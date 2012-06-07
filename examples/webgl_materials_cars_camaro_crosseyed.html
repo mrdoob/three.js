@@ -36,6 +36,8 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="js/effects/CrosseyedEffect.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
@@ -48,7 +50,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, effect;
 
 			var lightMesh;
 
@@ -78,7 +80,7 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x555555 );
+				var ambient = new THREE.AmbientLight( 0x020202 );
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
@@ -97,11 +99,13 @@
 				scene.add( lightMesh );
 
 
-				renderer = new THREE.CrosseyedWebGLRenderer( { separation: 20, antialias: true } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setFaceCulling( 0 );
-
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.CrosseyedEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.separation = 20;
 
 
 				stats = new Stats();
@@ -207,14 +211,14 @@
 				switch( event.keyCode ) {
 
 					/* O */
-					case 79: renderer.separation -= 0.5; break;
+					case 79: effect.separation -= 0.5; break;
 
 					/* P */
-					case 80: renderer.separation += 0.5; break;
+					case 80: effect.separation += 0.5; break;
 
 				}
 
-				console.log( renderer.separation );
+				console.log( effect.separation );
 
 			};
 
@@ -241,7 +245,7 @@
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );
 
-				renderer.render( scene, camera );
+				effect.render( scene, camera );
 
 			}
 

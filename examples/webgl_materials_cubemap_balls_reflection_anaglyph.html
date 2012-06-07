@@ -37,6 +37,8 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="js/effects/AnaglyphEffect.js"></script>
+
 		<script src="js/Detector.js"></script>
 
 		<script>
@@ -45,9 +47,9 @@
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, effect;
 
-			var mesh, zmesh, lightMesh, geometry;
+			var mesh, lightMesh, geometry;
 			var spheres = [];
 
 			var directionalLight, pointLight;
@@ -122,9 +124,11 @@
 
 				//
 
-				renderer = new THREE.AnaglyphWebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer();
 				container.appendChild( renderer.domElement );
+
+				effect = new THREE.AnaglyphEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -163,7 +167,7 @@
 
 				}
 
-				renderer.render( scene, camera );
+				effect.render( scene, camera );
 
 			}
 

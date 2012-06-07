@@ -1,0 +1,55 @@
+<h1>[name]</h1>
+
+<div class="desc">
+	Mainly used internaly by [page:CanvasRenderer] for 2D clipping.
+</div>
+
+
+<h2>Constructor</h2>
+
+<h3>[name]()</h3>
+
+
+<h2>Methods</h2>
+
+<h3>.getX() [page:Float]</h3>
+
+<h3>.getY() [page:Float]</h3>
+
+<h3>.getWidth() [page:Float]</h3>
+
+<h3>.getHeight() [page:Float]</h3>
+
+<h3>.getLeft() [page:Float]</h3>
+
+<h3>.getTop() [page:Float]</h3>
+
+<h3>.getRight() [page:Float]</h3>
+
+<h3>.getBottom() [page:Float]</h3>
+
+<h3>.set( [page:Float left], [page:Float top], [page:Float right], [page:Float bottom] )</h3>
+
+<h3>.addPoint( [page:Float x], [page:Float y] )</h3>
+
+<h3>.add3Points( [page:Float x1], [page:Float y1], [page:Float x2], [page:Float y2], [page:Float x3], [page:Float y3] )</h3>
+
+<h3>.addRectangle( [page:Rectangle r] )</h3>
+
+<h3>.inflate( [page:Float v] )</h3>
+
+<h3>.minSelf( [page:Rectangle r] )</h3>
+
+<h3>.intersects( [page:Rectangle r] ) [page:Boolean]</h3>
+<div>
+Adapted from [link:http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/].
+</div>
+
+<h3>.empty()</h3>
+
+<h3>.isEmpty() [page:Boolean]</h3>
+
+
+<h2>Source</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

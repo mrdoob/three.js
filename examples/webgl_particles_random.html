@@ -32,7 +32,7 @@
 	</head>
 	<body>
 
-        <div id="info">
+		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl particles example
 		</div>
 
@@ -71,8 +71,12 @@
 
 				for ( i = 0; i < 20000; i ++ ) {
 
-					vector = new THREE.Vector3( Math.random() * 2000 - 1000, Math.random() * 2000 - 1000, Math.random() * 2000 - 1000 );
-					geometry.vertices.push( new THREE.Vertex( vector ) );
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 2000 - 1000;
+					vertex.y = Math.random() * 2000 - 1000;
+					vertex.z = Math.random() * 2000 - 1000;
+
+					geometry.vertices.push( vertex );
 
 				}
 
@@ -167,13 +171,19 @@
 
 				camera.lookAt( scene.position );
 
-				for( i = 0; i < scene.objects.length; i ++ ) {
+				for ( i = 0; i < scene.children.length; i ++ ) {
 
-					scene.objects[i].rotation.y = time * ( i < 4 ? i+1 : - (i+1) );
+					var object = scene.children[ i ];
+
+					if ( object instanceof THREE.ParticleSystem ) {
+
+						object.rotation.y = time * ( i < 4 ? i + 1 : - ( i + 1 ) );
+
+					}
 
 				}
 
-				for( i = 0; i < materials.length; i ++ ) {
+				for ( i = 0; i < materials.length; i ++ ) {
 
 					color = parameters[i][0];
 

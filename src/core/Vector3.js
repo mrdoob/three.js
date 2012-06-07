@@ -63,18 +63,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	clone: function () {
+	add: function ( a, b ) {
 
-		return new THREE.Vector3( this.x, this.y, this.z );
-
-	},
-
-
-	add: function ( v1, v2 ) {
-
-		this.x = v1.x + v2.x;
-		this.y = v1.y + v2.y;
-		this.z = v1.z + v2.z;
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+		this.z = a.z + b.z;
 
 		return this;
 
@@ -100,11 +93,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	sub: function ( v1, v2 ) {
+	sub: function ( a, b ) {
 
-		this.x = v1.x - v2.x;
-		this.y = v1.y - v2.y;
-		this.z = v1.z - v2.z;
+		this.x = a.x - b.x;
+		this.y = a.y - b.y;
+		this.z = a.z - b.z;
 
 		return this;
 
@@ -183,7 +176,7 @@ THREE.Vector3.prototype = {
 
 	negate: function() {
 
-		return this.multiplyScalar( -1 );
+		return this.multiplyScalar( - 1 );
 
 	},
 
@@ -207,10 +200,7 @@ THREE.Vector3.prototype = {
 
 	lengthManhattan: function () {
 
-		// correct version
-		// return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
-
-		return this.x + this.y + this.z;
+		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 
 	},
 
@@ -226,6 +216,15 @@ THREE.Vector3.prototype = {
 
 	},
 
+	lerpSelf: function ( v, alpha ) {
+
+		this.x += ( v.x - this.x ) * alpha;
+		this.y += ( v.y - this.y ) * alpha;
+		this.z += ( v.z - this.z ) * alpha;
+
+		return this;
+
+	},
 
 	cross: function ( a, b ) {
 
@@ -249,7 +248,6 @@ THREE.Vector3.prototype = {
 
 	},
 
-
 	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
@@ -262,32 +260,114 @@ THREE.Vector3.prototype = {
 
 	},
 
+	getPositionFromMatrix: function ( m ) {
 
-	setPositionFromMatrix: function ( m ) {
+		this.x = m.elements[12];
+		this.y = m.elements[13];
+		this.z = m.elements[14];
 
-		this.x = m.n14;
-		this.y = m.n24;
-		this.z = m.n34;
+		return this;
 
 	},
 
-	setRotationFromMatrix: function ( m ) {
+	getRotationFromMatrix: function ( m, scale ) {
+
+		var sx = scale ? scale.x : 1;
+		var sy = scale ? scale.y : 1;
+		var sz = scale ? scale.z : 1;
+
+		var m11 = m.elements[0] / sx, m12 = m.elements[4] / sy, m13 = m.elements[8] / sz;
+		var m21 = m.elements[1] / sx, m22 = m.elements[5] / sy, m23 = m.elements[9] / sz;
+		var m33 = m.elements[10] / sz;
+
+		this.y = Math.asin( m13 );
 
 		var cosY = Math.cos( this.y );
 
-		this.y = Math.asin( m.n13 );
-
 		if ( Math.abs( cosY ) > 0.00001 ) {
 
-			this.x = Math.atan2( - m.n23 / cosY, m.n33 / cosY );
-			this.z = Math.atan2( - m.n12 / cosY, m.n11 / cosY );
+			this.x = Math.atan2( - m23 / cosY, m33 / cosY );
+			this.z = Math.atan2( - m12 / cosY, m11 / cosY );
 
 		} else {
 
 			this.x = 0;
-			this.z = Math.atan2( m.n21, m.n22 );
+			this.z = Math.atan2( m21, m22 );
 
 		}
+
+		return this;
+
+	},
+
+	/*
+
+	// from http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
+	// order XYZ
+
+	getEulerXYZFromQuaternion: function ( q ) {
+
+		this.x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z ) );
+		this.y = Math.asin( 2 *  ( q.x * q.z + q.y * q.w ) );
+		this.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z ) );
+
+	},
+
+	// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToEuler/index.htm
+	// order YZX (assuming heading == y, attitude == z, bank == x)
+
+	getEulerYZXFromQuaternion: function ( q ) {
+
+		var sqw = q.w * q.w;
+		var sqx = q.x * q.x;
+		var sqy = q.y * q.y;
+		var sqz = q.z * q.z;
+		var unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
+		var test = q.x * q.y + q.z * q.w;
+
+		if ( test > 0.499 * unit ) { // singularity at north pole
+
+			this.y = 2 * Math.atan2( q.x, q.w );
+			this.z = Math.PI / 2;
+			this.x = 0;
+
+			return;
+
+		}
+
+		if ( test < -0.499 * unit ) { // singularity at south pole
+
+			this.y = -2 * Math.atan2( q.x, q.w );
+			this.z = -Math.PI / 2;
+			this.x = 0;
+
+			return;
+
+		}
+
+		this.y = Math.atan2( 2 * q.y * q.w - 2 * q.x * q.z, sqx - sqy - sqz + sqw );
+		this.z = Math.asin( 2 * test / unit );
+		this.x = Math.atan2( 2 * q.x * q.w - 2 * q.y * q.z, -sqx + sqy - sqz + sqw );
+
+	},
+
+	*/
+
+	getScaleFromMatrix: function ( m ) {
+
+		var sx = this.set( m.elements[0], m.elements[1], m.elements[2] ).length();
+		var sy = this.set( m.elements[4], m.elements[5], m.elements[6] ).length();
+		var sz = this.set( m.elements[8], m.elements[9], m.elements[10] ).length();
+
+		this.x = sx;
+		this.y = sy;
+		this.z = sz;
+
+	},
+
+	equals: function ( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
 
 	},
 
@@ -295,6 +375,13 @@ THREE.Vector3.prototype = {
 
 		return ( this.lengthSq() < 0.0001 /* almostZero */ );
 
+	},
+
+	clone: function () {
+
+		return new THREE.Vector3( this.x, this.y, this.z );
+
 	}
 
 };
+

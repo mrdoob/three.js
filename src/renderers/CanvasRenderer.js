@@ -4,6 +4,8 @@
 
 THREE.CanvasRenderer = function ( parameters ) {
 
+	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
+
 	parameters = parameters || {};
 
 	var _this = this,
@@ -120,19 +122,19 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	};
 
-	this.setClearColor = function( color, opacity ) {
+	this.setClearColor = function ( color, opacity ) {
 
 		_clearColor.copy( color );
-		_clearOpacity = opacity;
+		_clearOpacity = opacity !== undefined ? opacity : 1;
 
 		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
-	this.setClearColorHex = function( hex, opacity ) {
+	this.setClearColorHex = function ( hex, opacity ) {
 
 		_clearColor.setHex( hex );
-		_clearOpacity = opacity;
+		_clearOpacity = opacity !== undefined ? opacity : 1;
 
 		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
 
@@ -204,7 +206,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			material = element.material;
 			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
 
-			if ( material == null || material.opacity == 0 ) continue;
+			if ( material === undefined || material.visible === false ) continue;
 
 			_bboxRect.empty();
 
@@ -527,7 +529,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshBasicMaterial ) {
 
-				if ( material.map/* && !material.wireframe*/ ) {
+				if ( material.map ) {
 
 					if ( material.map.mapping instanceof THREE.UVMapping ) {
 
@@ -544,16 +546,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 						var cameraMatrix = camera.matrixWorldInverse;
 
 						_vector3.copy( element.vertexNormalsWorld[ uv1 ] );
-						_uv1x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
-						_uv1y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
+						_uv1x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
+						_uv1y = - ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
 
 						_vector3.copy( element.vertexNormalsWorld[ uv2 ] );
-						_uv2x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
-						_uv2y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
+						_uv2x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
+						_uv2y = - ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
 
 						_vector3.copy( element.vertexNormalsWorld[ uv3 ] );
-						_uv3x = ( _vector3.x * cameraMatrix.n11 + _vector3.y * cameraMatrix.n12 + _vector3.z * cameraMatrix.n13 ) * 0.5 + 0.5;
-						_uv3y = - ( _vector3.x * cameraMatrix.n21 + _vector3.y * cameraMatrix.n22 + _vector3.z * cameraMatrix.n23 ) * 0.5 + 0.5;
+						_uv3x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
+						_uv3y = - ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
 
 						patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
@@ -571,19 +573,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 				}
 
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-				if ( material.map && !material.wireframe ) {
-
-					if ( material.map.mapping instanceof THREE.UVMapping ) {
-
-						_uvs = element.uvs[ 0 ];
-						patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uvs[ uv1 ].u, _uvs[ uv1 ].v, _uvs[ uv2 ].u, _uvs[ uv2 ].v, _uvs[ uv3 ].u, _uvs[ uv3 ].v, material.map );
-
-					}
-
-					setBlending( THREE.SubtractiveBlending );
-
-				}
 
 				if ( _enableLighting ) {
 
@@ -1063,12 +1052,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 				case THREE.AdditiveBlending:
 
 					_context.globalCompositeOperation = 'lighter';
-
-					break;
-
-				case THREE.SubtractiveBlending:
-
-					_context.globalCompositeOperation = 'darker';
 
 					break;
 

@@ -55,10 +55,10 @@
 
 				for ( var i = 0; i < 2000; i ++ ) {
 
-					var vertex = new THREE.Vertex();
-					vertex.position.x = Math.random() * 4000 - 2000;
-					vertex.position.y = Math.random() * 4000 - 2000;
-					vertex.position.z = Math.random() * 4000 - 2000;
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 4000 - 2000;
+					vertex.y = Math.random() * 4000 - 2000;
+					vertex.z = Math.random() * 4000 - 2000;
 					geometry.vertices.push( vertex );
 
 					geometry.colors.push( new THREE.Color( colors[ Math.floor( Math.random() * colors.length ) ] ) );

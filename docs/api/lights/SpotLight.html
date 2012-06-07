@@ -1,0 +1,39 @@
+[page:Object3D] &rarr; [page:Light] &rarr;
+
+<h1>[name]</h1>
+
+<div class="desc">todo</div>
+
+
+<h2>Example</h2>
+
+<code>// white spotlight shining from the side, casting shadow
+
+var spotLight = new THREE.SpotLight( 0xffffff );
+spotLight.position.set( 100, 1000, 100 );
+
+spotLight.castShadow = true;
+
+spotLight.shadowMapWidth = 1024;
+spotLight.shadowMapHeight = 1024;
+
+spotLight.shadowCameraNear = 500;
+spotLight.shadowCameraFar = 4000;
+spotLight.shadowCameraFov = 30;
+
+scene.add( spotLight );</code>
+
+
+<h2>Constructor</h2>
+
+<h3>[name]()</h3>
+
+
+<h2>Properties</h2>
+
+<h3>.[page:Vector3 todo]</h3>
+
+
+<h2>Source</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

@@ -140,11 +140,38 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 
 	var args = Array.prototype.slice.call( arguments );
 
+	var laste = this.actions[ this.actions.length - 1];
+
+	var curve = new THREE.ArcCurve( laste.x + aX, laste.y + aY, aRadius,
+									aStartAngle, aEndAngle, aClockwise );
+	this.curves.push( curve );
+
+	// All of the other actions look to the last two elements in the list to
+	// find the ending point, so we need to append them.
+	var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
+	args.push(lastPoint.x);
+	args.push(lastPoint.y);
+
+	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
+
+ };
+
+THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
+
+	var args = Array.prototype.slice.call( arguments );
+
 	var curve = new THREE.ArcCurve( aX, aY, aRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
 
 	// console.log( 'arc', args );
+
+        // All of the other actions look to the last two elements in the list to
+        // find the ending point, so we need to append them.
+        var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
+        args.push(lastPoint.x);
+        args.push(lastPoint.y);
 
 	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
 
@@ -179,6 +206,11 @@ THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
 THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
+	if (this.useSpacedPoints) {
+		console.log('tata');
+		return this.getSpacedPoints( divisions, closedPath );
+	}
+
 	divisions = divisions || 12;
 
 	var points = [];
@@ -199,7 +231,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 		case THREE.PathActions.MOVE_TO:
 
-			// points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
+			points.push( new THREE.Vector2( args[ 0 ], args[ 1 ] ) );
 
 			break;
 
@@ -317,15 +349,6 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
 				aClockwise = !!args[ 5 ];
 
-			var lastx = laste[ laste.length - 2 ],
-				lasty = laste[ laste.length - 1 ];
-
-			if ( laste.length == 0 ) {
-
-				lastx = lasty = 0;
-
-			}
-
 
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
@@ -343,8 +366,8 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				angle = aStartAngle + t * deltaAngle;
 
-				tx = lastx + aX + aRadius * Math.cos( angle );
-				ty = lasty + aY + aRadius * Math.sin( angle );
+				tx = aX + aRadius * Math.cos( angle );
+				ty = aY + aRadius * Math.sin( angle );
 
 				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
@@ -360,6 +383,14 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 	}
 
+
+
+	// Normalize to remove the closing point by default.
+	var lastPoint = points[ points.length - 1];
+	var EPSILON = 0.0000000001;
+	if ( Math.abs(lastPoint.x - points[ 0 ].x) < EPSILON &&
+             Math.abs(lastPoint.y - points[ 0 ].y) < EPSILON)
+		points.splice( points.length - 1, 1);
 	if ( closedPath ) {
 
 		points.push( points[ 0 ] );

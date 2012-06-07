@@ -1,0 +1,319 @@
+<h1>[name]</h1>
+
+<div class="desc">The WebGL renderer displays your beautifully crafted scenes using WebGL, if your device supports it.</div>
+<div class="desc">This renderer has way better performance than [page:CanvasRenderer].</div>
+
+
+<h2>Constructor</h2>
+
+<h3>[name]( [page:Object parameters] )</h3>
+
+<div>parameters is an optional object with properties defining the renderer's behaviour. The constructor also accepts no parameters at all. In all cases, it will assume sane defaults when parameters are missing.</div>
+
+<div>
+canvas — A [page:Canvas] where the renderer draws its output.<br />
+precision — shader precision. Can be *"highp"*, *"mediump"* or *"lowp"*.<br />
+alpha — [page:Boolean], default is *true*.<br />
+premultipliedAlpha — [page:Boolean], default is *true*.<br />
+antialias — [page:Boolean], default is *false*.<br />
+stencil — [page:Boolean], default is *true*.<br />
+preserveDrawingBuffer — [page:Boolean], default is *false*.<br />
+clearColor — [page:Integer], default is *0x000000*.<br />
+clearAlpha — [page:Float], default is *0*.<br />
+maxLights — [page:Integer], default is *4*.<br />
+</div>
+
+<h2>Properties</h2>
+
+<h3>.[page:DOMElement domElement]</h3>
+
+<div>A [page:Canvas] where the renderer draws its output.<br />
+This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.</div>
+
+<h3>.context</h3>
+
+<div>The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.</div>
+
+<h3>.[page:Boolean autoClear]</h3>
+
+<div>Defines whether the renderer should automatically clear its output before rendering.</div>
+
+
+<h3>.[page:Boolean autoClearColor]</h3>
+
+<div>If autoClear is true, defines whether the renderer should clear the color buffer. Default is true.</div>
+
+
+<h3>.[page:Boolean autoClearDepth]</h3>
+
+<div>If autoClear is true, defines whether the renderer should clear the depth buffer. Default is true.</div>
+
+
+<h3>.[page:Boolean autoClearStencil]</h3>
+
+<div>If autoClear is true, defines whether the renderer should clear the stencil buffer. Default is true.</div>
+
+
+<h3>.[page:Boolean sortObjects]</h3>
+
+<div>Defines whether the renderer should sort objects. Default is true.</div>
+
+<div>TODO</div>
+
+
+<h3>.[page:Boolean autoUpdateObjects]</h3>
+
+<div>Defines whether the renderer should auto update objects. Default is true.</div>
+
+<div>TODO</div>
+
+
+<h3>.[page:Boolean autoUpdateScene]</h3>
+
+<div>Defines whether the renderer should auto update the scene. Default is true.</div>
+
+<div>TODO</div>
+
+<!-- Physically based shading -->
+
+<h3>.[page:Boolean gammaInput]</h3>
+
+<div>Default is false. TODO</div>
+
+
+<h3>.[page:Boolean gammaOutput]</h3>
+
+<div>Default is false. TODO</div>
+
+
+<h3>.[page:Boolean physicallyBasedShading]</h3>
+
+<div>Default is false. TODO</div>
+
+
+<h3>.[page:Boolean shadowMapEnabled]</h3>
+
+<div>Default is false. TODO</div>
+
+
+<h3>.[page:Boolean shadowMapAutoUpdate]</h3>
+
+<div>Default is true. TODO</div>
+
+
+<h3>.[page:Boolean shadowMapSoft]</h3>
+
+<div>Default is true. TODO</div>
+
+
+<h3>.[page:Boolean shadowMapCullFrontFaces]</h3>
+
+<div>Default is true. TODO</div>
+
+
+<h3>.[page:Boolean shadowMapDebug]</h3>
+
+<div>Default is false. TODO</div>
+
+
+<h3>.[page:Boolean shadowMapCascade]</h3>
+
+<div>Default is false. TODO</div>
+
+
+<h3>.[page:Integer maxMorphTargets]</h3>
+
+<div>Default is 8. TODO</div>
+
+
+<h3>.[page:Integer maxMorphNormals]</h3>
+
+<div>Default is 4. TODO</div>
+
+
+<h3>.[page:Boolean autoScaleCubemaps]</h3>
+
+<div>Default is true. TODO</div>
+
+
+<h3>.[page:Boolean renderPluginsPre]</h3>
+
+<div>An array with render plugins to be applied before rendering.</div>
+<div>Default is an empty array, or [].</div>
+
+
+<h3>.[page:Boolean renderPluginsPost]</h3>
+
+<div>An array with render plugins to be applied after rendering.</div>
+<div>Default is an empty array, or [].</div>
+
+
+<h3>.[page:Object info]</h3>
+
+<div>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</div>
+<div>
+<ul>
+	<li>memory:
+		<ul>
+			<li>programs</li>
+			<li>geometries</li>
+			<li>textures</li>
+		</ul>
+	</li>
+	<li>render:
+		<ul>
+			<li>calls</li>
+			<li>vertices</li>
+			<li>faces</li>
+			<li>points</li>
+		</ul>
+	</li>
+</ul>
+</div>
+
+<h2>Methods</h2>
+
+<h3>.getContext()</h3>
+<div>
+Return the WebGL context.
+</div>
+
+<h3>.supportsVertexTextures()</h3>
+<div>
+Return a [page:Boolean] true if the context supports vertex textures.
+</div>
+
+
+<h3>.setSize( [page:Integer width], [page:Integer height] )</h3>
+<div>Resizes the output canvas to (width, height), and also sets the viewport to fit that size, starting in (0, 0).</div>
+
+<h3>.setViewport( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
+<div>Sets the viewport to render from (x, y) to (x + width, y + height).</div>
+
+
+<h3>.setScissor( [page:Integer x], [page:Integer y], [page:Integer width], [page:Integer height] )</h3>
+<div>Sets the scissor area from (x, y) to (x + width, y + height).</div>
+
+<h3>.enableScissorTest( [page:Boolean enable] )</h3>
+<div>Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
+
+
+<h3>.setClearColorHex( [page:Integer hex], [page:Float alpha] )</h3>
+<div>Sets the clear color, using hex for the color and alpha for the opacity.</div>
+
+<code>// Creates a renderer with black background
+var renderer = new THREE.WebGLRenderer();
+renderer.setSize(200, 100);
+renderer.setClearColorHex(0x000000, 1);
+</code>
+
+<h3>.setClearColor( [page:Color color], [page:Float alpha] )</h3>
+<div>Sets the clear color, using color for the color and alpha for the opacity.</div>
+
+<h3>.getClearColor() [page:Color]</h3>
+<div>Returns a [page:Color THREE.Color] instance with the current clear color.</div>
+
+
+<h3>.getClearAlpha() [page:Float]</h3>
+<div>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</div>
+
+<h3>.clear( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
+<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
+<div>If no parameters are passed, no buffer will be cleared.</div>
+
+
+<h3>.addPostPlugin( plugin )</h3>
+<div>Initialises the postprocessing plugin, and adds it to the renderPluginsPost array.</div>
+
+<h3>.addPrePlugin( plugin )</h3>
+<div>Initialises the preprocessing plugin, and adds it to the renderPluginsPre array.</div>
+
+<h3>.deallocateObject( [page:Object3D object] )</h3>
+<div>object — an instance of [page:Object3D]</div>
+<div>Removes an object from the GL context and releases all the data (geometry, matrices...) that the GL context keeps about the object, but it doesn't release textures or affect any JavaScript data.</div>
+
+<h3>.deallocateTexture( [page:??? texture] )</h3>
+<div>texture — an instance of [page:???] TODO</div>
+<div>Releases a texture from the GL context.</div>
+
+<h3>.deallocateRenderTarget( [page:WebGLRenderTarget renderTarget] )</h3>
+<div>renderTarget — an instance of [page:WebGLRenderTarget]</div>
+<div>Releases a render target from the GL context.</div>
+
+<h3>.updateShadowMap( [page:Scene scene], [page:Camera camera] )</h3>
+<div>scene — an instance of [page:Scene]<br />
+camera — an instance of [page:Camera]</div>
+<div>Tells the shadow map plugin to update using the passed scene and camera parameters.</div>
+
+
+<h3>.renderBufferImmediate( [page:Object3D object], [page:??? program], [page:??? shading] )</h3>
+<div>object — an instance of [page:Object3D]]<br />
+program — an instance of ???<br />
+shading — an instance of ???<br />
+</div>
+<div>TODO.</div>
+
+
+<h3>.renderBufferDirect(  camera, lights, fog, material, geometryGroup, object )</h3>
+<div>TODO.</div>
+
+
+<h3>.renderBuffer( camera, lights, fog, material, geometryGroup, object )</h3>
+<div>TODO.</div>
+
+
+<h3>.render( [page:Scene scene], [page:Camera camera], [page:WebGLRenderTarget renderTarget], [page:Boolean forceClear] )</h3>
+<div>Render a scene using a camera.</div>
+<div>The render is done to the renderTarget (if specified) or to the canvas as usual.</div>
+<div>If forceClear is true, the canvas will be cleared before rendering, even if the renderer's autoClear property is false.</div>
+
+
+<h3>.renderImmediateObject( camera, lights, fog, material, object )</h3>
+<div>TODO.</div>
+
+
+<h3>.initWebGLObjects( [page:Scene scene] )</h3>
+<div>TODO.</div>
+
+
+<h3>.initMaterial( material, lights, fog, object )</h3>
+<div>TODO.</div>
+
+
+<h3>.setFaceCulling( cullFace, frontFace )</h3>
+<div>
+[page:String cullFace] — "back", "front", "front_and_back", or false.<br />
+[page:String frontFace] — "ccw" or "cw<br />
+</div>
+<div>Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.</div>
+<div>If cullFace is false, culling will be disabled.</div>
+
+
+<h3>.setObjectFaces( object )</h3>
+<div>TODO.</div>
+
+
+<h3>.setDepthTest( depthTest )</h3>
+<div>TODO.</div>
+
+
+<h3>.setDepthWrite( depthWrite )</h3>
+<div>TODO.</div>
+
+
+<h3>.setBlending( blending, blendEquation, blendSrc, blendDst )</h3>
+<div>TODO.</div>
+
+
+<h3>.setTexture( texture, slot )</h3>
+<div>TODO.</div>
+
+
+<h3>.setRenderTarget( renderTarget )</h3>
+<div>TODO.</div>
+
+
+
+<h2>Source</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

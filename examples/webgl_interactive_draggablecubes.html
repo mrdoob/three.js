@@ -22,7 +22,7 @@
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, renderer;
+			var camera, controls, scene, projector, renderer;
 			var objects = [], plane;
 
 			var mouse = new THREE.Vector2(),
@@ -42,6 +42,15 @@
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 				scene.add( camera );
+
+				controls = new THREE.TrackballControls( camera );
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+				controls.noZoom = false;
+				controls.noPan = false;
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
@@ -91,7 +100,7 @@
 				}
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
-				plane.lookAt( camera.position );
+				plane.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 				plane.visible = false;
 				scene.add( plane );
 
@@ -161,6 +170,7 @@
 						INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
 
 						plane.position.copy( INTERSECTED.position );
+						plane.lookAt( camera.position );
 
 					}
 
@@ -191,6 +201,8 @@
 
 				if ( intersects.length > 0 ) {
 
+					controls.enabled = false;
+
 					SELECTED = intersects[ 0 ].object;
 
 					var intersects = ray.intersectObject( plane );
@@ -205,6 +217,8 @@
 			function onDocumentMouseUp( event ) {
 
 				event.preventDefault();
+
+				controls.enabled = true;
 
 				if ( INTERSECTED ) {
 
@@ -230,6 +244,8 @@
 			}
 
 			function render() {
+
+				controls.update();
 
 				renderer.render( scene, camera );
 

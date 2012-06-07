@@ -1,0 +1,63 @@
+<h1>[name]</h1>
+
+<div class="desc">Math utility functions</div>
+
+
+<h2>Methods</h2>
+
+<h3>.clamp( [page:Float x], [page:Float a], [page:Float b] ) [page:Float]</h3>
+<div>
+x — Value to be clamped.<br />
+a — Minimum value<br />
+b — Maximum value.
+</div>
+<div>
+Clamps the *x* to be between *a* and *b*.
+</div>
+
+<h3>.clampBottom( [page:Float x], [page:Float a] ) [page:Float]</h3>
+<div>
+x — Value to be clamped.<br />
+a — Minimum value
+</div>
+<div>
+Clamps the *x* to be larger than *a*.
+</div>
+
+<h3>.mapLinear( [page:Float x], [page:Float a] ) [page:Float]</h3>
+<div>
+x — Value to be mapped.<br />
+a1 — Minimum value for range A.<br />
+a2 — Maximum value for range A.<br />
+b1 — Minimum value for range B.<br />
+b2 — Maximum value for range B.
+</div>
+<div>
+Linear mapping of *x* from range [*a1*, *a2*] to range [*b1*, *b2*].
+</div>
+
+<h3>.random16() [page:Float]</h3>
+<div>
+Random float from 0 to 1 with 16 bits of randomness.<br />
+Standard Math.random() creates repetitive patterns when applied over larger space.
+</div>
+
+<h3>.randInt( [page:Integer low], [page:Integer high] ) [page:Integer]</h3>
+<div>
+Random integer from *low* to *high* interval.
+</div>
+
+<h3>.randFloat( [page:Float low], [page:Float high] ) [page:Float]</h3>
+<div>
+Random float from *low* to *high* interval.
+</div>
+
+<h3>.randFloatSpread( [page:Float range] ) [page:Float]</h3>
+<div>
+Random float from *- range / 2* to *range / 2* interval.
+</div>
+
+
+<h2>Source</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

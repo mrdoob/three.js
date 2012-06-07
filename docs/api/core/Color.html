@@ -1,0 +1,120 @@
+<h1>[name]</h1>
+
+<div class="desc">
+Represents a color. See also [page:ColorUtils].
+</div>
+
+
+<h2>Example</h2>
+
+<code>var color = new THREE.Color( 0xff0000 );</code>
+
+
+<h2>Constructor</h2>
+
+<h3>[name]( [page:Integer hex])</h3>
+<div>
+hex — initial color in hexadecimal<br />
+</div>
+
+<h2>Properties</h2>
+
+<h3>.[page:Float r]</h3>
+<div>
+Red channel value between 0 and 1. Default is 1.
+</div>
+
+<h3>.[page:Float g]</h3>
+<div>
+Green channel value between 0 and 1. Default is 1.
+</div>
+
+<h3>.[page:Float b]</h3>
+<div>
+Blue channel value between 0 and 1. Default is 1.
+</div>
+
+<h2>Methods</h2>
+
+<h3>.copy( [page:Color color] ) [page:this]</h3>
+<div>
+color — Color to copy.
+</div>
+<div>
+Copies given color.
+</div>
+
+<h3>.copyGammaToLinear( [page:Color color] ) [page:this]</h3>
+<div>
+color — Color to copy.
+</div>
+<div>
+Copies given color making conversion from gamma to linear space.
+</div>
+
+<h3>.copyLinearToGamma( [page:Color color] ) [page:this]</h3>
+<div>
+color — Color to copy.
+</div>
+<div>
+Copies given color making conversion from linear to gamma space.
+</div>
+
+<h3>.convertGammaToLinear() [page:this]</h3>
+<div>
+Converts this color from gamma to linear space.
+</div>
+
+<h3>.convertLinearToGamma() [page:this]</h3>
+<div>
+Converts this color from linear to gamma space.
+</div>
+
+<h3>.setRGB( [page:Float r], [page:Float g], [page:Float b] ) [page:this]</h3>
+<div>
+r — Red channel value between 0 and 1.<br />
+g — Green channel value between 0 and 1.<br />
+b — Blue channel value between 0 and 1.
+</div>
+<div>
+Sets this color from RGB values.
+</div>
+
+<h3>.setHSV( [page:Float h], [page:Float s], [page:Float v] ) [page:this]</h3>
+<div>
+h — Hue channel value between 0 and 1.<br />
+s — Saturation value channel between 0 and 1.<br />
+v — Value channel value between 0 and 1.
+</div>
+<div>
+Sets this color from HSV values.<br />
+Based on MochiKit implementation by Bob Ippolito.
+</div>
+
+<h3>.setHex( [page:Integer hex] ) [page:this]</h3>
+<div>
+hex — Color in hexadecimal.<br />
+</div>
+<div>
+Sets this color from a hexadecimal value.
+</div>
+
+<h3>.getHex() [page:Integer]</h3>
+<div>
+Returns the value of this color in hexadecimal.
+</div>
+
+<h3>.getContextStyle() [page:String]</h3>
+<div>
+Returns the value of this color in CSS context style.<br />
+Example: rgb(r, g, b)
+</div>
+
+<h3>.clone() [page:Color]</h3>
+<div>
+Clones this color.
+</div>
+
+<h2>Source</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

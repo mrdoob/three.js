@@ -66,18 +66,15 @@
 
 				// Plane
 
-				var material = new THREE.MeshDepthMaterial();
+				var material = new THREE.MeshDepthMaterial( { overdraw: true } );
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
-				plane.overdraw = true;
 				plane.doubleSided = true;
-
-				plane.rotation.x = - 90 * ( Math.PI / 180 );
 				plane.position.y = - 100;
 
 				scene.add( plane );
 
-				// Spheres
+				// Cubes
 
 				geometry = new THREE.CubeGeometry( 100, 100, 100 );
 				material = new THREE.MeshDepthMaterial( { near: 1, far: 2000, overdraw: true } );

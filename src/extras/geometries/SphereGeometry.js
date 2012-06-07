@@ -29,11 +29,12 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 			var u = x / segmentsX;
 			var v = y / segmentsY;
 
-			var xpos = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-			var ypos = radius * Math.cos( thetaStart + v * thetaLength );
-			var zpos = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			var vertex = new THREE.Vector3();
+			vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
+			vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
-			this.vertices.push( new THREE.Vertex( new THREE.Vector3( xpos, ypos, zpos ) ) );
+			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
 			uvsRow.push( new THREE.UV( u, v ) );
@@ -54,22 +55,22 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 			var v3 = vertices[ y + 1 ][ x ];
 			var v4 = vertices[ y + 1 ][ x + 1 ];
 
-			var n1 = this.vertices[ v1 ].position.clone().normalize();
-			var n2 = this.vertices[ v2 ].position.clone().normalize();
-			var n3 = this.vertices[ v3 ].position.clone().normalize();
-			var n4 = this.vertices[ v4 ].position.clone().normalize();
+			var n1 = this.vertices[ v1 ].clone().normalize();
+			var n2 = this.vertices[ v2 ].clone().normalize();
+			var n3 = this.vertices[ v3 ].clone().normalize();
+			var n4 = this.vertices[ v4 ].clone().normalize();
 
 			var uv1 = uvs[ y ][ x + 1 ].clone();
 			var uv2 = uvs[ y ][ x ].clone();
 			var uv3 = uvs[ y + 1 ][ x ].clone();
 			var uv4 = uvs[ y + 1 ][ x + 1 ].clone();
 
-			if ( Math.abs( this.vertices[ v1 ].position.y ) == radius ) {
+			if ( Math.abs( this.vertices[ v1 ].y ) == radius ) {
 
 				this.faces.push( new THREE.Face3( v1, v3, v4, [ n1, n3, n4 ] ) );
 				this.faceVertexUvs[ 0 ].push( [ uv1, uv3, uv4 ] );
 
-			} else if ( Math.abs( this.vertices[ v3 ].position.y ) ==  radius ) {
+			} else if ( Math.abs( this.vertices[ v3 ].y ) ==  radius ) {
 
 				this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );

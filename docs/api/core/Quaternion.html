@@ -1,0 +1,121 @@
+<h1>[name]</h1>
+
+<div class="desc">Implementation of a quaternion</div>
+
+
+<h2>Example</h2>
+
+<code>var q = new THREE.Quaternion();
+q.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+
+var v = new THREE.Vector3( 1, 0, 0 );
+q.multiplyVector3( v );
+</code>
+
+
+<h2>Constructor</h2>
+
+<h3>[name]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
+<div>
+x - x coordinate<br />
+y - y coordinate<br />
+z - z coordinate<br />
+w - w coordinate
+</div>
+
+
+<h2>Properties</h2>
+
+<h3>.[page:Float x]</h3>
+
+<h3>.[page:Float y]</h3>
+
+<h3>.[page:Float z]</h3>
+
+<h3>.[page:Float w]</h3>
+
+
+<h2>Methods</h2>
+
+<h3>.set( [page:Float x], [page:Float y], [page:Float z], [page:Float w] ) [page:Quaternion]</h3>
+<div>
+Sets values of this quaternion.
+</div>
+
+<h3>.copy( [page:Quaternion q] ) [page:Quaternion]</h3>
+<div>
+Copies values of *q* to this quaternion.
+</div>
+
+<h3>.setFromEuler( [page:Vector3 vector] ) [page:Quaternion]</h3>
+<div>
+Sets this quaternion from rotation specified by Euler angles.
+</div>
+
+<h3>.setFromAxisAngle( [page:Vector3 axis], [page:Float angle] ) [page:Quaternion]</h3>
+<div>
+Sets this quaternion from rotation specified by axis and angle.<br />
+Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm].<br />
+*Axis* have to be normalized, *angle* is in radians.
+</div>
+
+<h3>.setFromRotationMatrix( [page:Matrix4 m] ) [page:Quaternion]</h3>
+<div>
+Sets this quaternion from rotation component of *m*.
+Adapted from [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm].
+</div>
+
+<h3>.calculateW() [page:Quaternion]</h3>
+<div>
+Calculates *w* component of this quaternion.
+</div>
+
+<h3>.inverse() [page:Quaternion]</h3>
+<div>
+Inverts this quaternion.
+</div>
+
+<h3>.length() [page:Float]</h3>
+<div>
+Computes length of this quaternion.
+</div>
+
+<h3>.normalize() [page:Quaternion]</h3>
+<div>
+Normalizes this quaternion.
+</div>
+
+<h3>.multiply( [page:Quaternion a], [page:Quaternion b] ) [page:Quaternion]</h3>
+<div>
+Sets this quaternion to *a x b*<br />
+Adapted from [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm].
+</div>
+
+<h3>.multiplySelf( [page:Quaternion b] ) [page:Quaternion]</h3>
+<div>
+Multiplies this quaternion by *b*.
+</div>
+
+<h3>.multiplyVector3( [page:Vector3 vector], [page:Vector3 dest] ) [page:Quaternion]</h3>
+<div>
+Rotates *vector* by this quaternion into *dest*.<br />
+If *dest* is not specified, result goes to *vec*.
+</div>
+
+<h3>.clone() [page:Quaternion]</h3>
+<div>
+Clones this quaternion.
+</div>
+
+
+<h2>Static methods</h2>
+
+<h3>.slerp( [page:Quaternion qa], [page:Quaternion qb], [page:Quaternion qm], [page:Float t] ) [page:Quaternion]</h3>
+<div>
+Adapted from [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/].
+</div>
+
+
+<h2>Source</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

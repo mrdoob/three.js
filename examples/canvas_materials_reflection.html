@@ -35,7 +35,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - spherical reflection demo.<br />
-			Walt Disney head by <a href="http://www.davidoreilly.com/2009/01/walt-disneys-head-on-a-plate" target="_blank">David OReilly</a>. Reflection texture by <a href="http://kewlers.scene.org/" target="_blank">Kewlers</a>.
+			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>. Reflection texture by <a href="http://kewlers.scene.org/" target="_blank">Kewlers</a>.
 		</div>
 
 		<script src="../build/Three.js"></script>
@@ -89,7 +89,7 @@
 
 			function render() {
 
-				var time = new Date().getTime() * 0.0005;
+				var time = Date.now() * 0.0005;
 
 				if ( mesh ) mesh.rotation.y -= 0.01;
 

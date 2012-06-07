@@ -49,12 +49,6 @@ THREE.Projector = function() {
 
 	};
 
-	/**
-	 * Translates a 2D point from NDC to a THREE.Ray
-	 * that can be used for picking.
-	 * @vector - THREE.Vector3 that represents 2D point
-	 * @camera - THREE.Camera
-	 */
 	this.pickingRay = function ( vector, camera ) {
 
 		var end, ray, t;
@@ -88,7 +82,8 @@ THREE.Projector = function() {
 			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
 			( object.frustumCulled === false || _frustum.contains( object ) ) ) {
 
-				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
+				_vector3.copy( object.matrixWorld.getPosition() );
+				_projScreenMatrix.multiplyVector3( _vector3 );
 
 				_object = getNextObjectInPool();
 				_object.object = object;
@@ -98,7 +93,8 @@ THREE.Projector = function() {
 
 			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
 
-				_projScreenMatrix.multiplyVector3( _vector3.copy( object.position ) );
+				_vector3.copy( object.matrixWorld.getPosition() );
+				_projScreenMatrix.multiplyVector3( _vector3 );
 
 				_object = getNextObjectInPool();
 				_object.object = object;
@@ -130,9 +126,9 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sort ) {
 
-		var near = camera.near, far = camera.far,
+		var near = camera.near, far = camera.far, visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
-		objectMatrixWorld, objectMatrixWorldRotation, objectMaterial,
+		objectMatrixWorld, objectMatrixWorldRotation,
 		geometry, geometryMaterials, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
 		v1, v2, v3, v4;
@@ -166,7 +162,6 @@ THREE.Projector = function() {
 			object = _renderData.objects[ o ].object;
 
 			objectMatrixWorld = object.matrixWorld;
-			objectMaterial = object.material;
 
 			_vertexCount = 0;
 
@@ -183,7 +178,7 @@ THREE.Projector = function() {
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					_vertex = getNextVertexInPool();
-					_vertex.positionWorld.copy( vertices[ v ].position );
+					_vertex.positionWorld.copy( vertices[ v ] );
 
 					objectMatrixWorld.multiplyVector3( _vertex.positionWorld );
 
@@ -207,16 +202,24 @@ THREE.Projector = function() {
 						v2 = _vertexPool[ face.b ];
 						v3 = _vertexPool[ face.c ];
 
-						if ( v1.visible && v2.visible && v3.visible &&
-							( object.doubleSided || ( object.flipSided !=
-							( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
-							( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ) ) ) {
+						if ( v1.visible && v2.visible && v3.visible ) {
 
-							_face = getNextFace3InPool();
+							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
+								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
 
-							_face.v1.copy( v1 );
-							_face.v2.copy( v2 );
-							_face.v3.copy( v3 );
+							if ( object.doubleSided || visible != object.flipSided ) {
+
+								_face = getNextFace3InPool();
+
+								_face.v1.copy( v1 );
+								_face.v2.copy( v2 );
+								_face.v3.copy( v3 );
+
+							} else {
+
+								continue;
+
+							}
 
 						} else {
 
@@ -231,19 +234,28 @@ THREE.Projector = function() {
 						v3 = _vertexPool[ face.c ];
 						v4 = _vertexPool[ face.d ];
 
-						if ( v1.visible && v2.visible && v3.visible && v4.visible &&
-							( object.doubleSided || ( object.flipSided !=
-							( ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
-							( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||
-							( v2.positionScreen.x - v3.positionScreen.x ) * ( v4.positionScreen.y - v3.positionScreen.y ) -
-							( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0 ) ) ) ) {
+						if ( v1.visible && v2.visible && v3.visible && v4.visible ) {
 
-							_face = getNextFace4InPool();
+							visible = ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
+								( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||
+								( v2.positionScreen.x - v3.positionScreen.x ) * ( v4.positionScreen.y - v3.positionScreen.y ) -
+								( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0;
 
-							_face.v1.copy( v1 );
-							_face.v2.copy( v2 );
-							_face.v3.copy( v3 );
-							_face.v4.copy( v4 );
+
+							if ( object.doubleSided || visible != object.flipSided ) {
+
+								_face = getNextFace4InPool();
+
+								_face.v1.copy( v1 );
+								_face.v2.copy( v2 );
+								_face.v3.copy( v3 );
+								_face.v4.copy( v4 );
+
+							} else {
+
+								continue;
+
+							}
 
 						} else {
 
@@ -254,6 +266,7 @@ THREE.Projector = function() {
 					}
 
 					_face.normalWorld.copy( face.normal );
+					if ( !visible && ( object.flipSided || object.doubleSided ) ) _face.normalWorld.negate();
 					objectMatrixWorldRotation.multiplyVector3( _face.normalWorld );
 
 					_face.centroidWorld.copy( face.centroid );
@@ -268,6 +281,7 @@ THREE.Projector = function() {
 
 						normal = _face.vertexNormalsWorld[ n ];
 						normal.copy( faceVertexNormals[ n ] );
+						if ( !visible && ( object.flipSided || object.doubleSided ) ) normal.negate();
 						objectMatrixWorldRotation.multiplyVector3( normal );
 
 					}
@@ -286,7 +300,7 @@ THREE.Projector = function() {
 
 					}
 
-					_face.material = objectMaterial;
+					_face.material = object.material;
 					_face.faceMaterial = face.materialIndex !== null ? geometryMaterials[ face.materialIndex ] : null;
 
 					_face.z = _face.centroidScreen.z;
@@ -300,16 +314,21 @@ THREE.Projector = function() {
 				_projScreenobjectMatrixWorld.multiply( _projScreenMatrix, objectMatrixWorld );
 
 				vertices = object.geometry.vertices;
-
+				
 				v1 = getNextVertexInPool();
-				v1.positionScreen.copy( vertices[ 0 ].position );
+				v1.positionScreen.copy( vertices[ 0 ] );
 				_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
 
-				for ( v = 1, vl = vertices.length; v < vl; v++ ) {
+				// Handle LineStrip and LinePieces
+				var step = object.type === THREE.LinePieces ? 2 : 1;
+
+				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ v ].position );
+					v1.positionScreen.copy( vertices[ v ] );
 					_projScreenobjectMatrixWorld.multiplyVector4( v1.positionScreen );
+
+					if ( ( v + 1 ) % step > 0 ) continue;
 
 					v2 = _vertexPool[ _vertexCount - 2 ];
 
@@ -328,7 +347,7 @@ THREE.Projector = function() {
 
 						_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
 
-						_line.material = objectMaterial;
+						_line.material = object.material;
 
 						_renderData.elements.push( _line );
 
@@ -348,7 +367,7 @@ THREE.Projector = function() {
 
 			if ( object instanceof THREE.Particle ) {
 
-				_vector4.set( objectMatrixWorld.n14, objectMatrixWorld.n24, objectMatrixWorld.n34, 1 );
+				_vector4.set( objectMatrixWorld.elements[12], objectMatrixWorld.elements[13], objectMatrixWorld.elements[14], 1 );
 				_projScreenMatrix.multiplyVector4( _vector4 );
 
 				_vector4.z /= _vector4.w;
@@ -362,8 +381,8 @@ THREE.Projector = function() {
 
 					_particle.rotation = object.rotation.z;
 
-					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.n11 ) / ( _vector4.w + camera.projectionMatrix.n14 ) );
-					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.n22 ) / ( _vector4.w + camera.projectionMatrix.n24 ) );
+					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
+					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
 
 					_particle.material = object.material;
 

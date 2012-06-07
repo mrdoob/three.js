@@ -9,14 +9,7 @@ THREE.Mesh = function ( geometry, material ) {
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.material = material;
-
-	if ( material instanceof Array ) {
-
-		console.warn( 'DEPRECATED: Mesh material can no longer be an Array. Using material at index 0...' );
-		this.material = material[ 0 ];
-
-	}
+	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
 
 	if ( this.geometry ) {
 

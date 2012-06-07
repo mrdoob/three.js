@@ -42,7 +42,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter<br /><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
+				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter<br><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -55,8 +55,8 @@
 				// Grid
 
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
+				geometry.vertices.push( new THREE.Vector3( - 500, 0, 0 ) );
+				geometry.vertices.push( new THREE.Vector3( 500, 0, 0 ) );
 
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
 
@@ -75,8 +75,7 @@
 
 				projector = new THREE.Projector();
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshFaceMaterial() );
-				plane.rotation.x = - 90 * Math.PI / 180;
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshFaceMaterial() );
 				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
@@ -131,7 +130,7 @@
 
 				event.preventDefault();
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -147,13 +146,12 @@
 
 						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.matrixRotationWorld.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
 
-						var voxel = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1, shading: THREE.FlatShading } ) );
+						var voxel = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1 } ) );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
 						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
 						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;
 						voxel.matrixAutoUpdate = false;
 						voxel.updateMatrix();
-						voxel.overdraw = true;
 						scene.add( voxel );
 
 					}
@@ -214,7 +212,7 @@
 				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
 				ray.direction = mouse3D.subSelf( camera.position ).normalize();
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -227,8 +225,8 @@
 
 				} else if ( rollOveredFace ) {
 
-					 rollOveredFace.materials = [];
-					 rollOveredFace = null;
+					rollOveredFace.materials = [];
+					rollOveredFace = null;
 
 				}
 

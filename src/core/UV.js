@@ -31,6 +31,15 @@ THREE.UV.prototype = {
 
 	},
 
+	lerpSelf: function ( uv, alpha ) {
+
+		this.u += ( uv.u - this.u ) * alpha;
+		this.v += ( uv.v - this.v ) * alpha;
+
+		return this;
+
+	},
+
 	clone: function () {
 
 		return new THREE.UV( this.u, this.v );

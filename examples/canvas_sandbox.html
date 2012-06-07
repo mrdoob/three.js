@@ -69,8 +69,8 @@
 				// Grid
 
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( - 500, 0, 0 ) ) );
-				geometry.vertices.push( new THREE.Vertex( new THREE.Vector3( 500, 0, 0 ) ) );
+				geometry.vertices.push( new THREE.Vector3( - 500, 0, 0 ) );
+				geometry.vertices.push( new THREE.Vector3( 500, 0, 0 ) );
 
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
 
@@ -91,8 +91,7 @@
 
 				objects = [];
 
-				geometry = new THREE.IcosahedronGeometry( 1 );
-				geometry.applyMatrix( new THREE.Matrix4().setScale( 100, 100, 100 ) );
+				geometry = new THREE.IcosahedronGeometry( 100, 1 );
 
 				material = new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/metal.jpg', new THREE.SphericalReflectionMapping() ), overdraw: true } );
 

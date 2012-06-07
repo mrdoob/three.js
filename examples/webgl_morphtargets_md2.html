@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - morphtargets - MD2</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+		    body {
+			color: #fff;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			font-weight: bold;
+
+			background-color: #000;
+			margin: 0px;
+			overflow: hidden;
+		    }
+
+		    #info {
+			color:#fff;
+			position: relative;
+			margin: 0 auto -2.1em;
+			top: 0px;
+
+			padding: 5px;
+			z-index:100;
+		    }
+
+		    a { color: skyblue; }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - morphtargets -
+			MD2 character by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=368">Brian Collins</a> -
+			converted by <a href="https://twitter.com/#!/oosmoxiecode">@oosmoxiecode</a>'s <a href="http://oos.moxiecode.com/blog/2012/01/md2-to-json-converter/">MD2 converter<a>
+		</div>
+
+		<script src="../build/Three.js"></script>
+		<script src='js/MD2Character.js'></script>
+
+		<script src='js/Detector.js'></script>
+		<script src='js/Stats.js'></script>
+		<script src='js/DAT.GUI.min.js'></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container, camera, scene, renderer;
+
+			var character;
+
+			var gui, playbackConfig = {
+
+				speed: 1.0,
+				wireframe: false
+
+			};
+
+			var controls;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x050505, 400, 1000 );
+
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 150, 400 );
+				scene.add( camera );
+
+				// LIGHTS
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				var light = new THREE.SpotLight( 0xffffff, 2, 1000 );
+				light.position.set( 200, 250, 500 );
+
+				light.castShadow = true;
+				light.shadowMapWidth = 1024;
+				light.shadowMapHeight = 1024;
+				light.shadowMapDarkness = 0.95;
+				//light.shadowCameraVisible = true;
+
+				scene.add( light );
+
+				var light = new THREE.SpotLight( 0xffffff, 1.5, 500 );
+				light.position.set( -100, 350, 250 );
+
+				light.castShadow = true;
+				light.shadowMapWidth = 1024;
+				light.shadowMapHeight = 1024;
+				light.shadowMapDarkness = 0.95;
+				//light.shadowCameraVisible = true;
+
+				scene.add( light );
+
+				//  GROUND
+
+				var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
+				var gg = new THREE.PlaneGeometry( 2000, 2000 );
+				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt, perPixel: true } );
+
+				var ground = new THREE.Mesh( gg, gm );
+				ground.material.map.repeat.set( 8, 8 );
+				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.receiveShadow = true;
+
+				scene.add( ground );
+
+				// RENDERER
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.setClearColor( scene.fog.color, 1 );
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.shadowMapEnabled = true;
+				//renderer.shadowMapCullFrontFaces = false;
+
+				// STATS
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
+				stats.domElement.children[ 0 ].style.background = "transparent";
+				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
+
+				// EVENTS
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// CONTROLS
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.target.set( 0, 50, 0 );
+
+				// GUI
+
+				gui = new DAT.GUI();
+
+				gui.add( playbackConfig, 'speed', 0, 2 ).onChange( function() {
+
+					character.setPlaybackRate( playbackConfig.speed );
+
+				} );
+
+				gui.add( playbackConfig, 'wireframe', false ).onChange( function() {
+
+					character.setWireframe( playbackConfig.wireframe );
+
+				} );
+
+				// CHARACTER
+
+				var config = {
+
+					baseUrl: "models/animated/ratamahatta/",
+
+					body: "ratamahatta.js",
+					skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],
+					weapons:  [  [ "weapon.js", "weapon.png" ],
+								 [ "w_bfg.js", "w_bfg.png" ],
+								 [ "w_blaster.js", "w_blaster.png" ],
+								 [ "w_chaingun.js", "w_chaingun.png" ],
+								 [ "w_glauncher.js", "w_glauncher.png" ],
+								 [ "w_hyperblaster.js", "w_hyperblaster.png" ],
+								 [ "w_machinegun.js", "w_machinegun.png" ],
+								 [ "w_railgun.js", "w_railgun.png" ],
+								 [ "w_rlauncher.js", "w_rlauncher.png" ],
+								 [ "w_shotgun.js", "w_shotgun.png" ],
+								 [ "w_sshotgun.js", "w_sshotgun.png" ]
+								]
+
+				};
+
+				character = new THREE.MD2Character();
+				character.scale = 3;
+
+				character.onLoadComplete = function() {
+
+					setupSkinsGUI( character );
+					setupWeaponsGUI( character );
+					setupGUIAnimations( character );
+
+				}
+
+				character.loadParts( config );
+
+				scene.add( character.root );
+
+			}
+
+			// EVENT HANDLERS
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH/ SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
+			// GUI
+
+			function addGuiHeader( label, h, s, v ) {
+
+				// add dummy item
+
+				playbackConfig[ label ] = function() {};
+
+				// hack GUI item styling
+
+				var dummy = gui.add( playbackConfig, label, label );
+				setGuiHeaderStyle( dummy, h, s, v );
+
+			}
+
+			function setGuiHeaderStyle( g, h, s, v ) {
+
+				var color = "hsl(" + h + "," + s + "%, " + v + "%)";
+
+				g.domElement.style.borderLeft = "solid 5px " + color;
+				g.domElement.style.background = color;
+				g.domElement.style.fontWeight = "bold";
+
+			}
+
+			function setGuiElementStyle( a, h, s, v, display ) {
+
+				var i, s, color = "hsl(" + h + "," + s + "%, " + v + "%)";
+
+				for( i = 0; i < a.length; i ++ ) {
+
+					s = a[ i ].domElement.style;
+					s.borderLeft = "solid 5px " + color;
+					s.display = display ? display : "none";
+
+				}
+
+			}
+
+			function labelize( text ) {
+
+				var parts = text.split( "." );
+
+				if ( parts.length > 1 ) {
+
+					parts.length -= 1;
+					return parts.join( "." );
+
+				}
+
+				return text;
+
+			}
+
+			//
+
+			function setupWeaponsGUI( character ) {
+
+				addGuiHeader( "Weapons", 20, 90, 30 );
+
+				var generateCallback = function( index ) {
+
+					return function () { character.setWeapon( index ); };
+
+				}
+
+				var guiItems = [];
+
+				for ( var i = 0; i < character.weapons.length; i ++ ) {
+
+					var name = character.weapons[ i ].name;
+
+					playbackConfig[ name ] = generateCallback( i );
+					guiItems[ i ] = gui.add( playbackConfig, name ).name( labelize( name ) );
+
+				}
+
+				setGuiElementStyle( guiItems, 20, 90, 30, "block" );
+
+			}
+
+			//
+
+			function setupSkinsGUI( character ) {
+
+				addGuiHeader( "Skins", 0, 90, 30 );
+
+				var generateCallback = function( index ) {
+
+					return function () { character.setSkin( index ); };
+
+				}
+
+				var guiItems = [];
+
+				for ( var i = 0; i < character.skinsBody.length; i ++ ) {
+
+					var name = character.skinsBody[ i ].name;
+
+					playbackConfig[ name ] = generateCallback( i );
+					guiItems[ i ] = gui.add( playbackConfig, name ).name( labelize( name ) );
+
+				}
+
+				setGuiElementStyle( guiItems, 0, 90, 30, "block" );
+
+			}
+
+			//
+
+			function setupGUIAnimations( character ) {
+
+				addGuiHeader( "Animations", 100, 90, 30 );
+
+				var generateCallback = function( animationName ) {
+
+					return function () { character.setAnimation( animationName ); };
+
+				}
+
+				var i = 0, guiItems = [];
+				var animations = character.meshBody.geometry.animations;
+
+				for ( var a in animations ) {
+
+					playbackConfig[ a ] = generateCallback( a );
+					guiItems[ i ] = gui.add( playbackConfig, a, a );
+
+					i ++;
+
+				}
+
+				setGuiElementStyle( guiItems, 100, 90, 30, "block" );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				controls.update();
+				character.update( delta );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -89,7 +89,6 @@
 				// grid
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
-				plane.rotation.x = - 90 * Math.PI / 180;
 				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
@@ -181,7 +180,7 @@
 
 				event.preventDefault();
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -263,7 +262,7 @@
 
 				ray = projector.pickingRay( mouse2D.clone(), camera );
 
-				var intersects = ray.intersectScene( scene );
+				var intersects = ray.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 

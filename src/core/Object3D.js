@@ -6,9 +6,9 @@
 
 THREE.Object3D = function () {
 
-	this.name = '';
-
 	this.id = THREE.Object3DCount ++;
+
+	this.name = '';
 
 	this.parent = undefined;
 	this.children = [];
@@ -19,8 +19,6 @@ THREE.Object3D = function () {
 	this.rotation = new THREE.Vector3();
 	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
-
-	this.dynamic = false; // when true it retains arrays so they can be updated with __dirty*
 
 	this.doubleSided = false;
 	this.flipSided = false;
@@ -58,6 +56,16 @@ THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
 
+	applyMatrix: function ( matrix ) {
+
+		this.matrix.multiply( matrix, this.matrix );
+
+		this.scale.getScaleFromMatrix( this.matrix );
+		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+		this.position.getPositionFromMatrix( this.matrix );
+
+	},
+
 	translate: function ( distance, axis ) {
 
 		this.matrix.rotateAxis( axis );
@@ -91,7 +99,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.setRotationFromMatrix( this.matrix );
+			this.rotation.getRotationFromMatrix( this.matrix );
 
 		}
 
@@ -99,7 +107,14 @@ THREE.Object3D.prototype = {
 
 	add: function ( object ) {
 
-		if ( this.children.indexOf( object ) === - 1 ) {
+		if ( object === this ) {
+
+			console.warn( 'THREE.Object3D.add: An object can\'t be added as a child of itself.' );
+			return;
+
+		}
+
+		if ( object instanceof THREE.Object3D ) { // && this.children.indexOf( object ) === - 1
 
 			if ( object.parent !== undefined ) {
 
@@ -122,7 +137,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene )  {
 
-				scene.addObject( object );
+				scene.__addObject( object );
 
 			}
 
@@ -151,7 +166,7 @@ THREE.Object3D.prototype = {
 
 			if ( scene !== undefined && scene instanceof THREE.Scene ) {
 
-				scene.removeObject( object );
+				scene.__removeObject( object );
 
 			}
 
@@ -159,9 +174,9 @@ THREE.Object3D.prototype = {
 
 	},
 
-	getChildByName: function ( name, doRecurse ) {
+	getChildByName: function ( name, recursive ) {
 
-		var c, cl, child, recurseResult;
+		var c, cl, child;
 
 		for ( c = 0, cl = this.children.length; c < cl; c ++ ) {
 
@@ -173,13 +188,13 @@ THREE.Object3D.prototype = {
 
 			}
 
-			if ( doRecurse ) {
+			if ( recursive ) {
 
-				recurseResult = child.getChildByName( name, doRecurse );
+				child = child.getChildByName( name, recursive );
 
-				if ( recurseResult !== undefined ) {
+				if ( child !== undefined ) {
 
-					return recurseResult;
+					return child;
 
 				}
 

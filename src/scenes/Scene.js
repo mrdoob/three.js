@@ -11,8 +11,8 @@ THREE.Scene = function () {
 
 	this.matrixAutoUpdate = false;
 
-	this.objects = [];
-	this.lights = [];
+	this.__objects = [];
+	this.__lights = [];
 
 	this.__objectsAdded = [];
 	this.__objectsRemoved = [];
@@ -22,21 +22,21 @@ THREE.Scene = function () {
 THREE.Scene.prototype = new THREE.Object3D();
 THREE.Scene.prototype.constructor = THREE.Scene;
 
-THREE.Scene.prototype.addObject = function ( object ) {
+THREE.Scene.prototype.__addObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
 
-		if ( this.lights.indexOf( object ) === - 1 ) {
+		if ( this.__lights.indexOf( object ) === - 1 ) {
 
-			this.lights.push( object );
+			this.__lights.push( object );
 
 		}
 
 	} else if ( !( object instanceof THREE.Camera || object instanceof THREE.Bone ) ) {
 
-		if ( this.objects.indexOf( object ) === - 1 ) {
+		if ( this.__objects.indexOf( object ) === - 1 ) {
 
-			this.objects.push( object );
+			this.__objects.push( object );
 			this.__objectsAdded.push( object );
 
 			// check if previously removed
@@ -55,31 +55,31 @@ THREE.Scene.prototype.addObject = function ( object ) {
 
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
-		this.addObject( object.children[ c ] );
+		this.__addObject( object.children[ c ] );
 
 	}
 
 };
 
-THREE.Scene.prototype.removeObject = function ( object ) {
+THREE.Scene.prototype.__removeObject = function ( object ) {
 
 	if ( object instanceof THREE.Light ) {
 
-		var i = this.lights.indexOf( object );
+		var i = this.__lights.indexOf( object );
 
 		if ( i !== -1 ) {
 
-			this.lights.splice( i, 1 );
+			this.__lights.splice( i, 1 );
 
 		}
 
 	} else if ( !( object instanceof THREE.Camera ) ) {
 
-		var i = this.objects.indexOf( object );
+		var i = this.__objects.indexOf( object );
 
 		if( i !== -1 ) {
 
-			this.objects.splice( i, 1 );
+			this.__objects.splice( i, 1 );
 			this.__objectsRemoved.push( object );
 
 			// check if previously added
@@ -98,7 +98,7 @@ THREE.Scene.prototype.removeObject = function ( object ) {
 
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
-		this.removeObject( object.children[ c ] );
+		this.__removeObject( object.children[ c ] );
 
 	}
 

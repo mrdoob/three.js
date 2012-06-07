@@ -148,7 +148,6 @@
 				scene.add( parent );
 
 				var grid = new THREE.ParticleSystem( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.ParticleBasicMaterial( { color: 0xff0000, size: 10 } ) );
-				grid.rotation.x = Math.PI/2;
 				grid.position.y = -400;
 				parent.add( grid );
 
@@ -213,9 +212,9 @@
 
 				for ( i = 0; i < vl; i ++ ) {
 
-					p = vertices[ i ].position;
+					p = vertices[ i ];
 
-					geometry.vertices[ i ] = new THREE.Vertex( p.clone() );
+					geometry.vertices[ i ] = p.clone();
 					vertices_tmp[ i ] = [ p.x, p.y, p.z, 0, 0 ];
 
 				}
@@ -335,7 +334,7 @@
 
 					for ( i = 0; i < vl; i ++ ) {
 
-						p = vertices[ i ].position;
+						p = vertices[ i ];
 						vt = vertices_tmp[ i ];
 
 						// falling down
@@ -450,7 +449,7 @@
 
 					}
 
-					mesh.geometry.__dirtyVertices = true;
+					mesh.geometry.verticesNeedUpdate = true;
 
 				}
 

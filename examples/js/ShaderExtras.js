@@ -1,6 +1,7 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author davidedc / http://www.sketchpatch.net/
  *
  * ShaderExtras currently contains:
  *
@@ -257,7 +258,7 @@ THREE.ShaderExtras = {
 				focus:    { type: "f", value: 1.0 },
 				aspect:   { type: "f", value: 1.0 },
 				aperture: { type: "f", value: 0.025 },
-				maxblur:  { type: "f", value: 1.0 },
+				maxblur:  { type: "f", value: 1.0 }
 			  },
 
 	vertexShader: [
@@ -707,7 +708,7 @@ THREE.ShaderExtras = {
 				"vec2 vin;",
 				"vec2 uv = vUv;",
 
-				"add += color = org = texture2D( tDiffuse, uv );",
+				"add = color = org = texture2D( tDiffuse, uv );",
 
 				"vin = ( uv - vec2( 0.5 ) ) * vec2( 1.4 );",
 				"sample_dist = dot( vin, vin ) * 2.0;",
@@ -1188,7 +1189,9 @@ THREE.ShaderExtras = {
 				"vec3 rgbNE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, -1.0 ) ) * resolution ).xyz;",
 				"vec3 rgbSW = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( -1.0, 1.0 ) ) * resolution ).xyz;",
 				"vec3 rgbSE = texture2D( tDiffuse, ( gl_FragCoord.xy + vec2( 1.0, 1.0 ) ) * resolution ).xyz;",
-				"vec3 rgbM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution ).xyz;",
+				"vec4 rgbaM  = texture2D( tDiffuse,  gl_FragCoord.xy  * resolution );",
+				"vec3 rgbM  = rgbaM.xyz;",
+				"float opacity  = rgbaM.w;",
 
 				"vec3 luma = vec3( 0.299, 0.587, 0.114 );",
 
@@ -1223,17 +1226,17 @@ THREE.ShaderExtras = {
 
 				"if ( ( lumaB < lumaMin ) || ( lumaB > lumaMax ) ) {",
 
-					"gl_FragColor = vec4( rgbA, 1.0 );",
+					"gl_FragColor = vec4( rgbA, opacity );",
 
 				"} else {",
 
-					"gl_FragColor = vec4( rgbB, 1.0 );",
+					"gl_FragColor = vec4( rgbB, opacity );",
 
 				"}",
 
 			"}",
 
-		].join("\n"),
+		].join("\n")
 
 	},
 
@@ -1410,7 +1413,9 @@ THREE.ShaderExtras = {
 			"fogNear":		{ type: "f", value: 5 },
 			"fogFar":		{ type: "f", value: 100 },
 			"fogEnabled":	{ type: "i", value: 0 },
-			"aoClamp":		{ type: "f", value: 0.3 }
+			"onlyAO":		{ type: "i", value: 0 },
+			"aoClamp":		{ type: "f", value: 0.3 },
+			"lumInfluence":	{ type: "f", value: 0.9 }
 
 		},
 
@@ -1436,10 +1441,13 @@ THREE.ShaderExtras = {
 			"uniform float fogNear;",
 			"uniform float fogFar;",
 
-			"uniform bool fogEnabled;",
+			"uniform bool fogEnabled;",		// attenuate AO with linear fog
+			"uniform bool onlyAO;", 		// use only ambient occlusion pass?
 
-			"uniform vec2 size;",		// texture width, height
-			"uniform float aoClamp;", 	// depth clamp - reduces haloing at screen edges
+			"uniform vec2 size;",			// texture width, height
+			"uniform float aoClamp;", 		// depth clamp - reduces haloing at screen edges
+
+			"uniform float lumInfluence;",  // how much luminance affects occlusion
 
 			"uniform sampler2D tDiffuse;",
 			"uniform sampler2D tDepth;",
@@ -1465,13 +1473,14 @@ THREE.ShaderExtras = {
 			"const float radius = 5.0;", 	// ao radius
 
 			"const bool useNoise = false;", 		 // use noise instead of pattern for sample dithering
-			"const float noiseAmount = 0.0002;", // dithering amount
+			"const float noiseAmount = 0.0003;", // dithering amount
 
 			"const float diffArea = 0.4;", 		// self-shadowing reduction
 			"const float gDisplace = 0.4;", 	// gauss bell center
 
-			"const bool onlyAO = false;", 		// use only ambient occlusion pass?
-			"const float lumInfluence = 0.3;",  // how much luminance affects occlusion
+			"const vec3 onlyAOColor = vec3( 1.0, 0.7, 0.5 );",
+			//"const vec3 onlyAOColor = vec3( 1.0, 1.0, 1.0 );",
+
 
 			// RGBA depth
 
@@ -1626,7 +1635,7 @@ THREE.ShaderExtras = {
 
 				"if ( onlyAO ) {",
 
-					"final = vec3( mix( vec3( ao ), vec3( 1.0 ), luminance * lumInfluence ) );", // ambient occlusion only
+					"final = onlyAOColor * vec3( mix( vec3( ao ), vec3( 1.0 ), luminance * lumInfluence ) );", // ambient occlusion only
 
 				"}",
 
@@ -1757,7 +1766,7 @@ THREE.ShaderExtras = {
 		var i, values, sum, halfWidth, kMaxKernelSize = 25, kernelSize = 2 * Math.ceil( sigma * 3.0 ) + 1;
 
 		if ( kernelSize > kMaxKernelSize ) kernelSize = kMaxKernelSize;
-		halfWidth = ( kernelSize - 1 ) * 0.5
+		halfWidth = ( kernelSize - 1 ) * 0.5;
 
 		values = new Array( kernelSize );
 		sum = 0.0;

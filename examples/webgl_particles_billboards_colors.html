@@ -46,7 +46,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, scene, renderer, particles, geometry, material, i, h, color, colors = [], sprite, size, x, y, z;
+			var camera, scene, renderer, particles, geometry, material, i, h, color, colors = [], sprite, size;
 			var mouseX = 0, mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
@@ -73,15 +73,15 @@
 
 				for ( i = 0; i < 5000; i ++ ) {
 
-					x = 2000 * Math.random() - 1000;
-					y = 2000 * Math.random() - 1000;
-					z = 2000 * Math.random() - 1000;
+					var vertex = new THREE.Vector3();
+					vertex.x = 2000 * Math.random() - 1000;
+					vertex.y = 2000 * Math.random() - 1000;
+					vertex.z = 2000 * Math.random() - 1000;
 
-					vector = new THREE.Vector3( x, y, z );
-					geometry.vertices.push( new THREE.Vertex( vector ) );
+					geometry.vertices.push( vertex );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSV( (x+1000)/2000, 1.0, 1.0 );
+					colors[ i ].setHSV( ( vertex.x + 1000 ) / 2000, 1, 1 );
 
 				}
 

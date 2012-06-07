@@ -79,7 +79,9 @@
 
 				// CONTROLS
 
-				if ( 1 ) {
+				var fly = false;
+
+				if ( !fly ) {
 
 					controls = new THREE.TrackballControls( camera );
 					controls.target.set( 0, 0, 0 );
@@ -129,7 +131,6 @@
 				// GROUND
 
 				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 800, 400, 2, 2 ), groundMaterial );
-				mesh.rotation.x = -1.57;
 				mesh.position.y = -5;
 				scene.add( mesh );
 
@@ -225,8 +226,6 @@
 				renderer.gammaOutput = true;
 				renderer.physicallyBasedShading = true;
 
-				renderer.sortObjects = false;
-
 				// STATS
 
 				stats = new Stats();
@@ -255,8 +254,6 @@
 
 			function render() {
 
-				controls.update( clock.getDelta() );
-
 				var time = Date.now() * 0.00025;
 				var z = 20, d = 150;
 
@@ -277,6 +274,8 @@
 
 				light6.position.x = Math.cos( time * 0.7 ) * d;
 				light6.position.z = Math.cos( time * 0.5 ) * d;
+
+				controls.update( clock.getDelta() );
 
 				renderer.render( scene, camera );
 

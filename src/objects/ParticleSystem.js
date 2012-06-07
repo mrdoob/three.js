@@ -7,7 +7,7 @@ THREE.ParticleSystem = function ( geometry, material ) {
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry;
-	this.material = material;
+	this.material = ( material !== undefined ) ? material : new THREE.ParticleBasicMaterial( { color: Math.random() * 0xffffff } );
 
 	this.sortParticles = false;
 

@@ -84,8 +84,6 @@
 				mesh.position.set( x, y, z );
 				mesh.rotation.set( rx, ry, rz );
 
-				mesh.overdraw = true;
-
 				scene.add( mesh );
 
 			}
@@ -121,7 +119,6 @@
 				lightMesh = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.set( 0.05, 0.05, 0.05 );
 				lightMesh.position = pointLight.position;
-				lightMesh.overdraw = true;
 				scene.add( lightMesh );
 
 				// material samples

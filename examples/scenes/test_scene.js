@@ -60,7 +60,7 @@
 		"materials": [ "faceted_white" ],
 		"position" : [ 20, 10, -60 ],
 		"rotation" : [ 0, 0, 0 ],
-		"scale"	   : [ 20, 20, 20 ],
+		"scale"	   : [ 1, 1, 1 ],
 		"visible"  : true
 	},
 
@@ -123,7 +123,7 @@
 		"geometry" : "quad",
 		"materials": [ "textured_bg" ],
 		"position" : [ 0, 15, -90 ],
-		"rotation" : [ 0, 0, 0 ],
+		"rotation" : [ 1.57, 0, 0 ],
 		"scale"	   : [ 20, 20, 20 ],
 		"visible"  : true
 	},
@@ -132,7 +132,7 @@
 		"geometry" : "plane",
 		"materials": [ "basic_gray" ],
 		"position" : [ 0, -10, 0 ],
-		"rotation" : [ 1.57, 0, 0 ],
+		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 100, 100, 100 ],
 		"visible"  : true
 	}
@@ -178,6 +178,7 @@
 
 	"icosahedron": {
 		"type"    : "icosahedron",
+		"radius"  : 20,
 		"subdivisions"  : 2
 	},
 

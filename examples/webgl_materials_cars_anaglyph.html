@@ -57,6 +57,8 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="js/effects/AnaglyphEffect.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
@@ -137,7 +139,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, effect;
 
 			var m, mi;
 
@@ -166,7 +168,7 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x555555 );
+				var ambient = new THREE.AmbientLight( 0x050505 );
 				scene.add( ambient );
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
@@ -200,9 +202,11 @@
 
 				//
 
-				renderer = new THREE.AnaglyphWebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setFaceCulling( 0 );
+
+				effect = new THREE.AnaglyphEffect( renderer );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 
@@ -596,14 +600,13 @@
 
 				var timer = -0.0002 * Date.now();
 
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
 				camera.position.x = 1000 * Math.cos( timer );
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );
 
-				renderer.render( scene, camera );
+				effect.render( scene, camera );
 
 				if ( STATS_ENABLED ) stats.update();
 

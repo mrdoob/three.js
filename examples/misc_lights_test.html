@@ -17,7 +17,7 @@
 			a { color:skyblue }
 			canvas { pointer-events:none; z-index:10; }
 
-			#d { text-align:center; margin:1em 0 -15.7em 0; z-index:0; position:relative; display:block }
+			#d { text-align:center; margin:1em 0 -11.4em 0; z-index:0; position:relative; display:block }
 			.button { background:#000; color:#fff; padding:0.2em 0.5em; cursor:pointer }
 			.inactive { background:#999; color:#eee }
 		</style>
@@ -50,6 +50,7 @@
 			var camera, scene, canvasRenderer, webglRenderer;
 
 			var mesh, zmesh, lightMesh, geometry;
+			var materialSpheres, materialTorus;
 
 			var directionalLight, pointLight;
 
@@ -88,11 +89,11 @@
 				// Spheres
 
 				var geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
+				materialSpheres = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
-					mesh = new THREE.Mesh( geometry, material );
+					mesh = new THREE.Mesh( geometry, materialSpheres );
 					mesh.position.x = 500 * ( Math.random() - 0.5 );
 					mesh.position.y = 500 * ( Math.random() - 0.5 );
 					mesh.position.z = 500 * ( Math.random() - 0.5 );
@@ -103,7 +104,8 @@
 
 				// Torus
 
-				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: true } ) );
+				materialTorus = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: true } );
+				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), materialTorus );
 				scene.add( mesh );
 
 				// Lights
@@ -113,7 +115,7 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, -70, 100 ).normalize();
-				scene.add( directionalLight );
+				//scene.add( directionalLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00 );
 				scene.add( pointLight );
@@ -121,7 +123,6 @@
 				lightMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xffaa00 } ) );
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				lightMesh.position = pointLight.position;
-				lightMesh.overdraw = true;
 				scene.add( lightMesh );
 
 
@@ -137,7 +138,7 @@
 
 					try {
 
-						webglRenderer = new THREE.WebGLRenderer();
+						webglRenderer = new THREE.WebGLRenderer( { alpha: true } );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 						container.appendChild( webglRenderer.domElement );
@@ -183,26 +184,43 @@
 
 			function render() {
 
-				counter == 30 ? scene.remove( directionalLight ) : counter ++;
+				if ( counter == 30 ) {
+
+					scene.add( directionalLight );
+
+					materialTorus.needsUpdate = true;
+					materialSpheres.needsUpdate = true;
+
+				} else {
+
+					counter ++;
+
+				}
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
 
-				for ( var i = 0, l = scene.objects.length; i < l; i ++ ) {
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
-					if ( i%3 == 1 )
+					var object = scene.children[ i ];
 
-						scene.objects[i].rotation.z += 0.05;
+					if ( object instanceof THREE.Mesh ) {
 
-					else if ( i%3 == 2 )
+						if ( i % 3 == 1 )
 
-						scene.objects[i].rotation.y += 0.05;
+							object.rotation.z += 0.05;
 
-					else if ( i%3 == 0 )
+						else if ( i % 3 == 2 )
 
-						scene.objects[i].rotation.x += 0.05;
+							object.rotation.y += 0.05;
+
+						else if ( i % 3 == 0 )
+
+							object.rotation.x += 0.05;
+
+					}
 
 				}
 

@@ -132,14 +132,10 @@
 
 
 				var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
-				meshCanvas.rotation.x = Math.PI / 2;
 				meshCanvas.scale.set( 1000, 1000, 1000 );
-				meshCanvas.doubleSided = true;
 
 				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
-				meshCanvas2.rotation.x = Math.PI / 2;
 				meshCanvas2.scale.set( 1000, 1000, 1000 );
-				meshCanvas2.doubleSided = true;
 
 
 				// PAINTING
@@ -152,9 +148,12 @@
 					scene.add( meshCanvas );
 					scene2.add( meshCanvas2 );
 
-					var geometry = new THREE.PlaneGeometry( 100, 100 ),
-						mesh = new THREE.Mesh( geometry, materialPainting ),
-						mesh2 = new THREE.Mesh( geometry, materialPainting2 );
+					var geometry = new THREE.PlaneGeometry( 100, 100 );
+					var mesh = new THREE.Mesh( geometry, materialPainting );
+					var mesh2 = new THREE.Mesh( geometry, materialPainting2 );
+
+					mesh.rotation.x = Math.PI / 2;
+					mesh2.rotation.x = Math.PI / 2;
 
 					addPainting( scene, mesh );
 					addPainting( scene2, mesh2 );
@@ -162,23 +161,22 @@
 					function addPainting( zscene, zmesh ) {
 
 						zmesh.scale.x = image.width / 100;
-						zmesh.scale.y = image.height / 100;
+						zmesh.scale.z = image.height / 100;
 
 						zscene.add( zmesh );
 
 						var meshFrame = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 5 } )  );
-
+						meshFrame.rotation.x = Math.PI / 2;
 						meshFrame.scale.x = 1.1 * image.width / 100;
-						meshFrame.scale.y = 1.1 * image.height / 100;
+						meshFrame.scale.z = 1.1 * image.height / 100;
 
 						zscene.add( meshFrame );
 
-						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.9, transparent: true } )  );
+						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } )  );
 
 						meshShadow.position.z = - 1.1 * image.height/2;
 						meshShadow.scale.x = 1.1 * image.width / 100;
-						meshShadow.scale.y = 1.1 * image.height / 100;
-						meshShadow.rotation.x = -Math.PI / 2;
+						meshShadow.scale.z = 1.1 * image.height / 100;
 						zscene.add( meshShadow );
 
 						meshShadow.position.y = - 1.1 * image.height/2;

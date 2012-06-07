@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometries</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/Three.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/Stats.js"></script>
+		<script src="../src/core/Geometry.js"></script>
+		<script src="js/CurveExtras.js"></script>
+
+		<script src="js/UVsUtils.js"></script>
+		<script src="../src/extras/geometries/ParametricGeometry.js"></script>
+		<script src="../src/extras/geometries/ParametricGeometries.js"></script>
+		<script>
+
+			/* Testing the new Parametric Surfaces Geometries*/
+
+			
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.y = 400;
+				scene.add( camera );
+
+				var light, object, materials;
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 );
+				scene.add( light );
+
+				materials = [
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
+				];
+
+
+				var heightScale = 1;
+				var p = 2;
+				var q = 3;
+				var radius = 150, tube = 10, segmentsR = 50, segmentsT = 20;
+
+				var GrannyKnot =  new THREE.Curves.GrannyKnot();
+				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+				var torus2 = new THREE.TorusKnotGeometry2( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+				// var sphere = new THREE.SphereGeometry( 75, 20, 10 );
+				var sphere2 = new THREE.SphereGeometry2( 75, 20, 10 );
+				// var tube = new THREE.TubeGeometry(GrannyKnot, 150, 2, 8, true, false);
+				var tube2 = new THREE.TubeGeometry2(GrannyKnot, 150, 2, 8, true, false);
+
+
+				// var benchmarkCopies = 1000;
+				// var benchmarkObject = tube;
+				// var rand = function() { return (Math.random() - 0.5 ) * 600; };
+				// for (var b=0;b<benchmarkCopies;b++) {
+				//    object = THREE.SceneUtils.createMultiMaterialObject( benchmarkObject, materials );
+				//   object.position.set( rand(), rand(), rand() );
+				//   scene.add( object );
+				// }
+
+				console.log(THREE.ParametricGeometries);
+				var geo;
+
+				// Klein Bottle
+				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.klein, 20, 20);
+				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
+				object.children[ 0 ].doubleSided = true;
+				object.position.set( 0, 0, 0 );
+				object.scale.multiplyScalar(10);
+				scene.add( object );
+
+				// Mobius Strip
+				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.mobius, 20, 20);
+				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
+				// object.children[ 0 ].doubleSided = true;
+				object.position.set( 10, 0, 0 );
+				object.scale.multiplyScalar(100);
+				scene.add( object );
+
+				// var geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.plane(200, 200), 10, 10);
+				// THREE.UVsDebug( geo );
+				// document.body.appendChild( THREE.UVsDebug( geo ));
+				// object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
+
+
+				// object = THREE.SceneUtils.createMultiMaterialObject( torus, materials );
+				// object.position.set( 0, 0, 0 );
+				// scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( torus2, materials );
+				object.position.set( 0, 100, 0 );
+				scene.add( object );
+
+
+
+
+				//  object = THREE.SceneUtils.createMultiMaterialObject( sphere, materials );
+				//  object.position.set( 500, 0, 0 );
+				//  scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( sphere2, materials );
+				object.position.set( 200, 0, 0 );
+				scene.add( object );
+
+				// object = THREE.SceneUtils.createMultiMaterialObject( tube, materials );
+				// object.position.set( 0, 0, 0 );
+				// scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( tube2, materials );
+				object.position.set( 100, 0, 0 );
+				scene.add( object );
+
+
+				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 400, 400, 4, 4 ), materials );
+				// // object.children[ 0 ].doubleSided = true;
+				// object.position.set( -200, 100, 0 );
+				// scene.add( object );
+
+				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry2( 400, 400, 4, 4 ), materials );
+				// object.children[ 0 ].doubleSided = true;
+				// object.position.set( -200, 100, 0 );
+				// scene.add( object );
+
+				object = new THREE.AxisHelper();
+				object.position.set( 200, 0, -200 );
+				object.scale.x = object.scale.y = object.scale.z = 0.5;
+				scene.add( object );
+
+				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
+				object.position.set( 200, 0, 400 );
+				scene.add( object );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = Date.now() * 0.0001;
+
+				camera.position.x = Math.cos( timer ) * 800;
+				camera.position.z = Math.sin( timer ) * 800;
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+					var object = scene.children[ i ];
+
+					object.rotation.x += 0.01;
+					object.rotation.y += 0.005;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

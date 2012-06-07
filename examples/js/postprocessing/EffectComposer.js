@@ -10,7 +10,7 @@ THREE.EffectComposer = function( renderer, renderTarget ) {
 
 	if ( this.renderTarget1 === undefined ) {
 
-		this.renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
+		this.renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 		this.renderTarget1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, this.renderTargetParameters );
 
 	}
@@ -126,6 +126,7 @@ THREE.EffectComposer.camera = new THREE.OrthographicCamera( window.innerWidth / 
 // shared fullscreen quad scene
 
 THREE.EffectComposer.geometry = new THREE.PlaneGeometry( 1, 1 );
+THREE.EffectComposer.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 
 THREE.EffectComposer.quad = new THREE.Mesh( THREE.EffectComposer.geometry, null );
 THREE.EffectComposer.quad.position.z = -100;

@@ -33,7 +33,6 @@ COMMON_FILES = [
 'core/UV.js',
 'core/Geometry.js',
 'core/Spline.js',
-'core/Edge.js',
 'cameras/Camera.js',
 'cameras/OrthographicCamera.js',
 'cameras/PerspectiveCamera.js',
@@ -42,6 +41,10 @@ COMMON_FILES = [
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
 'lights/SpotLight.js',
+'loaders/Loader.js',
+'loaders/BinaryLoader.js',
+'loaders/JSONLoader.js',
+'loaders/SceneLoader.js',
 'materials/Material.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
@@ -50,7 +53,6 @@ COMMON_FILES = [
 'materials/MeshDepthMaterial.js',
 'materials/MeshNormalMaterial.js',
 'materials/MeshFaceMaterial.js',
-'materials/MeshShaderMaterial.js',
 'materials/ParticleBasicMaterial.js',
 'materials/ParticleCanvasMaterial.js',
 'materials/ParticleDOMMaterial.js',
@@ -94,6 +96,7 @@ EXTRAS_FILES = [
 'extras/core/BufferGeometry.js',
 'extras/core/Curve.js',
 'extras/core/CurvePath.js',
+'extras/core/EventTarget.js',
 'extras/core/Gyroscope.js',
 'extras/core/Path.js',
 'extras/core/Shape.js',
@@ -102,11 +105,6 @@ EXTRAS_FILES = [
 'extras/animation/Animation.js',
 'extras/animation/KeyFrameAnimation.js',
 'extras/cameras/CubeCamera.js',
-'extras/cameras/FirstPersonCamera.js',
-'extras/cameras/PathCamera.js',
-'extras/cameras/FlyCamera.js',
-'extras/cameras/RollCamera.js',
-'extras/cameras/TrackballCamera.js',
 'extras/cameras/CombinedCamera.js',
 'extras/controls/FirstPersonControls.js',
 'extras/controls/PathControls.js',
@@ -116,30 +114,29 @@ EXTRAS_FILES = [
 'extras/geometries/CubeGeometry.js',
 'extras/geometries/CylinderGeometry.js',
 'extras/geometries/ExtrudeGeometry.js',
-'extras/geometries/IcosahedronGeometry.js',
 'extras/geometries/LatheGeometry.js',
-'extras/geometries/OctahedronGeometry.js',
 'extras/geometries/PlaneGeometry.js',
 'extras/geometries/SphereGeometry.js',
 'extras/geometries/TextGeometry.js',
 'extras/geometries/TorusGeometry.js',
 'extras/geometries/TorusKnotGeometry.js',
+'extras/geometries/TubeGeometry.js',
+'extras/geometries/PolyhedronGeometry.js',
+'extras/geometries/IcosahedronGeometry.js',
+'extras/geometries/OctahedronGeometry.js',
+'extras/geometries/TetrahedronGeometry.js',
+'extras/geometries/ParametricGeometry.js',
 'extras/helpers/AxisHelper.js',
+'extras/helpers/ArrowHelper.js',
 'extras/helpers/CameraHelper.js',
 'extras/modifiers/SubdivisionModifier.js',
-'extras/loaders/Loader.js',
-'extras/loaders/BinaryLoader.js',
-'extras/loaders/ColladaLoader.js',
-'extras/loaders/JSONLoader.js',
-'extras/loaders/SceneLoader.js',
-'extras/loaders/UTF8Loader.js',
-'extras/objects/MarchingCubes.js',
+'extras/objects/ImmediateRenderObject.js',
 'extras/objects/LensFlare.js',
-'extras/plugins/LensFlarePlugin.js',
-'extras/plugins/ShadowMapPlugin.js',
-'extras/plugins/SpritePlugin.js',
-'extras/renderers/AnaglyphWebGLRenderer.js',
-'extras/renderers/CrosseyedWebGLRenderer.js',
+'extras/objects/MorphBlendMesh.js',
+'extras/renderers/plugins/LensFlarePlugin.js',
+'extras/renderers/plugins/ShadowMapPlugin.js',
+'extras/renderers/plugins/SpritePlugin.js',
+'extras/renderers/plugins/DepthPassPlugin.js',
 'extras/shaders/ShaderFlares.js',
 'extras/shaders/ShaderSprite.js'
 ]
@@ -171,6 +168,10 @@ CANVAS_FILES = [
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
+'loaders/Loader.js',
+'loaders/BinaryLoader.js',
+'loaders/JSONLoader.js',
+'loaders/SceneLoader.js',
 'materials/Material.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
@@ -182,6 +183,7 @@ CANVAS_FILES = [
 'materials/ParticleBasicMaterial.js',
 'materials/ParticleCanvasMaterial.js',
 'textures/Texture.js',
+'textures/DataTexture.js',
 'objects/Particle.js',
 'objects/Line.js',
 'objects/Mesh.js',
@@ -194,8 +196,7 @@ CANVAS_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'extras/ImageUtils.js'
+'renderers/renderables/RenderableLine.js'
 ]
 
 DOM_FILES = [
@@ -221,9 +222,14 @@ DOM_FILES = [
 'cameras/OrthographicCamera.js',
 'cameras/PerspectiveCamera.js',
 'lights/Light.js',
+'loaders/Loader.js',
 'materials/Material.js',
+'materials/LineBasicMaterial.js',
+'materials/MeshBasicMaterial.js',
+'materials/ParticleBasicMaterial.js',
 'materials/ParticleDOMMaterial.js',
 'textures/Texture.js',
+'textures/DataTexture.js',
 'objects/Particle.js',
 'objects/Mesh.js',
 'objects/Line.js',
@@ -237,8 +243,7 @@ DOM_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'extras/ImageUtils.js'
+'renderers/renderables/RenderableLine.js'
 ]
 
 SVG_FILES = [
@@ -268,6 +273,10 @@ SVG_FILES = [
 'lights/AmbientLight.js',
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
+'loaders/Loader.js',
+'loaders/BinaryLoader.js',
+'loaders/JSONLoader.js',
+'loaders/SceneLoader.js',
 'materials/Material.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
@@ -278,6 +287,7 @@ SVG_FILES = [
 'materials/MeshFaceMaterial.js',
 'materials/ParticleBasicMaterial.js',
 'textures/Texture.js',
+'textures/DataTexture.js',
 'objects/Particle.js',
 'objects/Line.js',
 'objects/Mesh.js',
@@ -290,8 +300,7 @@ SVG_FILES = [
 'renderers/renderables/RenderableFace4.js',
 'renderers/renderables/RenderableObject.js',
 'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'extras/ImageUtils.js'
+'renderers/renderables/RenderableLine.js'
 ]
 
 WEBGL_FILES = [
@@ -315,7 +324,6 @@ WEBGL_FILES = [
 'core/UV.js',
 'core/Geometry.js',
 'core/Spline.js',
-'core/Edge.js',
 'cameras/Camera.js',
 'cameras/OrthographicCamera.js',
 'cameras/PerspectiveCamera.js',
@@ -324,6 +332,10 @@ WEBGL_FILES = [
 'lights/DirectionalLight.js',
 'lights/PointLight.js',
 'lights/SpotLight.js',
+'loaders/Loader.js',
+'loaders/BinaryLoader.js',
+'loaders/JSONLoader.js',
+'loaders/SceneLoader.js',
 'materials/Material.js',
 'materials/LineBasicMaterial.js',
 'materials/MeshBasicMaterial.js',
@@ -332,7 +344,6 @@ WEBGL_FILES = [
 'materials/MeshDepthMaterial.js',
 'materials/MeshNormalMaterial.js',
 'materials/MeshFaceMaterial.js',
-'materials/MeshShaderMaterial.js',
 'materials/ParticleBasicMaterial.js',
 'materials/ShaderMaterial.js',
 'textures/Texture.js',
@@ -360,15 +371,15 @@ WEBGL_FILES = [
 'renderers/renderables/RenderableParticle.js',
 'renderers/renderables/RenderableLine.js',
 'extras/core/BufferGeometry.js',
+'extras/core/Gyroscope.js',
 'extras/helpers/CameraHelper.js',
 'extras/objects/LensFlare.js',
-'extras/objects/MarchingCubes.js',
-'extras/plugins/LensFlarePlugin.js',
-'extras/plugins/ShadowMapPlugin.js',
-'extras/plugins/SpritePlugin.js',
+'extras/objects/ImmediateRenderObject.js',
+'extras/renderers/plugins/LensFlarePlugin.js',
+'extras/renderers/plugins/ShadowMapPlugin.js',
+'extras/renderers/plugins/SpritePlugin.js',
 'extras/shaders/ShaderFlares.js',
-'extras/shaders/ShaderSprite.js',
-'extras/ImageUtils.js'
+'extras/shaders/ShaderSprite.js'
 ]
 
 def merge(files):
@@ -412,10 +423,8 @@ def compress(text, fname_externs):
 
 
 def addHeader(text, endFilename):
-	with open(os.path.join('..', 'REVISION'), 'r') as handle:
-		revision = handle.read().rstrip()
 
-	return ("// %s r%s - http://github.com/mrdoob/three.js\n" % (endFilename, revision)) + text
+	return ("// %s - http://github.com/mrdoob/three.js\n" % endFilename) + text
 
 
 def makeDebug(text):

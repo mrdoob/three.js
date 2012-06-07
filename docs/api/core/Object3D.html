@@ -1,0 +1,187 @@
+<h1>[name]</h1>
+
+<div class="desc">Base class for scene graph objects</div>
+
+
+<h2>Constructor</h2>
+
+<h3>[name]()</h3>
+
+
+<h2>Properties</h2>
+
+<h3>.[page:Integer id]</h3>
+<div>
+Unique number of this object instance.
+</div>
+
+<h3>.[page:String name]</h3>
+<div>
+Optional name of the object (doesn't have to be unique).
+</div>
+
+<h3>.[page:Object3D parent]</h3>
+<div>
+Object's parent in scene graph.
+</div>
+
+<h3>.[page:Object3D children]</h3>
+<div>
+Array with object's children.
+</div>
+
+<h3>.[page:Vector3 position]</h3>
+<div>
+Object's local position.
+</div>
+
+<h3>.[page:Vector3 rotation]</h3>
+<div>
+Object's local rotation (Euler angles).
+</div>
+
+<h3>.[page:String eulerOrder]</h3>
+<div>
+Order of axis for Euler angles.
+</div>
+
+<h3>.[page:Vector3 scale]</h3>
+<div>
+Object's local scale.
+</div>
+
+<h3>.[page:Vector3 up]</h3>
+<div>
+Up direction.
+</div>
+
+<h3>.[page:Vector3 matrix]</h3>
+<div>
+Local transform.
+</div>
+
+<h3>.[page:Vector3 matrixRotationWorld]</h3>
+<div>
+Global rotation.
+</div>
+
+<h3>.[page:Quaternion quaternion]</h3>
+<div>
+Global rotation.
+</div>
+
+<h3>.[page:Boolean useQuaternion]</h3>
+<div>
+Use quaternion instead of Euler angles for specifying local rotation.
+</div>
+
+<h3>.[page:Float boundRadius]</h3>
+
+<h3>.[page:Float boundRadiusScale]</h3>
+<div>
+Maximum scale from x, y, z scale components.
+</div>
+
+<h3>.[page:Float renderDepth]</h3>
+<div>
+Override depth-sorting order if non *null*.
+</div>
+
+<h3>.[page:Boolean visible]</h3>
+<div>
+Object gets rendered if *true*.
+</div>
+
+<h3>.[page:Boolean doubleSided]</h3>
+<div>
+Both sides of faces visible if *true*.
+</div>
+
+<h3>.[page:Boolean flipSided]</h3>
+<div>
+Backside of face visible if *true*.
+</div>
+
+<h3>.[page:Boolean castShadow]</h3>
+<div>
+Gets rendered into shadow map.
+</div>
+
+<h3>.[page:Boolean receiveShadow]</h3>
+<div>
+Material gets baked in shadow receiving.
+</div>
+
+<h3>.[page:Boolean frustumCulled]</h3>
+
+<h3>.[page:Boolean matrixAutoUpdate]</h3>
+
+<h3>.[page:Boolean matrixWorldNeedsUpdate]</h3>
+
+<h3>.[page:Boolean rotationAutoUpdate]</h3>
+
+
+<h2>Methods</h2>
+
+<h3>.translate( [page:Float distance], [page:Vector3 axis] )</h3>
+<div>
+distance - Distance.<br />
+axis - Translation direction.
+</div>
+<div>
+Translates object along arbitrary *axis* by *distance*.
+</div>
+
+<h3>.translateX( [page:Float distance] )</h3>
+<div>
+Translates object along x axis by distance.
+</div>
+
+<h3>.translateY( [page:Float distance] )</h3>
+<div>
+Translates object along y axis by distance.
+</div>
+
+<h3>.translateZ( [page:Float distance] )</h3>
+<div>
+Translates object along z axis by distance.
+</div>
+
+<h3>.lookAt( [page:Vector3 vector] )</h3>
+<div>
+Rotates object to face point in space.
+</div>
+
+<h3>.add( [page:Object3D object] )</h3>
+<div>
+Adds *object* as child of this object.
+</div>
+
+<h3>.remove( [page:Object3D object] )</h3>
+<div>
+Removes *object* as child of this object.
+</div>
+
+<h3>.getChildByName( [page:String name], [page:Boolean recursive] )</h3>
+<div>
+name - Object name.<br />
+recursive - Whether check in the objects's children.
+</div>
+<div>
+Gets first child with name matching the argument. Searches whole subgraph recursively if *recursive* is true.
+</div>
+
+<h3>.updateMatrix()</h3>
+<div>
+Updates local transform.
+</div>
+
+<h3>.updateMatrixWorld( [page:Boolean force] )</h3>
+<div>
+Updates global transform of the object and its children.
+</div>
+
+
+<h2>Source</h2>
+
+[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

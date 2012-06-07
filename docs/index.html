@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js - documentation</title>
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				color: #555;
+				font-family: Arial, sans-serif;
+				font-size: 15px;
+				overflow: hidden;
+			}
+
+			a {
+
+				color: #2194CE;
+
+			}
+
+			#panel	{
+
+				position: fixed;
+
+				width: 260px;
+
+				overflow: auto;
+
+			}
+
+				#panel h1 {
+					color: #444;
+					font-size: 25px;
+					margin-top: 25px;
+					margin-left: 20px;
+				}
+
+				#panel h2 {
+					color: #999;
+					font-size: 16px;
+					margin-top: 20px;
+					margin-left: 20px;
+				}
+
+				#panel ul {
+					list-style-type: none;
+					padding: 0px;
+					margin-left: 20px;
+				}
+
+			#viewer {
+				overflow: auto;
+			}
+
+				#viewer h1 {
+					color: #444;
+					font-size: 25px;
+					margin-top: 10px;
+				}
+
+				#viewer h2 {
+					color: #8B2;
+					font-size: 18px;
+					margin-top: 40px;
+				}
+
+				#viewer h3 {
+					color: #000;
+					font-size: 16px;
+					margin-top: 30px;
+					font-weight: normal;
+				}
+
+				#viewer div {
+					padding-left: 30px;
+					margin-bottom: 20px;
+				}
+
+				#viewer div.desc {
+
+					padding-left: 0px;
+
+				}
+
+				#viewer pre, code {
+					margin-top: 20px;
+					margin-bottom: 20px;
+				}
+				#viewer code {
+					display: block;
+					width: 90%;
+					padding: 20px;
+					white-space: pre;
+					background-color: #f9f9f9;
+					overflow: auto;
+				}
+
+			#button {
+				position: fixed;
+				top: 20px;
+				right: 30px;
+				padding: 8px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.5;
+			}
+
+				#button:hover {
+					cursor: pointer;
+					opacity: 1;
+				}
+		</style>
+	</head>
+	<body>
+		<div id="panel"></div>
+		<div id="viewer"></div>
+		<div id="button">Edit this page</div>
+
+		<script>
+			var REVISION = '49';
+
+			var path = null;
+
+			var panel = document.getElementById( 'panel' );
+			var viewer = document.getElementById( 'viewer' );
+			var button = document.getElementById( 'button' );
+
+			button.addEventListener( 'click', function ( event ) {
+
+				window.open( 'https://github.com/mrdoob/three.js/blob/dev/docs/api/' + path + '.html' );
+
+			}, false );
+
+			var pages = {
+				"Integer": "Integer",
+				"Float": "Float",
+				"Array": "Array"
+			};
+
+			var list = {
+
+				"Cameras": [
+					{ name: "Camera", path: "cameras/Camera" },
+					{ name: "OrthographicCamera", path: "cameras/OrthographicCamera" },
+					{ name: "PerspectiveCamera", path: "cameras/PerspectiveCamera" }
+				],
+
+				"Core": [
+					{ name: "Clock", path: "core/Clock" },
+					{ name: "Color", path: "core/Color" },
+					{ name: "Face3", path: "core/Face3" },
+					{ name: "Face4", path: "core/Face4" },
+					{ name: "Frustum", path: "core/Frustum" },
+					{ name: "Geometry", path: "core/Geometry" },
+					{ name: "Math", path: "core/Math" },
+					{ name: "Matrix3", path: "core/Matrix3" },
+					{ name: "Matrix4", path: "core/Matrix4" },
+					{ name: "Object3D", path: "core/Object3D" },
+					{ name: "Projector", path: "core/Projector" },
+					{ name: "Quaternion", path: "core/Quaternion" },
+					{ name: "Ray", path: "core/Ray" },
+					{ name: "Rectangle", path: "core/Rectangle" },
+					{ name: "Spline", path: "core/Spline" },
+					{ name: "UV", path: "core/UV" },
+					{ name: "Vector2", path: "core/Vector2" },
+					{ name: "Vector3", path: "core/Vector3" },
+					{ name: "Vector4", path: "core/Vector4" }
+				],
+
+				"Lights": [
+					{ name: "Light", path: "lights/Light" },
+					{ name: "AmbientLight", path: "lights/AmbientLight" },
+					{ name: "DirectionalLight", path: "lights/DirectionalLight" },
+					{ name: "PointLight", path: "lights/PointLight" },
+					{ name: "SpotLight", path: "lights/SpotLight" }
+				],
+
+
+				"Loaders": [
+					{ name: "Loader", path: "loaders/Loader" },
+					{ name: "BinaryLoader", path: "loaders/BinaryLoader" },
+					{ name: "JSONLoader", path: "loaders/JSONLoader" },
+					{ name: "SceneLoader", path: "loaders/SceneLoader" },
+				],
+
+				"Materials": [
+					{ name: "Material", path: "materials/Material" },
+					{ name: "LineBasicMaterial", path: "materials/LineBasicMaterial" },
+					{ name: "MeshBasicMaterial", path: "materials/MeshBasicMaterial" },
+					{ name: "MeshDepthMaterial", path: "materials/MeshDepthMaterial" },
+					{ name: "MeshFaceMaterial", path: "materials/MeshFaceMaterial" },
+					{ name: "MeshLambertMaterial", path: "materials/MeshLambertMaterial" },
+					{ name: "MeshNormalMaterial", path: "materials/MeshNormalMaterial" },
+					{ name: "MeshPhongMaterial", path: "materials/MeshPhongMaterial" },
+					{ name: "ParticleBasicMaterial", path: "materials/ParticleBasicMaterial" },
+					{ name: "ParticleCanvasMaterial", path: "materials/ParticleCanvasMaterial" },
+					{ name: "ParticleDOMMaterial", path: "materials/ParticleDOMMaterial" },
+					{ name: "ShaderMaterial", path: "materials/ShaderMaterial" }
+
+				],
+
+				"Objects": [
+					{ name: "Bone", path: "objects/Bone" },
+					{ name: "Line", path: "objects/Line" },
+					{ name: "LOD", path: "objects/LOD" },
+					{ name: "Mesh", path: "objects/Mesh" },
+					{ name: "MorphAnimMesh", path: "objects/MorphAnimMesh" },
+					{ name: "Particle", path: "objects/Particle" },
+					{ name: "ParticleSystem", path: "objects/ParticleSystem" },
+					{ name: "Ribbon", path: "objects/Ribbon" },
+					{ name: "SkinnedMesh", path: "objects/SkinnedMesh" },
+					{ name: "Sprite", path: "objects/Sprite" }
+
+				],
+
+				"Renderers": [
+					{ name: "CanvasRenderer", path: "renderers/CanvasRenderer" },
+					{ name: "DOMRenderer", path: "renderers/DOMRenderer" },
+					{ name: "SVGRenderer", path: "renderers/SVGRenderer" },
+					{ name: "WebGLRenderer", path: "renderers/WebGLRenderer" },
+					{ name: "WebGLRenderTarget", path: "renderers/WebGLRenderTarget" },
+					{ name: "WebGLRenderTargetCube", path: "renderers/WebGLRenderTargetCube" },
+					{ name: "WebGLShaders", path: "renderers/WebGLShaders" }
+				],
+
+				"Renderers / Renderables": [
+					{ name: "RenderableFace3", path: "renderers/renderables/RenderableFace3" },
+					{ name: "RenderableFace4", path: "renderers/renderables/RenderableFace4" },
+					{ name: "RenderableLine", path: "renderers/renderables/RenderableLine" },
+					{ name: "RenderableObject", path: "renderers/renderables/RenderableObject" },
+					{ name: "RenderableParticle", path: "renderers/renderables/RenderableParticle" },
+					{ name: "RenderableVertex", path: "renderers/renderables/RenderableVertex" }
+				],
+
+				"Scenes": [
+					{ name: "Fog", path: "scenes/Fog" },
+					{ name: "FogExp2", path: "scenes/FogExp2" },
+					{ name: "Scene", path: "scenes/Scene" }
+				],
+
+				"Textures": [
+					{ name: "DataTexture", path: "textures/DataTexture" },
+					{ name: "Texture", path: "textures/Texture" }
+				],
+
+				"Extras": [
+					{ name: "ColorUtils", path: "extras/ColorUtils" },
+					{ name: "GeometryUtils", path: "extras/GeometryUtils" },
+					{ name: "ImageUtils", path: "extras/ImageUtils" },
+					{ name: "SceneUtils", path: "extras/SceneUtils" },
+					{ name: "ShaderUtils", path: "extras/ShaderUtils" }
+				],
+
+				"Extras / Animation": [
+					{ name: "Animation", path: "extras/animation/Animation" },
+					{ name: "AnimationHandler", path: "extras/animation/AnimationHandler" },
+					{ name: "AnimationMorphTarget", path: "extras/animation/AnimationMorphTarget" },
+					{ name: "KeyFrameAnimation", path: "extras/animation/KeyFrameAnimation" }
+				],
+
+				"Extras / Cameras": [
+					{ name: "CombinedCamera", path: "extras/cameras/CombinedCamera" },
+					{ name: "CubeCamera", path: "extras/cameras/CubeCamera" }
+				],
+
+				"Extras / Controls": [
+					{ name: "FirstPersonControls", path: "extras/controls/FirstPersonControls" },
+					{ name: "FlyControls", path: "extras/controls/FlyControls" },
+					{ name: "PathControls", path: "extras/controls/PathControls" },
+					{ name: "RollControls", path: "extras/controls/RollControls" },
+					{ name: "TrackballControls", path: "extras/controls/TrackballControls" }
+				],
+
+				"Extras / Core": [
+					{ name: "BufferGeometry", path: "extras/core/BufferGeometry" },
+					{ name: "Curve", path: "extras/core/Curve" },
+					{ name: "CurvePath", path: "extras/core/CurvePath" },
+					{ name: "EventTarget", path: "extras/core/EventTarget" },
+					{ name: "Gyroscope", path: "extras/core/Gyroscope" },
+					{ name: "Path", path: "extras/core/Path" },
+					{ name: "Shape", path: "extras/core/Shape" },
+					{ name: "TextPath", path: "extras/core/TextPath" }
+				],
+
+				"Extras / Geometries": [
+					{ name: "CubeGeometry", path: "extras/geometries/CubeGeometry" },
+					{ name: "CylinderGeometry", path: "extras/geometries/CylinderGeometry" },
+					{ name: "ExtrudeGeometry", path: "extras/geometries/ExtrudeGeometry" },
+					{ name: "IcosahedronGeometry", path: "extras/geometries/IcosahedronGeometry" },
+					{ name: "LatheGeometry", path: "extras/geometries/LatheGeometry" },
+					{ name: "OctahedronGeometry", path: "extras/geometries/OctahedronGeometry" },
+					{ name: "PlaneGeometry", path: "extras/geometries/PlaneGeometry" },
+					{ name: "PolyhedronGeometry", path: "extras/geometries/PolyhedronGeometry" },
+					{ name: "SphereGeometry", path: "extras/geometries/SphereGeometry" },
+					{ name: "TetrahedronGeometry", path: "extras/geometries/TetrahedronGeometry" },
+					{ name: "TextGeometry", path: "extras/geometries/TextGeometry" },
+					{ name: "TorusGeometry", path: "extras/geometries/TorusGeometry" },
+					{ name: "TorusKnotGeometry", path: "extras/geometries/TorusKnotGeometry" }
+				],
+
+				"Extras / Helpers": [
+					{ name: "AxisHelper", path: "extras/helpers/AxisHelper" },
+					{ name: "CameraHelper", path: "extras/helpers/CameraHelper" }
+				],
+
+				"Extras / Modifiers": [
+					{ name: "SubdivisionModifier", path: "extras/modifiers/SubdivisionModifier" }
+				],
+
+				"Extras / Objects": [
+					{ name: "LensFlare", path: "extras/objects/LensFlare" },
+					{ name: "MarchingCubes", path: "extras/objects/MarchingCubes" }
+				],
+
+				"Extras / Renderers / Effects": [
+					{ name: "AnaglyphEffect", path: "extras/renderers/effects/AnaglyphEffect" },
+					{ name: "CrosseyedEffect", path: "extras/renderers/effects/CrosseyedEffect" },
+					{ name: "ParallaxBarrierEffect", path: "extras/renderers/effects/ParallaxBarrierEffect" },
+					{ name: "StereoEffect", path: "extras/renderers/effects/StereoEffect" }
+				],
+
+				"Extras / Renderers / Plugins": [
+					{ name: "LensFlarePlugin", path: "extras/renderers/plugins/LensFlarePlugin" },
+					{ name: "ShadowMapPlugin", path: "extras/renderers/plugins/ShadowMapPlugin" },
+					{ name: "SpritePlugin", path: "extras/renderers/plugins/SpritePlugin" }
+				],
+
+				"Extras / Shaders": [
+					{ name: "ShaderFlares", path: "extras/shaders/ShaderFlares" },
+					{ name: "ShaderSprite", path: "extras/shaders/ShaderSprite" }
+				]
+
+			};
+
+			var html = '<h1>three.js <span style="font-size: 50%; vertical-align: super;">r' + REVISION + '</span></h1>';
+
+			for ( var category in list ) {
+
+				html += '<h2>' + category + '</h2>';
+
+				html += '<ul>';
+
+				for ( var i = 0; i < list[ category ].length; i ++ ) {
+
+					var page = list[ category ][ i ];
+					pages[ page.name ] = page.path;
+					html += '<li><a href="javascript:goTo(\'' + page.name + '\')">' + page.name + '</a></li>';
+
+				}
+
+				html += '</ul>';
+
+			}
+
+			panel.innerHTML += html;
+
+			// Page loading
+
+			function goTo( name ) {
+
+				path = pages[ name ];
+
+				window.location.hash = name;
+				viewer.innerHTML = '';
+
+				var xhr = new XMLHttpRequest();
+				xhr.open( 'GET', 'api/' + path + '.html', true );
+				xhr.onreadystatechange = function () {
+
+					if ( xhr.readyState == 4 && ( xhr.status == 200 || xhr.status == 0 ) ) {
+
+						// TODO: Set title.
+
+						var text = xhr.responseText;
+						
+						text = text.replace(/\[name\]/gi, name);
+						text = text.replace(/\[path\]/gi, path);
+						text = text.replace(/\[page:(\w+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
+						text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:goTo('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
+						text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
+						text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+) ([\w|\:|\/|\.|\-|\_]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
+						text = text.replace(/\*([\w|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]+)\*/gi, "<strong>$1</strong>" ); // *
+
+						viewer.innerHTML = '<br>' + text + '<br><br>';
+
+					}
+
+				};
+
+				xhr.send( null );
+
+			}
+
+			function goToHash() {
+
+				goTo( window.location.hash.substring( 1 ) );
+
+			}
+			
+			window.addEventListener( 'hashchange', goToHash, false );
+
+			goToHash();
+
+			// Layout
+
+			var margin = 280;
+
+			function updateLayout() {
+
+				panel.style.height = window.innerHeight + 'px';
+
+				viewer.style.marginLeft = margin + 'px';
+				viewer.style.width = ( window.innerWidth - margin ) + 'px';
+				viewer.style.height = window.innerHeight + 'px';
+
+			}
+
+			window.addEventListener( 'resize', updateLayout, false );
+
+			updateLayout();
+
+		</script>
+	</body>
+</html>

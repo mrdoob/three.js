@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - cube</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/Three.js"></script>
+
+		<script>
+
+			var camera, scene, renderer;
+			var mesh;
+
+			init();
+			animate();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 400;
+				scene.add( camera );
+
+				//
+
+				geometry = new THREE.CubeGeometry( 200, 200, 200 );
+				material = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/crate.gif' ) });
+
+				mesh = new THREE.Mesh( geometry, material);
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				mesh.rotation.x += 0.005;
+				mesh.rotation.y += 0.01;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

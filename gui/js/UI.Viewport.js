@@ -35,12 +35,13 @@ UI.Viewport = function () {
 	var _sceneHelpers = new THREE.Scene();
 
 	var _grid = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x606060, wireframe: true, transparent: true } ) );
-	_grid.rotation.x = Math.PI / 2;
 	_sceneHelpers.add( _grid );
 
 	//
 
 	var _scene = new THREE.Scene();
+
+	_scene.add(_camera);
 
 	/*
 	var light = new THREE.AmbientLight( 0x404040 );
@@ -54,6 +55,8 @@ UI.Viewport = function () {
 
 	var _plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
 	_plane.visible = false;
+	_plane.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+
 	_sceneHelpers.add( _plane );
 
 	var _projector = new THREE.Projector();
@@ -70,7 +73,7 @@ UI.Viewport = function () {
 		_projector.unprojectVector( vector, _camera );
 
 		var ray = new THREE.Ray( _camera.position, vector.subSelf( _camera.position ).normalize() );
-		var intersects = ray.intersectScene( _scene );
+		var intersects = ray.intersectObjects( _scene.children );
 
 		if ( intersects.length ) {
 
@@ -92,7 +95,7 @@ UI.Viewport = function () {
 		_projector.unprojectVector( vector, _camera );
 
 		var ray = new THREE.Ray( _camera.position, vector.subSelf( _camera.position ).normalize() );
-		var intersects = ray.intersectScene( _scene );
+		var intersects = ray.intersectObjects( _scene.children );
 
 		if ( _SELECTED ) {
 

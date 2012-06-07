@@ -4,6 +4,8 @@
 
 THREE.SVGRenderer = function () {
 
+	console.log( 'THREE.SVGRenderer', THREE.REVISION );
+
 	var _this = this,
 	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
@@ -109,7 +111,7 @@ THREE.SVGRenderer = function () {
 			material = element.material;
 			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
 
-			if ( material == null || material.opacity == 0 ) continue;
+			if ( material === undefined || material.visible === false ) continue;
 
 			_bboxRect.empty();
 

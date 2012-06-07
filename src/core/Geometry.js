@@ -22,6 +22,7 @@ THREE.Geometry = function () {
 
 	this.morphTargets = [];
 	this.morphColors = [];
+	this.morphNormals = [];
 
 	this.skinWeights = [];
 	this.skinIndices = [];
@@ -42,13 +43,13 @@ THREE.Geometry.prototype = {
 	applyMatrix: function ( matrix ) {
 
 		var matrixRotation = new THREE.Matrix4();
-		matrixRotation.extractRotation( matrix, new THREE.Vector3( 1, 1, 1 ) );
+		matrixRotation.extractRotation( matrix );
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			var vertex = this.vertices[ i ];
 
-			matrix.multiplyVector3( vertex.position );
+			matrix.multiplyVector3( vertex );
 
 		}
 
@@ -81,17 +82,17 @@ THREE.Geometry.prototype = {
 
 			if ( face instanceof THREE.Face3 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ].position );
-				face.centroid.addSelf( this.vertices[ face.b ].position );
-				face.centroid.addSelf( this.vertices[ face.c ].position );
+				face.centroid.addSelf( this.vertices[ face.a ] );
+				face.centroid.addSelf( this.vertices[ face.b ] );
+				face.centroid.addSelf( this.vertices[ face.c ] );
 				face.centroid.divideScalar( 3 );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ].position );
-				face.centroid.addSelf( this.vertices[ face.b ].position );
-				face.centroid.addSelf( this.vertices[ face.c ].position );
-				face.centroid.addSelf( this.vertices[ face.d ].position );
+				face.centroid.addSelf( this.vertices[ face.a ] );
+				face.centroid.addSelf( this.vertices[ face.b ] );
+				face.centroid.addSelf( this.vertices[ face.c ] );
+				face.centroid.addSelf( this.vertices[ face.d ] );
 				face.centroid.divideScalar( 4 );
 
 			}
@@ -113,8 +114,8 @@ THREE.Geometry.prototype = {
 			vB = this.vertices[ face.b ];
 			vC = this.vertices[ face.c ];
 
-			cb.sub( vC.position, vB.position );
-			ab.sub( vA.position, vB.position );
+			cb.sub( vC, vB );
+			ab.sub( vA, vB );
 			cb.crossSelf( ab );
 
 			if ( !cb.isZero() ) {
@@ -225,6 +226,145 @@ THREE.Geometry.prototype = {
 
 	},
 
+	computeMorphNormals: function () {
+
+		var i, il, f, fl, face;
+
+		// save original normals
+		// - create temp variables on first access
+		//   otherwise just copy (for faster repeated calls)
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			if ( ! face.__originalFaceNormal ) {
+
+				face.__originalFaceNormal = face.normal.clone();
+
+			} else {
+
+				face.__originalFaceNormal.copy( face.normal );
+
+			}
+
+			if ( ! face.__originalVertexNormals ) face.__originalVertexNormals = [];
+
+			for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
+
+				if ( ! face.__originalVertexNormals[ i ] ) {
+
+					face.__originalVertexNormals[ i ] = face.vertexNormals[ i ].clone();
+
+				} else {
+
+					face.__originalVertexNormals[ i ].copy( face.vertexNormals[ i ] );
+
+				}
+
+			}
+
+		}
+
+		// use temp geometry to compute face and vertex normals for each morph
+
+		var tmpGeo = new THREE.Geometry();
+		tmpGeo.faces = this.faces;
+
+		for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
+
+			// create on first access
+
+			if ( ! this.morphNormals[ i ] ) {
+
+				this.morphNormals[ i ] = {};
+				this.morphNormals[ i ].faceNormals = [];
+				this.morphNormals[ i ].vertexNormals = [];
+
+				var dstNormalsFace = this.morphNormals[ i ].faceNormals;
+				var dstNormalsVertex = this.morphNormals[ i ].vertexNormals;
+
+				var faceNormal, vertexNormals;
+
+				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+					face = this.faces[ f ];
+
+					faceNormal = new THREE.Vector3();
+
+					if ( face instanceof THREE.Face3 ) {
+
+						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
+
+					} else {
+
+						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3() };
+
+					}
+
+					dstNormalsFace.push( faceNormal );
+					dstNormalsVertex.push( vertexNormals );
+
+				}
+
+			}
+
+			var morphNormals = this.morphNormals[ i ];
+
+			// set vertices to morph target
+
+			tmpGeo.vertices = this.morphTargets[ i ].vertices;
+
+			// compute morph normals
+
+			tmpGeo.computeFaceNormals();
+			tmpGeo.computeVertexNormals();
+
+			// store morph normals
+
+			var faceNormal, vertexNormals;
+
+			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+				face = this.faces[ f ];
+
+				faceNormal = morphNormals.faceNormals[ f ];
+				vertexNormals = morphNormals.vertexNormals[ f ];
+
+				faceNormal.copy( face.normal );
+
+				if ( face instanceof THREE.Face3 ) {
+
+					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
+
+				} else {
+
+					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
+					vertexNormals.d.copy( face.vertexNormals[ 3 ] );
+
+				}
+
+			}
+
+		}
+
+		// restore original normals
+
+		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			face = this.faces[ f ];
+
+			face.normal = face.__originalFaceNormal;
+			face.vertexNormals = face.__originalVertexNormals;
+
+		}
+
+	},
+
 	computeTangents: function () {
 
 		// based on http://www.terathon.com/code/tangent.html
@@ -248,9 +388,9 @@ THREE.Geometry.prototype = {
 
 		function handleTriangle( context, a, b, c, ua, ub, uc ) {
 
-			vA = context.vertices[ a ].position;
-			vB = context.vertices[ b ].position;
-			vC = context.vertices[ c ].position;
+			vA = context.vertices[ a ];
+			vB = context.vertices[ b ];
+			vC = context.vertices[ c ];
 
 			uvA = uv[ ua ];
 			uvB = uv[ ub ];
@@ -297,8 +437,8 @@ THREE.Geometry.prototype = {
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
 				handleTriangle( this, face.a, face.b, face.d, 0, 1, 3 );
+				handleTriangle( this, face.b, face.c, face.d, 1, 2, 3 );
 
 			}
 
@@ -341,27 +481,25 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
+		if ( ! this.boundingBox ) {
+
+			this.boundingBox = { min: new THREE.Vector3(), max: new THREE.Vector3() };
+
+		}
+
 		if ( this.vertices.length > 0 ) {
 
-			var position, firstPosition = this.vertices[ 0 ].position;
+			var position, firstPosition = this.vertices[ 0 ];
 
-			if ( ! this.boundingBox ) {
-
-				this.boundingBox = { min: firstPosition.clone(), max: firstPosition.clone() };
-
-			} else {
-
-				this.boundingBox.min.copy( firstPosition );
-				this.boundingBox.max.copy( firstPosition );
-
-			}
+			this.boundingBox.min.copy( firstPosition );
+			this.boundingBox.max.copy( firstPosition );
 
 			var min = this.boundingBox.min,
 				max = this.boundingBox.max;
 
 			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
 
-				position = this.vertices[ v ].position;
+				position = this.vertices[ v ];
 
 				if ( position.x < min.x ) {
 
@@ -395,22 +533,29 @@ THREE.Geometry.prototype = {
 
 			}
 
+		} else {
+
+			this.boundingBox.min.set( 0, 0, 0 );
+			this.boundingBox.max.set( 0, 0, 0 );
+
 		}
 
 	},
 
 	computeBoundingSphere: function () {
 
+		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+
 		var radius, maxRadius = 0;
 
 		for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			radius = this.vertices[ v ].position.length();
+			radius = this.vertices[ v ].length();
 			if ( radius > maxRadius ) maxRadius = radius;
 
 		}
 
-		this.boundingSphere = { radius: maxRadius };
+		this.boundingSphere.radius = maxRadius;
 
 	},
 
@@ -429,10 +574,11 @@ THREE.Geometry.prototype = {
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
+		var abcd = 'abcd', o, k, j, jl, u;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
-			v = this.vertices[ i ].position;
+			v = this.vertices[ i ];
 			key = [ Math.round( v.x * precision ), Math.round( v.y * precision ), Math.round( v.z * precision ) ].join( '_' );
 
 			if ( verticesMap[ key ] === undefined ) {
@@ -470,13 +616,31 @@ THREE.Geometry.prototype = {
 				face.c = changes[ face.c ];
 				face.d = changes[ face.d ];
 
+				// check dups in (a, b, c, d) and convert to -> face3
+				o = [face.a, face.b, face.c, face.d];
+				for (k=3;k>0;k--) {
+					if ( o.indexOf(face[abcd[k]]) != k ) {
+						// console.log('faces', face.a, face.b, face.c, face.d, 'dup at', k);
+						o.splice(k, 1);
+						this.faces[ i ] = new THREE.Face3(o[0], o[1], o[2]);
+						for (j=0,jl=this.faceVertexUvs.length;j<jl;j++) {
+							u = this.faceVertexUvs[j][i];
+							if (u) u.splice(k, 1);
+						}
+						
+						break;
+					}
+				}
+
+
 			}
 
 		}
 
 		// Use unique set of vertices
-
+		var diff = this.vertices.length - unique.length;
 		this.vertices = unique;
+		return diff;
 
 	}
 

@@ -113,11 +113,13 @@ THREE.SceneUtils = {
 
 			object = new THREE.LOD();
 
+		/*
 		} else if ( source instanceof THREE.MarchingCubes ) {
 
 			object = new THREE.MarchingCubes( source.resolution, source.material );
 			object.field.set( source.field );
 			object.isolation = source.isolation;
+		*/
 
 		} else if ( source instanceof THREE.Object3D ) {
 
@@ -198,6 +200,25 @@ THREE.SceneUtils = {
 		}
 
 		return object;
+
+	},
+
+	detach : function ( child, parent, scene ) {
+
+		child.applyMatrix( parent.matrixWorld );
+		parent.remove( child );
+		scene.add( child );
+
+	},
+
+	attach: function ( child, scene, parent ) {
+
+		var matrixWorldInverse = new THREE.Matrix4();
+		matrixWorldInverse.getInverse( parent.matrixWorld );
+		child.applyMatrix( matrixWorldInverse );
+
+		scene.remove( child );
+		parent.add( child );
 
 	}
 
