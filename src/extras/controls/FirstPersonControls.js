@@ -7,6 +7,7 @@
 THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.object = object;
+	this.objectPosition = object.position.clone();
 	this.target = new THREE.Vector3( 0, 0, 0 );
 
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -258,6 +259,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 		this.object.lookAt( targetPosition );
 
+		if ( this.noFly ) {
+
+			position.y = this.objectPosition.y;
+
+		}
 	};
 
 
