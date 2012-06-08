@@ -3,7 +3,7 @@
     "metadata" :
     {
         "formatVersion" : 3,
-        "generatedBy"   : "Blender 2.60 Exporter",
+        "generatedBy"   : "Blender 2.63 Exporter",
         "vertices"      : 8,
         "faces"         : 6,
         "normals"       : 0,
@@ -19,12 +19,16 @@
 	"DbgColor" : 15658734,
 	"DbgIndex" : 0,
 	"DbgName" : "Material",
+	"blending" : "NormalBlending",
 	"colorAmbient" : [0.0, 0.0, 0.0],
 	"colorDiffuse" : [0.800000011920929, 0.800000011920929, 0.800000011920929],
 	"colorSpecular" : [0.5, 0.5, 0.5],
+	"depthTest" : true,
+	"depthWrite" : true,
 	"shading" : "Lambert",
 	"specularCoef" : 50,
 	"transparency" : 1.0,
+	"transparent" : false,
 	"vertexColors" : true
 	}],
 

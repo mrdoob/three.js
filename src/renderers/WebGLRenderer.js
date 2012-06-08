@@ -5137,7 +5137,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			light = lights[ l ];
 
-			if ( light.onlyShadow ) continue;
+			if ( light.onlyShadow || ! light.visible ) continue;
 
 			color = light.color;
 			intensity = light.intensity;

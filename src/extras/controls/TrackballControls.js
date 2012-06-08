@@ -258,6 +258,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( ! _this.enabled ) return;
 
+		event.preventDefault();
+
 		if ( _state !== STATE.NONE ) {
 
 			return;

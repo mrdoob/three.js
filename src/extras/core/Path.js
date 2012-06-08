@@ -29,8 +29,8 @@ THREE.PathActions = {
 	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
 	BEZIER_CURVE_TO: 'bezierCurveTo', 		// Bezier cubic curve
 	CSPLINE_THRU: 'splineThru',				// Catmull-rom spline
-	ARC: 'arc'								// Circle
-
+	ARC: 'arc',								// Circle
+	ELLIPSE: 'ellipse'
 };
 
 // TODO Clean up PATH API
@@ -133,16 +133,31 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 };
 
 // FUTURE: Change the API or follow canvas API?
-// TODO ARC ( x, y, x - radius, y - radius, startAngle, endAngle )
 
+THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
+
+	var laste = this.actions[ this.actions.length - 1];
+	this.absellipse(laste.x + aX, laste.y + aY, xRadius, yRadius,
+									aStartAngle, aEndAngle, aClockwise );
+ };
+ 
 THREE.Path.prototype.arc = function ( aX, aY, aRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
+
+	var laste = this.actions[ this.actions.length - 1];
+	this.absarc(laste.x + aX, laste.y + aY, aRadius,
+									aStartAngle, aEndAngle, aClockwise );
+ };
+ 
+
+
+THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 
 	var args = Array.prototype.slice.call( arguments );
 
-	var laste = this.actions[ this.actions.length - 1];
-
-	var curve = new THREE.ArcCurve( laste.x + aX, laste.y + aY, aRadius,
+	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
 
@@ -152,29 +167,14 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 	args.push(lastPoint.x);
 	args.push(lastPoint.y);
 
-	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
+	this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
 
  };
 
 THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
-
-	var args = Array.prototype.slice.call( arguments );
-
-	var curve = new THREE.ArcCurve( aX, aY, aRadius,
-									aStartAngle, aEndAngle, aClockwise );
-	this.curves.push( curve );
-
-	// console.log( 'arc', args );
-
-        // All of the other actions look to the last two elements in the list to
-        // find the ending point, so we need to append them.
-        var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
-        args.push(lastPoint.x);
-        args.push(lastPoint.y);
-
-	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
-
+	this.absellipse(aX, aY, aRadius, aRadius,
+		aStartAngle, aEndAngle, aClockwise);
  };
 
 
@@ -342,8 +342,6 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 		case THREE.PathActions.ARC:
 
-			laste = this.actions[ i - 1 ].args;
-
 			var aX = args[ 0 ], aY = args[ 1 ],
 				aRadius = args[ 2 ],
 				aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
@@ -368,6 +366,44 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				tx = aX + aRadius * Math.cos( angle );
 				ty = aY + aRadius * Math.sin( angle );
+
+				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+
+				points.push( new THREE.Vector2( tx, ty ) );
+
+			}
+
+			//console.log(points);
+
+		  break;
+		  
+		case THREE.PathActions.ELLIPSE:
+
+			var aX = args[ 0 ], aY = args[ 1 ],
+				xRadius = args[ 2 ],
+				yRadius = args[3]
+				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
+				aClockwise = !!args[ 6 ];
+
+
+			var deltaAngle = aEndAngle - aStartAngle;
+			var angle;
+			var tdivisions = divisions * 2;
+
+			for ( j = 1; j <= tdivisions; j ++ ) {
+
+				t = j / tdivisions;
+
+				if ( ! aClockwise ) {
+
+					t = 1 - t;
+
+				}
+
+				angle = aStartAngle + t * deltaAngle;
+
+				tx = aX + xRadius * Math.cos( angle );
+				ty = aY + yRadius * Math.sin( angle );
 
 				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
