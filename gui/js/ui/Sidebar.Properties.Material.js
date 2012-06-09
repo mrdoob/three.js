@@ -17,8 +17,21 @@ Sidebar.Properties.Material = function ( signals ) {
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Color' ).setColor( '#666' ) );
-	var materialColor = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	
+	var materialColor = new UI.Color( 'absolute' ).setLeft( '90px' );
 	container.add( materialColor );
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'Ambient' ).setColor( '#666' ) );
+	
+	var materialAmbient = new UI.Color( 'absolute' ).setLeft( '90px' );
+	container.add( materialAmbient );
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setText( 'Specular' ).setColor( '#666' ) );
+	
+	var materialSpecular = new UI.Color( 'absolute' ).setLeft( '90px' );
+	container.add( materialSpecular );
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Map' ).setColor( '#666' ) );
@@ -27,7 +40,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Opacity' ).setColor( '#666' ) );
-	var materialOpacity = new UI.FloatNumber( 'absolute' ).setLeft( '90px' ).setWidth( '60px' ).setMin( 0 ).setMax( 1 ).onChange( update );
+	var materialOpacity = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '60px' ).setMin( 0 ).setMax( 1 ).onChange( update );
 	container.add( materialOpacity );
 	container.add( new UI.HorizontalRule() );
 
@@ -61,7 +74,9 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			materialName.setText( object.material.name );
 			materialClass.setText( getMaterialInstanceName( object.material ) );
-			materialColor.setText( '#' + object.material.color.getHex().toString(16) );
+			materialColor.setValue( '#' + object.material.color.getHex().toString( 16 ) );
+			if ( object.material.ambient ) materialAmbient.setValue( '#' + object.material.ambient.getHex().toString( 16 ) );
+			if ( object.material.specular ) materialSpecular.setValue( '#' + object.material.specular.getHex().toString( 16 ) );
 			materialMap.setText( object.material.map );
 			materialOpacity.setValue( object.material.opacity );
 			materialTransparent.setText( object.material.transparent );

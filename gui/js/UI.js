@@ -243,9 +243,42 @@ UI.Text.prototype.setText = function ( value ) {
 };
 
 
-// FloatNumber
+// Color
 
-UI.FloatNumber = function ( position ) {
+UI.Color = function ( position ) {
+
+	UI.Element.call( this );
+
+	this.dom = document.createElement( 'span' );
+	this.dom.style.position = position || 'relative';
+	this.dom.style.width = '64px';
+	this.dom.style.height = '16px';
+	this.dom.style.backgroundColor = '#000000';
+
+	return this;
+
+};
+
+UI.Color.prototype = new UI.Element();
+UI.Color.prototype.constructor = UI.Color;
+
+UI.Color.prototype.getValue = function () {
+
+	return this.dom.style.backgroundColor;
+
+};
+
+UI.Color.prototype.setValue = function ( value ) {
+
+	this.dom.style.backgroundColor = value;
+	return this;
+
+};
+
+
+// Number
+
+UI.Number = function ( position ) {
 
 	UI.Element.call( this );
 
@@ -318,37 +351,37 @@ UI.FloatNumber = function ( position ) {
 
 };
 
-UI.FloatNumber.prototype = new UI.Element();
-UI.FloatNumber.prototype.constructor = UI.FloatNumber;
+UI.Number.prototype = new UI.Element();
+UI.Number.prototype.constructor = UI.Number;
 
-UI.FloatNumber.prototype.getValue = function () {
+UI.Number.prototype.getValue = function () {
 
 	return parseFloat( this.dom.value );
 
 };
 
-UI.FloatNumber.prototype.setValue = function ( value ) {
+UI.Number.prototype.setValue = function ( value ) {
 
 	this.dom.value = value.toFixed( 2 );
 	return this;
 
 };
 
-UI.FloatNumber.prototype.setMin = function ( value ) {
+UI.Number.prototype.setMin = function ( value ) {
 
 	this.min = value;
 	return this;
 
 };
 
-UI.FloatNumber.prototype.setMax = function ( value ) {
+UI.Number.prototype.setMax = function ( value ) {
 
 	this.max = value;
 	return this;
 
 };
 
-UI.FloatNumber.prototype.onChange = function ( callback ) {
+UI.Number.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 	return this;
