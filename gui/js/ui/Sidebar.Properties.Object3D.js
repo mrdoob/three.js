@@ -12,23 +12,23 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Position' ).setColor( '#666' ) );
-	var positionX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '60px' ).onChange( update );
-	var positionY = new UI.Number( 'absolute' ).setLeft( '160px' ).setWidth( '60px' ).onChange( update );
-	var positionZ = new UI.Number( 'absolute' ).setLeft( '230px' ).setWidth( '60px' ).onChange( update );
+	var positionX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+	var positionY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
+	var positionZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 	container.add( positionX, positionY, positionZ );
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Rotation' ).setColor( '#666' ) );
-	var rotationX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '60px' ).onChange( update );
-	var rotationY = new UI.Number( 'absolute' ).setLeft( '160px' ).setWidth( '60px' ).onChange( update );
-	var rotationZ = new UI.Number( 'absolute' ).setLeft( '230px' ).setWidth( '60px' ).onChange( update );
+	var rotationX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+	var rotationY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
+	var rotationZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 	container.add( rotationX, rotationY, rotationZ );
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Scale' ).setColor( '#666' ) );
-	var scaleX = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '90px' ).setWidth( '60px' ).onChange( update );
-	var scaleY = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '160px' ).setWidth( '60px' ).onChange( update );
-	var scaleZ = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '230px' ).setWidth( '60px' ).onChange( update );
+	var scaleX = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+	var scaleY = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
+	var scaleZ = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 	container.add( scaleX, scaleY, scaleZ );
 	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
