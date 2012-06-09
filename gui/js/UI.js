@@ -337,6 +337,9 @@ UI.FloatNumber = function ( position ) {
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
 
+	this.min = - Infinity;
+	this.max = Infinity;
+
 	this.onChangeCallback = null;
 
 	var scope = this;
@@ -357,10 +360,12 @@ UI.FloatNumber = function ( position ) {
 
 	var onMouseMove = function ( event ) {
 
-		var dx = event.screenX - onMouseDownScreenX;
-		var dy = event.screenY - onMouseDownScreenY;
+		var distance = ( event.screenX - onMouseDownScreenX ) - ( event.screenY - onMouseDownScreenY );
+		var amount = event.shiftKey ? 10 : 100;
 
-		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 2 );
+		var number = onMouseDownValue + ( distance / amount );
+
+		scope.dom.textContent = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
 		scope.onChangeCallback();
 
 	}
@@ -390,6 +395,20 @@ UI.FloatNumber.prototype.getValue = function () {
 UI.FloatNumber.prototype.setValue = function ( value ) {
 
 	this.dom.textContent = value.toFixed( 2 );
+	return this;
+
+};
+
+UI.FloatNumber.prototype.setMin = function ( value ) {
+
+	this.min = value;
+	return this;
+
+};
+
+UI.FloatNumber.prototype.setMax = function ( value ) {
+
+	this.max = value;
 	return this;
 
 };

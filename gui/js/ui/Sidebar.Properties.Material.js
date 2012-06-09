@@ -27,7 +27,9 @@ Sidebar.Properties.Material = function ( signals ) {
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Opacity' ).setColor( '#666' ) );
-	var materialOpacity = new UI.FloatNumber( 'absolute' ).setLeft( '90px' ).setFontSize( '12px' ).onChange( update );
+	var materialOpacity = new UI.FloatNumber( 'absolute' ).setLeft( '90px' ).setFontSize( '12px' );
+	materialOpacity.setMin( 0 ).setMax( 1 );
+	materialOpacity.onChange( update );
 	container.add( materialOpacity );
 	container.add( new UI.HorizontalRule() );
 
