@@ -198,7 +198,7 @@ UI.Panel = function ( position ) {
 	this.dom = document.createElement( 'div' );
 	this.dom.style.position = position || 'relative';
 
-	this.dom.addEventListener( 'mousedown', function ( event ) { event.preventDefault() }, false );
+	// this.dom.addEventListener( 'mousedown', function ( event ) { event.preventDefault() }, false );
 
 	return this;
 };
@@ -243,99 +243,22 @@ UI.Text.prototype.setText = function ( value ) {
 };
 
 
-// IntNumber
-
-UI.IntNumber = function ( position ) {
-
-	UI.Element.call( this );
-
-	this.dom = document.createElement( 'span' );
-	this.dom.style.position = position || 'relative';
-	this.dom.textContent = '0.00';
-	this.dom.style.marginTop = '2px';
-	this.dom.style.color = '#0080f0';
-	this.dom.style.fontSize = '12px';
-	this.dom.style.textDecoration = 'underline';
-
-	this.onChangeCallback = null;
-
-	var scope = this;
-	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
-
-	var onMouseDown = function ( event ) {
-
-		event.preventDefault();
-
-		onMouseDownValue = parseInt( scope.dom.textContent );
-		onMouseDownScreenX = event.screenX;
-		onMouseDownScreenY = event.screenY;
-
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
-
-	}
-
-	var onMouseMove = function ( event ) {
-
-		var dx = event.screenX - onMouseDownScreenX;
-		var dy = event.screenY - onMouseDownScreenY;
-
-		scope.dom.textContent = ( onMouseDownValue + ( dx - dy ) / ( event.shiftKey ? 10 : 100 ) ).toFixed( 0 );
-		scope.onChangeCallback();
-
-	}
-
-	var onMouseUp = function ( event ) {
-
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
-
-	}
-
-	this.dom.addEventListener( 'mousedown', onMouseDown, false );
-
-	return this;
-
-};
-
-UI.IntNumber.prototype = new UI.Element();
-UI.IntNumber.prototype.constructor = UI.IntNumber;
-
-UI.IntNumber.prototype.getValue = function () {
-
-	return parseInt( this.dom.textContent );
-
-};
-
-UI.IntNumber.prototype.setValue = function ( value ) {
-
-	this.dom.textContent = value.toFixed( 0 );
-	return this;
-
-};
-
-UI.IntNumber.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-	return this;
-
-};
-
-
-
 // FloatNumber
 
 UI.FloatNumber = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'span' );
+	this.dom = document.createElement( 'input' );
 	this.dom.style.position = position || 'relative';
-	this.dom.textContent = '0.00';
-	this.dom.style.marginTop = '2px';
+	this.dom.style.marginTop = '0px';
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
 	this.dom.style.textDecoration = 'underline';
+	this.dom.style.backgroundColor = 'transparent';
+	this.dom.style.border = '0px';
+
+	this.dom.value = '0.00';
 
 	this.min = - Infinity;
 	this.max = Infinity;
@@ -347,9 +270,9 @@ UI.FloatNumber = function ( position ) {
 
 	var onMouseDown = function ( event ) {
 
-		event.preventDefault();
+		// event.preventDefault();
 
-		onMouseDownValue = parseFloat( scope.dom.textContent );
+		onMouseDownValue = parseFloat( scope.dom.value );
 		onMouseDownScreenX = event.screenX;
 		onMouseDownScreenY = event.screenY;
 
@@ -365,7 +288,7 @@ UI.FloatNumber = function ( position ) {
 
 		var number = onMouseDownValue + ( distance / amount );
 
-		scope.dom.textContent = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
+		scope.dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
 		scope.onChangeCallback();
 
 	}
@@ -378,6 +301,18 @@ UI.FloatNumber = function ( position ) {
 	}
 
 	this.dom.addEventListener( 'mousedown', onMouseDown, false );
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		var number = parseFloat( scope.dom.value );
+
+		if ( number !== NaN ) {
+
+			scope.dom.value = number.toFixed( 2 );
+			scope.onChangeCallback();
+
+		}
+
+	}, false );
 
 	return this;
 
@@ -388,13 +323,13 @@ UI.FloatNumber.prototype.constructor = UI.FloatNumber;
 
 UI.FloatNumber.prototype.getValue = function () {
 
-	return parseFloat( this.dom.textContent );
+	return parseFloat( this.dom.value );
 
 };
 
 UI.FloatNumber.prototype.setValue = function ( value ) {
 
-	this.dom.textContent = value.toFixed( 2 );
+	this.dom.value = value.toFixed( 2 );
 	return this;
 
 };
