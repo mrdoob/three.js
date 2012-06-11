@@ -124,7 +124,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.onKeyDown = function ( event ) {
 
-		event.preventDefault();
+		//event.preventDefault();
 
 		switch ( event.keyCode ) {
 
@@ -174,11 +174,11 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.update = function( delta ) {
 		var actualMoveSpeed = 0;
-		
+
 		if ( this.freeze ) {
-			
+
 			return;
-			
+
 		} else {
 
 			if ( this.heightSpeed ) {
