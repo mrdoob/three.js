@@ -123,7 +123,7 @@ THREE.Ray.prototype = {
 	},
 
 	// Canvas Particle
-	intersectParticle: function ( object, intersections ) {
+	intersectParticle: function ( object, intersects ) {
 
 		var distance = this.distanceFromIntersection(
 			this.origin,
