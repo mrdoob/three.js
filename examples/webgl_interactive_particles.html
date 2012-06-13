@@ -83,8 +83,6 @@
 		var renderer, scene, camera, stats;
 		var cube, uniforms, attributes;
 
-		var vc1;
-
 		var WIDTH = window.innerWidth,
 			HEIGHT = window.innerHeight;
 
@@ -114,14 +112,13 @@
 
 			attributes = {
 
-				size: {	type: 'f', value: [] },
-				ca:   {	type: 'c', value: [] }
+				size: { type: 'f', value: [] },
+				ca: { type: 'c', value: [] }
 
 			};
 
 			uniforms = {
 
-				amplitude: { type: "f", value: 1.0 },
 				color: { type: "c", value: new THREE.Color( 0xffffff ) },
 				texture: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" ) }
 
@@ -137,11 +134,10 @@
 
 			});
 
-
-			var radius = 100, segments = 68, rings = 38;
 			var geometry = new THREE.CubeGeometry( 200, 200, 200, 12, 12, 12 );
+			var radius = 150;
 
-			vc1 = geometry.vertices.length;
+			var vc1 = geometry.vertices.length;
 
 			cube = new THREE.ParticleSystem( geometry, shaderMaterial );
 			cube.position.set( 0, 0, 50 );
@@ -157,7 +153,7 @@
 
 				values_size[ v ] = PARTICLE_SIZE * 0.5;
 				values_color[ v ] = new THREE.Color( 0xffffff );
-				values_color[ v ].setHSV( 0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].y + radius ) / ( 2 *radius ) );
+				values_color[ v ].setHSV( 0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].y + radius ) / ( 2 * radius ) );
 
 			}
 
@@ -175,7 +171,6 @@
 			container.appendChild( stats.domElement );
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-			console.log( cube );
 		}
 
 		function onDocumentMouseMove( event ) {
