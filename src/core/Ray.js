@@ -41,9 +41,10 @@ THREE.Ray.prototype = {
 	distanceFromIntersection: ( function () {
 
 		var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-		var dot, intersect, distance;
 
 		return function ( origin, direction, position ) {
+
+			var dot, intersect, distance;
 
 			v0.sub( position, origin );
 			dot = v0.dot( direction );
@@ -60,9 +61,10 @@ THREE.Ray.prototype = {
 	pointInFace3: ( function () {
 
 		var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-		var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
 
 		return function ( p, a, b, c ) {
+
+			var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
 
 			v0.sub( c, a );
 			v1.sub( b, a );
