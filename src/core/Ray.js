@@ -155,7 +155,6 @@ THREE.Ray.prototype = {
 	intersectParticleSystem: function ( object, intersects ) {
 
 		var vertices = object.geometry.vertices;
-		var objectPosition = object.matrixWorld.getPosition();
 		var point, distance;
 
 		for ( var i = 0; i < vertices.length; i ++ ) {
@@ -164,7 +163,7 @@ THREE.Ray.prototype = {
 			distance = this.distanceFromIntersection(
 				this.origin,
 				this.direction,
-				objectPosition.clone().addSelf( point )
+				object.matrixWorld.multiplyVector3( point.clone() )
 			);
 
 			if ( distance > this.threshold ) {
