@@ -303,7 +303,7 @@ def get_uv_indices(face_index, uvs, mesh):
 
 def get_color_indices(face_index, colors, mesh):
     c = []
-    color_layer = mesh.vertex_colors.active.data
+    color_layer = mesh.tessface_vertex_colors.active.data
     face_colors = color_layer[face_index]
     face_colors = face_colors.color1, face_colors.color2, face_colors.color3, face_colors.color4
     for i in face_colors:
@@ -607,7 +607,7 @@ def generate_normals(normals, option_normals):
 # #####################################################
 
 def extract_vertex_colors(mesh, colors, count):
-    color_layer = mesh.vertex_colors.active.data
+    color_layer = mesh.tessface_vertex_colors.active.data
 
     for face_index, face in enumerate(get_faces(mesh)):
 
@@ -1013,6 +1013,7 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
                     mesh.transform(object.matrix_world)
 
             mesh.calc_normals()
+            mesh.calc_tessface()
             mesh.transform(mathutils.Matrix.Scale(option_scale, 4))
             meshes.append([mesh, object])
 
