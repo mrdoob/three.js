@@ -38,6 +38,13 @@ THREE.Ray.prototype = {
 
 	},
 
+	setThreshold: function ( v ) {
+
+		this.threshold = v;
+		return this;
+
+	},
+
 	distanceFromIntersection: ( function () {
 
 		var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
