@@ -134,6 +134,7 @@ THREE.Ray.prototype = {
 	// Canvas Particle
 	intersectParticle: function ( object, intersects ) {
 
+		var intersect;
 		var distance = this.distanceFromIntersection(
 			this.origin,
 			this.direction,
@@ -162,7 +163,7 @@ THREE.Ray.prototype = {
 	intersectParticleSystem: function ( object, intersects ) {
 
 		var vertices = object.geometry.vertices;
-		var point, distance;
+		var point, distance, intersect;
 
 		for ( var i = 0; i < vertices.length; i ++ ) {
 
@@ -180,7 +181,7 @@ THREE.Ray.prototype = {
 			intersect = {
 
 				distance: distance,
-				point: point,
+				point: point.clone(),
 				face: null,
 				object: object,
 				vertex: i
@@ -209,6 +210,7 @@ THREE.Ray.prototype = {
 
 			// Checking boundingSphere
 
+			var intersect;
 			var distance = this.distanceFromIntersection(
 				this.origin,
 				this.direction,
