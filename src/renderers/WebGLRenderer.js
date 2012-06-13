@@ -3239,7 +3239,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var used = [];
 			var candidateInfluence = - 1;
-			var candidate = 0;
+			var candidate = -1;
 			var influences = object.morphTargetInfluences;
 			var i, il = influences.length;
 			var m = 0;
@@ -3263,20 +3263,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ candidate ] );
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ candidate < 0 ? 0 : candidate ] );
 				_gl.vertexAttribPointer( attributes[ "morphTarget" + m ], 3, _gl.FLOAT, false, 0, 0 );
 
 				if ( material.morphNormals ) {
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ candidate ] );
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphNormalsBuffers[ candidate < 0 ? 0 : candidate ] );
 					_gl.vertexAttribPointer( attributes[ "morphNormal" + m ], 3, _gl.FLOAT, false, 0, 0 );
 
 				}
 
-				object.__webglMorphTargetInfluences[ m ] = candidateInfluence;
+				if ( candidate >= 0 ) {
+                    object.__webglMorphTargetInfluences[ m ] = candidateInfluence;
 
-				used[ candidate ] = 1;
+                    used[ candidate ] = 1;
+                } else {
+                    object.__webglMorphTargetInfluences[ m ] = 0;
+                }
 				candidateInfluence = -1;
+                candidate = -1;
 				m ++;
 
 			}
