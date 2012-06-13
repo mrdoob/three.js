@@ -80,9 +80,19 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 	};
 
-	this.intersectObject = function ( object ) {
+	this.intersectObject = function ( object, recursive ) {
 
 		var intersect, intersects = [];
+
+		if ( recursive === true ) {
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				Array.prototype.push.apply( intersects, this.intersectObject( object.children[ i ], recursive ) );
+
+			}
+
+		}
 
 		if ( object instanceof THREE.Particle ) {
 
@@ -125,7 +135,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			// Checking faces
 
 			var f, fl, face, dot, scalar,
-			rangeSq = this.range*this.range,
+			rangeSq = this.range * this.range,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix;
@@ -226,13 +236,13 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 	};
 
-	this.intersectObjects = function ( objects ) {
+	this.intersectObjects = function ( objects, recursive ) {
 
 		var intersects = [];
 
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ] ) );
+			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ], recursive ) );
 
 		}
 
