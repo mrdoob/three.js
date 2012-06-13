@@ -1,7 +1,7 @@
 {
     "name": "three.js",
     "description": "JavaScript 3D library",
-    "version": "0.0.50dev",
+    "version": "50dev",
     "homepage" : "http://mrdoob.github.com/three.js/",
     "author": "three.js contributors",
     "help": {
