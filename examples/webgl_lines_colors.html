@@ -61,6 +61,8 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
+			var effectFXAA;
+
 			var mouseX = 0, mouseY = 0,
 
 			windowHalfX = window.innerWidth / 2,
@@ -158,9 +160,13 @@
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.3 );
 				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
-				var effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
 				effectScreen.renderToScreen = true;
 
@@ -170,6 +176,26 @@
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBloom );
 				composer.addPass( effectScreen );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+
+				composer.reset();
 
 			}
 
