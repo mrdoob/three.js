@@ -65,8 +65,8 @@
 				light.shadowBias = -0.00022;
 				light.shadowDarkness = 0.5;
 
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
+				light.shadowMapWidth = 2048;
+				light.shadowMapHeight = 2048;
 
 				scene.add( light );
 
@@ -131,6 +131,19 @@
 				renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

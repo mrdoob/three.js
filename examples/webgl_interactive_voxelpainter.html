@@ -102,7 +102,7 @@
 				directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer : true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -117,7 +117,12 @@
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 				// add GUI
+
 				gui = new DAT.GUI();
 				gui.add(voxelConfig, 'orthographicProjection').onChange(function(){
 
@@ -133,7 +138,17 @@
 					}
 
 				});
+
 				gui.close();
+
+			}
+
+			function onWindowResize() {
+
+				camera.setSize( window.innerWidth, window.innerHeight );
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

@@ -225,11 +225,11 @@
 
 				// mergeVertices(); is run in case of duplicated vertices
 				smooth.mergeVertices();
-				
+
 				smooth.computeCentroids();
 				smooth.computeFaceNormals();
 				smooth.computeVertexNormals();
-				
+
 				modifier.modify( smooth );
 
 				updateInfo();
@@ -379,6 +379,22 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//
@@ -395,6 +411,7 @@
 				mouseYOnMouseDown = event.clientY - windowHalfY;
 				targetYRotationOnMouseDown = targetYRotation;
 				targetXRotationOnMouseDown = targetXRotation;
+
 			}
 
 			function onDocumentMouseMove( event ) {

@@ -342,7 +342,7 @@
 				//splineShape.debug( document.getElementById("debug") );
 
 				// TODO 3d path?
-				
+
 				var apath = new THREE.SplineCurve3();
 				apath.points.push(new THREE.Vector3(-50, 150, 10));
 				apath.points.push(new THREE.Vector3(-20, 180, 20));
@@ -384,6 +384,22 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

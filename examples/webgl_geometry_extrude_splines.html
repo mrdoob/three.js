@@ -15,7 +15,7 @@
 		</style>
 	</head>
 	<body>
-	
+
 		<script src="../build/Three.js"></script>
 		<script src="../src/extras/core/Curve.js"></script>
 		<script src="../src/extras/geometries/TubeGeometry.js"></script>
@@ -104,7 +104,7 @@
 		function addTube() {
 
 			var value = document.getElementById('dropdown').value;
-			
+
 			var segments = parseInt(document.getElementById('segments').value);
 			closed2 = document.getElementById('closed').checked;
 			debug = document.getElementById('debug').checked;
@@ -115,12 +115,12 @@
 			if (tubeMesh) parent.remove(tubeMesh);
 
 			extrudePath = splines[value];
-			
+
 			tube = new THREE.TubeGeometry(extrudePath, segments, 2, radiusSegments, closed2, debug);
 
 			addGeometry(tube, 0xff00ff);
 			setScale();
-		
+
 		}
 
 		function setScale() {
@@ -159,7 +159,7 @@
 				animation = !animation;
 				document.getElementById('animation').value = 'Camera Spline Animation View: ' + (animation? 'ON': 'OFF');
 			}
-			
+
 			lookAhead = document.getElementById('lookAhead').checked;
 
 			showCameraHelper = document.getElementById('cameraHelper').checked;
@@ -197,16 +197,16 @@
 
 			scene = new THREE.Scene();
 
-			// 
+			//
 			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 1000);
 			splineCamera = new THREE.PerspectiveCamera(84, window.innerWidth / window.innerHeight, 0.01, 1000);
 			cameraHelper = new THREE.CameraHelper(splineCamera);
 
 			camera.position.set(0, 50, 500);
-			
+
 			scene.add(camera);
 
-			
+
 			var light = new THREE.DirectionalLight(0xffffff);
 			light.position.set(0, 0, 1);
 			scene.add(light);
@@ -247,6 +247,22 @@
 			renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
 			renderer.domElement.addEventListener('touchstart', onDocumentTouchStart, false);
 			renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, false);
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			windowHalfX = window.innerWidth / 2;
+			windowHalfY = window.innerHeight / 2;
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 
@@ -364,7 +380,7 @@
 
 			// Using arclength for stablization in look ahead.
 			var lookAt = tube.path.getPointAt((t + 30/tube.path.getLength()) % 1).multiplyScalar(scale);
-			
+
 			// Camera Orientation 2 - up orientation via normal
 			if (!lookAhead)
 			lookAt.copy(pos).addSelf(dir);
@@ -385,8 +401,8 @@
 
 			}
 
-			
-			
+
+
 		}
 	</script>
 

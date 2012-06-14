@@ -77,6 +77,7 @@
 			var camera, cameraTarget, scene, renderer;
 
 			var composer;
+			var effectFXAA;
 
 			var textMesh1, textMesh2, textGeo, faceMaterial, textMaterialFront, textMaterialSide, parent;
 
@@ -343,9 +344,13 @@
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 0.25 );
 				var effectFilm = new THREE.FilmPass( 0.5, 0.125, 2048, false );
-				var effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
 				effectFilm.renderToScreen = true;
 
@@ -355,6 +360,26 @@
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBloom );
 				composer.addPass( effectFilm );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				composer.reset();
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
 			}
 
