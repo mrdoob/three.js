@@ -162,9 +162,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lights = {
 
 		ambient: [ 0, 0, 0 ],
-		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() },
-		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), angles: new Array(), exponents: new Array() }
+		directional: { length: 0, colors: [], positions: [] },
+		point: { length: 0, colors: [], positions: [], distances: [] },
+		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], angles: [], exponents: [] }
 
 	};
 
@@ -179,7 +179,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// GPU capabilities
 
 	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
-	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
+//	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
 	_maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
 
 	// API
@@ -941,12 +941,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sortArray = geometry.__sortArray,
 
 		dirtyVertices = geometry.verticesNeedUpdate,
-		dirtyElements = geometry.elementsNeedUpdate,
+//		dirtyElements = geometry.elementsNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
 
 		customAttributes = geometry.__webglCustomAttributesList,
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( object.sortParticles ) {
@@ -1265,7 +1265,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		customAttributes = geometry.__webglCustomAttributesList,
 
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -1472,7 +1472,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		needsSmoothNormals = ( normalType === THREE.SmoothShading );
 
 		var f, fl, fi, face,
-		vertexNormals, faceNormal, normal,
+		vertexNormals, faceNormal,
 		vertexColors, faceColor,
 		vertexTangents,
 		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
@@ -1481,11 +1481,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		si1, si2, si3, si4,
 		sa1, sa2, sa3, sa4,
 		sb1, sb2, sb3, sb4,
-		m, ml, i, il,
+		i, il,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
 		nka, chf, faceVertexNormals,
-		a,
 
 		vertexIndex = 0,
 
@@ -1543,7 +1542,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
 		obj_uvs2 = geometry.faceVertexUvs[ 1 ],
 
-		obj_colors = geometry.colors,
+//		obj_colors = geometry.colors,
 
 		obj_skinVerticesA = geometry.skinVerticesA,
 		obj_skinVerticesB = geometry.skinVerticesB,
@@ -2977,7 +2976,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute;
+		var program, attributes;
 
 		program = setProgram( camera, lights, fog, material, object );
 
@@ -3069,7 +3068,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute, i, il;
+		var program, attributes, primitives, attribute, i, il;
 
 		program = setProgram( camera, lights, fog, material, object );
 
@@ -3717,7 +3716,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
 
-		var webglObject, object, material, program;
+		var webglObject, object, material;
 
 		for ( var i = 0, il = renderList.length; i < il; i ++ ) {
 
@@ -4331,7 +4330,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
+		var u, a, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -5105,7 +5104,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupLights ( program, lights ) {
 
-		var l, ll, light, n,
+		var l, ll, light,
 		r = 0, g = 0, b = 0,
 		color, position, intensity, distance,
 
