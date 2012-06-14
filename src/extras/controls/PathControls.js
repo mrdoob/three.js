@@ -44,6 +44,9 @@ THREE.PathControls = function ( object, domElement ) {
 	var PI2 = Math.PI * 2,
 		PI180 = Math.PI / 180;
 
+	this.viewHalfX = 0;
+	this.viewHalfY = 0;
+
 	if ( this.domElement !== document ) {
 
 		this.domElement.setAttribute( 'tabindex', -1 );

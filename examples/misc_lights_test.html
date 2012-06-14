@@ -164,6 +164,23 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				SCREEN_WIDTH = window.innerWidth / 2;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				if ( render_canvas ) canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				if ( render_gl && has_gl ) webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
 			}
 
 			function onDocumentMouseMove( event ) {

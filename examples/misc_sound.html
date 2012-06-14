@@ -171,12 +171,28 @@
 				mesh.position.y = 0.1;
 				scene.add( mesh );
 
+				//
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
 				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
 
 			}
 

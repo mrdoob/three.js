@@ -47,18 +47,32 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 	this.mouseDragOn = false;
 
-	if ( this.domElement === document ) {
+	this.viewHalfX = 0;
+	this.viewHalfY = 0;
 
-		this.viewHalfX = window.innerWidth / 2;
-		this.viewHalfY = window.innerHeight / 2;
+	if ( this.domElement !== document ) {
 
-	} else {
-
-		this.viewHalfX = this.domElement.offsetWidth / 2;
-		this.viewHalfY = this.domElement.offsetHeight / 2;
 		this.domElement.setAttribute( 'tabindex', -1 );
 
 	}
+
+	//
+
+	this.handleResize = function () {
+
+		if ( this.domElement === document ) {
+
+			this.viewHalfX = window.innerWidth / 2;
+			this.viewHalfY = window.innerHeight / 2;
+
+		} else {
+
+			this.viewHalfX = this.domElement.offsetWidth / 2;
+			this.viewHalfY = this.domElement.offsetHeight / 2;
+
+		}
+
+	};
 
 	this.onMouseDown = function ( event ) {
 
@@ -280,5 +294,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		};
 
 	};
+
+	this.handleResize();
 
 };
