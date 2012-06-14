@@ -49,7 +49,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		}
 
-		event.preventDefault();
+		//event.preventDefault();
 
 		switch ( event.keyCode ) {
 

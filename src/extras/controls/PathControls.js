@@ -41,23 +41,32 @@ THREE.PathControls = function ( object, domElement ) {
 	this.phi = 0;
 	this.theta = 0;
 
-	if ( this.domElement === document ) {
+	var PI2 = Math.PI * 2,
+		PI180 = Math.PI / 180;
 
-		this.viewHalfX = window.innerWidth / 2;
-		this.viewHalfY = window.innerHeight / 2;
+	if ( this.domElement !== document ) {
 
-	} else {
-
-		this.viewHalfX = this.domElement.offsetWidth / 2;
-		this.viewHalfY = this.domElement.offsetHeight / 2;
 		this.domElement.setAttribute( 'tabindex', -1 );
 
 	}
 
-	var PI2 = Math.PI * 2,
-		PI180 = Math.PI / 180;
-
 	// methods
+
+	this.handleResize = function () {
+
+		if ( this.domElement === document ) {
+
+			this.viewHalfX = window.innerWidth / 2;
+			this.viewHalfY = window.innerHeight / 2;
+
+		} else {
+
+			this.viewHalfX = this.domElement.offsetWidth / 2;
+			this.viewHalfY = this.domElement.offsetHeight / 2;
+
+		}
+
+	};
 
 	this.update = function ( delta ) {
 
@@ -305,6 +314,8 @@ THREE.PathControls = function ( object, domElement ) {
 		this.domElement.addEventListener( 'mousemove', bind( this, this.onMouseMove ), false );
 
 	};
+
+	this.handleResize();
 
 };
 
