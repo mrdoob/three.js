@@ -113,9 +113,11 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
+
 
 			function onDocumentMouseMove( event ) {
 
@@ -126,7 +128,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -134,11 +136,12 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -150,6 +153,9 @@
 			}
 
 			function onWindowResize( event ) {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();

@@ -100,6 +100,9 @@
 			var _rotation = 0;
 			var timeOnShapePath = 0;
 
+			var composer;
+			var effectBlurX, effectBlurY, hblur, vblur;
+
 			init();
 			animate();
 
@@ -511,15 +514,15 @@
 				effectFilm = new THREE.FilmPass( 0.5, 0.25, 2048, false );
 
 				var shaderBlur = THREE.ShaderExtras[ "triangleBlur" ];
-				var effectBlurX = new THREE.ShaderPass( shaderBlur, 'texture' );
-				var effectBlurY = new THREE.ShaderPass( shaderBlur, 'texture' );
+				effectBlurX = new THREE.ShaderPass( shaderBlur, 'texture' );
+				effectBlurY = new THREE.ShaderPass( shaderBlur, 'texture' );
 
 				var radius = 15;
 				var blurAmountX = radius / window.innerWidth;
 				var blurAmountY = radius / window.innerHeight;
 
-				var hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
-				var vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
+				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
+				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
 
 				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
 				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
@@ -551,6 +554,36 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				//
+
+				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
+				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
+
+				var radius = 15;
+				var blurAmountX = radius / window.innerWidth;
+				var blurAmountY = radius / window.innerHeight;
+
+				effectBlurX.uniforms[ 'delta' ].value = new THREE.Vector2( blurAmountX, 0 );
+				effectBlurY.uniforms[ 'delta' ].value = new THREE.Vector2( 0, blurAmountY );
+
+				composer.reset();
 
 			}
 
@@ -588,7 +621,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -601,7 +634,7 @@
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 

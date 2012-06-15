@@ -209,6 +209,24 @@
 				composer.addPass( effectBloom );
 				composer.addPass( effectScreen );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				composer.reset();
+
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -220,7 +238,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -228,11 +246,12 @@
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 

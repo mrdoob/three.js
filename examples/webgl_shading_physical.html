@@ -59,8 +59,11 @@
 
 			var MARGIN = 0;
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var WIDTH = window.innerWidth || 2;
+			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
+
+			var SCREEN_WIDTH = WIDTH;
+			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
 
 			var FAR = 10000;
 
@@ -506,6 +509,8 @@
 				vblur.uniforms[ 'v' ].value = 4 / SCREEN_HEIGHT;
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+
+				controls.handleResize();
 
 			}
 

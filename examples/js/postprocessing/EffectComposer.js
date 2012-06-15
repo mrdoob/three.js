@@ -124,8 +124,8 @@ THREE.EffectComposer.prototype = {
 
 // shared ortho camera
 
-THREE.EffectComposer.initWidth = window.innerWidth | 1;
-THREE.EffectComposer.initHeight = window.innerHeight | 1;
+THREE.EffectComposer.initWidth = window.innerWidth || 1;
+THREE.EffectComposer.initHeight = window.innerHeight || 1;
 
 THREE.EffectComposer.camera = new THREE.OrthographicCamera( THREE.EffectComposer.initWidth / - 2, THREE.EffectComposer.initWidth / 2, THREE.EffectComposer.initHeight / 2, THREE.EffectComposer.initHeight / - 2, -10000, 10000 );
 

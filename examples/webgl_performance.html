@@ -89,6 +89,22 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function onDocumentMouseMove(event) {
@@ -115,7 +131,7 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
 				camera.lookAt( scene.position );
 
-				for ( var i = 0; i < 5000; i ++ ) {
+				for ( var i = 0, il = objects.length; i < il; i ++ ) {
 
 					objects[ i ].rotation.x += 0.01;
 					objects[ i ].rotation.y += 0.02;
