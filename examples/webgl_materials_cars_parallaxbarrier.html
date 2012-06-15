@@ -207,8 +207,11 @@
 				renderer.setFaceCulling( 0 );
 				container.appendChild( renderer.domElement );
 
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
 				effect = new THREE.ParallaxBarrierEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );				
+				effect.setSize( width, height );
 
 				if ( STATS_ENABLED ) {
 
@@ -459,6 +462,22 @@
 
 				for( var c in CARS ) initCarButton( c );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function initCarButton( car ) {
@@ -476,7 +495,7 @@
 
 					}
 
-				}, false);
+				}, false );
 
 			}
 
