@@ -205,8 +205,8 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
-				if ( render_gl && has_gl ) webglRenderer.setSize( window.innerWidth, window.innerHeight );
-				if ( render_canvas ) canvasRenderer.setSize( window.innerWidth, window.innerHeight );
+				if ( webglRenderer ) webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				if ( canvasRenderer ) canvasRenderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

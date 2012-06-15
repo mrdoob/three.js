@@ -178,8 +178,8 @@
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				if ( render_canvas ) canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				if ( render_gl && has_gl ) webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				if ( canvasRenderer ) canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				if ( webglRenderer ) webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
 

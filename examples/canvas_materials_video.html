@@ -151,6 +151,7 @@
 						scene.add( particle );
 
 					}
+
 				}
 
 				renderer = new THREE.CanvasRenderer();
@@ -165,9 +166,25 @@
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
-			function onDocumentMouseMove(event) {
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY ) * 0.2;

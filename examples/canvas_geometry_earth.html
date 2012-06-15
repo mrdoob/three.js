@@ -64,7 +64,7 @@
 				scene.add( group );
 
 				// earth
-				
+
 				var earthTexture = new THREE.Texture();
 				var loader = new THREE.ImageLoader();
 
@@ -84,12 +84,12 @@
 				group.add( mesh );
 
 				// shadow
-				
+
 				var shadowTexture = new THREE.Texture();
 				var loader = new THREE.ImageLoader();
 
 				loader.addEventListener( 'load', function ( event ) {
-				
+
 					shadowTexture.image = event.content;
 					shadowTexture.needsUpdate = true;
 
@@ -115,6 +115,22 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

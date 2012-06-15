@@ -91,6 +91,23 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//
@@ -105,6 +122,7 @@
 
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
+
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -112,6 +130,7 @@
 				mouseX = event.clientX - windowHalfX;
 
 				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+
 			}
 
 			function onDocumentMouseUp( event ) {
@@ -119,6 +138,7 @@
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
 			}
 
 			function onDocumentMouseOut( event ) {
@@ -126,11 +146,12 @@
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
 			}
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -138,11 +159,12 @@
 					targetRotationOnMouseDown = targetRotation;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -150,6 +172,7 @@
 					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 
 				}
+
 			}
 
 			//
