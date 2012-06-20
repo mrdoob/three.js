@@ -368,10 +368,10 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 					if ( vertexColorArray ) {
 
-						newColors[ vertexCounter * 4 ] 	   = vertexNormalArray[ v * 4 ];
-						newColors[ vertexCounter * 4 + 1 ] = vertexNormalArray[ v * 4 + 1 ];
-						newColors[ vertexCounter * 4 + 2 ] = vertexNormalArray[ v * 4 + 2 ];
-						newColors[ vertexCounter * 4 + 3 ] = vertexNormalArray[ v * 4 + 3 ];
+						newColors[ vertexCounter * 4 ] 	   = vertexColorArray[ v * 4 ];
+						newColors[ vertexCounter * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
+						newColors[ vertexCounter * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
+						newColors[ vertexCounter * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
 
 					}
 
