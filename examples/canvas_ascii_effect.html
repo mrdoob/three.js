@@ -10,7 +10,7 @@
 				font-family: Monospace;
 				background-color: #f0f0f0;
 				margin: 0px;
-				overflow: hidden; 
+				overflow: hidden;
 			}
 		</style>
 	</head>
@@ -19,6 +19,7 @@
 		<script src="../build/Three.js"></script>
 		<script src="js/effects/AsciiEffect.js"></script>
 		<script src="js/Stats.js"></script>
+
 		<script>
 
 			var container, stats;
@@ -34,6 +35,9 @@
 
 			function init() {
 
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -47,7 +51,7 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
 				scene.add( camera );
@@ -72,16 +76,31 @@
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( width, height );
 				// container.appendChild( renderer.domElement );
 
 				effect = new THREE.AsciiEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( width, height );
 				container.appendChild( effect.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

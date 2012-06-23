@@ -127,7 +127,26 @@
 				renderer = new THREE.WebGLRenderer();
 				container.appendChild( renderer.domElement );
 
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
 				effect = new THREE.AnaglyphEffect( renderer );
+				effect.setSize( width, height );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}

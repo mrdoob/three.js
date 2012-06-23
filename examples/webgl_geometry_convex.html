@@ -113,12 +113,25 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 
 			function randomPointInSphere( radius ) {
 
-				return new THREE.Vector3( 
+				return new THREE.Vector3(
 					( Math.random() - 0.5 ) * 2 * radius,
 					( Math.random() - 0.5 ) * 2 * radius,
 					( Math.random() - 0.5 ) * 2 * radius

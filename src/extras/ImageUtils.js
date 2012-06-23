@@ -18,7 +18,7 @@ THREE.ImageUtils = {
 			texture.image = event.content;
 			texture.needsUpdate = true;
 			
-			if ( onLoad ) onLoad();
+			if ( onLoad ) onLoad( texture );
 
 		} );
 

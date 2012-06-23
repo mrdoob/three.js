@@ -37,8 +37,17 @@ THREE.RollControls = function ( object, domElement ) {
 
 	var mouseX = 0, mouseY = 0;
 
-	var windowHalfX = window.innerWidth / 2;
-	var windowHalfY = window.innerHeight / 2;
+	var windowHalfX = 0;
+	var windowHalfY = 0;
+
+	//
+
+	this.handleResize = function () {
+
+		windowHalfX = window.innerWidth / 2;
+		windowHalfY = window.innerHeight / 2;
+
+	};
 
 	// custom update
 
@@ -164,7 +173,7 @@ THREE.RollControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		event.preventDefault();
+		//event.preventDefault();
 
 		switch ( event.keyCode ) {
 
@@ -258,5 +267,7 @@ THREE.RollControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'mouseup', onMouseUp, false );
 	this.domElement.addEventListener( 'keydown', onKeyDown, false );
 	this.domElement.addEventListener( 'keyup', onKeyUp, false );
+
+	this.handleResize();
 
 };

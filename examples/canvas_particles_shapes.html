@@ -138,6 +138,7 @@
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
 				var circleLines = function ( context ) {
+
 					context.lineWidth = 0.05;
 					context.beginPath();
 					context.arc( 0, 0, 1, 0, Math.PI*2, true );
@@ -146,11 +147,13 @@
 
 					context.globalAlpha = 0.2;
 					context.fill();
+
 				}
 
 				var hue = 0;
 
 				var hearts = function ( context ) {
+
 					context.globalAlpha = 0.5;
 					var x = 0, y = 0;
 					context.scale(0.1, -0.1); // Scale so canvas render can redraw within bounds
@@ -166,6 +169,7 @@
 					context.fill();
 					context.lineWidth = 0.5; //0.05
 					context.stroke();
+
 				}
 
 				var setTargetParticle = function() {
@@ -183,11 +187,14 @@
 					particleCloud.add( particle );
 
 					return particle;
+
 				};
 
-				var onParticleCreated = function(p) {
+				var onParticleCreated = function( p ) {
+
 					var position = p.position;
 					p.target.position = position;
+
 				};
 
 				var onParticleDead = function(particle) {
@@ -233,6 +240,22 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//
@@ -246,10 +269,14 @@
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
 
-				if (sparksEmitter.isRunning()) {
+				if ( sparksEmitter.isRunning() ) {
+
 					sparksEmitter.stop();
+
 				} else {
+
 					sparksEmitter.start();
+
 				}
 
 			}

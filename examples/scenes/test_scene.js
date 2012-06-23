@@ -11,7 +11,7 @@
 "objects":
 {
 	"cube1" : {
-		"geometry" : "cube",
+		"geometry" : "cubeNormals",
 		"materials": [ "lambert_red" ],
 		"position" : [ 0, 0, 0 ],
 		"rotation" : [ 0, -0.3, 0 ],
@@ -20,7 +20,7 @@
 	},
 
 	"cube2" : {
-		"geometry" : "cube",
+		"geometry" : "cubeWire",
 		"materials": [ "basic_white" ],
 		"position" : [ 0, 0, 0 ],
 		"rotation" : [ 0, -0.3, 0 ],
@@ -142,6 +142,30 @@
 "geometries":
 {
 	"cube": {
+		"type"  : "cube",
+		"width" : 10,
+		"height": 10,
+		"depth" : 10,
+		"segmentsWidth"  : 1,
+		"segmentsHeight" : 1,
+		"segmentsDepth"  : 1,
+		"flipped" : false,
+		"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
+	},
+
+	"cubeNormals": {
+		"type"  : "cube",
+		"width" : 10,
+		"height": 10,
+		"depth" : 10,
+		"segmentsWidth"  : 1,
+		"segmentsHeight" : 1,
+		"segmentsDepth"  : 1,
+		"flipped" : false,
+		"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
+	},
+
+	"cubeWire": {
 		"type"  : "cube",
 		"width" : 10,
 		"height": 10,

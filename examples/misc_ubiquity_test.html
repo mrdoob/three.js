@@ -154,7 +154,7 @@
 				svgRenderer.setQuality( 'low' );
 				container.appendChild( svgRenderer.domElement );
 
-				webglRenderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				// webglRenderer.setFaceCulling( 0 );
 				container.appendChild( webglRenderer.domElement );
@@ -165,6 +165,27 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				SCREEN_WIDTH = window.innerWidth / 3;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				camera.aspect = SCREEN_WIDTH / window.SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
 

@@ -125,6 +125,22 @@
 
 				}, { scale: 0.707192, offsetX: -0.109362, offsetY: -0.006435, offsetZ: -0.268751 } );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function callbackModel( geometry, s, color, x, y, z ) {

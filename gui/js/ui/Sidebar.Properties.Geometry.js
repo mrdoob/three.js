@@ -109,9 +109,9 @@ Sidebar.Properties.Geometry = function ( signals ) {
 			var hasFaceColor = face.color;
 			var hasFaceVertexColor = face.vertexColors[ 0 ] !== undefined;
 
-			var faceType = 0
-			faceType = setBit( faceType, 0, ! isTriangle );
+			var faceType = 0;
 			
+			faceType = setBit( faceType, 0, ! isTriangle );			
 			// faceType = setBit( faceType, 1, hasMaterial );
 			// faceType = setBit( faceType, 2, hasFaceUv );
 			// faceType = setBit( faceType, 3, hasFaceVertexUv );

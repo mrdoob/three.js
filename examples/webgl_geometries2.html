@@ -19,7 +19,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
-		
+
 		<!--
 		<script src="../src/core/Geometry.js"></script>
 		<script src="../src/extras/geometries/ParametricGeometry.js"></script>
@@ -32,7 +32,7 @@
 
 			/* Testing the new Parametric Surfaces Geometries*/
 
-			
+
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
@@ -172,6 +172,19 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

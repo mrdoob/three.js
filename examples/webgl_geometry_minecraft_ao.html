@@ -465,6 +465,21 @@
 				document.getElementById( "baot" ).addEventListener( "click", function() { mat.map = m_aot.map; }, false );
 				document.getElementById( "bt" ).addEventListener( "click",   function() { mat.map = m_t.map; }, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
 			}
 
 			function generateMegamaterialAO( textures, strength, debug_texture, debug_numbers, debug_corner_colors  ) {

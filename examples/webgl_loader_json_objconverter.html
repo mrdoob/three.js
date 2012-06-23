@@ -191,6 +191,23 @@
 				//loader.load( "obj/male02/Male02_bin.js", callbackMale );
 				//loader.load( "obj/female02/Female02_bin.js", callbackFemale );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				if ( webglRenderer ) webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				if ( canvasRenderer ) canvasRenderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function createScene( geometry, x, y, z, b ) {

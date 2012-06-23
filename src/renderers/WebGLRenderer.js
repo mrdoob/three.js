@@ -3006,15 +3006,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// vertices
 
+					var positionSize = geometryGroup.vertexPositionBuffer.itemSize;
+
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexPositionBuffer );
-					_gl.vertexAttribPointer( attributes.position, geometryGroup.vertexPositionBuffer.itemSize, _gl.FLOAT, false, 0, offsets[ i ].index * 4 * 3 );
+					_gl.vertexAttribPointer( attributes.position, positionSize, _gl.FLOAT, false, 0, offsets[ i ].index * positionSize * 4 ); // 4 bytes per Float32
 
 					// normals
 
 					if ( attributes.normal >= 0 && geometryGroup.vertexNormalBuffer ) {
 
+						var normalSize = geometryGroup.vertexNormalBuffer.itemSize;
+
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexNormalBuffer );
-						_gl.vertexAttribPointer( attributes.normal, geometryGroup.vertexNormalBuffer.itemSize, _gl.FLOAT, false, 0, offsets[ i ].index * 4 * 3 );
+						_gl.vertexAttribPointer( attributes.normal, normalSize, _gl.FLOAT, false, 0, offsets[ i ].index * normalSize * 4 );
 
 					}
 
@@ -3024,8 +3028,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						if ( geometryGroup.vertexUvBuffer ) {
 
+							var uvSize = geometryGroup.vertexUvBuffer.itemSize;
+
 							_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexUvBuffer );
-							_gl.vertexAttribPointer(  attributes.uv, geometryGroup.vertexUvBuffer.itemSize, _gl.FLOAT, false, 0, offsets[ i ].index * 4 * 2 );
+							_gl.vertexAttribPointer(  attributes.uv, uvSize, _gl.FLOAT, false, 0, offsets[ i ].index * uvSize * 4 );
 
 							_gl.enableVertexAttribArray( attributes.uv );
 
@@ -3041,8 +3047,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( attributes.color >= 0 && geometryGroup.vertexColorBuffer ) {
 
+						var colorSize = geometryGroup.vertexColorBuffer.itemSize;
+
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexColorBuffer );
-						_gl.vertexAttribPointer( attributes.color, geometryGroup.vertexColorBuffer.itemSize, _gl.FLOAT, false, 0, offsets[ i ].index * 4 * 4 );
+						_gl.vertexAttribPointer( attributes.color, colorSize, _gl.FLOAT, false, 0, offsets[ i ].index * colorSize * 4 );
 
 
 					}
@@ -3053,7 +3061,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render indexed triangles
 
-				_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 = Uint16
+				_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
 
 				_this.info.render.calls ++;
 				_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared

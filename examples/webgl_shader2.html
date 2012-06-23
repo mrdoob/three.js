@@ -211,7 +211,7 @@
 					texture: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
 				};
 
-				uniforms2.texture.texture.wrapS = uniforms2.texture.texture.wrapT = THREE.Repeat;
+				uniforms2.texture.texture.wrapS = uniforms2.texture.texture.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.75, mlib = [],
 					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];
@@ -258,6 +258,9 @@
 
 				uniforms2.resolution.value.x = window.innerWidth;
 				uniforms2.resolution.value.y = window.innerHeight;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

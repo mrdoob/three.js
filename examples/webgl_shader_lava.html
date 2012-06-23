@@ -129,8 +129,11 @@
 			var mouseX = 0, mouseY = 0,
 			lat = 0, lon = 0, phy = 0, theta = 0;
 
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
+			var width = window.innerWidth || 2;
+			var height = window.innerHeight || 2;
+
+			var windowHalfX = width / 2;
+			var windowHalfY = height / 2;
 
 			init();
 			animate();
@@ -157,8 +160,8 @@
 
 				};
 
-				uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.Repeat;
-				uniforms.texture2.texture.wrapS = uniforms.texture2.texture.wrapT = THREE.Repeat;
+				uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.RepeatWrapping;
+				uniforms.texture2.texture.wrapS = uniforms.texture2.texture.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.65;
 

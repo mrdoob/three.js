@@ -256,10 +256,7 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				controls.screen.width = width;
-				controls.screen.height = height;
-
-				controls.radius = ( width + height ) / 4;
+				controls.handleResize();
 
 			};
 

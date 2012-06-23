@@ -80,11 +80,11 @@ THREE.AnaglyphEffect = function ( renderer ) {
 
 	this.setSize = function ( width, height ) {
 
-		_renderTargetL.width = width;
-		_renderTargetL.height = height;
+		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
+		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
-		_renderTargetR.width = width;
-		_renderTargetR.height = height;
+		_material.uniforms[ "mapLeft" ].texture = _renderTargetL;
+		_material.uniforms[ "mapRight" ].texture = _renderTargetR;
 
 		renderer.setSize( width, height );
 
