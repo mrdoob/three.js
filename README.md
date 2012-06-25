@@ -5,7 +5,7 @@ three.js
 
 The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt; and WebGL renderers.
 
-[Examples](http://mrdoob.github.com/three.js/) — [Documentation](http://mrdoob.github.com/three.js/docs/latest/) — [Questions](http://stackoverflow.com/questions/tagged/three.js)
+[Examples](http://mrdoob.github.com/three.js/) — [Documentation](http://mrdoob.github.com/three.js/docs/latest/) — [Help](http://stackoverflow.com/questions/tagged/three.js)
 
 
 ### Usage ###
