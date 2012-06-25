@@ -114,6 +114,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentGeometryGroupHash = null,
 	_currentCamera = null,
 	_geometryGroupCounter = 0,
+	
+	_renderList = [],
+	_renderListImmediate = [],
 
 	// GL state cache
 
@@ -162,9 +165,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_lights = {
 
 		ambient: [ 0, 0, 0 ],
-		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() },
-		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), angles: new Array(), exponents: new Array() }
+		directional: { length: 0, colors: [], positions: [] },
+		point: { length: 0, colors: [], positions: [], distances: [] },
+		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], angles: [], exponents: [] }
 
 	};
 
@@ -179,7 +182,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// GPU capabilities
 
 	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
-	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
+//	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
 	_maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
 
 	// API
@@ -941,12 +944,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		sortArray = geometry.__sortArray,
 
 		dirtyVertices = geometry.verticesNeedUpdate,
-		dirtyElements = geometry.elementsNeedUpdate,
+//		dirtyElements = geometry.elementsNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
 
 		customAttributes = geometry.__webglCustomAttributesList,
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( object.sortParticles ) {
@@ -1265,7 +1268,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		customAttributes = geometry.__webglCustomAttributesList,
 
 		i, il,
-		a, ca, cal, value,
+		ca, cal, value,
 		customAttribute;
 
 		if ( dirtyVertices ) {
@@ -1472,7 +1475,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		needsSmoothNormals = ( normalType === THREE.SmoothShading );
 
 		var f, fl, fi, face,
-		vertexNormals, faceNormal, normal,
+		vertexNormals, faceNormal,
 		vertexColors, faceColor,
 		vertexTangents,
 		uv, uv2, v1, v2, v3, v4, t1, t2, t3, t4, n1, n2, n3, n4,
@@ -1481,11 +1484,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		si1, si2, si3, si4,
 		sa1, sa2, sa3, sa4,
 		sb1, sb2, sb3, sb4,
-		m, ml, i, il,
+		i, il,
 		vn, uvi, uv2i,
 		vk, vkl, vka,
 		nka, chf, faceVertexNormals,
-		a,
 
 		vertexIndex = 0,
 
@@ -1543,7 +1545,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
 		obj_uvs2 = geometry.faceVertexUvs[ 1 ],
 
-		obj_colors = geometry.colors,
+//		obj_colors = geometry.colors,
 
 		obj_skinVerticesA = geometry.skinVerticesA,
 		obj_skinVerticesB = geometry.skinVerticesB,
@@ -2977,7 +2979,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute;
+		var program, attributes;
 
 		program = setProgram( camera, lights, fog, material, object );
 
@@ -3077,7 +3079,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute, i, il;
+		var program, attributes, primitives, attribute, i, il;
 
 		program = setProgram( camera, lights, fog, material, object );
 
@@ -3433,7 +3435,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var i, il,
 
 		webglObject, object,
-		renderList,
+		webglObjects,
 
 		lights = scene.__lights,
 		fog = scene.fog;
@@ -3492,11 +3494,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// set matrices for regular objects (frustum culled)
 
-		renderList = scene.__webglObjects;
+		webglObjects = scene.__webglObjects;
+		
+		_renderList.length = 0;
 
-		for ( i = 0, il = renderList.length; i < il; i ++ ) {
+		for ( i = 0, il = webglObjects.length; i < il; i ++ ) {
 
-			webglObject = renderList[ i ];
+			webglObject = webglObjects[ i ];
 			object = webglObject.object;
 
 			webglObject.render = false;
@@ -3512,6 +3516,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					unrollBufferMaterial( webglObject );
 
 					webglObject.render = true;
+					_renderList.push(webglObject);
 
 					if ( this.sortObjects ) {
 
@@ -3538,17 +3543,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.sortObjects ) {
 
-			renderList.sort( painterSort );
+			_renderList.sort( painterSort );
 
 		}
 
 		// set matrices for immediate objects
 
-		renderList = scene.__webglObjectsImmediate;
+		webglObjects = scene.__webglObjectsImmediate;
 
-		for ( i = 0, il = renderList.length; i < il; i ++ ) {
+		for ( i = 0, il = webglObjects.length; i < il; i ++ ) {
 
-			webglObject = renderList[ i ];
+			webglObject = webglObjects[ i ];
 			object = webglObject.object;
 
 			if ( object.visible ) {
@@ -3578,7 +3583,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setDepthWrite( material.depthWrite );
 			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
+			renderObjects( _renderList, false, "", camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
 
 		} else {
@@ -3587,12 +3592,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NormalBlending );
 
-			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false );
+			renderObjects( _renderList, true, "opaque", camera, lights, fog, false );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false );
 
 			// transparent pass (back-to-front order)
 
-			renderObjects( scene.__webglObjects, false, "transparent", camera, lights, fog, true );
+			renderObjects( _renderList, false, "transparent", camera, lights, fog, true );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "transparent", camera, lights, fog, true );
 
 		}
@@ -3681,41 +3686,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( var i = start; i !== end; i += delta ) {
 
 			webglObject = renderList[ i ];
+			object = webglObject.object;
+			buffer = webglObject.buffer;
 
-			if ( webglObject.render ) {
+			if ( overrideMaterial ) {
 
-				object = webglObject.object;
-				buffer = webglObject.buffer;
+				material = overrideMaterial;
 
-				if ( overrideMaterial ) {
+			} else {
 
-					material = overrideMaterial;
+				material = webglObject[ materialType ];
 
-				} else {
+				if ( ! material ) continue;
 
-					material = webglObject[ materialType ];
+				if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 
-					if ( ! material ) continue;
+				_this.setDepthTest( material.depthTest );
+				_this.setDepthWrite( material.depthWrite );
+				setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 
-					if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			}
 
-					_this.setDepthTest( material.depthTest );
-					_this.setDepthWrite( material.depthWrite );
-					setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+			_this.setObjectFaces( object );
 
-				}
+			if ( buffer instanceof THREE.BufferGeometry ) {
 
-				_this.setObjectFaces( object );
+				_this.renderBufferDirect( camera, lights, fog, material, buffer, object );
 
-				if ( buffer instanceof THREE.BufferGeometry ) {
+			} else {
 
-					_this.renderBufferDirect( camera, lights, fog, material, buffer, object );
-
-				} else {
-
-					_this.renderBuffer( camera, lights, fog, material, buffer, object );
-
-				}
+				_this.renderBuffer( camera, lights, fog, material, buffer, object );
 
 			}
 
@@ -3725,7 +3725,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function renderObjectsImmediate ( renderList, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
 
-		var webglObject, object, material, program;
+		var webglObject, object, material;
 
 		for ( var i = 0, il = renderList.length; i < il; i ++ ) {
 
@@ -4339,7 +4339,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
+		var u, a, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
 
 		if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -5113,7 +5113,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupLights ( program, lights ) {
 
-		var l, ll, light, n,
+		var l, ll, light,
 		r = 0, g = 0, b = 0,
 		color, position, intensity, distance,
 
