@@ -40,5 +40,4 @@ THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
 
 };
 
-THREE.SpotLight.prototype = new THREE.Light();
-THREE.SpotLight.prototype.constructor = THREE.SpotLight;
+THREE.SpotLight.prototype = Object.create( THREE.Light.prototype );

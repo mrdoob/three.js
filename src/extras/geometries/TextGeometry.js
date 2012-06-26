@@ -58,9 +58,11 @@ THREE.TextGeometry = function ( text, parameters ) {
 		var b = textShapes[ textShapes.length - 1 ].getBoundingBox();
 		var max = b.maxX;
 
-		parameters.bendPath = new THREE.QuadraticBezierCurve( new THREE.Vector2( 0, 0 ),
-															  new THREE.Vector2( max / 2, 120 ),
-															  new THREE.Vector2( max, 0 ) );
+		parameters.bendPath = new THREE.QuadraticBezierCurve(
+			new THREE.Vector2( 0, 0 ),
+			new THREE.Vector2( max / 2, 120 ),
+			new THREE.Vector2( max, 0 )
+		);
 
 	}
 
@@ -68,5 +70,4 @@ THREE.TextGeometry = function ( text, parameters ) {
 
 };
 
-THREE.TextGeometry.prototype = new THREE.ExtrudeGeometry();
-THREE.TextGeometry.prototype.constructor = THREE.TextGeometry;
+THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );

@@ -26,5 +26,4 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 
 };
 
-THREE.MeshNormalMaterial.prototype = new THREE.Material();
-THREE.MeshNormalMaterial.prototype.constructor = THREE.MeshNormalMaterial;
+THREE.MeshNormalMaterial.prototype = Object.create( THREE.Material.prototype );

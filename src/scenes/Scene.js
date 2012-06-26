@@ -19,8 +19,7 @@ THREE.Scene = function () {
 
 };
 
-THREE.Scene.prototype = new THREE.Object3D();
-THREE.Scene.prototype.constructor = THREE.Scene;
+THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Scene.prototype.__addObject = function ( object ) {
 

@@ -56,8 +56,7 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 };
 
-THREE.ExtrudeGeometry.prototype = new THREE.Geometry();
-THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
+THREE.ExtrudeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.ExtrudeGeometry.prototype.addShapeList = function(shapes, options) {
 	var sl = shapes.length;

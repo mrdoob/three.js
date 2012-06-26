@@ -2651,8 +2651,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Polylist.prototype = new Polygons();
-	Polylist.prototype.constructor = Polylist;
+	Polylist.prototype = Object.create( Polygons.prototype );
 
 	function Triangles () {
 
@@ -2662,8 +2661,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Triangles.prototype = new Polygons();
-	Triangles.prototype.constructor = Triangles;
+	Triangles.prototype = Object.create( Polygons.prototype );
 
 	function Accessor() {
 

@@ -37,5 +37,4 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleBasicMaterial.prototype = new THREE.Material();
-THREE.ParticleBasicMaterial.prototype.constructor = THREE.ParticleBasicMaterial;
+THREE.ParticleBasicMaterial.prototype = Object.create( THREE.Material.prototype );

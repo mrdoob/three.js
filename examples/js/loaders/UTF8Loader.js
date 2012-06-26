@@ -319,9 +319,7 @@ THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offse
 
 	};
 
-
-	Model.prototype = new THREE.Geometry();
-	Model.prototype.constructor = Model;
+	Model.prototype = Object.create( THREE.Geometry.prototype );
 
 	callback( new Model() );
 

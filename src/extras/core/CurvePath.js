@@ -16,8 +16,7 @@ THREE.CurvePath = function () {
 	this.autoClose = false; // Automatically closes the path
 };
 
-THREE.CurvePath.prototype = new THREE.Curve();
-THREE.CurvePath.prototype.constructor = THREE.CurvePath;
+THREE.CurvePath.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.CurvePath.prototype.add = function ( curve ) {
 

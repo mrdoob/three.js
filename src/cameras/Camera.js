@@ -14,8 +14,7 @@ THREE.Camera = function () {
 
 };
 
-THREE.Camera.prototype = new THREE.Object3D();
-THREE.Camera.prototype.constructor = THREE.Camera;
+THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Camera.prototype.lookAt = function ( vector ) {
 

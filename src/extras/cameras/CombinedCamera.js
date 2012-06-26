@@ -33,8 +33,7 @@ THREE.CombinedCamera = function ( width, height, fov, near, far, orthoNear, orth
 
 };
 
-THREE.CombinedCamera.prototype = new THREE.Camera();
-THREE.CombinedCamera.prototype.constructor = THREE.CombinedCamera;
+THREE.CombinedCamera.prototype = Object.create( THREE.Camera.prototype );
 
 THREE.CombinedCamera.prototype.toPerspective = function () {
 

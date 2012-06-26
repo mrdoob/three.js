@@ -84,5 +84,4 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 
 };
 
-THREE.ParametricGeometry.prototype = new THREE.Geometry();
-THREE.ParametricGeometry.prototype.constructor = THREE.ParametricGeometry;
+THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );

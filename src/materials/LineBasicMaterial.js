@@ -37,5 +37,4 @@ THREE.LineBasicMaterial = function ( parameters ) {
 
 };
 
-THREE.LineBasicMaterial.prototype = new THREE.Material();
-THREE.LineBasicMaterial.prototype.constructor = THREE.LineBasicMaterial;
+THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );

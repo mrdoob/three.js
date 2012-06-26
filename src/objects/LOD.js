@@ -12,8 +12,8 @@ THREE.LOD = function () {
 
 };
 
-THREE.LOD.prototype = new THREE.Object3D();
-THREE.LOD.prototype.constructor = THREE.LOD;
+
+THREE.LOD.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 

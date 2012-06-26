@@ -285,8 +285,7 @@ THREE.LineCurve = function ( v1, v2 ) {
 
 };
 
-THREE.LineCurve.prototype = new THREE.Curve();
-THREE.LineCurve.prototype.constructor = THREE.LineCurve;
+THREE.LineCurve.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.LineCurve.prototype.getPoint = function ( t ) {
 
@@ -326,8 +325,7 @@ THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
 
 };
 
-THREE.QuadraticBezierCurve.prototype = new THREE.Curve();
-THREE.QuadraticBezierCurve.prototype.constructor = THREE.QuadraticBezierCurve;
+THREE.QuadraticBezierCurve.prototype = Object.create( THREE.Curve.prototype );
 
 
 THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
@@ -372,8 +370,7 @@ THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
 
 };
 
-THREE.CubicBezierCurve.prototype = new THREE.Curve();
-THREE.CubicBezierCurve.prototype.constructor = THREE.CubicBezierCurve;
+THREE.CubicBezierCurve.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
@@ -411,8 +408,7 @@ THREE.SplineCurve = function ( points /* array of Vector2 */ ) {
 
 };
 
-THREE.SplineCurve.prototype = new THREE.Curve();
-THREE.SplineCurve.prototype.constructor = THREE.SplineCurve;
+THREE.SplineCurve.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.SplineCurve.prototype.getPoint = function ( t ) {
 
@@ -457,8 +453,7 @@ THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius,
 
 };
 
-THREE.EllipseCurve.prototype = new THREE.Curve();
-THREE.EllipseCurve.prototype.constructor = THREE.EllipseCurve;
+THREE.EllipseCurve.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 
@@ -483,16 +478,12 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
  *	Arc curve
  **************************************************************/
 
-THREE.ArcCurve = function ( aX, aY, aRadius,
-							aStartAngle, aEndAngle,
-							aClockwise ) {
+THREE.ArcCurve = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
-	THREE.EllipseCurve.call(this, aX, aY, aRadius, aRadius,
-		aStartAngle, aEndAngle, aClockwise);
+	THREE.EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 };
 
-THREE.ArcCurve.prototype = new THREE.EllipseCurve();
-THREE.ArcCurve.prototype.constructor = THREE.ArcCurve;
+THREE.ArcCurve.prototype = Object.create( THREE.EllipseCurve.prototype );
 
 
 /**************************************************************
@@ -554,16 +545,12 @@ THREE.Curve.Utils = {
 
 // A Factory method for creating new curve subclasses
 
-THREE.Curve.create = function( constructor, getPointFunc ) {
+THREE.Curve.create = function ( constructor, getPointFunc ) {
 
-    var subClass = constructor;
+	constructor.prototype = Object.create( THREE.Curve.prototype );
+	constructor.prototype.getPoint = getPointFunc;
 
-	subClass.prototype = new THREE.Curve();
-
-	subClass.prototype.constructor = constructor;
-    subClass.prototype.getPoint = getPointFunc;
-
-	return subClass;
+	return constructor;
 
 };
 

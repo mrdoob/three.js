@@ -99,8 +99,7 @@ THREE.CameraHelper = function ( camera ) {
 
 };
 
-THREE.CameraHelper.prototype = new THREE.Object3D();
-THREE.CameraHelper.prototype.constructor = THREE.CameraHelper;
+THREE.CameraHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.CameraHelper.prototype.update = function () {
 

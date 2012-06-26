@@ -16,8 +16,7 @@ THREE.Shape = function ( ) {
 
 };
 
-THREE.Shape.prototype = new THREE.Path();
-THREE.Shape.prototype.constructor = THREE.Path;
+THREE.Shape.prototype = Object.create( THREE.Path.prototype );
 
 // Convenience method to return ExtrudeGeometry
 

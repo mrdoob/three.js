@@ -33,10 +33,6 @@ THREE.SubdivisionModifier = function( subdivisions ) {
 	
 };
 
-//THREE.SubdivisionModifier.prototype = new THREE.Modifier();
-
-THREE.SubdivisionModifier.prototype.constructor = THREE.SubdivisionModifier;
-
 // Applies the "modify" pattern
 THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	

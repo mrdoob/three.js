@@ -69,5 +69,4 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 };
 
-THREE.TorusGeometry.prototype = new THREE.Geometry();
-THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
+THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
