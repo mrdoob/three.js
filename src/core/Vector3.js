@@ -490,6 +490,7 @@ THREE.Vector3.prototype = {
 		this.y = sy;
 		this.z = sz;
 
+		return this;
 	},
 
 	equals: function ( v ) {
