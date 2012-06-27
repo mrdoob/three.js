@@ -18,19 +18,19 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	container.add( new UI.Text().setText( 'Color' ).setColor( '#666' ) );
 	
-	var materialColor = new UI.Color( 'absolute' ).setLeft( '90px' );
+	var materialColor = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
 	container.add( materialColor );
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Ambient' ).setColor( '#666' ) );
 	
-	var materialAmbient = new UI.Color( 'absolute' ).setLeft( '90px' );
+	var materialAmbient = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
 	container.add( materialAmbient );
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setText( 'Specular' ).setColor( '#666' ) );
 	
-	var materialSpecular = new UI.Color( 'absolute' ).setLeft( '90px' );
+	var materialSpecular = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
 	container.add( materialSpecular );
 	container.add( new UI.HorizontalRule() );
 
@@ -55,6 +55,20 @@ Sidebar.Properties.Material = function ( signals ) {
 	function update() {
 
 		if ( selected ) {
+
+			selected.color.setHex( parseInt( materialColor.getValue().substr( 1 ), 16 ) );
+
+			if ( selected.ambient ) {
+
+				selected.ambient.setHex( parseInt( materialAmbient.getValue().substr( 1 ), 16 ) );
+
+			}
+
+			if ( selected.specular ) {
+
+				selected.specular.setHex( parseInt( materialSpecular.getValue().substr( 1 ), 16 ) );
+
+			}
 
 			selected.opacity = materialOpacity.getValue();
 

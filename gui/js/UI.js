@@ -17,6 +17,7 @@ UI.Element.prototype = {
 	setLeft: function () {
 
 		this.setStyle( 'left', arguments );
+
 		return this;
 
 	},
@@ -24,6 +25,7 @@ UI.Element.prototype = {
 	setTop: function () {
 
 		this.setStyle( 'top', arguments );
+
 		return this;
 
 	},
@@ -31,6 +33,7 @@ UI.Element.prototype = {
 	setRight: function () {
 
 		this.setStyle( 'right', arguments );
+
 		return this;
 
 	},
@@ -38,6 +41,7 @@ UI.Element.prototype = {
 	setBottom: function () {
 
 		this.setStyle( 'bottom', arguments );
+
 		return this;
 
 	},
@@ -45,6 +49,7 @@ UI.Element.prototype = {
 	setWidth: function () {
 
 		this.setStyle( 'width', arguments );
+
 		return this;
 
 	},
@@ -52,6 +57,7 @@ UI.Element.prototype = {
 	setHeight: function () {
 
 		this.setStyle( 'height', arguments );
+
 		return this;
 
 	},
@@ -61,6 +67,7 @@ UI.Element.prototype = {
 	setBorder: function () {
 
 		this.setStyle( 'border', arguments );
+
 		return this;
 
 	},
@@ -68,6 +75,7 @@ UI.Element.prototype = {
 	setBorderTop: function () {
 
 		this.setStyle( 'borderTop', arguments );
+
 		return this;
 
 	},
@@ -75,6 +83,7 @@ UI.Element.prototype = {
 	setBorderBottom: function () {
 
 		this.setStyle( 'borderBottom', arguments );
+
 		return this;
 
 	},
@@ -82,6 +91,7 @@ UI.Element.prototype = {
 	setBorderLeft: function () {
 
 		this.setStyle( 'borderLeft', arguments );
+
 		return this;
 
 	},
@@ -89,6 +99,7 @@ UI.Element.prototype = {
 	setBorderRight: function () {
 
 		this.setStyle( 'borderRight', arguments );
+
 		return this;
 
 	},
@@ -98,6 +109,7 @@ UI.Element.prototype = {
 	setMargin: function () {
 
 		this.setStyle( 'margin', arguments );
+
 		return this;
 
 	},
@@ -105,6 +117,7 @@ UI.Element.prototype = {
 	setMarginTop: function () {
 
 		this.setStyle( 'marginTop', arguments );
+
 		return this;
 
 	},
@@ -112,6 +125,7 @@ UI.Element.prototype = {
 	setMarginBottom: function () {
 
 		this.setStyle( 'marginBottom', arguments );
+
 		return this;
 
 	},
@@ -119,6 +133,7 @@ UI.Element.prototype = {
 	setMarginLeft: function () {
 
 		this.setStyle( 'marginLeft', arguments );
+
 		return this;
 
 	},
@@ -126,6 +141,7 @@ UI.Element.prototype = {
 	setMarginRight: function () {
 
 		this.setStyle( 'marginRight', arguments );
+
 		return this;
 
 	},
@@ -135,6 +151,7 @@ UI.Element.prototype = {
 	setPadding: function () {
 
 		this.setStyle( 'padding', arguments );
+
 		return this;
 
 	},
@@ -144,6 +161,7 @@ UI.Element.prototype = {
 	setFontSize: function () {
 
 		this.setStyle( 'fontSize', arguments );
+
 		return this;
 
 	},
@@ -151,6 +169,7 @@ UI.Element.prototype = {
 	setFontWeight: function () {
 
 		this.setStyle( 'fontWeight', arguments );
+
 		return this;
 
 	},
@@ -160,6 +179,7 @@ UI.Element.prototype = {
 	setColor: function () {
 
 		this.setStyle( 'color', arguments );
+
 		return this;
 
 	},
@@ -167,6 +187,7 @@ UI.Element.prototype = {
 	setBackgroundColor: function () {
 
 		this.setStyle( 'backgroundColor', arguments );
+
 		return this;
 
 	},
@@ -174,6 +195,7 @@ UI.Element.prototype = {
 	setDisplay: function () {
 
 		this.setStyle( 'display', arguments );
+
 		return this;
 
 	},
@@ -181,6 +203,7 @@ UI.Element.prototype = {
 	setOverflow: function () {
 
 		this.setStyle( 'overflow', arguments );
+
 		return this;
 
 	}
@@ -203,8 +226,7 @@ UI.Panel = function ( position ) {
 	return this;
 };
 
-UI.Panel.prototype = new UI.Element();
-UI.Panel.prototype.constructor = UI.Panel;
+UI.Panel.prototype = Object.create( UI.Element.prototype );
 
 UI.Panel.prototype.add = function () {
 
@@ -232,12 +254,12 @@ UI.Text = function ( position ) {
 
 };
 
-UI.Text.prototype = new UI.Element();
-UI.Text.prototype.constructor = UI.Text;
+UI.Text.prototype = Object.create( UI.Element.prototype );
 
 UI.Text.prototype.setText = function ( value ) {
 
 	this.dom.textContent = value;
+
 	return this;
 
 };
@@ -249,28 +271,49 @@ UI.Color = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'span' );
+	var scope = this;
+
+	this.dom = document.createElement( 'input' );
+	this.dom.type = 'color';
 	this.dom.style.position = position || 'relative';
 	this.dom.style.width = '64px';
 	this.dom.style.height = '16px';
-	this.dom.style.backgroundColor = '#000000';
+	this.dom.style.border = '0px';
+	this.dom.style.padding = '0px';
+	this.dom.style.backgroundColor = 'transparent';
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
 
 	return this;
 
 };
 
-UI.Color.prototype = new UI.Element();
-UI.Color.prototype.constructor = UI.Color;
+UI.Color.prototype = Object.create( UI.Element.prototype );
 
 UI.Color.prototype.getValue = function () {
 
-	return this.dom.style.backgroundColor;
+	return this.dom.value;
 
 };
 
 UI.Color.prototype.setValue = function ( value ) {
 
-	this.dom.style.backgroundColor = value;
+	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.Color.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
 	return this;
 
 };
@@ -281,6 +324,8 @@ UI.Color.prototype.setValue = function ( value ) {
 UI.Number = function ( position ) {
 
 	UI.Element.call( this );
+
+	var scope = this;
 
 	this.dom = document.createElement( 'input' );
 	this.dom.style.position = position || 'relative';
@@ -298,7 +343,6 @@ UI.Number = function ( position ) {
 
 	this.onChangeCallback = null;
 
-	var scope = this;
 	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
 
 	var onMouseDown = function ( event ) {
@@ -322,7 +366,8 @@ UI.Number = function ( position ) {
 		var number = onMouseDownValue + ( distance / amount );
 
 		scope.dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
-		scope.onChangeCallback();
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 	}
 
@@ -341,7 +386,8 @@ UI.Number = function ( position ) {
 		if ( number !== NaN ) {
 
 			scope.dom.value = number.toFixed( 2 );
-			scope.onChangeCallback();
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 		}
 
@@ -351,8 +397,7 @@ UI.Number = function ( position ) {
 
 };
 
-UI.Number.prototype = new UI.Element();
-UI.Number.prototype.constructor = UI.Number;
+UI.Number.prototype = Object.create( UI.Element.prototype );
 
 UI.Number.prototype.getValue = function () {
 
@@ -363,6 +408,7 @@ UI.Number.prototype.getValue = function () {
 UI.Number.prototype.setValue = function ( value ) {
 
 	this.dom.value = value.toFixed( 2 );
+
 	return this;
 
 };
@@ -370,6 +416,7 @@ UI.Number.prototype.setValue = function ( value ) {
 UI.Number.prototype.setMin = function ( value ) {
 
 	this.min = value;
+
 	return this;
 
 };
@@ -377,6 +424,7 @@ UI.Number.prototype.setMin = function ( value ) {
 UI.Number.prototype.setMax = function ( value ) {
 
 	this.max = value;
+
 	return this;
 
 };
@@ -384,6 +432,7 @@ UI.Number.prototype.setMax = function ( value ) {
 UI.Number.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
+
 	return this;
 
 };
@@ -401,8 +450,7 @@ UI.Break = function () {
 
 };
 
-UI.Break.prototype = new UI.Element();
-UI.Break.prototype.constructor = UI.Break;
+UI.Break.prototype = Object.create( UI.Element.prototype );
 
 
 // HorizontalRule
@@ -418,8 +466,7 @@ UI.HorizontalRule = function ( position ) {
 
 };
 
-UI.HorizontalRule.prototype = new UI.Element();
-UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
+UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
 
 // Button
 
@@ -427,12 +474,12 @@ UI.Button = function ( position ) {
 
 	UI.Element.call( this );
 
+	var scope = this;
+
 	this.dom = document.createElement( 'button' );
 	this.dom.style.position = position || 'relative';
 
 	this.onClickCallback = null;
-
-	var scope = this;
 
 	this.dom.addEventListener( 'click', function ( event ) {
 
@@ -444,12 +491,12 @@ UI.Button = function ( position ) {
 
 };
 
-UI.Button.prototype = new UI.Element();
-UI.Button.prototype.constructor = UI.Button;
+UI.Button.prototype = Object.create( UI.Element.prototype );
 
 UI.Button.prototype.setText = function ( value ) {
 
 	this.dom.textContent = value;
+
 	return this;
 
 };
@@ -457,6 +504,7 @@ UI.Button.prototype.setText = function ( value ) {
 UI.Button.prototype.onClick = function ( callback ) {
 
 	this.onClickCallback = callback;
+
 	return this;
 
 };
