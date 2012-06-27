@@ -40,7 +40,11 @@ THREE.ColladaLoader = function () {
 
 		subdivideFaces: true,
 
-		upAxis: 'Y'
+		upAxis: 'Y',
+		
+		// For reflective or refractive materials we'll use this cubemap
+		defaultEnvMap: null
+		
 	};
 
 	// TODO: support unit conversion as well
@@ -3033,6 +3037,7 @@ THREE.ColladaLoader = function () {
 
 				case 'shininess':
 				case 'reflectivity':
+				case 'index_of_refraction':
 				case 'transparency':
 
 					var f = evaluateXPath( child, './/dae:float' );
@@ -3119,9 +3124,18 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'shininess':
-				case 'reflectivity':
-
 					props[ prop ] = this[ prop ];
+					break;
+					
+				case 'reflectivity':
+					props[ prop ] = this[ prop ];
+					if(props[ prop ] > 0.0) props['envMap'] = options.defaultEnvMap;
+					props['combine'] = THREE.MixOperation;	//mix regular shading with reflective component
+					break;
+					
+				case 'index_of_refraction':
+					props[ 'refractionRatio' ] = this[ prop ]; //TODO: "index_of_refraction" becomes "refractionRatio" in shader, but I'm not sure if the two are actually comparable
+					if(this[ prop ] != 1.0) props['envMap'] = options.defaultEnvMap;
 					break;
 
 				case 'transparency':
