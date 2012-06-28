@@ -2,13 +2,22 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.Ray = function ( origin, direction ) {
+THREE.Ray = function ( origin, direction, near, far ) {
 
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
 
+	this.near = near || 0;
+	this.far = far || Infinity;
+
 	this.precision = 0.0001;
 	this.threshold = 5;
+
+	this.comparator = function ( a, b ) {
+
+		return a.distance - b.distance;
+
+	};
 
 };
 
@@ -93,9 +102,19 @@ THREE.Ray.prototype = {
 
 	}()),
 
-	intersectObject: function ( object ) {
+	intersectObject: function ( object, recursive ) {
 
 		var intersects = [];
+
+		if ( recursive === true ) {
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				Array.prototype.push.apply( intersects, this.intersectObject( object.children[ i ], recursive ) );
+
+			}
+
+		}
 
 		if ( object instanceof THREE.Particle ) {
 
@@ -111,22 +130,22 @@ THREE.Ray.prototype = {
 
 		}
 
+		intersects.sort( this.comparator );
 		return intersects;
 
 	},
 
-	intersectObjects: function ( objects ) {
+	intersectObjects: function ( objects, recursive ) {
 
 		var intersects = [];
 
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ] ) );
+			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ], recursive ) );
 
 		}
 
-		intersects.sort( function ( a, b ) { return a.distance - b.distance; } );
-
+		intersects.sort( this.comparator );
 		return intersects;
 
 	},
@@ -210,20 +229,14 @@ THREE.Ray.prototype = {
 
 			// Checking boundingSphere
 
-			var intersect;
-			var distance = this.distanceFromIntersection(
-				this.origin,
-				this.direction,
-				object.matrixWorld.getPosition()
-			);
+			var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
+			var scaledRadius = object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ); 
 
-			var scale = THREE.Frustum.__v1.set(
-				object.matrixWorld.getColumnX().length(),
-				object.matrixWorld.getColumnY().length(),
-				object.matrixWorld.getColumnZ().length()
-			);
+			// Checking distance to ray
 
-			if ( distance > object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ) ) {
+			distance = this.distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+
+			if ( distance > scaledRadius) {
 
 				return intersects;
 
@@ -232,6 +245,7 @@ THREE.Ray.prototype = {
 			// Checking faces
 
 			var f, fl, face, dot, scalar,
+			//rangeSq = this.range * this.range,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix;
@@ -270,17 +284,22 @@ THREE.Ray.prototype = {
 
 					intersectPoint.add( originCopy, directionCopy.multiplyScalar( scalar ) );
 
+					distance = originCopy.distanceTo( intersectPoint );
+
+					if ( distance < this.near ) continue;
+					if ( distance > this.far ) continue;
+
 					if ( face instanceof THREE.Face3 ) {
 
 						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
 						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
 						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
 
-						if ( this.pointInFace3( intersectPoint, a, b, c ) ) {
+						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
 							intersect = {
 
-								distance: originCopy.distanceTo( intersectPoint ),
+								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
 								object: object
@@ -302,7 +321,7 @@ THREE.Ray.prototype = {
 
 							intersect = {
 
-								distance: originCopy.distanceTo( intersectPoint ),
+								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
 								object: object
