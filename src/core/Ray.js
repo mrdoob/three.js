@@ -295,7 +295,7 @@ THREE.Ray.prototype = {
 						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
 						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
 
-						if ( pointInFace3( intersectPoint, a, b, c ) ) {
+						if ( this.pointInFace3( intersectPoint, a, b, c ) ) {
 
 							intersect = {
 
