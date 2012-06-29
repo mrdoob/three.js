@@ -6,83 +6,105 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 	this.origin = origin || new THREE.Vector3();
 	this.direction = direction || new THREE.Vector3();
+
 	this.near = near || 0;
 	this.far = far || Infinity;
 
-	//
+	this.precision = 0.0001;
+	this.threshold = 5;
 
-	var a = new THREE.Vector3();
-	var b = new THREE.Vector3();
-	var c = new THREE.Vector3();
-	var d = new THREE.Vector3();
+	this.comparator = function ( a, b ) {
 
-	var originCopy = new THREE.Vector3();
-	var directionCopy = new THREE.Vector3();
+		return a.distance - b.distance;
 
-	var vector = new THREE.Vector3();
-	var normal = new THREE.Vector3();
-	var intersectPoint = new THREE.Vector3();
-	
-	var descSort = function ( a, b ) {
-	
-			return a.distance - b.distance;
-			
 	};
 
-	//
+};
 
-	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-	var dot, intersect, distance;
 
-	var distanceFromIntersection = function ( origin, direction, position ) {
+THREE.Ray.prototype = {
 
-		v0.sub( position, origin );
-		dot = v0.dot( direction );
+	constructor: THREE.Ray,
 
-		intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
-		distance = position.distanceTo( intersect );
+	setPrecision: function ( value ) {
 
-		return distance;
+		this.precision = value;
+		return this;
 
-	}
+	},
+
+	setOrigin: function ( v ) {
+
+		this.origin = v;
+		return this;
+
+	},
+
+	setDirection: function ( v ) {
+
+		this.direction = v;
+		return this;
+
+	},
+
+	setThreshold: function ( v ) {
+
+		this.threshold = v;
+		return this;
+
+	},
+
+	distanceFromIntersection: ( function () {
+
+		var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
+
+		return function ( origin, direction, position ) {
+
+			var dot, intersect, distance;
+
+			v0.sub( position, origin );
+			dot = v0.dot( direction );
+
+			intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
+			distance = position.distanceTo( intersect );
+
+			return distance;
+		};
+
+	}()),
 
 	// http://www.blackpawn.com/texts/pointinpoly/default.html
+	pointInFace3: ( function () {
 
-	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
+		var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
 
-	var pointInFace3 = function ( p, a, b, c ) {
+		return function ( p, a, b, c ) {
 
-		v0.sub( c, a );
-		v1.sub( b, a );
-		v2.sub( p, a );
+			var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
 
-		dot00 = v0.dot( v0 );
-		dot01 = v0.dot( v1 );
-		dot02 = v0.dot( v2 );
-		dot11 = v1.dot( v1 );
-		dot12 = v1.dot( v2 );
+			v0.sub( c, a );
+			v1.sub( b, a );
+			v2.sub( p, a );
 
-		invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
-		u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+			dot00 = v0.dot( v0 );
+			dot01 = v0.dot( v1 );
+			dot02 = v0.dot( v2 );
+			dot11 = v1.dot( v1 );
+			dot12 = v1.dot( v2 );
 
-		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
+			invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
+			u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+			v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-	}
+			return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
 
-	//
+		};
 
-	var precision = 0.0001;
+	}()),
 
-	this.setPrecision = function ( value ) {
+	intersectObject: function ( object, recursive ) {
 
-		precision = value;
-
-	};
-
-	this.intersectObject = function ( object, recursive ) {
-
-		var intersect, intersects = [];
+		var intersects = [];
 
 		if ( recursive === true ) {
 
@@ -96,26 +118,114 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 		if ( object instanceof THREE.Particle ) {
 
-			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+			this.intersectParticle( object, intersects );
 
-			if ( distance > object.scale.x ) {
+		} else if ( object instanceof THREE.ParticleSystem ) {
 
-				return [];
+			this.intersectParticleSystem( object, intersects );
 
+		} else if ( object instanceof THREE.Mesh ) {
+
+			this.intersectMesh( object, intersects );
+
+		}
+
+		intersects.sort( this.comparator );
+		return intersects;
+
+	},
+
+	intersectObjects: function ( objects, recursive ) {
+
+		var intersects = [];
+
+		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ], recursive ) );
+
+		}
+
+		intersects.sort( this.comparator );
+		return intersects;
+
+	},
+
+	// Canvas Particle
+	intersectParticle: function ( object, intersects ) {
+
+		var intersect;
+		var distance = this.distanceFromIntersection(
+			this.origin,
+			this.direction,
+			object.matrixWorld.getPosition()
+		);
+
+		if ( distance > object.scale.x ) {
+
+			return;
+
+		}
+
+		intersect = {
+
+			distance: distance,
+			point: object.position,
+			face: null,
+			object: object
+
+		};
+
+		intersects.push( intersect );
+	},
+
+	// WebGL Particle System
+	intersectParticleSystem: function ( object, intersects ) {
+
+		var vertices = object.geometry.vertices;
+		var point, distance, intersect;
+
+		for ( var i = 0; i < vertices.length; i ++ ) {
+
+			point = vertices[ i ];
+			distance = this.distanceFromIntersection(
+				this.origin,
+				this.direction,
+				object.matrixWorld.multiplyVector3( point.clone() )
+			);
+
+			if ( distance > this.threshold ) {
+				continue;
 			}
 
 			intersect = {
 
 				distance: distance,
-				point: object.position,
+				point: point.clone(),
 				face: null,
-				object: object
+				object: object,
+				vertex: i
 
 			};
 
 			intersects.push( intersect );
+		}
+	},
 
-		} else if ( object instanceof THREE.Mesh ) {
+	intersectMesh: ( function () {
+
+		var a = new THREE.Vector3();
+		var b = new THREE.Vector3();
+		var c = new THREE.Vector3();
+		var d = new THREE.Vector3();
+
+		var originCopy = new THREE.Vector3();
+		var directionCopy = new THREE.Vector3();
+
+		var vector = new THREE.Vector3();
+		var normal = new THREE.Vector3();
+		var intersectPoint = new THREE.Vector3();
+
+		return function ( object, intersects ) {
 
 			// Checking boundingSphere
 
@@ -123,8 +233,8 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			var scaledRadius = object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ); 
 
 			// Checking distance to ray
-		
-			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+
+			distance = this.distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
 			if ( distance > scaledRadius) {
 
@@ -135,7 +245,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			// Checking faces
 
 			var f, fl, face, dot, scalar,
-			rangeSq = this.range * this.range,
+			//rangeSq = this.range * this.range,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix;
@@ -160,7 +270,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 				// bail if ray and plane are parallel
 
-				if ( Math.abs( dot ) < precision ) continue;
+				if ( Math.abs( dot ) < this.precision ) continue;
 
 				// calc distance to plane
 
@@ -185,7 +295,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
 						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
 
-						if ( pointInFace3( intersectPoint, a, b, c ) ) {
+						if ( this.pointInFace3( intersectPoint, a, b, c ) ) {
 
 							intersect = {
 
@@ -207,7 +317,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
 						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ] ) );
 
-						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
+						if ( this.pointInFace3( intersectPoint, a, b, d ) || this.pointInFace3( intersectPoint, b, c, d ) ) {
 
 							intersect = {
 
@@ -228,28 +338,8 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 			}
 
-		}
+		};
 
-		intersects.sort( descSort );
-
-		return intersects;
-
-	};
-
-	this.intersectObjects = function ( objects, recursive ) {
-
-		var intersects = [];
-
-		for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ], recursive ) );
-
-		}
-
-		intersects.sort( descSort );
-
-		return intersects;
-
-	};
+	}())
 
 };
