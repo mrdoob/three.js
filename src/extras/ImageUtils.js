@@ -31,8 +31,10 @@ THREE.ImageUtils = {
 			images[ i ].onload = function () {
 
 				images.loadCount += 1;
-				if ( images.loadCount === 6 ) texture.needsUpdate = true;
-				if ( callback ) callback( this );
+				if ( images.loadCount === 6 ) {
+					texture.needsUpdate = true;
+					if ( callback ) callback( this );
+				}
 
 			};
 
