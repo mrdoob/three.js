@@ -66,40 +66,40 @@ THREE.SphericalRefractionMapping = function () {};
 
 // Wrapping modes
 
-THREE.RepeatWrapping = 0;
-THREE.ClampToEdgeWrapping = 1;
-THREE.MirroredRepeatWrapping = 2;
+THREE.RepeatWrapping = 1000;
+THREE.ClampToEdgeWrapping = 1001;
+THREE.MirroredRepeatWrapping = 1002;
 
 // Filters
 
-THREE.NearestFilter = 3;
-THREE.NearestMipMapNearestFilter = 4;
-THREE.NearestMipMapLinearFilter = 5;
-THREE.LinearFilter = 6;
-THREE.LinearMipMapNearestFilter = 7;
-THREE.LinearMipMapLinearFilter = 8;
+THREE.NearestFilter = 1003;
+THREE.NearestMipMapNearestFilter = 1004;
+THREE.NearestMipMapLinearFilter = 1005;
+THREE.LinearFilter = 1006;
+THREE.LinearMipMapNearestFilter = 1007;
+THREE.LinearMipMapLinearFilter = 1008;
 
 // Data types
 
-THREE.UnsignedByteType = 9;
-THREE.ByteType = 10;
-THREE.ShortType = 11;
-THREE.UnsignedShortType = 12;
-THREE.IntType = 13;
-THREE.UnsignedIntType = 14;
-THREE.FloatType = 15;
+THREE.UnsignedByteType = 1009;
+THREE.ByteType = 1010;
+THREE.ShortType = 1011;
+THREE.UnsignedShortType = 1012;
+THREE.IntType = 1013;
+THREE.UnsignedIntType = 1014;
+THREE.FloatType = 1015;
 
 // Pixel types
 
-//THREE.UnsignedByteType = 9;
-THREE.UnsignedShort4444Type = 16;
-THREE.UnsignedShort5551Type = 17;
-THREE.UnsignedShort565Type = 18;
+//THREE.UnsignedByteType = 1009;
+THREE.UnsignedShort4444Type = 1016;
+THREE.UnsignedShort5551Type = 1017;
+THREE.UnsignedShort565Type = 1018;
 
 // Pixel formats
 
-THREE.AlphaFormat = 19;
-THREE.RGBFormat = 20;
-THREE.RGBAFormat = 21;
-THREE.LuminanceFormat = 22;
-THREE.LuminanceAlphaFormat = 23;
+THREE.AlphaFormat = 1019;
+THREE.RGBFormat = 1020;
+THREE.RGBAFormat = 1021;
+THREE.LuminanceFormat = 1022;
+THREE.LuminanceAlphaFormat = 1023;
