@@ -63,5 +63,4 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 };
 
-THREE.LatheGeometry.prototype = new THREE.Geometry();
-THREE.LatheGeometry.prototype.constructor = THREE.LatheGeometry;
+THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );

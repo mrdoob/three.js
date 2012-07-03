@@ -164,8 +164,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 
 };
 
-THREE.AudioObject.prototype = new THREE.Object3D();
-THREE.AudioObject.prototype.constructor = THREE.AudioObject;
+THREE.AudioObject.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.AudioObject.prototype.context = null;
 THREE.AudioObject.prototype.type = null;

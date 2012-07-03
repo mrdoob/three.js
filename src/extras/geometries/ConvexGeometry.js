@@ -224,5 +224,4 @@ THREE.ConvexGeometry = function( vertices ) {
 
 };
 
-THREE.ConvexGeometry.prototype = new THREE.Geometry();
-THREE.ConvexGeometry.prototype.constructor = THREE.ConvexGeometry;
+THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );

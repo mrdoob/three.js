@@ -60,5 +60,4 @@ THREE.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
 
 };
 
-THREE.PlaneGeometry.prototype = new THREE.Geometry();
-THREE.PlaneGeometry.prototype.constructor = THREE.PlaneGeometry;
+THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );

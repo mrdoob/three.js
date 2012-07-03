@@ -101,34 +101,31 @@
 
 			];
 
-			if (location.protocol !== "file:") {
-				var loader = new THREE.JSONLoader();
-				loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+			var loader = new THREE.JSONLoader();
+			loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
 
-					geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
+				geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
 
-					THREE.WaltHead = function() {
-						return THREE.GeometryUtils.clone(geometry);
-					};
+				THREE.WaltHead = function() {
+					return THREE.GeometryUtils.clone(geometry);
+				};
 
-					updateInfo()
+				updateInfo()
 
-				});
+			});
 
-				var loader2 = new THREE.JSONLoader();
-				loader2.load( 'obj/Suzanne.js', function ( geometry ) {
+			var loader2 = new THREE.JSONLoader();
+			loader2.load( 'obj/Suzanne.js', function ( geometry ) {
 
-					geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
+				geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
 
-					THREE.Suzanne = function() {
-						return THREE.GeometryUtils.clone(geometry);
-					};
+				THREE.Suzanne = function() {
+					return THREE.GeometryUtils.clone(geometry);
+				};
 
-					updateInfo()
+				updateInfo()
 
-				} );
-
-			}
+			} );
 
 
 			var info;

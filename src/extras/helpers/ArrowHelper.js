@@ -38,8 +38,7 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 };
 
-THREE.ArrowHelper.prototype = new THREE.Object3D();
-THREE.ArrowHelper.prototype.constructor = THREE.ArrowHelper;
+THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 

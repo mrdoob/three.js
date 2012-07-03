@@ -75,5 +75,4 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 
 };
 
-THREE.MeshLambertMaterial.prototype = new THREE.Material();
-THREE.MeshLambertMaterial.prototype.constructor = THREE.MeshLambertMaterial;
+THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );

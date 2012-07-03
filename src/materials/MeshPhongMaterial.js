@@ -82,5 +82,4 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 };
 
-THREE.MeshPhongMaterial.prototype = new THREE.Material();
-THREE.MeshPhongMaterial.prototype.constructor = THREE.MeshPhongMaterial;
+THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );

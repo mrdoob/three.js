@@ -144,5 +144,4 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 };
 
-THREE.CubeGeometry.prototype = new THREE.Geometry();
-THREE.CubeGeometry.prototype.constructor = THREE.CubeGeometry;
+THREE.CubeGeometry.prototype = Object.create( THREE.Geometry.prototype );

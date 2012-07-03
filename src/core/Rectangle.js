@@ -4,8 +4,13 @@
 
 THREE.Rectangle = function () {
 
-	var _left, _top, _right, _bottom,
-	_width, _height, _isEmpty = true;
+	var _left = 0;
+	var _top = 0;
+	var _right = 0;
+	var _bottom = 0;
+	var _width = 0;
+	var _height = 0;
+	var _isEmpty = true;
 
 	function resize() {
 
@@ -75,7 +80,7 @@ THREE.Rectangle = function () {
 
 	this.addPoint = function ( x, y ) {
 
-		if ( _isEmpty ) {
+		if ( _isEmpty === true ) {
 
 			_isEmpty = false;
 			_left = x; _top = y;
@@ -97,7 +102,7 @@ THREE.Rectangle = function () {
 
 	this.add3Points = function ( x1, y1, x2, y2, x3, y3 ) {
 
-		if (_isEmpty) {
+		if ( _isEmpty === true ) {
 
 			_isEmpty = false;
 			_left = x1 < x2 ? ( x1 < x3 ? x1 : x3 ) : ( x2 < x3 ? x2 : x3 );
@@ -122,7 +127,7 @@ THREE.Rectangle = function () {
 
 	this.addRectangle = function ( r ) {
 
-		if ( _isEmpty ) {
+		if ( _isEmpty === true ) {
 
 			_isEmpty = false;
 			_left = r.getLeft(); _top = r.getTop();

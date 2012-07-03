@@ -14,8 +14,7 @@ THREE.Camera = function () {
 
 };
 
-THREE.Camera.prototype = new THREE.Object3D();
-THREE.Camera.prototype.constructor = THREE.Camera;
+THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Camera.prototype.lookAt = function ( vector ) {
 
@@ -23,7 +22,7 @@ THREE.Camera.prototype.lookAt = function ( vector ) {
 
 	this.matrix.lookAt( this.position, vector, this.up );
 
-	if ( this.rotationAutoUpdate ) {
+	if ( this.rotationAutoUpdate === true ) {
 
 		this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
 

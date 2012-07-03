@@ -18,9 +18,7 @@ THREE.Path = function ( points ) {
 
 };
 
-THREE.Path.prototype = new THREE.CurvePath();
-THREE.Path.prototype.constructor = THREE.Path;
-
+THREE.Path.prototype = Object.create( THREE.CurvePath.prototype );
 
 THREE.PathActions = {
 

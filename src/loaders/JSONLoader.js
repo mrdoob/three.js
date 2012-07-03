@@ -9,8 +9,7 @@ THREE.JSONLoader = function ( showStatus ) {
 
 };
 
-THREE.JSONLoader.prototype = new THREE.Loader();
-THREE.JSONLoader.prototype.constructor = THREE.JSONLoader;
+THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
 
 THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 

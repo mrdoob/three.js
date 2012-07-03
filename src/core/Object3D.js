@@ -117,7 +117,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-		if ( object instanceof THREE.Object3D ) { // && this.children.indexOf( object ) === - 1
+		if ( object instanceof THREE.Object3D ) {
 
 			if ( object.parent !== undefined ) {
 
@@ -213,7 +213,7 @@ THREE.Object3D.prototype = {
 
 		this.matrix.setPosition( this.position );
 
-		if ( this.useQuaternion )  {
+		if ( this.useQuaternion === true )  {
 
 			this.matrix.setRotationFromQuaternion( this.quaternion );
 
@@ -236,13 +236,11 @@ THREE.Object3D.prototype = {
 
 	updateMatrixWorld: function ( force ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
-		// update matrixWorld
+		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
-			if ( this.parent ) {
+			if ( this.parent !== undefined ) {
 
 				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
 

@@ -2,6 +2,4 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function () {
-
-};
+THREE.MeshFaceMaterial = function () {};

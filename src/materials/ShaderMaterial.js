@@ -55,5 +55,4 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 };
 
-THREE.ShaderMaterial.prototype = new THREE.Material();
-THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
+THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );

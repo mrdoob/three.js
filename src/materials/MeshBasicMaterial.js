@@ -65,5 +65,4 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 
 };
 
-THREE.MeshBasicMaterial.prototype = new THREE.Material();
-THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
+THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );

@@ -17,8 +17,7 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 };
 
-THREE.PerspectiveCamera.prototype = new THREE.Camera();
-THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
+THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
 
 
 /**

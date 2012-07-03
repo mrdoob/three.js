@@ -93,5 +93,4 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 
 };
 
-THREE.SphereGeometry.prototype = new THREE.Geometry();
-THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
+THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );

@@ -29,5 +29,4 @@ THREE.ParticleSystem = function ( geometry, material ) {
 
 };
 
-THREE.ParticleSystem.prototype = new THREE.Object3D();
-THREE.ParticleSystem.prototype.constructor = THREE.ParticleSystem;
+THREE.ParticleSystem.prototype = Object.create( THREE.Object3D.prototype );

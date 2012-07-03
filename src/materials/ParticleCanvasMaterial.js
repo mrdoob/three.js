@@ -20,5 +20,4 @@ THREE.ParticleCanvasMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleCanvasMaterial.prototype = new THREE.Material();
-THREE.ParticleCanvasMaterial.prototype.constructor = THREE.ParticleCanvasMaterial;
+THREE.ParticleCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
