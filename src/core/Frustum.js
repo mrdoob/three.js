@@ -20,7 +20,8 @@ THREE.Frustum = function ( ) {
 
 THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 
-	var i, plane, planes = this.planes;
+	var plane;
+	var planes = this.planes;
 
 	var me = m.elements;
 	var me0 = me[0], me1 = me[1], me2 = me[2], me3 = me[3];
@@ -35,7 +36,7 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 	planes[ 4 ].set( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
 	planes[ 5 ].set( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
 
-	for ( i = 0; i < 6; i ++ ) {
+	for ( var i = 0; i < 6; i ++ ) {
 
 		plane = planes[ i ];
 		plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
@@ -46,11 +47,11 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 
 THREE.Frustum.prototype.contains = function ( object ) {
 
-	var distance,
-	planes = this.planes,
-	matrix = object.matrixWorld,
-	me = matrix.elements,
-	radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+	var distance = 0.0;
+	var planes = this.planes;
+	var matrix = object.matrixWorld;
+	var me = matrix.elements;
+	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
 
 	for ( var i = 0; i < 6; i ++ ) {
 

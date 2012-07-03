@@ -22,7 +22,7 @@ THREE.Camera.prototype.lookAt = function ( vector ) {
 
 	this.matrix.lookAt( this.position, vector, this.up );
 
-	if ( this.rotationAutoUpdate ) {
+	if ( this.rotationAutoUpdate === true ) {
 
 		this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
 

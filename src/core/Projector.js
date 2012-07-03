@@ -80,7 +80,7 @@ THREE.Projector = function() {
 			if ( object.visible === false ) return;
 
 			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
-			( object.frustumCulled === false || _frustum.contains( object ) ) ) {
+			( object.frustumCulled === false || _frustum.contains( object ) === true ) ) {
 
 				_vector3.copy( object.matrixWorld.getPosition() );
 				_projScreenMatrix.multiplyVector3( _vector3 );
@@ -118,7 +118,7 @@ THREE.Projector = function() {
 
 		projectObject( root );
 
-		sort && _renderData.objects.sort( painterSort );
+		if ( sort === true ) _renderData.objects.sort( painterSort );
 
 		return _renderData;
 
@@ -202,12 +202,12 @@ THREE.Projector = function() {
 						v2 = _vertexPool[ face.b ];
 						v3 = _vertexPool[ face.c ];
 
-						if ( v1.visible && v2.visible && v3.visible ) {
+						if ( v1.visible === true && v2.visible === true && v3.visible === true ) {
 
 							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
 
-							if ( object.doubleSided || visible != object.flipSided ) {
+							if ( object.doubleSided === true || visible !== object.flipSided ) {
 
 								_face = getNextFace3InPool();
 
@@ -234,7 +234,7 @@ THREE.Projector = function() {
 						v3 = _vertexPool[ face.c ];
 						v4 = _vertexPool[ face.d ];
 
-						if ( v1.visible && v2.visible && v3.visible && v4.visible ) {
+						if ( v1.visible === true && v2.visible === true && v3.visible === true && v4.visible === true ) {
 
 							visible = ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||
@@ -242,7 +242,7 @@ THREE.Projector = function() {
 								( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0;
 
 
-							if ( object.doubleSided || visible != object.flipSided ) {
+							if ( object.doubleSided === true || visible !== object.flipSided ) {
 
 								_face = getNextFace4InPool();
 
@@ -266,7 +266,7 @@ THREE.Projector = function() {
 					}
 
 					_face.normalWorld.copy( face.normal );
-					if ( !visible && ( object.flipSided || object.doubleSided ) ) _face.normalWorld.negate();
+					if ( visible === false && ( object.flipSided === true || object.doubleSided === true ) ) _face.normalWorld.negate();
 					objectMatrixWorldRotation.multiplyVector3( _face.normalWorld );
 
 					_face.centroidWorld.copy( face.centroid );
@@ -281,7 +281,9 @@ THREE.Projector = function() {
 
 						normal = _face.vertexNormalsWorld[ n ];
 						normal.copy( faceVertexNormals[ n ] );
-						if ( !visible && ( object.flipSided || object.doubleSided ) ) normal.negate();
+
+						if ( visible === false && ( object.flipSided === true || object.doubleSided === true ) ) normal.negate();
+
 						objectMatrixWorldRotation.multiplyVector3( normal );
 
 					}
@@ -290,7 +292,7 @@ THREE.Projector = function() {
 
 						uvs = faceVertexUvs[ c ][ f ];
 
-						if ( !uvs ) continue;
+						if ( uvs === undefined ) continue;
 
 						for ( u = 0, ul = uvs.length; u < ul; u ++ ) {
 
@@ -335,7 +337,7 @@ THREE.Projector = function() {
 					_clippedVertex1PositionScreen.copy( v1.positionScreen );
 					_clippedVertex2PositionScreen.copy( v2.positionScreen );
 
-					if ( clipLine( _clippedVertex1PositionScreen, _clippedVertex2PositionScreen ) ) {
+					if ( clipLine( _clippedVertex1PositionScreen, _clippedVertex2PositionScreen ) === true ) {
 
 						// Perform the perspective divide
 						_clippedVertex1PositionScreen.multiplyScalar( 1 / _clippedVertex1PositionScreen.w );
@@ -404,7 +406,18 @@ THREE.Projector = function() {
 
 	function getNextObjectInPool() {
 
-		var object = _objectPool[ _objectCount ] = _objectPool[ _objectCount ] || new THREE.RenderableObject();
+		var object;
+
+		if ( _objectCount === _objectPool.length ) {
+
+			object = new THREE.RenderableObject();
+			_objectPool.push( object );
+
+		} else {
+
+			object =  _objectPool[ _objectCount ];
+
+		}
 
 		_objectCount ++;
 
@@ -414,7 +427,18 @@ THREE.Projector = function() {
 
 	function getNextVertexInPool() {
 
-		var vertex = _vertexPool[ _vertexCount ] = _vertexPool[ _vertexCount ] || new THREE.RenderableVertex();
+		var vertex;
+
+		if ( _vertexCount === _vertexPool.length ) {
+
+			vertex = new THREE.RenderableVertex();
+			_vertexPool.push( vertex );
+
+		} else {
+
+			vertex =  _vertexPool[ _vertexCount ];
+
+		}
 
 		_vertexCount ++;
 
@@ -424,17 +448,40 @@ THREE.Projector = function() {
 
 	function getNextFace3InPool() {
 
-		var face = _face3Pool[ _face3Count ] = _face3Pool[ _face3Count ] || new THREE.RenderableFace3();
+		var face;
+
+		if ( _face3Count === _face3Pool.length ) {
+
+			face = new THREE.RenderableFace3();
+			_face3Pool.push( face );
+
+		} else {
+
+			face =  _face3Pool[ _face3Count ];
+
+		}
 
 		_face3Count ++;
 
 		return face;
 
+
 	}
 
 	function getNextFace4InPool() {
 
-		var face = _face4Pool[ _face4Count ] = _face4Pool[ _face4Count ] || new THREE.RenderableFace4();
+		var face;
+
+		if ( _face4Count === _face4Pool.length ) {
+
+			face = new THREE.RenderableFace4();
+			_face4Pool.push( face );
+
+		} else {
+
+			face =  _face4Pool[ _face4Count ];
+
+		}
 
 		_face4Count ++;
 
@@ -444,7 +491,18 @@ THREE.Projector = function() {
 
 	function getNextLineInPool() {
 
-		var line = _linePool[ _lineCount ] = _linePool[ _lineCount ] || new THREE.RenderableLine();
+		var line;
+
+		if ( _lineCount === _linePool.length ) {
+
+			line = new THREE.RenderableLine();
+			_linePool.push( line );
+
+		} else {
+
+			line =  _linePool[ _lineCount ];
+
+		}
 
 		_lineCount ++;
 
@@ -454,8 +512,21 @@ THREE.Projector = function() {
 
 	function getNextParticleInPool() {
 
-		var particle = _particlePool[ _particleCount ] = _particlePool[ _particleCount ] || new THREE.RenderableParticle();
+		var particle;
+
+		if ( _particleCount === _particlePool.length ) {
+
+			particle = new THREE.RenderableParticle();
+			_particlePool.push( particle );
+
+		} else {
+
+			particle =  _particlePool[ _particleCount ];
+
+		}
+
 		_particleCount ++;
+
 		return particle;
 
 	}
