@@ -96,15 +96,41 @@ THREE.Color.prototype = {
 			q = v * ( 1 - ( s * f ) );
 			t = v * ( 1 - ( s * ( 1 - f ) ) );
 
-			switch ( i ) {
+			if ( i === 0 ) {
 
-				case 1: this.r = q; this.g = v; this.b = p; break;
-				case 2: this.r = p; this.g = v; this.b = t; break;
-				case 3: this.r = p; this.g = q; this.b = v; break;
-				case 4: this.r = t; this.g = p; this.b = v; break;
-				case 5: this.r = v; this.g = p; this.b = q; break;
-				case 6: // fall through
-				case 0: this.r = v; this.g = t; this.b = p; break;
+				this.r = v;
+				this.g = t;
+				this.b = p;
+
+			} else if ( i === 1 ) {
+
+				this.r = q;
+				this.g = v;
+				this.b = p;
+
+			} else if ( i === 2 ) {
+
+				this.r = p;
+				this.g = v;
+				this.b = t;
+
+			} else if ( i === 3 ) {
+
+				this.r = p;
+				this.g = q;
+				this.b = v;
+
+			} else if ( i === 4 ) {
+
+				this.r = t;
+				this.g = p;
+				this.b = v;
+
+			} else if ( i === 5 ) {
+
+				this.r = v;
+				this.g = p;
+				this.b = q;
 
 			}
 

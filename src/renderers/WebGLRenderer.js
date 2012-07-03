@@ -4897,204 +4897,172 @@ THREE.WebGLRenderer = function ( parameters ) {
 			type = uniform.type;
 			value = uniform.value;
 
-			switch ( type ) {
+			if ( type === "i" ) { // single integer
 
-				case "i": // single integer
+				_gl.uniform1i( location, value );
 
-					_gl.uniform1i( location, value );
+			} else if ( type === "f" ) { // single float
 
-					break;
+				_gl.uniform1f( location, value );
 
-				case "f": // single float
+			} else if ( type === "v2" ) { // single THREE.Vector2
 
-					_gl.uniform1f( location, value );
+				_gl.uniform2f( location, value.x, value.y );
 
-					break;
+			} else if ( type === "v3" ) { // single THREE.Vector3
 
-				case "v2": // single THREE.Vector2
+				_gl.uniform3f( location, value.x, value.y, value.z );
 
-					_gl.uniform2f( location, value.x, value.y );
+			} else if ( type === "v4" ) { // single THREE.Vector4
 
-					break;
+				_gl.uniform4f( location, value.x, value.y, value.z, value.w );
 
-				case "v3": // single THREE.Vector3
+			} else if ( type === "c" ) { // single THREE.Color
 
-					_gl.uniform3f( location, value.x, value.y, value.z );
+				_gl.uniform3f( location, value.r, value.g, value.b );
 
-					break;
+			} else if ( type === "fv1" ) { // flat array of floats (JS or typed array)
 
-				case "v4": // single THREE.Vector4
+				_gl.uniform1fv( location, value );
 
-					_gl.uniform4f( location, value.x, value.y, value.z, value.w );
+			} else if ( type === "fv" ) { // flat array of floats with 3 x N size (JS or typed array)
 
-					break;
+				_gl.uniform3fv( location, value );
 
-				case "c": // single THREE.Color
+			} else if ( type === "v2v" ) { // array of THREE.Vector2
 
-					_gl.uniform3f( location, value.r, value.g, value.b );
+				if ( uniform._array === undefined ) {
 
-					break;
+					uniform._array = new Float32Array( 2 * value.length );
 
-				case "fv1": // flat array of floats (JS or typed array)
+				}
 
-					_gl.uniform1fv( location, value );
+				for ( i = 0, il = value.length; i < il; i ++ ) {
 
-					break;
+					offset = i * 2;
 
-				case "fv": // flat array of floats with 3 x N size (JS or typed array)
+					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset + 1 ] = value[ i ].y;
 
-					_gl.uniform3fv( location, value );
+				}
 
-					break;
+				_gl.uniform2fv( location, uniform._array );
 
-				case "v2v": // array of THREE.Vector2
+			} else if ( type === "v3v" ) { // array of THREE.Vector3
 
-					if ( ! uniform._array ) {
+				if ( uniform._array === undefined ) {
 
-						uniform._array = new Float32Array( 2 * value.length );
+					uniform._array = new Float32Array( 3 * value.length );
 
-					}
+				}
 
-					for ( i = 0, il = value.length; i < il; i ++ ) {
+				for ( i = 0, il = value.length; i < il; i ++ ) {
 
-						offset = i * 2;
+					offset = i * 3;
 
-						uniform._array[ offset ] 	 = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
+					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset + 1 ] = value[ i ].y;
+					uniform._array[ offset + 2 ] = value[ i ].z;
 
-					}
+				}
 
-					_gl.uniform2fv( location, uniform._array );
+				_gl.uniform3fv( location, uniform._array );
 
-					break;
+			} else if ( type === "v4v" ) { // array of THREE.Vector4
 
-				case "v3v": // array of THREE.Vector3
+				if ( uniform._array === undefined ) {
 
-					if ( ! uniform._array ) {
+					uniform._array = new Float32Array( 4 * value.length );
 
-						uniform._array = new Float32Array( 3 * value.length );
+				}
 
-					}
+				for ( i = 0, il = value.length; i < il; i ++ ) {
 
-					for ( i = 0, il = value.length; i < il; i ++ ) {
+					offset = i * 4;
 
-						offset = i * 3;
+					uniform._array[ offset ] 	 = value[ i ].x;
+					uniform._array[ offset + 1 ] = value[ i ].y;
+					uniform._array[ offset + 2 ] = value[ i ].z;
+					uniform._array[ offset + 3 ] = value[ i ].w;
 
-						uniform._array[ offset ] 	 = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
-						uniform._array[ offset + 2 ] = value[ i ].z;
+				}
 
-					}
+				_gl.uniform4fv( location, uniform._array );
 
-					_gl.uniform3fv( location, uniform._array );
+			} else if ( type === "m4") { // single THREE.Matrix4
 
-					break;
+				if ( uniform._array === undefined ) {
 
-				case "v4v": // array of THREE.Vector4
+					uniform._array = new Float32Array( 16 );
 
-					if ( ! uniform._array ) {
+				}
 
-						uniform._array = new Float32Array( 4 * value.length );
+				value.flattenToArray( uniform._array );
+				_gl.uniformMatrix4fv( location, false, uniform._array );
 
-					}
+			} else if ( type === "m4v" ) { // array of THREE.Matrix4
 
-					for ( i = 0, il = value.length; i < il; i ++ ) {
+				if ( uniform._array === undefined ) {
 
-						offset = i * 4;
+					uniform._array = new Float32Array( 16 * value.length );
 
-						uniform._array[ offset ] 	 = value[ i ].x;
-						uniform._array[ offset + 1 ] = value[ i ].y;
-						uniform._array[ offset + 2 ] = value[ i ].z;
-						uniform._array[ offset + 3 ] = value[ i ].w;
+				}
 
-					}
+				for ( i = 0, il = value.length; i < il; i ++ ) {
 
-					_gl.uniform4fv( location, uniform._array );
+					value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
 
-					break;
+				}
 
-				case "m4": // single THREE.Matrix4
+				_gl.uniformMatrix4fv( location, false, uniform._array );
 
-					if ( ! uniform._array ) {
+			} else if ( type === "t" ) { // single THREE.Texture (2d or cube)
 
-						uniform._array = new Float32Array( 16 );
+				_gl.uniform1i( location, value );
 
-					}
+				texture = uniform.texture;
 
-					value.flattenToArray( uniform._array );
-					_gl.uniformMatrix4fv( location, false, uniform._array );
+				if ( !texture ) continue;
 
-					break;
+				if ( texture.image instanceof Array && texture.image.length === 6 ) {
 
-				case "m4v": // array of THREE.Matrix4
+					setCubeTexture( texture, value );
 
-					if ( ! uniform._array ) {
+				} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
-						uniform._array = new Float32Array( 16 * value.length );
+					setCubeTextureDynamic( texture, value );
 
-					}
+				} else {
 
-					for ( i = 0, il = value.length; i < il; i ++ ) {
+					_this.setTexture( texture, value );
 
-						value[ i ].flattenToArrayOffset( uniform._array, i * 16 );
+				}
 
-					}
+			} else if ( type === "tv" ) { // array of THREE.Texture (2d)
 
-					_gl.uniformMatrix4fv( location, false, uniform._array );
+				if ( uniform._array === undefined ) {
 
-					break;
-
-				case "t": // single THREE.Texture (2d or cube)
-
-					_gl.uniform1i( location, value );
-
-					texture = uniform.texture;
-
-					if ( !texture ) continue;
-
-					if ( texture.image instanceof Array && texture.image.length === 6 ) {
-
-						setCubeTexture( texture, value );
-
-					} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
-
-						setCubeTextureDynamic( texture, value );
-
-					} else {
-
-						_this.setTexture( texture, value );
-
-					}
-
-					break;
-
-				case "tv": // array of THREE.Texture (2d)
-
-					if ( ! uniform._array ) {
-
-						uniform._array = [];
-
-						for( i = 0, il = uniform.texture.length; i < il; i ++ ) {
-
-							uniform._array[ i ] = value + i;
-
-						}
-
-					}
-
-					_gl.uniform1iv( location, uniform._array );
+					uniform._array = [];
 
 					for( i = 0, il = uniform.texture.length; i < il; i ++ ) {
 
-						texture = uniform.texture[ i ];
-
-						if ( !texture ) continue;
-
-						_this.setTexture( texture, uniform._array[ i ] );
+						uniform._array[ i ] = value + i;
 
 					}
 
-					break;
+				}
+
+				_gl.uniform1iv( location, uniform._array );
+
+				for( i = 0, il = uniform.texture.length; i < il; i ++ ) {
+
+					texture = uniform.texture[ i ];
+
+					if ( !texture ) continue;
+
+					_this.setTexture( texture, uniform._array[ i ] );
+
+				}
 
 			}
 
@@ -5435,53 +5403,39 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( blending !== _oldBlending ) {
 
-			switch ( blending ) {
+			if ( blending === THREE.NoBlending ) {
 
-				case THREE.NoBlending:
+				_gl.disable( _gl.BLEND );
 
-					_gl.disable( _gl.BLEND );
+			} else if ( blending === THREE.AdditiveBlending ) {
 
-					break;
+				_gl.enable( _gl.BLEND );
+				_gl.blendEquation( _gl.FUNC_ADD );
+				_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
 
-				case THREE.AdditiveBlending:
+			} else if ( blending === THREE.SubtractiveBlending ) {
 
-					_gl.enable( _gl.BLEND );
-					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE );
+				// TODO: Find blendFuncSeparate() combination
+				_gl.enable( _gl.BLEND );
+				_gl.blendEquation( _gl.FUNC_ADD );
+				_gl.blendFunc( _gl.ZERO, _gl.ONE_MINUS_SRC_COLOR );
 
-					break;
+			} else if ( blending === THREE.MultiplyBlending ) {
 
-				case THREE.SubtractiveBlending:
+				// TODO: Find blendFuncSeparate() combination
+				_gl.enable( _gl.BLEND );
+				_gl.blendEquation( _gl.FUNC_ADD );
+				_gl.blendFunc( _gl.ZERO, _gl.SRC_COLOR );
 
-					// TODO: Find blendFuncSeparate() combination
-					_gl.enable( _gl.BLEND );
-					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.ZERO, _gl.ONE_MINUS_SRC_COLOR );
+			} else if ( blending === THREE.CustomBlending ) {
 
-					break;
+				_gl.enable( _gl.BLEND );
 
-				case THREE.MultiplyBlending:
+			} else {
 
-					// TODO: Find blendFuncSeparate() combination
-					_gl.enable( _gl.BLEND );
-					_gl.blendEquation( _gl.FUNC_ADD );
-					_gl.blendFunc( _gl.ZERO, _gl.SRC_COLOR );
-
-					break;
-
-				case THREE.CustomBlending:
-
-					_gl.enable( _gl.BLEND );
-
-					break;
-
-				default:
-
-					_gl.enable( _gl.BLEND );
-					_gl.blendEquationSeparate( _gl.FUNC_ADD, _gl.FUNC_ADD );
-					_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
-
-					break;
+				_gl.enable( _gl.BLEND );
+				_gl.blendEquationSeparate( _gl.FUNC_ADD, _gl.FUNC_ADD );
+				_gl.blendFuncSeparate( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA, _gl.ONE, _gl.ONE_MINUS_SRC_ALPHA );
 
 			}
 
@@ -6196,20 +6150,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function filterFallback ( f ) {
 
-		switch ( f ) {
+		if ( f === THREE.NearestFilter || f === THREE.NearestMipMapNearestFilter || f === THREE.NearestMipMapLinearFilter ) {
 
-			case THREE.NearestFilter:
-			case THREE.NearestMipMapNearestFilter:
-			case THREE.NearestMipMapLinearFilter: return _gl.NEAREST; break;
-
-			case THREE.LinearFilter:
-			case THREE.LinearMipMapNearestFilter:
-			case THREE.LinearMipMapLinearFilter:
-			default:
-
-				return _gl.LINEAR; break;
+			return _gl.NEAREST;
 
 		}
+
+		return _gl.LINEAR;
 
 	};
 
@@ -6217,56 +6164,52 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function paramThreeToGL ( p ) {
 
-		switch ( p ) {
+		if ( p === THREE.RepeatWrapping ) return _gl.REPEAT;
+		if ( p === THREE.ClampToEdgeWrapping ) return _gl.CLAMP_TO_EDGE;
+		if ( p === THREE.MirroredRepeatWrapping ) return _gl.MIRRORED_REPEAT;
 
-			case THREE.RepeatWrapping: return _gl.REPEAT; break;
-			case THREE.ClampToEdgeWrapping: return _gl.CLAMP_TO_EDGE; break;
-			case THREE.MirroredRepeatWrapping: return _gl.MIRRORED_REPEAT; break;
+		if ( p === THREE.NearestFilter ) return _gl.NEAREST;
+		if ( p === THREE.NearestMipMapNearestFilter ) return _gl.NEAREST_MIPMAP_NEAREST;
+		if ( p === THREE.NearestMipMapLinearFilter ) return _gl.NEAREST_MIPMAP_LINEAR;
 
-			case THREE.NearestFilter: return _gl.NEAREST; break;
-			case THREE.NearestMipMapNearestFilter: return _gl.NEAREST_MIPMAP_NEAREST; break;
-			case THREE.NearestMipMapLinearFilter: return _gl.NEAREST_MIPMAP_LINEAR; break;
+		if ( p === THREE.LinearFilter ) return _gl.LINEAR;
+		if ( p === THREE.LinearMipMapNearestFilter ) return _gl.LINEAR_MIPMAP_NEAREST;
+		if ( p === THREE.LinearMipMapLinearFilter ) return _gl.LINEAR_MIPMAP_LINEAR;
 
-			case THREE.LinearFilter: return _gl.LINEAR; break;
-			case THREE.LinearMipMapNearestFilter: return _gl.LINEAR_MIPMAP_NEAREST; break;
-			case THREE.LinearMipMapLinearFilter: return _gl.LINEAR_MIPMAP_LINEAR; break;
+		if ( p === THREE.UnsignedByteType ) return _gl.UNSIGNED_BYTE;
+		if ( p === THREE.UnsignedShort4444Type ) return _gl.UNSIGNED_SHORT_4_4_4_4;
+		if ( p === THREE.UnsignedShort5551Type ) return _gl.UNSIGNED_SHORT_5_5_5_1;
+		if ( p === THREE.UnsignedShort565Type ) return _gl.UNSIGNED_SHORT_5_6_5;
 
-			case THREE.UnsignedByteType: return _gl.UNSIGNED_BYTE; break;
-			case THREE.UnsignedShort4444Type: return _gl.UNSIGNED_SHORT_4_4_4_4; break;
-			case THREE.UnsignedShort5551Type: return _gl.UNSIGNED_SHORT_5_5_5_1; break;
-			case THREE.UnsignedShort565Type: return _gl.UNSIGNED_SHORT_5_6_5; break;
+		if ( p === THREE.ByteType ) return _gl.BYTE;
+		if ( p === THREE.ShortType ) return _gl.SHORT;
+		if ( p === THREE.UnsignedShortType ) return _gl.UNSIGNED_SHORT;
+		if ( p === THREE.IntType ) return _gl.INT;
+		if ( p === THREE.UnsignedIntType ) return _gl.UNSIGNED_INT;
+		if ( p === THREE.FloatType ) return _gl.FLOAT;
 
-			case THREE.ByteType: return _gl.BYTE; break;
-			case THREE.ShortType: return _gl.SHORT; break;
-			case THREE.UnsignedShortType: return _gl.UNSIGNED_SHORT; break;
-			case THREE.IntType: return _gl.INT; break;
-			case THREE.UnsignedIntType: return _gl.UNSIGNED_INT; break;
-			case THREE.FloatType: return _gl.FLOAT; break;
+		if ( p === THREE.AlphaFormat ) return _gl.ALPHA;
+		if ( p === THREE.RGBFormat ) return _gl.RGB;
+		if ( p === THREE.RGBAFormat ) return _gl.RGBA;
+		if ( p === THREE.LuminanceFormat ) return _gl.LUMINANCE;
+		if ( p === THREE.LuminanceAlphaFormat ) return _gl.LUMINANCE_ALPHA;
 
-			case THREE.AlphaFormat: return _gl.ALPHA; break;
-			case THREE.RGBFormat: return _gl.RGB; break;
-			case THREE.RGBAFormat: return _gl.RGBA; break;
-			case THREE.LuminanceFormat: return _gl.LUMINANCE; break;
-			case THREE.LuminanceAlphaFormat: return _gl.LUMINANCE_ALPHA; break;
+		if ( p === THREE.AddEquation ) return _gl.FUNC_ADD;
+		if ( p === THREE.SubtractEquation ) return _gl.FUNC_SUBTRACT;
+		if ( p === THREE.ReverseSubtractEquation ) return _gl.FUNC_REVERSE_SUBTRACT;
 
-			case THREE.AddEquation: return _gl.FUNC_ADD; break;
-			case THREE.SubtractEquation: return _gl.FUNC_SUBTRACT; break;
-			case THREE.ReverseSubtractEquation: return _gl.FUNC_REVERSE_SUBTRACT; break;
+		if ( p === THREE.ZeroFactor ) return _gl.ZERO;
+		if ( p === THREE.OneFactor ) return _gl.ONE;
+		if ( p === THREE.SrcColorFactor ) return _gl.SRC_COLOR;
+		if ( p === THREE.OneMinusSrcColorFactor ) return _gl.ONE_MINUS_SRC_COLOR;
+		if ( p === THREE.SrcAlphaFactor ) return _gl.SRC_ALPHA;
+		if ( p === THREE.OneMinusSrcAlphaFactor ) return _gl.ONE_MINUS_SRC_ALPHA;
+		if ( p === THREE.DstAlphaFactor ) return _gl.DST_ALPHA;
+		if ( p === THREE.OneMinusDstAlphaFactor ) return _gl.ONE_MINUS_DST_ALPHA;
 
-			case THREE.ZeroFactor: return _gl.ZERO; break;
-			case THREE.OneFactor: return _gl.ONE; break;
-			case THREE.SrcColorFactor: return _gl.SRC_COLOR; break;
-			case THREE.OneMinusSrcColorFactor: return _gl.ONE_MINUS_SRC_COLOR; break;
-			case THREE.SrcAlphaFactor: return _gl.SRC_ALPHA; break;
-			case THREE.OneMinusSrcAlphaFactor: return _gl.ONE_MINUS_SRC_ALPHA; break;
-			case THREE.DstAlphaFactor: return _gl.DST_ALPHA; break;
-			case THREE.OneMinusDstAlphaFactor: return _gl.ONE_MINUS_DST_ALPHA; break;
-
-			case THREE.DstColorFactor: return _gl.DST_COLOR; break;
-			case THREE.OneMinusDstColorFactor: return _gl.ONE_MINUS_DST_COLOR; break;
-			case THREE.SrcAlphaSaturateFactor: return _gl.SRC_ALPHA_SATURATE; break;
-
-		}
+		if ( p === THREE.DstColorFactor ) return _gl.DST_COLOR;
+		if ( p === THREE.OneMinusDstColorFactor ) return _gl.ONE_MINUS_DST_COLOR;
+		if ( p === THREE.SrcAlphaSaturateFactor ) return _gl.SRC_ALPHA_SATURATE;
 
 		return 0;
 
