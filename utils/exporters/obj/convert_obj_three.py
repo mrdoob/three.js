@@ -159,7 +159,7 @@ TEMPLATE_FILE_ASCII = u"""\
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "%(fname)s",
         "generatedBy"   : "OBJConverter",
         "vertices"      : %(nvertex)d,
@@ -699,7 +699,7 @@ def generate_normal(n):
     return TEMPLATE_N % (n[0], n[1], n[2])
 
 def generate_uv(uv):
-    return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
+    return TEMPLATE_UV % (uv[0], uv[1])
 
 def generate_color_rgb(c):
     return TEMPLATE_COLOR % (c[0], c[1], c[2])

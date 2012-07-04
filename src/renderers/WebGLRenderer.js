@@ -5844,6 +5844,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
+			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 
 			var image = texture.image,
@@ -5919,6 +5920,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.activeTexture( _gl.TEXTURE0 + slot );
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
 
+				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
+
 				var cubeImage = [];
 
 				for ( var i = 0; i < 6; i ++ ) {
@@ -5948,7 +5951,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if ( texture.generateMipmaps && isImagePowerOfTwo )	_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+				if ( texture.generateMipmaps && isImagePowerOfTwo ) {
+
+					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
+
+				}
 
 				texture.needsUpdate = false;
 
@@ -6015,8 +6022,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( renderTarget && ! renderTarget.__webglFramebuffer ) {
 
-			if( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
-			if( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
+			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
+			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
 
 			renderTarget.__webglTexture = _gl.createTexture();
 

@@ -61,7 +61,7 @@
 
 			void main() {
 
-				vUv = vec2( position.x / width, 1.0 - ( position.y / height ) );
+				vUv = vec2( position.x / width, position.y / height );
 
 				vec4 color = texture2D( map, vUv );
 				float depth = ( color.r + color.g + color.b ) / 3.0;
