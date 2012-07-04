@@ -82,6 +82,18 @@
 
 		</script>
 
+		<script id="vertexShaderFlip" type="x-shader/x-vertex">
+
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = vec2( uv.x, 1.0 - uv.y );
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
 
 		<script>
 
@@ -132,7 +144,9 @@
 				light.position.set( 0, 0, -1 ).normalize();
 				sceneRTT.add( light );
 
-				rtTexture = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBFormat } );
+				rtTexture = new THREE.WebGLRenderTarget( 1024, 1024, { minFilter: THREE.LinearMipMapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat } );
+				rtTexture.wrapS = rtTexture.wrapT = THREE.RepeatWrapping;
+				rtTexture.repeat.set( 1, -1 );
 
 				material = new THREE.ShaderMaterial( {
 
@@ -145,7 +159,7 @@
 				var materialScreen = new THREE.ShaderMaterial( {
 
 					uniforms: { tDiffuse: { type: "t", value: 0, texture: rtTexture } },
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					vertexShader: document.getElementById( 'vertexShaderFlip' ).textContent,
 					fragmentShader: document.getElementById( 'fragment_shader_screen' ).textContent,
 
 					depthWrite: false
