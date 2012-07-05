@@ -17,7 +17,7 @@ THREE.ImageUtils = {
 
 			texture.image = event.content;
 			texture.needsUpdate = true;
-			
+
 			if ( onLoad ) onLoad( texture );
 
 		} );
@@ -37,7 +37,10 @@ THREE.ImageUtils = {
 
 	loadTextureCube: function ( array, mapping, onLoad ) {
 
-		var i, l, images = [], texture = new THREE.Texture( images, mapping );
+		var i, l, images = [];
+		var texture = new THREE.Texture( images, mapping );
+
+		texture.flipY = false;
 
 		images.loadCount = 0;
 
