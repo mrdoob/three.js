@@ -144,14 +144,14 @@
 					material = materials[ cube_count ];
 
 					material.hue = i/xgrid;
-					material.saturation = j/ygrid;
+					material.saturation = 1 - j/ygrid;
 
 					material.color.setHSV( material.hue, material.saturation, 1 );
 
 					mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.x =   ( i - xgrid/2 ) * xsize;
-					mesh.position.y = - ( j - ygrid/2 ) * ysize;
+					mesh.position.y =   ( j - ygrid/2 ) * ysize;
 					mesh.position.z = 0;
 
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = 1;
