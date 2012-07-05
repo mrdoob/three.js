@@ -708,7 +708,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"vUv = vec2( uv.x, 1.0 - uv.y );",
+				"vUv = uv;",
 				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
