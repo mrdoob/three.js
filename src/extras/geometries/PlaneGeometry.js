@@ -46,10 +46,10 @@ THREE.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
 
 			this.faces.push( face );
 			this.faceVertexUvs[ 0 ].push( [
-				new THREE.UV( ix / gridX, iz / gridZ ),
-				new THREE.UV( ix / gridX, ( iz + 1 ) / gridZ ),
-				new THREE.UV( ( ix + 1 ) / gridX, ( iz + 1 ) / gridZ ),
-				new THREE.UV( ( ix + 1 ) / gridX, iz / gridZ )
+				new THREE.UV( ix / gridX, 1 - iz / gridZ ),
+				new THREE.UV( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
+				new THREE.UV( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
+				new THREE.UV( ( ix + 1 ) / gridX, 1 - iz / gridZ )
 			] );
 
 		}
