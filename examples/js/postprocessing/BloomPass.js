@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
+THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	strength = ( strength !== undefined ) ? strength : 1;
 	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
