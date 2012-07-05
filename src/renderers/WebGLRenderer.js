@@ -5844,7 +5844,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.activeTexture( _gl.TEXTURE0 + slot );
 			_gl.bindTexture( _gl.TEXTURE_2D, texture.__webglTexture );
 
-			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
+			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
 
 			var image = texture.image,
@@ -5920,7 +5920,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				_gl.activeTexture( _gl.TEXTURE0 + slot );
 				_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.image.__webglTextureCube );
 
-				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, true );
+				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
 				var cubeImage = [];
 

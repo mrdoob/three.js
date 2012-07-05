@@ -26,6 +26,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
+	this.flipY = true;
 
 	this.needsUpdate = false;
 	this.onUpdate = null;
