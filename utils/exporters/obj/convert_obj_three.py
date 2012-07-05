@@ -196,7 +196,7 @@ TEMPLATE_FILE_BIN = u"""\
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "%(fname)s",
         "generatedBy"   : "OBJConverter",
         "vertices"      : %(nvertex)d,
@@ -1332,7 +1332,7 @@ def convert_binary(infile, outfile):
     # u float   4
     # v float   4
     for uv in uvs:
-        data = struct.pack('<ff', uv[0], 1.0-uv[1])
+        data = struct.pack('<ff', uv[0], uv[1])
         buffer.append(data)
 
     # padding
