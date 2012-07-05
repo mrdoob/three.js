@@ -133,9 +133,11 @@ THREE.EffectComposer.camera = new THREE.OrthographicCamera( THREE.EffectComposer
 
 THREE.EffectComposer.geometry = new THREE.PlaneGeometry( 1, 1 );
 THREE.EffectComposer.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+THREE.EffectComposer.geometry.applyMatrix( new THREE.Matrix4().makeScale( 1, -1, 1 ) );
 
 THREE.EffectComposer.quad = new THREE.Mesh( THREE.EffectComposer.geometry, null );
 THREE.EffectComposer.quad.position.z = -100;
+THREE.EffectComposer.quad.flipSided = true;
 THREE.EffectComposer.quad.scale.set( THREE.EffectComposer.initWidth, THREE.EffectComposer.initHeight, 1 );
 
 THREE.EffectComposer.scene = new THREE.Scene();
