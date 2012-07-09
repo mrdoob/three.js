@@ -518,63 +518,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		}
 
-		// compute bounding sphere and bounding box
-		// (must do it now as we don't keep typed arrays after setting GL buffers)
-
-		scope.boundingBox = { min: new THREE.Vector3( Infinity, Infinity, Infinity ), max: new THREE.Vector3( -Infinity, -Infinity, -Infinity ) };
-
-		var vertices = file.body.vertices,
-			bb = scope.boundingBox,
-			radius, maxRadius = 0,
-			x, y, z;
-
-		for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
-
-			x = vertices[ i ];
-			y = vertices[ i + 1 ];
-			z = vertices[ i + 2 ];
-
-			// bounding sphere
-
-			radius = Math.sqrt( x * x + y * y + z * z );
-			if ( radius > maxRadius ) maxRadius = radius;
-
-			// bounding box
-
-			if ( x < bb.min.x ) {
-
-				bb.min.x = x;
-
-			} else if ( x > bb.max.x ) {
-
-				bb.max.x = x;
-
-			}
-
-			if ( y < bb.min.y ) {
-
-				bb.min.y = y;
-
-			} else if ( y > bb.max.y ) {
-
-				bb.max.y = y;
-
-			}
-
-			if ( z < bb.min.z ) {
-
-				bb.min.z = z;
-
-			} else if ( z > bb.max.z ) {
-
-				bb.max.z = z;
-
-			}
-
-		}
-
-		scope.boundingSphere = { radius: maxRadius };
-
 		// keep references to typed arrays
 
 		if ( keepArrays ) {
