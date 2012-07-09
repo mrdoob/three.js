@@ -39,6 +39,27 @@ THREE.BufferGeometry.prototype = {
 
 	constructor : THREE.BufferGeometry,
 
+	applyMatrix: function ( matrix ) {
+
+		if ( this.vertexPositionArray !== undefined ) {
+
+			matrix.multiplyVector3Array( this.vertexPositionArray );
+			this.verticesNeedUpdate = true;
+
+		}
+
+		if ( this.vertexNormalArray !== undefined ) {
+
+			var matrixRotation = new THREE.Matrix4();
+			matrixRotation.extractRotation( matrix );
+
+			matrixRotation.multiplyVector3Array( this.vertexNormalArray );
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
 	// for compatibility
 
 	computeBoundingBox: function () {

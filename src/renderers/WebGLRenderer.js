@@ -2878,6 +2878,56 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function setDirectBuffers ( geometry, hint, dispose ) {
+
+		if ( geometry.elementsNeedUpdate && geometry.vertexIndexArray !== undefined ) {
+
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.vertexIndexBuffer );
+			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, geometry.vertexIndexArray, hint );
+
+		}
+
+		if ( geometry.verticesNeedUpdate && geometry.vertexPositionArray !== undefined ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexPositionBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexPositionArray, hint );
+
+		}
+
+		if ( geometry.normalsNeedUpdate && geometry.vertexNormalArray !== undefined ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexNormalBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexNormalArray, hint );
+
+		}
+
+		if ( geometry.uvsNeedUpdate && geometry.vertexUvArray !== undefined ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexUvBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexUvArray, hint );
+
+		}
+
+		if ( geometry.colorsNeedUpdate && geometry.vertexColorArray !== undefined ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexColorBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexColorArray, hint );
+
+		}
+
+
+		if ( dispose ) {
+
+			delete geometry.vertexIndexArray;
+			delete geometry.vertexPositionArray;
+			delete geometry.vertexNormalArray;
+			delete geometry.vertexUvArray;
+			delete geometry.vertexColorArray;
+
+		}
+
+	};
+
 	// Buffer rendering
 
 	this.renderBufferImmediate = function ( object, program, material ) {
@@ -4154,16 +4204,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				/*
 				if ( geometry.verticesNeedUpdate || geometry.elementsNeedUpdate ||
 					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
 					 geometry.colorsNeedUpdate  ) {
 
-					// TODO
-					// set buffers from typed arrays
+					setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
 				}
-				*/
 
 				geometry.verticesNeedUpdate = false;
 				geometry.elementsNeedUpdate = false;

@@ -30,9 +30,9 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 
 	xhr.onreadystatechange = function() {
 
-		if ( xhr.readyState == 4 ) {
+		if ( xhr.readyState === 4 ) {
 
-			if ( xhr.status == 200 || xhr.status == 0 ) {
+			if ( xhr.status === 200 || xhr.status === 0 ) {
 
 				var jsonObject = JSON.parse( xhr.responseText );
 
@@ -97,9 +97,9 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 	xhr.onreadystatechange = function() {
 
-		if ( xhr.readyState == 4 ) {
+		if ( xhr.readyState === 4 ) {
 
-			if ( xhr.status == 200 || xhr.status == 0 ) {
+			if ( xhr.status === 200 || xhr.status === 0 ) {
 
 				var binaryData = xhr.responseText;
 
@@ -169,11 +169,11 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 			}
 
-		} else if ( xhr.readyState == 3 ) {
+		} else if ( xhr.readyState === 3 ) {
 
 			if ( callbackProgress ) {
 
-				if ( length == 0 ) {
+				if ( length === 0 ) {
 
 					length = xhr.getResponseHeader( "Content-Length" );
 
@@ -183,7 +183,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 			}
 
-		} else if ( xhr.readyState == 2 ) {
+		} else if ( xhr.readyState === 2 ) {
 
 			length = xhr.getResponseHeader( "Content-Length" );
 
@@ -206,7 +206,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		var scope = this;
 
-		var dynamic = false,
+		var keepArrays = true,
 		computeNormals = true,
 		normalizeNormals = true,
 		reorderVertices = true;
@@ -461,9 +461,11 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		// indices
 
+		var vertexIndexArray16 = new Uint16Array( vertexIndexArray );
+
 		scope.vertexIndexBuffer = gl.createBuffer();
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, scope.vertexIndexBuffer );
-		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( vertexIndexArray ), gl.STATIC_DRAW );
+		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, vertexIndexArray16, gl.STATIC_DRAW );
 
 		scope.vertexIndexBuffer.itemSize = 1;
 		scope.vertexIndexBuffer.numItems = vertexIndexArray.length;
@@ -583,9 +585,9 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		// keep references to typed arrays
 
-		if ( dynamic ) {
+		if ( keepArrays ) {
 
-			scope.vertexIndexArray = vertexIndexArray;
+			scope.vertexIndexArray = vertexIndexArray16;
 			scope.vertexPositionArray = vertexPositionArray;
 			scope.vertexNormalArray = vertexNormalArray;
 			scope.vertexUvArray = vertexUvArray;

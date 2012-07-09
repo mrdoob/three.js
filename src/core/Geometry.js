@@ -34,7 +34,7 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = false; // unless set to true the *Arrays will be deleted once sent to a buffer.
+	this.dynamic = false; // unless set to true the *Arrays will be deleted once sent to a buffer
 
 };
 
@@ -629,7 +629,7 @@ THREE.Geometry.prototype = {
 							u = this.faceVertexUvs[j][i];
 							if (u) u.splice(k, 1);
 						}
-						
+
 						break;
 					}
 				}
