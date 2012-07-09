@@ -213,6 +213,28 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	multiplyVector3Array: function ( a ) {
+
+		var tmp = THREE.Matrix4.__v1;
+
+		for ( var i = 0, il = a.length; i < il; i += 3 ) {
+
+			tmp.x = a[ i ];
+			tmp.y = a[ i + 1 ];
+			tmp.z = a[ i + 2 ];
+
+			this.multiplyVector3( tmp );
+
+			a[ i ]     = tmp.x;
+			a[ i + 1 ] = tmp.y;
+			a[ i + 2 ] = tmp.z;
+
+		}
+
+		return a;
+
+	},
+
 	rotateAxis: function ( v ) {
 
 		var te = this.elements;
