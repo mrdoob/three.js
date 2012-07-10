@@ -635,7 +635,7 @@ THREE.CTMLoader.prototype.createModelClassic = function ( file, callback ) {
 				u = buffer[ i ];
 				v = buffer[ i + 1 ];
 
-				uvs.push( u, 1 - v );
+				uvs.push( u, v );
 
 			}
 
