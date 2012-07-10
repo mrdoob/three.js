@@ -3050,6 +3050,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var offsets = geometryGroup.offsets;
 
+			// if there is more than 1 chunk
+			// must set vertexAttribPointer to use new offsets for each chunk
+			// even if geometry and materials didn't change
+
+			if ( offsets.length > 1 ) updateBuffers = true;
+
 			for ( var i = 0, il = offsets.length; i < il; ++ i ) {
 
 				if ( updateBuffers ) {

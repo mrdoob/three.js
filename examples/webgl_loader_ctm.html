@@ -90,12 +90,23 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x050505 );
-				scene.add( ambient );
+				var ambient = new THREE.AmbientLight( 0x080808 );
+				//scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
-				scene.add( directionalLight );
+				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, 2.5, 3 );
+				light.position.set( 0, -100, 500 );
+
+				light.castShadow = true;
+				light.shadowMapWidth = 2048;
+				light.shadowMapHeight = 2048;
+				light.shadowCameraFov = 45;
+				//light.shadowCameraVisible = true;
+
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0xffeedd, 0.25 );
+				light.position.set( 0, -50, 200 );
+				//scene.add( light );
 
 				// RENDERER
 
@@ -111,6 +122,9 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+				renderer.shadowMapEnabled = true;
 
 				// STATS
 
@@ -119,6 +133,10 @@
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
+
+				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
+				stats.domElement.children[ 0 ].style.background = "transparent";
+				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// EVENTS
 
@@ -158,15 +176,22 @@
 
 					//geometry.computeVertexNormals();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffffff, envMaps: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
-					callbackModel( geometry, 5, material, -200, 0, 0, 0, 0 );
+					var material1 = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+					var material2 = new THREE.MeshPhongMaterial( { color: 0xff4400, specular: 0x333333, shininess: 100 } );
+					var material3 = new THREE.MeshPhongMaterial( { color: 0x00ff44, specular: 0x333333, shininess: 100 } );
+
+					callbackModel( geometry, 5, material1, -200, 0, 0, 0, 0 );
+					callbackModel( geometry, 2, material2,  100, 0, 125, 0, 0 );
+					callbackModel( geometry, 2, material3, -100, 0, 125, 0, 0 );
+
 					checkTime();
 
 				}, useWorker, useBuffers );
 
 				loader.load( "models/ctm/LeePerry.ctm",  function( geometry ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x444444, shininess: 30, map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ), envMaps: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+					var material = new THREE.MeshPhongMaterial( { wrapAround: true, color: 0xffffff, specular: 0x232323, shininess: 50, map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } );
+					material.wrapRGB.set( 0.65, 0.5, 0.5 );
 					callbackModel( geometry, 1300, material, 200, 50, 0, 0, 0 );
 					checkTime();
 
@@ -182,7 +207,9 @@
 				mesh.scale.set( s, s, s );
 				mesh.rotation.x = rx;
 				mesh.rotation.z = ry;
-				//mesh.flipSided = true;
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
 
 				scene.add( mesh );
 
