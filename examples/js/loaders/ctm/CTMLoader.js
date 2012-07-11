@@ -207,8 +207,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		var scope = this;
 
 		var keepArrays = true,
-		computeNormals = true,
-		normalizeNormals = true,
 		reorderVertices = true;
 
 		scope.materials = [];
@@ -232,86 +230,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
 
 			vertexColorArray = file.body.attrMaps[ 0 ].attr;
-
-		}
-
-		//console.log( "vertices", vertexPositionArray.length/3 );
-		//console.log( "triangles", vertexIndexArray.length/3 );
-
-		// compute face normals from scratch
-		// (must be done before computing offsets)
-
-		if ( vertexNormalArray === undefined && computeNormals ) {
-
-			var nElements = vertexPositionArray.length;
-
-			vertexNormalArray = new Float32Array( nElements );
-
-			var vA, vB, vC, x, y, z,
-
-			pA = new THREE.Vector3(),
-			pB = new THREE.Vector3(),
-			pC = new THREE.Vector3(),
-
-			cb = new THREE.Vector3(),
-			ab = new THREE.Vector3();
-
-			for ( var i = 0; i < vertexIndexArray.length; i += 3 ) {
-
-				vA = vertexIndexArray[ i ];
-				vB = vertexIndexArray[ i + 1 ];
-				vC = vertexIndexArray[ i + 2 ];
-
-				x = vertexPositionArray[ vA * 3 ];
-				y = vertexPositionArray[ vA * 3 + 1 ];
-				z = vertexPositionArray[ vA * 3 + 2 ];
-				pA.set( x, y, z );
-
-				x = vertexPositionArray[ vB * 3 ];
-				y = vertexPositionArray[ vB * 3 + 1 ];
-				z = vertexPositionArray[ vB * 3 + 2 ];
-				pB.set( x, y, z );
-
-				x = vertexPositionArray[ vC * 3 ];
-				y = vertexPositionArray[ vC * 3 + 1 ];
-				z = vertexPositionArray[ vC * 3 + 2 ];
-				pC.set( x, y, z );
-
-				cb.sub( pC, pB );
-				ab.sub( pA, pB );
-				cb.crossSelf( ab );
-
-				vertexNormalArray[ vA * 3 ] 	+= cb.x;
-				vertexNormalArray[ vA * 3 + 1 ] += cb.y;
-				vertexNormalArray[ vA * 3 + 2 ] += cb.z;
-
-				vertexNormalArray[ vB * 3 ] 	+= cb.x;
-				vertexNormalArray[ vB * 3 + 1 ] += cb.y;
-				vertexNormalArray[ vB * 3 + 2 ] += cb.z;
-
-				vertexNormalArray[ vC * 3 ] 	+= cb.x;
-				vertexNormalArray[ vC * 3 + 1 ] += cb.y;
-				vertexNormalArray[ vC * 3 + 2 ] += cb.z;
-
-			}
-
-			if ( normalizeNormals ) {
-
-				for ( var i = 0; i < nElements; i += 3 ) {
-
-					x = vertexNormalArray[ i ];
-					y = vertexNormalArray[ i + 1 ];
-					z = vertexNormalArray[ i + 2 ];
-
-					var n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-					vertexNormalArray[ i ] 	   *= n;
-					vertexNormalArray[ i + 1 ] *= n;
-					vertexNormalArray[ i + 2 ] *= n;
-
-				}
-
-			}
 
 		}
 
@@ -458,7 +376,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
-
 		// indices
 
 		var vertexIndexArray16 = new Uint16Array( vertexIndexArray );
@@ -534,7 +451,24 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-	callback( new Model() );
+	var geometry = new Model();
+
+	// compute vertex normals if not present in the CTM model
+
+	if ( geometry.vertexNormalArray === undefined ) {
+
+		geometry.computeVertexNormals();
+
+		geometry.vertexNormalBuffer = gl.createBuffer();
+		gl.bindBuffer( gl.ARRAY_BUFFER, geometry.vertexNormalBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, geometry.vertexNormalArray, gl.STATIC_DRAW );
+
+		geometry.vertexNormalBuffer.itemSize = 3;
+		geometry.vertexNormalBuffer.numItems = geometry.vertexNormalArray.length;
+
+	}
+
+	callback( geometry );
 
 };
 
