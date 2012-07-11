@@ -6,21 +6,11 @@ THREE.BufferGeometry = function () {
 
 	this.id = THREE.GeometryCount ++;
 
-	// GL buffers
+	// attributes
 
-	this.vertexIndexBuffer = null;
-	this.vertexPositionBuffer = null;
-	this.vertexNormalBuffer = null;
-	this.vertexUvBuffer = null;
-	this.vertexColorBuffer = null;
+	this.attributes = {};
 
-	// typed arrays (kept only if dynamic flag is set)
-
-	this.vertexIndexArray = null;
-	this.vertexPositionArray = null;
-	this.vertexNormalArray = null;
-	this.vertexUvArray = null;
-	this.vertexColorArray = null;
+	// attributes typed arrays are kept only if dynamic flag is set
 
 	this.dynamic = false;
 
@@ -41,19 +31,25 @@ THREE.BufferGeometry.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		if ( this.vertexPositionArray !== undefined ) {
+		var positionArray;
+		var normalArray;
 
-			matrix.multiplyVector3Array( this.vertexPositionArray );
+		if ( this.attributes[ "position" ] ) positionArray = this.attributes[ "position" ].array;
+		if ( this.attributes[ "normal" ] ) normalArray = this.attributes[ "normal" ].array;
+
+		if ( positionArray !== undefined ) {
+
+			matrix.multiplyVector3Array( positionArray );
 			this.verticesNeedUpdate = true;
 
 		}
 
-		if ( this.vertexNormalArray !== undefined ) {
+		if ( normalArray !== undefined ) {
 
 			var matrixRotation = new THREE.Matrix4();
 			matrixRotation.extractRotation( matrix );
 
-			matrixRotation.multiplyVector3Array( this.vertexNormalArray );
+			matrixRotation.multiplyVector3Array( normalArray );
 			this.normalsNeedUpdate = true;
 
 		}
@@ -64,22 +60,27 @@ THREE.BufferGeometry.prototype = {
 
 		if ( ! this.boundingBox ) {
 
-			this.boundingBox = { min: new THREE.Vector3( Infinity, Infinity, Infinity ), max: new THREE.Vector3( -Infinity, -Infinity, -Infinity ) };
+			this.boundingBox = {
+
+				min: new THREE.Vector3( Infinity, Infinity, Infinity ),
+				max: new THREE.Vector3( -Infinity, -Infinity, -Infinity )
+
+			};
 
 		}
 
-		var vertices = this.vertexPositionArray;
+		var positions = this.attributes[ "position" ].array;
 
-		if ( vertices ) {
+		if ( positions ) {
 
 			var bb = this.boundingBox;
 			var x, y, z;
 
-			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
+			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-				x = vertices[ i ];
-				y = vertices[ i + 1 ];
-				z = vertices[ i + 2 ];
+				x = positions[ i ];
+				y = positions[ i + 1 ];
+				z = positions[ i + 2 ];
 
 				// bounding box
 
@@ -117,7 +118,7 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		if ( vertices === undefined || vertices.length === 0 ) {
+		if ( positions === undefined || positions.length === 0 ) {
 
 			this.boundingBox.min.set( 0, 0, 0 );
 			this.boundingBox.max.set( 0, 0, 0 );
@@ -130,18 +131,18 @@ THREE.BufferGeometry.prototype = {
 
 		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
 
-		var vertices = this.vertexPositionArray;
+		var positions = this.attributes[ "position" ].array;
 
-		if ( vertices ) {
+		if ( positions ) {
 
 			var radius, maxRadius = 0;
 			var x, y, z;
 
-			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
+			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
 
-				x = vertices[ i ];
-				y = vertices[ i + 1 ];
-				z = vertices[ i + 2 ];
+				x = positions[ i ];
+				y = positions[ i + 1 ];
+				z = positions[ i + 2 ];
 
 				radius = Math.sqrt( x * x + y * y + z * z );
 				if ( radius > maxRadius ) maxRadius = radius;
@@ -156,34 +157,40 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		var indices = this.vertexIndexArray;
-		var vertices = this.vertexPositionArray;
-
-		if ( vertices && indices ) {
+		if ( this.attributes[ "position" ] && this.attributes[ "index" ] ) {
 
 			var i, il;
 			var j, jl;
 
-			var nElements = vertices.length;
+			var nVertices = this.attributes[ "position" ].array.length;
 
-			if ( this.vertexNormalArray === undefined ) {
+			if ( this.attributes[ "normal" ] === undefined ) {
 
-				this.vertexNormalArray = new Float32Array( nElements );
+				this.attributes[ "normal" ] = {
+
+					itemSize: 3,
+					array: new Float32Array( nVertices ),
+					numItems: nVertices * 3
+
+				};
 
 			} else {
 
 				// reset existing normals to zero
 
-				for ( i = 0, il = this.vertexNormalArray.length; i < il; i ++ ) {
+				for ( i = 0, il = this.attributes[ "normal" ].array.length; i < il; i ++ ) {
 
-					this.vertexNormalArray[ i ] = 0;
+					this.attributes[ "normal" ].array[ i ] = 0;
 
 				}
 
 			}
 
 			var offsets = this.offsets;
-			var normals = this.vertexNormalArray;
+
+			var indices = this.attributes[ "index" ].array;
+			var positions = this.attributes[ "position" ].array;
+			var normals = this.attributes[ "normal" ].array;
 
 			var vA, vB, vC, x, y, z,
 
@@ -206,19 +213,19 @@ THREE.BufferGeometry.prototype = {
 					vB = index + indices[ i + 1 ];
 					vC = index + indices[ i + 2 ];
 
-					x = vertices[ vA * 3 ];
-					y = vertices[ vA * 3 + 1 ];
-					z = vertices[ vA * 3 + 2 ];
+					x = positions[ vA * 3 ];
+					y = positions[ vA * 3 + 1 ];
+					z = positions[ vA * 3 + 2 ];
 					pA.set( x, y, z );
 
-					x = vertices[ vB * 3 ];
-					y = vertices[ vB * 3 + 1 ];
-					z = vertices[ vB * 3 + 2 ];
+					x = positions[ vB * 3 ];
+					y = positions[ vB * 3 + 1 ];
+					z = positions[ vB * 3 + 2 ];
 					pB.set( x, y, z );
 
-					x = vertices[ vC * 3 ];
-					y = vertices[ vC * 3 + 1 ];
-					z = vertices[ vC * 3 + 2 ];
+					x = positions[ vC * 3 ];
+					y = positions[ vC * 3 + 1 ];
+					z = positions[ vC * 3 + 2 ];
 					pC.set( x, y, z );
 
 					cb.sub( pC, pB );

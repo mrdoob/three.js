@@ -923,6 +923,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	//
+
+	function initDirectBuffers( geometry ) {
+
+		var a, attribute, type;
+
+		for ( a in geometry.attributes ) {
+
+			if ( a === "index" ) {
+
+				type = _gl.ELEMENT_ARRAY_BUFFER;
+
+			} else {
+
+				type = _gl.ARRAY_BUFFER;
+
+			}
+
+			attribute = geometry.attributes[ a ];
+
+			attribute.buffer = _gl.createBuffer();
+
+			_gl.bindBuffer( type, attribute.buffer );
+			_gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
+
+		}
+
+	};
+
 	// Buffer setting
 
 	function setParticleBuffers ( geometry, hint, object ) {
@@ -2880,49 +2909,57 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setDirectBuffers ( geometry, hint, dispose ) {
 
-		if ( geometry.elementsNeedUpdate && geometry.vertexIndexArray !== undefined ) {
+		var attributes = geometry.attributes;
 
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometry.vertexIndexBuffer );
-			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, geometry.vertexIndexArray, hint );
+		var index = attributes[ "index" ];
+		var position = attributes[ "position" ];
+		var normal = attributes[ "normal" ];
+		var uv = attributes[ "uv" ];
+		var color = attributes[ "color" ];
 
-		}
+		if ( geometry.elementsNeedUpdate && index !== undefined ) {
 
-		if ( geometry.verticesNeedUpdate && geometry.vertexPositionArray !== undefined ) {
-
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexPositionBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexPositionArray, hint );
-
-		}
-
-		if ( geometry.normalsNeedUpdate && geometry.vertexNormalArray !== undefined ) {
-
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexNormalBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexNormalArray, hint );
+			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, index.array, hint );
 
 		}
 
-		if ( geometry.uvsNeedUpdate && geometry.vertexUvArray !== undefined ) {
+		if ( geometry.verticesNeedUpdate && position !== undefined ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexUvBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexUvArray, hint );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, position.buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, position.array, hint );
 
 		}
 
-		if ( geometry.colorsNeedUpdate && geometry.vertexColorArray !== undefined ) {
+		if ( geometry.normalsNeedUpdate && normal !== undefined ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.vertexColorBuffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, geometry.vertexColorArray, hint );
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, normal.buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, normal.array, hint );
+
+		}
+
+		if ( geometry.uvsNeedUpdate && uv !== undefined ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, uv.buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, uv.array, hint );
+
+		}
+
+		if ( geometry.colorsNeedUpdate && color !== undefined ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, color.buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, color.array, hint );
 
 		}
 
 
 		if ( dispose ) {
 
-			delete geometry.vertexIndexArray;
-			delete geometry.vertexPositionArray;
-			delete geometry.vertexNormalArray;
-			delete geometry.vertexUvArray;
-			delete geometry.vertexColorArray;
+			for ( var i in geometry.attributes ) {
+
+				delete geometry.attributes[ i ].array;
+
+			}
 
 		}
 
@@ -3023,7 +3060,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, material, geometryGroup, object ) {
+	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
 
 		if ( material.visible === false ) return;
 
@@ -3035,11 +3072,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
-			geometryGroupHash = ( geometryGroup.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
+			geometryHash = ( geometry.id * 0xffffff ) + ( program.id * 2 ) + wireframeBit;
 
-		if ( geometryGroupHash !== _currentGeometryGroupHash ) {
+		if ( geometryHash !== _currentGeometryGroupHash ) {
 
-			_currentGeometryGroupHash = geometryGroupHash;
+			_currentGeometryGroupHash = geometryHash;
 			updateBuffers = true;
 
 		}
@@ -3048,46 +3085,53 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var offsets = geometryGroup.offsets;
+			var offsets = geometry.offsets;
 
 			// if there is more than 1 chunk
-			// must set vertexAttribPointer to use new offsets for each chunk
+			// must set attribute pointers to use new offsets for each chunk
 			// even if geometry and materials didn't change
 
 			if ( offsets.length > 1 ) updateBuffers = true;
 
 			for ( var i = 0, il = offsets.length; i < il; ++ i ) {
 
+				var startIndex = offsets[ i ].index;
+
 				if ( updateBuffers ) {
 
 					// vertices
 
-					var positionSize = geometryGroup.vertexPositionBuffer.itemSize;
+					var position = geometry.attributes[ "position" ];
+					var positionSize = position.itemSize;
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexPositionBuffer );
-					_gl.vertexAttribPointer( attributes.position, positionSize, _gl.FLOAT, false, 0, offsets[ i ].index * positionSize * 4 ); // 4 bytes per Float32
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, position.buffer );
+					_gl.vertexAttribPointer( attributes.position, positionSize, _gl.FLOAT, false, 0, startIndex * positionSize * 4 ); // 4 bytes per Float32
 
 					// normals
 
-					if ( attributes.normal >= 0 && geometryGroup.vertexNormalBuffer ) {
+					var normal = geometry.attributes[ "normal" ];
 
-						var normalSize = geometryGroup.vertexNormalBuffer.itemSize;
+					if ( attributes.normal >= 0 && normal ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexNormalBuffer );
-						_gl.vertexAttribPointer( attributes.normal, normalSize, _gl.FLOAT, false, 0, offsets[ i ].index * normalSize * 4 );
+						var normalSize = normal.itemSize;
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, normal.buffer );
+						_gl.vertexAttribPointer( attributes.normal, normalSize, _gl.FLOAT, false, 0, startIndex * normalSize * 4 );
 
 					}
 
 					// uvs
 
-					if ( attributes.uv >= 0 && geometryGroup.vertexUvBuffer ) {
+					var uv = geometry.attributes[ "uv" ];
 
-						if ( geometryGroup.vertexUvBuffer ) {
+					if ( attributes.uv >= 0 && uv ) {
 
-							var uvSize = geometryGroup.vertexUvBuffer.itemSize;
+						if ( uv.buffer ) {
 
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexUvBuffer );
-							_gl.vertexAttribPointer(  attributes.uv, uvSize, _gl.FLOAT, false, 0, offsets[ i ].index * uvSize * 4 );
+							var uvSize = uv.itemSize;
+
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, uv.buffer );
+							_gl.vertexAttribPointer( attributes.uv, uvSize, _gl.FLOAT, false, 0, startIndex * uvSize * 4 );
 
 							_gl.enableVertexAttribArray( attributes.uv );
 
@@ -3101,17 +3145,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// colors
 
-					if ( attributes.color >= 0 && geometryGroup.vertexColorBuffer ) {
+					var color = geometry.attributes[ "color" ];
 
-						var colorSize = geometryGroup.vertexColorBuffer.itemSize;
+					if ( attributes.color >= 0 && color ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.vertexColorBuffer );
-						_gl.vertexAttribPointer( attributes.color, colorSize, _gl.FLOAT, false, 0, offsets[ i ].index * colorSize * 4 );
+						var colorSize = color.itemSize;
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, color.buffer );
+						_gl.vertexAttribPointer( attributes.color, colorSize, _gl.FLOAT, false, 0, startIndex * colorSize * 4 );
 
 
 					}
 
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.vertexIndexBuffer );
+					// indices
+
+					var index = geometry.attributes[ "index" ];
+
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 				}
 
@@ -4034,12 +4084,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
-			//object._normalMatrixArray = new Float32Array( 9 );
-			//object._modelViewMatrixArray = new Float32Array( 16 );
-			//object._objectMatrixArray = new Float32Array( 16 );
-
-			//object.matrixWorld.flattenToArray( object._objectMatrixArray );
-
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
@@ -4076,6 +4120,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 
 					}
+
+				} else if ( geometry instanceof THREE.BufferGeometry ) {
+
+					initDirectBuffers( geometry );
 
 				}
 

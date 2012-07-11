@@ -8,9 +8,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CTMLoader = function ( context, showStatus ) {
-
-	this.context = context;
+THREE.CTMLoader = function ( showStatus ) {
 
 	THREE.Loader.call( this, showStatus );
 
@@ -200,14 +198,11 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
-	var gl = this.context;
-
 	var Model = function ( ) {
 
 		var scope = this;
 
-		var keepArrays = true,
-		reorderVertices = true;
+		var reorderVertices = true;
 
 		scope.materials = [];
 
@@ -376,74 +371,32 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
-		// indices
+		// recast CTM 32-bit indices as 16-bit WebGL indices
 
 		var vertexIndexArray16 = new Uint16Array( vertexIndexArray );
 
-		scope.vertexIndexBuffer = gl.createBuffer();
-		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, scope.vertexIndexBuffer );
-		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, vertexIndexArray16, gl.STATIC_DRAW );
+		// attributes
 
-		scope.vertexIndexBuffer.itemSize = 1;
-		scope.vertexIndexBuffer.numItems = vertexIndexArray.length;
+		var attributes = scope.attributes;
 
-		// vertices
-
-		scope.vertexPositionBuffer = gl.createBuffer();
-		gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexPositionBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, vertexPositionArray, gl.STATIC_DRAW );
-
-		scope.vertexPositionBuffer.itemSize = 3;
-		scope.vertexPositionBuffer.numItems = vertexPositionArray.length;
-
-		// normals
+		attributes[ "index" ]    = { itemSize: 1, array: vertexIndexArray16, numItems: vertexIndexArray16.length };
+		attributes[ "position" ] = { itemSize: 3, array: vertexPositionArray, numItems: vertexPositionArray.length };
 
 		if ( vertexNormalArray !== undefined ) {
 
-			scope.vertexNormalBuffer = gl.createBuffer();
-			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexNormalBuffer );
-			gl.bufferData( gl.ARRAY_BUFFER, vertexNormalArray, gl.STATIC_DRAW );
-
-			scope.vertexNormalBuffer.itemSize = 3;
-			scope.vertexNormalBuffer.numItems = vertexNormalArray.length;
+			attributes[ "normal" ] = { itemSize: 3, array: vertexNormalArray, numItems: vertexNormalArray.length };
 
 		}
-
-		// uvs
 
 		if ( vertexUvArray !== undefined ) {
 
-			scope.vertexUvBuffer = gl.createBuffer();
-			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexUvBuffer );
-			gl.bufferData( gl.ARRAY_BUFFER, vertexUvArray, gl.STATIC_DRAW );
-
-			scope.vertexUvBuffer.itemSize = 2;
-			scope.vertexUvBuffer.numItems = vertexUvArray.length;
+			attributes[ "uv" ] = { itemSize: 2, array: vertexUvArray, numItems: vertexUvArray.length };
 
 		}
-
-		// colors
 
 		if ( vertexColorArray !== undefined ) {
 
-			scope.vertexColorBuffer = gl.createBuffer();
-			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexColorBuffer );
-			gl.bufferData( gl.ARRAY_BUFFER, vertexColorArray, gl.STATIC_DRAW );
-
-			scope.vertexColorBuffer.itemSize = 4;
-			scope.vertexColorBuffer.numItems = vertexColorArray.length;
-
-		}
-
-		// keep references to typed arrays
-
-		if ( keepArrays ) {
-
-			scope.vertexIndexArray = vertexIndexArray16;
-			scope.vertexPositionArray = vertexPositionArray;
-			scope.vertexNormalArray = vertexNormalArray;
-			scope.vertexUvArray = vertexUvArray;
-			scope.vertexColorArray = vertexColorArray;
+			attributes[ "color" ]  = { itemSize: 4, array: vertexColorArray, numItems: vertexColorArray.length };
 
 		}
 
@@ -455,16 +408,9 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 	// compute vertex normals if not present in the CTM model
 
-	if ( geometry.vertexNormalArray === undefined ) {
+	if ( geometry.attributes[ "normal" ] === undefined ) {
 
 		geometry.computeVertexNormals();
-
-		geometry.vertexNormalBuffer = gl.createBuffer();
-		gl.bindBuffer( gl.ARRAY_BUFFER, geometry.vertexNormalBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, geometry.vertexNormalArray, gl.STATIC_DRAW );
-
-		geometry.vertexNormalBuffer.itemSize = 3;
-		geometry.vertexNormalBuffer.numItems = geometry.vertexNormalArray.length;
 
 	}
 
