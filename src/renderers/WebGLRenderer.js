@@ -2916,6 +2916,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var normal = attributes[ "normal" ];
 		var uv = attributes[ "uv" ];
 		var color = attributes[ "color" ];
+		var tangent = attributes[ "tangent" ];
 
 		if ( geometry.elementsNeedUpdate && index !== undefined ) {
 
@@ -2952,6 +2953,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( geometry.tangentsNeedUpdate && tangent !== undefined ) {
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, tangent.buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, tangent.array, hint );
+
+		}
 
 		if ( dispose ) {
 
@@ -3154,6 +3161,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 						_gl.bindBuffer( _gl.ARRAY_BUFFER, color.buffer );
 						_gl.vertexAttribPointer( attributes.color, colorSize, _gl.FLOAT, false, 0, startIndex * colorSize * 4 );
 
+					}
+
+					// tangents
+
+					var tangent = geometry.attributes[ "tangent" ];
+
+					if ( attributes.tangent >= 0 && tangent ) {
+
+						var tangentSize = tangent.itemSize;
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, tangent.buffer );
+						_gl.vertexAttribPointer( attributes.tangent, tangentSize, _gl.FLOAT, false, 0, startIndex * tangentSize * 4 );
 
 					}
 
@@ -4260,7 +4279,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.verticesNeedUpdate || geometry.elementsNeedUpdate ||
 					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-					 geometry.colorsNeedUpdate  ) {
+					 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate ) {
 
 					setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
@@ -4271,6 +4290,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.uvsNeedUpdate = false;
 				geometry.normalsNeedUpdate = false;
 				geometry.colorsNeedUpdate = false;
+				geometry.tangentsNeedUpdate = false;
 
 			} else {
 
