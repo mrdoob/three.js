@@ -494,14 +494,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		if ( vertexUvArray !== undefined ) {
 
-			// "fix" flipping
-
-			for ( var i = 0; i < vertexUvArray.length; i += 2 ) {
-
-				vertexUvArray[ i + 1 ] = 1 - vertexUvArray[ i + 1 ];
-
-			}
-
 			scope.vertexUvBuffer = gl.createBuffer();
 			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexUvBuffer );
 			gl.bufferData( gl.ARRAY_BUFFER, vertexUvArray, gl.STATIC_DRAW );

@@ -127,10 +127,10 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [
-							new THREE.UV( ix / gridX, iy / gridY ),
-							new THREE.UV( ix / gridX, ( iy + 1 ) / gridY ),
-							new THREE.UV( ( ix + 1 ) / gridX, ( iy + 1 ) / gridY ),
-							new THREE.UV( ( ix + 1 ) / gridX, iy / gridY )
+							new THREE.UV( ix / gridX, 1 - iy / gridY ),
+							new THREE.UV( ix / gridX, 1 - ( iy + 1 ) / gridY ),
+							new THREE.UV( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
+							new THREE.UV( ( ix + 1 ) / gridX, 1 - iy / gridY )
 						] );
 
 			}

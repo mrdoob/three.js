@@ -45,70 +45,54 @@ THREE.Quaternion.prototype = {
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 	
-		var _order = order || 'XYZ',
-		
-			c1 = Math.cos( v.x / 2 ),
-			c2 = Math.cos( v.y / 2 ),
-			c3 = Math.cos( v.z / 2 ),
-			s1 = Math.sin( v.x / 2 ),
-			s2 = Math.sin( v.y / 2 ),
-			s3 = Math.sin( v.z / 2 );
+		var c1 = Math.cos( v.x / 2 );
+		var c2 = Math.cos( v.y / 2 );
+		var c3 = Math.cos( v.z / 2 );
+		var s1 = Math.sin( v.x / 2 );
+		var s2 = Math.sin( v.y / 2 );
+		var s3 = Math.sin( v.z / 2 );
+
+		if ( order === undefined || order === 'XYZ' ) {
+
+			this.x = s1 * c2 * c3 + c1 * s2 * s3;
+			this.y = c1 * s2 * c3 - s1 * c2 * s3;
+			this.z = c1 * c2 * s3 + s1 * s2 * c3;
+			this.w = c1 * c2 * c3 - s1 * s2 * s3;
+
+		} else if ( order === 'YXZ' ) {
+	
+			this.x = s1 * c2 * c3 + c1 * s2 * s3;
+			this.y = c1 * s2 * c3 - s1 * c2 * s3;
+			this.z = c1 * c2 * s3 - s1 * s2 * c3;
+			this.w = c1 * c2 * c3 + s1 * s2 * s3;
 				
-		switch ( _order ) {
+		} else if ( order === 'ZXY' ) {
 	
-			case 'YXZ':
-	
-				this.x = s1 * c2 * c3 + c1 * s2 * s3;
-				this.y = c1 * s2 * c3 - s1 * c2 * s3;
-				this.z = c1 * c2 * s3 - s1 * s2 * c3;
-				this.w = c1 * c2 * c3 + s1 * s2 * s3;
-	
-				break;
+			this.x = s1 * c2 * c3 - c1 * s2 * s3;
+			this.y = c1 * s2 * c3 + s1 * c2 * s3;
+			this.z = c1 * c2 * s3 + s1 * s2 * c3;
+			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 				
-			case 'ZXY':
+		} else if ( order === 'ZYX' ) {
 	
-				this.x = s1 * c2 * c3 - c1 * s2 * s3;
-				this.y = c1 * s2 * c3 + s1 * c2 * s3;
-				this.z = c1 * c2 * s3 + s1 * s2 * c3;
-				this.w = c1 * c2 * c3 - s1 * s2 * s3;
-	
-				break;
+			this.x = s1 * c2 * c3 - c1 * s2 * s3;
+			this.y = c1 * s2 * c3 + s1 * c2 * s3;
+			this.z = c1 * c2 * s3 - s1 * s2 * c3;
+			this.w = c1 * c2 * c3 + s1 * s2 * s3;
 				
-			case 'ZYX':
-	
-				this.x = s1 * c2 * c3 - c1 * s2 * s3;
-				this.y = c1 * s2 * c3 + s1 * c2 * s3;
-				this.z = c1 * c2 * s3 - s1 * s2 * c3;
-				this.w = c1 * c2 * c3 + s1 * s2 * s3;
-	
-				break;
-				
-			case 'YZX':
+		} else if ( order === 'YZX' ) {
 			
-				this.x = s1 * c2 * c3 + c1 * s2 * s3;
-				this.y = c1 * s2 * c3 + s1 * c2 * s3;
-				this.z = c1 * c2 * s3 - s1 * s2 * c3;
-				this.w = c1 * c2 * c3 - s1 * s2 * s3;
-	
-				break;
+			this.x = s1 * c2 * c3 + c1 * s2 * s3;
+			this.y = c1 * s2 * c3 + s1 * c2 * s3;
+			this.z = c1 * c2 * s3 - s1 * s2 * c3;
+			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 				
-			case 'XZY':
+		} else if ( order === 'XZY' ) {
 			
-				this.x = s1 * c2 * c3 - c1 * s2 * s3;
-				this.y = c1 * s2 * c3 - s1 * c2 * s3;
-				this.z = c1 * c2 * s3 + s1 * s2 * c3;
-				this.w = c1 * c2 * c3 + s1 * s2 * s3;
-	
-				break;
-				
-			default: // 'XYZ'
-	
-				this.x = s1 * c2 * c3 + c1 * s2 * s3;
-				this.y = c1 * s2 * c3 - s1 * c2 * s3;
-				this.z = c1 * c2 * s3 + s1 * s2 * c3;
-				this.w = c1 * c2 * c3 - s1 * s2 * s3;
-		
-				break;
+			this.x = s1 * c2 * c3 - c1 * s2 * s3;
+			this.y = c1 * s2 * c3 - s1 * c2 * s3;
+			this.z = c1 * c2 * s3 + s1 * s2 * c3;
+			this.w = c1 * c2 * c3 + s1 * s2 * s3;
 				
 		}
 		

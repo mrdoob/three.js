@@ -159,7 +159,20 @@
 				quad.rotation.x = Math.PI / 2;
 				sceneRTT.add( quad );
 
-				createMesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), sceneRTT );
+				var geometry = new THREE.TorusGeometry( 100, 25, 15, 30 );
+
+				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } );
+				var mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
+
+				zmesh1 = new THREE.Mesh( geometry, mat1 );
+				zmesh1.position.set( 0, 0, 100 );
+				zmesh1.scale.set( 1.5, 1.5, 1.5 );
+				sceneRTT.add( zmesh1 );
+
+				zmesh2 = new THREE.Mesh( geometry, mat2 );
+				zmesh2.position.set( 0, 150, 100 );
+				zmesh2.scale.set( 0.75, 0.75, 0.75 );
+				sceneRTT.add( zmesh2 );
 
 				quad = new THREE.Mesh( plane, materialScreen );
 				quad.position.z = -100;
@@ -176,11 +189,11 @@
 
 						mesh = new THREE.Mesh( geometry, material2 );
 
-						mesh.position.x = ( i - (n-1)/2 ) * 20;
-						mesh.position.y = ( j - (n-1)/2 ) * 20;
+						mesh.position.x = ( i - ( n - 1 ) / 2 ) * 20;
+						mesh.position.y = ( j - ( n - 1 ) / 2 ) * 20;
 						mesh.position.z = 0;
 
-						mesh.rotation.y = -Math.PI/2;
+						mesh.rotation.y = - Math.PI / 2;
 
 						scene.add( mesh );
 
@@ -200,23 +213,6 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-			}
-
-			function createMesh( geometry, xscene ) {
-
-				var mat1 = new THREE.MeshPhongMaterial( { color: 0x555555, specular: 0xffaa00, shininess: 5 } ),
-					mat2 = new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0xff2200, shininess: 5 } );
-
-				zmesh1 = new THREE.Mesh( geometry, mat1 );
-				zmesh1.position.set( 0, 0, 100 );
-				zmesh1.scale.set( 1.5, 1.5, 1.5 );
-				xscene.add( zmesh1 );
-
-				zmesh2 = new THREE.Mesh( geometry, mat2 );
-				zmesh2.position.set( 0, 150, 100 );
-				zmesh2.scale.set( 0.75, 0.75, 0.75 );
-				xscene.add( zmesh2 );
 
 			}
 

@@ -2,7 +2,7 @@
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "VeyronNoUv.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 36210,

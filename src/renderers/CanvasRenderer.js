@@ -1040,25 +1040,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( _contextGlobalCompositeOperation !== value ) {
 
-			switch ( value ) {
+			if ( value === THREE.NormalBlending ) {
 
-				case THREE.NormalBlending:
+				_context.globalCompositeOperation = 'source-over';
 
-					_context.globalCompositeOperation = 'source-over';
+			} else if ( value === THREE.AdditiveBlending ) {
 
-					break;
+				_context.globalCompositeOperation = 'lighter';
 
-				case THREE.AdditiveBlending:
+			} else if ( value === THREE.SubtractiveBlending ) {
 
-					_context.globalCompositeOperation = 'lighter';
-
-					break;
-
-				case THREE.SubtractiveBlending:
-
-					_context.globalCompositeOperation = 'darker';
-
-					break;
+				_context.globalCompositeOperation = 'darker';
 
 			}
 

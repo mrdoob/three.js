@@ -375,6 +375,20 @@
 
 						cube = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, sides );
 
+						// revert back to old flipped UVs
+
+						for ( i = 0; i < cube.faceVertexUvs[ 0 ].length; i ++ ) {
+
+							uv = cube.faceVertexUvs[ 0 ][ i ];
+
+							for ( j = 0; j < uv.length; j++ ) {
+
+								uv[j].v = 1 - uv[j].v;
+
+							}
+
+						}
+
 						// set UV tiles
 
 						for ( i = 0; i < cube.faceVertexUvs[ 0 ].length; i ++ ) {
@@ -496,6 +510,7 @@
 				canvas.width = canvas.height = size;
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+				texture.flipY = false;
 
 				function generateTexture() {
 
@@ -535,6 +550,7 @@
 				canvas.width = canvas.height = size;
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+				texture.flipY = false;
 
 				function generateTexture() {
 
@@ -563,6 +579,7 @@
 				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}
+
 			function generateMegamaterialDebug() {
 
 				var canvas = document.createElement( 'canvas' ),
@@ -576,9 +593,9 @@
 				ctx.textBaseline = "top";
 				ctx.font = "8pt arial";
 
-				for ( i = 0; i < tile; i++ ) {
+				for ( i = 0; i < tile; i ++ ) {
 
-					for ( j = 0; j < tile; j++ ) {
+					for ( j = 0; j < tile; j ++ ) {
 
 						h = i * tile + j;
 						ctx.fillStyle = "hsl(" + h + ",90%, 50%)";
@@ -645,6 +662,7 @@
 					ctx.fillRect( sx + a * i, sy + b * i, width, height );
 
 				}
+
 			}
 
 			function drawAOSides( ctx, image, row, column, sides, tile, strength, debug_texture, debug_numbers ) {

@@ -418,7 +418,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	setRotationFromEuler: function( v, order ) {
+	setRotationFromEuler: function ( v, order ) {
 
 		var te = this.elements;
 
@@ -427,109 +427,101 @@ THREE.Matrix4.prototype = {
 		var c = Math.cos( y ), d = Math.sin( y );
 		var e = Math.cos( z ), f = Math.sin( z );
 
-		switch ( order ) {
+		if ( order === undefined || order === 'XYZ' ) {
 
-			case 'YXZ':
+			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-				var ce = c * e, cf = c * f, de = d * e, df = d * f;
+			te[0] = c * e;
+			te[4] = - c * f;
+			te[8] = d;
 
-				te[0] = ce + df * b;
-				te[4] = de * b - cf;
-				te[8] = a * d;
+			te[1] = af + be * d;
+			te[5] = ae - bf * d;
+			te[9] = - b * c;
 
-				te[1] = a * f;
-				te[5] = a * e;
-				te[9] = - b;
+			te[2] = bf - ae * d;
+			te[6] = be + af * d;
+			te[10] = a * c;
 
-				te[2] = cf * b - de;
-				te[6] = df + ce * b;
-				te[10] = a * c;
-				break;
+		} else if ( order === 'YXZ' ) {
 
-			case 'ZXY':
+			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-				var ce = c * e, cf = c * f, de = d * e, df = d * f;
+			te[0] = ce + df * b;
+			te[4] = de * b - cf;
+			te[8] = a * d;
 
-				te[0] = ce - df * b;
-				te[4] = - a * f;
-				te[8] = de + cf * b;
+			te[1] = a * f;
+			te[5] = a * e;
+			te[9] = - b;
 
-				te[1] = cf + de * b;
-				te[5] = a * e;
-				te[9] = df - ce * b;
+			te[2] = cf * b - de;
+			te[6] = df + ce * b;
+			te[10] = a * c;
 
-				te[2] = - a * d;
-				te[6] = b;
-				te[10] = a * c;
-				break;
+		} else if ( order === 'ZXY' ) {
 
-			case 'ZYX':
+			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
-				var ae = a * e, af = a * f, be = b * e, bf = b * f;
+			te[0] = ce - df * b;
+			te[4] = - a * f;
+			te[8] = de + cf * b;
 
-				te[0] = c * e;
-				te[4] = be * d - af;
-				te[8] = ae * d + bf;
+			te[1] = cf + de * b;
+			te[5] = a * e;
+			te[9] = df - ce * b;
 
-				te[1] = c * f;
-				te[5] = bf * d + ae;
-				te[9] = af * d - be;
+			te[2] = - a * d;
+			te[6] = b;
+			te[10] = a * c;
 
-				te[2] = - d;
-				te[6] = b * c;
-				te[10] = a * c;
-				break;
+		} else if ( order === 'ZYX' ) {
 
-			case 'YZX':
+			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
-				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+			te[0] = c * e;
+			te[4] = be * d - af;
+			te[8] = ae * d + bf;
 
-				te[0] = c * e;
-				te[4] = bd - ac * f;
-				te[8] = bc * f + ad;
+			te[1] = c * f;
+			te[5] = bf * d + ae;
+			te[9] = af * d - be;
 
-				te[1] = f;
-				te[5] = a * e;
-				te[9] = - b * e;
+			te[2] = - d;
+			te[6] = b * c;
+			te[10] = a * c;
 
-				te[2] = - d * e;
-				te[6] = ad * f + bc;
-				te[10] = ac - bd * f;
-				break;
+		} else if ( order === 'YZX' ) {
 
-			case 'XZY':
+			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+			te[0] = c * e;
+			te[4] = bd - ac * f;
+			te[8] = bc * f + ad;
 
-				te[0] = c * e;
-				te[4] = - f;
-				te[8] = d * e;
+			te[1] = f;
+			te[5] = a * e;
+			te[9] = - b * e;
 
-				te[1] = ac * f + bd;
-				te[5] = a * e;
-				te[9] = ad * f - bc;
+			te[2] = - d * e;
+			te[6] = ad * f + bc;
+			te[10] = ac - bd * f;
 
-				te[2] = bc * f - ad;
-				te[6] = b * e;
-				te[10] = bd * f + ac;
-				break;
+		} else if ( order === 'XZY' ) {
 
-			default: // 'XYZ'
+			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
-				var ae = a * e, af = a * f, be = b * e, bf = b * f;
+			te[0] = c * e;
+			te[4] = - f;
+			te[8] = d * e;
 
-				te[0] = c * e;
-				te[4] = - c * f;
-				te[8] = d;
+			te[1] = ac * f + bd;
+			te[5] = a * e;
+			te[9] = ad * f - bc;
 
-				te[1] = af + be * d;
-				te[5] = ae - bf * d;
-				te[9] = - b * c;
-
-				te[2] = bf - ae * d;
-				te[6] = be + af * d;
-				te[10] = a * c;
-				break;
+			te[2] = bc * f - ad;
+			te[6] = b * e;
+			te[10] = bd * f + ac;
 
 		}
 
@@ -538,7 +530,7 @@ THREE.Matrix4.prototype = {
 	},
 
 
-	setRotationFromQuaternion: function( q ) {
+	setRotationFromQuaternion: function ( q ) {
 
 		var te = this.elements;
 

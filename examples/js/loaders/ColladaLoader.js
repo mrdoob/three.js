@@ -2414,7 +2414,7 @@ THREE.ColladaLoader = function () {
 								ts = ts || { };
 								if ( ts[ input.set ] === undefined ) ts[ input.set ] = [];
 								// invert the V
-								ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], 1.0 - source.data[ idx32 + 1 ] ) );
+								ts[ input.set ].push( new THREE.UV( source.data[ idx32 ], source.data[ idx32 + 1 ] ) );
 
 								break;
 

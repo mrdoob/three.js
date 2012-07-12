@@ -37,7 +37,7 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.UV( u, v ) );
+			uvsRow.push( new THREE.UV( u, 1 - v ) );
 
 		}
 
