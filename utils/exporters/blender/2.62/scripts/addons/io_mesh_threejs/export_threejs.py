@@ -947,7 +947,7 @@ def generate_ascii_model(meshes, morphs,
     materials_string = ",\n\n".join(materials)
 
     model_string = TEMPLATE_MODEL_ASCII % {
-    "scale" : option_scale,
+    "scale" : 1,
 
     "uvs"       : generate_uvs(uvs, option_uv_coords),
     "normals"   : generate_normals(normals, option_normals),
