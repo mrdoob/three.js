@@ -182,6 +182,17 @@ THREE.ShaderUtils = {
 					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 				"#endif",
 
+				"#if MAX_SPOT_LIGHTS > 0",
+					"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
+					"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
+					"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+
+					"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
+					"varying vec3 vWorldPosition;",
+				"#endif",
+
 				"#ifdef WRAP_AROUND",
 					"uniform vec3 wrapRGB;",
 				"#endif",
@@ -298,6 +309,68 @@ THREE.ShaderUtils = {
 
 					"#endif",
 
+					// spot lights
+
+					"#if MAX_SPOT_LIGHTS > 0",
+
+						"vec3 spotDiffuse = vec3( 0.0 );",
+						"vec3 spotSpecular = vec3( 0.0 );",
+
+						"for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
+
+							"vec3 spotVector = normalize( vSpotLight[ i ].xyz );",
+							"float spotDistance = vSpotLight[ i ].w;",
+
+							"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
+
+							"if ( spotEffect > spotLightAngle[ i ] ) {",
+
+								"spotEffect = pow( spotEffect, spotLightExponent[ i ] );",
+
+								// diffuse
+
+								"#ifdef WRAP_AROUND",
+
+									"float spotDiffuseWeightFull = max( dot( normal, spotVector ), 0.0 );",
+									"float spotDiffuseWeightHalf = max( 0.5 * dot( normal, spotVector ) + 0.5, 0.0 );",
+
+									"vec3 spotDiffuseWeight = mix( vec3 ( spotDiffuseWeightFull ), vec3( spotDiffuseWeightHalf ), wrapRGB );",
+
+								"#else",
+
+									"float spotDiffuseWeight = max( dot( normal, spotVector ), 0.0 );",
+
+								"#endif",
+
+								"spotDiffuse += spotDistance * spotLightColor[ i ] * uDiffuseColor * spotDiffuseWeight * spotEffect;",
+
+								// specular
+
+								"vec3 spotHalfVector = normalize( spotVector + viewPosition );",
+								"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
+								"float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, uShininess ), 0.0 );",
+
+								"#ifdef PHYSICALLY_BASED_SHADING",
+
+									// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+									"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
+
+									"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
+									"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
+
+								"#else",
+
+									"spotSpecular += spotDistance * spotLightColor[ i ] * uSpecularColor * spotSpecularWeight * spotDiffuseWeight * spotEffect;",
+
+								"#endif",
+
+							"}",
+
+						"}",
+
+					"#endif",
+
 					// directional lights
 
 					"#if MAX_DIR_LIGHTS > 0",
@@ -371,6 +444,13 @@ THREE.ShaderUtils = {
 
 					"#endif",
 
+					"#if MAX_SPOT_LIGHTS > 0",
+
+						"totalDiffuse += spotDiffuse;",
+						"totalSpecular += spotSpecular;",
+
+					"#endif",
+
 					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
 
 					"if ( enableReflection ) {",
@@ -427,6 +507,17 @@ THREE.ShaderUtils = {
 
 				"#endif",
 
+				"#if MAX_SPOT_LIGHTS > 0",
+
+					"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+
+					"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
+
+					"varying vec3 vWorldPosition;",
+
+				"#endif",
+
 				"varying vec3 vViewPosition;",
 
 				THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
@@ -463,6 +554,28 @@ THREE.ShaderUtils = {
 							"vPointLight[ i ] = vec4( lVector, lDistance );",
 
 						"}",
+
+					"#endif",
+
+					// spot lights
+
+					"#if MAX_SPOT_LIGHTS > 0",
+
+						"for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
+
+							"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
+							"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+
+							"float lDistance = 1.0;",
+							"if ( spotLightDistance[ i ] > 0.0 )",
+								"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+
+							"vSpotLight[ i ] = vec4( lVector, lDistance );",
+
+						"}",
+
+						"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+						"vWorldPosition = mPosition.xyz;",
 
 					"#endif",
 
