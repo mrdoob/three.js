@@ -101,8 +101,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _this = this,
 
-	_gl,
-
 	_programs = [],
 	_programs_counter = 0,
 
@@ -170,7 +168,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// initialize
 
-	_gl = initGL();
+	var _gl;
+	var _glExtensionTextureFloat;
+
+	initGL();
 
 	setDefaultGLState();
 
@@ -6426,11 +6427,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initGL () {
 
-		var gl;
-
 		try {
 
-			if ( ! ( gl = _canvas.getContext( 'experimental-webgl', { alpha: _alpha, premultipliedAlpha: _premultipliedAlpha, antialias: _antialias, stencil: _stencil, preserveDrawingBuffer: _preserveDrawingBuffer } ) ) ) {
+			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { alpha: _alpha, premultipliedAlpha: _premultipliedAlpha, antialias: _antialias, stencil: _stencil, preserveDrawingBuffer: _preserveDrawingBuffer } ) ) ) {
 
 				throw 'Error creating WebGL context.';
 
@@ -6442,13 +6441,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		if ( ! gl.getExtension( 'OES_texture_float' ) ) {
+		_glExtensionTextureFloat = _gl.getExtension( 'OES_texture_float' );
+
+		if ( ! _glExtensionTextureFloat ) {
 
 			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
 
 		}
-
-		return gl;
 
 	};
 
