@@ -619,27 +619,39 @@ THREE.Geometry.prototype = {
 				face.d = changes[ face.d ];
 
 				// check dups in (a, b, c, d) and convert to -> face3
-				o = [face.a, face.b, face.c, face.d];
-				for (k=3;k>0;k--) {
-					if ( o.indexOf(face[abcd[k]]) != k ) {
+
+				o = [ face.a, face.b, face.c, face.d ];
+
+				for ( k = 3; k > 0; k -- ) {
+
+					if ( o.indexOf( face[ abcd[ k ] ] ) !== k ) {
+
 						// console.log('faces', face.a, face.b, face.c, face.d, 'dup at', k);
-						o.splice(k, 1);
-						this.faces[ i ] = new THREE.Face3(o[0], o[1], o[2]);
-						for (j=0,jl=this.faceVertexUvs.length;j<jl;j++) {
-							u = this.faceVertexUvs[j][i];
-							if (u) u.splice(k, 1);
+
+						o.splice( k, 1 );
+
+						this.faces[ i ] = new THREE.Face3( o[0], o[1], o[2], face.normal, face.color, face.materialIndex );
+
+						for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
+
+							u = this.faceVertexUvs[ j ][ i ];
+							if ( u ) u.splice( k, 1 );
+
 						}
+
+						this.faces[ i ].vertexColors = face.vertexColors;
 
 						break;
 					}
-				}
 
+				}
 
 			}
 
 		}
 
 		// Use unique set of vertices
+
 		var diff = this.vertices.length - unique.length;
 		this.vertices = unique;
 		return diff;
