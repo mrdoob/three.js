@@ -1058,6 +1058,20 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	skinnormal_vertex: [
+
+		"#ifdef USE_SKINNING",
+
+			"mat4 skinMatrix = skinWeight.x * boneGlobalMatrices[ int( skinIndex.x ) ];",
+			"skinMatrix 	+= skinWeight.y * boneGlobalMatrices[ int( skinIndex.y ) ];",
+
+			"vec4 skinnedNormal = skinMatrix * vec4( transformedNormal, 0.0 );",
+			"transformedNormal = skinnedNormal.xyz;",
+
+		"#endif"
+
+	].join("\n"),
+
 	// SHADOW MAP
 
 	// based on SpiderGL shadow map and Fabien Sanglard's GLSL shadow mapping examples
@@ -1657,6 +1671,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
+				THREE.ShaderChunk[ "skinnormal_vertex" ],
 
 				"#ifndef USE_ENVMAP",
 
@@ -1669,7 +1684,6 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
-
 
 			"}"
 
@@ -1783,6 +1797,7 @@ THREE.ShaderLib = {
 				"vViewPosition = -mvPosition.xyz;",
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
+				THREE.ShaderChunk[ "skinnormal_vertex" ],
 
 				"vNormal = transformedNormal;",
 
