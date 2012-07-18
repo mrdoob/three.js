@@ -967,10 +967,10 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SKINNING",
 
-			"gl_Position  = ( boneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
-			"gl_Position += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
+			"vec4 skinned  = ( boneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
+			"skinned 	  += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
 
-			"gl_Position  = projectionMatrix * modelViewMatrix * gl_Position;",
+			"gl_Position  = projectionMatrix * modelViewMatrix * skinned;",
 
 		"#endif"
 
@@ -1296,7 +1296,15 @@ THREE.ShaderChunk = {
 
 				"#else",
 
+				"#ifdef USE_SKINNING",
+
+					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * skinned;",
+
+				"#else",
+
 					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( position, 1.0 );",
+
+				"#endif",
 
 				"#endif",
 
