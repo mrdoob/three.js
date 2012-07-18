@@ -1930,12 +1930,14 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 
