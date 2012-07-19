@@ -4790,7 +4790,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( material.skinning ) {
+		}
+
+		if ( material.skinning ) {
+
+			if ( p_uniforms.boneGlobalMatrices !== null ) {
 
 				_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
 

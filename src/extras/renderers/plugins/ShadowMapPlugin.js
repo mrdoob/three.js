@@ -235,7 +235,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
+						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
 						webglObject.render = true;
 
@@ -304,7 +304,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( object.visible && object.castShadow ) {
 
-					object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
+					object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
 					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
 
