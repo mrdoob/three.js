@@ -4,16 +4,19 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Animation = function( root, data, interpolationType, JITCompile ) {
+THREE.Animation = function( root, name, interpolationType, JITCompile ) {
 
 	this.root = root;
-	this.data = THREE.AnimationHandler.get( data );
+	this.data = THREE.AnimationHandler.get( name );
 	this.hierarchy = THREE.AnimationHandler.parse( root );
+
 	this.currentTime = 0;
 	this.timeScale = 1;
+
 	this.isPlaying = false;
 	this.isPaused = true;
 	this.loop = true;
+
 	this.interpolationType = interpolationType !== undefined ? interpolationType : THREE.AnimationHandler.LINEAR;
 	this.JITCompile = JITCompile !== undefined ? JITCompile : true;
 
@@ -22,23 +25,20 @@ THREE.Animation = function( root, data, interpolationType, JITCompile ) {
 
 };
 
-// Play
-
 THREE.Animation.prototype.play = function( loop, startTimeMS ) {
 
-	if( !this.isPlaying ) {
+	if ( !this.isPlaying ) {
 
 		this.isPlaying = true;
 		this.loop = loop !== undefined ? loop : true;
 		this.currentTime = startTimeMS !== undefined ? startTimeMS : 0;
-
 
 		// reset key cache
 
 		var h, hl = this.hierarchy.length,
 			object;
 
-		for ( h = 0; h < hl; h++ ) {
+		for ( h = 0; h < hl; h ++ ) {
 
 			object = this.hierarchy[ h ];
 
@@ -83,9 +83,6 @@ THREE.Animation.prototype.play = function( loop, startTimeMS ) {
 };
 
 
-
-// Pause
-
 THREE.Animation.prototype.pause = function() {
 
 	if( this.isPaused ) {
@@ -103,18 +100,15 @@ THREE.Animation.prototype.pause = function() {
 };
 
 
-// Stop
-
 THREE.Animation.prototype.stop = function() {
 
 	this.isPlaying = false;
 	this.isPaused  = false;
 	THREE.AnimationHandler.removeFromUpdate( this );
 
-
 	// reset JIT matrix and remove cache
 
-	for ( var h = 0; h < this.hierarchy.length; h++ ) {
+	for ( var h = 0; h < this.hierarchy.length; h ++ ) {
 
 		if ( this.hierarchy[ h ].animationCache !== undefined ) {
 
@@ -138,13 +132,11 @@ THREE.Animation.prototype.stop = function() {
 };
 
 
-// Update
-
 THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 	// early out
 
-	if( !this.isPlaying ) return;
+	if ( !this.isPlaying ) return;
 
 
 	// vars
@@ -174,7 +166,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 	// update
 
-	for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
+	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
 		object = this.hierarchy[ h ];
 		animationCache = object.animationCache;
@@ -207,7 +199,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 			if ( this.JITCompile ) {
 
-				if( object instanceof THREE.Bone ) {
+				if ( object instanceof THREE.Bone ) {
 
 					object.skinMatrix = object.animationCache.originalMatrix;
 
@@ -222,7 +214,7 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 			// loop through pos/rot/scl
 
-			for ( var t = 0; t < 3; t++ ) {
+			for ( var t = 0; t < 3; t ++ ) {
 
 				// get keys
 
@@ -363,9 +355,9 @@ THREE.Animation.prototype.update = function( deltaTimeMS ) {
 
 			this.hierarchy[ 0 ].updateMatrixWorld( true );
 
-			for ( var h = 0; h < this.hierarchy.length; h++ ) {
+			for ( var h = 0; h < this.hierarchy.length; h ++ ) {
 
-				if( this.hierarchy[ h ] instanceof THREE.Bone ) {
+				if ( this.hierarchy[ h ] instanceof THREE.Bone ) {
 
 					JIThierarchy[ h ][ frame ] = this.hierarchy[ h ].skinMatrix.clone();
 
@@ -476,7 +468,7 @@ THREE.Animation.prototype.getPrevKeyWith = function( type, h, key ) {
 	}
 
 
-	for ( ; key >= 0; key-- ) {
+	for ( ; key >= 0; key -- ) {
 
 		if ( keys[ key ][ type ] !== undefined ) {
 

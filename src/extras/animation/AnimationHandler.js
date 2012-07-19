@@ -13,7 +13,7 @@ THREE.AnimationHandler = (function() {
 
 	that.update = function( deltaTimeMS ) {
 
-		for( var i = 0; i < playing.length; i++ )
+		for( var i = 0; i < playing.length; i ++ )
 			playing[ i ].update( deltaTimeMS );
 
 	};
@@ -23,7 +23,7 @@ THREE.AnimationHandler = (function() {
 
 	that.addToUpdate = function( animation ) {
 
-		if( playing.indexOf( animation ) === -1 )
+		if ( playing.indexOf( animation ) === -1 )
 			playing.push( animation );
 
 	};
@@ -45,7 +45,7 @@ THREE.AnimationHandler = (function() {
 
 	that.add = function( data ) {
 
-		if( library[ data.name ] !== undefined )
+		if ( library[ data.name ] !== undefined )
 			console.log( "THREE.AnimationHandler.add: Warning! " + data.name + " already exists in library. Overwriting." );
 
 		library[ data.name ] = data;
@@ -58,9 +58,9 @@ THREE.AnimationHandler = (function() {
 
 	that.get = function( name ) {
 
-		if( typeof name === "string" ) {
+		if ( typeof name === "string" ) {
 
-			if( library[ name ] ) {
+			if ( library[ name ] ) {
 
 				return library[ name ];
 
@@ -144,20 +144,21 @@ THREE.AnimationHandler = (function() {
 					data.hierarchy[ h ].keys[ k ].rot = new THREE.Quaternion( quat[0], quat[1], quat[2], quat[3] );
 
 				}
+
 			}
 
 
 			// prepare morph target keys
 
-			if( data.hierarchy[h].keys.length && data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
+			if( data.hierarchy[ h ].keys.length && data.hierarchy[ h ].keys[ 0 ].morphTargets !== undefined ) {
 
 				// get all used
 
 				var usedMorphTargets = {};
 
-				for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+				for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
-					for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
+					for ( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
 
 						var morphTargetName = data.hierarchy[ h ].keys[ k ].morphTargets[ m ];
 						usedMorphTargets[ morphTargetName ] = -1;
@@ -171,15 +172,15 @@ THREE.AnimationHandler = (function() {
 
 				// set all used on all frames
 
-				for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+				for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 					var influences = {};
 
-					for( var morphTargetName in usedMorphTargets ) {
+					for ( var morphTargetName in usedMorphTargets ) {
 
-						for( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
+						for ( var m = 0; m < data.hierarchy[ h ].keys[ k ].morphTargets.length; m ++ ) {
 
-							if( data.hierarchy[ h ].keys[ k ].morphTargets[ m ] === morphTargetName ) {
+							if ( data.hierarchy[ h ].keys[ k ].morphTargets[ m ] === morphTargetName ) {
 
 								influences[ morphTargetName ] = data.hierarchy[ h ].keys[ k ].morphTargetsInfluences[ m ];
 								break;
@@ -188,7 +189,7 @@ THREE.AnimationHandler = (function() {
 
 						}
 
-						if( m === data.hierarchy[ h ].keys[ k ].morphTargets.length ) {
+						if ( m === data.hierarchy[ h ].keys[ k ].morphTargets.length ) {
 
 							influences[ morphTargetName ] = 0;
 
@@ -205,9 +206,9 @@ THREE.AnimationHandler = (function() {
 
 			// remove all keys that are on the same time
 
-			for( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
+			for ( var k = 1; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
-				if( data.hierarchy[ h ].keys[ k ].time === data.hierarchy[ h ].keys[ k - 1 ].time ) {
+				if ( data.hierarchy[ h ].keys[ k ].time === data.hierarchy[ h ].keys[ k - 1 ].time ) {
 
 					data.hierarchy[ h ].keys.splice( k, 1 );
 					k --;
@@ -219,7 +220,7 @@ THREE.AnimationHandler = (function() {
 
 			// set index
 
-			for( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
+			for ( var k = 0; k < data.hierarchy[ h ].keys.length; k ++ ) {
 
 				data.hierarchy[ h ].keys[ k ].index = k;
 
