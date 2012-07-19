@@ -278,11 +278,11 @@
 
 				var arcShape = new THREE.Shape();
 				arcShape.moveTo( 50, 10 );
-				arcShape.arc( 10, 10, 40, 0, Math.PI*2, false );
+				arcShape.absarc( 10, 10, 40, 0, Math.PI*2, false );
 
 				var holePath = new THREE.Path();
 				holePath.moveTo( 20, 10 );
-				holePath.arc( 10, 10, 10, 0, Math.PI*2, true );
+				holePath.absarc( 10, 10, 10, 0, Math.PI*2, true );
 				arcShape.holes.push( holePath );
 
 				var arc3d = arcShape.extrude( extrudeSettings );
@@ -294,16 +294,18 @@
 
 				var smileyShape = new THREE.Shape();
 				smileyShape.moveTo( 80, 40 );
-				smileyShape.arc( 40, 40, 40, 0, Math.PI*2, false );
+				smileyShape.absarc( 40, 40, 40, 0, Math.PI*2, false );
 
 				var smileyEye1Path = new THREE.Path();
 				smileyEye1Path.moveTo( 35, 20 );
-				smileyEye1Path.arc( 25, 20, 10, 0, Math.PI*2, true );
+				// smileyEye1Path.absarc( 25, 20, 10, 0, Math.PI*2, true );
+				smileyEye1Path.absellipse( 25, 20, 10, 10, 0, Math.PI*2, true );
+				
 				smileyShape.holes.push( smileyEye1Path );
 
 				var smileyEye2Path = new THREE.Path();
 				smileyEye2Path.moveTo( 65, 20 );
-				smileyEye2Path.arc( 55, 20, 10, 0, Math.PI*2, true );
+				smileyEye2Path.absarc( 55, 20, 10, 0, Math.PI*2, true );
 				smileyShape.holes.push( smileyEye2Path );
 
 				var smileyMouthPath = new THREE.Path();

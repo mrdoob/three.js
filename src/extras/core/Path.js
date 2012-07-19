@@ -132,35 +132,44 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 
 // FUTURE: Change the API or follow canvas API?
 
-THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
-
-	var laste = this.actions[ this.actions.length - 1];
-	this.absellipse(laste.x + aX, laste.y + aY, xRadius, yRadius,
-									aStartAngle, aEndAngle, aClockwise );
- };
- 
 THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 
-	var laste = this.actions[ this.actions.length - 1];
-	this.absarc(laste.x + aX, laste.y + aY, aRadius,
-									aStartAngle, aEndAngle, aClockwise );
+	var lastargs = this.actions[ this.actions.length - 1].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
+
+	this.absarc(aX + x0, aY + y0, aRadius,
+		aStartAngle, aEndAngle, aClockwise );
+	
+ };
+
+ THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
+	this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
  };
  
+THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
 
+	var lastargs = this.actions[ this.actions.length - 1].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
+
+	this.absellipse(aX + x0, aY + y0, xRadius, yRadius,
+		aStartAngle, aEndAngle, aClockwise );
+
+ };
+ 
 
 THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 
 	var args = Array.prototype.slice.call( arguments );
-
 	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
 
-	// All of the other actions look to the last two elements in the list to
-	// find the ending point, so we need to append them.
 	var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
 	args.push(lastPoint.x);
 	args.push(lastPoint.y);
@@ -168,13 +177,6 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 	this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
 
  };
-
-THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
-	this.absellipse(aX, aY, aRadius, aRadius,
-		aStartAngle, aEndAngle, aClockwise);
- };
-
 
 THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
@@ -345,7 +347,6 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 				aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
 				aClockwise = !!args[ 5 ];
 
-
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
 			var tdivisions = divisions * 2;
@@ -379,7 +380,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 			var aX = args[ 0 ], aY = args[ 1 ],
 				xRadius = args[ 2 ],
-				yRadius = args[3]
+				yRadius = args[ 3 ],
 				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
 				aClockwise = !!args[ 6 ];
 

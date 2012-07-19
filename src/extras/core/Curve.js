@@ -18,6 +18,7 @@
  * THREE.CubicBezierCurve
  * THREE.SplineCurve
  * THREE.ArcCurve
+ * THREE.EllipseCurve
  *
  * -- 3d classes --
  * THREE.LineCurve3
