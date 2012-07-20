@@ -726,6 +726,8 @@ def generate_indices(meshes, option_skinning):
 
     indices = []
 
+    armature = bpy.data.armatures[0]
+
     for mesh, dummy in meshes:
 
         i = 0
@@ -744,15 +746,15 @@ def generate_indices(meshes, option_skinning):
 
         object = bpy.data.objects[mesh_index]
 
-        for v in mesh.vertices:
+        for vertex in mesh.vertices:
 
             for vgroup in range(MAX_INFLUENCES):
 
-                if vgroup < len(v.groups):
+                if vgroup < len(vertex.groups):
 
                     index = 0
-                    for bone in bpy.data.armatures[0].bones:
-                        group_index = v.groups[vgroup].group
+                    for bone in armature.bones:
+                        group_index = vertex.groups[vgroup].group
 
                         if object.vertex_groups[group_index].name == bone.name:
                             indices.append('%d' % index)
@@ -777,10 +779,10 @@ def generate_weights(vertices, option_skinning):
 
     weights = []
 
-    for v in vertices:
+    for vertex in vertices:
         for vgroup in range(MAX_INFLUENCES):
-            if vgroup < len(v.groups):
-                weights.append('%f' % (v.groups[vgroup].weight))
+            if vgroup < len(vertex.groups):
+                weights.append('%f' % (vertex.groups[vgroup].weight))
             else:
                 weights.append('0')
 
