@@ -70,8 +70,8 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 	var pattern, result;
 
 	// v float float float
-
-	pattern = /v( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
+	
+	pattern = /v( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -88,7 +88,7 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 	// vn float float float
 
-	pattern = /vn( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
+	pattern = /vn( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -104,7 +104,7 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 	// vt float float
 
-	pattern = /vt( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
+	pattern = /vt( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
 
 	while ( ( result = pattern.exec( data ) ) != null ) {
 
@@ -129,7 +129,7 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 		// f vertex vertex vertex ...
 
-		pattern = /f( [\d]+)( [\d]+)( [\d]+)( [\d]+)?/g;
+		pattern = /f( +[\d]+)( [\d]+)( [\d]+)( [\d]+)?/g;
 
 		while ( ( result = pattern.exec( object ) ) != null ) {
 
@@ -158,7 +158,7 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 		// f vertex/uv vertex/uv vertex/uv ...
 
-		pattern = /f( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/g;
+		pattern = /f( +([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/g;
 
 		while ( ( result = pattern.exec( object ) ) != null ) {
 
@@ -200,7 +200,7 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
 
-		pattern = /f( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))?/g;
+		pattern = /f( +([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))?/g;
 
 		while ( ( result = pattern.exec( object ) ) != null ) {
 
@@ -254,7 +254,7 @@ THREE.OBJLoader.prototype.parse = function ( data ) {
 
 		// f vertex//normal vertex//normal vertex//normal ...
 
-		pattern = /f( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/g;
+		pattern = /f( +([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/g;
 
 		while ( ( result = pattern.exec( object ) ) != null ) {
 
