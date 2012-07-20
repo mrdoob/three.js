@@ -679,12 +679,14 @@ def generate_uvs(uvs, option_uv_coords):
 
 def generate_bones(option_bones, flipyz):
 
-    if not option_bones:
+    if not option_bones or len(bpy.data.armatures) == 0:
         return "", 0
 
     hierarchy = []
 
-    for bone in bpy.data.armatures[0].bones:
+    armature = bpy.data.armatures[0]
+
+    for bone in armature.bones:
         if bone.parent == None:
             if flipyz:
                 joint = '{"parent":-1,"name":"%s","pos":[%f,%f,%f],"rotq":[0,0,0,1]}' % (bone.name, bone.head.x, bone.head.z, -bone.head.y)
@@ -694,7 +696,7 @@ def generate_bones(option_bones, flipyz):
                 hierarchy.append(joint)
         else:
             index = i = 0
-            for parent in bpy.data.armatures[0].bones:
+            for parent in armature.bones:
                 if parent.name == bone.parent.name:
                     index = i
                 i += 1
@@ -710,7 +712,7 @@ def generate_bones(option_bones, flipyz):
 
     bones_string = ",".join(hierarchy)
 
-    return bones_string, len(bpy.data.armatures[0].bones)
+    return bones_string, len(armature.bones)
 
 
 # ##############################################################################
@@ -794,12 +796,13 @@ def generate_weights(vertices, option_skinning):
 
 def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
-    if not option_animation_skeletal:
+    if not option_animation_skeletal or len(bpy.data.actions) == 0 or len(bpy.data.armatures) == 0:
         return ""
 
     # TODO: Add scaling influences
 
     action = bpy.data.actions[0]
+    armature = bpy.data.armatures[0]
 
     parents = []
     parent_index = -1
@@ -811,7 +814,7 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
     frame_length = end_frame - start_frame
 
-    for hierarchy in bpy.data.armatures[0].bones:
+    for hierarchy in armature.bones:
 
         keys = []
 
@@ -882,13 +885,15 @@ def position(bone, frame):
     index = 0
     change = False
 
-    for i in range(len(bpy.data.actions[0].groups)):
-        if bpy.data.actions[0].groups[i].name == bone.name:
+    action = bpy.data.actions[0]
+
+    for i in range(len(action.groups)):
+        if action.groups[i].name == bone.name:
             index = i
 
     position = mathutils.Vector((0,0,0))
 
-    for channel in bpy.data.actions[0].groups[index].channels:
+    for channel in action.groups[index].channels:
 
         if "location" in channel.data_path:
 
@@ -938,14 +943,16 @@ def rotation(bone, frame):
     index = 0
     change = False
 
-    for i in range(len(bpy.data.actions[0].groups)):
-        if bpy.data.actions[0].groups[i].name == bone.name:
+    action = bpy.data.actions[0]
+
+    for i in range(len(action.groups)):
+        if action.groups[i].name == bone.name:
             index = i
 
     rotation = mathutils.Vector((0,0,0))
     w = 1
 
-    for channel in bpy.data.actions[0].groups[index].channels:
+    for channel in action.groups[index].channels:
 
         if "quaternion" in channel.data_path:
 
