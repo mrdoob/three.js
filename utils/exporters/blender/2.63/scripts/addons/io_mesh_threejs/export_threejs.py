@@ -679,6 +679,9 @@ def generate_uvs(uvs, option_uv_coords):
 
 def generate_bones(option_bones, flipyz):
 
+    if not option_bones:
+        return "", 0
+
     hierarchy = []
 
     for bone in bpy.data.armatures[0].bones:
@@ -707,10 +710,7 @@ def generate_bones(option_bones, flipyz):
 
     bones_string = ",".join(hierarchy)
 
-    if option_bones:
-        return bones_string, len(bpy.data.armatures[0].bones)
-    else:
-        return "", 0
+    return bones_string, len(bpy.data.armatures[0].bones)
 
 
 # ##############################################################################
@@ -718,6 +718,9 @@ def generate_bones(option_bones, flipyz):
 # ##############################################################################
 
 def generate_indices(meshes, option_skinning):
+
+    if not option_skinning:
+        return ""
 
     indices = []
 
@@ -758,10 +761,7 @@ def generate_indices(meshes, option_skinning):
 
     indices_string = ",".join(indices)
 
-    if option_skinning:
-        return indices_string
-    else:
-        return ""
+    return indices_string
 
 
 # ##############################################################################
@@ -769,6 +769,9 @@ def generate_indices(meshes, option_skinning):
 # ##############################################################################
 
 def generate_weights(vertices, option_skinning):
+
+    if not option_skinning:
+        return ""
 
     weights = []
 
@@ -781,10 +784,8 @@ def generate_weights(vertices, option_skinning):
 
     weights_string = ",".join(weights)
 
-    if option_skinning:
-        return weights_string
-    else:
-        return ""
+    return weights_string
+
 
 # ##############################################################################
 # Model exporter - skeletal animation
@@ -792,6 +793,9 @@ def generate_weights(vertices, option_skinning):
 # ##############################################################################
 
 def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
+
+    if not option_animation_skeletal:
+        return ""
 
     # TODO: Add scaling influences
 
@@ -871,10 +875,7 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
     hierarchy_string = ",".join(parents)
     animation_string = '"name":"%s","fps":%d,"length":%f,"hierarchy":[%s]' % (action.name, fps, (frame_length / fps), hierarchy_string)
 
-    if option_animation_skeletal:
-        return animation_string
-    else:
-        return ""
+    return animation_string
 
 def position(bone, frame):
 
