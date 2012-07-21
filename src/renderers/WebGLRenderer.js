@@ -6360,11 +6360,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 		//  - limit here is ANGLE's 254 max uniform vectors
 		//    (up to 54 should be safe)
 
-		var maxBones = 50;
+		var nVertexUniforms = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );
+		var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
+
+		var maxBones = nVertexMatrices;
 
 		if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
 
-			maxBones = object.bones.length;
+			maxBones = Math.min( object.bones.length, maxBones );
+
+			if ( maxBones < object.bones.length ) {
+
+				console.warn( "WebGLRenderer: too many bones - " + object.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
+
+			}
 
 		}
 

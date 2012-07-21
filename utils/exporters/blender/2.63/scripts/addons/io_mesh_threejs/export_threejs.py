@@ -752,10 +752,11 @@ def generate_indices(meshes, option_skinning):
 
                 if vgroup < len(vertex.groups):
 
-                    index = 0
-                    for bone in armature.bones:
-                        group_index = vertex.groups[vgroup].group
+                    group_index = vertex.groups[vgroup].group
 
+                    index = 0
+
+                    for bone in armature.bones:
                         if object.vertex_groups[group_index].name == bone.name:
                             indices.append('%d' % index)
 
