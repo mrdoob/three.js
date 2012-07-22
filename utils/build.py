@@ -137,7 +137,7 @@ def parse_args():
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_argument('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
-		parser.add_argument('--amd', help='Generate AMD module versions', action='store_const', const=True, default=False)
+		parser.add_argument('--module', help='Encapsulate in an AMD formatted module', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
 
 		args = parser.parse_args()
@@ -151,7 +151,7 @@ def parse_args():
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_option('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
-		parser.add_option('--amd', help='Generate AMD module versions', action='store_const', const=True, default=False)
+		parser.add_option('--module', help='Encapsulate in an AMD formatted module', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
 
 		args, remainder = parser.parse_args()
