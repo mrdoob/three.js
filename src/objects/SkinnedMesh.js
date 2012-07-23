@@ -7,6 +7,10 @@ THREE.SkinnedMesh = function ( geometry, material ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
+	//
+
+	this.useVertexTexture = true;
+
 	// init bones
 
 	this.identityMatrix = new THREE.Matrix4();
@@ -62,14 +66,29 @@ THREE.SkinnedMesh = function ( geometry, material ) {
 
 		}
 
-		//this.boneMatrices = new Float32Array( 16 * this.bones.length );
+		//
 
-		this.boneMatrices = new Float32Array( 64 * 64 * 4 ); // max 1024 bones
-		this.boneTexture = new THREE.DataTexture( this.boneMatrices, 64, 64, THREE.RGBAFormat, THREE.FloatType );
-		this.boneTexture.minFilter = THREE.NearestFilter;
-		this.boneTexture.magFilter = THREE.NearestFilter;
-		this.boneTexture.generateMipmaps = false;
-		this.boneTexture.flipY = false;
+		if ( this.useVertexTexture ) {
+
+			// layout (1 matrix = 4 pixels)
+			//	RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+			//  with 64x64 pixel texture max 1024 bones (64 * 64 / 4)
+
+			this.boneTextureWidth = 64;
+			this.boneTextureHeight = 64;
+
+			this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
+			this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
+			this.boneTexture.minFilter = THREE.NearestFilter;
+			this.boneTexture.magFilter = THREE.NearestFilter;
+			this.boneTexture.generateMipmaps = false;
+			this.boneTexture.flipY = false;
+
+		} else {
+
+			this.boneMatrices = new Float32Array( 16 * this.bones.length );
+
+		}
 
 		this.pose();
 
@@ -147,7 +166,11 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 
 	}
 
-	this.boneTexture.needsUpdate = true;
+	if ( this.useVertexTexture ) {
+
+		this.boneTexture.needsUpdate = true;
+
+	}
 
 };
 

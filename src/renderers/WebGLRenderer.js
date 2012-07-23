@@ -183,6 +183,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
 	_maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
 
+	var _supportsVertexTextures = ( _maxVertexTextures > 0 );
+	var _supportsBoneTextures = _supportsVertexTextures && _glExtensionTextureFloat;
+
 	// API
 
 	this.getContext = function () {
@@ -193,7 +196,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.supportsVertexTextures = function () {
 
-		return _maxVertexTextures > 0;
+		return _supportsVertexTextures;
 
 	};
 
@@ -4794,19 +4797,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			/*
-			if ( p_uniforms.boneGlobalMatrices !== null ) {
+			if ( _supportsBoneTextures ) {
 
-				_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
+				if ( p_uniforms.boneTexture !== null ) {
 
-			}
-			*/
+					// shadowMap texture array starts from 6
+					// texture unit 12 should leave space for 6 shadowmaps
 
-			if ( p_uniforms.boneTexture !== null ) {
+					var textureUnit = 12;
 
-				var textureUnit = 12; // shadowMap texture array starts from 6, 12 should leave space for 6 shadowmaps
-				_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
-				_this.setTexture( object.boneTexture, textureUnit );
+					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
+					_this.setTexture( object.boneTexture, textureUnit );
+
+				}
+
+			} else {
+
+				if ( p_uniforms.boneGlobalMatrices !== null ) {
+
+					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
+
+				}
 
 			}
 
@@ -5665,7 +5676,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"precision " + _precision + " float;",
 
-			( _maxVertexTextures > 0 ) ? "#define VERTEX_TEXTURES" : "",
+			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
 			_this.gammaInput ? "#define GAMMA_INPUT" : "",
 			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
@@ -5683,7 +5694,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
+
 			parameters.skinning ? "#define USE_SKINNING" : "",
+			_supportsBoneTextures ? "#define BONE_TEXTURE" : "",
+
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
 			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
 			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
@@ -5825,11 +5839,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		identifiers = [
 
 			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-			//'boneGlobalMatrices',
-			'boneTexture',
 			'morphTargetInfluences'
 
 		];
+
+		if ( _supportsBoneTextures ) {
+
+			identifiers.push( 'boneTexture' );
+
+		} else {
+
+			identifiers.push( 'boneGlobalMatrices' );
+
+		}
 
 		for ( u in uniforms ) {
 
@@ -6364,42 +6386,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateBones ( object ) {
 
-		// default for when object is not specified
-		// ( for example when prebuilding shader
-		//   to be used with multiple objects )
-		//
-		// 	- leave some extra space for other uniforms
-		//  - limit here is ANGLE's 254 max uniform vectors
-		//    (up to 54 should be safe)
+		if ( _supportsBoneTextures ) {
 
-		/*
-		var nVertexUniforms = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );
-		var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
+			return 1024;
 
-		var maxBones = nVertexMatrices;
+		} else {
 
-		if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
+			// default for when object is not specified
+			// ( for example when prebuilding shader
+			//   to be used with multiple objects )
+			//
+			// 	- leave some extra space for other uniforms
+			//  - limit here is ANGLE's 254 max uniform vectors
+			//    (up to 54 should be safe)
 
-			maxBones = Math.min( object.bones.length, maxBones );
+			var nVertexUniforms = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );
+			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
-			if ( maxBones < object.bones.length ) {
+			var maxBones = nVertexMatrices;
 
-				console.warn( "WebGLRenderer: too many bones - " + object.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
+			if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
+
+				maxBones = Math.min( object.bones.length, maxBones );
+
+				if ( maxBones < object.bones.length ) {
+
+					console.warn( "WebGLRenderer: too many bones - " + object.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
+
+				}
 
 			}
 
-		}
-		*/
-
-		var maxBones = 0;
-
-		if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
-
-			maxBones = object.bones.length;
+			return maxBones;
 
 		}
-
-		return maxBones;
 
 	};
 
