@@ -957,7 +957,44 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SKINNING",
 
-			"uniform mat4 boneGlobalMatrices[ MAX_BONES ];",
+			//"uniform mat4 boneGlobalMatrices[ MAX_BONES ];",
+			"uniform sampler2D boneTexture;",
+
+			"#define N_SKIN_PIXEL_X 64.0",
+			"#define N_SKIN_PIXEL_Y 64.0",
+
+			"mat4 getBoneMatrix( const in float i ) {",
+
+				"float j = i * 4.0;",
+				"float x = mod( j, N_SKIN_PIXEL_X );",
+				"float y = floor( j / N_SKIN_PIXEL_X );",
+
+				"const float dx = 1.0 / N_SKIN_PIXEL_X;",
+				"const float dy = 1.0 / N_SKIN_PIXEL_Y;",
+
+				"y = dy * ( y + 0.5 );",
+
+				"vec4 v1 = texture2D( boneTexture, vec2( dx * ( x + 0.5 ), y ) );",
+				"vec4 v2 = texture2D( boneTexture, vec2( dx * ( x + 1.5 ), y ) );",
+				"vec4 v3 = texture2D( boneTexture, vec2( dx * ( x + 2.5 ), y ) );",
+				"vec4 v4 = texture2D( boneTexture, vec2( dx * ( x + 3.5 ), y ) );",
+
+				"mat4 bone = mat4( v1, v2, v3, v4 );",
+
+				"return bone;",
+
+			"}",
+
+		"#endif"
+
+	].join("\n"),
+
+	skinbase_vertex: [
+
+		"#ifdef USE_SKINNING",
+
+			"mat4 boneMatX = getBoneMatrix( skinIndex.x );",
+			"mat4 boneMatY = getBoneMatrix( skinIndex.y );",
 
 		"#endif"
 
@@ -967,8 +1004,11 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SKINNING",
 
-			"vec4 skinned  = ( boneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
-			"skinned 	  += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
+			"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
+			"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+
+			//"vec4 skinned  = ( boneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;",
+			//"skinned 	  += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;",
 
 			"gl_Position  = projectionMatrix * modelViewMatrix * skinned;",
 
@@ -1062,8 +1102,13 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SKINNING",
 
+			/*
 			"mat4 skinMatrix = skinWeight.x * boneGlobalMatrices[ int( skinIndex.x ) ];",
 			"skinMatrix 	+= skinWeight.y * boneGlobalMatrices[ int( skinIndex.y ) ];",
+			*/
+
+			"mat4 skinMatrix = skinWeight.x * boneMatX;",
+			"skinMatrix 	+= skinWeight.y * boneMatY;",
 
 			"vec4 skinnedNormal = skinMatrix * vec4( transformedNormal, 0.0 );",
 			"transformedNormal = skinnedNormal.xyz;",
@@ -1591,6 +1636,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "lightmap_vertex" ],
 				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
+				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
@@ -1679,6 +1725,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
+				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 
 				"#ifndef USE_ENVMAP",
@@ -1805,6 +1852,7 @@ THREE.ShaderLib = {
 				"vViewPosition = -mvPosition.xyz;",
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
+				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 
 				"vNormal = transformedNormal;",
@@ -1945,6 +1993,7 @@ THREE.ShaderLib = {
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
+				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],

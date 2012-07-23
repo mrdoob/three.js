@@ -4794,9 +4794,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
+			/*
 			if ( p_uniforms.boneGlobalMatrices !== null ) {
 
 				_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
+
+			}
+			*/
+
+			if ( p_uniforms.boneTexture !== null ) {
+
+				var textureUnit = 12; // shadowMap texture array starts from 6, 12 should leave space for 6 shadowmaps
+				_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
+				_this.setTexture( object.boneTexture, textureUnit );
 
 			}
 
@@ -5815,7 +5825,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		identifiers = [
 
 			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
-			'boneGlobalMatrices', 'morphTargetInfluences'
+			//'boneGlobalMatrices',
+			'boneTexture',
+			'morphTargetInfluences'
 
 		];
 
@@ -6360,6 +6372,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		//  - limit here is ANGLE's 254 max uniform vectors
 		//    (up to 54 should be safe)
 
+		/*
 		var nVertexUniforms = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );
 		var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
@@ -6374,6 +6387,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 				console.warn( "WebGLRenderer: too many bones - " + object.bones.length + ", this GPU supports just " + maxBones + " (try OpenGL instead of ANGLE)" );
 
 			}
+
+		}
+		*/
+
+		var maxBones = 0;
+
+		if ( object !== undefined && object instanceof THREE.SkinnedMesh ) {
+
+			maxBones = object.bones.length;
 
 		}
 

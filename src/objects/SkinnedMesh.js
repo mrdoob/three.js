@@ -62,7 +62,14 @@ THREE.SkinnedMesh = function ( geometry, material ) {
 
 		}
 
-		this.boneMatrices = new Float32Array( 16 * this.bones.length );
+		//this.boneMatrices = new Float32Array( 16 * this.bones.length );
+
+		this.boneMatrices = new Float32Array( 64 * 64 * 4 ); // max 1024 bones
+		this.boneTexture = new THREE.DataTexture( this.boneMatrices, 64, 64, THREE.RGBAFormat, THREE.FloatType );
+		this.boneTexture.minFilter = THREE.NearestFilter;
+		this.boneTexture.magFilter = THREE.NearestFilter;
+		this.boneTexture.generateMipmaps = false;
+		this.boneTexture.flipY = false;
 
 		this.pose();
 
@@ -139,6 +146,8 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 		ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
 
 	}
+
+	this.boneTexture.needsUpdate = true;
 
 };
 
