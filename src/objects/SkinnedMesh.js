@@ -68,14 +68,30 @@ THREE.SkinnedMesh = function ( geometry, material ) {
 
 		//
 
+		var nBones = this.bones.length;
+
 		if ( this.useVertexTexture ) {
 
 			// layout (1 matrix = 4 pixels)
 			//	RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-			//  with 64x64 pixel texture max 1024 bones (64 * 64 / 4)
+			//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
+			//  	 16x16 pixel texture max   64 bones (16 * 16 / 4)
+			//  	 32x32 pixel texture max  256 bones (32 * 32 / 4)
+			//  	 64x64 pixel texture max 1024 bones (64 * 64 / 4)
 
-			this.boneTextureWidth = 64;
-			this.boneTextureHeight = 64;
+			var size;
+
+			if ( nBones > 256 )
+				size = 64;
+			else if ( nBones > 64 )
+				size = 32;
+			else if ( nBones > 16 )
+				size = 16;
+			else
+				size = 8;
+
+			this.boneTextureWidth = size;
+			this.boneTextureHeight = size;
 
 			this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
 			this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
@@ -86,7 +102,7 @@ THREE.SkinnedMesh = function ( geometry, material ) {
 
 		} else {
 
-			this.boneMatrices = new Float32Array( 16 * this.bones.length );
+			this.boneMatrices = new Float32Array( 16 * nBones );
 
 		}
 

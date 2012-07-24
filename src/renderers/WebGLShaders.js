@@ -961,17 +961,14 @@ THREE.ShaderChunk = {
 
 				"uniform sampler2D boneTexture;",
 
-				"#define N_SKIN_PIXEL_X 64.0",
-				"#define N_SKIN_PIXEL_Y 64.0",
-
 				"mat4 getBoneMatrix( const in float i ) {",
 
 					"float j = i * 4.0;",
-					"float x = mod( j, N_SKIN_PIXEL_X );",
-					"float y = floor( j / N_SKIN_PIXEL_X );",
+					"float x = mod( j, N_BONE_PIXEL_X );",
+					"float y = floor( j / N_BONE_PIXEL_X );",
 
-					"const float dx = 1.0 / N_SKIN_PIXEL_X;",
-					"const float dy = 1.0 / N_SKIN_PIXEL_Y;",
+					"const float dx = 1.0 / N_BONE_PIXEL_X;",
+					"const float dy = 1.0 / N_BONE_PIXEL_Y;",
 
 					"y = dy * ( y + 0.5 );",
 
