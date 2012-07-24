@@ -5075,6 +5075,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform1iv( location, value );
 
+			} else if ( type === "iv" ) { // flat array of integers with 3 x N size (JS or typed array)
+
+				_gl.uniform3iv( location, value );
+
 			} else if ( type === "fv1" ) { // flat array of floats (JS or typed array)
 
 				_gl.uniform1fv( location, value );
