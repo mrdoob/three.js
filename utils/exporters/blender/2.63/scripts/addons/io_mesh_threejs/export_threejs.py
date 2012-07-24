@@ -819,7 +819,10 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
     frame_length = end_frame - start_frame
 
-    TEMPLATE_KEYFRAME = '{"time":%g,"pos":[%g,%g,%g],"rot":[%g,%g,%g,%g],"scl":[1,1,1]}'
+    TEMPLATE_KEYFRAME_FULL  = '{"time":%g,"pos":[%g,%g,%g],"rot":[%g,%g,%g,%g],"scl":[1,1,1]}'
+    TEMPLATE_KEYFRAME       = '{"time":%g,"pos":[%g,%g,%g],"rot":[%g,%g,%g,%g]}'
+    TEMPLATE_KEYFRAME_POS   = '{"time":%g,"pos":[%g,%g,%g]}'
+    TEMPLATE_KEYFRAME_ROT   = '{"time":%g,"rot":[%g,%g,%g,%g]}'
 
     for hierarchy in armature.bones:
 
@@ -830,52 +833,43 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
             pos, pchange = position(hierarchy, frame * option_frame_step)
             rot, rchange = rotation(hierarchy, frame * option_frame_step)
 
-            # START-FRAME: Need pos, rot and scl attributes
+            if flipyz:
+                px, py, pz = pos.x, pos.z, -pos.y
+                rx, ry, rz, rw = rot.x, rot.z, -rot.y, rot.w
+            else:
+                px, py, pz = pos.x, pos.y, pos.z
+                rx, ry, rz, rw = rot.x, rot.y, rot.z, rot.w
+
+            # START-FRAME: needs pos, rot and scl attributes (required frame)
 
             if frame == int(start_frame):
 
                 time = (frame * option_frame_step - start_frame) / fps
-
-                if flipyz:
-                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.z, -pos.y, rot.x, rot.z, -rot.y, rot.w)
-                else:
-                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w)
-
+                keyframe = TEMPLATE_KEYFRAME_FULL % (time, px, py, pz, rx, ry, rz, rw)
                 keys.append(keyframe)
 
-            # END-FRAME: Need pos, rot and scl attributes with animation length - 'must-have' frame
+            # END-FRAME: needs pos, rot and scl attributes with animation length (required frame)
 
             elif frame == int(end_frame / option_frame_step):
 
                 time = frame_length / fps
-
-                if flipyz:
-                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.z, -pos.y, rot.x, rot.z, -rot.y, rot.w)
-                else:
-                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w)
-
+                keyframe = TEMPLATE_KEYFRAME_FULL % (time, px, py, pz, rx, ry, rz, rw)
                 keys.append(keyframe)
 
-            # MIDDLE-FRAME: Need only one of the attributes - can be an empty frame
+            # MIDDLE-FRAME: needs only one of the attributes, can be an empty frame (optional frame)
 
             elif pchange == True or rchange == True:
 
                 time = (frame * option_frame_step - start_frame) / fps
-                keyframe = '{"time":%g' % time
 
-                if flipyz:
-                    if pchange == True:
-                        keyframe += ',"pos":[%g,%g,%g]' % (pos.x, pos.z, -pos.y)
-                    if rchange == True:
-                        keyframe += ',"rot":[%g,%g,%g,%g]' % (rot.x, rot.z, -rot.y, rot.w)
+                if pchange == True and rchange == True:
+                    keyframe = TEMPLATE_KEYFRAME % (time, px, py, pz, rx, ry, rz, rw)
+                elif pchange == True:
+                    keyframe = TEMPLATE_KEYFRAME_POS % (time, px, py, pz)
+                elif rchange == True:
+                    keyframe = TEMPLATE_KEYFRAME_ROT % (time, rx, ry, rz, rw)
 
-                else:
-                    if pchange == True:
-                        keyframe += ',"pos":[%g,%g,%g]' % (pos.x, pos.y, pos.z)
-                    if rchange == True:
-                        keyframe += ',"rot":[%g,%g,%g,%g]' % (rot.x, rot.y, rot.z, rot.w)
-
-                keys.append(keyframe + '}')
+                keys.append(keyframe)
 
         keys_string = ",".join(keys)
         parent = '{"parent":%d,"keys":[%s]}' % (parent_index, keys_string)
