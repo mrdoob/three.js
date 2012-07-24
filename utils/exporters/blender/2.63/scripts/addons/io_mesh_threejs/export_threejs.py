@@ -718,15 +718,16 @@ def generate_bones(option_bones, flipyz):
 
 
 # ##############################################################################
-# Model exporter - skin indices
+# Model exporter - skin indices and weights
 # ##############################################################################
 
-def generate_indices(meshes, option_skinning):
+def generate_indices_and_weights(meshes, option_skinning):
 
     if not option_skinning:
         return ""
 
     indices = []
+    weights = []
 
     armature = bpy.data.armatures[0]
 
@@ -743,55 +744,50 @@ def generate_indices(meshes, option_skinning):
             i += 1
 
         if mesh_index == -1:
-            print("generate_indices: couldn't find mesh", mesh.name)
+            print("generate_indices: couldn't find object for mesh", mesh.name)
             continue
 
         object = bpy.data.objects[mesh_index]
 
         for vertex in mesh.vertices:
 
-            for vgroup in range(MAX_INFLUENCES):
+            # sort bones by influence
 
-                if vgroup < len(vertex.groups):
+            bone_array = []
 
-                    group_index = vertex.groups[vgroup].group
+            for group in vertex.groups:
+                index = group.group
+                weight = group.weight
 
-                    index = 0
+                bone_array.append( (index, weight) )
 
-                    for bone in armature.bones:
-                        if object.vertex_groups[group_index].name == bone.name:
-                            indices.append('%d' % index)
+            bone_array.sort(key = operator.itemgetter(1), reverse=True)
 
-                        index += 1
+            # select first N bones
+
+            for i in range(MAX_INFLUENCES):
+
+                if i < len(bone_array):
+                    bone_proxy = bone_array[i]
+
+                    index = bone_proxy[0]
+                    weight = bone_proxy[1]
+
+                    for j, bone in enumerate(armature.bones):
+                        if object.vertex_groups[index].name == bone.name:
+                            indices.append('%d' % j)
+                            weights.append('%g' % weight)
+                            break
+
                 else:
                     indices.append('0')
+                    weights.append('0')
+
 
     indices_string = ",".join(indices)
-
-    return indices_string
-
-
-# ##############################################################################
-# Model exporter - skin weights
-# ##############################################################################
-
-def generate_weights(vertices, option_skinning):
-
-    if not option_skinning:
-        return ""
-
-    weights = []
-
-    for vertex in vertices:
-        for vgroup in range(MAX_INFLUENCES):
-            if vgroup < len(vertex.groups):
-                weights.append('%g' % (vertex.groups[vgroup].weight))
-            else:
-                weights.append('0')
-
     weights_string = ",".join(weights)
 
-    return weights_string
+    return indices_string, weights_string
 
 
 # ##############################################################################
@@ -1281,6 +1277,7 @@ def generate_ascii_model(meshes, morphs,
     faces_string, nfaces = generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces)
 
     bones_string, nbone = generate_bones(option_bones, flipyz)
+    indices_string, weights_string = generate_indices_and_weights(meshes, option_skinning)
 
     materials_string = ",\n\n".join(materials)
 
@@ -1300,8 +1297,8 @@ def generate_ascii_model(meshes, morphs,
     "morphTargets" : morphTargets_string,
 
     "bones"     : bones_string,
-    "indices"   : generate_indices(meshes, option_skinning),
-    "weights"   : generate_weights(vertices, option_skinning),
+    "indices"   : indices_string,
+    "weights"   : weights_string,
     "animation" : generate_animation(option_animation_skeletal, option_frame_step, flipyz)
     }
 
