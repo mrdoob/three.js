@@ -210,9 +210,9 @@ TEMPLATE_LIGHT_POINT = """\
         "intensity"	 : %(intensity).3f
     }"""
 
-TEMPLATE_VEC4 = '[ %f, %f, %f, %f ]'
-TEMPLATE_VEC3 = '[ %f, %f, %f ]'
-TEMPLATE_VEC2 = '[ %f, %f ]'
+TEMPLATE_VEC4 = '[ %g, %g, %g, %g ]'
+TEMPLATE_VEC3 = '[ %g, %g, %g ]'
+TEMPLATE_VEC2 = '[ %g, %g ]'
 TEMPLATE_STRING = '"%s"'
 TEMPLATE_HEX = "0x%06x"
 
@@ -268,11 +268,11 @@ TEMPLATE_MODEL_ASCII = """\
     "animation" : {%(animation)s}
 """
 
-TEMPLATE_VERTEX = "%f,%f,%f"
+TEMPLATE_VERTEX = "%g,%g,%g"
 TEMPLATE_VERTEX_TRUNCATE = "%d,%d,%d"
 
-TEMPLATE_N = "%f,%f,%f"
-TEMPLATE_UV = "%f,%f"
+TEMPLATE_N = "%g,%g,%g"
+TEMPLATE_UV = "%g,%g"
 TEMPLATE_C = "%d"
 
 # #####################################################
@@ -686,13 +686,15 @@ def generate_bones(option_bones, flipyz):
 
     armature = bpy.data.armatures[0]
 
+    TEMPLATE_BONE = '{"parent":%d,"name":"%s","pos":[%g,%g,%g],"rotq":[0,0,0,1]}'
+
     for bone in armature.bones:
         if bone.parent == None:
             if flipyz:
-                joint = '{"parent":-1,"name":"%s","pos":[%f,%f,%f],"rotq":[0,0,0,1]}' % (bone.name, bone.head.x, bone.head.z, -bone.head.y)
+                joint = TEMPLATE_BONE % (-1, bone.name, bone.head.x, bone.head.z, -bone.head.y)
                 hierarchy.append(joint)
             else:
-                joint = '{"parent":-1,"name":"%s","pos":[%f,%f,%f],"rotq":[0,0,0,1]}' % (bone.name, bone.head.x, bone.head.y, bone.head.z)
+                joint = TEMPLATE_BONE % (-1, bone.name, bone.head.x, bone.head.y, bone.head.z)
                 hierarchy.append(joint)
         else:
             index = i = 0
@@ -704,10 +706,10 @@ def generate_bones(option_bones, flipyz):
             position = bone.head_local - bone.parent.head_local
 
             if flipyz:
-                joint = '{"parent":%d,"name":"%s","pos":[%f,%f,%f],"rotq":[0,0,0,1]}' % (index, bone.name, position.x, position.z, -position.y)
+                joint = TEMPLATE_BONE % (index, bone.name, position.x, position.z, -position.y)
                 hierarchy.append(joint)
             else:
-                joint = '{"parent":%d,"name":"%s","pos":[%f,%f,%f],"rotq":[0,0,0,1]}' % (index, bone.name, position.x, position.y, position.z)
+                joint = TEMPLATE_BONE % (index, bone.name, position.x, position.y, position.z)
                 hierarchy.append(joint)
 
     bones_string = ",".join(hierarchy)
@@ -783,7 +785,7 @@ def generate_weights(vertices, option_skinning):
     for vertex in vertices:
         for vgroup in range(MAX_INFLUENCES):
             if vgroup < len(vertex.groups):
-                weights.append('%f' % (vertex.groups[vgroup].weight))
+                weights.append('%g' % (vertex.groups[vgroup].weight))
             else:
                 weights.append('0')
 
@@ -817,6 +819,8 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
     frame_length = end_frame - start_frame
 
+    TEMPLATE_KEYFRAME = '{"time":%g,"pos":[%g,%g,%g],"rot":[%g,%g,%g,%g],"scl":[1,1,1]}'
+
     for hierarchy in armature.bones:
 
         keys = []
@@ -833,9 +837,9 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
                 time = (frame * option_frame_step - start_frame) / fps
 
                 if flipyz:
-                    keyframe = '{"time":%f,"pos":[%f,%f,%f],"rot":[%f,%f,%f,%f],"scl":[1,1,1]}' % (time, pos.x, pos.z, -pos.y, rot.x, rot.z, -rot.y, rot.w)
+                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.z, -pos.y, rot.x, rot.z, -rot.y, rot.w)
                 else:
-                    keyframe = '{"time":%f,"pos":[%f,%f,%f],"rot":[%f,%f,%f,%f],"scl":[1,1,1]}' % (time, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w)
+                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w)
 
                 keys.append(keyframe)
 
@@ -846,9 +850,9 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
                 time = frame_length / fps
 
                 if flipyz:
-                    keyframe = '{"time":%f,"pos":[%f,%f,%f],"rot":[%f,%f,%f,%f],"scl":[1,1,1]}' % (time, pos.x, pos.z, -pos.y, rot.x, rot.z, -rot.y, rot.w)
+                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.z, -pos.y, rot.x, rot.z, -rot.y, rot.w)
                 else:
-                    keyframe = '{"time":%f,"pos":[%f,%f,%f],"rot":[%f,%f,%f,%f],"scl":[1,1,1]}' % (time, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w)
+                    keyframe = TEMPLATE_KEYFRAME % (time, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z, rot.w)
 
                 keys.append(keyframe)
 
@@ -857,19 +861,19 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
             elif pchange == True or rchange == True:
 
                 time = (frame * option_frame_step - start_frame) / fps
-                keyframe = '{"time":%f' % time
+                keyframe = '{"time":%g' % time
 
                 if flipyz:
                     if pchange == True:
-                        keyframe += ',"pos":[%f,%f,%f]' % (pos.x, pos.z, -pos.y)
+                        keyframe += ',"pos":[%g,%g,%g]' % (pos.x, pos.z, -pos.y)
                     if rchange == True:
-                        keyframe += ',"rot":[%f,%f,%f,%f]' % (rot.x, rot.z, -rot.y, rot.w)
+                        keyframe += ',"rot":[%g,%g,%g,%g]' % (rot.x, rot.z, -rot.y, rot.w)
 
                 else:
                     if pchange == True:
-                        keyframe += ',"pos":[%f,%f,%f]' % (pos.x, pos.y, pos.z)
+                        keyframe += ',"pos":[%g,%g,%g]' % (pos.x, pos.y, pos.z)
                     if rchange == True:
-                        keyframe += ',"rot":[%f,%f,%f,%f]' % (rot.x, rot.y, rot.z, rot.w)
+                        keyframe += ',"rot":[%g,%g,%g,%g]' % (rot.x, rot.y, rot.z, rot.w)
 
                 keys.append(keyframe + '}')
 
@@ -879,7 +883,7 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
         parents.append(parent)
 
     hierarchy_string = ",".join(parents)
-    animation_string = '"name":"%s","fps":%d,"length":%f,"hierarchy":[%s]' % (action.name, fps, (frame_length / fps), hierarchy_string)
+    animation_string = '"name":"%s","fps":%d,"length":%g,"hierarchy":[%s]' % (action.name, fps, (frame_length / fps), hierarchy_string)
 
     return animation_string
 
@@ -1696,7 +1700,7 @@ def generate_textures_scene(data):
             extras = ""
 
             if texture.repeat_x != 1 or texture.repeat_y != 1:
-                extras += ',\n        "repeat": [%f, %f]' % (texture.repeat_x, texture.repeat_y)
+                extras += ',\n        "repeat": [%g, %g]' % (texture.repeat_x, texture.repeat_y)
 
             if texture.extension == "REPEAT":
                 wrap_x = "repeat"
@@ -1882,7 +1886,7 @@ def generate_material_string(material):
         parameters += ', "normalMap": %s' % generate_string(normalMap)
 
     if normalMapFactor != 1.0:
-        parameters += ', "normalMapFactor": %f' % normalMapFactor
+        parameters += ', "normalMapFactor": %g' % normalMapFactor
 
     if material['vertexColors']:
         parameters += ', "vertexColors": "vertex"'
