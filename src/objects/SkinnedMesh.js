@@ -3,13 +3,13 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SkinnedMesh = function ( geometry, material ) {
+THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
 	//
 
-	this.useVertexTexture = true;
+	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
 	// init bones
 

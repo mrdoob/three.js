@@ -4526,6 +4526,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			skinning: material.skinning,
 			maxBones: maxBones,
+			useVertexTexture: _supportsBoneTextures && object.useVertexTexture,
 			boneTextureWidth: object.boneTextureWidth,
 			boneTextureHeight: object.boneTextureHeight,
 
@@ -4799,7 +4800,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.skinning ) {
 
-			if ( _supportsBoneTextures ) {
+			if ( _supportsBoneTextures && object.useVertexTexture ) {
 
 				if ( p_uniforms.boneTexture !== null ) {
 
@@ -5698,7 +5699,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.skinning ? "#define USE_SKINNING" : "",
-			_supportsBoneTextures ? "#define BONE_TEXTURE" : "",
+			parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
 			parameters.boneTextureWidth ? "#define N_BONE_PIXEL_X " + parameters.boneTextureWidth.toFixed( 1 ) : "",
 			parameters.boneTextureHeight ? "#define N_BONE_PIXEL_Y " + parameters.boneTextureHeight.toFixed( 1 ) : "",
 
@@ -5847,7 +5848,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		];
 
-		if ( _supportsBoneTextures ) {
+		if ( parameters.useVertexTexture ) {
 
 			identifiers.push( 'boneTexture' );
 
@@ -6390,7 +6391,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function allocateBones ( object ) {
 
-		if ( _supportsBoneTextures ) {
+		if ( _supportsBoneTextures && object.useVertexTexture ) {
 
 			return 1024;
 
