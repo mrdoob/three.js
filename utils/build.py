@@ -23,6 +23,18 @@ def merge(files):
 	return "".join(buffer)
 
 
+def amdModule(text):
+
+	buffer = []
+	files = ['amd_intro.js','amd_outro.js']
+
+	for filename in files:
+		with open(os.path.join('amd', filename), 'r') as f:
+			buffer.append(f.read())
+
+	return buffer[0] + text + buffer[1]
+
+
 def output(text, filename):
 
 	with open(os.path.join('..', 'build', filename), 'w') as f:
@@ -69,9 +81,13 @@ def makeDebug(text):
 	return text
 
 
-def buildLib(files, debug, minified, filename, fname_externs):
+def buildLib(files, debug, minified, amd, filename, fname_externs):
 
 	text = merge(files)
+
+	if amd:
+		text = amdModule(text)
+		fname_externs = 'externs_amd'
 
 	if debug:
 		text = makeDebug(text)
@@ -121,6 +137,7 @@ def parse_args():
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_argument('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
+		parser.add_argument('--module', help='Encapsulate in an AMD formatted module', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
 
 		args = parser.parse_args()
@@ -134,6 +151,7 @@ def parse_args():
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
 		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_option('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
+		parser.add_option('--module', help='Encapsulate in an AMD formatted module', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
 
 		args, remainder = parser.parse_args()
@@ -151,6 +169,7 @@ def main(argv=None):
 	args = parse_args()
 	debug = args.debug
 	minified = args.minified
+	amd = args.amd
 	files = getFileNames()
 
 	config = [
@@ -162,7 +181,7 @@ def main(argv=None):
 
 	for fname_lib, fname_inc, fname_externs, files, enabled in config:
 		if enabled or args.all:
-			buildLib(files, debug, minified, fname_lib, fname_externs)
+			buildLib(files, debug, minified, amd, fname_lib, fname_externs)
 			if args.includes:
 				buildIncludes(files, fname_inc)
 
