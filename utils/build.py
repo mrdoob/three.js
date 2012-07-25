@@ -93,6 +93,7 @@ EXTRAS_FILES = [
 'extras/ImageUtils.js',
 'extras/SceneUtils.js',
 'extras/ShaderUtils.js',
+'extras/KeyboardUtils.js',
 'extras/core/BufferGeometry.js',
 'extras/core/Curve.js',
 'extras/core/CurvePath.js',
