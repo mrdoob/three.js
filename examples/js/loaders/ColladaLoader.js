@@ -41,10 +41,10 @@ THREE.ColladaLoader = function () {
 		subdivideFaces: true,
 
 		upAxis: 'Y',
-		
+
 		// For reflective or refractive materials we'll use this cubemap
 		defaultEnvMap: null
-		
+
 	};
 
 	// TODO: support unit conversion as well
@@ -772,13 +772,13 @@ THREE.ColladaLoader = function () {
 
 				}
 
-				if ( skinController !== undefined) {
+				if ( skinController !== undefined ) {
 
 					applySkin( geom, skinController );
 
 					material.morphTargets = true;
 
-					mesh = new THREE.SkinnedMesh( geom, material );
+					mesh = new THREE.SkinnedMesh( geom, material, false );
 					mesh.skeleton = skinController.skeleton;
 					mesh.skinController = controllers[ skinController.url ];
 					mesh.skinInstanceController = skinController;
@@ -2007,7 +2007,7 @@ THREE.ColladaLoader = function () {
 
 					var propName = 'n' + ( member[ 0 ] + 1 ) + ( member[ 1 ] + 1 );
 					this.obj[ propName ] = data;
-					
+
 				} else {
 
 					console.log('Incorrect addressing of matrix in transform.');
@@ -2324,14 +2324,14 @@ THREE.ColladaLoader = function () {
 
 		this.geometry3js.computeCentroids();
 		this.geometry3js.computeFaceNormals();
-		
+
 		if ( this.geometry3js.calcNormals ) {
-			
+
 			this.geometry3js.computeVertexNormals();
 			delete this.geometry3js.calcNormals;
-			
+
 		}
-		
+
 		this.geometry3js.computeBoundingBox();
 
 		return this;
@@ -2425,7 +2425,7 @@ THREE.ColladaLoader = function () {
 								break;
 
 							default:
-							
+
 								break;
 
 						}
@@ -3126,13 +3126,13 @@ THREE.ColladaLoader = function () {
 				case 'shininess':
 					props[ prop ] = this[ prop ];
 					break;
-					
+
 				case 'reflectivity':
 					props[ prop ] = this[ prop ];
 					if(props[ prop ] > 0.0) props['envMap'] = options.defaultEnvMap;
 					props['combine'] = THREE.MixOperation;	//mix regular shading with reflective component
 					break;
-					
+
 				case 'index_of_refraction':
 					props[ 'refractionRatio' ] = this[ prop ]; //TODO: "index_of_refraction" becomes "refractionRatio" in shader, but I'm not sure if the two are actually comparable
 					if(this[ prop ] != 1.0) props['envMap'] = options.defaultEnvMap;
@@ -3984,11 +3984,11 @@ THREE.ColladaLoader = function () {
 					}
 
 				}
-				
+
 			}
 
 		}
-		
+
 		return this;
 
 	};
@@ -4351,7 +4351,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		return index;
-		
+
 	};
 
 	function getConvertedMember( member ) {
