@@ -170,6 +170,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _gl;
 	var _glExtensionTextureFloat;
+	var _glExtensionTextureFilterAnisotropic;
 
 	initGL();
 
@@ -182,6 +183,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
 	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
 	_maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
+
+	var _maxAnisotropy = _glExtensionTextureFilterAnisotropic ? _gl.getParameter( _glExtensionTextureFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT ) : 0;
 
 	var _supportsVertexTextures = ( _maxVertexTextures > 0 );
 	var _supportsBoneTextures = _supportsVertexTextures && _glExtensionTextureFloat;
@@ -197,6 +200,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.supportsVertexTextures = function () {
 
 		return _supportsVertexTextures;
+
+	};
+
+	this.getMaxAnisotropy  = function () {
+
+		return _maxAnisotropy;
 
 	};
 
@@ -5999,6 +6008,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( _glExtensionTextureFilterAnisotropic ) {
+
+			_gl.texParameterf( textureType, _glExtensionTextureFilterAnisotropic.TEXTURE_MAX_ANISOTROPY_EXT, texture.anisotropy );
+
+		}
+
 	};
 
 	this.setTexture = function ( texture, slot ) {
@@ -6514,6 +6529,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( ! _glExtensionTextureFloat ) {
 
 			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
+
+		}
+
+		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) ||
+											   _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) ||
+											   _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+
+		if ( ! _glExtensionTextureFilterAnisotropic ) {
+
+			console.log( 'THREE.WebGLRenderer: Anisotropic texture filtering not supported.' );
+
+		} else {
+
+
 
 		}
 
