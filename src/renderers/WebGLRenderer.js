@@ -169,7 +169,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// initialize
 
 	var _gl;
+
 	var _glExtensionTextureFloat;
+	var _glExtensionStandardDerivatives;
 	var _glExtensionTextureFilterAnisotropic;
 
 	initGL();
@@ -6525,6 +6527,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		_glExtensionTextureFloat = _gl.getExtension( 'OES_texture_float' );
+		_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
+
+		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) ||
+											   _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) ||
+											   _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+
 
 		if ( ! _glExtensionTextureFloat ) {
 
@@ -6532,17 +6540,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) ||
-											   _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) ||
-											   _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+		if ( ! _glExtensionStandardDerivatives ) {
+
+			console.log( 'THREE.WebGLRenderer: Standard derivatives not supported.' );
+
+		}
 
 		if ( ! _glExtensionTextureFilterAnisotropic ) {
 
 			console.log( 'THREE.WebGLRenderer: Anisotropic texture filtering not supported.' );
-
-		} else {
-
-
 
 		}
 
