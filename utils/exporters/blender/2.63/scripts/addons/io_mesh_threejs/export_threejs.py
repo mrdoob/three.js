@@ -723,8 +723,8 @@ def generate_bones(option_bones, flipyz):
 
 def generate_indices_and_weights(meshes, option_skinning):
 
-    if not option_skinning:
-        return ""
+    if not option_skinning or len(bpy.data.armatures) == 0:
+        return "", ""
 
     indices = []
     weights = []
