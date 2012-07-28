@@ -665,7 +665,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			setOpacity( material.opacity );
 			setBlending( material.blending );
 
-			if ( material.map !== null || material.envMap !== null ) {
+			if ( ( material.map !== undefined && material.map !== null ) || ( material.envMap !== undefined && material.envMap !== null ) ) {
 
 				// Let renderFace3() handle this
 
