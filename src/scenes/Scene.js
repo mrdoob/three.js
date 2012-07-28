@@ -31,6 +31,12 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 		}
 
+		if ( object.target && object.target.parent === undefined ) {
+
+			this.add( object.target );
+
+		}
+
 	} else if ( !( object instanceof THREE.Camera || object instanceof THREE.Bone ) ) {
 
 		if ( this.__objects.indexOf( object ) === - 1 ) {
