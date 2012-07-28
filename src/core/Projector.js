@@ -67,7 +67,7 @@ THREE.Projector = function() {
 
 	};
 
-	this.projectGraph = function ( root, sort ) {
+	function projectGraph( root, sort ) {
 
 		_objectCount = 0;
 
@@ -155,7 +155,7 @@ THREE.Projector = function() {
 
 		_frustum.setFromMatrix( _projScreenMatrix );
 
-		_renderData = this.projectGraph( scene, false );
+		_renderData = projectGraph( scene, false );
 
 		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
 
