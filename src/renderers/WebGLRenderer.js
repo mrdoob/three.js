@@ -231,6 +231,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
 	};
+	
+	//reset the viewport to the current canvas size
+	this.resetViewport = function () {
+		this.setViewport( 0, 0, _canvas.width, _canvas.height );
+	}
 
 	this.setScissor = function ( x, y, width, height ) {
 
