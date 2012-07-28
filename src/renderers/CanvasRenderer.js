@@ -547,15 +547,15 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 						_vector3.copy( element.vertexNormalsWorld[ uv1 ] );
 						_uv1x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
-						_uv1y = - ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
+						_uv1y = ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
 
 						_vector3.copy( element.vertexNormalsWorld[ uv2 ] );
 						_uv2x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
-						_uv2y = - ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
+						_uv2y = ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
 
 						_vector3.copy( element.vertexNormalsWorld[ uv3 ] );
 						_uv3x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
-						_uv3y = - ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
+						_uv3y = ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
 
 						patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
@@ -859,13 +859,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 			height = texture.image.height * texture.repeat.y;
 
 			u0 = ( u0 + offsetX ) * width;
-			v0 = ( v0 + offsetY ) * height;
+			v0 = ( 1.0 - v0 + offsetY ) * height;
 
 			u1 = ( u1 + offsetX ) * width;
-			v1 = ( v1 + offsetY ) * height;
+			v1 = ( 1.0 - v1 + offsetY ) * height;
 
 			u2 = ( u2 + offsetX ) * width;
-			v2 = ( v2 + offsetY ) * height;
+			v2 = ( 1.0 - v2 + offsetY ) * height;
 
 			x1 -= x0; y1 -= y0;
 			x2 -= x0; y2 -= y0;
