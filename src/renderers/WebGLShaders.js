@@ -1808,7 +1808,7 @@ THREE.UniformsLib = {
 
 	normalmap: {
 
-		"normalMap" : { type: "t", value: 4, texture: null },
+		"normalMap" : { type: "t", value: null },
 		"normalScale" : { type: "f", value: 1 }
 	},
 

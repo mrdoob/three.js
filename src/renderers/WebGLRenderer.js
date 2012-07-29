@@ -4944,7 +4944,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 		if ( material.normalMap ) {
 
-			uniforms.normalMap.texture = material.normalMap;
+			uniforms.normalMap.value = material.normalMap;
 			uniforms.normalScale.value = material.normalScale;
 		}
 
