@@ -59,7 +59,7 @@
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( 'models/collada/monster/monster.dae', function colladaReady( collada ) {
+			loader.load( 'models/collada/monster/monster.dae', function ( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
