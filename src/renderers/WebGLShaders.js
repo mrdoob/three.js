@@ -1096,12 +1096,6 @@ THREE.ShaderChunk = {
 
 			"morphedNormal += normal;",
 
-			"vec3 transformedNormal = normalMatrix * morphedNormal;",
-
-		"#else",
-
-			"vec3 transformedNormal = normalMatrix * normal;",
-
 		"#endif"
 
 	].join("\n"),
@@ -1113,10 +1107,37 @@ THREE.ShaderChunk = {
 			"mat4 skinMatrix = skinWeight.x * boneMatX;",
 			"skinMatrix 	+= skinWeight.y * boneMatY;",
 
-			"vec4 skinnedNormal = skinMatrix * vec4( transformedNormal, 0.0 );",
-			"transformedNormal = skinnedNormal.xyz;",
+			"vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );",
 
 		"#endif"
+
+	].join("\n"),
+
+	defaultnormal_vertex: [
+
+		"vec3 transformedNormal;",
+
+		"#ifdef USE_SKINNING",
+
+			"transformedNormal = skinnedNormal.xyz;",
+
+		"#endif",
+
+		"#ifdef USE_MORPHNORMALS",
+
+			"transformedNormal = morphedNormal;",
+
+		"#endif",
+
+		"#ifndef USE_MORPHNORMALS",
+		"#ifndef USE_SKINNING",
+
+			"transformedNormal = normal;",
+
+		"#endif",
+		"#endif",
+
+		"transformedNormal = normalMatrix * transformedNormal;",
 
 	].join("\n"),
 
@@ -1730,6 +1751,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
+				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 				"#ifndef USE_ENVMAP",
 
@@ -1857,6 +1879,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
+				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 				"vNormal = transformedNormal;",
 
