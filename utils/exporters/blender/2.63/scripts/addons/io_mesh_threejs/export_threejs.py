@@ -731,7 +731,7 @@ def generate_indices_and_weights(meshes, option_skinning):
 
     armature = bpy.data.armatures[0]
 
-    for mesh, dummy in meshes:
+    for mesh, object in meshes:
 
         i = 0
         mesh_index = -1
@@ -739,7 +739,7 @@ def generate_indices_and_weights(meshes, option_skinning):
         # find the original object
 
         for obj in bpy.data.objects:
-            if obj.name == mesh.name:
+            if obj.name == mesh.name or obj == object:
                 mesh_index = i
             i += 1
 
