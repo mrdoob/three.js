@@ -173,28 +173,37 @@ THREE.ShaderUtils = {
 				"uniform vec3 ambientLightColor;",
 
 				"#if MAX_DIR_LIGHTS > 0",
+
 					"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
 					"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+
 				"#endif",
 
 				"#if MAX_POINT_LIGHTS > 0",
+
 					"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
-					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
+					"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
+					"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+
 				"#endif",
 
 				"#if MAX_SPOT_LIGHTS > 0",
+
 					"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
 					"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 					"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
 					"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
 					"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 
-					"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
 					"varying vec3 vWorldPosition;",
+
 				"#endif",
 
 				"#ifdef WRAP_AROUND",
+
 					"uniform vec3 wrapRGB;",
+
 				"#endif",
 
 				"varying vec3 vViewPosition;",
@@ -264,8 +273,14 @@ THREE.ShaderUtils = {
 
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-							"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-							"float pointDistance = vPointLight[ i ].w;",
+							"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
+							"vec3 pointVector = lPosition.xyz + vViewPosition.xyz;",
+
+							"float pointDistance = 1.0;",
+							"if ( pointLightDistance[ i ] > 0.0 )",
+								"pointDistance = 1.0 - min( ( length( pointVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+							"pointVector = normalize( pointVector );",
 
 							// diffuse
 
@@ -318,8 +333,14 @@ THREE.ShaderUtils = {
 
 						"for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
 
-							"vec3 spotVector = normalize( vSpotLight[ i ].xyz );",
-							"float spotDistance = vSpotLight[ i ].w;",
+							"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
+							"vec3 spotVector = lPosition.xyz + vViewPosition.xyz;",
+
+							"float spotDistance = 1.0;",
+							"if ( spotLightDistance[ i ] > 0.0 )",
+								"spotDistance = 1.0 - min( ( length( spotVector ) / spotLightDistance[ i ] ), 1.0 );",
+
+							"spotVector = normalize( spotVector );",
 
 							"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
 
@@ -498,21 +519,7 @@ THREE.ShaderUtils = {
 				"varying vec3 vNormal;",
 				"varying vec2 vUv;",
 
-				"#if MAX_POINT_LIGHTS > 0",
-
-					"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
-					"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-
-					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
-
-				"#endif",
-
 				"#if MAX_SPOT_LIGHTS > 0",
-
-					"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
-					"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
-
-					"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
 
 					"varying vec3 vWorldPosition;",
 
@@ -536,46 +543,12 @@ THREE.ShaderUtils = {
 
 					"vUv = uv * uRepeat + uOffset;",
 
-					// point lights
-
-					"#if MAX_POINT_LIGHTS > 0",
-
-						"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
-
-							"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-							"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-							"float lDistance = 1.0;",
-							"if ( pointLightDistance[ i ] > 0.0 )",
-								"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
-
-							"lVector = normalize( lVector );",
-
-							"vPointLight[ i ] = vec4( lVector, lDistance );",
-
-						"}",
-
-					"#endif",
-
 					// spot lights
 
 					"#if MAX_SPOT_LIGHTS > 0",
 
-						"for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
-
-							"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
-							"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-							"float lDistance = 1.0;",
-							"if ( spotLightDistance[ i ] > 0.0 )",
-								"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
-
-							"vSpotLight[ i ] = vec4( lVector, lDistance );",
-
-						"}",
-
-						"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
-						"vWorldPosition = mPosition.xyz;",
+						"vec4 wPosition = objectMatrix * vec4( position, 1.0 );",
+						"vWorldPosition = wPosition.xyz;",
 
 					"#endif",
 
