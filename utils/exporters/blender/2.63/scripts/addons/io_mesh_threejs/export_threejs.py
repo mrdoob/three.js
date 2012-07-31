@@ -877,40 +877,56 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
     return animation_string
 
+def handle_position_channel(channel, frame, position):
+
+    change = False
+
+    if channel.array_index in [0, 1, 2]:
+        for keyframe in channel.keyframe_points:
+            if keyframe.co[0] == frame:
+                change = True
+
+        value = channel.evaluate(frame)
+
+        if channel.array_index == 0:
+            position.x = value
+
+        if channel.array_index == 1:
+            position.y = value
+
+        if channel.array_index == 2:
+            position.z = value
+
+    return change
+
 def position(bone, frame):
 
-    index = 0
+    position = mathutils.Vector((0,0,0))
     change = False
 
     action = bpy.data.actions[0]
+    ngroups = len(action.groups)
 
-    for i in range(len(action.groups)):
-        if action.groups[i].name == bone.name:
-            index = i
+    if ngroups > 0:
 
-    position = mathutils.Vector((0,0,0))
+        index = 0
 
-    for channel in action.groups[index].channels:
+        for i in range(ngroups):
+            if action.groups[i].name == bone.name:
+                index = i
 
-        if "location" in channel.data_path:
+        for channel in action.groups[index].channels:
+            if "location" in channel.data_path:
+                hasChanged = handle_position_channel(channel, frame, position)
+                change = change or hasChanged
 
-            if channel.array_index == 0:
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        change = True
-                position.x = channel.evaluate(frame)
+    else:
 
-            if channel.array_index == 1:
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        change = True
-                position.y = channel.evaluate(frame)
-
-            if channel.array_index == 2:
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        change = True
-                position.z = channel.evaluate(frame)
+        for channel in action.fcurves:
+            data_path = channel.data_path
+            if bone.name in data_path and "location" in data_path:
+                hasChanged = handle_position_channel(channel, frame, position)
+                change = change or hasChanged
 
     position = position * bone.matrix_local.inverted()
 
@@ -933,53 +949,70 @@ def position(bone, frame):
 
     return position, change
 
+def handle_rotation_channel(channel, frame, rotation):
+
+    change = False
+
+    if channel.array_index in [0, 1, 2, 3]:
+
+        for keyframe in channel.keyframe_points:
+            if keyframe.co[0] == frame:
+                change = True
+
+        value = channel.evaluate(frame)
+
+        if channel.array_index == 1:
+            rotation.x = value
+
+        elif channel.array_index == 2:
+            rotation.y = value
+
+        elif channel.array_index == 3:
+            rotation.z = value
+
+        elif channel.array_index == 0:
+            rotation.w = value
+
+    return change
+
 def rotation(bone, frame):
 
-    # TODO: Calculate rotation also from rotation_euler channels
+    # TODO: calculate rotation also from rotation_euler channels
 
-    index = 0
+    rotation = mathutils.Vector((0,0,0,1))
+
     change = False
 
     action = bpy.data.actions[0]
+    ngroups = len(action.groups)
 
-    for i in range(len(action.groups)):
-        if action.groups[i].name == bone.name:
-            index = i
+    # animation grouped by bones
 
-    rotation = mathutils.Vector((0,0,0))
-    w = 1
+    if ngroups > 0:
 
-    for channel in action.groups[index].channels:
+        index = 0
 
-        if "quaternion" in channel.data_path:
+        for i in range(ngroups):
+            if action.groups[i].name == bone.name:
+                index = i
 
-            if channel.array_index == 1:
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        change = True
-                rotation.x = channel.evaluate(frame)
+        for channel in action.groups[index].channels:
+            if "quaternion" in channel.data_path:
+                hasChanged = handle_rotation_channel(channel, frame, rotation)
+                change = change or hasChanged
 
-            if channel.array_index == 2:
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        change = True
-                rotation.y = channel.evaluate(frame)
+    # animation in raw fcurves
 
-            if channel.array_index == 3:
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        change = True
-                rotation.z = channel.evaluate(frame)
+    else:
 
-            if channel.array_index == 0:
-                for keyframe in channel.keyframe_points:
-                    if keyframe.co[0] == frame:
-                        change = True
-                w = channel.evaluate(frame)
+        for channel in action.fcurves:
+            data_path = channel.data_path
+            if bone.name in data_path and "quaternion" in data_path:
+                hasChanged = handle_rotation_channel(channel, frame, rotation)
+                change = change or hasChanged
 
-    rotation = rotation * bone.matrix_local.inverted()
-    rotation.resize_4d()
-    rotation.w = w
+    rot3 = rotation.to_3d()
+    rotation.xyz = rot3 * bone.matrix_local.inverted()
 
     return rotation, change
 
