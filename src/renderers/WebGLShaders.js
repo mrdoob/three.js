@@ -1357,25 +1357,27 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SHADOWMAP",
 
+			"vec4 transformedPosition;",
+
+			"#ifdef USE_MORPHTARGETS",
+
+				"transformedPosition = objectMatrix * vec4( morphed, 1.0 );",
+
+			"#else",
+			"#ifdef USE_SKINNING",
+
+				"transformedPosition = objectMatrix * skinned;",
+
+			"#else",
+
+				"transformedPosition = objectMatrix * vec4( position, 1.0 );",
+
+			"#endif",
+			"#endif",
+
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-				"#ifdef USE_MORPHTARGETS",
-
-					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( morphed, 1.0 );",
-
-				"#else",
-
-				"#ifdef USE_SKINNING",
-
-					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * skinned;",
-
-				"#else",
-
-					"vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				"#endif",
+				"vShadowCoord[ i ] = shadowMatrix[ i ] * transformedPosition;",
 
 			"}",
 
