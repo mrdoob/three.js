@@ -41,10 +41,14 @@ THREE.Texture.prototype = {
 
 	clone: function () {
 
-		var clonedTexture = new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter, this.format, this.type );
+		var clonedTexture = new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter, this.format, this.type, this.anisotropy );
 
 		clonedTexture.offset.copy( this.offset );
 		clonedTexture.repeat.copy( this.repeat );
+
+		clonedTexture.generateMipmaps = this.generateMipmaps;
+		clonedTexture.premultiplyAlpha = this.premultiplyAlpha;
+		clonedTexture.flipY = this.flipY;
 
 		return clonedTexture;
 
