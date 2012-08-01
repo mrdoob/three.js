@@ -112,6 +112,7 @@ THREE.ShaderUtils = {
 				"enableDiffuse"	  : { type: "i", value: 0 },
 				"enableSpecular"  : { type: "i", value: 0 },
 				"enableReflection": { type: "i", value: 0 },
+				"enableDisplacement": { type: "i", value: 0 },
 
 				"tDiffuse"	   : { type: "t", value: 0, texture: null },
 				"tCube"		   : { type: "t", value: 1, texture: null },
@@ -196,8 +197,6 @@ THREE.ShaderUtils = {
 					"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 					"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 
-					"varying vec3 vWorldPosition;",
-
 				"#endif",
 
 				"#ifdef WRAP_AROUND",
@@ -206,12 +205,14 @@ THREE.ShaderUtils = {
 
 				"#endif",
 
-				"varying vec3 vViewPosition;",
+				"varying vec3 vWorldPosition;",
 
 				THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 				THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 				"void main() {",
+
+					"vec3 vViewPosition = cameraPosition - vWorldPosition;",
 
 					"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
 
@@ -476,8 +477,7 @@ THREE.ShaderUtils = {
 
 					"if ( enableReflection ) {",
 
-						"vec3 wPos = cameraPosition - vViewPosition;",
-						"vec3 vReflect = reflect( normalize( wPos ), normal );",
+						"vec3 vReflect = reflect( normalize( vWorldPosition ), normal );",
 
 						"vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
 
@@ -506,6 +506,8 @@ THREE.ShaderUtils = {
 				"uniform vec2 uOffset;",
 				"uniform vec2 uRepeat;",
 
+				"uniform bool enableDisplacement;",
+
 				"#ifdef VERTEX_TEXTURES",
 
 					"uniform sampler2D tDisplacement;",
@@ -519,21 +521,11 @@ THREE.ShaderUtils = {
 				"varying vec3 vNormal;",
 				"varying vec2 vUv;",
 
-				"#if MAX_SPOT_LIGHTS > 0",
-
-					"varying vec3 vWorldPosition;",
-
-				"#endif",
-
-				"varying vec3 vViewPosition;",
+				"varying vec3 vWorldPosition;",
 
 				THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 				"void main() {",
-
-					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
-					"vViewPosition = -mvPosition.xyz;",
 
 					// normal, tangent and binormal vectors
 
@@ -543,31 +535,52 @@ THREE.ShaderUtils = {
 
 					"vUv = uv * uRepeat + uOffset;",
 
-					// spot lights
-
-					"#if MAX_SPOT_LIGHTS > 0",
-
-						"vec4 wPosition = objectMatrix * vec4( position, 1.0 );",
-						"vWorldPosition = wPosition.xyz;",
-
-					"#endif",
-
 					// displacement mapping
+
+					"vec3 displacedPosition;",
 
 					"#ifdef VERTEX_TEXTURES",
 
-						"vec3 dv = texture2D( tDisplacement, uv ).xyz;",
-						"float df = uDisplacementScale * dv.x + uDisplacementBias;",
-						"vec4 displacedPosition = vec4( normalize( vNormal.xyz ) * df, 0.0 ) + mvPosition;",
-						"gl_Position = projectionMatrix * displacedPosition;",
+						"if ( enableDisplacement ) {",
+
+							"vec3 dv = texture2D( tDisplacement, uv ).xyz;",
+							"float df = uDisplacementScale * dv.x + uDisplacementBias;",
+							"displacedPosition = position + normalize( normal ) * df;",
+
+						"} else {",
+
+							"displacedPosition = position;",
+
+						"}",
 
 					"#else",
 
-						"gl_Position = projectionMatrix * mvPosition;",
+						"displacedPosition = position;",
 
 					"#endif",
 
-					THREE.ShaderChunk[ "shadowmap_vertex" ],
+					//
+
+					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 wPosition = objectMatrix * vec4( displacedPosition, 1.0 );",
+
+					"gl_Position = projectionMatrix * mvPosition;",
+
+					//
+
+					"vWorldPosition = wPosition.xyz;",
+
+					// shadows
+
+					"#ifdef USE_SHADOWMAP",
+
+						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
+
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * wPosition;",
+
+						"}",
+
+					"#endif",
 
 				"}"
 
