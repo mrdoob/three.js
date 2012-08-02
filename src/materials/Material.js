@@ -31,7 +31,7 @@ THREE.Material = function ( parameters ) {
 
 	this.overdraw = parameters.overdraw !== undefined ? parameters.overdraw : false; // Boolean for fixing antialiasing gaps in CanvasRenderer
 
-	this.visible = true;
+	this.visible = parameters.visible !== undefined ? parameters.visible : true;
 
 	this.needsUpdate = true;
 

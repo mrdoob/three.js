@@ -907,6 +907,8 @@ def position(bone, frame):
     action = bpy.data.actions[0]
     ngroups = len(action.groups)
 
+
+
     if ngroups > 0:
 
         index = 0
@@ -922,9 +924,11 @@ def position(bone, frame):
 
     else:
 
+        bone_label = '"%s"' % bone.name
+
         for channel in action.fcurves:
             data_path = channel.data_path
-            if bone.name in data_path and "location" in data_path:
+            if bone_label in data_path and "location" in data_path:
                 hasChanged = handle_position_channel(channel, frame, position)
                 change = change or hasChanged
 
@@ -1005,9 +1009,11 @@ def rotation(bone, frame):
 
     else:
 
+        bone_label = '"%s"' % bone.name
+
         for channel in action.fcurves:
             data_path = channel.data_path
-            if bone.name in data_path and "quaternion" in data_path:
+            if bone_label in data_path and "quaternion" in data_path:
                 hasChanged = handle_rotation_channel(channel, frame, rotation)
                 change = change or hasChanged
 

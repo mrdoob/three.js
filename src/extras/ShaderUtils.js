@@ -473,7 +473,15 @@ THREE.ShaderUtils = {
 
 					"#endif",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
+					"#ifdef METAL",
+
+						"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor + totalSpecular );",
+
+					"#else",
+
+						"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor ) + totalSpecular;",
+
+					"#endif",
 
 					"if ( enableReflection ) {",
 
@@ -523,14 +531,30 @@ THREE.ShaderUtils = {
 
 				"varying vec3 vWorldPosition;",
 
+				THREE.ShaderChunk[ "skinning_pars_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 				"void main() {",
 
+					THREE.ShaderChunk[ "skinbase_vertex" ],
+					THREE.ShaderChunk[ "skinnormal_vertex" ],
+
 					// normal, tangent and binormal vectors
 
-					"vNormal = normalMatrix * normal;",
-					"vTangent = normalMatrix * tangent.xyz;",
+					"#ifdef USE_SKINNING",
+
+						"vNormal = normalMatrix * skinnedNormal.xyz;",
+
+						"vec4 skinnedTangent = skinMatrix * vec4( tangent.xyz, 0.0 );",
+						"vTangent = normalMatrix * skinnedTangent.xyz;",
+
+					"#else",
+
+						"vNormal = normalMatrix * normal;",
+						"vTangent = normalMatrix * tangent.xyz;",
+
+					"#endif",
+
 					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
 
 					"vUv = uv * uRepeat + uOffset;",
@@ -549,13 +573,35 @@ THREE.ShaderUtils = {
 
 						"} else {",
 
-							"displacedPosition = position;",
+							"#ifdef USE_SKINNING",
+
+								"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
+								"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+
+								"displacedPosition  = skinned.xyz;",
+
+							"#else",
+
+								"displacedPosition = position;",
+
+							"#endif",
 
 						"}",
 
 					"#else",
 
-						"displacedPosition = position;",
+						"#ifdef USE_SKINNING",
+
+							"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
+							"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+
+							"displacedPosition  = skinned.xyz;",
+
+						"#else",
+
+							"displacedPosition = position;",
+
+						"#endif",
 
 					"#endif",
 
