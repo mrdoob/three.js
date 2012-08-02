@@ -415,7 +415,34 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.ParticleBasicMaterial ) {
 
-				if ( material.map !== null ) {
+				if ( material.map === null ) {
+
+					scaleX = element.object.scale.x;
+					scaleY = element.object.scale.y;
+
+					// TODO: Be able to disable this
+
+					scaleX *= element.scale.x * _canvasWidthHalf;
+					scaleY *= element.scale.y * _canvasHeightHalf;
+
+					_bboxRect.set( v1.x - scaleX, v1.y - scaleY, v1.x  + scaleX, v1.y + scaleY );
+
+					if ( _clipRect.intersects( _bboxRect ) === false ) {
+
+						return;
+
+					}
+
+					setFillStyle( material.color.getContextStyle() );
+
+					_context.save();
+					_context.translate( v1.x, v1.y );
+					_context.rotate( - element.rotation );
+					_context.scale( scaleX, scaleY );
+					_context.fillRect( - 1, - 1, 1, 1 );
+					_context.restore();
+
+				} else {
 
 					bitmap = material.map.image;
 					bitmapWidth = bitmap.width >> 1;
@@ -444,19 +471,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_context.translate( - bitmapWidth, - bitmapHeight );
 					_context.drawImage( bitmap, 0, 0 );
-
 					_context.restore();
 
 				}
 
 				/* DEBUG
+				setStrokeStyle( 'rgb(255,255,0)' );
 				_context.beginPath();
 				_context.moveTo( v1.x - 10, v1.y );
 				_context.lineTo( v1.x + 10, v1.y );
 				_context.moveTo( v1.x, v1.y - 10 );
 				_context.lineTo( v1.x, v1.y + 10 );
-				_context.closePath();
-				_context.strokeStyle = 'rgb(255,255,0)';
 				_context.stroke();
 				*/
 
