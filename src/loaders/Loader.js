@@ -225,6 +225,12 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.visible !== undefined ) {
+
+			mpars.visible = m.visible;
+
+		}
+
 		if ( m.vertexColors !== undefined ) {
 
 			if ( m.vertexColors == "face" ) {
