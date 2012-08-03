@@ -140,14 +140,9 @@ THREE.Projector = function() {
 
 		_renderData.elements.length = 0;
 
-		if ( camera.parent === undefined ) {
-
-			console.warn( 'DEPRECATED: Camera hasn\'t been added to a Scene. Adding it...' );
-			scene.add( camera );
-
-		}
-
 		scene.updateMatrixWorld();
+
+		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 

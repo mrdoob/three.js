@@ -3702,16 +3702,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( camera.parent === undefined ) {
-
-			console.warn( 'DEPRECATED: Camera hasn\'t been added to a Scene. Adding it...' );
-			scene.add( camera );
-
-		}
-
 		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
+
+		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
 		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
