@@ -22,8 +22,8 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 ```html
 <script>
 
-	var camera, scene, renderer,
-	geometry, material, mesh;
+	var camera, scene, renderer;
+	var geometry, material, mesh;
 
 	init();
 	animate();
@@ -52,11 +52,6 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 		// note: three.js includes requestAnimationFrame shim
 		requestAnimationFrame( animate );
-		render();
-
-	}
-
-	function render() {
 
 		mesh.rotation.x += 0.01;
 		mesh.rotation.y += 0.02;
