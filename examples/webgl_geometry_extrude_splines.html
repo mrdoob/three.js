@@ -124,39 +124,41 @@
 
 		function setScale() {
 
-			scale = parseInt(document.getElementById('scale').value);
-			tubeMesh.scale.set(scale, scale, scale);
+			scale = parseInt( document.getElementById('scale').value );
+			tubeMesh.scale.set( scale, scale, scale );
 
 		}
 
 
-		function addGeometry(geometry, color) {
+		function addGeometry( geometry, color ) {
 
-				// 3d shape
-				tubeMesh = THREE.SceneUtils.createMultiMaterialObject(geometry, [
-					new THREE.MeshLambertMaterial({
-							color: color,
-							opacity: (geometry.debug) ? 0.2 : 0.8,
-							transparent: true
-					}),
-				 new THREE.MeshBasicMaterial({
-						color: 0x000000,
-						opacity: 0.5,
-						wireframe: true
-				})]);
+			// 3d shape
 
-				if (geometry.debug) tubeMesh.add(geometry.debug);
+			tubeMesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [
+				new THREE.MeshLambertMaterial({
+					color: color,
+					opacity: geometry.debug ? 0.2 : 0.8,
+					transparent: true
+				}),
+				new THREE.MeshBasicMaterial({
+					color: 0x000000,
+					opacity: 0.5,
+					wireframe: true
+			})]);
 
-				//mesh.children[0].doubleSided = true;
-				parent.add(tubeMesh);
+			if ( geometry.debug ) tubeMesh.add( geometry.debug );
+
+			parent.add( tubeMesh );
 
 		}
 
-		function animateCamera(toggle) {
+		function animateCamera( toggle ) {
 
-			if (toggle) {
+			if ( toggle ) {
+
 				animation = !animation;
 				document.getElementById('animation').value = 'Camera Spline Animation View: ' + (animation? 'ON': 'OFF');
+
 			}
 
 			lookAhead = document.getElementById('lookAhead').checked;
@@ -194,13 +196,18 @@
 
 			container.appendChild(info);
 
+			scene = new THREE.Scene();
+
+			//
+
 			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 1000);
 			splineCamera = new THREE.PerspectiveCamera(84, window.innerWidth / window.innerHeight, 0.01, 1000);
 			cameraHelper = new THREE.CameraHelper(splineCamera);
 
 			camera.position.set(0, 50, 500);
 
-			scene = new THREE.Scene();
+			scene.add(camera);
+
 
 			var light = new THREE.DirectionalLight(0xffffff);
 			light.position.set(0, 0, 1);
