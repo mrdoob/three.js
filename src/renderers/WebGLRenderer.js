@@ -3957,7 +3957,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_this.setObjectFaces( object );
+				_this.setMaterialFaces( material );
 
 				if ( buffer instanceof THREE.BufferGeometry ) {
 
@@ -4018,7 +4018,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_currentGeometryGroupHash = -1;
 
-		_this.setObjectFaces( object );
+		_this.setMaterialFaces( material );
 
 		if ( object.immediateRenderCallback ) {
 
@@ -4672,7 +4672,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			metal: material.metal,
 			perPixel: material.perPixel,
 			wrapAround: material.wrapAround,
-			doubleSided: object && object.doubleSided
+			doubleSided: material.doubleSided
 
 		};
 
@@ -5353,7 +5353,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
+		object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld );
 
 		object._normalMatrix.getInverse( object._modelViewMatrix );
 		object._normalMatrix.transpose();
@@ -5572,11 +5572,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setObjectFaces = function ( object ) {
+	this.setMaterialFaces = function ( material ) {
 
-		if ( _oldDoubleSided !== object.doubleSided ) {
+		if ( _oldDoubleSided !== material.doubleSided ) {
 
-			if ( object.doubleSided ) {
+			if ( material.doubleSided ) {
 
 				_gl.disable( _gl.CULL_FACE );
 
@@ -5586,13 +5586,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldDoubleSided = object.doubleSided;
+			_oldDoubleSided = material.doubleSided;
 
 		}
 
-		if ( _oldFlipSided !== object.flipSided ) {
+		if ( _oldFlipSided !== material.flipSided ) {
 
-			if ( object.flipSided ) {
+			if ( material.flipSided ) {
 
 				_gl.frontFace( _gl.CW );
 
@@ -5602,7 +5602,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldFlipSided = object.flipSided;
+			_oldFlipSided = material.flipSided;
 
 		}
 

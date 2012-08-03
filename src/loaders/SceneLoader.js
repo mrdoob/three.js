@@ -211,7 +211,6 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						}
 
 						object.visible = o.visible;
-						object.doubleSided = o.doubleSided;
 						object.castShadow = o.castShadow;
 						object.receiveShadow = o.receiveShadow;
 

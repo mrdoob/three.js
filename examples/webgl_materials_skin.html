@@ -278,7 +278,6 @@
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );
-				mesh.doubleSided = true;
 
 				scene.add( mesh );
 
@@ -286,7 +285,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );

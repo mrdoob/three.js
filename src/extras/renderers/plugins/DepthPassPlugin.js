@@ -114,7 +114,7 @@ THREE.DepthPassPlugin = function ( ) {
 				object = webglObject.object;
 				buffer = webglObject.buffer;
 
-				_renderer.setObjectFaces( object );
+				if ( object.material ) _renderer.setMaterialFaces( object.material );
 
 				if ( object.customDepthMaterial ) {
 

@@ -61,8 +61,8 @@
 				scene.add( light );
 
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ), doubleSided: true } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, doubleSided: true } )
 				];
 
 
@@ -93,19 +93,19 @@
 				var geo;
 
 				// Klein Bottle
+
 				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.klein, 20, 20);
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
-				object.children[ 0 ].doubleSided = true;
 				object.position.set( 0, 0, 0 );
-				object.scale.multiplyScalar(10);
+				object.scale.multiplyScalar( 10 );
 				scene.add( object );
 
 				// Mobius Strip
+
 				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.mobius, 20, 20);
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
-				// object.children[ 0 ].doubleSided = true;
 				object.position.set( 10, 0, 0 );
-				object.scale.multiplyScalar(100);
+				object.scale.multiplyScalar( 100 );
 				scene.add( object );
 
 				var geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.plane(200, 200), 10, 20);
@@ -144,12 +144,10 @@
 
 
 				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 400, 400, 4, 4 ), materials );
-				// // object.children[ 0 ].doubleSided = true;
 				// object.position.set( -200, 100, 0 );
 				// scene.add( object );
 
 				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry2( 400, 400, 4, 4 ), materials );
-				// object.children[ 0 ].doubleSided = true;
 				// object.position.set( -200, 100, 0 );
 				// scene.add( object );
 

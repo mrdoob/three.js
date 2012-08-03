@@ -124,7 +124,7 @@
 				for ( i = 0; i < xgrid; i ++ )
 				for ( j = 0; j < ygrid; j ++ ) {
 
-					materials[ c ] = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true } );
+					materials[ c ] = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true, doubleSided: true } );
 
 					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[ c ] );
 					ribbon.rotation.x = 0;
@@ -138,7 +138,6 @@
 
 					materials[c].color.setHSV( i / xgrid, 0.3 +  0.7 * j / ygrid, 1 );
 
-					ribbon.doubleSided = true;
 					ribbon.matrixAutoUpdate = false;
 
 					// manually create local matrix

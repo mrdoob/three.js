@@ -113,12 +113,12 @@
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
-					depthWrite: false
+					depthWrite: false,
+					flipSided: true
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
-				mesh.flipSided = true;
 				sceneCube.add( mesh );
 
 				// LIGHTS
@@ -214,7 +214,6 @@
 						var mesh = new THREE.Mesh( geometries[ i ], materials[ i ] );
 						mesh.position = position;
 						mesh.scale = scale;
-						mesh.doubleSided = true;
 						scene.add( mesh );
 
 					}
@@ -282,6 +281,8 @@
 
 					}
 
+					materials[ i ].doubleSided = true;
+
 				}
 
 			}
@@ -300,7 +301,6 @@
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );
-				mesh.doubleSided = true;
 				scene.add( mesh );
 
 			}

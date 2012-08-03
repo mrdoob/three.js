@@ -148,9 +148,6 @@ THREE.SceneUtils = {
 
 		object.dynamic = source.dynamic;
 
-		object.doubleSided = source.doubleSided;
-		object.flipSided = source.flipSided;
-
 		object.renderDepth = source.renderDepth;
 
 		object.rotationAutoUpdate = source.rotationAutoUpdate;

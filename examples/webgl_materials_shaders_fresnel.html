@@ -125,12 +125,12 @@
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					flipSided: true
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
-				mesh.flipSided = true;
 				sceneCube.add( mesh );
 
 				//

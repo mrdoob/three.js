@@ -79,10 +79,9 @@
 
 				// PLANE
 
-				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100 ), new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, doubleSided: true } ) );
 				mesh.position.y = -500;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
-				mesh.doubleSided = true;
 				scene.add( mesh );
 
 				// CYLINDER
@@ -111,7 +110,7 @@
 
 					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, geometry.materials.length );
 
-					geometry.materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+					geometry.materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, doubleSided: true } ) );
 
 					geometry.faces.push( face );
 
@@ -125,12 +124,10 @@
 				scene.add( group );
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
-				mesh.doubleSided = true;
 				group.add( mesh );
 
 				/*
-				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10 } ) );
-				mesh.doubleSided = true;
+				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true, wireframe: true, wireframeLinewidth: 10, doubleSided: true } ) );
 				group.add( mesh );
 				*/
 
