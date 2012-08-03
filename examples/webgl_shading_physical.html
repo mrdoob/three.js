@@ -292,7 +292,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true  } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, doubleSided: true } );
 					morphMaterial.shading = THREE.FlatShading;
 
 					geometry.computeMorphNormals();
@@ -306,8 +306,6 @@
 
 					morph.castShadow = true;
 					morph.receiveShadow = true;
-
-					morph.doubleSided = true;
 
 					scene.add( morph );
 

@@ -33,6 +33,9 @@ THREE.Material = function ( parameters ) {
 
 	this.visible = parameters.visible !== undefined ? parameters.visible : true;
 
+	this.doubleSided = parameters.doubleSided !== undefined ? parameters.doubleSided : false;
+	this.flipSided = parameters.flipSided !== undefined ? parameters.flipSided : false;
+
 	this.needsUpdate = true;
 
 }

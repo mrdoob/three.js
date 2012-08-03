@@ -51,8 +51,8 @@
 				scene.add( light );
 
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ), doubleSided: true } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, doubleSided: true } )
 				];
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
@@ -77,7 +77,6 @@
 				scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 100, 100, 4, 4 ), materials );
-				object.children[ 0 ].doubleSided = true;
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
 
@@ -94,7 +93,6 @@
 				}
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.LatheGeometry( points, 20 ), materials );
-				object.children[ 0 ].doubleSided = true;
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 

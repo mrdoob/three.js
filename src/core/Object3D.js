@@ -20,9 +20,6 @@ THREE.Object3D = function () {
 	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
-	this.doubleSided = false;
-	this.flipSided = false;
-
 	this.renderDepth = null;
 
 	this.rotationAutoUpdate = true;
@@ -61,10 +58,10 @@ THREE.Object3D.prototype = {
 		this.matrix.multiply( matrix, this.matrix );
 
 		this.scale.getScaleFromMatrix( this.matrix );
-		
+
 		var mat = new THREE.Matrix4().extractRotation( this.matrix );
 		this.rotation.setEulerFromRotationMatrix( mat, this.eulerOrder );
-		
+
 		this.position.getPositionFromMatrix( this.matrix );
 
 	},

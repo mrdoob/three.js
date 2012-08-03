@@ -231,6 +231,18 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.doubleSided !== undefined ) {
+
+			mpars.doubleSided = m.doubleSided;
+
+		}
+
+		if ( m.flipSided !== undefined ) {
+
+			mpars.flipSided = m.flipSided;
+
+		}
+
 		if ( m.vertexColors !== undefined ) {
 
 			if ( m.vertexColors == "face" ) {

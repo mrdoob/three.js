@@ -130,7 +130,8 @@
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-				shading: 		THREE.FlatShading
+				shading: 		THREE.FlatShading,
+				doubleSided:	true
 
 			});
 
@@ -211,7 +212,6 @@
 
 			mesh = new THREE.Mesh( geometry, shaderMaterial );
 			mesh.rotation.set( 0.5, 0.5, 0 );
-			mesh.doubleSided = true;
 
 			scene.add( mesh );
 
