@@ -102,6 +102,8 @@ THREE.AnaglyphEffect = function ( renderer ) {
 
 		scene.updateMatrixWorld();
 
+		if ( camera.parent === undefined ) camera.updateMatrixWorld();
+
 		var hasCameraChanged = ( _aspect !== camera.aspect ) || ( _near !== camera.near ) || ( _far !== camera.far ) || ( _fov !== camera.fov );
 
 		if ( hasCameraChanged ) {
