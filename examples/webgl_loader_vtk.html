@@ -53,13 +53,8 @@
 
 			function init() {
 
-				// scene and camera
-
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
 				camera.position.z = 0.2;
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 
@@ -73,10 +68,15 @@
 				controls.staticMoving = true;
 				controls.dynamicDampingFactor = 0.3;
 
+				scene = new THREE.Scene();
+
+				scene.add( camera );
+
 				// light
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff );
 				dirLight.position.set( 200, 200, 1000 ).normalize();
+
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 

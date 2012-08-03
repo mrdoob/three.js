@@ -85,12 +85,8 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
-				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
 
@@ -100,6 +96,9 @@
 				controls.constrainVertical = true;
 				controls.verticalMin = 1.1;
 				controls.verticalMax = 2.2;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
 
 				var debug_texture = false,
 					debug_numbers = false,

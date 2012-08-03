@@ -48,14 +48,13 @@
 				info.innerHTML = '<a href="https://github.com/mrdoob/three.js/" target="_blank">three.js<a/> - software renderer<br/>drag to change the point of view';
 				container.appendChild( info );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.y = 150;
 				camera.position.z = 600;
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
+
+				scene = new THREE.Scene();
 
 				sphere = new THREE.Mesh( new THREE.IcosahedronGeometry( 150, 3 ), new THREE.MeshBasicMaterial() );
 				scene.add( sphere );

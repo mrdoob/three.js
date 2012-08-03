@@ -45,11 +45,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 3200;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				objects = [];
 

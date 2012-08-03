@@ -29,7 +29,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, cameraTarget, scene, renderer;
+			var camera, scene, renderer;
 			var projector, plane, cube;
 			var mouse2D, mouse3D, ray,
 			rollOveredFace, isShiftDown = false,
@@ -59,14 +59,10 @@
 				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - voxel painter - webgl<br><strong>click</strong>: add voxel, <strong>control + click</strong>: remove voxel, <strong>shift + click</strong>: rotate, <a href="javascript:save();return false;">save .png</a>';
 				container.appendChild( info );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.CombinedCamera( window.innerWidth, window.innerHeight, 45, 1, 10000, -2000, 10000 );
 				camera.position.y = 800;
-				scene.add( camera );
 
-				cameraTarget = new THREE.Vector3( 0, 0, 0 );
-
+				scene = new THREE.Scene();
 
 				// roll-over helpers
 
@@ -295,7 +291,7 @@
 				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
 
-				camera.lookAt( cameraTarget );
+				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
 

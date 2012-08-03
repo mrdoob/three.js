@@ -44,11 +44,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 100000, 0, 3200 );
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				var colors = [ 0x000000, 0xff0080, 0x8000ff, 0xffffff ];
 				var geometry = new THREE.Geometry();

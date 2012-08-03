@@ -91,16 +91,14 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				scene2 = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
-				scene2.fog = scene.fog;
-
 				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
 				camera.position.z = 1500;
 
-				scene.add( camera );
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
+
+				scene2 = new THREE.Scene();
+				scene2.fog = scene.fog;
 
 				// GROUND
 

@@ -108,20 +108,18 @@
 
 			container = document.getElementById( 'container' );
 
-			// SCENE
-
-			scene = new THREE.Scene();
-
 			// CAMERA
 
 			camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 			camera.position.set( -500, 500, 1500 );
 
-			scene.add( camera );
-
 			// CONTROLS
 
 			controls = new THREE.TrackballControls( camera );
+
+			// SCENE
+
+			scene = new THREE.Scene();
 
 			// LIGHTS
 

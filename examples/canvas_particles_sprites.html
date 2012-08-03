@@ -45,8 +45,6 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 				var material = new THREE.ParticleBasicMaterial( { map: new THREE.Texture( generateSprite() ), blending: THREE.AdditiveBlending } );
 
 				for ( var i = 0; i < 1000; i++ ) {

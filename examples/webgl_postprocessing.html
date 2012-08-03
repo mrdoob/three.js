@@ -88,19 +88,16 @@
 
 				//
 
-				sceneModel = new THREE.Scene();
-				sceneBG = new THREE.Scene();
-
-				//
-
 				cameraOrtho = new THREE.OrthographicCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
 				cameraOrtho.position.z = 100;
 
 				cameraPerspective = new THREE.PerspectiveCamera( 50, width / height, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
-				sceneModel.add( cameraPerspective );
-				sceneBG.add( cameraOrtho );
+				//
+
+				sceneModel = new THREE.Scene();
+				sceneBG = new THREE.Scene();
 
 				//
 

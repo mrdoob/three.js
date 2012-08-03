@@ -108,8 +108,6 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				for (var ii =  0; ii < views.length; ++ii ) {
 
 					var view = views[ii];
@@ -120,9 +118,10 @@
 					camera.up.x = view.up[ 0 ];
 					camera.up.y = view.up[ 1 ];
 					camera.up.z = view.up[ 2 ];
-					scene.add( camera );
 					view.camera = camera;
 				}
+
+				scene = new THREE.Scene();
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );

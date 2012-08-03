@@ -64,8 +64,6 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 				var data = generateHeight( 1024, 1024 );
 				var material = new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTexture( data, 1024, 1024 ) ), overdraw: true } );
 

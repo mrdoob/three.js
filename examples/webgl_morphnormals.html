@@ -52,14 +52,12 @@
 
 				//
 
-				scene1 = new THREE.Scene();
-				scene2 = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 40, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.y = 300;
-				scene1.add( camera );
-
 				camera.target = new THREE.Vector3( 0, 150, 0 );
+
+				scene1 = new THREE.Scene();
+				scene2 = new THREE.Scene();
 
 				//
 

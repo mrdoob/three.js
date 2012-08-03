@@ -57,13 +57,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.z = 100;
+
 				// scene
 
 				scene = new THREE.Scene();
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.z = 100;
-				scene.add( camera );
 
 				var ambient = new THREE.AmbientLight( 0x101030 );
 				scene.add( ambient );

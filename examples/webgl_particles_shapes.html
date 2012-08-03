@@ -119,15 +119,14 @@
 				info.innerHTML = 'Three.js - simple particle systems with shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br>Move your mouse. Click to pause/resume.';
 				container.appendChild( info );
 
-				// SCENE
-
-				scene = new THREE.Scene();
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 150, 400 );
-				scene.add( camera );
+
+				// SCENE
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 

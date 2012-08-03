@@ -68,11 +68,10 @@
 				vertexShader = document.getElementById( "vertexShader" ).textContent;
 				fragmentShader = document.getElementById( "fragmentShader" ).textContent;
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 2000;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				geometry = new THREE.SphereGeometry( 15, 64, 32 );
 

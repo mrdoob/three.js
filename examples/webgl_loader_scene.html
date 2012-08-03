@@ -219,8 +219,9 @@
 				document.body.appendChild( container );
 
 				var loadScene = createLoadScene();
-				scene  = loadScene.scene;
+
 				camera = loadScene.camera;
+				scene = loadScene.scene;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -339,13 +340,11 @@
 
 				$( "progress" ).style.display = "none";
 
-				scene = loaded.scene;
 				camera = loaded.currentCamera;
-
-				scene.add( camera );
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+
+				scene = loaded.scene;
 
 				renderer.setClearColor( loaded.bgColor, loaded.bgAlpha );
 

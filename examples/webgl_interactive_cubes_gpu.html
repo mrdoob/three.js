@@ -57,14 +57,8 @@
 
 				container = document.getElementById("container");
 
-				scene = new THREE.Scene();
-				pickingScene = new THREE.Scene();
-				pickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
-				pickingTexture.generateMipmaps = false;
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.rotateSpeed = 1.0;
@@ -74,6 +68,11 @@
 				controls.noPan = false;
 				controls.staticMoving = true;
 				controls.dynamicDampingFactor = 0.3;
+
+				scene = new THREE.Scene();
+				pickingScene = new THREE.Scene();
+				pickingTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight);
+				pickingTexture.generateMipmaps = false;
 
 				scene.add( new THREE.AmbientLight( 0x555555 ) );
 

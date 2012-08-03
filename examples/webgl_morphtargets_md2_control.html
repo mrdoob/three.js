@@ -79,15 +79,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera.position.set( 0, 150, 1300 );
+
 				// SCENE
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
 
-				// CAMERA
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
-				camera.position.set( 0, 150, 1300 );
 				scene.add( camera );
 
 				// LIGHTS

@@ -69,19 +69,13 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
-
-				// CAMERAS
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 2000;
 
 				cameraCube = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 100000 );
-				cubeTarget = new THREE.Vector3( 0, 0, 0 );
 
-				scene.add( camera );
-				sceneCube.add( cameraCube );
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
 
 				// LIGHTS
 
@@ -223,11 +217,7 @@
 
 				camera.lookAt( scene.position );
 
-				cubeTarget.x = - camera.position.x;
-				cubeTarget.y = - camera.position.y;
-				cubeTarget.z = - camera.position.z;
-
-				cameraCube.lookAt( cubeTarget );
+				cameraCube.rotation.copy( camera.rotation );
 
 				lightMesh.position.x = 1500 * Math.cos( timer );
 				lightMesh.position.z = 1500 * Math.sin( timer );

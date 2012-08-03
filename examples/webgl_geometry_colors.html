@@ -61,11 +61,10 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1800;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );

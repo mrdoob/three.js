@@ -278,17 +278,10 @@
 
 				sceneRenderTarget.add( cameraOrtho );
 
-				// SCENE (FINAL)
-
-				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
-				scene.fog.color.setHSV( 0.102, 0.9, 0.825 );
+				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( -1200, 800, 1200 );
-
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.target.set( 0, 0, 0 );
@@ -304,6 +297,12 @@
 				controls.dynamicDampingFactor = 0.15;
 
 				controls.keys = [ 65, 83, 68 ];
+
+				// SCENE (FINAL)
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
+				scene.fog.color.setHSV( 0.102, 0.9, 0.825 );
 
 				// LIGHTS
 

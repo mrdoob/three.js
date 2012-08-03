@@ -101,11 +101,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1500;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 

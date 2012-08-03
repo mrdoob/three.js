@@ -83,13 +83,11 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
-
 				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 50000 );
 				camera.position.set( 0, 700, 7000 );
-				camera.lookAt( scene.position );
-				scene.add( camera );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
 
 				//
 

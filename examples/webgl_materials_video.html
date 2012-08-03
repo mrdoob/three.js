@@ -88,11 +88,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0.5, 1, 1 ).normalize();

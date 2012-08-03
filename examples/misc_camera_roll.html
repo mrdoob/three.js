@@ -59,11 +59,6 @@
 
 			function init() {
 
-				// scene and camera
-
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
 
 				controls = new THREE.RollControls( camera );
@@ -74,6 +69,9 @@
 				//controls.autoForward = true;
 
 				// world
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
 
 				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
 				var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
@@ -89,8 +87,6 @@
 					scene.add( mesh );
 
 				}
-
-				scene.add( camera );
 
 				// lights
 

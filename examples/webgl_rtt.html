@@ -107,22 +107,17 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				sceneRTT = new THREE.Scene();
-				sceneScreen = new THREE.Scene();
-
-				//
-
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 100;
 
 				cameraRTT = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				cameraRTT.position.z = 100;
 
-				scene.add( camera );
-				sceneRTT.add( cameraRTT );
-
 				//
+
+				scene = new THREE.Scene();
+				sceneRTT = new THREE.Scene();
+				sceneScreen = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 ).normalize();

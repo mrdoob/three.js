@@ -68,16 +68,14 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
-
 				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
 				data = generateHeight( worldWidth, worldDepth );
 

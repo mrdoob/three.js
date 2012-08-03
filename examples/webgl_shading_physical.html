@@ -106,22 +106,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE
-
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
-
-				if ( DAY )
-					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
-				else
-					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
-
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
 				camera.position.set( 500, 400, 1200 );
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.target.set( 0, 120, 0 );
@@ -137,6 +125,16 @@
 				controls.dynamicDampingFactor = 0.15;
 
 				controls.keys = [ 65, 83, 68 ];
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
+
+				if ( DAY )
+					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
+				else
+					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
 
 				// CUBE CAMERA
 

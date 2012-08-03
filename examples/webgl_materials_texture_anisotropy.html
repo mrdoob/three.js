@@ -79,11 +79,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// RENDERER
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 
-				// SCENE
+				//
+
+				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 25000 );
+				camera.position.z = 1500;
 
 				scene1 = new THREE.Scene();
 				scene2 = new THREE.Scene();
@@ -91,13 +92,6 @@
 				scene1.fog = new THREE.Fog( 0xffffff, 1, 25000 );
 				scene1.fog.color.setHSV( 0.6, 0.05, 1 );
 				scene2.fog = scene1.fog;
-
-				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 25000 );
-				camera.position.z = 1500;
-
-				scene1.add( camera );
-
-				//
 
 				scene1.add( new THREE.AmbientLight( 0xeef0ff ) );
 				scene2.add( new THREE.AmbientLight( 0xeef0ff ) );

@@ -159,18 +159,17 @@
 
 				permalink = document.getElementById( "permalink" );
 
-				// SCENE
-
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1500 );
 				camera.position.set( 0, 400, 700 );
-				scene.add( camera );
 
 				cameraTarget = new THREE.Vector3( 0, 150, 0 );
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
 
 				// LIGHTS
 

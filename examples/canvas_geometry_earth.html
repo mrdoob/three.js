@@ -54,11 +54,10 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 500;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				group = new THREE.Object3D();
 				scene.add( group );

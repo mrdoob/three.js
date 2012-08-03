@@ -88,15 +88,10 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
-
-				// camera
-
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 800;
-				scene.add( camera );
 
-				//
+				scene = new THREE.Scene();
 
 				var size = 150;
 

@@ -25,18 +25,11 @@
 	var rY = 0;
 
 	window.launch = function() {
-		scene    = new THREE.Scene();
-		renderer = new THREE.WebGLRenderer();
-		camera   = new THREE.PerspectiveCamera(30, WIDTH / HEIGHT);
-		camera.position.set(0, 0, 20);
-		scene.add(camera);
-		renderer.setSize(WIDTH, HEIGHT);
 
-		// show canvas
-		targetCanvas = renderer.domElement;
-		targetCanvas.width  = WIDTH;
-		targetCanvas.height = HEIGHT;
-		document.getElementById('canvas-container').appendChild(targetCanvas);
+		camera = new THREE.PerspectiveCamera(30, WIDTH / HEIGHT);
+		camera.position.z = 20;
+
+		scene = new THREE.Scene();
 
 		/** Custom UV mapper **/
 		uvGenerator = new THREE.UVsUtils.CylinderUVGenerator();
@@ -46,6 +39,15 @@
 		
 		tex = setupTexture(TestTextureData);
 		renewMesh();
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.setSize(WIDTH, HEIGHT);
+
+		// show canvas
+		targetCanvas = renderer.domElement;
+		targetCanvas.width  = WIDTH;
+		targetCanvas.height = HEIGHT;
+		document.getElementById('canvas-container').appendChild(targetCanvas);
 
 		setupAnimation();
 		render();

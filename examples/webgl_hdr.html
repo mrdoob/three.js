@@ -121,12 +121,10 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
-				scene.add( camera );
 
+				scene = new THREE.Scene();
 
 				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;

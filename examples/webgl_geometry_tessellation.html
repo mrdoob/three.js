@@ -100,14 +100,12 @@
 
 		function init() {
 
-			scene = new THREE.Scene();
-
 			camera = new THREE.PerspectiveCamera( 25, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 350;
 
 			controls = new THREE.TrackballControls( camera );
 
-			scene.add( camera );
+			scene = new THREE.Scene();
 
 			//
 

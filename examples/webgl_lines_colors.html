@@ -80,11 +80,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
