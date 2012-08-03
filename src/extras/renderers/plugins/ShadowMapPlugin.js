@@ -259,8 +259,6 @@ THREE.ShadowMapPlugin = function ( ) {
 					// culling is overriden globally for all objects
 					// while rendering depth map
 
-					//_renderer.setObjectFaces( object );
-
 					if ( object.customDepthMaterial ) {
 
 						material = object.customDepthMaterial;
