@@ -519,6 +519,7 @@
 
 				ground = new THREE.Mesh( new THREE.PlaneGeometry( 50000, 50000 ), groundBasic );
 				ground.position.y = - 215;
+				ground.rotation.x = - Math.PI / 2;
 				scene.add( ground );
 
 				ground.castShadow = false;
@@ -567,7 +568,7 @@
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
 				shadow.position.y = sy;
-				shadow.rotation.y = Math.PI / 2;
+				shadow.rotation.x = - Math.PI / 2;
 
 				object.add( shadow );
 
@@ -684,8 +685,8 @@
 				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
-				shadow.rotation.y = Math.PI / 2;
 				shadow.position.y = s + 10;
+				shadow.rotation.x = - Math.PI / 2;
 
 				object.root.add( shadow );
 

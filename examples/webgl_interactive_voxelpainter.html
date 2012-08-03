@@ -89,6 +89,7 @@
 				// grid
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 20, 20 ), new THREE.MeshBasicMaterial( { color: 0x555555, wireframe: true } ) );
+				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );

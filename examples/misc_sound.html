@@ -165,10 +165,9 @@
 				var material_wireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, wireframeLinewidth: 1 } );
 				material_wireframe.color.setHSV( 0.1, 0.2, 0.5 );
 
-
-				var plane = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
-				mesh = new THREE.Mesh( plane, material_wireframe );
+				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 100, 100 ), material_wireframe );
 				mesh.position.y = 0.1;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				//

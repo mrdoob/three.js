@@ -76,16 +76,19 @@
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = - 400;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = 400;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];

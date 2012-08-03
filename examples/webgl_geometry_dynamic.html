@@ -85,6 +85,7 @@
 				controls.lookSpeed = 0.1
 
 				geometry = new THREE.PlaneGeometry( 20000, 20000, worldWidth - 1, worldDepth - 1 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 				geometry.dynamic = true;
 
 				var i, j, il, jl;

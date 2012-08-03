@@ -118,8 +118,7 @@
 
 				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), materialColor );
 				quadBG.position.z = -500;
-				quadBG.rotation.x = Math.PI / 2;
-				quadBG.scale.set( width, 1, height );
+				quadBG.scale.set( width, height, 1 );
 				sceneBG.add( quadBG );
 
 				//
@@ -128,8 +127,7 @@
 
 				quadMask = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
 				quadMask.position.z = -300;
-				quadMask.rotation.x = Math.PI / 2;
-				quadMask.scale.set( width / 2, 1, height / 2 );
+				quadMask.scale.set( width / 2, height / 2, 1 );
 				sceneMask.add( quadMask );
 
 				//

@@ -201,6 +201,7 @@
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
+				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
 
 				ground.receiveShadow = true;

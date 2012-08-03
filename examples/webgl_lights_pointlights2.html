@@ -132,6 +132,7 @@
 
 				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 800, 400, 2, 2 ), groundMaterial );
 				mesh.position.y = -5;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				// OBJECTS

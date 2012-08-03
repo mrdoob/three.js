@@ -3,29 +3,29 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
+THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight ) {
 
 	THREE.Geometry.call( this );
 
 	var ix, iz,
 	width_half = width / 2,
-	depth_half = depth / 2,
+	height_half = height / 2,
 	gridX = segmentsWidth || 1,
-	gridZ = segmentsDepth || 1,
+	gridZ = segmentsheight || 1,
 	gridX1 = gridX + 1,
 	gridZ1 = gridZ + 1,
 	segment_width = width / gridX,
-	segment_depth = depth / gridZ,
-	normal = new THREE.Vector3( 0, 1, 0 );
+	segment_height = height / gridZ,
+	normal = new THREE.Vector3( 0, 0, 1 );
 
 	for ( iz = 0; iz < gridZ1; iz ++ ) {
 
 		for ( ix = 0; ix < gridX1; ix ++ ) {
 
 			var x = ix * segment_width - width_half;
-			var z = iz * segment_depth - depth_half;
+			var y = iz * segment_height - height_half;
 
-			this.vertices.push( new THREE.Vector3( x, 0, z ) );
+			this.vertices.push( new THREE.Vector3( x, - y, 0 ) );
 
 		}
 

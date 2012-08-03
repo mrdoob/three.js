@@ -120,6 +120,7 @@
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt, perPixel: true } );
 
 				var ground = new THREE.Mesh( gg, gm );
+				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 64, 64 );
 				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
 				ground.receiveShadow = true;

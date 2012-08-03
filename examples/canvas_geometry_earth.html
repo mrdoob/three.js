@@ -102,6 +102,7 @@
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;
+				mesh.rotation.x = - Math.PI / 2;
 				group.add( mesh );
 
 				renderer = new THREE.CanvasRenderer();

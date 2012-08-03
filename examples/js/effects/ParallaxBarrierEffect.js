@@ -77,7 +77,6 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 	} );
 
 	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
-	mesh.rotation.x = Math.PI / 2;
 	_scene.add( mesh );
 
 	this.setSize = function ( width, height ) {

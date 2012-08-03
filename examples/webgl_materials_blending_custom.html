@@ -178,7 +178,6 @@
 
 				var meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, -1 );
-				meshBg.rotation.x = Math.PI / 2;
 				scene.add( meshBg );
 
 				// FOREGROUND IMAGES
@@ -239,7 +238,6 @@
 
 						var mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, y, z );
-						mesh.rotation.x = Math.PI / 2;
 						mesh.matrixAutoUpdate = false;
 						mesh.updateMatrix();
 						scene.add( mesh );
@@ -260,7 +258,6 @@
 
 					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.replace( "Factor", "" ), "rgba( 0, 150, 0, 1 )" ) );
 					mesh.position.set( x, - (y - 70), z );
-					mesh.rotation.x = Math.PI / 2;
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.add( mesh );
@@ -277,7 +274,6 @@
 
 					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.replace( "Factor", "" ), "rgba( 150, 0, 0, 1 )" ) );
 					mesh.position.set( x, - (y - 70), z );
-					mesh.rotation.x = Math.PI / 2;
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.add( mesh );

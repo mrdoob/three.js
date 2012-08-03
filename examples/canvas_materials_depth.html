@@ -66,9 +66,9 @@
 				var material = new THREE.MeshDepthMaterial( { overdraw: true } );
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
-				plane.doubleSided = true;
 				plane.position.y = - 100;
-
+				plane.rotation.x = - Math.PI / 2;
+				plane.doubleSided = true;
 				scene.add( plane );
 
 				// Cubes

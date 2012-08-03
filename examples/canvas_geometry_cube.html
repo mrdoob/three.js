@@ -76,6 +76,7 @@
 				// Plane
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				plane.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();

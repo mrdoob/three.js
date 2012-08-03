@@ -129,7 +129,6 @@
 				} );
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), material );
-				mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();

@@ -145,9 +145,11 @@
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
 
 				var mesh1 = new THREE.Mesh( geometry, material1 );
+				mesh1.rotation.x = - Math.PI / 2;
 				mesh1.scale.set( 1000, 1000, 1000 );
 
 				var mesh2 = new THREE.Mesh( geometry, material2 );
+				mesh2.rotation.x = - Math.PI / 2;
 				mesh2.scale.set( 1000, 1000, 1000 );
 
 				scene1.add( mesh1 );
