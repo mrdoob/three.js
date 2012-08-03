@@ -296,7 +296,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
-			/*
+			/* DEBUG
 			_context.lineWidth = 1;
 			_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
 			_context.strokeRect( _bboxRect.getX(), _bboxRect.getY(), _bboxRect.getWidth(), _bboxRect.getHeight() );
@@ -439,7 +439,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_context.translate( v1.x, v1.y );
 					_context.rotate( - element.rotation );
 					_context.scale( scaleX, scaleY );
-					_context.fillRect( - 1, - 1, 1, 1 );
+					_context.fillRect( -1, -1, 2, 2 );
 					_context.restore();
 
 				} else {
