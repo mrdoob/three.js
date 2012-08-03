@@ -2,4 +2,8 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function () {};
+THREE.MeshFaceMaterial = function ( parameters ) {
+
+	THREE.Material.call( this, parameters );
+
+};

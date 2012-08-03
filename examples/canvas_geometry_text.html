@@ -90,8 +90,6 @@
 				var textMaterial = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, overdraw: true } );
 				text = new THREE.Mesh( text3d, textMaterial );
 
-				text.doubleSided = false;
-
 				text.position.x = centerOffset;
 				text.position.y = 100;
 				text.position.z = 0;
