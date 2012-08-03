@@ -1,0 +1,1 @@
+{"materials": [{"DbgColor": 16777215, "DbgName": "Material.001", "DbgIndex": 0}], "buffers": "q9260.p3d.r48.bin", "metadata": {"uvs": 0, "generatedBy": "JS OBJConverter", "sourceFile": "tests/test_files/captain.obj", "vertices": 1784, "formatVersion": 3, "materials": 1, "normals": 1680, "faces": 1650}}
