@@ -196,8 +196,6 @@
 
 			container.appendChild(info);
 
-			scene = new THREE.Scene();
-
 			//
 
 			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 1000);
@@ -206,8 +204,7 @@
 
 			camera.position.set(0, 50, 500);
 
-			scene.add(camera);
-
+			scene = new THREE.Scene();
 
 			var light = new THREE.DirectionalLight(0xffffff);
 			light.position.set(0, 0, 1);
