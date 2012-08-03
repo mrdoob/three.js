@@ -122,8 +122,8 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_ENVMAP",
 
-			"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
-			"vec3 nWorld = mat3( objectMatrix[ 0 ].xyz, objectMatrix[ 1 ].xyz, objectMatrix[ 2 ].xyz ) * normal;",
+			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
 
 			"if ( useRefract ) {",
 
@@ -1361,16 +1361,16 @@ THREE.ShaderChunk = {
 
 			"#ifdef USE_MORPHTARGETS",
 
-				"transformedPosition = objectMatrix * vec4( morphed, 1.0 );",
+				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
 
 			"#else",
 			"#ifdef USE_SKINNING",
 
-				"transformedPosition = objectMatrix * skinned;",
+				"transformedPosition = modelMatrix * skinned;",
 
 			"#else",
 
-				"transformedPosition = objectMatrix * vec4( position, 1.0 );",
+				"transformedPosition = modelMatrix * vec4( position, 1.0 );",
 
 			"#endif",
 			"#endif",
@@ -1757,7 +1757,7 @@ THREE.ShaderLib = {
 
 				"#ifndef USE_ENVMAP",
 
-					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"#endif",
 
@@ -1872,7 +1872,7 @@ THREE.ShaderLib = {
 
 				"#ifndef USE_ENVMAP",
 
-					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"#endif",
 

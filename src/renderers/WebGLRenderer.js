@@ -324,7 +324,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		delete object._normalMatrixArray;
 		delete object._modelViewMatrixArray;
-		delete object._objectMatrixArray;
+		delete object._modelMatrixArray;
 
 		if ( object instanceof THREE.Mesh ) {
 
@@ -3762,7 +3762,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					//object.matrixWorld.flattenToArray( object._modelMatrixArray );
 
 					setupMatrices( object, camera );
 
@@ -3813,7 +3813,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				/*
 				if ( object.matrixAutoUpdate ) {
 
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					object.matrixWorld.flattenToArray( object._modelMatrixArray );
 
 				}
 				*/
@@ -4956,9 +4956,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		loadUniformsMatrices( p_uniforms, object );
 
-		if ( p_uniforms.objectMatrix !== null ) {
+		if ( p_uniforms.modelMatrix !== null ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.objectMatrix, false, object.matrixWorld.elements );
+			_gl.uniformMatrix4fv( p_uniforms.modelMatrix, false, object.matrixWorld.elements );
 
 		}
 
@@ -5852,7 +5852,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
 
-			"uniform mat4 objectMatrix;",
+			"uniform mat4 modelMatrix;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
 			"uniform mat4 viewMatrix;",
@@ -5979,7 +5979,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		identifiers = [
 
-			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'objectMatrix', 'cameraPosition',
+			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'modelMatrix', 'cameraPosition',
 			'morphTargetInfluences'
 
 		];

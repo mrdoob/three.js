@@ -553,7 +553,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
@@ -642,7 +642,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
@@ -731,7 +731,7 @@ THREE.ShaderSkin = {
 
 			"float KSTextureCompute( vec2 tex ) {",
 
-				// Scale the value to fit within [0,1] – invert upon lookup.
+				// Scale the value to fit within [0,1]  invert upon lookup.
 
 				"return 0.5 * pow( PHBeckmann( tex.x, tex.y ), 0.1 );",
 
