@@ -122,16 +122,37 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		}
 
 	};
+        // the toplevel loader function, delegates to handle_children
+	 function handle_objects() {
 
-	function handle_objects() {
+		console.log("handle_objects");
+                
+                var parentNode=result.scene;
+                var children = data.objects;
+                
+                handle_children( parentNode, children);
+         }
+         
+         // the loading function to load all children of one node
+         // parentNode: the node to attach the children to, either the scene itself or Object3D
+         // children: the list of children to handle
+         function handle_children( parentNode, childrenVar) {
+             
+                console.log("handle_children", parentNode, childrenVar);
+             
+                var object;
+                
+		for( dd in childrenVar ) {
+                        console.log("dd : ", dd);
+                        console.log("children ", childrenVar[dd].children);
+                        console.log("check", !result.objects[ dd ] , " ", result.objects[ dd ] );
 
-		var object;
-
-		for( dd in data.objects ) {
-
+                        // check by id if child has already been handled, 
+                        // if not, create new objec
 			if ( !result.objects[ dd ] ) {
 
-				o = data.objects[ dd ];
+				o = childrenVar[ dd ];
+                                console.log("o : ", o);
 
 				if ( o.geometry !== undefined ) {
 
@@ -214,7 +235,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						object.castShadow = o.castShadow;
 						object.receiveShadow = o.receiveShadow;
 
-						result.scene.add( object );
+						parentNode.add( object );
 
 						result.objects[ dd ] = object;
 
@@ -251,12 +272,20 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 					object.scale.set( s[0], s[1], s[2] );
 					object.visible = ( o.visible !== undefined ) ? o.visible : false;
 
-					result.scene.add( object );
+					parentNode.add( object );
 
 					result.objects[ dd ] = object;
 					result.empties[ dd ] = object;
 
 				}
+                                
+                                // recursive descend if necessary
+                                if ( o.children !== undefined ) {
+                                    console.log("add children of ", dd);
+                                    handle_children( object, o.children);
+                                } else {
+                                    console.log("no children of ", dd);
+                                }                               
 
 			}
 
