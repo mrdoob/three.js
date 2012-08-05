@@ -122,37 +122,27 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 		}
 
 	};
-        // the toplevel loader function, delegates to handle_children
-	 function handle_objects() {
 
-		console.log("handle_objects");
-                
-                var parentNode=result.scene;
-                var children = data.objects;
-                
-                handle_children( parentNode, children);
-         }
-         
-         // the loading function to load all children of one node
-         // parentNode: the node to attach the children to, either the scene itself or Object3D
-         // children: the list of children to handle
-         function handle_children( parentNode, childrenVar) {
-             
-                console.log("handle_children", parentNode, childrenVar);
-             
-                var object;
-                
-		for( dd in childrenVar ) {
-                        console.log("dd : ", dd);
-                        console.log("children ", childrenVar[dd].children);
-                        console.log("check", !result.objects[ dd ] , " ", result.objects[ dd ] );
+	// the toplevel loader function, delegates to handle_children
 
-                        // check by id if child has already been handled, 
-                        // if not, create new objec
-			if ( !result.objects[ dd ] ) {
+	function handle_objects() {
 
-				o = childrenVar[ dd ];
-                                console.log("o : ", o);
+		handle_children( result.scene, data.objects );
+
+	}
+
+	function handle_children( parent, children ) {
+
+		var object;
+
+		for ( dd in children ) {
+
+			// check by id if child has already been handled, 
+			// if not, create new object
+
+			if ( result.objects[ dd ] === undefined ) {
+
+				o = children[ dd ];
 
 				if ( o.geometry !== undefined ) {
 
@@ -207,10 +197,12 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						if ( m ) {
 
 							object.matrixAutoUpdate = false;
-							object.matrix.set( m[0], m[1], m[2], m[3],
-											   m[4], m[5], m[6], m[7],
-											   m[8], m[9], m[10], m[11],
-											   m[12], m[13], m[14], m[15]);
+							object.matrix.set(
+								m[0], m[1], m[2], m[3],
+								m[4], m[5], m[6], m[7],
+								m[8], m[9], m[10], m[11],
+								m[12], m[13], m[14], m[15]
+							);
 
 						} else {
 
@@ -235,7 +227,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 						object.castShadow = o.castShadow;
 						object.receiveShadow = o.receiveShadow;
 
-						parentNode.add( object );
+						parent.add( object );
 
 						result.objects[ dd ] = object;
 
@@ -272,20 +264,19 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 					object.scale.set( s[0], s[1], s[2] );
 					object.visible = ( o.visible !== undefined ) ? o.visible : false;
 
-					parentNode.add( object );
+					parent.add( object );
 
 					result.objects[ dd ] = object;
 					result.empties[ dd ] = object;
 
 				}
-                                
-                                // recursive descend if necessary
-                                if ( o.children !== undefined ) {
-                                    console.log("add children of ", dd);
-                                    handle_children( object, o.children);
-                                } else {
-                                    console.log("no children of ", dd);
-                                }                               
+
+				// recursive descend if necessary
+				if ( o.children !== undefined ) {
+
+					handle_children( object, o.children );
+
+				}
 
 			}
 
@@ -330,10 +321,10 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		var progress = {
 
-			totalModels		: total_models,
-			totalTextures	: total_textures,
-			loadedModels	: total_models - counter_models,
-			loadedTextures	: total_textures - counter_textures
+			totalModels : total_models,
+			totalTextures : total_textures,
+			loadedModels : total_models - counter_models,
+			loadedTextures : total_textures - counter_textures
 
 		};
 
@@ -341,7 +332,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 		scope.onLoadProgress();
 
-		if( counter_models === 0 && counter_textures === 0 ) {
+		if ( counter_models === 0 && counter_textures === 0 ) {
 
 			callbackFinished( result );
 

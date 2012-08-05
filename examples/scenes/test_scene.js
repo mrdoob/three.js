@@ -92,13 +92,43 @@
 		"visible"  : true
 	},
 
-	"colorcube" : {
+	"colorcube1" : {
 		"geometry" : "colorcube",
-		"materials": [ ],
+		"materials": [],
 		"position" : [ -10, -5, 30 ],
-		"rotation" : [ 1.57, 0, 0 ],
+		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 5, 5, 5 ],
-		"visible"  : true
+		"visible"  : true,
+		"children" : {
+			"colorcube2" : {
+				"geometry" : "colorcube",
+				"materials": [],
+				"position" : [ 0, 2, 0 ],
+				"rotation" : [ 0.1, 0.1, 0.1 ],
+				"scale"    : [ 0.5, 0.5, 0.5 ],
+				"visible"  : true,
+				"children" : {
+					"colorcube3" : {
+						"geometry" : "colorcube",
+						"materials": [],
+						"position" : [ 0, 2, 0 ],
+						"rotation" : [ 0.1, 0.1, 0.1 ],
+						"scale"    : [ 0.5, 0.5, 0.5 ],
+						"visible"  : true,
+						"children" : {
+							"colorcube4" : {
+								"geometry" : "colorcube",
+								"materials": [],
+								"position" : [ 0, 2, 0 ],
+								"rotation" : [ 0.1, 0.1, 0.1 ],
+								"scale"    : [ 0.5, 0.5, 0.5 ],
+								"visible"  : true
+							}
+						}
+					}
+				}
+			}
+		}
 	},
 
 	"veyron" : {
