@@ -36,6 +36,11 @@
 		<div>
 		Unique number of this geometry instance
 		</div>
+		
+		<h3>.[page:String name]</h3>
+		<div>
+		Name for this geometry. Default is an empty string.
+		</div>
 
 		<h3>.[page:Array vertices]</h3>
 		<div>
@@ -73,14 +78,14 @@
 
 		<h3>.[page:Array morphTargets]</h3>
 		<div>
-		Array of morph targets. Each morph target is JS object:
+		Array of morph targets. Each morph target is a Javascript object:
 		<code>{ name: "targetName", vertices: [ new THREE.Vertex(), ... ] }</code>
 		Morph vertices match number and order of primary vertices.
 		</div>
 
 		<h3>.[page:Array morphColors]</h3>
 		<div>
-		Array of morph colors. Morph colors have similar structure as morph targets, each color set is JS object:
+		Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:
 		<code>morphColor = { name: "colorName", colors: [ new THREE.Color(), ... ] }</code>
 		Morph colors can match either number and order of faces (face colors) or number of vertices (vertex colors).
 		</div>
@@ -158,6 +163,8 @@
 		<div>
 		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.
 		</div>
+		
+		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
 
 		<h3>.mergeVertices()</h3>
 		<div>
