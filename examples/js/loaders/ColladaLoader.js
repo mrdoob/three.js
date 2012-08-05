@@ -3318,12 +3318,19 @@ THREE.ColladaLoader = function () {
 		this.name = element.getAttribute( 'name' );
 
 		this.doubleSided = false;
-		var double_sided = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-		if (double_sided) {
-			double_sided = double_sided.iterateNext();
-			if ( double_sided && parseInt( double_sided.textContent, 10 ) === 1) {
+
+		var node = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+
+		if ( node ) {
+
+			node = node.iterateNext();
+
+			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
+
 				this.doubleSided = true;
+
 			}
+
 		}
 
 		this.shader = null;
