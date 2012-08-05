@@ -3158,6 +3158,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		props[ 'shading' ] = preferredShading;
+		props[ 'doubleSided' ] = this.effect.doubleSided;
 
 		switch ( this.type ) {
 
@@ -3315,6 +3316,16 @@ THREE.ColladaLoader = function () {
 
 		this.id = element.getAttribute( 'id' );
 		this.name = element.getAttribute( 'name' );
+
+		this.doubleSided = false;
+		var double_sided = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+		if (double_sided) {
+			double_sided = double_sided.iterateNext();
+			if ( double_sided && parseInt( double_sided.textContent, 10 ) === 1) {
+				this.doubleSided = true;
+			}
+		}
+
 		this.shader = null;
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
