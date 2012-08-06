@@ -43,11 +43,13 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 	for ( var key in values ) {
 
+		if ( key === 'id' || key === 'setValues' || key === 'clone' ) continue;
+
 		var value = values[ key ];
 
-		if ( this[ key ] !== undefined && key !== "id") {
+		if ( this[ key ] !== undefined ) {
 
-			if (this[key] instanceof THREE.Color) {
+			if ( this[ key ] instanceof THREE.Color ) {
 				
 				if ( value instanceof THREE.Color ) {
 
@@ -59,10 +61,14 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 				}
 				
-			} else if (this[key] instanceof THREE.Vector3){
+			} else if ( this[ key ] instanceof THREE.Vector3 ) {
+
 				this[ key ].copy( value );
+
 			} else {
+
 				this[ key ] = value;
+
 			}
 
 		}
