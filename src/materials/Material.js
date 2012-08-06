@@ -49,6 +49,9 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 			switch ( key ) {
 
+				case "id":
+					break;
+
 				case "color":
 				case "ambient":
 				case "emissive":
