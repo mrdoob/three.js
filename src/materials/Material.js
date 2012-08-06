@@ -55,7 +55,7 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 };
 
-THREE.Material.prototype.clone = function () {
+THREE.Material.prototype.clone = function ( material ) {
 
 	material.name = this.name;
 

@@ -69,6 +69,8 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 
 	var material = new THREE.MeshBasicMaterial();
 
+	THREE.Material.prototype.clone.call( this, material );
+
 	material.color.copy( this.color );
 
 	material.map = this.map;
