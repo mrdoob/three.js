@@ -43,33 +43,11 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 	for ( var key in values ) {
 
-		if ( key === 'id' || key === 'setValues' || key === 'clone' ) continue;
-
 		var value = values[ key ];
 
 		if ( this[ key ] !== undefined ) {
 
-			if ( this[ key ] instanceof THREE.Color ) {
-				
-				if ( value instanceof THREE.Color ) {
-
-					this[ key ].copy( value );
-
-				} else {
-
-					this[ key ].setHex( value );
-
-				}
-				
-			} else if ( this[ key ] instanceof THREE.Vector3 ) {
-
-				this[ key ].copy( value );
-
-			} else {
-
-				this[ key ] = value;
-
-			}
+			this[ key ] = value;
 
 		}
 
@@ -79,7 +57,31 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 THREE.Material.prototype.clone = function () {
 
-	return new THREE.Material( this );
+	material.name = this.name;
+
+	material.side = this.side;
+
+	material.opacity = this.opacity;
+	material.transparent = this.transparent;
+
+	material.blending = this.blending;
+
+	material.blendSrc = this.blendSrc;
+	material.blendDst = this.blendDst;
+	material.blendEquation = this.blendEquation;
+
+	material.depthTest = this.depthTest;
+	material.depthWrite = this.depthWrite;
+
+	material.polygonOffset = this.polygonOffset;
+	material.polygonOffsetFactor = this.polygonOffsetFactor;
+	material.polygonOffsetUnits = this.polygonOffsetUnits;
+
+	material.alphaTest = this.alphaTest;
+
+	material.overdraw = this.overdraw;
+
+	material.visible = this.visible;
 
 };
 

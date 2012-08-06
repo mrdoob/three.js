@@ -67,6 +67,33 @@ THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshBasicMaterial.prototype.clone = function () {
 
-	return new THREE.MeshBasicMaterial( this );
+	var material = new THREE.MeshBasicMaterial();
+
+	material.color.copy( this.color );
+
+	material.map = this.map;
+
+	material.lightMap = this.lightMap;
+	
+	material.envMap = this.envMap;
+	material.combine = this.combine;
+	material.reflectivity = this.reflectivity;
+	material.refractionRatio = this.refractionRatio;
+
+	material.fog = this.fog;
+
+	material.shading = this.shading;
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+	material.wireframeLinecap = this.wireframeLinecap;
+	material.wireframeLinejoin = this.wireframeLinejoin;
+
+	material.vertexColors = this.vertexColors;
+
+	material.skinning = this.skinning;
+	material.morphTargets = this.morphTargets;
+
+	return material;
 
 };
