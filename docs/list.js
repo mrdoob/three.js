@@ -43,6 +43,7 @@ var list = {
 		[ "GeometryLoader", "loaders/GeometryLoader" ],
 		[ "ImageLoader", "loaders/ImageLoader" ],
 		[ "JSONLoader", "loaders/JSONLoader" ],
+		[ "LoadingMonitor", "loaders/LoadingMonitor" ],
 		[ "SceneLoader", "loaders/SceneLoader" ],
 	],
 
