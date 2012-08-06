@@ -195,6 +195,9 @@ THREE.Projector = function() {
 					face = faces[ f ];
 
 					material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
+
+					if ( material === undefined ) continue;
+
 					side = material.side;
 
 					if ( face instanceof THREE.Face3 ) {

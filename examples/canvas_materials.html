@@ -66,33 +66,33 @@
 
 				var geometry = new THREE.SphereGeometry( 100, 14, 7, false );
 
-				var materials = [
+				geometry.materials = [
 
-					{ material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, oubleSided: true } ) },
-					{ material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending, doubleSided: true } ) },
-					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, doubleSided: false, overdraw: true } ) },
-					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, doubleSided: false, overdraw: true } ) },
-					{ material: new THREE.MeshDepthMaterial( { doubleSided: false, overdraw: true } ) },
-					{ material: new THREE.MeshNormalMaterial( { doubleSided: false, overdraw: true } ) },
-					{ material: new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ), doubleSided: false } ) },
-					{ material: new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ), doubleSided: false } ) }
+					new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
+					new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending, side: THREE.DoubleSide } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, side: THREE.DoubleSide, overdraw: true } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: true } ),
+					new THREE.MeshDepthMaterial( { overdraw: true } ),
+					new THREE.MeshNormalMaterial( { overdraw: true } ),
+					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } )
 
 				];
 
 				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
 					var face = geometry.faces[ i ];
-					if ( Math.random() > 0.7 ) face.material = [ materials[ Math.floor( Math.random() * materials.length )  ].material ];
+					if ( Math.random() > 0.5 ) face.materialIndex = Math.floor( Math.random() * geometry.materials.length );
 
 				}
 
-				materials.push( { material: new THREE.MeshFaceMaterial(), overdraw: false, doubleSided: true } );
+				geometry.materials.push( new THREE.MeshFaceMaterial() );
 
 				objects = [];
 
-				for ( var i = 0, l = materials.length; i < l; i ++ ) {
+				for ( var i = 0, l = geometry.materials.length; i < l; i ++ ) {
 
-					var sphere = new THREE.Mesh( geometry, materials[ i ].material );
+					var sphere = new THREE.Mesh( geometry, geometry.materials[ i ] );
 
 					sphere.position.x = ( i % 5 ) * 200 - 400;
 					sphere.position.z = Math.floor( i / 5 ) * 200 - 200;
