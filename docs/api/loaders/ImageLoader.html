@@ -9,15 +9,9 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">A loader for loading an image.</div>
+		<div class="desc">A loader for loading an [page:Image image].</div>
 		<div class="desc">Unlike other loaders, this one emits events instead of using predefined callbacks. So if you're interested in getting notified when <em>things</em> happen, you need to add listeners to the object.</div>
-		<div class="desc">Possible events:<br />
-			<ul>
-				<li>type: error, message: error message</li>
-				<li>type: load, content: loaded image</li>
-			</ul>
-		</div>
-
+		
 		<h2>Constructor</h2>
 
 		<h3>[name]()</h3>
@@ -31,6 +25,23 @@
 		
 		<div class="desc">Begin loading from <em>url</em></div>
 
+		<h2>Events</h2>
+		
+		<h3>load</h3>
+		<div class="desc">
+		Dispatched when the image has completed loading
+		</div>
+		<div>
+		content — loaded image
+		</div>
+		
+		<h3>error</h3>
+		<div class="desc">
+		Dispatched when the image can't be loaded
+		</div>
+		<div>
+		message — error message
+		</div>
 
 		<h2>Source</h2>
 
