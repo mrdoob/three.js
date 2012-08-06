@@ -43,9 +43,29 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 	for ( var key in values ) {
 
-		if ( this[ key ] !== undefined ) {
+		var newValue = values[ key ];
 
-			this[ key ] = values[ key ];
+		if ( key in this ) {
+
+			var currentValue = this[ key ];
+
+			if ( currentValue instanceof THREE.Color && newValue instanceof THREE.Color ) {
+
+				currentValue.copy( newValue );
+
+			} else if ( currentValue instanceof THREE.Color && typeof( newValue ) === "number" ) {
+
+				currentValue.setHex( newValue );
+
+			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+
+				currentValue.copy( newValue );
+
+			} else {
+
+				this[ key ] = newValue;
+
+			}
 
 		}
 
