@@ -131,7 +131,7 @@ THREE.Projector = function() {
 		modelMatrix, rotationMatrix,
 		geometry, geometryMaterials, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
-		v1, v2, v3, v4, flipSided, doubleSided;
+		v1, v2, v3, v4, isFaceMaterial, material, side;
 
 		_face3Count = 0;
 		_face4Count = 0;
@@ -170,8 +170,8 @@ THREE.Projector = function() {
 
 				rotationMatrix = object.matrixRotationWorld.extractRotation( modelMatrix );
 
-				flipSided = object.material.flipSided;
-				doubleSided = object.material.doubleSided;
+				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+				side = object.material.side;
 
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
@@ -190,10 +190,12 @@ THREE.Projector = function() {
 
 				}
 
-
 				for ( f = 0, fl = faces.length; f < fl; f ++ ) {
 
 					face = faces[ f ];
+
+					material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
+					side = material.side;
 
 					if ( face instanceof THREE.Face3 ) {
 
@@ -206,7 +208,7 @@ THREE.Projector = function() {
 							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
 
-							if ( doubleSided === true || visible !== flipSided ) {
+							if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
 
 								_face = getNextFace3InPool();
 
@@ -241,7 +243,7 @@ THREE.Projector = function() {
 								( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0;
 
 
-							if ( doubleSided === true || visible !== flipSided ) {
+							if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
 
 								_face = getNextFace4InPool();
 
@@ -266,7 +268,7 @@ THREE.Projector = function() {
 
 					_face.normalWorld.copy( face.normal );
 
-					if ( visible === false && ( flipSided === true || doubleSided === true ) ) _face.normalWorld.negate();
+					if ( visible === false && ( side === THREE.BackSide || side === THREE.DoubleSide ) ) _face.normalWorld.negate();
 					rotationMatrix.multiplyVector3( _face.normalWorld );
 
 					_face.centroidWorld.copy( face.centroid );
@@ -282,7 +284,7 @@ THREE.Projector = function() {
 						normal = _face.vertexNormalsWorld[ n ];
 						normal.copy( faceVertexNormals[ n ] );
 
-						if ( visible === false && ( flipSided === true || doubleSided === true ) ) normal.negate();
+						if ( visible === false && ( side === THREE.BackSide || side === THREE.DoubleSide ) ) normal.negate();
 
 						rotationMatrix.multiplyVector3( normal );
 
@@ -302,8 +304,7 @@ THREE.Projector = function() {
 
 					}
 
-					_face.material = object.material;
-					_face.faceMaterial = face.materialIndex !== null ? geometryMaterials[ face.materialIndex ] : null;
+					_face.material = material;
 
 					_face.z = _face.centroidScreen.z;
 

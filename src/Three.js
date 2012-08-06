@@ -68,6 +68,12 @@ if ( ! self.Int32Array ) {
 
 // MATERIAL CONSTANTS
 
+// side
+
+THREE.FrontSide = 0;
+THREE.BackSide = 1;
+THREE.DoubleSide = 2;
+
 // shading
 
 THREE.NoShading = 0;

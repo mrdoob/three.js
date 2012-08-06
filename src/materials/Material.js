@@ -11,6 +11,8 @@ THREE.Material = function ( parameters ) {
 
 	this.name = '';
 
+	this.side = parameters.side !== undefined ? parameters.side : THREE.FrontSide;
+
 	this.opacity = parameters.opacity !== undefined ? parameters.opacity : 1;
 	this.transparent = parameters.transparent !== undefined ? parameters.transparent : false;
 
@@ -32,9 +34,6 @@ THREE.Material = function ( parameters ) {
 	this.overdraw = parameters.overdraw !== undefined ? parameters.overdraw : false; // Boolean for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = parameters.visible !== undefined ? parameters.visible : true;
-
-	this.doubleSided = parameters.doubleSided !== undefined ? parameters.doubleSided : false;
-	this.flipSided = parameters.flipSided !== undefined ? parameters.flipSided : false;
 
 	this.needsUpdate = true;
 

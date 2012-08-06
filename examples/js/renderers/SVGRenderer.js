@@ -109,7 +109,6 @@ THREE.SVGRenderer = function () {
 			element = _elements[ e ];
 
 			material = element.material;
-			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
 
 			if ( material === undefined || material.visible === false ) continue;
 
