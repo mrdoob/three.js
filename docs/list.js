@@ -40,8 +40,12 @@ var list = {
 	"Loaders": [
 		[ "Loader", "loaders/Loader" ],
 		[ "BinaryLoader", "loaders/BinaryLoader" ],
+		[ "GeometryLoader", "loaders/GeometryLoader" ],
+		[ "ImageLoader", "loaders/ImageLoader" ],
 		[ "JSONLoader", "loaders/JSONLoader" ],
+		[ "LoadingMonitor", "loaders/LoadingMonitor" ],
 		[ "SceneLoader", "loaders/SceneLoader" ],
+		[ "TextureLoader", "loaders/TextureLoader" ],
 	],
 
 	"Materials": [
