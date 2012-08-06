@@ -30,6 +30,15 @@ THREE.MeshNormalMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshNormalMaterial.prototype.clone = function () {
 
-	return new THREE.MeshNormalMaterial( this );
+	var material = new THREE.MeshNormalMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.shading = this.shading;
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+
+	return material;
 
 };

@@ -41,6 +41,20 @@ THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.LineBasicMaterial.prototype.clone = function () {
 
-	return new THREE.LineBasicMaterial( this );
+	var material = new THREE.LineBasicMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+
+	material.linewidth = this.linewidth;
+	material.linecap = this.linecap;
+	material.linejoin = this.linejoin;
+
+	material.vertexColors = this.vertexColors;
+
+	material.fog = this.fog;
+
+	return material;
 
 };

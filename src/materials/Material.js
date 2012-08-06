@@ -43,11 +43,9 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 	for ( var key in values ) {
 
-		var value = values[ key ];
-
 		if ( this[ key ] !== undefined ) {
 
-			this[ key ] = value;
+			this[ key ] = values[ key ];
 
 		}
 
@@ -56,6 +54,8 @@ THREE.Material.prototype.setValues = function ( values ) {
 };
 
 THREE.Material.prototype.clone = function ( material ) {
+
+	if ( material === undefined ) material = new THREE.material()
 
 	material.name = this.name;
 
@@ -82,6 +82,8 @@ THREE.Material.prototype.clone = function ( material ) {
 	material.overdraw = this.overdraw;
 
 	material.visible = this.visible;
+
+	return material;
 
 };
 

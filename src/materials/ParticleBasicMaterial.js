@@ -41,6 +41,21 @@ THREE.ParticleBasicMaterial.prototype = Object.create( THREE.Material.prototype 
 
 THREE.ParticleBasicMaterial.prototype.clone = function () {
 
-	return new THREE.ParticleBasicMaterial( this );
+	var material = new THREE.ParticleBasicMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+
+	material.map = this.map;
+
+	material.size = this.size;
+	material.sizeAttenuation = this.sizeAttenuation;
+
+	material.vertexColors = this.vertexColors;
+
+	material.fog = this.fog;
+
+	return material;
 
 };

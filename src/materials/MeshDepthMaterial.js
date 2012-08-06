@@ -17,8 +17,6 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
-	this.shading = THREE.SmoothShading; // doesn't really apply here, normals are not used
-
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
@@ -30,6 +28,13 @@ THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshDepthMaterial.prototype.clone = function () {
 
-	return new THREE.MeshDepthMaterial( this );
+	var material = new THREE.LineBasicMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+
+	return material;
 
 };

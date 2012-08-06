@@ -59,6 +59,31 @@ THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.ShaderMaterial.prototype.clone = function () {
 
-	return new THREE.ShaderMaterial( this );
+	var material = new THREE.ShaderMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.fragmentShader = this.fragmentShader;
+	material.vertexShader = this.vertexShader;
+	material.uniforms = this.uniforms;
+	material.attributes = this.attributes;
+
+	material.shading = this.shading;
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+
+	material.fog = this.fog;
+
+	material.lights = this.lights;
+
+	material.vertexColors = this.vertexColors;
+
+	material.skinning = this.skinning;
+
+	material.morphTargets = this.morphTargets;
+	material.morphNormals = this.morphNormals;
+
+	return material;
 
 };

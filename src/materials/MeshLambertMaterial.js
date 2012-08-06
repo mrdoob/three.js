@@ -77,6 +77,41 @@ THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshLambertMaterial.prototype.clone = function () {
 
-	return new THREE.MeshLambertMaterial( this );
+	var material = new THREE.MeshLambertMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+	material.ambient.copy( this.ambient );
+	material.emissive.copy( this.emissive );
+
+	material.wrapAround = this.wrapAround;
+	material.wrapRGB.copy( this.wrapRGB );
+
+	material.map = this.map;
+
+	material.lightMap = this.lightMap;
+
+	material.envMap = this.envMap;
+	material.combine = this.combine;
+	material.reflectivity = this.reflectivity;
+	material.refractionRatio = this.refractionRatio;
+
+	material.fog = this.fog;
+
+	material.shading = this.shading;
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+	material.wireframeLinecap = this.wireframeLinecap;
+	material.wireframeLinejoin = this.wireframeLinejoin;
+
+	material.vertexColors = this.vertexColors;
+
+	material.skinning = this.skinning;
+	material.morphTargets = this.morphTargets;
+	material.morphNormals = this.morphNormals;
+
+	return material;
 
 };
