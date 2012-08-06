@@ -45,40 +45,24 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 		var value = values[ key ];
 
-		if ( this[ key ] !== undefined ) {
+		if ( this[ key ] !== undefined && key !== "id") {
 
-			switch ( key ) {
-
-				case "id":
-					break;
-
-				case "color":
-				case "ambient":
-				case "emissive":
-				case "specular":
-
-					if ( value instanceof THREE.Color ) {
-
-						this[ key ].copy( value );
-
-					} else {
-
-						this[ key ].setHex( value );
-
-					}
-
-					break;
-
-				case "wrapRGB":
+			if (this[key] instanceof THREE.Color) {
+				
+				if ( value instanceof THREE.Color ) {
 
 					this[ key ].copy( value );
 
-					break;
+				} else {
 
-				default:
+					this[ key ].setHex( value );
 
-					this[ key ] = value;
-
+				}
+				
+			} else if (this[key] instanceof THREE.Vector3){
+				this[ key ].copy( value );
+			} else {
+				this[ key ] = value;
 			}
 
 		}
