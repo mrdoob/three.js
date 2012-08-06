@@ -273,6 +273,12 @@ THREE.Object3D.prototype = {
 
 		return this.matrixWorld.multiplyVector3( vector );
 
+	},
+
+	clone: function () {
+
+		// TODO
+
 	}
 
 };
