@@ -114,7 +114,7 @@
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
 					depthWrite: false,
-					flipSided: true
+					side: THREE.BackSide
 
 				} ),
 
@@ -281,7 +281,7 @@
 
 					}
 
-					materials[ i ].doubleSided = true;
+					materials[ i ].side = THREE.DoubleSide;
 
 				}
 

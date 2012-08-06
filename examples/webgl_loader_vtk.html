@@ -80,7 +80,7 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
-				var material = new THREE.MeshLambertMaterial( { color:0xffffff, doubleSided: true } );
+				var material = new THREE.MeshLambertMaterial( { color:0xffffff, side: THREE.DoubleSide } );
 
 				var loader = new THREE.VTKLoader();
 				loader.addEventListener( 'load', function ( event ) {
