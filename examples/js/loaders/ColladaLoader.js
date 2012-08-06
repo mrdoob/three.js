@@ -129,7 +129,7 @@ THREE.ColladaLoader = function () {
 		parseAsset();
 		setUpConversion();
 		images = parseLib( "//dae:library_images/dae:image", _Image, "image" );
-		materials = parseLib( "//dae:library_materials/dae:material", Material, "material") ;
+		materials = parseLib( "//dae:library_materials/dae:material", Material, "material" );
 		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
 		geometries = parseLib( "//dae:library_geometries/dae:geometry", Geometry, "geometry" );
 		cameras = parseLib( ".//dae:library_cameras/dae:camera", Camera, "camera" );
@@ -715,7 +715,7 @@ THREE.ColladaLoader = function () {
 
 			var instance_geometry = node.geometries[i];
 			var instance_materials = instance_geometry.instance_material;
-			var geometry = geometries[instance_geometry.url];
+			var geometry = geometries[ instance_geometry.url ];
 			var used_materials = {};
 			var used_materials_array = [];
 			var num_materials = 0;
@@ -2114,8 +2114,8 @@ THREE.ColladaLoader = function () {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			var child = element.childNodes[i];
-			if (child.nodeType != 1) continue;
+			var child = element.childNodes[ i ];
+			if ( child.nodeType !== 1 ) continue;
 
 			switch ( child.nodeName ) {
 
@@ -2134,7 +2134,7 @@ THREE.ColladaLoader = function () {
 
 						while ( instance ) {
 
-							this.instance_material.push((new InstanceMaterial()).parse(instance));
+							this.instance_material.push( (new InstanceMaterial()).parse(instance) );
 							instance = instances.iterateNext();
 
 						}
@@ -2519,9 +2519,11 @@ THREE.ColladaLoader = function () {
 						vec1, vec2, vec3, v1, v2, norm;
 
 					// subdivide into multiple Face3s
-					for ( k = 1; k < vcount-1; ) {
+
+					for ( k = 1; k < vcount - 1; ) {
 
 						// FIXME: normals don't seem to be quite right
+
 						faces.push( new THREE.Face3( vs[0], vs[k], vs[k+1], [ ns[0], ns[k++], ns[k] ],  clr ) );
 
 					}
@@ -2530,7 +2532,7 @@ THREE.ColladaLoader = function () {
 
 				if ( faces.length ) {
 
-					for (var ndx = 0, len = faces.length; ndx < len; ndx++) {
+					for ( var ndx = 0, len = faces.length; ndx < len; ndx ++ ) {
 
 						face = faces[ndx];
 						face.daeMaterial = primitive.material;
@@ -3073,7 +3075,7 @@ THREE.ColladaLoader = function () {
 				case 'diffuse':
 				case 'specular':
 
-					var cot = this[prop];
+					var cot = this[ prop ];
 
 					if ( cot instanceof ColorOrTexture ) {
 
@@ -3097,7 +3099,7 @@ THREE.ColladaLoader = function () {
 										props['map'] = texture;
 
 										// Texture with baked lighting?
-										if ( prop == 'emission' ) props[ 'emissive' ] = 0xffffff;
+										if ( prop === 'emission' ) props[ 'emissive' ] = 0xffffff;
 
 									}
 
@@ -3105,9 +3107,9 @@ THREE.ColladaLoader = function () {
 
 							}
 
-						} else if ( prop == 'diffuse' || !transparent ) {
+						} else if ( prop === 'diffuse' || !transparent ) {
 
-							if ( prop == 'emission' ) {
+							if ( prop === 'emission' ) {
 
 								props[ 'emissive' ] = cot.color.getHex();
 
@@ -3124,18 +3126,21 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'shininess':
+
 					props[ prop ] = this[ prop ];
 					break;
 
 				case 'reflectivity':
+
 					props[ prop ] = this[ prop ];
-					if(props[ prop ] > 0.0) props['envMap'] = options.defaultEnvMap;
+					if( props[ prop ] > 0.0 ) props['envMap'] = options.defaultEnvMap;
 					props['combine'] = THREE.MixOperation;	//mix regular shading with reflective component
 					break;
 
 				case 'index_of_refraction':
+
 					props[ 'refractionRatio' ] = this[ prop ]; //TODO: "index_of_refraction" becomes "refractionRatio" in shader, but I'm not sure if the two are actually comparable
-					if(this[ prop ] != 1.0) props['envMap'] = options.defaultEnvMap;
+					if ( this[ prop ] !== 1.0 ) props['envMap'] = options.defaultEnvMap;
 					break;
 
 				case 'transparency':
@@ -3158,7 +3163,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		props[ 'shading' ] = preferredShading;
-		props[ 'doubleSided' ] = this.effect.doubleSided;
+		props[ 'side' ] = this.effect.doubleSided ? THREE.DoubleSide : THREE.FrontSide;
 
 		switch ( this.type ) {
 

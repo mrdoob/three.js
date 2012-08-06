@@ -666,7 +666,7 @@
 				object.bodyMesh.geometry.computeBoundingBox();
 				var bb = object.bodyMesh.geometry.boundingBox;
 
-				var ss = object.modelScale * 1.0;
+				var ss = object.modelScale * 1.1;
 				var shadowWidth  =        ss * ( bb.max.z - bb.min.z );
 				var shadowHeight = 1.25 * ss * ( bb.max.x - bb.min.x );
 
@@ -679,6 +679,7 @@
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
 				shadow.position.y = s + 10;
 				shadow.rotation.x = - Math.PI / 2;
+				shadow.rotation.z = Math.PI / 2;
 
 				object.root.add( shadow );
 
