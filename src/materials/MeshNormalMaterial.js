@@ -22,7 +22,7 @@ THREE.MeshNormalMaterial = function ( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
-	this.setParameters( parameters );
+	this.setValues( parameters );
 
 };
 

@@ -51,7 +51,7 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
-	this.setParameters( parameters );
+	this.setValues( parameters );
 
 };
 

@@ -76,7 +76,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.morphTargets = false;
 	this.morphNormals = false;
 
-	this.setParameters( parameters );
+	this.setValues( parameters );
 
 };
 
@@ -84,8 +84,6 @@ THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshPhongMaterial.prototype.clone = function () {
 
-	var material = new THREE.MeshPhongMaterial( this );
-	material.wrapRGB = this.wrapRGB.clone();
-	return material;
+	return new THREE.MeshPhongMaterial( this );
 
 };

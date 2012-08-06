@@ -33,7 +33,7 @@ THREE.LineBasicMaterial = function ( parameters ) {
 
 	this.fog = true;
 
-	this.setParameters( parameters );
+	this.setValues( parameters );
 
 };
 

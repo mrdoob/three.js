@@ -69,7 +69,7 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.morphTargets = false;
 	this.morphNormals = false;
 
-	this.setParameters( parameters );
+	this.setValues( parameters );
 
 };
 
@@ -77,8 +77,6 @@ THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshLambertMaterial.prototype.clone = function () {
 
-	var material = new THREE.MeshLambertMaterial( this );
-	material.wrapRGB = this.wrapRGB.clone();
-	return material;
+	return new THREE.MeshLambertMaterial( this );
 
 };

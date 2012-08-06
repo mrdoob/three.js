@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Material = function ( parameters ) {
+THREE.Material = function () {
 
 	this.id = THREE.MaterialCount ++;
 
@@ -37,13 +37,13 @@ THREE.Material = function ( parameters ) {
 
 };
 
-THREE.Material.prototype.setParameters = function ( parameters ) {
+THREE.Material.prototype.setValues = function ( values ) {
 
-	if ( parameters === undefined ) parameters = {};
+	if ( values === undefined ) values = {};
 
-	for ( var key in parameters ) {
+	for ( var key in values ) {
 
-		var value = parameters[ key ];
+		var value = values[ key ];
 
 		if ( this[ key ] !== undefined ) {
 
