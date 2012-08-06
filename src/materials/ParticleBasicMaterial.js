@@ -20,26 +20,27 @@
 
 THREE.ParticleBasicMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.color = new THREE.Color( 0xffffff );
 
-	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
+	this.map = null;
 
-	this.map = parameters.map !== undefined ? parameters.map : null;
+	this.size = 1;
+	this.sizeAttenuation = true;
 
-	this.size = parameters.size !== undefined ? parameters.size : 1;
-	this.sizeAttenuation = parameters.sizeAttenuation !== undefined ? parameters.sizeAttenuation : true;
+	this.vertexColors = false;
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : false;
+	this.fog = true;
 
-	this.fog = parameters.fog !== undefined ? parameters.fog : true;
+	this.setParameters( parameters );
 
 };
 
 THREE.ParticleBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleBasicMaterial.prototype.clone = function(){ 
-	var returnValue = new THREE.ParticleBasicMaterial(this);
-	return returnValue;
+THREE.ParticleBasicMaterial.prototype.clone = function () {
+
+	return new THREE.ParticleBasicMaterial( this );
+
 };

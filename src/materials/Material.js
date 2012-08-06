@@ -5,43 +5,89 @@
 
 THREE.Material = function ( parameters ) {
 
-	parameters = parameters || {};
-
 	this.id = THREE.MaterialCount ++;
 
 	this.name = '';
 
-	this.side = parameters.side !== undefined ? parameters.side : THREE.FrontSide;
+	this.side = THREE.FrontSide;
 
-	this.opacity = parameters.opacity !== undefined ? parameters.opacity : 1;
-	this.transparent = parameters.transparent !== undefined ? parameters.transparent : false;
+	this.opacity = 1;
+	this.transparent = false;
 
-	this.blending = parameters.blending !== undefined ? parameters.blending : THREE.NormalBlending;
+	this.blending = THREE.NormalBlending;
 
-	this.blendSrc = parameters.blendSrc !== undefined ? parameters.blendSrc : THREE.SrcAlphaFactor;
-	this.blendDst = parameters.blendDst !== undefined ? parameters.blendDst : THREE.OneMinusSrcAlphaFactor;
-	this.blendEquation = parameters.blendEquation !== undefined ? parameters.blendEquation : THREE.AddEquation;
+	this.blendSrc = THREE.SrcAlphaFactor;
+	this.blendDst = THREE.OneMinusSrcAlphaFactor;
+	this.blendEquation = THREE.AddEquation;
 
-	this.depthTest = parameters.depthTest !== undefined ? parameters.depthTest : true;
-	this.depthWrite = parameters.depthWrite !== undefined ? parameters.depthWrite : true;
+	this.depthTest = true;
+	this.depthWrite = true;
 
-	this.polygonOffset = parameters.polygonOffset !== undefined ? parameters.polygonOffset : false;
-	this.polygonOffsetFactor = parameters.polygonOffsetFactor !== undefined ? parameters.polygonOffsetFactor : 0;
-	this.polygonOffsetUnits = parameters.polygonOffsetUnits !== undefined ? parameters.polygonOffsetUnits : 0;
+	this.polygonOffset = false;
+	this.polygonOffsetFactor = 0;
+	this.polygonOffsetUnits = 0;
 
-	this.alphaTest = parameters.alphaTest !== undefined ? parameters.alphaTest : 0;
+	this.alphaTest = 0;
 
-	this.overdraw = parameters.overdraw !== undefined ? parameters.overdraw : false; // Boolean for fixing antialiasing gaps in CanvasRenderer
+	this.overdraw = false; // Boolean for fixing antialiasing gaps in CanvasRenderer
 
-	this.visible = parameters.visible !== undefined ? parameters.visible : true;
+	this.visible = true;
 
 	this.needsUpdate = true;
 
-}
+};
 
-THREE.Material.prototype.clone = function(){
-	var returnValue = new THREE.Material(this);
-	return returnValue;
+THREE.Material.prototype.setParameters = function ( parameters ) {
+
+	if ( parameters === undefined ) parameters = {};
+
+	for ( var key in parameters ) {
+
+		var value = parameters[ key ];
+
+		if ( this[ key ] !== undefined ) {
+
+			switch ( key ) {
+
+				case "color":
+				case "ambient":
+				case "emissive":
+				case "specular":
+
+					if ( value instanceof THREE.Color ) {
+
+						this[ key ].copy( value );
+
+					} else {
+
+						this[ key ].setHex( value );
+
+					}
+
+					break;
+
+				case "wrapRGB":
+
+					this[ key ].copy( value );
+
+					break;
+
+				default:
+
+					this[ key ] = value;
+
+			}
+
+		}
+
+	}
+
+};
+
+THREE.Material.prototype.clone = function () {
+
+	return new THREE.Material( this );
+
 };
 
 THREE.MaterialCount = 0;

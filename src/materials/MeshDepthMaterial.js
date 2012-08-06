@@ -15,20 +15,21 @@
 
 THREE.MeshDepthMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.shading = THREE.SmoothShading; // doesn't really apply here, normals are not used
 
-	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading; // doesn't really apply here, normals are not used
+	this.wireframe = false;
+	this.wireframeLinewidth = 1;
 
-	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
-	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
+	this.setParameters( parameters );
 
 };
 
 THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.MeshDepthMaterial.prototype.clone = function(){ 
-	var returnValue = new THREE.MeshDepthMaterial(this);
-	return returnValue;
+THREE.MeshDepthMaterial.prototype.clone = function () {
+
+	return new THREE.MeshDepthMaterial( this );
+
 };

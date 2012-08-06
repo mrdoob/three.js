@@ -38,55 +38,54 @@
 
 THREE.MeshPhongMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.color = new THREE.Color( 0xffffff ); // diffuse
+	this.ambient = new THREE.Color( 0xffffff );
+	this.emissive = new THREE.Color( 0x000000 );
+	this.specular = new THREE.Color( 0x111111 );
+	this.shininess = 30;
 
-	// color property represents diffuse for MeshPhongMaterial
+	this.metal = false;
+	this.perPixel = false;
 
-	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
-	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0xffffff );
-	this.emissive = parameters.emissive !== undefined ? new THREE.Color( parameters.emissive ) : new THREE.Color( 0x000000 );
-	this.specular = parameters.specular !== undefined ? new THREE.Color( parameters.specular ) : new THREE.Color( 0x111111 );
-	this.shininess = parameters.shininess !== undefined ? parameters.shininess : 30;
-
-	this.metal = parameters.metal !== undefined ? parameters.metal : false;
-	this.perPixel = parameters.perPixel !== undefined ? parameters.perPixel : false;
-
-	this.wrapAround = parameters.wrapAround !== undefined ? parameters.wrapAround: false;
+	this.wrapAround = false;
 	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
 
-	this.map = parameters.map !== undefined ? parameters.map : null;
+	this.map = null;
 
-	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
+	this.lightMap = null;
 
-	this.envMap = parameters.envMap !== undefined ? parameters.envMap : null;
-	this.combine = parameters.combine !== undefined ? parameters.combine : THREE.MultiplyOperation;
-	this.reflectivity = parameters.reflectivity !== undefined ? parameters.reflectivity : 1;
-	this.refractionRatio = parameters.refractionRatio !== undefined ? parameters.refractionRatio : 0.98;
+	this.envMap = null;
+	this.combine = THREE.MultiplyOperation;
+	this.reflectivity = 1;
+	this.refractionRatio = 0.98;
 
-	this.fog = parameters.fog !== undefined ? parameters.fog : true;
+	this.fog = true;
 
-	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
+	this.shading = THREE.SmoothShading;
 
-	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
-	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
-	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
-	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
+	this.wireframe = false;
+	this.wireframeLinewidth = 1;
+	this.wireframeLinecap = 'round';
+	this.wireframeLinejoin = 'round';
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : THREE.NoColors;
+	this.vertexColors = THREE.NoColors;
 
-	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
-	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
-	this.morphNormals = parameters.morphNormals !== undefined ? parameters.morphNormals : false;
+	this.skinning = false;
+	this.morphTargets = false;
+	this.morphNormals = false;
+
+	this.setParameters( parameters );
 
 };
 
 THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );
 
+THREE.MeshPhongMaterial.prototype.clone = function () {
 
-THREE.MeshPhongMaterial.prototype.clone = function(){ 
-	var returnValue = new THREE.MeshPhongMaterial(this);
-	returnValue.wrapRGB = this.wrapRGB.clone();
-	return returnValue;
+	var material = new THREE.MeshPhongMaterial( this );
+	material.wrapRGB = this.wrapRGB.clone();
+	return material;
+
 };

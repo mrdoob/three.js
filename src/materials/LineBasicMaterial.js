@@ -21,27 +21,26 @@
 
 THREE.LineBasicMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.color = new THREE.Color( 0xffffff );
 
-	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
+	this.linewidth = 1;
+	this.linecap = 'round';
+	this.linejoin = 'round';
 
-	this.linewidth = parameters.linewidth !== undefined ? parameters.linewidth : 1;
-	this.linecap = parameters.linecap !== undefined ? parameters.linecap : 'round';
-	this.linejoin = parameters.linejoin !== undefined ? parameters.linejoin : 'round';
+	this.vertexColors = false;
 
-	this.vertexColors = parameters.vertexColors ? parameters.vertexColors : false;
+	this.fog = true;
 
-	this.fog = parameters.fog !== undefined ? parameters.fog : true;
+	this.setParameters( parameters );
 
 };
 
 THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
 
+THREE.LineBasicMaterial.prototype.clone = function () {
 
-THREE.LineBasicMaterial.prototype.clone = function(){ 
-	var returnValue = new THREE.LineBasicMaterial(this);
-	return returnValue;
+	return new THREE.LineBasicMaterial( this );
+
 };
-

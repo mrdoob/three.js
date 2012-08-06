@@ -4,8 +4,8 @@
 
 THREE.Color = function ( hex ) {
 
-	if ( hex instanceof THREE.Color ) return this.clone();
 	if ( hex !== undefined ) this.setHex( hex );
+
 	return this;
 
 };
