@@ -76,7 +76,9 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				THREE.BinaryLoader.prototype.createBinModel( xhr.response, callback, texturePath, json.materials );
+				var buffer = xhr.response;
+				if ( buffer === undefined ) buffer = ( new Uint8Array( xhr.responseBody ) ).buffer; // IEWEBGL needs this
+				THREE.BinaryLoader.prototype.createBinModel( buffer, callback, texturePath, json.materials );
 
 			} else {
 
