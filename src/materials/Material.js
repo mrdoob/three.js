@@ -45,6 +45,8 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 		var newValue = values[ key ];
 
+		if ( newValue === undefined ) continue;
+
 		if ( key in this ) {
 
 			var currentValue = this[ key ];
