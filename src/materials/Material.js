@@ -39,7 +39,7 @@ THREE.Material = function () {
 
 THREE.Material.prototype.setValues = function ( values ) {
 
-	if ( values === undefined ) values = {};
+	if ( values === undefined ) return;
 
 	for ( var key in values ) {
 
