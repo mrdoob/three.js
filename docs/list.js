@@ -41,6 +41,7 @@ var list = {
 		[ "Loader", "loaders/Loader" ],
 		[ "BinaryLoader", "loaders/BinaryLoader" ],
 		[ "GeometryLoader", "loaders/GeometryLoader" ],
+		[ "ImageLoader", "loaders/ImageLoader" ],
 		[ "JSONLoader", "loaders/JSONLoader" ],
 		[ "SceneLoader", "loaders/SceneLoader" ],
 	],
