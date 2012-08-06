@@ -75,7 +75,7 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 THREE.Material.prototype.clone = function ( material ) {
 
-	if ( material === undefined ) material = new THREE.material()
+	if ( material === undefined ) material = new THREE.Material();
 
 	material.name = this.name;
 
