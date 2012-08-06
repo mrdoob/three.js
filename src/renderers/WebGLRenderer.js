@@ -5574,9 +5574,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setMaterialFaces = function ( material ) {
 
-		if ( _oldDoubleSided !== material.doubleSided ) {
+		var doubleSided = material.side === THREE.DoubleSide;
+		var flipSided = material.side === THREE.BackSide;
 
-			if ( material.doubleSided ) {
+		if ( _oldDoubleSided !== doubleSided ) {
+
+			if ( doubleSided ) {
 
 				_gl.disable( _gl.CULL_FACE );
 
@@ -5586,13 +5589,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldDoubleSided = material.doubleSided;
+			_oldDoubleSided = doubleSided;
 
 		}
 
-		if ( _oldFlipSided !== material.flipSided ) {
+		if ( _oldFlipSided !== flipSided ) {
 
-			if ( material.flipSided ) {
+			if ( flipSided ) {
 
 				_gl.frontFace( _gl.CW );
 
@@ -5602,7 +5605,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			_oldFlipSided = material.flipSided;
+			_oldFlipSided = flipSided;
 
 		}
 

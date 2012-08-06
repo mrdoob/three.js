@@ -80,7 +80,7 @@
 					var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 					reflectionCube.format = THREE.RGBFormat;
 
-					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, perPixel: true, doubleSided: true } );
+					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, perPixel: true, side: THREE.DoubleSide } );
 					material.wrapAround = true;
 					material.wrapRGB.set( 0.5, 0.5, 0.5 );
 

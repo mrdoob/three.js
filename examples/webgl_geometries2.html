@@ -61,7 +61,7 @@
 				scene.add( light );
 
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ), doubleSided: true } ),
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ), side: THREE.DoubleSide } ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, doubleSided: true } )
 				];
 
