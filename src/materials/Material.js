@@ -39,4 +39,9 @@ THREE.Material = function ( parameters ) {
 
 }
 
+THREE.Material.prototype.clone = function(){
+	var returnValue = new THREE.Material(this);
+	return returnValue;
+};
+
 THREE.MaterialCount = 0;

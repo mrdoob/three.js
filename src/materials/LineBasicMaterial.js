@@ -38,3 +38,10 @@ THREE.LineBasicMaterial = function ( parameters ) {
 };
 
 THREE.LineBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+
+
+THREE.LineBasicMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.LineBasicMaterial(this);
+	return returnValue;
+};
+

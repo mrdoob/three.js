@@ -66,3 +66,9 @@ THREE.MeshBasicMaterial = function ( parameters ) {
 };
 
 THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+
+
+THREE.MeshBasicMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.MeshBasicMaterial(this);
+	return returnValue;
+};

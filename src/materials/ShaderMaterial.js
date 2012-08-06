@@ -56,3 +56,9 @@ THREE.ShaderMaterial = function ( parameters ) {
 };
 
 THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
+
+
+THREE.ShaderMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.ShaderMaterial(this);
+	return returnValue;
+};

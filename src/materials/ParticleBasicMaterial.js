@@ -38,3 +38,8 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 };
 
 THREE.ParticleBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.ParticleBasicMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.ParticleBasicMaterial(this);
+	return returnValue;
+};
