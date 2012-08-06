@@ -9,3 +9,9 @@ THREE.ParticleDOMMaterial = function ( domElement ) {
 	this.domElement = domElement;
 
 };
+
+
+THREE.ParticleDOMMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.ParticleDOMMaterial(this);
+	return returnValue;
+};

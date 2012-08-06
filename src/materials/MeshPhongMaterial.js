@@ -83,3 +83,10 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 };
 
 THREE.MeshPhongMaterial.prototype = Object.create( THREE.Material.prototype );
+
+
+THREE.MeshPhongMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.MeshPhongMaterial(this);
+	returnValue.wrapRGB = this.wrapRGB.clone();
+	return returnValue;
+};

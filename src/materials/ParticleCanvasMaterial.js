@@ -21,3 +21,8 @@ THREE.ParticleCanvasMaterial = function ( parameters ) {
 };
 
 THREE.ParticleCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.ParticleCanvasMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.ParticleCanvasMaterial(this);
+	return returnValue;
+};

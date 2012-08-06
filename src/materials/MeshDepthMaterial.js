@@ -27,3 +27,8 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 };
 
 THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.MeshDepthMaterial.prototype.clone = function(){ 
+	var returnValue = new THREE.MeshDepthMaterial(this);
+	return returnValue;
+};
