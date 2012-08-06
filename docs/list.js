@@ -45,6 +45,7 @@ var list = {
 		[ "JSONLoader", "loaders/JSONLoader" ],
 		[ "LoadingMonitor", "loaders/LoadingMonitor" ],
 		[ "SceneLoader", "loaders/SceneLoader" ],
+		[ "TextureLoader", "loaders/TextureLoader" ],
 	],
 
 	"Materials": [
