@@ -368,7 +368,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					lightPosition = light.matrixWorld.getPosition();
+					lightPosition = light.matrixWorld.getPosition().normalize();
 
 					amount = normal.dot( lightPosition );
 
