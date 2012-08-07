@@ -34,7 +34,7 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = false; // unless set to true the *Arrays will be deleted once sent to a buffer
+	this.dynamic = true; // the intermediate typearrays will be deleted when set to false
 
 };
 
