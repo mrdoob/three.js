@@ -711,8 +711,6 @@ THREE.ColladaLoader = function () {
 		// FIXME: multi-material mesh?
 		// geometries
 
-		var double_sided_materials = {};
-
 		for ( i = 0; i < node.geometries.length; i ++ ) {
 
 			var instance_geometry = node.geometries[i];
@@ -748,15 +746,8 @@ THREE.ColladaLoader = function () {
 
 						if ( geometry.doubleSided ) {
 
-							if ( !( material3js in double_sided_materials ) ) {
-
-								var _copied_material = material3js.clone();
-								_copied_material.side = THREE.DoubleSide;
-								double_sided_materials[ material3js ] = _copied_material;
-
-							}
-
-							material3js = double_sided_materials[ material3js ];
+							material3js = material3js.clone();
+							material3js.side = THREE.DoubleSide;
 
 						}
 
