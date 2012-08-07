@@ -83,6 +83,13 @@ THREE.SVGRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
+		if ( camera instanceof THREE.Camera === false ) {
+
+			console.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
+			return;
+
+		}
+
 		var e, el, element, material;
 
 		this.autoClear && this.clear();
