@@ -72,6 +72,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// custom render plugins
 
 	this.renderPluginsPre = [];
+	this.renderPlugins = [];
 	this.renderPluginsPost = [];
 
 	// info
@@ -301,6 +302,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		plugin.init( this );
 		this.renderPluginsPost.push( plugin );
+
+	};
+
+	this.addPlugin = function ( plugin ) {
+
+		plugin.init( this );
+		this.renderPlugins.push( plugin );
 
 	};
 
@@ -3748,6 +3756,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
 
 		}
+
+		// custom render plugins (main pass)
+
+		renderPlugins( this.renderPlugins, scene, camera );
 
 		// set matrices for regular objects (frustum culled)
 
