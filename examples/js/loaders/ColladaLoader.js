@@ -711,6 +711,8 @@ THREE.ColladaLoader = function () {
 		// FIXME: multi-material mesh?
 		// geometries
 
+		var double_sided_materials = {};
+
 		for ( i = 0; i < node.geometries.length; i ++ ) {
 
 			var instance_geometry = node.geometries[i];
@@ -742,11 +744,26 @@ THREE.ColladaLoader = function () {
 						var mat = materials[ instance_material.target ];
 						var effect_id = mat.instance_effect.url;
 						var shader = effects[ effect_id ].shader;
+						var material3js = shader.material;
 
-						shader.material.opacity = !shader.material.opacity ? 1 : shader.material.opacity;
+						if ( geometry.doubleSided ) {
+
+							if ( !( material3js in double_sided_materials ) ) {
+
+								var _copied_material = material3js.clone();
+								_copied_material.side = THREE.DoubleSide;
+								double_sided_materials[ material3js ] = _copied_material;
+
+							}
+
+							material3js = double_sided_materials[ material3js ];
+
+						}
+
+						material3js.opacity = !material3js.opacity ? 1 : material3js.opacity;
 						used_materials[ instance_material.symbol ] = num_materials;
-						used_materials_array.push( shader.material )
-						first_material = shader.material;
+						used_materials_array.push( material3js );
+						first_material = material3js;
 						first_material.name = mat.name == null || mat.name === '' ? mat.id : mat.name;
 						num_materials ++;
 
@@ -755,7 +772,7 @@ THREE.ColladaLoader = function () {
 				}
 
 				var mesh;
-				var material = first_material || new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } );
+				var material = first_material || new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading, side: geometry.doubleSided ? THREE.DoubleSided : THREE.FrontSide } );
 				var geom = geometry.mesh.geometry3js;
 
 				if ( num_materials > 1 ) {
@@ -2226,6 +2243,8 @@ THREE.ColladaLoader = function () {
 
 		this.id = element.getAttribute('id');
 
+		extractDoubleSided( this, element );
+
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[i];
@@ -3322,21 +3341,7 @@ THREE.ColladaLoader = function () {
 		this.id = element.getAttribute( 'id' );
 		this.name = element.getAttribute( 'name' );
 
-		this.doubleSided = false;
-
-		var node = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
-		if ( node ) {
-
-			node = node.iterateNext();
-
-			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
-
-				this.doubleSided = true;
-
-			}
-
-		}
+		extractDoubleSided( this, element );
 
 		this.shader = null;
 
@@ -4202,6 +4207,26 @@ THREE.ColladaLoader = function () {
 		}
 
 		return result;
+
+	};
+
+	function extractDoubleSided( obj, element ) {
+
+		obj.doubleSided = false;
+
+		var node = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+
+		if ( node ) {
+
+			node = node.iterateNext();
+
+			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
+
+				obj.doubleSided = true;
+
+			}
+
+		}
 
 	};
 
