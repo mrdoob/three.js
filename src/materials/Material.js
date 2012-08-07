@@ -45,7 +45,12 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 		var newValue = values[ key ];
 
-		if ( newValue === undefined ) continue;
+		if ( newValue === undefined ) {
+
+			console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
+			continue;
+
+		}
 
 		if ( key in this ) {
 
