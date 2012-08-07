@@ -14,12 +14,12 @@ THREE.ImageLoader.prototype = {
 
 	constructor: THREE.ImageLoader,
 
-	load: function ( url ) {
+	load: function ( url, image ) {
 
 		var scope = this;
 
-		var image = new Image();
-		
+		if ( image === undefined ) image = new Image();
+
 		image.addEventListener( 'load', function () {
 
 			scope.dispatchEvent( { type: 'load', content: image } );
@@ -27,9 +27,9 @@ THREE.ImageLoader.prototype = {
 		}, false );
 
 		image.addEventListener( 'error', function () {
-		
+
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-		
+
 		}, false );
 
 		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
