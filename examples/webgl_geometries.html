@@ -54,6 +54,8 @@
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, doubleSided: true } )
 				];
 
+				materials[ 0 ].map.anisotropy = 16;
+
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
 				object.position.set( -200, 0, 400 );
 				scene.add( object );

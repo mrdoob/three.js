@@ -36,7 +36,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.UV( u, v ) );
+			uvsRow.push( new THREE.UV( u, 1 - v ) );
 
 		}
 
@@ -61,7 +61,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 			nb = this.vertices[ vertices[ 1 ][ x + 1 ] ].clone();
 
 		}
-		
+
 		na.setY( Math.sqrt( na.x * na.x + na.z * na.z ) * tanTheta ).normalize();
 		nb.setY( Math.sqrt( nb.x * nb.x + nb.z * nb.z ) * tanTheta ).normalize();
 
