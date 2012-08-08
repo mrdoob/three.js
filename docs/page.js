@@ -1,6 +1,6 @@
 var onDocumentLoad = function ( event ) {
 
-	var name = /[A-z0-9]+.html/.exec( window.location.pathname ).toString().split( '.html' )[ 0 ];
+	var name = /[A-z0-9]+\.html/.exec( window.location.pathname ).toString().split( '.html' )[ 0 ];
 	var path = /\/api\/[A-z0-9\/]+/.exec( window.location.pathname ).toString().substr( 5 );
 
 	var text = document.body.innerHTML;
