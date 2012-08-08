@@ -22,11 +22,11 @@ THREE.Ray = function ( origin, direction, near, far ) {
 	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
 	var intersectPoint = new THREE.Vector3();
-	
+
 	var descSort = function ( a, b ) {
-	
+
 			return a.distance - b.distance;
-			
+
 	};
 
 	//
@@ -120,10 +120,10 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			// Checking boundingSphere
 
 			var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
-			var scaledRadius = object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) ); 
+			var scaledRadius = object.geometry.boundingSphere.radius * Math.max( scale.x, Math.max( scale.y, scale.z ) );
 
 			// Checking distance to ray
-		
+
 			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
 			if ( distance > scaledRadius) {
@@ -192,6 +192,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
+								faceIndex: f,
 								object: object
 
 							};
@@ -214,6 +215,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 								distance: distance,
 								point: intersectPoint.clone(),
 								face: face,
+								faceIndex: f,
 								object: object
 
 							};
