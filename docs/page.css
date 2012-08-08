@@ -1,7 +1,14 @@
+@font-face {
+	font-family: 'inconsolata';
+	src: url('files/inconsolata.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
 body {
 	margin: 20px;
 	color: #555;
-	font-family: Arial, sans-serif;
+	font-family: 'inconsolata';
 	font-size: 15px;
 	overflow: auto;
 }
@@ -13,7 +20,7 @@ a {
 h1 {
 	color: #444;
 	font-size: 25px;
-	margin-top: 10px;
+	margin-top: 24px;
 }
 
 h2 {
