@@ -65,6 +65,10 @@ code {
 	overflow: auto;
 }
 
+strong {
+	color: #000;
+	font-weight: normal;
+}
 
 #button {
 	position: fixed;
