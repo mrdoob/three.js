@@ -6,7 +6,7 @@
 }
 
 body {
-	margin: 20px;
+	margin: 25px 20px;
 	color: #555;
 	font-family: 'inconsolata';
 	font-size: 15px;
@@ -20,7 +20,7 @@ a {
 h1 {
 	color: #444;
 	font-size: 25px;
-	margin-top: 24px;
+	margin-top: 10px;
 }
 
 h2 {
