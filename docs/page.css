@@ -14,26 +14,31 @@ body {
 }
 
 a {
-	color: #2194CE;
+	color: #1184CE;
 }
 
 h1 {
-	color: #444;
+	color: #333;
 	font-size: 25px;
+	font-weight: normal;
+
 	margin-top: 10px;
 }
 
 h2 {
-	color: #8B2;
+	color: #4B0;
 	font-size: 18px;
+	font-weight: normal;
+
 	margin-top: 40px;
 }
 
 h3 {
 	color: #000;
 	font-size: 16px;
-	margin-top: 30px;
 	font-weight: normal;
+
+	margin-top: 30px;
 }
 
 div {
