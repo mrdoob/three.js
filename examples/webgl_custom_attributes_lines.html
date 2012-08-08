@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - custom attributes [lines]</title>
@@ -109,12 +109,10 @@
 
 		function init() {
 
-			scene = new THREE.Scene();
-
 			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 400;
 
-			scene.add( camera );
+			scene = new THREE.Scene();
 
 			attributes = {
 
@@ -200,6 +198,19 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 

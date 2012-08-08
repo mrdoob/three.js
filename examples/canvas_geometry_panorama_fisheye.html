@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - panorama fisheye demo</title>
@@ -58,8 +58,6 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 				texture_placeholder = document.createElement( 'canvas' );
 				texture_placeholder.width = 128;
 				texture_placeholder.height = 128;
@@ -105,6 +103,21 @@
 
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
 
 			}
 

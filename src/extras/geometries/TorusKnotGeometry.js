@@ -106,5 +106,4 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 
 };
 
-THREE.TorusKnotGeometry.prototype = new THREE.Geometry();
-THREE.TorusKnotGeometry.prototype.constructor = THREE.TorusKnotGeometry;
+THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );

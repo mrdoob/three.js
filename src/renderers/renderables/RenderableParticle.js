@@ -4,6 +4,8 @@
 
 THREE.RenderableParticle = function () {
 
+	this.object = null;
+
 	this.x = null;
 	this.y = null;
 	this.z = null;

@@ -221,7 +221,7 @@ TEMPLATE_FILE_ASCII = """\
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "generatedBy"   : "Blender 2.62 Exporter",
         "vertices"      : %(nvertex)d,
         "faces"         : %(nface)d,
@@ -439,7 +439,7 @@ def generate_vertex_color(c):
     return TEMPLATE_C % c
 
 def generate_uv(uv):
-    return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
+    return TEMPLATE_UV % (uv[0], uv[1])
 
 # #####################################################
 # Model exporter - faces

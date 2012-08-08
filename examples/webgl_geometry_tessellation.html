@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - tessellation</title>
@@ -100,14 +100,12 @@
 
 		function init() {
 
-			scene = new THREE.Scene();
-
 			camera = new THREE.PerspectiveCamera( 25, WIDTH / HEIGHT, 1, 10000 );
 			camera.position.z = 350;
 
 			controls = new THREE.TrackballControls( camera );
 
-			scene.add( camera );
+			scene = new THREE.Scene();
 
 			//
 
@@ -130,7 +128,8 @@
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-				shading: 		THREE.FlatShading
+				shading: 		THREE.FlatShading,
+				side: 			THREE.DoubleSide
 
 			});
 
@@ -211,7 +210,6 @@
 
 			mesh = new THREE.Mesh( geometry, shaderMaterial );
 			mesh.rotation.set( 0.5, 0.5, 0 );
-			mesh.doubleSided = true;
 
 			scene.add( mesh );
 
@@ -230,6 +228,20 @@
 			stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 			container.appendChild( stats.domElement );
+
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 

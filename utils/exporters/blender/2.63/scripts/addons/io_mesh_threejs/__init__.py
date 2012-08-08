@@ -23,9 +23,9 @@
 
 bl_info = {
     "name": "three.js format",
-    "author": "mrdoob, kikko, alteredq, remoe, pxf",
-    "version": (1, 3, 0),
-    "blender": (2, 6, 0),
+    "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k",
+    "version": (1, 4, 0),
+    "blender": (2, 6, 3),
     "api": 35622,
     "location": "File > Import-Export",
     "description": "Import-Export three.js meshes",
@@ -200,7 +200,9 @@ def save_settings_export(properties):
     "option_lights" : properties.option_lights,
     "option_cameras" : properties.option_cameras,
 
-    "option_animation" : properties.option_animation,
+    "option_animation_morph" : properties.option_animation_morph,
+    "option_animation_skeletal" : properties.option_animation_skeletal,
+
     "option_frame_step" : properties.option_frame_step,
     "option_all_meshes" : properties.option_all_meshes,
 
@@ -212,6 +214,9 @@ def save_settings_export(properties):
     "option_uv_coords"       : properties.option_uv_coords,
     "option_faces"           : properties.option_faces,
     "option_vertices"        : properties.option_vertices,
+
+    "option_skinning"        : properties.option_skinning,
+    "option_bones"           : properties.option_bones,
 
     "option_vertices_truncate" : properties.option_vertices_truncate,
     "option_scale"        : properties.option_scale,
@@ -241,6 +246,9 @@ def restore_settings_export(properties):
     properties.option_uv_coords = settings.get("option_uv_coords", True)
     properties.option_materials = settings.get("option_materials", True)
 
+    properties.option_skinning = settings.get("option_skinning", True)
+    properties.option_bones = settings.get("option_bones", True)
+
     properties.align_model = settings.get("align_model", "None")
 
     properties.option_scale = settings.get("option_scale", 1.0)
@@ -254,7 +262,9 @@ def restore_settings_export(properties):
     properties.option_lights = settings.get("option_lights", False)
     properties.option_cameras = settings.get("option_cameras", False)
 
-    properties.option_animation = settings.get("option_animation", False)
+    properties.option_animation_morph = settings.get("option_animation_morph", False)
+    properties.option_animation_skeletal = settings.get("option_animation_skeletal", False)
+
     properties.option_frame_step = settings.get("option_frame_step", 1)
     properties.option_all_meshes = settings.get("option_all_meshes", True)
 
@@ -283,6 +293,9 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     option_uv_coords = BoolProperty(name = "UVs", description = "Export texture coordinates", default = True)
     option_materials = BoolProperty(name = "Materials", description = "Export materials", default = True)
 
+    option_skinning = BoolProperty(name = "Skinning", description = "Export skin data", default = True)
+    option_bones = BoolProperty(name = "Bones", description = "Export bones", default = True)
+
     align_types = [("None","None","None"), ("Center","Center","Center"), ("Bottom","Bottom","Bottom"), ("Top","Top","Top")]
     align_model = EnumProperty(name = "Align model", description = "Align model", items = align_types, default = "None")
 
@@ -297,7 +310,9 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
     option_lights = BoolProperty(name = "Lights", description = "Export default scene lights", default = False)
     option_cameras = BoolProperty(name = "Cameras", description = "Export default scene cameras", default = False)
 
-    option_animation = BoolProperty(name = "Animation", description = "Export animation (morphs)", default = False)
+    option_animation_morph = BoolProperty(name = "Morph animation", description = "Export animation (morphs)", default = False)
+    option_animation_skeletal = BoolProperty(name = "Skeletal animation", description = "Export animation (skeletal)", default = False)
+
     option_frame_step = IntProperty(name = "Frame step", description = "Animation frame step", min = 1, max = 1000, soft_min = 1, soft_max = 1000, default = 1)
     option_all_meshes = BoolProperty(name = "All meshes", description = "All meshes (merged)", default = True)
 
@@ -348,6 +363,11 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         layout.separator()
 
         row = layout.row()
+        row.prop(self.properties, "option_bones")
+        row.prop(self.properties, "option_skinning")
+        layout.separator()
+
+        row = layout.row()
         row.label(text="Materials:")
 
         row = layout.row()
@@ -387,7 +407,10 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         row.label(text="Animation:")
 
         row = layout.row()
-        row.prop(self.properties, "option_animation")
+        row.prop(self.properties, "option_animation_morph")
+        row = layout.row()
+        row.prop(self.properties, "option_animation_skeletal")
+        row = layout.row()
         row.prop(self.properties, "option_frame_step")
         layout.separator()
 

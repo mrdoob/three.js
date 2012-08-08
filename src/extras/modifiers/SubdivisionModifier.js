@@ -33,10 +33,6 @@ THREE.SubdivisionModifier = function( subdivisions ) {
 	
 };
 
-//THREE.SubdivisionModifier.prototype = new THREE.Modifier();
-
-THREE.SubdivisionModifier.prototype.constructor = THREE.SubdivisionModifier;
-
 // Applies the "modify" pattern
 THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	
@@ -75,7 +71,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		
 		// TODO move vertex selection over here!
 		
-		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.material );
+		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.materialIndex );
 		
 		if (scope.useOldVertexColors) {
 			

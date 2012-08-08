@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - skin [Lee Perry-Smith]</title>
@@ -90,13 +90,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
-				// CAMERA
-
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 900;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
@@ -118,7 +115,7 @@
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniformsUV[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniformsUV[ "uNormalScale" ].value = -0.75;
+				uniformsUV[ "uNormalScale" ].value = 0.75;
 
 				uniformsUV[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
@@ -256,6 +253,21 @@
 
 				uniforms[ "tBeckmann" ].texture = composerBeckmann.renderTarget1;
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -266,7 +278,6 @@
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 50;
 				mesh.scale.set( scale, scale, scale );
-				mesh.doubleSided = true;
 
 				scene.add( mesh );
 
@@ -274,7 +285,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );

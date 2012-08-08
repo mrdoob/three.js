@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js misc - sound</title>
@@ -107,13 +107,8 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 25, 0 );
-
-				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
 
@@ -121,6 +116,9 @@
 				controls.lookSpeed = 0.05;
 				controls.noFly = true;
 				controls.lookVertical = false;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0.5, 1 ).normalize();
@@ -165,18 +163,33 @@
 				var material_wireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, wireframeLinewidth: 1 } );
 				material_wireframe.color.setHSV( 0.1, 0.2, 0.5 );
 
-
-				var plane = new THREE.PlaneGeometry( 1000, 1000, 100, 100 );
-				mesh = new THREE.Mesh( plane, material_wireframe );
+				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 100, 100 ), material_wireframe );
 				mesh.position.y = 0.1;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
+				//
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";
 				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
 
 			}
 

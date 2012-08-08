@@ -59,5 +59,4 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 
 };
 
-THREE.DirectionalLight.prototype = new THREE.Light();
-THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
+THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );

@@ -239,7 +239,7 @@ THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offse
 				u /= 1023;
 				v /= 1023;
 
-				uvs.push( u, 1 - v );
+				uvs.push( u, v );
 
 			}
 
@@ -319,9 +319,7 @@ THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offse
 
 	};
 
-
-	Model.prototype = new THREE.Geometry();
-	Model.prototype.constructor = Model;
+	Model.prototype = Object.create( THREE.Geometry.prototype );
 
 	callback( new Model() );
 

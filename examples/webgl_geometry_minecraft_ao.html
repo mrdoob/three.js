@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - minecraft - ao</title>
@@ -85,12 +85,8 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.y = getY( worldHalfWidth, worldHalfDepth ) * 100 + 100;
-				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
 
@@ -100,6 +96,9 @@
 				controls.constrainVertical = true;
 				controls.verticalMin = 1.1;
 				controls.verticalMax = 2.2;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xffffff, 0.00015 );
 
 				var debug_texture = false,
 					debug_numbers = false,
@@ -375,6 +374,20 @@
 
 						cube = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1, materials, sides );
 
+						// revert back to old flipped UVs
+
+						for ( i = 0; i < cube.faceVertexUvs[ 0 ].length; i ++ ) {
+
+							uv = cube.faceVertexUvs[ 0 ][ i ];
+
+							for ( j = 0; j < uv.length; j++ ) {
+
+								uv[j].v = 1 - uv[j].v;
+
+							}
+
+						}
+
 						// set UV tiles
 
 						for ( i = 0; i < cube.faceVertexUvs[ 0 ].length; i ++ ) {
@@ -465,6 +478,21 @@
 				document.getElementById( "baot" ).addEventListener( "click", function() { mat.map = m_aot.map; }, false );
 				document.getElementById( "bt" ).addEventListener( "click",   function() { mat.map = m_t.map; }, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
 			}
 
 			function generateMegamaterialAO( textures, strength, debug_texture, debug_numbers, debug_corner_colors  ) {
@@ -481,6 +509,7 @@
 				canvas.width = canvas.height = size;
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+				texture.flipY = false;
 
 				function generateTexture() {
 
@@ -520,6 +549,7 @@
 				canvas.width = canvas.height = size;
 
 				var texture = new THREE.Texture( canvas, new THREE.UVMapping(), THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.NearestFilter, THREE.LinearMipMapLinearFilter );
+				texture.flipY = false;
 
 				function generateTexture() {
 
@@ -548,6 +578,7 @@
 				return new THREE.MeshLambertMaterial( { map: texture } );
 
 			}
+
 			function generateMegamaterialDebug() {
 
 				var canvas = document.createElement( 'canvas' ),
@@ -561,9 +592,9 @@
 				ctx.textBaseline = "top";
 				ctx.font = "8pt arial";
 
-				for ( i = 0; i < tile; i++ ) {
+				for ( i = 0; i < tile; i ++ ) {
 
-					for ( j = 0; j < tile; j++ ) {
+					for ( j = 0; j < tile; j ++ ) {
 
 						h = i * tile + j;
 						ctx.fillStyle = "hsl(" + h + ",90%, 50%)";
@@ -630,6 +661,7 @@
 					ctx.fillRect( sx + a * i, sy + b * i, width, height );
 
 				}
+
 			}
 
 			function drawAOSides( ctx, image, row, column, sides, tile, strength, debug_texture, debug_numbers ) {

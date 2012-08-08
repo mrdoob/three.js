@@ -72,6 +72,10 @@ DEFAULTS = {
 COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
 
 
+# skinning
+MAX_INFLUENCES = 2
+
+
 # #####################################################
 # Templates - scene
 # #####################################################
@@ -206,9 +210,9 @@ TEMPLATE_LIGHT_POINT = """\
         "intensity"	 : %(intensity).3f
     }"""
 
-TEMPLATE_VEC4 = '[ %f, %f, %f, %f ]'
-TEMPLATE_VEC3 = '[ %f, %f, %f ]'
-TEMPLATE_VEC2 = '[ %f, %f ]'
+TEMPLATE_VEC4 = '[ %g, %g, %g, %g ]'
+TEMPLATE_VEC3 = '[ %g, %g, %g ]'
+TEMPLATE_VEC2 = '[ %g, %g ]'
 TEMPLATE_STRING = '"%s"'
 TEMPLATE_HEX = "0x%06x"
 
@@ -221,7 +225,7 @@ TEMPLATE_FILE_ASCII = """\
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "generatedBy"   : "Blender 2.63 Exporter",
         "vertices"      : %(nvertex)d,
         "faces"         : %(nface)d,
@@ -229,7 +233,8 @@ TEMPLATE_FILE_ASCII = """\
         "colors"        : %(ncolor)d,
         "uvs"           : %(nuv)d,
         "materials"     : %(nmaterial)d,
-        "morphTargets"  : %(nmorphTarget)d
+        "morphTargets"  : %(nmorphTarget)d,
+        "bones"         : %(nbone)d
     },
 
 %(model)s
@@ -252,15 +257,22 @@ TEMPLATE_MODEL_ASCII = """\
 
     "uvs": [[%(uvs)s]],
 
-    "faces": [%(faces)s]
+    "faces": [%(faces)s],
 
+    "bones" : [%(bones)s],
+
+    "skinIndices" : [%(indices)s],
+
+    "skinWeights" : [%(weights)s],
+
+    "animation" : {%(animation)s}
 """
 
-TEMPLATE_VERTEX = "%f,%f,%f"
+TEMPLATE_VERTEX = "%g,%g,%g"
 TEMPLATE_VERTEX_TRUNCATE = "%d,%d,%d"
 
-TEMPLATE_N = "%f,%f,%f"
-TEMPLATE_UV = "%f,%f"
+TEMPLATE_N = "%g,%g,%g"
+TEMPLATE_UV = "%g,%g"
 TEMPLATE_C = "%d"
 
 # #####################################################
@@ -445,7 +457,7 @@ def generate_vertex_color(c):
     return TEMPLATE_C % c
 
 def generate_uv(uv):
-    return TEMPLATE_UV % (uv[0], 1.0 - uv[1])
+    return TEMPLATE_UV % (uv[0], uv[1])
 
 # #####################################################
 # Model exporter - faces
@@ -660,6 +672,356 @@ def generate_uvs(uvs, option_uv_coords):
 
     return ",".join(generate_uv(n) for n in chunks)
 
+# ##############################################################################
+# Model exporter - bones
+# (only the first armature will exported)
+# ##############################################################################
+
+def generate_bones(option_bones, flipyz):
+
+    if not option_bones or len(bpy.data.armatures) == 0:
+        return "", 0
+
+    hierarchy = []
+
+    armature = bpy.data.armatures[0]
+
+    TEMPLATE_BONE = '{"parent":%d,"name":"%s","pos":[%g,%g,%g],"rotq":[0,0,0,1]}'
+
+    for bone in armature.bones:
+        if bone.parent == None:
+            if flipyz:
+                joint = TEMPLATE_BONE % (-1, bone.name, bone.head.x, bone.head.z, -bone.head.y)
+                hierarchy.append(joint)
+            else:
+                joint = TEMPLATE_BONE % (-1, bone.name, bone.head.x, bone.head.y, bone.head.z)
+                hierarchy.append(joint)
+        else:
+            index = i = 0
+            for parent in armature.bones:
+                if parent.name == bone.parent.name:
+                    index = i
+                i += 1
+
+            position = bone.head_local - bone.parent.head_local
+
+            if flipyz:
+                joint = TEMPLATE_BONE % (index, bone.name, position.x, position.z, -position.y)
+                hierarchy.append(joint)
+            else:
+                joint = TEMPLATE_BONE % (index, bone.name, position.x, position.y, position.z)
+                hierarchy.append(joint)
+
+    bones_string = ",".join(hierarchy)
+
+    return bones_string, len(armature.bones)
+
+
+# ##############################################################################
+# Model exporter - skin indices and weights
+# ##############################################################################
+
+def generate_indices_and_weights(meshes, option_skinning):
+
+    if not option_skinning or len(bpy.data.armatures) == 0:
+        return "", ""
+
+    indices = []
+    weights = []
+
+    armature = bpy.data.armatures[0]
+
+    for mesh, object in meshes:
+
+        i = 0
+        mesh_index = -1
+
+        # find the original object
+
+        for obj in bpy.data.objects:
+            if obj.name == mesh.name or obj == object:
+                mesh_index = i
+            i += 1
+
+        if mesh_index == -1:
+            print("generate_indices: couldn't find object for mesh", mesh.name)
+            continue
+
+        object = bpy.data.objects[mesh_index]
+
+        for vertex in mesh.vertices:
+
+            # sort bones by influence
+
+            bone_array = []
+
+            for group in vertex.groups:
+                index = group.group
+                weight = group.weight
+
+                bone_array.append( (index, weight) )
+
+            bone_array.sort(key = operator.itemgetter(1), reverse=True)
+
+            # select first N bones
+
+            for i in range(MAX_INFLUENCES):
+
+                if i < len(bone_array):
+                    bone_proxy = bone_array[i]
+
+                    index = bone_proxy[0]
+                    weight = bone_proxy[1]
+
+                    for j, bone in enumerate(armature.bones):
+                        if object.vertex_groups[index].name == bone.name:
+                            indices.append('%d' % j)
+                            weights.append('%g' % weight)
+                            break
+
+                else:
+                    indices.append('0')
+                    weights.append('0')
+
+
+    indices_string = ",".join(indices)
+    weights_string = ",".join(weights)
+
+    return indices_string, weights_string
+
+
+# ##############################################################################
+# Model exporter - skeletal animation
+# (only the first action will exported)
+# ##############################################################################
+
+def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
+
+    if not option_animation_skeletal or len(bpy.data.actions) == 0 or len(bpy.data.armatures) == 0:
+        return ""
+
+    # TODO: Add scaling influences
+
+    action = bpy.data.actions[0]
+    armature = bpy.data.armatures[0]
+
+    parents = []
+    parent_index = -1
+
+    fps = bpy.data.scenes[0].render.fps
+
+    end_frame = action.frame_range[1]
+    start_frame = action.frame_range[0]
+
+    frame_length = end_frame - start_frame
+
+    TEMPLATE_KEYFRAME_FULL  = '{"time":%g,"pos":[%g,%g,%g],"rot":[%g,%g,%g,%g],"scl":[1,1,1]}'
+    TEMPLATE_KEYFRAME       = '{"time":%g,"pos":[%g,%g,%g],"rot":[%g,%g,%g,%g]}'
+    TEMPLATE_KEYFRAME_POS   = '{"time":%g,"pos":[%g,%g,%g]}'
+    TEMPLATE_KEYFRAME_ROT   = '{"time":%g,"rot":[%g,%g,%g,%g]}'
+
+    for hierarchy in armature.bones:
+
+        keys = []
+
+        for frame in range(int(start_frame), int(end_frame / option_frame_step) + 1):
+
+            pos, pchange = position(hierarchy, frame * option_frame_step)
+            rot, rchange = rotation(hierarchy, frame * option_frame_step)
+
+            if flipyz:
+                px, py, pz = pos.x, pos.z, -pos.y
+                rx, ry, rz, rw = rot.x, rot.z, -rot.y, rot.w
+            else:
+                px, py, pz = pos.x, pos.y, pos.z
+                rx, ry, rz, rw = rot.x, rot.y, rot.z, rot.w
+
+            # START-FRAME: needs pos, rot and scl attributes (required frame)
+
+            if frame == int(start_frame):
+
+                time = (frame * option_frame_step - start_frame) / fps
+                keyframe = TEMPLATE_KEYFRAME_FULL % (time, px, py, pz, rx, ry, rz, rw)
+                keys.append(keyframe)
+
+            # END-FRAME: needs pos, rot and scl attributes with animation length (required frame)
+
+            elif frame == int(end_frame / option_frame_step):
+
+                time = frame_length / fps
+                keyframe = TEMPLATE_KEYFRAME_FULL % (time, px, py, pz, rx, ry, rz, rw)
+                keys.append(keyframe)
+
+            # MIDDLE-FRAME: needs only one of the attributes, can be an empty frame (optional frame)
+
+            elif pchange == True or rchange == True:
+
+                time = (frame * option_frame_step - start_frame) / fps
+
+                if pchange == True and rchange == True:
+                    keyframe = TEMPLATE_KEYFRAME % (time, px, py, pz, rx, ry, rz, rw)
+                elif pchange == True:
+                    keyframe = TEMPLATE_KEYFRAME_POS % (time, px, py, pz)
+                elif rchange == True:
+                    keyframe = TEMPLATE_KEYFRAME_ROT % (time, rx, ry, rz, rw)
+
+                keys.append(keyframe)
+
+        keys_string = ",".join(keys)
+        parent = '{"parent":%d,"keys":[%s]}' % (parent_index, keys_string)
+        parent_index += 1
+        parents.append(parent)
+
+    hierarchy_string = ",".join(parents)
+    animation_string = '"name":"%s","fps":%d,"length":%g,"hierarchy":[%s]' % (action.name, fps, (frame_length / fps), hierarchy_string)
+
+    return animation_string
+
+def handle_position_channel(channel, frame, position):
+
+    change = False
+
+    if channel.array_index in [0, 1, 2]:
+        for keyframe in channel.keyframe_points:
+            if keyframe.co[0] == frame:
+                change = True
+
+        value = channel.evaluate(frame)
+
+        if channel.array_index == 0:
+            position.x = value
+
+        if channel.array_index == 1:
+            position.y = value
+
+        if channel.array_index == 2:
+            position.z = value
+
+    return change
+
+def position(bone, frame):
+
+    position = mathutils.Vector((0,0,0))
+    change = False
+
+    action = bpy.data.actions[0]
+    ngroups = len(action.groups)
+
+
+
+    if ngroups > 0:
+
+        index = 0
+
+        for i in range(ngroups):
+            if action.groups[i].name == bone.name:
+                index = i
+
+        for channel in action.groups[index].channels:
+            if "location" in channel.data_path:
+                hasChanged = handle_position_channel(channel, frame, position)
+                change = change or hasChanged
+
+    else:
+
+        bone_label = '"%s"' % bone.name
+
+        for channel in action.fcurves:
+            data_path = channel.data_path
+            if bone_label in data_path and "location" in data_path:
+                hasChanged = handle_position_channel(channel, frame, position)
+                change = change or hasChanged
+
+    position = position * bone.matrix_local.inverted()
+
+    if bone.parent == None:
+
+        position.x += bone.head.x
+        position.y += bone.head.y
+        position.z += bone.head.z
+
+    else:
+
+        parent = bone.parent
+
+        parentInvertedLocalMatrix = parent.matrix_local.inverted()
+        parentHeadTailDiff = parent.tail_local - parent.head_local
+
+        position.x += (bone.head * parentInvertedLocalMatrix).x + parentHeadTailDiff.x
+        position.y += (bone.head * parentInvertedLocalMatrix).y + parentHeadTailDiff.y
+        position.z += (bone.head * parentInvertedLocalMatrix).z + parentHeadTailDiff.z
+
+    return position, change
+
+def handle_rotation_channel(channel, frame, rotation):
+
+    change = False
+
+    if channel.array_index in [0, 1, 2, 3]:
+
+        for keyframe in channel.keyframe_points:
+            if keyframe.co[0] == frame:
+                change = True
+
+        value = channel.evaluate(frame)
+
+        if channel.array_index == 1:
+            rotation.x = value
+
+        elif channel.array_index == 2:
+            rotation.y = value
+
+        elif channel.array_index == 3:
+            rotation.z = value
+
+        elif channel.array_index == 0:
+            rotation.w = value
+
+    return change
+
+def rotation(bone, frame):
+
+    # TODO: calculate rotation also from rotation_euler channels
+
+    rotation = mathutils.Vector((0,0,0,1))
+
+    change = False
+
+    action = bpy.data.actions[0]
+    ngroups = len(action.groups)
+
+    # animation grouped by bones
+
+    if ngroups > 0:
+
+        index = 0
+
+        for i in range(ngroups):
+            if action.groups[i].name == bone.name:
+                index = i
+
+        for channel in action.groups[index].channels:
+            if "quaternion" in channel.data_path:
+                hasChanged = handle_rotation_channel(channel, frame, rotation)
+                change = change or hasChanged
+
+    # animation in raw fcurves
+
+    else:
+
+        bone_label = '"%s"' % bone.name
+
+        for channel in action.fcurves:
+            data_path = channel.data_path
+            if bone_label in data_path and "quaternion" in data_path:
+                hasChanged = handle_rotation_channel(channel, frame, rotation)
+                change = change or hasChanged
+
+    rot3 = rotation.to_3d()
+    rotation.xyz = rot3 * bone.matrix_local.inverted()
+
+    return rotation, change
+
 # #####################################################
 # Model exporter - materials
 # #####################################################
@@ -866,12 +1228,15 @@ def generate_ascii_model(meshes, morphs,
                          option_uv_coords,
                          option_materials,
                          option_colors,
+                         option_bones,
+                         option_skinning,
                          align_model,
                          flipyz,
                          option_scale,
                          option_copy_textures,
                          filepath,
-                         option_animation,
+                         option_animation_morph,
+                         option_animation_skeletal,
                          option_frame_step):
 
     vertices = []
@@ -932,7 +1297,7 @@ def generate_ascii_model(meshes, morphs,
     morphTargets_string = ""
     nmorphTarget = 0
 
-    if option_animation:
+    if option_animation_morph:
         chunks = []
         for i, morphVertices in enumerate(morphs):
             morphTarget = '{ "name": "%s_%06d", "vertices": [%s] }' % ("animation", i, morphVertices)
@@ -950,6 +1315,9 @@ def generate_ascii_model(meshes, morphs,
 
     faces_string, nfaces = generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces)
 
+    bones_string, nbone = generate_bones(option_bones, flipyz)
+    indices_string, weights_string = generate_indices_and_weights(meshes, option_skinning)
+
     materials_string = ",\n\n".join(materials)
 
     model_string = TEMPLATE_MODEL_ASCII % {
@@ -965,7 +1333,12 @@ def generate_ascii_model(meshes, morphs,
 
     "faces"    : faces_string,
 
-    "morphTargets" : morphTargets_string
+    "morphTargets" : morphTargets_string,
+
+    "bones"     : bones_string,
+    "indices"   : indices_string,
+    "weights"   : weights_string,
+    "animation" : generate_animation(option_animation_skeletal, option_frame_step, flipyz)
     }
 
     text = TEMPLATE_FILE_ASCII % {
@@ -976,6 +1349,7 @@ def generate_ascii_model(meshes, morphs,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
     "nmorphTarget": nmorphTarget,
+    "nbone"     : nbone,
 
     "model"     : model_string
     }
@@ -1003,12 +1377,19 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
             if not mesh:
                 raise Exception("Error, could not get mesh data from object [%s]" % object.name)
 
+            # preserve original name
+
+            mesh.name = object.name
+
             if export_single_model:
+
                 if flipyz:
-                    # that's what Blender's native export_obj.py does
-                    # to flip YZ
+
+                    # that's what Blender's native export_obj.py does to flip YZ
+
                     X_ROT = mathutils.Matrix.Rotation(-math.pi/2, 4, 'X')
                     mesh.transform(X_ROT * object.matrix_world)
+
                 else:
                     mesh.transform(object.matrix_world)
 
@@ -1027,20 +1408,23 @@ def generate_mesh_string(objects, scene,
                 option_uv_coords,
                 option_materials,
                 option_colors,
+                option_bones,
+                option_skinning,
                 align_model,
                 flipyz,
                 option_scale,
                 export_single_model,
                 option_copy_textures,
                 filepath,
-                option_animation,
+                option_animation_morph,
+                option_animation_skeletal,
                 option_frame_step):
 
     meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
 
     morphs = []
 
-    if option_animation:
+    if option_animation_morph:
 
         original_frame = scene.frame_current # save animation state
 
@@ -1076,12 +1460,15 @@ def generate_mesh_string(objects, scene,
                                 option_uv_coords,
                                 option_materials,
                                 option_colors,
+                                option_bones,
+                                option_skinning,
                                 align_model,
                                 flipyz,
                                 option_scale,
                                 option_copy_textures,
                                 filepath,
-                                option_animation,
+                                option_animation_morph,
+                                option_animation_skeletal,
                                 option_frame_step)
 
     # remove temp meshes
@@ -1100,12 +1487,15 @@ def export_mesh(objects,
                 option_uv_coords,
                 option_materials,
                 option_colors,
+                option_bones,
+                option_skinning,
                 align_model,
                 flipyz,
                 option_scale,
                 export_single_model,
                 option_copy_textures,
-                option_animation,
+                option_animation_morph,
+                option_animation_skeletal,
                 option_frame_step):
 
     """Export single mesh"""
@@ -1119,13 +1509,16 @@ def export_mesh(objects,
                 option_uv_coords,
                 option_materials,
                 option_colors,
+                option_bones,
+                option_skinning,
                 align_model,
                 flipyz,
                 option_scale,
                 export_single_model,
                 option_copy_textures,
                 filepath,
-                option_animation,
+                option_animation_morph,
+                option_animation_skeletal,
                 option_frame_step)
 
     write_file(filepath, text)
@@ -1337,7 +1730,7 @@ def generate_textures_scene(data):
             extras = ""
 
             if texture.repeat_x != 1 or texture.repeat_y != 1:
-                extras += ',\n        "repeat": [%f, %f]' % (texture.repeat_x, texture.repeat_y)
+                extras += ',\n        "repeat": [%g, %g]' % (texture.repeat_x, texture.repeat_y)
 
             if texture.extension == "REPEAT":
                 wrap_x = "repeat"
@@ -1523,7 +1916,7 @@ def generate_material_string(material):
         parameters += ', "normalMap": %s' % generate_string(normalMap)
 
     if normalMapFactor != 1.0:
-        parameters += ', "normalMapFactor": %f' % normalMapFactor
+        parameters += ', "normalMapFactor": %g' % normalMapFactor
 
     if material['vertexColors']:
         parameters += ', "vertexColors": "vertex"'
@@ -1807,6 +2200,8 @@ def save(operator, context, filepath = "",
          option_uv_coords = True,
          option_materials = True,
          option_colors = True,
+         option_bones = True,
+         option_skinning = True,
          align_model = 0,
          option_export_scene = False,
          option_lights = False,
@@ -1815,7 +2210,8 @@ def save(operator, context, filepath = "",
          option_embed_meshes = True,
          option_url_base_html = False,
          option_copy_textures = False,
-         option_animation = False,
+         option_animation_morph = False,
+         option_animation_skeletal = False,
          option_frame_step = 1,
          option_all_meshes = True):
 
@@ -1876,13 +2272,16 @@ def save(operator, context, filepath = "",
                                                         option_uv_coords,
                                                         option_materials,
                                                         option_colors,
+                                                        option_bones,
+                                                        option_skinning,
                                                         False,          # align_model
                                                         option_flip_yz,
                                                         option_scale,
                                                         False,          # export_single_model
                                                         False,          # option_copy_textures
                                                         filepath,
-                                                        option_animation,
+                                                        option_animation_morph,
+                                                        option_animation_skeletal,
                                                         option_frame_step)
 
                         embeds[name] = model_string
@@ -1899,12 +2298,15 @@ def save(operator, context, filepath = "",
                                     option_uv_coords,
                                     option_materials,
                                     option_colors,
+                                    option_bones,
+                                    option_skinning,
                                     False,          # align_model
                                     option_flip_yz,
                                     option_scale,
                                     False,          # export_single_model
                                     option_copy_textures,
-                                    option_animation,
+                                    option_animation_morph,
+                                    option_animation_skeletal,
                                     option_frame_step)
 
                     geo_set.add(name)
@@ -1929,12 +2331,15 @@ def save(operator, context, filepath = "",
                     option_uv_coords,
                     option_materials,
                     option_colors,
+                    option_bones,
+                    option_skinning,
                     align_model,
                     option_flip_yz,
                     option_scale,
                     True,            # export_single_model
                     option_copy_textures,
-                    option_animation,
+                    option_animation_morph,
+                    option_animation_skeletal,
                     option_frame_step)
 
     return {'FINISHED'}

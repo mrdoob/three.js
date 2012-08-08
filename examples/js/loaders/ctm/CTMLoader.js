@@ -8,17 +8,13 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CTMLoader = function ( context, showStatus ) {
-
-	this.context = context;
+THREE.CTMLoader = function ( showStatus ) {
 
 	THREE.Loader.call( this, showStatus );
 
 };
 
-THREE.CTMLoader.prototype = new THREE.Loader();
-THREE.CTMLoader.prototype.constructor = THREE.CTMLoader;
-
+THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
 
 // Load multiple CTM parts defined in JSON
 
@@ -32,9 +28,9 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 
 	xhr.onreadystatechange = function() {
 
-		if ( xhr.readyState == 4 ) {
+		if ( xhr.readyState === 4 ) {
 
-			if ( xhr.status == 200 || xhr.status == 0 ) {
+			if ( xhr.status === 200 || xhr.status === 0 ) {
 
 				var jsonObject = JSON.parse( xhr.responseText );
 
@@ -99,9 +95,9 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 	xhr.onreadystatechange = function() {
 
-		if ( xhr.readyState == 4 ) {
+		if ( xhr.readyState === 4 ) {
 
-			if ( xhr.status == 200 || xhr.status == 0 ) {
+			if ( xhr.status === 200 || xhr.status === 0 ) {
 
 				var binaryData = xhr.responseText;
 
@@ -171,11 +167,11 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 			}
 
-		} else if ( xhr.readyState == 3 ) {
+		} else if ( xhr.readyState === 3 ) {
 
 			if ( callbackProgress ) {
 
-				if ( length == 0 ) {
+				if ( length === 0 ) {
 
 					length = xhr.getResponseHeader( "Content-Length" );
 
@@ -185,7 +181,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 			}
 
-		} else if ( xhr.readyState == 2 ) {
+		} else if ( xhr.readyState === 2 ) {
 
 			length = xhr.getResponseHeader( "Content-Length" );
 
@@ -202,16 +198,11 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
-	var gl = this.context;
-
 	var Model = function ( ) {
 
 		var scope = this;
 
-		var dynamic = false,
-		computeNormals = true,
-		normalizeNormals = true,
-		reorderVertices = true;
+		var reorderVertices = true;
 
 		scope.materials = [];
 
@@ -234,86 +225,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
 
 			vertexColorArray = file.body.attrMaps[ 0 ].attr;
-
-		}
-
-		//console.log( "vertices", vertexPositionArray.length/3 );
-		//console.log( "triangles", vertexIndexArray.length/3 );
-
-		// compute face normals from scratch
-		// (must be done before computing offsets)
-
-		if ( vertexNormalArray === undefined && computeNormals ) {
-
-			var nElements = vertexPositionArray.length;
-
-			vertexNormalArray = new Float32Array( nElements );
-
-			var vA, vB, vC, x, y, z,
-
-			pA = new THREE.Vector3(),
-			pB = new THREE.Vector3(),
-			pC = new THREE.Vector3(),
-
-			cb = new THREE.Vector3(),
-			ab = new THREE.Vector3();
-
-			for ( var i = 0; i < vertexIndexArray.length; i += 3 ) {
-
-				vA = vertexIndexArray[ i ];
-				vB = vertexIndexArray[ i + 1 ];
-				vC = vertexIndexArray[ i + 2 ];
-
-				x = vertexPositionArray[ vA * 3 ];
-				y = vertexPositionArray[ vA * 3 + 1 ];
-				z = vertexPositionArray[ vA * 3 + 2 ];
-				pA.set( x, y, z );
-
-				x = vertexPositionArray[ vB * 3 ];
-				y = vertexPositionArray[ vB * 3 + 1 ];
-				z = vertexPositionArray[ vB * 3 + 2 ];
-				pB.set( x, y, z );
-
-				x = vertexPositionArray[ vC * 3 ];
-				y = vertexPositionArray[ vC * 3 + 1 ];
-				z = vertexPositionArray[ vC * 3 + 2 ];
-				pC.set( x, y, z );
-
-				cb.sub( pC, pB );
-				ab.sub( pA, pB );
-				cb.crossSelf( ab );
-
-				vertexNormalArray[ vA * 3 ] 	+= cb.x;
-				vertexNormalArray[ vA * 3 + 1 ] += cb.y;
-				vertexNormalArray[ vA * 3 + 2 ] += cb.z;
-
-				vertexNormalArray[ vB * 3 ] 	+= cb.x;
-				vertexNormalArray[ vB * 3 + 1 ] += cb.y;
-				vertexNormalArray[ vB * 3 + 2 ] += cb.z;
-
-				vertexNormalArray[ vC * 3 ] 	+= cb.x;
-				vertexNormalArray[ vC * 3 + 1 ] += cb.y;
-				vertexNormalArray[ vC * 3 + 2 ] += cb.z;
-
-			}
-
-			if ( normalizeNormals ) {
-
-				for ( var i = 0; i < nElements; i += 3 ) {
-
-					x = vertexNormalArray[ i ];
-					y = vertexNormalArray[ i + 1 ];
-					z = vertexNormalArray[ i + 2 ];
-
-					var n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-					vertexNormalArray[ i ] 	   *= n;
-					vertexNormalArray[ i + 1 ] *= n;
-					vertexNormalArray[ i + 2 ] *= n;
-
-				}
-
-			}
 
 		}
 
@@ -368,10 +279,10 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 					if ( vertexColorArray ) {
 
-						newColors[ vertexCounter * 4 ] 	   = vertexNormalArray[ v * 4 ];
-						newColors[ vertexCounter * 4 + 1 ] = vertexNormalArray[ v * 4 + 1 ];
-						newColors[ vertexCounter * 4 + 2 ] = vertexNormalArray[ v * 4 + 2 ];
-						newColors[ vertexCounter * 4 + 3 ] = vertexNormalArray[ v * 4 + 3 ];
+						newColors[ vertexCounter * 4 ] 	   = vertexColorArray[ v * 4 ];
+						newColors[ vertexCounter * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
+						newColors[ vertexCounter * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
+						newColors[ vertexCounter * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
 
 					}
 
@@ -460,147 +371,50 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
+		// recast CTM 32-bit indices as 16-bit WebGL indices
 
-		// indices
+		var vertexIndexArray16 = new Uint16Array( vertexIndexArray );
 
-		scope.vertexIndexBuffer = gl.createBuffer();
-		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, scope.vertexIndexBuffer );
-		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( vertexIndexArray ), gl.STATIC_DRAW );
+		// attributes
 
-		scope.vertexIndexBuffer.itemSize = 1;
-		scope.vertexIndexBuffer.numItems = vertexIndexArray.length;
+		var attributes = scope.attributes;
 
-		// vertices
-
-		scope.vertexPositionBuffer = gl.createBuffer();
-		gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexPositionBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, vertexPositionArray, gl.STATIC_DRAW );
-
-		scope.vertexPositionBuffer.itemSize = 3;
-		scope.vertexPositionBuffer.numItems = vertexPositionArray.length;
-
-		// normals
+		attributes[ "index" ]    = { itemSize: 1, array: vertexIndexArray16, numItems: vertexIndexArray16.length };
+		attributes[ "position" ] = { itemSize: 3, array: vertexPositionArray, numItems: vertexPositionArray.length };
 
 		if ( vertexNormalArray !== undefined ) {
 
-			scope.vertexNormalBuffer = gl.createBuffer();
-			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexNormalBuffer );
-			gl.bufferData( gl.ARRAY_BUFFER, vertexNormalArray, gl.STATIC_DRAW );
-
-			scope.vertexNormalBuffer.itemSize = 3;
-			scope.vertexNormalBuffer.numItems = vertexNormalArray.length;
+			attributes[ "normal" ] = { itemSize: 3, array: vertexNormalArray, numItems: vertexNormalArray.length };
 
 		}
-
-		// uvs
 
 		if ( vertexUvArray !== undefined ) {
 
-			// "fix" flipping
-
-			for ( var i = 0; i < vertexUvArray.length; i += 2 ) {
-
-				vertexUvArray[ i + 1 ] = 1 - vertexUvArray[ i + 1 ];
-
-			}
-
-			scope.vertexUvBuffer = gl.createBuffer();
-			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexUvBuffer );
-			gl.bufferData( gl.ARRAY_BUFFER, vertexUvArray, gl.STATIC_DRAW );
-
-			scope.vertexUvBuffer.itemSize = 2;
-			scope.vertexUvBuffer.numItems = vertexUvArray.length;
+			attributes[ "uv" ] = { itemSize: 2, array: vertexUvArray, numItems: vertexUvArray.length };
 
 		}
-
-		// colors
 
 		if ( vertexColorArray !== undefined ) {
 
-			scope.vertexColorBuffer = gl.createBuffer();
-			gl.bindBuffer( gl.ARRAY_BUFFER, scope.vertexColorBuffer );
-			gl.bufferData( gl.ARRAY_BUFFER, vertexColorArray, gl.STATIC_DRAW );
-
-			scope.vertexColorBuffer.itemSize = 4;
-			scope.vertexColorBuffer.numItems = vertexColorArray.length;
-
-		}
-
-		// compute bounding sphere and bounding box
-		// (must do it now as we don't keep typed arrays after setting GL buffers)
-
-		scope.boundingBox = { min: new THREE.Vector3( Infinity, Infinity, Infinity ), max: new THREE.Vector3( -Infinity, -Infinity, -Infinity ) };
-
-		var vertices = file.body.vertices,
-			bb = scope.boundingBox,
-			radius, maxRadius = 0,
-			x, y, z;
-
-		for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
-
-			x = vertices[ i ];
-			y = vertices[ i + 1 ];
-			z = vertices[ i + 2 ];
-
-			// bounding sphere
-
-			radius = Math.sqrt( x * x + y * y + z * z );
-			if ( radius > maxRadius ) maxRadius = radius;
-
-			// bounding box
-
-			if ( x < bb.min.x ) {
-
-				bb.min.x = x;
-
-			} else if ( x > bb.max.x ) {
-
-				bb.max.x = x;
-
-			}
-
-			if ( y < bb.min.y ) {
-
-				bb.min.y = y;
-
-			} else if ( y > bb.max.y ) {
-
-				bb.max.y = y;
-
-			}
-
-			if ( z < bb.min.z ) {
-
-				bb.min.z = z;
-
-			} else if ( z > bb.max.z ) {
-
-				bb.max.z = z;
-
-			}
-
-		}
-
-		scope.boundingSphere = { radius: maxRadius };
-
-		// keep references to typed arrays
-
-		if ( dynamic ) {
-
-			scope.vertexIndexArray = vertexIndexArray;
-			scope.vertexPositionArray = vertexPositionArray;
-			scope.vertexNormalArray = vertexNormalArray;
-			scope.vertexUvArray = vertexUvArray;
-			scope.vertexColorArray = vertexColorArray;
+			attributes[ "color" ]  = { itemSize: 4, array: vertexColorArray, numItems: vertexColorArray.length };
 
 		}
 
 	}
 
-	Model.prototype = new THREE.BufferGeometry();
-	Model.prototype.constructor = Model;
+	Model.prototype = Object.create( THREE.BufferGeometry.prototype );
 
-	callback( new Model() );
+	var geometry = new Model();
+
+	// compute vertex normals if not present in the CTM model
+
+	if ( geometry.attributes[ "normal" ] === undefined ) {
+
+		geometry.computeVertexNormals();
+
+	}
+
+	callback( geometry );
 
 };
 
@@ -701,7 +515,7 @@ THREE.CTMLoader.prototype.createModelClassic = function ( file, callback ) {
 				u = buffer[ i ];
 				v = buffer[ i + 1 ];
 
-				uvs.push( u, 1 - v );
+				uvs.push( u, v );
 
 			}
 
@@ -813,8 +627,7 @@ THREE.CTMLoader.prototype.createModelClassic = function ( file, callback ) {
 
 	};
 
-	Model.prototype = new THREE.Geometry();
-	Model.prototype.constructor = Model;
+	Model.prototype = Object.create( THREE.Geometry.prototype );
 
 	callback( new Model() );
 

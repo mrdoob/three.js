@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - OBJ converter</title>
@@ -107,6 +107,7 @@
 
 				mesh = new THREE.Mesh( geometry, xm );
 				mesh.position.set( 0, FLOOR, 0 );
+				mesh.rotation.x = - Math.PI / 2;
 				mesh.scale.set( 10, 10, 10 );
 				scene.add( mesh );
 
@@ -191,6 +192,23 @@
 				//loader.load( "obj/male02/Male02_bin.js", callbackMale );
 				//loader.load( "obj/female02/Female02_bin.js", callbackFemale );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				if ( webglRenderer ) webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				if ( canvasRenderer ) canvasRenderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function createScene( geometry, x, y, z, b ) {
@@ -214,8 +232,6 @@
 					mesh.position.x = i * (size + 5) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -100;
-					mesh.rotation.x = Math.PI / 2;
-					mesh.doubleSided = true;
 					scene.add( mesh );
 
 					// number
@@ -236,8 +252,6 @@
 					mesh.position.x = i * ( size + 5 ) - ( ( materials.length - 1 )* ( size + 5 )/2);
 					mesh.position.y = FLOOR + size/2 + bottom;
 					mesh.position.z = -99;
-					mesh.rotation.x = Math.PI / 2;
-					mesh.doubleSided = true;
 					scene.add( mesh );
 
 				}

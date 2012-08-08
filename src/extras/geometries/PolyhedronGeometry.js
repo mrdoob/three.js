@@ -136,5 +136,4 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 };
 
-THREE.PolyhedronGeometry.prototype = new THREE.Geometry();
-THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
+THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );

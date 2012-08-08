@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - animation - skinning</title>
@@ -61,8 +61,6 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
-			var height = window.innerHeight;
-
 			var animations = [];
 			var buffalos = [];
 			var offset = [];
@@ -75,14 +73,12 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / height, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 185, 2500 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xffffff, 0.0003 );
 				scene.fog.color.setHSV( 0.1, 0.10, 1 );
-
-				scene.add( camera );
 
 				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, 1, 1 ).normalize();
@@ -96,15 +92,17 @@
 
 				floor = new THREE.Mesh( planeSimple, matSolid );
 				floor.position.y = -10;
+				floor.rotation.x = - Math.PI / 2;
 				floor.scale.set( 25, 25, 25 );
 				scene.add( floor );
 
 				floor = new THREE.Mesh( planeTesselated, matWire );
+				floor.rotation.x = - Math.PI / 2;
 				floor.scale.set( 25, 25, 25 );
 				scene.add( floor );
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff, clearAlpha: 1, antialias: true } );
-				renderer.setSize( window.innerWidth, height );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.sortObjects = false;
 
@@ -121,7 +119,25 @@
 				var loader = new THREE.JSONLoader();
 				loader.load( "obj/buffalo/buffalo.js", createScene );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				//
+
 				loop();
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -149,9 +165,7 @@
 
 					for( z = 0; z < gridz; z ++ ) {
 
-						buffalo = new THREE.SkinnedMesh( geometry, material );
-
-						//buffalo.doubleSided = true;
+						buffalo = new THREE.SkinnedMesh( geometry, material, false );
 
 						buffalo.position.x = - ( gridx - 1 ) * sepx * 0.5 + x * sepx + Math.random() * 0.5 * sepx;
 						buffalo.position.z = - ( gridz - 1 ) * sepz * 0.5 + z * sepz + Math.random() * 0.5 * sepz - 500;

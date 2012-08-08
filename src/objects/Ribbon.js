@@ -11,5 +11,4 @@ THREE.Ribbon = function ( geometry, material ) {
 
 };
 
-THREE.Ribbon.prototype = new THREE.Object3D();
-THREE.Ribbon.prototype.constructor = THREE.Ribbon;
+THREE.Ribbon.prototype = Object.create( THREE.Object3D.prototype );

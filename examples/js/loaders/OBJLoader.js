@@ -2,302 +2,311 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJLoader = function () {};
+THREE.OBJLoader = function () {
 
-THREE.OBJLoader.prototype = new THREE.Loader();
-THREE.OBJLoader.prototype.constructor = THREE.OBJLoader;
-
-THREE.OBJLoader.prototype.load = function ( url, callback ) {
-
-	var that = this;
-	var xhr = new XMLHttpRequest();
-
-	xhr.onreadystatechange = function () {
-
-		if ( xhr.readyState == 4 ) {
-
-			if ( xhr.status == 200 || xhr.status == 0 ) {
-
-				callback( that.parse( xhr.responseText ) );
-
-			} else {
-
-				console.error( 'THREE.OBJLoader: Couldn\'t load ' + url + ' (' + xhr.status + ')' );
-
-			}
-
-		}
-
-	};
-
-	xhr.open( "GET", url, true );
-	xhr.send( null );
+	THREE.EventTarget.call( this );
 
 };
 
-THREE.OBJLoader.prototype.parse = function ( data ) {
+THREE.OBJLoader.prototype = {
 
-	function vector( x, y, z ) {
+	constructor: THREE.OBJLoader,
 
-		return new THREE.Vector3( x, y, z );
+	load: function ( url ) {
 
-	}
+		var scope = this;
+		var xhr = new XMLHttpRequest();
 
-	function uv( u, v ) {
+		xhr.addEventListener( 'load', function ( event ) {
 
-		return new THREE.UV( u, 1.0 - v );
+			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
 
-	}
+		}, false );
 
-	function face3( a, b, c, normals ) {
+		xhr.addEventListener( 'progress', function ( event ) {
 
-		return new THREE.Face3( a, b, c, normals );
+			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
 
-	}
+		}, false );
 
-	function face4( a, b, c, d, normals ) {
+		xhr.addEventListener( 'error', function () {
 
-		return new THREE.Face4( a, b, c, d, normals );
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-	}
+		}, false );
 
-	var group = new THREE.Object3D();
+		xhr.open( 'GET', url, true );
+		xhr.send( null );
 
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	},
 
-	var pattern, result;
+	parse: function ( data ) {
 
-	// v float float float
+		function vector( x, y, z ) {
 
-	pattern = /v( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
-
-	while ( ( result = pattern.exec( data ) ) != null ) {
-
-		// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-
-		vertices.push( vector(
-			parseFloat( result[ 1 ] ),
-			parseFloat( result[ 2 ] ),
-			parseFloat( result[ 3 ] )
-		) );
-
-	}
-
-
-	// vn float float float
-
-	pattern = /vn( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
-
-	while ( ( result = pattern.exec( data ) ) != null ) {
-
-		// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
-
-		normals.push( vector(
-			parseFloat( result[ 1 ] ),
-			parseFloat( result[ 2 ] ),
-			parseFloat( result[ 3 ] )
-		) );
-
-	}
-
-	// vt float float
-
-	pattern = /vt( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
-
-	while ( ( result = pattern.exec( data ) ) != null ) {
-
-		// ["vt 0.1 0.2", "0.1", "0.2"]
-
-		uvs.push( uv(
-			parseFloat( result[ 1 ] ),
-			parseFloat( result[ 2 ] )
-		) );
-
-	}
-
-	var data = data.split( '\no ');
-
-	for ( var i = 0, l = data.length; i < l; i ++ ) {
-
-		var object = data[ i ];
-
-		var geometry = new THREE.Geometry();
-
-		geometry.vertices = vertices;
-
-		// f vertex vertex vertex ...
-
-		pattern = /f( [\d]+)( [\d]+)( [\d]+)( [\d]+)?/g;
-
-		while ( ( result = pattern.exec( object ) ) != null ) {
-
-			// ["f 1 2 3", "1", "2", "3", undefined]
-
-			if ( result[ 4 ] === undefined ) {
-			
-				geometry.faces.push( face3(
-					parseInt( result[ 1 ] ) - 1,
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 3 ] ) - 1
-				) );
-
-			} else {
-
-				geometry.faces.push( face4(
-					parseInt( result[ 1 ] ) - 1,
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 3 ] ) - 1,
-					parseInt( result[ 4 ] ) - 1
-				) );
-
-			}
+			return new THREE.Vector3( x, y, z );
 
 		}
 
-		// f vertex/uv vertex/uv vertex/uv ...
+		function uv( u, v ) {
 
-		pattern = /f( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/g;
-
-		while ( ( result = pattern.exec( object ) ) != null ) {
-
-			// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
-
-			if ( result[ 10 ] === undefined ) {
-			
-				geometry.faces.push( face3(
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 5 ] ) - 1,
-					parseInt( result[ 8 ] ) - 1
-				) );
-
-				geometry.faceVertexUvs[ 0 ].push( [
-					uvs[ parseInt( result[ 3 ] ) - 1 ],
-					uvs[ parseInt( result[ 6 ] ) - 1 ],
-					uvs[ parseInt( result[ 9 ] ) - 1 ]
-				] );
-
-			} else {
-
-				geometry.faces.push( face4(
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 5 ] ) - 1,
-					parseInt( result[ 8 ] ) - 1,
-					parseInt( result[ 11 ] ) - 1
-				) );
-
-				geometry.faceVertexUvs[ 0 ].push( [
-					uvs[ parseInt( result[ 3 ] ) - 1 ],
-					uvs[ parseInt( result[ 6 ] ) - 1 ],
-					uvs[ parseInt( result[ 9 ] ) - 1 ],
-					uvs[ parseInt( result[ 12 ] ) - 1 ]
-				] );
-
-			}
+			return new THREE.UV( u, v );
 
 		}
 
-		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
+		function face3( a, b, c, normals ) {
 
-		pattern = /f( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))?/g;
-
-		while ( ( result = pattern.exec( object ) ) != null ) {
-
-			// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
-
-			if ( result[ 13 ] === undefined ) {
-			
-				geometry.faces.push( face3(
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 6 ] ) - 1,
-					parseInt( result[ 10 ] ) - 1,
-					[
-						normals[ parseInt( result[ 4 ] ) - 1 ],
-						normals[ parseInt( result[ 8 ] ) - 1 ],
-						normals[ parseInt( result[ 12 ] ) - 1 ]
-					]
-				) );
-
-				geometry.faceVertexUvs[ 0 ].push( [
-					uvs[ parseInt( result[ 3 ] ) - 1 ],
-					uvs[ parseInt( result[ 7 ] ) - 1 ],
-					uvs[ parseInt( result[ 11 ] ) - 1 ]
-				] );
-
-			} else {
-
-				geometry.faces.push( face4(
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 6 ] ) - 1,
-					parseInt( result[ 10 ] ) - 1,
-					parseInt( result[ 14 ] ) - 1,
-					[
-						normals[ parseInt( result[ 4 ] ) - 1 ],
-						normals[ parseInt( result[ 8 ] ) - 1 ],
-						normals[ parseInt( result[ 12 ] ) - 1 ],
-						normals[ parseInt( result[ 16 ] ) - 1 ]
-					]
-				) );
-
-				geometry.faceVertexUvs[ 0 ].push( [
-					uvs[ parseInt( result[ 3 ] ) - 1 ],
-					uvs[ parseInt( result[ 7 ] ) - 1 ],
-					uvs[ parseInt( result[ 11 ] ) - 1 ],
-					uvs[ parseInt( result[ 15 ] ) - 1 ]
-				] );
-
-			}
-
+			return new THREE.Face3( a, b, c, normals );
 
 		}
 
-		// f vertex//normal vertex//normal vertex//normal ...
+		function face4( a, b, c, d, normals ) {
 
-		pattern = /f( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/g;
-
-		while ( ( result = pattern.exec( object ) ) != null ) {
-
-			// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
-
-			if ( result[ 10 ] === undefined ) {
-			
-				geometry.faces.push( face3(
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 5 ] ) - 1,
-					parseInt( result[ 8 ] ) - 1,
-					[
-						normals[ parseInt( result[ 3 ] ) - 1 ],
-						normals[ parseInt( result[ 6 ] ) - 1 ],
-						normals[ parseInt( result[ 9 ] ) - 1 ]
-					]
-				) );
-
-			} else {
-
-				geometry.faces.push( face4(
-					parseInt( result[ 2 ] ) - 1,
-					parseInt( result[ 5 ] ) - 1,
-					parseInt( result[ 8 ] ) - 1,
-					parseInt( result[ 11 ] ) - 1,
-					[
-						normals[ parseInt( result[ 3 ] ) - 1 ],
-						normals[ parseInt( result[ 6 ] ) - 1 ],
-						normals[ parseInt( result[ 9 ] ) - 1 ],
-						normals[ parseInt( result[ 12 ] ) - 1 ]
-					]
-				) );
-
-			}
+			return new THREE.Face4( a, b, c, d, normals );
 
 		}
 
-		geometry.computeCentroids();
+		var group = new THREE.Object3D();
 
-		group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() ) );
+		var vertices = [];
+		var normals = [];
+		var uvs = [];
+
+		var pattern, result;
+
+		// v float float float
+
+		pattern = /v( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
+
+		while ( ( result = pattern.exec( data ) ) != null ) {
+
+			// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+
+			vertices.push( vector(
+				parseFloat( result[ 1 ] ),
+				parseFloat( result[ 2 ] ),
+				parseFloat( result[ 3 ] )
+			) );
+
+		}
+
+
+		// vn float float float
+
+		pattern = /vn( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
+
+		while ( ( result = pattern.exec( data ) ) != null ) {
+
+			// ["vn 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
+
+			normals.push( vector(
+				parseFloat( result[ 1 ] ),
+				parseFloat( result[ 2 ] ),
+				parseFloat( result[ 3 ] )
+			) );
+
+		}
+
+		// vt float float
+
+		pattern = /vt( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/g;
+
+		while ( ( result = pattern.exec( data ) ) != null ) {
+
+			// ["vt 0.1 0.2", "0.1", "0.2"]
+
+			uvs.push( uv(
+				parseFloat( result[ 1 ] ),
+				parseFloat( result[ 2 ] )
+			) );
+
+		}
+
+		var data = data.split( '\no ');
+
+		for ( var i = 0, l = data.length; i < l; i ++ ) {
+
+			var object = data[ i ];
+
+			var geometry = new THREE.Geometry();
+
+			geometry.vertices = vertices;
+
+			// f vertex vertex vertex ...
+
+			pattern = /f( +[\d]+)( [\d]+)( [\d]+)( [\d]+)?/g;
+
+			while ( ( result = pattern.exec( object ) ) != null ) {
+
+				// ["f 1 2 3", "1", "2", "3", undefined]
+
+				if ( result[ 4 ] === undefined ) {
+			
+					geometry.faces.push( face3(
+						parseInt( result[ 1 ] ) - 1,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 3 ] ) - 1
+					) );
+
+				} else {
+
+					geometry.faces.push( face4(
+						parseInt( result[ 1 ] ) - 1,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 3 ] ) - 1,
+						parseInt( result[ 4 ] ) - 1
+					) );
+
+				}
+
+			}
+
+			// f vertex/uv vertex/uv vertex/uv ...
+
+			pattern = /f( +([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/g;
+
+			while ( ( result = pattern.exec( object ) ) != null ) {
+
+				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
+
+				if ( result[ 10 ] === undefined ) {
+			
+					geometry.faces.push( face3(
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1
+					) );
+
+					geometry.faceVertexUvs[ 0 ].push( [
+						uvs[ parseInt( result[ 3 ] ) - 1 ],
+						uvs[ parseInt( result[ 6 ] ) - 1 ],
+						uvs[ parseInt( result[ 9 ] ) - 1 ]
+					] );
+
+				} else {
+
+					geometry.faces.push( face4(
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1,
+						parseInt( result[ 11 ] ) - 1
+					) );
+
+					geometry.faceVertexUvs[ 0 ].push( [
+						uvs[ parseInt( result[ 3 ] ) - 1 ],
+						uvs[ parseInt( result[ 6 ] ) - 1 ],
+						uvs[ parseInt( result[ 9 ] ) - 1 ],
+						uvs[ parseInt( result[ 12 ] ) - 1 ]
+					] );
+
+				}
+
+			}
+
+			// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
+
+			pattern = /f( +([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))?/g;
+
+			while ( ( result = pattern.exec( object ) ) != null ) {
+
+				// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
+
+				if ( result[ 13 ] === undefined ) {
+			
+					geometry.faces.push( face3(
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 6 ] ) - 1,
+						parseInt( result[ 10 ] ) - 1,
+						[
+							normals[ parseInt( result[ 4 ] ) - 1 ],
+							normals[ parseInt( result[ 8 ] ) - 1 ],
+							normals[ parseInt( result[ 12 ] ) - 1 ]
+						]
+					) );
+
+					geometry.faceVertexUvs[ 0 ].push( [
+						uvs[ parseInt( result[ 3 ] ) - 1 ],
+						uvs[ parseInt( result[ 7 ] ) - 1 ],
+						uvs[ parseInt( result[ 11 ] ) - 1 ]
+					] );
+
+				} else {
+
+					geometry.faces.push( face4(
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 6 ] ) - 1,
+						parseInt( result[ 10 ] ) - 1,
+						parseInt( result[ 14 ] ) - 1,
+						[
+							normals[ parseInt( result[ 4 ] ) - 1 ],
+							normals[ parseInt( result[ 8 ] ) - 1 ],
+							normals[ parseInt( result[ 12 ] ) - 1 ],
+							normals[ parseInt( result[ 16 ] ) - 1 ]
+						]
+					) );
+
+					geometry.faceVertexUvs[ 0 ].push( [
+						uvs[ parseInt( result[ 3 ] ) - 1 ],
+						uvs[ parseInt( result[ 7 ] ) - 1 ],
+						uvs[ parseInt( result[ 11 ] ) - 1 ],
+						uvs[ parseInt( result[ 15 ] ) - 1 ]
+					] );
+
+				}
+
+
+			}
+
+			// f vertex//normal vertex//normal vertex//normal ...
+
+			pattern = /f( +([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/g;
+
+			while ( ( result = pattern.exec( object ) ) != null ) {
+
+				// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
+
+				if ( result[ 10 ] === undefined ) {
+			
+					geometry.faces.push( face3(
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1,
+						[
+							normals[ parseInt( result[ 3 ] ) - 1 ],
+							normals[ parseInt( result[ 6 ] ) - 1 ],
+							normals[ parseInt( result[ 9 ] ) - 1 ]
+						]
+					) );
+
+				} else {
+
+					geometry.faces.push( face4(
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1,
+						parseInt( result[ 11 ] ) - 1,
+						[
+							normals[ parseInt( result[ 3 ] ) - 1 ],
+							normals[ parseInt( result[ 6 ] ) - 1 ],
+							normals[ parseInt( result[ 9 ] ) - 1 ],
+							normals[ parseInt( result[ 12 ] ) - 1 ]
+						]
+					) );
+
+				}
+
+			}
+
+			geometry.computeCentroids();
+			geometry.computeFaceNormals();
+			geometry.computeBoundingSphere();
+
+			group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() ) );
+
+		}
+
+		return group;
 
 	}
-
-	return group;
 
 }

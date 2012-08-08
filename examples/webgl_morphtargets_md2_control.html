@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - morphtargets - MD2 controls</title>
@@ -79,15 +79,16 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
+				camera.position.set( 0, 150, 1300 );
+
 				// SCENE
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 1000, 4000 );
 
-				// CAMERA
-
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 4000 );
-				camera.position.set( 0, 150, 1300 );
 				scene.add( camera );
 
 				// LIGHTS
@@ -120,6 +121,7 @@
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt, perPixel: true } );
 
 				var ground = new THREE.Mesh( gg, gm );
+				ground.rotation.x = - Math.PI / 2;
 				ground.material.map.repeat.set( 64, 64 );
 				ground.material.map.wrapS = ground.material.map.wrapT = THREE.RepeatWrapping;
 				ground.receiveShadow = true;

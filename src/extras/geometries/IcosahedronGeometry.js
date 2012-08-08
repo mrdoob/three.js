@@ -22,5 +22,5 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 	THREE.PolyhedronGeometry.call( this, vertices, faces, radius, detail );
 
 };
-THREE.IcosahedronGeometry.prototype = new THREE.Geometry();
-THREE.IcosahedronGeometry.prototype.constructor = THREE.IcosahedronGeometry;
+
+THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );

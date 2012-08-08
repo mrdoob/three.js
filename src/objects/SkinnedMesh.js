@@ -3,9 +3,13 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SkinnedMesh = function ( geometry, material ) {
+THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	THREE.Mesh.call( this, geometry, material );
+
+	//
+
+	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
 	// init bones
 
@@ -62,7 +66,45 @@ THREE.SkinnedMesh = function ( geometry, material ) {
 
 		}
 
-		this.boneMatrices = new Float32Array( 16 * this.bones.length );
+		//
+
+		var nBones = this.bones.length;
+
+		if ( this.useVertexTexture ) {
+
+			// layout (1 matrix = 4 pixels)
+			//	RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+			//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
+			//  	 16x16 pixel texture max   64 bones (16 * 16 / 4)
+			//  	 32x32 pixel texture max  256 bones (32 * 32 / 4)
+			//  	 64x64 pixel texture max 1024 bones (64 * 64 / 4)
+
+			var size;
+
+			if ( nBones > 256 )
+				size = 64;
+			else if ( nBones > 64 )
+				size = 32;
+			else if ( nBones > 16 )
+				size = 16;
+			else
+				size = 8;
+
+			this.boneTextureWidth = size;
+			this.boneTextureHeight = size;
+
+			this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
+			this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
+			this.boneTexture.minFilter = THREE.NearestFilter;
+			this.boneTexture.magFilter = THREE.NearestFilter;
+			this.boneTexture.generateMipmaps = false;
+			this.boneTexture.flipY = false;
+
+		} else {
+
+			this.boneMatrices = new Float32Array( 16 * nBones );
+
+		}
 
 		this.pose();
 
@@ -70,8 +112,7 @@ THREE.SkinnedMesh = function ( geometry, material ) {
 
 };
 
-THREE.SkinnedMesh.prototype = new THREE.Mesh();
-THREE.SkinnedMesh.prototype.constructor = THREE.SkinnedMesh;
+THREE.SkinnedMesh.prototype = Object.create( THREE.Mesh.prototype );
 
 THREE.SkinnedMesh.prototype.addBone = function( bone ) {
 
@@ -138,6 +179,12 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 	for ( b = 0; b < bl; b ++ ) {
 
 		ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
+
+	}
+
+	if ( this.useVertexTexture ) {
+
+		this.boneTexture.needsUpdate = true;
 
 	}
 

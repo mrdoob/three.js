@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [cars]</title>
@@ -161,10 +161,9 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
@@ -192,12 +191,12 @@
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					side: THREE.BackSide
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
-				mesh.flipSided = true;
 				scene.add( mesh );
 
 				//
@@ -205,8 +204,11 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setFaceCulling( 0 );
 
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
 				effect = new THREE.AnaglyphEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( width, height );
 
 				container.appendChild( renderer.domElement );
 
@@ -458,6 +460,22 @@
 				loader.load( CARS[ "veyron" ].url, function( geometry ) { createScene( geometry, "veyron" ) } );
 
 				for( var c in CARS ) initCarButton( c );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

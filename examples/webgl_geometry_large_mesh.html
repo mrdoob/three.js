@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - large mesh</title>
@@ -101,11 +101,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1500;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
@@ -170,6 +169,23 @@
 
 				//loader.load( 'obj/lucy/Lucy100k_slim.js', callback );
 				loader.load( 'obj/lucy/Lucy100k_bin.js', callback );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				if ( render_canvas ) canvasRenderer.setSize( window.innerWidth, window.innerHeight );
+				if ( render_gl && has_gl ) webglRenderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

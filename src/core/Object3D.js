@@ -20,9 +20,6 @@ THREE.Object3D = function () {
 	this.eulerOrder = 'XYZ';
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
-	this.doubleSided = false;
-	this.flipSided = false;
-
 	this.renderDepth = null;
 
 	this.rotationAutoUpdate = true;
@@ -61,7 +58,10 @@ THREE.Object3D.prototype = {
 		this.matrix.multiply( matrix, this.matrix );
 
 		this.scale.getScaleFromMatrix( this.matrix );
-		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+
+		var mat = new THREE.Matrix4().extractRotation( this.matrix );
+		this.rotation.setEulerFromRotationMatrix( mat, this.eulerOrder );
+
 		this.position.getPositionFromMatrix( this.matrix );
 
 	},
@@ -99,7 +99,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.getRotationFromMatrix( this.matrix );
+			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
 
 		}
 
@@ -114,7 +114,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-		if ( object instanceof THREE.Object3D ) { // && this.children.indexOf( object ) === - 1
+		if ( object instanceof THREE.Object3D ) {
 
 			if ( object.parent !== undefined ) {
 
@@ -210,7 +210,7 @@ THREE.Object3D.prototype = {
 
 		this.matrix.setPosition( this.position );
 
-		if ( this.useQuaternion )  {
+		if ( this.useQuaternion === true )  {
 
 			this.matrix.setRotationFromQuaternion( this.quaternion );
 
@@ -233,13 +233,11 @@ THREE.Object3D.prototype = {
 
 	updateMatrixWorld: function ( force ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
-		// update matrixWorld
+		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
-
-			if ( this.parent ) {
+			if ( this.parent !== undefined ) {
 
 				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
 
@@ -263,8 +261,28 @@ THREE.Object3D.prototype = {
 
 		}
 
+	},
+
+	worldToLocal: function ( vector ) {
+
+		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
+
+	},
+
+	localToWorld: function ( vector ) {
+
+		return this.matrixWorld.multiplyVector3( vector );
+
+	},
+
+	clone: function () {
+
+		// TODO
+
 	}
 
 };
+
+THREE.Object3D.__m1 = new THREE.Matrix4();
 
 THREE.Object3DCount = 0;

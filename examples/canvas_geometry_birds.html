@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - geometry - birds</title>
@@ -342,8 +342,6 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 				birds = [];
 				boids = [];
 
@@ -359,11 +357,9 @@
 					boid.setAvoidWalls( true );
 					boid.setWorldSize( 500, 500, 400 );
 
-					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshBasicMaterial( { color:Math.random() * 0xffffff } ) );
+					bird = birds[ i ] = new THREE.Mesh( new Bird(), new THREE.MeshBasicMaterial( { color:Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 					bird.phase = Math.floor( Math.random() * 62.83 );
 					bird.position = boids[ i ].position;
-					bird.doubleSided = true;
-					// bird.scale.x = bird.scale.y = bird.scale.z = 10;
 					scene.add( bird );
 
 
@@ -382,6 +378,19 @@
 				stats.domElement.style.top = '0px';
 
 				document.getElementById( 'container' ).appendChild(stats.domElement);
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

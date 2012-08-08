@@ -12,10 +12,7 @@ THREE.Bone = function( belongsToSkin ) {
 
 };
 
-THREE.Bone.prototype = new THREE.Object3D();
-THREE.Bone.prototype.constructor = THREE.Bone;
-THREE.Bone.prototype.supr = THREE.Object3D.prototype;
-
+THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate ) {
 

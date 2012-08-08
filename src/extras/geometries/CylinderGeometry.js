@@ -147,5 +147,5 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 	this.computeFaceNormals();
 
 }
-THREE.CylinderGeometry.prototype = new THREE.Geometry();
-THREE.CylinderGeometry.prototype.constructor = THREE.CylinderGeometry;
+
+THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );

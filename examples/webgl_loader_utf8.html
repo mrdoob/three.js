@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - UTF8 loader</title>
@@ -67,12 +67,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
-
 				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000 );
 				camera.position.z = 800;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
@@ -124,6 +123,22 @@
 					callbackModel( geometry, 400, 0xffaa00, -125, FLOOR, 0 );
 
 				}, { scale: 0.707192, offsetX: -0.109362, offsetY: -0.006435, offsetZ: -0.268751 } );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

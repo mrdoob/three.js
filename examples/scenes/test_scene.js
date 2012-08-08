@@ -11,7 +11,7 @@
 "objects":
 {
 	"cube1" : {
-		"geometry" : "cube",
+		"geometry" : "cubeNormals",
 		"materials": [ "lambert_red" ],
 		"position" : [ 0, 0, 0 ],
 		"rotation" : [ 0, -0.3, 0 ],
@@ -20,7 +20,7 @@
 	},
 
 	"cube2" : {
-		"geometry" : "cube",
+		"geometry" : "cubeWire",
 		"materials": [ "basic_white" ],
 		"position" : [ 0, 0, 0 ],
 		"rotation" : [ 0, -0.3, 0 ],
@@ -92,13 +92,43 @@
 		"visible"  : true
 	},
 
-	"colorcube" : {
+	"colorcube1" : {
 		"geometry" : "colorcube",
-		"materials": [ ],
+		"materials": [],
 		"position" : [ -10, -5, 30 ],
-		"rotation" : [ 1.57, 0, 0 ],
+		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 5, 5, 5 ],
-		"visible"  : true
+		"visible"  : true,
+		"children" : {
+			"colorcube2" : {
+				"geometry" : "colorcube",
+				"materials": [],
+				"position" : [ 0, 2, 0 ],
+				"rotation" : [ 0.1, 0.1, 0.1 ],
+				"scale"    : [ 0.5, 0.5, 0.5 ],
+				"visible"  : true,
+				"children" : {
+					"colorcube3" : {
+						"geometry" : "colorcube",
+						"materials": [],
+						"position" : [ 0, 2, 0 ],
+						"rotation" : [ 0.1, 0.1, 0.1 ],
+						"scale"    : [ 0.5, 0.5, 0.5 ],
+						"visible"  : true,
+						"children" : {
+							"colorcube4" : {
+								"geometry" : "colorcube",
+								"materials": [],
+								"position" : [ 0, 2, 0 ],
+								"rotation" : [ 0.1, 0.1, 0.1 ],
+								"scale"    : [ 0.5, 0.5, 0.5 ],
+								"visible"  : true
+							}
+						}
+					}
+				}
+			}
+		}
 	},
 
 	"veyron" : {
@@ -123,7 +153,7 @@
 		"geometry" : "quad",
 		"materials": [ "textured_bg" ],
 		"position" : [ 0, 15, -90 ],
-		"rotation" : [ 1.57, 0, 0 ],
+		"rotation" : [ 0, 0, 0 ],
 		"scale"	   : [ 20, 20, 20 ],
 		"visible"  : true
 	},
@@ -132,7 +162,7 @@
 		"geometry" : "plane",
 		"materials": [ "basic_gray" ],
 		"position" : [ 0, -10, 0 ],
-		"rotation" : [ 0, 0, 0 ],
+		"rotation" : [ -1.57, 0, 0 ],
 		"scale"	   : [ 100, 100, 100 ],
 		"visible"  : true
 	}
@@ -142,6 +172,30 @@
 "geometries":
 {
 	"cube": {
+		"type"  : "cube",
+		"width" : 10,
+		"height": 10,
+		"depth" : 10,
+		"segmentsWidth"  : 1,
+		"segmentsHeight" : 1,
+		"segmentsDepth"  : 1,
+		"flipped" : false,
+		"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
+	},
+
+	"cubeNormals": {
+		"type"  : "cube",
+		"width" : 10,
+		"height": 10,
+		"depth" : 10,
+		"segmentsWidth"  : 1,
+		"segmentsHeight" : 1,
+		"segmentsDepth"  : 1,
+		"flipped" : false,
+		"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
+	},
+
+	"cubeWire": {
 		"type"  : "cube",
 		"width" : 10,
 		"height": 10,

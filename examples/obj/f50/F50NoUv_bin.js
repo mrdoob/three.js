@@ -2,7 +2,7 @@
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "F50NoUv.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 67006,
