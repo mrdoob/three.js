@@ -60,9 +60,13 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
+				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 16;
+
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ), side: THREE.DoubleSide } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, doubleSided: true } )
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
 				];
 
 
@@ -72,12 +76,14 @@
 				var radius = 150, tube = 10, segmentsR = 50, segmentsT = 20;
 
 				var GrannyKnot =  new THREE.Curves.GrannyKnot();
-				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+
 				var torus2 = new THREE.ParametricGeometries.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
-				// var sphere = new THREE.SphereGeometry( 75, 20, 10 );
 				var sphere2 = new THREE.ParametricGeometries.SphereGeometry( 75, 20, 10 );
-				// var tube = new THREE.TubeGeometry(GrannyKnot, 150, 2, 8, true, false);
-				var tube2 = new THREE.ParametricGeometries.TubeGeometry(GrannyKnot, 150, 2, 8, true, false);
+				var tube2 = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
+
+				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+				// var sphere = new THREE.SphereGeometry( 75, 20, 10 );
+				// var tube = new THREE.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
 
 
 				// var benchmarkCopies = 1000;
@@ -94,7 +100,7 @@
 
 				// Klein Bottle
 
-				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.klein, 20, 20);
+				geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, 20, 20 );
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 0, 0 );
 				object.scale.multiplyScalar( 10 );
@@ -102,13 +108,13 @@
 
 				// Mobius Strip
 
-				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.mobius, 20, 20);
+				geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.mobius, 20, 20 );
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 10, 0, 0 );
 				object.scale.multiplyScalar( 100 );
 				scene.add( object );
 
-				var geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.plane(200, 200), 10, 20);
+				var geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.plane( 200, 200 ), 10, 20 );
 				// document.body.appendChild( THREE.UVsDebug( geo ));
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 0, 0 );
@@ -209,8 +215,8 @@
 
 					var object = scene.children[ i ];
 
-					object.rotation.x += 0.01;
-					object.rotation.y += 0.005;
+					object.rotation.x = timer * 5;
+					object.rotation.y = timer * 2.5;
 
 				}
 

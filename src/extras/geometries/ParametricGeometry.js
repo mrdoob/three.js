@@ -3,7 +3,7 @@
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  *
- * new THREE.ParametricGeometry( parametricFunction, uSements, ySegements, useTris );
+ * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements, useTris );
  *
  */
 
@@ -22,7 +22,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 
 	var stackCount = stacks + 1;
 	var sliceCount = slices + 1;
-	
+
 	for ( i = 0; i <= stacks; i ++ ) {
 
 		v = i / stacks;
@@ -41,6 +41,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 	var uva, uvb, uvc, uvd;
 
 	for ( i = 0; i < stacks; i ++ ) {
+
 		for ( j = 0; j < slices; j ++ ) {
 
 			a = i * sliceCount + j;
@@ -69,7 +70,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 			}
 
 		}
-		
+
 	}
 
 	// console.log(this);
@@ -77,7 +78,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 	// magic bullet
 	// var diff = this.mergeVertices();
 	// console.log('removed ', diff, ' vertices by merging');
-	
+
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();

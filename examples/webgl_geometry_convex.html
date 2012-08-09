@@ -48,13 +48,18 @@
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
+				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 16;
+
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ) } ),
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map } ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
 				];
 
 
 				// tetrahedron
+
 				var points = [
 					new THREE.Vector3( 100, 0, 0 ),
 					new THREE.Vector3( 0, 100, 0 ),
@@ -67,6 +72,7 @@
 				scene.add( object );
 
 				// cube
+
 				var points = [
 					new THREE.Vector3( 50, 50, 50 ),
 					new THREE.Vector3( 50, 50, -50 ),
@@ -83,9 +89,12 @@
 				scene.add( object );
 
 				// random convex
+
 				points = [];
-				for ( var i = 0; i < 30; i++ ) {
+				for ( var i = 0; i < 30; i ++ ) {
+
 					points.push( randomPointInSphere( 50 ) );
+
 				}
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.ConvexGeometry( points ), materials );
@@ -160,8 +169,8 @@
 
 					var object = scene.children[ i ];
 
-					object.rotation.x += 0.01;
-					object.rotation.y += 0.005;
+					object.rotation.x = timer * 5;
+					object.rotation.y = timer * 2.5;
 
 				}
 
