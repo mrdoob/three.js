@@ -41,7 +41,7 @@
 
 				scene = new THREE.Scene();
 
-				var light, object, materials;
+				var light, object, object2, materials;
 
 				scene.add( new THREE.AmbientLight( 0x404040 ) );
 
@@ -51,7 +51,7 @@
 
 				materials = [
 					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ), side: THREE.DoubleSide } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, doubleSided: true } )
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
 				];
 
 				materials[ 0 ].map.anisotropy = 16;
@@ -80,6 +80,10 @@
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 100, 100, 4, 4 ), materials );
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
+
+				object2 = THREE.SceneUtils.createMultiMaterialObject( new THREE.CircleGeometry( 50, 10, 0, Math.PI ), materials );
+				object2.rotation.x = Math.PI/2;
+				object.add( object2 );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 75, 20, 10 ), materials );
 				object.position.set( 0, 0, 0 );

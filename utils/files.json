@@ -101,6 +101,7 @@
 		"extras/controls/RollControls.js",
 		"extras/controls/TrackballControls.js",
 		"extras/controls/OrbitControls.js",
+		"extras/geometries/CircleGeometry.js",
 		"extras/geometries/CubeGeometry.js",
 		"extras/geometries/CylinderGeometry.js",
 		"extras/geometries/ExtrudeGeometry.js",

@@ -10,7 +10,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
     thetaStart = thetaStart !== undefined ? thetaStart : 0;
     thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-    segments = segments !== undefined ? Math.max(3, segments) : 8;
+    segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
     var i, uvs = [],
     center = new THREE.Vector3(), centerUV = new THREE.UV( 0.5, 0.5 );
@@ -26,19 +26,19 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
         vertex.y = radius * Math.sin( thetaStart + i / segments * thetaLength );
 
         this.vertices.push( vertex );
-        uvs.push( new THREE.UV( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1) );
+        uvs.push( new THREE.UV( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
 
     }
 
-    var n = new THREE.Vector3(0, 0, -1);
+    var n = new THREE.Vector3( 0, 0, -1 );
 
-    for ( i=1; i <= segments; i ++ ) {
+    for ( i = 1; i <= segments; i ++ ) {
 
         var v1 = i;
         var v2 = i + 1 ;
         var v3 = 0;
 
-        this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ]));
+        this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
         this.faceVertexUvs[ 0 ].push( [ uvs[ i ], uvs[ i + 1 ], centerUV ] );
 
     }
