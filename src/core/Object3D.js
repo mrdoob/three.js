@@ -45,6 +45,8 @@ THREE.Object3D = function () {
 	this.frustumCulled = true;
 
 	this._vector = new THREE.Vector3();
+        
+        this.properties = {};
 
 };
 
