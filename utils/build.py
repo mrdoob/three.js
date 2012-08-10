@@ -81,11 +81,11 @@ def makeDebug(text):
 	return text
 
 
-def buildLib(files, debug, minified, amd, filename, fname_externs):
+def buildLib(files, debug, minified, module, filename, fname_externs):
 
 	text = merge(files)
 
-	if amd:
+	if module:
 		text = amdModule(text)
 		fname_externs = 'externs_amd'
 
@@ -169,7 +169,7 @@ def main(argv=None):
 	args = parse_args()
 	debug = args.debug
 	minified = args.minified
-	amd = args.amd
+	module = args.module
 	files = getFileNames()
 
 	config = [
@@ -181,7 +181,7 @@ def main(argv=None):
 
 	for fname_lib, fname_inc, fname_externs, files, enabled in config:
 		if enabled or args.all:
-			buildLib(files, debug, minified, amd, fname_lib, fname_externs)
+			buildLib(files, debug, minified, module, fname_lib, fname_externs)
 			if args.includes:
 				buildIncludes(files, fname_inc)
 
