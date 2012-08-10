@@ -38,7 +38,7 @@ THREE.GeometryLoader.prototype = {
 			if ( event.target.responseText ) {
 
 				geometry = scope.parse( JSON.parse( event.target.responseText ), monitor );
-				
+
 			} else {
 
 				scope.dispatchEvent( { type: 'error', message: 'Invalid file [' + url + ']' } );
@@ -179,7 +179,7 @@ THREE.GeometryLoader.prototype = {
 				// defaults
 
 				var mtype = "MeshLambertMaterial";
-				var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, wireframe: m.wireframe };
+				var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, wireframe: false };
 
 				// parameters from model file
 
@@ -265,6 +265,12 @@ THREE.GeometryLoader.prototype = {
 				if ( m.specularCoef ) {
 
 					mpars.shininess = m.specularCoef;
+
+				}
+
+				if ( m.wireframe !== undefined ) {
+
+					mpars.wireframe = m.wireframe;
 
 				}
 
@@ -368,7 +374,7 @@ THREE.GeometryLoader.prototype = {
 			return value & ( 1 << position );
 
 		}
-	
+
 		var faces = data.faces;
 		var vertices = data.vertices;
 		var normals = data.normals;

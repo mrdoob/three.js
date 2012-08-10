@@ -188,7 +188,7 @@ THREE.Loader.prototype = {
 		// defaults
 
 		var mtype = "MeshLambertMaterial";
-		var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, wireframe: m.wireframe };
+		var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, wireframe: false };
 
 		// parameters from model file
 
@@ -240,6 +240,12 @@ THREE.Loader.prototype = {
 		if ( m.flipSided !== undefined ) {
 
 			mpars.flipSided = m.flipSided;
+
+		}
+
+		if ( m.wireframe !== undefined ) {
+
+			mpars.wireframe = m.wireframe;
 
 		}
 
