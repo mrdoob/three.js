@@ -231,15 +231,15 @@ THREE.Loader.prototype = {
 
 		}
 
-		if ( m.doubleSided !== undefined ) {
+		if ( m.flipSided !== undefined ) {
 
-			mpars.doubleSided = m.doubleSided;
+			mpars.side = THREE.BackSide;
 
 		}
 
-		if ( m.flipSided !== undefined ) {
+		if ( m.doubleSided !== undefined ) {
 
-			mpars.flipSided = m.flipSided;
+			mpars.side = THREE.DoubleSide;
 
 		}
 

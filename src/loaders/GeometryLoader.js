@@ -268,6 +268,24 @@ THREE.GeometryLoader.prototype = {
 
 				}
 
+				if ( m.visible !== undefined ) {
+
+					mpars.visible = m.visible;
+
+				}
+
+				if ( m.flipSided !== undefined ) {
+
+					mpars.side = THREE.BackSide;
+
+				}
+
+				if ( m.doubleSided !== undefined ) {
+
+					mpars.side = THREE.DoubleSide;
+
+				}
+
 				if ( m.wireframe !== undefined ) {
 
 					mpars.wireframe = m.wireframe;
