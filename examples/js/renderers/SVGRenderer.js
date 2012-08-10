@@ -83,6 +83,13 @@ THREE.SVGRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
+		if ( camera instanceof THREE.Camera === false ) {
+
+			console.error( 'THREE.SVGRenderer.render: camera is not an instance of THREE.Camera.' );
+			return;
+
+		}
+
 		var e, el, element, material;
 
 		this.autoClear && this.clear();
@@ -109,7 +116,6 @@ THREE.SVGRenderer = function () {
 			element = _elements[ e ];
 
 			material = element.material;
-			material = material instanceof THREE.MeshFaceMaterial ? element.faceMaterial : material;
 
 			if ( material === undefined || material.visible === false ) continue;
 
@@ -236,7 +242,7 @@ THREE.SVGRenderer = function () {
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				lightPosition = light.matrixWorld.getPosition();
+				lightPosition = light.matrixWorld.getPosition().normalize();
 
 				amount = normal.dot( lightPosition );
 

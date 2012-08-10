@@ -10,6 +10,8 @@ THREE.Geometry = function () {
 
 	this.id = THREE.GeometryCount ++;
 
+	this.name = '';
+
 	this.vertices = [];
 	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
 
@@ -32,7 +34,7 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = false; // unless set to true the *Arrays will be deleted once sent to a buffer.
+	this.dynamic = true; // the intermediate typearrays will be deleted when set to false
 
 };
 
@@ -565,7 +567,7 @@ THREE.Geometry.prototype = {
 	 * and faces' vertices are updated.
 	 */
 
-	mergeVertices: function() {
+	mergeVertices: function () {
 
 		var verticesMap = {}; // Hashmap for looking up vertice by position coordinates (and making sure they are unique)
 		var unique = [], changes = [];
@@ -617,30 +619,48 @@ THREE.Geometry.prototype = {
 				face.d = changes[ face.d ];
 
 				// check dups in (a, b, c, d) and convert to -> face3
-				o = [face.a, face.b, face.c, face.d];
-				for (k=3;k>0;k--) {
-					if ( o.indexOf(face[abcd[k]]) != k ) {
+
+				o = [ face.a, face.b, face.c, face.d ];
+
+				for ( k = 3; k > 0; k -- ) {
+
+					if ( o.indexOf( face[ abcd[ k ] ] ) !== k ) {
+
 						// console.log('faces', face.a, face.b, face.c, face.d, 'dup at', k);
-						o.splice(k, 1);
-						this.faces[ i ] = new THREE.Face3(o[0], o[1], o[2]);
-						for (j=0,jl=this.faceVertexUvs.length;j<jl;j++) {
-							u = this.faceVertexUvs[j][i];
-							if (u) u.splice(k, 1);
+
+						o.splice( k, 1 );
+
+						this.faces[ i ] = new THREE.Face3( o[0], o[1], o[2], face.normal, face.color, face.materialIndex );
+
+						for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
+
+							u = this.faceVertexUvs[ j ][ i ];
+							if ( u ) u.splice( k, 1 );
+
 						}
-						
+
+						this.faces[ i ].vertexColors = face.vertexColors;
+
 						break;
 					}
-				}
 
+				}
 
 			}
 
 		}
 
 		// Use unique set of vertices
+
 		var diff = this.vertices.length - unique.length;
 		this.vertices = unique;
 		return diff;
+
+	},
+
+	clone: function () {
+
+		// TODO
 
 	}
 

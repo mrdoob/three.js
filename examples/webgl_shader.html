@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - shader [Monjori]</title>
@@ -109,11 +109,10 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.Camera();
 				camera.position.z = 1;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				uniforms = {
 					time: { type: "f", value: 1.0 },
@@ -129,7 +128,6 @@
 				} );
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), material );
-				mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();

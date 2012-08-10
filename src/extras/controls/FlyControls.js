@@ -49,7 +49,9 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		}
 
-		switch( event.keyCode ) {
+		//event.preventDefault();
+
+		switch ( event.keyCode ) {
 
 			case 16: /* shift */ this.movementSpeedMultiplier = .1; break;
 

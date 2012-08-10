@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - physically based shading</title>
@@ -59,8 +59,11 @@
 
 			var MARGIN = 0;
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var WIDTH = window.innerWidth || 2;
+			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
+
+			var SCREEN_WIDTH = WIDTH;
+			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
 
 			var FAR = 10000;
 
@@ -103,22 +106,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE
-
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
-
-				if ( DAY )
-					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
-				else
-					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
-
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
 				camera.position.set( 500, 400, 1200 );
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.target.set( 0, 120, 0 );
@@ -134,6 +125,16 @@
 				controls.dynamicDampingFactor = 0.15;
 
 				controls.keys = [ 65, 83, 68 ];
+
+				// SCENE
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
+
+				if ( DAY )
+					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
+				else
+					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
 
 				// CUBE CAMERA
 
@@ -198,6 +199,7 @@
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
+				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
 
 				ground.receiveShadow = true;
@@ -288,7 +290,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true  } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
 					morphMaterial.shading = THREE.FlatShading;
 
 					geometry.computeMorphNormals();
@@ -302,8 +304,6 @@
 
 					morph.castShadow = true;
 					morph.receiveShadow = true;
-
-					morph.doubleSided = true;
 
 					scene.add( morph );
 
@@ -506,6 +506,8 @@
 				vblur.uniforms[ 'v' ].value = 4 / SCREEN_HEIGHT;
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+
+				controls.handleResize();
 
 			}
 

@@ -71,9 +71,9 @@ THREE.ShaderUtils = {
 				"void main() {",
 
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
 
-					"vec3 nWorld = normalize ( mat3( objectMatrix[0].xyz, objectMatrix[1].xyz, objectMatrix[2].xyz ) * normal );",
+					"vec3 nWorld = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
 
 					"vec3 I = mPosition.xyz - cameraPosition;",
 
@@ -112,6 +112,7 @@ THREE.ShaderUtils = {
 				"enableDiffuse"	  : { type: "i", value: 0 },
 				"enableSpecular"  : { type: "i", value: 0 },
 				"enableReflection": { type: "i", value: 0 },
+				"enableDisplacement": { type: "i", value: 0 },
 
 				"tDiffuse"	   : { type: "t", value: 0, texture: null },
 				"tCube"		   : { type: "t", value: 1, texture: null },
@@ -173,25 +174,45 @@ THREE.ShaderUtils = {
 				"uniform vec3 ambientLightColor;",
 
 				"#if MAX_DIR_LIGHTS > 0",
+
 					"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
 					"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+
 				"#endif",
 
 				"#if MAX_POINT_LIGHTS > 0",
+
 					"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
-					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
+					"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
+					"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+
+				"#endif",
+
+				"#if MAX_SPOT_LIGHTS > 0",
+
+					"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
+					"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
+					"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+
 				"#endif",
 
 				"#ifdef WRAP_AROUND",
+
 					"uniform vec3 wrapRGB;",
+
 				"#endif",
 
-				"varying vec3 vViewPosition;",
+				"varying vec3 vWorldPosition;",
 
 				THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 				THREE.ShaderChunk[ "fog_pars_fragment" ],
 
 				"void main() {",
+
+					"vec3 vViewPosition = cameraPosition - vWorldPosition;",
 
 					"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
 
@@ -253,8 +274,14 @@ THREE.ShaderUtils = {
 
 						"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-							"vec3 pointVector = normalize( vPointLight[ i ].xyz );",
-							"float pointDistance = vPointLight[ i ].w;",
+							"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
+							"vec3 pointVector = lPosition.xyz + vViewPosition.xyz;",
+
+							"float pointDistance = 1.0;",
+							"if ( pointLightDistance[ i ] > 0.0 )",
+								"pointDistance = 1.0 - min( ( length( pointVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+							"pointVector = normalize( pointVector );",
 
 							// diffuse
 
@@ -293,6 +320,74 @@ THREE.ShaderUtils = {
 								"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
 
 							"#endif",
+
+						"}",
+
+					"#endif",
+
+					// spot lights
+
+					"#if MAX_SPOT_LIGHTS > 0",
+
+						"vec3 spotDiffuse = vec3( 0.0 );",
+						"vec3 spotSpecular = vec3( 0.0 );",
+
+						"for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
+
+							"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
+							"vec3 spotVector = lPosition.xyz + vViewPosition.xyz;",
+
+							"float spotDistance = 1.0;",
+							"if ( spotLightDistance[ i ] > 0.0 )",
+								"spotDistance = 1.0 - min( ( length( spotVector ) / spotLightDistance[ i ] ), 1.0 );",
+
+							"spotVector = normalize( spotVector );",
+
+							"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
+
+							"if ( spotEffect > spotLightAngle[ i ] ) {",
+
+								"spotEffect = pow( spotEffect, spotLightExponent[ i ] );",
+
+								// diffuse
+
+								"#ifdef WRAP_AROUND",
+
+									"float spotDiffuseWeightFull = max( dot( normal, spotVector ), 0.0 );",
+									"float spotDiffuseWeightHalf = max( 0.5 * dot( normal, spotVector ) + 0.5, 0.0 );",
+
+									"vec3 spotDiffuseWeight = mix( vec3 ( spotDiffuseWeightFull ), vec3( spotDiffuseWeightHalf ), wrapRGB );",
+
+								"#else",
+
+									"float spotDiffuseWeight = max( dot( normal, spotVector ), 0.0 );",
+
+								"#endif",
+
+								"spotDiffuse += spotDistance * spotLightColor[ i ] * uDiffuseColor * spotDiffuseWeight * spotEffect;",
+
+								// specular
+
+								"vec3 spotHalfVector = normalize( spotVector + viewPosition );",
+								"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
+								"float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, uShininess ), 0.0 );",
+
+								"#ifdef PHYSICALLY_BASED_SHADING",
+
+									// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+									"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
+
+									"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
+									"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
+
+								"#else",
+
+									"spotSpecular += spotDistance * spotLightColor[ i ] * uSpecularColor * spotSpecularWeight * spotDiffuseWeight * spotEffect;",
+
+								"#endif",
+
+							"}",
 
 						"}",
 
@@ -371,12 +466,26 @@ THREE.ShaderUtils = {
 
 					"#endif",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor) + totalSpecular;",
+					"#if MAX_SPOT_LIGHTS > 0",
+
+						"totalDiffuse += spotDiffuse;",
+						"totalSpecular += spotSpecular;",
+
+					"#endif",
+
+					"#ifdef METAL",
+
+						"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor + totalSpecular );",
+
+					"#else",
+
+						"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor ) + totalSpecular;",
+
+					"#endif",
 
 					"if ( enableReflection ) {",
 
-						"vec3 wPos = cameraPosition - vViewPosition;",
-						"vec3 vReflect = reflect( normalize( wPos ), normal );",
+						"vec3 vReflect = reflect( normalize( vWorldPosition ), normal );",
 
 						"vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
 
@@ -405,6 +514,8 @@ THREE.ShaderUtils = {
 				"uniform vec2 uOffset;",
 				"uniform vec2 uRepeat;",
 
+				"uniform bool enableDisplacement;",
+
 				"#ifdef VERTEX_TEXTURES",
 
 					"uniform sampler2D tDisplacement;",
@@ -418,70 +529,104 @@ THREE.ShaderUtils = {
 				"varying vec3 vNormal;",
 				"varying vec2 vUv;",
 
-				"#if MAX_POINT_LIGHTS > 0",
+				"varying vec3 vWorldPosition;",
 
-					"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
-					"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-
-					"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
-
-				"#endif",
-
-				"varying vec3 vViewPosition;",
-
+				THREE.ShaderChunk[ "skinning_pars_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 				"void main() {",
 
-					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
-					"vViewPosition = -mvPosition.xyz;",
+					THREE.ShaderChunk[ "skinbase_vertex" ],
+					THREE.ShaderChunk[ "skinnormal_vertex" ],
 
 					// normal, tangent and binormal vectors
 
-					"vNormal = normalMatrix * normal;",
-					"vTangent = normalMatrix * tangent.xyz;",
+					"#ifdef USE_SKINNING",
+
+						"vNormal = normalMatrix * skinnedNormal.xyz;",
+
+						"vec4 skinnedTangent = skinMatrix * vec4( tangent.xyz, 0.0 );",
+						"vTangent = normalMatrix * skinnedTangent.xyz;",
+
+					"#else",
+
+						"vNormal = normalMatrix * normal;",
+						"vTangent = normalMatrix * tangent.xyz;",
+
+					"#endif",
+
 					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
 
 					"vUv = uv * uRepeat + uOffset;",
 
-					// point lights
+					// displacement mapping
 
-					"#if MAX_POINT_LIGHTS > 0",
+					"vec3 displacedPosition;",
 
-						"for( int i = 0; i < MAX_POINT_LIGHTS; i++ ) {",
+					"#ifdef VERTEX_TEXTURES",
 
-							"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-							"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+						"if ( enableDisplacement ) {",
 
-							"float lDistance = 1.0;",
-							"if ( pointLightDistance[ i ] > 0.0 )",
-								"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+							"vec3 dv = texture2D( tDisplacement, uv ).xyz;",
+							"float df = uDisplacementScale * dv.x + uDisplacementBias;",
+							"displacedPosition = position + normalize( normal ) * df;",
 
-							"lVector = normalize( lVector );",
+						"} else {",
 
-							"vPointLight[ i ] = vec4( lVector, lDistance );",
+							"#ifdef USE_SKINNING",
+
+								"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
+								"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+
+								"displacedPosition  = skinned.xyz;",
+
+							"#else",
+
+								"displacedPosition = position;",
+
+							"#endif",
+
+						"}",
+
+					"#else",
+
+						"#ifdef USE_SKINNING",
+
+							"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
+							"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+
+							"displacedPosition  = skinned.xyz;",
+
+						"#else",
+
+							"displacedPosition = position;",
+
+						"#endif",
+
+					"#endif",
+
+					//
+
+					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 wPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+
+					"gl_Position = projectionMatrix * mvPosition;",
+
+					//
+
+					"vWorldPosition = wPosition.xyz;",
+
+					// shadows
+
+					"#ifdef USE_SHADOWMAP",
+
+						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
+
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * wPosition;",
 
 						"}",
 
 					"#endif",
-
-					// displacement mapping
-
-					"#ifdef VERTEX_TEXTURES",
-
-						"vec3 dv = texture2D( tDisplacement, uv ).xyz;",
-						"float df = uDisplacementScale * dv.x + uDisplacementBias;",
-						"vec4 displacedPosition = vec4( normalize( vNormal.xyz ) * df, 0.0 ) + mvPosition;",
-						"gl_Position = projectionMatrix * displacedPosition;",
-
-					"#else",
-
-						"gl_Position = projectionMatrix * mvPosition;",
-
-					"#endif",
-
-					THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 				"}"
 
@@ -504,7 +649,7 @@ THREE.ShaderUtils = {
 
 				"void main() {",
 
-					"vec4 mPosition = objectMatrix * vec4( position, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
 					"vViewPosition = cameraPosition - mPosition.xyz;",
 
 					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [Phong, Lambert]</title>
@@ -93,13 +93,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
-				// CAMERA
-
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 1000;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
@@ -188,6 +185,23 @@
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				if ( webglRenderer ) webglRenderer.setSize( window.innerWidth, window.innerHeight );
+				if ( canvasRenderer ) canvasRenderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

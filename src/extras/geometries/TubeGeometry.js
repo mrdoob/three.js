@@ -134,8 +134,7 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 
 };
 
-THREE.TubeGeometry.prototype = new THREE.Geometry();
-THREE.TubeGeometry.prototype.constructor = THREE.TubeGeometry;
+THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline

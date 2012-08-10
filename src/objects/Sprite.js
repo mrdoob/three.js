@@ -30,9 +30,7 @@ THREE.Sprite = function ( parameters ) {
 
 };
 
-THREE.Sprite.prototype = new THREE.Object3D();
-THREE.Sprite.prototype.constructor = THREE.Sprite;
-
+THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 
 /*
  * Custom update matrix

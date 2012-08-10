@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - interactive - cubes tween</title>
@@ -47,8 +47,6 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
 
 				for ( var i = 0; i < 20; i ++ ) {
@@ -80,6 +78,19 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

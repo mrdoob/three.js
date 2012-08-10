@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - performance</title>
@@ -27,15 +27,6 @@
 
 			var sphere, plane;
 
-			var targetRotation = 0;
-			var targetRotationOnMouseDown = 0;
-
-			var mouseX = 0;
-			var mouseXOnMouseDown = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			init();
 			animate();
 
@@ -48,8 +39,6 @@
 				camera.position.set( 0, 1000, 1000 );
 
 				scene = new THREE.Scene();
-
-				scene.add( camera );
 
 				// Grid
 
@@ -94,9 +83,7 @@
 				scene.add( ambientLight );
 
 				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
-				directionalLight.position.x = 0;
-				directionalLight.position.y = 1;
-				directionalLight.position.z = 0;
+				directionalLight.position.set( 0, 1, 0 );
 				scene.add( directionalLight );
 
 				var pointLight = new THREE.PointLight( 0xff0000, 1, 500 );
@@ -111,6 +98,19 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild(stats.domElement);
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

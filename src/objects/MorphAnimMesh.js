@@ -24,8 +24,7 @@ THREE.MorphAnimMesh = function ( geometry, material ) {
 
 };
 
-THREE.MorphAnimMesh.prototype = new THREE.Mesh();
-THREE.MorphAnimMesh.prototype.constructor = THREE.MorphAnimMesh;
+THREE.MorphAnimMesh.prototype = Object.create( THREE.Mesh.prototype );
 
 THREE.MorphAnimMesh.prototype.setFrameRange = function ( start, end ) {
 

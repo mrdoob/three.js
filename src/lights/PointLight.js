@@ -12,5 +12,4 @@ THREE.PointLight = function ( hex, intensity, distance ) {
 
 };
 
-THREE.PointLight.prototype = new THREE.Light();
-THREE.PointLight.prototype.constructor = THREE.PointLight;
+THREE.PointLight.prototype = Object.create( THREE.Light.prototype );

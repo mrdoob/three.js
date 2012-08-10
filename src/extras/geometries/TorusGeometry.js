@@ -35,7 +35,7 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 			this.vertices.push( vertex );
 
-			uvs.push( new THREE.UV( i / this.segmentsT, 1 - j / this.segmentsR ) );
+			uvs.push( new THREE.UV( i / this.segmentsT, j / this.segmentsR ) );
 			normals.push( vertex.clone().subSelf( center ).normalize() );
 
 		}
@@ -69,5 +69,4 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 };
 
-THREE.TorusGeometry.prototype = new THREE.Geometry();
-THREE.TorusGeometry.prototype.constructor = THREE.TorusGeometry;
+THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );

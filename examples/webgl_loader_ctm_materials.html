@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - baked illumination</title>
@@ -79,19 +79,17 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE
-
-				scene = new THREE.Scene();
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.set( 185, 40, 170 );
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.dynamicDampingFactor = 0.25;
 
+				// SCENE
+
+				scene = new THREE.Scene();
 
 				// SKYBOX
 
@@ -115,12 +113,12 @@
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
-					depthWrite: false
+					depthWrite: false,
+					side: THREE.BackSide
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
-				mesh.flipSided = true;
 				sceneCube.add( mesh );
 
 				// LIGHTS
@@ -201,7 +199,7 @@
 				var useWorker = true,
 					useBuffers = true;
 
-				loaderCTM = new THREE.CTMLoader( renderer.context, true );
+				loaderCTM = new THREE.CTMLoader( true );
 				document.body.appendChild( loaderCTM.statusDomElement );
 
 				var position = new THREE.Vector3( -105, -78, -40 );
@@ -216,7 +214,6 @@
 						var mesh = new THREE.Mesh( geometries[ i ], materials[ i ] );
 						mesh.position = position;
 						mesh.scale = scale;
-						mesh.doubleSided = true;
 						scene.add( mesh );
 
 					}
@@ -284,6 +281,8 @@
 
 					}
 
+					materials[ i ].side = THREE.DoubleSide;
+
 				}
 
 			}
@@ -302,7 +301,6 @@
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );
-				mesh.doubleSided = true;
 				scene.add( mesh );
 
 			}

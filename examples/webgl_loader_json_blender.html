@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - collada - blender</title>
@@ -34,6 +34,9 @@
 
 		<script src="../build/Three.js"></script>
 
+		<script src="../src/loaders/LoadingMonitor.js"></script>
+		<script src="../src/loaders/GeometryLoader.js"></script>
+
 		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -56,7 +59,7 @@
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( 'models/collada/monster/monster.dae', function colladaReady( collada ) {
+			loader.load( 'models/collada/monster/monster.dae', function ( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
@@ -75,18 +78,18 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 2, 4, 5 );
+
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000000, 0.035 );
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 2, 4, 5 );
-				scene.add( camera );
-
-
 				// Add Blender exported Collada model
 
-				var loader = new THREE.JSONLoader();
-				loader.load( "models/animated/monster/monster.js", function ( geometry ) {
+				var loader = new THREE.GeometryLoader();
+				loader.addEventListener( 'load', function ( event ) {
+
+					var geometry = event.content;
 
 					// adjust color a bit
 
@@ -134,6 +137,7 @@
 					}
 
 				} );
+				loader.load( 'models/animated/monster/monster.js' );
 
 
 				// Add the COLLADA

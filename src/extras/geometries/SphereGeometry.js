@@ -37,7 +37,7 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.UV( u, v ) );
+			uvsRow.push( new THREE.UV( u, 1 - v ) );
 
 		}
 
@@ -93,5 +93,4 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 
 };
 
-THREE.SphereGeometry.prototype = new THREE.Geometry();
-THREE.SphereGeometry.prototype.constructor = THREE.SphereGeometry;
+THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );

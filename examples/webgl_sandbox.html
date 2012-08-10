@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js - webgl sandbox</title>
@@ -67,8 +67,6 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 20000 );
-
-				scene.add( camera );
 
 				var light = new THREE.PointLight( 0xffffff );
 				scene.add( light );
@@ -170,6 +168,22 @@
 				}
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

@@ -9,18 +9,20 @@
  *  height: 		<float>, 	// thickness to extrude text
  *  curveSegments: 	<int>,		// number of points on the curves
  *  steps: 			<int>,		// number of points for z-side extrusions / used for subdividing segements of extrude spline too
- 	amount: <int>,	// Amount 
+ 	amount: <int>,	// Amount
  *
  *  bevelEnabled:	<bool>,			// turn on bevel
  *  bevelThickness: <float>, 		// how deep into text bevel goes
  *  bevelSize:		<float>, 		// how far from text outline is bevel
  *  bevelSegments:	<int>, 			// number of bevel layers
  *
- *  extrudePath:	<THREE.CurvePath>	// 2d/3d spline path to extrude shape orthogonality to
+ *  extrudePath:	<THREE.CurvePath>	// 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
+ *  frames:			<THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
  *  bendPath:		<THREE.CurvePath> 	// 2d path for bend the shape around x/y plane
  *
  *  material:		 <int>	// material index for front and back faces
  *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
+ *  uvGenerator:	 <Object> // object that provides UV generator functions
  *
  *  }
   **/
@@ -54,12 +56,11 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 };
 
-THREE.ExtrudeGeometry.prototype = new THREE.Geometry();
-THREE.ExtrudeGeometry.prototype.constructor = THREE.ExtrudeGeometry;
+THREE.ExtrudeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.ExtrudeGeometry.prototype.addShapeList = function(shapes, options) {
 	var sl = shapes.length;
-	
+
 	for ( var s = 0; s < sl; s ++ ) {
 		var shape = shapes[ s ];
 		this.addShape( shape, options );
@@ -88,6 +89,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var material = options.material;
 	var extrudeMaterial = options.extrudeMaterial;
 
+	// Use default WorldUVGenerator if no UV generators are specified.
+	var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : THREE.ExtrudeGeometry.WorldUVGenerator;
+
 	var shapebb = this.shapebb;
 	//shapebb = shape.getBoundingBox();
 
@@ -105,7 +109,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 		// Reuse TNB from TubeGeomtry for now.
 		// TODO1 - have a .isClosed in spline?
-		splineTube = new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
+
+		splineTube = options.frames !== undefined ?
+			options.frames :
+			new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
 
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
@@ -433,12 +440,12 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 			// v( vert.x, vert.y + extrudePts[ 0 ].y, extrudePts[ 0 ].x );
 
-			normal.copy(splineTube.normals[0]).multiplyScalar(vert.x);
-			binormal.copy(splineTube.binormals[0]).multiplyScalar(vert.y);
+			normal.copy( splineTube.normals[0] ).multiplyScalar(vert.x);
+			binormal.copy( splineTube.binormals[0] ).multiplyScalar(vert.y);
 
-			position2.copy(extrudePts[0]).addSelf(normal).addSelf(binormal);
-			
-			v(position2.x, position2.y, position2.z);
+			position2.copy( extrudePts[0] ).addSelf(normal).addSelf(binormal);
+
+			v( position2.x, position2.y, position2.z );
 
 		}
 
@@ -463,12 +470,12 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 				// v( vert.x, vert.y + extrudePts[ s - 1 ].y, extrudePts[ s - 1 ].x );
 
-				normal.copy(splineTube.normals[s]).multiplyScalar(vert.x);
-				binormal.copy(splineTube.binormals[s]).multiplyScalar(vert.y);
+				normal.copy( splineTube.normals[s] ).multiplyScalar( vert.x );
+				binormal.copy( splineTube.binormals[s] ).multiplyScalar( vert.y );
 
-				position2.copy(extrudePts[s]).addSelf(normal).addSelf(binormal);
+				position2.copy( extrudePts[s] ).addSelf( normal ).addSelf( binormal );
 
-				v(position2.x, position2.y, position2.z );
+				v( position2.x, position2.y, position2.z );
 
 			}
 
@@ -503,7 +510,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			ahole = holes[ h ];
 			oneHoleMovements = holesMovements[ h ];
 
-			for ( i = 0, il = ahole.length; i < il; i++ ) {
+			for ( i = 0, il = ahole.length; i < il; i ++ ) {
 
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
@@ -523,30 +530,32 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-	// set UV generator
-	var uvgen = THREE.ExtrudeGeometry.WorldUVGenerator;
+
 
 	////
 	///   Handle Faces
 	////
 
 	// Top and bottom faces
+
 	buildLidFaces();
 
 	// Sides faces
+
 	buildSideFaces();
 
 
 	/////  Internal functions
 
 	function buildLidFaces() {
+
 		if ( bevelEnabled ) {
 
 			var layer = 0 ; // steps + 1
 			var offset = vlen * layer;
 
 			// Bottom faces
-			
+
 			for ( i = 0; i < flen; i ++ ) {
 
 				face = faces[ i ];
@@ -560,48 +569,62 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			// Top faces
 
 			for ( i = 0; i < flen; i ++ ) {
+
 				face = faces[ i ];
 				f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset, false );
+
 			}
+
 		} else {
-		
+
 			// Bottom faces
 
 			for ( i = 0; i < flen; i++ ) {
+
 				face = faces[ i ];
 				f3( face[ 2 ], face[ 1 ], face[ 0 ], true );
+
 			}
 
 			// Top faces
 
 			for ( i = 0; i < flen; i ++ ) {
+
 				face = faces[ i ];
 				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps, false );
+
 			}
 		}
+
 	}
 
 	// Create faces for the z-sides of the shape
 
 	function buildSideFaces() {
+
 		var layeroffset = 0;
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
 
 		for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
+
 			ahole = holes[ h ];
 			sidewalls( ahole, layeroffset );
 
 			//, true
 			layeroffset += ahole.length;
+
 		}
+
 	}
 
 	function sidewalls( contour, layeroffset ) {
+
 		var j, k;
 		i = contour.length;
 
 		while ( --i >= 0 ) {
+
 			j = i;
 			k = i - 1;
 			if ( k < 0 ) k = contour.length - 1;
@@ -611,24 +634,31 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 			var s = 0, sl = steps  + bevelSegments * 2;
 
 			for ( s = 0; s < sl; s ++ ) {
+
 				var slen1 = vlen * s;
 				var slen2 = vlen * ( s + 1 );
+
 				var a = layeroffset + j + slen1,
 					b = layeroffset + k + slen1,
 					c = layeroffset + k + slen2,
 					d = layeroffset + j + slen2;
 
-				f4( a, b, c, d, contour, s, sl );
+				f4( a, b, c, d, contour, s, sl, j, k );
+
 			}
 		}
+
 	}
 
 
 	function v( x, y, z ) {
+
 		scope.vertices.push( new THREE.Vector3( x, y, z ) );
+
 	}
 
 	function f3( a, b, c, isBottom ) {
+
 		a += shapesOffset;
 		b += shapesOffset;
 		c += shapesOffset;
@@ -636,22 +666,26 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		// normal, color, material
 		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
-		var uvs = isBottom ? uvgen.generateBottomUV( scope, shape, options, a, b, c)
-		                   : uvgen.generateTopUV( scope, shape, options, a, b, c);
+		var uvs = isBottom ? uvgen.generateBottomUV( scope, shape, options, a, b, c )
+		                   : uvgen.generateTopUV( scope, shape, options, a, b, c );
 
- 		scope.faceVertexUvs[ 0 ].push(uvs);
+ 		scope.faceVertexUvs[ 0 ].push( uvs );
+
 	}
 
-	function f4( a, b, c, d, wallContour, stepIndex, stepsLength ) {
+	function f4( a, b, c, d, wallContour, stepIndex, stepsLength, contourIndex1, contourIndex2 ) {
+
 		a += shapesOffset;
 		b += shapesOffset;
 		c += shapesOffset;
 		d += shapesOffset;
 
  		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
- 
- 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d, stepIndex, stepsLength);
- 		scope.faceVertexUvs[ 0 ].push(uvs);
+
+ 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
+ 		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
+ 		scope.faceVertexUvs[ 0 ].push( uvs );
+
 	}
 
 };
@@ -659,7 +693,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 
 THREE.ExtrudeGeometry.WorldUVGenerator = {
-	generateTopUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC) {
+
+	generateTopUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC ) {
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
 
@@ -668,20 +703,24 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 			cx = geometry.vertices[ indexC ].x,
 			cy = geometry.vertices[ indexC ].y;
-			
+
 		return [
-			new THREE.UV( ax, 1 - ay ),
-			new THREE.UV( bx, 1 - by ),
-			new THREE.UV( cx, 1 - cy )
+			new THREE.UV( ax, ay ),
+			new THREE.UV( bx, by ),
+			new THREE.UV( cx, cy )
 		];
+
 	},
 
-	generateBottomUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC) {
+	generateBottomUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC ) {
+
 		return this.generateTopUV( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC );
+
 	},
 
 	generateSideWallUV: function( geometry, extrudedShape, wallContour, extrudeOptions,
-	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength) {
+	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength,
+	                              contourIndex1, contourIndex2 ) {
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
 			az = geometry.vertices[ indexA ].z,
@@ -697,20 +736,20 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 			dx = geometry.vertices[ indexD ].x,
 			dy = geometry.vertices[ indexD ].y,
 			dz = geometry.vertices[ indexD ].z;
-		
+
 		if ( Math.abs( ay - by ) < 0.01 ) {
 			return [
-				new THREE.UV( ax, az ),
-				new THREE.UV( bx, bz ),
-				new THREE.UV( cx, cz ),
-				new THREE.UV( dx, dz )
+				new THREE.UV( ax, 1 - az ),
+				new THREE.UV( bx, 1 - bz ),
+				new THREE.UV( cx, 1 - cz ),
+				new THREE.UV( dx, 1 - dz )
 			];
 		} else {
 			return [
-				new THREE.UV( ay, az ),
-				new THREE.UV( by, bz ),
-				new THREE.UV( cy, cz ),
-				new THREE.UV( dy, dz )
+				new THREE.UV( ay, 1 - az ),
+				new THREE.UV( by, 1 - bz ),
+				new THREE.UV( cy, 1 - cz ),
+				new THREE.UV( dy, 1 - dz )
 			];
 		}
 	}

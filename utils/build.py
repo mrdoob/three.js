@@ -10,377 +10,7 @@ except ImportError:
 import os
 import tempfile
 import sys
-
-COMMON_FILES = [
-'Three.js',
-'core/Clock.js',
-'core/Color.js',
-'core/Vector2.js',
-'core/Vector3.js',
-'core/Vector4.js',
-'core/Frustum.js',
-'core/Ray.js',
-'core/Rectangle.js',
-'core/Math.js',
-'core/Matrix3.js',
-'core/Matrix4.js',
-'core/Object3D.js',
-'core/Projector.js',
-'core/Quaternion.js',
-'core/Vertex.js',
-'core/Face3.js',
-'core/Face4.js',
-'core/UV.js',
-'core/Geometry.js',
-'core/Spline.js',
-'cameras/Camera.js',
-'cameras/OrthographicCamera.js',
-'cameras/PerspectiveCamera.js',
-'lights/Light.js',
-'lights/AmbientLight.js',
-'lights/DirectionalLight.js',
-'lights/PointLight.js',
-'lights/SpotLight.js',
-'loaders/Loader.js',
-'loaders/BinaryLoader.js',
-'loaders/JSONLoader.js',
-'loaders/SceneLoader.js',
-'materials/Material.js',
-'materials/LineBasicMaterial.js',
-'materials/MeshBasicMaterial.js',
-'materials/MeshLambertMaterial.js',
-'materials/MeshPhongMaterial.js',
-'materials/MeshDepthMaterial.js',
-'materials/MeshNormalMaterial.js',
-'materials/MeshFaceMaterial.js',
-'materials/ParticleBasicMaterial.js',
-'materials/ParticleCanvasMaterial.js',
-'materials/ParticleDOMMaterial.js',
-'materials/ShaderMaterial.js',
-'textures/Texture.js',
-'textures/DataTexture.js',
-'objects/Particle.js',
-'objects/ParticleSystem.js',
-'objects/Line.js',
-'objects/Mesh.js',
-'objects/Bone.js',
-'objects/SkinnedMesh.js',
-'objects/MorphAnimMesh.js',
-'objects/Ribbon.js',
-'objects/LOD.js',
-'objects/Sprite.js',
-'scenes/Scene.js',
-'scenes/Fog.js',
-'scenes/FogExp2.js',
-'renderers/DOMRenderer.js',
-'renderers/CanvasRenderer.js',
-'renderers/SVGRenderer.js',
-'renderers/WebGLShaders.js',
-'renderers/WebGLRenderer.js',
-'renderers/WebGLRenderTarget.js',
-'renderers/WebGLRenderTargetCube.js',
-'renderers/renderables/RenderableVertex.js',
-'renderers/renderables/RenderableFace3.js',
-'renderers/renderables/RenderableFace4.js',
-'renderers/renderables/RenderableObject.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
-]
-
-EXTRAS_FILES = [
-'extras/ColorUtils.js',
-'extras/GeometryUtils.js',
-'extras/ImageUtils.js',
-'extras/SceneUtils.js',
-'extras/ShaderUtils.js',
-'extras/core/BufferGeometry.js',
-'extras/core/Curve.js',
-'extras/core/CurvePath.js',
-'extras/core/EventTarget.js',
-'extras/core/Gyroscope.js',
-'extras/core/Path.js',
-'extras/core/Shape.js',
-'extras/core/TextPath.js',
-'extras/animation/AnimationHandler.js',
-'extras/animation/Animation.js',
-'extras/animation/KeyFrameAnimation.js',
-'extras/cameras/CubeCamera.js',
-'extras/cameras/CombinedCamera.js',
-'extras/controls/FirstPersonControls.js',
-'extras/controls/PathControls.js',
-'extras/controls/FlyControls.js',
-'extras/controls/RollControls.js',
-'extras/controls/TrackballControls.js',
-'extras/geometries/CubeGeometry.js',
-'extras/geometries/CylinderGeometry.js',
-'extras/geometries/ExtrudeGeometry.js',
-'extras/geometries/LatheGeometry.js',
-'extras/geometries/PlaneGeometry.js',
-'extras/geometries/SphereGeometry.js',
-'extras/geometries/TextGeometry.js',
-'extras/geometries/TorusGeometry.js',
-'extras/geometries/TorusKnotGeometry.js',
-'extras/geometries/TubeGeometry.js',
-'extras/geometries/PolyhedronGeometry.js',
-'extras/geometries/IcosahedronGeometry.js',
-'extras/geometries/OctahedronGeometry.js',
-'extras/geometries/TetrahedronGeometry.js',
-'extras/geometries/ParametricGeometry.js',
-'extras/helpers/AxisHelper.js',
-'extras/helpers/ArrowHelper.js',
-'extras/helpers/CameraHelper.js',
-'extras/modifiers/SubdivisionModifier.js',
-'extras/objects/ImmediateRenderObject.js',
-'extras/objects/LensFlare.js',
-'extras/objects/MorphBlendMesh.js',
-'extras/renderers/plugins/LensFlarePlugin.js',
-'extras/renderers/plugins/ShadowMapPlugin.js',
-'extras/renderers/plugins/SpritePlugin.js',
-'extras/renderers/plugins/DepthPassPlugin.js',
-'extras/shaders/ShaderFlares.js',
-'extras/shaders/ShaderSprite.js'
-]
-
-CANVAS_FILES = [
-'Three.js',
-'core/Color.js',
-'core/Vector2.js',
-'core/Vector3.js',
-'core/Vector4.js',
-'core/Frustum.js',
-'core/Ray.js',
-'core/Rectangle.js',
-'core/Math.js',
-'core/Matrix3.js',
-'core/Matrix4.js',
-'core/Object3D.js',
-'core/Projector.js',
-'core/Quaternion.js',
-'core/Vertex.js',
-'core/Face3.js',
-'core/Face4.js',
-'core/UV.js',
-'core/Geometry.js',
-'cameras/Camera.js',
-'cameras/OrthographicCamera.js',
-'cameras/PerspectiveCamera.js',
-'lights/Light.js',
-'lights/AmbientLight.js',
-'lights/DirectionalLight.js',
-'lights/PointLight.js',
-'loaders/Loader.js',
-'loaders/BinaryLoader.js',
-'loaders/JSONLoader.js',
-'loaders/SceneLoader.js',
-'materials/Material.js',
-'materials/LineBasicMaterial.js',
-'materials/MeshBasicMaterial.js',
-'materials/MeshLambertMaterial.js',
-'materials/MeshPhongMaterial.js',
-'materials/MeshDepthMaterial.js',
-'materials/MeshNormalMaterial.js',
-'materials/MeshFaceMaterial.js',
-'materials/ParticleBasicMaterial.js',
-'materials/ParticleCanvasMaterial.js',
-'textures/Texture.js',
-'textures/DataTexture.js',
-'objects/Particle.js',
-'objects/Line.js',
-'objects/Mesh.js',
-'objects/Bone.js',
-'objects/Sprite.js',
-'scenes/Scene.js',
-'renderers/CanvasRenderer.js',
-'renderers/renderables/RenderableVertex.js',
-'renderers/renderables/RenderableFace3.js',
-'renderers/renderables/RenderableFace4.js',
-'renderers/renderables/RenderableObject.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
-]
-
-DOM_FILES = [
-'Three.js',
-'core/Color.js',
-'core/Vector2.js',
-'core/Vector3.js',
-'core/Vector4.js',
-'core/Frustum.js',
-'core/Ray.js',
-'core/Rectangle.js',
-'core/Math.js',
-'core/Matrix3.js',
-'core/Matrix4.js',
-'core/Object3D.js',
-'core/Projector.js',
-'core/Quaternion.js',
-'core/Vertex.js',
-'core/Face3.js',
-'core/Face4.js',
-'core/UV.js',
-'cameras/Camera.js',
-'cameras/OrthographicCamera.js',
-'cameras/PerspectiveCamera.js',
-'lights/Light.js',
-'loaders/Loader.js',
-'materials/Material.js',
-'materials/LineBasicMaterial.js',
-'materials/MeshBasicMaterial.js',
-'materials/ParticleBasicMaterial.js',
-'materials/ParticleDOMMaterial.js',
-'textures/Texture.js',
-'textures/DataTexture.js',
-'objects/Particle.js',
-'objects/Mesh.js',
-'objects/Line.js',
-'objects/Bone.js',
-'objects/Sprite.js',
-'scenes/Scene.js',
-'renderers/DOMRenderer.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableVertex.js',
-'renderers/renderables/RenderableFace3.js',
-'renderers/renderables/RenderableFace4.js',
-'renderers/renderables/RenderableObject.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
-]
-
-SVG_FILES = [
-'Three.js',
-'core/Color.js',
-'core/Vector2.js',
-'core/Vector3.js',
-'core/Vector4.js',
-'core/Frustum.js',
-'core/Ray.js',
-'core/Rectangle.js',
-'core/Math.js',
-'core/Matrix3.js',
-'core/Matrix4.js',
-'core/Object3D.js',
-'core/Projector.js',
-'core/Quaternion.js',
-'core/Vertex.js',
-'core/Face3.js',
-'core/Face4.js',
-'core/UV.js',
-'core/Geometry.js',
-'cameras/Camera.js',
-'cameras/OrthographicCamera.js',
-'cameras/PerspectiveCamera.js',
-'lights/Light.js',
-'lights/AmbientLight.js',
-'lights/DirectionalLight.js',
-'lights/PointLight.js',
-'loaders/Loader.js',
-'loaders/BinaryLoader.js',
-'loaders/JSONLoader.js',
-'loaders/SceneLoader.js',
-'materials/Material.js',
-'materials/LineBasicMaterial.js',
-'materials/MeshBasicMaterial.js',
-'materials/MeshLambertMaterial.js',
-'materials/MeshPhongMaterial.js',
-'materials/MeshDepthMaterial.js',
-'materials/MeshNormalMaterial.js',
-'materials/MeshFaceMaterial.js',
-'materials/ParticleBasicMaterial.js',
-'textures/Texture.js',
-'textures/DataTexture.js',
-'objects/Particle.js',
-'objects/Line.js',
-'objects/Mesh.js',
-'objects/Bone.js',
-'objects/Sprite.js',
-'scenes/Scene.js',
-'renderers/SVGRenderer.js',
-'renderers/renderables/RenderableVertex.js',
-'renderers/renderables/RenderableFace3.js',
-'renderers/renderables/RenderableFace4.js',
-'renderers/renderables/RenderableObject.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js'
-]
-
-WEBGL_FILES = [
-'Three.js',
-'core/Color.js',
-'core/Vector2.js',
-'core/Vector3.js',
-'core/Vector4.js',
-'core/Frustum.js',
-'core/Ray.js',
-'core/Rectangle.js',
-'core/Math.js',
-'core/Matrix3.js',
-'core/Matrix4.js',
-'core/Object3D.js',
-'core/Projector.js',
-'core/Quaternion.js',
-'core/Vertex.js',
-'core/Face3.js',
-'core/Face4.js',
-'core/UV.js',
-'core/Geometry.js',
-'core/Spline.js',
-'cameras/Camera.js',
-'cameras/OrthographicCamera.js',
-'cameras/PerspectiveCamera.js',
-'lights/Light.js',
-'lights/AmbientLight.js',
-'lights/DirectionalLight.js',
-'lights/PointLight.js',
-'lights/SpotLight.js',
-'loaders/Loader.js',
-'loaders/BinaryLoader.js',
-'loaders/JSONLoader.js',
-'loaders/SceneLoader.js',
-'materials/Material.js',
-'materials/LineBasicMaterial.js',
-'materials/MeshBasicMaterial.js',
-'materials/MeshLambertMaterial.js',
-'materials/MeshPhongMaterial.js',
-'materials/MeshDepthMaterial.js',
-'materials/MeshNormalMaterial.js',
-'materials/MeshFaceMaterial.js',
-'materials/ParticleBasicMaterial.js',
-'materials/ShaderMaterial.js',
-'textures/Texture.js',
-'textures/DataTexture.js',
-'objects/Particle.js',
-'objects/ParticleSystem.js',
-'objects/Line.js',
-'objects/Mesh.js',
-'objects/Bone.js',
-'objects/SkinnedMesh.js',
-'objects/Ribbon.js',
-'objects/LOD.js',
-'objects/Sprite.js',
-'scenes/Scene.js',
-'scenes/Fog.js',
-'scenes/FogExp2.js',
-'renderers/WebGLShaders.js',
-'renderers/WebGLRenderer.js',
-'renderers/WebGLRenderTarget.js',
-'renderers/WebGLRenderTargetCube.js',
-'renderers/renderables/RenderableVertex.js',
-'renderers/renderables/RenderableFace3.js',
-'renderers/renderables/RenderableFace4.js',
-'renderers/renderables/RenderableObject.js',
-'renderers/renderables/RenderableParticle.js',
-'renderers/renderables/RenderableLine.js',
-'extras/core/BufferGeometry.js',
-'extras/core/Gyroscope.js',
-'extras/helpers/CameraHelper.js',
-'extras/objects/LensFlare.js',
-'extras/objects/ImmediateRenderObject.js',
-'extras/renderers/plugins/LensFlarePlugin.js',
-'extras/renderers/plugins/ShadowMapPlugin.js',
-'extras/renderers/plugins/SpritePlugin.js',
-'extras/shaders/ShaderFlares.js',
-'extras/shaders/ShaderSprite.js'
-]
+import json
 
 def merge(files):
 
@@ -454,9 +84,9 @@ def buildLib(files, debug, minified, filename, fname_externs):
 
 	filename = filename + '.js'
 
-	print "=" * 40
-	print "Compiling", filename
-	print "=" * 40
+	print("=" * 40)
+	print("Compiling " + filename)
+	print("=" * 40)
 
 	if minified:
 		text = compress(text, fname_externs)
@@ -470,6 +100,14 @@ def buildIncludes(files, filename):
 	text = "\n".join(template % f for f in files)
 
 	output(text, filename + '.js')
+	
+def getFileNames():
+	
+	file =  open(os.path.join('.', 'files.json'), 'r')
+	data = json.load(file)
+	file.close()
+	
+	return data
 
 
 def parse_args():
@@ -481,8 +119,6 @@ def parse_args():
 		parser.add_argument('--extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_argument('--canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_argument('--webgl', help='Build ThreeWebGL.js', action='store_true')
-		parser.add_argument('--svg', help='Build ThreeSVG.js', action='store_true')
-		parser.add_argument('--dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_argument('--debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_argument('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_argument('--all', help='Build all Three.js versions', action='store_true')
@@ -496,8 +132,6 @@ def parse_args():
 		parser.add_option('--extras', dest='extras', help='Build ThreeExtras.js', action='store_const', const=True)
 		parser.add_option('--canvas', dest='canvas', help='Build ThreeCanvas.js', action='store_true')
 		parser.add_option('--webgl', dest='webgl', help='Build ThreeWebGL.js', action='store_true')
-		parser.add_option('--svg', dest='svg', help='Build ThreeSVG.js', action='store_true')
-		parser.add_option('--dom', dest='dom', help='Build ThreeDOM.js', action='store_true')
 		parser.add_option('--debug', dest='debug', help='Generate debug versions', action='store_const', const=True, default=False)
 		parser.add_option('--minified', help='Generate minified versions', action='store_const', const=True, default=False)
 		parser.add_option('--all', dest='all', help='Build all Three.js versions', action='store_true')
@@ -517,14 +151,13 @@ def main(argv=None):
 	args = parse_args()
 	debug = args.debug
 	minified = args.minified
+	files = getFileNames()
 
 	config = [
-	['Three', 'includes', '', COMMON_FILES + EXTRAS_FILES, args.common],
-	['ThreeCanvas', 'includes_canvas', '', CANVAS_FILES, args.canvas],
-	['ThreeDOM', 'includes_dom', '', DOM_FILES, args.dom],
-	['ThreeSVG', 'includes_svg', '', SVG_FILES, args.svg],
-	['ThreeWebGL', 'includes_webgl', '', WEBGL_FILES, args.webgl],
-	['ThreeExtras', 'includes_extras', 'externs_extras', EXTRAS_FILES, args.extras]
+	['Three', 'includes', '', files["COMMON"] + files["EXTRAS"], args.common],
+	['ThreeCanvas', 'includes_canvas', '', files["CANVAS"], args.canvas],
+	['ThreeWebGL', 'includes_webgl', '', files["WEBGL"], args.webgl],
+	['ThreeExtras', 'includes_extras', 'externs_extras', files["EXTRAS"], args.extras]
 	]
 
 	for fname_lib, fname_inc, fname_externs, files, enabled in config:

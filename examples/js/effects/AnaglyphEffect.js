@@ -43,7 +43,7 @@ THREE.AnaglyphEffect = function ( renderer ) {
 
 			"void main() {",
 
-			"	vUv = vec2( uv.x, 1.0 - uv.y );",
+			"	vUv = vec2( uv.x, uv.y );",
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
@@ -75,16 +75,15 @@ THREE.AnaglyphEffect = function ( renderer ) {
 	} );
 
 	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
-	mesh.rotation.x = Math.PI / 2;
 	_scene.add( mesh );
 
 	this.setSize = function ( width, height ) {
 
-		_renderTargetL.width = width;
-		_renderTargetL.height = height;
+		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
+		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
-		_renderTargetR.width = width;
-		_renderTargetR.height = height;
+		_material.uniforms[ "mapLeft" ].texture = _renderTargetL;
+		_material.uniforms[ "mapRight" ].texture = _renderTargetR;
 
 		renderer.setSize( width, height );
 
@@ -102,6 +101,8 @@ THREE.AnaglyphEffect = function ( renderer ) {
 	this.render = function ( scene, camera ) {
 
 		scene.updateMatrixWorld();
+
+		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		var hasCameraChanged = ( _aspect !== camera.aspect ) || ( _near !== camera.near ) || ( _far !== camera.far ) || ( _fov !== camera.fov );
 

@@ -28,32 +28,62 @@
 
 THREE.ShaderMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.fragmentShader = "void main() {}";
+	this.vertexShader = "void main() {}";
+	this.uniforms = {};
+	this.attributes = null;
 
-	this.fragmentShader = parameters.fragmentShader !== undefined ? parameters.fragmentShader : "void main() {}";
-	this.vertexShader = parameters.vertexShader !== undefined ? parameters.vertexShader : "void main() {}";
-	this.uniforms = parameters.uniforms !== undefined ? parameters.uniforms : {};
-	this.attributes = parameters.attributes;
+	this.shading = THREE.SmoothShading;
 
-	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
+	this.wireframe = false;
+	this.wireframeLinewidth = 1;
 
-	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
-	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
+	this.fog = false; // set to use scene fog
 
-	this.fog = parameters.fog !== undefined ? parameters.fog : false; // set to use scene fog
+	this.lights = false; // set to use scene lights
 
-	this.lights = parameters.lights !== undefined ? parameters.lights : false; // set to use scene lights
+	this.vertexColors = THREE.NoColors; // set to use "color" attribute stream
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : THREE.NoColors; // set to use "color" attribute stream
+	this.skinning = false; // set to use skinning attribute streams
 
-	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false; // set to use skinning attribute streams
+	this.morphTargets = false; // set to use morph targets
+	this.morphNormals = false; // set to use morph normals
 
-	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false; // set to use morph targets
-	this.morphNormals = parameters.morphNormals !== undefined ? parameters.morphNormals : false; // set to use morph normals
+	this.setValues( parameters );
 
 };
 
-THREE.ShaderMaterial.prototype = new THREE.Material();
-THREE.ShaderMaterial.prototype.constructor = THREE.ShaderMaterial;
+THREE.ShaderMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.ShaderMaterial.prototype.clone = function () {
+
+	var material = new THREE.ShaderMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.fragmentShader = this.fragmentShader;
+	material.vertexShader = this.vertexShader;
+	material.uniforms = this.uniforms;
+	material.attributes = this.attributes;
+
+	material.shading = this.shading;
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+
+	material.fog = this.fog;
+
+	material.lights = this.lights;
+
+	material.vertexColors = this.vertexColors;
+
+	material.skinning = this.skinning;
+
+	material.morphTargets = this.morphTargets;
+	material.morphNormals = this.morphNormals;
+
+	return material;
+
+};

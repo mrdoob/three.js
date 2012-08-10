@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing</title>
@@ -67,8 +67,11 @@
 
 			var cameraOrtho, cameraPerspective, sceneModel, sceneBG, renderer, mesh, directionalLight;
 
-			var halfWidth = window.innerWidth / 2;
-			var halfHeight = window.innerHeight / 2;
+			var width = window.innerWidth || 2;
+			var height = window.innerHeight || 2;
+
+			var halfWidth = width / 2;
+			var halfHeight = height / 2;
 
 			var materialColor, material2D, quadBG, quadMask, renderScene;
 
@@ -85,19 +88,16 @@
 
 				//
 
-				sceneModel = new THREE.Scene();
-				sceneBG = new THREE.Scene();
-
-				//
-
 				cameraOrtho = new THREE.OrthographicCamera( -halfWidth, halfWidth, halfHeight, -halfHeight, -10000, 10000 );
 				cameraOrtho.position.z = 100;
 
-				cameraPerspective = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				cameraPerspective = new THREE.PerspectiveCamera( 50, width / height, 1, 10000 );
 				cameraPerspective.position.z = 900;
 
-				sceneModel.add( cameraPerspective );
-				sceneBG.add( cameraOrtho );
+				//
+
+				sceneModel = new THREE.Scene();
+				sceneBG = new THREE.Scene();
 
 				//
 
@@ -115,8 +115,7 @@
 
 				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), materialColor );
 				quadBG.position.z = -500;
-				quadBG.rotation.x = Math.PI / 2;
-				quadBG.scale.set( window.innerWidth, 1, window.innerHeight );
+				quadBG.scale.set( width, height, 1 );
 				sceneBG.add( quadBG );
 
 				//
@@ -125,14 +124,13 @@
 
 				quadMask = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffaa00 } )  );
 				quadMask.position.z = -300;
-				quadMask.rotation.x = Math.PI / 2;
-				quadMask.scale.set( window.innerWidth / 2, 1, window.innerHeight / 2 );
+				quadMask.scale.set( width / 2, height / 2, 1 );
 				sceneMask.add( quadMask );
 
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 				renderer.setClearColorHex( 0x000000, 1 );
 				renderer.autoClear = false;
 
@@ -178,8 +176,8 @@
 
 				var effectHBlur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
 				var effectVBlur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
-				effectHBlur.uniforms[ 'h' ].value = 2 / ( window.innerWidth/2 );
-				effectVBlur.uniforms[ 'v' ].value = 2 / ( window.innerHeight/2 );
+				effectHBlur.uniforms[ 'h' ].value = 2 / ( width/2 );
+				effectVBlur.uniforms[ 'v' ].value = 2 / ( height/2 );
 
 				var effectColorify1 = new THREE.ShaderPass( THREE.ShaderExtras[ "colorify" ] );
 				var effectColorify2 = new THREE.ShaderPass( THREE.ShaderExtras[ "colorify" ] );
@@ -203,8 +201,8 @@
 
 				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: true };
 
-				var rtWidth  = window.innerWidth / 2;
-				var rtHeight = window.innerHeight / 2;
+				var rtWidth  = width / 2;
+				var rtHeight = height / 2;
 
 				//
 
@@ -330,7 +328,7 @@
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value = - 0.75;
+				uniforms[ "uNormalScale" ].value = 0.75;
 
 				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 

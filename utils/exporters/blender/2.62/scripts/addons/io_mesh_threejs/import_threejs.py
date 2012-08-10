@@ -248,7 +248,7 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
                         v = layer[fi][vi][1]
 
                         face_uvs[vi].x = u
-                        face_uvs[vi].y = 1.0 - v
+                        face_uvs[vi].y = v
 
                     active_texture = materials[faceMaterials[fi]].active_texture
 

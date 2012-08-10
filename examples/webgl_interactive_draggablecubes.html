@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - draggable cubes</title>
@@ -37,11 +37,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.rotateSpeed = 1.0;
@@ -51,6 +48,8 @@
 				controls.noPan = false;
 				controls.staticMoving = true;
 				controls.dynamicDampingFactor = 0.3;
+
+				scene = new THREE.Scene();
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
@@ -65,8 +64,8 @@
 				light.shadowBias = -0.00022;
 				light.shadowDarkness = 0.5;
 
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
+				light.shadowMapWidth = 2048;
+				light.shadowMapHeight = 2048;
 
 				scene.add( light );
 
@@ -100,7 +99,6 @@
 				}
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
-				plane.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 				plane.visible = false;
 				scene.add( plane );
 
@@ -131,6 +129,19 @@
 				renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

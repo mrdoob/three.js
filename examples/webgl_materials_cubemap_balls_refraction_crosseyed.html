@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube refraction [balls]</title>
@@ -114,12 +114,12 @@
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					side: THREE.BackSide
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
-				mesh.flipSided = true;
 				scene.add( mesh );
 
 				//
@@ -130,8 +130,24 @@
 				effect = new THREE.CrosseyedEffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.separation = 90;
-				
+
 				document.addEventListener( 'keydown', onKeyDown, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

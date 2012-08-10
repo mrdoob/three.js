@@ -6,7 +6,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 	var _gl,
 	_renderer,
-	_depthMaterial, _depthMaterialMorph,
+	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
@@ -24,9 +24,11 @@ THREE.ShadowMapPlugin = function ( ) {
 
 		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
 		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
+		_depthMaterialSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, skinning: true } );
 
 		_depthMaterial._shadowPass = true;
 		_depthMaterialMorph._shadowPass = true;
+		_depthMaterialSkin._shadowPass = true;
 
 	};
 
@@ -233,7 +235,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
+						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
 						webglObject.render = true;
 
@@ -257,8 +259,6 @@ THREE.ShadowMapPlugin = function ( ) {
 					// culling is overriden globally for all objects
 					// while rendering depth map
 
-					//_renderer.setObjectFaces( object );
-
 					if ( object.customDepthMaterial ) {
 
 						material = object.customDepthMaterial;
@@ -266,6 +266,10 @@ THREE.ShadowMapPlugin = function ( ) {
 					} else if ( object.geometry.morphTargets.length ) {
 
 						material = _depthMaterialMorph;
+
+					} else if ( object instanceof THREE.SkinnedMesh ) {
+
+						material = _depthMaterialSkin;
 
 					} else {
 
@@ -298,7 +302,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( object.visible && object.castShadow ) {
 
-					object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld);
+					object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
 					_renderer.renderImmediateObject( shadowCamera, scene.__lights, fog, _depthMaterial, object );
 

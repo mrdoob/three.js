@@ -4,8 +4,12 @@
 
 THREE.ParticleDOMMaterial = function ( domElement ) {
 
-	THREE.Material.call( this );
-
 	this.domElement = domElement;
+
+};
+
+THREE.ParticleDOMMaterial.prototype.clone = function(){ 
+
+	return new THREE.ParticleDOMMaterial( this.domElement );
 
 };

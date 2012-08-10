@@ -278,17 +278,10 @@
 
 				sceneRenderTarget.add( cameraOrtho );
 
-				// SCENE (FINAL)
-
-				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
-				scene.fog.color.setHSV( 0.102, 0.9, 0.825 );
+				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( -1200, 800, 1200 );
-
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.target.set( 0, 0, 0 );
@@ -304,6 +297,12 @@
 				controls.dynamicDampingFactor = 0.15;
 
 				controls.keys = [ 65, 83, 68 ];
+
+				// SCENE (FINAL)
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
+				scene.fog.color.setHSV( 0.102, 0.9, 0.825 );
 
 				// LIGHTS
 
@@ -419,13 +418,11 @@
 
 				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				quadTarget.position.z = -500;
-				quadTarget.rotation.x = Math.PI / 2;
 				sceneRenderTarget.add( quadTarget );
 
 				// TERRAIN MESH
 
 				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
-				geometryTerrain.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 
 				geometryTerrain.computeFaceNormals();
 				geometryTerrain.computeVertexNormals();
@@ -634,7 +631,7 @@
 
 				var meshTmp = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
 				meshTmp.position.z = -500;
-				 meshTmp.rotation.x = Math.PI / 2;
+
 				sceneTmp.add( meshTmp );
 
 				renderer.render( sceneTmp, cameraOrtho, target, true );

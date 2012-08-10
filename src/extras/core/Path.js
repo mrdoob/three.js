@@ -18,9 +18,7 @@ THREE.Path = function ( points ) {
 
 };
 
-THREE.Path.prototype = new THREE.CurvePath();
-THREE.Path.prototype.constructor = THREE.Path;
-
+THREE.Path.prototype = Object.create( THREE.CurvePath.prototype );
 
 THREE.PathActions = {
 
@@ -29,8 +27,8 @@ THREE.PathActions = {
 	QUADRATIC_CURVE_TO: 'quadraticCurveTo', // Bezier quadratic curve
 	BEZIER_CURVE_TO: 'bezierCurveTo', 		// Bezier cubic curve
 	CSPLINE_THRU: 'splineThru',				// Catmull-rom spline
-	ARC: 'arc'								// Circle
-
+	ARC: 'arc',								// Circle
+	ELLIPSE: 'ellipse'
 };
 
 // TODO Clean up PATH API
@@ -133,50 +131,52 @@ THREE.Path.prototype.splineThru = function( pts /*Array of Vector*/ ) {
 };
 
 // FUTURE: Change the API or follow canvas API?
-// TODO ARC ( x, y, x - radius, y - radius, startAngle, endAngle )
 
 THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 
+	var lastargs = this.actions[ this.actions.length - 1].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
+
+	this.absarc(aX + x0, aY + y0, aRadius,
+		aStartAngle, aEndAngle, aClockwise );
+	
+ };
+
+ THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
+	this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
+ };
+ 
+THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
+
+	var lastargs = this.actions[ this.actions.length - 1].args;
+	var x0 = lastargs[ lastargs.length - 2 ];
+	var y0 = lastargs[ lastargs.length - 1 ];
+
+	this.absellipse(aX + x0, aY + y0, xRadius, yRadius,
+		aStartAngle, aEndAngle, aClockwise );
+
+ };
+ 
+
+THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
+									  aStartAngle, aEndAngle, aClockwise ) {
+
 	var args = Array.prototype.slice.call( arguments );
-
-	var laste = this.actions[ this.actions.length - 1];
-
-	var curve = new THREE.ArcCurve( laste.x + aX, laste.y + aY, aRadius,
+	var curve = new THREE.EllipseCurve( aX, aY, xRadius, yRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
 
-	// All of the other actions look to the last two elements in the list to
-	// find the ending point, so we need to append them.
 	var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
 	args.push(lastPoint.x);
 	args.push(lastPoint.y);
 
-	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
+	this.actions.push( { action: THREE.PathActions.ELLIPSE, args: args } );
 
  };
-
-THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
-									  aStartAngle, aEndAngle, aClockwise ) {
-
-	var args = Array.prototype.slice.call( arguments );
-
-	var curve = new THREE.ArcCurve( aX, aY, aRadius,
-									aStartAngle, aEndAngle, aClockwise );
-	this.curves.push( curve );
-
-	// console.log( 'arc', args );
-
-        // All of the other actions look to the last two elements in the list to
-        // find the ending point, so we need to append them.
-        var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
-        args.push(lastPoint.x);
-        args.push(lastPoint.y);
-
-	this.actions.push( { action: THREE.PathActions.ARC, args: args } );
-
- };
-
 
 THREE.Path.prototype.getSpacedPoints = function ( divisions, closedPath ) {
 
@@ -342,13 +342,10 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 		case THREE.PathActions.ARC:
 
-			laste = this.actions[ i - 1 ].args;
-
 			var aX = args[ 0 ], aY = args[ 1 ],
 				aRadius = args[ 2 ],
 				aStartAngle = args[ 3 ], aEndAngle = args[ 4 ],
 				aClockwise = !!args[ 5 ];
-
 
 			var deltaAngle = aEndAngle - aStartAngle;
 			var angle;
@@ -368,6 +365,44 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				tx = aX + aRadius * Math.cos( angle );
 				ty = aY + aRadius * Math.sin( angle );
+
+				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
+
+				points.push( new THREE.Vector2( tx, ty ) );
+
+			}
+
+			//console.log(points);
+
+		  break;
+		  
+		case THREE.PathActions.ELLIPSE:
+
+			var aX = args[ 0 ], aY = args[ 1 ],
+				xRadius = args[ 2 ],
+				yRadius = args[ 3 ],
+				aStartAngle = args[ 4 ], aEndAngle = args[ 5 ],
+				aClockwise = !!args[ 6 ];
+
+
+			var deltaAngle = aEndAngle - aStartAngle;
+			var angle;
+			var tdivisions = divisions * 2;
+
+			for ( j = 1; j <= tdivisions; j ++ ) {
+
+				t = j / tdivisions;
+
+				if ( ! aClockwise ) {
+
+					t = 1 - t;
+
+				}
+
+				angle = aStartAngle + t * deltaAngle;
+
+				tx = aX + xRadius * Math.cos( angle );
+				ty = aY + yRadius * Math.sin( angle );
 
 				//console.log('t', t, 'angle', angle, 'tx', tx, 'ty', ty);
 
@@ -398,153 +433,6 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 	}
 
 	return points;
-
-};
-
-
-
-// This was used for testing purposes. Should be removed soon.
-
-THREE.Path.prototype.transform = function( path, segments ) {
-
-	var bounds = this.getBoundingBox();
-	var oldPts = this.getPoints( segments ); // getPoints getSpacedPoints
-
-	//console.log( path.cacheArcLengths() );
-	//path.getLengths(400);
-	//segments = 40;
-
-	return this.getWrapPoints( oldPts, path );
-
-};
-
-// Read http://www.tinaja.com/glib/nonlingr.pdf
-// nonlinear transforms
-
-THREE.Path.prototype.nltransform = function( a, b, c, d, e, f ) {
-
-	// a - horizontal size
-	// b - lean
-	// c - x offset
-	// d - vertical size
-	// e - climb
-	// f - y offset
-
-	var oldPts = this.getPoints();
-
-	var i, il, p, oldX, oldY;
-
-	for ( i = 0, il = oldPts.length; i < il; i ++ ) {
-
-		p = oldPts[i];
-
-		oldX = p.x;
-		oldY = p.y;
-
-		p.x = a * oldX + b * oldY + c;
-		p.y = d * oldY + e * oldX + f;
-
-	}
-
-	return oldPts;
-
-};
-
-
-// FUTURE Export JSON Format
-
-/* Draws this path onto a 2d canvas easily */
-
-THREE.Path.prototype.debug = function( canvas ) {
-
-	var bounds = this.getBoundingBox();
-
-	if ( !canvas ) {
-
-		canvas = document.createElement( "canvas" );
-
-		canvas.setAttribute( 'width',  bounds.maxX + 100 );
-		canvas.setAttribute( 'height', bounds.maxY + 100 );
-
-		document.body.appendChild( canvas );
-
-	}
-
-	var ctx = canvas.getContext( "2d" );
-	ctx.fillStyle = "white";
-	ctx.fillRect( 0, 0, canvas.width, canvas.height );
-
-	ctx.strokeStyle = "black";
-	ctx.beginPath();
-
-	var i, il, item, action, args;
-
-	// Debug Path
-
-	for ( i = 0, il = this.actions.length; i < il; i ++ ) {
-
-		item = this.actions[ i ];
-
-		args = item.args;
-		action = item.action;
-
-		// Short hand for now
-
-		if ( action != THREE.PathActions.CSPLINE_THRU ) {
-
-			ctx[ action ].apply( ctx, args );
-
-		}
-
-		/*
-		switch ( action ) {
-
-			case THREE.PathActions.MOVE_TO:
-
-				ctx[ action ]( args[ 0 ], args[ 1 ] );
-				break;
-
-			case THREE.PathActions.LINE_TO:
-
-				ctx[ action ]( args[ 0 ], args[ 1 ] );
-				break;
-
-			case THREE.PathActions.QUADRATIC_CURVE_TO:
-
-				ctx[ action ]( args[ 0 ], args[ 1 ], args[ 2 ], args[ 3 ] );
-				break;
-
-			case THREE.PathActions.CUBIC_CURVE_TO:
-
-				ctx[ action ]( args[ 0 ], args[ 1 ], args[ 2 ], args[ 3 ], args[ 4 ], args[ 5 ] );
-				break;
-
-		}
-		*/
-
-	}
-
-	ctx.stroke();
-	ctx.closePath();
-
-	// Debug Points
-
-	ctx.strokeStyle = "red";
-
-	/* TO CLEAN UP */
-
-	var p, points = this.getPoints();
-
-	for ( i = 0, il = points.length; i < il; i ++ ) {
-
-		p = points[ i ];
-
-		ctx.beginPath();
-		ctx.arc( p.x, p.y, 1.5, 0, Math.PI * 2, false );
-		ctx.stroke();
-		ctx.closePath();
-
-	}
 
 };
 

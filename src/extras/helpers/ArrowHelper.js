@@ -1,5 +1,5 @@
 /**
- * @author WestLangley / https://github.com/WestLangley
+ * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
  *
  * Creates an arrow for visualizing directions
@@ -38,8 +38,7 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 };
 
-THREE.ArrowHelper.prototype = new THREE.Object3D();
-THREE.ArrowHelper.prototype.constructor = THREE.ArrowHelper;
+THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
@@ -49,7 +48,7 @@ THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
 	this.matrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
 
-	this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+	this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
 
 };
 

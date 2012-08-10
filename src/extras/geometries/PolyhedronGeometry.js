@@ -36,26 +36,27 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	}
 
-	/**
-	 * Project vector onto sphere's surface
-	 */
+
+	// Project vector onto sphere's surface
+
 	function prepare( vector ) {
 
 		var vertex = vector.normalize().clone();
 		vertex.index = that.vertices.push( vertex ) - 1;
 
 		// Texture coords are equivalent to map coords, calculate angle and convert to fraction of a circle.
+
 		var u = azimuth( vector ) / 2 / Math.PI + 0.5;
 		var v = inclination( vector ) / Math.PI + 0.5;
-		vertex.uv = new THREE.UV( u, v );
+		vertex.uv = new THREE.UV( u, 1 - v );
 
 		return vertex;
 
 	}
 
-	/**
-	 * Approximate a curved face with recursively sub-divided triangles.
-	 */
+
+	// Approximate a curved face with recursively sub-divided triangles.
+
 	function make( v1, v2, v3, detail ) {
 
 		if ( detail < 1 ) {
@@ -66,17 +67,18 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 			that.faces.push( face );
 
 			var azi = azimuth( face.centroid );
-			that.faceVertexUvs[ 0 ].push( [ 
+			that.faceVertexUvs[ 0 ].push( [
 				correctUV( v1.uv, v1, azi ),
 				correctUV( v2.uv, v2, azi ),
 				correctUV( v3.uv, v3, azi )
 			] );
 
-		}
-		else {
+		} else {
 
 			detail -= 1;
+
 			// split triangle into 4 smaller triangles
+
 			make( v1, midpoint( v1, v2 ), midpoint( v1, v3 ), detail ); // top quadrant
 			make( midpoint( v1, v2 ), v2, midpoint( v2, v3 ), detail ); // left quadrant
 			make( midpoint( v1, v3 ), midpoint( v2, v3 ), v3, detail ); // right quadrant
@@ -90,42 +92,47 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		if ( !midpoints[ v1.index ] ) midpoints[ v1.index ] = [];
 		if ( !midpoints[ v2.index ] ) midpoints[ v2.index ] = [];
+
 		var mid = midpoints[ v1.index ][ v2.index ];
+
 		if ( mid === undefined ) {
+
 			// generate mean point and project to surface with prepare()
-			midpoints[ v1.index ][ v2.index ] = midpoints[ v2.index ][ v1.index ] = mid = prepare( 
+
+			midpoints[ v1.index ][ v2.index ] = midpoints[ v2.index ][ v1.index ] = mid = prepare(
 				new THREE.Vector3().add( v1, v2 ).divideScalar( 2 )
 			);
 		}
+
 		return mid;
 
 	}
 
-	/**
-	 * Angle around the Y axis, counter-clockwise when looking from above.
-	 */
+
+	// Angle around the Y axis, counter-clockwise when looking from above.
+
 	function azimuth( vector ) {
 
 		return Math.atan2( vector.z, -vector.x );
 
 	}
 
-	/**
-	 * Angle above the XZ plane.
-	 */
+
+	// Angle above the XZ plane.
+
 	function inclination( vector ) {
 
 		return Math.atan2( -vector.y, Math.sqrt( ( vector.x * vector.x ) + ( vector.z * vector.z ) ) );
 
 	}
 
-	/**
-	 * Texture fixing helper. Spheres have some odd behaviours.
-	 */
+
+	// Texture fixing helper. Spheres have some odd behaviours.
+
 	function correctUV( uv, vector, azimuth ) {
 
-		if ( (azimuth < 0) && (uv.u === 1) ) uv = new THREE.UV( uv.u - 1, uv.v );
-		if ( (vector.x === 0) && (vector.z === 0) ) uv = new THREE.UV( azimuth / 2 / Math.PI + 0.5, uv.v );
+		if ( ( azimuth < 0 ) && ( uv.u === 1 ) ) uv = new THREE.UV( uv.u - 1, uv.v );
+		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new THREE.UV( azimuth / 2 / Math.PI + 0.5, uv.v );
 		return uv;
 
 	}
@@ -136,5 +143,4 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 };
 
-THREE.PolyhedronGeometry.prototype = new THREE.Geometry();
-THREE.PolyhedronGeometry.prototype.constructor = THREE.PolyhedronGeometry;
+THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );

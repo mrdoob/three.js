@@ -76,8 +76,11 @@
 
 			var MARGIN = 100;
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var WIDTH = window.innerWidth || 2;
+			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
+
+			var SCREEN_WIDTH = WIDTH;
+			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
 
 			var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
 
@@ -137,24 +140,16 @@
 
 				container = document.getElementById( 'container' );
 
-				// SCENE
+				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera.position.set( 2000, 0, 2000 );
+
+				cameraTarget = new THREE.Vector3();
 
 				scene = new THREE.Scene();
-
 				scene.fog = new THREE.Fog( 0xffffff, 3000, 10000 );
 				scene.fog.color.setHSV( 0.51, 0.5, 0.9 );
 
 				createScene();
-
-				// SCENE CAMERA
-
-				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
-				camera.position.set( 2000, 0, 2000 );
-
-				cameraTarget = new THREE.Vector3( 0, 0, 0 );
-
-				scene.add( camera );
-
 
 				// LIGHTS
 
@@ -176,7 +171,6 @@
 				spotLight.shadowMapHeight = SHADOW_MAP_HEIGHT;
 
 				scene.add( spotLight );
-				scene.add( spotLight.target );
 
 				directionalLight2 = new THREE.PointLight( 0xff9900, 0.25 );
 				directionalLight2.position.set( 0.5, -1, 0.5 );
@@ -517,6 +511,7 @@
 
 				ground = new THREE.Mesh( new THREE.PlaneGeometry( 50000, 50000 ), groundBasic );
 				ground.position.y = - 215;
+				ground.rotation.x = - Math.PI / 2;
 				scene.add( ground );
 
 				ground.castShadow = false;
@@ -565,7 +560,7 @@
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
 				shadow.position.y = sy;
-				shadow.rotation.y = Math.PI / 2;
+				shadow.rotation.x = - Math.PI / 2;
 
 				object.add( shadow );
 
@@ -671,7 +666,7 @@
 				object.bodyMesh.geometry.computeBoundingBox();
 				var bb = object.bodyMesh.geometry.boundingBox;
 
-				var ss = object.modelScale * 1.0;
+				var ss = object.modelScale * 1.1;
 				var shadowWidth  =        ss * ( bb.max.z - bb.min.z );
 				var shadowHeight = 1.25 * ss * ( bb.max.x - bb.min.x );
 
@@ -682,8 +677,9 @@
 				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
-				shadow.rotation.y = Math.PI / 2;
 				shadow.position.y = s + 10;
+				shadow.rotation.x = - Math.PI / 2;
+				shadow.rotation.z = Math.PI / 2;
 
 				object.root.add( shadow );
 

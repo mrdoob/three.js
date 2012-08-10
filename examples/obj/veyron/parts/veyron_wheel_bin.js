@@ -2,7 +2,7 @@
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "veyron_wheel.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 3300,

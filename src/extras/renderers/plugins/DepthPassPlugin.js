@@ -92,7 +92,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-					//object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					//object.matrixWorld.flattenToArray( object._modelMatrixArray );
 					object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
 
 					webglObject.render = true;
@@ -114,7 +114,7 @@ THREE.DepthPassPlugin = function ( ) {
 				object = webglObject.object;
 				buffer = webglObject.buffer;
 
-				_renderer.setObjectFaces( object );
+				if ( object.material ) _renderer.setMaterialFaces( object.material );
 
 				if ( object.customDepthMaterial ) {
 
@@ -158,7 +158,7 @@ THREE.DepthPassPlugin = function ( ) {
 				/*
 				if ( object.matrixAutoUpdate ) {
 
-					object.matrixWorld.flattenToArray( object._objectMatrixArray );
+					object.matrixWorld.flattenToArray( object._modelMatrixArray );
 
 				}
 				*/

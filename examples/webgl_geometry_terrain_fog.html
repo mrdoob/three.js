@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - terrain + fog</title>
@@ -68,22 +68,21 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				scene.add( camera );
 
 				controls = new THREE.FirstPersonControls( camera );
-
 				controls.movementSpeed = 150;
 				controls.lookSpeed = 0.1;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
 
 				data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
 
 				var geometry = new THREE.PlaneGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
 
@@ -108,6 +107,22 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
 
 			}
 
