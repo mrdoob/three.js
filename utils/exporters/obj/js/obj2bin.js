@@ -102,7 +102,7 @@ function obj2bin(input) {
     // faces:
     start();
     // f pos/uv?/normal? pos/uv?/normal? ...
-    pattern = /f +((-?\d+(\/(-?\d+)?)?(\/-?\d+)? *)+)/g;
+    pattern = /f +((-?\d+(\/(-?\d+)?)?(\/-?\d+)?[ \\\n\r]*)+)/g;
     var f3_count = [0, 0, 0, 0];
     var f4_count = [0, 0, 0, 0];
     
@@ -116,7 +116,7 @@ function obj2bin(input) {
     var type;
     
     while ( ( result = pattern.exec( input ) ) != null ) {
-        verts = result[1].trim().split(/ +/);
+        verts = result[1].trim().split(/[ \\\n\r]+/);
         vert = verts[0].split('/');
         
         type = 0;
@@ -385,7 +385,7 @@ function obj2bin(input) {
     var vertlen;
 
     // f pos/uv?/normal? pos/uv?/normal? ...
-    pattern = /f +((-?\d+(\/(-?\d+)?)?(\/-?\d+)? *)+)/g;
+    pattern = /f +((-?\d+(\/(-?\d+)?)?(\/-?\d+)?[ \\\n\r]*)+)/g;
     while ( ( result = pattern.exec( input ) ) != null ) {
         if(pattern.lastIndex > next_mat_pos) {
             mat_index = material_pos[mat_pos_index].index;
@@ -395,7 +395,7 @@ function obj2bin(input) {
             faceblock = faceblocks[++faceblock_idx];
         }
 
-        verts = result[1].trim().split(/ +/);
+        verts = result[1].trim().split(/[ \\\n\r]+/);
         vertlen = verts.length;
         vert = verts[0].split('/');
         
