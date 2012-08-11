@@ -159,9 +159,9 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 		else if ( p.x < minX ) minX = p.x;
 
 		if ( p.y > maxY ) maxY = p.y;
-		else if ( p.y < maxY ) minY = p.y;
+		else if ( p.y < minY ) minY = p.y;
 
-		sum.addSelf( p.x, p.y );
+		sum.addSelf( p );
 
 	}
 
