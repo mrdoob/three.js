@@ -101,7 +101,7 @@
 				// shadow for PointLight
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1.5 );
-				spotLight.position.copy( pointLight.position );
+				spotLight.position.set( 0.05, 0.05, 1 );
 				spotLight.color.setHSV( 0.6, 0.05, 1 );
 				scene.add( spotLight );
 
@@ -153,6 +153,10 @@
 				var mapDummy = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
 
 				mapHeight.anisotropy = 16;
+
+				mapDummy.repeat.set( 0.998, 0.998 );
+				mapDummy.offset.set( 0.001, 0.001 )
+				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 
 				var material = new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0x333333, shininess: 25, perPixel: true, map: mapDummy, bumpMap: mapHeight, bumpScale: 19, metal: false } );
 
