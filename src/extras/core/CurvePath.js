@@ -167,13 +167,10 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 			if ( p.z > maxZ ) maxZ = p.z;
 			else if ( p.z < minZ ) minZ = p.z;
 
-			sum.addSelf( p.x, p.y, p.z );
-
-		} else {
-
-			sum.addSelf( p.x, p.y );
-
 		}
+
+		sum.addSelf( p );
+
 	}
 
 	var ret = {
