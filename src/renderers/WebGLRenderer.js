@@ -6074,6 +6074,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function addLineNumbers ( string ) {
+
+		var chunks = string.split( "\n" );
+
+		for ( var i = 0, il = chunks.length; i < il; i ++ ) {
+
+			// Chrome reports shader errors on lines
+			// starting counting from 1
+
+			chunks[ i ] = ( i + 1 ) + ": " + chunks[ i ];
+
+		}
+
+		return chunks.join( "\n" );
+
+	};
+
 	function getShader ( type, string ) {
 
 		var shader;
@@ -6094,7 +6111,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( !_gl.getShaderParameter( shader, _gl.COMPILE_STATUS ) ) {
 
 			console.error( _gl.getShaderInfoLog( shader ) );
-			console.error( string );
+			console.error( addLineNumbers( string ) );
 			return null;
 
 		}
