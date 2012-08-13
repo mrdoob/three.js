@@ -59,12 +59,21 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_ENVMAP",
 
-			"varying vec3 vReflect;",
-
 			"uniform float reflectivity;",
 			"uniform samplerCube envMap;",
 			"uniform float flipEnvMap;",
 			"uniform int combine;",
+
+			"#ifdef USE_BUMPMAP",
+
+				"uniform bool useRefract;",
+				"uniform float refractionRatio;",
+
+			"#else",
+
+				"varying vec3 vReflect;",
+
+			"#endif",
 
 		"#endif"
 
@@ -74,14 +83,34 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_ENVMAP",
 
-			"#ifdef DOUBLE_SIDED",
+			"vec3 reflectVec;",
 
-				"float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
-				"vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * vReflect.x, vReflect.yz ) );",
+			"#ifdef USE_BUMPMAP",
+
+				"if ( useRefract ) {",
+
+					"reflectVec = refract( normalize( vWorldPosition - cameraPosition ), normal, refractionRatio );",
+
+				"} else { ",
+
+					"reflectVec = reflect( normalize( vWorldPosition - cameraPosition ), normal );",
+
+				"}",
 
 			"#else",
 
-				"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * vReflect.x, vReflect.yz ) );",
+				"reflectVec = vReflect;",
+
+			"#endif",
+
+			"#ifdef DOUBLE_SIDED",
+
+				"float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
+				"vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+
+			"#else",
+
+				"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
 
 			"#endif",
 
@@ -107,7 +136,7 @@ THREE.ShaderChunk = {
 
 	envmap_pars_vertex: [
 
-		"#ifdef USE_ENVMAP",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
 
 			"varying vec3 vReflect;",
 
@@ -123,6 +152,11 @@ THREE.ShaderChunk = {
 		"#ifdef USE_ENVMAP",
 
 			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+
+		"#endif",
+
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
+
 			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
 
 			"if ( useRefract ) {",
@@ -565,7 +599,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if MAX_SPOT_LIGHTS > 0",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
 			"varying vec3 vWorldPosition;",
 
@@ -614,7 +648,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if MAX_SPOT_LIGHTS > 0",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
 			"vWorldPosition = mPosition.xyz;",
 
@@ -667,6 +701,10 @@ THREE.ShaderChunk = {
 				"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
 
 			"#endif",
+
+		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
 			"varying vec3 vWorldPosition;",
 
