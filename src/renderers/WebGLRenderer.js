@@ -5000,6 +5000,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			uniforms.bumpScale.value = material.bumpScale;
 
+			if ( ! material.map ) {
+
+				uniforms.offsetRepeat.value.set( material.bumpMap.offset.x, material.bumpMap.offset.y, material.bumpMap.repeat.x, material.bumpMap.repeat.y );
+
+			}
+
 		}
 
 		uniforms.envMap.texture = material.envMap;
@@ -5926,6 +5932,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"precision " + _precision + " float;",
 
+			parameters.bumpMap ? "#extension GL_OES_standard_derivatives : enable" : "",
+
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
@@ -6084,6 +6092,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function addLineNumbers ( string ) {
+
+		var chunks = string.split( "\n" );
+
+		for ( var i = 0, il = chunks.length; i < il; i ++ ) {
+
+			// Chrome reports shader errors on lines
+			// starting counting from 1
+
+			chunks[ i ] = ( i + 1 ) + ": " + chunks[ i ];
+
+		}
+
+		return chunks.join( "\n" );
+
+	};
+
 	function getShader ( type, string ) {
 
 		var shader;
@@ -6104,7 +6129,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( !_gl.getShaderParameter( shader, _gl.COMPILE_STATUS ) ) {
 
 			console.error( _gl.getShaderInfoLog( shader ) );
-			console.error( string );
+			console.error( addLineNumbers( string ) );
 			return null;
 
 		}

@@ -166,7 +166,7 @@ THREE.ShaderChunk = {
 
 	map_pars_vertex: [
 
-		"#ifdef USE_MAP",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
 
 			"varying vec2 vUv;",
 			"uniform vec4 offsetRepeat;",
@@ -177,18 +177,23 @@ THREE.ShaderChunk = {
 
 	map_pars_fragment: [
 
-		"#ifdef USE_MAP",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
 
 			"varying vec2 vUv;",
+
+		"#endif",
+
+		"#ifdef USE_MAP",
+
 			"uniform sampler2D map;",
 
-		"#endif"
+		"#endif",
 
 	].join("\n"),
 
 	map_vertex: [
 
-		"#ifdef USE_MAP",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
 
 			"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -265,8 +270,6 @@ THREE.ShaderChunk = {
 	bumpmap_pars_fragment: [
 
 		"#ifdef USE_BUMPMAP",
-
-			"#extension GL_OES_standard_derivatives : enable",
 
 			"uniform sampler2D bumpMap;",
 			"uniform float bumpScale;",
