@@ -491,14 +491,15 @@ THREE.ShaderUtils = {
 					"if ( enableReflection ) {",
 
 						"vec3 vReflect;",
+						"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
 						"if ( useRefract ) {",
 
-							"vReflect = refract( normalize( vWorldPosition - cameraPosition ), normal, uRefractionRatio );",
+							"vReflect = refract( cameraToVertex, normal, uRefractionRatio );",
 
 						"} else {",
 
-							"vReflect = reflect( normalize( vWorldPosition - cameraPosition ), normal );",
+							"vReflect = reflect( cameraToVertex, normal );",
 
 						"}",
 

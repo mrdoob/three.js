@@ -87,13 +87,15 @@ THREE.ShaderChunk = {
 
 			"#ifdef USE_BUMPMAP",
 
+				"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
+
 				"if ( useRefract ) {",
 
-					"reflectVec = refract( normalize( vWorldPosition - cameraPosition ), normal, refractionRatio );",
+					"reflectVec = refract( cameraToVertex, normal, refractionRatio );",
 
 				"} else { ",
 
-					"reflectVec = reflect( normalize( vWorldPosition - cameraPosition ), normal );",
+					"reflectVec = reflect( cameraToVertex, normal );",
 
 				"}",
 
