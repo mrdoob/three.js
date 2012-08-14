@@ -544,15 +544,13 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeBoundingSphere: function ( step ) {
-
-		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
-
-		if ( step === undefined ) step = 1;
+	computeBoundingSphere: function () {
 
 		var maxRadiusSq = 0;
 
-		for ( var i = 0, l = this.vertices.length; i < l; i += step ) {
+		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
+
+		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
 
 			var radiusSq = this.vertices[ i ].lengthSq();
 			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
