@@ -1,3 +1,22 @@
+pre .str, code .str { color: #ad934c; } /* string */
+pre .kwd, code .kwd { color: #ffffa0; } /* keyword */
+pre .com, code .com { color: #709070; } /* comment */
+pre .typ, code .typ { color: #f09041; } /* type */
+pre .lit, code .lit { color: #22c0c4; } /* literal */
+pre .pun, code .pun { color: #cccccc; } /* punctuation */
+pre .pln, code .pln { color: #cccccc; } /* plaintext */
+pre .dec, code .dec { color: #22c0c4; } /* decimal */
+
+
+
 pre.prettyprint, code.prettyprint {
-	background-color: #f9f9f9;
+	background-color: #211e1e;
+	font-family: 'inconsolata';
+	box-shadow: 0 0 0.5em #666;
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-o-border-radius: 3px;
+	-ms-border-radius: 3px;
+	-khtml-border-radius: 3px;
+	border-radius: 3px;
 }
