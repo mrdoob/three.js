@@ -1585,9 +1585,6 @@ THREE.UniformsLib = {
 
 		"lightMap" : { type: "t", value: 2, texture: null },
 
-		"bumpMap" : { type: "t", value: 3, texture: null },
-		"bumpScale" : { type: "f", value: 1 },
-
 		"envMap" : { type: "t", value: 1, texture: null },
 		"flipEnvMap" : { type: "f", value: -1 },
 		"useRefract" : { type: "i", value: 0 },
@@ -1596,6 +1593,13 @@ THREE.UniformsLib = {
 		"combine" : { type: "i", value: 0 },
 
 		"morphTargetInfluences" : { type: "f", value: 0 }
+
+	},
+
+	bump: {
+
+		"bumpMap" : { type: "t", value: 3, texture: null },
+		"bumpScale" : { type: "f", value: 1 }
 
 	},
 
@@ -1934,6 +1938,7 @@ THREE.ShaderLib = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "bump" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
