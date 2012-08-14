@@ -62,7 +62,7 @@
 
 			var mesh;
 
-			var directionalLight, pointLight, ambientLight, spotLight;
+			var directionalLight, directionalLight2, pointLight, ambientLight, spotLight;
 
 			var mouseX = 0;
 			var mouseY = 0;
@@ -148,6 +148,12 @@
 				directionalLight.shadowBias = -0.005;
 				directionalLight.shadowDarkness = 0.35;
 
+				//
+
+				directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1.2 );
+				directionalLight2.position.set( 1, -0.5, -1 );
+				directionalLight2.color.setHSV( 0.08, 0.35, 1 );
+				scene.add( directionalLight2 );
 
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
@@ -156,7 +162,7 @@
 				mapHeight.offset.set( 0.001, 0.001 )
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0x555555, specular: 0x333333, shininess: 25, perPixel: true, bumpMap: mapHeight, bumpScale: 19, metal: false } );
+				var material = new THREE.MeshPhongMaterial( { ambient: 0x552811, color: 0x552811, specular: 0x333333, shininess: 25, perPixel: true, bumpMap: mapHeight, bumpScale: 19, metal: false } );
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
