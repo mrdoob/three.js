@@ -227,11 +227,13 @@ THREE.Quaternion.prototype = {
 	multiply: function ( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
+		var qax = a.x, qay = a.y, qaz = a.z, qaw = a.w,
+		qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
 
-		this.x =  a.x * b.w + a.y * b.z - a.z * b.y + a.w * b.x;
-		this.y = -a.x * b.z + a.y * b.w + a.z * b.x + a.w * b.y;
-		this.z =  a.x * b.y - a.y * b.x + a.z * b.w + a.w * b.z;
-		this.w = -a.x * b.x - a.y * b.y - a.z * b.z + a.w * b.w;
+		this.x =  qax * qbw + qay * qbz - qaz * qby + qaw * qbx;
+		this.y = -qax * qbz + qay * qbw + qaz * qbx + qaw * qby;
+		this.z =  qax * qby - qay * qbx + qaz * qbw + qaw * qbz;
+		this.w = -qax * qbx - qay * qby - qaz * qbz + qaw * qbw;
 
 		return this;
 

@@ -131,6 +131,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 	}
 
+        // handle all the children from the loaded json and attach them to given parent        
 	function handle_children( parent, children ) {
 
 		var object;
@@ -271,7 +272,16 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 				}
 
-				// recursive descend if necessary
+				if ( o.properties !== undefined)  {
+
+					for ( var key in o.properties ) {
+
+						var value = o.properties[ key ];
+						object.properties[ key ] = value;
+
+					}
+				}
+
 				if ( o.children !== undefined ) {
 
 					handle_children( object, o.children );
