@@ -160,10 +160,11 @@
 
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				mapHeight.anisotropy = 16;
+				mapHeight.anisotropy = 4;
 				mapHeight.repeat.set( 0.998, 0.998 );
 				mapHeight.offset.set( 0.001, 0.001 )
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+				mapHeight.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshPhongMaterial( { ambient: 0x552811, color: 0x552811, specular: 0x333333, shininess: 25, perPixel: true, bumpMap: mapHeight, bumpScale: 19, metal: false } );
 
@@ -172,7 +173,7 @@
 
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0x060708, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x060708, clearAlpha: 1, alpha: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
