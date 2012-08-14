@@ -271,17 +271,17 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 					result.empties[ dd ] = object;
 
 				}
-                                
-                                // Copy attributes from json to scene object
-                                if ( o.properties !== undefined)  {
-                                    
-                                    for ( var key in o.properties ) {                                    
-                                        var value = o.properties[ key];                                    
-                                        object.properties[ key ] = value;
-                                    }
-                                }
 
-				// recursive descend if necessary
+				if ( o.properties !== undefined)  {
+
+					for ( var key in o.properties ) {
+
+						var value = o.properties[ key ];
+						object.properties[ key ] = value;
+
+					}
+				}
+
 				if ( o.children !== undefined ) {
 
 					handle_children( object, o.children );

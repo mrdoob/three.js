@@ -169,6 +169,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var rotatingObjects = [];
+
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			init();
@@ -194,10 +196,10 @@
 
 						if( !material.program ) {
 
-							console.log(m);
 							renderer.initMaterial( material, result.scene.__lights, result.scene.fog );
 
 							count += 1;
+
 							if( count > pieces ) {
 
 								//console.log("xxxxxxxxx");
@@ -275,7 +277,7 @@
 
 				}
 
-				var callbackFinished = function( result ) {
+				var callbackFinished = function ( result ) {
 
 					loaded = result;
 
@@ -297,7 +299,15 @@
 
 					handle_update( result, 1 );
 
-					console.log( result );
+					THREE.SceneUtils.traverseHierarchy( result.scene, function ( child ) {
+
+						if ( child.properties.rotating === true ) {
+
+							rotatingObjects.push( child );
+
+						}
+
+					} );
 
 				}
 
@@ -423,6 +433,15 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
 				camera.lookAt( scene.position );
+
+				for ( var i = 0; i < rotatingObjects.length; i ++ ) {
+
+					var object = rotatingObjects[ i ];
+
+					object.rotation.x += 0.01;
+					object.rotation.y += 0.02;
+
+				}
 
 				renderer.render( scene, camera );
 
