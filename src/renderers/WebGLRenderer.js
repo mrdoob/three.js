@@ -928,7 +928,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// material must use some texture to require uvs
 
-		if ( material.map || material.lightMap || material instanceof THREE.ShaderMaterial ) {
+		if ( material.map || material.lightMap || material.bumpMap || material instanceof THREE.ShaderMaterial ) {
 
 			return true;
 
@@ -4646,6 +4646,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			map: !!material.map,
 			envMap: !!material.envMap,
 			lightMap: !!material.lightMap,
+			bumpMap: !!material.bumpMap,
 
 			vertexColors: material.vertexColors,
 
@@ -4993,6 +4994,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.lightMap.texture = material.lightMap;
+		uniforms.bumpMap.texture = material.bumpMap;
+
+		if ( material.bumpMap ) {
+
+			uniforms.bumpScale.value = material.bumpScale;
+
+			if ( ! material.map ) {
+
+				uniforms.offsetRepeat.value.set( material.bumpMap.offset.x, material.bumpMap.offset.y, material.bumpMap.repeat.x, material.bumpMap.repeat.y );
+
+			}
+
+		}
 
 		uniforms.envMap.texture = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
@@ -5837,6 +5851,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.skinning ? "#define USE_SKINNING" : "",
@@ -5917,6 +5932,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"precision " + _precision + " float;",
 
+			parameters.bumpMap ? "#extension GL_OES_standard_derivatives : enable" : "",
+
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
 			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
@@ -5935,6 +5952,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.map ? "#define USE_MAP" : "",
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.metal ? "#define METAL" : "",

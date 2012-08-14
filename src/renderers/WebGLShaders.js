@@ -59,12 +59,21 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_ENVMAP",
 
-			"varying vec3 vReflect;",
-
 			"uniform float reflectivity;",
 			"uniform samplerCube envMap;",
 			"uniform float flipEnvMap;",
 			"uniform int combine;",
+
+			"#ifdef USE_BUMPMAP",
+
+				"uniform bool useRefract;",
+				"uniform float refractionRatio;",
+
+			"#else",
+
+				"varying vec3 vReflect;",
+
+			"#endif",
 
 		"#endif"
 
@@ -74,14 +83,36 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_ENVMAP",
 
-			"#ifdef DOUBLE_SIDED",
+			"vec3 reflectVec;",
 
-				"float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
-				"vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * vReflect.x, vReflect.yz ) );",
+			"#ifdef USE_BUMPMAP",
+
+				"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
+
+				"if ( useRefract ) {",
+
+					"reflectVec = refract( cameraToVertex, normal, refractionRatio );",
+
+				"} else { ",
+
+					"reflectVec = reflect( cameraToVertex, normal );",
+
+				"}",
 
 			"#else",
 
-				"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * vReflect.x, vReflect.yz ) );",
+				"reflectVec = vReflect;",
+
+			"#endif",
+
+			"#ifdef DOUBLE_SIDED",
+
+				"float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
+				"vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+
+			"#else",
+
+				"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
 
 			"#endif",
 
@@ -107,7 +138,7 @@ THREE.ShaderChunk = {
 
 	envmap_pars_vertex: [
 
-		"#ifdef USE_ENVMAP",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
 
 			"varying vec3 vReflect;",
 
@@ -123,6 +154,11 @@ THREE.ShaderChunk = {
 		"#ifdef USE_ENVMAP",
 
 			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+
+		"#endif",
+
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
+
 			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
 
 			"if ( useRefract ) {",
@@ -166,7 +202,7 @@ THREE.ShaderChunk = {
 
 	map_pars_vertex: [
 
-		"#ifdef USE_MAP",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
 
 			"varying vec2 vUv;",
 			"uniform vec4 offsetRepeat;",
@@ -177,18 +213,23 @@ THREE.ShaderChunk = {
 
 	map_pars_fragment: [
 
-		"#ifdef USE_MAP",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
 
 			"varying vec2 vUv;",
+
+		"#endif",
+
+		"#ifdef USE_MAP",
+
 			"uniform sampler2D map;",
 
-		"#endif"
+		"#endif",
 
 	].join("\n"),
 
 	map_vertex: [
 
-		"#ifdef USE_MAP",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
 
 			"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -255,6 +296,53 @@ THREE.ShaderChunk = {
 		"#ifdef USE_LIGHTMAP",
 
 			"vUv2 = uv2;",
+
+		"#endif"
+
+	].join("\n"),
+
+	// BUMP MAP
+
+	bumpmap_pars_fragment: [
+
+		"#ifdef USE_BUMPMAP",
+
+			"uniform sampler2D bumpMap;",
+			"uniform float bumpScale;",
+
+			// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
+			//	http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
+
+			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
+
+			"vec2 dHdxy_fwd() {",
+
+				"vec2 dSTdx = dFdx( vUv );",
+				"vec2 dSTdy = dFdy( vUv );",
+
+				"float Hll = bumpScale * texture2D( bumpMap, vUv ).x;",
+				"float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;",
+				"float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;",
+
+				"return vec2( dBx, dBy );",
+
+			"}",
+
+			"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {",
+
+				"vec3 vSigmaX = dFdx( surf_pos );",
+				"vec3 vSigmaY = dFdy( surf_pos );",
+				"vec3 vN = surf_norm;",		// normalized
+
+				"vec3 R1 = cross( vSigmaY, vN );",
+				"vec3 R2 = cross( vN, vSigmaX );",
+
+				"float fDet = dot( vSigmaX, R1 );",
+
+				"vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
+				"return normalize( abs( fDet ) * surf_norm - vGrad );",
+
+			"}",
 
 		"#endif"
 
@@ -513,7 +601,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if MAX_SPOT_LIGHTS > 0",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
 			"varying vec3 vWorldPosition;",
 
@@ -562,7 +650,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if MAX_SPOT_LIGHTS > 0",
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
 			"vWorldPosition = mPosition.xyz;",
 
@@ -616,6 +704,10 @@ THREE.ShaderChunk = {
 
 			"#endif",
 
+		"#endif",
+
+		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
+
 			"varying vec3 vWorldPosition;",
 
 		"#endif",
@@ -639,6 +731,12 @@ THREE.ShaderChunk = {
 		"#ifdef DOUBLE_SIDED",
 
 			"normal = normal * ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
+
+		"#endif",
+
+		"#ifdef USE_BUMPMAP",
+
+			"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
 
 		"#endif",
 
@@ -1498,6 +1596,13 @@ THREE.UniformsLib = {
 
 	},
 
+	bump: {
+
+		"bumpMap" : { type: "t", value: 3, texture: null },
+		"bumpScale" : { type: "f", value: 1 }
+
+	},
+
 	fog : {
 
 		"fogDensity" : { type: "f", value: 0.00025 },
@@ -1833,6 +1938,7 @@ THREE.ShaderLib = {
 		uniforms: THREE.UniformsUtils.merge( [
 
 			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "bump" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
@@ -1912,6 +2018,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
 
 			"void main() {",
 
