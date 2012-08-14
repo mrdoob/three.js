@@ -928,7 +928,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// material must use some texture to require uvs
 
-		if ( material.map || material.lightMap || material.bumpMap || material instanceof THREE.ShaderMaterial ) {
+		if ( material.map || material.lightMap || material.bumpMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
 
 			return true;
 
@@ -4647,6 +4647,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			envMap: !!material.envMap,
 			lightMap: !!material.lightMap,
 			bumpMap: !!material.bumpMap,
+			specularMap: !!material.specularMap,
 
 			vertexColors: material.vertexColors,
 
@@ -4986,25 +4987,43 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		uniforms.map.texture = material.map;
-
-		if ( material.map ) {
-
-			uniforms.offsetRepeat.value.set( material.map.offset.x, material.map.offset.y, material.map.repeat.x, material.map.repeat.y );
-
-		}
-
 		uniforms.lightMap.texture = material.lightMap;
-		uniforms.bumpMap.texture = material.bumpMap;
+		uniforms.specularMap.texture = material.specularMap;
 
 		if ( material.bumpMap ) {
 
+			uniforms.bumpMap.texture = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
 
-			if ( ! material.map ) {
+		}
 
-				uniforms.offsetRepeat.value.set( material.bumpMap.offset.x, material.bumpMap.offset.y, material.bumpMap.repeat.x, material.bumpMap.repeat.y );
+		// uv repeat and offset setting priorities
+		//	1. color map
+		//	2. specular map
+		//	3. bump map
 
-			}
+		var uvScaleMap;
+
+		if ( material.map ) {
+
+			uvScaleMap = material.map;
+
+		} else if ( material.specularMap ) {
+
+			uvScaleMap = material.specularMap;
+
+		} else if ( material.bumpMap ) {
+
+			uvScaleMap = material.bumpMap;
+
+		}
+
+		if ( uvScaleMap !== undefined ) {
+
+			var offset = uvScaleMap.offset;
+			var repeat = uvScaleMap.repeat;
+
+			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
 		}
 
@@ -5852,6 +5871,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.skinning ? "#define USE_SKINNING" : "",
@@ -5953,6 +5973,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.metal ? "#define METAL" : "",

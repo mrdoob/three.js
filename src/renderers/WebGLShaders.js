@@ -124,11 +124,11 @@ THREE.ShaderChunk = {
 
 			"if ( combine == 1 ) {",
 
-				"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, reflectivity );",
+				"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularStrength * reflectivity );",
 
 			"} else {",
 
-				"gl_FragColor.xyz = gl_FragColor.xyz * cubeColor.xyz;",
+				"gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * cubeColor.xyz, specularStrength * reflectivity );",
 
 			"}",
 
@@ -202,7 +202,7 @@ THREE.ShaderChunk = {
 
 	map_pars_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 			"uniform vec4 offsetRepeat;",
@@ -213,7 +213,7 @@ THREE.ShaderChunk = {
 
 	map_pars_fragment: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 
@@ -229,7 +229,7 @@ THREE.ShaderChunk = {
 
 	map_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
 
 			"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -343,6 +343,35 @@ THREE.ShaderChunk = {
 				"return normalize( abs( fDet ) * surf_norm - vGrad );",
 
 			"}",
+
+		"#endif"
+
+	].join("\n"),
+
+	// SPECULAR MAP
+
+	specularmap_pars_fragment: [
+
+		"#ifdef USE_SPECULARMAP",
+
+			"uniform sampler2D specularMap;",
+
+		"#endif"
+
+	].join("\n"),
+
+	specularmap_fragment: [
+
+		"float specularStrength;",
+
+		"#ifdef USE_SPECULARMAP",
+
+			"vec4 texelSpecular = texture2D( specularMap, vUv );",
+			"specularStrength = texelSpecular.r;",
+
+		"#else",
+
+			"specularStrength = 1.0;",
 
 		"#endif"
 
@@ -788,7 +817,7 @@ THREE.ShaderChunk = {
 
 				"vec3 pointHalfVector = normalize( lVector + viewPosition );",
 				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-				"float pointSpecularWeight = max( pow( pointDotNormalHalf, shininess ), 0.0 );",
+				"float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
@@ -863,7 +892,7 @@ THREE.ShaderChunk = {
 
 					"vec3 spotHalfVector = normalize( lVector + viewPosition );",
 					"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
-					"float spotSpecularWeight = max( pow( spotDotNormalHalf, shininess ), 0.0 );",
+					"float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
 					"#ifdef PHYSICALLY_BASED_SHADING",
 
@@ -919,7 +948,7 @@ THREE.ShaderChunk = {
 
 				"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-				"float dirSpecularWeight = max( pow( dirDotNormalHalf, shininess ), 0.0 );",
+				"float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
 
@@ -1584,6 +1613,7 @@ THREE.UniformsLib = {
 		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
 		"lightMap" : { type: "t", value: 2, texture: null },
+		"specularMap" : { type: "t", value: 3, texture: null },
 
 		"envMap" : { type: "t", value: 1, texture: null },
 		"flipEnvMap" : { type: "f", value: -1 },
@@ -1598,7 +1628,7 @@ THREE.UniformsLib = {
 
 	bump: {
 
-		"bumpMap" : { type: "t", value: 3, texture: null },
+		"bumpMap" : { type: "t", value: 4, texture: null },
 		"bumpScale" : { type: "f", value: 1 }
 
 	},
@@ -1788,6 +1818,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 
 			"void main() {",
 
@@ -1795,6 +1826,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
+				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "envmap_fragment" ],
@@ -1894,6 +1926,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
+			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 
 			"void main() {",
 
@@ -1901,6 +1934,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
+				THREE.ShaderChunk[ "specularmap_fragment" ],
 
 				"#ifdef DOUBLE_SIDED",
 
@@ -2019,6 +2053,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
+			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 
 			"void main() {",
 
@@ -2026,6 +2061,7 @@ THREE.ShaderLib = {
 
 				THREE.ShaderChunk[ "map_fragment" ],
 				THREE.ShaderChunk[ "alphatest_fragment" ],
+				THREE.ShaderChunk[ "specularmap_fragment" ],
 
 				THREE.ShaderChunk[ "lights_phong_fragment" ],
 
