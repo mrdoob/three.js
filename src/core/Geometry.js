@@ -544,15 +544,17 @@ THREE.Geometry.prototype = {
 
 	},
 
-	computeBoundingSphere: function ( skip ) {
+	computeBoundingSphere: function ( step ) {
 
-		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
 
-		var radiusSq, maxRadiusSq = 0, vs = skip || 1;
+		if ( step === undefined ) step = 1;
 
-		for ( var v = 0, vl = this.vertices.length; v < vl; v += vs ) {
+		var maxRadiusSq = 0;
 
-			radiusSq = this.vertices[ v ].lengthSq();
+		for ( var i = 0, l = this.vertices.length; i < l; i += step ) {
+
+			var radiusSq = this.vertices[ i ].lengthSq();
 			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
 
 		}
