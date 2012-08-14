@@ -179,7 +179,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0x060708, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x060708, clearAlpha: 1, alpha: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -245,24 +245,27 @@
 
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				mapHeight.anisotropy = 16;
+				mapHeight.anisotropy = 4;
 				mapHeight.repeat.set( 0.998, 0.998 );
 				mapHeight.offset.set( 0.001, 0.001 )
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+				mapHeight.format = THREE.RGBFormat;
 
 				var mapSpecular = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
 
-				mapSpecular.anisotropy = 16;
+				mapSpecular.anisotropy = 4;
 				mapSpecular.repeat.set( 0.998, 0.998 );
 				mapSpecular.offset.set( 0.001, 0.001 )
 				mapSpecular.wrapS = mapSpecular.wrapT = THREE.RepeatWrapping;
+				mapSpecular.format = THREE.RGBFormat;
 
 				var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
-				mapColor.anisotropy = 16;
+				mapColor.anisotropy = 4;
 				mapColor.repeat.set( 0.998, 0.998 );
 				mapColor.offset.set( 0.001, 0.001 )
 				mapColor.wrapS = mapColor.wrapT = THREE.RepeatWrapping;
+				mapColor.format = THREE.RGBFormat;
 
 				var shader = THREE.ShaderSkin[ "skinSimple" ];
 
