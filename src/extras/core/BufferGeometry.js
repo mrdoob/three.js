@@ -137,7 +137,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( positions ) {
 
-			var radius, maxRadius = 0;
+			var radiusSq, maxRadiusSq = 0;
 			var x, y, z;
 
 			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
@@ -146,12 +146,12 @@ THREE.BufferGeometry.prototype = {
 				y = positions[ i + 1 ];
 				z = positions[ i + 2 ];
 
-				radius = Math.sqrt( x * x + y * y + z * z );
-				if ( radius > maxRadius ) maxRadius = radius;
+				radiusSq =  x * x + y * y + z * z;
+				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
 
 			}
 
-			this.boundingSphere.radius = maxRadius;
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
 
 		}
 
