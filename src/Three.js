@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = THREE || { REVISION: '50' };
+var THREE = THREE || { REVISION: '51dev' };
 
 if ( self.console === undefined ) {
 
