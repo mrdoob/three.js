@@ -152,7 +152,7 @@ THREE.CombinedCamera.prototype.updateProjectionMatrix = function() {
 */
 THREE.CombinedCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
-	frameHeight = frameHeight !== undefined ? frameHeight : 24;
+	if ( frameHeight === undefined ) frameHeight = 24;
 
 	var fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
 
