@@ -59,6 +59,7 @@ def main(argv=None):
     f.write(("// %s - http://github.com/mrdoob/three.js\n" % os.path.basename(output)) + text)
     f.close()
 
+  os.close(file)
   os.unlink(path)
 
 
