@@ -30,11 +30,14 @@ def main(argv=None):
 
   print(' * Building ' + output)
 
-  file, path = tempfile.mkstemp()
+  fd, path = tempfile.mkstemp()
+  tmp = open(path, 'w')
 
   for include in args.include:
     for filename in files[include]:
-      with open(filename, 'r') as f: os.write(file, f.read())
+      with open(filename, 'r') as f: tmp.write(f.read())
+
+  tmp.close()
 
   # save
 
@@ -52,8 +55,8 @@ def main(argv=None):
     with open(output,'r') as f: text = f.read()
     with open(output,'w') as f: f.write(("// %s - http://github.com/mrdoob/three.js\n" % os.path.basename(output)) + text)
 
-  os.close(file)
-  os.unlink(path)
+  os.close(fd)
+  os.remove(path)
 
 
 if __name__ == "__main__":
