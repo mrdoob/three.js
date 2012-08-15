@@ -67,7 +67,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 2012 08 15 - **r50** (391,250 KB, gzip: 96,143 KB)
 
-* Experimenting with `SoftwareRenderer`. ([mrdoob](http://github.com/mrdoob) and [rygorous](http://github.com/rygorous))
+* Experimenting with [SoftwareRenderer](http://pouet.net/topic.php?which=8760&page=1). ([mrdoob](http://github.com/mrdoob) and [rygorous](http://github.com/rygorous))
 * Improved rotation conversion routines. ([WestLangley](http://github.com/WestLangley))
 * Moved `DOMRenderer` and `SVGRenderer` out of common build. ([mrdoob](http://github.com/mrdoob))
 * Improvements to Morph targets. ([alteredq](http://github.com/alteredq) and [gero3](http://github.com/gero3))
