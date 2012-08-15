@@ -15,7 +15,7 @@ def main(argv=None):
   parser.add_argument('--externs', action='append', default=['externs_common.js'])
   parser.add_argument('--minify', action='store_true', default=False)
   parser.add_argument('--output', default='../build/three.js')
-  # parser.add_argument('--debug', help='Generate list of files to include for debugging', action='store_true', default=False)
+
   args = parser.parse_args()
 
   # load files
