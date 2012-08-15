@@ -2,9 +2,9 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-var THREE = THREE || { REVISION: '50dev' };
+var THREE = THREE || { REVISION: '50' };
 
-if ( ! self.console ) {
+if ( self.console === undefined ) {
 
 	self.console = {
 
@@ -18,7 +18,7 @@ if ( ! self.console ) {
 
 }
 
-if ( ! self.Int32Array ) {
+if ( self.Int32Array === undefined ) {
 
 	self.Int32Array = Array;
 	self.Float32Array = Array;
@@ -43,7 +43,7 @@ if ( ! self.Int32Array ) {
 
 	}
 
-	if ( !window.requestAnimationFrame ) {
+	if ( window.requestAnimationFrame === undefined ) {
 
 		window.requestAnimationFrame = function ( callback, element ) {
 
@@ -57,7 +57,7 @@ if ( ! self.Int32Array ) {
 	}
 
 
-	if ( !window.cancelAnimationFrame ) {
+	if ( window.cancelAnimationFrame === undefined ) {
 
 		window.cancelAnimationFrame = function ( id ) { clearTimeout( id ); };
 
