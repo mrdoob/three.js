@@ -113,10 +113,12 @@
 					index: 0
 				}]
 
-				geometry.computeBoundingSphere()
-				geometry.computeVertexNormals()
+				geometry.computeBoundingSphere();
+				geometry.computeVertexNormals();
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x000000, side: THREE.DoubleSide } ) );
+				var material = new THREE.MeshLambertMaterial( { color: 0x000000, side: THREE.DoubleSide } );
+
+				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
