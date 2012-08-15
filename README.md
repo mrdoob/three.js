@@ -102,7 +102,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * `Camera` doesn't need to be added to the scene anymore. ([mrdoob](http://github.com/mrdoob))
 * `Object3D`'s `flipSided` and `doubleSided` properties are now `Material`'s `side` property. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
 * Added `.clone` method to `*Material`. ([gero3](http://github.com/gero3), [mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
-* [IEWEBGL](http://iewebgl.com/Engines.aspx#ThreeJS) support. ([mrdoob](http://github.com/mrdoob))
+* [IEWEBGL](http://iewebgl.com/Engines.aspx#ThreeJS) support. ([iewebgl](http://github.com/iewebgl) and [mrdoob](http://github.com/mrdoob))
 * Added `CircleGeometry`. ([hughes](http://github.com/hughes))
 * Added `bumpMap` to `MeshPhongMaterial`. ([alteredq](http://github.com/alteredq))
 * Added `specularMap` to `MeshBasicMaterial`, `MeshLambertMaterial` and `MeshPhongMaterial`. ([alteredq](http://github.com/alteredq))
