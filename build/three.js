@@ -1,10 +1,10 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = THREE || { REVISION: '50dev' };
+var THREE = THREE || { REVISION: '50' };
 
-if ( ! self.console ) {
+if ( self.console === undefined ) {
 
 	self.console = {
 
@@ -18,7 +18,7 @@ if ( ! self.console ) {
 
 }
 
-if ( ! self.Int32Array ) {
+if ( self.Int32Array === undefined ) {
 
 	self.Int32Array = Array;
 	self.Float32Array = Array;
@@ -43,7 +43,7 @@ if ( ! self.Int32Array ) {
 
 	}
 
-	if ( !window.requestAnimationFrame ) {
+	if ( window.requestAnimationFrame === undefined ) {
 
 		window.requestAnimationFrame = function ( callback, element ) {
 
@@ -57,7 +57,7 @@ if ( ! self.Int32Array ) {
 	}
 
 
-	if ( !window.cancelAnimationFrame ) {
+	if ( window.cancelAnimationFrame === undefined ) {
 
 		window.cancelAnimationFrame = function ( id ) { clearTimeout( id ); };
 
@@ -246,7 +246,7 @@ THREE.Clock.prototype.getDelta = function () {
 	return diff;
 
 };/**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Color = function ( hex ) {
@@ -430,7 +430,7 @@ THREE.Color.prototype = {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
  * @author egraether / http://egraether.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -605,7 +605,7 @@ THREE.Vector2.prototype = {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
@@ -1532,7 +1532,7 @@ THREE.Frustum.prototype.contains = function ( object ) {
 
 THREE.Frustum.__v1 = new THREE.Vector3();
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Ray = function ( origin, direction, near, far ) {
@@ -1789,7 +1789,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Rectangle = function () {
@@ -2146,7 +2146,7 @@ THREE.Matrix3.prototype = {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
  * @author jordi_ros / http://plattsoft.com
@@ -3215,7 +3215,7 @@ THREE.Matrix4.__v3 = new THREE.Vector3();
 THREE.Matrix4.__m1 = new THREE.Matrix4();
 THREE.Matrix4.__m2 = new THREE.Matrix4();
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
@@ -3504,7 +3504,7 @@ THREE.Object3D.__m1 = new THREE.Matrix4();
 
 THREE.Object3DCount = 0;
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author julianwa / https://github.com/julianwa
  */
@@ -4525,7 +4525,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
 }
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Vertex = function ( v ) {
@@ -4535,7 +4535,7 @@ THREE.Vertex = function ( v ) {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -4584,7 +4584,7 @@ THREE.Face3.prototype = {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -4634,7 +4634,7 @@ THREE.Face4.prototype = {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.UV = function ( u, v ) {
@@ -4683,7 +4683,7 @@ THREE.UV.prototype = {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
@@ -5352,6 +5352,486 @@ THREE.Geometry.prototype = {
 
 THREE.GeometryCount = 0;
 /**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.BufferGeometry = function () {
+
+	this.id = THREE.GeometryCount ++;
+
+	// attributes
+
+	this.attributes = {};
+
+	// attributes typed arrays are kept only if dynamic flag is set
+
+	this.dynamic = false;
+
+	// boundings
+
+	this.boundingBox = null;
+	this.boundingSphere = null;
+
+	this.hasTangents = false;
+
+	// for compatibility
+
+	this.morphTargets = [];
+
+};
+
+THREE.BufferGeometry.prototype = {
+
+	constructor : THREE.BufferGeometry,
+
+	applyMatrix: function ( matrix ) {
+
+		var positionArray;
+		var normalArray;
+
+		if ( this.attributes[ "position" ] ) positionArray = this.attributes[ "position" ].array;
+		if ( this.attributes[ "normal" ] ) normalArray = this.attributes[ "normal" ].array;
+
+		if ( positionArray !== undefined ) {
+
+			matrix.multiplyVector3Array( positionArray );
+			this.verticesNeedUpdate = true;
+
+		}
+
+		if ( normalArray !== undefined ) {
+
+			var matrixRotation = new THREE.Matrix4();
+			matrixRotation.extractRotation( matrix );
+
+			matrixRotation.multiplyVector3Array( normalArray );
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	computeBoundingBox: function () {
+
+		if ( ! this.boundingBox ) {
+
+			this.boundingBox = {
+
+				min: new THREE.Vector3( Infinity, Infinity, Infinity ),
+				max: new THREE.Vector3( -Infinity, -Infinity, -Infinity )
+
+			};
+
+		}
+
+		var positions = this.attributes[ "position" ].array;
+
+		if ( positions ) {
+
+			var bb = this.boundingBox;
+			var x, y, z;
+
+			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+				x = positions[ i ];
+				y = positions[ i + 1 ];
+				z = positions[ i + 2 ];
+
+				// bounding box
+
+				if ( x < bb.min.x ) {
+
+					bb.min.x = x;
+
+				} else if ( x > bb.max.x ) {
+
+					bb.max.x = x;
+
+				}
+
+				if ( y < bb.min.y ) {
+
+					bb.min.y = y;
+
+				} else if ( y > bb.max.y ) {
+
+					bb.max.y = y;
+
+				}
+
+				if ( z < bb.min.z ) {
+
+					bb.min.z = z;
+
+				} else if ( z > bb.max.z ) {
+
+					bb.max.z = z;
+
+				}
+
+			}
+
+		}
+
+		if ( positions === undefined || positions.length === 0 ) {
+
+			this.boundingBox.min.set( 0, 0, 0 );
+			this.boundingBox.max.set( 0, 0, 0 );
+
+		}
+
+	},
+
+	computeBoundingSphere: function () {
+
+		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+
+		var positions = this.attributes[ "position" ].array;
+
+		if ( positions ) {
+
+			var radiusSq, maxRadiusSq = 0;
+			var x, y, z;
+
+			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+				x = positions[ i ];
+				y = positions[ i + 1 ];
+				z = positions[ i + 2 ];
+
+				radiusSq =  x * x + y * y + z * z;
+				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
+
+			}
+
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+		}
+
+	},
+
+	computeVertexNormals: function () {
+
+		if ( this.attributes[ "position" ] && this.attributes[ "index" ] ) {
+
+			var i, il;
+			var j, jl;
+
+			var nVertexElements = this.attributes[ "position" ].array.length;
+
+			if ( this.attributes[ "normal" ] === undefined ) {
+
+				this.attributes[ "normal" ] = {
+
+					itemSize: 3,
+					array: new Float32Array( nVertexElements ),
+					numItems: nVertexElements
+
+				};
+
+			} else {
+
+				// reset existing normals to zero
+
+				for ( i = 0, il = this.attributes[ "normal" ].array.length; i < il; i ++ ) {
+
+					this.attributes[ "normal" ].array[ i ] = 0;
+
+				}
+
+			}
+
+			var offsets = this.offsets;
+
+			var indices = this.attributes[ "index" ].array;
+			var positions = this.attributes[ "position" ].array;
+			var normals = this.attributes[ "normal" ].array;
+
+			var vA, vB, vC, x, y, z,
+
+			pA = new THREE.Vector3(),
+			pB = new THREE.Vector3(),
+			pC = new THREE.Vector3(),
+
+			cb = new THREE.Vector3(),
+			ab = new THREE.Vector3();
+
+			for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+
+				var start = offsets[ j ].start;
+				var count = offsets[ j ].count;
+				var index = offsets[ j ].index;
+
+				for ( i = start, il = start + count; i < il; i += 3 ) {
+
+					vA = index + indices[ i ];
+					vB = index + indices[ i + 1 ];
+					vC = index + indices[ i + 2 ];
+
+					x = positions[ vA * 3 ];
+					y = positions[ vA * 3 + 1 ];
+					z = positions[ vA * 3 + 2 ];
+					pA.set( x, y, z );
+
+					x = positions[ vB * 3 ];
+					y = positions[ vB * 3 + 1 ];
+					z = positions[ vB * 3 + 2 ];
+					pB.set( x, y, z );
+
+					x = positions[ vC * 3 ];
+					y = positions[ vC * 3 + 1 ];
+					z = positions[ vC * 3 + 2 ];
+					pC.set( x, y, z );
+
+					cb.sub( pC, pB );
+					ab.sub( pA, pB );
+					cb.crossSelf( ab );
+
+					normals[ vA * 3 ] += cb.x;
+					normals[ vA * 3 + 1 ] += cb.y;
+					normals[ vA * 3 + 2 ] += cb.z;
+
+					normals[ vB * 3 ] += cb.x;
+					normals[ vB * 3 + 1 ] += cb.y;
+					normals[ vB * 3 + 2 ] += cb.z;
+
+					normals[ vC * 3 ] += cb.x;
+					normals[ vC * 3 + 1 ] += cb.y;
+					normals[ vC * 3 + 2 ] += cb.z;
+
+				}
+
+			}
+
+			// normalize normals
+
+			for ( i = 0, il = normals.length; i < il; i += 3 ) {
+
+				x = normals[ i ];
+				y = normals[ i + 1 ];
+				z = normals[ i + 2 ];
+
+				var n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+
+				normals[ i ] *= n;
+				normals[ i + 1 ] *= n;
+				normals[ i + 2 ] *= n;
+
+			}
+
+			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	computeTangents: function () {
+
+		// based on http://www.terathon.com/code/tangent.html
+		// (per vertex tangents)
+
+		if ( this.attributes[ "index" ] === undefined ||
+			 this.attributes[ "position" ] === undefined ||
+			 this.attributes[ "normal" ] === undefined ||
+			 this.attributes[ "uv" ] === undefined ) {
+
+			console.warn( "Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()" );
+			return;
+
+		}
+
+		var indices = this.attributes[ "index" ].array;
+		var positions = this.attributes[ "position" ].array;
+		var normals = this.attributes[ "normal" ].array;
+		var uvs = this.attributes[ "uv" ].array;
+
+		var nVertices = positions.length / 3;
+
+		if ( this.attributes[ "tangent" ] === undefined ) {
+
+			var nTangentElements = 4 * nVertices;
+
+			this.attributes[ "tangent" ] = {
+
+				itemSize: 4,
+				array: new Float32Array( nTangentElements ),
+				numItems: nTangentElements
+
+			};
+
+		}
+
+		var tangents = this.attributes[ "tangent" ].array;
+
+		var tan1 = [], tan2 = [];
+
+		for ( var k = 0; k < nVertices; k ++ ) {
+
+			tan1[ k ] = new THREE.Vector3();
+			tan2[ k ] = new THREE.Vector3();
+
+		}
+
+		var xA, yA, zA,
+			xB, yB, zB,
+			xC, yC, zC,
+
+			uA, vA,
+			uB, vB,
+			uC, vC,
+
+			x1, x2, y1, y2, z1, z2,
+			s1, s2, t1, t2, r;
+
+		var sdir = new THREE.Vector3(), tdir = new THREE.Vector3();
+
+		function handleTriangle( a, b, c ) {
+
+			xA = positions[ a * 3 ];
+			yA = positions[ a * 3 + 1 ];
+			zA = positions[ a * 3 + 2 ];
+
+			xB = positions[ b * 3 ];
+			yB = positions[ b * 3 + 1 ];
+			zB = positions[ b * 3 + 2 ];
+
+			xC = positions[ c * 3 ];
+			yC = positions[ c * 3 + 1 ];
+			zC = positions[ c * 3 + 2 ];
+
+			uA = uvs[ a * 2 ];
+			vA = uvs[ a * 2 + 1 ];
+
+			uB = uvs[ b * 2 ];
+			vB = uvs[ b * 2 + 1 ];
+
+			uC = uvs[ c * 2 ];
+			vC = uvs[ c * 2 + 1 ];
+
+			x1 = xB - xA;
+			x2 = xC - xA;
+
+			y1 = yB - yA;
+			y2 = yC - yA;
+
+			z1 = zB - zA;
+			z2 = zC - zA;
+
+			s1 = uB - uA;
+			s2 = uC - uA;
+
+			t1 = vB - vA;
+			t2 = vC - vA;
+
+			r = 1.0 / ( s1 * t2 - s2 * t1 );
+
+			sdir.set(
+				( t2 * x1 - t1 * x2 ) * r,
+				( t2 * y1 - t1 * y2 ) * r,
+				( t2 * z1 - t1 * z2 ) * r
+			);
+
+			tdir.set(
+				( s1 * x2 - s2 * x1 ) * r,
+				( s1 * y2 - s2 * y1 ) * r,
+				( s1 * z2 - s2 * z1 ) * r
+			);
+
+			tan1[ a ].addSelf( sdir );
+			tan1[ b ].addSelf( sdir );
+			tan1[ c ].addSelf( sdir );
+
+			tan2[ a ].addSelf( tdir );
+			tan2[ b ].addSelf( tdir );
+			tan2[ c ].addSelf( tdir );
+
+		}
+
+		var i, il;
+		var j, jl;
+		var iA, iB, iC;
+
+		var offsets = this.offsets;
+
+		for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+
+			var start = offsets[ j ].start;
+			var count = offsets[ j ].count;
+			var index = offsets[ j ].index;
+
+			for ( i = start, il = start + count; i < il; i += 3 ) {
+
+				iA = index + indices[ i ];
+				iB = index + indices[ i + 1 ];
+				iC = index + indices[ i + 2 ];
+
+				handleTriangle( iA, iB, iC );
+
+			}
+
+		}
+
+		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
+		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
+		var w, t, test;
+		var nx, ny, nz;
+
+		function handleVertex( v ) {
+
+			n.x = normals[ v * 3 ];
+			n.y = normals[ v * 3 + 1 ];
+			n.z = normals[ v * 3 + 2 ];
+
+			n2.copy( n );
+
+			t = tan1[ v ];
+
+			// Gram-Schmidt orthogonalize
+
+			tmp.copy( t );
+			tmp.subSelf( n.multiplyScalar( n.dot( t ) ) ).normalize();
+
+			// Calculate handedness
+
+			tmp2.cross( n2, t );
+			test = tmp2.dot( tan2[ v ] );
+			w = ( test < 0.0 ) ? -1.0 : 1.0;
+
+			tangents[ v * 4 ] 	  = tmp.x;
+			tangents[ v * 4 + 1 ] = tmp.y;
+			tangents[ v * 4 + 2 ] = tmp.z;
+			tangents[ v * 4 + 3 ] = w;
+
+		}
+
+		for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+
+			var start = offsets[ j ].start;
+			var count = offsets[ j ].count;
+			var index = offsets[ j ].index;
+
+			for ( i = start, il = start + count; i < il; i += 3 ) {
+
+				iA = index + indices[ i ];
+				iB = index + indices[ i + 1 ];
+				iC = index + indices[ i + 2 ];
+
+				handleVertex( iA );
+				handleVertex( iB );
+				handleVertex( iC );
+
+			}
+
+		}
+
+		this.hasTangents = true;
+		this.tangentsNeedUpdate = true;
+
+	}
+
+};
+
+/**
  * Spline from Tween.js, slightly optimized (and trashed)
  * http://sole.github.com/tween.js/examples/05_spline.html
  *
@@ -5528,7 +6008,7 @@ THREE.Spline = function ( points ) {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  */
 
@@ -5586,7 +6066,7 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
@@ -5702,7 +6182,7 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
  
@@ -5716,7 +6196,7 @@ THREE.Light = function ( hex ) {
 
 THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.AmbientLight = function ( hex ) {
@@ -5727,7 +6207,7 @@ THREE.AmbientLight = function ( hex ) {
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -5789,7 +6269,7 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 
 THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.PointLight = function ( hex, intensity, distance ) {
@@ -9012,7 +9492,7 @@ THREE.TextureLoader.prototype = {
 
 }
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -9129,7 +9609,7 @@ THREE.Material.prototype.clone = function ( material ) {
 
 THREE.MaterialCount = 0;
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -9189,7 +9669,7 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -9296,7 +9776,7 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -9419,7 +9899,7 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -9563,7 +10043,7 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -9603,7 +10083,7 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  *
  * parameters = {
  *  opacity: <float>,
@@ -9647,7 +10127,7 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.MeshFaceMaterial = function () {};
@@ -9658,7 +10138,7 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -9719,7 +10199,7 @@ THREE.ParticleBasicMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  *
  * parameters = {
  *  color: <hex>,
@@ -9755,7 +10235,7 @@ THREE.ParticleCanvasMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.ParticleDOMMaterial = function ( domElement ) {
@@ -9859,7 +10339,7 @@ THREE.ShaderMaterial.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  */
@@ -9942,7 +10422,7 @@ THREE.DataTexture.prototype.clone = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Particle = function ( material ) {
@@ -9987,7 +10467,7 @@ THREE.ParticleSystem = function ( geometry, material ) {
 
 THREE.ParticleSystem.prototype = Object.create( THREE.Object3D.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Line = function ( geometry, material, type ) {
@@ -10015,7 +10495,7 @@ THREE.LinePieces = 1;
 
 THREE.Line.prototype = Object.create( THREE.Object3D.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  */
@@ -10584,7 +11064,7 @@ THREE.Ribbon.prototype = Object.create( THREE.Object3D.prototype );
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.LOD = function () {
@@ -10729,7 +11209,7 @@ THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
 THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
 THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Scene = function () {
@@ -10839,7 +11319,7 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -10852,7 +11332,7 @@ THREE.Fog = function ( hex, near, far ) {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -10863,7 +11343,7 @@ THREE.FogExp2 = function ( hex, density ) {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.CanvasRenderer = function ( parameters ) {
@@ -21060,7 +21540,7 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 
 THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.RenderableVertex = function () {
@@ -21079,7 +21559,7 @@ THREE.RenderableVertex.prototype.copy = function ( vertex ) {
 
 }
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.RenderableFace3 = function () {
@@ -21101,7 +21581,7 @@ THREE.RenderableFace3 = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.RenderableFace4 = function () {
@@ -21124,7 +21604,7 @@ THREE.RenderableFace4 = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.RenderableObject = function () {
@@ -21134,7 +21614,7 @@ THREE.RenderableObject = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.RenderableParticle = function () {
@@ -21152,7 +21632,7 @@ THREE.RenderableParticle = function () {
 
 };
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.RenderableLine = function () {
@@ -22789,7 +23269,7 @@ THREE.SceneUtils = {
 };
 /**
  * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  *
  * ShaderUtils currently contains:
  *
@@ -23960,482 +24440,6 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 
 // To use the typeface.js face files, hook up the API
 self._typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.BufferGeometry = function () {
-
-	this.id = THREE.GeometryCount ++;
-
-	// attributes
-
-	this.attributes = {};
-
-	// attributes typed arrays are kept only if dynamic flag is set
-
-	this.dynamic = false;
-
-	// boundings
-
-	this.boundingBox = null;
-	this.boundingSphere = null;
-
-	this.hasTangents = false;
-
-	// for compatibility
-
-	this.morphTargets = [];
-
-};
-
-THREE.BufferGeometry.prototype = {
-
-	constructor : THREE.BufferGeometry,
-
-	applyMatrix: function ( matrix ) {
-
-		var positionArray;
-		var normalArray;
-
-		if ( this.attributes[ "position" ] ) positionArray = this.attributes[ "position" ].array;
-		if ( this.attributes[ "normal" ] ) normalArray = this.attributes[ "normal" ].array;
-
-		if ( positionArray !== undefined ) {
-
-			matrix.multiplyVector3Array( positionArray );
-			this.verticesNeedUpdate = true;
-
-		}
-
-		if ( normalArray !== undefined ) {
-
-			var matrixRotation = new THREE.Matrix4();
-			matrixRotation.extractRotation( matrix );
-
-			matrixRotation.multiplyVector3Array( normalArray );
-			this.normalsNeedUpdate = true;
-
-		}
-
-	},
-
-	computeBoundingBox: function () {
-
-		if ( ! this.boundingBox ) {
-
-			this.boundingBox = {
-
-				min: new THREE.Vector3( Infinity, Infinity, Infinity ),
-				max: new THREE.Vector3( -Infinity, -Infinity, -Infinity )
-
-			};
-
-		}
-
-		var positions = this.attributes[ "position" ].array;
-
-		if ( positions ) {
-
-			var bb = this.boundingBox;
-			var x, y, z;
-
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
-
-				// bounding box
-
-				if ( x < bb.min.x ) {
-
-					bb.min.x = x;
-
-				} else if ( x > bb.max.x ) {
-
-					bb.max.x = x;
-
-				}
-
-				if ( y < bb.min.y ) {
-
-					bb.min.y = y;
-
-				} else if ( y > bb.max.y ) {
-
-					bb.max.y = y;
-
-				}
-
-				if ( z < bb.min.z ) {
-
-					bb.min.z = z;
-
-				} else if ( z > bb.max.z ) {
-
-					bb.max.z = z;
-
-				}
-
-			}
-
-		}
-
-		if ( positions === undefined || positions.length === 0 ) {
-
-			this.boundingBox.min.set( 0, 0, 0 );
-			this.boundingBox.max.set( 0, 0, 0 );
-
-		}
-
-	},
-
-	computeBoundingSphere: function () {
-
-		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
-
-		var positions = this.attributes[ "position" ].array;
-
-		if ( positions ) {
-
-			var radiusSq, maxRadiusSq = 0;
-			var x, y, z;
-
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
-
-				radiusSq =  x * x + y * y + z * z;
-				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
-
-			}
-
-			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
-		}
-
-	},
-
-	computeVertexNormals: function () {
-
-		if ( this.attributes[ "position" ] && this.attributes[ "index" ] ) {
-
-			var i, il;
-			var j, jl;
-
-			var nVertexElements = this.attributes[ "position" ].array.length;
-
-			if ( this.attributes[ "normal" ] === undefined ) {
-
-				this.attributes[ "normal" ] = {
-
-					itemSize: 3,
-					array: new Float32Array( nVertexElements ),
-					numItems: nVertexElements
-
-				};
-
-			} else {
-
-				// reset existing normals to zero
-
-				for ( i = 0, il = this.attributes[ "normal" ].array.length; i < il; i ++ ) {
-
-					this.attributes[ "normal" ].array[ i ] = 0;
-
-				}
-
-			}
-
-			var offsets = this.offsets;
-
-			var indices = this.attributes[ "index" ].array;
-			var positions = this.attributes[ "position" ].array;
-			var normals = this.attributes[ "normal" ].array;
-
-			var vA, vB, vC, x, y, z,
-
-			pA = new THREE.Vector3(),
-			pB = new THREE.Vector3(),
-			pC = new THREE.Vector3(),
-
-			cb = new THREE.Vector3(),
-			ab = new THREE.Vector3();
-
-			for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
-
-				var start = offsets[ j ].start;
-				var count = offsets[ j ].count;
-				var index = offsets[ j ].index;
-
-				for ( i = start, il = start + count; i < il; i += 3 ) {
-
-					vA = index + indices[ i ];
-					vB = index + indices[ i + 1 ];
-					vC = index + indices[ i + 2 ];
-
-					x = positions[ vA * 3 ];
-					y = positions[ vA * 3 + 1 ];
-					z = positions[ vA * 3 + 2 ];
-					pA.set( x, y, z );
-
-					x = positions[ vB * 3 ];
-					y = positions[ vB * 3 + 1 ];
-					z = positions[ vB * 3 + 2 ];
-					pB.set( x, y, z );
-
-					x = positions[ vC * 3 ];
-					y = positions[ vC * 3 + 1 ];
-					z = positions[ vC * 3 + 2 ];
-					pC.set( x, y, z );
-
-					cb.sub( pC, pB );
-					ab.sub( pA, pB );
-					cb.crossSelf( ab );
-
-					normals[ vA * 3 ] 	  += cb.x;
-					normals[ vA * 3 + 1 ] += cb.y;
-					normals[ vA * 3 + 2 ] += cb.z;
-
-					normals[ vB * 3 ] 	  += cb.x;
-					normals[ vB * 3 + 1 ] += cb.y;
-					normals[ vB * 3 + 2 ] += cb.z;
-
-					normals[ vC * 3 ] 	  += cb.x;
-					normals[ vC * 3 + 1 ] += cb.y;
-					normals[ vC * 3 + 2 ] += cb.z;
-
-				}
-
-			}
-
-			// normalize normals
-
-			for ( i = 0, il = normals.length; i < il; i += 3 ) {
-
-				x = normals[ i ];
-				y = normals[ i + 1 ];
-				z = normals[ i + 2 ];
-
-				var n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-				normals[ i ] 	 *= n;
-				normals[ i + 1 ] *= n;
-				normals[ i + 2 ] *= n;
-
-			}
-
-			this.normalsNeedUpdate = true;
-
-		}
-
-	},
-
-	computeTangents: function () {
-
-		// based on http://www.terathon.com/code/tangent.html
-		// (per vertex tangents)
-
-		if ( this.attributes[ "index" ] === undefined ||
-			 this.attributes[ "position" ] === undefined ||
-			 this.attributes[ "normal" ] === undefined ||
-			 this.attributes[ "uv" ] === undefined ) {
-
-			console.warn( "Missing required attributes (index, position, normal or uv) in BufferGeometry.computeTangents()" );
-			return;
-
-		}
-
-		var indices = this.attributes[ "index" ].array;
-		var positions = this.attributes[ "position" ].array;
-		var normals = this.attributes[ "normal" ].array;
-		var uvs = this.attributes[ "uv" ].array;
-
-		var nVertices = positions.length / 3;
-
-		if ( this.attributes[ "tangent" ] === undefined ) {
-
-			var nTangentElements = 4 * nVertices;
-
-			this.attributes[ "tangent" ] = {
-
-				itemSize: 4,
-				array: new Float32Array( nTangentElements ),
-				numItems: nTangentElements
-
-			};
-
-		}
-
-		var tangents = this.attributes[ "tangent" ].array;
-
-		var tan1 = [], tan2 = [];
-
-		for ( var k = 0; k < nVertices; k ++ ) {
-
-			tan1[ k ] = new THREE.Vector3();
-			tan2[ k ] = new THREE.Vector3();
-
-		}
-
-		var xA, yA, zA,
-			xB, yB, zB,
-			xC, yC, zC,
-
-			uA, vA,
-			uB, vB,
-			uC, vC,
-
-			x1, x2, y1, y2, z1, z2,
-			s1, s2, t1, t2, r;
-
-		var sdir = new THREE.Vector3(), tdir = new THREE.Vector3();
-
-		function handleTriangle( a, b, c ) {
-
-			xA = positions[ a * 3 ];
-			yA = positions[ a * 3 + 1 ];
-			zA = positions[ a * 3 + 2 ];
-
-			xB = positions[ b * 3 ];
-			yB = positions[ b * 3 + 1 ];
-			zB = positions[ b * 3 + 2 ];
-
-			xC = positions[ c * 3 ];
-			yC = positions[ c * 3 + 1 ];
-			zC = positions[ c * 3 + 2 ];
-
-			uA = uvs[ a * 2 ];
-			vA = uvs[ a * 2 + 1 ];
-
-			uB = uvs[ b * 2 ];
-			vB = uvs[ b * 2 + 1 ];
-
-			uC = uvs[ c * 2 ];
-			vC = uvs[ c * 2 + 1 ];
-
-			x1 = xB - xA;
-			x2 = xC - xA;
-
-			y1 = yB - yA;
-			y2 = yC - yA;
-
-			z1 = zB - zA;
-			z2 = zC - zA;
-
-			s1 = uB - uA;
-			s2 = uC - uA;
-
-			t1 = vB - vA;
-			t2 = vC - vA;
-
-			r = 1.0 / ( s1 * t2 - s2 * t1 );
-
-			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
-					  ( t2 * y1 - t1 * y2 ) * r,
-					  ( t2 * z1 - t1 * z2 ) * r );
-
-			tdir.set( ( s1 * x2 - s2 * x1 ) * r,
-					  ( s1 * y2 - s2 * y1 ) * r,
-					  ( s1 * z2 - s2 * z1 ) * r );
-
-			tan1[ a ].addSelf( sdir );
-			tan1[ b ].addSelf( sdir );
-			tan1[ c ].addSelf( sdir );
-
-			tan2[ a ].addSelf( tdir );
-			tan2[ b ].addSelf( tdir );
-			tan2[ c ].addSelf( tdir );
-
-		}
-
-		var i, il;
-		var j, jl;
-		var iA, iB, iC;
-
-		var offsets = this.offsets;
-
-		for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
-
-			var start = offsets[ j ].start;
-			var count = offsets[ j ].count;
-			var index = offsets[ j ].index;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = index + indices[ i ];
-				iB = index + indices[ i + 1 ];
-				iC = index + indices[ i + 2 ];
-
-				handleTriangle( iA, iB, iC );
-
-			}
-
-		}
-
-		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
-		var w, t, test;
-		var nx, ny, nz;
-
-		function handleVertex( v ) {
-
-			n.x = normals[ v * 3 ];
-			n.y = normals[ v * 3 + 1 ];
-			n.z = normals[ v * 3 + 2 ];
-
-			n2.copy( n );
-
-			t = tan1[ v ];
-
-			// Gram-Schmidt orthogonalize
-
-			tmp.copy( t );
-			tmp.subSelf( n.multiplyScalar( n.dot( t ) ) ).normalize();
-
-			// Calculate handedness
-
-			tmp2.cross( n2, t );
-			test = tmp2.dot( tan2[ v ] );
-			w = ( test < 0.0 ) ? -1.0 : 1.0;
-
-			tangents[ v * 4 ] 	  = tmp.x;
-			tangents[ v * 4 + 1 ] = tmp.y;
-			tangents[ v * 4 + 2 ] = tmp.z;
-			tangents[ v * 4 + 3 ] = w;
-
-		}
-
-		for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
-
-			var start = offsets[ j ].start;
-			var count = offsets[ j ].count;
-			var index = offsets[ j ].index;
-
-			for ( i = start, il = start + count; i < il; i += 3 ) {
-
-				iA = index + indices[ i ];
-				iB = index + indices[ i + 1 ];
-				iC = index + indices[ i + 2 ];
-
-				handleVertex( iA );
-				handleVertex( iB );
-				handleVertex( iC );
-
-			}
-
-		}
-
-		this.hasTangents = true;
-		this.tangentsNeedUpdate = true;
-
-	}
-
-};
-
-/**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
  * 
@@ -29937,7 +29941,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 
 THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
@@ -30084,7 +30088,7 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 THREE.CubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded ) {
@@ -31064,7 +31068,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
@@ -31127,7 +31131,7 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight ) 
 
 THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStart, phiLength, thetaStart, thetaLength ) {
@@ -31297,7 +31301,7 @@ THREE.TextGeometry = function ( text, parameters ) {
 THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
 /**
  * @author oosmoxiecode
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
@@ -32285,7 +32289,7 @@ THREE.ConvexGeometry = function( vertices ) {
 THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
 /**
  * @author sroucheray / http://sroucheray.org/
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.AxisHelper = function () {

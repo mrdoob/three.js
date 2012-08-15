@@ -234,15 +234,15 @@ THREE.BufferGeometry.prototype = {
 					ab.sub( pA, pB );
 					cb.crossSelf( ab );
 
-					normals[ vA * 3 ] 	  += cb.x;
+					normals[ vA * 3 ] += cb.x;
 					normals[ vA * 3 + 1 ] += cb.y;
 					normals[ vA * 3 + 2 ] += cb.z;
 
-					normals[ vB * 3 ] 	  += cb.x;
+					normals[ vB * 3 ] += cb.x;
 					normals[ vB * 3 + 1 ] += cb.y;
 					normals[ vB * 3 + 2 ] += cb.z;
 
-					normals[ vC * 3 ] 	  += cb.x;
+					normals[ vC * 3 ] += cb.x;
 					normals[ vC * 3 + 1 ] += cb.y;
 					normals[ vC * 3 + 2 ] += cb.z;
 
@@ -260,7 +260,7 @@ THREE.BufferGeometry.prototype = {
 
 				var n = 1.0 / Math.sqrt( x * x + y * y + z * z );
 
-				normals[ i ] 	 *= n;
+				normals[ i ] *= n;
 				normals[ i + 1 ] *= n;
 				normals[ i + 2 ] *= n;
 
@@ -372,13 +372,17 @@ THREE.BufferGeometry.prototype = {
 
 			r = 1.0 / ( s1 * t2 - s2 * t1 );
 
-			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
-					  ( t2 * y1 - t1 * y2 ) * r,
-					  ( t2 * z1 - t1 * z2 ) * r );
+			sdir.set(
+				( t2 * x1 - t1 * x2 ) * r,
+				( t2 * y1 - t1 * y2 ) * r,
+				( t2 * z1 - t1 * z2 ) * r
+			);
 
-			tdir.set( ( s1 * x2 - s2 * x1 ) * r,
-					  ( s1 * y2 - s2 * y1 ) * r,
-					  ( s1 * z2 - s2 * z1 ) * r );
+			tdir.set(
+				( s1 * x2 - s2 * x1 ) * r,
+				( s1 * y2 - s2 * y1 ) * r,
+				( s1 * z2 - s2 * z1 ) * r
+			);
 
 			tan1[ a ].addSelf( sdir );
 			tan1[ b ].addSelf( sdir );
