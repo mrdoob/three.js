@@ -138,13 +138,23 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			rangeSq = this.range * this.range,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
-			objMatrix;
+			objMatrix, geometryMaterials,
+			isFaceMaterial, material, side;
+
+			geometryMaterials = object.geometry.materials;
+			isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+			side = object.material.side;
 
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 				face = geometry.faces[ f ];
+
+				material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
+				if ( material === undefined ) continue;
+
+				side = material.side;
 
 				originCopy.copy( this.origin );
 				directionCopy.copy( this.direction );
@@ -170,7 +180,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 				if ( scalar < 0 ) continue;
 
-				if ( object.doubleSided || ( object.flipSided ? dot > 0 : dot < 0 ) ) {
+				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? dot < 0 : dot > 0 ) ) {
 
 					intersectPoint.add( originCopy, directionCopy.multiplyScalar( scalar ) );
 
