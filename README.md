@@ -10,11 +10,11 @@ The aim of the project is to create a lightweight 3D library with a very low lev
 
 ### Usage ###
 
-Download the [minified library](http://mrdoob.github.com/three.js/build/Three.js) and include it in your html.
+Download the [minified library](http://mrdoob.github.com/three.js/build/three.min.js) and include it in your html.
 Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file). 
 
 ```html
-<script src="js/Three.js"></script>
+<script src="js/three.min.js"></script>
 ```
 
 This code creates a scene, then creates a camera, adds the camera and cube to the scene, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
