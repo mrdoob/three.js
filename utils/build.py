@@ -34,9 +34,7 @@ def main(argv=None):
 
   for include in args.include:
     for filename in files[include]:
-        src = open(filename, 'r')
-        os.write(file, src.read())
-        src.close()
+      with open(filename, 'r') as f: os.write(file, f.read())
 
   # save
 
@@ -51,13 +49,8 @@ def main(argv=None):
 
     # header
 
-    f = open(output,'r')
-    text = f.read()
-    f.close()
-
-    f = open(output,'w')
-    f.write(("// %s - http://github.com/mrdoob/three.js\n" % os.path.basename(output)) + text)
-    f.close()
+    with open(output,'r') as f: text = f.read()
+    with open(output,'w') as f: f.write(("// %s - http://github.com/mrdoob/three.js\n" % os.path.basename(output)) + text)
 
   os.close(file)
   os.unlink(path)
