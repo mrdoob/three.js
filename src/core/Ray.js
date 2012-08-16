@@ -18,10 +18,17 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 	var originCopy = new THREE.Vector3();
 	var directionCopy = new THREE.Vector3();
+	
+	var localOriginCopy = new THREE.Vector3();
+    var localDirectionCopy = new THREE.Vector3();
+
 
 	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
 	var intersectPoint = new THREE.Vector3();
+	
+	
+    var inverseMatrix = new THREE.Matrix4();
 
 	var descSort = function ( a, b ) {
 
@@ -146,6 +153,21 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			side = object.material.side;
 
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
+			
+			originCopy.copy( this.origin );
+            directionCopy.copy( this.direction );
+
+            objMatrix = object.matrixWorld;
+            inverseMatrix.getInverse(objMatrix);
+            
+            
+            
+            localOriginCopy.copy(originCopy);
+            inverseMatrix.multiplyVector3(localOriginCopy);
+            
+            localDirectionCopy.add(originCopy,directionCopy);
+            inverseMatrix.multiplyVector3(localDirectionCopy);
+            localDirectionCopy.subSelf(localOriginCopy).normalize();
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -156,17 +178,21 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 				side = material.side;
 
-				originCopy.copy( this.origin );
-				directionCopy.copy( this.direction );
+				//originCopy.copy( this.origin );
+				//directionCopy.copy( this.direction );
 
-				objMatrix = object.matrixWorld;
+				//objMatrix = object.matrixWorld;
 
 				// determine if ray intersects the plane of the face
 				// note: this works regardless of the direction of the face normal
+				
+				//vector = objMatrix.multiplyVector3( vector.copy( face.centroid ) ).subSelf( originCopy );
+				//normal = object.matrixRotationWorld.multiplyVector3( normal.copy( face.normal ) );
+				//dot = directionCopy.dot( normal );
+				vector.sub( face.centroid, localOriginCopy );
+				normal.copy( face.normal );
+                dot = localDirectionCopy.dot( normal );
 
-				vector = objMatrix.multiplyVector3( vector.copy( face.centroid ) ).subSelf( originCopy );
-				normal = object.matrixRotationWorld.multiplyVector3( normal.copy( face.normal ) );
-				dot = directionCopy.dot( normal );
 
 				// bail if ray and plane are parallel
 
@@ -182,25 +208,32 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? dot < 0 : dot > 0 ) ) {
 
-					intersectPoint.add( originCopy, directionCopy.multiplyScalar( scalar ) );
+					intersectPoint.add( localOriginCopy, localDirectionCopy.multiplyScalar( scalar ) );
 
-					distance = originCopy.distanceTo( intersectPoint );
+					//distance = originCopy.distanceTo( intersectPoint );
 
-					if ( distance < this.near ) continue;
-					if ( distance > this.far ) continue;
+					//if ( distance < this.near ) continue;
+					//if ( distance > this.far ) continue;
 
 					if ( face instanceof THREE.Face3 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
+						a.copy( vertices[ face.a ] );
+						b.copy( vertices[ face.b ] );
+						c.copy( vertices[ face.c ] );
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
+							var point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
+                            distance = originCopy.distanceTo( point);
+                            
+                            if ( distance < this.near ) continue;
+							if ( distance > this.far ) continue; 
+                            
+                            
 							intersect = {
 
 								distance: distance,
-								point: intersectPoint.clone(),
+								point: point,
 								face: face,
 								faceIndex: f,
 								object: object
@@ -213,17 +246,23 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 					} else if ( face instanceof THREE.Face4 ) {
 
-						a = objMatrix.multiplyVector3( a.copy( vertices[ face.a ] ) );
-						b = objMatrix.multiplyVector3( b.copy( vertices[ face.b ] ) );
-						c = objMatrix.multiplyVector3( c.copy( vertices[ face.c ] ) );
-						d = objMatrix.multiplyVector3( d.copy( vertices[ face.d ] ) );
+						a.copy( vertices[ face.a ] );
+						b.copy( vertices[ face.b ] );
+						c.copy( vertices[ face.c ] );
+						d.copy( vertices[ face.d ] );
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
+							var point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
+                            distance = originCopy.distanceTo( point);
+                            
+                            if ( distance < this.near ) continue;
+							if ( distance > this.far ) continue; 
+                            
 							intersect = {
 
 								distance: distance,
-								point: intersectPoint.clone(),
+								point: point,
 								face: face,
 								faceIndex: f,
 								object: object
