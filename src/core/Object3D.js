@@ -105,6 +105,16 @@ THREE.Object3D.prototype = {
 		}
 
 	},
+	
+		
+	lookAtObject: function( obj ) {
+		this.lookAt(this.worldToLocal(obj.matrix.getPosition()));
+	},
+	
+	lookAtWorld: function( vector ) {
+		this.lookAt(this.worldToLocal(vector));
+	},
+
 
 	add: function ( object ) {
 
