@@ -10,15 +10,8 @@
  * 	var loader = new THREE.STLLoader();
  * 	loader.addEventListener( 'load', function ( event ) {
  *
- * 		var object = event.content;
- *
- * 		for ( var i = 0; i < object.children.length; i ++ ) {
- *
- * 			object.children[ i ].material = material;
- *
- * 		}
- *
- * 		scene.add( object );
+ * 		var geometry = event.content;
+ * 		scene.add( new THREE.Mesh( geometry ) );
  *
  * 	} );
  * 	loader.load( './models/stl/slotted_disk.stl' );
@@ -65,53 +58,43 @@ THREE.STLLoader.prototype = {
 
 	parse: function ( data ) {
 
-		function face3( a, b, c, normals ) {
-
-			return new THREE.Face3( a, b, c, normals );
-
-		}
-
-
-		var group = new THREE.Object3D();
 		var geometry = new THREE.Geometry();
 
-		var pattern, result;
+		var patternFace = /facet([\s\S]*?)endfacet/g;
+		var result;
 
-		pattern = /facet([\s\S]*?)endfacet/g;
+		while ( ( result = patternFace.exec( data ) ) != null ) {
 
-		while ( ( result = pattern.exec( data ) ) != null ) {
-
-			facet_text = facet_result[ 0 ];
-
-			var face_normal = new THREE.Vector3();
+			var text = result[ 0 ];
 
 			// Normal
-			pattern = /normal[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
+			var patternNormal = /normal[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
 
-			while( ( result = pattern.exec( facet_text ) ) != null ) {
+			while( ( result = patternNormal.exec( text ) ) != null ) {
 
-				var normal = new THREE.Vector3( +( result[1]), +( result[3] ), +( result[5] ) );
+				var normal = new THREE.Vector3( result[ 1 ], result[ 3 ], result[ 5 ] );
 
 			}
 
 			// Vertex
-			pattern = /vertex[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
+			var patternVertex = /vertex[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
 
-			while( ( result = pattern.exec( facet_text ) ) != null ) {
+			while( ( result = patternVertex.exec( text ) ) != null ) {
 
-				geometry.vertices.push( new THREE.Vector3(+(result[1]), +(result[3]), +(result[ 5 ] ) ) );
+				geometry.vertices.push(
+					new THREE.Vector3( result[ 1 ], result[ 3 ], result[ 5 ] )
+				);
 
 			}
 
 			var len = geometry.vertices.length;
-			geometry.faces.push( face3( len - 3, len - 2, len - 1, normal ) );
+			geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal ) );
 
 		}
 
 		geometry.computeCentroids();
-		group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() ) );
 
-		return group;
+		return geometry;
 
 	}
 

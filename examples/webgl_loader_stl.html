@@ -49,6 +49,7 @@
 			var particleLight, pointLight;
 
 			init();
+			animate();
 
 			function init() {
 
@@ -83,20 +84,10 @@
 				var loader = new THREE.STLLoader();
 				loader.addEventListener( 'load', function ( event ) {
 
-					var object = event.content;
-
+					var geometry = event.content;
 					var material = new THREE.MeshPhongMaterial( { ambient: 0xff0000, color: 0xff0000, specular: 0xffffff } );
-					console.log( object );
 
-					for ( var i = 0; i < object.children.length; i ++ ) {
-
-						object.children[ i ].material = material;
-
-					}
-
-					scene.add( object );
-
-					animate();
+					scene.add( new THREE.Mesh( geometry, material ) );
 
 				} );
 				loader.load( './models/stl/slotted_disk.stl' );
@@ -147,17 +138,9 @@
 
 			//
 
-			var t = 0;
-			var clock = new THREE.Clock();
-
 			function animate() {
 
-				var delta = clock.getDelta();
-
 				requestAnimationFrame( animate );
-
-				if ( t > 1 ) t = 0;
-
 
 				render();
 				stats.update();
