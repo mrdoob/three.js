@@ -61,7 +61,7 @@
 
 				scene = new THREE.Scene();
 
-				var triangles = 500;
+				var triangles = 10000;
 
 				var geometry = new THREE.BufferGeometry();
 				geometry.attributes = {
@@ -116,12 +116,12 @@
 				geometry.computeBoundingSphere();
 				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshLambertMaterial( { color: 0x000000, side: THREE.DoubleSide } );
+				var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
