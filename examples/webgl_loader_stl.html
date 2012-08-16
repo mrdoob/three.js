@@ -47,25 +47,8 @@
 
 			var camera, scene, renderer, objects;
 			var particleLight, pointLight;
-			var stl;
-      var material = new THREE.MeshPhongMaterial( { ambient :0xFF0000, color: 0xFF0000, specular: 0xFFFFFF } );
-      
-      var loader = new THREE.STLLoader();
-      loader.addEventListener( 'load', function ( event ) {
-          var object = event.content;
-          if(material instanceof THREE.Material){
-              for ( var i = 0; i < object.children.length; i ++ ) {
-                  object.children[ i ].material = material;
-              }
-          }
-          object.updateMatrix();// Not sure if this is needed.
-          stl = object;
-          init();
-          animate();
-      } );
-      var file_path = './models/stl/slotted_disk.stl';
-      loader.load( file_path );
 
+			init();
 
 			function init() {
 
@@ -97,9 +80,27 @@
 				var line = new THREE.Line( geometry, material, THREE.LinePieces );
 				scene.add( line );
 
-				// Add the STL file
+				var loader = new THREE.STLLoader();
+				loader.addEventListener( 'load', function ( event ) {
 
-				scene.add( stl );
+					var object = event.content;
+
+					var material = new THREE.MeshPhongMaterial( { ambient: 0xff0000, color: 0xff0000, specular: 0xffffff } );
+					console.log( object );
+
+					for ( var i = 0; i < object.children.length; i ++ ) {
+
+						object.children[ i ].material = material;
+
+					}
+
+					scene.add( object );
+
+					animate();
+
+				} );
+				loader.load( './models/stl/slotted_disk.stl' );
+
 
 				particleLight = new THREE.Mesh( new THREE.SphereGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
 				scene.add( particleLight );
@@ -108,7 +109,7 @@
 
 				scene.add( new THREE.AmbientLight( 0xcccccc ) );
 
-				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
+				var directionalLight = new THREE.DirectionalLight( 0xeeeeee );
 				directionalLight.position.x = Math.random() - 0.5;
 				directionalLight.position.y = Math.random() - 0.5;
 				directionalLight.position.z = Math.random() - 0.5;

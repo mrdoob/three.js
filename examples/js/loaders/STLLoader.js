@@ -2,28 +2,26 @@
  * @author aleeper / http://adamleeper.com/
  * @author mrdoob / http://mrdoob.com/
  *
- * Description: A THREE loader for STL ASCII files, as created
- *              by Solidworks and other CAD programs.
+ * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
  * Limitations: Currently supports ASCII format only
  *
  * Usage:
- *    var loader = new THREE.STLLoader();
- *    loader.addEventListener( 'load', function ( event ) {
- *        var object = event.content;
- *        // Optionally apply some sort of material...
- *        if(material instanceof THREE.Material){
- *            for ( var i = 0; i < object.children.length; i ++ ) {
- *                object.children[ i ].material = material;
- *            }
- *        }
- *        object.updateMatrix(); // Not sure if this is needed.
- *        stl = object;
- *        init();
- *        animate();
- *    } );
- *    loader.load( './models/stl/slotted_disk.stl' );
+ * 	var loader = new THREE.STLLoader();
+ * 	loader.addEventListener( 'load', function ( event ) {
  *
+ * 		var object = event.content;
+ *
+ * 		for ( var i = 0; i < object.children.length; i ++ ) {
+ *
+ * 			object.children[ i ].material = material;
+ *
+ * 		}
+ *
+ * 		scene.add( object );
+ *
+ * 	} );
+ * 	loader.load( './models/stl/slotted_disk.stl' );
  */
 
 
@@ -35,12 +33,12 @@ THREE.STLLoader = function () {
 
 THREE.STLLoader.prototype = {
 
-  constructor: THREE.STLLoader,
+	constructor: THREE.STLLoader,
 
-  load: function ( url ) {
+	load: function ( url ) {
 
-	  var scope = this;
-	  var xhr = new XMLHttpRequest();
+		var scope = this;
+		var xhr = new XMLHttpRequest();
 
 		xhr.addEventListener( 'load', function ( event ) {
 
@@ -63,49 +61,58 @@ THREE.STLLoader.prototype = {
 		xhr.open( 'GET', url, true );
 		xhr.send( null );
 
-  },
+	},
 
-  parse: function ( data ) {
+	parse: function ( data ) {
 
-    function face3( a, b, c, normals ) {
-      return new THREE.Face3( a, b, c, normals );
-    }
+		function face3( a, b, c, normals ) {
+
+			return new THREE.Face3( a, b, c, normals );
+
+		}
 
 
-  	var group = new THREE.Object3D();
-    var geometry = new THREE.Geometry();
+		var group = new THREE.Object3D();
+		var geometry = new THREE.Geometry();
 
-	  var pattern, result;
+		var pattern, result;
 
-    facet_pattern = /facet([\s\S]*?)endfacet/g;
-    while ( ( facet_result = facet_pattern.exec( data ) ) != null ) {
-        facet_text = facet_result[0];
+		pattern = /facet([\s\S]*?)endfacet/g;
 
-        var face_normal = new THREE.Vector3();
+		while ( ( result = pattern.exec( data ) ) != null ) {
 
-        // Find the normal info
-        normal_pattern = /normal[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
-        while( (normal_result = normal_pattern.exec(facet_text)) != null )
-        {
-            //console.log(vsprintf("normal: %f %f %f", [+(normal_result[1]), +(normal_result[3]), +(normal_result[5])]));
-            var face_normal = new THREE.Vector3( +(normal_result[1]), +(normal_result[3]), +(normal_result[5]) );
-            //geometry.normals.push(new THREE.Vector3( +(normal_result[1]), +(normal_result[3]), +(normal_result[5])));
-        }
+			facet_text = facet_result[ 0 ];
 
-        // Find the vertex info
-        vertex_pattern = /vertex[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
-        while( (vertex_result = vertex_pattern.exec(facet_text)) != null )
-        {
-            //console.log(vsprintf("vertex: %f %f %f", [+(vertex_result[1]), +(vertex_result[3]), +(vertex_result[5])]));
-            geometry.vertices.push(new THREE.Vector3(+(vertex_result[1]), +(vertex_result[3]), +(vertex_result[5])));
-        }
+			var face_normal = new THREE.Vector3();
 
-        var len = geometry.vertices.length;
-        geometry.faces.push( face3(len-3, len-2, len-1, face_normal) );
+			// Normal
+			pattern = /normal[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
 
-    }
-    geometry.computeCentroids();
-    group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() ) );
-	  return group;
-  }
+			while( ( result = pattern.exec( facet_text ) ) != null ) {
+
+				var normal = new THREE.Vector3( +( result[1]), +( result[3] ), +( result[5] ) );
+
+			}
+
+			// Vertex
+			pattern = /vertex[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
+
+			while( ( result = pattern.exec( facet_text ) ) != null ) {
+
+				geometry.vertices.push( new THREE.Vector3(+(result[1]), +(result[3]), +(result[ 5 ] ) ) );
+
+			}
+
+			var len = geometry.vertices.length;
+			geometry.faces.push( face3( len - 3, len - 2, len - 1, normal ) );
+
+		}
+
+		geometry.computeCentroids();
+		group.add( new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() ) );
+
+		return group;
+
+	}
+
 };
