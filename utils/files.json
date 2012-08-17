@@ -267,7 +267,6 @@
 		"../src/renderers/renderables/RenderableObject.js",
 		"../src/renderers/renderables/RenderableParticle.js",
 		"../src/renderers/renderables/RenderableLine.js",
-		"../src/extras/core/BufferGeometry.js",
 		"../src/extras/core/Gyroscope.js",
 		"../src/extras/helpers/CameraHelper.js",
 		"../src/extras/objects/LensFlare.js",

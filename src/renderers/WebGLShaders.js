@@ -1141,11 +1141,19 @@ THREE.ShaderChunk = {
 	skinning_vertex: [
 
 		"#ifdef USE_SKINNING",
+		
+			"#ifdef USE_MORPHTARGETS",
+			
+			"vec4 skinVertex = vec4( morphed, 1.0 );",
+			
+			"#else",
+						
+			"vec4 skinVertex = vec4( position, 1.0 );",
+			
+			"#endif",
 
-			"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-			"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
-
-			"gl_Position  = projectionMatrix * modelViewMatrix * skinned;",
+			"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+			"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 		"#endif"
 
@@ -1192,20 +1200,34 @@ THREE.ShaderChunk = {
 
 			"morphed += position;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
+			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
 
 		"#endif"
 
 	].join("\n"),
 
 	default_vertex : [
+		
+		"#ifdef USE_SKINNING",
+		
+			"gl_Position = projectionMatrix * modelViewMatrix * skinned;",
+			
+		"#endif",
+		
+		"#ifndef USE_SKINNING",
+		"#ifdef USE_MORPHTARGETS",
+		
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
+		
+		"#endif",		
+		"#endif",
 
 		"#ifndef USE_MORPHTARGETS",
 		"#ifndef USE_SKINNING",
 
 			"gl_Position = projectionMatrix * mvPosition;",
-
-		"#endif",
+		
+		"#endif",		
 		"#endif"
 
 	].join("\n"),
@@ -1234,7 +1256,15 @@ THREE.ShaderChunk = {
 			"mat4 skinMatrix = skinWeight.x * boneMatX;",
 			"skinMatrix 	+= skinWeight.y * boneMatY;",
 
+			"#ifdef USE_MORPHNORMALS",
+
+			"vec4 skinnedNormal = skinMatrix * vec4( morphedNormal, 0.0 );",
+
+			"#else",
+
 			"vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );",
+			
+			"#endif",
 
 		"#endif"
 
@@ -1250,10 +1280,12 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#ifndef USE_SKINNING",
 		"#ifdef USE_MORPHNORMALS",
 
 			"transformedNormal = morphedNormal;",
 
+		"#endif",
 		"#endif",
 
 		"#ifndef USE_MORPHNORMALS",
@@ -1486,14 +1518,15 @@ THREE.ShaderChunk = {
 
 			"vec4 transformedPosition;",
 
-			"#ifdef USE_MORPHTARGETS",
-
-				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
-
-			"#else",
 			"#ifdef USE_SKINNING",
 
 				"transformedPosition = modelMatrix * skinned;",
+
+			"#else",
+			
+			"#ifdef USE_MORPHTARGETS",
+
+				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
 
 			"#else",
 
@@ -1785,8 +1818,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -1798,8 +1831,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
@@ -1874,8 +1907,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -1899,8 +1932,8 @@ THREE.ShaderLib = {
 				"#endif",
 
 				THREE.ShaderChunk[ "lights_lambert_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
@@ -1997,8 +2030,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -2026,8 +2059,8 @@ THREE.ShaderLib = {
 				"vNormal = transformedNormal;",
 
 				THREE.ShaderChunk[ "lights_phong_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
@@ -2157,16 +2190,16 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 
 			"}"
