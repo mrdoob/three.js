@@ -13655,15 +13655,15 @@ THREE.ShaderChunk = {
 	skinning_vertex: [
 
 		"#ifdef USE_SKINNING",
-		
+
 			"#ifdef USE_MORPHTARGETS",
-			
+
 			"vec4 skinVertex = vec4( morphed, 1.0 );",
-			
+
 			"#else",
-						
+
 			"vec4 skinVertex = vec4( position, 1.0 );",
-			
+
 			"#endif",
 
 			"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
@@ -13721,27 +13721,27 @@ THREE.ShaderChunk = {
 	].join("\n"),
 
 	default_vertex : [
-		
+
 		"#ifdef USE_SKINNING",
-		
+
 			"gl_Position = projectionMatrix * modelViewMatrix * skinned;",
-			
+
 		"#endif",
-		
+
 		"#ifndef USE_SKINNING",
 		"#ifdef USE_MORPHTARGETS",
-		
+
 			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-		
-		"#endif",		
+
+		"#endif",
 		"#endif",
 
 		"#ifndef USE_MORPHTARGETS",
 		"#ifndef USE_SKINNING",
 
 			"gl_Position = projectionMatrix * mvPosition;",
-		
-		"#endif",		
+
+		"#endif",
 		"#endif"
 
 	].join("\n"),
@@ -13777,7 +13777,7 @@ THREE.ShaderChunk = {
 			"#else",
 
 			"vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );",
-			
+
 			"#endif",
 
 		"#endif"
@@ -14037,7 +14037,7 @@ THREE.ShaderChunk = {
 				"transformedPosition = modelMatrix * skinned;",
 
 			"#else",
-			
+
 			"#ifdef USE_MORPHTARGETS",
 
 				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
@@ -23786,8 +23786,10 @@ THREE.ShaderUtils = {
 
 							"#ifdef USE_SKINNING",
 
-								"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-								"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+								"vec4 skinVertex = vec4( position, 1.0 );",
+
+								"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+								"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 								"displacedPosition  = skinned.xyz;",
 
@@ -23803,8 +23805,10 @@ THREE.ShaderUtils = {
 
 						"#ifdef USE_SKINNING",
 
-							"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-							"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+							"vec4 skinVertex = vec4( position, 1.0 );",
+
+							"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+							"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 							"displacedPosition  = skinned.xyz;",
 
