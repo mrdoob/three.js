@@ -20,7 +20,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 	var directionCopy = new THREE.Vector3();
 	
 	var localOriginCopy = new THREE.Vector3();
-    var localDirectionCopy = new THREE.Vector3();
+	var localDirectionCopy = new THREE.Vector3();
 
 
 	var vector = new THREE.Vector3();
@@ -28,7 +28,7 @@ THREE.Ray = function ( origin, direction, near, far ) {
 	var intersectPoint = new THREE.Vector3();
 	
 	
-    var inverseMatrix = new THREE.Matrix4();
+	var inverseMatrix = new THREE.Matrix4();
 
 	var descSort = function ( a, b ) {
 
@@ -142,7 +142,6 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			// Checking faces
 
 			var f, fl, face, dot, scalar,
-			rangeSq = this.range * this.range,
 			geometry = object.geometry,
 			vertices = geometry.vertices,
 			objMatrix, geometryMaterials,
@@ -155,19 +154,18 @@ THREE.Ray = function ( origin, direction, near, far ) {
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 			
 			originCopy.copy( this.origin );
-            directionCopy.copy( this.direction );
+			directionCopy.copy( this.direction );
 
-            objMatrix = object.matrixWorld;
-            inverseMatrix.getInverse(objMatrix);
-            
-            
-            
-            localOriginCopy.copy(originCopy);
-            inverseMatrix.multiplyVector3(localOriginCopy);
-            
-            localDirectionCopy.add(originCopy,directionCopy);
-            inverseMatrix.multiplyVector3(localDirectionCopy);
-            localDirectionCopy.subSelf(localOriginCopy).normalize();
+			objMatrix = object.matrixWorld;
+			inverseMatrix.getInverse(objMatrix);
+			
+			
+			
+			localOriginCopy.copy(originCopy);
+			inverseMatrix.multiplyVector3(localOriginCopy);
+			
+			localDirectionCopy.copy(directionCopy);
+			inverseMatrix.rotateAxis(localDirectionCopy).normalize();
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -178,20 +176,9 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 				side = material.side;
 
-				//originCopy.copy( this.origin );
-				//directionCopy.copy( this.direction );
-
-				//objMatrix = object.matrixWorld;
-
-				// determine if ray intersects the plane of the face
-				// note: this works regardless of the direction of the face normal
-				
-				//vector = objMatrix.multiplyVector3( vector.copy( face.centroid ) ).subSelf( originCopy );
-				//normal = object.matrixRotationWorld.multiplyVector3( normal.copy( face.normal ) );
-				//dot = directionCopy.dot( normal );
 				vector.sub( face.centroid, localOriginCopy );
 				normal.copy( face.normal );
-                dot = localDirectionCopy.dot( normal );
+				dot = localDirectionCopy.dot( normal );
 
 
 				// bail if ray and plane are parallel
@@ -210,11 +197,6 @@ THREE.Ray = function ( origin, direction, near, far ) {
 
 					intersectPoint.add( localOriginCopy, localDirectionCopy.multiplyScalar( scalar ) );
 
-					//distance = originCopy.distanceTo( intersectPoint );
-
-					//if ( distance < this.near ) continue;
-					//if ( distance > this.far ) continue;
-
 					if ( face instanceof THREE.Face3 ) {
 
 						a.copy( vertices[ face.a ] );
@@ -224,12 +206,12 @@ THREE.Ray = function ( origin, direction, near, far ) {
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
 							var point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
-                            distance = originCopy.distanceTo( point);
-                            
-                            if ( distance < this.near ) continue;
+							distance = originCopy.distanceTo( point);
+							
+							if ( distance < this.near ) continue;
 							if ( distance > this.far ) continue; 
-                            
-                            
+							
+							
 							intersect = {
 
 								distance: distance,
@@ -254,11 +236,11 @@ THREE.Ray = function ( origin, direction, near, far ) {
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
 							var point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
-                            distance = originCopy.distanceTo( point);
-                            
-                            if ( distance < this.near ) continue;
+							distance = originCopy.distanceTo( point);
+							
+							if ( distance < this.near ) continue;
 							if ( distance > this.far ) continue; 
-                            
+							
 							intersect = {
 
 								distance: distance,
