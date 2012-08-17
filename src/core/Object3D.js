@@ -206,6 +206,23 @@ THREE.Object3D.prototype = {
 		return undefined;
 
 	},
+	
+	getDescendants: function (returnValue) {
+		var children = this.children,l = children.length,child;
+		
+		if (returnValue === undefined){
+			returnValue = [];	
+		}
+		
+		for (var i = 0; i < l ; i++){
+			child = children[i];
+			returnValue.push(child);
+			child.getDescendants(returnValue);
+		};
+		
+		return returnValue;
+		
+	},
 
 	updateMatrix: function () {
 
