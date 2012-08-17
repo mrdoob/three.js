@@ -1234,6 +1234,12 @@ THREE.Vector4.prototype = {
 		return Math.sqrt( this.lengthSq() );
 
 	},
+	
+	lengthManhattan: function () {
+
+		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
+
+	},
 
 	normalize: function () {
 
@@ -10884,11 +10890,27 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 THREE.SkinnedMesh.prototype.pose = function() {
 
 	this.updateMatrixWorld( true );
-	
-	// TODO: decide if we need to normalize weights here; for now it's
-	//  done automatically by shader (as a byproduct of using vec4 arithmetic)
+		
+	for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
+		// normalize weights
+
+		var sw = this.geometry.skinWeights[ i ];
+		
+		var scale = 1.0 / sw.lengthManhattan();
+		
+		if ( scale != Infinity ) {
+		
+			sw.multiplyScalar( scale );
+			
+		} else {
+		
+			sw.set( 1 ); // this will be normalized by the shader anyway
+			
+		}
+	}
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
