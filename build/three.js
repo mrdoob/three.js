@@ -7663,8 +7663,8 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 	};
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
-	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "application/json; charset=x-user-defined" );
+	xhr.setRequestHeader( "Content-Type", "application/json" );
 	xhr.send( null );
 
 };
@@ -8062,6 +8062,7 @@ THREE.GeometryLoader.prototype = {
 		}, false );
 
 		xhr.open( 'GET', url, true );
+		xhr.setRequestHeader( "Content-Type", "application/json" );
 		xhr.send( null );
 
 		//
@@ -8740,8 +8741,8 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 	};
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
-	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "application/json; charset=x-user-defined" );
+	xhr.setRequestHeader( "Content-Type", "application/json" );
 	xhr.send( null );
 
 };
@@ -10832,17 +10833,38 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 		}
 
 	}
+	
+	// make a snapshot of the bones' rest position
+	
+	if (this.boneInverses == undefined)
+	{
+		this.boneInverses = [];
+		
+		for ( var b = 0; b < this.bones.length; b ++ )
+		{
+			var inverse = new THREE.Matrix4();
+			
+			inverse.getInverse( this.bones[ b ].skinMatrix );
+			
+			this.boneInverses.push( inverse );
+		}
+	}
 
 	// flatten bone matrices to array
 
-	var b, bl = this.bones.length,
-		ba = this.bones,
-		bm = this.boneMatrices;
+	for ( var b = 0; b < this.bones.length; b ++ )
+	{
+		var offset = new THREE.Matrix4();
+		
+		// compute the offset between the current and the original transform;
+		
+		//TODO: we could get rid of this multiplication step if the skinMatrix
+		// was already representing the offset; however, this requires some
+		// major changes to the animation system
+		
+		offset.multiply( this.bones[ b ].skinMatrix, this.boneInverses[ b ] );
 
-	for ( b = 0; b < bl; b ++ ) {
-
-		ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
-
+		offset.flattenToArrayOffset( this.boneMatrices, b * 16 );		
 	}
 
 	if ( this.useVertexTexture ) {
@@ -10860,59 +10882,9 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 THREE.SkinnedMesh.prototype.pose = function() {
 
 	this.updateMatrixWorld( true );
-
-	var bim, bone, boneInverses = [];
-
-	for ( var b = 0; b < this.bones.length; b ++ ) {
-
-		bone = this.bones[ b ];
-
-		var inverseMatrix = new THREE.Matrix4();
-		inverseMatrix.getInverse( bone.skinMatrix );
-
-		boneInverses.push( inverseMatrix );
-
-		bone.skinMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
-
-	}
-
-	// project vertices to local
-
-	if ( this.geometry.skinVerticesA === undefined ) {
-
-		this.geometry.skinVerticesA = [];
-		this.geometry.skinVerticesB = [];
-
-		var orgVertex, vertex;
-
-		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
-
-			orgVertex = this.geometry.vertices[ i ];
-
-			var indexA = this.geometry.skinIndices[ i ].x;
-			var indexB = this.geometry.skinIndices[ i ].y;
-
-			vertex = new THREE.Vector3( orgVertex.x, orgVertex.y, orgVertex.z );
-			this.geometry.skinVerticesA.push( boneInverses[ indexA ].multiplyVector3( vertex ) );
-
-			vertex = new THREE.Vector3( orgVertex.x, orgVertex.y, orgVertex.z );
-			this.geometry.skinVerticesB.push( boneInverses[ indexB ].multiplyVector3( vertex ) );
-
-			// todo: add more influences
-
-			// normalize weights
-
-			if ( this.geometry.skinWeights[ i ].x + this.geometry.skinWeights[ i ].y !== 1 ) {
-
-				var len = ( 1.0 - ( this.geometry.skinWeights[ i ].x + this.geometry.skinWeights[ i ].y ) ) * 0.5;
-				this.geometry.skinWeights[ i ].x += len;
-				this.geometry.skinWeights[ i ].y += len;
-
-			}
-
-		}
-
-	}
+	
+	// TODO: decide if we need to normalize weights here; for now it's
+	//  done automatically by shader (as a byproduct of using vec4 arithmetic)
 
 };
 /**
@@ -13682,11 +13654,19 @@ THREE.ShaderChunk = {
 	skinning_vertex: [
 
 		"#ifdef USE_SKINNING",
+		
+			"#ifdef USE_MORPHTARGETS",
+			
+			"vec4 skinVertex = vec4( morphed, 1.0 );",
+			
+			"#else",
+						
+			"vec4 skinVertex = vec4( position, 1.0 );",
+			
+			"#endif",
 
-			"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-			"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
-
-			"gl_Position  = projectionMatrix * modelViewMatrix * skinned;",
+			"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+			"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 		"#endif"
 
@@ -13733,20 +13713,34 @@ THREE.ShaderChunk = {
 
 			"morphed += position;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
+			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
 
 		"#endif"
 
 	].join("\n"),
 
 	default_vertex : [
+		
+		"#ifdef USE_SKINNING",
+		
+			"gl_Position = projectionMatrix * modelViewMatrix * skinned;",
+			
+		"#endif",
+		
+		"#ifndef USE_SKINNING",
+		"#ifdef USE_MORPHTARGETS",
+		
+			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
+		
+		"#endif",		
+		"#endif",
 
 		"#ifndef USE_MORPHTARGETS",
 		"#ifndef USE_SKINNING",
 
 			"gl_Position = projectionMatrix * mvPosition;",
-
-		"#endif",
+		
+		"#endif",		
 		"#endif"
 
 	].join("\n"),
@@ -13775,7 +13769,15 @@ THREE.ShaderChunk = {
 			"mat4 skinMatrix = skinWeight.x * boneMatX;",
 			"skinMatrix 	+= skinWeight.y * boneMatY;",
 
+			"#ifdef USE_MORPHNORMALS",
+
+			"vec4 skinnedNormal = skinMatrix * vec4( morphedNormal, 0.0 );",
+
+			"#else",
+
 			"vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );",
+			
+			"#endif",
 
 		"#endif"
 
@@ -13791,10 +13793,12 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#ifndef USE_SKINNING",
 		"#ifdef USE_MORPHNORMALS",
 
 			"transformedNormal = morphedNormal;",
 
+		"#endif",
 		"#endif",
 
 		"#ifndef USE_MORPHNORMALS",
@@ -14027,14 +14031,15 @@ THREE.ShaderChunk = {
 
 			"vec4 transformedPosition;",
 
-			"#ifdef USE_MORPHTARGETS",
-
-				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
-
-			"#else",
 			"#ifdef USE_SKINNING",
 
 				"transformedPosition = modelMatrix * skinned;",
+
+			"#else",
+			
+			"#ifdef USE_MORPHTARGETS",
+
+				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
 
 			"#else",
 
@@ -14326,8 +14331,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -14339,8 +14344,8 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
@@ -14415,8 +14420,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -14440,8 +14445,8 @@ THREE.ShaderLib = {
 				"#endif",
 
 				THREE.ShaderChunk[ "lights_lambert_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
@@ -14538,8 +14543,8 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
@@ -14567,8 +14572,8 @@ THREE.ShaderLib = {
 				"vNormal = transformedNormal;",
 
 				THREE.ShaderChunk[ "lights_phong_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
@@ -14698,16 +14703,16 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 
 			"}"
@@ -15250,8 +15255,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometryGroup.__webglUVBuffer = _gl.createBuffer();
 		geometryGroup.__webglUV2Buffer = _gl.createBuffer();
 
-		geometryGroup.__webglSkinVertexABuffer = _gl.createBuffer();
-		geometryGroup.__webglSkinVertexBBuffer = _gl.createBuffer();
 		geometryGroup.__webglSkinIndicesBuffer = _gl.createBuffer();
 		geometryGroup.__webglSkinWeightsBuffer = _gl.createBuffer();
 
@@ -15326,8 +15329,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.deleteBuffer( geometryGroup.__webglUVBuffer );
 		_gl.deleteBuffer( geometryGroup.__webglUV2Buffer );
 
-		_gl.deleteBuffer( geometryGroup.__webglSkinVertexABuffer );
-		_gl.deleteBuffer( geometryGroup.__webglSkinVertexBBuffer );
 		_gl.deleteBuffer( geometryGroup.__webglSkinIndicesBuffer );
 		_gl.deleteBuffer( geometryGroup.__webglSkinWeightsBuffer );
 
@@ -15516,8 +15517,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.geometry.skinWeights.length && object.geometry.skinIndices.length ) {
 
-			geometryGroup.__skinVertexAArray = new Float32Array( nvertices * 4 );
-			geometryGroup.__skinVertexBArray = new Float32Array( nvertices * 4 );
 			geometryGroup.__skinIndexArray = new Float32Array( nvertices * 4 );
 			geometryGroup.__skinWeightArray = new Float32Array( nvertices * 4 );
 
@@ -16299,8 +16298,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		tangentArray = geometryGroup.__tangentArray,
 		colorArray = geometryGroup.__colorArray,
 
-		skinVertexAArray = geometryGroup.__skinVertexAArray,
-		skinVertexBArray = geometryGroup.__skinVertexBArray,
 		skinIndexArray = geometryGroup.__skinIndexArray,
 		skinWeightArray = geometryGroup.__skinWeightArray,
 
@@ -16333,8 +16330,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		obj_colors = geometry.colors,
 
-		obj_skinVerticesA = geometry.skinVerticesA,
-		obj_skinVerticesB = geometry.skinVerticesB,
 		obj_skinIndices = geometry.skinIndices,
 		obj_skinWeights = geometry.skinWeights,
 
@@ -16614,48 +16609,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				skinIndexArray[ offset_skin + 10 ] = si3.z;
 				skinIndexArray[ offset_skin + 11 ] = si3.w;
 
-				// vertices A
-
-				sa1 = obj_skinVerticesA[ face.a ];
-				sa2 = obj_skinVerticesA[ face.b ];
-				sa3 = obj_skinVerticesA[ face.c ];
-
-				skinVertexAArray[ offset_skin ]     = sa1.x;
-				skinVertexAArray[ offset_skin + 1 ] = sa1.y;
-				skinVertexAArray[ offset_skin + 2 ] = sa1.z;
-				skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-				skinVertexAArray[ offset_skin + 4 ] = sa2.x;
-				skinVertexAArray[ offset_skin + 5 ] = sa2.y;
-				skinVertexAArray[ offset_skin + 6 ] = sa2.z;
-				skinVertexAArray[ offset_skin + 7 ] = 1;
-
-				skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
-				skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
-				skinVertexAArray[ offset_skin + 10 ] = sa3.z;
-				skinVertexAArray[ offset_skin + 11 ] = 1;
-
-				// vertices B
-
-				sb1 = obj_skinVerticesB[ face.a ];
-				sb2 = obj_skinVerticesB[ face.b ];
-				sb3 = obj_skinVerticesB[ face.c ];
-
-				skinVertexBArray[ offset_skin ]     = sb1.x;
-				skinVertexBArray[ offset_skin + 1 ] = sb1.y;
-				skinVertexBArray[ offset_skin + 2 ] = sb1.z;
-				skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-				skinVertexBArray[ offset_skin + 4 ] = sb2.x;
-				skinVertexBArray[ offset_skin + 5 ] = sb2.y;
-				skinVertexBArray[ offset_skin + 6 ] = sb2.z;
-				skinVertexBArray[ offset_skin + 7 ] = 1;
-
-				skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
-				skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
-				skinVertexBArray[ offset_skin + 10 ] = sb3.z;
-				skinVertexBArray[ offset_skin + 11 ] = 1;
-
 				offset_skin += 12;
 
 			}
@@ -16718,71 +16671,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				skinIndexArray[ offset_skin + 14 ] = si4.z;
 				skinIndexArray[ offset_skin + 15 ] = si4.w;
 
-				// vertices A
-
-				sa1 = obj_skinVerticesA[ face.a ];
-				sa2 = obj_skinVerticesA[ face.b ];
-				sa3 = obj_skinVerticesA[ face.c ];
-				sa4 = obj_skinVerticesA[ face.d ];
-
-				skinVertexAArray[ offset_skin ]     = sa1.x;
-				skinVertexAArray[ offset_skin + 1 ] = sa1.y;
-				skinVertexAArray[ offset_skin + 2 ] = sa1.z;
-				skinVertexAArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-				skinVertexAArray[ offset_skin + 4 ] = sa2.x;
-				skinVertexAArray[ offset_skin + 5 ] = sa2.y;
-				skinVertexAArray[ offset_skin + 6 ] = sa2.z;
-				skinVertexAArray[ offset_skin + 7 ] = 1;
-
-				skinVertexAArray[ offset_skin + 8 ]  = sa3.x;
-				skinVertexAArray[ offset_skin + 9 ]  = sa3.y;
-				skinVertexAArray[ offset_skin + 10 ] = sa3.z;
-				skinVertexAArray[ offset_skin + 11 ] = 1;
-
-				skinVertexAArray[ offset_skin + 12 ] = sa4.x;
-				skinVertexAArray[ offset_skin + 13 ] = sa4.y;
-				skinVertexAArray[ offset_skin + 14 ] = sa4.z;
-				skinVertexAArray[ offset_skin + 15 ] = 1;
-
-				// vertices B
-
-				sb1 = obj_skinVerticesB[ face.a ];
-				sb2 = obj_skinVerticesB[ face.b ];
-				sb3 = obj_skinVerticesB[ face.c ];
-				sb4 = obj_skinVerticesB[ face.d ];
-
-				skinVertexBArray[ offset_skin ]     = sb1.x;
-				skinVertexBArray[ offset_skin + 1 ] = sb1.y;
-				skinVertexBArray[ offset_skin + 2 ] = sb1.z;
-				skinVertexBArray[ offset_skin + 3 ] = 1; // pad for faster vertex shader
-
-				skinVertexBArray[ offset_skin + 4 ] = sb2.x;
-				skinVertexBArray[ offset_skin + 5 ] = sb2.y;
-				skinVertexBArray[ offset_skin + 6 ] = sb2.z;
-				skinVertexBArray[ offset_skin + 7 ] = 1;
-
-				skinVertexBArray[ offset_skin + 8 ]  = sb3.x;
-				skinVertexBArray[ offset_skin + 9 ]  = sb3.y;
-				skinVertexBArray[ offset_skin + 10 ] = sb3.z;
-				skinVertexBArray[ offset_skin + 11 ] = 1;
-
-				skinVertexBArray[ offset_skin + 12 ] = sb4.x;
-				skinVertexBArray[ offset_skin + 13 ] = sb4.y;
-				skinVertexBArray[ offset_skin + 14 ] = sb4.z;
-				skinVertexBArray[ offset_skin + 15 ] = 1;
-
 				offset_skin += 16;
 
 			}
 
 			if ( offset_skin > 0 ) {
-
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglSkinVertexABuffer );
-				_gl.bufferData( _gl.ARRAY_BUFFER, skinVertexAArray, hint );
-
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglSkinVertexBBuffer );
-				_gl.bufferData( _gl.ARRAY_BUFFER, skinVertexBArray, hint );
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglSkinIndicesBuffer );
 				_gl.bufferData( _gl.ARRAY_BUFFER, skinIndexArray, hint );
@@ -17774,8 +17667,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			delete geometryGroup.__faceArray;
 			delete geometryGroup.__vertexArray;
 			delete geometryGroup.__lineArray;
-			delete geometryGroup.__skinVertexAArray;
-			delete geometryGroup.__skinVertexBArray;
 			delete geometryGroup.__skinIndexArray;
 			delete geometryGroup.__skinWeightArray;
 
@@ -18205,14 +18096,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			if ( material.skinning &&
-				 attributes.skinVertexA >= 0 && attributes.skinVertexB >= 0 &&
 				 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
-
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglSkinVertexABuffer );
-				_gl.vertexAttribPointer( attributes.skinVertexA, 4, _gl.FLOAT, false, 0, 0 );
-
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglSkinVertexBBuffer );
-				_gl.vertexAttribPointer( attributes.skinVertexB, 4, _gl.FLOAT, false, 0, 0 );
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglSkinIndicesBuffer );
 				_gl.vertexAttribPointer( attributes.skinIndex, 4, _gl.FLOAT, false, 0, 0 );
@@ -19439,11 +19323,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( attributes.tangent >= 0 ) _gl.enableVertexAttribArray( attributes.tangent );
 
 		if ( material.skinning &&
-			 attributes.skinVertexA >=0 && attributes.skinVertexB >= 0 &&
 			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
 
-			_gl.enableVertexAttribArray( attributes.skinVertexA );
-			_gl.enableVertexAttribArray( attributes.skinVertexB );
 			_gl.enableVertexAttribArray( attributes.skinIndex );
 			_gl.enableVertexAttribArray( attributes.skinWeight );
 
@@ -20681,8 +20562,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"#ifdef USE_SKINNING",
 
-				"attribute vec4 skinVertexA;",
-				"attribute vec4 skinVertexB;",
 				"attribute vec4 skinIndex;",
 				"attribute vec4 skinWeight;",
 
@@ -20795,7 +20674,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		identifiers = [
 
 			"position", "normal", "uv", "uv2", "tangent", "color",
-			"skinVertexA", "skinVertexB", "skinIndex", "skinWeight"
+			"skinIndex", "skinWeight"
 
 		];
 
@@ -33967,7 +33846,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 	var _gl,
 	_renderer,
-	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin,
+	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4(),
@@ -33986,10 +33865,12 @@ THREE.ShadowMapPlugin = function ( ) {
 		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
 		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
 		_depthMaterialSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, skinning: true } );
+		_depthMaterialMorphSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true, skinning: true } );
 
 		_depthMaterial._shadowPass = true;
 		_depthMaterialMorph._shadowPass = true;
 		_depthMaterialSkin._shadowPass = true;
+		_depthMaterialMorphSkin._shadowPass = true;
 
 	};
 
@@ -34224,13 +34105,15 @@ THREE.ShadowMapPlugin = function ( ) {
 
 						material = object.customDepthMaterial;
 
+					} else if ( object instanceof THREE.SkinnedMesh ) {
+						
+						material = object.geometry.morphTargets.length ?
+						
+							_depthMaterialMorphSkin : _depthMaterialSkin;
+
 					} else if ( object.geometry.morphTargets.length ) {
 
 						material = _depthMaterialMorph;
-
-					} else if ( object instanceof THREE.SkinnedMesh ) {
-
-						material = _depthMaterialSkin;
 
 					} else {
 
