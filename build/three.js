@@ -3842,7 +3842,7 @@ THREE.Projector = function() {
 
 					}
 
-					face.vertexNormalsLength = faceVertexNormals.length;
+					_face.vertexNormalsLength = faceVertexNormals.length;
 
 					for ( c = 0, cl = faceVertexUvs.length; c < cl; c ++ ) {
 
@@ -12085,7 +12085,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _enableLighting === true ) {
 
-					if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
+					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
 
 						_color1.r = _color2.r = _color3.r = _color4.r = _ambientLight.r;
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;

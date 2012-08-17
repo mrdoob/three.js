@@ -293,7 +293,7 @@ THREE.Projector = function() {
 
 					}
 
-					face.vertexNormalsLength = faceVertexNormals.length;
+					_face.vertexNormalsLength = faceVertexNormals.length;
 
 					for ( c = 0, cl = faceVertexUvs.length; c < cl; c ++ ) {
 
