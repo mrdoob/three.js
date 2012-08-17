@@ -13,6 +13,8 @@ THREE.Ray = function ( origin, direction, near, far ) {
 	this.precision = 0.0001;
 	this.threshold = 5;
 
+	this.localMatrix = new THREE.Matrix4();
+
 	this.comparator = function ( a, b ) {
 
 		return a.distance - b.distance;
@@ -184,14 +186,17 @@ THREE.Ray.prototype = {
 		var vertices = object.geometry.vertices;
 		var point, distance, intersect;
 
+		var localOrigin = this.origin.clone();
+		var localDirection = this.direction.clone();
+
+		this.localMatrix.getInverse( object.matrixWorld );
+		this.localMatrix.multiplyVector3( localOrigin );
+		this.localMatrix.rotateAxis( localDirection ).normalize();
+
 		for ( var i = 0; i < vertices.length; i ++ ) {
 
 			point = vertices[ i ];
-			distance = this.distanceFromIntersection(
-				this.origin,
-				this.direction,
-				object.matrixWorld.multiplyVector3( point.clone() )
-			);
+			distance = this.distanceFromIntersection( localOrigin, localDirection, point );
 
 			if ( distance > this.threshold ) {
 				continue;
