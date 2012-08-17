@@ -3842,6 +3842,8 @@ THREE.Projector = function() {
 
 					}
 
+					face.vertexNormalsLength = faceVertexNormals.length;
+
 					for ( c = 0, cl = faceVertexUvs.length; c < cl; c ++ ) {
 
 						uvs = faceVertexUvs[ c ][ f ];
@@ -11888,7 +11890,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.beginPath();
 			_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
 			_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
-			_context.closePath();
 
 			if ( material instanceof THREE.LineBasicMaterial ) {
 
@@ -11967,7 +11968,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _enableLighting === true ) {
 
-					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 3 ) {
+					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 3 ) {
 
 						_color1.r = _color2.r = _color3.r = _ambientLight.r;
 						_color1.g = _color2.g = _color3.g = _ambientLight.g;
@@ -12084,7 +12085,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _enableLighting === true ) {
 
-					if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 4 ) {
+					if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
 
 						_color1.r = _color2.r = _color3.r = _color4.r = _ambientLight.r;
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
@@ -12189,7 +12190,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.moveTo( x0, y0 );
 			_context.lineTo( x1, y1 );
 			_context.lineTo( x2, y2 );
-			_context.lineTo( x0, y0 );
+			_context.closePath();
 
 		}
 
@@ -12200,7 +12201,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.lineTo( x1, y1 );
 			_context.lineTo( x2, y2 );
 			_context.lineTo( x3, y3 );
-			_context.lineTo( x0, y0 );
+			_context.closePath();
 
 		}
 
@@ -21496,6 +21497,7 @@ THREE.RenderableFace3 = function () {
 
 	this.normalWorld = new THREE.Vector3();
 	this.vertexNormalsWorld = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	this.vertexNormalsLength = 0;
 
 	this.material = null;
 	this.uvs = [[]];
@@ -21519,6 +21521,7 @@ THREE.RenderableFace4 = function () {
 
 	this.normalWorld = new THREE.Vector3();
 	this.vertexNormalsWorld = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	this.vertexNormalsLength = 0;
 
 	this.material = null;
 	this.uvs = [[]];
