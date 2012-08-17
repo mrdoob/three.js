@@ -54,6 +54,7 @@ THREE.GeometryLoader.prototype = {
 		}, false );
 
 		xhr.open( 'GET', url, true );
+		xhr.setRequestHeader( "Content-Type", "application/json" );
 		xhr.send( null );
 
 		//
