@@ -218,8 +218,24 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 THREE.SkinnedMesh.prototype.pose = function() {
 
 	this.updateMatrixWorld( true );
-	
-	// TODO: decide if we need to normalize weights here; for now it's
-	//  done automatically by shader (as a byproduct of using vec4 arithmetic)
+		
+	for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
+		// normalize weights
+
+		var sw = this.geometry.skinWeights[ i ];
+		
+		var scale = 1.0 / sw.lengthManhattan();
+		
+		if ( scale != Infinity ) {
+		
+			sw.multiplyScalar( scale );
+			
+		} else {
+		
+			sw.set( 1 ); // this will be normalized by the shader anyway
+			
+		}
+	}
 };
+

@@ -142,6 +142,12 @@ THREE.Vector4.prototype = {
 		return Math.sqrt( this.lengthSq() );
 
 	},
+	
+	lengthManhattan: function () {
+
+		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
+
+	},
 
 	normalize: function () {
 
