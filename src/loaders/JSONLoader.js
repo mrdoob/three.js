@@ -80,8 +80,8 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 	};
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
-	xhr.setRequestHeader( "Content-Type", "text/plain" );
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "application/json; charset=x-user-defined" );
+	xhr.setRequestHeader( "Content-Type", "application/json" );
 	xhr.send( null );
 
 };

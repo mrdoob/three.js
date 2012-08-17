@@ -590,9 +590,10 @@ THREE.ShaderUtils = {
 						"} else {",
 
 							"#ifdef USE_SKINNING",
-
-								"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-								"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+								"vec4 skinVertex = vec4( position, 1.0 );",
+								
+								"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+								"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 								"displacedPosition  = skinned.xyz;",
 
@@ -607,9 +608,10 @@ THREE.ShaderUtils = {
 					"#else",
 
 						"#ifdef USE_SKINNING",
+							"vec4 skinVertex = vec4( position, 1.0 );",
 
-							"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-							"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+							"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+							"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 							"displacedPosition  = skinned.xyz;",
 
