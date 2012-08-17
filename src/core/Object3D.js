@@ -207,20 +207,19 @@ THREE.Object3D.prototype = {
 
 	},
 	
-	getDescendants: function (returnValue) {
-		var children = this.children,l = children.length,child;
-		
-		if (returnValue === undefined){
-			returnValue = [];	
-		}
-		
-		for (var i = 0; i < l ; i++){
-			child = children[i];
-			returnValue.push(child);
-			child.getDescendants(returnValue);
+	getDescendants: function ( array ) {
+
+		if ( array === undefined ) array = [];
+
+		Array.prototype.push.apply( array, this.children );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].getDescendants( array );
+
 		};
 		
-		return returnValue;
+		return array;
 		
 	},
 
