@@ -169,38 +169,39 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 		}
 
 	}
-	
+
 	// make a snapshot of the bones' rest position
-	
-	if (this.boneInverses == undefined)
-	{
+
+	if ( this.boneInverses == undefined ) {
+
 		this.boneInverses = [];
-		
-		for ( var b = 0; b < this.bones.length; b ++ )
-		{
+
+		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
 			var inverse = new THREE.Matrix4();
-			
+
 			inverse.getInverse( this.bones[ b ].skinMatrix );
-			
+
 			this.boneInverses.push( inverse );
+
 		}
+
 	}
 
 	// flatten bone matrices to array
 
-	for ( var b = 0; b < this.bones.length; b ++ )
-	{
-		var offset = new THREE.Matrix4();
-		
+	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
 		// compute the offset between the current and the original transform;
-		
+
 		//TODO: we could get rid of this multiplication step if the skinMatrix
 		// was already representing the offset; however, this requires some
 		// major changes to the animation system
-		
-		offset.multiply( this.bones[ b ].skinMatrix, this.boneInverses[ b ] );
 
-		offset.flattenToArrayOffset( this.boneMatrices, b * 16 );		
+		THREE.SkinnedMesh.offsetMatrix.multiply( this.bones[ b ].skinMatrix, this.boneInverses[ b ] );
+
+		THREE.SkinnedMesh.offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+
 	}
 
 	if ( this.useVertexTexture ) {
@@ -218,24 +219,28 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 THREE.SkinnedMesh.prototype.pose = function() {
 
 	this.updateMatrixWorld( true );
-		
+
 	for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
 		// normalize weights
 
 		var sw = this.geometry.skinWeights[ i ];
-		
+
 		var scale = 1.0 / sw.lengthManhattan();
-		
-		if ( scale != Infinity ) {
-		
+
+		if ( scale !== Infinity ) {
+
 			sw.multiplyScalar( scale );
-			
+
 		} else {
-		
+
 			sw.set( 1 ); // this will be normalized by the shader anyway
-			
+
 		}
+
 	}
+
 };
+
+THREE.SkinnedMesh.offsetMatrix = new THREE.Matrix4();
 
