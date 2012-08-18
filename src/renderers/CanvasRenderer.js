@@ -918,9 +918,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
 
-					// variables cannot be deleted in ES5 strict mode
-					//delete canvas;
-
 				}
 
 				var data = _imagedatas[ texture.id ];
@@ -992,10 +989,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			// http://mrdoob.com/blog/post/710
 
-			var c1r = ~~ ( color1.r * 255 ), c1g = ~~ ( color1.g * 255 ), c1b = ~~ ( color1.b * 255 ),
-			c2r = ~~ ( color2.r * 255 ), c2g = ~~ ( color2.g * 255 ), c2b = ~~ ( color2.b * 255 ),
-			c3r = ~~ ( color3.r * 255 ), c3g = ~~ ( color3.g * 255 ), c3b = ~~ ( color3.b * 255 ),
-			c4r = ~~ ( color4.r * 255 ), c4g = ~~ ( color4.g * 255 ), c4b = ~~ ( color4.b * 255 );
+			var c1r = ( color1.r * 255 ) | 0, c1g = ( color1.g * 255 ) | 0, c1b = ( color1.b * 255 ) | 0;
+			var c2r = ( color2.r * 255 ) | 0, c2g = ( color2.g * 255 ) | 0, c2b = ( color2.b * 255 ) | 0;
+			var c3r = ( color3.r * 255 ) | 0, c3g = ( color3.g * 255 ) | 0, c3b = ( color3.b * 255 ) | 0;
+			var c4r = ( color4.r * 255 ) | 0, c4g = ( color4.g * 255 ) | 0, c4b = ( color4.b * 255 ) | 0;
 
 			_pixelMapData[ 0 ] = c1r < 0 ? 0 : c1r > 255 ? 255 : c1r;
 			_pixelMapData[ 1 ] = c1g < 0 ? 0 : c1g > 255 ? 255 : c1g;
