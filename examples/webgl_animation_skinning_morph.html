@@ -34,7 +34,7 @@
 
 		<div id="info">
 		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - skinning + morphing
-		- knight by <a href="https://github.com/apendua">apendua</a>
+		- knight by <a href="http://vimeo.com/36113323">apendua</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -53,7 +53,7 @@
 			var camera, scene;
 			var renderer;
 
-			var mesh, geometry;
+			var mesh;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -77,22 +77,23 @@
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
-				scene.fog.color.setHSV( 0.6, 0.125, 1 );
+				scene.fog.color.setHSV( 0.6, 0, 1 );
 
 				scene.add( camera );
 
 				// GROUND
 
+				/*
 				var groundTexture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
 				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 				groundTexture.repeat.set( 16, 16 );
 				groundTexture.anisotropy = 4;
+				*/
 
-				var xm = new THREE.MeshPhongMaterial( { map: groundTexture, emissive: 0xbbbbbb, perPixel: true } );
+				var groundMaterial = new THREE.MeshPhongMaterial( { /*map: groundTexture,*/ emissive: 0xbbbbbb, perPixel: true } );
+				var planeGeometry = new THREE.PlaneGeometry( 16000, 16000 );
 
-				geometry = new THREE.PlaneGeometry( 16000, 16000 );
-
-				var ground = new THREE.Mesh( geometry, xm );
+				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, FLOOR, 0 );
 				ground.rotation.x = -Math.PI/2;
 				scene.add( ground );
