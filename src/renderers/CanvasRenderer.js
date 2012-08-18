@@ -202,7 +202,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( _enableLighting === true ) {
 
-			 calculateLights( _lights );
+			 calculateLights();
 
 		}
 
@@ -323,18 +323,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		//
 
-		function calculateLights( lights ) {
-
-			var l, ll, light, lightColor;
+		function calculateLights() {
 
 			_ambientLight.setRGB( 0, 0, 0 );
 			_directionalLights.setRGB( 0, 0, 0 );
 			_pointLights.setRGB( 0, 0, 0 );
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.AmbientLight ) {
 
@@ -364,20 +362,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function calculateLight( lights, position, normal, color ) {
+		function calculateLight( position, normal, color ) {
 
-			var l, ll, light, lightColor, lightPosition, amount;
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					lightPosition = light.matrixWorld.getPosition().normalize();
+					var lightPosition = light.matrixWorld.getPosition().normalize();
 
-					amount = normal.dot( lightPosition );
+					var amount = normal.dot( lightPosition );
 
 					if ( amount <= 0 ) continue;
 
@@ -389,9 +385,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else if ( light instanceof THREE.PointLight ) {
 
-					lightPosition = light.matrixWorld.getPosition();
+					var lightPosition = light.matrixWorld.getPosition();
 
-					amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
+					var amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
 
 					if ( amount <= 0 ) continue;
 
@@ -612,9 +608,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _ambientLight.b;
 
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -642,7 +638,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
 						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
 						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
@@ -729,10 +725,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _color4.b = _ambientLight.b;
 
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -766,7 +762,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
 						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
 						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
