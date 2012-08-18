@@ -165,7 +165,7 @@
 
 			showCameraHelper = document.getElementById('cameraHelper').checked;
 
-			cameraHelper.children[0].visible = showCameraHelper;
+			cameraHelper.visible = showCameraHelper;
 			cameraEye.visible = showCameraHelper;
 		}
 
@@ -217,23 +217,22 @@
 			addTube();
 
 			// Debug point
-			cameraEye = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
-					color: 0xdddddd
-			}));
+			cameraEye = new THREE.Mesh(
+				new THREE.SphereGeometry( 5 ),
+				new THREE.MeshBasicMaterial( { color: 0xdddddd } )
+			);
 
-			cameraHelper.children[0].visible = showCameraHelper;
+			cameraHelper.visible = showCameraHelper;
 			cameraEye.visible = showCameraHelper;
 
 			parent.add(cameraEye);
 
-			cameraHelper.scale.multiplyScalar(0.1);
+			cameraHelper.scale.multiplyScalar( 0.1 );
 			splineCamera.add(cameraHelper);
 			parent.add(splineCamera);
 
 			//
-			renderer = new THREE.WebGLRenderer({
-					antialias: true
-			});
+			renderer = new THREE.WebGLRenderer({ antialias: true } );
 			renderer.setSize(window.innerWidth, window.innerHeight);
 
 			container.appendChild(renderer.domElement);
@@ -308,10 +307,10 @@
 
 			if (event.touches.length == 1) {
 
-					event.preventDefault();
+				event.preventDefault();
 
-					mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
-					targetRotationOnMouseDown = targetRotation;
+				mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
+				targetRotationOnMouseDown = targetRotation;
 
 			}
 
@@ -321,10 +320,10 @@
 
 			if (event.touches.length == 1) {
 
-					event.preventDefault();
+				event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
+				mouseX = event.touches[0].pageX - windowHalfX;
+				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
 
 			}
 
