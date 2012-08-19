@@ -628,13 +628,13 @@ THREE.ShaderUtils = {
 					//
 
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
-					"vec4 wPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
 					//
 
-					"vWorldPosition = wPosition.xyz;",
+					"vWorldPosition = mPosition.xyz;",
 
 					// shadows
 
@@ -642,7 +642,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-							"vShadowCoord[ i ] = shadowMatrix[ i ] * wPosition;",
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 						"}",
 

@@ -1424,6 +1424,676 @@ THREE.Vector4.prototype = {
 
 };
 /**
+ * https://github.com/mrdoob/eventtarget.js/
+ */
+
+THREE.EventTarget = function () {
+
+	var listeners = {};
+
+	this.addEventListener = function ( type, listener ) {
+
+		if ( listeners[ type ] === undefined ) {
+
+			listeners[ type ] = [];
+
+		}
+
+		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
+
+			listeners[ type ].push( listener );
+
+		}
+
+	};
+
+	this.dispatchEvent = function ( event ) {
+
+		for ( var listener in listeners[ event.type ] ) {
+
+			listeners[ event.type ][ listener ]( event );
+
+		}
+
+	};
+
+	this.removeEventListener = function ( type, listener ) {
+
+		var index = listeners[ type ].indexOf( listener );
+
+		if ( index !== - 1 ) {
+
+			listeners[ type ].splice( index, 1 );
+
+		}
+
+	};
+
+};
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.Frustum = function ( ) {
+
+	this.planes = [
+
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4(),
+		new THREE.Vector4()
+
+	];
+
+};
+
+THREE.Frustum.prototype.setFromMatrix = function ( m ) {
+
+	var plane;
+	var planes = this.planes;
+
+	var me = m.elements;
+	var me0 = me[0], me1 = me[1], me2 = me[2], me3 = me[3];
+	var me4 = me[4], me5 = me[5], me6 = me[6], me7 = me[7];
+	var me8 = me[8], me9 = me[9], me10 = me[10], me11 = me[11];
+	var me12 = me[12], me13 = me[13], me14 = me[14], me15 = me[15];
+
+	planes[ 0 ].set( me3 - me0, me7 - me4, me11 - me8, me15 - me12 );
+	planes[ 1 ].set( me3 + me0, me7 + me4, me11 + me8, me15 + me12 );
+	planes[ 2 ].set( me3 + me1, me7 + me5, me11 + me9, me15 + me13 );
+	planes[ 3 ].set( me3 - me1, me7 - me5, me11 - me9, me15 - me13 );
+	planes[ 4 ].set( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
+	planes[ 5 ].set( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
+
+	for ( var i = 0; i < 6; i ++ ) {
+
+		plane = planes[ i ];
+		plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
+
+	}
+
+};
+
+THREE.Frustum.prototype.contains = function ( object ) {
+
+	var distance = 0.0;
+	var planes = this.planes;
+	var matrix = object.matrixWorld;
+	var me = matrix.elements;
+	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+
+	for ( var i = 0; i < 6; i ++ ) {
+
+		distance = planes[ i ].x * me[12] + planes[ i ].y * me[13] + planes[ i ].z * me[14] + planes[ i ].w;
+		if ( distance <= radius ) return false;
+
+	}
+
+	return true;
+
+};
+
+THREE.Frustum.__v1 = new THREE.Vector3();
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Ray = function ( origin, direction, near, far ) {
+
+	this.origin = origin || new THREE.Vector3();
+	this.direction = direction || new THREE.Vector3();
+	this.near = near || 0;
+	this.far = far || Infinity;
+
+	//
+
+	var a;// = new THREE.Vector3();
+	var b;// = new THREE.Vector3();
+	var c;// = new THREE.Vector3();
+	var d;// = new THREE.Vector3();
+
+	var originCopy = new THREE.Vector3();
+//	var directionCopy = new THREE.Vector3();
+	
+	var localOriginCopy = new THREE.Vector3();
+	var localDirectionCopy = new THREE.Vector3();
+
+
+	var vector = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+	var intersectPoint = new THREE.Vector3();
+	
+	
+	var inverseMatrix = new THREE.Matrix4();
+
+	var descSort = function ( a, b ) {
+
+			return a.distance - b.distance;
+
+	};
+
+	//
+
+	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
+	var dot, intersect, distance;
+
+	var distanceFromIntersection = function ( origin, direction, position ) {
+
+		v0.sub( position, origin );
+		dot = v0.dot( direction );
+
+		intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
+		distance = position.distanceTo( intersect );
+
+		return distance;
+
+	}
+
+	// http://www.blackpawn.com/texts/pointinpoly/default.html
+
+	var dot00, dot01, dot02, dot11, dot12, invDenom, u, v;
+
+	var pointInFace3 = function ( p, a, b, c ) {
+
+		v0.sub( c, a );
+		v1.sub( b, a );
+		v2.sub( p, a );
+
+		dot00 = v0.dot( v0 );
+		dot01 = v0.dot( v1 );
+		dot02 = v0.dot( v2 );
+		dot11 = v1.dot( v1 );
+		dot12 = v1.dot( v2 );
+
+		invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
+		u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
+
+	}
+
+	//
+
+	var precision = 0.0001;
+
+	this.setPrecision = function ( value ) {
+
+		precision = value;
+
+	};
+
+	this.intersectObject = function ( object, recursive ) {
+
+		var intersect, intersects = [];
+
+		if ( recursive === true ) {
+
+			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+				Array.prototype.push.apply( intersects, this.intersectObject( object.children[ i ], recursive ) );
+
+			}
+
+		}
+
+		if ( object instanceof THREE.Particle ) {
+
+			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+
+			if ( distance > object.scale.x ) {
+
+				return [];
+
+			}
+
+			intersect = {
+
+				distance: distance,
+				point: object.position,
+				face: null,
+				object: object
+
+			};
+
+			intersects.push( intersect );
+
+		} else if ( object instanceof THREE.Mesh ) {
+
+			// Checking boundingSphere
+
+			//var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
+			var scaledRadius = object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis();
+
+			// Checking distance to ray
+
+			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+
+			if ( distance > scaledRadius) {
+
+				return intersects;
+
+			}
+
+			// Checking faces
+
+			var f, fl, face, dot, scalar,
+			geometry = object.geometry,
+			vertices = geometry.vertices,
+			objMatrix, geometryMaterials,
+			isFaceMaterial, material, side;
+
+			geometryMaterials = object.geometry.materials;
+			isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+			side = object.material.side;
+
+			object.matrixRotationWorld.extractRotation( object.matrixWorld );
+			
+			originCopy.copy( this.origin );
+			//directionCopy.copy( this.direction );
+
+			objMatrix = object.matrixWorld;
+			inverseMatrix.getInverse(objMatrix);
+			
+			localOriginCopy.copy(originCopy);
+			inverseMatrix.multiplyVector3(localOriginCopy);
+			
+			localDirectionCopy.copy(this.direction);
+			inverseMatrix.rotateAxis(localDirectionCopy).normalize();
+
+			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+
+				face = geometry.faces[ f ];
+
+				material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
+				if ( material === undefined ) continue;
+				side = material.side;
+
+				vector.sub( face.centroid, localOriginCopy );
+				normal = face.normal;
+				dot = localDirectionCopy.dot( normal );
+
+
+				// bail if ray and plane are parallel
+
+				if ( Math.abs( dot ) < precision ) continue;
+
+				// calc distance to plane
+
+				scalar = normal.dot( vector ) / dot;
+
+				// if negative distance, then plane is behind ray
+
+				if ( scalar < 0 ) continue;
+
+				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? dot < 0 : dot > 0 ) ) {
+
+					intersectPoint.add( localOriginCopy, localDirectionCopy.multiplyScalar( scalar ) );
+
+					if ( face instanceof THREE.Face3 ) {
+
+						a = vertices[ face.a ];
+						b = vertices[ face.b ];
+						c = vertices[ face.c ];
+
+						if ( pointInFace3( intersectPoint, a, b, c ) ) {
+
+							var point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
+							distance = originCopy.distanceTo( point);
+							
+							if ( distance < this.near ) continue;
+							if ( distance > this.far ) continue; 
+							
+							
+							intersect = {
+
+								distance: distance,
+								point: point,
+								face: face,
+								faceIndex: f,
+								object: object
+
+							};
+
+							intersects.push( intersect );
+
+						}
+
+					} else if ( face instanceof THREE.Face4 ) {
+
+						a = vertices[ face.a ];
+						b = vertices[ face.b ];
+						c = vertices[ face.c ];
+						d = vertices[ face.d ];
+
+						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
+
+							var point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
+							distance = originCopy.distanceTo( point);
+							
+							if ( distance < this.near ) continue;
+							if ( distance > this.far ) continue; 
+							
+							intersect = {
+
+								distance: distance,
+								point: point,
+								face: face,
+								faceIndex: f,
+								object: object
+
+							};
+
+							intersects.push( intersect );
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		intersects.sort( descSort );
+
+		return intersects;
+
+	};
+
+	this.intersectObjects = function ( objects, recursive ) {
+
+		var intersects = [];
+
+		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ], recursive ) );
+
+		}
+
+		intersects.sort( descSort );
+
+		return intersects;
+
+	};
+
+};
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Rectangle = function () {
+
+	var _left = 0;
+	var _top = 0;
+	var _right = 0;
+	var _bottom = 0;
+	var _width = 0;
+	var _height = 0;
+	var _isEmpty = true;
+
+	function resize() {
+
+		_width = _right - _left;
+		_height = _bottom - _top;
+
+	}
+
+	this.getX = function () {
+
+		return _left;
+
+	};
+
+	this.getY = function () {
+
+		return _top;
+
+	};
+
+	this.getWidth = function () {
+
+		return _width;
+
+	};
+
+	this.getHeight = function () {
+
+		return _height;
+
+	};
+
+	this.getLeft = function() {
+
+		return _left;
+
+	};
+
+	this.getTop = function() {
+
+		return _top;
+
+	};
+
+	this.getRight = function() {
+
+		return _right;
+
+	};
+
+	this.getBottom = function() {
+
+		return _bottom;
+
+	};
+
+	this.set = function ( left, top, right, bottom ) {
+
+		_isEmpty = false;
+
+		_left = left; _top = top;
+		_right = right; _bottom = bottom;
+
+		resize();
+
+	};
+
+	this.addPoint = function ( x, y ) {
+
+		if ( _isEmpty === true ) {
+
+			_isEmpty = false;
+			_left = x; _top = y;
+			_right = x; _bottom = y;
+
+			resize();
+
+		} else {
+
+			_left = _left < x ? _left : x; // Math.min( _left, x );
+			_top = _top < y ? _top : y; // Math.min( _top, y );
+			_right = _right > x ? _right : x; // Math.max( _right, x );
+			_bottom = _bottom > y ? _bottom : y; // Math.max( _bottom, y );
+
+			resize();
+		}
+
+	};
+
+	this.add3Points = function ( x1, y1, x2, y2, x3, y3 ) {
+
+		if ( _isEmpty === true ) {
+
+			_isEmpty = false;
+			_left = x1 < x2 ? ( x1 < x3 ? x1 : x3 ) : ( x2 < x3 ? x2 : x3 );
+			_top = y1 < y2 ? ( y1 < y3 ? y1 : y3 ) : ( y2 < y3 ? y2 : y3 );
+			_right = x1 > x2 ? ( x1 > x3 ? x1 : x3 ) : ( x2 > x3 ? x2 : x3 );
+			_bottom = y1 > y2 ? ( y1 > y3 ? y1 : y3 ) : ( y2 > y3 ? y2 : y3 );
+
+			resize();
+
+		} else {
+
+			_left = x1 < x2 ? ( x1 < x3 ? ( x1 < _left ? x1 : _left ) : ( x3 < _left ? x3 : _left ) ) : ( x2 < x3 ? ( x2 < _left ? x2 : _left ) : ( x3 < _left ? x3 : _left ) );
+			_top = y1 < y2 ? ( y1 < y3 ? ( y1 < _top ? y1 : _top ) : ( y3 < _top ? y3 : _top ) ) : ( y2 < y3 ? ( y2 < _top ? y2 : _top ) : ( y3 < _top ? y3 : _top ) );
+			_right = x1 > x2 ? ( x1 > x3 ? ( x1 > _right ? x1 : _right ) : ( x3 > _right ? x3 : _right ) ) : ( x2 > x3 ? ( x2 > _right ? x2 : _right ) : ( x3 > _right ? x3 : _right ) );
+			_bottom = y1 > y2 ? ( y1 > y3 ? ( y1 > _bottom ? y1 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) ) : ( y2 > y3 ? ( y2 > _bottom ? y2 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) );
+
+			resize();
+
+		};
+
+	};
+
+	this.addRectangle = function ( r ) {
+
+		if ( _isEmpty === true ) {
+
+			_isEmpty = false;
+			_left = r.getLeft(); _top = r.getTop();
+			_right = r.getRight(); _bottom = r.getBottom();
+
+			resize();
+
+		} else {
+
+			_left = _left < r.getLeft() ? _left : r.getLeft(); // Math.min(_left, r.getLeft() );
+			_top = _top < r.getTop() ? _top : r.getTop(); // Math.min(_top, r.getTop() );
+			_right = _right > r.getRight() ? _right : r.getRight(); // Math.max(_right, r.getRight() );
+			_bottom = _bottom > r.getBottom() ? _bottom : r.getBottom(); // Math.max(_bottom, r.getBottom() );
+
+			resize();
+
+		}
+
+	};
+
+	this.inflate = function ( v ) {
+
+		_left -= v; _top -= v;
+		_right += v; _bottom += v;
+
+		resize();
+
+	};
+
+	this.minSelf = function ( r ) {
+
+		_left = _left > r.getLeft() ? _left : r.getLeft(); // Math.max( _left, r.getLeft() );
+		_top = _top > r.getTop() ? _top : r.getTop(); // Math.max( _top, r.getTop() );
+		_right = _right < r.getRight() ? _right : r.getRight(); // Math.min( _right, r.getRight() );
+		_bottom = _bottom < r.getBottom() ? _bottom : r.getBottom(); // Math.min( _bottom, r.getBottom() );
+
+		resize();
+
+	};
+
+	this.intersects = function ( r ) {
+
+		// http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/
+
+		if ( _right < r.getLeft() ) return false;
+		if ( _left > r.getRight() ) return false;
+		if ( _bottom < r.getTop() ) return false;
+		if ( _top > r.getBottom() ) return false;
+
+		return true;
+
+	};
+
+	this.empty = function () {
+
+		_isEmpty = true;
+
+		_left = 0; _top = 0;
+		_right = 0; _bottom = 0;
+
+		resize();
+
+	};
+
+	this.isEmpty = function () {
+
+		return _isEmpty;
+
+	};
+
+};
+/**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.Math = {
+
+	// Clamp value to range <a, b>
+
+	clamp: function ( x, a, b ) {
+
+		return ( x < a ) ? a : ( ( x > b ) ? b : x );
+
+	},
+
+	// Clamp value to range <a, inf)
+
+	clampBottom: function ( x, a ) {
+
+		return x < a ? a : x;
+
+	},
+
+	// Linear mapping from range <a1, a2> to range <b1, b2>
+
+	mapLinear: function ( x, a1, a2, b1, b2 ) {
+
+		return b1 + ( x - a1 ) * ( b2 - b1 ) / ( a2 - a1 );
+
+	},
+
+	// Random float from <0, 1> with 16 bits of randomness
+	// (standard Math.random() creates repetitive patterns when applied over larger space)
+
+	random16: function () {
+
+		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
+
+	},
+
+	// Random integer from <low, high> interval
+
+	randInt: function ( low, high ) {
+
+		return low + Math.floor( Math.random() * ( high - low + 1 ) );
+
+	},
+
+	// Random float from <low, high> interval
+
+	randFloat: function ( low, high ) {
+
+		return low + Math.random() * ( high - low );
+
+	},
+
+	// Random float from <-range/2, range/2> interval
+
+	randFloatSpread: function ( range ) {
+
+		return range * ( 0.5 - Math.random() );
+
+	},
+
+	sign: function ( x ) {
+
+		return ( x < 0 ) ? -1 : ( ( x > 0 ) ? 1 : 0 );
+
+	}
+
+};
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -2578,659 +3248,6 @@ THREE.Matrix4.__v3 = new THREE.Vector3();
 
 THREE.Matrix4.__m1 = new THREE.Matrix4();
 THREE.Matrix4.__m2 = new THREE.Matrix4();
-/**
- * https://github.com/mrdoob/eventtarget.js/
- */
-
-THREE.EventTarget = function () {
-
-	var listeners = {};
-
-	this.addEventListener = function ( type, listener ) {
-
-		if ( listeners[ type ] === undefined ) {
-
-			listeners[ type ] = [];
-
-		}
-
-		if ( listeners[ type ].indexOf( listener ) === - 1 ) {
-
-			listeners[ type ].push( listener );
-
-		}
-
-	};
-
-	this.dispatchEvent = function ( event ) {
-
-		for ( var listener in listeners[ event.type ] ) {
-
-			listeners[ event.type ][ listener ]( event );
-
-		}
-
-	};
-
-	this.removeEventListener = function ( type, listener ) {
-
-		var index = listeners[ type ].indexOf( listener );
-
-		if ( index !== - 1 ) {
-
-			listeners[ type ].splice( index, 1 );
-
-		}
-
-	};
-
-};
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.Frustum = function ( ) {
-
-	this.planes = [
-
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4()
-
-	];
-
-};
-
-THREE.Frustum.prototype.setFromMatrix = function ( m ) {
-
-	var plane;
-	var planes = this.planes;
-
-	var me = m.elements;
-	var me0 = me[0], me1 = me[1], me2 = me[2], me3 = me[3];
-	var me4 = me[4], me5 = me[5], me6 = me[6], me7 = me[7];
-	var me8 = me[8], me9 = me[9], me10 = me[10], me11 = me[11];
-	var me12 = me[12], me13 = me[13], me14 = me[14], me15 = me[15];
-
-	planes[ 0 ].set( me3 - me0, me7 - me4, me11 - me8, me15 - me12 );
-	planes[ 1 ].set( me3 + me0, me7 + me4, me11 + me8, me15 + me12 );
-	planes[ 2 ].set( me3 + me1, me7 + me5, me11 + me9, me15 + me13 );
-	planes[ 3 ].set( me3 - me1, me7 - me5, me11 - me9, me15 - me13 );
-	planes[ 4 ].set( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
-	planes[ 5 ].set( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
-
-	for ( var i = 0; i < 6; i ++ ) {
-
-		plane = planes[ i ];
-		plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
-
-	}
-
-};
-
-THREE.Frustum.prototype.contains = function ( object ) {
-
-	var distance = 0.0;
-	var planes = this.planes;
-	var matrix = object.matrixWorld;
-	var me = matrix.elements;
-	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
-
-	for ( var i = 0; i < 6; i ++ ) {
-
-		distance = planes[ i ].x * me[12] + planes[ i ].y * me[13] + planes[ i ].z * me[14] + planes[ i ].w;
-		if ( distance <= radius ) return false;
-
-	}
-
-	return true;
-
-};
-
-THREE.Frustum.__v1 = new THREE.Vector3();
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-(function(THREE){
-
-	THREE.Ray = function ( origin, direction, near, far ) {
-
-		this.origin = origin || new THREE.Vector3();
-		this.direction = direction || new THREE.Vector3();
-		this.near = near || 0;
-		this.far = far || Infinity;
-
-	};
-
-	var originCopy = new THREE.Vector3();
-
-	var localOriginCopy = new THREE.Vector3();
-	var localDirectionCopy = new THREE.Vector3();
-
-	var vector = new THREE.Vector3();
-	var normal = new THREE.Vector3();
-	var intersectPoint = new THREE.Vector3();
-
-	var inverseMatrix = new THREE.Matrix4();
-
-	var descSort = function ( a, b ) {
-
-		return a.distance - b.distance;
-
-	};
-
-	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-
-	var distanceFromIntersection = function ( origin, direction, position ) {
-
-		v0.sub( position, origin );
-
-		var dot = v0.dot( direction );
-
-		var intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
-		var distance = position.distanceTo( intersect );
-
-		return distance;
-
-	};
-
-	// http://www.blackpawn.com/texts/pointinpoly/default.html
-
-	var pointInFace3 = function ( p, a, b, c ) {
-
-		v0.sub( c, a );
-		v1.sub( b, a );
-		v2.sub( p, a );
-
-		var dot00 = v0.dot( v0 );
-		var dot01 = v0.dot( v1 );
-		var dot02 = v0.dot( v2 );
-		var dot11 = v1.dot( v1 );
-		var dot12 = v1.dot( v2 );
-
-		var invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
-		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
-
-	};
-
-	//
-
-	THREE.Ray.prototype.precision = 0.0001;
-
-	THREE.Ray.prototype.intersectObject = function ( object, recursive ) {
-
-		var intersect, intersects = [], distance;
-
-		if ( recursive === true ) {
-
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-
-				Array.prototype.push.apply( intersects, this.intersectObject( object.children[ i ], recursive ) );
-
-			}
-
-		}
-
-		if ( object instanceof THREE.Particle ) {
-
-			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
-
-			if ( distance > object.scale.x ) {
-
-				return [];
-
-			}
-
-			intersect = {
-
-				distance: distance,
-				point: object.position,
-				face: null,
-				object: object
-
-			};
-
-			intersects.push( intersect );
-
-		} else if ( object instanceof THREE.Mesh ) {
-
-			// Checking boundingSphere
-
-			//var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
-			var scaledRadius = object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis();
-
-			// Checking distance to ray
-
-			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
-
-			if ( distance > scaledRadius) {
-
-				return intersects;
-
-			}
-
-			// Checking faces
-
-			var f, fl, face, dot, scalar,
-			geometry = object.geometry,
-			vertices = geometry.vertices,
-			objMatrix, geometryMaterials,
-			isFaceMaterial, material, side, point;
-
-			geometryMaterials = object.geometry.materials;
-			isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-			side = object.material.side;
-			var a, b, c, d;
-			var precision = this.precision;
-
-			object.matrixRotationWorld.extractRotation( object.matrixWorld );
-
-			originCopy.copy( this.origin );
-			//directionCopy.copy( this.direction );
-
-			objMatrix = object.matrixWorld;
-			inverseMatrix.getInverse(objMatrix);
-
-			localOriginCopy.copy(originCopy);
-			inverseMatrix.multiplyVector3(localOriginCopy);
-
-			localDirectionCopy.copy(this.direction);
-			inverseMatrix.rotateAxis(localDirectionCopy).normalize();
-
-			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
-
-				face = geometry.faces[ f ];
-
-				material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
-				if ( material === undefined ) continue;
-				side = material.side;
-
-				vector.sub( face.centroid, localOriginCopy );
-				normal = face.normal;
-				dot = localDirectionCopy.dot( normal );
-
-				// bail if ray and plane are parallel
-
-				if ( Math.abs( dot ) < precision ) continue;
-
-				// calc distance to plane
-
-				scalar = normal.dot( vector ) / dot;
-
-				// if negative distance, then plane is behind ray
-
-				if ( scalar < 0 ) continue;
-
-				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? dot < 0 : dot > 0 ) ) {
-
-					intersectPoint.add( localOriginCopy, localDirectionCopy.multiplyScalar( scalar ) );
-
-					if ( face instanceof THREE.Face3 ) {
-
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
-
-						if ( pointInFace3( intersectPoint, a, b, c ) ) {
-
-							point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
-							distance = originCopy.distanceTo( point);
-
-							if ( distance < this.near ) continue;
-							if ( distance > this.far ) continue; 
-
-							intersect = {
-
-								distance: distance,
-								point: point,
-								face: face,
-								faceIndex: f,
-								object: object
-
-							};
-
-							intersects.push( intersect );
-
-						}
-
-					} else if ( face instanceof THREE.Face4 ) {
-
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
-						d = vertices[ face.d ];
-
-						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
-
-							point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
-							distance = originCopy.distanceTo( point);
-
-							if ( distance < this.near ) continue;
-							if ( distance > this.far ) continue; 
-
-							intersect = {
-
-								distance: distance,
-								point: point,
-								face: face,
-								faceIndex: f,
-								object: object
-
-							};
-
-							intersects.push( intersect );
-
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		intersects.sort( descSort );
-
-		return intersects;
-
-	};
-
-	THREE.Ray.prototype.intersectObjects = function ( objects, recursive ) {
-
-		var intersects = [];
-
-		for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ], recursive ) );
-
-		}
-
-		intersects.sort( descSort );
-
-		return intersects;
-
-	};
-
-}(THREE));
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Rectangle = function () {
-
-	var _left = 0;
-	var _top = 0;
-	var _right = 0;
-	var _bottom = 0;
-	var _width = 0;
-	var _height = 0;
-	var _isEmpty = true;
-
-	function resize() {
-
-		_width = _right - _left;
-		_height = _bottom - _top;
-
-	}
-
-	this.getX = function () {
-
-		return _left;
-
-	};
-
-	this.getY = function () {
-
-		return _top;
-
-	};
-
-	this.getWidth = function () {
-
-		return _width;
-
-	};
-
-	this.getHeight = function () {
-
-		return _height;
-
-	};
-
-	this.getLeft = function() {
-
-		return _left;
-
-	};
-
-	this.getTop = function() {
-
-		return _top;
-
-	};
-
-	this.getRight = function() {
-
-		return _right;
-
-	};
-
-	this.getBottom = function() {
-
-		return _bottom;
-
-	};
-
-	this.set = function ( left, top, right, bottom ) {
-
-		_isEmpty = false;
-
-		_left = left; _top = top;
-		_right = right; _bottom = bottom;
-
-		resize();
-
-	};
-
-	this.addPoint = function ( x, y ) {
-
-		if ( _isEmpty === true ) {
-
-			_isEmpty = false;
-			_left = x; _top = y;
-			_right = x; _bottom = y;
-
-			resize();
-
-		} else {
-
-			_left = _left < x ? _left : x; // Math.min( _left, x );
-			_top = _top < y ? _top : y; // Math.min( _top, y );
-			_right = _right > x ? _right : x; // Math.max( _right, x );
-			_bottom = _bottom > y ? _bottom : y; // Math.max( _bottom, y );
-
-			resize();
-		}
-
-	};
-
-	this.add3Points = function ( x1, y1, x2, y2, x3, y3 ) {
-
-		if ( _isEmpty === true ) {
-
-			_isEmpty = false;
-			_left = x1 < x2 ? ( x1 < x3 ? x1 : x3 ) : ( x2 < x3 ? x2 : x3 );
-			_top = y1 < y2 ? ( y1 < y3 ? y1 : y3 ) : ( y2 < y3 ? y2 : y3 );
-			_right = x1 > x2 ? ( x1 > x3 ? x1 : x3 ) : ( x2 > x3 ? x2 : x3 );
-			_bottom = y1 > y2 ? ( y1 > y3 ? y1 : y3 ) : ( y2 > y3 ? y2 : y3 );
-
-			resize();
-
-		} else {
-
-			_left = x1 < x2 ? ( x1 < x3 ? ( x1 < _left ? x1 : _left ) : ( x3 < _left ? x3 : _left ) ) : ( x2 < x3 ? ( x2 < _left ? x2 : _left ) : ( x3 < _left ? x3 : _left ) );
-			_top = y1 < y2 ? ( y1 < y3 ? ( y1 < _top ? y1 : _top ) : ( y3 < _top ? y3 : _top ) ) : ( y2 < y3 ? ( y2 < _top ? y2 : _top ) : ( y3 < _top ? y3 : _top ) );
-			_right = x1 > x2 ? ( x1 > x3 ? ( x1 > _right ? x1 : _right ) : ( x3 > _right ? x3 : _right ) ) : ( x2 > x3 ? ( x2 > _right ? x2 : _right ) : ( x3 > _right ? x3 : _right ) );
-			_bottom = y1 > y2 ? ( y1 > y3 ? ( y1 > _bottom ? y1 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) ) : ( y2 > y3 ? ( y2 > _bottom ? y2 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) );
-
-			resize();
-
-		};
-
-	};
-
-	this.addRectangle = function ( r ) {
-
-		if ( _isEmpty === true ) {
-
-			_isEmpty = false;
-			_left = r.getLeft(); _top = r.getTop();
-			_right = r.getRight(); _bottom = r.getBottom();
-
-			resize();
-
-		} else {
-
-			_left = _left < r.getLeft() ? _left : r.getLeft(); // Math.min(_left, r.getLeft() );
-			_top = _top < r.getTop() ? _top : r.getTop(); // Math.min(_top, r.getTop() );
-			_right = _right > r.getRight() ? _right : r.getRight(); // Math.max(_right, r.getRight() );
-			_bottom = _bottom > r.getBottom() ? _bottom : r.getBottom(); // Math.max(_bottom, r.getBottom() );
-
-			resize();
-
-		}
-
-	};
-
-	this.inflate = function ( v ) {
-
-		_left -= v; _top -= v;
-		_right += v; _bottom += v;
-
-		resize();
-
-	};
-
-	this.minSelf = function ( r ) {
-
-		_left = _left > r.getLeft() ? _left : r.getLeft(); // Math.max( _left, r.getLeft() );
-		_top = _top > r.getTop() ? _top : r.getTop(); // Math.max( _top, r.getTop() );
-		_right = _right < r.getRight() ? _right : r.getRight(); // Math.min( _right, r.getRight() );
-		_bottom = _bottom < r.getBottom() ? _bottom : r.getBottom(); // Math.min( _bottom, r.getBottom() );
-
-		resize();
-
-	};
-
-	this.intersects = function ( r ) {
-
-		// http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/
-
-		if ( _right < r.getLeft() ) return false;
-		if ( _left > r.getRight() ) return false;
-		if ( _bottom < r.getTop() ) return false;
-		if ( _top > r.getBottom() ) return false;
-
-		return true;
-
-	};
-
-	this.empty = function () {
-
-		_isEmpty = true;
-
-		_left = 0; _top = 0;
-		_right = 0; _bottom = 0;
-
-		resize();
-
-	};
-
-	this.isEmpty = function () {
-
-		return _isEmpty;
-
-	};
-
-};
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.Math = {
-
-	// Clamp value to range <a, b>
-
-	clamp: function ( x, a, b ) {
-
-		return ( x < a ) ? a : ( ( x > b ) ? b : x );
-
-	},
-
-	// Clamp value to range <a, inf)
-
-	clampBottom: function ( x, a ) {
-
-		return x < a ? a : x;
-
-	},
-
-	// Linear mapping from range <a1, a2> to range <b1, b2>
-
-	mapLinear: function ( x, a1, a2, b1, b2 ) {
-
-		return b1 + ( x - a1 ) * ( b2 - b1 ) / ( a2 - a1 );
-
-	},
-
-	// Random float from <0, 1> with 16 bits of randomness
-	// (standard Math.random() creates repetitive patterns when applied over larger space)
-
-	random16: function () {
-
-		return ( 65280 * Math.random() + 255 * Math.random() ) / 65535;
-
-	},
-
-	// Random integer from <low, high> interval
-
-	randInt: function ( low, high ) {
-
-		return low + Math.floor( Math.random() * ( high - low + 1 ) );
-
-	},
-
-	// Random float from <low, high> interval
-
-	randFloat: function ( low, high ) {
-
-		return low + Math.random() * ( high - low );
-
-	},
-
-	// Random float from <-range/2, range/2> interval
-
-	randFloatSpread: function ( range ) {
-
-		return range * ( 0.5 - Math.random() );
-
-	},
-
-	sign: function ( x ) {
-
-		return ( x < 0 ) ? -1 : ( ( x > 0 ) ? 1 : 0 );
-
-	}
-
-};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -12637,17 +12654,37 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	worldpos_vertex : [
+
+		"#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )",
+
+			"#ifdef USE_SKINNING",
+
+				"vec4 mPosition = modelMatrix * skinned;",
+
+			"#endif",
+
+			"#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( morphed, 1.0 );",
+
+			"#endif",
+
+			"#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+
+			"#endif",
+
+		"#endif"
+
+	].join("\n"),
+
 	envmap_vertex : [
-
-		"#ifdef USE_ENVMAP",
-
-			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-		"#endif",
 
 		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
 
-			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
+			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;",
 
 			"if ( useRefract ) {",
 
@@ -13688,35 +13725,33 @@ THREE.ShaderChunk = {
 
 			"morphed += position;",
 
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
 		"#endif"
 
 	].join("\n"),
 
 	default_vertex : [
 
+		"vec4 mvPosition;",
+
 		"#ifdef USE_SKINNING",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * skinned;",
+			"mvPosition = modelViewMatrix * skinned;",
 
 		"#endif",
 
-		"#ifndef USE_SKINNING",
-		"#ifdef USE_MORPHTARGETS",
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
-		"#endif",
-		"#endif",
-
-		"#ifndef USE_MORPHTARGETS",
-		"#ifndef USE_SKINNING",
-
-			"gl_Position = projectionMatrix * mvPosition;",
+			"mvPosition = modelViewMatrix * vec4( morphed, 1.0 );",
 
 		"#endif",
-		"#endif"
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )",
+
+			"mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+		"#endif",
+
+		"gl_Position = projectionMatrix * mvPosition;",
 
 	].join("\n"),
 
@@ -13760,31 +13795,27 @@ THREE.ShaderChunk = {
 
 	defaultnormal_vertex: [
 
-		"vec3 transformedNormal;",
+		"vec3 objectNormal;",
 
 		"#ifdef USE_SKINNING",
 
-			"transformedNormal = skinnedNormal.xyz;",
+			"objectNormal = skinnedNormal.xyz;",
 
 		"#endif",
 
-		"#ifndef USE_SKINNING",
-		"#ifdef USE_MORPHNORMALS",
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )",
 
-			"transformedNormal = morphedNormal;",
-
-		"#endif",
-		"#endif",
-
-		"#ifndef USE_MORPHNORMALS",
-		"#ifndef USE_SKINNING",
-
-			"transformedNormal = normal;",
+			"objectNormal = morphedNormal;",
 
 		"#endif",
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )",
+
+			"objectNormal = normal;",
+
 		"#endif",
 
-		"transformedNormal = normalMatrix * transformedNormal;",
+		"vec3 transformedNormal = normalMatrix * objectNormal;",
 
 	].join("\n"),
 
@@ -14004,28 +14035,9 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SHADOWMAP",
 
-			"vec4 transformedPosition;",
-
-			"#ifdef USE_SKINNING",
-
-				"transformedPosition = modelMatrix * skinned;",
-
-			"#else",
-
-			"#ifdef USE_MORPHTARGETS",
-
-				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
-
-			"#else",
-
-				"transformedPosition = modelMatrix * vec4( position, 1.0 );",
-
-			"#endif",
-			"#endif",
-
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-				"vShadowCoord[ i ] = shadowMatrix[ i ] * transformedPosition;",
+				"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 			"}",
 
@@ -14312,16 +14324,25 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
+
+				"#ifdef USE_ENVMAP",
+
+				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
+				THREE.ShaderChunk[ "skinnormal_vertex" ],
+				THREE.ShaderChunk[ "defaultnormal_vertex" ],
+
+				"#endif",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14382,6 +14403,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define LAMBERT",
+
 			"varying vec3 vLightFront;",
 
 			"#ifdef DOUBLE_SIDED",
@@ -14401,11 +14424,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
@@ -14413,16 +14433,13 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14510,6 +14527,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define PHONG",
+
 			"varying vec3 vViewPosition;",
 			"varying vec3 vNormal;",
 
@@ -14524,20 +14543,9 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
-
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				"vViewPosition = -mvPosition.xyz;",
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
@@ -14546,10 +14554,15 @@ THREE.ShaderLib = {
 
 				"vNormal = transformedNormal;",
 
-				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				"vViewPosition = -mvPosition.xyz;",
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14632,6 +14645,7 @@ THREE.ShaderLib = {
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
+				THREE.ShaderChunk[ "worldpos_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14682,8 +14696,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 
 			"void main() {",
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
@@ -23797,13 +23809,13 @@ THREE.ShaderUtils = {
 					//
 
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
-					"vec4 wPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
 					//
 
-					"vWorldPosition = wPosition.xyz;",
+					"vWorldPosition = mPosition.xyz;",
 
 					// shadows
 
@@ -23811,7 +23823,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-							"vShadowCoord[ i ] = shadowMatrix[ i ] * wPosition;",
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 						"}",
 
@@ -32319,26 +32331,22 @@ THREE.ArrowHelper.prototype.setColor = function ( hex ) {
 
 THREE.CameraHelper = function ( camera ) {
 
-	THREE.Line.call( this );
+	THREE.Object3D.call( this );
 
-	var scope = this;
+	var _this = this;
 
-	this.geometry = new THREE.Geometry();
-	this.material = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } );
-	this.type = THREE.LinePieces;
-
-	this.matrixWorld = camera.matrixWorld;
-	this.matrixAutoUpdate = false;
+	this.lineGeometry = new THREE.Geometry();
+	this.lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } );
 
 	this.pointMap = {};
 
 	// colors
 
-	var hexFrustum = 0xffaa00;
-	var hexCone = 0xff0000;
-	var hexUp = 0x00aaff;
-	var hexTarget = 0xffffff;
-	var hexCross = 0x333333;
+	var hexFrustum = 0xffaa00,
+	hexCone	   	   = 0xff0000,
+	hexUp	   	   = 0x00aaff,
+	hexTarget  	   = 0xffffff,
+	hexCross   	   = 0x333333;
 
 	// near
 
@@ -32398,31 +32406,36 @@ THREE.CameraHelper = function ( camera ) {
 
 	function addPoint( id, hex ) {
 
-		scope.geometry.vertices.push( new THREE.Vector3() );
-		scope.geometry.colors.push( new THREE.Color( hex ) );
+		_this.lineGeometry.vertices.push( new THREE.Vector3() );
+		_this.lineGeometry.colors.push( new THREE.Color( hex ) );
 
-		if ( scope.pointMap[ id ] === undefined ) scope.pointMap[ id ] = [];
-
-		scope.pointMap[ id ].push( scope.geometry.vertices.length - 1 );
+		if ( _this.pointMap[ id ] === undefined ) _this.pointMap[ id ] = [];
+		_this.pointMap[ id ].push( _this.lineGeometry.vertices.length - 1 );
 
 	}
 
 	this.update( camera );
 
+	this.lines = new THREE.Line( this.lineGeometry, this.lineMaterial, THREE.LinePieces );
+	this.add( this.lines );
+
 };
 
-THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.CameraHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.CameraHelper.prototype.update = function () {
 
-	var scope = this;
+	var camera = this.camera;
 
-	var w = 1, h = 1;
+	var w = 1;
+	var h = 1;
+
+	var _this = this;
 
 	// we need just camera projection matrix
 	// world matrix must be identity
 
-	THREE.CameraHelper.__c.projectionMatrix.copy( this.camera.projectionMatrix );
+	THREE.CameraHelper.__c.projectionMatrix.copy( camera.projectionMatrix );
 
 	// center / target
 
@@ -32466,13 +32479,14 @@ THREE.CameraHelper.prototype.update = function () {
 		THREE.CameraHelper.__v.set( x, y, z );
 		THREE.CameraHelper.__projector.unprojectVector( THREE.CameraHelper.__v, THREE.CameraHelper.__c );
 
-		var points = scope.pointMap[ point ];
+		var points = _this.pointMap[ point ];
 
 		if ( points !== undefined ) {
 
 			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-				scope.geometry.vertices[ points[ i ] ].copy( THREE.CameraHelper.__v );
+				var j = points[ i ];
+				_this.lineGeometry.vertices[ j ].copy( THREE.CameraHelper.__v );
 
 			}
 
@@ -32480,7 +32494,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 	}
 
-	this.geometry.verticesNeedUpdate = true;
+	this.lineGeometry.verticesNeedUpdate = true;
 
 };
 

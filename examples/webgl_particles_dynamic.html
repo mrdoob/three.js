@@ -89,6 +89,8 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
 
+				camera.lookAt( scene.position );
+
 				//
 
 				aloader = new THREE.JSONLoader( );

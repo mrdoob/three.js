@@ -149,17 +149,37 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	worldpos_vertex : [
+
+		"#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )",
+
+			"#ifdef USE_SKINNING",
+
+				"vec4 mPosition = modelMatrix * skinned;",
+
+			"#endif",
+
+			"#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( morphed, 1.0 );",
+
+			"#endif",
+
+			"#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+
+			"#endif",
+
+		"#endif"
+
+	].join("\n"),
+
 	envmap_vertex : [
-
-		"#ifdef USE_ENVMAP",
-
-			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-		"#endif",
 
 		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
 
-			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
+			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;",
 
 			"if ( useRefract ) {",
 
@@ -1200,35 +1220,33 @@ THREE.ShaderChunk = {
 
 			"morphed += position;",
 
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
 		"#endif"
 
 	].join("\n"),
 
 	default_vertex : [
 
+		"vec4 mvPosition;",
+
 		"#ifdef USE_SKINNING",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * skinned;",
+			"mvPosition = modelViewMatrix * skinned;",
 
 		"#endif",
 
-		"#ifndef USE_SKINNING",
-		"#ifdef USE_MORPHTARGETS",
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
-		"#endif",
-		"#endif",
-
-		"#ifndef USE_MORPHTARGETS",
-		"#ifndef USE_SKINNING",
-
-			"gl_Position = projectionMatrix * mvPosition;",
+			"mvPosition = modelViewMatrix * vec4( morphed, 1.0 );",
 
 		"#endif",
-		"#endif"
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )",
+
+			"mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+		"#endif",
+
+		"gl_Position = projectionMatrix * mvPosition;",
 
 	].join("\n"),
 
@@ -1272,31 +1290,27 @@ THREE.ShaderChunk = {
 
 	defaultnormal_vertex: [
 
-		"vec3 transformedNormal;",
+		"vec3 objectNormal;",
 
 		"#ifdef USE_SKINNING",
 
-			"transformedNormal = skinnedNormal.xyz;",
+			"objectNormal = skinnedNormal.xyz;",
 
 		"#endif",
 
-		"#ifndef USE_SKINNING",
-		"#ifdef USE_MORPHNORMALS",
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )",
 
-			"transformedNormal = morphedNormal;",
-
-		"#endif",
-		"#endif",
-
-		"#ifndef USE_MORPHNORMALS",
-		"#ifndef USE_SKINNING",
-
-			"transformedNormal = normal;",
+			"objectNormal = morphedNormal;",
 
 		"#endif",
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )",
+
+			"objectNormal = normal;",
+
 		"#endif",
 
-		"transformedNormal = normalMatrix * transformedNormal;",
+		"vec3 transformedNormal = normalMatrix * objectNormal;",
 
 	].join("\n"),
 
@@ -1516,28 +1530,9 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SHADOWMAP",
 
-			"vec4 transformedPosition;",
-
-			"#ifdef USE_SKINNING",
-
-				"transformedPosition = modelMatrix * skinned;",
-
-			"#else",
-
-			"#ifdef USE_MORPHTARGETS",
-
-				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
-
-			"#else",
-
-				"transformedPosition = modelMatrix * vec4( position, 1.0 );",
-
-			"#endif",
-			"#endif",
-
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-				"vShadowCoord[ i ] = shadowMatrix[ i ] * transformedPosition;",
+				"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 			"}",
 
@@ -1824,16 +1819,25 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
+
+				"#ifdef USE_ENVMAP",
+
+				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
+				THREE.ShaderChunk[ "skinnormal_vertex" ],
+				THREE.ShaderChunk[ "defaultnormal_vertex" ],
+
+				"#endif",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -1894,6 +1898,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define LAMBERT",
+
 			"varying vec3 vLightFront;",
 
 			"#ifdef DOUBLE_SIDED",
@@ -1913,11 +1919,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
@@ -1925,16 +1928,13 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -2022,6 +2022,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define PHONG",
+
 			"varying vec3 vViewPosition;",
 			"varying vec3 vNormal;",
 
@@ -2036,20 +2038,9 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
-
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				"vViewPosition = -mvPosition.xyz;",
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
@@ -2058,10 +2049,15 @@ THREE.ShaderLib = {
 
 				"vNormal = transformedNormal;",
 
-				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				"vViewPosition = -mvPosition.xyz;",
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -2144,6 +2140,7 @@ THREE.ShaderLib = {
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
+				THREE.ShaderChunk[ "worldpos_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -2194,8 +2191,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 
 			"void main() {",
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
