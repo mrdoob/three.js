@@ -1637,13 +1637,13 @@ THREE.UniformsLib = {
 		"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },
 
-		"map" : { type: "t", value: 0, texture: null },
+		"map" : { type: "t", value: null },
 		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-		"lightMap" : { type: "t", value: 2, texture: null },
-		"specularMap" : { type: "t", value: 3, texture: null },
+		"lightMap" : { type: "t", value: null },
+		"specularMap" : { type: "t", value: null },
 
-		"envMap" : { type: "t", value: 1, texture: null },
+		"envMap" : { type: "t", value: null },
 		"flipEnvMap" : { type: "f", value: -1 },
 		"useRefract" : { type: "i", value: 0 },
 		"reflectivity" : { type: "f", value: 1.0 },
@@ -1656,7 +1656,7 @@ THREE.UniformsLib = {
 
 	bump: {
 
-		"bumpMap" : { type: "t", value: 4, texture: null },
+		"bumpMap" : { type: "t", value: null },
 		"bumpScale" : { type: "f", value: 1 }
 
 	},
@@ -1696,7 +1696,7 @@ THREE.UniformsLib = {
 		"opacity" : { type: "f", value: 1.0 },
 		"size" : { type: "f", value: 1.0 },
 		"scale" : { type: "f", value: 1.0 },
-		"map" : { type: "t", value: 0, texture: null },
+		"map" : { type: "t", value: null },
 
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
@@ -1707,7 +1707,7 @@ THREE.UniformsLib = {
 
 	shadowmap: {
 
-		"shadowMap": { type: "tv", value: 6, texture: [] },
+		"shadowMap": { type: "tv", value: [] },
 		"shadowMapSize": { type: "v2v", value: [] },
 
 		"shadowBias" : { type: "fv1", value: [] },

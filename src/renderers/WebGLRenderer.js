@@ -113,6 +113,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentCamera = null,
 	_geometryGroupCounter = 0,
 
+	_usedTextureUnits = 0,
+
 	// GL state cache
 
 	_oldDoubleSided = -1,
@@ -182,9 +184,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// GPU capabilities
 
-	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ),
-	_maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE ),
-	_maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
+	var _maxTextures = _gl.getParameter( _gl.MAX_TEXTURE_IMAGE_UNITS );
+	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
+	var _maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE );
+	var _maxCubemapSize = _gl.getParameter( _gl.MAX_CUBE_MAP_TEXTURE_SIZE );
 
 	var _maxAnisotropy = _glExtensionTextureFilterAnisotropic ? _gl.getParameter( _glExtensionTextureFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT ) : 0;
 
@@ -4653,6 +4656,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setProgram( camera, lights, fog, material, object ) {
 
+		_usedTextureUnits = 0;
+
 		if ( material.needsUpdate ) {
 
 			if ( material.program ) _this.deallocateMaterial( material );
@@ -4812,10 +4817,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.boneTexture !== null ) {
 
-					// shadowMap texture array starts from 6
-					// texture unit 12 should leave space for 6 shadowmaps
-
-					var textureUnit = 12;
+					var textureUnit = getTextureUnit();
 
 					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
 					_this.setTexture( object.boneTexture, textureUnit );
@@ -4862,13 +4864,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		uniforms.map.texture = material.map;
-		uniforms.lightMap.texture = material.lightMap;
-		uniforms.specularMap.texture = material.specularMap;
+		uniforms.map.value = material.map;
+		uniforms.lightMap.value = material.lightMap;
+		uniforms.specularMap.value = material.specularMap;
 
 		if ( material.bumpMap ) {
 
-			uniforms.bumpMap.texture = material.bumpMap;
+			uniforms.bumpMap.value = material.bumpMap;
 			uniforms.bumpScale.value = material.bumpScale;
 
 		}
@@ -4903,7 +4905,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		uniforms.envMap.texture = material.envMap;
+		uniforms.envMap.value = material.envMap;
 		uniforms.flipEnvMap.value = ( material.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
 
 		if ( _this.gammaInput ) {
@@ -4937,7 +4939,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.size.value = material.size;
 		uniforms.scale.value = _canvas.height / 2.0; // TODO: Cache this.
 
-		uniforms.map.texture = material.map;
+		uniforms.map.value = material.map;
 
 	};
 
@@ -5040,7 +5042,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( light instanceof THREE.SpotLight || ( light instanceof THREE.DirectionalLight && ! light.shadowCascade ) ) {
 
-					uniforms.shadowMap.texture[ j ] = light.shadowMap;
+					uniforms.shadowMap.value[ j ] = light.shadowMap;
 					uniforms.shadowMapSize.value[ j ] = light.shadowMapSize;
 
 					uniforms.shadowMatrix.value[ j ] = light.shadowMatrix;
@@ -5072,9 +5074,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	function getTextureUnit() {
+
+		var textureUnit = _usedTextureUnits;
+
+		if ( textureUnit >= _maxTextures ) {
+
+			console.warn( "Trying to use " + textureUnit + " texture units while this GPU supports only " + _maxTextures );
+
+		}
+
+		_usedTextureUnits += 1;
+
+		return textureUnit;
+
+	};
+
 	function loadUniformsGeneric ( program, uniforms ) {
 
-		var uniform, value, type, location, texture, i, il, j, jl, offset;
+		var uniform, value, type, location, texture, textureUnit, i, il, j, jl, offset;
 
 		for ( j = 0, jl = uniforms.length; j < jl; j ++ ) {
 
@@ -5215,23 +5233,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( type === "t" ) { // single THREE.Texture (2d or cube)
 
-				_gl.uniform1i( location, value );
+				texture = value;
+				textureUnit = getTextureUnit();
 
-				texture = uniform.texture;
+				_gl.uniform1i( location, textureUnit );
 
 				if ( !texture ) continue;
 
 				if ( texture.image instanceof Array && texture.image.length === 6 ) {
 
-					setCubeTexture( texture, value );
+					setCubeTexture( texture, textureUnit );
 
 				} else if ( texture instanceof THREE.WebGLRenderTargetCube ) {
 
-					setCubeTextureDynamic( texture, value );
+					setCubeTextureDynamic( texture, textureUnit );
 
 				} else {
 
-					_this.setTexture( texture, value );
+					_this.setTexture( texture, textureUnit );
 
 				}
 
@@ -5241,9 +5260,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uniform._array = [];
 
-					for( i = 0, il = uniform.texture.length; i < il; i ++ ) {
+					for( i = 0, il = uniform.value.length; i < il; i ++ ) {
 
-						uniform._array[ i ] = value + i;
+						uniform._array[ i ] = getTextureUnit();
 
 					}
 
@@ -5251,13 +5270,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.uniform1iv( location, uniform._array );
 
-				for( i = 0, il = uniform.texture.length; i < il; i ++ ) {
+				for( i = 0, il = uniform.value.length; i < il; i ++ ) {
 
-					texture = uniform.texture[ i ];
+					texture = uniform.value[ i ];
+					textureUnit = uniform._array[ i ];
 
 					if ( !texture ) continue;
 
-					_this.setTexture( texture, uniform._array[ i ] );
+					_this.setTexture( texture, textureUnit );
 
 				}
 
