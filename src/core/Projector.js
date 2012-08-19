@@ -68,7 +68,7 @@ THREE.Projector = function() {
 
 	};
 
-	function projectGraph( root, sort ) {
+	var projectGraph = function ( root, sort ) {
 
 		_objectCount = 0;
 

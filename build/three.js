@@ -2695,7 +2695,8 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 /**
  * @author mrdoob / http://mrdoob.com/
  */
-(function(THREE){
+
+( function ( THREE ) {
 
 	THREE.Ray = function ( origin, direction, near, far ) {
 
@@ -2784,7 +2785,7 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 			if ( distance > object.scale.x ) {
 
-				return [];
+				return intersects;
 
 			}
 
@@ -2803,14 +2804,13 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 			// Checking boundingSphere
 
-			//var scale = THREE.Frustum.__v1.set( object.matrixWorld.getColumnX().length(), object.matrixWorld.getColumnY().length(), object.matrixWorld.getColumnZ().length() );
 			var scaledRadius = object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis();
 
 			// Checking distance to ray
 
 			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
 
-			if ( distance > scaledRadius) {
+			if ( distance > scaledRadius ) {
 
 				return intersects;
 
@@ -2836,13 +2836,13 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 			//directionCopy.copy( this.direction );
 
 			objMatrix = object.matrixWorld;
-			inverseMatrix.getInverse(objMatrix);
+			inverseMatrix.getInverse( objMatrix );
 
-			localOriginCopy.copy(originCopy);
-			inverseMatrix.multiplyVector3(localOriginCopy);
+			localOriginCopy.copy( originCopy );
+			inverseMatrix.multiplyVector3( localOriginCopy );
 
-			localDirectionCopy.copy(this.direction);
-			inverseMatrix.rotateAxis(localDirectionCopy).normalize();
+			localDirectionCopy.copy( this.direction );
+			inverseMatrix.rotateAxis( localDirectionCopy ).normalize();
 
 			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -2880,11 +2880,10 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
-							point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
-							distance = originCopy.distanceTo( point);
+							point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
+							distance = originCopy.distanceTo( point );
 
-							if ( distance < this.near ) continue;
-							if ( distance > this.far ) continue; 
+							if ( distance < this.near || distance > this.far ) continue;
 
 							intersect = {
 
@@ -2909,11 +2908,10 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
-							point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
-							distance = originCopy.distanceTo( point);
+							point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
+							distance = originCopy.distanceTo( point );
 
-							if ( distance < this.near ) continue;
-							if ( distance > this.far ) continue; 
+							if ( distance < this.near || distance > this.far ) continue;
 
 							intersect = {
 
@@ -2959,7 +2957,7 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 	};
 
-}(THREE));
+}( THREE ) );
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -3606,7 +3604,7 @@ THREE.Projector = function() {
 
 	};
 
-	function projectGraph( root, sort ) {
+	var projectGraph = function ( root, sort ) {
 
 		_objectCount = 0;
 
