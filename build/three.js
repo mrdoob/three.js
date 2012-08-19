@@ -880,7 +880,7 @@ THREE.Vector3.prototype = {
 	setEulerFromRotationMatrix: function ( m, order ) {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-	
+
 		// clamp, to handle numerical problems
 
 		function clamp( x ) {
@@ -897,101 +897,101 @@ THREE.Vector3.prototype = {
 		if ( order === undefined || order === 'XYZ' ) {
 
 			this.y = Math.asin( clamp( m13 ) );
-		
+
 			if ( Math.abs( m13 ) < 0.99999 ) {
-		
+
 				this.x = Math.atan2( - m23, m33 );
 				this.z = Math.atan2( - m12, m11 );
-		
+
 			} else {
-			
+
 				this.x = Math.atan2( m21, m22 );
 				this.z = 0;
-		
+
 			}
 
 		} else if ( order === 'YXZ' ) {
-				
+
 			this.x = Math.asin( - clamp( m23 ) );
-		
+
 			if ( Math.abs( m23 ) < 0.99999 ) {
-			
+
 				this.y = Math.atan2( m13, m33 );
 				this.z = Math.atan2( m21, m22 );
-				
+
 			} else {
-			
+
 				this.y = Math.atan2( - m31, m11 );
 				this.z = 0;
-				
+
 			}
-				
+
 		} else if ( order === 'ZXY' ) {
-	
+
 			this.x = Math.asin( clamp( m32 ) );
-		
+
 			if ( Math.abs( m32 ) < 0.99999 ) {
-			
+
 				this.y = Math.atan2( - m31, m33 );
 				this.z = Math.atan2( - m12, m22 );
-				
+
 			} else {
-				
+
 				this.y = 0;
 				this.z = Math.atan2( m13, m11 );
-				
+
 			}
 
 		} else if ( order === 'ZYX' ) {
-	
+
 			this.y = Math.asin( - clamp( m31 ) );
-			
+
 			if ( Math.abs( m31 ) < 0.99999 ) {
-			
+
 				this.x = Math.atan2( m32, m33 );
 				this.z = Math.atan2( m21, m11 );
-				
+
 			} else {
-			
+
 				this.x = 0;
 				this.z = Math.atan2( - m12, m22 );
-				
+
 			}
-				
+
 		} else if ( order === 'YZX' ) {
-			
+
 			this.z = Math.asin( clamp( m21 ) );
-		
+
 			if ( Math.abs( m21 ) < 0.99999 ) {
-		
+
 				this.x = Math.atan2( - m23, m22 );
 				this.y = Math.atan2( - m31, m11 );
-		
+
 			} else {
-			
+
 				this.x = 0;
 				this.y = Math.atan2( m31, m33 );
-		
+
 			}
-				
+
 		} else if ( order === 'XZY' ) {
-			
+
 			this.z = Math.asin( - clamp( m12 ) );
-		
+
 			if ( Math.abs( m12 ) < 0.99999 ) {
-		
+
 				this.x = Math.atan2( m32, m22 );
 				this.y = Math.atan2( m13, m11 );
-		
+
 			} else {
-			
+
 				this.x = Math.atan2( - m13, m33 );
 				this.y = 0;
-		
+
 			}
-				
+
 		}
-		
+
 		return this;
 
 	},
@@ -1009,7 +1009,7 @@ THREE.Vector3.prototype = {
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/content/SpinCalc.m
-	
+
 		var sqx = q.x * q.x;
 		var sqy = q.y * q.y;
 		var sqz = q.z * q.z;
@@ -1020,39 +1020,39 @@ THREE.Vector3.prototype = {
 			this.x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( sqw - sqx - sqy + sqz ) );
 			this.y = Math.asin(  clamp( 2 * ( q.x * q.z + q.y * q.w ) ) );
 			this.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw + sqx - sqy - sqz ) );
-	
+
 		} else if ( order ===  'YXZ' ) {
-	
+
 			this.x = Math.asin(  clamp( 2 * ( q.x * q.w - q.y * q.z ) ) );
 			this.y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw - sqx - sqy + sqz ) );
 			this.z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw - sqx + sqy - sqz ) );
-	
+
 		} else if ( order === 'ZXY' ) {
-			
+
 			this.x = Math.asin(  clamp( 2 * ( q.x * q.w + q.y * q.z ) ) );
 			this.y = Math.atan2( 2 * ( q.y * q.w - q.z * q.x ), ( sqw - sqx - sqy + sqz ) );
 			this.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw - sqx + sqy - sqz ) );
-			
+
 		} else if ( order === 'ZYX' ) {
-			
+
 			this.x = Math.atan2( 2 * ( q.x * q.w + q.z * q.y ), ( sqw - sqx - sqy + sqz ) );
 			this.y = Math.asin(  clamp( 2 * ( q.y * q.w - q.x * q.z ) ) );
 			this.z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw + sqx - sqy - sqz ) );
-	
+
 		} else if ( order === 'YZX' ) {
-			
+
 			this.x = Math.atan2( 2 * ( q.x * q.w - q.z * q.y ), ( sqw - sqx + sqy - sqz ) );
 			this.y = Math.atan2( 2 * ( q.y * q.w - q.x * q.z ), ( sqw + sqx - sqy - sqz ) );
 			this.z = Math.asin(  clamp( 2 * ( q.x * q.y + q.z * q.w ) ) );
-			
+
 		} else if ( order === 'XZY' ) {
-			
+
 			this.x = Math.atan2( 2 * ( q.x * q.w + q.y * q.z ), ( sqw - sqx + sqy - sqz ) );
 			this.y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw + sqx - sqy - sqz ) );
 			this.z = Math.asin(  clamp( 2 * ( q.z * q.w - q.x * q.y ) ) );
-	
+
 		}
-		
+
 		return this;
 
 	},
@@ -1234,7 +1234,7 @@ THREE.Vector4.prototype = {
 		return Math.sqrt( this.lengthSq() );
 
 	},
-	
+
 	lengthManhattan: function () {
 
 		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
@@ -1273,27 +1273,27 @@ THREE.Vector4.prototype = {
 	setAxisAngleFromQuaternion: function ( q ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
-		
+
 		// q is assumed to be normalized
-		
+
 		this.w = 2 * Math.acos( q.w );
-		
+
 		var s = Math.sqrt( 1 - q.w * q.w );
-		
+
 		if ( s < 0.0001 ) {
-		
+
 			 this.x = 1;
 			 this.y = 0;
 			 this.z = 0;
-		 
+
 		} else {
-		
+
 			 this.x = q.x / s;
 			 this.y = q.y / s;
 			 this.z = q.z / s;
-		 
+
 		}
-	
+
 		return this;
 
 	},
@@ -1301,15 +1301,15 @@ THREE.Vector4.prototype = {
 	setAxisAngleFromRotationMatrix: function ( m ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
-		
+
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-		
+
 		var angle, x, y, z,		// variables for result
 			epsilon = 0.01,		// margin to allow for rounding errors
 			epsilon2 = 0.1,		// margin to distinguish between 0 and 180 degrees
-		
+
 			te = m.elements,
-			
+
 			m11 = te[0], m12 = te[4], m13 = te[8],
 			m21 = te[1], m22 = te[5], m23 = te[9],
 			m31 = te[2], m32 = te[6], m33 = te[10];
@@ -1317,107 +1317,107 @@ THREE.Vector4.prototype = {
 		if ( ( Math.abs( m12 - m21 ) < epsilon )
 		  && ( Math.abs( m13 - m31 ) < epsilon )
 		  && ( Math.abs( m23 - m32 ) < epsilon ) ) {
-			
+
 			// singularity found
 			// first check for identity matrix which must have +1 for all terms
 			// in leading diagonal and zero in other terms
-			
+
 			if ( ( Math.abs( m12 + m21 ) < epsilon2 )
 			  && ( Math.abs( m13 + m31 ) < epsilon2 )
 			  && ( Math.abs( m23 + m32 ) < epsilon2 )
 			  && ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
-				
+
 				// this singularity is identity matrix so angle = 0
-				
+
 				this.set( 1, 0, 0, 0 );
-				
+
 				return this; // zero angle, arbitrary axis
-				
+
 			}
-			
+
 			// otherwise this singularity is angle = 180
-			
+
 			angle = Math.PI;
-			
+
 			var xx = ( m11 + 1 ) / 2;
 			var yy = ( m22 + 1 ) / 2;
 			var zz = ( m33 + 1 ) / 2;
 			var xy = ( m12 + m21 ) / 4;
 			var xz = ( m13 + m31 ) / 4;
 			var yz = ( m23 + m32 ) / 4;
-			
+
 			if ( ( xx > yy ) && ( xx > zz ) ) { // m11 is the largest diagonal term
-			
+
 				if ( xx < epsilon ) {
-				
+
 					x = 0;
 					y = 0.707106781;
 					z = 0.707106781;
-					
+
 				} else {
-				
+
 					x = Math.sqrt( xx );
 					y = xy / x;
 					z = xz / x;
-					
+
 				}
-				
+
 			} else if ( yy > zz ) { // m22 is the largest diagonal term
-			
+
 				if ( yy < epsilon ) {
-				
+
 					x = 0.707106781;
 					y = 0;
 					z = 0.707106781;
-					
+
 				} else {
-				
+
 					y = Math.sqrt( yy );
 					x = xy / y;
 					z = yz / y;
-					
-				}	
-				
+
+				}
+
 			} else { // m33 is the largest diagonal term so base result on this
-			
+
 				if ( zz < epsilon ) {
-				
+
 					x = 0.707106781;
 					y = 0.707106781;
 					z = 0;
-					
+
 				} else {
-				
+
 					z = Math.sqrt( zz );
 					x = xz / z;
 					y = yz / z;
-					
+
 				}
-				
+
 			}
-			
+
 			this.set( x, y, z, angle );
-			
+
 			return this; // return 180 deg rotation
-	
+
 		}
-		
+
 		// as we have reached here there are no singularities so we can handle normally
-		
+
 		var s = Math.sqrt( ( m32 - m23 ) * ( m32 - m23 )
 						 + ( m13 - m31 ) * ( m13 - m31 )
 						 + ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
-			
+
 		if ( Math.abs( s ) < 0.001 ) s = 1; 
-		
+
 		// prevent divide by zero, should not happen if matrix is orthogonal and should be
 		// caught by singularity test above, but I've left it in just in case
-		
+
 		this.x = ( m32 - m23 ) / s;
 		this.y = ( m13 - m31 ) / s;
 		this.z = ( m21 - m12 ) / s;
 		this.w = Math.acos( ( m11 + m22 + m33 - 1 ) / 2 );
-	
+
 		return this;
 
 	}
@@ -3561,11 +3561,12 @@ THREE.Object3DCount = 0;
 
 THREE.Projector = function() {
 
-	var _object, _objectCount, _objectPool = [],
-	_vertex, _vertexCount, _vertexPool = [],
-	_face, _face3Count, _face3Pool = [], _face4Count, _face4Pool = [],
-	_line, _lineCount, _linePool = [],
-	_particle, _particleCount, _particlePool = [],
+	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
+	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
+	_face, _face3Count, _face3Pool = [], _face3PoolLength = 0,
+	_face4Count, _face4Pool = [], _face4PoolLength = 0,
+	_line, _lineCount, _linePool = [], _linePoolLength = 0,
+	_particle, _particleCount, _particlePool = [], _particlePoolLength = 0,
 
 	_renderData = { objects: [], sprites: [], lights: [], elements: [] },
 
@@ -3877,7 +3878,7 @@ THREE.Projector = function() {
 				_modelViewProjectionMatrix.multiply( _viewProjectionMatrix, modelMatrix );
 
 				vertices = object.geometry.vertices;
-				
+
 				v1 = getNextVertexInPool();
 				v1.positionScreen.copy( vertices[ 0 ] );
 				_modelViewProjectionMatrix.multiplyVector4( v1.positionScreen );
@@ -3968,128 +3969,98 @@ THREE.Projector = function() {
 
 	function getNextObjectInPool() {
 
-		var object;
+		if ( _objectCount === _objectPoolLength ) {
 
-		if ( _objectCount === _objectPool.length ) {
-
-			object = new THREE.RenderableObject();
+			var object = new THREE.RenderableObject();
 			_objectPool.push( object );
-
-		} else {
-
-			object =  _objectPool[ _objectCount ];
+			_objectPoolLength ++;
+			_objectCount ++;
+			return object;
 
 		}
 
-		_objectCount ++;
-
-		return object;
+		return _objectPool[ _objectCount ++ ];
 
 	}
 
 	function getNextVertexInPool() {
 
-		var vertex;
+		if ( _vertexCount === _vertexPoolLength ) {
 
-		if ( _vertexCount === _vertexPool.length ) {
-
-			vertex = new THREE.RenderableVertex();
+			var vertex = new THREE.RenderableVertex();
 			_vertexPool.push( vertex );
-
-		} else {
-
-			vertex =  _vertexPool[ _vertexCount ];
+			_vertexPoolLength ++;
+			_vertexCount ++;
+			return vertex;
 
 		}
 
-		_vertexCount ++;
-
-		return vertex;
+		return _vertexPool[ _vertexCount ++ ];
 
 	}
 
 	function getNextFace3InPool() {
 
-		var face;
+		if ( _face3Count === _face3PoolLength ) {
 
-		if ( _face3Count === _face3Pool.length ) {
-
-			face = new THREE.RenderableFace3();
+			var face = new THREE.RenderableFace3();
 			_face3Pool.push( face );
-
-		} else {
-
-			face =  _face3Pool[ _face3Count ];
+			_face3PoolLength ++;
+			_face3Count ++;
+			return face;
 
 		}
 
-		_face3Count ++;
-
-		return face;
+		return _face3Pool[ _face3Count ++ ];
 
 
 	}
 
 	function getNextFace4InPool() {
 
-		var face;
+		if ( _face4Count === _face4PoolLength ) {
 
-		if ( _face4Count === _face4Pool.length ) {
-
-			face = new THREE.RenderableFace4();
+			var face = new THREE.RenderableFace4();
 			_face4Pool.push( face );
-
-		} else {
-
-			face =  _face4Pool[ _face4Count ];
+			_face4PoolLength ++;
+			_face4Count ++;
+			return face;
 
 		}
 
-		_face4Count ++;
-
-		return face;
+		return _face4Pool[ _face4Count ++ ];
 
 	}
 
 	function getNextLineInPool() {
 
-		var line;
+		if ( _lineCount === _linePoolLength ) {
 
-		if ( _lineCount === _linePool.length ) {
-
-			line = new THREE.RenderableLine();
+			var line = new THREE.RenderableLine();
 			_linePool.push( line );
-
-		} else {
-
-			line =  _linePool[ _lineCount ];
+			_linePoolLength ++;
+			_lineCount ++
+			return line;
 
 		}
 
-		_lineCount ++;
-
-		return line;
+		return _linePool[ _lineCount ++ ];
 
 	}
 
 	function getNextParticleInPool() {
 
-		var particle;
+		if ( _particleCount === _particlePoolLength ) {
 
-		if ( _particleCount === _particlePool.length ) {
-
-			particle = new THREE.RenderableParticle();
+			var particle = new THREE.RenderableParticle();
 			_particlePool.push( particle );
-
-		} else {
-
-			particle =  _particlePool[ _particleCount ];
+			_particlePoolLength ++;
+			_particleCount ++
+			return particle;
 
 		}
 
-		_particleCount ++;
-
-		return particle;
+		return _particlePool[ _particleCount ++ ];
 
 	}
 
@@ -11591,7 +11562,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( _enableLighting === true ) {
 
-			 calculateLights( _lights );
+			 calculateLights();
 
 		}
 
@@ -11712,18 +11683,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		//
 
-		function calculateLights( lights ) {
-
-			var l, ll, light, lightColor;
+		function calculateLights() {
 
 			_ambientLight.setRGB( 0, 0, 0 );
 			_directionalLights.setRGB( 0, 0, 0 );
 			_pointLights.setRGB( 0, 0, 0 );
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.AmbientLight ) {
 
@@ -11753,20 +11722,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function calculateLight( lights, position, normal, color ) {
+		function calculateLight( position, normal, color ) {
 
-			var l, ll, light, lightColor, lightPosition, amount;
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					lightPosition = light.matrixWorld.getPosition().normalize();
+					var lightPosition = light.matrixWorld.getPosition().normalize();
 
-					amount = normal.dot( lightPosition );
+					var amount = normal.dot( lightPosition );
 
 					if ( amount <= 0 ) continue;
 
@@ -11778,9 +11745,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else if ( light instanceof THREE.PointLight ) {
 
-					lightPosition = light.matrixWorld.getPosition();
+					var lightPosition = light.matrixWorld.getPosition();
 
-					amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
+					var amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
 
 					if ( amount <= 0 ) continue;
 
@@ -12001,9 +11968,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _ambientLight.b;
 
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -12031,7 +11998,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
 						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
 						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
@@ -12118,10 +12085,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _color4.b = _ambientLight.b;
 
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -12155,7 +12122,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
 						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
 						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
@@ -12307,9 +12274,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
 
-					// variables cannot be deleted in ES5 strict mode
-					//delete canvas;
-
 				}
 
 				var data = _imagedatas[ texture.id ];
@@ -12381,10 +12345,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			// http://mrdoob.com/blog/post/710
 
-			var c1r = ~~ ( color1.r * 255 ), c1g = ~~ ( color1.g * 255 ), c1b = ~~ ( color1.b * 255 ),
-			c2r = ~~ ( color2.r * 255 ), c2g = ~~ ( color2.g * 255 ), c2b = ~~ ( color2.b * 255 ),
-			c3r = ~~ ( color3.r * 255 ), c3g = ~~ ( color3.g * 255 ), c3b = ~~ ( color3.b * 255 ),
-			c4r = ~~ ( color4.r * 255 ), c4g = ~~ ( color4.g * 255 ), c4b = ~~ ( color4.b * 255 );
+			var c1r = ( color1.r * 255 ) | 0, c1g = ( color1.g * 255 ) | 0, c1b = ( color1.b * 255 ) | 0;
+			var c2r = ( color2.r * 255 ) | 0, c2g = ( color2.g * 255 ) | 0, c2b = ( color2.b * 255 ) | 0;
+			var c3r = ( color3.r * 255 ) | 0, c3g = ( color3.g * 255 ) | 0, c3b = ( color3.b * 255 ) | 0;
+			var c4r = ( color4.r * 255 ) | 0, c4g = ( color4.g * 255 ) | 0, c4b = ( color4.b * 255 ) | 0;
 
 			_pixelMapData[ 0 ] = c1r < 0 ? 0 : c1r > 255 ? 255 : c1r;
 			_pixelMapData[ 1 ] = c1g < 0 ? 0 : c1g > 255 ? 255 : c1g;
@@ -12690,17 +12654,37 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	worldpos_vertex : [
+
+		"#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )",
+
+			"#ifdef USE_SKINNING",
+
+				"vec4 mPosition = modelMatrix * skinned;",
+
+			"#endif",
+
+			"#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( morphed, 1.0 );",
+
+			"#endif",
+
+			"#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+
+			"#endif",
+
+		"#endif"
+
+	].join("\n"),
+
 	envmap_vertex : [
-
-		"#ifdef USE_ENVMAP",
-
-			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-		"#endif",
 
 		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
 
-			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
+			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;",
 
 			"if ( useRefract ) {",
 
@@ -13741,35 +13725,33 @@ THREE.ShaderChunk = {
 
 			"morphed += position;",
 
-			//"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
 		"#endif"
 
 	].join("\n"),
 
 	default_vertex : [
 
+		"vec4 mvPosition;",
+
 		"#ifdef USE_SKINNING",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * skinned;",
+			"mvPosition = modelViewMatrix * skinned;",
 
 		"#endif",
 
-		"#ifndef USE_SKINNING",
-		"#ifdef USE_MORPHTARGETS",
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
-		"#endif",
-		"#endif",
-
-		"#ifndef USE_MORPHTARGETS",
-		"#ifndef USE_SKINNING",
-
-			"gl_Position = projectionMatrix * mvPosition;",
+			"mvPosition = modelViewMatrix * vec4( morphed, 1.0 );",
 
 		"#endif",
-		"#endif"
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )",
+
+			"mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+		"#endif",
+
+		"gl_Position = projectionMatrix * mvPosition;",
 
 	].join("\n"),
 
@@ -13813,31 +13795,27 @@ THREE.ShaderChunk = {
 
 	defaultnormal_vertex: [
 
-		"vec3 transformedNormal;",
+		"vec3 objectNormal;",
 
 		"#ifdef USE_SKINNING",
 
-			"transformedNormal = skinnedNormal.xyz;",
+			"objectNormal = skinnedNormal.xyz;",
 
 		"#endif",
 
-		"#ifndef USE_SKINNING",
-		"#ifdef USE_MORPHNORMALS",
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )",
 
-			"transformedNormal = morphedNormal;",
-
-		"#endif",
-		"#endif",
-
-		"#ifndef USE_MORPHNORMALS",
-		"#ifndef USE_SKINNING",
-
-			"transformedNormal = normal;",
+			"objectNormal = morphedNormal;",
 
 		"#endif",
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )",
+
+			"objectNormal = normal;",
+
 		"#endif",
 
-		"transformedNormal = normalMatrix * transformedNormal;",
+		"vec3 transformedNormal = normalMatrix * objectNormal;",
 
 	].join("\n"),
 
@@ -14057,28 +14035,9 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SHADOWMAP",
 
-			"vec4 transformedPosition;",
-
-			"#ifdef USE_SKINNING",
-
-				"transformedPosition = modelMatrix * skinned;",
-
-			"#else",
-
-			"#ifdef USE_MORPHTARGETS",
-
-				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
-
-			"#else",
-
-				"transformedPosition = modelMatrix * vec4( position, 1.0 );",
-
-			"#endif",
-			"#endif",
-
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-				"vShadowCoord[ i ] = shadowMatrix[ i ] * transformedPosition;",
+				"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 			"}",
 
@@ -14365,16 +14324,25 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
+
+				"#ifdef USE_ENVMAP",
+
+				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
+				THREE.ShaderChunk[ "skinnormal_vertex" ],
+				THREE.ShaderChunk[ "defaultnormal_vertex" ],
+
+				"#endif",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14435,6 +14403,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define LAMBERT",
+
 			"varying vec3 vLightFront;",
 
 			"#ifdef DOUBLE_SIDED",
@@ -14454,11 +14424,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
@@ -14466,16 +14433,13 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14563,6 +14527,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define PHONG",
+
 			"varying vec3 vViewPosition;",
 			"varying vec3 vNormal;",
 
@@ -14577,20 +14543,9 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
-
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				"vViewPosition = -mvPosition.xyz;",
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
@@ -14599,10 +14554,15 @@ THREE.ShaderLib = {
 
 				"vNormal = transformedNormal;",
 
-				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				"vViewPosition = -mvPosition.xyz;",
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14685,6 +14645,7 @@ THREE.ShaderLib = {
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
+				THREE.ShaderChunk[ "worldpos_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -14735,8 +14696,6 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 
 			"void main() {",
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
@@ -23850,13 +23809,13 @@ THREE.ShaderUtils = {
 					//
 
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
-					"vec4 wPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
 					//
 
-					"vWorldPosition = wPosition.xyz;",
+					"vWorldPosition = mPosition.xyz;",
 
 					// shadows
 
@@ -23864,7 +23823,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-							"vShadowCoord[ i ] = shadowMatrix[ i ] * wPosition;",
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 						"}",
 
