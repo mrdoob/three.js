@@ -71,33 +71,11 @@
 	
 	};
 	
-	//
-	
-	THREE.Ray.prototype.precision = 0.0001;
-		
-	THREE.Ray.prototype.setPrecision = function ( value ) {
-		
-		this.precision = value;
-		
-	};
-		
-	THREE.Ray.prototype.intersectObject = function ( object, recursive ) {
-	
-		var intersect, intersects = [],distance;
-	
-		if ( recursive === true ) {
-	
-			for ( var i = 0, l = object.children.length; i < l; i ++ ) {
-	
-				Array.prototype.push.apply( intersects, this.intersectObject( object.children[ i ], recursive ) );
-	
-			}
-	
-		}
-	
+	var intersectObject = function(object,ray,intersects){
+		var distance,intersect;
 		if ( object instanceof THREE.Particle ) {
 	
-			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+			distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
 	
 			if ( distance > object.scale.x ) {
 	
@@ -125,7 +103,7 @@
 	
 			// Checking distance to ray
 	
-			distance = distanceFromIntersection( this.origin, this.direction, object.matrixWorld.getPosition() );
+			distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
 	
 			if ( distance > scaledRadius) {
 	
@@ -145,12 +123,11 @@
 			isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 			side = object.material.side;
 			var a, b, c, d;
-			var precision = this.precision;
+			var precision = ray.precision;
 			
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 			
-			originCopy.copy( this.origin );
-			//directionCopy.copy( this.direction );
+			originCopy.copy( ray.origin );
 	
 			objMatrix = object.matrixWorld;
 			inverseMatrix.getInverse(objMatrix);
@@ -158,7 +135,7 @@
 			localOriginCopy.copy(originCopy);
 			inverseMatrix.multiplyVector3(localOriginCopy);
 			
-			localDirectionCopy.copy(this.direction);
+			localDirectionCopy.copy(ray.direction);
 			inverseMatrix.rotateAxis(localDirectionCopy).normalize();
 	
 			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
@@ -201,8 +178,8 @@
 							point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
 							distance = originCopy.distanceTo( point);
 							
-							if ( distance < this.near ) continue;
-							if ( distance > this.far ) continue; 
+							if ( distance < ray.near ) continue;
+							if ( distance > ray.far ) continue; 
 							
 							
 							intersect = {
@@ -231,8 +208,8 @@
 							point = object.matrixWorld.multiplyVector3(intersectPoint.clone()); 
 							distance = originCopy.distanceTo( point);
 							
-							if ( distance < this.near ) continue;
-							if ( distance > this.far ) continue; 
+							if ( distance < ray.near ) continue;
+							if ( distance > ray.far ) continue; 
 							
 							intersect = {
 	
@@ -255,6 +232,41 @@
 			}
 	
 		}
+		
+	};
+	
+	var intersectDescendants= function(object,ray,intersects){
+		var descendants = object.getDescendants();
+		var length = descendants.length;
+		for ( var i = 0; i < length; i ++ ) {
+	
+			intersectObject(descendants[i],this,intersects);
+	
+		}
+	};
+	
+	//
+	
+	THREE.Ray.prototype.precision = 0.0001;
+/*
+	This has deemed to be unnessecary
+	THREE.Ray.prototype.setPrecision = function ( value ) {
+		
+		this.precision = value;
+		
+	};*/
+		
+	THREE.Ray.prototype.intersectObject = function ( object, recursive ) {
+	
+		var intersects = [];
+	
+		if ( recursive === true ) {
+			
+			intersectDescendants(object,this,intersects);
+	
+		}
+	
+		intersectObject(object,this,intersects);
 	
 		intersects.sort( descSort );
 	
@@ -267,9 +279,14 @@
 		var intersects = [];
 	
 		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+			
+			intersectObject(objects[i],this,intersects);
 	
-			Array.prototype.push.apply( intersects, this.intersectObject( objects[ i ], recursive ) );
+			if ( recursive === true ) { 
+				
+				intersectDescendants(objects[i],this,intersects);
 	
+			}
 		}
 	
 		intersects.sort( descSort );
