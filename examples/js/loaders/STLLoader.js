@@ -93,6 +93,7 @@ THREE.STLLoader.prototype = {
 		}
 
 		geometry.computeCentroids();
+		geometry.computeBoundingSphere();
 
 		return geometry;
 
