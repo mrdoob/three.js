@@ -18,15 +18,12 @@
  *  bevelEnabled:	<bool>,			// turn on bevel
  *  bevelThickness: <float>, 		// how deep into text bevel goes
  *  bevelSize:		<float>, 		// how far from text outline is bevel
- *
- *  bend:			<bool>			// bend according to hardcoded curve (generates bendPath)
- *  bendPath:       <curve>         // wraps text according to bend Path
  *  }
  *
  */
 
 /*	Usage Examples
-	
+
 	// TextGeometry wrapper
 
 	var text3d = new TextGeometry( text, options );
@@ -35,7 +32,7 @@
 
 	var textShapes = THREE.FontUtils.generateShapes( text, options );
 	var text3d = new ExtrudeGeometry( textShapes, options );
-	
+
 */
 
 
@@ -52,19 +49,6 @@ THREE.TextGeometry = function ( text, parameters ) {
 	if ( parameters.bevelThickness === undefined ) parameters.bevelThickness = 10;
 	if ( parameters.bevelSize === undefined ) parameters.bevelSize = 8;
 	if ( parameters.bevelEnabled === undefined ) parameters.bevelEnabled = false;
-
-	if ( parameters.bend ) {
-
-		var b = textShapes[ textShapes.length - 1 ].getBoundingBox();
-		var max = b.maxX;
-
-		parameters.bendPath = new THREE.QuadraticBezierCurve(
-			new THREE.Vector2( 0, 0 ),
-			new THREE.Vector2( max / 2, 120 ),
-			new THREE.Vector2( max, 0 )
-		);
-
-	}
 
 	THREE.ExtrudeGeometry.call( this, textShapes, parameters );
 
