@@ -6694,7 +6694,7 @@ THREE.Loader.prototype = {
 			var shader = THREE.ShaderUtils.lib[ "normal" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-			uniforms[ "tNormal" ].texture = mpars.normalMap;
+			uniforms[ "tNormal" ].value = mpars.normalMap;
 
 			if ( m.mapNormalFactor ) {
 
@@ -6704,21 +6704,21 @@ THREE.Loader.prototype = {
 
 			if ( mpars.map ) {
 
-				uniforms[ "tDiffuse" ].texture = mpars.map;
+				uniforms[ "tDiffuse" ].value = mpars.map;
 				uniforms[ "enableDiffuse" ].value = true;
 
 			}
 
 			if ( mpars.specularMap ) {
 
-				uniforms[ "tSpecular" ].texture = mpars.specularMap;
+				uniforms[ "tSpecular" ].value = mpars.specularMap;
 				uniforms[ "enableSpecular" ].value = true;
 
 			}
 
 			if ( mpars.lightMap ) {
 
-				uniforms[ "tAO" ].texture = mpars.lightMap;
+				uniforms[ "tAO" ].value = mpars.lightMap;
 				uniforms[ "enableAO" ].value = true;
 
 			}
@@ -8320,7 +8320,7 @@ THREE.GeometryLoader.prototype = {
 					var shader = THREE.ShaderUtils.lib[ "normal" ];
 					var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-					uniforms[ "tNormal" ].texture = mpars.normalMap;
+					uniforms[ "tNormal" ].value = mpars.normalMap;
 
 					if ( m.mapNormalFactor ) {
 
@@ -8330,21 +8330,21 @@ THREE.GeometryLoader.prototype = {
 
 					if ( mpars.map ) {
 
-						uniforms[ "tDiffuse" ].texture = mpars.map;
+						uniforms[ "tDiffuse" ].value = mpars.map;
 						uniforms[ "enableDiffuse" ].value = true;
 
 					}
 
 					if ( mpars.specularMap ) {
 
-						uniforms[ "tSpecular" ].texture = mpars.specularMap;
+						uniforms[ "tSpecular" ].value = mpars.specularMap;
 						uniforms[ "enableSpecular" ].value = true;
 
 					}
 
 					if ( mpars.lightMap ) {
 
-						uniforms[ "tAO" ].texture = mpars.lightMap;
+						uniforms[ "tAO" ].value = mpars.lightMap;
 						uniforms[ "enableAO" ].value = true;
 
 					}
@@ -8811,14 +8811,15 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 	}
 
-        // handle all the children from the loaded json and attach them to given parent        
+	// handle all the children from the loaded json and attach them to given parent
+
 	function handle_children( parent, children ) {
 
 		var object;
 
 		for ( dd in children ) {
 
-			// check by id if child has already been handled, 
+			// check by id if child has already been handled,
 			// if not, create new object
 
 			if ( result.objects[ dd ] === undefined ) {
@@ -9404,7 +9405,7 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 			var ambient = m.parameters.ambient;
 			var shininess = m.parameters.shininess;
 
-			uniforms[ "tNormal" ].texture = result.textures[ m.parameters.normalMap ];
+			uniforms[ "tNormal" ].value = result.textures[ m.parameters.normalMap ];
 
 			if ( m.parameters.normalMapFactor ) {
 
@@ -9414,21 +9415,21 @@ THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url
 
 			if ( m.parameters.map ) {
 
-				uniforms[ "tDiffuse" ].texture = m.parameters.map;
+				uniforms[ "tDiffuse" ].value = m.parameters.map;
 				uniforms[ "enableDiffuse" ].value = true;
 
 			}
 
 			if ( m.parameters.lightMap ) {
 
-				uniforms[ "tAO" ].texture = m.parameters.lightMap;
+				uniforms[ "tAO" ].value = m.parameters.lightMap;
 				uniforms[ "enableAO" ].value = true;
 
 			}
 
 			if ( m.parameters.specularMap ) {
 
-				uniforms[ "tSpecular" ].texture = result.textures[ m.parameters.specularMap ];
+				uniforms[ "tSpecular" ].value = result.textures[ m.parameters.specularMap ];
 				uniforms[ "enableSpecular" ].value = true;
 
 			}
@@ -14079,7 +14080,7 @@ THREE.UniformsUtils = {
 
 		var u, p, tmp, merged = {};
 
-		for ( u = 0; u < uniforms.length; u++ ) {
+		for ( u = 0; u < uniforms.length; u ++ ) {
 
 			tmp = this.clone( uniforms[ u ] );
 
@@ -19444,6 +19445,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// skinning uniforms must be set even if material didn't change
+		// auto-setting of texture unit for bone texture must go before other textures
+		// not sure why, but otherwise weird things happen
+
+		if ( material.skinning ) {
+
+			if ( _supportsBoneTextures && object.useVertexTexture ) {
+
+				if ( p_uniforms.boneTexture !== null ) {
+
+					var textureUnit = getTextureUnit();
+
+					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
+					_this.setTexture( object.boneTexture, textureUnit );
+
+				}
+
+			} else {
+
+				if ( p_uniforms.boneGlobalMatrices !== null ) {
+
+					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
+
+				}
+
+			}
+
+		}
+
 		if ( refreshMaterial ) {
 
 			// refresh uniforms common to several materials
@@ -19541,31 +19571,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( p_uniforms.viewMatrix !== null ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera._viewMatrixArray );
-
-				}
-
-			}
-
-		}
-
-		if ( material.skinning ) {
-
-			if ( _supportsBoneTextures && object.useVertexTexture ) {
-
-				if ( p_uniforms.boneTexture !== null ) {
-
-					var textureUnit = getTextureUnit();
-
-					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
-					_this.setTexture( object.boneTexture, textureUnit );
-
-				}
-
-			} else {
-
-				if ( p_uniforms.boneGlobalMatrices !== null ) {
-
-					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 				}
 
@@ -19997,11 +20002,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uniform._array = [];
 
-					for( i = 0, il = uniform.value.length; i < il; i ++ ) {
+				}
 
-						uniform._array[ i ] = getTextureUnit();
+				for( i = 0, il = uniform.value.length; i < il; i ++ ) {
 
-					}
+					uniform._array[ i ] = getTextureUnit();
 
 				}
 
@@ -23231,7 +23236,7 @@ THREE.ShaderUtils = {
 				"mFresnelBias": { type: "f", value: 0.1 },
 				"mFresnelPower": { type: "f", value: 2.0 },
 				"mFresnelScale": { type: "f", value: 1.0 },
-				"tCube": { type: "t", value: 1, texture: null }
+				"tCube": { type: "t", value: null }
 
 			},
 
@@ -23316,12 +23321,12 @@ THREE.ShaderUtils = {
 				"enableReflection": { type: "i", value: 0 },
 				"enableDisplacement": { type: "i", value: 0 },
 
-				"tDiffuse"	   : { type: "t", value: 0, texture: null },
-				"tCube"		   : { type: "t", value: 1, texture: null },
-				"tNormal"	   : { type: "t", value: 2, texture: null },
-				"tSpecular"	   : { type: "t", value: 3, texture: null },
-				"tAO"		   : { type: "t", value: 4, texture: null },
-				"tDisplacement": { type: "t", value: 5, texture: null },
+				"tDisplacement": { type: "t", value: null }, // must go first as this is vertex texture
+				"tDiffuse"	   : { type: "t", value: null },
+				"tCube"		   : { type: "t", value: null },
+				"tNormal"	   : { type: "t", value: null },
+				"tSpecular"	   : { type: "t", value: null },
+				"tAO"		   : { type: "t", value: null },
 
 				"uNormalScale": { type: "f", value: 1.0 },
 
@@ -23862,7 +23867,7 @@ THREE.ShaderUtils = {
 
 		'cube': {
 
-			uniforms: { "tCube": { type: "t", value: 1, texture: null },
+			uniforms: { "tCube": { type: "t", value: null },
 						"tFlip": { type: "f", value: -1 } },
 
 			vertexShader: [
@@ -34072,10 +34077,8 @@ THREE.ShadowMapPlugin = function ( ) {
 						material = object.customDepthMaterial;
 
 					} else if ( object instanceof THREE.SkinnedMesh ) {
-						
-						material = object.geometry.morphTargets.length ?
-						
-							_depthMaterialMorphSkin : _depthMaterialSkin;
+
+						material = object.geometry.morphTargets.length ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
 					} else if ( object.geometry.morphTargets.length ) {
 

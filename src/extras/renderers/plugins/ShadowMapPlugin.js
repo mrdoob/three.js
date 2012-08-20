@@ -266,10 +266,8 @@ THREE.ShadowMapPlugin = function ( ) {
 						material = object.customDepthMaterial;
 
 					} else if ( object instanceof THREE.SkinnedMesh ) {
-						
-						material = object.geometry.morphTargets.length ?
-						
-							_depthMaterialMorphSkin : _depthMaterialSkin;
+
+						material = object.geometry.morphTargets.length ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
 					} else if ( object.geometry.morphTargets.length ) {
 

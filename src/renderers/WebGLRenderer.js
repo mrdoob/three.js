@@ -4707,6 +4707,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		// skinning uniforms must be set even if material didn't change
+		// auto-setting of texture unit for bone texture must go before other textures
+		// not sure why, but otherwise weird things happen
+
+		if ( material.skinning ) {
+
+			if ( _supportsBoneTextures && object.useVertexTexture ) {
+
+				if ( p_uniforms.boneTexture !== null ) {
+
+					var textureUnit = getTextureUnit();
+
+					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
+					_this.setTexture( object.boneTexture, textureUnit );
+
+				}
+
+			} else {
+
+				if ( p_uniforms.boneGlobalMatrices !== null ) {
+
+					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
+
+				}
+
+			}
+
+		}
+
 		if ( refreshMaterial ) {
 
 			// refresh uniforms common to several materials
@@ -4804,31 +4833,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( p_uniforms.viewMatrix !== null ) {
 
 					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera._viewMatrixArray );
-
-				}
-
-			}
-
-		}
-
-		if ( material.skinning ) {
-
-			if ( _supportsBoneTextures && object.useVertexTexture ) {
-
-				if ( p_uniforms.boneTexture !== null ) {
-
-					var textureUnit = getTextureUnit();
-
-					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
-					_this.setTexture( object.boneTexture, textureUnit );
-
-				}
-
-			} else {
-
-				if ( p_uniforms.boneGlobalMatrices !== null ) {
-
-					_gl.uniformMatrix4fv( p_uniforms.boneGlobalMatrices, false, object.boneMatrices );
 
 				}
 
@@ -5260,11 +5264,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uniform._array = [];
 
-					for( i = 0, il = uniform.value.length; i < il; i ++ ) {
+				}
 
-						uniform._array[ i ] = getTextureUnit();
+				for( i = 0, il = uniform.value.length; i < il; i ++ ) {
 
-					}
+					uniform._array[ i ] = getTextureUnit();
 
 				}
 

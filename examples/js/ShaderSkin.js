@@ -33,8 +33,8 @@ THREE.ShaderSkin = {
 			"enableBump"	: { type: "i", value: 0 },
 			"enableSpecular": { type: "i", value: 0 },
 
-			"tDiffuse"	: { type: "t", value: 0, texture: null },
-			"tBeckmann"	: { type: "t", value: 1, texture: null },
+			"tDiffuse"	: { type: "t", value: null },
+			"tBeckmann"	: { type: "t", value: null },
 
 			"uDiffuseColor":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
 			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
@@ -44,10 +44,10 @@ THREE.ShaderSkin = {
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
 			"uSpecularBrightness": 	{ type: "f", value: 0.75 },
 
-			"bumpMap"	: { type: "t", value: 2, texture: null },
+			"bumpMap"	: { type: "t", value: null },
 			"bumpScale" : { type: "f", value: 1 },
 
-			"specularMap" : { type: "t", value: 3, texture: null },
+			"specularMap" : { type: "t", value: null },
 
 			"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
@@ -319,15 +319,15 @@ THREE.ShaderSkin = {
 
 			"passID": { type: "i", value: 0 },
 
-			"tDiffuse"	: { type: "t", value: 0, texture: null },
-			"tNormal"	: { type: "t", value: 1, texture: null },
+			"tDiffuse"	: { type: "t", value: null },
+			"tNormal"	: { type: "t", value: null },
 
-			"tBlur1"	: { type: "t", value: 2, texture: null },
-			"tBlur2"	: { type: "t", value: 3, texture: null },
-			"tBlur3"	: { type: "t", value: 4, texture: null },
-			"tBlur4"	: { type: "t", value: 5, texture: null },
+			"tBlur1"	: { type: "t", value: null },
+			"tBlur2"	: { type: "t", value: null },
+			"tBlur3"	: { type: "t", value: null },
+			"tBlur4"	: { type: "t", value: null },
 
-			"tBeckmann"	: { type: "t", value: 6, texture: null },
+			"tBeckmann"	: { type: "t", value: null },
 
 			"uNormalScale": { type: "f", value: 1.0 },
 

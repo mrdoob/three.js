@@ -1573,7 +1573,7 @@ THREE.UniformsUtils = {
 
 		var u, p, tmp, merged = {};
 
-		for ( u = 0; u < uniforms.length; u++ ) {
+		for ( u = 0; u < uniforms.length; u ++ ) {
 
 			tmp = this.clone( uniforms[ u ] );
 

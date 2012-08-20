@@ -29,7 +29,7 @@ THREE.ShaderUtils = {
 				"mFresnelBias": { type: "f", value: 0.1 },
 				"mFresnelPower": { type: "f", value: 2.0 },
 				"mFresnelScale": { type: "f", value: 1.0 },
-				"tCube": { type: "t", value: 1, texture: null }
+				"tCube": { type: "t", value: null }
 
 			},
 
@@ -114,12 +114,12 @@ THREE.ShaderUtils = {
 				"enableReflection": { type: "i", value: 0 },
 				"enableDisplacement": { type: "i", value: 0 },
 
-				"tDiffuse"	   : { type: "t", value: 0, texture: null },
-				"tCube"		   : { type: "t", value: 1, texture: null },
-				"tNormal"	   : { type: "t", value: 2, texture: null },
-				"tSpecular"	   : { type: "t", value: 3, texture: null },
-				"tAO"		   : { type: "t", value: 4, texture: null },
-				"tDisplacement": { type: "t", value: 5, texture: null },
+				"tDisplacement": { type: "t", value: null }, // must go first as this is vertex texture
+				"tDiffuse"	   : { type: "t", value: null },
+				"tCube"		   : { type: "t", value: null },
+				"tNormal"	   : { type: "t", value: null },
+				"tSpecular"	   : { type: "t", value: null },
+				"tAO"		   : { type: "t", value: null },
 
 				"uNormalScale": { type: "f", value: 1.0 },
 
@@ -660,7 +660,7 @@ THREE.ShaderUtils = {
 
 		'cube': {
 
-			uniforms: { "tCube": { type: "t", value: 1, texture: null },
+			uniforms: { "tCube": { type: "t", value: null },
 						"tFlip": { type: "f", value: -1 } },
 
 			vertexShader: [

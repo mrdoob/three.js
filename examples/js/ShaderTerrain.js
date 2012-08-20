@@ -26,12 +26,12 @@ THREE.ShaderTerrain = {
 			"enableSpecular"  : { type: "i", value: 0 },
 			"enableReflection": { type: "i", value: 0 },
 
-			"tDiffuse1"	   : { type: "t", value: 0, texture: null },
-			"tDiffuse2"	   : { type: "t", value: 1, texture: null },
-			"tDetail"	   : { type: "t", value: 2, texture: null },
-			"tNormal"	   : { type: "t", value: 3, texture: null },
-			"tSpecular"	   : { type: "t", value: 4, texture: null },
-			"tDisplacement": { type: "t", value: 5, texture: null },
+			"tDiffuse1"	   : { type: "t", value: null },
+			"tDiffuse2"	   : { type: "t", value: null },
+			"tDetail"	   : { type: "t", value: null },
+			"tNormal"	   : { type: "t", value: null },
+			"tSpecular"	   : { type: "t", value: null },
+			"tDisplacement": { type: "t", value: null },
 
 			"uNormalScale": { type: "f", value: 1.0 },
 
