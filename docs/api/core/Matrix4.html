@@ -135,50 +135,6 @@
 		Flattens this matrix into supplied *flat* array starting from *offset* position in the array.
 		</div>
 
-		<h3>.setTranslation( [page:Float x], [page:Float y], [page:Float z] ) [page:Matrix4]</h3>
-		<div>
-		Sets this matrix as translation transform.
-		</div>
-
-		<h3>.setScale( [page:Float x], [page:Float y], [page:Float z] ) [page:Matrix4]</h3>
-		<div>
-		Sets this matrix as scale transform.
-		</div>
-
-		<h3>.makeRotationX( [page:Float theta] ) [page:Matrix4]</h3>
-		<div>
-		theta — Rotation angle in radians.
-		</div>
-		<div>
-		Sets this matrix as rotation transform around x axis by *theta* radians.
-		</div>
-
-		<h3>.makeRotationY( [page:Float theta] ) [page:Matrix4]</h3>
-		<div>
-		theta — Rotation angle in radians.
-		</div>
-		<div>
-		Sets this matrix as rotation transform around y axis by *theta* radians.
-		</div>
-
-		<h3>.makeRotationZ( [page:Float theta] ) [page:Matrix4]</h3>
-		<div>
-		theta — Rotation angle in radians.
-		</div>
-		<div>
-		Sets this matrix as rotation transform around z axis by *theta* radians.
-		</div>
-
-		<h3>.makeRotationAxis( [page:Vector3 axis], [page:Float theta] ) [page:Matrix4]</h3>
-		<div>
-		axis — Rotation axis.
-		theta — Rotation angle in radians.
-		</div>
-		<div>
-		Sets this matrix as rotation transform around *axis* by *angle* radians.<br />
-		Based on [link:http://www.gamedev.net/reference/articles/article1199.asp].
-		</div>
-
 		<h3>.setPosition( [page:Vector3 v] ) [page:Matrix4]</h3>
 		<div>
 		Sets the position component for this matrix from vector *v*.
@@ -280,19 +236,48 @@
 		Translates this matrix by vector *v*.
 		</div>
 
-		<h3>.clone() [page:Matrix4]</h3>
+		<h3>.makeTranslation( [page:Float x], [page:Float y], [page:Float z] ) [page:Matrix4]</h3>
 		<div>
-		Clones this matrix.
+		Sets this matrix as translation transform.
 		</div>
 
-
-		<h2>Static methods</h2>
-
-		<h3>.makeInvert3x3( [page:Matrix4 m] ) [page:Matrix3]</h3>
+		<h3>.makeRotationX( [page:Float theta] ) [page:Matrix4]</h3>
 		<div>
-		Inverts just the rotation submatrix of matrix *m*.<br />
-		Note: this method returns a reference to the internal 3x3 matrix, make a copy or clone it if you don't use it right away.<br />
-		Based on [link:http://code.google.com/p/webgl-mjs/].
+		theta — Rotation angle in radians.
+		</div>
+		<div>
+		Sets this matrix as rotation transform around x axis by *theta* radians.
+		</div>
+
+		<h3>.makeRotationY( [page:Float theta] ) [page:Matrix4]</h3>
+		<div>
+		theta — Rotation angle in radians.
+		</div>
+		<div>
+		Sets this matrix as rotation transform around y axis by *theta* radians.
+		</div>
+
+		<h3>.makeRotationZ( [page:Float theta] ) [page:Matrix4]</h3>
+		<div>
+		theta — Rotation angle in radians.
+		</div>
+		<div>
+		Sets this matrix as rotation transform around z axis by *theta* radians.
+		</div>
+
+		<h3>.makeRotationAxis( [page:Vector3 axis], [page:Float theta] ) [page:Matrix4]</h3>
+		<div>
+		axis — Rotation axis.
+		theta — Rotation angle in radians.
+		</div>
+		<div>
+		Sets this matrix as rotation transform around *axis* by *angle* radians.<br />
+		Based on [link:http://www.gamedev.net/reference/articles/article1199.asp].
+		</div>
+
+		<h3>.makeScale( [page:Float x], [page:Float y], [page:Float z] ) [page:Matrix4]</h3>
+		<div>
+		Sets this matrix as scale transform.
 		</div>
 
 		<h3>.makeFrustum( [page:Float left], [page:Float right], [page:Float bottom], [page:Float top], [page:Float near], [page:Float far] ) [page:Matrix4]</h3>
@@ -305,9 +290,14 @@
 		Creates a perspective projection matrix.
 		</div>
 
-		<h3>.makeOrtho( [page:Float left], [page:Float right], [page:Float bottom], [page:Float top], [page:Float near], [page:Float far] ) [page:Matrix4]</h3>
+		<h3>.makeOrthographic( [page:Float left], [page:Float right], [page:Float bottom], [page:Float top], [page:Float near], [page:Float far] ) [page:Matrix4]</h3>
 		<div>
 		Creates an orthographic projection matrix.
+		</div>
+
+		<h3>.clone() [page:Matrix4]</h3>
+		<div>
+		Clones this matrix.
 		</div>
 
 		<h2>Source</h2>
