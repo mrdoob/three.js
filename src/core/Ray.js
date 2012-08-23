@@ -282,5 +282,12 @@
 		return intersects;
 
 	};
+    
+    THREE.Ray.prototype.setSource = function ( origin, direction){
+        
+        this.origin = origin;
+        this.direction = direction;
+        
+    }
 
 }( THREE ) );
