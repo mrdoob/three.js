@@ -29,6 +29,7 @@
 		"../src/lights/Light.js",
 		"../src/lights/AmbientLight.js",
 		"../src/lights/DirectionalLight.js",
+		"../src/lights/HemisphereLight.js",
 		"../src/lights/PointLight.js",
 		"../src/lights/SpotLight.js",
 		"../src/loaders/Loader.js",
