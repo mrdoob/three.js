@@ -92,6 +92,14 @@ THREE.ShaderSkin = {
 
 			"#endif",
 
+			"#if MAX_HEMI_LIGHTS > 0",
+
+				"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
+				"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
+				"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+
+			"#endif",
+
 			"#if MAX_POINT_LIGHTS > 0",
 
 				"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
@@ -239,6 +247,38 @@ THREE.ShaderSkin = {
 
 				"#endif",
 
+				// hemisphere lights
+
+				"#if MAX_HEMI_LIGHTS > 0",
+
+					"vec3 hemiTotal = vec3( 0.0 );",
+
+					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
+
+						"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
+						"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+
+						"float dotProduct = dot( normal, lVector );",
+						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
+
+						"hemiTotal += uDiffuseColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+
+						// specular (sky light)
+
+						"float hemiSpecularWeight = 0.0;",
+						"hemiSpecularWeight += KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
+
+						// specular (ground light)
+
+						"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+						"hemiSpecularWeight += KS_Skin_Specular( normal, lVectorGround, viewPosition, uRoughness, uSpecularBrightness );",
+
+						"specularTotal += uSpecularColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",
+
+					"}",
+
+				"#endif",
+
 				// all lights contribution summation
 
 				"vec3 totalLight = vec3( 0.0 );",
@@ -249,6 +289,10 @@ THREE.ShaderSkin = {
 
 				"#if MAX_POINT_LIGHTS > 0",
 					"totalLight += pointTotal;",
+				"#endif",
+
+				"#if MAX_HEMI_LIGHTS > 0",
+					"totalLight += hemiTotal;",
 				"#endif",
 
 				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * uAmbientColor ) + specularTotal;",
