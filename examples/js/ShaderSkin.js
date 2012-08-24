@@ -14,7 +14,7 @@ THREE.ShaderSkin = {
 	//		- diffuse map
 	//		- bump map
 	//		- specular map
-	//		- point and directional lights (use with "lights: true" material option)
+	//		- point, directional and hemisphere lights (use with "lights: true" material option)
 	//		- fog (use with "fog: true" material option)
 	//		- shadow maps
 	//
