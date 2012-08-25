@@ -229,7 +229,7 @@
 
 	};
 
-	var intersectDescendants= function ( object, ray, intersects ) {
+	var intersectDescendants = function ( object, ray, intersects ) {
 
 		var descendants = object.getDescendants();
 
@@ -243,6 +243,13 @@
 	//
 
 	THREE.Ray.prototype.precision = 0.0001;
+    
+    THREE.Ray.prototype.set = function ( origin, direction){
+        
+        this.origin = origin;
+        this.direction = direction;
+        
+    };
 
 	THREE.Ray.prototype.intersectObject = function ( object, recursive ) {
 
@@ -282,12 +289,5 @@
 		return intersects;
 
 	};
-    
-    THREE.Ray.prototype.setSource = function ( origin, direction){
-        
-        this.origin = origin;
-        this.direction = direction;
-        
-    }
 
 }( THREE ) );
