@@ -112,7 +112,15 @@ THREE.ShaderChunk = {
 
 			"#else",
 
-				"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+				"#ifdef FLIP_SIDED",
+				
+					"vec4 cubeColor = textureCube( envMap, -vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+					
+				"#else",
+				
+					"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+					
+				"#endif",
 
 			"#endif",
 
@@ -459,7 +467,16 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"transformedNormal = normalize( transformedNormal );",
+		"#ifdef FLIP_SIDED",
+		
+			"transformedNormal = normalize( -transformedNormal );",
+			
+		"#else",
+		
+			"transformedNormal = normalize( transformedNormal );",
+			
+		"#endif",
+
 
 		"#if MAX_DIR_LIGHTS > 0",
 
@@ -818,6 +835,12 @@ THREE.ShaderChunk = {
 
 		"vec3 normal = normalize( vNormal );",
 		"vec3 viewPosition = normalize( vViewPosition );",
+
+		"#ifdef FLIP_SIDED",
+		
+			"normal = -normal;",
+			
+		"#endif",
 
 		"#ifdef DOUBLE_SIDED",
 
