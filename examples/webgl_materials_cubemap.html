@@ -107,7 +107,7 @@
 				reflectionCube.format = THREE.RGBFormat;
 
 				var refractionCube = new THREE.Texture( reflectionCube.image, new THREE.CubeRefractionMapping() );
-				reflectionCube.format = THREE.RGBFormat;
+				refractionCube.format = THREE.RGBFormat;
 
 				//var cubeMaterial3 = new THREE.MeshPhongMaterial( { color: 0x000000, specular:0xaa0000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.25 } );
 				var cubeMaterial3 = new THREE.MeshLambertMaterial( { color: 0xff6600, ambient: 0x993300, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
