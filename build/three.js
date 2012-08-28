@@ -9927,6 +9927,9 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
  *  bumpMap: new THREE.Texture( <Image> ),
  *  bumpScale: <float>,
  *
+ *  normalMap: new THREE.Texture( <Image> ),
+ *  normalScale: <float>,
+ *
  *  specularMap: new THREE.Texture( <Image> ),
  *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
@@ -9973,6 +9976,9 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 
 	this.bumpMap = null;
 	this.bumpScale = 1;
+
+	this.normalMap = null;
+	this.normalScale = 1;
 
 	this.specularMap = null;
 
@@ -10025,7 +10031,10 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	material.lightMap = this.lightMap;
 
 	material.bumpMap = this.bumpMap;
-	material.bumpScale= this.bumpScale;
+	material.bumpScale = this.bumpScale;
+
+	material.normalMap = this.normalMap;
+	material.normalScale = this.normalScale;
 
 	material.specularMap = this.specularMap;
 
@@ -12571,7 +12580,7 @@ THREE.ShaderChunk = {
 			"uniform float flipEnvMap;",
 			"uniform int combine;",
 
-			"#ifdef USE_BUMPMAP",
+			"#if defined(USE_BUMPMAP) || defined(USE_NORMALMAP)",
 
 				"uniform bool useRefract;",
 				"uniform float refractionRatio;",
@@ -12592,7 +12601,7 @@ THREE.ShaderChunk = {
 
 			"vec3 reflectVec;",
 
-			"#ifdef USE_BUMPMAP",
+			"#if defined(USE_BUMPMAP) || defined(USE_NORMALMAP)",
 
 				"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
@@ -12645,7 +12654,7 @@ THREE.ShaderChunk = {
 
 	envmap_pars_vertex: [
 
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined(USE_NORMALMAP)",
 
 			"varying vec3 vReflect;",
 
@@ -12664,7 +12673,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined(USE_NORMALMAP)",
 
 			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
 
@@ -12709,7 +12718,7 @@ THREE.ShaderChunk = {
 
 	map_pars_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 			"uniform vec4 offsetRepeat;",
@@ -12720,7 +12729,7 @@ THREE.ShaderChunk = {
 
 	map_pars_fragment: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 
@@ -12736,7 +12745,7 @@ THREE.ShaderChunk = {
 
 	map_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -12848,6 +12857,39 @@ THREE.ShaderChunk = {
 
 				"vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
 				"return normalize( abs( fDet ) * surf_norm - vGrad );",
+
+			"}",
+
+		"#endif"
+
+	].join("\n"),
+
+	// NORMAL MAP
+	normalmap_pars_fragment: [
+
+		"#ifdef USE_NORMALMAP",
+
+			"uniform sampler2D normalMap;",
+			"uniform float normalScale;",
+
+			// Per-Pixel Tangent Space Normal Mapping
+			// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
+
+			"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm) {",
+
+				"vec3 q0 = dFdx(eye_pos.xyz);",
+				"vec3 q1 = dFdy(eye_pos.xyz);",
+				"vec2 st0 = dFdx(vUv.st);",
+				"vec2 st1 = dFdy(vUv.st);",
+
+				"vec3 S = normalize( q0 * st1.t - q1 * st0.t);",
+				"vec3 T = normalize(-q0 * st1.s + q1 * st0.s);",
+				"vec3 N = normalize(surf_norm);",
+
+				"vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;",
+				"mapN = normalScale * mapN;",
+				"mat3 tsn = mat3( S, T, N );",
+				"return normalize( tsn * mapN );",
 
 			"}",
 
@@ -13270,7 +13312,11 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#ifdef USE_BUMPMAP",
+		"#ifdef USE_NORMALMAP",
+
+			"normal = perturbNormal2Arb( -viewPosition, normal);",
+
+		"#elif defined( USE_BUMPMAP )",
 
 			"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
 
@@ -14140,6 +14186,12 @@ THREE.UniformsLib = {
 
 	},
 
+	normalmap: {
+
+		"normalMap" : { type: "t", value: 4, texture: null },
+		"normalScale" : { type: "f", value: 1 }
+	},
+
 	fog : {
 
 		"fogDensity" : { type: "f", value: 0.00025 },
@@ -14480,6 +14532,7 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "bump" ],
+            THREE.UniformsLib[ "normalmap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
@@ -14560,6 +14613,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
+            THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 
 			"void main() {",
@@ -15638,7 +15692,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// material must use some texture to require uvs
 
-		if ( material.map || material.lightMap || material.bumpMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
+		if ( material.map || material.lightMap || material.bumpMap || material.normalMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
 
 			return true;
 
@@ -19357,6 +19411,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			envMap: !!material.envMap,
 			lightMap: !!material.lightMap,
 			bumpMap: !!material.bumpMap,
+			normalMap: !!material.normalMap,
 			specularMap: !!material.specularMap,
 
 			vertexColors: material.vertexColors,
@@ -19706,6 +19761,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 			uniforms.bumpScale.value = material.bumpScale;
 
 		}
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.texture = material.normalMap;
+			uniforms.normalScale.value = material.normalScale;
+		}
 
 		// uv repeat and offset setting priorities
 		//	1. color map
@@ -19721,6 +19781,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material.specularMap ) {
 
 			uvScaleMap = material.specularMap;
+
+		} else if ( material.normalMap ) {
+
+			uvScaleMap = material.normalMap;
 
 		} else if ( material.bumpMap ) {
 
@@ -20581,6 +20645,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.normalMap ? "#define USE_NORMALMAP" : "",
 			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
@@ -20662,7 +20727,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"precision " + _precision + " float;",
 
-			parameters.bumpMap ? "#extension GL_OES_standard_derivatives : enable" : "",
+			(parameters.bumpMap||parameters.normalMap) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -20683,6 +20748,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+            parameters.normalMap ? "#define USE_NORMALMAP" : "",
 			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
@@ -20700,7 +20766,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"uniform vec3 cameraPosition;",
 			""
 
-		].join("\n");
+		];
+        
+        prefix_fragment = prefix_fragment.join("\n");
 
 		var glFragmentShader = getShader( "fragment", prefix_fragment + fragmentShader );
 		var glVertexShader = getShader( "vertex", prefix_vertex + vertexShader );

@@ -64,7 +64,7 @@ THREE.ShaderChunk = {
 			"uniform float flipEnvMap;",
 			"uniform int combine;",
 
-			"#ifdef USE_BUMPMAP",
+			"#if defined(USE_BUMPMAP) || defined(USE_NORMALMAP)",
 
 				"uniform bool useRefract;",
 				"uniform float refractionRatio;",
@@ -85,7 +85,7 @@ THREE.ShaderChunk = {
 
 			"vec3 reflectVec;",
 
-			"#ifdef USE_BUMPMAP",
+			"#if defined(USE_BUMPMAP) || defined(USE_NORMALMAP)",
 
 				"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
@@ -138,7 +138,7 @@ THREE.ShaderChunk = {
 
 	envmap_pars_vertex: [
 
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined(USE_NORMALMAP)",
 
 			"varying vec3 vReflect;",
 
@@ -157,7 +157,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined(USE_NORMALMAP)",
 
 			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
 
@@ -202,7 +202,7 @@ THREE.ShaderChunk = {
 
 	map_pars_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 			"uniform vec4 offsetRepeat;",
@@ -213,7 +213,7 @@ THREE.ShaderChunk = {
 
 	map_pars_fragment: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 
@@ -229,7 +229,7 @@ THREE.ShaderChunk = {
 
 	map_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -341,6 +341,39 @@ THREE.ShaderChunk = {
 
 				"vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );",
 				"return normalize( abs( fDet ) * surf_norm - vGrad );",
+
+			"}",
+
+		"#endif"
+
+	].join("\n"),
+
+	// NORMAL MAP
+	normalmap_pars_fragment: [
+
+		"#ifdef USE_NORMALMAP",
+
+			"uniform sampler2D normalMap;",
+			"uniform float normalScale;",
+
+			// Per-Pixel Tangent Space Normal Mapping
+			// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
+
+			"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm) {",
+
+				"vec3 q0 = dFdx(eye_pos.xyz);",
+				"vec3 q1 = dFdy(eye_pos.xyz);",
+				"vec2 st0 = dFdx(vUv.st);",
+				"vec2 st1 = dFdy(vUv.st);",
+
+				"vec3 S = normalize( q0 * st1.t - q1 * st0.t);",
+				"vec3 T = normalize(-q0 * st1.s + q1 * st0.s);",
+				"vec3 N = normalize(surf_norm);",
+
+				"vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;",
+				"mapN.xy = normalScale * mapN.xy;",
+				"mat3 tsn = mat3( S, T, N );",
+				"return normalize( tsn * mapN );",
 
 			"}",
 
@@ -763,7 +796,11 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#ifdef USE_BUMPMAP",
+		"#ifdef USE_NORMALMAP",
+
+			"normal = perturbNormal2Arb( -viewPosition, normal);",
+
+		"#elif defined( USE_BUMPMAP )",
 
 			"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
 
@@ -1633,6 +1670,12 @@ THREE.UniformsLib = {
 
 	},
 
+	normalmap: {
+
+		"normalMap" : { type: "t", value: 4, texture: null },
+		"normalScale" : { type: "f", value: 1 }
+	},
+
 	fog : {
 
 		"fogDensity" : { type: "f", value: 0.00025 },
@@ -1973,6 +2016,7 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "bump" ],
+            THREE.UniformsLib[ "normalmap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
@@ -2053,6 +2097,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
+            THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 
 			"void main() {",
