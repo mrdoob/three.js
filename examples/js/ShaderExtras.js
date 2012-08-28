@@ -39,7 +39,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse: { type: "t", value: 0, texture: null },
+			tDiffuse: { type: "t", value: null },
 			opacity:  { type: "f", value: 1.0 }
 
 		},
@@ -86,7 +86,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse" : 		{ type: "t", value: 0, texture: null },
+			"tDiffuse" : 		{ type: "t", value: null },
 			"uImageIncrement" : { type: "v2", value: new THREE.Vector2( 0.001953125, 0.0 ) },
 			"cKernel" : 		{ type: "fv1", value: [] }
 
@@ -165,7 +165,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse:   { type: "t", value: 0, texture: null },
+			tDiffuse:   { type: "t", value: null },
 			time: 	    { type: "f", value: 0.0 },
 			nIntensity: { type: "f", value: 0.5 },
 			sIntensity: { type: "f", value: 0.05 },
@@ -253,8 +253,8 @@ THREE.ShaderExtras = {
 
 	'bokeh'	: {
 
-	uniforms: { tColor:   { type: "t", value: 0, texture: null },
-				tDepth:   { type: "t", value: 1, texture: null },
+	uniforms: { tColor:   { type: "t", value: null },
+				tDepth:   { type: "t", value: null },
 				focus:    { type: "f", value: 1.0 },
 				aspect:   { type: "f", value: 1.0 },
 				aperture: { type: "f", value: 0.025 },
@@ -367,8 +367,8 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tColor:   { type: "t", value: 0, texture: null },
-			tDepth:   { type: "t", value: 1, texture: null },
+			tColor:   { type: "t", value: null },
+			tDepth:   { type: "t", value: null },
 			focus:    { type: "f", value: 1.0 },
 			maxblur:  { type: "f", value: 1.0 }
 
@@ -424,7 +424,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse: { type: "t", value: 0, texture: null },
+			tDiffuse: { type: "t", value: null },
 			amount:   { type: "f", value: 1.0 }
 
 		},
@@ -477,7 +477,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse: { type: "t", value: 0, texture: null },
+			tDiffuse: { type: "t", value: null },
 			tSize:    { type: "v2", value: new THREE.Vector2( 256, 256 ) },
 			center:   { type: "v2", value: new THREE.Vector2( 0.5, 0.5 ) },
 			angle:	  { type: "f", value: 1.57 },
@@ -544,7 +544,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse: { type: "t", value: 0, texture: null },
+			tDiffuse: { type: "t", value: null },
 			offset:   { type: "f", value: 1.0 },
 			darkness: { type: "f", value: 1.0 }
 
@@ -606,7 +606,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse: { type: "t", value: 0, texture: null },
+			tDiffuse: { type: "t", value: null },
 			opacity:  { type: "f", value: 1.0 }
 
 		},
@@ -669,7 +669,7 @@ THREE.ShaderExtras = {
 
 		uniforms : {
 
-			"tDiffuse": 		{ type: "t", value: 0, texture: null },
+			"tDiffuse": 		{ type: "t", value: null },
 			"screenWidth": 		{ type: "f", value: 1024 },
 			"screenHeight": 	{ type: "f", value: 1024 },
 			"sampleDistance": 	{ type: "f", value: 0.94 },
@@ -764,7 +764,7 @@ THREE.ShaderExtras = {
 
 		uniforms : {
 
-			"texture": 	{ type: "t", value: 0, texture: null },
+			"texture": 	{ type: "t", value: null },
 			"delta": 	{ type: "v2", value:new THREE.Vector2( 1, 1 )  }
 
 		},
@@ -871,7 +871,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse": { type: "t", value: 0, texture: null },
+			"tDiffuse": { type: "t", value: null },
 			"h": 		{ type: "f", value: 1.0 / 512.0 }
 
 		},
@@ -923,7 +923,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse": { type: "t", value: 0, texture: null },
+			"tDiffuse": { type: "t", value: null },
 			"v": 		{ type: "f", value: 1.0 / 512.0 }
 
 		},
@@ -984,7 +984,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse": { type: "t", value: 0, texture: null },
+			"tDiffuse": { type: "t", value: null },
 			"h": 		{ type: "f", value: 1.0 / 512.0 },
 			"r": 		{ type: "f", value: 0.35 }
 
@@ -1040,7 +1040,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse": { type: "t", value: 0, texture: null },
+			"tDiffuse": { type: "t", value: null },
 			"v": 		{ type: "f", value: 1.0 / 512.0 },
 			"r": 		{ type: "f", value: 0.35 }
 
@@ -1100,8 +1100,8 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse1: { type: "t", value: 0, texture: null },
-			tDiffuse2: { type: "t", value: 1, texture: null },
+			tDiffuse1: { type: "t", value: null },
+			tDiffuse2: { type: "t", value: null },
 			mixRatio:  { type: "f", value: 0.5 },
 			opacity:   { type: "f", value: 1.0 }
 
@@ -1153,7 +1153,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse": 	{ type: "t", value: 0, texture: null },
+			"tDiffuse": 	{ type: "t", value: null },
 			"resolution": 	{ type: "v2", value: new THREE.Vector2( 1 / 1024, 1 / 512 )  }
 
 		},
@@ -1249,7 +1249,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse": 	{ type: "t", value: 0, texture: null }
+			"tDiffuse": 	{ type: "t", value: null }
 
 		},
 
@@ -1297,7 +1297,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse" : 	{ type: "t", value: 0, texture: null },
+			"tDiffuse" : 	{ type: "t", value: null },
 			"powRGB" :		{ type: "v3", value: new THREE.Vector3( 2, 2, 2 ) },
 			"mulRGB" :		{ type: "v3", value: new THREE.Vector3( 1, 1, 1 ) }
 
@@ -1345,7 +1345,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"heightMap"	: { type: "t", value: 0, texture: null },
+			"heightMap"	: { type: "t", value: null },
 			"resolution": { type: "v2", value: new THREE.Vector2( 512, 512 ) },
 			"scale"		: { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 			"height"	: { type: "f", value: 0.05 }
@@ -1405,8 +1405,8 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			"tDiffuse": 	{ type: "t", value: 0, texture: null },
-			"tDepth":   	{ type: "t", value: 1, texture: null },
+			"tDiffuse": 	{ type: "t", value: null },
+			"tDepth":   	{ type: "t", value: null },
 			"size": 		{ type: "v2", value: new THREE.Vector2( 512, 512 ) },
 			"cameraNear":	{ type: "f", value: 1 },
 			"cameraFar":	{ type: "f", value: 100 },
@@ -1655,7 +1655,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse: { type: "t", value: 0, texture: null },
+			tDiffuse: { type: "t", value: null },
 			color:    { type: "c", value: new THREE.Color( 0xffffff ) }
 
 		},
@@ -1704,7 +1704,7 @@ THREE.ShaderExtras = {
 
 		uniforms: {
 
-			tDiffuse: { type: "t", value: 0, texture: null },
+			tDiffuse: { type: "t", value: null },
 			opacity:  { type: "f", value: 1.0 }
 
 		},

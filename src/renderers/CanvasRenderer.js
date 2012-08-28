@@ -202,7 +202,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( _enableLighting === true ) {
 
-			 calculateLights( _lights );
+			 calculateLights();
 
 		}
 
@@ -323,18 +323,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		//
 
-		function calculateLights( lights ) {
-
-			var l, ll, light, lightColor;
+		function calculateLights() {
 
 			_ambientLight.setRGB( 0, 0, 0 );
 			_directionalLights.setRGB( 0, 0, 0 );
 			_pointLights.setRGB( 0, 0, 0 );
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.AmbientLight ) {
 
@@ -364,20 +362,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function calculateLight( lights, position, normal, color ) {
+		function calculateLight( position, normal, color ) {
 
-			var l, ll, light, lightColor, lightPosition, amount;
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					lightPosition = light.matrixWorld.getPosition().normalize();
+					var lightPosition = light.matrixWorld.getPosition().normalize();
 
-					amount = normal.dot( lightPosition );
+					var amount = normal.dot( lightPosition );
 
 					if ( amount <= 0 ) continue;
 
@@ -389,9 +385,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else if ( light instanceof THREE.PointLight ) {
 
-					lightPosition = light.matrixWorld.getPosition();
+					var lightPosition = light.matrixWorld.getPosition();
 
-					amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
+					var amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
 
 					if ( amount <= 0 ) continue;
 
@@ -528,7 +524,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.beginPath();
 			_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
 			_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
-			_context.closePath();
 
 			if ( material instanceof THREE.LineBasicMaterial ) {
 
@@ -607,15 +602,15 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _enableLighting === true ) {
 
-					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 3 ) {
+					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 3 ) {
 
 						_color1.r = _color2.r = _color3.r = _ambientLight.r;
 						_color1.g = _color2.g = _color3.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _ambientLight.b;
 
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -643,7 +638,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
 						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
 						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
@@ -724,16 +719,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _enableLighting === true ) {
 
-					if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 4 ) {
+					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
 
 						_color1.r = _color2.r = _color3.r = _color4.r = _ambientLight.r;
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _color4.b = _ambientLight.b;
 
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
 
 						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
 						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
@@ -767,7 +762,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
 						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
 						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
@@ -829,7 +824,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.moveTo( x0, y0 );
 			_context.lineTo( x1, y1 );
 			_context.lineTo( x2, y2 );
-			_context.lineTo( x0, y0 );
+			_context.closePath();
 
 		}
 
@@ -840,7 +835,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.lineTo( x1, y1 );
 			_context.lineTo( x2, y2 );
 			_context.lineTo( x3, y3 );
-			_context.lineTo( x0, y0 );
+			_context.closePath();
 
 		}
 
@@ -919,9 +914,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
 
-					// variables cannot be deleted in ES5 strict mode
-					//delete canvas;
-
 				}
 
 				var data = _imagedatas[ texture.id ];
@@ -993,10 +985,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			// http://mrdoob.com/blog/post/710
 
-			var c1r = ~~ ( color1.r * 255 ), c1g = ~~ ( color1.g * 255 ), c1b = ~~ ( color1.b * 255 ),
-			c2r = ~~ ( color2.r * 255 ), c2g = ~~ ( color2.g * 255 ), c2b = ~~ ( color2.b * 255 ),
-			c3r = ~~ ( color3.r * 255 ), c3g = ~~ ( color3.g * 255 ), c3b = ~~ ( color3.b * 255 ),
-			c4r = ~~ ( color4.r * 255 ), c4g = ~~ ( color4.g * 255 ), c4b = ~~ ( color4.b * 255 );
+			var c1r = ( color1.r * 255 ) | 0, c1g = ( color1.g * 255 ) | 0, c1b = ( color1.b * 255 ) | 0;
+			var c2r = ( color2.r * 255 ) | 0, c2g = ( color2.g * 255 ) | 0, c2b = ( color2.b * 255 ) | 0;
+			var c3r = ( color3.r * 255 ) | 0, c3g = ( color3.g * 255 ) | 0, c3b = ( color3.b * 255 ) | 0;
+			var c4r = ( color4.r * 255 ) | 0, c4g = ( color4.g * 255 ) | 0, c4b = ( color4.b * 255 ) | 0;
 
 			_pixelMapData[ 0 ] = c1r < 0 ? 0 : c1r > 255 ? 255 : c1r;
 			_pixelMapData[ 1 ] = c1g < 0 ? 0 : c1g > 255 ? 255 : c1g;

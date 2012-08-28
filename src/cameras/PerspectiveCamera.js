@@ -28,7 +28,7 @@ THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
 
 THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
-	frameHeight = frameHeight !== undefined ? frameHeight : 24;
+	if ( frameHeight === undefined ) frameHeight = 24;
 
 	this.fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
 	this.updateProjectionMatrix();

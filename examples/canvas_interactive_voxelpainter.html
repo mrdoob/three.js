@@ -25,7 +25,7 @@
 			var camera, scene, renderer;
 			var projector, plane;
 			var mouse2D, mouse3D, ray,
-			rollOveredFace, isShiftDown = false,
+			isShiftDown = false,
 			theta = 45, isCtrlDown = false,
 			target = new THREE.Vector3( 0, 200, 0 );
 
@@ -52,29 +52,33 @@
 
 				// Grid
 
+				var size = 500, step = 50;
+
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3( - 500, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 500, 0, 0 ) );
 
-				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
+				for ( var i = - size; i <= size; i += step ) {
 
-				for ( var i = 0; i <= 20; i ++ ) {
+					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
 
-					var line = new THREE.Line( geometry, material );
-					line.position.z = ( i * 50 ) - 500;
-					scene.add( line );
-
-					var line = new THREE.Line( geometry, material );
-					line.position.x = ( i * 50 ) - 500;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.add( line );
+					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
 
 				}
 
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
+
+				var line = new THREE.Line( geometry, material );
+				line.type = THREE.LinePieces;
+				scene.add( line );
+
+				//
+
 				projector = new THREE.Projector();
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshFaceMaterial() );
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000 ), new THREE.MeshBasicMaterial() );
 				plane.rotation.x = - Math.PI / 2;
+				plane.visible = false;
 				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
@@ -141,6 +145,9 @@
 			function onDocumentMouseDown( event ) {
 
 				event.preventDefault();
+
+				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
+				ray.direction = mouse3D.subSelf( camera.position ).normalize();
 
 				var intersects = ray.intersectObjects( scene.children );
 
@@ -220,27 +227,6 @@
 				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
 				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
 				camera.lookAt( target );
-
-				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
-				ray.direction = mouse3D.subSelf( camera.position ).normalize();
-
-				var intersects = ray.intersectObjects( scene.children );
-
-				if ( intersects.length > 0 ) {
-
-					if ( intersects[ 0 ].face != rollOveredFace ) {
-
-						if ( rollOveredFace ) rollOveredFace.materials = [];
-						rollOveredFace = intersects[ 0 ].face;
-						rollOveredFace.materials = [ new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5 } ) ];
-					}
-
-				} else if ( rollOveredFace ) {
-
-					rollOveredFace.materials = [];
-					rollOveredFace = null;
-
-				}
 
 				renderer.render( scene, camera );
 

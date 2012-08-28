@@ -93,7 +93,7 @@
 				var shader = THREE.ShaderUtils.lib[ "fresnel" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "tCube" ].texture = textureCube;
+				uniforms[ "tCube" ].value = textureCube;
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms };
 				var material = new THREE.ShaderMaterial( parameters );
@@ -119,7 +119,7 @@
 				// Skybox
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = textureCube;
+				shader.uniforms[ "tCube" ].value = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 

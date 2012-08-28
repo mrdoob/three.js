@@ -342,7 +342,7 @@ THREE.Loader.prototype = {
 			var shader = THREE.ShaderUtils.lib[ "normal" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-			uniforms[ "tNormal" ].texture = mpars.normalMap;
+			uniforms[ "tNormal" ].value = mpars.normalMap;
 
 			if ( m.mapNormalFactor ) {
 
@@ -352,21 +352,21 @@ THREE.Loader.prototype = {
 
 			if ( mpars.map ) {
 
-				uniforms[ "tDiffuse" ].texture = mpars.map;
+				uniforms[ "tDiffuse" ].value = mpars.map;
 				uniforms[ "enableDiffuse" ].value = true;
 
 			}
 
 			if ( mpars.specularMap ) {
 
-				uniforms[ "tSpecular" ].texture = mpars.specularMap;
+				uniforms[ "tSpecular" ].value = mpars.specularMap;
 				uniforms[ "enableSpecular" ].value = true;
 
 			}
 
 			if ( mpars.lightMap ) {
 
-				uniforms[ "tAO" ].texture = mpars.lightMap;
+				uniforms[ "tAO" ].value = mpars.lightMap;
 				uniforms[ "enableAO" ].value = true;
 
 			}

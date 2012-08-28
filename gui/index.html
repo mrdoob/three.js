@@ -19,23 +19,24 @@
 	</head>
 	<body>
 
-		<script type="text/javascript" src="../build/three.min.js"></script>
-		<script type="text/javascript" src="../examples/js/loaders/ColladaLoader.js"></script>
-		<script type="text/javascript" src="../examples/js/loaders/OBJLoader.js"></script>
-		<script type="text/javascript" src="../examples/js/loaders/UTF8Loader.js"></script>
-		<script type="text/javascript" src="../examples/js/loaders/VTKLoader.js"></script>
+		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/STLLoader.js"></script>
+		<script src="../examples/js/loaders/UTF8Loader.js"></script>
+		<script src="../examples/js/loaders/VTKLoader.js"></script>
 
-		<script type="text/javascript" src="js/libs/signals.min.js"></script>
+		<script src="js/libs/signals.min.js"></script>
 
-		<script type="text/javascript" src="js/UI.js"></script>
-		<script type="text/javascript" src="js/ui/Menubar.js"></script>
-		<script type="text/javascript" src="js/ui/Viewport.js"></script>
-		<script type="text/javascript" src="js/ui/Sidebar.js"></script>
-		<script type="text/javascript" src="js/ui/Sidebar.Outliner.js"></script>
-		<script type="text/javascript" src="js/ui/Sidebar.Properties.js"></script>
-		<script type="text/javascript" src="js/ui/Sidebar.Properties.Object3D.js"></script>
-		<script type="text/javascript" src="js/ui/Sidebar.Properties.Geometry.js"></script>
-		<script type="text/javascript" src="js/ui/Sidebar.Properties.Material.js"></script>
+		<script src="js/UI.js"></script>
+		<script src="js/ui/Menubar.js"></script>
+		<script src="js/ui/Viewport.js"></script>
+		<script src="js/ui/Sidebar.js"></script>
+		<script src="js/ui/Sidebar.Outliner.js"></script>
+		<script src="js/ui/Sidebar.Properties.js"></script>
+		<script src="js/ui/Sidebar.Properties.Object3D.js"></script>
+		<script src="js/ui/Sidebar.Properties.Geometry.js"></script>
+		<script src="js/ui/Sidebar.Properties.Material.js"></script>
 
 		<script>
 
@@ -121,6 +122,17 @@
 
 							signals.objectAdded.dispatch( object );
 							signals.objectSelected.dispatch( object );
+
+							break;
+
+						case 'stl':
+
+							var geometry = new THREE.STLLoader().parse( contents );
+
+							var mesh = new THREE.Mesh( geometry );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
 
 							break;
 
