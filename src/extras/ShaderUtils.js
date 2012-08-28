@@ -275,6 +275,12 @@ THREE.ShaderUtils = {
 					"mat3 tsb = mat3( normalize( vTangent ), normalize( vBinormal ), normalize( vNormal ) );",
 					"vec3 finalNormal = tsb * normalTex;",
 
+					"#ifdef FLIP_SIDED",
+
+						"finalNormal = -finalNormal;",
+
+					"#endif",
+
 					"vec3 normal = normalize( finalNormal );",
 					"vec3 viewPosition = normalize( vViewPosition );",
 
