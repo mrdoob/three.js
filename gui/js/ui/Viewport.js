@@ -46,7 +46,6 @@ var Viewport = function ( signals ) {
 	camera.lookAt( scene.position );
 	scene.add( camera );
 
-	/*
 	var controls = new THREE.TrackballControls( camera, container.dom );
 	controls.rotateSpeed = 1.0;
 	controls.zoomSpeed = 1.2;
@@ -56,10 +55,11 @@ var Viewport = function ( signals ) {
 	controls.staticMoving = true;
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', render );
-	*/
 
+	/*
 	var controls = new THREE.OrbitControls( camera, container.dom );
 	controls.addEventListener( 'change', render );
+	*/
 
 	var light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 1, 0.5, 0 ).normalize();

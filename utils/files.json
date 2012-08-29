@@ -52,6 +52,7 @@
 		"../src/materials/ParticleDOMMaterial.js",
 		"../src/materials/ShaderMaterial.js",
 		"../src/textures/Texture.js",
+		"../src/textures/CompressedTexture.js",
 		"../src/textures/DataTexture.js",
 		"../src/objects/Particle.js",
 		"../src/objects/ParticleSystem.js",

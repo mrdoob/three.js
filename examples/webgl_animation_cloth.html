@@ -190,10 +190,7 @@
 				clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
 				clothTexture.anisotropy = 16;
 
-				materials = [
-					new THREE.MeshPhongMaterial( { alphaTest: 0.5, ambient: 0xffffff, color: 0xffffff, specular: 0x030303, emissive: 0x111111, shiness: 10, perPixel: true, metal: false, map: clothTexture, side: THREE.DoubleSide } ),
-					new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, transparent: true, opacity: 0.9 } )
-				];
+				var clothMaterial = new THREE.MeshPhongMaterial( { alphaTest: 0.5, ambient: 0xffffff, color: 0xffffff, specular: 0x030303, emissive: 0x111111, shiness: 10, perPixel: true, metal: false, map: clothTexture, side: THREE.DoubleSide } );
 
 				// cloth geometry
 				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h, true );
@@ -206,7 +203,7 @@
 
 				// cloth mesh
 
-				object = new THREE.Mesh( clothGeometry, materials[ 0 ] );
+				object = new THREE.Mesh( clothGeometry, clothMaterial );
 				object.position.set( 0, 0, 0 );
 				object.castShadow = true;
 				object.receiveShadow = true;
@@ -257,19 +254,19 @@
 
 				// poles
 
-				var poleGeo = new THREE.CubeGeometry( 5, 750, 5 );
+				var poleGeo = new THREE.CubeGeometry( 5, 375, 5 );
 				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shiness: 100, perPixel: true } );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
-				mesh.position.y = -250;
 				mesh.position.x = -125;
+				mesh.position.y = -62;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
-				mesh.position.y = -250;
 				mesh.position.x = 125;
+				mesh.position.y = -62;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );

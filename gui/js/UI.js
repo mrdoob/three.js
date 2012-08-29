@@ -256,7 +256,7 @@ UI.Text = function ( position ) {
 
 UI.Text.prototype = Object.create( UI.Element.prototype );
 
-UI.Text.prototype.setText = function ( value ) {
+UI.Text.prototype.setValue = function ( value ) {
 
 	this.dom.textContent = value;
 
@@ -264,6 +264,100 @@ UI.Text.prototype.setText = function ( value ) {
 
 };
 
+// Select
+
+UI.Select = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	this.dom = document.createElement( 'select' );
+	this.dom.style.position = position || 'relative';
+	this.dom.style.width = '64px';
+	this.dom.style.height = '16px';
+	this.dom.style.border = '0px';
+	this.dom.style.padding = '0px';
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		// console.log( scope.dom.selectedIndex );
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
+
+	return this;
+
+};
+
+UI.Select.prototype = Object.create( UI.Element.prototype );
+
+UI.Select.prototype.setOptions = function ( options ) {
+
+	for ( var i = 0; i < options.length; i ++ ) {
+
+		var option = document.createElement( 'option' );
+		option.appendChild( document.createTextNode( options[ i ] ) );
+		this.dom.appendChild( option );
+
+	}
+
+	return this;
+
+};
+
+UI.Select.prototype.getValue = function () {
+
+	return this.dom.value;
+
+};
+
+UI.Select.prototype.setValue = function ( value ) {
+
+	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.Select.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+
+// Boolean
+
+UI.Boolean = function ( position ) {
+
+	UI.Select.call( this, position );
+
+	this.setOptions( [ 'true', 'false' ] );
+
+	return this;
+
+};
+
+UI.Boolean.prototype = Object.create( UI.Select.prototype );
+
+UI.Boolean.prototype.getValue = function () {
+
+	return this.dom.value === 'true';
+
+};
+
+UI.Boolean.prototype.setValue = function ( value ) {
+
+	this.dom.value = value.toString();
+
+	return this;
+
+};
 
 // Color
 
@@ -493,7 +587,7 @@ UI.Button = function ( position ) {
 
 UI.Button.prototype = Object.create( UI.Element.prototype );
 
-UI.Button.prototype.setText = function ( value ) {
+UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
 

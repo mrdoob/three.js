@@ -176,6 +176,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionTextureFloat;
 	var _glExtensionStandardDerivatives;
 	var _glExtensionTextureFilterAnisotropic;
+	var _glExtensionCompressedTextureS3TC;
 
 	initGL();
 
@@ -194,6 +195,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var _supportsVertexTextures = ( _maxVertexTextures > 0 );
 	var _supportsBoneTextures = _supportsVertexTextures && _glExtensionTextureFloat;
+
+	var _compressedTextureFormats = _glExtensionCompressedTextureS3TC ? _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS ) : [];
 
 	// API
 
@@ -6243,7 +6246,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, isImagePowerOfTwo );
 
-			if ( texture instanceof THREE.DataTexture ) {
+			if ( texture instanceof THREE.CompressedTexture ) {
+
+				var mipmap, mipmaps = texture.mipmaps;
+
+				for( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+					mipmap = mipmaps[ i ];
+					_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+				}
+
+			} else if ( texture instanceof THREE.DataTexture ) {
 
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
 
@@ -6607,6 +6621,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( p === THREE.OneMinusDstColorFactor ) return _gl.ONE_MINUS_DST_COLOR;
 		if ( p === THREE.SrcAlphaSaturateFactor ) return _gl.SRC_ALPHA_SATURATE;
 
+		if ( _glExtensionCompressedTextureS3TC !== undefined ) {
+
+			if ( p === THREE.RGB_S3TC_DXT1_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGB_S3TC_DXT1_EXT;
+			if ( p === THREE.RGBA_S3TC_DXT1_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT1_EXT;
+			if ( p === THREE.RGBA_S3TC_DXT3_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+			if ( p === THREE.RGBA_S3TC_DXT5_Format ) return _glExtensionCompressedTextureS3TC.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+
+		}
+
 		return 0;
 
 	};
@@ -6739,6 +6762,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 											   _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
 
 
+		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) ||
+											_gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) ||
+											_gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
+
 		if ( ! _glExtensionTextureFloat ) {
 
 			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
@@ -6754,6 +6781,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( ! _glExtensionTextureFilterAnisotropic ) {
 
 			console.log( 'THREE.WebGLRenderer: Anisotropic texture filtering not supported.' );
+
+		}
+
+		if ( ! _glExtensionCompressedTextureS3TC ) {
+
+			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
 
 		}
 
