@@ -929,7 +929,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// material must use some texture to require uvs
 
-		if ( material.map || material.lightMap || material.bumpMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
+		if ( material.map || material.lightMap || material.bumpMap || material.normalMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
 
 			return true;
 
@@ -4593,6 +4593,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			envMap: !!material.envMap,
 			lightMap: !!material.lightMap,
 			bumpMap: !!material.bumpMap,
+			normalMap: !!material.normalMap,
 			specularMap: !!material.specularMap,
 
 			vertexColors: material.vertexColors,
@@ -4945,10 +4946,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value = material.normalScale;
+
+		}
+
 		// uv repeat and offset setting priorities
 		//	1. color map
 		//	2. specular map
-		//	3. bump map
+		//	3. normal map
+		//	4. bump map
 
 		var uvScaleMap;
 
@@ -4959,6 +4968,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material.specularMap ) {
 
 			uvScaleMap = material.specularMap;
+
+		} else if ( material.normalMap ) {
+
+			uvScaleMap = material.normalMap;
 
 		} else if ( material.bumpMap ) {
 
@@ -5889,6 +5902,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.normalMap ? "#define USE_NORMALMAP" : "",
 			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
@@ -5969,7 +5983,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"precision " + _precision + " float;",
 
-			parameters.bumpMap ? "#extension GL_OES_standard_derivatives : enable" : "",
+			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -5991,6 +6005,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.normalMap ? "#define USE_NORMALMAP" : "",
 			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
