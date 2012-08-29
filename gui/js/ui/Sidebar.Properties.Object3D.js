@@ -3,29 +3,29 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text().setText( 'OBJECT' ).setColor( '#666' ) );
+	container.add( new UI.Text().setValue( 'OBJECT' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	container.add( new UI.Text().setText( 'Name' ).setColor( '#666' ) );
+	container.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	var objectName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' );
 	container.add( objectName );
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'Position' ).setColor( '#666' ) );
+	container.add( new UI.Text().setValue( 'Position' ).setColor( '#666' ) );
 	var positionX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
 	var positionY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
 	var positionZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 	container.add( positionX, positionY, positionZ );
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'Rotation' ).setColor( '#666' ) );
+	container.add( new UI.Text().setValue( 'Rotation' ).setColor( '#666' ) );
 	var rotationX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
 	var rotationY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
 	var rotationZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 	container.add( rotationX, rotationY, rotationZ );
 	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'Scale' ).setColor( '#666' ) );
+	container.add( new UI.Text().setValue( 'Scale' ).setColor( '#666' ) );
 	var scaleX = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
 	var scaleY = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
 	var scaleZ = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
@@ -66,7 +66,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 			container.setDisplay( 'block' );
 
-			objectName.setText( object.name );
+			objectName.setValue( object.name );
 
 			positionX.setValue( object.position.x );
 			positionY.setValue( object.position.y );
