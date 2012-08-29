@@ -30,7 +30,7 @@ THREE.ShaderPass.prototype = {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ].texture = readBuffer;
+			this.uniforms[ this.textureID ].value = readBuffer;
 
 		}
 

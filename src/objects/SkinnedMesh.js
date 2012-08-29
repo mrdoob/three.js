@@ -170,15 +170,37 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 
 	}
 
+	// make a snapshot of the bones' rest position
+
+	if ( this.boneInverses == undefined ) {
+
+		this.boneInverses = [];
+
+		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
+			var inverse = new THREE.Matrix4();
+
+			inverse.getInverse( this.bones[ b ].skinMatrix );
+
+			this.boneInverses.push( inverse );
+
+		}
+
+	}
+
 	// flatten bone matrices to array
 
-	var b, bl = this.bones.length,
-		ba = this.bones,
-		bm = this.boneMatrices;
+	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
-	for ( b = 0; b < bl; b ++ ) {
+		// compute the offset between the current and the original transform;
 
-		ba[ b ].skinMatrix.flattenToArrayOffset( bm, b * 16 );
+		//TODO: we could get rid of this multiplication step if the skinMatrix
+		// was already representing the offset; however, this requires some
+		// major changes to the animation system
+
+		THREE.SkinnedMesh.offsetMatrix.multiply( this.bones[ b ].skinMatrix, this.boneInverses[ b ] );
+
+		THREE.SkinnedMesh.offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
 
 	}
 
@@ -198,57 +220,27 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 	this.updateMatrixWorld( true );
 
-	var bim, bone, boneInverses = [];
+	for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
-	for ( var b = 0; b < this.bones.length; b ++ ) {
+		// normalize weights
 
-		bone = this.bones[ b ];
+		var sw = this.geometry.skinWeights[ i ];
 
-		var inverseMatrix = new THREE.Matrix4();
-		inverseMatrix.getInverse( bone.skinMatrix );
+		var scale = 1.0 / sw.lengthManhattan();
 
-		boneInverses.push( inverseMatrix );
+		if ( scale !== Infinity ) {
 
-		bone.skinMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+			sw.multiplyScalar( scale );
 
-	}
+		} else {
 
-	// project vertices to local
-
-	if ( this.geometry.skinVerticesA === undefined ) {
-
-		this.geometry.skinVerticesA = [];
-		this.geometry.skinVerticesB = [];
-
-		var orgVertex, vertex;
-
-		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
-
-			orgVertex = this.geometry.vertices[ i ];
-
-			var indexA = this.geometry.skinIndices[ i ].x;
-			var indexB = this.geometry.skinIndices[ i ].y;
-
-			vertex = new THREE.Vector3( orgVertex.x, orgVertex.y, orgVertex.z );
-			this.geometry.skinVerticesA.push( boneInverses[ indexA ].multiplyVector3( vertex ) );
-
-			vertex = new THREE.Vector3( orgVertex.x, orgVertex.y, orgVertex.z );
-			this.geometry.skinVerticesB.push( boneInverses[ indexB ].multiplyVector3( vertex ) );
-
-			// todo: add more influences
-
-			// normalize weights
-
-			if ( this.geometry.skinWeights[ i ].x + this.geometry.skinWeights[ i ].y !== 1 ) {
-
-				var len = ( 1.0 - ( this.geometry.skinWeights[ i ].x + this.geometry.skinWeights[ i ].y ) ) * 0.5;
-				this.geometry.skinWeights[ i ].x += len;
-				this.geometry.skinWeights[ i ].y += len;
-
-			}
+			sw.set( 1 ); // this will be normalized by the shader anyway
 
 		}
 
 	}
 
 };
+
+THREE.SkinnedMesh.offsetMatrix = new THREE.Matrix4();
+

@@ -117,6 +117,8 @@
 
 				var path = pages[ name ];
 
+				window.document.title = 'three.js - documentation - ' + name;
+
 				window.location.hash = name;
 				viewer.src = 'api/' + path + '.html';
 

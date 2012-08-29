@@ -33,7 +33,6 @@
 			<span class="button" id="font">change font</span>,
 			<span class="button" id="weight">change weight</span>,
 			<span class="button" id="bevel">change bevel</span>,
-			<span class="button" id="bend">bend</span>,
 			<span class="button" id="postprocessing">change postprocessing</span>,
 			<a id="permalink" href="#">permalink</a>
 		</div>
@@ -95,27 +94,29 @@
 				bevelSize = 1.5,
 				bevelSegments = 3,
 				bevelEnabled = true,
-				bend = true,
 
-				font = "optimer", 		// helvetiker, optimer, gentilis, droid sans, droid serif
-				weight = "bold",		// normal bold
-				style = "normal";		// normal italic
+				font = "optimer", // helvetiker, optimer, gentilis, droid sans, droid serif
+				weight = "bold", // normal bold
+				style = "normal"; // normal italic
 
 			var mirror = true;
 
 			var fontMap = {
-			"helvetiker"  : 0,
-			"optimer"  	  : 1,
-			"gentilis" 	  : 2,
-			"droid sans"  : 3,
-			"droid serif" : 4
+
+				"helvetiker": 0,
+				"optimer": 1,
+				"gentilis": 2,
+				"droid sans": 3,
+				"droid serif": 4
 
 			};
 
 			var weightMap = {
-			"normal"	: 0,
-			"bold"		: 1
-			}
+
+				"normal": 0,
+				"bold": 1
+
+			};
 
 			var reverseFontMap = {};
 			var reverseWeightMap = {};
@@ -196,8 +197,7 @@
 					var weighthash = hash.substring( 7, 8 );
 					var pphash 	   = hash.substring( 8, 9 );
 					var bevelhash  = hash.substring( 9, 10 );
-					var bendhash   = hash.substring( 10, 11 );
-					var texthash   = hash.substring( 12 );
+					var texthash   = hash.substring( 10 );
 
 					hex = colorhash;
 					pointLight.color.setHex( parseInt( colorhash, 16 ) );
@@ -207,7 +207,6 @@
 
 					postprocessing.enabled = parseInt( pphash );
 					bevelEnabled = parseInt( bevelhash );
-					bend = parseInt( bendhash );
 
 					text = decodeURI( texthash );
 
@@ -322,13 +321,6 @@
 
 				}, false );
 
-				document.getElementById( "bend" ).addEventListener( 'click', function() {
-
-					bend = !bend;
-					refreshText();
-
-				}, false );
-
 				document.getElementById( "postprocessing" ).addEventListener( 'click', function() {
 
 					postprocessing.enabled = !postprocessing.enabled;
@@ -393,8 +385,7 @@
 
 			function updatePermalink() {
 
-				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + boolToNum( bevelEnabled )
-				+ boolToNum( bend ) + "#" + encodeURI( text );
+				var link = hex + fontMap[ font ] + weightMap[ weight ] + boolToNum( postprocessing.enabled ) + boolToNum( bevelEnabled ) + "#" + encodeURI( text );
 
 				permalink.href = "#" + link;
 				window.location.hash = link;
@@ -463,8 +454,6 @@
 					bevelThickness: bevelThickness,
 					bevelSize: bevelSize,
 					bevelEnabled: bevelEnabled,
-
-					bend: bend,
 
 					material: 0,
 					extrudeMaterial: 1

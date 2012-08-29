@@ -10,7 +10,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			
+
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
@@ -37,7 +37,7 @@
 
 			var camera, cubeCamera, scene, renderer;
 			var cube, sphere, torus;
-			
+
 			var fov = 70,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
@@ -74,7 +74,7 @@
 				//
 
 				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget } );
-				
+
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 60, 40 ), material );
 				scene.add( sphere );
 
@@ -90,11 +90,11 @@
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
 				window.addEventListener( 'resize', onWindowResized, false );
-			
+
 				onWindowResized( null );
 
 			}
-			
+
 			function onWindowResized( event ) {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -153,7 +153,7 @@
 				}
 
 				camera.projectionMatrix.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
-				
+
 			}
 
 			function animate() {
@@ -164,7 +164,7 @@
 			}
 
 			function render() {
-				
+
 				var time = Date.now();
 
 				lon += .15;
@@ -211,6 +211,6 @@
 			}
 
 		</script>
-	
+
 	</body>
 </html>

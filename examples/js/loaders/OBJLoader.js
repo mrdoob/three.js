@@ -141,7 +141,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1 2 3", "1", "2", "3", undefined]
 
 				if ( result[ 4 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 1 ] ) - 1,
 						parseInt( result[ 2 ] ) - 1,
@@ -170,7 +170,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
 
 				if ( result[ 10 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 2 ] ) - 1,
 						parseInt( result[ 5 ] ) - 1,
@@ -212,7 +212,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
 
 				if ( result[ 13 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 2 ] ) - 1,
 						parseInt( result[ 6 ] ) - 1,
@@ -266,7 +266,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
 
 				if ( result[ 10 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 2 ] ) - 1,
 						parseInt( result[ 5 ] ) - 1,

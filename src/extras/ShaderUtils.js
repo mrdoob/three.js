@@ -29,7 +29,7 @@ THREE.ShaderUtils = {
 				"mFresnelBias": { type: "f", value: 0.1 },
 				"mFresnelPower": { type: "f", value: 2.0 },
 				"mFresnelScale": { type: "f", value: 1.0 },
-				"tCube": { type: "t", value: 1, texture: null }
+				"tCube": { type: "t", value: null }
 
 			},
 
@@ -114,12 +114,12 @@ THREE.ShaderUtils = {
 				"enableReflection": { type: "i", value: 0 },
 				"enableDisplacement": { type: "i", value: 0 },
 
-				"tDiffuse"	   : { type: "t", value: 0, texture: null },
-				"tCube"		   : { type: "t", value: 1, texture: null },
-				"tNormal"	   : { type: "t", value: 2, texture: null },
-				"tSpecular"	   : { type: "t", value: 3, texture: null },
-				"tAO"		   : { type: "t", value: 4, texture: null },
-				"tDisplacement": { type: "t", value: 5, texture: null },
+				"tDisplacement": { type: "t", value: null }, // must go first as this is vertex texture
+				"tDiffuse"	   : { type: "t", value: null },
+				"tCube"		   : { type: "t", value: null },
+				"tNormal"	   : { type: "t", value: null },
+				"tSpecular"	   : { type: "t", value: null },
+				"tAO"		   : { type: "t", value: null },
 
 				"uNormalScale": { type: "f", value: 1.0 },
 
@@ -182,6 +182,14 @@ THREE.ShaderUtils = {
 
 					"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
 					"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+
+				"#endif",
+
+				"#if MAX_HEMI_LIGHTS > 0",
+
+					"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
+					"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
+					"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
 
 				"#endif",
 
@@ -266,6 +274,12 @@ THREE.ShaderUtils = {
 
 					"mat3 tsb = mat3( normalize( vTangent ), normalize( vBinormal ), normalize( vNormal ) );",
 					"vec3 finalNormal = tsb * normalTex;",
+
+					"#ifdef FLIP_SIDED",
+
+						"finalNormal = -finalNormal;",
+
+					"#endif",
 
 					"vec3 normal = normalize( finalNormal );",
 					"vec3 viewPosition = normalize( vViewPosition );",
@@ -452,6 +466,61 @@ THREE.ShaderUtils = {
 
 					"#endif",
 
+					// hemisphere lights
+
+					"#if MAX_HEMI_LIGHTS > 0",
+
+						"vec3 hemiDiffuse  = vec3( 0.0 );",
+						"vec3 hemiSpecular = vec3( 0.0 );" ,
+
+						"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
+
+							"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
+							"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+
+							// diffuse
+
+							"float dotProduct = dot( normal, lVector );",
+							"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
+
+							"hemiDiffuse += uDiffuseColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+
+							// specular (sky light)
+
+							"float hemiSpecularWeight = 0.0;",
+
+							"vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
+							"float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
+							"hemiSpecularWeight += specularTex.r * max( pow( hemiDotNormalHalfSky, uShininess ), 0.0 );",
+
+							// specular (ground light)
+
+							"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+
+							"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
+							"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
+							"hemiSpecularWeight += specularTex.r * max( pow( hemiDotNormalHalfGround, uShininess ), 0.0 );",
+
+							"#ifdef PHYSICALLY_BASED_SHADING",
+
+								// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+								"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
+
+								"vec3 schlickSky = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
+								"vec3 schlickGround = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+								"hemiSpecular += ( schlickSky + schlickGround ) * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * hemiDiffuseWeight * specularNormalization;",
+
+							"#else",
+
+								"hemiSpecular += uSpecularColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * hemiDiffuseWeight;",
+
+							"#endif",
+
+						"}",
+
+					"#endif",
+
 					// all lights contribution summation
 
 					"vec3 totalDiffuse = vec3( 0.0 );",
@@ -461,6 +530,13 @@ THREE.ShaderUtils = {
 
 						"totalDiffuse += dirDiffuse;",
 						"totalSpecular += dirSpecular;",
+
+					"#endif",
+
+					"#if MAX_HEMI_LIGHTS > 0",
+
+						"totalDiffuse += hemiDiffuse;",
+						"totalSpecular += hemiSpecular;",
 
 					"#endif",
 
@@ -591,8 +667,10 @@ THREE.ShaderUtils = {
 
 							"#ifdef USE_SKINNING",
 
-								"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-								"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+								"vec4 skinVertex = vec4( position, 1.0 );",
+
+								"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+								"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 								"displacedPosition  = skinned.xyz;",
 
@@ -608,8 +686,10 @@ THREE.ShaderUtils = {
 
 						"#ifdef USE_SKINNING",
 
-							"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-							"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+							"vec4 skinVertex = vec4( position, 1.0 );",
+
+							"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+							"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 							"displacedPosition  = skinned.xyz;",
 
@@ -624,13 +704,13 @@ THREE.ShaderUtils = {
 					//
 
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
-					"vec4 wPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
 					//
 
-					"vWorldPosition = wPosition.xyz;",
+					"vWorldPosition = mPosition.xyz;",
 
 					// shadows
 
@@ -638,7 +718,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-							"vShadowCoord[ i ] = shadowMatrix[ i ] * wPosition;",
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 						"}",
 
@@ -656,7 +736,7 @@ THREE.ShaderUtils = {
 
 		'cube': {
 
-			uniforms: { "tCube": { type: "t", value: 1, texture: null },
+			uniforms: { "tCube": { type: "t", value: null },
 						"tFlip": { type: "f", value: -1 } },
 
 			vertexShader: [
