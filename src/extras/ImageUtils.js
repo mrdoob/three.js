@@ -70,6 +70,211 @@ THREE.ImageUtils = {
 
 	},
 
+	loadCompressedTexture: function ( url, mapping, onLoad, onError ) {
+
+		var texture = new THREE.CompressedTexture();
+		texture.mapping = mapping;
+
+		var xhr = new XMLHttpRequest();
+
+		xhr.onload = function () {
+
+			var buffer = xhr.response;
+			var dds = THREE.ImageUtils.parseDDS( buffer, true );
+
+			texture.format = dds.format;
+
+			texture.mipmaps = dds.mipmaps;
+			texture.image.width = dds.width;
+			texture.image.height = dds.height;
+
+			// gl.generateMipmap fails for compressed textures
+			// mipmaps must be embedded in the DDS file
+			// or texture filters must not use mipmapping
+
+			texture.generateMipmaps = false;
+
+			texture.needsUpdate = true;
+
+			if ( onLoad ) onLoad( texture );
+
+		}
+
+		xhr.onerror = onError;
+
+        xhr.open( 'GET', url, true );
+        xhr.responseType = "arraybuffer";
+		xhr.send( null );
+
+		return texture;
+
+	},
+
+	parseDDS: function ( buffer, loadMipmaps ) {
+
+		var dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
+
+		// Adapted from @toji's DDS utils
+		//	https://github.com/toji/webgl-texture-utils/blob/master/texture-util/dds.js
+
+		// All values and structures referenced from:
+		// http://msdn.microsoft.com/en-us/library/bb943991.aspx/
+
+		var DDS_MAGIC = 0x20534444;
+
+		var DDSD_CAPS = 0x1,
+			DDSD_HEIGHT = 0x2,
+			DDSD_WIDTH = 0x4,
+			DDSD_PITCH = 0x8,
+			DDSD_PIXELFORMAT = 0x1000,
+			DDSD_MIPMAPCOUNT = 0x20000,
+			DDSD_LINEARSIZE = 0x80000,
+			DDSD_DEPTH = 0x800000;
+
+		var DDSCAPS_COMPLEX = 0x8,
+			DDSCAPS_MIPMAP = 0x400000,
+			DDSCAPS_TEXTURE = 0x1000;
+
+		var DDSCAPS2_CUBEMAP = 0x200,
+			DDSCAPS2_CUBEMAP_POSITIVEX = 0x400,
+			DDSCAPS2_CUBEMAP_NEGATIVEX = 0x800,
+			DDSCAPS2_CUBEMAP_POSITIVEY = 0x1000,
+			DDSCAPS2_CUBEMAP_NEGATIVEY = 0x2000,
+			DDSCAPS2_CUBEMAP_POSITIVEZ = 0x4000,
+			DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000,
+			DDSCAPS2_VOLUME = 0x200000;
+
+		var DDPF_ALPHAPIXELS = 0x1,
+			DDPF_ALPHA = 0x2,
+			DDPF_FOURCC = 0x4,
+			DDPF_RGB = 0x40,
+			DDPF_YUV = 0x200,
+			DDPF_LUMINANCE = 0x20000;
+
+		function fourCCToInt32( value ) {
+
+			return value.charCodeAt(0) +
+				(value.charCodeAt(1) << 8) +
+				(value.charCodeAt(2) << 16) +
+				(value.charCodeAt(3) << 24);
+
+		}
+
+		function int32ToFourCC( value ) {
+
+			return String.fromCharCode(
+				value & 0xff,
+				(value >> 8) & 0xff,
+				(value >> 16) & 0xff,
+				(value >> 24) & 0xff
+			);
+		}
+
+		var FOURCC_DXT1 = fourCCToInt32("DXT1");
+		var FOURCC_DXT3 = fourCCToInt32("DXT3");
+		var FOURCC_DXT5 = fourCCToInt32("DXT5");
+
+		var headerLengthInt = 31; // The header length in 32 bit ints
+
+		// Offsets into the header array
+
+		var off_magic = 0;
+
+		var off_size = 1;
+		var off_flags = 2;
+		var off_height = 3;
+		var off_width = 4;
+
+		var off_mipmapCount = 7;
+
+		var off_pfFlags = 20;
+		var off_pfFourCC = 21;
+
+		// Parse header
+
+		var header = new Int32Array( buffer, 0, headerLengthInt );
+
+        if ( header[ off_magic ] !== DDS_MAGIC ) {
+
+            console.error( "ImageUtils.parseDDS(): Invalid magic number in DDS header" );
+            return dds;
+
+        }
+
+        if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
+
+            console.error( "ImageUtils.parseDDS(): Unsupported format, must contain a FourCC code" );
+            return dds;
+
+        }
+
+		var blockBytes;
+
+		var fourCC = header[ off_pfFourCC ];
+
+        switch ( fourCC ) {
+
+			case FOURCC_DXT1:
+
+				blockBytes = 8;
+                dds.format = THREE.RGB_S3TC_DXT1_Format;
+                break;
+
+            case FOURCC_DXT3:
+
+                blockBytes = 16;
+                dds.format = THREE.RGBA_S3TC_DXT3_Format;
+                break;
+
+            case FOURCC_DXT5:
+
+                blockBytes = 16;
+                dds.format = THREE.RGBA_S3TC_DXT5_Format;
+                break;
+
+            default:
+
+                console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+                return dds;
+
+        }
+
+		dds.mipmapCount = 1;
+
+        if ( header[ off_flags ] & DDSD_MIPMAPCOUNT && loadMipmaps !== false ) {
+
+            dds.mipmapCount = Math.max( 1, header[ off_mipmapCount ] );
+
+        }
+
+        dds.width = header[ off_width ];
+        dds.height = header[ off_height ];
+
+        var dataOffset = header[ off_size ] + 4;
+
+		// Extract mipmaps buffers
+
+		var width = dds.width;
+		var height = dds.height;
+
+		for ( var i = 0; i < dds.mipmapCount; i ++ ) {
+
+			var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
+			var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
+
+			var mipmap = { "data": byteArray, "width": width, "height": height };
+			dds.mipmaps.push( mipmap );
+
+			dataOffset += dataLength;
+			width *= 0.5;
+			height *= 0.5;
+
+		}
+
+		return dds;
+
+	},
+
 	getNormalMap: function ( image, depth ) {
 
 		// Adapted from http://www.paulbrunt.co.uk/lab/heightnormal/
