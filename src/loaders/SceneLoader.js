@@ -17,7 +17,7 @@ THREE.SceneLoader.prototype.constructor = THREE.SceneLoader;
 
 THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 
-	var context = this;
+	var scope = this;
 
 	var xhr = new XMLHttpRequest();
 
@@ -28,7 +28,7 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 			if ( xhr.status === 200 || xhr.status === 0 ) {
 
 				var json = JSON.parse( xhr.responseText );
-				context.createScene( json, callbackFinished, url );
+				scope.parse( json, callbackFinished, url );
 
 			} else {
 
@@ -47,7 +47,7 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 
 };
 
-THREE.SceneLoader.prototype.createScene = function ( json, callbackFinished, url ) {
+THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var scope = this;
 

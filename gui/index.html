@@ -107,12 +107,27 @@
 
 						case 'js':
 
-							var geometry = new THREE.GeometryLoader().parse( JSON.parse( contents ) );
-							var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-							var mesh = new THREE.Mesh( geometry, material );
+							var data = JSON.parse( contents );
 
-							signals.objectAdded.dispatch( mesh );
-							signals.objectSelected.dispatch( mesh );
+							if ( data.metadata.type === 'scene' ) {
+
+								new THREE.SceneLoader().parse( data, function ( scene ) {
+
+									signals.objectAdded.dispatch( scene );
+									signals.objectSelected.dispatch( scene );
+
+								}, '' );
+
+							} else {
+
+								var geometry = new THREE.GeometryLoader().parse( data );
+								var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+								var mesh = new THREE.Mesh( geometry, material );
+
+								signals.objectAdded.dispatch( mesh );
+								signals.objectSelected.dispatch( mesh );
+
+							}
 
 							break;
 
