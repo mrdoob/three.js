@@ -140,6 +140,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	};
 
+	this.getMaxAnisotropy  = function () {
+
+		return 0;
+
+	};
+
 	this.clear = function () {
 
 		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
