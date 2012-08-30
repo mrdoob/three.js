@@ -6,31 +6,63 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	container.add( new UI.Text().setValue( 'OBJECT' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	container.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
+	// name
+
+	var objectNameRow = new UI.Panel();
 	var objectName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' );
-	container.add( objectName );
-	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setValue( 'Position' ).setColor( '#666' ) );
-	var positionX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
-	var positionY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
-	var positionZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
-	container.add( positionX, positionY, positionZ );
-	container.add( new UI.HorizontalRule() );
+	objectNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
+	objectNameRow.add( objectName );
 
-	container.add( new UI.Text().setValue( 'Rotation' ).setColor( '#666' ) );
-	var rotationX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
-	var rotationY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
-	var rotationZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
-	container.add( rotationX, rotationY, rotationZ );
-	container.add( new UI.HorizontalRule() );
+	container.add( objectNameRow );
 
-	container.add( new UI.Text().setValue( 'Scale' ).setColor( '#666' ) );
-	var scaleX = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
-	var scaleY = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
-	var scaleZ = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
-	container.add( scaleX, scaleY, scaleZ );
-	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
+	// position
+
+	var objectPositionRow = new UI.Panel();
+	var objectPositionX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+	var objectPositionY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
+	var objectPositionZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
+
+	objectPositionRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Position' ).setColor( '#666' ) );
+	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
+
+	container.add( objectPositionRow );
+
+	// rotation
+
+	var objectRotationRow = new UI.Panel();
+	var objectRotationX = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+	var objectRotationY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
+	var objectRotationZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
+
+	objectRotationRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Rotation' ).setColor( '#666' ) );
+	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
+
+	container.add( objectRotationRow );
+
+	// scale
+
+	var objectScaleRow = new UI.Panel();
+	var objectScaleX = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+	var objectScaleY = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
+	var objectScaleZ = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
+
+	objectScaleRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Scale' ).setColor( '#666' ) );
+	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
+
+	container.add( objectScaleRow );
+
+	// visible
+
+	var objectVisibleRow = new UI.Panel();
+	var objectVisible = new UI.Boolean( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+
+	objectVisibleRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Visible' ).setColor( '#666' ) );
+	objectVisibleRow.add( objectVisible );
+
+	container.add( objectVisibleRow );
+
+	container.add( new UI.Break(), new UI.Break() );
 
 	//
 
@@ -40,17 +72,19 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 		if ( selected ) {
 
-			selected.position.x = positionX.getValue();
-			selected.position.y = positionY.getValue();
-			selected.position.z = positionZ.getValue();
+			selected.position.x = objectPositionX.getValue();
+			selected.position.y = objectPositionY.getValue();
+			selected.position.z = objectPositionZ.getValue();
 
-			selected.rotation.x = rotationX.getValue();
-			selected.rotation.y = rotationY.getValue();
-			selected.rotation.z = rotationZ.getValue();
+			selected.rotation.x = objectRotationX.getValue();
+			selected.rotation.y = objectRotationY.getValue();
+			selected.rotation.z = objectRotationZ.getValue();
 
-			selected.scale.x = scaleX.getValue();
-			selected.scale.y = scaleY.getValue();
-			selected.scale.z = scaleZ.getValue();
+			selected.scale.x = objectScaleX.getValue();
+			selected.scale.y = objectScaleY.getValue();
+			selected.scale.z = objectScaleZ.getValue();
+
+			selected.visible = objectVisible.getValue();
 
 			signals.objectChanged.dispatch( selected );
 
@@ -68,17 +102,19 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 			objectName.setValue( object.name );
 
-			positionX.setValue( object.position.x );
-			positionY.setValue( object.position.y );
-			positionZ.setValue( object.position.z );
+			objectPositionX.setValue( object.position.x );
+			objectPositionY.setValue( object.position.y );
+			objectPositionZ.setValue( object.position.z );
 
-			rotationX.setValue( object.rotation.x );
-			rotationY.setValue( object.rotation.y );
-			rotationZ.setValue( object.rotation.z );
+			objectRotationX.setValue( object.rotation.x );
+			objectRotationY.setValue( object.rotation.y );
+			objectRotationZ.setValue( object.rotation.z );
 
-			scaleX.setValue( object.scale.x );
-			scaleY.setValue( object.scale.y );
-			scaleZ.setValue( object.scale.z );
+			objectScaleX.setValue( object.scale.x );
+			objectScaleY.setValue( object.scale.y );
+			objectScaleZ.setValue( object.scale.z );
+
+			objectVisible.setValue( object.visible );
 
 		} else {
 
