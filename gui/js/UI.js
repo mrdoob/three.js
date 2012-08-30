@@ -508,17 +508,10 @@ UI.Number.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setMin = function ( value ) {
+UI.Number.prototype.setRange = function ( min, max ) {
 
-	this.min = value;
-
-	return this;
-
-};
-
-UI.Number.prototype.setMax = function ( value ) {
-
-	this.max = value;
+	this.min = min;
+	this.max = max;
 
 	return this;
 

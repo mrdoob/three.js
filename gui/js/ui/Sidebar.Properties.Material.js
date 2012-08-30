@@ -23,60 +23,136 @@ Sidebar.Properties.Material = function ( signals ) {
 	container.add( new UI.Text().setValue( 'MATERIAL' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	container.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
+	// name
+
+	var materialNameRow = new UI.Panel();
 	var materialName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-	container.add( materialName );
 
-	container.add( new UI.HorizontalRule() );
+	materialNameRow.add(
+		new UI.Text().setValue( 'Name' ).setColor( '#666' ),
+		materialName
+	);
 
-	container.add( new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
+	container.add( materialNameRow );
+
+	// class
+
+	var materialClassRow = new UI.Panel();
 	var materialClass = new UI.Select( 'absolute' ).setOptions( [ 'LineBasicMaterial', 'MeshBasicMaterial', 'MeshDepthMaterial', 'MeshFaceMaterial', 'MeshLambertMaterial', 'MeshNormalMaterial', 'MeshPhongMaterial', 'ParticleBasicMaterial', 'ParticleCanvasMaterial', 'ParticleDOMMaterial', 'ShaderMaterial' ] ).setLeft( '90px' ).setWidth( '180px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
-	container.add( materialClass );
 
-	container.add( new UI.HorizontalRule() );
+	materialClassRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Class' ).setColor( '#666' ),
+		materialClass
+	);
 
-	container.add( new UI.Text().setValue( 'Color' ).setColor( '#666' ) );
+	container.add( materialClassRow );
 
+	// color
+
+	var materialColorRow = new UI.Panel();
 	var materialColor = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
-	container.add( materialColor );
 
-	container.add( new UI.HorizontalRule() );
+	materialColorRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Color' ).setColor( '#666' ),
+		materialColor
+	);
 
-	container.add( new UI.Text().setValue( 'Ambient' ).setColor( '#666' ) );
+	container.add( materialColorRow );
 
+	// ambient
+
+	var materialAmbientRow = new UI.Panel();
 	var materialAmbient = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
-	container.add( materialAmbient );
 
-	container.add( new UI.HorizontalRule() );
+	materialAmbientRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Ambient' ).setColor( '#666' ),
+		materialAmbient
+	);
 
-	container.add( new UI.Text().setValue( 'Specular' ).setColor( '#666' ) );
+	container.add( materialAmbientRow );
 
+	// specular
+
+	var materialSpecularRow = new UI.Panel();
 	var materialSpecular = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
-	container.add( materialSpecular );
 
-	container.add( new UI.HorizontalRule() );
+	materialSpecularRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Specular' ).setColor( '#666' ),
+		materialSpecular
+	);
 
-	container.add( new UI.Text().setValue( 'Map' ).setColor( '#666' ) );
+	container.add( materialSpecularRow );
+
+	// map
+
+	var materialMapRow = new UI.Panel();
 	var materialMap = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-	container.add( materialMap );
 
-	container.add( new UI.HorizontalRule() );
+	materialMapRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Map' ).setColor( '#666' ),
+		materialMap
+	);
 
-	container.add( new UI.Text().setValue( 'Opacity' ).setColor( '#666' ) );
-	var materialOpacity = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '60px' ).setMin( 0 ).setMax( 1 ).onChange( update );
-	container.add( materialOpacity );
+	container.add( materialSpecularRow );
 
-	container.add( new UI.HorizontalRule() );
+	// opacity
 
-	container.add( new UI.Text().setValue( 'Transparent' ).setColor( '#666' ) );
+	var materialOpacityRow = new UI.Panel();
+	var materialOpacity = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+
+	materialOpacityRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Opacity' ).setColor( '#666' ),
+		materialOpacity
+	);
+
+	container.add( materialOpacityRow );
+
+	// transparent
+
+	var materialTransparentRow = new UI.Panel();
 	var materialTransparent = new UI.Boolean( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
-	container.add( materialTransparent );
 
-	container.add( new UI.HorizontalRule() );
+	materialTransparentRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Transparent' ).setColor( '#666' ),
+		materialTransparent
+	);
 
-	container.add( new UI.Text().setValue( 'Wireframe' ).setColor( '#666' ) );
+	container.add( materialTransparentRow );
+
+	// wireframe
+
+	var materialWireframeRow = new UI.Panel();
 	var materialWireframe = new UI.Boolean( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
-	container.add( materialWireframe );
+
+	materialWireframeRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Wireframe' ).setColor( '#666' ),
+		materialWireframe
+	);
+
+	container.add( materialWireframeRow );
+
+	// wireframeLinewidth
+
+	var materialWireframeLinewidthRow = new UI.Panel();
+	var materialWireframeLinewidth = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '90px' ).setRange( 0, 100 ).onChange( update );
+
+	materialWireframeLinewidthRow.add(
+		new UI.HorizontalRule(),
+		new UI.Text().setValue( 'Linewidth' ).setColor( '#666' ),
+		materialWireframeLinewidth
+	);
+
+	container.add( materialWireframeLinewidthRow );
+
+
 
 	//
 
@@ -95,33 +171,70 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
-			if ( material.color ) {
+			if ( material.color !== undefined ) {
 
 				material.color.setHex( parseInt( materialColor.getValue().substr( 1 ), 16 ) );
 
 			}
 
-			if ( material.ambient ) {
+			if ( material.ambient !== undefined ) {
 
 				material.ambient.setHex( parseInt( materialAmbient.getValue().substr( 1 ), 16 ) );
 
 			}
 
-			if ( material.specular ) {
+			if ( material.specular !== undefined ) {
 
 				material.specular.setHex( parseInt( materialSpecular.getValue().substr( 1 ), 16 ) );
 
 			}
 
-			material.opacity = materialOpacity.getValue();
-			material.transparent = materialTransparent.getValue();
-			material.wireframe = materialWireframe.getValue();
+			if ( material.opacity !== undefined ) {
+
+				material.opacity = materialOpacity.getValue();
+
+			}
+
+			if ( material.transparent !== undefined ) {
+
+				material.transparent = materialTransparent.getValue();
+
+			}
+
+			if ( material.wireframe !== undefined ) {
+
+				material.wireframe = materialWireframe.getValue();
+
+			}
+
+			if ( material.wireframe === true ) {
+
+				material.wireframeLinewidth = materialWireframeLinewidth.getValue();
+
+			}
+
+			updateRows();
 
 			signals.materialChanged.dispatch( material );
 
 		}
 
-	}
+	};
+
+	function updateRows() {
+
+		var material = selected.material;
+
+		materialColorRow.setDisplay( material.color !== undefined ? '' : 'none' );
+		materialAmbientRow.setDisplay( material.ambient !== undefined ? '' : 'none' );
+		materialSpecularRow.setDisplay( material.specular !== undefined ? '' : 'none' );
+		materialMapRow.setDisplay( material.map !== undefined ? '' : 'none' );
+		materialOpacityRow.setDisplay( material.opacity !== undefined ? '' : 'none' );
+		materialTransparentRow.setDisplay( material.transparent !== undefined ? '' : 'none' );
+		materialWireframeRow.setDisplay( material.wireframe !== undefined ? '' : 'none' );
+		materialWireframeLinewidthRow.setDisplay( material.wireframe === true ? '' : 'none' );
+
+	};
 
 	signals.objectSelected.add( function ( object ) {
 
@@ -129,20 +242,62 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			selected = object;
 
-			container.setDisplay( 'block' );
+			container.setDisplay( '' );
 
 			var material = object.material;
 
 			materialName.setValue( material.name );
 			materialClass.setValue( getMaterialInstanceName( material ) );
 
-			if ( material.color ) materialColor.setValue( '#' + material.color.getHex().toString( 16 ) );
-			if ( material.ambient ) materialAmbient.setValue( '#' + material.ambient.getHex().toString( 16 ) );
-			if ( material.specular ) materialSpecular.setValue( '#' + material.specular.getHex().toString( 16 ) );
-			if ( material.map ) materialMap.setValue( material.map );
+			if ( material.color !== undefined ) {
 
-			materialOpacity.setValue( material.opacity );
-			materialTransparent.setValue( material.transparent );
+				materialColor.setValue( '#' + material.color.getHex().toString( 16 ) );
+
+			}
+
+			if ( material.ambient !== undefined ) {
+
+				materialAmbient.setValue( '#' + material.ambient.getHex().toString( 16 ) );
+
+			}
+
+			if ( material.specular !== undefined ) {
+
+				materialSpecular.setValue( '#' + material.specular.getHex().toString( 16 ) );
+
+			}
+
+			if ( material.map !== undefined ) {
+
+				materialMap.setValue( material.map );
+
+			}
+
+			if ( material.opacity !== undefined ) {
+
+				materialOpacity.setValue( material.opacity );
+
+			}
+
+			if ( material.transparent !== undefined ) {
+
+				materialTransparent.setValue( material.transparent );
+
+			}
+
+			if ( material.wireframe !== undefined ) {
+
+				materialWireframe.setValue( material.wireframe );
+
+			}
+
+			if ( material.wireframeLinewidth !== undefined ) {
+
+				materialWireframeLinewidth.setValue( material.wireframeLinewidth );
+
+			}
+
+			updateRows();
 
 		} else {
 
