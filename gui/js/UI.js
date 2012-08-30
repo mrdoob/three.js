@@ -299,7 +299,8 @@ UI.Select.prototype.setOptions = function ( options ) {
 	for ( var i = 0; i < options.length; i ++ ) {
 
 		var option = document.createElement( 'option' );
-		option.appendChild( document.createTextNode( options[ i ] ) );
+		option.value = options[ i ];
+		option.appendChild( document.createTextNode( option.value ) );
 		this.dom.appendChild( option );
 
 	}

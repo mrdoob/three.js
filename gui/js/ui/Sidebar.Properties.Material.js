@@ -26,44 +26,57 @@ Sidebar.Properties.Material = function ( signals ) {
 	container.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	var materialName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( materialName );
+
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
 	var materialClass = new UI.Select( 'absolute' ).setOptions( [ 'LineBasicMaterial', 'MeshBasicMaterial', 'MeshDepthMaterial', 'MeshFaceMaterial', 'MeshLambertMaterial', 'MeshNormalMaterial', 'MeshPhongMaterial', 'ParticleBasicMaterial', 'ParticleCanvasMaterial', 'ParticleDOMMaterial', 'ShaderMaterial' ] ).setLeft( '90px' ).setWidth( '180px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	container.add( materialClass );
+
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setValue( 'Color' ).setColor( '#666' ) );
 
 	var materialColor = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
 	container.add( materialColor );
+
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setValue( 'Ambient' ).setColor( '#666' ) );
 
 	var materialAmbient = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
 	container.add( materialAmbient );
+
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setValue( 'Specular' ).setColor( '#666' ) );
 
 	var materialSpecular = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
 	container.add( materialSpecular );
+
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setValue( 'Map' ).setColor( '#666' ) );
 	var materialMap = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 	container.add( materialMap );
+
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setValue( 'Opacity' ).setColor( '#666' ) );
 	var materialOpacity = new UI.Number( 'absolute' ).setLeft( '90px' ).setWidth( '60px' ).setMin( 0 ).setMax( 1 ).onChange( update );
 	container.add( materialOpacity );
+
 	container.add( new UI.HorizontalRule() );
 
 	container.add( new UI.Text().setValue( 'Transparent' ).setColor( '#666' ) );
-	var materialTransparent = new UI.Boolean( 'absolute' ).setLeft( '90px' ).onChange( update );
+	var materialTransparent = new UI.Boolean( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
 	container.add( materialTransparent );
+
+	container.add( new UI.HorizontalRule() );
+
+	container.add( new UI.Text().setValue( 'Wireframe' ).setColor( '#666' ) );
+	var materialWireframe = new UI.Boolean( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
+	container.add( materialWireframe );
 
 	//
 
@@ -102,6 +115,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			material.opacity = materialOpacity.getValue();
 			material.transparent = materialTransparent.getValue();
+			material.wireframe = materialWireframe.getValue();
 
 			signals.materialChanged.dispatch( material );
 
