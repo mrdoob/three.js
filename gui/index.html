@@ -121,7 +121,8 @@
 							} else {
 
 								var geometry = new THREE.GeometryLoader().parse( data );
-								var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+								var material = new THREE.MeshLambertMaterial();
+
 								var mesh = new THREE.Mesh( geometry, material );
 
 								signals.objectAdded.dispatch( mesh );
@@ -143,8 +144,9 @@
 						case 'stl':
 
 							var geometry = new THREE.STLLoader().parse( contents );
+							var material = new THREE.MeshLambertMaterial();
 
-							var mesh = new THREE.Mesh( geometry );
+							var mesh = new THREE.Mesh( geometry, material );
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
@@ -153,14 +155,21 @@
 
 						case 'utf8':
 
-							// TODO
+							var geometry = new THREE.UTF8Loader().parse( contents );
+							var material = new THREE.MeshLambertMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
 
 							break;
 
 						case 'vtk':
 
 							var geometry = new THREE.VTKLoader().parse( contents );
-							var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+							var material = new THREE.MeshLambertMaterial();
+
 							var mesh = new THREE.Mesh( geometry, material );
 
 							signals.objectAdded.dispatch( mesh );
