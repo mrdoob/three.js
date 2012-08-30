@@ -57,6 +57,14 @@
 
 				geometry = new THREE.CubeGeometry( 200, 200, 200 );
 
+				/*
+				This is how compressed textures are supposed to be used:
+
+				DXT1 - RGB - opaque textures
+				DXT3 - RGBA - transparent textures with sharp alpha transitions
+				DXT5 - RGBA - transparent textures with full alpha range
+				*/
+
 				var map1 = THREE.ImageUtils.loadCompressedTexture( 'textures/compressed/disturb_dxt1_nomip.dds' );
 				map1.minFilter = map1.magFilter = THREE.LinearFilter;
 				map1.anisotropy = 4;
