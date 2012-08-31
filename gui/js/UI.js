@@ -294,6 +294,14 @@ UI.Select = function ( position ) {
 
 UI.Select.prototype = Object.create( UI.Element.prototype );
 
+UI.Select.prototype.setMultiple = function ( boolean ) {
+
+	this.dom.multiple = boolean;
+
+	return this;
+
+};
+
 UI.Select.prototype.setOptions = function ( options ) {
 
 	for ( var i = 0; i < options.length; i ++ ) {
