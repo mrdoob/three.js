@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/

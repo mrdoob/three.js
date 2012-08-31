@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
  * @author jordi_ros / http://plattsoft.com

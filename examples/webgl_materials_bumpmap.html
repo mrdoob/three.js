@@ -45,7 +45,7 @@
 			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
@@ -66,6 +66,9 @@
 
 			var mouseX = 0;
 			var mouseY = 0;
+
+			var targetX = 0;
+			var targetY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -157,10 +160,11 @@
 
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 
-				mapHeight.anisotropy = 16;
+				mapHeight.anisotropy = 4;
 				mapHeight.repeat.set( 0.998, 0.998 );
 				mapHeight.offset.set( 0.001, 0.001 )
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+				mapHeight.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshPhongMaterial( { ambient: 0x552811, color: 0x552811, specular: 0x333333, shininess: 25, perPixel: true, bumpMap: mapHeight, bumpScale: 19, metal: false } );
 
@@ -169,7 +173,7 @@
 
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0x060708, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x060708, clearAlpha: 1, alpha: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -236,10 +240,10 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
 
 			}
 
@@ -256,12 +260,13 @@
 
 			function render() {
 
-				var ry = mouseX * 0.0003, rx = mouseY * 0.0003;
+				targetX = mouseX * .001;
+				targetY = mouseY * .001;
 
 				if ( mesh ) {
 
-					mesh.rotation.y = ry;
-					mesh.rotation.x = rx;
+					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
+					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
 
 				}
 

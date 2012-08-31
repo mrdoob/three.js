@@ -23,12 +23,12 @@
 		<div>
 		Unique number of this material instance.
 		</div>
-		
+
 		<h3>.[page:String name]</h3>
 		<div>
 		Material name. Default is an empty string.
 		</div>
-		
+
 		<h3>.[page:Number opacity]</h3>
 		<div>
 		Opacity. Default is *1*.
@@ -49,12 +49,12 @@
 		<div>
 		Blending source. It's one of the blending mode constants defined in [page:Three Three.js]. Default is *SrcAlphaFactor*.
 		</div>
-		
+
 		<h3>.[page:Integer blendDst]</h3>
 		<div>
 		Blending destination. It's one of the blending mode constants defined in [page:Three Three.js]. Default is *OneMinusSrcAlphaFactor*.
 		</div>
-		
+
 		<h3>.[page:Integer blendEquation]</h3>
 		<div>
 		Blending equation to use when applying blending. It's one of the constants defined in [page:Three Three.js]. Default is *AddEquation*.
@@ -82,7 +82,7 @@
 		<div>
 		Sets the polygon offset factor. Default is *0*.
 		</div>
-		
+
 		<h3>.[page:Integer polygonOffsetUnits]</h3>
 		<div>
 		Sets the polygon offset units. Default is *0*.
@@ -100,21 +100,15 @@
 
 		<h3>.[page:Boolean visible]</h3>
 		<div>
-		Define whether this material is visible. Default is *true*.
+		Defines whether this material is visible. Default is *true*.
 		</div>
 
-		<h3>.[page:Boolean doubleSided]</h3>
+		<h3>.[page:Enum side]</h3>
 		<div>
-		Defines whether this both sides of faces will be visible. Default is *false*.
+		Defines which of the face sides will be rendered - front, back or both.
 		</div>
-		
 		<div>
-		The normals in each face will be used in order to determine which side is visible; positive normals are the front face and thus visible, whereas negative normals correspond to the back faces and are normally not rendered, which can cause a 'disappearing' effect if an object is rotated and its backfaces are looking at the camera.
-		</div>
-
-		<h3>.[page:Boolean flipSided]</h3>
-		<div>
-		Defines if the object's faces are flipsided. If enabled, faces with negative normals will be visible (which is the opposite of the default behaviour). Default is *false*.
+		Default is *THREE.FrontSide*. Other options are *THREE.BackSide* and *THREE.DoubleSide*.
 		</div>
 
 		<h3>.[page:Boolean needsUpdate]</h3>

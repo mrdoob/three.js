@@ -1,0 +1,1 @@
+python build.py --all

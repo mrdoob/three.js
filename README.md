@@ -5,16 +5,16 @@ three.js
 
 The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt; and WebGL renderers.
 
-[Examples](http://mrdoob.github.com/three.js/) — [Documentation](http://mrdoob.github.com/three.js/docs/latest/) — [Help](http://stackoverflow.com/questions/tagged/three.js)
+[Examples](http://mrdoob.github.com/three.js/) — [Documentation](http://mrdoob.github.com/three.js/docs/) — [Help](http://stackoverflow.com/questions/tagged/three.js)
 
 
 ### Usage ###
 
-Download the [minified library](http://mrdoob.github.com/three.js/build/Three.js) and include it in your html.
+Download the [minified library](http://mrdoob.github.com/three.js/build/three.min.js) and include it in your html.
 Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file). 
 
 ```html
-<script src="js/Three.js"></script>
+<script src="js/three.min.js"></script>
 ```
 
 This code creates a scene, then creates a camera, adds the camera and cube to the scene, creates a &lt;canvas&gt; renderer and adds its viewport in the document.body element.
@@ -64,6 +64,50 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 ```
 
 ### Change log ###
+
+2012 08 15 - **r50** (391,250 KB, gzip: 96,143 KB)
+
+* Experimenting with [SoftwareRenderer](http://pouet.net/topic.php?which=8760&page=1). ([mrdoob](http://github.com/mrdoob) and [rygorous](http://github.com/rygorous))
+* Improved rotation conversion routines. ([WestLangley](http://github.com/WestLangley))
+* Moved `DOMRenderer` and `SVGRenderer` out of common build. ([mrdoob](http://github.com/mrdoob))
+* Improvements to Morph targets. ([alteredq](http://github.com/alteredq) and [gero3](http://github.com/gero3))
+* Added `.deallocateMaterial` method to `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Added `.worldToLocal` and `.localToWorld` methods to `Object3D`. ([zz85](http://github.com/zz85) and [WestLangley](http://github.com/WestLangley))
+* Added `ConvexGeometry`. ([qiao](http://github.com/qiao))
+* Added node.js build system. ([gero3](http://github.com/gero3))
+* Improvements to Blender exporter. ([timbot](http://github.com/timbot) and [alteredq](http://github.com/alteredq))
+* Added uvs and vertex colors support to `ImmediateRenderObjects`. ([alteredq](http://github.com/alteredq))
+* Started implementing `LoadingMonitor` and `EventTarget` in loaders. ([mrdoob](http://github.com/mrdoob))
+* Added `Path.ellipse`. ([linzhp](http://github.com/linzhp))
+* Added `near` and `far` properties to `Ray`. ([niklassa](http://github.com/niklassa))
+* Added `OrbitControls`. ([qiao](http://github.com/qiao), [mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Completed some more documentation pages. ([mrdoob](http://github.com/mrdoob), [phenomnomnominal](http://github.com/phenomnomnominal), [FuzzYspo0N](http://github.com/FuzzYspo0N), [poeschko](http://github.com/poeschko), [wwwtyro](http://github.com/wwwtyro), [maximeq](http://github.com/maximeq) and [alteredq](http://github.com/alteredq))
+* Completed lots more documentation pages. ([sole](http://github.com/sole))
+* Started reworking [GUI](http://mrdoob.github.com/three.js/gui/). ([mrdoob](http://github.com/mrdoob))
+* Improved python build system. ([gero3](http://github.com/gero3))
+* Made `VTKLoader` parsing more robust. ([mrdoob](http://github.com/mrdoob))
+* Added `recursive` flag to `Ray`. ([mrdoob](http://github.com/mrdoob))
+* Handling resizes properly in controls and examples. ([alteredq](http://github.com/alteredq))
+* Improvements to ColladaLoader. ([spacecookies](http://github.com/spacecookies))
+* Unflipped V coordinate across the whole library. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Refactored `BufferGeometry`. ([alteredq](http://github.com/alteredq))
+* Improved GL extensions initialisation in `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Rescued `SkinnedMesh`. ([n3tfr34k](http://github.com/n3tfr34k) and [alteredq](http://github.com/alteredq))
+* Made `OBJLoader` parsing more robust. ([Dahie](http://github.com/Dahie))
+* Implemented skinning via floating point textures. ([alteredq](http://github.com/alteredq))
+* Improved documentation system. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Added support for anisotropic texture filtering and standard derivatives in `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
+* Added support for `ParticleBasicMaterial` without `map` in `CanvasRenderer`. ([mrdoob](http://github.com/mrdoob))
+* `SceneLoader` now supports nested scene graphs and per object custom properties. ([skfcz](http://github.com/skfcz))
+* `Camera` doesn't need to be added to the scene anymore. ([mrdoob](http://github.com/mrdoob))
+* `Object3D`'s `flipSided` and `doubleSided` properties are now `Material`'s `side` property. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Added `.clone` method to `*Material`. ([gero3](http://github.com/gero3), [mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* [IEWEBGL](http://iewebgl.com/Engines.aspx#ThreeJS) support. ([iewebgl](http://github.com/iewebgl) and [mrdoob](http://github.com/mrdoob))
+* Added `CircleGeometry`. ([hughes](http://github.com/hughes))
+* Added `bumpMap` to `MeshPhongMaterial`. ([alteredq](http://github.com/alteredq))
+* Added `specularMap` to `MeshBasicMaterial`, `MeshLambertMaterial` and `MeshPhongMaterial`. ([alteredq](http://github.com/alteredq))
+* Reworked python build system. ([mrdoob](http://github.com/mrdoob))
+
 
 2012 04 22 - **r49** (364,242 KB, gzip: 89,057 KB)
 
