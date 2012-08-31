@@ -305,7 +305,7 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_LIGHTMAP",
 
-			"gl_FragColor = gl_FragColor * texture2D( lightMap, vUv2 );",
+			"gl_FragColor = gl_FragColor + texture2D( lightMap, vUv2 );",
 
 		"#endif"
 
@@ -315,7 +315,7 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_LIGHTMAP",
 
-			"vUv2 = uv2;",
+			"vUv2 = uv;",
 
 		"#endif"
 
