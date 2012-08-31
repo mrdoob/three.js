@@ -18,7 +18,7 @@
  *  bumpScale: <float>,
  *
  *  normalMap: new THREE.Texture( <Image> ),
- *  normalScale: <float>,
+ *  normalScale: <Vector2>,
  *
  *  specularMap: new THREE.Texture( <Image> ),
  *
@@ -68,7 +68,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.bumpScale = 1;
 
 	this.normalMap = null;
-	this.normalScale = 1;
+	this.normalScale = new THREE.Vector2( 1, 1 );
 
 	this.specularMap = null;
 
@@ -124,7 +124,7 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	material.bumpScale = this.bumpScale;
 
 	material.normalMap = this.normalMap;
-	material.normalScale = this.normalScale;
+	material.normalScale.copy( this.normalScale );
 
 	material.specularMap = this.specularMap;
 

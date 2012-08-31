@@ -729,7 +729,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			if ( m.parameters.normalMapFactor ) {
 
-				uniforms[ "uNormalScale" ].value = m.parameters.normalMapFactor;
+				uniforms[ "uNormalScale" ].value.set( m.parameters.normalMapFactor, m.parameters.normalMapFactor );
 
 			}
 

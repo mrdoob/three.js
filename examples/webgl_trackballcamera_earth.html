@@ -133,7 +133,7 @@
 				uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tNormal" ].value = normalTexture;
-				uniforms[ "uNormalScale" ].value = 0.85;
+				uniforms[ "uNormalScale" ].value.set( 0.85, 0.85 );
 
 				uniforms[ "tDiffuse" ].value = planetTexture;
 				uniforms[ "tSpecular" ].value = specularTexture;

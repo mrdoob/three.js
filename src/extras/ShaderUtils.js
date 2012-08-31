@@ -121,7 +121,7 @@ THREE.ShaderUtils = {
 				"tSpecular"	   : { type: "t", value: null },
 				"tAO"		   : { type: "t", value: null },
 
-				"uNormalScale": { type: "f", value: 1.0 },
+				"uNormalScale": { type: "v2", value: new THREE.Vector2( 1, 1 ) },
 
 				"uDisplacementBias": { type: "f", value: 0.0 },
 				"uDisplacementScale": { type: "f", value: 1.0 },
@@ -165,7 +165,7 @@ THREE.ShaderUtils = {
 
 				"uniform samplerCube tCube;",
 
-				"uniform float uNormalScale;",
+				"uniform vec2 uNormalScale;",
 
 				"uniform bool useRefract;",
 				"uniform float uRefractionRatio;",
