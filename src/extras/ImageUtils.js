@@ -55,7 +55,9 @@ THREE.ImageUtils = {
 				if ( images.loadCount === 6 ) {
 
 					texture.needsUpdate = true;
-					if ( onLoad ) onLoad();
+					//START_VEROLD_MOD
+					if ( onLoad ) onLoad( texture );
+					//END_VEROLD_MOD
 
 				}
 

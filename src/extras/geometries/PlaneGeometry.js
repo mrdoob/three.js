@@ -3,7 +3,9 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight ) {
+//START_VEROLD_MOD
+THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight, uvMult ) {
+//END_VEROLD_MOD
 
 	THREE.Geometry.call( this );
 
@@ -17,6 +19,10 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight ) 
 	segment_width = width / gridX,
 	segment_height = height / gridZ,
 	normal = new THREE.Vector3( 0, 0, 1 );
+
+	//START_VEROLD_MOD
+	uvMult = uvMult || 1.0;
+	//END_VEROLD_MOD
 
 	for ( iz = 0; iz < gridZ1; iz ++ ) {
 
@@ -43,14 +49,16 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight ) 
 			var face = new THREE.Face4( a, b, c, d );
 			face.normal.copy( normal );
 			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
-
 			this.faces.push( face );
+
+			//START_VEROLD_MOD
 			this.faceVertexUvs[ 0 ].push( [
-				new THREE.UV( ix / gridX, 1 - iz / gridZ ),
-				new THREE.UV( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.UV( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.UV( ( ix + 1 ) / gridX, 1 - iz / gridZ )
+				new THREE.UV( ix / gridX * uvMult, 1 - iz  * uvMult / gridZ ),
+				new THREE.UV( ix / gridX * uvMult, 1 - ( iz + 1 )  * uvMult / gridZ ),
+				new THREE.UV( ( ix + 1 )  * uvMult / gridX, 1 - ( iz + 1 ) * uvMult/ gridZ ),
+				new THREE.UV( ( ix + 1 )  * uvMult / gridX, 1 - iz  * uvMult / gridZ )
 			] );
+			//END_VEROLD_MOD
 
 		}
 

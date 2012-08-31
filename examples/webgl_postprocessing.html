@@ -191,7 +191,7 @@
 				renderMaskInverse.inverse = true;
 
 				//effectFilm.renderToScreen = true;
-				//effectFilmBW.renderToScreen = true;
+				effectFilmBW.renderToScreen = true;
 				//effectDotScreen.renderToScreen = true;
 				//effectBleach.renderToScreen = true;
 				effectVignette.renderToScreen = true;
@@ -210,15 +210,17 @@
 				var renderModel = new THREE.RenderPass( sceneModel, cameraPerspective );
 
 				renderModel.clear = false;
+				renderModel.renderToScreen = true;
 
 				composerScene = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth * 2, rtHeight * 2, rtParameters ) );
 
 				composerScene.addPass( renderBackground );
 				composerScene.addPass( renderModel );
-				composerScene.addPass( renderMaskInverse );
-				composerScene.addPass( effectHBlur );
-				composerScene.addPass( effectVBlur );
-				composerScene.addPass( clearMask );
+				//composerScene.addPass( renderMaskInverse );
+				//composerScene.addPass( effectHBlur );
+				//composerScene.addPass( effectVBlur );
+				//composerScene.addPass( clearMask );
+				//composerScene.addPass( effectVignette );
 
 				//
 
@@ -232,7 +234,7 @@
 				//composer1.addPass( renderMask );
 				composer1.addPass( effectFilmBW );
 				//composer1.addPass( clearMask );
-				composer1.addPass( effectVignette );
+				//composer1.addPass( effectVignette );
 
 				//
 
@@ -380,7 +382,7 @@
 				renderer.clear();
 				composerScene.render( delta );
 
-				renderer.setViewport( 0, 0, halfWidth, halfHeight );
+				/*renderer.setViewport( 0, 0, halfWidth, halfHeight );
 				composer1.render( delta );
 
 				renderer.setViewport( halfWidth, 0, halfWidth, halfHeight );
@@ -390,7 +392,7 @@
 				composer3.render( delta );
 
 				renderer.setViewport( halfWidth, halfHeight, halfWidth, halfHeight );
-				composer4.render( delta );
+				composer4.render( delta );*/
 
 			}
 

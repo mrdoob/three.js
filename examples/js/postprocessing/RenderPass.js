@@ -36,7 +36,16 @@ THREE.RenderPass.prototype = {
 
 		}
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		//renderer.render( this.scene, this.camera, readBuffer, this.clear );
+		if ( this.renderToScreen ) {
+
+			renderer.render( this.scene, this.camera );
+
+		} else {
+
+			renderer.render( this.scene, this.camera, readBuffer, this.clear );
+
+		}
 
 		if ( this.clearColor ) {
 

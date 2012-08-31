@@ -1679,7 +1679,11 @@ THREE.UniformsLib = {
 
 	shadowmap: {
 
-		"shadowMap": { type: "tv", value: 6, texture: [] },
+		//START_VEROLD_MOD
+		//Changed shadow map texture unit to start at 7 instead of 6
+		"shadowMap": { type: "tv", value: 8, texture: [] },
+		//END_VEROLD_MOD
+
 		"shadowMapSize": { type: "v2v", value: [] },
 
 		"shadowBias" : { type: "fv1", value: [] },

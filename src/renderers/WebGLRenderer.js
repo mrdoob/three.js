@@ -3946,6 +3946,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object = webglObject.object;
 				buffer = webglObject.buffer;
 
+				//START_VEROLD_MOD
+				//Variables to store transparency info for material (so that it can be restored
+				//after object transparency has been handled.)
+				var overriden = false;
+				var materialTransparent;
+				var materialDepthWrite;
+				var materialOpacity;
+				//END_VEROLD_MOD
+
 				if ( overrideMaterial ) {
 
 					material = overrideMaterial;
@@ -3953,6 +3962,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 				} else {
 
 					material = webglObject[ materialType ];
+
+					//START_VEROLD_MOD
+					//Handle per-object opacity. Save and restore the material's opacity settings after rendering the object.
+					//If this is the opaque pass and we're using object-transparency, skip it.
+					if ( materialType == "opaque" && object.opacity && webglObject.object.opacity < 1.0 ) {
+						continue;
+					}
+					//If this is the transparent pass and we're using object-transparency, override the settings.
+					else if ( materialType == "transparent" && object.opacity && webglObject.object.opacity < 1.0 ) {
+						if (!material) {
+							//This is an object using a normally opaque material that we want to render translucent.
+							material = webglObject[ "opaque" ];
+						}
+						overriden = true;
+						materialTransparent = material.transparent;
+						materialDepthWrite = material.depthWrite;
+						materialOpacity = material.opacity;
+
+						material.opacity = object.opacity;
+						material.transparent = true;
+						material.depthWrite = false;
+					}
+					//END_VEROLD_MOD
 
 					if ( ! material ) continue;
 
@@ -3975,6 +4007,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_this.renderBuffer( camera, lights, fog, material, buffer, object );
 
 				}
+
+				//START_VEROLD_MOD
+				//Restore material transparency after using object transparency
+				if (overriden) {
+					material.opacity = materialOpacity;
+					material.transparent = materialTransparent;
+					material.depthWrite = materialDepthWrite;
+				}
+				//END_VEROLD_MOD
 
 			}
 
@@ -4648,6 +4689,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			lightMap: !!material.lightMap,
 			bumpMap: !!material.bumpMap,
 			specularMap: !!material.specularMap,
+			//START_VEROLD_MOD
+			userDefines: material.userDefines,
+			//END_VEROLD_MOD
 
 			vertexColors: material.vertexColors,
 
@@ -5845,13 +5889,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//console.log( "building new program " );
 
-		//
+		//START_VEROLD_MOD
+		//Build vertex shader prefix for user #defines
+		var user_VS_Prefix = "";
+ 	 	for ( var x in parameters.userDefines ) {
+		  user_VS_Prefix += "#define ";
+		  user_VS_Prefix += x + " " + parameters.userDefines[x] + "\n";
+		}
+		//END_VEROLD_MOD
 
 		program = _gl.createProgram();
 
 		var prefix_vertex = [
 
 			"precision " + _precision + " float;",
+
+			//START_VEROLD_MOD
+			user_VS_Prefix,
+			//END_VEROLD_MOD
 
 			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
@@ -5948,11 +6003,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		].join("\n");
 
+		//START_VEROLD_MOD
+		//Build fragment shader prefix for user #defines
+		var user_FS_Prefix = "";
+ 	 	for ( var x in parameters.userDefines ) {
+		  user_FS_Prefix += "#define ";
+		  user_FS_Prefix += x + " " + parameters.userDefines[x] + "\n";
+		}
+		//END_VEROLD_MOD
+
 		var prefix_fragment = [
 
 			"precision " + _precision + " float;",
 
 			parameters.bumpMap ? "#extension GL_OES_standard_derivatives : enable" : "",
+
+			//START_VEROLD_MOD
+			user_FS_Prefix,
+			//END_VEROLD_MOD
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
