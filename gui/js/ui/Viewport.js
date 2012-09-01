@@ -86,7 +86,7 @@ var Viewport = function ( signals ) {
 		projector.unprojectVector( vector, camera );
 
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-		var intersects = ray.intersectObjects( objects );
+		var intersects = ray.intersectObjects( objects, true );
 
 		if ( intersects.length ) {
 

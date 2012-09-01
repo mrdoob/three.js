@@ -63,6 +63,16 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	container.add( materialAmbientRow );
 
+	// emissive
+
+	var materialEmissiveRow = new UI.Panel();
+	var materialEmissive = new UI.Color( 'absolute' ).setLeft( '90px' ).onChange( update );
+
+	materialEmissiveRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Emissive' ).setColor( '#666' ) );
+	materialEmissiveRow.add( materialEmissive );
+
+	container.add( materialEmissiveRow );
+
 	// specular
 
 	var materialSpecularRow = new UI.Panel();
@@ -73,6 +83,16 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	container.add( materialSpecularRow );
 
+	// shininess
+
+	var materialShininessRow = new UI.Panel();
+	var materialShininess = new UI.Number( 'absolute' ).setValue( 30 ).setLeft( '90px' ).onChange( update );
+
+	materialShininessRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Shininess' ).setColor( '#666' ) );
+	materialShininessRow.add( materialShininess );
+
+	container.add( materialShininessRow );
+
 	// map
 
 	var materialMapRow = new UI.Panel();
@@ -81,7 +101,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	materialMapRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Map' ).setColor( '#666' ) );
 	materialMapRow.add( materialMap );
 
-	container.add( materialSpecularRow );
+	container.add( materialMapRow );
 
 	// opacity
 
@@ -137,7 +157,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material instanceof materials[ materialClass.getValue() ] == false ) {
 
-				material = new materials[ materialClass.getValue() ];
+				material = new materials[ materialClass.getValue() ]();
 				selected.material = material;
 
 			}
@@ -154,9 +174,21 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
+			if ( material.emissive !== undefined ) {
+
+				material.emissive.setHex( parseInt( materialEmissive.getValue().substr( 1 ), 16 ) );
+
+			}
+
 			if ( material.specular !== undefined ) {
 
 				material.specular.setHex( parseInt( materialSpecular.getValue().substr( 1 ), 16 ) );
+
+			}
+
+			if ( material.shininess !== undefined ) {
+
+				material.shininess = materialShininess.getValue();
 
 			}
 
@@ -198,7 +230,9 @@ Sidebar.Properties.Material = function ( signals ) {
 
 		materialColorRow.setDisplay( material.color !== undefined ? '' : 'none' );
 		materialAmbientRow.setDisplay( material.ambient !== undefined ? '' : 'none' );
+		materialEmissiveRow.setDisplay( material.emissive !== undefined ? '' : 'none' );
 		materialSpecularRow.setDisplay( material.specular !== undefined ? '' : 'none' );
+		materialShininessRow.setDisplay( material.shininess !== undefined ? '' : 'none' );
 		materialMapRow.setDisplay( material.map !== undefined ? '' : 'none' );
 		materialOpacityRow.setDisplay( material.opacity !== undefined ? '' : 'none' );
 		materialTransparentRow.setDisplay( material.transparent !== undefined ? '' : 'none' );
@@ -232,9 +266,21 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
+			if ( material.emissive !== undefined ) {
+
+				materialEmissive.setValue( '#' + material.emissive.getHex().toString( 16 ) );
+
+			}
+
 			if ( material.specular !== undefined ) {
 
 				materialSpecular.setValue( '#' + material.specular.getHex().toString( 16 ) );
+
+			}
+
+			if ( material.shininess !== undefined ) {
+
+				materialShininess.setValue( material.shininess );
 
 			}
 

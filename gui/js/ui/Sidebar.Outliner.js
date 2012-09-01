@@ -9,10 +9,16 @@ Sidebar.Outliner = function ( signals ) {
 	container.add( new UI.Text().setValue( 'SCENE' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	var scene = new UI.Select().setMultiple( true ).setOptions( [ 'test', 'test' ] ).setWidth( '280px' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' );
+	var scene = new UI.Select().setMultiple( true ).setOptions( [ 'test', 'test' ] ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	container.add( scene );
 
 	container.add( new UI.Break(), new UI.Break() );
+
+	function update() {
+
+		console.log( scene.getValue() );
+
+	}
 
 	return container;
 

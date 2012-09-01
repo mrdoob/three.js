@@ -243,13 +243,13 @@
 	//
 
 	THREE.Ray.prototype.precision = 0.0001;
-    
-    THREE.Ray.prototype.set = function ( origin, direction ) {
-        
-        this.origin = origin;
-        this.direction = direction;
-        
-    };
+
+	THREE.Ray.prototype.set = function ( origin, direction ) {
+
+		this.origin = origin;
+		this.direction = direction;
+
+	};
 
 	THREE.Ray.prototype.intersectObject = function ( object, recursive ) {
 

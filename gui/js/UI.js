@@ -283,7 +283,8 @@ UI.Select = function ( position ) {
 
 	this.dom.addEventListener( 'change', function ( event ) {
 
-		// console.log( scope.dom.selectedIndex );
+		// console.log( scope.dom.selectedIndex, scope.dom.value );
+
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 	}, false );
