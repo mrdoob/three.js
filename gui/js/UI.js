@@ -283,8 +283,6 @@ UI.Select = function ( position ) {
 
 	this.dom.addEventListener( 'change', function ( event ) {
 
-		// console.log( scope.dom.selectedIndex, scope.dom.value );
-
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 	}, false );
@@ -305,11 +303,17 @@ UI.Select.prototype.setMultiple = function ( boolean ) {
 
 UI.Select.prototype.setOptions = function ( options ) {
 
-	for ( var i = 0; i < options.length; i ++ ) {
+	while ( this.dom.children.length > 0 ) {
+
+		this.dom.removeChild( this.dom.firstChild );
+
+	}
+
+	for ( var key in options ) {
 
 		var option = document.createElement( 'option' );
-		option.value = options[ i ];
-		option.appendChild( document.createTextNode( option.value ) );
+		option.value = key;
+		option.appendChild( document.createTextNode( options[ key ] ) );
 		this.dom.appendChild( option );
 
 	}
@@ -347,7 +351,7 @@ UI.Boolean = function ( position ) {
 
 	UI.Select.call( this, position );
 
-	this.setOptions( [ 'true', 'false' ] );
+	this.setOptions( { 'true': 'true', 'false': 'false' } );
 
 	return this;
 

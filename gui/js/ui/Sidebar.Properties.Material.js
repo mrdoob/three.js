@@ -36,7 +36,17 @@ Sidebar.Properties.Material = function ( signals ) {
 	// class
 
 	var materialClassRow = new UI.Panel();
-	var materialClass = new UI.Select( 'absolute' ).setOptions( [ 'LineBasicMaterial', 'MeshBasicMaterial', 'MeshDepthMaterial', 'MeshFaceMaterial', 'MeshLambertMaterial', 'MeshNormalMaterial', 'MeshPhongMaterial', 'ParticleBasicMaterial', 'ParticleCanvasMaterial', 'ParticleDOMMaterial', 'ShaderMaterial' ] ).setLeft( '90px' ).setWidth( '180px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var materialClass = new UI.Select( 'absolute' ).setOptions( {
+
+		'LineBasicMaterial': 'LineBasicMaterial',
+		'MeshBasicMaterial': 'MeshBasicMaterial',
+		'MeshDepthMaterial': 'MeshDepthMaterial',
+		'MeshFaceMaterial': 'MeshFaceMaterial',
+		'MeshLambertMaterial': 'MeshLambertMaterial',
+		'MeshNormalMaterial': 'MeshNormalMaterial',
+		'MeshPhongMaterial': 'MeshPhongMaterial'
+
+	} ).setLeft( '90px' ).setWidth( '180px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialClassRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
 	materialClassRow.add( materialClass );

@@ -44,7 +44,6 @@ var Viewport = function ( signals ) {
 	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
 	camera.position.set( 500, 250, 500 );
 	camera.lookAt( scene.position );
-	scene.add( camera );
 
 	var controls = new THREE.TrackballControls( camera, container.dom );
 	controls.rotateSpeed = 1.0;
@@ -117,6 +116,8 @@ var Viewport = function ( signals ) {
 		scene.add( object );
 		render();
 
+		signals.sceneChanged.dispatch( scene );
+
 	} );
 
 	signals.objectChanged.add( function ( object ) {
@@ -125,13 +126,13 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	var selected = null;
+
 	signals.objectSelected.add( function ( object ) {
 
-		if ( object === null ) {
+		selectionBox.visible = false;
 
-			selectionBox.visible = false;
-
-		} else if ( object.geometry ) {
+		if ( object !== null && object.geometry ) {
 
 			var geometry = object.geometry;
 
