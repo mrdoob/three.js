@@ -235,7 +235,7 @@
 
 		for ( var i = 0, l = descendants.length; i < l; i ++ ) {
 
-			intersectObject( descendants[ i ], this, intersects );
+			intersectObject( descendants[ i ], ray, intersects );
 
 		}
 	};
@@ -261,7 +261,7 @@
 
 		}
 
-		intersectObject(object,this,intersects);
+		intersectObject( object, this, intersects );
 
 		intersects.sort( descSort );
 
