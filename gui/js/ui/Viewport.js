@@ -121,11 +121,6 @@ var Viewport = function ( signals ) {
 
 	signals.objectChanged.add( function ( object ) {
 
-		object.updateMatrix();
-		object.updateMatrixWorld();
-
-		selectionBox.matrixWorld.copy( object.matrixWorld );
-
 		render();
 
 	} );
@@ -182,7 +177,7 @@ var Viewport = function ( signals ) {
 
 			selectionBox.geometry.verticesNeedUpdate = true;
 
-			selectionBox.matrixWorld.copy( object.matrixWorld );
+			selectionBox.matrixWorld = object.matrixWorld;
 
 			selectionBox.visible = true;
 
