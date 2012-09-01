@@ -92,6 +92,8 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 	}
 
+	// events
+
 	signals.objectSelected.add( function ( object ) {
 
 		selected = object;

@@ -251,6 +251,18 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	};
 
+	function getMaterialInstanceName( material ) {
+
+		for ( var key in materials ) {
+
+			if ( material instanceof materials[ key ] ) return key;
+
+		}
+
+	}
+
+	// events
+
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object && object.material ) {
@@ -335,16 +347,6 @@ Sidebar.Properties.Material = function ( signals ) {
 		}
 
 	} );
-
-	function getMaterialInstanceName( material ) {
-
-		for ( var key in materials ) {
-
-			if ( material instanceof materials[ key ] ) return key;
-
-		}
-
-	}
 
 	return container;
 

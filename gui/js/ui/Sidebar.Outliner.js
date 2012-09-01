@@ -1,5 +1,15 @@
 Sidebar.Outliner = function ( signals ) {
 
+	var objects = {
+
+		'PerspectiveCamera': THREE.PerspectiveCamera,
+		'PointLight': THREE.PointLight,
+		'DirectionalLight': THREE.DirectionalLight,
+		'Mesh': THREE.Mesh,
+		'Object3D': THREE.Object3D
+
+	};
+
 	var selected = null;
 
 	var container = new UI.Panel();
@@ -35,6 +45,18 @@ Sidebar.Outliner = function ( signals ) {
 
 	}
 
+	function getObjectInstanceName( object ) {
+
+		for ( var key in objects ) {
+
+			if ( object instanceof objects[ key ] ) return key;
+
+		}
+
+	}
+
+	// events
+
 	signals.sceneChanged.add( function ( object ) {
 
 		scene = object;
@@ -44,7 +66,7 @@ Sidebar.Outliner = function ( signals ) {
 		for ( var i in scene.children ) {
 
 			var object = scene.children[ i ];
-			options[ object.id ] = ' - ' + object.name;
+			options[ object.id ] = ' - ' + object.name + '[' + getObjectInstanceName( object ) + ']';
 
 		}
 
