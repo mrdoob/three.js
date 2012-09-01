@@ -278,6 +278,7 @@ UI.Select = function ( position ) {
 	this.dom.style.height = '16px';
 	this.dom.style.border = '0px';
 	this.dom.style.padding = '0px';
+	this.dom.style.whiteSpace = 'pre';
 
 	this.onChangeCallback = null;
 
@@ -313,7 +314,7 @@ UI.Select.prototype.setOptions = function ( options ) {
 
 		var option = document.createElement( 'option' );
 		option.value = key;
-		option.appendChild( document.createTextNode( options[ key ] ) );
+		option.innerHTML = options[ key ];
 		this.dom.appendChild( option );
 
 	}

@@ -63,12 +63,19 @@ Sidebar.Outliner = function ( signals ) {
 
 		var options = {};
 
-		for ( var i in scene.children ) {
+		( function createList( object, pad ) {
 
-			var object = scene.children[ i ];
-			options[ object.id ] = ' - ' + object.name + '[' + getObjectInstanceName( object ) + ']';
+			for ( var key in object.children ) {
 
-		}
+				var child = object.children[ key ];
+
+				options[ child.id ] = pad + '+ ' + object.name + ' [' + getObjectInstanceName( child ) + ']';
+
+				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
+
+			}
+
+		} )( scene, '' );
 
 		sceneGraph.setOptions( options );
 
