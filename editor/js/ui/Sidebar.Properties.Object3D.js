@@ -66,7 +66,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	// visible
 
 	var objectVisibleRow = new UI.Panel();
-	var objectVisible = new UI.Boolean( 'absolute' ).setLeft( '90px' ).setWidth( '50px' ).onChange( update );
+	var objectVisible = new UI.Checkbox( 'absolute' ).setLeft( '90px' ).onChange( update );
 
 	objectVisibleRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Visible' ).setColor( '#666' ) );
 	objectVisibleRow.add( objectVisible );

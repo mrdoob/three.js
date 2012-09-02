@@ -176,7 +176,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	// transparent
 
 	var materialTransparentRow = new UI.Panel();
-	var materialTransparent = new UI.Boolean( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
+	var materialTransparent = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
 
 	materialTransparentRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Transparent' ).setColor( '#666' ) );
 	materialTransparentRow.add( materialTransparent );
@@ -186,7 +186,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	// wireframe
 
 	var materialWireframeRow = new UI.Panel();
-	var materialWireframe = new UI.Boolean( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
+	var materialWireframe = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
 
 	materialWireframeRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Wireframe' ).setColor( '#666' ) );
 	materialWireframeRow.add( materialWireframe );

@@ -344,30 +344,49 @@ UI.Select.prototype.onChange = function ( callback ) {
 
 };
 
+// Checkbox
 
-// Boolean
+UI.Checkbox = function ( position ) {
 
-UI.Boolean = function ( position ) {
+	UI.Element.call( this );
 
-	UI.Select.call( this, position );
+	var scope = this;
 
-	this.setOptions( { 'true': 'true', 'false': 'false' } );
+	this.dom = document.createElement( 'input' );
+	this.dom.type = 'checkbox';
+	this.dom.style.position = position || 'relative';
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
 
 	return this;
 
 };
 
-UI.Boolean.prototype = Object.create( UI.Select.prototype );
+UI.Checkbox.prototype = Object.create( UI.Element.prototype );
 
-UI.Boolean.prototype.getValue = function () {
+UI.Checkbox.prototype.getValue = function () {
 
-	return this.dom.value === 'true';
+	return this.dom.checked;
 
 };
 
-UI.Boolean.prototype.setValue = function ( value ) {
+UI.Checkbox.prototype.setValue = function ( value ) {
 
-	this.dom.value = value.toString();
+	this.dom.checked = value;
+
+	return this;
+
+};
+
+UI.Checkbox.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
 
 	return this;
 
