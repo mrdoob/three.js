@@ -1,9 +1,20 @@
 Sidebar.Properties.Object3D = function ( signals ) {
 
+	var objects = {
+
+		'PerspectiveCamera': THREE.PerspectiveCamera,
+		'PointLight': THREE.PointLight,
+		'DirectionalLight': THREE.DirectionalLight,
+		'Mesh': THREE.Mesh,
+		'Object3D': THREE.Object3D
+
+	};
+
 	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text().setValue( 'OBJECT' ).setColor( '#666' ) );
+	var objectType = new UI.Text().setColor( '#666' );
+	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// name
@@ -92,6 +103,16 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 	}
 
+	function getObjectInstanceName( object ) {
+
+		for ( var key in objects ) {
+
+			if ( object instanceof objects[ key ] ) return key;
+
+		}
+
+	}
+
 	// events
 
 	signals.objectSelected.add( function ( object ) {
@@ -101,6 +122,8 @@ Sidebar.Properties.Object3D = function ( signals ) {
 		if ( object ) {
 
 			container.setDisplay( 'block' );
+
+			objectType.setValue( getObjectInstanceName( object ).toUpperCase() );
 
 			objectName.setValue( object.name );
 
