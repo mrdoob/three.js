@@ -336,7 +336,7 @@ THREE.GeometryLoader.prototype = {
 
 					if ( m.mapNormalFactor ) {
 
-						uniforms[ "uNormalScale" ].value = m.mapNormalFactor;
+						uniforms[ "uNormalScale" ].value.set( m.mapNormalFactor, m.mapNormalFactor );
 
 					}
 

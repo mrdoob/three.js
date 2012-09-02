@@ -375,7 +375,7 @@ THREE.ShaderChunk = {
 		"#ifdef USE_NORMALMAP",
 
 			"uniform sampler2D normalMap;",
-			"uniform float normalScale;",
+			"uniform vec2 normalScale;",
 
 			// Per-Pixel Tangent Space Normal Mapping
 			// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
@@ -1810,7 +1810,7 @@ THREE.UniformsLib = {
 	normalmap: {
 
 		"normalMap" : { type: "t", value: null },
-		"normalScale" : { type: "f", value: 1 }
+		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
 	},
 
 	fog : {
