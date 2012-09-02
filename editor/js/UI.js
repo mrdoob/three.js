@@ -278,7 +278,6 @@ UI.Select = function ( position ) {
 	this.dom.style.height = '16px';
 	this.dom.style.border = '0px';
 	this.dom.style.padding = '0px';
-	this.dom.style.whiteSpace = 'pre';
 
 	this.onChangeCallback = null;
 
