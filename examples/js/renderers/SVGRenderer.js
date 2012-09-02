@@ -359,9 +359,9 @@ THREE.SVGRenderer = function () {
 
 				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-				_color.r = Math.max( 0, Math.min( diffuse.r * _color.r + emissive.r, 1 ) );
-				_color.g = Math.max( 0, Math.min( diffuse.g * _color.g + emissive.g, 1 ) );
-				_color.b = Math.max( 0, Math.min( diffuse.b * _color.b + emissive.b, 1 ) );
+				_color.r = diffuse.r * _color.r + emissive.r;
+				_color.g = diffuse.g * _color.g + emissive.g;
+				_color.b = diffuse.b * _color.b + emissive.b;
 
 			} else {
 
@@ -419,9 +419,9 @@ THREE.SVGRenderer = function () {
 
 				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-				_color.r = Math.max( 0, Math.min( diffuse.r * _color.r + emissive.r, 1 ) );
-				_color.g = Math.max( 0, Math.min( diffuse.g * _color.g + emissive.g, 1 ) );
-				_color.b = Math.max( 0, Math.min( diffuse.b * _color.b + emissive.b, 1 ) );
+				_color.r = diffuse.r * _color.r + emissive.r;
+				_color.g = diffuse.g * _color.g + emissive.g;
+				_color.b = diffuse.b * _color.b + emissive.b;
 
 			} else {
 
