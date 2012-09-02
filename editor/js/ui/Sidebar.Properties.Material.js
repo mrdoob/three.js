@@ -113,6 +113,56 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	container.add( materialMapRow );
 
+	// light map
+
+	var materialLightMapRow = new UI.Panel();
+	var materialLightMap = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	materialLightMapRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Light Map' ).setColor( '#666' ) );
+	materialLightMapRow.add( materialLightMap );
+
+	container.add( materialLightMapRow );
+
+	// bump map
+
+	var materialBumpMapRow = new UI.Panel();
+	var materialBumpMap = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	materialBumpMapRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Bump Map' ).setColor( '#666' ) );
+	materialBumpMapRow.add( materialBumpMap );
+
+	container.add( materialBumpMapRow );
+
+	// normal map
+
+	var materialNormalMapRow = new UI.Panel();
+	var materialNormalMap = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	materialNormalMapRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Normal Map' ).setColor( '#666' ) );
+	materialNormalMapRow.add( materialNormalMap );
+
+	container.add( materialNormalMapRow );
+
+	// specular map
+
+	var materialSpecularMapRow = new UI.Panel();
+	var materialSpecularMap = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	materialSpecularMapRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Specular Map' ).setColor( '#666' ) );
+	materialSpecularMapRow.add( materialSpecularMap );
+
+	container.add( materialSpecularMapRow );
+
+	// env map
+
+	var materialEnvMapRow = new UI.Panel();
+	var materialEnvMap = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	materialEnvMapRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Env Map' ).setColor( '#666' ) );
+	materialEnvMapRow.add( materialEnvMap );
+
+	container.add( materialEnvMapRow );
+
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
@@ -244,6 +294,11 @@ Sidebar.Properties.Material = function ( signals ) {
 		materialSpecularRow.setDisplay( material.specular !== undefined ? '' : 'none' );
 		materialShininessRow.setDisplay( material.shininess !== undefined ? '' : 'none' );
 		materialMapRow.setDisplay( material.map !== undefined ? '' : 'none' );
+		materialLightMapRow.setDisplay( material.lightMap !== undefined ? '' : 'none' );
+		materialBumpMapRow.setDisplay( material.bumpMap !== undefined ? '' : 'none' );
+		materialNormalMapRow.setDisplay( material.normalMap !== undefined ? '' : 'none' );
+		materialSpecularMapRow.setDisplay( material.specularMap !== undefined ? '' : 'none' );
+		materialEnvMapRow.setDisplay( material.envMap !== undefined ? '' : 'none' );
 		materialOpacityRow.setDisplay( material.opacity !== undefined ? '' : 'none' );
 		materialTransparentRow.setDisplay( material.transparent !== undefined ? '' : 'none' );
 		materialWireframeRow.setDisplay( material.wireframe !== undefined ? '' : 'none' );
@@ -306,11 +361,13 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
+			/*
 			if ( material.map !== undefined ) {
 
 				materialMap.setValue( material.map );
 
 			}
+			*/
 
 			if ( material.opacity !== undefined ) {
 
