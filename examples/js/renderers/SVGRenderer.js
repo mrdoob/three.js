@@ -350,15 +350,18 @@ THREE.SVGRenderer = function () {
 
 			if ( _enableLighting ) {
 
+				var diffuse = material.color;
+				var emissive = material.emissive;
+
 				_color.r = _ambientLight.r;
 				_color.g = _ambientLight.g;
 				_color.b = _ambientLight.b;
 
 				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-				_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
-				_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
-				_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
+				_color.r = Math.max( 0, Math.min( diffuse.r * _color.r + emissive.r, 1 ) );
+				_color.g = Math.max( 0, Math.min( diffuse.g * _color.g + emissive.g, 1 ) );
+				_color.b = Math.max( 0, Math.min( diffuse.b * _color.b + emissive.b, 1 ) );
 
 			} else {
 
@@ -407,15 +410,18 @@ THREE.SVGRenderer = function () {
 
 			if ( _enableLighting ) {
 
+				var diffuse = material.color;
+				var emissive = material.emissive;
+
 				_color.r = _ambientLight.r;
 				_color.g = _ambientLight.g;
 				_color.b = _ambientLight.b;
 
 				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
 
-				_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
-				_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
-				_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
+				_color.r = Math.max( 0, Math.min( diffuse.r * _color.r + emissive.r, 1 ) );
+				_color.g = Math.max( 0, Math.min( diffuse.g * _color.g + emissive.g, 1 ) );
+				_color.b = Math.max( 0, Math.min( diffuse.b * _color.b + emissive.b, 1 ) );
 
 			} else {
 
