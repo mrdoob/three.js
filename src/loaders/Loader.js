@@ -335,6 +335,14 @@ THREE.Loader.prototype = {
 
 		}
 
+		//
+
+		if ( m.mapBumpScale ) {
+
+			mpars.bumpScale = m.mapBumpScale;
+
+		}
+
 		// special case for normal mapped material
 
 		if ( m.mapNormal ) {
