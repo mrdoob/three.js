@@ -437,7 +437,8 @@
 		},
 
 		"texture_bg": {
-			"url": "textures/cube/SwedishRoyalCastle/pz.jpg"
+			"url": "textures/cube/SwedishRoyalCastle/pz.jpg",
+			"anisotropy": 4
 		},
 
 		"texture_minecraft": {

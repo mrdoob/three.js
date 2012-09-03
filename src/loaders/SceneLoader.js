@@ -631,6 +631,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			if ( THREE[ tt.magFilter ] !== undefined )
 				texture.magFilter = THREE[ tt.magFilter ];
 
+			if ( tt.anisotropy ) texture.anisotropy = tt.anisotropy;
 
 			if ( tt.repeat ) {
 
