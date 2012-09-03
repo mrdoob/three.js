@@ -175,26 +175,6 @@
 
 			function createScene( geometry, x, y, z, b, s ) {
 
-				for ( var i = 0; i < geometry.materials.length; i ++ ) {
-
-					var m = geometry.materials[ i ];
-					m.specular.setHex( 0x111111 );
-					m.color.setHex( 0xbbbbbb );
-
-					if ( m.name === "floor" ) m.color.setHSV( 0.1, 0.25, 0.8 );
-					else if ( m.name === "redstone" ) m.color.setHSV( 0.03, 0.65, 0.8 );
-					else if ( m.name === "stone" ) m.color.setHSV( 0.06, 0.55, 0.8 )
-					m.ambient.copy( m.color );
-
-					m.bumpScale = 2;
-					m.shininess = 100;
-
-					m.lightMap.anisotropy = 4;
-					m.bumpMap.anisotropy = 4;
-					m.specularMap.anisotropy = 4;
-
-				}
-
 				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );

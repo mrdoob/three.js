@@ -143,7 +143,7 @@ THREE.Loader.prototype = {
 
 		}
 
-		function create_texture( where, name, sourceFile, repeat, offset, wrap ) {
+		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
 			var texture = document.createElement( 'canvas' );
 
@@ -174,6 +174,12 @@ THREE.Loader.prototype = {
 
 				if ( wrapMap[ wrap[ 0 ] ] !== undefined ) where[ name ].wrapS = wrapMap[ wrap[ 0 ] ];
 				if ( wrapMap[ wrap[ 1 ] ] !== undefined ) where[ name ].wrapT = wrapMap[ wrap[ 1 ] ];
+
+			}
+
+			if ( anisotropy ) {
+
+				where[ name ].anisotropy = anisotropy;
 
 			}
 
@@ -307,31 +313,31 @@ THREE.Loader.prototype = {
 
 		if ( m.mapDiffuse && texturePath ) {
 
-			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap );
+			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 
 		}
 
 		if ( m.mapLight && texturePath ) {
 
-			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap );
+			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
 
 		}
 
 		if ( m.mapBump && texturePath ) {
 
-			create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap );
+			create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
 
 		}
 
 		if ( m.mapNormal && texturePath ) {
 
-			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap );
+			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 
 		}
 
 		if ( m.mapSpecular && texturePath ) {
 
-			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap );
+			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
 
 		}
 
