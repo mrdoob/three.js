@@ -676,7 +676,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		for ( pp in m.parameters ) {
 
-			if ( pp === "envMap" || pp === "map" || pp === "lightMap" ) {
+			if ( pp === "envMap" || pp === "map" || pp === "lightMap" || pp === "bumpMap" ) {
 
 				m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
 

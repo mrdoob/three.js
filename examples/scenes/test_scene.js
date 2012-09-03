@@ -11,7 +11,7 @@
 
 		"cube1" : {
 			"geometry" : "cubeNormals",
-			"materials": [ "lambert_red" ],
+			"materials": [ "phong_red" ],
 			"position" : [ 0, 0, 0 ],
 			"rotation" : [ 0, -0.3, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -336,9 +336,9 @@
 			"parameters": { "color": 16777215, "shading": "flat" }
 		},
 
-		"lambert_red": {
-			"type": "MeshLambertMaterial",
-			"parameters": { "color": 16711680 }
+		"phong_red": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16711680, "specular": 16711680, "shininess": 25, "bumpMap": "texture_bump", "bumpScale": -0.75 }
 		},
 
 		"lambert_green": {
@@ -438,6 +438,11 @@
 
 		"texture_bg": {
 			"url": "textures/cube/SwedishRoyalCastle/pz.jpg",
+			"anisotropy": 4
+		},
+
+		"texture_bump": {
+			"url": "textures/water.jpg",
 			"anisotropy": 4
 		},
 
