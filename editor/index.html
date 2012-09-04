@@ -80,7 +80,7 @@
 				event.preventDefault();
 
 				var file = event.dataTransfer.files[ 0 ];
-				var extension = file.name.split( '.' )[1].toLowerCase();
+				var extension = file.name.split( '.' ).pop().toLowerCase();
 				var reader = new FileReader();
 
 				reader.onload = function ( event ) {
