@@ -1890,7 +1890,7 @@ def guess_material_textures(material):
                     textures['specular'] = { "texture": texture, "slot": slot }
 
                 else:
-                    if not textures['diffuse']:
+                    if not textures['diffuse'] and not slot.blend_type == 'MULTIPLY':
                         textures['diffuse'] = { "texture": texture, "slot": slot }
 
                     else:
