@@ -665,7 +665,7 @@ THREE.ShaderChunk = {
 
 				"lVector = normalize( lVector );",
 
-				"float dotProduct = dot( normal, lVector );",
+				"float dotProduct = dot( transformedNormal, lVector );",
 
 				"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
 				"float hemiDiffuseWeightBack = -0.5 * dotProduct + 0.5;",
