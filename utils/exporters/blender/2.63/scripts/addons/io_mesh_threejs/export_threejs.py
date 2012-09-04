@@ -1145,6 +1145,7 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
             handle_texture('light', textures, material, filepath, option_copy_textures)
             handle_texture('normal', textures, material, filepath, option_copy_textures)
             handle_texture('specular', textures, material, filepath, option_copy_textures)
+            handle_texture('bump', textures, material, filepath, option_copy_textures)
 
             material["vertexColors"] = m.THREE_useVertexColors and option_colors
 
@@ -1226,7 +1227,10 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
 
         if slot.use_map_normal:
             if slot.normal_factor != 1.0:
-                material['mapNormalFactor'] = slot.normal_factor
+                if id == "bump":
+                    material['mapBumpScale'] = slot.normal_factor
+                else:
+                    material['mapNormalFactor'] = slot.normal_factor
 
 
 # #####################################################
@@ -1820,7 +1824,10 @@ def extract_material_data(m, option_colors):
     material['mapLight'] = ""
     material['mapSpecular'] = ""
     material['mapNormal'] = ""
+    material['mapBump'] = ""
+
     material['mapNormalFactor'] = 1.0
+    material['mapBumpScale'] = 1.0
 
     textures = guess_material_textures(m)
 
@@ -1838,6 +1845,11 @@ def extract_material_data(m, option_colors):
         if textures['normal']['slot'].use_map_normal:
             material['mapNormalFactor'] = textures['normal']['slot'].normal_factor
 
+    if textures['bump']:
+        material['mapBump'] = textures['bump']['texture'].image.name
+        if textures['normal']['slot'].use_map_normal:
+            material['mapBumpScale'] = textures['normal']['slot'].normal_factor
+
     material['shading'] = m.THREE_materialType
     material['blending'] = m.THREE_blendingType
     material['depthWrite'] = m.THREE_depthWrite
@@ -1851,7 +1863,8 @@ def guess_material_textures(material):
         'diffuse' : None,
         'light'   : None,
         'normal'  : None,
-        'specular': None
+        'specular': None,
+        'bump'    : None
     }
 
     # just take first textures of each, for the moment three.js materials can't handle more
@@ -1863,8 +1876,15 @@ def guess_material_textures(material):
             texture = slot.texture
             if slot.use and texture and texture.type == 'IMAGE':
 
+                # normal map in Blender UI: textures => image sampling => normal map
+
                 if texture.use_normal_map:
                     textures['normal'] = { "texture": texture, "slot": slot }
+
+                # bump map in Blender UI: textures => influence => geometry => normal
+
+                elif slot.use_map_normal:
+                    textures['bump'] = { "texture": texture, "slot": slot }
 
                 elif slot.use_map_specular or slot.use_map_hardness:
                     textures['specular'] = { "texture": texture, "slot": slot }
@@ -1876,7 +1896,7 @@ def guess_material_textures(material):
                     else:
                         textures['light'] = { "texture": texture, "slot": slot }
 
-                if textures['diffuse'] and textures['normal'] and textures['light'] and textures['specular']:
+                if textures['diffuse'] and textures['normal'] and textures['light'] and textures['specular'] and textures['bump']:
                     break
 
     return textures
@@ -1889,10 +1909,10 @@ def generate_material_string(material):
 
     shading = material.get("shading", "Lambert")
 
-    # normal mapped materials must use Phong
+    # normal and bump mapped materials must use Phong
     # to get all required parameters for normal shader
 
-    if material['mapNormal']:
+    if material['mapNormal'] or material['mapBump']:
         shading = "Phong"
 
     type_map = {
@@ -1914,7 +1934,9 @@ def generate_material_string(material):
     lightMap = material['mapLight']
     specularMap = material['mapSpecular']
     normalMap = material['mapNormal']
+    bumpMap = material['mapBump']
     normalMapFactor = material['mapNormalFactor']
+    bumpMapScale = material['mapBumpScale']
 
     if colorMap:
         parameters += ', "map": %s' % generate_string(colorMap)
@@ -1924,9 +1946,14 @@ def generate_material_string(material):
         parameters += ', "specularMap": %s' % generate_string(specularMap)
     if normalMap:
         parameters += ', "normalMap": %s' % generate_string(normalMap)
+    if bumpMap:
+        parameters += ', "bumpMap": %s' % generate_string(bumpMap)
 
     if normalMapFactor != 1.0:
         parameters += ', "normalMapFactor": %g' % normalMapFactor
+
+    if bumpMapScale != 1.0:
+        parameters += ', "bumpMapScale": %g' % bumpMapScale
 
     if material['vertexColors']:
         parameters += ', "vertexColors": "vertex"'
