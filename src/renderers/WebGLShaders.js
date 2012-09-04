@@ -1105,15 +1105,15 @@ THREE.ShaderChunk = {
 				"float dotProduct = dot( normal, lVector );",
 				"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
 
-				"hemiDiffuse += diffuse * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+				"vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+
+				"hemiDiffuse += diffuse * hemiColor;",
 
 				// specular (sky light)
 
-				"float hemiSpecularWeight = 0.0;",
-
 				"vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
 				"float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
-				"hemiSpecularWeight += specularStrength * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
+				"float hemiSpecularWeightSky = specularStrength * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
 
 				// specular (ground light)
 
@@ -1121,9 +1121,11 @@ THREE.ShaderChunk = {
 
 				"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 				"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
-				"hemiSpecularWeight += specularStrength * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
+				"float hemiSpecularWeightGround = specularStrength * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
 
 				"#ifdef PHYSICALLY_BASED_SHADING",
+
+					"float dotProductGround = dot( normal, lVectorGround );",
 
 					// 2.0 => 2.0001 is hack to work around ANGLE bug
 
@@ -1131,11 +1133,11 @@ THREE.ShaderChunk = {
 
 					"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
 					"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
-					"hemiSpecular += ( schlickSky + schlickGround ) * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * hemiDiffuseWeight * specularNormalization;",
+					"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 				"#else",
 
-					"hemiSpecular += specular * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * hemiDiffuseWeight;",
+					"hemiSpecular += specular * hemiColor * ( hemiSpecularWeightSky + hemiSpecularWeightGround ) * hemiDiffuseWeight;",
 
 				"#endif",
 
