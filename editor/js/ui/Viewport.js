@@ -44,6 +44,7 @@ var Viewport = function ( signals ) {
 	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
 	camera.position.set( 500, 250, 500 );
 	camera.lookAt( scene.position );
+	scene.add( camera );
 
 	var controls = new THREE.TrackballControls( camera, container.dom );
 	controls.rotateSpeed = 1.0;
