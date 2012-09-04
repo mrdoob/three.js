@@ -1127,13 +1127,9 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
                                          m.specular_intensity * m.specular_color[1],
                                          m.specular_intensity * m.specular_color[2]]
 
-            world_ambient_color = [0, 0, 0]
-            if world:
-                world_ambient_color = world.ambient_color
-
-            material['colorAmbient'] = [m.ambient * world_ambient_color[0],
-                                        m.ambient * world_ambient_color[1],
-                                        m.ambient * world_ambient_color[2]]
+            material['colorAmbient'] = [m.ambient * m.diffuse_color[0],
+                                        m.ambient * m.diffuse_color[1],
+                                        m.ambient * m.diffuse_color[2]]
 
             material['transparency'] = m.alpha
 
@@ -1806,13 +1802,9 @@ def extract_material_data(m, option_colors):
                                  m.specular_intensity * m.specular_color[1],
                                  m.specular_intensity * m.specular_color[2]]
 
-    world_ambient_color = [0, 0, 0]
-    if world:
-        world_ambient_color = world.ambient_color
-
-    material['colorAmbient'] = [m.ambient * world_ambient_color[0],
-                                m.ambient * world_ambient_color[1],
-                                m.ambient * world_ambient_color[2]]
+    material['colorAmbient'] = [m.ambient * m.diffuse_color[0],
+                                m.ambient * m.diffuse_color[1],
+                                m.ambient * m.diffuse_color[2]]
 
     material['transparency'] = m.alpha
 
