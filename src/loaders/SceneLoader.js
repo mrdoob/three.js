@@ -728,9 +728,9 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			uniforms[ "tNormal" ].value = result.textures[ m.parameters.normalMap ];
 
-			if ( m.parameters.normalMapFactor ) {
+			if ( m.parameters.normalScale ) {
 
-				uniforms[ "uNormalScale" ].value.set( m.parameters.normalMapFactor, m.parameters.normalMapFactor );
+				uniforms[ "uNormalScale" ].value.set( m.parameters.normalScale[ 0 ], m.parameters.normalScale[ 1 ] );
 
 			}
 
@@ -738,6 +738,14 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				uniforms[ "tDiffuse" ].value = m.parameters.map;
 				uniforms[ "enableDiffuse" ].value = true;
+
+			}
+
+			if ( m.parameters.envMap ) {
+
+				uniforms[ "tCube" ].value = m.parameters.envMap;
+				uniforms[ "enableReflection" ].value = true;
+				uniforms[ "uReflectivity" ].value = m.parameters.reflectivity;
 
 			}
 
@@ -752,6 +760,16 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				uniforms[ "tSpecular" ].value = result.textures[ m.parameters.specularMap ];
 				uniforms[ "enableSpecular" ].value = true;
+
+			}
+
+			if ( m.parameters.displacementMap ) {
+
+				uniforms[ "tDisplacement" ].value = result.textures[ m.parameters.displacementMap ];
+				uniforms[ "enableDisplacement" ].value = true;
+
+				uniforms[ "uDisplacementBias" ].value = m.parameters.displacementBias;
+				uniforms[ "uDisplacementScale" ].value = m.parameters.displacementScale;
 
 			}
 

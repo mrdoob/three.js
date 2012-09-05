@@ -192,7 +192,7 @@
 				for ( m in result.materials ) {
 
 					material = result.materials[ m ];
-					if ( ! ( material instanceof THREE.MeshFaceMaterial ) ) {
+					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial ) ) {
 
 						if( !material.program ) {
 
