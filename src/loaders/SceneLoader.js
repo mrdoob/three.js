@@ -58,15 +58,17 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		geometry, material, camera, fog,
 		texture, images,
 		light,
-		data, binLoader, jsonLoader,
 		counter_models, counter_textures,
 		total_models, total_textures,
 		result;
 
-	data = json;
+	var data = json;
 
-	binLoader = new THREE.BinaryLoader();
-	jsonLoader = new THREE.JSONLoader();
+	var binLoader = new THREE.BinaryLoader();
+	var jsonLoader = new THREE.JSONLoader();
+	var ctmLoader = new THREE.CTMLoader();
+
+	var useWorker, useBuffers;
 
 	counter_models = 0;
 	counter_textures = 0;
@@ -123,7 +125,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
-	// the toplevel loader function, delegates to handle_children
+	// toplevel loader function, delegates to handle_children
 
 	function handle_objects() {
 
@@ -273,7 +275,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				}
 
-				if ( o.properties !== undefined)  {
+				if ( o.properties !== undefined )  {
 
 					for ( var key in o.properties ) {
 
@@ -495,7 +497,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		g = data.geometries[ dg ];
 
-		if ( g.type == "bin_mesh" || g.type == "ascii_mesh" ) {
+		if ( g.type === "bin_mesh" || g.type === "ascii_mesh" || g.type === "ctm_mesh" ) {
 
 			counter_models += 1;
 
@@ -540,6 +542,12 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			geometry = new THREE.IcosahedronGeometry( g.radius, g.subdivisions );
 			result.geometries[ dg ] = geometry;
+
+		} else if ( g.type === "ctm_mesh" ) {
+
+			useWorker = data.useWorker !== undefined ? data.useWorker : true;
+			useBuffers = data.useBuffers !== undefined ? data.useBuffers : true;
+			ctmLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ), useWorker, useBuffers );
 
 		} else if ( g.type === "bin_mesh" ) {
 
