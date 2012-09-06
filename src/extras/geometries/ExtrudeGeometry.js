@@ -5,23 +5,23 @@
  *
  * parameters = {
  *
- *  size: <float>, // size of the text
- *  height: <float>, // thickness to extrude text
- *  curveSegments: <int>, // number of points on the curves
- *  steps: <int>, // number of points for z-side extrusions / used for subdividing segements of extrude spline too
- *  amount: <int>, // Amount
+ *	size: <float>, // size of the text
+ *	height: <float>, // thickness to extrude text
+ *	curveSegments: <int>, // number of points on the curves
+ *	steps: <int>, // number of points for z-side extrusions / used for subdividing segements of extrude spline too
+ *	amount: <int>, // Amount
  *
- *  bevelEnabled: <bool>, // turn on bevel
- *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float>, // how far from text outline is bevel
- *  bevelSegments: <int>, // number of bevel layers
+ *	bevelEnabled: <bool>, // turn on bevel
+ *	bevelThickness: <float>, // how deep into text bevel goes
+ *	bevelSize: <float>, // how far from text outline is bevel
+ *	bevelSegments: <int>, // number of bevel layers
  *
- *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
- *  frames: <THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
+ *	extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
+ *	frames: <THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
  *
- *  material: <int> // material index for front and back faces
- *  extrudeMaterial: <int> // material index for extrusion and beveled faces
- *  uvGenerator: <Object> // object that provides UV generator functions
+ *	material: <int> // material index for front and back faces
+ *	extrudeMaterial: <int> // material index for extrusion and beveled faces
+ *	uvGenerator: <Object> // object that provides UV generator functions
  *
  * }
  **/
@@ -170,7 +170,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var contour = vertices; // vertices has all points but contour has only points of circumference
 
-	for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
+	for ( h = 0, hl = holes.length;	 h < hl; h ++ ) {
 
 		ahole = holes[ h ];
 
@@ -323,7 +323,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		if ( j === il ) j = 0;
 		if ( k === il ) k = 0;
 
-		//  (j)---(i)---(k)
+		//	(j)---(i)---(k)
 		// console.log('i,j,k', i, j , k)
 
 		var pt_i = contour[ i ];
@@ -347,7 +347,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			if ( j === il ) j = 0;
 			if ( k === il ) k = 0;
 
-			//  (j)---(i)---(k)
+			//	(j)---(i)---(k)
 			oneHoleMovements[ i ]= getBevelVec( ahole[ i ], ahole[ j ], ahole[ k ] );
 
 		}
@@ -376,7 +376,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 			//vert = scalePt( contour[ i ], contourCentroid, bs, false );
-			v( vert.x, vert.y,  - z );
+			v( vert.x, vert.y,	- z );
 
 		}
 
@@ -392,7 +392,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 				//vert = scalePt( ahole[ i ], holesCentroids[ h ], bs, true );
 
-				v( vert.x, vert.y,  -z );
+				v( vert.x, vert.y,	-z );
 
 			}
 
@@ -401,6 +401,10 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 	}
 
 	bs = bevelSize;
+
+	/**
+	 * Made it this far...
+	 */
 
 	// Back facing vertices
 
@@ -440,7 +444,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			if ( !extrudeByPath ) {
 
-				v( vert.x, vert.y, amount / steps * s );
+				if ( options.amount > 0 ) {
+					v( vert.x, vert.y, amount / steps * s );
+				}
 
 			} else {
 
@@ -459,52 +465,57 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-
 	// Add bevel segments planes
 
-	//for ( b = 1; b <= bevelSegments; b ++ ) {
+  // for ( b = 1; b <= bevelSegments; b ++ ) {
 	for ( b = bevelSegments - 1; b >= 0; b -- ) {
 
-		t = b / bevelSegments;
-		z = bevelThickness * ( 1 - t );
-		//bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
-		bs = bevelSize * Math.sin ( t * Math.PI/2 ) ;
+			console.log('running');
 
-		// contract shape
+	 t = b / bevelSegments;
+	 z = bevelThickness * ( 1 - t );
+	 //bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
+	 bs = bevelSize * Math.sin ( t * Math.PI/2 ) ;
 
-		for ( i = 0, il = contour.length; i < il; i ++ ) {
+	 // contract shape
 
-			vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
-			v( vert.x, vert.y,  amount + z );
+	 for ( i = 0, il = contour.length; i < il; i ++ ) {
 
-		}
+		 vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+		 v( vert.x, vert.y, amount + z );
 
-		// expand holes
+	 }
 
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+	 // expand holes
 
-			ahole = holes[ h ];
-			oneHoleMovements = holesMovements[ h ];
+	 for ( h = 0, hl = holes.length; h < hl; h ++ ) {
 
-			for ( i = 0, il = ahole.length; i < il; i ++ ) {
+		 ahole = holes[ h ];
+		 oneHoleMovements = holesMovements[ h ];
 
-				vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+		 for ( i = 0, il = ahole.length; i < il; i ++ ) {
 
-				if ( !extrudeByPath ) {
+			 vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
-					v( vert.x, vert.y,  amount + z );
+			 if ( !extrudeByPath ) {
 
-				} else {
+				 v( vert.x, vert.y,	 amount + z );
 
-					v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
+			 } else {
 
-				}
+				 v( vert.x, vert.y + extrudePts[ steps - 1 ].y, extrudePts[ steps - 1 ].x + z );
 
-			}
+			 }
 
-		}
+		 }
+
+	 }
 
 	}
+
+	/**
+	 * This is the problem
+	 */
 
 	/* Faces */
 
@@ -514,10 +525,11 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	// Sides faces
 
-	buildSideFaces();
+	if ( options.amount > 0 ) {
+		buildSideFaces();
+	}
 
-
-	/////  Internal functions
+	/////	 Internal functions
 
 	function buildLidFaces() {
 
@@ -560,12 +572,17 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			// Top faces
 
-			for ( i = 0; i < flen; i ++ ) {
+			if (options.amount > 0) {
 
-				face = faces[ i ];
-				f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps, false );
+				for ( i = 0; i < flen; i ++ ) {
+
+				 face = faces[ i ];
+				 f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps, false );
+
+				}
 
 			}
+
 		}
 
 	}
@@ -578,7 +595,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		sidewalls( contour, layeroffset );
 		layeroffset += contour.length;
 
-		for ( h = 0, hl = holes.length;  h < hl; h ++ ) {
+		for ( h = 0, hl = holes.length;	 h < hl; h ++ ) {
 
 			ahole = holes[ h ];
 			sidewalls( ahole, layeroffset );
@@ -603,7 +620,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 			//console.log('b', i,j, i-1, k,vertices.length);
 
-			var s = 0, sl = steps  + bevelSegments * 2;
+			var s = 0, sl = steps	 + bevelSegments * 2;
 
 			for ( s = 0; s < sl; s ++ ) {
 
@@ -640,7 +657,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 		var uvs = isBottom ? uvgen.generateBottomUV( scope, shape, options, a, b, c ) : uvgen.generateTopUV( scope, shape, options, a, b, c );
 
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+		scope.faceVertexUvs[ 0 ].push( uvs );
 
 	}
 
@@ -651,11 +668,11 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
+		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
 
- 		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
- 		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
+																				stepIndex, stepsLength, contourIndex1, contourIndex2 );
+		scope.faceVertexUvs[ 0 ].push( uvs );
 
 	}
 
@@ -664,6 +681,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 	generateTopUV: function( geometry, extrudedShape, extrudeOptions, indexA, indexB, indexC ) {
+
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
 
@@ -688,8 +706,8 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 	},
 
 	generateSideWallUV: function( geometry, extrudedShape, wallContour, extrudeOptions,
-	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength,
-	                              contourIndex1, contourIndex2 ) {
+																indexA, indexB, indexC, indexD, stepIndex, stepsLength,
+																contourIndex1, contourIndex2 ) {
 
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
