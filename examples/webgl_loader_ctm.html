@@ -155,9 +155,7 @@
 
 				}
 
-				var useWorker = true;
-				var useBuffers = true;
-
+				var parameters = { useWorker: true, useBuffers: true };
 				var loader = new THREE.CTMLoader();
 
 				loader.load( "models/ctm/ben.ctm",   function( geometry ) {
@@ -166,7 +164,7 @@
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
 					checkTime();
 
-				}, useWorker, useBuffers );
+				}, parameters );
 
 				loader.load( "models/ctm/WaltHead.ctm",  function( geometry ) {
 
@@ -180,7 +178,7 @@
 
 					checkTime();
 
-				}, useWorker, useBuffers );
+				}, parameters );
 
 				loader.load( "models/ctm/LeePerry.ctm",  function( geometry ) {
 
@@ -222,7 +220,7 @@
 					callbackModel( geometry, 1300, material, 200, 50, 0, 0, 0 );
 					checkTime();
 
-				}, useWorker, useBuffers );
+				}, parameters );
 
 			}
 
