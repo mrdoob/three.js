@@ -559,11 +559,19 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		} else if ( g.type in this.geometryHandlerMap ) {
 
-			//useWorker = data.useWorker !== undefined ? data.useWorker : true;
-			//useBuffers = data.useBuffers !== undefined ? data.useBuffers : true;
+			var loaderParameters = {};
+			for ( var parType in g ) {
+
+				if ( parType !== "type" && parType !== "url" ) {
+
+					loaderParameters[ parType ] = g[ parType ];
+
+				}
+
+			}
 
 			var loader = this.geometryHandlerMap[ g.type ][ "loaderObject" ];
-			loader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
+			loader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ), loaderParameters );
 
 		} else if ( g.type === "embedded_mesh" ) {
 
