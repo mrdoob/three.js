@@ -11,11 +11,16 @@ THREE.SceneLoader = function () {
 	this.callbackSync = function () {};
 	this.callbackProgress = function () {};
 
+	this.geometryHandlerMap = {};
+
+	this.addGeometryHandler( "ascii_mesh", THREE.JSONLoader );
+	this.addGeometryHandler( "bin_mesh", THREE.BinaryLoader );
+
 };
 
 THREE.SceneLoader.prototype.constructor = THREE.SceneLoader;
 
-THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
+THREE.SceneLoader.prototype.load = function ( url, callbackFinished ) {
 
 	var scope = this;
 
@@ -47,6 +52,12 @@ THREE.SceneLoader.prototype.load = function( url, callbackFinished ) {
 
 };
 
+THREE.SceneLoader.prototype.addGeometryHandler = function ( typeID, loaderClass ) {
+
+	this.geometryHandlerMap[ typeID ] = { "loaderClass": loaderClass };
+
+};
+
 THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var scope = this;
@@ -64,11 +75,14 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var data = json;
 
-	var binLoader = new THREE.BinaryLoader();
-	var jsonLoader = new THREE.JSONLoader();
-	var ctmLoader = new THREE.CTMLoader();
+	// async geometry loaders
 
-	var useWorker, useBuffers;
+	for ( var typeID in this.geometryHandlerMap ) {
+
+		var loaderClass = this.geometryHandlerMap[ typeID ][ "loaderClass" ];
+		this.geometryHandlerMap[ typeID ][ "loaderObject" ] = new loaderClass();
+
+	}
 
 	counter_models = 0;
 	counter_textures = 0;
@@ -497,7 +511,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		g = data.geometries[ dg ];
 
-		if ( g.type === "bin_mesh" || g.type === "ascii_mesh" || g.type === "ctm_mesh" ) {
+		if ( g.type in this.geometryHandlerMap ) {
 
 			counter_models += 1;
 
@@ -543,19 +557,13 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			geometry = new THREE.IcosahedronGeometry( g.radius, g.subdivisions );
 			result.geometries[ dg ] = geometry;
 
-		} else if ( g.type === "ctm_mesh" ) {
+		} else if ( g.type in this.geometryHandlerMap ) {
 
-			useWorker = data.useWorker !== undefined ? data.useWorker : true;
-			useBuffers = data.useBuffers !== undefined ? data.useBuffers : true;
-			ctmLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ), useWorker, useBuffers );
+			//useWorker = data.useWorker !== undefined ? data.useWorker : true;
+			//useBuffers = data.useBuffers !== undefined ? data.useBuffers : true;
 
-		} else if ( g.type === "bin_mesh" ) {
-
-			binLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
-
-		} else if ( g.type === "ascii_mesh" ) {
-
-			jsonLoader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
+			var loader = this.geometryHandlerMap[ g.type ][ "loaderObject" ];
+			loader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ) );
 
 		} else if ( g.type === "embedded_mesh" ) {
 
@@ -568,6 +576,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			if ( modelJson ) {
 
+				var jsonLoader = this.geometryHandlerMap[ "ascii_mesh" ][ "loaderObject" ];
 				jsonLoader.createModel( modelJson, create_callback_embed( dg ), texture_path );
 
 			}

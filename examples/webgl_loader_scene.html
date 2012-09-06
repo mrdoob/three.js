@@ -323,6 +323,8 @@
 
 				var loader = new THREE.SceneLoader();
 
+				loader.addGeometryHandler( "ctm_mesh", THREE.CTMLoader );
+
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
 
