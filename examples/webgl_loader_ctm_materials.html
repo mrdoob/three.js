@@ -196,8 +196,6 @@
 */
 				// new way via CTMLoader and separate parts
 
-				var parameters = { useWorker: true,	useBuffers: true };
-
 				loaderCTM = new THREE.CTMLoader( true );
 				document.body.appendChild( loaderCTM.statusDomElement );
 
@@ -223,7 +221,7 @@
 
 					console.log( "load time:", end - start, "ms" );
 
-				}, parameters );
+				}, { useWorker: true, useBuffers: true } );
 
 			}
 

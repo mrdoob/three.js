@@ -155,7 +155,6 @@
 
 				}
 
-				var parameters = { useWorker: true, useBuffers: true };
 				var loader = new THREE.CTMLoader();
 
 				loader.load( "models/ctm/ben.ctm",   function( geometry ) {
@@ -164,7 +163,7 @@
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
 					checkTime();
 
-				}, parameters );
+				}, { useWorker: true, useBuffers: true } );
 
 				loader.load( "models/ctm/WaltHead.ctm",  function( geometry ) {
 
@@ -178,7 +177,7 @@
 
 					checkTime();
 
-				}, parameters );
+				}, { useWorker: true, useBuffers: true } );
 
 				loader.load( "models/ctm/LeePerry.ctm",  function( geometry ) {
 
@@ -210,8 +209,12 @@
 
 					uniforms[ "wrapRGB" ].value.set( 0.75, 0.5, 0.5 );
 
-					var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
-					var material = new THREE.ShaderMaterial( parameters );
+					var material = new THREE.ShaderMaterial( {
+						fragmentShader: shader.fragmentShader,
+						vertexShader: shader.vertexShader,
+						uniforms: uniforms,
+						lights: true
+					} );
 
 					material.wrapAround = true;
 
@@ -220,7 +223,7 @@
 					callbackModel( geometry, 1300, material, 200, 50, 0, 0, 0 );
 					checkTime();
 
-				}, parameters );
+				}, { useWorker: true, useBuffers: true } );
 
 			}
 
