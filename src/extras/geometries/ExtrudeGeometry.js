@@ -470,8 +470,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
   // for ( b = 1; b <= bevelSegments; b ++ ) {
 	for ( b = bevelSegments - 1; b >= 0; b -- ) {
 
-			console.log('running');
-
 	 t = b / bevelSegments;
 	 z = bevelThickness * ( 1 - t );
 	 //bs = bevelSize * ( 1-Math.sin ( ( 1 - t ) * Math.PI/2 ) );
