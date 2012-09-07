@@ -88,8 +88,6 @@ THREE.Projector = function() {
 
 				if ( object.renderDepth !== null ) {
 
-					console.log( object.renderDepth );
-
 					_object.z = object.renderDepth;
 
 				} else {
