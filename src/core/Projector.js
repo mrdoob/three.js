@@ -68,7 +68,7 @@ THREE.Projector = function() {
 
 	};
 
-	var projectGraph = function ( root, sort ) {
+	var projectGraph = function ( root, sortObjects ) {
 
 		_objectCount = 0;
 
@@ -83,23 +83,43 @@ THREE.Projector = function() {
 			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
 			( object.frustumCulled === false || _frustum.contains( object ) === true ) ) {
 
-				_vector3.copy( object.matrixWorld.getPosition() );
-				_viewProjectionMatrix.multiplyVector3( _vector3 );
-
 				_object = getNextObjectInPool();
 				_object.object = object;
-				_object.z = _vector3.z;
+
+				if ( object.renderDepth !== null ) {
+
+					console.log( object.renderDepth );
+
+					_object.z = object.renderDepth;
+
+				} else {
+
+					_vector3.copy( object.matrixWorld.getPosition() );
+					_viewProjectionMatrix.multiplyVector3( _vector3 );
+					_object.z = _vector3.z;
+
+				}
 
 				_renderData.objects.push( _object );
 
 			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
 
-				_vector3.copy( object.matrixWorld.getPosition() );
-				_viewProjectionMatrix.multiplyVector3( _vector3 );
-
 				_object = getNextObjectInPool();
 				_object.object = object;
-				_object.z = _vector3.z;
+
+				// TODO: Find an elegant and performant solution and remove this dupe code.
+
+				if ( object.renderDepth !== null ) {
+
+					_object.z = object.renderDepth;
+
+				} else {
+
+					_vector3.copy( object.matrixWorld.getPosition() );
+					_viewProjectionMatrix.multiplyVector3( _vector3 );
+					_object.z = _vector3.z;
+
+				}
 
 				_renderData.sprites.push( _object );
 
@@ -119,13 +139,13 @@ THREE.Projector = function() {
 
 		projectObject( root );
 
-		if ( sort === true ) _renderData.objects.sort( painterSort );
+		if ( sortObjects === true ) _renderData.objects.sort( painterSort );
 
 		return _renderData;
 
 	};
 
-	this.projectScene = function ( scene, camera, sort ) {
+	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
 		var near = camera.near, far = camera.far, visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
@@ -151,7 +171,7 @@ THREE.Projector = function() {
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
-		_renderData = projectGraph( scene, false );
+		_renderData = projectGraph( scene, sortObjects );
 
 		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
 
@@ -404,7 +424,7 @@ THREE.Projector = function() {
 
 		}
 
-		sort && _renderData.elements.sort( painterSort );
+		if ( sortElements === true ) _renderData.elements.sort( painterSort );
 
 		return _renderData;
 

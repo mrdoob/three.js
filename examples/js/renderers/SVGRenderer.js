@@ -97,7 +97,7 @@ THREE.SVGRenderer = function () {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		_renderData = _projector.projectScene( scene, camera, this.sortElements );
+		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 
