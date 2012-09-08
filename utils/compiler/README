@@ -146,7 +146,7 @@ the parse tree data structures were extracted and modified
 significantly for use by Google's JavaScript compiler.
 
 Local Modifications: The packages have been renamespaced. All code not
-relavant to parsing has been removed. A JSDoc parser and static typing
+relevant to parsing has been removed. A JsDoc parser and static typing
 system have been added.
 
 

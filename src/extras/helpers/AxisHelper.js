@@ -1,6 +1,6 @@
 /**
  * @author sroucheray / http://sroucheray.org/
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.AxisHelper = function () {

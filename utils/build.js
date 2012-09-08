@@ -150,10 +150,10 @@ function main(){
 	var files = getFileNames();
 
 	var config = [
-	['Three', 'includes', '', files["COMMON"].concat(files["EXTRAS"]), args.common],
-	['ThreeCanvas', 'includes_canvas', '', files["CANVAS"], args.canvas],
-	['ThreeWebGL', 'includes_webgl', '', files["WEBGL"], args.webgl],
-	['ThreeExtras', 'includes_extras', 'externs_extras', files["EXTRAS"], args.extras]
+	['Three', 'includes', '', files["common"].concat(files["extras"]), args.common],
+	['ThreeCanvas', 'includes_canvas', '', files["canvas"], args.canvas],
+	['ThreeWebGL', 'includes_webgl', '', files["webgl"], args.webgl],
+	['ThreeExtras', 'includes_extras', 'externs_extras', files["extras"], args.extras]
 	];
 
 

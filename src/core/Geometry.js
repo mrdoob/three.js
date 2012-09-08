@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
@@ -546,18 +546,18 @@ THREE.Geometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+		var maxRadiusSq = 0;
 
-		var radius, maxRadius = 0;
+		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
 
-		for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
 
-			radius = this.vertices[ v ].length();
-			if ( radius > maxRadius ) maxRadius = radius;
+			var radiusSq = this.vertices[ i ].lengthSq();
+			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
 
 		}
 
-		this.boundingSphere.radius = maxRadius;
+		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
 
 	},
 

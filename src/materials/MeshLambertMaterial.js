@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -11,6 +11,8 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  lightMap: new THREE.Texture( <Image> ),
+ *
+ *  specularMap: new THREE.Texture( <Image> ),
  *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
@@ -48,6 +50,8 @@ THREE.MeshLambertMaterial = function ( parameters ) {
 	this.map = null;
 
 	this.lightMap = null;
+
+	this.specularMap = null;
 
 	this.envMap = null;
 	this.combine = THREE.MultiplyOperation;
@@ -91,6 +95,8 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.lightMap = this.lightMap;
+
+	material.specularMap = this.specularMap;
 
 	material.envMap = this.envMap;
 	material.combine = this.combine;

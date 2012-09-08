@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9,6 +9,7 @@ THREE.Object3D = function () {
 	this.id = THREE.Object3DCount ++;
 
 	this.name = '';
+	this.properties = {};
 
 	this.parent = undefined;
 	this.children = [];
@@ -204,6 +205,22 @@ THREE.Object3D.prototype = {
 
 		return undefined;
 
+	},
+	
+	getDescendants: function ( array ) {
+
+		if ( array === undefined ) array = [];
+
+		Array.prototype.push.apply( array, this.children );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].getDescendants( array );
+
+		};
+		
+		return array;
+		
 	},
 
 	updateMatrix: function () {

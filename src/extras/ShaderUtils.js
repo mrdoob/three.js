@@ -1,6 +1,6 @@
 /**
  * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  *
  * ShaderUtils currently contains:
  *
@@ -132,6 +132,8 @@ THREE.ShaderUtils = {
 				"uShininess": { type: "f", value: 30 },
 				"uOpacity": { type: "f", value: 1 },
 
+				"useRefract": { type: "i", value: 0 },
+				"uRefractionRatio": { type: "f", value: 0.98 },
 				"uReflectivity": { type: "f", value: 0.5 },
 
 				"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
@@ -164,6 +166,9 @@ THREE.ShaderUtils = {
 				"uniform samplerCube tCube;",
 
 				"uniform float uNormalScale;",
+
+				"uniform bool useRefract;",
+				"uniform float uRefractionRatio;",
 				"uniform float uReflectivity;",
 
 				"varying vec3 vTangent;",
@@ -485,7 +490,18 @@ THREE.ShaderUtils = {
 
 					"if ( enableReflection ) {",
 
-						"vec3 vReflect = reflect( normalize( vWorldPosition ), normal );",
+						"vec3 vReflect;",
+						"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
+
+						"if ( useRefract ) {",
+
+							"vReflect = refract( cameraToVertex, normal, uRefractionRatio );",
+
+						"} else {",
+
+							"vReflect = reflect( cameraToVertex, normal );",
+
+						"}",
 
 						"vec4 cubeColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
 
@@ -575,8 +591,10 @@ THREE.ShaderUtils = {
 
 							"#ifdef USE_SKINNING",
 
-								"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-								"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+								"vec4 skinVertex = vec4( position, 1.0 );",
+
+								"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+								"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 								"displacedPosition  = skinned.xyz;",
 
@@ -592,8 +610,10 @@ THREE.ShaderUtils = {
 
 						"#ifdef USE_SKINNING",
 
-							"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-							"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+							"vec4 skinVertex = vec4( position, 1.0 );",
+
+							"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+							"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 							"displacedPosition  = skinned.xyz;",
 

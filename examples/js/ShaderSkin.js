@@ -12,6 +12,8 @@ THREE.ShaderSkin = {
 	//		- physically based specular term (Kelemen/Szirmay-Kalos specular reflectance)
 	//
 	//		- diffuse map
+	//		- bump map
+	//		- specular map
 	//		- point and directional lights (use with "lights: true" material option)
 	//		- fog (use with "fog: true" material option)
 	//		- shadow maps
@@ -28,6 +30,9 @@ THREE.ShaderSkin = {
 
 			{
 
+			"enableBump"	: { type: "i", value: 0 },
+			"enableSpecular": { type: "i", value: 0 },
+
 			"tDiffuse"	: { type: "t", value: 0, texture: null },
 			"tBeckmann"	: { type: "t", value: 1, texture: null },
 
@@ -39,6 +44,13 @@ THREE.ShaderSkin = {
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
 			"uSpecularBrightness": 	{ type: "f", value: 0.75 },
 
+			"bumpMap"	: { type: "t", value: 2, texture: null },
+			"bumpScale" : { type: "f", value: 1 },
+
+			"specularMap" : { type: "t", value: 3, texture: null },
+
+			"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
+
 			"uWrapRGB":	{ type: "v3", value: new THREE.Vector3( 0.75, 0.375, 0.1875 ) }
 
 			}
@@ -46,6 +58,12 @@ THREE.ShaderSkin = {
 		] ),
 
 		fragmentShader: [
+
+			"#define USE_BUMPMAP",
+			"#extension GL_OES_standard_derivatives : enable",
+
+			"uniform bool enableBump;",
+			"uniform bool enableSpecular;",
 
 			"uniform vec3 uAmbientColor;",
 			"uniform vec3 uDiffuseColor;",
@@ -59,6 +77,8 @@ THREE.ShaderSkin = {
 
 			"uniform sampler2D tDiffuse;",
 			"uniform sampler2D tBeckmann;",
+
+			"uniform sampler2D specularMap;",
 
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
@@ -84,6 +104,7 @@ THREE.ShaderSkin = {
 
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
+			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
 
 			// Fresnel term
 
@@ -140,6 +161,25 @@ THREE.ShaderSkin = {
 				"vec3 normal = normalize( vNormal );",
 				"vec3 viewPosition = normalize( vViewPosition );",
 
+				"float specularStrength;",
+
+				"if ( enableSpecular ) {",
+
+					"vec4 texelSpecular = texture2D( specularMap, vUv );",
+					"specularStrength = texelSpecular.r;",
+
+				"} else {",
+
+					"specularStrength = 1.0;",
+
+				"}",
+
+				"#ifdef USE_BUMPMAP",
+
+					"if ( enableBump ) normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
+
+				"#endif",
+
 				// point lights
 
 				"vec3 specularTotal = vec3( 0.0 );",
@@ -168,7 +208,7 @@ THREE.ShaderSkin = {
 						"float pointSpecularWeight = KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
 
 						"pointTotal    += lDistance * uDiffuseColor * pointLightColor[ i ] * pointDiffuseWeight;",
-						"specularTotal += lDistance * uSpecularColor * pointLightColor[ i ] * pointSpecularWeight;",
+						"specularTotal += lDistance * uSpecularColor * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -193,7 +233,7 @@ THREE.ShaderSkin = {
 						"float dirSpecularWeight =  KS_Skin_Specular( normal, dirVector, viewPosition, uRoughness, uSpecularBrightness );",
 
 						"dirTotal 	   += uDiffuseColor * directionalLightColor[ i ] * dirDiffuseWeight;",
-						"specularTotal += uSpecularColor * directionalLightColor[ i ] * dirSpecularWeight;",
+						"specularTotal += uSpecularColor * directionalLightColor[ i ] * dirSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -223,6 +263,8 @@ THREE.ShaderSkin = {
 
 		vertexShader: [
 
+			"uniform vec4 offsetRepeat;",
+
 			"varying vec3 vNormal;",
 			"varying vec2 vUv;",
 
@@ -237,7 +279,7 @@ THREE.ShaderSkin = {
 
 				"vNormal = normalMatrix * normal;",
 
-				"vUv = uv;",
+				"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
