@@ -162,6 +162,15 @@
 			"visible"  : true
 		},
 
+		"hand" : {
+			"geometry" : "hand",
+			"materials": [ "phong_hand" ],
+			"position" : [ -28, -5, 29 ],
+			"rotation" : [ 0, 0.5, 0 ],
+			"scale"	   : [ 22, 22, 22 ],
+			"visible"  : true
+		},
+
 		"ninja" : {
 			"geometry" : "NinjaLo",
 			"materials": [ "phong_normal" ],
@@ -306,6 +315,15 @@
 			"useBuffers" : true
 		},
 
+		"hand": {
+			"type": "utf8_mesh",
+			"url" : "models/utf8/hand.utf8",
+			"scale"   : 0.815141,
+			"offsetX" : -0.371823,
+			"offsetY" : -0.011920,
+			"offsetZ" : -0.416061
+		},
+
 		"colorcube": {
 			"type": "embedded_mesh",
 			"id"  : "cube_fvc"
@@ -375,7 +393,12 @@
 
 		"phong_ben": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 1118481, "ambient": 1118481, "specular": 5601245, "shininess": 12, "bumpMap": "texture_bump_repeat", "bumpScale": 0.125, "envMaps": "cube_reflection", "reflectivity": 0.5 }
+			"parameters": { "color": 1118481, "ambient": 1118481, "specular": 5601245, "shininess": 12, "bumpMap": "texture_bump_repeat", "bumpScale": 0.125 }
+		},
+
+		"phong_hand": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 14527112, "ambient": 14527112, "specular": 2236962, "shininess": 40 }
 		},
 
 		"phong_normal": {
