@@ -731,6 +731,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				}
 
+			} else if ( pp === "wrapRGB" ) {
+
+				var v3 = m.parameters[ pp ];
+				m.parameters[ pp ] = new THREE.Vector3( v3[ 0 ], v3[ 1 ], v3[ 2 ] );
+
 			}
 
 		}

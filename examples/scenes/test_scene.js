@@ -165,9 +165,9 @@
 		"hand" : {
 			"geometry" : "hand",
 			"materials": [ "phong_hand" ],
-			"position" : [ -28, -5, 29 ],
+			"position" : [ -28, -1, 29 ],
 			"rotation" : [ 0, 0.5, 0 ],
-			"scale"	   : [ 22, 22, 22 ],
+			"scale"	   : [ 12, 12, 12 ],
 			"visible"  : true
 		},
 
@@ -398,7 +398,7 @@
 
 		"phong_hand": {
 			"type": "MeshPhongMaterial",
-			"parameters": { "color": 14527112, "ambient": 14527112, "specular": 2236962, "shininess": 40 }
+			"parameters": { "color": 14531481, "ambient": 14531481, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
 		},
 
 		"phong_normal": {
