@@ -259,7 +259,7 @@ THREE.Loader.prototype = {
 
 		if ( m.vertexColors !== undefined ) {
 
-			if ( m.vertexColors == "face" ) {
+			if ( m.vertexColors === "face" ) {
 
 				mpars.vertexColors = THREE.FaceColors;
 

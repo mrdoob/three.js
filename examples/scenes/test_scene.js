@@ -36,9 +36,7 @@
 			"position" : [ -30, -5, 25 ],
 			"rotation" : [ 0, 0.8, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
-			"visible"  : true,
-			"children" : {
-			}
+			"visible"  : true
 		},
 
 		"sphere_lambert" : {
@@ -180,6 +178,18 @@
 			"visible"  : true
 		},
 
+		"sittingBox" : {
+			"geometry" : "sittingBox",
+			"materials": [ "phong_morph" ],
+			"position" : [ -60, -10, 10 ],
+			"rotation" : [ 0, 0.5, 0 ],
+			"scale"	   : [ 23, 23, 23 ],
+			"visible"  : true,
+			"morph"	   : true,
+			"duration" : 8000,
+			"mirroredLoop" : true
+		},
+
 		"quad_bg" : {
 			"geometry" : "quad",
 			"materials": [ "textured_bg" ],
@@ -308,6 +318,11 @@
 			"url" : "obj/veyron/VeyronNoUv_bin.js"
 		},
 
+		"sittingBox": {
+			"type": "ascii",
+			"url" : "models/animated/sittingBox.js"
+		},
+
 		"ben": {
 			"type": "ctm",
 			"url" : "models/ctm/ben.ctm",
@@ -404,6 +419,11 @@
 		"phong_normal": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 0, "specular": 16777215, "shininess": 25, "envMap": "cube_reflection", "reflectivity": 0.1, "lightMap": "texture_ao", "normalMap": "texture_normal", "normalScale": [ 1, -1 ], "displacementMap": "texture_displacement", "displacementScale": 2.436143, "displacementBias": -0.428408 }
+		},
+
+		"phong_morph": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true, "morphNormals" : true }
 		},
 
 		"lambert_green": {

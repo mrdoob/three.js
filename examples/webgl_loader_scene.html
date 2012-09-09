@@ -175,6 +175,9 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			var rotatingObjects = [];
+			var morphAnimatedObjects = [];
+
+			var clock = new THREE.Clock();
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -197,7 +200,7 @@
 				for ( m in result.materials ) {
 
 					material = result.materials[ m ];
-					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial ) ) {
+					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial || material.morphTargets ) ) {
 
 						if( !material.program ) {
 
@@ -313,6 +316,12 @@
 						if ( child.properties.rotating === true ) {
 
 							rotatingObjects.push( child );
+
+						}
+
+						if ( child instanceof THREE.MorphAnimMesh ) {
+
+							morphAnimatedObjects.push( child );
 
 						}
 
@@ -441,6 +450,8 @@
 
 			function render() {
 
+				var delta = clock.getDelta();
+
 				camera.position.x += ( mouseX - camera.position.x ) * .001;
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
@@ -452,6 +463,14 @@
 
 					object.rotation.x += 0.01;
 					object.rotation.y += 0.02;
+
+				}
+
+				for ( var i = 0; i < morphAnimatedObjects.length; i ++ ) {
+
+					var object = morphAnimatedObjects[ i ];
+
+					object.updateAnimation( 1000 * delta );
 
 				}
 

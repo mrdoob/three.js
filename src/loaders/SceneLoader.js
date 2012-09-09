@@ -192,7 +192,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						q = 0;
 
-						if ( o.materials.length == 0 ) {
+						if ( o.materials.length === 0 ) {
 
 							material = new THREE.MeshFaceMaterial();
 
@@ -207,7 +207,40 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						}
 
-						object = new THREE.Mesh( geometry, material );
+						if ( o.morph ) {
+
+							object = new THREE.MorphAnimMesh( geometry, material );
+
+							if ( o.duration !== undefined ) {
+
+								object.duration = o.duration;
+
+							}
+
+							if ( o.time !== undefined ) {
+
+								object.time = o.time;
+
+							}
+
+							if ( o.mirroredLoop !== undefined ) {
+
+								object.mirroredLoop = o.mirroredLoop;
+
+							}
+
+							if ( material.morphNormals ) {
+
+								geometry.computeMorphNormals();
+
+							}
+
+						} else {
+
+							object = new THREE.Mesh( geometry, material );
+
+						}
+
 						object.name = dd;
 
 						if ( m ) {
@@ -705,7 +738,23 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			} else if ( pp === "shading" ) {
 
-				m.parameters[ pp ] = ( m.parameters[ pp ] == "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
+				m.parameters[ pp ] = ( m.parameters[ pp ] === "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
+
+			} else if ( pp === "side" ) {
+
+				if (  m.parameters[ pp ] == "double" ) {
+
+					m.parameters[ pp ] = THREE.DoubleSide;
+
+				} else if ( m.parameters[ pp ] == "back" ) {
+
+					m.parameters[ pp ] = THREE.BackSide;
+
+				} else {
+
+					m.parameters[ pp ] = THREE.FrontSide;
+
+				}
 
 			} else if ( pp === "blending" ) {
 
