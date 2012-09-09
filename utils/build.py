@@ -18,12 +18,6 @@ def main(argv=None):
 
   args = parser.parse_args()
 
-  # load files
-
-  f =  open('files.json', 'r')
-  files = json.load(f)
-  f.close()
-
   output = args.output
 
   # merge
@@ -34,7 +28,8 @@ def main(argv=None):
   tmp = open(path, 'w')
 
   for include in args.include:
-    for filename in files[include]:
+    with open('includes/' + include + '.json','r') as f: files = json.load(f)
+    for filename in files:
       with open(filename, 'r') as f: tmp.write(f.read())
 
   tmp.close()
@@ -62,4 +57,3 @@ def main(argv=None):
 
 if __name__ == "__main__":
   main()
-
