@@ -187,21 +187,13 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialWireframeRow = new UI.Panel();
 	var materialWireframe = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '90px' ).onChange( update );
+	var materialWireframeLinewidth = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '120px' ).setRange( 0, 100 ).onChange( update );
 
 	materialWireframeRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Wireframe' ).setColor( '#666' ) );
 	materialWireframeRow.add( materialWireframe );
+	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
-
-	// wireframeLinewidth
-
-	var materialWireframeLinewidthRow = new UI.Panel();
-	var materialWireframeLinewidth = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '90px' ).setRange( 0, 100 ).onChange( update );
-
-	materialWireframeLinewidthRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Linewidth' ).setColor( '#666' ) );
-	materialWireframeLinewidthRow.add( materialWireframeLinewidth );
-
-	container.add( materialWireframeLinewidthRow );
 
 
 
@@ -270,7 +262,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
-			if ( material.wireframe === true ) {
+			if ( material.wireframeLinewidth !== undefined ) {
 
 				material.wireframeLinewidth = materialWireframeLinewidth.getValue();
 
@@ -302,7 +294,6 @@ Sidebar.Properties.Material = function ( signals ) {
 		materialOpacityRow.setDisplay( material.opacity !== undefined ? '' : 'none' );
 		materialTransparentRow.setDisplay( material.transparent !== undefined ? '' : 'none' );
 		materialWireframeRow.setDisplay( material.wireframe !== undefined ? '' : 'none' );
-		materialWireframeLinewidthRow.setDisplay( material.wireframe === true ? '' : 'none' );
 
 	};
 
