@@ -13,8 +13,8 @@ THREE.SceneLoader = function () {
 
 	this.geometryHandlerMap = {};
 
-	this.addGeometryHandler( "ascii_mesh", THREE.JSONLoader );
-	this.addGeometryHandler( "bin_mesh", THREE.BinaryLoader );
+	this.addGeometryHandler( "ascii", THREE.JSONLoader );
+	this.addGeometryHandler( "binary", THREE.BinaryLoader );
 
 };
 
@@ -571,7 +571,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			var loader = this.geometryHandlerMap[ g.type ][ "loaderObject" ];
 			loader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ), loaderParameters );
 
-		} else if ( g.type === "embedded_mesh" ) {
+		} else if ( g.type === "embedded" ) {
 
 			var modelJson = data.embeds[ g.id ],
 				texture_path = "";
@@ -582,7 +582,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			if ( modelJson ) {
 
-				var jsonLoader = this.geometryHandlerMap[ "ascii_mesh" ][ "loaderObject" ];
+				var jsonLoader = this.geometryHandlerMap[ "ascii" ][ "loaderObject" ];
 				jsonLoader.createModel( modelJson, create_callback_embed( dg ), texture_path );
 
 			}

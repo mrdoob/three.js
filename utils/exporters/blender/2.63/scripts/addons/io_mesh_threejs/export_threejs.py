@@ -85,7 +85,7 @@ TEMPLATE_SCENE_ASCII = """\
 
 "metadata" :
 {
-    "formatVersion" : 3,
+    "formatVersion" : 3.1,
     "sourceFile"    : "%(fname)s",
     "generatedBy"   : "Blender 2.63 Exporter",
     "objects"       : %(nobjects)s,
@@ -149,13 +149,13 @@ TEMPLATE_EMPTY = """\
 
 TEMPLATE_GEOMETRY_LINK = """\
     %(geometry_id)s : {
-        "type" : "ascii_mesh",
+        "type" : "ascii",
         "url"  : %(model_file)s
     }"""
 
 TEMPLATE_GEOMETRY_EMBED = """\
     %(geometry_id)s : {
-        "type" : "embedded_mesh",
+        "type" : "embedded",
         "id"  : %(embed_id)s
     }"""
 

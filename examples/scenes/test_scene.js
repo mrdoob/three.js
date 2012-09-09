@@ -1,7 +1,7 @@
 {
 
 	"metadata": {
-		"formatVersion": 3,
+		"formatVersion": 3.1,
 		"type" : "scene"
 	},
 
@@ -294,29 +294,29 @@
 		},
 
 		"WaltHead": {
-			"type": "bin_mesh",
+			"type": "binary",
 			"url" : "obj/walt/WaltHead_bin.js"
 		},
 
 		"NinjaLo": {
-			"type": "bin_mesh",
+			"type": "binary",
 			"url" : "obj/ninja/NinjaLo_bin.js"
 		},
 
 		"veyron": {
-			"type": "bin_mesh",
+			"type": "binary",
 			"url" : "obj/veyron/VeyronNoUv_bin.js"
 		},
 
 		"ben": {
-			"type": "ctm_mesh",
+			"type": "ctm",
 			"url" : "models/ctm/ben.ctm",
 			"useWorkers" : true,
 			"useBuffers" : true
 		},
 
 		"hand": {
-			"type": "utf8_mesh",
+			"type": "utf8",
 			"url" : "models/utf8/hand.utf8",
 			"scale"   : 0.815141,
 			"offsetX" : -0.371823,
@@ -325,7 +325,7 @@
 		},
 
 		"colorcube": {
-			"type": "embedded_mesh",
+			"type": "embedded",
 			"id"  : "cube_fvc"
 		}
 

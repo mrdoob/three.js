@@ -324,8 +324,8 @@
 
 				var loader = new THREE.SceneLoader();
 
-				loader.addGeometryHandler( "ctm_mesh", THREE.CTMLoader );
-				loader.addGeometryHandler( "utf8_mesh", THREE.UTF8Loader );
+				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
+				loader.addGeometryHandler( "utf8", THREE.UTF8Loader );
 
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
