@@ -62,8 +62,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var urlBase = THREE.Loader.prototype.extractUrlBase( url );
 
-	var dg, dm, dd, dl, dc, df, dt,
-		g, o, m, l, d, p, r, q, s, c, t, f, tt, pp, u,
+	var dg, dm, dl, dc, df, dt,
+		g, m, l, d, p, r, q, s, c, t, f, tt, pp, u,
 		geometry, material, camera, fog,
 		texture, images,
 		light,
@@ -149,16 +149,16 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function handle_children( parent, children ) {
 
-		var object;
-
-		for ( dd in children ) {
+		for ( var dd in children ) {
 
 			// check by id if child has already been handled,
 			// if not, create new object
 
 			if ( result.objects[ dd ] === undefined ) {
 
-				o = children[ dd ];
+				var o = children[ dd ];
+
+				var object = null;
 
 				if ( o.geometry !== undefined ) {
 
@@ -320,19 +320,24 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				}
 
-				if ( o.properties !== undefined )  {
+				if ( object ) {
 
-					for ( var key in o.properties ) {
+					if ( o.properties !== undefined )  {
 
-						var value = o.properties[ key ];
-						object.properties[ key ] = value;
+						for ( var key in o.properties ) {
+
+							var value = o.properties[ key ];
+							object.properties[ key ] = value;
+
+						}
 
 					}
-				}
 
-				if ( o.children !== undefined ) {
+					if ( o.children !== undefined ) {
 
-					handle_children( object, o.children );
+						handle_children( object, o.children );
+
+					}
 
 				}
 

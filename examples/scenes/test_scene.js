@@ -17,7 +17,9 @@
 			"scale"	   : [ 1, 1, 1 ],
 			"visible"  : true,
 			"properties" : {
-				"rotating" : true
+				"rotating" : true,
+				"rotateX"  : true,
+				"rotateY"  : true
 			}
 		},
 
@@ -65,7 +67,6 @@
 			"scale"	   : [ 1, 1, 1 ],
 			"visible"  : true
 		},
-
 
 		"torus" : {
 			"geometry" : "torus",
@@ -166,7 +167,11 @@
 			"position" : [ -28, -1, 29 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 12, 12, 12 ],
-			"visible"  : true
+			"visible"  : true,
+			"properties" : {
+				"rotating" : true,
+				"rotateY"  : true
+			}
 		},
 
 		"ninja" : {
