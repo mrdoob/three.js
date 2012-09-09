@@ -57,8 +57,6 @@ THREE.BinaryLoader.prototype.loadAjaxJSON = function ( context, url, callback, t
 	};
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
-	xhr.setRequestHeader( "Content-Type", "text/plain" );
 	xhr.send( null );
 
 };

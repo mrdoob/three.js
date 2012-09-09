@@ -46,8 +46,6 @@ THREE.SceneLoader.prototype.load = function ( url, callbackFinished ) {
 	};
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "application/json; charset=x-user-defined" );
-	xhr.setRequestHeader( "Content-Type", "application/json" );
 	xhr.send( null );
 
 };
