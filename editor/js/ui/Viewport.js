@@ -69,6 +69,7 @@ var Viewport = function ( signals ) {
 	light.position.set( - 1, - 0.5, 0 ).normalize();
 	scene.add( light );
 
+	signals.sceneChanged.dispatch( scene );
 
 	// object picking
 

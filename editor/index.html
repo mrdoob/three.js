@@ -47,6 +47,7 @@
 
 			var signals = {
 
+				sceneCreated: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
@@ -63,17 +64,17 @@
 			menubar.setHeight( '32px' );
 			document.body.appendChild( menubar.dom );
 
-			var viewport = new Viewport( signals );
-			viewport.setTop( '32px' );
-			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
-			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
-			document.body.appendChild( viewport.dom );
-
 			var sidebar = new Sidebar( signals );
 			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
 			sidebar.setTop( '32px' );
 			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
 			document.body.appendChild( sidebar.dom );
+
+			var viewport = new Viewport( signals );
+			viewport.setTop( '32px' );
+			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			document.body.appendChild( viewport.dom );
 
 			document.addEventListener( 'drop', function ( event ) {
 
@@ -217,7 +218,7 @@
 
 			}
 
-			//
+			/*
 
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
 			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
@@ -226,7 +227,7 @@
 			signals.objectAdded.dispatch( mesh );
 			signals.objectSelected.dispatch( mesh );
 
-			//
+			*/
 
 			var onWindowResize = function ( event ) {
 
