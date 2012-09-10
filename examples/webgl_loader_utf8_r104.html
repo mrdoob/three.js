@@ -89,9 +89,26 @@
 				var ambient = new THREE.AmbientLight( 0x222222 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.1 );
+				directionalLight.position.set( 0, 20, 300 );
 				scene.add( directionalLight );
+
+				directionalLight.castShadow = true;
+				//directionalLight.shadowCameraVisible = true;
+
+				directionalLight.shadowMapWidth = 2048;
+				directionalLight.shadowMaHeight = 2048;
+
+				var d = 150;
+
+				directionalLight.shadowCameraLeft = -d * 1.2;
+				directionalLight.shadowCameraRight = d * 1.2;
+				directionalLight.shadowCameraTop = d;
+				directionalLight.shadowCameraBottom = -d;
+
+				directionalLight.shadowCameraNear = 200;
+				directionalLight.shadowCameraFar = 500;
+
 
 				// RENDERER
 
@@ -108,6 +125,8 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				renderer.physicallyBasedShading = true;
+
+				renderer.shadowMapEnabled = true;
 
 				// STATS
 
@@ -127,6 +146,20 @@
 					object.position.y = -125;
 					scene.add( object );
 
+					THREE.SceneUtils.traverseHierarchy( object, function( node ) {
+
+						node.castShadow = true;
+						node.receiveShadow = true;
+
+						if ( node.material && node.material.name === "skin" ) {
+
+							node.material.wrapAround = true;
+							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
+
+						}
+
+					} );
+
 				}, { normalizeRGB: true } );
 
 				loader.load( "models/utf8_r104/ben.js", function ( object ) {
@@ -136,6 +169,20 @@
 					object.position.x = -125;
 					object.position.y = -125;
 					scene.add( object );
+
+					THREE.SceneUtils.traverseHierarchy( object, function( node ) {
+
+						node.castShadow = true;
+						node.receiveShadow = true;
+
+						if ( node.material && ( node.material.name === "head" || node.material.name === "skinbody" ) ) {
+
+							node.material.wrapAround = true;
+							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
+
+						}
+
+					} );
 
 				}, { normalizeRGB: true } );
 
