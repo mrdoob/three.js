@@ -86,10 +86,10 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x221100 );
+				var ambient = new THREE.AmbientLight( 0x222222 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( directionalLight );
 
@@ -127,7 +127,7 @@
 					object.position.y = -125;
 					scene.add( object );
 
-				} );
+				}, { normalizeRGB: true } );
 
 				loader.load( "models/utf8_r104/ben.js", function ( object ) {
 
@@ -137,7 +137,7 @@
 					object.position.y = -125;
 					scene.add( object );
 
-				} );
+				}, { normalizeRGB: true } );
 
 				//
 

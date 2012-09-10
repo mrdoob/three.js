@@ -232,7 +232,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
                     params['map'].wrapS = this.wrap;
                     params['map'].wrapT = this.wrap;
                     break;
-                case 'Ns':
+                case 'ns':
                     // The specular exponent (defines the focus of the specular highlight)
                     // A high exponent results in a tight, concentrated highlight. Ns values normally range from 0 to 1000.
                     params['shininess'] = value;

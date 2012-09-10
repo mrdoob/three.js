@@ -1,8 +1,8 @@
 {
   "materials": {
     "preview": { "Kd": [184, 136, 234] },
-    "nails": { "map_Kd": "hand.jpg" },
-    "skin": { "map_Kd": "hand.jpg" }
+    "nails": { "Kd": [251, 238, 209], "map_Kd": "hand.jpg", "Ks": [30,30,30], "Ns": 100 },
+    "skin": { "Kd": [207, 181, 161],  "map_Kd": "hand.jpg", "Ks": [30,30,30], "Ns": 30 }
   },
   "decodeParams": {
     "decodeOffsets": [-7473,-239,-8362,0,0,-511,-511,-511],
