@@ -95,13 +95,19 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
 
 				// STATS
 

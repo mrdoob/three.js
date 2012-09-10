@@ -1,8 +1,8 @@
 {
   "materials": {
     "preview": { "Kd": [184, 136, 234] },
-    "nails": { "map_Kd": "../../textures/ash_uvgrid01.jpg" },
-    "skin": { "map_Kd": "../../textures/ash_uvgrid01.jpg" }
+    "nails": { "map_Kd": "hand.jpg" },
+    "skin": { "map_Kd": "hand.jpg" }
   },
   "decodeParams": {
     "decodeOffsets": [-7473,-239,-8362,0,0,-511,-511,-511],
