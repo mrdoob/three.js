@@ -488,28 +488,3 @@ THREE.OBJMTLLoader.prototype = {
 	}
 };
 
-// Shims of "startsWith" and "trim" for old browsers
-// not sure we should have this, or at least not have it here
-
-// http://stackoverflow.com/questions/646628/javascript-startswith
-// http://stackoverflow.com/questions/498970/how-do-i-trim-a-string-in-javascript
-
-if ( ! String.prototype.startsWith ) {
-
-    String.prototype.startsWith = function ( str ) {
-
-        return this.slice( 0, str.length ) === str;
-
-    };
-
-}
-
-if ( ! String.prototype.trim ) {
-
-   String.prototype.trim = function () {
-
-	   return this.replace( /^\s+|\s+$/g, "" );
-
-	};
-
-}

@@ -145,9 +145,23 @@ THREE.Loader.prototype = {
 
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
-			var texture = document.createElement( 'canvas' );
+			var isCompressed = sourceFile.toLowerCase().endsWith( ".dds" );
+			var fullPath = texturePath + "/" + sourceFile;
 
-			where[ name ] = new THREE.Texture( texture );
+			if ( isCompressed ) {
+
+				var texture = THREE.ImageUtils.loadCompressedTexture( fullPath );
+
+				where[ name ] = texture;
+
+			} else {
+
+				var texture = document.createElement( 'canvas' );
+
+				where[ name ] = new THREE.Texture( texture );
+
+			}
+
 			where[ name ].sourceFile = sourceFile;
 
 			if( repeat ) {
@@ -183,7 +197,11 @@ THREE.Loader.prototype = {
 
 			}
 
-			load_image( where[ name ], texturePath + "/" + sourceFile );
+			if ( ! isCompressed ) {
+
+				load_image( where[ name ], fullPath );
+
+			}
 
 		}
 
