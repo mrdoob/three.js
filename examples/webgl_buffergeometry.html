@@ -6,12 +6,12 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				color: #808080;
+				color: #cccccc;
 				font-family:Monospace;
 				font-size:13px;
 				text-align:center;
 
-				background-color: #fff;
+				background-color: #050505;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -34,7 +34,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - buffergeometry</div>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
@@ -56,12 +56,29 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1800;
+				//
+
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera.position.z = 2750;
 
 				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
 
-				var triangles = 500;
+				//
+
+				scene.add( new THREE.AmbientLight( 0x444444 ) );
+
+				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				light1.position.set( 1, 1, 1 );
+				scene.add( light1 );
+
+				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				light2.position.set( 0, -1, 0 );
+				scene.add( light2 );
+
+				//
+
+				var triangles = 160000;
 
 				var geometry = new THREE.BufferGeometry();
 				geometry.attributes = {
@@ -74,57 +91,176 @@
 						itemSize: 3,
 						array: new Float32Array( triangles * 3 * 3 ),
 						numItems: triangles * 3 * 3
+					},
+					normal: {
+						itemSize: 3,
+						array: new Float32Array( triangles * 3 * 3 ),
+						numItems: triangles * 3 * 3
+					},
+					color: {
+						itemSize: 3,
+						array: new Float32Array( triangles * 3 * 3 ),
+						numItems: triangles * 3 * 3
 					}
 				}
+
+				// break geometry into
+				// chunks of 20,000 triangles (3 unique vertices per triangle)
+				// for indices to fit into 16 bit integer number
+
+				var chunkSize = 20000;
 
 				var indices = geometry.attributes.index.array;
 
 				for ( var i = 0; i < indices.length; i ++ ) {
 
-					indices[ i ] = i;
+					indices[ i ] = i % ( 3 * chunkSize );
 
 				}
 
 				var positions = geometry.attributes.position.array;
+				var normals = geometry.attributes.normal.array;
+				var colors = geometry.attributes.color.array;
+
+				var color = new THREE.Color();
+
+				var n = 800, n2 = n/2;	// triangles spread in the cube
+				var d = 12, d2 = d/2;	// individual triangle size
+
+				var pA = new THREE.Vector3();
+				var pB = new THREE.Vector3();
+				var pC = new THREE.Vector3();
+
+				var cb = new THREE.Vector3();
+				var ab = new THREE.Vector3();
 
 				for ( var i = 0; i < positions.length; i += 9 ) {
 
-					var x = Math.random() * 400 - 200;
-					var y = Math.random() * 400 - 200;
-					var z = Math.random() * 400 - 200;
+					// positions
 
-					positions[ i ] = x + Math.random() * 40 - 20;
-					positions[ i + 1 ] = y + Math.random() * 40 - 20;
-					positions[ i + 2 ] = z + Math.random() * 40 - 20;
+					var x = Math.random() * n - n2;
+					var y = Math.random() * n - n2;
+					var z = Math.random() * n - n2;
 
-					positions[ i + 3 ] = x + Math.random() * 40 - 20;
-					positions[ i + 4 ] = y + Math.random() * 40 - 20;
-					positions[ i + 5 ] = z + Math.random() * 40 - 20;
+					var ax = x + Math.random() * d - d2;
+					var ay = y + Math.random() * d - d2;
+					var az = z + Math.random() * d - d2;
 
-					positions[ i + 6 ] = x + Math.random() * 40 - 20;
-					positions[ i + 7 ] = y + Math.random() * 40 - 20;
-					positions[ i + 8 ] = z + Math.random() * 40 - 20;
+					var bx = x + Math.random() * d - d2;
+					var by = y + Math.random() * d - d2;
+					var bz = z + Math.random() * d - d2;
+
+					var cx = x + Math.random() * d - d2;
+					var cy = y + Math.random() * d - d2;
+					var cz = z + Math.random() * d - d2;
+
+					positions[ i ]     = ax;
+					positions[ i + 1 ] = ay;
+					positions[ i + 2 ] = az;
+
+					positions[ i + 3 ] = bx;
+					positions[ i + 4 ] = by;
+					positions[ i + 5 ] = bz;
+
+					positions[ i + 6 ] = cx;
+					positions[ i + 7 ] = cy;
+					positions[ i + 8 ] = cz;
+
+					// flat face normals
+
+					pA.set( ax, ay, az );
+					pB.set( bx, by, bz );
+					pC.set( cx, cy, cz );
+
+					cb.sub( pC, pB );
+					ab.sub( pA, pB );
+					cb.crossSelf( ab );
+
+					cb.normalize();
+
+					var nx = cb.x;
+					var ny = cb.y;
+					var nz = cb.z;
+
+					normals[ i ]     = nx;
+					normals[ i + 1 ] = ny;
+					normals[ i + 2 ] = nz;
+
+					normals[ i + 3 ] = nx;
+					normals[ i + 4 ] = ny;
+					normals[ i + 5 ] = nz;
+
+					normals[ i + 6 ] = nx;
+					normals[ i + 7 ] = ny;
+					normals[ i + 8 ] = nz;
+
+					// colors
+
+					var vx = ( x / n ) + 0.5;
+					var vy = ( y / n ) + 0.5;
+					var vz = ( z / n ) + 0.5;
+
+					//color.setHSV( 0.5 + 0.5 * vx, 0.25 + 0.75 * vy, 0.25 + 0.75 * vz );
+					color.setRGB( vx, vy, vz );
+
+					colors[ i ]     = color.r;
+					colors[ i + 1 ] = color.g;
+					colors[ i + 2 ] = color.b;
+
+					colors[ i + 3 ] = color.r;
+					colors[ i + 4 ] = color.g;
+					colors[ i + 5 ] = color.b;
+
+					colors[ i + 6 ] = color.r;
+					colors[ i + 7 ] = color.g;
+					colors[ i + 8 ] = color.b;
 
 				}
 
-				geometry.offsets = [{
-					start: 0,
-					count: triangles * 3,
-					index: 0
-				}]
+				geometry.offsets = [];
+
+				var start = 0;
+				var index = 0;
+				var left = triangles * 3;
+
+				for ( ;; ) {
+
+					var count = Math.min( chunkSize * 3, left );
+
+					var chunk = { start: start, count: count, index: index };
+
+					geometry.offsets.push( chunk );
+
+					start += count;
+					index += chunkSize * 3;
+
+					left -= count;
+
+					if ( left <= 0 ) break;
+
+				}
 
 				geometry.computeBoundingSphere();
-				geometry.computeVertexNormals();
 
-				var material = new THREE.MeshLambertMaterial( { color: 0x000000, side: THREE.DoubleSide } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+															  side: THREE.DoubleSide, perPixel: true, vertexColors: THREE.VertexColors } );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x333333, clearAlpha: 1, alpha: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( scene.fog.color, 1 );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
 
 				container.appendChild( renderer.domElement );
+
+				//
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -138,9 +274,6 @@
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -162,8 +295,10 @@
 
 			function render() {
 
-				mesh.rotation.x += 0.01;
-				mesh.rotation.y += 0.02;
+				var time = Date.now() * 0.001;
+
+				mesh.rotation.x = time * 0.25;
+				mesh.rotation.y = time * 0.5;
 
 				renderer.render( scene, camera );
 

@@ -64,7 +64,7 @@ THREE.ShaderChunk = {
 			"uniform float flipEnvMap;",
 			"uniform int combine;",
 
-			"#ifdef USE_BUMPMAP",
+			"#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )",
 
 				"uniform bool useRefract;",
 				"uniform float refractionRatio;",
@@ -85,7 +85,7 @@ THREE.ShaderChunk = {
 
 			"vec3 reflectVec;",
 
-			"#ifdef USE_BUMPMAP",
+			"#if defined( USE_BUMPMAP ) || defined( USE_NORMALMAP )",
 
 				"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
 
@@ -138,7 +138,7 @@ THREE.ShaderChunk = {
 
 	envmap_pars_vertex: [
 
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP )",
 
 			"varying vec3 vReflect;",
 
@@ -149,17 +149,37 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	worldpos_vertex : [
+
+		"#if defined( USE_ENVMAP ) || defined( PHONG ) || defined( LAMBERT ) || defined ( USE_SHADOWMAP )",
+
+			"#ifdef USE_SKINNING",
+
+				"vec4 mPosition = modelMatrix * skinned;",
+
+			"#endif",
+
+			"#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( morphed, 1.0 );",
+
+			"#endif",
+
+			"#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
+
+				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+
+			"#endif",
+
+		"#endif"
+
+	].join("\n"),
+
 	envmap_vertex : [
 
-		"#ifdef USE_ENVMAP",
+		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP )",
 
-			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-		"#endif",
-
-		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP )",
-
-			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * normal;",
+			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;",
 
 			"if ( useRefract ) {",
 
@@ -202,7 +222,7 @@ THREE.ShaderChunk = {
 
 	map_pars_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 			"uniform vec4 offsetRepeat;",
@@ -213,7 +233,7 @@ THREE.ShaderChunk = {
 
 	map_pars_fragment: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"varying vec2 vUv;",
 
@@ -229,7 +249,7 @@ THREE.ShaderChunk = {
 
 	map_vertex: [
 
-		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_SPECULARMAP )",
+		"#if defined( USE_MAP ) || defined( USE_BUMPMAP ) || defined( USE_NORMALMAP ) || defined( USE_SPECULARMAP )",
 
 			"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -348,6 +368,40 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+	// NORMAL MAP
+
+	normalmap_pars_fragment: [
+
+		"#ifdef USE_NORMALMAP",
+
+			"uniform sampler2D normalMap;",
+			"uniform vec2 normalScale;",
+
+			// Per-Pixel Tangent Space Normal Mapping
+			// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
+
+			"vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm ) {",
+
+				"vec3 q0 = dFdx( eye_pos.xyz );",
+				"vec3 q1 = dFdy( eye_pos.xyz );",
+				"vec2 st0 = dFdx( vUv.st );",
+				"vec2 st1 = dFdy( vUv.st );",
+
+				"vec3 S = normalize(  q0 * st1.t - q1 * st0.t );",
+				"vec3 T = normalize( -q0 * st1.s + q1 * st0.s );",
+				"vec3 N = normalize( surf_norm );",
+
+				"vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;",
+				"mapN.xy = normalScale * mapN.xy;",
+				"mat3 tsn = mat3( S, T, N );",
+				"return normalize( tsn * mapN );",
+
+			"}",
+
+		"#endif"
+
+	].join("\n"),
+
 	// SPECULAR MAP
 
 	specularmap_pars_fragment: [
@@ -391,6 +445,14 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 directionalLightColor[ MAX_DIR_LIGHTS ];",
 			"uniform vec3 directionalLightDirection[ MAX_DIR_LIGHTS ];",
+
+		"#endif",
+
+		"#if MAX_HEMI_LIGHTS > 0",
+
+			"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
+			"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
+			"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
 
 		"#endif",
 
@@ -594,6 +656,32 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#if MAX_HEMI_LIGHTS > 0",
+
+			"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
+
+				"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
+				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
+
+				"lVector = normalize( lVector );",
+
+				"float dotProduct = dot( transformedNormal, lVector );",
+
+				"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
+				"float hemiDiffuseWeightBack = -0.5 * dotProduct + 0.5;",
+
+				"vLightFront += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+
+				"#ifdef DOUBLE_SIDED",
+
+					"vLightBack += mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeightBack );",
+
+				"#endif",
+
+			"}",
+
+		"#endif",
+
 		"vLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;",
 
 		"#ifdef DOUBLE_SIDED",
@@ -698,6 +786,14 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#if MAX_HEMI_LIGHTS > 0",
+
+			"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
+			"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
+			"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+
+		"#endif",
+
 		"#if MAX_POINT_LIGHTS > 0",
 
 			"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
@@ -763,7 +859,11 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"#ifdef USE_BUMPMAP",
+		"#ifdef USE_NORMALMAP",
+
+			"normal = perturbNormal2Arb( -viewPosition, normal );",
+
+		"#elif defined( USE_BUMPMAP )",
 
 			"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
 
@@ -990,6 +1090,61 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
+		"#if MAX_HEMI_LIGHTS > 0",
+
+			"vec3 hemiDiffuse  = vec3( 0.0 );",
+			"vec3 hemiSpecular = vec3( 0.0 );" ,
+
+			"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
+
+				"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
+				"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+
+				// diffuse
+
+				"float dotProduct = dot( normal, lVector );",
+				"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
+
+				"vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+
+				"hemiDiffuse += diffuse * hemiColor;",
+
+				// specular (sky light)
+
+				"vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
+				"float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
+				"float hemiSpecularWeightSky = specularStrength * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
+
+				// specular (ground light)
+
+				"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+
+				"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
+				"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
+				"float hemiSpecularWeightGround = specularStrength * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
+
+				"#ifdef PHYSICALLY_BASED_SHADING",
+
+					"float dotProductGround = dot( normal, lVectorGround );",
+
+					// 2.0 => 2.0001 is hack to work around ANGLE bug
+
+					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+
+					"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
+					"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+					"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
+
+				"#else",
+
+					"hemiSpecular += specular * hemiColor * ( hemiSpecularWeightSky + hemiSpecularWeightGround ) * hemiDiffuseWeight;",
+
+				"#endif",
+
+			"}",
+
+		"#endif",
+
 		"vec3 totalDiffuse = vec3( 0.0 );",
 		"vec3 totalSpecular = vec3( 0.0 );",
 
@@ -997,6 +1152,13 @@ THREE.ShaderChunk = {
 
 			"totalDiffuse += dirDiffuse;",
 			"totalSpecular += dirSpecular;",
+
+		"#endif",
+
+		"#if MAX_HEMI_LIGHTS > 0",
+
+			"totalDiffuse += hemiDiffuse;",
+			"totalSpecular += hemiSpecular;",
 
 		"#endif",
 
@@ -1142,10 +1304,18 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SKINNING",
 
-			"vec4 skinned  = boneMatX * skinVertexA * skinWeight.x;",
-			"skinned 	  += boneMatY * skinVertexB * skinWeight.y;",
+			"#ifdef USE_MORPHTARGETS",
 
-			"gl_Position  = projectionMatrix * modelViewMatrix * skinned;",
+			"vec4 skinVertex = vec4( morphed, 1.0 );",
+
+			"#else",
+
+			"vec4 skinVertex = vec4( position, 1.0 );",
+
+			"#endif",
+
+			"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
+			"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
 
 		"#endif"
 
@@ -1192,21 +1362,33 @@ THREE.ShaderChunk = {
 
 			"morphed += position;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( morphed, 1.0 );",
-
 		"#endif"
 
 	].join("\n"),
 
 	default_vertex : [
 
-		"#ifndef USE_MORPHTARGETS",
-		"#ifndef USE_SKINNING",
+		"vec4 mvPosition;",
 
-			"gl_Position = projectionMatrix * mvPosition;",
+		"#ifdef USE_SKINNING",
+
+			"mvPosition = modelViewMatrix * skinned;",
 
 		"#endif",
-		"#endif"
+
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHTARGETS )",
+
+			"mvPosition = modelViewMatrix * vec4( morphed, 1.0 );",
+
+		"#endif",
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHTARGETS )",
+
+			"mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+		"#endif",
+
+		"gl_Position = projectionMatrix * mvPosition;",
 
 	].join("\n"),
 
@@ -1234,7 +1416,15 @@ THREE.ShaderChunk = {
 			"mat4 skinMatrix = skinWeight.x * boneMatX;",
 			"skinMatrix 	+= skinWeight.y * boneMatY;",
 
+			"#ifdef USE_MORPHNORMALS",
+
+			"vec4 skinnedNormal = skinMatrix * vec4( morphedNormal, 0.0 );",
+
+			"#else",
+
 			"vec4 skinnedNormal = skinMatrix * vec4( normal, 0.0 );",
+
+			"#endif",
 
 		"#endif"
 
@@ -1242,29 +1432,33 @@ THREE.ShaderChunk = {
 
 	defaultnormal_vertex: [
 
-		"vec3 transformedNormal;",
+		"vec3 objectNormal;",
 
 		"#ifdef USE_SKINNING",
 
-			"transformedNormal = skinnedNormal.xyz;",
+			"objectNormal = skinnedNormal.xyz;",
 
 		"#endif",
 
-		"#ifdef USE_MORPHNORMALS",
+		"#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )",
 
-			"transformedNormal = morphedNormal;",
+			"objectNormal = morphedNormal;",
+
+		"#endif",
+
+		"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )",
+
+			"objectNormal = normal;",
 
 		"#endif",
 
-		"#ifndef USE_MORPHNORMALS",
-		"#ifndef USE_SKINNING",
+		"#ifdef FLIP_SIDED",
 
-			"transformedNormal = normal;",
+			"objectNormal = -objectNormal;",
 
 		"#endif",
-		"#endif",
 
-		"transformedNormal = normalMatrix * transformedNormal;",
+		"vec3 transformedNormal = normalMatrix * objectNormal;",
 
 	].join("\n"),
 
@@ -1484,27 +1678,9 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_SHADOWMAP",
 
-			"vec4 transformedPosition;",
-
-			"#ifdef USE_MORPHTARGETS",
-
-				"transformedPosition = modelMatrix * vec4( morphed, 1.0 );",
-
-			"#else",
-			"#ifdef USE_SKINNING",
-
-				"transformedPosition = modelMatrix * skinned;",
-
-			"#else",
-
-				"transformedPosition = modelMatrix * vec4( position, 1.0 );",
-
-			"#endif",
-			"#endif",
-
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-				"vShadowCoord[ i ] = shadowMatrix[ i ] * transformedPosition;",
+				"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
 
 			"}",
 
@@ -1545,7 +1721,7 @@ THREE.UniformsUtils = {
 
 		var u, p, tmp, merged = {};
 
-		for ( u = 0; u < uniforms.length; u++ ) {
+		for ( u = 0; u < uniforms.length; u ++ ) {
 
 			tmp = this.clone( uniforms[ u ] );
 
@@ -1609,13 +1785,13 @@ THREE.UniformsLib = {
 		"diffuse" : { type: "c", value: new THREE.Color( 0xeeeeee ) },
 		"opacity" : { type: "f", value: 1.0 },
 
-		"map" : { type: "t", value: 0, texture: null },
+		"map" : { type: "t", value: null },
 		"offsetRepeat" : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) },
 
-		"lightMap" : { type: "t", value: 2, texture: null },
-		"specularMap" : { type: "t", value: 3, texture: null },
+		"lightMap" : { type: "t", value: null },
+		"specularMap" : { type: "t", value: null },
 
-		"envMap" : { type: "t", value: 1, texture: null },
+		"envMap" : { type: "t", value: null },
 		"flipEnvMap" : { type: "f", value: -1 },
 		"useRefract" : { type: "i", value: 0 },
 		"reflectivity" : { type: "f", value: 1.0 },
@@ -1628,9 +1804,15 @@ THREE.UniformsLib = {
 
 	bump: {
 
-		"bumpMap" : { type: "t", value: 4, texture: null },
+		"bumpMap" : { type: "t", value: null },
 		"bumpScale" : { type: "f", value: 1 }
 
+	},
+
+	normalmap: {
+
+		"normalMap" : { type: "t", value: null },
+		"normalScale" : { type: "v2", value: new THREE.Vector2( 1, 1 ) }
 	},
 
 	fog : {
@@ -1648,6 +1830,10 @@ THREE.UniformsLib = {
 
 		"directionalLightDirection" : { type: "fv", value: [] },
 		"directionalLightColor" : { type: "fv", value: [] },
+
+		"hemisphereLightPosition" : { type: "fv", value: [] },
+		"hemisphereLightSkyColor" : { type: "fv", value: [] },
+		"hemisphereLightGroundColor" : { type: "fv", value: [] },
 
 		"pointLightColor" : { type: "fv", value: [] },
 		"pointLightPosition" : { type: "fv", value: [] },
@@ -1668,7 +1854,7 @@ THREE.UniformsLib = {
 		"opacity" : { type: "f", value: 1.0 },
 		"size" : { type: "f", value: 1.0 },
 		"scale" : { type: "f", value: 1.0 },
-		"map" : { type: "t", value: 0, texture: null },
+		"map" : { type: "t", value: null },
 
 		"fogDensity" : { type: "f", value: 0.00025 },
 		"fogNear" : { type: "f", value: 1 },
@@ -1679,7 +1865,7 @@ THREE.UniformsLib = {
 
 	shadowmap: {
 
-		"shadowMap": { type: "tv", value: 6, texture: [] },
+		"shadowMap": { type: "tv", value: [] },
 		"shadowMapSize": { type: "v2v", value: [] },
 
 		"shadowBias" : { type: "fv1", value: [] },
@@ -1785,22 +1971,31 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
+
+				"#ifdef USE_ENVMAP",
+
+				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
+				THREE.ShaderChunk[ "skinnormal_vertex" ],
+				THREE.ShaderChunk[ "defaultnormal_vertex" ],
+
+				"#endif",
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -1861,6 +2056,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define LAMBERT",
+
 			"varying vec3 vLightFront;",
 
 			"#ifdef DOUBLE_SIDED",
@@ -1874,17 +2071,14 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_lambert_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
@@ -1892,16 +2086,13 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				THREE.ShaderChunk[ "lights_lambert_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_lambert_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -1973,6 +2164,7 @@ THREE.ShaderLib = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "bump" ],
+			THREE.UniformsLib[ "normalmap" ],
 			THREE.UniformsLib[ "fog" ],
 			THREE.UniformsLib[ "lights" ],
 			THREE.UniformsLib[ "shadowmap" ],
@@ -1989,6 +2181,8 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
+			"#define PHONG",
+
 			"varying vec3 vViewPosition;",
 			"varying vec3 vNormal;",
 
@@ -1997,26 +2191,15 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "lights_phong_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "map_vertex" ],
 				THREE.ShaderChunk[ "lightmap_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
-
-				"#ifndef USE_ENVMAP",
-
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-
-				"#endif",
-
-				"vViewPosition = -mvPosition.xyz;",
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
@@ -2025,10 +2208,15 @@ THREE.ShaderLib = {
 
 				"vNormal = transformedNormal;",
 
-				THREE.ShaderChunk[ "lights_phong_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
+
+				"vViewPosition = -mvPosition.xyz;",
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+				THREE.ShaderChunk[ "envmap_vertex" ],
+				THREE.ShaderChunk[ "lights_phong_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -2053,6 +2241,7 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "lights_phong_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
+			THREE.ShaderChunk[ "normalmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 
 			"void main() {",
@@ -2111,6 +2300,7 @@ THREE.ShaderLib = {
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
+				THREE.ShaderChunk[ "worldpos_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
 
 			"}"
@@ -2157,16 +2347,14 @@ THREE.ShaderLib = {
 
 		vertexShader: [
 
-			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-
 				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
 
 			"}"

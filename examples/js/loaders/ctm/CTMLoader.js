@@ -18,13 +18,13 @@ THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
 
 // Load multiple CTM parts defined in JSON
 
-THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuffers, basePath ) {
+THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 	var scope = this;
 
 	var xhr = new XMLHttpRequest();
 
-	basePath = basePath ? basePath : this.extractUrlBase( url );
+	var basePath = parameters.basePath ? parameters.basePath : this.extractUrlBase( url );
 
 	xhr.onreadystatechange = function() {
 
@@ -62,7 +62,8 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 				// load joined CTM file
 
 				var partUrl = basePath + jsonObject.data;
-				scope.load( partUrl, callbackFinal, useWorker, useBuffers, jsonObject.offsets );
+				var parametersPart = { useWorker: parameters.useWorker, useBuffers: parameters.useBuffers, offsets: jsonObject.offsets };
+				scope.load( partUrl, callbackFinal, parametersPart );
 
 			}
 
@@ -82,11 +83,11 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, useWorker, useBuf
 //		- url (required)
 //		- callback (required)
 
-THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers, offsets ) {
+THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 	var scope = this;
 
-	offsets = offsets !== undefined ? offsets : [ 0 ];
+	var offsets = parameters.offsets !== undefined ? parameters.offsets : [ 0 ];
 
 	var xhr = new XMLHttpRequest(),
 		callbackProgress = null;
@@ -103,7 +104,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 				//var s = Date.now();
 
-				if ( useWorker ) {
+				if ( parameters.useWorker ) {
 
 					var worker = new Worker( "js/loaders/ctm/CTMWorker.js" );
 
@@ -115,7 +116,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 							var ctmFile = files[ i ];
 
-							if ( useBuffers ) {
+							if ( parameters.useBuffers ) {
 
 								scope.createModelBuffers( ctmFile, callback );
 
@@ -144,7 +145,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, useWorker, useBuffers,
 
 						var ctmFile = new CTM.File( stream );
 
-						if ( useBuffers ) {
+						if ( parameters.useBuffers ) {
 
 							scope.createModelBuffers( ctmFile, callback );
 

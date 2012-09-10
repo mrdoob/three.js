@@ -115,11 +115,11 @@
 
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xff2200 ) },
-				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/water.jpg" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/water.jpg" ) },
 
 			};
 
-			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
+			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 

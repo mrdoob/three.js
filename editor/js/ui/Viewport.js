@@ -46,7 +46,6 @@ var Viewport = function ( signals ) {
 	camera.lookAt( scene.position );
 	scene.add( camera );
 
-	/*
 	var controls = new THREE.TrackballControls( camera, container.dom );
 	controls.rotateSpeed = 1.0;
 	controls.zoomSpeed = 1.2;
@@ -56,10 +55,11 @@ var Viewport = function ( signals ) {
 	controls.staticMoving = true;
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', render );
-	*/
 
+	/*
 	var controls = new THREE.OrbitControls( camera, container.dom );
 	controls.addEventListener( 'change', render );
+	*/
 
 	var light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 1, 0.5, 0 ).normalize();
@@ -69,6 +69,7 @@ var Viewport = function ( signals ) {
 	light.position.set( - 1, - 0.5, 0 ).normalize();
 	scene.add( light );
 
+	signals.sceneChanged.dispatch( scene );
 
 	// object picking
 
@@ -86,7 +87,7 @@ var Viewport = function ( signals ) {
 		projector.unprojectVector( vector, camera );
 
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
-		var intersects = ray.intersectObjects( objects );
+		var intersects = ray.intersectObjects( objects, true );
 
 		if ( intersects.length ) {
 
@@ -117,26 +118,23 @@ var Viewport = function ( signals ) {
 		scene.add( object );
 		render();
 
+		signals.sceneChanged.dispatch( scene );
+
 	} );
 
 	signals.objectChanged.add( function ( object ) {
-
-		object.updateMatrix();
-		object.updateMatrixWorld();
-
-		selectionBox.matrixWorld.copy( object.matrixWorld );
 
 		render();
 
 	} );
 
+	var selected = null;
+
 	signals.objectSelected.add( function ( object ) {
 
-		if ( object === null ) {
+		selectionBox.visible = false;
 
-			selectionBox.visible = false;
-
-		} else if ( object.geometry ) {
+		if ( object !== null && object.geometry ) {
 
 			var geometry = object.geometry;
 
@@ -182,7 +180,7 @@ var Viewport = function ( signals ) {
 
 			selectionBox.geometry.verticesNeedUpdate = true;
 
-			selectionBox.matrixWorld.copy( object.matrixWorld );
+			selectionBox.matrixWorld = object.matrixWorld;
 
 			selectionBox.visible = true;
 

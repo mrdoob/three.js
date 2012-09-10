@@ -114,10 +114,10 @@
 
 				var uniformsUV = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniformsUV[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniformsUV[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniformsUV[ "uNormalScale" ].value = 0.75;
 
-				uniformsUV[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniformsUV[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 
 				uniformsUV[ "passID" ].value = 0;
 
@@ -129,8 +129,8 @@
 				uniformsUV[ "uSpecularBrightness" ].value = 0.8;
 
 				var uniforms = THREE.UniformsUtils.clone( uniformsUV );
-				uniforms[ "tDiffuse" ].texture = uniformsUV[ "tDiffuse" ].texture;
-				uniforms[ "tNormal" ].texture = uniformsUV[ "tNormal" ].texture;
+				uniforms[ "tDiffuse" ].value = uniformsUV[ "tDiffuse" ].value;
+				uniforms[ "tNormal" ].value = uniformsUV[ "tNormal" ].value;
 				uniforms[ "passID" ].value = 1;
 
 				var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true };
@@ -246,12 +246,12 @@
 
 				//
 
-				uniforms[ "tBlur1" ].texture = composerScene.renderTarget2;
-				uniforms[ "tBlur2" ].texture = composerUV1.renderTarget2;
-				uniforms[ "tBlur3" ].texture = composerUV2.renderTarget2;
-				uniforms[ "tBlur4" ].texture = composerUV3.renderTarget2;
+				uniforms[ "tBlur1" ].value = composerScene.renderTarget2;
+				uniforms[ "tBlur2" ].value = composerUV1.renderTarget2;
+				uniforms[ "tBlur3" ].value = composerUV2.renderTarget2;
+				uniforms[ "tBlur4" ].value = composerUV3.renderTarget2;
 
-				uniforms[ "tBeckmann" ].texture = composerBeckmann.renderTarget1;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
 
 				//
 

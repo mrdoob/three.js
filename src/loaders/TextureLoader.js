@@ -19,7 +19,7 @@ THREE.TextureLoader.prototype = {
 		var scope = this;
 
 		var image = new Image();
-		
+
 		image.addEventListener( 'load', function () {
 
 			var texture = new THREE.Texture( image );
@@ -30,9 +30,9 @@ THREE.TextureLoader.prototype = {
 		}, false );
 
 		image.addEventListener( 'error', function () {
-		
+
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-		
+
 		}, false );
 
 		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;

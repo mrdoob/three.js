@@ -149,6 +149,11 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/loaders/ctm/lzma.js"></script>
+		<script src="js/loaders/ctm/ctm.js"></script>
+		<script src="js/loaders/ctm/CTMLoader.js"></script>
+		<script src="js/loaders/UTF8Loader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
@@ -192,7 +197,7 @@
 				for ( m in result.materials ) {
 
 					material = result.materials[ m ];
-					if ( ! ( material instanceof THREE.MeshFaceMaterial ) ) {
+					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial ) ) {
 
 						if( !material.program ) {
 
@@ -229,6 +234,10 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -314,6 +323,9 @@
 				$( "progress" ).style.display = "block";
 
 				var loader = new THREE.SceneLoader();
+
+				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
+				loader.addGeometryHandler( "utf8", THREE.UTF8Loader );
 
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;

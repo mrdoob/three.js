@@ -17,14 +17,8 @@ THREE.UTF8Loader = function () {};
 
 THREE.UTF8Loader.prototype.load = function ( url, callback, metadata ) {
 
-	var xhr = new XMLHttpRequest(),
-		callbackProgress = null,
-
-		scale = metadata.scale !== undefined ? metadata.scale : 1,
-		offsetX = metadata.offsetX !== undefined ? metadata.offsetX : 0,
-		offsetY = metadata.offsetY !== undefined ? metadata.offsetY : 0,
-		offsetZ = metadata.offsetZ !== undefined ? metadata.offsetZ : 0;
-
+	var xhr = new XMLHttpRequest();
+	var callbackProgress = null;
 	var length = 0;
 
 	xhr.onreadystatechange = function() {
@@ -33,7 +27,8 @@ THREE.UTF8Loader.prototype.load = function ( url, callback, metadata ) {
 
 			if ( xhr.status == 200 || xhr.status == 0 ) {
 
-				THREE.UTF8Loader.prototype.createModel( xhr.responseText, callback, scale, offsetX, offsetY, offsetZ );
+				var geometry = THREE.UTF8Loader.prototype.parse( xhr.responseText, metadata );
+				callback( geometry );
 
 			} else {
 
@@ -143,7 +138,14 @@ THREE.UTF8Loader.prototype.decompressMesh = function ( str ) {
 
 };
 
-THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offsetX, offsetY, offsetZ ) {
+THREE.UTF8Loader.prototype.parse = function ( data, metadata ) {
+
+	if ( metadata === undefined ) metadata = {};
+
+	var scale = metadata.scale !== undefined ? metadata.scale : 1;
+	var offsetX = metadata.offsetX !== undefined ? metadata.offsetX : 0;
+	var offsetY = metadata.offsetY !== undefined ? metadata.offsetY : 0;
+	var offsetZ = metadata.offsetZ !== undefined ? metadata.offsetZ : 0;
 
 	var Model = function ( texture_path ) {
 
@@ -321,6 +323,6 @@ THREE.UTF8Loader.prototype.createModel = function ( data, callback, scale, offse
 
 	Model.prototype = Object.create( THREE.Geometry.prototype );
 
-	callback( new Model() );
+	return new Model();
 
 };

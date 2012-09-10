@@ -117,11 +117,11 @@
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "tNormal" ].texture = normalTexture;
-				uniforms[ "uNormalScale" ].value = 0.85;
+				uniforms[ "tNormal" ].value = normalTexture;
+				uniforms[ "uNormalScale" ].value.set( 0.85, 0.85 );
 
-				uniforms[ "tDiffuse" ].texture = planetTexture;
-				uniforms[ "tSpecular" ].texture = specularTexture;
+				uniforms[ "tDiffuse" ].value = planetTexture;
+				uniforms[ "tSpecular" ].value = specularTexture;
 
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;

@@ -1,7 +1,7 @@
 {
 
 	"metadata": {
-		"formatVersion": 3,
+		"formatVersion": 3.1,
 		"type" : "scene"
 	},
 
@@ -11,7 +11,7 @@
 
 		"cube1" : {
 			"geometry" : "cubeNormals",
-			"materials": [ "lambert_red" ],
+			"materials": [ "phong_red" ],
 			"position" : [ 0, 0, 0 ],
 			"rotation" : [ 0, -0.3, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -36,7 +36,9 @@
 			"position" : [ -30, -5, 25 ],
 			"rotation" : [ 0, 0.8, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
-			"visible"  : true
+			"visible"  : true,
+			"children" : {
+			}
 		},
 
 		"sphere_lambert" : {
@@ -145,9 +147,36 @@
 		"walt" : {
 			"geometry" : "WaltHead",
 			"materials": [ "lambert_cube" ],
-			"position" : [ -45, 10, 0 ],
-			"rotation" : [ 0, 0, 0 ],
+			"position" : [ -75, 10, -30 ],
+			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 0.5, 0.5, 0.5 ],
+			"visible"  : true
+		},
+
+		"ben" : {
+			"geometry" : "ben",
+			"materials": [ "phong_ben" ],
+			"position" : [ -45, -10, 0 ],
+			"rotation" : [ 0, 0.5, 0 ],
+			"scale"	   : [ 55, 55, 55 ],
+			"visible"  : true
+		},
+
+		"hand" : {
+			"geometry" : "hand",
+			"materials": [ "phong_hand" ],
+			"position" : [ -28, -1, 29 ],
+			"rotation" : [ 0, 0.5, 0 ],
+			"scale"	   : [ 12, 12, 12 ],
+			"visible"  : true
+		},
+
+		"ninja" : {
+			"geometry" : "NinjaLo",
+			"materials": [ "phong_normal" ],
+			"position" : [ 75, 10, -30 ],
+			"rotation" : [ 0, -0.5, 0 ],
+			"scale"	   : [ 1.25, 1.25, 1.25 ],
 			"visible"  : true
 		},
 
@@ -265,17 +294,38 @@
 		},
 
 		"WaltHead": {
-			"type": "bin_mesh",
+			"type": "binary",
 			"url" : "obj/walt/WaltHead_bin.js"
 		},
 
+		"NinjaLo": {
+			"type": "binary",
+			"url" : "obj/ninja/NinjaLo_bin.js"
+		},
+
 		"veyron": {
-			"type": "bin_mesh",
+			"type": "binary",
 			"url" : "obj/veyron/VeyronNoUv_bin.js"
 		},
 
+		"ben": {
+			"type": "ctm",
+			"url" : "models/ctm/ben.ctm",
+			"useWorkers" : true,
+			"useBuffers" : true
+		},
+
+		"hand": {
+			"type": "utf8",
+			"url" : "models/utf8/hand.utf8",
+			"scale"   : 0.815141,
+			"offsetX" : -0.371823,
+			"offsetY" : -0.011920,
+			"offsetZ" : -0.416061
+		},
+
 		"colorcube": {
-			"type": "embedded_mesh",
+			"type": "embedded",
 			"id"  : "cube_fvc"
 		}
 
@@ -336,9 +386,24 @@
 			"parameters": { "color": 16777215, "shading": "flat" }
 		},
 
-		"lambert_red": {
-			"type": "MeshLambertMaterial",
-			"parameters": { "color": 16711680 }
+		"phong_red": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16711680, "specular": 16711680, "shininess": 25, "bumpMap": "texture_bump", "bumpScale": -0.75 }
+		},
+
+		"phong_ben": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 1118481, "ambient": 1118481, "specular": 5601245, "shininess": 12, "bumpMap": "texture_bump_repeat", "bumpScale": 0.125 }
+		},
+
+		"phong_hand": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 14531481, "ambient": 14531481, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+		},
+
+		"phong_normal": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 0, "specular": 16777215, "shininess": 25, "envMap": "cube_reflection", "reflectivity": 0.1, "lightMap": "texture_ao", "normalMap": "texture_normal", "normalScale": [ 1, -1 ], "displacementMap": "texture_displacement", "displacementScale": 2.436143, "displacementBias": -0.428408 }
 		},
 
 		"lambert_green": {
@@ -437,7 +502,34 @@
 		},
 
 		"texture_bg": {
-			"url": "textures/cube/SwedishRoyalCastle/pz.jpg"
+			"url": "textures/cube/SwedishRoyalCastle/pz.jpg",
+			"anisotropy": 4
+		},
+
+		"texture_bump": {
+			"url": "textures/water.jpg",
+			"anisotropy": 4
+		},
+
+		"texture_bump_repeat": {
+			"url": "textures/water.jpg",
+			"repeat" : [ 20, 20 ],
+			"anisotropy": 4
+		},
+
+		"texture_normal": {
+			"url": "textures/normal/ninja/normal.jpg",
+			"anisotropy": 4
+		},
+
+		"texture_ao": {
+			"url": "textures/normal/ninja/ao.jpg",
+			"anisotropy": 4
+		},
+
+		"texture_displacement": {
+			"url": "textures/normal/ninja/displacement.jpg",
+			"anisotropy": 4
 		},
 
 		"texture_minecraft": {
@@ -478,15 +570,15 @@
 			"type"		 : "directional",
 			"direction"	 : [0,1,1],
 			"color" 	 : 16777215,
-			"intensity"	 : 0.8
+			"intensity"	 : 1
 		},
 
 		"light2": {
 			"type"	  : "point",
 			"position": [0,0,0],
-			"color"   : 16777215
+			"color"   : 16777215,
+			"intensity"	 : 1.25
 		}
-
 	},
 
 	"fogs":	{

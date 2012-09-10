@@ -256,7 +256,7 @@ UI.Text = function ( position ) {
 
 UI.Text.prototype = Object.create( UI.Element.prototype );
 
-UI.Text.prototype.setText = function ( value ) {
+UI.Text.prototype.setValue = function ( value ) {
 
 	this.dom.textContent = value;
 
@@ -264,6 +264,133 @@ UI.Text.prototype.setText = function ( value ) {
 
 };
 
+// Select
+
+UI.Select = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	this.dom = document.createElement( 'select' );
+	this.dom.style.position = position || 'relative';
+	this.dom.style.width = '64px';
+	this.dom.style.height = '16px';
+	this.dom.style.border = '0px';
+	this.dom.style.padding = '0px';
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
+
+	return this;
+
+};
+
+UI.Select.prototype = Object.create( UI.Element.prototype );
+
+UI.Select.prototype.setMultiple = function ( boolean ) {
+
+	this.dom.multiple = boolean;
+
+	return this;
+
+};
+
+UI.Select.prototype.setOptions = function ( options ) {
+
+	while ( this.dom.children.length > 0 ) {
+
+		this.dom.removeChild( this.dom.firstChild );
+
+	}
+
+	for ( var key in options ) {
+
+		var option = document.createElement( 'option' );
+		option.value = key;
+		option.innerHTML = options[ key ];
+		this.dom.appendChild( option );
+
+	}
+
+	return this;
+
+};
+
+UI.Select.prototype.getValue = function () {
+
+	return this.dom.value;
+
+};
+
+UI.Select.prototype.setValue = function ( value ) {
+
+	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.Select.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+// Checkbox
+
+UI.Checkbox = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	this.dom = document.createElement( 'input' );
+	this.dom.type = 'checkbox';
+	this.dom.style.position = position || 'relative';
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
+
+	return this;
+
+};
+
+UI.Checkbox.prototype = Object.create( UI.Element.prototype );
+
+UI.Checkbox.prototype.getValue = function () {
+
+	return this.dom.checked;
+
+};
+
+UI.Checkbox.prototype.setValue = function ( value ) {
+
+	this.dom.checked = value;
+
+	return this;
+
+};
+
+UI.Checkbox.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
 
 // Color
 
@@ -413,17 +540,10 @@ UI.Number.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setMin = function ( value ) {
+UI.Number.prototype.setRange = function ( min, max ) {
 
-	this.min = value;
-
-	return this;
-
-};
-
-UI.Number.prototype.setMax = function ( value ) {
-
-	this.max = value;
+	this.min = min;
+	this.max = max;
 
 	return this;
 
@@ -493,7 +613,7 @@ UI.Button = function ( position ) {
 
 UI.Button.prototype = Object.create( UI.Element.prototype );
 
-UI.Button.prototype.setText = function ( value ) {
+UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
 

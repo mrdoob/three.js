@@ -156,7 +156,7 @@
 
 			if ( toggle ) {
 
-				animation = !animation;
+				animation = animation === false;
 				document.getElementById('animation').value = 'Camera Spline Animation View: ' + (animation? 'ON': 'OFF');
 
 			}
@@ -165,7 +165,7 @@
 
 			showCameraHelper = document.getElementById('cameraHelper').checked;
 
-			cameraHelper.children[0].visible = showCameraHelper;
+			cameraHelper.visible = showCameraHelper;
 			cameraEye.visible = showCameraHelper;
 		}
 
@@ -199,9 +199,6 @@
 			//
 
 			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 1000);
-			splineCamera = new THREE.PerspectiveCamera(84, window.innerWidth / window.innerHeight, 0.01, 1000);
-			cameraHelper = new THREE.CameraHelper(splineCamera);
-
 			camera.position.set(0, 50, 500);
 
 			scene = new THREE.Scene();
@@ -212,40 +209,39 @@
 
 			parent = new THREE.Object3D();
 			parent.position.y = 100;
-			scene.add(parent);
+			scene.add( parent );
+
+			splineCamera = new THREE.PerspectiveCamera(84, window.innerWidth / window.innerHeight, 0.01, 1000);
+			parent.add(splineCamera);
+
+			cameraHelper = new THREE.CameraHelper(splineCamera);
+			scene.add(cameraHelper);
 
 			addTube();
 
 			// Debug point
-			cameraEye = new THREE.Mesh(new THREE.SphereGeometry(5), new THREE.MeshBasicMaterial({
-					color: 0xdddddd
-			}));
 
-			cameraHelper.children[0].visible = showCameraHelper;
-			cameraEye.visible = showCameraHelper;
-
+			cameraEye = new THREE.Mesh( new THREE.SphereGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
 			parent.add(cameraEye);
 
-			cameraHelper.scale.multiplyScalar(0.1);
-			splineCamera.add(cameraHelper);
-			parent.add(splineCamera);
+			cameraHelper.visible = showCameraHelper;
+			cameraEye.visible = showCameraHelper;
 
 			//
-			renderer = new THREE.WebGLRenderer({
-					antialias: true
-			});
-			renderer.setSize(window.innerWidth, window.innerHeight);
 
-			container.appendChild(renderer.domElement);
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			container.appendChild( renderer.domElement );
 
 			stats = new Stats();
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
-			container.appendChild(stats.domElement);
+			container.appendChild( stats.domElement );
 
-			renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
-			renderer.domElement.addEventListener('touchstart', onDocumentTouchStart, false);
-			renderer.domElement.addEventListener('touchmove', onDocumentTouchMove, false);
+			renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
+			renderer.domElement.addEventListener( 'touchstart', onDocumentTouchStart, false );
+			renderer.domElement.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
 			//
 
@@ -271,9 +267,9 @@
 
 			event.preventDefault();
 
-			renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
-			renderer.domElement.addEventListener('mouseup', onDocumentMouseUp, false);
-			renderer.domElement.addEventListener('mouseout', onDocumentMouseOut, false);
+			renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+			renderer.domElement.addEventListener( 'mouseout', onDocumentMouseOut, false );
 
 			mouseXOnMouseDown = event.clientX - windowHalfX;
 			targetRotationOnMouseDown = targetRotation;
@@ -290,17 +286,17 @@
 
 		function onDocumentMouseUp(event) {
 
-			renderer.domElement.removeEventListener('mousemove', onDocumentMouseMove, false);
-			renderer.domElement.removeEventListener('mouseup', onDocumentMouseUp, false);
-			renderer.domElement.removeEventListener('mouseout', onDocumentMouseOut, false);
+			renderer.domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+			renderer.domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+			renderer.domElement.removeEventListener( 'mouseout', onDocumentMouseOut, false );
 
 		}
 
 		function onDocumentMouseOut(event) {
 
-			renderer.domElement.removeEventListener('mousemove', onDocumentMouseMove, false);
-			renderer.domElement.removeEventListener('mouseup', onDocumentMouseUp, false);
-			renderer.domElement.removeEventListener('mouseout', onDocumentMouseOut, false);
+			renderer.domElement.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+			renderer.domElement.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+			renderer.domElement.removeEventListener( 'mouseout', onDocumentMouseOut, false );
 
 		}
 
@@ -308,10 +304,10 @@
 
 			if (event.touches.length == 1) {
 
-					event.preventDefault();
+				event.preventDefault();
 
-					mouseXOnMouseDown = event.touches[0].pageX - windowHalfX;
-					targetRotationOnMouseDown = targetRotation;
+				mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
+				targetRotationOnMouseDown = targetRotation;
 
 			}
 
@@ -321,10 +317,10 @@
 
 			if (event.touches.length == 1) {
 
-					event.preventDefault();
+				event.preventDefault();
 
-					mouseX = event.touches[0].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
+				mouseX = event.touches[ 0 ].pageX - windowHalfX;
+				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
 
 			}
 
@@ -388,19 +384,9 @@
 
 			cameraHelper.update();
 
-			parent.rotation.y += (targetRotation - parent.rotation.y) * 0.05;
+			parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
 
-			if (animation) {
-
-				renderer.render(scene, splineCamera);
-
-			} else {
-
-				renderer.render(scene, camera);
-
-			}
-
-
+			renderer.render( scene, animation === true ? splineCamera : camera );
 
 		}
 	</script>

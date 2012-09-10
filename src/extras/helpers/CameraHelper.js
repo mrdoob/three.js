@@ -9,22 +9,26 @@
 
 THREE.CameraHelper = function ( camera ) {
 
-	THREE.Object3D.call( this );
+	THREE.Line.call( this );
 
-	var _this = this;
+	var scope = this;
 
-	this.lineGeometry = new THREE.Geometry();
-	this.lineMaterial = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } );
+	this.geometry = new THREE.Geometry();
+	this.material = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } );
+	this.type = THREE.LinePieces;
+
+	this.matrixWorld = camera.matrixWorld;
+	this.matrixAutoUpdate = false;
 
 	this.pointMap = {};
 
 	// colors
 
-	var hexFrustum = 0xffaa00,
-	hexCone	   	   = 0xff0000,
-	hexUp	   	   = 0x00aaff,
-	hexTarget  	   = 0xffffff,
-	hexCross   	   = 0x333333;
+	var hexFrustum = 0xffaa00;
+	var hexCone = 0xff0000;
+	var hexUp = 0x00aaff;
+	var hexTarget = 0xffffff;
+	var hexCross = 0x333333;
 
 	// near
 
@@ -84,36 +88,31 @@ THREE.CameraHelper = function ( camera ) {
 
 	function addPoint( id, hex ) {
 
-		_this.lineGeometry.vertices.push( new THREE.Vector3() );
-		_this.lineGeometry.colors.push( new THREE.Color( hex ) );
+		scope.geometry.vertices.push( new THREE.Vector3() );
+		scope.geometry.colors.push( new THREE.Color( hex ) );
 
-		if ( _this.pointMap[ id ] === undefined ) _this.pointMap[ id ] = [];
-		_this.pointMap[ id ].push( _this.lineGeometry.vertices.length - 1 );
+		if ( scope.pointMap[ id ] === undefined ) scope.pointMap[ id ] = [];
+
+		scope.pointMap[ id ].push( scope.geometry.vertices.length - 1 );
 
 	}
 
 	this.update( camera );
 
-	this.lines = new THREE.Line( this.lineGeometry, this.lineMaterial, THREE.LinePieces );
-	this.add( this.lines );
-
 };
 
-THREE.CameraHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
 
 THREE.CameraHelper.prototype.update = function () {
 
-	var camera = this.camera;
+	var scope = this;
 
-	var w = 1;
-	var h = 1;
-
-	var _this = this;
+	var w = 1, h = 1;
 
 	// we need just camera projection matrix
 	// world matrix must be identity
 
-	THREE.CameraHelper.__c.projectionMatrix.copy( camera.projectionMatrix );
+	THREE.CameraHelper.__c.projectionMatrix.copy( this.camera.projectionMatrix );
 
 	// center / target
 
@@ -157,14 +156,13 @@ THREE.CameraHelper.prototype.update = function () {
 		THREE.CameraHelper.__v.set( x, y, z );
 		THREE.CameraHelper.__projector.unprojectVector( THREE.CameraHelper.__v, THREE.CameraHelper.__c );
 
-		var points = _this.pointMap[ point ];
+		var points = scope.pointMap[ point ];
 
 		if ( points !== undefined ) {
 
 			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-				var j = points[ i ];
-				_this.lineGeometry.vertices[ j ].copy( THREE.CameraHelper.__v );
+				scope.geometry.vertices[ points[ i ] ].copy( THREE.CameraHelper.__v );
 
 			}
 
@@ -172,7 +170,7 @@ THREE.CameraHelper.prototype.update = function () {
 
 	}
 
-	this.lineGeometry.verticesNeedUpdate = true;
+	this.geometry.verticesNeedUpdate = true;
 
 };
 

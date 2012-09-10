@@ -1,30 +1,74 @@
 Sidebar.Properties.Geometry = function ( signals ) {
 
+	var geometries = {
+
+		"ConvexGeometry": THREE.ConvexGeometry,
+		"CubeGeometry": THREE.CubeGeometry,
+		"CylinderGeometry": THREE.CylinderGeometry,
+		"ExtrudeGeometry": THREE.ExtrudeGeometry,
+		"IcosahedronGeometry": THREE.IcosahedronGeometry,
+		"LatheGeometry": THREE.LatheGeometry,
+		"OctahedronGeometry": THREE.OctahedronGeometry,
+		"ParametricGeometry": THREE.ParametricGeometry,
+		"PlaneGeometry": THREE.PlaneGeometry,
+		"PolyhedronGeometry": THREE.PolyhedronGeometry,
+		"SphereGeometry": THREE.SphereGeometry,
+		"TetrahedronGeometry": THREE.TetrahedronGeometry,
+		"TextGeometry": THREE.TextGeometry,
+		"TorusGeometry": THREE.TorusGeometry,
+		"TorusKnotGeometry": THREE.TorusKnotGeometry,
+		"TubeGeometry": THREE.TubeGeometry,
+		"Geometry": THREE.Geometry
+
+	};
+
 	var container = new UI.Panel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text().setText( 'GEOMETRY' ).setColor( '#666' ) );
-	container.add( new UI.Button( 'absolute' ).setRight( '0px' ).setText( 'Export' ).onClick( exportGeometry ) );
+	container.add( new UI.Text().setValue( 'GEOMETRY' ).setColor( '#666' ) );
+	container.add( new UI.Button( 'absolute' ).setRight( '0px' ).setLabel( 'Export' ).onClick( exportGeometry ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	container.add( new UI.Text().setText( 'Name' ).setColor( '#666' ) );
+	// name
+
+	var geometryNameRow = new UI.Panel();
 	var geometryName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-	container.add( geometryName );
-	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'Class' ).setColor( '#666' ) );
+	geometryNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
+	geometryNameRow.add( geometryName );
+
+	container.add( geometryNameRow );
+
+	// class
+
+	var geometryClassRow = new UI.Panel();
 	var geometryClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-	container.add( geometryClass );
-	container.add( new UI.HorizontalRule() );
 
-	container.add( new UI.Text().setText( 'Vertices' ).setColor( '#666' ) );
-	var verticesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-	container.add( verticesCount );
-	container.add( new UI.HorizontalRule() );
+	geometryClassRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
+	geometryClassRow.add( geometryClass );
 
-	container.add( new UI.Text().setText( 'Faces' ).setColor( '#666' ) );
-	var facesCount = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
-	container.add( facesCount );
+	container.add( geometryClassRow );
+
+	// vertices
+
+	var geometryVerticesRow = new UI.Panel();
+	var geometryVertices = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	geometryVerticesRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Vertices' ).setColor( '#666' ) );
+	geometryVerticesRow.add( geometryVertices );
+
+	container.add( geometryVerticesRow );
+
+	// faces
+
+	var geometryFacesRow = new UI.Panel();
+	var geometryFaces = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	geometryFacesRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Faces' ).setColor( '#666' ) );
+	geometryFacesRow.add( geometryFaces );
+
+	container.add( geometryFacesRow );
+
 	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
 
 	//
@@ -39,10 +83,10 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 			container.setDisplay( 'block' );
 
-			geometryName.setText( object.geometry.name );
-			geometryClass.setText( getGeometryInstanceName( object.geometry ) );
-			verticesCount.setText( object.geometry.vertices.length );
-			facesCount.setText( object.geometry.faces.length );
+			geometryName.setValue( object.geometry.name );
+			geometryClass.setValue( getGeometryInstanceName( object.geometry ) );
+			geometryVertices.setValue( object.geometry.vertices.length );
+			geometryFaces.setValue( object.geometry.faces.length );
 
 		} else {
 
@@ -56,25 +100,11 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 	function getGeometryInstanceName( geometry ) {
 
-		// TODO: Is there a way of doing this automatically?
+		for ( var key in geometries ) {
 
-		if ( geometry instanceof THREE.ConvexGeometry ) return "ConvexGeometry";
-		if ( geometry instanceof THREE.CubeGeometry ) return "CubeGeometry";
-		if ( geometry instanceof THREE.CylinderGeometry ) return "CylinderGeometry";
-		if ( geometry instanceof THREE.ExtrudeGeometry ) return "ExtrudeGeometry";
-		if ( geometry instanceof THREE.IcosahedronGeometry ) return "IcosahedronGeometry";
-		if ( geometry instanceof THREE.LatheGeometry ) return "LatheGeometry";
-		if ( geometry instanceof THREE.OctahedronGeometry ) return "OctahedronGeometry";
-		if ( geometry instanceof THREE.ParametricGeometry ) return "ParametricGeometry";
-		if ( geometry instanceof THREE.PlaneGeometry ) return "PlaneGeometry";
-		if ( geometry instanceof THREE.PolyhedronGeometry ) return "PolyhedronGeometry";
-		if ( geometry instanceof THREE.SphereGeometry ) return "SphereGeometry";
-		if ( geometry instanceof THREE.TetrahedronGeometry ) return "TetrahedronGeometry";
-		if ( geometry instanceof THREE.TextGeometry ) return "TextGeometry";
-		if ( geometry instanceof THREE.TorusGeometry ) return "TorusGeometry";
-		if ( geometry instanceof THREE.TorusKnotGeometry ) return "TorusKnotGeometry";
-		if ( geometry instanceof THREE.TubeGeometry ) return "TubeGeometry";
-		if ( geometry instanceof THREE.Geometry ) return "Geometry";
+			if ( geometry instanceof geometries[ key ] ) return key;
+
+		}
 
 	}
 
@@ -110,8 +140,8 @@ Sidebar.Properties.Geometry = function ( signals ) {
 			var hasFaceVertexColor = face.vertexColors[ 0 ] !== undefined;
 
 			var faceType = 0;
-			
-			faceType = setBit( faceType, 0, ! isTriangle );			
+
+			faceType = setBit( faceType, 0, ! isTriangle );
 			// faceType = setBit( faceType, 1, hasMaterial );
 			// faceType = setBit( faceType, 2, hasFaceUv );
 			// faceType = setBit( faceType, 3, hasFaceVertexUv );

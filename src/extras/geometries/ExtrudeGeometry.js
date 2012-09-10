@@ -5,30 +5,28 @@
  *
  * parameters = {
  *
- *  size: 			<float>, 	// size of the text
- *  height: 		<float>, 	// thickness to extrude text
- *  curveSegments: 	<int>,		// number of points on the curves
- *  steps: 			<int>,		// number of points for z-side extrusions / used for subdividing segements of extrude spline too
- 	amount: <int>,	// Amount
+ *  size: <float>, // size of the text
+ *  height: <float>, // thickness to extrude text
+ *  curveSegments: <int>, // number of points on the curves
+ *  steps: <int>, // number of points for z-side extrusions / used for subdividing segements of extrude spline too
+ *  amount: <int>, // Amount
  *
- *  bevelEnabled:	<bool>,			// turn on bevel
- *  bevelThickness: <float>, 		// how deep into text bevel goes
- *  bevelSize:		<float>, 		// how far from text outline is bevel
- *  bevelSegments:	<int>, 			// number of bevel layers
+ *  bevelEnabled: <bool>, // turn on bevel
+ *  bevelThickness: <float>, // how deep into text bevel goes
+ *  bevelSize: <float>, // how far from text outline is bevel
+ *  bevelSegments: <int>, // number of bevel layers
  *
- *  extrudePath:	<THREE.CurvePath>	// 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
- *  frames:			<THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
- *  bendPath:		<THREE.CurvePath> 	// 2d path for bend the shape around x/y plane
+ *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
+ *  frames: <THREE.TubeGeometry.FrenetFrames> // containing arrays of tangents, normals, binormals
  *
- *  material:		 <int>	// material index for front and back faces
- *  extrudeMaterial: <int>	// material index for extrusion and beveled faces
- *  uvGenerator:	 <Object> // object that provides UV generator functions
+ *  material: <int> // material index for front and back faces
+ *  extrudeMaterial: <int> // material index for extrusion and beveled faces
+ *  uvGenerator: <Object> // object that provides UV generator functions
  *
- *  }
-  **/
+ * }
+ **/
 
-
-THREE.ExtrudeGeometry = function( shapes, options ) {
+THREE.ExtrudeGeometry = function ( shapes, options ) {
 
 	if ( typeof( shapes ) === "undefined" ) {
 		shapes = [];
@@ -58,7 +56,7 @@ THREE.ExtrudeGeometry = function( shapes, options ) {
 
 THREE.ExtrudeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-THREE.ExtrudeGeometry.prototype.addShapeList = function(shapes, options) {
+THREE.ExtrudeGeometry.prototype.addShapeList = function ( shapes, options ) {
 	var sl = shapes.length;
 
 	for ( var s = 0; s < sl; s ++ ) {
@@ -67,7 +65,7 @@ THREE.ExtrudeGeometry.prototype.addShapeList = function(shapes, options) {
 	}
 };
 
-THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
+THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var amount = options.amount !== undefined ? options.amount : 100;
 
@@ -80,8 +78,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
 
 	var steps = options.steps !== undefined ? options.steps : 1;
-
-	var bendPath = options.bendPath;
 
 	var extrudePath = options.extrudePath;
 	var extrudePts, extrudeByPath = false;
@@ -110,9 +106,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		// Reuse TNB from TubeGeomtry for now.
 		// TODO1 - have a .isClosed in spline?
 
-		splineTube = options.frames !== undefined ?
-			options.frames :
-			new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
+		splineTube = options.frames !== undefined ? options.frames : new THREE.TubeGeometry.FrenetFrames(extrudePath, steps, false);
 
 		// console.log(splineTube, 'splineTube', splineTube.normals.length, 'steps', steps, 'extrudePts', extrudePts.length);
 
@@ -140,15 +134,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	var shapesOffset = this.vertices.length;
 
-	if ( bendPath ) {
-
-		shape.addWrapPath( bendPath );
-
-	}
-
 	var shapePoints = shape.extractPoints();
 
-    var vertices = shapePoints.shape;
+	var vertices = shapePoints.shape;
 	var holes = shapePoints.holes;
 
 	var reverse = !THREE.Shape.Utils.isClockWise( vertices ) ;
@@ -177,18 +165,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 
 	var faces = THREE.Shape.Utils.triangulateShape ( vertices, holes );
-	//var faces = THREE.Shape.Utils.triangulate2( vertices, holes );
 
-	// Would it be better to move points after triangulation?
-	// shapePoints = shape.extractAllPointsWithBend( curveSegments, bendPath );
-	// 	vertices = shapePoints.shape;
-	// 	holes = shapePoints.holes;
-
-	//console.log(faces);
-
-	////
-	///   Handle Vertices
-	////
+	/* Vertices */
 
 	var contour = vertices; // vertices has all points but contour has only points of circumference
 
@@ -215,9 +193,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		cont, clen = contour.length;
 
 
-	//------
 	// Find directions for point movement
-	//
 
 	var RAD_TO_DEGREES = 180 / Math.PI;
 
@@ -530,11 +506,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 
 	}
 
-
-
-	////
-	///   Handle Faces
-	////
+	/* Faces */
 
 	// Top and bottom faces
 
@@ -666,8 +638,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 		// normal, color, material
 		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 
-		var uvs = isBottom ? uvgen.generateBottomUV( scope, shape, options, a, b, c )
-		                   : uvgen.generateTopUV( scope, shape, options, a, b, c );
+		var uvs = isBottom ? uvgen.generateBottomUV( scope, shape, options, a, b, c ) : uvgen.generateTopUV( scope, shape, options, a, b, c );
 
  		scope.faceVertexUvs[ 0 ].push( uvs );
 
@@ -689,8 +660,6 @@ THREE.ExtrudeGeometry.prototype.addShape = function( shape, options ) {
 	}
 
 };
-
-
 
 THREE.ExtrudeGeometry.WorldUVGenerator = {
 
@@ -721,6 +690,7 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 	generateSideWallUV: function( geometry, extrudedShape, wallContour, extrudeOptions,
 	                              indexA, indexB, indexC, indexD, stepIndex, stepsLength,
 	                              contourIndex1, contourIndex2 ) {
+
 		var ax = geometry.vertices[ indexA ].x,
 			ay = geometry.vertices[ indexA ].y,
 			az = geometry.vertices[ indexA ].z,

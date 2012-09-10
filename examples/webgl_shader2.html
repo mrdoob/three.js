@@ -12,7 +12,7 @@
 				text-align:center;
 				font-weight: bold;
 
-				background-color: #000000;
+				background-color: #050505;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -207,10 +207,10 @@
 				uniforms2 = {
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
-					texture: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
+					texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
 				};
 
-				uniforms2.texture.texture.wrapS = uniforms2.texture.texture.wrapT = THREE.RepeatWrapping;
+				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.75, mlib = [],
 					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];

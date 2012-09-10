@@ -117,7 +117,7 @@
 				// Skybox
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = reflectionCube;
+				shader.uniforms[ "tCube" ].value = reflectionCube;
 
 				var material = new THREE.ShaderMaterial( {
 

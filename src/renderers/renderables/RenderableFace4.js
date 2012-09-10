@@ -14,6 +14,7 @@ THREE.RenderableFace4 = function () {
 
 	this.normalWorld = new THREE.Vector3();
 	this.vertexNormalsWorld = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	this.vertexNormalsLength = 0;
 
 	this.material = null;
 	this.uvs = [[]];
