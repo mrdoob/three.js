@@ -136,9 +136,14 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
+				var start = Date.now();
+
 				var loader = new THREE.UTF8v2Loader();
 
 				loader.load( "models/utf8_r104/hand.js", function ( object ) {
+
+					var end = Date.now();
+					console.log( "hand", end - start, "ms" );
 
 					var s = 350;
 					object.scale.set( s, s, s );
@@ -160,9 +165,12 @@
 
 					} );
 
-				}, { normalizeRGB: true } );
+				}, { normalizeRGB: true, useBuffers: true } );
 
 				loader.load( "models/utf8_r104/ben.js", function ( object ) {
+
+					var end = Date.now();
+					console.log( "ben", end - start, "ms" );
 
 					var s = 350;
 					object.scale.set( s, s, s );
@@ -184,7 +192,7 @@
 
 					} );
 
-				}, { normalizeRGB: true } );
+				}, { normalizeRGB: true, useBuffers: true } );
 
 				//
 

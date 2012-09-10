@@ -16,18 +16,112 @@ THREE.UTF8v2Loader = function () {};
  *                   geometryBase: Base url from which to load referenced geometries
  *                   materialBase: Base url from which to load referenced textures
  */
+
 THREE.UTF8v2Loader.prototype.load = function ( jsonUrl, callback, options ) {
 
     this.downloadModelJson( jsonUrl, options, callback );
 
 };
 
+// BufferGeometryCreator
+
+THREE.UTF8v2Loader.BufferGeometryCreator = function () {
+};
+
+THREE.UTF8v2Loader.BufferGeometryCreator.prototype.create = function ( attribArray, indexArray ) {
+
+	var ntris = indexArray.length / 3;
+
+	var geometry = new THREE.BufferGeometry();
+
+	var positionArray = new Float32Array( 3 * 3 * ntris );
+	var normalArray = new Float32Array( 3 * 3 * ntris );
+	var uvArray = new Float32Array( 2 * 3 * ntris );
+
+	var i, j, offset;
+	var x, y, z;
+	var u, v;
+
+	var end = attribArray.length;
+	var stride = 8;
+
+	// extract positions
+
+	j = 0;
+	offset = 0;
+
+	for( i = offset; i < end; i += stride ) {
+
+		x = attribArray[ i ];
+		y = attribArray[ i + 1 ];
+		z = attribArray[ i + 2 ];
+
+		positionArray[ j++ ] = x;
+		positionArray[ j++ ] = y;
+		positionArray[ j++ ] = z;
+
+	}
+
+	// extract uvs
+
+	j = 0;
+	offset = 3;
+
+	for( i = offset; i < end; i += stride ) {
+
+		u = attribArray[ i ];
+		v = attribArray[ i + 1 ];
+
+		uvArray[ j++ ] = u;
+		uvArray[ j++ ] = v;
+
+	}
+
+	// extract normals
+
+	j = 0;
+	offset = 5;
+
+	for( i = offset; i < end; i += stride ) {
+
+		x = attribArray[ i ];
+		y = attribArray[ i + 1 ];
+		z = attribArray[ i + 2 ];
+
+		normalArray[ j++ ] = x;
+		normalArray[ j++ ] = y;
+		normalArray[ j++ ] = z;
+
+	}
+
+	// create attributes
+
+	var attributes = geometry.attributes;
+
+	attributes[ "index" ]    = { itemSize: 1, array: indexArray, numItems: indexArray.length };
+	attributes[ "position" ] = { itemSize: 3, array: positionArray, numItems: positionArray.length };
+	attributes[ "normal" ]   = { itemSize: 3, array: normalArray, numItems: normalArray.length };
+	attributes[ "uv" ] 		 = { itemSize: 2, array: uvArray, numItems: uvArray.length };
+
+	// create offsets
+	// (all triangles should fit in a single chunk)
+
+	geometry.offsets = [ { start: 0, count: indexArray.length, index: 0 } ];
+
+	geometry.computeBoundingSphere();
+
+	return geometry;
+
+};
+
+// GeometryCreator
+
 THREE.UTF8v2Loader.GeometryCreator = function () {
 };
 
 THREE.UTF8v2Loader.GeometryCreator.prototype = {
 
-    create: function ( attribArray, indexArray, bboxen ) {
+    create: function ( attribArray, indexArray ) {
 
         var geometry = new THREE.Geometry();
 
@@ -148,15 +242,15 @@ THREE.UTF8v2Loader.GeometryCreator.prototype = {
 
     f3n: function( scope, normals, a, b, c, mi, nai, nbi, nci ) {
 
-        var nax = normals[ nai * 3     ],
+        var nax = normals[ nai * 3 ],
             nay = normals[ nai * 3 + 1 ],
             naz = normals[ nai * 3 + 2 ],
 
-            nbx = normals[ nbi * 3     ],
+            nbx = normals[ nbi * 3 ],
             nby = normals[ nbi * 3 + 1 ],
             nbz = normals[ nbi * 3 + 2 ],
 
-            ncx = normals[ nci * 3     ],
+            ncx = normals[ nci * 3 ],
             ncy = normals[ nci * 3 + 1 ],
             ncz = normals[ nci * 3 + 2 ];
 
@@ -350,8 +444,7 @@ THREE.UTF8v2Loader.prototype.decompressMesh =  function ( str, meshParams, decod
 
     if ( bboxOffset ) {
 
-        bboxen = this.decompressAABBs_( str, bboxOffset, meshParams.names.length,
-            decodeOffsets, decodeScales );
+        bboxen = this.decompressAABBs_( str, bboxOffset, meshParams.names.length, decodeOffsets, decodeScales );
     }
 
     callback( name, idx, attribsOut, indicesOut, bboxen, meshParams );
@@ -703,16 +796,19 @@ THREE.UTF8v2Loader.prototype.createMeshCallback = function( materialBaseUrl, loa
 
     var model = new THREE.Object3D();
 
-    var geometryCreator = new THREE.UTF8v2Loader.GeometryCreator();
+    // Prepare materials first...
 
     var materialCreator = new THREE.MTLLoader.MaterialCreator( materialBaseUrl, loadModelInfo.options );
-    materialCreator.setMaterials(loadModelInfo.materials);
-
-    // Prepare materials first...
+    materialCreator.setMaterials( loadModelInfo.materials );
 
     materialCreator.preload();
 
-    return function( name, idx, attribArray, indexArray, bboxen, meshParams ) {
+	// Create callback for creating mesh parts
+
+    var geometryCreator = new THREE.UTF8v2Loader.GeometryCreator();
+	var bufferGeometryCreator = new THREE.UTF8v2Loader.BufferGeometryCreator();
+
+	var meshCallback = function( name, idx, attribArray, indexArray, bboxen, meshParams ) {
 
         // Got ourselves a new mesh
 
@@ -723,16 +819,26 @@ THREE.UTF8v2Loader.prototype.createMeshCallback = function( materialBaseUrl, loa
         // bboxen defines the bounding box
         // meshParams contains the material info
 
-        var geometry = geometryCreator.create( attribArray, indexArray, bboxen );
+		if ( loadModelInfo.options.useBuffers ) {
+
+			var geometry = bufferGeometryCreator.create( attribArray, indexArray );
+
+		} else {
+
+			var geometry = geometryCreator.create( attribArray, indexArray );
+
+		}
+
         var material = materialCreator.create( meshParams.material );
 
-        modelParts[name].add( new THREE.Mesh( geometry, material  ));
+		var mesh = new THREE.Mesh( geometry, material );
+        modelParts[ name ].add( mesh );
 
         //model.add(new THREE.Mesh(geometry, material));
 
         decodedMeshesPerUrl[ name ] ++;
 
-        if ( decodedMeshesPerUrl[name] === expectedMeshesPerUrl[name] ) {
+        if ( decodedMeshesPerUrl[ name ] === expectedMeshesPerUrl[ name ] ) {
 
             nCompletedUrls ++;
 
@@ -748,7 +854,9 @@ THREE.UTF8v2Loader.prototype.createMeshCallback = function( materialBaseUrl, loa
 
         }
 
-    }
+    };
+
+	return meshCallback;
 
 };
 
@@ -763,7 +871,7 @@ THREE.UTF8v2Loader.prototype.downloadModelJson = function ( jsonUrl, options, ca
 
     getJsonRequest( jsonUrl, function( loaded ) {
 
-        if ( !loaded.decodeParams ) {
+        if ( ! loaded.decodeParams ) {
 
             if ( options && options.decodeParams ) {
 
@@ -803,6 +911,7 @@ THREE.UTF8v2Loader.prototype.downloadModelJson = function ( jsonUrl, options, ca
                 materialBase = materialBase  + "/";
 
             }
+
         }
 
         this.downloadModel( geometryBase, materialBase, loaded, callback );
