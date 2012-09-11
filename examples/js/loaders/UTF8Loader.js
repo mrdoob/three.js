@@ -5,7 +5,7 @@
  * Code to load/decompress mesh is taken from r100 of this webgl-loader
  */
 
-THREE.UTF8v2Loader = function () {};
+THREE.UTF8Loader = function () {};
 
 /**
  * Load UTF8 encoded model
@@ -17,7 +17,7 @@ THREE.UTF8v2Loader = function () {};
  *                   materialBase: Base url from which to load referenced textures
  */
 
-THREE.UTF8v2Loader.prototype.load = function ( jsonUrl, callback, options ) {
+THREE.UTF8Loader.prototype.load = function ( jsonUrl, callback, options ) {
 
     this.downloadModelJson( jsonUrl, options, callback );
 
@@ -25,10 +25,10 @@ THREE.UTF8v2Loader.prototype.load = function ( jsonUrl, callback, options ) {
 
 // BufferGeometryCreator
 
-THREE.UTF8v2Loader.BufferGeometryCreator = function () {
+THREE.UTF8Loader.BufferGeometryCreator = function () {
 };
 
-THREE.UTF8v2Loader.BufferGeometryCreator.prototype.create = function ( attribArray, indexArray ) {
+THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray, indexArray ) {
 
 	var ntris = indexArray.length / 3;
 
@@ -116,10 +116,10 @@ THREE.UTF8v2Loader.BufferGeometryCreator.prototype.create = function ( attribArr
 
 // GeometryCreator
 
-THREE.UTF8v2Loader.GeometryCreator = function () {
+THREE.UTF8Loader.GeometryCreator = function () {
 };
 
-THREE.UTF8v2Loader.GeometryCreator.prototype = {
+THREE.UTF8Loader.GeometryCreator.prototype = {
 
     create: function ( attribArray, indexArray ) {
 
@@ -321,7 +321,7 @@ var DEFAULT_DECODE_PARAMS = {
 // runtime for different combinations of stride, decodeOffset and
 // decodeScale?
 
-THREE.UTF8v2Loader.prototype.decompressAttribsInner_ = function ( str, inputStart, inputEnd,
+THREE.UTF8Loader.prototype.decompressAttribsInner_ = function ( str, inputStart, inputEnd,
                                                                   output, outputStart, stride,
                                                                   decodeOffset, decodeScale ) {
 
@@ -339,7 +339,7 @@ THREE.UTF8v2Loader.prototype.decompressAttribsInner_ = function ( str, inputStar
 
 };
 
-THREE.UTF8v2Loader.prototype.decompressIndices_ = function( str, inputStart, numIndices,
+THREE.UTF8Loader.prototype.decompressIndices_ = function( str, inputStart, numIndices,
                                                             output, outputStart ) {
 
 	var highest = 0;
@@ -360,7 +360,7 @@ THREE.UTF8v2Loader.prototype.decompressIndices_ = function( str, inputStart, num
 
 };
 
-THREE.UTF8v2Loader.prototype.decompressAABBs_ = function ( str, inputStart, numBBoxen,
+THREE.UTF8Loader.prototype.decompressAABBs_ = function ( str, inputStart, numBBoxen,
                                                            decodeOffsets, decodeScales ) {
     var numFloats = 6 * numBBoxen;
 
@@ -393,7 +393,7 @@ THREE.UTF8v2Loader.prototype.decompressAABBs_ = function ( str, inputStart, numB
 
 };
 
-THREE.UTF8v2Loader.prototype.decompressMesh =  function ( str, meshParams, decodeParams, name, idx, callback ) {
+THREE.UTF8Loader.prototype.decompressMesh =  function ( str, meshParams, decodeParams, name, idx, callback ) {
 
     // Extract conversion parameters from attribArrays.
 
@@ -451,7 +451,7 @@ THREE.UTF8v2Loader.prototype.decompressMesh =  function ( str, meshParams, decod
 
 };
 
-THREE.UTF8v2Loader.prototype.copyAttrib = function ( stride, attribsOutFixed, lastAttrib, index ) {
+THREE.UTF8Loader.prototype.copyAttrib = function ( stride, attribsOutFixed, lastAttrib, index ) {
 
     for ( var j = 0; j < stride; j ++ ) {
 
@@ -461,7 +461,7 @@ THREE.UTF8v2Loader.prototype.copyAttrib = function ( stride, attribsOutFixed, la
 
 };
 
-THREE.UTF8v2Loader.prototype.decodeAttrib2 = function ( str, stride, decodeOffsets, decodeScales, deltaStart,
+THREE.UTF8Loader.prototype.decodeAttrib2 = function ( str, stride, decodeOffsets, decodeScales, deltaStart,
                                                         numVerts, attribsOut, attribsOutFixed, lastAttrib,
                                                         index ) {
 
@@ -477,7 +477,7 @@ THREE.UTF8v2Loader.prototype.decodeAttrib2 = function ( str, stride, decodeOffse
 
 };
 
-THREE.UTF8v2Loader.prototype.accumulateNormal = function ( i0, i1, i2, attribsOutFixed, crosses ) {
+THREE.UTF8Loader.prototype.accumulateNormal = function ( i0, i1, i2, attribsOutFixed, crosses ) {
 
     var p0x = attribsOutFixed[ 8*i0 ];
     var p0y = attribsOutFixed[ 8*i0 + 1 ];
@@ -517,7 +517,7 @@ THREE.UTF8v2Loader.prototype.accumulateNormal = function ( i0, i1, i2, attribsOu
 
 };
 
-THREE.UTF8v2Loader.prototype.decompressMesh2 = function( str, meshParams, decodeParams, name, idx, callback ) {
+THREE.UTF8Loader.prototype.decompressMesh2 = function( str, meshParams, decodeParams, name, idx, callback ) {
 
     var MAX_BACKREF = 96;
 
@@ -710,7 +710,7 @@ THREE.UTF8v2Loader.prototype.decompressMesh2 = function( str, meshParams, decode
 
 };
 
-THREE.UTF8v2Loader.prototype.downloadMesh = function ( path, name, meshEntry, decodeParams, callback ) {
+THREE.UTF8Loader.prototype.downloadMesh = function ( path, name, meshEntry, decodeParams, callback ) {
 
     var loader = this;
     var idx = 0;
@@ -760,7 +760,7 @@ THREE.UTF8v2Loader.prototype.downloadMesh = function ( path, name, meshEntry, de
 
 };
 
-THREE.UTF8v2Loader.prototype.downloadMeshes = function ( path, meshUrlMap, decodeParams, callback ) {
+THREE.UTF8Loader.prototype.downloadMeshes = function ( path, meshUrlMap, decodeParams, callback ) {
 
     for ( var url in meshUrlMap ) {
 
@@ -771,7 +771,7 @@ THREE.UTF8v2Loader.prototype.downloadMeshes = function ( path, meshUrlMap, decod
 
 };
 
-THREE.UTF8v2Loader.prototype.createMeshCallback = function( materialBaseUrl, loadModelInfo, allDoneCallback ) {
+THREE.UTF8Loader.prototype.createMeshCallback = function( materialBaseUrl, loadModelInfo, allDoneCallback ) {
 
 	var nCompletedUrls = 0;
     var nExpectedUrls = 0;
@@ -805,8 +805,8 @@ THREE.UTF8v2Loader.prototype.createMeshCallback = function( materialBaseUrl, loa
 
 	// Create callback for creating mesh parts
 
-    var geometryCreator = new THREE.UTF8v2Loader.GeometryCreator();
-	var bufferGeometryCreator = new THREE.UTF8v2Loader.BufferGeometryCreator();
+    var geometryCreator = new THREE.UTF8Loader.GeometryCreator();
+	var bufferGeometryCreator = new THREE.UTF8Loader.BufferGeometryCreator();
 
 	var meshCallback = function( name, idx, attribArray, indexArray, bboxen, meshParams ) {
 
@@ -862,14 +862,14 @@ THREE.UTF8v2Loader.prototype.createMeshCallback = function( materialBaseUrl, loa
 
 };
 
-THREE.UTF8v2Loader.prototype.downloadModel = function ( geometryBase, materialBase, model, callback ) {
+THREE.UTF8Loader.prototype.downloadModel = function ( geometryBase, materialBase, model, callback ) {
 
     var meshCallback = this.createMeshCallback( materialBase, model, callback );
     this.downloadMeshes( geometryBase, model.urls, model.decodeParams, meshCallback );
 
 };
 
-THREE.UTF8v2Loader.prototype.downloadModelJson = function ( jsonUrl, options, callback ) {
+THREE.UTF8Loader.prototype.downloadModelJson = function ( jsonUrl, options, callback ) {
 
     getJsonRequest( jsonUrl, function( loaded ) {
 

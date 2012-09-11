@@ -33,7 +33,8 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/loaders/UTF8v2Loader.js"></script>
+
+		<script src="js/loaders/UTF8Loader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -138,9 +139,9 @@
 
 				var start = Date.now();
 
-				var loader = new THREE.UTF8v2Loader();
+				var loader = new THREE.UTF8Loader();
 
-				loader.load( "models/utf8_r104/hand.js", function ( object ) {
+				loader.load( "models/utf8/hand.js", function ( object ) {
 
 					var end = Date.now();
 					console.log( "hand", end - start, "ms" );
@@ -167,7 +168,7 @@
 
 				}, { normalizeRGB: true } );
 
-				loader.load( "models/utf8_r104/ben.js", function ( object ) {
+				loader.load( "models/utf8/ben.js", function ( object ) {
 
 					var end = Date.now();
 					console.log( "ben", end - start, "ms" );
