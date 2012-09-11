@@ -152,7 +152,6 @@
 		<script src="js/loaders/ctm/lzma.js"></script>
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
-		<script src="js/loaders/UTF8Loader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
@@ -334,7 +333,6 @@
 				var loader = new THREE.SceneLoader();
 
 				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
-				loader.addGeometryHandler( "utf8", THREE.UTF8Loader );
 
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
