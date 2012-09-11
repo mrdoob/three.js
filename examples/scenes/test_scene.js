@@ -204,6 +204,24 @@
 			"visible"  : true
 		},
 
+		"quad_texture1" : {
+			"geometry" : "quad",
+			"materials": [ "textured_compressed_dxt3" ],
+			"position" : [ 15, -5, 20 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 1, 1, 1 ],
+			"visible"  : true
+		},
+
+		"quad_texture2" : {
+			"geometry" : "quad",
+			"materials": [ "textured_compressed_dxt5" ],
+			"position" : [ 15, -5, 25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 1, 1, 1 ],
+			"visible"  : true
+		},
+
 		"ground" : {
 			"geometry" : "plane",
 			"materials": [ "basic_gray" ],
@@ -491,6 +509,16 @@
 			"parameters": { "color": 16777215, "map": "texture_bg" }
 		},
 
+		"textured_compressed_dxt3": {
+			"type": "MeshBasicMaterial",
+			"parameters": { "color": 16777215, "map": "texture_compressed_dxt3", "transparent": true }
+		},
+
+		"textured_compressed_dxt5": {
+			"type": "MeshBasicMaterial",
+			"parameters": { "color": 16777215, "map": "texture_compressed_dxt5", "transparent": true, "blending": "AdditiveBlending" }
+		},
+
 		"minecraft": {
 			"type": "MeshBasicMaterial",
 			"parameters": { "color": 16777215, "map": "texture_minecraft" }
@@ -528,6 +556,16 @@
 
 		"texture_bg": {
 			"url": "textures/cube/SwedishRoyalCastle/pz.jpg",
+			"anisotropy": 4
+		},
+
+		"texture_compressed_dxt3": {
+			"url": "textures/compressed/hepatica_dxt3_mip.dds",
+			"anisotropy": 4
+		},
+
+		"texture_compressed_dxt5": {
+			"url": "textures/compressed/explosion_dxt5_mip.dds",
 			"anisotropy": 4
 		},
 

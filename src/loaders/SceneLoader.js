@@ -684,7 +684,19 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		} else {
 
-			texture = THREE.ImageUtils.loadTexture( get_url( tt.url, data.urlBaseType ), tt.mapping, generateTextureCallback( 1 ) );
+			var isCompressed = tt.url.toLowerCase().endsWith( ".dds" );
+			var fullUrl = get_url( tt.url, data.urlBaseType );
+			var textureCallback = generateTextureCallback( 1 );
+
+			if ( isCompressed ) {
+
+				texture = THREE.ImageUtils.loadCompressedTexture( fullUrl, tt.mapping, textureCallback );
+
+			} else {
+
+				texture = THREE.ImageUtils.loadTexture( fullUrl, tt.mapping, textureCallback );
+
+			}
 
 			if ( THREE[ tt.minFilter ] !== undefined )
 				texture.minFilter = THREE[ tt.minFilter ];
