@@ -398,31 +398,41 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 THREE.MTLLoader.loadTexture = function ( url, mapping, onLoad, onError ) {
 
-        var image = new Image();
-        var texture = new THREE.Texture( image, mapping );
+	var isCompressed = url.toLowerCase().endsWith( ".dds" );
 
-        var loader = new THREE.ImageLoader();
+	if ( isCompressed ) {
 
-        loader.addEventListener( 'load', function ( event ) {
+		var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
 
-            texture.image = THREE.MTLLoader.ensurePowerOfTwo_( event.content );
-            texture.needsUpdate = true;
-            if ( onLoad ) onLoad( texture );
+	} else {
 
-        } );
+		var image = new Image();
+		var texture = new THREE.Texture( image, mapping );
 
-        loader.addEventListener( 'error', function ( event ) {
+		var loader = new THREE.ImageLoader();
 
-            if ( onError ) onError( event.message );
+		loader.addEventListener( 'load', function ( event ) {
 
-        } );
+			texture.image = THREE.MTLLoader.ensurePowerOfTwo_( event.content );
+			texture.needsUpdate = true;
+			if ( onLoad ) onLoad( texture );
 
-        loader.crossOrigin = this.crossOrigin;
-        loader.load( url, image );
+		} );
 
-        return texture;
+		loader.addEventListener( 'error', function ( event ) {
 
-    };
+			if ( onError ) onError( event.message );
+
+		} );
+
+		loader.crossOrigin = this.crossOrigin;
+		loader.load( url, image );
+
+	}
+
+	return texture;
+
+};
 
 THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 
