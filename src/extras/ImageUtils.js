@@ -266,8 +266,9 @@ THREE.ImageUtils = {
 			dds.mipmaps.push( mipmap );
 
 			dataOffset += dataLength;
-			width *= 0.5;
-			height *= 0.5;
+
+			width = Math.max( width * 0.5, 1 );
+			height = Math.max( height * 0.5, 1 );
 
 		}
 
