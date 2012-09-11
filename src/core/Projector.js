@@ -76,60 +76,84 @@ THREE.Projector = function() {
 		_renderData.sprites.length = 0;
 		_renderData.lights.length = 0;
 
-		var projectObject = function ( object ) {
+		var projectObject = function ( parent ) {
 
-			if ( object.visible === false ) return;
+			for ( var c = 0, cl = parent.children.length; c < cl; c ++ ) {
 
-			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
-			( object.frustumCulled === false || _frustum.contains( object ) === true ) ) {
+				var object = parent.children[ c ];
 
-				_object = getNextObjectInPool();
-				_object.object = object;
+				if ( object.visible === false ) continue;
 
-				if ( object.renderDepth !== null ) {
+				if ( object instanceof THREE.Light ) {
 
-					_object.z = object.renderDepth;
+					_renderData.lights.push( object );
+
+				} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line ) {
+
+					if ( object.frustumCulled === false || _frustum.contains( object ) === true ) {
+
+						_object = getNextObjectInPool();
+						_object.object = object;
+
+						if ( object.renderDepth !== null ) {
+
+							_object.z = object.renderDepth;
+
+						} else {
+
+							_vector3.copy( object.matrixWorld.getPosition() );
+							_viewProjectionMatrix.multiplyVector3( _vector3 );
+							_object.z = _vector3.z;
+
+						}
+
+						_renderData.objects.push( _object );
+
+					}
+
+				} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
+
+					_object = getNextObjectInPool();
+					_object.object = object;
+
+					// TODO: Find an elegant and performant solution and remove this dupe code.
+
+					if ( object.renderDepth !== null ) {
+
+						_object.z = object.renderDepth;
+
+					} else {
+
+						_vector3.copy( object.matrixWorld.getPosition() );
+						_viewProjectionMatrix.multiplyVector3( _vector3 );
+						_object.z = _vector3.z;
+
+					}
+
+					_renderData.sprites.push( _object );
 
 				} else {
 
-					_vector3.copy( object.matrixWorld.getPosition() );
-					_viewProjectionMatrix.multiplyVector3( _vector3 );
-					_object.z = _vector3.z;
+					_object = getNextObjectInPool();
+					_object.object = object;
+
+					if ( object.renderDepth !== null ) {
+
+						_object.z = object.renderDepth;
+
+					} else {
+
+						_vector3.copy( object.matrixWorld.getPosition() );
+						_viewProjectionMatrix.multiplyVector3( _vector3 );
+						_object.z = _vector3.z;
+
+					}
+
+					_renderData.objects.push( _object );
 
 				}
 
-				_renderData.objects.push( _object );
-
-			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
-
-				_object = getNextObjectInPool();
-				_object.object = object;
-
-				// TODO: Find an elegant and performant solution and remove this dupe code.
-
-				if ( object.renderDepth !== null ) {
-
-					_object.z = object.renderDepth;
-
-				} else {
-
-					_vector3.copy( object.matrixWorld.getPosition() );
-					_viewProjectionMatrix.multiplyVector3( _vector3 );
-					_object.z = _vector3.z;
-
-				}
-
-				_renderData.sprites.push( _object );
-
-			} else if ( object instanceof THREE.Light ) {
-
-				_renderData.lights.push( object );
-
-			}
-
-			for ( var c = 0, cl = object.children.length; c < cl; c ++ ) {
-
-				projectObject( object.children[ c ] );
+				projectObject( object );
 
 			}
 
