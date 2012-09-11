@@ -6340,11 +6340,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
+				var isCompressed = texture instanceof THREE.CompressedTexture;
+
 				var cubeImage = [];
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					if ( _this.autoScaleCubemaps ) {
+					if ( _this.autoScaleCubemaps && ! isCompressed ) {
 
 						cubeImage[ i ] = clampToMaxSize( texture.image[ i ], _maxCubemapSize );
 
@@ -6365,7 +6367,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
+					if ( isCompressed ) {
+
+						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
+
+						for( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
+
+							mipmap = mipmaps[ j ];
+							_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+						}
+
+					} else {
+
+						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
+
+					}
 
 				}
 

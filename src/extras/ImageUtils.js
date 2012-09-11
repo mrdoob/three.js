@@ -36,50 +36,16 @@ THREE.ImageUtils = {
 
 	},
 
-	loadTextureCube: function ( array, mapping, onLoad ) {
-
-		var i, l, images = [];
-		var texture = new THREE.Texture( images, mapping );
-
-		texture.flipY = false;
-
-		images.loadCount = 0;
-
-		for ( i = 0, l = array.length; i < l; ++ i ) {
-
-			images[ i ] = new Image();
-			images[ i ].onload = function () {
-
-				images.loadCount += 1;
-
-				if ( images.loadCount === 6 ) {
-
-					texture.needsUpdate = true;
-					if ( onLoad ) onLoad();
-
-				}
-
-			};
-
-			images[ i ].crossOrigin = this.crossOrigin;
-			images[ i ].src = array[ i ];
-
-		}
-
-		return texture;
-
-	},
-
 	loadCompressedTexture: function ( url, mapping, onLoad, onError ) {
 
 		var texture = new THREE.CompressedTexture();
 		texture.mapping = mapping;
 
-		var xhr = new XMLHttpRequest();
+		var request = new XMLHttpRequest();
 
-		xhr.onload = function () {
+		request.onload = function () {
 
-			var buffer = xhr.response;
+			var buffer = request.response;
 			var dds = THREE.ImageUtils.parseDDS( buffer, true );
 
 			texture.format = dds.format;
@@ -100,11 +66,121 @@ THREE.ImageUtils = {
 
 		}
 
-		xhr.onerror = onError;
+		request.onerror = onError;
 
-        xhr.open( 'GET', url, true );
-        xhr.responseType = "arraybuffer";
-		xhr.send( null );
+		request.open( 'GET', url, true );
+		request.responseType = "arraybuffer";
+		request.send( null );
+
+		return texture;
+
+	},
+
+	loadTextureCube: function ( array, mapping, onLoad, onError ) {
+
+		var images = [];
+		images.loadCount = 0;
+
+		var texture = new THREE.Texture();
+		texture.image = images;
+		if ( mapping !== undefined ) texture.mapping = mapping;
+
+		// no flipping needed for cube textures
+
+		texture.flipY = false;
+
+		for ( var i = 0, il = array.length; i < il; ++ i ) {
+
+			var cubeImage = new Image();
+			images[ i ] = cubeImage;
+
+			cubeImage.onload = function () {
+
+				images.loadCount += 1;
+
+				if ( images.loadCount === 6 ) {
+
+					texture.needsUpdate = true;
+					if ( onLoad ) onLoad();
+
+				}
+
+			};
+
+			cubeImage.onerror = onError;
+
+			cubeImage.crossOrigin = this.crossOrigin;
+			cubeImage.src = array[ i ];
+
+		}
+
+		return texture;
+
+	},
+
+	loadCompressedTextureCube: function ( array, mapping, onLoad, onError ) {
+
+		var images = [];
+		images.loadCount = 0;
+
+		var texture = new THREE.CompressedTexture();
+		texture.image = images;
+		if ( mapping !== undefined ) texture.mapping = mapping;
+
+		// no flipping for cube textures
+		// (also flipping doesn't work for compressed textures )
+
+		texture.flipY = false;
+
+		// can't generate mipmaps for compressed textures
+		// mips must be embedded in DDS files
+
+		texture.generateMipmaps = false;
+
+		var generateCubeFaceCallback = function ( rq, img ) {
+
+			return function () {
+
+				var buffer = rq.response;
+				var dds = THREE.ImageUtils.parseDDS( buffer, true );
+
+				img.format = dds.format;
+
+				img.mipmaps = dds.mipmaps;
+				img.width = dds.width;
+				img.height = dds.height;
+
+				images.loadCount += 1;
+
+				if ( images.loadCount === 6 ) {
+
+					texture.format = dds.format;
+					texture.needsUpdate = true;
+					if ( onLoad ) onLoad();
+
+				}
+
+			}
+
+		}
+
+		for ( var i = 0, il = array.length; i < il; ++ i ) {
+
+			var cubeImage = {};
+			images[ i ] = cubeImage;
+
+			var request = new XMLHttpRequest();
+
+			request.onload = generateCubeFaceCallback( request, cubeImage );
+			request.onerror = onError;
+
+			var url = array[ i ];
+
+			request.open( 'GET', url, true );
+			request.responseType = "arraybuffer";
+			request.send( null );
+
+		}
 
 		return texture;
 
