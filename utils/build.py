@@ -39,7 +39,7 @@ def main(argv=None):
   if args.minify is False:
 
       shutil.copy(path, output)
-      os.chmod(output, 0664); # temp files would usually get 0600
+      os.chmod(output, 0o664); # temp files would usually get 0600
 
   else:
 
