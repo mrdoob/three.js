@@ -11,7 +11,7 @@ import tempfile
 def main(argv=None):
 
   parser = argparse.ArgumentParser()
-  parser.add_argument('--include', action='append', choices=['common', 'canvas', 'webgl', 'extras'], required=True)
+  parser.add_argument('--include', action='append', required=True)
   parser.add_argument('--externs', action='append', default=['externs/common.js'])
   parser.add_argument('--minify', action='store_true', default=False)
   parser.add_argument('--output', default='../build/three.js')
