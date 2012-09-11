@@ -819,7 +819,9 @@ THREE.UTF8v2Loader.prototype.createMeshCallback = function( materialBaseUrl, loa
         // bboxen defines the bounding box
         // meshParams contains the material info
 
-		if ( loadModelInfo.options.useBuffers ) {
+		var useBuffers = loadModelInfo.options.useBuffers !== undefined ? loadModelInfo.options.useBuffers : true;
+
+		if ( useBuffers ) {
 
 			var geometry = bufferGeometryCreator.create( attribArray, indexArray );
 

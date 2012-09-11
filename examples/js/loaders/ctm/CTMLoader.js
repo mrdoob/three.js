@@ -88,6 +88,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 	var scope = this;
 
 	var offsets = parameters.offsets !== undefined ? parameters.offsets : [ 0 ];
+	var useBuffers = parameters.useBuffers !== undefined ? parameters.useBuffers : true;
 
 	var xhr = new XMLHttpRequest(),
 		callbackProgress = null;
@@ -116,7 +117,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 							var ctmFile = files[ i ];
 
-							if ( parameters.useBuffers ) {
+							if ( useBuffers ) {
 
 								scope.createModelBuffers( ctmFile, callback );
 
@@ -137,7 +138,6 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 				} else {
 
-
 					for ( var i = 0; i < offsets.length; i ++ ) {
 
 						var stream = new CTM.Stream( binaryData );
@@ -145,7 +145,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 						var ctmFile = new CTM.File( stream );
 
-						if ( parameters.useBuffers ) {
+						if ( useBuffers ) {
 
 							scope.createModelBuffers( ctmFile, callback );
 
