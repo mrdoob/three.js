@@ -45,8 +45,7 @@ THREE.ShaderGodRays = {
 
 			tInput: {
 				type: "t",
-				value: 0,
-				texture: null
+				value: null
 			},
 
 			fStepSize: {
@@ -148,14 +147,12 @@ THREE.ShaderGodRays = {
 
 			tColors: {
 				type: "t",
-				value: 0,
-				texture: null
+				value: null
 			},
 
 			tGodRays: {
 				type: "t",
-				value: 1,
-				texture: null
+				value: null
 			},
 
 			fGodRayIntensity: {

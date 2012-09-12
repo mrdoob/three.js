@@ -154,13 +154,13 @@
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
 					uvScale: { type: "v2", value: new THREE.Vector2( 3.0, 1.0 ) },
-					texture1: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
-					texture2: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
+					texture1: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/cloud.png" ) },
+					texture2: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" ) }
 
 				};
 
-				uniforms.texture1.texture.wrapS = uniforms.texture1.texture.wrapT = THREE.RepeatWrapping;
-				uniforms.texture2.texture.wrapS = uniforms.texture2.texture.wrapT = THREE.RepeatWrapping;
+				uniforms.texture1.value.wrapS = uniforms.texture1.value.wrapT = THREE.RepeatWrapping;
+				uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.65;
 

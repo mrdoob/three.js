@@ -117,11 +117,11 @@
 
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/ball.png" ) },
 
 			};
 
-			uniforms.texture.texture.wrapS = uniforms.texture.texture.wrapT = THREE.RepeatWrapping;
+			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 

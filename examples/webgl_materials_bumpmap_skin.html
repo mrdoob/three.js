@@ -277,11 +277,11 @@
 				uniforms[ "enableBump" ].value = true;
 				uniforms[ "enableSpecular" ].value = true;
 
-				uniforms[ "tBeckmann" ].texture = composerBeckmann.renderTarget1;
-				uniforms[ "tDiffuse" ].texture = mapColor;
+				uniforms[ "tBeckmann" ].value = composerBeckmann.renderTarget1;
+				uniforms[ "tDiffuse" ].value = mapColor;
 
-				uniforms[ "bumpMap" ].texture = mapHeight;
-				uniforms[ "specularMap" ].texture = mapSpecular;
+				uniforms[ "bumpMap" ].value = mapHeight;
+				uniforms[ "specularMap" ].value = mapSpecular;
 
 				uniforms[ "uAmbientColor" ].value.setHex( 0xa0a0a0 );
 				uniforms[ "uDiffuseColor" ].value.setHex( 0xa0a0a0 );

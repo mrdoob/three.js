@@ -445,7 +445,7 @@
 
 				// motion blur
 
-				effectBlend.uniforms[ 'tDiffuse2' ].texture = effectSave.renderTarget;
+				effectBlend.uniforms[ 'tDiffuse2' ].value = effectSave.renderTarget;
 				effectBlend.uniforms[ 'mixRatio' ].value = 0.65;
 
 				var renderModel = new THREE.RenderPass( scene, camera );

@@ -85,7 +85,7 @@ TEMPLATE_SCENE_ASCII = """\
 
 "metadata" :
 {
-    "formatVersion" : 3,
+    "formatVersion" : 3.1,
     "sourceFile"    : "%(fname)s",
     "generatedBy"   : "Blender 2.63 Exporter",
     "objects"       : %(nobjects)s,
@@ -149,13 +149,13 @@ TEMPLATE_EMPTY = """\
 
 TEMPLATE_GEOMETRY_LINK = """\
     %(geometry_id)s : {
-        "type" : "ascii_mesh",
+        "type" : "ascii",
         "url"  : %(model_file)s
     }"""
 
 TEMPLATE_GEOMETRY_EMBED = """\
     %(geometry_id)s : {
-        "type" : "embedded_mesh",
+        "type" : "embedded",
         "id"  : %(embed_id)s
     }"""
 
@@ -231,7 +231,7 @@ TEMPLATE_FILE_ASCII = """\
         "faces"         : %(nface)d,
         "normals"       : %(nnormal)d,
         "colors"        : %(ncolor)d,
-        "uvs"           : %(nuv)d,
+        "uvs"           : [%(nuvs)s],
         "materials"     : %(nmaterial)d,
         "morphTargets"  : %(nmorphTarget)d,
         "bones"         : %(nbone)d
@@ -255,7 +255,7 @@ TEMPLATE_MODEL_ASCII = """\
 
     "colors": [%(colors)s],
 
-    "uvs": [[%(uvs)s]],
+    "uvs": [%(uvs)s],
 
     "faces": [%(faces)s],
 
@@ -306,9 +306,9 @@ def get_normal_indices(v, normals, mesh):
 
     return n
 
-def get_uv_indices(face_index, uvs, mesh):
+def get_uv_indices(face_index, uvs, mesh, layer_index):
     uv = []
-    uv_layer = mesh.tessface_uv_textures.active.data
+    uv_layer = mesh.tessface_uv_textures[layer_index].data
     for i in uv_layer[face_index].uv:
         uv.append( uvs[veckey2d(i)] )
     return uv
@@ -471,7 +471,7 @@ def setBit(value, position, on):
         mask = ~(1 << position)
         return (value & mask)
 
-def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces):
+def generate_faces(normals, uv_layers, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces):
 
     if not option_faces:
         return "", 0
@@ -482,8 +482,8 @@ def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, 
     chunks = []
     for mesh, object in meshes:
 
-        faceUV = (len(mesh.uv_textures) > 0)
-        vertexUV = (len(mesh.sticky) > 0)
+        faceUV = len(mesh.uv_textures) > 0
+        vertexUV = len(mesh.sticky) > 0
         vertexColors = len(mesh.vertex_colors) > 0
 
         mesh_colors = option_colors and vertexColors
@@ -500,7 +500,7 @@ def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, 
                 mesh_extract_colors = False
 
         for i, f in enumerate(get_faces(mesh)):
-            face = generate_face(f, i, normals, uvs, colors, mesh, option_normals, mesh_colors, mesh_uvs, option_materials, vertex_offset, material_offset)
+            face = generate_face(f, i, normals, uv_layers, colors, mesh, option_normals, mesh_colors, mesh_uvs, option_materials, vertex_offset, material_offset)
             chunks.append(face)
 
         vertex_offset += len(mesh.vertices)
@@ -513,7 +513,7 @@ def generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, 
 
     return ",".join(chunks), len(chunks)
 
-def generate_face(f, faceIndex, normals, uvs, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, vertex_offset, material_offset):
+def generate_face(f, faceIndex, normals, uv_layers, colors, mesh, option_normals, option_colors, option_uv_coords, option_materials, vertex_offset, material_offset):
     isTriangle = ( len(f.vertices) == 3 )
 
     if isTriangle:
@@ -567,10 +567,11 @@ def generate_face(f, faceIndex, normals, uvs, colors, mesh, option_normals, opti
         faceData.append( index )
 
     if hasFaceVertexUvs:
-        uv = get_uv_indices(faceIndex, uvs, mesh)
-        for i in range(nVertices):
-            index = uv[i]
-            faceData.append(index)
+        for layer_index, uvs in enumerate(uv_layers):
+            uv = get_uv_indices(faceIndex, uvs, mesh, layer_index)
+            for i in range(nVertices):
+                index = uv[i]
+                faceData.append(index)
 
     if hasFaceVertexNormals:
         n = get_normal_indices(f.vertices, normals, mesh)
@@ -648,29 +649,46 @@ def generate_vertex_colors(colors, option_colors):
 # Model exporter - UVs
 # #####################################################
 
-def extract_uvs(mesh, uvs, count):
-    uv_layer = mesh.tessface_uv_textures.active.data
+def extract_uvs(mesh, uv_layers, counts):
+    for index, layer in enumerate(mesh.tessface_uv_textures):
 
-    for face_index, face in enumerate(get_faces(mesh)):
+        if len(uv_layers) <= index:
+            uvs = {}
+            count = 0
+            uv_layers.append(uvs)
+            counts.append(count)
+        else:
+            uvs = uv_layers[index]
+            count = counts[index]
 
-        for uv_index, uv in enumerate(uv_layer[face_index].uv):
+        uv_layer = layer.data
 
-            key = veckey2d(uv)
-            if key not in uvs:
-                uvs[key] = count
-                count += 1
+        for face_index, face in enumerate(get_faces(mesh)):
 
-    return count
+            for uv_index, uv in enumerate(uv_layer[face_index].uv):
 
-def generate_uvs(uvs, option_uv_coords):
+                key = veckey2d(uv)
+                if key not in uvs:
+                    uvs[key] = count
+                    count += 1
+
+        counts[index] = count
+
+    return counts
+
+def generate_uvs(uv_layers, option_uv_coords):
     if not option_uv_coords:
-        return ""
+        return "[]"
 
-    chunks = []
-    for key, index in sorted(uvs.items(), key=operator.itemgetter(1)):
-        chunks.append(key)
+    layers = []
+    for uvs in uv_layers:
+        chunks = []
+        for key, index in sorted(uvs.items(), key=operator.itemgetter(1)):
+            chunks.append(key)
+        layer = ",".join(generate_uv(n) for n in chunks)
+        layers.append(layer)
 
-    return ",".join(generate_uv(n) for n in chunks)
+    return ",".join("[%s]" % n for n in layers)
 
 # ##############################################################################
 # Model exporter - bones
@@ -1109,13 +1127,9 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
                                          m.specular_intensity * m.specular_color[1],
                                          m.specular_intensity * m.specular_color[2]]
 
-            world_ambient_color = [0, 0, 0]
-            if world:
-                world_ambient_color = world.ambient_color
-
-            material['colorAmbient'] = [m.ambient * world_ambient_color[0],
-                                        m.ambient * world_ambient_color[1],
-                                        m.ambient * world_ambient_color[2]]
+            material['colorAmbient'] = [m.ambient * material['colorDiffuse'][0],
+                                        m.ambient * material['colorDiffuse'][1],
+                                        m.ambient * material['colorDiffuse'][2]]
 
             material['transparency'] = m.alpha
 
@@ -1131,6 +1145,7 @@ def extract_materials(mesh, scene, option_colors, option_copy_textures, filepath
             handle_texture('light', textures, material, filepath, option_copy_textures)
             handle_texture('normal', textures, material, filepath, option_copy_textures)
             handle_texture('specular', textures, material, filepath, option_copy_textures)
+            handle_texture('bump', textures, material, filepath, option_copy_textures)
 
             material["vertexColors"] = m.THREE_useVertexColors and option_colors
 
@@ -1212,7 +1227,10 @@ def handle_texture(id, textures, material, filepath, option_copy_textures):
 
         if slot.use_map_normal:
             if slot.normal_factor != 1.0:
-                material['mapNormalFactor'] = slot.normal_factor
+                if id == "bump":
+                    material['mapBumpScale'] = slot.normal_factor
+                else:
+                    material['mapNormalFactor'] = slot.normal_factor
 
 
 # #####################################################
@@ -1250,16 +1268,16 @@ def generate_ascii_model(meshes, morphs,
     ncolor = 0
     colors = {}
 
-    nuv = 0
-    uvs = {}
+    nuvs = []
+    uv_layers = []
 
     nmaterial = 0
     materials = []
 
     for mesh, object in meshes:
 
-        faceUV = (len(mesh.uv_textures) > 0)
-        vertexUV = (len(mesh.sticky) > 0)
+        faceUV = len(mesh.uv_textures) > 0
+        vertexUV = len(mesh.sticky) > 0
         vertexColors = len(mesh.vertex_colors) > 0
 
         mesh_extract_colors = option_colors and vertexColors
@@ -1287,7 +1305,7 @@ def generate_ascii_model(meshes, morphs,
             ncolor = extract_vertex_colors(mesh, colors, ncolor)
 
         if mesh_extract_uvs:
-            nuv = extract_uvs(mesh, uvs, nuv)
+            nuvs = extract_uvs(mesh, uv_layers, nuvs)
 
         if option_materials:
             mesh_materials, nmaterial = generate_materials_string(mesh, scene, mesh_extract_colors, object.draw_type, option_copy_textures, filepath, nmaterial)
@@ -1313,7 +1331,7 @@ def generate_ascii_model(meshes, morphs,
     elif align_model == 3:
         top(vertices)
 
-    faces_string, nfaces = generate_faces(normals, uvs, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces)
+    faces_string, nfaces = generate_faces(normals, uv_layers, colors, meshes, option_normals, option_colors, option_uv_coords, option_materials, option_faces)
 
     bones_string, nbone = generate_bones(option_bones, flipyz)
     indices_string, weights_string = generate_indices_and_weights(meshes, option_skinning)
@@ -1323,7 +1341,7 @@ def generate_ascii_model(meshes, morphs,
     model_string = TEMPLATE_MODEL_ASCII % {
     "scale" : option_scale,
 
-    "uvs"       : generate_uvs(uvs, option_uv_coords),
+    "uvs"       : generate_uvs(uv_layers, option_uv_coords),
     "normals"   : generate_normals(normals, option_normals),
     "colors"    : generate_vertex_colors(colors, option_colors),
 
@@ -1344,7 +1362,7 @@ def generate_ascii_model(meshes, morphs,
     text = TEMPLATE_FILE_ASCII % {
     "nvertex"   : len(vertices),
     "nface"     : nfaces,
-    "nuv"       : nuv,
+    "nuvs"      : ",".join("%d" % n for n in nuvs),
     "nnormal"   : nnormal,
     "ncolor"    : ncolor,
     "nmaterial" : nmaterial,
@@ -1788,13 +1806,9 @@ def extract_material_data(m, option_colors):
                                  m.specular_intensity * m.specular_color[1],
                                  m.specular_intensity * m.specular_color[2]]
 
-    world_ambient_color = [0, 0, 0]
-    if world:
-        world_ambient_color = world.ambient_color
-
-    material['colorAmbient'] = [m.ambient * world_ambient_color[0],
-                                m.ambient * world_ambient_color[1],
-                                m.ambient * world_ambient_color[2]]
+    material['colorAmbient'] = [m.ambient * material['colorDiffuse'][0],
+                                m.ambient * material['colorDiffuse'][1],
+                                m.ambient * material['colorDiffuse'][2]]
 
     material['transparency'] = m.alpha
 
@@ -1810,7 +1824,10 @@ def extract_material_data(m, option_colors):
     material['mapLight'] = ""
     material['mapSpecular'] = ""
     material['mapNormal'] = ""
+    material['mapBump'] = ""
+
     material['mapNormalFactor'] = 1.0
+    material['mapBumpScale'] = 1.0
 
     textures = guess_material_textures(m)
 
@@ -1828,6 +1845,11 @@ def extract_material_data(m, option_colors):
         if textures['normal']['slot'].use_map_normal:
             material['mapNormalFactor'] = textures['normal']['slot'].normal_factor
 
+    if textures['bump']:
+        material['mapBump'] = textures['bump']['texture'].image.name
+        if textures['normal']['slot'].use_map_normal:
+            material['mapBumpScale'] = textures['normal']['slot'].normal_factor
+
     material['shading'] = m.THREE_materialType
     material['blending'] = m.THREE_blendingType
     material['depthWrite'] = m.THREE_depthWrite
@@ -1841,7 +1863,8 @@ def guess_material_textures(material):
         'diffuse' : None,
         'light'   : None,
         'normal'  : None,
-        'specular': None
+        'specular': None,
+        'bump'    : None
     }
 
     # just take first textures of each, for the moment three.js materials can't handle more
@@ -1853,20 +1876,27 @@ def guess_material_textures(material):
             texture = slot.texture
             if slot.use and texture and texture.type == 'IMAGE':
 
+                # normal map in Blender UI: textures => image sampling => normal map
+
                 if texture.use_normal_map:
                     textures['normal'] = { "texture": texture, "slot": slot }
+
+                # bump map in Blender UI: textures => influence => geometry => normal
+
+                elif slot.use_map_normal:
+                    textures['bump'] = { "texture": texture, "slot": slot }
 
                 elif slot.use_map_specular or slot.use_map_hardness:
                     textures['specular'] = { "texture": texture, "slot": slot }
 
                 else:
-                    if not textures['diffuse']:
+                    if not textures['diffuse'] and not slot.blend_type == 'MULTIPLY':
                         textures['diffuse'] = { "texture": texture, "slot": slot }
 
                     else:
                         textures['light'] = { "texture": texture, "slot": slot }
 
-                if textures['diffuse'] and textures['normal'] and textures['light'] and textures['specular']:
+                if textures['diffuse'] and textures['normal'] and textures['light'] and textures['specular'] and textures['bump']:
                     break
 
     return textures
@@ -1879,10 +1909,10 @@ def generate_material_string(material):
 
     shading = material.get("shading", "Lambert")
 
-    # normal mapped materials must use Phong
+    # normal and bump mapped materials must use Phong
     # to get all required parameters for normal shader
 
-    if material['mapNormal']:
+    if material['mapNormal'] or material['mapBump']:
         shading = "Phong"
 
     type_map = {
@@ -1904,7 +1934,9 @@ def generate_material_string(material):
     lightMap = material['mapLight']
     specularMap = material['mapSpecular']
     normalMap = material['mapNormal']
+    bumpMap = material['mapBump']
     normalMapFactor = material['mapNormalFactor']
+    bumpMapScale = material['mapBumpScale']
 
     if colorMap:
         parameters += ', "map": %s' % generate_string(colorMap)
@@ -1914,9 +1946,14 @@ def generate_material_string(material):
         parameters += ', "specularMap": %s' % generate_string(specularMap)
     if normalMap:
         parameters += ', "normalMap": %s' % generate_string(normalMap)
+    if bumpMap:
+        parameters += ', "bumpMap": %s' % generate_string(bumpMap)
 
     if normalMapFactor != 1.0:
         parameters += ', "normalMapFactor": %g' % normalMapFactor
+
+    if bumpMapScale != 1.0:
+        parameters += ', "bumpMapScale": %g' % bumpMapScale
 
     if material['vertexColors']:
         parameters += ', "vertexColors": "vertex"'

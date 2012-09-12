@@ -31,28 +31,28 @@ THREE.STLLoader.prototype = {
 	load: function ( url ) {
 
 		var scope = this;
-		var xhr = new XMLHttpRequest();
+		var request = new XMLHttpRequest();
 
-		xhr.addEventListener( 'load', function ( event ) {
+		request.addEventListener( 'load', function ( event ) {
 
 			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
 
 		}, false );
 
-		xhr.addEventListener( 'progress', function ( event ) {
+		request.addEventListener( 'progress', function ( event ) {
 
 			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
 
 		}, false );
 
-		xhr.addEventListener( 'error', function () {
+		request.addEventListener( 'error', function () {
 
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
 		}, false );
 
-		xhr.open( 'GET', url, true );
-		xhr.send( null );
+		request.open( 'GET', url, true );
+		request.send( null );
 
 	},
 
@@ -93,6 +93,7 @@ THREE.STLLoader.prototype = {
 		}
 
 		geometry.computeCentroids();
+		geometry.computeBoundingSphere();
 
 		return geometry;
 

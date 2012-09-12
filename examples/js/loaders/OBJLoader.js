@@ -15,28 +15,28 @@ THREE.OBJLoader.prototype = {
 	load: function ( url ) {
 
 		var scope = this;
-		var xhr = new XMLHttpRequest();
+		var request = new XMLHttpRequest();
 
-		xhr.addEventListener( 'load', function ( event ) {
+		request.addEventListener( 'load', function ( event ) {
 
 			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
 
 		}, false );
 
-		xhr.addEventListener( 'progress', function ( event ) {
+		request.addEventListener( 'progress', function ( event ) {
 
 			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
 
 		}, false );
 
-		xhr.addEventListener( 'error', function () {
+		request.addEventListener( 'error', function () {
 
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
 		}, false );
 
-		xhr.open( 'GET', url, true );
-		xhr.send( null );
+		request.open( 'GET', url, true );
+		request.send( null );
 
 	},
 
@@ -141,7 +141,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1 2 3", "1", "2", "3", undefined]
 
 				if ( result[ 4 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 1 ] ) - 1,
 						parseInt( result[ 2 ] ) - 1,
@@ -170,7 +170,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1/1 2/2 3/3", " 1/1", "1", "1", " 2/2", "2", "2", " 3/3", "3", "3", undefined, undefined, undefined]
 
 				if ( result[ 10 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 2 ] ) - 1,
 						parseInt( result[ 5 ] ) - 1,
@@ -212,7 +212,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1/1/1 2/2/2 3/3/3", " 1/1/1", "1", "1", "1", " 2/2/2", "2", "2", "2", " 3/3/3", "3", "3", "3", undefined, undefined, undefined, undefined]
 
 				if ( result[ 13 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 2 ] ) - 1,
 						parseInt( result[ 6 ] ) - 1,
@@ -266,7 +266,7 @@ THREE.OBJLoader.prototype = {
 				// ["f 1//1 2//2 3//3", " 1//1", "1", "1", " 2//2", "2", "2", " 3//3", "3", "3", undefined, undefined, undefined]
 
 				if ( result[ 10 ] === undefined ) {
-			
+
 					geometry.faces.push( face3(
 						parseInt( result[ 2 ] ) - 1,
 						parseInt( result[ 5 ] ) - 1,

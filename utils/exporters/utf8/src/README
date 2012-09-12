@@ -1,0 +1,20 @@
+Usage: ./objcompress in.obj [out.utf8]
+
+        If 'out' is specified, then attempt to write out a compressed,
+        UTF-8 version to 'out.'
+
+        If not, write a JSON version to STDOUT.
+
+Usage: ./objanalyze in.obj [list of cache sizes]
+
+        Perform vertex cache analysis on in.obj using specified sizes.
+        For example: ./objanalyze in.obj 6 16 24 32
+        Maximum cache size is 32.
+
+Building:
+
+Since there are no external dependences outside of the C/C++ standard
+libraries, you can pretty much build this however you please. I've
+included a cheeky way to do this on POSIX-like systems by including a
+build shell script at the top of the file itself. You can build by
+making the .cc file executable, and running it on the command line.

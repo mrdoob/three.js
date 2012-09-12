@@ -29,8 +29,8 @@
 	</head>
 
 	<body>
-		<div id="info">Simple Cloth Simulation #3<br/>
-			Verlet based with Constrains relaxation<br/>
+		<div id="info">Simple Cloth Simulation<br/>
+			Verlet integration with Constrains relaxation<br/>
 			Toggle: <a onclick="rotate = !rotate;">Camera</a> |
 			<a onclick="wind = !wind;">Wind</a> |
 			<a onclick="sphere.visible = !sphere.visible;">Ball</a> |
@@ -42,7 +42,6 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<script src="js/ParametricGeometries.js"></script>
 		<script src="js/Cloth.js"></script>
 
 		<script type="x-shader/x-fragment" id="fragmentShaderDepth">
@@ -92,22 +91,20 @@
 			/* testing cloth simulation */
 
 			var pinsFormation = [];
-			var pins = [];
+			var pins = [6];
 
-			pins[6] = true;
 			pinsFormation.push( pins );
 
-			pins = [ true, true, true, true, true, true, true, true, true, true, true, true ];
+			pins = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
 			pinsFormation.push( pins );
 
-			pins = [ true ];
+			pins = [ 0 ];
 			pinsFormation.push( pins );
 
 			pins = []; // cut the rope ;)
 			pinsFormation.push( pins );
 
-			pins = [ true ]; // classic 2 pins
-			pins[ cloth.w ] = true;
+			pins = [ 0, cloth.w ]; // classic 2 pins
 			pinsFormation.push( pins );
 
 			pins = pinsFormation[ 1 ];
@@ -193,14 +190,10 @@
 				clothTexture.wrapS = clothTexture.wrapT = THREE.RepeatWrapping;
 				clothTexture.anisotropy = 16;
 
-				materials = [
-					new THREE.MeshPhongMaterial( { alphaTest: 0.5, ambient: 0xffffff, color: 0xffffff, specular: 0x030303, emissive: 0x111111, shiness: 10, perPixel: true, metal: false, map: clothTexture, side: THREE.DoubleSide } ),
-					new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true, transparent: true, opacity: 0.9 } )
-				];
+				var clothMaterial = new THREE.MeshPhongMaterial( { alphaTest: 0.5, ambient: 0xffffff, color: 0xffffff, specular: 0x030303, emissive: 0x111111, shiness: 10, perPixel: true, metal: false, map: clothTexture, side: THREE.DoubleSide } );
 
 				// cloth geometry
-
-				clothGeometry = new THREE.ParametricGeometry( THREE.ParametricGeometries.plane( 200, 200 ), cloth.w, cloth.h, true );
+				clothGeometry = new THREE.ParametricGeometry( clothFunction, cloth.w, cloth.h, true );
 				clothGeometry.dynamic = true;
 				clothGeometry.computeFaceNormals();
 
@@ -210,7 +203,7 @@
 
 				// cloth mesh
 
-				object = new THREE.Mesh( clothGeometry, materials[ 0 ] );
+				object = new THREE.Mesh( clothGeometry, clothMaterial );
 				object.position.set( 0, 0, 0 );
 				object.castShadow = true;
 				object.receiveShadow = true;
@@ -261,19 +254,19 @@
 
 				// poles
 
-				var poleGeo = new THREE.CubeGeometry( 5, 750, 5 );
+				var poleGeo = new THREE.CubeGeometry( 5, 375, 5 );
 				var poleMat = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shiness: 100, perPixel: true } );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
-				mesh.position.y = -250;
 				mesh.position.x = -125;
+				mesh.position.y = -62;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
 
 				var mesh = new THREE.Mesh( poleGeo, poleMat );
-				mesh.position.y = -250;
 				mesh.position.x = 125;
+				mesh.position.y = -62;
 				mesh.receiveShadow = true;
 				mesh.castShadow = true;
 				scene.add( mesh );
@@ -357,7 +350,7 @@
 				arrow.setLength( windStrength );
 				arrow.setDirection( windForce );
 
-				simulate();
+				simulate(time);
 				render();
 				stats.update();
 

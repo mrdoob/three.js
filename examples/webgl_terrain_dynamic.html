@@ -339,7 +339,7 @@
 
 				uniformsNormal.height.value = 0.05;
 				uniformsNormal.resolution.value.set( rx, ry );
-				uniformsNormal.heightMap.texture = heightMap;
+				uniformsNormal.heightMap.value = heightMap;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 
@@ -368,15 +368,15 @@
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
-				uniformsTerrain[ "tNormal" ].texture = normalMap;
+				uniformsTerrain[ "tNormal" ].value = normalMap;
 				uniformsTerrain[ "uNormalScale" ].value = 3.5;
 
-				uniformsTerrain[ "tDisplacement" ].texture = heightMap;
+				uniformsTerrain[ "tDisplacement" ].value = heightMap;
 
-				uniformsTerrain[ "tDiffuse1" ].texture = diffuseTexture1;
-				uniformsTerrain[ "tDiffuse2" ].texture = diffuseTexture2;
-				uniformsTerrain[ "tSpecular" ].texture = specularMap;
-				uniformsTerrain[ "tDetail" ].texture = detailTexture;
+				uniformsTerrain[ "tDiffuse1" ].value = diffuseTexture1;
+				uniformsTerrain[ "tDiffuse2" ].value = diffuseTexture2;
+				uniformsTerrain[ "tSpecular" ].value = specularMap;
+				uniformsTerrain[ "tDetail" ].value = detailTexture;
 
 				uniformsTerrain[ "enableDiffuse1" ].value = true;
 				uniformsTerrain[ "enableDiffuse2" ].value = true;
@@ -625,7 +625,7 @@
 
 				} );
 
-				shaderMaterial.uniforms[ "tDiffuse" ].texture = texture;
+				shaderMaterial.uniforms[ "tDiffuse" ].value = texture;
 
 				var sceneTmp = new THREE.Scene();
 

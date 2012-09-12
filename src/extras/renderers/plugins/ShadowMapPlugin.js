@@ -62,6 +62,7 @@ THREE.ShadowMapPlugin = function ( ) {
 		_gl.disable( _gl.BLEND );
 
 		_gl.enable( _gl.CULL_FACE );
+		_gl.frontFace( _gl.CCW );
 
 		if ( _renderer.shadowMapCullFrontFaces ) {
 
@@ -193,7 +194,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
 
-			if ( light.cameraHelper ) light.cameraHelper.lines.visible = light.shadowCameraVisible;
+			if ( light.cameraHelper ) light.cameraHelper.visible = light.shadowCameraVisible;
 			if ( light.shadowCameraVisible ) light.cameraHelper.update();
 
 			// compute shadow matrix
@@ -266,10 +267,8 @@ THREE.ShadowMapPlugin = function ( ) {
 						material = object.customDepthMaterial;
 
 					} else if ( object instanceof THREE.SkinnedMesh ) {
-						
-						material = object.geometry.morphTargets.length ?
-						
-							_depthMaterialMorphSkin : _depthMaterialSkin;
+
+						material = object.geometry.morphTargets.length ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
 					} else if ( object.geometry.morphTargets.length ) {
 

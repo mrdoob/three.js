@@ -162,12 +162,14 @@
 				uniforms[ "enableReflection" ].value = true;
 				uniforms[ "enableDisplacement" ].value = true;
 
-				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
-				uniforms[ "tAO" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
+				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
+				uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
 
-				uniforms[ "tDisplacement" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
+				uniforms[ "tDisplacement" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
 				uniforms[ "uDisplacementBias" ].value = - 0.428408;
 				uniforms[ "uDisplacementScale" ].value = 2.436143;
+
+				uniforms[ "uNormalScale" ].value.y = -1;
 
 				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 				uniforms[ "uSpecularColor" ].value.setHex( specular );
@@ -175,7 +177,7 @@
 
 				uniforms[ "uShininess" ].value = shininess;
 
-				uniforms[ "tCube" ].texture = reflectionCube;
+				uniforms[ "tCube" ].value = reflectionCube;
 				uniforms[ "uReflectivity" ].value = 0.1;
 
 				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();

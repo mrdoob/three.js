@@ -92,6 +92,18 @@ THREE.Object3D.prototype = {
 
 	},
 
+	localToWorld: function ( vector ) {
+
+		return this.matrixWorld.multiplyVector3( vector );
+
+	},
+
+	worldToLocal: function ( vector ) {
+
+		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
+
+	},
+
 	lookAt: function ( vector ) {
 
 		// TODO: Add hierarchy support.
@@ -206,7 +218,7 @@ THREE.Object3D.prototype = {
 		return undefined;
 
 	},
-	
+
 	getDescendants: function ( array ) {
 
 		if ( array === undefined ) array = [];
@@ -218,22 +230,22 @@ THREE.Object3D.prototype = {
 			this.children[ i ].getDescendants( array );
 
 		};
-		
+
 		return array;
-		
+
 	},
 
 	updateMatrix: function () {
 
 		this.matrix.setPosition( this.position );
 
-		if ( this.useQuaternion === true )  {
+		if ( this.useQuaternion === false )  {
 
-			this.matrix.setRotationFromQuaternion( this.quaternion );
+			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
 
 		} else {
 
-			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
+			this.matrix.setRotationFromQuaternion( this.quaternion );
 
 		}
 
@@ -254,13 +266,13 @@ THREE.Object3D.prototype = {
 
 		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
-			if ( this.parent !== undefined ) {
+			if ( this.parent === undefined ) {
 
-				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+				this.matrixWorld.copy( this.matrix );
 
 			} else {
 
-				this.matrixWorld.copy( this.matrix );
+				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
 
 			}
 
@@ -277,18 +289,6 @@ THREE.Object3D.prototype = {
 			this.children[ i ].updateMatrixWorld( force );
 
 		}
-
-	},
-
-	worldToLocal: function ( vector ) {
-
-		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
-
-	},
-
-	localToWorld: function ( vector ) {
-
-		return this.matrixWorld.multiplyVector3( vector );
 
 	},
 
