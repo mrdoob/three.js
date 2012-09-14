@@ -84,20 +84,23 @@
 
 				// shadow
 
-				var shadowTexture = new THREE.Texture();
-				var loader = new THREE.ImageLoader();
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
 
-				loader.addEventListener( 'load', function ( event ) {
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
+				gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
 
-					shadowTexture.image = event.content;
-					shadowTexture.needsUpdate = true;
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
 
-				} );
-
-				loader.load( 'textures/shadow.png' );
+				var texture = new THREE.Texture( canvas );
+				texture.needsUpdate = true;
 
 				var geometry = new THREE.PlaneGeometry( 300, 300, 3, 3 );
-				var material = new THREE.MeshBasicMaterial( { map: shadowTexture, overdraw: true } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				mesh.position.y = - 250;
