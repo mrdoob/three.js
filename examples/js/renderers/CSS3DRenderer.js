@@ -138,17 +138,22 @@ THREE.CSS3DRenderer = function () {
 		for ( var i = 0, il = objects.length; i < il; i ++ ) {
 
 			var object = objects[ i ].object;
-			var element = object.element;
 
-			style = getObjectCSSMatrix( object.matrixWorld );
+			if ( object instanceof THREE.CSS3DObject ) {
 
-			element.style.WebkitTransform = style;
-			element.style.MozTransform = style;
-			element.style.oTransform = style;
+				var element = object.element;
 
-			if ( element.parentNode !== this.cameraElement ) {
+				style = getObjectCSSMatrix( object.matrixWorld );
 
-				this.cameraElement.appendChild( element );
+				element.style.WebkitTransform = style;
+				element.style.MozTransform = style;
+				element.style.oTransform = style;
+
+				if ( element.parentNode !== this.cameraElement ) {
+
+					this.cameraElement.appendChild( element );
+
+				}
 
 			}
 
