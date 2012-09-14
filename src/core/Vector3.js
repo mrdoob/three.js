@@ -299,7 +299,7 @@ THREE.Vector3.prototype = {
 
 			} else {
 
-				this.x = Math.atan2( m21, m22 );
+				this.x = Math.atan2( m32, m22 );
 				this.z = 0;
 
 			}
@@ -332,7 +332,7 @@ THREE.Vector3.prototype = {
 			} else {
 
 				this.y = 0;
-				this.z = Math.atan2( m13, m11 );
+				this.z = Math.atan2( m21, m11 );
 
 			}
 
@@ -364,7 +364,7 @@ THREE.Vector3.prototype = {
 			} else {
 
 				this.x = 0;
-				this.y = Math.atan2( m31, m33 );
+				this.y = Math.atan2( m13, m33 );
 
 			}
 
@@ -379,7 +379,7 @@ THREE.Vector3.prototype = {
 
 			} else {
 
-				this.x = Math.atan2( - m13, m33 );
+				this.x = Math.atan2( - m23, m33 );
 				this.y = 0;
 
 			}
