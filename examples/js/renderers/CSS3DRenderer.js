@@ -146,6 +146,12 @@ THREE.CSS3DRenderer = function () {
 			element.style.MozTransform = style;
 			element.style.oTransform = style;
 
+			if ( element.parentNode !== this.cameraElement ) {
+
+				this.cameraElement.appendChild( element );
+
+			}
+
 		}
 
 	};
