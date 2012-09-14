@@ -10,16 +10,28 @@
         margin: 0;
         padding: 0;
       }
+      body {
+        overflow: hidden;
+        color: #808080;
+        font-family: Monospace;
+        font-size: 13px;
+      }
       #debug {
         display: block;
         position: relative;
         margin: 50px auto;
-        border: 1px solid #ccc;
+      }
+      #info {
+        position: absolute;
+        top: 0px; width: 100%;
+        padding: 5px;
+        text-align: center;
       }
     </style>
   </head>
 
   <body>
+    <div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - 2d geometry in 3d space</div>
     <canvas id="debug" width="800" height="600"></canvas>
 
     <script src="../build/three.min.js"></script>
@@ -31,6 +43,8 @@
       var height = 600;
 
       var stats = new Stats();
+      stats.domElement.style.position = 'absolute';
+      stats.domElement.style.top = '0px';
       document.body.appendChild( stats.domElement );
 
       var renderer = new THREE.CanvasRenderer({
