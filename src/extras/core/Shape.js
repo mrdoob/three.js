@@ -27,6 +27,15 @@ THREE.Shape.prototype.extrude = function ( options ) {
 
 };
 
+// Convenience method to return ShapeGeometry
+
+THREE.Shape.prototype.makeGeometry = function ( options ) {
+
+	var geometry = new THREE.ShapeGeometry( this, options );
+	return geometry;
+
+};
+
 // Get points of holes
 
 THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
