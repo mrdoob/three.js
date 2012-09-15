@@ -6,177 +6,154 @@
  *
  * parameters = {
  *
- *  curveSegments: <int>, // number of points on the curves. NOT USED AT THE MOMENT.
+ *	curveSegments: <int>, // number of points on the curves. NOT USED AT THE MOMENT.
  *
- *  material: <int> // material index for front and back faces
- *  uvGenerator: <Object> // object that provides UV generator functions
+ *	material: <int> // material index for front and back faces
+ *	uvGenerator: <Object> // object that provides UV generator functions
  *
  * }
  **/
 
-(function() {
+THREE.ShapeGeometry = function ( shapes, options ) {
 
-  THREE.ShapeGeometry = function( _shapes, options ) {
+	THREE.Geometry.call( this );
 
-    THREE.Geometry.call( this );
+	if ( shapes instanceof Array === false ) shapes = [ shapes ];
 
-    var shapes = _shapes instanceof Array ? _shapes : [ _shapes ];
+	this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
 
-    this.shapebb = shapes[ shapes.length - 1 ].getBoundingBox();
+	this.addShapeList( shapes, options );
 
-    this.addShapeList( shapes, options );
+	this.computeCentroids();
+	this.computeFaceNormals();
 
-    this.computeCentroids();
-    this.computeFaceNormals();
+};
 
-  };
+THREE.ShapeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
-  /**
-   * Extends THREE.Geometry
-   */
-  THREE.ShapeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+/**
+ * Add an array of shapes to THREE.ShapeGeometry.
+ */
+THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
-  /**
-   * Add an array of shapes to THREE.ShapeGeometry.
-   */
-  THREE.ShapeGeometry.prototype.addShapeList = function( shapes, options ) {
+	for ( var i = 0, l = shapes.length; i < l; i++ ) {
 
-    for ( var i = 0, l = shapes.length; i < l; i++ ) {
+		var shape = shapes[ i ];
+		this.addShape( shape, options );
 
-      var shape = shapes[ i ];
-      this.addShape( shape, options );
+	}
 
-    }
+	return this;
 
-    return this;
+};
 
-  };
+/**
+ * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
+ */
+THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
-  /**
-   * Adds a shape to THREE.ShapeGeometry, based on THREE.ExtrudeGeometry.
-   */
-  THREE.ShapeGeometry.prototype.addShape = function( shape, _options ) {
+	if ( options === undefined ) options = {};
 
-    var options = isUndefined( _options ) ? {} : _options;
+	var material = options.material;
+	var uvgen = options.UVGenerator === undefined ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
 
-    // TODO: This exists in THREE.ExtrudeGeometry, but not really used.
-    // var curveSegments = isNumber( options.curveSegments ) ? options.curveSegments : 12;
+	var shapebb = this.shapebb;
 
-    var material = options.material;
-    var uvgen = isUndefined( options.UVGenerator ) ? THREE.ExtrudeGeometry.WorldUVGenerator : options.UVGenerator;
+	// Variable initialization
 
-    var shapebb = this.shapebb;
+	var scope = this, i, l, hole, s; // Iterable variables
 
-    // Variable initialization
+	var shapesOffset = this.vertices.length;
+	var shapePoints = shape.extractPoints();
 
-    var scope = this,
-      i, l, hole, s; // Iterable variables
+	var vertices = shapePoints.shape;
+	var holes = shapePoints.holes;
 
-    var shapesOffset = this.vertices.length;
-    var shapePoints = shape.extractPoints();
+	var reverse = !THREE.Shape.Utils.isClockWise( vertices );
 
-    var vertices = shapePoints.shape;
-    var holes = shapePoints.holes;
+	if ( reverse ) {
 
-    var reverse = !THREE.Shape.Utils.isClockWise( vertices );
+		vertices = vertices.reverse();
 
-    if ( reverse ) {
+		// Maybe we should also check if holes are in the opposite direction, just to be safe...
 
-      vertices = vertices.reverse();
+		for ( i = 0, l = holes.length; i < l; i++ ) {
 
-      // Maybe we should also check if holes are in the opposite direction, just to be safe...
+			hole = holes[ i ];
 
-      for ( i = 0, l = holes.length; i < l; i++ ) {
+			if ( THREE.Shape.Utils.isClockWise( hole ) ) {
 
-        hole = holes[ i ];
+				holes[ i ] = hole.reverse();
 
-        if ( THREE.Shape.Utils.isClockWise( hole ) ) {
+			}
 
-          holes[ i ] = hole.reverse();
+		}
 
-        }
+		reverse = false;
 
-      }
+	}
 
-      reverse = false;
+	var faces = THREE.Shape.Utils.triangulateShape( vertices, holes );
 
-    }
+	// Vertices
 
-    var faces = THREE.Shape.Utils.triangulateShape( vertices, holes );
+	var contour = vertices;
 
-    // Vertices
+	for ( i = 0, l = holes.length; i < l; i++ ) {
 
-    var contour = vertices;
+		hole = holes[ i ];
+		vertices = vertices.concat( hole );
 
-    for ( i = 0, l = holes.length; i < l; i++ ) {
+	}
 
-      hole = holes[ i ];
-      vertices = vertices.concat( hole );
+	// Variable initialization round 2
 
-    }
+	var vert, vlen = vertices.length;
+	var face, flen = faces.length;
+	var cont, clen = contour.length;
 
-    // Variable initialization round 2
+	/* Vertices */
 
-    var vert, vlen = vertices.length,
-        face, flen = faces.length,
-        cont, clen = contour.length;
+	// Make sure there is a z-depth, usually not the case
+	// when converting from THREE.Shape
 
-    /* Vertices */
+	for ( i = 0; i < vlen; i++ ) {
 
-    // Make sure there is a z-depth, usually not the case
-    // when converting from THREE.Shape
+		vert = vertices[ i ];
+		v( vert.x, vert.y, 0 );
 
-    for ( i = 0; i < vlen; i++ ) {
+	}
 
-      vert = vertices[ i ];
-      v( vert.x, vert.y, 0 );
+	/* Faces */
 
-    }
+	for ( i = 0; i < flen; i++ ) {
 
-    /* Faces */
+		face = faces[ i ];
+		f3( face[ 2 ], face[ 1 ], face[ 0 ] );
 
-    for ( i = 0; i < flen; i++ ) {
+	}
 
-      face = faces[ i ];
-      f3( face[ 2 ], face[ 1 ], face[ 0 ] );
+	/**
+	 * Utility functions for addShape method
+	 */
 
-    }
+	function v( x, y, z ) {
 
-    /**
-     * Utility functions for addShape method
-     */
+		scope.vertices.push( new THREE.Vector3( x, y, z ) );
 
-    function v( x, y, z ) {
+	}
 
-      scope.vertices.push( new THREE.Vector3( x, y, z ) );
+	function f3( a, b, c ) {
 
-    }
+		a += shapesOffset;
+		b += shapesOffset;
+		c += shapesOffset;
 
-    function f3( a, b, c ) {
+		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
+		var uvs = uvgen.generateBottomUV( scope, shape, options, a, b, c );
 
-      a += shapesOffset;
-      b += shapesOffset;
-      c += shapesOffset;
+		scope.faceVertexUvs[ 0 ].push( uvs );
 
-      scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
-      var uvs = uvgen.generateBottomUV( scope, shape, options, a, b, c );
+	}
 
-      scope.faceVertexUvs[ 0 ].push( uvs );
-
-    }
-
-  };
-
-  /**
-   * A few utility functions.
-   */
-
-  function isNumber(o) {
-    return toString.call(o) == '[object Number]';
-  }
-
-  function isUndefined(o) {
-    return o === void 0;
-  }
-
-})();
+};

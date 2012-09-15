@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - geometry - shapes</title>
+		<title>three.js canvas - geometry - shapes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -46,14 +46,6 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = 'Simple procedurally generated 3D shapes example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin';
-				container.appendChild( info );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 150, 500 );
 
@@ -67,72 +59,28 @@
 				parent.position.y = 50;
 				scene.add( parent );
 
-				function addShape( shape, extrudeSettings, color, x, y, z, rx, ry, rz, s ) {
-
-					var points = shape.createPointsGeometry();
-					var spacedPoints = shape.createSpacedPointsGeometry( 100 );
+				function addShape( shape, color, x, y, z, rx, ry, rz, s ) {
 
 					// flat shape
 
 					var geometry = new THREE.ShapeGeometry( shape );
 
-					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ) ] );
-					mesh.position.set( x, y, z - 125 );
+					var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, overdraw: true } ) );
+					mesh.position.set( x, y, z );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
 					parent.add( mesh );
 
-					// 3d shape
+					// line
 
-					var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
+					var geometry = shape.createPointsGeometry();
+					var material = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333, transparent: true } );
 
-					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ) ] );
-					mesh.position.set( x, y, z - 75 );
-					mesh.rotation.set( rx, ry, rz );
-					mesh.scale.set( s, s, s );
-					parent.add( mesh );
-
-					// solid line
-
-					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, linewidth: 2 } ) );
-					line.position.set( x, y, z + 25 );
+					var line = new THREE.Line( geometry, material );
+					line.position.set( x, y, z );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
 					parent.add( line );
-
-					// transparent line from real points
-
-					var line = new THREE.Line( points, new THREE.LineBasicMaterial( { color: color, opacity: 0.5 } ) );
-					line.position.set( x, y, z + 75 );
-					line.rotation.set( rx, ry, rz );
-					line.scale.set( s, s, s );
-					parent.add( line );
-
-					// vertices from real points
-
-					var pgeo = THREE.GeometryUtils.clone( points );
-					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.75 } ) );
-					particles.position.set( x, y, z + 75 );
-					particles.rotation.set( rx, ry, rz );
-					particles.scale.set( s, s, s );
-					parent.add( particles );
-
-					// transparent line from equidistance sampled points
-
-					var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
-					line.position.set( x, y, z + 125 );
-					line.rotation.set( rx, ry, rz );
-					line.scale.set( s, s, s );
-					parent.add( line );
-
-					// equidistance sampled points
-
-					var pgeo = THREE.GeometryUtils.clone( spacedPoints );
-					var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.5 } ) );
-					particles2.position.set( x, y, z + 125 );
-					particles2.rotation.set( rx, ry, rz );
-					particles2.scale.set( s, s, s );
-					parent.add( particles2 );
 
 				}
 
@@ -318,47 +266,26 @@
 				splineShape.moveTo( 0, 0 );
 				splineShape.splineThru( splinepts );
 
-				// splineShape.debug( document.getElementById("debug") );
-
-				// TODO 3d path?
-
-				var apath = new THREE.SplineCurve3();
-				apath.points.push(new THREE.Vector3(-50, 150, 10));
-				apath.points.push(new THREE.Vector3(-20, 180, 20));
-				apath.points.push(new THREE.Vector3(40, 220, 50));
-				apath.points.push(new THREE.Vector3(200, 290, 100));
-
-
-				var extrudeSettings = { amount: 20 }; // bevelSegments: 2, steps: 2 , bevelSegments: 5, bevelSize: 8, bevelThickness:5
 
 				// addShape( shape, color, x, y, z, rx, ry,rz, s );
 
-				addShape( californiaShape, extrudeSettings, 0xffaa00, -300, -100, 0, 0, 0, 0, 0.25 );
-
-				extrudeSettings.bevelEnabled = true;
-				extrudeSettings.bevelSegments = 2;
-				extrudeSettings.steps = 2;
-
-				addShape( triangleShape, extrudeSettings, 0xffee00, -180, 0, 0, 0, 0, 0, 1 );
-				addShape( roundedRectShape, extrudeSettings, 0x005500, -150, 150, 0, 0, 0, 0, 1 );
-				addShape( squareShape, extrudeSettings, 0x0055ff, 150, 100, 0, 0, 0, 0, 1 );
-				addShape( heartShape, extrudeSettings, 0xff1100, 0, 100, 0, Math.PI, 0, 0, 1 );
-				addShape( circleShape, extrudeSettings, 0x00ff11, 120, 250, 0, 0, 0, 0, 1 );
-				addShape( fishShape, extrudeSettings, 0x222222, -60, 200, 0, 0, 0, 0, 1 );
-				addShape( smileyShape, extrudeSettings, 0xee00ff, -270, 250, 0, Math.PI, 0, 0, 1 );
-				addShape( arcShape, extrudeSettings, 0xbb4422, 150, 0, 0, 0, 0, 0, 1 );
-
-				extrudeSettings.extrudePath = apath;
-				extrudeSettings.bevelEnabled = false;
-				extrudeSettings.steps = 20;
-
-				addShape( splineShape, extrudeSettings, 0x888888, -50, -100, -50, 0, 0, 0, 0.2 );
+				addShape( californiaShape, 0xffaa00, -300, -100, 0, 0, 0, 0, 0.25 );
+				addShape( triangleShape, 0xffee00, -180, 0, 0, 0, 0, 0, 1 );
+				addShape( roundedRectShape, 0x005500, -150, 150, 0, 0, 0, 0, 1 );
+				addShape( squareShape, 0x0055ff, 150, 100, 0, 0, 0, 0, 1 );
+				addShape( heartShape, 0xff1100, 0, 100, 0, Math.PI, 0, 0, 1 );
+				addShape( circleShape, 0x00ff11, 120, 250, 0, 0, 0, 0, 1 );
+				addShape( fishShape, 0x222222, -60, 200, 0, 0, 0, 0, 1 );
+				addShape( smileyShape, 0xee00ff, -270, 250, 0, Math.PI, 0, 0, 1 );
+				addShape( arcShape, 0xbb4422, 150, 0, 0, 0, 0, 0, 1 );
+				addShape( splineShape, 0x888888, -50, -100, 0, 0, 0, 0, 0.2 );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.CanvasRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
+				renderer.sortObjects = false;
+				renderer.sortElements = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
