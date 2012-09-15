@@ -38,8 +38,7 @@ THREE.ShapeGeometry.prototype.addShapeList = function ( shapes, options ) {
 
 	for ( var i = 0, l = shapes.length; i < l; i++ ) {
 
-		var shape = shapes[ i ];
-		this.addShape( shape, options );
+		this.addShape( shapes[ i ], options );
 
 	}
 
@@ -59,9 +58,9 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	var shapebb = this.shapebb;
 
-	// Variable initialization
+	//
 
-	var scope = this, i, l, hole, s; // Iterable variables
+	var i, l, hole, s;
 
 	var shapesOffset = this.vertices.length;
 	var shapePoints = shape.extractPoints();
@@ -106,53 +105,30 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 	}
 
-	// Variable initialization round 2
+	//
 
 	var vert, vlen = vertices.length;
 	var face, flen = faces.length;
 	var cont, clen = contour.length;
 
-	/* Vertices */
-
-	// Make sure there is a z-depth, usually not the case
-	// when converting from THREE.Shape
-
 	for ( i = 0; i < vlen; i++ ) {
 
 		vert = vertices[ i ];
-		v( vert.x, vert.y, 0 );
+
+		this.vertices.push( new THREE.Vector3( vert.x, vert.y, 0 ) );
 
 	}
-
-	/* Faces */
 
 	for ( i = 0; i < flen; i++ ) {
 
 		face = faces[ i ];
-		f3( face[ 2 ], face[ 1 ], face[ 0 ] );
 
-	}
+		var a = face[ 2 ] + shapesOffset;
+		var b = face[ 1 ] + shapesOffset;
+		var c = face[ 0 ] + shapesOffset;
 
-	/**
-	 * Utility functions for addShape method
-	 */
-
-	function v( x, y, z ) {
-
-		scope.vertices.push( new THREE.Vector3( x, y, z ) );
-
-	}
-
-	function f3( a, b, c ) {
-
-		a += shapesOffset;
-		b += shapesOffset;
-		c += shapesOffset;
-
-		scope.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
-		var uvs = uvgen.generateBottomUV( scope, shape, options, a, b, c );
-
-		scope.faceVertexUvs[ 0 ].push( uvs );
+		this.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
+		this.faceVertexUvs[ 0 ].push( uvgen.generateBottomUV( this, shape, options, a, b, c ) );
 
 	}
 
