@@ -555,34 +555,37 @@
 	"textures": {
 
 		"cube_reflection": {
-			"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
-					 "textures/cube/SwedishRoyalCastle/nx.jpg",
-					 "textures/cube/SwedishRoyalCastle/py.jpg",
-					 "textures/cube/SwedishRoyalCastle/ny.jpg",
-					 "textures/cube/SwedishRoyalCastle/pz.jpg",
-					 "textures/cube/SwedishRoyalCastle/nz.jpg"
-					]
+			"url": [
+				"textures/cube/SwedishRoyalCastle/px.jpg",
+				"textures/cube/SwedishRoyalCastle/nx.jpg",
+				"textures/cube/SwedishRoyalCastle/py.jpg",
+				"textures/cube/SwedishRoyalCastle/ny.jpg",
+				"textures/cube/SwedishRoyalCastle/pz.jpg",
+				"textures/cube/SwedishRoyalCastle/nz.jpg"
+			]
 		},
 
 		"cube_refraction": {
-			"url": [ "textures/cube/SwedishRoyalCastle/px.jpg",
-					 "textures/cube/SwedishRoyalCastle/nx.jpg",
-					 "textures/cube/SwedishRoyalCastle/py.jpg",
-					 "textures/cube/SwedishRoyalCastle/ny.jpg",
-					 "textures/cube/SwedishRoyalCastle/nz.jpg",
-					 "textures/cube/SwedishRoyalCastle/pz.jpg"
-					],
+			"url": [
+				"textures/cube/SwedishRoyalCastle/px.jpg",
+				"textures/cube/SwedishRoyalCastle/nx.jpg",
+				"textures/cube/SwedishRoyalCastle/py.jpg",
+				"textures/cube/SwedishRoyalCastle/ny.jpg",
+				"textures/cube/SwedishRoyalCastle/nz.jpg",
+				"textures/cube/SwedishRoyalCastle/pz.jpg"
+			],
 			"mapping": "CubeRefractionMapping"
 		},
 
 		"cube_compressed": {
-			"url": [ "textures/cube/Escher/dds/px.dds",
-					 "textures/cube/Escher/dds/nx.dds",
-					 "textures/cube/Escher/dds/py.dds",
-					 "textures/cube/Escher/dds/ny.dds",
-					 "textures/cube/Escher/dds/pz.dds",
-					 "textures/cube/Escher/dds/nz.dds"
-					]
+			"url": [
+				"textures/cube/Escher/dds/px.dds",
+				 "textures/cube/Escher/dds/nx.dds",
+				 "textures/cube/Escher/dds/py.dds",
+				 "textures/cube/Escher/dds/ny.dds",
+				 "textures/cube/Escher/dds/pz.dds",
+				 "textures/cube/Escher/dds/nz.dds"
+			]
 		},
 
 		"texture_bg": {
