@@ -51,10 +51,6 @@
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( 0, 0, 1 );
-				scene.add( light );
-
 				parent = new THREE.Object3D();
 				parent.position.y = 50;
 				scene.add( parent );
@@ -64,8 +60,9 @@
 					// flat shape
 
 					var geometry = new THREE.ShapeGeometry( shape );
+					var material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, overdraw: true } );
 
-					var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, overdraw: true } ) );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( x, y, z );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
