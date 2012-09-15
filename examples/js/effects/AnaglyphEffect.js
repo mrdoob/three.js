@@ -4,12 +4,14 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.AnaglyphEffect = function ( renderer ) {
+THREE.AnaglyphEffect = function ( renderer, rSz  ) {
 
 	var eyeRight = new THREE.Matrix4();
 	var eyeLeft = new THREE.Matrix4();
 	var focalLength = 125;
 	var _aspect, _near, _far, _fov;
+	
+	if (!rSz) { var rSz = 512;}
 
 	var _cameraL = new THREE.PerspectiveCamera();
 	_cameraL.matrixAutoUpdate = false;
@@ -25,8 +27,8 @@ THREE.AnaglyphEffect = function ( renderer ) {
 
 	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
-	var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, _params );
-	var _renderTargetR = new THREE.WebGLRenderTarget( 512, 512, _params );
+	var _renderTargetL = new THREE.WebGLRenderTarget( rSz, rSz, _params );
+	var _renderTargetR = new THREE.WebGLRenderTarget( rSz, rSz, _params );
 
 	var _material = new THREE.ShaderMaterial( {
 
