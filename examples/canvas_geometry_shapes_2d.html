@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>three.js webgl - geometry - shape 2d</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        overflow: hidden;
+        color: #808080;
+        font-family: Monospace;
+        font-size: 13px;
+      }
+      #debug {
+        display: block;
+        position: relative;
+        margin: 50px auto;
+      }
+      #info {
+        position: absolute;
+        top: 0px; width: 100%;
+        padding: 5px;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - 2d geometry in 3d space</div>
+    <canvas id="debug" width="800" height="600"></canvas>
+
+    <script src="../build/three.min.js"></script>
+    <script src="js/Stats.js"></script>
+
+    <script>
+
+      var width = 800;
+      var height = 600;
+
+      var stats = new Stats();
+      stats.domElement.style.position = 'absolute';
+      stats.domElement.style.top = '0px';
+      document.body.appendChild( stats.domElement );
+
+      var renderer = new THREE.CanvasRenderer({
+        canvas: document.getElementById( 'debug' )
+      });
+      renderer.sortElements = false;
+      var camera = new THREE.OrthographicCamera(0, width, 0, height, -10000);
+      var scene = new THREE.Scene();
+
+      var a = width / 4;
+      var b = height / 4;
+      var c = width / 4 + width / 2;
+      var d = height / 4 + height / 2;
+
+      renderer.setSize( width, height );
+
+      var points = [], radius = width / 4, ox = width / 2, oy = height / 2;
+
+      for ( var i = 0, l = 33; i < l; i++ ) {
+
+        var pct = ( i ) / 32;
+        var angle = pct * Math.PI + Math.PI;
+        var x = radius * Math.cos( angle );
+        var y = radius * Math.sin( angle );
+
+        points.push( new THREE.Vector2( x, y ) );
+
+      }
+
+      points.push( new THREE.Vector2(
+        radius * Math.cos( Math.PI * 1.5 + Math.PI ),
+        radius * Math.sin( Math.PI * 1.5 + Math.PI )
+      ) );
+
+      var shape = new THREE.Shape(points);
+      var geometry = shape.makeGeometry();
+
+      // Make the fill.
+
+      var material = new THREE.MeshBasicMaterial({
+        color: 0xFF7d72,
+        overdraw: true,
+        transparent: true
+      });
+      material.side = THREE.DoubleSide;
+
+      var mesh = new THREE.Mesh( geometry, material );
+      mesh.position.x = ox;
+      mesh.position.y = oy;
+
+      scene.add( camera );
+      scene.add( mesh );
+
+      // Make the outline.
+
+      geometry = new THREE.ShapeGeometry( shape );
+      material = new THREE.LineBasicMaterial({
+        linewidth: 25,
+        color: 0x333333,
+        overdraw: true,
+        transparent: true
+      });
+
+      // Close the line
+      geometry.vertices.push(geometry.vertices[0].clone());
+
+      mesh = new THREE.Line( geometry, material );
+      mesh.position.x = ox;
+      mesh.position.y = oy;
+
+      scene.add( mesh );
+
+      loop();
+
+      function loop() {
+
+        rotate();
+
+        renderer.render( scene, camera );
+        stats.update();
+
+        requestAnimationFrame( loop );
+
+      }
+
+      function rotate() {
+
+        for ( var i = 0, l = scene.__objects.length; i < l; i++ ) {
+
+          var mesh = scene.__objects[ i ];
+          mesh.rotation.y += 0.05;
+
+        }
+
+      }
+
+    </script>
+
+</body>
+</html>

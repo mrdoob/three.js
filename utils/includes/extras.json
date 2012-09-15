@@ -25,6 +25,7 @@
 	"../src/extras/geometries/CubeGeometry.js",
 	"../src/extras/geometries/CylinderGeometry.js",
 	"../src/extras/geometries/ExtrudeGeometry.js",
+	"../src/extras/geometries/ShapeGeometry.js",
 	"../src/extras/geometries/LatheGeometry.js",
 	"../src/extras/geometries/PlaneGeometry.js",
 	"../src/extras/geometries/SphereGeometry.js",
