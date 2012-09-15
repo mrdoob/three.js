@@ -96,5 +96,3 @@ THREE.BloomPass.prototype = {
 
 THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
 THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
-
-
