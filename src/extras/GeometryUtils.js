@@ -584,13 +584,13 @@ THREE.GeometryUtils = {
 
 				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
 
-					faceUvs[ j ].push( geometry.faceUvs[ j ] );
+					faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
 
 				}
 
 				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
-					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ] );
+					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
 
 				}
 

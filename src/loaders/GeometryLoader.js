@@ -54,7 +54,6 @@ THREE.GeometryLoader.prototype = {
 		}, false );
 
 		xhr.open( 'GET', url, true );
-		xhr.setRequestHeader( "Content-Type", "application/json" );
 		xhr.send( null );
 
 		//
@@ -336,7 +335,7 @@ THREE.GeometryLoader.prototype = {
 
 					if ( m.mapNormalFactor ) {
 
-						uniforms[ "uNormalScale" ].value = m.mapNormalFactor;
+						uniforms[ "uNormalScale" ].value.set( m.mapNormalFactor, m.mapNormalFactor );
 
 					}
 

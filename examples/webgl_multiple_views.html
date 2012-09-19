@@ -127,7 +127,24 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
+				// shadow
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(0,0,0,0.15)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				var shadowTexture = new THREE.Texture( canvas );
+				shadowTexture.needsUpdate = true;
+
+				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 				var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );

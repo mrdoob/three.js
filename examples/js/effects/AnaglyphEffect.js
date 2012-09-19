@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.AnaglyphEffect = function ( renderer ) {
+THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	var eyeRight = new THREE.Matrix4();
 	var eyeLeft = new THREE.Matrix4();
@@ -17,16 +17,17 @@ THREE.AnaglyphEffect = function ( renderer ) {
 	var _cameraR = new THREE.PerspectiveCamera();
 	_cameraR.matrixAutoUpdate = false;
 
-	var _scene = new THREE.Scene();
+	var _camera = new THREE.OrthographicCamera( -1, 1, 1, - 1, 0, 1 );
 
-	var _camera = new THREE.PerspectiveCamera( 53, 1, 1, 10000 );
-	_camera.position.z = 2;
-	_scene.add( _camera );
+	var _scene = new THREE.Scene();
 
 	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
-	var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, _params );
-	var _renderTargetR = new THREE.WebGLRenderTarget( 512, 512, _params );
+	if ( width === undefined ) width = 512;
+	if ( height === undefined ) height = 512;
+
+	var _renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
+	var _renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
 	var _material = new THREE.ShaderMaterial( {
 
@@ -159,8 +160,6 @@ THREE.AnaglyphEffect = function ( renderer ) {
 		_cameraR.far = camera.far;
 
 		renderer.render( scene, _cameraR, _renderTargetR, true );
-
-		_scene.updateMatrixWorld();
 
 		renderer.render( _scene, _camera );
 

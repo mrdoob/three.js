@@ -482,7 +482,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		geometry.__webglVertexBuffer = _gl.createBuffer();
 		geometry.__webglColorBuffer = _gl.createBuffer();
 
-		_this.info.geometries ++;
+		_this.info.memory.geometries ++;
 
 	};
 
@@ -929,7 +929,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// material must use some texture to require uvs
 
-		if ( material.map || material.lightMap || material.bumpMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
+		if ( material.map || material.lightMap || material.bumpMap || material.normalMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
 
 			return true;
 
@@ -3694,9 +3694,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					webglObject.render = true;
 
-					if ( this.sortObjects ) {
+					if ( this.sortObjects === true ) {
 
-						if ( object.renderDepth ) {
+						if ( object.renderDepth !== null ) {
 
 							webglObject.z = object.renderDepth;
 
@@ -4593,6 +4593,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			envMap: !!material.envMap,
 			lightMap: !!material.lightMap,
 			bumpMap: !!material.bumpMap,
+			normalMap: !!material.normalMap,
 			specularMap: !!material.specularMap,
 
 			vertexColors: material.vertexColors,
@@ -4945,10 +4946,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( material.normalMap ) {
+
+			uniforms.normalMap.value = material.normalMap;
+			uniforms.normalScale.value.copy( material.normalScale );
+
+		}
+
 		// uv repeat and offset setting priorities
 		//	1. color map
 		//	2. specular map
-		//	3. bump map
+		//	3. normal map
+		//	4. bump map
 
 		var uvScaleMap;
 
@@ -4959,6 +4968,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		} else if ( material.specularMap ) {
 
 			uvScaleMap = material.specularMap;
+
+		} else if ( material.normalMap ) {
+
+			uvScaleMap = material.normalMap;
 
 		} else if ( material.bumpMap ) {
 
@@ -5889,6 +5902,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.normalMap ? "#define USE_NORMALMAP" : "",
 			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
@@ -5969,7 +5983,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"precision " + _precision + " float;",
 
-			parameters.bumpMap ? "#extension GL_OES_standard_derivatives : enable" : "",
+			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -5991,6 +6005,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.normalMap ? "#define USE_NORMALMAP" : "",
 			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
@@ -6325,11 +6340,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
+				var isCompressed = texture instanceof THREE.CompressedTexture;
+
 				var cubeImage = [];
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					if ( _this.autoScaleCubemaps ) {
+					if ( _this.autoScaleCubemaps && ! isCompressed ) {
 
 						cubeImage[ i ] = clampToMaxSize( texture.image[ i ], _maxCubemapSize );
 
@@ -6350,7 +6367,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
+					if ( isCompressed ) {
+
+						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
+
+						for( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
+
+							mipmap = mipmaps[ j ];
+							_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+						}
+
+					} else {
+
+						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
+
+					}
 
 				}
 

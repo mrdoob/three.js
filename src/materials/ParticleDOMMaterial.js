@@ -2,14 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ParticleDOMMaterial = function ( domElement ) {
+THREE.ParticleDOMMaterial = function ( element ) {
 
-	this.domElement = domElement;
+	this.element = element;
 
 };
 
-THREE.ParticleDOMMaterial.prototype.clone = function(){ 
+THREE.ParticleDOMMaterial.prototype.clone = function(){
 
-	return new THREE.ParticleDOMMaterial( this.domElement );
+	return new THREE.ParticleDOMMaterial( this.element );
 
 };

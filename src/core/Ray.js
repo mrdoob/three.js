@@ -235,7 +235,7 @@
 
 		for ( var i = 0, l = descendants.length; i < l; i ++ ) {
 
-			intersectObject( descendants[ i ], this, intersects );
+			intersectObject( descendants[ i ], ray, intersects );
 
 		}
 	};
@@ -243,13 +243,13 @@
 	//
 
 	THREE.Ray.prototype.precision = 0.0001;
-    
-    THREE.Ray.prototype.set = function ( origin, direction ) {
-        
-        this.origin = origin;
-        this.direction = direction;
-        
-    };
+
+	THREE.Ray.prototype.set = function ( origin, direction ) {
+
+		this.origin = origin;
+		this.direction = direction;
+
+	};
 
 	THREE.Ray.prototype.intersectObject = function ( object, recursive ) {
 
@@ -261,7 +261,7 @@
 
 		}
 
-		intersectObject(object,this,intersects);
+		intersectObject( object, this, intersects );
 
 		intersects.sort( descSort );
 

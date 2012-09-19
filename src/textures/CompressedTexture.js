@@ -15,11 +15,27 @@ THREE.CompressedTexture.prototype = Object.create( THREE.Texture.prototype );
 
 THREE.CompressedTexture.prototype.clone = function () {
 
-	var clonedTexture = new THREE.CompressedTexture( this.mipmaps, this.image.width, this.image.height, this.format, this.type, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
+	var texture = new THREE.CompressedTexture();
 
-	clonedTexture.offset.copy( this.offset );
-	clonedTexture.repeat.copy( this.repeat );
+	texture.image = this.image;
+	texture.mipmaps = this.mipmaps;
 
-	return clonedTexture;
+	texture.format = this.format;
+	texture.type = this.type;
+
+	texture.mapping = this.mapping;
+
+	texture.wrapS = this.wrapS;
+	texture.wrapT = this.wrapT;
+
+	texture.magFilter = this.magFilter;
+	texture.minFilter = this.minFilter;
+
+	texture.anisotropy = this.anisotropy;
+
+	texture.offset.copy( this.offset );
+	texture.repeat.copy( this.repeat );
+
+	return texture;
 
 };

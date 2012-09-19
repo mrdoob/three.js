@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var THREE = THREE || { REVISION: '51dev' };
+var THREE = THREE || { REVISION: '52dev' };
 
 if ( self.console === undefined ) {
 
@@ -22,6 +22,45 @@ if ( self.Int32Array === undefined ) {
 
 	self.Int32Array = Array;
 	self.Float32Array = Array;
+
+}
+
+// Shims for "startsWith", "endsWith", and "trim" for browsers where this is not yet implemented
+// not sure we should have this, or at least not have it here
+
+// http://stackoverflow.com/questions/646628/javascript-startswith
+// http://stackoverflow.com/questions/498970/how-do-i-trim-a-string-in-javascript
+// http://wiki.ecmascript.org/doku.php?id=harmony%3astring_extras
+
+if ( String.prototype.startsWith === undefined ) {
+
+	String.prototype.startsWith = function ( str ) {
+
+		return this.slice( 0, str.length ) === str;
+
+	};
+
+}
+
+if ( String.prototype.endsWith === undefined ) {
+
+	String.prototype.endsWith = function ( str ) {
+
+		var t = String( str );
+		var index = this.lastIndexOf( t );
+		return index >= 0 && index === this.length - t.length;
+
+	};
+
+}
+
+if ( ! String.prototype.trim === undefined ) {
+
+	String.prototype.trim = function () {
+
+		return this.replace( /^\s+|\s+$/g, '' );
+
+	};
 
 }
 
