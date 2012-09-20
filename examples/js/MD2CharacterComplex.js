@@ -388,7 +388,7 @@ THREE.MD2CharacterComplex = function () {
 		}
 
 
-		if ( Math.abs( this.speed ) < 0.2 * this.maxSpeed && !( controls.moveLeft || controls.moveRight ) ) {
+		if ( Math.abs( this.speed ) < 0.2 * this.maxSpeed && !( controls.moveLeft || controls.moveRight || controls.moveForward || controls.moveBackward ) ) {
 
 			if ( this.activeAnimation !== idleAnimation ) {
 
