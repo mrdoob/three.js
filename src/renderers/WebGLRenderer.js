@@ -4634,7 +4634,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		};
 
-		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, parameters );
+		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters );
 
 		var attributes = material.program.attributes;
 
@@ -5826,11 +5826,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// Defines
+
+	function generateDefines ( defines ) {
+
+		var chunk, chunks = [];
+
+		for ( var d in defines ) {
+
+			chunk = "#define " + d + " " + defines[ d ];
+			chunks.push( chunk );
+
+		}
+
+		return chunks.join( "\n" );
+
+	};
+
 	// Shaders
 
-	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, parameters ) {
+	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
 
-		var p, pl, program, code;
+		var p, pl, d, program, code;
 		var chunks = [];
 
 		// Generate code
@@ -5843,6 +5860,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			chunks.push( fragmentShader );
 			chunks.push( vertexShader );
+
+		}
+
+		for ( d in defines ) {
+
+			chunks.push( d );
+			chunks.push( defines[ d ] );
 
 		}
 
@@ -5877,11 +5901,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//
 
+		var customDefines = generateDefines( defines );
+
+		//
+
 		program = _gl.createProgram();
 
 		var prefix_vertex = [
 
 			"precision " + _precision + " float;",
+
+			customDefines,
 
 			_supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
 
@@ -5984,6 +6014,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"precision " + _precision + " float;",
 
 			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
+
+			customDefines,
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
