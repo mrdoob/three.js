@@ -74,6 +74,13 @@ THREE.ColladaLoader = function () {
 							readyCallbackFunc = readyCallback;
 							parse( request.responseXML, undefined, url );
 
+						} else if ( request.responseText ) {
+
+							readyCallbackFunc = readyCallback;
+							var xmlParser = new DOMParser();
+							var responseXML = xmlParser.parseFromString( request.responseText, "application/xml" );
+							parse( responseXML, undefined, url );
+
 						} else {
 
 							console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
