@@ -84,6 +84,13 @@ THREE.ShaderExtras = {
 
 	'convolution': {
 
+		defines: {
+
+			"KERNEL_SIZE_FLOAT": "25.0",
+			"KERNEL_SIZE_INT": "25",
+
+		},
+
 		uniforms: {
 
 			"tDiffuse" : 		{ type: "t", value: null },
@@ -94,15 +101,13 @@ THREE.ShaderExtras = {
 
 		vertexShader: [
 
-			//"#define KERNEL_SIZE 25.0",
-
 			"uniform vec2 uImageIncrement;",
 
 			"varying vec2 vUv;",
 
 			"void main() {",
 
-				"vUv = uv - ( ( KERNEL_SIZE - 1.0 ) / 2.0 ) * uImageIncrement;",
+				"vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;",
 				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
@@ -111,8 +116,7 @@ THREE.ShaderExtras = {
 
 		fragmentShader: [
 
-			//"#define KERNEL_SIZE 25",
-			"uniform float cKernel[ KERNEL_SIZE ];",
+			"uniform float cKernel[ KERNEL_SIZE_INT ];",
 
 			"uniform sampler2D tDiffuse;",
 			"uniform vec2 uImageIncrement;",
@@ -124,7 +128,7 @@ THREE.ShaderExtras = {
 				"vec2 imageCoord = vUv;",
 				"vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
 
-				"for( int i = 0; i < KERNEL_SIZE; i ++ ) {",
+				"for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {",
 
 					"sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
 					"imageCoord += uImageIncrement;",
