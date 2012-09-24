@@ -61,6 +61,7 @@ THREE.ColladaLoader = function () {
 		if ( document.implementation && document.implementation.createDocument ) {
 
 			var request = new XMLHttpRequest();
+			request.overrideMimeType && request.overrideMimeType('model/vnd.collada+xml');
 
 			request.onreadystatechange = function() {
 
