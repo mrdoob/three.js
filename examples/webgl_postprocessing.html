@@ -42,8 +42,16 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/BlitShader.js"></script>
+		<script src="js/shaders/ColorifyShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/DotScreenShader.js"></script>
 		<script src="js/shaders/FilmShader.js"></script>
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/HorizontalBlurShader.js"></script>
+		<script src="js/shaders/SepiaShader.js"></script>
+		<script src="js/shaders/VerticalBlurShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -152,15 +160,15 @@
 
 				//
 
-				var shaderBleach = THREE.ShaderExtras[ "bleachbypass" ];
-				var shaderSepia = THREE.ShaderExtras[ "sepia" ];
-				var shaderVignette = THREE.ShaderExtras[ "vignette" ];
-				var shaderScreen = THREE.ShaderExtras[ "screen" ];
+				var shaderBleach = THREE.BleachBypassShader;
+				var shaderSepia = THREE.SepiaShader;
+				var shaderVignette = THREE.VignetteShader;
+				var shaderBlit = THREE.BlitShader;
 
 				var effectBleach = new THREE.ShaderPass( shaderBleach );
 				var effectSepia = new THREE.ShaderPass( shaderSepia );
 				var effectVignette = new THREE.ShaderPass( shaderVignette );
-				var effectScreen = new THREE.ShaderPass( shaderScreen );
+				var effectBlit = new THREE.ShaderPass( shaderBlit );
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
 
@@ -174,13 +182,13 @@
 				var effectFilmBW = new THREE.FilmPass( 0.35, 0.5, 2048, true );
 				var effectDotScreen = new THREE.DotScreenPass( new THREE.Vector2( 0, 0 ), 0.5, 0.8 );
 
-				var effectHBlur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
-				var effectVBlur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
-				effectHBlur.uniforms[ 'h' ].value = 2 / ( width/2 );
-				effectVBlur.uniforms[ 'v' ].value = 2 / ( height/2 );
+				var effectHBlur = new THREE.ShaderPass( THREE.HorizontalBlurShader );
+				var effectVBlur = new THREE.ShaderPass( THREE.VerticalBlurShader );
+				effectHBlur.uniforms[ 'h' ].value = 2 / ( width / 2 );
+				effectVBlur.uniforms[ 'v' ].value = 2 / ( height / 2 );
 
-				var effectColorify1 = new THREE.ShaderPass( THREE.ShaderExtras[ "colorify" ] );
-				var effectColorify2 = new THREE.ShaderPass( THREE.ShaderExtras[ "colorify" ] );
+				var effectColorify1 = new THREE.ShaderPass( THREE.ColorifyShader );
+				var effectColorify2 = new THREE.ShaderPass( THREE.ColorifyShader );
 				effectColorify1.uniforms[ 'color' ].value.setRGB( 1, 0.8, 0.8 );
 				effectColorify2.uniforms[ 'color' ].value.setRGB( 1, 0.75, 0.5 );
 
@@ -195,7 +203,7 @@
 				//effectDotScreen.renderToScreen = true;
 				//effectBleach.renderToScreen = true;
 				effectVignette.renderToScreen = true;
-				//effectScreen.renderToScreen = true;
+				//effectBlit.renderToScreen = true;
 
 				//
 

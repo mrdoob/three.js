@@ -4,7 +4,10 @@
 
 THREE.TexturePass = function ( texture, opacity ) {
 
-	var shader = THREE.ShaderExtras[ "screen" ];
+	if ( THREE.BlitShader === undefined )
+		console.error( "THREE.TexturePass relies on THREE.BlitShader" );
+
+	var shader = THREE.BlitShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 

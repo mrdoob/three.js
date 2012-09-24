@@ -16,19 +16,22 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 
-	// screen material
+	// blit material
 
-	var screenShader = THREE.ShaderExtras[ "screen" ];
+	if ( THREE.BlitShader === undefined )
+		console.error( "THREE.BloomPass relies on THREE.BlitShader" );
 
-	this.screenUniforms = THREE.UniformsUtils.clone( screenShader.uniforms );
+	var blitShader = THREE.BlitShader;
 
-	this.screenUniforms[ "opacity" ].value = strength;
+	this.blitUniforms = THREE.UniformsUtils.clone( blitShader.uniforms );
 
-	this.materialScreen = new THREE.ShaderMaterial( {
+	this.blitUniforms[ "opacity" ].value = strength;
 
-		uniforms: this.screenUniforms,
-		vertexShader: screenShader.vertexShader,
-		fragmentShader: screenShader.fragmentShader,
+	this.materialBlit = new THREE.ShaderMaterial( {
+
+		uniforms: this.blitUniforms,
+		vertexShader: blitShader.vertexShader,
+		fragmentShader: blitShader.fragmentShader,
 		blending: THREE.AdditiveBlending,
 		transparent: true
 
@@ -36,12 +39,15 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 
 	// convolution material
 
-	var convolutionShader = THREE.ShaderExtras[ "convolution" ];
+	if ( THREE.ConvolutionShader === undefined )
+		console.error( "THREE.BloomPass relies on THREE.ConvolutionShader" );
+
+	var convolutionShader = THREE.ConvolutionShader;
 
 	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
 
 	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
-	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderExtras.buildKernel( sigma );
+	this.convolutionUniforms[ "cKernel" ].value = THREE.ConvolutionShader.buildKernel( sigma );
 
 	this.materialConvolution = new THREE.ShaderMaterial( {
 
@@ -49,8 +55,8 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 		vertexShader:  convolutionShader.vertexShader,
 		fragmentShader: convolutionShader.fragmentShader,
 		defines: {
-				"KERNEL_SIZE_FLOAT": kernelSize.toFixed( 1 ),
-				"KERNEL_SIZE_INT": kernelSize.toFixed( 0 )
+			"KERNEL_SIZE_FLOAT": kernelSize.toFixed( 1 ),
+			"KERNEL_SIZE_INT": kernelSize.toFixed( 0 )
 		}
 
 	} );
@@ -86,9 +92,9 @@ THREE.BloomPass.prototype = {
 
 		// Render original scene with superimposed blur to texture
 
-		THREE.EffectComposer.quad.material = this.materialScreen;
+		THREE.EffectComposer.quad.material = this.materialBlit;
 
-		this.screenUniforms[ "tDiffuse" ].value = this.renderTargetY;
+		this.blitUniforms[ "tDiffuse" ].value = this.renderTargetY;
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 

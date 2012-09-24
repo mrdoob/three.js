@@ -4,7 +4,10 @@
 
 THREE.SavePass = function ( renderTarget ) {
 
-	var shader = THREE.ShaderExtras[ "screen" ];
+	if ( THREE.BlitShader === undefined )
+		console.error( "THREE.SavePass relies on THREE.BlitShader" );
+
+	var shader = THREE.BlitShader;
 
 	this.textureID = "tDiffuse";
 

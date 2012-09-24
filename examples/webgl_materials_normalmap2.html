@@ -14,7 +14,9 @@
 				overflow:hidden;
 			}
 
-			a {	color: #ffffff;	}
+			a {
+				color: #ffffff;
+			}
 
 			#info {
 				position: absolute;
@@ -55,7 +57,10 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BlitShader.js"></script>
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -176,9 +181,9 @@
 
 				var renderModel = new THREE.RenderPass( scene, camera );
 
-				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
-				var effectColor = new THREE.ShaderPass( THREE.ShaderExtras[ "colorCorrection" ] );
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
+				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 

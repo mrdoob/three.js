@@ -45,7 +45,7 @@
 
 		<script src="js/ShaderSkin.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BlitShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -219,16 +219,16 @@
 				// BECKMANN
 
 				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
-				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectBlit = new THREE.ShaderPass( THREE.BlitShader );
 
-				effectScreen.renderToScreen = true;
+				effectBlit.renderToScreen = true;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
 				var rtwidth = 512, rtheight = 512;
 
 				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerBeckmann.addPass( effectBeckmann );
-				composerBeckmann.addPass( effectScreen );
+				composerBeckmann.addPass( effectBlit );
 
 				// EVENTS
 

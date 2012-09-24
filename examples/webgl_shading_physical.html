@@ -38,7 +38,11 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BlitShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -397,11 +401,11 @@
 				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
-				var effectVignette = new THREE.ShaderPass( THREE.ShaderExtras[ "vignette" ] );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				var effectVignette = new THREE.ShaderPass( THREE.VignetteShader );
 
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
 
 				var bluriness = 4;
 

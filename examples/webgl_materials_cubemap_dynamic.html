@@ -57,7 +57,15 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/Stats.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/BlendShader.js"></script>
+		<script src="js/shaders/BlitShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
+		<script src="js/shaders/TriangleBlurShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -403,19 +411,19 @@
 
 				effectSave = new THREE.SavePass( new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters ) );
 
-				effectBlend = new THREE.ShaderPass( THREE.ShaderExtras[ "blend" ], "tDiffuse1" );
+				effectBlend = new THREE.ShaderPass( THREE.BlendShader, "tDiffuse1" );
 
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
-				var effectVignette = new THREE.ShaderPass( THREE.ShaderExtras[ "vignette" ] );
-				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				var effectVignette = new THREE.ShaderPass( THREE.VignetteShader );
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
 				effectBloom = new THREE.BloomPass( 0.75 );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
 
 				// tilt shift
 
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
 
 				var bluriness = 7;
 
@@ -611,7 +619,7 @@
 
 				var renderShadow = new THREE.RenderPass( shadowScene, topCamera );
 
-				var blurShader = THREE.ShaderExtras[ "triangleBlur" ];
+				var blurShader = THREE.TriangleBlurShader;
 				var effectBlurX = new THREE.ShaderPass( blurShader, 'texture' );
 				var effectBlurY = new THREE.ShaderPass( blurShader, 'texture' );
 
@@ -931,7 +939,7 @@
 
 				}
 
-				effectBloom.screenUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
+				effectBloom.blitUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
 
 				ambientLight.color.setHSV( 0, 0, THREE.Math.mapLinear( vnorm, 0, 1, 0.07, 0.33 ) );
 				groundBasic.color.setHSV( 0.1, 0.45, THREE.Math.mapLinear( vnorm, 0, 1, 0.725, 0.995 ) );

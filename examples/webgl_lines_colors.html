@@ -46,7 +46,9 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BlitShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
@@ -158,23 +160,23 @@
 
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.3 );
-				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectBlit = new THREE.ShaderPass( THREE.BlitShader );
 
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
 				var width = window.innerWidth || 2;
 				var height = window.innerHeight || 2;
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
-				effectScreen.renderToScreen = true;
+				effectBlit.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBloom );
-				composer.addPass( effectScreen );
+				composer.addPass( effectBlit );
 
 				//
 
