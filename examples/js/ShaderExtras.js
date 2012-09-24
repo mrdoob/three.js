@@ -7,7 +7,6 @@
  *
  *  screen
  *  convolution
- *  film
  *  bokeh
  *  sepia
  *  dotscreen
@@ -147,38 +146,21 @@ THREE.ShaderExtras = {
 	},
 
 	/* -------------------------------------------------------------------------
-
-	// Film grain & scanlines shader
-
-	//	- ported from HLSL to WebGL / GLSL
-	//	  http://www.truevision3d.com/forums/showcase/staticnoise_colorblackwhite_scanline_shaders-t18698.0.html
-
-	// Screen Space Static Postprocessor
-	//
-	// Produces an analogue noise overlay similar to a film grain / TV static
-	//
-	// Original implementation and noise algorithm
-	// Pat 'Hawthorne' Shearon
-	//
-	// Optimized scanlines + noise version with intensity scaling
-	// Georg 'Leviathan' Steinrohder
-
-	// This version is provided under a Creative Commons Attribution 3.0 License
-	// http://creativecommons.org/licenses/by/3.0/
+	//	Depth-of-field shader with bokeh
+	//	ported from GLSL shader by Martins Upitis
+	//	http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
 	 ------------------------------------------------------------------------- */
 
-	'film': {
+	'bokeh'	: {
 
 		uniforms: {
-
-			tDiffuse:   { type: "t", value: null },
-			time: 	    { type: "f", value: 0.0 },
-			nIntensity: { type: "f", value: 0.5 },
-			sIntensity: { type: "f", value: 0.05 },
-			sCount: 	{ type: "f", value: 4096 },
-			grayscale:  { type: "i", value: 1 }
-
-		},
+			tColor:   { type: "t", value: null },
+			tDepth:   { type: "t", value: null },
+			focus:    { type: "f", value: 1.0 },
+			aspect:   { type: "f", value: 1.0 },
+			aperture: { type: "f", value: 0.025 },
+			maxblur:  { type: "f", value: 1.0 }
+		  },
 
 		vertexShader: [
 
@@ -195,171 +177,84 @@ THREE.ShaderExtras = {
 
 		fragmentShader: [
 
-			// control parameter
-			"uniform float time;",
-
-			"uniform bool grayscale;",
-
-			// noise effect intensity value (0 = no effect, 1 = full effect)
-			"uniform float nIntensity;",
-
-			// scanlines effect intensity value (0 = no effect, 1 = full effect)
-			"uniform float sIntensity;",
-
-			// scanlines effect count value (0 = no effect, 4096 = full effect)
-			"uniform float sCount;",
-
-			"uniform sampler2D tDiffuse;",
-
 			"varying vec2 vUv;",
+
+			"uniform sampler2D tColor;",
+			"uniform sampler2D tDepth;",
+
+			"uniform float maxblur;",  	// max blur amount
+			"uniform float aperture;",	// aperture - bigger values for shallower depth of field
+
+			"uniform float focus;",
+			"uniform float aspect;",
 
 			"void main() {",
 
-				// sample the source
-				"vec4 cTextureScreen = texture2D( tDiffuse, vUv );",
+				"vec2 aspectcorrect = vec2( 1.0, aspect );",
 
-				// make some noise
-				"float x = vUv.x * vUv.y * time *  1000.0;",
-				"x = mod( x, 13.0 ) * mod( x, 123.0 );",
-				"float dx = mod( x, 0.01 );",
+				"vec4 depth1 = texture2D( tDepth, vUv );",
 
-				// add noise
-				"vec3 cResult = cTextureScreen.rgb + cTextureScreen.rgb * clamp( 0.1 + dx * 100.0, 0.0, 1.0 );",
+				"float factor = depth1.x - focus;",
 
-				// get us a sine and cosine
-				"vec2 sc = vec2( sin( vUv.y * sCount ), cos( vUv.y * sCount ) );",
+				"vec2 dofblur = vec2 ( clamp( factor * aperture, -maxblur, maxblur ) );",
 
-				// add scanlines
-				"cResult += cTextureScreen.rgb * vec3( sc.x, sc.y, sc.x ) * sIntensity;",
+				"vec2 dofblur9 = dofblur * 0.9;",
+				"vec2 dofblur7 = dofblur * 0.7;",
+				"vec2 dofblur4 = dofblur * 0.4;",
 
-				// interpolate between source and result by intensity
-				"cResult = cTextureScreen.rgb + clamp( nIntensity, 0.0,1.0 ) * ( cResult - cTextureScreen.rgb );",
+				"vec4 col = vec4( 0.0 );",
 
-				// convert to grayscale if desired
-				"if( grayscale ) {",
+				"col += texture2D( tColor, vUv.xy );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur );",
 
-					"cResult = vec3( cResult.r * 0.3 + cResult.g * 0.59 + cResult.b * 0.11 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur9 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur9 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur9 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur9 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur9 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur9 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur9 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur9 );",
 
-				"}",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur7 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur7 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur7 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur7 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur7 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur7 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur7 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur7 );",
 
-				"gl_FragColor =  vec4( cResult, cTextureScreen.a );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur4 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.4,   0.0  ) * aspectcorrect ) * dofblur4 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur4 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur4 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur4 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur4 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur4 );",
+				"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur4 );",
+
+				"gl_FragColor = col / 41.0;",
+				"gl_FragColor.a = 1.0;",
 
 			"}"
 
 		].join("\n")
-
-	},
-
-
-	/* -------------------------------------------------------------------------
-	//	Depth-of-field shader with bokeh
-	//	ported from GLSL shader by Martins Upitis
-	//	http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
-	 ------------------------------------------------------------------------- */
-
-	'bokeh'	: {
-
-	uniforms: { tColor:   { type: "t", value: null },
-				tDepth:   { type: "t", value: null },
-				focus:    { type: "f", value: 1.0 },
-				aspect:   { type: "f", value: 1.0 },
-				aperture: { type: "f", value: 0.025 },
-				maxblur:  { type: "f", value: 1.0 }
-			  },
-
-	vertexShader: [
-
-	"varying vec2 vUv;",
-
-	"void main() {",
-
-		"vUv = uv;",
-		"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
-
-	"}"
-
-	].join("\n"),
-
-	fragmentShader: [
-
-	"varying vec2 vUv;",
-
-	"uniform sampler2D tColor;",
-	"uniform sampler2D tDepth;",
-
-	"uniform float maxblur;",  	// max blur amount
-	"uniform float aperture;",	// aperture - bigger values for shallower depth of field
-
-	"uniform float focus;",
-	"uniform float aspect;",
-
-	"void main() {",
-
-		"vec2 aspectcorrect = vec2( 1.0, aspect );",
-
-		"vec4 depth1 = texture2D( tDepth, vUv );",
-
-		"float factor = depth1.x - focus;",
-
-		"vec2 dofblur = vec2 ( clamp( factor * aperture, -maxblur, maxblur ) );",
-
-		"vec2 dofblur9 = dofblur * 0.9;",
-		"vec2 dofblur7 = dofblur * 0.7;",
-		"vec2 dofblur4 = dofblur * 0.4;",
-
-		"vec4 col = vec4( 0.0 );",
-
-		"col += texture2D( tColor, vUv.xy );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur );",
-
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.15,  0.37 ) * aspectcorrect ) * dofblur9 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.37,  0.15 ) * aspectcorrect ) * dofblur9 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.37, -0.15 ) * aspectcorrect ) * dofblur9 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.15, -0.37 ) * aspectcorrect ) * dofblur9 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.15,  0.37 ) * aspectcorrect ) * dofblur9 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.37,  0.15 ) * aspectcorrect ) * dofblur9 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.37, -0.15 ) * aspectcorrect ) * dofblur9 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.15, -0.37 ) * aspectcorrect ) * dofblur9 );",
-
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur7 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.40,  0.0  ) * aspectcorrect ) * dofblur7 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur7 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur7 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur7 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur7 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur7 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur7 );",
-
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.29,  0.29 ) * aspectcorrect ) * dofblur4 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.4,   0.0  ) * aspectcorrect ) * dofblur4 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.29, -0.29 ) * aspectcorrect ) * dofblur4 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,  -0.4  ) * aspectcorrect ) * dofblur4 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.29,  0.29 ) * aspectcorrect ) * dofblur4 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.4,   0.0  ) * aspectcorrect ) * dofblur4 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2( -0.29, -0.29 ) * aspectcorrect ) * dofblur4 );",
-		"col += texture2D( tColor, vUv.xy + ( vec2(  0.0,   0.4  ) * aspectcorrect ) * dofblur4 );",
-
-		"gl_FragColor = col / 41.0;",
-		"gl_FragColor.a = 1.0;",
-
-	"}"
-
-	].join("\n")
 
 	},
 
