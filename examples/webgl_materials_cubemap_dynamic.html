@@ -59,8 +59,8 @@
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/BlendShader.js"></script>
-		<script src="js/shaders/BlitShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
 		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
 		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
@@ -939,7 +939,7 @@
 
 				}
 
-				effectBloom.blitUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
+				effectBloom.copyUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
 
 				ambientLight.color.setHSV( 0, 0, THREE.Math.mapLinear( vnorm, 0, 1, 0.07, 0.33 ) );
 				groundBasic.color.setHSV( 0.1, 0.45, THREE.Math.mapLinear( vnorm, 0, 1, 0.725, 0.995 ) );

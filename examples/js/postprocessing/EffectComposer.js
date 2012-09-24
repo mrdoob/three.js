@@ -25,10 +25,10 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.passes = [];
 
-	if ( THREE.BlitShader === undefined )
-		console.error( "THREE.EffectComposer relies on THREE.BlitShader" );
+	if ( THREE.CopyShader === undefined )
+		console.error( "THREE.EffectComposer relies on THREE.CopyShader" );
 
-	this.copyPass = new THREE.ShaderPass( THREE.BlitShader );
+	this.copyPass = new THREE.ShaderPass( THREE.CopyShader );
 
 };
 

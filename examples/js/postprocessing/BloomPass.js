@@ -16,22 +16,22 @@ THREE.BloomPass = function ( strength, kernelSize, sigma, resolution ) {
 	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 
-	// blit material
+	// copy material
 
-	if ( THREE.BlitShader === undefined )
-		console.error( "THREE.BloomPass relies on THREE.BlitShader" );
+	if ( THREE.CopyShader === undefined )
+		console.error( "THREE.BloomPass relies on THREE.CopyShader" );
 
-	var blitShader = THREE.BlitShader;
+	var copyShader = THREE.CopyShader;
 
-	this.blitUniforms = THREE.UniformsUtils.clone( blitShader.uniforms );
+	this.copyUniforms = THREE.UniformsUtils.clone( copyShader.uniforms );
 
-	this.blitUniforms[ "opacity" ].value = strength;
+	this.copyUniforms[ "opacity" ].value = strength;
 
-	this.materialBlit = new THREE.ShaderMaterial( {
+	this.materialCopy = new THREE.ShaderMaterial( {
 
-		uniforms: this.blitUniforms,
-		vertexShader: blitShader.vertexShader,
-		fragmentShader: blitShader.fragmentShader,
+		uniforms: this.copyUniforms,
+		vertexShader: copyShader.vertexShader,
+		fragmentShader: copyShader.fragmentShader,
 		blending: THREE.AdditiveBlending,
 		transparent: true
 
@@ -92,9 +92,9 @@ THREE.BloomPass.prototype = {
 
 		// Render original scene with superimposed blur to texture
 
-		THREE.EffectComposer.quad.material = this.materialBlit;
+		THREE.EffectComposer.quad.material = this.materialCopy;
 
-		this.blitUniforms[ "tDiffuse" ].value = this.renderTargetY;
+		this.copyUniforms[ "tDiffuse" ].value = this.renderTargetY;
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 

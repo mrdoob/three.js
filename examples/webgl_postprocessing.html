@@ -43,9 +43,9 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/BlitShader.js"></script>
 		<script src="js/shaders/ColorifyShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/DotScreenShader.js"></script>
 		<script src="js/shaders/FilmShader.js"></script>
 		<script src="js/shaders/HorizontalBlurShader.js"></script>
@@ -163,12 +163,12 @@
 				var shaderBleach = THREE.BleachBypassShader;
 				var shaderSepia = THREE.SepiaShader;
 				var shaderVignette = THREE.VignetteShader;
-				var shaderBlit = THREE.BlitShader;
+				var shaderCopy = THREE.CopyShader;
 
 				var effectBleach = new THREE.ShaderPass( shaderBleach );
 				var effectSepia = new THREE.ShaderPass( shaderSepia );
 				var effectVignette = new THREE.ShaderPass( shaderVignette );
-				var effectBlit = new THREE.ShaderPass( shaderBlit );
+				var effectCopy = new THREE.ShaderPass( shaderCopy );
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
 
@@ -203,7 +203,7 @@
 				//effectDotScreen.renderToScreen = true;
 				//effectBleach.renderToScreen = true;
 				effectVignette.renderToScreen = true;
-				//effectBlit.renderToScreen = true;
+				//effectCopy.renderToScreen = true;
 
 				//
 

@@ -23,7 +23,7 @@
 		<script src="js/Tween.js"></script>
 		<script src="js/Sparks.js"></script>
 
-		<script src="js/shaders/BlitShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FilmShader.js"></script>
 		<script src="js/shaders/FocusShader.js"></script>
 		<script src="js/shaders/HorizontalBlurShader.js"></script>
@@ -515,7 +515,7 @@
 
 				var effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
-				var effectBlit = new THREE.ShaderPass( THREE.BlitShader );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 				effectFilm = new THREE.FilmPass( 0.5, 0.25, 2048, false );
 
 				var shaderBlur = THREE.TriangleBlurShader;
@@ -546,14 +546,14 @@
 				composer.addPass( vblur );
 				//composer.addPass( effectBlurX );
 				//composer.addPass( effectBlurY );
-				//composer.addPass( effectBlit );
+				//composer.addPass( effectCopy );
 				//composer.addPass( effectFocus );
 				//composer.addPass( effectFilm );
 
 				vblur.renderToScreen = true;
 				effectBlurY.renderToScreen = true;
 				effectFocus.renderToScreen = true;
-				effectBlit.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 				effectFilm.renderToScreen = true;
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );

@@ -46,8 +46,8 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/shaders/BlitShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
@@ -160,7 +160,7 @@
 
 				var renderModel = new THREE.RenderPass( scene, camera );
 				var effectBloom = new THREE.BloomPass( 1.3 );
-				var effectBlit = new THREE.ShaderPass( THREE.BlitShader );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
@@ -169,14 +169,14 @@
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
-				effectBlit.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 
 				composer = new THREE.EffectComposer( renderer );
 
 				composer.addPass( renderModel );
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBloom );
-				composer.addPass( effectBlit );
+				composer.addPass( effectCopy );
 
 				//
 

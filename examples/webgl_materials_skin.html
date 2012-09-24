@@ -46,9 +46,9 @@
 
 		<script src="js/ShaderSkin.js"></script>
 
-		<script src="js/shaders/BlitShader.js"></script>
 		<script src="js/shaders/BleachBypassShader.js"></script>
 		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -182,7 +182,7 @@
 
 				THREE.ColorUtils.adjustHSV( renderModelUV.clearColor, 0, -0.5, -0.45 );
 
-				var effectBlit = new THREE.ShaderPass( THREE.BlitShader );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
 				var effectBloom1 = new THREE.BloomPass( 1, 15, 2, 512 );
 				var effectBloom2 = new THREE.BloomPass( 1, 25, 4, 512 );
@@ -192,7 +192,7 @@
 				effectBloom2.clear = true;
 				effectBloom3.clear = true;
 
-				effectBlit.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 
 				//
 
