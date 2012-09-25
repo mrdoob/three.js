@@ -187,13 +187,23 @@ THREE.Object3D.prototype = {
 
 	},
 
+	traverse: function ( callback ) {
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
 	getChildByName: function ( name, recursive ) {
 
-		var c, cl, child;
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		for ( c = 0, cl = this.children.length; c < cl; c ++ ) {
-
-			child = this.children[ c ];
+			var child = this.children[ i ];
 
 			if ( child.name === name ) {
 
@@ -201,7 +211,7 @@ THREE.Object3D.prototype = {
 
 			}
 
-			if ( recursive ) {
+			if ( recursive === true ) {
 
 				child = child.getChildByName( name, recursive );
 
