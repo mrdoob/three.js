@@ -112,13 +112,11 @@ var Viewport = function ( signals ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		THREE.SceneUtils.traverseHierarchy( object, function ( child ) {
+		object.traverse( function ( child ) {
 
 			objects.push( child );
 
 		} );
-
-		objects.push( object );
 
 		scene.add( object );
 		render();
@@ -138,7 +136,7 @@ var Viewport = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
-		selectionAxis.getDescendants().map( function ( object ) { object.visible = false } );
+		selectionAxis.traverse( function ( object ) { object.visible = false } );
 
 		if ( object !== null && object.geometry ) {
 
@@ -190,7 +188,7 @@ var Viewport = function ( signals ) {
 			selectionAxis.matrixWorld = object.matrixWorld;
 
 			selectionBox.visible = true;
-			selectionAxis.getDescendants().map( function ( object ) { object.visible = true } );
+			selectionAxis.traverse( function ( object ) { object.visible = true } );
 
 		}
 
