@@ -18,7 +18,7 @@ THREE.Object3D = function () {
 
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
-	this.eulerOrder = 'XYZ';
+	this.eulerOrder = THREE.Object3D.defaultEulerOrder;
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.renderDepth = null;
@@ -229,7 +229,7 @@ THREE.Object3D.prototype = {
 
 			this.children[ i ].getDescendants( array );
 
-		};
+		}
 
 		return array;
 
@@ -301,5 +301,6 @@ THREE.Object3D.prototype = {
 };
 
 THREE.Object3D.__m1 = new THREE.Matrix4();
+THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DCount = 0;
