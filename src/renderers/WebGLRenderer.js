@@ -5830,11 +5830,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function generateDefines ( defines ) {
 
-		var chunk, chunks = [];
+		var value, chunk, chunks = [];
 
 		for ( var d in defines ) {
 
-			chunk = "#define " + d + " " + defines[ d ];
+			value = defines[ d ];
+			if ( value === false ) continue;
+
+			chunk = "#define " + d + " " + value;
 			chunks.push( chunk );
 
 		}
