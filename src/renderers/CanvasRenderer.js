@@ -41,6 +41,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_color3 = new THREE.Color(),
 	_color4 = new THREE.Color(),
 
+	_diffuseColor = new THREE.Color(),
+	_emissiveColor = new THREE.Color(),
+
 	_patterns = {}, _imagedatas = {},
 
 	_near, _far,
@@ -190,7 +193,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		var e, el, element, material;
 
-		this.autoClear === true ? this.clear() : _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+		this.autoClear === true
+			? this.clear()
+			: _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
@@ -561,10 +566,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) && material.map === null && material.map === null ) {
 
-				if ( _enableLighting === true ) {
+				_diffuseColor.copy( material.color );
+				_emissiveColor.copy( material.emissive );
 
-					var diffuse = material.color;
-					var emissive = material.emissive;
+				if ( material.vertexColors === THREE.FaceColors ) {
+
+					_diffuseColor.r *= element.color.r;
+					_diffuseColor.g *= element.color.g;
+					_diffuseColor.b *= element.color.b;
+
+				}
+
+				if ( _enableLighting === true ) {
 
 					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 3 ) {
 
@@ -576,17 +589,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
 						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
 
-						_color1.r = diffuse.r * _color1.r + emissive.r;
-						_color1.g = diffuse.g * _color1.g + emissive.g;
-						_color1.b = diffuse.b * _color1.b + emissive.b;
+						_color1.r = _color1.r * _diffuseColor.r + _emissiveColor.r;
+						_color1.g = _color1.g * _diffuseColor.g + _emissiveColor.g;
+						_color1.b = _color1.b * _diffuseColor.b + _emissiveColor.b;
 
-						_color2.r = diffuse.r * _color2.r + emissive.r;
-						_color2.g = diffuse.g * _color2.g + emissive.g;
-						_color2.b = diffuse.b * _color2.b + emissive.b;
+						_color2.r = _color2.r * _diffuseColor.r + _emissiveColor.r;
+						_color2.g = _color2.g * _diffuseColor.g + _emissiveColor.g;
+						_color2.b = _color2.b * _diffuseColor.b + _emissiveColor.b;
 
-						_color3.r = diffuse.r * _color3.r + emissive.r;
-						_color3.g = diffuse.g * _color3.g + emissive.g;
-						_color3.b = diffuse.b * _color3.b + emissive.b;
+						_color3.r = _color3.r * _diffuseColor.r + _emissiveColor.r;
+						_color3.g = _color3.g * _diffuseColor.g + _emissiveColor.g;
+						_color3.b = _color3.b * _diffuseColor.b + _emissiveColor.b;
 
 						_color4.r = ( _color2.r + _color3.r ) * 0.5;
 						_color4.g = ( _color2.g + _color3.g ) * 0.5;
@@ -604,17 +617,21 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
-						_color.r = diffuse.r * _color.r + emissive.r;
-						_color.g = diffuse.g * _color.g + emissive.g;
-						_color.b = diffuse.b * _color.b + emissive.b;
+						_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
+						_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
+						_color.b = _color.b * _diffuseColor.b + _emissiveColor.b;
 
-						material.wireframe === true ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
+						material.wireframe === true
+							? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+							: fillPath( _color );
 
 					}
 
 				} else {
 
-					material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
+					material.wireframe === true
+						? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( material.color );
 
 				}
 
@@ -659,7 +676,19 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else {
 
-					material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
+					_color.copy( material.color );
+
+					if ( material.vertexColors === THREE.FaceColors ) {
+
+						_color.r *= element.color.r;
+						_color.g *= element.color.g;
+						_color.b *= element.color.b;
+
+					}
+
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
 
 				}
 
@@ -686,7 +715,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_color.g = normalToComponent( element.normalWorld.y );
 				_color.b = normalToComponent( element.normalWorld.z );
 
-				material.wireframe === true ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
+				material.wireframe === true
+					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+					: fillPath( _color );
 
 			}
 
@@ -720,10 +751,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
 
-				if ( _enableLighting === true ) {
+				_diffuseColor.copy( material.color );
+				_emissiveColor.copy( material.emissive );
 
-					var diffuse = material.color;
-					var emissive = material.emissive;
+				if ( material.vertexColors === THREE.FaceColors ) {
+
+					_diffuseColor.r *= element.color.r;
+					_diffuseColor.g *= element.color.g;
+					_diffuseColor.b *= element.color.b;
+
+				}
+
+				if ( _enableLighting === true ) {
 
 					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
 
@@ -736,21 +775,21 @@ THREE.CanvasRenderer = function ( parameters ) {
 						calculateLight( element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
 						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
 
-						_color1.r = diffuse.r * _color1.r + emissive.r;
-						_color1.g = diffuse.g * _color1.g + emissive.g;
-						_color1.b = diffuse.b * _color1.b + emissive.b;
+						_color1.r = _color1.r * _diffuseColor.r + _emissiveColor.r;
+						_color1.g = _color1.g * _diffuseColor.g + _emissiveColor.g;
+						_color1.b = _color1.b * _diffuseColor.b + _emissiveColor.b;
 
-						_color2.r = diffuse.r * _color2.r + emissive.r;
-						_color2.g = diffuse.g * _color2.g + emissive.g;
-						_color2.b = diffuse.b * _color2.b + emissive.b;
+						_color2.r = _color2.r * _diffuseColor.r + _emissiveColor.r;
+						_color2.g = _color2.g * _diffuseColor.g + _emissiveColor.g;
+						_color2.b = _color2.b * _diffuseColor.b + _emissiveColor.b;
 
-						_color3.r = diffuse.r * _color3.r + emissive.r;
-						_color3.g = diffuse.g * _color3.g + emissive.g;
-						_color3.b = diffuse.b * _color3.b + emissive.b;
+						_color3.r = _color3.r * _diffuseColor.r + _emissiveColor.r;
+						_color3.g = _color3.g * _diffuseColor.g + _emissiveColor.g;
+						_color3.b = _color3.b * _diffuseColor.b + _emissiveColor.b;
 
-						_color4.r = diffuse.r * _color4.r + emissive.r;
-						_color4.g = diffuse.g * _color4.g + emissive.g;
-						_color4.b = diffuse.b * _color4.b + emissive.b;
+						_color4.r = _color4.r * _diffuseColor.r + _emissiveColor.r;
+						_color4.g = _color4.g * _diffuseColor.g + _emissiveColor.g;
+						_color4.b = _color4.b * _diffuseColor.b + _emissiveColor.b;
 
 						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 
@@ -770,29 +809,49 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
-						_color.r = diffuse.r * _color.r + emissive.r;
-						_color.g = diffuse.g * _color.g + emissive.g;
-						_color.b = diffuse.b * _color.b + emissive.b;
+						_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
+						_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
+						_color.b = _color.b * _diffuseColor.b + _emissiveColor.b;
 
 						drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-						material.wireframe === true ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
+						material.wireframe === true
+							? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+							: fillPath( _color );
 
 					}
 
 				} else {
 
+					_color.r = _diffuseColor.r + _emissiveColor.r;
+					_color.g = _diffuseColor.g + _emissiveColor.g;
+					_color.b = _diffuseColor.b + _emissiveColor.b;
+
 					drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-					material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
 
 				}
 
 			} else if ( material instanceof THREE.MeshBasicMaterial ) {
 
+				_color.copy( material.color );
+
+				if ( material.vertexColors === THREE.FaceColors ) {
+
+					_color.r *= element.color.r;
+					_color.g *= element.color.g;
+					_color.b *= element.color.b;
+
+				}
+
 				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-				material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
+				material.wireframe === true
+					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+					: fillPath( _color );
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
@@ -802,7 +861,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
-				material.wireframe === true ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
+				material.wireframe === true
+					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+					: fillPath( _color );
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
