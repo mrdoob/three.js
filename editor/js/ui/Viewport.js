@@ -32,10 +32,20 @@ var Viewport = function ( signals ) {
 	sceneHelpers.add( grid );
 
 	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } ) );
-	selectionBox.geometry.dynamic = true;
 	selectionBox.matrixAutoUpdate = false;
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
+
+	var selectionAxis = new THREE.AxisHelper();
+	selectionAxis.matrixAutoUpdate = false;
+	sceneHelpers.add( selectionAxis );
+
+	for ( var i = 0; i < selectionAxis.children.length; i ++ ) {
+
+		selectionAxis.children[ i ].material.depthTest = false;
+		selectionAxis.children[ i ].material.transparent = true;
+
+	}
 
 	//
 
@@ -55,11 +65,6 @@ var Viewport = function ( signals ) {
 	controls.staticMoving = true;
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', render );
-
-	/*
-	var controls = new THREE.OrbitControls( camera, container.dom );
-	controls.addEventListener( 'change', render );
-	*/
 
 	var light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 1, 0.5, 0 ).normalize();
@@ -133,6 +138,7 @@ var Viewport = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
+		selectionAxis.getDescendants().map( function ( object ) { object.visible = false } );
 
 		if ( object !== null && object.geometry ) {
 
@@ -181,8 +187,10 @@ var Viewport = function ( signals ) {
 			selectionBox.geometry.verticesNeedUpdate = true;
 
 			selectionBox.matrixWorld = object.matrixWorld;
+			selectionAxis.matrixWorld = object.matrixWorld;
 
 			selectionBox.visible = true;
+			selectionAxis.getDescendants().map( function ( object ) { object.visible = true } );
 
 		}
 
@@ -231,8 +239,8 @@ var Viewport = function ( signals ) {
 		scene.updateMatrixWorld();
 
 		renderer.clear();
-		renderer.render( sceneHelpers, camera );
 		renderer.render( scene, camera );
+		renderer.render( sceneHelpers, camera );
 
 	}
 
