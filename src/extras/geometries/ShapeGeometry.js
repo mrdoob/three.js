@@ -123,9 +123,9 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 
 		face = faces[ i ];
 
-		var a = face[ 2 ] + shapesOffset;
+		var a = face[ 0 ] + shapesOffset;
 		var b = face[ 1 ] + shapesOffset;
-		var c = face[ 0 ] + shapesOffset;
+		var c = face[ 2 ] + shapesOffset;
 
 		this.faces.push( new THREE.Face3( a, b, c, null, null, material ) );
 		this.faceVertexUvs[ 0 ].push( uvgen.generateBottomUV( this, shape, options, a, b, c ) );
