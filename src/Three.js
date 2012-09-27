@@ -4,19 +4,16 @@
 
 var THREE = THREE || { REVISION: '51' };
 
-if ( self.console === undefined ) {
+self.console = self.console || {
 
-	self.console = {
+	info: function () {},
+	log: function () {},
+	debug: function () {},
+	warn: function () {},
+	error: function () {}
 
-		info: function () {},
-		log: function () {},
-		debug: function () {},
-		warn: function () {},
-		error: function () {}
+};
 
-	};
-
-}
 
 if ( self.Int32Array === undefined ) {
 
@@ -32,37 +29,27 @@ if ( self.Int32Array === undefined ) {
 // http://stackoverflow.com/questions/498970/how-do-i-trim-a-string-in-javascript
 // http://wiki.ecmascript.org/doku.php?id=harmony%3astring_extras
 
-if ( String.prototype.startsWith === undefined ) {
+String.prototype.startsWith = String.prototype.startsWith || function ( str ) {
 
-	String.prototype.startsWith = function ( str ) {
+	return this.slice( 0, str.length ) === str;
 
-		return this.slice( 0, str.length ) === str;
+};
 
-	};
+String.prototype.endsWith = String.prototype.endsWith || function ( str ) {
 
-}
+	var t = String( str );
+	var index = this.lastIndexOf( t );
+	return index >= 0 && index === this.length - t.length;
 
-if ( String.prototype.endsWith === undefined ) {
+};
 
-	String.prototype.endsWith = function ( str ) {
+String.prototype.trim = String.prototype.trim || function () {
 
-		var t = String( str );
-		var index = this.lastIndexOf( t );
-		return index >= 0 && index === this.length - t.length;
+	return this.replace( /^\s+|\s+$/g, '' );
 
-	};
+};
 
-}
 
-if ( ! String.prototype.trim === undefined ) {
-
-	String.prototype.trim = function () {
-
-		return this.replace( /^\s+|\s+$/g, '' );
-
-	};
-
-}
 
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
