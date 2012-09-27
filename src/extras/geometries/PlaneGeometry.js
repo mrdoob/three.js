@@ -3,15 +3,15 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight ) {
+THREE.PlaneGeometry = function ( width, height, segmentsAmountX, segmentsAmountY ) {
 
 	THREE.Geometry.call( this );
 
 	var ix, iz,
 	width_half = width / 2,
 	height_half = height / 2,
-	gridX = segmentsWidth || 1,
-	gridZ = segmentsheight || 1,
+	gridX = segmentsAmountX || 1,
+	gridZ = segmentsAmountY || 1,
 	gridX1 = gridX + 1,
 	gridZ1 = gridZ + 1,
 	segment_width = width / gridX,
