@@ -5,6 +5,7 @@
 		<title>three.js - pointer lock</title>
 		<style>
 			html, body {
+				width: 100%;
 				height: 100%;
 			}
 
@@ -18,10 +19,18 @@
 			#blocker {
 
 				position: absolute;
+
 				width: 100%;
 				height: 100%;
 
 				background-color: rgba(0,0,0,0.5);
+
+			}
+
+			#instructions {
+
+				width: 100%;
+				height: 100%;
 
 				display: -webkit-box;
 				display: -moz-box;
@@ -38,10 +47,6 @@
 				-webkit-box-align: center;
 				-moz-box-align: center;
 				box-align: center;
-
-			}
-
-			#instructions {
 
 				color: #ffffff;
 				text-align: center;
@@ -180,7 +185,7 @@
 				light.position.set( 1, 1, 1 );
 				scene.add( light );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				var light = new THREE.DirectionalLight( 0xffffff, 0.75 );
 				light.position.set( -1, - 0.5, -1 );
 				scene.add( light );
 
