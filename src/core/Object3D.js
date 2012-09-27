@@ -18,7 +18,7 @@ THREE.Object3D = function () {
 
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
-	this.eulerOrder = 'XYZ';
+	this.eulerOrder = THREE.Object3D.defaultEulerOrder;
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.renderDepth = null;
@@ -187,13 +187,23 @@ THREE.Object3D.prototype = {
 
 	},
 
+	traverse: function ( callback ) {
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
 	getChildByName: function ( name, recursive ) {
 
-		var c, cl, child;
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		for ( c = 0, cl = this.children.length; c < cl; c ++ ) {
-
-			child = this.children[ c ];
+			var child = this.children[ i ];
 
 			if ( child.name === name ) {
 
@@ -201,7 +211,7 @@ THREE.Object3D.prototype = {
 
 			}
 
-			if ( recursive ) {
+			if ( recursive === true ) {
 
 				child = child.getChildByName( name, recursive );
 
@@ -229,7 +239,7 @@ THREE.Object3D.prototype = {
 
 			this.children[ i ].getDescendants( array );
 
-		};
+		}
 
 		return array;
 
@@ -301,5 +311,6 @@ THREE.Object3D.prototype = {
 };
 
 THREE.Object3D.__m1 = new THREE.Matrix4();
+THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DCount = 0;

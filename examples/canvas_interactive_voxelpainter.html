@@ -24,10 +24,10 @@
 			var container, stats;
 			var camera, scene, renderer;
 			var projector, plane;
-			var mouse2D, mouse3D, ray,
-			isShiftDown = false,
-			theta = 45, isCtrlDown = false,
+			var mouse2D, mouse3D, ray, theta = 45,
+			isShiftDown = false, isCtrlDown = false,
 			target = new THREE.Vector3( 0, 200, 0 );
+			var ROLLOVERED;
 
 			init();
 			animate();
@@ -140,14 +140,25 @@
 				mouse2D.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse2D.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
+				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
+				ray.direction = mouse3D.subSelf( camera.position ).normalize();
+
+				var intersects = ray.intersectObjects( scene.children );
+
+				if ( intersects.length > 0 ) {
+
+					if ( ROLLOVERED ) ROLLOVERED.color.setHex( 0x00ff80 );
+
+					ROLLOVERED = intersects[ 0 ].face;
+					ROLLOVERED.color.setHex( 0xff8000 )
+
+				}
+
 			}
 
 			function onDocumentMouseDown( event ) {
 
 				event.preventDefault();
-
-				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
-				ray.direction = mouse3D.subSelf( camera.position ).normalize();
 
 				var intersects = ray.intersectObjects( scene.children );
 
@@ -165,7 +176,17 @@
 
 						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.matrixRotationWorld.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
 
-						var voxel = new THREE.Mesh( new THREE.CubeGeometry( 50, 50, 50 ), new THREE.MeshLambertMaterial( { color: 0x00ff80, opacity: 1 } ) );
+						var geometry = new THREE.CubeGeometry( 50, 50, 50 );
+
+						for ( var i = 0; i < geometry.faces.length; i ++ ) {
+
+							geometry.faces[ i ].color.setHex( 0x00ff80 );
+
+						}
+
+						var material = new THREE.MeshLambertMaterial( { vertexColors: THREE.FaceColors } );
+
+						var voxel = new THREE.Mesh( geometry, material );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
 						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
 						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;

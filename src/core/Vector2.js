@@ -160,9 +160,9 @@ THREE.Vector2.prototype = {
 
 	},
 
-	isZero: function () {
+	isZero: function ( v ) {
 
-		return ( this.lengthSq() < 0.0001 /* almostZero */ );
+		return this.lengthSq() < ( v !== undefined ? v : 0.0001 );
 
 	},
 

@@ -33,8 +33,9 @@
 	<body>
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/shaders/BokehShader.js"></script>
+
 		<script src="js/Detector.js"></script>
-		<script src="js/ShaderExtras.js"></script>
 		<script src="js/Stats.js"></script>
 
 		<script src='js/DAT.GUI.min.js'></script>
@@ -243,7 +244,7 @@
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 
-				var bokeh_shader = THREE.ShaderExtras[ "bokeh" ];
+				var bokeh_shader = THREE.BokehShader;
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 

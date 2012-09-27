@@ -352,6 +352,7 @@ THREE.Projector = function() {
 
 					}
 
+					_face.color = face.color;
 					_face.material = material;
 
 					_face.z = _face.centroidScreen.z;

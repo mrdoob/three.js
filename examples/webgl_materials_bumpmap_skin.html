@@ -45,14 +45,10 @@
 
 		<script src="js/ShaderSkin.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-		<script src="js/postprocessing/DotScreenPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
@@ -223,16 +219,16 @@
 				// BECKMANN
 
 				var effectBeckmann = new THREE.ShaderPass( THREE.ShaderSkin[ "beckmann" ] );
-				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
-				effectScreen.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 
 				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
 				var rtwidth = 512, rtheight = 512;
 
 				composerBeckmann = new THREE.EffectComposer( renderer, new THREE.WebGLRenderTarget( rtwidth, rtheight, pars ) );
 				composerBeckmann.addPass( effectBeckmann );
-				composerBeckmann.addPass( effectScreen );
+				composerBeckmann.addPass( effectCopy );
 
 				// EVENTS
 

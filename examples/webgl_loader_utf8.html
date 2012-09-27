@@ -152,7 +152,7 @@
 					object.position.y = -125;
 					scene.add( object );
 
-					THREE.SceneUtils.traverseHierarchy( object, function( node ) {
+					object.traverse( function( node ) {
 
 						node.castShadow = true;
 						node.receiveShadow = true;
@@ -179,7 +179,7 @@
 					object.position.y = -125;
 					scene.add( object );
 
-					THREE.SceneUtils.traverseHierarchy( object, function( node ) {
+					object.traverse( function( node ) {
 
 						node.castShadow = true;
 						node.receiveShadow = true;

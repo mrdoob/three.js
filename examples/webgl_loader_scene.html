@@ -310,17 +310,17 @@
 
 					handle_update( result, 1 );
 
-					THREE.SceneUtils.traverseHierarchy( result.scene, function ( child ) {
+					result.scene.traverse( function ( object ) {
 
-						if ( child.properties.rotating === true ) {
+						if ( object.properties.rotating === true ) {
 
-							rotatingObjects.push( child );
+							rotatingObjects.push( object );
 
 						}
 
-						if ( child instanceof THREE.MorphAnimMesh ) {
+						if ( object instanceof THREE.MorphAnimMesh ) {
 
-							morphAnimatedObjects.push( child );
+							morphAnimatedObjects.push( object );
 
 						}
 

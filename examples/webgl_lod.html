@@ -165,7 +165,15 @@
 				camera.lookAt( scene.position );
 
 				scene.updateMatrixWorld();
-				THREE.SceneUtils.traverseHierarchy( scene, function ( node ) { if ( node instanceof THREE.LOD ) node.update( camera ) } );
+				scene.traverse( function ( object ) {
+
+					if ( object instanceof THREE.LOD ) {
+
+						object.update( camera );
+
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

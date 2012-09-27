@@ -42,7 +42,10 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FocusShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
@@ -161,7 +164,7 @@
 				var effectBloom = new THREE.BloomPass( 0.75 );
 				var effectFilm = new THREE.FilmPass( 0.5, 0.5, 1448, false );
 
-				effectFocus = new THREE.ShaderPass( THREE.ShaderExtras[ "focus" ] );
+				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
 				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
 				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;
