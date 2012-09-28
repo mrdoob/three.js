@@ -3,14 +3,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AxisHelper = function () {
+THREE.AxisHelper = function ( size ) {
 
 	var geometry = new THREE.Geometry();
 
 	geometry.vertices.push(
-		new THREE.Vector3(), new THREE.Vector3( 1, 0, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, 0, 1 )
+		new THREE.Vector3(), new THREE.Vector3( size || 1, 0, 0 ),
+		new THREE.Vector3(), new THREE.Vector3( 0, size || 1, 0 ),
+		new THREE.Vector3(), new THREE.Vector3( 0, 0, size || 1 )
 	);
 
 	geometry.colors.push(

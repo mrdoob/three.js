@@ -36,8 +36,7 @@ var Viewport = function ( signals ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var selectionAxis = new THREE.AxisHelper();
-	selectionAxis.geometry.applyMatrix( new THREE.Matrix4().makeScale( 100, 100, 100 ) );
+	var selectionAxis = new THREE.AxisHelper( 100 );
 	selectionAxis.material.depthTest = false;
 	selectionAxis.material.transparent = true;
 	selectionAxis.matrixAutoUpdate = false;
