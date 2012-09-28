@@ -15,7 +15,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 		// calc bound radius
 
-		if ( ! this.geometry.boundingSphere ) {
+		if ( this.geometry.boundingSphere === null ) {
 
 			this.geometry.computeBoundingSphere();
 
@@ -26,7 +26,7 @@ THREE.Mesh = function ( geometry, material ) {
 
 		// setup morph targets
 
-		if( this.geometry.morphTargets.length ) {
+		if ( this.geometry.morphTargets.length ) {
 
 			this.morphTargetBase = -1;
 			this.morphTargetForcedOrder = [];
@@ -48,19 +48,26 @@ THREE.Mesh = function ( geometry, material ) {
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 
-
-/*
- * Get Morph Target Index by Name
- */
-
-THREE.Mesh.prototype.getMorphTargetIndexByName = function( name ) {
+THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 	if ( this.morphTargetDictionary[ name ] !== undefined ) {
 
 		return this.morphTargetDictionary[ name ];
+
 	}
 
 	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
+
 	return 0;
 
-}
+};
+
+THREE.Mesh.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};

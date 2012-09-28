@@ -26,3 +26,13 @@ THREE.LineStrip = 0;
 THREE.LinePieces = 1;
 
 THREE.Line.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.Line.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Line( this.geometry, this.material, this.type );
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};

@@ -15,7 +15,7 @@ THREE.ParticleSystem = function ( geometry, material ) {
 
 		// calc bound radius
 
-		if( !this.geometry.boundingSphere ) {
+		if( this.geometry.boundingSphere === null ) {
 
 			this.geometry.computeBoundingSphere();
 
@@ -30,3 +30,14 @@ THREE.ParticleSystem = function ( geometry, material ) {
 };
 
 THREE.ParticleSystem.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.ParticleSystem.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.ParticleSystem( this.geometry, this.material );
+	object.sortParticles = this.sortParticles;
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};

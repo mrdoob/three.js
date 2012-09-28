@@ -302,9 +302,44 @@ THREE.Object3D.prototype = {
 
 	},
 
-	clone: function () {
+	clone: function ( object ) {
 
-		// TODO
+		if ( object === undefined ) object = new THREE.Object3D();
+
+		object.name = this.name;
+
+		object.up.copy( this.up );
+
+		object.position.copy( this.position );
+		if ( object.rotation instanceof THREE.Vector3 ) object.rotation.copy( this.rotation ); // because of Sprite madness
+		object.eulerOrder = this.eulerOrder;
+		object.scale.copy( this.scale );
+
+		object.renderDepth = this.renderDepth;
+
+		object.rotationAutoUpdate = this.rotationAutoUpdate;
+
+		object.matrix.copy( this.matrix );
+		object.matrixWorld.copy( this.matrixWorld );
+		object.matrixRotationWorld.copy( this.matrixRotationWorld );
+
+		object.matrixAutoUpdate = this.matrixAutoUpdate;
+		object.matrixWorldNeedsUpdate = this.matrixWorldNeedsUpdate;
+
+		object.quaternion.copy( this.quaternion );
+		object.useQuaternion = this.useQuaternion;
+
+		object.boundRadius = this.boundRadius;
+		object.boundRadiusScale = this.boundRadiusScale;
+
+		object.visible = this.visible;
+
+		object.castShadow = this.castShadow;
+		object.receiveShadow = this.receiveShadow;
+
+		object.frustumCulled = this.frustumCulled;
+
+		return object;
 
 	}
 
