@@ -1,6 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * @modified by Larry Battle / http://bateru.com/news
+ * @author Larry Battle / http://bateru.com/news
  */
 
 var THREE = THREE || { REVISION: '52dev' };
@@ -15,13 +15,8 @@ self.console = self.console || {
 
 };
 
-
-if ( self.Int32Array === undefined ) {
-
-	self.Int32Array = Array;
-	self.Float32Array = Array;
-
-}
+self.Int32Array = self.Int32Array || Array;
+self.Float32Array = self.Float32Array || Array;
 
 // Shims for "startsWith", "endsWith", and "trim" for browsers where this is not yet implemented
 // not sure we should have this, or at least not have it here
@@ -81,8 +76,8 @@ String.prototype.trim = String.prototype.trim || function () {
 		};
 
 	}
-	
-	window.cancelAnimationFrame = window.cancelAnimationFrame || function ( id ) { window.clearTimeout( id ); };
+
+	window.cancelAnimationFrame = window.cancelAnimationFrame || function ( id ) { window.clearTimeout( id ) };
 
 }() );
 
