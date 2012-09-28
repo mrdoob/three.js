@@ -37,15 +37,12 @@ var Viewport = function ( signals ) {
 	sceneHelpers.add( selectionBox );
 
 	var selectionAxis = new THREE.AxisHelper();
+	selectionAxis.geometry.applyMatrix( new THREE.Matrix4().makeScale( 100, 100, 100 ) );
+	selectionAxis.material.depthTest = false;
+	selectionAxis.material.transparent = true;
 	selectionAxis.matrixAutoUpdate = false;
+	selectionAxis.visible = false;
 	sceneHelpers.add( selectionAxis );
-
-	for ( var i = 0; i < selectionAxis.children.length; i ++ ) {
-
-		selectionAxis.children[ i ].material.depthTest = false;
-		selectionAxis.children[ i ].material.transparent = true;
-
-	}
 
 	//
 
@@ -136,7 +133,7 @@ var Viewport = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
-		selectionAxis.traverse( function ( object ) { object.visible = false } );
+		selectionAxis.visible = false;
 
 		if ( object !== null && object.geometry ) {
 
@@ -188,7 +185,7 @@ var Viewport = function ( signals ) {
 			selectionAxis.matrixWorld = object.matrixWorld;
 
 			selectionBox.visible = true;
-			selectionAxis.traverse( function ( object ) { object.visible = true } );
+			selectionAxis.visible = true;
 
 		}
 

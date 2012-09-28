@@ -20,6 +20,7 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 	this.radius = radius || 1;
 	this.segmentsRadius = segmentsRadius || 8;
 	this.closed = closed || false;
+
 	if ( debug ) this.debug = new THREE.Object3D();
 
 	this.grid = [];
@@ -31,7 +32,7 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 		binormal,
 
 		numpoints = this.segments + 1,
-		
+
 		x, y, z,
 		tx, ty, tz,
 		u, v,
@@ -53,14 +54,11 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 	this.normals = normals;
 	this.binormals = binormals;
 
-	
 	function vert( x, y, z ) {
 
 		return scope.vertices.push( new THREE.Vector3( x, y, z ) ) - 1;
 
 	}
-
-
 
 
 	// consruct the grid
@@ -79,9 +77,9 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 
 		if ( this.debug ) {
 
-			this.debug.add(new THREE.ArrowHelper(tangent, pos, radius, 0x0000ff));	
-			this.debug.add(new THREE.ArrowHelper(normal, pos, radius, 0xff0000));
-			this.debug.add(new THREE.ArrowHelper(binormal, pos, radius, 0x00ff00));
+			this.debug.add( new THREE.ArrowHelper(tangent, pos, radius, 0x0000ff ) );
+			this.debug.add( new THREE.ArrowHelper(normal, pos, radius, 0xff0000 ) );
+			this.debug.add( new THREE.ArrowHelper(binormal, pos, radius, 0x00ff00 ) );
 
 		}
 
@@ -92,12 +90,12 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 			cx = -this.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = this.radius * Math.sin( v );
 
-            pos2.copy( pos );
-            pos2.x += cx * normal.x + cy * binormal.x;
-            pos2.y += cx * normal.y + cy * binormal.y;
-            pos2.z += cx * normal.z + cy * binormal.z;
+			pos2.copy( pos );
+			pos2.x += cx * normal.x + cy * binormal.x;
+			pos2.y += cx * normal.y + cy * binormal.y;
+			pos2.z += cx * normal.z + cy * binormal.z;
 
-            this.grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
+			this.grid[ i ][ j ] = vert( pos2.x, pos2.y, pos2.z );
 
 		}
 	}
