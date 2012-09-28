@@ -44,7 +44,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	var geometryClassRow = new UI.Panel();
 	var geometryClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 
-	geometryClassRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
+	geometryClassRow.add( new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
 	geometryClassRow.add( geometryClass );
 
 	container.add( geometryClassRow );
@@ -54,7 +54,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	var geometryVerticesRow = new UI.Panel();
 	var geometryVertices = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 
-	geometryVerticesRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Vertices' ).setColor( '#666' ) );
+	geometryVerticesRow.add( new UI.Text().setValue( 'Vertices' ).setColor( '#666' ) );
 	geometryVerticesRow.add( geometryVertices );
 
 	container.add( geometryVerticesRow );
@@ -64,12 +64,12 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	var geometryFacesRow = new UI.Panel();
 	var geometryFaces = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
 
-	geometryFacesRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Faces' ).setColor( '#666' ) );
+	geometryFacesRow.add( new UI.Text().setValue( 'Faces' ).setColor( '#666' ) );
 	geometryFacesRow.add( geometryFaces );
 
 	container.add( geometryFacesRow );
 
-	container.add( new UI.Break(), new UI.Break(), new UI.Break() );
+	container.add( new UI.Break() );
 
 	//
 

@@ -220,6 +220,7 @@ UI.Panel = function ( position ) {
 
 	this.dom = document.createElement( 'div' );
 	this.dom.style.position = position || 'relative';
+	this.dom.style.marginBottom = '10px';
 
 	// this.dom.addEventListener( 'mousedown', function ( event ) { event.preventDefault() }, false );
 
@@ -459,9 +460,9 @@ UI.Number = function ( position ) {
 	this.dom.style.marginTop = '0px';
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
-	this.dom.style.textDecoration = 'underline';
 	this.dom.style.backgroundColor = 'transparent';
 	this.dom.style.border = '0px';
+	this.dom.style.cursor = 'col-resize';
 
 	this.dom.value = '0.00';
 

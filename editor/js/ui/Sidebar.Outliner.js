@@ -22,7 +22,7 @@ Sidebar.Outliner = function ( signals ) {
 	var sceneGraph = new UI.Select().setMultiple( true ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	container.add( sceneGraph );
 
-	container.add( new UI.Break(), new UI.Break() );
+	container.add( new UI.Break() );
 
 	var scene = null;
 

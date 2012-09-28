@@ -34,7 +34,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	var objectPositionY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
 	var objectPositionZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 
-	objectPositionRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Position' ).setColor( '#666' ) );
+	objectPositionRow.add( new UI.Text().setValue( 'Position' ).setColor( '#666' ) );
 	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
 
 	container.add( objectPositionRow );
@@ -46,7 +46,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	var objectRotationY = new UI.Number( 'absolute' ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
 	var objectRotationZ = new UI.Number( 'absolute' ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 
-	objectRotationRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Rotation' ).setColor( '#666' ) );
+	objectRotationRow.add( new UI.Text().setValue( 'Rotation' ).setColor( '#666' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
 
 	container.add( objectRotationRow );
@@ -58,7 +58,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	var objectScaleY = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '150px' ).setWidth( '50px' ).onChange( update );
 	var objectScaleZ = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '210px' ).setWidth( '50px' ).onChange( update );
 
-	objectScaleRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Scale' ).setColor( '#666' ) );
+	objectScaleRow.add( new UI.Text().setValue( 'Scale' ).setColor( '#666' ) );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
 
 	container.add( objectScaleRow );
@@ -68,12 +68,12 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	var objectVisibleRow = new UI.Panel();
 	var objectVisible = new UI.Checkbox( 'absolute' ).setLeft( '90px' ).onChange( update );
 
-	objectVisibleRow.add( new UI.HorizontalRule(), new UI.Text().setValue( 'Visible' ).setColor( '#666' ) );
+	objectVisibleRow.add( new UI.Text().setValue( 'Visible' ).setColor( '#666' ) );
 	objectVisibleRow.add( objectVisible );
 
 	container.add( objectVisibleRow );
 
-	container.add( new UI.Break(), new UI.Break() );
+	container.add( new UI.Break() );
 
 	//
 
