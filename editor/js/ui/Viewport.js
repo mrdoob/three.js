@@ -123,6 +123,12 @@ var Viewport = function ( signals ) {
 
 	signals.objectChanged.add( function ( object ) {
 
+		if ( object instanceof THREE.Camera ) {
+
+			object.updateProjectionMatrix();
+
+		}
+
 		render();
 
 	} );

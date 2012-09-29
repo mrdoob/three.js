@@ -73,6 +73,38 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 	container.add( objectVisibleRow );
 
+
+	// fov
+
+	var objectFovRow = new UI.Panel();
+	var objectFov = new UI.Number( 'absolute' ).setLeft( '100px' ).onChange( update );
+
+	objectFovRow.add( new UI.Text().setValue( 'Fov' ).setColor( '#666' ) );
+	objectFovRow.add( objectFov );
+
+	container.add( objectFovRow );
+
+	// near
+
+	var objectNearRow = new UI.Panel();
+	var objectNear = new UI.Number( 'absolute' ).setLeft( '100px' ).onChange( update );
+
+	objectNearRow.add( new UI.Text().setValue( 'Near' ).setColor( '#666' ) );
+	objectNearRow.add( objectNear );
+
+	container.add( objectNearRow );
+
+	// far
+
+	var objectFarRow = new UI.Panel();
+	var objectFar = new UI.Number( 'absolute' ).setLeft( '100px' ).onChange( update );
+
+	objectFarRow.add( new UI.Text().setValue( 'Far' ).setColor( '#666' ) );
+	objectFarRow.add( objectFar );
+
+	container.add( objectFarRow );
+
+
 	container.add( new UI.Break() );
 
 	//
@@ -97,7 +129,41 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 			selected.visible = objectVisible.getValue();
 
+			if ( selected.fov !== undefined ) {
+
+				selected.fov = objectFov.getValue();
+
+			}
+
+			if ( selected.near !== undefined ) {
+
+				selected.near = objectNear.getValue();
+
+			}
+
+			if ( selected.far !== undefined ) {
+
+				selected.far = objectFar.getValue();
+
+			}
+
 			signals.objectChanged.dispatch( selected );
+
+		}
+
+	}
+
+	function updateRows() {
+
+		var properties = {
+			'fov': objectFovRow,
+			'near': objectNearRow,
+			'far': objectFarRow
+		};
+
+		for ( var property in properties ) {
+
+			properties[ property ].setDisplay( selected[ property ] !== undefined ? '' : 'none' );
 
 		}
 
@@ -139,7 +205,27 @@ Sidebar.Properties.Object3D = function ( signals ) {
 			objectScaleY.setValue( object.scale.y );
 			objectScaleZ.setValue( object.scale.z );
 
+			if ( object.fov !== undefined ) {
+
+				objectFov.setValue( object.fov );
+
+			}
+
+			if ( object.near !== undefined ) {
+
+				objectNear.setValue( object.near );
+
+			}
+
+			if ( object.far !== undefined ) {
+
+				objectFar.setValue( object.far );
+
+			}
+
 			objectVisible.setValue( object.visible );
+
+			updateRows();
 
 		} else {
 

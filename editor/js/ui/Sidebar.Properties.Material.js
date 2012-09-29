@@ -290,22 +290,28 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	function updateRows() {
 
-		var material = selected.material;
+		var properties = {
+			'color': materialColorRow,
+			'ambient': materialAmbientRow,
+			'emissive': materialEmissiveRow,
+			'specular': materialSpecularRow,
+			'shininess': materialShininessRow,
+			'lightMap': materialLightMapRow,
+			'bumpMap': materialBumpMapRow,
+			'normalMap': materialNormalMapRow,
+			'specularMap': materialSpecularMapRow,
+			'envMap': materialEnvMapRow,
+			'opacity': materialOpacityRow,
+			'transparent': materialTransparentRow,
+			'wireframe': materialWireframeRow
 
-		materialColorRow.setDisplay( material.color !== undefined ? '' : 'none' );
-		materialAmbientRow.setDisplay( material.ambient !== undefined ? '' : 'none' );
-		materialEmissiveRow.setDisplay( material.emissive !== undefined ? '' : 'none' );
-		materialSpecularRow.setDisplay( material.specular !== undefined ? '' : 'none' );
-		materialShininessRow.setDisplay( material.shininess !== undefined ? '' : 'none' );
-		materialMapRow.setDisplay( material.map !== undefined ? '' : 'none' );
-		materialLightMapRow.setDisplay( material.lightMap !== undefined ? '' : 'none' );
-		materialBumpMapRow.setDisplay( material.bumpMap !== undefined ? '' : 'none' );
-		materialNormalMapRow.setDisplay( material.normalMap !== undefined ? '' : 'none' );
-		materialSpecularMapRow.setDisplay( material.specularMap !== undefined ? '' : 'none' );
-		materialEnvMapRow.setDisplay( material.envMap !== undefined ? '' : 'none' );
-		materialOpacityRow.setDisplay( material.opacity !== undefined ? '' : 'none' );
-		materialTransparentRow.setDisplay( material.transparent !== undefined ? '' : 'none' );
-		materialWireframeRow.setDisplay( material.wireframe !== undefined ? '' : 'none' );
+		};
+
+		for ( var property in properties ) {
+
+			properties[ property ].setDisplay( selected.material[ property ] !== undefined ? '' : 'none' );
+
+		}
 
 	};
 
