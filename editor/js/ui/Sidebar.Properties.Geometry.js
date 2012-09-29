@@ -32,7 +32,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	// name
 
 	var geometryNameRow = new UI.Panel();
-	var geometryName = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryName = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	geometryNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	geometryNameRow.add( geometryName );
@@ -42,7 +42,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	// class
 
 	var geometryClassRow = new UI.Panel();
-	var geometryClass = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryClass = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	geometryClassRow.add( new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
 	geometryClassRow.add( geometryClass );
@@ -52,7 +52,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	// vertices
 
 	var geometryVerticesRow = new UI.Panel();
-	var geometryVertices = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryVertices = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	geometryVerticesRow.add( new UI.Text().setValue( 'Vertices' ).setColor( '#666' ) );
 	geometryVerticesRow.add( geometryVertices );
@@ -62,7 +62,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	// faces
 
 	var geometryFacesRow = new UI.Panel();
-	var geometryFaces = new UI.Text( 'absolute' ).setLeft( '90px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryFaces = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	geometryFacesRow.add( new UI.Text().setValue( 'Faces' ).setColor( '#666' ) );
 	geometryFacesRow.add( geometryFaces );
