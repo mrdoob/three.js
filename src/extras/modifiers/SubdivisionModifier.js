@@ -51,89 +51,88 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 /// REFACTORING THIS OUT
 
-function orderedKey( a, b ) {
+THREE.GeometryUtils.orderedKey = function ( a, b ) {
 
 	return Math.min( a, b ) + "_" + Math.max( a, b );
 
-}
-
-var G  = {
+};
 
 
-	// Returns a hashmap - of { edge_key: face_index }
-	computeEdgeFaces: function ( geometry ) {
+// Returns a hashmap - of { edge_key: face_index }
+THREE.GeometryUtils.computeEdgeFaces = function ( geometry ) {
 
-		var i, il, v1, v2, j, k,
-			face, faceIndices, faceIndex,
-			edge,
-			hash,
-			edgeFaceMap = {};
+	var i, il, v1, v2, j, k,
+		face, faceIndices, faceIndex,
+		edge,
+		hash,
+		edgeFaceMap = {};
 
-		function mapEdgeHash( hash, i ) {
+	var orderedKey = THREE.GeometryUtils.orderedKey;
+
+	function mapEdgeHash( hash, i ) {
+		
+		if ( edgeFaceMap[ hash ] === undefined ) {
+
+			edgeFaceMap[ hash ] = [];
 			
-			if ( edgeFaceMap[ hash ] === undefined ) {
-
-				edgeFaceMap[ hash ] = [];
-				
-			}
-			
-			edgeFaceMap[ hash ].push( i );
 		}
+		
+		edgeFaceMap[ hash ].push( i );
+	}
 
 
-		// construct vertex -> face map
+	// construct vertex -> face map
 
-		for( i = 0, il = geometry.faces.length; i < il; i ++ ) {
+	for( i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
-			face = geometry.faces[ i ];
+		face = geometry.faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+		if ( face instanceof THREE.Face3 ) {
 
-				hash = orderedKey( face.a, face.b );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.a, face.b );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.b, face.c );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.b, face.c );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.c, face.a );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.c, face.a );
+			mapEdgeHash( hash, i );
 
-			} else if ( face instanceof THREE.Face4 ) {
+		} else if ( face instanceof THREE.Face4 ) {
 
-				hash = orderedKey( face.a, face.b );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.a, face.b );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.b, face.c );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.b, face.c );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.c, face.d );
-				mapEdgeHash( hash, i );
-				
-				hash = orderedKey( face.d, face.a );
-				mapEdgeHash( hash, i );
-
-			}
+			hash = orderedKey( face.c, face.d );
+			mapEdgeHash( hash, i );
+			
+			hash = orderedKey( face.d, face.a );
+			mapEdgeHash( hash, i );
 
 		}
-
-		// extract faces
-		
-		// var edges = [];
-		// 
-		// var numOfEdges = 0;
-		// for (i in edgeFaceMap) {
-		// 	numOfEdges++;
-		// 	
-		// 	edge = edgeFaceMap[i];
-		// 	edges.push(edge);
-		// 	
-		// }
-		
-		//debug('edgeFaceMap', edgeFaceMap, 'geometry.edges',geometry.edges, 'numOfEdges', numOfEdges);
-
-		return edgeFaceMap;
 
 	}
+
+	// extract faces
+	
+	// var edges = [];
+	// 
+	// var numOfEdges = 0;
+	// for (i in edgeFaceMap) {
+	// 	numOfEdges++;
+	// 	
+	// 	edge = edgeFaceMap[i];
+	// 	edges.push(edge);
+	// 	
+	// }
+	
+	//debug('edgeFaceMap', edgeFaceMap, 'geometry.edges',geometry.edges, 'numOfEdges', numOfEdges);
+
+	return edgeFaceMap;
+
 }
 
 /////////////////////////////
@@ -151,6 +150,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	}
 	
 	var scope = this;
+	var orderedKey = THREE.GeometryUtils.orderedKey;
+	var computeEdgeFaces = THREE.GeometryUtils.computeEdgeFaces;
 
 	function assert() {
 		if (scope.debug && console && console.assert) console.assert.apply(console, arguments);
@@ -344,7 +345,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	//	For each edge, add an edge point.
 	//	Set each edge point to be the average of the two neighbouring face points and its two original endpoints.
 	
-	var edgeFaceMap = G.computeEdgeFaces ( oldGeometry ); // Edge Hash -> Faces Index  eg { edge_key: [face_index, face_index2 ]}
+	var edgeFaceMap = computeEdgeFaces ( oldGeometry ); // Edge Hash -> Faces Index  eg { edge_key: [face_index, face_index2 ]}
 	var edge, faceIndexA, faceIndexB, avg;
 	
 	// debug('edgeFaceMap', edgeFaceMap);
@@ -485,7 +486,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	// Step 3
 	//	For each face point, add an edge for every edge of the face, 
 	//	connecting the face point to each edge point for the face.
-	debugCoreStuff();
 	
 	var facePt, currentVerticeIndex;
 	
