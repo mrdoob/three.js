@@ -110,21 +110,11 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 	function exportGeometry() {
 
-		var output = new THREE.GeometrySaver().save( selected );
-
-		var blob = new Blob( [ output ], { type: 'text/json' } );
-		var objectURL = URL.createObjectURL( blob );
+		var output = new THREE.GeometryExporter().parse( selected );
 
 		/*
-		var clickEvent = document.createEvent( 'MouseEvent' );
-		clickEvent.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null );
-
-		var download = document.createElement( 'a' );
-		download.href = objectURL;
-		download.download = 'geometry.js';
-		download.dispatchEvent( clickEvent );
-
-		URL.revokeObjectURL( objectURL );
+		var blob = new Blob( [ output ], { type: 'text/json' } );
+		var objectURL = URL.createObjectURL( blob );
 		*/
 
 	}

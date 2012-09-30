@@ -2,13 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometrySaver = function () {};
+THREE.GeometryExporter = function () {};
 
-THREE.GeometrySaver.prototype = {
+THREE.GeometryExporter.prototype = {
 
-	constructor: THREE.GeometrySaver,
+	constructor: THREE.GeometryExporter,
 
-	save: function ( geometry ) {
+	parse: function ( geometry ) {
 
 		var vertices = [];
 
