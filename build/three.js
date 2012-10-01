@@ -17674,7 +17674,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				fi = chunk_faces3[ f ];
 
-				face = obj_faces[ fi ];
 				uv = obj_uvs[ fi ];
 
 				if ( uv === undefined ) continue;
@@ -17696,7 +17695,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				fi = chunk_faces4[ f ];
 
-				face = obj_faces[ fi ];
 				uv = obj_uvs[ fi ];
 
 				if ( uv === undefined ) continue;
@@ -17729,7 +17727,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				fi = chunk_faces3[ f ];
 
-				face = obj_faces[ fi ];
 				uv2 = obj_uvs2[ fi ];
 
 				if ( uv2 === undefined ) continue;
@@ -17751,7 +17748,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				fi = chunk_faces4[ f ];
 
-				face = obj_faces[ fi ];
 				uv2 = obj_uvs2[ fi ];
 
 				if ( uv2 === undefined ) continue;
@@ -17782,8 +17778,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
-				face = obj_faces[ chunk_faces3[ f ]	];
-
 				faceArray[ offset_face ] 	 = vertexIndex;
 				faceArray[ offset_face + 1 ] = vertexIndex + 1;
 				faceArray[ offset_face + 2 ] = vertexIndex + 2;
@@ -17806,8 +17800,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
 
 				faceArray[ offset_face ]     = vertexIndex;
 				faceArray[ offset_face + 1 ] = vertexIndex + 1;
