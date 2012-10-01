@@ -11,7 +11,9 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	};
 
 	var container = new UI.Panel();
+	container.setBorderTop( '1px solid #ccc' );
 	container.setDisplay( 'none' );
+	container.setPadding( '10px' );
 
 	var objectType = new UI.Text().setColor( '#666' );
 	container.add( objectType );
@@ -20,7 +22,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	// name
 
 	var objectNameRow = new UI.Panel();
-	var objectName = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' );
+	var objectName = new UI.Input( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	objectNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	objectNameRow.add( objectName );
@@ -104,8 +106,6 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 	container.add( objectFarRow );
 
-
-	container.add( new UI.Break() );
 
 	//
 

@@ -265,6 +265,57 @@ UI.Text.prototype.setValue = function ( value ) {
 
 };
 
+
+// Input
+
+UI.Input = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	this.dom = document.createElement( 'input' );
+	this.dom.style.position = position || 'relative';
+	this.dom.style.marginTop = '-2px';
+	this.dom.style.marginLeft = '-2px';
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
+
+	return this;
+
+};
+
+UI.Input.prototype = Object.create( UI.Element.prototype );
+
+UI.Input.prototype.getValue = function () {
+
+	return this.dom.value;
+
+};
+
+UI.Input.prototype.setValue = function ( value ) {
+
+	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.Input.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+
 // Select
 
 UI.Select = function ( position ) {
@@ -345,6 +396,7 @@ UI.Select.prototype.onChange = function ( callback ) {
 
 };
 
+
 // Checkbox
 
 UI.Checkbox = function ( position ) {
@@ -392,6 +444,7 @@ UI.Checkbox.prototype.onChange = function ( callback ) {
 	return this;
 
 };
+
 
 // Color
 
@@ -642,6 +695,7 @@ UI.HorizontalRule = function ( position ) {
 };
 
 UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
+
 
 // Button
 

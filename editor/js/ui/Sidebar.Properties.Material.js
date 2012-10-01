@@ -18,7 +18,9 @@ Sidebar.Properties.Material = function ( signals ) {
 	};
 
 	var container = new UI.Panel();
+	container.setBorderTop( '1px solid #ccc' );
 	container.setDisplay( 'none' );
+	container.setPadding( '10px' );
 
 	container.add( new UI.Text().setValue( 'MATERIAL' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
@@ -26,7 +28,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	// name
 
 	var materialNameRow = new UI.Panel();
-	var materialName = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialName = new UI.Input( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	materialNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	materialNameRow.add( materialName );
@@ -206,7 +208,6 @@ Sidebar.Properties.Material = function ( signals ) {
 	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
-
 
 
 	//
