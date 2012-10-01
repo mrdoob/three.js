@@ -34,7 +34,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	// name
 
 	var geometryNameRow = new UI.Panel();
-	var geometryName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	geometryNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	geometryNameRow.add( geometryName );
@@ -75,6 +75,16 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	//
 
 	var selected = null;
+
+	function update() {
+
+		if ( selected ) {
+
+			selected.name = geometryName.getValue();
+
+		}
+
+	}
 
 	signals.objectSelected.add( function ( object ) {
 

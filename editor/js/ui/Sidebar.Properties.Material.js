@@ -28,7 +28,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	// name
 
 	var materialNameRow = new UI.Panel();
-	var materialName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	materialNameRow.add( materialName );
@@ -219,6 +219,8 @@ Sidebar.Properties.Material = function ( signals ) {
 		var material = selected.material;
 
 		if ( material ) {
+
+			material.name = materialName.getValue();
 
 			if ( material instanceof materials[ materialClass.getValue() ] == false ) {
 
