@@ -245,7 +245,7 @@ UI.Panel.prototype.add = function () {
 // Text
 
 UI.Text = function ( position ) {
-	
+
 	UI.Element.call( this );
 
 	this.dom = document.createElement( 'span' );
@@ -468,7 +468,8 @@ UI.Number = function ( position ) {
 
 	this.onChangeCallback = null;
 
-	var onMouseDownValue, distance;
+	var distance = 0;
+	var onMouseDownValue = 0;
 
 	var onMouseDown = function ( event ) {
 
@@ -503,7 +504,7 @@ UI.Number = function ( position ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		if ( distance == 0 ) console.log( 'click' );
+		if ( Math.abs( distance ) > 0 ) console.log( 'click' );
 
 	};
 

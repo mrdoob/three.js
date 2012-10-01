@@ -76,9 +76,26 @@ var Viewport = function ( signals ) {
 
 	var projector = new THREE.Projector();
 
+	var distance = 0;
+
 	container.dom.addEventListener( 'mousedown', function ( event ) {
 
 		event.preventDefault();
+
+		distance = 0;
+
+	}, false );
+
+	container.dom.addEventListener( 'mousemove', function ( event ) {
+
+		distance += event.movementX || event.webkitMovementX || event.mozMovementX || 0;
+		distance += event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+
+	}, false );
+
+	container.dom.addEventListener( 'mouseup', function ( event ) {
+
+		if ( Math.abs( distance ) > 1 ) return;
 
 		var vector = new THREE.Vector3(
 			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
