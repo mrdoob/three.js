@@ -65,7 +65,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 ### Change log ###
 
-2012 09 15 - **r51** (405,240 KB, gzip: 99,326 KB)
+2012 09 15 - **r51** (405,491 KB, gzip: 99,389 KB)
 
 * Added `STLLoader`. ([aleeper](http://github.com/aleeper) and [mrdoob](http://github.com/mrdoob))
 * Optimised `Ray` (2x faster). ([gero3](http://github.com/gero3))
