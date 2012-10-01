@@ -245,7 +245,7 @@ UI.Panel.prototype.add = function () {
 // Text
 
 UI.Text = function ( position ) {
-
+	
 	UI.Element.call( this );
 
 	this.dom = document.createElement( 'span' );
@@ -455,71 +455,80 @@ UI.Number = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'input' );
+	this.dom = document.createElement( 'span' );
 	this.dom.style.position = position || 'relative';
-	this.dom.style.marginTop = '0px';
 	this.dom.style.color = '#0080f0';
 	this.dom.style.fontSize = '12px';
-	this.dom.style.backgroundColor = 'transparent';
-	this.dom.style.border = '0px';
 	this.dom.style.cursor = 'col-resize';
 
-	this.dom.value = '0.00';
+	this.dom.textContent = '0.00';
 
 	this.min = - Infinity;
 	this.max = Infinity;
 
 	this.onChangeCallback = null;
 
-	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
+	var onMouseDownValue, distance;
 
 	var onMouseDown = function ( event ) {
 
-		// event.preventDefault();
+		event.preventDefault();
 
-		onMouseDownValue = parseFloat( scope.dom.value );
-		onMouseDownScreenX = event.screenX;
-		onMouseDownScreenY = event.screenY;
+		distance = 0;
+
+		onMouseDownValue = parseFloat( scope.dom.textContent );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
-	}
+	};
 
 	var onMouseMove = function ( event ) {
 
-		var distance = ( event.screenX - onMouseDownScreenX ) - ( event.screenY - onMouseDownScreenY );
-		var amount = event.shiftKey ? 10 : 100;
+		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
+		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
 
-		var number = onMouseDownValue + ( distance / amount );
+		distance += movementX - movementY;
 
-		scope.dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
+		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) );
+
+		scope.dom.textContent = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
-	}
+	};
 
 	var onMouseUp = function ( event ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-	}
+		if ( distance == 0 ) console.log( 'click' );
+
+	};
 
 	this.dom.addEventListener( 'mousedown', onMouseDown, false );
+
+	/*
 	this.dom.addEventListener( 'change', function ( event ) {
 
-		var number = parseFloat( scope.dom.value );
+		var number = parseFloat( scope.dom.textContent );
 
 		if ( number !== NaN ) {
 
-			scope.dom.value = number.toFixed( 2 );
+			scope.dom.textContent = number.toFixed( 2 );
 
 			if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 		}
 
 	}, false );
+	this.dom.addEventListener( 'blur', function ( event ) {
+
+		console.log( 'Yay?' );
+
+	}, false );
+	*/
 
 	return this;
 
@@ -529,13 +538,13 @@ UI.Number.prototype = Object.create( UI.Element.prototype );
 
 UI.Number.prototype.getValue = function () {
 
-	return parseFloat( this.dom.value );
+	return parseFloat( this.dom.textContent );
 
 };
 
 UI.Number.prototype.setValue = function ( value ) {
 
-	this.dom.value = value.toFixed( 2 );
+	this.dom.textContent = value.toFixed( 2 );
 
 	return this;
 

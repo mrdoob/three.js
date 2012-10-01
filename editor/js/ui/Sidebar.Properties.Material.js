@@ -46,7 +46,7 @@ Sidebar.Properties.Material = function ( signals ) {
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial'
 
-	} ).setLeft( '100px' ).setWidth( '180px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	} ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialClassRow.add( new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
 	materialClassRow.add( materialClass );
