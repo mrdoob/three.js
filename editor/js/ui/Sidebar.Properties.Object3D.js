@@ -22,7 +22,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	// name
 
 	var objectNameRow = new UI.Panel();
-	var objectName = new UI.Input( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var objectName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	objectNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	objectNameRow.add( objectName );

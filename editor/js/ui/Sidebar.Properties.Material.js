@@ -28,7 +28,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	// name
 
 	var materialNameRow = new UI.Panel();
-	var materialName = new UI.Input( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	materialNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	materialNameRow.add( materialName );

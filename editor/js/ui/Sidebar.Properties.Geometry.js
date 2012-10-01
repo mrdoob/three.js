@@ -34,7 +34,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	// name
 
 	var geometryNameRow = new UI.Panel();
-	var geometryName = new UI.Input( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
 
 	geometryNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	geometryNameRow.add( geometryName );
