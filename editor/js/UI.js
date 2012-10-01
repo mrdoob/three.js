@@ -457,11 +457,21 @@ UI.Number = function ( position ) {
 
 	this.dom = document.createElement( 'span' );
 	this.dom.style.position = position || 'relative';
-	this.dom.style.color = '#0080f0';
-	this.dom.style.fontSize = '12px';
-	this.dom.style.cursor = 'col-resize';
 
-	this.dom.textContent = '0.00';
+	var display = document.createElement( 'span' );
+	display.style.color = '#0080f0';
+	display.style.fontSize = '12px';
+	display.style.cursor = 'col-resize';
+	display.textContent = '0.00';
+	this.dom.appendChild( display );
+
+	var input = document.createElement( 'input' );
+	input.style.display = 'none';
+	input.style.width = '100%';
+	input.style.marginTop = '-2px';
+	input.style.marginLeft = '-2px';
+	input.style.fontSize = '12px';
+	this.dom.appendChild( input );
 
 	this.min = - Infinity;
 	this.max = Infinity;
@@ -477,7 +487,7 @@ UI.Number = function ( position ) {
 
 		distance = 0;
 
-		onMouseDownValue = parseFloat( scope.dom.textContent );
+		onMouseDownValue = parseFloat( display.textContent );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -493,7 +503,7 @@ UI.Number = function ( position ) {
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) );
 
-		scope.dom.textContent = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
+		display.textContent = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -504,32 +514,66 @@ UI.Number = function ( position ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		if ( Math.abs( distance ) > 0 ) console.log( 'click' );
+		if ( Math.abs( distance ) < 1 ) {
+
+			display.style.display = 'none';
+
+			input.value = display.textContent;
+
+			input.addEventListener( 'change', onInputChange, false );
+			input.addEventListener( 'blur', onInputBlur, false );
+			input.addEventListener( 'keyup', onInputKeyUp, false );
+
+			input.style.display = '';
+
+			input.focus();
+			input.select();
+
+		}
 
 	};
 
-	this.dom.addEventListener( 'mousedown', onMouseDown, false );
+	var onInputChange = function ( event ) {
 
-	/*
-	this.dom.addEventListener( 'change', function ( event ) {
+		var number = parseFloat( input.value );
 
-		var number = parseFloat( scope.dom.textContent );
+		if ( isNaN( number ) === false ) {
 
-		if ( number !== NaN ) {
-
-			scope.dom.textContent = number.toFixed( 2 );
+			display.textContent = number.toFixed( 2 );
 
 			if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 		}
 
-	}, false );
-	this.dom.addEventListener( 'blur', function ( event ) {
+	};
 
-		console.log( 'Yay?' );
+	var onInputBlur = function ( event ) {
 
-	}, false );
-	*/
+		display.style.display = '';
+
+		input.removeEventListener( 'change', onInputChange );
+		input.removeEventListener( 'blur', onInputBlur );
+		input.removeEventListener( 'keyup', onInputKeyUp );
+		input.style.display = 'none';
+
+	};
+
+	var onInputKeyUp = function ( event ) {
+
+		if ( event.keyCode == 13 ) {
+
+			display.style.display = '';
+
+			input.removeEventListener( 'change', onInputChange );
+			input.removeEventListener( 'blur', onInputBlur );
+			input.removeEventListener( 'keyup', onInputKeyUp );
+			input.style.display = 'none';
+
+		}
+
+	};
+
+	display.addEventListener( 'mousedown', onMouseDown, false );
 
 	return this;
 
@@ -539,13 +583,13 @@ UI.Number.prototype = Object.create( UI.Element.prototype );
 
 UI.Number.prototype.getValue = function () {
 
-	return parseFloat( this.dom.textContent );
+	return parseFloat( this.dom.children[ 0 ].textContent );
 
 };
 
 UI.Number.prototype.setValue = function ( value ) {
 
-	this.dom.textContent = value.toFixed( 2 );
+	this.dom.children[ 0 ].textContent = value.toFixed( 2 );
 
 	return this;
 

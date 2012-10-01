@@ -38,7 +38,6 @@ var Viewport = function ( signals ) {
 
 	var selectionAxis = new THREE.AxisHelper( 100 );
 	selectionAxis.material.depthTest = false;
-	selectionAxis.material.transparent = true;
 	selectionAxis.matrixAutoUpdate = false;
 	selectionAxis.visible = false;
 	sceneHelpers.add( selectionAxis );
@@ -102,6 +101,7 @@ var Viewport = function ( signals ) {
 			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
 			0.5
 		);
+
 		projector.unprojectVector( vector, camera );
 
 		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
@@ -110,8 +110,6 @@ var Viewport = function ( signals ) {
 		if ( intersects.length ) {
 
 			signals.objectSelected.dispatch( intersects[ 0 ].object );
-
-			// controls.enabled = false;
 
 		} else {
 
