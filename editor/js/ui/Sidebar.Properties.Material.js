@@ -296,6 +296,7 @@ Sidebar.Properties.Material = function ( signals ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
+			'map': materialMapRow,
 			'lightMap': materialLightMapRow,
 			'bumpMap': materialBumpMapRow,
 			'normalMap': materialNormalMapRow,
