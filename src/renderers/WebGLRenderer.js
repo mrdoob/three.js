@@ -361,6 +361,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	//START_VEROLD_MOD
+	this.deallocateTextureCube = function ( texture ) {
+     _gl.deleteTexture( texture.image.__webglTextureCube );
+  };
+  //END_VEROLD_MOD
+
 	this.deallocateRenderTarget = function ( renderTarget ) {
 
 		if ( !renderTarget || ! renderTarget.__webglTexture ) return;
@@ -3839,19 +3845,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
+		}
+		//START_VEROLD_MOD
+		else if ( scene.enablePicking ) {
 
+			this.setBlending( THREE.NormalBlending );
+			
+			renderObjects( scene.__webglObjects, false, "picking", camera, [], undefined, true );
+			renderObjectsImmediate( scene.__webglObjectsImmediate, "picking", camera, [], undefined, false );	
+		//END_VEROLD_MOD
 		} else {
 
 			// opaque pass (front-to-back order)
 
 			this.setBlending( THREE.NormalBlending );
 
-			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false );
+			//START_VEROLD_MOD
+			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false, undefined, scene.overrideUniforms );
+			//END_VEROLD_MOD
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false );
 
 			// transparent pass (back-to-front order)
-
-			renderObjects( scene.__webglObjects, false, "transparent", camera, lights, fog, true );
+			//START_VEROLD_MOD
+			renderObjects( scene.__webglObjects, false, "transparent", camera, lights, fog, true, undefined, scene.overrideUniforms );
+			//END_VEROLD_MOD
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "transparent", camera, lights, fog, true );
 
 		}
@@ -3920,7 +3937,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function renderObjects ( renderList, reverse, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
+//START_VEROLD_MOD
+	function renderObjects ( renderList, reverse, materialType, camera, lights, fog, useBlending, overrideMaterial, overrideUniforms ) {
+//END_VEROLD_MOD
 
 		var webglObject, object, buffer, material, start, end, delta;
 
@@ -3987,6 +4006,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 					//END_VEROLD_MOD
 
 					if ( ! material ) continue;
+					//START_VEROLD_MOD
+					else {
+						for ( var x in overrideUniforms) {
+							if ( material.uniforms[x] ) {
+								material.uniforms[x].value = overrideUniforms[x].value;
+							}
+						}
+					}
+					//END_VEROLD_MOD
 
 					if ( useBlending ) _this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 
@@ -4009,6 +4037,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				//START_VEROLD_MOD
+				for ( var x in overrideUniforms) {
+					if ( material.uniforms[x] ) {
+						material.uniforms[x].value = overrideUniforms[x].defaultValue;
+					}
+				}
+
 				//Restore material transparency after using object transparency
 				if (overriden) {
 					material.opacity = materialOpacity;
@@ -4096,6 +4130,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			globject.transparent = null;
 
 		}
+		//VEROLD_MOD_START
+		//Set up a special material to use for object picking
+		if ( !globject.picking ) {
+			globject.picking = new THREE.MeshBasicMaterial( { color: object.id } )
+		}
+		//VEROLD_MOD_END
+		
 
 	};
 
@@ -4150,6 +4191,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+		//VEROLD_MOD_START
+		//Set up a special material to use for object picking
+		if ( !globject.picking ) {
+			globject.picking = new THREE.MeshBasicMaterial( { color: object.id } )
+		}
+		//VEROLD_MOD_END
 
 	};
 

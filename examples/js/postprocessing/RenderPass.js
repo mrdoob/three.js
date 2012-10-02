@@ -27,6 +27,10 @@ THREE.RenderPass.prototype = {
 
 		this.scene.overrideMaterial = this.overrideMaterial;
 
+		//START_VEROLD_MOD
+		this.scene.overrideUniforms = this.overrideUniforms;
+		//END_VEROLD_MOD
+
 		if ( this.clearColor ) {
 
 			this.oldClearColor.copy( renderer.getClearColor() );

@@ -2,8 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
-
-THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, sides ) {
+//START_VEROLD_MOD
+THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, sides, flipSided ) {
+//END_VEROLD_MOD
 
 	THREE.Geometry.call( this );
 
@@ -57,13 +58,13 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 	}
 
 	//START_VEROLD_MOD
-	//Flipping the Y-value for the texture coords to compensate for Three.JS change to texture.FlipY
-	this.sides.px && buildPlane( 'z', 'y', - 1,  1, depth, height, -width_half, mpx ); // px
-	this.sides.nx && buildPlane( 'z', 'y',   1,  1, depth, height,  width_half, mnx ); // nx
-	this.sides.py && buildPlane( 'x', 'z',   1,   1, width, depth, height_half, mpy ); // py
-	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, mny ); // ny
-	this.sides.pz && buildPlane( 'x', 'y',   1,  1, width, height, -depth_half, mpz ); // pz
-	this.sides.nz && buildPlane( 'x', 'y', - 1,  1, width, height,  depth_half, mnz ); // nz
+	var flipSideMod = flipSided ? -1 : 1;
+	this.sides.px && buildPlane( 'z', 'y', - 1 * flipSideMod, - 1, depth, height, width_half, mpx ); // px
+	this.sides.nx && buildPlane( 'z', 'y',   1 * flipSideMod, - 1, depth, height, - width_half, mnx ); // nx
+	this.sides.py && buildPlane( 'x', 'z',   1 * flipSideMod,   1, width, depth, height_half, mpy ); // py
+	this.sides.ny && buildPlane( 'x', 'z',   1 * flipSideMod, - 1, width, depth, - height_half, mny ); // ny
+	this.sides.pz && buildPlane( 'x', 'y',   1 * flipSideMod, - 1, width, height, depth_half, mpz ); // pz
+	this.sides.nz && buildPlane( 'x', 'y', - 1 * flipSideMod, - 1, width, height, - depth_half, mnz ); // nz
 	//END_VEROLD_MOD
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
@@ -97,7 +98,7 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		segment_height = height / gridY,
 		normal = new THREE.Vector3();
 
-		normal[ w ] = depth > 0 ? 1 : - 1;
+		normal[ w ] = depth * flipSideMod > 0 ? 1 : - 1;
 
 		for ( iy = 0; iy < gridY1; iy ++ ) {
 
