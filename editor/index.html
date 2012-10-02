@@ -94,7 +94,22 @@
 
 				};
 
-				reader.readAsText( file );
+				var binaryFormats = {
+
+					"ctm": true,
+					"utf8": true
+
+				};
+
+				if ( extension in binaryFormats ) {
+
+					reader.readAsBinaryString( file );
+
+				} else {
+
+					reader.readAsText( file );
+
+				}
 
 			}, false );
 
