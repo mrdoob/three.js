@@ -127,7 +127,12 @@
 						var loader = new THREE.CTMLoader();
 						loader.createModelClassic( file, function( geometry ) {
 
-							console.log( geometry );
+							var material = new THREE.MeshLambertMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
 
 						} );
 
