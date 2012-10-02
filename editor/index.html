@@ -94,7 +94,22 @@
 
 				};
 
-				reader.readAsText( file );
+				var binaryFormats = {
+
+					"ctm": true,
+					"utf8": true
+
+				};
+
+				if ( extension in binaryFormats ) {
+
+					reader.readAsBinaryString( file );
+
+				} else {
+
+					reader.readAsText( file );
+
+				}
 
 			}, false );
 
@@ -112,7 +127,12 @@
 						var loader = new THREE.CTMLoader();
 						loader.createModelClassic( file, function( geometry ) {
 
-							console.log( geometry );
+							var material = new THREE.MeshLambertMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
 
 						} );
 
