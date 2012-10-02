@@ -25,6 +25,9 @@
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
+		<script src="../examples/js/loaders/ctm/lzma.js"></script>
+		<script src="../examples/js/loaders/ctm/ctm.js"></script>
+		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
@@ -99,12 +102,26 @@
 
 				switch ( extension ) {
 
+					case 'ctm':
+
+						var stream = new CTM.Stream( contents );
+						stream.offset = 0;
+
+						var file = new CTM.File( stream );
+
+						var loader = new THREE.CTMLoader();
+						loader.createModelClassic( file, function( geometry ) {
+
+							console.log( geometry );
+
+						} );
+
+						break;
+
 					case 'dae':
 
 						var parser = new DOMParser();
 						var xml = parser.parseFromString( contents, 'text/xml' );
-
-						// TODO: Update ColladaLoader
 
 						var loader = new THREE.ColladaLoader();
 						loader.parse( xml, function ( collada ) {
