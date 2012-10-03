@@ -291,8 +291,10 @@
 
 			}
 
+			var dummyTexture = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
+
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
-			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, map: dummyTexture } );
 			var mesh = new THREE.Mesh( geometry, material );
 
 			signals.objectAdded.dispatch( mesh );

@@ -214,6 +214,8 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var selected = null;
 
+	var dummyTexture = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
+
 	function update() {
 
 		var material = selected.material;
@@ -226,6 +228,8 @@ Sidebar.Properties.Material = function ( signals ) {
 
 				material = new materials[ materialClass.getValue() ]();
 				selected.material = material;
+
+				material.map = dummyTexture;
 
 			}
 
@@ -262,7 +266,12 @@ Sidebar.Properties.Material = function ( signals ) {
 			/*
 			if ( material.map !== undefined ) {
 
-				material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : null;
+				if ( materialMapEnabled.getValue() === true ) {
+
+					material.map = materialMap.getValue();
+
+				}
+				//material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : null;
 				material.needsUpdate = true;
 
 			}
