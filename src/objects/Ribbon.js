@@ -8,6 +8,18 @@ THREE.Ribbon = function ( geometry, material ) {
 
 	this.geometry = geometry;
 	this.material = material;
+	
+	if ( this.geometry ) {
+
+		if ( ! this.geometry.boundingSphere ) {
+
+			this.geometry.computeBoundingSphere();
+
+		}
+		
+		this.boundRadius = geometry.boundingSphere.radius;
+		this.boundCenter = geometry.boundingSphere.origin;
+	}
 
 };
 

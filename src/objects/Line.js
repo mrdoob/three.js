@@ -17,7 +17,9 @@ THREE.Line = function ( geometry, material, type ) {
 			this.geometry.computeBoundingSphere();
 
 		}
-
+		
+		this.boundRadius = geometry.boundingSphere.radius;
+		this.boundCenter = geometry.boundingSphere.origin;
 	}
 
 };
