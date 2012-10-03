@@ -6,9 +6,9 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DLibrary.length;
-
 	THREE.Object3DLibrary.push( this );
+
+	this.id = THREE.Object3DIdCount ++;
 
 	this.name = '';
 	this.properties = {};
@@ -347,7 +347,8 @@ THREE.Object3D.prototype = {
 
 	deallocate: function () {
 
-		THREE.Object3DLibrary[ this.id ] = null;
+		var index = THREE.Object3DLibrary.indexOf( this );
+		if ( index !== -1 ) THREE.Object3DLibrary.splice( index, 1 );
 
 	}
 
@@ -356,4 +357,5 @@ THREE.Object3D.prototype = {
 THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
+THREE.Object3DIdCount = 0;
 THREE.Object3DLibrary = [];

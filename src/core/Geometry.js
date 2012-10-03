@@ -8,9 +8,9 @@
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryLibrary.length;
-
 	THREE.GeometryLibrary.push( this );
+
+	this.id = THREE.GeometryIdCount ++;
 
 	this.name = '';
 
@@ -677,10 +677,12 @@ THREE.Geometry.prototype = {
 
 	deallocate: function () {
 
-		THREE.GeometryLibrary[ this.id ] = null;
+		var index = THREE.GeometryLibrary.indexOf( this );
+		if ( index !== -1 ) THREE.GeometryLibrary.splice( index, 1 );
 
 	}
 
 };
 
+THREE.GeometryIdCount = 0;
 THREE.GeometryLibrary = [];

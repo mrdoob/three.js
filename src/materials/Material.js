@@ -5,9 +5,9 @@
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialLibrary.length;
-
 	THREE.MaterialLibrary.push( this );
+
+	this.id = THREE.MaterialIdCount ++;
 
 	this.name = '';
 
@@ -118,8 +118,10 @@ THREE.Material.prototype.clone = function ( material ) {
 
 THREE.Material.prototype.deallocate = function () {
 
-	THREE.MaterialLibrary[ this.id ] = null;
+	var index = THREE.MaterialLibrary.indexOf( this );
+	if ( index !== -1 ) THREE.MaterialLibrary.splice( index, 1 );
 
 };
 
+THREE.MaterialIdCount = 0;
 THREE.MaterialLibrary = [];

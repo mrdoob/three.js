@@ -6,9 +6,9 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureLibrary.length;
-
 	THREE.TextureLibrary.push( this );
+
+	this.id = THREE.TextureIdCount ++;
 
 	this.image = image;
 
@@ -73,10 +73,12 @@ THREE.Texture.prototype = {
 
 	deallocate: function () {
 
-		THREE.TextureLibrary[ this.id ] = null;
+		var index = THREE.TextureLibrary.indexOf( this );
+		if ( index !== -1 ) THREE.TextureLibrary.splice( index, 1 );
 
 	}
 
 };
 
+THREE.TextureIdCount = 0;
 THREE.TextureLibrary = [];
