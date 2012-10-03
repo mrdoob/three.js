@@ -3294,9 +3294,9 @@ THREE.Math = {
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DLib.length;
+	this.id = THREE.Object3DLibrary.length;
 
-	THREE.Object3DLib.push( this );
+	THREE.Object3DLibrary.push( this );
 
 	this.name = '';
 	this.properties = {};
@@ -3635,7 +3635,7 @@ THREE.Object3D.prototype = {
 
 	deallocate: function () {
 
-		THREE.Object3DLib[ this.id ] = null;
+		THREE.Object3DLibrary[ this.id ] = null;
 
 	}
 
@@ -3644,7 +3644,7 @@ THREE.Object3D.prototype = {
 THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
-THREE.Object3DLib = [];
+THREE.Object3DLibrary = [];
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -4850,9 +4850,9 @@ THREE.UV.prototype = {
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryLib.length;
+	this.id = THREE.GeometryLibrary.length;
 
-	THREE.GeometryLib.push( this );
+	THREE.GeometryLibrary.push( this );
 
 	this.name = '';
 
@@ -5519,13 +5519,13 @@ THREE.Geometry.prototype = {
 
 	deallocate: function () {
 
-		THREE.GeometryLib[ this.id ] = null;
+		THREE.GeometryLibrary[ this.id ] = null;
 
 	}
 
 };
 
-THREE.GeometryLib = [];
+THREE.GeometryLibrary = [];
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9878,9 +9878,9 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialLib.length;
+	this.id = THREE.MaterialLibrary.length;
 
-	THREE.MaterialLib.push( this );
+	THREE.MaterialLibrary.push( this );
 
 	this.name = '';
 
@@ -9991,11 +9991,11 @@ THREE.Material.prototype.clone = function ( material ) {
 
 THREE.Material.prototype.deallocate = function () {
 
-	THREE.MaterialLib[ this.id ] = null;
+	THREE.MaterialLibrary[ this.id ] = null;
 
 };
 
-THREE.MaterialLib = [];
+THREE.MaterialLibrary = [];
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -10747,9 +10747,9 @@ THREE.ShaderMaterial.prototype.clone = function () {
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureLib.length;
+	this.id = THREE.TextureLibrary.length;
 
-	THREE.TextureLib.push( this );
+	THREE.TextureLibrary.push( this );
 
 	this.image = image;
 
@@ -10814,13 +10814,13 @@ THREE.Texture.prototype = {
 
 	deallocate: function () {
 
-		THREE.TextureLib[ this.id ] = null;
+		THREE.TextureLibrary[ this.id ] = null;
 
 	}
 
 };
 
-THREE.TextureLib = [];
+THREE.TextureLibrary = [];
 /**
  * @author alteredq / http://alteredqualia.com/
  */
