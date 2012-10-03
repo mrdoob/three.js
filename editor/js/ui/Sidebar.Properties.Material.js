@@ -109,7 +109,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialMapRow = new UI.Panel();
 	var materialMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialMap = new UI.Text( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialMapRow.add( new UI.Text().setValue( 'Map' ).setColor( '#666' ) );
 	materialMapRow.add( materialMapEnabled );
@@ -121,7 +121,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialLightMapRow = new UI.Panel();
 	var materialLightMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialLightMap = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialLightMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialLightMapRow.add( new UI.Text().setValue( 'Light Map' ).setColor( '#666' ) );
 	materialLightMapRow.add( materialLightMapEnabled );
@@ -133,7 +133,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialBumpMapRow = new UI.Panel();
 	var materialBumpMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialBumpMap = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialBumpMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialBumpMapRow.add( new UI.Text().setValue( 'Bump Map' ).setColor( '#666' ) );
 	materialBumpMapRow.add( materialBumpMapEnabled );
@@ -145,7 +145,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialNormalMapRow = new UI.Panel();
 	var materialNormalMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialNormalMap = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialNormalMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialNormalMapRow.add( new UI.Text().setValue( 'Normal Map' ).setColor( '#666' ) );
 	materialNormalMapRow.add( materialNormalMapEnabled );
@@ -157,7 +157,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialSpecularMapRow = new UI.Panel();
 	var materialSpecularMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialSpecularMap = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialSpecularMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialSpecularMapRow.add( new UI.Text().setValue( 'Specular Map' ).setColor( '#666' ) );
 	materialSpecularMapRow.add( materialSpecularMapEnabled );
@@ -169,7 +169,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialEnvMapRow = new UI.Panel();
 	var materialEnvMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialEnvMap = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialEnvMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialEnvMapRow.add( new UI.Text().setValue( 'Env Map' ).setColor( '#666' ) );
 	materialEnvMapRow.add( materialEnvMapEnabled );
@@ -263,15 +263,47 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
-			/*
 			if ( material.map !== undefined ) {
 
-				if ( materialMapEnabled.getValue() === true ) {
+				material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : dummyTexture;
+				material.needsUpdate = true;
 
-					material.map = materialMap.getValue();
+			}
 
-				}
-				//material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : null;
+			/*
+			if ( material.lightMap !== undefined ) {
+
+				material.lightMap = materialLightMapEnabled.getValue() === true ? materialLightMap.getValue() : null;
+				material.needsUpdate = true;
+
+			}
+			*/
+
+			if ( material.bumpMap !== undefined ) {
+
+				material.bumpMap = materialBumpMapEnabled.getValue() === true ? materialBumpMap.getValue() : null;
+				material.needsUpdate = true;
+
+			}
+
+			if ( material.normalMap !== undefined ) {
+
+				material.normalMap = materialNormalMapEnabled.getValue() === true ? materialNormalMap.getValue() : null;
+				material.needsUpdate = true;
+
+			}
+
+			if ( material.specularMap !== undefined ) {
+
+				material.specularMap = materialSpecularMapEnabled.getValue() === true ? materialSpecularMap.getValue() : null;
+				material.needsUpdate = true;
+
+			}
+
+			/*
+			if ( material.envMap !== undefined ) {
+
+				material.envMap = materialEnvMapEnabled.getValue() === true ? materialEnvMap.getValue() : null;
 				material.needsUpdate = true;
 
 			}
