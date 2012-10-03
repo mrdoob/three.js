@@ -34,9 +34,11 @@ THREE.Object3D = function () {
 
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
-
+	
+	this.boundCenter = null;
 	this.boundRadius = 0.0;
 	this.boundRadiusScale = 1.0;
+	this.boundRadiusScaleWorld = 1.0;
 
 	this.visible = true;
 
@@ -279,10 +281,14 @@ THREE.Object3D.prototype = {
 			if ( this.parent === undefined ) {
 
 				this.matrixWorld.copy( this.matrix );
+				
+				this.boundRadiusScaleWorld = this.boundRadiusScale;
 
 			} else {
 
 				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+				
+				this.boundRadiusScaleWorld = this.parent.boundRadiusScaleWorld * this.boundRadiusScale;
 
 			}
 
@@ -301,7 +307,36 @@ THREE.Object3D.prototype = {
 		}
 
 	},
-
+	
+	getCentroid: function ( ) {
+		
+		if ( this.matrixWorldNeedsUpdate )
+		
+			this.updateMatrixWorld ( false );
+		
+		if ( !this.boundCenter )
+		
+			return this.matrixWorld.getPosition ();
+		
+		if ( this.__offset === undefined )
+		
+			this.__offset = this.boundCenter.clone ();
+			
+		else
+			this.__offset.copy ( this.boundCenter );
+		
+		return this.matrixWorld.multiplyVector3 ( this.__offset );
+	},
+	
+	getBoundRadius: function ( ) {
+		
+		if ( this.matrixWorldNeedsUpdate )
+		
+			this.updateMatrixWorld ( false );
+		
+		return this.boundRadius * this.boundRadiusScaleWorld;
+	},
+	
 	clone: function ( object ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();

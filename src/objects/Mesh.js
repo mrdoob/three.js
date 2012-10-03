@@ -22,6 +22,7 @@ THREE.Mesh = function ( geometry, material ) {
 		}
 
 		this.boundRadius = geometry.boundingSphere.radius;
+		this.boundCenter = geometry.boundingSphere.origin;
 
 
 		// setup morph targets

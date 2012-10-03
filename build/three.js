@@ -690,6 +690,15 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+	
+	setScalar: function ( s ) {
+	
+		this.x = s;
+		this.y = s;
+		this.z = s;
+	
+		return this;
+	},
 
 	copy: function ( v ) {
 
@@ -2706,13 +2715,12 @@ THREE.Frustum.prototype.contains = function ( object ) {
 
 	var distance = 0.0;
 	var planes = this.planes;
-	var matrix = object.matrixWorld;
-	var me = matrix.elements;
-	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
-
+	var radius = - object.getBoundRadius ();
+	var center = object.getCentroid ();
+	
 	for ( var i = 0; i < 6; i ++ ) {
 
-		distance = planes[ i ].x * me[12] + planes[ i ].y * me[13] + planes[ i ].z * me[14] + planes[ i ].w;
+		distance = planes[ i ].x * center.x + planes[ i ].y * center.y + planes[ i ].z * center.z + planes[ i ].w;
 		if ( distance <= radius ) return false;
 
 	}
@@ -2820,11 +2828,11 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 			// Checking boundingSphere
 
-			var scaledRadius = object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis();
+			var scaledRadius = object.getBoundRadius ();
 
 			// Checking distance to ray
 
-			distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
+			distance = distanceFromIntersection( ray.origin, ray.direction, object.getCentroid () );
 
 			if ( distance > scaledRadius) {
 
@@ -3322,9 +3330,11 @@ THREE.Object3D = function () {
 
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
-
+	
+	this.boundCenter = null;
 	this.boundRadius = 0.0;
 	this.boundRadiusScale = 1.0;
+	this.boundRadiusScaleWorld = 1.0;
 
 	this.visible = true;
 
@@ -3567,10 +3577,14 @@ THREE.Object3D.prototype = {
 			if ( this.parent === undefined ) {
 
 				this.matrixWorld.copy( this.matrix );
+				
+				this.boundRadiusScaleWorld = this.boundRadiusScale;
 
 			} else {
 
 				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+				
+				this.boundRadiusScaleWorld = this.parent.boundRadiusScaleWorld * this.boundRadiusScale;
 
 			}
 
@@ -3589,7 +3603,36 @@ THREE.Object3D.prototype = {
 		}
 
 	},
-
+	
+	getCentroid: function ( ) {
+		
+		if ( this.matrixWorldNeedsUpdate )
+		
+			this.updateMatrixWorld ( false );
+		
+		if ( !this.boundCenter )
+		
+			return this.matrixWorld.getPosition ();
+		
+		if ( this.__offset === undefined )
+		
+			this.__offset = this.boundCenter.clone ();
+			
+		else
+			this.__offset.copy ( this.boundCenter );
+		
+		return this.matrixWorld.multiplyVector3 ( this.__offset );
+	},
+	
+	getBoundRadius: function ( ) {
+		
+		if ( this.matrixWorldNeedsUpdate )
+		
+			this.updateMatrixWorld ( false );
+		
+		return this.boundRadius * this.boundRadiusScaleWorld;
+	},
+	
 	clone: function ( object ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
@@ -5380,19 +5423,41 @@ THREE.Geometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		var maxRadiusSq = 0;
+		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0, origin: null };
+		
+		if ( this.vertices.length > 0 )
+		{
+			var maxRadiusSq = 0;
+			
+			var centerOfMass = new THREE.Vector3 ( 0, 0, 0 );
+			
+			var i, l = this.vertices.length;
+			
+			for ( i = 0; i < l; i ++ )
+				
+				centerOfMass.addSelf ( this.vertices [ i ] );
+			
+			centerOfMass.divideScalar ( l );
+			
+			var v, x, y, z, cx = centerOfMass.x, cy = centerOfMass.y, cz = centerOfMass.z;
+			
+			for ( i = 0; i < l; i ++ ) {
+				
+				v = this.vertices [ i ];
+				
+				x = v.x - cx;
+				y = v.y - cy;
+				z = v.z - cz;
+				
+				var radiusSq = x * x + y * y + z * z;
+				
+				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
+			}
 
-		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
-
-		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
-
-			var radiusSq = this.vertices[ i ].lengthSq();
-			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
-
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+			
+			this.boundingSphere.origin = centerOfMass;
 		}
-
-		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
 	},
 
 	/*
@@ -5634,28 +5699,45 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0, origin : null };
 
 		var positions = this.attributes[ "position" ].array;
 
-		if ( positions ) {
+		if ( positions.length > 0 ) {
 
 			var radiusSq, maxRadiusSq = 0;
-			var x, y, z;
+			var x, y, z, cx = 0, cy = 0, cz = 0;
+			var i, il = positions.length;
+			
+			for ( i = 0; i < il; i += 3 )
+			{
+				cx += positions[ i + 0 ];
+				cy += positions[ i + 1 ];
+				cz += positions[ i + 2 ];
+			}
+			
+			var centerOfMass = new THREE.Vector3 ( cx, cy, cz );
+			
+			centerOfMass.divideScalar ( il );
+			
+			cx = centerOfMass.x;
+			cy = centerOfMass.y;
+			cz = centerOfMass.z;
+			
+			for ( i = 0; i < il; i += 3 ) {
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
+				x = positions[ i + 0 ] - cx;
+				y = positions[ i + 1 ] - cy;
+				z = positions[ i + 2 ] - cz;
 
 				radiusSq =  x * x + y * y + z * z;
 				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
 
 			}
-
+			
+			this.boundingSphere.origin = new THREE.Vector3 ( cx, cy, cz );
+			
 			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
 		}
 
 	},
@@ -10892,6 +10974,7 @@ THREE.ParticleSystem = function ( geometry, material ) {
 		}
 
 		this.boundRadius = geometry.boundingSphere.radius;
+		this.boundCenter = geometry.boundingSphere.origin;
 
 	}
 
@@ -10930,7 +11013,9 @@ THREE.Line = function ( geometry, material, type ) {
 			this.geometry.computeBoundingSphere();
 
 		}
-
+		
+		this.boundRadius = geometry.boundingSphere.radius;
+		this.boundCenter = geometry.boundingSphere.origin;
 	}
 
 };
@@ -10973,6 +11058,7 @@ THREE.Mesh = function ( geometry, material ) {
 		}
 
 		this.boundRadius = geometry.boundingSphere.radius;
+		this.boundCenter = geometry.boundingSphere.origin;
 
 
 		// setup morph targets
@@ -11536,6 +11622,18 @@ THREE.Ribbon = function ( geometry, material ) {
 
 	this.geometry = geometry;
 	this.material = material;
+	
+	if ( this.geometry ) {
+
+		if ( ! this.geometry.boundingSphere ) {
+
+			this.geometry.computeBoundingSphere();
+
+		}
+		
+		this.boundRadius = geometry.boundingSphere.radius;
+		this.boundCenter = geometry.boundingSphere.origin;
+	}
 
 };
 

@@ -546,19 +546,41 @@ THREE.Geometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		var maxRadiusSq = 0;
+		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0, origin: null };
+		
+		if ( this.vertices.length > 0 )
+		{
+			var maxRadiusSq = 0;
+			
+			var centerOfMass = new THREE.Vector3 ( 0, 0, 0 );
+			
+			var i, l = this.vertices.length;
+			
+			for ( i = 0; i < l; i ++ )
+				
+				centerOfMass.addSelf ( this.vertices [ i ] );
+			
+			centerOfMass.divideScalar ( l );
+			
+			var v, x, y, z, cx = centerOfMass.x, cy = centerOfMass.y, cz = centerOfMass.z;
+			
+			for ( i = 0; i < l; i ++ ) {
+				
+				v = this.vertices [ i ];
+				
+				x = v.x - cx;
+				y = v.y - cy;
+				z = v.z - cz;
+				
+				var radiusSq = x * x + y * y + z * z;
+				
+				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
+			}
 
-		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
-
-		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
-
-			var radiusSq = this.vertices[ i ].lengthSq();
-			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
-
+			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+			
+			this.boundingSphere.origin = centerOfMass;
 		}
-
-		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
 	},
 
 	/*

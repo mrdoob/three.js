@@ -131,28 +131,45 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0, origin : null };
 
 		var positions = this.attributes[ "position" ].array;
 
-		if ( positions ) {
+		if ( positions.length > 0 ) {
 
 			var radiusSq, maxRadiusSq = 0;
-			var x, y, z;
+			var x, y, z, cx = 0, cy = 0, cz = 0;
+			var i, il = positions.length;
+			
+			for ( i = 0; i < il; i += 3 )
+			{
+				cx += positions[ i + 0 ];
+				cy += positions[ i + 1 ];
+				cz += positions[ i + 2 ];
+			}
+			
+			var centerOfMass = new THREE.Vector3 ( cx, cy, cz );
+			
+			centerOfMass.divideScalar ( il );
+			
+			cx = centerOfMass.x;
+			cy = centerOfMass.y;
+			cz = centerOfMass.z;
+			
+			for ( i = 0; i < il; i += 3 ) {
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
+				x = positions[ i + 0 ] - cx;
+				y = positions[ i + 1 ] - cy;
+				z = positions[ i + 2 ] - cz;
 
 				radiusSq =  x * x + y * y + z * z;
 				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
 
 			}
-
+			
+			this.boundingSphere.origin = new THREE.Vector3 ( cx, cy, cz );
+			
 			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
 		}
 
 	},

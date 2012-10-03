@@ -53,6 +53,15 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+	
+	setScalar: function ( s ) {
+	
+		this.x = s;
+		this.y = s;
+		this.z = s;
+	
+		return this;
+	},
 
 	copy: function ( v ) {
 

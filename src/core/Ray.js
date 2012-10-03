@@ -96,11 +96,11 @@
 
 			// Checking boundingSphere
 
-			var scaledRadius = object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis();
+			var scaledRadius = object.getBoundRadius ();
 
 			// Checking distance to ray
 
-			distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
+			distance = distanceFromIntersection( ray.origin, ray.direction, object.getCentroid () );
 
 			if ( distance > scaledRadius) {
 
