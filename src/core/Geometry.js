@@ -673,6 +673,12 @@ THREE.Geometry.prototype = {
 
 		// TODO
 
+	},
+
+	deallocate: function () {
+
+		THREE.GeometryLib[ this.id ] = null;
+
 	}
 
 };

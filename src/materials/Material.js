@@ -116,4 +116,10 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
+THREE.Material.prototype.deallocate = function () {
+
+	THREE.MaterialLib[ this.id ] = null;
+
+};
+
 THREE.MaterialLib = [];

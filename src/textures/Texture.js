@@ -69,6 +69,12 @@ THREE.Texture.prototype = {
 
 		return texture;
 
+	},
+
+	deallocate: function () {
+
+		THREE.TextureLib[ this.id ] = null;
+
 	}
 
 };

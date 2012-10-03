@@ -343,6 +343,12 @@ THREE.Object3D.prototype = {
 
 		return object;
 
+	},
+
+	deallocate: function () {
+
+		THREE.Object3DLib[ this.id ] = null;
+
 	}
 
 };
