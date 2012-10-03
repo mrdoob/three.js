@@ -5,7 +5,9 @@
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialCount ++;
+	this.id = THREE.MaterialLib.length;
+
+	THREE.MaterialLib.push( this );
 
 	this.name = '';
 
@@ -114,4 +116,4 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
-THREE.MaterialCount = 0;
+THREE.MaterialLib = [];

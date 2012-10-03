@@ -8,7 +8,9 @@
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryCount ++;
+	this.id = THREE.GeometryLib.length;
+
+	THREE.GeometryLib.push( this );
 
 	this.name = '';
 
@@ -675,4 +677,4 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.GeometryCount = 0;
+THREE.GeometryLib = [];
