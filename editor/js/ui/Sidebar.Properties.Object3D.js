@@ -68,7 +68,7 @@ Sidebar.Properties.Object3D = function ( signals ) {
 	// uniform scale lock
 
 	var objectScaleLockRow = new UI.Panel();
-	var objectScaleLock = new UI.Checkbox( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var objectScaleLock = new UI.Checkbox( 'absolute' ).setLeft( '100px' ).onChange( updateScaleLock );
 
 	objectScaleLockRow.add( new UI.Text().setValue( 'Uniform scale' ).setColor( '#666' ) );
 	objectScaleLockRow.add( objectScaleLock );
@@ -122,6 +122,26 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 	var uniformScale = 1;
 
+	var scaleRatioX = 1;
+	var scaleRatioY = 1;
+	var scaleRatioZ = 1;
+
+	var scaleLock = false;
+
+	function updateScaleLock() {
+
+		scaleLock = objectScaleLock.getValue();
+
+		if ( scaleLock ) {
+
+			scaleRatioX = objectScaleX.getValue() / uniformScale;
+			scaleRatioY = objectScaleY.getValue() / uniformScale;
+			scaleRatioZ = objectScaleZ.getValue() / uniformScale;
+
+		}
+
+	}
+
 	function updateScaleX() {
 
 		uniformScale = objectScaleX.getValue();
@@ -157,11 +177,11 @@ Sidebar.Properties.Object3D = function ( signals ) {
 			selected.rotation.y = objectRotationY.getValue();
 			selected.rotation.z = objectRotationZ.getValue();
 
-			if ( objectScaleLock.getValue() ) {
+			if ( scaleLock ) {
 
-				objectScaleX.setValue( uniformScale );
-				objectScaleY.setValue( uniformScale );
-				objectScaleZ.setValue( uniformScale );
+				objectScaleX.setValue( uniformScale * scaleRatioX );
+				objectScaleY.setValue( uniformScale * scaleRatioY );
+				objectScaleZ.setValue( uniformScale * scaleRatioZ );
 
 			}
 
