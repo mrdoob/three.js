@@ -6,9 +6,9 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DLib.length;
+	this.id = THREE.Object3DLibrary.length;
 
-	THREE.Object3DLib.push( this );
+	THREE.Object3DLibrary.push( this );
 
 	this.name = '';
 	this.properties = {};
@@ -347,7 +347,7 @@ THREE.Object3D.prototype = {
 
 	deallocate: function () {
 
-		THREE.Object3DLib[ this.id ] = null;
+		THREE.Object3DLibrary[ this.id ] = null;
 
 	}
 
@@ -356,4 +356,4 @@ THREE.Object3D.prototype = {
 THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
-THREE.Object3DLib = [];
+THREE.Object3DLibrary = [];

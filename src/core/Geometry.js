@@ -8,9 +8,9 @@
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryLib.length;
+	this.id = THREE.GeometryLibrary.length;
 
-	THREE.GeometryLib.push( this );
+	THREE.GeometryLibrary.push( this );
 
 	this.name = '';
 
@@ -677,10 +677,10 @@ THREE.Geometry.prototype = {
 
 	deallocate: function () {
 
-		THREE.GeometryLib[ this.id ] = null;
+		THREE.GeometryLibrary[ this.id ] = null;
 
 	}
 
 };
 
-THREE.GeometryLib = [];
+THREE.GeometryLibrary = [];
