@@ -64,6 +64,10 @@
 
 			//
 
+			var dummyTexture = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
+
+			//
+
 			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
@@ -109,7 +113,7 @@
 							var loader = new THREE.CTMLoader();
 							loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
 
-								var material = new THREE.MeshLambertMaterial();
+								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
 
 								var mesh = new THREE.Mesh( geometry, material );
 
@@ -135,6 +139,13 @@
 
 							var loader = new THREE.ColladaLoader();
 							loader.parse( xml, function ( collada ) {
+
+								 collada.scene.traverse( function ( node ) {
+
+									if ( node.material ) node.material.map = dummyTexture;
+
+								} );
+
 
 								signals.objectAdded.dispatch( collada.scene );
 								signals.objectSelected.dispatch( collada.scene );
@@ -185,7 +196,7 @@
 							if ( data.metadata.type === 'geometry' ) {
 
 								var geometry = new THREE.GeometryLoader().parse( data );
-								var material = new THREE.MeshLambertMaterial();
+								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
 
 								var mesh = new THREE.Mesh( geometry, material );
 
@@ -217,6 +228,12 @@
 
 							var object = new THREE.OBJLoader().parse( contents );
 
+							object.traverse( function ( node ) {
+
+								if ( node.material ) node.material.map = dummyTexture;
+
+							} );
+
 							signals.objectAdded.dispatch( object );
 							signals.objectSelected.dispatch( object );
 
@@ -233,7 +250,7 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.STLLoader().parse( contents );
-							var material = new THREE.MeshLambertMaterial();
+							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
 
 							var mesh = new THREE.Mesh( geometry, material );
 
@@ -275,8 +292,7 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.VTKLoader().parse( contents );
-							var material = new THREE.MeshLambertMaterial();
-
+							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
 							var mesh = new THREE.Mesh( geometry, material );
 
 							signals.objectAdded.dispatch( mesh );
@@ -290,8 +306,6 @@
 				}
 
 			}
-
-			var dummyTexture = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
 
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
 			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, map: dummyTexture } );
