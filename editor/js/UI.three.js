@@ -26,11 +26,15 @@ UI.Texture = function ( position ) {
 			reader.addEventListener( 'load', function ( event ) {
 
 				var image = document.createElement( 'img' );
+				image.addEventListener( 'load', function( event ) {
+
+					scope.texture.image = this;
+					scope.texture.needsUpdate = true;
+
+					if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+				}, false );
 				image.src = event.target.result;
-
-				scope.texture.image = image;
-
-				if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 			}, false );
 			reader.readAsDataURL( file );
