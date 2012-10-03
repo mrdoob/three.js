@@ -6,7 +6,9 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureCount ++;
+	this.id = THREE.TextureLib.length;
+
+	THREE.TextureLib.push( this );
 
 	this.image = image;
 
@@ -71,4 +73,4 @@ THREE.Texture.prototype = {
 
 };
 
-THREE.TextureCount = 0;
+THREE.TextureLib = [];

@@ -3294,7 +3294,9 @@ THREE.Math = {
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DCount ++;
+	this.id = THREE.Object3DLib.length;
+
+	THREE.Object3DLib.push( this );
 
 	this.name = '';
 	this.properties = {};
@@ -3636,7 +3638,7 @@ THREE.Object3D.prototype = {
 THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
-THREE.Object3DCount = 0;
+THREE.Object3DLib = [];
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -4842,7 +4844,9 @@ THREE.UV.prototype = {
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryCount ++;
+	this.id = THREE.GeometryLib.length;
+
+	THREE.GeometryLib.push( this );
 
 	this.name = '';
 
@@ -4869,6 +4873,15 @@ THREE.Geometry = function () {
 	this.hasTangents = false;
 
 	this.dynamic = true; // the intermediate typearrays will be deleted when set to false
+
+	// update flags
+
+	this.verticesNeedUpdate = false;
+	this.elementsNeedUpdate = false;
+	this.uvsNeedUpdate = false;
+	this.normalsNeedUpdate = false;
+	this.tangentsNeedUpdate = false;
+	this.colorsNeedUpdate = false;
 
 };
 
@@ -5500,7 +5513,7 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.GeometryCount = 0;
+THREE.GeometryLib = [];
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9853,7 +9866,9 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialCount ++;
+	this.id = THREE.MaterialLib.length;
+
+	THREE.MaterialLib.push( this );
 
 	this.name = '';
 
@@ -9962,7 +9977,7 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
-THREE.MaterialCount = 0;
+THREE.MaterialLib = [];
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -10714,7 +10729,9 @@ THREE.ShaderMaterial.prototype.clone = function () {
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureCount ++;
+	this.id = THREE.TextureLib.length;
+
+	THREE.TextureLib.push( this );
 
 	this.image = image;
 
@@ -10779,7 +10796,7 @@ THREE.Texture.prototype = {
 
 };
 
-THREE.TextureCount = 0;
+THREE.TextureLib = [];
 /**
  * @author alteredq / http://alteredqualia.com/
  */

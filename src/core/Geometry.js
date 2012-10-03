@@ -8,7 +8,9 @@
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryCount ++;
+	this.id = THREE.GeometryLib.length;
+
+	THREE.GeometryLib.push( this );
 
 	this.name = '';
 
@@ -35,6 +37,15 @@ THREE.Geometry = function () {
 	this.hasTangents = false;
 
 	this.dynamic = true; // the intermediate typearrays will be deleted when set to false
+
+	// update flags
+
+	this.verticesNeedUpdate = false;
+	this.elementsNeedUpdate = false;
+	this.uvsNeedUpdate = false;
+	this.normalsNeedUpdate = false;
+	this.tangentsNeedUpdate = false;
+	this.colorsNeedUpdate = false;
 
 };
 
@@ -666,4 +677,4 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.GeometryCount = 0;
+THREE.GeometryLib = [];

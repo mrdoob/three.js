@@ -6,7 +6,9 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DCount ++;
+	this.id = THREE.Object3DLib.length;
+
+	THREE.Object3DLib.push( this );
 
 	this.name = '';
 	this.properties = {};
@@ -348,4 +350,4 @@ THREE.Object3D.prototype = {
 THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
-THREE.Object3DCount = 0;
+THREE.Object3DLib = [];

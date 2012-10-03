@@ -109,7 +109,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialMapRow = new UI.Panel();
 	var materialMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialMap = new UI.Text( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var materialMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialMapRow.add( new UI.Text().setValue( 'Map' ).setColor( '#666' ) );
 	materialMapRow.add( materialMapEnabled );
@@ -259,6 +259,13 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
+			if ( material.map !== undefined ) {
+
+				material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : null;
+				material.needsUpdate = true;
+
+			}
+
 			if ( material.opacity !== undefined ) {
 
 				material.opacity = materialOpacity.getValue();
@@ -374,13 +381,11 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
-			/*
 			if ( material.map !== undefined ) {
 
-				materialMap.setValue( material.map );
+				materialMapEnabled.setValue( material.map !== null );
 
 			}
-			*/
 
 			if ( material.opacity !== undefined ) {
 
