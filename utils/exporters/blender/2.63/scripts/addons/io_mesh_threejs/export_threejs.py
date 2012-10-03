@@ -482,14 +482,13 @@ def generate_faces(normals, uv_layers, colors, meshes, option_normals, option_co
     chunks = []
     for mesh, object in meshes:
 
-        faceUV = len(mesh.uv_textures) > 0
-        vertexUV = len(mesh.sticky) > 0
+        vertexUV = len(mesh.uv_textures) > 0
         vertexColors = len(mesh.vertex_colors) > 0
 
         mesh_colors = option_colors and vertexColors
-        mesh_uvs = option_uv_coords and (faceUV or vertexUV)
+        mesh_uvs = option_uv_coords and vertexUV
 
-        if faceUV or vertexUV:
+        if vertexUV:
             active_uv_layer = mesh.uv_textures.active
             if not active_uv_layer:
                 mesh_extract_uvs = False
@@ -1276,14 +1275,13 @@ def generate_ascii_model(meshes, morphs,
 
     for mesh, object in meshes:
 
-        faceUV = len(mesh.uv_textures) > 0
-        vertexUV = len(mesh.sticky) > 0
+        vertexUV = len(mesh.uv_textures) > 0
         vertexColors = len(mesh.vertex_colors) > 0
 
         mesh_extract_colors = option_colors and vertexColors
-        mesh_extract_uvs = option_uv_coords and (faceUV or vertexUV)
+        mesh_extract_uvs = option_uv_coords and vertexUV
 
-        if faceUV or vertexUV:
+        if vertexUV:
             active_uv_layer = mesh.uv_textures.active
             if not active_uv_layer:
                 mesh_extract_uvs = False
