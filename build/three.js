@@ -3631,6 +3631,12 @@ THREE.Object3D.prototype = {
 
 		return object;
 
+	},
+
+	deallocate: function () {
+
+		THREE.Object3DLib[ this.id ] = null;
+
 	}
 
 };
@@ -5508,6 +5514,12 @@ THREE.Geometry.prototype = {
 	clone: function () {
 
 		// TODO
+
+	},
+
+	deallocate: function () {
+
+		THREE.GeometryLib[ this.id ] = null;
 
 	}
 
@@ -9977,6 +9989,12 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
+THREE.Material.prototype.deallocate = function () {
+
+	THREE.MaterialLib[ this.id ] = null;
+
+};
+
 THREE.MaterialLib = [];
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -10791,6 +10809,12 @@ THREE.Texture.prototype = {
 		texture.flipY = this.flipY;
 
 		return texture;
+
+	},
+
+	deallocate: function () {
+
+		THREE.TextureLib[ this.id ] = null;
 
 	}
 
