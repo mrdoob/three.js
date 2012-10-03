@@ -30722,6 +30722,7 @@ THREE.TrackballControls = function ( object, domElement ) {
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
  * @author alteredq / http://alteredqualia.com/
+ * @author WestLangley / https://github.com/WestLangley
  */
 
 THREE.OrbitControls = function ( object, domElement ) {
@@ -30743,6 +30744,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
+
+	this.minPolarAngle = 0; // radians
+	this.maxPolarAngle = Math.PI; // radians
+
+	this.minDistance = 0;
+	this.maxDistance = Infinity;
 
 	// internals
 
@@ -30867,15 +30874,20 @@ THREE.OrbitControls = function ( object, domElement ) {
 		theta += thetaDelta;
 		phi += phiDelta;
 
-		// restrict phi to be betwee EPS and PI-EPS
+		// restrict phi to be between desired limits
+		phi = Math.max( this.minPolarAngle, Math.min( this.maxPolarAngle, phi ) );
 
+		// restrict phi to be betwee EPS and PI-EPS
 		phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
 
-		var radius = offset.length();
+		var radius = offset.length() * scale;
+
+		// restrict radius to be between desired limits
+		radius = Math.max( this.minDistance, Math.min( this.maxDistance, radius ) );
+
 		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
-		offset.multiplyScalar( scale );
 
 		position.copy( this.center ).addSelf( offset );
 
