@@ -117,18 +117,18 @@ THREE.MD2CharacterComplex = function () {
 
 		for ( var i = 0; i < original.weapons.length; i ++ ) {
 
-			var mesh = createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
-			mesh.scale.set( this.scale, this.scale, this.scale );
-			mesh.visible = false;
+			var meshWeapon = createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
+			meshWeapon.scale.set( this.scale, this.scale, this.scale );
+			meshWeapon.visible = false;
 
-			mesh.name = name;
+			meshWeapon.name = original.weapons[ i ].name;
 
-			this.root.add( mesh );
+			this.root.add( meshWeapon );
 
-			this.weapons[ i ] = mesh;
-			this.meshWeapon = mesh;
+			this.weapons[ i ] = meshWeapon;
+			this.meshWeapon = meshWeapon;
 
-			this.meshes.push( mesh );
+			this.meshes.push( meshWeapon );
 
 		}
 

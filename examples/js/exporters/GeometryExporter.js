@@ -66,18 +66,18 @@ THREE.GeometryExporter.prototype = {
 
 			}
 
+			/*
 			if ( hasFaceUv ) {
 
-				/*
 				var uv = geometry.faceUvs[ 0 ][ i ];
 				uvs[ 0 ].push( uv.u, uv.v );
-				*/
 
 			}
+			*/
 
+			/*
 			if ( hasFaceVertexUv ) {
 
-				/*
 				var uvs = geometry.faceVertexUvs[ 0 ][ i ];
 
 				if ( isTriangle ) {
@@ -98,9 +98,9 @@ THREE.GeometryExporter.prototype = {
 					);
 
 				}
-				*/
 
 			}
+			*/
 
 			if ( hasFaceNormal ) {
 
@@ -146,7 +146,7 @@ THREE.GeometryExporter.prototype = {
 
 				var hash = x.toString() + y.toString() + z.toString();
 
-				if ( normalsHash[ hash ] !== undefined ) { 
+				if ( normalsHash[ hash ] !== undefined ) {
 
 					return normalsHash[ hash ];
 
