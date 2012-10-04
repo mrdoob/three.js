@@ -64,7 +64,13 @@
 
 			//
 
-			var dummyTexture = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
+			var canvas = document.createElement( 'canvas' );
+			var context = canvas.getContext( '2d' );
+			context.fillStyle = 'rgb(255,255,255)';
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+
+			var dummyTexture = new THREE.Texture( canvas );
+			dummyTexture.needsUpdate = true;
 
 			//
 

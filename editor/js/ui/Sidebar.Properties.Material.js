@@ -214,7 +214,13 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var selected = null;
 
-	var dummyTexture = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
+	var canvas = document.createElement( 'canvas' );
+	var context = canvas.getContext( '2d' );
+	context.fillStyle = 'rgb(255,255,255)';
+	context.fillRect( 0, 0, canvas.width, canvas.height );
+
+	var dummyTexture = new THREE.Texture( canvas );
+	dummyTexture.needsUpdate = true;
 
 	function update() {
 
@@ -426,9 +432,103 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material.map !== undefined ) {
 
-				materialMapEnabled.setValue( material.map !== null );
+				if ( material.map !== null ) {
+
+					materialMapEnabled.setValue( true );
+					materialMap.setValue( material.map );
+
+				} else {
+
+					materialMapEnabled.setValue( false );
+					materialMap.setValue( dummyTexture );
+
+				}
 
 			}
+
+			/*
+			if ( material.lightMap !== undefined ) {
+
+				if ( material.lightMap !== null ) {
+
+					materialLightMapEnabled.setValue( true );
+					materialLightMap.setValue( material.lightMap );
+
+				} else {
+
+					materialLightMapEnabled.setValue( false );
+					materialLightMap.setValue( null );
+
+				}
+
+			}
+			*/
+
+			if ( material.bumpMap !== undefined ) {
+
+				if ( material.bumpMap !== null ) {
+
+					materialBumpMapEnabled.setValue( true );
+					materialBumpMap.setValue( material.bumpMap );
+
+				} else {
+
+					materialBumpMapEnabled.setValue( false );
+					materialBumpMap.setValue( null );
+
+				}
+
+			}
+
+			if ( material.normalMap !== undefined ) {
+
+				if ( material.normalMap !== null ) {
+
+					materialNormalMapEnabled.setValue( true );
+					materialNormalMap.setValue( material.normalMap );
+
+				} else {
+
+					materialNormalMapEnabled.setValue( false );
+					materialNormalMap.setValue( null );
+
+				}
+
+			}
+
+			if ( material.specularMap !== undefined ) {
+
+				if ( material.specularMap !== null ) {
+
+					materialSpecularMapEnabled.setValue( true );
+					materialSpecularMap.setValue( material.specularMap );
+
+				} else {
+
+					materialSpecularMapEnabled.setValue( false );
+					materialSpecularMap.setValue( null );
+
+				}
+
+			}
+
+			/*
+			if ( material.envMap !== undefined ) {
+
+				if ( material.envMap !== null ) {
+
+					materialEnvMapEnabled.setValue( true );
+					materialEnvMap.setValue( material.envMap );
+
+				} else {
+
+					materialEnvMapEnabled.setValue( false );
+					materialEnvMap.setValue( null );
+
+				}
+
+			}
+			*/
 
 			if ( material.opacity !== undefined ) {
 

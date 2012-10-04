@@ -55,6 +55,12 @@ UI.Texture.prototype.getValue = function () {
 
 };
 
+UI.Texture.prototype.setValue = function ( value ) {
+
+	this.texture = value;
+
+};
+
 UI.Texture.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
