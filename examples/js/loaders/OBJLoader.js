@@ -122,11 +122,11 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		var data = data.split( '\no ');
+		var splitData = data.split( '\no ' );
 
-		for ( var i = 0, l = data.length; i < l; i ++ ) {
+		for ( var i = 0, l = splitData.length; i < l; i ++ ) {
 
-			var object = data[ i ];
+			var object = splitData[ i ];
 
 			var geometry = new THREE.Geometry();
 

@@ -474,34 +474,35 @@ THREE.OBJMTLLoader.prototype = {
 			} else if ( line.startsWith( "o " ) ) {
 
 				// Object
-				var object_name = line.substring(2);
-				//object_name = $.trim(object_name);
 
-			} else if (line.startsWith("s ")) {
+				var object_name = line.substring(2);
+				object_name = object_name.trim();
+
+			} else if ( line.startsWith( "s ") ) {
 
 				// Smooth shading
 
-			} else if (line.startsWith("mtllib ")) {
+			} else if ( line.startsWith( "mtllib ") ) {
 
 				// mtl file
 
-				if (mtllibCallback) {
+				if ( mtllibCallback ) {
 
-					var mtlfile = line.substring(7);
-					mtlfile = $.trim(mtlfile);
-					mtllibCallback(mtlfile);
+					var mtlfile = line.substring( 7 );
+					mtlfile = mtlfile.trim();
+					mtllibCallback( mtlfile );
 
 				}
 
 			} else {
 
-				console.error("Unhandled line " + line);
+				console.error( "Unhandled line " + line );
 
 			}
 
 		}
 
-		finalize_mesh(final_model, cur_mesh);
+		finalize_mesh( final_model, cur_mesh );
 
 		return final_model;
 
