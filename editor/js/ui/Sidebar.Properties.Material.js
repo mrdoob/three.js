@@ -455,7 +455,6 @@ Sidebar.Properties.Material = function ( signals ) {
 				} else {
 
 					materialLightMapEnabled.setValue( false );
-					materialLightMap.setValue( null );
 
 				}
 
@@ -472,7 +471,6 @@ Sidebar.Properties.Material = function ( signals ) {
 				} else {
 
 					materialBumpMapEnabled.setValue( false );
-					materialBumpMap.setValue( null );
 
 				}
 
@@ -488,7 +486,6 @@ Sidebar.Properties.Material = function ( signals ) {
 				} else {
 
 					materialNormalMapEnabled.setValue( false );
-					materialNormalMap.setValue( null );
 
 				}
 
@@ -504,7 +501,6 @@ Sidebar.Properties.Material = function ( signals ) {
 				} else {
 
 					materialSpecularMapEnabled.setValue( false );
-					materialSpecularMap.setValue( null );
 
 				}
 
@@ -520,7 +516,6 @@ Sidebar.Properties.Material = function ( signals ) {
 				} else {
 
 					materialEnvMapEnabled.setValue( false );
-					materialEnvMap.setValue( null );
 
 				}
 
