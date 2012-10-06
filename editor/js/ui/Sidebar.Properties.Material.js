@@ -1,6 +1,6 @@
 Sidebar.Properties.Material = function ( signals ) {
 
-	var materials = {
+    var materials = {
 
 		'LineBasicMaterial': THREE.LineBasicMaterial,
 		'MeshBasicMaterial': THREE.MeshBasicMaterial,
@@ -169,7 +169,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialEnvMapRow = new UI.Panel();
 	var materialEnvMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialEnvMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
+	var materialEnvMap = new UI.CubeTexture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialEnvMapRow.add( new UI.Text().setValue( 'Env Map' ).setColor( '#666' ) );
 	materialEnvMapRow.add( materialEnvMapEnabled );
@@ -306,14 +306,12 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
-			/*
 			if ( material.envMap !== undefined ) {
 
 				material.envMap = materialEnvMapEnabled.getValue() === true ? materialEnvMap.getValue() : null;
 				material.needsUpdate = true;
 
 			}
-			*/
 
 			if ( material.opacity !== undefined ) {
 
@@ -512,7 +510,6 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			}
 
-			/*
 			if ( material.envMap !== undefined ) {
 
 				if ( material.envMap !== null ) {
@@ -528,7 +525,6 @@ Sidebar.Properties.Material = function ( signals ) {
 				}
 
 			}
-			*/
 
 			if ( material.opacity !== undefined ) {
 
