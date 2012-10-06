@@ -133,8 +133,8 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialBumpMapRow = new UI.Panel();
 	var materialBumpMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialBumpScale = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).setColor( '#444' ).onChange( update );
 	var materialBumpMap = new UI.Texture( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
+	var materialBumpScale = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).setColor( '#444' ).onChange( update );
 
 	materialBumpMapRow.add( new UI.Text().setValue( 'Bump Map' ).setColor( '#666' ) );
 	materialBumpMapRow.add( materialBumpMapEnabled );
@@ -171,10 +171,13 @@ Sidebar.Properties.Material = function ( signals ) {
 
 	var materialEnvMapRow = new UI.Panel();
 	var materialEnvMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialEnvMap = new UI.CubeTexture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
+	var materialEnvMap = new UI.CubeTexture( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
+	var materialReflectivity = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).setColor( '#444' ).onChange( update );
+
 
 	materialEnvMapRow.add( new UI.Text().setValue( 'Env Map' ).setColor( '#666' ) );
 	materialEnvMapRow.add( materialEnvMapEnabled );
+	materialEnvMapRow.add( materialReflectivity );
 	materialEnvMapRow.add( materialEnvMap );
 
 	container.add( materialEnvMapRow );
@@ -312,6 +315,7 @@ Sidebar.Properties.Material = function ( signals ) {
 			if ( material.envMap !== undefined ) {
 
 				material.envMap = materialEnvMapEnabled.getValue() === true ? materialEnvMap.getValue() : null;
+				material.reflectivity = materialReflectivity.getValue();
 				material.needsUpdate = true;
 
 			}
@@ -517,6 +521,7 @@ Sidebar.Properties.Material = function ( signals ) {
 
 					materialEnvMapEnabled.setValue( true );
 					materialEnvMap.setValue( material.envMap );
+					materialReflectivity.setValue( material.reflectivity );
 
 				} else {
 
