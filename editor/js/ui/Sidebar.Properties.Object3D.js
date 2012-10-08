@@ -297,6 +297,53 @@ Sidebar.Properties.Object3D = function ( signals ) {
 
 	} );
 
+
+	signals.objectChanged.add( function ( object ) {
+
+		if ( object ) {
+
+			container.setDisplay( 'block' );
+
+			objectType.setValue( getObjectInstanceName( object ).toUpperCase() );
+
+			objectName.setValue( object.name );
+
+			objectPositionX.setValue( object.position.x );
+			objectPositionY.setValue( object.position.y );
+			objectPositionZ.setValue( object.position.z );
+
+			objectRotationX.setValue( object.rotation.x );
+			objectRotationY.setValue( object.rotation.y );
+			objectRotationZ.setValue( object.rotation.z );
+
+			objectScaleX.setValue( object.scale.x );
+			objectScaleY.setValue( object.scale.y );
+			objectScaleZ.setValue( object.scale.z );
+
+			if ( object.fov !== undefined ) {
+
+				objectFov.setValue( object.fov );
+
+			}
+
+			if ( object.near !== undefined ) {
+
+				objectNear.setValue( object.near );
+
+			}
+
+			if ( object.far !== undefined ) {
+
+				objectFar.setValue( object.far );
+
+			}
+
+			objectVisible.setValue( object.visible );
+
+		}
+
+	} );
+
 	return container;
 
 }
