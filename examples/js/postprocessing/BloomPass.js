@@ -67,7 +67,7 @@ THREE.BloomPass.prototype = {
 
 		THREE.EffectComposer.quad.material = this.materialConvolution;
 
-		this.convolutionUniforms[ "tDiffuse" ].texture = readBuffer;
+		this.convolutionUniforms[ "tDiffuse" ].value = readBuffer;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurX;
 
 		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, this.renderTargetX, true );
@@ -75,7 +75,7 @@ THREE.BloomPass.prototype = {
 
 		// Render quad with blured scene into texture (convolution pass 2)
 
-		this.convolutionUniforms[ "tDiffuse" ].texture = this.renderTargetX;
+		this.convolutionUniforms[ "tDiffuse" ].value = this.renderTargetX;
 		this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurY;
 
 		renderer.render( THREE.EffectComposer.scene, THREE.EffectComposer.camera, this.renderTargetY, true );
@@ -84,7 +84,7 @@ THREE.BloomPass.prototype = {
 
 		THREE.EffectComposer.quad.material = this.materialScreen;
 
-		this.screenUniforms[ "tDiffuse" ].texture = this.renderTargetY;
+		this.screenUniforms[ "tDiffuse" ].value = this.renderTargetY;
 
 		if ( maskActive ) renderer.context.enable( renderer.context.STENCIL_TEST );
 
@@ -96,5 +96,3 @@ THREE.BloomPass.prototype = {
 
 THREE.BloomPass.blurX = new THREE.Vector2( 0.001953125, 0.0 );
 THREE.BloomPass.blurY = new THREE.Vector2( 0.0, 0.001953125 );
-
-

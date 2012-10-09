@@ -17,20 +17,21 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/renderers/SVGRenderer.js"></script>
+		<script src="js/renderers/SoftwareRenderer3.js"></script>
 		<script src="js/Stats.js"></script>
 
 		<script src="obj/Qrcode.js"></script>
 
 		<script>
 
-			var SCREEN_WIDTH = window.innerWidth / 3;
-			var SCREEN_HEIGHT = window.innerHeight;
+			var SCREEN_WIDTH = window.innerWidth / 2;
+			var SCREEN_HEIGHT = window.innerHeight / 2;
 			var AMOUNT = 100;
 
 			var container, stats;
 
 			var camera, scene;
-			var canvasRenderer, svgRenderer, webglRenderer;
+			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
 
 			var mesh, group, qrcode;
 
@@ -144,9 +145,12 @@
 				svgRenderer.setQuality( 'low' );
 				container.appendChild( svgRenderer.domElement );
 
+				softwareRenderer = new THREE.SoftwareRenderer3();
+				softwareRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( softwareRenderer.domElement );
+
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				// webglRenderer.setFaceCulling( 0 );
 				container.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
@@ -167,14 +171,15 @@
 				windowHalfX = window.innerWidth / 2;
 				windowHalfY = window.innerHeight / 2;
 
-				SCREEN_WIDTH = window.innerWidth / 3;
-				SCREEN_HEIGHT = window.innerHeight;
+				SCREEN_WIDTH = window.innerWidth / 2;
+				SCREEN_HEIGHT = window.innerHeight / 2;
 
 				camera.aspect = SCREEN_WIDTH / window.SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				softwareRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			}
@@ -212,6 +217,7 @@
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );
+				softwareRenderer.render( scene, camera );
 				webglRenderer.render( scene, camera );
 
 			}

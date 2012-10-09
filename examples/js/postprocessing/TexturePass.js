@@ -9,7 +9,7 @@ THREE.TexturePass = function ( texture, opacity ) {
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	this.uniforms[ "opacity" ].value = ( opacity !== undefined ) ? opacity : 1.0;
-	this.uniforms[ "tDiffuse" ].texture = texture;
+	this.uniforms[ "tDiffuse" ].value = texture;
 
 	this.material = new THREE.ShaderMaterial( {
 

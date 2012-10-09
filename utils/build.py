@@ -11,18 +11,12 @@ import tempfile
 def main(argv=None):
 
   parser = argparse.ArgumentParser()
-  parser.add_argument('--include', action='append', choices=['common', 'canvas', 'webgl', 'extras'], required=True)
-  parser.add_argument('--externs', action='append', default=['externs_common.js'])
+  parser.add_argument('--include', action='append', required=True)
+  parser.add_argument('--externs', action='append', default=['externs/common.js'])
   parser.add_argument('--minify', action='store_true', default=False)
   parser.add_argument('--output', default='../build/three.js')
 
   args = parser.parse_args()
-
-  # load files
-
-  f =  open('files.json', 'r')
-  files = json.load(f)
-  f.close()
 
   output = args.output
 
@@ -34,7 +28,8 @@ def main(argv=None):
   tmp = open(path, 'w')
 
   for include in args.include:
-    for filename in files[include]:
+    with open('includes/' + include + '.json','r') as f: files = json.load(f)
+    for filename in files:
       with open(filename, 'r') as f: tmp.write(f.read())
 
   tmp.close()
@@ -44,6 +39,7 @@ def main(argv=None):
   if args.minify is False:
 
       shutil.copy(path, output)
+      os.chmod(output, 0o664); # temp files would usually get 0600
 
   else:
 
@@ -61,4 +57,3 @@ def main(argv=None):
 
 if __name__ == "__main__":
   main()
-

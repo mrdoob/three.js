@@ -41,7 +41,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_color3 = new THREE.Color(),
 	_color4 = new THREE.Color(),
 
-	_patterns = [], _imagedatas = [],
+	_patterns = {}, _imagedatas = {},
 
 	_near, _far,
 
@@ -140,6 +140,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	};
 
+	this.getMaxAnisotropy  = function () {
+
+		return 0;
+
+	};
+
 	this.clear = function () {
 
 		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
@@ -189,7 +195,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
-		_renderData = _projector.projectScene( scene, camera, this.sortElements );
+		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 
@@ -202,7 +208,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( _enableLighting === true ) {
 
-			 calculateLights( _lights );
+			 calculateLights();
 
 		}
 
@@ -323,18 +329,16 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		//
 
-		function calculateLights( lights ) {
-
-			var l, ll, light, lightColor;
+		function calculateLights() {
 
 			_ambientLight.setRGB( 0, 0, 0 );
 			_directionalLights.setRGB( 0, 0, 0 );
 			_pointLights.setRGB( 0, 0, 0 );
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.AmbientLight ) {
 
@@ -364,20 +368,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function calculateLight( lights, position, normal, color ) {
+		function calculateLight( position, normal, color ) {
 
-			var l, ll, light, lightColor, lightPosition, amount;
+			for ( var l = 0, ll = _lights.length; l < ll; l ++ ) {
 
-			for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-
-				light = lights[ l ];
-				lightColor = light.color;
+				var light = _lights[ l ];
+				var lightColor = light.color;
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					lightPosition = light.matrixWorld.getPosition().normalize();
+					var lightPosition = light.matrixWorld.getPosition().normalize();
 
-					amount = normal.dot( lightPosition );
+					var amount = normal.dot( lightPosition );
 
 					if ( amount <= 0 ) continue;
 
@@ -389,9 +391,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else if ( light instanceof THREE.PointLight ) {
 
-					lightPosition = light.matrixWorld.getPosition();
+					var lightPosition = light.matrixWorld.getPosition();
 
-					amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
+					var amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
 
 					if ( amount <= 0 ) continue;
 
@@ -528,7 +530,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.beginPath();
 			_context.moveTo( v1.positionScreen.x, v1.positionScreen.y );
 			_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
-			_context.closePath();
 
 			if ( material instanceof THREE.LineBasicMaterial ) {
 
@@ -558,7 +559,66 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y );
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
+			if ( ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) && material.map === null && material.map === null ) {
+
+				if ( _enableLighting === true ) {
+
+					var diffuse = material.color;
+					var emissive = material.emissive;
+
+					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 3 ) {
+
+						_color1.r = _color2.r = _color3.r = _ambientLight.r;
+						_color1.g = _color2.g = _color3.g = _ambientLight.g;
+						_color1.b = _color2.b = _color3.b = _ambientLight.b;
+
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
+
+						_color1.r = diffuse.r * _color1.r + emissive.r;
+						_color1.g = diffuse.g * _color1.g + emissive.g;
+						_color1.b = diffuse.b * _color1.b + emissive.b;
+
+						_color2.r = diffuse.r * _color2.r + emissive.r;
+						_color2.g = diffuse.g * _color2.g + emissive.g;
+						_color2.b = diffuse.b * _color2.b + emissive.b;
+
+						_color3.r = diffuse.r * _color3.r + emissive.r;
+						_color3.g = diffuse.g * _color3.g + emissive.g;
+						_color3.b = diffuse.b * _color3.b + emissive.b;
+
+						_color4.r = ( _color2.r + _color3.r ) * 0.5;
+						_color4.g = ( _color2.g + _color3.g ) * 0.5;
+						_color4.b = ( _color2.b + _color3.b ) * 0.5;
+
+						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+						clipImage( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, 0, 0, 1, 0, 0, 1, _image );
+
+					} else {
+
+						_color.r = _ambientLight.r;
+						_color.g = _ambientLight.g;
+						_color.b = _ambientLight.b;
+
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
+
+						_color.r = diffuse.r * _color.r + emissive.r;
+						_color.g = diffuse.g * _color.g + emissive.g;
+						_color.b = diffuse.b * _color.b + emissive.b;
+
+						material.wireframe === true ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
+
+					}
+
+				} else {
+
+					material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
+
+				}
+
+			} else if ( material instanceof THREE.MeshBasicMaterial || material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
 
 				if ( material.map !== null ) {
 
@@ -596,62 +656,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					}*/
 
-
-				} else {
-
-					material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
-
-				}
-
-			} else if ( material instanceof THREE.MeshLambertMaterial ) {
-
-				if ( _enableLighting === true ) {
-
-					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 3 ) {
-
-						_color1.r = _color2.r = _color3.r = _ambientLight.r;
-						_color1.g = _color2.g = _color3.g = _ambientLight.g;
-						_color1.b = _color2.b = _color3.b = _ambientLight.b;
-
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
-
-						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
-						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
-						_color1.b = Math.max( 0, Math.min( material.color.b * _color1.b, 1 ) );
-
-						_color2.r = Math.max( 0, Math.min( material.color.r * _color2.r, 1 ) );
-						_color2.g = Math.max( 0, Math.min( material.color.g * _color2.g, 1 ) );
-						_color2.b = Math.max( 0, Math.min( material.color.b * _color2.b, 1 ) );
-
-						_color3.r = Math.max( 0, Math.min( material.color.r * _color3.r, 1 ) );
-						_color3.g = Math.max( 0, Math.min( material.color.g * _color3.g, 1 ) );
-						_color3.b = Math.max( 0, Math.min( material.color.b * _color3.b, 1 ) );
-
-						_color4.r = ( _color2.r + _color3.r ) * 0.5;
-						_color4.g = ( _color2.g + _color3.g ) * 0.5;
-						_color4.b = ( _color2.b + _color3.b ) * 0.5;
-
-						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
-
-						clipImage( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, 0, 0, 1, 0, 0, 1, _image );
-
-					} else {
-
-						_color.r = _ambientLight.r;
-						_color.g = _ambientLight.g;
-						_color.b = _ambientLight.b;
-
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
-
-						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
-						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
-						_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
-
-						material.wireframe === true ? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( _color );
-
-					}
 
 				} else {
 
@@ -714,42 +718,39 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
 			_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
-
-				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
-
-				material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
-
-			} else if ( material instanceof THREE.MeshLambertMaterial ) {
+			if ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
 
 				if ( _enableLighting === true ) {
 
-					if ( !material.wireframe && material.shading == THREE.SmoothShading && element.vertexNormalsWorld.length == 4 ) {
+					var diffuse = material.color;
+					var emissive = material.emissive;
+
+					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
 
 						_color1.r = _color2.r = _color3.r = _color4.r = _ambientLight.r;
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _color4.b = _ambientLight.b;
 
-						calculateLight( _lights, element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( _lights, element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( _lights, element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
-						calculateLight( _lights, element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
+						calculateLight( element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
 
-						_color1.r = Math.max( 0, Math.min( material.color.r * _color1.r, 1 ) );
-						_color1.g = Math.max( 0, Math.min( material.color.g * _color1.g, 1 ) );
-						_color1.b = Math.max( 0, Math.min( material.color.b * _color1.b, 1 ) );
+						_color1.r = diffuse.r * _color1.r + emissive.r;
+						_color1.g = diffuse.g * _color1.g + emissive.g;
+						_color1.b = diffuse.b * _color1.b + emissive.b;
 
-						_color2.r = Math.max( 0, Math.min( material.color.r * _color2.r, 1 ) );
-						_color2.g = Math.max( 0, Math.min( material.color.g * _color2.g, 1 ) );
-						_color2.b = Math.max( 0, Math.min( material.color.b * _color2.b, 1 ) );
+						_color2.r = diffuse.r * _color2.r + emissive.r;
+						_color2.g = diffuse.g * _color2.g + emissive.g;
+						_color2.b = diffuse.b * _color2.b + emissive.b;
 
-						_color3.r = Math.max( 0, Math.min( material.color.r * _color3.r, 1 ) );
-						_color3.g = Math.max( 0, Math.min( material.color.g * _color3.g, 1 ) );
-						_color3.b = Math.max( 0, Math.min( material.color.b * _color3.b, 1 ) );
+						_color3.r = diffuse.r * _color3.r + emissive.r;
+						_color3.g = diffuse.g * _color3.g + emissive.g;
+						_color3.b = diffuse.b * _color3.b + emissive.b;
 
-						_color4.r = Math.max( 0, Math.min( material.color.r * _color4.r, 1 ) );
-						_color4.g = Math.max( 0, Math.min( material.color.g * _color4.g, 1 ) );
-						_color4.b = Math.max( 0, Math.min( material.color.b * _color4.b, 1 ) );
+						_color4.r = diffuse.r * _color4.r + emissive.r;
+						_color4.g = diffuse.g * _color4.g + emissive.g;
+						_color4.b = diffuse.b * _color4.b + emissive.b;
 
 						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 
@@ -767,11 +768,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidWorld, element.normalWorld, _color );
 
-						_color.r = Math.max( 0, Math.min( material.color.r * _color.r, 1 ) );
-						_color.g = Math.max( 0, Math.min( material.color.g * _color.g, 1 ) );
-						_color.b = Math.max( 0, Math.min( material.color.b * _color.b, 1 ) );
+						_color.r = diffuse.r * _color.r + emissive.r;
+						_color.g = diffuse.g * _color.g + emissive.g;
+						_color.b = diffuse.b * _color.b + emissive.b;
 
 						drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
@@ -786,6 +787,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 					material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
 
 				}
+
+			} else if ( material instanceof THREE.MeshBasicMaterial ) {
+
+				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+
+				material.wireframe === true ? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin ) : fillPath( material.color );
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
@@ -829,7 +836,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.moveTo( x0, y0 );
 			_context.lineTo( x1, y1 );
 			_context.lineTo( x2, y2 );
-			_context.lineTo( x0, y0 );
+			_context.closePath();
 
 		}
 
@@ -840,7 +847,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.lineTo( x1, y1 );
 			_context.lineTo( x2, y2 );
 			_context.lineTo( x3, y3 );
-			_context.lineTo( x0, y0 );
+			_context.closePath();
 
 		}
 
@@ -866,20 +873,30 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-			if ( texture.image === undefined || texture.image.width === 0 ) return;
+			if ( texture instanceof THREE.DataTexture || texture.image === undefined || texture.image.width == 0 ) return;
 
-			if ( texture.needsUpdate === true || _patterns[ texture.id ] === undefined ) {
+			if ( texture.needsUpdate === true ) {
 
 				var repeatX = texture.wrapS == THREE.RepeatWrapping;
 				var repeatY = texture.wrapT == THREE.RepeatWrapping;
 
-				_patterns[ texture.id ] = _context.createPattern( texture.image, repeatX === true && repeatY === true ? 'repeat' : repeatX === true && repeatY === false ? 'repeat-x' : repeatX === false && repeatY === true ? 'repeat-y' : 'no-repeat' );
+				_patterns[ texture.id ] = _context.createPattern(
+					texture.image, repeatX === true && repeatY === true
+						? 'repeat'
+						: repeatX === true && repeatY === false
+							? 'repeat-x'
+							: repeatX === false && repeatY === true
+								? 'repeat-y'
+								: 'no-repeat'
+				);
 
 				texture.needsUpdate = false;
 
 			}
 
-			setFillStyle( _patterns[ texture.id ] );
+			_patterns[ texture.id ] === undefined
+				? setFillStyle( 'rgba(0,0,0,1)' )
+				: setFillStyle( _patterns[ texture.id ] );
 
 			// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
@@ -918,9 +935,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 					context.drawImage( texture.image, 0, 0 );
 
 					_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
-
-					// variables cannot be deleted in ES5 strict mode
-					//delete canvas;
 
 				}
 
@@ -993,26 +1007,21 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			// http://mrdoob.com/blog/post/710
 
-			var c1r = ~~ ( color1.r * 255 ), c1g = ~~ ( color1.g * 255 ), c1b = ~~ ( color1.b * 255 ),
-			c2r = ~~ ( color2.r * 255 ), c2g = ~~ ( color2.g * 255 ), c2b = ~~ ( color2.b * 255 ),
-			c3r = ~~ ( color3.r * 255 ), c3g = ~~ ( color3.g * 255 ), c3b = ~~ ( color3.b * 255 ),
-			c4r = ~~ ( color4.r * 255 ), c4g = ~~ ( color4.g * 255 ), c4b = ~~ ( color4.b * 255 );
+			_pixelMapData[ 0 ] = ( color1.r * 255 ) | 0;
+			_pixelMapData[ 1 ] = ( color1.g * 255 ) | 0;
+			_pixelMapData[ 2 ] = ( color1.b * 255 ) | 0;
 
-			_pixelMapData[ 0 ] = c1r < 0 ? 0 : c1r > 255 ? 255 : c1r;
-			_pixelMapData[ 1 ] = c1g < 0 ? 0 : c1g > 255 ? 255 : c1g;
-			_pixelMapData[ 2 ] = c1b < 0 ? 0 : c1b > 255 ? 255 : c1b;
+			_pixelMapData[ 4 ] = ( color2.r * 255 ) | 0;
+			_pixelMapData[ 5 ] = ( color2.g * 255 ) | 0;
+			_pixelMapData[ 6 ] = ( color2.b * 255 ) | 0;
 
-			_pixelMapData[ 4 ] = c2r < 0 ? 0 : c2r > 255 ? 255 : c2r;
-			_pixelMapData[ 5 ] = c2g < 0 ? 0 : c2g > 255 ? 255 : c2g;
-			_pixelMapData[ 6 ] = c2b < 0 ? 0 : c2b > 255 ? 255 : c2b;
+			_pixelMapData[ 8 ] = ( color3.r * 255 ) | 0;
+			_pixelMapData[ 9 ] = ( color3.g * 255 ) | 0;
+			_pixelMapData[ 10 ] = ( color3.b * 255 ) | 0;
 
-			_pixelMapData[ 8 ] = c3r < 0 ? 0 : c3r > 255 ? 255 : c3r;
-			_pixelMapData[ 9 ] = c3g < 0 ? 0 : c3g > 255 ? 255 : c3g;
-			_pixelMapData[ 10 ] = c3b < 0 ? 0 : c3b > 255 ? 255 : c3b;
-
-			_pixelMapData[ 12 ] = c4r < 0 ? 0 : c4r > 255 ? 255 : c4r;
-			_pixelMapData[ 13 ] = c4g < 0 ? 0 : c4g > 255 ? 255 : c4g;
-			_pixelMapData[ 14 ] = c4b < 0 ? 0 : c4b > 255 ? 255 : c4b;
+			_pixelMapData[ 12 ] = ( color4.r * 255 ) | 0;
+			_pixelMapData[ 13 ] = ( color4.g * 255 ) | 0;
+			_pixelMapData[ 14 ] = ( color4.b * 255 ) | 0;
 
 			_pixelMapContext.putImageData( _pixelMapImage, 0, 0 );
 			_gradientMapContext.drawImage( _pixelMap, 0, 0 );

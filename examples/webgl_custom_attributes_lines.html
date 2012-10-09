@@ -95,7 +95,6 @@
 			bevelSize = 1.5,
 			bevelSegments = 10,
 			bevelEnabled = true,
-			bend = false,
 
 			font = "helvetiker", 		// helvetiker, optimer, gentilis, droid sans, droid serif
 			weight = "bold",		// normal bold
@@ -131,13 +130,13 @@
 
 			var shaderMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
+				uniforms:       uniforms,
 				attributes:     attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
-				blending: 		THREE.AdditiveBlending,
-				depthTest:		false,
-				transparent:	true
+				blending:       THREE.AdditiveBlending,
+				depthTest:      false,
+				transparent:    true
 
 			});
 
@@ -157,8 +156,6 @@
 				bevelSize: bevelSize,
 				bevelEnabled: bevelEnabled,
 				bevelSegments: bevelSegments,
-
-				bend: bend,
 
 				steps: steps
 

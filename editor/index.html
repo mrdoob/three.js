@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js editor</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				font-size: 14px;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			hr {
+				border: 0px;
+				border-top: 1px solid #ccc;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/STLLoader.js"></script>
+		<script src="../examples/js/loaders/UTF8Loader.js"></script>
+		<script src="../examples/js/loaders/VTKLoader.js"></script>
+
+		<script src="js/libs/signals.min.js"></script>
+
+		<script src="js/UI.js"></script>
+		<script src="js/ui/Menubar.js"></script>
+		<script src="js/ui/Viewport.js"></script>
+		<script src="js/ui/Sidebar.js"></script>
+		<script src="js/ui/Sidebar.Outliner.js"></script>
+		<script src="js/ui/Sidebar.Properties.js"></script>
+		<script src="js/ui/Sidebar.Properties.Object3D.js"></script>
+		<script src="js/ui/Sidebar.Properties.Geometry.js"></script>
+		<script src="js/ui/Sidebar.Properties.Material.js"></script>
+
+		<script>
+
+			window.URL = window.URL || window.webkitURL;
+			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+			var SIGNALS = signals;
+
+			var signals = {
+
+				sceneCreated: new SIGNALS.Signal(),
+				sceneChanged: new SIGNALS.Signal(),
+				objectAdded: new SIGNALS.Signal(),
+				objectSelected: new SIGNALS.Signal(),
+				objectChanged: new SIGNALS.Signal(),
+				materialChanged: new SIGNALS.Signal(),
+				windowResize: new SIGNALS.Signal()
+
+			};
+
+			//
+
+			var menubar = new Menubar( signals );
+			menubar.setWidth( '100%' );
+			menubar.setHeight( '32px' );
+			document.body.appendChild( menubar.dom );
+
+			var sidebar = new Sidebar( signals );
+			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			sidebar.setTop( '32px' );
+			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			document.body.appendChild( sidebar.dom );
+
+			var viewport = new Viewport( signals );
+			viewport.setTop( '32px' );
+			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			document.body.appendChild( viewport.dom );
+
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+
+				var file = event.dataTransfer.files[ 0 ];
+				var extension = file.name.split( '.' ).pop().toLowerCase();
+				var reader = new FileReader();
+
+				reader.onload = function ( event ) {
+
+					parseFile( event.target.result, extension );
+
+				};
+
+				reader.readAsText( file );
+
+			}, false );
+
+			var parseFile = function ( contents, extension ) {
+
+				switch ( extension ) {
+
+					case 'dae':
+
+						var parser = new DOMParser();
+						var xml = parser.parseFromString( contents, 'text/xml' );
+
+						// TODO: Update ColladaLoader
+
+						var loader = new THREE.ColladaLoader();
+						loader.parse( xml, function ( collada ) {
+
+							signals.objectAdded.dispatch( collada.scene );
+							signals.objectSelected.dispatch( collada.scene );
+
+						} );
+
+						break;
+
+					case 'js':
+
+						// 2.0
+
+						if ( contents.indexOf( 'postMessage' ) !== -1 ) {
+
+							var blob = new Blob( [ contents ], { type: 'text/javascript' } );
+							var url = URL.createObjectURL( blob );
+
+							var worker = new Worker( url );
+
+							worker.onmessage = function ( event ) {
+
+								event.data.metadata = { 'format': 2 };
+								parseFile( JSON.stringify( event.data ), extension );
+
+							};
+
+							worker.postMessage( new Date().getTime() );
+
+							return;
+
+						}
+
+						// 3.0
+
+						var data = JSON.parse( contents );
+
+						if ( data.metadata === undefined ) data.metadata = { type: 'geometry' }; // 2.0
+						if ( data.metadata.type === undefined ) data.metadata.type = 'geometry'; // 3.0
+
+						if ( data.metadata.type === 'geometry' ) {
+
+							var geometry = new THREE.GeometryLoader().parse( data );
+							var material = new THREE.MeshLambertMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
+
+						} else if ( data.metadata.type === 'scene' ) {
+
+							new THREE.SceneLoader().parse( data, function ( scene ) {
+
+								signals.objectAdded.dispatch( scene );
+								signals.objectSelected.dispatch( scene );
+
+							}, '' );
+
+						}
+
+						break;
+
+					case 'obj':
+
+						var object = new THREE.OBJLoader().parse( contents );
+
+						signals.objectAdded.dispatch( object );
+						signals.objectSelected.dispatch( object );
+
+						break;
+
+					case 'stl':
+
+						var geometry = new THREE.STLLoader().parse( contents );
+						var material = new THREE.MeshLambertMaterial();
+
+						var mesh = new THREE.Mesh( geometry, material );
+
+						signals.objectAdded.dispatch( mesh );
+						signals.objectSelected.dispatch( mesh );
+
+						break;
+
+					case 'utf8':
+
+						var geometry = new THREE.UTF8Loader().parse( contents );
+						var material = new THREE.MeshLambertMaterial();
+
+						var mesh = new THREE.Mesh( geometry, material );
+
+						signals.objectAdded.dispatch( mesh );
+						signals.objectSelected.dispatch( mesh );
+
+						break;
+
+					case 'vtk':
+
+						var geometry = new THREE.VTKLoader().parse( contents );
+						var material = new THREE.MeshLambertMaterial();
+
+						var mesh = new THREE.Mesh( geometry, material );
+
+						signals.objectAdded.dispatch( mesh );
+						signals.objectSelected.dispatch( mesh );
+
+						break;
+
+				}
+
+			}
+
+			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
+			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+			var mesh = new THREE.Mesh( geometry, material );
+
+			signals.objectAdded.dispatch( mesh );
+			signals.objectSelected.dispatch( mesh );
+
+			var onWindowResize = function ( event ) {
+
+				signals.windowResize.dispatch();
+
+			};
+
+			onWindowResize();
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		</script>
+	</body>
+</html>

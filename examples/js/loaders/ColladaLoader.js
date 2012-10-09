@@ -60,21 +60,26 @@ THREE.ColladaLoader = function () {
 
 		if ( document.implementation && document.implementation.createDocument ) {
 
-			var req = new XMLHttpRequest();
+			var request = new XMLHttpRequest();
 
-			if ( req.overrideMimeType ) req.overrideMimeType( "text/xml" );
+			request.onreadystatechange = function() {
 
-			req.onreadystatechange = function() {
+				if( request.readyState == 4 ) {
 
-				if( req.readyState == 4 ) {
-
-					if( req.status == 0 || req.status == 200 ) {
+					if( request.status == 0 || request.status == 200 ) {
 
 
-						if ( req.responseXML ) {
+						if ( request.responseXML ) {
 
 							readyCallbackFunc = readyCallback;
-							parse( req.responseXML, undefined, url );
+							parse( request.responseXML, undefined, url );
+
+						} else if ( request.responseText ) {
+
+							readyCallbackFunc = readyCallback;
+							var xmlParser = new DOMParser();
+							var responseXML = xmlParser.parseFromString( request.responseText, "application/xml" );
+							parse( responseXML, undefined, url );
 
 						} else {
 
@@ -84,17 +89,17 @@ THREE.ColladaLoader = function () {
 
 					}
 
-				} else if ( req.readyState == 3 ) {
+				} else if ( request.readyState == 3 ) {
 
 					if ( progressCallback ) {
 
 						if ( length == 0 ) {
 
-							length = req.getResponseHeader( "Content-Length" );
+							length = request.getResponseHeader( "Content-Length" );
 
 						}
 
-						progressCallback( { total: length, loaded: req.responseText.length } );
+						progressCallback( { total: length, loaded: request.responseText.length } );
 
 					}
 
@@ -102,8 +107,8 @@ THREE.ColladaLoader = function () {
 
 			}
 
-			req.open( "GET", url, true );
-			req.send( null );
+			request.open( "GET", url, true );
+			request.send( null );
 
 		} else {
 

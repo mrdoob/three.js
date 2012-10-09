@@ -32,8 +32,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		uniforms: {
 
-			"mapLeft": { type: "t", value: 0, texture: _renderTargetL },
-			"mapRight": { type: "t", value: 1, texture: _renderTargetR }
+			"mapLeft": { type: "t", value: _renderTargetL },
+			"mapRight": { type: "t", value: _renderTargetR }
 
 		},
 
@@ -84,8 +84,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
 		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
-		_material.uniforms[ "mapLeft" ].texture = _renderTargetL;
-		_material.uniforms[ "mapRight" ].texture = _renderTargetR;
+		_material.uniforms[ "mapLeft" ].value = _renderTargetL;
+		_material.uniforms[ "mapRight" ].value = _renderTargetR;
 
 		renderer.setSize( width, height );
 

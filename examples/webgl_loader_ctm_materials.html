@@ -106,7 +106,7 @@
 				textureCube = THREE.ImageUtils.loadTextureCube( urls );
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = textureCube;
+				shader.uniforms[ "tCube" ].value = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 
@@ -196,9 +196,6 @@
 */
 				// new way via CTMLoader and separate parts
 
-				var useWorker = true,
-					useBuffers = true;
-
 				loaderCTM = new THREE.CTMLoader( true );
 				document.body.appendChild( loaderCTM.statusDomElement );
 
@@ -224,7 +221,7 @@
 
 					console.log( "load time:", end - start, "ms" );
 
-				}, useWorker, useBuffers );
+				}, { useWorker: true } );
 
 			}
 

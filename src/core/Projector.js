@@ -6,11 +6,12 @@
 
 THREE.Projector = function() {
 
-	var _object, _objectCount, _objectPool = [],
-	_vertex, _vertexCount, _vertexPool = [],
-	_face, _face3Count, _face3Pool = [], _face4Count, _face4Pool = [],
-	_line, _lineCount, _linePool = [],
-	_particle, _particleCount, _particlePool = [],
+	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
+	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
+	_face, _face3Count, _face3Pool = [], _face3PoolLength = 0,
+	_face4Count, _face4Pool = [], _face4PoolLength = 0,
+	_line, _lineCount, _linePool = [], _linePoolLength = 0,
+	_particle, _particleCount, _particlePool = [], _particlePoolLength = 0,
 
 	_renderData = { objects: [], sprites: [], lights: [], elements: [] },
 
@@ -67,7 +68,7 @@ THREE.Projector = function() {
 
 	};
 
-	function projectGraph( root, sort ) {
+	var projectGraph = function ( root, sortObjects ) {
 
 		_objectCount = 0;
 
@@ -75,42 +76,84 @@ THREE.Projector = function() {
 		_renderData.sprites.length = 0;
 		_renderData.lights.length = 0;
 
-		var projectObject = function ( object ) {
+		var projectObject = function ( parent ) {
 
-			if ( object.visible === false ) return;
+			for ( var c = 0, cl = parent.children.length; c < cl; c ++ ) {
 
-			if ( ( object instanceof THREE.Mesh || object instanceof THREE.Line ) &&
-			( object.frustumCulled === false || _frustum.contains( object ) === true ) ) {
+				var object = parent.children[ c ];
 
-				_vector3.copy( object.matrixWorld.getPosition() );
-				_viewProjectionMatrix.multiplyVector3( _vector3 );
+				if ( object.visible === false ) continue;
 
-				_object = getNextObjectInPool();
-				_object.object = object;
-				_object.z = _vector3.z;
+				if ( object instanceof THREE.Light ) {
 
-				_renderData.objects.push( _object );
+					_renderData.lights.push( object );
 
-			} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
+				} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line ) {
 
-				_vector3.copy( object.matrixWorld.getPosition() );
-				_viewProjectionMatrix.multiplyVector3( _vector3 );
+					if ( object.frustumCulled === false || _frustum.contains( object ) === true ) {
 
-				_object = getNextObjectInPool();
-				_object.object = object;
-				_object.z = _vector3.z;
+						_object = getNextObjectInPool();
+						_object.object = object;
 
-				_renderData.sprites.push( _object );
+						if ( object.renderDepth !== null ) {
 
-			} else if ( object instanceof THREE.Light ) {
+							_object.z = object.renderDepth;
 
-				_renderData.lights.push( object );
+						} else {
 
-			}
+							_vector3.copy( object.matrixWorld.getPosition() );
+							_viewProjectionMatrix.multiplyVector3( _vector3 );
+							_object.z = _vector3.z;
 
-			for ( var c = 0, cl = object.children.length; c < cl; c ++ ) {
+						}
 
-				projectObject( object.children[ c ] );
+						_renderData.objects.push( _object );
+
+					}
+
+				} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
+
+					_object = getNextObjectInPool();
+					_object.object = object;
+
+					// TODO: Find an elegant and performant solution and remove this dupe code.
+
+					if ( object.renderDepth !== null ) {
+
+						_object.z = object.renderDepth;
+
+					} else {
+
+						_vector3.copy( object.matrixWorld.getPosition() );
+						_viewProjectionMatrix.multiplyVector3( _vector3 );
+						_object.z = _vector3.z;
+
+					}
+
+					_renderData.sprites.push( _object );
+
+				} else {
+
+					_object = getNextObjectInPool();
+					_object.object = object;
+
+					if ( object.renderDepth !== null ) {
+
+						_object.z = object.renderDepth;
+
+					} else {
+
+						_vector3.copy( object.matrixWorld.getPosition() );
+						_viewProjectionMatrix.multiplyVector3( _vector3 );
+						_object.z = _vector3.z;
+
+					}
+
+					_renderData.objects.push( _object );
+
+				}
+
+				projectObject( object );
 
 			}
 
@@ -118,13 +161,13 @@ THREE.Projector = function() {
 
 		projectObject( root );
 
-		if ( sort === true ) _renderData.objects.sort( painterSort );
+		if ( sortObjects === true ) _renderData.objects.sort( painterSort );
 
 		return _renderData;
 
 	};
 
-	this.projectScene = function ( scene, camera, sort ) {
+	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
 		var near = camera.near, far = camera.far, visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
@@ -150,7 +193,7 @@ THREE.Projector = function() {
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
-		_renderData = projectGraph( scene, false );
+		_renderData = projectGraph( scene, sortObjects );
 
 		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
 
@@ -293,6 +336,8 @@ THREE.Projector = function() {
 
 					}
 
+					_face.vertexNormalsLength = faceVertexNormals.length;
+
 					for ( c = 0, cl = faceVertexUvs.length; c < cl; c ++ ) {
 
 						uvs = faceVertexUvs[ c ][ f ];
@@ -320,7 +365,7 @@ THREE.Projector = function() {
 				_modelViewProjectionMatrix.multiply( _viewProjectionMatrix, modelMatrix );
 
 				vertices = object.geometry.vertices;
-				
+
 				v1 = getNextVertexInPool();
 				v1.positionScreen.copy( vertices[ 0 ] );
 				_modelViewProjectionMatrix.multiplyVector4( v1.positionScreen );
@@ -401,7 +446,7 @@ THREE.Projector = function() {
 
 		}
 
-		sort && _renderData.elements.sort( painterSort );
+		if ( sortElements === true ) _renderData.elements.sort( painterSort );
 
 		return _renderData;
 
@@ -411,128 +456,98 @@ THREE.Projector = function() {
 
 	function getNextObjectInPool() {
 
-		var object;
+		if ( _objectCount === _objectPoolLength ) {
 
-		if ( _objectCount === _objectPool.length ) {
-
-			object = new THREE.RenderableObject();
+			var object = new THREE.RenderableObject();
 			_objectPool.push( object );
-
-		} else {
-
-			object =  _objectPool[ _objectCount ];
+			_objectPoolLength ++;
+			_objectCount ++;
+			return object;
 
 		}
 
-		_objectCount ++;
-
-		return object;
+		return _objectPool[ _objectCount ++ ];
 
 	}
 
 	function getNextVertexInPool() {
 
-		var vertex;
+		if ( _vertexCount === _vertexPoolLength ) {
 
-		if ( _vertexCount === _vertexPool.length ) {
-
-			vertex = new THREE.RenderableVertex();
+			var vertex = new THREE.RenderableVertex();
 			_vertexPool.push( vertex );
-
-		} else {
-
-			vertex =  _vertexPool[ _vertexCount ];
+			_vertexPoolLength ++;
+			_vertexCount ++;
+			return vertex;
 
 		}
 
-		_vertexCount ++;
-
-		return vertex;
+		return _vertexPool[ _vertexCount ++ ];
 
 	}
 
 	function getNextFace3InPool() {
 
-		var face;
+		if ( _face3Count === _face3PoolLength ) {
 
-		if ( _face3Count === _face3Pool.length ) {
-
-			face = new THREE.RenderableFace3();
+			var face = new THREE.RenderableFace3();
 			_face3Pool.push( face );
-
-		} else {
-
-			face =  _face3Pool[ _face3Count ];
+			_face3PoolLength ++;
+			_face3Count ++;
+			return face;
 
 		}
 
-		_face3Count ++;
-
-		return face;
+		return _face3Pool[ _face3Count ++ ];
 
 
 	}
 
 	function getNextFace4InPool() {
 
-		var face;
+		if ( _face4Count === _face4PoolLength ) {
 
-		if ( _face4Count === _face4Pool.length ) {
-
-			face = new THREE.RenderableFace4();
+			var face = new THREE.RenderableFace4();
 			_face4Pool.push( face );
-
-		} else {
-
-			face =  _face4Pool[ _face4Count ];
+			_face4PoolLength ++;
+			_face4Count ++;
+			return face;
 
 		}
 
-		_face4Count ++;
-
-		return face;
+		return _face4Pool[ _face4Count ++ ];
 
 	}
 
 	function getNextLineInPool() {
 
-		var line;
+		if ( _lineCount === _linePoolLength ) {
 
-		if ( _lineCount === _linePool.length ) {
-
-			line = new THREE.RenderableLine();
+			var line = new THREE.RenderableLine();
 			_linePool.push( line );
-
-		} else {
-
-			line =  _linePool[ _lineCount ];
+			_linePoolLength ++;
+			_lineCount ++
+			return line;
 
 		}
 
-		_lineCount ++;
-
-		return line;
+		return _linePool[ _lineCount ++ ];
 
 	}
 
 	function getNextParticleInPool() {
 
-		var particle;
+		if ( _particleCount === _particlePoolLength ) {
 
-		if ( _particleCount === _particlePool.length ) {
-
-			particle = new THREE.RenderableParticle();
+			var particle = new THREE.RenderableParticle();
 			_particlePool.push( particle );
-
-		} else {
-
-			particle =  _particlePool[ _particleCount ];
+			_particlePoolLength ++;
+			_particleCount ++
+			return particle;
 
 		}
 
-		_particleCount ++;
-
-		return particle;
+		return _particlePool[ _particleCount ++ ];
 
 	}
 

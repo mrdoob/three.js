@@ -67,19 +67,18 @@
 
 				camera = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.z = 2500;
-				scene.add( camera );
 
 				cameraPerspective = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 150, 1000 );
 
 				cameraPerspectiveHelper = new THREE.CameraHelper( cameraPerspective );
-				cameraPerspective.add( cameraPerspectiveHelper );
+				scene.add( cameraPerspectiveHelper );
 
 				//
 
 				cameraOrtho = new THREE.OrthographicCamera( 0.5 * SCREEN_WIDTH / - 2, 0.5 * SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, 150, 1000 );
 
 				cameraOrthoHelper = new THREE.CameraHelper( cameraOrtho );
-				cameraOrtho.add( cameraOrthoHelper );
+				scene.add( cameraOrthoHelper );
 
 				//
 
@@ -166,8 +165,19 @@
 
 				switch( event.keyCode ) {
 
-					case 79: /*O*/	activeCamera = cameraOrtho; activeHelper = cameraOrthoHelper; break;
-					case 80: /*P*/ 	activeCamera = cameraPerspective; activeHelper = cameraPerspectiveHelper; break;
+					case 79: /*O*/
+
+						activeCamera = cameraOrtho;
+						activeHelper = cameraOrthoHelper;
+
+						break;
+
+					case 80: /*P*/
+
+						activeCamera = cameraPerspective;
+						activeHelper = cameraPerspectiveHelper;
+
+						break;
 
 				}
 
@@ -226,9 +236,9 @@
 					cameraPerspective.updateProjectionMatrix();
 
 					cameraPerspectiveHelper.update();
-					cameraPerspectiveHelper.lines.visible = true;
+					cameraPerspectiveHelper.visible = true;
 
-					cameraOrthoHelper.lines.visible = false;
+					cameraOrthoHelper.visible = false;
 
 				} else {
 
@@ -236,9 +246,9 @@
 					cameraOrtho.updateProjectionMatrix();
 
 					cameraOrthoHelper.update();
-					cameraOrthoHelper.lines.visible = true;
+					cameraOrthoHelper.visible = true;
 
-					cameraPerspectiveHelper.lines.visible = false;
+					cameraPerspectiveHelper.visible = false;
 
 				}
 
@@ -246,12 +256,12 @@
 
 				renderer.clear();
 
-				activeHelper.lines.visible = false;
+				activeHelper.visible = false;
 
 				renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.render( scene, activeCamera );
 
-				activeHelper.lines.visible = true;
+				activeHelper.visible = true;
 
 				renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
