@@ -165,13 +165,9 @@
 
 				}
 
-				if ( render_canvas ) {
-
-					canvasRenderer = new THREE.CanvasRenderer();
-					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-					container.appendChild( canvasRenderer.domElement );
-
-				}
+				canvasRenderer = new THREE.CanvasRenderer();
+				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( canvasRenderer.domElement );
 
 				//
 
