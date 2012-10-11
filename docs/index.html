@@ -52,6 +52,15 @@
 				}
 
 				#panel h2 {
+					color: #454545;
+					font-size: 18px;
+					font-weight: normal;
+
+					margin-top: 20px;
+					margin-left: 20px;
+				}
+
+				#panel h3 {
 					color: #666;
 					font-size: 16px;
 					font-weight: normal;
@@ -91,17 +100,27 @@
 
 			var html = '<h1>three.js<span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
-			for ( var category in list ) {
+			for ( var section in list ) {
 
-				html += '<h2>' + category + '</h2>';
+				html += '<h2>' + section + '</h2>';
 
 				html += '<ul>';
 
-				for ( var i = 0; i < list[ category ].length; i ++ ) {
+				for ( var category in list[ section ] ) {
 
-					var page = list[ category ][ i ];
+					html += '<h3>' + category + '</h3>';
 
-					html += '<li><a href="javascript:goTo(\'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+					html += '<ul>';
+
+					for ( var i = 0; i < list[ section ][ category ].length; i ++ ) {
+
+						var page = list[ section ][ category ][ i ];
+
+						html += '<li><a href="javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+
+					}
+
+					html += '</ul>';
 
 				}
 
@@ -113,20 +132,22 @@
 
 			// Page loading
 
-			function goTo( name ) {
+			function goTo( section, category, name ) {
 
-				var path = pages[ name ];
+				var path = pages[ section ][ category ][ name ];
 
-				window.document.title = 'three.js - documentation - ' + name;
+				window.document.title = 'three.js - documentation - ' + section + ': ' + name;
 
-				window.location.hash = name;
-				viewer.src = 'api/' + path + '.html';
+				window.location.hash = section + '/' + category + '/' + name;
+				section = section.toLowerCase();
+				viewer.src = section + '/' + path + '.html';
 
 			}
 
 			function goToHash() {
 
-				goTo( window.location.hash.substring( 1 ) );
+				var hash = window.location.hash.substring( 1 ).split('/');
+				goTo( hash[0], hash[1], hash[2] );
 
 			}
 
