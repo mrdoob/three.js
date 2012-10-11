@@ -22,6 +22,7 @@
 				color: #555;
 				font-family: 'inconsolata';
 				font-size: 15px;
+				line-height: 18px;
 				overflow: hidden;
 			}
 
@@ -47,7 +48,7 @@
 					font-size: 25px;
 					font-weight: normal;
 
-					margin-top: 25px;
+					margin-top: 20px;
 					margin-left: 20px;
 				}
 
@@ -134,20 +135,18 @@
 
 			function goTo( section, category, name ) {
 
-				var path = pages[ section ][ category ][ name ];
+				window.document.title = 'three.js - documentation - ' + section + ' - ' + name;
 
-				window.document.title = 'three.js - documentation - ' + section + ': ' + name;
+				window.location.hash = section + '/' + category + '/' + name.replace(/\ /g, '-');
 
-				window.location.hash = section + '/' + category + '/' + name;
-				section = section.toLowerCase();
-				viewer.src = section + '/' + path + '.html';
+				viewer.src = pages[ section ][ category ][ name ] + '.html';
 
 			}
 
 			function goToHash() {
 
 				var hash = window.location.hash.substring( 1 ).split('/');
-				goTo( hash[0], hash[1], hash[2] );
+				goTo( hash[0], hash[1], hash[2].replace(/\-/g, ' ') );
 
 			}
 

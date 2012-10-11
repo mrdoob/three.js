@@ -1,16 +1,20 @@
 var onDocumentLoad = function ( event ) {
 
-	var section = /\/(manual|api)\//.exec( window.location.pathname )[ 1 ].toString().split( '.html' )[ 0 ];
-	var name = /[-A-z0-9]+\.html/.exec( window.location.pathname ).toString().split( '.html' )[ 0 ];
-
 	var path;
+	var section = /\/(manual|api)\//.exec( window.location.pathname )[ 1 ].toString().split( '.html' )[ 0 ];
+	var name = /[\-A-z0-9]+\.html/.exec( window.location.pathname ).toString().split( '.html' )[ 0 ];
+
 	if ( section == 'manual' ) {
+
 		name = name.replace(/\-/g, ' ');
 
 		path = window.location.pathname.replace( /\ /g, '-' );
 		path = /\/manual\/[-a-z0-9\/]+/.exec( path ).toString().substr( 8 );
+
 	} else {
+
 		path = /\/api\/[A-z0-9\/]+/.exec( window.location.pathname ).toString().substr( 5 );
+
 	}
 
 	var text = document.body.innerHTML;
