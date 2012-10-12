@@ -188,6 +188,38 @@ var Viewport = function ( signals ) {
 
 	}, false );
 
+	container.dom.addEventListener( 'mousewheel', function ( event ) {
+
+		if ( !picked ) return;
+
+		var delta = 0;
+
+		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
+
+			delta = event.wheelDelta / 40;
+
+		} else if ( event.detail ) { // Firefox
+
+			delta = - event.detail / 3;
+
+		}
+
+		if ( delta > 0 ) {
+
+			picked.scale.x += 0.1;
+			picked.scale.y += 0.1;
+			picked.scale.z += 0.1;
+
+		} else {
+			
+			picked.scale.x -= 0.1;
+			picked.scale.y -= 0.1;
+			picked.scale.z -= 0.1;
+
+		}
+		render();
+	} );
+
 	// events
 
 	signals.objectAdded.add( function ( object ) {
