@@ -77,13 +77,15 @@ var Viewport = function ( signals ) {
 	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ) );
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
-	
+
 	var ray = new THREE.Ray();
 	var projector = new THREE.Projector();
 	var offset = new THREE.Vector3();
 	var picked = null;
 
-	container.dom.addEventListener( 'mousedown', function ( event ) {
+	// events
+
+	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
 
@@ -92,7 +94,7 @@ var Viewport = function ( signals ) {
 			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
 			0.5
 		);
-		
+
 		projector.unprojectVector( vector, camera );
 
 		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
@@ -103,6 +105,9 @@ var Viewport = function ( signals ) {
 
 			controls.enabled = false;
 
+			intersectionPlane.position.copy( intersects[ 0 ].object.position );
+			intersectionPlane.lookAt( camera.position );
+
 			picked = intersects[ 0 ].object;
 
 			signals.objectSelected.dispatch( picked );
@@ -110,15 +115,18 @@ var Viewport = function ( signals ) {
 			var intersects = ray.intersectObject( intersectionPlane );
 			offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
 
+			document.addEventListener( 'mousemove', onMouseMove, false );
+			document.addEventListener( 'mouseup', onMouseUp, false );
+
 		} else {
-			
+
 			controls.enabled = true;
-			
+
 		}
 
-	}, false );
+	};
 
-	container.dom.addEventListener( 'mousemove', function ( event ) {
+	var onMouseMove = function ( event ) {
 
 		var vector = new THREE.Vector3(
 			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
@@ -129,41 +137,29 @@ var Viewport = function ( signals ) {
 		projector.unprojectVector( vector, camera );
 
 		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
-		
-		if ( picked ) {
 
-			var intersects = ray.intersectObject( intersectionPlane );
-			
-			if ( intersects.length > 0 ) {
-			
-				picked.position.copy( intersects[ 0 ].point.subSelf( offset ) );
-				
-				signals.objectChanged.dispatch( picked );
-
-				render();
-
-			}
-			
-			return;
-
-		}
-		
-		var intersects = ray.intersectObjects( objects, true );
+		var intersects = ray.intersectObject( intersectionPlane );
 
 		if ( intersects.length > 0 ) {
 
-			intersectionPlane.position.copy( intersects[ 0 ].object.position );
-			intersectionPlane.lookAt( camera.position );
+			picked.position.copy( intersects[ 0 ].point.subSelf( offset ) );
+
+			signals.objectChanged.dispatch( picked );
+
+			render();
 
 		}
 
-	}, false );
+	};
 
-	container.dom.addEventListener( 'mouseup', function ( event ) {
+	var onMouseUp = function ( event ) {
 
-		picked = false;
-		
-		controls.enabled = true;
+		document.removeEventListener( 'mousemove', onMouseMove );
+		document.removeEventListener( 'mouseup', onMouseUp );
+
+	};
+
+	var onClick = function ( event ) {
 
 		var vector = new THREE.Vector3(
 			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
@@ -186,9 +182,12 @@ var Viewport = function ( signals ) {
 
 		}
 
-	}, false );
+	};
 
-	// events
+	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'click', onClick, false );
+
+	// signals
 
 	signals.objectAdded.add( function ( object ) {
 
