@@ -268,7 +268,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	function keydown( event ) {
 
 		if ( ! _this.enabled ) return;
-		
+
 		window.removeEventListener( 'keydown', keydown );
 
 		_prevState = _state;
@@ -290,15 +290,15 @@ THREE.TrackballControls = function ( object, domElement ) {
 			_state = STATE.PAN;
 
 		}
-	
+
 	}
 
 	function keyup( event ) {
 
 		if ( ! _this.enabled ) return;
-		
+
 		_state = _prevState;
-		
+
 		window.addEventListener( 'keydown', keydown, false );
 
 	}
@@ -311,9 +311,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 		event.stopPropagation();
 
 		if ( _state === STATE.NONE ) {
-			
+
 			_state = event.button;
-				
+
 		}
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
@@ -363,7 +363,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		event.stopPropagation();
 
 		_state = STATE.NONE;
-		
+
 		document.removeEventListener( 'mousemove', mousemove );
 		document.removeEventListener( 'mouseup', mouseup );
 

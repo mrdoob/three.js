@@ -52,16 +52,6 @@ var Viewport = function ( signals ) {
 	camera.lookAt( scene.position );
 	scene.add( camera );
 
-	var controls = new THREE.TrackballControls( camera, container.dom );
-	controls.rotateSpeed = 1.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
-	controls.addEventListener( 'change', render );
-
 	var light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 1, 0.5, 0 ).normalize();
 	scene.add( light );
@@ -186,6 +176,19 @@ var Viewport = function ( signals ) {
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'click', onClick, false );
+
+	// controls need to be added *after* main logic,
+	// otherwise controls.enabled doesn't work.
+
+	var controls = new THREE.TrackballControls( camera, container.dom );
+	controls.rotateSpeed = 1.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.addEventListener( 'change', render );
 
 	// signals
 
