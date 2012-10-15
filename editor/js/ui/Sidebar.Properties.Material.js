@@ -218,6 +218,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	//
 
 	var selected = null;
+	var selectedHasUvs = false;
 
 	var canvas = document.createElement( 'canvas' );
 	var context = canvas.getContext( '2d' );
@@ -240,7 +241,15 @@ Sidebar.Properties.Material = function ( signals ) {
 				material = new materials[ materialClass.getValue() ]();
 				selected.material = material;
 
-				material.map = dummyTexture;
+				if ( selectedHasUvs ) {
+
+					material.map = dummyTexture;
+
+				} else {
+
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+				}
 
 			}
 
@@ -276,47 +285,95 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material.map !== undefined ) {
 
-				material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : dummyTexture;
-				material.needsUpdate = true;
+				if ( selectedHasUvs )  {
+
+					material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : dummyTexture;
+					material.needsUpdate = true;
+
+				} else {
+
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+				}
 
 			}
 
 			/*
 			if ( material.lightMap !== undefined ) {
 
-				material.lightMap = materialLightMapEnabled.getValue() === true ? materialLightMap.getValue() : null;
-				material.needsUpdate = true;
+				if ( selectedHasUvs )  {
+
+					material.lightMap = materialLightMapEnabled.getValue() === true ? materialLightMap.getValue() : null;
+					material.needsUpdate = true;
+
+				} else {
+
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+				}
 
 			}
 			*/
 
 			if ( material.bumpMap !== undefined ) {
 
-				material.bumpMap = materialBumpMapEnabled.getValue() === true ? materialBumpMap.getValue() : null;
-				material.bumpScale = materialBumpScale.getValue();
-				material.needsUpdate = true;
+				if ( selectedHasUvs )  {
+
+					material.bumpMap = materialBumpMapEnabled.getValue() === true ? materialBumpMap.getValue() : null;
+					material.bumpScale = materialBumpScale.getValue();
+					material.needsUpdate = true;
+
+				} else {
+
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+				}
 
 			}
 
 			if ( material.normalMap !== undefined ) {
 
-				material.normalMap = materialNormalMapEnabled.getValue() === true ? materialNormalMap.getValue() : null;
-				material.needsUpdate = true;
+				if ( selectedHasUvs )  {
+
+					material.normalMap = materialNormalMapEnabled.getValue() === true ? materialNormalMap.getValue() : null;
+					material.needsUpdate = true;
+
+				} else {
+
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+				}
 
 			}
 
 			if ( material.specularMap !== undefined ) {
 
-				material.specularMap = materialSpecularMapEnabled.getValue() === true ? materialSpecularMap.getValue() : null;
-				material.needsUpdate = true;
+				if ( selectedHasUvs )  {
+
+					material.specularMap = materialSpecularMapEnabled.getValue() === true ? materialSpecularMap.getValue() : null;
+					material.needsUpdate = true;
+
+				} else {
+
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+				}
 
 			}
 
 			if ( material.envMap !== undefined ) {
 
-				material.envMap = materialEnvMapEnabled.getValue() === true ? materialEnvMap.getValue() : null;
-				material.reflectivity = materialReflectivity.getValue();
-				material.needsUpdate = true;
+				if ( selectedHasUvs )  {
+
+					material.envMap = materialEnvMapEnabled.getValue() === true ? materialEnvMap.getValue() : null;
+					material.reflectivity = materialReflectivity.getValue();
+					material.needsUpdate = true;
+
+				} else {
+
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+				}
 
 			}
 
@@ -397,6 +454,7 @@ Sidebar.Properties.Material = function ( signals ) {
 		if ( object && object.material ) {
 
 			selected = object;
+			selectedHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
 
 			container.setDisplay( '' );
 
@@ -437,15 +495,23 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material.map !== undefined ) {
 
-				if ( material.map !== null ) {
+				if ( selectedHasUvs ) {
 
-					materialMapEnabled.setValue( true );
-					materialMap.setValue( material.map );
+					if ( material.map !== null ) {
+
+						materialMapEnabled.setValue( true );
+						materialMap.setValue( material.map );
+
+					} else {
+
+						materialMapEnabled.setValue( false );
+						materialMap.setValue( dummyTexture );
+
+					}
 
 				} else {
 
-					materialMapEnabled.setValue( false );
-					materialMap.setValue( dummyTexture );
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
 
 				}
 
@@ -560,6 +626,7 @@ Sidebar.Properties.Material = function ( signals ) {
 		} else {
 
 			selected = null;
+			selectedHasUvs = false;
 
 			container.setDisplay( 'none' );
 
