@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '52dev' };
+var THREE = THREE || { REVISION: '52' };
 
 self.console = self.console || {
 
@@ -29391,7 +29391,7 @@ THREE.CubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRadius, segmentsHeight, openEnded ) {
+THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded ) {
 
 	THREE.Geometry.call( this );
 
@@ -29400,8 +29400,8 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, segmentsRad
 	height = height !== undefined ? height : 100;
 
 	var heightHalf = height / 2;
-	var segmentsX = segmentsRadius || 8;
-	var segmentsY = segmentsHeight || 1;
+	var segmentsX = radiusSegments || 8;
+	var segmentsY = heightSegments || 1;
 
 	var x, y, vertices = [], uvs = [];
 
@@ -30477,15 +30477,15 @@ THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight ) {
+THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
 	THREE.Geometry.call( this );
 
 	var ix, iz,
 	width_half = width / 2,
 	height_half = height / 2,
-	gridX = segmentsWidth || 1,
-	gridZ = segmentsheight || 1,
+	gridX = widthSegments || 1,
+	gridZ = heightSegments || 1,
 	gridX1 = gridX + 1,
 	gridZ1 = gridZ + 1,
 	segment_width = width / gridX,
@@ -30539,7 +30539,7 @@ THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStart, phiLength, thetaStart, thetaLength ) {
+THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
 	THREE.Geometry.call( this );
 
@@ -30551,8 +30551,8 @@ THREE.SphereGeometry = function ( radius, segmentsWidth, segmentsHeight, phiStar
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
-	var segmentsX = Math.max( 3, Math.floor( segmentsWidth ) || 8 );
-	var segmentsY = Math.max( 2, Math.floor( segmentsHeight ) || 6 );
+	var segmentsX = Math.max( 3, Math.floor( widthSegments ) || 8 );
+	var segmentsY = Math.max( 2, Math.floor( heightSegments ) || 6 );
 
 	var x, y, vertices = [], uvs = [];
 
@@ -30694,7 +30694,7 @@ THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
+THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
 
 	THREE.Geometry.call( this );
 
@@ -30702,18 +30702,18 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 	this.radius = radius || 100;
 	this.tube = tube || 40;
-	this.segmentsR = segmentsR || 8;
-	this.segmentsT = segmentsT || 6;
+	this.radialSegments = radialSegments || 8;
+	this.tubularSegments = tubularSegments || 6;
 	this.arc = arc || Math.PI * 2;
 
 	var center = new THREE.Vector3(), uvs = [], normals = [];
 
-	for ( var j = 0; j <= this.segmentsR; j ++ ) {
+	for ( var j = 0; j <= this.radialSegments; j ++ ) {
 
-		for ( var i = 0; i <= this.segmentsT; i ++ ) {
+		for ( var i = 0; i <= this.tubularSegments; i ++ ) {
 
-			var u = i / this.segmentsT * this.arc;
-			var v = j / this.segmentsR * Math.PI * 2;
+			var u = i / this.tubularSegments * this.arc;
+			var v = j / this.radialSegments * Math.PI * 2;
 
 			center.x = this.radius * Math.cos( u );
 			center.y = this.radius * Math.sin( u );
@@ -30725,21 +30725,21 @@ THREE.TorusGeometry = function ( radius, tube, segmentsR, segmentsT, arc ) {
 
 			this.vertices.push( vertex );
 
-			uvs.push( new THREE.UV( i / this.segmentsT, j / this.segmentsR ) );
+			uvs.push( new THREE.UV( i / this.tubularSegments, j / this.radialSegments ) );
 			normals.push( vertex.clone().subSelf( center ).normalize() );
 
 		}
 	}
 
 
-	for ( var j = 1; j <= this.segmentsR; j ++ ) {
+	for ( var j = 1; j <= this.radialSegments; j ++ ) {
 
-		for ( var i = 1; i <= this.segmentsT; i ++ ) {
+		for ( var i = 1; i <= this.tubularSegments; i ++ ) {
 
-			var a = ( this.segmentsT + 1 ) * j + i - 1;
-			var b = ( this.segmentsT + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( this.segmentsT + 1 ) * ( j - 1 ) + i;
-			var d = ( this.segmentsT + 1 ) * j + i;
+			var a = ( this.tubularSegments + 1 ) * j + i - 1;
+			var b = ( this.tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+			var c = ( this.tubularSegments + 1 ) * ( j - 1 ) + i;
+			var d = ( this.tubularSegments + 1 ) * j + i;
 
 			var face = new THREE.Face4( a, b, c, d, [ normals[ a ], normals[ b ], normals[ c ], normals[ d ] ] );
 			face.normal.addSelf( normals[ a ] );
@@ -30765,7 +30765,7 @@ THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473
  */
 
-THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, heightScale ) {
+THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegments, p, q, heightScale ) {
 
 	THREE.Geometry.call( this );
 
@@ -30773,25 +30773,25 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 
 	this.radius = radius || 200;
 	this.tube = tube || 40;
-	this.segmentsR = segmentsR || 64;
-	this.segmentsT = segmentsT || 8;
+	this.radialSegments = radialSegments || 64;
+	this.tubularSegments = tubularSegments || 8;
 	this.p = p || 2;
 	this.q = q || 3;
 	this.heightScale = heightScale || 1;
-	this.grid = new Array(this.segmentsR);
+	this.grid = new Array(this.radialSegments);
 
 	var tang = new THREE.Vector3();
 	var n = new THREE.Vector3();
 	var bitan = new THREE.Vector3();
 
-	for ( var i = 0; i < this.segmentsR; ++ i ) {
+	for ( var i = 0; i < this.radialSegments; ++ i ) {
 
-		this.grid[ i ] = new Array( this.segmentsT );
+		this.grid[ i ] = new Array( this.tubularSegments );
 
-		for ( var j = 0; j < this.segmentsT; ++ j ) {
+		for ( var j = 0; j < this.tubularSegments; ++ j ) {
 
-			var u = i / this.segmentsR * 2 * this.p * Math.PI;
-			var v = j / this.segmentsT * 2 * Math.PI;
+			var u = i / this.radialSegments * 2 * this.p * Math.PI;
+			var v = j / this.tubularSegments * 2 * Math.PI;
 			var p1 = getPos( u, v, this.q, this.p, this.radius, this.heightScale );
 			var p2 = getPos( u + 0.01, v, this.q, this.p, this.radius, this.heightScale );
 			var cx, cy;
@@ -30817,22 +30817,22 @@ THREE.TorusKnotGeometry = function ( radius, tube, segmentsR, segmentsT, p, q, h
 
 	}
 
-	for ( var i = 0; i < this.segmentsR; ++ i ) {
+	for ( var i = 0; i < this.radialSegments; ++ i ) {
 
-		for ( var j = 0; j < this.segmentsT; ++ j ) {
+		for ( var j = 0; j < this.tubularSegments; ++ j ) {
 
-			var ip = ( i + 1 ) % this.segmentsR;
-			var jp = ( j + 1 ) % this.segmentsT;
+			var ip = ( i + 1 ) % this.radialSegments;
+			var jp = ( j + 1 ) % this.tubularSegments;
 
 			var a = this.grid[ i ][ j ];
 			var b = this.grid[ ip ][ j ];
 			var c = this.grid[ ip ][ jp ];
 			var d = this.grid[ i ][ jp ];
 
-			var uva = new THREE.UV( i / this.segmentsR, j / this.segmentsT );
-			var uvb = new THREE.UV( ( i + 1 ) / this.segmentsR, j / this.segmentsT );
-			var uvc = new THREE.UV( ( i + 1 ) / this.segmentsR, ( j + 1 ) / this.segmentsT );
-			var uvd = new THREE.UV( i / this.segmentsR, ( j + 1 ) / this.segmentsT );
+			var uva = new THREE.UV( i / this.radialSegments, j / this.tubularSegments );
+			var uvb = new THREE.UV( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
+			var uvc = new THREE.UV( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uvd = new THREE.UV( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva,uvb,uvc, uvd ] );
@@ -30882,14 +30882,14 @@ THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, debug ) {
+THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, debug ) {
 
 	THREE.Geometry.call( this );
 
 	this.path = path;
 	this.segments = segments || 64;
 	this.radius = radius || 1;
-	this.segmentsRadius = segmentsRadius || 8;
+	this.radiusSegments = radiusSegments || 8;
 	this.closed = closed || false;
 
 	if ( debug ) this.debug = new THREE.Object3D();
@@ -30954,9 +30954,9 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 
 		}
 
-		for ( j = 0; j < this.segmentsRadius; j++ ) {
+		for ( j = 0; j < this.radiusSegments; j++ ) {
 
-			v = j / this.segmentsRadius * 2 * Math.PI;
+			v = j / this.radiusSegments * 2 * Math.PI;
 
 			cx = -this.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = this.radius * Math.sin( v );
@@ -30976,20 +30976,20 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 
 	for ( i = 0; i < this.segments; i++ ) {
 
-		for ( j = 0; j < this.segmentsRadius; j++ ) {
+		for ( j = 0; j < this.radiusSegments; j++ ) {
 
 			ip = ( closed ) ? (i + 1) % this.segments : i + 1;
-			jp = (j + 1) % this.segmentsRadius;
+			jp = (j + 1) % this.radiusSegments;
 
 			a = this.grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
 			b = this.grid[ ip ][ j ];
 			c = this.grid[ ip ][ jp ];
 			d = this.grid[ i ][ jp ];
 
-			uva = new THREE.UV( i / this.segments, j / this.segmentsRadius );
-			uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.segmentsRadius );
-			uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.segmentsRadius );
-			uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.segmentsRadius );
+			uva = new THREE.UV( i / this.segments, j / this.radiusSegments );
+			uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.radiusSegments );
+			uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.radiusSegments );
+			uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.radiusSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
@@ -31456,9 +31456,9 @@ THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * Benchmark: 
  *
  *  Platform: CPU: P7350 @2.00GHz Engine: V8
- *		
+ *
  *  Num Vertices	Time(ms)
- *		
+ *
  *     10           1
  *     20           3
  *     30           19
@@ -31493,21 +31493,21 @@ THREE.ConvexGeometry = function( vertices ) {
 		for ( var f = 0; f < faces.length; ) {
 
 			var face = faces[ f ];
-			
+
 			// for each face, if the vertex can see it,
 			// then we try to add the face's edges into the hole.
 			if ( visible( face, vertex ) ) {
 
 				for ( var e = 0; e < 3; e++ ) {
-					
+
 					var edge = [ face[ e ], face[ ( e + 1 ) % 3 ] ];
 					var boundary = true;
 
 					// remove duplicated edges.
 					for ( var h = 0; h < hole.length; h++ ) {
-					
+
 						if ( equalEdge( hole[ h ], edge ) ) {
-						
+
 							hole[ h ] = hole[ hole.length - 1 ];
 							hole.pop();
 							boundary = false;
@@ -31528,9 +31528,9 @@ THREE.ConvexGeometry = function( vertices ) {
 				// remove faces[ f ]
 				faces[ f ] = faces[ faces.length - 1 ];
 				faces.pop();
-			
+
 			} else { // not visible
-			
+
 				f++;
 
 			}
@@ -31570,7 +31570,7 @@ THREE.ConvexGeometry = function( vertices ) {
 	 * Face normal
 	 */
 	function normal( va, vb, vc ) {
-	
+
 		var cb = new THREE.Vector3();
 		var ab = new THREE.Vector3();
 
@@ -31579,7 +31579,7 @@ THREE.ConvexGeometry = function( vertices ) {
 		cb.crossSelf( ab );
 
 		if ( !cb.isZero() ) {
-			
+
 			cb.normalize(); 
 
 		}
@@ -31594,7 +31594,7 @@ THREE.ConvexGeometry = function( vertices ) {
 	 * be of the negative direction.
 	 */
 	function equalEdge( ea, eb ) {
-	
+
 		return ea[ 0 ] === eb[ 1 ] && ea[ 1 ] === eb[ 0 ]; 
 
 	}
@@ -31626,20 +31626,20 @@ THREE.ConvexGeometry = function( vertices ) {
 	for ( var i = 0; i < faces.length; i++ ) {
 
 		 var face = faces[ i ];
-		
+
 		 for ( var j = 0; j < 3; j++ ) {
-		 
+
 				if ( newId[ face[ j ] ] === undefined ) {
-				
+
 						newId[ face[ j ] ] = id++;
 						this.vertices.push( vertices[ face[ j ] ] );
-				
+
 				}
 
 				face[ j ] = newId[ face[ j ] ];
 
-		 } 
-		
+		 }
+
 	}
 
 	// Convert faces into instances of THREE.Face3
@@ -31655,7 +31655,7 @@ THREE.ConvexGeometry = function( vertices ) {
 
 	// Compute UVs
 	for ( var i = 0; i < this.faces.length; i++ ) {
-		
+
 		var face = this.faces[ i ];
 
 		this.faceVertexUvs[ 0 ].push( [
@@ -31665,7 +31665,7 @@ THREE.ConvexGeometry = function( vertices ) {
 		] );
 
 	}
-	
+
 
 	this.computeCentroids();
 	this.computeFaceNormals();
@@ -32001,89 +32001,88 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 /// REFACTORING THIS OUT
 
-function orderedKey( a, b ) {
+THREE.GeometryUtils.orderedKey = function ( a, b ) {
 
 	return Math.min( a, b ) + "_" + Math.max( a, b );
 
-}
-
-var G  = {
+};
 
 
-	// Returns a hashmap - of { edge_key: face_index }
-	computeEdgeFaces: function ( geometry ) {
+// Returns a hashmap - of { edge_key: face_index }
+THREE.GeometryUtils.computeEdgeFaces = function ( geometry ) {
 
-		var i, il, v1, v2, j, k,
-			face, faceIndices, faceIndex,
-			edge,
-			hash,
-			edgeFaceMap = {};
+	var i, il, v1, v2, j, k,
+		face, faceIndices, faceIndex,
+		edge,
+		hash,
+		edgeFaceMap = {};
 
-		function mapEdgeHash( hash, i ) {
+	var orderedKey = THREE.GeometryUtils.orderedKey;
+
+	function mapEdgeHash( hash, i ) {
+		
+		if ( edgeFaceMap[ hash ] === undefined ) {
+
+			edgeFaceMap[ hash ] = [];
 			
-			if ( edgeFaceMap[ hash ] === undefined ) {
-
-				edgeFaceMap[ hash ] = [];
-				
-			}
-			
-			edgeFaceMap[ hash ].push( i );
 		}
+		
+		edgeFaceMap[ hash ].push( i );
+	}
 
 
-		// construct vertex -> face map
+	// construct vertex -> face map
 
-		for( i = 0, il = geometry.faces.length; i < il; i ++ ) {
+	for( i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
-			face = geometry.faces[ i ];
+		face = geometry.faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+		if ( face instanceof THREE.Face3 ) {
 
-				hash = orderedKey( face.a, face.b );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.a, face.b );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.b, face.c );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.b, face.c );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.c, face.a );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.c, face.a );
+			mapEdgeHash( hash, i );
 
-			} else if ( face instanceof THREE.Face4 ) {
+		} else if ( face instanceof THREE.Face4 ) {
 
-				hash = orderedKey( face.a, face.b );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.a, face.b );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.b, face.c );
-				mapEdgeHash( hash, i );
+			hash = orderedKey( face.b, face.c );
+			mapEdgeHash( hash, i );
 
-				hash = orderedKey( face.c, face.d );
-				mapEdgeHash( hash, i );
-				
-				hash = orderedKey( face.d, face.a );
-				mapEdgeHash( hash, i );
-
-			}
+			hash = orderedKey( face.c, face.d );
+			mapEdgeHash( hash, i );
+			
+			hash = orderedKey( face.d, face.a );
+			mapEdgeHash( hash, i );
 
 		}
-
-		// extract faces
-		
-		// var edges = [];
-		// 
-		// var numOfEdges = 0;
-		// for (i in edgeFaceMap) {
-		// 	numOfEdges++;
-		// 	
-		// 	edge = edgeFaceMap[i];
-		// 	edges.push(edge);
-		// 	
-		// }
-		
-		//debug('edgeFaceMap', edgeFaceMap, 'geometry.edges',geometry.edges, 'numOfEdges', numOfEdges);
-
-		return edgeFaceMap;
 
 	}
+
+	// extract faces
+	
+	// var edges = [];
+	// 
+	// var numOfEdges = 0;
+	// for (i in edgeFaceMap) {
+	// 	numOfEdges++;
+	// 	
+	// 	edge = edgeFaceMap[i];
+	// 	edges.push(edge);
+	// 	
+	// }
+	
+	//debug('edgeFaceMap', edgeFaceMap, 'geometry.edges',geometry.edges, 'numOfEdges', numOfEdges);
+
+	return edgeFaceMap;
+
 }
 
 /////////////////////////////
@@ -32101,6 +32100,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	}
 	
 	var scope = this;
+	var orderedKey = THREE.GeometryUtils.orderedKey;
+	var computeEdgeFaces = THREE.GeometryUtils.computeEdgeFaces;
 
 	function assert() {
 		if (scope.debug && console && console.assert) console.assert.apply(console, arguments);
@@ -32294,7 +32295,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	//	For each edge, add an edge point.
 	//	Set each edge point to be the average of the two neighbouring face points and its two original endpoints.
 	
-	var edgeFaceMap = G.computeEdgeFaces ( oldGeometry ); // Edge Hash -> Faces Index  eg { edge_key: [face_index, face_index2 ]}
+	var edgeFaceMap = computeEdgeFaces ( oldGeometry ); // Edge Hash -> Faces Index  eg { edge_key: [face_index, face_index2 ]}
 	var edge, faceIndexA, faceIndexB, avg;
 	
 	// debug('edgeFaceMap', edgeFaceMap);
@@ -32435,7 +32436,6 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 	// Step 3
 	//	For each face point, add an edge for every edge of the face, 
 	//	connecting the face point to each edge point for the face.
-	debugCoreStuff();
 	
 	var facePt, currentVerticeIndex;
 	
@@ -33979,9 +33979,12 @@ THREE.SpritePlugin = function ( ) {
 				if ( sprite.useScreenCoordinates ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
-					_gl.uniform3f( uniforms.screenPosition, ( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
-															( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
-															  Math.max( 0, Math.min( 1, sprite.position.z ) ) );
+					_gl.uniform3f(
+						uniforms.screenPosition,
+						( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
+						( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
+						Math.max( 0, Math.min( 1, sprite.position.z ) )
+					);
 
 				} else {
 
@@ -34063,7 +34066,8 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-};/**
+};
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 

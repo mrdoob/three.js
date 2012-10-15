@@ -44,12 +44,15 @@
 			}
 
 				#panel h1 {
-					color: #333;
-					font-size: 25px;
-					font-weight: normal;
-
 					margin-top: 20px;
 					margin-left: 20px;
+				}
+
+				#panel h1 a {
+					color: #444;
+					font-size: 25px;
+					font-weight: normal;
+					text-decoration: none;
 				}
 
 				#panel h2 {
@@ -94,12 +97,12 @@
 
 		<script src="list.js"></script>
 		<script>
-			var REVISION = '51';
+			var REVISION = '52';
 
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
-			var html = '<h1>three.js<span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
+			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
 			for ( var section in list ) {
 
