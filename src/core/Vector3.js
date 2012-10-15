@@ -250,8 +250,10 @@ THREE.Vector3.prototype = {
 	},
 
 	angleTo: function ( v ) {
+
 		return Math.acos( this.dot( v ) / this.length() / v.length() );
-	};
+
+	},
 
 	distanceTo: function ( v ) {
 
