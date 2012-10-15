@@ -31,18 +31,16 @@ Sidebar.Outliner = function ( signals ) {
 
 		var id = parseInt( sceneGraph.getValue() );
 
-		for ( var i in scene.children ) {
+		scene.traverse( function ( node ) {
 
-			var object = scene.children[ i ];
+			if ( node.id === id ) {
 
-			if ( object.id === id ) {
-
-				signals.objectSelected.dispatch( object );
+				signals.objectSelected.dispatch( node );
 				return;
 
 			}
 
-		}
+		} );
 
 	}
 
