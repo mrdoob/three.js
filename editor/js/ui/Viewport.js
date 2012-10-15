@@ -62,17 +62,25 @@ var Viewport = function ( signals ) {
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', render );
 
-	var light = new THREE.DirectionalLight( 0xffffff );
-	light.position.set( 1, 0.5, 0 ).normalize();
-	scene.add( light );
+	var light1 = new THREE.DirectionalLight( 0xffffff );
+	light1.position.set( 1, 0.5, 0 ).normalize();
+	scene.add( light1 );
 
-	light.name = "Directional light #1";
+	var light2 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+	light2.position.set( - 1, - 0.5, 0 ).normalize();
+	scene.add( light2 );
 
-	var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
-	light.position.set( - 1, - 0.5, 0 ).normalize();
-	scene.add( light );
+	// default objects names
 
-	light.name = "Directional light #2";
+	camera.name = "Camera";
+
+	light1.name = "Light #1";
+	light1.target.name = "Light #1 target";
+
+	light2.name = "Light #2";
+	light2.target.name = "Light #2 target";
+
+	//
 
 	signals.sceneChanged.dispatch( scene );
 

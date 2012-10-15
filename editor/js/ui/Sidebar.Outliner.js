@@ -1,6 +1,6 @@
 Sidebar.Outliner = function ( signals ) {
 
-	var objects = {
+	var objectTypes = {
 
 		'PerspectiveCamera': THREE.PerspectiveCamera,
 		'PointLight': THREE.PointLight,
@@ -19,7 +19,8 @@ Sidebar.Outliner = function ( signals ) {
 	container.add( new UI.Text().setValue( 'SCENE' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	var sceneGraph = new UI.Select().setMultiple( true ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	//var sceneGraph = new UI.Select().setMultiple( true ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var sceneGraph = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	container.add( sceneGraph );
 
 	container.add( new UI.Break() );
@@ -45,11 +46,11 @@ Sidebar.Outliner = function ( signals ) {
 
 	}
 
-	function getObjectInstanceName( object ) {
+	function getObjectType( object ) {
 
-		for ( var key in objects ) {
+		for ( var type in objectTypes ) {
 
-			if ( object instanceof objects[ key ] ) return key;
+			if ( object instanceof objectTypes[ type ] ) return type;
 
 		}
 
@@ -75,7 +76,7 @@ Sidebar.Outliner = function ( signals ) {
 
 				var child = object.children[ key ];
 
-				options[ child.id ] = pad + '+ ' + child.name + ' [' + getObjectInstanceName( child ) + ']';
+				options[ child.id ] = '<div class="option_item">'+pad + '+ ' + child.name + ' <span class="object_type">[' + getObjectType( child ) + ']</span></div>';
 
 				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
 
@@ -89,7 +90,7 @@ Sidebar.Outliner = function ( signals ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		sceneGraph.setValue( object !== null ? object.id: null );
+		sceneGraph.setValue( object !== null ? object.id : null );
 
 	} );
 
