@@ -222,9 +222,11 @@ UI.Panel = function ( position ) {
 	dom.style.position = position || 'relative';
 	dom.style.marginBottom = '10px';
 
-	this.dom = dom;
+	dom.style.userSelect = 'none';
+	dom.style.WebkitUserSelect = 'none';
+	dom.style.MozUserSelect = 'none';
 
-	// this.dom.addEventListener( 'mousedown', function ( event ) { event.preventDefault() }, false );
+	this.dom = dom;
 
 	return this;
 };
