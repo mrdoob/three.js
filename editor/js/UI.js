@@ -603,6 +603,7 @@ UI.Number = function ( position ) {
 
 		dom.style.backgroundColor = '';
 		dom.style.borderColor = '';
+		dom.style.cursor = '';
 
 	};
 
@@ -610,6 +611,7 @@ UI.Number = function ( position ) {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.borderColor = 'transparent';
+		dom.style.cursor = 'col-resize';
 
 	};
 
