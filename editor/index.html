@@ -120,9 +120,7 @@
 							var loader = new THREE.CTMLoader();
 							loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
 
-								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
-
-								var mesh = new THREE.Mesh( geometry, material );
+								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 
 								signals.objectAdded.dispatch( mesh );
 								signals.objectSelected.dispatch( mesh );
@@ -147,12 +145,7 @@
 							var loader = new THREE.ColladaLoader();
 							loader.parse( xml, function ( collada ) {
 
-								 collada.scene.traverse( function ( node ) {
-
-									if ( node.material ) node.material.map = dummyTexture;
-
-								} );
-
+								applyDummyTexture( collada.scene );
 
 								signals.objectAdded.dispatch( collada.scene );
 								signals.objectSelected.dispatch( collada.scene );
@@ -203,9 +196,7 @@
 							if ( data.metadata.type === 'geometry' ) {
 
 								var geometry = new THREE.GeometryLoader().parse( data );
-								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
-
-								var mesh = new THREE.Mesh( geometry, material );
+								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 
 								signals.objectAdded.dispatch( mesh );
 								signals.objectSelected.dispatch( mesh );
@@ -234,12 +225,7 @@
 							var contents = event.target.result;
 
 							var object = new THREE.OBJLoader().parse( contents );
-
-							object.traverse( function ( node ) {
-
-								if ( node.material ) node.material.map = dummyTexture;
-
-							} );
+							applyDummyTexture( object );
 
 							signals.objectAdded.dispatch( object );
 							signals.objectSelected.dispatch( object );
@@ -257,9 +243,7 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.STLLoader().parse( contents );
-							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
-
-							var mesh = new THREE.Mesh( geometry, material );
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
@@ -299,8 +283,7 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.VTKLoader().parse( contents );
-							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
-							var mesh = new THREE.Mesh( geometry, material );
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
@@ -324,6 +307,31 @@
 			var onWindowResize = function ( event ) {
 
 				signals.windowResize.dispatch();
+
+			};
+
+			var createDummyMaterial = function ( geometry ) {
+
+				var material = new THREE.MeshLambertMaterial();
+
+				if ( geometry.faceVertexUvs[ 0 ].length > 0 )
+					material.map = dummyTexture;
+
+				return material;
+
+			};
+
+			var applyDummyTexture = function ( root ) {
+
+				root.traverse( function ( node ) {
+
+					if ( node.material && node.geometry.faceVertexUvs[ 0 ].length > 0 ) {
+
+						node.material.map = dummyTexture;
+
+					}
+
+				} );
 
 			};
 
