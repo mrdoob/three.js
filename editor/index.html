@@ -97,13 +97,16 @@
 				event.preventDefault();
 
 				var file = event.dataTransfer.files[ 0 ];
-				var extension = file.name.split( '.' ).pop().toLowerCase();
 
-				parseFile( file, extension );
+				var chunks = file.name.split( '.' );
+				var extension = chunks.pop().toLowerCase();
+				var filename = chunks.join( '.' );
+
+				parseFile( file, filename, extension );
 
 			}, false );
 
-			var parseFile = function ( file, extension ) {
+			var parseFile = function ( file, filename, extension ) {
 
 				switch ( extension ) {
 
@@ -121,6 +124,7 @@
 							loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
 
 								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
 								signals.objectSelected.dispatch( mesh );
@@ -145,6 +149,7 @@
 							var loader = new THREE.ColladaLoader();
 							loader.parse( xml, function ( collada ) {
 
+								collada.scene.name = filename;
 								applyDummyTexture( collada.scene );
 
 								signals.objectAdded.dispatch( collada.scene );
@@ -197,6 +202,7 @@
 
 								var geometry = new THREE.GeometryLoader().parse( data );
 								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
 								signals.objectSelected.dispatch( mesh );
@@ -204,6 +210,8 @@
 							} else if ( data.metadata.type === 'scene' ) {
 
 								new THREE.SceneLoader().parse( data, function ( scene ) {
+
+									scene.name = filename;
 
 									signals.objectAdded.dispatch( scene );
 									signals.objectSelected.dispatch( scene );
@@ -225,6 +233,7 @@
 							var contents = event.target.result;
 
 							var object = new THREE.OBJLoader().parse( contents );
+							object.name = filename;
 							applyDummyTexture( object );
 
 							signals.objectAdded.dispatch( object );
@@ -244,6 +253,7 @@
 
 							var geometry = new THREE.STLLoader().parse( contents );
 							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
@@ -284,6 +294,7 @@
 
 							var geometry = new THREE.VTKLoader().parse( contents );
 							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
