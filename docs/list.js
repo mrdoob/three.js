@@ -180,8 +180,7 @@ var list = {
 		],
 
 		"Extras / Objects": [
-			[ "LensFlare", "api/extras/objects/LensFlare" ],
-			[ "MarchingCubes", "api/extras/objects/MarchingCubes" ]
+			[ "LensFlare", "api/extras/objects/LensFlare" ]
 		],
 
 		"Extras / Renderers / Effects": [
