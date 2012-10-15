@@ -116,8 +116,9 @@ var Viewport = function ( signals ) {
 			controls.enabled = false;
 
 			picked = intersects[ 0 ].object;
+			selected = picked;
 
-			signals.objectSelected.dispatch( picked );
+			signals.objectSelected.dispatch( selected );
 
 			var intersects = ray.intersectObject( intersectionPlane );
 			offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
@@ -190,13 +191,15 @@ var Viewport = function ( signals ) {
 
 		if ( intersects.length > 0 ) {
 
-			signals.objectSelected.dispatch( intersects[ 0 ].object );
+			selected = intersects[ 0 ].object;
 
 		} else {
 
-			signals.objectSelected.dispatch( null );
+			selected = null;
 
 		}
+
+		signals.objectSelected.dispatch( selected );
 
 	}, false );
 
@@ -226,6 +229,55 @@ var Viewport = function ( signals ) {
 		}
 
 		render();
+
+	} );
+
+	signals.objectRemoved.add( function ( ) {
+
+		if ( !selected ) {
+
+			console.warn( "No object selected for delete" );
+			return;
+
+		}
+
+		var toRemove = {};
+
+		selected.traverse( function ( child ) {
+
+			toRemove[ child.id ] = true;
+
+		} );
+
+		var newObjects = [];
+
+		for ( var i = 0; i < objects.length; i ++ ) {
+
+			var object = objects[ i ];
+
+			if ( ! ( object.id in toRemove ) ) {
+
+				newObjects.push( object );
+
+			}
+
+		}
+
+		objects = newObjects;
+
+		selectionBox.visible = false;
+		selectionAxis.visible = false;
+
+		scene.traverse( function( node ) {
+
+			node.remove( selected );
+
+		} );
+
+		render();
+
+		signals.sceneChanged.dispatch( scene );
+		signals.objectSelected.dispatch( null );
 
 	} );
 
@@ -287,6 +339,12 @@ var Viewport = function ( signals ) {
 
 			selectionBox.visible = true;
 			selectionAxis.visible = true;
+
+		}
+
+		if ( object !== null ) {
+
+			selected = object;
 
 		}
 

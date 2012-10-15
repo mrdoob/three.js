@@ -74,6 +74,7 @@
 				sceneCreated: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
+				objectRemoved: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
 				objectChanged: new SIGNALS.Signal(),
 				materialChanged: new SIGNALS.Signal(),
@@ -109,6 +110,20 @@
 			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
 			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
 			document.body.appendChild( viewport.dom );
+
+			document.addEventListener( 'keydown', function ( event ) {
+
+				// delete
+
+				if ( event.which === 46 ) {
+
+					// here should come confirmation pop-up modal dialog
+
+					signals.objectRemoved.dispatch();
+
+				}
+
+			} );
 
 			document.addEventListener( 'drop', function ( event ) {
 
