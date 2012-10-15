@@ -66,9 +66,13 @@ var Viewport = function ( signals ) {
 	light.position.set( 1, 0.5, 0 ).normalize();
 	scene.add( light );
 
+	light.name = "Directional light #1";
+
 	var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
 	light.position.set( - 1, - 0.5, 0 ).normalize();
 	scene.add( light );
+
+	light.name = "Directional light #2";
 
 	signals.sceneChanged.dispatch( scene );
 
@@ -77,7 +81,7 @@ var Viewport = function ( signals ) {
 	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ) );
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
-	
+
 	var ray = new THREE.Ray();
 	var projector = new THREE.Projector();
 	var offset = new THREE.Vector3();
@@ -92,7 +96,7 @@ var Viewport = function ( signals ) {
 			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
 			0.5
 		);
-		
+
 		projector.unprojectVector( vector, camera );
 
 		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
@@ -111,9 +115,9 @@ var Viewport = function ( signals ) {
 			offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
 
 		} else {
-			
+
 			controls.enabled = true;
-			
+
 		}
 
 	}, false );
@@ -129,25 +133,25 @@ var Viewport = function ( signals ) {
 		projector.unprojectVector( vector, camera );
 
 		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
-		
+
 		if ( picked ) {
 
 			var intersects = ray.intersectObject( intersectionPlane );
-			
+
 			if ( intersects.length > 0 ) {
-			
+
 				picked.position.copy( intersects[ 0 ].point.subSelf( offset ) );
-				
+
 				signals.objectChanged.dispatch( picked );
 
 				render();
 
 			}
-			
+
 			return;
 
 		}
-		
+
 		var intersects = ray.intersectObjects( objects, true );
 
 		if ( intersects.length > 0 ) {
@@ -162,7 +166,7 @@ var Viewport = function ( signals ) {
 	container.dom.addEventListener( 'mouseup', function ( event ) {
 
 		picked = false;
-		
+
 		controls.enabled = true;
 
 		var vector = new THREE.Vector3(

@@ -311,6 +311,7 @@
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
 			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, map: dummyTexture } );
 			var mesh = new THREE.Mesh( geometry, material );
+			mesh.name = "Sphere";
 
 			signals.objectAdded.dispatch( mesh );
 			signals.objectSelected.dispatch( mesh );

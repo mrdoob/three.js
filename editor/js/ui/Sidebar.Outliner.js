@@ -75,7 +75,7 @@ Sidebar.Outliner = function ( signals ) {
 
 				var child = object.children[ key ];
 
-				options[ child.id ] = pad + '+ ' + object.name + ' [' + getObjectInstanceName( child ) + ']';
+				options[ child.id ] = pad + '+ ' + child.name + ' [' + getObjectInstanceName( child ) + ']';
 
 				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
 

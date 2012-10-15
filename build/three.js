@@ -6396,6 +6396,7 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 
 	this.position = new THREE.Vector3( 0, 1, 0 );
 	this.target = new THREE.Object3D();
+	this.target.name = "Light target";
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
@@ -6489,6 +6490,7 @@ THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
 
 	this.position = new THREE.Vector3( 0, 1, 0 );
 	this.target = new THREE.Object3D();
+	this.target.name = "Light target";
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
