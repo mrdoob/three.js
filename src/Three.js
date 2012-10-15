@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '52' };
+var THREE = THREE || { REVISION: '53dev' };
 
 self.console = self.console || {
 
