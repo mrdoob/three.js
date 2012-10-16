@@ -407,6 +407,8 @@ def center(vertices):
 
     translate(vertices, [-cx,-cy,-cz])
 
+    return [-cx,-cy,-cz]
+
 def top(vertices):
     """Align top of the model with the floor (Y-axis) and center it around X and Z.
     """
@@ -419,6 +421,8 @@ def top(vertices):
 
     translate(vertices, [-cx,-cy,-cz])
 
+    return [-cx,-cy,-cz]
+
 def bottom(vertices):
     """Align bottom of the model with the floor (Y-axis) and center it around X and Z.
     """
@@ -430,6 +434,8 @@ def bottom(vertices):
     cz = bb['z'][0] + (bb['z'][1] - bb['z'][0])/2.0
 
     translate(vertices, [-cx,-cy,-cz])
+
+    return [-cx,-cy,-cz]
 
 # #####################################################
 # Elements rendering
@@ -1446,7 +1452,7 @@ def generate_mesh_string(objects, scene,
 
         scene_frames = range(scene.frame_start, scene.frame_end + 1, option_frame_step)
 
-        for frame in scene_frames:
+        for index, frame in enumerate(scene_frames):
             scene.frame_set(frame, 0.0)
 
             anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
@@ -1455,6 +1461,19 @@ def generate_mesh_string(objects, scene,
 
             for mesh, object in anim_meshes:
                 frame_vertices.extend(mesh.vertices[:])
+
+            if index == 0:
+                if align_model == 1:
+                    offset = center(frame_vertices)
+                elif align_model == 2:
+                    offset = bottom(frame_vertices)
+                elif align_model == 3:
+                    offset = top(frame_vertices)
+                else:
+                    offset = False
+            else:
+                if offset:
+                    translate(frame_vertices, offset)
 
             morphVertices = generate_vertices(frame_vertices, option_vertices_truncate, option_vertices)
             morphs.append(morphVertices)
