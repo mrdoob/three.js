@@ -172,7 +172,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	var materialEnvMapRow = new UI.Panel();
 	var materialEnvMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
 	var materialEnvMap = new UI.CubeTexture( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
-	var materialReflectivity = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).setColor( '#444' ).onChange( update );
+	var materialReflectivity = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).onChange( update );
 
 
 	materialEnvMapRow.add( new UI.Text().setValue( 'Env Map' ).setColor( '#666' ) );

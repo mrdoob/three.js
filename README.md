@@ -65,6 +65,31 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 ### Change log ###
 
+2012 10 15 - **r52** (379,442 KB, gzip: 94,126 KB)
+
+* New node.js build system. ([gero3](http://github.com/gero3))
+* Proper edge handling in `SubdivisionModifier`. ([zz85](http://github.com/zz85))
+* Added `defines` parameter for adding preprocessor definitions to `ShaderMaterial`. ([alteredq](http://github.com/alteredq))
+* Split `ShaderExtras` into single files (`BasicShader`, `BlendShader`, `ConvolutionShader`, ... ). ([mrdoob](http://github.com/mrdoob))
+* Added `HueSaturationShader` and `BrightnessContrastShader`. ([tapio](http://github.com/tapio))
+* Fixed `ColladaLoader` not loading sometimes. ([tapio](http://github.com/tapio))
+* Added `material.vertexColors = THREE.FaceColor` support to `CanvasRenderer` and `SVGRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Added `Object3D.defaultEulerOrder`. ([mrdoob](http://github.com/mrdoob))
+* Replaced `SceneUtils.traverseHierarchy` and `SceneUtils.showHierarchy` with `object.traverse`. ([mrdoob](http://github.com/mrdoob))
+* Added `PointerLockControls`. ([mrdoob](http://github.com/mrdoob))
+* Completed more [documentation](http://mrdoob.github.com/three.js/docs/) pages. ([sole](http://github.com/sole))
+* Split `SceneUtils.cloneObject` into `*.clone()`. ([mrdoob](http://github.com/mrdoob))
+* Simplified `AxisHelper`. ([mrdoob](http://github.com/mrdoob))
+* Added `GeometryExporter`. ([mrdoob](http://github.com/mrdoob))
+* Improved `OrbitControls`. ([WestLangley](http://github.com/WestLangley))
+* Added `GeometryLibrary`, `MaterialLibrary`, `TextureLibrary` and `ObjectLibrary` (bear in mind that you can't rely on the GC now. Call `*.deallocate()` for removing). ([mrdoob](http://github.com/mrdoob))
+* Moved `*Controls` out of the lib. ([mrdoob](http://github.com/mrdoob))
+* Fixed shadows getting animated when skinning / morphing was disabled. ([alteredq](http://github.com/alteredq))
+* Added `Manual` section to the [documentation](http://mrdoob.github.com/three.js/docs/) pages. ([oal](http://github.com/oal))
+* Added `.angleTo()` to `Vector3`. ([Wilt](http://github.com/Wilt))
+* Many improvements to the [editor](http://mrdoob.github.com/three.js/editor/). ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+
+
 2012 09 15 - **r51** (405,491 KB, gzip: 99,389 KB)
 
 * Added `STLLoader`. ([aleeper](http://github.com/aleeper) and [mrdoob](http://github.com/mrdoob))

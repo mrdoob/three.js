@@ -11,14 +11,14 @@
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, debug ) {
+THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, debug ) {
 
 	THREE.Geometry.call( this );
 
 	this.path = path;
 	this.segments = segments || 64;
 	this.radius = radius || 1;
-	this.segmentsRadius = segmentsRadius || 8;
+	this.radiusSegments = radiusSegments || 8;
 	this.closed = closed || false;
 
 	if ( debug ) this.debug = new THREE.Object3D();
@@ -83,9 +83,9 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 
 		}
 
-		for ( j = 0; j < this.segmentsRadius; j++ ) {
+		for ( j = 0; j < this.radiusSegments; j++ ) {
 
-			v = j / this.segmentsRadius * 2 * Math.PI;
+			v = j / this.radiusSegments * 2 * Math.PI;
 
 			cx = -this.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = this.radius * Math.sin( v );
@@ -105,20 +105,20 @@ THREE.TubeGeometry = function( path, segments, radius, segmentsRadius, closed, d
 
 	for ( i = 0; i < this.segments; i++ ) {
 
-		for ( j = 0; j < this.segmentsRadius; j++ ) {
+		for ( j = 0; j < this.radiusSegments; j++ ) {
 
 			ip = ( closed ) ? (i + 1) % this.segments : i + 1;
-			jp = (j + 1) % this.segmentsRadius;
+			jp = (j + 1) % this.radiusSegments;
 
 			a = this.grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
 			b = this.grid[ ip ][ j ];
 			c = this.grid[ ip ][ jp ];
 			d = this.grid[ i ][ jp ];
 
-			uva = new THREE.UV( i / this.segments, j / this.segmentsRadius );
-			uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.segmentsRadius );
-			uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.segmentsRadius );
-			uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.segmentsRadius );
+			uva = new THREE.UV( i / this.segments, j / this.radiusSegments );
+			uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.radiusSegments );
+			uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.radiusSegments );
+			uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.radiusSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );

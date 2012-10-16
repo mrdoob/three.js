@@ -22,6 +22,7 @@
 				color: #555;
 				font-family: 'inconsolata';
 				font-size: 15px;
+				line-height: 18px;
 				overflow: hidden;
 			}
 
@@ -43,15 +44,27 @@
 			}
 
 				#panel h1 {
-					color: #333;
+					margin-top: 20px;
+					margin-left: 20px;
 					font-size: 25px;
 					font-weight: normal;
+				}
 
-					margin-top: 25px;
-					margin-left: 20px;
+				#panel h1 a {
+					color: #444;
+					text-decoration: none;
 				}
 
 				#panel h2 {
+					color: #454545;
+					font-size: 18px;
+					font-weight: normal;
+
+					margin-top: 20px;
+					margin-left: 20px;
+				}
+
+				#panel h3 {
 					color: #666;
 					font-size: 16px;
 					font-weight: normal;
@@ -84,24 +97,34 @@
 
 		<script src="list.js"></script>
 		<script>
-			var REVISION = '51';
+			var REVISION = '52';
 
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
-			var html = '<h1>three.js<span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
+			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
-			for ( var category in list ) {
+			for ( var section in list ) {
 
-				html += '<h2>' + category + '</h2>';
+				html += '<h2>' + section + '</h2>';
 
 				html += '<ul>';
 
-				for ( var i = 0; i < list[ category ].length; i ++ ) {
+				for ( var category in list[ section ] ) {
 
-					var page = list[ category ][ i ];
+					html += '<h3>' + category + '</h3>';
 
-					html += '<li><a href="javascript:goTo(\'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+					html += '<ul>';
+
+					for ( var i = 0; i < list[ section ][ category ].length; i ++ ) {
+
+						var page = list[ section ][ category ][ i ];
+
+						html += '<li><a href="javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+
+					}
+
+					html += '</ul>';
 
 				}
 
@@ -113,20 +136,20 @@
 
 			// Page loading
 
-			function goTo( name ) {
+			function goTo( section, category, name ) {
 
-				var path = pages[ name ];
+				window.document.title = 'three.js - documentation - ' + section + ' - ' + name;
 
-				window.document.title = 'three.js - documentation - ' + name;
+				window.location.hash = section + '/' + category + '/' + name.replace(/\ /g, '-');
 
-				window.location.hash = name;
-				viewer.src = 'api/' + path + '.html';
+				viewer.src = pages[ section ][ category ][ name ] + '.html';
 
 			}
 
 			function goToHash() {
 
-				goTo( window.location.hash.substring( 1 ) );
+				var hash = window.location.hash.substring( 1 ).split('/');
+				goTo( hash[0], hash[1], hash[2].replace(/\-/g, ' ') );
 
 			}
 

@@ -52,16 +52,6 @@ var Viewport = function ( signals ) {
 	camera.lookAt( scene.position );
 	scene.add( camera );
 
-	var controls = new THREE.TrackballControls( camera, container.dom );
-	controls.rotateSpeed = 1.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
-	controls.addEventListener( 'change', render );
-
 	var light1 = new THREE.DirectionalLight( 0xffffff );
 	light1.position.set( 1, 0.5, 0 ).normalize();
 	scene.add( light1 );
@@ -74,14 +64,11 @@ var Viewport = function ( signals ) {
 
 	camera.name = "Camera";
 
-	light1.name = "Light #1";
-	light1.target.name = "Light #1 target";
+	light1.name = "Light 1";
+	light1.target.name = "Target for light 1";
 
-	light2.name = "Light #2";
-	light2.target.name = "Light #2 target";
-
-	//
-
+	light2.name = "Light 2";
+	light2.target.name = "Target for light 2";
 	signals.sceneChanged.dispatch( scene );
 
 	// object picking
@@ -95,7 +82,9 @@ var Viewport = function ( signals ) {
 	var offset = new THREE.Vector3();
 	var picked = null;
 
-	container.dom.addEventListener( 'mousedown', function ( event ) {
+	// events
+
+	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
 
@@ -115,13 +104,18 @@ var Viewport = function ( signals ) {
 
 			controls.enabled = false;
 
-			picked = intersects[ 0 ].object;
-			selected = picked;
+			intersectionPlane.position.copy( intersects[ 0 ].object.position );
+			intersectionPlane.lookAt( camera.position );
 
-			signals.objectSelected.dispatch( selected );
+			picked = intersects[ 0 ].object;
+
+			signals.objectSelected.dispatch( picked );
 
 			var intersects = ray.intersectObject( intersectionPlane );
 			offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
+
+			document.addEventListener( 'mousemove', onMouseMove, false );
+			document.addEventListener( 'mouseup', onMouseUp, false );
 
 		} else {
 
@@ -129,9 +123,9 @@ var Viewport = function ( signals ) {
 
 		}
 
-	}, false );
+	};
 
-	container.dom.addEventListener( 'mousemove', function ( event ) {
+	var onMouseMove = function ( event ) {
 
 		var vector = new THREE.Vector3(
 			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
@@ -143,40 +137,28 @@ var Viewport = function ( signals ) {
 
 		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
 
-		if ( picked ) {
-
-			var intersects = ray.intersectObject( intersectionPlane );
-
-			if ( intersects.length > 0 ) {
-
-				picked.position.copy( intersects[ 0 ].point.subSelf( offset ) );
-
-				signals.objectChanged.dispatch( picked );
-
-				render();
-
-			}
-
-			return;
-
-		}
-
-		var intersects = ray.intersectObjects( objects, true );
+		var intersects = ray.intersectObject( intersectionPlane );
 
 		if ( intersects.length > 0 ) {
 
-			intersectionPlane.position.copy( intersects[ 0 ].object.position );
-			intersectionPlane.lookAt( camera.position );
+			picked.position.copy( intersects[ 0 ].point.subSelf( offset ) );
+
+			signals.objectChanged.dispatch( picked );
+
+			render();
 
 		}
 
-	}, false );
+	};
 
-	container.dom.addEventListener( 'mouseup', function ( event ) {
+	var onMouseUp = function ( event ) {
 
-		picked = false;
+		document.removeEventListener( 'mousemove', onMouseMove );
+		document.removeEventListener( 'mouseup', onMouseUp );
 
-		controls.enabled = true;
+	};
+
+	var onClick = function ( event ) {
 
 		var vector = new THREE.Vector3(
 			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
@@ -191,19 +173,33 @@ var Viewport = function ( signals ) {
 
 		if ( intersects.length > 0 ) {
 
-			selected = intersects[ 0 ].object;
+			signals.objectSelected.dispatch( intersects[ 0 ].object );
 
 		} else {
 
-			selected = null;
+			signals.objectSelected.dispatch( null );
 
 		}
 
-		signals.objectSelected.dispatch( selected );
+	};
 
-	}, false );
+	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'click', onClick, false );
 
-	// events
+	// controls need to be added *after* main logic,
+	// otherwise controls.enabled doesn't work.
+
+	var controls = new THREE.TrackballControls( camera, container.dom );
+	controls.rotateSpeed = 1.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.addEventListener( 'change', render );
+
+	// signals
 
 	signals.objectAdded.add( function ( object ) {
 
@@ -229,55 +225,6 @@ var Viewport = function ( signals ) {
 		}
 
 		render();
-
-	} );
-
-	signals.objectRemoved.add( function ( ) {
-
-		if ( !selected ) {
-
-			console.warn( "No object selected for delete" );
-			return;
-
-		}
-
-		var toRemove = {};
-
-		selected.traverse( function ( child ) {
-
-			toRemove[ child.id ] = true;
-
-		} );
-
-		var newObjects = [];
-
-		for ( var i = 0; i < objects.length; i ++ ) {
-
-			var object = objects[ i ];
-
-			if ( ! ( object.id in toRemove ) ) {
-
-				newObjects.push( object );
-
-			}
-
-		}
-
-		objects = newObjects;
-
-		selectionBox.visible = false;
-		selectionAxis.visible = false;
-
-		scene.traverse( function( node ) {
-
-			node.remove( selected );
-
-		} );
-
-		render();
-
-		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( null );
 
 	} );
 
@@ -339,12 +286,6 @@ var Viewport = function ( signals ) {
 
 			selectionBox.visible = true;
 			selectionAxis.visible = true;
-
-		}
-
-		if ( object !== null ) {
-
-			selected = object;
 
 		}
 

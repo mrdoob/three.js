@@ -155,9 +155,12 @@ THREE.SpritePlugin = function ( ) {
 				if ( sprite.useScreenCoordinates ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
-					_gl.uniform3f( uniforms.screenPosition, ( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
-															( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
-															  Math.max( 0, Math.min( 1, sprite.position.z ) ) );
+					_gl.uniform3f(
+						uniforms.screenPosition,
+						( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
+						( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
+						Math.max( 0, Math.min( 1, sprite.position.z ) )
+					);
 
 				} else {
 
