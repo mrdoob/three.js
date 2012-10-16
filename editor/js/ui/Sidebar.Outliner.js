@@ -17,6 +17,7 @@ Sidebar.Outliner = function ( signals ) {
 	container.setBorderTop( '1px solid #ccc' );
 
 	container.add( new UI.Text().setValue( 'SCENE' ).setColor( '#666' ) );
+	container.add( new UI.Button( 'absolute' ).setRight( '8px' ).setTop( '5px' ).setLabel( 'Export' ).onClick( exportScene ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	//var sceneGraph = new UI.Select().setMultiple( true ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
@@ -74,7 +75,7 @@ Sidebar.Outliner = function ( signals ) {
 
 				var child = object.children[ key ];
 
-				options[ child.id ] = '<div class="option_item">'+pad + '+ ' + child.name + ' <span class="object_type">[' + getObjectType( child ) + ']</span></div>';
+				options[ child.id ] = '<div class="option_item">' + pad + '+ ' + child.name + ' <span class="object_type">[' + getObjectType( child ) + ']</span></div>';
 
 				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
 
@@ -91,6 +92,18 @@ Sidebar.Outliner = function ( signals ) {
 		sceneGraph.setValue( object !== null ? object.id : null );
 
 	} );
+
+	function exportScene() {
+
+		var output = new THREE.SceneExporter().parse( scene );
+
+		var blob = new Blob( [ output ], { type: 'text/json' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	}
 
 	return container;
 

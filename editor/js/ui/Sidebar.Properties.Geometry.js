@@ -28,7 +28,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	container.setPadding( '10px' );
 
 	container.add( new UI.Text().setValue( 'GEOMETRY' ).setColor( '#666' ) );
-	container.add( new UI.Button( 'absolute' ).setRight( '0px' ).setLabel( 'Export' ).onClick( exportGeometry ) );
+	container.add( new UI.Button( 'absolute' ).setRight( '8px' ).setTop( '5px' ).setLabel( 'Export' ).onClick( exportGeometry ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// name

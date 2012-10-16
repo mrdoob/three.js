@@ -3,14 +3,23 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, sides ) {
+THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments, materials, sides ) {
 
 	THREE.Geometry.call( this );
 
-	var scope = this,
-	width_half = width / 2,
-	height_half = height / 2,
-	depth_half = depth / 2;
+	var scope = this;
+
+	this.width = width;
+	this.height = height;
+	this.depth = depth;
+
+	this.widthSegments = widthSegments || 1;
+	this.heightSegments = heightSegments || 1;
+	this.depthSegments = depthSegments || 1;
+
+	var width_half = this.width / 2;
+	var height_half = this.height / 2;
+	var depth_half = this.depth / 2;
 
 	var mpx, mpy, mpz, mnx, mny, mnz;
 
@@ -56,18 +65,18 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 
 	}
 
-	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, depth, height, width_half, mpx ); // px
-	this.sides.nx && buildPlane( 'z', 'y',   1, - 1, depth, height, - width_half, mnx ); // nx
-	this.sides.py && buildPlane( 'x', 'z',   1,   1, width, depth, height_half, mpy ); // py
-	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, width, depth, - height_half, mny ); // ny
-	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, width, height, depth_half, mpz ); // pz
-	this.sides.nz && buildPlane( 'x', 'y', - 1, - 1, width, height, - depth_half, mnz ); // nz
+	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, this.depth, this.height, width_half, mpx ); // px
+	this.sides.nx && buildPlane( 'z', 'y',   1, - 1, this.depth, this.height, - width_half, mnx ); // nx
+	this.sides.py && buildPlane( 'x', 'z',   1,   1, this.width, this.depth, height_half, mpy ); // py
+	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, this.width, this.depth, - height_half, mny ); // ny
+	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, this.width, this.height, depth_half, mpz ); // pz
+	this.sides.nz && buildPlane( 'x', 'y', - 1, - 1, this.width, this.height, - depth_half, mnz ); // nz
 
 	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
 
 		var w, ix, iy,
-		gridX = segmentsWidth || 1,
-		gridY = segmentsHeight || 1,
+		gridX = scope.widthSegments,
+		gridY = scope.heightSegments,
 		width_half = width / 2,
 		height_half = height / 2,
 		offset = scope.vertices.length;
@@ -79,12 +88,12 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
 			w = 'y';
-			gridY = segmentsDepth || 1;
+			gridY = scope.depthSegments;
 
 		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
 			w = 'x';
-			gridX = segmentsDepth || 1;
+			gridX = scope.depthSegments;
 
 		}
 

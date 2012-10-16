@@ -249,9 +249,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -261,9 +261,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -273,9 +273,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -284,30 +284,30 @@
 			"type"   : "plane",
 			"width"  : 10,
 			"height" : 10,
-			"segmentsWidth"  : 50,
-			"segmentsHeight" : 50
+			"widthSegments"  : 50,
+			"heightSegments" : 50
 		},
 
 		"quad": {
 			"type"   : "plane",
 			"width"  : 10,
 			"height" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1
+			"widthSegments"  : 1,
+			"heightSegments" : 1
 		},
 
 		"sphere": {
 			"type"    : "sphere",
 			"radius"  : 5,
-			"segmentsWidth"  : 32,
-			"segmentsHeight" : 16
+			"widthSegments"  : 32,
+			"heightSegments" : 16
 		},
 
 		"sphere_uvs": {
 			"type"    : "sphere",
 			"radius"  : 5,
-			"segmentsWidth"  : 32,
-			"segmentsHeight" : 16
+			"widthSegments"  : 32,
+			"heightSegments" : 16
 		},
 
 		"icosahedron": {

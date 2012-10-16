@@ -565,17 +565,17 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		if ( g.type === "cube" ) {
 
-			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.segmentsWidth, g.segmentsHeight, g.segmentsDepth, null, g.flipped, g.sides );
+			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.widthSegments, g.heightSegments, g.depthSegments, null, g.flipped, g.sides );
 			result.geometries[ dg ] = geometry;
 
 		} else if ( g.type === "plane" ) {
 
-			geometry = new THREE.PlaneGeometry( g.width, g.height, g.segmentsWidth, g.segmentsHeight );
+			geometry = new THREE.PlaneGeometry( g.width, g.height, g.widthSegments, g.heightSegments );
 			result.geometries[ dg ] = geometry;
 
 		} else if ( g.type === "sphere" ) {
 
-			geometry = new THREE.SphereGeometry( g.radius, g.segmentsWidth, g.segmentsHeight );
+			geometry = new THREE.SphereGeometry( g.radius, g.widthSegments, g.heightSegments );
 			result.geometries[ dg ] = geometry;
 
 		} else if ( g.type === "cylinder" ) {
