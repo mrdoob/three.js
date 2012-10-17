@@ -36,7 +36,7 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = true; // the intermediate typearrays will be deleted when set to false
+	this.dynamic = true; // the intermediate typed arrays will be deleted when set to false
 
 	// update flags
 
@@ -46,6 +46,8 @@ THREE.Geometry = function () {
 	this.normalsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
+
+	this.buffersNeedUpdate = false;
 
 };
 

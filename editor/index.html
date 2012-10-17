@@ -85,16 +85,6 @@
 
 			//
 
-			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( '2d' );
-			context.fillStyle = 'rgb(255,255,255)';
-			context.fillRect( 0, 0, canvas.width, canvas.height );
-
-			var dummyTexture = new THREE.Texture( canvas );
-			dummyTexture.needsUpdate = true;
-
-			//
-
 			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
@@ -184,7 +174,6 @@
 							loader.parse( xml, function ( collada ) {
 
 								collada.scene.name = filename;
-								applyDummyTexture( collada.scene );
 
 								signals.objectAdded.dispatch( collada.scene );
 								signals.objectSelected.dispatch( collada.scene );
@@ -268,7 +257,6 @@
 
 							var object = new THREE.OBJLoader().parse( contents );
 							object.name = filename;
-							applyDummyTexture( object );
 
 							signals.objectAdded.dispatch( object );
 							signals.objectSelected.dispatch( object );
@@ -345,7 +333,7 @@
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
 
 			var color = Math.random() * 0xffffff;
-			var material = new THREE.MeshLambertMaterial( { color: color, ambient: color, map: dummyTexture } );
+			var material = new THREE.MeshLambertMaterial( { color: color, ambient: color } );
 
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.name = "Sphere";
@@ -361,26 +349,7 @@
 
 			var createDummyMaterial = function ( geometry ) {
 
-				var material = new THREE.MeshLambertMaterial();
-
-				if ( geometry.faceVertexUvs[ 0 ].length > 0 )
-					material.map = dummyTexture;
-
-				return material;
-
-			};
-
-			var applyDummyTexture = function ( root ) {
-
-				root.traverse( function ( node ) {
-
-					if ( node.material && node.geometry.faceVertexUvs[ 0 ].length > 0 ) {
-
-						node.material.map = dummyTexture;
-
-					}
-
-				} );
+				return new THREE.MeshLambertMaterial();
 
 			};
 

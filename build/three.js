@@ -4886,7 +4886,7 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = true; // the intermediate typearrays will be deleted when set to false
+	this.dynamic = true; // the intermediate typed arrays will be deleted when set to false
 
 	// update flags
 
@@ -4896,6 +4896,8 @@ THREE.Geometry = function () {
 	this.normalsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
+
+	this.buffersNeedUpdate = false;
 
 };
 
@@ -19894,6 +19896,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					material = getBufferMaterial( object, geometryGroup );
 
+					if ( geometry.buffersNeedUpdate ) {
+
+						initMeshBuffers( geometryGroup, object );
+
+					}
+
 					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 					if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
@@ -19913,6 +19921,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.normalsNeedUpdate = false;
 				geometry.colorsNeedUpdate = false;
 				geometry.tangentsNeedUpdate = false;
+
+				geometry.buffersNeedUpdate = false;
 
 				material.attributes && clearCustomAttributes( material );
 
