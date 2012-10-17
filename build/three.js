@@ -16375,7 +16375,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
+				if ( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
 
 					attribute.__webglInitialized = true;
 
