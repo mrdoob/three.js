@@ -7,16 +7,26 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 	THREE.Geometry.call( this );
 
-	var ix, iz,
-	width_half = width / 2,
-	height_half = height / 2,
-	gridX = widthSegments || 1,
-	gridZ = heightSegments || 1,
-	gridX1 = gridX + 1,
-	gridZ1 = gridZ + 1,
-	segment_width = width / gridX,
-	segment_height = height / gridZ,
-	normal = new THREE.Vector3( 0, 0, 1 );
+	this.width = width;
+	this.height = height;
+
+	this.widthSegments = widthSegments || 1;
+	this.heightSegments = heightSegments || 1;
+
+	var ix, iz;
+	var width_half = width / 2;
+	var height_half = height / 2;
+
+	var gridX = this.widthSegments;
+	var gridZ = this.heightSegments;
+
+	var gridX1 = gridX + 1;
+	var gridZ1 = gridZ + 1;
+
+	var segment_width = this.width / gridX;
+	var segment_height = this.height / gridZ;
+
+	var normal = new THREE.Vector3( 0, 0, 1 );
 
 	for ( iz = 0; iz < gridZ1; iz ++ ) {
 

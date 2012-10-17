@@ -65,10 +65,10 @@ var Viewport = function ( signals ) {
 	camera.name = "Camera";
 
 	light1.name = "Light 1";
-	light1.target.name = "Target for light 1";
+	light1.target.name = "Light 1 Target";
 
 	light2.name = "Light 2";
-	light2.target.name = "Target for light 2";
+	light2.target.name = "Light 2 Target";
 	signals.sceneChanged.dispatch( scene );
 
 	// object picking

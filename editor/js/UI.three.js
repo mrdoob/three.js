@@ -6,7 +6,8 @@ UI.Texture = function ( position ) {
 
 	var scope = this;
 
-	this.texture = new THREE.Texture();
+	var image = new Image();
+	this.texture = new THREE.Texture( image );
 
 	this.dom = document.createElement( 'input' );
 	this.dom.type = 'file';

@@ -86,6 +86,7 @@ TEMPLATE_SCENE_ASCII = """\
 "metadata" :
 {
 	"formatVersion" : 3.1,
+	"type" 			: "scene",
 	"sourceFile"    : "%(fname)s",
 	"generatedBy"   : "Blender 2.64 Exporter",
 	"objects"       : %(nobjects)s,
@@ -94,7 +95,6 @@ TEMPLATE_SCENE_ASCII = """\
 	"textures"      : %(ntextures)s
 },
 
-"type" : "scene",
 "urlBaseType" : %(basetype)s,
 
 %(sections)s

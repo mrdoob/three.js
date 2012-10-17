@@ -15,24 +15,6 @@
 				border-top: 1px solid #ccc;
 			}
 
-			.fancy_select {
-				background: #fff;
-				border: 1px solid #ccc;
-				padding: 0;
-				cursor: default;
-				overflow: auto;
-			}
-
-			.option_item {
-				padding: 0 0.25em;
-			}
-
-			.option_selected {
-				background: #000;
-				color: #fff;
-			}
-
-			.object_type { color: #aaa }
 		</style>
 	</head>
 	<body>
@@ -48,6 +30,7 @@
 		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
+		<script src="../examples/js/exporters/SceneExporter.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
@@ -81,16 +64,6 @@
 				windowResize: new SIGNALS.Signal()
 
 			};
-
-			//
-
-			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( '2d' );
-			context.fillStyle = 'rgb(255,255,255)';
-			context.fillRect( 0, 0, canvas.width, canvas.height );
-
-			var dummyTexture = new THREE.Texture( canvas );
-			dummyTexture.needsUpdate = true;
 
 			//
 
@@ -183,7 +156,6 @@
 							loader.parse( xml, function ( collada ) {
 
 								collada.scene.name = filename;
-								applyDummyTexture( collada.scene );
 
 								signals.objectAdded.dispatch( collada.scene );
 								signals.objectSelected.dispatch( collada.scene );
@@ -267,7 +239,6 @@
 
 							var object = new THREE.OBJLoader().parse( contents );
 							object.name = filename;
-							applyDummyTexture( object );
 
 							signals.objectAdded.dispatch( object );
 							signals.objectSelected.dispatch( object );
@@ -342,7 +313,10 @@
 			}
 
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
-			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, map: dummyTexture } );
+
+			var color = Math.random() * 0xffffff;
+			var material = new THREE.MeshLambertMaterial( { color: color, ambient: color } );
+
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.name = "Sphere";
 
@@ -357,26 +331,7 @@
 
 			var createDummyMaterial = function ( geometry ) {
 
-				var material = new THREE.MeshLambertMaterial();
-
-				if ( geometry.faceVertexUvs[ 0 ].length > 0 )
-					material.map = dummyTexture;
-
-				return material;
-
-			};
-
-			var applyDummyTexture = function ( root ) {
-
-				root.traverse( function ( node ) {
-
-					if ( node.material && node.geometry.faceVertexUvs[ 0 ].length > 0 ) {
-
-						node.material.map = dummyTexture;
-
-					}
-
-				} );
+				return new THREE.MeshLambertMaterial();
 
 			};
 

@@ -414,9 +414,15 @@ UI.FancySelect = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'div' );
-	this.dom.className = "fancy_select";
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'div' );
+	dom.style.position = position || 'relative';
+	dom.style.background = '#fff';
+	dom.style.border = '1px solid #ccc';
+	dom.style.padding = '0';
+	dom.style.cursor = 'default';
+	dom.style.overflow = 'auto';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -447,11 +453,11 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 			for ( var i = 0; i < scope.options.length; i ++ ) {
 
-				scope.options[ i ].className = "";
+				scope.options[ i ].style.backgroundColor = '#f0f0f0';
 
 			}
 
-			element.className = "option_selected";
+			element.style.backgroundColor = '#f0f0f0';
 
 			scope.selectedValue = value;
 
@@ -464,6 +470,8 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 	for ( var key in options ) {
 
 		var option = document.createElement( 'div' );
+		option.style.padding = '4px';
+		option.style.whiteSpace = 'nowrap';
 		option.innerHTML = options[ key ];
 		option.value = key;
 		scope.dom.appendChild( option );
@@ -496,11 +504,11 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 		if ( element.value === key ) {
 
-			element.className = "option_selected";
+			element.style.backgroundColor = '#f0f0f0';
 
 		} else {
 
-			element.className = "";
+			element.style.backgroundColor = '';
 
 		}
 

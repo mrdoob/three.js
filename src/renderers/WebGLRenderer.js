@@ -838,7 +838,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				if( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
+				if ( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
 
 					attribute.__webglInitialized = true;
 
@@ -4359,6 +4359,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					material = getBufferMaterial( object, geometryGroup );
 
+					if ( geometry.buffersNeedUpdate ) {
+
+						initMeshBuffers( geometryGroup, object );
+
+					}
+
 					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
 					if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
@@ -4378,6 +4384,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry.normalsNeedUpdate = false;
 				geometry.colorsNeedUpdate = false;
 				geometry.tangentsNeedUpdate = false;
+
+				geometry.buffersNeedUpdate = false;
 
 				material.attributes && clearCustomAttributes( material );
 
