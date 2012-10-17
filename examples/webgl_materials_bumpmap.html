@@ -34,8 +34,11 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-			.code { }
 
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -191,14 +194,6 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-
-					stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-					stats.domElement.children[ 0 ].style.background = "transparent";
-					stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 					container.appendChild( stats.domElement );
 
 				}
