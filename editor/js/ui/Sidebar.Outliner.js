@@ -20,11 +20,8 @@ Sidebar.Outliner = function ( signals ) {
 	container.add( new UI.Button( 'absolute' ).setRight( '8px' ).setTop( '5px' ).setLabel( 'Export' ).onClick( exportScene ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	//var sceneGraph = new UI.Select().setMultiple( true ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	var sceneGraph = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	container.add( sceneGraph );
-
-	container.add( new UI.Break() );
 
 	var scene = null;
 
