@@ -170,7 +170,8 @@ THREE.SpritePlugin = function ( ) {
 
 				}
 
-				size = sprite.map.image.width / ( sprite.scaleByViewport ? viewportHeight : 1 );
+				//size = sprite.map.image.width / ( sprite.scaleByViewport ? viewportHeight : 1 );
+				size = 1 / ( sprite.scaleByViewport ? viewportHeight : 1 );
 
 				scale[ 0 ] = size * invAspect * sprite.scale.x;
 				scale[ 1 ] = size * sprite.scale.y;
