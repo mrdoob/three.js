@@ -306,7 +306,10 @@
 
 						var sprite = new THREE.Sprite( p );
 
-						sprite.scale.set( s, s, s );
+						var spriteWidth = 128;
+						var spriteHeight = 128;
+
+						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
 
 						object.bodyMesh.add( sprite );
@@ -371,7 +374,10 @@
 
 						var sprite = new THREE.Sprite( p );
 
-						sprite.scale.set( s, s, s );
+						var spriteWidth = 128;
+						var spriteHeight = 128;
+
+						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
 
 						object.bodyMesh.add( sprite );
