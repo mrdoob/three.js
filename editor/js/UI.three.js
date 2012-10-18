@@ -27,6 +27,7 @@ UI.Texture = function ( position ) {
 			reader.addEventListener( 'load', function ( event ) {
 
 				var image = document.createElement( 'img' );
+
 				image.addEventListener( 'load', function( event ) {
 
 					scope.texture.image = this;
@@ -35,9 +36,34 @@ UI.Texture = function ( position ) {
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 				}, false );
+
 				image.src = event.target.result;
 
+				// remember the original filename (including extension)
+				// this is used for url field in the scene export
+
+				scope.texture.sourceFile = file.name;
+
+				// generate unique name per texture
+				// based on source file name
+
+				var chunks = file.name.split( '.' );
+				var extension = chunks.pop().toLowerCase();
+				var filename = chunks.join( '.' );
+
+				if ( ! ( filename in scope.textureNameMap ) ) {
+
+					scope.textureNameMap[ filename ] = true;
+					scope.texture.name = filename;
+
+				} else {
+
+					scope.texture.name = filename + "_" + scope.texture.id;
+
+				}
+
 			}, false );
+
 			reader.readAsDataURL( file );
 
 		}
@@ -49,6 +75,8 @@ UI.Texture = function ( position ) {
 };
 
 UI.Texture.prototype = Object.create( UI.Element.prototype );
+
+UI.Texture.prototype.textureNameMap = {};
 
 UI.Texture.prototype.getValue = function () {
 

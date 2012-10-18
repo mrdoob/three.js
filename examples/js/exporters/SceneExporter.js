@@ -24,11 +24,27 @@ THREE.SceneExporter.prototype = {
 		var objectsArray = [];
 		var geometriesArray = [];
 		var materialsArray = [];
+		var texturesArray = [];
 
 		var geometriesMap = {};
 		var materialsMap = {};
+		var texturesMap = {};
 
 		// todo: make object creation properly recursive
+
+		var checkTexture = function ( map ) {
+
+			if ( ! map ) return;
+
+			if ( ! ( map.id in texturesMap ) ) {
+
+				texturesMap[ map.id ] = true;
+				texturesArray.push( TextureString( map ) );
+				ntextures += 1;
+
+			}
+
+		};
 
 		scene.traverse( function ( node ) {
 
@@ -51,6 +67,13 @@ THREE.SceneExporter.prototype = {
 					materialsArray.push( MaterialString( node.material ) );
 					nmaterials += 1;
 
+					checkTexture( node.material.map );
+					checkTexture( node.material.envMap );
+					checkTexture( node.material.lightMap );
+					checkTexture( node.material.specularMap );
+					checkTexture( node.material.bumpMap );
+					checkTexture( node.material.normalMap );
+
 				}
 
 			}
@@ -60,8 +83,8 @@ THREE.SceneExporter.prototype = {
 		var objects = generateMultiLineString( objectsArray, ",\n\n\t" );
 		var geometries = generateMultiLineString( geometriesArray, ",\n\n\t" );
 		var materials = generateMultiLineString( materialsArray, ",\n\n\t" );
+		var textures = generateMultiLineString( texturesArray, ",\n\n\t" );
 
-		var textures = "";
 		var cameras = "";
 		var lights = "";
 
@@ -72,6 +95,12 @@ THREE.SceneExporter.prototype = {
 		var defcamera = LabelString( "default_camera" );
 
 		//
+
+		function Vector2String( v ) {
+
+			return "[" + v.x + "," + v.y + "]";
+
+		}
 
 		function Vector3String( v ) {
 
@@ -88,6 +117,21 @@ THREE.SceneExporter.prototype = {
 		function LabelString( s ) {
 
 			return '"' + s + '"';
+
+		}
+
+		function NumConstantString( c ) {
+
+			var constants = [ "NearestFilter", "NearestMipMapNearestFilter" , "NearestMipMapLinearFilter",
+							  "LinearFilter", "LinearMipMapNearestFilter", "LinearMipMapLinearFilter" ];
+
+			for ( var i = 0; i < constants.length; i ++ ) {
+
+				if ( THREE[ constants[ i ] ] === c ) return LabelString( constants[ i ] );
+
+			};
+
+			return "";
 
 		}
 
@@ -299,6 +343,31 @@ THREE.SceneExporter.prototype = {
 			return generateMultiLineString( output, '\n\t\t' );
 
 		}
+
+		function TextureString( t ) {
+
+			// here would be also an option to use data URI
+			// with embedded image from "t.image.src"
+			// (that's a side effect of using FileReader to load images)
+
+			var output = [
+
+			'\t' + LabelString( getTextureName( t ) ) + ': {',
+			'	"url"    : "' + t.sourceFile + '",',
+			'	"repeat" : ' + Vector2String( t.repeat ) + ',',
+			'	"offset" : ' + Vector2String( t.offset ) + ',',
+			'	"magFilter" : ' + NumConstantString( t.magFilter ) + ',',
+			'	"minFilter" : ' + NumConstantString( t.minFilter ) + ',',
+			'	"anisotropy" : ' + t.anisotropy,
+			'}',
+
+			];
+
+			return generateMultiLineString( output, '\n\t\t' );
+
+		}
+
+		//
 
 		function generateMultiLineString( lines, separator ) {
 
