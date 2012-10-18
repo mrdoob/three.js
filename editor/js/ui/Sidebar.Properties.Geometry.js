@@ -123,7 +123,7 @@ Sidebar.Properties.Geometry = function ( signals ) {
 
 		var output = new THREE.GeometryExporter().parse( selected );
 
-		var blob = new Blob( [ output ], { type: 'text/json' } );
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
 
 		window.open( objectURL, '_blank' );
