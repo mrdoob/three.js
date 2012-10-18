@@ -166,12 +166,18 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 						prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 						nextKey = this.getNextKeyWith( type, h, 1 );
 
-						while( nextKey.time < currentTime ) {
+						//START_VEROLD_MOD
+						if ( prevKey != nextKey ) {
+							//END_VEROLD_MOD
+							while( nextKey.time < currentTime ) {
 
-							prevKey = nextKey;
-							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
+								prevKey = nextKey;
+								nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
 
+							}
+							//START_VEROLD_MOD
 						}
+						//END_VEROLD_MOD
 
 					} else {
 
@@ -186,8 +192,9 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 						prevKey = nextKey;
 						nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
-
-					} while( nextKey.time < currentTime )
+						//START_VEROLD_MOD
+					} while( nextKey.time < currentTime && prevKey != nextKey )
+					//END_VEROLD_MOD
 
 				}
 

@@ -3759,11 +3759,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( scene.overrideMaterial ) {
 
 			var material = scene.overrideMaterial;
-
-			this.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-			this.setDepthTest( material.depthTest );
-			this.setDepthWrite( material.depthWrite );
-			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+			//START_VEROLD_MOD - override materials are objects with separate materials defined for different types of objects
+			this.setBlending( material["static"].blending, material["static"].blendEquation, material["static"].blendSrc, material["static"].blendDst );
+			this.setDepthTest( material["static"].depthTest );
+			this.setDepthWrite( material["static"].depthWrite );
+			setPolygonOffset( material["static"].polygonOffset, material["static"].polygonOffsetFactor, material["static"].polygonOffsetUnits );
+			//END_VEROLD_MOD
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
@@ -3898,7 +3899,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( overrideMaterial ) {
 
-					material = overrideMaterial;
+					//START_VEROLD_MOD
+					if ( object instanceof THREE.SkinnedMesh ) {
+						material = overrideMaterial[ "skinned" ];
+					}
+					else {
+						material = overrideMaterial[ "static" ];
+					}
+					//END_VEROLD_MOD
 
 				} else {
 
@@ -4052,14 +4060,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			globject.transparent = null;
 
 		}
-		//VEROLD_MOD_START
+		//START_VEROLD_MOD
 		//Set up a special material to use for object picking
 		if ( !globject.picking ) {
-			globject.picking = new THREE.MeshBasicMaterial( { color: object.id } )
+			globject.picking = object.pickingMaterial;
 		}
-		//VEROLD_MOD_END
-		
-
+		//END_VEROLD_MOD
 	};
 
 	function unrollBufferMaterial ( globject ) {
@@ -4113,12 +4119,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-		//VEROLD_MOD_START
+		//START_VEROLD_MOD
 		//Set up a special material to use for object picking
 		if ( !globject.picking ) {
-			globject.picking = new THREE.MeshBasicMaterial( { color: object.id } )
+			globject.picking = object.pickingMaterial;
 		}
-		//VEROLD_MOD_END
+		//END_VEROLD_MOD
 
 	};
 

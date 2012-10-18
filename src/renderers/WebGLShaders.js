@@ -1981,14 +1981,18 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "lightmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
-				"#ifdef USE_ENVMAP",
+				//START_VEROLD_MOD
+				//Commenting out ENVMAP stuff for basic material because we use it for
+				//picking skinned geometry. With USE_SKINNING enabled and not USE_ENV, this
+				//shader doesn't compile.
+				//"#ifdef USE_ENVMAP",
 
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
+				//THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-				"#endif",
+				//"#endif",
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
