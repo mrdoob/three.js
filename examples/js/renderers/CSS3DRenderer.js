@@ -67,7 +67,7 @@ THREE.CSS3DRenderer = function () {
 
 		return Math.abs( value ) < 0.000001 ? 0 : value;
 
-        }
+        };
 
 	var getCameraCSSMatrix = function ( matrix ) {
 
@@ -98,7 +98,7 @@ THREE.CSS3DRenderer = function () {
 
 		var elements = matrix.elements;
 
-		return 'translate3d(-50%,-50%,0) scale3d(1,-1,1) matrix3d(' +
+		return 'translate3d(-50%,-50%,0) matrix3d(' +
 			epsilon( elements[ 0 ] ) + ',' +
 			epsilon( elements[ 1 ] ) + ',' +
 			epsilon( elements[ 2 ] ) + ',' +
@@ -115,7 +115,7 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 13 ] ) + ',' +
 			epsilon( elements[ 14 ] ) + ',' +
 			epsilon( elements[ 15 ] ) +
-		')';
+		') scale3d(1,-1,1)';
 
 	}
 
