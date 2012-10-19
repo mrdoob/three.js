@@ -75,3 +75,9 @@ THREE.LOD.prototype.update = function ( camera ) {
 	}
 
 };
+
+THREE.LOD.prototype.clone = function () {
+
+	// TODO
+
+};

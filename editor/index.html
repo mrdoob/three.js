@@ -20,15 +20,21 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/controls/TrackballControls.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
+		<script src="../examples/js/loaders/ctm/lzma.js"></script>
+		<script src="../examples/js/loaders/ctm/ctm.js"></script>
+		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
+		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
 		<script src="js/UI.js"></script>
+		<script src="js/UI.three.js"></script>
 		<script src="js/ui/Menubar.js"></script>
 		<script src="js/ui/Viewport.js"></script>
 		<script src="js/ui/Sidebar.js"></script>
@@ -59,6 +65,16 @@
 
 			//
 
+			var canvas = document.createElement( 'canvas' );
+			var context = canvas.getContext( '2d' );
+			context.fillStyle = 'rgb(255,255,255)';
+			context.fillRect( 0, 0, canvas.width, canvas.height );
+
+			var dummyTexture = new THREE.Texture( canvas );
+			dummyTexture.needsUpdate = true;
+
+			//
+
 			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
@@ -82,73 +98,186 @@
 
 				var file = event.dataTransfer.files[ 0 ];
 				var extension = file.name.split( '.' ).pop().toLowerCase();
-				var reader = new FileReader();
 
-				reader.onload = function ( event ) {
-
-					parseFile( event.target.result, extension );
-
-				};
-
-				reader.readAsText( file );
+				parseFile( file, extension );
 
 			}, false );
 
-			var parseFile = function ( contents, extension ) {
+			var parseFile = function ( file, extension ) {
 
 				switch ( extension ) {
 
+					case 'ctm':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var stream = new CTM.Stream( contents );
+							stream.offset = 0;
+
+							var loader = new THREE.CTMLoader();
+							loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
+
+								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
+
+								var mesh = new THREE.Mesh( geometry, material );
+
+								signals.objectAdded.dispatch( mesh );
+								signals.objectSelected.dispatch( mesh );
+
+							} );
+
+						}, false );
+						reader.readAsBinaryString( file );
+
+						break;
+
 					case 'dae':
 
-						var parser = new DOMParser();
-						var xml = parser.parseFromString( contents, 'text/xml' );
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
 
-						// TODO: Update ColladaLoader
+							var contents = event.target.result;
 
-						var loader = new THREE.ColladaLoader();
-						loader.parse( xml, function ( collada ) {
+							var parser = new DOMParser();
+							var xml = parser.parseFromString( contents, 'text/xml' );
 
-							signals.objectAdded.dispatch( collada.scene );
-							signals.objectSelected.dispatch( collada.scene );
+							var loader = new THREE.ColladaLoader();
+							loader.parse( xml, function ( collada ) {
 
-						} );
+								 collada.scene.traverse( function ( node ) {
+
+									if ( node.material ) node.material.map = dummyTexture;
+
+								} );
+
+
+								signals.objectAdded.dispatch( collada.scene );
+								signals.objectSelected.dispatch( collada.scene );
+
+							} );
+
+						}, false );
+						reader.readAsText( file );
 
 						break;
 
 					case 'js':
 
-						// 2.0
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
 
-						if ( contents.indexOf( 'postMessage' ) !== -1 ) {
+							var contents = event.target.result;
 
-							var blob = new Blob( [ contents ], { type: 'text/javascript' } );
-							var url = URL.createObjectURL( blob );
+							// 2.0
 
-							var worker = new Worker( url );
+							if ( contents.indexOf( 'postMessage' ) !== -1 ) {
 
-							worker.onmessage = function ( event ) {
+								var blob = new Blob( [ contents ], { type: 'text/javascript' } );
+								var url = URL.createObjectURL( blob );
 
-								event.data.metadata = { 'format': 2 };
-								parseFile( JSON.stringify( event.data ), extension );
+								var worker = new Worker( url );
 
-							};
+								worker.onmessage = function ( event ) {
 
-							worker.postMessage( new Date().getTime() );
+									event.data.metadata = { 'format': 2 };
+									parseFile( JSON.stringify( event.data ), extension );
 
-							return;
+								};
 
-						}
+								worker.postMessage( new Date().getTime() );
 
-						// 3.0
+								return;
 
-						var data = JSON.parse( contents );
+							}
 
-						if ( data.metadata === undefined ) data.metadata = { type: 'geometry' }; // 2.0
-						if ( data.metadata.type === undefined ) data.metadata.type = 'geometry'; // 3.0
+							// 3.0
 
-						if ( data.metadata.type === 'geometry' ) {
+							var data = JSON.parse( contents );
 
-							var geometry = new THREE.GeometryLoader().parse( data );
+							if ( data.metadata === undefined ) data.metadata = { type: 'geometry' }; // 2.0
+							if ( data.metadata.type === undefined ) data.metadata.type = 'geometry'; // 3.0
+
+							if ( data.metadata.type === 'geometry' ) {
+
+								var geometry = new THREE.GeometryLoader().parse( data );
+								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
+
+								var mesh = new THREE.Mesh( geometry, material );
+
+								signals.objectAdded.dispatch( mesh );
+								signals.objectSelected.dispatch( mesh );
+
+							} else if ( data.metadata.type === 'scene' ) {
+
+								new THREE.SceneLoader().parse( data, function ( scene ) {
+
+									signals.objectAdded.dispatch( scene );
+									signals.objectSelected.dispatch( scene );
+
+								}, '' );
+
+							}
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+					case 'obj':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var object = new THREE.OBJLoader().parse( contents );
+
+							object.traverse( function ( node ) {
+
+								if ( node.material ) node.material.map = dummyTexture;
+
+							} );
+
+							signals.objectAdded.dispatch( object );
+							signals.objectSelected.dispatch( object );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+					case 'stl':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var geometry = new THREE.STLLoader().parse( contents );
+							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
+
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+					/*
+					case 'utf8':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var geometry = new THREE.UTF8Loader().parse( contents );
 							var material = new THREE.MeshLambertMaterial();
 
 							var mesh = new THREE.Mesh( geometry, material );
@@ -156,61 +285,28 @@
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
 
-						} else if ( data.metadata.type === 'scene' ) {
-
-							new THREE.SceneLoader().parse( data, function ( scene ) {
-
-								signals.objectAdded.dispatch( scene );
-								signals.objectSelected.dispatch( scene );
-
-							}, '' );
-
-						}
+						}, false );
+						reader.readAsBinaryString( file );
 
 						break;
-
-					case 'obj':
-
-						var object = new THREE.OBJLoader().parse( contents );
-
-						signals.objectAdded.dispatch( object );
-						signals.objectSelected.dispatch( object );
-
-						break;
-
-					case 'stl':
-
-						var geometry = new THREE.STLLoader().parse( contents );
-						var material = new THREE.MeshLambertMaterial();
-
-						var mesh = new THREE.Mesh( geometry, material );
-
-						signals.objectAdded.dispatch( mesh );
-						signals.objectSelected.dispatch( mesh );
-
-						break;
-
-					case 'utf8':
-
-						var geometry = new THREE.UTF8Loader().parse( contents );
-						var material = new THREE.MeshLambertMaterial();
-
-						var mesh = new THREE.Mesh( geometry, material );
-
-						signals.objectAdded.dispatch( mesh );
-						signals.objectSelected.dispatch( mesh );
-
-						break;
+					*/
 
 					case 'vtk':
 
-						var geometry = new THREE.VTKLoader().parse( contents );
-						var material = new THREE.MeshLambertMaterial();
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
 
-						var mesh = new THREE.Mesh( geometry, material );
+							var contents = event.target.result;
 
-						signals.objectAdded.dispatch( mesh );
-						signals.objectSelected.dispatch( mesh );
+							var geometry = new THREE.VTKLoader().parse( contents );
+							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
+
+						}, false );
+						reader.readAsText( file );
 
 						break;
 
@@ -219,7 +315,7 @@
 			}
 
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
-			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } );
+			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, map: dummyTexture } );
 			var mesh = new THREE.Mesh( geometry, material );
 
 			signals.objectAdded.dispatch( mesh );

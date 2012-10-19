@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author mraleph / http://mrale.ph/
  */
 
 THREE.SoftwareRenderer3 = function () {
@@ -181,15 +182,14 @@ THREE.SoftwareRenderer3 = function () {
 		var ymin = Math.max( Math.min( y1, y2 ), 0 );
 		var ymax = Math.min( Math.max( y1, y2 ), canvasHeight );
 
-		var offset = ( xmin + ymin * canvasWidth ) * 4 + 3;
+		var offset = ( xmin + ymin * canvasWidth - 1 ) * 4 + 3;
 		var linestep = ( canvasWidth - ( xmax - xmin ) ) * 4;
 
 		for ( var y = ymin; y < ymax; y ++ ) {
 
 			for ( var x = xmin; x < xmax; x ++ ) {
 
-				data[ offset ] = 0;
-				offset += 4;
+				data[ offset += 4 ] = 0;
 
 			}
 
@@ -206,13 +206,13 @@ THREE.SoftwareRenderer3 = function () {
 
 		// 28.4 fixed-point coordinates
 
-		var x1 = Math.round( 16 * x1 );
-		var x2 = Math.round( 16 * x2 );
-		var x3 = Math.round( 16 * x3 );
+		var x1 = (16 * x1) | 0;
+		var x2 = (16 * x2) | 0;
+		var x3 = (16 * x3) | 0;
 
-		var y1 = Math.round( 16 * y1 );
-		var y2 = Math.round( 16 * y2 );
-		var y3 = Math.round( 16 * y3 );
+		var y1 = (16 * y1) | 0;
+		var y2 = (16 * y2) | 0;
+		var y3 = (16 * y3) | 0;
 
 		// Deltas
 
@@ -384,7 +384,7 @@ THREE.SoftwareRenderer3 = function () {
 								var u = cx1 * scale; // 0-255!
 								var v = cx2 * scale; // 0-255!
 								data[offset] = u;
-								data[offset + 1] = v; 
+								data[offset + 1] = v;
 								data[offset + 2] = 0;
 								data[offset + 3] = 255;
 

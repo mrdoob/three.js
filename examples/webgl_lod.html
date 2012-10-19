@@ -32,14 +32,14 @@
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - level-of-details WebGL example
+			<a href="http://threejs.org" target="_blank">three.js</a> - level-of-details WebGL example
 		</div>
 
 
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -165,7 +165,15 @@
 				camera.lookAt( scene.position );
 
 				scene.updateMatrixWorld();
-				THREE.SceneUtils.traverseHierarchy( scene, function ( node ) { if ( node instanceof THREE.LOD ) node.update( camera ) } );
+				scene.traverse( function ( object ) {
+
+					if ( object instanceof THREE.LOD ) {
+
+						object.update( camera );
+
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

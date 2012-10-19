@@ -249,6 +249,12 @@ THREE.Vector3.prototype = {
 
 	},
 
+	angleTo: function ( v ) {
+
+		return Math.acos( this.dot( v ) / this.length() / v.length() );
+
+	},
+
 	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
@@ -470,9 +476,9 @@ THREE.Vector3.prototype = {
 
 	},
 
-	isZero: function () {
+	isZero: function ( v ) {
 
-		return ( this.lengthSq() < 0.0001 /* almostZero */ );
+		return this.lengthSq() < ( v !== undefined ? v : 0.0001 );
 
 	},
 
@@ -483,4 +489,3 @@ THREE.Vector3.prototype = {
 	}
 
 };
-

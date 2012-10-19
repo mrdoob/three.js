@@ -33,7 +33,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - dynamic procedural terrain using
+			<a href="http://threejs.org" target="_blank">three.js</a> - dynamic procedural terrain using
 			<a href="https://github.com/ashima/webgl-noise" target="_blank">3d simplex noise</a><br/>
 			birds by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">ro.me</a> -
 			textures by <a href="http://opengameart.org/content/dark-grass">qubodup</a> and
@@ -64,11 +64,15 @@
 -->
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/ShaderTerrain.js"></script>
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="js/shaders/LuminosityShader.js"></script>
+		<script src="js/shaders/NormalMapShader.js"></script>
+		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -76,6 +80,11 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/SavePass.js"></script>
+
+		<script src="js/ShaderTerrain.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
 
@@ -319,7 +328,7 @@
 
 				// HEIGHT + NORMAL MAPS
 
-				var normalShader = THREE.ShaderExtras[ 'normalmap' ];
+				var normalShader = THREE.NormalMapShader;
 
 				var rx = 256, ry = 256;
 				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -350,7 +359,7 @@
 				var diffuseTexture1 = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, function () {
 
 					loadTextures();
-					applyShader( THREE.ShaderExtras[ 'luminosity' ], diffuseTexture1, specularMap );
+					applyShader( THREE.LuminosityShader, diffuseTexture1, specularMap );
 
 				} );
 
@@ -479,10 +488,10 @@
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 				effectBloom = new THREE.BloomPass( 0.6 );
-				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
 
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
 
 				var bluriness = 6;
 

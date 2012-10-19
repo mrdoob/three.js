@@ -27,16 +27,18 @@
 	<body>
 
 		<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a></br>
+		<a href="http://threejs.org" target="_blank">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a></br>
 		move camera with WASD / RF + mouse
 		</div>
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/controls/FirstPersonControls.js"></script>
+
+		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="fonts/helvetiker_bold.typeface.js"></script>
 
@@ -174,7 +176,7 @@
 				cameraOrtho = new THREE.OrthographicCamera( SCREEN_WIDTH / - 2, SCREEN_WIDTH / 2,  SCREEN_HEIGHT / 2, SCREEN_HEIGHT / - 2, -10, 1000 );
 				cameraOrtho.position.z = 10;
 
-				var shader = THREE.ShaderExtras[ "unpackDepthRGBA" ];
+				var shader = THREE.UnpackDepthRGBAShader;
 				var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
 
 				hudMaterial = new THREE.ShaderMaterial( { vertexShader: shader.vertexShader, fragmentShader: shader.fragmentShader, uniforms: uniforms } );

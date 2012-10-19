@@ -218,10 +218,15 @@ UI.Panel = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'div' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'div' );
+	dom.style.position = position || 'relative';
+	dom.style.marginBottom = '10px';
 
-	// this.dom.addEventListener( 'mousedown', function ( event ) { event.preventDefault() }, false );
+	dom.style.userSelect = 'none';
+	dom.style.WebkitUserSelect = 'none';
+	dom.style.MozUserSelect = 'none';
+
+	this.dom = dom;
 
 	return this;
 };
@@ -247,8 +252,10 @@ UI.Text = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'span' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'span' );
+	dom.style.position = position || 'relative';
+
+	this.dom = dom;
 
 	return this;
 
@@ -264,6 +271,59 @@ UI.Text.prototype.setValue = function ( value ) {
 
 };
 
+
+// Input
+
+UI.Input = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'input' );
+	dom.style.position = position || 'relative';
+	dom.style.marginTop = '-2px';
+	dom.style.marginLeft = '-2px';
+
+	this.dom = dom;
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
+
+	return this;
+
+};
+
+UI.Input.prototype = Object.create( UI.Element.prototype );
+
+UI.Input.prototype.getValue = function () {
+
+	return this.dom.value;
+
+};
+
+UI.Input.prototype.setValue = function ( value ) {
+
+	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.Input.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+
 // Select
 
 UI.Select = function ( position ) {
@@ -272,12 +332,14 @@ UI.Select = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'select' );
-	this.dom.style.position = position || 'relative';
-	this.dom.style.width = '64px';
-	this.dom.style.height = '16px';
-	this.dom.style.border = '0px';
-	this.dom.style.padding = '0px';
+	var dom = document.createElement( 'select' );
+	dom.style.position = position || 'relative';
+	dom.style.width = '64px';
+	dom.style.height = '16px';
+	dom.style.border = '0px';
+	dom.style.padding = '0px';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -344,6 +406,7 @@ UI.Select.prototype.onChange = function ( callback ) {
 
 };
 
+
 // Checkbox
 
 UI.Checkbox = function ( position ) {
@@ -352,9 +415,11 @@ UI.Checkbox = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'checkbox';
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'input' );
+	dom.type = 'checkbox';
+	dom.style.position = position || 'relative';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -392,6 +457,7 @@ UI.Checkbox.prototype.onChange = function ( callback ) {
 
 };
 
+
 // Color
 
 UI.Color = function ( position ) {
@@ -400,14 +466,16 @@ UI.Color = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'color';
-	this.dom.style.position = position || 'relative';
-	this.dom.style.width = '64px';
-	this.dom.style.height = '16px';
-	this.dom.style.border = '0px';
-	this.dom.style.padding = '0px';
-	this.dom.style.backgroundColor = 'transparent';
+	var dom = document.createElement( 'input' );
+	dom.type = 'color';
+	dom.style.position = position || 'relative';
+	dom.style.width = '64px';
+	dom.style.height = '16px';
+	dom.style.border = '0px';
+	dom.style.padding = '0px';
+	dom.style.backgroundColor = 'transparent';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -454,71 +522,112 @@ UI.Number = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'input' );
-	this.dom.style.position = position || 'relative';
-	this.dom.style.marginTop = '0px';
-	this.dom.style.color = '#0080f0';
-	this.dom.style.fontSize = '12px';
-	this.dom.style.textDecoration = 'underline';
-	this.dom.style.backgroundColor = 'transparent';
-	this.dom.style.border = '0px';
+	var dom = document.createElement( 'input' );
+	dom.style.position = position || 'relative';
+	dom.style.color = '#0080f0';
+	dom.style.fontSize = '12px';
+	dom.style.cursor = 'col-resize';
+	dom.style.backgroundColor = 'transparent';
+	dom.style.borderColor = 'transparent';
+	dom.style.marginTop = '-2px';
+	dom.style.marginLegt = '-2px';
+	dom.value = '0.00';
 
-	this.dom.value = '0.00';
+	this.dom = dom;
 
 	this.min = - Infinity;
 	this.max = Infinity;
 
 	this.onChangeCallback = null;
 
-	var onMouseDownValue, onMouseDownScreenX, onMouseDownScreenY;
+	var distance = 0;
+	var onMouseDownValue = 0;
 
 	var onMouseDown = function ( event ) {
 
-		// event.preventDefault();
+		event.preventDefault();
 
-		onMouseDownValue = parseFloat( scope.dom.value );
-		onMouseDownScreenX = event.screenX;
-		onMouseDownScreenY = event.screenY;
+		distance = 0;
+
+		onMouseDownValue = parseFloat( dom.value );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
-	}
+	};
 
 	var onMouseMove = function ( event ) {
 
-		var distance = ( event.screenX - onMouseDownScreenX ) - ( event.screenY - onMouseDownScreenY );
-		var amount = event.shiftKey ? 10 : 100;
+		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
+		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
 
-		var number = onMouseDownValue + ( distance / amount );
+		distance += movementX - movementY;
 
-		scope.dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
+		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) );
+
+		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
-	}
+	};
 
 	var onMouseUp = function ( event ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-	}
+		if ( Math.abs( distance ) < 2 ) {
 
-	this.dom.addEventListener( 'mousedown', onMouseDown, false );
-	this.dom.addEventListener( 'change', function ( event ) {
+			dom.focus();
+			dom.select();
 
-		var number = parseFloat( scope.dom.value );
+		}
 
-		if ( number !== NaN ) {
+	};
 
-			scope.dom.value = number.toFixed( 2 );
+	var onChange = function ( event ) {
+
+		var number = parseFloat( dom.value );
+
+		if ( isNaN( number ) === false ) {
+
+			dom.value = number;
 
 			if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 		}
 
-	}, false );
+	};
+
+	var onFocus = function ( event ) {
+
+		dom.style.backgroundColor = '';
+		dom.style.borderColor = '';
+
+	};
+
+	var onBlur = function ( event ) {
+
+		dom.style.backgroundColor = 'transparent';
+		dom.style.borderColor = 'transparent';
+
+	};
+
+	var onKeyUp = function ( event ) {
+
+		if ( event.keyCode == 13 ) {
+
+			onBlur();
+
+		}
+
+	};
+
+	dom.addEventListener( 'mousedown', onMouseDown, false );
+	dom.addEventListener( 'change', onChange, false );
+	dom.addEventListener( 'focus', onFocus, false );
+	dom.addEventListener( 'blur', onBlur, false );
+	dom.addEventListener( 'keyup', onKeyUp, false );
 
 	return this;
 
@@ -564,7 +673,9 @@ UI.Break = function () {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'br' );
+	var dom = document.createElement( 'br' );
+
+	this.dom = dom;
 
 	return this;
 
@@ -579,14 +690,17 @@ UI.HorizontalRule = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'hr' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'hr' );
+	dom.style.position = position || 'relative';
+
+	this.dom = dom;
 
 	return this;
 
 };
 
 UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
+
 
 // Button
 
@@ -596,8 +710,10 @@ UI.Button = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'button' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'button' );
+	dom.style.position = position || 'relative';
+
+	this.dom = dom;
 
 	this.onClickCallback = null;
 

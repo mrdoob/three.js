@@ -33,14 +33,14 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl HDR texture example -
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl HDR texture example -
 			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<!-- HDR fragment shader -->
 
@@ -210,8 +210,6 @@
 				}
 
 				materialHDR.uniforms.exposure.value += sign * rate * delta;
-
-				// Render final scene to the screen with film shader
 
 				renderer.render( scene, camera );
 

@@ -10,6 +10,7 @@ body {
 	color: #555;
 	font-family: 'inconsolata';
 	font-size: 15px;
+	line-height: 18px;
 	overflow: auto;
 }
 
@@ -42,7 +43,7 @@ h3 {
 }
 
 div {
-	padding-left: 30px;
+	/* padding-left: 30px; */
 	margin-bottom: 20px;
 }
 

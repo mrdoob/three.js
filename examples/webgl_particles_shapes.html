@@ -19,11 +19,17 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/Tween.js"></script>
 		<script src="js/Sparks.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FocusShader.js"></script>
+		<script src="js/shaders/HorizontalBlurShader.js"></script>
+		<script src="js/shaders/TriangleBlurShader.js"></script>
+		<script src="js/shaders/VerticalBlurShader.js"></script>
+
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
@@ -507,12 +513,12 @@
 
 				// POST PROCESSING
 
-				var effectFocus = new THREE.ShaderPass( THREE.ShaderExtras[ "focus" ] );
+				var effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
-				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 				effectFilm = new THREE.FilmPass( 0.5, 0.25, 2048, false );
 
-				var shaderBlur = THREE.ShaderExtras[ "triangleBlur" ];
+				var shaderBlur = THREE.TriangleBlurShader;
 				effectBlurX = new THREE.ShaderPass( shaderBlur, 'texture' );
 				effectBlurY = new THREE.ShaderPass( shaderBlur, 'texture' );
 
@@ -520,8 +526,8 @@
 				var blurAmountX = radius / window.innerWidth;
 				var blurAmountY = radius / window.innerHeight;
 
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalBlurShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalBlurShader);
 
 				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
 				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
@@ -540,14 +546,14 @@
 				composer.addPass( vblur );
 				//composer.addPass( effectBlurX );
 				//composer.addPass( effectBlurY );
-				//composer.addPass( effectScreen );
+				//composer.addPass( effectCopy );
 				//composer.addPass( effectFocus );
 				//composer.addPass( effectFilm );
 
 				vblur.renderToScreen = true;
 				effectBlurY.renderToScreen = true;
 				effectFocus.renderToScreen = true;
-				effectScreen.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 				effectFilm.renderToScreen = true;
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );

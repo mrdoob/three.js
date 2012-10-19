@@ -212,10 +212,6 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
 
 };
 
-/*
- * Pose
- */
-
 THREE.SkinnedMesh.prototype.pose = function() {
 
 	this.updateMatrixWorld( true );
@@ -242,5 +238,14 @@ THREE.SkinnedMesh.prototype.pose = function() {
 
 };
 
-THREE.SkinnedMesh.offsetMatrix = new THREE.Matrix4();
+THREE.SkinnedMesh.prototype.clone = function ( object ) {
 
+	if ( object === undefined ) object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
+
+	THREE.Mesh.prototype.clone.call( this, object );
+
+	return object;
+
+};
+
+THREE.SkinnedMesh.offsetMatrix = new THREE.Matrix4();

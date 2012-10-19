@@ -32,12 +32,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl sandbox.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl sandbox.</div>
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/shaders/BasicShader.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -71,9 +72,10 @@
 				var light = new THREE.PointLight( 0xffffff );
 				scene.add( light );
 
-				var uniforms = THREE.ShaderExtras[ 'basic' ].uniforms;
-				var vertexShader = THREE.ShaderExtras[ 'basic' ].vertexShader;
-				var fragmentShader = THREE.ShaderExtras[ 'basic' ].fragmentShader;
+				var shader = THREE.BasicShader;
+				var uniforms = shader.uniforms;
+				var vertexShader = shader.vertexShader;
+				var fragmentShader = shader.fragmentShader;
 
 				var texture1 = new THREE.Texture( generateTexture( 0, 0.5, 1 ), new THREE.UVMapping() );
 				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), new THREE.SphericalReflectionMapping() );

@@ -23,10 +23,10 @@
 	<body>
 		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shape geometry</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shape geometry</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -67,7 +67,7 @@
 					// flat shape
 
 					var geometry = new THREE.ShapeGeometry( shape );
-					var material = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, overdraw: true } );
+					var material = new THREE.MeshBasicMaterial( { color: color, overdraw: true } );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( x, y, z );
@@ -277,10 +277,10 @@
 				addShape( triangleShape, 0xffee00, -180, 0, 0, 0, 0, 0, 1 );
 				addShape( roundedRectShape, 0x005500, -150, 150, 0, 0, 0, 0, 1 );
 				addShape( squareShape, 0x0055ff, 150, 100, 0, 0, 0, 0, 1 );
-				addShape( heartShape, 0xff1100, 0, 100, 0, Math.PI, 0, 0, 1 );
+				addShape( heartShape, 0xff1100, 60, 100, 0, 0, 0, Math.PI, 1 );
 				addShape( circleShape, 0x00ff11, 120, 250, 0, 0, 0, 0, 1 );
 				addShape( fishShape, 0x222222, -60, 200, 0, 0, 0, 0, 1 );
-				addShape( smileyShape, 0xee00ff, -270, 250, 0, Math.PI, 0, 0, 1 );
+				addShape( smileyShape, 0xee00ff, -200, 250, 0, 0, 0, Math.PI, 1 );
 				addShape( arcShape, 0xbb4422, 150, 0, 0, 0, 0, 0, 1 );
 				addShape( splineShape, 0x888888, -50, -100, 0, 0, 0, 0, 0.2 );
 

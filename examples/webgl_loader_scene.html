@@ -130,7 +130,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js">three.js</a> - scene loader test
+			<a href="http://threejs.org">three.js</a> - scene loader test
 		</div>
 
 		<div id="scene_explorer">
@@ -154,7 +154,7 @@
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -310,17 +310,17 @@
 
 					handle_update( result, 1 );
 
-					THREE.SceneUtils.traverseHierarchy( result.scene, function ( child ) {
+					result.scene.traverse( function ( object ) {
 
-						if ( child.properties.rotating === true ) {
+						if ( object.properties.rotating === true ) {
 
-							rotatingObjects.push( child );
+							rotatingObjects.push( object );
 
 						}
 
-						if ( child instanceof THREE.MorphAnimMesh ) {
+						if ( object instanceof THREE.MorphAnimMesh ) {
 
-							morphAnimatedObjects.push( child );
+							morphAnimatedObjects.push( object );
 
 						}
 

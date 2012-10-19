@@ -54,6 +54,33 @@ THREE.Sprite.prototype.updateMatrix = function () {
 
 };
 
+THREE.Sprite.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Sprite( {} );
+
+	object.color.copy( this.color );
+	object.map = this.map;
+	object.blending = this.blending;
+
+	object.useScreenCoordinates = this.useScreenCoordinates;
+	object.mergeWith3D = this.mergeWith3D;
+	object.affectedByDistance = this.affectedByDistance;
+	object.scaleByViewport = this.scaleByViewport;
+	object.alignment = this.alignment;
+
+	object.rotation3d.copy( this.rotation3d );
+	object.rotation = this.rotation;
+	object.opacity = this.opacity;
+
+	object.uvOffset.copy( this.uvOffset );
+	object.uvScale.copy( this.uvScale);
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};
+
 /*
  * Alignment
  */

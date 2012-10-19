@@ -49,19 +49,19 @@
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+		<a href="http://threejs.org" target="_blank">three.js</a> -
 		marching cubes -
 		[based on greggman's <a href="http://webglsamples.googlecode.com/hg/blob/blob.html">blob</a>, original code by Henrik Rydgård]
 	</div>
 
 	<script src="../build/three.min.js"></script>
 
-	<script src="js/MarchingCubes.js"></script>
+	<script src="js/controls/TrackballControls.js"></script>
 
-	<script src="js/ShaderExtras.js"></script>
-	<script src="js/ShaderToon.js"></script>
-
-	<script src="js/ShaderExtras.js"></script>
+	<script src="js/shaders/CopyShader.js"></script>
+	<script src="js/shaders/FXAAShader.js"></script>
+	<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
+	<script src="js/shaders/VerticalTiltShiftShader.js"></script>
 
 	<script src="js/postprocessing/EffectComposer.js"></script>
 	<script src="js/postprocessing/RenderPass.js"></script>
@@ -70,10 +70,12 @@
 	<script src="js/postprocessing/MaskPass.js"></script>
 	<script src="js/postprocessing/SavePass.js"></script>
 
+	<script src="js/MarchingCubes.js"></script>
+	<script src="js/ShaderToon.js"></script>
 
 	<script src="js/Detector.js"></script>
-	<script src="js/Stats.js"></script>
-	<script src="js/DAT.GUI.min.js"></script>
+	<script src="js/libs/stats.min.js"></script>
+	<script src="js/libs/DAT.GUI.min.js"></script>
 
 
 	<script>
@@ -187,10 +189,10 @@
 			renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
-			effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+			effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-			hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-			vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+			hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
+			vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
 
 			var bluriness = 8;
 

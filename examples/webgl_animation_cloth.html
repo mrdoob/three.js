@@ -40,7 +40,7 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/Cloth.js"></script>
 
@@ -225,13 +225,7 @@
 
 				arrow = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50, 0xff0000 );
 				arrow.position.set( -200, 0, -200 );
-				//scene.add( arrow );
-
-				var axis;
-				axis = new THREE.AxisHelper();
-				axis.position.set( 200, 0, -200 );
-				axis.scale.x = axis.scale.y = axis.scale.z = 0.5;
-				//scene.add( axis );
+				// scene.add( arrow );
 
 				// ground
 

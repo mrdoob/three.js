@@ -32,10 +32,16 @@ var Viewport = function ( signals ) {
 	sceneHelpers.add( grid );
 
 	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } ) );
-	selectionBox.geometry.dynamic = true;
 	selectionBox.matrixAutoUpdate = false;
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
+
+	var selectionAxis = new THREE.AxisHelper( 100 );
+	selectionAxis.material.depthTest = false;
+	selectionAxis.material.transparent = true;
+	selectionAxis.matrixAutoUpdate = false;
+	selectionAxis.visible = false;
+	sceneHelpers.add( selectionAxis );
 
 	//
 
@@ -45,21 +51,6 @@ var Viewport = function ( signals ) {
 	camera.position.set( 500, 250, 500 );
 	camera.lookAt( scene.position );
 	scene.add( camera );
-
-	var controls = new THREE.TrackballControls( camera, container.dom );
-	controls.rotateSpeed = 1.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
-	controls.addEventListener( 'change', render );
-
-	/*
-	var controls = new THREE.OrbitControls( camera, container.dom );
-	controls.addEventListener( 'change', render );
-	*/
 
 	var light = new THREE.DirectionalLight( 0xffffff );
 	light.position.set( 1, 0.5, 0 ).normalize();
@@ -73,9 +64,18 @@ var Viewport = function ( signals ) {
 
 	// object picking
 
-	var projector = new THREE.Projector();
+	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ) );
+	intersectionPlane.visible = false;
+	sceneHelpers.add( intersectionPlane );
 
-	container.dom.addEventListener( 'mousedown', function ( event ) {
+	var ray = new THREE.Ray();
+	var projector = new THREE.Projector();
+	var offset = new THREE.Vector3();
+	var picked = null;
+
+	// events
+
+	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
 
@@ -84,16 +84,87 @@ var Viewport = function ( signals ) {
 			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
 			0.5
 		);
+
 		projector.unprojectVector( vector, camera );
 
-		var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+
 		var intersects = ray.intersectObjects( objects, true );
 
-		if ( intersects.length ) {
+		if ( intersects.length > 0 ) {
+
+			controls.enabled = false;
+
+			intersectionPlane.position.copy( intersects[ 0 ].object.position );
+			intersectionPlane.lookAt( camera.position );
+
+			picked = intersects[ 0 ].object;
+
+			signals.objectSelected.dispatch( picked );
+
+			var intersects = ray.intersectObject( intersectionPlane );
+			offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
+
+			document.addEventListener( 'mousemove', onMouseMove, false );
+			document.addEventListener( 'mouseup', onMouseUp, false );
+
+		} else {
+
+			controls.enabled = true;
+
+		}
+
+	};
+
+	var onMouseMove = function ( event ) {
+
+		var vector = new THREE.Vector3(
+			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+			0.5
+		);
+
+		projector.unprojectVector( vector, camera );
+
+		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+
+		var intersects = ray.intersectObject( intersectionPlane );
+
+		if ( intersects.length > 0 ) {
+
+			picked.position.copy( intersects[ 0 ].point.subSelf( offset ) );
+
+			signals.objectChanged.dispatch( picked );
+
+			render();
+
+		}
+
+	};
+
+	var onMouseUp = function ( event ) {
+
+		document.removeEventListener( 'mousemove', onMouseMove );
+		document.removeEventListener( 'mouseup', onMouseUp );
+
+	};
+
+	var onClick = function ( event ) {
+
+		var vector = new THREE.Vector3(
+			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+			0.5
+		);
+
+		projector.unprojectVector( vector, camera );
+
+		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+		var intersects = ray.intersectObjects( objects, true );
+
+		if ( intersects.length > 0 ) {
 
 			signals.objectSelected.dispatch( intersects[ 0 ].object );
-
-			// controls.enabled = false;
 
 		} else {
 
@@ -101,19 +172,33 @@ var Viewport = function ( signals ) {
 
 		}
 
-	}, false );
+	};
 
-	// events
+	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'click', onClick, false );
+
+	// controls need to be added *after* main logic,
+	// otherwise controls.enabled doesn't work.
+
+	var controls = new THREE.TrackballControls( camera, container.dom );
+	controls.rotateSpeed = 1.0;
+	controls.zoomSpeed = 1.2;
+	controls.panSpeed = 0.8;
+	controls.noZoom = false;
+	controls.noPan = false;
+	controls.staticMoving = true;
+	controls.dynamicDampingFactor = 0.3;
+	controls.addEventListener( 'change', render );
+
+	// signals
 
 	signals.objectAdded.add( function ( object ) {
 
-		THREE.SceneUtils.traverseHierarchy( object, function ( child ) {
+		object.traverse( function ( child ) {
 
 			objects.push( child );
 
 		} );
-
-		objects.push( object );
 
 		scene.add( object );
 		render();
@@ -124,6 +209,12 @@ var Viewport = function ( signals ) {
 
 	signals.objectChanged.add( function ( object ) {
 
+		if ( object instanceof THREE.Camera ) {
+
+			object.updateProjectionMatrix();
+
+		}
+
 		render();
 
 	} );
@@ -133,6 +224,7 @@ var Viewport = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
+		selectionAxis.visible = false;
 
 		if ( object !== null && object.geometry ) {
 
@@ -181,8 +273,10 @@ var Viewport = function ( signals ) {
 			selectionBox.geometry.verticesNeedUpdate = true;
 
 			selectionBox.matrixWorld = object.matrixWorld;
+			selectionAxis.matrixWorld = object.matrixWorld;
 
 			selectionBox.visible = true;
+			selectionAxis.visible = true;
 
 		}
 
@@ -231,8 +325,8 @@ var Viewport = function ( signals ) {
 		scene.updateMatrixWorld();
 
 		renderer.clear();
-		renderer.render( sceneHelpers, camera );
 		renderer.render( scene, camera );
+		renderer.render( sceneHelpers, camera );
 
 	}
 

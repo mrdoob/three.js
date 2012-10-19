@@ -27,7 +27,7 @@
 
 	<body>
 		<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+		<a href="http://threejs.org" target="_blank">three.js</a> -
 		<a href="http://code.google.com/p/webgl-loader/" target="_blank">UTF8 format</a> loader test -
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>
 		</div>
@@ -38,7 +38,7 @@
 		<script src="js/loaders/MTLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -152,7 +152,7 @@
 					object.position.y = -125;
 					scene.add( object );
 
-					THREE.SceneUtils.traverseHierarchy( object, function( node ) {
+					object.traverse( function( node ) {
 
 						node.castShadow = true;
 						node.receiveShadow = true;
@@ -179,7 +179,7 @@
 					object.position.y = -125;
 					scene.add( object );
 
-					THREE.SceneUtils.traverseHierarchy( object, function( node ) {
+					object.traverse( function( node ) {
 
 						node.castShadow = true;
 						node.receiveShadow = true;

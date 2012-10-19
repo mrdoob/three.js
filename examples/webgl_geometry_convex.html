@@ -17,7 +17,7 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -102,9 +102,8 @@
 				scene.add( object );
 
 
-				object = new THREE.AxisHelper();
+				object = new THREE.AxisHelper( 50 );
 				object.position.set( 200, 0, -200 );
-				object.scale.x = object.scale.y = object.scale.z = 0.5;
 				scene.add( object );
 
 				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );

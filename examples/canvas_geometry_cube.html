@@ -17,7 +17,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -60,22 +60,28 @@
 
 				// Cube
 
-				var materials = [];
+				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
 
-				for ( var i = 0; i < 6; i ++ ) {
+				for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
 
 				}
 
-				cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
+
+				cube = new THREE.Mesh( geometry, material );
 				cube.position.y = 150;
 				scene.add( cube );
 
 				// Plane
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
-				plane.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+				var geometry = new THREE.PlaneGeometry( 200, 200 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } );
+
+				plane = new THREE.Mesh( geometry, material );
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();

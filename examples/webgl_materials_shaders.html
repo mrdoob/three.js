@@ -31,7 +31,7 @@
 			<span id="rwebgl" class="button">WebGL renderer</span>
 			<br/>
 
-			<p><a href="http://github.com/mrdoob/three.js">Three.js</a> example
+			<p><a href="http://threejs.org">Three.js</a> example
 
 			<br/>
 			<p>Best viewed in Chrome 9 or Firefox 4 using WebGL renderer.
@@ -42,7 +42,7 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -165,13 +165,9 @@
 
 				}
 
-				if ( render_canvas ) {
-
-					canvasRenderer = new THREE.CanvasRenderer();
-					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-					container.appendChild( canvasRenderer.domElement );
-
-				}
+				canvasRenderer = new THREE.CanvasRenderer();
+				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				container.appendChild( canvasRenderer.domElement );
 
 				//
 

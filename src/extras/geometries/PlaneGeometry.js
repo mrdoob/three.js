@@ -4,7 +4,7 @@
  */
 
 //START_VEROLD_MOD
-THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight, uvMult ) {
+THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments, uvMult ) {
 //END_VEROLD_MOD
 
 	THREE.Geometry.call( this );
@@ -12,8 +12,8 @@ THREE.PlaneGeometry = function ( width, height, segmentsWidth, segmentsheight, u
 	var ix, iz,
 	width_half = width / 2,
 	height_half = height / 2,
-	gridX = segmentsWidth || 1,
-	gridZ = segmentsheight || 1,
+	gridX = widthSegments || 1,
+	gridZ = heightSegments || 1,
 	gridX1 = gridX + 1,
 	gridZ1 = gridZ + 1,
 	segment_width = width / gridX,
