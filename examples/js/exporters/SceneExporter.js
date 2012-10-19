@@ -76,6 +76,16 @@ THREE.SceneExporter.prototype = {
 
 				}
 
+			} else if ( node instanceof THREE.Light ) {
+
+				objectsArray.push( LightString( node ) );
+				nobjects += 1;
+
+			} else if ( node instanceof THREE.Camera ) {
+
+				objectsArray.push( CameraString( node ) );
+				nobjects += 1;
+
 			}
 
 		} );
@@ -84,9 +94,6 @@ THREE.SceneExporter.prototype = {
 		var geometries = generateMultiLineString( geometriesArray, ",\n\n\t" );
 		var materials = generateMultiLineString( materialsArray, ",\n\n\t" );
 		var textures = generateMultiLineString( texturesArray, ",\n\n\t" );
-
-		var cameras = "";
-		var lights = "";
 
 		// todo: get somehow these from Viewport's renderer
 
@@ -136,6 +143,130 @@ THREE.SceneExporter.prototype = {
 		}
 
 		//
+
+		function LightString( l ) {
+
+			if ( l instanceof THREE.AmbientLight ) {
+
+				var output = [
+
+				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'	"type" : AmbientLight,',
+				'	"color"  : ' + l.color.getHex(),
+				'}'
+
+				];
+
+			} else if ( l instanceof THREE.DirectionalLight ) {
+
+				var output = [
+
+				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'	"type" : DirectionalLight,',
+				'	"color"  : ' + l.color.getHex() + ',',
+				'	"intensity"  : ' + l.intensity + ',',
+				'	"direction" : ' + Vector3String( l.position ),
+				'}'
+
+				];
+
+			} else if ( l instanceof THREE.PointLight ) {
+
+				var output = [
+
+				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'	"type" : PointLight,',
+				'	"color"  : ' + l.color.getHex() + ',',
+				'	"intensity"  : ' + l.intensity + ',',
+				'	"position" : ' + Vector3String( l.position ) + ',',
+				'	"distance"  : ' + l.distance,
+				'}'
+
+				];
+
+			} else if ( l instanceof THREE.SpotLight ) {
+
+				var output = [
+
+				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'	"type" : SpotLight,',
+				'	"color"  : ' + l.color.getHex() + ',',
+				'	"intensity"  : ' + l.intensity + ',',
+				'	"position" : ' + Vector3String( l.position ) + ',',
+				'	"distance"  : ' + l.distance + ',',
+				'	"angle"  : ' + l.angle + ',',
+				'	"exponent"  : ' + l.exponent,
+				'}'
+
+				];
+
+			} else if ( l instanceof THREE.HemisphereLight ) {
+
+				var output = [
+
+				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'	"type" : HemisphereLight,',
+				'	"skyColor"  : ' + l.color.getHex() + ',',
+				'	"groundColor"  : ' + l.groundColor.getHex() + ',',
+				'	"intensity"  : ' + l.intensity + ',',
+				'	"position" : ' + Vector3String( l.position ),
+				'}'
+
+				];
+
+			} else {
+
+				var output = [];
+
+			}
+
+			return output.join( '\n\t\t' );
+
+		}
+
+		function CameraString( c ) {
+
+			if ( c instanceof THREE.PerspectiveCamera ) {
+
+				var output = [
+
+				'\t' + LabelString( getObjectName( c ) ) + ' : {',
+				'	"type" : PerspectiveCamera,',
+				'	"fov": ' + c.fov + ',',
+				'	"aspect": ' + c.aspect + ',',
+				'	"near": ' + c.near + ',',
+				'	"far": ' + c.far + ',',
+				'	"position" : ' + Vector3String( c.position ),
+				'}'
+
+				];
+
+			} else if ( c instanceof THREE.OrthographicCamera ) {
+
+				var output = [
+
+				'\t' + LabelString( getObjectName( c ) ) + ' : {',
+				'	"type" : OrthographicCamera,',
+				'	"left": ' + c.left + ',',
+				'	"right": ' + c.right + ',',
+				'	"top": ' + c.top + ',',
+				'	"bottom": ' + c.bottom + ',',
+				'	"near": ' + c.near + ',',
+				'	"far": ' + c.far + ',',
+				'	"position" : ' + Vector3String( c.position ),
+				'}'
+
+				];
+
+			} else {
+
+				var output = [];
+
+			}
+
+			return output.join( '\n\t\t' );
+
+		}
 
 		function ObjectString( o ) {
 
@@ -445,18 +576,6 @@ THREE.SceneExporter.prototype = {
 			'	"textures" :',
 			'	{',
 			'\t' + 	textures,
-			'	},',
-			'',
-
-			'	"cameras" :',
-			'	{',
-			'\t' + 	cameras,
-			'	},',
-			'',
-
-			'	"lights" :',
-			'	{',
-			'\t' + 	lights,
 			'	},',
 			'',
 
