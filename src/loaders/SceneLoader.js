@@ -62,11 +62,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var urlBase = THREE.Loader.prototype.extractUrlBase( url );
 
-	var dg, dm, dl, dc, df, dt,
+	var dg, dm, dc, df, dt,
 		g, m, l, d, p, r, q, s, c, t, f, tt, pp, u,
 		geometry, material, camera, fog,
 		texture, images,
-		light,
+		light, hex, intensity,
 		counter_models, counter_textures,
 		total_models, total_textures,
 		result;
@@ -282,6 +282,39 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					}
 
+				} else if ( o.type === "DirectionalLight" || o.type === "PointLight" || o.type === "AmbientLight" ) {
+
+					hex = ( o.color !== undefined ) ? o.color : 0xffffff;
+					intensity = ( o.intensity !== undefined ) ? o.intensity : 1;
+
+					if ( o.type === "DirectionalLight" ) {
+
+						p = o.direction;
+
+						light = new THREE.DirectionalLight( hex, intensity );
+						light.position.set( p[0], p[1], p[2] );
+						light.position.normalize();
+
+					} else if ( o.type === "PointLight" ) {
+
+						p = o.position;
+						d = o.distance;
+
+						light = new THREE.PointLight( hex, intensity, d );
+						light.position.set( p[0], p[1], p[2] );
+
+					} else if ( o.type === "AmbientLight" ) {
+
+						light = new THREE.AmbientLight( hex );
+
+					}
+
+					parent.add( light );
+
+					light.name = dd;
+					result.lights[ dd ] = light;
+					result.objects[ dd ] = light;
+
 				// pure Object3D
 
 				} else {
@@ -452,45 +485,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		if ( u ) camera.up.set( u[0], u[1], u[2] );
 
 		result.cameras[ dc ] = camera;
-
-	}
-
-	// lights
-
-	var hex, intensity;
-
-	for ( dl in data.lights ) {
-
-		l = data.lights[ dl ];
-
-		hex = ( l.color !== undefined ) ? l.color : 0xffffff;
-		intensity = ( l.intensity !== undefined ) ? l.intensity : 1;
-
-		if ( l.type === "directional" ) {
-
-			p = l.direction;
-
-			light = new THREE.DirectionalLight( hex, intensity );
-			light.position.set( p[0], p[1], p[2] );
-			light.position.normalize();
-
-		} else if ( l.type === "point" ) {
-
-			p = l.position;
-			d = l.distance;
-
-			light = new THREE.PointLight( hex, intensity, d );
-			light.position.set( p[0], p[1], p[2] );
-
-		} else if ( l.type === "ambient" ) {
-
-			light = new THREE.AmbientLight( hex );
-
-		}
-
-		result.scene.add( light );
-
-		result.lights[ dl ] = light;
 
 	}
 

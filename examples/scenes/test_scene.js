@@ -238,6 +238,20 @@
 			"rotation" : [ -1.57, 0, 0 ],
 			"scale"	   : [ 100, 100, 100 ],
 			"visible"  : true
+		},
+
+		"light1": {
+			"type"		 : "DirectionalLight",
+			"direction"	 : [ 0, 1, 1 ],
+			"color" 	 : 16777215,
+			"intensity"	 : 1
+		},
+
+		"light2": {
+			"type"	  : "PointLight",
+			"position": [ 0, 0, 0 ],
+			"color"   : 16777215,
+			"intensity"	 : 1.25
 		}
 
 	},
@@ -666,22 +680,6 @@
 			"target"  : [0,0,0]
 		}
 
-	},
-
-	"lights": {
-		"light1": {
-			"type"		 : "directional",
-			"direction"	 : [0,1,1],
-			"color" 	 : 16777215,
-			"intensity"	 : 1
-		},
-
-		"light2": {
-			"type"	  : "point",
-			"position": [0,0,0],
-			"color"   : 16777215,
-			"intensity"	 : 1.25
-		}
 	},
 
 	"fogs":	{

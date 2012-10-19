@@ -60,7 +60,7 @@ DEFAULTS = {
 "light" :
  {
     "name"       : "default_light",
-    "type"       : "directional",
+    "type"       : "DirectionalLight",
     "direction"  : [0, 1, 1],
     "color"      : [1, 1, 1],
     "intensity"  : 0.8
@@ -196,7 +196,7 @@ TEMPLATE_CAMERA_ORTHO = """\
 
 TEMPLATE_LIGHT_DIRECTIONAL = """\
 	%(light_id)s : {
-		"type"       : "directional",
+		"type"       : "DirectionalLight",
 		"direction"  : %(direction)s,
 		"color"      : %(color)d,
 		"intensity"  : %(intensity).2f
@@ -204,7 +204,7 @@ TEMPLATE_LIGHT_DIRECTIONAL = """\
 
 TEMPLATE_LIGHT_POINT = """\
 	%(light_id)s : {
-		"type"       : "point",
+		"type"       : "PointLight",
 		"position"   : %(position)s,
 		"color"      : %(color)d,
 		"intensity"  : %(intensity).3f
@@ -2082,6 +2082,7 @@ def generate_cameras(data):
 # #####################################################
 
 def generate_lights(data):
+    chunks = []
 
     if data["use_lights"]:
 
@@ -2089,10 +2090,9 @@ def generate_lights(data):
         if not lights:
             lights.append(DEFAULTS["light"])
 
-        chunks = []
         for light in lights:
 
-            if light["type"] == "directional":
+            if light["type"] == "DirectionalLight":
                 light_string = TEMPLATE_LIGHT_DIRECTIONAL % {
                 "light_id"      : generate_string(light["name"]),
                 "direction"     : generate_vec3(light["direction"]),
@@ -2100,7 +2100,7 @@ def generate_lights(data):
                 "intensity"     : light["intensity"]
                 }
 
-            elif light["type"] == "point":
+            elif light["type"] == "PointLight":
                 light_string = TEMPLATE_LIGHT_POINT % {
                 "light_id"      : generate_string(light["name"]),
                 "position"      : generate_vec3(light["position"]),
@@ -2110,9 +2110,7 @@ def generate_lights(data):
 
             chunks.append(light_string)
 
-        return ",\n\n".join(chunks)
-
-    return ""
+    return ",\n\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - embedded meshes
@@ -2143,10 +2141,16 @@ def generate_ascii_scene(data):
     geometries, ngeometries = generate_geometries(data)
     textures, ntextures = generate_textures_scene(data)
     materials, nmaterials = generate_materials_scene(data)
+    lights, nlights = generate_lights(data)
+
+    if nlights > 0:
+        if nobjects > 0:
+            objects = objects + ",\n\n" + lights
+        else:
+            objects = lights
+        nobjects += nlights
 
     cameras = generate_cameras(data)
-    lights = generate_lights(data)
-
     embeds = generate_embeds(data)
 
     basetype = "relativeTo"
@@ -2162,7 +2166,6 @@ def generate_ascii_scene(data):
     ["textures",   textures],
     ["materials",  materials],
     ["cameras",    cameras],
-    ["lights",     lights],
     ["embeds",     embeds]
     ]
 
