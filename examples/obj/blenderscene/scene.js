@@ -6,7 +6,7 @@
 	"type" 			: "scene",
 	"sourceFile"    : "scene.blend",
 	"generatedBy"   : "Blender 2.64 Exporter",
-	"objects"       : 28,
+	"objects"       : 29,
 	"geometries"    : 3,
 	"materials"     : 3,
 	"textures"      : 0
@@ -400,6 +400,16 @@
 		"direction"  : [ 0, 1, 1 ],
 		"color"      : 16777215,
 		"intensity"  : 0.80
+	},
+
+	"default_camera" : {
+		"type"  : "PerspectiveCamera",
+		"fov"   : 60.000000,
+		"aspect": 1.333000,
+		"near"  : 1.000000,
+		"far"   : 10000.000000,
+		"position": [ 0, 0, 10 ],
+		"target"  : [ 0, 0, 0 ]
 	}
 },
 
@@ -438,20 +448,6 @@
 	"Material.002" : {
 		"type": "MeshLambertMaterial",
 		"parameters": { "color": 10711076, "opacity": 1, "blending": "NormalBlending" }
-	}
-},
-
-
-"cameras" :
-{
-	"default_camera" : {
-		"type"  : "perspective",
-		"fov"   : 60.000000,
-		"aspect": 1.333000,
-		"near"  : 1.000000,
-		"far"   : 10000.000000,
-		"position": [ 0, 0, 10 ],
-		"target"  : [ 0, 0, 0 ]
 	}
 },
 

@@ -48,7 +48,7 @@ DEFAULTS = {
 "camera"  :
     {
         "name" : "default_camera",
-        "type" : "perspective",
+        "type" : "PerspectiveCamera",
         "near" : 1,
         "far"  : 10000,
         "fov"  : 60,
@@ -172,7 +172,7 @@ TEMPLATE_MATERIAL_SCENE = """\
 
 TEMPLATE_CAMERA_PERSPECTIVE = """\
 	%(camera_id)s : {
-		"type"  : "perspective",
+		"type"  : "PerspectiveCamera",
 		"fov"   : %(fov)f,
 		"aspect": %(aspect)f,
 		"near"  : %(near)f,
@@ -183,7 +183,7 @@ TEMPLATE_CAMERA_PERSPECTIVE = """\
 
 TEMPLATE_CAMERA_ORTHO = """\
 	%(camera_id)s : {
-		"type"  : "ortho",
+		"type"  : "OrthographicCamera",
 		"left"  : %(left)f,
 		"right" : %(right)f,
 		"top"   : %(top)f,
@@ -2012,17 +2012,17 @@ def generate_materials_scene(data):
 # #####################################################
 
 def generate_cameras(data):
+    chunks = []
+
     if data["use_cameras"]:
 
         cams = bpy.data.objects
         cams = [ob for ob in cams if (ob.type == 'CAMERA' and ob.select)]
 
-        chunks = []
-
         if not cams:
             camera = DEFAULTS["camera"]
 
-            if camera["type"] == "perspective":
+            if camera["type"] == "PerspectiveCamera":
 
                 camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
                 "camera_id" : generate_string(camera["name"]),
@@ -2034,7 +2034,7 @@ def generate_cameras(data):
                 "target"    : generate_vec3(camera["target"])
                 }
 
-            elif camera["type"] == "ortho":
+            elif camera["type"] == "OrthographicCamera":
 
                 camera_string = TEMPLATE_CAMERA_ORTHO % {
                 "camera_id" : generate_string(camera["name"]),
@@ -2073,9 +2073,7 @@ def generate_cameras(data):
 
                 chunks.append(camera_string)
 
-        return ",\n\n".join(chunks)
-
-    return ""
+    return ",\n\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - lights
@@ -2142,6 +2140,9 @@ def generate_ascii_scene(data):
     textures, ntextures = generate_textures_scene(data)
     materials, nmaterials = generate_materials_scene(data)
     lights, nlights = generate_lights(data)
+    cameras, ncameras = generate_cameras(data)
+
+    embeds = generate_embeds(data)
 
     if nlights > 0:
         if nobjects > 0:
@@ -2150,8 +2151,12 @@ def generate_ascii_scene(data):
             objects = lights
         nobjects += nlights
 
-    cameras = generate_cameras(data)
-    embeds = generate_embeds(data)
+    if ncameras > 0:
+        if nobjects > 0:
+            objects = objects + ",\n\n" + cameras
+        else:
+            objects = cameras
+        nobjects += ncameras
 
     basetype = "relativeTo"
 
@@ -2165,7 +2170,6 @@ def generate_ascii_scene(data):
     ["geometries", geometries],
     ["textures",   textures],
     ["materials",  materials],
-    ["cameras",    cameras],
     ["embeds",     embeds]
     ]
 

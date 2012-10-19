@@ -160,6 +160,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				var object = null;
 
+				// meshes
+
 				if ( o.geometry !== undefined ) {
 
 					geometry = result.geometries[ o.geometry ];
@@ -282,6 +284,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					}
 
+				// lights
+
 				} else if ( o.type === "DirectionalLight" || o.type === "PointLight" || o.type === "AmbientLight" ) {
 
 					hex = ( o.color !== undefined ) ? o.color : 0xffffff;
@@ -314,6 +318,34 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					light.name = dd;
 					result.lights[ dd ] = light;
 					result.objects[ dd ] = light;
+
+				// cameras
+
+				} else if ( o.type === "PerspectiveCamera" || o.type === "OrthographicCamera" ) {
+
+					if ( o.type === "PerspectiveCamera" ) {
+
+						camera = new THREE.PerspectiveCamera( o.fov, o.aspect, o.near, o.far );
+
+					} else if ( o.type === "OrthographicCamera" ) {
+
+						camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
+
+					}
+
+					p = o.position;
+					t = o.target;
+					u = o.up;
+
+					camera.position.set( p[0], p[1], p[2] );
+					camera.target = new THREE.Vector3( t[0], t[1], t[2] );
+					if ( u ) camera.up.set( u[0], u[1], u[2] );
+
+					parent.add( camera );
+
+					camera.name = dd;
+					result.cameras[ dd ] = camera;
+					result.objects[ dd ] = camera;
 
 				// pure Object3D
 
@@ -460,34 +492,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// first go synchronous elements
 
-	// cameras
-
-	for( dc in data.cameras ) {
-
-		c = data.cameras[ dc ];
-
-		if ( c.type === "perspective" ) {
-
-			camera = new THREE.PerspectiveCamera( c.fov, c.aspect, c.near, c.far );
-
-		} else if ( c.type === "ortho" ) {
-
-			camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
-
-		}
-
-		p = c.position;
-		t = c.target;
-		u = c.up;
-
-		camera.position.set( p[0], p[1], p[2] );
-		camera.target = new THREE.Vector3( t[0], t[1], t[2] );
-		if ( u ) camera.up.set( u[0], u[1], u[2] );
-
-		result.cameras[ dc ] = camera;
-
-	}
-
 	// fogs
 
 	for( df in data.fogs ) {
@@ -510,26 +514,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		result.fogs[ df ] = fog;
 
 	}
-
-	// defaults
-
-	if ( result.cameras && data.defaults.camera ) {
-
-		result.currentCamera = result.cameras[ data.defaults.camera ];
-
-	}
-
-	if ( result.fogs && data.defaults.fog ) {
-
-		result.scene.fog = result.fogs[ data.defaults.fog ];
-
-	}
-
-	c = data.defaults.bgcolor;
-	result.bgColor = new THREE.Color();
-	result.bgColor.setRGB( c[0], c[1], c[2] );
-
-	result.bgColorAlpha = data.defaults.bgalpha;
 
 	// now come potentially asynchronous elements
 
@@ -900,6 +884,26 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 	// objects ( synchronous init of procedural primitives )
 
 	handle_objects();
+
+	// defaults
+
+	if ( result.cameras && data.defaults.camera ) {
+
+		result.currentCamera = result.cameras[ data.defaults.camera ];
+
+	}
+
+	if ( result.fogs && data.defaults.fog ) {
+
+		result.scene.fog = result.fogs[ data.defaults.fog ];
+
+	}
+
+	c = data.defaults.bgcolor;
+	result.bgColor = new THREE.Color();
+	result.bgColor.setRGB( c[0], c[1], c[2] );
+
+	result.bgColorAlpha = data.defaults.bgalpha;
 
 	// synchronous callback
 

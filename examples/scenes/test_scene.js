@@ -252,6 +252,28 @@
 			"position": [ 0, 0, 0 ],
 			"color"   : 16777215,
 			"intensity"	 : 1.25
+		},
+
+		"camera1": {
+			"type"  : "PerspectiveCamera",
+			"fov"   : 50,
+			"aspect": 1.33333,
+			"near"  : 1,
+			"far"   : 1000,
+			"position": [ 0, 0, 100 ],
+			"target"  : [ 0, 0, 0 ]
+		},
+
+		"camera2": {
+			"type"  : "OrthographicCamera",
+			"left"  : 0,
+			"right" : 1024,
+			"top"   : 0,
+			"bottom": 1024,
+			"near"  : 1,
+			"far"   : 1000,
+			"position": [ 0, 0, 0 ],
+			"target"  : [ 0, 0, 0 ]
 		}
 
 	},
@@ -657,31 +679,6 @@
 
 	},
 
-	"cameras": {
-		"cam1": {
-			"type"  : "perspective",
-			"fov"   : 50,
-			"aspect": 1.33333,
-			"near"  : 1,
-			"far"   : 1000,
-			"position": [0,0,100],
-			"target"  : [0,0,0]
-		},
-
-		"cam2": {
-			"type"  : "ortho",
-			"left"  : 0,
-			"right" : 1024,
-			"top"   : 0,
-			"bottom": 1024,
-			"near"  : 1,
-			"far"   : 1000,
-			"position": [0,0,0],
-			"target"  : [0,0,0]
-		}
-
-	},
-
 	"fogs":	{
 		"basic": {
 			"type": "linear",
@@ -706,7 +703,7 @@
 	"defaults": {
 		"bgcolor": [0,0,0],
 		"bgalpha": 1,
-		"camera": "cam1",
+		"camera": "camera1",
 		"fog": "black"
 	}
 
