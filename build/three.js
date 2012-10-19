@@ -8985,11 +8985,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var urlBase = THREE.Loader.prototype.extractUrlBase( url );
 
-	var dg, dm, dl, dc, df, dt,
+	var dg, dm, dc, df, dt,
 		g, m, l, d, p, r, q, s, c, t, f, tt, pp, u,
 		geometry, material, camera, fog,
 		texture, images,
-		light,
+		light, hex, intensity,
 		counter_models, counter_textures,
 		total_models, total_textures,
 		result;
@@ -9082,6 +9082,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 				var o = children[ dd ];
 
 				var object = null;
+
+				// meshes
 
 				if ( o.geometry !== undefined ) {
 
@@ -9204,6 +9206,69 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 						result.objects[ dd ] = object;
 
 					}
+
+				// lights
+
+				} else if ( o.type === "DirectionalLight" || o.type === "PointLight" || o.type === "AmbientLight" ) {
+
+					hex = ( o.color !== undefined ) ? o.color : 0xffffff;
+					intensity = ( o.intensity !== undefined ) ? o.intensity : 1;
+
+					if ( o.type === "DirectionalLight" ) {
+
+						p = o.direction;
+
+						light = new THREE.DirectionalLight( hex, intensity );
+						light.position.set( p[0], p[1], p[2] );
+						light.position.normalize();
+
+					} else if ( o.type === "PointLight" ) {
+
+						p = o.position;
+						d = o.distance;
+
+						light = new THREE.PointLight( hex, intensity, d );
+						light.position.set( p[0], p[1], p[2] );
+
+					} else if ( o.type === "AmbientLight" ) {
+
+						light = new THREE.AmbientLight( hex );
+
+					}
+
+					parent.add( light );
+
+					light.name = dd;
+					result.lights[ dd ] = light;
+					result.objects[ dd ] = light;
+
+				// cameras
+
+				} else if ( o.type === "PerspectiveCamera" || o.type === "OrthographicCamera" ) {
+
+					if ( o.type === "PerspectiveCamera" ) {
+
+						camera = new THREE.PerspectiveCamera( o.fov, o.aspect, o.near, o.far );
+
+					} else if ( o.type === "OrthographicCamera" ) {
+
+						camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
+
+					}
+
+					p = o.position;
+					t = o.target;
+					u = o.up;
+
+					camera.position.set( p[0], p[1], p[2] );
+					camera.target = new THREE.Vector3( t[0], t[1], t[2] );
+					if ( u ) camera.up.set( u[0], u[1], u[2] );
+
+					parent.add( camera );
+
+					camera.name = dd;
+					result.cameras[ dd ] = camera;
+					result.objects[ dd ] = camera;
 
 				// pure Object3D
 
@@ -9350,73 +9415,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// first go synchronous elements
 
-	// cameras
-
-	for( dc in data.cameras ) {
-
-		c = data.cameras[ dc ];
-
-		if ( c.type === "perspective" ) {
-
-			camera = new THREE.PerspectiveCamera( c.fov, c.aspect, c.near, c.far );
-
-		} else if ( c.type === "ortho" ) {
-
-			camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
-
-		}
-
-		p = c.position;
-		t = c.target;
-		u = c.up;
-
-		camera.position.set( p[0], p[1], p[2] );
-		camera.target = new THREE.Vector3( t[0], t[1], t[2] );
-		if ( u ) camera.up.set( u[0], u[1], u[2] );
-
-		result.cameras[ dc ] = camera;
-
-	}
-
-	// lights
-
-	var hex, intensity;
-
-	for ( dl in data.lights ) {
-
-		l = data.lights[ dl ];
-
-		hex = ( l.color !== undefined ) ? l.color : 0xffffff;
-		intensity = ( l.intensity !== undefined ) ? l.intensity : 1;
-
-		if ( l.type === "directional" ) {
-
-			p = l.direction;
-
-			light = new THREE.DirectionalLight( hex, intensity );
-			light.position.set( p[0], p[1], p[2] );
-			light.position.normalize();
-
-		} else if ( l.type === "point" ) {
-
-			p = l.position;
-			d = l.distance;
-
-			light = new THREE.PointLight( hex, intensity, d );
-			light.position.set( p[0], p[1], p[2] );
-
-		} else if ( l.type === "ambient" ) {
-
-			light = new THREE.AmbientLight( hex );
-
-		}
-
-		result.scene.add( light );
-
-		result.lights[ dl ] = light;
-
-	}
-
 	// fogs
 
 	for( df in data.fogs ) {
@@ -9439,26 +9437,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		result.fogs[ df ] = fog;
 
 	}
-
-	// defaults
-
-	if ( result.cameras && data.defaults.camera ) {
-
-		result.currentCamera = result.cameras[ data.defaults.camera ];
-
-	}
-
-	if ( result.fogs && data.defaults.fog ) {
-
-		result.scene.fog = result.fogs[ data.defaults.fog ];
-
-	}
-
-	c = data.defaults.bgcolor;
-	result.bgColor = new THREE.Color();
-	result.bgColor.setRGB( c[0], c[1], c[2] );
-
-	result.bgColorAlpha = data.defaults.bgalpha;
 
 	// now come potentially asynchronous elements
 
@@ -9829,6 +9807,26 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 	// objects ( synchronous init of procedural primitives )
 
 	handle_objects();
+
+	// defaults
+
+	if ( result.cameras && data.defaults.camera ) {
+
+		result.currentCamera = result.cameras[ data.defaults.camera ];
+
+	}
+
+	if ( result.fogs && data.defaults.fog ) {
+
+		result.scene.fog = result.fogs[ data.defaults.fog ];
+
+	}
+
+	c = data.defaults.bgcolor;
+	result.bgColor = new THREE.Color();
+	result.bgColor.setRGB( c[0], c[1], c[2] );
+
+	result.bgColorAlpha = data.defaults.bgalpha;
 
 	// synchronous callback
 

@@ -94,7 +94,7 @@ Sidebar.Outliner = function ( signals ) {
 
 		var output = new THREE.SceneExporter().parse( scene );
 
-		var blob = new Blob( [ output ], { type: 'text/json' } );
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
 
 		window.open( objectURL, '_blank' );
