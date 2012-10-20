@@ -332,6 +332,25 @@ THREE.SceneExporter.prototype = {
 
 				];
 
+			} else if ( g instanceof THREE.Geometry ) {
+
+				if ( g.sourceType === "ascii" || g.sourceType === "ctm" || g.sourceType === "stl" || g.sourceType === "vtk" ) {
+
+					var output = [
+
+					'\t' + LabelString( getGeometryName( g ) ) + ': {',
+					'	"type" : ' + LabelString( g.sourceType ) + ',',
+					'	"url"  : ' + LabelString( g.sourceFile ),
+					'}',
+
+					];
+
+				} else {
+
+					var output = [];
+
+				}
+
 			} else {
 
 				var output = [];

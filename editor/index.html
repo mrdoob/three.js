@@ -129,6 +129,9 @@
 							var loader = new THREE.CTMLoader();
 							loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
 
+								geometry.sourceType = "ctm";
+								geometry.sourceFile = file.name;
+
 								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 								mesh.name = filename;
 
@@ -206,6 +209,9 @@
 							if ( data.metadata.type === 'geometry' ) {
 
 								var geometry = new THREE.GeometryLoader().parse( data );
+								geometry.sourceType = "ascii";
+								geometry.sourceFile = file.name;
+
 								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 								mesh.name = filename;
 
@@ -256,6 +262,9 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.STLLoader().parse( contents );
+							geometry.sourceType = "stl";
+							geometry.sourceFile = file.name;
+
 							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 							mesh.name = filename;
 
@@ -297,6 +306,9 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.VTKLoader().parse( contents );
+							geometry.sourceType = "vtk";
+							geometry.sourceFile = file.name;
+
 							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 							mesh.name = filename;
 
