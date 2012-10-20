@@ -14,8 +14,6 @@ THREE.SceneExporter.prototype = {
 		var rotation = Vector3String( scene.rotation );
 		var scale = Vector3String( scene.scale );
 
-		// todo: extract all scene elements
-
 		var nobjects = 0;
 		var ngeometries = 0;
 		var nmaterials = 0;
@@ -29,8 +27,6 @@ THREE.SceneExporter.prototype = {
 		var geometriesMap = {};
 		var materialsMap = {};
 		var texturesMap = {};
-
-		// todo: make object creation properly recursive
 
 		var checkTexture = function ( map ) {
 
@@ -46,51 +42,83 @@ THREE.SceneExporter.prototype = {
 
 		};
 
-		scene.traverse( function ( node ) {
+		var linesArray = [];
 
-			if ( node instanceof THREE.Mesh ) {
+		function createObjectsList( object, pad ) {
 
-				objectsArray.push( ObjectString( node ) );
-				nobjects += 1;
+			for ( var i = 0; i < object.children.length; i ++ ) {
 
-				if ( ! ( node.geometry.id in geometriesMap ) ) {
+				var node = object.children[ i ];
 
-					geometriesMap[ node.geometry.id ] = true;
-					geometriesArray.push( GeometryString( node.geometry ) );
-					ngeometries += 1;
+				if ( node instanceof THREE.Mesh ) {
+
+					linesArray.push( MeshString( node, pad ) );
+					nobjects += 1;
+
+					if ( ! ( node.geometry.id in geometriesMap ) ) {
+
+						geometriesMap[ node.geometry.id ] = true;
+						geometriesArray.push( GeometryString( node.geometry ) );
+						ngeometries += 1;
+
+					}
+
+					if ( ! ( node.material.id in materialsMap ) ) {
+
+						materialsMap[ node.material.id ] = true;
+						materialsArray.push( MaterialString( node.material ) );
+						nmaterials += 1;
+
+						checkTexture( node.material.map );
+						checkTexture( node.material.envMap );
+						checkTexture( node.material.lightMap );
+						checkTexture( node.material.specularMap );
+						checkTexture( node.material.bumpMap );
+						checkTexture( node.material.normalMap );
+
+					}
+
+				} else if ( node instanceof THREE.Light ) {
+
+					linesArray.push( LightString( node, pad ) );
+					nobjects += 1;
+
+				} else if ( node instanceof THREE.Camera ) {
+
+					linesArray.push( CameraString( node, pad ) );
+					nobjects += 1;
+
+				} else if ( node instanceof THREE.Object3D ) {
+
+					linesArray.push( ObjectString( node, pad ) );
+					nobjects += 1;
 
 				}
 
-				if ( ! ( node.material.id in materialsMap ) ) {
+				if ( node.children.length > 0 ) {
 
-					materialsMap[ node.material.id ] = true;
-					materialsArray.push( MaterialString( node.material ) );
-					nmaterials += 1;
-
-					checkTexture( node.material.map );
-					checkTexture( node.material.envMap );
-					checkTexture( node.material.lightMap );
-					checkTexture( node.material.specularMap );
-					checkTexture( node.material.bumpMap );
-					checkTexture( node.material.normalMap );
+					linesArray.push( PaddingString( pad + 1 ) + '\t\t"children" : {' );
 
 				}
 
-			} else if ( node instanceof THREE.Light ) {
+				createObjectsList( node, pad + 2 );
 
-				objectsArray.push( LightString( node ) );
-				nobjects += 1;
+				if ( node.children.length > 0 ) {
 
-			} else if ( node instanceof THREE.Camera ) {
+					linesArray.push( PaddingString( pad + 1 ) + "\t\t}" );
 
-				objectsArray.push( CameraString( node ) );
-				nobjects += 1;
+				}
+
+				linesArray.push( PaddingString( pad ) + "\t\t}" + ( i < object.children.length - 1 ? ",\n" : "" ) );
 
 			}
 
-		} );
+		}
 
-		var objects = generateMultiLineString( objectsArray, ",\n\n\t" );
+		createObjectsList( scene, 0 );
+
+		var objects = linesArray.join( "\n" );
+
 		var geometries = generateMultiLineString( geometriesArray, ",\n\n\t" );
 		var materials = generateMultiLineString( materialsArray, ",\n\n\t" );
 		var textures = generateMultiLineString( texturesArray, ",\n\n\t" );
@@ -142,75 +170,81 @@ THREE.SceneExporter.prototype = {
 
 		}
 
+		function PaddingString( n ) {
+
+			var output = "";
+
+			for ( var i = 0; i < n; i ++ ) output += "\t";
+
+			return output;
+
+		}
+
+
 		//
 
-		function LightString( l ) {
+		function LightString( o, n ) {
 
-			if ( l instanceof THREE.AmbientLight ) {
+			if ( o instanceof THREE.AmbientLight ) {
 
 				var output = [
 
-				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 				'	"type" : AmbientLight,',
-				'	"color"  : ' + l.color.getHex(),
-				'}'
+				'	"color"  : ' + o.color.getHex() + ( o.children.length ? ',' : '' )
 
 				];
 
-			} else if ( l instanceof THREE.DirectionalLight ) {
+			} else if ( o instanceof THREE.DirectionalLight ) {
 
 				var output = [
 
-				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 				'	"type" : DirectionalLight,',
-				'	"color"  : ' + l.color.getHex() + ',',
-				'	"intensity"  : ' + l.intensity + ',',
-				'	"direction" : ' + Vector3String( l.position ),
-				'}'
+				'	"color"  : ' + o.color.getHex() + ',',
+				'	"intensity"  : ' + o.intensity + ',',
+				'	"direction" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
 
 				];
 
-			} else if ( l instanceof THREE.PointLight ) {
+			} else if ( o instanceof THREE.PointLight ) {
 
 				var output = [
 
-				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 				'	"type" : PointLight,',
-				'	"color"  : ' + l.color.getHex() + ',',
-				'	"intensity"  : ' + l.intensity + ',',
-				'	"position" : ' + Vector3String( l.position ) + ',',
-				'	"distance"  : ' + l.distance,
-				'}'
+				'	"color"  : ' + o.color.getHex() + ',',
+				'	"intensity"  : ' + o.intensity + ',',
+				'	"position" : ' + Vector3String( o.position ) + ',',
+				'	"distance"  : ' + o.distance + ( o.children.length ? ',' : '' )
 
 				];
 
-			} else if ( l instanceof THREE.SpotLight ) {
+			} else if ( o instanceof THREE.SpotLight ) {
 
 				var output = [
 
-				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 				'	"type" : SpotLight,',
-				'	"color"  : ' + l.color.getHex() + ',',
-				'	"intensity"  : ' + l.intensity + ',',
-				'	"position" : ' + Vector3String( l.position ) + ',',
-				'	"distance"  : ' + l.distance + ',',
-				'	"angle"  : ' + l.angle + ',',
-				'	"exponent"  : ' + l.exponent,
-				'}'
+				'	"color"  : ' + o.color.getHex() + ',',
+				'	"intensity"  : ' + o.intensity + ',',
+				'	"position" : ' + Vector3String( o.position ) + ',',
+				'	"distance"  : ' + o.distance + ',',
+				'	"angle"  : ' + o.angle + ',',
+				'	"exponent"  : ' + o.exponent + ( o.children.length ? ',' : '' )
 
 				];
 
-			} else if ( l instanceof THREE.HemisphereLight ) {
+			} else if ( o instanceof THREE.HemisphereLight ) {
 
 				var output = [
 
-				'\t' + LabelString( getObjectName( l ) ) + ' : {',
+				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 				'	"type" : HemisphereLight,',
-				'	"skyColor"  : ' + l.color.getHex() + ',',
-				'	"groundColor"  : ' + l.groundColor.getHex() + ',',
-				'	"intensity"  : ' + l.intensity + ',',
-				'	"position" : ' + Vector3String( l.position ),
-				'}'
+				'	"skyColor"  : ' + o.color.getHex() + ',',
+				'	"groundColor"  : ' + o.groundColor.getHex() + ',',
+				'	"intensity"  : ' + o.intensity + ',',
+				'	"position" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -220,41 +254,39 @@ THREE.SceneExporter.prototype = {
 
 			}
 
-			return output.join( '\n\t\t' );
+			return generateMultiLineString( output, '\n\t\t', n );
 
 		}
 
-		function CameraString( c ) {
+		function CameraString( o, n ) {
 
-			if ( c instanceof THREE.PerspectiveCamera ) {
+			if ( o instanceof THREE.PerspectiveCamera ) {
 
 				var output = [
 
-				'\t' + LabelString( getObjectName( c ) ) + ' : {',
+				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 				'	"type" : PerspectiveCamera,',
-				'	"fov": ' + c.fov + ',',
-				'	"aspect": ' + c.aspect + ',',
-				'	"near": ' + c.near + ',',
-				'	"far": ' + c.far + ',',
-				'	"position" : ' + Vector3String( c.position ),
-				'}'
+				'	"fov": ' + o.fov + ',',
+				'	"aspect": ' + o.aspect + ',',
+				'	"near": ' + o.near + ',',
+				'	"far": ' + o.far + ',',
+				'	"position" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
 
 				];
 
-			} else if ( c instanceof THREE.OrthographicCamera ) {
+			} else if ( o instanceof THREE.OrthographicCamera ) {
 
 				var output = [
 
-				'\t' + LabelString( getObjectName( c ) ) + ' : {',
+				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 				'	"type" : OrthographicCamera,',
-				'	"left": ' + c.left + ',',
-				'	"right": ' + c.right + ',',
-				'	"top": ' + c.top + ',',
-				'	"bottom": ' + c.bottom + ',',
-				'	"near": ' + c.near + ',',
-				'	"far": ' + c.far + ',',
-				'	"position" : ' + Vector3String( c.position ),
-				'}'
+				'	"left": ' + o.left + ',',
+				'	"right": ' + o.right + ',',
+				'	"top": ' + o.top + ',',
+				'	"bottom": ' + o.bottom + ',',
+				'	"near": ' + o.near + ',',
+				'	"far": ' + o.far + ',',
+				'	"position" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -264,28 +296,45 @@ THREE.SceneExporter.prototype = {
 
 			}
 
-			return output.join( '\n\t\t' );
+			return generateMultiLineString( output, '\n\t\t', n );
 
 		}
 
-		function ObjectString( o ) {
+		function ObjectString( o, n ) {
 
 			var output = [
 
-			'\t' + LabelString( getObjectName( o ) ) + ' : {',
+			'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
+			'	"position" : ' + Vector3String( o.position ) + ',',
+			'	"rotation" : ' + Vector3String( o.rotation ) + ',',
+			'	"scale"	   : ' + Vector3String( o.scale ) + ',',
+			'	"visible"  : ' + o.visible + ( o.children.length ? ',' : '' )
+
+			];
+
+			return generateMultiLineString( output, '\n\t\t', n );
+
+		}
+
+		function MeshString( o, n ) {
+
+			var output = [
+
+			'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
 			'	"geometry" : '   + LabelString( getGeometryName( o.geometry ) ) + ',',
 			'	"materials": [ ' + LabelString( getMaterialName( o.material ) ) + ' ],',
 			'	"position" : ' + Vector3String( o.position ) + ',',
 			'	"rotation" : ' + Vector3String( o.rotation ) + ',',
 			'	"scale"	   : ' + Vector3String( o.scale ) + ',',
-			'	"visible"  : ' + o.visible,
-			'}'
+			'	"visible"  : ' + o.visible + ( o.children.length ? ',' : '' )
 
 			];
 
-			return output.join( '\n\t\t' );
+			return generateMultiLineString( output, '\n\t\t', n );
 
 		}
+
+		//
 
 		function GeometryString( g ) {
 
@@ -298,7 +347,7 @@ THREE.SceneExporter.prototype = {
 				'	"radius"  : ' 		 + g.radius + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
 				'	"heightSegments" : ' + g.heightSegments + ',',
-				'}',
+				'}'
 
 				];
 
@@ -314,7 +363,7 @@ THREE.SceneExporter.prototype = {
 				'	"widthSegments"  : ' + g.widthSegments + ',',
 				'	"heightSegments" : ' + g.heightSegments + ',',
 				'	"depthSegments" : '  + g.depthSegments + ',',
-				'}',
+				'}'
 
 				];
 
@@ -328,7 +377,7 @@ THREE.SceneExporter.prototype = {
 				'	"height"  : ' + g.height + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
 				'	"heightSegments" : ' + g.heightSegments + ',',
-				'}',
+				'}'
 
 				];
 
@@ -341,7 +390,7 @@ THREE.SceneExporter.prototype = {
 					'\t' + LabelString( getGeometryName( g ) ) + ': {',
 					'	"type" : ' + LabelString( g.sourceType ) + ',',
 					'	"url"  : ' + LabelString( g.sourceFile ),
-					'}',
+					'}'
 
 					];
 
@@ -383,7 +432,7 @@ THREE.SceneExporter.prototype = {
 				'		"wireframe" : ' + m.wireframe + ',',
 				'		"wireframeLinewidth" : ' + m.wireframeLinewidth,
 				'	}',
-				'}',
+				'}'
 
 				];
 
@@ -410,7 +459,7 @@ THREE.SceneExporter.prototype = {
 				'		"wireframe" : ' + m.wireframe + ',',
 				'		"wireframeLinewidth" : ' + m.wireframeLinewidth,
 				'	}',
-				'}',
+				'}'
 
 				];
 
@@ -441,7 +490,7 @@ THREE.SceneExporter.prototype = {
 				'		"wireframe" : ' + m.wireframe + ',',
 				'		"wireframeLinewidth" : ' + m.wireframeLinewidth,
 				'	}',
-				'}',
+				'}'
 
 				];
 
@@ -457,7 +506,7 @@ THREE.SceneExporter.prototype = {
 				'		"wireframe" : ' + m.wireframe + ',',
 				'		"wireframeLinewidth" : ' + m.wireframeLinewidth,
 				'	}',
-				'}',
+				'}'
 
 				];
 
@@ -473,7 +522,7 @@ THREE.SceneExporter.prototype = {
 				'		"wireframe" : ' + m.wireframe + ',',
 				'		"wireframeLinewidth" : ' + m.wireframeLinewidth,
 				'	}',
-				'}',
+				'}'
 
 				];
 
@@ -484,7 +533,7 @@ THREE.SceneExporter.prototype = {
 				'\t' + LabelString( getMaterialName( m ) ) + ': {',
 				'	"type"    : "MeshFaceMaterial",',
 				'	"parameters"  : {}',
-				'}',
+				'}'
 
 				];
 
@@ -509,7 +558,7 @@ THREE.SceneExporter.prototype = {
 			'	"magFilter" : ' + NumConstantString( t.magFilter ) + ',',
 			'	"minFilter" : ' + NumConstantString( t.minFilter ) + ',',
 			'	"anisotropy" : ' + t.anisotropy,
-			'}',
+			'}'
 
 			];
 
@@ -519,13 +568,20 @@ THREE.SceneExporter.prototype = {
 
 		//
 
-		function generateMultiLineString( lines, separator ) {
+		function generateMultiLineString( lines, separator, padding ) {
 
 			var cleanLines = [];
 
 			for ( var i = 0; i < lines.length; i ++ ) {
 
-				if ( lines[ i ] ) cleanLines.push( lines[ i ] );
+				var line = lines[ i ];
+
+				if ( line ) {
+
+					if ( padding ) line = PaddingString( padding ) + line;
+					cleanLines.push(  line );
+
+				}
 
 			}
 
@@ -576,7 +632,7 @@ THREE.SceneExporter.prototype = {
 
 			'	"objects" :',
 			'	{',
-			'\t' + objects,
+			objects,
 			'	},',
 			'',
 
