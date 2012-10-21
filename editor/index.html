@@ -30,6 +30,7 @@
 		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
+		<script src="../examples/js/exporters/SceneExporter.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
@@ -56,22 +57,13 @@
 				sceneCreated: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
+				objectRemoved: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
 				objectChanged: new SIGNALS.Signal(),
 				materialChanged: new SIGNALS.Signal(),
 				windowResize: new SIGNALS.Signal()
 
 			};
-
-			//
-
-			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( '2d' );
-			context.fillStyle = 'rgb(255,255,255)';
-			context.fillRect( 0, 0, canvas.width, canvas.height );
-
-			var dummyTexture = new THREE.Texture( canvas );
-			dummyTexture.needsUpdate = true;
 
 			//
 
@@ -92,18 +84,35 @@
 			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
 			document.body.appendChild( viewport.dom );
 
+			document.addEventListener( 'keydown', function ( event ) {
+
+				// delete
+
+				if ( event.which === 46 ) {
+
+					// here should come confirmation pop-up modal dialog
+
+					signals.objectRemoved.dispatch();
+
+				}
+
+			} );
+
 			document.addEventListener( 'drop', function ( event ) {
 
 				event.preventDefault();
 
 				var file = event.dataTransfer.files[ 0 ];
-				var extension = file.name.split( '.' ).pop().toLowerCase();
 
-				parseFile( file, extension );
+				var chunks = file.name.split( '.' );
+				var extension = chunks.pop().toLowerCase();
+				var filename = chunks.join( '.' );
+
+				parseFile( file, filename, extension );
 
 			}, false );
 
-			var parseFile = function ( file, extension ) {
+			var parseFile = function ( file, filename, extension ) {
 
 				switch ( extension ) {
 
@@ -120,9 +129,11 @@
 							var loader = new THREE.CTMLoader();
 							loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
 
-								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
+								geometry.sourceType = "ctm";
+								geometry.sourceFile = file.name;
 
-								var mesh = new THREE.Mesh( geometry, material );
+								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
 								signals.objectSelected.dispatch( mesh );
@@ -147,12 +158,7 @@
 							var loader = new THREE.ColladaLoader();
 							loader.parse( xml, function ( collada ) {
 
-								 collada.scene.traverse( function ( node ) {
-
-									if ( node.material ) node.material.map = dummyTexture;
-
-								} );
-
+								collada.scene.name = filename;
 
 								signals.objectAdded.dispatch( collada.scene );
 								signals.objectSelected.dispatch( collada.scene );
@@ -203,9 +209,11 @@
 							if ( data.metadata.type === 'geometry' ) {
 
 								var geometry = new THREE.GeometryLoader().parse( data );
-								var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
+								geometry.sourceType = "ascii";
+								geometry.sourceFile = file.name;
 
-								var mesh = new THREE.Mesh( geometry, material );
+								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
 								signals.objectSelected.dispatch( mesh );
@@ -213,6 +221,8 @@
 							} else if ( data.metadata.type === 'scene' ) {
 
 								new THREE.SceneLoader().parse( data, function ( scene ) {
+
+									scene.name = filename;
 
 									signals.objectAdded.dispatch( scene );
 									signals.objectSelected.dispatch( scene );
@@ -234,12 +244,7 @@
 							var contents = event.target.result;
 
 							var object = new THREE.OBJLoader().parse( contents );
-
-							object.traverse( function ( node ) {
-
-								if ( node.material ) node.material.map = dummyTexture;
-
-							} );
+							object.name = filename;
 
 							signals.objectAdded.dispatch( object );
 							signals.objectSelected.dispatch( object );
@@ -257,9 +262,11 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.STLLoader().parse( contents );
-							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
+							geometry.sourceType = "stl";
+							geometry.sourceFile = file.name;
 
-							var mesh = new THREE.Mesh( geometry, material );
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
@@ -299,8 +306,11 @@
 							var contents = event.target.result;
 
 							var geometry = new THREE.VTKLoader().parse( contents );
-							var material = new THREE.MeshLambertMaterial( { map: dummyTexture } );
-							var mesh = new THREE.Mesh( geometry, material );
+							geometry.sourceType = "vtk";
+							geometry.sourceFile = file.name;
+
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
@@ -315,8 +325,12 @@
 			}
 
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
-			var material = new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff, map: dummyTexture } );
+
+			var color = Math.random() * 0xffffff;
+			var material = new THREE.MeshLambertMaterial( { color: color, ambient: color } );
+
 			var mesh = new THREE.Mesh( geometry, material );
+			mesh.name = "Sphere";
 
 			signals.objectAdded.dispatch( mesh );
 			signals.objectSelected.dispatch( mesh );
@@ -324,6 +338,12 @@
 			var onWindowResize = function ( event ) {
 
 				signals.windowResize.dispatch();
+
+			};
+
+			var createDummyMaterial = function ( geometry ) {
+
+				return new THREE.MeshLambertMaterial();
 
 			};
 

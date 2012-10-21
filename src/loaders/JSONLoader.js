@@ -7,6 +7,8 @@ THREE.JSONLoader = function ( showStatus ) {
 
 	THREE.Loader.call( this, showStatus );
 
+	this.withCredentials = false;
+
 };
 
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
@@ -27,6 +29,8 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 	var xhr = new XMLHttpRequest();
 
 	var length = 0;
+
+	xhr.withCredentials = this.withCredentials;
 
 	xhr.onreadystatechange = function () {
 

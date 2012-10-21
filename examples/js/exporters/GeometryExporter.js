@@ -164,7 +164,8 @@ THREE.GeometryExporter.prototype = {
 		var output = [
 			'{',
 			'	"metadata": {',
-			'		"formatVersion" : 3',
+			'		"formatVersion" : 3.1,',
+			'		"generatedBy"	: "GeometryExporter"',
 			'	},',
 			'	"vertices": ' + JSON.stringify( vertices ) + ',',
 			'	"normals": ' + JSON.stringify( normals ) + ',',

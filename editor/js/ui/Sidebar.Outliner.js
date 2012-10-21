@@ -1,6 +1,6 @@
 Sidebar.Outliner = function ( signals ) {
 
-	var objects = {
+	var objectTypes = {
 
 		'PerspectiveCamera': THREE.PerspectiveCamera,
 		'PointLight': THREE.PointLight,
@@ -17,12 +17,11 @@ Sidebar.Outliner = function ( signals ) {
 	container.setBorderTop( '1px solid #ccc' );
 
 	container.add( new UI.Text().setValue( 'SCENE' ).setColor( '#666' ) );
+	container.add( new UI.Button( 'absolute' ).setRight( '8px' ).setTop( '5px' ).setLabel( 'Export' ).onClick( exportScene ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	var sceneGraph = new UI.Select().setMultiple( true ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var sceneGraph = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	container.add( sceneGraph );
-
-	container.add( new UI.Break() );
 
 	var scene = null;
 
@@ -30,26 +29,24 @@ Sidebar.Outliner = function ( signals ) {
 
 		var id = parseInt( sceneGraph.getValue() );
 
-		for ( var i in scene.children ) {
+		scene.traverse( function ( node ) {
 
-			var object = scene.children[ i ];
+			if ( node.id === id ) {
 
-			if ( object.id === id ) {
-
-				signals.objectSelected.dispatch( object );
+				signals.objectSelected.dispatch( node );
 				return;
 
 			}
 
-		}
+		} );
 
 	}
 
-	function getObjectInstanceName( object ) {
+	function getObjectType( object ) {
 
-		for ( var key in objects ) {
+		for ( var type in objectTypes ) {
 
-			if ( object instanceof objects[ key ] ) return key;
+			if ( object instanceof objectTypes[ type ] ) return type;
 
 		}
 
@@ -75,7 +72,7 @@ Sidebar.Outliner = function ( signals ) {
 
 				var child = object.children[ key ];
 
-				options[ child.id ] = pad + '+ ' + object.name + ' [' + getObjectInstanceName( child ) + ']';
+				options[ child.id ] = pad + child.name + ' <span style="color: #aaa">- ' + getObjectType( child ) + '</span>';
 
 				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
 
@@ -89,9 +86,21 @@ Sidebar.Outliner = function ( signals ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		sceneGraph.setValue( object !== null ? object.id: null );
+		sceneGraph.setValue( object !== null ? object.id : null );
 
 	} );
+
+	function exportScene() {
+
+		var output = new THREE.SceneExporter().parse( scene );
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	}
 
 	return container;
 

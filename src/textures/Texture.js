@@ -10,6 +10,8 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this.id = THREE.TextureIdCount ++;
 
+	this.name = '';
+
 	this.image = image;
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();

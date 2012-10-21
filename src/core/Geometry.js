@@ -15,7 +15,8 @@ THREE.Geometry = function () {
 	this.name = '';
 
 	this.vertices = [];
-	this.colors = []; // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
+	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
+	this.normals = []; // one-to-one vertex normals, used in Ribbon
 
 	this.materials = [];
 
@@ -36,7 +37,7 @@ THREE.Geometry = function () {
 
 	this.hasTangents = false;
 
-	this.dynamic = true; // the intermediate typearrays will be deleted when set to false
+	this.dynamic = true; // the intermediate typed arrays will be deleted when set to false
 
 	// update flags
 
@@ -46,6 +47,8 @@ THREE.Geometry = function () {
 	this.normalsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
+
+	this.buffersNeedUpdate = false;
 
 };
 

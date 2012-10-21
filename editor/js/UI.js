@@ -406,6 +406,127 @@ UI.Select.prototype.onChange = function ( callback ) {
 
 };
 
+// FancySelect
+
+UI.FancySelect = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'div' );
+	dom.style.position = position || 'relative';
+	dom.style.background = '#fff';
+	dom.style.border = '1px solid #ccc';
+	dom.style.padding = '0';
+	dom.style.cursor = 'default';
+	dom.style.overflow = 'auto';
+
+	this.dom = dom;
+
+	this.onChangeCallback = null;
+
+	this.options = [];
+	this.selectedValue = null;
+
+	return this;
+
+};
+
+UI.FancySelect.prototype = Object.create( UI.Element.prototype );
+
+UI.FancySelect.prototype.setOptions = function ( options ) {
+
+	var scope = this;
+
+	while ( scope.dom.children.length > 0 ) {
+
+		scope.dom.removeChild( scope.dom.firstChild );
+
+	}
+
+	scope.options = [];
+
+	var generateOptionCallback = function ( element, value ) {
+
+		return function ( event ) {
+
+			for ( var i = 0; i < scope.options.length; i ++ ) {
+
+				scope.options[ i ].style.backgroundColor = '#f0f0f0';
+
+			}
+
+			element.style.backgroundColor = '#f0f0f0';
+
+			scope.selectedValue = value;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+		}
+
+	};
+
+	for ( var key in options ) {
+
+		var option = document.createElement( 'div' );
+		option.style.padding = '4px';
+		option.style.whiteSpace = 'nowrap';
+		option.innerHTML = options[ key ];
+		option.value = key;
+		scope.dom.appendChild( option );
+
+		scope.options.push( option );
+		option.addEventListener( 'click', generateOptionCallback( option, key ), false );
+
+	}
+
+	return scope;
+
+};
+
+UI.FancySelect.prototype.getValue = function () {
+
+	return this.selectedValue;
+
+};
+
+UI.FancySelect.prototype.setValue = function ( value ) {
+
+	// must convert raw value into string for compatibility with UI.Select
+	// which uses string values (initialized from options keys)
+
+	var key = value ? value.toString() : value;
+
+	for ( var i = 0; i < this.options.length; i ++ ) {
+
+		var element = this.options[ i ];
+
+		if ( element.value === key ) {
+
+			element.style.backgroundColor = '#f0f0f0';
+
+		} else {
+
+			element.style.backgroundColor = '';
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	return this;
+
+};
+
+UI.FancySelect.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
 
 // Checkbox
 
@@ -603,6 +724,7 @@ UI.Number = function ( position ) {
 
 		dom.style.backgroundColor = '';
 		dom.style.borderColor = '';
+		dom.style.cursor = '';
 
 	};
 
@@ -610,6 +732,7 @@ UI.Number = function ( position ) {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.borderColor = 'transparent';
+		dom.style.cursor = 'col-resize';
 
 	};
 
