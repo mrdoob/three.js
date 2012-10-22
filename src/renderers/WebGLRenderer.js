@@ -557,6 +557,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
 		_gl.deleteBuffer( geometry.__webglColorBuffer );
 
+		deleteCustomAttributesBuffers( geometry );
+
 		_this.info.memory.geometries --;
 
 	};
@@ -565,6 +567,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
 		_gl.deleteBuffer( geometry.__webglColorBuffer );
+
+		deleteCustomAttributesBuffers( geometry );
 
 		_this.info.memory.geometries --;
 
@@ -617,18 +621,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		deleteCustomAttributesBuffers( geometryGroup );
 
-		if ( geometryGroup.__webglCustomAttributesList ) {
+		_this.info.memory.geometries --;
 
-			for ( var id in geometryGroup.__webglCustomAttributesList ) {
+	};
 
-				_gl.deleteBuffer( geometryGroup.__webglCustomAttributesList[ id ].buffer );
+	function deleteCustomAttributesBuffers( geometry ) {
+
+		if ( geometry.__webglCustomAttributesList ) {
+
+			for ( var id in geometry.__webglCustomAttributesList ) {
+
+				_gl.deleteBuffer( geometry.__webglCustomAttributesList[ id ].buffer );
 
 			}
 
 		}
-
-		_this.info.memory.geometries --;
 
 	};
 
