@@ -11706,6 +11706,7 @@ THREE.LOD.prototype.clone = function () {
 };
 /**
  * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Sprite = function ( parameters ) {
@@ -11726,6 +11727,8 @@ THREE.Sprite = function ( parameters ) {
 	this.affectedByDistance = ( parameters.affectedByDistance !== undefined ) ? parameters.affectedByDistance : !this.useScreenCoordinates;
 	this.scaleByViewport = ( parameters.scaleByViewport !== undefined ) ? parameters.scaleByViewport : !this.affectedByDistance;
 	this.alignment = ( parameters.alignment instanceof THREE.Vector2 ) ? parameters.alignment : THREE.SpriteAlignment.center;
+
+	this.fog = ( parameters.fog !== undefined ) ? parameters.fog : false;
 
 	this.rotation3d = this.rotation;
 	this.rotation = 0;
@@ -11773,6 +11776,8 @@ THREE.Sprite.prototype.clone = function ( object ) {
 	object.affectedByDistance = this.affectedByDistance;
 	object.scaleByViewport = this.scaleByViewport;
 	object.alignment = this.alignment;
+
+	object.fog = this.fog;
 
 	object.rotation3d.copy( this.rotation3d );
 	object.rotation = this.rotation;
@@ -33966,6 +33971,12 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 		_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
 
+		_sprite.uniforms.fogType 		  	  = _gl.getUniformLocation( _sprite.program, "fogType" );
+		_sprite.uniforms.fogDensity 		  = _gl.getUniformLocation( _sprite.program, "fogDensity" );
+		_sprite.uniforms.fogNear 		  	  = _gl.getUniformLocation( _sprite.program, "fogNear" );
+		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
+		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
+
 		_sprite.attributesEnabled = false;
 
 	};
@@ -34015,9 +34026,45 @@ THREE.SpritePlugin = function ( ) {
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
 
+		var oldFogType = 0;
+		var sceneFogType = 0;
+		var fog = scene.fog;
+
+		if ( fog ) {
+
+			_gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
+
+			if ( fog instanceof THREE.Fog ) {
+
+				_gl.uniform1f( uniforms.fogNear, fog.near );
+				_gl.uniform1f( uniforms.fogFar, fog.far );
+
+				_gl.uniform1i( uniforms.fogType, 1 );
+				oldFogType = 1;
+				sceneFogType = 1;
+
+			} else if ( fog instanceof THREE.FogExp2 ) {
+
+				_gl.uniform1f( uniforms.fogDensity, fog.density );
+
+				_gl.uniform1i( uniforms.fogType, 2 );
+				oldFogType = 2;
+				sceneFogType = 2;
+
+			}
+
+		} else {
+
+			_gl.uniform1i( uniforms.fogType, 0 );
+			oldFogType = 0;
+			sceneFogType = 0;
+
+		}
+
+
 		// update positions and sort
 
-		var i, sprite, screenPosition, size, scale = [];
+		var i, sprite, screenPosition, size, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
@@ -34025,7 +34072,7 @@ THREE.SpritePlugin = function ( ) {
 
 			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
 
-			if( ! sprite.useScreenCoordinates ) {
+			if ( ! sprite.useScreenCoordinates ) {
 
 				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld );
 				sprite.z = - sprite._modelViewMatrix.elements[14];
@@ -34068,7 +34115,23 @@ THREE.SpritePlugin = function ( ) {
 
 				}
 
-				//size = sprite.map.image.width / ( sprite.scaleByViewport ? viewportHeight : 1 );
+				if ( scene.fog && sprite.fog ) {
+
+					fogType = sceneFogType;
+
+				} else {
+
+					fogType = 0;
+
+				}
+
+				if ( oldFogType !== fogType ) {
+
+					_gl.uniform1i( uniforms.fogType, fogType );
+					oldFogType = fogType;
+
+				}
+
 				size = 1 / ( sprite.scaleByViewport ? viewportHeight : 1 );
 
 				scale[ 0 ] = size * invAspect * sprite.scale.x;
@@ -34141,8 +34204,7 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-};
-/**
+};/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -34514,6 +34576,7 @@ THREE.ShaderFlares = {
 };
 /**
  * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
  *
  */
 
@@ -34576,12 +34639,39 @@ THREE.ShaderSprite = {
 			"uniform sampler2D map;",
 			"uniform float opacity;",
 
+			"uniform int fogType;",
+			"uniform vec3 fogColor;",
+			"uniform float fogDensity;",
+			"uniform float fogNear;",
+			"uniform float fogFar;",
+
 			"varying vec2 vUV;",
 
 			"void main() {",
 
 				"vec4 texture = texture2D( map, vUV );",
 				"gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );",
+
+				"if ( fogType > 0 ) {",
+
+					"float depth = gl_FragCoord.z / gl_FragCoord.w;",
+					"float fogFactor = 0.0;",
+
+					"if ( fogType == 1 ) {",
+
+						"fogFactor = smoothstep( fogNear, fogFar, depth );",
+
+					"} else {",
+
+						"const float LOG2 = 1.442695;",
+						"float fogFactor = exp2( - fogDensity * fogDensity * depth * depth * LOG2 );",
+						"fogFactor = 1.0 - clamp( fogFactor, 0.0, 1.0 );",
+
+					"}",
+
+					"gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );",
+
+				"}",
 
 			"}"
 

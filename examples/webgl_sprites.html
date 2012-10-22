@@ -44,10 +44,12 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2100 );
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
+
+				scene.fog = new THREE.Fog( 0x000000, 1500, 2100 );
 
 				// create sprites
 
@@ -61,7 +63,7 @@
 
 				for( var a = 0; a < amount; a ++ ) {
 
-					var sprite = new THREE.Sprite( { map: mapC, useScreenCoordinates: false, color: 0xffffff } );
+					var sprite = new THREE.Sprite( { map: mapC, useScreenCoordinates: false, color: 0xffffff, fog: true } );
 
 					sprite.position.set( Math.random() - 0.5,
 					                     Math.random() - 0.5,
