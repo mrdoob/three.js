@@ -120,7 +120,7 @@ THREE.Object3D.prototype = {
 
 			} else {
 
-				this.quaternion.setFromRotationMatrix( this.matrix );
+				this.quaternion.copy(this.matrix.decompose()[1]);
 
 			}
 
