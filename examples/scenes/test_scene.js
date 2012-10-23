@@ -224,6 +224,24 @@
 			"visible"  : true
 		},
 
+		"bunny" : {
+			"geometry": "bunny",
+			"materials": [ "phong_bunny" ],
+			"position" : [ -25, -14, 0 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 100, 100, 100 ],
+			"visible"  : true
+		},
+
+		"disk" : {
+			"geometry": "disk",
+			"materials": [ "phong_disk" ],
+			"position" : [ 7, -10, 30 ],
+			"rotation" : [ 1.57, 0, 0 ],
+			"scale"	   : [ 10, 10, 10 ],
+			"visible"  : true
+		},
+
 		"quad_bg" : {
 			"geometry" : "quad",
 			"materials": [ "textured_bg" ],
@@ -430,6 +448,16 @@
 			"useBuffers" : true
 		},
 
+		"bunny": {
+			"type": "vtk",
+			"url" : "models/vtk/bunny.vtk"
+		},
+
+		"disk": {
+			"type": "stl",
+			"url" : "models/stl/slotted_disk.stl"
+		},
+
 		"hand": {
 			"type": "utf8",
 			"url" : "models/utf8/hand.utf8",
@@ -514,6 +542,16 @@
 		"phong_hand": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 14531481, "ambient": 14531481, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+		},
+
+		"phong_bunny": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+		},
+
+		"phong_disk": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16733491, "ambient": 16733491, "specular": 1118481, "shininess": 30, "wireframe": false }
 		},
 
 		"phong_normal": {

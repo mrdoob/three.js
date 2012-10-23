@@ -154,6 +154,8 @@
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
 		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/VTKLoader.js"></script>
+		<script src="js/loaders/STLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -347,6 +349,9 @@
 				var loader = new THREE.SceneLoader();
 
 				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
+				loader.addGeometryHandler( "vtk", THREE.VTKLoader );
+				loader.addGeometryHandler( "stl", THREE.STLLoader );
+
 				loader.addHierarchyHandler( "obj", THREE.OBJLoader );
 
 				loader.callbackSync = callbackSync;
