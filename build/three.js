@@ -9115,7 +9115,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				// meshes
 
-				if ( o.type in this.hierachyHandlerMap ) {
+				if ( o.type && ( o.type in scope.hierarchyHandlerMap ) && o.loading === undefined ) {
 
 					var loaderParameters = {};
 					for ( var parType in g ) {
@@ -9128,8 +9128,13 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					}
 
-					var loader = this.hierachyHandlerMap[ o.type ][ "loaderObject" ];
-					loader.load( get_url( o.url, data.urlBaseType ), create_callback_hierachy( dd, parent ), loaderParameters );
+					material = result.materials[ o.materials[ 0 ] ];
+
+					o.loading = true;
+
+					var loader = scope.hierarchyHandlerMap[ o.type ][ "loaderObject" ];
+					loader.addEventListener( 'load', create_callback_hierachy( dd, parent, material, o ) );
+					loader.load( get_url( o.url, data.urlBaseType ) );
 
 				} else if ( o.geometry !== undefined ) {
 
@@ -9392,9 +9397,40 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
-	function handle_hierarchy( node, id, parent ) {
+	function handle_hierarchy( node, id, parent, material, o ) {
+
+		var p = o.position;
+		var r = o.rotation;
+		var q = o.quaternion;
+		var s = o.scale;
+
+		node.position.set( p[0], p[1], p[2] );
+
+		if ( q ) {
+
+			node.quaternion.set( q[0], q[1], q[2], q[3] );
+			node.useQuaternion = true;
+
+		} else {
+
+			node.rotation.set( r[0], r[1], r[2] );
+
+		}
+
+		node.scale.set( s[0], s[1], s[2] );
+
+		if ( material ) {
+
+			node.traverse( function ( child )  {
+
+				child.material = material;
+
+			} );
+
+		}
 
 		parent.add( node );
+
 		result.objects[ id ] = node;
 		handle_objects();
 
@@ -9416,11 +9452,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
-	function create_callback_hierachy( id, parent ) {
+	function create_callback_hierachy( id, parent, material, obj ) {
 
-		return function( node ) {
+		return function( event ) {
 
-			handle_hierarchy( node, id, parent );
+			handle_hierarchy( event.content, id, parent, material, obj );
 
 			counter_models -= 1;
 
@@ -9516,7 +9552,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// geometries
 
-	// count how many models will be loaded asynchronously
+	// count how many geometries will be loaded asynchronously
 
 	for( dg in data.geometries ) {
 
@@ -9532,11 +9568,13 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	}
 
+	// count how many hierarchies will be loaded asynchronously
+
 	for ( var dd in data.objects ) {
 
-		var o = data.geometries[ dd ];
+		var o = data.objects[ dd ];
 
-		if ( o.type in this.hierarchyHandlerMap ) {
+		if ( o.type && ( o.type in this.hierarchyHandlerMap ) ) {
 
 			counter_models += 1;
 
