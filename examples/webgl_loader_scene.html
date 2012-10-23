@@ -156,6 +156,7 @@
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
 		<script src="js/loaders/STLLoader.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -353,6 +354,7 @@
 				loader.addGeometryHandler( "stl", THREE.STLLoader );
 
 				loader.addHierarchyHandler( "obj", THREE.OBJLoader );
+				loader.addHierarchyHandler( "dae", THREE.ColladaLoader );
 
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;

@@ -9133,8 +9133,17 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					o.loading = true;
 
 					var loader = scope.hierarchyHandlerMap[ o.type ][ "loaderObject" ];
-					loader.addEventListener( 'load', create_callback_hierachy( dd, parent, material, o ) );
-					loader.load( get_url( o.url, data.urlBaseType ) );
+
+					if ( loader.addEventListener ) {
+
+						loader.addEventListener( 'load', create_callback_hierachy( dd, parent, material, o ) );
+						loader.load( get_url( o.url, data.urlBaseType ) );
+
+					} else {
+
+						loader.load( get_url( o.url, data.urlBaseType ), create_callback_hierachy( dd, parent, material, o ), loaderParameters );
+
+					}
 
 				} else if ( o.geometry !== undefined ) {
 
@@ -9456,7 +9465,23 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		return function( event ) {
 
-			handle_hierarchy( event.content, id, parent, material, obj );
+			var result;
+
+			// loaders which use EventTarget
+
+			if ( event.content ) {
+
+				result = event.content;
+
+			// ColladaLoader
+
+			} else if ( event.dae ) {
+
+				result = event.scene;
+
+			}
+
+			handle_hierarchy( result, id, parent, material, obj );
 
 			counter_models -= 1;
 

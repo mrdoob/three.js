@@ -224,6 +224,16 @@
 			"visible"  : true
 		},
 
+		"monster" : {
+			"type": "dae",
+			"url" : "models/collada/monster/monster.dae",
+			"materials": [ ],
+			"position" : [ -43, -10, 27 ],
+			"rotation" : [ -1.57, 0, 0 ],
+			"scale"	   : [ 0.01, 0.01, 0.01 ],
+			"visible"  : true
+		},
+
 		"bunny" : {
 			"geometry": "bunny",
 			"materials": [ "phong_bunny" ],
@@ -545,6 +555,11 @@
 		},
 
 		"phong_bunny": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+		},
+
+		"phong_monster": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
 		},
