@@ -214,6 +214,16 @@
 			"skin"	   : true
 		},
 
+		"man" : {
+			"type": "obj",
+			"url" : "obj/male02/male02.obj",
+			"materials": [ "phong_hand" ],
+			"position" : [ -10, -10, -25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 0.2, 0.2, 0.2 ],
+			"visible"  : true
+		},
+
 		"quad_bg" : {
 			"geometry" : "quad",
 			"materials": [ "textured_bg" ],

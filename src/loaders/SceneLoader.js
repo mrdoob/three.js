@@ -12,6 +12,7 @@ THREE.SceneLoader = function () {
 	this.callbackProgress = function () {};
 
 	this.geometryHandlerMap = {};
+	this.hierarchyHandlerMap = {};
 
 	this.addGeometryHandler( "ascii", THREE.JSONLoader );
 	this.addGeometryHandler( "binary", THREE.BinaryLoader );
@@ -56,6 +57,12 @@ THREE.SceneLoader.prototype.addGeometryHandler = function ( typeID, loaderClass 
 
 };
 
+THREE.SceneLoader.prototype.addHierarchyHandler = function ( typeID, loaderClass ) {
+
+	this.hierarchyHandlerMap[ typeID ] = { "loaderClass": loaderClass };
+
+};
+
 THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var scope = this;
@@ -79,6 +86,15 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		var loaderClass = this.geometryHandlerMap[ typeID ][ "loaderClass" ];
 		this.geometryHandlerMap[ typeID ][ "loaderObject" ] = new loaderClass();
+
+	}
+
+	// async hierachy loaders
+
+	for ( var typeID in this.hierarchyHandlerMap ) {
+
+		var loaderClass = this.hierarchyHandlerMap[ typeID ][ "loaderClass" ];
+		this.hierarchyHandlerMap[ typeID ][ "loaderObject" ] = new loaderClass();
 
 	}
 
@@ -162,7 +178,28 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				// meshes
 
-				if ( o.geometry !== undefined ) {
+				if ( o.type && ( o.type in scope.hierarchyHandlerMap ) && o.loading === undefined ) {
+
+					var loaderParameters = {};
+					for ( var parType in g ) {
+
+						if ( parType !== "type" && parType !== "url" ) {
+
+							loaderParameters[ parType ] = g[ parType ];
+
+						}
+
+					}
+
+					material = result.materials[ o.materials[ 0 ] ];
+
+					o.loading = true;
+
+					var loader = scope.hierarchyHandlerMap[ o.type ][ "loaderObject" ];
+					loader.addEventListener( 'load', create_callback_hierachy( dd, parent, material, o ) );
+					loader.load( get_url( o.url, data.urlBaseType ) );
+
+				} else if ( o.geometry !== undefined ) {
 
 					geometry = result.geometries[ o.geometry ];
 
@@ -423,11 +460,66 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
-	function create_callback( id ) {
+	function handle_hierarchy( node, id, parent, material, o ) {
+
+		var p = o.position;
+		var r = o.rotation;
+		var q = o.quaternion;
+		var s = o.scale;
+
+		node.position.set( p[0], p[1], p[2] );
+
+		if ( q ) {
+
+			node.quaternion.set( q[0], q[1], q[2], q[3] );
+			node.useQuaternion = true;
+
+		} else {
+
+			node.rotation.set( r[0], r[1], r[2] );
+
+		}
+
+		node.scale.set( s[0], s[1], s[2] );
+
+		if ( material ) {
+
+			node.traverse( function ( child )  {
+
+				child.material = material;
+
+			} );
+
+		}
+
+		parent.add( node );
+
+		result.objects[ id ] = node;
+		handle_objects();
+
+	};
+
+	function create_callback_geometry( id ) {
 
 		return function( geo ) {
 
 			handle_mesh( geo, id );
+
+			counter_models -= 1;
+
+			scope.onLoadComplete();
+
+			async_callback_gate();
+
+		}
+
+	};
+
+	function create_callback_hierachy( id, parent, material, obj ) {
+
+		return function( event ) {
+
+			handle_hierarchy( event.content, id, parent, material, obj );
 
 			counter_models -= 1;
 
@@ -523,13 +615,29 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// geometries
 
-	// count how many models will be loaded asynchronously
+	// count how many geometries will be loaded asynchronously
 
 	for( dg in data.geometries ) {
 
 		g = data.geometries[ dg ];
 
 		if ( g.type in this.geometryHandlerMap ) {
+
+			counter_models += 1;
+
+			scope.onLoadStart();
+
+		}
+
+	}
+
+	// count how many hierarchies will be loaded asynchronously
+
+	for ( var dd in data.objects ) {
+
+		var o = data.objects[ dd ];
+
+		if ( o.type && ( o.type in this.hierarchyHandlerMap ) ) {
 
 			counter_models += 1;
 
@@ -589,7 +697,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			}
 
 			var loader = this.geometryHandlerMap[ g.type ][ "loaderObject" ];
-			loader.load( get_url( g.url, data.urlBaseType ), create_callback( dg ), loaderParameters );
+			loader.load( get_url( g.url, data.urlBaseType ), create_callback_geometry( dg ), loaderParameters );
 
 		} else if ( g.type === "embedded" ) {
 
@@ -615,11 +723,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many textures will be loaded asynchronously
 
-	for( dt in data.textures ) {
+	for ( dt in data.textures ) {
 
 		tt = data.textures[ dt ];
 
-		if( tt.url instanceof Array ) {
+		if ( tt.url instanceof Array ) {
 
 			counter_textures += tt.url.length;
 

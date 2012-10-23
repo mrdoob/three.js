@@ -153,6 +153,8 @@
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
+		<script src="js/loaders/OBJLoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -334,8 +336,6 @@
 
 							animation.play();
 
-							console.log( object );
-
 						}
 
 					} );
@@ -347,6 +347,7 @@
 				var loader = new THREE.SceneLoader();
 
 				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
+				loader.addHierarchyHandler( "obj", THREE.OBJLoader );
 
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
