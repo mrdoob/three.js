@@ -324,6 +324,20 @@
 
 						}
 
+						if ( object instanceof THREE.SkinnedMesh ) {
+
+							THREE.AnimationHandler.add( object.geometry.animation );
+
+							var animation = new THREE.Animation( object, object.geometry.animation.name );
+							animation.JITCompile = false;
+							animation.interpolationType = THREE.AnimationHandler.LINEAR;
+
+							animation.play();
+
+							console.log( object );
+
+						}
+
 					} );
 
 				}
@@ -379,7 +393,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -454,6 +468,10 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
 				camera.lookAt( scene.position );
+
+				// update skinning
+
+				THREE.AnimationHandler.update( delta * 0.75 );
 
 				for ( var i = 0; i < rotatingObjects.length; i ++ ) {
 

@@ -204,6 +204,16 @@
 			"mirroredLoop" : true
 		},
 
+		"knight" : {
+			"geometry" : "knight",
+			"materials": [ "phong_skin" ],
+			"position" : [ 70, -10, 10 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 2.5, 2.5, 2.5 ],
+			"visible"  : true,
+			"skin"	   : true
+		},
+
 		"quad_bg" : {
 			"geometry" : "quad",
 			"materials": [ "textured_bg" ],
@@ -398,6 +408,11 @@
 			"url" : "models/animated/sittingBox.js"
 		},
 
+		"knight": {
+			"type": "ascii",
+			"url" : "models/skinned/knight.js"
+		},
+
 		"ben": {
 			"type": "ctm",
 			"url" : "models/ctm/ben.ctm",
@@ -499,6 +514,11 @@
 		"phong_morph": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true, "morphNormals" : true }
+		},
+
+		"phong_skin": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.5, "combine": "MixOperation", "skinning": true, "morphTargets": true }
 		},
 
 		"phong_compressed_cube": {

@@ -9146,7 +9146,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						}
 
-						if ( o.morph ) {
+						if ( o.skin ) {
+
+							object = new THREE.SkinnedMesh( geometry, material );
+
+						} else if ( o.morph ) {
 
 							object = new THREE.MorphAnimMesh( geometry, material );
 
