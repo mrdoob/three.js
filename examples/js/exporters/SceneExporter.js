@@ -188,7 +188,7 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : AmbientLight,',
+				'	"type" : "AmbientLight",',
 				'	"color"  : ' + o.color.getHex() + ( o.children.length ? ',' : '' )
 
 				];
@@ -198,7 +198,7 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : DirectionalLight,',
+				'	"type" : "DirectionalLight",',
 				'	"color"  : ' + o.color.getHex() + ',',
 				'	"intensity"  : ' + o.intensity + ',',
 				'	"direction" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
@@ -210,7 +210,7 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : PointLight,',
+				'	"type" : "PointLight",',
 				'	"color"  : ' + o.color.getHex() + ',',
 				'	"intensity"  : ' + o.intensity + ',',
 				'	"position" : ' + Vector3String( o.position ) + ',',
@@ -223,7 +223,7 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : SpotLight,',
+				'	"type" : "SpotLight",',
 				'	"color"  : ' + o.color.getHex() + ',',
 				'	"intensity"  : ' + o.intensity + ',',
 				'	"position" : ' + Vector3String( o.position ) + ',',
@@ -238,7 +238,7 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : HemisphereLight,',
+				'	"type" : "HemisphereLight",',
 				'	"skyColor"  : ' + o.color.getHex() + ',',
 				'	"groundColor"  : ' + o.groundColor.getHex() + ',',
 				'	"intensity"  : ' + o.intensity + ',',
@@ -263,7 +263,7 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : PerspectiveCamera,',
+				'	"type" : "PerspectiveCamera",',
 				'	"fov": ' + o.fov + ',',
 				'	"aspect": ' + o.aspect + ',',
 				'	"near": ' + o.near + ',',
@@ -277,7 +277,7 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : OrthographicCamera,',
+				'	"type" : "OrthographicCamera",',
 				'	"left": ' + o.left + ',',
 				'	"right": ' + o.right + ',',
 				'	"top": ' + o.top + ',',
