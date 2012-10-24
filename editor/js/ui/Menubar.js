@@ -19,7 +19,7 @@ var Menubar = function ( signals ) {
 	var optionEdit = new UI.Text().setValue( 'Edit' ).setColor( '#666' ).setMarginRight( '20px' ).onMouseOver( onOptionEditClick );
 	options.add( optionEdit );
 
-	var optionEditMenu = new Menubar.File().setTop( '32px' ).setLeft( '50px' ).setDisplay( 'none' ).onMouseOut( closeAll );
+	var optionEditMenu = new Menubar.Edit().setTop( '32px' ).setLeft( '50px' ).setDisplay( 'none' ).onMouseOut( closeAll );
 	container.add( optionEditMenu );
 
 	// Add
@@ -27,7 +27,7 @@ var Menubar = function ( signals ) {
 	var optionAdd = new UI.Text().setValue( 'Add' ).setColor( '#666' ).setMarginRight( '20px' ).onMouseOver( onOptionAddClick );
 	options.add( optionAdd );
 
-	var optionAddMenu = new Menubar.File().setTop( '32px' ).setLeft( '90px' ).setDisplay( 'none' ).onMouseOut( closeAll );
+	var optionAddMenu = new Menubar.Add().setTop( '32px' ).setLeft( '90px' ).setDisplay( 'none' ).onMouseOut( closeAll );
 	container.add( optionAddMenu );
 
 
@@ -36,7 +36,7 @@ var Menubar = function ( signals ) {
 	var optionHelp = new UI.Text().setValue( 'Help' ).setColor( '#666' ).setMarginRight( '20px' ).onMouseOver( onOptionHelpClick );
 	options.add( optionHelp );
 
-	var optionHelpMenu = new Menubar.File().setTop( '32px' ).setLeft( '140px' ).setDisplay( 'none' ).onMouseOut( closeAll );
+	var optionHelpMenu = new Menubar.Help().setTop( '32px' ).setLeft( '140px' ).setDisplay( 'none' ).onMouseOut( closeAll );
 	container.add( optionHelpMenu );
 
 
