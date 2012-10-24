@@ -172,6 +172,16 @@ var Viewport = function ( signals ) {
 
 	};
 
+	var onMouseMove = function ( event ) {
+
+		if ( controls.enabled ) {
+
+			signals.cameraChanged.dispatch( camera );
+
+		}
+
+	};
+
 	var onMouseUp = function ( event ) {
 
 		// clear selection when clicking in empty space
@@ -213,6 +223,7 @@ var Viewport = function ( signals ) {
 
 	};
 
+	container.dom.addEventListener( 'mousemove', onMouseMove, false );
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'mouseup', onMouseUp, false );
 	container.dom.addEventListener( 'click', onClick, false );
