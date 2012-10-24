@@ -197,6 +197,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					var loader = scope.hierarchyHandlerMap[ o.type ][ "loaderObject" ];
 
+					// OBJLoader
+
 					if ( loader.addEventListener ) {
 
 						loader.addEventListener( 'load', create_callback_hierachy( dd, parent, material, o ) );
@@ -210,7 +212,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 							loader.load( get_url( o.url, data.urlBaseType ), create_callback_hierachy( dd, parent, material, o ) );
 
-						// OBJLoader
+						// UTF8Loader
 
 						} else {
 
@@ -553,6 +555,13 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			} else if ( event.dae ) {
 
 				result = event.scene;
+
+
+			// UTF8Loader
+
+			} else {
+
+				result = event;
 
 			}
 

@@ -157,6 +157,8 @@
 		<script src="js/loaders/VTKLoader.js"></script>
 		<script src="js/loaders/STLLoader.js"></script>
 		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/loaders/UTF8Loader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -359,6 +361,7 @@
 
 				loader.addHierarchyHandler( "obj", THREE.OBJLoader );
 				loader.addHierarchyHandler( "dae", THREE.ColladaLoader );
+				loader.addHierarchyHandler( "utf8", THREE.UTF8Loader );
 
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
