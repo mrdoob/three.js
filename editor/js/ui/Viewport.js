@@ -430,6 +430,8 @@ var Viewport = function ( signals ) {
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
 
+	signals.cameraChanged.dispatch( camera );
+
 	animate();
 
 	//
