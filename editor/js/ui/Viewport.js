@@ -88,39 +88,43 @@ var Viewport = function ( signals ) {
 
 		event.preventDefault();
 
-		var vector = new THREE.Vector3(
-			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
-			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
+		if ( event.button === 0 ) {
 
-		projector.unprojectVector( vector, camera );
+			var vector = new THREE.Vector3(
+				( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+				- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+				0.5
+			);
 
-		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			projector.unprojectVector( vector, camera );
 
-		var intersects = ray.intersectObjects( objects, true );
+			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
 
-		if ( intersects.length > 0 ) {
+			var intersects = ray.intersectObjects( objects, true );
 
-			controls.enabled = false;
+			if ( intersects.length > 0 ) {
 
-			intersectionPlane.position.copy( intersects[ 0 ].object.position );
-			intersectionPlane.lookAt( camera.position );
+				controls.enabled = false;
 
-			picked = intersects[ 0 ].object;
-			selected = picked;
+				intersectionPlane.position.copy( intersects[ 0 ].object.position );
+				intersectionPlane.lookAt( camera.position );
 
-			signals.objectSelected.dispatch( selected );
+				picked = intersects[ 0 ].object;
+				selected = picked;
 
-			var intersects = ray.intersectObject( intersectionPlane );
-			offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
+				signals.objectSelected.dispatch( selected );
 
-			document.addEventListener( 'mousemove', onMouseMove, false );
-			document.addEventListener( 'mouseup', onMouseUp, false );
+				var intersects = ray.intersectObject( intersectionPlane );
+				offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
 
-		} else {
+				document.addEventListener( 'mousemove', onMouseMove, false );
+				document.addEventListener( 'mouseup', onMouseUp, false );
 
-			controls.enabled = true;
+			} else {
+
+				controls.enabled = true;
+
+			}
 
 		}
 
@@ -161,28 +165,34 @@ var Viewport = function ( signals ) {
 
 	var onClick = function ( event ) {
 
-		var vector = new THREE.Vector3(
-			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
-			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
+		if ( event.button === 0 ) {
 
-		projector.unprojectVector( vector, camera );
+			var vector = new THREE.Vector3(
+				( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+				- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+				0.5
+			);
 
-		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
-		var intersects = ray.intersectObjects( objects, true );
+			projector.unprojectVector( vector, camera );
 
-		if ( intersects.length > 0 ) {
+			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			var intersects = ray.intersectObjects( objects, true );
 
-			selected = intersects[ 0 ].object;
+			if ( intersects.length > 0 ) {
 
-		} else {
+				selected = intersects[ 0 ].object;
 
-			selected = null;
+			} else {
+
+				selected = null;
+
+			}
+
+			signals.objectSelected.dispatch( selected );
 
 		}
 
-		signals.objectSelected.dispatch( selected );
+		controls.enabled = true;
 
 	};
 
