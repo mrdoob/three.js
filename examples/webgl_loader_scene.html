@@ -331,13 +331,17 @@
 
 						if ( object instanceof THREE.SkinnedMesh ) {
 
-							THREE.AnimationHandler.add( object.geometry.animation );
+							if ( object.geometry.animation ) {
 
-							var animation = new THREE.Animation( object, object.geometry.animation.name );
-							animation.JITCompile = false;
-							animation.interpolationType = THREE.AnimationHandler.LINEAR;
+								THREE.AnimationHandler.add( object.geometry.animation );
 
-							animation.play();
+								var animation = new THREE.Animation( object, object.geometry.animation.name );
+								animation.JITCompile = false;
+								animation.interpolationType = THREE.AnimationHandler.LINEAR;
+
+								animation.play();
+
+							}
 
 						}
 
