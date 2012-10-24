@@ -91,11 +91,7 @@
 
 					case 46: // delete
 
-						if ( confirm( 'Delete selected object?' ) === true ) {
-
-							signals.objectRemoved.dispatch();
-
-						}
+						signals.objectRemoved.dispatch();
 
 						break;
 

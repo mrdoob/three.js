@@ -250,6 +250,14 @@ var Viewport = function ( signals ) {
 
 		}
 
+		var name = selected.name ?  '"' + selected.name + '"': "selected object";
+
+		if ( ! confirm( 'Delete ' + name + '?' ) ) {
+
+			return;
+
+		}
+
 		var toRemove = {};
 
 		selected.traverse( function ( child ) {
