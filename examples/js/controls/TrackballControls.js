@@ -329,7 +329,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 			_panStart = _panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
 
 		}
-		
+
 		document.addEventListener( 'mousemove', mousemove, false );
 		document.addEventListener( 'mouseup', mouseup, false );
 
