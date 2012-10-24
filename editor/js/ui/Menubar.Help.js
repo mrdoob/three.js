@@ -1,7 +1,7 @@
 Menubar.Help = function ( signals ) {
 
 	var container = new UI.Panel( 'absolute' );
-	container.setBackgroundColor( '#eee' );
+	container.setBackgroundColor( '#ccc' );
 	container.setWidth( '120px' );
 	container.setPadding( '10px' );
 
