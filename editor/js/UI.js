@@ -646,6 +646,12 @@ UI.Color.prototype.getValue = function () {
 
 };
 
+UI.Color.prototype.getHexValue = function () {
+
+	return parseInt( this.dom.value.substr( 1 ), 16 );
+
+};
+
 UI.Color.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;

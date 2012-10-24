@@ -8,7 +8,7 @@ THREE.SceneExporter.prototype = {
 
 	constructor: THREE.SceneExporter,
 
-	parse: function ( scene ) {
+	parse: function ( scene, clearColor, clearAlpha ) {
 
 		var position = Vector3String( scene.position );
 		var rotation = Vector3String( scene.rotation );
@@ -125,8 +125,8 @@ THREE.SceneExporter.prototype = {
 
 		// todo: get somehow these from Viewport's renderer
 
-		var bgcolor = ColorString( new THREE.Color( 0xaaaaaa ) );
-		var bgalpha = 1.0;
+		var bgcolor = ColorString( clearColor );
+		var bgalpha = clearAlpha;
 		var defcamera = LabelString( "default_camera" );
 
 		//

@@ -238,25 +238,25 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material.color !== undefined ) {
 
-				material.color.setHex( parseInt( materialColor.getValue().substr( 1 ), 16 ) );
+				material.color.setHex( materialColor.getHexValue() );
 
 			}
 
 			if ( material.ambient !== undefined ) {
 
-				material.ambient.setHex( parseInt( materialAmbient.getValue().substr( 1 ), 16 ) );
+				material.ambient.setHex( materialAmbient.getHexValue() );
 
 			}
 
 			if ( material.emissive !== undefined ) {
 
-				material.emissive.setHex( parseInt( materialEmissive.getValue().substr( 1 ), 16 ) );
+				material.emissive.setHex( materialEmissive.getHexValue() );
 
 			}
 
 			if ( material.specular !== undefined ) {
 
-				material.specular.setHex( parseInt( materialSpecular.getValue().substr( 1 ), 16 ) );
+				material.specular.setHex( materialSpecular.getHexValue() );
 
 			}
 

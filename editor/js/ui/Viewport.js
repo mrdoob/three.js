@@ -393,6 +393,14 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.clearColorChanged.add( function ( color ) {
+
+		renderer.setClearColorHex( color, 1 );
+
+		render();
+
+	} );
+
 	signals.windowResize.add( function () {
 
 		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
