@@ -37,13 +37,14 @@
 		<script src="js/UI.js"></script>
 		<script src="js/UI.three.js"></script>
 		<script src="js/ui/Menubar.js"></script>
-		<script src="js/ui/Viewport.js"></script>
+		<script src="js/ui/Menubar.File.js"></script>
 		<script src="js/ui/Sidebar.js"></script>
 		<script src="js/ui/Sidebar.Outliner.js"></script>
 		<script src="js/ui/Sidebar.Properties.js"></script>
 		<script src="js/ui/Sidebar.Properties.Object3D.js"></script>
 		<script src="js/ui/Sidebar.Properties.Geometry.js"></script>
 		<script src="js/ui/Sidebar.Properties.Material.js"></script>
+		<script src="js/ui/Viewport.js"></script>
 
 		<script>
 
@@ -67,6 +68,12 @@
 
 			//
 
+			var viewport = new Viewport( signals );
+			viewport.setTop( '32px' );
+			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			document.body.appendChild( viewport.dom );
+
 			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
@@ -77,12 +84,6 @@
 			sidebar.setTop( '32px' );
 			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
 			document.body.appendChild( sidebar.dom );
-
-			var viewport = new Viewport( signals );
-			viewport.setTop( '32px' );
-			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
-			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
-			document.body.appendChild( viewport.dom );
 
 			document.addEventListener( 'keydown', function ( event ) {
 

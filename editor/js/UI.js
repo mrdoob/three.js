@@ -4,6 +4,8 @@ UI.Element = function () {};
 
 UI.Element.prototype = {
 
+	// styles
+
 	setStyle: function ( style, array ) {
 
 		for ( var i = 0; i < array.length; i ++ ) {
@@ -62,7 +64,7 @@ UI.Element.prototype = {
 
 	},
 
-	// border
+	//
 
 	setBorder: function () {
 
@@ -104,7 +106,7 @@ UI.Element.prototype = {
 
 	},
 
-	// margin
+	//
 
 	setMargin: function () {
 
@@ -146,7 +148,7 @@ UI.Element.prototype = {
 
 	},
 
-	// padding
+	//
 
 	setPadding: function () {
 
@@ -206,8 +208,33 @@ UI.Element.prototype = {
 
 		return this;
 
-	}
+	},
 
+	// events
+
+	onMouseOver: function ( callback ) {
+
+		this.dom.addEventListener( 'mouseover', callback, false );
+
+		return this;
+
+	},
+
+	onMouseOut: function ( callback ) {
+
+		this.dom.addEventListener( 'mouseout', callback, false );
+
+		return this;
+
+	},
+
+	onClick: function ( callback ) {
+
+		this.dom.addEventListener( 'click', callback, false );
+
+		return this;
+
+	}
 
 }
 
@@ -254,6 +281,7 @@ UI.Text = function ( position ) {
 
 	var dom = document.createElement( 'span' );
 	dom.style.position = position || 'relative';
+	dom.style.cursor = 'default';
 
 	this.dom = dom;
 
