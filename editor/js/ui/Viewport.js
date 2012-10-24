@@ -181,14 +181,9 @@ var Viewport = function ( signals ) {
 			if ( intersects.length > 0 ) {
 
 				selected = intersects[ 0 ].object;
-
-			} else {
-
-				selected = null;
+				signals.objectSelected.dispatch( selected );
 
 			}
-
-			signals.objectSelected.dispatch( selected );
 
 		}
 
