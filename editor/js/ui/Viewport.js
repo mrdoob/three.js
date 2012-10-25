@@ -499,6 +499,8 @@ var Viewport = function ( signals ) {
 	container.dom.tabIndex = 1;
 	container.dom.addEventListener( 'keydown', onKeyDown, false );
 
+	container.dom.className = "hideFocus";
+
 	//
 
 	function updateMaterials( root ) {
