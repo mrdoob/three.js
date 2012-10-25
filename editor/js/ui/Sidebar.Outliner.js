@@ -25,8 +25,6 @@ Sidebar.Outliner = function ( signals ) {
 
 	var scene = null;
 
-	var activeCamera = null;
-
 	var clearColor = new THREE.Color( 0xaaaaaa );
 	var clearAlpha = 1;
 
@@ -101,15 +99,10 @@ Sidebar.Outliner = function ( signals ) {
 
 	} );
 
-	signals.cameraChanged.add( function ( camera ) {
-
-		activeCamera = camera;
-
-	} );
 
 	function exportScene() {
 
-		var output = new THREE.SceneExporter().parse( scene, clearColor, clearAlpha, activeCamera );
+		var output = new THREE.SceneExporter().parse( scene, clearColor, clearAlpha );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );

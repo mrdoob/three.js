@@ -8,7 +8,7 @@ THREE.SceneExporter.prototype = {
 
 	constructor: THREE.SceneExporter,
 
-	parse: function ( scene, clearColor, clearAlpha, activeCamera ) {
+	parse: function ( scene, clearColor, clearAlpha ) {
 
 		var position = Vector3String( scene.position );
 		var rotation = Vector3String( scene.rotation );
@@ -139,9 +139,21 @@ THREE.SceneExporter.prototype = {
 
 		// generate defaults
 
+		var activeCamera = null;
+
+		scene.traverse( function ( node ) {
+
+			if ( node instanceof THREE.Camera && node.properties.active ) {
+
+				activeCamera = node;
+
+			}
+
+		} );
+
 		var bgcolor = ColorString( clearColor );
 		var bgalpha = clearAlpha;
-		var defcamera = LabelString( getObjectName( activeCamera ) );
+		var defcamera = LabelString( activeCamera ? getObjectName( activeCamera ) : "" );
 		var deffog = LabelString( scene.fog ? getFogName( scene.fog ) : "" );
 
 		// templates

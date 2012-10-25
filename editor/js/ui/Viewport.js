@@ -79,6 +79,10 @@ var Viewport = function ( signals ) {
 	light2.target.name = "Light 2 Target";
 	signals.sceneChanged.dispatch( scene );
 
+	// active objects
+
+	camera.properties.active = true;
+
 	// object picking
 
 	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ) );
