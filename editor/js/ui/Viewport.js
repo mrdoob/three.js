@@ -60,6 +60,14 @@ var Viewport = function ( signals ) {
 	light2.position.set( - 1, - 0.5, 0 ).normalize();
 	scene.add( light2 );
 
+	// fog
+
+	var oldFogType = "None";
+	var oldFogColor = 0xaaaaaa;
+	var oldFogNear = 1;
+	var oldFogFar = 5000;
+	var oldFogDensity = 0.00025;
+
 	// default objects names
 
 	camera.name = "Camera";
@@ -412,6 +420,65 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.fogTypeChanged.add( function ( fogType ) {
+
+		if ( fogType !== oldFogType ) {
+
+			if ( fogType === "None" ) {
+
+				scene.fog = null;
+
+			} else if ( fogType === "Fog" ) {
+
+				scene.fog = new THREE.Fog( oldFogColor, oldFogNear, oldFogFar );
+
+			} else if ( fogType === "FogExp2" ) {
+
+				scene.fog = new THREE.FogExp2( oldFogColor, oldFogDensity );
+
+			}
+
+			updateMaterials( scene );
+
+			var enableHelpersFog = true;
+
+			if ( enableHelpersFog )	{
+
+				sceneHelpers.fog = scene.fog;
+				updateMaterials( sceneHelpers );
+
+			}
+
+			oldFogType = fogType;
+
+		}
+
+		render();
+
+	} );
+
+	signals.fogColorChanged.add( function ( fogColor ) {
+
+		oldFogColor = fogColor;
+
+		updateFog( scene );
+
+		render();
+
+	} );
+
+	signals.fogParametersChanged.add( function ( near, far, density ) {
+
+		oldFogNear = near;
+		oldFogFar = far;
+		oldFogDensity = density;
+
+		updateFog( scene );
+
+		render();
+
+	} );
+
 	signals.windowResize.add( function () {
 
 		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
@@ -435,6 +502,44 @@ var Viewport = function ( signals ) {
 	animate();
 
 	//
+
+	function updateMaterials( root ) {
+
+		root.traverse( function ( node ) {
+
+			if ( node.material ) {
+
+				node.material.needsUpdate = true;
+
+			}
+
+			if ( node.geometry && node.geometry.materials ) {
+
+				for ( var i = 0; i < node.geometry.materials.length; i ++ ) {
+
+					node.geometry.materials[ i ].needsUpdate = true;
+
+				}
+
+			}
+
+		} );
+
+	}
+
+	function updateFog( root ) {
+
+		if ( root.fog ) {
+
+			root.fog.color.setHex( oldFogColor );
+
+			if ( root.fog.near !== undefined ) root.fog.near = oldFogNear;
+			if ( root.fog.far !== undefined ) root.fog.far = oldFogFar;
+			if ( root.fog.density !== undefined ) root.fog.density = oldFogDensity;
+
+		}
+
+	}
 
 	function animate() {
 

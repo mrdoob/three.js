@@ -693,6 +693,9 @@ UI.Number = function ( position ) {
 	this.min = - Infinity;
 	this.max = Infinity;
 
+	this.precision = 2;
+	this.step = 1;
+
 	this.onChangeCallback = null;
 
 	var distance = 0;
@@ -718,9 +721,9 @@ UI.Number = function ( position ) {
 
 		distance += movementX - movementY;
 
-		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) );
+		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) ) * scope.step;
 
-		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
+		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -800,7 +803,7 @@ UI.Number.prototype.getValue = function () {
 
 UI.Number.prototype.setValue = function ( value ) {
 
-	this.dom.value = value.toFixed( 2 );
+	this.dom.value = value.toFixed( this.precision );
 
 	return this;
 
@@ -810,6 +813,20 @@ UI.Number.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
 	this.max = max;
+
+	return this;
+
+};
+
+UI.Number.prototype.setPrecision = function ( precision ) {
+
+	this.precision = precision;
+
+	if ( precision > 2 ) {
+
+		this.step = Math.pow( 10, -( precision - 1 ) );
+
+	}
 
 	return this;
 

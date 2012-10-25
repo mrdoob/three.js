@@ -20,19 +20,79 @@ Sidebar.Properties.World = function ( signals ) {
 
 	// fog
 
-	var fogRow = new UI.Panel();
-	var fog = new UI.Select( 'absolute' ).setOptions( {
+	var fogTypeRow = new UI.Panel();
+	var fogType = new UI.Select( 'absolute' ).setOptions( {
 
 		'None': 'None',
-		'Fog': 'Fog',
-		'FogExp2': 'FogExp2'
+		'Fog': 'Linear',
+		'FogExp2': 'Exponential'
 
-	} ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateFog );
+	} ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateFogType );
 
-	fogRow.add( new UI.Text().setValue( 'Fog' ).setColor( '#666' ) );
-	fogRow.add( fog );
+	fogTypeRow.add( new UI.Text().setValue( 'Fog type' ).setColor( '#666' ) );
+	fogTypeRow.add( fogType );
 
-	container.add( fogRow );
+	container.add( fogTypeRow );
+
+	// fog color
+
+	var fogColorRow = new UI.Panel();
+	fogColorRow.setDisplay( 'none' );
+
+	var fogColor = new UI.Color( 'absolute' ).setLeft( '100px' ).setValue( '#aaaaaa' ).onChange( updateFogColor );
+
+	fogColorRow.add( new UI.Text().setValue( 'Fog color' ).setColor( '#666' ) );
+	fogColorRow.add( fogColor );
+
+	container.add( fogColorRow );
+
+	// clear color lock
+
+	var colorLockEnabled = true;
+
+	var colorLockRow = new UI.Panel();
+	colorLockRow.setDisplay( 'inline-block' ).setLeft( '100px' ).setMargin( '0px' );
+
+	var colorLock = new UI.Checkbox( 'relative' ).setLeft( '10px' ).setValue( colorLockEnabled ).onChange( updateColorLock );
+	colorLockRow.add( colorLock );
+
+	fogColorRow.add( colorLockRow );
+
+	// fog near
+
+	var fogNearRow = new UI.Panel();
+	fogNearRow.setDisplay( 'none' );
+
+	var fogNear = new UI.Number( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 1 ).onChange( updateFogParameters );
+
+	fogNearRow.add( new UI.Text().setValue( 'Fog near' ).setColor( '#666' ) );
+	fogNearRow.add( fogNear );
+
+	container.add( fogNearRow );
+
+	var fogFarRow = new UI.Panel();
+	fogFarRow.setDisplay( 'none' );
+
+	// fog far
+
+	var fogFar = new UI.Number( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 5000 ).onChange( updateFogParameters );
+
+	fogFarRow.add( new UI.Text().setValue( 'Fog far' ).setColor( '#666' ) );
+	fogFarRow.add( fogFar );
+
+	container.add( fogFarRow );
+
+	// fog density
+
+	var fogDensityRow = new UI.Panel();
+	fogDensityRow.setDisplay( 'none' );
+
+	var fogDensity = new UI.Number( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).setValue( 0.00025 ).onChange( updateFogParameters );
+
+	fogDensityRow.add( new UI.Text().setValue( 'Fog density' ).setColor( '#666' ) );
+	fogDensityRow.add( fogDensity );
+
+	container.add( fogDensityRow );
 
 	//
 
@@ -42,9 +102,69 @@ Sidebar.Properties.World = function ( signals ) {
 
 	}
 
-	function updateFog() {
+	function updateFogType() {
 
-		console.log( "fog", fog.getValue() );
+		var type = fogType.getValue();
+
+		if ( type === "None" ) {
+
+			fogColorRow.setDisplay( 'none' );
+
+		} else {
+
+			fogColorRow.setDisplay( '' );
+
+		}
+
+		if ( type === "Fog" ) {
+
+			fogNearRow.setDisplay( '' );
+			fogFarRow.setDisplay( '' );
+
+		} else {
+
+			fogNearRow.setDisplay( 'none' );
+			fogFarRow.setDisplay( 'none' );
+
+		}
+
+		if ( type === "FogExp2" ) {
+
+			fogDensityRow.setDisplay( '' );
+
+		} else {
+
+			fogDensityRow.setDisplay( 'none' );
+
+		}
+
+		signals.fogTypeChanged.dispatch( type );
+
+	}
+
+	function updateFogColor() {
+
+		signals.fogColorChanged.dispatch( fogColor.getHexValue() );
+
+		if ( colorLockEnabled )  {
+
+			clearColor.setValue( fogColor.getValue() );
+			updateClearColor();
+
+		}
+
+	}
+
+	function updateFogParameters() {
+
+		signals.fogParametersChanged.dispatch( fogNear.getValue(), fogFar.getValue(), fogDensity.getValue() );
+
+	}
+
+	function updateColorLock() {
+
+		colorLockEnabled = colorLock.getValue();
+		updateFogColor();
 
 	}
 
