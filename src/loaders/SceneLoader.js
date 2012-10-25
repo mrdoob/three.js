@@ -636,7 +636,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// fogs
 
-	for( df in data.fogs ) {
+	for ( df in data.fogs ) {
 
 		f = data.fogs[ df ];
 
@@ -663,7 +663,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many geometries will be loaded asynchronously
 
-	for( dg in data.geometries ) {
+	for ( dg in data.geometries ) {
 
 		g = data.geometries[ dg ];
 

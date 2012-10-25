@@ -23,10 +23,13 @@ THREE.SceneExporter.prototype = {
 		var geometriesArray = [];
 		var materialsArray = [];
 		var texturesArray = [];
+		var fogsArray = [];
 
 		var geometriesMap = {};
 		var materialsMap = {};
 		var texturesMap = {};
+
+		// extract objects, geometries, materials, textures
 
 		var checkTexture = function ( map ) {
 
@@ -119,15 +122,29 @@ THREE.SceneExporter.prototype = {
 
 		var objects = linesArray.join( "\n" );
 
+		// extract fog
+
+		if ( scene.fog ) {
+
+			fogsArray.push( FogString( scene.fog ) );
+
+		}
+
+		// generate sections
+
 		var geometries = generateMultiLineString( geometriesArray, ",\n\n\t" );
 		var materials = generateMultiLineString( materialsArray, ",\n\n\t" );
 		var textures = generateMultiLineString( texturesArray, ",\n\n\t" );
+		var fogs = generateMultiLineString( fogsArray, ",\n\n\t" );
+
+		// generate defaults
 
 		var bgcolor = ColorString( clearColor );
 		var bgalpha = clearAlpha;
 		var defcamera = LabelString( getObjectName( activeCamera ) );
+		var deffog = LabelString( scene.fog ? getFogName( scene.fog ) : "" );
 
-		//
+		// templates
 
 		function Vector2String( v ) {
 
@@ -344,7 +361,7 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "sphere",',
 				'	"radius"  : ' 		 + g.radius + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
-				'	"heightSegments" : ' + g.heightSegments + ',',
+				'	"heightSegments" : ' + g.heightSegments,
 				'}'
 
 				];
@@ -360,7 +377,7 @@ THREE.SceneExporter.prototype = {
 				'	"depth"  : '  + g.depth  + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
 				'	"heightSegments" : ' + g.heightSegments + ',',
-				'	"depthSegments" : '  + g.depthSegments + ',',
+				'	"depthSegments" : '  + g.depthSegments,
 				'}'
 
 				];
@@ -374,7 +391,7 @@ THREE.SceneExporter.prototype = {
 				'	"width"  : '  + g.width  + ',',
 				'	"height"  : ' + g.height + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
-				'	"heightSegments" : ' + g.heightSegments + ',',
+				'	"heightSegments" : ' + g.heightSegments,
 				'}'
 
 				];
@@ -566,6 +583,45 @@ THREE.SceneExporter.prototype = {
 
 		//
 
+		function FogString( f ) {
+
+			if ( f instanceof THREE.Fog ) {
+
+				var output = [
+
+				'\t' + LabelString( getFogName( f ) ) + ': {',
+				'	"type"  : "linear",',
+				'	"color" : ' + ColorString( f.color ) + ',',
+				'	"near"  : '  + f.near + ',',
+				'	"far"   : '    + f.far,
+				'}'
+
+				];
+
+			} else if ( f instanceof THREE.FogExp2 ) {
+
+				var output = [
+
+				'\t' + LabelString( getFogName( f ) ) + ': {',
+				'	"type"    : "exp2",',
+				'	"color"   : '  + ColorString( f.color ) + ',',
+				'	"density" : ' + f.density,
+				'}'
+
+				];
+
+			} else {
+
+				var output = [];
+
+			}
+
+			return generateMultiLineString( output, '\n\t\t' );
+
+		}
+
+		//
+
 		function generateMultiLineString( lines, separator, padding ) {
 
 			var cleanLines = [];
@@ -611,6 +667,12 @@ THREE.SceneExporter.prototype = {
 
 		}
 
+		function getFogName( f ) {
+
+			return f.name ? f.name : "Default fog";
+
+		}
+
 		//
 
 		var output = [
@@ -652,6 +714,12 @@ THREE.SceneExporter.prototype = {
 			'	},',
 			'',
 
+			'	"fogs" :',
+			'	{',
+			'\t' + 	fogs,
+			'	},',
+			'',
+
 			'	"transform" :',
 			'	{',
 			'		"position"  : ' + position + ',',
@@ -663,7 +731,8 @@ THREE.SceneExporter.prototype = {
 			'	{',
 			'		"bgcolor" : ' + bgcolor + ',',
 			'		"bgalpha" : ' + bgalpha + ',',
-			'		"camera"  : ' + defcamera,
+			'		"camera"  : ' + defcamera + ',',
+			'		"fog"  	  : ' + deffog,
 			'	}',
 			'}'
 		].join( '\n' );
