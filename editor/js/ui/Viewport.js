@@ -90,7 +90,7 @@ var Viewport = function ( signals ) {
 	var offset = new THREE.Vector3();
 	var picked = null;
 
-	var oldMouseX = 0, oldMouseY = 0;
+	var cameraChanged = false;
 
 	// events
 
@@ -127,8 +127,8 @@ var Viewport = function ( signals ) {
 				var intersects = ray.intersectObject( intersectionPlane );
 				offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
 
-				document.addEventListener( 'mousemove', onMouseMoveDrag, false );
-				document.addEventListener( 'mouseup', onMouseUpDrag, false );
+				document.addEventListener( 'mousemove', onMouseMove, false );
+				document.addEventListener( 'mouseup', onMouseUp, false );
 
 			} else {
 
@@ -138,16 +138,11 @@ var Viewport = function ( signals ) {
 
 		}
 
-		if ( controls.enabled ) {
-
-			oldMouseX = event.clientX;
-			oldMouseY = event.clientY;
-
-		}
+		cameraChanged = false;
 
 	};
 
-	var onMouseMoveDrag = function ( event ) {
+	var onMouseMove = function ( event ) {
 
 		var vector = new THREE.Vector3(
 			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
@@ -173,29 +168,16 @@ var Viewport = function ( signals ) {
 
 	};
 
-	var onMouseUpDrag = function ( event ) {
-
-		document.removeEventListener( 'mousemove', onMouseMoveDrag );
-		document.removeEventListener( 'mouseup', onMouseUpDrag );
-
-	};
-
 	var onMouseUp = function ( event ) {
 
-		// clear selection when clicking in empty space
-
-		if ( controls.enabled && event.clientX === oldMouseX && event.clientY === oldMouseY ) {
-
-			selected = null;
-			signals.objectSelected.dispatch( selected );
-
-		}
+		document.removeEventListener( 'mousemove', onMouseMove );
+		document.removeEventListener( 'mouseup', onMouseUp );
 
 	};
 
 	var onClick = function ( event ) {
 
-		if ( event.button === 0 ) {
+		if ( event.button == 0 && cameraChanged === false ) {
 
 			var vector = new THREE.Vector3(
 				( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
@@ -211,9 +193,14 @@ var Viewport = function ( signals ) {
 			if ( intersects.length > 0 && ! controls.enabled ) {
 
 				selected = intersects[ 0 ].object;
-				signals.objectSelected.dispatch( selected );
+
+			} else {
+
+				selected = null;
 
 			}
+
+			signals.objectSelected.dispatch( selected );
 
 		}
 
@@ -222,7 +209,6 @@ var Viewport = function ( signals ) {
 	};
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
-	container.dom.addEventListener( 'mouseup', onMouseUp, false );
 	container.dom.addEventListener( 'click', onClick, false );
 
 	// controls need to be added *after* main logic,
@@ -238,10 +224,13 @@ var Viewport = function ( signals ) {
 	controls.dynamicDampingFactor = 0.3;
 	controls.addEventListener( 'change', function () {
 
+		cameraChanged = true;
+
 		signals.cameraChanged.dispatch( camera );
 		render();
 
 	} );
+
 
 	// signals
 
