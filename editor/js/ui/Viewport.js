@@ -278,9 +278,9 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.objectRemoved.add( function ( ) {
+	signals.removeSelectedObject.add( function () {
 
-		if ( !selected ) {
+		if ( selected === null ) {
 
 			console.warn( "No object selected for delete" );
 			return;

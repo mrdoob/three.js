@@ -59,10 +59,15 @@
 
 			var signals = {
 
+				// actions
+
+				removeSelectedObject: new SIGNALS.Signal(),
+
+				// notifications
+
 				sceneCreated: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
-				objectRemoved: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
 				objectChanged: new SIGNALS.Signal(),
 				materialChanged: new SIGNALS.Signal(),
@@ -100,7 +105,7 @@
 
 					case 46: // delete
 
-						signals.objectRemoved.dispatch();
+						signals.removeSelectedObject.dispatch();
 
 						break;
 
