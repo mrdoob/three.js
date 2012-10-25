@@ -25,9 +25,6 @@ Sidebar.Outliner = function ( signals ) {
 
 	var scene = null;
 
-	var clearColor = new THREE.Color( 0xaaaaaa );
-	var clearAlpha = 1;
-
 	function update() {
 
 		var id = parseInt( sceneGraph.getValue() );
@@ -102,13 +99,7 @@ Sidebar.Outliner = function ( signals ) {
 
 	function exportScene() {
 
-		var output = new THREE.SceneExporter().parse( scene, clearColor, clearAlpha );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
+		signals.exportScene.dispatch( scene );
 
 	}
 

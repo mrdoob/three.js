@@ -488,6 +488,21 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.exportScene.add( function ( root ) {
+
+		var clearColor = renderer.getClearColor();
+		var clearAlpha = renderer.getClearAlpha();
+
+		var output = new THREE.SceneExporter().parse( root, clearColor, clearAlpha );
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	} );
+
 	//
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
