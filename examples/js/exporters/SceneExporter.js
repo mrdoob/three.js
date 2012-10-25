@@ -361,7 +361,7 @@ THREE.SceneExporter.prototype = {
 				'	"type"    : "sphere",',
 				'	"radius"  : ' 		 + g.radius + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
-				'	"heightSegments" : ' + g.heightSegments + ',',
+				'	"heightSegments" : ' + g.heightSegments,
 				'}'
 
 				];
@@ -377,7 +377,7 @@ THREE.SceneExporter.prototype = {
 				'	"depth"  : '  + g.depth  + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
 				'	"heightSegments" : ' + g.heightSegments + ',',
-				'	"depthSegments" : '  + g.depthSegments + ',',
+				'	"depthSegments" : '  + g.depthSegments,
 				'}'
 
 				];
@@ -391,7 +391,7 @@ THREE.SceneExporter.prototype = {
 				'	"width"  : '  + g.width  + ',',
 				'	"height"  : ' + g.height + ',',
 				'	"widthSegments"  : ' + g.widthSegments + ',',
-				'	"heightSegments" : ' + g.heightSegments + ',',
+				'	"heightSegments" : ' + g.heightSegments,
 				'}'
 
 				];
