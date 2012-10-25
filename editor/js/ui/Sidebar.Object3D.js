@@ -1,4 +1,4 @@
-Sidebar.Properties.Object3D = function ( signals ) {
+Sidebar.Object3D = function ( signals ) {
 
 	var objects = {
 

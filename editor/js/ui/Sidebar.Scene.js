@@ -1,4 +1,4 @@
-Sidebar.Outliner = function ( signals ) {
+Sidebar.Scene = function ( signals ) {
 
 	var objectTypes = {
 

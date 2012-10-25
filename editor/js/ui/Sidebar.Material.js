@@ -1,4 +1,4 @@
-Sidebar.Properties.Material = function ( signals ) {
+Sidebar.Material = function ( signals ) {
 
     var materials = {
 

@@ -1,4 +1,4 @@
-Sidebar.Properties.Geometry = function ( signals ) {
+Sidebar.Geometry = function ( signals ) {
 
 	var geometries = {
 
