@@ -180,16 +180,6 @@ var Viewport = function ( signals ) {
 
 	};
 
-	var onMouseMove = function ( event ) {
-
-		if ( controls.enabled ) {
-
-			signals.cameraChanged.dispatch( camera );
-
-		}
-
-	};
-
 	var onMouseUp = function ( event ) {
 
 		// clear selection when clicking in empty space
@@ -231,7 +221,6 @@ var Viewport = function ( signals ) {
 
 	};
 
-	container.dom.addEventListener( 'mousemove', onMouseMove, false );
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'mouseup', onMouseUp, false );
 	container.dom.addEventListener( 'click', onClick, false );
@@ -247,7 +236,12 @@ var Viewport = function ( signals ) {
 	controls.noPan = false;
 	controls.staticMoving = true;
 	controls.dynamicDampingFactor = 0.3;
-	controls.addEventListener( 'change', render );
+	controls.addEventListener( 'change', function () {
+
+		signals.cameraChanged.dispatch( camera );
+		render();
+
+	} );
 
 	// signals
 
@@ -496,8 +490,6 @@ var Viewport = function ( signals ) {
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
-
-	signals.cameraChanged.dispatch( camera );
 
 	animate();
 
