@@ -96,6 +96,8 @@ var Viewport = function ( signals ) {
 
 	var onMouseDown = function ( event ) {
 
+		container.dom.focus();
+
 		event.preventDefault();
 
 		if ( event.button === 0 ) {
@@ -228,6 +230,22 @@ var Viewport = function ( signals ) {
 		}
 
 		controls.enabled = true;
+
+	};
+
+	var onKeyDown = function ( event ) {
+
+		console.log( event );
+
+		switch ( event.keyCode ) {
+
+			case 46: // delete
+
+				signals.objectRemoved.dispatch();
+
+				break;
+
+		}
 
 	};
 
@@ -500,6 +518,12 @@ var Viewport = function ( signals ) {
 	signals.cameraChanged.dispatch( camera );
 
 	animate();
+
+	// set up for hotkeys
+	// must be done here, otherwise it doesn't work
+
+	container.dom.tabIndex = 1;
+	container.dom.addEventListener( 'keydown', onKeyDown, false );
 
 	//
 
