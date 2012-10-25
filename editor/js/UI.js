@@ -310,8 +310,10 @@ UI.Input = function ( position ) {
 
 	var dom = document.createElement( 'input' );
 	dom.style.position = position || 'relative';
+	dom.style.padding = '2px';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLeft = '-2px';
+	dom.style.border = '1px solid #ccc';
 
 	this.dom = dom;
 
@@ -681,11 +683,12 @@ UI.Number = function ( position ) {
 	dom.style.position = position || 'relative';
 	dom.style.color = '#0080f0';
 	dom.style.fontSize = '12px';
-	dom.style.cursor = 'col-resize';
 	dom.style.backgroundColor = 'transparent';
-	dom.style.borderColor = 'transparent';
+	dom.style.border = '1px solid transparent';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLegt = '-2px';
+	dom.style.padding = '2px';
+	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	this.dom = dom;
@@ -760,7 +763,7 @@ UI.Number = function ( position ) {
 	var onFocus = function ( event ) {
 
 		dom.style.backgroundColor = '';
-		dom.style.borderColor = '';
+		dom.style.borderColor = '#ccc';
 		dom.style.cursor = '';
 
 	};
