@@ -15,6 +15,7 @@
 				border-top: 1px solid #ccc;
 			}
 
+			.hideFocus:focus { outline: 0 }
 		</style>
 	</head>
 	<body>
@@ -82,6 +83,17 @@
 
 			//
 
+			var menubar = new Menubar( signals );
+			menubar.setWidth( '100%' );
+			menubar.setHeight( '32px' );
+			document.body.appendChild( menubar.dom );
+
+			var sidebar = new Sidebar( signals );
+			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			sidebar.setTop( '32px' );
+			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			document.body.appendChild( sidebar.dom );
+
 			var viewport = new Viewport( signals );
 			viewport.setTop( '32px' );
 			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
@@ -93,16 +105,6 @@
 
 			viewport.dom.focus();
 
-			var menubar = new Menubar( signals );
-			menubar.setWidth( '100%' );
-			menubar.setHeight( '32px' );
-			document.body.appendChild( menubar.dom );
-
-			var sidebar = new Sidebar( signals );
-			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
-			sidebar.setTop( '32px' );
-			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
-			document.body.appendChild( sidebar.dom );
 
 			document.addEventListener( 'drop', function ( event ) {
 
