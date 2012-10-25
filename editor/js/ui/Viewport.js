@@ -497,9 +497,8 @@ var Viewport = function ( signals ) {
 	// must be done here, otherwise it doesn't work
 
 	container.dom.tabIndex = 1;
+	container.dom.style.outline = 'transparent';
 	container.dom.addEventListener( 'keydown', onKeyDown, false );
-
-	container.dom.className = "hideFocus";
 
 	//
 
