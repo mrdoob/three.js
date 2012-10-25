@@ -1,12 +1,28 @@
-Sidebar.Properties.World = function ( signals ) {
+Sidebar.Outliner = function ( signals ) {
+
+	var objectTypes = {
+
+		'PerspectiveCamera': THREE.PerspectiveCamera,
+		'PointLight': THREE.PointLight,
+		'DirectionalLight': THREE.DirectionalLight,
+		'Mesh': THREE.Mesh,
+		'Object3D': THREE.Object3D
+
+	};
+
+	var selected = null;
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
 	container.setPadding( '10px' );
+	container.setBorderTop( '1px solid #ccc' );
 
-	var objectType = new UI.Text().setColor( '#666' ).setValue( 'WORLD' );
-	container.add( objectType );
+	container.add( new UI.Text().setValue( 'SCENE' ).setColor( '#666' ) );
+	container.add( new UI.Button( 'absolute' ).setRight( '8px' ).setTop( '5px' ).setLabel( 'Export' ).onClick( exportScene ) );
 	container.add( new UI.Break(), new UI.Break() );
+
+	var outliner = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( updateOutliner );
+	container.add( outliner );
+	container.add( new UI.Break() );
 
 	// clear color
 
@@ -96,6 +112,35 @@ Sidebar.Properties.World = function ( signals ) {
 
 	//
 
+	var scene = null;
+
+	function getObjectType( object ) {
+
+		for ( var type in objectTypes ) {
+
+			if ( object instanceof objectTypes[ type ] ) return type;
+
+		}
+
+	}
+
+	function updateOutliner() {
+
+		var id = parseInt( outliner.getValue() );
+
+		scene.traverse( function ( node ) {
+
+			if ( node.id === id ) {
+
+				signals.objectSelected.dispatch( node );
+				return;
+
+			}
+
+		} );
+
+	}
+
 	function updateClearColor() {
 
 		signals.clearColorChanged.dispatch( clearColor.getHexValue() );
@@ -169,6 +214,55 @@ Sidebar.Properties.World = function ( signals ) {
 	}
 
 	// events
+
+	signals.sceneCreated.add( function ( object ) {
+
+		scene = object;
+
+	} );
+
+	signals.sceneChanged.add( function ( object ) {
+
+		scene = object;
+
+		var options = {};
+
+		( function createList( object, pad ) {
+
+			for ( var key in object.children ) {
+
+				var child = object.children[ key ];
+
+				options[ child.id ] = pad + child.name + ' <span style="color: #aaa">- ' + getObjectType( child ) + '</span>';
+
+				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
+
+			}
+
+		} )( scene, '' );
+
+		outliner.setOptions( options );
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
+		outliner.setValue( object !== null ? object.id : null );
+
+	} );
+
+	signals.clearColorChanged.add( function ( color ) {
+
+		clearColor.setHex( color );
+
+	} );
+
+
+	function exportScene() {
+
+		signals.exportScene.dispatch( scene );
+
+	}
 
 	return container;
 
