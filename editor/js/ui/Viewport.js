@@ -95,6 +95,7 @@ var Viewport = function ( signals ) {
 	var picked = null;
 
 	var cameraChanged = false;
+	var helpersVisible = true;
 
 	// events
 
@@ -221,6 +222,12 @@ var Viewport = function ( signals ) {
 			case 46: // delete
 
 				signals.removeSelectedObject.dispatch();
+
+				break;
+
+			case 72: // h
+
+				signals.toggleHelpers.dispatch();
 
 				break;
 
@@ -503,6 +510,13 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.toggleHelpers.add( function () {
+
+		helpersVisible = !helpersVisible;
+		render();
+
+	} );
+
 	//
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
@@ -573,7 +587,12 @@ var Viewport = function ( signals ) {
 
 		renderer.clear();
 		renderer.render( scene, camera );
-		renderer.render( sceneHelpers, camera );
+
+		if ( helpersVisible ) {
+
+			renderer.render( sceneHelpers, camera );
+
+		}
 
 	}
 
