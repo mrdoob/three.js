@@ -9573,7 +9573,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// fogs
 
-	for( df in data.fogs ) {
+	for ( df in data.fogs ) {
 
 		f = data.fogs[ df ];
 
@@ -9600,7 +9600,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many geometries will be loaded asynchronously
 
-	for( dg in data.geometries ) {
+	for ( dg in data.geometries ) {
 
 		g = data.geometries[ dg ];
 
@@ -12083,6 +12083,8 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 THREE.Fog = function ( hex, near, far ) {
 
+	this.name = '';
+
 	this.color = new THREE.Color( hex );
 
 	this.near = ( near !== undefined ) ? near : 1;
@@ -12102,6 +12104,7 @@ THREE.Fog.prototype.clone = function () {
 
 THREE.FogExp2 = function ( hex, density ) {
 
+	this.name = '';
 	this.color = new THREE.Color( hex );
 	this.density = ( density !== undefined ) ? density : 0.00025;
 
