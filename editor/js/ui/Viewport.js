@@ -198,7 +198,7 @@ var Viewport = function ( signals ) {
 
 			} else {
 
-				selected = null;
+				selected = camera;
 
 			}
 
@@ -279,12 +279,7 @@ var Viewport = function ( signals ) {
 
 	signals.removeSelectedObject.add( function () {
 
-		if ( selected === null ) {
-
-			console.warn( "No object selected for delete" );
-			return;
-
-		}
+		if ( selected === camera ) return;
 
 		var name = selected.name ?  '"' + selected.name + '"': "selected object";
 
@@ -334,7 +329,7 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	var selected = null;
+	var selected = camera;
 
 	signals.objectSelected.add( function ( object ) {
 
