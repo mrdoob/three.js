@@ -7,7 +7,7 @@ var Viewport = function ( signals ) {
 
 	var enableHelpersFog = true;
 
-	//
+	// helpers
 
 	var objects = [];
 
@@ -49,6 +49,13 @@ var Viewport = function ( signals ) {
 
 	//
 
+	var lightGeo = new THREE.SphereGeometry( 5, 16, 8 );
+	var targetGeo = new THREE.SphereGeometry( 5, 8, 4 );
+
+	var direction = new THREE.Vector3();
+
+	//
+
 	var scene = new THREE.Scene();
 
 	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
@@ -57,12 +64,13 @@ var Viewport = function ( signals ) {
 	scene.add( camera );
 
 	var light1 = new THREE.DirectionalLight( 0xffffff );
-	light1.position.set( 1, 0.5, 0 ).normalize();
-	scene.add( light1 );
+	light1.position.set( 1, 0.5, 0 ).multiplyScalar( 400 );
 
 	var light2 = new THREE.DirectionalLight( 0xffffff, 0.5 );
-	light2.position.set( - 1, - 0.5, 0 ).normalize();
-	scene.add( light2 );
+	light2.position.set( - 1, - 0.5, 0 ).multiplyScalar( 400 );
+
+	light1.target.properties.targetInverse = light1;
+	light2.target.properties.targetInverse = light2;
 
 	// fog
 
@@ -81,7 +89,6 @@ var Viewport = function ( signals ) {
 
 	light2.name = "Light 2";
 	light2.target.name = "Light 2 Target";
-	signals.sceneChanged.dispatch( scene );
 
 	// active objects
 
@@ -262,16 +269,65 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	var handleAddition = function ( object ) {
+
+		// add to picking list
+
+		objects.push( object );
+
+		// create helpers for invisible object types (lights, cameras, targets)
+
+		if ( object instanceof THREE.DirectionalLight ) {
+
+			var lightGizmo = new THREE.Object3D();
+			lightGizmo.position = object.position;
+			lightGizmo.properties.gizmo = true;
+
+			var lightColor = object.color.clone();
+			lightColor.r *= object.intensity;
+			lightColor.g *= object.intensity;
+			lightColor.b *= object.intensity;
+
+			var length = 30;
+			direction.sub( object.target.position, object.position );
+
+			var lightArrow = new THREE.ArrowHelper( direction, null, length, lightColor.getHex() );
+
+			var lightMaterial = new THREE.MeshBasicMaterial( { color: lightColor.getHex() } );
+			var lightSphere = new THREE.Mesh( lightGeo, lightMaterial );
+
+			lightGizmo.add( lightArrow );
+			lightGizmo.add( lightSphere );
+
+			sceneHelpers.add( lightGizmo );
+
+			object.properties.arrow = lightArrow;
+
+			if ( object.target.properties.targetInverse ) {
+
+				var targetMaterial = new THREE.MeshBasicMaterial( { color: lightColor.getHex(), wireframe: true } );
+
+				var targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
+				targetSphere.position = object.target.position;
+				targetSphere.properties.gizmo = true;
+
+				sceneHelpers.add( targetSphere );
+
+			}
+
+		} else if ( object instanceof THREE.PointLight ) {
+		} else if ( object instanceof THREE.SpotLight ) {
+		} else if ( object instanceof THREE.HemisphereLight ) {
+		}
+
+	};
+
 
 	// signals
 
 	signals.objectAdded.add( function ( object ) {
 
-		object.traverse( function ( child ) {
-
-			objects.push( child );
-
-		} );
+		object.traverse( handleAddition );
 
 		scene.add( object );
 		render();
@@ -285,6 +341,19 @@ var Viewport = function ( signals ) {
 		if ( object instanceof THREE.Camera ) {
 
 			object.updateProjectionMatrix();
+
+		} else if ( object instanceof THREE.DirectionalLight ) {
+
+			direction.sub( object.target.position, object.position );
+			object.properties.arrow.setDirection( direction );
+
+		} else if ( object instanceof THREE.PointLight ) {
+		} else if ( object instanceof THREE.SpotLight ) {
+		} else if ( object instanceof THREE.HemisphereLight ) {
+		} else if ( object.properties.targetInverse ) {
+
+			direction.sub( object.position, object.properties.targetInverse.position );
+			object.properties.targetInverse.properties.arrow.setDirection( direction );
 
 		}
 
@@ -303,6 +372,8 @@ var Viewport = function ( signals ) {
 			return;
 
 		}
+
+		// remove from picking list
 
 		var toRemove = {};
 
@@ -327,6 +398,8 @@ var Viewport = function ( signals ) {
 		}
 
 		objects = newObjects;
+
+		//
 
 		selectionBox.visible = false;
 		selectionAxis.visible = false;
@@ -523,13 +596,35 @@ var Viewport = function ( signals ) {
 
 		scene = newScene;
 
-		objects = [];
+		// remove old gizmos
 
-		scene.traverse( function ( child ) {
+		var toRemove = {};
 
-			objects.push( child );
+		sceneHelpers.traverse( function ( child ) {
+
+			if ( child.properties.gizmo ) {
+
+				toRemove[ child.id ] = child;
+
+			}
 
 		} );
+
+		for ( var id in toRemove ) {
+
+			sceneHelpers.remove( toRemove[ id ] );
+
+		}
+
+		// reset picking list
+
+		objects = [];
+
+		// add new gizmos and fill picking list
+
+		scene.traverse( handleAddition );
+
+		//
 
 		if ( newCamera ) {
 
@@ -600,6 +695,12 @@ var Viewport = function ( signals ) {
 	container.dom.tabIndex = 1;
 	container.dom.style.outline = 'transparent';
 	container.dom.addEventListener( 'keydown', onKeyDown, false );
+
+	// must come after listeners are registered
+
+	signals.sceneChanged.dispatch( scene );
+	signals.objectAdded.dispatch( light1 );
+	signals.objectAdded.dispatch( light2 );
 
 	//
 
