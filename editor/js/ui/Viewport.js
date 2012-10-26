@@ -3,6 +3,10 @@ var Viewport = function ( signals ) {
 	var container = new UI.Panel( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
 
+	// settings
+
+	var enableHelpersFog = true;
+
 	//
 
 	var objects = [];
@@ -445,8 +449,6 @@ var Viewport = function ( signals ) {
 
 			updateMaterials( scene );
 
-			var enableHelpersFog = true;
-
 			if ( enableHelpersFog )	{
 
 				sceneHelpers.fog = scene.fog;
@@ -514,6 +516,49 @@ var Viewport = function ( signals ) {
 
 		helpersVisible = !helpersVisible;
 		render();
+
+	} );
+
+	signals.resetScene.add( function ( newScene, newCamera, newClearColor ) {
+
+		scene = newScene;
+
+		objects = [];
+
+		scene.traverse( function ( child ) {
+
+			objects.push( child );
+
+		} );
+
+		if ( newCamera ) {
+
+			camera = newCamera;
+			camera.properties.active = true;
+
+			camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+			camera.updateProjectionMatrix();
+
+			controls.object = camera;
+			controls.update();
+
+		}
+
+		if ( newClearColor ) {
+
+			signals.clearColorChanged.dispatch( newClearColor.getHex() );
+
+		}
+
+		if ( enableHelpersFog )	{
+
+			sceneHelpers.fog = scene.fog;
+			updateMaterials( sceneHelpers );
+
+		}
+
+		signals.sceneChanged.dispatch( scene );
+		signals.objectSelected.dispatch( null );
 
 	} );
 

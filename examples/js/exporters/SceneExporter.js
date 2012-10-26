@@ -230,7 +230,8 @@ THREE.SceneExporter.prototype = {
 				'	"type" : "DirectionalLight",',
 				'	"color"  : ' + o.color.getHex() + ',',
 				'	"intensity"  : ' + o.intensity + ',',
-				'	"direction" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
+				'	"direction" : ' + Vector3String( o.position ) + ',',
+				'	"target"    : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -258,7 +259,8 @@ THREE.SceneExporter.prototype = {
 				'	"position" : ' + Vector3String( o.position ) + ',',
 				'	"distance"  : ' + o.distance + ',',
 				'	"angle"  : ' + o.angle + ',',
-				'	"exponent"  : ' + o.exponent + ( o.children.length ? ',' : '' )
+				'	"exponent"  : ' + o.exponent + ',',
+				'	"target"    : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
 				];
 
