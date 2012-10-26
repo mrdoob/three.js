@@ -169,9 +169,10 @@ THREE.Color.prototype = {
 
 	},
 
-	getHexString: function(){
-		var str = color.getHex().toString(16);
-		return ("000000" + str).slice(-6);
+	getHexString: function () {
+
+		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
+
 	},
 
 	getContextStyle: function () {

@@ -25,13 +25,13 @@ THREE.Camera.prototype.lookAt = function ( vector ) {
 	if ( this.rotationAutoUpdate === true ) {
 
 		if ( this.useQuaternion === false )  {
-			
+
 			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
-			
+
 		} else {
-			
-			this.quaternion.copy(this.matrix.decompose()[1]);
-			
+
+			this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+
 		}
 
 	}
