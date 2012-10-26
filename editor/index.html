@@ -61,6 +61,7 @@
 				removeSelectedObject: new SIGNALS.Signal(),
 				exportScene: new SIGNALS.Signal(),
 				toggleHelpers: new SIGNALS.Signal(),
+				resetScene: new SIGNALS.Signal(),
 
 				// notifications
 
@@ -234,12 +235,22 @@
 
 							} else if ( data.metadata.type === 'scene' ) {
 
-								new THREE.SceneLoader().parse( data, function ( scene ) {
+								new THREE.SceneLoader().parse( data, function ( result ) {
 
-									scene.name = filename;
+									result.scene.name = filename;
 
-									signals.objectAdded.dispatch( scene );
-									signals.objectSelected.dispatch( scene );
+									var resetScene = true;
+
+									if ( resetScene ) {
+
+										signals.resetScene.dispatch( result.scene, result.currentCamera, result.bgColor );
+
+									} else {
+
+										signals.objectAdded.dispatch( result.scene );
+										signals.objectSelected.dispatch( result.scene );
+
+									}
 
 								}, '' );
 

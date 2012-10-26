@@ -150,6 +150,15 @@ Sidebar.Scene = function ( signals ) {
 	function updateFogType() {
 
 		var type = fogType.getValue();
+		signals.fogTypeChanged.dispatch( type );
+
+		refreshFogUI();
+
+	}
+
+	function refreshFogUI() {
+
+		var type = fogType.getValue();
 
 		if ( type === "None" ) {
 
@@ -182,8 +191,6 @@ Sidebar.Scene = function ( signals ) {
 			fogDensityRow.setDisplay( 'none' );
 
 		}
-
-		signals.fogTypeChanged.dispatch( type );
 
 	}
 
@@ -243,6 +250,31 @@ Sidebar.Scene = function ( signals ) {
 
 		outliner.setOptions( options );
 
+		if ( scene.fog ) {
+
+			fogColor.setHexValue( scene.fog.color.getHex() );
+
+			if ( scene.fog instanceof THREE.Fog ) {
+
+				fogType.setValue( "Fog" );
+				fogNear.setValue( scene.fog.near );
+				fogFar.setValue( scene.fog.far );
+
+			} else if ( scene.fog instanceof THREE.FogExp2 ) {
+
+				fogType.setValue( "FogExp2" );
+				fogDensity.setValue( scene.fog.density );
+
+			}
+
+		} else {
+
+			fogType.setValue( "None" );
+
+		}
+
+		refreshFogUI();
+
 	} );
 
 	signals.objectSelected.add( function ( object ) {
@@ -253,7 +285,7 @@ Sidebar.Scene = function ( signals ) {
 
 	signals.clearColorChanged.add( function ( color ) {
 
-		clearColor.setHex( color );
+		clearColor.setHexValue( color );
 
 	} );
 

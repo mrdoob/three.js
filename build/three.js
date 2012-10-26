@@ -147,6 +147,7 @@ THREE.SrcAlphaSaturateFactor = 210;
 
 THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;
+THREE.AddOperation = 2;
 
 // Mapping modes
 
@@ -9037,6 +9038,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		total_models, total_textures,
 		result;
 
+	var target_array = [];
+
 	var data = json;
 
 	// async geometry loaders
@@ -9320,7 +9323,17 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						light = new THREE.DirectionalLight( hex, intensity );
 						light.position.set( p[0], p[1], p[2] );
-						light.position.normalize();
+
+						if ( o.target ) {
+
+							target_array.push( { "object": light, "targetName" : o.target } );
+
+							// kill existing default target
+							// otherwise it gets added to scene when parent gets added
+
+							light.target = null;
+
+						}
 
 					} else if ( o.type === "PointLight" ) {
 
@@ -9357,13 +9370,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					}
 
 					p = o.position;
-					t = o.target;
-					u = o.up;
-
 					camera.position.set( p[0], p[1], p[2] );
-					camera.target = new THREE.Vector3( t[0], t[1], t[2] );
-					if ( u ) camera.up.set( u[0], u[1], u[2] );
-
 					parent.add( camera );
 
 					camera.name = dd;
@@ -9563,7 +9570,37 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		if ( counter_models === 0 && counter_textures === 0 ) {
 
+			finalize();
 			callbackFinished( result );
+
+		}
+
+	};
+
+	function finalize() {
+
+		// take care of targets which could be asynchronously loaded objects
+
+		for ( var i = 0; i < target_array.length; i ++ ) {
+
+			var ta = target_array[ i ];
+
+			var target = result.objects[ ta.targetName ];
+
+			if ( target ) {
+
+				ta.object.target = target;
+
+			} else {
+
+				// if there was error and target of specified name doesn't exist in the scene file
+				// create instead dummy target
+				// (target must be added to scene explicitly as parent is already added)
+
+				ta.object.target = new THREE.Object3D();
+				result.scene.add( ta.object.target );
+
+			}
 
 		}
 
@@ -13487,6 +13524,10 @@ THREE.ShaderChunk = {
 			"if ( combine == 1 ) {",
 
 				"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularStrength * reflectivity );",
+
+			"} else if ( combine == 2 ) {",
+
+				"gl_FragColor.xyz += cubeColor.xyz * specularStrength * reflectivity;",
 
 			"} else {",
 
