@@ -784,21 +784,10 @@ UI.Number = function ( position ) {
 
 	};
 
-	var onKeyUp = function ( event ) {
-
-		if ( event.keyCode == 13 ) {
-
-			onBlur();
-
-		}
-
-	};
-
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );
 	dom.addEventListener( 'focus', onFocus, false );
 	dom.addEventListener( 'blur', onBlur, false );
-	dom.addEventListener( 'keyup', onKeyUp, false );
 
 	return this;
 
