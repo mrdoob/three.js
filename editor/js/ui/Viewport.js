@@ -550,6 +550,29 @@ var Viewport = function ( signals ) {
 
 		}
 
+		if ( newScene.fog ) {
+
+			oldFogColor = newScene.fog.color.getHex();
+
+			if ( newScene.fog instanceof THREE.Fog ) {
+
+				oldFogType = "Fog";
+				oldFogNear = newScene.fog.near;
+				oldFogFar = newScene.fog.far;
+
+			} else if ( newScene.fog instanceof THREE.FogExp2 ) {
+
+				oldFogType = "FogExp2";
+				oldFogDensity = newScene.fog.density;
+
+			}
+
+		} else {
+
+			oldFogType = "None";
+
+		}
+
 		if ( enableHelpersFog )	{
 
 			sceneHelpers.fog = scene.fog;
