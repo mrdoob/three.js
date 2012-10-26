@@ -447,6 +447,12 @@ THREE.Color.prototype = {
 
 	},
 
+	getHexString: function () {
+
+		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
+
+	},
+
 	getContextStyle: function () {
 
 		return 'rgb(' + ( ( this.r * 255 ) | 0 )  + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
@@ -3408,7 +3414,15 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+			if ( this.useQuaternion === false )  {
+
+				this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+
+			} else {
+
+				this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+
+			}
 
 		}
 
@@ -6230,7 +6244,15 @@ THREE.Camera.prototype.lookAt = function ( vector ) {
 
 	if ( this.rotationAutoUpdate === true ) {
 
-		this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+		if ( this.useQuaternion === false )  {
+
+			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+
+		} else {
+
+			this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+
+		}
 
 	}
 
