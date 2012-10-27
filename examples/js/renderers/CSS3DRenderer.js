@@ -145,6 +145,10 @@ THREE.CSS3DRenderer = function () {
 
 				style = getObjectCSSMatrix( object.matrixWorld );
 
+				element.style.WebkitBackfaceVisibility = 'hidden';
+				element.style.MozBackfaceVisibility = 'hidden';
+				element.style.oBackfaceVisibility = 'hidden';
+
 				element.style.WebkitTransform = style;
 				element.style.MozTransform = style;
 				element.style.oTransform = style;

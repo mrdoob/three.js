@@ -2,11 +2,13 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<title>three.js css3d - panorama</title>
 		<style>
 			body {
-				background-color: #ffffff;
+				background-color: #000000;
 				margin: 0;
+				cursor: move;
 				overflow: hidden;
 			}
 
@@ -42,7 +44,10 @@
 			var lon = 90, lat = 0;
 			var phi = 0, theta = 0;
 
+			var touchX, touchY;
+
 			init();
+			animate();
 
 			function init() {
 
@@ -88,7 +93,7 @@
 					var side = sides[ i ];
 
 					var element = document.createElement( 'img' );
-					element.addEventListener( 'load', render, false );
+					element.width = 1026; // 2 pixels extra to close the gap.
 					element.src = side.url;
 
 					var object = new THREE.CSS3DObject( element );
@@ -109,6 +114,9 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -119,8 +127,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
 
 			}
 
@@ -141,8 +147,6 @@
 				lon -= movementX * 0.1;
 				lat += movementY * 0.1;
 
-				render();
-
 			}
 
 			function onDocumentMouseUp( event ) {
@@ -157,12 +161,38 @@
 				camera.fov -= event.wheelDeltaY * 0.05;
 				camera.updateProjectionMatrix();
 
-				render();
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				event.preventDefault();
+
+				var touch = event.touches[ 0 ];
+
+				touchX = touch.screenX;
+				touchY = touch.screenY;
 
 			}
 
-			function render() {
+			function onDocumentTouchMove( event ) {
 
+				event.preventDefault();
+
+				var touch = event.touches[ 0 ];
+
+				lon -= ( touch.screenX - touchX ) * 0.1;
+				lat += ( touch.screenY - touchY ) * 0.1;
+
+				touchX = touch.screenX;
+				touchY = touch.screenY;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				lon +=  0.1;
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = ( 90 - lat ) * Math.PI / 180;
 				theta = lon * Math.PI / 180;
