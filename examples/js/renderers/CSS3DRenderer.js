@@ -29,6 +29,8 @@ THREE.CSS3DRenderer = function () {
 
 	this.domElement = document.createElement( 'div' );
 
+	this.domElement.style.overflow = 'hidden';
+
 	this.domElement.style.WebkitTransformStyle = 'preserve-3d';
 	this.domElement.style.WebkitPerspectiveOrigin = '50% 50%';
 
@@ -38,9 +40,11 @@ THREE.CSS3DRenderer = function () {
 	this.domElement.style.oTransformStyle = 'preserve-3d';
 	this.domElement.style.oPerspectiveOrigin = '50% 50%';
 
+
 	// TODO: Shouldn't it be possible to remove cameraElement?
 
 	this.cameraElement = document.createElement( 'div' );
+
 	this.cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	this.cameraElement.style.MozTransformStyle = 'preserve-3d';
 	this.cameraElement.style.oTransformStyle = 'preserve-3d';
@@ -145,9 +149,11 @@ THREE.CSS3DRenderer = function () {
 
 				style = getObjectCSSMatrix( object.matrixWorld );
 
+				/*
 				element.style.WebkitBackfaceVisibility = 'hidden';
 				element.style.MozBackfaceVisibility = 'hidden';
 				element.style.oBackfaceVisibility = 'hidden';
+				*/
 
 				element.style.WebkitTransform = style;
 				element.style.MozTransform = style;
