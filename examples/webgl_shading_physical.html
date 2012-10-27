@@ -6,19 +6,18 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 		    body {
-				color: #222;
+				color: #fff;
 				font-family: Monospace;
 				font-size: 13px;
 				text-align: center;
 				font-weight: bold;
 
-				background-color: #fff;
+				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
 		    }
 
 		    #info {
-				color: #000;
 				position: relative;
 				margin: 0 auto -2.1em;
 				top: 0px;
@@ -60,7 +59,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/Tween.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 
 		<script src='js/libs/DAT.GUI.min.js'></script>
 
@@ -439,8 +438,8 @@
 
 				tweenDirection = -1;
 
-				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
-				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
+				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 
 				// GUI
 
