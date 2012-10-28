@@ -12,6 +12,7 @@ THREE.CSS3DObject = function ( element ) {
 	this.element.style.WebkitTransformStyle = 'preserve-3d';
 	this.element.style.MozTransformStyle = 'preserve-3d';
 	this.element.style.oTransformStyle = 'preserve-3d';
+	this.element.style.transformStyle = 'preserve-3d';
 
 };
 
@@ -40,6 +41,8 @@ THREE.CSS3DRenderer = function () {
 	this.domElement.style.oTransformStyle = 'preserve-3d';
 	this.domElement.style.oPerspectiveOrigin = '50% 50%';
 
+	this.domElement.style.transformStyle = 'preserve-3d';
+	this.domElement.style.perspectiveOrigin = '50% 50%';
 
 	// TODO: Shouldn't it be possible to remove cameraElement?
 
@@ -48,6 +51,7 @@ THREE.CSS3DRenderer = function () {
 	this.cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	this.cameraElement.style.MozTransformStyle = 'preserve-3d';
 	this.cameraElement.style.oTransformStyle = 'preserve-3d';
+	this.cameraElement.style.transformStyle = 'preserve-3d';
 
 	this.domElement.appendChild( this.cameraElement );
 
@@ -130,12 +134,14 @@ THREE.CSS3DRenderer = function () {
 		this.domElement.style.WebkitPerspective = fov + "px";
 		this.domElement.style.MozPerspective = fov + "px";
 		this.domElement.style.oPerspective = fov + "px";
+		this.domElement.style.perspective = fov + "px";
 
 		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) + " translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
 
 		this.cameraElement.style.WebkitTransform = style;
 		this.cameraElement.style.MozTransform = style;
 		this.cameraElement.style.oTransform = style;
+		this.cameraElement.style.transform = style;
 
 		var objects = _projector.projectScene( scene, camera, false ).objects;
 
@@ -153,11 +159,13 @@ THREE.CSS3DRenderer = function () {
 				element.style.WebkitBackfaceVisibility = 'hidden';
 				element.style.MozBackfaceVisibility = 'hidden';
 				element.style.oBackfaceVisibility = 'hidden';
+				element.style.backfaceVisibility = 'hidden';
 				*/
 
 				element.style.WebkitTransform = style;
 				element.style.MozTransform = style;
 				element.style.oTransform = style;
+				element.style.transform = style;
 
 				if ( element.parentNode !== this.cameraElement ) {
 
