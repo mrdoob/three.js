@@ -22,6 +22,7 @@
 				position: relative;
 				margin: 0 auto -2.1em;
 				top: 0px;
+				width: 70em;
 
 				padding: 5px;
 				z-index:100;
@@ -234,43 +235,6 @@
 
 			// GUI
 
-			function addGuiHeader( label, h, s, v ) {
-
-				// add dummy item
-
-				playbackConfig[ label ] = function() {};
-
-				// hack GUI item styling
-
-				var dummy = gui.add( playbackConfig, label, label );
-				setGuiHeaderStyle( dummy, h, s, v );
-
-			}
-
-			function setGuiHeaderStyle( g, h, s, v ) {
-
-				var color = "hsl(" + h + "," + s + "%, " + v + "%)";
-
-				g.domElement.style.borderLeft = "solid 5px " + color;
-				g.domElement.style.background = color;
-				g.domElement.style.fontWeight = "bold";
-
-			}
-
-			function setGuiElementStyle( a, h, s, v, display ) {
-
-				var i, s, color = "hsl(" + h + "," + s + "%, " + v + "%)";
-
-				for( i = 0; i < a.length; i ++ ) {
-
-					s = a[ i ].domElement.style;
-					s.borderLeft = "solid 5px " + color;
-					s.display = display ? display : "none";
-
-				}
-
-			}
-
 			function labelize( text ) {
 
 				var parts = text.split( "." );
@@ -290,7 +254,7 @@
 
 			function setupWeaponsGUI( character ) {
 
-				addGuiHeader( "Weapons", 20, 90, 30 );
+				var folder = gui.addFolder( "Weapons" );
 
 				var generateCallback = function( index ) {
 
@@ -305,11 +269,9 @@
 					var name = character.weapons[ i ].name;
 
 					playbackConfig[ name ] = generateCallback( i );
-					guiItems[ i ] = gui.add( playbackConfig, name ).name( labelize( name ) );
+					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
 
 				}
-
-				setGuiElementStyle( guiItems, 20, 90, 30, "block" );
 
 			}
 
@@ -317,7 +279,7 @@
 
 			function setupSkinsGUI( character ) {
 
-				addGuiHeader( "Skins", 0, 90, 30 );
+				var folder = gui.addFolder( "Skins" );
 
 				var generateCallback = function( index ) {
 
@@ -332,11 +294,9 @@
 					var name = character.skinsBody[ i ].name;
 
 					playbackConfig[ name ] = generateCallback( i );
-					guiItems[ i ] = gui.add( playbackConfig, name ).name( labelize( name ) );
+					guiItems[ i ] = folder.add( playbackConfig, name ).name( labelize( name ) );
 
 				}
-
-				setGuiElementStyle( guiItems, 0, 90, 30, "block" );
 
 			}
 
@@ -344,7 +304,7 @@
 
 			function setupGUIAnimations( character ) {
 
-				addGuiHeader( "Animations", 100, 90, 30 );
+				var folder = gui.addFolder( "Animations" );
 
 				var generateCallback = function( animationName ) {
 
@@ -358,13 +318,11 @@
 				for ( var a in animations ) {
 
 					playbackConfig[ a ] = generateCallback( a );
-					guiItems[ i ] = gui.add( playbackConfig, a, a );
+					guiItems[ i ] = folder.add( playbackConfig, a, a );
 
 					i ++;
 
 				}
-
-				setGuiElementStyle( guiItems, 100, 90, 30, "block" );
 
 			}
 
