@@ -7,8 +7,6 @@ THREE.CSS3DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
-	this.billboard = false;
-
 	this.element = element;
 	this.element.style.position = "absolute";
 	this.element.style.WebkitTransformStyle = 'preserve-3d';
@@ -19,6 +17,14 @@ THREE.CSS3DObject = function ( element ) {
 };
 
 THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.CSS3DSprite = function ( element ) {
+
+	THREE.CSS3DObject.call( this, element );
+
+};
+
+THREE.CSS3DSprite.prototype = Object.create( THREE.CSS3DObject.prototype );
 
 //
 
@@ -157,7 +163,7 @@ THREE.CSS3DRenderer = function () {
 
 				var element = object.element;
 
-				if ( object.billboard )	{
+				if ( object instanceof THREE.CSS3DSprite ) {
 
 					// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
 
