@@ -51,6 +51,17 @@
 				margin: 0;
 			}
 
+			#topmenu {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				width: 100%;
+				text-align: right;
+				padding: 0;
+				margin: 0;
+				z-index: 100;
+			}
+
 			button {
 				color: rgb(255,255,255);
 				background: transparent;
@@ -82,6 +93,11 @@
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - molecules</div>
+		<div id="topmenu">
+			<button id="b_a">Atoms</button>
+			<button id="b_b">Bonds</button>
+			<button id="b_ab">Atoms + Bonds</button>
+		</div>
 		<div id="menu"></div>
 
 		<script>
@@ -94,6 +110,8 @@
 			var tmpVec2 = new THREE.Vector3();
 			var tmpVec3 = new THREE.Vector3();
 			var tmpVec4 = new THREE.Vector3();
+
+			var visualizationType = 2;
 
 			var MOLECULES = {
 			"Ethanol"   :"ethanol.pdb",
@@ -192,6 +210,80 @@
 
 				}
 
+				var b_a = document.getElementById( "b_a" );
+				var b_b = document.getElementById( "b_b" );
+				var b_ab = document.getElementById( "b_ab" );
+
+				b_a.addEventListener( 'click', function() { visualizationType = 0; showAtoms() } );
+				b_b.addEventListener( 'click', function() { visualizationType = 1; showBonds() } );
+				b_ab.addEventListener( 'click', function() { visualizationType = 2; showAtomsBonds() } );
+
+			}
+
+			//
+
+			function showAtoms() {
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+
+					if ( object instanceof THREE.CSS3DSprite ) {
+
+						object.element.style.display = "";
+						object.visible = true;
+
+					} else {
+
+						object.element.style.display = "none";
+						object.visible = false;
+
+					}
+
+				}
+
+			}
+
+			function showBonds() {
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+
+					if ( object instanceof THREE.CSS3DSprite ) {
+
+						object.element.style.display = "none";
+						object.visible = false;
+
+					} else {
+
+						object.element.style.display = "";
+						object.element.style.height = object.properties.bondLengthFull;
+						object.visible = true;
+
+					}
+
+				}
+
+			}
+
+			function showAtomsBonds() {
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+
+					object.element.style.display = "";
+					object.visible = true;
+
+					if ( ! ( object instanceof THREE.CSS3DSprite ) ) {
+
+						object.element.style.height = object.properties.bondLengthShort;
+
+					}
+
+				}
+
 			}
 
 			//
@@ -250,7 +342,18 @@
 					var object = objects[ i ];
 
 					object.parent.remove( object );
-					renderer.cameraElement.removeChild( object.element );
+
+					if ( object.element.parentNode === renderer.cameraElement ) {
+
+						renderer.cameraElement.removeChild( object.element );
+
+					}
+
+					if ( object.properties.joint ) {
+
+						object.properties.joint.parent.remove( object.properties.joint );
+
+					}
 
 				}
 
@@ -306,6 +409,7 @@
 						tmpVec1.sub( end, start );
 						var bondLength = tmpVec1.length() - 50;
 
+
 						//
 
 						var bond = document.createElement( 'div' );
@@ -315,6 +419,9 @@
 						var object = new THREE.CSS3DObject( bond );
 						object.position.copy( start );
 						object.position.lerpSelf( end, 0.5 );
+
+						object.properties.bondLengthShort = bondLength + "px";
+						object.properties.bondLengthFull = ( bondLength + 55 ) + "px";
 
 						//
 
@@ -345,6 +452,11 @@
 						var object = new THREE.CSS3DObject( bond );
 						object.rotation.y = Math.PI/2;
 
+						object.properties.bondLengthShort = bondLength + "px";
+						object.properties.bondLengthFull = ( bondLength + 55 ) + "px";
+
+						object.properties.joint = joint;
+
 						joint.add( object );
 						root.add( joint );
 
@@ -353,6 +465,14 @@
 					}
 
 					//console.log( "CSS3DObjects:", objects.length );
+
+					switch ( visualizationType ) {
+
+						case 0: showAtoms(); break;
+						case 1: showBonds(); break;
+						case 2: showAtomsBonds(); break;
+
+					}
 
 					render();
 
