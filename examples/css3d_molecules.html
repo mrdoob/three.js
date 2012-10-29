@@ -129,28 +129,7 @@
 				baseSprite.onload = function () {
 
 					loadMolecule( "models/molecules/caffeine.pdb" );
-
-					function generateButtonCallback( url ) {
-
-						return function ( event ) {
-
-							loadMolecule( url );
-
-						}
-
-					}
-
-					for ( var m in MOLECULES ) {
-
-						var button = document.createElement( 'button' );
-						button.innerHTML = m;
-						menu.appendChild( button );
-
-						var url = "models/molecules/" +  MOLECULES[ m ];
-
-						button.addEventListener( 'click', generateButtonCallback( url ), false );
-
-					}
+					createMenu();
 
 				};
 
@@ -164,39 +143,33 @@
 
 			//
 
-			function parseColor( colorString ) {
+			function generateButtonCallback( url ) {
 
-				// default to white opaque
+				return function ( event ) {
 
-				var r, g, b, a;
-				r = g = b = a = 1;
-
-				var matchRGBA = reRGBA.exec( colorString );
-
-				if ( matchRGBA ) {
-
-					r = parseInt( matchRGBA[ 1 ] ) / 255;
-					g = parseInt( matchRGBA[ 2 ] ) / 255;
-					b = parseInt( matchRGBA[ 3 ] ) / 255;
-					a = parseFloat( matchRGBA[ 4 ] );
-
-				} else {
-
-					var matchRGB = reRGB.exec( colorString );
-
-					if ( matchRGB ) {
-
-						r = parseInt( matchRGB[ 1 ] ) / 255;
-						g = parseInt( matchRGB[ 2 ] ) / 255;
-						b = parseInt( matchRGB[ 3 ] ) / 255;
-
-					}
+					loadMolecule( url );
 
 				}
 
-				return { "r": r, "g": g, "b": b, "a": a };
+			}
+
+			function createMenu() {
+
+				for ( var m in MOLECULES ) {
+
+					var button = document.createElement( 'button' );
+					button.innerHTML = m;
+					menu.appendChild( button );
+
+					var url = "models/molecules/" +  MOLECULES[ m ];
+
+					button.addEventListener( 'click', generateButtonCallback( url ), false );
+
+				}
 
 			}
+
+			//
 
 			function colorify( ctx, width, height, color, a ) {
 
@@ -247,8 +220,6 @@
 
 			function loadMolecule( url ) {
 
-				//console.log( "loading", url );
-
 				for ( var i = 0; i < objects.length; i ++ ) {
 
 					scene.remove( objects[ i ] );
@@ -268,7 +239,7 @@
 						var color = geometry.colors[ i ];
 						var element = geometry.elements[ i ];
 
-						if ( !colorSpriteMap[ element ] ) {
+						if ( ! colorSpriteMap[ element ] ) {
 
 							var canvas = imageToCanvas( baseSprite );
 							var context = canvas.getContext( '2d' );
@@ -295,8 +266,6 @@
 						objects.push( object );
 
 					}
-
-					//console.log( "atoms", geometry.vertices.length );
 
 					render();
 
