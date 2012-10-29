@@ -7,6 +7,8 @@ THREE.CSS3DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
+	this.billboard = false;
+
 	this.element = element;
 	this.element.style.position = "absolute";
 	this.element.style.WebkitTransformStyle = 'preserve-3d';
@@ -152,6 +154,8 @@ THREE.CSS3DRenderer = function () {
 			if ( object instanceof THREE.CSS3DObject ) {
 
 				var element = object.element;
+
+				if ( object.billboard )	object.lookAt( camera.position );
 
 				style = getObjectCSSMatrix( object.matrixWorld );
 
