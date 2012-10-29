@@ -392,6 +392,10 @@
 						object.position.copy( position );
 						object.position.multiplyScalar( 75 );
 						object.billboard = true;
+
+						object.matrixAutoUpdate = false;
+						object.updateMatrix();
+
 						root.add( object );
 
 						objects.push( object );
@@ -432,6 +436,9 @@
 						object.matrix = objMatrix;
 						object.rotation.setEulerFromRotationMatrix( object.matrix, object.eulerOrder );
 
+						object.matrixAutoUpdate = false;
+						object.updateMatrix();
+
 						root.add( object );
 
 						objects.push( object );
@@ -449,8 +456,14 @@
 						joint.matrix.copy( objMatrix );
 						joint.rotation.setEulerFromRotationMatrix( joint.matrix, joint.eulerOrder );
 
+						joint.matrixAutoUpdate = false;
+						joint.updateMatrix();
+
 						var object = new THREE.CSS3DObject( bond );
 						object.rotation.y = Math.PI/2;
+
+						object.matrixAutoUpdate = false;
+						object.updateMatrix();
 
 						object.properties.bondLengthShort = bondLength + "px";
 						object.properties.bondLengthFull = ( bondLength + 55 ) + "px";
