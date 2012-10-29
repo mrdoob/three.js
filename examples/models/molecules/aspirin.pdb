@@ -1,0 +1,40 @@
+HEADER    NONAME 22-Apr-10                                              NONE   1
+TITLE                                                                   NONE   2
+AUTHOR    Chemical Structure Services at http://cactus.nci.nih.gov      NONE   3
+REVDAT   1  22-Apr-10     0                                             NONE   4
+ATOM      1  C           0       2.154   1.017  -0.012  0.00  0.00           C+0
+ATOM      2  C           0      -0.545   1.675   0.087  0.00  0.00           C+0
+ATOM      3  C           0       1.761   2.338   0.015  0.00  0.00           C+0
+ATOM      4  C           0       0.416   2.666   0.064  0.00  0.00           C+0
+ATOM      5  C           0      -3.466  -1.377   0.133  0.00  0.00           C+0
+ATOM      6  C           0       1.192   0.004   0.010  0.00  0.00           C+0
+ATOM      7  C           0      -0.168   0.341   0.060  0.00  0.00           C+0
+ATOM      8  O           0       0.765  -2.290  -0.001  0.00  0.00           O+0
+ATOM      9  O           0      -2.733   0.825  -0.277  0.00  0.00           O+0
+ATOM     10  O           0       2.912  -1.731  -0.067  0.00  0.00           O+0
+ATOM     11  C           0       1.604  -1.411  -0.019  0.00  0.00           C+0
+ATOM     12  C           0      -2.411  -0.315  -0.036  0.00  0.00           C+0
+ATOM     13  O           0      -1.112  -0.634   0.081  0.00  0.00           O+0
+ATOM     14  H           0       3.183  -2.659  -0.086  0.00  0.00           H+0
+ATOM     15  H           0       3.203   0.765  -0.054  0.00  0.00           H+0
+ATOM     16  H           0      -1.591   1.939   0.125  0.00  0.00           H+0
+ATOM     17  H           0       2.506   3.120  -0.002  0.00  0.00           H+0
+ATOM     18  H           0       0.118   3.704   0.085  0.00  0.00           H+0
+ATOM     19  H           0      -3.762  -1.431   1.181  0.00  0.00           H+0
+ATOM     20  H           0      -4.334  -1.127  -0.477  0.00  0.00           H+0
+ATOM     21  H           0      -3.066  -2.340  -0.182  0.00  0.00           H+0
+CONECT    1    6    3   15    0                                         NONE  26
+CONECT    2    7    4   16    0                                         NONE  27
+CONECT    3    1    4   17    0                                         NONE  28
+CONECT    4    2    3   18    0                                         NONE  29
+CONECT    5   12   19   20   21                                         NONE  30
+CONECT    6    7    1   11    0                                         NONE  31
+CONECT    7    6    2   13    0                                         NONE  32
+CONECT    8   11    0    0    0                                         NONE  33
+CONECT    9   12    0    0    0                                         NONE  34
+CONECT   10   11   14    0    0                                         NONE  35
+CONECT   11    6   10    8    0                                         NONE  36
+CONECT   12   13    5    9    0                                         NONE  37
+CONECT   13    7   12    0    0                                         NONE  38
+END                                                                     NONE  39
+
