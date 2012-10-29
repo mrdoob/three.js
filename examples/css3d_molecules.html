@@ -55,6 +55,13 @@
 				color: #000000;
 				background-color: rgba(0,255,255,1);
 			}
+
+			.bond {
+				width: 5px;
+				height: 10px;
+				background: #ffffff;
+				display: block;
+			}
 		</style>
 	</head>
 	<body>
@@ -73,6 +80,10 @@
 			var root;
 
 			var objects = [];
+			var tmpVec1 = new THREE.Vector3();
+			var tmpVec2 = new THREE.Vector3();
+			var tmpVec3 = new THREE.Vector3();
+			var tmpVec4 = new THREE.Vector3();
 
 			var MOLECULES = {
 			"Ethanol"   :"ethanol.pdb",
@@ -226,16 +237,19 @@
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
-					root.remove( objects[ i ] );
-					renderer.cameraElement.removeChild( objects[ i ].element );
+					var object = objects[ i ];
+
+					object.parent.remove( object );
+					renderer.cameraElement.removeChild( object.element );
 
 				}
 
 				objects = [];
 
-				loader.load( url, function ( geometry ) {
+				loader.load( url, function ( geometry, geometryBonds ) {
 
-					THREE.GeometryUtils.center( geometry );
+					var offset = THREE.GeometryUtils.center( geometry );
+					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
 
 					for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
@@ -263,13 +277,72 @@
 
 						var object = new THREE.CSS3DObject( atom );
 						object.position.copy( position );
-						object.position.multiplyScalar( 50 );
+						object.position.multiplyScalar( 75 );
 						object.billboard = true;
 						root.add( object );
 
 						objects.push( object );
 
 					}
+
+					for ( var i = 0; i < geometryBonds.vertices.length; i += 2 ) {
+
+						var start = geometryBonds.vertices[ i ];
+						var end = geometryBonds.vertices[ i + 1 ];
+
+						start.multiplyScalar( 75 );
+						end.multiplyScalar( 75 );
+
+						tmpVec1.sub( end, start );
+						var bondLength = tmpVec1.length() - 50;
+
+						//
+
+						var bond = document.createElement( 'div' );
+						bond.className = "bond";
+						bond.style.height = bondLength + "px";
+
+						var object = new THREE.CSS3DObject( bond );
+						object.position.copy( start );
+						object.position.lerpSelf( end, 0.5 );
+
+						//
+
+						var axis = tmpVec2.set( 0, 1, 0 ).crossSelf( tmpVec1 );
+						var radians = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
+
+						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+						object.matrix = objMatrix;
+						object.rotation.setEulerFromRotationMatrix( object.matrix, object.eulerOrder );
+
+						root.add( object );
+
+						objects.push( object );
+
+						//
+
+						var bond = document.createElement( 'div' );
+						bond.className = "bond";
+						bond.style.height = bondLength + "px";
+
+						var joint = new THREE.Object3D( bond );
+						joint.position.copy( start );
+						joint.position.lerpSelf( end, 0.5 );
+
+						joint.matrix.copy( objMatrix );
+						joint.rotation.setEulerFromRotationMatrix( joint.matrix, joint.eulerOrder );
+
+						var object = new THREE.CSS3DObject( bond );
+						object.rotation.y = Math.PI/2;
+
+						joint.add( object );
+						root.add( joint );
+
+						objects.push( object );
+
+					}
+
+					//console.log( "CSS3DObjects:", objects.length );
 
 					render();
 

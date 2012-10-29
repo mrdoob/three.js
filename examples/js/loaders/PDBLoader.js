@@ -214,7 +214,6 @@ THREE.PDBLoader.prototype.createModel = function ( json, callback ) {
 
 	}
 
-/*
 	for ( var i = 0; i < bonds.length; i ++ ) {
 
 		var bond = bonds[ i ];
@@ -229,7 +228,7 @@ THREE.PDBLoader.prototype.createModel = function ( json, callback ) {
 		geometryBonds.vertices.push( vertex2.clone() );
 
 	}
-*/
+
 
 	callback( geometryAtoms, geometryBonds );
 
