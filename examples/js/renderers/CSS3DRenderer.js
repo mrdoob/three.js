@@ -165,6 +165,11 @@ THREE.CSS3DRenderer = function () {
 					_tmpMatrix.transpose();
 					_tmpMatrix.extractPosition( object.matrixWorld );
 
+					_tmpMatrix.elements[ 3 ] = 0;
+					_tmpMatrix.elements[ 7 ] = 0;
+					_tmpMatrix.elements[ 11 ] = 0;
+					_tmpMatrix.elements[ 15 ] = 1;
+
 					style = getObjectCSSMatrix( _tmpMatrix );
 
 				} else {
