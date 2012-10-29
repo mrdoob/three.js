@@ -85,9 +85,9 @@
 				}
 
 			button {
-				color: rgb(127,255,255);
+				color: rgba(127,255,255,0.75);
 				background: transparent;
-				outline: 1px solid rgb(127,255,255);
+				outline: 1px solid rgba(127,255,255,0.75);
 				border: 0px;
 				padding: 5px 10px;
 				cursor: pointer;
@@ -97,7 +97,7 @@
 			}
 			button:active {
 				color: #000000;
-				background-color: rgba(0,255,255,1);
+				background-color: rgba(0,255,255,0.75);
 			}
 		</style>
 	</head>
@@ -337,13 +337,13 @@
 
 					var object = objects[ i ];
 
-					var phi = i * 0.2 + Math.PI;
+					var phi = i * 0.175 + Math.PI;
 
 					var object = new THREE.Object3D();
 
-					object.position.x = 1000 * Math.sin( phi );
-					object.position.y = i * 10 - 600;
-					object.position.z = 1000 * Math.cos( phi );
+					object.position.x = 1100 * Math.sin( phi );
+					object.position.y = - ( i * 8 ) + 450;
+					object.position.z = 1100 * Math.cos( phi );
 
 					vector.copy( object.position );
 					vector.x *= 2;
