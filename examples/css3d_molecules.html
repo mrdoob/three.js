@@ -10,7 +10,17 @@
 			}
 
 			body {
-				background-color: #000000;
+				background-color: #050505;
+
+				background: rgb(43,45,48); /* Old browsers */
+				background: -moz-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%, rgba(0,0,0,1) 100%); /* FF3.6+ */
+				background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(43,45,48,1)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
+				background: -webkit-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
+				background: -o-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Opera 12+ */
+				background: -ms-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
+				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* W3C */
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2b2d30', endColorstr='#000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
 				margin: 0;
 				font-family: Arial;
 				overflow: hidden;
@@ -59,7 +69,7 @@
 			.bond {
 				width: 5px;
 				height: 10px;
-				background: #ffffff;
+				background: #eee;
 				display: block;
 			}
 		</style>
