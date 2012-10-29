@@ -70,6 +70,7 @@
 		<script>
 			var camera, scene, renderer;
 			var controls;
+			var root;
 
 			var objects = [];
 
@@ -105,10 +106,13 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 1800;
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
+
+				root = new THREE.Object3D();
+				scene.add( root );
 
 				//
 
@@ -222,7 +226,7 @@
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
-					scene.remove( objects[ i ] );
+					root.remove( objects[ i ] );
 					renderer.cameraElement.removeChild( objects[ i ].element );
 
 				}
@@ -261,7 +265,7 @@
 						object.position.copy( position );
 						object.position.multiplyScalar( 50 );
 						object.billboard = true;
-						scene.add( object );
+						root.add( object );
 
 						objects.push( object );
 
@@ -291,6 +295,13 @@
 
 				requestAnimationFrame( animate );
 				controls.update();
+
+				var time = Date.now() * 0.0004;
+
+				root.rotation.x = time;
+				root.rotation.y = time * 0.7;
+
+				render();
 
 			}
 
