@@ -30,6 +30,8 @@ THREE.CSS3DRenderer = function () {
 	var _widthHalf, _heightHalf;
 	var _projector = new THREE.Projector();
 
+	var _tmpMatrix = new THREE.Matrix4();
+
 	this.domElement = document.createElement( 'div' );
 
 	this.domElement.style.overflow = 'hidden';
@@ -155,9 +157,21 @@ THREE.CSS3DRenderer = function () {
 
 				var element = object.element;
 
-				if ( object.billboard )	object.lookAt( camera.position );
+				if ( object.billboard )	{
 
-				style = getObjectCSSMatrix( object.matrixWorld );
+					// http://swiftcoder.wordpress.com/2008/11/25/constructing-a-billboard-matrix/
+
+					_tmpMatrix.copy( camera.matrixWorldInverse );
+					_tmpMatrix.transpose();
+					_tmpMatrix.extractPosition( object.matrixWorld );
+
+					style = getObjectCSSMatrix( _tmpMatrix );
+
+				} else {
+
+					style = getObjectCSSMatrix( object.matrixWorld );
+
+				}
 
 				/*
 				element.style.WebkitBackfaceVisibility = 'hidden';
