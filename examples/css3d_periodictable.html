@@ -29,6 +29,7 @@
 				font-size: 13px;
 				font-weight: bold;
 				text-align: center;
+				z-index: 1;
 			}
 
 			#menu {
@@ -239,8 +240,6 @@
 			];
 
 			var camera, scene, renderer;
-			var geometry, material, mesh;
-
 			var controls;
 
 			var objects = [];
@@ -376,7 +375,6 @@
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.domElement.style.position = 'absolute';
-				renderer.domElement.style.top = 0;
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//

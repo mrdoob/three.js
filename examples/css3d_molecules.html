@@ -32,6 +32,7 @@
 
 			#info {
 				position: absolute;
+				top: 0px;
 				width: 100%;
 				color: #ffffff;
 				padding: 5px;
@@ -39,7 +40,7 @@
 				font-size: 13px;
 				font-weight: bold;
 				text-align: center;
-				z-index: 100;
+				z-index: 1;
 			}
 
 			#menu {
@@ -59,7 +60,7 @@
 				text-align: right;
 				padding: 0;
 				margin: 0;
-				z-index: 100;
+				z-index: 1;
 			}
 
 			button {
@@ -114,24 +115,24 @@
 			var visualizationType = 2;
 
 			var MOLECULES = {
-			"Ethanol"   :"ethanol.pdb",
-			"Aspirin"   :"aspirin.pdb",
-			"Caffeine"  :"caffeine.pdb",
-			"Nicotine"  :"nicotine.pdb",
-			"LSD"  		:"lsd.pdb",
-			"Cocaine"  		:"cocaine.pdb",
-			"Cholesterol"  :"cholesterol.pdb",
-			"Lycopene"  :"lycopene.pdb",
-			"Glucose"   : "glucose.pdb",
-			"Aluminium oxide":"Al2O3.pdb",
-			"Cubane"	:"cubane.pdb",
-			"Copper"    :"cu.pdb",
-			"Fluorite"  :"caf2.pdb",
-			"Salt"      :"nacl.pdb",
-			"YBCO superconductor":"ybco.pdb",
-			"Buckyball" : "buckyball.pdb",
-			//"Diamond"   :"diamond.pdb",
-			"Graphite"  :"graphite.pdb"
+				"Ethanol"   :"ethanol.pdb",
+				"Aspirin"   :"aspirin.pdb",
+				"Caffeine"  :"caffeine.pdb",
+				"Nicotine"  :"nicotine.pdb",
+				"LSD"  		:"lsd.pdb",
+				"Cocaine"  		:"cocaine.pdb",
+				"Cholesterol"  :"cholesterol.pdb",
+				"Lycopene"  :"lycopene.pdb",
+				"Glucose"   : "glucose.pdb",
+				"Aluminium oxide":"Al2O3.pdb",
+				"Cubane"	:"cubane.pdb",
+				"Copper"    :"cu.pdb",
+				"Fluorite"  :"caf2.pdb",
+				"Salt"      :"nacl.pdb",
+				"YBCO superconductor":"ybco.pdb",
+				"Buckyball" : "buckyball.pdb",
+				//"Diamond"   :"diamond.pdb",
+				"Graphite"  :"graphite.pdb"
 			};
 
 			var loader = new THREE.PDBLoader();
@@ -157,8 +158,6 @@
 
 				renderer = new THREE.CSS3DRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.domElement.style.position = 'absolute';
-				renderer.domElement.style.top = 0;
 				document.getElementById( 'container' ).appendChild( renderer.domElement );
 
 				//
