@@ -3720,6 +3720,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Sorting
 
+	function painterSortStable ( a, b ) {
+
+		if ( a.z !== b.z ) {
+
+			return b.z - a.z;
+
+		} else {
+
+			return b.id - a.id;
+
+		}
+
+	};
+
 	function painterSort ( a, b ) {
 
 		return b.z - a.z;
@@ -3837,6 +3851,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
+						webglObject.id = object.id;
+
 					}
 
 				}
@@ -3847,7 +3863,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( this.sortObjects ) {
 
-			renderList.sort( painterSort );
+			renderList.sort( painterSortStable );
 
 		}
 
