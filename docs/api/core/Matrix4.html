@@ -26,9 +26,9 @@
 		var beta = Math.PI;
 		var gamma = Math.PI/2;
 
-		m1.setRotationX( alpha );
-		m2.setRotationY( beta );
-		m3.setRotationZ( gamma );
+		m1.makeRotationX( alpha );
+		m2.makeRotationY( beta );
+		m3.makeRotationZ( gamma );
 
 		m.multiply( m1, m2 );
 		m.multiplySelf( m3 );
