@@ -172,7 +172,7 @@ THREE.SpritePlugin = function ( ) {
 			if ( ! sprite.useScreenCoordinates ) {
 
 				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld );
-				sprite.z = - sprite._modelViewMatrix.elements[14];
+				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
 
 			} else {
 
@@ -182,7 +182,7 @@ THREE.SpritePlugin = function ( ) {
 
 		}
 
-		sprites.sort( painterSort );
+		sprites.sort( painterSortStable );
 
 		// render all sprites
 
@@ -295,9 +295,17 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-	function painterSort ( a, b ) {
+	function painterSortStable ( a, b ) {
 
-		return b.z - a.z;
+		if ( a.z !== b.z ) {
+
+			return b.z - a.z;
+
+		} else {
+
+			return b.id - a.id;
+
+		}
 
 	};
 

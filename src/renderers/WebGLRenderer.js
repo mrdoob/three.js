@@ -3734,12 +3734,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function painterSort ( a, b ) {
-
-		return b.z - a.z;
-
-	};
-
 	function numericalSort ( a, b ) {
 
 		return b[ 1 ] - a[ 1 ];
