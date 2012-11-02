@@ -126,6 +126,18 @@ THREE.Vector2.prototype = {
 
 	},
 
+	cross: function( a, b ) {
+		
+		return a.x * b.y - b.x * a.y;
+		
+	},
+	
+	crossSelf: function ( v ) {
+	
+		return this.x * v.y - this.y * v.x;
+	
+	},
+
 	distanceTo: function ( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
