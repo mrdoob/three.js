@@ -265,6 +265,24 @@ Sidebar.Object3D = function ( signals ) {
 
 	}
 
+	function updateTransformRows() {
+
+		if ( selected instanceof THREE.Light || ( selected instanceof THREE.Object3D && selected.properties.targetInverse ) ) {
+
+			objectRotationRow.setDisplay( 'none' );
+			objectScaleRow.setDisplay( 'none' );
+			objectScaleLockRow.setDisplay( 'none' );
+
+		} else {
+
+			objectRotationRow.setDisplay( '' );
+			objectScaleRow.setDisplay( '' );
+			objectScaleLockRow.setDisplay( '' );
+
+		}
+
+	}
+
 	function getObjectInstanceName( object ) {
 
 		for ( var key in objects ) {
@@ -334,6 +352,7 @@ Sidebar.Object3D = function ( signals ) {
 			objectVisible.setValue( object.visible );
 
 			updateRows();
+			updateTransformRows();
 
 		} else {
 
