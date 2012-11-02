@@ -103,10 +103,14 @@ var Viewport = function ( signals ) {
 	var ray = new THREE.Ray();
 	var projector = new THREE.Projector();
 	var offset = new THREE.Vector3();
-	var picked = null;
 
 	var cameraChanged = false;
 	var helpersVisible = true;
+
+	//
+
+	var picked = null;
+	var selected = camera;
 
 	// events
 
@@ -134,11 +138,24 @@ var Viewport = function ( signals ) {
 
 				controls.enabled = false;
 
-				intersectionPlane.position.copy( intersects[ 0 ].object.position );
-				intersectionPlane.lookAt( camera.position );
-
 				picked = intersects[ 0 ].object;
-				selected = picked;
+
+				var root;
+
+				if ( picked.properties.isGizmo ) {
+
+					root = picked.properties.gizmoRoot;
+					selected = picked.properties.gizmoSubject;
+
+				} else {
+
+					root = picked;
+					selected = picked;
+
+				}
+
+				intersectionPlane.position.copy( root.position );
+				intersectionPlane.lookAt( camera.position );
 
 				signals.objectSelected.dispatch( selected );
 
@@ -176,9 +193,20 @@ var Viewport = function ( signals ) {
 
 		if ( intersects.length > 0 ) {
 
-			picked.position.copy( intersects[ 0 ].point.subSelf( offset ) );
+			intersects[ 0 ].point.subSelf( offset );
 
-			signals.objectChanged.dispatch( picked );
+			if ( picked.properties.isGizmo ) {
+
+				picked.properties.gizmoRoot.position.copy( intersects[ 0 ].point );
+				picked.properties.gizmoSubject.position.copy( intersects[ 0 ].point );
+				signals.objectChanged.dispatch( picked.properties.gizmoSubject );
+
+			} else {
+
+				picked.position.copy( intersects[ 0 ].point );
+				signals.objectChanged.dispatch( picked );
+
+			}
 
 			render();
 
@@ -218,7 +246,15 @@ var Viewport = function ( signals ) {
 
 			}
 
-			signals.objectSelected.dispatch( selected );
+			if ( selected.properties.isGizmo ) {
+
+				signals.objectSelected.dispatch( selected.properties.gizmoSubject );
+
+			} else {
+
+				signals.objectSelected.dispatch( selected );
+
+			}
 
 		}
 
@@ -281,7 +317,7 @@ var Viewport = function ( signals ) {
 
 			var lightGizmo = new THREE.Object3D();
 			lightGizmo.position = object.position;
-			lightGizmo.properties.gizmo = true;
+			lightGizmo.properties.isGizmo = true;
 
 			var lightColor = object.color.clone();
 			lightColor.r *= object.intensity;
@@ -302,6 +338,7 @@ var Viewport = function ( signals ) {
 			sceneHelpers.add( lightGizmo );
 
 			object.properties.arrow = lightArrow;
+			object.properties.pickingProxy = lightSphere;
 
 			if ( object.target.properties.targetInverse ) {
 
@@ -309,11 +346,22 @@ var Viewport = function ( signals ) {
 
 				var targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
 				targetSphere.position = object.target.position;
-				targetSphere.properties.gizmo = true;
 
 				sceneHelpers.add( targetSphere );
 
+				targetSphere.properties.isGizmo = true;
+				targetSphere.properties.gizmoSubject = object.target;
+				targetSphere.properties.gizmoRoot = targetSphere;
+				objects.push( targetSphere );
+
+				object.target.properties.pickingProxy = targetSphere;
+
 			}
+
+			lightSphere.properties.isGizmo = true;
+			lightSphere.properties.gizmoSubject = object;
+			lightSphere.properties.gizmoRoot = lightGizmo;
+			objects.push( lightSphere );
 
 		} else if ( object instanceof THREE.PointLight ) {
 		} else if ( object instanceof THREE.SpotLight ) {
@@ -417,16 +465,33 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	var selected = camera;
-
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
 		selectionAxis.visible = false;
 
-		if ( object !== null && object.geometry ) {
+		var geometry;
+		var hasRotation;
 
-			var geometry = object.geometry;
+		if ( object !== null ) {
+
+			selected = object;
+
+			if ( object.geometry ) {
+
+				geometry = object.geometry;
+				hasRotation = true;
+
+			} else if ( object.properties.pickingProxy ) {
+
+				geometry = object.properties.pickingProxy.geometry;
+				hasRotation = false;
+
+			}
+
+		}
+
+		if ( geometry ) {
 
 			if ( geometry.boundingBox === null ) {
 
@@ -434,53 +499,53 @@ var Viewport = function ( signals ) {
 
 			}
 
-			selectionBox.geometry.vertices[ 0 ].x = geometry.boundingBox.max.x;
-			selectionBox.geometry.vertices[ 0 ].y = geometry.boundingBox.max.y;
-			selectionBox.geometry.vertices[ 0 ].z = geometry.boundingBox.max.z;
+			var vertices = selectionBox.geometry.vertices;
 
-			selectionBox.geometry.vertices[ 1 ].x = geometry.boundingBox.max.x;
-			selectionBox.geometry.vertices[ 1 ].y = geometry.boundingBox.max.y;
-			selectionBox.geometry.vertices[ 1 ].z = geometry.boundingBox.min.z;
+			vertices[ 0 ].x = geometry.boundingBox.max.x;
+			vertices[ 0 ].y = geometry.boundingBox.max.y;
+			vertices[ 0 ].z = geometry.boundingBox.max.z;
 
-			selectionBox.geometry.vertices[ 2 ].x = geometry.boundingBox.max.x;
-			selectionBox.geometry.vertices[ 2 ].y = geometry.boundingBox.min.y;
-			selectionBox.geometry.vertices[ 2 ].z = geometry.boundingBox.max.z;
+			vertices[ 1 ].x = geometry.boundingBox.max.x;
+			vertices[ 1 ].y = geometry.boundingBox.max.y;
+			vertices[ 1 ].z = geometry.boundingBox.min.z;
 
-			selectionBox.geometry.vertices[ 3 ].x = geometry.boundingBox.max.x;
-			selectionBox.geometry.vertices[ 3 ].y = geometry.boundingBox.min.y;
-			selectionBox.geometry.vertices[ 3 ].z = geometry.boundingBox.min.z;
+			vertices[ 2 ].x = geometry.boundingBox.max.x;
+			vertices[ 2 ].y = geometry.boundingBox.min.y;
+			vertices[ 2 ].z = geometry.boundingBox.max.z;
 
-			selectionBox.geometry.vertices[ 4 ].x = geometry.boundingBox.min.x;
-			selectionBox.geometry.vertices[ 4 ].y = geometry.boundingBox.max.y;
-			selectionBox.geometry.vertices[ 4 ].z = geometry.boundingBox.min.z;
+			vertices[ 3 ].x = geometry.boundingBox.max.x;
+			vertices[ 3 ].y = geometry.boundingBox.min.y;
+			vertices[ 3 ].z = geometry.boundingBox.min.z;
 
-			selectionBox.geometry.vertices[ 5 ].x = geometry.boundingBox.min.x;
-			selectionBox.geometry.vertices[ 5 ].y = geometry.boundingBox.max.y;
-			selectionBox.geometry.vertices[ 5 ].z = geometry.boundingBox.max.z;
+			vertices[ 4 ].x = geometry.boundingBox.min.x;
+			vertices[ 4 ].y = geometry.boundingBox.max.y;
+			vertices[ 4 ].z = geometry.boundingBox.min.z;
 
-			selectionBox.geometry.vertices[ 6 ].x = geometry.boundingBox.min.x;
-			selectionBox.geometry.vertices[ 6 ].y = geometry.boundingBox.min.y;
-			selectionBox.geometry.vertices[ 6 ].z = geometry.boundingBox.min.z;
+			vertices[ 5 ].x = geometry.boundingBox.min.x;
+			vertices[ 5 ].y = geometry.boundingBox.max.y;
+			vertices[ 5 ].z = geometry.boundingBox.max.z;
 
-			selectionBox.geometry.vertices[ 7 ].x = geometry.boundingBox.min.x;
-			selectionBox.geometry.vertices[ 7 ].y = geometry.boundingBox.min.y;
-			selectionBox.geometry.vertices[ 7 ].z = geometry.boundingBox.max.z;
+			vertices[ 6 ].x = geometry.boundingBox.min.x;
+			vertices[ 6 ].y = geometry.boundingBox.min.y;
+			vertices[ 6 ].z = geometry.boundingBox.min.z;
+
+			vertices[ 7 ].x = geometry.boundingBox.min.x;
+			vertices[ 7 ].y = geometry.boundingBox.min.y;
+			vertices[ 7 ].z = geometry.boundingBox.max.z;
 
 			selectionBox.geometry.computeBoundingSphere();
-
 			selectionBox.geometry.verticesNeedUpdate = true;
 
 			selectionBox.matrixWorld = object.matrixWorld;
 			selectionAxis.matrixWorld = object.matrixWorld;
 
 			selectionBox.visible = true;
-			selectionAxis.visible = true;
 
 		}
 
-		if ( object !== null ) {
+		if ( hasRotation ) {
 
-			selected = object;
+			selectionAxis.visible = true;
 
 		}
 
@@ -602,7 +667,7 @@ var Viewport = function ( signals ) {
 
 		sceneHelpers.traverse( function ( child ) {
 
-			if ( child.properties.gizmo ) {
+			if ( child.properties.isGizmo ) {
 
 				toRemove[ child.id ] = child;
 
