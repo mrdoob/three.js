@@ -642,7 +642,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			}
 
-			ta.object.target.properties.inverseTarget = ta.object;
+			ta.object.target.properties.targetInverse = ta.object;
 
 		}
 
