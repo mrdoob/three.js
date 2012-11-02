@@ -306,37 +306,37 @@
 
 			"shiny"  :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, perPixel: true, metal: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, metal: true } ),
 				h: 0, s: 0.9, v: 0.3
 			},
 
 			"matte" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1 } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"flat" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"textured" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"colors" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"plastic" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250 } ),
 				h: 0.6, s: 0.9, v: 0.2
 			},
 

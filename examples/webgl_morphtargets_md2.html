@@ -124,7 +124,7 @@
 
 				var gt = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
 				var gg = new THREE.PlaneGeometry( 2000, 2000 );
-				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt, perPixel: true } );
+				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
 				var ground = new THREE.Mesh( gg, gm );
 				ground.rotation.x = - Math.PI / 2;

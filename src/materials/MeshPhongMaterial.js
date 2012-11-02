@@ -55,7 +55,7 @@ THREE.MeshPhongMaterial = function ( parameters ) {
 	this.shininess = 30;
 
 	this.metal = false;
-	this.perPixel = false;
+	this.perPixel = true;
 
 	this.wrapAround = false;
 	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );

@@ -95,7 +95,7 @@
 				groundTexture.anisotropy = 4;
 				*/
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { /*map: groundTexture,*/ emissive: 0xbbbbbb, perPixel: true } );
+				var groundMaterial = new THREE.MeshPhongMaterial( { /*map: groundTexture,*/ emissive: 0xbbbbbb } );
 				var planeGeometry = new THREE.PlaneGeometry( 16000, 16000 );
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
@@ -247,7 +247,6 @@
 					//m.reflectivity = 0.75;
 
 					m.wrapAround = true;
-					m.perPixel = true;
 
 				}
 
