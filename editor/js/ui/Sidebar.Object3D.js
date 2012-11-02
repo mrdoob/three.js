@@ -115,6 +115,26 @@ Sidebar.Object3D = function ( signals ) {
 
 	container.add( objectFarRow );
 
+	// intensity
+
+	var objectIntensityRow = new UI.Panel();
+	var objectIntensity = new UI.Number( 'absolute' ).setRange( 0, Infinity ).setLeft( '100px' ).onChange( update );
+
+	objectIntensityRow.add( new UI.Text().setValue( 'Intensity' ).setColor( '#666' ) );
+	objectIntensityRow.add( objectIntensity );
+
+	container.add( objectIntensityRow );
+
+
+	// color
+
+	var objectColorRow = new UI.Panel();
+	var objectColor = new UI.Color( 'absolute' ).setLeft( '100px' ).onChange( update );
+
+	objectColorRow.add( new UI.Text().setValue( 'Color' ).setColor( '#666' ) );
+	objectColorRow.add( objectColor );
+
+	container.add( objectColorRow );
 
 	//
 
@@ -209,6 +229,18 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
+			if ( selected.intensity !== undefined ) {
+
+				selected.intensity = objectIntensity.getValue();
+
+			}
+
+			if ( selected.color !== undefined ) {
+
+				selected.color.setHex( objectColor.getHexValue() );
+
+			}
+
 			signals.objectChanged.dispatch( selected );
 
 		}
@@ -220,7 +252,9 @@ Sidebar.Object3D = function ( signals ) {
 		var properties = {
 			'fov': objectFovRow,
 			'near': objectNearRow,
-			'far': objectFarRow
+			'far': objectFarRow,
+			'intensity': objectIntensityRow,
+			'color': objectColorRow
 		};
 
 		for ( var property in properties ) {
@@ -282,6 +316,18 @@ Sidebar.Object3D = function ( signals ) {
 			if ( object.far !== undefined ) {
 
 				objectFar.setValue( object.far );
+
+			}
+
+			if ( object.intensity !== undefined ) {
+
+				objectIntensity.setValue( object.intensity );
+
+			}
+
+			if ( object.color !== undefined ) {
+
+				objectColor.setValue( '#' + object.color.getHexString() );
 
 			}
 
@@ -353,6 +399,18 @@ Sidebar.Object3D = function ( signals ) {
 		if ( object.far !== undefined ) {
 
 			objectFar.setValue( object.far );
+
+		}
+
+		if ( object.intensity !== undefined ) {
+
+			objectIntensity.setValue( object.intensity );
+
+		}
+
+		if ( object.color !== undefined ) {
+
+			objectColor.setValue( '#' + object.color.getHexString() );
 
 		}
 

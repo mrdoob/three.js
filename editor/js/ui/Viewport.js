@@ -392,8 +392,24 @@ var Viewport = function ( signals ) {
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
+			// set gizmo arrow orientation
+			// pointing from light to target
+
 			direction.sub( object.target.position, object.position );
 			object.properties.arrow.setDirection( direction );
+
+			// set gizmo color to light color * light intensity
+
+			var lightColor = object.properties.pickingProxy.material.color;
+			lightColor.copy( object.color );
+
+			var intensity = THREE.Math.clamp( object.intensity, 0, 1 );
+			lightColor.r *= intensity;
+			lightColor.g *= intensity;
+			lightColor.b *= intensity;
+
+			object.properties.arrow.setColor( lightColor.getHex() );
+			object.target.properties.pickingProxy.material.color.copy( lightColor );
 
 		} else if ( object instanceof THREE.PointLight ) {
 		} else if ( object instanceof THREE.SpotLight ) {
