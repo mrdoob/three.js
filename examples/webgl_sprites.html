@@ -44,16 +44,18 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 5000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2100 );
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
+
+				scene.fog = new THREE.Fog( 0x000000, 1500, 2100 );
 
 				// create sprites
 
 				var amount = 200;
 				var radius = 500;
-				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png" );
+				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png", undefined, function() { createHUDSprites() } );
 				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
 				mapC = THREE.ImageUtils.loadTexture( "textures/sprite2.png" );
 
@@ -61,7 +63,7 @@
 
 				for( var a = 0; a < amount; a ++ ) {
 
-					var sprite = new THREE.Sprite( { map: mapC, useScreenCoordinates: false, color: 0xffffff } );
+					var sprite = new THREE.Sprite( { map: mapC, useScreenCoordinates: false, color: 0xffffff, fog: true } );
 
 					sprite.position.set( Math.random() - 0.5,
 					                     Math.random() - 0.5,
@@ -90,20 +92,30 @@
 
 				// add 2d-sprites
 
-				sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
-				sprite.position.set( 100, 100, 0 );
-				sprite.opacity = 0.25;
-				scene.add( sprite );
+				var createHUDSprites = function() {
 
-				sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
-				sprite.position.set( 150, 150, 2 );
-				sprite.opacity = 0.5;
-				scene.add( sprite );
+					var scaleX = mapA.image.width;
+					var scaleY = mapA.image.height;
 
-				sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
-				sprite.position.set( 200, 200, 3 );
-				sprite.opacity = 1;
-				scene.add( sprite );
+					sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
+					sprite.position.set( 100, 100, 0 );
+					sprite.scale.set( scaleX, scaleY, 1 );
+					sprite.opacity = 0.25;
+					scene.add( sprite );
+
+					sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
+					sprite.position.set( 150, 150, 2 );
+					sprite.scale.set( scaleX, scaleY, 1 );
+					sprite.opacity = 0.5;
+					scene.add( sprite );
+
+					sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
+					sprite.position.set( 200, 200, 3 );
+					sprite.scale.set( scaleX, scaleY, 1 );
+					sprite.opacity = 1;
+					scene.add( sprite );
+
+				}
 
 				// renderer
 
@@ -152,8 +164,18 @@
 					var sprite = group.children[ c ];
 					var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
 
+					var imageWidth = 1;
+					var imageHeight = 1;
+
+					if ( sprite.map && sprite.map.image && sprite.map.image.width ) {
+
+						imageWidth = sprite.map.image.width;
+						imageHeight = sprite.map.image.height;
+
+					}
+
 					sprite.rotation += 0.1 * ( c / group.children.length );
-					sprite.scale.set( scale, scale, 1.0 );
+					sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
 
 					if ( sprite.map !== mapC )
 						sprite.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;

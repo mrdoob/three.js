@@ -5,11 +5,10 @@ var Sidebar = function ( signals ) {
 	container.setBackgroundColor( '#eee' );
 	container.setOverflow( 'auto' );
 
-	var outliner = new Sidebar.Outliner( signals );
-	container.add( outliner );
-
-	var properties = new Sidebar.Properties( signals );
-	container.add( properties );
+	container.add( new Sidebar.Scene( signals ) );
+	container.add( new Sidebar.Object3D( signals ) );
+	container.add( new Sidebar.Geometry( signals ) );
+	container.add( new Sidebar.Material( signals ) );
 
 	return container;
 

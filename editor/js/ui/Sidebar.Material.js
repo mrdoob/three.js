@@ -1,4 +1,4 @@
-Sidebar.Properties.Material = function ( signals ) {
+Sidebar.Material = function ( signals ) {
 
     var materials = {
 
@@ -134,7 +134,7 @@ Sidebar.Properties.Material = function ( signals ) {
 	var materialBumpMapRow = new UI.Panel();
 	var materialBumpMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
 	var materialBumpMap = new UI.Texture( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
-	var materialBumpScale = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).setColor( '#444' ).onChange( update );
+	var materialBumpScale = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).onChange( update );
 
 	materialBumpMapRow.add( new UI.Text().setValue( 'Bump Map' ).setColor( '#666' ) );
 	materialBumpMapRow.add( materialBumpMapEnabled );
@@ -218,18 +218,12 @@ Sidebar.Properties.Material = function ( signals ) {
 	//
 
 	var selected = null;
-
-	var canvas = document.createElement( 'canvas' );
-	var context = canvas.getContext( '2d' );
-	context.fillStyle = 'rgb(255,255,255)';
-	context.fillRect( 0, 0, canvas.width, canvas.height );
-
-	var dummyTexture = new THREE.Texture( canvas );
-	dummyTexture.needsUpdate = true;
+	var selectedHasUvs = false;
 
 	function update() {
 
 		var material = selected.material;
+		var textureWarning = false;
 
 		if ( material ) {
 
@@ -240,31 +234,29 @@ Sidebar.Properties.Material = function ( signals ) {
 				material = new materials[ materialClass.getValue() ]();
 				selected.material = material;
 
-				material.map = dummyTexture;
-
 			}
 
 			if ( material.color !== undefined ) {
 
-				material.color.setHex( parseInt( materialColor.getValue().substr( 1 ), 16 ) );
+				material.color.setHex( materialColor.getHexValue() );
 
 			}
 
 			if ( material.ambient !== undefined ) {
 
-				material.ambient.setHex( parseInt( materialAmbient.getValue().substr( 1 ), 16 ) );
+				material.ambient.setHex( materialAmbient.getHexValue() );
 
 			}
 
 			if ( material.emissive !== undefined ) {
 
-				material.emissive.setHex( parseInt( materialEmissive.getValue().substr( 1 ), 16 ) );
+				material.emissive.setHex( materialEmissive.getHexValue() );
 
 			}
 
 			if ( material.specular !== undefined ) {
 
-				material.specular.setHex( parseInt( materialSpecular.getValue().substr( 1 ), 16 ) );
+				material.specular.setHex( materialSpecular.getHexValue() );
 
 			}
 
@@ -276,47 +268,119 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material.map !== undefined ) {
 
-				material.map = materialMapEnabled.getValue() === true ? materialMap.getValue() : dummyTexture;
-				material.needsUpdate = true;
+				var mapEnabled = materialMapEnabled.getValue() === true;
+
+				if ( selectedHasUvs )  {
+
+					material.map = mapEnabled ? materialMap.getValue() : null;
+					material.needsUpdate = true;
+					selected.geometry.buffersNeedUpdate = true;
+					selected.geometry.uvsNeedUpdate = true;
+
+				} else {
+
+					if ( mapEnabled ) textureWarning = true;
+
+				}
 
 			}
 
 			/*
 			if ( material.lightMap !== undefined ) {
 
-				material.lightMap = materialLightMapEnabled.getValue() === true ? materialLightMap.getValue() : null;
-				material.needsUpdate = true;
+				var lightMapEnabled = materialLightMapEnabled.getValue() === true;
+
+				if ( selectedHasUvs )  {
+
+					material.lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
+					material.needsUpdate = true;
+					selected.geometry.buffersNeedUpdate = true;
+					selected.geometry.uvsNeedUpdate = true;
+
+				} else {
+
+					if ( lightMapEnabled ) textureWarning = true;
+
+				}
 
 			}
 			*/
 
 			if ( material.bumpMap !== undefined ) {
 
-				material.bumpMap = materialBumpMapEnabled.getValue() === true ? materialBumpMap.getValue() : null;
-				material.bumpScale = materialBumpScale.getValue();
-				material.needsUpdate = true;
+				var bumpMapEnabled = materialBumpMapEnabled.getValue() === true;
+
+				if ( selectedHasUvs )  {
+
+					material.bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
+					material.bumpScale = materialBumpScale.getValue();
+					material.needsUpdate = true;
+					selected.geometry.buffersNeedUpdate = true;
+					selected.geometry.uvsNeedUpdate = true;
+
+				} else {
+
+					if ( bumpMapEnabled ) textureWarning = true;
+
+				}
 
 			}
 
 			if ( material.normalMap !== undefined ) {
 
-				material.normalMap = materialNormalMapEnabled.getValue() === true ? materialNormalMap.getValue() : null;
-				material.needsUpdate = true;
+				var normalMapEnabled = materialNormalMapEnabled.getValue() === true;
+
+				if ( selectedHasUvs )  {
+
+					material.normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
+					material.needsUpdate = true;
+					selected.geometry.buffersNeedUpdate = true;
+					selected.geometry.uvsNeedUpdate = true;
+
+				} else {
+
+					if ( normalMapEnabled ) textureWarning = true;
+
+				}
 
 			}
 
 			if ( material.specularMap !== undefined ) {
 
-				material.specularMap = materialSpecularMapEnabled.getValue() === true ? materialSpecularMap.getValue() : null;
-				material.needsUpdate = true;
+				var specularMapEnabled = materialSpecularMapEnabled.getValue() === true;
+
+				if ( selectedHasUvs )  {
+
+					material.specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
+					material.needsUpdate = true;
+					selected.geometry.buffersNeedUpdate = true;
+					selected.geometry.uvsNeedUpdate = true;
+
+				} else {
+
+					if ( specularMapEnabled ) textureWarning = true;
+
+				}
 
 			}
 
 			if ( material.envMap !== undefined ) {
 
-				material.envMap = materialEnvMapEnabled.getValue() === true ? materialEnvMap.getValue() : null;
-				material.reflectivity = materialReflectivity.getValue();
-				material.needsUpdate = true;
+				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
+
+				if ( selectedHasUvs )  {
+
+					material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
+					material.reflectivity = materialReflectivity.getValue();
+					material.needsUpdate = true;
+					selected.geometry.buffersNeedUpdate = true;
+					selected.geometry.uvsNeedUpdate = true;
+
+				} else {
+
+					if ( envMapEnabled ) textureWarning = true;
+
+				}
 
 			}
 
@@ -347,6 +411,12 @@ Sidebar.Properties.Material = function ( signals ) {
 			updateRows();
 
 			signals.materialChanged.dispatch( material );
+
+		}
+
+		if ( textureWarning ) {
+
+			console.warn( "Can't set texture, model doesn't have texture coordinates" );
 
 		}
 
@@ -397,6 +467,7 @@ Sidebar.Properties.Material = function ( signals ) {
 		if ( object && object.material ) {
 
 			selected = object;
+			selectedHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
 
 			container.setDisplay( '' );
 
@@ -407,25 +478,25 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material.color !== undefined ) {
 
-				materialColor.setValue( '#' + material.color.getHex().toString( 16 ) );
+				materialColor.setValue( '#' + material.color.getHexString() );
 
 			}
 
 			if ( material.ambient !== undefined ) {
 
-				materialAmbient.setValue( '#' + material.ambient.getHex().toString( 16 ) );
+				materialAmbient.setValue( '#' + material.ambient.getHexString() );
 
 			}
 
 			if ( material.emissive !== undefined ) {
 
-				materialEmissive.setValue( '#' + material.emissive.getHex().toString( 16 ) );
+				materialEmissive.setValue( '#' + material.emissive.getHexString() );
 
 			}
 
 			if ( material.specular !== undefined ) {
 
-				materialSpecular.setValue( '#' + material.specular.getHex().toString( 16 ) );
+				materialSpecular.setValue( '#' + material.specular.getHexString() );
 
 			}
 
@@ -437,15 +508,22 @@ Sidebar.Properties.Material = function ( signals ) {
 
 			if ( material.map !== undefined ) {
 
-				if ( material.map !== null ) {
+				if ( selectedHasUvs ) {
 
-					materialMapEnabled.setValue( true );
-					materialMap.setValue( material.map );
+					if ( material.map !== null ) {
+
+						materialMapEnabled.setValue( true );
+						materialMap.setValue( material.map );
+
+					} else {
+
+						materialMapEnabled.setValue( false );
+
+					}
 
 				} else {
 
-					materialMapEnabled.setValue( false );
-					materialMap.setValue( dummyTexture );
+					console.warn( "Can't set texture, model doesn't have texture coordinates" );
 
 				}
 
@@ -560,6 +638,7 @@ Sidebar.Properties.Material = function ( signals ) {
 		} else {
 
 			selected = null;
+			selectedHasUvs = false;
 
 			container.setDisplay( 'none' );
 

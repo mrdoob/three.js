@@ -28,7 +28,7 @@ THREE.STLLoader.prototype = {
 
 	constructor: THREE.STLLoader,
 
-	load: function ( url ) {
+	load: function ( url, callback ) {
 
 		var scope = this;
 		var request = new XMLHttpRequest();
@@ -50,6 +50,16 @@ THREE.STLLoader.prototype = {
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
 		}, false );
+
+		if ( callback ) {
+
+			scope.addEventListener( 'load', function ( event ) {
+
+				callback( event.content );
+
+			} );
+
+		}
 
 		request.open( 'GET', url, true );
 		request.send( null );

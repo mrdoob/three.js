@@ -3,7 +3,11 @@ var Viewport = function ( signals ) {
 	var container = new UI.Panel( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
 
-	//
+	// settings
+
+	var enableHelpersFog = true;
+
+	// helpers
 
 	var objects = [];
 
@@ -45,6 +49,13 @@ var Viewport = function ( signals ) {
 
 	//
 
+	var lightGeo = new THREE.SphereGeometry( 5, 16, 8 );
+	var targetGeo = new THREE.SphereGeometry( 5, 8, 4 );
+
+	var direction = new THREE.Vector3();
+
+	//
+
 	var scene = new THREE.Scene();
 
 	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
@@ -52,15 +63,36 @@ var Viewport = function ( signals ) {
 	camera.lookAt( scene.position );
 	scene.add( camera );
 
-	var light = new THREE.DirectionalLight( 0xffffff );
-	light.position.set( 1, 0.5, 0 ).normalize();
-	scene.add( light );
+	var light1 = new THREE.DirectionalLight( 0xffffff );
+	light1.position.set( 1, 0.5, 0 ).multiplyScalar( 400 );
 
-	var light = new THREE.DirectionalLight( 0xffffff, 0.5 );
-	light.position.set( - 1, - 0.5, 0 ).normalize();
-	scene.add( light );
+	var light2 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+	light2.position.set( - 1, - 0.5, 0 ).multiplyScalar( 400 );
 
-	signals.sceneChanged.dispatch( scene );
+	light1.target.properties.targetInverse = light1;
+	light2.target.properties.targetInverse = light2;
+
+	// fog
+
+	var oldFogType = "None";
+	var oldFogColor = 0xaaaaaa;
+	var oldFogNear = 1;
+	var oldFogFar = 5000;
+	var oldFogDensity = 0.00025;
+
+	// default objects names
+
+	camera.name = "Camera";
+
+	light1.name = "Light 1";
+	light1.target.name = "Light 1 Target";
+
+	light2.name = "Light 2";
+	light2.target.name = "Light 2 Target";
+
+	// active objects
+
+	camera.properties.active = true;
 
 	// object picking
 
@@ -73,46 +105,58 @@ var Viewport = function ( signals ) {
 	var offset = new THREE.Vector3();
 	var picked = null;
 
+	var cameraChanged = false;
+	var helpersVisible = true;
+
 	// events
 
 	var onMouseDown = function ( event ) {
 
+		container.dom.focus();
+
 		event.preventDefault();
 
-		var vector = new THREE.Vector3(
-			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
-			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
+		if ( event.button === 0 ) {
 
-		projector.unprojectVector( vector, camera );
+			var vector = new THREE.Vector3(
+				( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+				- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+				0.5
+			);
 
-		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			projector.unprojectVector( vector, camera );
 
-		var intersects = ray.intersectObjects( objects, true );
+			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
 
-		if ( intersects.length > 0 ) {
+			var intersects = ray.intersectObjects( objects, true );
 
-			controls.enabled = false;
+			if ( intersects.length > 0 ) {
 
-			intersectionPlane.position.copy( intersects[ 0 ].object.position );
-			intersectionPlane.lookAt( camera.position );
+				controls.enabled = false;
 
-			picked = intersects[ 0 ].object;
+				intersectionPlane.position.copy( intersects[ 0 ].object.position );
+				intersectionPlane.lookAt( camera.position );
 
-			signals.objectSelected.dispatch( picked );
+				picked = intersects[ 0 ].object;
+				selected = picked;
 
-			var intersects = ray.intersectObject( intersectionPlane );
-			offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
+				signals.objectSelected.dispatch( selected );
 
-			document.addEventListener( 'mousemove', onMouseMove, false );
-			document.addEventListener( 'mouseup', onMouseUp, false );
+				var intersects = ray.intersectObject( intersectionPlane );
+				offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
 
-		} else {
+				document.addEventListener( 'mousemove', onMouseMove, false );
+				document.addEventListener( 'mouseup', onMouseUp, false );
 
-			controls.enabled = true;
+			} else {
+
+				controls.enabled = true;
+
+			}
 
 		}
+
+		cameraChanged = false;
 
 	};
 
@@ -151,24 +195,52 @@ var Viewport = function ( signals ) {
 
 	var onClick = function ( event ) {
 
-		var vector = new THREE.Vector3(
-			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
-			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
+		if ( event.button == 0 && cameraChanged === false ) {
 
-		projector.unprojectVector( vector, camera );
+			var vector = new THREE.Vector3(
+				( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
+				- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+				0.5
+			);
 
-		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
-		var intersects = ray.intersectObjects( objects, true );
+			projector.unprojectVector( vector, camera );
 
-		if ( intersects.length > 0 ) {
+			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			var intersects = ray.intersectObjects( objects, true );
 
-			signals.objectSelected.dispatch( intersects[ 0 ].object );
+			if ( intersects.length > 0 && ! controls.enabled ) {
 
-		} else {
+				selected = intersects[ 0 ].object;
 
-			signals.objectSelected.dispatch( null );
+			} else {
+
+				selected = camera;
+
+			}
+
+			signals.objectSelected.dispatch( selected );
+
+		}
+
+		controls.enabled = true;
+
+	};
+
+	var onKeyDown = function ( event ) {
+
+		switch ( event.keyCode ) {
+
+			case 46: // delete
+
+				signals.removeSelectedObject.dispatch();
+
+				break;
+
+			case 72: // h
+
+				signals.toggleHelpers.dispatch();
+
+				break;
 
 		}
 
@@ -188,17 +260,74 @@ var Viewport = function ( signals ) {
 	controls.noPan = false;
 	controls.staticMoving = true;
 	controls.dynamicDampingFactor = 0.3;
-	controls.addEventListener( 'change', render );
+	controls.addEventListener( 'change', function () {
+
+		cameraChanged = true;
+
+		signals.cameraChanged.dispatch( camera );
+		render();
+
+	} );
+
+	var handleAddition = function ( object ) {
+
+		// add to picking list
+
+		objects.push( object );
+
+		// create helpers for invisible object types (lights, cameras, targets)
+
+		if ( object instanceof THREE.DirectionalLight ) {
+
+			var lightGizmo = new THREE.Object3D();
+			lightGizmo.position = object.position;
+			lightGizmo.properties.gizmo = true;
+
+			var lightColor = object.color.clone();
+			lightColor.r *= object.intensity;
+			lightColor.g *= object.intensity;
+			lightColor.b *= object.intensity;
+
+			var length = 30;
+			direction.sub( object.target.position, object.position );
+
+			var lightArrow = new THREE.ArrowHelper( direction, null, length, lightColor.getHex() );
+
+			var lightMaterial = new THREE.MeshBasicMaterial( { color: lightColor.getHex() } );
+			var lightSphere = new THREE.Mesh( lightGeo, lightMaterial );
+
+			lightGizmo.add( lightArrow );
+			lightGizmo.add( lightSphere );
+
+			sceneHelpers.add( lightGizmo );
+
+			object.properties.arrow = lightArrow;
+
+			if ( object.target.properties.targetInverse ) {
+
+				var targetMaterial = new THREE.MeshBasicMaterial( { color: lightColor.getHex(), wireframe: true } );
+
+				var targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
+				targetSphere.position = object.target.position;
+				targetSphere.properties.gizmo = true;
+
+				sceneHelpers.add( targetSphere );
+
+			}
+
+		} else if ( object instanceof THREE.PointLight ) {
+		} else if ( object instanceof THREE.SpotLight ) {
+		} else if ( object instanceof THREE.HemisphereLight ) {
+		}
+
+	};
+
 
 	// signals
 
 	signals.objectAdded.add( function ( object ) {
 
-		object.traverse( function ( child ) {
-
-			objects.push( child );
-
-		} );
+		object.traverse( handleAddition );
 
 		scene.add( object );
 		render();
@@ -213,13 +342,82 @@ var Viewport = function ( signals ) {
 
 			object.updateProjectionMatrix();
 
+		} else if ( object instanceof THREE.DirectionalLight ) {
+
+			direction.sub( object.target.position, object.position );
+			object.properties.arrow.setDirection( direction );
+
+		} else if ( object instanceof THREE.PointLight ) {
+		} else if ( object instanceof THREE.SpotLight ) {
+		} else if ( object instanceof THREE.HemisphereLight ) {
+		} else if ( object.properties.targetInverse ) {
+
+			direction.sub( object.position, object.properties.targetInverse.position );
+			object.properties.targetInverse.properties.arrow.setDirection( direction );
+
 		}
 
 		render();
 
 	} );
 
-	var selected = null;
+	signals.removeSelectedObject.add( function () {
+
+		if ( selected === camera ) return;
+
+		var name = selected.name ?  '"' + selected.name + '"': "selected object";
+
+		if ( ! confirm( 'Delete ' + name + '?' ) ) {
+
+			return;
+
+		}
+
+		// remove from picking list
+
+		var toRemove = {};
+
+		selected.traverse( function ( child ) {
+
+			toRemove[ child.id ] = true;
+
+		} );
+
+		var newObjects = [];
+
+		for ( var i = 0; i < objects.length; i ++ ) {
+
+			var object = objects[ i ];
+
+			if ( ! ( object.id in toRemove ) ) {
+
+				newObjects.push( object );
+
+			}
+
+		}
+
+		objects = newObjects;
+
+		//
+
+		selectionBox.visible = false;
+		selectionAxis.visible = false;
+
+		scene.traverse( function( node ) {
+
+			node.remove( selected );
+
+		} );
+
+		render();
+
+		signals.sceneChanged.dispatch( scene );
+		signals.objectSelected.dispatch( null );
+
+	} );
+
+	var selected = camera;
 
 	signals.objectSelected.add( function ( object ) {
 
@@ -280,11 +478,82 @@ var Viewport = function ( signals ) {
 
 		}
 
+		if ( object !== null ) {
+
+			selected = object;
+
+		}
+
 		render();
 
 	} );
 
 	signals.materialChanged.add( function ( material ) {
+
+		render();
+
+	} );
+
+	signals.clearColorChanged.add( function ( color ) {
+
+		renderer.setClearColorHex( color, 1 );
+
+		render();
+
+	} );
+
+	signals.fogTypeChanged.add( function ( fogType ) {
+
+		if ( fogType !== oldFogType ) {
+
+			if ( fogType === "None" ) {
+
+				scene.fog = null;
+
+			} else if ( fogType === "Fog" ) {
+
+				scene.fog = new THREE.Fog( oldFogColor, oldFogNear, oldFogFar );
+
+			} else if ( fogType === "FogExp2" ) {
+
+				scene.fog = new THREE.FogExp2( oldFogColor, oldFogDensity );
+
+			}
+
+			updateMaterials( scene );
+
+			if ( enableHelpersFog )	{
+
+				sceneHelpers.fog = scene.fog;
+				updateMaterials( sceneHelpers );
+
+			}
+
+			oldFogType = fogType;
+
+		}
+
+		render();
+
+	} );
+
+	signals.fogColorChanged.add( function ( fogColor ) {
+
+		oldFogColor = fogColor;
+
+		updateFog( scene );
+
+		render();
+
+	} );
+
+	signals.fogParametersChanged.add( function ( near, far, density ) {
+
+		oldFogNear = near;
+		oldFogFar = far;
+		oldFogDensity = density;
+
+		updateFog( scene );
 
 		render();
 
@@ -301,6 +570,116 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.exportScene.add( function ( root ) {
+
+		var clearColor = renderer.getClearColor();
+		var clearAlpha = renderer.getClearAlpha();
+
+		var output = new THREE.SceneExporter().parse( root, clearColor, clearAlpha );
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	} );
+
+	signals.toggleHelpers.add( function () {
+
+		helpersVisible = !helpersVisible;
+		render();
+
+	} );
+
+	signals.resetScene.add( function ( newScene, newCamera, newClearColor ) {
+
+		scene = newScene;
+
+		// remove old gizmos
+
+		var toRemove = {};
+
+		sceneHelpers.traverse( function ( child ) {
+
+			if ( child.properties.gizmo ) {
+
+				toRemove[ child.id ] = child;
+
+			}
+
+		} );
+
+		for ( var id in toRemove ) {
+
+			sceneHelpers.remove( toRemove[ id ] );
+
+		}
+
+		// reset picking list
+
+		objects = [];
+
+		// add new gizmos and fill picking list
+
+		scene.traverse( handleAddition );
+
+		//
+
+		if ( newCamera ) {
+
+			camera = newCamera;
+			camera.properties.active = true;
+
+			camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+			camera.updateProjectionMatrix();
+
+			controls.object = camera;
+			controls.update();
+
+		}
+
+		if ( newClearColor ) {
+
+			signals.clearColorChanged.dispatch( newClearColor.getHex() );
+
+		}
+
+		if ( newScene.fog ) {
+
+			oldFogColor = newScene.fog.color.getHex();
+
+			if ( newScene.fog instanceof THREE.Fog ) {
+
+				oldFogType = "Fog";
+				oldFogNear = newScene.fog.near;
+				oldFogFar = newScene.fog.far;
+
+			} else if ( newScene.fog instanceof THREE.FogExp2 ) {
+
+				oldFogType = "FogExp2";
+				oldFogDensity = newScene.fog.density;
+
+			}
+
+		} else {
+
+			oldFogType = "None";
+
+		}
+
+		if ( enableHelpersFog )	{
+
+			sceneHelpers.fog = scene.fog;
+			updateMaterials( sceneHelpers );
+
+		}
+
+		signals.sceneChanged.dispatch( scene );
+		signals.objectSelected.dispatch( null );
+
+	} );
+
 	//
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
@@ -310,7 +689,58 @@ var Viewport = function ( signals ) {
 
 	animate();
 
+	// set up for hotkeys
+	// must be done here, otherwise it doesn't work
+
+	container.dom.tabIndex = 1;
+	container.dom.style.outline = 'transparent';
+	container.dom.addEventListener( 'keydown', onKeyDown, false );
+
+	// must come after listeners are registered
+
+	signals.sceneChanged.dispatch( scene );
+	signals.objectAdded.dispatch( light1 );
+	signals.objectAdded.dispatch( light2 );
+
 	//
+
+	function updateMaterials( root ) {
+
+		root.traverse( function ( node ) {
+
+			if ( node.material ) {
+
+				node.material.needsUpdate = true;
+
+			}
+
+			if ( node.geometry && node.geometry.materials ) {
+
+				for ( var i = 0; i < node.geometry.materials.length; i ++ ) {
+
+					node.geometry.materials[ i ].needsUpdate = true;
+
+				}
+
+			}
+
+		} );
+
+	}
+
+	function updateFog( root ) {
+
+		if ( root.fog ) {
+
+			root.fog.color.setHex( oldFogColor );
+
+			if ( root.fog.near !== undefined ) root.fog.near = oldFogNear;
+			if ( root.fog.far !== undefined ) root.fog.far = oldFogFar;
+			if ( root.fog.density !== undefined ) root.fog.density = oldFogDensity;
+
+		}
+
+	}
 
 	function animate() {
 
@@ -326,7 +756,12 @@ var Viewport = function ( signals ) {
 
 		renderer.clear();
 		renderer.render( scene, camera );
-		renderer.render( sceneHelpers, camera );
+
+		if ( helpersVisible ) {
+
+			renderer.render( sceneHelpers, camera );
+
+		}
 
 	}
 

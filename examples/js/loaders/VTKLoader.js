@@ -12,7 +12,7 @@ THREE.VTKLoader.prototype = {
 
 	constructor: THREE.VTKLoader,
 
-	load: function ( url ) {
+	load: function ( url, callback ) {
 
 		var scope = this;
 		var request = new XMLHttpRequest();
@@ -34,6 +34,16 @@ THREE.VTKLoader.prototype = {
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
 		}, false );
+
+		if ( callback ) {
+
+			scope.addEventListener( 'load', function ( event ) {
+
+				callback( event.content );
+
+			} );
+
+		}
 
 		request.open( 'GET', url, true );
 		request.send( null );

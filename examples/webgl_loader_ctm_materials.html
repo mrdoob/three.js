@@ -15,7 +15,9 @@
 				font-size:13px;
 				text-align:center;
 			}
+
 			a { color:skyblue }
+
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
@@ -26,6 +28,11 @@
 				z-index:100;
 				display:block;
 			}
+
+			#stats { position: absolute; top:5px; left: 0; z-index: 100 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -160,14 +167,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '5px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// EVENTS
 

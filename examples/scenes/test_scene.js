@@ -170,19 +170,6 @@
 			"visible"  : true
 		},
 
-		"hand" : {
-			"geometry" : "hand",
-			"materials": [ "phong_hand" ],
-			"position" : [ -28, -1, 29 ],
-			"rotation" : [ 0, 0.5, 0 ],
-			"scale"	   : [ 12, 12, 12 ],
-			"visible"  : true,
-			"properties" : {
-				"rotating" : true,
-				"rotateY"  : true
-			}
-		},
-
 		"ninja" : {
 			"geometry" : "NinjaLo",
 			"materials": [ "phong_normal" ],
@@ -202,6 +189,68 @@
 			"morph"	   : true,
 			"duration" : 8000,
 			"mirroredLoop" : true
+		},
+
+		"knight" : {
+			"geometry" : "knight",
+			"materials": [ "phong_skin" ],
+			"position" : [ 70, -10, 10 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 2.5, 2.5, 2.5 ],
+			"visible"  : true,
+			"skin"	   : true
+		},
+
+		"man" : {
+			"type": "obj",
+			"url" : "obj/male02/male02.obj",
+			"materials": [ "phong_man" ],
+			"position" : [ -10, -10, -25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 0.2, 0.2, 0.2 ],
+			"visible"  : true
+		},
+
+		"monster" : {
+			"type": "dae",
+			"url" : "models/collada/monster/monster.dae",
+			"materials": [ ],
+			"position" : [ -43, -10, 27 ],
+			"rotation" : [ -1.57, 0, 0 ],
+			"scale"	   : [ 0.01, 0.01, 0.01 ],
+			"visible"  : true
+		},
+
+		"hand" : {
+			"type" : "utf8",
+			"url"  : "models/utf8/hand.js",
+			"materials": [ "phong_hand" ],
+			"position" : [ -28, -1, 29 ],
+			"rotation" : [ 0, 0.5, 0 ],
+			"scale"	   : [ 12, 12, 12 ],
+			"visible"  : true,
+			"properties" : {
+				"rotating" : true,
+				"rotateY"  : true
+			}
+		},
+
+		"bunny" : {
+			"geometry": "bunny",
+			"materials": [ "phong_bunny" ],
+			"position" : [ -25, -14, 0 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 100, 100, 100 ],
+			"visible"  : true
+		},
+
+		"disk" : {
+			"geometry": "disk",
+			"materials": [ "phong_disk" ],
+			"position" : [ 7, -10, 30 ],
+			"rotation" : [ 1.57, 0, 0 ],
+			"scale"	   : [ 10, 10, 10 ],
+			"visible"  : true
 		},
 
 		"quad_bg" : {
@@ -238,6 +287,42 @@
 			"rotation" : [ -1.57, 0, 0 ],
 			"scale"	   : [ 100, 100, 100 ],
 			"visible"  : true
+		},
+
+		"light1": {
+			"type"		 : "DirectionalLight",
+			"direction"	 : [ 0, 1, 1 ],
+			"color" 	 : 16777215,
+			"intensity"	 : 1
+		},
+
+		"light2": {
+			"type"	  : "PointLight",
+			"position": [ 0, 0, 0 ],
+			"color"   : 16777215,
+			"intensity"	 : 1.25
+		},
+
+		"camera1": {
+			"type"  : "PerspectiveCamera",
+			"fov"   : 50,
+			"aspect": 1.33333,
+			"near"  : 1,
+			"far"   : 1000,
+			"position": [ 0, 0, 100 ],
+			"target"  : [ 0, 0, 0 ]
+		},
+
+		"camera2": {
+			"type"  : "OrthographicCamera",
+			"left"  : 0,
+			"right" : 1024,
+			"top"   : 0,
+			"bottom": 1024,
+			"near"  : 1,
+			"far"   : 1000,
+			"position": [ 0, 0, 0 ],
+			"target"  : [ 0, 0, 0 ]
 		}
 
 	},
@@ -249,9 +334,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -261,9 +346,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -273,9 +358,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -284,30 +369,30 @@
 			"type"   : "plane",
 			"width"  : 10,
 			"height" : 10,
-			"segmentsWidth"  : 50,
-			"segmentsHeight" : 50
+			"widthSegments"  : 50,
+			"heightSegments" : 50
 		},
 
 		"quad": {
 			"type"   : "plane",
 			"width"  : 10,
 			"height" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1
+			"widthSegments"  : 1,
+			"heightSegments" : 1
 		},
 
 		"sphere": {
 			"type"    : "sphere",
 			"radius"  : 5,
-			"segmentsWidth"  : 32,
-			"segmentsHeight" : 16
+			"widthSegments"  : 32,
+			"heightSegments" : 16
 		},
 
 		"sphere_uvs": {
 			"type"    : "sphere",
 			"radius"  : 5,
-			"segmentsWidth"  : 32,
-			"segmentsHeight" : 16
+			"widthSegments"  : 32,
+			"heightSegments" : 16
 		},
 
 		"icosahedron": {
@@ -362,6 +447,11 @@
 			"url" : "models/animated/sittingBox.js"
 		},
 
+		"knight": {
+			"type": "ascii",
+			"url" : "models/skinned/knight.js"
+		},
+
 		"ben": {
 			"type": "ctm",
 			"url" : "models/ctm/ben.ctm",
@@ -369,13 +459,14 @@
 			"useBuffers" : true
 		},
 
-		"hand": {
-			"type": "utf8",
-			"url" : "models/utf8/hand.utf8",
-			"scale"   : 0.815141,
-			"offsetX" : -0.371823,
-			"offsetY" : -0.011920,
-			"offsetZ" : -0.416061
+		"bunny": {
+			"type": "vtk",
+			"url" : "models/vtk/bunny.vtk"
+		},
+
+		"disk": {
+			"type": "stl",
+			"url" : "models/stl/slotted_disk.stl"
 		},
 
 		"colorcube": {
@@ -450,9 +541,29 @@
 			"parameters": { "color": 1118481, "ambient": 1118481, "specular": 5601245, "shininess": 12, "bumpMap": "texture_bump_repeat", "bumpScale": 0.125 }
 		},
 
+		"phong_man": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16737894, "ambient": 16737894, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+		},
+
 		"phong_hand": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 14531481, "ambient": 14531481, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+		},
+
+		"phong_bunny": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+		},
+
+		"phong_monster": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+		},
+
+		"phong_disk": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16733491, "ambient": 16733491, "specular": 1118481, "shininess": 30, "wireframe": false }
 		},
 
 		"phong_normal": {
@@ -463,6 +574,11 @@
 		"phong_morph": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true, "morphNormals" : true }
+		},
+
+		"phong_skin": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.5, "combine": "MixOperation", "skinning": true, "morphTargets": true }
 		},
 
 		"phong_compressed_cube": {
@@ -643,47 +759,6 @@
 
 	},
 
-	"cameras": {
-		"cam1": {
-			"type"  : "perspective",
-			"fov"   : 50,
-			"aspect": 1.33333,
-			"near"  : 1,
-			"far"   : 1000,
-			"position": [0,0,100],
-			"target"  : [0,0,0]
-		},
-
-		"cam2": {
-			"type"  : "ortho",
-			"left"  : 0,
-			"right" : 1024,
-			"top"   : 0,
-			"bottom": 1024,
-			"near"  : 1,
-			"far"   : 1000,
-			"position": [0,0,0],
-			"target"  : [0,0,0]
-		}
-
-	},
-
-	"lights": {
-		"light1": {
-			"type"		 : "directional",
-			"direction"	 : [0,1,1],
-			"color" 	 : 16777215,
-			"intensity"	 : 1
-		},
-
-		"light2": {
-			"type"	  : "point",
-			"position": [0,0,0],
-			"color"   : 16777215,
-			"intensity"	 : 1.25
-		}
-	},
-
 	"fogs":	{
 		"basic": {
 			"type": "linear",
@@ -708,7 +783,7 @@
 	"defaults": {
 		"bgcolor": [0,0,0],
 		"bgalpha": 1,
-		"camera": "cam1",
+		"camera": "camera1",
 		"fog": "black"
 	}
 

@@ -322,7 +322,7 @@ SPARKS.Action = function() {
 
 
 SPARKS.Age = function(easing) {
-    this._easing = (easing == null) ? TWEEN.Easing.Linear.EaseNone : easing;
+    this._easing = (easing == null) ? TWEEN.Easing.Linear.None : easing;
 };
 
 SPARKS.Age.prototype.update = function (emitter, particle, time) {
@@ -343,7 +343,7 @@ SPARKS.Age.prototype.update = function (emitter, particle, time) {
 // Mark particle as dead when particle's < 0
 
 SPARKS.Death = function(easing) {
-    this._easing = (easing == null) ? TWEEN.Linear.EaseNone : easing;
+    this._easing = (easing == null) ? TWEEN.Linear.None : easing;
 };
 
 SPARKS.Death.prototype.update = function (emitter, particle, time) {

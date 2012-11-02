@@ -1,5 +1,6 @@
 /**
  * @author mikael emtinger / http://gomo.se/
+ * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Sprite = function ( parameters ) {
@@ -20,6 +21,8 @@ THREE.Sprite = function ( parameters ) {
 	this.affectedByDistance = ( parameters.affectedByDistance !== undefined ) ? parameters.affectedByDistance : !this.useScreenCoordinates;
 	this.scaleByViewport = ( parameters.scaleByViewport !== undefined ) ? parameters.scaleByViewport : !this.affectedByDistance;
 	this.alignment = ( parameters.alignment instanceof THREE.Vector2 ) ? parameters.alignment : THREE.SpriteAlignment.center;
+
+	this.fog = ( parameters.fog !== undefined ) ? parameters.fog : false;
 
 	this.rotation3d = this.rotation;
 	this.rotation = 0;
@@ -67,6 +70,8 @@ THREE.Sprite.prototype.clone = function ( object ) {
 	object.affectedByDistance = this.affectedByDistance;
 	object.scaleByViewport = this.scaleByViewport;
 	object.alignment = this.alignment;
+
+	object.fog = this.fog;
 
 	object.rotation3d.copy( this.rotation3d );
 	object.rotation = this.rotation;
