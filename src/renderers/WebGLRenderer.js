@@ -6930,8 +6930,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// these are not really correct
 
-			maxSpotLights = maxPointLights;
-			maxHemiLights = maxDirLights;
+			if ( spotLights )
+				maxSpotLights = maxPointLights;
+
+			if ( hemiLights )
+				maxHemiLights = maxDirLights;
 
 		}
 
