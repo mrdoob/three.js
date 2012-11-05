@@ -20,7 +20,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	var b, bone, gbone, p, q, s;
 
-	if ( this.geometry.bones !== undefined ) {
+	if ( this.geometry && this.geometry.bones !== undefined ) {
 
 		for ( b = 0; b < this.geometry.bones.length; b ++ ) {
 
