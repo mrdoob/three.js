@@ -10,9 +10,11 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	this.light = light;
 
+	// position
+
 	this.position = light.position;
 
-	this.properties.isGizmo = true;
+	// color
 
 	this.color = light.color.clone();
 
@@ -22,50 +24,29 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	var hexColor = this.color.getHex();
 
-	var lightGeo = new THREE.SphereGeometry( sphereSize, 16, 8 );
-	var lightMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
+	// light helper
 
-	this.lightSphere = new THREE.Mesh( lightGeo, lightMaterial );
+	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
+	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
+
+	var bulbMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
+	var raysMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
+
+	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+	this.lightRays = new THREE.Line( raysGeometry, raysMaterial, THREE.LinePieces );
 
 	this.add( this.lightSphere );
+	this.add( this.lightRays );
+
+	//
 
 	this.lightSphere.properties.isGizmo = true;
 	this.lightSphere.properties.gizmoSubject = light;
 	this.lightSphere.properties.gizmoRoot = this;
 
-	var lineMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
-	var lineGeometry = new THREE.Geometry();
+	//
 
-	var sd = sphereSize * 1.25;
-	var ed = sphereSize * 2.25;
-
-	var sd2 = 0.707 * sd;
-	var ed2 = 0.707 * ed;
-
-	var rays = [ [ sd, 0, 0 ], [ ed, 0, 0 ], [ -sd, 0, 0 ], [ -ed, 0, 0 ],
-				 [ 0, sd, 0 ], [ 0, ed, 0 ], [ 0, -sd, 0 ], [ 0, -ed, 0 ],
-				 [ 0, 0, sd ], [ 0, 0, ed ], [ 0, 0, -sd ], [ 0, 0, -ed ],
-				 [ sd2, sd2, 0 ], [ ed2, ed2, 0 ], [ -sd2, -sd2, 0 ], [ -ed2, -ed2, 0 ],
-				 [ sd2, -sd2, 0 ], [ ed2, -ed2, 0 ], [ -sd2, sd2, 0 ], [ -ed2, ed2, 0 ],
-				 [ sd2, 0, sd2 ], [ ed2, 0, ed2 ], [ -sd2, 0, -sd2 ], [ -ed2, 0, -ed2 ],
-				 [ sd2, 0, -sd2 ], [ ed2, 0, -ed2 ], [ -sd2, 0, sd2 ], [ -ed2, 0, ed2 ],
-				 [ 0, sd2, sd2 ], [ 0, ed2, ed2 ], [ 0, -sd2, -sd2 ], [ 0, -ed2, -ed2 ],
-				 [ 0, sd2, -sd2 ], [ 0, ed2, -ed2 ], [ 0, -sd2, sd2 ], [ 0, -ed2, ed2 ]
-	];
-
-	for ( var i = 0, il = rays.length; i < il; i ++ ) {
-
-		var x = rays[ i ][ 0 ];
-		var y = rays[ i ][ 1 ];
-		var z = rays[ i ][ 2 ];
-
-		lineGeometry.vertices.push( new THREE.Vector3( x, y, z ) );
-
-	}
-
-	this.lightLine = new THREE.Line( lineGeometry, lineMaterial, THREE.LinePieces );
-
-	this.add( this.lightLine );
+	this.properties.isGizmo = true;
 
 }
 
@@ -73,7 +54,7 @@ THREE.PointLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.PointLightHelper.prototype.update = function () {
 
-	// set sphere color to light color * light intensity
+	// update sphere and rays colors to light color * light intensity
 
 	this.color.copy( this.light.color );
 
@@ -83,7 +64,7 @@ THREE.PointLightHelper.prototype.update = function () {
 	this.color.b *= intensity;
 
 	this.lightSphere.material.color.copy( this.color );
-	this.lightLine.material.color.copy( this.color );
+	this.lightRays.material.color.copy( this.color );
 
 }
 

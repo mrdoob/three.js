@@ -10,9 +10,16 @@ THREE.DirectionalLightHelper = function ( light, sphereSize, arrowLength ) {
 
 	this.light = light;
 
+	// position
+
 	this.position = light.position;
 
-	this.properties.isGizmo = true;
+	// direction
+
+	this.direction = new THREE.Vector3();
+	this.direction.sub( light.target.position, light.position );
+
+	// color
 
 	this.color = light.color.clone();
 
@@ -22,26 +29,37 @@ THREE.DirectionalLightHelper = function ( light, sphereSize, arrowLength ) {
 
 	var hexColor = this.color.getHex();
 
-	this.direction = new THREE.Vector3();
-	this.direction.sub( light.target.position, light.position );
+	// light helper
 
-	var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
-	var lightGeo = new THREE.SphereGeometry( sphereSize, 16, 8 );
-	var lightMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
+	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
+	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
+
+	var bulbMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
+	var raysMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
 
 	this.lightArrow = new THREE.ArrowHelper( this.direction, null, arrowLength, hexColor );
-	this.lightSphere = new THREE.Mesh( lightGeo, lightMaterial );
+	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 
 	this.lightArrow.cone.material.fog = false;
 	this.lightArrow.line.material.fog = false;
 
+	this.lightRays = new THREE.Line( raysGeometry, raysMaterial, THREE.LinePieces );
+
 	this.add( this.lightArrow );
 	this.add( this.lightSphere );
+	this.add( this.lightRays );
+
+	this.lightSphere.properties.isGizmo = true;
+	this.lightSphere.properties.gizmoSubject = light;
+	this.lightSphere.properties.gizmoRoot = this;
+
+	// light target helper
 
 	this.targetSphere = null;
 
 	if ( light.target.properties.targetInverse ) {
 
+		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
 		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
 
 		this.targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
@@ -62,9 +80,9 @@ THREE.DirectionalLightHelper = function ( light, sphereSize, arrowLength ) {
 
 	}
 
-	this.lightSphere.properties.isGizmo = true;
-	this.lightSphere.properties.gizmoSubject = light;
-	this.lightSphere.properties.gizmoRoot = this;
+	//
+
+	this.properties.isGizmo = true;
 
 }
 
@@ -72,13 +90,13 @@ THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype
 
 THREE.DirectionalLightHelper.prototype.update = function () {
 
-	// set arrow orientation
+	// update arrow orientation
 	// pointing from light to target
 
 	this.direction.sub( this.light.target.position, this.light.position );
 	this.lightArrow.setDirection( this.direction );
 
-	// set arrow and spheres colors to light color * light intensity
+	// update arrow, spheres, rays and line colors to light color * light intensity
 
 	this.color.copy( this.light.color );
 
@@ -89,10 +107,12 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 
 	this.lightArrow.setColor( this.color.getHex() );
 	this.lightSphere.material.color.copy( this.color );
+	this.lightRays.material.color.copy( this.color );
+
 	this.targetSphere.material.color.copy( this.color );
 	this.targetLine.material.color.copy( this.color );
 
-	// set target line
+	// update target line vertices
 
 	this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
 	this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );

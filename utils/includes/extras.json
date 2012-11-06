@@ -15,6 +15,7 @@
 	"../src/extras/animation/KeyFrameAnimation.js",
 	"../src/extras/cameras/CubeCamera.js",
 	"../src/extras/cameras/CombinedCamera.js",
+	"../src/extras/geometries/AsteriskGeometry.js",
 	"../src/extras/geometries/CircleGeometry.js",
 	"../src/extras/geometries/CubeGeometry.js",
 	"../src/extras/geometries/CylinderGeometry.js",
