@@ -48,6 +48,15 @@ THREE.DirectionalLightHelper = function ( light, arrowLength ) {
 		this.targetSphere.properties.gizmoSubject = light.target;
 		this.targetSphere.properties.gizmoRoot = this.targetSphere;
 
+		var lineMaterial = new THREE.LineDashedMaterial( { color: hexColor, dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true } );
+		var lineGeometry = new THREE.Geometry();
+		lineGeometry.vertices.push( this.position.clone() );
+		lineGeometry.vertices.push( this.targetSphere.position.clone() );
+		lineGeometry.computeLineDistances();
+
+		this.targetLine = new THREE.Line( lineGeometry, lineMaterial );
+		this.targetLine.properties.isGizmo = true;
+
 	}
 
 	this.lightSphere.properties.isGizmo = true;
@@ -78,6 +87,15 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	this.lightArrow.setColor( this.color.getHex() );
 	this.lightSphere.material.color.copy( this.color );
 	this.targetSphere.material.color.copy( this.color );
+	this.targetLine.material.color.copy( this.color );
+
+	// set target line
+
+	this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
+	this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+
+	this.targetLine.geometry.computeLineDistances();
+	this.targetLine.geometry.verticesNeedUpdate = true;
 
 }
 

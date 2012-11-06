@@ -311,6 +311,7 @@ var Viewport = function ( signals ) {
 			var lightGizmo = new THREE.DirectionalLightHelper( object, 30 );
 			sceneHelpers.add( lightGizmo );
 			sceneHelpers.add( lightGizmo.targetSphere );
+			sceneHelpers.add( lightGizmo.targetLine );
 
 			object.properties.helper = lightGizmo;
 			object.properties.pickingProxy = lightGizmo.lightSphere;
@@ -318,6 +319,7 @@ var Viewport = function ( signals ) {
 
 			objects.push( lightGizmo.lightSphere );
 			objects.push( lightGizmo.targetSphere );
+			objects.push( lightGizmo.targetLine );
 
 		} else if ( object instanceof THREE.PointLight ) {
 		} else if ( object instanceof THREE.SpotLight ) {
