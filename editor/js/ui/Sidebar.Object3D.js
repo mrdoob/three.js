@@ -136,6 +136,16 @@ Sidebar.Object3D = function ( signals ) {
 
 	container.add( objectColorRow );
 
+	// distance
+
+	var objectDistanceRow = new UI.Panel();
+	var objectDistance = new UI.Number( 'absolute' ).setRange( 0, Infinity ).setLeft( '100px' ).onChange( update );
+
+	objectDistanceRow.add( new UI.Text().setValue( 'Distance' ).setColor( '#666' ) );
+	objectDistanceRow.add( objectDistance );
+
+	container.add( objectDistanceRow );
+
 	//
 
 	var selected = null;
@@ -241,6 +251,12 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
+			if ( selected.distance !== undefined ) {
+
+				selected.distance = objectDistance.getValue();
+
+			}
+
 			signals.objectChanged.dispatch( selected );
 
 		}
@@ -254,7 +270,8 @@ Sidebar.Object3D = function ( signals ) {
 			'near': objectNearRow,
 			'far': objectFarRow,
 			'intensity': objectIntensityRow,
-			'color': objectColorRow
+			'color': objectColorRow,
+			'distance' : objectDistanceRow
 		};
 
 		for ( var property in properties ) {
@@ -349,6 +366,12 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
+			if ( object.distance !== undefined ) {
+
+				objectDistance.setValue( object.distance );
+
+			}
+
 			objectVisible.setValue( object.visible );
 
 			updateRows();
@@ -430,6 +453,12 @@ Sidebar.Object3D = function ( signals ) {
 		if ( object.color !== undefined ) {
 
 			objectColor.setValue( '#' + object.color.getHexString() );
+
+		}
+
+		if ( object.distance !== undefined ) {
+
+			objectDistance.setValue( object.distance );
 
 		}
 
