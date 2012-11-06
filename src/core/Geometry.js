@@ -498,6 +498,25 @@ THREE.Geometry.prototype = {
 
 	},
 
+	computeLineDistances: function ( ) {
+
+		var d = 0;
+		var vertices = this.vertices;
+
+		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+
+			if ( i > 0 ) {
+
+				d += vertices[ i ].distanceTo( vertices[ i - 1 ] );
+
+			}
+
+			this.lineDistances[ i ] = d;
+
+		}
+
+	},
+
 	computeBoundingBox: function () {
 
 		if ( ! this.boundingBox ) {

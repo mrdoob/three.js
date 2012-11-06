@@ -81,8 +81,8 @@
 
 				var geometryCube = cube( 50 );
 
-				computeLineDistances( geometryCube );
-				computeLineDistances( geometrySpline );
+				geometryCube.computeLineDistances();
+				geometrySpline.computeLineDistances();
 
 				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ), THREE.LineStrip );
 
@@ -108,25 +108,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-			}
-
-			function computeLineDistances( geometry ) {
-
-				var d = 0;
-				var vertices = geometry.vertices;
-
-				for ( var i = 0, il = vertices.length; i < il; i ++ ) {
-
-					if ( i > 0 ) {
-
-						d += vertices[ i ].distanceTo( vertices[ i - 1 ] );
-
-					}
-
-					geometry.lineDistances[ i ] = d;
-
-				}
 
 			}
 
