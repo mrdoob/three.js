@@ -78,6 +78,7 @@
 	"../src/extras/core/Gyroscope.js",
 	"../src/extras/helpers/CameraHelper.js",
 	"../src/extras/helpers/DirectionalLightHelper.js",
+	"../src/extras/helpers/PointLightHelper.js",
 	"../src/extras/objects/LensFlare.js",
 	"../src/extras/objects/ImmediateRenderObject.js",
 	"../src/extras/renderers/plugins/LensFlarePlugin.js",

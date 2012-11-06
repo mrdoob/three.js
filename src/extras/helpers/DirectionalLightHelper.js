@@ -4,7 +4,7 @@
  *	- shows directional light color, intensity, position, orientation and target
  */
 
-THREE.DirectionalLightHelper = function ( light, arrowLength ) {
+THREE.DirectionalLightHelper = function ( light, sphereSize, arrowLength ) {
 
 	THREE.Object3D.call( this );
 
@@ -25,12 +25,15 @@ THREE.DirectionalLightHelper = function ( light, arrowLength ) {
 	this.direction = new THREE.Vector3();
 	this.direction.sub( light.target.position, light.position );
 
-	var targetGeo = new THREE.SphereGeometry( 5, 8, 4 );
-	var lightGeo = new THREE.SphereGeometry( 5, 16, 8 );
-	var lightMaterial = new THREE.MeshBasicMaterial( { color: hexColor } );
+	var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
+	var lightGeo = new THREE.SphereGeometry( sphereSize, 16, 8 );
+	var lightMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
 
 	this.lightArrow = new THREE.ArrowHelper( this.direction, null, arrowLength, hexColor );
 	this.lightSphere = new THREE.Mesh( lightGeo, lightMaterial );
+
+	this.lightArrow.cone.material.fog = false;
+	this.lightArrow.line.material.fog = false;
 
 	this.add( this.lightArrow );
 	this.add( this.lightSphere );
@@ -39,7 +42,7 @@ THREE.DirectionalLightHelper = function ( light, arrowLength ) {
 
 	if ( light.target.properties.targetInverse ) {
 
-		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true } );
+		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
 
 		this.targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
 		this.targetSphere.position = light.target.position;
@@ -48,7 +51,7 @@ THREE.DirectionalLightHelper = function ( light, arrowLength ) {
 		this.targetSphere.properties.gizmoSubject = light.target;
 		this.targetSphere.properties.gizmoRoot = this.targetSphere;
 
-		var lineMaterial = new THREE.LineDashedMaterial( { color: hexColor, dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true } );
+		var lineMaterial = new THREE.LineDashedMaterial( { color: hexColor, dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
 		var lineGeometry = new THREE.Geometry();
 		lineGeometry.vertices.push( this.position.clone() );
 		lineGeometry.vertices.push( this.targetSphere.position.clone() );
