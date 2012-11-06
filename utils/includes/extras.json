@@ -36,6 +36,7 @@
 	"../src/extras/helpers/AxisHelper.js",
 	"../src/extras/helpers/ArrowHelper.js",
 	"../src/extras/helpers/CameraHelper.js",
+	"../src/extras/helpers/DirectionalLightHelper.js",
 	"../src/extras/modifiers/SubdivisionModifier.js",
 	"../src/extras/objects/ImmediateRenderObject.js",
 	"../src/extras/objects/LensFlare.js",
