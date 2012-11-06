@@ -35,7 +35,7 @@ var Viewport = function ( signals ) {
 	var grid = new THREE.Line( geometry, material, THREE.LinePieces );
 	sceneHelpers.add( grid );
 
-	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true } ) );
+	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true, fog: false } ) );
 	selectionBox.matrixAutoUpdate = false;
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
@@ -46,13 +46,6 @@ var Viewport = function ( signals ) {
 	selectionAxis.matrixAutoUpdate = false;
 	selectionAxis.visible = false;
 	sceneHelpers.add( selectionAxis );
-
-	//
-
-	var lightGeo = new THREE.SphereGeometry( 5, 16, 8 );
-	var targetGeo = new THREE.SphereGeometry( 5, 8, 4 );
-
-	var direction = new THREE.Vector3();
 
 	//
 
@@ -72,6 +65,9 @@ var Viewport = function ( signals ) {
 	light1.target.properties.targetInverse = light1;
 	light2.target.properties.targetInverse = light2;
 
+	var light3 = new THREE.PointLight( 0xffaa00, 0.75 );
+	light3.position.set( 0, -200, 0 );
+
 	// fog
 
 	var oldFogType = "None";
@@ -89,6 +85,8 @@ var Viewport = function ( signals ) {
 
 	light2.name = "Light 2";
 	light2.target.name = "Light 2 Target";
+
+	light3.name = "Light 3";
 
 	// active objects
 
@@ -315,57 +313,44 @@ var Viewport = function ( signals ) {
 
 		if ( object instanceof THREE.DirectionalLight ) {
 
-			var lightGizmo = new THREE.Object3D();
-			lightGizmo.position = object.position;
-			lightGizmo.properties.isGizmo = true;
+			var sphereSize = 5;
+			var arrowLength = 30;
 
-			var lightColor = object.color.clone();
-			lightColor.r *= object.intensity;
-			lightColor.g *= object.intensity;
-			lightColor.b *= object.intensity;
-
-			var length = 30;
-			direction.sub( object.target.position, object.position );
-
-			var lightArrow = new THREE.ArrowHelper( direction, null, length, lightColor.getHex() );
-
-			var lightMaterial = new THREE.MeshBasicMaterial( { color: lightColor.getHex() } );
-			var lightSphere = new THREE.Mesh( lightGeo, lightMaterial );
-
-			lightGizmo.add( lightArrow );
-			lightGizmo.add( lightSphere );
-
+			var lightGizmo = new THREE.DirectionalLightHelper( object, sphereSize, arrowLength );
 			sceneHelpers.add( lightGizmo );
+			sceneHelpers.add( lightGizmo.targetSphere );
+			sceneHelpers.add( lightGizmo.targetLine );
 
-			object.properties.arrow = lightArrow;
-			object.properties.pickingProxy = lightSphere;
+			object.properties.helper = lightGizmo;
+			object.properties.pickingProxy = lightGizmo.lightSphere;
+			object.target.properties.pickingProxy = lightGizmo.targetSphere;
 
-			if ( object.target.properties.targetInverse ) {
-
-				var targetMaterial = new THREE.MeshBasicMaterial( { color: lightColor.getHex(), wireframe: true } );
-
-				var targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
-				targetSphere.position = object.target.position;
-
-				sceneHelpers.add( targetSphere );
-
-				targetSphere.properties.isGizmo = true;
-				targetSphere.properties.gizmoSubject = object.target;
-				targetSphere.properties.gizmoRoot = targetSphere;
-				objects.push( targetSphere );
-
-				object.target.properties.pickingProxy = targetSphere;
-
-			}
-
-			lightSphere.properties.isGizmo = true;
-			lightSphere.properties.gizmoSubject = object;
-			lightSphere.properties.gizmoRoot = lightGizmo;
-			objects.push( lightSphere );
+			objects.push( lightGizmo.lightSphere );
+			objects.push( lightGizmo.targetSphere );
+			objects.push( lightGizmo.targetLine );
 
 		} else if ( object instanceof THREE.PointLight ) {
+
+			var sphereSize = 5;
+
+			var lightGizmo = new THREE.PointLightHelper( object, sphereSize );
+			sceneHelpers.add( lightGizmo );
+
+			object.properties.helper = lightGizmo;
+			object.properties.pickingProxy = lightGizmo.lightSphere;
+
+			objects.push( lightGizmo.lightSphere );
+
 		} else if ( object instanceof THREE.SpotLight ) {
+
+			//var lightGizmo = new THREE.SpotLightHelper( object );
+			//sceneHelpers.add( lightGizmo );
+
 		} else if ( object instanceof THREE.HemisphereLight ) {
+
+			//var lightGizmo = new THREE.HemisphereLightHelper( object );
+			//sceneHelpers.add( lightGizmo );
+
 		}
 
 	};
@@ -392,32 +377,17 @@ var Viewport = function ( signals ) {
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
-			// set gizmo arrow orientation
-			// pointing from light to target
-
-			direction.sub( object.target.position, object.position );
-			object.properties.arrow.setDirection( direction );
-
-			// set gizmo color to light color * light intensity
-
-			var lightColor = object.properties.pickingProxy.material.color;
-			lightColor.copy( object.color );
-
-			var intensity = THREE.Math.clamp( object.intensity, 0, 1 );
-			lightColor.r *= intensity;
-			lightColor.g *= intensity;
-			lightColor.b *= intensity;
-
-			object.properties.arrow.setColor( lightColor.getHex() );
-			object.target.properties.pickingProxy.material.color.copy( lightColor );
+			object.properties.helper.update();
 
 		} else if ( object instanceof THREE.PointLight ) {
+
+			object.properties.helper.update();
+
 		} else if ( object instanceof THREE.SpotLight ) {
 		} else if ( object instanceof THREE.HemisphereLight ) {
 		} else if ( object.properties.targetInverse ) {
 
-			direction.sub( object.position, object.properties.targetInverse.position );
-			object.properties.targetInverse.properties.arrow.setDirection( direction );
+			object.properties.targetInverse.properties.helper.update();
 
 		}
 
@@ -780,8 +750,10 @@ var Viewport = function ( signals ) {
 	// must come after listeners are registered
 
 	signals.sceneChanged.dispatch( scene );
+
 	signals.objectAdded.dispatch( light1 );
 	signals.objectAdded.dispatch( light2 );
+	signals.objectAdded.dispatch( light3 );
 
 	//
 

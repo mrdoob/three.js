@@ -41,6 +41,7 @@
 	"../src/loaders/TextureLoader.js",
 	"../src/materials/Material.js",
 	"../src/materials/LineBasicMaterial.js",
+	"../src/materials/LineDashedMaterial.js",
 	"../src/materials/MeshBasicMaterial.js",
 	"../src/materials/MeshLambertMaterial.js",
 	"../src/materials/MeshPhongMaterial.js",

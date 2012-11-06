@@ -460,6 +460,76 @@ THREE.Color.prototype = {
 
 	},
 
+
+	getHSV: function ( hsv ) {
+
+		// based on MochiKit implementation by Bob Ippolito
+		// h,s,v ranges are < 0.0 - 1.0 >
+
+		var r = this.r;
+		var g = this.g;
+		var b = this.b;
+
+		var max = Math.max( Math.max( r, g ), b );
+		var min = Math.min( Math.min( r, g ), b );
+
+		var hue;
+		var saturation;
+		var value = max;
+
+		if ( min === max )	{
+
+			hue = 0;
+			saturation = 0;
+
+		} else {
+
+			var delta = ( max - min );
+			saturation = delta / max;
+
+			if ( r === max ) {
+
+				hue = ( g - b ) / delta;
+
+			} else if ( g === max ) {
+
+				hue = 2 + ( ( b - r ) / delta );
+
+			} else	{
+
+				hue = 4 + ( ( r - g ) / delta );
+			}
+
+			hue /= 6;
+
+			if ( hue < 0 ) {
+
+				hue += 1;
+
+			}
+
+			if ( hue > 1 ) {
+
+				hue -= 1;
+
+			}
+
+		}
+
+		if ( hsv === undefined ) {
+
+			hsv = { h: 0, s: 0, v: 0 };
+
+		}
+
+		hsv.h = hue;
+		hsv.s = saturation;
+		hsv.v = value;
+
+		return hsv;
+
+	},
+
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );
@@ -4904,6 +4974,8 @@ THREE.Geometry = function () {
 	this.skinWeights = [];
 	this.skinIndices = [];
 
+	this.lineDistances = [];
+
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
@@ -4919,6 +4991,7 @@ THREE.Geometry = function () {
 	this.normalsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
+	this.lineDistancesNeedUpdate = false;
 
 	this.buffersNeedUpdate = false;
 
@@ -5364,6 +5437,25 @@ THREE.Geometry.prototype = {
 		}
 
 		this.hasTangents = true;
+
+	},
+
+	computeLineDistances: function ( ) {
+
+		var d = 0;
+		var vertices = this.vertices;
+
+		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+
+			if ( i > 0 ) {
+
+				d += vertices[ i ].distanceTo( vertices[ i - 1 ] );
+
+			}
+
+			this.lineDistances[ i ] = d;
+
+		}
 
 	},
 
@@ -10300,6 +10392,71 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 	material.linewidth = this.linewidth;
 	material.linecap = this.linecap;
 	material.linejoin = this.linejoin;
+
+	material.vertexColors = this.vertexColors;
+
+	material.fog = this.fog;
+
+	return material;
+
+};
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * parameters = {
+ *  color: <hex>,
+ *  opacity: <float>,
+ *
+ *  blending: THREE.NormalBlending,
+ *  depthTest: <bool>,
+ *
+ *  linewidth: <float>,
+ *
+ *  scale: <float>,
+ *  dashSize: <float>,
+ *  gapSize: <float>,
+ *
+ *  vertexColors: <bool>
+ *
+ *  fog: <bool>
+ * }
+ */
+
+THREE.LineDashedMaterial = function ( parameters ) {
+
+	THREE.Material.call( this );
+
+	this.color = new THREE.Color( 0xffffff );
+
+	this.linewidth = 1;
+
+	this.scale = 1;
+	this.dashSize = 3;
+	this.gapSize = 1;
+
+	this.vertexColors = false;
+
+	this.fog = true;
+
+	this.setValues( parameters );
+
+};
+
+THREE.LineDashedMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.LineDashedMaterial.prototype.clone = function () {
+
+	var material = new THREE.LineDashedMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+
+	material.linewidth = this.linewidth;
+
+	material.scale = this.scale;
+	material.dashSize = this.dashSize;
+	material.gapSize = this.gapSize;
 
 	material.vertexColors = this.vertexColors;
 
@@ -15747,6 +15904,75 @@ THREE.ShaderLib = {
 
 	},
 
+	'dashed': {
+
+		uniforms: THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "common" ],
+			THREE.UniformsLib[ "fog" ],
+
+			{
+				"scale":     { type: "f", value: 1 },
+				"dashSize":  { type: "f", value: 1 },
+				"totalSize": { type: "f", value: 2 }
+			}
+
+		] ),
+
+		vertexShader: [
+
+			"uniform float scale;",
+			"attribute float lineDistance;",
+
+			"varying float vLineDistance;",
+
+			THREE.ShaderChunk[ "color_pars_vertex" ],
+
+			"void main() {",
+
+				THREE.ShaderChunk[ "color_vertex" ],
+
+				"vLineDistance = scale * lineDistance;",
+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+				"gl_Position = projectionMatrix * mvPosition;",
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+
+			"uniform vec3 diffuse;",
+			"uniform float opacity;",
+
+			"uniform float dashSize;",
+			"uniform float totalSize;",
+
+			"varying float vLineDistance;",
+
+			THREE.ShaderChunk[ "color_pars_fragment" ],
+			THREE.ShaderChunk[ "fog_pars_fragment" ],
+
+			"void main() {",
+
+				"if ( mod( vLineDistance, totalSize ) > dashSize ) {",
+
+					"discard;",
+
+				"}",
+
+				"gl_FragColor = vec4( diffuse, opacity );",
+
+				THREE.ShaderChunk[ "color_fragment" ],
+				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"}"
+
+		].join("\n")
+
+	},
+
 	// Depth encoding into RGBA texture
 	// 	based on SpiderGL shadow map example
 	// 		http://spidergl.org/example.php?id=6
@@ -16293,6 +16519,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglVertexBuffer = _gl.createBuffer();
 		geometry.__webglColorBuffer = _gl.createBuffer();
+		geometry.__webglLineDistanceBuffer = _gl.createBuffer();
 
 		_this.info.memory.geometries ++;
 
@@ -16370,6 +16597,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
 		_gl.deleteBuffer( geometry.__webglColorBuffer );
+		_gl.deleteBuffer( geometry.__webglLineDistanceBuffer );
 
 		deleteCustomAttributesBuffers( geometry );
 
@@ -16517,6 +16745,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__vertexArray = new Float32Array( nvertices * 3 );
 		geometry.__colorArray = new Float32Array( nvertices * 3 );
+		geometry.__lineDistanceArray = new Float32Array( nvertices * 1 );
 
 		geometry.__webglLineCount = nvertices;
 
@@ -17113,18 +17342,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function setLineBuffers ( geometry, hint ) {
 
-		var v, c, vertex, offset, color,
+		var v, c, d, vertex, offset, color,
 
 		vertices = geometry.vertices,
 		colors = geometry.colors,
+		lineDistances = geometry.lineDistances,
+
 		vl = vertices.length,
 		cl = colors.length,
+		dl = lineDistances.length,
 
 		vertexArray = geometry.__vertexArray,
 		colorArray = geometry.__colorArray,
+		lineDistanceArray = geometry.__lineDistanceArray,
 
 		dirtyVertices = geometry.verticesNeedUpdate,
 		dirtyColors = geometry.colorsNeedUpdate,
+		dirtyLineDistances = geometry.lineDistancesNeedUpdate,
 
 		customAttributes = geometry.__webglCustomAttributesList,
 
@@ -17167,6 +17401,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglColorBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, colorArray, hint );
+
+		}
+
+		if ( dirtyLineDistances ) {
+
+			for ( d = 0; d < dl; d ++ ) {
+
+				lineDistanceArray[ d ] = lineDistances[ d ];
+
+			}
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.__webglLineDistanceBuffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, lineDistanceArray, hint );
 
 		}
 
@@ -19331,6 +19578,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
+			// line distances
+
+			if ( attributes.lineDistance >= 0 ) {
+
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglLineDistanceBuffer );
+				_gl.vertexAttribPointer( attributes.lineDistance, 1, _gl.FLOAT, false, 0, 0 );
+
+			}
+
 		}
 
 		// render mesh
@@ -20147,7 +20403,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry = object.geometry;
 
-				if( ! geometry.__webglVertexBuffer ) {
+				if ( ! geometry.__webglVertexBuffer ) {
 
 					createRibbonBuffers( geometry );
 					initRibbonBuffers( geometry, object );
@@ -20162,13 +20418,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry = object.geometry;
 
-				if( ! geometry.__webglVertexBuffer ) {
+				if ( ! geometry.__webglVertexBuffer ) {
 
 					createLineBuffers( geometry );
 					initLineBuffers( geometry, object );
 
 					geometry.verticesNeedUpdate = true;
 					geometry.colorsNeedUpdate = true;
+					geometry.lineDistancesNeedUpdate = true;
 
 				}
 
@@ -20365,7 +20622,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-			if ( geometry.verticesNeedUpdate ||  geometry.colorsNeedUpdate || customAttributesDirty ) {
+			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
 
 				setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
@@ -20373,6 +20630,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometry.verticesNeedUpdate = false;
 			geometry.colorsNeedUpdate = false;
+			geometry.lineDistancesNeedUpdate = false;
 
 			material.attributes && clearCustomAttributes( material );
 
@@ -20523,6 +20781,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			shaderID = 'basic';
 
+		} else if ( material instanceof THREE.LineDashedMaterial ) {
+
+			shaderID = 'dashed';
+
 		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
 
 			shaderID = 'particle_basic';
@@ -20600,6 +20862,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( attributes.color >= 0 ) _gl.enableVertexAttribArray( attributes.color );
 		if ( attributes.normal >= 0 ) _gl.enableVertexAttribArray( attributes.normal );
 		if ( attributes.tangent >= 0 ) _gl.enableVertexAttribArray( attributes.tangent );
+		if ( attributes.lineDistance >= 0 ) _gl.enableVertexAttribArray( attributes.lineDistance );
 
 		if ( material.skinning &&
 			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
@@ -20800,6 +21063,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsLine( m_uniforms, material );
 
+			} else if ( material instanceof THREE.LineDashedMaterial ) {
+
+				refreshUniformsLine( m_uniforms, material );
+				refreshUniformsDash( m_uniforms, material );
+
 			} else if ( material instanceof THREE.ParticleBasicMaterial ) {
 
 				refreshUniformsParticle( m_uniforms, material );
@@ -20970,6 +21238,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.diffuse.value = material.color;
 		uniforms.opacity.value = material.opacity;
+
+	};
+
+	function refreshUniformsDash ( uniforms, material ) {
+
+		uniforms.dashSize.value = material.dashSize;
+		uniforms.totalSize.value = material.dashSize + material.gapSize;
+		uniforms.scale.value = material.scale;
 
 	};
 
@@ -22078,7 +22354,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		identifiers = [
 
 			"position", "normal", "uv", "uv2", "tangent", "color",
-			"skinIndex", "skinWeight"
+			"skinIndex", "skinWeight", "lineDistance"
 
 		];
 
@@ -23020,81 +23296,13 @@ THREE.ColorUtils = {
 
 		var hsv = THREE.ColorUtils.__hsv;
 
-		THREE.ColorUtils.rgbToHsv( color, hsv );
+		color.getHSV( hsv );
 
 		hsv.h = THREE.Math.clamp( hsv.h + h, 0, 1 );
 		hsv.s = THREE.Math.clamp( hsv.s + s, 0, 1 );
 		hsv.v = THREE.Math.clamp( hsv.v + v, 0, 1 );
 
 		color.setHSV( hsv.h, hsv.s, hsv.v );
-
-	},
-
-	// based on MochiKit implementation by Bob Ippolito
-
-	rgbToHsv : function ( color, hsv ) {
-
-		var r = color.r;
-		var g = color.g;
-		var b = color.b;
-
-		var max = Math.max( Math.max( r, g ), b );
-		var min = Math.min( Math.min( r, g ), b );
-
-		var hue;
-		var saturation;
-		var value = max;
-
-		if ( min === max )	{
-
-			hue = 0;
-			saturation = 0;
-
-		} else {
-
-			var delta = ( max - min );
-			saturation = delta / max;
-
-			if ( r === max ) {
-
-				hue = ( g - b ) / delta;
-
-			} else if ( g === max ) {
-
-				hue = 2 + ( ( b - r ) / delta );
-
-			} else	{
-
-				hue = 4 + ( ( r - g ) / delta );
-			}
-
-			hue /= 6;
-
-			if ( hue < 0 ) {
-
-				hue += 1;
-
-			}
-
-			if ( hue > 1 ) {
-
-				hue -= 1;
-
-			}
-
-		}
-
-		if ( hsv === undefined ) {
-
-			hsv = { h: 0, s: 0, v: 0 };
-
-		}
-
-		hsv.h = hue;
-		hsv.s = saturation;
-		hsv.v = value;
-
-		return hsv;
 
 	}
 
@@ -29602,6 +29810,45 @@ THREE.CombinedCamera.prototype.toBottomView = function() {
 };
 
 /**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ *	- 3d asterisk shape (for line pieces THREE.Line)
+ */
+
+THREE.AsteriskGeometry = function ( innerRadius, outerRadius ) {
+
+	THREE.Geometry.call( this );
+
+	var sd = innerRadius;
+	var ed = outerRadius;
+
+	var sd2 = 0.707 * sd;
+	var ed2 = 0.707 * ed;
+
+	var rays = [ [ sd, 0, 0 ], [ ed, 0, 0 ], [ -sd, 0, 0 ], [ -ed, 0, 0 ],
+				 [ 0, sd, 0 ], [ 0, ed, 0 ], [ 0, -sd, 0 ], [ 0, -ed, 0 ],
+				 [ 0, 0, sd ], [ 0, 0, ed ], [ 0, 0, -sd ], [ 0, 0, -ed ],
+				 [ sd2, sd2, 0 ], [ ed2, ed2, 0 ], [ -sd2, -sd2, 0 ], [ -ed2, -ed2, 0 ],
+				 [ sd2, -sd2, 0 ], [ ed2, -ed2, 0 ], [ -sd2, sd2, 0 ], [ -ed2, ed2, 0 ],
+				 [ sd2, 0, sd2 ], [ ed2, 0, ed2 ], [ -sd2, 0, -sd2 ], [ -ed2, 0, -ed2 ],
+				 [ sd2, 0, -sd2 ], [ ed2, 0, -ed2 ], [ -sd2, 0, sd2 ], [ -ed2, 0, ed2 ],
+				 [ 0, sd2, sd2 ], [ 0, ed2, ed2 ], [ 0, -sd2, -sd2 ], [ 0, -ed2, -ed2 ],
+				 [ 0, sd2, -sd2 ], [ 0, ed2, -ed2 ], [ 0, -sd2, sd2 ], [ 0, -ed2, ed2 ]
+	];
+
+	for ( var i = 0, il = rays.length; i < il; i ++ ) {
+
+		var x = rays[ i ][ 0 ];
+		var y = rays[ i ][ 1 ];
+		var z = rays[ i ][ 2 ];
+
+		this.vertices.push( new THREE.Vector3( x, y, z ) );
+
+	}
+
+};
+
+THREE.AsteriskGeometry.prototype = Object.create( THREE.Geometry.prototype );/**
  * @author hughes
  */
 
@@ -32380,6 +32627,200 @@ THREE.CameraHelper.prototype.update = function () {
 THREE.CameraHelper.__projector = new THREE.Projector();
 THREE.CameraHelper.__v = new THREE.Vector3();
 THREE.CameraHelper.__c = new THREE.Camera();
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ *	- shows directional light color, intensity, position, orientation and target
+ */
+
+THREE.DirectionalLightHelper = function ( light, sphereSize, arrowLength ) {
+
+	THREE.Object3D.call( this );
+
+	this.light = light;
+
+	// position
+
+	this.position = light.position;
+
+	// direction
+
+	this.direction = new THREE.Vector3();
+	this.direction.sub( light.target.position, light.position );
+
+	// color
+
+	this.color = light.color.clone();
+
+	this.color.r *= light.intensity;
+	this.color.g *= light.intensity;
+	this.color.b *= light.intensity;
+
+	var hexColor = this.color.getHex();
+
+	// light helper
+
+	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
+	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
+
+	var bulbMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
+	var raysMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
+
+	this.lightArrow = new THREE.ArrowHelper( this.direction, null, arrowLength, hexColor );
+	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+
+	this.lightArrow.cone.material.fog = false;
+	this.lightArrow.line.material.fog = false;
+
+	this.lightRays = new THREE.Line( raysGeometry, raysMaterial, THREE.LinePieces );
+
+	this.add( this.lightArrow );
+	this.add( this.lightSphere );
+	this.add( this.lightRays );
+
+	this.lightSphere.properties.isGizmo = true;
+	this.lightSphere.properties.gizmoSubject = light;
+	this.lightSphere.properties.gizmoRoot = this;
+
+	// light target helper
+
+	this.targetSphere = null;
+
+	if ( light.target.properties.targetInverse ) {
+
+		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
+		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
+
+		this.targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
+		this.targetSphere.position = light.target.position;
+
+		this.targetSphere.properties.isGizmo = true;
+		this.targetSphere.properties.gizmoSubject = light.target;
+		this.targetSphere.properties.gizmoRoot = this.targetSphere;
+
+		var lineMaterial = new THREE.LineDashedMaterial( { color: hexColor, dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
+		var lineGeometry = new THREE.Geometry();
+		lineGeometry.vertices.push( this.position.clone() );
+		lineGeometry.vertices.push( this.targetSphere.position.clone() );
+		lineGeometry.computeLineDistances();
+
+		this.targetLine = new THREE.Line( lineGeometry, lineMaterial );
+		this.targetLine.properties.isGizmo = true;
+
+	}
+
+	//
+
+	this.properties.isGizmo = true;
+
+}
+
+THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.DirectionalLightHelper.prototype.update = function () {
+
+	// update arrow orientation
+	// pointing from light to target
+
+	this.direction.sub( this.light.target.position, this.light.position );
+	this.lightArrow.setDirection( this.direction );
+
+	// update arrow, spheres, rays and line colors to light color * light intensity
+
+	this.color.copy( this.light.color );
+
+	var intensity = THREE.Math.clamp( this.light.intensity, 0, 1 );
+	this.color.r *= intensity;
+	this.color.g *= intensity;
+	this.color.b *= intensity;
+
+	this.lightArrow.setColor( this.color.getHex() );
+	this.lightSphere.material.color.copy( this.color );
+	this.lightRays.material.color.copy( this.color );
+
+	this.targetSphere.material.color.copy( this.color );
+	this.targetLine.material.color.copy( this.color );
+
+	// update target line vertices
+
+	this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
+	this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+
+	this.targetLine.geometry.computeLineDistances();
+	this.targetLine.geometry.verticesNeedUpdate = true;
+
+}
+
+/**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ *	- shows point light color, intensity, and position
+ */
+
+THREE.PointLightHelper = function ( light, sphereSize ) {
+
+	THREE.Object3D.call( this );
+
+	this.light = light;
+
+	// position
+
+	this.position = light.position;
+
+	// color
+
+	this.color = light.color.clone();
+
+	this.color.r *= light.intensity;
+	this.color.g *= light.intensity;
+	this.color.b *= light.intensity;
+
+	var hexColor = this.color.getHex();
+
+	// light helper
+
+	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
+	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
+
+	var bulbMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
+	var raysMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
+
+	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
+	this.lightRays = new THREE.Line( raysGeometry, raysMaterial, THREE.LinePieces );
+
+	this.add( this.lightSphere );
+	this.add( this.lightRays );
+
+	//
+
+	this.lightSphere.properties.isGizmo = true;
+	this.lightSphere.properties.gizmoSubject = light;
+	this.lightSphere.properties.gizmoRoot = this;
+
+	//
+
+	this.properties.isGizmo = true;
+
+}
+
+THREE.PointLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.PointLightHelper.prototype.update = function () {
+
+	// update sphere and rays colors to light color * light intensity
+
+	this.color.copy( this.light.color );
+
+	var intensity = THREE.Math.clamp( this.light.intensity, 0, 1 );
+	this.color.r *= intensity;
+	this.color.g *= intensity;
+	this.color.b *= intensity;
+
+	this.lightSphere.material.color.copy( this.color );
+	this.lightRays.material.color.copy( this.color );
+
+}
 
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog 

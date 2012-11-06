@@ -181,6 +181,76 @@ THREE.Color.prototype = {
 
 	},
 
+
+	getHSV: function ( hsv ) {
+
+		// based on MochiKit implementation by Bob Ippolito
+		// h,s,v ranges are < 0.0 - 1.0 >
+
+		var r = this.r;
+		var g = this.g;
+		var b = this.b;
+
+		var max = Math.max( Math.max( r, g ), b );
+		var min = Math.min( Math.min( r, g ), b );
+
+		var hue;
+		var saturation;
+		var value = max;
+
+		if ( min === max )	{
+
+			hue = 0;
+			saturation = 0;
+
+		} else {
+
+			var delta = ( max - min );
+			saturation = delta / max;
+
+			if ( r === max ) {
+
+				hue = ( g - b ) / delta;
+
+			} else if ( g === max ) {
+
+				hue = 2 + ( ( b - r ) / delta );
+
+			} else	{
+
+				hue = 4 + ( ( r - g ) / delta );
+			}
+
+			hue /= 6;
+
+			if ( hue < 0 ) {
+
+				hue += 1;
+
+			}
+
+			if ( hue > 1 ) {
+
+				hue -= 1;
+
+			}
+
+		}
+
+		if ( hsv === undefined ) {
+
+			hsv = { h: 0, s: 0, v: 0 };
+
+		}
+
+		hsv.h = hue;
+		hsv.s = saturation;
+		hsv.v = value;
+
+		return hsv;
+
+	},
+
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );

@@ -32,6 +32,8 @@ THREE.Geometry = function () {
 	this.skinWeights = [];
 	this.skinIndices = [];
 
+	this.lineDistances = [];
+
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
@@ -47,6 +49,7 @@ THREE.Geometry = function () {
 	this.normalsNeedUpdate = false;
 	this.tangentsNeedUpdate = false;
 	this.colorsNeedUpdate = false;
+	this.lineDistancesNeedUpdate = false;
 
 	this.buffersNeedUpdate = false;
 
@@ -492,6 +495,25 @@ THREE.Geometry.prototype = {
 		}
 
 		this.hasTangents = true;
+
+	},
+
+	computeLineDistances: function ( ) {
+
+		var d = 0;
+		var vertices = this.vertices;
+
+		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+
+			if ( i > 0 ) {
+
+				d += vertices[ i ].distanceTo( vertices[ i - 1 ] );
+
+			}
+
+			this.lineDistances[ i ] = d;
+
+		}
 
 	},
 
