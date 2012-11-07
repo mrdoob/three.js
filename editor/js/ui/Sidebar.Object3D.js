@@ -3,6 +3,7 @@ Sidebar.Object3D = function ( signals ) {
 	var objects = {
 
 		'PerspectiveCamera': THREE.PerspectiveCamera,
+		'AmbientLight': THREE.AmbientLight,
 		'PointLight': THREE.PointLight,
 		'DirectionalLight': THREE.DirectionalLight,
 		'Mesh': THREE.Mesh,

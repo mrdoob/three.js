@@ -68,6 +68,8 @@ var Viewport = function ( signals ) {
 	var light3 = new THREE.PointLight( 0xffaa00, 0.75 );
 	light3.position.set( 0, -200, 0 );
 
+	var light4 = new THREE.AmbientLight( 0x111111 );
+
 	// fog
 
 	var oldFogType = "None";
@@ -87,6 +89,8 @@ var Viewport = function ( signals ) {
 	light2.target.name = "Light 2 Target";
 
 	light3.name = "Light 3";
+
+	light4.name = "Light 4";
 
 	// active objects
 
@@ -754,6 +758,7 @@ var Viewport = function ( signals ) {
 	signals.objectAdded.dispatch( light1 );
 	signals.objectAdded.dispatch( light2 );
 	signals.objectAdded.dispatch( light3 );
+	signals.objectAdded.dispatch( light4 );
 
 	//
 
