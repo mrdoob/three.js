@@ -157,9 +157,9 @@ THREE.Color.prototype = {
 
 		var color = /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/i.exec(contextStyle);
 
-		this.r = parseInt(color[1], 10);
-		this.g = parseInt(color[2], 10);
-		this.b = parseInt(color[3], 10);
+		this.r = parseInt(color[1], 10) / 255;
+		this.g = parseInt(color[2], 10) / 255;
+		this.b = parseInt(color[3], 10) / 255;
 
 		return this;
 
