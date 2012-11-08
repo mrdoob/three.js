@@ -5,6 +5,7 @@ Sidebar.Object3D = function ( signals ) {
 		'PerspectiveCamera': THREE.PerspectiveCamera,
 		'AmbientLight': THREE.AmbientLight,
 		'DirectionalLight': THREE.DirectionalLight,
+		'HemisphereLight': THREE.HemisphereLight,
 		'PointLight': THREE.PointLight,
 		'SpotLight': THREE.SpotLight,
 		'Mesh': THREE.Mesh,
@@ -136,6 +137,16 @@ Sidebar.Object3D = function ( signals ) {
 	objectColorRow.add( objectColor );
 
 	container.add( objectColorRow );
+
+	// ground color
+
+	var objectGroundColorRow = new UI.Panel();
+	var objectGroundColor = new UI.Color( 'absolute' ).setLeft( '100px' ).onChange( update );
+
+	objectGroundColorRow.add( new UI.Text().setValue( 'Ground color' ).setColor( '#666' ) );
+	objectGroundColorRow.add( objectGroundColor );
+
+	container.add( objectGroundColorRow );
 
 	// distance
 
@@ -272,6 +283,12 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
+			if ( selected.groundColor !== undefined ) {
+
+				selected.groundColor.setHex( objectGroundColor.getHexValue() );
+
+			}
+
 			if ( selected.distance !== undefined ) {
 
 				selected.distance = objectDistance.getValue();
@@ -304,6 +321,7 @@ Sidebar.Object3D = function ( signals ) {
 			'far': objectFarRow,
 			'intensity': objectIntensityRow,
 			'color': objectColorRow,
+			'groundColor': objectGroundColorRow,
 			'distance' : objectDistanceRow,
 			'angle' : objectAngleRow,
 			'exponent' : objectExponentRow
@@ -398,6 +416,12 @@ Sidebar.Object3D = function ( signals ) {
 			if ( object.color !== undefined ) {
 
 				objectColor.setValue( '#' + object.color.getHexString() );
+
+			}
+
+			if ( object.groundColor !== undefined ) {
+
+				objectGroundColor.setValue( '#' + object.groundColor.getHexString() );
 
 			}
 
@@ -500,6 +524,12 @@ Sidebar.Object3D = function ( signals ) {
 		if ( object.color !== undefined ) {
 
 			objectColor.setValue( '#' + object.color.getHexString() );
+
+		}
+
+		if ( object.groundColor !== undefined ) {
+
+			objectGroundColor.setValue( '#' + object.groundColor.getHexString() );
 
 		}
 

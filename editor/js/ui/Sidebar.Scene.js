@@ -5,6 +5,7 @@ Sidebar.Scene = function ( signals ) {
 		'PerspectiveCamera': THREE.PerspectiveCamera,
 		'AmbientLight': THREE.AmbientLight,
 		'DirectionalLight': THREE.DirectionalLight,
+		'HemisphereLight': THREE.HemisphereLight,
 		'PointLight': THREE.PointLight,
 		'SpotLight': THREE.SpotLight,
 		'Mesh': THREE.Mesh,
