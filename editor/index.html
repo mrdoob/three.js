@@ -351,8 +351,8 @@
 
 			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
 
-			var color = Math.random() * 0xffffff;
-			var material = new THREE.MeshPhongMaterial( { color: color } );
+			var material = new THREE.MeshPhongMaterial();
+			material.color.setHSV( Math.random(), Math.random(), 1 );
 
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.name = "Sphere";

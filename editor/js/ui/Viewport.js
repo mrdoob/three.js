@@ -66,11 +66,11 @@ var Viewport = function ( signals ) {
 	light2.target.properties.targetInverse = light2;
 
 	var light3 = new THREE.PointLight( 0xffaa00, 0.75 );
-	light3.position.set( -200, 200, -200 );
+	light3.position.set( -250, 200, -200 );
 
 	//var light4 = new THREE.AmbientLight( 0x111111 );
-	var light4 = new THREE.HemisphereLight( 0x00aaff, 0xff0000, 1 );
-	light4.position.y = 500;
+	var light4 = new THREE.HemisphereLight( 0x00aaff, 0xff0000, 0.75 );
+	light4.position.y = 250;
 
 	// fog
 

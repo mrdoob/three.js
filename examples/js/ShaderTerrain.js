@@ -230,8 +230,8 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-						"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+						"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+						"vec3 lVector = normalize( lDirection.xyz );",
 
 						// diffuse
 
@@ -250,7 +250,7 @@ THREE.ShaderTerrain = {
 
 						// specular (ground light)
 
-						"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+						"vec3 lVectorGround = -lVector;",
 
 						"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 						"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",

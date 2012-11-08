@@ -5773,11 +5773,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				position = light.matrixWorld.getPosition();
+				_direction.copy( light.matrixWorld.getPosition() );
+				_direction.normalize();
 
-				hemiPositions[ hemiOffset ]     = position.x;
-				hemiPositions[ hemiOffset + 1 ] = position.y;
-				hemiPositions[ hemiOffset + 2 ] = position.z;
+				hemiPositions[ hemiOffset ]     = _direction.x;
+				hemiPositions[ hemiOffset + 1 ] = _direction.y;
+				hemiPositions[ hemiOffset + 2 ] = _direction.z;
 
 				hemiLength += 1;
 

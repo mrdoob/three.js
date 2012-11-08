@@ -255,8 +255,8 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-						"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+						"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+						"vec3 lVector = normalize( lDirection.xyz );",
 
 						"float dotProduct = dot( normal, lVector );",
 						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
@@ -270,7 +270,7 @@ THREE.ShaderSkin = {
 
 						// specular (ground light)
 
-						"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+						"vec3 lVectorGround = -lVector;",
 						"hemiSpecularWeight += KS_Skin_Specular( normal, lVectorGround, viewPosition, uRoughness, uSpecularBrightness );",
 
 						"specularTotal += uSpecularColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",

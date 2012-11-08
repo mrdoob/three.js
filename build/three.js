@@ -14221,10 +14221,8 @@ THREE.ShaderChunk = {
 
 			"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-				"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-				"lVector = normalize( lVector );",
+				"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+				"vec3 lVector = normalize( lDirection.xyz );",
 
 				"float dotProduct = dot( transformedNormal, lVector );",
 
@@ -14658,8 +14656,8 @@ THREE.ShaderChunk = {
 
 			"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-				"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-				"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+				"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+				"vec3 lVector = normalize( lDirection.xyz );",
 
 				// diffuse
 
@@ -14678,7 +14676,7 @@ THREE.ShaderChunk = {
 
 				// specular (ground light)
 
-				"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+				"vec3 lVectorGround = -lVector;",
 
 				"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 				"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
@@ -21794,11 +21792,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				position = light.matrixWorld.getPosition();
+				_direction.copy( light.matrixWorld.getPosition() );
+				_direction.normalize();
 
-				hemiPositions[ hemiOffset ]     = position.x;
-				hemiPositions[ hemiOffset + 1 ] = position.y;
-				hemiPositions[ hemiOffset + 2 ] = position.z;
+				hemiPositions[ hemiOffset ]     = _direction.x;
+				hemiPositions[ hemiOffset + 1 ] = _direction.y;
+				hemiPositions[ hemiOffset + 2 ] = _direction.z;
 
 				hemiLength += 1;
 
@@ -25408,8 +25407,8 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-							"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-							"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+							"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+							"vec3 lVector = normalize( lDirection.xyz );",
 
 							// diffuse
 
@@ -25429,7 +25428,7 @@ THREE.ShaderUtils = {
 
 							// specular (ground light)
 
-							"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+							"vec3 lVectorGround = -lVector;",
 
 							"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 							"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
