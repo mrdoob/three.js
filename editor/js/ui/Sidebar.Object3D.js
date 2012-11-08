@@ -4,8 +4,9 @@ Sidebar.Object3D = function ( signals ) {
 
 		'PerspectiveCamera': THREE.PerspectiveCamera,
 		'AmbientLight': THREE.AmbientLight,
-		'PointLight': THREE.PointLight,
 		'DirectionalLight': THREE.DirectionalLight,
+		'PointLight': THREE.PointLight,
+		'SpotLight': THREE.SpotLight,
 		'Mesh': THREE.Mesh,
 		'Object3D': THREE.Object3D
 
@@ -126,7 +127,6 @@ Sidebar.Object3D = function ( signals ) {
 
 	container.add( objectIntensityRow );
 
-
 	// color
 
 	var objectColorRow = new UI.Panel();
@@ -146,6 +146,26 @@ Sidebar.Object3D = function ( signals ) {
 	objectDistanceRow.add( objectDistance );
 
 	container.add( objectDistanceRow );
+
+	// angle
+
+	var objectAngleRow = new UI.Panel();
+	var objectAngle = new UI.Number( 'absolute' ).setPrecision( 3 ).setRange( 0, Math.PI * 2 ).setLeft( '100px' ).onChange( update );
+
+	objectAngleRow.add( new UI.Text().setValue( 'Angle' ).setColor( '#666' ) );
+	objectAngleRow.add( objectAngle );
+
+	container.add( objectAngleRow );
+
+	// exponent
+
+	var objectExponentRow = new UI.Panel();
+	var objectExponent = new UI.Number( 'absolute' ).setRange( 0, Infinity ).setLeft( '100px' ).onChange( update );
+
+	objectExponentRow.add( new UI.Text().setValue( 'Exponent' ).setColor( '#666' ) );
+	objectExponentRow.add( objectExponent );
+
+	container.add( objectExponentRow );
 
 	//
 
@@ -258,6 +278,18 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
+			if ( selected.angle !== undefined ) {
+
+				selected.angle = objectAngle.getValue();
+
+			}
+
+			if ( selected.exponent !== undefined ) {
+
+				selected.exponent = objectExponent.getValue();
+
+			}
+
 			signals.objectChanged.dispatch( selected );
 
 		}
@@ -272,7 +304,9 @@ Sidebar.Object3D = function ( signals ) {
 			'far': objectFarRow,
 			'intensity': objectIntensityRow,
 			'color': objectColorRow,
-			'distance' : objectDistanceRow
+			'distance' : objectDistanceRow,
+			'angle' : objectAngleRow,
+			'exponent' : objectExponentRow
 		};
 
 		for ( var property in properties ) {
@@ -373,6 +407,18 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
+			if ( object.angle !== undefined ) {
+
+				objectAngle.setValue( object.angle );
+
+			}
+
+			if ( object.exponent !== undefined ) {
+
+				objectExponent.setValue( object.exponent );
+
+			}
+
 			objectVisible.setValue( object.visible );
 
 			updateRows();
@@ -460,6 +506,18 @@ Sidebar.Object3D = function ( signals ) {
 		if ( object.distance !== undefined ) {
 
 			objectDistance.setValue( object.distance );
+
+		}
+
+		if ( object.angle !== undefined ) {
+
+			objectAngle.setValue( object.angle );
+
+		}
+
+		if ( object.exponent !== undefined ) {
+
+			objectExponent.setValue( object.exponent );
 
 		}
 

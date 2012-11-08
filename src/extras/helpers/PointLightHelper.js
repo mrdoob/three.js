@@ -18,9 +18,11 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	this.color = light.color.clone();
 
-	this.color.r *= light.intensity;
-	this.color.g *= light.intensity;
-	this.color.b *= light.intensity;
+	var intensity = THREE.Math.clamp( light.intensity, 0, 1 );
+
+	this.color.r *= intensity;
+	this.color.g *= intensity;
+	this.color.b *= intensity;
 
 	var hexColor = this.color.getHex();
 

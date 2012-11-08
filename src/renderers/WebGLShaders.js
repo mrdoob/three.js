@@ -606,8 +606,6 @@ THREE.ShaderChunk = {
 				"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-				"lVector = normalize( lVector );",
-
 				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - mPosition.xyz ) );",
 
 				"if ( spotEffect > spotLightAngle[ i ] ) {",
@@ -617,6 +615,8 @@ THREE.ShaderChunk = {
 					"float lDistance = 1.0;",
 					"if ( spotLightDistance[ i ] > 0.0 )",
 						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+
+					"lVector = normalize( lVector );",
 
 					"float dotProduct = dot( transformedNormal, lVector );",
 					"vec3 spotLightWeighting = vec3( max( dotProduct, 0.0 ) );",
