@@ -1538,6 +1538,7 @@ THREE.Vector4.prototype = {
 };
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.Matrix3 = function () {
@@ -1549,6 +1550,20 @@ THREE.Matrix3 = function () {
 THREE.Matrix3.prototype = {
 
 	constructor: THREE.Matrix3,
+
+	multiplyVector3: function ( v ) {
+
+		var te = this.elements;
+
+		var vx = v.x, vy = v.y, vz = v.z;
+
+		v.x = te[0] * vx + te[3] * vy + te[6] * vz;
+		v.y = te[1] * vx + te[4] * vy + te[7] * vz;
+		v.z = te[2] * vx + te[5] * vy + te[8] * vz;
+
+		return v;
+
+	},
 
 	getInverse: function ( matrix ) {
 
@@ -3914,6 +3929,8 @@ THREE.Projector = function() {
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
 		v1, v2, v3, v4, isFaceMaterial, material, side;
 
+		rotationMatrix = new THREE.Matrix3();
+
 		_face3Count = 0;
 		_face4Count = 0;
 		_lineCount = 0;
@@ -3949,7 +3966,8 @@ THREE.Projector = function() {
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
 
-				rotationMatrix = object.matrixRotationWorld.extractRotation( modelMatrix );
+				rotationMatrix.getInverse( modelMatrix );
+				rotationMatrix.transpose();
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				side = object.material.side;
@@ -4053,7 +4071,7 @@ THREE.Projector = function() {
 					_face.normalWorld.copy( face.normal );
 
 					if ( visible === false && ( side === THREE.BackSide || side === THREE.DoubleSide ) ) _face.normalWorld.negate();
-					rotationMatrix.multiplyVector3( _face.normalWorld );
+					rotationMatrix.multiplyVector3( _face.normalWorld ).normalize();
 
 					_face.centroidWorld.copy( face.centroid );
 					modelMatrix.multiplyVector3( _face.centroidWorld );
@@ -4070,7 +4088,7 @@ THREE.Projector = function() {
 
 						if ( visible === false && ( side === THREE.BackSide || side === THREE.DoubleSide ) ) normal.negate();
 
-						rotationMatrix.multiplyVector3( normal );
+						rotationMatrix.multiplyVector3( normal ).normalize();
 
 					}
 
