@@ -61,8 +61,9 @@ THREE.Geometry.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		var matrixRotation = new THREE.Matrix4();
-		matrixRotation.extractRotation( matrix );
+		var normalMatrix = new THREE.Matrix3();
+
+		normalMatrix.getInverse( matrix ).transpose();
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -76,11 +77,11 @@ THREE.Geometry.prototype = {
 
 			var face = this.faces[ i ];
 
-			matrixRotation.multiplyVector3( face.normal );
+			normalMatrix.multiplyVector3( face.normal ).normalize();
 
 			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
-				matrixRotation.multiplyVector3( face.vertexNormals[ j ] );
+				normalMatrix.multiplyVector3( face.vertexNormals[ j ] ).normalize();
 
 			}
 

@@ -1,5 +1,6 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.Matrix3 = function () {
@@ -11,6 +12,20 @@ THREE.Matrix3 = function () {
 THREE.Matrix3.prototype = {
 
 	constructor: THREE.Matrix3,
+
+	multiplyVector3: function ( v ) {
+
+		var te = this.elements;
+
+		var vx = v.x, vy = v.y, vz = v.z;
+
+		v.x = te[0] * vx + te[3] * vy + te[6] * vz;
+		v.y = te[1] * vx + te[4] * vy + te[7] * vz;
+		v.z = te[2] * vx + te[5] * vy + te[8] * vz;
+
+		return v;
+
+	},
 
 	getInverse: function ( matrix ) {
 
