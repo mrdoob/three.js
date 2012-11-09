@@ -20,6 +20,7 @@ THREE.Projector = function() {
 
 	_viewProjectionMatrix = new THREE.Matrix4(),
 	_modelViewProjectionMatrix = new THREE.Matrix4(),
+	_normalMatrix = new THREE.Matrix3(),
 
 	_frustum = new THREE.Frustum(),
 
@@ -171,12 +172,10 @@ THREE.Projector = function() {
 
 		var near = camera.near, far = camera.far, visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
-		modelMatrix, rotationMatrix,
+		modelMatrix,
 		geometry, geometryMaterials, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
 		v1, v2, v3, v4, isFaceMaterial, material, side;
-
-		rotationMatrix = new THREE.Matrix3();
 
 		_face3Count = 0;
 		_face4Count = 0;
@@ -213,8 +212,8 @@ THREE.Projector = function() {
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
 
-				rotationMatrix.getInverse( modelMatrix );
-				rotationMatrix.transpose();
+				_normalMatrix.getInverse( modelMatrix );
+				_normalMatrix.transpose();
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				side = object.material.side;
@@ -318,7 +317,7 @@ THREE.Projector = function() {
 					_face.normalWorld.copy( face.normal );
 
 					if ( visible === false && ( side === THREE.BackSide || side === THREE.DoubleSide ) ) _face.normalWorld.negate();
-					rotationMatrix.multiplyVector3( _face.normalWorld ).normalize();
+					_normalMatrix.multiplyVector3( _face.normalWorld ).normalize();
 
 					_face.centroidWorld.copy( face.centroid );
 					modelMatrix.multiplyVector3( _face.centroidWorld );
@@ -335,7 +334,7 @@ THREE.Projector = function() {
 
 						if ( visible === false && ( side === THREE.BackSide || side === THREE.DoubleSide ) ) normal.negate();
 
-						rotationMatrix.multiplyVector3( normal ).normalize();
+						_normalMatrix.multiplyVector3( normal ).normalize();
 
 					}
 
