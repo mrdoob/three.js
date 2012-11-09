@@ -100,7 +100,7 @@ var Viewport = function ( signals ) {
 
 	// object picking
 
-	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ) );
+	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000, 8, 8 ) );
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
 
