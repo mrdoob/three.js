@@ -14013,7 +14013,7 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
 			"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-			"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+			"uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
 
 		"#endif",
 
@@ -14221,7 +14221,7 @@ THREE.ShaderChunk = {
 
 			"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-				"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+				"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
 				"vec3 lVector = normalize( lDirection.xyz );",
 
 				"float dotProduct = dot( transformedNormal, lVector );",
@@ -14349,7 +14349,7 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
 			"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-			"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+			"uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
 
 		"#endif",
 
@@ -14656,7 +14656,7 @@ THREE.ShaderChunk = {
 
 			"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-				"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+				"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
 				"vec3 lVector = normalize( lDirection.xyz );",
 
 				// diffuse
@@ -15390,7 +15390,7 @@ THREE.UniformsLib = {
 		"directionalLightDirection" : { type: "fv", value: [] },
 		"directionalLightColor" : { type: "fv", value: [] },
 
-		"hemisphereLightPosition" : { type: "fv", value: [] },
+		"hemisphereLightDirection" : { type: "fv", value: [] },
 		"hemisphereLightSkyColor" : { type: "fv", value: [] },
 		"hemisphereLightGroundColor" : { type: "fv", value: [] },
 
@@ -21333,7 +21333,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
 		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
-		uniforms.hemisphereLightPosition.value = lights.hemi.positions;
+		uniforms.hemisphereLightDirection.value = lights.hemi.positions;
 
 	};
 
@@ -25122,7 +25122,7 @@ THREE.ShaderUtils = {
 
 					"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
 					"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-					"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+					"uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
 
 				"#endif",
 
@@ -25407,7 +25407,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-							"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+							"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
 							"vec3 lVector = normalize( lDirection.xyz );",
 
 							// diffuse

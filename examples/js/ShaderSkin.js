@@ -96,7 +96,7 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
 				"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-				"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+				"uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
 
 			"#endif",
 
@@ -255,7 +255,7 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec4 lDirection = viewMatrix * vec4( hemisphereLightPosition[ i ], 0.0 );",
+						"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
 						"vec3 lVector = normalize( lDirection.xyz );",
 
 						"float dotProduct = dot( normal, lVector );",

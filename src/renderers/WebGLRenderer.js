@@ -5314,7 +5314,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
 		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
-		uniforms.hemisphereLightPosition.value = lights.hemi.positions;
+		uniforms.hemisphereLightDirection.value = lights.hemi.positions;
 
 	};
 
