@@ -50,10 +50,13 @@ THREE.BufferGeometry.prototype = {
 
 		if ( normalArray !== undefined ) {
 
-			var matrixRotation = new THREE.Matrix4();
-			matrixRotation.extractRotation( matrix );
+			var normalMatrix = new THREE.Matrix3();
+			normalMatrix.getInverse( matrix ).transpose();
 
-			matrixRotation.multiplyVector3Array( normalArray );
+			normalMatrix.multiplyVector3Array( normalArray );
+
+			this.normalizeNormals();
+
 			this.normalsNeedUpdate = true;
 
 		}
@@ -236,15 +239,15 @@ THREE.BufferGeometry.prototype = {
 					ab.sub( pA, pB );
 					cb.crossSelf( ab );
 
-					normals[ vA * 3 ] += cb.x;
+					normals[ vA * 3 ] 	  += cb.x;
 					normals[ vA * 3 + 1 ] += cb.y;
 					normals[ vA * 3 + 2 ] += cb.z;
 
-					normals[ vB * 3 ] += cb.x;
+					normals[ vB * 3 ] 	  += cb.x;
 					normals[ vB * 3 + 1 ] += cb.y;
 					normals[ vB * 3 + 2 ] += cb.z;
 
-					normals[ vC * 3 ] += cb.x;
+					normals[ vC * 3 ] 	  += cb.x;
 					normals[ vC * 3 + 1 ] += cb.y;
 					normals[ vC * 3 + 2 ] += cb.z;
 
@@ -252,23 +255,31 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			// normalize normals
-
-			for ( i = 0, il = normals.length; i < il; i += 3 ) {
-
-				x = normals[ i ];
-				y = normals[ i + 1 ];
-				z = normals[ i + 2 ];
-
-				var n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-				normals[ i ] *= n;
-				normals[ i + 1 ] *= n;
-				normals[ i + 2 ] *= n;
-
-			}
+			this.normalizeNormals();
 
 			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	normalizeNormals: function () {
+
+		var normals = this.attributes[ "normal" ].array;
+
+		var x, y, z, n;
+
+		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
+
+			x = normals[ i ];
+			y = normals[ i + 1 ];
+			z = normals[ i + 2 ];
+
+			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+
+			normals[ i ] 	 *= n;
+			normals[ i + 1 ] *= n;
+			normals[ i + 2 ] *= n;
 
 		}
 

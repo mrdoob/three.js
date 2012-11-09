@@ -27,13 +27,35 @@ THREE.Matrix3.prototype = {
 
 	},
 
+	multiplyVector3Array: function ( a ) {
+
+		var tmp = THREE.Matrix3.__v1;
+
+		for ( var i = 0, il = a.length; i < il; i += 3 ) {
+
+			tmp.x = a[ i ];
+			tmp.y = a[ i + 1 ];
+			tmp.z = a[ i + 2 ];
+
+			this.multiplyVector3( tmp );
+
+			a[ i ]     = tmp.x;
+			a[ i + 1 ] = tmp.y;
+			a[ i + 2 ] = tmp.z;
+
+		}
+
+		return a;
+
+	},
+
 	getInverse: function ( matrix ) {
 
 		// input: THREE.Matrix4
 		// ( based on http://code.google.com/p/webgl-mjs/ )
 
-        var me = matrix.elements;
-        
+		var me = matrix.elements;
+
 		var a11 =   me[10] * me[5] - me[6] * me[9];
 		var a21 = - me[10] * me[1] + me[2] * me[9];
 		var a31 =   me[6] * me[1] - me[2] * me[5];
@@ -66,7 +88,7 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	
+
 	transpose: function () {
 
 		var tmp, m = this.elements;
@@ -78,7 +100,7 @@ THREE.Matrix3.prototype = {
 		return this;
 
 	},
-	
+
 
 	transposeIntoArray: function ( r ) {
 
@@ -99,3 +121,5 @@ THREE.Matrix3.prototype = {
 	}
 
 };
+
+THREE.Matrix3.__v1 = new THREE.Vector3();
