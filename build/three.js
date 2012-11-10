@@ -13854,15 +13854,18 @@ THREE.ShaderChunk = {
 
 		"#if defined( USE_ENVMAP ) && ! defined( USE_BUMPMAP ) && ! defined( USE_NORMALMAP )",
 
-			"vec3 nWorld = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;",
+			"vec3 worldNormal = mat3( modelMatrix[ 0 ].xyz, modelMatrix[ 1 ].xyz, modelMatrix[ 2 ].xyz ) * objectNormal;",
+			"worldNormal = normalize( worldNormal );",
+
+			"vec3 cameraToVertex = normalize( worldPosition.xyz - cameraPosition );",
 
 			"if ( useRefract ) {",
 
-				"vReflect = refract( normalize( worldPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refractionRatio );",
+				"vReflect = refract( cameraToVertex, worldNormal, refractionRatio );",
 
 			"} else {",
 
-				"vReflect = reflect( normalize( worldPosition.xyz - cameraPosition ), normalize( nWorld.xyz ) );",
+				"vReflect = reflect( cameraToVertex, worldNormal );",
 
 			"}",
 
@@ -25155,15 +25158,15 @@ THREE.ShaderUtils = {
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
-					"vec3 nWorld = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
+					"vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
 
 					"vec3 I = worldPosition.xyz - cameraPosition;",
 
-					"vReflect = reflect( I, nWorld );",
-					"vRefract[0] = refract( normalize( I ), nWorld, mRefractionRatio );",
-					"vRefract[1] = refract( normalize( I ), nWorld, mRefractionRatio * 0.99 );",
-					"vRefract[2] = refract( normalize( I ), nWorld, mRefractionRatio * 0.98 );",
-					"vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), nWorld ), mFresnelPower );",
+					"vReflect = reflect( I, worldNormal );",
+					"vRefract[0] = refract( normalize( I ), worldNormal, mRefractionRatio );",
+					"vRefract[1] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.99 );",
+					"vRefract[2] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.98 );",
+					"vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
