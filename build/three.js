@@ -14145,7 +14145,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
-			"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 
 		"#endif",
@@ -14279,7 +14279,7 @@ THREE.ShaderChunk = {
 
 				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - mPosition.xyz ) );",
 
-				"if ( spotEffect > spotLightAngle[ i ] ) {",
+				"if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
 					"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
@@ -14489,7 +14489,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
 			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
-			"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 
 			"#ifdef PHONG_PER_PIXEL",
@@ -14638,7 +14638,7 @@ THREE.ShaderChunk = {
 
 				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
 
-				"if ( spotEffect > spotLightAngle[ i ] ) {",
+				"if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
 					"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
@@ -15516,7 +15516,7 @@ THREE.UniformsLib = {
 		"spotLightPosition" : { type: "fv", value: [] },
 		"spotLightDirection" : { type: "fv", value: [] },
 		"spotLightDistance" : { type: "fv1", value: [] },
-		"spotLightAngle" : { type: "fv1", value: [] },
+		"spotLightAngleCos" : { type: "fv1", value: [] },
 		"spotLightExponent" : { type: "fv1", value: [] }
 
 	},
@@ -16295,7 +16295,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: new Array(), positions: new Array() },
 		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() },
-		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), angles: new Array(), exponents: new Array() },
+		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), anglesCos: new Array(), exponents: new Array() },
 		hemi: { length: 0, skyColors: new Array(), groundColors: new Array(), positions: new Array() }
 
 	};
@@ -21442,7 +21442,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.spotLightPosition.value = lights.spot.positions;
 		uniforms.spotLightDistance.value = lights.spot.distances;
 		uniforms.spotLightDirection.value = lights.spot.directions;
-		uniforms.spotLightAngle.value = lights.spot.angles;
+		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
 		uniforms.spotLightExponent.value = lights.spot.exponents;
 
 		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
@@ -21759,7 +21759,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotPositions = zlights.spot.positions,
 		spotDistances = zlights.spot.distances,
 		spotDirections = zlights.spot.directions,
-		spotAngles = zlights.spot.angles,
+		spotAnglesCos = zlights.spot.anglesCos,
 		spotExponents = zlights.spot.exponents,
 
 		hemiSkyColors = zlights.hemi.skyColors,
@@ -21899,7 +21899,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				spotDirections[ spotOffset + 1 ] = _direction.y;
 				spotDirections[ spotOffset + 2 ] = _direction.z;
 
-				spotAngles[ spotLength ] = Math.cos( light.angle );
+				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
 				spotExponents[ spotLength ] = light.exponent;
 
 				spotLength += 1;
@@ -21955,7 +21955,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( l = spotLength * 3, ll = Math.max( spotColors.length, spotCount * 3 ); l < ll; l ++ ) spotColors[ l ] = 0.0;
 		for ( l = spotLength * 3, ll = Math.max( spotPositions.length, spotCount * 3 ); l < ll; l ++ ) spotPositions[ l ] = 0.0;
 		for ( l = spotLength * 3, ll = Math.max( spotDirections.length, spotCount * 3 ); l < ll; l ++ ) spotDirections[ l ] = 0.0;
-		for ( l = spotLength, ll = Math.max( spotAngles.length, spotCount ); l < ll; l ++ ) spotAngles[ l ] = 0.0;
+		for ( l = spotLength, ll = Math.max( spotAnglesCos.length, spotCount ); l < ll; l ++ ) spotAnglesCos[ l ] = 0.0;
 		for ( l = spotLength, ll = Math.max( spotExponents.length, spotCount ); l < ll; l ++ ) spotExponents[ l ] = 0.0;
 		for ( l = spotLength, ll = Math.max( spotDistances.length, spotCount ); l < ll; l ++ ) spotDistances[ l ] = 0.0;
 
@@ -25288,7 +25288,7 @@ THREE.ShaderUtils = {
 					"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
 					"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 					"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
-					"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 					"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 					"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 
@@ -25445,7 +25445,7 @@ THREE.ShaderUtils = {
 
 							"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
 
-							"if ( spotEffect > spotLightAngle[ i ] ) {",
+							"if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
 								"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 

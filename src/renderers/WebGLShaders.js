@@ -474,7 +474,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
-			"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 
 		"#endif",
@@ -608,7 +608,7 @@ THREE.ShaderChunk = {
 
 				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - mPosition.xyz ) );",
 
-				"if ( spotEffect > spotLightAngle[ i ] ) {",
+				"if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
 					"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
@@ -818,7 +818,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
 			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
-			"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 
 			"#ifdef PHONG_PER_PIXEL",
@@ -967,7 +967,7 @@ THREE.ShaderChunk = {
 
 				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
 
-				"if ( spotEffect > spotLightAngle[ i ] ) {",
+				"if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
 					"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
@@ -1845,7 +1845,7 @@ THREE.UniformsLib = {
 		"spotLightPosition" : { type: "fv", value: [] },
 		"spotLightDirection" : { type: "fv", value: [] },
 		"spotLightDistance" : { type: "fv1", value: [] },
-		"spotLightAngle" : { type: "fv1", value: [] },
+		"spotLightAngleCos" : { type: "fv1", value: [] },
 		"spotLightExponent" : { type: "fv1", value: [] }
 
 	},
