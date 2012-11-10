@@ -365,7 +365,7 @@ THREE.ShaderUtils = {
 
 							"if ( spotEffect > spotLightAngle[ i ] ) {",
 
-								"spotEffect = pow( spotEffect, spotLightExponent[ i ] );",
+								"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
 								// diffuse
 
