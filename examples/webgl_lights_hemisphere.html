@@ -59,14 +59,14 @@
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
-			varying vec3 worldPosition;
+			varying vec3 vWorldPosition;
 
 			void main() {
 
-				vec4 mPosition = modelMatrix * vec4( position, 1.0 );
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				worldPosition = mPosition.xyz;
 
 			}
 
@@ -79,16 +79,17 @@
 			uniform float offset;
 			uniform float exponent;
 
-			varying vec3 worldPosition;
+			varying vec3 vWorldPosition;
 
 			void main() {
 
-				float h = normalize( worldPosition + offset ).y;
+				float h = normalize( vWorldPosition + offset ).y;
 				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( h, exponent ), 0.0 ) ), 1.0 );
 
 			}
 
 		</script>
+
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();

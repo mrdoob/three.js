@@ -71,11 +71,11 @@ THREE.ShaderUtils = {
 				"void main() {",
 
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 					"vec3 nWorld = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
 
-					"vec3 I = mPosition.xyz - cameraPosition;",
+					"vec3 I = worldPosition.xyz - cameraPosition;",
 
 					"vReflect = reflect( I, nWorld );",
 					"vRefract[0] = refract( normalize( I ), nWorld, mRefractionRatio );",
@@ -707,13 +707,13 @@ THREE.ShaderUtils = {
 					//
 
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
-					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
 					//
 
-					"vWorldPosition = mPosition.xyz;",
+					"vWorldPosition = worldPosition.xyz;",
 					"vViewPosition = -mvPosition.xyz;",
 
 					// shadows
@@ -722,7 +722,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-							"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * worldPosition;",
 
 						"}",
 
@@ -749,8 +749,8 @@ THREE.ShaderUtils = {
 
 				"void main() {",
 
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-					"vViewPosition = cameraPosition - mPosition.xyz;",
+					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+					"vViewPosition = cameraPosition - worldPosition.xyz;",
 
 					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 

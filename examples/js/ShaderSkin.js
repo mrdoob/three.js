@@ -319,7 +319,7 @@ THREE.ShaderSkin = {
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vViewPosition = -mvPosition.xyz;",
 
@@ -641,7 +641,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
@@ -730,7 +730,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 

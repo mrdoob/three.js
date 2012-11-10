@@ -349,12 +349,12 @@ THREE.ShaderTerrain = {
 					"float df = uDisplacementScale * dv.x + uDisplacementBias;",
 					"vec3 displacedPosition = normal * df + position;",
 
-					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
 
 				"#else",
 
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				"#endif",

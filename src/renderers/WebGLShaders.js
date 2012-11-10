@@ -159,19 +159,19 @@ THREE.ShaderChunk = {
 
 			"#ifdef USE_SKINNING",
 
-				"vec4 mPosition = modelMatrix * skinned;",
+				"vec4 worldPosition = modelMatrix * skinned;",
 
 			"#endif",
 
 			"#if defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
 
-				"vec4 mPosition = modelMatrix * vec4( morphed, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( morphed, 1.0 );",
 
 			"#endif",
 
 			"#if ! defined( USE_MORPHTARGETS ) && ! defined( USE_SKINNING )",
 
-				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 			"#endif",
 
@@ -187,11 +187,11 @@ THREE.ShaderChunk = {
 
 			"if ( useRefract ) {",
 
-				"vReflect = refract( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refractionRatio );",
+				"vReflect = refract( normalize( worldPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refractionRatio );",
 
 			"} else {",
 
-				"vReflect = reflect( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ) );",
+				"vReflect = reflect( normalize( worldPosition.xyz - cameraPosition ), normalize( nWorld.xyz ) );",
 
 			"}",
 
@@ -606,7 +606,7 @@ THREE.ShaderChunk = {
 				"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
-				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - mPosition.xyz ) );",
+				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - worldPosition.xyz ) );",
 
 				"if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
@@ -771,7 +771,7 @@ THREE.ShaderChunk = {
 
 		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
-			"vWorldPosition = mPosition.xyz;",
+			"vWorldPosition = worldPosition.xyz;",
 
 		"#endif"
 
@@ -1682,7 +1682,7 @@ THREE.ShaderChunk = {
 
 			"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-				"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
+				"vShadowCoord[ i ] = shadowMatrix[ i ] * worldPosition;",
 
 			"}",
 
