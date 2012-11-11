@@ -44,12 +44,11 @@ THREE.ShaderUtils = {
 				"void main() {",
 
 					"vec4 reflectedColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-					"vec4 refractedColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+					"vec4 refractedColor = vec4( 1.0 );",
 
 					"refractedColor.r = textureCube( tCube, vec3( -vRefract[0].x, vRefract[0].yz ) ).r;",
 					"refractedColor.g = textureCube( tCube, vec3( -vRefract[1].x, vRefract[1].yz ) ).g;",
 					"refractedColor.b = textureCube( tCube, vec3( -vRefract[2].x, vRefract[2].yz ) ).b;",
-					"refractedColor.a = 1.0;",
 
 					"gl_FragColor = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );",
 
@@ -745,12 +744,12 @@ THREE.ShaderUtils = {
 
 			vertexShader: [
 
-				"varying vec3 vViewPosition;",
+				"varying vec3 vWorldPosition;",
 
 				"void main() {",
 
 					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
-					"vViewPosition = cameraPosition - worldPosition.xyz;",
+					"vWorldPosition = worldPosition.xyz;",
 
 					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -763,12 +762,11 @@ THREE.ShaderUtils = {
 				"uniform samplerCube tCube;",
 				"uniform float tFlip;",
 
-				"varying vec3 vViewPosition;",
+				"varying vec3 vWorldPosition;",
 
 				"void main() {",
 
-					"vec3 wPos = cameraPosition - vViewPosition;",
-					"gl_FragColor = textureCube( tCube, vec3( tFlip * wPos.x, wPos.yz ) );",
+					"gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				"}"
 
