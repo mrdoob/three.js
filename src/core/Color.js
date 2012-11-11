@@ -141,6 +141,12 @@ THREE.Color.prototype = {
 
 	},
 
+	getHex: function () {
+
+		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
+
+	},
+
 	setHex: function ( hex ) {
 
 		hex = Math.floor( hex );
@@ -150,22 +156,6 @@ THREE.Color.prototype = {
 		this.b = ( hex & 255 ) / 255;
 
 		return this;
-
-	},
-
-	lerpSelf: function ( color, alpha ) {
-
-		this.r += ( color.r - this.r ) * alpha;
-		this.g += ( color.g - this.g ) * alpha;
-		this.b += ( color.b - this.b ) * alpha;
-
-		return this;
-
-	},
-
-	getHex: function () {
-
-		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
 
 	},
 
@@ -181,6 +171,17 @@ THREE.Color.prototype = {
 
 	},
 
+	setContextStyle: function ( style ) {
+
+		var color = /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/i.exec( style );
+
+		this.r = parseInt( color[ 1 ], 10 ) / 255;
+		this.g = parseInt( color[ 2 ], 10 ) / 255;
+		this.b = parseInt( color[ 3 ], 10 ) / 255;
+
+		return this;
+
+	},
 
 	getHSV: function ( hsv ) {
 
@@ -248,6 +249,16 @@ THREE.Color.prototype = {
 		hsv.v = value;
 
 		return hsv;
+
+	},
+
+	lerpSelf: function ( color, alpha ) {
+
+		this.r += ( color.r - this.r ) * alpha;
+		this.g += ( color.g - this.g ) * alpha;
+		this.b += ( color.b - this.b ) * alpha;
+
+		return this;
 
 	},
 

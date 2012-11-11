@@ -100,6 +100,16 @@
 		Based on MochiKit implementation by Bob Ippolito.
 		</div>
 
+		<h3>.getHex() [page:Integer]</h3>
+		<div>
+		Returns the hexadecimal value of this color.
+		</div>
+
+		<h3>.getHexString() [page:String]</h3>
+		<div>
+		Returns the string formated hexadecimal value of this color.
+		</div>
+
 		<h3>.setHex( [page:Integer hex] ) [page:this]</h3>
 		<div>
 		hex — Color in hexadecimal.<br />
@@ -108,15 +118,18 @@
 		Sets this color from a hexadecimal value.
 		</div>
 
-		<h3>.getHex() [page:Integer]</h3>
-		<div>
-		Returns the value of this color in hexadecimal.
-		</div>
-
 		<h3>.getContextStyle() [page:String]</h3>
 		<div>
 		Returns the value of this color in CSS context style.<br />
 		Example: rgb(r, g, b)
+		</div>
+
+		<h3>.setContextStyle( [page:String contextStyle] ) [page:this]</h3>
+		<div>
+		contextStyle — Color in CSS context style format.<br />
+		</div>
+		<div>
+		Sets this color from a CSS context style string.
 		</div>
 
 		<h3>.clone() [page:Color]</h3>

@@ -35,7 +35,7 @@ THREE.SpotLightHelper = function ( light, sphereSize, arrowLength ) {
 
 	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
 	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
-	var coneGeometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 32, 1, true );
+	var coneGeometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 8, 1, true );
 
 	var coneMatrix = new THREE.Matrix4();
 	coneMatrix.rotateX( -Math.PI/2 );
