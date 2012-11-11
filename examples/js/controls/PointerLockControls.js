@@ -1,4 +1,8 @@
-var PointerLockControls = function ( camera ) {
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.PointerLockControls = function ( camera ) {
 
 	var scope = this;
 
