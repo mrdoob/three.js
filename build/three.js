@@ -420,6 +420,12 @@ THREE.Color.prototype = {
 
 	},
 
+	getHex: function () {
+
+		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
+
+	},
+
 	setHex: function ( hex ) {
 
 		hex = Math.floor( hex );
@@ -429,22 +435,6 @@ THREE.Color.prototype = {
 		this.b = ( hex & 255 ) / 255;
 
 		return this;
-
-	},
-
-	lerpSelf: function ( color, alpha ) {
-
-		this.r += ( color.r - this.r ) * alpha;
-		this.g += ( color.g - this.g ) * alpha;
-		this.b += ( color.b - this.b ) * alpha;
-
-		return this;
-
-	},
-
-	getHex: function () {
-
-		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
 
 	},
 
@@ -460,6 +450,17 @@ THREE.Color.prototype = {
 
 	},
 
+	setContextStyle: function ( style ) {
+
+		var color = /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/i.exec( style );
+
+		this.r = parseInt( color[ 1 ], 10 ) / 255;
+		this.g = parseInt( color[ 2 ], 10 ) / 255;
+		this.b = parseInt( color[ 3 ], 10 ) / 255;
+
+		return this;
+
+	},
 
 	getHSV: function ( hsv ) {
 
@@ -527,6 +528,16 @@ THREE.Color.prototype = {
 		hsv.v = value;
 
 		return hsv;
+
+	},
+
+	lerpSelf: function ( color, alpha ) {
+
+		this.r += ( color.r - this.r ) * alpha;
+		this.g += ( color.g - this.g ) * alpha;
+		this.b += ( color.b - this.b ) * alpha;
+
+		return this;
 
 	},
 
@@ -11661,7 +11672,7 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	var b, bone, gbone, p, q, s;
 
-	if ( this.geometry.bones !== undefined ) {
+	if ( this.geometry && this.geometry.bones !== undefined ) {
 
 		for ( b = 0; b < this.geometry.bones.length; b ++ ) {
 
@@ -33159,7 +33170,7 @@ THREE.SpotLightHelper = function ( light, sphereSize, arrowLength ) {
 
 	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
 	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
-	var coneGeometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 32, 1, true );
+	var coneGeometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 8, 1, true );
 
 	var coneMatrix = new THREE.Matrix4();
 	coneMatrix.rotateX( -Math.PI/2 );
