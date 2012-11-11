@@ -10,8 +10,6 @@
  *
  */
 
-if ( THREE.WebGLRenderer ) {
-
 THREE.ShaderUtils = {
 
 	lib: {
@@ -775,7 +773,5 @@ THREE.ShaderUtils = {
 		}
 
 	}
-
-};
 
 };
