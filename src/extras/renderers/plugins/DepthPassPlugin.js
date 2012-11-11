@@ -9,7 +9,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 	var _gl,
 	_renderer,
-	_depthMaterial, _depthMaterialMorph,
+	_depthMaterial, _depthMaterialMorph, _depthMaterialSkin, _depthMaterialMorphSkin,
 
 	_frustum = new THREE.Frustum(),
 	_projScreenMatrix = new THREE.Matrix4();
@@ -24,9 +24,13 @@ THREE.DepthPassPlugin = function ( ) {
 
 		_depthMaterial = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms } );
 		_depthMaterialMorph = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true } );
+		_depthMaterialSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, skinning: true } );
+		_depthMaterialMorphSkin = new THREE.ShaderMaterial( { fragmentShader: depthShader.fragmentShader, vertexShader: depthShader.vertexShader, uniforms: depthUniforms, morphTargets: true, skinning: true } );
 
 		_depthMaterial._shadowPass = true;
 		_depthMaterialMorph._shadowPass = true;
+		_depthMaterialSkin._shadowPass = true;
+		_depthMaterialMorphSkin._shadowPass = true;
 
 	};
 
@@ -90,10 +94,9 @@ THREE.DepthPassPlugin = function ( ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
-					//object.matrixWorld.flattenToArray( object._modelMatrixArray );
-					object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
+					object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld );
 
 					webglObject.render = true;
 
@@ -105,6 +108,8 @@ THREE.DepthPassPlugin = function ( ) {
 
 		// render regular objects
 
+		var objectMaterial, useMorphing, useSkinning;
+
 		for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
 			webglObject = renderList[ j ];
@@ -114,13 +119,26 @@ THREE.DepthPassPlugin = function ( ) {
 				object = webglObject.object;
 				buffer = webglObject.buffer;
 
-				if ( object.material ) _renderer.setMaterialFaces( object.material );
+				// todo: create proper depth material for particles
+
+				if ( object instanceof THREE.ParticleSystem && !object.customDepthMaterial ) continue;
+
+				objectMaterial = getObjectMaterial( object );
+
+				if ( objectMaterial ) _renderer.setMaterialFaces( object.material );
+
+				useMorphing = object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
+				useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
 
 				if ( object.customDepthMaterial ) {
 
 					material = object.customDepthMaterial;
 
-				} else if ( object.geometry.morphTargets.length ) {
+				} else if ( useSkinning ) {
+
+					material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
+
+				} else if ( useMorphing ) {
 
 					material = _depthMaterialMorph;
 
@@ -153,17 +171,9 @@ THREE.DepthPassPlugin = function ( ) {
 			webglObject = renderList[ j ];
 			object = webglObject.object;
 
-			if ( object.visible && object.castShadow ) {
+			if ( object.visible ) {
 
-				/*
-				if ( object.matrixAutoUpdate ) {
-
-					object.matrixWorld.flattenToArray( object._modelMatrixArray );
-
-				}
-				*/
-
-				object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld);
+				object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld );
 
 				_renderer.renderImmediateObject( camera, scene.__lights, fog, _depthMaterial, object );
 
@@ -180,6 +190,15 @@ THREE.DepthPassPlugin = function ( ) {
 		_gl.enable( _gl.BLEND );
 
 	};
+
+	// For the moment just ignore objects that have multiple materials with different animation methods
+	// Only the first material will be taken into account for deciding which depth material to use
+
+	function getObjectMaterial( object ) {
+
+		return object.material instanceof THREE.MeshFaceMaterial ? object.geometry.materials[ 0 ] : object.material;
+
+	}
 
 };
 

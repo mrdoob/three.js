@@ -236,7 +236,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( object.visible && object.castShadow ) {
 
-					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+					if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
