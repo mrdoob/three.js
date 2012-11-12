@@ -2,10 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function (materials) {
-    
-    this.useGeometryMaterial = !materials;
-    this.materials = materials !== undefined ? materials : [];
+THREE.MeshFaceMaterial = function ( materials ) {
+
+	this.materials = materials instanceof Array ? materials : [];
 
 };
 

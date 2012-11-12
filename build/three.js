@@ -11051,7 +11051,11 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function () {};
+THREE.MeshFaceMaterial = function ( materials ) {
+
+	this.materials = materials instanceof Array ? materials : [];
+
+};
 
 THREE.MeshFaceMaterial.prototype.clone = function () {
 
@@ -17037,13 +17041,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getBufferMaterial( object, geometryGroup ) {
 
-		if ( object.material && ! ( object.material instanceof THREE.MeshFaceMaterial ) ) {
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
+
+			if ( object.material.materials.length > 0 ) {
+
+				return object.material.materials[ geometryGroup.materialIndex ];
+
+			} else {
+
+				return object.geometry.materials[ geometryGroup.materialIndex ];
+
+			}
+
+		} else {
 
 			return object.material;
-
-		} else if ( geometryGroup.materialIndex >= 0 ) {
-
-			return object.geometry.materials[ geometryGroup.materialIndex ];
 
 		}
 
@@ -20307,7 +20319,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( materialIndex >= 0 ) {
 
-				material = object.geometry.materials[ materialIndex ];
+				if ( meshMaterial.materials.length > 0 ) {
+
+					material = meshMaterial.materials[ materialIndex ];
+
+				} else {
+
+					material = object.geometry.materials[ materialIndex ];
+
+				}
 
 				if ( material.transparent ) {
 
