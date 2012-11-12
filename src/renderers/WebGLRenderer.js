@@ -894,9 +894,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			return object.material;
 
-		} else if ( geometryGroup.materialIndex >= 0 ) {
+		} else if ( geometryGroup.materialIndex >= 0 ) { // what does this line prevent??
 
-			return object.geometry.materials[ geometryGroup.materialIndex ];
+            if (object.material instanceof THREE.MeshFaceMaterial && !object.material.useGeometryMaterial){
+            
+                return object.material.materials[ geometryGroup.materialIndex ];
+            
+            } else {
+                
+                return object.geometry.materials[ geometryGroup.materialIndex ];
+            
+            }
 
 		}
 
@@ -4159,9 +4167,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			materialIndex = buffer.materialIndex;
 
 			if ( materialIndex >= 0 ) {
-
-				material = object.geometry.materials[ materialIndex ];
-
+                
+                if (meshMaterial.useGeometryMaterial){
+                    
+				    material = object.geometry.materials[ materialIndex ];
+                    
+                } else {
+                    
+                    material = meshMaterial.materials[ materialIndex ];
+                    
+                }
 				if ( material.transparent ) {
 
 					globject.transparent = material;
