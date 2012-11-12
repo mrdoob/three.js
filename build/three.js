@@ -2965,8 +2965,9 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 			var geometry = object.geometry;
 			var vertices = geometry.vertices;
 
-			var geometryMaterials = object.geometry.materials;
 			var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+			var geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
+
 			var side = object.material.side;
 
 			var a, b, c, d;
@@ -3983,7 +3984,7 @@ THREE.Projector = function() {
 
 		_renderData = projectGraph( scene, sortObjects );
 
-		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
+		for ( o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
 			object = _renderData.objects[ o ].object;
 
@@ -3994,7 +3995,7 @@ THREE.Projector = function() {
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
-				geometryMaterials = object.geometry.materials;
+
 				vertices = geometry.vertices;
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
@@ -4003,6 +4004,8 @@ THREE.Projector = function() {
 				_normalMatrix.transpose();
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+				geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
+
 				side = object.material.side;
 
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
@@ -35174,9 +35177,25 @@ THREE.ShadowMapPlugin = function ( ) {
 
 	function getObjectMaterial( object ) {
 
-		return object.material instanceof THREE.MeshFaceMaterial ? object.geometry.materials[ 0 ] : object.material;
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
 
-	}
+			if ( object.material.materials.length > 0 ) {
+
+				return object.material.materials[ 0 ];
+
+			} else {
+
+				return object.geometry.materials[ 0 ];
+
+			}
+
+		} else {
+
+			return object.material;
+
+		}
+
+	};
 
 };
 
@@ -35690,9 +35709,25 @@ THREE.DepthPassPlugin = function ( ) {
 
 	function getObjectMaterial( object ) {
 
-		return object.material instanceof THREE.MeshFaceMaterial ? object.geometry.materials[ 0 ] : object.material;
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
 
-	}
+			if ( object.material.materials.length > 0 ) {
+
+				return object.material.materials[ 0 ];
+
+			} else {
+
+				return object.geometry.materials[ 0 ];
+
+			}
+
+		} else {
+
+			return object.material;
+
+		}
+
+	};
 
 };
 

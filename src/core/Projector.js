@@ -196,7 +196,7 @@ THREE.Projector = function() {
 
 		_renderData = projectGraph( scene, sortObjects );
 
-		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
+		for ( o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
 			object = _renderData.objects[ o ].object;
 
@@ -207,7 +207,7 @@ THREE.Projector = function() {
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
-				geometryMaterials = object.geometry.materials;
+
 				vertices = geometry.vertices;
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
@@ -216,6 +216,8 @@ THREE.Projector = function() {
 				_normalMatrix.transpose();
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+				geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
+
 				side = object.material.side;
 
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
