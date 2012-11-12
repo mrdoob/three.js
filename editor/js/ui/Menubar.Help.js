@@ -24,7 +24,7 @@ Menubar.Help = function ( signals ) {
 	container.add( options );
 
 	var option = new UI.Panel();
-	option.add( new UI.Text().setValue( 'About' ).setColor( '#666' ) );
+	option.setTextContent( 'About' ).setColor( '#666' );
 	option.onClick( function () { alert( 'About' ) } );
 	options.add( option );
 
