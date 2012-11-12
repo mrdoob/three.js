@@ -20,7 +20,6 @@ Sidebar.Scene = function ( signals ) {
 	container.setBorderTop( '1px solid #ccc' );
 
 	container.add( new UI.Text().setValue( 'SCENE' ).setColor( '#666' ) );
-	container.add( new UI.Button( 'absolute' ).setRight( '8px' ).setTop( '5px' ).setLabel( 'Export' ).onClick( exportScene ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	var outliner = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( updateOutliner );
@@ -291,13 +290,6 @@ Sidebar.Scene = function ( signals ) {
 		clearColor.setHexValue( color );
 
 	} );
-
-
-	function exportScene() {
-
-		signals.exportScene.dispatch( scene );
-
-	}
 
 	return container;
 

@@ -1,11 +1,32 @@
 Menubar.Help = function ( signals ) {
 
-	var container = new UI.Panel( 'absolute' );
-	container.setBackgroundColor( '#ccc' );
-	container.setWidth( '120px' );
-	container.setPadding( '10px' );
+	var container = new UI.Panel();
+	container.setFloat( 'left' );
+	container.setWidth( '50px' );
+	container.setCursor( 'pointer' );
+	container.onMouseOver( function () { options.setDisplay( '' ) } );
+	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
+	container.onClick( function () { options.setDisplay( 'none' ) } );
 
-	container.add( new UI.Panel().add( new UI.Text().setValue( 'About' ).setColor( '#666' ) ) );
+	var title = new UI.Panel();
+	title.setTextContent( 'Help' ).setColor( '#666' );
+	title.setMargin( '0px' );
+	title.setPadding( '8px' )
+	container.add( title );
+
+	//
+
+	var options = new UI.Panel();
+	options.setWidth( '140px' );
+	options.setBackgroundColor( '#ddd' );
+	options.setPadding( '10px' );
+	options.setDisplay( 'none' );
+	container.add( options );
+
+	var option = new UI.Panel();
+	option.add( new UI.Text().setValue( 'About' ).setColor( '#666' ) );
+	option.onClick( function () { alert( 'About' ) } );
+	options.add( option );
 
 	return container;
 

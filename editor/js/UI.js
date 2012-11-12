@@ -160,6 +160,16 @@ UI.Element.prototype = {
 
 	//
 
+	setFloat: function () {
+
+		this.setStyle( 'float', arguments );
+
+		return this;
+
+	},
+
+	//
+
 	setFontSize: function () {
 
 		this.setStyle( 'fontSize', arguments );
@@ -205,6 +215,26 @@ UI.Element.prototype = {
 	setOverflow: function () {
 
 		this.setStyle( 'overflow', arguments );
+
+		return this;
+
+	},
+
+	//
+
+	setCursor: function () {
+
+		this.setStyle( 'cursor', arguments );
+
+		return this;
+
+	},
+
+	// content
+
+	setTextContent: function ( value ) {
+
+		this.dom.textContent = value;
 
 		return this;
 

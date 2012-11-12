@@ -645,12 +645,24 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.exportScene.add( function ( root ) {
+	signals.exportGeometry.add( function () {
+
+		var output = new THREE.GeometryExporter().parse( selected.geometry );
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	} );
+
+	signals.exportScene.add( function () {
 
 		var clearColor = renderer.getClearColor();
 		var clearAlpha = renderer.getClearAlpha();
 
-		var output = new THREE.SceneExporter().parse( root, clearColor, clearAlpha );
+		var output = new THREE.SceneExporter().parse( scene, clearColor, clearAlpha );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
