@@ -183,6 +183,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 				if ( o.type && ( o.type in scope.hierarchyHandlerMap ) && o.loading === undefined ) {
 
 					var loaderParameters = {};
+
 					for ( var parType in g ) {
 
 						if ( parType !== "type" && parType !== "url" ) {
@@ -193,7 +194,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					}
 
-					material = result.materials[ o.materials[ 0 ] ];
+					material = result.materials[ o.material ];
 
 					o.loading = true;
 
@@ -234,10 +235,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						var hasNormals = false;
 
-						// not anymore support for multiple materials
-						// shouldn't really be array
-
-						material = result.materials[ o.materials[ 0 ] ];
+						material = result.materials[ o.material ];
 						hasNormals = material instanceof THREE.ShaderMaterial;
 
 						if ( hasNormals ) {
@@ -256,16 +254,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						q = 0;
 
-						if ( o.materials.length === 0 ) {
-
-							material = new THREE.MeshFaceMaterial();
-
-						}
-
-						// dirty hack to handle meshes with multiple materials
-						// just use face materials defined in model
-
-						if ( o.materials.length > 1 ) {
+						if ( ! o.material ) {
 
 							material = new THREE.MeshFaceMaterial();
 

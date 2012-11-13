@@ -1,7 +1,7 @@
 {
 
 	"metadata": {
-		"formatVersion": 3.1,
+		"formatVersion": 3.2,
 		"type" : "scene"
 	},
 
@@ -11,7 +11,7 @@
 
 		"cube1" : {
 			"geometry" : "cubeNormals",
-			"materials": [ "phong_red" ],
+			"material" : "phong_red",
 			"position" : [ 0, 0, 0 ],
 			"rotation" : [ 0, -0.3, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -25,7 +25,7 @@
 
 		"cube2" : {
 			"geometry" : "cubeWire",
-			"materials": [ "basic_white" ],
+			"material" : "basic_white",
 			"position" : [ 0, 0, 0 ],
 			"rotation" : [ 0, -0.3, 0 ],
 			"scale"	   : [ 2, 2, 2 ],
@@ -34,7 +34,7 @@
 
 		"cube3" : {
 			"geometry" : "cube",
-			"materials": [ "minecraft" ],
+			"material" : "minecraft",
 			"position" : [ -30, -5, 25 ],
 			"rotation" : [ 0, 0.8, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -43,7 +43,7 @@
 
 		"sphere_lambert" : {
 			"geometry" : "sphere",
-			"materials": [ "lambert_green" ],
+			"material" : "lambert_green",
 			"position" : [ -20, -5, 15 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -52,7 +52,7 @@
 
 		"sphere_refraction" : {
 			"geometry" : "sphere",
-			"materials": [ "basic_refraction" ],
+			"material" : "basic_refraction",
 			"position" : [ 50, 45, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -61,7 +61,7 @@
 
 		"sphere_cube" : {
 			"geometry" : "sphere_uvs",
-			"materials": [ "phong_compressed_cube" ],
+			"material" : "phong_compressed_cube",
 			"position" : [ -30, -2, -15 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1.5, 1.5, 1.5 ],
@@ -70,7 +70,7 @@
 
 		"icosahedron" : {
 			"geometry" : "icosahedron",
-			"materials": [ "faceted_white" ],
+			"material" : "faceted_white",
 			"position" : [ 20, 10, -60 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -79,7 +79,7 @@
 
 		"torus" : {
 			"geometry" : "torus",
-			"materials": [ "phong_orange" ],
+			"material" : "phong_orange",
 			"position" : [ -20, 5, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 2, 2, 2 ],
@@ -88,7 +88,7 @@
 
 		"cone" : {
 			"geometry" : "cone",
-			"materials": [ "lambert_blue" ],
+			"material" : "lambert_blue",
 			"position" : [ -50, 15, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -97,7 +97,7 @@
 
 		"cylinder" : {
 			"geometry" : "cylinder",
-			"materials": [ "lambert_blue" ],
+			"material" : "lambert_blue",
 			"position" : [ 50, 15, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -106,7 +106,7 @@
 
 		"colorcube1" : {
 			"geometry" : "colorcube",
-			"materials": [],
+			"material" : "face",
 			"position" : [ -10, -5, 30 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 5, 5, 5 ],
@@ -114,7 +114,7 @@
 			"children" : {
 				"colorcube2" : {
 					"geometry" : "colorcube",
-					"materials": [],
+					"material" : "face",
 					"position" : [ 0, 2, 0 ],
 					"rotation" : [ 0.1, 0.1, 0.1 ],
 					"scale"    : [ 0.5, 0.5, 0.5 ],
@@ -122,7 +122,7 @@
 					"children" : {
 						"colorcube3" : {
 							"geometry" : "colorcube",
-							"materials": [],
+							"material" : "face",
 							"position" : [ 0, 2, 0 ],
 							"rotation" : [ 0.1, 0.1, 0.1 ],
 							"scale"    : [ 0.5, 0.5, 0.5 ],
@@ -130,7 +130,7 @@
 							"children" : {
 								"colorcube4" : {
 									"geometry" : "colorcube",
-									"materials": [],
+									"material" : "face",
 									"position" : [ 0, 2, 0 ],
 									"rotation" : [ 0.1, 0.1, 0.1 ],
 									"scale"    : [ 0.5, 0.5, 0.5 ],
@@ -145,7 +145,7 @@
 
 		"veyron" : {
 			"geometry" : "veyron",
-			"materials": [ "face" ],
+			"material" : "face",
 			"position" : [ 40, -1, 0 ],
 			"rotation" : [ 0, 0.3, 0 ],
 			"scale"	   : [ 0.25, 0.25, 0.25 ],
@@ -154,7 +154,7 @@
 
 		"walt" : {
 			"geometry" : "WaltHead",
-			"materials": [ "lambert_cube" ],
+			"material" : "lambert_cube",
 			"position" : [ -75, 10, -30 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 0.5, 0.5, 0.5 ],
@@ -163,7 +163,7 @@
 
 		"ben" : {
 			"geometry" : "ben",
-			"materials": [ "phong_ben" ],
+			"material" : "phong_ben",
 			"position" : [ -45, -10, 0 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 55, 55, 55 ],
@@ -172,7 +172,7 @@
 
 		"ninja" : {
 			"geometry" : "NinjaLo",
-			"materials": [ "phong_normal" ],
+			"material" : "phong_normal",
 			"position" : [ 75, 10, -30 ],
 			"rotation" : [ 0, -0.5, 0 ],
 			"scale"	   : [ 1.25, 1.25, 1.25 ],
@@ -181,7 +181,7 @@
 
 		"sittingBox" : {
 			"geometry" : "sittingBox",
-			"materials": [ "phong_morph" ],
+			"material" : "phong_morph",
 			"position" : [ -60, -10, 10 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 23, 23, 23 ],
@@ -193,7 +193,7 @@
 
 		"knight" : {
 			"geometry" : "knight",
-			"materials": [ "phong_skin" ],
+			"material" : "phong_skin",
 			"position" : [ 70, -10, 10 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 2.5, 2.5, 2.5 ],
@@ -204,7 +204,7 @@
 		"man" : {
 			"type": "obj",
 			"url" : "obj/male02/male02.obj",
-			"materials": [ "phong_man" ],
+			"material" : "phong_man",
 			"position" : [ -10, -10, -25 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 0.2, 0.2, 0.2 ],
@@ -214,7 +214,6 @@
 		"monster" : {
 			"type": "dae",
 			"url" : "models/collada/monster/monster.dae",
-			"materials": [ ],
 			"position" : [ -43, -10, 27 ],
 			"rotation" : [ -1.57, 0, 0 ],
 			"scale"	   : [ 0.01, 0.01, 0.01 ],
@@ -224,7 +223,7 @@
 		"hand" : {
 			"type" : "utf8",
 			"url"  : "models/utf8/hand.js",
-			"materials": [ "phong_hand" ],
+			"material" : "phong_hand",
 			"position" : [ -28, -1, 29 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 12, 12, 12 ],
@@ -236,8 +235,8 @@
 		},
 
 		"bunny" : {
-			"geometry": "bunny",
-			"materials": [ "phong_bunny" ],
+			"geometry" : "bunny",
+			"material" : "phong_bunny",
 			"position" : [ -25, -14, 0 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 100, 100, 100 ],
@@ -245,8 +244,8 @@
 		},
 
 		"disk" : {
-			"geometry": "disk",
-			"materials": [ "phong_disk" ],
+			"geometry" : "disk",
+			"material" : "phong_disk",
 			"position" : [ 7, -10, 30 ],
 			"rotation" : [ 1.57, 0, 0 ],
 			"scale"	   : [ 10, 10, 10 ],
@@ -255,7 +254,7 @@
 
 		"quad_bg" : {
 			"geometry" : "quad",
-			"materials": [ "textured_bg" ],
+			"material" : "textured_bg",
 			"position" : [ 0, 15, -90 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 20, 20, 20 ],
@@ -264,7 +263,7 @@
 
 		"quad_texture1" : {
 			"geometry" : "quad",
-			"materials": [ "textured_compressed_dxt3" ],
+			"material" : "textured_compressed_dxt3",
 			"position" : [ 15, -5, 20 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -273,7 +272,7 @@
 
 		"quad_texture2" : {
 			"geometry" : "quad",
-			"materials": [ "textured_compressed_dxt5" ],
+			"material" : "textured_compressed_dxt5",
 			"position" : [ 15, -5, 25 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -282,7 +281,7 @@
 
 		"ground" : {
 			"geometry" : "plane",
-			"materials": [ "basic_gray" ],
+			"material" : "basic_gray",
 			"position" : [ 0, -10, 0 ],
 			"rotation" : [ -1.57, 0, 0 ],
 			"scale"	   : [ 100, 100, 100 ],

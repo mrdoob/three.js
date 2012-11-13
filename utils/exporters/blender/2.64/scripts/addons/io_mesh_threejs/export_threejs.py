@@ -85,7 +85,7 @@ TEMPLATE_SCENE_ASCII = """\
 
 "metadata" :
 {
-	"formatVersion" : 3.1,
+	"formatVersion" : 3.2,
 	"type" 			: "scene",
 	"sourceFile"    : "%(fname)s",
 	"generatedBy"   : "Blender 2.64 Exporter",
@@ -127,7 +127,7 @@ TEMPLATE_OBJECT = """\
 	%(object_id)s : {
 		"geometry"  : %(geometry_id)s,
 		"groups"    : [ %(group_id)s ],
-		"materials" : [ %(material_id)s ],
+		"material"  : %(material_id)s,
 		"position"  : %(position)s,
 		"rotation"  : %(rotation)s,
 		"quaternion": %(quaternion)s,
@@ -1637,8 +1637,11 @@ def generate_objects(data):
             position, quaternion, scale = obj.matrix_world.decompose()
             rotation = quaternion.to_euler("XYZ")
 
+            # use empty material string for multi-material objects
+            # this will trigger use of MeshFaceMaterial in SceneLoader
+
             material_string = ""
-            if len(material_ids) > 0:
+            if len(material_ids) == 1:
                 material_string = generate_string_list(material_ids)
 
             group_string = ""

@@ -350,8 +350,8 @@ THREE.SceneExporter.prototype = {
 			var output = [
 
 			'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-			'	"geometry" : '   + LabelString( getGeometryName( o.geometry ) ) + ',',
-			'	"materials": [ ' + LabelString( getMaterialName( o.material ) ) + ' ],',
+			'	"geometry" : ' + LabelString( getGeometryName( o.geometry ) ) + ',',
+			'	"material" : ' + LabelString( getMaterialName( o.material ) ) + ',',
 			'	"position" : ' + Vector3String( o.position ) + ',',
 			'	"rotation" : ' + Vector3String( o.rotation ) + ',',
 			'	"scale"	   : ' + Vector3String( o.scale ) + ',',
@@ -692,7 +692,7 @@ THREE.SceneExporter.prototype = {
 		var output = [
 			'{',
 			'	"metadata": {',
-			'		"formatVersion" : 3.1,',
+			'		"formatVersion" : 3.2,',
 			'		"type"		: "scene",',
 			'		"generatedBy"	: "SceneExporter",',
 			'		"objects"       : ' + nobjects + ',',
