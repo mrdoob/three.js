@@ -19,14 +19,28 @@ Menubar.Edit = function ( signals ) {
 	var options = new UI.Panel();
 	options.setWidth( '140px' );
 	options.setBackgroundColor( '#ddd' );
-	options.setPadding( '10px' );
+	options.setPadding( '0px' );
+	options.setStyle( 'box-shadow', [ '0 3px 6px rgba(0,0,0,0.1), 3px 3px 6px rgba(0,0,0,0.2)' ] );
 	options.setDisplay( 'none' );
 	container.add( options );
 
+	//
+
 	var option = new UI.Panel();
-	option.setTextContent( 'Delete' ).setColor( '#666' );
+	option.setTextContent( 'Delete' ).setColor( '#666' ).setPadding( '6px 12px' );
 	option.onClick( function () { signals.removeSelectedObject.dispatch(); } );
 	options.add( option );
+
+	addHoverStyle( option );
+
+	//
+
+	function addHoverStyle( element ) {
+
+		element.onMouseOver( function () { element.setBackgroundColor( '#356' ).setColor( '#eee' ); } );
+		element.onMouseOut( function () { element.setBackgroundColor( 'transparent' ).setColor( '#666' ) } );
+
+	}
 
 	return container;
 
