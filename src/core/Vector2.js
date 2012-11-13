@@ -160,12 +160,6 @@ THREE.Vector2.prototype = {
 
 	},
 
-	isZero: function ( v ) {
-
-		return this.lengthSq() < ( v !== undefined ? v : 0.0001 );
-
-	},
-
 	clone: function () {
 
 		return new THREE.Vector2( this.x, this.y );
