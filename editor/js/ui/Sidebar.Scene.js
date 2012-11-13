@@ -224,12 +224,6 @@ Sidebar.Scene = function ( signals ) {
 
 	// events
 
-	signals.sceneCreated.add( function ( object ) {
-
-		scene = object;
-
-	} );
-
 	signals.sceneChanged.add( function ( object ) {
 
 		scene = object;

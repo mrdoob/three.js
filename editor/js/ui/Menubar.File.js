@@ -30,7 +30,7 @@ Menubar.File = function ( signals ) {
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Reset' ).setColor( '#666' );
-	option.onClick( function () { alert( 'Reset' ) } );
+	option.onClick( function () { signals.resetScene.dispatch(); } );
 	options.add( option );
 
 	var option = new UI.Panel();

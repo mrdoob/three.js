@@ -66,7 +66,7 @@
 
 				// notifications
 
-				sceneCreated: new SIGNALS.Signal(),
+				sceneAdded: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
@@ -244,7 +244,7 @@
 
 									if ( resetScene ) {
 
-										signals.resetScene.dispatch( result.scene, result.currentCamera, result.bgColor );
+										signals.sceneAdded.dispatch( result.scene, result.currentCamera, result.bgColor );
 
 									} else {
 
@@ -350,16 +350,11 @@
 
 			}
 
-			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
+			// create default scene
 
-			var material = new THREE.MeshPhongMaterial();
-			material.color.setHSV( Math.random(), Math.random(), 1 );
+			signals.resetScene.dispatch();
 
-			var mesh = new THREE.Mesh( geometry, material );
-			mesh.name = "Sphere";
-
-			signals.objectAdded.dispatch( mesh );
-			signals.objectSelected.dispatch( mesh );
+			//
 
 			var onWindowResize = function ( event ) {
 
@@ -372,6 +367,8 @@
 				return new THREE.MeshLambertMaterial();
 
 			};
+
+			//
 
 			onWindowResize();
 

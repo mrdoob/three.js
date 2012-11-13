@@ -25,7 +25,7 @@ Menubar.Edit = function ( signals ) {
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Delete' ).setColor( '#666' );
-	option.onClick( function () { alert( 'Delete' ) } );
+	option.onClick( function () { signals.removeSelectedObject.dispatch(); } );
 	options.add( option );
 
 	return container;
