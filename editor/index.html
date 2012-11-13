@@ -66,7 +66,7 @@
 
 				// notifications
 
-				sceneCreated: new SIGNALS.Signal(),
+				sceneAdded: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
@@ -139,7 +139,7 @@
 								geometry.sourceType = "ctm";
 								geometry.sourceFile = file.name;
 
-								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+								var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
 								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
@@ -228,7 +228,7 @@
 								geometry.sourceType = "ascii";
 								geometry.sourceFile = file.name;
 
-								var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+								var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
 								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
@@ -244,7 +244,7 @@
 
 									if ( resetScene ) {
 
-										signals.resetScene.dispatch( result.scene, result.currentCamera, result.bgColor );
+										signals.sceneAdded.dispatch( result.scene, result.currentCamera, result.bgColor );
 
 									} else {
 
@@ -291,7 +291,7 @@
 							geometry.sourceType = "stl";
 							geometry.sourceFile = file.name;
 
-							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
 							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
@@ -335,7 +335,7 @@
 							geometry.sourceType = "vtk";
 							geometry.sourceFile = file.name;
 
-							var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
 							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
@@ -350,16 +350,11 @@
 
 			}
 
-			var geometry = new THREE.SphereGeometry( 75, 25, 15 );
+			// create default scene
 
-			var material = new THREE.MeshPhongMaterial();
-			material.color.setHSV( Math.random(), Math.random(), 1 );
+			signals.resetScene.dispatch();
 
-			var mesh = new THREE.Mesh( geometry, material );
-			mesh.name = "Sphere";
-
-			signals.objectAdded.dispatch( mesh );
-			signals.objectSelected.dispatch( mesh );
+			//
 
 			var onWindowResize = function ( event ) {
 
@@ -367,11 +362,13 @@
 
 			};
 
-			var createDummyMaterial = function ( geometry ) {
+			var createDummyMaterial = function () {
 
-				return new THREE.MeshLambertMaterial();
+				return new THREE.MeshPhongMaterial();
 
 			};
+
+			//
 
 			onWindowResize();
 

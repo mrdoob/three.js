@@ -1937,7 +1937,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vNormal = normalMatrix * normal;",
+				"vNormal = normalize( normalMatrix * normal );",
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
@@ -2211,7 +2211,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-				"vNormal = transformedNormal;",
+				"vNormal = normalize( transformedNormal );",
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],

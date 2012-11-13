@@ -2965,8 +2965,9 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 			var geometry = object.geometry;
 			var vertices = geometry.vertices;
 
-			var geometryMaterials = object.geometry.materials;
 			var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+			var geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
+
 			var side = object.material.side;
 
 			var a, b, c, d;
@@ -3983,7 +3984,7 @@ THREE.Projector = function() {
 
 		_renderData = projectGraph( scene, sortObjects );
 
-		for ( o = 0, ol = _renderData.objects.length; o < ol; o++ ) {
+		for ( o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
 			object = _renderData.objects[ o ].object;
 
@@ -3994,7 +3995,7 @@ THREE.Projector = function() {
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
-				geometryMaterials = object.geometry.materials;
+
 				vertices = geometry.vertices;
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
@@ -4003,6 +4004,8 @@ THREE.Projector = function() {
 				_normalMatrix.transpose();
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+				geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
+
 				side = object.material.side;
 
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
@@ -11051,7 +11054,11 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MeshFaceMaterial = function () {};
+THREE.MeshFaceMaterial = function ( materials ) {
+
+	this.materials = materials instanceof Array ? materials : [];
+
+};
 
 THREE.MeshFaceMaterial.prototype.clone = function () {
 
@@ -15619,7 +15626,7 @@ THREE.ShaderLib = {
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vNormal = normalMatrix * normal;",
+				"vNormal = normalize( normalMatrix * normal );",
 
 				"gl_Position = projectionMatrix * mvPosition;",
 
@@ -15893,7 +15900,7 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
-				"vNormal = transformedNormal;",
+				"vNormal = normalize( transformedNormal );",
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
@@ -17037,13 +17044,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getBufferMaterial( object, geometryGroup ) {
 
-		if ( object.material && ! ( object.material instanceof THREE.MeshFaceMaterial ) ) {
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
+
+			if ( object.material.materials.length > 0 ) {
+
+				return object.material.materials[ geometryGroup.materialIndex ];
+
+			} else {
+
+				return object.geometry.materials[ geometryGroup.materialIndex ];
+
+			}
+
+		} else {
 
 			return object.material;
-
-		} else if ( geometryGroup.materialIndex >= 0 ) {
-
-			return object.geometry.materials[ geometryGroup.materialIndex ];
 
 		}
 
@@ -20307,7 +20322,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( materialIndex >= 0 ) {
 
-				material = object.geometry.materials[ materialIndex ];
+				if ( meshMaterial.materials.length > 0 ) {
+
+					material = meshMaterial.materials[ materialIndex ];
+
+				} else {
+
+					material = object.geometry.materials[ materialIndex ];
+
+				}
 
 				if ( material.transparent ) {
 
@@ -25731,19 +25754,19 @@ THREE.ShaderUtils = {
 
 					"#ifdef USE_SKINNING",
 
-						"vNormal = normalMatrix * skinnedNormal.xyz;",
+						"vNormal = normalize( normalMatrix * skinnedNormal.xyz );",
 
 						"vec4 skinnedTangent = skinMatrix * vec4( tangent.xyz, 0.0 );",
-						"vTangent = normalMatrix * skinnedTangent.xyz;",
+						"vTangent = normalize( normalMatrix * skinnedTangent.xyz );",
 
 					"#else",
 
-						"vNormal = normalMatrix * normal;",
-						"vTangent = normalMatrix * tangent.xyz;",
+						"vNormal = normalize( normalMatrix * normal );",
+						"vTangent = normalize( normalMatrix * tangent.xyz );",
 
 					"#endif",
 
-					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
+					"vBinormal = normalize( cross( vNormal, vTangent ) * tangent.w );",
 
 					"vUv = uv * uRepeat + uOffset;",
 
@@ -35154,9 +35177,25 @@ THREE.ShadowMapPlugin = function ( ) {
 
 	function getObjectMaterial( object ) {
 
-		return object.material instanceof THREE.MeshFaceMaterial ? object.geometry.materials[ 0 ] : object.material;
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
 
-	}
+			if ( object.material.materials.length > 0 ) {
+
+				return object.material.materials[ 0 ];
+
+			} else {
+
+				return object.geometry.materials[ 0 ];
+
+			}
+
+		} else {
+
+			return object.material;
+
+		}
+
+	};
 
 };
 
@@ -35670,9 +35709,25 @@ THREE.DepthPassPlugin = function ( ) {
 
 	function getObjectMaterial( object ) {
 
-		return object.material instanceof THREE.MeshFaceMaterial ? object.geometry.materials[ 0 ] : object.material;
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
 
-	}
+			if ( object.material.materials.length > 0 ) {
+
+				return object.material.materials[ 0 ];
+
+			} else {
+
+				return object.geometry.materials[ 0 ];
+
+			}
+
+		} else {
+
+			return object.material;
+
+		}
+
+	};
 
 };
 

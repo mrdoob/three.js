@@ -2,6 +2,7 @@ var Viewport = function ( signals ) {
 
 	var container = new UI.Panel( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
+	container.setBorderTop( 'solid 1px #ccc' );
 
 	// settings
 
@@ -47,30 +48,10 @@ var Viewport = function ( signals ) {
 	selectionAxis.visible = false;
 	sceneHelpers.add( selectionAxis );
 
-	//
+	// default dummy scene and camera
 
 	var scene = new THREE.Scene();
-
-	var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
-	camera.position.set( 500, 250, 500 );
-	camera.lookAt( scene.position );
-	scene.add( camera );
-
-	var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
-	light1.position.set( 1, 0.5, 0 ).multiplyScalar( 400 );
-
-	var light2 = new THREE.SpotLight( 0xffffff, 1.5, 500, Math.PI * 0.025 );
-	light2.position.set( - 1, 0.5, 1 ).multiplyScalar( 300 );
-
-	light1.target.properties.targetInverse = light1;
-	light2.target.properties.targetInverse = light2;
-
-	var light3 = new THREE.PointLight( 0xffaa00, 0.75 );
-	light3.position.set( -250, 200, -200 );
-
-	//var light4 = new THREE.AmbientLight( 0x111111 );
-	var light4 = new THREE.HemisphereLight( 0x00aaff, 0xff0000, 0.75 );
-	light4.position.y = 250;
+	var camera = new THREE.Camera();
 
 	// fog
 
@@ -79,24 +60,6 @@ var Viewport = function ( signals ) {
 	var oldFogNear = 1;
 	var oldFogFar = 5000;
 	var oldFogDensity = 0.00025;
-
-	// default objects names
-
-	camera.name = "Camera";
-
-	light1.name = "Light 1";
-	light1.target.name = "Light 1 Target";
-
-	light2.name = "Light 2";
-	light2.target.name = "Light 2 Target";
-
-	light3.name = "Light 3";
-
-	light4.name = "Light 4";
-
-	// active objects
-
-	camera.properties.active = true;
 
 	// object picking
 
@@ -390,6 +353,13 @@ var Viewport = function ( signals ) {
 		object.traverse( handleAddition );
 
 		scene.add( object );
+
+		if ( object instanceof THREE.Light && ! ( object instanceof THREE.AmbientLight ) )  {
+
+			updateMaterials( scene );
+
+		}
+
 		render();
 
 		signals.sceneChanged.dispatch( scene );
@@ -431,15 +401,27 @@ var Viewport = function ( signals ) {
 
 		}
 
-		// remove from picking list
+		// remove proxies from picking list
 
 		var toRemove = {};
 
-		selected.traverse( function ( child ) {
+		var proxyObject = selected.properties.pickingProxy ? selected.properties.pickingProxy : selected;
+
+		proxyObject.traverse( function ( child ) {
 
 			toRemove[ child.id ] = true;
 
 		} );
+
+		// remove eventual pure Object3D target proxies from picking list
+
+		if ( selected.target && !selected.target.geometry ) {
+
+			toRemove[ selected.target.properties.pickingProxy.id ] = true;
+
+		}
+
+		//
 
 		var newObjects = [];
 
@@ -457,16 +439,60 @@ var Viewport = function ( signals ) {
 
 		objects = newObjects;
 
-		//
+		// clean selection highlight
 
 		selectionBox.visible = false;
 		selectionAxis.visible = false;
+
+		// remove selected object from the scene
 
 		scene.traverse( function( node ) {
 
 			node.remove( selected );
 
 		} );
+
+		// remove eventual pure Object3D targets from the scene
+
+		if ( selected.target && !selected.target.geometry ) {
+
+			scene.traverse( function( node ) {
+
+				node.remove( selected.target );
+
+			} );
+
+		}
+
+		// remove eventual helpers for the object from helpers scene
+
+		var helpersToRemove = [];
+
+		if ( selected.properties.helper ) {
+
+			helpersToRemove.push( selected.properties.helper );
+
+			if ( selected.properties.helper.targetLine ) helpersToRemove.push( selected.properties.helper.targetLine );
+			if ( selected.target && !selected.target.geometry ) helpersToRemove.push( selected.properties.helper.targetSphere );
+
+
+		}
+
+		sceneHelpers.traverse( function( node ) {
+
+			for ( var i = 0; i < helpersToRemove.length; i ++ ) {
+
+				node.remove( helpersToRemove[ i ] );
+
+			}
+
+		} );
+
+		if ( selected instanceof THREE.Light && ! ( selected instanceof THREE.AmbientLight ) )  {
+
+			updateMaterials( scene );
+
+		}
 
 		render();
 
@@ -647,6 +673,13 @@ var Viewport = function ( signals ) {
 
 	signals.exportGeometry.add( function () {
 
+		if ( !selected.geometry ) {
+
+			console.warn( "Selected object doesn't have any geometry" );
+			return;
+
+		}
+
 		var output = new THREE.GeometryExporter().parse( selected.geometry );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
@@ -679,7 +712,21 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.resetScene.add( function ( newScene, newCamera, newClearColor ) {
+	signals.resetScene.add( function () {
+
+		var defaultScene = createDefaultScene();
+		var defaultCamera = createDefaultCamera();
+		var defaultBgColor = new THREE.Color( 0xaaaaaa );
+
+		defaultCamera.lookAt( defaultScene.position );
+		defaultScene.add( defaultCamera );
+
+		signals.sceneAdded.dispatch( defaultScene, defaultCamera, defaultBgColor );
+		signals.objectSelected.dispatch( defaultScene.properties.defaultSelection );
+
+	} );
+
+	signals.sceneAdded.add( function ( newScene, newCamera, newClearColor ) {
 
 		scene = newScene;
 
@@ -787,11 +834,6 @@ var Viewport = function ( signals ) {
 
 	signals.sceneChanged.dispatch( scene );
 
-	signals.objectAdded.dispatch( light1 );
-	signals.objectAdded.dispatch( light2 );
-	signals.objectAdded.dispatch( light3 );
-	signals.objectAdded.dispatch( light4 );
-
 	//
 
 	function updateMaterials( root ) {
@@ -829,6 +871,81 @@ var Viewport = function ( signals ) {
 			if ( root.fog.density !== undefined ) root.fog.density = oldFogDensity;
 
 		}
+
+	}
+
+	function createDefaultScene() {
+
+		// create scene
+
+		var scene = new THREE.Scene();
+
+		// create lights
+
+		var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
+		light1.position.set( 1, 0.5, 0 ).multiplyScalar( 400 );
+
+		var light2 = new THREE.SpotLight( 0xffffff, 1.5, 500, Math.PI * 0.025 );
+		light2.position.set( - 1, 0.5, 1 ).multiplyScalar( 300 );
+
+		var light3 = new THREE.PointLight( 0xffaa00, 0.75 );
+		light3.position.set( -250, 200, -200 );
+
+		//var light4 = new THREE.AmbientLight( 0x111111 );
+		var light4 = new THREE.HemisphereLight( 0x00aaff, 0xff0000, 0.75 );
+		light4.position.y = 250;
+
+		light1.target.properties.targetInverse = light1;
+		light2.target.properties.targetInverse = light2;
+
+		// create objects
+
+		var geometry = new THREE.SphereGeometry( 75, 25, 15 );
+
+		var material = new THREE.MeshPhongMaterial();
+		material.color.setHSV( Math.random(), Math.random(), 1 );
+
+		var mesh = new THREE.Mesh( geometry, material );
+
+		// set default names
+
+		light1.name = "Light 1";
+		light1.target.name = "Light 1 Target";
+
+		light2.name = "Light 2";
+		light2.target.name = "Light 2 Target";
+
+		light3.name = "Light 3";
+
+		light4.name = "Light 4";
+
+		mesh.name = "Sphere";
+
+		// set default selection
+
+		scene.properties.defaultSelection = mesh;
+
+		// add to scene
+
+		scene.add( light1 );
+		scene.add( light2 );
+		scene.add( light3 );
+		scene.add( light4 );
+		scene.add( mesh );
+
+		return scene;
+
+	}
+
+	function createDefaultCamera() {
+
+		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
+		camera.position.set( 500, 250, 500 );
+
+		camera.name = "Camera";
+		camera.properties.active = true;
+
+		return camera;
 
 	}
 

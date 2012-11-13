@@ -109,8 +109,9 @@
 			var geometry = object.geometry;
 			var vertices = geometry.vertices;
 
-			var geometryMaterials = object.geometry.materials;
 			var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+			var geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
+
 			var side = object.material.side;
 
 			var a, b, c, d;

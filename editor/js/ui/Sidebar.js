@@ -3,6 +3,7 @@ var Sidebar = function ( signals ) {
 	var container = new UI.Panel( 'absolute' );
 	container.setWidth( '300px' ).setHeight( '100%' );
 	container.setBackgroundColor( '#eee' );
+	container.setBorderLeft( 'solid 1px #ccc' );
 	container.setOverflow( 'auto' );
 
 	container.add( new Sidebar.Scene( signals ) );

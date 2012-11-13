@@ -635,19 +635,19 @@ THREE.ShaderUtils = {
 
 					"#ifdef USE_SKINNING",
 
-						"vNormal = normalMatrix * skinnedNormal.xyz;",
+						"vNormal = normalize( normalMatrix * skinnedNormal.xyz );",
 
 						"vec4 skinnedTangent = skinMatrix * vec4( tangent.xyz, 0.0 );",
-						"vTangent = normalMatrix * skinnedTangent.xyz;",
+						"vTangent = normalize( normalMatrix * skinnedTangent.xyz );",
 
 					"#else",
 
-						"vNormal = normalMatrix * normal;",
-						"vTangent = normalMatrix * tangent.xyz;",
+						"vNormal = normalize( normalMatrix * normal );",
+						"vTangent = normalize( normalMatrix * tangent.xyz );",
 
 					"#endif",
 
-					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
+					"vBinormal = normalize( cross( vNormal, vTangent ) * tangent.w );",
 
 					"vUv = uv * uRepeat + uOffset;",
 

@@ -323,7 +323,7 @@ THREE.ShaderSkin = {
 
 				"vViewPosition = -mvPosition.xyz;",
 
-				"vNormal = normalMatrix * normal;",
+				"vNormal = normalize( normalMatrix * normal );",
 
 				"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
