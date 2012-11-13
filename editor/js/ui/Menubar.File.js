@@ -13,7 +13,6 @@ Menubar.File = function ( signals ) {
 
 	var options = new UI.Panel();
 	options.setClass( 'options' );
-	options.setWidth( '140px' );
 	container.add( options );
 
 	// open
