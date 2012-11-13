@@ -97,6 +97,62 @@ Menubar.Add = function ( signals ) {
 
 	addHoverStyle( option );
 
+	// divider
+
+	var option = new UI.Panel();
+	option.setBackgroundColor( '#ccc' ).setPadding( '1px 12px' );
+	options.add( option );
+
+	// add directional light
+
+	var option = new UI.Panel();
+	option.setTextContent( 'Directional light' ).setColor( '#666' ).setPadding( '6px 12px' );
+	option.onClick( function () {
+
+		var color = 0xffffff;
+		var intensity = 1;
+
+		var light = new THREE.DirectionalLight( color, intensity );
+		light.name = 'Light ' + light.id;
+		light.target.name = 'Light ' + light.id + ' target';
+
+		light.target.properties.targetInverse = light;
+
+		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+
+		signals.objectAdded.dispatch( light );
+
+	} );
+	options.add( option );
+
+	addHoverStyle( option );
+
+	// add point light
+
+	var option = new UI.Panel();
+	option.setTextContent( 'Point light' ).setColor( '#666' ).setPadding( '6px 12px' );
+	option.onClick( function () {
+
+		var color = 0xffffff;
+		var intensity = 1;
+		var distance = 0;
+
+		var light = new THREE.PointLight( color, intensity, distance );
+		light.name = 'Light ' + light.id;
+
+		signals.objectAdded.dispatch( light );
+
+	} );
+	options.add( option );
+
+	addHoverStyle( option );
+
+	// add spot light
+
+	// add hemisphere light
+
+	// add ambient light
+
 	//
 
 	function addHoverStyle( element ) {

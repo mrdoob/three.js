@@ -353,6 +353,13 @@ var Viewport = function ( signals ) {
 		object.traverse( handleAddition );
 
 		scene.add( object );
+
+		if ( object instanceof THREE.Light && ! ( object instanceof THREE.AmbientLight ) )  {
+
+			updateMaterials( scene );
+
+		}
+
 		render();
 
 		signals.sceneChanged.dispatch( scene );
@@ -481,7 +488,7 @@ var Viewport = function ( signals ) {
 
 		} );
 
-		if ( selected instanceof THREE.Light && !selected instanceof THREE.AmbientLight )  {
+		if ( selected instanceof THREE.Light && ! ( selected instanceof THREE.AmbientLight ) )  {
 
 			updateMaterials( scene );
 
