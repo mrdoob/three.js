@@ -20,6 +20,7 @@ Menubar.Help = function ( signals ) {
 	options.setWidth( '140px' );
 	options.setBackgroundColor( '#ddd' );
 	options.setPadding( '0px' );
+	options.setBorderTop( 'solid 1px #ccc' );
 	options.setStyle( 'box-shadow', [ '0 3px 7px rgba(0,0,0,0.05), 3px 3px 7px rgba(0,0,0,0.1)' ] );
 	options.setDisplay( 'none' );
 	container.add( options );
