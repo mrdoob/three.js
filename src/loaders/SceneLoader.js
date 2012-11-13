@@ -1066,6 +1066,30 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	}
 
+	// second pass through all materials to initialize MeshFaceMaterials
+	// that could be referring to other materials out of order
+
+	for ( dm in data.materials ) {
+
+		m = data.materials[ dm ];
+
+		if ( m.parameters.materials ) {
+
+			var materialArray = [];
+
+			for ( var i = 0; i < m.parameters.materials.length; i ++ ) {
+
+				var label = m.parameters.materials[ i ];
+				materialArray.push( result.materials[ label ] );
+
+			}
+
+			result.materials[ dm ].materials = materialArray;
+
+		}
+
+	}
+
 	// objects ( synchronous init of procedural primitives )
 
 	handle_objects();

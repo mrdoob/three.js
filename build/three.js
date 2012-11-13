@@ -7221,8 +7221,10 @@ THREE.BinaryLoader.prototype = Object.create( THREE.Loader.prototype );
 
 THREE.BinaryLoader.prototype.load = function( url, callback, texturePath, binaryPath ) {
 
-	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
-	binaryPath = binaryPath ? binaryPath : this.extractUrlBase( url );
+	// todo: unify load API to for easier SceneLoader use
+
+	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
+	binaryPath = binaryPath && ( typeof binaryPath === "string" ) ? binaryPath : this.extractUrlBase( url );
 
 	var callbackProgress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
 
@@ -8024,7 +8026,9 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	var scope = this;
 
-	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
+	// todo: unify load API to for easier SceneLoader use
+
+	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
 
 	this.onLoadStart();
 	this.loadAjaxJSON( this, url, callback, texturePath );
@@ -10224,6 +10228,30 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		}
 
 		result.materials[ dm ] = material;
+
+	}
+
+	// second pass through all materials to initialize MeshFaceMaterials
+	// that could be referring to other materials out of order
+
+	for ( dm in data.materials ) {
+
+		m = data.materials[ dm ];
+
+		if ( m.parameters.materials ) {
+
+			var materialArray = [];
+
+			for ( var i = 0; i < m.parameters.materials.length; i ++ ) {
+
+				var label = m.parameters.materials[ i ];
+				materialArray.push( result.materials[ label ] );
+
+			}
+
+			result.materials[ dm ].materials = materialArray;
+
+		}
 
 	}
 

@@ -211,6 +211,24 @@
 			"visible"  : true
 		},
 
+		"man_clone_1" : {
+			"geometry" : "man",
+			"material" : "multi_1",
+			"position" : [ 2.5, -10, -25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 0.2, 0.2, 0.2 ],
+			"visible"  : true
+		},
+
+		"man_clone_2" : {
+			"geometry" : "man",
+			"material" : "multi_2",
+			"position" : [ 15, -10, -25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 0.2, 0.2, 0.2 ],
+			"visible"  : true
+		},
+
 		"monster" : {
 			"type": "dae",
 			"url" : "models/collada/monster/monster.dae",
@@ -451,6 +469,11 @@
 			"url" : "models/skinned/knight.js"
 		},
 
+		"man": {
+			"type": "binary",
+			"url" : "obj/male02/Male02_bin.js"
+		},
+
 		"ben": {
 			"type": "ctm",
 			"url" : "models/ctm/ben.ctm",
@@ -663,6 +686,16 @@
 		"face": {
 			"type": "MeshFaceMaterial",
 			"parameters": {}
+		},
+
+		"multi_1": {
+			"type": "MeshFaceMaterial",
+			"parameters": {}
+		},
+
+		"multi_2": {
+			"type": "MeshFaceMaterial",
+			"parameters": { "materials": [ "phong_compressed_cube", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
 		}
 
 	},
