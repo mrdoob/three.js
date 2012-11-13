@@ -47,7 +47,7 @@ Sidebar.Scene = function ( signals ) {
 
 	} ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateFogType );
 
-	fogTypeRow.add( new UI.Text().setValue( 'Fog type' ).setColor( '#666' ) );
+	fogTypeRow.add( new UI.Text().setValue( 'Fog' ).setColor( '#666' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );

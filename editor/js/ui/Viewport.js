@@ -232,15 +232,15 @@ var Viewport = function ( signals ) {
 
 		switch ( event.keyCode ) {
 
-			case 46: // delete
+			case 27: // esc
 
-				signals.removeSelectedObject.dispatch();
+				signals.toggleHelpers.dispatch();
 
 				break;
 
-			case 72: // h
+			case 46: // delete
 
-				signals.toggleHelpers.dispatch();
+				signals.removeSelectedObject.dispatch();
 
 				break;
 
