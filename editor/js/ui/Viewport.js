@@ -609,6 +609,13 @@ var Viewport = function ( signals ) {
 
 	signals.exportGeometry.add( function () {
 
+		if ( !selected.geometry ) {
+
+			console.warn( "Selected object doesn't have any geometry" );
+			return;
+
+		}
+
 		var output = new THREE.GeometryExporter().parse( selected.geometry );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
