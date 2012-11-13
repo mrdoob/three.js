@@ -25,6 +25,8 @@ Menubar.Help = function ( signals ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
+	// about
+
 	var option = new UI.Panel();
 	option.setTextContent( 'About' ).setColor( '#666' ).setPadding( '6px 12px' );
 	option.onClick( function () { alert( 'About' ) } );

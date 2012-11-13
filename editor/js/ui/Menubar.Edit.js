@@ -25,7 +25,7 @@ Menubar.Edit = function ( signals ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
-	//
+	// delete
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Delete' ).setColor( '#666' ).setPadding( '6px 12px' );

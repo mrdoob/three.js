@@ -25,25 +25,74 @@ Menubar.Add = function ( signals ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
-	//
+	// add sphere
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Sphere' ).setColor( '#666' ).setPadding( '6px 12px' );
-	option.onClick( function () { alert( 'Sphere' ) } );
+	option.onClick( function () {
+
+		var radius = 75;
+		var widthSegments = 32;
+		var heightSegments = 16;
+
+		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+		mesh.name = 'Sphere ' + mesh.id;
+
+		signals.objectAdded.dispatch( mesh );
+
+	} );
 	options.add( option );
 
 	addHoverStyle( option );
+
+	// add cube
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Cube' ).setColor( '#666' ).setPadding( '6px 12px' );
-	option.onClick( function () { alert( 'Cube' ) } );
+	option.onClick( function () {
+
+		var width = 100;
+		var height = 100;
+		var depth = 100;
+
+		var widthSegments = 1;
+		var heightSegments = 1;
+		var depthSegments = 1;
+
+		var geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+		mesh.name = 'Cube ' + mesh.id;
+
+		signals.objectAdded.dispatch( mesh );
+
+
+	} );
 	options.add( option );
 
 	addHoverStyle( option );
 
+	// add plane
+
 	var option = new UI.Panel();
 	option.setTextContent( 'Plane' ).setColor( '#666' ).setPadding( '6px 12px' );
-	option.onClick( function () { alert( 'Plane' ) } );
+	option.onClick( function () {
+
+		var width = 200;
+		var height = 200;
+
+		var widthSegments = 1;
+		var heightSegments = 1;
+
+		var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+		mesh.name = 'Plane ' + mesh.id;
+
+		mesh.rotation.x = - Math.PI/2;
+
+		signals.objectAdded.dispatch( mesh );
+
+	} );
 	options.add( option );
 
 	addHoverStyle( option );
@@ -56,6 +105,12 @@ Menubar.Add = function ( signals ) {
 		element.onMouseOut( function () { element.setBackgroundColor( 'transparent' ).setColor( '#666' ) } );
 
 	}
+
+	function createDummyMaterial() {
+
+		return new THREE.MeshPhongMaterial();
+
+	};
 
 	return container;
 

@@ -25,7 +25,7 @@ Menubar.File = function ( signals ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
-	//
+	// open
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Open' ).setColor( '#666' ).setPadding( '6px 12px' );
@@ -34,12 +34,16 @@ Menubar.File = function ( signals ) {
 
 	addHoverStyle( option );
 
+	// reset scene
+
 	var option = new UI.Panel();
 	option.setTextContent( 'Reset' ).setColor( '#666' ).setPadding( '6px 12px' );
 	option.onClick( function () { signals.resetScene.dispatch(); } );
 	options.add( option );
 
 	addHoverStyle( option );
+
+	// export geometry
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Export Geometry' ).setColor( '#666' ).setPadding( '6px 12px' );
@@ -48,12 +52,16 @@ Menubar.File = function ( signals ) {
 
 	addHoverStyle( option );
 
+	// export scene
+
 	var option = new UI.Panel();
 	option.setTextContent( 'Export Scene' ).setColor( '#666' ).setPadding( '6px 12px' );
 	option.onClick( function () { signals.exportScene.dispatch(); } );
 	options.add( option );
 
 	addHoverStyle( option );
+
+	// export OBJ
 
 	var option = new UI.Panel();
 	option.setTextContent( 'Export OBJ' ).setColor( '#666' ).setPadding( '6px 12px' );
