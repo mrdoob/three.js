@@ -129,11 +129,7 @@ THREE.ConvexGeometry = function( vertices ) {
 		ab.sub( va, vb );
 		cb.crossSelf( ab );
 
-		if ( !cb.isZero() ) {
-
-			cb.normalize(); 
-
-		}
+		cb.normalize();
 
 		return cb;
 
