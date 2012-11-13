@@ -394,15 +394,27 @@ var Viewport = function ( signals ) {
 
 		}
 
-		// remove from picking list
+		// remove proxies from picking list
 
 		var toRemove = {};
 
-		selected.traverse( function ( child ) {
+		var proxyObject = selected.properties.pickingProxy ? selected.properties.pickingProxy : selected;
+
+		proxyObject.traverse( function ( child ) {
 
 			toRemove[ child.id ] = true;
 
 		} );
+
+		// remove eventual pure Object3D target proxies from picking list
+
+		if ( selected.target && !selected.target.geometry ) {
+
+			toRemove[ selected.target.properties.pickingProxy.id ] = true;
+
+		}
+
+		//
 
 		var newObjects = [];
 
@@ -420,16 +432,60 @@ var Viewport = function ( signals ) {
 
 		objects = newObjects;
 
-		//
+		// clean selection highlight
 
 		selectionBox.visible = false;
 		selectionAxis.visible = false;
+
+		// remove selected object from the scene
 
 		scene.traverse( function( node ) {
 
 			node.remove( selected );
 
 		} );
+
+		// remove eventual pure Object3D targets from the scene
+
+		if ( selected.target && !selected.target.geometry ) {
+
+			scene.traverse( function( node ) {
+
+				node.remove( selected.target );
+
+			} );
+
+		}
+
+		// remove eventual helpers for the object from helpers scene
+
+		var helpersToRemove = [];
+
+		if ( selected.properties.helper ) {
+
+			helpersToRemove.push( selected.properties.helper );
+
+			if ( selected.properties.helper.targetLine ) helpersToRemove.push( selected.properties.helper.targetLine );
+			if ( selected.target && !selected.target.geometry ) helpersToRemove.push( selected.properties.helper.targetSphere );
+
+
+		}
+
+		sceneHelpers.traverse( function( node ) {
+
+			for ( var i = 0; i < helpersToRemove.length; i ++ ) {
+
+				node.remove( helpersToRemove[ i ] );
+
+			}
+
+		} );
+
+		if ( selected instanceof THREE.Light && !selected instanceof THREE.AmbientLight )  {
+
+			updateMaterials( scene );
+
+		}
 
 		render();
 
