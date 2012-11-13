@@ -138,11 +138,7 @@ THREE.Geometry.prototype = {
 			ab.sub( vA, vB );
 			cb.crossSelf( ab );
 
-			if ( !cb.isZero() ) {
-
-				cb.normalize();
-
-			}
+			cb.normalize();
 
 			face.normal.copy( cb );
 
