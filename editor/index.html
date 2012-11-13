@@ -14,6 +14,40 @@
 				border: 0px;
 				border-top: 1px solid #ccc;
 			}
+
+			.menubar {
+				background-color: #eee;
+				padding: 0px;
+				margin: 0px;
+			}
+
+				.menubar .menu {
+					float: left;
+					width: 50px;
+					cursor: pointer;
+				}
+
+					.menubar .menu .options {
+						background-color: #fff;
+						display: none;
+					}
+
+					.menubar .menu:hover .options {
+						display: block;
+					}
+
+
+					.menubar .menu .options .option {
+						color: #666;
+						background-color: transparent;
+						padding: 5px 10px;
+						margin: 0px !important;
+					}
+
+						.menubar .menu .options .option:hover {
+							background-color: #eee;
+						}
+
 		</style>
 	</head>
 	<body>
