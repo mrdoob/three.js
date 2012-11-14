@@ -46,9 +46,6 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 	var bulbSkyMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
 	var bulbGroundMaterial = new THREE.MeshBasicMaterial( { color: hexColorGround, fog: false } );
 
-	bulbGeometry.materials[ 0 ] = bulbSkyMaterial;
-	bulbGroundGeometry.materials[ 0 ] = bulbGroundMaterial;
-
 	for ( var i = 0, il = bulbGeometry.faces.length; i < il; i ++ ) {
 
 		bulbGeometry.faces[ i ].materialIndex = 0;
@@ -57,13 +54,13 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 
 	for ( var i = 0, il = bulbGroundGeometry.faces.length; i < il; i ++ ) {
 
-		bulbGroundGeometry.faces[ i ].materialIndex = 0;
+		bulbGroundGeometry.faces[ i ].materialIndex = 1;
 
 	}
 
 	THREE.GeometryUtils.merge( bulbGeometry, bulbGroundGeometry );
 
-	this.lightSphere = new THREE.Mesh( bulbGeometry, new THREE.MeshFaceMaterial() );
+	this.lightSphere = new THREE.Mesh( bulbGeometry, new THREE.MeshFaceMaterial( [ bulbSkyMaterial, bulbGroundMaterial ] ) );
 
 	// arrows for sky and ground light directions
 
@@ -117,8 +114,8 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 	this.groundColor.g *= intensity;
 	this.groundColor.b *= intensity;
 
-	this.lightSphere.geometry.materials[ 0 ].color.copy( this.color );
-	this.lightSphere.geometry.materials[ 1 ].color.copy( this.groundColor );
+	this.lightSphere.material.materials[ 0 ].color.copy( this.color );
+	this.lightSphere.material.materials[ 1 ].color.copy( this.groundColor );
 
 	this.lightArrow.setColor( this.color.getHex() );
 	this.lightArrowGround.setColor( this.groundColor.getHex() );
