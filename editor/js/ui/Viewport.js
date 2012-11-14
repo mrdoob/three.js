@@ -445,21 +445,13 @@ var Viewport = function ( signals ) {
 
 		// remove selected object from the scene
 
-		scene.traverse( function( node ) {
-
-			node.remove( selected );
-
-		} );
+		selected.parent.remove( selected );
 
 		// remove eventual pure Object3D targets from the scene
 
 		if ( selected.target && !selected.target.geometry ) {
 
-			scene.traverse( function( node ) {
-
-				node.remove( selected.target );
-
-			} );
+			selected.target.parent.remove( selected.target );
 
 		}
 
@@ -477,15 +469,11 @@ var Viewport = function ( signals ) {
 
 		}
 
-		sceneHelpers.traverse( function( node ) {
+		for ( var i = 0; i < helpersToRemove.length; i ++ ) {
 
-			for ( var i = 0; i < helpersToRemove.length; i ++ ) {
+			helpersToRemove[ i ].parent.remove( helpersToRemove[ i ] );
 
-				node.remove( helpersToRemove[ i ] );
-
-			}
-
-		} );
+		}
 
 		if ( selected instanceof THREE.Light && ! ( selected instanceof THREE.AmbientLight ) )  {
 
