@@ -70,6 +70,9 @@ THREE.Car = function () {
 	this.bodyGeometry = null;
 	this.wheelGeometry = null;
 
+	this.bodyMaterials = null;
+	this.wheelMaterials = null;
+
 	// internal helper variables
 
 	this.loaded = false;
@@ -104,8 +107,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.JSONLoader();
 
-		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
-		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
+		loader.load( bodyURL, function( geometry, materials ) { createBody( geometry, materials ) } );
+		loader.load( wheelURL, function( geometry, materials ) { createWheels( geometry, materials ) } );
 
 	};
 
@@ -113,8 +116,8 @@ THREE.Car = function () {
 
 		var loader = new THREE.BinaryLoader();
 
-		loader.load( bodyURL, function( geometry ) { createBody( geometry ) } );
-		loader.load( wheelURL, function( geometry ) { createWheels( geometry ) } );
+		loader.load( bodyURL, function( geometry, materials ) { createBody( geometry, materials ) } );
+		loader.load( wheelURL, function( geometry, materials ) { createWheels( geometry, materials ) } );
 
 	};
 
@@ -236,17 +239,19 @@ THREE.Car = function () {
 
 	// internal helper methods
 
-	function createBody ( geometry ) {
+	function createBody ( geometry, materials ) {
 
 		scope.bodyGeometry = geometry;
+		scope.bodyMaterials = materials;
 
 		createCar();
 
 	};
 
-	function createWheels ( geometry ) {
+	function createWheels ( geometry, materials ) {
 
 		scope.wheelGeometry = geometry;
+		scope.wheelMaterials = materials;
 
 		createCar();
 
@@ -276,12 +281,14 @@ THREE.Car = function () {
 			// rig the car
 
 			var s = scope.modelScale,
-				delta = new THREE.Vector3(),
-				faceMaterial = new THREE.MeshFaceMaterial();
+				delta = new THREE.Vector3();
+
+			var bodyFaceMaterial = new THREE.MeshFaceMaterial( scope.bodyMaterials );
+			var wheelFaceMaterial = new THREE.MeshFaceMaterial( scope.wheelMaterials );
 
 			// body
 
-			scope.bodyMesh = new THREE.Mesh( scope.bodyGeometry, faceMaterial );
+			scope.bodyMesh = new THREE.Mesh( scope.bodyGeometry, bodyFaceMaterial );
 			scope.bodyMesh.scale.set( s, s, s );
 
 			scope.root.add( scope.bodyMesh );
@@ -292,7 +299,7 @@ THREE.Car = function () {
 
 			scope.frontLeftWheelRoot.position.addSelf( delta );
 
-			scope.frontLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.frontLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 			scope.frontLeftWheelMesh.scale.set( s, s, s );
 
 			scope.frontLeftWheelRoot.add( scope.frontLeftWheelMesh );
@@ -304,7 +311,7 @@ THREE.Car = function () {
 
 			scope.frontRightWheelRoot.position.addSelf( delta );
 
-			scope.frontRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.frontRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
 			scope.frontRightWheelMesh.scale.set( s, s, s );
 			scope.frontRightWheelMesh.rotation.z = Math.PI;
@@ -317,7 +324,7 @@ THREE.Car = function () {
 			delta.multiply( scope.wheelOffset, new THREE.Vector3( s, s, -s ) );
 			delta.z -= scope.backWheelOffset;
 
-			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
 			scope.backLeftWheelMesh.position.addSelf( delta );
 			scope.backLeftWheelMesh.scale.set( s, s, s );
@@ -329,7 +336,7 @@ THREE.Car = function () {
 			delta.multiply( scope.wheelOffset, new THREE.Vector3( -s, s, -s ) );
 			delta.z -= scope.backWheelOffset;
 
-			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, faceMaterial );
+			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
 			scope.backRightWheelMesh.position.addSelf( delta );
 			scope.backRightWheelMesh.scale.set( s, s, s );
