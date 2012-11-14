@@ -59,24 +59,17 @@ Sidebar.Object3D = function ( signals ) {
 	// scale
 
 	var objectScaleRow = new UI.Panel();
+	var objectScaleLock = new UI.Checkbox( 'absolute' ).setLeft( '75px' ).onChange( updateScaleLock );
 	var objectScaleX = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '100px' ).setWidth( '50px' ).onChange( updateScaleX );
 	var objectScaleY = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '160px' ).setWidth( '50px' ).onChange( updateScaleY );
 	var objectScaleZ = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '220px' ).setWidth( '50px' ).onChange( updateScaleZ );
 
 	objectScaleRow.add( new UI.Text().setValue( 'Scale' ).setColor( '#666' ) );
+	objectScaleRow.add( objectScaleLock );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
 
 	container.add( objectScaleRow );
 
-	// uniform scale lock
-
-	var objectScaleLockRow = new UI.Panel();
-	var objectScaleLock = new UI.Checkbox( 'absolute' ).setLeft( '100px' ).onChange( updateScaleLock );
-
-	objectScaleLockRow.add( new UI.Text().setValue( 'Uniform scale' ).setColor( '#666' ) );
-	objectScaleLockRow.add( objectScaleLock );
-
-	container.add( objectScaleLockRow );
 
 	// visible
 
@@ -341,13 +334,11 @@ Sidebar.Object3D = function ( signals ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );
-			objectScaleLockRow.setDisplay( 'none' );
 
 		} else {
 
 			objectRotationRow.setDisplay( '' );
 			objectScaleRow.setDisplay( '' );
-			objectScaleLockRow.setDisplay( '' );
 
 		}
 
