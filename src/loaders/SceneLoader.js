@@ -728,7 +728,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		if ( g.type === "cube" ) {
 
-			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.widthSegments, g.heightSegments, g.depthSegments, null, g.flipped, g.sides );
+			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.widthSegments, g.heightSegments, g.depthSegments );
 			result.geometries[ dg ] = geometry;
 
 		} else if ( g.type === "plane" ) {

@@ -9893,7 +9893,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		if ( g.type === "cube" ) {
 
-			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.widthSegments, g.heightSegments, g.depthSegments, null, g.flipped, g.sides );
+			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.widthSegments, g.heightSegments, g.depthSegments );
 			result.geometries[ dg ] = geometry;
 
 		} else if ( g.type === "plane" ) {
@@ -30080,7 +30080,7 @@ THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments, materials, sides ) {
+THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
 	THREE.Geometry.call( this );
 
@@ -30098,58 +30098,14 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 	var height_half = this.height / 2;
 	var depth_half = this.depth / 2;
 
-	var mpx, mpy, mpz, mnx, mny, mnz;
+	buildPlane( 'z', 'y', - 1, - 1, this.depth, this.height, width_half, 0 ); // px
+	buildPlane( 'z', 'y',   1, - 1, this.depth, this.height, - width_half, 1 ); // nx
+	buildPlane( 'x', 'z',   1,   1, this.width, this.depth, height_half, 2 ); // py
+	buildPlane( 'x', 'z',   1, - 1, this.width, this.depth, - height_half, 3 ); // ny
+	buildPlane( 'x', 'y',   1, - 1, this.width, this.height, depth_half, 4 ); // pz
+	buildPlane( 'x', 'y', - 1, - 1, this.width, this.height, - depth_half, 5 ); // nz
 
-	if ( materials !== undefined ) {
-
-		if ( materials instanceof Array ) {
-
-			this.materials = materials;
-
-		} else {
-
-			this.materials = [];
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				this.materials.push( materials );
-
-			}
-
-		}
-
-		mpx = 0; mnx = 1; mpy = 2; mny = 3; mpz = 4; mnz = 5;
-
-	} else {
-
-		this.materials = [];
-
-	}
-
-	this.sides = { px: true, nx: true, py: true, ny: true, pz: true, nz: true };
-
-	if ( sides != undefined ) {
-
-		for ( var s in sides ) {
-
-			if ( this.sides[ s ] !== undefined ) {
-
-				this.sides[ s ] = sides[ s ];
-
-			}
-
-		}
-
-	}
-
-	this.sides.px && buildPlane( 'z', 'y', - 1, - 1, this.depth, this.height, width_half, mpx ); // px
-	this.sides.nx && buildPlane( 'z', 'y',   1, - 1, this.depth, this.height, - width_half, mnx ); // nx
-	this.sides.py && buildPlane( 'x', 'z',   1,   1, this.width, this.depth, height_half, mpy ); // py
-	this.sides.ny && buildPlane( 'x', 'z',   1, - 1, this.width, this.depth, - height_half, mny ); // ny
-	this.sides.pz && buildPlane( 'x', 'y',   1, - 1, this.width, this.height, depth_half, mpz ); // pz
-	this.sides.nz && buildPlane( 'x', 'y', - 1, - 1, this.width, this.height, - depth_half, mnz ); // nz
-
-	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
+	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
 
 		var w, ix, iy,
 		gridX = scope.widthSegments,
@@ -30209,7 +30165,7 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 				var face = new THREE.Face4( a + offset, b + offset, c + offset, d + offset );
 				face.normal.copy( normal );
 				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = material;
+				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [
