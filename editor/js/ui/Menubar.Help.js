@@ -15,12 +15,20 @@ Menubar.Help = function ( signals ) {
 	options.setClass( 'options' );
 	container.add( options );
 
+	// source code
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Source code' );
+	option.onClick( function () { window.open( 'https://github.com/mrdoob/three.js/tree/master/editor', '_blank' ) } );
+	options.add( option );
+
 	// about
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'About' );
-	option.onClick( function () { alert( 'About' ) } );
+	option.onClick( function () { window.open( 'http://threejs.org', '_blank' ) } );
 	options.add( option );
 
 	//
