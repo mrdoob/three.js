@@ -218,6 +218,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	//START_VEROLD_MOD
+	this.getMaxTextureSize  = function () {
+
+		return _maxTextureSize;
+
+	};
+
+	this.getMaxCubemapSize  = function () {
+
+		return _maxCubemapSize;
+
+	};
+
+	this.getMaxTextures  = function () {
+
+		return _maxTextures;
+
+	};
+
+	this.getMaxVertexTextures  = function () {
+
+		return _maxVertexTextures;
+
+	};
+
+	this.setShaderPrecision = function( precision ) {
+		_precision = precision !== undefined ? precision : 'highp';
+	};
+
+	this.setMaxLights = function( maxLights ) {
+		_maxLights = maxLights !== undefined ? maxLights : 4;
+	};
+	//END_VEROLD_MOD
+
 	this.setSize = function ( width, height ) {
 
 		_canvas.width = width;
@@ -3916,14 +3950,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 							//This is an object using a normally opaque material that we want to render translucent.
 							material = webglObject[ "opaque" ];
 						}
-						overriden = true;
-						materialTransparent = material.transparent;
-						materialDepthWrite = material.depthWrite;
-						materialOpacity = material.uniforms.opacity.value;
+						if ( material.uniforms.opacity ) {
+							overriden = true;
+							materialTransparent = material.transparent;
+							materialDepthWrite = material.depthWrite;
+							materialOpacity = material.uniforms.opacity.value;
 
-						material.uniforms.opacity.value = object.opacity;
-						material.transparent = true;
-						material.depthWrite = false;
+							material.uniforms.opacity.value = object.opacity;
+							material.transparent = true;
+							material.depthWrite = false;
+						}
 					}
 					//END_VEROLD_MOD
 
@@ -4681,9 +4717,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			bumpMap: !!material.bumpMap,
 			normalMap: !!material.normalMap,
 			specularMap: !!material.specularMap,
-			//START_VEROLD_MOD
-			userDefines: material.userDefines,
-			//END_VEROLD_MOD
 
 			vertexColors: material.vertexColors,
 
@@ -5991,15 +6024,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		//console.log( "building new program " );
 
-		//START_VEROLD_MOD
-		//Build vertex shader prefix for user #defines
-		var user_VS_Prefix = "";
- 	 	for ( var x in parameters.userDefines ) {
-		  user_VS_Prefix += "#define ";
-		  user_VS_Prefix += x + " " + parameters.userDefines[x] + "\n";
-		}
-		//END_VEROLD_MOD
-
 		var customDefines = generateDefines( defines );
 
 		//
@@ -6009,11 +6033,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var prefix_vertex = [
 
 			"precision " + _precision + " float;",
-
-
-			//START_VEROLD_MOD
-			user_VS_Prefix,
-			//END_VEROLD_MOD
 
 			customDefines,
 
@@ -6113,24 +6132,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		].join("\n");
 
-		//START_VEROLD_MOD
-		//Build fragment shader prefix for user #defines
-		var user_FS_Prefix = "";
- 	 	for ( var x in parameters.userDefines ) {
-		  user_FS_Prefix += "#define ";
-		  user_FS_Prefix += x + " " + parameters.userDefines[x] + "\n";
-		}
-		//END_VEROLD_MOD
-
 		var prefix_fragment = [
 
 			"precision " + _precision + " float;",
 
 			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
-
-			//START_VEROLD_MOD
-			user_FS_Prefix,
-			//END_VEROLD_MOD
 
 			customDefines,
 
