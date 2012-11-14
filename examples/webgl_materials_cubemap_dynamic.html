@@ -826,14 +826,14 @@
 
 				// BODY
 
-				var materials = car.bodyGeometry.materials;
+				var materials = car.bodyMaterials;
 
 				materials[ 0 ] = mlib.body[ 0 ][ 1 ]; 		// body
 				materials[ 1 ] = mlib[ "Dark chrome" ]; 	// front under lights, back
 
 				// WHEELS
 
-				materials = car.wheelGeometry.materials;
+				materials = car.wheelMaterials;
 
 				materials[ 0 ] = mlib[ "Chrome" ];			// insides
 				materials[ 1 ] = mlib[ "Black rough" ];	// tire
@@ -853,7 +853,7 @@
 
 				// BODY
 
-				var materials = car.bodyGeometry.materials;
+				var materials = car.bodyMaterials;
 
 				materials[ 0 ] = mlib[ "Black metal" ];	// top, front center, back sides
 				materials[ 1 ] = mlib[ "Chrome" ];			// front sides
@@ -866,7 +866,7 @@
 
 				// WHEELS
 
-				materials = car.wheelGeometry.materials;
+				materials = car.wheelMaterials;
 
 				materials[ 0 ] = mlib[ "Chrome" ];			// insides
 				materials[ 1 ] = mlib[ "Black rough" ];	// tire
@@ -911,16 +911,16 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ] = mlib[ "ChromeN" ];
-						veyron.bodyGeometry.materials[ 2 ] = mlib[ "ChromeN" ];
+						veyron.bodyMaterials[ 1 ] = mlib[ "ChromeN" ];
+						veyron.bodyMaterials[ 2 ] = mlib[ "ChromeN" ];
 
-						veyron.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
+						veyron.wheelMaterials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
+						gallardo.wheelMaterials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
@@ -928,16 +928,16 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ] = mlib[ "Chrome" ];
-						veyron.bodyGeometry.materials[ 2 ] = mlib[ "Chrome" ];
+						veyron.bodyMaterials[ 1 ] = mlib[ "Chrome" ];
+						veyron.bodyMaterials[ 2 ] = mlib[ "Chrome" ];
 
-						veyron.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
+						veyron.wheelMaterials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
+						gallardo.wheelMaterials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 

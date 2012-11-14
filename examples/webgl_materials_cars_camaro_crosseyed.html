@@ -170,7 +170,7 @@
 			function $( id ) { return document.getElementById( id ) }
 
 
-			function createButtons( materials, geometry ) {
+			function createButtons( materials, faceMaterial ) {
 
 				var i, src = "", parent = $( "buttons" );
 
@@ -185,7 +185,7 @@
 				for( i = 0; i < materials.length; i ++ ) {
 
 					$( "m" + i ).counter = i;
-					$( "m" + i ).addEventListener( 'click', function() { geometry.materials[ 0 ] = materials[ this.counter ][ 1 ] }, false );
+					$( "m" + i ).addEventListener( 'click', function() { faceMaterial.materials[ 0 ] = materials[ this.counter ][ 1 ] }, false );
 
 				}
 
@@ -210,7 +210,7 @@
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				createButtons( materials.body, geometry );
+				createButtons( materials.body, m );
 
 			}
 
