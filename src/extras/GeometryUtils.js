@@ -20,6 +20,7 @@ THREE.GeometryUtils = {
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
+		/*
 		var geo1MaterialsMap = {};
 
 		for ( var i = 0; i < geometry1.materials.length; i ++ ) {
@@ -29,6 +30,7 @@ THREE.GeometryUtils = {
 			geo1MaterialsMap[ id ] = i;
 
 		}
+		*/
 
 		if ( object2 instanceof THREE.Mesh ) {
 
@@ -154,6 +156,7 @@ THREE.GeometryUtils = {
 			faces = geometry.faces,
 			uvs = geometry.faceVertexUvs[ 0 ];
 
+		/*
 		// materials
 
 		if ( geometry.materials ) {
@@ -161,6 +164,7 @@ THREE.GeometryUtils = {
 			cloneGeo.materials = geometry.materials.slice();
 
 		}
+		*/
 
 		// vertices
 

@@ -67,15 +67,17 @@ THREE.Loader.prototype = {
 
 	},
 
-	initMaterials: function ( scope, materials, texturePath ) {
+	initMaterials: function ( materials, texturePath ) {
 
-		scope.materials = [];
+		var array = [];
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			scope.materials[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
+			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
 
 		}
+
+		return array;
 
 	},
 

@@ -265,7 +265,7 @@ THREE.ShadowMapPlugin = function ( ) {
 					// while rendering depth map
 
 					// need to deal with MeshFaceMaterial somehow
-					// in that case just use the first of geometry.materials for now
+					// in that case just use the first of material.materials for now
 					// (proper solution would require to break objects by materials
 					//  similarly to regular rendering and then set corresponding
 					//  depth materials per each chunk instead of just once per object)
@@ -480,23 +480,9 @@ THREE.ShadowMapPlugin = function ( ) {
 
 	function getObjectMaterial( object ) {
 
-		if ( object.material instanceof THREE.MeshFaceMaterial ) {
-
-			if ( object.material.materials.length > 0 ) {
-
-				return object.material.materials[ 0 ];
-
-			} else {
-
-				return object.geometry.materials[ 0 ];
-
-			}
-
-		} else {
-
-			return object.material;
-
-		}
+		return object.material instanceof THREE.MeshFaceMaterial
+			? object.material.materials[ 0 ]
+			: object.material;
 
 	};
 

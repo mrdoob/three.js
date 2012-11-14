@@ -890,23 +890,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function getBufferMaterial( object, geometryGroup ) {
 
-		if ( object.material instanceof THREE.MeshFaceMaterial ) {
-
-			if ( object.material.materials.length > 0 ) {
-
-				return object.material.materials[ geometryGroup.materialIndex ];
-
-			} else {
-
-				return object.geometry.materials[ geometryGroup.materialIndex ];
-
-			}
-
-		} else {
-
-			return object.material;
-
-		}
+		return object.material instanceof THREE.MeshFaceMaterial
+			? object.material.materials[ geometryGroup.materialIndex ]
+			: object.material;
 
 	};
 
@@ -4168,15 +4154,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( materialIndex >= 0 ) {
 
-				if ( meshMaterial.materials.length > 0 ) {
-
-					material = meshMaterial.materials[ materialIndex ];
-
-				} else {
-
-					material = object.geometry.materials[ materialIndex ];
-
-				}
+				material = meshMaterial.materials[ materialIndex ];
 
 				if ( material.transparent ) {
 
