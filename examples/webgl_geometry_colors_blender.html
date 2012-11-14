@@ -105,16 +105,16 @@
 
 			}
 
-			function createScene1( geometry ) {
+			function createScene1( geometry, materials ) {
 
-				geometry.materials[ 0 ].shading = THREE.FlatShading;
+				materials[ 0 ].shading = THREE.FlatShading;
 
 				mesh = new THREE.Object3D();
 				mesh.position.x = 400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
 				scene.add( mesh );
 
-				var part1 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				var part1 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh.add( part1 );
 
 				var part2 = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 0.9, shading: THREE.FlatShading, wireframe: true, wireframeLinewidth: 2, transparent: true } ) );
@@ -122,13 +122,11 @@
 
 			}
 
-			function createScene2( geometry ) {
+			function createScene2( geometry, materials ) {
 
-				geometry.materials[ 0 ].shading = THREE.FlatShading;
+				materials[ 0 ].shading = THREE.FlatShading;
 
-				var material = new THREE.MeshFaceMaterial();
-
-				mesh2 = new THREE.Mesh( geometry, material );
+				mesh2 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh2.position.x = - 400;
 				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = 250;
 				scene.add( mesh2 );

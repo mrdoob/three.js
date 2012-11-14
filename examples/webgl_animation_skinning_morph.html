@@ -165,7 +165,7 @@
 				//
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "models/skinned/knight.js", function( geometry ) { createScene( geometry,  0, FLOOR, -300, 60 ) } );
+				loader.load( "models/skinned/knight.js", function ( geometry, materials ) { createScene( geometry, materials, 0, FLOOR, -300, 60 ) } );
 
 				//
 
@@ -202,7 +202,7 @@
 
 			}
 
-			function createScene( geometry, x, y, z, s ) {
+			function createScene( geometry, materials, x, y, z, s ) {
 
 				ensureLoop( geometry.animation );
 
@@ -227,9 +227,9 @@
 				//var bumpMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color() );
 				//var bumpMap = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
 
-				for ( var i = 0; i < geometry.materials.length; i ++ ) {
+				for ( var i = 0; i < materials.length; i ++ ) {
 
-					var m = geometry.materials[ i ];
+					var m = materials[ i ];
 					m.skinning = true;
 					m.morphTargets = true;
 
@@ -250,7 +250,7 @@
 
 				}
 
-				mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial() );
+				mesh = new THREE.SkinnedMesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh.position.set( x, y - bb.min.y * s, z );
 				mesh.scale.set( s, s, s );
 				scene.add( mesh );
