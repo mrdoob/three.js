@@ -171,9 +171,8 @@ THREE.Projector = function() {
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
 		var near = camera.near, far = camera.far, visible = false,
-		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
-		modelMatrix,
-		geometry, geometryMaterials, vertices, vertex, vertexPositionScreen,
+		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object, modelMatrix,
+		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, normal, faceVertexUvs, uvs,
 		v1, v2, v3, v4, isFaceMaterial, material, side;
 
@@ -216,7 +215,6 @@ THREE.Projector = function() {
 				_normalMatrix.transpose();
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-				geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
 
 				side = object.material.side;
 
@@ -241,7 +239,7 @@ THREE.Projector = function() {
 
 					face = faces[ f ];
 
-					material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
+					material = isFaceMaterial === true ? object.material.materials[ face.materialIndex ] : object.material;
 
 					if ( material === undefined ) continue;
 

@@ -96,6 +96,7 @@
 				// POLYFIELD
 
 				var geometry = new THREE.Geometry();
+				var materials = [];
 
 				for ( var i = 0; i < 100; i ++ ) {
 
@@ -109,11 +110,11 @@
 					v1.addSelf( v );
 					v2.addSelf( v );
 
-					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, geometry.materials.length );
-
-					geometry.materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
+					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, i );
 
 					geometry.faces.push( face );
+
+					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 
 				}
 
@@ -124,7 +125,7 @@
 				group.scale.x = group.scale.y = group.scale.z = 2;
 				scene.add( group );
 
-				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				group.add( mesh );
 
 				// LIGHTS

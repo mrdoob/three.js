@@ -96,22 +96,13 @@
 				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
 
 					var face = geometry_pieces.faces[ i ];
-
-					if ( Math.random() > 0.7 )  {
-
-						face.materialIndex = Math.floor( Math.random() * materials.length );
-
-					} else {
-
-						face.materialIndex = 0;
-
-					}
+					face.materialIndex = Math.floor( Math.random() * materials.length );
 
 				}
 
 				geometry_pieces.materials = materials;
 
-				materials.push( new THREE.MeshFaceMaterial() );
+				materials.push( new THREE.MeshFaceMaterial( materials ) );
 
 				objects = [];
 
