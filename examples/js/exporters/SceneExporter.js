@@ -217,8 +217,8 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : "AmbientLight",',
-				'	"color"  : ' + o.color.getHex() + ( o.children.length ? ',' : '' )
+				'	"type"  : "AmbientLight",',
+				'	"color" : ' + o.color.getHex() + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -227,9 +227,9 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : "DirectionalLight",',
-				'	"color"  : ' + o.color.getHex() + ',',
-				'	"intensity"  : ' + o.intensity + ',',
+				'	"type"      : "DirectionalLight",',
+				'	"color"     : ' + o.color.getHex() + ',',
+				'	"intensity" : ' + o.intensity + ',',
 				'	"direction" : ' + Vector3String( o.position ) + ',',
 				'	"target"    : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
@@ -240,10 +240,10 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : "PointLight",',
-				'	"color"  : ' + o.color.getHex() + ',',
-				'	"intensity"  : ' + o.intensity + ',',
-				'	"position" : ' + Vector3String( o.position ) + ',',
+				'	"type"      : "PointLight",',
+				'	"color"     : ' + o.color.getHex() + ',',
+				'	"intensity" : ' + o.intensity + ',',
+				'	"position"  : ' + Vector3String( o.position ) + ',',
 				'	"distance"  : ' + o.distance + ( o.children.length ? ',' : '' )
 
 				];
@@ -253,12 +253,12 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : "SpotLight",',
-				'	"color"  : ' + o.color.getHex() + ',',
-				'	"intensity"  : ' + o.intensity + ',',
-				'	"position" : ' + Vector3String( o.position ) + ',',
+				'	"type"      : "SpotLight",',
+				'	"color"     : ' + o.color.getHex() + ',',
+				'	"intensity" : ' + o.intensity + ',',
+				'	"position"  : ' + Vector3String( o.position ) + ',',
 				'	"distance"  : ' + o.distance + ',',
-				'	"angle"  : ' + o.angle + ',',
+				'	"angle"     : ' + o.angle + ',',
 				'	"exponent"  : ' + o.exponent + ',',
 				'	"target"    : ' + LabelString( getObjectName( o.target ) ) + ( o.children.length ? ',' : '' )
 
@@ -269,11 +269,11 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : "HemisphereLight",',
-				'	"skyColor"  : ' + o.color.getHex() + ',',
-				'	"groundColor"  : ' + o.groundColor.getHex() + ',',
-				'	"intensity"  : ' + o.intensity + ',',
-				'	"position" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
+				'	"type"        : "HemisphereLight",',
+				'	"skyColor"    : ' + o.color.getHex() + ',',
+				'	"groundColor" : ' + o.groundColor.getHex() + ',',
+				'	"intensity"   : ' + o.intensity + ',',
+				'	"position"    : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
 
 				];
 
@@ -294,11 +294,11 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : "PerspectiveCamera",',
-				'	"fov": ' + o.fov + ',',
-				'	"aspect": ' + o.aspect + ',',
-				'	"near": ' + o.near + ',',
-				'	"far": ' + o.far + ',',
+				'	"type"     : "PerspectiveCamera",',
+				'	"fov"      : ' + o.fov + ',',
+				'	"aspect"   : ' + o.aspect + ',',
+				'	"near"     : ' + o.near + ',',
+				'	"far"      : ' + o.far + ',',
 				'	"position" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
 
 				];
@@ -308,13 +308,13 @@ THREE.SceneExporter.prototype = {
 				var output = [
 
 				'\t\t' + LabelString( getObjectName( o ) ) + ' : {',
-				'	"type" : "OrthographicCamera",',
-				'	"left": ' + o.left + ',',
-				'	"right": ' + o.right + ',',
-				'	"top": ' + o.top + ',',
-				'	"bottom": ' + o.bottom + ',',
-				'	"near": ' + o.near + ',',
-				'	"far": ' + o.far + ',',
+				'	"type"     : "OrthographicCamera",',
+				'	"left"     : ' + o.left + ',',
+				'	"right"    : ' + o.right + ',',
+				'	"top"      : ' + o.top + ',',
+				'	"bottom"   : ' + o.bottom + ',',
+				'	"near"     : ' + o.near + ',',
+				'	"far"      : ' + o.far + ',',
 				'	"position" : ' + Vector3String( o.position ) + ( o.children.length ? ',' : '' )
 
 				];

@@ -132,10 +132,69 @@ Menubar.Add = function ( signals ) {
 
 	// add spot light
 
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Spot light' );
+	option.onClick( function () {
+
+		var color = 0xffffff;
+		var intensity = 1;
+		var distance = 0;
+		var angle = Math.PI * 0.1;
+		var exponent = 10;
+
+		var light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+		light.name = 'Light ' + light.id;
+		light.target.name = 'Light ' + light.id + ' target';
+
+		light.target.properties.targetInverse = light;
+
+		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
+
+		signals.objectAdded.dispatch( light );
+
+	} );
+	options.add( option );
+
 	// add hemisphere light
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Hemisphere light' );
+	option.onClick( function () {
+
+		var skyColor = 0x00aaff;
+		var groundColor = 0xffaa00;
+		var intensity = 1;
+
+		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
+		light.name = 'Light ' + light.id;
+
+		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+
+		signals.objectAdded.dispatch( light );
+
+	} );
+	options.add( option );
 
 	// add ambient light
 
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Ambient light' );
+	option.onClick( function () {
+
+		var color = 0x222222;
+
+		var light = new THREE.AmbientLight( color );
+		light.name = 'Light ' + light.id;
+
+		signals.objectAdded.dispatch( light );
+
+	} );
+	options.add( option );
+
+	//
 
 	function createDummyMaterial() {
 
