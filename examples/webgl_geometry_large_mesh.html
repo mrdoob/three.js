@@ -164,11 +164,24 @@
 				//loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				var s = Date.now(),
-					callback = function( geometry ) { createScene( geometry, s ) };
+				var start = Date.now();
 
 				//loader.load( 'obj/lucy/Lucy100k_slim.js', callback );
-				loader.load( 'obj/lucy/Lucy100k_bin.js', callback );
+				loader.load( 'obj/lucy/Lucy100k_bin.js', function ( geometry, materials ) {
+
+					addMesh( geometry, 0.75, 900, 0, 0,  0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x990000, shininess: 30 } ) );
+					addMesh( geometry, 0.75, 300, 0, 0,  0,0,0, new THREE.MeshFaceMaterial( materials ) );
+					addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
+					addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x555555, specular: 0x666666, shininess: 10 } ) );
+
+					loader.statusDomElement.style.display = "none";
+
+					log( "geometry.vertices: " + geometry.vertices.length );
+					log( "geometry.faces: " + geometry.faces.length );
+
+					log( "model loaded and created in " + ( Date.now() - start ) + " ms" );
+
+				} );
 
 				//
 
@@ -186,23 +199,6 @@
 
 				if ( render_canvas ) canvasRenderer.setSize( window.innerWidth, window.innerHeight );
 				if ( render_gl && has_gl ) webglRenderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-
-			function createScene( geometry, start ) {
-
-				addMesh( geometry, 0.75, 900, 0, 0,  0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x030303, specular: 0x990000, shininess: 30 } ) );
-				addMesh( geometry, 0.75, 300, 0, 0,  0,0,0, new THREE.MeshFaceMaterial( ) );
-				addMesh( geometry, 0.75, -300, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x111111, specular: 0xffaa00, shininess: 10 } ) );
-				addMesh( geometry, 0.75, -900, 0, 0, 0,0,0, new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0x555555, specular: 0x666666, shininess: 10 } ) );
-
-				loader.statusDomElement.style.display = "none";
-
-				log( "geometry.vertices: " + geometry.vertices.length );
-				log( "geometry.faces: " + geometry.faces.length );
-
-				log( "model loaded and created in " + ( Date.now() - start ) + " ms" );
 
 			}
 
