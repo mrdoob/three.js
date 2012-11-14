@@ -97,6 +97,7 @@ THREE.GeometryUtils = {
 
 			if ( face.materialIndex !== undefined ) {
 
+				/*
 				var material2 = geometry2.materials[ face.materialIndex ];
 				var materialId2 = material2.id;
 
@@ -112,6 +113,9 @@ THREE.GeometryUtils = {
 				}
 
 				faceCopy.materialIndex = materialIndex;
+				*/
+
+				faceCopy.materialIndex = face.materialIndex;
 
 			}
 
