@@ -85,11 +85,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			if ( face.materialIndex !== undefined ) {
-
-				faceCopy.materialIndex = face.materialIndex;
-
-			}
+			faceCopy.materialIndex = face.materialIndex;
 
 			faceCopy.centroid.copy( face.centroid );
 			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
@@ -113,56 +109,6 @@ THREE.GeometryUtils = {
 			uvs1.push( uvCopy );
 
 		}
-
-	},
-
-	clone: function ( geometry ) {
-
-		var cloneGeo = new THREE.Geometry();
-
-		var i, il;
-
-		var vertices = geometry.vertices,
-			faces = geometry.faces,
-			uvs = geometry.faceVertexUvs[ 0 ];
-
-		// vertices
-
-		for ( i = 0, il = vertices.length; i < il; i ++ ) {
-
-			var vertex = vertices[ i ];
-
-			cloneGeo.vertices.push( vertex.clone() );
-
-		}
-
-		// faces
-
-		for ( i = 0, il = faces.length; i < il; i ++ ) {
-
-			var face = faces[ i ];
-
-			cloneGeo.faces.push( face.clone() );
-
-		}
-
-		// uvs
-
-		for ( i = 0, il = uvs.length; i < il; i ++ ) {
-
-			var uv = uvs[ i ], uvCopy = [];
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
-
-			}
-
-			cloneGeo.faceVertexUvs[ 0 ].push( uvCopy );
-
-		}
-
-		return cloneGeo;
 
 	},
 
