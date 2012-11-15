@@ -11,7 +11,7 @@ THREE.MeshFaceMaterial = function ( materials ) {
 THREE.MeshFaceMaterial.prototype.clone = function () {
 	
 	var material = new THREE.MeshFaceMaterial();
-	material.materials = this.materials;
+	material.materials = this.materials.slice(0);
 	return material;
 
 };
