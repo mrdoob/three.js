@@ -65,6 +65,28 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 ### Change log ###
 
+2012 11 15 - **r53** (392,799 KB, gzip: 96,044 KB)
+
+* Lots of improvements to [editor](http://mrdoob.github.com/three.js/editor/). Including possibility to export geometry and scene. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* `Sprite` no longer gets its size from the texture. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Improved `CSS3DRenderer`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Added support for vertex normals in `Ribbon`. ([alteredq](http://github.com/alteredq))
+* `Object3D`'s `.clone()` is now recursive. ([mrdoob](http://github.com/mrdoob))
+* Added support for fog in `Sprite`. ([alteredq](http://github.com/alteredq))
+* Scene format now supports nested lights, cameras and SkinnedMesh, OBJ, VTK, STL, UTF8 and Collada files. ([alteredq](http://github.com/alteredq))
+* `Object3D`'s `.lookAt()` now working when using quaternions. ([motin](http://github.com/motin))
+* Added touch support to `TrackballControls`. ([mrdoob](http://github.com/mrdoob))
+* Object sorting in `WebGLRenderer` is now stable, regardless of browser implementation. ([alteredq](http://github.com/alteredq))
+* `MeshPhongMaterial`'s `perPixel` is not `true` by default. ([alteredq](http://github.com/alteredq))
+* Added `LineDashedMaterial`. ([alteredq](http://github.com/alteredq))
+* Added `.setContextStyle` to `Color`. ([greyscales](http://github.com/greyscales))
+* Corrected normal matrix calculations. ([WestLangley](http://github.com/WestLangley))
+* Added area weighted vertex normals computation to `Geometry`. ([alteredq](http://github.com/alteredq))
+* Moved geometry.materials to `MeshFaceMaterial`. ([gero3](http://github.com/gero3), [alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Removed `materials` and `sides` from `CubeGeometry`. ([mrdoob](http://github.com/mrdoob))
+* Move `GeometryUtils`'s `.clone()` to `Geometry`. ([mrdoob](http://github.com/mrdoob))
+
+
 2012 10 15 - **r52** (379,442 KB, gzip: 94,126 KB)
 
 * New node.js build system. ([gero3](http://github.com/gero3))
