@@ -116,7 +116,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 // Binary AJAX parser
 
-THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, materials ) {
+THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, jsonMaterials ) {
 
 	var Model = function ( texturePath ) {
 
@@ -196,8 +196,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 		this.computeCentroids();
 		this.computeFaceNormals();
-
-		if ( THREE.Loader.prototype.hasNormals( this ) ) this.computeTangents();
 
 		function handlePadding( n ) {
 
@@ -759,6 +757,11 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 	Model.prototype = Object.create( THREE.Geometry.prototype );
 
-	callback( new Model( texturePath ), this.initMaterials( materials, texturePath ) );
+	var geometry = new Model( texturePath );
+	var materials = this.initMaterials( jsonMaterials, texturePath );
+
+	if ( this.needsTangents( materials ) ) geometry.computeTangents();
+
+	callback( geometry, materials );
 
 };

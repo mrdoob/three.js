@@ -104,9 +104,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
 
-	if ( this.hasNormals( geometry ) ) geometry.computeTangents();
-
-
 	function parseModel( scale ) {
 
 		function isBitSet( value, position ) {
@@ -423,6 +420,8 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 	};
 
 	var materials = this.initMaterials( json.materials, texturePath );
+
+	if ( this.needsTangents( materials ) ) geometry.computeTangents();
 
 	callback( geometry, materials );
 
