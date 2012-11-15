@@ -153,6 +153,13 @@
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/VTKLoader.js"></script>
+		<script src="js/loaders/STLLoader.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/loaders/UTF8Loader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -324,6 +331,22 @@
 
 						}
 
+						if ( object instanceof THREE.SkinnedMesh ) {
+
+							if ( object.geometry.animation ) {
+
+								THREE.AnimationHandler.add( object.geometry.animation );
+
+								var animation = new THREE.Animation( object, object.geometry.animation.name );
+								animation.JITCompile = false;
+								animation.interpolationType = THREE.AnimationHandler.LINEAR;
+
+								animation.play();
+
+							}
+
+						}
+
 					} );
 
 				}
@@ -333,6 +356,12 @@
 				var loader = new THREE.SceneLoader();
 
 				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
+				loader.addGeometryHandler( "vtk", THREE.VTKLoader );
+				loader.addGeometryHandler( "stl", THREE.STLLoader );
+
+				loader.addHierarchyHandler( "obj", THREE.OBJLoader );
+				loader.addHierarchyHandler( "dae", THREE.ColladaLoader );
+				loader.addHierarchyHandler( "utf8", THREE.UTF8Loader );
 
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
@@ -379,7 +408,7 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -454,6 +483,10 @@
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
 				camera.lookAt( scene.position );
+
+				// update skinning
+
+				THREE.AnimationHandler.update( delta * 0.75 );
 
 				for ( var i = 0; i < rotatingObjects.length; i ++ ) {
 

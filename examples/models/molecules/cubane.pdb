@@ -1,0 +1,30 @@
+HEADER    NONAME 23-Apr-10                                              NONE   1
+TITLE                                                                   NONE   2
+AUTHOR    Chemical Structure Services at http://cactus.nci.nih.gov      NONE   3
+REVDAT   1  23-Apr-10     0                                             NONE   4
+ATOM      1  C           0       0.414   0.765   0.999  0.00  0.00           C+0
+ATOM      2  C           0       0.414  -0.765   0.999  0.00  0.00           C+0
+ATOM      3  C           0       0.999   0.765  -0.414  0.00  0.00           C+0
+ATOM      4  C           0      -1.000   0.765   0.414  0.00  0.00           C+0
+ATOM      5  C           0       0.999  -0.765  -0.414  0.00  0.00           C+0
+ATOM      6  C           0      -1.000  -0.765   0.414  0.00  0.00           C+0
+ATOM      7  C           0      -0.414   0.765  -1.000  0.00  0.00           C+0
+ATOM      8  C           0      -0.414  -0.765  -1.000  0.00  0.00           C+0
+ATOM      9  H           0       0.756   1.394   1.822  0.00  0.00           H+0
+ATOM     10  H           0       0.756  -1.394   1.822  0.00  0.00           H+0
+ATOM     11  H           0       1.823   1.394  -0.754  0.00  0.00           H+0
+ATOM     12  H           0      -1.822   1.394   0.756  0.00  0.00           H+0
+ATOM     13  H           0       1.823  -1.394  -0.754  0.00  0.00           H+0
+ATOM     14  H           0      -1.822  -1.394   0.756  0.00  0.00           H+0
+ATOM     15  H           0      -0.754   1.396  -1.821  0.00  0.00           H+0
+ATOM     16  H           0      -0.754  -1.396  -1.821  0.00  0.00           H+0
+CONECT    1    2    3    4    9                                         NONE  21
+CONECT    2    1    5    6   10                                         NONE  22
+CONECT    3    1    5    7   11                                         NONE  23
+CONECT    4    1    6    7   12                                         NONE  24
+CONECT    5    2    3    8   13                                         NONE  25
+CONECT    6    2    4    8   14                                         NONE  26
+CONECT    7    3    4    8   15                                         NONE  27
+CONECT    8    5    6    7   16                                         NONE  28
+END                                                                     NONE  29
+

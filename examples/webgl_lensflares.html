@@ -32,6 +32,10 @@
 				color: #0080ff;
 			}
 
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -89,7 +93,7 @@
 				var s = 250;
 
 				var cube = new THREE.CubeGeometry( s, s, s );
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50, perPixel: true } );
+				var material = new THREE.MeshPhongMaterial( { ambient: 0x333333, color: 0xffffff, specular: 0xffffff, shininess: 50 } );
 
 
 				for ( var i = 0; i < 3000; i ++ ) {
@@ -167,7 +171,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, maxLights: 8, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color, 1 );
 
@@ -182,14 +186,7 @@
 				// stats
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// events
 

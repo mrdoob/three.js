@@ -239,7 +239,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( object.visible && object.castShadow ) {
 
-					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+					if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
@@ -483,9 +483,25 @@ THREE.ShadowMapPlugin = function ( ) {
 
 	function getObjectMaterial( object ) {
 
-		return object.material instanceof THREE.MeshFaceMaterial ? object.geometry.materials[ 0 ] : object.material;
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
 
-	}
+			if ( object.material.materials.length > 0 ) {
+
+				return object.material.materials[ 0 ];
+
+			} else {
+
+				return object.geometry.materials[ 0 ];
+
+			}
+
+		} else {
+
+			return object.material;
+
+		}
+
+	};
 
 };
 

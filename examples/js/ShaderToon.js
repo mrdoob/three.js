@@ -32,14 +32,14 @@ THREE.ShaderToon = {
 
 		"void main() {",
 
-			"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+			"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 			"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-			"vec3 nWorld = normalize ( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
+			"vec3 worldNormal = normalize ( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
 
 			"vNormal = normalize( normalMatrix * normal );",
 
-			"vec3 I = mPosition.xyz - cameraPosition;",
-			"vRefract = refract( normalize( I ), nWorld, 1.02 );",
+			"vec3 I = worldPosition.xyz - cameraPosition;",
+			"vRefract = refract( normalize( I ), worldNormal, 1.02 );",
 
 			"gl_Position = projectionMatrix * mvPosition;",
 

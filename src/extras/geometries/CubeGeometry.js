@@ -2,76 +2,37 @@
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
-//START_VEROLD_MOD
-THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHeight, segmentsDepth, materials, sides, flipSided ) {
-//END_VEROLD_MOD
+
+THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
 	THREE.Geometry.call( this );
 
-	var scope = this,
-	width_half = width / 2,
-	height_half = height / 2,
-	depth_half = depth / 2;
+	var scope = this;
 
-	var mpx, mpy, mpz, mnx, mny, mnz;
+	this.width = width;
+	this.height = height;
+	this.depth = depth;
 
-	if ( materials !== undefined ) {
+	this.widthSegments = widthSegments || 1;
+	this.heightSegments = heightSegments || 1;
+	this.depthSegments = depthSegments || 1;
 
-		if ( materials instanceof Array ) {
+	var width_half = this.width / 2;
+	var height_half = this.height / 2;
+	var depth_half = this.depth / 2;
 
-			this.materials = materials;
+	buildPlane( 'z', 'y', - 1, - 1, this.depth, this.height, width_half, 0 ); // px
+	buildPlane( 'z', 'y',   1, - 1, this.depth, this.height, - width_half, 1 ); // nx
+	buildPlane( 'x', 'z',   1,   1, this.width, this.depth, height_half, 2 ); // py
+	buildPlane( 'x', 'z',   1, - 1, this.width, this.depth, - height_half, 3 ); // ny
+	buildPlane( 'x', 'y',   1, - 1, this.width, this.height, depth_half, 4 ); // pz
+	buildPlane( 'x', 'y', - 1, - 1, this.width, this.height, - depth_half, 5 ); // nz
 
-		} else {
-
-			this.materials = [];
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				this.materials.push( materials );
-
-			}
-
-		}
-
-		mpx = 0; mnx = 1; mpy = 2; mny = 3; mpz = 4; mnz = 5;
-
-	} else {
-
-		this.materials = [];
-
-	}
-
-	this.sides = { px: true, nx: true, py: true, ny: true, pz: true, nz: true };
-
-	if ( sides != undefined ) {
-
-		for ( var s in sides ) {
-
-			if ( this.sides[ s ] !== undefined ) {
-
-				this.sides[ s ] = sides[ s ];
-
-			}
-
-		}
-
-	}
-
-	//START_VEROLD_MOD
-	var flipSideMod = flipSided ? -1 : 1;
-	this.sides.px && buildPlane( 'z', 'y', - 1 * flipSideMod, - 1, depth, height, width_half, mpx ); // px
-	this.sides.nx && buildPlane( 'z', 'y',   1 * flipSideMod, - 1, depth, height, - width_half, mnx ); // nx
-	this.sides.py && buildPlane( 'x', 'z',   1 * flipSideMod,   1, width, depth, height_half, mpy ); // py
-	this.sides.ny && buildPlane( 'x', 'z',   1 * flipSideMod, - 1, width, depth, - height_half, mny ); // ny
-	this.sides.pz && buildPlane( 'x', 'y',   1 * flipSideMod, - 1, width, height, depth_half, mpz ); // pz
-	this.sides.nz && buildPlane( 'x', 'y', - 1 * flipSideMod, - 1, width, height, - depth_half, mnz ); // nz
-	//END_VEROLD_MOD
-
-	function buildPlane( u, v, udir, vdir, width, height, depth, material ) {
+	function buildPlane( u, v, udir, vdir, width, height, depth, materialIndex ) {
 
 		var w, ix, iy,
-		gridX = segmentsWidth || 1,
-		gridY = segmentsHeight || 1,
+		gridX = scope.widthSegments,
+		gridY = scope.heightSegments,
 		width_half = width / 2,
 		height_half = height / 2,
 		offset = scope.vertices.length;
@@ -83,12 +44,12 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		} else if ( ( u === 'x' && v === 'z' ) || ( u === 'z' && v === 'x' ) ) {
 
 			w = 'y';
-			gridY = segmentsDepth || 1;
+			gridY = scope.depthSegments;
 
 		} else if ( ( u === 'z' && v === 'y' ) || ( u === 'y' && v === 'z' ) ) {
 
 			w = 'x';
-			gridX = segmentsDepth || 1;
+			gridX = scope.depthSegments;
 
 		}
 
@@ -98,7 +59,7 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 		segment_height = height / gridY,
 		normal = new THREE.Vector3();
 
-		normal[ w ] = depth * flipSideMod > 0 ? 1 : - 1;
+		normal[ w ] = depth > 0 ? 1 : - 1;
 
 		for ( iy = 0; iy < gridY1; iy ++ ) {
 
@@ -127,7 +88,7 @@ THREE.CubeGeometry = function ( width, height, depth, segmentsWidth, segmentsHei
 				var face = new THREE.Face4( a + offset, b + offset, c + offset, d + offset );
 				face.normal.copy( normal );
 				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
-				face.materialIndex = material;
+				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [

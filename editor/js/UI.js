@@ -4,6 +4,16 @@ UI.Element = function () {};
 
 UI.Element.prototype = {
 
+	setClass: function ( name ) {
+
+		this.dom.className = name;
+
+		return this;
+
+	},
+
+	// styles
+
 	setStyle: function ( style, array ) {
 
 		for ( var i = 0; i < array.length; i ++ ) {
@@ -62,7 +72,7 @@ UI.Element.prototype = {
 
 	},
 
-	// border
+	//
 
 	setBorder: function () {
 
@@ -104,7 +114,7 @@ UI.Element.prototype = {
 
 	},
 
-	// margin
+	//
 
 	setMargin: function () {
 
@@ -146,11 +156,21 @@ UI.Element.prototype = {
 
 	},
 
-	// padding
+	//
 
 	setPadding: function () {
 
 		this.setStyle( 'padding', arguments );
+
+		return this;
+
+	},
+
+	//
+
+	setFloat: function () {
+
+		this.setStyle( 'float', arguments );
 
 		return this;
 
@@ -206,8 +226,53 @@ UI.Element.prototype = {
 
 		return this;
 
-	}
+	},
 
+	//
+
+	setCursor: function () {
+
+		this.setStyle( 'cursor', arguments );
+
+		return this;
+
+	},
+
+	// content
+
+	setTextContent: function ( value ) {
+
+		this.dom.textContent = value;
+
+		return this;
+
+	},
+
+	// events
+
+	onMouseOver: function ( callback ) {
+
+		this.dom.addEventListener( 'mouseover', callback, false );
+
+		return this;
+
+	},
+
+	onMouseOut: function ( callback ) {
+
+		this.dom.addEventListener( 'mouseout', callback, false );
+
+		return this;
+
+	},
+
+	onClick: function ( callback ) {
+
+		this.dom.addEventListener( 'click', callback, false );
+
+		return this;
+
+	}
 
 }
 
@@ -254,6 +319,7 @@ UI.Text = function ( position ) {
 
 	var dom = document.createElement( 'span' );
 	dom.style.position = position || 'relative';
+	dom.style.cursor = 'default';
 
 	this.dom = dom;
 
@@ -282,8 +348,10 @@ UI.Input = function ( position ) {
 
 	var dom = document.createElement( 'input' );
 	dom.style.position = position || 'relative';
+	dom.style.padding = '2px';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLeft = '-2px';
+	dom.style.border = '1px solid #ccc';
 
 	this.dom = dom;
 
@@ -406,6 +474,127 @@ UI.Select.prototype.onChange = function ( callback ) {
 
 };
 
+// FancySelect
+
+UI.FancySelect = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'div' );
+	dom.style.position = position || 'relative';
+	dom.style.background = '#fff';
+	dom.style.border = '1px solid #ccc';
+	dom.style.padding = '0';
+	dom.style.cursor = 'default';
+	dom.style.overflow = 'auto';
+
+	this.dom = dom;
+
+	this.onChangeCallback = null;
+
+	this.options = [];
+	this.selectedValue = null;
+
+	return this;
+
+};
+
+UI.FancySelect.prototype = Object.create( UI.Element.prototype );
+
+UI.FancySelect.prototype.setOptions = function ( options ) {
+
+	var scope = this;
+
+	while ( scope.dom.children.length > 0 ) {
+
+		scope.dom.removeChild( scope.dom.firstChild );
+
+	}
+
+	scope.options = [];
+
+	var generateOptionCallback = function ( element, value ) {
+
+		return function ( event ) {
+
+			for ( var i = 0; i < scope.options.length; i ++ ) {
+
+				scope.options[ i ].style.backgroundColor = '#f0f0f0';
+
+			}
+
+			element.style.backgroundColor = '#f0f0f0';
+
+			scope.selectedValue = value;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+		}
+
+	};
+
+	for ( var key in options ) {
+
+		var option = document.createElement( 'div' );
+		option.style.padding = '4px';
+		option.style.whiteSpace = 'nowrap';
+		option.innerHTML = options[ key ];
+		option.value = key;
+		scope.dom.appendChild( option );
+
+		scope.options.push( option );
+		option.addEventListener( 'click', generateOptionCallback( option, key ), false );
+
+	}
+
+	return scope;
+
+};
+
+UI.FancySelect.prototype.getValue = function () {
+
+	return this.selectedValue;
+
+};
+
+UI.FancySelect.prototype.setValue = function ( value ) {
+
+	// must convert raw value into string for compatibility with UI.Select
+	// which uses string values (initialized from options keys)
+
+	var key = value ? value.toString() : value;
+
+	for ( var i = 0; i < this.options.length; i ++ ) {
+
+		var element = this.options[ i ];
+
+		if ( element.value === key ) {
+
+			element.style.backgroundColor = '#f0f0f0';
+
+		} else {
+
+			element.style.backgroundColor = '';
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	return this;
+
+};
+
+UI.FancySelect.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
 
 // Checkbox
 
@@ -497,9 +686,23 @@ UI.Color.prototype.getValue = function () {
 
 };
 
+UI.Color.prototype.getHexValue = function () {
+
+	return parseInt( this.dom.value.substr( 1 ), 16 );
+
+};
+
 UI.Color.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.Color.prototype.setHexValue = function ( hex ) {
+
+	this.dom.value = "#" + ( '000000' + hex.toString( 16 ) ).slice( -6 );
 
 	return this;
 
@@ -526,17 +729,21 @@ UI.Number = function ( position ) {
 	dom.style.position = position || 'relative';
 	dom.style.color = '#0080f0';
 	dom.style.fontSize = '12px';
-	dom.style.cursor = 'col-resize';
 	dom.style.backgroundColor = 'transparent';
-	dom.style.borderColor = 'transparent';
+	dom.style.border = '1px solid transparent';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLegt = '-2px';
+	dom.style.padding = '2px';
+	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	this.dom = dom;
 
 	this.min = - Infinity;
 	this.max = Infinity;
+
+	this.precision = 2;
+	this.step = 1;
 
 	this.onChangeCallback = null;
 
@@ -563,9 +770,9 @@ UI.Number = function ( position ) {
 
 		distance += movementX - movementY;
 
-		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) );
+		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) ) * scope.step;
 
-		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
+		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -602,7 +809,8 @@ UI.Number = function ( position ) {
 	var onFocus = function ( event ) {
 
 		dom.style.backgroundColor = '';
-		dom.style.borderColor = '';
+		dom.style.borderColor = '#ccc';
+		dom.style.cursor = '';
 
 	};
 
@@ -610,16 +818,7 @@ UI.Number = function ( position ) {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.borderColor = 'transparent';
-
-	};
-
-	var onKeyUp = function ( event ) {
-
-		if ( event.keyCode == 13 ) {
-
-			onBlur();
-
-		}
+		dom.style.cursor = 'col-resize';
 
 	};
 
@@ -627,7 +826,6 @@ UI.Number = function ( position ) {
 	dom.addEventListener( 'change', onChange, false );
 	dom.addEventListener( 'focus', onFocus, false );
 	dom.addEventListener( 'blur', onBlur, false );
-	dom.addEventListener( 'keyup', onKeyUp, false );
 
 	return this;
 
@@ -643,7 +841,7 @@ UI.Number.prototype.getValue = function () {
 
 UI.Number.prototype.setValue = function ( value ) {
 
-	this.dom.value = value.toFixed( 2 );
+	this.dom.value = value.toFixed( this.precision );
 
 	return this;
 
@@ -653,6 +851,20 @@ UI.Number.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
 	this.max = max;
+
+	return this;
+
+};
+
+UI.Number.prototype.setPrecision = function ( precision ) {
+
+	this.precision = precision;
+
+	if ( precision > 2 ) {
+
+		this.step = Math.pow( 10, -( precision - 1 ) );
+
+	}
 
 	return this;
 

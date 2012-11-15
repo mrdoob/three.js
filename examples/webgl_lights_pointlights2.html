@@ -29,6 +29,11 @@
 			a:hover {
 				color: #0080ff;
 			}
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -124,8 +129,8 @@
 
 				// MATERIALS
 
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444, map: texture, perPixel: true } );
-				var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, ambient: 0x111111, specular: 0xffffff, perPixel: true, metal: true, map: texture2 } );
+				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444, map: texture } );
+				var objectMaterial = new THREE.MeshPhongMaterial( { color: 0x000000, ambient: 0x111111, specular: 0xffffff, metal: true, map: texture2 } );
 
 				// GROUND
 
@@ -216,7 +221,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { maxLights: 10, antialias: false, clearColor: 0x030303, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x030303, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( scene.fog.color, 1 );
 
@@ -229,14 +234,6 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 				container.appendChild( stats.domElement );
 
 				//

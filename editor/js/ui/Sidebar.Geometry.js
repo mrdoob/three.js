@@ -1,4 +1,4 @@
-Sidebar.Properties.Geometry = function ( signals ) {
+Sidebar.Geometry = function ( signals ) {
 
 	var geometries = {
 
@@ -28,7 +28,6 @@ Sidebar.Properties.Geometry = function ( signals ) {
 	container.setPadding( '10px' );
 
 	container.add( new UI.Text().setValue( 'GEOMETRY' ).setColor( '#666' ) );
-	container.add( new UI.Button( 'absolute' ).setRight( '0px' ).setLabel( 'Export' ).onClick( exportGeometry ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// name
@@ -116,17 +115,6 @@ Sidebar.Properties.Geometry = function ( signals ) {
 			if ( geometry instanceof geometries[ key ] ) return key;
 
 		}
-
-	}
-
-	function exportGeometry() {
-
-		var output = new THREE.GeometryExporter().parse( selected );
-
-		/*
-		var blob = new Blob( [ output ], { type: 'text/json' } );
-		var objectURL = URL.createObjectURL( blob );
-		*/
 
 	}
 

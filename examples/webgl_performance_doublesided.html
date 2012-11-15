@@ -12,6 +12,11 @@
 				font-weight: bold;
 				overflow:hidden;
 			}
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #eee !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -80,13 +85,13 @@
 					var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
 					reflectionCube.format = THREE.RGBFormat;
 
-					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, perPixel: true, side: THREE.DoubleSide } );
+					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
 					material.wrapAround = true;
 					material.wrapRGB.set( 0.5, 0.5, 0.5 );
 
 				} else {
 
-					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.SmoothShading, perPixel: true, doubleSided: true } );
+					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.SmoothShading, doubleSided: true } );
 
 				}
 
@@ -121,14 +126,6 @@
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#eee";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );

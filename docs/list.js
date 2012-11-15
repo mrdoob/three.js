@@ -135,14 +135,6 @@ var list = {
 			[ "CubeCamera", "api/extras/cameras/CubeCamera" ]
 		],
 
-		"Extras / Controls": [
-			[ "FirstPersonControls", "api/extras/controls/FirstPersonControls" ],
-			[ "FlyControls", "api/extras/controls/FlyControls" ],
-			[ "PathControls", "api/extras/controls/PathControls" ],
-			[ "RollControls", "api/extras/controls/RollControls" ],
-			[ "TrackballControls", "api/extras/controls/TrackballControls" ]
-		],
-
 		"Extras / Core": [
 			[ "BufferGeometry", "api/extras/core/BufferGeometry" ],
 			[ "Curve", "api/extras/core/Curve" ],

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - dashed lines</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #ffffff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - dashed lines example</div>
+		<div id="container"></div>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="../build/three.min.js"></script>
+
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var renderer, scene, camera, stats;
+			var objects = [];
+
+
+			var WIDTH = window.innerWidth,
+				HEIGHT = window.innerHeight;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, WIDTH / HEIGHT, 1, 200 );
+				camera.position.z = 150;
+
+				scene = new THREE.Scene();
+
+				scene.fog = new THREE.Fog( 0x111111, 150, 200 );
+
+				root = new THREE.Object3D();
+
+				var subdivisions = 6;
+				var recursion = 1;
+
+				var points = hilbert3D( new THREE.Vector3( 0,0,0 ), 25.0, recursion, 0, 1, 2, 3, 4, 5, 6, 7 );
+
+				var spline = new THREE.Spline( points );
+				var geometrySpline = new THREE.Geometry();
+
+				for ( var i = 0; i < points.length * subdivisions; i ++ ) {
+
+					var index = i / ( points.length * subdivisions );
+					var position = spline.getPoint( index );
+
+					geometrySpline.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
+
+				}
+
+				var geometryCube = cube( 50 );
+
+				geometryCube.computeLineDistances();
+				geometrySpline.computeLineDistances();
+
+				var object = new THREE.Line( geometrySpline, new THREE.LineDashedMaterial( { color: 0xffffff, dashSize: 1, gapSize: 0.5 } ), THREE.LineStrip );
+
+				objects.push( object );
+				scene.add( object );
+
+				var object = new THREE.Line( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1, linewidth: 2 } ), THREE.LinePieces );
+
+				objects.push( object );
+				scene.add( object );
+
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x111111, clearAlpha: 1, antialias: true } );
+				renderer.setSize( WIDTH, HEIGHT );
+
+				var container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function cube( size ) {
+
+				var h = size * 0.5;
+
+				var geometry = new THREE.Geometry();
+
+				geometry.vertices.push( new THREE.Vector3( -h, -h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( -h, h, -h ) );
+
+				geometry.vertices.push( new THREE.Vector3( -h, h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( h, h, -h ) );
+
+				geometry.vertices.push( new THREE.Vector3( h, h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( h, -h, -h ) );
+
+				geometry.vertices.push( new THREE.Vector3( h, -h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( -h, -h, -h ) );
+
+
+				geometry.vertices.push( new THREE.Vector3( -h, -h, h ) );
+				geometry.vertices.push( new THREE.Vector3( -h, h, h ) );
+
+				geometry.vertices.push( new THREE.Vector3( -h, h, h ) );
+				geometry.vertices.push( new THREE.Vector3( h, h, h ) );
+
+				geometry.vertices.push( new THREE.Vector3( h, h, h ) );
+				geometry.vertices.push( new THREE.Vector3( h, -h, h ) );
+
+				geometry.vertices.push( new THREE.Vector3( h, -h, h ) );
+				geometry.vertices.push( new THREE.Vector3( -h, -h, h ) );
+
+				geometry.vertices.push( new THREE.Vector3( -h, -h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( -h, -h, h ) );
+
+				geometry.vertices.push( new THREE.Vector3( -h, h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( -h, h, h ) );
+
+				geometry.vertices.push( new THREE.Vector3( h, h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( h, h, h ) );
+
+				geometry.vertices.push( new THREE.Vector3( h, -h, -h ) );
+				geometry.vertices.push( new THREE.Vector3( h, -h, h ) );
+
+				return geometry;
+
+			}
+
+			// port of Processing Java code by Thomas Diewald
+			// http://www.openprocessing.org/visuals/?visualID=15599
+
+			function hilbert3D( center, side, iterations, v0, v1, v2, v3, v4, v5, v6, v7 ) {
+
+				var half = side/2,
+
+					vec_s = [
+
+					new THREE.Vector3( center.x - half, center.y + half, center.z - half ),
+					new THREE.Vector3( center.x - half, center.y + half, center.z + half ),
+					new THREE.Vector3( center.x - half, center.y - half, center.z + half ),
+					new THREE.Vector3( center.x - half, center.y - half, center.z - half ),
+					new THREE.Vector3( center.x + half, center.y - half, center.z - half ),
+					new THREE.Vector3( center.x + half, center.y - half, center.z + half ),
+					new THREE.Vector3( center.x + half, center.y + half, center.z + half ),
+					new THREE.Vector3( center.x + half, center.y + half, center.z - half )
+
+					],
+
+					vec = [ vec_s[ v0 ], vec_s[ v1 ], vec_s[ v2 ], vec_s[ v3 ], vec_s[ v4 ], vec_s[ v5 ], vec_s[ v6 ], vec_s[ v7 ] ];
+
+				if ( --iterations >= 0 ) {
+
+					var tmp = [];
+
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
+					Array.prototype.push.apply( tmp, hilbert3D ( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
+
+					return tmp;
+
+				}
+
+				return vec;
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.001;
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+
+					//object.rotation.x = 0.25 * time * ( i%2 == 1 ? 1 : -1);
+					object.rotation.x = 0.25 * time;
+					object.rotation.y = 0.25 * time;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+	</script>
+
+</body>
+
+</html>

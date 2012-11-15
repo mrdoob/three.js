@@ -68,6 +68,12 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 		_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
 
+		_sprite.uniforms.fogType 		  	  = _gl.getUniformLocation( _sprite.program, "fogType" );
+		_sprite.uniforms.fogDensity 		  = _gl.getUniformLocation( _sprite.program, "fogDensity" );
+		_sprite.uniforms.fogNear 		  	  = _gl.getUniformLocation( _sprite.program, "fogNear" );
+		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
+		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
+
 		_sprite.attributesEnabled = false;
 
 	};
@@ -117,9 +123,45 @@ THREE.SpritePlugin = function ( ) {
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
 
+		var oldFogType = 0;
+		var sceneFogType = 0;
+		var fog = scene.fog;
+
+		if ( fog ) {
+
+			_gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
+
+			if ( fog instanceof THREE.Fog ) {
+
+				_gl.uniform1f( uniforms.fogNear, fog.near );
+				_gl.uniform1f( uniforms.fogFar, fog.far );
+
+				_gl.uniform1i( uniforms.fogType, 1 );
+				oldFogType = 1;
+				sceneFogType = 1;
+
+			} else if ( fog instanceof THREE.FogExp2 ) {
+
+				_gl.uniform1f( uniforms.fogDensity, fog.density );
+
+				_gl.uniform1i( uniforms.fogType, 2 );
+				oldFogType = 2;
+				sceneFogType = 2;
+
+			}
+
+		} else {
+
+			_gl.uniform1i( uniforms.fogType, 0 );
+			oldFogType = 0;
+			sceneFogType = 0;
+
+		}
+
+
 		// update positions and sort
 
-		var i, sprite, screenPosition, size, scale = [];
+		var i, sprite, screenPosition, size, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
@@ -127,10 +169,10 @@ THREE.SpritePlugin = function ( ) {
 
 			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
 
-			if( ! sprite.useScreenCoordinates ) {
+			if ( ! sprite.useScreenCoordinates ) {
 
 				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld );
-				sprite.z = - sprite._modelViewMatrix.elements[14];
+				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
 
 			} else {
 
@@ -140,7 +182,7 @@ THREE.SpritePlugin = function ( ) {
 
 		}
 
-		sprites.sort( painterSort );
+		sprites.sort( painterSortStable );
 
 		// render all sprites
 
@@ -170,7 +212,24 @@ THREE.SpritePlugin = function ( ) {
 
 				}
 
-				size = sprite.map.image.width / ( sprite.scaleByViewport ? viewportHeight : 1 );
+				if ( scene.fog && sprite.fog ) {
+
+					fogType = sceneFogType;
+
+				} else {
+
+					fogType = 0;
+
+				}
+
+				if ( oldFogType !== fogType ) {
+
+					_gl.uniform1i( uniforms.fogType, fogType );
+					oldFogType = fogType;
+
+				}
+
+				size = 1 / ( sprite.scaleByViewport ? viewportHeight : 1 );
 
 				scale[ 0 ] = size * invAspect * sprite.scale.x;
 				scale[ 1 ] = size * sprite.scale.y;
@@ -236,9 +295,17 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-	function painterSort ( a, b ) {
+	function painterSortStable ( a, b ) {
 
-		return b.z - a.z;
+		if ( a.z !== b.z ) {
+
+			return b.z - a.z;
+
+		} else {
+
+			return b.id - a.id;
+
+		}
 
 	};
 

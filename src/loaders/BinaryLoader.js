@@ -20,8 +20,10 @@ THREE.BinaryLoader.prototype = Object.create( THREE.Loader.prototype );
 
 THREE.BinaryLoader.prototype.load = function( url, callback, texturePath, binaryPath ) {
 
-	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
-	binaryPath = binaryPath ? binaryPath : this.extractUrlBase( url );
+	// todo: unify load API to for easier SceneLoader use
+
+	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
+	binaryPath = binaryPath && ( typeof binaryPath === "string" ) ? binaryPath : this.extractUrlBase( url );
 
 	var callbackProgress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
 

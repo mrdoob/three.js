@@ -114,7 +114,15 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+			if ( this.useQuaternion === false )  {
+
+				this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+
+			} else {
+
+				this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+
+			}
 
 		}
 
@@ -340,6 +348,13 @@ THREE.Object3D.prototype = {
 		object.receiveShadow = this.receiveShadow;
 
 		object.frustumCulled = this.frustumCulled;
+
+		for ( var i = 0; i < this.children.length; i ++ ) {
+
+			var child = this.children[ i ];
+			object.add( child.clone() );
+
+		}
 
 		return object;
 

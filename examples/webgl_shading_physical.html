@@ -6,28 +6,31 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 		    body {
-			color: #222;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+				color: #fff;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
 
-			background-color: #fff;
-			margin: 0px;
-			overflow: hidden;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
 		    }
 
 		    #info {
-			color:#000;
-			position: relative;
-			margin: 0 auto -2.1em;
-			top: 0px;
-			width: 550px;
-			padding: 5px;
-			z-index:100;
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0px;
+				width: 550px;
+				padding: 5px;
+				z-index:100;
 		    }
 
 		    a { color: skyblue; }
+
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #444 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -56,9 +59,9 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/Tween.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 
-		<script src='js/libs/DAT.GUI.min.js'></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 
 		<script>
@@ -116,21 +119,6 @@
 
 				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
 				camera.position.set( 500, 400, 1200 );
-
-				controls = new THREE.TrackballControls( camera );
-				controls.target.set( 0, 120, 0 );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.15;
-
-				controls.keys = [ 65, 83, 68 ];
 
 				// SCENE
 
@@ -378,17 +366,27 @@
 				renderer.gammaOutput = true;
 				renderer.physicallyBasedShading = true;
 
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.target.set( 0, 120, 0 );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.15;
+
+				controls.keys = [ 65, 83, 68 ];
+
+
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#222";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 				container.appendChild( stats.domElement );
 
 				// EVENTS
@@ -443,12 +441,12 @@
 
 				tweenDirection = -1;
 
-				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
-				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
+				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 
 				// GUI
 
-				gui = new DAT.GUI();
+				gui = new dat.GUI();
 
 				gui.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
 

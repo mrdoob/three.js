@@ -10,8 +10,6 @@
  *
  */
 
-if ( THREE.WebGLRenderer ) {
-
 THREE.ShaderUtils = {
 
 	lib: {
@@ -44,12 +42,11 @@ THREE.ShaderUtils = {
 				"void main() {",
 
 					"vec4 reflectedColor = textureCube( tCube, vec3( -vReflect.x, vReflect.yz ) );",
-					"vec4 refractedColor = vec4( 1.0, 1.0, 1.0, 1.0 );",
+					"vec4 refractedColor = vec4( 1.0 );",
 
 					"refractedColor.r = textureCube( tCube, vec3( -vRefract[0].x, vRefract[0].yz ) ).r;",
 					"refractedColor.g = textureCube( tCube, vec3( -vRefract[1].x, vRefract[1].yz ) ).g;",
 					"refractedColor.b = textureCube( tCube, vec3( -vRefract[2].x, vRefract[2].yz ) ).b;",
-					"refractedColor.a = 1.0;",
 
 					"gl_FragColor = mix( refractedColor, reflectedColor, clamp( vReflectionFactor, 0.0, 1.0 ) );",
 
@@ -71,17 +68,17 @@ THREE.ShaderUtils = {
 				"void main() {",
 
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
-					"vec3 nWorld = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
+					"vec3 worldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );",
 
-					"vec3 I = mPosition.xyz - cameraPosition;",
+					"vec3 I = worldPosition.xyz - cameraPosition;",
 
-					"vReflect = reflect( I, nWorld );",
-					"vRefract[0] = refract( normalize( I ), nWorld, mRefractionRatio );",
-					"vRefract[1] = refract( normalize( I ), nWorld, mRefractionRatio * 0.99 );",
-					"vRefract[2] = refract( normalize( I ), nWorld, mRefractionRatio * 0.98 );",
-					"vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), nWorld ), mFresnelPower );",
+					"vReflect = reflect( I, worldNormal );",
+					"vRefract[0] = refract( normalize( I ), worldNormal, mRefractionRatio );",
+					"vRefract[1] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.99 );",
+					"vRefract[2] = refract( normalize( I ), worldNormal, mRefractionRatio * 0.98 );",
+					"vReflectionFactor = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( I ), worldNormal ), mFresnelPower );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
@@ -189,7 +186,7 @@ THREE.ShaderUtils = {
 
 					"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
 					"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-					"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+					"uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
 
 				"#endif",
 
@@ -206,7 +203,7 @@ THREE.ShaderUtils = {
 					"uniform vec3 spotLightColor[ MAX_SPOT_LIGHTS ];",
 					"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 					"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
-					"uniform float spotLightAngle[ MAX_SPOT_LIGHTS ];",
+					"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 					"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 					"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 
@@ -363,9 +360,9 @@ THREE.ShaderUtils = {
 
 							"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
 
-							"if ( spotEffect > spotLightAngle[ i ] ) {",
+							"if ( spotEffect > spotLightAngleCos[ i ] ) {",
 
-								"spotEffect = pow( spotEffect, spotLightExponent[ i ] );",
+								"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
 								// diffuse
 
@@ -474,8 +471,8 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-							"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-							"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+							"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
+							"vec3 lVector = normalize( lDirection.xyz );",
 
 							// diffuse
 
@@ -495,7 +492,7 @@ THREE.ShaderUtils = {
 
 							// specular (ground light)
 
-							"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+							"vec3 lVectorGround = -lVector;",
 
 							"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 							"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
@@ -638,19 +635,19 @@ THREE.ShaderUtils = {
 
 					"#ifdef USE_SKINNING",
 
-						"vNormal = normalMatrix * skinnedNormal.xyz;",
+						"vNormal = normalize( normalMatrix * skinnedNormal.xyz );",
 
 						"vec4 skinnedTangent = skinMatrix * vec4( tangent.xyz, 0.0 );",
-						"vTangent = normalMatrix * skinnedTangent.xyz;",
+						"vTangent = normalize( normalMatrix * skinnedTangent.xyz );",
 
 					"#else",
 
-						"vNormal = normalMatrix * normal;",
-						"vTangent = normalMatrix * tangent.xyz;",
+						"vNormal = normalize( normalMatrix * normal );",
+						"vTangent = normalize( normalMatrix * tangent.xyz );",
 
 					"#endif",
 
-					"vBinormal = cross( vNormal, vTangent ) * tangent.w;",
+					"vBinormal = normalize( cross( vNormal, vTangent ) * tangent.w );",
 
 					"vUv = uv * uRepeat + uOffset;",
 
@@ -707,13 +704,13 @@ THREE.ShaderUtils = {
 					//
 
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
-					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 
 					"gl_Position = projectionMatrix * mvPosition;",
 
 					//
 
-					"vWorldPosition = mPosition.xyz;",
+					"vWorldPosition = worldPosition.xyz;",
 					"vViewPosition = -mvPosition.xyz;",
 
 					// shadows
@@ -722,7 +719,7 @@ THREE.ShaderUtils = {
 
 						"for( int i = 0; i < MAX_SHADOWS; i ++ ) {",
 
-							"vShadowCoord[ i ] = shadowMatrix[ i ] * mPosition;",
+							"vShadowCoord[ i ] = shadowMatrix[ i ] * worldPosition;",
 
 						"}",
 
@@ -745,12 +742,12 @@ THREE.ShaderUtils = {
 
 			vertexShader: [
 
-				"varying vec3 vViewPosition;",
+				"varying vec3 vWorldPosition;",
 
 				"void main() {",
 
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
-					"vViewPosition = cameraPosition - mPosition.xyz;",
+					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+					"vWorldPosition = worldPosition.xyz;",
 
 					"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -763,12 +760,11 @@ THREE.ShaderUtils = {
 				"uniform samplerCube tCube;",
 				"uniform float tFlip;",
 
-				"varying vec3 vViewPosition;",
+				"varying vec3 vWorldPosition;",
 
 				"void main() {",
 
-					"vec3 wPos = cameraPosition - vViewPosition;",
-					"gl_FragColor = textureCube( tCube, vec3( tFlip * wPos.x, wPos.yz ) );",
+					"gl_FragColor = textureCube( tCube, vec3( tFlip * vWorldPosition.x, vWorldPosition.yz ) );",
 
 				"}"
 
@@ -777,7 +773,5 @@ THREE.ShaderUtils = {
 		}
 
 	}
-
-};
 
 };

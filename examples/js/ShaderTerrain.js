@@ -99,7 +99,7 @@ THREE.ShaderTerrain = {
 
 				"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
 				"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-				"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+				"uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
 
 			"#endif",
 
@@ -230,8 +230,8 @@ THREE.ShaderTerrain = {
 
 					"for( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-						"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+						"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
+						"vec3 lVector = normalize( lDirection.xyz );",
 
 						// diffuse
 
@@ -250,7 +250,7 @@ THREE.ShaderTerrain = {
 
 						// specular (ground light)
 
-						"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+						"vec3 lVectorGround = -lVector;",
 
 						"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 						"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
@@ -349,12 +349,12 @@ THREE.ShaderTerrain = {
 					"float df = uDisplacementScale * dv.x + uDisplacementBias;",
 					"vec3 displacedPosition = normal * df + position;",
 
-					"vec4 mPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( displacedPosition, 1.0 );",
 					"vec4 mvPosition = modelViewMatrix * vec4( displacedPosition, 1.0 );",
 
 				"#else",
 
-					"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+					"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 					"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
 				"#endif",

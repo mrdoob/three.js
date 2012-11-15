@@ -7,6 +7,8 @@ THREE.JSONLoader = function ( showStatus ) {
 
 	THREE.Loader.call( this, showStatus );
 
+	this.withCredentials = false;
+
 };
 
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
@@ -15,7 +17,9 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	var scope = this;
 
-	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
+	// todo: unify load API to for easier SceneLoader use
+
+	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
 
 	this.onLoadStart();
 	this.loadAjaxJSON( this, url, callback, texturePath );
@@ -27,6 +31,8 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 	var xhr = new XMLHttpRequest();
 
 	var length = 0;
+
+	xhr.withCredentials = this.withCredentials;
 
 	xhr.onreadystatechange = function () {
 

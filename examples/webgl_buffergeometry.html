@@ -219,31 +219,26 @@
 
 				geometry.offsets = [];
 
-				var start = 0;
-				var index = 0;
-				var left = triangles * 3;
+				var offsets = triangles / chunkSize;
 
-				for ( ;; ) {
+				for ( var i = 0; i < offsets; i ++ ) {
 
-					var count = Math.min( chunkSize * 3, left );
+					var offset = {
+						start: i * chunkSize * 3,
+						index: i * chunkSize * 3,
+						count: Math.min( triangles - ( i * chunkSize ), chunkSize ) * 3
+					};
 
-					var chunk = { start: start, count: count, index: index };
-
-					geometry.offsets.push( chunk );
-
-					start += count;
-					index += chunkSize * 3;
-
-					left -= count;
-
-					if ( left <= 0 ) break;
+					geometry.offsets.push( offset );
 
 				}
 
 				geometry.computeBoundingSphere();
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-															  side: THREE.DoubleSide, perPixel: true, vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshPhongMaterial( {
+						color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+						side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+				} );
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );

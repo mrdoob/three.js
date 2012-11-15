@@ -29,8 +29,14 @@
 			a:hover {
 				color: #f00;
 			}
+
 			#footer { width: 100%; margin: 2em auto; text-align: center; position: absolute; bottom: 0 }
 			strong { color: red }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #555 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -53,14 +59,14 @@
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
-			varying vec3 worldPosition;
+			varying vec3 vWorldPosition;
 
 			void main() {
 
-				vec4 mPosition = modelMatrix * vec4( position, 1.0 );
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				worldPosition = mPosition.xyz;
 
 			}
 
@@ -73,16 +79,17 @@
 			uniform float offset;
 			uniform float exponent;
 
-			varying vec3 worldPosition;
+			varying vec3 vWorldPosition;
 
 			void main() {
 
-				float h = normalize( worldPosition + offset ).y;
+				float h = normalize( vWorldPosition + offset ).y;
 				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( h, exponent ), 0.0 ) ), 1.0 );
 
 			}
 
 		</script>
+
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -158,7 +165,7 @@
 				// GROUND
 
 				var groundGeo = new THREE.PlaneGeometry( 10000, 10000 );
-				var groundMat = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505, perPixel: true } );
+				var groundMat = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
 				groundMat.color.setHSV( 0.095, 0.5, 1 );
 
 				var ground = new THREE.Mesh( groundGeo, groundMat );
@@ -197,7 +204,7 @@
 					morphColorsToFaceColors( geometry );
 					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading, perPixel: false } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.FlatShading } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 					meshAnim.duration = 1000;
@@ -233,14 +240,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#777";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				//
 

@@ -32,6 +32,8 @@ THREE.ImageUtils = {
 		loader.crossOrigin = this.crossOrigin;
 		loader.load( url, image );
 
+		texture.sourceFile = url;
+
 		return texture;
 
 	},
