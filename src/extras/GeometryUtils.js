@@ -20,18 +20,6 @@ THREE.GeometryUtils = {
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
-		/*
-		var geo1MaterialsMap = {};
-
-		for ( var i = 0; i < geometry1.materials.length; i ++ ) {
-
-			var id = geometry1.materials[ i ].id;
-
-			geo1MaterialsMap[ id ] = i;
-
-		}
-		*/
-
 		if ( object2 instanceof THREE.Mesh ) {
 
 			object2.matrixAutoUpdate && object2.updateMatrix();
@@ -99,24 +87,6 @@ THREE.GeometryUtils = {
 
 			if ( face.materialIndex !== undefined ) {
 
-				/*
-				var material2 = geometry2.materials[ face.materialIndex ];
-				var materialId2 = material2.id;
-
-				var materialIndex = geo1MaterialsMap[ materialId2 ];
-
-				if ( materialIndex === undefined ) {
-
-					materialIndex = geometry1.materials.length;
-					geo1MaterialsMap[ materialId2 ] = materialIndex;
-
-					geometry1.materials.push( material2 );
-
-				}
-
-				faceCopy.materialIndex = materialIndex;
-				*/
-
 				faceCopy.materialIndex = face.materialIndex;
 
 			}
@@ -155,16 +125,6 @@ THREE.GeometryUtils = {
 		var vertices = geometry.vertices,
 			faces = geometry.faces,
 			uvs = geometry.faceVertexUvs[ 0 ];
-
-		/*
-		// materials
-
-		if ( geometry.materials ) {
-
-			cloneGeo.materials = geometry.materials.slice();
-
-		}
-		*/
 
 		// vertices
 

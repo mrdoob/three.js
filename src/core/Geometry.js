@@ -18,8 +18,6 @@ THREE.Geometry = function () {
 	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
 	this.normals = []; // one-to-one vertex normals, used in Ribbon
 
-	this.materials = [];
-
 	this.faces = [];
 
 	this.faceUvs = [[]];
