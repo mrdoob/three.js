@@ -234,16 +234,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					if ( geometry ) {
 
-						var hasNormals = false;
+						var needsTangents = false;
 
 						material = result.materials[ o.material ];
-						hasNormals = material instanceof THREE.ShaderMaterial;
-
-						if ( hasNormals ) {
-
-							geometry.computeTangents();
-
-						}
+						needsTangents = material instanceof THREE.ShaderMaterial;
 
 						p = o.position;
 						r = o.rotation;
@@ -271,6 +265,22 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 						if ( ( material instanceof THREE.MeshFaceMaterial ) && material.materials.length === 0 ) {
 
 							material = new THREE.MeshFaceMaterial( result.face_materials[ o.geometry ] );
+
+						}
+
+						if ( material instanceof THREE.MeshFaceMaterial ) {
+
+							for ( var i = 0; i < material.materials.length; i ++ ) {
+
+								needsTangents = needsTangents || ( material.materials[ i ] instanceof THREE.ShaderMaterial );
+
+							}
+
+						}
+
+						if ( needsTangents ) {
+
+							geometry.computeTangents();
 
 						}
 

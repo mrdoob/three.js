@@ -6846,13 +6846,11 @@ THREE.Loader.prototype = {
 
 	},
 
-	hasNormals: function ( scope ) {
+	needsTangents: function ( materials ) {
 
-		var m, i, il = scope.materials.length;
+		for( var i = 0, il = materials.length; i < il; i ++ ) {
 
-		for( i = 0; i < il; i ++ ) {
-
-			m = scope.materials[ i ];
+			var m = materials[ i ];
 
 			if ( m instanceof THREE.ShaderMaterial ) return true;
 
@@ -7318,7 +7316,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 // Binary AJAX parser
 
-THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, materials ) {
+THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, jsonMaterials ) {
 
 	var Model = function ( texturePath ) {
 
@@ -7398,8 +7396,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 		this.computeCentroids();
 		this.computeFaceNormals();
-
-		if ( THREE.Loader.prototype.hasNormals( this ) ) this.computeTangents();
 
 		function handlePadding( n ) {
 
@@ -7961,7 +7957,12 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 	Model.prototype = Object.create( THREE.Geometry.prototype );
 
-	callback( new Model( texturePath ), this.initMaterials( materials, texturePath ) );
+	var geometry = new Model( texturePath );
+	var materials = this.initMaterials( jsonMaterials, texturePath );
+
+	if ( this.needsTangents( materials ) ) geometry.computeTangents();
+
+	callback( geometry, materials );
 
 };
 /**
@@ -8110,9 +8111,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
-
-	if ( this.hasNormals( geometry ) ) geometry.computeTangents();
-
 
 	function parseModel( scale ) {
 
@@ -8431,6 +8429,8 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 	var materials = this.initMaterials( json.materials, texturePath );
 
+	if ( this.needsTangents( materials ) ) geometry.computeTangents();
+
 	callback( geometry, materials );
 
 };
@@ -8706,16 +8706,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					if ( geometry ) {
 
-						var hasNormals = false;
+						var needsTangents = false;
 
 						material = result.materials[ o.material ];
-						hasNormals = material instanceof THREE.ShaderMaterial;
-
-						if ( hasNormals ) {
-
-							geometry.computeTangents();
-
-						}
+						needsTangents = material instanceof THREE.ShaderMaterial;
 
 						p = o.position;
 						r = o.rotation;
@@ -8743,6 +8737,22 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 						if ( ( material instanceof THREE.MeshFaceMaterial ) && material.materials.length === 0 ) {
 
 							material = new THREE.MeshFaceMaterial( result.face_materials[ o.geometry ] );
+
+						}
+
+						if ( material instanceof THREE.MeshFaceMaterial ) {
+
+							for ( var i = 0; i < material.materials.length; i ++ ) {
+
+								needsTangents = needsTangents || ( material.materials[ i ] instanceof THREE.ShaderMaterial );
+
+							}
+
+						}
+
+						if ( needsTangents ) {
+
+							geometry.computeTangents();
 
 						}
 

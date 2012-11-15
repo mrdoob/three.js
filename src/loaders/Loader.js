@@ -81,13 +81,11 @@ THREE.Loader.prototype = {
 
 	},
 
-	hasNormals: function ( scope ) {
+	needsTangents: function ( materials ) {
 
-		var m, i, il = scope.materials.length;
+		for( var i = 0, il = materials.length; i < il; i ++ ) {
 
-		for( i = 0; i < il; i ++ ) {
-
-			m = scope.materials[ i ];
+			var m = materials[ i ];
 
 			if ( m instanceof THREE.ShaderMaterial ) return true;
 
