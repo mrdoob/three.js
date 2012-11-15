@@ -555,17 +555,33 @@
 
 				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, ambient: color } ) );
 				object.position.set( x, y, z );
-				scene.add( object );
-
 				object.castShadow = true;
 				object.receiveShadow = true;
+				scene.add( object );
 
-				var shadowTexture = THREE.ImageUtils.loadTexture( "textures/shadowAlpha.png" );
+				//
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(0,0,0,1)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				//
+
+				var shadowTexture = new THREE.Texture( canvas );
+				shadowTexture.needsUpdate = true;
 
 				var shadowPlane = new THREE.PlaneGeometry( 400, 400 );
 				var shadowMaterial = new THREE.MeshBasicMaterial( {
 
-					color: 0xff0000, opacity: 0.35, transparent: true, map: shadowTexture,
+					opacity: 0.35, transparent: true, map: shadowTexture,
 					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
 
 				} );
@@ -586,7 +602,7 @@
 				var shadowTarget = new THREE.WebGLRenderTarget( width, height, renderTargetParameters );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-				var shadowGeometry = THREE.GeometryUtils.clone( object.geometry );
+				var shadowGeometry = object.geometry.clone();
 
 				var shadowObject = new THREE.Mesh( shadowGeometry, shadowMaterial );
 
