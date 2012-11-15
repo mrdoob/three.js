@@ -81,6 +81,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added `LineDashedMaterial`. ([alteredq](http://github.com/alteredq))
 * Added `.setContextStyle` to `Color`. ([greyscales](http://github.com/greyscales))
 * Corrected normal matrix calculations. ([WestLangley](http://github.com/WestLangley))
+* Added `KaleidoShader`, `MirrorShader` and `RGBShiftShader`. ([felixturner](http://github.com/felixturner))
 * Added area weighted vertex normals computation to `Geometry`. ([alteredq](http://github.com/alteredq))
 * Moved geometry.materials to `MeshFaceMaterial`. ([gero3](http://github.com/gero3), [alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
 * Removed `materials` and `sides` from `CubeGeometry`. ([mrdoob](http://github.com/mrdoob))
