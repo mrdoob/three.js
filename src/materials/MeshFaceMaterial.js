@@ -10,7 +10,6 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 THREE.MeshFaceMaterial.prototype.clone = function () {
 	
-	//TODO do we need to clone the materials in the array also?? 
 	var material = new THREE.MeshFaceMaterial();
 	material.materials = this.materials;
 	return material;
