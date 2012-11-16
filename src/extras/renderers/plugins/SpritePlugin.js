@@ -74,6 +74,8 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
 		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
 
+		_sprite.uniforms.alphaTest 		  	  = _gl.getUniformLocation( _sprite.program, "alphaTest" );
+
 	};
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
@@ -185,6 +187,8 @@ THREE.SpritePlugin = function ( ) {
 			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
 
 			if ( sprite.map && sprite.map.image && sprite.map.image.width ) {
+
+				_gl.uniform1f( uniforms.alphaTest, sprite.alphaTest );
 
 				if ( sprite.useScreenCoordinates ) {
 

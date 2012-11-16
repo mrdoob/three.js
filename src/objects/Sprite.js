@@ -33,6 +33,8 @@ THREE.Sprite = function ( parameters ) {
 	this.uvOffset = new THREE.Vector2( 0, 0 );
 	this.uvScale  = new THREE.Vector2( 1, 1 );
 
+	this.alphaTest = 0;
+
 };
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
