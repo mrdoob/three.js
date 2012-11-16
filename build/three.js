@@ -19716,7 +19716,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Geometry splitting
 
-	function sortFacesByMaterial ( geometry ) {
+	function sortFacesByMaterial ( geometry, material ) {
 
 		var f, fl, face, materialIndex, vertices,
 			materialHash, groupHash,
@@ -19725,12 +19725,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var numMorphTargets = geometry.morphTargets.length;
 		var numMorphNormals = geometry.morphNormals.length;
 
+		var usesFaceMaterial = material instanceof THREE.MeshFaceMaterial;
+
 		geometry.geometryGroups = {};
 
 		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 			face = geometry.faces[ f ];
-			materialIndex = face.materialIndex;
+			materialIndex = usesFaceMaterial ? face.materialIndex : undefined;
 
 			materialHash = ( materialIndex !== undefined ) ? materialIndex : -1;
 
@@ -19830,7 +19832,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function addObject ( object, scene ) {
 
-		var g, geometry, geometryGroup;
+		var g, geometry, material, geometryGroup;
 
 		if ( ! object.__webglInit ) {
 
@@ -19842,12 +19844,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
+				material = object.material;
 
 				if ( geometry instanceof THREE.Geometry ) {
 
 					if ( geometry.geometryGroups === undefined ) {
 
-						sortFacesByMaterial( geometry );
+						sortFacesByMaterial( geometry, material );
 
 					}
 
