@@ -74,8 +74,6 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
 		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
 
-		_sprite.attributesEnabled = false;
-
 	};
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
@@ -99,14 +97,8 @@ THREE.SpritePlugin = function ( ) {
 
 		_gl.useProgram( _sprite.program );
 
-		if ( ! _sprite.attributesEnabled ) {
-
-			_gl.enableVertexAttribArray( attributes.position );
-			_gl.enableVertexAttribArray( attributes.uv );
-
-			_sprite.attributesEnabled = true;
-
-		}
+		_gl.enableVertexAttribArray( attributes.position );
+		_gl.enableVertexAttribArray( attributes.uv );
 
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
