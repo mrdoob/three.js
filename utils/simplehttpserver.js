@@ -7,7 +7,7 @@
  * Usage: node simplehttpserver.js <port number>
  *
  * do not use in production servers
- * and try  
+ * and try
  *     npm install http-server -g
  * instead.
  */
@@ -20,15 +20,13 @@ var port = 8000,
 	currentDir = process.cwd();
 
 
-console.log(process.argv);
-
 port = process.argv[2] ? parseInt(process.argv[2], 0) : port;
 
 function handleRequest(request, response) {
 
 	var urlObject = urlParser.parse(request.url, true);
 	var pathname = decodeURIComponent(urlObject.pathname);
-	
+
 	console.log('[' + (new Date()).toUTCString() + '] ' + '"' + request.method + ' ' + pathname + '"');
 
 	var filePath = path.join(currentDir, pathname);
@@ -38,7 +36,7 @@ function handleRequest(request, response) {
 		if (err) {
 			response.writeHead(404, {});
 			response.end('File not found!');
-			return;			
+			return;
 		}
 
 		if (stats.isFile()) {
