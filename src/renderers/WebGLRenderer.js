@@ -4853,32 +4853,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = material.program.attributes;
 
-		/*
-		if ( attributes.position >= 0 ) _gl.enableVertexAttribArray( attributes.position );
-		if ( attributes.color >= 0 ) _gl.enableVertexAttribArray( attributes.color );
-		if ( attributes.normal >= 0 ) _gl.enableVertexAttribArray( attributes.normal );
-		if ( attributes.tangent >= 0 ) _gl.enableVertexAttribArray( attributes.tangent );
-		if ( attributes.lineDistance >= 0 ) _gl.enableVertexAttribArray( attributes.lineDistance );
-
-		if ( material.skinning &&
-			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
-
-			_gl.enableVertexAttribArray( attributes.skinIndex );
-			_gl.enableVertexAttribArray( attributes.skinWeight );
-
-		}
-
-		if ( material.attributes ) {
-
-			for ( a in material.attributes ) {
-
-				if ( attributes[ a ] !== undefined && attributes[ a ] >= 0 ) _gl.enableVertexAttribArray( attributes[ a ] );
-
-			}
-
-		}
-		*/
-
 		if ( material.morphTargets ) {
 
 			material.numSupportedMorphTargets = 0;
@@ -4891,7 +4865,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( attributes[ id ] >= 0 ) {
 
-					//_gl.enableVertexAttribArray( attributes[ id ] );
 					material.numSupportedMorphTargets ++;
 
 				}
@@ -4912,7 +4885,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( attributes[ id ] >= 0 ) {
 
-					//_gl.enableVertexAttribArray( attributes[ id ] );
 					material.numSupportedMorphNormals ++;
 
 				}

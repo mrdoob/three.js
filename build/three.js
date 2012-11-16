@@ -20375,32 +20375,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = material.program.attributes;
 
-		/*
-		if ( attributes.position >= 0 ) _gl.enableVertexAttribArray( attributes.position );
-		if ( attributes.color >= 0 ) _gl.enableVertexAttribArray( attributes.color );
-		if ( attributes.normal >= 0 ) _gl.enableVertexAttribArray( attributes.normal );
-		if ( attributes.tangent >= 0 ) _gl.enableVertexAttribArray( attributes.tangent );
-		if ( attributes.lineDistance >= 0 ) _gl.enableVertexAttribArray( attributes.lineDistance );
-
-		if ( material.skinning &&
-			 attributes.skinIndex >= 0 && attributes.skinWeight >= 0 ) {
-
-			_gl.enableVertexAttribArray( attributes.skinIndex );
-			_gl.enableVertexAttribArray( attributes.skinWeight );
-
-		}
-
-		if ( material.attributes ) {
-
-			for ( a in material.attributes ) {
-
-				if ( attributes[ a ] !== undefined && attributes[ a ] >= 0 ) _gl.enableVertexAttribArray( attributes[ a ] );
-
-			}
-
-		}
-		*/
-
 		if ( material.morphTargets ) {
 
 			material.numSupportedMorphTargets = 0;
@@ -20413,7 +20387,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( attributes[ id ] >= 0 ) {
 
-					//_gl.enableVertexAttribArray( attributes[ id ] );
 					material.numSupportedMorphTargets ++;
 
 				}
@@ -20434,7 +20407,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( attributes[ id ] >= 0 ) {
 
-					//_gl.enableVertexAttribArray( attributes[ id ] );
 					material.numSupportedMorphNormals ++;
 
 				}
@@ -33770,8 +33742,6 @@ THREE.LensFlarePlugin = function ( ) {
 		_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
 		_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
 
-		_lensFlare.attributesEnabled = false;
-
 	};
 
 
@@ -33810,14 +33780,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 		_gl.useProgram( _lensFlare.program );
 
-		if ( ! _lensFlare.attributesEnabled ) {
-
-			_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
-			_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
-
-			_lensFlare.attributesEnabled = true;
-
-		}
+		_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
+		_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
 
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms
@@ -34552,8 +34516,6 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
 		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
 
-		_sprite.attributesEnabled = false;
-
 	};
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
@@ -34577,14 +34539,8 @@ THREE.SpritePlugin = function ( ) {
 
 		_gl.useProgram( _sprite.program );
 
-		if ( ! _sprite.attributesEnabled ) {
-
-			_gl.enableVertexAttribArray( attributes.position );
-			_gl.enableVertexAttribArray( attributes.uv );
-
-			_sprite.attributesEnabled = true;
-
-		}
+		_gl.enableVertexAttribArray( attributes.position );
+		_gl.enableVertexAttribArray( attributes.uv );
 
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
