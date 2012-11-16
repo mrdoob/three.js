@@ -10427,10 +10427,8 @@ THREE.MeshFaceMaterial = function ( materials ) {
 };
 
 THREE.MeshFaceMaterial.prototype.clone = function () {
-	
-	var material = new THREE.MeshFaceMaterial();
-	material.materials = this.materials;
-	return material;
+
+	return new THREE.MeshFaceMaterial( this.materials.slice( 0 ) );
 
 };
 /**
