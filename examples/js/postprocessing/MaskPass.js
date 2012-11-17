@@ -46,6 +46,7 @@ THREE.MaskPass.prototype = {
 		context.stencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
 		context.stencilFunc( context.ALWAYS, writeValue, 0xffffffff );
 		context.clearStencil( clearValue );
+                context.clear(context.STENCIL_BUFFER_BIT);
 
 		// draw into the stencil buffer
 
