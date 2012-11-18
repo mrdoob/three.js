@@ -84,7 +84,7 @@
 				geometry.attributes = {
 					index: {
 						itemSize: 1,
-						array: new Int16Array( triangles * 3 ),
+						array: new Uint16Array( triangles * 3 ),
 						numItems: triangles * 3
 					},
 					position: {
@@ -105,10 +105,11 @@
 				}
 
 				// break geometry into
-				// chunks of 20,000 triangles (3 unique vertices per triangle)
+				// chunks of 21,845 triangles (3 unique vertices per triangle)
 				// for indices to fit into 16 bit integer number
+				// floor(2^16 / 3) = 21845
 
-				var chunkSize = 20000;
+				var chunkSize = 21845;
 
 				var indices = geometry.attributes.index.array;
 
