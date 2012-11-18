@@ -68,12 +68,16 @@ THREE.ShaderSprite = {
 			"uniform float fogDensity;",
 			"uniform float fogNear;",
 			"uniform float fogFar;",
+			"uniform float alphaTest;",
 
 			"varying vec2 vUV;",
 
 			"void main() {",
 
 				"vec4 texture = texture2D( map, vUV );",
+
+				"if ( texture.a < alphaTest ) discard;",
+
 				"gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );",
 
 				"if ( fogType > 0 ) {",

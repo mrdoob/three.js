@@ -11612,6 +11612,8 @@ THREE.Sprite = function ( parameters ) {
 	this.uvOffset = new THREE.Vector2( 0, 0 );
 	this.uvScale  = new THREE.Vector2( 1, 1 );
 
+	this.alphaTest = 0;
+
 };
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
@@ -34517,6 +34519,8 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
 		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
 
+		_sprite.uniforms.alphaTest 		  	  = _gl.getUniformLocation( _sprite.program, "alphaTest" );
+
 	};
 
 	this.render = function ( scene, camera, viewportWidth, viewportHeight ) {
@@ -34628,6 +34632,8 @@ THREE.SpritePlugin = function ( ) {
 			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
 
 			if ( sprite.map && sprite.map.image && sprite.map.image.width ) {
+
+				_gl.uniform1f( uniforms.alphaTest, sprite.alphaTest );
 
 				if ( sprite.useScreenCoordinates ) {
 
@@ -35205,12 +35211,16 @@ THREE.ShaderSprite = {
 			"uniform float fogDensity;",
 			"uniform float fogNear;",
 			"uniform float fogFar;",
+			"uniform float alphaTest;",
 
 			"varying vec2 vUV;",
 
 			"void main() {",
 
 				"vec4 texture = texture2D( map, vUV );",
+
+				"if ( texture.a < alphaTest ) discard;",
+
 				"gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );",
 
 				"if ( fogType > 0 ) {",
