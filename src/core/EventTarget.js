@@ -24,7 +24,7 @@ THREE.EventTarget = function () {
 
 	this.dispatchEvent = function ( event ) {
 
-		for ( var i = 0; i < listeners[ event.type ].length; i++ ) {
+		for ( var i = 0; i < listeners[ event.type ].length; i ++ ) {
 
 			listeners[ event.type ][ i ]( event );
 
