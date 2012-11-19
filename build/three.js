@@ -2754,9 +2754,15 @@ THREE.EventTarget = function () {
 
 	this.dispatchEvent = function ( event ) {
 
-		for ( var listener in listeners[ event.type ] ) {
+		var listenerArray = listeners[ event.type ];
 
-			listeners[ event.type ][ listener ]( event );
+		if ( listenerArray !== undefined ) {
+
+			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
+
+				listenerArray[ i ]( event );
+
+			}
 
 		}
 

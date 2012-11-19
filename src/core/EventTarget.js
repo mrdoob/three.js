@@ -24,11 +24,13 @@ THREE.EventTarget = function () {
 
 	this.dispatchEvent = function ( event ) {
 
-		if ( listeners[ event.type ] !== undefined ) {
+		var listenerArray = listeners[ event.type ];
 
-			for ( var i = 0, l = listeners[ event.type ].length; i < l; i ++ ) {
+		if ( listenerArray !== undefined ) {
 
-				listeners[ event.type ][ i ]( event );
+			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
+
+				listenerArray[ i ]( event );
 
 			}
 
