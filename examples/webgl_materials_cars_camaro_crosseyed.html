@@ -170,7 +170,7 @@
 			function $( id ) { return document.getElementById( id ) }
 
 
-			function createButtons( materials, geometry ) {
+			function createButtons( materials, faceMaterial ) {
 
 				var i, src = "", parent = $( "buttons" );
 
@@ -185,7 +185,7 @@
 				for( i = 0; i < materials.length; i ++ ) {
 
 					$( "m" + i ).counter = i;
-					$( "m" + i ).addEventListener( 'click', function() { geometry.materials[ 0 ] = materials[ this.counter ][ 1 ] }, false );
+					$( "m" + i ).addEventListener( 'click', function() { faceMaterial.materials[ 0 ] = materials[ this.counter ][ 1 ] }, false );
 
 				}
 
@@ -195,22 +195,22 @@
 
 				var s = 75, m = new THREE.MeshFaceMaterial();
 
-				geometry.materials[ 0 ] = materials.body[ 0 ][ 1 ]; // car body
-				geometry.materials[ 1 ] = materials.chrome; // wheels chrome
-				geometry.materials[ 2 ] = materials.chrome; // grille chrome
-				geometry.materials[ 3 ] = materials.darkchrome; // door lines
-				geometry.materials[ 4 ] = materials.glass; // windshield
-				geometry.materials[ 5 ] = materials.interior; // interior
-				geometry.materials[ 6 ] = materials.tire; // tire
-				geometry.materials[ 7 ] = materials.black; // tireling
-				geometry.materials[ 8 ] = materials.black; // behind grille
+				m.materials[ 0 ] = materials.body[ 0 ][ 1 ]; // car body
+				m.materials[ 1 ] = materials.chrome; // wheels chrome
+				m.materials[ 2 ] = materials.chrome; // grille chrome
+				m.materials[ 3 ] = materials.darkchrome; // door lines
+				m.materials[ 4 ] = materials.glass; // windshield
+				m.materials[ 5 ] = materials.interior; // interior
+				m.materials[ 6 ] = materials.tire; // tire
+				m.materials[ 7 ] = materials.black; // tireling
+				m.materials[ 8 ] = materials.black; // behind grille
 
 				var mesh = new THREE.Mesh( geometry, m );
 				mesh.rotation.y = 1;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
 				scene.add( mesh );
 
-				createButtons( materials.body, geometry );
+				createButtons( materials.body, m );
 
 			}
 

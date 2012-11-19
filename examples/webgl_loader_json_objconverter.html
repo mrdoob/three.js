@@ -182,9 +182,9 @@
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
 				//var loader = new THREE.BinaryLoader(),
-				var loader = new THREE.JSONLoader(),
-					callbackMale   = function( geometry ) { createScene( geometry,  90, FLOOR, 50, 105 ) },
-					callbackFemale = function( geometry ) { createScene( geometry, -80, FLOOR, 50, 0 ) };
+				var loader = new THREE.JSONLoader();
+				var callbackMale = function ( geometry, materials ) { createScene( geometry, materials, 90, FLOOR, 50, 105 ) };
+				var callbackFemale = function ( geometry, materials ) { createScene( geometry, materials, -80, FLOOR, 50, 0 ) };
 
 				loader.load( "obj/male02/Male02_dds.js", callbackMale );
 				loader.load( "obj/female02/Female02_slim.js", callbackFemale );
@@ -211,14 +211,14 @@
 
 			}
 
-			function createScene( geometry, x, y, z, b ) {
+			function createScene( geometry, materials, x, y, z, b ) {
 
-				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				zmesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				zmesh.position.set( x, y, z );
 				zmesh.scale.set( 3, 3, 3 );
 				scene.add( zmesh );
 
-				createMaterialsPalette( geometry.materials, 100, b );
+				createMaterialsPalette( materials, 100, b );
 
 			}
 

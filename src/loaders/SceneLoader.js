@@ -107,6 +107,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		scene: new THREE.Scene(),
 		geometries: {},
+		face_materials: {},
 		materials: {},
 		textures: {},
 		objects: {},
@@ -233,16 +234,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					if ( geometry ) {
 
-						var hasNormals = false;
+						var needsTangents = false;
 
 						material = result.materials[ o.material ];
-						hasNormals = material instanceof THREE.ShaderMaterial;
-
-						if ( hasNormals ) {
-
-							geometry.computeTangents();
-
-						}
+						needsTangents = material instanceof THREE.ShaderMaterial;
 
 						p = o.position;
 						r = o.rotation;
@@ -254,9 +249,38 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						q = 0;
 
+						// use materials from the model file
+						// if there is no material specified in the object
+
 						if ( ! o.material ) {
 
-							material = new THREE.MeshFaceMaterial();
+							material = new THREE.MeshFaceMaterial( result.face_materials[ o.geometry ] );
+
+						}
+
+						// use materials from the model file
+						// if there is just empty face material
+						// (must create new material as each model has its own face material)
+
+						if ( ( material instanceof THREE.MeshFaceMaterial ) && material.materials.length === 0 ) {
+
+							material = new THREE.MeshFaceMaterial( result.face_materials[ o.geometry ] );
+
+						}
+
+						if ( material instanceof THREE.MeshFaceMaterial ) {
+
+							for ( var i = 0; i < material.materials.length; i ++ ) {
+
+								needsTangents = needsTangents || ( material.materials[ i ] instanceof THREE.ShaderMaterial );
+
+							}
+
+						}
+
+						if ( needsTangents ) {
+
+							geometry.computeTangents();
 
 						}
 
@@ -471,9 +495,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
-	function handle_mesh( geo, id ) {
+	function handle_mesh( geo, mat, id ) {
 
 		result.geometries[ id ] = geo;
+		result.face_materials[ id ] = mat;
 		handle_objects();
 
 	};
@@ -519,9 +544,9 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_geometry( id ) {
 
-		return function( geo ) {
+		return function( geo, mat ) {
 
-			handle_mesh( geo, id );
+			handle_mesh( geo, mat, id );
 
 			counter_models -= 1;
 
@@ -574,9 +599,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_embed( id ) {
 
-		return function( geo ) {
+		return function( geo, mat ) {
 
 			result.geometries[ id ] = geo;
+			result.face_materials[ id ] = mat;
 
 		}
 

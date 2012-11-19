@@ -116,7 +116,7 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 // Binary AJAX parser
 
-THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, materials ) {
+THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texturePath, jsonMaterials ) {
 
 	var Model = function ( texturePath ) {
 
@@ -133,8 +133,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 
 		THREE.Geometry.call( this );
-
-		THREE.Loader.prototype.initMaterials( scope, materials, texturePath );
 
 		md = parseMetaData( data, currentOffset );
 
@@ -198,8 +196,6 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 		this.computeCentroids();
 		this.computeFaceNormals();
-
-		if ( THREE.Loader.prototype.hasNormals( this ) ) this.computeTangents();
 
 		function handlePadding( n ) {
 
@@ -741,27 +737,31 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 	function uv3 ( where, u1, v1, u2, v2, u3, v3 ) {
 
-		var uv = [];
-		uv.push( new THREE.UV( u1, v1 ) );
-		uv.push( new THREE.UV( u2, v2 ) );
-		uv.push( new THREE.UV( u3, v3 ) );
-		where.push( uv );
+		where.push( [
+			new THREE.UV( u1, v1 ),
+			new THREE.UV( u2, v2 ),
+			new THREE.UV( u3, v3 )
+		] );
 
 	};
 
 	function uv4 ( where, u1, v1, u2, v2, u3, v3, u4, v4 ) {
 
-		var uv = [];
-		uv.push( new THREE.UV( u1, v1 ) );
-		uv.push( new THREE.UV( u2, v2 ) );
-		uv.push( new THREE.UV( u3, v3 ) );
-		uv.push( new THREE.UV( u4, v4 ) );
-		where.push( uv );
-
+		where.push( [
+			new THREE.UV( u1, v1 ),
+			new THREE.UV( u2, v2 ),
+			new THREE.UV( u3, v3 ),
+			new THREE.UV( u4, v4 )
+		] );
 	};
 
 	Model.prototype = Object.create( THREE.Geometry.prototype );
 
-	callback( new Model( texturePath ) );
+	var geometry = new Model( texturePath );
+	var materials = this.initMaterials( jsonMaterials, texturePath );
+
+	if ( this.needsTangents( materials ) ) geometry.computeTangents();
+
+	callback( geometry, materials );
 
 };

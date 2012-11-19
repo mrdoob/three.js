@@ -97,11 +97,7 @@
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.FlatShading } ),
 					new THREE.MeshLambertMaterial( { color: 0xdddddd, shading: THREE.SmoothShading } ),
 					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.FlatShading } ),
-					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } ),
-/*
-					new THREE.MeshBasicMaterial( { map: texture2, envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
-					new THREE.MeshLambertMaterial( { map: texture2, envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ),
-*/
+					new THREE.MeshPhongMaterial( { ambient: 0x030303, color: 0xdddddd, specular: 0x009900, shininess: 30, shading: THREE.SmoothShading } )
 
 				];
 
@@ -113,17 +109,6 @@
 					geometries.push( geometry );
 
 				}
-
-				/*
-				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-					var face = geometry.faces[ i ];
-					face.materialIndex = Math.floor( Math.random() * materials.length );
-
-				}
-				*/
-
-				//materials.push( new THREE.MeshFaceMaterial() );
 
 				for ( var i = 0; i < 5000; i ++ ) {
 

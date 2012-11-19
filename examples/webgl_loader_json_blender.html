@@ -89,19 +89,17 @@
 
 				// Add Blender exported Collada model
 
-				var loader = new THREE.GeometryLoader();
-				loader.addEventListener( 'load', function ( event ) {
-
-					var geometry = event.content;
+				var loader = new THREE.JSONLoader();
+				loader.load( 'models/animated/monster/monster.js', function ( geometry, materials ) {
 
 					// adjust color a bit
 
-					var material = geometry.materials[ 0 ];
+					var material = materials[ 0 ];
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
 					material.ambient.setHex( 0x222222 );
 
-					var faceMaterial = new THREE.MeshFaceMaterial();
+					var faceMaterial = new THREE.MeshFaceMaterial( materials );
 
 					for ( var i = 0; i < 729; i ++ ) {
 
@@ -140,7 +138,6 @@
 					}
 
 				} );
-				loader.load( 'models/animated/monster/monster.js' );
 
 
 				// Add the COLLADA

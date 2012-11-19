@@ -18,8 +18,6 @@ THREE.Geometry = function () {
 	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
 	this.normals = []; // one-to-one vertex normals, used in Ribbon
 
-	this.materials = [];
-
 	this.faces = [];
 
 	this.faceUvs = [[]];
@@ -755,7 +753,41 @@ THREE.Geometry.prototype = {
 
 	clone: function () {
 
-		// TODO
+		var geometry = new THREE.Geometry();
+
+		var vertices = this.vertices;
+
+		for ( var i = 0, il = vertices.length; i < il; i ++ ) {
+
+			geometry.vertices.push( vertices[ i ].clone() );
+
+		}
+
+		var faces = this.faces;
+
+		for ( var i = 0, il = faces.length; i < il; i ++ ) {
+
+			geometry.faces.push( faces[ i ].clone() );
+
+		}
+
+		var uvs = this.faceVertexUvs[ 0 ];
+
+		for ( var i = 0, il = uvs.length; i < il; i ++ ) {
+
+			var uv = uvs[ i ], uvCopy = [];
+
+			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
+
+				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+
+			}
+
+			geometry.faceVertexUvs[ 0 ].push( uvCopy );
+
+		}
+
+		return geometry;
 
 	},
 

@@ -145,7 +145,7 @@
 
 		"veyron" : {
 			"geometry" : "veyron",
-			"material" : "face",
+			"material" : "multi_veyron",
 			"position" : [ 40, -1, 0 ],
 			"rotation" : [ 0, 0.3, 0 ],
 			"scale"	   : [ 0.25, 0.25, 0.25 ],
@@ -696,6 +696,11 @@
 		"multi_2": {
 			"type": "MeshFaceMaterial",
 			"parameters": { "materials": [ "phong_compressed_cube", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
+		},
+
+		"multi_veyron": {
+			"type": "MeshFaceMaterial",
+			"parameters": { "materials": [ "interior", "chrome", "darkerchrome", "glass", "chrome", "chrome", "backlights", "backsignals" ] }
 		}
 
 	},

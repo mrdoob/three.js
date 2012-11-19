@@ -10,6 +10,6 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 THREE.MeshFaceMaterial.prototype.clone = function () {
 
-	return new THREE.MeshFaceMaterial();
+	return new THREE.MeshFaceMaterial( this.materials.slice( 0 ) );
 
 };

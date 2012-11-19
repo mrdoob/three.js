@@ -36,7 +36,7 @@
 		testShape = setupShape(8, 3);
 		holeShape = setupShape(8, 2);
 		testShape.holes.push(holeShape);
-		
+
 		tex = setupTexture(TestTextureData);
 		renewMesh();
 
@@ -53,7 +53,6 @@
 		render();
 	};
 
-	
 	function setupAnimation(n) {
 		new AnimationController(
 			document.getElementById('html-el'),
@@ -136,14 +135,11 @@
 	}
 
 	function setupMesh(geom, side_texture) {
-		var mesh = new THREE.Mesh(geom, new THREE.MeshFaceMaterial());
-
-		// Set multi materials
-		geom.materials = 
-			[
-				new THREE.MeshBasicMaterial( { map: side_texture } ),
-				new THREE.MeshBasicMaterial( { color: 0x447766 } )
-			];
+		var materials = [
+			new THREE.MeshBasicMaterial( { map: side_texture } ),
+			new THREE.MeshBasicMaterial( { color: 0x447766 } )
+		];
+		var mesh = new THREE.Mesh(geom, new THREE.MeshFaceMaterial(materials));
 
 		scene.add(mesh);
 		return mesh;

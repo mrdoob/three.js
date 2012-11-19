@@ -129,39 +129,36 @@
 						dummy.position.y = h * 100;
 						dummy.position.z = z * 100 - worldHalfDepth * 100;
 
+						var px = getY( x + 1, z );
+						var nx = getY( x - 1, z );
+						var pz = getY( x, z + 1 );
+						var nz = getY( x, z - 1 );
+
 						dummy.geometry = pyGeometry;
 						THREE.GeometryUtils.merge( geometry, dummy );
 
-						var h2 = getY( x + 1, z );
-
-						if ( ( h2 != h && h2 != h + 1 ) || x == 0 ) {
+						if ( ( px != h && px != h + 1 ) || x == 0 ) {
 
 							dummy.geometry = pxGeometry;
 							THREE.GeometryUtils.merge( geometry, dummy );
 
 						}
 
-						var h2 = getY( x - 1, z );
-
-						if ( ( h2 != h && h2 != h + 1 ) || x == worldWidth - 1 ) {
+						if ( ( nx != h && nx != h + 1 ) || x == worldWidth - 1 ) {
 
 							dummy.geometry = nxGeometry;
 							THREE.GeometryUtils.merge( geometry, dummy );
 
 						}
 
-						var h2 = getY( x, z + 1 );
-
-						if ( ( h2 != h && h2 != h + 1 ) || z == worldDepth - 1 ) {
+						if ( ( pz != h && pz != h + 1 ) || z == worldDepth - 1 ) {
 
 							dummy.geometry = pzGeometry;
 							THREE.GeometryUtils.merge( geometry, dummy );
 
 						}
 
-						var h2 = getY( x, z - 1 );
-
-						if ( ( h2 != h && h2 != h + 1 ) || z == 0 ) {
+						if ( ( nz != h && nz != h + 1 ) || z == 0 ) {
 
 							dummy.geometry = nzGeometry;
 							THREE.GeometryUtils.merge( geometry, dummy );
@@ -233,7 +230,7 @@
 
 					for ( var i = 0; i < size; i ++ ) {
 
-						var x = i % width, y = ~~ ( i / width );
+						var x = i % width, y = ( i / width ) | 0;
 						data[ i ] += perlin.noise( x / quality, y / quality, z ) * quality;
 
 
@@ -249,7 +246,7 @@
 
 			function getY( x, z ) {
 
-				return ~~( data[ x + z * worldWidth ] * 0.2 );
+				return ( data[ x + z * worldWidth ] * 0.2 ) | 0;
 
 			}
 

@@ -274,8 +274,6 @@
 
 					var material = new THREE.MeshLambertMaterial( { color: 0xffaa55, morphTargets: true, vertexColors: THREE.FaceColors } );
 
-					//geometry.materials[ 0 ] = material;
-
 					if ( fudgeColor ) {
 
 						THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );

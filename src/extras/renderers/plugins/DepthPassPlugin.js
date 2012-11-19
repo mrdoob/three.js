@@ -196,23 +196,9 @@ THREE.DepthPassPlugin = function ( ) {
 
 	function getObjectMaterial( object ) {
 
-		if ( object.material instanceof THREE.MeshFaceMaterial ) {
-
-			if ( object.material.materials.length > 0 ) {
-
-				return object.material.materials[ 0 ];
-
-			} else {
-
-				return object.geometry.materials[ 0 ];
-
-			}
-
-		} else {
-
-			return object.material;
-
-		}
+		return object.material instanceof THREE.MeshFaceMaterial
+			? object.material.materials[ 0 ]
+			: object.material;
 
 	};
 

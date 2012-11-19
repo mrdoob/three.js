@@ -154,7 +154,7 @@
 				// MODEL
 
 				var loader = new THREE.JSONLoader();
-				var callback = function( geometry ) { createScene( geometry,  0, 0, 0, 0, 100 ) };
+				var callback = function ( geometry, materials ) { createScene( geometry, materials, 0, 0, 0, 0, 100 ) };
 
 				loader.load( "obj/lightmap/lightmap.js", callback );
 
@@ -173,9 +173,9 @@
 
 			}
 
-			function createScene( geometry, x, y, z, b, s ) {
+			function createScene( geometry, materials, x, y, z, b, s ) {
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );
 				scene.add( mesh );

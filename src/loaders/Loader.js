@@ -67,25 +67,25 @@ THREE.Loader.prototype = {
 
 	},
 
-	initMaterials: function ( scope, materials, texturePath ) {
+	initMaterials: function ( materials, texturePath ) {
 
-		scope.materials = [];
+		var array = [];
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			scope.materials[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
+			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
 
 		}
 
+		return array;
+
 	},
 
-	hasNormals: function ( scope ) {
+	needsTangents: function ( materials ) {
 
-		var m, i, il = scope.materials.length;
+		for( var i = 0, il = materials.length; i < il; i ++ ) {
 
-		for( i = 0; i < il; i ++ ) {
-
-			m = scope.materials[ i ];
+			var m = materials[ i ];
 
 			if ( m instanceof THREE.ShaderMaterial ) return true;
 

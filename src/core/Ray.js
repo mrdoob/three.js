@@ -110,7 +110,7 @@
 			var vertices = geometry.vertices;
 
 			var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-			var geometryMaterials = ( isFaceMaterial && object.material.materials.length > 0 ) ? object.material.materials : object.geometry.materials;
+			var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
 
 			var side = object.material.side;
 
@@ -133,7 +133,7 @@
 
 				var face = geometry.faces[ f ];
 
-				var material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
+				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : object.material;
 
 				if ( material === undefined ) continue;
 
