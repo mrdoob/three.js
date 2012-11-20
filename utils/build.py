@@ -28,7 +28,7 @@ def main(argv=None):
 	# enable sourcemaps support
 
 	if args.sourcemaps:
-		sourcemap = '../build/three.js.map'
+		sourcemap = output + '.map'
 		sourcemapping = '\n//@ sourceMappingURL=' + sourcemap
 		sourcemapargs = ' --create_source_map ' + sourcemap + ' --source_map_format=V3'
 	else:
