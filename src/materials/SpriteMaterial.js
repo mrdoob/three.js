@@ -7,12 +7,13 @@
  *  map: new THREE.Texture( <Image> ),
  *
  *  blending: THREE.NormalBlending,
+ *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  useScreenCoordinates: <bool>,
- *  mergeWith3D: <bool>,
- *  affectedByDistance: <bool>,
+ *  sizeAttenuation: <bool>,
  *  scaleByViewport: <bool>,
- *  alignment: THREE.SpriteAlignment.center
+ *  alignment: THREE.SpriteAlignment.center,
  *
  *	uvOffset: new THREE.Vector2(),
  *	uvScale: new THREE.Vector2(),
@@ -31,9 +32,9 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.map = new THREE.Texture();
 
 	this.useScreenCoordinates = true;
-	this.mergeWith3D = !this.useScreenCoordinates;
-	this.affectedByDistance = !this.useScreenCoordinates;
-	this.scaleByViewport = !this.affectedByDistance;
+	this.depthTest = !this.useScreenCoordinates;
+	this.sizeAttenuation = !this.useScreenCoordinates;
+	this.scaleByViewport = !this.sizeAttenuation;
 	this.alignment = THREE.SpriteAlignment.center.clone();
 
 	this.fog = false;
@@ -49,9 +50,9 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	if ( parameters.mergeWith3D === undefined ) this.mergeWith3D = !this.useScreenCoordinates;
-	if ( parameters.affectedByDistance === undefined ) this.affectedByDistance = !this.useScreenCoordinates;
-	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.affectedByDistance;
+	if ( parameters.depthTest === undefined ) this.depthTest = !this.useScreenCoordinates;
+	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = !this.useScreenCoordinates;
+	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.sizeAttenuation;
 
 };
 
@@ -67,8 +68,7 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.useScreenCoordinates = this.useScreenCoordinates;
-	material.mergeWith3D = this.mergeWith3D;
-	material.affectedByDistance = this.affectedByDistance;
+	material.sizeAttenuation = this.sizeAttenuation;
 	material.scaleByViewport = this.scaleByViewport;
 	material.alignment.copy( this.alignment );
 

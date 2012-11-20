@@ -9840,6 +9840,7 @@ THREE.MaterialLibrary = [];
  *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  linewidth: <float>,
  *  linecap: "round",
@@ -9899,6 +9900,7 @@ THREE.LineBasicMaterial.prototype.clone = function () {
  *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  linewidth: <float>,
  *
@@ -9976,6 +9978,7 @@ THREE.LineDashedMaterial.prototype.clone = function () {
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -10086,6 +10089,7 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -10217,6 +10221,7 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -10344,13 +10349,14 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
  *
  * parameters = {
  *  opacity: <float>,
- 
+ *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+ *  depthWrite: <bool>,
+ *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
- * } 
+ * }
  */
 
 THREE.MeshDepthMaterial = function ( parameters ) {
@@ -10383,11 +10389,12 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
  *
  * parameters = {
  *  opacity: <float>,
- 
+ *
  *  shading: THREE.FlatShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+ *  depthWrite: <bool>,
+ *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  * }
@@ -10450,6 +10457,7 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
  *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  vertexColors: <bool>,
  *
@@ -10563,6 +10571,7 @@ THREE.ParticleDOMMaterial.prototype.clone = function(){
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -10653,12 +10662,13 @@ THREE.ShaderMaterial.prototype.clone = function () {
  *  map: new THREE.Texture( <Image> ),
  *
  *  blending: THREE.NormalBlending,
+ *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  useScreenCoordinates: <bool>,
- *  mergeWith3D: <bool>,
- *  affectedByDistance: <bool>,
+ *  sizeAttenuation: <bool>,
  *  scaleByViewport: <bool>,
- *  alignment: THREE.SpriteAlignment.center
+ *  alignment: THREE.SpriteAlignment.center,
  *
  *	uvOffset: new THREE.Vector2(),
  *	uvScale: new THREE.Vector2(),
@@ -10677,9 +10687,9 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.map = new THREE.Texture();
 
 	this.useScreenCoordinates = true;
-	this.mergeWith3D = !this.useScreenCoordinates;
-	this.affectedByDistance = !this.useScreenCoordinates;
-	this.scaleByViewport = !this.affectedByDistance;
+	this.depthTest = !this.useScreenCoordinates;
+	this.sizeAttenuation = !this.useScreenCoordinates;
+	this.scaleByViewport = !this.sizeAttenuation;
 	this.alignment = THREE.SpriteAlignment.center.clone();
 
 	this.fog = false;
@@ -10695,9 +10705,9 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	if ( parameters.mergeWith3D === undefined ) this.mergeWith3D = !this.useScreenCoordinates;
-	if ( parameters.affectedByDistance === undefined ) this.affectedByDistance = !this.useScreenCoordinates;
-	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.affectedByDistance;
+	if ( parameters.depthTest === undefined ) this.depthTest = !this.useScreenCoordinates;
+	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = !this.useScreenCoordinates;
+	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.sizeAttenuation;
 
 };
 
@@ -10713,8 +10723,7 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.useScreenCoordinates = this.useScreenCoordinates;
-	material.mergeWith3D = this.mergeWith3D;
-	material.affectedByDistance = this.affectedByDistance;
+	material.sizeAttenuation = this.sizeAttenuation;
 	material.scaleByViewport = this.scaleByViewport;
 	material.alignment.copy( this.alignment );
 
@@ -34553,7 +34562,7 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.opacity              = _gl.getUniformLocation( _sprite.program, "opacity" );
 
 		_sprite.uniforms.useScreenCoordinates = _gl.getUniformLocation( _sprite.program, "useScreenCoordinates" );
-		_sprite.uniforms.affectedByDistance   = _gl.getUniformLocation( _sprite.program, "affectedByDistance" );
+		_sprite.uniforms.sizeAttenuation   	  = _gl.getUniformLocation( _sprite.program, "sizeAttenuation" );
 		_sprite.uniforms.screenPosition    	  = _gl.getUniformLocation( _sprite.program, "screenPosition" );
 		_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 		_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
@@ -34583,8 +34592,6 @@ THREE.SpritePlugin = function ( ) {
 		var halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
 
-		var mergeWith3D = true;
-
 		// setup gl
 
 		_gl.useProgram( _sprite.program );
@@ -34594,7 +34601,6 @@ THREE.SpritePlugin = function ( ) {
 
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
-		_gl.depthMask( true );
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
@@ -34695,7 +34701,7 @@ THREE.SpritePlugin = function ( ) {
 				} else {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
-					_gl.uniform1i( uniforms.affectedByDistance, material.affectedByDistance ? 1 : 0 );
+					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
 				}
@@ -34732,19 +34738,9 @@ THREE.SpritePlugin = function ( ) {
 				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 
-				if ( material.mergeWith3D && !mergeWith3D ) {
-
-					_gl.enable( _gl.DEPTH_TEST );
-					mergeWith3D = true;
-
-				} else if ( ! material.mergeWith3D && mergeWith3D ) {
-
-					_gl.disable( _gl.DEPTH_TEST );
-					mergeWith3D = false;
-
-				}
-
 				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+				_renderer.setDepthTest( material.depthTest );
+				_renderer.setDepthWrite( material.depthWrite );
 				_renderer.setTexture( material.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
@@ -34756,8 +34752,6 @@ THREE.SpritePlugin = function ( ) {
 		// restore gl
 
 		_gl.enable( _gl.CULL_FACE );
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthMask( true );
 
 	};
 
@@ -35201,7 +35195,7 @@ THREE.ShaderSprite = {
 		vertexShader: [
 
 			"uniform int useScreenCoordinates;",
-			"uniform int affectedByDistance;",
+			"uniform int sizeAttenuation;",
 			"uniform vec3 screenPosition;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
@@ -35235,7 +35229,7 @@ THREE.ShaderSprite = {
 				"} else {",
 
 					"finalPosition = projectionMatrix * modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
-					"finalPosition.xy += rotatedPosition * ( affectedByDistance == 1 ? 1.0 : finalPosition.z );",
+					"finalPosition.xy += rotatedPosition * ( sizeAttenuation == 1 ? 1.0 : finalPosition.z );",
 
 				"}",
 

@@ -63,7 +63,7 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.opacity              = _gl.getUniformLocation( _sprite.program, "opacity" );
 
 		_sprite.uniforms.useScreenCoordinates = _gl.getUniformLocation( _sprite.program, "useScreenCoordinates" );
-		_sprite.uniforms.affectedByDistance   = _gl.getUniformLocation( _sprite.program, "affectedByDistance" );
+		_sprite.uniforms.sizeAttenuation   	  = _gl.getUniformLocation( _sprite.program, "sizeAttenuation" );
 		_sprite.uniforms.screenPosition    	  = _gl.getUniformLocation( _sprite.program, "screenPosition" );
 		_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 		_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
@@ -93,8 +93,6 @@ THREE.SpritePlugin = function ( ) {
 		var halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
 
-		var mergeWith3D = true;
-
 		// setup gl
 
 		_gl.useProgram( _sprite.program );
@@ -104,7 +102,6 @@ THREE.SpritePlugin = function ( ) {
 
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
-		_gl.depthMask( true );
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
@@ -205,7 +202,7 @@ THREE.SpritePlugin = function ( ) {
 				} else {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
-					_gl.uniform1i( uniforms.affectedByDistance, material.affectedByDistance ? 1 : 0 );
+					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
 				}
@@ -242,19 +239,9 @@ THREE.SpritePlugin = function ( ) {
 				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 
-				if ( material.mergeWith3D && !mergeWith3D ) {
-
-					_gl.enable( _gl.DEPTH_TEST );
-					mergeWith3D = true;
-
-				} else if ( ! material.mergeWith3D && mergeWith3D ) {
-
-					_gl.disable( _gl.DEPTH_TEST );
-					mergeWith3D = false;
-
-				}
-
 				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+				_renderer.setDepthTest( material.depthTest );
+				_renderer.setDepthWrite( material.depthWrite );
 				_renderer.setTexture( material.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
@@ -266,8 +253,6 @@ THREE.SpritePlugin = function ( ) {
 		// restore gl
 
 		_gl.enable( _gl.CULL_FACE );
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthMask( true );
 
 	};
 
