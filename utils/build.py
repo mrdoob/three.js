@@ -15,6 +15,7 @@ def main(argv=None):
   parser.add_argument('--externs', action='append', default=['externs/common.js'])
   parser.add_argument('--minify', action='store_true', default=False)
   parser.add_argument('--output', default='../build/three.js')
+  parser.add_argument('--sourcemaps', action='store_true', default=False)
 
   args = parser.parse_args()
 
@@ -24,12 +25,23 @@ def main(argv=None):
 
   print(' * Building ' + output)
 
+  # enable sourcemaps support
+
+  if args.sourcemaps:
+    sourcemap = '../build/three.js.map'
+    sourcemapping = '\n//@ sourceMappingURL=' + sourcemap
+    sourcemapargs = ' --create_source_map ' + sourcemap + ' --source_map_format=V3'
+  else:
+    sourcemap = sourcemapping = sourcemapargs = ''
+
   fd, path = tempfile.mkstemp()
   tmp = open(path, 'w')
+  sources = []
 
   for include in args.include:
     with open('includes/' + include + '.json','r') as f: files = json.load(f)
     for filename in files:
+      sources.append(filename)
       with open(filename, 'r') as f: tmp.write(f.read())
 
   tmp.close()
@@ -37,19 +49,20 @@ def main(argv=None):
   # save
 
   if args.minify is False:
-
       shutil.copy(path, output)
       os.chmod(output, 0o664); # temp files would usually get 0600
 
   else:
 
     externs = ' --externs '.join(args.externs)
-    os.system('java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s' % (externs, path, output))
+    source = ' '.join(sources)
+    cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, source, output, sourcemapargs)
+    os.system(cmd)
 
     # header
 
     with open(output,'r') as f: text = f.read()
-    with open(output,'w') as f: f.write('// three.js - http://github.com/mrdoob/three.js\n' + text)
+    with open(output,'w') as f: f.write('// three.js - http://github.com/mrdoob/three.js\n' + text + sourcemapping)
 
   os.close(fd)
   os.remove(path)
