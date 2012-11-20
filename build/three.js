@@ -10645,6 +10645,101 @@ THREE.ShaderMaterial.prototype.clone = function () {
 
 };
 /**
+ * @author alteredq / http://alteredqualia.com/
+ *
+ * parameters = {
+ *  color: <hex>,
+ *  opacity: <float>,
+ *  map: new THREE.Texture( <Image> ),
+ *
+ *  blending: THREE.NormalBlending,
+ *
+ *  useScreenCoordinates: <bool>,
+ *  mergeWith3D: <bool>,
+ *  affectedByDistance: <bool>,
+ *  scaleByViewport: <bool>,
+ *  alignment: THREE.SpriteAlignment.center
+ *
+ *	uvOffset: new THREE.Vector2(),
+ *	uvScale: new THREE.Vector2(),
+ *
+ *  fog: <bool>
+ * }
+ */
+
+THREE.SpriteMaterial = function ( parameters ) {
+
+	THREE.Material.call( this );
+
+	// defaults
+
+	this.color = new THREE.Color( 0xffffff );
+	this.map = new THREE.Texture();
+
+	this.useScreenCoordinates = true;
+	this.mergeWith3D = !this.useScreenCoordinates;
+	this.affectedByDistance = !this.useScreenCoordinates;
+	this.scaleByViewport = !this.affectedByDistance;
+	this.alignment = THREE.SpriteAlignment.center.clone();
+
+	this.fog = false;
+
+	this.uvOffset = new THREE.Vector2( 0, 0 );
+	this.uvScale  = new THREE.Vector2( 1, 1 );
+
+	// set parameters
+
+	this.setValues( parameters );
+
+	// override coupled defaults if not specified explicitly by parameters
+
+	parameters = parameters || {};
+
+	if ( parameters.mergeWith3D === undefined ) this.mergeWith3D = !this.useScreenCoordinates;
+	if ( parameters.affectedByDistance === undefined ) this.affectedByDistance = !this.useScreenCoordinates;
+	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.affectedByDistance;
+
+};
+
+THREE.SpriteMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.SpriteMaterial.prototype.clone = function () {
+
+	var material = new THREE.SpriteMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+	material.map = this.map;
+
+	material.useScreenCoordinates = this.useScreenCoordinates;
+	material.mergeWith3D = this.mergeWith3D;
+	material.affectedByDistance = this.affectedByDistance;
+	material.scaleByViewport = this.scaleByViewport;
+	material.alignment.copy( this.alignment );
+
+	material.uvOffset.copy( this.uvOffset );
+	material.uvScale.copy( this.uvScale );
+
+	material.fog = this.fog;
+
+	return material;
+
+};
+
+// Alignment enums
+
+THREE.SpriteAlignment = {};
+THREE.SpriteAlignment.topLeft = new THREE.Vector2( 1, -1 );
+THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -1 );
+THREE.SpriteAlignment.topRight = new THREE.Vector2( -1, -1 );
+THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 1, 0 );
+THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
+THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
+THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
+THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
+THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
@@ -11588,37 +11683,14 @@ THREE.LOD.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = function ( parameters ) {
+THREE.Sprite = function ( material ) {
 
 	THREE.Object3D.call( this );
 
-	parameters = parameters || {};
-
-	this.color = ( parameters.color !== undefined ) ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
-	this.map = ( parameters.map !== undefined ) ? parameters.map : new THREE.Texture();
-
-	this.blending = ( parameters.blending !== undefined ) ? parameters.blending : THREE.NormalBlending;
-
-	this.blendSrc = parameters.blendSrc !== undefined ? parameters.blendSrc : THREE.SrcAlphaFactor;
-	this.blendDst = parameters.blendDst !== undefined ? parameters.blendDst : THREE.OneMinusSrcAlphaFactor;
-	this.blendEquation = parameters.blendEquation !== undefined ? parameters.blendEquation : THREE.AddEquation;
-
-	this.useScreenCoordinates = ( parameters.useScreenCoordinates !== undefined ) ? parameters.useScreenCoordinates : true;
-	this.mergeWith3D = ( parameters.mergeWith3D !== undefined ) ? parameters.mergeWith3D : !this.useScreenCoordinates;
-	this.affectedByDistance = ( parameters.affectedByDistance !== undefined ) ? parameters.affectedByDistance : !this.useScreenCoordinates;
-	this.scaleByViewport = ( parameters.scaleByViewport !== undefined ) ? parameters.scaleByViewport : !this.affectedByDistance;
-	this.alignment = ( parameters.alignment instanceof THREE.Vector2 ) ? parameters.alignment : THREE.SpriteAlignment.center.clone();
-
-	this.fog = ( parameters.fog !== undefined ) ? parameters.fog : false;
+	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
 	this.rotation3d = this.rotation;
 	this.rotation = 0;
-	this.opacity = 1;
-
-	this.uvOffset = new THREE.Vector2( 0, 0 );
-	this.uvScale  = new THREE.Vector2( 1, 1 );
-
-	this.alphaTest = 0;
 
 };
 
@@ -11648,26 +11720,7 @@ THREE.Sprite.prototype.updateMatrix = function () {
 
 THREE.Sprite.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.Sprite( {} );
-
-	object.color.copy( this.color );
-	object.map = this.map;
-	object.blending = this.blending;
-
-	object.useScreenCoordinates = this.useScreenCoordinates;
-	object.mergeWith3D = this.mergeWith3D;
-	object.affectedByDistance = this.affectedByDistance;
-	object.scaleByViewport = this.scaleByViewport;
-	object.alignment = this.alignment;
-
-	object.fog = this.fog;
-
-	object.rotation3d.copy( this.rotation3d );
-	object.rotation = this.rotation;
-	object.opacity = this.opacity;
-
-	object.uvOffset.copy( this.uvOffset );
-	object.uvScale.copy( this.uvScale);
+	if ( object === undefined ) object = new THREE.Sprite( this.material );
 
 	THREE.Object3D.prototype.clone.call( this, object );
 
@@ -11675,20 +11728,6 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
-/*
- * Alignment
- */
-
-THREE.SpriteAlignment = {};
-THREE.SpriteAlignment.topLeft = new THREE.Vector2( 1, -1 );
-THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -1 );
-THREE.SpriteAlignment.topRight = new THREE.Vector2( -1, -1 );
-THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 1, 0 );
-THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
-THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
-THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
-THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
-THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -34606,15 +34645,16 @@ THREE.SpritePlugin = function ( ) {
 
 		// update positions and sort
 
-		var i, sprite, screenPosition, size, fogType, scale = [];
+		var i, sprite, material, screenPosition, size, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
 			sprite = sprites[ i ];
+			material = sprite.material;
 
-			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
+			if ( ! sprite.visible || material.opacity === 0 ) continue;
 
-			if ( ! sprite.useScreenCoordinates ) {
+			if ( ! material.useScreenCoordinates ) {
 
 				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld );
 				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
@@ -34634,14 +34674,15 @@ THREE.SpritePlugin = function ( ) {
 		for( i = 0; i < nSprites; i ++ ) {
 
 			sprite = sprites[ i ];
+			material = sprite.material;
 
-			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
+			if ( ! sprite.visible || material.opacity === 0 ) continue;
 
-			if ( sprite.map && sprite.map.image && sprite.map.image.width ) {
+			if ( material.map && material.map.image && material.map.image.width ) {
 
-				_gl.uniform1f( uniforms.alphaTest, sprite.alphaTest );
+				_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 
-				if ( sprite.useScreenCoordinates ) {
+				if ( material.useScreenCoordinates ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
 					_gl.uniform3f(
@@ -34654,12 +34695,12 @@ THREE.SpritePlugin = function ( ) {
 				} else {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
-					_gl.uniform1i( uniforms.affectedByDistance, sprite.affectedByDistance ? 1 : 0 );
+					_gl.uniform1i( uniforms.affectedByDistance, material.affectedByDistance ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
 				}
 
-				if ( scene.fog && sprite.fog ) {
+				if ( scene.fog && material.fog ) {
 
 					fogType = sceneFogType;
 
@@ -34676,35 +34717,35 @@ THREE.SpritePlugin = function ( ) {
 
 				}
 
-				size = 1 / ( sprite.scaleByViewport ? viewportHeight : 1 );
+				size = 1 / ( material.scaleByViewport ? viewportHeight : 1 );
 
 				scale[ 0 ] = size * invAspect * sprite.scale.x;
 				scale[ 1 ] = size * sprite.scale.y;
 
-				_gl.uniform2f( uniforms.uvScale, sprite.uvScale.x, sprite.uvScale.y );
-				_gl.uniform2f( uniforms.uvOffset, sprite.uvOffset.x, sprite.uvOffset.y );
-				_gl.uniform2f( uniforms.alignment, sprite.alignment.x, sprite.alignment.y );
+				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
+				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
+				_gl.uniform2f( uniforms.alignment, material.alignment.x, material.alignment.y );
 
-				_gl.uniform1f( uniforms.opacity, sprite.opacity );
-				_gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
+				_gl.uniform1f( uniforms.opacity, material.opacity );
+				_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
 				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 
-				if ( sprite.mergeWith3D && !mergeWith3D ) {
+				if ( material.mergeWith3D && !mergeWith3D ) {
 
 					_gl.enable( _gl.DEPTH_TEST );
 					mergeWith3D = true;
 
-				} else if ( ! sprite.mergeWith3D && mergeWith3D ) {
+				} else if ( ! material.mergeWith3D && mergeWith3D ) {
 
 					_gl.disable( _gl.DEPTH_TEST );
 					mergeWith3D = false;
 
 				}
 
-				_renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
-				_renderer.setTexture( sprite.map, 0 );
+				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+				_renderer.setTexture( material.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 

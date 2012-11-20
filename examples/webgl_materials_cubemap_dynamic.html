@@ -304,7 +304,8 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
 						var spriteWidth = 128;
 						var spriteHeight = 128;
@@ -372,7 +373,8 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
 						var spriteWidth = 128;
 						var spriteHeight = 128;
@@ -501,7 +503,7 @@
 
 				for ( var i = 0; i < sprites.length; i ++ ) {
 
-					sprites[ i ].opacity = opacity;
+					sprites[ i ].material.opacity = opacity;
 
 				}
 

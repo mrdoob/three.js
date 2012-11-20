@@ -3,37 +3,14 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Sprite = function ( parameters ) {
+THREE.Sprite = function ( material ) {
 
 	THREE.Object3D.call( this );
 
-	parameters = parameters || {};
-
-	this.color = ( parameters.color !== undefined ) ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
-	this.map = ( parameters.map !== undefined ) ? parameters.map : new THREE.Texture();
-
-	this.blending = ( parameters.blending !== undefined ) ? parameters.blending : THREE.NormalBlending;
-
-	this.blendSrc = parameters.blendSrc !== undefined ? parameters.blendSrc : THREE.SrcAlphaFactor;
-	this.blendDst = parameters.blendDst !== undefined ? parameters.blendDst : THREE.OneMinusSrcAlphaFactor;
-	this.blendEquation = parameters.blendEquation !== undefined ? parameters.blendEquation : THREE.AddEquation;
-
-	this.useScreenCoordinates = ( parameters.useScreenCoordinates !== undefined ) ? parameters.useScreenCoordinates : true;
-	this.mergeWith3D = ( parameters.mergeWith3D !== undefined ) ? parameters.mergeWith3D : !this.useScreenCoordinates;
-	this.affectedByDistance = ( parameters.affectedByDistance !== undefined ) ? parameters.affectedByDistance : !this.useScreenCoordinates;
-	this.scaleByViewport = ( parameters.scaleByViewport !== undefined ) ? parameters.scaleByViewport : !this.affectedByDistance;
-	this.alignment = ( parameters.alignment instanceof THREE.Vector2 ) ? parameters.alignment : THREE.SpriteAlignment.center.clone();
-
-	this.fog = ( parameters.fog !== undefined ) ? parameters.fog : false;
+	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
 	this.rotation3d = this.rotation;
 	this.rotation = 0;
-	this.opacity = 1;
-
-	this.uvOffset = new THREE.Vector2( 0, 0 );
-	this.uvScale  = new THREE.Vector2( 1, 1 );
-
-	this.alphaTest = 0;
 
 };
 
@@ -63,26 +40,7 @@ THREE.Sprite.prototype.updateMatrix = function () {
 
 THREE.Sprite.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.Sprite( {} );
-
-	object.color.copy( this.color );
-	object.map = this.map;
-	object.blending = this.blending;
-
-	object.useScreenCoordinates = this.useScreenCoordinates;
-	object.mergeWith3D = this.mergeWith3D;
-	object.affectedByDistance = this.affectedByDistance;
-	object.scaleByViewport = this.scaleByViewport;
-	object.alignment = this.alignment;
-
-	object.fog = this.fog;
-
-	object.rotation3d.copy( this.rotation3d );
-	object.rotation = this.rotation;
-	object.opacity = this.opacity;
-
-	object.uvOffset.copy( this.uvOffset );
-	object.uvScale.copy( this.uvScale);
+	if ( object === undefined ) object = new THREE.Sprite( this.material );
 
 	THREE.Object3D.prototype.clone.call( this, object );
 
@@ -90,17 +48,3 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
-/*
- * Alignment
- */
-
-THREE.SpriteAlignment = {};
-THREE.SpriteAlignment.topLeft = new THREE.Vector2( 1, -1 );
-THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -1 );
-THREE.SpriteAlignment.topRight = new THREE.Vector2( -1, -1 );
-THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 1, 0 );
-THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
-THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
-THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
-THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
-THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );

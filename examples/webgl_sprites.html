@@ -55,32 +55,38 @@
 
 				var amount = 200;
 				var radius = 500;
+
 				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png", undefined, function() { createHUDSprites() } );
 				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
 				mapC = THREE.ImageUtils.loadTexture( "textures/sprite2.png" );
 
 				group = new THREE.Object3D();
 
-				for( var a = 0; a < amount; a ++ ) {
+				var materialC = new THREE.SpriteMaterial( { map: mapC, useScreenCoordinates: false, color: 0xffffff, fog: true } );
+				var materialB = new THREE.SpriteMaterial( { map: mapB, useScreenCoordinates: false, color: 0xffffff, fog: true } );
 
-					var sprite = new THREE.Sprite( { map: mapC, useScreenCoordinates: false, color: 0xffffff, fog: true } );
+				for ( var a = 0; a < amount; a ++ ) {
 
-					sprite.position.set( Math.random() - 0.5,
-					                     Math.random() - 0.5,
-					                     Math.random() - 0.5 );
+					var x = Math.random() - 0.5;
+					var y = Math.random() - 0.5;
+					var z = Math.random() - 0.5;
 
-					if( sprite.position.z < 0 ) {
+					if ( z < 0 ) {
 
-						sprite.map = mapB;
+						material = materialB.clone();
 
 					} else {
 
-						sprite.color.setHSV( 0.5 * Math.random(), 0.8, 0.9 );
-						sprite.uvScale.set( 2, 2 );
-						sprite.uvOffset.set( -0.5, -0.5 );
+						material = materialC.clone();
+						material.color.setHSV( 0.5 * Math.random(), 0.8, 0.9 );
+						material.uvScale.set( 2, 2 );
+						material.uvOffset.set( -0.5, -0.5 );
 
 					}
 
+					var sprite = new THREE.Sprite( material );
+
+					sprite.position.set( x, y, z );
 					sprite.position.normalize();
 					sprite.position.multiplyScalar( radius );
 
@@ -97,22 +103,23 @@
 					var scaleX = mapA.image.width;
 					var scaleY = mapA.image.height;
 
-					sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
+					var materialA1 = new THREE.SpriteMaterial( { map: mapA, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.25 } );
+					var materialA2 = new THREE.SpriteMaterial( { map: mapA, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.5 } );
+					var materialA3 = new THREE.SpriteMaterial( { map: mapA, alignment: THREE.SpriteAlignment.topLeft, opacity: 1 } );
+
+					sprite = new THREE.Sprite( materialA1 );
 					sprite.position.set( 100, 100, 0 );
 					sprite.scale.set( scaleX, scaleY, 1 );
-					sprite.opacity = 0.25;
 					scene.add( sprite );
 
-					sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
+					sprite = new THREE.Sprite( materialA2 );
 					sprite.position.set( 150, 150, 2 );
 					sprite.scale.set( scaleX, scaleY, 1 );
-					sprite.opacity = 0.5;
 					scene.add( sprite );
 
-					sprite = new THREE.Sprite( { map: mapA, alignment: THREE.SpriteAlignment.topLeft } );
+					sprite = new THREE.Sprite( materialA3 );
 					sprite.position.set( 200, 200, 3 );
 					sprite.scale.set( scaleX, scaleY, 1 );
-					sprite.opacity = 1;
 					scene.add( sprite );
 
 				}
@@ -162,23 +169,24 @@
 				for ( var c = 0; c < group.children.length; c ++ ) {
 
 					var sprite = group.children[ c ];
+					var material = sprite.material;
 					var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
 
 					var imageWidth = 1;
 					var imageHeight = 1;
 
-					if ( sprite.map && sprite.map.image && sprite.map.image.width ) {
+					if ( material.map && material.map.image && material.map.image.width ) {
 
-						imageWidth = sprite.map.image.width;
-						imageHeight = sprite.map.image.height;
+						imageWidth = material.map.image.width;
+						imageHeight = material.map.image.height;
 
 					}
 
 					sprite.rotation += 0.1 * ( c / group.children.length );
 					sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
 
-					if ( sprite.map !== mapC )
-						sprite.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
+					if ( material.map !== mapC )
+						material.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
 
 				}
 
