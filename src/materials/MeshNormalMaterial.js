@@ -3,11 +3,12 @@
  *
  * parameters = {
  *  opacity: <float>,
- 
+ *
  *  shading: THREE.FlatShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
- 
+ *  depthWrite: <bool>,
+ *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>
  * }
