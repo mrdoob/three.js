@@ -82,11 +82,11 @@
 
 			// rendertargets
 
-			var rtNormals, rtDepth, rtLightBuffer, rtEmitter;
+			var rtColor, rtNormals, rtDepth, rtLightBuffer, rtEmitter;
 
 			// composer
 
-			var compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+			var compColor, compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
 
 			// materials
 
@@ -198,6 +198,7 @@
 
 			"varying vec3 lightView;"+
 
+			"uniform sampler2D samplerColor;"+
 			"uniform sampler2D samplerDepth;"+
 			"uniform sampler2D samplerNormals;"+
 			"uniform sampler2D samplerLightBuffer;"+
@@ -252,8 +253,10 @@
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );" +
 				"float specular = max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
 
+				"vec4 albedo = texture2D( samplerColor, texCoord );"+
+
 				"vec4 color = vec4( 0.0 );"+
-				"color.xyz = lightColor * lightIntensity;"+
+				"color.xyz = albedo.xyz * lightColor * lightIntensity;"+
 				"color.w = attenuation;"+
 				"gl_FragColor = color * ( diffuse + specular );" +
 
@@ -344,6 +347,7 @@
 					samplerLightBuffer: { type: "t", value: null },
 					samplerNormals: { type: "t", value: null },
 					samplerDepth: { type: "t", value: null },
+					samplerColor: { type: "t", value: null },
 					matView : { type: "m4", value: new THREE.Matrix4() },
 					matProjInverse : { type: "m4", value: new THREE.Matrix4() },
 					viewWidth: { type: "f", value: WIDTH },
@@ -379,9 +383,9 @@
 
 			function bootstrap() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
 				renderer.setSize( WIDTH, HEIGHT );
-				renderer.setClearColorHex( 0x000000 );
+				renderer.setClearColorHex( 0x000000, 1 );
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -437,15 +441,19 @@
 
 			function createRenderTargets() {
 
-				var rtParams = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter,
-							     format: THREE.RGBAFormat, type: THREE.FloatType };
+				var rtParamsFloat = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+							          format: THREE.RGBAFormat, type: THREE.FloatType };
+
+				var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+							          format: THREE.RGBFormat, type: THREE.UnsignedByteType };
 
 				// ----------------------------------------------------------
 				// g-buffer
 				// ----------------------------------------------------------
 
-				rtNormals = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
-				rtDepth = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtNormals = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
+				rtDepth = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
+				rtColor = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
 
 				var passNormals = new THREE.RenderPass( scene, camera );
 				compNormals = new THREE.EffectComposer( renderer, rtNormals );
@@ -455,12 +463,16 @@
 				compDepth = new THREE.EffectComposer( renderer, rtDepth );
 				compDepth.addPass( passDepth );
 
+				var passColor = new THREE.RenderPass( scene, camera );
+				compColor = new THREE.EffectComposer( renderer, rtColor );
+				compColor.addPass( passColor );
+
 				// ----------------------------------------------------------
 				// light emitter spheres
 				// ----------------------------------------------------------
 
 				var emitterPass = new THREE.RenderPass( emitterScene, camera );
-				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
 				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
 				compEmitter.addPass( emitterPass );
 
@@ -468,18 +480,21 @@
 				// lighting pass
 				// ----------------------------------------------------------
 
-				rtLightBuffer = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtLightBuffer = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
 				rtLightBuffer.generateMipmaps = false;
 
 				var passLight = new THREE.RenderPass( lightScene, camera );
 				compLightBuffer = new THREE.EffectComposer( renderer, rtLightBuffer );
 				compLightBuffer.addPass( passLight );
 
-				lightShader.uniforms['samplerNormals'].value = compNormals.renderTarget2;
-				lightShader.uniforms['samplerDepth'].value = compDepth.renderTarget2;
-				lightShader.uniforms['samplerLightBuffer'].value = rtLightBuffer;
+				lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+				lightShader.uniforms[ 'samplerNormals' ].value = compNormals.renderTarget2;
+				lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLightBuffer;
 
 				for ( var x = 0; x < numLights; x ++ ) {
+
+					var light = lights[ x ];
 
 					// setup material
 
@@ -494,14 +509,14 @@
 					matLight.blending = THREE.AdditiveBlending;
 					matLight.transparent = true;
 					matLight.depthWrite = false;
-					matLight.uniforms["lightPos"].value = lights[x].position;
-					matLight.uniforms["lightRadius"].value = lights[x].distance;
-					matLight.uniforms["lightIntensity"].value = lights[x].intensity;
-					matLight.uniforms["lightColor"].value = lights[x].color;
+					matLight.uniforms[ "lightPos" ].value = light.position;
+					matLight.uniforms[ "lightRadius" ].value = light.distance;
+					matLight.uniforms[ "lightIntensity" ].value = light.intensity;
+					matLight.uniforms[ "lightColor" ].value = light.color;
 
 					// setup proxy geometry for this light
 
-					var geomLight = new THREE.SphereGeometry( lights[x].distance, 16, 10 );
+					var geomLight = new THREE.SphereGeometry( light.distance, 16, 10 );
 					var meshLight = new THREE.Mesh( geomLight, matLight );
 					lightNode.add( meshLight );
 
@@ -517,7 +532,7 @@
 					});
 
 					var meshEmitter = new THREE.Mesh( geomEmitter, matEmitter );
-					meshEmitter.position = lights[ x ].position;
+					meshEmitter.position = light.position;
 					emitterNode.add( meshEmitter );
 
 					// add emitter to light node
@@ -544,19 +559,24 @@
 
 			// -----------------------------
 
-			function initScene( object ) {
+			function initScene( object, y, scale ) {
 
 				object.traverse( function( node ) {
 
 					if ( node.material ) {
 
-						node.material = new THREE.MeshBasicMaterial();
+						var material = new THREE.MeshBasicMaterial();
+						material.color.copy( node.material.color );
+						material.map = node.material.map;
+
+						node.colorMaterial = material;
 
 					}
 
 				} );
 
-				object.position.y = -35;
+				object.position.y = y;
+				object.scale.set( scale, scale, scale );
 				sceneNode.add( object );
 
 			}
@@ -590,12 +610,26 @@
 
 				var distance = 25;
 
-				for ( var i = 0; i < numLights; i ++ ) {
+				// front light
+
+				var light = new THREE.PointLight();
+
+				light.color = new THREE.Vector3( 1, 1, 1 );
+				light.intensity = 1.5;
+				light.distance = 1.5 * distance;
+
+				lights.push( light );
+
+				// random lights
+
+				for ( var i = 1; i < numLights; i ++ ) {
 
 					var light = new THREE.PointLight();
+
 					light.color = new THREE.Vector3( Math.random(), Math.random(), Math.random() ).normalize();
 					light.intensity = 1.0;
 					light.distance = distance;
+
 					lights.push( light );
 
 				}
@@ -619,6 +653,22 @@
 			// -----------------------------
 
 			function render() {
+
+				// -----------------------------
+				// g-buffer color
+				// -----------------------------
+
+				sceneNode.traverse( function( node ) {
+
+					if ( node.material ) {
+
+						node.material = node.colorMaterial;
+
+					}
+
+				} );
+
+				compColor.render();
 
 				// -----------------------------
 				// g-buffer depth
@@ -656,13 +706,14 @@
 				// emitter pass
 				// -----------------------------
 
-				for ( var idx in lightNode.children ) {
+				for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
 
-					var light = lightNode.children[idx];
-					var color = light.material.uniforms["lightColor"].value;
+					var light = lightNode.children[ i ];
+					var color = light.material.uniforms[ "lightColor" ].value;
+
 					var emitter = light.emitter;
-					emitter.material.uniforms['samplerDepth'].value = compDepth.renderTarget2;
-					emitter.material.uniforms["lightColor"].value = color;
+					emitter.material.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
+					emitter.material.uniforms[ "lightColor" ].value = color;
 
 				}
 
@@ -672,11 +723,11 @@
 				// light pass
 				// -----------------------------
 
-				for ( var idx in lightNode.children ) {
+				for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
 
 					camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
-					lightNode.children[idx].material.uniforms["matProjInverse"].value = camera.projectionMatrixInverse;
-					lightNode.children[idx].material.uniforms["matView"].value = camera.matrixWorldInverse;
+					lightNode.children[ i ].material.uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
+					lightNode.children[ i ].material.uniforms[ "matView" ].value = camera.matrixWorldInverse;
 
 				}
 
@@ -684,15 +735,33 @@
 
 				// update lights
 
+				var x, y, z;
+
 				for ( var i = 0; i < numLights; i ++ ) {
 
-					var lightPosition = lightNode.children[i].material.uniforms["lightPos"].value;
-					lightPosition.x = Math.sin( time + i * 1.7 ) * 30;
-					lightPosition.y = Math.cos( time + i * 1.5 ) * 40;
-					lightPosition.z = Math.cos( time + i * 1.3 ) * 30;
-					lightNode.children[i].emitter.position = lightPosition;
-					lightNode.children[i].position = lightPosition;
-					lightNode.children[i].frustumCulled = false;
+					var lightPosition = lightNode.children[ i ].material.uniforms[ "lightPos" ].value;
+
+					if ( i > 0 ) {
+
+						x = Math.sin( time + i * 1.7 ) * 30;
+						y = Math.cos( time + i * 1.5 ) * 40;
+						z = Math.cos( time + i * 1.3 ) * 30;
+
+					} else {
+
+						x = Math.sin( time * 3 ) * 20;
+						y = 15;
+						z = Math.cos( time * 3 ) * 25 + 10;
+
+					}
+
+					lightPosition.x = x;
+					lightPosition.y = y;
+					lightPosition.z = z;
+
+					lightNode.children[ i ].emitter.position = lightPosition;
+					lightNode.children[ i ].position = lightPosition;
+					lightNode.children[ i ].frustumCulled = false;
 
 				}
 
@@ -712,16 +781,29 @@
 
 			var loader = new THREE.UTF8Loader();
 
-			loader.load( "models/utf8/WaltHi.js", function ( object ) {
+			loader.load( "models/utf8/ben.js", function ( object ) {
 
 				bootstrap();
-				initScene( object );
+				initScene( object, -75, 150 );
 				initMaterials();
 				initLights();
 				createRenderTargets();
 				animate();
 
 			}, { normalizeRGB: true } );
+
+			/*
+			loader.load( "models/utf8/WaltHi.js", function ( object ) {
+
+				bootstrap();
+				initScene( object, -35, 1 );
+				initMaterials();
+				initLights();
+				createRenderTargets();
+				animate();
+
+			}, { normalizeRGB: true } );
+			*/
 
 		</script>
 	</body>
