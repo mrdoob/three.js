@@ -250,7 +250,7 @@ THREE.ShaderChunk = {
 
 			"uniform sampler2D map;",
 
-		"#endif",
+		"#endif"
 
 	].join("\n"),
 
@@ -1393,7 +1393,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"gl_Position = projectionMatrix * mvPosition;",
+		"gl_Position = projectionMatrix * mvPosition;"
 
 	].join("\n"),
 
@@ -1463,7 +1463,7 @@ THREE.ShaderChunk = {
 
 		"#endif",
 
-		"vec3 transformedNormal = normalMatrix * objectNormal;",
+		"vec3 transformedNormal = normalMatrix * objectNormal;"
 
 	].join("\n"),
 
@@ -1715,7 +1715,7 @@ THREE.ShaderChunk = {
 
 		"#endif"
 
-	].join("\n"),
+	].join("\n")
 
 
 };
@@ -1876,7 +1876,7 @@ THREE.UniformsLib = {
 		"shadowBias" : { type: "fv1", value: [] },
 		"shadowDarkness": { type: "fv1", value: [] },
 
-		"shadowMatrix" : { type: "m4v", value: [] },
+		"shadowMatrix" : { type: "m4v", value: [] }
 
 	}
 
