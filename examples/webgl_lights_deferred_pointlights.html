@@ -1,0 +1,758 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<title>three.js webgl - deferred rendering</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+			}
+
+			a {
+				color: #ff0080;
+				text-decoration: none;
+			}
+
+			a:hover {
+				color: #0080ff;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - deferred point lights WebGL demo by <a href="http://de.redplant.de" target=_blank>redPlant</a>.<br />
+			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a><br>
+			Point Light attenuation formula by <a href="http://imdoingitwrong.wordpress.com/tag/glsl/" target=_blank>Tom Madams</a>
+		</div>
+		<div id="container"></div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/loaders/ctm/lzma.js"></script>
+		<script src="js/loaders/ctm/ctm.js"></script>
+		<script src="js/loaders/ctm/CTMLoader.js"></script>
+
+		<script src="js/loaders/UTF8Loader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var WIDTH = window.innerWidth;
+			var HEIGHT = window.innerHeight;
+
+			var NEAR = 1.0, FAR = 250.0;
+			var VIEW_ANGLE = 45;
+			var ASPECT = WIDTH / HEIGHT;
+
+			// core
+
+			var renderer, camera, controls, stats, clock;
+
+			// scenes and scene nodes
+
+			var lightScene, lightNode, scene, sceneNode, emitterScene, emitterNode, quadScene, quadNode;
+
+			// rendertargets
+
+			var rtNormals, rtDepth, rtLightBuffer, rtEmitter;
+
+			// composer
+
+			var compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+
+			// materials
+
+			var matNormal, matClipDepth, matBasic, matUnlit;
+
+			var numLights = 0;
+			var lights = new Array();
+
+			// -----------------------
+			// shader definitions
+			// -----------------------
+
+			var clipdepth_frag = ""+
+
+			"varying vec4 clipPos;"+
+
+			"void main() {"+
+
+				"gl_FragColor = vec4( clipPos.z / clipPos.w, 1.0, 1.0, 1.0 );"+
+
+			"}";
+
+
+			var clipdepth_vert = "" +
+
+			"varying vec4 clipPos;"+
+
+			"void main() {"+
+
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"clipPos = gl_Position;"+
+
+			"}";
+
+
+			// -----------------------
+
+			var normals_vert = "" +
+
+			"varying vec3 normalView;"+
+
+			"void main() {"+
+
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"normalView = normalize( normalMatrix * normal );"+
+
+			"}";
+
+			var normals_frag = "" +
+
+			"varying vec3 normalView;"+
+
+			"void main() {"+
+
+				"gl_FragColor = vec4( vec3( normalView * 0.5 + 0.5 ), 1.0 );"+
+
+			"}";
+
+			// -----------------------
+
+			var unlit_vert = "" +
+
+			"varying vec4 clipPos;"+
+
+			"void main() {"+
+
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"clipPos = gl_Position;"+
+
+			"}";
+
+			var unlit_frag = "" +
+
+			"varying vec4 clipPos;"+
+			"uniform sampler2D samplerDepth;"+
+
+			"uniform float viewHeight;"+
+			"uniform float viewWidth;"+
+
+			"uniform vec3 lightColor;" +
+
+			"void main() {"+
+
+				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"+
+				"float z = texture2D( samplerDepth, texCoord ).x;"+
+				"vec4 color = vec4( lightColor, 1.0 );"+
+				"float depth = clipPos.z / clipPos.w;"+
+				"if( depth > z && z > 0.0 ) color.w = 0.0;"+
+				"gl_FragColor = color;"+
+
+			"}";
+
+			// -----------------------
+
+			var deferredlight_vert = "" +
+
+			"varying vec3 lightView;" +
+			"uniform vec3 lightPos;" +
+			"uniform mat4 matView;" +
+
+			"void main() { " +
+
+				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"lightView = vec3( matView * vec4( lightPos, 1.0 ) );" +
+
+			"}"
+
+			var deferredlight_frag = "" +
+
+			"varying vec3 lightView;"+
+
+			"uniform sampler2D samplerDepth;"+
+			"uniform sampler2D samplerNormals;"+
+			"uniform sampler2D samplerLightBuffer;"+
+
+			"uniform float lightRadius;"+
+			"uniform float lightIntensity;"+
+			"uniform float viewHeight;"+
+			"uniform float viewWidth;"+
+
+			"uniform vec3 lightColor;"+
+
+			"uniform mat4 matProjInverse;"+
+
+			"void main() {"+
+
+				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"+
+
+				"float z = texture2D( samplerDepth, texCoord ).x;"+
+
+				"if ( z == 0.0 ) {"+
+
+					"gl_FragColor = vec4( vec3( 0.0 ), 1.0 );"+
+					"return;"+
+
+				"}"+
+
+				"float x = texCoord.x * 2.0 - 1.0;"+
+				"float y = texCoord.y * 2.0 - 1.0;"+
+
+				"vec4 projectedPos = vec4( x, y, z, 1.0 );"+
+
+				"vec4 viewPos = matProjInverse * projectedPos;"+
+				"viewPos.xyz /= viewPos.w;"+
+				"viewPos.w = 1.0;"+
+
+				"vec3 lightDir = lightView - viewPos.xyz;"+
+				"float dist = length( lightDir );"+
+
+				"float cutoff = 0.3;"+
+				"float denom = dist/lightRadius + 1.0;"+
+				"float attenuation = 1.0 / ( denom * denom );"+
+				"attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );"+
+				"attenuation = max( attenuation, 0.0 );"+
+
+				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;" +
+				"float diffuse = max( dot( normal, normalize( lightDir ) ), 0.0 );" +
+
+				"vec4 color = vec4( 0.0 );"+
+				"color.xyz = lightColor * lightIntensity;"+
+				"color.w = attenuation;"+
+				"gl_FragColor = color * diffuse;"+
+
+			"}";
+
+			var composite_vert = "" +
+
+			"varying vec2 texCoord;"+
+
+			"void main() {"+
+
+				"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );"+
+				"texCoord = pos.xy * vec2( 0.5, 0.5 ) + 0.5;"+
+				"gl_Position = pos;"+
+
+			"}";
+
+			var composite_frag = "" +
+
+			"varying vec2 texCoord;"+
+			"uniform sampler2D samplerLightBuffer;" +
+			"uniform sampler2D samplerEmitter;" +
+			"uniform vec3 lightPos;" +
+
+			"void main() {" +
+
+				"vec3 color = texture2D( samplerLightBuffer, texCoord ).xyz;" +
+				"vec3 emitter = texture2D( samplerEmitter, texCoord ).xyz;"+
+
+				"if ( emitter != vec3( 0.0 ) ) {"+
+
+					"gl_FragColor = vec4( emitter, 1.0 );" +
+
+				"} else {"+
+
+					"gl_FragColor = vec4( color, 1.0 );" +
+
+				"}"+
+
+			"}"
+
+			// -----------------------
+
+			var normalShader = {
+
+				uniforms: {},
+
+				vertexShader: normals_vert,
+				fragmentShader: normals_frag
+
+			};
+
+			// -----------------------
+
+			var clipDepthShader = {
+
+				uniforms: {},
+
+				vertexShader: clipdepth_vert,
+				fragmentShader: clipdepth_frag
+
+			};
+
+			// -----------------------
+
+			var unlitShader = {
+
+				uniforms: {
+
+					samplerDepth: { type: "t", value: null },
+					viewWidth: { type: "f", value: WIDTH },
+					viewHeight: { type: "f", value: HEIGHT },
+					lightColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
+
+				},
+
+				vertexShader: unlit_vert,
+				fragmentShader: unlit_frag
+
+			};
+
+			// -----------------------
+
+			var lightShader = {
+
+				uniforms: {
+
+					samplerLightBuffer: { type: "t", value: null },
+					samplerNormals: { type: "t", value: null },
+					samplerDepth: { type: "t", value: null },
+					matView : { type: "m4", value: new THREE.Matrix4() },
+					matProjInverse : { type: "m4", value: new THREE.Matrix4() },
+					viewWidth: { type: "f", value: WIDTH },
+					viewHeight: { type: "f", value: HEIGHT },
+					lightPos: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+					lightColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+					lightIntensity: { type: "f", value: 1.0 },
+					lightRadius: { type: "f", value: 1.0 }
+
+				},
+
+				vertexShader: deferredlight_vert,
+				fragmentShader: deferredlight_frag
+
+			};
+
+			// -----------------------
+
+			var compositeShader = {
+
+				uniforms: {
+
+					samplerLightBuffer: { type: "t", value: null },
+					samplerEmitter: { type: "t", value: null }
+				},
+
+				vertexShader: composite_vert,
+				fragmentShader: composite_frag
+
+			};
+
+			// -----------------------------
+
+			function bootstrap() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( WIDTH, HEIGHT );
+				renderer.setClearColorHex( 0x000000 );
+
+				var container = document.getElementById( 'container' );
+				container.appendChild( renderer.domElement );
+
+				// scene camera
+
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+				camera.position.z = 150;
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+
+				// scene for walt's head model
+
+				scene = new THREE.Scene();
+				sceneNode = new THREE.Object3D();
+				scene.add( sceneNode );
+				scene.add( camera );
+
+				// scene for light proxy geometry
+
+				lightScene = new THREE.Scene();
+				lightNode = new THREE.Object3D();
+				lightScene.add( lightNode );
+
+				// scene for the coloured emitter spheres
+
+				emitterScene = new THREE.Scene();
+				emitterNode = new THREE.Object3D();
+				emitterScene.add( emitterNode );
+
+				// full screen quad for compositing
+
+				quadScene = new THREE.Scene();
+				quadNode = new THREE.Object3D();
+				quadScene.add( quadNode );
+				quadNode.add( new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ) ) );
+
+				// stats
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '8px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				// clock
+
+				clock = new THREE.Clock();
+
+			}
+
+			// -----------------------------
+
+			function createRenderTargets() {
+
+				var rtParams = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter,
+							     format: THREE.RGBAFormat, type: THREE.FloatType };
+
+				// ----------------------------------------------------------
+				// g-buffer
+				// ----------------------------------------------------------
+
+				rtNormals = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtDepth = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+
+				var passNormals = new THREE.RenderPass( scene, camera );
+				compNormals = new THREE.EffectComposer( renderer, rtNormals );
+				compNormals.addPass( passNormals );
+
+				var passDepth = new THREE.RenderPass( scene, camera );
+				compDepth = new THREE.EffectComposer( renderer, rtDepth );
+				compDepth.addPass( passDepth );
+
+				// ----------------------------------------------------------
+				// light emitter spheres
+				// ----------------------------------------------------------
+
+				var emitterPass = new THREE.RenderPass( emitterScene, camera );
+				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
+				compEmitter.addPass( emitterPass );
+
+				// ----------------------------------------------------------
+				// lighting pass
+				// ----------------------------------------------------------
+
+				rtLightBuffer = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtLightBuffer.generateMipmaps = false;
+
+				var passLight = new THREE.RenderPass( lightScene, camera );
+				compLightBuffer = new THREE.EffectComposer( renderer, rtLightBuffer );
+				compLightBuffer.addPass( passLight );
+
+				lightShader.uniforms['samplerNormals'].value = compNormals.renderTarget2;
+				lightShader.uniforms['samplerDepth'].value = compDepth.renderTarget2;
+				lightShader.uniforms['samplerLightBuffer'].value = rtLightBuffer;
+
+				for ( var x = 0; x < numLights; x ++ ) {
+
+					// setup material
+
+					var matLight = new THREE.ShaderMaterial({
+
+						uniforms:       THREE.UniformsUtils.clone( lightShader.uniforms ),
+						vertexShader:   lightShader.vertexShader,
+						fragmentShader: lightShader.fragmentShader
+
+					});
+
+					matLight.blending = THREE.AdditiveBlending;
+					matLight.transparent = true;
+					matLight.depthWrite = false;
+					matLight.uniforms["lightPos"].value = lights[x].position;
+					matLight.uniforms["lightRadius"].value = lights[x].distance;
+					matLight.uniforms["lightIntensity"].value = lights[x].intensity;
+					matLight.uniforms["lightColor"].value = lights[x].color;
+
+					// setup proxy geometry for this light
+
+					var geomLight = new THREE.SphereGeometry( lights[x].distance, 16, 10 );
+					var meshLight = new THREE.Mesh( geomLight, matLight );
+					lightNode.add( meshLight );
+
+					// create emitter sphere
+
+					var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
+					var matEmitter = new THREE.ShaderMaterial({
+
+						uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
+						vertexShader:   unlitShader.vertexShader,
+						fragmentShader: unlitShader.fragmentShader
+
+					});
+
+					var meshEmitter = new THREE.Mesh( geomEmitter, matEmitter );
+					meshEmitter.position = lights[ x ].position;
+					emitterNode.add( meshEmitter );
+
+					// add emitter to light node
+
+					meshLight.emitter = meshEmitter;
+
+				}
+
+				// ----------------------------------------------------------
+				// composite
+				// ----------------------------------------------------------
+
+				compositeShader.uniforms['samplerLightBuffer'].value = compLightBuffer.renderTarget2;
+				compositeShader.uniforms['samplerEmitter'].value = compEmitter.renderTarget2;
+
+				compositePass = new THREE.ShaderPass( compositeShader );
+				compositePass.needsSwap = true;
+				compositePass.renderToScreen = true;
+
+				compFinal = new THREE.EffectComposer( renderer );
+				compFinal.addPass( compositePass );
+
+			}
+
+			// -----------------------------
+
+			function initScene( object ) {
+
+				object.traverse( function( node ) {
+
+					if ( node.material ) {
+
+						node.material = new THREE.MeshBasicMaterial();
+
+					}
+
+				} );
+
+				object.position.y = -35;
+				sceneNode.add( object );
+
+			}
+
+			// -----------------------------
+
+			function initMaterials() {
+
+
+				matNormal = new THREE.ShaderMaterial({
+
+					uniforms:       normalShader.uniforms,
+					vertexShader:   normalShader.vertexShader,
+					fragmentShader: normalShader.fragmentShader
+
+				});
+
+				matClipDepth = new THREE.ShaderMaterial({
+
+					uniforms:       clipDepthShader.uniforms,
+					vertexShader:   clipDepthShader.vertexShader,
+					fragmentShader: clipDepthShader.fragmentShader
+
+				});
+
+			}
+
+			// -----------------------------
+
+			function initLights() {
+
+				var distance = 50;
+
+				var tmp = new THREE.PointLight();
+				tmp.color = new THREE.Vector3( 0.0, 0.0, 1.0 );
+				tmp.intensity = 1.0;
+				tmp.distance = distance;
+				lights[ 0 ] = tmp;
+
+				var tmp = new THREE.PointLight();
+				tmp.color = new THREE.Vector3( 0.0, 1.0, 0.0 );
+				tmp.intensity = 1.0;
+				tmp.distance = distance;
+				lights[ 1 ] = tmp;
+
+				var tmp = new THREE.PointLight();
+				tmp.color = new THREE.Vector3( 1.0, 0.0, 0.0 );
+				tmp.intensity = 1.0;
+				tmp.distance = distance;
+				lights[ 2 ] = tmp;
+
+				var tmp = new THREE.PointLight();
+				tmp.color = new THREE.Vector3( 0.0, 1.0, 1.0 );
+				tmp.intensity = 1.0;
+				tmp.distance = distance;
+				lights[ 3 ] = tmp;
+
+				numLights = 4;
+
+			}
+
+			// -----------------------------
+
+			function animate() {
+
+				var delta = clock.getDelta();
+
+				requestAnimationFrame( animate );
+
+				controls.update( delta );
+				stats.update();
+				render();
+
+			}
+
+			// -----------------------------
+
+			function render() {
+
+				// -----------------------------
+				// g-buffer depth
+				// -----------------------------
+
+				sceneNode.traverse( function( node ) {
+
+					if ( node.material ) {
+
+						node.material = matClipDepth;
+
+					}
+
+				} );
+
+				compDepth.render();
+
+				// -----------------------------
+				// g-buffer normals
+				// -----------------------------
+
+				sceneNode.traverse( function( node ) {
+
+					if ( node.material ) {
+
+						node.material = matNormal;
+
+					}
+
+				} );
+
+				compNormals.render();
+
+				// -----------------------------
+				// emitter pass
+				// -----------------------------
+
+				for ( var idx in lightNode.children ) {
+
+					var light = lightNode.children[idx];
+					var color = light.material.uniforms["lightColor"].value;
+					var emitter = light.emitter;
+					emitter.material.uniforms['samplerDepth'].value = compDepth.renderTarget2;
+					emitter.material.uniforms["lightColor"].value = color;
+
+				}
+
+				compEmitter.render();
+
+				// -----------------------------
+				// light pass
+				// -----------------------------
+
+				for ( var idx in lightNode.children ) {
+
+					camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
+					lightNode.children[idx].material.uniforms["matProjInverse"].value = camera.projectionMatrixInverse;
+					lightNode.children[idx].material.uniforms["matView"].value = camera.matrixWorldInverse;
+
+				}
+
+				var time = Date.now() * 0.0005;
+
+				// update lights
+
+				var lightPosition = lightNode.children[0].material.uniforms["lightPos"].value;
+				lightPosition.x = Math.sin( time * 0.7 ) * 30;
+				lightPosition.y = Math.cos( time * 0.5 ) * 40;
+				lightPosition.z = Math.cos( time * 0.3 ) * 30;
+				lightNode.children[0].emitter.position = lightPosition;
+				lightNode.children[0].position = lightPosition;
+				lightNode.children[0].frustumCulled = false;
+
+				lightPosition = lightNode.children[1].material.uniforms["lightPos"].value;
+				lightPosition.x = Math.sin( time * 0.5 ) * 30;
+				lightPosition.y = Math.cos( time * 0.5 ) * 40;
+				lightPosition.z = Math.cos( time * 0.7 ) * 30;
+				lightNode.children[1].emitter.position = lightPosition;
+				lightNode.children[1].position = lightPosition;
+				lightNode.children[1].frustumCulled = false;
+
+				lightPosition = lightNode.children[2].material.uniforms["lightPos"].value;
+				lightPosition.x = Math.sin( time * 0.7 ) * 30;
+				lightPosition.y = Math.cos( time * 0.3 ) * 40;
+				lightPosition.z = Math.cos( time * 0.5 ) * 30;
+				lightNode.children[2].emitter.position = lightPosition;
+				lightNode.children[2].position = lightPosition;
+				lightNode.children[2].frustumCulled = false;
+
+				lightPosition = lightNode.children[3].material.uniforms["lightPos"].value;
+				lightPosition.x = Math.sin( time * 0.3 ) * 30;
+				lightPosition.y = Math.cos( time * 0.7 ) * 40;
+				lightPosition.z = Math.cos( time * 0.5 ) * 30;
+				lightNode.children[3].emitter.position = lightPosition;
+				lightNode.children[3].position = lightPosition;
+				lightNode.children[3].frustumCulled = false;
+
+				compLightBuffer.render();
+
+				// -----------------------------
+				// composite pass
+				// -----------------------------
+
+				compFinal.render();
+
+			}
+
+			// -----------------------------
+			// entry point
+			// -----------------------------
+
+			var loader = new THREE.UTF8Loader();
+
+			loader.load( "models/utf8/WaltHi.js", function ( object ) {
+
+				bootstrap();
+				initScene( object );
+				initMaterials();
+				initLights();
+				createRenderTargets();
+				animate();
+
+			}, { normalizeRGB: true } );
+
+		</script>
+	</body>
+
+</html>
