@@ -569,6 +569,18 @@
 						material.color.copy( node.material.color );
 						material.map = node.material.map;
 
+						if ( node.material.transparent ) {
+
+							material.alphaTest = 0.1;
+
+						}
+
+						if ( node.material.name === "eyetrans" ) {
+
+							material.visible = false;
+
+						}
+
 						node.colorMaterial = material;
 
 					}
@@ -781,7 +793,7 @@
 
 			var loader = new THREE.UTF8Loader();
 
-			loader.load( "models/utf8/ben.js", function ( object ) {
+			loader.load( "models/utf8/ben_dds.js", function ( object ) {
 
 				bootstrap();
 				initScene( object, -75, 150 );
