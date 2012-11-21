@@ -26,7 +26,7 @@ import time
 import json
 import bpy
 import mathutils
-from mathutils.geometry import tesselate_polygon
+from mathutils.geometry import tessellate_polygon
 from bpy_extras.image_utils import load_image
 
 # #####################################################
