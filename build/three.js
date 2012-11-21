@@ -19490,13 +19490,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
-		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
-		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
-		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
-		camera.projectionMatrix.flattenToArray( camera._projectionMatrixArray );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
@@ -20616,7 +20610,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial || camera !== _currentCamera ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera._projectionMatrixArray );
+			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
 			if ( camera !== _currentCamera ) _currentCamera = camera;
 
@@ -20752,7 +20746,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.viewMatrix !== null ) {
 
-					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera._viewMatrixArray );
+					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements );
 
 				}
 
@@ -34296,12 +34290,6 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			// update camera matrices and frustum
 
-			if ( ! shadowCamera._viewMatrixArray ) shadowCamera._viewMatrixArray = new Float32Array( 16 );
-			if ( ! shadowCamera._projectionMatrixArray ) shadowCamera._projectionMatrixArray = new Float32Array( 16 );
-
-			shadowCamera.matrixWorldInverse.flattenToArray( shadowCamera._viewMatrixArray );
-			shadowCamera.projectionMatrix.flattenToArray( shadowCamera._projectionMatrixArray );
-
 			_projScreenMatrix.multiply( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 			_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -34687,7 +34675,7 @@ THREE.SpritePlugin = function ( ) {
 
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
 
-		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera._projectionMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
@@ -34937,13 +34925,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 		// update camera matrices and frustum
 
-		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
-		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
-		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
-		camera.projectionMatrix.flattenToArray( camera._projectionMatrixArray );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );

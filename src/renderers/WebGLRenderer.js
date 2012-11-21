@@ -3910,13 +3910,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
-		if ( ! camera._viewMatrixArray ) camera._viewMatrixArray = new Float32Array( 16 );
-		if ( ! camera._projectionMatrixArray ) camera._projectionMatrixArray = new Float32Array( 16 );
-
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
-
-		camera.matrixWorldInverse.flattenToArray( camera._viewMatrixArray );
-		camera.projectionMatrix.flattenToArray( camera._projectionMatrixArray );
 
 		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
@@ -5036,7 +5030,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( refreshMaterial || camera !== _currentCamera ) {
 
-			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera._projectionMatrixArray );
+			_gl.uniformMatrix4fv( p_uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
 			if ( camera !== _currentCamera ) _currentCamera = camera;
 
@@ -5172,7 +5166,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.viewMatrix !== null ) {
 
-					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera._viewMatrixArray );
+					_gl.uniformMatrix4fv( p_uniforms.viewMatrix, false, camera.matrixWorldInverse.elements );
 
 				}
 
