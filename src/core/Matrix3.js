@@ -104,7 +104,7 @@ THREE.Matrix3.prototype = {
 
 	transposeIntoArray: function ( r ) {
 
-		var m = this.m;
+		var m = this.elements;
 
 		r[ 0 ] = m[ 0 ];
 		r[ 1 ] = m[ 3 ];

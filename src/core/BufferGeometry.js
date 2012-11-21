@@ -16,6 +16,10 @@ THREE.BufferGeometry = function () {
 
 	this.dynamic = false;
 
+	// offsets for chunks when using indexed elements
+
+	this.offsets = [];
+
 	// boundings
 
 	this.boundingBox = null;
