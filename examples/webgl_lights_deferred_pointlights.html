@@ -235,6 +235,7 @@
 
 				"vec3 lightDir = lightView - viewPos.xyz;"+
 				"float dist = length( lightDir );"+
+				"lightDir = normalize( lightDir );"+
 
 				"float cutoff = 0.3;"+
 				"float denom = dist/lightRadius + 1.0;"+
@@ -243,12 +244,18 @@
 				"attenuation = max( attenuation, 0.0 );"+
 
 				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;" +
-				"float diffuse = max( dot( normal, normalize( lightDir ) ), 0.0 );" +
+				"float diffuse = max( dot( normal, lightDir ), 0.0 );" +
+
+				"const float shininess = 150.0;" +
+
+				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );" +
+				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );" +
+				"float specular = max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
 
 				"vec4 color = vec4( 0.0 );"+
 				"color.xyz = lightColor * lightIntensity;"+
 				"color.w = attenuation;"+
-				"gl_FragColor = color * diffuse;"+
+				"gl_FragColor = color * ( diffuse + specular );" +
 
 			"}";
 
