@@ -11,6 +11,7 @@
  *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  vertexColors: <bool>,
  *

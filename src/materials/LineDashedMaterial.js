@@ -7,6 +7,7 @@
  *
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  linewidth: <float>,
  *
