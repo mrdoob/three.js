@@ -3266,102 +3266,185 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var offsets = geometry.offsets;
+		    var index = geometry.attributes["index"];
+		    if (index) {
+		        // Indexed triangles
+		        var offsets = geometry.offsets;
 
-			// if there is more than 1 chunk
-			// must set attribute pointers to use new offsets for each chunk
-			// even if geometry and materials didn't change
+		        // if there is more than 1 chunk
+		        // must set attribute pointers to use new offsets for each chunk
+		        // even if geometry and materials didn't change
 
-			if ( offsets.length > 1 ) updateBuffers = true;
+		        if (offsets.length > 1) updateBuffers = true;
 
-			for ( var i = 0, il = offsets.length; i < il; ++ i ) {
+		        for (var i = 0, il = offsets.length; i < il; ++i) {
 
-				var startIndex = offsets[ i ].index;
+		            var startIndex = offsets[i].index;
 
-				if ( updateBuffers ) {
+		            if (updateBuffers) {
 
-					// vertices
+		                // vertices
 
-					var position = geometry.attributes[ "position" ];
-					var positionSize = position.itemSize;
+		                var position = geometry.attributes["position"];
+		                var positionSize = position.itemSize;
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, position.buffer );
-					enableAttribute( attributes.position );
-					_gl.vertexAttribPointer( attributes.position, positionSize, _gl.FLOAT, false, 0, startIndex * positionSize * 4 ); // 4 bytes per Float32
+		                _gl.bindBuffer(_gl.ARRAY_BUFFER, position.buffer);
+		                enableAttribute(attributes.position);
+		                _gl.vertexAttribPointer(attributes.position, positionSize, _gl.FLOAT, false, 0, startIndex * positionSize * 4); // 4 bytes per Float32
 
-					// normals
+		                // normals
 
-					var normal = geometry.attributes[ "normal" ];
+		                var normal = geometry.attributes["normal"];
 
-					if ( attributes.normal >= 0 && normal ) {
+		                if (attributes.normal >= 0 && normal) {
 
-						var normalSize = normal.itemSize;
+		                    var normalSize = normal.itemSize;
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, normal.buffer );
-						enableAttribute( attributes.normal );
-						_gl.vertexAttribPointer( attributes.normal, normalSize, _gl.FLOAT, false, 0, startIndex * normalSize * 4 );
+		                    _gl.bindBuffer(_gl.ARRAY_BUFFER, normal.buffer);
+		                    enableAttribute(attributes.normal);
+		                    _gl.vertexAttribPointer(attributes.normal, normalSize, _gl.FLOAT, false, 0, startIndex * normalSize * 4);
 
-					}
+		                }
 
-					// uvs
+		                // uvs
 
-					var uv = geometry.attributes[ "uv" ];
+		                var uv = geometry.attributes["uv"];
 
-					if ( attributes.uv >= 0 && uv ) {
+		                if (attributes.uv >= 0 && uv) {
 
-						var uvSize = uv.itemSize;
+		                    var uvSize = uv.itemSize;
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, uv.buffer );
-						enableAttribute( attributes.uv );
-						_gl.vertexAttribPointer( attributes.uv, uvSize, _gl.FLOAT, false, 0, startIndex * uvSize * 4 );
+		                    _gl.bindBuffer(_gl.ARRAY_BUFFER, uv.buffer);
+		                    enableAttribute(attributes.uv);
+		                    _gl.vertexAttribPointer(attributes.uv, uvSize, _gl.FLOAT, false, 0, startIndex * uvSize * 4);
 
-					}
+		                }
 
-					// colors
+		                // colors
 
-					var color = geometry.attributes[ "color" ];
+		                var color = geometry.attributes["color"];
 
-					if ( attributes.color >= 0 && color ) {
+		                if (attributes.color >= 0 && color) {
 
-						var colorSize = color.itemSize;
+		                    var colorSize = color.itemSize;
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, color.buffer );
-						enableAttribute( attributes.color );
-						_gl.vertexAttribPointer( attributes.color, colorSize, _gl.FLOAT, false, 0, startIndex * colorSize * 4 );
+		                    _gl.bindBuffer(_gl.ARRAY_BUFFER, color.buffer);
+		                    enableAttribute(attributes.color);
+		                    _gl.vertexAttribPointer(attributes.color, colorSize, _gl.FLOAT, false, 0, startIndex * colorSize * 4);
 
-					}
+		                }
 
-					// tangents
+		                // tangents
 
-					var tangent = geometry.attributes[ "tangent" ];
+		                var tangent = geometry.attributes["tangent"];
 
-					if ( attributes.tangent >= 0 && tangent ) {
+		                if (attributes.tangent >= 0 && tangent) {
 
-						var tangentSize = tangent.itemSize;
+		                    var tangentSize = tangent.itemSize;
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, tangent.buffer );
-						enableAttribute( attributes.tangent );
-						_gl.vertexAttribPointer( attributes.tangent, tangentSize, _gl.FLOAT, false, 0, startIndex * tangentSize * 4 );
+		                    _gl.bindBuffer(_gl.ARRAY_BUFFER, tangent.buffer);
+		                    enableAttribute(attributes.tangent);
+		                    _gl.vertexAttribPointer(attributes.tangent, tangentSize, _gl.FLOAT, false, 0, startIndex * tangentSize * 4);
 
-					}
+		                }
 
-					// indices
+		                // indices
+                        
+		                _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, index.buffer);
 
-					var index = geometry.attributes[ "index" ];
+		            }
 
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+		            // render indexed triangles
 
-				}
+		            _gl.drawElements(_gl.TRIANGLES, offsets[i].count, _gl.UNSIGNED_SHORT, offsets[i].start * 2); // 2 bytes per Uint16
 
-				// render indexed triangles
+		            _this.info.render.calls++;
+		            _this.info.render.vertices += offsets[i].count; // not really true, here vertices can be shared
+		            _this.info.render.faces += offsets[i].count / 3;
 
-				_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
+		        }
 
-				_this.info.render.calls ++;
-				_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-				_this.info.render.faces += offsets[ i ].count / 3;
+		    }
+		    else
+		    {
+                // non-indexed triangles
+		        if (updateBuffers) {
 
-			}
+		            // vertices
+		            var position = geometry.attributes["position"];
+		            var positionSize = position.itemSize;
+
+		            _gl.bindBuffer(_gl.ARRAY_BUFFER, position.buffer);
+		            enableAttribute(attributes.position);
+		            _gl.vertexAttribPointer(attributes.position, positionSize, _gl.FLOAT, false, 0, 0);
+
+		            // normals
+
+		            var normal = geometry.attributes["normal"];
+
+		            if (attributes.normal >= 0 && normal) {
+
+		                var normalSize = normal.itemSize;
+
+		                _gl.bindBuffer(_gl.ARRAY_BUFFER, normal.buffer);
+		                enableAttribute(attributes.normal);
+		                _gl.vertexAttribPointer(attributes.normal, normalSize, _gl.FLOAT, false, 0, 0);
+
+		            }
+
+		            // uvs
+
+		            var uv = geometry.attributes["uv"];
+
+		            if (attributes.uv >= 0 && uv) {
+
+		                var uvSize = uv.itemSize;
+
+		                _gl.bindBuffer(_gl.ARRAY_BUFFER, uv.buffer);
+		                enableAttribute(attributes.uv);
+		                _gl.vertexAttribPointer(attributes.uv, uvSize, _gl.FLOAT, false, 0, 0);
+
+		            }
+
+		            // colors
+
+		            var color = geometry.attributes["color"];
+
+		            if (attributes.color >= 0 && color) {
+
+		                var colorSize = color.itemSize;
+
+		                _gl.bindBuffer(_gl.ARRAY_BUFFER, color.buffer);
+		                enableAttribute(attributes.color);
+		                _gl.vertexAttribPointer(attributes.color, colorSize, _gl.FLOAT, false, 0, 0);
+
+		            }
+
+		            // tangents
+
+		            var tangent = geometry.attributes["tangent"];
+
+		            if (attributes.tangent >= 0 && tangent) {
+
+		                var tangentSize = tangent.itemSize;
+
+		                _gl.bindBuffer(_gl.ARRAY_BUFFER, tangent.buffer);
+		                enableAttribute(attributes.tangent);
+		                _gl.vertexAttribPointer(attributes.tangent, tangentSize, _gl.FLOAT, false, 0, 0);
+
+		            }
+                    
+		        }
+
+		        // render non-indexed triangles
+
+		        _gl.drawArrays(_gl.TRIANGLES, 0, position.numItems / 3);
+
+		        _this.info.render.calls++;
+		        _this.info.render.vertices += position.numItems / 3;
+		        _this.info.render.faces += position.numItems / 3 / 3;
+
+		    }
 
 		// render particles
 
