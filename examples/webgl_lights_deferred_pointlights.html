@@ -92,7 +92,7 @@
 
 			var matNormal, matClipDepth, matBasic, matUnlit;
 
-			var numLights = 0;
+			var numLights = 20;
 			var lights = new Array();
 
 			// -----------------------
@@ -583,31 +583,15 @@
 
 				var distance = 50;
 
-				var tmp = new THREE.PointLight();
-				tmp.color = new THREE.Vector3( 0.0, 0.0, 1.0 );
-				tmp.intensity = 1.0;
-				tmp.distance = distance;
-				lights[ 0 ] = tmp;
+				for ( var i = 0; i < numLights; i ++ ) {
 
-				var tmp = new THREE.PointLight();
-				tmp.color = new THREE.Vector3( 0.0, 1.0, 0.0 );
-				tmp.intensity = 1.0;
-				tmp.distance = distance;
-				lights[ 1 ] = tmp;
+					var light = new THREE.PointLight();
+					light.color = new THREE.Vector3( Math.random(), Math.random(), Math.random() ).normalize();
+					light.intensity = 1.0;
+					light.distance = distance;
+					lights.push( light );
 
-				var tmp = new THREE.PointLight();
-				tmp.color = new THREE.Vector3( 1.0, 0.0, 0.0 );
-				tmp.intensity = 1.0;
-				tmp.distance = distance;
-				lights[ 2 ] = tmp;
-
-				var tmp = new THREE.PointLight();
-				tmp.color = new THREE.Vector3( 0.0, 1.0, 1.0 );
-				tmp.intensity = 1.0;
-				tmp.distance = distance;
-				lights[ 3 ] = tmp;
-
-				numLights = 4;
+				}
 
 			}
 
@@ -693,37 +677,17 @@
 
 				// update lights
 
-				var lightPosition = lightNode.children[0].material.uniforms["lightPos"].value;
-				lightPosition.x = Math.sin( time * 0.7 ) * 30;
-				lightPosition.y = Math.cos( time * 0.5 ) * 40;
-				lightPosition.z = Math.cos( time * 0.3 ) * 30;
-				lightNode.children[0].emitter.position = lightPosition;
-				lightNode.children[0].position = lightPosition;
-				lightNode.children[0].frustumCulled = false;
+				for ( var i = 0; i < numLights; i ++ ) {
 
-				lightPosition = lightNode.children[1].material.uniforms["lightPos"].value;
-				lightPosition.x = Math.sin( time * 0.5 ) * 30;
-				lightPosition.y = Math.cos( time * 0.5 ) * 40;
-				lightPosition.z = Math.cos( time * 0.7 ) * 30;
-				lightNode.children[1].emitter.position = lightPosition;
-				lightNode.children[1].position = lightPosition;
-				lightNode.children[1].frustumCulled = false;
+					var lightPosition = lightNode.children[i].material.uniforms["lightPos"].value;
+					lightPosition.x = Math.sin( time + i * 1.7 ) * 30;
+					lightPosition.y = Math.cos( time + i * 1.5 ) * 40;
+					lightPosition.z = Math.cos( time + i * 1.3 ) * 30;
+					lightNode.children[i].emitter.position = lightPosition;
+					lightNode.children[i].position = lightPosition;
+					lightNode.children[i].frustumCulled = false;
 
-				lightPosition = lightNode.children[2].material.uniforms["lightPos"].value;
-				lightPosition.x = Math.sin( time * 0.7 ) * 30;
-				lightPosition.y = Math.cos( time * 0.3 ) * 40;
-				lightPosition.z = Math.cos( time * 0.5 ) * 30;
-				lightNode.children[2].emitter.position = lightPosition;
-				lightNode.children[2].position = lightPosition;
-				lightNode.children[2].frustumCulled = false;
-
-				lightPosition = lightNode.children[3].material.uniforms["lightPos"].value;
-				lightPosition.x = Math.sin( time * 0.3 ) * 30;
-				lightPosition.y = Math.cos( time * 0.7 ) * 40;
-				lightPosition.z = Math.cos( time * 0.5 ) * 30;
-				lightNode.children[3].emitter.position = lightPosition;
-				lightNode.children[3].position = lightPosition;
-				lightNode.children[3].frustumCulled = false;
+				}
 
 				compLightBuffer.render();
 
