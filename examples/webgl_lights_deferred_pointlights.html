@@ -527,7 +527,7 @@
 				// scene camera
 
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
-				camera.position.z = 150;
+				camera.position.z = 125;
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
@@ -634,7 +634,7 @@
 				lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
 				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLightBuffer;
 
-				var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
+				var geomEmitter = new THREE.SphereGeometry( 0.4, 7, 7 );
 
 				for ( var x = 0; x < numLights; x ++ ) {
 
@@ -805,7 +805,7 @@
 
 			function initLights() {
 
-				var distance = 25;
+				var distance = 20;
 
 				// front light
 
@@ -831,7 +831,7 @@
 					light.color.y *= light.color.y;
 					light.color.z *= light.color.z;
 
-					light.intensity = 1.0;
+					light.intensity = 2.0;
 					light.distance = distance;
 
 					lights.push( light );
@@ -938,7 +938,7 @@
 
 				}
 
-				var time = Date.now() * 0.0005;
+				var time = Date.now() * 0.0002;
 
 				// update lights
 
@@ -948,9 +948,9 @@
 
 					if ( i > 0 ) {
 
-						x = Math.sin( time + i * 1.7 ) * 30;
-						y = Math.cos( time + i * 1.5 ) * 40;
-						z = Math.cos( time + i * 1.3 ) * 30;
+						x = Math.sin( time + i * 0.175 ) * 20;
+						y = Math.cos( time + i * 0.153 ) * 30;
+						z = Math.cos( time + i * 0.137 ) * 20;
 
 					} else {
 
@@ -1024,7 +1024,7 @@
 				mapHeight.anisotropy = 4;
 				mapHeight.format = THREE.RGBFormat;
 
-				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5 } );
+				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 1.5 } );
 
 				var object = new THREE.Mesh( geometry, material );
 
