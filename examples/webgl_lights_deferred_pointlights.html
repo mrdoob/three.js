@@ -292,12 +292,16 @@
 
 				"float z = texture2D( samplerDepth, texCoord ).x;"+
 
+				/*
 				"if ( z == 0.0 ) {"+
 
 					"gl_FragColor = vec4( vec3( 0.0 ), 1.0 );"+
 					"return;"+
 
 				"}"+
+				*/
+
+				"if ( z == 0.0 ) discard;"+
 
 				"float x = texCoord.x * 2.0 - 1.0;"+
 				"float y = texCoord.y * 2.0 - 1.0;"+
