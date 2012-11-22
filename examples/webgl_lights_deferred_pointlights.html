@@ -83,7 +83,7 @@
 
 			// rendertargets
 
-			var rtColor, rtNormals, rtDepth, rtLightBuffer, rtEmitter;
+			var rtColor, rtNormals, rtDepth, rtLightBuffer, rtEmitter, rtFinal;
 
 			// composer
 
@@ -118,7 +118,8 @@
 
 			"void main() {"+
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
 				"clipPos = gl_Position;"+
 
 			"}";
@@ -132,7 +133,8 @@
 
 			"void main() {"+
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
 				"normalView = normalize( normalMatrix * normal );"+
 
 			"}";
@@ -263,7 +265,8 @@
 
 			"void main() { " +
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
 				"lightView = vec3( matView * vec4( lightPos, 1.0 ) );" +
 
 			"}"
@@ -378,7 +381,7 @@
 			"void main() {"+
 
 				"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );"+
-				"texCoord = pos.xy * vec2( 0.5, 0.5 ) + 0.5;"+
+				"texCoord = pos.xy * vec2( 0.5 ) + 0.5;"+
 				"gl_Position = pos;"+
 
 			"}";
@@ -580,6 +583,12 @@
 				rtNormals = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
 				rtDepth = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
 				rtColor = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+				rtFinal = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+
+				rtNormals.generateMipmaps = false;
+				rtDepth.generateMipmaps = false;
+				rtColor.generateMipmaps = false;
+				rtFinal.generateMipmaps = false;
 
 				var passNormals = new THREE.RenderPass( scene, camera );
 				compNormals = new THREE.EffectComposer( renderer, rtNormals );
@@ -598,7 +607,9 @@
 				// ----------------------------------------------------------
 
 				var emitterPass = new THREE.RenderPass( emitterScene, camera );
-				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
+				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+				rtEmitter.generateMipmaps = false;
+
 				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
 				compEmitter.addPass( emitterPass );
 
@@ -617,6 +628,8 @@
 				lightShader.uniforms[ 'samplerNormals' ].value = compNormals.renderTarget2;
 				lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
 				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLightBuffer;
+
+				var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
 
 				for ( var x = 0; x < numLights; x ++ ) {
 
@@ -642,13 +655,12 @@
 
 					// setup proxy geometry for this light
 
-					var geomLight = new THREE.SphereGeometry( light.distance, 16, 10 );
+					var geomLight = new THREE.SphereGeometry( light.distance, 16, 8 );
 					var meshLight = new THREE.Mesh( geomLight, matLight );
 					lightNode.add( meshLight );
 
 					// create emitter sphere
 
-					var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
 					var matEmitter = new THREE.ShaderMaterial({
 
 						uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
@@ -671,8 +683,8 @@
 				// composite
 				// ----------------------------------------------------------
 
-				compositeShader.uniforms['samplerLightBuffer'].value = compLightBuffer.renderTarget2;
-				compositeShader.uniforms['samplerEmitter'].value = compEmitter.renderTarget2;
+				compositeShader.uniforms[ 'samplerLightBuffer' ].value = compLightBuffer.renderTarget2;
+				compositeShader.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
 
 				compositePass = new THREE.ShaderPass( compositeShader );
 				compositePass.needsSwap = true;
@@ -686,7 +698,7 @@
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 				effectFXAA.renderToScreen = true;
 
-				compFinal = new THREE.EffectComposer( renderer );
+				compFinal = new THREE.EffectComposer( renderer, rtFinal );
 				compFinal.addPass( compositePass );
 				compFinal.addPass( effectFXAA );
 
@@ -910,11 +922,14 @@
 				// light pass
 				// -----------------------------
 
+				camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
+
 				for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
 
-					camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
-					lightNode.children[ i ].material.uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
-					lightNode.children[ i ].material.uniforms[ "matView" ].value = camera.matrixWorldInverse;
+					var uniforms = lightNode.children[ i ].material.uniforms;
+
+					uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
+					uniforms[ "matView" ].value = camera.matrixWorldInverse;
 
 				}
 
@@ -925,8 +940,6 @@
 				var x, y, z;
 
 				for ( var i = 0; i < numLights; i ++ ) {
-
-					var lightPosition = lightNode.children[ i ].material.uniforms[ "lightPos" ].value;
 
 					if ( i > 0 ) {
 
@@ -942,13 +955,16 @@
 
 					}
 
+					var light = lightNode.children[ i ];
+					var lightPosition = light.material.uniforms[ "lightPos" ].value;
+
 					lightPosition.x = x;
 					lightPosition.y = y;
 					lightPosition.z = z;
 
-					lightNode.children[ i ].emitter.position = lightPosition;
-					lightNode.children[ i ].position = lightPosition;
-					lightNode.children[ i ].frustumCulled = false;
+					light.emitter.position = lightPosition;
+					light.position = lightPosition;
+					light.frustumCulled = false;
 
 				}
 
