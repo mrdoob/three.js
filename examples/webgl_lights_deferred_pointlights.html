@@ -147,6 +147,78 @@
 
 			// -----------------------
 
+			var bump_vert = "" +
+
+			"varying vec3 normalView;"+
+			"varying vec2 vUv;"+
+			"varying vec3 vViewPosition;"+
+
+			"uniform vec4 offsetRepeat;"+
+
+			"void main() {"+
+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
+				"normalView = normalize( normalMatrix * normal );"+
+				"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;"+
+				"vViewPosition = -mvPosition.xyz;"+
+
+			"}";
+
+			var bump_frag = "" +
+
+			"#extension GL_OES_standard_derivatives : enable\n"+
+			"varying vec3 normalView;"+
+			"varying vec2 vUv;"+
+			"varying vec3 vViewPosition;"+
+
+			"uniform sampler2D bumpMap;"+
+			"uniform float bumpScale;"+
+
+			// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
+			//	http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
+
+			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
+
+			"vec2 dHdxy_fwd() {"+
+
+				"vec2 dSTdx = dFdx( vUv );"+
+				"vec2 dSTdy = dFdy( vUv );"+
+
+				"float Hll = bumpScale * texture2D( bumpMap, vUv ).x;"+
+				"float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;"+
+				"float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;"+
+
+				"return vec2( dBx, dBy );"+
+
+			"}"+
+
+			"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {"+
+
+				"vec3 vSigmaX = dFdx( surf_pos );"+
+				"vec3 vSigmaY = dFdy( surf_pos );"+
+				"vec3 vN = surf_norm;"+		// normalized
+
+				"vec3 R1 = cross( vSigmaY, vN );"+
+				"vec3 R2 = cross( vN, vSigmaX );"+
+
+				"float fDet = dot( vSigmaX, R1 );"+
+
+				"vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );"+
+				"return normalize( abs( fDet ) * surf_norm - vGrad );"+
+
+			"}"+
+
+			"void main() {"+
+
+				"vec3 normal = normalize( normalView );"+
+				"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );"+
+				"gl_FragColor = vec4( vec3( normal * 0.5 + 0.5 ), 1.0 );"+
+
+			"}";
+
+			// -----------------------
+
 			var unlit_vert = "" +
 
 			"varying vec4 clipPos;"+
@@ -245,20 +317,39 @@
 				"attenuation = max( attenuation, 0.0 );"+
 
 				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;" +
-				"float diffuse = max( dot( normal, lightDir ), 0.0 );" +
 
-				"const float shininess = 150.0;" +
+				// wrap around lighting
+
+				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
+				"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );" +
+
+				"const vec3 wrapRGB = vec3( 0.8, 0.5, 0.5 );"+
+				"vec3 diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );"+
+
+				// simple lighting
+
+				//"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
+				//"vec3 diffuse = vec3 ( diffuseFull );"+
+
+				// specular
+
+				"const float shininess = 75.0;" +
+				"const float specularIntensity = 0.4;"+
 
 				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );" +
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );" +
-				"float specular = max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
+				"vec3 specular = specularIntensity * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
+
+				// color
 
 				"vec4 albedo = texture2D( samplerColor, texCoord );"+
+
+				// combine
 
 				"vec4 color = vec4( 0.0 );"+
 				"color.xyz = albedo.xyz * lightColor * lightIntensity;"+
 				"color.w = attenuation;"+
-				"gl_FragColor = color * ( diffuse + specular );" +
+				"gl_FragColor = color * vec4( diffuse + specular, 1.0 );" +
 
 			"}";
 
@@ -292,7 +383,7 @@
 
 				"} else {"+
 
-					"gl_FragColor = vec4( color, 1.0 );" +
+					"gl_FragColor = vec4( sqrt( color ), 1.0 );" +
 
 				"}"+
 
@@ -306,6 +397,23 @@
 
 				vertexShader: normals_vert,
 				fragmentShader: normals_frag
+
+			};
+
+			// -----------------------
+
+			var bumpShader = {
+
+				uniforms: {
+
+					bumpMap: 	{ type: "t", value: null },
+					bumpScale:	{ type: "f", value: 1 },
+					offsetRepeat : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
+
+				},
+
+				vertexShader: bump_vert,
+				fragmentShader: bump_frag
 
 			};
 
@@ -570,7 +678,7 @@
 						// color material
 
 						var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
-						var defines = { "USE_MAP": !!node.material.map };
+						var defines = { "USE_MAP": !!node.material.map, "GAMMA_INPUT": true };
 
 						var material = new THREE.ShaderMaterial( { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, defines: defines } );
 						uniforms.diffuse.value.copy( node.material.color );
@@ -592,7 +700,25 @@
 
 						// normal material
 
-						node.properties.normalMaterial = matNormal;
+						if ( node.material.bumpMap ) {
+
+							var uniforms = THREE.UniformsUtils.clone( bumpShader.uniforms );
+							var normalMaterial = new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: bumpShader.vertexShader, fragmentShader: bumpShader.fragmentShader } );
+							uniforms.bumpMap.value = node.material.bumpMap;
+							uniforms.bumpScale.value = node.material.bumpScale;
+
+							var offset = node.material.bumpMap.offset;
+							var repeat = node.material.bumpMap.repeat;
+
+							uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+							node.properties.normalMaterial = normalMaterial;
+
+						} else {
+
+							node.properties.normalMaterial = matNormal;
+
+						}
 
 						// depth material
 
@@ -814,14 +940,14 @@
 
 			var loader = new THREE.UTF8Loader();
 
-
+			/*
 			loader.load( "models/utf8/ben_dds.js", function ( object ) {
 
 				initScene( object, -75, 150 );
 				animate();
 
 			}, { normalizeRGB: true } );
-
+			*/
 
 			/*
 			loader.load( "models/utf8/WaltHi.js", function ( object ) {
@@ -832,13 +958,18 @@
 			}, { normalizeRGB: true } );
 			*/
 
-			/*
 			var loader = new THREE.JSONLoader();
 			loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
 
 				var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
-				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight  } );
+				mapHeight.repeat.set( 0.998, 0.998 );
+				mapHeight.offset.set( 0.001, 0.001 )
+				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+				mapHeight.anisotropy = 4;
+				mapHeight.format = THREE.RGBFormat;
+
+				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5 } );
 
 				var object = new THREE.Mesh( geometry, material );
 
@@ -846,7 +977,6 @@
 				animate();
 
 			} );
-			*/
 
 		</script>
 	</body>
