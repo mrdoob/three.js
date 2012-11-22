@@ -46,6 +46,7 @@
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -82,11 +83,12 @@
 
 			// rendertargets
 
-			var rtNormals, rtDepth, rtLightBuffer, rtEmitter;
+			var rtColor, rtNormals, rtDepth, rtLightBuffer, rtEmitter, rtFinal;
 
 			// composer
 
-			var compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+			var compColor, compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+			var effectFXAA;
 
 			// materials
 
@@ -116,7 +118,8 @@
 
 			"void main() {"+
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
 				"clipPos = gl_Position;"+
 
 			"}";
@@ -130,7 +133,8 @@
 
 			"void main() {"+
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
 				"normalView = normalize( normalMatrix * normal );"+
 
 			"}";
@@ -142,6 +146,78 @@
 			"void main() {"+
 
 				"gl_FragColor = vec4( vec3( normalView * 0.5 + 0.5 ), 1.0 );"+
+
+			"}";
+
+			// -----------------------
+
+			var bump_vert = "" +
+
+			"varying vec3 normalView;"+
+			"varying vec2 vUv;"+
+			"varying vec3 vViewPosition;"+
+
+			"uniform vec4 offsetRepeat;"+
+
+			"void main() {"+
+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
+				"normalView = normalize( normalMatrix * normal );"+
+				"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;"+
+				"vViewPosition = -mvPosition.xyz;"+
+
+			"}";
+
+			var bump_frag = "" +
+
+			"#extension GL_OES_standard_derivatives : enable\n"+
+			"varying vec3 normalView;"+
+			"varying vec2 vUv;"+
+			"varying vec3 vViewPosition;"+
+
+			"uniform sampler2D bumpMap;"+
+			"uniform float bumpScale;"+
+
+			// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
+			//	http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
+
+			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
+
+			"vec2 dHdxy_fwd() {"+
+
+				"vec2 dSTdx = dFdx( vUv );"+
+				"vec2 dSTdy = dFdy( vUv );"+
+
+				"float Hll = bumpScale * texture2D( bumpMap, vUv ).x;"+
+				"float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;"+
+				"float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;"+
+
+				"return vec2( dBx, dBy );"+
+
+			"}"+
+
+			"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {"+
+
+				"vec3 vSigmaX = dFdx( surf_pos );"+
+				"vec3 vSigmaY = dFdy( surf_pos );"+
+				"vec3 vN = surf_norm;"+		// normalized
+
+				"vec3 R1 = cross( vSigmaY, vN );"+
+				"vec3 R2 = cross( vN, vSigmaX );"+
+
+				"float fDet = dot( vSigmaX, R1 );"+
+
+				"vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );"+
+				"return normalize( abs( fDet ) * surf_norm - vGrad );"+
+
+			"}"+
+
+			"void main() {"+
+
+				"vec3 normal = normalize( normalView );"+
+				"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );"+
+				"gl_FragColor = vec4( vec3( normal * 0.5 + 0.5 ), 1.0 );"+
 
 			"}";
 
@@ -184,20 +260,25 @@
 			var deferredlight_vert = "" +
 
 			"varying vec3 lightView;" +
+			"varying vec4 clipPos;" +
 			"uniform vec3 lightPos;" +
 			"uniform mat4 matView;" +
 
 			"void main() { " +
 
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
+				"gl_Position = projectionMatrix * mvPosition;"+
 				"lightView = vec3( matView * vec4( lightPos, 1.0 ) );" +
+				"clipPos = gl_Position;"+
 
 			"}"
 
 			var deferredlight_frag = "" +
 
 			"varying vec3 lightView;"+
+			"varying vec4 clipPos;" +
 
+			"uniform sampler2D samplerColor;"+
 			"uniform sampler2D samplerDepth;"+
 			"uniform sampler2D samplerNormals;"+
 			"uniform sampler2D samplerLightBuffer;"+
@@ -216,13 +297,18 @@
 				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"+
 
 				"float z = texture2D( samplerDepth, texCoord ).x;"+
+				"float lightZ = clipPos.z / clipPos.w;"+
 
+				/*
 				"if ( z == 0.0 ) {"+
 
 					"gl_FragColor = vec4( vec3( 0.0 ), 1.0 );"+
 					"return;"+
 
 				"}"+
+				*/
+
+				"if ( z == 0.0 || lightZ > z ) discard;"+
 
 				"float x = texCoord.x * 2.0 - 1.0;"+
 				"float y = texCoord.y * 2.0 - 1.0;"+
@@ -235,6 +321,7 @@
 
 				"vec3 lightDir = lightView - viewPos.xyz;"+
 				"float dist = length( lightDir );"+
+				"lightDir = normalize( lightDir );"+
 
 				"float cutoff = 0.3;"+
 				"float denom = dist/lightRadius + 1.0;"+
@@ -243,12 +330,52 @@
 				"attenuation = max( attenuation, 0.0 );"+
 
 				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;" +
-				"float diffuse = max( dot( normal, normalize( lightDir ) ), 0.0 );" +
+
+				// wrap around lighting
+
+				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
+				"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );" +
+
+				"const vec3 wrapRGB = vec3( 0.9, 0.7, 0.7 );"+
+				"vec3 diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );"+
+
+				// simple lighting
+
+				//"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
+				//"vec3 diffuse = vec3 ( diffuseFull );"+
+
+				// specular
+
+				"const float shininess = 75.0;" +
+				"const float specularIntensity = 0.4;"+
+
+				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );" +
+				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );" +
+
+				// simple specular
+
+				//"vec3 specular = specularIntensity * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
+
+				// physically based specular
+
+				"vec3 specularColor = specularIntensity * vec3( 0.12 );"+
+
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;"+
+
+				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDir, halfVector ), 5.0 );"+
+				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;"+
+
+				// color
+
+				"vec4 albedo = texture2D( samplerColor, texCoord );"+
+
+				// combine
 
 				"vec4 color = vec4( 0.0 );"+
-				"color.xyz = lightColor * lightIntensity;"+
+				"color.xyz = albedo.xyz * lightColor * lightIntensity;"+
 				"color.w = attenuation;"+
-				"gl_FragColor = color * diffuse;"+
+				"gl_FragColor = color * vec4( diffuse + specular, 1.0 );" +
+				//"gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.05 );"+
 
 			"}";
 
@@ -259,7 +386,7 @@
 			"void main() {"+
 
 				"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );"+
-				"texCoord = pos.xy * vec2( 0.5, 0.5 ) + 0.5;"+
+				"texCoord = pos.xy * vec2( 0.5 ) + 0.5;"+
 				"gl_Position = pos;"+
 
 			"}";
@@ -282,7 +409,7 @@
 
 				"} else {"+
 
-					"gl_FragColor = vec4( color, 1.0 );" +
+					"gl_FragColor = vec4( sqrt( color ), 1.0 );" +
 
 				"}"+
 
@@ -296,6 +423,23 @@
 
 				vertexShader: normals_vert,
 				fragmentShader: normals_frag
+
+			};
+
+			// -----------------------
+
+			var bumpShader = {
+
+				uniforms: {
+
+					bumpMap: 	{ type: "t", value: null },
+					bumpScale:	{ type: "f", value: 1 },
+					offsetRepeat : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
+
+				},
+
+				vertexShader: bump_vert,
+				fragmentShader: bump_frag
 
 			};
 
@@ -337,6 +481,7 @@
 					samplerLightBuffer: { type: "t", value: null },
 					samplerNormals: { type: "t", value: null },
 					samplerDepth: { type: "t", value: null },
+					samplerColor: { type: "t", value: null },
 					matView : { type: "m4", value: new THREE.Matrix4() },
 					matProjInverse : { type: "m4", value: new THREE.Matrix4() },
 					viewWidth: { type: "f", value: WIDTH },
@@ -372,9 +517,9 @@
 
 			function bootstrap() {
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
 				renderer.setSize( WIDTH, HEIGHT );
-				renderer.setClearColorHex( 0x000000 );
+				renderer.setClearColorHex( 0x000000, 1 );
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
@@ -382,7 +527,7 @@
 				// scene camera
 
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
-				camera.position.z = 150;
+				camera.position.z = 125;
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
@@ -430,15 +575,25 @@
 
 			function createRenderTargets() {
 
-				var rtParams = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter,
-							     format: THREE.RGBAFormat, type: THREE.FloatType };
+				var rtParamsFloat = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+							          format: THREE.RGBAFormat, type: THREE.FloatType };
+
+				var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+							          format: THREE.RGBFormat, type: THREE.UnsignedByteType };
 
 				// ----------------------------------------------------------
 				// g-buffer
 				// ----------------------------------------------------------
 
-				rtNormals = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
-				rtDepth = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtNormals = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
+				rtDepth = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
+				rtColor = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+				rtFinal = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+
+				rtNormals.generateMipmaps = false;
+				rtDepth.generateMipmaps = false;
+				rtColor.generateMipmaps = false;
+				rtFinal.generateMipmaps = false;
 
 				var passNormals = new THREE.RenderPass( scene, camera );
 				compNormals = new THREE.EffectComposer( renderer, rtNormals );
@@ -448,12 +603,18 @@
 				compDepth = new THREE.EffectComposer( renderer, rtDepth );
 				compDepth.addPass( passDepth );
 
+				var passColor = new THREE.RenderPass( scene, camera );
+				compColor = new THREE.EffectComposer( renderer, rtColor );
+				compColor.addPass( passColor );
+
 				// ----------------------------------------------------------
 				// light emitter spheres
 				// ----------------------------------------------------------
 
 				var emitterPass = new THREE.RenderPass( emitterScene, camera );
-				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+				rtEmitter.generateMipmaps = false;
+
 				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
 				compEmitter.addPass( emitterPass );
 
@@ -461,18 +622,23 @@
 				// lighting pass
 				// ----------------------------------------------------------
 
-				rtLightBuffer = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParams );
+				rtLightBuffer = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
 				rtLightBuffer.generateMipmaps = false;
 
 				var passLight = new THREE.RenderPass( lightScene, camera );
 				compLightBuffer = new THREE.EffectComposer( renderer, rtLightBuffer );
 				compLightBuffer.addPass( passLight );
 
-				lightShader.uniforms['samplerNormals'].value = compNormals.renderTarget2;
-				lightShader.uniforms['samplerDepth'].value = compDepth.renderTarget2;
-				lightShader.uniforms['samplerLightBuffer'].value = rtLightBuffer;
+				lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+				lightShader.uniforms[ 'samplerNormals' ].value = compNormals.renderTarget2;
+				lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLightBuffer;
+
+				var geomEmitter = new THREE.SphereGeometry( 0.4, 7, 7 );
 
 				for ( var x = 0; x < numLights; x ++ ) {
+
+					var light = lights[ x ];
 
 					// setup material
 
@@ -487,20 +653,19 @@
 					matLight.blending = THREE.AdditiveBlending;
 					matLight.transparent = true;
 					matLight.depthWrite = false;
-					matLight.uniforms["lightPos"].value = lights[x].position;
-					matLight.uniforms["lightRadius"].value = lights[x].distance;
-					matLight.uniforms["lightIntensity"].value = lights[x].intensity;
-					matLight.uniforms["lightColor"].value = lights[x].color;
+					matLight.uniforms[ "lightPos" ].value = light.position;
+					matLight.uniforms[ "lightRadius" ].value = light.distance;
+					matLight.uniforms[ "lightIntensity" ].value = light.intensity;
+					matLight.uniforms[ "lightColor" ].value = light.color;
 
 					// setup proxy geometry for this light
 
-					var geomLight = new THREE.SphereGeometry( lights[x].distance, 16, 10 );
+					var geomLight = new THREE.SphereGeometry( light.distance, 16, 8 );
 					var meshLight = new THREE.Mesh( geomLight, matLight );
 					lightNode.add( meshLight );
 
 					// create emitter sphere
 
-					var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
 					var matEmitter = new THREE.ShaderMaterial({
 
 						uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
@@ -510,7 +675,7 @@
 					});
 
 					var meshEmitter = new THREE.Mesh( geomEmitter, matEmitter );
-					meshEmitter.position = lights[ x ].position;
+					meshEmitter.position = light.position;
 					emitterNode.add( meshEmitter );
 
 					// add emitter to light node
@@ -523,33 +688,92 @@
 				// composite
 				// ----------------------------------------------------------
 
-				compositeShader.uniforms['samplerLightBuffer'].value = compLightBuffer.renderTarget2;
-				compositeShader.uniforms['samplerEmitter'].value = compEmitter.renderTarget2;
+				compositeShader.uniforms[ 'samplerLightBuffer' ].value = compLightBuffer.renderTarget2;
+				compositeShader.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
 
 				compositePass = new THREE.ShaderPass( compositeShader );
 				compositePass.needsSwap = true;
-				compositePass.renderToScreen = true;
+				//compositePass.renderToScreen = true;
 
-				compFinal = new THREE.EffectComposer( renderer );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+				effectFXAA.renderToScreen = true;
+
+				compFinal = new THREE.EffectComposer( renderer, rtFinal );
 				compFinal.addPass( compositePass );
+				compFinal.addPass( effectFXAA );
 
 			}
 
 			// -----------------------------
 
-			function initScene( object ) {
+			function initScene( object, y, scale ) {
+
+				var shader = THREE.ShaderLib[ "basic" ];
 
 				object.traverse( function( node ) {
 
 					if ( node.material ) {
 
-						node.material = new THREE.MeshBasicMaterial();
+						// color material
+
+						var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+						var defines = { "USE_MAP": !!node.material.map, "GAMMA_INPUT": true };
+
+						var material = new THREE.ShaderMaterial( { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, defines: defines } );
+						uniforms.diffuse.value.copy( node.material.color );
+						uniforms.map.value = node.material.map;
+
+						if ( node.material.transparent ) {
+
+							material.alphaTest = 0.1;
+
+						}
+
+						if ( node.material.name === "eyetrans" ) {
+
+							material.visible = false;
+
+						}
+
+						node.properties.colorMaterial = material;
+
+						// normal material
+
+						if ( node.material.bumpMap ) {
+
+							var uniforms = THREE.UniformsUtils.clone( bumpShader.uniforms );
+							var normalMaterial = new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: bumpShader.vertexShader, fragmentShader: bumpShader.fragmentShader } );
+							uniforms.bumpMap.value = node.material.bumpMap;
+							uniforms.bumpScale.value = node.material.bumpScale;
+
+							var offset = node.material.bumpMap.offset;
+							var repeat = node.material.bumpMap.repeat;
+
+							uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+							node.properties.normalMaterial = normalMaterial;
+
+						} else {
+
+							node.properties.normalMaterial = matNormal;
+
+						}
+
+						// depth material
+
+						node.properties.depthMaterial = matClipDepth;
 
 					}
 
 				} );
 
-				object.position.y = -35;
+				object.position.y = y;
+				object.scale.set( scale, scale, scale );
 				sceneNode.add( object );
 
 			}
@@ -581,14 +805,35 @@
 
 			function initLights() {
 
-				var distance = 25;
+				var distance = 20;
 
-				for ( var i = 0; i < numLights; i ++ ) {
+				// front light
+
+				var light = new THREE.PointLight();
+
+				light.color = new THREE.Vector3( 1, 1, 1 );
+				light.intensity = 1.5;
+				light.distance = 1.5 * distance;
+
+				lights.push( light );
+
+				// random lights
+
+				for ( var i = 1; i < numLights; i ++ ) {
 
 					var light = new THREE.PointLight();
+
 					light.color = new THREE.Vector3( Math.random(), Math.random(), Math.random() ).normalize();
-					light.intensity = 1.0;
+
+					// gamma to linear
+
+					light.color.x *= light.color.x;
+					light.color.y *= light.color.y;
+					light.color.z *= light.color.z;
+
+					light.intensity = 2.0;
 					light.distance = distance;
+
 					lights.push( light );
 
 				}
@@ -614,6 +859,22 @@
 			function render() {
 
 				// -----------------------------
+				// g-buffer color
+				// -----------------------------
+
+				sceneNode.traverse( function( node ) {
+
+					if ( node.material ) {
+
+						node.material = node.properties.colorMaterial;
+
+					}
+
+				} );
+
+				compColor.render();
+
+				// -----------------------------
 				// g-buffer depth
 				// -----------------------------
 
@@ -621,7 +882,7 @@
 
 					if ( node.material ) {
 
-						node.material = matClipDepth;
+						node.material = node.properties.depthMaterial;
 
 					}
 
@@ -637,7 +898,7 @@
 
 					if ( node.material ) {
 
-						node.material = matNormal;
+						node.material = node.properties.normalMaterial;
 
 					}
 
@@ -649,13 +910,14 @@
 				// emitter pass
 				// -----------------------------
 
-				for ( var idx in lightNode.children ) {
+				for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
 
-					var light = lightNode.children[idx];
-					var color = light.material.uniforms["lightColor"].value;
+					var light = lightNode.children[ i ];
+					var color = light.material.uniforms[ "lightColor" ].value;
+
 					var emitter = light.emitter;
-					emitter.material.uniforms['samplerDepth'].value = compDepth.renderTarget2;
-					emitter.material.uniforms["lightColor"].value = color;
+					emitter.material.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
+					emitter.material.uniforms[ "lightColor" ].value = color;
 
 				}
 
@@ -665,27 +927,49 @@
 				// light pass
 				// -----------------------------
 
-				for ( var idx in lightNode.children ) {
+				camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
 
-					camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
-					lightNode.children[idx].material.uniforms["matProjInverse"].value = camera.projectionMatrixInverse;
-					lightNode.children[idx].material.uniforms["matView"].value = camera.matrixWorldInverse;
+				for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
+
+					var uniforms = lightNode.children[ i ].material.uniforms;
+
+					uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
+					uniforms[ "matView" ].value = camera.matrixWorldInverse;
 
 				}
 
-				var time = Date.now() * 0.0005;
+				var time = Date.now() * 0.0002;
 
 				// update lights
 
+				var x, y, z;
+
 				for ( var i = 0; i < numLights; i ++ ) {
 
-					var lightPosition = lightNode.children[i].material.uniforms["lightPos"].value;
-					lightPosition.x = Math.sin( time + i * 1.7 ) * 30;
-					lightPosition.y = Math.cos( time + i * 1.5 ) * 40;
-					lightPosition.z = Math.cos( time + i * 1.3 ) * 30;
-					lightNode.children[i].emitter.position = lightPosition;
-					lightNode.children[i].position = lightPosition;
-					lightNode.children[i].frustumCulled = false;
+					if ( i > 0 ) {
+
+						x = Math.sin( time + i * 0.175 ) * 20;
+						y = Math.cos( time + i * 0.153 ) * 30;
+						z = Math.cos( time + i * 0.137 ) * 20;
+
+					} else {
+
+						x = Math.sin( time * 3 ) * 20;
+						y = 15;
+						z = Math.cos( time * 3 ) * 25 + 10;
+
+					}
+
+					var light = lightNode.children[ i ];
+					var lightPosition = light.material.uniforms[ "lightPos" ].value;
+
+					lightPosition.x = x;
+					lightPosition.y = y;
+					lightPosition.z = z;
+
+					light.emitter.position = lightPosition;
+					light.position = lightPosition;
+					light.frustumCulled = false;
 
 				}
 
@@ -703,18 +987,51 @@
 			// entry point
 			// -----------------------------
 
+			bootstrap();
+			initMaterials();
+			initLights();
+			createRenderTargets();
+
+
 			var loader = new THREE.UTF8Loader();
 
-			loader.load( "models/utf8/WaltHi.js", function ( object ) {
+			/*
+			loader.load( "models/utf8/ben_dds.js", function ( object ) {
 
-				bootstrap();
-				initScene( object );
-				initMaterials();
-				initLights();
-				createRenderTargets();
+				initScene( object, -75, 150 );
 				animate();
 
 			}, { normalizeRGB: true } );
+			*/
+
+			/*
+			loader.load( "models/utf8/WaltHi.js", function ( object ) {
+
+				initScene( object, -35, 1 );
+				animate();
+
+			}, { normalizeRGB: true } );
+			*/
+
+			var loader = new THREE.JSONLoader();
+			loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
+
+				var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				mapHeight.repeat.set( 0.998, 0.998 );
+				mapHeight.offset.set( 0.001, 0.001 )
+				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+				mapHeight.anisotropy = 4;
+				mapHeight.format = THREE.RGBFormat;
+
+				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 1.5 } );
+
+				var object = new THREE.Mesh( geometry, material );
+
+				initScene( object, 0, 8 );
+				animate();
+
+			} );
 
 		</script>
 	</body>
