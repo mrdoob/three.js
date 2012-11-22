@@ -44,10 +44,6 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
-	//START_VEROLD_MOD
-	this.userDefines = parameters.userDefines;
-	//END_VEROLD_MOD
-
 	this.fog = false; // set to use scene fog
 
 	this.lights = false; // set to use scene lights

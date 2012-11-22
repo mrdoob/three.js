@@ -400,7 +400,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//START_VEROLD_MOD
 	this.deallocateTextureCube = function ( texture ) {
-     _gl.deleteTexture( texture.image.__webglTextureCube );
+    if ( ! texture.__webglInit ) return;
+
+		texture.__webglInit = false;
+		_gl.deleteTexture( texture.__webglTextureCube );
+
+		_this.info.memory.textures --;
   };
   //END_VEROLD_MOD
 
