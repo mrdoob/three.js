@@ -561,13 +561,18 @@
 
 			function initScene( object, y, scale ) {
 
+				var shader = THREE.ShaderLib[ "basic" ];
+
 				object.traverse( function( node ) {
 
 					if ( node.material ) {
 
-						var material = new THREE.MeshBasicMaterial();
-						material.color.copy( node.material.color );
-						material.map = node.material.map;
+						var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+						var defines = { "USE_MAP": !!node.material.map };
+
+						var material = new THREE.ShaderMaterial( { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, defines: defines } );
+						uniforms.diffuse.value.copy( node.material.color );
+						uniforms.map.value = node.material.map;
 
 						if ( node.material.transparent ) {
 
@@ -791,6 +796,7 @@
 			// entry point
 			// -----------------------------
 
+
 			var loader = new THREE.UTF8Loader();
 
 			loader.load( "models/utf8/ben_dds.js", function ( object ) {
@@ -804,6 +810,7 @@
 
 			}, { normalizeRGB: true } );
 
+
 			/*
 			loader.load( "models/utf8/WaltHi.js", function ( object ) {
 
@@ -815,6 +822,23 @@
 				animate();
 
 			}, { normalizeRGB: true } );
+			*/
+
+
+			/*
+			var loader = new THREE.JSONLoader();
+			loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
+
+				var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } ) );
+
+				bootstrap();
+				initScene( object, 0, 10 );
+				initMaterials();
+				initLights();
+				createRenderTargets();
+				animate();
+
+			} );
 			*/
 
 		</script>
