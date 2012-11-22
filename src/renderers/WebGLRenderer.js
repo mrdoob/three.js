@@ -366,6 +366,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.deallocateTextureCube = function ( texture ) {
+    
+		_gl.deleteTexture( texture.__webglTextureCube );
+
+  };
+
 	this.deallocateRenderTarget = function ( renderTarget ) {
 
 		if ( !renderTarget || ! renderTarget.__webglTexture ) return;
