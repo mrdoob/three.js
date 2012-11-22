@@ -567,6 +567,8 @@
 
 					if ( node.material ) {
 
+						// color material
+
 						var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 						var defines = { "USE_MAP": !!node.material.map };
 
@@ -586,7 +588,15 @@
 
 						}
 
-						node.colorMaterial = material;
+						node.properties.colorMaterial = material;
+
+						// normal material
+
+						node.properties.normalMaterial = matNormal;
+
+						// depth material
+
+						node.properties.depthMaterial = matClipDepth;
 
 					}
 
@@ -679,7 +689,7 @@
 
 					if ( node.material ) {
 
-						node.material = node.colorMaterial;
+						node.material = node.properties.colorMaterial;
 
 					}
 
@@ -695,7 +705,7 @@
 
 					if ( node.material ) {
 
-						node.material = matClipDepth;
+						node.material = node.properties.depthMaterial;
 
 					}
 
@@ -711,7 +721,7 @@
 
 					if ( node.material ) {
 
-						node.material = matNormal;
+						node.material = node.properties.normalMaterial;
 
 					}
 
@@ -796,16 +806,18 @@
 			// entry point
 			// -----------------------------
 
+			bootstrap();
+			initMaterials();
+			initLights();
+			createRenderTargets();
+
 
 			var loader = new THREE.UTF8Loader();
 
+
 			loader.load( "models/utf8/ben_dds.js", function ( object ) {
 
-				bootstrap();
 				initScene( object, -75, 150 );
-				initMaterials();
-				initLights();
-				createRenderTargets();
 				animate();
 
 			}, { normalizeRGB: true } );
@@ -814,28 +826,23 @@
 			/*
 			loader.load( "models/utf8/WaltHi.js", function ( object ) {
 
-				bootstrap();
 				initScene( object, -35, 1 );
-				initMaterials();
-				initLights();
-				createRenderTargets();
 				animate();
 
 			}, { normalizeRGB: true } );
 			*/
 
-
 			/*
 			var loader = new THREE.JSONLoader();
 			loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
 
-				var object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" ) } ) );
+				var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight  } );
 
-				bootstrap();
+				var object = new THREE.Mesh( geometry, material );
+
 				initScene( object, 0, 10 );
-				initMaterials();
-				initLights();
-				createRenderTargets();
 				animate();
 
 			} );
