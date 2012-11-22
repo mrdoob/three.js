@@ -325,7 +325,7 @@
 				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
 				"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );" +
 
-				"const vec3 wrapRGB = vec3( 0.8, 0.5, 0.5 );"+
+				"const vec3 wrapRGB = vec3( 0.9, 0.7, 0.7 );"+
 				"vec3 diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );"+
 
 				// simple lighting
@@ -340,7 +340,19 @@
 
 				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );" +
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );" +
-				"vec3 specular = specularIntensity * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
+
+				// simple specular
+
+				//"vec3 specular = specularIntensity * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
+
+				// physically based specular
+
+				"vec3 specularColor = specularIntensity * vec3( 0.12 );"+
+
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;"+
+
+				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDir, halfVector ), 5.0 );"+
+				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;"+
 
 				// color
 
@@ -791,6 +803,13 @@
 					var light = new THREE.PointLight();
 
 					light.color = new THREE.Vector3( Math.random(), Math.random(), Math.random() ).normalize();
+
+					// gamma to linear
+
+					light.color.x *= light.color.x;
+					light.color.y *= light.color.y;
+					light.color.z *= light.color.z;
+
 					light.intensity = 1.0;
 					light.distance = distance;
 
@@ -984,7 +1003,7 @@
 
 				var object = new THREE.Mesh( geometry, material );
 
-				initScene( object, 0, 10 );
+				initScene( object, 0, 8 );
 				animate();
 
 			} );
