@@ -46,6 +46,7 @@
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -87,6 +88,7 @@
 			// composer
 
 			var compColor, compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+			var effectFXAA;
 
 			// materials
 
@@ -658,10 +660,19 @@
 
 				compositePass = new THREE.ShaderPass( compositeShader );
 				compositePass.needsSwap = true;
-				compositePass.renderToScreen = true;
+				//compositePass.renderToScreen = true;
+
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+				effectFXAA.renderToScreen = true;
 
 				compFinal = new THREE.EffectComposer( renderer );
 				compFinal.addPass( compositePass );
+				compFinal.addPass( effectFXAA );
 
 			}
 
