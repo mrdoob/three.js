@@ -260,6 +260,7 @@
 			var deferredlight_vert = "" +
 
 			"varying vec3 lightView;" +
+			"varying vec4 clipPos;" +
 			"uniform vec3 lightPos;" +
 			"uniform mat4 matView;" +
 
@@ -268,12 +269,14 @@
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
 				"gl_Position = projectionMatrix * mvPosition;"+
 				"lightView = vec3( matView * vec4( lightPos, 1.0 ) );" +
+				"clipPos = gl_Position;"+
 
 			"}"
 
 			var deferredlight_frag = "" +
 
 			"varying vec3 lightView;"+
+			"varying vec4 clipPos;" +
 
 			"uniform sampler2D samplerColor;"+
 			"uniform sampler2D samplerDepth;"+
@@ -294,6 +297,7 @@
 				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"+
 
 				"float z = texture2D( samplerDepth, texCoord ).x;"+
+				"float lightZ = clipPos.z / clipPos.w;"+
 
 				/*
 				"if ( z == 0.0 ) {"+
@@ -304,7 +308,7 @@
 				"}"+
 				*/
 
-				"if ( z == 0.0 ) discard;"+
+				"if ( z == 0.0 || lightZ > z ) discard;"+
 
 				"float x = texCoord.x * 2.0 - 1.0;"+
 				"float y = texCoord.y * 2.0 - 1.0;"+
@@ -371,6 +375,7 @@
 				"color.xyz = albedo.xyz * lightColor * lightIntensity;"+
 				"color.w = attenuation;"+
 				"gl_FragColor = color * vec4( diffuse + specular, 1.0 );" +
+				//"gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.05 );"+
 
 			"}";
 
