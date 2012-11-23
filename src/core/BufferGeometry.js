@@ -4,7 +4,9 @@
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.GeometryCount ++;
+	THREE.GeometryLibrary.push( this );
+
+	this.id = THREE.GeometryIdCount ++;
 
 	// attributes
 
@@ -13,6 +15,10 @@ THREE.BufferGeometry = function () {
 	// attributes typed arrays are kept only if dynamic flag is set
 
 	this.dynamic = false;
+
+	// offsets for chunks when using indexed elements
+
+	this.offsets = [];
 
 	// boundings
 
@@ -48,10 +54,13 @@ THREE.BufferGeometry.prototype = {
 
 		if ( normalArray !== undefined ) {
 
-			var matrixRotation = new THREE.Matrix4();
-			matrixRotation.extractRotation( matrix );
+			var normalMatrix = new THREE.Matrix3();
+			normalMatrix.getInverse( matrix ).transpose();
 
-			matrixRotation.multiplyVector3Array( normalArray );
+			normalMatrix.multiplyVector3Array( normalArray );
+
+			this.normalizeNormals();
+
 			this.normalsNeedUpdate = true;
 
 		}
@@ -159,7 +168,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeVertexNormals: function () {
 
-		if ( this.attributes[ "position" ] && this.attributes[ "index" ] ) {
+		if ( this.attributes[ "position" ] ) {
 
 			var i, il;
 			var j, jl;
@@ -188,9 +197,6 @@ THREE.BufferGeometry.prototype = {
 
 			}
 
-			var offsets = this.offsets;
-
-			var indices = this.attributes[ "index" ].array;
 			var positions = this.attributes[ "position" ].array;
 			var normals = this.attributes[ "normal" ].array;
 
@@ -203,70 +209,127 @@ THREE.BufferGeometry.prototype = {
 			cb = new THREE.Vector3(),
 			ab = new THREE.Vector3();
 
-			for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+			// indexed elements
 
-				var start = offsets[ j ].start;
-				var count = offsets[ j ].count;
-				var index = offsets[ j ].index;
+			if ( this.attributes[ "index" ] ) {
 
-				for ( i = start, il = start + count; i < il; i += 3 ) {
+				var indices = this.attributes[ "index" ].array;
 
-					vA = index + indices[ i ];
-					vB = index + indices[ i + 1 ];
-					vC = index + indices[ i + 2 ];
+				var offsets = this.offsets;
 
-					x = positions[ vA * 3 ];
-					y = positions[ vA * 3 + 1 ];
-					z = positions[ vA * 3 + 2 ];
+				for ( j = 0, jl = offsets.length; j < jl; ++ j ) {
+
+					var start = offsets[ j ].start;
+					var count = offsets[ j ].count;
+					var index = offsets[ j ].index;
+
+					for ( i = start, il = start + count; i < il; i += 3 ) {
+
+						vA = index + indices[ i ];
+						vB = index + indices[ i + 1 ];
+						vC = index + indices[ i + 2 ];
+
+						x = positions[ vA * 3 ];
+						y = positions[ vA * 3 + 1 ];
+						z = positions[ vA * 3 + 2 ];
+						pA.set( x, y, z );
+
+						x = positions[ vB * 3 ];
+						y = positions[ vB * 3 + 1 ];
+						z = positions[ vB * 3 + 2 ];
+						pB.set( x, y, z );
+
+						x = positions[ vC * 3 ];
+						y = positions[ vC * 3 + 1 ];
+						z = positions[ vC * 3 + 2 ];
+						pC.set( x, y, z );
+
+						cb.sub( pC, pB );
+						ab.sub( pA, pB );
+						cb.crossSelf( ab );
+
+						normals[ vA * 3 ] 	  += cb.x;
+						normals[ vA * 3 + 1 ] += cb.y;
+						normals[ vA * 3 + 2 ] += cb.z;
+
+						normals[ vB * 3 ] 	  += cb.x;
+						normals[ vB * 3 + 1 ] += cb.y;
+						normals[ vB * 3 + 2 ] += cb.z;
+
+						normals[ vC * 3 ] 	  += cb.x;
+						normals[ vC * 3 + 1 ] += cb.y;
+						normals[ vC * 3 + 2 ] += cb.z;
+
+					}
+
+				}
+
+			// non-indexed elements (unconnected triangle soup)
+
+			} else {
+
+				for ( i = 0, il = positions.length; i < il; i += 9 ) {
+
+					x = positions[ i ];
+					y = positions[ i + 1 ];
+					z = positions[ i + 2 ];
 					pA.set( x, y, z );
 
-					x = positions[ vB * 3 ];
-					y = positions[ vB * 3 + 1 ];
-					z = positions[ vB * 3 + 2 ];
+					x = positions[ i + 3 ];
+					y = positions[ i + 4 ];
+					z = positions[ i + 5 ];
 					pB.set( x, y, z );
 
-					x = positions[ vC * 3 ];
-					y = positions[ vC * 3 + 1 ];
-					z = positions[ vC * 3 + 2 ];
+					x = positions[ i + 6 ];
+					y = positions[ i + 7 ];
+					z = positions[ i + 8 ];
 					pC.set( x, y, z );
 
 					cb.sub( pC, pB );
 					ab.sub( pA, pB );
 					cb.crossSelf( ab );
 
-					normals[ vA * 3 ] += cb.x;
-					normals[ vA * 3 + 1 ] += cb.y;
-					normals[ vA * 3 + 2 ] += cb.z;
+					normals[ i ] 	 = cb.x;
+					normals[ i + 1 ] = cb.y;
+					normals[ i + 2 ] = cb.z;
 
-					normals[ vB * 3 ] += cb.x;
-					normals[ vB * 3 + 1 ] += cb.y;
-					normals[ vB * 3 + 2 ] += cb.z;
+					normals[ i + 3 ] = cb.x;
+					normals[ i + 4 ] = cb.y;
+					normals[ i + 5 ] = cb.z;
 
-					normals[ vC * 3 ] += cb.x;
-					normals[ vC * 3 + 1 ] += cb.y;
-					normals[ vC * 3 + 2 ] += cb.z;
+					normals[ i + 6 ] = cb.x;
+					normals[ i + 7 ] = cb.y;
+					normals[ i + 8 ] = cb.z;
 
 				}
 
 			}
 
-			// normalize normals
-
-			for ( i = 0, il = normals.length; i < il; i += 3 ) {
-
-				x = normals[ i ];
-				y = normals[ i + 1 ];
-				z = normals[ i + 2 ];
-
-				var n = 1.0 / Math.sqrt( x * x + y * y + z * z );
-
-				normals[ i ] *= n;
-				normals[ i + 1 ] *= n;
-				normals[ i + 2 ] *= n;
-
-			}
+			this.normalizeNormals();
 
 			this.normalsNeedUpdate = true;
+
+		}
+
+	},
+
+	normalizeNormals: function () {
+
+		var normals = this.attributes[ "normal" ].array;
+
+		var x, y, z, n;
+
+		for ( var i = 0, il = normals.length; i < il; i += 3 ) {
+
+			x = normals[ i ];
+			y = normals[ i + 1 ];
+			z = normals[ i + 2 ];
+
+			n = 1.0 / Math.sqrt( x * x + y * y + z * z );
+
+			normals[ i ] 	 *= n;
+			normals[ i + 1 ] *= n;
+			normals[ i + 2 ] *= n;
 
 		}
 
@@ -473,6 +536,13 @@ THREE.BufferGeometry.prototype = {
 
 		this.hasTangents = true;
 		this.tangentsNeedUpdate = true;
+
+	},
+
+	deallocate: function () {
+
+		var index = THREE.GeometryLibrary.indexOf( this );
+		if ( index !== -1 ) THREE.GeometryLibrary.splice( index, 1 );
 
 	}
 

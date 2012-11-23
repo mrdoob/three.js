@@ -48,7 +48,7 @@ DEFAULTS = {
 "camera"  :
     {
         "name" : "default_camera",
-        "type" : "perspective",
+        "type" : "PerspectiveCamera",
         "near" : 1,
         "far"  : 10000,
         "fov"  : 60,
@@ -60,7 +60,7 @@ DEFAULTS = {
 "light" :
  {
     "name"       : "default_light",
-    "type"       : "directional",
+    "type"       : "DirectionalLight",
     "direction"  : [0, 1, 1],
     "color"      : [1, 1, 1],
     "intensity"  : 0.8
@@ -85,7 +85,8 @@ TEMPLATE_SCENE_ASCII = """\
 
 "metadata" :
 {
-	"formatVersion" : 3.1,
+	"formatVersion" : 3.2,
+	"type" 			: "scene",
 	"sourceFile"    : "%(fname)s",
 	"generatedBy"   : "Blender 2.64 Exporter",
 	"objects"       : %(nobjects)s,
@@ -94,7 +95,6 @@ TEMPLATE_SCENE_ASCII = """\
 	"textures"      : %(ntextures)s
 },
 
-"type" : "scene",
 "urlBaseType" : %(basetype)s,
 
 %(sections)s
@@ -127,7 +127,7 @@ TEMPLATE_OBJECT = """\
 	%(object_id)s : {
 		"geometry"  : %(geometry_id)s,
 		"groups"    : [ %(group_id)s ],
-		"materials" : [ %(material_id)s ],
+		"material"  : %(material_id)s,
 		"position"  : %(position)s,
 		"rotation"  : %(rotation)s,
 		"quaternion": %(quaternion)s,
@@ -172,7 +172,7 @@ TEMPLATE_MATERIAL_SCENE = """\
 
 TEMPLATE_CAMERA_PERSPECTIVE = """\
 	%(camera_id)s : {
-		"type"  : "perspective",
+		"type"  : "PerspectiveCamera",
 		"fov"   : %(fov)f,
 		"aspect": %(aspect)f,
 		"near"  : %(near)f,
@@ -183,7 +183,7 @@ TEMPLATE_CAMERA_PERSPECTIVE = """\
 
 TEMPLATE_CAMERA_ORTHO = """\
 	%(camera_id)s : {
-		"type"  : "ortho",
+		"type"  : "OrthographicCamera",
 		"left"  : %(left)f,
 		"right" : %(right)f,
 		"top"   : %(top)f,
@@ -196,7 +196,7 @@ TEMPLATE_CAMERA_ORTHO = """\
 
 TEMPLATE_LIGHT_DIRECTIONAL = """\
 	%(light_id)s : {
-		"type"       : "directional",
+		"type"       : "DirectionalLight",
 		"direction"  : %(direction)s,
 		"color"      : %(color)d,
 		"intensity"  : %(intensity).2f
@@ -204,7 +204,7 @@ TEMPLATE_LIGHT_DIRECTIONAL = """\
 
 TEMPLATE_LIGHT_POINT = """\
 	%(light_id)s : {
-		"type"       : "point",
+		"type"       : "PointLight",
 		"position"   : %(position)s,
 		"color"      : %(color)d,
 		"intensity"  : %(intensity).3f
@@ -407,6 +407,8 @@ def center(vertices):
 
     translate(vertices, [-cx,-cy,-cz])
 
+    return [-cx,-cy,-cz]
+
 def top(vertices):
     """Align top of the model with the floor (Y-axis) and center it around X and Z.
     """
@@ -419,6 +421,8 @@ def top(vertices):
 
     translate(vertices, [-cx,-cy,-cz])
 
+    return [-cx,-cy,-cz]
+
 def bottom(vertices):
     """Align bottom of the model with the floor (Y-axis) and center it around X and Z.
     """
@@ -430,6 +434,8 @@ def bottom(vertices):
     cz = bb['z'][0] + (bb['z'][1] - bb['z'][0])/2.0
 
     translate(vertices, [-cx,-cy,-cz])
+
+    return [-cx,-cy,-cz]
 
 # #####################################################
 # Elements rendering
@@ -1446,7 +1452,7 @@ def generate_mesh_string(objects, scene,
 
         scene_frames = range(scene.frame_start, scene.frame_end + 1, option_frame_step)
 
-        for frame in scene_frames:
+        for index, frame in enumerate(scene_frames):
             scene.frame_set(frame, 0.0)
 
             anim_meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
@@ -1455,6 +1461,19 @@ def generate_mesh_string(objects, scene,
 
             for mesh, object in anim_meshes:
                 frame_vertices.extend(mesh.vertices[:])
+
+            if index == 0:
+                if align_model == 1:
+                    offset = center(frame_vertices)
+                elif align_model == 2:
+                    offset = bottom(frame_vertices)
+                elif align_model == 3:
+                    offset = top(frame_vertices)
+                else:
+                    offset = False
+            else:
+                if offset:
+                    translate(frame_vertices, offset)
 
             morphVertices = generate_vertices(frame_vertices, option_vertices_truncate, option_vertices)
             morphs.append(morphVertices)
@@ -1618,8 +1637,11 @@ def generate_objects(data):
             position, quaternion, scale = obj.matrix_world.decompose()
             rotation = quaternion.to_euler("XYZ")
 
+            # use empty material string for multi-material objects
+            # this will trigger use of MeshFaceMaterial in SceneLoader
+
             material_string = ""
-            if len(material_ids) > 0:
+            if len(material_ids) == 1:
                 material_string = generate_string_list(material_ids)
 
             group_string = ""
@@ -1993,17 +2015,17 @@ def generate_materials_scene(data):
 # #####################################################
 
 def generate_cameras(data):
+    chunks = []
+
     if data["use_cameras"]:
 
         cams = bpy.data.objects
         cams = [ob for ob in cams if (ob.type == 'CAMERA' and ob.select)]
 
-        chunks = []
-
         if not cams:
             camera = DEFAULTS["camera"]
 
-            if camera["type"] == "perspective":
+            if camera["type"] == "PerspectiveCamera":
 
                 camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
                 "camera_id" : generate_string(camera["name"]),
@@ -2015,7 +2037,7 @@ def generate_cameras(data):
                 "target"    : generate_vec3(camera["target"])
                 }
 
-            elif camera["type"] == "ortho":
+            elif camera["type"] == "OrthographicCamera":
 
                 camera_string = TEMPLATE_CAMERA_ORTHO % {
                 "camera_id" : generate_string(camera["name"]),
@@ -2054,15 +2076,14 @@ def generate_cameras(data):
 
                 chunks.append(camera_string)
 
-        return ",\n\n".join(chunks)
-
-    return ""
+    return ",\n\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - lights
 # #####################################################
 
 def generate_lights(data):
+    chunks = []
 
     if data["use_lights"]:
 
@@ -2070,10 +2091,9 @@ def generate_lights(data):
         if not lights:
             lights.append(DEFAULTS["light"])
 
-        chunks = []
         for light in lights:
 
-            if light["type"] == "directional":
+            if light["type"] == "DirectionalLight":
                 light_string = TEMPLATE_LIGHT_DIRECTIONAL % {
                 "light_id"      : generate_string(light["name"]),
                 "direction"     : generate_vec3(light["direction"]),
@@ -2081,7 +2101,7 @@ def generate_lights(data):
                 "intensity"     : light["intensity"]
                 }
 
-            elif light["type"] == "point":
+            elif light["type"] == "PointLight":
                 light_string = TEMPLATE_LIGHT_POINT % {
                 "light_id"      : generate_string(light["name"]),
                 "position"      : generate_vec3(light["position"]),
@@ -2091,9 +2111,7 @@ def generate_lights(data):
 
             chunks.append(light_string)
 
-        return ",\n\n".join(chunks)
-
-    return ""
+    return ",\n\n".join(chunks), len(chunks)
 
 # #####################################################
 # Scene exporter - embedded meshes
@@ -2124,11 +2142,24 @@ def generate_ascii_scene(data):
     geometries, ngeometries = generate_geometries(data)
     textures, ntextures = generate_textures_scene(data)
     materials, nmaterials = generate_materials_scene(data)
-
-    cameras = generate_cameras(data)
-    lights = generate_lights(data)
+    lights, nlights = generate_lights(data)
+    cameras, ncameras = generate_cameras(data)
 
     embeds = generate_embeds(data)
+
+    if nlights > 0:
+        if nobjects > 0:
+            objects = objects + ",\n\n" + lights
+        else:
+            objects = lights
+        nobjects += nlights
+
+    if ncameras > 0:
+        if nobjects > 0:
+            objects = objects + ",\n\n" + cameras
+        else:
+            objects = cameras
+        nobjects += ncameras
 
     basetype = "relativeTo"
 
@@ -2142,8 +2173,6 @@ def generate_ascii_scene(data):
     ["geometries", geometries],
     ["textures",   textures],
     ["materials",  materials],
-    ["cameras",    cameras],
-    ["lights",     lights],
     ["embeds",     embeds]
     ]
 

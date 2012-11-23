@@ -17,8 +17,8 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/libs/Tween.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 
 		<script>
 
@@ -111,13 +111,13 @@
 						x: Math.random() * 800 - 400,
 						y: Math.random() * 800 - 400,
 						z: Math.random() * 800 - 400 }, 2000 )
-					.easing( TWEEN.Easing.Elastic.EaseOut).start();
+					.easing( TWEEN.Easing.Elastic.Out).start();
 
 					new TWEEN.Tween( intersects[ 0 ].object.rotation ).to( {
 						x: ( Math.random() * 360 ) * Math.PI / 180,
 						y: ( Math.random() * 360 ) * Math.PI / 180,
 						z: ( Math.random() * 360 ) * Math.PI / 180 }, 2000 )
-					.easing( TWEEN.Easing.Elastic.EaseOut).start();
+					.easing( TWEEN.Easing.Elastic.Out).start();
 
 				}
 

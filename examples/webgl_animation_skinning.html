@@ -141,7 +141,7 @@
 
 			}
 
-			function createScene( geometry ) {
+			function createScene( geometry, materials ) {
 
 				buffalos = [];
 				animations = [];
@@ -151,9 +151,9 @@
 					gridx = 25, gridz = 15,
 					sepx  = 150, sepz = 300;
 
-				var material = new THREE.MeshFaceMaterial();
+				var material = new THREE.MeshFaceMaterial( materials );
 
-				var originalMaterial = geometry.materials[ 0 ];
+				var originalMaterial = materials[ 0 ];
 
 				originalMaterial.skinning = true;
 				originalMaterial.transparent = true;

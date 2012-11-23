@@ -24,8 +24,14 @@
 			}
 
 			a { color: red }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
+
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> -
@@ -83,19 +89,17 @@
 
 				// Add Blender exported Collada model
 
-				var loader = new THREE.GeometryLoader();
-				loader.addEventListener( 'load', function ( event ) {
-
-					var geometry = event.content;
+				var loader = new THREE.JSONLoader();
+				loader.load( 'models/animated/monster/monster.js', function ( geometry, materials ) {
 
 					// adjust color a bit
 
-					var material = geometry.materials[ 0 ];
+					var material = materials[ 0 ];
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
 					material.ambient.setHex( 0x222222 );
 
-					var faceMaterial = new THREE.MeshFaceMaterial();
+					var faceMaterial = new THREE.MeshFaceMaterial( materials );
 
 					for ( var i = 0; i < 729; i ++ ) {
 
@@ -134,7 +138,6 @@
 					}
 
 				} );
-				loader.load( 'models/animated/monster/monster.js' );
 
 
 				// Add the COLLADA
@@ -159,13 +162,7 @@
 				// Stats
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// Events
 

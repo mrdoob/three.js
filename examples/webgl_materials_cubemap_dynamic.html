@@ -22,6 +22,11 @@
 
 			.h { color: skyblue }
 			.c { display: inline; margin-left: 1em }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #888 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -206,14 +211,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#888";
-				stats.domElement.children[ 0 ].style.background = "#000";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// CUBE CAMERA
 
@@ -306,9 +304,13 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
-						sprite.scale.set( s, s, s );
+						var spriteWidth = 128;
+						var spriteHeight = 128;
+
+						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
 
 						object.bodyMesh.add( sprite );
@@ -371,9 +373,13 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
-						sprite.scale.set( s, s, s );
+						var spriteWidth = 128;
+						var spriteHeight = 128;
+
+						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
 
 						object.bodyMesh.add( sprite );
@@ -497,7 +503,7 @@
 
 				for ( var i = 0; i < sprites.length; i ++ ) {
 
-					sprites[ i ].opacity = opacity;
+					sprites[ i ].material.opacity = opacity;
 
 				}
 
@@ -551,17 +557,33 @@
 
 				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, ambient: color } ) );
 				object.position.set( x, y, z );
-				scene.add( object );
-
 				object.castShadow = true;
 				object.receiveShadow = true;
+				scene.add( object );
 
-				var shadowTexture = THREE.ImageUtils.loadTexture( "textures/shadowAlpha.png" );
+				//
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(0,0,0,1)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				//
+
+				var shadowTexture = new THREE.Texture( canvas );
+				shadowTexture.needsUpdate = true;
 
 				var shadowPlane = new THREE.PlaneGeometry( 400, 400 );
 				var shadowMaterial = new THREE.MeshBasicMaterial( {
 
-					color: 0xff0000, opacity: 0.35, transparent: true, map: shadowTexture,
+					opacity: 0.35, transparent: true, map: shadowTexture,
 					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
 
 				} );
@@ -582,7 +604,7 @@
 				var shadowTarget = new THREE.WebGLRenderTarget( width, height, renderTargetParameters );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-				var shadowGeometry = THREE.GeometryUtils.clone( object.geometry );
+				var shadowGeometry = object.geometry.clone();
 
 				var shadowObject = new THREE.Mesh( shadowGeometry, shadowMaterial );
 
@@ -822,14 +844,14 @@
 
 				// BODY
 
-				var materials = car.bodyGeometry.materials;
+				var materials = car.bodyMaterials;
 
 				materials[ 0 ] = mlib.body[ 0 ][ 1 ]; 		// body
 				materials[ 1 ] = mlib[ "Dark chrome" ]; 	// front under lights, back
 
 				// WHEELS
 
-				materials = car.wheelGeometry.materials;
+				materials = car.wheelMaterials;
 
 				materials[ 0 ] = mlib[ "Chrome" ];			// insides
 				materials[ 1 ] = mlib[ "Black rough" ];	// tire
@@ -849,7 +871,7 @@
 
 				// BODY
 
-				var materials = car.bodyGeometry.materials;
+				var materials = car.bodyMaterials;
 
 				materials[ 0 ] = mlib[ "Black metal" ];	// top, front center, back sides
 				materials[ 1 ] = mlib[ "Chrome" ];			// front sides
@@ -862,7 +884,7 @@
 
 				// WHEELS
 
-				materials = car.wheelGeometry.materials;
+				materials = car.wheelMaterials;
 
 				materials[ 0 ] = mlib[ "Chrome" ];			// insides
 				materials[ 1 ] = mlib[ "Black rough" ];	// tire
@@ -907,16 +929,16 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ] = mlib[ "ChromeN" ];
-						veyron.bodyGeometry.materials[ 2 ] = mlib[ "ChromeN" ];
+						veyron.bodyMaterials[ 1 ] = mlib[ "ChromeN" ];
+						veyron.bodyMaterials[ 2 ] = mlib[ "ChromeN" ];
 
-						veyron.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
+						veyron.wheelMaterials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
+						gallardo.wheelMaterials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
@@ -924,16 +946,16 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ] = mlib[ "Chrome" ];
-						veyron.bodyGeometry.materials[ 2 ] = mlib[ "Chrome" ];
+						veyron.bodyMaterials[ 1 ] = mlib[ "Chrome" ];
+						veyron.bodyMaterials[ 2 ] = mlib[ "Chrome" ];
 
-						veyron.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
+						veyron.wheelMaterials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
+						gallardo.wheelMaterials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 

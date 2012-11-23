@@ -96,7 +96,7 @@ THREE.ShaderSkin = {
 
 				"uniform vec3 hemisphereLightSkyColor[ MAX_HEMI_LIGHTS ];",
 				"uniform vec3 hemisphereLightGroundColor[ MAX_HEMI_LIGHTS ];",
-				"uniform vec3 hemisphereLightPosition[ MAX_HEMI_LIGHTS ];",
+				"uniform vec3 hemisphereLightDirection[ MAX_HEMI_LIGHTS ];",
 
 			"#endif",
 
@@ -255,8 +255,8 @@ THREE.ShaderSkin = {
 
 					"for ( int i = 0; i < MAX_HEMI_LIGHTS; i ++ ) {",
 
-						"vec4 lPosition = viewMatrix * vec4( hemisphereLightPosition[ i ], 1.0 );",
-						"vec3 lVector = normalize( lPosition.xyz + vViewPosition.xyz );",
+						"vec4 lDirection = viewMatrix * vec4( hemisphereLightDirection[ i ], 0.0 );",
+						"vec3 lVector = normalize( lDirection.xyz );",
 
 						"float dotProduct = dot( normal, lVector );",
 						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
@@ -270,7 +270,7 @@ THREE.ShaderSkin = {
 
 						// specular (ground light)
 
-						"vec3 lVectorGround = normalize( -lPosition.xyz + vViewPosition.xyz );",
+						"vec3 lVectorGround = -lVector;",
 						"hemiSpecularWeight += KS_Skin_Specular( normal, lVectorGround, viewPosition, uRoughness, uSpecularBrightness );",
 
 						"specularTotal += uSpecularColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",
@@ -319,11 +319,11 @@ THREE.ShaderSkin = {
 			"void main() {",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vViewPosition = -mvPosition.xyz;",
 
-				"vNormal = normalMatrix * normal;",
+				"vNormal = normalize( normalMatrix * normal );",
 
 				"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
 
@@ -641,7 +641,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 
@@ -730,7 +730,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"vec4 mPosition = modelMatrix * vec4( position, 1.0 );",
+				"vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 

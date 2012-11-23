@@ -540,7 +540,7 @@
 
 			}
 
-			function attachButtonMaterials( materials, geometry, material_indices, car ) {
+			function attachButtonMaterials( materials, faceMaterial, material_indices, car ) {
 
 				for( var i = 0; i < materials.length; i ++ ) {
 
@@ -549,7 +549,7 @@
 
 						for ( var j = 0; j < material_indices.length; j ++ ) {
 
-							geometry.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
+							faceMaterial.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
 
 						}
 
@@ -572,7 +572,7 @@
 
 				for( var i in CARS[ car ].mmap ) {
 
-					geometry.materials[ i ] = CARS[ car ].mmap[ i ];
+					m.materials[ i ] = CARS[ car ].mmap[ i ];
 
 				}
 
@@ -589,7 +589,7 @@
 				CARS[ car ].object = mesh;
 
 				CARS[ car ].buttons = createButtons( materials.body, car );
-				attachButtonMaterials( materials.body, geometry, bm, car );
+				attachButtonMaterials( materials.body, m, bm, car );
 
 				switchCar( car );
 

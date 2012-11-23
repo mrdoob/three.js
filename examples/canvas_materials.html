@@ -65,7 +65,7 @@
 
 				var geometry = new THREE.SphereGeometry( 100, 14, 7, false );
 
-				geometry.materials = [
+				var materials = [
 
 					new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
 					new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending, side: THREE.DoubleSide } ),
@@ -81,17 +81,17 @@
 				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
 					var face = geometry.faces[ i ];
-					if ( Math.random() > 0.5 ) face.materialIndex = Math.floor( Math.random() * geometry.materials.length );
+					if ( Math.random() > 0.5 ) face.materialIndex = Math.floor( Math.random() * materials.length );
 
 				}
 
-				geometry.materials.push( new THREE.MeshFaceMaterial() );
+				materials.push( new THREE.MeshFaceMaterial( materials ) );
 
 				objects = [];
 
-				for ( var i = 0, l = geometry.materials.length; i < l; i ++ ) {
+				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-					var sphere = new THREE.Mesh( geometry, geometry.materials[ i ] );
+					var sphere = new THREE.Mesh( geometry, materials[ i ] );
 
 					sphere.position.x = ( i % 5 ) * 200 - 400;
 					sphere.position.z = Math.floor( i / 5 ) * 200 - 200;

@@ -32,6 +32,10 @@
 				color:#fff;
 			}
 
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -65,7 +69,7 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var statsEnabled = false;
+			var statsEnabled = true;
 
 			var container, stats, loader;
 
@@ -164,9 +168,6 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
 					container.appendChild( stats.domElement );
 
 				}

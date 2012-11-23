@@ -13,7 +13,15 @@
 
 
 		<h2>Constructor</h2>
-
+		<h3>[name]([page:Float radiusTop], [page:Float radiusBottom], [page:Float height], [page:Integer radiusSegments], [page:Integer heightSegments], [page:Boolean openEnded])</h3>
+		<div>
+		radiusTop — Radius of the cylinder at the top.<br />
+		radiusBottom — Radius of the cylinder at the bottom.<br />
+		height — Height of the cylinder.<br />
+		radiusSegments — Number of segmented faces around the circumference of the cylinder.<br />
+		heightSegments — Number of rows of faces along the height of the cylinder.<br />
+		openEnded - A Boolean indicating whether or not to cap the ends of the cylinder.
+		</div>
 		<h3>[name]()</h3>
 
 
@@ -24,10 +32,8 @@
 
 		<h2>Methods</h2>
 
-		<h3>.todo( [page:Vector3 todo] )</h3>
-		<div>
-		todo — todo<br />
-		</div>
+		<h3>.computeCentroids();</h3>
+		<h3>.computeFaceNormals();</h3>
 
 
 		<h2>Source</h2>

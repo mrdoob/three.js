@@ -174,15 +174,15 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	calculateW : function () {
+	inverse: function () {
 
-		this.w = - Math.sqrt( Math.abs( 1.0 - this.x * this.x - this.y * this.y - this.z * this.z ) );
+		this.conjugate().normalize();
 
 		return this;
 
 	},
 
-	inverse: function () {
+	conjugate: function () {
 
 		this.x *= -1;
 		this.y *= -1;
@@ -207,7 +207,7 @@ THREE.Quaternion.prototype = {
 			this.x = 0;
 			this.y = 0;
 			this.z = 0;
-			this.w = 0;
+			this.w = 1;
 
 		} else {
 

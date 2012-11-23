@@ -209,12 +209,6 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			// update camera matrices and frustum
 
-			if ( ! shadowCamera._viewMatrixArray ) shadowCamera._viewMatrixArray = new Float32Array( 16 );
-			if ( ! shadowCamera._projectionMatrixArray ) shadowCamera._projectionMatrixArray = new Float32Array( 16 );
-
-			shadowCamera.matrixWorldInverse.flattenToArray( shadowCamera._viewMatrixArray );
-			shadowCamera.projectionMatrix.flattenToArray( shadowCamera._projectionMatrixArray );
-
 			_projScreenMatrix.multiply( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
 			_frustum.setFromMatrix( _projScreenMatrix );
 
@@ -236,7 +230,7 @@ THREE.ShadowMapPlugin = function ( ) {
 
 				if ( object.visible && object.castShadow ) {
 
-					if ( ! ( object instanceof THREE.Mesh ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+					if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
 
 						object._modelViewMatrix.multiply( shadowCamera.matrixWorldInverse, object.matrixWorld );
 
@@ -250,6 +244,8 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			// render regular objects
 
+			var objectMaterial, useMorphing, useSkinning;
+
 			for ( j = 0, jl = renderList.length; j < jl; j ++ ) {
 
 				webglObject = renderList[ j ];
@@ -262,15 +258,26 @@ THREE.ShadowMapPlugin = function ( ) {
 					// culling is overriden globally for all objects
 					// while rendering depth map
 
+					// need to deal with MeshFaceMaterial somehow
+					// in that case just use the first of material.materials for now
+					// (proper solution would require to break objects by materials
+					//  similarly to regular rendering and then set corresponding
+					//  depth materials per each chunk instead of just once per object)
+
+					objectMaterial = getObjectMaterial( object );
+
+					useMorphing = object.geometry.morphTargets.length > 0 && objectMaterial.morphTargets;
+					useSkinning = object instanceof THREE.SkinnedMesh && objectMaterial.skinning;
+
 					if ( object.customDepthMaterial ) {
 
 						material = object.customDepthMaterial;
 
-					} else if ( object instanceof THREE.SkinnedMesh ) {
+					} else if ( useSkinning ) {
 
-						material = object.geometry.morphTargets.length ? _depthMaterialMorphSkin : _depthMaterialSkin;
+						material = useMorphing ? _depthMaterialMorphSkin : _depthMaterialSkin;
 
-					} else if ( object.geometry.morphTargets.length ) {
+					} else if ( useMorphing ) {
 
 						material = _depthMaterialMorph;
 
@@ -461,6 +468,17 @@ THREE.ShadowMapPlugin = function ( ) {
 		shadowCamera.updateProjectionMatrix();
 
 	}
+
+	// For the moment just ignore objects that have multiple materials with different animation methods
+	// Only the first material will be taken into account for deciding which depth material to use for shadow maps
+
+	function getObjectMaterial( object ) {
+
+		return object.material instanceof THREE.MeshFaceMaterial
+			? object.material.materials[ 0 ]
+			: object.material;
+
+	};
 
 };
 

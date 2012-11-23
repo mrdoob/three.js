@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DirectionalLight = function ( hex, intensity, distance ) {
+THREE.DirectionalLight = function ( hex, intensity ) {
 
 	THREE.Light.call( this, hex );
 
@@ -11,7 +11,6 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
-	this.distance = ( distance !== undefined ) ? distance : 0;
 
 	this.castShadow = false;
 	this.onlyShadow = false;

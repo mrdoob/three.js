@@ -12,6 +12,7 @@
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -68,7 +69,9 @@ THREE.ShaderMaterial.prototype.clone = function () {
 
 	material.fragmentShader = this.fragmentShader;
 	material.vertexShader = this.vertexShader;
-	material.uniforms = this.uniforms;
+
+	material.uniforms = THREE.UniformsUtils.clone( this.uniforms );
+
 	material.attributes = this.attributes;
 	material.defines = this.defines;
 

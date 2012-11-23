@@ -33,7 +33,7 @@ THREE.Clock.prototype.stop = function () {
 
 THREE.Clock.prototype.getElapsedTime = function () {
 
-	this.elapsedTime += this.getDelta();
+	this.getDelta();
 
 	return this.elapsedTime;
 

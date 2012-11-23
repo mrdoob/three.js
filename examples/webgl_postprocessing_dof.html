@@ -22,8 +22,10 @@
 
 			#info {
 				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
+				position: relative;
+				top: 0px;
+				width: 50em;
+				margin: 0 auto -2.1em;
 				padding: 5px;
 				z-index:100;
 			}
@@ -38,7 +40,7 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
-		<script src='js/libs/DAT.GUI.min.js'></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
@@ -191,7 +193,7 @@
 
 				};
 
-				var gui = new DAT.GUI();
+				var gui = new dat.GUI();
 				gui.add( effectController, "focus", 0.0, 3.0, 0.025 ).onChange( matChanger );
 				gui.add( effectController, "aperture", 0.001, 0.2, 0.001 ).onChange( matChanger );
 				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );

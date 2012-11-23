@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '52dev' };
+var THREE = THREE || { REVISION: '54dev' };
 
 self.console = self.console || {
 
@@ -147,6 +147,7 @@ THREE.SrcAlphaSaturateFactor = 210;
 
 THREE.MultiplyOperation = 0;
 THREE.MixOperation = 1;
+THREE.AddOperation = 2;
 
 // Mapping modes
 

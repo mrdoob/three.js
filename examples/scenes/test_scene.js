@@ -1,7 +1,7 @@
 {
 
 	"metadata": {
-		"formatVersion": 3.1,
+		"formatVersion": 3.2,
 		"type" : "scene"
 	},
 
@@ -11,7 +11,7 @@
 
 		"cube1" : {
 			"geometry" : "cubeNormals",
-			"materials": [ "phong_red" ],
+			"material" : "phong_red",
 			"position" : [ 0, 0, 0 ],
 			"rotation" : [ 0, -0.3, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -25,7 +25,7 @@
 
 		"cube2" : {
 			"geometry" : "cubeWire",
-			"materials": [ "basic_white" ],
+			"material" : "basic_white",
 			"position" : [ 0, 0, 0 ],
 			"rotation" : [ 0, -0.3, 0 ],
 			"scale"	   : [ 2, 2, 2 ],
@@ -34,7 +34,7 @@
 
 		"cube3" : {
 			"geometry" : "cube",
-			"materials": [ "minecraft" ],
+			"material" : "minecraft",
 			"position" : [ -30, -5, 25 ],
 			"rotation" : [ 0, 0.8, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -43,7 +43,7 @@
 
 		"sphere_lambert" : {
 			"geometry" : "sphere",
-			"materials": [ "lambert_green" ],
+			"material" : "lambert_green",
 			"position" : [ -20, -5, 15 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -52,7 +52,7 @@
 
 		"sphere_refraction" : {
 			"geometry" : "sphere",
-			"materials": [ "basic_refraction" ],
+			"material" : "basic_refraction",
 			"position" : [ 50, 45, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -61,7 +61,7 @@
 
 		"sphere_cube" : {
 			"geometry" : "sphere_uvs",
-			"materials": [ "phong_compressed_cube" ],
+			"material" : "phong_compressed_cube",
 			"position" : [ -30, -2, -15 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1.5, 1.5, 1.5 ],
@@ -70,7 +70,7 @@
 
 		"icosahedron" : {
 			"geometry" : "icosahedron",
-			"materials": [ "faceted_white" ],
+			"material" : "faceted_white",
 			"position" : [ 20, 10, -60 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -79,7 +79,7 @@
 
 		"torus" : {
 			"geometry" : "torus",
-			"materials": [ "phong_orange" ],
+			"material" : "phong_orange",
 			"position" : [ -20, 5, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 2, 2, 2 ],
@@ -88,7 +88,7 @@
 
 		"cone" : {
 			"geometry" : "cone",
-			"materials": [ "lambert_blue" ],
+			"material" : "lambert_blue",
 			"position" : [ -50, 15, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -97,7 +97,7 @@
 
 		"cylinder" : {
 			"geometry" : "cylinder",
-			"materials": [ "lambert_blue" ],
+			"material" : "lambert_blue",
 			"position" : [ 50, 15, -50 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -106,7 +106,7 @@
 
 		"colorcube1" : {
 			"geometry" : "colorcube",
-			"materials": [],
+			"material" : "face",
 			"position" : [ -10, -5, 30 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 5, 5, 5 ],
@@ -114,7 +114,7 @@
 			"children" : {
 				"colorcube2" : {
 					"geometry" : "colorcube",
-					"materials": [],
+					"material" : "face",
 					"position" : [ 0, 2, 0 ],
 					"rotation" : [ 0.1, 0.1, 0.1 ],
 					"scale"    : [ 0.5, 0.5, 0.5 ],
@@ -122,7 +122,7 @@
 					"children" : {
 						"colorcube3" : {
 							"geometry" : "colorcube",
-							"materials": [],
+							"material" : "face",
 							"position" : [ 0, 2, 0 ],
 							"rotation" : [ 0.1, 0.1, 0.1 ],
 							"scale"    : [ 0.5, 0.5, 0.5 ],
@@ -130,7 +130,7 @@
 							"children" : {
 								"colorcube4" : {
 									"geometry" : "colorcube",
-									"materials": [],
+									"material" : "face",
 									"position" : [ 0, 2, 0 ],
 									"rotation" : [ 0.1, 0.1, 0.1 ],
 									"scale"    : [ 0.5, 0.5, 0.5 ],
@@ -145,7 +145,7 @@
 
 		"veyron" : {
 			"geometry" : "veyron",
-			"materials": [ "face" ],
+			"material" : "multi_veyron",
 			"position" : [ 40, -1, 0 ],
 			"rotation" : [ 0, 0.3, 0 ],
 			"scale"	   : [ 0.25, 0.25, 0.25 ],
@@ -154,7 +154,7 @@
 
 		"walt" : {
 			"geometry" : "WaltHead",
-			"materials": [ "lambert_cube" ],
+			"material" : "lambert_cube",
 			"position" : [ -75, 10, -30 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 0.5, 0.5, 0.5 ],
@@ -163,16 +163,85 @@
 
 		"ben" : {
 			"geometry" : "ben",
-			"materials": [ "phong_ben" ],
+			"material" : "phong_ben",
 			"position" : [ -45, -10, 0 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 55, 55, 55 ],
 			"visible"  : true
 		},
 
+		"ninja" : {
+			"geometry" : "NinjaLo",
+			"material" : "phong_normal",
+			"position" : [ 75, 10, -30 ],
+			"rotation" : [ 0, -0.5, 0 ],
+			"scale"	   : [ 1.25, 1.25, 1.25 ],
+			"visible"  : true
+		},
+
+		"sittingBox" : {
+			"geometry" : "sittingBox",
+			"material" : "phong_morph",
+			"position" : [ -60, -10, 10 ],
+			"rotation" : [ 0, 0.5, 0 ],
+			"scale"	   : [ 23, 23, 23 ],
+			"visible"  : true,
+			"morph"	   : true,
+			"duration" : 8000,
+			"mirroredLoop" : true
+		},
+
+		"knight" : {
+			"geometry" : "knight",
+			"material" : "phong_skin",
+			"position" : [ 70, -10, 10 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 2.5, 2.5, 2.5 ],
+			"visible"  : true,
+			"skin"	   : true
+		},
+
+		"man" : {
+			"type": "obj",
+			"url" : "obj/male02/male02.obj",
+			"material" : "phong_man",
+			"position" : [ -10, -10, -25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 0.2, 0.2, 0.2 ],
+			"visible"  : true
+		},
+
+		"man_clone_1" : {
+			"geometry" : "man",
+			"material" : "multi_1",
+			"position" : [ 2.5, -10, -25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 0.2, 0.2, 0.2 ],
+			"visible"  : true
+		},
+
+		"man_clone_2" : {
+			"geometry" : "man",
+			"material" : "multi_2",
+			"position" : [ 15, -10, -25 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 0.2, 0.2, 0.2 ],
+			"visible"  : true
+		},
+
+		"monster" : {
+			"type": "dae",
+			"url" : "models/collada/monster/monster.dae",
+			"position" : [ -43, -10, 27 ],
+			"rotation" : [ -1.57, 0, 0 ],
+			"scale"	   : [ 0.01, 0.01, 0.01 ],
+			"visible"  : true
+		},
+
 		"hand" : {
-			"geometry" : "hand",
-			"materials": [ "phong_hand" ],
+			"type" : "utf8",
+			"url"  : "models/utf8/hand.js",
+			"material" : "phong_hand",
 			"position" : [ -28, -1, 29 ],
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 12, 12, 12 ],
@@ -183,30 +252,27 @@
 			}
 		},
 
-		"ninja" : {
-			"geometry" : "NinjaLo",
-			"materials": [ "phong_normal" ],
-			"position" : [ 75, 10, -30 ],
-			"rotation" : [ 0, -0.5, 0 ],
-			"scale"	   : [ 1.25, 1.25, 1.25 ],
+		"bunny" : {
+			"geometry" : "bunny",
+			"material" : "phong_bunny",
+			"position" : [ -25, -14, 0 ],
+			"rotation" : [ 0, 0, 0 ],
+			"scale"	   : [ 100, 100, 100 ],
 			"visible"  : true
 		},
 
-		"sittingBox" : {
-			"geometry" : "sittingBox",
-			"materials": [ "phong_morph" ],
-			"position" : [ -60, -10, 10 ],
-			"rotation" : [ 0, 0.5, 0 ],
-			"scale"	   : [ 23, 23, 23 ],
-			"visible"  : true,
-			"morph"	   : true,
-			"duration" : 8000,
-			"mirroredLoop" : true
+		"disk" : {
+			"geometry" : "disk",
+			"material" : "phong_disk",
+			"position" : [ 7, -10, 30 ],
+			"rotation" : [ 1.57, 0, 0 ],
+			"scale"	   : [ 10, 10, 10 ],
+			"visible"  : true
 		},
 
 		"quad_bg" : {
 			"geometry" : "quad",
-			"materials": [ "textured_bg" ],
+			"material" : "textured_bg",
 			"position" : [ 0, 15, -90 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 20, 20, 20 ],
@@ -215,7 +281,7 @@
 
 		"quad_texture1" : {
 			"geometry" : "quad",
-			"materials": [ "textured_compressed_dxt3" ],
+			"material" : "textured_compressed_dxt3",
 			"position" : [ 15, -5, 20 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -224,7 +290,7 @@
 
 		"quad_texture2" : {
 			"geometry" : "quad",
-			"materials": [ "textured_compressed_dxt5" ],
+			"material" : "textured_compressed_dxt5",
 			"position" : [ 15, -5, 25 ],
 			"rotation" : [ 0, 0, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
@@ -233,11 +299,47 @@
 
 		"ground" : {
 			"geometry" : "plane",
-			"materials": [ "basic_gray" ],
+			"material" : "basic_gray",
 			"position" : [ 0, -10, 0 ],
 			"rotation" : [ -1.57, 0, 0 ],
 			"scale"	   : [ 100, 100, 100 ],
 			"visible"  : true
+		},
+
+		"light1": {
+			"type"		 : "DirectionalLight",
+			"direction"	 : [ 0, 1, 1 ],
+			"color" 	 : 16777215,
+			"intensity"	 : 1
+		},
+
+		"light2": {
+			"type"	  : "PointLight",
+			"position": [ 0, 0, 0 ],
+			"color"   : 16777215,
+			"intensity"	 : 1.25
+		},
+
+		"camera1": {
+			"type"  : "PerspectiveCamera",
+			"fov"   : 50,
+			"aspect": 1.33333,
+			"near"  : 1,
+			"far"   : 1000,
+			"position": [ 0, 0, 100 ],
+			"target"  : [ 0, 0, 0 ]
+		},
+
+		"camera2": {
+			"type"  : "OrthographicCamera",
+			"left"  : 0,
+			"right" : 1024,
+			"top"   : 0,
+			"bottom": 1024,
+			"near"  : 1,
+			"far"   : 1000,
+			"position": [ 0, 0, 0 ],
+			"target"  : [ 0, 0, 0 ]
 		}
 
 	},
@@ -249,9 +351,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -261,9 +363,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -273,9 +375,9 @@
 			"width" : 10,
 			"height": 10,
 			"depth" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1,
-			"segmentsDepth"  : 1,
+			"widthSegments"  : 1,
+			"heightSegments" : 1,
+			"depthSegments"  : 1,
 			"flipped" : false,
 			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
 		},
@@ -284,30 +386,30 @@
 			"type"   : "plane",
 			"width"  : 10,
 			"height" : 10,
-			"segmentsWidth"  : 50,
-			"segmentsHeight" : 50
+			"widthSegments"  : 50,
+			"heightSegments" : 50
 		},
 
 		"quad": {
 			"type"   : "plane",
 			"width"  : 10,
 			"height" : 10,
-			"segmentsWidth"  : 1,
-			"segmentsHeight" : 1
+			"widthSegments"  : 1,
+			"heightSegments" : 1
 		},
 
 		"sphere": {
 			"type"    : "sphere",
 			"radius"  : 5,
-			"segmentsWidth"  : 32,
-			"segmentsHeight" : 16
+			"widthSegments"  : 32,
+			"heightSegments" : 16
 		},
 
 		"sphere_uvs": {
 			"type"    : "sphere",
 			"radius"  : 5,
-			"segmentsWidth"  : 32,
-			"segmentsHeight" : 16
+			"widthSegments"  : 32,
+			"heightSegments" : 16
 		},
 
 		"icosahedron": {
@@ -362,6 +464,16 @@
 			"url" : "models/animated/sittingBox.js"
 		},
 
+		"knight": {
+			"type": "ascii",
+			"url" : "models/skinned/knight.js"
+		},
+
+		"man": {
+			"type": "binary",
+			"url" : "obj/male02/Male02_bin.js"
+		},
+
 		"ben": {
 			"type": "ctm",
 			"url" : "models/ctm/ben.ctm",
@@ -369,13 +481,14 @@
 			"useBuffers" : true
 		},
 
-		"hand": {
-			"type": "utf8",
-			"url" : "models/utf8/hand.utf8",
-			"scale"   : 0.815141,
-			"offsetX" : -0.371823,
-			"offsetY" : -0.011920,
-			"offsetZ" : -0.416061
+		"bunny": {
+			"type": "vtk",
+			"url" : "models/vtk/bunny.vtk"
+		},
+
+		"disk": {
+			"type": "stl",
+			"url" : "models/stl/slotted_disk.stl"
 		},
 
 		"colorcube": {
@@ -450,9 +563,29 @@
 			"parameters": { "color": 1118481, "ambient": 1118481, "specular": 5601245, "shininess": 12, "bumpMap": "texture_bump_repeat", "bumpScale": 0.125 }
 		},
 
+		"phong_man": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16737894, "ambient": 16737894, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+		},
+
 		"phong_hand": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 14531481, "ambient": 14531481, "specular": 2236962, "shininess": 40, "wrapAround": true, "wrapRGB": [ 0.15, 0.02, 0.01 ] }
+		},
+
+		"phong_bunny": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+		},
+
+		"phong_monster": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16777215, "ambient": 16777215, "specular": 1118481, "shininess": 10 }
+		},
+
+		"phong_disk": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 16733491, "ambient": 16733491, "specular": 1118481, "shininess": 30, "wireframe": false }
 		},
 
 		"phong_normal": {
@@ -463,6 +596,11 @@
 		"phong_morph": {
 			"type": "MeshPhongMaterial",
 			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.125, "combine": "MixOperation", "shading": "flat", "side": "double", "morphTargets": true, "morphNormals" : true }
+		},
+
+		"phong_skin": {
+			"type": "MeshPhongMaterial",
+			"parameters": { "color": 0, "ambient": 0, "specular": 16777215, "shininess": 50, "envMap": "cube_reflection", "reflectivity": 0.5, "combine": "MixOperation", "skinning": true, "morphTargets": true }
 		},
 
 		"phong_compressed_cube": {
@@ -548,6 +686,21 @@
 		"face": {
 			"type": "MeshFaceMaterial",
 			"parameters": {}
+		},
+
+		"multi_1": {
+			"type": "MeshFaceMaterial",
+			"parameters": {}
+		},
+
+		"multi_2": {
+			"type": "MeshFaceMaterial",
+			"parameters": { "materials": [ "phong_compressed_cube", "phong_man", "phong_hand", "minecraft", "backsignals" ] }
+		},
+
+		"multi_veyron": {
+			"type": "MeshFaceMaterial",
+			"parameters": { "materials": [ "interior", "chrome", "darkerchrome", "glass", "chrome", "chrome", "backlights", "backsignals" ] }
 		}
 
 	},
@@ -643,47 +796,6 @@
 
 	},
 
-	"cameras": {
-		"cam1": {
-			"type"  : "perspective",
-			"fov"   : 50,
-			"aspect": 1.33333,
-			"near"  : 1,
-			"far"   : 1000,
-			"position": [0,0,100],
-			"target"  : [0,0,0]
-		},
-
-		"cam2": {
-			"type"  : "ortho",
-			"left"  : 0,
-			"right" : 1024,
-			"top"   : 0,
-			"bottom": 1024,
-			"near"  : 1,
-			"far"   : 1000,
-			"position": [0,0,0],
-			"target"  : [0,0,0]
-		}
-
-	},
-
-	"lights": {
-		"light1": {
-			"type"		 : "directional",
-			"direction"	 : [0,1,1],
-			"color" 	 : 16777215,
-			"intensity"	 : 1
-		},
-
-		"light2": {
-			"type"	  : "point",
-			"position": [0,0,0],
-			"color"   : 16777215,
-			"intensity"	 : 1.25
-		}
-	},
-
 	"fogs":	{
 		"basic": {
 			"type": "linear",
@@ -708,7 +820,7 @@
 	"defaults": {
 		"bgcolor": [0,0,0],
 		"bgalpha": 1,
-		"camera": "cam1",
+		"camera": "camera1",
 		"fog": "black"
 	}
 

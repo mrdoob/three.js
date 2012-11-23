@@ -12,7 +12,13 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
 			a { color: #f00 }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #666 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
@@ -105,7 +111,7 @@
 					morphColorsToFaceColors( geometry );
 					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading, perPixel: false } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 					meshAnim.duration = 5000;
@@ -134,13 +140,6 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#666";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 				container.appendChild( stats.domElement );
 
 				//

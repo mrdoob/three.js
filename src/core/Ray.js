@@ -69,11 +69,9 @@
 
 	var intersectObject = function ( object, ray, intersects ) {
 
-		var distance,intersect;
-
 		if ( object instanceof THREE.Particle ) {
 
-			distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
+			var distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
 
 			if ( distance > object.scale.x ) {
 
@@ -81,16 +79,14 @@
 
 			}
 
-			intersect = {
+			intersects.push( {
 
 				distance: distance,
 				point: object.position,
 				face: null,
 				object: object
 
-			};
-
-			intersects.push( intersect );
+			} );
 
 		} else if ( object instanceof THREE.Mesh ) {
 
@@ -100,7 +96,7 @@
 
 			// Checking distance to ray
 
-			distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
+			var distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
 
 			if ( distance > scaledRadius) {
 
@@ -110,15 +106,13 @@
 
 			// Checking faces
 
-			var f, fl, face, dot, scalar,
-			geometry = object.geometry,
-			vertices = geometry.vertices,
-			objMatrix, geometryMaterials,
-			isFaceMaterial, material, side, point;
+			var geometry = object.geometry;
+			var vertices = geometry.vertices;
 
-			geometryMaterials = object.geometry.materials;
-			isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-			side = object.material.side;
+			var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
+			var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
+
+			var side = object.material.side;
 
 			var a, b, c, d;
 			var precision = ray.precision;
@@ -127,8 +121,7 @@
 
 			originCopy.copy( ray.origin );
 
-			objMatrix = object.matrixWorld;
-			inverseMatrix.getInverse( objMatrix );
+			inverseMatrix.getInverse( object.matrixWorld );
 
 			localOriginCopy.copy( originCopy );
 			inverseMatrix.multiplyVector3( localOriginCopy );
@@ -136,17 +129,20 @@
 			localDirectionCopy.copy( ray.direction );
 			inverseMatrix.rotateAxis( localDirectionCopy ).normalize();
 
-			for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
-				face = geometry.faces[ f ];
+				var face = geometry.faces[ f ];
 
-				material = isFaceMaterial === true ? geometryMaterials[ face.materialIndex ] : object.material;
+				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : object.material;
+
 				if ( material === undefined ) continue;
+
 				side = material.side;
 
 				vector.sub( face.centroid, localOriginCopy );
-				normal = face.normal;
-				dot = localDirectionCopy.dot( normal );
+
+				var normal = face.normal;
+				var dot = localDirectionCopy.dot( normal );
 
 				// bail if ray and plane are parallel
 
@@ -154,7 +150,7 @@
 
 				// calc distance to plane
 
-				scalar = normal.dot( vector ) / dot;
+				var scalar = normal.dot( vector ) / dot;
 
 				// if negative distance, then plane is behind ray
 
@@ -172,12 +168,12 @@
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
-							point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
+							var point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
 							distance = originCopy.distanceTo( point );
 
 							if ( distance < ray.near || distance > ray.far ) continue;
 
-							intersect = {
+							intersects.push( {
 
 								distance: distance,
 								point: point,
@@ -185,9 +181,7 @@
 								faceIndex: f,
 								object: object
 
-							};
-
-							intersects.push( intersect );
+							} );
 
 						}
 
@@ -200,12 +194,12 @@
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
-							point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
+							var point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
 							distance = originCopy.distanceTo( point );
 
 							if ( distance < ray.near || distance > ray.far ) continue;
 
-							intersect = {
+							intersects.push( {
 
 								distance: distance,
 								point: point,
@@ -213,9 +207,7 @@
 								faceIndex: f,
 								object: object
 
-							};
-
-							intersects.push( intersect );
+							} );
 
 						}
 

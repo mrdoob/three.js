@@ -141,6 +141,12 @@ THREE.Color.prototype = {
 
 	},
 
+	getHex: function () {
+
+		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
+
+	},
+
 	setHex: function ( hex ) {
 
 		hex = Math.floor( hex );
@@ -153,6 +159,99 @@ THREE.Color.prototype = {
 
 	},
 
+	getHexString: function () {
+
+		return ( '000000' + this.getHex().toString( 16 ) ).slice( - 6 );
+
+	},
+
+	getContextStyle: function () {
+
+		return 'rgb(' + ( ( this.r * 255 ) | 0 )  + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+
+	},
+
+	setContextStyle: function ( style ) {
+
+		var color = /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/i.exec( style );
+
+		this.r = parseInt( color[ 1 ], 10 ) / 255;
+		this.g = parseInt( color[ 2 ], 10 ) / 255;
+		this.b = parseInt( color[ 3 ], 10 ) / 255;
+
+		return this;
+
+	},
+
+	getHSV: function ( hsv ) {
+
+		// based on MochiKit implementation by Bob Ippolito
+		// h,s,v ranges are < 0.0 - 1.0 >
+
+		var r = this.r;
+		var g = this.g;
+		var b = this.b;
+
+		var max = Math.max( Math.max( r, g ), b );
+		var min = Math.min( Math.min( r, g ), b );
+
+		var hue;
+		var saturation;
+		var value = max;
+
+		if ( min === max )	{
+
+			hue = 0;
+			saturation = 0;
+
+		} else {
+
+			var delta = ( max - min );
+			saturation = delta / max;
+
+			if ( r === max ) {
+
+				hue = ( g - b ) / delta;
+
+			} else if ( g === max ) {
+
+				hue = 2 + ( ( b - r ) / delta );
+
+			} else	{
+
+				hue = 4 + ( ( r - g ) / delta );
+			}
+
+			hue /= 6;
+
+			if ( hue < 0 ) {
+
+				hue += 1;
+
+			}
+
+			if ( hue > 1 ) {
+
+				hue -= 1;
+
+			}
+
+		}
+
+		if ( hsv === undefined ) {
+
+			hsv = { h: 0, s: 0, v: 0 };
+
+		}
+
+		hsv.h = hue;
+		hsv.s = saturation;
+		hsv.v = value;
+
+		return hsv;
+
+	},
+
 	lerpSelf: function ( color, alpha ) {
 
 		this.r += ( color.r - this.r ) * alpha;
@@ -160,18 +259,6 @@ THREE.Color.prototype = {
 		this.b += ( color.b - this.b ) * alpha;
 
 		return this;
-
-	},
-
-	getHex: function () {
-
-		return ( this.r * 255 ) << 16 ^ ( this.g * 255 ) << 8 ^ ( this.b * 255 ) << 0;
-
-	},
-
-	getContextStyle: function () {
-
-		return 'rgb(' + ( ( this.r * 255 ) | 0 )  + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
 
 	},
 

@@ -20,16 +20,6 @@ THREE.GeometryUtils = {
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
-		var geo1MaterialsMap = {};
-
-		for ( var i = 0; i < geometry1.materials.length; i ++ ) {
-
-			var id = geometry1.materials[ i ].id;
-
-			geo1MaterialsMap[ id ] = i;
-
-		}
-
 		if ( object2 instanceof THREE.Mesh ) {
 
 			object2.matrixAutoUpdate && object2.updateMatrix();
@@ -95,25 +85,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			if ( face.materialIndex !== undefined ) {
-
-				var material2 = geometry2.materials[ face.materialIndex ];
-				var materialId2 = material2.id;
-
-				var materialIndex = geo1MaterialsMap[ materialId2 ];
-
-				if ( materialIndex === undefined ) {
-
-					materialIndex = geometry1.materials.length;
-					geo1MaterialsMap[ materialId2 ] = materialIndex;
-
-					geometry1.materials.push( material2 );
-
-				}
-
-				faceCopy.materialIndex = materialIndex;
-
-			}
+			faceCopy.materialIndex = face.materialIndex;
 
 			faceCopy.centroid.copy( face.centroid );
 			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
@@ -140,61 +112,26 @@ THREE.GeometryUtils = {
 
 	},
 
-	clone: function ( geometry ) {
+	removeMaterials: function ( geometry, materialIndexArray ) {
 
-		var cloneGeo = new THREE.Geometry();
+		var materialIndexMap = {};
 
-		var i, il;
+		for ( var i = 0, il = materialIndexArray.length; i < il; i ++ ) {
 
-		var vertices = geometry.vertices,
-			faces = geometry.faces,
-			uvs = geometry.faceVertexUvs[ 0 ];
-
-		// materials
-
-		if ( geometry.materials ) {
-
-			cloneGeo.materials = geometry.materials.slice();
+			materialIndexMap[ materialIndexArray[i] ] = true;
 
 		}
 
-		// vertices
+		var face, newFaces = [];
 
-		for ( i = 0, il = vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
-			var vertex = vertices[ i ];
-
-			cloneGeo.vertices.push( vertex.clone() );
-
-		}
-
-		// faces
-
-		for ( i = 0, il = faces.length; i < il; i ++ ) {
-
-			var face = faces[ i ];
-
-			cloneGeo.faces.push( face.clone() );
+			face = geometry.faces[ i ];
+			if ( ! ( face.materialIndex in materialIndexMap ) ) newFaces.push( face );
 
 		}
 
-		// uvs
-
-		for ( i = 0, il = uvs.length; i < il; i ++ ) {
-
-			var uv = uvs[ i ], uvCopy = [];
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
-
-			}
-
-			cloneGeo.faceVertexUvs[ 0 ].push( uvCopy );
-
-		}
-
-		return cloneGeo;
+		geometry.faces = newFaces;
 
 	},
 

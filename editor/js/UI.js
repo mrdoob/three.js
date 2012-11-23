@@ -4,6 +4,16 @@ UI.Element = function () {};
 
 UI.Element.prototype = {
 
+	setClass: function ( name ) {
+
+		this.dom.className = name;
+
+		return this;
+
+	},
+
+	// styles
+
 	setStyle: function ( style, array ) {
 
 		for ( var i = 0; i < array.length; i ++ ) {
@@ -62,7 +72,7 @@ UI.Element.prototype = {
 
 	},
 
-	// border
+	//
 
 	setBorder: function () {
 
@@ -104,7 +114,7 @@ UI.Element.prototype = {
 
 	},
 
-	// margin
+	//
 
 	setMargin: function () {
 
@@ -146,11 +156,21 @@ UI.Element.prototype = {
 
 	},
 
-	// padding
+	//
 
 	setPadding: function () {
 
 		this.setStyle( 'padding', arguments );
+
+		return this;
+
+	},
+
+	//
+
+	setFloat: function () {
+
+		this.setStyle( 'float', arguments );
 
 		return this;
 
@@ -206,8 +226,53 @@ UI.Element.prototype = {
 
 		return this;
 
-	}
+	},
 
+	//
+
+	setCursor: function () {
+
+		this.setStyle( 'cursor', arguments );
+
+		return this;
+
+	},
+
+	// content
+
+	setTextContent: function ( value ) {
+
+		this.dom.textContent = value;
+
+		return this;
+
+	},
+
+	// events
+
+	onMouseOver: function ( callback ) {
+
+		this.dom.addEventListener( 'mouseover', callback, false );
+
+		return this;
+
+	},
+
+	onMouseOut: function ( callback ) {
+
+		this.dom.addEventListener( 'mouseout', callback, false );
+
+		return this;
+
+	},
+
+	onClick: function ( callback ) {
+
+		this.dom.addEventListener( 'click', callback, false );
+
+		return this;
+
+	}
 
 }
 
@@ -218,11 +283,15 @@ UI.Panel = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'div' );
-	this.dom.style.position = position || 'relative';
-	this.dom.style.marginBottom = '10px';
+	var dom = document.createElement( 'div' );
+	dom.style.position = position || 'relative';
+	dom.style.marginBottom = '10px';
 
-	// this.dom.addEventListener( 'mousedown', function ( event ) { event.preventDefault() }, false );
+	dom.style.userSelect = 'none';
+	dom.style.WebkitUserSelect = 'none';
+	dom.style.MozUserSelect = 'none';
+
+	this.dom = dom;
 
 	return this;
 };
@@ -248,8 +317,11 @@ UI.Text = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'span' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'span' );
+	dom.style.position = position || 'relative';
+	dom.style.cursor = 'default';
+
+	this.dom = dom;
 
 	return this;
 
@@ -274,10 +346,14 @@ UI.Input = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'input' );
-	this.dom.style.position = position || 'relative';
-	this.dom.style.marginTop = '-2px';
-	this.dom.style.marginLeft = '-2px';
+	var dom = document.createElement( 'input' );
+	dom.style.position = position || 'relative';
+	dom.style.padding = '2px';
+	dom.style.marginTop = '-2px';
+	dom.style.marginLeft = '-2px';
+	dom.style.border = '1px solid #ccc';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -324,12 +400,14 @@ UI.Select = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'select' );
-	this.dom.style.position = position || 'relative';
-	this.dom.style.width = '64px';
-	this.dom.style.height = '16px';
-	this.dom.style.border = '0px';
-	this.dom.style.padding = '0px';
+	var dom = document.createElement( 'select' );
+	dom.style.position = position || 'relative';
+	dom.style.width = '64px';
+	dom.style.height = '16px';
+	dom.style.border = '0px';
+	dom.style.padding = '0px';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -396,6 +474,127 @@ UI.Select.prototype.onChange = function ( callback ) {
 
 };
 
+// FancySelect
+
+UI.FancySelect = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'div' );
+	dom.style.position = position || 'relative';
+	dom.style.background = '#fff';
+	dom.style.border = '1px solid #ccc';
+	dom.style.padding = '0';
+	dom.style.cursor = 'default';
+	dom.style.overflow = 'auto';
+
+	this.dom = dom;
+
+	this.onChangeCallback = null;
+
+	this.options = [];
+	this.selectedValue = null;
+
+	return this;
+
+};
+
+UI.FancySelect.prototype = Object.create( UI.Element.prototype );
+
+UI.FancySelect.prototype.setOptions = function ( options ) {
+
+	var scope = this;
+
+	while ( scope.dom.children.length > 0 ) {
+
+		scope.dom.removeChild( scope.dom.firstChild );
+
+	}
+
+	scope.options = [];
+
+	var generateOptionCallback = function ( element, value ) {
+
+		return function ( event ) {
+
+			for ( var i = 0; i < scope.options.length; i ++ ) {
+
+				scope.options[ i ].style.backgroundColor = '#f0f0f0';
+
+			}
+
+			element.style.backgroundColor = '#f0f0f0';
+
+			scope.selectedValue = value;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+		}
+
+	};
+
+	for ( var key in options ) {
+
+		var option = document.createElement( 'div' );
+		option.style.padding = '4px';
+		option.style.whiteSpace = 'nowrap';
+		option.innerHTML = options[ key ];
+		option.value = key;
+		scope.dom.appendChild( option );
+
+		scope.options.push( option );
+		option.addEventListener( 'click', generateOptionCallback( option, key ), false );
+
+	}
+
+	return scope;
+
+};
+
+UI.FancySelect.prototype.getValue = function () {
+
+	return this.selectedValue;
+
+};
+
+UI.FancySelect.prototype.setValue = function ( value ) {
+
+	// must convert raw value into string for compatibility with UI.Select
+	// which uses string values (initialized from options keys)
+
+	var key = value ? value.toString() : value;
+
+	for ( var i = 0; i < this.options.length; i ++ ) {
+
+		var element = this.options[ i ];
+
+		if ( element.value === key ) {
+
+			element.style.backgroundColor = '#f0f0f0';
+
+		} else {
+
+			element.style.backgroundColor = '';
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	return this;
+
+};
+
+UI.FancySelect.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
 
 // Checkbox
 
@@ -405,9 +604,11 @@ UI.Checkbox = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'checkbox';
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'input' );
+	dom.type = 'checkbox';
+	dom.style.position = position || 'relative';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -454,14 +655,16 @@ UI.Color = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'color';
-	this.dom.style.position = position || 'relative';
-	this.dom.style.width = '64px';
-	this.dom.style.height = '16px';
-	this.dom.style.border = '0px';
-	this.dom.style.padding = '0px';
-	this.dom.style.backgroundColor = 'transparent';
+	var dom = document.createElement( 'input' );
+	dom.type = 'color';
+	dom.style.position = position || 'relative';
+	dom.style.width = '64px';
+	dom.style.height = '16px';
+	dom.style.border = '0px';
+	dom.style.padding = '0px';
+	dom.style.backgroundColor = 'transparent';
+
+	this.dom = dom;
 
 	this.onChangeCallback = null;
 
@@ -483,9 +686,23 @@ UI.Color.prototype.getValue = function () {
 
 };
 
+UI.Color.prototype.getHexValue = function () {
+
+	return parseInt( this.dom.value.substr( 1 ), 16 );
+
+};
+
 UI.Color.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.Color.prototype.setHexValue = function ( hex ) {
+
+	this.dom.value = "#" + ( '000000' + hex.toString( 16 ) ).slice( -6 );
 
 	return this;
 
@@ -508,26 +725,25 @@ UI.Number = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'span' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'input' );
+	dom.style.position = position || 'relative';
+	dom.style.color = '#0080f0';
+	dom.style.fontSize = '12px';
+	dom.style.backgroundColor = 'transparent';
+	dom.style.border = '1px solid transparent';
+	dom.style.marginTop = '-2px';
+	dom.style.marginLegt = '-2px';
+	dom.style.padding = '2px';
+	dom.style.cursor = 'col-resize';
+	dom.value = '0.00';
 
-	var display = document.createElement( 'span' );
-	display.style.color = '#0080f0';
-	display.style.fontSize = '12px';
-	display.style.cursor = 'col-resize';
-	display.textContent = '0.00';
-	this.dom.appendChild( display );
-
-	var input = document.createElement( 'input' );
-	input.style.display = 'none';
-	input.style.width = '100%';
-	input.style.marginTop = '-2px';
-	input.style.marginLeft = '-2px';
-	input.style.fontSize = '12px';
-	this.dom.appendChild( input );
+	this.dom = dom;
 
 	this.min = - Infinity;
 	this.max = Infinity;
+
+	this.precision = 2;
+	this.step = 1;
 
 	this.onChangeCallback = null;
 
@@ -540,7 +756,7 @@ UI.Number = function ( position ) {
 
 		distance = 0;
 
-		onMouseDownValue = parseFloat( display.textContent );
+		onMouseDownValue = parseFloat( dom.value );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -554,9 +770,9 @@ UI.Number = function ( position ) {
 
 		distance += movementX - movementY;
 
-		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) );
+		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) ) * scope.step;
 
-		display.textContent = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( 2 );
+		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -567,32 +783,22 @@ UI.Number = function ( position ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		if ( Math.abs( distance ) < 1 ) {
+		if ( Math.abs( distance ) < 2 ) {
 
-			display.style.display = 'none';
-
-			input.value = display.textContent;
-
-			input.addEventListener( 'change', onInputChange, false );
-			input.addEventListener( 'blur', onInputBlur, false );
-			input.addEventListener( 'keyup', onInputKeyUp, false );
-
-			input.style.display = '';
-
-			input.focus();
-			input.select();
+			dom.focus();
+			dom.select();
 
 		}
 
 	};
 
-	var onInputChange = function ( event ) {
+	var onChange = function ( event ) {
 
-		var number = parseFloat( input.value );
+		var number = parseFloat( dom.value );
 
 		if ( isNaN( number ) === false ) {
 
-			display.textContent = number.toFixed( 2 );
+			dom.value = number;
 
 			if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -600,33 +806,26 @@ UI.Number = function ( position ) {
 
 	};
 
-	var onInputBlur = function ( event ) {
+	var onFocus = function ( event ) {
 
-		display.style.display = '';
-
-		input.removeEventListener( 'change', onInputChange );
-		input.removeEventListener( 'blur', onInputBlur );
-		input.removeEventListener( 'keyup', onInputKeyUp );
-		input.style.display = 'none';
+		dom.style.backgroundColor = '';
+		dom.style.borderColor = '#ccc';
+		dom.style.cursor = '';
 
 	};
 
-	var onInputKeyUp = function ( event ) {
+	var onBlur = function ( event ) {
 
-		if ( event.keyCode == 13 ) {
-
-			display.style.display = '';
-
-			input.removeEventListener( 'change', onInputChange );
-			input.removeEventListener( 'blur', onInputBlur );
-			input.removeEventListener( 'keyup', onInputKeyUp );
-			input.style.display = 'none';
-
-		}
+		dom.style.backgroundColor = 'transparent';
+		dom.style.borderColor = 'transparent';
+		dom.style.cursor = 'col-resize';
 
 	};
 
-	display.addEventListener( 'mousedown', onMouseDown, false );
+	dom.addEventListener( 'mousedown', onMouseDown, false );
+	dom.addEventListener( 'change', onChange, false );
+	dom.addEventListener( 'focus', onFocus, false );
+	dom.addEventListener( 'blur', onBlur, false );
 
 	return this;
 
@@ -636,13 +835,13 @@ UI.Number.prototype = Object.create( UI.Element.prototype );
 
 UI.Number.prototype.getValue = function () {
 
-	return parseFloat( this.dom.children[ 0 ].textContent );
+	return parseFloat( this.dom.value );
 
 };
 
 UI.Number.prototype.setValue = function ( value ) {
 
-	this.dom.children[ 0 ].textContent = value.toFixed( 2 );
+	this.dom.value = value.toFixed( this.precision );
 
 	return this;
 
@@ -652,6 +851,20 @@ UI.Number.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
 	this.max = max;
+
+	return this;
+
+};
+
+UI.Number.prototype.setPrecision = function ( precision ) {
+
+	this.precision = precision;
+
+	if ( precision > 2 ) {
+
+		this.step = Math.pow( 10, -( precision - 1 ) );
+
+	}
 
 	return this;
 
@@ -672,7 +885,9 @@ UI.Break = function () {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'br' );
+	var dom = document.createElement( 'br' );
+
+	this.dom = dom;
 
 	return this;
 
@@ -687,8 +902,10 @@ UI.HorizontalRule = function ( position ) {
 
 	UI.Element.call( this );
 
-	this.dom = document.createElement( 'hr' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'hr' );
+	dom.style.position = position || 'relative';
+
+	this.dom = dom;
 
 	return this;
 
@@ -705,8 +922,10 @@ UI.Button = function ( position ) {
 
 	var scope = this;
 
-	this.dom = document.createElement( 'button' );
-	this.dom.style.position = position || 'relative';
+	var dom = document.createElement( 'button' );
+	dom.style.position = position || 'relative';
+
+	this.dom = dom;
 
 	this.onClickCallback = null;
 

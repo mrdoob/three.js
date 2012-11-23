@@ -42,6 +42,10 @@
 		  display: none;
 		}
 
+		#stats { position: absolute; top:0; left: 0 }
+		#stats #fps { background: transparent !important }
+		#stats #fps #fpsText { color: #aaa !important }
+		#stats #fps #fpsGraph { display: none }
 	</style>
 </head>
 
@@ -75,7 +79,7 @@
 
 	<script src="js/Detector.js"></script>
 	<script src="js/libs/stats.min.js"></script>
-	<script src="js/libs/DAT.GUI.min.js"></script>
+	<script src="js/libs/dat.gui.min.js"></script>
 
 
 	<script>
@@ -114,10 +118,6 @@
 
 			camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 			camera.position.set( -500, 500, 1500 );
-
-			// CONTROLS
-
-			controls = new THREE.TrackballControls( camera );
 
 			// SCENE
 
@@ -165,22 +165,21 @@
 			renderer.domElement.style.left = "0px";
 
 			container.appendChild( renderer.domElement );
+
 			//
 
 			renderer.gammaInput = true;
 			renderer.gammaOutput = true;
 			renderer.physicallyBasedShading = true;
 
+			// CONTROLS
+
+			controls = new THREE.TrackballControls( camera, renderer.domElement );
+
 			// STATS
 
 			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
-
-			stats.domElement.children[ 0 ].children[ 0 ].style.color = "#888";
-			stats.domElement.children[ 0 ].style.background = "transparent";
-			stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 			// COMPOSER
 
@@ -307,37 +306,37 @@
 
 			"shiny"  :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, perPixel: true, metal: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, metal: true } ),
 				h: 0, s: 0.9, v: 0.3
 			},
 
 			"matte" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1 } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"flat" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"textured" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"colors" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors } ),
 				h: 0, s: 0, v: 1
 			},
 
 			"plastic" :
 			{
-				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250, perPixel: true } ),
+				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250 } ),
 				h: 0.6, s: 0.9, v: 0.2
 			},
 
@@ -425,8 +424,6 @@
 					m_s.setValue( mat.s );
 					m_v.setValue( mat.v );
 
-					mm.setValue( current_material );
-
 					if ( current_material === "textured" ) {
 
 						effect.enableUvs = true;
@@ -450,20 +447,6 @@
 				};
 
 			};
-
-			function toggle( e ) {
-
-				if ( e.style.display === "block" ) {
-
-					e.style.display = "none";
-
-				} else {
-
-					e.style.display = "block";
-
-				}
-
-			}
 
 			effectController = {
 
@@ -492,161 +475,67 @@
 
 			postprocessing: false,
 
-			h_m:  function() {
-			  for (var i = 0; i < g_m.length; i++)  toggle(g_m[ i ].domElement);
-			},
-			h_c:  function() {
-			  for (var i = 0; i < g_c.length; i++)  toggle(g_c[ i ].domElement);
-			},
-			h_pc: function() {
-			  for (var i = 0; i < g_pc.length; i++) toggle(g_pc[ i ].domElement);
-			},
-			h_do: function() {
-			  for (var i = 0; i < g_do.length; i++) toggle(g_do[ i ].domElement);
-			},
-			h_s:  function() {
-			  for (var i = 0; i < g_s.length; i++)  toggle(g_s[ i ].domElement);
-			},
-			h_r:  function() {
-			  for (var i = 0; i < g_r.length; i++)  toggle(g_r[ i ].domElement);
-			},
-
 			dummy: function() {
 			}
 
 			};
 
-			var e1, e2, e3, e4, e5, e6, h, m_h, m_s, m_v,
-			g_m = [], g_c, g_pc, g_do, g_s, g_r, mm,
-			gui = new DAT.GUI();
+			var h, m_h, m_s, m_v;
+
+			var gui = new dat.GUI();
 
 			// material (type)
 
-			mm = gui.add( effectController, "material" );
-			mm.domElement.style.display = "none";
-
-			h = gui.add( effectController, "h_m" ).name( "Materials" );
-			setGuiHeaderStyle(h, 0, 65, 50);
+			h = gui.addFolder( "Materials" );
 
 			for ( var m in materials ) {
 
 				effectController[ m ] = createHandler( m );
-
-				e1 = gui.add( effectController, m ).name( m );
-				setGuiElementStyle( [ e1 ], 0, 65, 50, "block" );
-				g_m.push( e1 );
+				h.add( effectController, m ).name( m );
 
 			}
 
 			// material (color)
 
-			h = gui.add( effectController, "h_c" ).name( "Material color" );
+			h = gui.addFolder( "Material color" );
 
-			m_h = gui.add( effectController, "hue", 0.0, 1.0, 0.025 );
-			m_s = gui.add( effectController, "saturation", 0.0, 1.0, 0.025 );
-			m_v = gui.add( effectController, "value", 0.0, 1.0, 0.025 );
-
-			g_c = [ m_h, m_s, m_v ];
-
-			setGuiHeaderStyle( h, 20, 65, 50 );
-			setGuiElementStyle( g_c, 20, 65, 50, "block" );
+			m_h = h.add( effectController, "hue", 0.0, 1.0, 0.025 );
+			m_s = h.add( effectController, "saturation", 0.0, 1.0, 0.025 );
+			m_v = h.add( effectController, "value", 0.0, 1.0, 0.025 );
 
 			// light (point)
 
-			h = gui.add(effectController, "h_pc").name("Point light color");
+			h = gui.addFolder( "Point light color" );
 
-			e1 = gui.add(effectController, "lhue", 0.0, 1.0, 0.025).name("hue");
-			e2 = gui.add(effectController, "lsaturation", 0.0, 1.0, 0.025).name("saturation");
-			e3 = gui.add(effectController, "lvalue", 0.0, 1.0, 0.025).name("value");
-
-			g_pc = [ e1, e2, e3 ];
-
-			setGuiHeaderStyle(h, 50, 65, 50);
-			setGuiElementStyle(g_pc, 50, 65, 50);
+			h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name("hue");
+			h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name("saturation");
+			h.add( effectController, "lvalue", 0.0, 1.0, 0.025 ).name("value");
 
 			// light (directional)
 
-			h = gui.add(effectController, "h_do").name("Directional light orientation");
+			h = gui.addFolder( "Directional light orientation" );
 
-			e1 = gui.add(effectController, "lx", -1.0, 1.0, 0.025).name("x");
-			e2 = gui.add(effectController, "ly", -1.0, 1.0, 0.025).name("y");
-			e3 = gui.add(effectController, "lz", -1.0, 1.0, 0.025).name("z");
-
-			g_do = [ e1, e2, e3 ];
-
-			setGuiHeaderStyle(h, 80, 65, 50);
-			setGuiElementStyle(g_do, 80, 65, 50);
+			h.add( effectController, "lx", -1.0, 1.0, 0.025 ).name("x");
+			h.add( effectController, "ly", -1.0, 1.0, 0.025 ).name("y");
+			h.add( effectController, "lz", -1.0, 1.0, 0.025 ).name("z");
 
 			// simulation
 
-			h = gui.add(effectController, "h_s").name("Simulation");
+			h = gui.addFolder( "Simulation" );
 
-			e1 = gui.add(effectController, "speed", 0.1, 8.0, 0.05);
-			e2 = gui.add(effectController, "numBlobs", 1, 50, 1);
-			e3 = gui.add(effectController, "resolution", 14, 40, 1);
-			e4 = gui.add(effectController, "isolation", 10, 300, 1);
+			h.add( effectController, "speed", 0.1, 8.0, 0.05 );
+			h.add( effectController, "numBlobs", 1, 50, 1 );
+			h.add( effectController, "resolution", 14, 40, 1 );
+			h.add( effectController, "isolation", 10, 300, 1 );
 
-			e5 = gui.add(effectController, "floor");
-			e6 = gui.add(effectController, "wallx");
-			e7 = gui.add(effectController, "wallz");
-
-			e5.updateDisplay();
-			e6.updateDisplay();
-			e7.updateDisplay();
-
-			g_s = [ e1, e2, e3, e4, e5, e6, e7 ];
-
-			setGuiHeaderStyle(h, 200, 65, 50);
-			setGuiElementStyle(g_s, 200, 65, 50, "block");
+			h.add( effectController, "floor" );
+			h.add( effectController, "wallx" );
+			h.add( effectController, "wallz" );
 
 			// rendering
 
-			h = gui.add(effectController, "h_r").name("Rendering");
-			e1 = gui.add(effectController, "postprocessing");
-
-			g_r = [ e1 ];
-
-			setGuiHeaderStyle(h, 225, 65, 50);
-			setGuiElementStyle(g_r, 225, 65, 50, "block");
-
-			// save
-
-			//e1 = gui.add(GUI, "saveURL").name("Save to URL");
-			//setGuiHeaderStyle(e1, 250, 65, 50, "block");
-
-			gui.domElement.style.backgroundColor = "#222";
-
-			// restore material from URL
-
-			id = mm.getValue()
-			current_material = id;
-			var mat = materials[ id ];
-			effect.material = mat.m;
-
-		}
-
-
-		function setGuiHeaderStyle( g, h, s, v ) {
-
-			var color = "hsl(" + h + "," + s + "%, " + v + "%)";
-
-			g.domElement.style.borderLeft = "solid 5px " + color;
-			g.domElement.style.background = color;
-			g.domElement.style.fontWeight = "bold";
-
-		}
-
-		function setGuiElementStyle( a, h, s, v, display ) {
-
-			var s, color = "hsl(" + h + "," + s + "%, " + v + "%)";
-
-			for ( i = 0; i < a.length; i ++ ) {
-
-				s = a[ i ].domElement.style;
-				s.borderLeft = "solid 5px " + color;
-				s.display = display ? display : "none";
-
-			}
+			h = gui.addFolder( "Rendering" );
+			h.add( effectController, "postprocessing" );
 
 		}
 

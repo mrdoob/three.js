@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>three.js - pointer lock</title>
+		<title>three.js - pointerlock controls</title>
 		<style>
 			html, body {
 				width: 100%;
@@ -189,7 +189,7 @@
 				light.position.set( -1, - 0.5, -1 );
 				scene.add( light );
 
-				controls = new PointerLockControls( camera );
+				controls = new THREE.PointerLockControls( camera );
 				scene.add( controls.getObject() );
 
 				ray = new THREE.Ray();

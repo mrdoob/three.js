@@ -7,6 +7,8 @@ THREE.JSONLoader = function ( showStatus ) {
 
 	THREE.Loader.call( this, showStatus );
 
+	this.withCredentials = false;
+
 };
 
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
@@ -15,7 +17,9 @@ THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
 
 	var scope = this;
 
-	texturePath = texturePath ? texturePath : this.extractUrlBase( url );
+	// todo: unify load API to for easier SceneLoader use
+
+	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
 
 	this.onLoadStart();
 	this.loadAjaxJSON( this, url, callback, texturePath );
@@ -27,6 +31,8 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 	var xhr = new XMLHttpRequest();
 
 	var length = 0;
+
+	xhr.withCredentials = this.withCredentials;
 
 	xhr.onreadystatechange = function () {
 
@@ -90,8 +96,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 	geometry = new THREE.Geometry(),
 	scale = ( json.scale !== undefined ) ? 1.0 / json.scale : 1.0;
 
-	this.initMaterials( geometry, json.materials, texturePath );
-
 	parseModel( scale );
 
 	parseSkin();
@@ -99,9 +103,6 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
-
-	if ( this.hasNormals( geometry ) ) geometry.computeTangents();
-
 
 	function parseModel( scale ) {
 
@@ -418,6 +419,10 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 	};
 
-	callback( geometry );
+	var materials = this.initMaterials( json.materials, texturePath );
+
+	if ( this.needsTangents( materials ) ) geometry.computeTangents();
+
+	callback( geometry, materials );
 
 };

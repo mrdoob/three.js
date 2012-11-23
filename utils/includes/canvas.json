@@ -30,7 +30,6 @@
 	"../src/loaders/BinaryLoader.js",
 	"../src/loaders/ImageLoader.js",
 	"../src/loaders/JSONLoader.js",
-	"../src/loaders/GeometryLoader.js",
 	"../src/loaders/SceneLoader.js",
 	"../src/loaders/TextureLoader.js",
 	"../src/materials/Material.js",

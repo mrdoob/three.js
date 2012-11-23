@@ -81,7 +81,7 @@
 			var composer;
 			var effectFXAA;
 
-			var textMesh1, textMesh2, textGeo, faceMaterial, textMaterialFront, textMaterialSide, parent;
+			var textMesh1, textMesh2, textGeo, material, parent;
 
 			var firstLetter = true;
 
@@ -222,10 +222,10 @@
 
 				}
 
-				faceMaterial = new THREE.MeshFaceMaterial();
-
-				textMaterialFront = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
-				textMaterialSide = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } );
+				material = new THREE.MeshFaceMaterial( [ 
+					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } ), // front
+					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
+				] );
 
 				parent = new THREE.Object3D();
 				parent.position.y = 100;
@@ -463,8 +463,6 @@
 
 				});
 
-				textGeo.materials = [ textMaterialFront, textMaterialSide ];
-
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
 
@@ -512,7 +510,7 @@
 
 				var centerOffset = -0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
-				textMesh1 = new THREE.Mesh( textGeo, faceMaterial );
+				textMesh1 = new THREE.Mesh( textGeo, material );
 
 				textMesh1.position.x = centerOffset;
 				textMesh1.position.y = hover;
@@ -525,7 +523,7 @@
 
 				if ( mirror ) {
 
-					textMesh2 = new THREE.Mesh( textGeo, faceMaterial );
+					textMesh2 = new THREE.Mesh( textGeo, material );
 
 					textMesh2.position.x = centerOffset;
 					textMesh2.position.y = -hover;

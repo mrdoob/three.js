@@ -34,8 +34,11 @@
 
 			#vt { display:none }
 			#vt, #vt a { color:orange; }
-			.code { }
 
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -166,7 +169,7 @@
 				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
 				mapHeight.format = THREE.RGBFormat;
 
-				var material = new THREE.MeshPhongMaterial( { ambient: 0x552811, color: 0x552811, specular: 0x333333, shininess: 25, perPixel: true, bumpMap: mapHeight, bumpScale: 19, metal: false } );
+				var material = new THREE.MeshPhongMaterial( { ambient: 0x552811, color: 0x552811, specular: 0x333333, shininess: 25, bumpMap: mapHeight, bumpScale: 19, metal: false } );
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -191,14 +194,6 @@
 				if ( statsEnabled ) {
 
 					stats = new Stats();
-					stats.domElement.style.position = 'absolute';
-					stats.domElement.style.top = '0px';
-					stats.domElement.style.zIndex = 100;
-
-					stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-					stats.domElement.children[ 0 ].style.background = "transparent";
-					stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 					container.appendChild( stats.domElement );
 
 				}

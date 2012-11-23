@@ -15,7 +15,9 @@
 				font-size:13px;
 				text-align:center;
 			}
+
 			a { color:skyblue }
+
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
@@ -26,6 +28,11 @@
 				z-index:100;
 				display:block;
 			}
+
+			#stats { position: absolute; top:5px; left: 0; z-index: 100 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -160,14 +167,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '5px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// EVENTS
 
@@ -183,9 +183,9 @@
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				var callbackScene   = function( geometry ) {
+				var callbackScene   = function( geometry, materials ) {
 
-					createScene( geometry,  0, 0, 0, 30 );
+					createScene( geometry, materials, 0, 0, 0, 30 );
 
 					var end = Date.now();
 
@@ -274,7 +274,6 @@
 						mm.shininess = 30;
 						mm.color.setHex( 0x404040 );
 						mm.metal = true;
-						mm.perPixel = true;
 
 						materials[ i ] = mm;
 
@@ -288,14 +287,14 @@
 
 			//
 
-			function createScene( geometry, x, y, z, s ) {
+			function createScene( geometry, materials, x, y, z, s ) {
 
 				loader.statusDomElement.style.display = "none";
 
 				THREE.GeometryUtils.center( geometry );
-				hackMaterials( geometry.materials );
+				hackMaterials( materials );
 
-				var material = new THREE.MeshFaceMaterial();
+				var material = new THREE.MeshFaceMaterial( materials );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( x, y, z );

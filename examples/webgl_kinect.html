@@ -38,7 +38,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src='js/libs/DAT.GUI.min.js'></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -198,11 +198,11 @@
 					}, 1000 / 30 );
 
 
-					var gui = new DAT.GUI();
-					gui.add( material.uniforms.nearClipping, 'value' ).name( 'nearClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
-					gui.add( material.uniforms.farClipping, 'value' ).name( 'farClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
-					gui.add( material.uniforms.pointSize, 'value' ).name( 'pointSize' ).min( 1 ).max( 10 ).step( 1.0 );
-					gui.add( material.uniforms.zOffset, 'value' ).name( 'zOffset' ).min( 0 ).max( 4000 ).step( 1.0 );
+					var gui = new dat.GUI();
+					gui.add( material.uniforms.nearClipping, 'value', 1, 10000, 1.0 ).name( 'nearClipping' );
+					gui.add( material.uniforms.farClipping, 'value', 1, 10000, 1.0 ).name( 'farClipping' );
+					gui.add( material.uniforms.pointSize, 'value', 1, 10, 1.0 ).name( 'pointSize' );
+					gui.add( material.uniforms.zOffset, 'value', 0, 4000, 1.0 ).name( 'zOffset' );
 					gui.close();
 
 

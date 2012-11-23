@@ -15,6 +15,11 @@
 			}
 			h1 { }
 			a { color:skyblue }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #abc !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -28,14 +33,14 @@
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
-			varying vec3 worldPosition;
+			varying vec3 vWorldPosition;
 
 			void main() {
 
-				vec4 mPosition = modelMatrix * vec4( position, 1.0 );
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-				worldPosition = mPosition.xyz;
 
 			}
 
@@ -48,11 +53,11 @@
 			uniform float offset;
 			uniform float exponent;
 
-			varying vec3 worldPosition;
+			varying vec3 vWorldPosition;
 
 			void main() {
 
-				float h = normalize( worldPosition + offset ).y;
+				float h = normalize( vWorldPosition + offset ).y;
 				gl_FragColor = vec4( mix( bottomColor, topColor, max( pow( h, exponent ), 0.0 ) ), 1.0 );
 
 			}
@@ -144,19 +149,12 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#abc";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// MODEL
 
 				var loader = new THREE.JSONLoader();
-				var callback = function( geometry ) { createScene( geometry,  0, 0, 0, 0, 100 ) };
+				var callback = function ( geometry, materials ) { createScene( geometry, materials, 0, 0, 0, 0, 100 ) };
 
 				loader.load( "obj/lightmap/lightmap.js", callback );
 
@@ -175,9 +173,9 @@
 
 			}
 
-			function createScene( geometry, x, y, z, b, s ) {
+			function createScene( geometry, materials, x, y, z, b, s ) {
 
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );
 				scene.add( mesh );
