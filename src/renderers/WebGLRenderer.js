@@ -355,10 +355,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.deallocateTexture = function ( texture ) {
 
-		if ( ! texture.__webglInit ) return;
+		// cube texture
 
-		texture.__webglInit = false;
-		_gl.deleteTexture( texture.__webglTexture );
+		if ( texture.image && texture.image.__webglTextureCube ) {
+
+			_gl.deleteTexture( texture.image.__webglTextureCube );
+
+		// 2D texture
+
+		} else {
+
+			if ( ! texture.__webglInit ) return;
+
+			texture.__webglInit = false;
+			_gl.deleteTexture( texture.__webglTexture );
+
+		}
 
 		_this.info.memory.textures --;
 
@@ -6690,6 +6702,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					texture.image.__webglTextureCube = _gl.createTexture();
 
+					_this.info.memory.textures ++;
+
 				}
 
 				_gl.activeTexture( _gl.TEXTURE0 + slot );
@@ -6818,6 +6832,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
 
 			renderTarget.__webglTexture = _gl.createTexture();
+
+			_this.info.memory.textures ++;
 
 			// Setup texture, create render and frame buffers
 
