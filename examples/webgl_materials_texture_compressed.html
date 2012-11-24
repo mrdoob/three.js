@@ -37,7 +37,7 @@
 			leaf texture by <a href="http://opengameart.org/node/10505">lauris71</a>, explosion texture by <a href="http://opengameart.org/node/7728">bart</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -82,7 +82,13 @@
 				var map4 = THREE.ImageUtils.loadCompressedTexture( 'textures/compressed/explosion_dxt5_mip.dds' );
 				map4.anisotropy = 4;
 
-				var material1 = new THREE.MeshBasicMaterial( { map: map1 } );
+				var cubemap = THREE.ImageUtils.loadCompressedTextureCube( 'textures/compressed/Mountains.dds', new THREE.CubeReflectionMapping, function( cubemap ) {
+					cubemap.magFilter = cubemap.minFilter = THREE.LinearFilter;
+					material1.envMap = cubemap;
+					material1.needsUpdate = true;
+				} );
+
+				var material1 = new THREE.MeshBasicMaterial( { map: map1, envMap: true } );
 				var material2 = new THREE.MeshBasicMaterial( { map: map2 } );
 				var material3 = new THREE.MeshBasicMaterial( { map: map3, alphaTest: 0.5, side: THREE.DoubleSide } );
 				var material4 = new THREE.MeshBasicMaterial( { map: map4, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
