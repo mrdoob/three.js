@@ -82,12 +82,19 @@
 				var map4 = THREE.ImageUtils.loadCompressedTexture( 'textures/compressed/explosion_dxt5_mip.dds' );
 				map4.anisotropy = 4;
 
-				var material1 = new THREE.MeshBasicMaterial( { map: map1 } );
+				var cubemap = THREE.ImageUtils.loadCompressedTextureCube( 'textures/compressed/Mountains.dds', new THREE.CubeReflectionMapping, function( cubemap ) {
+
+					cubemap.magFilter = cubemap.minFilter = THREE.LinearFilter;
+					material1.needsUpdate = true;
+
+				} );
+
+				var material1 = new THREE.MeshBasicMaterial( { map: map1, envMap: cubemap } );
 				var material2 = new THREE.MeshBasicMaterial( { map: map2 } );
 				var material3 = new THREE.MeshBasicMaterial( { map: map3, alphaTest: 0.5, side: THREE.DoubleSide } );
 				var material4 = new THREE.MeshBasicMaterial( { map: map4, side: THREE.DoubleSide, blending: THREE.AdditiveBlending, depthTest: false, transparent: true } );
 
-				var mesh = new THREE.Mesh( geometry, material1 );
+				var mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 50, 32, 16 ), material1 );
 				mesh.position.x = -200;
 				mesh.position.y = -200;
 				scene.add( mesh );

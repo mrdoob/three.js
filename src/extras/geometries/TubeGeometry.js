@@ -44,7 +44,7 @@ THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, d
 		a, b, c, d,
 		uva, uvb, uvc, uvd;
 
-	var frames = new THREE.TubeGeometry.FrenetFrames(this.path, this.segments, this.closed),
+	var frames = new THREE.TubeGeometry.FrenetFrames( this.path, this.segments, this.closed ),
 		tangents = frames.tangents,
 		normals = frames.normals,
 		binormals = frames.binormals;
@@ -138,8 +138,7 @@ THREE.TubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
 // For computing of Frenet frames, exposing the tangents, normals and binormals the spline
 THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
-	var 
-		tangent = new THREE.Vector3(),
+	var	tangent = new THREE.Vector3(),
 		normal = new THREE.Vector3(),
 		binormal = new THREE.Vector3(),
 

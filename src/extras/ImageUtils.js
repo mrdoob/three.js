@@ -103,7 +103,7 @@ THREE.ImageUtils = {
 				if ( images.loadCount === 6 ) {
 
 					texture.needsUpdate = true;
-					if ( onLoad ) onLoad();
+					if ( onLoad ) onLoad( texture );
 
 				}
 
@@ -158,7 +158,7 @@ THREE.ImageUtils = {
 
 					texture.format = dds.format;
 					texture.needsUpdate = true;
-					if ( onLoad ) onLoad();
+					if ( onLoad ) onLoad( texture );
 
 				}
 
@@ -166,17 +166,68 @@ THREE.ImageUtils = {
 
 		}
 
-		for ( var i = 0, il = array.length; i < il; ++ i ) {
+		// compressed cubemap textures as 6 separate DDS files
 
-			var cubeImage = {};
-			images[ i ] = cubeImage;
+		if ( array instanceof Array ) {
 
+			for ( var i = 0, il = array.length; i < il; ++ i ) {
+
+				var cubeImage = {};
+				images[ i ] = cubeImage;
+
+				var request = new XMLHttpRequest();
+
+				request.onload = generateCubeFaceCallback( request, cubeImage );
+				request.onerror = onError;
+
+				var url = array[ i ];
+
+				request.open( 'GET', url, true );
+				request.responseType = "arraybuffer";
+				request.send( null );
+
+			}
+
+		// compressed cubemap texture stored in a single DDS file
+
+		} else {
+
+			var url = array;
 			var request = new XMLHttpRequest();
 
-			request.onload = generateCubeFaceCallback( request, cubeImage );
-			request.onerror = onError;
+			request.onload = function( ) {
 
-			var url = array[ i ];
+				var buffer = request.response;
+				var dds = THREE.ImageUtils.parseDDS( buffer, true );
+
+				if ( dds.isCubemap ) {
+
+					var faces = dds.mipmaps.length / dds.mipmapCount;
+
+					for ( var f = 0; f < faces; f ++ ) {
+
+						images[ f ] = { mipmaps : [] };
+
+						for ( var i = 0; i < dds.mipmapCount; i ++ ) {
+
+							images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
+							images[ f ].format = dds.format;
+							images[ f ].width = dds.width;
+							images[ f ].height = dds.height;
+
+						}
+
+					}
+
+					texture.format = dds.format;
+					texture.needsUpdate = true;
+					if ( onLoad ) onLoad( texture );
+
+				}
+
+			}
+
+			request.onerror = onError;
 
 			request.open( 'GET', url, true );
 			request.responseType = "arraybuffer";
@@ -268,85 +319,103 @@ THREE.ImageUtils = {
 		var off_pfFlags = 20;
 		var off_pfFourCC = 21;
 
+		var off_caps = 27;
+		var off_caps2 = 28;
+		var off_caps3 = 29;
+		var off_caps4 = 30;
+
 		// Parse header
 
 		var header = new Int32Array( buffer, 0, headerLengthInt );
 
-        if ( header[ off_magic ] !== DDS_MAGIC ) {
+		if ( header[ off_magic ] !== DDS_MAGIC ) {
 
-            console.error( "ImageUtils.parseDDS(): Invalid magic number in DDS header" );
-            return dds;
+			console.error( "ImageUtils.parseDDS(): Invalid magic number in DDS header" );
+			return dds;
 
-        }
+		}
 
-        if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
+		if ( ! header[ off_pfFlags ] & DDPF_FOURCC ) {
 
-            console.error( "ImageUtils.parseDDS(): Unsupported format, must contain a FourCC code" );
-            return dds;
+			console.error( "ImageUtils.parseDDS(): Unsupported format, must contain a FourCC code" );
+			return dds;
 
-        }
+		}
 
 		var blockBytes;
 
 		var fourCC = header[ off_pfFourCC ];
 
-        switch ( fourCC ) {
+		switch ( fourCC ) {
 
 			case FOURCC_DXT1:
 
 				blockBytes = 8;
-                dds.format = THREE.RGB_S3TC_DXT1_Format;
-                break;
+				dds.format = THREE.RGB_S3TC_DXT1_Format;
+				break;
 
-            case FOURCC_DXT3:
+			case FOURCC_DXT3:
 
-                blockBytes = 16;
-                dds.format = THREE.RGBA_S3TC_DXT3_Format;
-                break;
+				blockBytes = 16;
+				dds.format = THREE.RGBA_S3TC_DXT3_Format;
+				break;
 
-            case FOURCC_DXT5:
+			case FOURCC_DXT5:
 
-                blockBytes = 16;
-                dds.format = THREE.RGBA_S3TC_DXT5_Format;
-                break;
+				blockBytes = 16;
+				dds.format = THREE.RGBA_S3TC_DXT5_Format;
+				break;
 
-            default:
+			default:
 
-                console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
-                return dds;
+				console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+				return dds;
 
-        }
+		}
 
 		dds.mipmapCount = 1;
 
-        if ( header[ off_flags ] & DDSD_MIPMAPCOUNT && loadMipmaps !== false ) {
+		if ( header[ off_flags ] & DDSD_MIPMAPCOUNT && loadMipmaps !== false ) {
 
-            dds.mipmapCount = Math.max( 1, header[ off_mipmapCount ] );
+			dds.mipmapCount = Math.max( 1, header[ off_mipmapCount ] );
 
-        }
+		}
 
-        dds.width = header[ off_width ];
-        dds.height = header[ off_height ];
+		//TODO: Verify that all faces of the cubemap are present with DDSCAPS2_CUBEMAP_POSITIVEX, etc.
 
-        var dataOffset = header[ off_size ] + 4;
+		dds.isCubemap = header[ off_caps2 ] & DDSCAPS2_CUBEMAP ? true : false;
+
+		dds.width = header[ off_width ];
+		dds.height = header[ off_height ];
+
+		var dataOffset = header[ off_size ] + 4;
 
 		// Extract mipmaps buffers
 
 		var width = dds.width;
 		var height = dds.height;
 
-		for ( var i = 0; i < dds.mipmapCount; i ++ ) {
+		var faces = dds.isCubemap ? 6 : 1;
 
-			var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
-			var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
+		for ( var face = 0; face < faces; face ++ ) {
 
-			var mipmap = { "data": byteArray, "width": width, "height": height };
-			dds.mipmaps.push( mipmap );
+			for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
-			dataOffset += dataLength;
+				var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
+				var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
 
-			width = Math.max( width * 0.5, 1 );
-			height = Math.max( height * 0.5, 1 );
+				var mipmap = { "data": byteArray, "width": width, "height": height };
+				dds.mipmaps.push( mipmap );
+
+				dataOffset += dataLength;
+
+				width = Math.max( width * 0.5, 1 );
+				height = Math.max( height * 0.5, 1 );
+
+			}
+
+			width = dds.width;
+			height = dds.height;
 
 		}
 
