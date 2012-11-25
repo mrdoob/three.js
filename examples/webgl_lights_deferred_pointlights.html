@@ -13,7 +13,7 @@
 
 			#info {
 				position: absolute;
-				top: 0px; width: 100%;
+				top: 20px; width: 100%;
 				color: #ffffff;
 				padding: 5px;
 				font-family: Monospace;
@@ -29,14 +29,19 @@
 			a:hover {
 				color: #0080ff;
 			}
+
+			#stats { position: absolute; top:10px; left: 5px }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - deferred point lights WebGL demo by <a href="http://de.redplant.de" target=_blank>redPlant</a>.<br />
-			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a><br>
-			Point Light attenuation formula by <a href="http://imdoingitwrong.wordpress.com/tag/glsl/" target=_blank>Tom Madams</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - deferred point lights WebGL demo by <a href="http://de.redplant.de" target=_blank>redPlant</a> -
+			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head -
+			light attenuation formula by <a href="http://imdoingitwrong.wordpress.com/tag/glsl/" target=_blank>Tom Madams</a>
 		</div>
 		<div id="container"></div>
 
@@ -47,6 +52,7 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -55,23 +61,35 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/loaders/ctm/lzma.js"></script>
-		<script src="js/loaders/ctm/ctm.js"></script>
-		<script src="js/loaders/ctm/CTMLoader.js"></script>
-
+		<!--
 		<script src="js/loaders/UTF8Loader.js"></script>
 		<script src="js/loaders/MTLLoader.js"></script>
+		-->
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var WIDTH = window.innerWidth;
-			var HEIGHT = window.innerHeight;
+			var SCALE = 0.75;
+			var MARGIN = 100;
 
-			var NEAR = 1.0, FAR = 250.0;
+			var WIDTH = window.innerWidth;
+			var HEIGHT = window.innerHeight - 2 * MARGIN;
+
+			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
 			var ASPECT = WIDTH / HEIGHT;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var targetX = 0, targetY = 0;
+			var angle = 0;
+			var target = new THREE.Vector3( 0, 0, 0 );
+
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
 
 			// core
 
@@ -321,6 +339,9 @@
 
 				"vec3 lightDir = lightView - viewPos.xyz;"+
 				"float dist = length( lightDir );"+
+
+				"if ( dist > lightRadius ) discard;" +
+
 				"lightDir = normalize( lightDir );"+
 
 				"float cutoff = 0.3;"+
@@ -328,6 +349,7 @@
 				"float attenuation = 1.0 / ( denom * denom );"+
 				"attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );"+
 				"attenuation = max( attenuation, 0.0 );"+
+				"attenuation *= attenuation;"+
 
 				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;" +
 
@@ -336,7 +358,7 @@
 				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
 				"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );" +
 
-				"const vec3 wrapRGB = vec3( 0.9, 0.7, 0.7 );"+
+				"const vec3 wrapRGB = vec3( 0.6, 0.2, 0.2 );"+
 				"vec3 diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );"+
 
 				// simple lighting
@@ -375,7 +397,6 @@
 				"color.xyz = albedo.xyz * lightColor * lightIntensity;"+
 				"color.w = attenuation;"+
 				"gl_FragColor = color * vec4( diffuse + specular, 1.0 );" +
-				//"gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.05 );"+
 
 			"}";
 
@@ -461,8 +482,8 @@
 				uniforms: {
 
 					samplerDepth: { type: "t", value: null },
-					viewWidth: { type: "f", value: WIDTH },
-					viewHeight: { type: "f", value: HEIGHT },
+					viewWidth: { type: "f", value: SCALE * WIDTH },
+					viewHeight: { type: "f", value: SCALE * HEIGHT },
 					lightColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
 
 				},
@@ -484,8 +505,8 @@
 					samplerColor: { type: "t", value: null },
 					matView : { type: "m4", value: new THREE.Matrix4() },
 					matProjInverse : { type: "m4", value: new THREE.Matrix4() },
-					viewWidth: { type: "f", value: WIDTH },
-					viewHeight: { type: "f", value: HEIGHT },
+					viewWidth: { type: "f", value: SCALE * WIDTH },
+					viewHeight: { type: "f", value: SCALE * HEIGHT },
 					lightPos: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
 					lightColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
 					lightIntensity: { type: "f", value: 1.0 },
@@ -521,13 +542,19 @@
 				renderer.setSize( WIDTH, HEIGHT );
 				renderer.setClearColorHex( 0x000000, 1 );
 
+
+				renderer.domElement.style.position = "absolute";
+				renderer.domElement.style.top = MARGIN + "px";
+				renderer.domElement.style.left = "0px";
+
+
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
 				// scene camera
 
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
-				camera.position.z = 125;
+				camera.position.z = 150;
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
 
@@ -575,20 +602,20 @@
 
 			function createRenderTargets() {
 
-				var rtParamsFloat = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+				var rtParamsFloat = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
 							          format: THREE.RGBAFormat, type: THREE.FloatType };
 
-				var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+				var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
 							          format: THREE.RGBFormat, type: THREE.UnsignedByteType };
 
 				// ----------------------------------------------------------
 				// g-buffer
 				// ----------------------------------------------------------
 
-				rtNormals = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
-				rtDepth = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
-				rtColor = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
-				rtFinal = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+				rtNormals = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
+				rtDepth = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
+				rtColor = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
+				rtFinal = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
 
 				rtNormals.generateMipmaps = false;
 				rtDepth.generateMipmaps = false;
@@ -612,7 +639,7 @@
 				// ----------------------------------------------------------
 
 				var emitterPass = new THREE.RenderPass( emitterScene, camera );
-				rtEmitter = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsUByte );
+				rtEmitter = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
 				rtEmitter.generateMipmaps = false;
 
 				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
@@ -622,7 +649,7 @@
 				// lighting pass
 				// ----------------------------------------------------------
 
-				rtLightBuffer = new THREE.WebGLRenderTarget( WIDTH, HEIGHT, rtParamsFloat );
+				rtLightBuffer = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
 				rtLightBuffer.generateMipmaps = false;
 
 				var passLight = new THREE.RenderPass( lightScene, camera );
@@ -634,7 +661,7 @@
 				lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
 				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLightBuffer;
 
-				var geomEmitter = new THREE.SphereGeometry( 0.4, 7, 7 );
+				var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
 
 				for ( var x = 0; x < numLights; x ++ ) {
 
@@ -697,15 +724,20 @@
 
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				var width = window.innerWidth || 2;
-				var height = window.innerHeight || 2;
+				//effectFXAA.uniforms[ 'resolution' ].value.set( 1 / ( WIDTH ), 1 / ( HEIGHT ) );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / ( SCALE * WIDTH ), 1 / ( SCALE * HEIGHT ) );
+				//effectFXAA.renderToScreen = true;
 
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-				effectFXAA.renderToScreen = true;
+				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				effectColor.renderToScreen = true;
+
+				effectColor.uniforms[ 'powRGB' ].value.set( 1, 1, 1 );
+				effectColor.uniforms[ 'mulRGB' ].value.set( 2, 2, 2 );
 
 				compFinal = new THREE.EffectComposer( renderer, rtFinal );
 				compFinal.addPass( compositePass );
 				compFinal.addPass( effectFXAA );
+				compFinal.addPass( effectColor );
 
 			}
 
@@ -727,6 +759,15 @@
 						var material = new THREE.ShaderMaterial( { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, defines: defines } );
 						uniforms.diffuse.value.copy( node.material.color );
 						uniforms.map.value = node.material.map;
+
+						if ( node.material.bumpMap ) {
+
+							var offset = node.material.bumpMap.offset;
+							var repeat = node.material.bumpMap.repeat;
+
+							uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+						}
 
 						if ( node.material.transparent ) {
 
@@ -805,7 +846,7 @@
 
 			function initLights() {
 
-				var distance = 20;
+				var distance = 40;
 
 				// front light
 
@@ -842,13 +883,33 @@
 
 			// -----------------------------
 
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 1;
+				mouseY = ( event.clientY - windowHalfY ) * 1;
+
+			}
+
+			// -----------------------------
+
 			function animate() {
 
 				var delta = clock.getDelta();
 
 				requestAnimationFrame( animate );
 
-				controls.update( delta );
+				//controls.update( delta );
+
+				targetX = mouseX * .001;
+				targetY = mouseY * .001;
+
+				angle += 0.05 * ( targetX - angle );
+
+				camera.position.x = -Math.sin( angle ) * 150;
+				camera.position.z = Math.cos( angle ) * 150;
+
+				camera.lookAt( target );
+
 				stats.update();
 				render();
 
@@ -938,7 +999,7 @@
 
 				}
 
-				var time = Date.now() * 0.0002;
+				var time = Date.now() * 0.0005;
 
 				// update lights
 
@@ -948,9 +1009,9 @@
 
 					if ( i > 0 ) {
 
-						x = Math.sin( time + i * 0.175 ) * 20;
-						y = Math.cos( time + i * 0.153 ) * 30;
-						z = Math.cos( time + i * 0.137 ) * 20;
+						x = Math.sin( time + i * 1.7 ) * 80;
+						y = Math.cos( time + i * 1.5 ) * 40;
+						z = Math.cos( time + i * 1.3 ) * 30;
 
 					} else {
 
@@ -979,7 +1040,7 @@
 				// composite pass
 				// -----------------------------
 
-				compFinal.render();
+				compFinal.render( 0.1 );
 
 			}
 
@@ -992,10 +1053,9 @@
 			initLights();
 			createRenderTargets();
 
-
+			/*
 			var loader = new THREE.UTF8Loader();
 
-			/*
 			loader.load( "models/utf8/ben_dds.js", function ( object ) {
 
 				initScene( object, -75, 150 );
@@ -1024,14 +1084,76 @@
 				mapHeight.anisotropy = 4;
 				mapHeight.format = THREE.RGBFormat;
 
-				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 1.5 } );
+				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5 } );
 
 				var object = new THREE.Mesh( geometry, material );
+
+				// box
+
+				var mapHeight2 = THREE.ImageUtils.loadTexture( "obj/lightmap/rocks.jpg" );
+				mapHeight2.repeat.set( 3, 1.5 );
+				mapHeight2.wrapS = mapHeight2.wrapT = THREE.RepeatWrapping;
+				mapHeight2.anisotropy = 4;
+				mapHeight2.format = THREE.RGBFormat;
+
+				var mapHeight3 = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+				mapHeight3.repeat.set( 16, 8 );
+				mapHeight3.wrapS = mapHeight3.wrapT = THREE.RepeatWrapping;
+				mapHeight3.anisotropy = 4;
+				mapHeight3.format = THREE.RGBFormat;
+
+				var geoPlane = new THREE.PlaneGeometry( 40, 20 );
+				var matPlane = new THREE.MeshPhongMaterial( { color: 0xffffff, bumpMap: mapHeight2, bumpScale: 0.5 } );
+				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x331919, bumpMap: mapHeight2, bumpScale: 1 } );
+				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0xffffff, bumpMap: mapHeight3, bumpScale: 1 } );
+
+				// bottom
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane2 );
+				mesh.position.z = -2;
+				mesh.position.y = -6;
+				mesh.rotation.x = -Math.PI/2;
+				object.add( mesh );
+
+				// top
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane3 );
+				mesh.position.z = -2;
+				mesh.position.y = 6;
+				mesh.rotation.x = Math.PI/2;
+				object.add( mesh );
+
+				// back
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = -4;
+				mesh.position.y = 0;
+				object.add( mesh );
+
+				// right
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = 0;
+				mesh.position.y = 0;
+				mesh.position.x = 13;
+				mesh.rotation.y = -Math.PI/2;
+				//object.add( mesh );
+
+				// left
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = 0;
+				mesh.position.y = 0;
+				mesh.position.x = -13;
+				mesh.rotation.y = Math.PI/2;
+				//object.add( mesh );
 
 				initScene( object, 0, 8 );
 				animate();
 
 			} );
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 		</script>
 	</body>
