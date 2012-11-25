@@ -142,8 +142,7 @@ var list = {
 			[ "EventTarget", "api/extras/core/EventTarget" ],
 			[ "Gyroscope", "api/extras/core/Gyroscope" ],
 			[ "Path", "api/extras/core/Path" ],
-			[ "Shape", "api/extras/core/Shape" ],
-			[ "TextPath", "api/extras/core/TextPath" ]
+			[ "Shape", "api/extras/core/Shape" ]
 		],
 
 		"Extras / Geometries": [
