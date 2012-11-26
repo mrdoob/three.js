@@ -112,7 +112,7 @@
 
 			// materials
 
-			var compColor, compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+			var colorShader, normalShader, bumpShader, clipDepthShader, lightShader, unlitShader, compositeShader;
 			var matNormal, matClipDepth, matBasic, matUnlit;
 
 			var numLights = 50;
@@ -331,18 +331,24 @@
 
 			function initScene( object, y, scale ) {
 
-				var shader = THREE.ShaderLib[ "basic" ];
-
 				object.traverse( function( node ) {
 
 					if ( node.material ) {
 
 						// color material
 
-						var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+						var uniforms = THREE.UniformsUtils.clone( colorShader.uniforms );
 						var defines = { "USE_MAP": !!node.material.map, "GAMMA_INPUT": true };
 
-						var material = new THREE.ShaderMaterial( { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, defines: defines } );
+						var material = new THREE.ShaderMaterial( {
+
+							fragmentShader: colorShader.fragmentShader,
+							vertexShader: 	colorShader.vertexShader,
+							uniforms: 		uniforms,
+							defines: 		defines
+
+						} );
+
 						uniforms.diffuse.value.copy( node.material.color );
 						uniforms.map.value = node.material.map;
 
@@ -420,6 +426,7 @@
 				// shader definitions
 				// -----------------------
 
+				colorShader = THREE.ShaderDeferred[ "color" ];
 				normalShader = THREE.ShaderDeferred[ "normals" ];
 				bumpShader = THREE.ShaderDeferred[ "bump" ];
 				clipDepthShader = THREE.ShaderDeferred[ "clipDepth" ];
