@@ -378,7 +378,8 @@
 
 								uniforms: 		uniforms,
 								vertexShader: 	bumpShader.vertexShader,
-								fragmentShader: bumpShader.fragmentShader
+								fragmentShader: bumpShader.fragmentShader,
+								defines:		{ "USE_BUMPMAP": true }
 
 							} );
 							uniforms.bumpMap.value = node.material.bumpMap;
