@@ -193,17 +193,35 @@ THREE.Color.prototype = {
 
 	setStyle: function ( style ) {
 
+		// rgb(255,0,0)
+
 		if ( /^rgb\((\d+),(\d+),(\d+)\)$/i.test( style ) ) {
 
 			var color = /^rgb\((\d+),(\d+),(\d+)\)$/i.exec( style );
 
-			this.r = parseInt( color[ 1 ], 10 ) / 255;
-			this.g = parseInt( color[ 2 ], 10 ) / 255;
-			this.b = parseInt( color[ 3 ], 10 ) / 255;
+			this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
+			this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
+			this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
 
 			return this;
 
 		}
+
+		// rgb(100%,0%,0%)
+
+		if ( /^rgb\((\d+)\%,(\d+)\%,(\d+)\%\)$/i.test( style ) ) {
+
+			var color = /^rgb\((\d+)\%,(\d+)\%,(\d+)\%\)$/i.exec( style );
+
+			this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
+			this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
+			this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+
+			return this;
+
+		}
+
+		// red
 
 		if ( /^(\w+)$/i.test( style ) ) {
 
