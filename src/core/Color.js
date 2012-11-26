@@ -81,7 +81,7 @@ THREE.Color.prototype = {
 				break;
 
 			case "string":
-				this.setContextStyle( value );
+				this.setStyle( value );
 				break;
 
 		}
@@ -185,13 +185,13 @@ THREE.Color.prototype = {
 
 	},
 
-	getContextStyle: function () {
+	getStyle: function () {
 
 		return 'rgb(' + ( ( this.r * 255 ) | 0 )  + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
 
 	},
 
-	setContextStyle: function ( style ) {
+	setStyle: function ( style ) {
 
 		if ( /^rgb\((\d+),(\d+),(\d+)\)$/i.test( style ) ) {
 
