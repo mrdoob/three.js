@@ -104,6 +104,8 @@
 
 			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
+			var DELIMITER = '#';
+
 			for ( var section in list ) {
 
 				html += '<h2>' + section + '</h2>';
@@ -134,13 +136,21 @@
 
 			panel.innerHTML += html;
 
+			function encodeUrl( path ) {
+				return path.replace(/\ /g, '_');
+			}
+
+			function decodeUrl( path ) {
+				return path.replace(/_/g, ' ');
+			}
+
 			// Page loading
 
 			function goTo( section, category, name ) {
 
 				window.document.title = 'three.js - documentation - ' + section + ' - ' + name;
 
-				window.location.hash = section + '/' + category + '/' + name.replace(/\ /g, '-');
+				window.location.hash = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name);
 
 				viewer.src = pages[ section ][ category ][ name ] + '.html';
 
@@ -148,8 +158,8 @@
 
 			function goToHash() {
 
-				var hash = window.location.hash.substring( 1 ).split('/');
-				goTo( hash[0], hash[1], hash[2].replace(/\-/g, ' ') );
+				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
+				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]) );
 
 			}
 
