@@ -64,7 +64,7 @@ THREE.ShadowMapPlugin = function ( ) {
 		_gl.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 
-		if ( _renderer.shadowMapCullFrontFaces ) {
+		if ( _renderer.shadowMaterialSide === THREE.BackSide ) {
 
 			_gl.cullFace( _gl.FRONT );
 
@@ -330,7 +330,7 @@ THREE.ShadowMapPlugin = function ( ) {
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 		_gl.enable( _gl.BLEND );
 
-		if ( _renderer.shadowMapCullFrontFaces ) {
+		if ( _renderer.shadowMaterialSide === THREE.BackSide ) {
 
 			_gl.cullFace( _gl.BACK );
 

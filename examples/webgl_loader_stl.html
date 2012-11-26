@@ -129,7 +129,7 @@
 				renderer.physicallyBasedShading = true;
 
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapCullFrontFaces = false;
+				renderer.shadowMaterialSide = THREE.FrontSide;
 
 				container.appendChild( renderer.domElement );
 

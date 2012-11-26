@@ -54,7 +54,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
-	this.shadowMapCullFrontFaces = true;
+	this.shadowMaterialSide = THREE.BackSide;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
 
