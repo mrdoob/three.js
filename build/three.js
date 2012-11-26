@@ -10813,6 +10813,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.name = '';
 
 	this.image = image;
+	this.mipmaps = null;
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
 
@@ -10848,6 +10849,7 @@ THREE.Texture.prototype = {
 		var texture = new THREE.Texture();
 
 		texture.image = this.image;
+		texture.mipmaps = this.mipmaps;
 
 		texture.mapping = this.mapping;
 
@@ -22273,7 +22275,28 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+				var mipmap, mipmaps = texture.mipmaps;
+
+				if ( mipmaps && isImagePowerOfTwo ) {
+
+					// pre generated mipmaped regular texture
+
+					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+						mipmap = mipmaps[ i ];
+						_gl.texImage2D(_gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap );
+
+					}
+
+					texture.generateMipmaps = false;
+
+				} else {
+
+					// regular texture
+
+					_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+
+				}
 
 			}
 
