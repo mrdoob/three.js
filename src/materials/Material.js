@@ -62,9 +62,9 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 				currentValue.copy( newValue );
 
-			} else if ( currentValue instanceof THREE.Color && typeof( newValue ) === "number" ) {
+			} else if ( currentValue instanceof THREE.Color ) {
 
-				currentValue.setHex( newValue );
+				currentValue.set( newValue );
 
 			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 
