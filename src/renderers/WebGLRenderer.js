@@ -6622,6 +6622,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = texture.image,
 			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
@@ -6644,8 +6645,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						mipmap = mipmaps[ i ];
 						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
-
-						console.log( mipmap.width, mipmap.height, mipmap.data );
 
 					}
 

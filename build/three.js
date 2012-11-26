@@ -10834,6 +10834,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
 	this.flipY = true;
+	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
 	this.needsUpdate = false;
 	this.onUpdate = null;
@@ -10870,6 +10871,7 @@ THREE.Texture.prototype = {
 		texture.generateMipmaps = this.generateMipmaps;
 		texture.premultiplyAlpha = this.premultiplyAlpha;
 		texture.flipY = this.flipY;
+		texture.unpackAlignment = this.unpackAlignment;
 
 		return texture;
 
@@ -10946,6 +10948,7 @@ THREE.DataTexture.prototype.clone = function () {
 	var clonedTexture = new THREE.DataTexture( this.image.data, this.image.width, this.image.height, this.format, this.type, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter, this.anisotropy );
 
 	clonedTexture.mipmaps = this.mipmaps;
+	clonedTexture.unpackAlignment = this.unpackAlignment;
 
 	clonedTexture.offset.copy( this.offset );
 	clonedTexture.repeat.copy( this.repeat );
@@ -22252,6 +22255,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = texture.image,
 			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
@@ -22274,8 +22278,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						mipmap = mipmaps[ i ];
 						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
-
-						console.log( mipmap.width, mipmap.height, mipmap.data );
 
 					}
 

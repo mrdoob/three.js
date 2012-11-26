@@ -34,6 +34,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
 	this.flipY = true;
+	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
 	this.needsUpdate = false;
 	this.onUpdate = null;
@@ -70,6 +71,7 @@ THREE.Texture.prototype = {
 		texture.generateMipmaps = this.generateMipmaps;
 		texture.premultiplyAlpha = this.premultiplyAlpha;
 		texture.flipY = this.flipY;
+		texture.unpackAlignment = this.unpackAlignment;
 
 		return texture;
 
