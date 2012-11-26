@@ -104,7 +104,7 @@
 
 			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
-			var DELIMITER = '#';
+			var DELIMITER = '/';
 
 			for ( var section in list ) {
 
@@ -137,11 +137,15 @@
 			panel.innerHTML += html;
 
 			function encodeUrl( path ) {
-				return path.replace(/\ /g, '_');
+
+				return path.replace(/\ \/\ /g, '.').replace(/\ /g, '_');
+
 			}
 
 			function decodeUrl( path ) {
-				return path.replace(/_/g, ' ');
+
+				return path.replace(/_/g, ' ').replace(/\./g, ' / ');
+
 			}
 
 			// Page loading
