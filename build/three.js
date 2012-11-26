@@ -10813,7 +10813,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.name = '';
 
 	this.image = image;
-	this.mipmaps = null;
+	this.mipmaps = [];
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
 
@@ -10850,7 +10850,7 @@ THREE.Texture.prototype = {
 		if ( texture === undefined ) texture = new THREE.Texture();
 
 		texture.image = this.image;
-		texture.mipmaps = this.mipmaps;
+		texture.mipmaps = this.mipmaps.slice(0);
 
 		texture.mapping = this.mapping;
 
@@ -22253,7 +22253,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// if there are no manual mipmaps
 				// set 0 level mipmap and then use GL to generate other mipmap levels
 
-				if ( mipmaps && isImagePowerOfTwo ) {
+				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
 
 					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -22288,7 +22288,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// if there are no manual mipmaps
 				// set 0 level mipmap and then use GL to generate other mipmap levels
 
-				if ( mipmaps && isImagePowerOfTwo ) {
+				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
 
 					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
