@@ -375,8 +375,8 @@ THREE.ShaderDeferred = {
 
 				// specular
 
-				"const float shininess = 75.0;",
-				"const float specularIntensity = 0.4;",
+				"const float shininess = SHININESS;",
+				"const float specularIntensity = SPECULAR_INTENSITY;",
 
 				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );",
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
@@ -387,7 +387,7 @@ THREE.ShaderDeferred = {
 
 				// physically based specular
 
-				"vec3 specularColor = specularIntensity * vec3( 0.312 );",
+				"vec3 specularColor = specularIntensity * vec3( 1.0 );",
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
@@ -403,8 +403,16 @@ THREE.ShaderDeferred = {
 				"vec4 color = vec4( 0.0 );",
 				"color.xyz = albedo.xyz * lightColor * lightIntensity;",
 				"color.w = attenuation;",
-				//"gl_FragColor = color * vec4( diffuse + specular, 1.0 );",
-				"gl_FragColor = color * vec4( diffuse, 1.0 ) + vec4( lightColor * lightIntensity * specular, attenuation );",
+
+				"#ifdef ADDITIVE_SPECULAR",
+
+					"gl_FragColor = color * vec4( diffuse, 1.0 ) + vec4( lightColor * lightIntensity * specular, attenuation );",
+
+				"#else",
+
+					"gl_FragColor = color * vec4( diffuse + specular, 1.0 );",
+
+				"#endif",
 
 			"}"
 

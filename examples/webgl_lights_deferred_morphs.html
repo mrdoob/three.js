@@ -254,17 +254,19 @@
 
 					// setup material
 
-					var matLight = new THREE.ShaderMaterial({
+					var matLight = new THREE.ShaderMaterial( {
 
 						uniforms:       THREE.UniformsUtils.clone( lightShader.uniforms ),
 						vertexShader:   lightShader.vertexShader,
-						fragmentShader: lightShader.fragmentShader
+						fragmentShader: lightShader.fragmentShader,
+						defines:		{ "ADDITIVE_SPECULAR": true, "SPECULAR_INTENSITY" : 0.125, "SHININESS": 75.01 },
 
-					});
+						blending:		THREE.AdditiveBlending,
+						depthWrite:		false,
+						transparent:	true
 
-					matLight.blending = THREE.AdditiveBlending;
-					matLight.transparent = true;
-					matLight.depthWrite = false;
+					} );
+
 					matLight.uniforms[ "lightPos" ].value = light.position;
 					matLight.uniforms[ "lightRadius" ].value = light.distance;
 					matLight.uniforms[ "lightIntensity" ].value = light.intensity;
@@ -278,13 +280,13 @@
 
 					// create emitter sphere
 
-					var matEmitter = new THREE.ShaderMaterial({
+					var matEmitter = new THREE.ShaderMaterial( {
 
 						uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
 						vertexShader:   unlitShader.vertexShader,
 						fragmentShader: unlitShader.fragmentShader
 
-					});
+					} );
 
 					var meshEmitter = new THREE.Mesh( geomEmitter, matEmitter );
 					meshEmitter.position = light.position;
