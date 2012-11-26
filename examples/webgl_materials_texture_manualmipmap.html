@@ -75,7 +75,7 @@
 
 			var container, stats;
 
-			var camera, scene, scene2, renderer;
+			var camera, scene1, scene2, renderer;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -94,11 +94,11 @@
 				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
 				camera.position.z = 1500;
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 1500, 4000 );
+				scene1 = new THREE.Scene();
+				scene1.fog = new THREE.Fog( 0x000000, 1500, 4000 );
 
 				scene2 = new THREE.Scene();
-				scene2.fog = scene.fog;
+				scene2.fog = scene1.fog;
 
 				// GROUND
 
@@ -120,43 +120,32 @@
 				}
 
 				var canvas = mipmap( 128, '#f00' );
-				var textureCanvas = new THREE.Texture( canvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
-				textureCanvas.mipmaps = [];
-				textureCanvas.mipmaps[ 0 ] = canvas;
-				textureCanvas.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
-				textureCanvas.mipmaps[ 2 ] = mipmap( 32, '#00f' );
-				textureCanvas.mipmaps[ 3 ] = mipmap( 16, '#400' );
-				textureCanvas.mipmaps[ 4 ] = mipmap( 8,  '#040' );
-				textureCanvas.mipmaps[ 5 ] = mipmap( 4,  '#004' );
-				textureCanvas.mipmaps[ 6 ] = mipmap( 2,  '#044' );
-				textureCanvas.mipmaps[ 7 ] = mipmap( 1,  '#404' );
+				var textureCanvas1 = new THREE.Texture( canvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
+				textureCanvas1.repeat.set( 1000, 1000 );
+				textureCanvas1.mipmaps = [];
+				textureCanvas1.mipmaps[ 0 ] = canvas;
+				textureCanvas1.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
+				textureCanvas1.mipmaps[ 2 ] = mipmap( 32, '#00f' );
+				textureCanvas1.mipmaps[ 3 ] = mipmap( 16, '#400' );
+				textureCanvas1.mipmaps[ 4 ] = mipmap( 8,  '#040' );
+				textureCanvas1.mipmaps[ 5 ] = mipmap( 4,  '#004' );
+				textureCanvas1.mipmaps[ 6 ] = mipmap( 2,  '#044' );
+				textureCanvas1.mipmaps[ 7 ] = mipmap( 1,  '#404' );
+				textureCanvas1.needsUpdate = true;
 
-				materialCanvas = new THREE.MeshBasicMaterial( { map: textureCanvas } );
+				materialCanvas1 = new THREE.MeshBasicMaterial( { map: textureCanvas1 } );
 
-				textureCanvas.needsUpdate = true;
-				textureCanvas.repeat.set( 1000, 1000 );
-
-				canvas = mipmap( 128, '#f00' );
-				var textureCanvas2 = new THREE.Texture( canvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping, THREE.NearestFilter, THREE.NearestMipMapNearestFilter );
-				textureCanvas2.mipmaps = [];
-				textureCanvas2.mipmaps[ 0 ] = canvas;
-				textureCanvas2.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
-				textureCanvas2.mipmaps[ 2 ] = mipmap( 32, '#00f' );
-				textureCanvas2.mipmaps[ 3 ] = mipmap( 16, '#400' );
-				textureCanvas2.mipmaps[ 4 ] = mipmap( 8,  '#040' );
-				textureCanvas2.mipmaps[ 5 ] = mipmap( 4,  '#004' );
-				textureCanvas2.mipmaps[ 6 ] = mipmap( 2,  '#044' );
-				textureCanvas2.mipmaps[ 7 ] = mipmap( 1,  '#404' );
-				materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
-
+				var textureCanvas2 = textureCanvas1.clone();
+				textureCanvas2.magFilter = THREE.NearestFilter;
+				textureCanvas2.minFilter = THREE.NearestMipMapNearestFilter;
 				textureCanvas2.needsUpdate = true;
-				textureCanvas2.repeat.set( 1000, 1000 );
+				materialCanvas2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: textureCanvas2 } );
 
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
 
-				var meshCanvas = new THREE.Mesh( geometry, materialCanvas );
-				meshCanvas.rotation.x = -Math.PI / 2;
-				meshCanvas.scale.set(1000, 1000, 1000);
+				var meshCanvas1 = new THREE.Mesh( geometry, materialCanvas1 );
+				meshCanvas1.rotation.x = -Math.PI / 2;
+				meshCanvas1.scale.set(1000, 1000, 1000);
 
 				var meshCanvas2 = new THREE.Mesh( geometry, materialCanvas2 );
 				meshCanvas2.rotation.x = -Math.PI / 2;
@@ -167,19 +156,19 @@
 
 				var callbackPainting = function () {
 
-					var image = texturePainting.image;
+					var image = texturePainting1.image;
 
 					texturePainting2.image = image;
 					texturePainting2.needsUpdate = true;
 
-					scene.add( meshCanvas );
+					scene1.add( meshCanvas1 );
 					scene2.add( meshCanvas2 );
 
 					var geometry = new THREE.PlaneGeometry( 100, 100 );
-					var mesh = new THREE.Mesh( geometry, materialPainting );
+					var mesh1 = new THREE.Mesh( geometry, materialPainting1 );
 					var mesh2 = new THREE.Mesh( geometry, materialPainting2 );
 
-					addPainting( scene, mesh );
+					addPainting( scene1, mesh1 );
 					addPainting( scene2, mesh2 );
 
 					function addPainting( zscene, zmesh ) {
@@ -204,25 +193,25 @@
 						zscene.add( meshShadow );
 
 						var floorHeight = -1.117 * image.height / 2;
-						meshCanvas.position.y = meshCanvas2.position.y = floorHeight;
+						meshCanvas1.position.y = meshCanvas2.position.y = floorHeight;
 
 					}
 
 
 				};
 
-				var texturePainting = THREE.ImageUtils.loadTexture( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", THREE.UVMapping, callbackPainting ),
+				var texturePainting1 = THREE.ImageUtils.loadTexture( "textures/758px-Canestra_di_frutta_(Caravaggio).jpg", THREE.UVMapping, callbackPainting ),
 					texturePainting2 = new THREE.Texture(),
-					materialPainting = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting } ),
+					materialPainting1 = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texturePainting1 } ),
 					materialPainting2 = new THREE.MeshBasicMaterial( { color: 0xffccaa, map: texturePainting2 } );
 
 				texturePainting2.minFilter = texturePainting2.magFilter = THREE.NearestFilter;
-				texturePainting.minFilter = texturePainting.magFilter = THREE.LinearFilter;
+				texturePainting1.minFilter = texturePainting1.magFilter = THREE.LinearFilter;
 
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setClearColor( scene1.fog.color, 1 );
 				renderer.autoClear = false;
 
 				renderer.domElement.style.position = "relative";
@@ -261,7 +250,7 @@
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( -( mouseY - 200 ) - camera.position.y ) * .05;
 
-				camera.lookAt( scene.position );
+				camera.lookAt( scene1.position );
 
 				renderer.enableScissorTest( false );
 				renderer.clear();
@@ -269,7 +258,7 @@
 
 				//renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
 				renderer.setScissor( 0, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
-				renderer.render( scene, camera );
+				renderer.render( scene1, camera );
 
 
 				//renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
