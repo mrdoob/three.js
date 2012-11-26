@@ -5938,7 +5938,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// GL state setting
 
-	this.setFaceCulling = function ( cullFace, frontFace ) {
+	this.setFaceCulling = function ( cullFace, frontFaceDirection ) {
 
 		if ( cullFace === THREE.CullFaceNone ) {
 
@@ -5946,13 +5946,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			if ( !frontFace || frontFace === "ccw" ) {
+			if ( frontFaceDirection === THREE.FrontFaceDirectionCW ) {
 
-				_gl.frontFace( _gl.CCW );
+				_gl.frontFace( _gl.CW );
 
 			} else {
 
-				_gl.frontFace( _gl.CW );
+				_gl.frontFace( _gl.CCW );
 
 			}
 

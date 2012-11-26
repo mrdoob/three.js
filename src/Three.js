@@ -88,6 +88,9 @@ THREE.CullFaceBack = 1;
 THREE.CullFaceFront = 2;
 THREE.CullFaceFrontBack = 3;
 
+THREE.FrontFaceDirectionCW = 0;
+THREE.FrontFaceDirectionCCW = 1;
+
 // MATERIAL CONSTANTS
 
 // side
