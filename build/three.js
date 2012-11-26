@@ -81,6 +81,12 @@ String.prototype.trim = String.prototype.trim || function () {
 
 }() );
 
+// GL STATE CONSTANTS
+
+THREE.CullFaceNone = 0;
+THREE.CullFaceBack = 1;
+THREE.CullFaceFront = 2;
+THREE.CullFaceFrontBack = 3;
 
 // MATERIAL CONSTANTS
 
@@ -15668,7 +15674,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
-	this.shadowMaterialSide = THREE.BackSide;
+	this.shadowMapCullFace = THREE.CullFaceFront;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
 
@@ -21554,7 +21560,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setFaceCulling = function ( cullFace, frontFace ) {
 
-		if ( cullFace ) {
+		if ( cullFace === THREE.CullFaceNone ) {
+
+			_gl.disable( _gl.CULL_FACE );
+
+		} else {
 
 			if ( !frontFace || frontFace === "ccw" ) {
 
@@ -21566,11 +21576,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if( cullFace === "back" ) {
+			if ( cullFace === THREE.CullFaceBack ) {
 
 				_gl.cullFace( _gl.BACK );
 
-			} else if( cullFace === "front" ) {
+			} else if ( cullFace === THREE.CullFaceFront ) {
 
 				_gl.cullFace( _gl.FRONT );
 
@@ -21581,10 +21591,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.enable( _gl.CULL_FACE );
-
-		} else {
-
-			_gl.disable( _gl.CULL_FACE );
 
 		}
 
@@ -34317,7 +34323,7 @@ THREE.ShadowMapPlugin = function ( ) {
 		_gl.enable( _gl.CULL_FACE );
 		_gl.frontFace( _gl.CCW );
 
-		if ( _renderer.shadowMaterialSide === THREE.BackSide ) {
+		if ( _renderer.shadowMapCullFace === THREE.CullFaceFront ) {
 
 			_gl.cullFace( _gl.FRONT );
 
@@ -34583,7 +34589,7 @@ THREE.ShadowMapPlugin = function ( ) {
 		_gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
 		_gl.enable( _gl.BLEND );
 
-		if ( _renderer.shadowMaterialSide === THREE.BackSide ) {
+		if ( _renderer.shadowMapCullFace === THREE.CullFaceFront ) {
 
 			_gl.cullFace( _gl.BACK );
 

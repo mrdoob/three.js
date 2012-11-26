@@ -54,7 +54,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
-	this.shadowMaterialSide = THREE.BackSide;
+	this.shadowMapCullFace = THREE.CullFaceFront;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
 
@@ -5940,7 +5940,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setFaceCulling = function ( cullFace, frontFace ) {
 
-		if ( cullFace ) {
+		if ( cullFace === THREE.CullFaceNone ) {
+
+			_gl.disable( _gl.CULL_FACE );
+
+		} else {
 
 			if ( !frontFace || frontFace === "ccw" ) {
 
@@ -5952,11 +5956,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if( cullFace === "back" ) {
+			if ( cullFace === THREE.CullFaceBack ) {
 
 				_gl.cullFace( _gl.BACK );
 
-			} else if( cullFace === "front" ) {
+			} else if ( cullFace === THREE.CullFaceFront ) {
 
 				_gl.cullFace( _gl.FRONT );
 
@@ -5967,10 +5971,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.enable( _gl.CULL_FACE );
-
-		} else {
-
-			_gl.disable( _gl.CULL_FACE );
 
 		}
 

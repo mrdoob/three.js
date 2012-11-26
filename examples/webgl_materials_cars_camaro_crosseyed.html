@@ -99,7 +99,8 @@
 
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setFaceCulling( 0 );
+				renderer.setFaceCulling( THREE.CullFaceNone );
+
 				container.appendChild( renderer.domElement );
 
 				effect = new THREE.CrosseyedEffect( renderer );
