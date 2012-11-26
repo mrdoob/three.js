@@ -6622,7 +6622,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
-			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = texture.image,
 			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
@@ -6631,35 +6630,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, isImagePowerOfTwo );
 
-			var mipmap, mipmaps = texture.mipmaps;
+			if ( texture instanceof THREE.CompressedTexture ) {
 
-			if ( texture instanceof THREE.DataTexture ) {
-
-				// use manually created mipmaps if available
-				// if there are no manual mipmaps
-				// set 0 level mipmap and then use GL to generate other mipmap levels
-
-				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
-
-					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
-
-						mipmap = mipmaps[ i ];
-						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
-
-					}
-
-					texture.generateMipmaps = false;
-
-				} else {
-
-					_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
-
-				}
-
-			} else if ( texture instanceof THREE.CompressedTexture ) {
-
-				// compressed textures can only use manually created mipmaps
-				// WebGL can't generate mipmaps for DDS textures
+				var mipmap, mipmaps = texture.mipmaps;
 
 				for( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -6668,27 +6641,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			} else { // regular Texture (image, video, canvas)
+			} else if ( texture instanceof THREE.DataTexture ) {
 
-				// use manually created mipmaps if available
-				// if there are no manual mipmaps
-				// set 0 level mipmap and then use GL to generate other mipmap levels
+				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
 
-				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
+			} else {
 
-					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
-
-						mipmap = mipmaps[ i ];
-						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap );
-
+				var mipmap, mipmaps = texture.mipmaps;
+				if (mipmaps && isImagePowerOfTwo) {
+					// pre generated mipmaped regular texture
+					for (var i = 0, il = mipmaps.length; i < il; i++) {
+						mipmap = mipmaps[i];
+						_gl.texImage2D(_gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap);
 					}
-
 					texture.generateMipmaps = false;
-
-				} else {
-
+				}
+				else
+				{
+					// regular texture
 					_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
-
 				}
 
 			}
