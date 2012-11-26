@@ -10845,9 +10845,9 @@ THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
 
-	clone: function () {
+	clone: function ( texture ) {
 
-		var texture = new THREE.Texture();
+		if ( texture === undefined ) texture = new THREE.Texture();
 
 		texture.image = this.image;
 		texture.mipmaps = this.mipmaps;
@@ -10899,6 +10899,8 @@ THREE.CompressedTexture = function ( mipmaps, width, height, format, type, mappi
 	this.image = { width: width, height: height };
 	this.mipmaps = mipmaps;
 
+	this.generateMipmaps = false; // WebGL currently can't generate mipmaps for compressed textures, they must be embedded in DDS file
+
 };
 
 THREE.CompressedTexture.prototype = Object.create( THREE.Texture.prototype );
@@ -10907,24 +10909,7 @@ THREE.CompressedTexture.prototype.clone = function () {
 
 	var texture = new THREE.CompressedTexture();
 
-	texture.image = this.image;
-	texture.mipmaps = this.mipmaps;
-
-	texture.format = this.format;
-	texture.type = this.type;
-
-	texture.mapping = this.mapping;
-
-	texture.wrapS = this.wrapS;
-	texture.wrapT = this.wrapT;
-
-	texture.magFilter = this.magFilter;
-	texture.minFilter = this.minFilter;
-
-	texture.anisotropy = this.anisotropy;
-
-	texture.offset.copy( this.offset );
-	texture.repeat.copy( this.repeat );
+	THREE.Texture.prototype.clone.call( this, texture );
 
 	return texture;
 
@@ -10945,15 +10930,11 @@ THREE.DataTexture.prototype = Object.create( THREE.Texture.prototype );
 
 THREE.DataTexture.prototype.clone = function () {
 
-	var clonedTexture = new THREE.DataTexture( this.image.data, this.image.width, this.image.height, this.format, this.type, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter, this.anisotropy );
+	var texture = new THREE.DataTexture();
 
-	clonedTexture.mipmaps = this.mipmaps;
-	clonedTexture.unpackAlignment = this.unpackAlignment;
+	THREE.Texture.prototype.clone.call( this, texture );
 
-	clonedTexture.offset.copy( this.offset );
-	clonedTexture.repeat.copy( this.repeat );
-
-	return clonedTexture;
+	return texture;
 
 };
 /**
