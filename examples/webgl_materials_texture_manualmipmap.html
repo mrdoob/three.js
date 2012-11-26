@@ -122,7 +122,6 @@
 				var canvas = mipmap( 128, '#f00' );
 				var textureCanvas1 = new THREE.Texture( canvas, THREE.UVMapping, THREE.RepeatWrapping, THREE.RepeatWrapping );
 				textureCanvas1.repeat.set( 1000, 1000 );
-				textureCanvas1.mipmaps = [];
 				textureCanvas1.mipmaps[ 0 ] = canvas;
 				textureCanvas1.mipmaps[ 1 ] = mipmap( 64, '#0f0' );
 				textureCanvas1.mipmaps[ 2 ] = mipmap( 32, '#00f' );

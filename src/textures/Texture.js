@@ -13,7 +13,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.name = '';
 
 	this.image = image;
-	this.mipmaps = null;
+	this.mipmaps = [];
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
 
@@ -50,7 +50,7 @@ THREE.Texture.prototype = {
 		if ( texture === undefined ) texture = new THREE.Texture();
 
 		texture.image = this.image;
-		texture.mipmaps = this.mipmaps;
+		texture.mipmaps = this.mipmaps.slice(0);
 
 		texture.mapping = this.mapping;
 

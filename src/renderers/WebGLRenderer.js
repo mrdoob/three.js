@@ -6639,7 +6639,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// if there are no manual mipmaps
 				// set 0 level mipmap and then use GL to generate other mipmap levels
 
-				if ( mipmaps && isImagePowerOfTwo ) {
+				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
 
 					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -6674,7 +6674,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// if there are no manual mipmaps
 				// set 0 level mipmap and then use GL to generate other mipmap levels
 
-				if ( mipmaps && isImagePowerOfTwo ) {
+				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
 
 					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
