@@ -4050,7 +4050,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// opaque pass (front-to-back order)
 
-			this.setBlending( THREE.NormalBlending );
+			this.setBlending( THREE.NoBlending );
 
 			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false, material );

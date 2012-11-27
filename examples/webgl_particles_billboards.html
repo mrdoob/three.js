@@ -81,7 +81,7 @@
 
 				}
 
-				material = new THREE.ParticleBasicMaterial( { size: 35, sizeAttenuation: false, map: sprite } );
+				material = new THREE.ParticleBasicMaterial( { size: 35, sizeAttenuation: false, map: sprite, transparent: true } );
 				material.color.setHSV( 1.0, 0.2, 0.8 );
 
 				particles = new THREE.ParticleSystem( geometry, material );
