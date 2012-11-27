@@ -493,17 +493,15 @@ THREE.ShaderDeferred = {
 
 				// combine
 
-				"vec4 color = vec4( 0.0 );",
-				"color.xyz = albedo.xyz * lightColor * lightIntensity;",
-				"color.w = attenuation;",
+				"vec3 light = lightIntensity * lightColor;",
 
 				"#ifdef ADDITIVE_SPECULAR",
 
-					"gl_FragColor = color * vec4( diffuse, 1.0 ) + vec4( lightColor * lightIntensity * specular, attenuation );",
+					"gl_FragColor = vec4( albedo * light * diffuse, attenuation ) + vec4( light * specular, attenuation );",
 
 				"#else",
 
-					"gl_FragColor = color * vec4( diffuse + specular, 1.0 );",
+					"gl_FragColor = vec4( albedo * light * ( diffuse + specular ), attenuation );",
 
 				"#endif",
 
