@@ -54,7 +54,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
 	this.shadowMapSoft = true;
-	this.shadowMapCullFrontFaces = true;
+	this.shadowMapCullFace = THREE.CullFaceFront;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
 
@@ -4104,7 +4104,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// opaque pass (front-to-back order)
 
-			this.setBlending( THREE.NormalBlending );
+			this.setBlending( THREE.NoBlending );
 
 			//START_VEROLD_MOD
 			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false, material, scene.overrideUniforms );
@@ -4405,21 +4405,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			materialIndex = buffer.materialIndex;
 
-			if ( materialIndex >= 0 ) {
+			material = meshMaterial.materials[ materialIndex ];
 
-				material = meshMaterial.materials[ materialIndex ];
+			if ( material.transparent ) {
 
-				if ( material.transparent ) {
+				globject.transparent = material;
+				globject.opaque = null;
 
-					globject.transparent = material;
-					globject.opaque = null;
+			} else {
 
-				} else {
-
-					globject.opaque = material;
-					globject.transparent = null;
-
-				}
+				globject.opaque = material;
+				globject.transparent = null;
 
 			}
 
@@ -4458,8 +4454,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function sortFacesByMaterial ( geometry, material ) {
 
 		var f, fl, face, materialIndex, vertices,
-			materialHash, groupHash,
-			hash_map = {};
+			groupHash, hash_map = {};
 
 		var numMorphTargets = geometry.morphTargets.length;
 		var numMorphNormals = geometry.morphNormals.length;
@@ -4471,17 +4466,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 			face = geometry.faces[ f ];
-			materialIndex = usesFaceMaterial ? face.materialIndex : undefined;
+			materialIndex = usesFaceMaterial ? face.materialIndex : 0;
 
-			materialHash = ( materialIndex !== undefined ) ? materialIndex : -1;
+			if ( hash_map[ materialIndex ] === undefined ) {
 
-			if ( hash_map[ materialHash ] === undefined ) {
-
-				hash_map[ materialHash ] = { 'hash': materialHash, 'counter': 0 };
+				hash_map[ materialIndex ] = { 'hash': materialIndex, 'counter': 0 };
 
 			}
 
-			groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
+			groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
 
 			if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
@@ -4493,8 +4486,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ groupHash ].vertices + vertices > 65535 ) {
 
-				hash_map[ materialHash ].counter += 1;
-				groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
+				hash_map[ materialIndex ].counter += 1;
+				groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
 
 				if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
@@ -6073,25 +6066,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// GL state setting
 
-	this.setFaceCulling = function ( cullFace, frontFace ) {
+	this.setFaceCulling = function ( cullFace, frontFaceDirection ) {
 
-		if ( cullFace ) {
+		if ( cullFace === THREE.CullFaceNone ) {
 
-			if ( !frontFace || frontFace === "ccw" ) {
+			_gl.disable( _gl.CULL_FACE );
 
-				_gl.frontFace( _gl.CCW );
+		} else {
 
-			} else {
+			if ( frontFaceDirection === THREE.FrontFaceDirectionCW ) {
 
 				_gl.frontFace( _gl.CW );
 
+			} else {
+
+				_gl.frontFace( _gl.CCW );
+
 			}
 
-			if( cullFace === "back" ) {
+			if ( cullFace === THREE.CullFaceBack ) {
 
 				_gl.cullFace( _gl.BACK );
 
-			} else if( cullFace === "front" ) {
+			} else if ( cullFace === THREE.CullFaceFront ) {
 
 				_gl.cullFace( _gl.FRONT );
 
@@ -6102,10 +6099,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.enable( _gl.CULL_FACE );
-
-		} else {
-
-			_gl.disable( _gl.CULL_FACE );
 
 		}
 

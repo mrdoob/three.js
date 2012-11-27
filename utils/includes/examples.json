@@ -79,6 +79,7 @@
 	"../examples/js/ShaderSkin.js",
 	"../examples/js/ShaderTerrain.js",
 	"../examples/js/ShaderToon.js",
+	"../examples/js/ShaderDeferred.js",
 
 	"../examples/js/Sparks.js",
 	"../examples/js/UVsUtils.js",

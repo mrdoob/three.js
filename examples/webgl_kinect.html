@@ -148,7 +148,7 @@
 					texture = new THREE.Texture( video );
 
 					var width = 640, height = 480;
-					var nearClipping = 850/*850*/, farClipping = 4000/*4000*/;
+					var nearClipping = 850, farClipping = 4000;
 
 					geometry = new THREE.Geometry();
 
@@ -178,7 +178,8 @@
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
 						fragmentShader: document.getElementById( 'fs' ).textContent,
-						depthWrite: false
+						depthTest: false, depthWrite: false,
+						transparent: true
 
 					} );
 

@@ -50,6 +50,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
+		<script src="js/ShaderDeferred.js"></script>
+
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
 		<script src="js/shaders/ColorCorrectionShader.js"></script>
@@ -76,6 +78,9 @@
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight - 2 * MARGIN;
 
+			var SCALED_WIDTH = Math.floor( SCALE * WIDTH );
+			var SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
+
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
 			var ASPECT = WIDTH / HEIGHT;
@@ -101,7 +106,7 @@
 
 			// rendertargets
 
-			var rtColor, rtNormals, rtDepth, rtLightBuffer, rtEmitter, rtFinal;
+			var rtColor, rtNormals, rtDepth, rtLight, rtEmitter, rtFinal;
 
 			// composer
 
@@ -110,429 +115,11 @@
 
 			// materials
 
+			var colorShader, normalShader, bumpShader, clipDepthShader, lightShader, unlitShader, compositeShader;
 			var matNormal, matClipDepth, matBasic, matUnlit;
 
 			var numLights = 50;
 			var lights = new Array();
-
-			// -----------------------
-			// shader definitions
-			// -----------------------
-
-			var clipdepth_frag = ""+
-
-			"varying vec4 clipPos;"+
-
-			"void main() {"+
-
-				"gl_FragColor = vec4( clipPos.z / clipPos.w, 1.0, 1.0, 1.0 );"+
-
-			"}";
-
-
-			var clipdepth_vert = "" +
-
-			"varying vec4 clipPos;"+
-
-			"void main() {"+
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
-				"gl_Position = projectionMatrix * mvPosition;"+
-				"clipPos = gl_Position;"+
-
-			"}";
-
-
-			// -----------------------
-
-			var normals_vert = "" +
-
-			"varying vec3 normalView;"+
-
-			"void main() {"+
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
-				"gl_Position = projectionMatrix * mvPosition;"+
-				"normalView = normalize( normalMatrix * normal );"+
-
-			"}";
-
-			var normals_frag = "" +
-
-			"varying vec3 normalView;"+
-
-			"void main() {"+
-
-				"gl_FragColor = vec4( vec3( normalView * 0.5 + 0.5 ), 1.0 );"+
-
-			"}";
-
-			// -----------------------
-
-			var bump_vert = "" +
-
-			"varying vec3 normalView;"+
-			"varying vec2 vUv;"+
-			"varying vec3 vViewPosition;"+
-
-			"uniform vec4 offsetRepeat;"+
-
-			"void main() {"+
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
-				"gl_Position = projectionMatrix * mvPosition;"+
-				"normalView = normalize( normalMatrix * normal );"+
-				"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;"+
-				"vViewPosition = -mvPosition.xyz;"+
-
-			"}";
-
-			var bump_frag = "" +
-
-			"#extension GL_OES_standard_derivatives : enable\n"+
-			"varying vec3 normalView;"+
-			"varying vec2 vUv;"+
-			"varying vec3 vViewPosition;"+
-
-			"uniform sampler2D bumpMap;"+
-			"uniform float bumpScale;"+
-
-			// Derivative maps - bump mapping unparametrized surfaces by Morten Mikkelsen
-			//	http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html
-
-			// Evaluate the derivative of the height w.r.t. screen-space using forward differencing (listing 2)
-
-			"vec2 dHdxy_fwd() {"+
-
-				"vec2 dSTdx = dFdx( vUv );"+
-				"vec2 dSTdy = dFdy( vUv );"+
-
-				"float Hll = bumpScale * texture2D( bumpMap, vUv ).x;"+
-				"float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;"+
-				"float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;"+
-
-				"return vec2( dBx, dBy );"+
-
-			"}"+
-
-			"vec3 perturbNormalArb( vec3 surf_pos, vec3 surf_norm, vec2 dHdxy ) {"+
-
-				"vec3 vSigmaX = dFdx( surf_pos );"+
-				"vec3 vSigmaY = dFdy( surf_pos );"+
-				"vec3 vN = surf_norm;"+		// normalized
-
-				"vec3 R1 = cross( vSigmaY, vN );"+
-				"vec3 R2 = cross( vN, vSigmaX );"+
-
-				"float fDet = dot( vSigmaX, R1 );"+
-
-				"vec3 vGrad = sign( fDet ) * ( dHdxy.x * R1 + dHdxy.y * R2 );"+
-				"return normalize( abs( fDet ) * surf_norm - vGrad );"+
-
-			"}"+
-
-			"void main() {"+
-
-				"vec3 normal = normalize( normalView );"+
-				"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );"+
-				"gl_FragColor = vec4( vec3( normal * 0.5 + 0.5 ), 1.0 );"+
-
-			"}";
-
-			// -----------------------
-
-			var unlit_vert = "" +
-
-			"varying vec4 clipPos;"+
-
-			"void main() {"+
-
-				"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );"+
-				"clipPos = gl_Position;"+
-
-			"}";
-
-			var unlit_frag = "" +
-
-			"varying vec4 clipPos;"+
-			"uniform sampler2D samplerDepth;"+
-
-			"uniform float viewHeight;"+
-			"uniform float viewWidth;"+
-
-			"uniform vec3 lightColor;" +
-
-			"void main() {"+
-
-				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"+
-				"float z = texture2D( samplerDepth, texCoord ).x;"+
-				"vec4 color = vec4( lightColor, 1.0 );"+
-				"float depth = clipPos.z / clipPos.w;"+
-				"if( depth > z && z > 0.0 ) color.w = 0.0;"+
-				"gl_FragColor = color;"+
-
-			"}";
-
-			// -----------------------
-
-			var deferredlight_vert = "" +
-
-			"varying vec3 lightView;" +
-			"varying vec4 clipPos;" +
-			"uniform vec3 lightPos;" +
-			"uniform mat4 matView;" +
-
-			"void main() { " +
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );"+
-				"gl_Position = projectionMatrix * mvPosition;"+
-				"lightView = vec3( matView * vec4( lightPos, 1.0 ) );" +
-				"clipPos = gl_Position;"+
-
-			"}"
-
-			var deferredlight_frag = "" +
-
-			"varying vec3 lightView;"+
-			"varying vec4 clipPos;" +
-
-			"uniform sampler2D samplerColor;"+
-			"uniform sampler2D samplerDepth;"+
-			"uniform sampler2D samplerNormals;"+
-			"uniform sampler2D samplerLightBuffer;"+
-
-			"uniform float lightRadius;"+
-			"uniform float lightIntensity;"+
-			"uniform float viewHeight;"+
-			"uniform float viewWidth;"+
-
-			"uniform vec3 lightColor;"+
-
-			"uniform mat4 matProjInverse;"+
-
-			"void main() {"+
-
-				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );"+
-
-				"float z = texture2D( samplerDepth, texCoord ).x;"+
-				"float lightZ = clipPos.z / clipPos.w;"+
-
-				/*
-				"if ( z == 0.0 ) {"+
-
-					"gl_FragColor = vec4( vec3( 0.0 ), 1.0 );"+
-					"return;"+
-
-				"}"+
-				*/
-
-				"if ( z == 0.0 || lightZ > z ) discard;"+
-
-				"float x = texCoord.x * 2.0 - 1.0;"+
-				"float y = texCoord.y * 2.0 - 1.0;"+
-
-				"vec4 projectedPos = vec4( x, y, z, 1.0 );"+
-
-				"vec4 viewPos = matProjInverse * projectedPos;"+
-				"viewPos.xyz /= viewPos.w;"+
-				"viewPos.w = 1.0;"+
-
-				"vec3 lightDir = lightView - viewPos.xyz;"+
-				"float dist = length( lightDir );"+
-
-				"if ( dist > lightRadius ) discard;" +
-
-				"lightDir = normalize( lightDir );"+
-
-				"float cutoff = 0.3;"+
-				"float denom = dist/lightRadius + 1.0;"+
-				"float attenuation = 1.0 / ( denom * denom );"+
-				"attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );"+
-				"attenuation = max( attenuation, 0.0 );"+
-				"attenuation *= attenuation;"+
-
-				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;" +
-
-				// wrap around lighting
-
-				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
-				"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );" +
-
-				"const vec3 wrapRGB = vec3( 0.6, 0.2, 0.2 );"+
-				"vec3 diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );"+
-
-				// simple lighting
-
-				//"float diffuseFull = max( dot( normal, lightDir ), 0.0 );" +
-				//"vec3 diffuse = vec3 ( diffuseFull );"+
-
-				// specular
-
-				"const float shininess = 75.0;" +
-				"const float specularIntensity = 0.4;"+
-
-				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );" +
-				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );" +
-
-				// simple specular
-
-				//"vec3 specular = specularIntensity * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;" +
-
-				// physically based specular
-
-				"vec3 specularColor = specularIntensity * vec3( 0.12 );"+
-
-				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;"+
-
-				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDir, halfVector ), 5.0 );"+
-				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;"+
-
-				// color
-
-				"vec4 albedo = texture2D( samplerColor, texCoord );"+
-
-				// combine
-
-				"vec4 color = vec4( 0.0 );"+
-				"color.xyz = albedo.xyz * lightColor * lightIntensity;"+
-				"color.w = attenuation;"+
-				"gl_FragColor = color * vec4( diffuse + specular, 1.0 );" +
-
-			"}";
-
-			var composite_vert = "" +
-
-			"varying vec2 texCoord;"+
-
-			"void main() {"+
-
-				"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );"+
-				"texCoord = pos.xy * vec2( 0.5 ) + 0.5;"+
-				"gl_Position = pos;"+
-
-			"}";
-
-			var composite_frag = "" +
-
-			"varying vec2 texCoord;"+
-			"uniform sampler2D samplerLightBuffer;" +
-			"uniform sampler2D samplerEmitter;" +
-			"uniform vec3 lightPos;" +
-
-			"void main() {" +
-
-				"vec3 color = texture2D( samplerLightBuffer, texCoord ).xyz;" +
-				"vec3 emitter = texture2D( samplerEmitter, texCoord ).xyz;"+
-
-				"if ( emitter != vec3( 0.0 ) ) {"+
-
-					"gl_FragColor = vec4( emitter, 1.0 );" +
-
-				"} else {"+
-
-					"gl_FragColor = vec4( sqrt( color ), 1.0 );" +
-
-				"}"+
-
-			"}"
-
-			// -----------------------
-
-			var normalShader = {
-
-				uniforms: {},
-
-				vertexShader: normals_vert,
-				fragmentShader: normals_frag
-
-			};
-
-			// -----------------------
-
-			var bumpShader = {
-
-				uniforms: {
-
-					bumpMap: 	{ type: "t", value: null },
-					bumpScale:	{ type: "f", value: 1 },
-					offsetRepeat : { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
-
-				},
-
-				vertexShader: bump_vert,
-				fragmentShader: bump_frag
-
-			};
-
-			// -----------------------
-
-			var clipDepthShader = {
-
-				uniforms: {},
-
-				vertexShader: clipdepth_vert,
-				fragmentShader: clipdepth_frag
-
-			};
-
-			// -----------------------
-
-			var unlitShader = {
-
-				uniforms: {
-
-					samplerDepth: { type: "t", value: null },
-					viewWidth: { type: "f", value: SCALE * WIDTH },
-					viewHeight: { type: "f", value: SCALE * HEIGHT },
-					lightColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
-
-				},
-
-				vertexShader: unlit_vert,
-				fragmentShader: unlit_frag
-
-			};
-
-			// -----------------------
-
-			var lightShader = {
-
-				uniforms: {
-
-					samplerLightBuffer: { type: "t", value: null },
-					samplerNormals: { type: "t", value: null },
-					samplerDepth: { type: "t", value: null },
-					samplerColor: { type: "t", value: null },
-					matView : { type: "m4", value: new THREE.Matrix4() },
-					matProjInverse : { type: "m4", value: new THREE.Matrix4() },
-					viewWidth: { type: "f", value: SCALE * WIDTH },
-					viewHeight: { type: "f", value: SCALE * HEIGHT },
-					lightPos: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-					lightColor: { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-					lightIntensity: { type: "f", value: 1.0 },
-					lightRadius: { type: "f", value: 1.0 }
-
-				},
-
-				vertexShader: deferredlight_vert,
-				fragmentShader: deferredlight_frag
-
-			};
-
-			// -----------------------
-
-			var compositeShader = {
-
-				uniforms: {
-
-					samplerLightBuffer: { type: "t", value: null },
-					samplerEmitter: { type: "t", value: null }
-				},
-
-				vertexShader: composite_vert,
-				fragmentShader: composite_frag
-
-			};
 
 			// -----------------------------
 
@@ -602,8 +189,11 @@
 
 			function createRenderTargets() {
 
-				var rtParamsFloat = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
-							          format: THREE.RGBAFormat, type: THREE.FloatType };
+				var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
+										    format: THREE.RGBAFormat, type: THREE.FloatType };
+
+				var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+											 format: THREE.RGBAFormat, type: THREE.FloatType };
 
 				var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
 							          format: THREE.RGBFormat, type: THREE.UnsignedByteType };
@@ -612,14 +202,18 @@
 				// g-buffer
 				// ----------------------------------------------------------
 
-				rtNormals = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
-				rtDepth = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
-				rtColor = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
-				rtFinal = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
+				rtNormals = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
+				rtDepth   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
+				rtColor   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatNearest );
+				rtLight   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
+				rtEmitter = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsUByte );
+				rtFinal   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsUByte );
 
 				rtNormals.generateMipmaps = false;
 				rtDepth.generateMipmaps = false;
 				rtColor.generateMipmaps = false;
+				rtLight.generateMipmaps = false;
+				rtEmitter.generateMipmaps = false;
 				rtFinal.generateMipmaps = false;
 
 				var passNormals = new THREE.RenderPass( scene, camera );
@@ -639,8 +233,6 @@
 				// ----------------------------------------------------------
 
 				var emitterPass = new THREE.RenderPass( emitterScene, camera );
-				rtEmitter = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
-				rtEmitter.generateMipmaps = false;
 
 				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
 				compEmitter.addPass( emitterPass );
@@ -649,17 +241,14 @@
 				// lighting pass
 				// ----------------------------------------------------------
 
-				rtLightBuffer = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
-				rtLightBuffer.generateMipmaps = false;
-
 				var passLight = new THREE.RenderPass( lightScene, camera );
-				compLightBuffer = new THREE.EffectComposer( renderer, rtLightBuffer );
+				compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
 				compLightBuffer.addPass( passLight );
 
 				lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
 				lightShader.uniforms[ 'samplerNormals' ].value = compNormals.renderTarget2;
 				lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
-				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLightBuffer;
+				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLight;
 
 				var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
 
@@ -669,17 +258,19 @@
 
 					// setup material
 
-					var matLight = new THREE.ShaderMaterial({
+					var matLight = new THREE.ShaderMaterial( {
 
 						uniforms:       THREE.UniformsUtils.clone( lightShader.uniforms ),
 						vertexShader:   lightShader.vertexShader,
-						fragmentShader: lightShader.fragmentShader
+						fragmentShader: lightShader.fragmentShader,
+						defines:		{ "ADDITIVE_SPECULAR": false, "SPECULAR_INTENSITY" : 0.048, "SHININESS": 75.01 },
 
-					});
+						blending:		THREE.AdditiveBlending,
+						depthWrite:		false,
+						transparent:	true
 
-					matLight.blending = THREE.AdditiveBlending;
-					matLight.transparent = true;
-					matLight.depthWrite = false;
+					} );
+
 					matLight.uniforms[ "lightPos" ].value = light.position;
 					matLight.uniforms[ "lightRadius" ].value = light.distance;
 					matLight.uniforms[ "lightIntensity" ].value = light.intensity;
@@ -693,13 +284,13 @@
 
 					// create emitter sphere
 
-					var matEmitter = new THREE.ShaderMaterial({
+					var matEmitter = new THREE.ShaderMaterial( {
 
 						uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
 						vertexShader:   unlitShader.vertexShader,
 						fragmentShader: unlitShader.fragmentShader
 
-					});
+					} );
 
 					var meshEmitter = new THREE.Mesh( geomEmitter, matEmitter );
 					meshEmitter.position = light.position;
@@ -724,8 +315,8 @@
 
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				//effectFXAA.uniforms[ 'resolution' ].value.set( 1 / ( WIDTH ), 1 / ( HEIGHT ) );
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / ( SCALE * WIDTH ), 1 / ( SCALE * HEIGHT ) );
+				//effectFXAA.uniforms[ 'resolution' ].value.set( 1 / WIDTH, 1 / HEIGHT );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCALED_WIDTH, 1 / SCALED_HEIGHT );
 				//effectFXAA.renderToScreen = true;
 
 				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
@@ -745,18 +336,24 @@
 
 			function initScene( object, y, scale ) {
 
-				var shader = THREE.ShaderLib[ "basic" ];
-
 				object.traverse( function( node ) {
 
 					if ( node.material ) {
 
 						// color material
 
-						var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+						var uniforms = THREE.UniformsUtils.clone( colorShader.uniforms );
 						var defines = { "USE_MAP": !!node.material.map, "GAMMA_INPUT": true };
 
-						var material = new THREE.ShaderMaterial( { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, defines: defines } );
+						var material = new THREE.ShaderMaterial( {
+
+							fragmentShader: colorShader.fragmentShader,
+							vertexShader: 	colorShader.vertexShader,
+							uniforms: 		uniforms,
+							defines: 		defines
+
+						} );
+
 						uniforms.diffuse.value.copy( node.material.color );
 						uniforms.map.value = node.material.map;
 
@@ -788,7 +385,14 @@
 						if ( node.material.bumpMap ) {
 
 							var uniforms = THREE.UniformsUtils.clone( bumpShader.uniforms );
-							var normalMaterial = new THREE.ShaderMaterial( { uniforms: uniforms, vertexShader: bumpShader.vertexShader, fragmentShader: bumpShader.fragmentShader } );
+							var normalMaterial = new THREE.ShaderMaterial( {
+
+								uniforms: 		uniforms,
+								vertexShader: 	bumpShader.vertexShader,
+								fragmentShader: bumpShader.fragmentShader,
+								defines:		{ "USE_BUMPMAP": true }
+
+							} );
 							uniforms.bumpMap.value = node.material.bumpMap;
 							uniforms.bumpScale.value = node.material.bumpScale;
 
@@ -823,22 +427,43 @@
 
 			function initMaterials() {
 
+				// -----------------------
+				// shader definitions
+				// -----------------------
 
-				matNormal = new THREE.ShaderMaterial({
+				colorShader = THREE.ShaderDeferred[ "color" ];
+				normalShader = THREE.ShaderDeferred[ "normals" ];
+				bumpShader = THREE.ShaderDeferred[ "bump" ];
+				clipDepthShader = THREE.ShaderDeferred[ "clipDepth" ];
+				unlitShader = THREE.ShaderDeferred[ "unlit" ];
+				lightShader = THREE.ShaderDeferred[ "light" ];
+				compositeShader = THREE.ShaderDeferred[ "composite" ];
 
-					uniforms:       normalShader.uniforms,
+				unlitShader.uniforms[ "viewWidth" ].value = SCALED_WIDTH;
+				unlitShader.uniforms[ "viewHeight" ].value = SCALED_HEIGHT;
+
+				lightShader.uniforms[ "viewWidth" ].value = SCALED_WIDTH;
+				lightShader.uniforms[ "viewHeight" ].value = SCALED_HEIGHT;
+
+				// -----------------------
+				// default materials
+				// -----------------------
+
+				matNormal = new THREE.ShaderMaterial( {
+
+					uniforms:       THREE.UniformsUtils.clone( normalShader.uniforms ),
 					vertexShader:   normalShader.vertexShader,
 					fragmentShader: normalShader.fragmentShader
 
-				});
+				} );
 
-				matClipDepth = new THREE.ShaderMaterial({
+				matClipDepth = new THREE.ShaderMaterial( {
 
-					uniforms:       clipDepthShader.uniforms,
+					uniforms:       THREE.UniformsUtils.clone( clipDepthShader.uniforms ),
 					vertexShader:   clipDepthShader.vertexShader,
 					fragmentShader: clipDepthShader.fragmentShader
 
-				});
+				} );
 
 			}
 
