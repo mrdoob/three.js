@@ -4931,7 +4931,7 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 	this.vertexTangents = [];
 
-	this.materialIndex = materialIndex;
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 	this.centroid = new THREE.Vector3();
 
@@ -4981,7 +4981,7 @@ THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
 
 	this.vertexTangents = [];
 
-	this.materialIndex = materialIndex;
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 	this.centroid = new THREE.Vector3();
 
@@ -16597,7 +16597,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function getBufferMaterial( object, geometryGroup ) {
 
 		return object.material instanceof THREE.MeshFaceMaterial
-			? object.material.materials[ geometryGroup.materialIndex !== undefined ? geometryGroup.materialIndex : 0 ]
+			? object.material.materials[ geometryGroup.materialIndex ]
 			: object.material;
 
 	};
@@ -19970,7 +19970,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-			materialIndex = buffer.materialIndex !== undefined ? buffer.materialIndex : 0;
+			materialIndex = buffer.materialIndex;
 
 			material = meshMaterial.materials[ materialIndex ];
 
@@ -20015,8 +20015,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function sortFacesByMaterial ( geometry, material ) {
 
 		var f, fl, face, materialIndex, vertices,
-			materialHash, groupHash,
-			hash_map = {};
+			groupHash, hash_map = {};
 
 		var numMorphTargets = geometry.morphTargets.length;
 		var numMorphNormals = geometry.morphNormals.length;
@@ -20028,17 +20027,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 			face = geometry.faces[ f ];
-			materialIndex = usesFaceMaterial ? face.materialIndex : undefined;
+			materialIndex = usesFaceMaterial ? face.materialIndex : 0;
 
-			materialHash = ( materialIndex !== undefined ) ? materialIndex : -1;
+			if ( hash_map[ materialIndex ] === undefined ) {
 
-			if ( hash_map[ materialHash ] === undefined ) {
-
-				hash_map[ materialHash ] = { 'hash': materialHash, 'counter': 0 };
+				hash_map[ materialIndex ] = { 'hash': materialIndex, 'counter': 0 };
 
 			}
 
-			groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
+			groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
 
 			if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
@@ -20050,8 +20047,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ groupHash ].vertices + vertices > 65535 ) {
 
-				hash_map[ materialHash ].counter += 1;
-				groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
+				hash_map[ materialIndex ].counter += 1;
+				groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
 
 				if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
