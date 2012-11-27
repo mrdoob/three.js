@@ -14,14 +14,20 @@ THREE.ShaderDeferred = {
 
 			THREE.UniformsLib[ "common" ],
 			THREE.UniformsLib[ "fog" ],
-			THREE.UniformsLib[ "shadowmap" ]
+			THREE.UniformsLib[ "shadowmap" ],
+
+			{
+				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
+				"shininess": { type: "f", value: 30 }
+			}
 
 		] ),
 
 		fragmentShader : [
 
 			"uniform vec3 diffuse;",
-			"uniform float opacity;",
+			"uniform vec3 specular;",
+			"uniform float shininess;",
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
@@ -42,6 +48,8 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
+				"const float opacity = 1.0;",
+
 				"gl_FragColor = vec4( diffuse, opacity );",
 
 				THREE.ShaderChunk[ "map_fragment" ],
@@ -56,8 +64,21 @@ THREE.ShaderDeferred = {
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 
+				// diffuse color
+
 				"gl_FragColor.x = vec3_to_float( 0.999 * gl_FragColor.xyz );",
-				"gl_FragColor.yzw = vec3( 0.0 );",
+
+				// specular color
+
+				"gl_FragColor.y = vec3_to_float( 0.999 * specular );",
+
+				// shininess
+
+				"gl_FragColor.z = shininess;",
+
+				// free
+
+				"gl_FragColor.w = 0.0;",
 
 			"}"
 
@@ -429,7 +450,17 @@ THREE.ShaderDeferred = {
 				"attenuation = max( attenuation, 0.0 );",
 				"attenuation *= attenuation;",
 
+				// normal
+
 				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;",
+
+				// color
+
+				"vec4 colorMap = texture2D( samplerColor, texCoord );",
+
+				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
+				"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
+				"float shininess = colorMap.z;",
 
 				// wrap around lighting
 
@@ -446,8 +477,8 @@ THREE.ShaderDeferred = {
 
 				// specular
 
-				"const float shininess = SHININESS;",
-				"const float specularIntensity = SPECULAR_INTENSITY;",
+				//"const float shininess = SHININESS;",
+				//"const float specularIntensity = SPECULAR_INTENSITY;",
 
 				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );",
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
@@ -458,17 +489,12 @@ THREE.ShaderDeferred = {
 
 				// physically based specular
 
-				"vec3 specularColor = specularIntensity * vec3( 1.0 );",
+				//"vec3 specularColor = specularIntensity * vec3( 1.0 );",
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
 				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDir, halfVector ), 5.0 );",
 				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;",
-
-				// color
-
-				"vec4 colorMap = texture2D( samplerColor, texCoord );",
-				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
 
 				// combine
 

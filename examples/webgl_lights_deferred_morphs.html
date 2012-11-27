@@ -332,6 +332,8 @@
 
 			function initScene( object, y, scale ) {
 
+				var black = new THREE.Color( 0x000000 );
+
 				object.traverse( function( node ) {
 
 					if ( node.material ) {
@@ -351,7 +353,14 @@
 
 						} );
 
-						uniforms.diffuse.value.copy( node.material.color );
+						var diffuse = node.material.color;
+						var specular = node.material.specular !== undefined ? node.material.specular : black;
+						var shininess = node.material.shininess !== undefined ? node.material.shininess : 1;
+
+						uniforms.diffuse.value.copy( diffuse );
+						uniforms.specular.value.copy( specular );
+						uniforms.shininess.value = shininess;
+
 						uniforms.map.value = node.material.map;
 
 						material.vertexColors = node.material.vertexColors;
@@ -431,13 +440,13 @@
 
 						if ( node.material.morphTargets ) {
 
-							var depthMaterial = new THREE.ShaderMaterial({
+							var depthMaterial = new THREE.ShaderMaterial( {
 
 								uniforms:       THREE.UniformsUtils.clone( clipDepthShader.uniforms ),
 								vertexShader:   clipDepthShader.vertexShader,
 								fragmentShader: clipDepthShader.fragmentShader
 
-							});
+							} );
 
 							depthMaterial.morphTargets = node.material.morphTargets;
 
@@ -734,14 +743,14 @@
 				mapHeight3.format = THREE.RGBFormat;
 
 				var geoPlane = new THREE.PlaneGeometry( 40, 20 );
-				var matPlane = new THREE.MeshPhongMaterial( { color: 0x000000, bumpMap: mapHeight2, bumpScale: 0.5 } );
-				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x000000, bumpMap: mapHeight3, bumpScale: 0.5 } );
-				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0x000000, bumpMap: mapHeight3, bumpScale: 1 } );
+				var matPlaneSide   = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight2, bumpScale: 0.5 } );
+				var matPlaneBottom = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight3, bumpScale: 0.5 } );
+				var matPlaneTop    = new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x222222, shininess: 75, bumpMap: mapHeight3, bumpScale: 1 } );
 
 
 				// bottom
 
-				var mesh = new THREE.Mesh( geoPlane, matPlane2 );
+				var mesh = new THREE.Mesh( geoPlane, matPlaneBottom );
 				mesh.position.z = -2;
 				mesh.position.y = -6;
 				mesh.rotation.x = -Math.PI/2;
@@ -749,7 +758,7 @@
 
 				// top
 
-				var mesh = new THREE.Mesh( geoPlane, matPlane3 );
+				var mesh = new THREE.Mesh( geoPlane, matPlaneTop );
 				mesh.position.z = -2;
 				mesh.position.y = 7;
 				mesh.rotation.x = Math.PI/2;
@@ -757,14 +766,14 @@
 
 				// back
 
-				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				var mesh = new THREE.Mesh( geoPlane, matPlaneSide );
 				mesh.position.z = -4;
 				mesh.position.y = 0;
 				object.add( mesh );
 
 				// right
 
-				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				var mesh = new THREE.Mesh( geoPlane, matPlaneSide );
 				mesh.position.z = 0;
 				mesh.position.y = 0;
 				mesh.position.x = 13;
@@ -773,7 +782,7 @@
 
 				// left
 
-				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				var mesh = new THREE.Mesh( geoPlane, matPlaneSide );
 				mesh.position.z = 0;
 				mesh.position.y = 0;
 				mesh.position.x = -13;
@@ -800,7 +809,7 @@
 
 				geometry.computeMorphNormals();
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x333333, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
 				var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 				meshAnim.duration = 3000;

@@ -336,6 +336,8 @@
 
 			function initScene( object, y, scale ) {
 
+				var black = new THREE.Color( 0x000000 );
+
 				object.traverse( function( node ) {
 
 					if ( node.material ) {
@@ -354,7 +356,14 @@
 
 						} );
 
-						uniforms.diffuse.value.copy( node.material.color );
+						var diffuse = node.material.color;
+						var specular = node.material.specular !== undefined ? node.material.specular : black;
+						var shininess = node.material.shininess !== undefined ? node.material.shininess : 1;
+
+						uniforms.diffuse.value.copy( diffuse );
+						uniforms.specular.value.copy( specular );
+						uniforms.shininess.value = shininess;
+
 						uniforms.map.value = node.material.map;
 
 						if ( node.material.bumpMap ) {
@@ -669,6 +678,74 @@
 
 			}
 
+			function generateBox() {
+
+				var object = new THREE.Object3D();
+
+				var mapHeight2 = THREE.ImageUtils.loadTexture( "obj/lightmap/rocks.jpg" );
+				mapHeight2.repeat.set( 3, 1.5 );
+				mapHeight2.wrapS = mapHeight2.wrapT = THREE.RepeatWrapping;
+				mapHeight2.anisotropy = 4;
+				mapHeight2.format = THREE.RGBFormat;
+
+				var mapHeight3 = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+				mapHeight3.repeat.set( 16, 8 );
+				mapHeight3.wrapS = mapHeight3.wrapT = THREE.RepeatWrapping;
+				mapHeight3.anisotropy = 4;
+				mapHeight3.format = THREE.RGBFormat;
+
+				var geoPlane = new THREE.PlaneGeometry( 40, 20 );
+
+				var matPlane  = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 0.5 } );
+				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x331919, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 1 } );
+				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0x00aaff, specular: 0xffffff, shininess: 200, bumpMap: mapHeight3, bumpScale: 1.2 } );
+				var matPlane4 = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight3, bumpScale: 1 } );
+
+				// bottom
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane3 );
+				mesh.position.z = -2;
+				mesh.position.y = -6;
+				mesh.rotation.x = -Math.PI/2;
+				object.add( mesh );
+
+				// top
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane4 );
+				mesh.position.z = -2;
+				mesh.position.y = 6;
+				mesh.rotation.x = Math.PI/2;
+				object.add( mesh );
+
+				// back
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = -4;
+				mesh.position.y = 0;
+				object.add( mesh );
+
+				// right
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = 0;
+				mesh.position.y = 0;
+				mesh.position.x = 13;
+				mesh.rotation.y = -Math.PI/2;
+				//object.add( mesh );
+
+				// left
+
+				var mesh = new THREE.Mesh( geoPlane, matPlane );
+				mesh.position.z = 0;
+				mesh.position.y = 0;
+				mesh.position.x = -13;
+				mesh.rotation.y = Math.PI/2;
+				//object.add( mesh );
+
+				return object;
+
+			}
+
 			// -----------------------------
 			// entry point
 			// -----------------------------
@@ -709,74 +786,19 @@
 				mapHeight.anisotropy = 4;
 				mapHeight.format = THREE.RGBFormat;
 
-				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5 } );
+				var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909 } );
 
 				var object = new THREE.Mesh( geometry, material );
-
-				// box
-
-				var mapHeight2 = THREE.ImageUtils.loadTexture( "obj/lightmap/rocks.jpg" );
-				mapHeight2.repeat.set( 3, 1.5 );
-				mapHeight2.wrapS = mapHeight2.wrapT = THREE.RepeatWrapping;
-				mapHeight2.anisotropy = 4;
-				mapHeight2.format = THREE.RGBFormat;
-
-				var mapHeight3 = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
-				mapHeight3.repeat.set( 16, 8 );
-				mapHeight3.wrapS = mapHeight3.wrapT = THREE.RepeatWrapping;
-				mapHeight3.anisotropy = 4;
-				mapHeight3.format = THREE.RGBFormat;
-
-				var geoPlane = new THREE.PlaneGeometry( 40, 20 );
-				var matPlane = new THREE.MeshPhongMaterial( { color: 0xffffff, bumpMap: mapHeight2, bumpScale: 0.5 } );
-				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x331919, bumpMap: mapHeight2, bumpScale: 1 } );
-				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0xffffff, bumpMap: mapHeight3, bumpScale: 1 } );
-
-				// bottom
-
-				var mesh = new THREE.Mesh( geoPlane, matPlane2 );
-				mesh.position.z = -2;
-				mesh.position.y = -6;
-				mesh.rotation.x = -Math.PI/2;
-				object.add( mesh );
-
-				// top
-
-				var mesh = new THREE.Mesh( geoPlane, matPlane3 );
-				mesh.position.z = -2;
-				mesh.position.y = 6;
-				mesh.rotation.x = Math.PI/2;
-				object.add( mesh );
-
-				// back
-
-				var mesh = new THREE.Mesh( geoPlane, matPlane );
-				mesh.position.z = -4;
-				mesh.position.y = 0;
-				object.add( mesh );
-
-				// right
-
-				var mesh = new THREE.Mesh( geoPlane, matPlane );
-				mesh.position.z = 0;
-				mesh.position.y = 0;
-				mesh.position.x = 13;
-				mesh.rotation.y = -Math.PI/2;
-				//object.add( mesh );
-
-				// left
-
-				var mesh = new THREE.Mesh( geoPlane, matPlane );
-				mesh.position.z = 0;
-				mesh.position.y = 0;
-				mesh.position.x = -13;
-				mesh.rotation.y = Math.PI/2;
-				//object.add( mesh );
-
 				initScene( object, 0, 8 );
-				animate();
 
 			} );
+
+			// create box
+
+			var object = generateBox();
+			initScene( object, 0, 8 );
+
+			animate();
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
