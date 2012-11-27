@@ -477,9 +477,6 @@ THREE.ShaderDeferred = {
 
 				// specular
 
-				//"const float shininess = SHININESS;",
-				//"const float specularIntensity = SPECULAR_INTENSITY;",
-
 				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );",
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
 
@@ -488,8 +485,6 @@ THREE.ShaderDeferred = {
 				//"vec3 specular = specularIntensity * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;",
 
 				// physically based specular
-
-				//"vec3 specularColor = specularIntensity * vec3( 1.0 );",
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
