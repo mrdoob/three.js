@@ -1,6 +1,7 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author MPanknin / http://www.redplant.de/
+ * @author benaadams / http://blog.illyriad.co.uk/
  *
  */
 
@@ -30,6 +31,15 @@ THREE.ShaderDeferred = {
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
 
+			"const float unit = 255.0/256.0;",
+
+			"float vec3_to_float( vec3 data ) {",
+
+				"highp float compressed = fract( data.x * unit ) + floor( data.y * unit * 255.0 ) + floor( data.z * unit * 255.0 ) * 255.0;",
+				"return compressed;",
+
+			"}",
+
 			"void main() {",
 
 				"gl_FragColor = vec4( diffuse, opacity );",
@@ -45,6 +55,9 @@ THREE.ShaderDeferred = {
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
 
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+				"gl_FragColor.x = vec3_to_float( 0.999 * gl_FragColor.xyz );",
+				"gl_FragColor.yzw = vec3( 0.0 );",
 
 			"}"
 
@@ -364,6 +377,17 @@ THREE.ShaderDeferred = {
 
 			"uniform mat4 matProjInverse;",
 
+			"vec3 float_to_vec3( float data ) {",
+
+				"vec3 uncompressed;",
+				"uncompressed.x = fract( data );",
+				"float zInt = floor( data / 255.0 );",
+				"uncompressed.z = fract( zInt / 255.0 );",
+				"uncompressed.y = fract( floor( data - ( zInt * 255.0 ) ) / 255.0 );",
+				"return uncompressed;",
+
+			"}",
+
 			"void main() {",
 
 				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
@@ -443,7 +467,8 @@ THREE.ShaderDeferred = {
 
 				// color
 
-				"vec4 albedo = texture2D( samplerColor, texCoord );",
+				"vec4 colorMap = texture2D( samplerColor, texCoord );",
+				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
 
 				// combine
 

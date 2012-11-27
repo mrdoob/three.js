@@ -78,6 +78,9 @@
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight - 2 * MARGIN;
 
+			var SCALED_WIDTH = Math.floor( SCALE * WIDTH );
+			var SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
+
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
 			var ASPECT = WIDTH / HEIGHT;
@@ -103,7 +106,7 @@
 
 			// rendertargets
 
-			var rtColor, rtNormals, rtDepth, rtLightBuffer, rtEmitter, rtFinal;
+			var rtColor, rtNormals, rtDepth, rtLight, rtEmitter, rtFinal;
 
 			// composer
 
@@ -186,8 +189,11 @@
 
 			function createRenderTargets() {
 
-				var rtParamsFloat = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
-							          format: THREE.RGBAFormat, type: THREE.FloatType };
+				var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
+										    format: THREE.RGBAFormat, type: THREE.FloatType };
+
+				var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+											 format: THREE.RGBAFormat, type: THREE.FloatType };
 
 				var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
 							          format: THREE.RGBFormat, type: THREE.UnsignedByteType };
@@ -196,14 +202,18 @@
 				// g-buffer
 				// ----------------------------------------------------------
 
-				rtNormals = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
-				rtDepth = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
-				rtColor = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
-				rtFinal = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
+				rtNormals = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
+				rtDepth   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
+				rtColor   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatNearest );
+				rtLight   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
+				rtEmitter = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsUByte );
+				rtFinal   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsUByte );
 
 				rtNormals.generateMipmaps = false;
 				rtDepth.generateMipmaps = false;
 				rtColor.generateMipmaps = false;
+				rtLight.generateMipmaps = false;
+				rtEmitter.generateMipmaps = false;
 				rtFinal.generateMipmaps = false;
 
 				var passNormals = new THREE.RenderPass( scene, camera );
@@ -223,8 +233,6 @@
 				// ----------------------------------------------------------
 
 				var emitterPass = new THREE.RenderPass( emitterScene, camera );
-				rtEmitter = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsUByte );
-				rtEmitter.generateMipmaps = false;
 
 				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
 				compEmitter.addPass( emitterPass );
@@ -233,17 +241,14 @@
 				// lighting pass
 				// ----------------------------------------------------------
 
-				rtLightBuffer = new THREE.WebGLRenderTarget( SCALE * WIDTH, SCALE * HEIGHT, rtParamsFloat );
-				rtLightBuffer.generateMipmaps = false;
-
 				var passLight = new THREE.RenderPass( lightScene, camera );
-				compLightBuffer = new THREE.EffectComposer( renderer, rtLightBuffer );
+				compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
 				compLightBuffer.addPass( passLight );
 
 				lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
 				lightShader.uniforms[ 'samplerNormals' ].value = compNormals.renderTarget2;
 				lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
-				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLightBuffer;
+				lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLight;
 
 				var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
 
@@ -310,8 +315,8 @@
 
 				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
-				//effectFXAA.uniforms[ 'resolution' ].value.set( 1 / ( WIDTH ), 1 / ( HEIGHT ) );
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / ( SCALE * WIDTH ), 1 / ( SCALE * HEIGHT ) );
+				//effectFXAA.uniforms[ 'resolution' ].value.set( 1 / WIDTH, 1 / HEIGHT );
+				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCALED_WIDTH, 1 / SCALED_HEIGHT );
 				//effectFXAA.renderToScreen = true;
 
 				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
@@ -434,11 +439,11 @@
 				lightShader = THREE.ShaderDeferred[ "light" ];
 				compositeShader = THREE.ShaderDeferred[ "composite" ];
 
-				unlitShader.uniforms[ "viewWidth" ].value = SCALE * WIDTH;
-				unlitShader.uniforms[ "viewHeight" ].value = SCALE * HEIGHT;
+				unlitShader.uniforms[ "viewWidth" ].value = SCALED_WIDTH;
+				unlitShader.uniforms[ "viewHeight" ].value = SCALED_HEIGHT;
 
-				lightShader.uniforms[ "viewWidth" ].value = SCALE * WIDTH;
-				lightShader.uniforms[ "viewHeight" ].value = SCALE * HEIGHT;
+				lightShader.uniforms[ "viewWidth" ].value = SCALED_WIDTH;
+				lightShader.uniforms[ "viewHeight" ].value = SCALED_HEIGHT;
 
 				// -----------------------
 				// default materials
