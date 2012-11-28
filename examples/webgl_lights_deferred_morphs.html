@@ -63,9 +63,6 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-
-
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -83,6 +80,8 @@
 			var VIEW_ANGLE = 45;
 			var ASPECT = WIDTH / HEIGHT;
 
+			// controls
+
 			var mouseX = 0;
 			var mouseY = 0;
 
@@ -90,39 +89,32 @@
 			var angle = 0;
 			var target = new THREE.Vector3( 0, 0, 0 );
 
-
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
 			// core
 
-			var renderer, camera, controls, stats, clock;
-
-			// scenes and scene nodes
-
-			var lightScene, lightNode, scene, sceneNode, emitterScene, emitterNode, quadScene, quadNode;
-
-			// rendertargets
-
-			var rtColor, rtNormals, rtDepth, rtLight, rtEmitter, rtFinal;
-
-			// composer
-
-			var compColor, compNormals, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
-			var effectFXAA;
+			var renderer, camera, scene, controls, stats, clock;
 
 			// lights
 
 			var numLights = 50;
-			var lights = new Array();
+			var lights = [];
 
 			// morphs
 
 			var morphs = [];
 
+			//
+
+			init();
+			animate();
+
 			// -----------------------------
 
-			function bootstrap() {
+			function init() {
+
+				// renderer
 
 				renderer = new THREE.WebGLRenderer( { alpha: false } );
 				renderer.setSize( WIDTH, HEIGHT );
@@ -135,38 +127,15 @@
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				// scene camera
+				// camera
 
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.z = 150;
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
-
-				// scene for walt's head model
+				// scene
 
 				scene = new THREE.Scene();
-				sceneNode = new THREE.Object3D();
-				scene.add( sceneNode );
 				scene.add( camera );
-
-				// scene for light proxy geometry
-
-				lightScene = new THREE.Scene();
-				lightNode = new THREE.Object3D();
-				lightScene.add( lightNode );
-
-				// scene for the coloured emitter spheres
-
-				emitterScene = new THREE.Scene();
-				emitterNode = new THREE.Object3D();
-				emitterScene.add( emitterNode );
-
-				// full screen quad for compositing
-
-				quadScene = new THREE.Scene();
-				quadNode = new THREE.Object3D();
-				quadScene.add( quadNode );
-				quadNode.add( new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ) ) );
 
 				// stats
 
@@ -182,161 +151,33 @@
 
 				// deferred helper
 
-				deferredHelper = new THREE.DeferredHelper( { width: SCALED_WIDTH, height: SCALED_HEIGHT } );
+				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, scene: scene, camera: camera, width: SCALED_WIDTH, height: SCALED_HEIGHT } );
+				deferredHelper.createRenderTargets();
+
+				// add lights
+
+				initLights();
+
+				// add objects
+
+				initObjects();
+
+				// events
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			}
 
-			// -----------------------------
-
-			function createRenderTargets() {
-
-				var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
-										    format: THREE.RGBAFormat, type: THREE.FloatType };
-
-				var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
-											 format: THREE.RGBAFormat, type: THREE.FloatType };
-
-				var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
-							          format: THREE.RGBFormat, type: THREE.UnsignedByteType };
-
-				// ----------------------------------------------------------
-				// g-buffer
-				// ----------------------------------------------------------
-
-				rtNormals = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
-				rtDepth   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
-				rtColor   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatNearest );
-				rtLight   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsFloatLinear );
-				rtEmitter = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsUByte );
-				rtFinal   = new THREE.WebGLRenderTarget( SCALED_WIDTH, SCALED_HEIGHT, rtParamsUByte );
-
-				rtNormals.generateMipmaps = false;
-				rtDepth.generateMipmaps = false;
-				rtColor.generateMipmaps = false;
-				rtLight.generateMipmaps = false;
-				rtEmitter.generateMipmaps = false;
-				rtFinal.generateMipmaps = false;
-
-				var passNormals = new THREE.RenderPass( scene, camera );
-				compNormals = new THREE.EffectComposer( renderer, rtNormals );
-				compNormals.addPass( passNormals );
-
-				var passDepth = new THREE.RenderPass( scene, camera );
-				compDepth = new THREE.EffectComposer( renderer, rtDepth );
-				compDepth.addPass( passDepth );
-
-				var passColor = new THREE.RenderPass( scene, camera );
-				compColor = new THREE.EffectComposer( renderer, rtColor );
-				compColor.addPass( passColor );
-
-				// ----------------------------------------------------------
-				// light emitter spheres
-				// ----------------------------------------------------------
-
-				var emitterPass = new THREE.RenderPass( emitterScene, camera );
-
-				compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
-				compEmitter.addPass( emitterPass );
-
-				// ----------------------------------------------------------
-				// lighting pass
-				// ----------------------------------------------------------
-
-				var passLight = new THREE.RenderPass( lightScene, camera );
-				compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
-				compLightBuffer.addPass( passLight );
-
-				deferredHelper.lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-				deferredHelper.lightShader.uniforms[ 'samplerNormals' ].value = compNormals.renderTarget2;
-				deferredHelper.lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
-				deferredHelper.lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLight;
-
-				var geomEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
-
-				for ( var x = 0; x < numLights; x ++ ) {
-
-					var light = lights[ x ];
-
-					// setup material
-
-					var matLight = new THREE.ShaderMaterial( {
-
-						uniforms:       THREE.UniformsUtils.clone( deferredHelper.lightShader.uniforms ),
-						vertexShader:   deferredHelper.lightShader.vertexShader,
-						fragmentShader: deferredHelper.lightShader.fragmentShader,
-						defines:		{ "ADDITIVE_SPECULAR": true },
-
-						blending:		THREE.AdditiveBlending,
-						depthWrite:		false,
-						transparent:	true
-
-					} );
-
-					matLight.uniforms[ "lightPos" ].value = light.position;
-					matLight.uniforms[ "lightRadius" ].value = light.distance;
-					matLight.uniforms[ "lightIntensity" ].value = light.intensity;
-					matLight.uniforms[ "lightColor" ].value = light.color;
-
-					// setup proxy geometry for this light
-
-					var geomLight = new THREE.SphereGeometry( light.distance, 16, 8 );
-					var meshLight = new THREE.Mesh( geomLight, matLight );
-					lightNode.add( meshLight );
-
-					// create emitter sphere
-
-					var matEmitter = new THREE.ShaderMaterial( {
-
-						uniforms:       THREE.UniformsUtils.clone( deferredHelper.unlitShader.uniforms ),
-						vertexShader:   deferredHelper.unlitShader.vertexShader,
-						fragmentShader: deferredHelper.unlitShader.fragmentShader
-
-					} );
-
-					var meshEmitter = new THREE.Mesh( geomEmitter, matEmitter );
-					meshEmitter.position = light.position;
-					emitterNode.add( meshEmitter );
-
-					// add emitter to light node
-
-					meshLight.emitter = meshEmitter;
-
-				}
-
-				// ----------------------------------------------------------
-				// composite
-				// ----------------------------------------------------------
-
-				deferredHelper.compositeShader.uniforms[ 'samplerLightBuffer' ].value = compLightBuffer.renderTarget2;
-				deferredHelper.compositeShader.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
-
-				compositePass = new THREE.ShaderPass( deferredHelper.compositeShader );
-				compositePass.needsSwap = true;
-
-				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCALED_WIDTH, 1 / SCALED_HEIGHT );
-
-				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
-				effectColor.renderToScreen = true;
-				effectColor.uniforms[ 'powRGB' ].value.set( 1, 1, 1 );
-				effectColor.uniforms[ 'mulRGB' ].value.set( 2, 2, 2 );
-
-				compFinal = new THREE.EffectComposer( renderer, rtFinal );
-				compFinal.addPass( compositePass );
-				compFinal.addPass( effectFXAA );
-				compFinal.addPass( effectColor );
-
-			}
 
 			// -----------------------------
 
-			function initScene( object, y, scale ) {
+			function addObject( object, y, scale ) {
 
 				deferredHelper.addDeferredMaterials( object );
 
 				object.position.y = y;
 				object.scale.set( scale, scale, scale );
-				sceneNode.add( object );
+				scene.add( object );
 
 			}
 
@@ -348,211 +189,65 @@
 
 				// front light
 
-				var light = new THREE.PointLight();
-
-				light.color = new THREE.Vector3( 1, 1, 1 );
-				light.intensity = 1.5;
-				light.distance = 1.5 * distance;
-
+				var light = new THREE.PointLight( 0xffffff, 1.5, 1.5 * distance );
 				lights.push( light );
 
 				// random lights
 
+				var c = new THREE.Vector3();
+
 				for ( var i = 1; i < numLights; i ++ ) {
 
-					var light = new THREE.PointLight();
+					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
 
-					light.color = new THREE.Vector3( Math.random(), Math.random(), Math.random() ).normalize();
+					c.set( Math.random(), Math.random(), Math.random() ).normalize();
 
-					// gamma to linear
-
-					light.color.x *= light.color.x;
-					light.color.y *= light.color.y;
-					light.color.z *= light.color.z;
-
-					light.intensity = 2.0;
-					light.distance = distance;
+					light.color.setRGB( c.x, c.y, c.z );
+					light.color.convertGammaToLinear();
 
 					lights.push( light );
 
 				}
 
-			}
-
-			// -----------------------------
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX ) * 1;
-				mouseY = ( event.clientY - windowHalfY ) * 1;
+				deferredHelper.addDeferredLights( lights, true );
 
 			}
 
-			// -----------------------------
+			function initObjects() {
 
-			function animate() {
+				// add animated model
 
-				var delta = clock.getDelta();
+				var loader = new THREE.JSONLoader();
+				loader.load( "models/animated/elderlyWalk.js", function( geometry ) {
 
-				requestAnimationFrame( animate );
+					geometry.computeMorphNormals();
 
-				//controls.update( delta );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x333333, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
-				targetX = mouseX * .001;
-				targetY = mouseY * .001;
+					meshAnim.duration = 3000;
+					meshAnim.properties.delta = -13;
 
-				angle += 0.05 * ( targetX - angle );
+					var s = 1;
+					meshAnim.scale.set( s, s, s );
+					meshAnim.position.x = 180;
+					meshAnim.position.z = -10;
+					meshAnim.rotation.y = -Math.PI/2;
 
-				camera.position.x = -Math.sin( angle ) * 150;
-				camera.position.z = Math.cos( angle ) * 150;
+					morphs.push( meshAnim );
 
-				camera.lookAt( target );
+					addObject( meshAnim, -48, 50 );
 
-				for ( var i = 0; i < morphs.length; i ++ ) {
+				} );
 
-					morph = morphs[ i ];
-					morph.updateAnimation( 1000 * delta );
+				// add box
 
-					morph.position.x += morph.properties.delta * delta;
-					if ( morph.position.x < -50 ) morph.position.x = 200;
-
-				}
-
-				stats.update();
-				render();
+				var object = generateBox();
+				addObject( object, 0, 8 );
 
 			}
 
 			// -----------------------------
-
-			function render() {
-
-				// -----------------------------
-				// g-buffer color
-				// -----------------------------
-
-				sceneNode.traverse( function( node ) {
-
-					if ( node.material ) {
-
-						node.material = node.properties.colorMaterial;
-
-					}
-
-				} );
-
-				compColor.render();
-
-
-				// -----------------------------
-				// g-buffer depth
-				// -----------------------------
-
-				sceneNode.traverse( function( node ) {
-
-					if ( node.material ) {
-
-						node.material = node.properties.depthMaterial;
-
-					}
-
-				} );
-
-				compDepth.render();
-
-
-				// -----------------------------
-				// g-buffer normals
-				// -----------------------------
-
-				sceneNode.traverse( function( node ) {
-
-					if ( node.material ) {
-
-						node.material = node.properties.normalMaterial;
-
-					}
-
-				} );
-
-				compNormals.render();
-
-				// -----------------------------
-				// emitter pass
-				// -----------------------------
-
-				for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
-
-					var light = lightNode.children[ i ];
-					var color = light.material.uniforms[ "lightColor" ].value;
-
-					var emitter = light.emitter;
-					emitter.material.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
-					emitter.material.uniforms[ "lightColor" ].value = color;
-
-				}
-
-				compEmitter.render();
-
-				// -----------------------------
-				// light pass
-				// -----------------------------
-
-				camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
-
-				for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
-
-					var uniforms = lightNode.children[ i ].material.uniforms;
-
-					uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
-					uniforms[ "matView" ].value = camera.matrixWorldInverse;
-
-				}
-
-				var time = Date.now() * 0.0005;
-
-				// update lights
-
-				var x, y, z;
-
-				for ( var i = 0; i < numLights; i ++ ) {
-
-					if ( i > 0 ) {
-
-						x = Math.sin( time + i * 1.7 ) * 80;
-						y = Math.cos( time + i * 1.5 ) * 40;
-						z = Math.cos( time + i * 1.3 ) * 30;
-
-					} else {
-
-						x = Math.sin( time * 3 ) * 20;
-						y = 15;
-						z = Math.cos( time * 3 ) * 25 + 10;
-
-					}
-
-					var light = lightNode.children[ i ];
-					var lightPosition = light.material.uniforms[ "lightPos" ].value;
-
-					lightPosition.x = x;
-					lightPosition.y = y;
-					lightPosition.z = z;
-
-					light.emitter.position = lightPosition;
-					light.position = lightPosition;
-					light.frustumCulled = false;
-
-				}
-
-				compLightBuffer.render();
-
-				// -----------------------------
-				// composite pass
-				// -----------------------------
-
-				compFinal.render( 0.1 );
-
-			}
 
 			function generateBox() {
 
@@ -622,46 +317,84 @@
 			}
 
 			// -----------------------------
-			// entry point
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 1;
+				mouseY = ( event.clientY - windowHalfY ) * 1;
+
+			}
+
 			// -----------------------------
 
-			bootstrap();
-			initLights();
-			createRenderTargets();
+			function animate() {
 
-			// create animated model
+				requestAnimationFrame( animate );
 
-			var loader = new THREE.JSONLoader();
-			loader.load( "models/animated/elderlyWalk.js", function( geometry ) {
+				render();
+				stats.update();
 
-				geometry.computeMorphNormals();
+			}
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x333333, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
-				var meshAnim = new THREE.MorphAnimMesh( geometry, material );
+			function render() {
 
-				meshAnim.duration = 3000;
-				meshAnim.properties.delta = -13;
+				var delta = clock.getDelta();
+				var time = Date.now() * 0.0005;
 
-				var s = 1;
-				meshAnim.scale.set( s, s, s );
-				meshAnim.position.x = 180;
-				meshAnim.position.z = -10;
-				meshAnim.rotation.y = -Math.PI/2;
+				// update lights
 
-				morphs.push( meshAnim );
+				var x, y, z;
 
-				initScene( meshAnim, -48, 50 );
+				for ( var i = 0, il = lights.length; i < il; i ++ ) {
 
-			} );
+					var light = lights[ i ];
 
-			// create box
+					if ( i > 0 ) {
 
-			var object = generateBox();
-			initScene( object, 0, 8 );
+						x = Math.sin( time + i * 1.7 ) * 80;
+						y = Math.cos( time + i * 1.5 ) * 40;
+						z = Math.cos( time + i * 1.3 ) * 30;
 
-			animate();
+					} else {
 
-			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+						x = Math.sin( time * 3 ) * 20;
+						y = 15;
+						z = Math.cos( time * 3 ) * 25 + 10;
+
+					}
+
+					light.position.set( x, y, z );
+
+				}
+
+				// update morphs
+
+				for ( var i = 0; i < morphs.length; i ++ ) {
+
+					morph = morphs[ i ];
+					morph.updateAnimation( 1000 * delta );
+
+					morph.position.x += morph.properties.delta * delta;
+					if ( morph.position.x < -50 ) morph.position.x = 200;
+
+				}
+
+				// update controls
+
+				targetX = mouseX * .001;
+				targetY = mouseY * .001;
+
+				angle += 0.05 * ( targetX - angle );
+
+				camera.position.x = -Math.sin( angle ) * 150;
+				camera.position.z = Math.cos( angle ) * 150;
+
+				camera.lookAt( target );
+
+
+				deferredHelper.render();
+
+			}
 
 		</script>
 	</body>

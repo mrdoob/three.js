@@ -1,11 +1,30 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author MPanknin / http://www.redplant.de/
  */
 
 THREE.DeferredHelper = function ( parameters ) {
 
 	var width = parameters.width;
 	var height = parameters.height;
+
+	var scene = parameters.scene;
+	var camera = parameters.camera;
+	var renderer = parameters.renderer;
+
+	// scene for light proxy geometry
+
+	var lightScene = new THREE.Scene();
+	lightNode = new THREE.Object3D();
+	lightScene.add( lightNode );
+
+	// scene for the coloured emitter spheres
+
+	var emitterScene = new THREE.Scene();
+	emitterNode = new THREE.Object3D();
+	emitterScene.add( emitterNode );
+
+	//
 
 	var black = new THREE.Color( 0x000000 );
 
@@ -14,17 +33,25 @@ THREE.DeferredHelper = function ( parameters ) {
 	var bumpShader = THREE.ShaderDeferred[ "bump" ];
 	var clipDepthShader = THREE.ShaderDeferred[ "clipDepth" ];
 
-	this.unlitShader = THREE.ShaderDeferred[ "unlit" ];
-	this.lightShader = THREE.ShaderDeferred[ "light" ];
-	this.compositeShader = THREE.ShaderDeferred[ "composite" ];
+	//
 
-	this.unlitShader.uniforms[ "viewWidth" ].value = width;
-	this.unlitShader.uniforms[ "viewHeight" ].value = height;
+	var unlitShader = THREE.ShaderDeferred[ "unlit" ];
+	var lightShader = THREE.ShaderDeferred[ "light" ];
+	var compositeShader = THREE.ShaderDeferred[ "composite" ];
 
-	this.lightShader.uniforms[ "viewWidth" ].value = width;
-	this.lightShader.uniforms[ "viewHeight" ].value = height;
+	unlitShader.uniforms[ "viewWidth" ].value = width;
+	unlitShader.uniforms[ "viewHeight" ].value = height;
 
-	var matNormal = new THREE.ShaderMaterial( {
+	lightShader.uniforms[ "viewWidth" ].value = width;
+	lightShader.uniforms[ "viewHeight" ].value = height;
+
+	//
+
+	var compColor, compNormal, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+
+	//
+
+	var defaultNormalMaterial = new THREE.ShaderMaterial( {
 
 		uniforms:       THREE.UniformsUtils.clone( normalShader.uniforms ),
 		vertexShader:   normalShader.vertexShader,
@@ -32,13 +59,26 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	} );
 
-	var matClipDepth = new THREE.ShaderMaterial( {
+	var defaultDepthMaterial = new THREE.ShaderMaterial( {
 
 		uniforms:       THREE.UniformsUtils.clone( clipDepthShader.uniforms ),
 		vertexShader:   clipDepthShader.vertexShader,
 		fragmentShader: clipDepthShader.fragmentShader
 
 	} );
+
+	//
+
+	var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
+								format: THREE.RGBAFormat, type: THREE.FloatType };
+
+	var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+								 format: THREE.RGBAFormat, type: THREE.FloatType };
+
+	var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
+						  format: THREE.RGBFormat, type: THREE.UnsignedByteType };
+
+	//
 
 	this.addDeferredMaterials = function ( object ) {
 
@@ -144,7 +184,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 			} else {
 
-				node.properties.normalMaterial = matNormal;
+				node.properties.normalMaterial = defaultNormalMaterial;
 
 			}
 
@@ -166,12 +206,212 @@ THREE.DeferredHelper = function ( parameters ) {
 
 			} else {
 
-				node.properties.depthMaterial = matClipDepth;
+				node.properties.depthMaterial = defaultDepthMaterial;
 
 			}
 
 		} );
 
-	}
+	};
+
+	this.createRenderTargets = function ( ) {
+
+		// g-buffers
+
+		var rtColor   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatNearest );
+		var rtNormal  = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
+		var rtDepth   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
+		var rtLight   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
+		var rtEmitter = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
+		var rtFinal   = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
+
+		rtColor.generateMipmaps = false;
+		rtNormal.generateMipmaps = false;
+		rtDepth.generateMipmaps = false;
+		rtLight.generateMipmaps = false;
+		rtEmitter.generateMipmaps = false;
+		rtFinal.generateMipmaps = false;
+
+		// composers
+
+		var passColor = new THREE.RenderPass( scene, camera );
+		compColor = new THREE.EffectComposer( renderer, rtColor );
+		compColor.addPass( passColor );
+
+		var passNormal = new THREE.RenderPass( scene, camera );
+		compNormal = new THREE.EffectComposer( renderer, rtNormal );
+		compNormal.addPass( passNormal );
+
+		var passDepth = new THREE.RenderPass( scene, camera );
+		compDepth = new THREE.EffectComposer( renderer, rtDepth );
+		compDepth.addPass( passDepth );
+
+		var passEmitter = new THREE.RenderPass( emitterScene, camera );
+		compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
+		compEmitter.addPass( passEmitter );
+
+		var passLight = new THREE.RenderPass( lightScene, camera );
+		compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
+		compLightBuffer.addPass( passLight );
+
+		//
+
+		lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		lightShader.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+		lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+		lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLight;
+
+		compositeShader.uniforms[ 'samplerLightBuffer' ].value = compLightBuffer.renderTarget2;
+		compositeShader.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
+
+		// composite
+
+		var compositePass = new THREE.ShaderPass( compositeShader );
+		compositePass.needsSwap = true;
+
+		var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+
+		var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+		effectColor.renderToScreen = true;
+
+		effectColor.uniforms[ 'powRGB' ].value.set( 1, 1, 1 );
+		effectColor.uniforms[ 'mulRGB' ].value.set( 2, 2, 2 );
+
+		compFinal = new THREE.EffectComposer( renderer, rtFinal );
+		compFinal.addPass( compositePass );
+		compFinal.addPass( effectFXAA );
+		compFinal.addPass( effectColor );
+
+	};
+
+	this.addDeferredLights = function ( lights, additiveSpecular ) {
+
+		var geometryEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
+
+		for ( var i = 0, il = lights.length; i < il; i ++ ) {
+
+			var light = lights[ i ];
+
+			// setup material
+
+			var materialLight = new THREE.ShaderMaterial( {
+
+				uniforms:       THREE.UniformsUtils.clone( lightShader.uniforms ),
+				vertexShader:   lightShader.vertexShader,
+				fragmentShader: lightShader.fragmentShader,
+				defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
+
+				blending:		THREE.AdditiveBlending,
+				depthWrite:		false,
+				transparent:	true
+
+			} );
+
+			materialLight.uniforms[ "lightPos" ].value = light.position;
+			materialLight.uniforms[ "lightRadius" ].value = light.distance;
+			materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
+			materialLight.uniforms[ "lightColor" ].value = light.color;
+
+			// setup proxy geometry for this light
+
+			var geometryLight = new THREE.SphereGeometry( light.distance, 16, 8 );
+			var meshLight = new THREE.Mesh( geometryLight, materialLight );
+			meshLight.position = light.position;
+			lightNode.add( meshLight );
+
+			// create emitter sphere
+
+			var matEmitter = new THREE.ShaderMaterial( {
+
+				uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
+				vertexShader:   unlitShader.vertexShader,
+				fragmentShader: unlitShader.fragmentShader
+
+			} );
+
+			matEmitter.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
+			matEmitter.uniforms[ "lightColor" ].value = light.color;
+
+			var meshEmitter = new THREE.Mesh( geometryEmitter, matEmitter );
+			meshEmitter.position = light.position;
+			emitterNode.add( meshEmitter );
+
+			// add emitter to light node
+
+			meshLight.properties.emitter = meshEmitter;
+
+		}
+
+	};
+
+	this.render = function () {
+
+		// -----------------------------
+		// g-buffer color
+		// -----------------------------
+
+		scene.traverse( function( node ) {
+
+			if ( node.material ) node.material = node.properties.colorMaterial;
+
+		} );
+
+		compColor.render();
+
+		// -----------------------------
+		// g-buffer depth
+		// -----------------------------
+
+		scene.traverse( function( node ) {
+
+			if ( node.material ) node.material = node.properties.depthMaterial;
+
+		} );
+
+		compDepth.render();
+
+		// -----------------------------
+		// g-buffer normals
+		// -----------------------------
+
+		scene.traverse( function( node ) {
+
+			if ( node.material ) node.material = node.properties.normalMaterial;
+
+		} );
+
+		compNormal.render();
+
+		// -----------------------------
+		// emitter pass
+		// -----------------------------
+
+		compEmitter.render();
+
+		// -----------------------------
+		// light pass
+		// -----------------------------
+
+		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
+
+		for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
+
+			var uniforms = lightNode.children[ i ].material.uniforms;
+
+			uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
+			uniforms[ "matView" ].value = camera.matrixWorldInverse;
+
+		}
+
+		compLightBuffer.render();
+
+		// -----------------------------
+		// composite pass
+		// -----------------------------
+
+		compFinal.render( 0.1 );
+
+	};
 
 };

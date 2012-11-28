@@ -267,7 +267,7 @@ THREE.ShaderDeferred = {
 			samplerDepth: { type: "t", value: null },
 			viewWidth:    { type: "f", value: 800 },
 			viewHeight:   { type: "f", value: 600 },
-			lightColor:   { type: "v3", value: new THREE.Vector3( 0, 0, 0 ) }
+			lightColor:   { type: "c", value: new THREE.Color( 0x000000 ) }
 
 		},
 
@@ -373,7 +373,7 @@ THREE.ShaderDeferred = {
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
 			lightPos: 		{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
-			lightColor: 	{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
 			lightRadius: 	{ type: "f", value: 1.0 }
 
