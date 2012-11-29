@@ -12,18 +12,6 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	var additiveSpecular = parameters.additiveSpecular;
 
-	// scene for light proxy geometry
-
-	var lightScene = new THREE.Scene();
-	lightNode = new THREE.Object3D();
-	lightScene.add( lightNode );
-
-	// scene for the coloured emitter spheres
-
-	var emitterScene = new THREE.Scene();
-	emitterNode = new THREE.Object3D();
-	emitterScene.add( emitterNode );
-
 	//
 
 	var geometryEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
@@ -51,6 +39,8 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	var compColor, compNormal, compDepth, compEmitter, compLightBuffer, compFinal, compositePass;
 	var passColor, passNormal, passDepth, passEmitter, passLight;
+
+	var emitterScene, lightScene;
 
 	//
 
@@ -83,7 +73,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
-	var addDeferredMaterials = function ( object ) {
+	var initDeferredMaterials = function ( object ) {
 
 		var originalMaterial = object.material;
 
@@ -211,13 +201,11 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		}
 
-		object.properties.deferredInitialized = true;
-
 	};
 
-	var addDeferredPointLight = function ( light ) {
+	var createDeferredPointLight = function ( light ) {
 
-		// setup material
+		// setup light material
 
 		var materialLight = new THREE.ShaderMaterial( {
 
@@ -237,14 +225,19 @@ THREE.DeferredHelper = function ( parameters ) {
 		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
 		materialLight.uniforms[ "lightColor" ].value = light.color;
 
-		// setup proxy geometry for this light
+		// create light proxy mesh
 
 		var geometryLight = new THREE.SphereGeometry( light.distance, 16, 8 );
 		var meshLight = new THREE.Mesh( geometryLight, materialLight );
 		meshLight.position = light.position;
-		lightNode.add( meshLight );
 
-		// create emitter sphere
+		return meshLight;
+
+	};
+
+	var createEmitter = function ( light ) {
+
+		// setup emitter material
 
 		var matEmitter = new THREE.ShaderMaterial( {
 
@@ -257,15 +250,12 @@ THREE.DeferredHelper = function ( parameters ) {
 		matEmitter.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
 		matEmitter.uniforms[ "lightColor" ].value = light.color;
 
+		// create emitter mesh
+
 		var meshEmitter = new THREE.Mesh( geometryEmitter, matEmitter );
 		meshEmitter.position = light.position;
-		emitterNode.add( meshEmitter );
 
-		// add emitter to light node
-
-		meshLight.properties.emitter = meshEmitter;
-
-		light.properties.deferredInitialized = true;
+		return meshEmitter;
 
 	};
 
@@ -273,8 +263,19 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		if ( object.properties.deferredInitialized ) return;
 
-		if ( object.material ) addDeferredMaterials( object );
-		if ( object instanceof THREE.PointLight ) addDeferredPointLight( object );
+		if ( object.material ) initDeferredMaterials( object );
+
+		if ( object instanceof THREE.PointLight ) {
+
+			var meshEmitter = createEmitter( object );
+			var meshLight = createDeferredPointLight( object );
+
+			lightScene.add( meshLight );
+			emitterScene.add( meshEmitter );
+
+		}
+
+		object.properties.deferredInitialized = true;
 
 	};
 
@@ -302,6 +303,14 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	this.render = function ( scene, camera ) {
 
+		// setup deferred properties
+
+		if ( ! scene.properties.emitterScene ) scene.properties.emitterScene = new THREE.Scene();
+		if ( ! scene.properties.lightScene ) scene.properties.lightScene = new THREE.Scene();
+
+		emitterScene = scene.properties.emitterScene;
+		lightScene = scene.properties.lightScene;
+
 		passColor.camera = camera;
 		passNormal.camera = camera;
 		passDepth.camera = camera;
@@ -311,6 +320,8 @@ THREE.DeferredHelper = function ( parameters ) {
 		passColor.scene = scene;
 		passNormal.scene = scene;
 		passDepth.scene = scene;
+		passEmitter.scene = emitterScene;
+		passLight.scene = lightScene;
 
 		scene.traverse( initDeferredProperties );
 
@@ -337,9 +348,9 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
 
-		for ( var i = 0, il = lightNode.children.length; i < il; i ++ ) {
+		for ( var i = 0, il = lightScene.children.length; i < il; i ++ ) {
 
-			var uniforms = lightNode.children[ i ].material.uniforms;
+			var uniforms = lightScene.children[ i ].material.uniforms;
 
 			uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
 			uniforms[ "matView" ].value = camera.matrixWorldInverse;
@@ -386,11 +397,11 @@ THREE.DeferredHelper = function ( parameters ) {
 		compDepth = new THREE.EffectComposer( renderer, rtDepth );
 		compDepth.addPass( passDepth );
 
-		passEmitter = new THREE.RenderPass( emitterScene );
+		passEmitter = new THREE.RenderPass();
 		compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
 		compEmitter.addPass( passEmitter );
 
-		passLight = new THREE.RenderPass( lightScene );
+		passLight = new THREE.RenderPass();
 		compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
 		compLightBuffer.addPass( passLight );
 
