@@ -229,9 +229,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_this.info.render.faces = 0;
 
 		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
-
-		console.log(_renderData);
-
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 
