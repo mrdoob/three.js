@@ -214,77 +214,6 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	};
 
-	this.createRenderTargets = function ( ) {
-
-		// g-buffers
-
-		var rtColor   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatNearest );
-		var rtNormal  = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
-		var rtDepth   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
-		var rtLight   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
-		var rtEmitter = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
-		var rtFinal   = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
-
-		rtColor.generateMipmaps = false;
-		rtNormal.generateMipmaps = false;
-		rtDepth.generateMipmaps = false;
-		rtLight.generateMipmaps = false;
-		rtEmitter.generateMipmaps = false;
-		rtFinal.generateMipmaps = false;
-
-		// composers
-
-		var passColor = new THREE.RenderPass( scene, camera );
-		compColor = new THREE.EffectComposer( renderer, rtColor );
-		compColor.addPass( passColor );
-
-		var passNormal = new THREE.RenderPass( scene, camera );
-		compNormal = new THREE.EffectComposer( renderer, rtNormal );
-		compNormal.addPass( passNormal );
-
-		var passDepth = new THREE.RenderPass( scene, camera );
-		compDepth = new THREE.EffectComposer( renderer, rtDepth );
-		compDepth.addPass( passDepth );
-
-		var passEmitter = new THREE.RenderPass( emitterScene, camera );
-		compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
-		compEmitter.addPass( passEmitter );
-
-		var passLight = new THREE.RenderPass( lightScene, camera );
-		compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
-		compLightBuffer.addPass( passLight );
-
-		//
-
-		lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		lightShader.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
-		lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
-		lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLight;
-
-		compositeShader.uniforms[ 'samplerLightBuffer' ].value = compLightBuffer.renderTarget2;
-		compositeShader.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
-
-		// composite
-
-		var compositePass = new THREE.ShaderPass( compositeShader );
-		compositePass.needsSwap = true;
-
-		var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-
-		var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
-		effectColor.renderToScreen = true;
-
-		effectColor.uniforms[ 'powRGB' ].value.set( 1, 1, 1 );
-		effectColor.uniforms[ 'mulRGB' ].value.set( 2, 2, 2 );
-
-		compFinal = new THREE.EffectComposer( renderer, rtFinal );
-		compFinal.addPass( compositePass );
-		compFinal.addPass( effectFXAA );
-		compFinal.addPass( effectColor );
-
-	};
-
 	this.addDeferredLights = function ( lights, additiveSpecular ) {
 
 		var geometryEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
@@ -413,5 +342,80 @@ THREE.DeferredHelper = function ( parameters ) {
 		compFinal.render( 0.1 );
 
 	};
+
+	var createRenderTargets = function ( ) {
+
+		// g-buffers
+
+		var rtColor   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatNearest );
+		var rtNormal  = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
+		var rtDepth   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
+		var rtLight   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
+		var rtEmitter = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
+		var rtFinal   = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
+
+		rtColor.generateMipmaps = false;
+		rtNormal.generateMipmaps = false;
+		rtDepth.generateMipmaps = false;
+		rtLight.generateMipmaps = false;
+		rtEmitter.generateMipmaps = false;
+		rtFinal.generateMipmaps = false;
+
+		// composers
+
+		var passColor = new THREE.RenderPass( scene, camera );
+		compColor = new THREE.EffectComposer( renderer, rtColor );
+		compColor.addPass( passColor );
+
+		var passNormal = new THREE.RenderPass( scene, camera );
+		compNormal = new THREE.EffectComposer( renderer, rtNormal );
+		compNormal.addPass( passNormal );
+
+		var passDepth = new THREE.RenderPass( scene, camera );
+		compDepth = new THREE.EffectComposer( renderer, rtDepth );
+		compDepth.addPass( passDepth );
+
+		var passEmitter = new THREE.RenderPass( emitterScene, camera );
+		compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
+		compEmitter.addPass( passEmitter );
+
+		var passLight = new THREE.RenderPass( lightScene, camera );
+		compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
+		compLightBuffer.addPass( passLight );
+
+		//
+
+		lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		lightShader.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+		lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+		lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLight;
+
+		compositeShader.uniforms[ 'samplerLightBuffer' ].value = compLightBuffer.renderTarget2;
+		compositeShader.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
+
+		// composite
+
+		var compositePass = new THREE.ShaderPass( compositeShader );
+		compositePass.needsSwap = true;
+
+		var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+
+		var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+		effectColor.renderToScreen = true;
+
+		effectColor.uniforms[ 'powRGB' ].value.set( 1, 1, 1 );
+		effectColor.uniforms[ 'mulRGB' ].value.set( 2, 2, 2 );
+
+		compFinal = new THREE.EffectComposer( renderer, rtFinal );
+		compFinal.addPass( compositePass );
+		compFinal.addPass( effectFXAA );
+		compFinal.addPass( effectColor );
+
+	};
+
+	// init
+
+	createRenderTargets();
 
 };
