@@ -274,42 +274,45 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	};
 
+	var setMaterialColor = function ( object ) {
+
+		if ( object.material ) object.material = object.properties.colorMaterial;
+
+	};
+
+	var setMaterialDepth = function ( object ) {
+
+		if ( object.material ) object.material = object.properties.depthMaterial;
+
+	};
+
+	var setMaterialNormal= function ( object ) {
+
+		if ( object.material ) object.material = object.properties.normalMaterial;
+
+	};
+
 	this.render = function () {
 
 		// -----------------------------
 		// g-buffer color
 		// -----------------------------
 
-		scene.traverse( function( node ) {
-
-			if ( node.material ) node.material = node.properties.colorMaterial;
-
-		} );
-
+		scene.traverse( setMaterialColor );
 		compColor.render();
 
 		// -----------------------------
 		// g-buffer depth
 		// -----------------------------
 
-		scene.traverse( function( node ) {
-
-			if ( node.material ) node.material = node.properties.depthMaterial;
-
-		} );
-
+		scene.traverse( setMaterialDepth );
 		compDepth.render();
 
 		// -----------------------------
 		// g-buffer normals
 		// -----------------------------
 
-		scene.traverse( function( node ) {
-
-			if ( node.material ) node.material = node.properties.normalMaterial;
-
-		} );
-
+		scene.traverse( setMaterialNormal );
 		compNormal.render();
 
 		// -----------------------------
