@@ -1086,9 +1086,7 @@ def generate_camera_string(node, padding):
     if projection == "perspective":
 
         aspect = camera.PixelAspectRatio.Get()
-        fov = camera.FieldOfView.Get()
-        fov = 75
-        far = 1000
+        fov = camera.FieldOfViewY.Get()
 
         output = [
 
