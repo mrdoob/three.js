@@ -966,10 +966,43 @@ def generate_light_string(node, padding):
 
     transform = node.EvaluateLocalTransform()
     position = transform.GetT()
+    rotation = getRadians(transform.GetR())
 
     output = []
 
     if light_type == "directional":
+
+        # Three.js directional lights emit light from a point in 3d space to a target node or the origin.
+        # When there is no target, we need to take a point, one unit away from the origin, and move it 
+        # into the right location so that the origin acts like the target
+        
+        if node.GetTarget():
+            direction = position
+        else:
+            a = math.cos(rotation[0]);
+            b = math.sin(rotation[0]);
+            c = math.cos(rotation[1]);
+            d = math.sin(rotation[1]);
+            e = math.cos(rotation[2]);
+            f = math.sin(rotation[2]);
+
+            # This is simply the result of combining the x, y, and z rotation matrix transforms
+            m11 = (c * e)
+            m12 = (c * f)
+            m13 = -d
+            m21 = (e * b * d - a * f)
+            m22 = ((e * a) + (f * b * d))
+            m23 = (b * c)
+            m31 = (e * a * d + b * f)
+            m32 = -(b * e - f * a * d)
+            m33 = (a * c)
+
+            # TODO: remove the pointless multiplications
+            unit_vector = (0,1,0)
+            direction = (
+            (unit_vector[0] * m11) + (unit_vector[1] * m21) + (unit_vector[2] * m31), 
+            (unit_vector[0] * m12) + (unit_vector[1] * m22) + (unit_vector[2] * m32), 
+            (unit_vector[0] * m13) + (unit_vector[1] * m23) + (unit_vector[2] * m33))
 
         output = [
 
@@ -977,9 +1010,8 @@ def generate_light_string(node, padding):
         '	"type"      : "DirectionalLight",',
         '	"color"     : ' + str(getHex(light.Color.Get())) + ',',
         '	"intensity" : ' + str(light.Intensity.Get()/100.0) + ',',
-        '	"direction" : ' + Vector3String( position ) + ',',
+        '	"direction" : ' + Vector3String( direction ) + ',',
         '	"target"    : ' + LabelString( getObjectName( node.GetTarget() ) ) + ( ',' if node.GetChildCount() > 0 else '' )
-
         ]
 
     elif light_type == "point":
@@ -1005,7 +1037,7 @@ def generate_light_string(node, padding):
         '	"intensity" : ' + str(light.Intensity.Get()/100.0) + ',',
         '	"position"  : ' + Vector3String( position ) + ',',
         '	"distance"  : ' + str(light.FarAttenuationEnd.Get()) + ',',
-        '	"angle"     : ' + str(light.OuterAngle.Get()) + ',',
+        '	"angle"     : ' + str((light.OuterAngle.Get()*math.pi)/180) + ',',
         '	"exponent"  : ' + str(light.DecayType.Get()) + ',',
         '	"target"    : ' + LabelString( getObjectName( node.GetTarget() ) ) + ( ',' if node.GetChildCount() > 0 else '' )
 
@@ -1086,7 +1118,7 @@ def generate_camera_string(node, padding):
     if projection == "perspective":
 
         aspect = camera.PixelAspectRatio.Get()
-        fov = camera.FieldOfViewY.Get()
+        fov = camera.FieldOfView.Get()
 
         output = [
 
