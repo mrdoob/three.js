@@ -185,11 +185,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					var loaderParameters = {};
 
-					for ( var parType in g ) {
+					for ( var parType in o ) {
 
 						if ( parType !== "type" && parType !== "url" ) {
 
-							loaderParameters[ parType ] = g[ parType ];
+							loaderParameters[ parType ] = o[ parType ];
 
 						}
 
