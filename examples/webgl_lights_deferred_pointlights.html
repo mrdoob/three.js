@@ -151,7 +151,7 @@
 
 				// deferred helper
 
-				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, scene: scene, camera: camera, width: SCALED_WIDTH, height: SCALED_HEIGHT } );
+				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, scene: scene, camera: camera, width: SCALED_WIDTH, height: SCALED_HEIGHT, additiveSpecular: false } );
 
 				// add lights
 
@@ -171,8 +171,6 @@
 
 			function addObject( object, y, scale ) {
 
-				deferredHelper.addDeferredMaterials( object );
-
 				object.position.y = y;
 				object.scale.set( scale, scale, scale );
 
@@ -189,6 +187,7 @@
 				// front light
 
 				var light = new THREE.PointLight( 0xffffff, 1.5, 1.5 * distance );
+				scene.add( light );
 				lights.push( light );
 
 				// random lights
@@ -204,11 +203,10 @@
 					light.color.setRGB( c.x, c.y, c.z );
 					light.color.convertGammaToLinear();
 
+					scene.add( light );
 					lights.push( light );
 
 				}
-
-				deferredHelper.addDeferredLights( lights, false );
 
 			}
 

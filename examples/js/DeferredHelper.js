@@ -12,6 +12,8 @@ THREE.DeferredHelper = function ( parameters ) {
 	var camera = parameters.camera;
 	var renderer = parameters.renderer;
 
+	var additiveSpecular = parameters.additiveSpecular;
+
 	// scene for light proxy geometry
 
 	var lightScene = new THREE.Scene();
@@ -25,6 +27,8 @@ THREE.DeferredHelper = function ( parameters ) {
 	emitterScene.add( emitterNode );
 
 	//
+
+	var geometryEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
 
 	var black = new THREE.Color( 0x000000 );
 
@@ -80,199 +84,202 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
-	this.addDeferredMaterials = function ( object ) {
+	var addDeferredMaterials = function ( object ) {
 
-		object.traverse( function( node ) {
+		var originalMaterial = object.material;
 
-			if ( !node.material ) return;
+		// color material
+		// -----------------
+		// 	diffuse color
+		//	specular color
+		//	shininess
+		//	diffuse map
+		//	vertex colors
+		//	alphaTest
+		// 	morphs
 
-			var originalMaterial = node.material;
+		var uniforms = THREE.UniformsUtils.clone( colorShader.uniforms );
+		var defines = { "USE_MAP": !! originalMaterial.map, "GAMMA_INPUT": true };
 
-			// color material
-			// 	diffuse color
-			//	specular color
-			//	shininess
-			//	diffuse map
-			//	vertex colors
-			//	alphaTest
-			// 	morphs
+		var material = new THREE.ShaderMaterial( {
 
-			var uniforms = THREE.UniformsUtils.clone( colorShader.uniforms );
-			var defines = { "USE_MAP": !! originalMaterial.map, "GAMMA_INPUT": true };
+			fragmentShader: colorShader.fragmentShader,
+			vertexShader: 	colorShader.vertexShader,
+			uniforms: 		uniforms,
+			defines: 		defines,
+			shading:		originalMaterial.shading
 
-			var material = new THREE.ShaderMaterial( {
+		} );
 
-				fragmentShader: colorShader.fragmentShader,
-				vertexShader: 	colorShader.vertexShader,
+		var diffuse = originalMaterial.color;
+		var specular = originalMaterial.specular !== undefined ? originalMaterial.specular : black;
+		var shininess = originalMaterial.shininess !== undefined ? originalMaterial.shininess : 1;
+
+		uniforms.diffuse.value.copy( diffuse );
+		uniforms.specular.value.copy( specular );
+		uniforms.shininess.value = shininess;
+
+		uniforms.map.value = originalMaterial.map;
+
+		material.vertexColors = originalMaterial.vertexColors;
+		material.morphTargets = originalMaterial.morphTargets;
+		material.morphNormals = originalMaterial.morphNormals;
+
+		material.alphaTest = originalMaterial.alphaTest;
+
+		if ( originalMaterial.bumpMap ) {
+
+			var offset = originalMaterial.bumpMap.offset;
+			var repeat = originalMaterial.bumpMap.repeat;
+
+			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+		}
+
+		object.properties.colorMaterial = material;
+
+		// normal material
+		// -----------------
+		//	vertex normals
+		//	morph normals
+		//	bump map
+		//	bump scale
+
+		if ( originalMaterial.bumpMap ) {
+
+			var uniforms = THREE.UniformsUtils.clone( bumpShader.uniforms );
+
+			var normalMaterial = new THREE.ShaderMaterial( {
+
 				uniforms: 		uniforms,
-				defines: 		defines,
+				vertexShader: 	bumpShader.vertexShader,
+				fragmentShader: bumpShader.fragmentShader,
+				defines:		{ "USE_BUMPMAP": true }
+
+			} );
+
+			uniforms.bumpMap.value = originalMaterial.bumpMap;
+			uniforms.bumpScale.value = originalMaterial.bumpScale;
+
+			var offset = originalMaterial.bumpMap.offset;
+			var repeat = originalMaterial.bumpMap.repeat;
+
+			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+			object.properties.normalMaterial = normalMaterial;
+
+		} else if ( originalMaterial.morphTargets ) {
+
+			var normalMaterial = new THREE.ShaderMaterial( {
+
+				uniforms:       THREE.UniformsUtils.clone( normalShader.uniforms ),
+				vertexShader:   normalShader.vertexShader,
+				fragmentShader: normalShader.fragmentShader,
 				shading:		originalMaterial.shading
 
 			} );
 
-			var diffuse = originalMaterial.color;
-			var specular = originalMaterial.specular !== undefined ? originalMaterial.specular : black;
-			var shininess = originalMaterial.shininess !== undefined ? originalMaterial.shininess : 1;
+			normalMaterial.morphTargets = originalMaterial.morphTargets;
+			normalMaterial.morphNormals = originalMaterial.morphNormals;
 
-			uniforms.diffuse.value.copy( diffuse );
-			uniforms.specular.value.copy( specular );
-			uniforms.shininess.value = shininess;
+			object.properties.normalMaterial = normalMaterial;
 
-			uniforms.map.value = originalMaterial.map;
+		} else {
 
-			material.vertexColors = originalMaterial.vertexColors;
-			material.morphTargets = originalMaterial.morphTargets;
-			material.morphNormals = originalMaterial.morphNormals;
-
-			material.alphaTest = originalMaterial.alphaTest;
-
-			if ( originalMaterial.bumpMap ) {
-
-				var offset = originalMaterial.bumpMap.offset;
-				var repeat = originalMaterial.bumpMap.repeat;
-
-				uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-			}
-
-			node.properties.colorMaterial = material;
-
-			// normal material
-			//	vertex normals
-			//	morph normals
-			//	bump map
-			//	bump scale
-
-			if ( originalMaterial.bumpMap ) {
-
-				var uniforms = THREE.UniformsUtils.clone( bumpShader.uniforms );
-
-				var normalMaterial = new THREE.ShaderMaterial( {
-
-					uniforms: 		uniforms,
-					vertexShader: 	bumpShader.vertexShader,
-					fragmentShader: bumpShader.fragmentShader,
-					defines:		{ "USE_BUMPMAP": true }
-
-				} );
-
-				uniforms.bumpMap.value = originalMaterial.bumpMap;
-				uniforms.bumpScale.value = originalMaterial.bumpScale;
-
-				var offset = originalMaterial.bumpMap.offset;
-				var repeat = originalMaterial.bumpMap.repeat;
-
-				uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-				node.properties.normalMaterial = normalMaterial;
-
-			} else if ( originalMaterial.morphTargets ) {
-
-				var normalMaterial = new THREE.ShaderMaterial( {
-
-					uniforms:       THREE.UniformsUtils.clone( normalShader.uniforms ),
-					vertexShader:   normalShader.vertexShader,
-					fragmentShader: normalShader.fragmentShader,
-					shading:		originalMaterial.shading
-
-				} );
-
-				normalMaterial.morphTargets = originalMaterial.morphTargets;
-				normalMaterial.morphNormals = originalMaterial.morphNormals;
-
-				node.properties.normalMaterial = normalMaterial;
-
-			} else {
-
-				node.properties.normalMaterial = defaultNormalMaterial;
-
-			}
-
-			// depth material
-
-			if ( originalMaterial.morphTargets ) {
-
-				var depthMaterial = new THREE.ShaderMaterial( {
-
-					uniforms:       THREE.UniformsUtils.clone( clipDepthShader.uniforms ),
-					vertexShader:   clipDepthShader.vertexShader,
-					fragmentShader: clipDepthShader.fragmentShader
-
-				} );
-
-				depthMaterial.morphTargets = originalMaterial.morphTargets;
-
-				node.properties.depthMaterial = depthMaterial;
-
-			} else {
-
-				node.properties.depthMaterial = defaultDepthMaterial;
-
-			}
-
-		} );
-
-	};
-
-	this.addDeferredLights = function ( lights, additiveSpecular ) {
-
-		var geometryEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
-
-		for ( var i = 0, il = lights.length; i < il; i ++ ) {
-
-			var light = lights[ i ];
-
-			// setup material
-
-			var materialLight = new THREE.ShaderMaterial( {
-
-				uniforms:       THREE.UniformsUtils.clone( lightShader.uniforms ),
-				vertexShader:   lightShader.vertexShader,
-				fragmentShader: lightShader.fragmentShader,
-				defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
-
-				blending:		THREE.AdditiveBlending,
-				depthWrite:		false,
-				transparent:	true
-
-			} );
-
-			materialLight.uniforms[ "lightPos" ].value = light.position;
-			materialLight.uniforms[ "lightRadius" ].value = light.distance;
-			materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
-			materialLight.uniforms[ "lightColor" ].value = light.color;
-
-			// setup proxy geometry for this light
-
-			var geometryLight = new THREE.SphereGeometry( light.distance, 16, 8 );
-			var meshLight = new THREE.Mesh( geometryLight, materialLight );
-			meshLight.position = light.position;
-			lightNode.add( meshLight );
-
-			// create emitter sphere
-
-			var matEmitter = new THREE.ShaderMaterial( {
-
-				uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
-				vertexShader:   unlitShader.vertexShader,
-				fragmentShader: unlitShader.fragmentShader
-
-			} );
-
-			matEmitter.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
-			matEmitter.uniforms[ "lightColor" ].value = light.color;
-
-			var meshEmitter = new THREE.Mesh( geometryEmitter, matEmitter );
-			meshEmitter.position = light.position;
-			emitterNode.add( meshEmitter );
-
-			// add emitter to light node
-
-			meshLight.properties.emitter = meshEmitter;
+			object.properties.normalMaterial = defaultNormalMaterial;
 
 		}
 
+		// depth material
+
+		if ( originalMaterial.morphTargets ) {
+
+			var depthMaterial = new THREE.ShaderMaterial( {
+
+				uniforms:       THREE.UniformsUtils.clone( clipDepthShader.uniforms ),
+				vertexShader:   clipDepthShader.vertexShader,
+				fragmentShader: clipDepthShader.fragmentShader
+
+			} );
+
+			depthMaterial.morphTargets = originalMaterial.morphTargets;
+
+			object.properties.depthMaterial = depthMaterial;
+
+		} else {
+
+			object.properties.depthMaterial = defaultDepthMaterial;
+
+		}
+
+		object.properties.deferredInitialized = true;
+
 	};
+
+	var addDeferredPointLight = function ( light ) {
+
+		// setup material
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       THREE.UniformsUtils.clone( lightShader.uniforms ),
+			vertexShader:   lightShader.vertexShader,
+			fragmentShader: lightShader.fragmentShader,
+			defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			transparent:	true
+
+		} );
+
+		materialLight.uniforms[ "lightPos" ].value = light.position;
+		materialLight.uniforms[ "lightRadius" ].value = light.distance;
+		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
+		materialLight.uniforms[ "lightColor" ].value = light.color;
+
+		// setup proxy geometry for this light
+
+		var geometryLight = new THREE.SphereGeometry( light.distance, 16, 8 );
+		var meshLight = new THREE.Mesh( geometryLight, materialLight );
+		meshLight.position = light.position;
+		lightNode.add( meshLight );
+
+		// create emitter sphere
+
+		var matEmitter = new THREE.ShaderMaterial( {
+
+			uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
+			vertexShader:   unlitShader.vertexShader,
+			fragmentShader: unlitShader.fragmentShader
+
+		} );
+
+		matEmitter.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
+		matEmitter.uniforms[ "lightColor" ].value = light.color;
+
+		var meshEmitter = new THREE.Mesh( geometryEmitter, matEmitter );
+		meshEmitter.position = light.position;
+		emitterNode.add( meshEmitter );
+
+		// add emitter to light node
+
+		meshLight.properties.emitter = meshEmitter;
+
+		light.properties.deferredInitialized = true;
+
+	};
+
+	var initDeferredProperties = function ( object ) {
+
+		if ( object.properties.deferredInitialized ) return;
+
+		if ( object.material ) addDeferredMaterials( object );
+		if ( object instanceof THREE.PointLight ) addDeferredPointLight( object );
+
+	};
+
+	//
 
 	var setMaterialColor = function ( object ) {
 
@@ -292,38 +299,32 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	};
 
+	//
+
 	this.render = function () {
 
-		// -----------------------------
+		scene.traverse( initDeferredProperties );
+
 		// g-buffer color
-		// -----------------------------
 
 		scene.traverse( setMaterialColor );
 		compColor.render();
 
-		// -----------------------------
 		// g-buffer depth
-		// -----------------------------
 
 		scene.traverse( setMaterialDepth );
 		compDepth.render();
 
-		// -----------------------------
 		// g-buffer normals
-		// -----------------------------
 
 		scene.traverse( setMaterialNormal );
 		compNormal.render();
 
-		// -----------------------------
 		// emitter pass
-		// -----------------------------
 
 		compEmitter.render();
 
-		// -----------------------------
 		// light pass
-		// -----------------------------
 
 		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
 
@@ -338,9 +339,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		compLightBuffer.render();
 
-		// -----------------------------
 		// composite pass
-		// -----------------------------
 
 		compFinal.render( 0.1 );
 
