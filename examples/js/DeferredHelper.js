@@ -8,8 +8,6 @@ THREE.DeferredHelper = function ( parameters ) {
 	var width = parameters.width;
 	var height = parameters.height;
 
-	var scene = parameters.scene;
-	var camera = parameters.camera;
 	var renderer = parameters.renderer;
 
 	var additiveSpecular = parameters.additiveSpecular;
@@ -51,7 +49,8 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
-	var compColor, compNormal, compDepth, compLightBuffer, compFinal, compEmitter, compositePass;
+	var compColor, compNormal, compDepth, compEmitter, compLightBuffer, compFinal, compositePass;
+	var passColor, passNormal, passDepth, passEmitter, passLight;
 
 	//
 
@@ -301,7 +300,17 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
-	this.render = function () {
+	this.render = function ( scene, camera ) {
+
+		passColor.camera = camera;
+		passNormal.camera = camera;
+		passDepth.camera = camera;
+		passEmitter.camera = camera;
+		passLight.camera = camera;
+
+		passColor.scene = scene;
+		passNormal.scene = scene;
+		passDepth.scene = scene;
 
 		scene.traverse( initDeferredProperties );
 
@@ -365,23 +374,23 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		// composers
 
-		var passColor = new THREE.RenderPass( scene, camera );
+		passColor = new THREE.RenderPass();
 		compColor = new THREE.EffectComposer( renderer, rtColor );
 		compColor.addPass( passColor );
 
-		var passNormal = new THREE.RenderPass( scene, camera );
+		passNormal = new THREE.RenderPass();
 		compNormal = new THREE.EffectComposer( renderer, rtNormal );
 		compNormal.addPass( passNormal );
 
-		var passDepth = new THREE.RenderPass( scene, camera );
+		passDepth = new THREE.RenderPass();
 		compDepth = new THREE.EffectComposer( renderer, rtDepth );
 		compDepth.addPass( passDepth );
 
-		var passEmitter = new THREE.RenderPass( emitterScene, camera );
+		passEmitter = new THREE.RenderPass( emitterScene );
 		compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
 		compEmitter.addPass( passEmitter );
 
-		var passLight = new THREE.RenderPass( lightScene, camera );
+		passLight = new THREE.RenderPass( lightScene );
 		compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
 		compLightBuffer.addPass( passLight );
 

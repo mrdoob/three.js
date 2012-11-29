@@ -151,7 +151,7 @@
 
 				// deferred helper
 
-				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, scene: scene, camera: camera, width: SCALED_WIDTH, height: SCALED_HEIGHT, additiveSpecular: false } );
+				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, width: SCALED_WIDTH, height: SCALED_HEIGHT, additiveSpecular: false } );
 
 				// add lights
 
@@ -390,7 +390,7 @@
 
 				camera.lookAt( target );
 
-				deferredHelper.render();
+				deferredHelper.render( scene, camera );
 
 			}
 
