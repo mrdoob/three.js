@@ -8825,13 +8825,18 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				if ( o.type && ( o.type in scope.hierarchyHandlerMap ) && o.loading === undefined ) {
 
+					var reservedTypes = { "type": 1, "url": 1, "material": 1,
+										  "position": 1, "rotation": 1, "scale" : 1,
+										  "visible": 1, "children": 1, "properties": 1,
+										  "skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1 };
+
 					var loaderParameters = {};
 
-					for ( var parType in g ) {
+					for ( var parType in o ) {
 
-						if ( parType !== "type" && parType !== "url" ) {
+						if ( ! ( parType in reservedTypes ) ) {
 
-							loaderParameters[ parType ] = g[ parType ];
+							loaderParameters[ parType ] = o[ parType ];
 
 						}
 
