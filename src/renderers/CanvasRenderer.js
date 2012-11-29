@@ -51,6 +51,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_image, _uvs,
 	_uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y,
 
+	_viewportX = 0,
+	_viewportY = 0,
+	_viewportWidth = 0,
+	_viewportHeight = 0,
+
 	_clipRect = new THREE.Rectangle(),
 	_clearRect = new THREE.Rectangle(),
 	_bboxRect = new THREE.Rectangle(),
@@ -123,7 +128,20 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_contextLineCap = null;
 		_contextLineJoin = null;
 
+		this.setViewport( 0, 0, _canvas.width, _canvas.height);
+
 	};
+
+	this.setViewport = function ( x, y, width, height ) {
+
+		_viewportX = x !== undefined ? x : 0;
+		_viewportY = y !== undefined ? y : 0;
+
+		_viewportWidth = width !== undefined ? width : _canvas.width;
+		_viewportHeight = height !== undefined ? height : _canvas.height;
+
+	};
+
 
 	this.setClearColor = function ( color, opacity ) {
 
@@ -197,10 +215,23 @@ THREE.CanvasRenderer = function ( parameters ) {
 			? this.clear()
 			: _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
+		// apply viewport transformation
+		var scaleX = _viewportWidth/_canvasWidth;
+		var scaleY = _viewportHeight/_canvasHeight;
+
+		_context.translate(
+		  -_canvasWidthHalf+(_viewportX + _viewportWidth/2),
+		  -_canvasHeightHalf+(_viewportY + _viewportHeight/2)
+		);
+		_context.scale(scaleX, scaleY);
+
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
 		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
+
+		console.log(_renderData);
+
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 
