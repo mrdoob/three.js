@@ -15,6 +15,7 @@ option_default_camera = False
 option_default_light = False
 
 converter = None
+global_up_vector = None
 
 # #####################################################
 # Templates
@@ -48,44 +49,44 @@ def BoolString(value):
 # #####################################################
 # Helpers
 # #####################################################
-def getObjectName(o): 
+def getObjectName(o, force_prefix = False): 
     if not o:
         return ""  
     prefix = ""
-    if option_prefix:
-        prefix = "Object_"
+    if option_prefix or force_prefix:
+        prefix = "Object_%s_" % o.GetUniqueID()
     return prefix + o.GetName()
       
-def getGeometryName(g):
+def getGeometryName(g, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Geometry_"
+    if option_prefix or force_prefix:
+        prefix = "Geometry_%s_" % g.GetUniqueID()
     return prefix + g.GetName()
 
-def getEmbedName(e):
+def getEmbedName(e, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Embed_"
+    if option_prefix or force_prefix:
+        prefix = "Embed_%s_" % e.GetUniqueID()
     return prefix + e.GetName()
 
-def getMaterialName(m):
+def getMaterialName(m, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Material_"
+    if option_prefix or force_prefix:
+        prefix = "Material_%s_" % m.GetUniqueID()
     return prefix + m.GetName()
 
-def getTextureName(t):
+def getTextureName(t, force_prefix = False):
     texture_file = t.GetFileName()
     texture_id = os.path.splitext(os.path.basename(texture_file))[0]
     prefix = ""
-    if option_prefix:
-        prefix = "Texture_"
+    if option_prefix or force_prefix:
+        prefix = "Texture_%s_" % t.GetUniqueID()
     return prefix + texture_id
 
-def getFogName(f):
+def getFogName(f, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Fog_"
+    if option_prefix or force_prefix:
+        prefix = "Fog_%s_" % f.GetUniqueID()
     return prefix + f.GetName()
 
 def getObjectVisible(n):
@@ -106,6 +107,14 @@ def generateMultiLineString(lines, separator, padding):
         cleanLines.append(line)
     return separator.join(cleanLines)
 
+def get_up_vector(scene):
+    global_settings = scene.GetGlobalSettings()
+    axis_system = global_settings.GetAxisSystem()
+    up_vector = axis_system.GetUpVector()
+    tmp = [0,0,0]
+    tmp[up_vector[0] - 1] = up_vector[1] * 1
+    return FbxVector4(tmp[0], tmp[1], tmp[2], 1)
+    
 # #####################################################
 # Generate - Triangles 
 # #####################################################
@@ -153,7 +162,7 @@ def generate_texture_bindings(material_property, texture_list):
                 for k in range(texture_count):
                     texture = layered_texture.GetSrcObject(FbxTexture.ClassId,k)
                     if texture:
-                        texture_id = getTextureName(texture) 
+                        texture_id = getTextureName(texture, True) 
                         texture_binding = '		"%s": "%s",' % (binding_types[str(material_property.GetName())], texture_id)
                         texture_list.append(texture_binding)
         else:
@@ -162,7 +171,7 @@ def generate_texture_bindings(material_property, texture_list):
             for j in range(texture_count):
                 texture = material_property.GetSrcObject(FbxTexture.ClassId,j)
                 if texture:
-                    texture_id = getTextureName(texture) 
+                    texture_id = getTextureName(texture, True) 
                     texture_binding = '		"%s": "%s",' % (binding_types[str(material_property.GetName())], texture_id)
                     texture_list.append(texture_binding)
 
@@ -264,7 +273,7 @@ def generate_proxy_material_string(node, material_names):
     
     output = [
 
-    '\t' + LabelString( getMaterialName( node ) ) + ': {',
+    '\t' + LabelString( getMaterialName( node, True ) ) + ': {',
     '	"type"    : "MeshFaceMaterial",',
     '	"parameters"  : {',
     '		"materials"  : ' + ArrayString( ",".join(LabelString(m) for m in material_names) ),
@@ -329,13 +338,14 @@ def generate_material_list(scene):
 # #####################################################
 def generate_texture_string(texture):
 
+    #TODO: extract more texture properties
     wrap_u = texture.GetWrapModeU()
     wrap_v = texture.GetWrapModeV()
     offset = texture.GetUVTranslation()
 
     output = [
 
-    '\t' + LabelString( getTextureName( texture ) ) + ': {',
+    '\t' + LabelString( getTextureName( texture, True ) ) + ': {',
     '	"url"    : "' + texture.GetFileName() + '",',
     '	"repeat" : ' + Vector2String( (1,1) ) + ',',
     '	"offset" : ' + Vector2String( texture.GetUVTranslation() ) + ',',
@@ -827,30 +837,53 @@ def generate_mesh_string(node):
     aabb_min = ",".join(str(f) for f in aabb_min)
     aabb_max = ",".join(str(f) for f in aabb_max)
 
-    output = [
-    '\t' + LabelString( getEmbedName( node ) ) + ' : {',
-    '	"metadata"  : {',
-    '		"vertices" : ' + str(nvertices) + ',',
-    '		"normals" : ' + str(nnormals) + ',',
-    '		"colors" : ' + str(ncolors) + ',',
-    '		"faces" : ' + str(nfaces) + ',',
-    '		"uvs" : ' + ArrayString(nuvs),
-    '	},',
-    '	"boundingBox"  : {',
-    '		"min" : ' + ArrayString(aabb_min) + ',',   
-    '		"max" : ' + ArrayString(aabb_max),   
-    '	},',
-    '	"scale" : ' + str( 1 ) + ',',   
-    '	"materials" : ' + ArrayString("") + ',',   
-    '	"vertices" : ' + ArrayString(vertices) + ',',   
-    '	"normals" : ' + ArrayString(normals) + ',',   
-    '	"colors" : ' + ArrayString(colors) + ',',   
-    '	"uvs" : ' + ArrayString(uvs) + ',',   
-    '	"faces" : ' + ArrayString(faces),
-    '}'
-    ]
+    if option_geometry:
+        output = [
 
-    return generateMultiLineString( output, '\n\t\t', 0 )
+        '"boundingBox"  : {',
+        '	"min" : ' + ArrayString(aabb_min) + ',',   
+        '	"max" : ' + ArrayString(aabb_max),   
+        '},',
+        '"scale" : ' + str( 1 ) + ',',   
+        '"materials" : ' + ArrayString("") + ',',   
+        '"vertices" : ' + ArrayString(vertices) + ',',   
+        '"normals" : ' + ArrayString(normals) + ',',   
+        '"colors" : ' + ArrayString(colors) + ',',   
+        '"uvs" : ' + ArrayString(uvs) + ',',   
+        '"faces" : ' + ArrayString(faces),
+
+        ]
+
+        return generateMultiLineString( output, '\n\t', 0 )
+
+    else:
+        output = [
+
+        '\t' + LabelString( getEmbedName( node, True ) ) + ' : {',
+        '	"metadata"  : {',
+        '		"vertices" : ' + str(nvertices) + ',',
+        '		"normals" : ' + str(nnormals) + ',',
+        '		"colors" : ' + str(ncolors) + ',',
+        '		"faces" : ' + str(nfaces) + ',',
+        '		"uvs" : ' + ArrayString(nuvs),
+        '	},',
+        '	"boundingBox"  : {',
+        '		"min" : ' + ArrayString(aabb_min) + ',',   
+        '		"max" : ' + ArrayString(aabb_max),   
+        '	},',
+        '	"scale" : ' + str( 1 ) + ',',   
+        '	"materials" : ' + ArrayString("") + ',',   
+        '	"vertices" : ' + ArrayString(vertices) + ',',   
+        '	"normals" : ' + ArrayString(normals) + ',',   
+        '	"colors" : ' + ArrayString(colors) + ',',   
+        '	"uvs" : ' + ArrayString(uvs) + ',',   
+        '	"faces" : ' + ArrayString(faces),
+        '}'
+
+        ]
+        
+        return generateMultiLineString( output, '\n\t\t', 0 )
+
 
 # #####################################################
 # Generate - Embeds 
@@ -888,9 +921,9 @@ def generate_embed_list(scene):
 def generate_geometry_string(node):
 
     output = [
-    '\t' + LabelString( getGeometryName( node ) ) + ' : {',
+    '\t' + LabelString( getGeometryName( node, True ) ) + ' : {',
     '	"type"  : "embedded",',
-    '	"id" : ' + LabelString( getEmbedName( node ) ),
+    '	"id" : ' + LabelString( getEmbedName( node, True ) ),
     '}'
     ]
 
@@ -966,7 +999,6 @@ def generate_light_string(node, padding):
 
     transform = node.EvaluateLocalTransform()
     position = transform.GetT()
-    rotation = getRadians(transform.GetR())
 
     output = []
 
@@ -979,30 +1011,11 @@ def generate_light_string(node, padding):
         if node.GetTarget():
             direction = position
         else:
-            a = math.cos(rotation[0]);
-            b = math.sin(rotation[0]);
-            c = math.cos(rotation[1]);
-            d = math.sin(rotation[1]);
-            e = math.cos(rotation[2]);
-            f = math.sin(rotation[2]);
-
-            # This is simply the result of combining the x, y, and z rotation matrix transforms
-            m11 = (c * e)
-            m12 = (c * f)
-            m13 = -d
-            m21 = (e * b * d - a * f)
-            m22 = ((e * a) + (f * b * d))
-            m23 = (b * c)
-            m31 = (e * a * d + b * f)
-            m32 = -(b * e - f * a * d)
-            m33 = (a * c)
-
-            # TODO: remove the pointless multiplications
-            unit_vector = (0,1,0)
-            direction = (
-            (unit_vector[0] * m11) + (unit_vector[1] * m21) + (unit_vector[2] * m31), 
-            (unit_vector[0] * m12) + (unit_vector[1] * m22) + (unit_vector[2] * m32), 
-            (unit_vector[0] * m13) + (unit_vector[1] * m23) + (unit_vector[2] * m33))
+            translation = FbxVector4(0,0,0,0)
+            scale = FbxVector4(1,1,1,1)
+            rotation = transform.GetR()
+            matrix = FbxMatrix(translation, rotation, scale)
+            direction = matrix.MultNormalize(global_up_vector) 
 
         output = [
 
@@ -1180,12 +1193,12 @@ def generate_mesh_object_string(node, padding):
                     material = node.GetMaterial(i)
                     material_names.append( getMaterialName(material) )
         #If this mesh has more than one material, use a proxy material
-        material_name = getMaterialName( node ) if material_count > 1 else material_names[0] 
+        material_name = getMaterialName( node, True) if material_count > 1 else material_names[0] 
 
     output = [
 
     '\t\t' + LabelString( getObjectName( node ) ) + ' : {',
-    '	"geometry" : ' + LabelString( getGeometryName( node ) ) + ',',
+    '	"geometry" : ' + LabelString( getGeometryName( node, True ) ) + ',',
     '	"material" : ' + LabelString( material_name ) + ',',
     '	"position" : ' + Vector3String( position ) + ',',
     '	"rotation" : ' + Vector3String( rotation ) + ',',
@@ -1300,9 +1313,37 @@ def generate_scene_objects_string(scene):
     return "\n".join(object_list), object_count
 
 # #####################################################
+# Parse - Geometry 
+# #####################################################
+def extract_geometry(scene, filename):
+
+    embeds_list = generate_embed_list(scene)
+
+    #TODO: update the Three.js Geometry Format to support multiple geometries?
+    embeds = [ embeds_list[0] ] if len(embeds_list) > 0 else []
+    embeds = generateMultiLineString( embeds_list, ",\n\n\t", 0 )
+
+    output = [
+
+    '{',
+    '	"metadata": {',
+    '		"formatVersion" : 3.2,',
+    '		"type"		: "geometry",',
+    '		"generatedBy"	: "convert-to-threejs.py"',
+    '	},',
+    '',
+    '\t' + 	embeds,
+    '}'
+
+    ]
+
+    return "\n".join(output)
+
+# #####################################################
 # Parse - Scene 
 # #####################################################
 def extract_scene(scene, filename):
+    global_settings = scene.GetGlobalSettings()
     objects, nobjects = generate_scene_objects_string(scene)
 
     textures = generate_texture_list(scene)
@@ -1315,6 +1356,7 @@ def extract_scene(scene, filename):
     nmaterials = len(materials)
     ngeometries = len(geometries)
 
+    #TODO: extract actual root/scene data here
     position = Vector3String( (0,0,0) )
     rotation = Vector3String( (0,0,0) )
     scale    = Vector3String( (1,1,1) )
@@ -1322,8 +1364,13 @@ def extract_scene(scene, filename):
     camera_names = generate_camera_name_list(scene)
     scene_settings = scene.GetGlobalSettings()
 
+    #TODO: this might exist as part of the FBX spec
     bgcolor = Vector3String( (0.667,0.667,0.667) )
     bgalpha = 1
+
+    # This does not seem to be any help here
+    # global_settings.GetDefaultCamera() 
+
     defcamera = LabelString(camera_names[0] if len(camera_names) > 0 else "")
     if option_default_camera:
       defcamera = LabelString('default_camera')
@@ -1446,7 +1493,7 @@ if __name__ == "__main__":
 
     parser.add_option('-t', '--triangulate', action='store_true', dest='triangulate', help="force quad geometry into triangles", default=False)
     parser.add_option('-x', '--no-textures', action='store_true', dest='notextures', help="don't include texture references in output file", default=False)
-    parser.add_option('-p', '--no-prefix', action='store_true', dest='noprefix', help="don't prefix object names in output file", default=False)
+    parser.add_option('-p', '--prefix', action='store_true', dest='prefix', help="prefix object names in output file", default=False)
     parser.add_option('-g', '--geometry-only', action='store_true', dest='geometry', help="output geometry only", default=False)
     parser.add_option('-c', '--default-camera', action='store_true', dest='defcamera', help="include default camera in output scene", default=False)
     parser.add_option('-l', '--defualt-light', action='store_true', dest='deflight', help="include default light in output scene", default=False)
@@ -1455,7 +1502,7 @@ if __name__ == "__main__":
 
     option_triangulate = options.triangulate 
     option_textures = True if not options.notextures else False
-    option_prefix = True if not options.noprefix else False
+    option_prefix = options.prefix
     option_geometry = options.geometry 
     option_default_camera = options.defcamera 
     option_default_light = options.deflight 
@@ -1463,6 +1510,7 @@ if __name__ == "__main__":
     # Prepare the FBX SDK.
     sdk_manager, scene = InitializeSdkObjects()
     converter = FbxGeometryConverter(sdk_manager)
+    global_up_vector = get_up_vector(scene)
 
     # The converter takes an FBX file as an argument.
     if len(args) > 1:
@@ -1479,11 +1527,15 @@ if __name__ == "__main__":
             print("\nForcing geometry to triangles")
             triangulate_scene(scene)
 
-        output_content = extract_scene(scene, os.path.basename(args[0]))
+        if option_geometry:
+            output_content = extract_geometry(scene, os.path.basename(args[0]))
+        else:
+            output_content = extract_scene(scene, os.path.basename(args[0]))
+
         output_path = os.path.join(os.getcwd(), args[1])
         write_file(output_path, output_content)
+
         print("\nExported Three.js file to:\n%s\n" % output_path)
-        # SaveScene(sdk_manager, scene, args[2], 8)
 
     # Destroy all objects created by the FBX SDK.
     sdk_manager.Destroy()
