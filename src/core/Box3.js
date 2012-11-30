@@ -79,8 +79,10 @@
 	};
 
 	THREE.Box3.prototype.extendByPoint = function ( point ) {
-		this.min.minSelf( point );
+
+		this.min.minSelf( point );		
 		this.max.maxSelf( point );
+
 		return this;
 	};
 
@@ -88,6 +90,7 @@
 
 		this.min.subSelf( vector );
 		this.max.addSelf( vector );
+
 		return this;
 	};
 
@@ -95,6 +98,7 @@
 
 		this.min.addScalar( -scalar );
 		this.max.addScalar( scalar );
+		
 		return this;
 	};
 
@@ -110,7 +114,6 @@
 	};
 
 	THREE.Box3.prototype.containsBox = function ( box ) {
-		// Assumption: for speed purposes, we assume that the box is not empty, e.g. box.min < box.max
 		if( 
 			( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
 			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
@@ -122,8 +125,6 @@
 	};
 
 	THREE.Box3.prototype.isIntersection = function ( box ) {
-		// Assumption: for speed purposes, we assume that the box is not empty, e.g. box.min < box.max
-
 		// using 6 splitting planes to rule out intersections.
 		if( 
 			( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
@@ -136,11 +137,8 @@
 	};
 
 	THREE.Box3.prototype.getParameter = function ( point ) {
-		// Assumption: for speed purposes, we assume that the box is not empty, e.g. box.min < box.max
-
-		// This assumption can lead to a divide by zero if the box is actually empty.
-		// Suggestions?  I don't want to check for empty as it is a speed hit, but maybe
-		// it is necessary.
+		// This can potentially have a divide by zero if the box
+		// has a size dimension of 0.
 		return new THREE.Vector3(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
@@ -150,7 +148,7 @@
 
 	THREE.Box3.prototype.clampPoint = function ( point ) {
 
-		return point.maxSelf( this.min ).minSelf( this.max );
+		return new THREE.Vector3().copy( point ).maxSelf( this.min ).minSelf( this.max );
 	};
 
 	THREE.Box3.prototype.distanceToPoint = function ( point ) {
