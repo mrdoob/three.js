@@ -55,7 +55,6 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -152,7 +151,7 @@
 
 				// deferred helper
 
-				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, width: SCALED_WIDTH, height: SCALED_HEIGHT, additiveSpecular: false } );
+				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, width: SCALED_WIDTH, height: SCALED_HEIGHT, scale: SCALE, additiveSpecular: false, multiply: 2 } );
 
 				// add lights
 

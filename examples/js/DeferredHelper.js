@@ -7,10 +7,12 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	var width = parameters.width;
 	var height = parameters.height;
+	var scale = parameters.scale;
 
 	var renderer = parameters.renderer;
 
 	var additiveSpecular = parameters.additiveSpecular;
+	var multiply = parameters.multiply;
 
 	//
 
@@ -407,7 +409,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
 
-		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+		effectFXAA.uniforms[ 'resolution' ].value.set( scale / width, scale / height );
 
 	};
 
@@ -529,29 +531,20 @@ THREE.DeferredHelper = function ( parameters ) {
 		// composite
 
 		compositePass = new THREE.ShaderPass( compositeShader );
-		compositePass.needsSwap = true;
-
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
+		compositePass.uniforms[ 'multiply' ].value = multiply;
 
 		// FXAA
 
 		effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
-
-		// color correction
-
-		var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
-		effectColor.renderToScreen = true;
-
-		effectColor.uniforms[ 'powRGB' ].value.set( 1, 1, 1 );
-		effectColor.uniforms[ 'mulRGB' ].value.set( 2, 2, 2 );
+		effectFXAA.uniforms[ 'resolution' ].value.set( scale / width, scale / height );
+		effectFXAA.renderToScreen = true;
 
 		//
 
 		compFinal = new THREE.EffectComposer( renderer, rtFinal );
 		compFinal.addPass( compositePass );
 		compFinal.addPass( effectFXAA );
-		compFinal.addPass( effectColor );
 
 	};
 
