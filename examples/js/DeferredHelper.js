@@ -14,8 +14,6 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
-	var geometryEmitter = new THREE.SphereGeometry( 0.7, 7, 7 );
-
 	var black = new THREE.Color( 0x000000 );
 
 	var colorShader = THREE.ShaderDeferred[ "color" ];
@@ -25,21 +23,23 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
-	var unlitShader = THREE.ShaderDeferred[ "unlit" ];
-	var lightShader = THREE.ShaderDeferred[ "light" ];
-	var compositeShader = THREE.ShaderDeferred[ "composite" ];
+	var emissiveLightShader = THREE.ShaderDeferred[ "emissiveLight" ];
+	var pointLightShader = THREE.ShaderDeferred[ "pointLight" ];
+	var directionalLightShader = THREE.ShaderDeferred[ "directionalLight" ];
 
-	var unlitMaterials = [];
-	var lightMaterials = [];
+	var compositeShader = THREE.ShaderDeferred[ "composite" ];
 
 	//
 
-	var compColor, compNormal, compDepth, compEmitter, compLight, compFinal;
-	var passColor, passNormal, passDepth, passEmitter, passLight, compositePass;
+	var compColor, compNormal, compDepth, compLight, compFinal;
+	var passColor, passNormal, passDepth, passLightFullscreen, passLightProxy, compositePass;
 
 	var effectFXAA;
 
-	var emitterScene, lightScene;
+	//
+
+	var lightSceneFullscreen, lightSceneProxy;
+	var lightMaterials = [];
 
 	//
 
@@ -99,10 +99,22 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		} );
 
-		var diffuse = originalMaterial.color;
+		if ( originalMaterial instanceof THREE.MeshBasicMaterial ) {
+
+			var diffuse = black;
+			var emissive = originalMaterial.color;
+
+		} else {
+
+			var diffuse = originalMaterial.color;
+			var emissive = originalMaterial.emissive !== undefined ? originalMaterial.emissive : black;
+
+		}
+
 		var specular = originalMaterial.specular !== undefined ? originalMaterial.specular : black;
 		var shininess = originalMaterial.shininess !== undefined ? originalMaterial.shininess : 1;
 
+		uniforms.emissive.value.copy( emissive );
 		uniforms.diffuse.value.copy( diffuse );
 		uniforms.specular.value.copy( specular );
 		uniforms.shininess.value = shininess;
@@ -208,9 +220,9 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		var materialLight = new THREE.ShaderMaterial( {
 
-			uniforms:       THREE.UniformsUtils.clone( lightShader.uniforms ),
-			vertexShader:   lightShader.vertexShader,
-			fragmentShader: lightShader.fragmentShader,
+			uniforms:       THREE.UniformsUtils.clone( pointLightShader.uniforms ),
+			vertexShader:   pointLightShader.vertexShader,
+			fragmentShader: pointLightShader.fragmentShader,
 			defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
 
 			blending:		THREE.AdditiveBlending,
@@ -245,33 +257,81 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	};
 
-	var createEmitter = function ( light ) {
+	var createDeferredDirectionalLight = function ( light ) {
 
-		// setup emitter material
+		// setup light material
 
-		var matEmitter = new THREE.ShaderMaterial( {
+		var materialLight = new THREE.ShaderMaterial( {
 
-			uniforms:       THREE.UniformsUtils.clone( unlitShader.uniforms ),
-			vertexShader:   unlitShader.vertexShader,
-			fragmentShader: unlitShader.fragmentShader
+			uniforms:       THREE.UniformsUtils.clone( directionalLightShader.uniforms ),
+			vertexShader:   directionalLightShader.vertexShader,
+			fragmentShader: directionalLightShader.fragmentShader,
+			defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			transparent:	true
 
 		} );
 
-		matEmitter.uniforms[ "viewWidth" ].value = width;
-		matEmitter.uniforms[ "viewHeight" ].value = height;
-		matEmitter.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
-		matEmitter.uniforms[ "lightColor" ].value = light.color;
+		materialLight.uniforms[ "lightDir" ].value = light.position;
+		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
+		materialLight.uniforms[ "lightColor" ].value = light.color;
 
-		// create emitter mesh
+		materialLight.uniforms[ "viewWidth" ].value = width;
+		materialLight.uniforms[ "viewHeight" ].value = height;
 
-		var meshEmitter = new THREE.Mesh( geometryEmitter, matEmitter );
-		meshEmitter.position = light.position;
+		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+		materialLight.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+
+		// create light proxy mesh
+
+		var geometryLight = new THREE.PlaneGeometry( 2, 2 );
+		var meshLight = new THREE.Mesh( geometryLight, materialLight );
 
 		// keep reference for size reset
 
-		unlitMaterials.push( matEmitter );
+		lightMaterials.push( materialLight );
 
-		return meshEmitter;
+		return meshLight;
+
+	};
+
+	var createDeferredEmissiveLight = function () {
+
+		// setup light material
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       THREE.UniformsUtils.clone( emissiveLightShader.uniforms ),
+			vertexShader:   emissiveLightShader.vertexShader,
+			fragmentShader: emissiveLightShader.fragmentShader,
+
+			blending:		THREE.AdditiveBlending,
+			depthTest:		false,
+			depthWrite:		false,
+			transparent:	true
+
+		} );
+
+
+		materialLight.uniforms[ "viewWidth" ].value = width;
+		materialLight.uniforms[ "viewHeight" ].value = height;
+
+		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+
+		// create light proxy mesh
+
+		var geometryLight = new THREE.PlaneGeometry( 2, 2 );
+		var meshLight = new THREE.Mesh( geometryLight, materialLight );
+
+		// keep reference for size reset
+
+		lightMaterials.push( materialLight );
+
+		return meshLight;
 
 	};
 
@@ -283,11 +343,13 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		if ( object instanceof THREE.PointLight ) {
 
-			var meshEmitter = createEmitter( object );
 			var meshLight = createDeferredPointLight( object );
+			lightSceneProxy.add( meshLight );
 
-			lightScene.add( meshLight );
-			emitterScene.add( meshEmitter );
+		} else if ( object instanceof THREE.DirectionalLight ) {
+
+			var meshLight = createDeferredDirectionalLight( object );
+			lightSceneFullscreen.add( meshLight );
 
 		}
 
@@ -309,7 +371,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	};
 
-	var setMaterialNormal= function ( object ) {
+	var setMaterialNormal = function ( object ) {
 
 		if ( object.material ) object.material = object.properties.normalMaterial;
 
@@ -322,18 +384,8 @@ THREE.DeferredHelper = function ( parameters ) {
 		compColor.setSize( width, height );
 		compNormal.setSize( width, height );
 		compDepth.setSize( width, height );
-		compEmitter.setSize( width, height );
 		compLight.setSize( width, height );
 		compFinal.setSize( width, height );
-
-		for ( var i = 0, il = unlitMaterials.length; i < il; i ++ ) {
-
-			var uniforms = unlitMaterials[ i ].uniforms;
-
-			uniforms[ "viewWidth" ].value = width;
-			uniforms[ "viewHeight" ].value = height;
-
-		}
 
 		for ( var i = 0, il = lightMaterials.length; i < il; i ++ ) {
 
@@ -343,13 +395,17 @@ THREE.DeferredHelper = function ( parameters ) {
 			uniforms[ "viewHeight" ].value = height;
 
 			uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-			uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
 			uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+
+			if ( uniforms[ 'samplerNormals' ] ) {
+
+				uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+
+			}
 
 		}
 
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
-		compositePass.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
 
 		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
@@ -361,23 +417,30 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		// setup deferred properties
 
-		if ( ! scene.properties.emitterScene ) scene.properties.emitterScene = new THREE.Scene();
-		if ( ! scene.properties.lightScene ) scene.properties.lightScene = new THREE.Scene();
+		if ( ! scene.properties.lightSceneProxy ) {
 
-		emitterScene = scene.properties.emitterScene;
-		lightScene = scene.properties.lightScene;
+			scene.properties.lightSceneProxy = new THREE.Scene();
+			scene.properties.lightSceneFullscreen = new THREE.Scene();
+
+			var meshLight = createDeferredEmissiveLight();
+			scene.properties.lightSceneFullscreen.add( meshLight );
+
+		}
+
+		lightSceneProxy = scene.properties.lightSceneProxy;
+		lightSceneFullscreen = scene.properties.lightSceneFullscreen;
 
 		passColor.camera = camera;
 		passNormal.camera = camera;
 		passDepth.camera = camera;
-		passEmitter.camera = camera;
-		passLight.camera = camera;
+		passLightProxy.camera = camera;
+		passLightFullscreen.camera = THREE.EffectComposer.camera;
 
 		passColor.scene = scene;
 		passNormal.scene = scene;
 		passDepth.scene = scene;
-		passEmitter.scene = emitterScene;
-		passLight.scene = lightScene;
+		passLightFullscreen.scene = lightSceneFullscreen;
+		passLightProxy.scene = lightSceneProxy;
 
 		scene.traverse( initDeferredProperties );
 
@@ -396,20 +459,24 @@ THREE.DeferredHelper = function ( parameters ) {
 		scene.traverse( setMaterialNormal );
 		compNormal.render();
 
-		// emitter pass
-
-		compEmitter.render();
-
 		// light pass
 
 		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
 
-		for ( var i = 0, il = lightScene.children.length; i < il; i ++ ) {
+		for ( var i = 0, il = lightSceneProxy.children.length; i < il; i ++ ) {
 
-			var uniforms = lightScene.children[ i ].material.uniforms;
+			var uniforms = lightSceneProxy.children[ i ].material.uniforms;
 
 			uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
 			uniforms[ "matView" ].value = camera.matrixWorldInverse;
+
+		}
+
+		for ( var i = 0, il = lightSceneFullscreen.children.length; i < il; i ++ ) {
+
+			var uniforms = lightSceneFullscreen.children[ i ].material.uniforms;
+
+			if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = camera.matrixWorldInverse;
 
 		}
 
@@ -429,14 +496,12 @@ THREE.DeferredHelper = function ( parameters ) {
 		var rtNormal  = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
 		var rtDepth   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
 		var rtLight   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
-		var rtEmitter = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
 		var rtFinal   = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
 
 		rtColor.generateMipmaps = false;
 		rtNormal.generateMipmaps = false;
 		rtDepth.generateMipmaps = false;
 		rtLight.generateMipmaps = false;
-		rtEmitter.generateMipmaps = false;
 		rtFinal.generateMipmaps = false;
 
 		// composers
@@ -453,13 +518,13 @@ THREE.DeferredHelper = function ( parameters ) {
 		compDepth = new THREE.EffectComposer( renderer, rtDepth );
 		compDepth.addPass( passDepth );
 
-		passEmitter = new THREE.RenderPass();
-		compEmitter = new THREE.EffectComposer( renderer, rtEmitter );
-		compEmitter.addPass( passEmitter );
+		passLightProxy = new THREE.RenderPass();
+		passLightFullscreen = new THREE.RenderPass();
+		passLightFullscreen.clear = false;
 
-		passLight = new THREE.RenderPass();
 		compLight = new THREE.EffectComposer( renderer, rtLight );
-		compLight.addPass( passLight );
+		compLight.addPass( passLightProxy );
+		compLight.addPass( passLightFullscreen );
 
 		// composite
 
@@ -467,7 +532,6 @@ THREE.DeferredHelper = function ( parameters ) {
 		compositePass.needsSwap = true;
 
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
-		compositePass.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
 
 		// FXAA
 

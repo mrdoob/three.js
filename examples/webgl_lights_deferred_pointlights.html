@@ -119,6 +119,8 @@
 				renderer.setSize( WIDTH, HEIGHT );
 				renderer.setClearColorHex( 0x000000, 1 );
 
+				renderer.autoClear = false;
+
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
 				renderer.domElement.style.left = "0px";
@@ -205,6 +207,22 @@
 
 					scene.add( light );
 					lights.push( light );
+
+				}
+
+				var geometry = new THREE.SphereGeometry( 0.7, 7, 7 );
+
+				for ( var i = 0; i < numLights; i ++ ) {
+
+					var light = lights[ i ];
+
+					var material = new THREE.MeshBasicMaterial();
+					material.color = light.color;
+
+					var emitter = new THREE.Mesh( geometry, material );
+					emitter.position = light.position;
+
+					scene.add( emitter );
 
 				}
 
