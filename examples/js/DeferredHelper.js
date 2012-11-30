@@ -29,16 +29,15 @@ THREE.DeferredHelper = function ( parameters ) {
 	var lightShader = THREE.ShaderDeferred[ "light" ];
 	var compositeShader = THREE.ShaderDeferred[ "composite" ];
 
-	unlitShader.uniforms[ "viewWidth" ].value = width;
-	unlitShader.uniforms[ "viewHeight" ].value = height;
-
-	lightShader.uniforms[ "viewWidth" ].value = width;
-	lightShader.uniforms[ "viewHeight" ].value = height;
+	var unlitMaterials = [];
+	var lightMaterials = [];
 
 	//
 
-	var compColor, compNormal, compDepth, compEmitter, compLightBuffer, compFinal, compositePass;
-	var passColor, passNormal, passDepth, passEmitter, passLight;
+	var compColor, compNormal, compDepth, compEmitter, compLight, compFinal;
+	var passColor, passNormal, passDepth, passEmitter, passLight, compositePass;
+
+	var effectFXAA;
 
 	var emitterScene, lightScene;
 
@@ -225,11 +224,22 @@ THREE.DeferredHelper = function ( parameters ) {
 		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
 		materialLight.uniforms[ "lightColor" ].value = light.color;
 
+		materialLight.uniforms[ "viewWidth" ].value = width;
+		materialLight.uniforms[ "viewHeight" ].value = height;
+
+		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		materialLight.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+
 		// create light proxy mesh
 
 		var geometryLight = new THREE.SphereGeometry( light.distance, 16, 8 );
 		var meshLight = new THREE.Mesh( geometryLight, materialLight );
 		meshLight.position = light.position;
+
+		// keep reference for size reset
+
+		lightMaterials.push( materialLight );
 
 		return meshLight;
 
@@ -247,6 +257,8 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		} );
 
+		matEmitter.uniforms[ "viewWidth" ].value = width;
+		matEmitter.uniforms[ "viewHeight" ].value = height;
 		matEmitter.uniforms[ "samplerDepth" ].value = compDepth.renderTarget2;
 		matEmitter.uniforms[ "lightColor" ].value = light.color;
 
@@ -254,6 +266,10 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		var meshEmitter = new THREE.Mesh( geometryEmitter, matEmitter );
 		meshEmitter.position = light.position;
+
+		// keep reference for size reset
+
+		unlitMaterials.push( matEmitter );
 
 		return meshEmitter;
 
@@ -296,6 +312,46 @@ THREE.DeferredHelper = function ( parameters ) {
 	var setMaterialNormal= function ( object ) {
 
 		if ( object.material ) object.material = object.properties.normalMaterial;
+
+	};
+
+	//
+
+	this.setSize = function ( width, height ) {
+
+		compColor.setSize( width, height );
+		compNormal.setSize( width, height );
+		compDepth.setSize( width, height );
+		compEmitter.setSize( width, height );
+		compLight.setSize( width, height );
+		compFinal.setSize( width, height );
+
+		for ( var i = 0, il = unlitMaterials.length; i < il; i ++ ) {
+
+			var uniforms = unlitMaterials[ i ].uniforms;
+
+			uniforms[ "viewWidth" ].value = width;
+			uniforms[ "viewHeight" ].value = height;
+
+		}
+
+		for ( var i = 0, il = lightMaterials.length; i < il; i ++ ) {
+
+			var uniforms = lightMaterials[ i ].uniforms;
+
+			uniforms[ "viewWidth" ].value = width;
+			uniforms[ "viewHeight" ].value = height;
+
+			uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+			uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+			uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+
+		}
+
+		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
+		compositePass.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
+
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
 	};
 
@@ -357,7 +413,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		}
 
-		compLightBuffer.render();
+		compLight.render();
 
 		// composite pass
 
@@ -402,32 +458,31 @@ THREE.DeferredHelper = function ( parameters ) {
 		compEmitter.addPass( passEmitter );
 
 		passLight = new THREE.RenderPass();
-		compLightBuffer = new THREE.EffectComposer( renderer, rtLight );
-		compLightBuffer.addPass( passLight );
-
-		//
-
-		lightShader.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		lightShader.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
-		lightShader.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
-		lightShader.uniforms[ 'samplerLightBuffer' ].value = rtLight;
-
-		compositeShader.uniforms[ 'samplerLightBuffer' ].value = compLightBuffer.renderTarget2;
-		compositeShader.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
+		compLight = new THREE.EffectComposer( renderer, rtLight );
+		compLight.addPass( passLight );
 
 		// composite
 
-		var compositePass = new THREE.ShaderPass( compositeShader );
+		compositePass = new THREE.ShaderPass( compositeShader );
 		compositePass.needsSwap = true;
 
-		var effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
+		compositePass.uniforms[ 'samplerEmitter' ].value = compEmitter.renderTarget2;
+
+		// FXAA
+
+		effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+
+		// color correction
 
 		var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
 		effectColor.renderToScreen = true;
 
 		effectColor.uniforms[ 'powRGB' ].value.set( 1, 1, 1 );
 		effectColor.uniforms[ 'mulRGB' ].value.set( 2, 2, 2 );
+
+		//
 
 		compFinal = new THREE.EffectComposer( renderer, rtFinal );
 		compFinal.addPass( compositePass );

@@ -78,7 +78,6 @@
 
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
-			var ASPECT = WIDTH / HEIGHT;
 
 			// controls
 
@@ -129,7 +128,7 @@
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
 				camera.position.z = 150;
 
 				// scene
@@ -164,6 +163,7 @@
 				// events
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -314,6 +314,25 @@
 			}
 
 			// -----------------------------
+
+			function onWindowResize( event ) {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				WIDTH = window.innerWidth;
+				HEIGHT = window.innerHeight - 2 * MARGIN;
+
+				SCALED_WIDTH = Math.floor( SCALE * WIDTH );
+				SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
+
+				renderer.setSize( WIDTH, HEIGHT );
+				deferredHelper.setSize( SCALED_WIDTH, SCALED_HEIGHT );
+
+				camera.aspect = WIDTH / HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
 
 			function onDocumentMouseMove( event ) {
 

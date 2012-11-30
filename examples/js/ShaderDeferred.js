@@ -313,21 +313,21 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerLightBuffer: { type: "t", value: null },
-			samplerEmitter: 	{ type: "t", value: null }
+			samplerLight: 	{ type: "t", value: null },
+			samplerEmitter: { type: "t", value: null }
 
 		},
 
 		fragmentShader : [
 
 			"varying vec2 texCoord;",
-			"uniform sampler2D samplerLightBuffer;",
+			"uniform sampler2D samplerLight;",
 			"uniform sampler2D samplerEmitter;",
 			"uniform vec3 lightPos;",
 
 			"void main() {",
 
-				"vec3 color = texture2D( samplerLightBuffer, texCoord ).xyz;",
+				"vec3 color = texture2D( samplerLight, texCoord ).xyz;",
 				"vec3 emitter = texture2D( samplerEmitter, texCoord ).xyz;",
 
 				"if ( emitter != vec3( 0.0 ) ) {",
@@ -364,7 +364,6 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerLightBuffer: { type: "t", value: null },
 			samplerNormals: { type: "t", value: null },
 			samplerDepth: 	{ type: "t", value: null },
 			samplerColor: 	{ type: "t", value: null },
@@ -387,7 +386,6 @@ THREE.ShaderDeferred = {
 			"uniform sampler2D samplerColor;",
 			"uniform sampler2D samplerDepth;",
 			"uniform sampler2D samplerNormals;",
-			"uniform sampler2D samplerLightBuffer;",
 
 			"uniform float lightRadius;",
 			"uniform float lightIntensity;",
