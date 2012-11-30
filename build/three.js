@@ -22641,7 +22641,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 		}
 

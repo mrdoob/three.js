@@ -63,17 +63,6 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
-	var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
-								format: THREE.RGBAFormat, type: THREE.FloatType };
-
-	var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
-								 format: THREE.RGBAFormat, type: THREE.FloatType };
-
-	var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
-						  format: THREE.RGBFormat, type: THREE.UnsignedByteType };
-
-	//
-
 	var initDeferredMaterials = function ( object ) {
 
 		var originalMaterial = object.material;
@@ -309,11 +298,8 @@ THREE.DeferredHelper = function ( parameters ) {
 			uniforms:       THREE.UniformsUtils.clone( emissiveLightShader.uniforms ),
 			vertexShader:   emissiveLightShader.vertexShader,
 			fragmentShader: emissiveLightShader.fragmentShader,
-
-			blending:		THREE.AdditiveBlending,
 			depthTest:		false,
-			depthWrite:		false,
-			transparent:	true
+			depthWrite:		false
 
 		} );
 
@@ -492,6 +478,15 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	var createRenderTargets = function ( ) {
 
+		var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
+									format: THREE.RGBAFormat, type: THREE.FloatType };
+
+		var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+									 format: THREE.RGBAFormat, type: THREE.FloatType };
+
+		var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
+							  format: THREE.RGBFormat, type: THREE.UnsignedByteType };
+
 		// g-buffers
 
 		var rtColor   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatNearest );
@@ -520,13 +515,13 @@ THREE.DeferredHelper = function ( parameters ) {
 		compDepth = new THREE.EffectComposer( renderer, rtDepth );
 		compDepth.addPass( passDepth );
 
-		passLightProxy = new THREE.RenderPass();
 		passLightFullscreen = new THREE.RenderPass();
-		passLightFullscreen.clear = false;
+		passLightProxy = new THREE.RenderPass();
+		passLightProxy.clear = false;
 
 		compLight = new THREE.EffectComposer( renderer, rtLight );
-		compLight.addPass( passLightProxy );
 		compLight.addPass( passLightFullscreen );
+		compLight.addPass( passLightProxy );
 
 		// composite
 
