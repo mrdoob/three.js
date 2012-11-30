@@ -19,6 +19,15 @@
 		return this;
 	};
 
+	THREE.Sphere.prototype.copy = function ( sphere ) {
+
+		this.center = sphere.center;
+		this.radius = sphere.radius;
+
+		return this;
+	};
+
+
 	THREE.Sphere.prototype.empty = function () {
 
 		return ( this.radius <= 0 );
@@ -28,33 +37,29 @@
 
 	THREE.Sphere.prototype.volume = function () {
 
-		// NOTE: would love to replace r*r*r with a helper cube(r), but may be much slower
 		return Math.PI * 4 / 3 * this.radius * this.radius * this.radius;
 
 	};
 
 	THREE.Sphere.prototype.containsPoint = function ( point ) {
 
-		var delta = new THREE.VEctor3();
-		var distanceSq = delta.sub( point, this.center ).lengthSq();
+		var distanceSq = new THREE.VEctor3().sub( point, this.center ).lengthSq();
 
 		return ( distanceSq <= this.radius * this.radius );
 	};
 
 	THREE.Sphere.prototype.distanceToPoint = function ( point ) {
 
-		var delta = new THREE.VEctor3();
-		var distanceSq = delta.sub( point, this.center ).length();
+		var distanceSq = new THREE.Vector3().sub( point, this.center ).length();
 
-		return ( distanceSq - this.radius  );
+		return ( distanceSq - this.radius );
 	};
 
 	THREE.Sphere.prototype.clampPoint = function ( point ) {
 
 		// NOTE: There is likely a more optimal way of doing this.
 
-		var delta = new THREE.VEctor3();
-		delta.sub( point, this.center );
+		var delta = new THREE.Vector3().sub( point, this.center );
 
 		var deltaLengthSq = delta.lengthSq();
 
@@ -70,7 +75,7 @@
 
 	THREE.Sphere.prototype.bounds = function () {
 
-		var box =  new THREE.Box3( this.center );
+		var box =  new THREE.Box3( this.center, this.center );
 		box.expandByScalar( this.radius );
 
 		return box;
@@ -78,7 +83,7 @@
 
 	THREE.Sphere.prototype.translate = function ( offset ) {
 
-		this.center.add( this.center, this.offset );
+		this.center.addSelf( this.offset );
 		
 		return this;
 	};

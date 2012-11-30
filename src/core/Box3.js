@@ -7,7 +7,7 @@
 	THREE.Box3 = function ( min, max ) {
 
 		this.min = min || new THREE.Vector3();
-		this.max = max || new THREE.Vector3();
+		this.max = max || this.min;		// This is done on purpose so you can make a box using a single point and then expand it.
 
 	};
 
@@ -18,6 +18,15 @@
 
 		return this;
 	};
+
+	THREE.Box3.prototype.copy = function ( box ) {
+
+		this.min = box.min;
+		this.max = box.max;
+
+		return this;
+	};
+
 
 	THREE.Box3.prototype.empty = function () {
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
@@ -35,13 +44,11 @@
 	};
 
 	THREE.Box3.prototype.center = function () {
-		var c = new THREE.Vector3();
-		return c.add( this.min, this.max ).multiplyScalar( 0.5 );
+		return new THREE.Vector3().add( this.min, this.max ).multiplyScalar( 0.5 );
 	};
 
 	THREE.Box3.prototype.size = function () {
-		var s = new THREE.Vector3();
-		return s.sub( this.max, this.min );
+		return new THREE.Vector3().sub( this.max, this.min );
 	};
 
 	THREE.Box3.prototype.extendByPoint = function ( point ) {
@@ -74,12 +81,8 @@
 	};
 
 	THREE.Box3.prototype.expandByScalar = function ( scalar ) {
-		this.min.x -= scalar;
-		this.min.y -= scalar;
-		this.min.z -= scalar;
-		this.max.x += scalar;
-		this.max.y += scalar;
-		this.max.z += scalar;
+		this.min.addScalar( -scalar );
+		this.max.addScalar( scalar );
 		return this;
 	};
 

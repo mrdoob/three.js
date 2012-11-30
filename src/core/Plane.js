@@ -31,6 +31,14 @@
 		return this;
 	};
 
+	THREE.Plane.prototype.copy = function ( plane ) {
+
+		this.normal = plane.normal;
+		this.constant = plane.constant;
+
+		return this;
+	};
+
 	THREE.Plane.prototype.flip = function () {
 
 		// Note: can also be flipped by inverting constant, but I like constant to stay positive generally.
@@ -58,7 +66,7 @@
 
 		var perpendicularMagnitude = this.distanceToPoint( point );
 
-		return new THREE.Vector3(
+		return new THREE.Vector3( 
 			point.x - this.normal.x * perpendicularMagnitude,
 			point.y - this.normal.y * perpendicularMagnitude,
 			point.z - this.normal.z * perpendicularMagnitude
@@ -69,11 +77,7 @@
 
 		var perpendicularMagnitude = this.distanceToPoint( point );
 
-		return new THREE.Vector3(
-			this.normal.x * perpendicularMagnitude,
-			this.normal.y * perpendicularMagnitude,
-			this.normal.z * perpendicularMagnitude
-			);
+		return new THREE.Vector3().copy( this.normal ).multipleByScalar( perpendicularMagnitude );
 	};
 
 	THREE.Plane.prototype.intersectsLine = function ( startPoint, endPoint ) {	
@@ -87,7 +91,7 @@
 
 	THREE.Plane.prototype.coplanarPoint = function () {		
 		
-		return this.projectPoint( new THREE.Vector3( 0,0,0 ) );
+		return this.projectPoint( new THREE.Vector3( 0, 0, 0 ) );
 	};
 
 }( THREE ) );
