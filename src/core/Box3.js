@@ -52,25 +52,15 @@
 	};
 
 	THREE.Box3.prototype.extendByPoint = function ( point ) {
-		// TODO: replace by THREE.Vector3.min/max methods when they exist
-		this.min.x = Math.min( this.min.x, point.x );
-		this.min.y = Math.min( this.min.y, point.y );
-		this.min.z = Math.min( this.min.z, point.z );
-		this.max.x = Math.max( this.max.x, point.x );
-		this.max.y = Math.max( this.max.y, point.y );
-		this.max.z = Math.max( this.max.z, point.z );
+		this.min.minSelf( point );
+		this.max.maxSelf( point );
 		return this;
 	};
 
 	THREE.Box3.prototype.extendByBox = function ( box ) {
 		// Assumption: for speed purposes, we assume that the box is not empty, e.g. box.min < box.max
-		// TODO: replace by THREE.Vector3.min/max methods when they exist
-		this.min.x = Math.min( this.min.x, box.min.x );
-		this.min.y = Math.min( this.min.y, box.min.y );
-		this.min.z = Math.min( this.min.z, box.min.z );
-		this.max.x = Math.max( this.max.x, box.max.x );
-		this.max.y = Math.max( this.max.y, box.max.y );
-		this.max.z = Math.max( this.max.z, box.max.z );
+		this.min.minSelf( box.min );
+		this.max.maxSelf( box.max );
 		return this;
 	};
 
@@ -135,12 +125,7 @@
 	};
 
 	THREE.Box3.prototype.clampPoint = function ( point ) {
-		// TODO: replace by THREE.Vector3.min/max methods when they exist
-		return new THREE.Vector3(
-			Math.min( Math.max( this.min.x, point.x ), this.max.x ),
-			Math.min( Math.max( this.min.y, point.y ), this.max.y ),
-			Math.min( Math.max( this.min.z, point.z ), this.max.z )
-			);
+		return point.maxSelf( this.min ).minSelf( this.max );
 	};
 
 	THREE.Box3.prototype.distanceToPoint = function ( point ) {
