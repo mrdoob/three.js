@@ -19,7 +19,7 @@
 	THREE.Box3.fromPoints = function ( points ) {
 
 		var boundingBox = new THREE.Box3();
-		for( var i = 0; i < points.length; i ++ ) {
+		for( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {
 			boundingBox.extendByPoint( points[i] );
 		}
 

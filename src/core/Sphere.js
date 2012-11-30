@@ -15,6 +15,18 @@
 
 	};
 
+	THREE.Sphere.fromCenterAndPoints = function ( center, points ) {
+		var maxRadiusSq = 0;
+		var delta = new THREE.Vector3().copy( center );
+
+		for ( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {			
+			var radiusSq = center.distanceToSquared( points[i] );
+			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+		}
+
+		return new THREE.Sphere( center, Math.sqrt( maxRadiusSq ) );
+	};
+
 	THREE.Sphere.prototype.set = function ( center, radius ) {
 
 		this.center = center;
