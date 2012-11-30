@@ -4,6 +4,10 @@
 
 ( function ( THREE ) {
 
+	var sphereVolumeConstant = Math.PI * 4 / 3;
+	var square = function( x ) { return x*x; }
+	var cube = function( x ) { return x*x; }
+
 	THREE.Sphere = function ( center, radius ) {
 
 		this.center = center || new THREE.Vector3();
@@ -27,22 +31,20 @@
 		return this;
 	};
 
-
 	THREE.Sphere.prototype.empty = function () {
 
 		return ( this.radius <= 0 );
 
 	};
 
-
 	THREE.Sphere.prototype.volume = function () {
 
-		return Math.PI * 4 / 3 * this.radius * this.radius * this.radius;
+		return sphereVolumeConstant * cube( this.radius );
 	};
 
 	THREE.Sphere.prototype.containsPoint = function ( point ) {
 
-		return ( point.distanceToSquared( this.center ) <= this.radius * this.radius );
+		return ( point.distanceToSquared( this.center ) <= square( this.radius ) );
 	};
 
 	THREE.Sphere.prototype.distanceToPoint = function ( point ) {
@@ -54,7 +56,7 @@
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
-		if( deltaLengthSq > ( this.radius*this.radius ) ) {
+		if( deltaLengthSq > square( this.radius ) ) {
 
 			var delta = new THREE.Vector3().sub( point, center ).normalize();
 			delta.multiplyByScalar( this.radius ).addSelf( this.center );
