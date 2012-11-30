@@ -1,5 +1,6 @@
 [
 	"../src/Three.js",
+	"../src/core/Box3.js",
 	"../src/core/Clock.js",
 	"../src/core/Color.js",
 	"../src/core/Vector2.js",
