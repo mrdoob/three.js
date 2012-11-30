@@ -63,14 +63,8 @@
 	};
 
 	THREE.Plane.prototype.projectPoint = function ( point ) {		
-
-		var perpendicularMagnitude = this.distanceToPoint( point );
-
-		return new THREE.Vector3( 
-			point.x - this.normal.x * perpendicularMagnitude,
-			point.y - this.normal.y * perpendicularMagnitude,
-			point.z - this.normal.z * perpendicularMagnitude
-			);
+		
+		return new THREE.Vector3().copy( point ).sub( this.orthoPoint( point ) );
 	};
 
 	THREE.Plane.prototype.orthoPoint = function ( point ) {		
@@ -91,7 +85,7 @@
 
 	THREE.Plane.prototype.coplanarPoint = function () {		
 		
-		return this.projectPoint( new THREE.Vector3( 0, 0, 0 ) );
+		return this.projectPoint( new THREE.Vector3() );
 	};
 
 }( THREE ) );

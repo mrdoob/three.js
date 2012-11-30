@@ -38,36 +38,28 @@
 	THREE.Sphere.prototype.volume = function () {
 
 		return Math.PI * 4 / 3 * this.radius * this.radius * this.radius;
-
 	};
 
 	THREE.Sphere.prototype.containsPoint = function ( point ) {
 
-		var distanceSq = new THREE.VEctor3().sub( point, this.center ).lengthSq();
-
-		return ( distanceSq <= this.radius * this.radius );
+		return ( point.distanceToSquared( this.center ) <= this.radius * this.radius );
 	};
 
 	THREE.Sphere.prototype.distanceToPoint = function ( point ) {
 
-		var distanceSq = new THREE.Vector3().sub( point, this.center ).length();
-
-		return ( distanceSq - this.radius );
+		return ( point.distanceTo( this.center ) - this.radius );
 	};
 
 	THREE.Sphere.prototype.clampPoint = function ( point ) {
 
-		// NOTE: There is likely a more optimal way of doing this.
-
-		var delta = new THREE.Vector3().sub( point, this.center );
-
-		var deltaLengthSq = delta.lengthSq();
+		var deltaLengthSq = this.center.distanceToSquared( point );
 
 		if( deltaLengthSq > ( this.radius*this.radius ) ) {
 
-			delta.normalize().multiplyByScalar( this.radius ).addSelf( this.center );
-			return delta;
+			var delta = new THREE.Vector3().sub( point, center ).normalize();
+			delta.multiplyByScalar( this.radius ).addSelf( this.center );
 
+			return delta;
 		}
 
 		return point;
