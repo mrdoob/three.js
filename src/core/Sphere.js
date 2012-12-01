@@ -6,7 +6,7 @@
 
 	var sphereVolumeConstant = Math.PI * 4 / 3;
 	var square = function( x ) { return x*x; }
-	var cube = function( x ) { return x*x; }
+	var cube = function( x ) { return x*x*x; }
 
 	THREE.Sphere = function ( center, radius ) {
 
@@ -16,9 +16,8 @@
 	};
 
 	THREE.Sphere.fromCenterAndPoints = function ( center, points ) {
-		var maxRadiusSq = 0;
-		var delta = new THREE.Vector3().copy( center );
 
+		var maxRadiusSq = 0;
 		for ( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {			
 			var radiusSq = center.distanceToSquared( points[i] );
 			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
@@ -71,7 +70,7 @@
 		if( deltaLengthSq > square( this.radius ) ) {
 
 			var delta = new THREE.Vector3().sub( point, center ).normalize();
-			delta.multiplyByScalar( this.radius ).addSelf( this.center );
+			delta.multiplyScalar( this.radius ).addSelf( this.center );
 
 			return delta;
 		}
@@ -90,6 +89,13 @@
 	THREE.Sphere.prototype.translate = function ( offset ) {
 
 		this.center.addSelf( this.offset );
+		
+		return this;
+	};
+
+	THREE.Sphere.prototype.scale = function ( factor ) {
+
+		this.radius *= factor;
 		
 		return this;
 	};

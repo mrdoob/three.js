@@ -110,7 +110,15 @@
 
 	THREE.Plane.prototype.coplanarPoint = function () {		
 		
-		return new THREE.Vector3().copy( this.normal ).multiplyByScalar( - this.constant );
+		return new THREE.Vector3().copy( this.normal ).multiplyScalar( - this.constant );
+	};
+
+	THREE.Plane.prototype.translate = function ( offset ) {
+
+		// TODO: test this.
+		this.constant =	- offset.dot( normal );
+
+		return this;
 	};
 
 }( THREE ) );

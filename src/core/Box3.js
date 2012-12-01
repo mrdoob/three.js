@@ -26,6 +26,16 @@
 		return boundingBox;
 	};
 
+	THREE.Box3.fromCenterAndSize = function ( center, size ) {
+
+		var halfSize = new THREE.Vector3().copy( size ).multiplyScalar( 0.5 );
+		var box = new THREE.Box3( center, center );
+		box.min.subSelf( halfSize );
+		box.min.addSelf( halfSize );
+
+		return box;	
+	};
+
 	THREE.Box3.prototype.set = function ( min, max ) {
 
 		this.min = min;
@@ -53,7 +63,6 @@
 	THREE.Box3.prototype.empty = function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
-
 		return 
 			( this.max.x < this.min.x ) ||
 			( this.max.y < this.min.y ) ||
@@ -78,7 +87,7 @@
 		return new THREE.Vector3().sub( this.max, this.min );
 	};
 
-	THREE.Box3.prototype.extendByPoint = function ( point ) {
+	THREE.Box3.prototype.expandByPoint = function ( point ) {
 
 		this.min.minSelf( point );		
 		this.max.maxSelf( point );
@@ -176,6 +185,14 @@
 
 		this.min.addSelf( offset );
 		this.max.addSelf( offset );
+
+		return this;
+	};
+
+	THREE.Box3.prototype.scale = function ( factor ) {
+
+		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
+		this.expandByVector( sizeDeltaHalf );
 
 		return this;
 	};
