@@ -170,17 +170,6 @@
 
 			// -----------------------------
 
-			function addObject( object, y, scale ) {
-
-				object.position.y = y;
-				object.scale.set( scale, scale, scale );
-
-				scene.add( object );
-
-			}
-
-			// -----------------------------
-
 			function initLights() {
 
 				var distance = 40;
@@ -237,19 +226,21 @@
 
 				loader.load( "models/utf8/ben_dds.js", function ( object ) {
 
-					addObject( object, -75, 150 );
-					animate();
+					object.scale.multiplyScalar( 150 );
+					object.position.y = -75;
+					scene.add( object );
 
 				}, { normalizeRGB: true } );
 
 				loader.load( "models/utf8/WaltHi.js", function ( object ) {
 
-					addObject( object, -35, 1 );
-					animate();
+					object.position.y = -35;
+					scene.add( object );
 
 				}, { normalizeRGB: true } );
 
 				*/
+
 
 				var loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
@@ -265,14 +256,42 @@
 					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909 } );
 
 					var object = new THREE.Mesh( geometry, material );
-					addObject( object, 0, 8 );
+					object.scale.multiplyScalar( 8 );
+					scene.add( object );
+
+				} );
+
+
+				var loader = new THREE.BinaryLoader();
+				loader.load( "obj/female02/Female02_bin.js", function( geometry, materials ) {
+
+					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999 } );
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					object.position.x = -50;
+					object.position.y = -48;
+					object.scale.multiplyScalar( 0.45 );
+					scene.add( object );
+
+				} );
+
+				loader.load( "obj/male02/Male02_bin.js", function( geometry, materials ) {
+
+					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999 } );
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					object.position.x = 50;
+					object.position.y = -48;
+					object.scale.multiplyScalar( 0.45 );
+					scene.add( object );
 
 				} );
 
 				// create box
 
-				var object = generateBox();
-				addObject( object, 0, 8 );
+				var box = generateBox();
+				box.scale.multiplyScalar( 8 );
+				scene.add( box );
 
 			}
 

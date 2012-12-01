@@ -65,7 +65,44 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	var initDeferredMaterials = function ( object ) {
 
-		var originalMaterial = object.material;
+		if ( object.material instanceof THREE.MeshFaceMaterial ) {
+
+			var colorMaterials = [];
+			var depthMaterials = [];
+			var normalMaterials = [];
+
+			var materials = object.material.materials;
+
+			for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+				var deferredMaterials = createDeferredMaterials( materials[ i ] );
+
+				colorMaterials.push( deferredMaterials.colorMaterial );
+				depthMaterials.push( deferredMaterials.depthMaterial );
+				normalMaterials.push( deferredMaterials.normalMaterial );
+
+			}
+
+			object.properties.colorMaterial = new THREE.MeshFaceMaterial( colorMaterials );
+			object.properties.depthMaterial = new THREE.MeshFaceMaterial( depthMaterials );
+			object.properties.normalMaterial = new THREE.MeshFaceMaterial( normalMaterials );
+
+		} else {
+
+			var deferredMaterials = createDeferredMaterials( object.material );
+
+			object.properties.colorMaterial = deferredMaterials.colorMaterial;
+			object.properties.depthMaterial = deferredMaterials.depthMaterial;
+			object.properties.normalMaterial = deferredMaterials.normalMaterial;
+
+		}
+
+	};
+
+
+	var createDeferredMaterials = function ( originalMaterial ) {
+
+		var deferredMaterials = {};
 
 		// color material
 		// -----------------
@@ -127,7 +164,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		}
 
-		object.properties.colorMaterial = material;
+		deferredMaterials.colorMaterial = material;
 
 		// normal material
 		// -----------------
@@ -157,7 +194,7 @@ THREE.DeferredHelper = function ( parameters ) {
 
 			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
-			object.properties.normalMaterial = normalMaterial;
+			deferredMaterials.normalMaterial = normalMaterial;
 
 		} else if ( originalMaterial.morphTargets ) {
 
@@ -173,11 +210,11 @@ THREE.DeferredHelper = function ( parameters ) {
 			normalMaterial.morphTargets = originalMaterial.morphTargets;
 			normalMaterial.morphNormals = originalMaterial.morphNormals;
 
-			object.properties.normalMaterial = normalMaterial;
+			deferredMaterials.normalMaterial = normalMaterial;
 
 		} else {
 
-			object.properties.normalMaterial = defaultNormalMaterial;
+			deferredMaterials.normalMaterial = defaultNormalMaterial;
 
 		}
 
@@ -195,13 +232,15 @@ THREE.DeferredHelper = function ( parameters ) {
 
 			depthMaterial.morphTargets = originalMaterial.morphTargets;
 
-			object.properties.depthMaterial = depthMaterial;
+			deferredMaterials.depthMaterial = depthMaterial;
 
 		} else {
 
-			object.properties.depthMaterial = defaultDepthMaterial;
+			deferredMaterials.depthMaterial = defaultDepthMaterial;
 
 		}
+
+		return deferredMaterials;
 
 	};
 

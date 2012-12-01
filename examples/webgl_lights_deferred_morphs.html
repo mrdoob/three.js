@@ -171,16 +171,6 @@
 
 			// -----------------------------
 
-			function addObject( object, y, scale ) {
-
-				object.position.y = y;
-				object.scale.set( scale, scale, scale );
-				scene.add( object );
-
-			}
-
-			// -----------------------------
-
 			function initLights() {
 
 				var distance = 40;
@@ -242,22 +232,20 @@
 					meshAnim.duration = 3000;
 					meshAnim.properties.delta = -13;
 
-					var s = 1;
-					meshAnim.scale.set( s, s, s );
-					meshAnim.position.x = 180;
-					meshAnim.position.z = -10;
+					meshAnim.scale.multiplyScalar( 50 );
+					meshAnim.position.set( 180, -48, -10 );
 					meshAnim.rotation.y = -Math.PI/2;
 
+					scene.add( meshAnim );
 					morphs.push( meshAnim );
-
-					addObject( meshAnim, -48, 50 );
 
 				} );
 
 				// add box
 
-				var object = generateBox();
-				addObject( object, 0, 8 );
+				var box = generateBox();
+				box.scale.multiplyScalar( 8 );
+				scene.add( box );
 
 			}
 
