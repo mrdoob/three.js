@@ -29,10 +29,40 @@ THREE.Box3.prototype = {
 
 	setFromPoints: function ( points ) {
 
-		this.makeEmpty();
-		
-		for( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {
-			this.expandByPoint( points[i] );
+		if( points.length > 0 ) {
+
+			var p = points[0];
+			this.min.copy( p );
+			this.max.copy( p );
+
+			for( var i = 1, numPoints = points.length; i < numPoints; i ++ ) {
+
+				p = points[ v ];
+
+				if ( p.x < this.min.x ) {
+					this.min.x = p.x;
+				}
+				else if ( p.x > this.max.x ) {
+					this.max.x = p.x;
+				}
+
+				if ( p.y < this.min.y ) {
+					this.min.y = p.y;
+				}
+				else if ( p.y > this.max.y ) {
+					this.max.y = p.y;
+				}
+
+				if ( p.z < this.min.z ) {
+					this.min.z = p.z;
+				}
+				else if ( p.z > this.max.z ) {
+					this.max.z = p.z;
+				}
+			}
+		}
+		else {
+			this.makeEmpty();
 		}
 
 		return this;
