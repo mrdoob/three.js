@@ -1,5 +1,5 @@
 /**
- * @author Ben Houston / ben@exocortex.com / http://github.com/bhouston
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Box3 = function ( min, max ) {

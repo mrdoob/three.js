@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author Ben Houston / ben@exocortex.com / http://github.com/bhouston
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Geometry = function () {

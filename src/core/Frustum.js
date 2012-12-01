@@ -1,7 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
- * @author Ben Houston / ben@exocortex.com / http://github.com/bhouston
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Frustum = function ( ) {
