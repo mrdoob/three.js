@@ -6,11 +6,13 @@ THREE.Box3 = function ( min, max ) {
 
 	// TODO: Is this valid JavaScript to check if the parameters are specified?
 	if( ! min && ! max ) {			
+		this.min = new THREE.Vector3();
+		this.max = new THREE.Vector3();
 		this.makeEmpty();
 	}
 	else {
 		this.min = min || new THREE.Vector3();
-		this.max = max || this.min;		// This is done on purpose so you can make a box using a single point and then expand it.
+		this.max = max || new THREE.Vector3().copy( this.min );		// This is done on purpose so you can make a box using a single point and then expand it.
 	}
 };
 
@@ -35,7 +37,7 @@ THREE.Box3.prototype = {
 		}
 
 		return this;
-	};
+	},
 
 	setFromCenterAndSize: function ( center, size ) {
 

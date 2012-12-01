@@ -70,7 +70,7 @@ THREE.Plane.prototype = {
 
 		// Note: will lead to a divide by zero if the plane is invalid.
 		var inverseNormalLength = 1.0 / this.normal.length();
-		this.normal.multipleByScalar( inverseNormalLength );
+		this.normal.multiplyScalar( inverseNormalLength );
 		this.constant *= inverseNormalLength;
 
 		return this;
@@ -97,7 +97,7 @@ THREE.Plane.prototype = {
 
 		var perpendicularMagnitude = this.distanceToPoint( point );
 
-		return new THREE.Vector3().copy( this.normal ).multipleByScalar( perpendicularMagnitude );
+		return new THREE.Vector3().copy( this.normal ).multiplyScalar( perpendicularMagnitude );
 	},
 
 	intersectsLine: function ( startPoint, endPoint ) {	
