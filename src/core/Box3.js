@@ -14,26 +14,6 @@ THREE.Box3 = function ( min, max ) {
 	}
 };
 
-THREE.Box3.fromPoints = function ( points ) {
-
-	var boundingBox = new THREE.Box3();
-	for( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {
-		boundingBox.extendByPoint( points[i] );
-	}
-
-	return boundingBox;
-};
-
-THREE.Box3.fromCenterAndSize = function ( center, size ) {
-
-	var halfSize = new THREE.Vector3().copy( size ).multiplyScalar( 0.5 );
-	var box = new THREE.Box3( center, center );
-	box.min.subSelf( halfSize );
-	box.min.addSelf( halfSize );
-
-	return box;	
-};
-
 THREE.Box3.prototype = {
 
 	constructor: THREE.Box3,
@@ -44,6 +24,26 @@ THREE.Box3.prototype = {
 		this.max = max;
 
 		return this;
+	},
+
+	setFromPoints: function ( points ) {
+
+		this.makeEmpty();
+		
+		for( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {
+			this.expandByPoint( points[i] );
+		}
+
+		return this;
+	};
+
+	setFromCenterAndSize: function ( center, size ) {
+
+		var halfSize = new THREE.Vector3().copy( size ).multiplyScalar( 0.5 );
+		this.min.copy( center ).subSelf( halfSize );
+		this.max.copy( center ).addSelf( halfSize );
+
+		return box;	
 	},
 
 	copy: function ( box ) {

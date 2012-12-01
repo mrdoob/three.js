@@ -9,26 +9,6 @@ THREE.Plane = function ( normal, constant ) {
 
 };
 
-THREE.Plane.fromNormalAndCoplanarPoint = function ( normal, point ) {
-	// NOTE: This function doens't support optional parameters like the constructor.
-
-	return new THREE.Plane( 
-		normal,
-		- point.dot( normal )
-		);
-};
-
-THREE.Plane.fromCoplanarPoints = function ( a, b, c ) {
-	// NOTE: This function doens't support optional parameters like the constructor.
-
-	var normal = new THREE.Vector3().sub( b, a ).cross(
-		new THREE.Vector3().sub( c, a ) );
-
-	// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
-
-	return THREE.Plane.fromNormalAndCoplanarPoint( normal, a );
-};
-
 THREE.Plane.prototype = {
 
 	constructor: THREE.Plane,
@@ -46,6 +26,27 @@ THREE.Plane.prototype = {
 		this.normal.set( x, y, z );
 		this.constant = w;
 
+		return this;
+	},
+
+	setFromNormalAndCoplanarPoint: function ( normal, point ) {
+		// NOTE: This function doens't support optional parameters like the constructor.
+
+		this.normal = normal;
+		this.constant = - point.dot( normal );
+
+		return this;
+	},
+
+	setFromCoplanarPoints: function ( a, b, c ) {
+		// NOTE: This function doens't support optional parameters like the constructor.
+
+		var normal = new THREE.Vector3().sub( b, a ).cross(
+			new THREE.Vector3().sub( c, a ) );
+
+		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+		this.setFromNormalAndCoplanarPoint( normal, a );
+		
 		return this;
 	},
 

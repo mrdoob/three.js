@@ -577,12 +577,12 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		this.boundingBox = THREE.Box3.fromPoints( this.vertices );
+		this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
 	},
 
 	computeBoundingSphere: function () {
 
-		this.boundingSphere = THREE.Sphere.fromCenterAndPoints( new THREE.Vector3(), this.vertices );
+		this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
 	},
 
 	/*

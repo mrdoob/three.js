@@ -9,17 +9,6 @@ THREE.Sphere = function ( center, radius ) {
 
 };
 
-THREE.Sphere.fromCenterAndPoints = function ( center, points ) {
-
-	var maxRadiusSq = 0;
-	for ( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {			
-		var radiusSq = center.distanceToSquared( points[i] );
-		maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
-	}
-
-	return new THREE.Sphere( center, Math.sqrt( maxRadiusSq ) );
-};
-
 THREE.Sphere.prototype = {
 
 	constructor: THREE.Sphere,
@@ -28,6 +17,20 @@ THREE.Sphere.prototype = {
 
 		this.center = center;
 		this.radius = radius;
+
+		return this;
+	},
+
+	setFromCenterAndPoints: function ( center, points ) {
+
+		var maxRadiusSq = 0;
+		for ( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {			
+			var radiusSq = center.distanceToSquared( points[i] );
+			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+		}
+
+		this.center = center;
+		this.radius = Math.sqrt( maxRadiusSq );
 
 		return this;
 	},
