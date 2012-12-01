@@ -50,8 +50,8 @@ THREE.Plane.prototype = {
 
 	copy: function ( plane ) {
 
-		this.normal = plane.normal;
-		this.constant = plane.constant;
+		this.normal.copy( plane.normal );
+		this.constant = plane.constant.clone();
 
 		return this;
 	},

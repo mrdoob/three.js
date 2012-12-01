@@ -79,8 +79,8 @@ THREE.Box3.prototype = {
 
 	copy: function ( box ) {
 
-		this.min = box.min;
-		this.max = box.max;
+		this.min.copy( box.min );
+		this.max.copy( box.max );
 
 		return this;
 	},

@@ -37,8 +37,8 @@ THREE.Sphere.prototype = {
 
 	copy: function ( sphere ) {
 
-		this.center = sphere.center;
-		this.radius = sphere.radius;
+		this.center.copy( sphere.center );
+		this.radius = sphere.radius.clone();
 
 		return this;
 	},
