@@ -81,6 +81,12 @@ String.prototype.trim = String.prototype.trim || function () {
 
 }() );
 
+// SHADOWING TYPES
+
+THREE.BasicShadowMap = 0;
+THREE.PCFShadowMap = 1;
+THREE.PCFSoftShadowMap = 2;
+
 
 // MATERIAL CONSTANTS
 

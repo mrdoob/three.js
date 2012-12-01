@@ -81,6 +81,12 @@ String.prototype.trim = String.prototype.trim || function () {
 
 }() );
 
+// SHADOWING TYPES
+
+THREE.BasicShadowMap = 0;
+THREE.PCFShadowMap = 1;
+THREE.PCFSoftShadowMap = 2;
+
 
 // MATERIAL CONSTANTS
 
@@ -14711,8 +14717,7 @@ THREE.ShaderChunk = {
 
 					"shadowCoord.z += shadowBias[ i ];",
 
-					"#ifdef SHADOWMAP_SOFT",
-
+					"#if defined( SHADOWMAP_TYPE_PCF )",
 						// Percentage-close filtering
 						// (9 pixel kernel)
 						// http://fabiensanglard.net/shadowmappingPCF/
@@ -14778,6 +14783,76 @@ THREE.ShaderChunk = {
 
 						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
 						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
+						
+					"#elif defined( SHADOWMAP_TYPE_PCF_SOFT )",
+
+						// Percentage-close filtering
+						// (9 pixel kernel)
+						// http://fabiensanglard.net/shadowmappingPCF/
+
+						"float shadow = 0.0;",
+
+						"float xPixelOffset = 1.0 / shadowMapSize[ i ].x;",
+						"float yPixelOffset = 1.0 / shadowMapSize[ i ].y;",
+
+						"float dx0 = -1.0 * xPixelOffset;",
+						"float dy0 = -1.0 * yPixelOffset;",
+						"float dx1 = 1.0 * xPixelOffset;",
+						"float dy1 = 1.0 * yPixelOffset;",
+
+						"mat3 shadowKernel;",
+						"mat3 depthKernel;",
+
+						"depthKernel[0][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );",
+						"if ( depthKernel[0][0] < shadowCoord.z ) shadowKernel[0][0] = 0.25;",
+						"else shadowKernel[0][0] = 0.0;",
+
+						"depthKernel[0][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );",
+						"if ( depthKernel[0][1] < shadowCoord.z ) shadowKernel[0][1] = 0.25;",
+						"else shadowKernel[0][1] = 0.0;",
+
+						"depthKernel[0][2] = unpackDepth( texture2D( shadowMap[ i], shadowCoord.xy + vec2( dx0, dy1 ) ) );",
+						"if ( depthKernel[0][2] < shadowCoord.z ) shadowKernel[0][2] = 0.25;",
+						"else shadowKernel[0][2] = 0.0;",
+
+						"depthKernel[1][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );",
+						"if ( depthKernel[1][0] < shadowCoord.z ) shadowKernel[1][0] = 0.25;",
+						"else shadowKernel[1][0] = 0.0;",
+
+						"depthKernel[1][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );",
+						"if ( depthKernel[1][1] < shadowCoord.z ) shadowKernel[1][1] = 0.25;",
+						"else shadowKernel[1][1] = 0.0;",
+
+						"depthKernel[1][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );",
+						"if ( depthKernel[1][2] < shadowCoord.z ) shadowKernel[1][2] = 0.25;",
+						"else shadowKernel[1][2] = 0.0;",
+
+						"depthKernel[2][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );",
+						"if ( depthKernel[2][0] < shadowCoord.z ) shadowKernel[2][0] = 0.25;",
+						"else shadowKernel[2][0] = 0.0;",
+
+						"depthKernel[2][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );",
+						"if ( depthKernel[2][1] < shadowCoord.z ) shadowKernel[2][1] = 0.25;",
+						"else shadowKernel[2][1] = 0.0;",
+
+						"depthKernel[2][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
+						"if ( depthKernel[2][2] < shadowCoord.z ) shadowKernel[2][2] = 0.25;",
+						"else shadowKernel[2][2] = 0.0;",
+
+						"vec2 fractionalCoord = 1.0 - fract(shadowCoord.xy * shadowMapSize[i].xy );",
+						
+						"shadowKernel[0] = mix( shadowKernel[1], shadowKernel[0], fractionalCoord.x );",
+						"shadowKernel[1] = mix( shadowKernel[2], shadowKernel[1], fractionalCoord.x );",
+
+						"vec4 shadowValues;",
+						"shadowValues.x = mix(shadowKernel[0][1], shadowKernel[0][0], fractionalCoord.y );",
+						"shadowValues.y = mix(shadowKernel[0][2], shadowKernel[0][1], fractionalCoord.y );",
+						"shadowValues.z = mix(shadowKernel[1][1], shadowKernel[1][0], fractionalCoord.y );",
+						"shadowValues.w = mix(shadowKernel[1][2], shadowKernel[1][1], fractionalCoord.y );",
+
+						"shadow = dot(shadowValues, vec4(1.0));",
 
 						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
 
@@ -15679,7 +15754,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
-	this.shadowMapSoft = true;
+	this.shadowMapType = THREE.PCFShadowMap;
 	this.shadowMapCullFrontFaces = true;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
@@ -15989,6 +16064,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.memory.textures --;
 
 	};
+
+	this.deallocateTextureCube = function ( texture ) {
+    
+		_gl.deleteTexture( texture.__webglTextureCube );
+
+  };
 
 	this.deallocateRenderTarget = function ( renderTarget ) {
 
@@ -20534,7 +20615,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			maxShadows: maxShadows,
 			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
-			shadowMapSoft: this.shadowMapSoft,
+			shadowMapType: this.shadowMapType,
 			shadowMapDebug: this.shadowMapDebug,
 			shadowMapCascade: this.shadowMapCascade,
 
@@ -21837,6 +21918,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
+		if ( parameters.shadowMapType == THREE.PCFShadowMap ) {
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF";
+		}
+		else if ( parameters.shadowMapType == THREE.PCFSoftShadowMap ) {
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
+		}
+
 		//console.log( "building new program " );
 
 		//
@@ -21889,7 +21978,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
 			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
@@ -21988,7 +22077,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
 			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
@@ -24163,7 +24252,7 @@ THREE.ImageUtils = {
 				if ( images.loadCount === 6 ) {
 
 					texture.needsUpdate = true;
-					if ( onLoad ) onLoad();
+					if ( onLoad ) onLoad( texture );
 
 				}
 
@@ -24218,7 +24307,7 @@ THREE.ImageUtils = {
 
 					texture.format = dds.format;
 					texture.needsUpdate = true;
-					if ( onLoad ) onLoad();
+					if ( onLoad ) onLoad( texture );
 
 				}
 
@@ -24226,22 +24315,55 @@ THREE.ImageUtils = {
 
 		}
 
-		for ( var i = 0, il = array.length; i < il; ++ i ) {
+		if ( array instanceof Array ) {
+			for ( var i = 0, il = array.length; i < il; ++ i ) {
 
-			var cubeImage = {};
-			images[ i ] = cubeImage;
+				var cubeImage = {};
+				images[ i ] = cubeImage;
 
+				var request = new XMLHttpRequest();
+
+				request.onload = generateCubeFaceCallback( request, cubeImage );
+				request.onerror = onError;
+
+				var url = array[ i ];
+
+				request.open( 'GET', url, true );
+				request.responseType = "arraybuffer";
+				request.send( null );
+
+			}
+		}
+		//If the compressed cubemap texture is stored in a single DDS file.
+		else {
+			var url = array;
 			var request = new XMLHttpRequest();
 
-			request.onload = generateCubeFaceCallback( request, cubeImage );
-			request.onerror = onError;
+			request.onload = function( ) {
+				var buffer = request.response;
+				var dds = THREE.ImageUtils.parseDDS( buffer, true );
+				if ( dds.isCubemap ) {
+					var faces = dds.mipmaps.length / dds.mipmapCount;
+					for ( var f = 0; f < faces; f++ ) {
+						images[ f ] = { mipmaps : []};
+						for ( var i = 0; i < dds.mipmapCount; i++ ) {
+							images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
+							images[ f ].format = dds.format;
+							images[ f ].width = dds.width;
+							images[ f ].height = dds.height;
+						}
+					}
 
-			var url = array[ i ];
+					texture.format = dds.format;
+					texture.needsUpdate = true;
+					if ( onLoad ) onLoad( texture );
+				}
+			}
+			request.onerror = onError;
 
 			request.open( 'GET', url, true );
 			request.responseType = "arraybuffer";
 			request.send( null );
-
 		}
 
 		return texture;
@@ -24328,6 +24450,11 @@ THREE.ImageUtils = {
 		var off_pfFlags = 20;
 		var off_pfFourCC = 21;
 
+		var off_caps = 27;
+		var off_caps2 = 28;
+		var off_caps3 = 29;
+		var off_caps4 = 30;
+
 		// Parse header
 
 		var header = new Int32Array( buffer, 0, headerLengthInt );
@@ -24350,64 +24477,74 @@ THREE.ImageUtils = {
 
 		var fourCC = header[ off_pfFourCC ];
 
-        switch ( fourCC ) {
+    switch ( fourCC ) {
 
 			case FOURCC_DXT1:
 
 				blockBytes = 8;
-                dds.format = THREE.RGB_S3TC_DXT1_Format;
-                break;
+        dds.format = THREE.RGB_S3TC_DXT1_Format;
+        break;
 
-            case FOURCC_DXT3:
+      case FOURCC_DXT3:
 
-                blockBytes = 16;
-                dds.format = THREE.RGBA_S3TC_DXT3_Format;
-                break;
+        blockBytes = 16;
+        dds.format = THREE.RGBA_S3TC_DXT3_Format;
+        break;
 
-            case FOURCC_DXT5:
+      case FOURCC_DXT5:
 
-                blockBytes = 16;
-                dds.format = THREE.RGBA_S3TC_DXT5_Format;
-                break;
+        blockBytes = 16;
+        dds.format = THREE.RGBA_S3TC_DXT5_Format;
+        break;
 
-            default:
+      default:
 
-                console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
-                return dds;
+        console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+        return dds;
 
-        }
+    }
 
 		dds.mipmapCount = 1;
 
-        if ( header[ off_flags ] & DDSD_MIPMAPCOUNT && loadMipmaps !== false ) {
+    if ( header[ off_flags ] & DDSD_MIPMAPCOUNT && loadMipmaps !== false ) {
 
-            dds.mipmapCount = Math.max( 1, header[ off_mipmapCount ] );
+        dds.mipmapCount = Math.max( 1, header[ off_mipmapCount ] );
 
-        }
+    }
 
-        dds.width = header[ off_width ];
-        dds.height = header[ off_height ];
+    //TODO: Verify that all faces of the cubemap are present with DDSCAPS2_CUBEMAP_POSITIVEX, etc.
+    dds.isCubemap = header[ off_caps2 ] & DDSCAPS2_CUBEMAP ? true : false;
+    	
 
-        var dataOffset = header[ off_size ] + 4;
+    dds.width = header[ off_width ];
+    dds.height = header[ off_height ];
+
+    var dataOffset = header[ off_size ] + 4;
 
 		// Extract mipmaps buffers
 
 		var width = dds.width;
 		var height = dds.height;
 
-		for ( var i = 0; i < dds.mipmapCount; i ++ ) {
+		var faces = dds.isCubemap ? 6 : 1;
 
-			var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
-			var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
+		for ( var face = 0; face < faces; face++ ) {
+			for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
-			var mipmap = { "data": byteArray, "width": width, "height": height };
-			dds.mipmaps.push( mipmap );
+				var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
+				var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
 
-			dataOffset += dataLength;
+				var mipmap = { "data": byteArray, "width": width, "height": height };
+				dds.mipmaps.push( mipmap );
 
-			width = Math.max( width * 0.5, 1 );
-			height = Math.max( height * 0.5, 1 );
+				dataOffset += dataLength;
 
+				width = Math.max( width * 0.5, 1 );
+				height = Math.max( height * 0.5, 1 );
+
+			}
+			width = dds.width;
+			height = dds.height;
 		}
 
 		return dds;
@@ -31185,7 +31322,7 @@ THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, d
 		a, b, c, d,
 		uva, uvb, uvc, uvd;
 
-	var frames = new THREE.TubeGeometry.FrenetFrames(path, segments, closed),
+	var frames = new THREE.TubeGeometry.FrenetFrames(this.path, this.segments, this.closed),
 		tangents = frames.tangents,
 		normals = frames.normals,
 		binormals = frames.binormals;
@@ -31248,7 +31385,7 @@ THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, d
 
 		for ( j = 0; j < this.radiusSegments; j++ ) {
 
-			ip = ( closed ) ? (i + 1) % this.segments : i + 1;
+			ip = ( this.closed ) ? (i + 1) % this.segments : i + 1;
 			jp = (j + 1) % this.radiusSegments;
 
 			a = this.grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
@@ -34266,7 +34403,11 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			if ( ! light.shadowMap ) {
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+				var shadowFilter = THREE.LinearFilter;
+				if ( _renderer.shadowMapType == THREE.PCFSoftShadowMap ) {
+					shadowFilter = THREE.NearestFilter;
+				}
+				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
 				light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
 				light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );
