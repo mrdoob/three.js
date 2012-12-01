@@ -30,7 +30,6 @@ THREE.Plane.prototype = {
 	},
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
-		// NOTE: This function doens't support optional parameters like the constructor.
 
 		this.normal = normal;
 		this.constant = - point.dot( normal );
@@ -39,7 +38,6 @@ THREE.Plane.prototype = {
 	},
 
 	setFromCoplanarPoints: function ( a, b, c ) {
-		// NOTE: This function doens't support optional parameters like the constructor.
 
 		var normal = new THREE.Vector3().sub( b, a ).cross(
 			new THREE.Vector3().sub( c, a ) );
@@ -60,7 +58,6 @@ THREE.Plane.prototype = {
 
 	flip: function () {
 
-		// Note: can also be flipped by inverting constant, but I like constant to stay positive generally.
 		this.normal.negate();
 
 		return this;
@@ -116,7 +113,6 @@ THREE.Plane.prototype = {
 
 	translate: function ( offset ) {
 
-		// TODO: test this.
 		this.constant =	- offset.dot( normal );
 
 		return this;

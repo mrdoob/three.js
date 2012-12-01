@@ -4,7 +4,6 @@
 
 THREE.Box3 = function ( min, max ) {
 
-	// TODO: Is this valid JavaScript to check if the parameters are specified?
 	if( ! min && ! max ) {			
 		this.min = new THREE.Vector3();
 		this.max = new THREE.Vector3();
