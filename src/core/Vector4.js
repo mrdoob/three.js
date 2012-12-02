@@ -118,6 +118,78 @@ THREE.Vector4.prototype = {
 
 	},
 
+	minSelf: function ( v ) {
+
+		if( this.x > min.x ) {
+			this.x = min.x;
+		}
+		if( this.y > min.y ) {
+			this.y = min.y;
+		}
+		if( this.z > min.z ) {
+			this.z = min.z;
+		}
+		if( this.w > min.w ) {
+			this.w = min.w;
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if( this.x < max.x ) {
+			this.x = max.x;
+		}
+		if( this.y < max.y ) {
+			this.y = max.y;
+		}
+		if( this.z < max.z ) {
+			this.z = max.z;
+		}
+		if( this.w < max.w ) {
+			this.w = max.w;
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if( this.x < min.x ) {
+			this.x = min.x;
+		}
+		else if( this.x > max.x ) {
+			this.x = max.x;
+		}
+
+		if( this.y < min.y ) {
+			this.y = min.y;
+		}
+		else if( this.y > max.y ) {
+			this.y = max.y;
+		}
+
+		if( this.z < min.z ) {
+			this.z = min.z;
+		}
+		else if( this.z > max.z ) {
+			this.z = max.z;
+		}
+
+		if( this.w < min.w ) {
+			this.w = min.w;
+		}
+		else if( this.w > max.w ) {
+			this.w = max.w;
+		}
+
+		return this;
+	},
 
 	negate: function() {
 
