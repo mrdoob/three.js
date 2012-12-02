@@ -63,7 +63,7 @@ THREE.Box2.prototype = {
 
 	setFromCenterAndSize: function ( center, size ) {
 
-		var halfSize = new THREE.Vector2().copy( size ).multiplyScalar( 0.5 );
+		var halfSize = THREE.Box2.__v1.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).subSelf( halfSize );
 		this.max.copy( center ).addSelf( halfSize );
 
@@ -218,3 +218,5 @@ THREE.Box2.prototype = {
 	}
 	
 };
+
+THREE.Box2.__v1 = new THREE.Vector2();
