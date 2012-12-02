@@ -190,7 +190,31 @@ THREE.Box3.prototype = {
 
 	clampPoint: function ( point ) {
 
-		return new THREE.Vector3().copy( point ).maxSelf( this.min ).minSelf( this.max );
+		var p = new THREE.Vector3().copy( point );
+
+		// this requires less if's then a point.minSelf( this.max ).maxSelf( this.min )
+		if( p.x < this.min.x ) {
+			p.x = this.min.x;
+		}
+		else if( p.x > this.max.x ) {
+			p.x = this.max.x;
+		}
+
+		if( p.y < this.min.y ) {
+			p.y = this.min.y;
+		}
+		else if( p.y > this.max.y ) {
+			p.y = this.max.y;
+		}
+
+		if( p.z < this.min.z ) {
+			p.z = this.min.z;
+		}
+		else if( p.z > this.max.z ) {
+			p.z = this.max.z;
+		}
+
+		return p;
 	},
 
 	distanceToPoint: function ( point ) {
