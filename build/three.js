@@ -23516,26 +23516,19 @@ THREE.GeometryUtils = {
 
 	},
 
-	// Get triangle area (by Heron's formula)
-	// 	http://en.wikipedia.org/wiki/Heron%27s_formula
+	// Get triangle area (half of parallelogram)
+	//	http://mathworld.wolfram.com/TriangleArea.html
 
 	triangleArea: function ( vectorA, vectorB, vectorC ) {
 
-		var s, a, b, c,
-			tmp = THREE.GeometryUtils.__v1;
+		var tmp1 = THREE.GeometryUtils.__v1,
+			tmp2 = THREE.GeometryUtils.__v2;
 
-		tmp.sub( vectorA, vectorB );
-		a = tmp.length();
+		tmp1.sub( vectorB, vectorA );
+		tmp2.sub( vectorC, vectorA );
+		tmp1.crossSelf( tmp2 );
 
-		tmp.sub( vectorA, vectorC );
-		b = tmp.length();
-
-		tmp.sub( vectorB, vectorC );
-		c = tmp.length();
-
-		s = 0.5 * ( a + b + c );
-
-		return Math.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) );
+		return 0.5 * tmp1.length();
 
 	},
 
@@ -24207,6 +24200,7 @@ THREE.GeometryUtils = {
 THREE.GeometryUtils.random = THREE.Math.random16;
 
 THREE.GeometryUtils.__v1 = new THREE.Vector3();
+THREE.GeometryUtils.__v2 = new THREE.Vector3();
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
