@@ -5,6 +5,7 @@
 	"../src/core/Vector2.js",
 	"../src/core/Vector3.js",
 	"../src/core/Vector4.js",
+	"../src/core/Box2.js",
 	"../src/core/Box3.js",
 	"../src/core/Matrix3.js",
 	"../src/core/Matrix4.js",
