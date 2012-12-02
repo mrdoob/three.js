@@ -1,6 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author kile / http://kile.stravaganza.org/
+ * @author *kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
  * @author egraether / http://egraether.com/
@@ -176,14 +176,14 @@ THREE.Vector3.prototype = {
 
 	minSelf: function ( v ) {
 
-		if( this.x > min.x ) {
-			this.x = min.x;
+		if( this.x > v.x ) {
+			this.x = v.x;
 		}
-		if( this.y > min.y ) {
-			this.y = min.y;
+		if( this.y > v.y ) {
+			this.y = v.y;
 		}
-		if( this.z > min.z ) {
-			this.z = min.z;
+		if( this.z > v.z ) {
+			this.z = v.z;
 		}
 
 		return this;
@@ -192,14 +192,14 @@ THREE.Vector3.prototype = {
 
 	maxSelf: function ( v ) {
 
-		if( this.x < max.x ) {
-			this.x = max.x;
+		if( this.x < v.x ) {
+			this.x = v.x;
 		}
-		if( this.y < max.y ) {
-			this.y = max.y;
+		if( this.y < v.y ) {
+			this.y = v.y;
 		}
-		if( this.z < max.z ) {
-			this.z = max.z;
+		if( this.z < v.z ) {
+			this.z = v.z;
 		}
 
 		return this;

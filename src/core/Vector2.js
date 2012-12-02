@@ -49,7 +49,7 @@ THREE.Vector2.prototype = {
 		this.y += v.y;
 
 		return this;
-
+		
 	},
 
 	sub: function ( a, b ) {
@@ -98,11 +98,11 @@ THREE.Vector2.prototype = {
 
 	minSelf: function ( v ) {
 
-		if( this.x > min.x ) {
-			this.x = min.x;
+		if( this.x > v.x ) {
+			this.x = v.x;
 		}
-		if( this.y > min.y ) {
-			this.y = min.y;
+		if( this.y > v.y ) {
+			this.y = v.y;
 		}
 
 		return this;
@@ -111,11 +111,11 @@ THREE.Vector2.prototype = {
 
 	maxSelf: function ( v ) {
 
-		if( this.x < max.x ) {
-			this.x = max.x;
+		if( this.x < v.x ) {
+			this.x = v.x;
 		}
-		if( this.y < max.y ) {
-			this.y = max.y;
+		if( this.y < v.y ) {
+			this.y = v.y;
 		}
 
 		return this;

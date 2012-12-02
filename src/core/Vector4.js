@@ -120,17 +120,17 @@ THREE.Vector4.prototype = {
 
 	minSelf: function ( v ) {
 
-		if( this.x > min.x ) {
-			this.x = min.x;
+		if( this.x > v.x ) {
+			this.x = v.x;
 		}
-		if( this.y > min.y ) {
-			this.y = min.y;
+		if( this.y > v.y ) {
+			this.y = v.y;
 		}
-		if( this.z > min.z ) {
-			this.z = min.z;
+		if( this.z > v.z ) {
+			this.z = v.z;
 		}
-		if( this.w > min.w ) {
-			this.w = min.w;
+		if( this.w > v.w ) {
+			this.w = v.w;
 		}
 
 		return this;
@@ -139,17 +139,17 @@ THREE.Vector4.prototype = {
 
 	maxSelf: function ( v ) {
 
-		if( this.x < max.x ) {
-			this.x = max.x;
+		if( this.x < v.x ) {
+			this.x = v.x;
 		}
-		if( this.y < max.y ) {
-			this.y = max.y;
+		if( this.y < v.y ) {
+			this.y = v.y;
 		}
-		if( this.z < max.z ) {
-			this.z = max.z;
+		if( this.z < v.z ) {
+			this.z = v.z;
 		}
-		if( this.w < max.w ) {
-			this.w = max.w;
+		if( this.w < v.w ) {
+			this.w = v.w;
 		}
 
 		return this;
