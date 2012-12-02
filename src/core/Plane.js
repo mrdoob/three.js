@@ -51,7 +51,7 @@ THREE.Plane.prototype = {
 	copy: function ( plane ) {
 
 		this.normal.copy( plane.normal );
-		this.constant = new Number( plane.constant );
+		this.constant = plane.constant;
 
 		return this;
 	},
@@ -85,9 +85,7 @@ THREE.Plane.prototype = {
 
 	projectPoint: function ( point ) {		
 		
-		// TODO: optimize this by expanding and simplifying
-		
-		return new THREE.Vector3().copy( point ).sub( this.orthoPoint( point ) );
+		return this.orthoPoint( point ).subSelf( point ).negate();
 	},
 
 	orthoPoint: function ( point ) {		
