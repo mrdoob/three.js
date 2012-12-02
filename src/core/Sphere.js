@@ -98,6 +98,18 @@ THREE.Sphere.prototype = {
 		this.radius *= factor;
 		
 		return this;
+	},
+
+	equals: function ( sphere ) {
+
+		return sphere.center.equals( this.center ) && ( sphere.radius == this.radius );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Sphere3().copy( this );
+
 	}
 
 };

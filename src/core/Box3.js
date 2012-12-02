@@ -7,7 +7,9 @@ THREE.Box3 = function ( min, max ) {
 	if( ! min && ! max ) {			
 		this.min = new THREE.Vector3();
 		this.max = new THREE.Vector3();
-		this.makeEmpty();
+		this.min.x = this.min.y = this.min.z = Infinity;
+		this.max.x = this.max.y = this.max.z = -Infinity;
+		console.log( this );
 	}
 	else {
 		this.min = min || new THREE.Vector3();
@@ -87,8 +89,8 @@ THREE.Box3.prototype = {
 
 	makeEmpty: function () {
 
-		this.min.x = this.min.y = this.min.z = Number.MAX_VALUE;
-		this.max.x = this.max.y = this.max.z = -Number.MAX_VALUE;
+		this.min.x = this.min.y = this.min.z = Infinity;
+		this.max.x = this.max.y = this.max.z = -Infinity;
 
 		return this;
 	},
@@ -228,6 +230,18 @@ THREE.Box3.prototype = {
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;
+	},
+
+	equals: function ( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Box3().copy( this );
+
 	}
 	
 };

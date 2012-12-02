@@ -114,6 +114,18 @@ THREE.Plane.prototype = {
 		this.constant =	- offset.dot( normal );
 
 		return this;
+	},
+
+	equals: function ( plane ) {
+
+		return plane.normal.equals( this.normal ) && ( sphere.constant == this.constant );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Plane3().copy( this );
+
 	}
 
 };

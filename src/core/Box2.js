@@ -80,8 +80,8 @@ THREE.Box2.prototype = {
 
 	makeEmpty: function () {
 
-		this.min.x = this.min.y = Number.MAX_VALUE;
-		this.max.x = this.max.y = -Number.MAX_VALUE;
+		this.min.x = this.min.y = Infinity;
+		this.max.x = this.max.y = -Infinity;
 
 		return this;
 	},
@@ -215,7 +215,20 @@ THREE.Box2.prototype = {
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;
+	},
+
+	equals: function ( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Box2().copy( this );
+
 	}
+
 	
 };
 
