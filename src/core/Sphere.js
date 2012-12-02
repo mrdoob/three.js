@@ -67,15 +67,15 @@ THREE.Sphere.prototype = {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
+		var result = new THREE.Vector3().copy( point );
+
 		if( deltaLengthSq > ( this.radius * this.radius ) ) {
 
-			var delta = new THREE.Vector3().sub( point, center ).normalize();
-			delta.multiplyScalar( this.radius ).addSelf( this.center );
-
-			return delta;
+			result.subSelf( center ).normalize();
+			result.multiplyScalar( this.radius ).addSelf( this.center );
 		}
 
-		return point;
+		return result;
 	},
 
 	bounds: function () {
