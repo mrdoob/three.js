@@ -30,6 +30,38 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
+	setZ: function ( z ) {
+
+		this.z = z;
+
+		return this;
+
+	},
+
+	setW: function ( w ) {
+
+		this.w = w;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -241,6 +273,12 @@ THREE.Vector4.prototype = {
 		this.w += ( v.w - this.w ) * alpha;
 
 		return this;
+
+	},
+
+	equals: function ( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
 
 	},
 

@@ -25,6 +25,22 @@ THREE.Vector2.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;

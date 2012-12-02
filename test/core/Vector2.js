@@ -1,7 +1,11 @@
-var x = 1;
-var y = 2;
-var z = 3;
-var w = 4;
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+var x = 2;
+var y = 3;
+var z = 4;
+var w = 5;
 
 module( "Vector2" );
 
@@ -130,9 +134,92 @@ test( "dot", function() {
 	var c = new THREE.Vector2();
 	
 	var result = a.dot( b );
-	ok( result == (x*x+y*y), "Passed!" );
+	ok( result == (-x*x-y*y), "Passed!" );
 
 	result = a.dot( c );
 	ok( result == 0, "Passed!" );
 });
 
+test( "length/lengthSq", function() {
+	var a = new THREE.Vector2( x, 0 );
+	var b = new THREE.Vector2( 0, -y );
+	var c = new THREE.Vector2();
+	
+	ok( a.length() == x, "Passed!" );
+	ok( a.lengthSq() == x*x, "Passed!" );
+	ok( b.length() == y, "Passed!" );
+	ok( b.lengthSq() == y*y, "Passed!" );
+	ok( c.length() == 0, "Passed!" );
+	ok( c.lengthSq() == 0, "Passed!" );
+
+	a.set( x, y );
+	ok( a.length() == Math.sqrt( x*x + y*y ), "Passed!" );
+	ok( a.lengthSq() == ( x*x + y*y ), "Passed!" );
+});
+
+test( "normalize", function() {
+	var a = new THREE.Vector2( x, 0 );
+	var b = new THREE.Vector2( 0, -y );
+	var c = new THREE.Vector2();
+	
+	a.normalize();
+	ok( a.length() == 1, "Passed!" );
+	ok( a.x == 1, "Passed!" );
+
+	b.normalize();
+	ok( b.length() == 1, "Passed!" );
+	ok( b.y == -1, "Passed!" );
+});
+
+test( "distanceTo/distanceToSquared", function() {
+	var a = new THREE.Vector2( x, 0 );
+	var b = new THREE.Vector2( 0, -y );
+	var c = new THREE.Vector2();
+	
+	ok( a.distanceTo( c ) == x, "Passed!" );
+	ok( a.distanceToSquared( c ) == x*x, "Passed!" );
+
+	ok( b.distanceTo( c ) == y, "Passed!" );
+	ok( b.distanceToSquared( c ) == y*y, "Passed!" );
+});
+
+test( "setLength", function() {
+	var a = new THREE.Vector2( x, 0 );
+	
+	ok( a.length() == x, "Passed!" );
+	a.setLength( y );
+	ok( a.length() == y, "Passed!" );
+});
+
+test( "lerpSelf/clone", function() {
+	var a = new THREE.Vector2( x, 0 );
+	var b = new THREE.Vector2( 0, -y );
+	
+	ok( a.lerpSelf( a, 0 ).equals( a.lerpSelf( a, 0.5 ) ), "Passed!" );
+	ok( a.lerpSelf( a, 0 ).equals( a.lerpSelf( a, 1 ) ), "Passed!" );
+
+	ok( a.clone().lerpSelf( b, 0 ).equals( a ), "Passed!" );
+
+	ok( a.clone().lerpSelf( b, 0.5 ).x == x*0.5, "Passed!" );
+	ok( a.clone().lerpSelf( b, 0.5 ).y == -y*0.5, "Passed!" );
+
+	ok( a.clone().lerpSelf( b, 1 ).equals( b ), "Passed!" );
+});
+
+test( "equals", function() {
+	var a = new THREE.Vector2( x, 0 );
+	var b = new THREE.Vector2( 0, -y );
+	
+	ok( a.x != b.x, "Passed!" );
+	ok( a.y != b.y, "Passed!" );
+
+	ok( ! a.equals( b ), "Passed!" );
+	ok( ! b.equals( a ), "Passed!" );
+
+	a.copy( b );
+	ok( a.x == b.x, "Passed!" );
+	ok( a.y == b.y, "Passed!" );
+
+	ok( a.equals( b ), "Passed!" );
+	ok( b.equals( a ), "Passed!" );
+});
