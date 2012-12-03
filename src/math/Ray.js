@@ -149,7 +149,7 @@ THREE.Ray.prototype = {
 			// line is coplanar, return origin
 			if( plane.distanceToPoint( this.origin ) == 0 ) {
 
-				return origin.clone();
+				return this.origin.clone();
 
 			}
 
