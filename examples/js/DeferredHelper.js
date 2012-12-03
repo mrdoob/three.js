@@ -16,6 +16,8 @@ THREE.DeferredHelper = function ( parameters ) {
 
 	//
 
+	var geometryLight = new THREE.SphereGeometry( 1, 16, 8 );
+
 	var black = new THREE.Color( 0x000000 );
 
 	var colorShader = THREE.ShaderDeferred[ "color" ];
@@ -275,9 +277,9 @@ THREE.DeferredHelper = function ( parameters ) {
 
 		// create light proxy mesh
 
-		var geometryLight = new THREE.SphereGeometry( light.distance, 16, 8 );
 		var meshLight = new THREE.Mesh( geometryLight, materialLight );
 		meshLight.position = light.position;
+		meshLight.scale.multiplyScalar( light.distance );
 
 		// keep reference for size reset
 
