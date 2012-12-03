@@ -51,9 +51,9 @@ test( "empty/makeEmpty", function() {
 	ok( a.empty(), "Passed!" );
 });
 
-test( "volume", function() {
+test( "area", function() {
 	var a = new THREE.Box2( zero, one );
-	ok( a.volume() == 1, "Passed!" );
+	ok( a.area() == 1, "Passed!" );
 });
 
 test( "center", function() {
@@ -86,16 +86,21 @@ test( "expandByPoint", function() {
 
 	a.expandByPoint( one.clone().negate() );
 	ok( a.size().equals( one.clone().multiplyScalar( 2 ) ), "Passed!" );
+	console.log( a );
+	console.log( a.center() );
 	ok( a.center().equals( zero ), "Passed!" );
 });
 
 test( "expandByVector", function() {
 	var a = new THREE.Box2( zero );
+	console.log( a );
 
 	a.expandByVector( zero );
+	console.log( a );
 	ok( a.size().equals( zero ), "Passed!" );
 
 	a.expandByVector( one );
+	console.log( a );
 	ok( a.size().equals( one.clone().multiplyScalar( 2 ) ), "Passed!" );
 	ok( a.center().equals( zero ), "Passed!" );
 });
