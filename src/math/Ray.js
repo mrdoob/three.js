@@ -5,17 +5,8 @@
 THREE.Ray = function ( origin, direction ) {
 
 
-	if ( origin === undefined && direction === undefined ) {
-
-		this.origin = new THREE.Vector3();
-		this.direction = new THREE.Vector3( 0, 0, 0 );
-
-	} else {
-
-		this.origin = origin.clone();
-		this.direction = direction.clone();
-
-	}
+	this.origin = origin !== undefined ? origin.clone() : new THREE.Vector3();
+	this.direction = direction !== undefined ? direction.clone() : new THREE.Vector3();
 
 };
 
@@ -152,7 +143,7 @@ THREE.Ray.prototype = {
 			return true;
 
 		}
-		
+
 		// line is coplanar, return origin
 		if( plane.distanceToPoint( this.origin ) == 0 ) {
 
