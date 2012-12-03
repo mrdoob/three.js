@@ -1,4 +1,4 @@
-	/**
+/**
  * @author bhouston / http://exocortex.com
  */
 
@@ -17,7 +17,6 @@ test( "constructor", function() {
 	ok( a.min.equals( zero2 ), "Passed!" );
 	ok( a.max.equals( one2 ), "Passed!" );
 });
-
 
 test( "copy", function() {
 	var a = new THREE.Box2( zero2, one2 );

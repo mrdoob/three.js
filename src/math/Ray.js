@@ -23,7 +23,7 @@ THREE.Ray.prototype = {
 
 	constructor: THREE.Ray,
 
-	set: function ( origin, direction) {
+	set: function ( origin, direction ) {
 
 		this.origin.copy( origin );
 		this.direction.copy( direction );
@@ -61,6 +61,13 @@ THREE.Ray.prototype = {
 
 	},
 
+	flip: function () {
+
+		this.direction.negate();
+
+		return this;
+	},
+
 	closestPointToPoint: function ( point ) {
 
 		var result = point.clone().subSelf( this.origin );
@@ -84,10 +91,10 @@ THREE.Ray.prototype = {
 		// Assumes the lines are normalized
 		// based on algorithm in ILM's Imath Plane class.
 
-	    __v1.copy( this.origin ).subSelf( ray.origin );
-	    var c = this.direction.dot( __v1 );
+	    THREE.Ray.__v1.copy( this.origin ).subSelf( ray.origin );
+	    var c = this.direction.dot( THREE.Ray.__v1 );
 	    var a = ray.direction.dot( this.direction );
-	    var f = ray.direction.dot( __v1 );
+	    var f = ray.direction.dot( THREE.Ray.__v1 );
 	    var num = c - a * f;
 	    var denom = a*a - 1;
 
@@ -105,17 +112,17 @@ THREE.Ray.prototype = {
 		    }
 	    }
 
-	    return this.direction.clone().multipleScalar( num / denom ).addSelf( this.origin );
+	    return this.direction.clone().multiplyScalar( num / denom ).addSelf( this.origin );
 
 	},
 
 	distanceToRay: function ( ray ) {
 
-		__v1.copy( this.direction ).crossSelf( ray.direction );
-		__v2.copy( ray.origin ).subSelf( this.origin );
+		THREE.Ray.__v1.copy( this.direction ).crossSelf( ray.direction );
+		THREE.Ray.__v2.copy( ray.origin ).subSelf( this.origin );
 
 
-		var d = __v1.dot( __v2 );
+		var d = THREE.Ray.__v1.dot( THREE.Ray.__v2 );
 		if( d >= 0 ) {
 
 			return d;
@@ -138,6 +145,13 @@ THREE.Ray.prototype = {
 
 		var a = plane.normal.dot( this.direction );
 		if ( a == 0.0 ) {
+
+			// line is coplanar, return origin
+			if( plane.distanceToPoint( this.origin ) == 0 ) {
+
+				return origin.clone();
+
+			}
 
 			// Unsure if this is the correct method to handle this case.
 			return undefined;
