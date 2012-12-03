@@ -11,7 +11,7 @@ var negInf = new THREE.Vector3( -Infinity, -Infinity );
 var posInf = new THREE.Vector3( Infinity, Infinity );
 
 var zero = new THREE.Vector3();
-var one = new THREE.Vector3( 1, 1 );
+var one = new THREE.Vector3( 1, 1, 1 );
 
 module( "Box2" );
 
