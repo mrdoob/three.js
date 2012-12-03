@@ -147,11 +147,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var specular = originalMaterial.specular !== undefined ? originalMaterial.specular : black;
 		var shininess = originalMaterial.shininess !== undefined ? originalMaterial.shininess : 1;
+		var wrapAround = originalMaterial.wrapAround !== undefined ? ( originalMaterial.wrapAround ? -1 : 1 ) : 1;
 
 		uniforms.emissive.value.copy( emissive );
 		uniforms.diffuse.value.copy( diffuse );
 		uniforms.specular.value.copy( specular );
 		uniforms.shininess.value = shininess;
+		uniforms.wrapAround.value = wrapAround;
 
 		uniforms.map.value = originalMaterial.map;
 

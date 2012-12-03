@@ -17,9 +17,10 @@ THREE.ShaderDeferred = {
 			THREE.UniformsLib[ "shadowmap" ],
 
 			{
-				"emissive" : { type: "c", value: new THREE.Color( 0x000000 ) },
-				"specular" : { type: "c", value: new THREE.Color( 0x111111 ) },
-				"shininess": { type: "f", value: 30 }
+				"emissive" :  { type: "c", value: new THREE.Color( 0x000000 ) },
+				"specular" :  { type: "c", value: new THREE.Color( 0x111111 ) },
+				"shininess":  { type: "f", value: 30 },
+				"wrapAround": { type: "f", value: 1 }
 			}
 
 		] ),
@@ -30,6 +31,7 @@ THREE.ShaderDeferred = {
 			"uniform vec3 specular;",
 			"uniform vec3 emissive;",
 			"uniform float shininess;",
+			"uniform float wrapAround;",
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
@@ -76,7 +78,7 @@ THREE.ShaderDeferred = {
 
 				// shininess
 
-				"gl_FragColor.z = shininess;",
+				"gl_FragColor.z = wrapAround * shininess;",
 
 				// emissive color
 
@@ -350,20 +352,31 @@ THREE.ShaderDeferred = {
 
 				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
 				"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
-				"float shininess = colorMap.z;",
+				"float shininess = abs( colorMap.z );",
+				"float wrapAround = sign( colorMap.z );",
 
-				// wrap around lighting
+				// light
+
+				"vec3 diffuse;",
 
 				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );",
-				"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );",
 
-				"const vec3 wrapRGB = vec3( 0.6, 0.2, 0.2 );",
-				"vec3 diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
+				"if ( wrapAround < 0.0 ) {",
 
-				// simple lighting
+					// wrap around lighting
 
-				//"float diffuseFull = max( dot( normal, lightDir ), 0.0 );",
-				//"vec3 diffuse = vec3 ( diffuseFull );",
+					"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );",
+
+					"const vec3 wrapRGB = vec3( 0.6, 0.2, 0.2 );",
+					"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
+
+				"} else {",
+
+					// simple lighting
+
+					"diffuse = vec3( diffuseFull );",
+
+				"}",
 
 				// specular
 

@@ -242,7 +242,7 @@
 					mapHeight.anisotropy = 4;
 					mapHeight.format = THREE.RGBFormat;
 
-					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909 } );
+					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909, wrapAround: true } );
 
 					var object = new THREE.Mesh( geometry, material );
 					object.scale.multiplyScalar( 8 );
@@ -254,7 +254,7 @@
 				var loader = new THREE.BinaryLoader();
 				loader.load( "obj/female02/Female02_bin.js", function( geometry, materials ) {
 
-					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999 } );
+					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999, wrapAround: true } );
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 					object.position.x = -50;
@@ -266,7 +266,7 @@
 
 				loader.load( "obj/male02/Male02_bin.js", function( geometry, materials ) {
 
-					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999 } );
+					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999, wrapAround: true } );
 
 					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 					object.position.x = 50;
@@ -306,7 +306,7 @@
 
 				var matPlane  = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 0.5 } );
 				var matPlane2 = new THREE.MeshPhongMaterial( { color: 0x331919, specular: 0x111111, shininess:  50, bumpMap: mapHeight2, bumpScale: 1 } );
-				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0x00aaff, specular: 0xffffff, shininess: 200, bumpMap: mapHeight3, bumpScale: 1.2 } );
+				var matPlane3 = new THREE.MeshPhongMaterial( { color: 0x00aaff, specular: 0xffffff, shininess: 200, bumpMap: mapHeight3, bumpScale: 1.2, wrapAround: true } );
 				var matPlane4 = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess:  50, bumpMap: mapHeight3, bumpScale: 1 } );
 
 				// bottom
