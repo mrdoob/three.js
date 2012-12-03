@@ -33,7 +33,7 @@ test( "set", function() {
 	ok( a.center.equals( zero ), "Passed!" );
 	ok( a.radius == 0, "Passed!" );
 
-	a.set( one, radius )
+	a.set( one, 1 )
 	ok( a.center.equals( one ), "Passed!" );
-	ok( a.radius == 0, "Passed!" );
+	ok( a.radius == 1, "Passed!" );
 });

@@ -73,6 +73,17 @@ THREE.Vector4.prototype = {
 
 	},
 
+	addScalar: function ( s ) {
+
+		this.x += s;
+		this.y += s;
+		this.z += s;
+		this.w += s;
+
+		return this;
+
+	},
+
 	add: function ( a, b ) {
 
 		this.x = a.x + b.x;

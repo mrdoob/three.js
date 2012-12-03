@@ -107,7 +107,7 @@ test( "expandByScalar", function() {
 	ok( a.size().equals( zero ), "Passed!" );
 
 	a.expandByScalar( 1 );
-	ok( a.size().equals( oneone.clone().multiplyScalar( 2 ) ), "Passed!" );
+	ok( a.size().equals( one.clone().multiplyScalar( 2 ) ), "Passed!" );
 	ok( a.center().equals( zero ), "Passed!" );
 });
 
@@ -207,7 +207,7 @@ test( "isIntersection", function() {
 	ok( c.isIntersection( a ), "Passed!" );
 	ok( b.isIntersection( c ), "Passed!" );
 
-	b.translate( one.clone().translate( new THREE.Vector3( 2, 2, 2 ) ));
+	b.translate( new THREE.Vector3( 2, 2, 2 ) );
 	ok( ! a.isIntersection( b ), "Passed!" );
 	ok( ! b.isIntersection( a ), "Passed!" );
 	ok( ! c.isIntersection( a ), "Passed!" );
