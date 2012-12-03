@@ -55,7 +55,6 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -82,7 +81,6 @@
 
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
-			var ASPECT = WIDTH / HEIGHT;
 
 			// controls
 
@@ -120,6 +118,8 @@
 				renderer.setSize( WIDTH, HEIGHT );
 				renderer.setClearColorHex( 0x000000, 1 );
 
+				renderer.autoClear = false;
+
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
 				renderer.domElement.style.left = "0px";
@@ -129,7 +129,7 @@
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
 				camera.position.z = 150;
 
 				// scene
@@ -151,8 +151,7 @@
 
 				// deferred helper
 
-				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, scene: scene, camera: camera, width: SCALED_WIDTH, height: SCALED_HEIGHT } );
-				deferredHelper.createRenderTargets();
+				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, width: SCALED_WIDTH, height: SCALED_HEIGHT, scale: SCALE, additiveSpecular: false, multiply: 2 } );
 
 				// add lights
 
@@ -165,19 +164,7 @@
 				// events
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-			}
-
-			// -----------------------------
-
-			function addObject( object, y, scale ) {
-
-				deferredHelper.addDeferredMaterials( object );
-
-				object.position.y = y;
-				object.scale.set( scale, scale, scale );
-
-				scene.add( object );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
@@ -190,6 +177,7 @@
 				// front light
 
 				var light = new THREE.PointLight( 0xffffff, 1.5, 1.5 * distance );
+				scene.add( light );
 				lights.push( light );
 
 				// random lights
@@ -205,11 +193,26 @@
 					light.color.setRGB( c.x, c.y, c.z );
 					light.color.convertGammaToLinear();
 
+					scene.add( light );
 					lights.push( light );
 
 				}
 
-				deferredHelper.addDeferredLights( lights, false );
+				var geometry = new THREE.SphereGeometry( 0.7, 7, 7 );
+
+				for ( var i = 0; i < numLights; i ++ ) {
+
+					var light = lights[ i ];
+
+					var material = new THREE.MeshBasicMaterial();
+					material.color = light.color;
+
+					var emitter = new THREE.Mesh( geometry, material );
+					emitter.position = light.position;
+
+					scene.add( emitter );
+
+				}
 
 			}
 
@@ -223,19 +226,21 @@
 
 				loader.load( "models/utf8/ben_dds.js", function ( object ) {
 
-					addObject( object, -75, 150 );
-					animate();
+					object.scale.multiplyScalar( 150 );
+					object.position.y = -75;
+					scene.add( object );
 
 				}, { normalizeRGB: true } );
 
 				loader.load( "models/utf8/WaltHi.js", function ( object ) {
 
-					addObject( object, -35, 1 );
-					animate();
+					object.position.y = -35;
+					scene.add( object );
 
 				}, { normalizeRGB: true } );
 
 				*/
+
 
 				var loader = new THREE.JSONLoader();
 				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
@@ -251,14 +256,42 @@
 					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909 } );
 
 					var object = new THREE.Mesh( geometry, material );
-					addObject( object, 0, 8 );
+					object.scale.multiplyScalar( 8 );
+					scene.add( object );
+
+				} );
+
+
+				var loader = new THREE.BinaryLoader();
+				loader.load( "obj/female02/Female02_bin.js", function( geometry, materials ) {
+
+					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999 } );
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					object.position.x = -50;
+					object.position.y = -48;
+					object.scale.multiplyScalar( 0.45 );
+					scene.add( object );
+
+				} );
+
+				loader.load( "obj/male02/Male02_bin.js", function( geometry, materials ) {
+
+					var material = new THREE.MeshPhongMaterial( { shininess: 175, specular: 0x999999 } );
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					object.position.x = 50;
+					object.position.y = -48;
+					object.scale.multiplyScalar( 0.45 );
+					scene.add( object );
 
 				} );
 
 				// create box
 
-				var object = generateBox();
-				addObject( object, 0, 8 );
+				var box = generateBox();
+				box.scale.multiplyScalar( 8 );
+				scene.add( box );
 
 			}
 
@@ -334,6 +367,25 @@
 
 			// -----------------------------
 
+			function onWindowResize( event ) {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				WIDTH = window.innerWidth;
+				HEIGHT = window.innerHeight - 2 * MARGIN;
+
+				SCALED_WIDTH = Math.floor( SCALE * WIDTH );
+				SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
+
+				renderer.setSize( WIDTH, HEIGHT );
+				deferredHelper.setSize( SCALED_WIDTH, SCALED_HEIGHT );
+
+				camera.aspect = WIDTH / HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
 			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 1;
@@ -393,7 +445,7 @@
 
 				camera.lookAt( target );
 
-				deferredHelper.render();
+				deferredHelper.render( scene, camera );
 
 			}
 

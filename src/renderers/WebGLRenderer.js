@@ -151,7 +151,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenMatrixPS = new THREE.Matrix4(),
 
-	_vector3 = new THREE.Vector4(),
+	_vector3 = new THREE.Vector3(),
 
 	// light arrays cache
 
@@ -1031,7 +1031,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			sortArray.sort( function( a, b ) { return b[ 0 ] - a[ 0 ]; } );
+			sortArray.sort( numericalSort );
 
 			for ( v = 0; v < vl; v ++ ) {
 
@@ -3798,7 +3798,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( influence > 0 ) {
 
-					activeInfluenceIndices.push( [ i, influence ] );
+					activeInfluenceIndices.push( [ influence, i ] );
 
 				}
 
@@ -3825,7 +3825,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( activeInfluenceIndices[ m ] ) {
 
-					influenceIndex = activeInfluenceIndices[ m ][ 0 ];
+					influenceIndex = activeInfluenceIndices[ m ][ 1 ];
 
 					if ( attributes[ "morphTarget" + m ] >= 0 ) {
 
@@ -3896,7 +3896,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function numericalSort ( a, b ) {
 
-		return b[ 1 ] - a[ 1 ];
+		return b[ 0 ] - a[ 0 ];
 
 	};
 
@@ -6928,7 +6928,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 		}
 

@@ -19,20 +19,25 @@ THREE.Sphere.prototype = {
 		this.radius = radius;
 
 		return this;
+
 	},
 
 	setFromCenterAndPoints: function ( center, points ) {
 
 		var maxRadiusSq = 0;
-		for ( var i = 0, numPoints = points.length; i < numPoints; i ++ ) {			
-			var radiusSq = center.distanceToSquared( points[i] );
+
+		for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+			var radiusSq = center.distanceToSquared( points[ i ] );
 			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+
 		}
 
 		this.center = center;
 		this.radius = Math.sqrt( maxRadiusSq );
 
 		return this;
+
 	},
 
 	copy: function ( sphere ) {
@@ -41,26 +46,31 @@ THREE.Sphere.prototype = {
 		this.radius = sphere.radius;
 
 		return this;
+
 	},
 
 	empty: function () {
 
 		return ( this.radius <= 0 );
+
 	},
 
 	volume: function () {
 
 		return Math.PI * 4 / 3 * ( this.radius * this.radius * this.radius );
+
 	},
 
 	containsPoint: function ( point ) {
 
 		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
+
 	},
 
 	distanceToPoint: function ( point ) {
 
 		return ( point.distanceTo( this.center ) - this.radius );
+
 	},
 
 	clampPoint: function ( point ) {
@@ -69,13 +79,15 @@ THREE.Sphere.prototype = {
 
 		var result = new THREE.Vector3().copy( point );
 
-		if( deltaLengthSq > ( this.radius * this.radius ) ) {
+		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
 
-			result.subSelf( center ).normalize();
+			result.subSelf( this.center ).normalize();
 			result.multiplyScalar( this.radius ).addSelf( this.center );
+
 		}
 
 		return result;
+
 	},
 
 	bounds: function () {
@@ -84,20 +96,23 @@ THREE.Sphere.prototype = {
 		box.expandByScalar( this.radius );
 
 		return box;
+
 	},
 
 	translate: function ( offset ) {
 
 		this.center.addSelf( this.offset );
-		
+
 		return this;
+
 	},
 
 	scale: function ( factor ) {
 
 		this.radius *= factor;
-		
+
 		return this;
+
 	},
 
 	equals: function ( sphere ) {
