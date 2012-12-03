@@ -51,7 +51,7 @@
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="js/ShaderDeferred.js"></script>
-		<script src="js/DeferredHelper.js"></script>
+		<script src="js/WebGLDeferredRenderer.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
@@ -151,7 +151,7 @@
 
 				// deferred helper
 
-				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, width: SCALED_WIDTH, height: SCALED_HEIGHT, scale: SCALE, additiveSpecular: false, multiply: 2 } );
+				deferredRenderer = new THREE.WebGLDeferredRenderer( { renderer: renderer, width: SCALED_WIDTH, height: SCALED_HEIGHT, scale: SCALE, additiveSpecular: false, multiply: 2 } );
 
 				// add lights
 
@@ -379,7 +379,7 @@
 				SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
 
 				renderer.setSize( WIDTH, HEIGHT );
-				deferredHelper.setSize( SCALED_WIDTH, SCALED_HEIGHT );
+				deferredRenderer.setSize( SCALED_WIDTH, SCALED_HEIGHT );
 
 				camera.aspect = WIDTH / HEIGHT;
 				camera.updateProjectionMatrix();
@@ -445,7 +445,7 @@
 
 				camera.lookAt( target );
 
-				deferredHelper.render( scene, camera );
+				deferredRenderer.render( scene, camera );
 
 			}
 

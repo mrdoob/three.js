@@ -3,7 +3,7 @@
  * @author MPanknin / http://www.redplant.de/
  */
 
-THREE.DeferredHelper = function ( parameters ) {
+THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var width = parameters.width;
 	var height = parameters.height;
