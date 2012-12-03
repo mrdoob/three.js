@@ -348,7 +348,8 @@ THREE.Vector3.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		return new THREE.Vector3().sub( this, v ).lengthSq();
+		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+		return dx * dx + dy * dy + dz * dz;
 
 	},
 

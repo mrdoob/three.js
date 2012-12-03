@@ -215,7 +215,8 @@ THREE.Box2.prototype = {
 
 	distanceToPoint: function ( point ) {
 
-		return this.clampPoint( point ).subSelf( point ).length();
+		var clampedPoint = THREE.Box2.__v1.copy( point ).clampSelf( this.min, this.max );
+		return clampedPoint.subSelf( point ).length();
 
 	},
 
