@@ -5,13 +5,18 @@
 THREE.Box2 = function ( min, max ) {
 
 	if ( min == undefined && max === undefined ) {
+
 		this.min = new THREE.Vector2();
 		this.max = new THREE.Vector2();
 		this.makeEmpty();
+
 	} else {
+
 		this.min = min || new THREE.Vector2();
 		this.max = max || new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
 	}
+
 };
 
 THREE.Box2.prototype = {
