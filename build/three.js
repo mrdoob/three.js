@@ -1238,7 +1238,10 @@ THREE.Vector3.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+		var dx = this.x - v.x;
+		var dy = this.y - v.y;
+		var dz = this.z - v.z;
+
 		return dx * dx + dy * dy + dz * dz;
 
 	},
@@ -1961,10 +1964,13 @@ THREE.Box2 = function ( min, max ) {
 		this.makeEmpty();
 
 	} else {
-
-		this.min = min || new THREE.Vector2();
-		this.max = max || new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-
+		this.min = min.clone();
+		if( max === undefined ) {
+			this.max = new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+		}
+		else {
+			this.max = max.clone();
+		}
 	}
 
 };
@@ -1975,8 +1981,8 @@ THREE.Box2.prototype = {
 
 	set: function ( min, max ) {
 
-		this.min = min;
-		this.max = max;
+		this.min.copy( min );
+		this.max.copy( max );
 
 		return this;
 	},
@@ -2146,8 +2152,8 @@ THREE.Box2.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ) {
+		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
+			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ) {
 
 			return false;
 
@@ -2199,7 +2205,7 @@ THREE.Box2.prototype = {
 
 	scale: function ( factor ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
+		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;
@@ -2235,8 +2241,17 @@ THREE.Box3 = function ( min, max ) {
 
 	} else {
 
-		this.min = min || new THREE.Vector3();
-		this.max = max || new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+		this.min = min.clone();
+
+		if( max === undefined ) {
+
+			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
+		} else {
+
+			this.max = max.clone();
+
+		}
 
 	}
 
@@ -2248,8 +2263,8 @@ THREE.Box3.prototype = {
 
 	set: function ( min, max ) {
 
-		this.min = min;
-		this.max = max;
+		this.min.copy( min );
+		this.max.copy( max );
 
 		return this;
 
@@ -2437,9 +2452,9 @@ THREE.Box3.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
-			 ( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
+		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
+			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ||
+			 ( box.max.z < this.min.z ) || ( box.min.z > this.max.z ) ) {
 
 			return false;
 
@@ -2491,7 +2506,7 @@ THREE.Box3.prototype = {
 
 	scale: function ( factor ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
+		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;
@@ -3833,8 +3848,17 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 THREE.Plane = function ( normal, constant ) {
 
-	this.normal = normal || new THREE.Vector3();
-	this.constant = constant || 0;
+	if ( normal === undefined && constant === undefined ) {
+
+		this.normal = new THREE.Vector3();
+		this.constant = 0;
+
+	} else {
+
+		this.normal = normal.clone();
+		this.constant = constant || 0;
+
+	}
 
 };
 
@@ -3844,7 +3868,7 @@ THREE.Plane.prototype = {
 
 	set: function ( normal, constant ) {
 
-		this.normal = normal;
+		this.normal.copy( normal );
 		this.constant = constant;
 
 		return this;
@@ -3862,7 +3886,7 @@ THREE.Plane.prototype = {
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
 
-		this.normal = normal;
+		this.normal.copy( normal );
 		this.constant = - point.dot( normal );
 
 		return this;
@@ -4470,9 +4494,19 @@ THREE.Rectangle = function () {
 
 THREE.Sphere = function ( center, radius ) {
 
-	this.center = center || new THREE.Vector3();
-	this.radius = radius || 0;
 
+	if ( center === undefined && radius === undefined ) {
+
+		this.center = new THREE.Vector3();
+		this.radius = 0;
+
+	} else {
+
+		this.center = center.clone();
+		this.radius = radius || 0;
+
+	}
+	
 };
 
 THREE.Sphere.prototype = {
@@ -4481,7 +4515,7 @@ THREE.Sphere.prototype = {
 
 	set: function ( center, radius ) {
 
-		this.center = center;
+		this.center.copy( center );
 		this.radius = radius;
 
 		return this;
