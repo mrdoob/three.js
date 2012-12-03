@@ -230,7 +230,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 					u = uvLayer[ uvIndex * 2 ];
 					v = uvLayer[ uvIndex * 2 + 1 ];
 
-					geometry.faceUvs[ i ][ fi ] = new THREE.UV( u, v );
+					geometry.faceUvs[ i ][ fi ] = new THREE.Vector2( u, v );
 
 				}
 
@@ -251,7 +251,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 						u = uvLayer[ uvIndex * 2 ];
 						v = uvLayer[ uvIndex * 2 + 1 ];
 
-						uvs[ j ] = new THREE.UV( u, v );
+						uvs[ j ] = new THREE.Vector2( u, v );
 
 					}
 

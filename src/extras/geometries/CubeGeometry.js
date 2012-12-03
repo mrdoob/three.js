@@ -92,10 +92,10 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [
-							new THREE.UV( ix / gridX, 1 - iy / gridY ),
-							new THREE.UV( ix / gridX, 1 - ( iy + 1 ) / gridY ),
-							new THREE.UV( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
-							new THREE.UV( ( ix + 1 ) / gridX, 1 - iy / gridY )
+							new THREE.Vector2( ix / gridX, 1 - iy / gridY ),
+							new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY ),
+							new THREE.Vector2( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
+							new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY )
 						] );
 
 			}
