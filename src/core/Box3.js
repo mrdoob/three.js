@@ -11,10 +11,13 @@ THREE.Box3 = function ( min, max ) {
 		this.makeEmpty();
 
 	} else {
-
-		this.min = min || new THREE.Vector3();
-		this.max = max || new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-
+		this.min = min.clone();
+		if( max === undefined ) {
+			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+		}
+		else {
+			this.max = max.clone();
+		}
 	}
 
 };
@@ -25,8 +28,8 @@ THREE.Box3.prototype = {
 
 	set: function ( min, max ) {
 
-		this.min = min;
-		this.max = max;
+		this.min.copy( min );
+		this.max.copy( max );
 
 		return this;
 

@@ -4,6 +4,14 @@
 
 module( "Box2" );
 
+test( "verifyConstants=beginning", function() {
+	ok( negInf.equals( new THREE.Vector3( -Infinity, -Infinity ) ), "Passed!" );
+	ok( posInf.equals( new THREE.Vector3( Infinity, Infinity ) ), "Passed!" );
+	ok( zero.equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	ok( one.equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+	ok( two.equals( new THREE.Vector3( 2, 2, 2 ) ), "Passed!" );
+});
+
 test( "constructor", function() {
 	var a = new THREE.Box2();
 	ok( a.min.equals( posInf ), "Passed!" );
@@ -15,8 +23,12 @@ test( "constructor", function() {
 
 	a = new THREE.Box2( zero, one );
 	ok( a.min.equals( zero ), "Passed!" );
+	console.log( "constructor");
+	console.log( a );
+	console.log( one );
 	ok( a.max.equals( one ), "Passed!" );
 });
+
 
 test( "copy", function() {
 	var a = new THREE.Box2( zero, one );
@@ -51,9 +63,12 @@ test( "empty/makeEmpty", function() {
 	ok( a.empty(), "Passed!" );
 });
 
-test( "area", function() {
+test( "volume", function() {
 	var a = new THREE.Box2( zero, one );
-	ok( a.area() == 1, "Passed!" );
+	ok( a.volume() == 1, "Passed!" );
+
+	a = new THREE.Box2( one.clone().negate(), zero );
+	ok( a.volume() == 1, "Passed!" );
 });
 
 test( "center", function() {
@@ -64,6 +79,14 @@ test( "center", function() {
 	a = new THREE.Box2( zero, one );
 	var midpoint = one.clone().multiplyScalar( 0.5 );
 	ok( a.center().equals( midpoint ), "Passed!" );
+});
+
+test( "verifyConstants1", function() {
+	ok( negInf.equals( new THREE.Vector3( -Infinity, -Infinity ) ), "Passed!" );
+	ok( posInf.equals( new THREE.Vector3( Infinity, Infinity ) ), "Passed!" );
+	ok( zero.equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	ok( one.equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+	ok( two.equals( new THREE.Vector3( 2, 2, 2 ) ), "Passed!" );
 });
 
 test( "size", function() {
@@ -86,8 +109,10 @@ test( "expandByPoint", function() {
 
 	a.expandByPoint( one.clone().negate() );
 	ok( a.size().equals( one.clone().multiplyScalar( 2 ) ), "Passed!" );
+	console.log( "expandByPoint" );
 	console.log( a );
 	console.log( a.center() );
+	console.log( zero  );
 	ok( a.center().equals( zero ), "Passed!" );
 });
 
@@ -155,7 +180,7 @@ test( "getParameter", function() {
 });
 
 test( "clampPoint", function() {
-	var a = new THREE.Box2( zero, one );
+	var a = new THREE.Box2( zero, zero );
 	var b = new THREE.Box2( one.clone().negate(), one );
 
 	ok( a.clampPoint( new THREE.Vector2( 0, 0 ) ).equals( new THREE.Vector2( 0, 0 ) ), "Passed!" );
@@ -170,7 +195,7 @@ test( "clampPoint", function() {
 });
 
 test( "distanceToPoint", function() {
-	var a = new THREE.Box2( zero, one );
+	var a = new THREE.Box2( zero, zero );
 	var b = new THREE.Box2( one.clone().negate(), one );
 
 	ok( a.distanceToPoint( new THREE.Vector2( 0, 0 ) ) == 0, "Passed!" );
@@ -185,7 +210,7 @@ test( "distanceToPoint", function() {
 });
 
 test( "distanceToPoint", function() {
-	var a = new THREE.Box2( zero, one );
+	var a = new THREE.Box2( zero, zero );
 	var b = new THREE.Box2( one.clone().negate(), one );
 
 	ok( a.distanceToPoint( new THREE.Vector2( 0, 0 ) ) == 0, "Passed!" );
@@ -213,6 +238,10 @@ test( "isIntersection", function() {
 	ok( b.isIntersection( c ), "Passed!" );
 
 	b.translate( new THREE.Vector2( 2, 2 ) );
+	console.log( "isIntersection");
+	console.log( a );
+	console.log( b );
+	console.log( c );
 	ok( ! a.isIntersection( b ), "Passed!" );
 	ok( ! b.isIntersection( a ), "Passed!" );
 	ok( ! c.isIntersection( a ), "Passed!" );
@@ -264,4 +293,12 @@ test( "scale", function() {
 	ok( b.clone().scale( 0 ).equals( a ), "Passed!" );
 	ok( b.clone().scale( 2 ).equals( new THREE.Box2( zero, new THREE.Vector2( 2, 2 ) ) ), "Passed!" );
 	ok( d.clone().scale( 2 ).equals( new THREE.Box2( new THREE.Vector2( 2, 2 ).negate(), zero ) ), "Passed!" );
+});
+
+test( "verifyConstants-end", function() {
+	ok( negInf.equals( new THREE.Vector3( -Infinity, -Infinity ) ), "Passed!" );
+	ok( posInf.equals( new THREE.Vector3( Infinity, Infinity ) ), "Passed!" );
+	ok( zero.equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	ok( one.equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
+	ok( two.equals( new THREE.Vector3( 2, 2, 2 ) ), "Passed!" );
 });

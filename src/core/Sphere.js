@@ -4,9 +4,19 @@
 
 THREE.Sphere = function ( center, radius ) {
 
-	this.center = center || new THREE.Vector3();
-	this.radius = radius || 0;
 
+	if ( center === undefined && radius === undefined ) {
+
+		this.center = new THREE.Vector3();
+		this.radius = 0;
+
+	} else {
+
+		this.center = center.clone();
+		this.radius = radius || 0;
+
+	}
+	
 };
 
 THREE.Sphere.prototype = {
@@ -15,7 +25,7 @@ THREE.Sphere.prototype = {
 
 	set: function ( center, radius ) {
 
-		this.center = center;
+		this.center.copy( center );
 		this.radius = radius;
 
 		return this;

@@ -87,10 +87,10 @@ test( "flip", function() {
 });
 
 test( "normalize", function() {
-	var a = new THREE.Plane( two, 2 );
+	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), 2 );
 	
 	a.normalize();
 	ok( a.normal.length() == 1, "Passed!" );
-	ok( a.normal.equals( one ), "Passed!" );
+	ok( a.normal.equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
 	ok( a.constant == 1, "Passed!" );
 });

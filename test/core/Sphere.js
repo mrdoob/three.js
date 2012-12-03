@@ -11,7 +11,7 @@ test( "constructor", function() {
 
 	a = new THREE.Sphere( one, 1 );
 	ok( a.center.equals( one ), "Passed!" );
-	ok( a.radius == 0, "Passed!" );
+	ok( a.radius == 1, "Passed!" );
 });
 
 test( "copy", function() {
@@ -19,13 +19,13 @@ test( "copy", function() {
 	var b = new THREE.Sphere().copy( a );
 
 	ok( b.center.equals( one ), "Passed!" );
-	ok( b.radius == 0, "Passed!" );
+	ok( b.radius == 1, "Passed!" );
 
 	// ensure that it is a true copy
 	a.center = zero;
 	a.radius = 0;
 	ok( b.center.equals( one ), "Passed!" );
-	ok( b.radius == 0, "Passed!" );
+	ok( b.radius == 1, "Passed!" );
 });
 
 test( "set", function() {
