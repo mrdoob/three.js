@@ -17,7 +17,7 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 	this.vertexTangents = [];
 
-	this.materialIndex = materialIndex;
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 	this.centroid = new THREE.Vector3();
 

@@ -9,7 +9,7 @@
     },
 
     "devDependencies": {
-    	"uglify-js": "*",
+    	"uglify-js2": "*",
     	"argparse" : "*"
     },
     

@@ -2,9 +2,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DataTexture = function ( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter ) {
+THREE.DataTexture = function ( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
 
-	THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type );
+	THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.image = { data: data, width: width, height: height };
 
@@ -14,11 +14,10 @@ THREE.DataTexture.prototype = Object.create( THREE.Texture.prototype );
 
 THREE.DataTexture.prototype.clone = function () {
 
-	var clonedTexture = new THREE.DataTexture( this.image.data,  this.image.width, this.image.height, this.format, this.type, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter );
+	var texture = new THREE.DataTexture();
 
-	clonedTexture.offset.copy( this.offset );
-	clonedTexture.repeat.copy( this.repeat );
+	THREE.Texture.prototype.clone.call( this, texture );
 
-	return clonedTexture;
+	return texture;
 
 };

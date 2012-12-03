@@ -100,7 +100,7 @@
 			var container, stats;
 
 			var camera, cameraTarget, scene, renderer;
-			var renderTarget, renderTargetParameters;
+			var renderTarget;
 
 			var spotLight, ambientLight;
 
@@ -205,7 +205,7 @@
 
 				// SHADOW
 
-				renderer.shadowMapCullFrontFaces = false;
+				renderer.shadowMapCullFace = THREE.CullFaceBack;
 				renderer.shadowMapEnabled = true;
 
 				// STATS
@@ -304,7 +304,8 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
 						var spriteWidth = 128;
 						var spriteHeight = 128;
@@ -372,7 +373,8 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
 						var spriteWidth = 128;
 						var spriteHeight = 128;
@@ -410,7 +412,7 @@
 
 				renderer.autoClear = false;
 
-				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 				effectSave = new THREE.SavePass( new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters ) );
@@ -501,7 +503,7 @@
 
 				for ( var i = 0; i < sprites.length; i ++ ) {
 
-					sprites[ i ].opacity = opacity;
+					sprites[ i ].material.opacity = opacity;
 
 				}
 
@@ -766,14 +768,11 @@
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-
-				composer.reset( renderTarget );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				hblur.uniforms[ 'h' ].value = 10.75 / SCREEN_WIDTH;
 				vblur.uniforms[ 'v' ].value = 10.75 / SCREEN_HEIGHT;

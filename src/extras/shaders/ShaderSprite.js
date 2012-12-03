@@ -11,7 +11,7 @@ THREE.ShaderSprite = {
 		vertexShader: [
 
 			"uniform int useScreenCoordinates;",
-			"uniform int affectedByDistance;",
+			"uniform int sizeAttenuation;",
 			"uniform vec3 screenPosition;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
@@ -45,7 +45,7 @@ THREE.ShaderSprite = {
 				"} else {",
 
 					"finalPosition = projectionMatrix * modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
-					"finalPosition.xy += rotatedPosition * ( affectedByDistance == 1 ? 1.0 : finalPosition.z );",
+					"finalPosition.xy += rotatedPosition * ( sizeAttenuation == 1 ? 1.0 : finalPosition.z );",
 
 				"}",
 
@@ -68,12 +68,16 @@ THREE.ShaderSprite = {
 			"uniform float fogDensity;",
 			"uniform float fogNear;",
 			"uniform float fogFar;",
+			"uniform float alphaTest;",
 
 			"varying vec2 vUV;",
 
 			"void main() {",
 
 				"vec4 texture = texture2D( map, vUV );",
+
+				"if ( texture.a < alphaTest ) discard;",
+
 				"gl_FragColor = vec4( color * texture.xyz, texture.a * opacity );",
 
 				"if ( fogType > 0 ) {",

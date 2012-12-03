@@ -2,12 +2,14 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.CompressedTexture = function ( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter ) {
+THREE.CompressedTexture = function ( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy ) {
 
-	THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type );
+	THREE.Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
 	this.image = { width: width, height: height };
 	this.mipmaps = mipmaps;
+
+	this.generateMipmaps = false; // WebGL currently can't generate mipmaps for compressed textures, they must be embedded in DDS file
 
 };
 
@@ -17,24 +19,7 @@ THREE.CompressedTexture.prototype.clone = function () {
 
 	var texture = new THREE.CompressedTexture();
 
-	texture.image = this.image;
-	texture.mipmaps = this.mipmaps;
-
-	texture.format = this.format;
-	texture.type = this.type;
-
-	texture.mapping = this.mapping;
-
-	texture.wrapS = this.wrapS;
-	texture.wrapT = this.wrapT;
-
-	texture.magFilter = this.magFilter;
-	texture.minFilter = this.minFilter;
-
-	texture.anisotropy = this.anisotropy;
-
-	texture.offset.copy( this.offset );
-	texture.repeat.copy( this.repeat );
+	THREE.Texture.prototype.clone.call( this, texture );
 
 	return texture;
 
