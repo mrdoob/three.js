@@ -86,6 +86,9 @@ THREE.Ray.prototype = {
 
 	},
 
+	/*
+	// Commented out because this does not handle the case of non-intersecting
+	// perpendicular lines
 	closestPointToRay: function ( ray ) {
 
 		// Assumes the lines are normalized
@@ -115,8 +118,12 @@ THREE.Ray.prototype = {
 	    return this.direction.clone().multiplyScalar( num / denom ).addSelf( this.origin );
 
 	},
+	*/
 
-	distanceToRay: function ( ray ) {
+	/*
+	// Commented out because this does not handle the case of non-intersecting
+	// perpendicular lines
+	distanceToRay: function ( ray ) {		
 
 		THREE.Ray.__v1.copy( this.direction ).crossSelf( ray.direction );
 		THREE.Ray.__v2.copy( ray.origin ).subSelf( this.origin );
@@ -133,18 +140,34 @@ THREE.Ray.prototype = {
 			return -1;
 
 		}
-	},
+	},*/
 
 	isIntersectionPlane: function ( plane ) {
 
-		return ( plane.normal.dot( this.direction ) != 0 );
+		// check if the line and plane are non-perpendicular, if they
+		// eventually they will intersect.
+		var denominator = plane.normal.dot( this.direction );
+		if ( denominator != 0 ) {
+
+			return true;
+
+		}
+		
+		// line is coplanar, return origin
+		if( plane.distanceToPoint( this.origin ) == 0 ) {
+
+			return true;
+
+		}
+
+		return false;
 
 	},
 
 	intersectPlane: function ( plane ) {
 
-		var a = plane.normal.dot( this.direction );
-		if ( a == 0.0 ) {
+		var denominator = plane.normal.dot( this.direction );
+		if ( denominator == 0 ) {
 
 			// line is coplanar, return origin
 			if( plane.distanceToPoint( this.origin ) == 0 ) {
@@ -158,7 +181,7 @@ THREE.Ray.prototype = {
 
 		}
 
-		var t = - ( ( this.origin ^ plane.normal ) - plane.constant ) / a;
+		var t = - ( ( this.origin.dot( plane.normal ) ) + plane.constant ) / denominator;
 
 		return this.at( t );
 
