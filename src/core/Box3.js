@@ -201,6 +201,7 @@ THREE.Box3.prototype = {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
+
 		return new THREE.Vector3(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
@@ -233,7 +234,8 @@ THREE.Box3.prototype = {
 
 	distanceToPoint: function ( point ) {
 
-		return this.clampPoint( point ).subSelf( point ).length();
+		var clampedPoint = THREE.Box3.__v1.copy( point ).clampSelf( this.min, this.max );
+		return clampedPoint.subSelf( point ).length();
 
 	},
 

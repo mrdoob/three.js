@@ -1238,7 +1238,8 @@ THREE.Vector3.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		return new THREE.Vector3().sub( this, v ).lengthSq();
+		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+		return dx * dx + dy * dy + dz * dz;
 
 	},
 
@@ -2164,7 +2165,8 @@ THREE.Box2.prototype = {
 
 	distanceToPoint: function ( point ) {
 
-		return this.clampPoint( point ).subSelf( point ).length();
+		var clampedPoint = THREE.Box2.__v1.copy( point ).clampSelf( this.min, this.max );
+		return clampedPoint.subSelf( point ).length();
 
 	},
 
@@ -2422,6 +2424,7 @@ THREE.Box3.prototype = {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
+
 		return new THREE.Vector3(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
@@ -2454,7 +2457,8 @@ THREE.Box3.prototype = {
 
 	distanceToPoint: function ( point ) {
 
-		return this.clampPoint( point ).subSelf( point ).length();
+		var clampedPoint = THREE.Box3.__v1.copy( point ).clampSelf( this.min, this.max );
+		return clampedPoint.subSelf( point ).length();
 
 	},
 
@@ -3868,9 +3872,10 @@ THREE.Plane.prototype = {
 	setFromCoplanarPoints: function ( a, b, c ) {
 
 		var normal = THREE.Plane.__v1.sub( b, a ).cross(
-			THREE.Plane.__v2.sub( c, a ) );
+					 THREE.Plane.__v2.sub( c, a ) );
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+
 		this.setFromNormalAndCoplanarPoint( normal, a );
 
 		return this;
