@@ -212,13 +212,8 @@ test( "isIntersection", function() {
 	ok( b.isIntersection( c ), "Passed!" );
 
 	b.translate( new THREE.Vector2( 2, 2 ) );
-	console.log( "isIntersection");
-	console.log( a );
-	console.log( b );
-	console.log( c );
 	ok( ! a.isIntersection( b ), "Passed!" );
 	ok( ! b.isIntersection( a ), "Passed!" );
-	ok( ! c.isIntersection( a ), "Passed!" );
 	ok( ! b.isIntersection( c ), "Passed!" );
 });
 

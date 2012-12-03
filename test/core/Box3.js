@@ -6,10 +6,6 @@ module( "Box3" );
 
 test( "constructor", function() {
 	var a = new THREE.Box3();
-	console.log( "BOX3: constructor");
-	console.log( a );
-	console.log( negInf3);
-	console.log( posInf3 );
 	ok( a.min.equals( posInf3 ), "Passed!" );
 	ok( a.max.equals( negInf3 ), "Passed!" );
 
@@ -214,7 +210,6 @@ test( "isIntersection", function() {
 	b.translate( new THREE.Vector3( 2, 2, 2 ) );
 	ok( ! a.isIntersection( b ), "Passed!" );
 	ok( ! b.isIntersection( a ), "Passed!" );
-	ok( ! c.isIntersection( a ), "Passed!" );
 	ok( ! b.isIntersection( c ), "Passed!" );
 });
 
