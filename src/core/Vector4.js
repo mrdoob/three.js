@@ -30,6 +30,38 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
+	setZ: function ( z ) {
+
+		this.z = z;
+
+		return this;
+
+	},
+
+	setW: function ( w ) {
+
+		this.w = w;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -118,6 +150,78 @@ THREE.Vector4.prototype = {
 
 	},
 
+	minSelf: function ( v ) {
+
+		if( this.x > v.x ) {
+			this.x = v.x;
+		}
+		if( this.y > v.y ) {
+			this.y = v.y;
+		}
+		if( this.z > v.z ) {
+			this.z = v.z;
+		}
+		if( this.w > v.w ) {
+			this.w = v.w;
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if( this.x < v.x ) {
+			this.x = v.x;
+		}
+		if( this.y < v.y ) {
+			this.y = v.y;
+		}
+		if( this.z < v.z ) {
+			this.z = v.z;
+		}
+		if( this.w < v.w ) {
+			this.w = v.w;
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if( this.x < min.x ) {
+			this.x = min.x;
+		}
+		else if( this.x > max.x ) {
+			this.x = max.x;
+		}
+
+		if( this.y < min.y ) {
+			this.y = min.y;
+		}
+		else if( this.y > max.y ) {
+			this.y = max.y;
+		}
+
+		if( this.z < min.z ) {
+			this.z = min.z;
+		}
+		else if( this.z > max.z ) {
+			this.z = max.z;
+		}
+
+		if( this.w < min.w ) {
+			this.w = min.w;
+		}
+		else if( this.w > max.w ) {
+			this.w = max.w;
+		}
+
+		return this;
+	},
 
 	negate: function() {
 
@@ -169,6 +273,12 @@ THREE.Vector4.prototype = {
 		this.w += ( v.w - this.w ) * alpha;
 
 		return this;
+
+	},
+
+	equals: function ( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
 
 	},
 

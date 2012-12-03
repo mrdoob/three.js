@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Geometry = function () {
@@ -576,82 +577,12 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
-
-			this.boundingBox = { min: new THREE.Vector3(), max: new THREE.Vector3() };
-
-		}
-
-		if ( this.vertices.length > 0 ) {
-
-			var position, firstPosition = this.vertices[ 0 ];
-
-			this.boundingBox.min.copy( firstPosition );
-			this.boundingBox.max.copy( firstPosition );
-
-			var min = this.boundingBox.min,
-				max = this.boundingBox.max;
-
-			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
-
-				position = this.vertices[ v ];
-
-				if ( position.x < min.x ) {
-
-					min.x = position.x;
-
-				} else if ( position.x > max.x ) {
-
-					max.x = position.x;
-
-				}
-
-				if ( position.y < min.y ) {
-
-					min.y = position.y;
-
-				} else if ( position.y > max.y ) {
-
-					max.y = position.y;
-
-				}
-
-				if ( position.z < min.z ) {
-
-					min.z = position.z;
-
-				} else if ( position.z > max.z ) {
-
-					max.z = position.z;
-
-				}
-
-			}
-
-		} else {
-
-			this.boundingBox.min.set( 0, 0, 0 );
-			this.boundingBox.max.set( 0, 0, 0 );
-
-		}
-
+		this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
 	},
 
 	computeBoundingSphere: function () {
 
-		var maxRadiusSq = 0;
-
-		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
-
-		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
-
-			var radiusSq = this.vertices[ i ].lengthSq();
-			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
-
-		}
-
-		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
+		this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
 	},
 
 	/*
