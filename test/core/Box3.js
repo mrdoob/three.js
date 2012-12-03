@@ -214,7 +214,6 @@ test( "isIntersection", function() {
 	b.translate( new THREE.Vector3( 2, 2, 2 ) );
 	ok( ! a.isIntersection( b ), "Passed!" );
 	ok( ! b.isIntersection( a ), "Passed!" );
-	ok( ! c.isIntersection( a ), "Passed!" );
 	ok( ! b.isIntersection( c ), "Passed!" );
 });
 
