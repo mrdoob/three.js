@@ -2,15 +2,6 @@
  * @author bhouston / http://exocortex.com
  */
 
-x = 2;
-y = 3;
-z = 4;
-w = 5;
-
-zero = new THREE.Vector3();
-one = new THREE.Vector3( 1, 1, 1 );
-two = new THREE.Vector3( 1, 1, 1 );
-
 module( "Plane" );
 
 test( "constructor", function() {

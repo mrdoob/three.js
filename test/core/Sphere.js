@@ -2,14 +2,6 @@
  * @author bhouston / http://exocortex.com
  */
 
-var x = 2;
-var y = 3;
-var z = 4;
-var w = 5;
-
-var zero = new THREE.Vector3();
-var one = new THREE.Vector3( 1, 1, 1 );
-
 module( "Sphere" );
 
 test( "constructor", function() {
@@ -37,7 +29,7 @@ test( "copy", function() {
 });
 
 test( "set", function() {
-	var a = new THREE.Vector3();
+	var a = new THREE.Sphere();
 	ok( a.center.equals( zero ), "Passed!" );
 	ok( a.radius == 0, "Passed!" );
 

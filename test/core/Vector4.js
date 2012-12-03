@@ -2,11 +2,6 @@
  * @author bhouston / http://exocortex.com
  */
 
-var x = 2;
-var y = 3;
-var z = 4;
-var w = 5;
-
 module( "Vector4" );
 
 test( "constructor", function() {
