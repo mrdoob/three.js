@@ -7,9 +7,7 @@ THREE.Box3 = function ( min, max ) {
 	if( ! min && ! max ) {			
 		this.min = new THREE.Vector3();
 		this.max = new THREE.Vector3();
-		this.min.x = this.min.y = this.min.z = Infinity;
-		this.max.x = this.max.y = this.max.z = -Infinity;
-		console.log( this );
+		this.makeEmpty();
 	}
 	else {
 		this.min = min || new THREE.Vector3();

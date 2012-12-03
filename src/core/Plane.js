@@ -39,8 +39,8 @@ THREE.Plane.prototype = {
 
 	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var normal = THREE.Plane3.__v1.sub( b, a ).cross(
-			THREE.Plane3.__v2.sub( c, a ) );
+		var normal = THREE.Plane.__v1.sub( b, a ).cross(
+			THREE.Plane.__v2.sub( c, a ) );
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 		this.setFromNormalAndCoplanarPoint( normal, a );
@@ -124,8 +124,7 @@ THREE.Plane.prototype = {
 
 	clone: function () {
 
-		return new THREE.Plane3().copy( this );
-
+		return new THREE.Plane().copy( this );
 	}
 
 };
