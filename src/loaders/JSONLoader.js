@@ -98,7 +98,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 	parseModel( scale );
 
-	parseSkin();
+	parseSkin( scale );
 	parseMorphing( scale );
 
 	geometry.computeCentroids();
@@ -323,9 +323,9 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 	};
 
-	function parseSkin() {
+	function parseSkin(scale) {
 
-		var i, l, x, y, z, w, a, b, c, d;
+		var i, j, l, m, x, y, z, w, a, b, c, d, pos;
 
 		if ( json.skinWeights ) {
 
@@ -357,8 +357,39 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 		}
 
-		geometry.bones = json.bones;
-		geometry.animation = json.animation;
+		if ( json.bones ) {
+
+			geometry.bones = json.bones;
+
+			for ( i = 0, l = geometry.bones.length; i < l; ++ i ) {
+
+				pos = geometry.bones[ i ].pos;
+				pos[ 0 ] *= scale;
+				pos[ 1 ] *= scale;
+				pos[ 2 ] *= scale;
+
+			}
+
+		}
+
+		if ( json.animation ) {
+
+			geometry.animation = json.animation;
+
+			for ( i = 0, l = geometry.animation.hierarchy.length; i < l; ++ i ) {
+
+				for ( j = 0, m = geometry.animation.hierarchy[ i ].keys.length; j < m; ++ j ) {
+
+					pos = geometry.animation.hierarchy[ i ].keys[ j ].pos;
+					pos[ 0 ] *= scale;
+					pos[ 1 ] *= scale;
+					pos[ 2 ] *= scale;
+
+				}
+
+			}
+
+		}
 
 	};
 
