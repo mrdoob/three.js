@@ -125,42 +125,7 @@ THREE.ShaderDeferred = {
 
 	},
 
-	"clipDepth" : {
-
-		uniforms: { },
-
-		fragmentShader : [
-
-			"varying vec4 clipPos;",
-
-			"void main() {",
-
-				"gl_FragColor = vec4( clipPos.z / clipPos.w, 1.0, 1.0, 1.0 );",
-
-			"}"
-
-		].join("\n"),
-
-		vertexShader : [
-
-			"varying vec4 clipPos;",
-
-			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
-
-			"void main() {",
-
-				THREE.ShaderChunk[ "morphtarget_vertex" ],
-				THREE.ShaderChunk[ "default_vertex" ],
-
-				"clipPos = gl_Position;",
-
-			"}"
-
-		].join("\n")
-
-	},
-
-	"normals" : {
+	"normalDepth" : {
 
 		uniforms: {
 
@@ -184,6 +149,7 @@ THREE.ShaderDeferred = {
 			"#endif",
 
 			"varying vec3 normalView;",
+			"varying vec4 clipPos;",
 
 			"void main() {",
 
@@ -195,7 +161,8 @@ THREE.ShaderDeferred = {
 
 				"#endif",
 
-				"gl_FragColor = vec4( vec3( normal * 0.5 + 0.5 ), 1.0 );",
+				"gl_FragColor.xyz = normal * 0.5 + 0.5;",
+				"gl_FragColor.w = clipPos.z / clipPos.w;",
 
 			"}"
 
@@ -204,6 +171,7 @@ THREE.ShaderDeferred = {
 		vertexShader : [
 
 			"varying vec3 normalView;",
+			"varying vec4 clipPos;",
 
 			"#ifdef USE_BUMPMAP",
 
@@ -244,6 +212,8 @@ THREE.ShaderDeferred = {
 					"vViewPosition = -mvPosition.xyz;",
 
 				"#endif",
+
+				"clipPos = gl_Position;",
 
 			"}"
 
@@ -295,9 +265,8 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormals: { type: "t", value: null },
-			samplerDepth: 	{ type: "t", value: null },
-			samplerColor: 	{ type: "t", value: null },
+			samplerNormalDepth: { type: "t", value: null },
+			samplerColor: 		{ type: "t", value: null },
 			matView: 		{ type: "m4", value: new THREE.Matrix4() },
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
@@ -315,8 +284,7 @@ THREE.ShaderDeferred = {
 			"varying vec4 clipPos;",
 
 			"uniform sampler2D samplerColor;",
-			"uniform sampler2D samplerDepth;",
-			"uniform sampler2D samplerNormals;",
+			"uniform sampler2D samplerNormalDepth;",
 
 			"uniform float lightRadius;",
 			"uniform float lightIntensity;",
@@ -342,17 +310,10 @@ THREE.ShaderDeferred = {
 
 				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
 
-				"float z = texture2D( samplerDepth, texCoord ).x;",
+				"vec4 normalDepth = texture2D( samplerNormalDepth, texCoord );",
+
+				"float z = normalDepth.w;",
 				"float lightZ = clipPos.z / clipPos.w;",
-
-				/*
-				"if ( z == 0.0 ) {",
-
-					"gl_FragColor = vec4( vec3( 0.0 ), 1.0 );",
-					"return;",
-
-				"}",
-				*/
 
 				"if ( z == 0.0 || lightZ > z ) discard;",
 
@@ -381,7 +342,7 @@ THREE.ShaderDeferred = {
 
 				// normal
 
-				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;",
+				"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
 
 				// color
 
@@ -462,9 +423,8 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormals: { type: "t", value: null },
-			samplerDepth: 	{ type: "t", value: null },
-			samplerColor: 	{ type: "t", value: null },
+			samplerNormalDepth: { type: "t", value: null },
+			samplerColor: 		{ type: "t", value: null },
 			matView: 		{ type: "m4", value: new THREE.Matrix4() },
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
@@ -481,8 +441,7 @@ THREE.ShaderDeferred = {
 			"varying vec4 clipPos;",
 
 			"uniform sampler2D samplerColor;",
-			"uniform sampler2D samplerDepth;",
-			"uniform sampler2D samplerNormals;",
+			"uniform sampler2D samplerNormalDepth;",
 
 			"uniform float lightRadius;",
 			"uniform float lightIntensity;",
@@ -508,7 +467,8 @@ THREE.ShaderDeferred = {
 
 				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
 
-				"float z = texture2D( samplerDepth, texCoord ).x;",
+				"vec4 normalDepth = texture2D( samplerNormalDepth, texCoord );",
+				"float z = normalDepth.w;",
 
 				"if ( z == 0.0 ) discard;",
 
@@ -525,7 +485,7 @@ THREE.ShaderDeferred = {
 
 				// normal
 
-				"vec3 normal = texture2D( samplerNormals, texCoord ).xyz * 2.0 - 1.0;",
+				"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
 
 				// color
 
@@ -605,8 +565,8 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerDepth: 	{ type: "t", value: null },
-			samplerColor: 	{ type: "t", value: null },
+			samplerNormalDepth: 	{ type: "t", value: null },
+			samplerColor: 			{ type: "t", value: null },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
 
@@ -614,7 +574,7 @@ THREE.ShaderDeferred = {
 
 		fragmentShader : [
 
-			"uniform sampler2D samplerDepth;",
+			"uniform sampler2D samplerNormalDepth;",
 			"uniform sampler2D samplerColor;",
 
 			"uniform float viewHeight;",
@@ -635,7 +595,7 @@ THREE.ShaderDeferred = {
 
 				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
 
-				"float z = texture2D( samplerDepth, texCoord ).x;",
+				"float z = texture2D( samplerNormalDepth, texCoord ).w;",
 
 				"if ( z == 0.0 ) discard;",
 
