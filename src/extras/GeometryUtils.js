@@ -102,7 +102,7 @@ THREE.GeometryUtils = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
 
 			}
 
@@ -405,8 +405,8 @@ THREE.GeometryUtils = {
 
 				// texture repeat
 
-				if( uvs[ j ].u !== 1.0 ) uvs[ j ].u = uvs[ j ].u - Math.floor( uvs[ j ].u );
-				if( uvs[ j ].v !== 1.0 ) uvs[ j ].v = uvs[ j ].v - Math.floor( uvs[ j ].v );
+				if( uvs[ j ].x !== 1.0 ) uvs[ j ].x = uvs[ j ].x - Math.floor( uvs[ j ].x );
+				if( uvs[ j ].y !== 1.0 ) uvs[ j ].y = uvs[ j ].y - Math.floor( uvs[ j ].y );
 
 			}
 

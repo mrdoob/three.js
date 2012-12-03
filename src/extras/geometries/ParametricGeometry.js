@@ -49,10 +49,10 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 			c = (i + 1) * sliceCount + j;
 			d = (i + 1) * sliceCount + j + 1;
 
-			uva = new THREE.UV( j / slices, i / stacks );
-			uvb = new THREE.UV( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.UV( j / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.UV( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uva = new THREE.Vector2( j / slices, i / stacks );
+			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
+			uvc = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
+			uvd = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
 
 			if ( useTris ) {
 

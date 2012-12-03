@@ -480,10 +480,10 @@ THREE.Geometry.prototype = {
 			z1 = vB.z - vA.z;
 			z2 = vC.z - vA.z;
 
-			s1 = uvB.u - uvA.u;
-			s2 = uvC.u - uvA.u;
-			t1 = uvB.v - uvA.v;
-			t2 = uvC.v - uvA.v;
+			s1 = uvB.x - uvA.x;
+			s2 = uvC.x - uvA.x;
+			t1 = uvB.y - uvA.y;
+			t2 = uvC.y - uvA.y;
 
 			r = 1.0 / ( s1 * t2 - s2 * t1 );
 			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
@@ -710,7 +710,7 @@ THREE.Geometry.prototype = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
 
 			}
 

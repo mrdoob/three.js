@@ -46,11 +46,11 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.UV( 1 - i / _steps, k / kl ),
-				new THREE.UV( 1 - ( i + 1 ) / _steps, k / kl ),
-				new THREE.UV( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
-				new THREE.UV( 1 - i / _steps, ( k + 1 ) / kl )
-				
+				new THREE.Vector2( 1 - i / _steps, k / kl ),
+				new THREE.Vector2( 1 - ( i + 1 ) / _steps, k / kl ),
+				new THREE.Vector2( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
+				new THREE.Vector2( 1 - i / _steps, ( k + 1 ) / kl )
+
 			] );
 
 		}

@@ -67,10 +67,10 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 			var c = this.grid[ ip ][ jp ];
 			var d = this.grid[ i ][ jp ];
 
-			var uva = new THREE.UV( i / this.radialSegments, j / this.tubularSegments );
-			var uvb = new THREE.UV( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
-			var uvc = new THREE.UV( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
-			var uvd = new THREE.UV( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uva = new THREE.Vector2( i / this.radialSegments, j / this.tubularSegments );
+			var uvb = new THREE.Vector2( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
+			var uvc = new THREE.Vector2( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uvd = new THREE.Vector2( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva,uvb,uvc, uvd ] );

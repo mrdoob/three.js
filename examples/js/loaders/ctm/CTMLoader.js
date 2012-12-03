@@ -621,9 +621,9 @@ THREE.CTMLoader.prototype.createModelClassic = function ( file, callback ) {
 	function uv3 ( where, u1, v1, u2, v2, u3, v3 ) {
 
 		var uv = [];
-		uv.push( new THREE.UV( u1, v1 ) );
-		uv.push( new THREE.UV( u2, v2 ) );
-		uv.push( new THREE.UV( u3, v3 ) );
+		uv.push( new THREE.Vector2( u1, v1 ) );
+		uv.push( new THREE.Vector2( u2, v2 ) );
+		uv.push( new THREE.Vector2( u3, v3 ) );
 		where.push( uv );
 
 	};
