@@ -112,7 +112,7 @@ THREE.Box2.prototype = {
 
 	},
 
-	volume: function () {
+	area: function () {
 
 		return ( this.max.x - this.min.x ) * ( this.max.y - this.min.y );
 

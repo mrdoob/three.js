@@ -11,8 +11,6 @@ test( "constructor", function() {
 	ok( a.normal.z == 0, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 
-	console.log( one );
-
 	a = new THREE.Plane( one, 0 );
 	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 1, "Passed!" );
