@@ -329,7 +329,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
 		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		materialLight.uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 		// create light proxy mesh
 

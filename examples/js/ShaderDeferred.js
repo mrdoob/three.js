@@ -565,8 +565,7 @@ THREE.ShaderDeferred = {
 
 		uniforms: {
 
-			samplerNormalDepth: 	{ type: "t", value: null },
-			samplerColor: 			{ type: "t", value: null },
+			samplerColor: 	{ type: "t", value: null },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
 
@@ -574,7 +573,6 @@ THREE.ShaderDeferred = {
 
 		fragmentShader : [
 
-			"uniform sampler2D samplerNormalDepth;",
 			"uniform sampler2D samplerColor;",
 
 			"uniform float viewHeight;",
@@ -594,10 +592,6 @@ THREE.ShaderDeferred = {
 			"void main() {",
 
 				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
-
-				"float z = texture2D( samplerNormalDepth, texCoord ).w;",
-
-				"if ( z == 0.0 ) discard;",
 
 				"vec4 colorMap = texture2D( samplerColor, texCoord );",
 				"vec3 emissiveColor = float_to_vec3( abs( colorMap.w ) );",
