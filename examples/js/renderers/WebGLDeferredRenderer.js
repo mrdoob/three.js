@@ -15,7 +15,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var scaledHeight = Math.floor( scale * height );
 
 	var additiveSpecular = parameters.additiveSpecular;
-	var multiply = parameters.multiply;
+	var brightness = parameters.brightness;
 
 	this.renderer = parameters.renderer;
 
@@ -548,7 +548,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		compositePass = new THREE.ShaderPass( compositeShader );
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
-		compositePass.uniforms[ 'multiply' ].value = multiply;
+		compositePass.uniforms[ 'brightness' ].value = brightness;
 		compositePass.material.blending = THREE.NoBlending;
 		compositePass.clear = true;
 

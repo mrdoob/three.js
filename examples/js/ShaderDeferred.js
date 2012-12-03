@@ -226,7 +226,7 @@ THREE.ShaderDeferred = {
 		uniforms: {
 
 			samplerLight: 	{ type: "t", value: null },
-			multiply:		{ type: "f", value: 1 }
+			brightness:		{ type: "f", value: 1 }
 
 		},
 
@@ -234,12 +234,12 @@ THREE.ShaderDeferred = {
 
 			"varying vec2 texCoord;",
 			"uniform sampler2D samplerLight;",
-			"uniform float multiply;",
+			"uniform float brightness;",
 
 			"void main() {",
 
 				"vec3 color = texture2D( samplerLight, texCoord ).xyz;",
-				"gl_FragColor = vec4( multiply * sqrt( color ), 1.0 );",
+				"gl_FragColor = vec4( brightness * sqrt( color ), 1.0 );",
 
 			"}"
 
