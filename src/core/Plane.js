@@ -44,8 +44,9 @@ THREE.Plane.prototype = {
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 		this.setFromNormalAndCoplanarPoint( normal, a );
-		
+
 		return this;
+
 	},
 
 	copy: function ( plane ) {
@@ -54,6 +55,7 @@ THREE.Plane.prototype = {
 		this.constant = plane.constant;
 
 		return this;
+
 	},
 
 	flip: function () {
@@ -61,6 +63,7 @@ THREE.Plane.prototype = {
 		this.normal.negate();
 
 		return this;
+
 	},
 
 	normalize: function () {
@@ -71,6 +74,7 @@ THREE.Plane.prototype = {
 		this.constant *= inverseNormalLength;
 
 		return this;
+
 	},
 
 	distanceToPoint: function ( point ) {
@@ -83,42 +87,47 @@ THREE.Plane.prototype = {
 		return this.distanceToPoint( sphere.center ) - sphere.radius;
 	},
 
-	projectPoint: function ( point ) {		
-		
+	projectPoint: function ( point ) {
+
 		return this.orthoPoint( point ).subSelf( point ).negate();
+
 	},
 
-	orthoPoint: function ( point ) {		
+	orthoPoint: function ( point ) {
 
 		var perpendicularMagnitude = this.distanceToPoint( point );
 
 		return new THREE.Vector3().copy( this.normal ).multiplyScalar( perpendicularMagnitude );
+
 	},
 
-	intersectsLine: function ( startPoint, endPoint ) {	
+	intersectsLine: function ( startPoint, endPoint ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 		var startSign = this.distanceToPoint( startPoint );
 		var endSign = this.distanceToPoint( endPoint );
 
 		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
 	},
 
-	coplanarPoint: function () {		
-		
+	coplanarPoint: function () {
+
 		return new THREE.Vector3().copy( this.normal ).multiplyScalar( - this.constant );
+
 	},
 
 	translate: function ( offset ) {
 
-		this.constant =	- offset.dot( normal );
+		this.constant = - offset.dot( this.normal );
 
 		return this;
+
 	},
 
 	equals: function ( plane ) {
 
-		return plane.normal.equals( this.normal ) && ( sphere.constant == this.constant );
+		return plane.normal.equals( this.normal ) && ( plane.constant == this.constant );
 
 	},
 
