@@ -4,8 +4,17 @@
 
 THREE.Plane = function ( normal, constant ) {
 
-	this.normal = normal || new THREE.Vector3();
-	this.constant = constant || 0;
+	if ( normal === undefined && constant === undefined ) {
+
+		this.normal = new THREE.Vector3();
+		this.constant = 0;
+
+	} else {
+
+		this.normal = normal.clone();
+		this.constant = constant || 0;
+
+	}
 
 };
 
@@ -15,7 +24,7 @@ THREE.Plane.prototype = {
 
 	set: function ( normal, constant ) {
 
-		this.normal = normal;
+		this.normal.copy( normal );
 		this.constant = constant;
 
 		return this;
@@ -33,7 +42,7 @@ THREE.Plane.prototype = {
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
 
-		this.normal = normal;
+		this.normal.copy( normal );
 		this.constant = - point.dot( normal );
 
 		return this;

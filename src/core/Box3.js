@@ -12,8 +12,17 @@ THREE.Box3 = function ( min, max ) {
 
 	} else {
 
-		this.min = min || new THREE.Vector3();
-		this.max = max || new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+		this.min = min.clone();
+
+		if( max === undefined ) {
+
+			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
+		} else {
+
+			this.max = max.clone();
+
+		}
 
 	}
 
@@ -25,8 +34,8 @@ THREE.Box3.prototype = {
 
 	set: function ( min, max ) {
 
-		this.min = min;
-		this.max = max;
+		this.min.copy( min );
+		this.max.copy( max );
 
 		return this;
 
@@ -214,9 +223,9 @@ THREE.Box3.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
-			 ( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
+		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
+			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ||
+			 ( box.max.z < this.min.z ) || ( box.min.z > this.max.z ) ) {
 
 			return false;
 
@@ -268,7 +277,7 @@ THREE.Box3.prototype = {
 
 	scale: function ( factor ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
+		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;
