@@ -4,16 +4,19 @@
 
 THREE.Box3 = function ( min, max ) {
 
-	if( min == undefined && max === undefined ) {
+	if ( min === undefined && max === undefined ) {
 
 		this.min = new THREE.Vector3();
 		this.max = new THREE.Vector3();
 		this.makeEmpty();
-	}
-	else {
+
+	} else {
+
 		this.min = min || new THREE.Vector3();
 		this.max = max || new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
 	}
+
 };
 
 THREE.Box3.prototype = {
@@ -81,6 +84,7 @@ THREE.Box3.prototype = {
 		}
 
 		return this;
+
 	},
 
 	setFromCenterAndSize: function ( center, size ) {
@@ -115,6 +119,7 @@ THREE.Box3.prototype = {
 	empty: function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
 		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
 
 	},
@@ -167,8 +172,8 @@ THREE.Box3.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-			( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
-			( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
+			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
+			 ( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
 
 			return true;
 
@@ -181,8 +186,8 @@ THREE.Box3.prototype = {
 	containsBox: function ( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
-			( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
+			 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
 
 			return true;
 
@@ -209,8 +214,8 @@ THREE.Box3.prototype = {
 		// using 6 splitting planes to rule out intersections.
 
 		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
-			( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
+			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
+			 ( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
 
 			return false;
 
