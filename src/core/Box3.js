@@ -168,18 +168,6 @@ THREE.Box3.prototype = {
 		return false;
 	},
 
-	isIntersection: function ( box ) {
-		// using 6 splitting planes to rule out intersections.
-		if( 
-			( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
-			( this.max.z < box.min.z ) || ( box.min.z > this.max.z )
-			) {
-			return false;
-		}
-		return true;
-	},
-
 	getParameter: function ( point ) {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
@@ -198,6 +186,18 @@ THREE.Box3.prototype = {
 	distanceToPoint: function ( point ) {
 
 		return this.clampPoint( point ).subSelf( point ).length();
+	},
+
+	isIntersection: function ( box ) {
+		// using 6 splitting planes to rule out intersections.
+		if( 
+			( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
+			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
+			( this.max.z < box.min.z ) || ( box.min.z > this.max.z )
+			) {
+			return false;
+		}
+		return true;
 	},
 
 	intersect: function ( box ) {
