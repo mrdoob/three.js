@@ -162,15 +162,40 @@ THREE.ShaderDeferred = {
 
 	"normals" : {
 
-		uniforms: { },
+		uniforms: {
+
+			bumpMap: 	  { type: "t", value: null },
+			bumpScale:	  { type: "f", value: 1 },
+			offsetRepeat: { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
+
+		},
 
 		fragmentShader : [
+
+			"#ifdef USE_BUMPMAP",
+
+				"#extension GL_OES_standard_derivatives : enable\n",
+
+				"varying vec2 vUv;",
+				"varying vec3 vViewPosition;",
+
+				THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
+
+			"#endif",
 
 			"varying vec3 normalView;",
 
 			"void main() {",
 
-				"gl_FragColor = vec4( vec3( normalView * 0.5 + 0.5 ), 1.0 );",
+				"vec3 normal = normalize( normalView );",
+
+				"#ifdef USE_BUMPMAP",
+
+					"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
+
+				"#endif",
+
+				"gl_FragColor = vec4( vec3( normal * 0.5 + 0.5 ), 1.0 );",
 
 			"}"
 
@@ -179,6 +204,15 @@ THREE.ShaderDeferred = {
 		vertexShader : [
 
 			"varying vec3 normalView;",
+
+			"#ifdef USE_BUMPMAP",
+
+				"varying vec2 vUv;",
+				"varying vec3 vViewPosition;",
+
+				"uniform vec4 offsetRepeat;",
+
+			"#endif",
 
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 
@@ -204,57 +238,12 @@ THREE.ShaderDeferred = {
 
 				"normalView = normalize( normalMatrix * objectNormal );",
 
-			"}"
+				"#ifdef USE_BUMPMAP",
 
-		].join("\n")
+					"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
+					"vViewPosition = -mvPosition.xyz;",
 
-	},
-
-	"bump" : {
-
-		uniforms: {
-
-			bumpMap: 	  { type: "t", value: null },
-			bumpScale:	  { type: "f", value: 1 },
-			offsetRepeat: { type: "v4", value: new THREE.Vector4( 0, 0, 1, 1 ) }
-
-		},
-
-		fragmentShader : [
-
-			"#extension GL_OES_standard_derivatives : enable\n",
-
-			"varying vec3 normalView;",
-			"varying vec2 vUv;",
-			"varying vec3 vViewPosition;",
-
-			THREE.ShaderChunk[ "bumpmap_pars_fragment" ],
-
-			"void main() {",
-
-				"vec3 normal = normalize( normalView );",
-				"normal = perturbNormalArb( -vViewPosition, normal, dHdxy_fwd() );",
-				"gl_FragColor = vec4( vec3( normal * 0.5 + 0.5 ), 1.0 );",
-
-			"}"
-
-		].join("\n"),
-
-		vertexShader : [
-
-			"varying vec3 normalView;",
-			"varying vec2 vUv;",
-			"varying vec3 vViewPosition;",
-
-			"uniform vec4 offsetRepeat;",
-
-			"void main() {",
-
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"gl_Position = projectionMatrix * mvPosition;",
-				"normalView = normalize( normalMatrix * normal );",
-				"vUv = uv * offsetRepeat.zw + offsetRepeat.xy;",
-				"vViewPosition = -mvPosition.xyz;",
+				"#endif",
 
 			"}"
 

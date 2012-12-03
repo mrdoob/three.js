@@ -40,7 +40,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var colorShader = THREE.ShaderDeferred[ "color" ];
 	var normalShader = THREE.ShaderDeferred[ "normals" ];
-	var bumpShader = THREE.ShaderDeferred[ "bump" ];
 	var clipDepthShader = THREE.ShaderDeferred[ "clipDepth" ];
 
 	//
@@ -193,42 +192,39 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		//	bump map
 		//	bump scale
 
-		if ( originalMaterial.bumpMap ) {
+		if ( originalMaterial.morphTargets || originalMaterial.bumpMap ) {
 
-			var uniforms = THREE.UniformsUtils.clone( bumpShader.uniforms );
-
-			var normalMaterial = new THREE.ShaderMaterial( {
-
-				uniforms: 		uniforms,
-				vertexShader: 	bumpShader.vertexShader,
-				fragmentShader: bumpShader.fragmentShader,
-				defines:		{ "USE_BUMPMAP": true }
-
-			} );
-
-			uniforms.bumpMap.value = originalMaterial.bumpMap;
-			uniforms.bumpScale.value = originalMaterial.bumpScale;
-
-			var offset = originalMaterial.bumpMap.offset;
-			var repeat = originalMaterial.bumpMap.repeat;
-
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-			deferredMaterials.normalMaterial = normalMaterial;
-
-		} else if ( originalMaterial.morphTargets ) {
+			var uniforms = THREE.UniformsUtils.clone( normalShader.uniforms );
+			var defines = { "USE_BUMPMAP": !!originalMaterial.bumpMap };
 
 			var normalMaterial = new THREE.ShaderMaterial( {
 
-				uniforms:       THREE.UniformsUtils.clone( normalShader.uniforms ),
+				uniforms:       uniforms,
 				vertexShader:   normalShader.vertexShader,
 				fragmentShader: normalShader.fragmentShader,
-				shading:		originalMaterial.shading
+				shading:		originalMaterial.shading,
+				defines:		defines
 
 			} );
 
-			normalMaterial.morphTargets = originalMaterial.morphTargets;
-			normalMaterial.morphNormals = originalMaterial.morphNormals;
+			if ( originalMaterial.morphTargets ) {
+
+				normalMaterial.morphTargets = originalMaterial.morphTargets;
+				normalMaterial.morphNormals = originalMaterial.morphNormals;
+
+			}
+
+			if ( originalMaterial.bumpMap ) {
+
+				uniforms.bumpMap.value = originalMaterial.bumpMap;
+				uniforms.bumpScale.value = originalMaterial.bumpScale;
+
+				var offset = originalMaterial.bumpMap.offset;
+				var repeat = originalMaterial.bumpMap.repeat;
+
+				uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+			}
 
 			deferredMaterials.normalMaterial = normalMaterial;
 
