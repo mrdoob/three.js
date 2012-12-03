@@ -12,7 +12,7 @@
 	"../src/math/Sphere.js",
 	"../src/math/Plane.js",
 	"../src/core/EventTarget.js",
-	"../src/core/Ray.js",
+	"../src/core/Raycaster.js",
 	"../src/core/Object3D.js",
 	"../src/core/Projector.js",
 	"../src/cameras/Camera.js",

@@ -4,7 +4,7 @@
 
 ( function ( THREE ) {
 
-	THREE.Ray = function ( origin, direction, near, far ) {
+	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.origin = origin || new THREE.Vector3();
 		this.direction = direction || new THREE.Vector3();
@@ -234,16 +234,16 @@
 
 	//
 
-	THREE.Ray.prototype.precision = 0.0001;
+	THREE.Raycaster.prototype.precision = 0.0001;
 
-	THREE.Ray.prototype.set = function ( origin, direction ) {
+	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
 		this.origin = origin;
 		this.direction = direction;
 
 	};
 
-	THREE.Ray.prototype.intersectObject = function ( object, recursive ) {
+	THREE.Raycaster.prototype.intersectObject = function ( object, recursive ) {
 
 		var intersects = [];
 
@@ -261,7 +261,7 @@
 
 	};
 
-	THREE.Ray.prototype.intersectObjects = function ( objects, recursive ) {
+	THREE.Raycaster.prototype.intersectObjects = function ( objects, recursive ) {
 
 		var intersects = [];
 

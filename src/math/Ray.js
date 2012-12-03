@@ -2,7 +2,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Ray3 = function ( origin, direction ) {
+THREE.Ray = function ( origin, direction ) {
 
 
 	if ( origin === undefined && direction === undefined ) {
@@ -19,9 +19,9 @@ THREE.Ray3 = function ( origin, direction ) {
 
 };
 
-THREE.Ray3.prototype = {
+THREE.Ray.prototype = {
 
-	constructor: THREE.Ray3,
+	constructor: THREE.Ray,
 
 	set: function ( origin, direction) {
 
@@ -114,6 +114,7 @@ THREE.Ray3.prototype = {
 		__v1.copy( this.direction ).crossSelf( ray.direction );
 		__v2.copy( ray.origin ).subSelf( this.origin );
 
+
 		var d = __v1.dot( __v2 );
 		if( d >= 0 ) {
 
@@ -157,11 +158,11 @@ THREE.Ray3.prototype = {
 
 	clone: function () {
 
-		return new THREE.Ray3().copy( this );
+		return new THREE.Ray().copy( this );
 
 	}
 
 };
 
-THREE.Ray3.__v1 = new THREE.Vector3();
-THREE.Ray3.__v2 = new THREE.Vector3();
+THREE.Ray.__v1 = new THREE.Vector3();
+THREE.Ray.__v2 = new THREE.Vector3();
