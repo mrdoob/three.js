@@ -68,13 +68,17 @@ THREE.ShaderDeferred = {
 
 				THREE.ShaderChunk[ "fog_fragment" ],
 
+				//
+
+				"const float compressionScale = 0.999;",
+
 				// diffuse color
 
-				"gl_FragColor.x = vec3_to_float( 0.999 * gl_FragColor.xyz );",
+				"gl_FragColor.x = vec3_to_float( compressionScale * gl_FragColor.xyz );",
 
 				// specular color
 
-				"gl_FragColor.y = vec3_to_float( 0.999 * specular );",
+				"gl_FragColor.y = vec3_to_float( compressionScale * specular );",
 
 				// shininess
 
@@ -82,7 +86,15 @@ THREE.ShaderDeferred = {
 
 				// emissive color
 
-				"gl_FragColor.w = vec3_to_float( 0.999 * emissive );",
+				"#ifdef USE_MAP",
+
+					"gl_FragColor.w = vec3_to_float( compressionScale * emissive * texelColor.xyz );",
+
+				"#else",
+
+					"gl_FragColor.w = vec3_to_float( compressionScale * emissive );",
+
+				"#endif",
 
 			"}"
 
