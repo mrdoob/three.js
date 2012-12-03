@@ -47,9 +47,17 @@ THREE.Ray3.prototype = {
 
 	},
 
+	recastSelf: function ( t ) {
+
+		this.origin = this.at( t );
+
+		return this;
+
+	},
+
 	recast: function ( t ) {
 
-		return new THREE.Ray3( this.at( t ), this.direction );
+		return this.clone().recastSelf( t );
 
 	},
 
@@ -90,7 +98,10 @@ THREE.Ray3.prototype = {
 			var absNum = ( ( num >= 0 ) ? num: -num );
 
 			if (absNum >= absDenom * Number.MAX_VALUE ) {
+
+				// Unsure if this is the correct method to handle this case.
 				return this.origin.clone();
+
 		    }
 	    }
 
@@ -105,10 +116,15 @@ THREE.Ray3.prototype = {
 
 		var d = __v1.dot( __v2 );
 		if( d >= 0 ) {
-			return d;
-		}
-		return -1;
 
+			return d;
+
+		} else {
+
+			// Unsure if this is the correct method to handle this case.
+			return -1;
+
+		}
 	},
 
 	isIntersectionPlane: function ( plane ) {
@@ -128,6 +144,7 @@ THREE.Ray3.prototype = {
 		}
 
 		var t = - ( ( this.origin ^ plane.normal ) - plane.constant ) / a;
+
 		return this.at( t );
 
 	},
