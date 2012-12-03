@@ -496,6 +496,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		scene.traverse( initDeferredProperties );
 
+		this.renderer.autoUpdateScene = false;
+		scene.updateMatrixWorld();
+
 		// g-buffer color
 
 		scene.traverse( setMaterialColor );
@@ -510,6 +513,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		scene.traverse( setMaterialNormal );
 		compNormal.render();
+
+		this.renderer.autoUpdateScene = true;
 
 		// light pass
 
