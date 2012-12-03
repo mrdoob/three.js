@@ -5,14 +5,32 @@
 
 THREE.WebGLDeferredRenderer = function ( parameters ) {
 
+	var _this = this;
+
 	var width = parameters.width;
 	var height = parameters.height;
 	var scale = parameters.scale;
 
-	var renderer = parameters.renderer;
+	var scaledWidth = Math.floor( scale * width );
+	var scaledHeight = Math.floor( scale * height );
 
 	var additiveSpecular = parameters.additiveSpecular;
 	var multiply = parameters.multiply;
+
+	this.renderer = parameters.renderer;
+
+	if ( this.renderer === undefined ) {
+
+		this.renderer = new THREE.WebGLRenderer( { alpha: false } );
+		this.renderer.setSize( width, height );
+		this.renderer.setClearColorHex( 0x000000, 1 );
+
+		this.renderer.autoClear = false;
+
+	}
+
+	this.domElement = this.renderer.domElement;
+
 
 	//
 
@@ -268,8 +286,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
 		materialLight.uniforms[ "lightColor" ].value = light.color;
 
-		materialLight.uniforms[ "viewWidth" ].value = width;
-		materialLight.uniforms[ "viewHeight" ].value = height;
+		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
+		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
 		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
 		materialLight.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
@@ -310,8 +328,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
 		materialLight.uniforms[ "lightColor" ].value = light.color;
 
-		materialLight.uniforms[ "viewWidth" ].value = width;
-		materialLight.uniforms[ "viewHeight" ].value = height;
+		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
+		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
 		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
 		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
@@ -345,8 +363,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		} );
 
 
-		materialLight.uniforms[ "viewWidth" ].value = width;
-		materialLight.uniforms[ "viewHeight" ].value = height;
+		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
+		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
 		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
 		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
@@ -410,18 +428,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		compColor.setSize( width, height );
-		compNormal.setSize( width, height );
-		compDepth.setSize( width, height );
-		compLight.setSize( width, height );
-		compFinal.setSize( width, height );
+		this.renderer.setSize( width, height );
+
+		scaledWidth = Math.floor( scale * width );
+		scaledHeight = Math.floor( scale * height );
+
+		compColor.setSize( scaledWidth, scaledHeight );
+		compNormal.setSize( scaledWidth, scaledHeight );
+		compDepth.setSize( scaledWidth, scaledHeight );
+		compLight.setSize( scaledWidth, scaledHeight );
+		compFinal.setSize( scaledWidth, scaledHeight );
 
 		for ( var i = 0, il = lightMaterials.length; i < il; i ++ ) {
 
 			var uniforms = lightMaterials[ i ].uniforms;
 
-			uniforms[ "viewWidth" ].value = width;
-			uniforms[ "viewHeight" ].value = height;
+			uniforms[ "viewWidth" ].value = scaledWidth;
+			uniforms[ "viewHeight" ].value = scaledHeight;
 
 			uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
 			uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
@@ -436,7 +459,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
 
-		effectFXAA.uniforms[ 'resolution' ].value.set( scale / width, scale / height );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
 	};
 
@@ -530,11 +553,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// g-buffers
 
-		var rtColor   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatNearest );
-		var rtNormal  = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
-		var rtDepth   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
-		var rtLight   = new THREE.WebGLRenderTarget( width, height, rtParamsFloatLinear );
-		var rtFinal   = new THREE.WebGLRenderTarget( width, height, rtParamsUByte );
+		var rtColor   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatNearest );
+		var rtNormal  = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
+		var rtDepth   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
+		var rtLight   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
+		var rtFinal   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsUByte );
 
 		rtColor.generateMipmaps = false;
 		rtNormal.generateMipmaps = false;
@@ -545,22 +568,22 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// composers
 
 		passColor = new THREE.RenderPass();
-		compColor = new THREE.EffectComposer( renderer, rtColor );
+		compColor = new THREE.EffectComposer( _this.renderer, rtColor );
 		compColor.addPass( passColor );
 
 		passNormal = new THREE.RenderPass();
-		compNormal = new THREE.EffectComposer( renderer, rtNormal );
+		compNormal = new THREE.EffectComposer( _this.renderer, rtNormal );
 		compNormal.addPass( passNormal );
 
 		passDepth = new THREE.RenderPass();
-		compDepth = new THREE.EffectComposer( renderer, rtDepth );
+		compDepth = new THREE.EffectComposer( _this.renderer, rtDepth );
 		compDepth.addPass( passDepth );
 
 		passLightFullscreen = new THREE.RenderPass();
 		passLightProxy = new THREE.RenderPass();
 		passLightProxy.clear = false;
 
-		compLight = new THREE.EffectComposer( renderer, rtLight );
+		compLight = new THREE.EffectComposer( _this.renderer, rtLight );
 		compLight.addPass( passLightFullscreen );
 		compLight.addPass( passLightProxy );
 
@@ -573,12 +596,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// FXAA
 
 		effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-		effectFXAA.uniforms[ 'resolution' ].value.set( scale / width, scale / height );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 		effectFXAA.renderToScreen = true;
 
 		//
 
-		compFinal = new THREE.EffectComposer( renderer, rtFinal );
+		compFinal = new THREE.EffectComposer( _this.renderer, rtFinal );
 		compFinal.addPass( compositePass );
 		compFinal.addPass( effectFXAA );
 

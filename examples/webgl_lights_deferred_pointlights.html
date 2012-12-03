@@ -76,9 +76,6 @@
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight - 2 * MARGIN;
 
-			var SCALED_WIDTH = Math.floor( SCALE * WIDTH );
-			var SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
-
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
 
@@ -114,11 +111,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
-				renderer.setSize( WIDTH, HEIGHT );
-				renderer.setClearColorHex( 0x000000, 1 );
-
-				renderer.autoClear = false;
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, additiveSpecular: false, multiply: 2 } );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -148,10 +141,6 @@
 				// clock
 
 				clock = new THREE.Clock();
-
-				// deferred helper
-
-				deferredRenderer = new THREE.WebGLDeferredRenderer( { renderer: renderer, width: SCALED_WIDTH, height: SCALED_HEIGHT, scale: SCALE, additiveSpecular: false, multiply: 2 } );
 
 				// add lights
 
@@ -375,11 +364,7 @@
 				WIDTH = window.innerWidth;
 				HEIGHT = window.innerHeight - 2 * MARGIN;
 
-				SCALED_WIDTH = Math.floor( SCALE * WIDTH );
-				SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
-
 				renderer.setSize( WIDTH, HEIGHT );
-				deferredRenderer.setSize( SCALED_WIDTH, SCALED_HEIGHT );
 
 				camera.aspect = WIDTH / HEIGHT;
 				camera.updateProjectionMatrix();
@@ -433,6 +418,8 @@
 
 				}
 
+				// update camera
+
 				var delta = clock.getDelta();
 
 				targetX = mouseX * .001;
@@ -445,7 +432,9 @@
 
 				camera.lookAt( target );
 
-				deferredRenderer.render( scene, camera );
+				// render
+
+				renderer.render( scene, camera );
 
 			}
 
