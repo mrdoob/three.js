@@ -252,7 +252,7 @@ THREE.Box2.prototype = {
 
 	scale: function ( factor ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
+		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;

@@ -11,13 +11,13 @@ test( "constructor", function() {
 	ok( a.normal.z == 0, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 
-	a = new THREE.Plane( one, 0 );
+	a = new THREE.Plane( one3, 0 );
 	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 1, "Passed!" );
 	ok( a.normal.z == 1, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 
-	a = new THREE.Plane( one, 1 );
+	a = new THREE.Plane( one3, 1 );
 	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 1, "Passed!" );
 	ok( a.normal.z == 1, "Passed!" );
@@ -72,18 +72,18 @@ test( "setComponents", function() {
 });
 
 test( "setFromNormalAndCoplanarPoint", function() {
-	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( one, zero );
+	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( one3, zero3 );
 	
-	ok( a.normal.equals( one ), "Passed!" );
+	ok( a.normal.equals( one3 ), "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 });
 
 test( "flip", function() {
-	var a = new THREE.Plane( one, 0 );
+	var a = new THREE.Plane( one3, 0 );
 	
-	ok( a.normal.equals( one ), "Passed!" );
+	ok( a.normal.equals( one3 ), "Passed!" );
 	a.flip();
-	ok( a.normal.negate().equals( one ), "Passed!" );
+	ok( a.normal.negate().equals( one3 ), "Passed!" );
 });
 
 test( "normalize", function() {
