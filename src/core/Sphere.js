@@ -117,7 +117,7 @@ THREE.Sphere.prototype = {
 
 	equals: function ( sphere ) {
 
-		return sphere.center.equals( this.center ) && ( sphere.radius == this.radius );
+		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
 
 	},
 

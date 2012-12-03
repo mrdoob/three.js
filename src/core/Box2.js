@@ -4,7 +4,7 @@
 
 THREE.Box2 = function ( min, max ) {
 
-	if ( min == undefined && max === undefined ) {
+	if ( min === undefined && max === undefined ) {
 
 		this.min = new THREE.Vector2();
 		this.max = new THREE.Vector2();
@@ -107,6 +107,7 @@ THREE.Box2.prototype = {
 	empty: function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
 		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
 
 	},
@@ -156,7 +157,7 @@ THREE.Box2.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-			( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
+			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
 
 			return true;
 
@@ -169,7 +170,7 @@ THREE.Box2.prototype = {
 	containsBox: function ( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
 
 			return true;
 
@@ -180,24 +181,30 @@ THREE.Box2.prototype = {
 	},
 
 	getParameter: function ( point ) {
+
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
+
 		return new THREE.Vector2(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y )
 		);
+
 	},
 
 	isIntersection: function ( box ) {
+
 		// using 6 splitting planes to rule out intersections.
+
 		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ) {
+			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ) {
 
 			return false;
 
 		}
 
 		return true;
+
 	},
 
 	clampPoint: function ( point ) {

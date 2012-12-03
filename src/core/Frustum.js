@@ -21,7 +21,6 @@ THREE.Frustum = function ( ) {
 
 THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 
-	var plane;
 	var planes = this.planes;
 
 	var me = m.elements;
@@ -38,18 +37,22 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 	planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
 
 	for ( var i = 0; i < 6; i ++ ) {
+
 		planes[ i ].normalize();
+
 	}
 
 };
 
 THREE.Frustum.prototype.contains = function ( object ) {
 
-	var distance = 0.0;
 	var planes = this.planes;
+
 	var matrix = object.matrixWorld;
 	var matrixPosition = matrix.getPosition();
 	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+
+	var distance = 0.0;
 
 	for ( var i = 0; i < 6; i ++ ) {
 

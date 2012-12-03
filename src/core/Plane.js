@@ -19,6 +19,7 @@ THREE.Plane.prototype = {
 		this.constant = constant;
 
 		return this;
+
 	},
 
 	setComponents: function ( x, y, z, w ) {
@@ -27,6 +28,7 @@ THREE.Plane.prototype = {
 		this.constant = w;
 
 		return this;
+
 	},
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
@@ -35,6 +37,7 @@ THREE.Plane.prototype = {
 		this.constant = - point.dot( normal );
 
 		return this;
+
 	},
 
 	setFromCoplanarPoints: function ( a, b, c ) {
@@ -69,6 +72,7 @@ THREE.Plane.prototype = {
 	normalize: function () {
 
 		// Note: will lead to a divide by zero if the plane is invalid.
+
 		var inverseNormalLength = 1.0 / this.normal.length();
 		this.normal.multiplyScalar( inverseNormalLength );
 		this.constant *= inverseNormalLength;
@@ -80,11 +84,13 @@ THREE.Plane.prototype = {
 	distanceToPoint: function ( point ) {
 
 		return this.normal.dot( point ) + this.constant;
+
 	},
 
 	distanceToSphere: function ( sphere ) {
 
 		return this.distanceToPoint( sphere.center ) - sphere.radius;
+
 	},
 
 	projectPoint: function ( point ) {
@@ -104,6 +110,7 @@ THREE.Plane.prototype = {
 	intersectsLine: function ( startPoint, endPoint ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
 		var startSign = this.distanceToPoint( startPoint );
 		var endSign = this.distanceToPoint( endPoint );
 
@@ -134,6 +141,7 @@ THREE.Plane.prototype = {
 	clone: function () {
 
 		return new THREE.Plane().copy( this );
+
 	}
 
 };

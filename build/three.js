@@ -682,6 +682,15 @@ THREE.Vector2.prototype = {
 
 	},
 
+	addScalar: function ( s ) {
+
+		this.x += s;
+		this.y += s;
+
+		return this;
+
+	},
+
 	add: function ( a, b ) {
 
 		this.x = a.x + b.x;
@@ -697,7 +706,7 @@ THREE.Vector2.prototype = {
 		this.y += v.y;
 
 		return this;
-		
+
 	},
 
 	sub: function ( a, b ) {
@@ -746,11 +755,16 @@ THREE.Vector2.prototype = {
 
 	minSelf: function ( v ) {
 
-		if( this.x > v.x ) {
+		if ( this.x > v.x ) {
+
 			this.x = v.x;
+
 		}
-		if( this.y > v.y ) {
+
+		if ( this.y > v.y ) {
+
 			this.y = v.y;
+
 		}
 
 		return this;
@@ -759,11 +773,16 @@ THREE.Vector2.prototype = {
 
 	maxSelf: function ( v ) {
 
-		if( this.x < v.x ) {
+		if ( this.x < v.x ) {
+
 			this.x = v.x;
+
 		}
-		if( this.y < v.y ) {
+
+		if ( this.y < v.y ) {
+
 			this.y = v.y;
+
 		}
 
 		return this;
@@ -774,21 +793,28 @@ THREE.Vector2.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		if( this.x < min.x ) {
+		if ( this.x < min.x ) {
+
 			this.x = min.x;
-		}
-		else if( this.x > max.x ) {
+
+		} else if ( this.x > max.x ) {
+
 			this.x = max.x;
+
 		}
 
-		if( this.y < min.y ) {
+		if ( this.y < min.y ) {
+
 			this.y = min.y;
-		}
-		else if( this.y > max.y ) {
+
+		} else if ( this.y > max.y ) {
+
 			this.y = max.y;
+
 		}
 
 		return this;
+
 	},
 
 	negate: function() {
@@ -1040,14 +1066,22 @@ THREE.Vector3.prototype = {
 
 	minSelf: function ( v ) {
 
-		if( this.x > v.x ) {
+		if ( this.x > v.x ) {
+
 			this.x = v.x;
+
 		}
-		if( this.y > v.y ) {
+
+		if ( this.y > v.y ) {
+
 			this.y = v.y;
+
 		}
-		if( this.z > v.z ) {
+
+		if ( this.z > v.z ) {
+
 			this.z = v.z;
+
 		}
 
 		return this;
@@ -1056,14 +1090,22 @@ THREE.Vector3.prototype = {
 
 	maxSelf: function ( v ) {
 
-		if( this.x < v.x ) {
+		if ( this.x < v.x ) {
+
 			this.x = v.x;
+
 		}
-		if( this.y < v.y ) {
+
+		if ( this.y < v.y ) {
+
 			this.y = v.y;
+
 		}
-		if( this.z < v.z ) {
+
+		if ( this.z < v.z ) {
+
 			this.z = v.z;
+
 		}
 
 		return this;
@@ -1074,28 +1116,38 @@ THREE.Vector3.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		if( this.x < min.x ) {
+		if ( this.x < min.x ) {
+
 			this.x = min.x;
-		}
-		else if( this.x > max.x ) {
+
+		} else if ( this.x > max.x ) {
+
 			this.x = max.x;
+
 		}
 
-		if( this.y < min.y ) {
+		if ( this.y < min.y ) {
+
 			this.y = min.y;
-		}
-		else if( this.y > max.y ) {
+
+		} else if ( this.y > max.y ) {
+
 			this.y = max.y;
+
 		}
 
-		if( this.z < min.z ) {
+		if ( this.z < min.z ) {
+
 			this.z = min.z;
-		}
-		else if( this.z > max.z ) {
+
+		} else if ( this.z > max.z ) {
+
 			this.z = max.z;
+
 		}
 
 		return this;
+
 	},
 
 	negate: function() {
@@ -1481,6 +1533,17 @@ THREE.Vector4.prototype = {
 
 	},
 
+	addScalar: function ( s ) {
+
+		this.x += s;
+		this.y += s;
+		this.z += s;
+		this.w += s;
+
+		return this;
+
+	},
+
 	add: function ( a, b ) {
 
 		this.x = a.x + b.x;
@@ -1560,17 +1623,28 @@ THREE.Vector4.prototype = {
 
 	minSelf: function ( v ) {
 
-		if( this.x > v.x ) {
+		if ( this.x > v.x ) {
+
 			this.x = v.x;
+
 		}
-		if( this.y > v.y ) {
+
+		if ( this.y > v.y ) {
+
 			this.y = v.y;
+
 		}
-		if( this.z > v.z ) {
+
+		if ( this.z > v.z ) {
+
 			this.z = v.z;
+
 		}
-		if( this.w > v.w ) {
+
+		if ( this.w > v.w ) {
+
 			this.w = v.w;
+
 		}
 
 		return this;
@@ -1579,17 +1653,28 @@ THREE.Vector4.prototype = {
 
 	maxSelf: function ( v ) {
 
-		if( this.x < v.x ) {
+		if ( this.x < v.x ) {
+
 			this.x = v.x;
+
 		}
-		if( this.y < v.y ) {
+
+		if ( this.y < v.y ) {
+
 			this.y = v.y;
+
 		}
-		if( this.z < v.z ) {
+
+		if ( this.z < v.z ) {
+
 			this.z = v.z;
+
 		}
-		if( this.w < v.w ) {
+
+		if ( this.w < v.w ) {
+
 			this.w = v.w;
+
 		}
 
 		return this;
@@ -1600,35 +1685,48 @@ THREE.Vector4.prototype = {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
-		if( this.x < min.x ) {
+		if ( this.x < min.x ) {
+
 			this.x = min.x;
-		}
-		else if( this.x > max.x ) {
+
+		} else if ( this.x > max.x ) {
+
 			this.x = max.x;
+
 		}
 
-		if( this.y < min.y ) {
+		if ( this.y < min.y ) {
+
 			this.y = min.y;
-		}
-		else if( this.y > max.y ) {
+
+		} else if ( this.y > max.y ) {
+
 			this.y = max.y;
+
 		}
 
-		if( this.z < min.z ) {
+		if ( this.z < min.z ) {
+
 			this.z = min.z;
-		}
-		else if( this.z > max.z ) {
+
+		} else if ( this.z > max.z ) {
+
 			this.z = max.z;
+
 		}
 
-		if( this.w < min.w ) {
+		if ( this.w < min.w ) {
+
 			this.w = min.w;
-		}
-		else if( this.w > max.w ) {
+
+		} else if ( this.w > max.w ) {
+
 			this.w = max.w;
+
 		}
 
 		return this;
+
 	},
 
 	negate: function() {
@@ -1834,7 +1932,7 @@ THREE.Vector4.prototype = {
 						 + ( m13 - m31 ) * ( m13 - m31 )
 						 + ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
 
-		if ( Math.abs( s ) < 0.001 ) s = 1; 
+		if ( Math.abs( s ) < 0.001 ) s = 1;
 
 		// prevent divide by zero, should not happen if matrix is orthogonal and should be
 		// caught by singularity test above, but I've left it in just in case
@@ -1855,14 +1953,19 @@ THREE.Vector4.prototype = {
 
 THREE.Box2 = function ( min, max ) {
 
-	if ( min == undefined && max === undefined ) {
+	if ( min === undefined && max === undefined ) {
+
 		this.min = new THREE.Vector2();
 		this.max = new THREE.Vector2();
 		this.makeEmpty();
+
 	} else {
+
 		this.min = min || new THREE.Vector2();
 		this.max = max || new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
 	}
+
 };
 
 THREE.Box2.prototype = {
@@ -1953,6 +2056,7 @@ THREE.Box2.prototype = {
 	empty: function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
 		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
 
 	},
@@ -2002,7 +2106,7 @@ THREE.Box2.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-			( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
+			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
 
 			return true;
 
@@ -2015,7 +2119,7 @@ THREE.Box2.prototype = {
 	containsBox: function ( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
 
 			return true;
 
@@ -2026,24 +2130,30 @@ THREE.Box2.prototype = {
 	},
 
 	getParameter: function ( point ) {
+
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
+
 		return new THREE.Vector2(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y )
 		);
+
 	},
 
 	isIntersection: function ( box ) {
+
 		// using 6 splitting planes to rule out intersections.
+
 		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ) {
+			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ) {
 
 			return false;
 
 		}
 
 		return true;
+
 	},
 
 	clampPoint: function ( point ) {
@@ -2115,19 +2225,19 @@ THREE.Box2.__v1 = new THREE.Vector2();
 
 THREE.Box3 = function ( min, max ) {
 
-	if( min == undefined && max === undefined ) {
+	if ( min === undefined && max === undefined ) {
 
 		this.min = new THREE.Vector3();
 		this.max = new THREE.Vector3();
-		this.min.x = this.min.y = this.min.z = Infinity;
-		this.max.x = this.max.y = this.max.z = -Infinity;
-		console.log( this );
+		this.makeEmpty();
 
 	} else {
 
 		this.min = min || new THREE.Vector3();
 		this.max = max || new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
 	}
+
 };
 
 THREE.Box3.prototype = {
@@ -2195,6 +2305,7 @@ THREE.Box3.prototype = {
 		}
 
 		return this;
+
 	},
 
 	setFromCenterAndSize: function ( center, size ) {
@@ -2229,6 +2340,7 @@ THREE.Box3.prototype = {
 	empty: function () {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
 		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
 
 	},
@@ -2281,8 +2393,8 @@ THREE.Box3.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-			( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
-			( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
+			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
+			 ( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
 
 			return true;
 
@@ -2295,8 +2407,8 @@ THREE.Box3.prototype = {
 	containsBox: function ( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
-			( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
+			 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
 
 			return true;
 
@@ -2323,8 +2435,8 @@ THREE.Box3.prototype = {
 		// using 6 splitting planes to rule out intersections.
 
 		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
-			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
-			( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
+			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
+			 ( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
 
 			return false;
 
@@ -3666,7 +3778,6 @@ THREE.Frustum = function ( ) {
 
 THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 
-	var plane;
 	var planes = this.planes;
 
 	var me = m.elements;
@@ -3683,18 +3794,22 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 	planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
 
 	for ( var i = 0; i < 6; i ++ ) {
+
 		planes[ i ].normalize();
+
 	}
 
 };
 
 THREE.Frustum.prototype.contains = function ( object ) {
 
-	var distance = 0.0;
 	var planes = this.planes;
+
 	var matrix = object.matrixWorld;
 	var matrixPosition = matrix.getPosition();
 	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+
+	var distance = 0.0;
 
 	for ( var i = 0; i < 6; i ++ ) {
 
@@ -3729,6 +3844,7 @@ THREE.Plane.prototype = {
 		this.constant = constant;
 
 		return this;
+
 	},
 
 	setComponents: function ( x, y, z, w ) {
@@ -3737,6 +3853,7 @@ THREE.Plane.prototype = {
 		this.constant = w;
 
 		return this;
+
 	},
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
@@ -3745,12 +3862,13 @@ THREE.Plane.prototype = {
 		this.constant = - point.dot( normal );
 
 		return this;
+
 	},
 
 	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var normal = THREE.Plane3.__v1.sub( b, a ).cross(
-			THREE.Plane3.__v2.sub( c, a ) );
+		var normal = THREE.Plane.__v1.sub( b, a ).cross(
+			THREE.Plane.__v2.sub( c, a ) );
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 		this.setFromNormalAndCoplanarPoint( normal, a );
@@ -3779,6 +3897,7 @@ THREE.Plane.prototype = {
 	normalize: function () {
 
 		// Note: will lead to a divide by zero if the plane is invalid.
+
 		var inverseNormalLength = 1.0 / this.normal.length();
 		this.normal.multiplyScalar( inverseNormalLength );
 		this.constant *= inverseNormalLength;
@@ -3790,11 +3909,13 @@ THREE.Plane.prototype = {
 	distanceToPoint: function ( point ) {
 
 		return this.normal.dot( point ) + this.constant;
+
 	},
 
 	distanceToSphere: function ( sphere ) {
 
 		return this.distanceToPoint( sphere.center ) - sphere.radius;
+
 	},
 
 	projectPoint: function ( point ) {
@@ -3814,6 +3935,7 @@ THREE.Plane.prototype = {
 	intersectsLine: function ( startPoint, endPoint ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
 		var startSign = this.distanceToPoint( startPoint );
 		var endSign = this.distanceToPoint( endPoint );
 
@@ -3843,7 +3965,7 @@ THREE.Plane.prototype = {
 
 	clone: function () {
 
-		return new THREE.Plane3().copy( this );
+		return new THREE.Plane().copy( this );
 
 	}
 
@@ -4456,7 +4578,7 @@ THREE.Sphere.prototype = {
 
 	equals: function ( sphere ) {
 
-		return sphere.center.equals( this.center ) && ( sphere.radius == this.radius );
+		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
 
 	},
 
