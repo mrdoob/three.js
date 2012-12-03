@@ -657,6 +657,22 @@ THREE.Vector2.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -681,7 +697,7 @@ THREE.Vector2.prototype = {
 		this.y += v.y;
 
 		return this;
-
+		
 	},
 
 	sub: function ( a, b ) {
@@ -726,6 +742,53 @@ THREE.Vector2.prototype = {
 
 		return this;
 
+	},
+
+	minSelf: function ( v ) {
+
+		if( this.x > v.x ) {
+			this.x = v.x;
+		}
+		if( this.y > v.y ) {
+			this.y = v.y;
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if( this.x < v.x ) {
+			this.x = v.x;
+		}
+		if( this.y < v.y ) {
+			this.y = v.y;
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if( this.x < min.x ) {
+			this.x = min.x;
+		}
+		else if( this.x > max.x ) {
+			this.x = max.x;
+		}
+
+		if( this.y < min.y ) {
+			this.y = min.y;
+		}
+		else if( this.y > max.y ) {
+			this.y = max.y;
+		}
+
+		return this;
 	},
 
 	negate: function() {
@@ -801,7 +864,7 @@ THREE.Vector2.prototype = {
 };
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author kile / http://kile.stravaganza.org/
+ * @author *kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
  * @author egraether / http://egraether.com/
@@ -975,6 +1038,65 @@ THREE.Vector3.prototype = {
 
 	},
 
+	minSelf: function ( v ) {
+
+		if( this.x > v.x ) {
+			this.x = v.x;
+		}
+		if( this.y > v.y ) {
+			this.y = v.y;
+		}
+		if( this.z > v.z ) {
+			this.z = v.z;
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if( this.x < v.x ) {
+			this.x = v.x;
+		}
+		if( this.y < v.y ) {
+			this.y = v.y;
+		}
+		if( this.z < v.z ) {
+			this.z = v.z;
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if( this.x < min.x ) {
+			this.x = min.x;
+		}
+		else if( this.x > max.x ) {
+			this.x = max.x;
+		}
+
+		if( this.y < min.y ) {
+			this.y = min.y;
+		}
+		else if( this.y > max.y ) {
+			this.y = max.y;
+		}
+
+		if( this.z < min.z ) {
+			this.z = min.z;
+		}
+		else if( this.z > max.z ) {
+			this.z = max.z;
+		}
+
+		return this;
+	},
 
 	negate: function() {
 
@@ -1316,6 +1438,38 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
+	setZ: function ( z ) {
+
+		this.z = z;
+
+		return this;
+
+	},
+
+	setW: function ( w ) {
+
+		this.w = w;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -1404,6 +1558,78 @@ THREE.Vector4.prototype = {
 
 	},
 
+	minSelf: function ( v ) {
+
+		if( this.x > v.x ) {
+			this.x = v.x;
+		}
+		if( this.y > v.y ) {
+			this.y = v.y;
+		}
+		if( this.z > v.z ) {
+			this.z = v.z;
+		}
+		if( this.w > v.w ) {
+			this.w = v.w;
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if( this.x < v.x ) {
+			this.x = v.x;
+		}
+		if( this.y < v.y ) {
+			this.y = v.y;
+		}
+		if( this.z < v.z ) {
+			this.z = v.z;
+		}
+		if( this.w < v.w ) {
+			this.w = v.w;
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if( this.x < min.x ) {
+			this.x = min.x;
+		}
+		else if( this.x > max.x ) {
+			this.x = max.x;
+		}
+
+		if( this.y < min.y ) {
+			this.y = min.y;
+		}
+		else if( this.y > max.y ) {
+			this.y = max.y;
+		}
+
+		if( this.z < min.z ) {
+			this.z = min.z;
+		}
+		else if( this.z > max.z ) {
+			this.z = max.z;
+		}
+
+		if( this.w < min.w ) {
+			this.w = min.w;
+		}
+		else if( this.w > max.w ) {
+			this.w = max.w;
+		}
+
+		return this;
+	},
 
 	negate: function() {
 
@@ -1455,6 +1681,12 @@ THREE.Vector4.prototype = {
 		this.w += ( v.w - this.w ) * alpha;
 
 		return this;
+
+	},
+
+	equals: function ( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
 
 	},
 
@@ -1617,6 +1849,554 @@ THREE.Vector4.prototype = {
 	}
 
 };
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Box2 = function ( min, max ) {
+
+	if ( min == undefined && max === undefined ) {
+		this.min = new THREE.Vector2();
+		this.max = new THREE.Vector2();
+		this.makeEmpty();
+	} else {
+		this.min = min || new THREE.Vector2();
+		this.max = max || new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+	}
+};
+
+THREE.Box2.prototype = {
+
+	constructor: THREE.Box2,
+
+	set: function ( min, max ) {
+
+		this.min = min;
+		this.max = max;
+
+		return this;
+	},
+
+	setFromPoints: function ( points ) {
+
+		if ( points.length > 0 ) {
+
+			var p = points[ 0 ];
+
+			this.min.copy( p );
+			this.max.copy( p );
+
+			for ( var i = 1, il = points.length; i < il; i ++ ) {
+
+				p = points[ i ];
+
+				if ( p.x < this.min.x ) {
+
+					this.min.x = p.x;
+
+				} else if ( p.x > this.max.x ) {
+
+					this.max.x = p.x;
+
+				}
+
+				if ( p.y < this.min.y ) {
+
+					this.min.y = p.y;
+
+				} else if ( p.y > this.max.y ) {
+
+					this.max.y = p.y;
+
+				}
+
+			}
+
+		} else {
+
+			this.makeEmpty();
+
+		}
+
+		return this;
+
+	},
+
+	setFromCenterAndSize: function ( center, size ) {
+
+		var halfSize = THREE.Box2.__v1.copy( size ).multiplyScalar( 0.5 );
+		this.min.copy( center ).subSelf( halfSize );
+		this.max.copy( center ).addSelf( halfSize );
+
+		return this;
+
+	},
+
+	copy: function ( box ) {
+
+		this.min.copy( box.min );
+		this.max.copy( box.max );
+
+		return this;
+
+	},
+
+	makeEmpty: function () {
+
+		this.min.x = this.min.y = Infinity;
+		this.max.x = this.max.y = -Infinity;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
+
+	},
+
+	volume: function () {
+
+		return ( this.max.x - this.min.x ) * ( this.max.y - this.min.y );
+
+	},
+
+	center: function () {
+
+		return new THREE.Vector2().add( this.min, this.max ).multiplyScalar( 0.5 );
+
+	},
+
+	size: function () {
+
+		return new THREE.Vector2().sub( this.max, this.min );
+
+	},
+
+	expandByPoint: function ( point ) {
+
+		this.min.minSelf( point );
+		this.max.maxSelf( point );
+
+		return this;
+	},
+
+	expandByVector: function ( vector ) {
+
+		this.min.subSelf( vector );
+		this.max.addSelf( vector );
+
+		return this;
+	},
+
+	expandByScalar: function ( scalar ) {
+
+		this.min.addScalar( -scalar );
+		this.max.addScalar( scalar );
+
+		return this;
+	},
+
+	containsPoint: function ( point ) {
+
+		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
+			( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	containsBox: function ( box ) {
+
+		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
+			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	getParameter: function ( point ) {
+		// This can potentially have a divide by zero if the box
+		// has a size dimension of 0.
+		return new THREE.Vector2(
+			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
+			( point.y - this.min.y ) / ( this.max.y - this.min.y )
+		);
+	},
+
+	isIntersection: function ( box ) {
+		// using 6 splitting planes to rule out intersections.
+		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
+			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ) {
+
+			return false;
+
+		}
+
+		return true;
+	},
+
+	clampPoint: function ( point ) {
+
+		return new THREE.Vector2().copy( point ).clampSelf( this.min, this.max );
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return this.clampPoint( point ).subSelf( point ).length();
+
+	},
+
+	intersect: function ( box ) {
+
+		this.min.maxSelf( box.min );
+		this.max.minSelf( box.max );
+
+		return this;
+
+	},
+
+	union: function ( box ) {
+
+		this.min.minSelf( box.min );
+		this.max.maxSelf( box.max );
+
+		return this;
+
+	},
+
+	translate: function ( offset ) {
+
+		this.min.addSelf( offset );
+		this.max.addSelf( offset );
+
+		return this;
+
+	},
+
+	scale: function ( factor ) {
+
+		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
+		this.expandByVector( sizeDeltaHalf );
+
+		return this;
+
+	},
+
+	equals: function ( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Box2().copy( this );
+
+	}
+
+};
+
+THREE.Box2.__v1 = new THREE.Vector2();
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Box3 = function ( min, max ) {
+
+	if( min == undefined && max === undefined ) {
+
+		this.min = new THREE.Vector3();
+		this.max = new THREE.Vector3();
+		this.min.x = this.min.y = this.min.z = Infinity;
+		this.max.x = this.max.y = this.max.z = -Infinity;
+		console.log( this );
+
+	} else {
+
+		this.min = min || new THREE.Vector3();
+		this.max = max || new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+	}
+};
+
+THREE.Box3.prototype = {
+
+	constructor: THREE.Box3,
+
+	set: function ( min, max ) {
+
+		this.min = min;
+		this.max = max;
+
+		return this;
+
+	},
+
+	setFromPoints: function ( points ) {
+
+		if ( points.length > 0 ) {
+
+			var p = points[ 0 ];
+
+			this.min.copy( p );
+			this.max.copy( p );
+
+			for ( var i = 1, il = points.length; i < il; i ++ ) {
+
+				p = points[ i ];
+
+				if ( p.x < this.min.x ) {
+
+					this.min.x = p.x;
+
+				} else if ( p.x > this.max.x ) {
+
+					this.max.x = p.x;
+
+				}
+
+				if ( p.y < this.min.y ) {
+
+					this.min.y = p.y;
+
+				} else if ( p.y > this.max.y ) {
+
+					this.max.y = p.y;
+
+				}
+
+				if ( p.z < this.min.z ) {
+
+					this.min.z = p.z;
+
+				} else if ( p.z > this.max.z ) {
+
+					this.max.z = p.z;
+
+				}
+
+			}
+
+		} else {
+
+			this.makeEmpty();
+
+		}
+
+		return this;
+	},
+
+	setFromCenterAndSize: function ( center, size ) {
+
+		var halfSize = THREE.Box3.__v1.copy( size ).multiplyScalar( 0.5 );
+
+		this.min.copy( center ).subSelf( halfSize );
+		this.max.copy( center ).addSelf( halfSize );
+
+		return this;
+
+	},
+
+	copy: function ( box ) {
+
+		this.min.copy( box.min );
+		this.max.copy( box.max );
+
+		return this;
+
+	},
+
+	makeEmpty: function () {
+
+		this.min.x = this.min.y = this.min.z = Infinity;
+		this.max.x = this.max.y = this.max.z = -Infinity;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
+
+	},
+
+	volume: function () {
+
+		return ( this.max.x - this.min.x ) * ( this.max.y - this.min.y ) * ( this.max.z - this.min.z );
+
+	},
+
+	center: function () {
+
+		return new THREE.Vector3().add( this.min, this.max ).multiplyScalar( 0.5 );
+
+	},
+
+	size: function () {
+
+		return new THREE.Vector3().sub( this.max, this.min );
+
+	},
+
+	expandByPoint: function ( point ) {
+
+		this.min.minSelf( point );
+		this.max.maxSelf( point );
+
+		return this;
+
+	},
+
+	expandByVector: function ( vector ) {
+
+		this.min.subSelf( vector );
+		this.max.addSelf( vector );
+
+		return this;
+
+	},
+
+	expandByScalar: function ( scalar ) {
+
+		this.min.addScalar( -scalar );
+		this.max.addScalar( scalar );
+
+		return this;
+
+	},
+
+	containsPoint: function ( point ) {
+
+		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
+			( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
+			( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	containsBox: function ( box ) {
+
+		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
+			( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
+			( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	getParameter: function ( point ) {
+
+		// This can potentially have a divide by zero if the box
+		// has a size dimension of 0.
+		return new THREE.Vector3(
+			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
+			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
+			( point.z - this.min.z ) / ( this.max.z - this.min.z )
+		);
+
+	},
+
+	isIntersection: function ( box ) {
+
+		// using 6 splitting planes to rule out intersections.
+
+		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
+			( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
+			( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	},
+
+	clampPoint: function ( point ) {
+
+		return new THREE.Vector3().copy( point ).clampSelf( this.min, this.max );
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return this.clampPoint( point ).subSelf( point ).length();
+
+	},
+
+	intersect: function ( box ) {
+
+		this.min.maxSelf( box.min );
+		this.max.minSelf( box.max );
+
+		return this;
+
+	},
+
+	union: function ( box ) {
+
+		this.min.minSelf( box.min );
+		this.max.maxSelf( box.max );
+
+		return this;
+
+	},
+
+	translate: function ( offset ) {
+
+		this.min.addSelf( offset );
+		this.max.addSelf( offset );
+
+		return this;
+
+	},
+
+	scale: function ( factor ) {
+
+		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
+		this.expandByVector( sizeDeltaHalf );
+
+		return this;
+
+	},
+
+	equals: function ( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Box3().copy( this );
+
+	}
+
+};
+
+THREE.Box3.__v1 = new THREE.Vector3();
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -2866,18 +3646,19 @@ THREE.EventTarget = function () {
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Frustum = function ( ) {
 
 	this.planes = [
 
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4()
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane()
 
 	];
 
@@ -2894,18 +3675,15 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 	var me8 = me[8], me9 = me[9], me10 = me[10], me11 = me[11];
 	var me12 = me[12], me13 = me[13], me14 = me[14], me15 = me[15];
 
-	planes[ 0 ].set( me3 - me0, me7 - me4, me11 - me8, me15 - me12 );
-	planes[ 1 ].set( me3 + me0, me7 + me4, me11 + me8, me15 + me12 );
-	planes[ 2 ].set( me3 + me1, me7 + me5, me11 + me9, me15 + me13 );
-	planes[ 3 ].set( me3 - me1, me7 - me5, me11 - me9, me15 - me13 );
-	planes[ 4 ].set( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
-	planes[ 5 ].set( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
+	planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 );
+	planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 );
+	planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 );
+	planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 );
+	planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
+	planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
 
 	for ( var i = 0; i < 6; i ++ ) {
-
-		plane = planes[ i ];
-		plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
-
+		planes[ i ].normalize();
 	}
 
 };
@@ -2915,12 +3693,12 @@ THREE.Frustum.prototype.contains = function ( object ) {
 	var distance = 0.0;
 	var planes = this.planes;
 	var matrix = object.matrixWorld;
-	var me = matrix.elements;
+	var matrixPosition = matrix.getPosition();
 	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
 
 	for ( var i = 0; i < 6; i ++ ) {
 
-		distance = planes[ i ].x * me[12] + planes[ i ].y * me[13] + planes[ i ].z * me[14] + planes[ i ].w;
+		distance = planes[ i ].distanceToPoint( matrixPosition );
 		if ( distance <= radius ) return false;
 
 	}
@@ -2930,6 +3708,149 @@ THREE.Frustum.prototype.contains = function ( object ) {
 };
 
 THREE.Frustum.__v1 = new THREE.Vector3();
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Plane = function ( normal, constant ) {
+
+	this.normal = normal || new THREE.Vector3();
+	this.constant = constant || 0;
+
+};
+
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
+
+	set: function ( normal, constant ) {
+
+		this.normal = normal;
+		this.constant = constant;
+
+		return this;
+	},
+
+	setComponents: function ( x, y, z, w ) {
+
+		this.normal.set( x, y, z );
+		this.constant = w;
+
+		return this;
+	},
+
+	setFromNormalAndCoplanarPoint: function ( normal, point ) {
+
+		this.normal = normal;
+		this.constant = - point.dot( normal );
+
+		return this;
+	},
+
+	setFromCoplanarPoints: function ( a, b, c ) {
+
+		var normal = THREE.Plane3.__v1.sub( b, a ).cross(
+			THREE.Plane3.__v2.sub( c, a ) );
+
+		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+		this.setFromNormalAndCoplanarPoint( normal, a );
+
+		return this;
+
+	},
+
+	copy: function ( plane ) {
+
+		this.normal.copy( plane.normal );
+		this.constant = plane.constant;
+
+		return this;
+
+	},
+
+	flip: function () {
+
+		this.normal.negate();
+
+		return this;
+
+	},
+
+	normalize: function () {
+
+		// Note: will lead to a divide by zero if the plane is invalid.
+		var inverseNormalLength = 1.0 / this.normal.length();
+		this.normal.multiplyScalar( inverseNormalLength );
+		this.constant *= inverseNormalLength;
+
+		return this;
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return this.normal.dot( point ) + this.constant;
+	},
+
+	distanceToSphere: function ( sphere ) {
+
+		return this.distanceToPoint( sphere.center ) - sphere.radius;
+	},
+
+	projectPoint: function ( point ) {
+
+		return this.orthoPoint( point ).subSelf( point ).negate();
+
+	},
+
+	orthoPoint: function ( point ) {
+
+		var perpendicularMagnitude = this.distanceToPoint( point );
+
+		return new THREE.Vector3().copy( this.normal ).multiplyScalar( perpendicularMagnitude );
+
+	},
+
+	intersectsLine: function ( startPoint, endPoint ) {
+
+		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+		var startSign = this.distanceToPoint( startPoint );
+		var endSign = this.distanceToPoint( endPoint );
+
+		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
+	},
+
+	coplanarPoint: function () {
+
+		return new THREE.Vector3().copy( this.normal ).multiplyScalar( - this.constant );
+
+	},
+
+	translate: function ( offset ) {
+
+		this.constant = - offset.dot( this.normal );
+
+		return this;
+
+	},
+
+	equals: function ( plane ) {
+
+		return plane.normal.equals( this.normal ) && ( plane.constant == this.constant );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Plane3().copy( this );
+
+	}
+
+};
+
+THREE.Plane.__v1 = new THREE.Vector3();
+THREE.Plane.__v2 = new THREE.Vector3();
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -3414,6 +4335,136 @@ THREE.Rectangle = function () {
 		return _isEmpty;
 
 	};
+
+};
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Sphere = function ( center, radius ) {
+
+	this.center = center || new THREE.Vector3();
+	this.radius = radius || 0;
+
+};
+
+THREE.Sphere.prototype = {
+
+	constructor: THREE.Sphere,
+
+	set: function ( center, radius ) {
+
+		this.center = center;
+		this.radius = radius;
+
+		return this;
+
+	},
+
+	setFromCenterAndPoints: function ( center, points ) {
+
+		var maxRadiusSq = 0;
+
+		for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+			var radiusSq = center.distanceToSquared( points[ i ] );
+			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+
+		}
+
+		this.center = center;
+		this.radius = Math.sqrt( maxRadiusSq );
+
+		return this;
+
+	},
+
+	copy: function ( sphere ) {
+
+		this.center.copy( sphere.center );
+		this.radius = sphere.radius;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		return ( this.radius <= 0 );
+
+	},
+
+	volume: function () {
+
+		return Math.PI * 4 / 3 * ( this.radius * this.radius * this.radius );
+
+	},
+
+	containsPoint: function ( point ) {
+
+		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return ( point.distanceTo( this.center ) - this.radius );
+
+	},
+
+	clampPoint: function ( point ) {
+
+		var deltaLengthSq = this.center.distanceToSquared( point );
+
+		var result = new THREE.Vector3().copy( point );
+
+		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
+
+			result.subSelf( this.center ).normalize();
+			result.multiplyScalar( this.radius ).addSelf( this.center );
+
+		}
+
+		return result;
+
+	},
+
+	bounds: function () {
+
+		var box =  new THREE.Box3( this.center, this.center );
+		box.expandByScalar( this.radius );
+
+		return box;
+
+	},
+
+	translate: function ( offset ) {
+
+		this.center.addSelf( this.offset );
+
+		return this;
+
+	},
+
+	scale: function ( factor ) {
+
+		this.radius *= factor;
+
+		return this;
+
+	},
+
+	equals: function ( sphere ) {
+
+		return sphere.center.equals( this.center ) && ( sphere.radius == this.radius );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Sphere3().copy( this );
+
+	}
 
 };
 /**
@@ -5066,6 +6117,7 @@ THREE.UV.prototype = {
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Geometry = function () {
@@ -5638,82 +6690,12 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
-
-			this.boundingBox = { min: new THREE.Vector3(), max: new THREE.Vector3() };
-
-		}
-
-		if ( this.vertices.length > 0 ) {
-
-			var position, firstPosition = this.vertices[ 0 ];
-
-			this.boundingBox.min.copy( firstPosition );
-			this.boundingBox.max.copy( firstPosition );
-
-			var min = this.boundingBox.min,
-				max = this.boundingBox.max;
-
-			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
-
-				position = this.vertices[ v ];
-
-				if ( position.x < min.x ) {
-
-					min.x = position.x;
-
-				} else if ( position.x > max.x ) {
-
-					max.x = position.x;
-
-				}
-
-				if ( position.y < min.y ) {
-
-					min.y = position.y;
-
-				} else if ( position.y > max.y ) {
-
-					max.y = position.y;
-
-				}
-
-				if ( position.z < min.z ) {
-
-					min.z = position.z;
-
-				} else if ( position.z > max.z ) {
-
-					max.z = position.z;
-
-				}
-
-			}
-
-		} else {
-
-			this.boundingBox.min.set( 0, 0, 0 );
-			this.boundingBox.max.set( 0, 0, 0 );
-
-		}
-
+		this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
 	},
 
 	computeBoundingSphere: function () {
 
-		var maxRadiusSq = 0;
-
-		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
-
-		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
-
-			var radiusSq = this.vertices[ i ].lengthSq();
-			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
-
-		}
-
-		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
+		this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
 	},
 
 	/*
