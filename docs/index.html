@@ -105,6 +105,7 @@
 			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
 			var DELIMITER = '/';
+			var nameCategoryMap = {};
 
 			for ( var section in list ) {
 
@@ -123,6 +124,12 @@
 						var page = list[ section ][ category ][ i ];
 
 						html += '<li><a href="javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+
+						nameCategoryMap[page[0]] = {
+							section: section,
+							category: category,
+							name: page[0]
+						};
 
 					}
 
@@ -153,16 +160,18 @@
 			function goTo( section, category, name ) {
 
 				// Fully resolve links that only provide a name
-				if(!category && !name) {
-					var location = getPageFromList(section);
+				if(arguments.length == 1) {
+					var location = nameCategoryMap[section];
 					section = location.section;
 					category = location.category;
 					name = location.name;
 				}
 
-				window.document.title = 'three.js - documentation - ' + section + ' - ' + name;
+				var title = 'three.js - documentation - ' + section + ' - ' + name;
+				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name);
 
-				window.location.hash = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name);
+				window.location.hash = url;
+				window.document.title = title;
 
 
 				viewer.src = pages[ section ][ category ][ name ] + '.html';
@@ -174,22 +183,6 @@
 				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
 				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]) );
 
-			}
-
-			function getPageFromList( name ) {
-				for ( var section in pages ) {
-				  for ( var category in pages[section] ) {
-					for ( var pageName in pages[section][category] ) {
-					  if(pageName === name) {
-						return {
-							section: section,
-							category: category,
-							name: pageName
-						};
-					  }
-					}
-				  }
-				}
 			}
 
 			window.addEventListener( 'hashchange', goToHash, false );
