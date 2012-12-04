@@ -7,6 +7,9 @@
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
+		if( this.ray.direction.length() > 0 ) {
+			this.ray.direction.normalize();	// required for accurate distance calculations
+		}
 		this.near = near || 0;
 		this.far = far || Infinity;
 
@@ -129,6 +132,9 @@
 						continue;
 					}
 				}
+
+				// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
+				if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
 				
 				intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
 
@@ -138,25 +144,8 @@
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 
-					if ( pointInFace3( intersectPoint, a, b, c ) ) {
-
-						var point = raycaster.ray.at( planeDistance );
-						// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
-						distance = raycaster.ray.origin.distanceTo( point );
-
-						// Optimization: clipping based on distance can be done earlier if plane is normalized.
-						if ( distance < raycaster.near || distance > raycaster.far ) continue;
-
-						intersects.push( {
-
-							distance: distance,
-							point: point,
-							face: face,
-							faceIndex: f,
-							object: object
-
-						} );
-
+					if ( ! pointInFace3( intersectPoint, a, b, c ) ) {
+						continue;
 					}
 
 				} else if ( face instanceof THREE.Face4 ) {
@@ -166,28 +155,27 @@
 					c = vertices[ face.c ];
 					d = vertices[ face.d ];
 
-					if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
-
-						var point = raycaster.ray.at( planeDistance );
-						// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
-						distance = raycaster.ray.origin.distanceTo( point );
-
-						// Optimization: clipping based on distance can be done earlier if plane is normalized.
-						if ( distance < raycaster.near || distance > raycaster.far ) continue;
-
-						intersects.push( {
-
-							distance: distance,
-							point: point,
-							face: face,
-							faceIndex: f,
-							object: object
-
-						} );
-
+					if ( ( ! pointInFace3( intersectPoint, a, b, d ) ) && ( ! pointInFace3( intersectPoint, b, c, d ) ) ) {
+						continue;
 					}
 
+				} else {
+
+					// This is added because if we call out of this if/else group when none of the cases
+					//    match it will add a point to the intersection list erroneously.
+					throw Error( "face type not supported" );
+
 				}
+
+				intersects.push( {
+
+					distance: planeDistance,	// this works because the original ray was normalized, and the transformed localRay wasn't
+					point: raycaster.ray.at( planeDistance ),
+					face: face,
+					faceIndex: f,
+					object: object
+
+				} );
 
 			}
 
@@ -213,6 +201,9 @@
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
 		this.ray.set( origin, direction );
+		if( this.ray.direction.length() > 0 ) {
+			this.ray.direction.normalize();	// required for accurate distance calculations
+		}
 
 	};
 
