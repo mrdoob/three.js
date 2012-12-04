@@ -140,6 +140,7 @@
 							// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
 							distance = raycaster.ray.origin.distanceTo( point );
 
+							// Optimization: clipping based on distance can be done earlier if plane is normalized.
 							if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 							intersects.push( {
@@ -167,6 +168,7 @@
 							// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
 							distance = raycaster.ray.origin.distanceTo( point );
 
+							// Optimization: clipping based on distance can be done earlier if plane is normalized.
 							if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 							intersects.push( {
