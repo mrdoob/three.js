@@ -32,9 +32,15 @@ THREE.Ray.prototype = {
 
 	},
 
-	at: function( t ) {
+	at: function( t, optionalTarget ) {
 
-		return this.direction.clone().multiplyScalar( t ).addSelf( this.origin );
+		if( optionalTarget === undefined ) {
+			optionalTarget = this.direction.clone();
+		}
+		else {
+			optionalTarget.copy( this.direction );
+		}
+		return optionalTarget.multiplyScalar( t ).addSelf( this.origin );
 
 	},
 
@@ -109,7 +115,7 @@ THREE.Ray.prototype = {
 
 		}
 
-		var t = - ( ( this.origin.dot( plane.normal ) ) + plane.constant ) / denominator;
+		var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
 
 		return this.at( t );
 
