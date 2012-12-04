@@ -133,6 +133,263 @@ THREE.Ray.prototype = {
 		}
 	},*/
 
+	isIntersectionSphere: function( sphere ) {
+
+		return ( this.distanceToPoint( sphere.center ) <= sphere.radius );
+
+	},
+
+	isIntersectionBox: function( box ) {
+
+		// this is very slow, this is just an initial implementation
+		return ( this.intersectBox( box ) !== undefined );
+
+	},
+
+	intersectBox: function( box ) {
+		// based on intersects from ImathBoxAlgo from ILM's Imath library
+		//
+		// Intersect a ray, r, with a box, b, and compute the intersection
+		// point, ip:
+		//
+		// isIntersectionBox() returns
+		//     - true if the ray starts inside the box or if the
+		//       ray starts outside and intersects the box
+		//     - false if the ray starts outside the box and intersects it,
+		//       but the intersection is behind the ray's origin.
+		//     - false if the ray starts outside and does not intersect it
+		//
+		// The intersection point is
+		//     - the ray's origin if the ray starts inside the box
+		//     - a point on one of the faces of the box if the ray
+		//       starts outside the box
+		//     - undefined when intersect() returns false
+
+		// No ray intersects an empty box
+		if(  box.empty() ) {
+			return false;
+		}
+
+		// The ray starts inside the box
+		if(  box.containsPoint( this.origin ) ) {
+			return this.origin;
+		}
+
+		// The ray starts outside the box.  Between one and three "frontfacing"
+		// sides of the box are oriented towards the ray, and between one and
+		// three "backfacing" sides are oriented away from the ray.
+		// We intersect the ray with the planes that contain the sides of the
+		// box, and compare the distances between ray's origin and the ray-plane
+		// intersections.
+		// The ray intersects the box if the most distant frontfacing intersection
+		// is nearer than the nearest backfacing intersection.  If the ray does
+		// intersect the box, then the most distant frontfacing ray-plane
+		// intersection is the ray-box intersection.
+		var TMAX = Infinity;
+		var tFrontMax = -1;
+		var tBackMin = TMAX;
+		var t, d;
+		var ip = new THREE.Vector3();
+
+		// Minimum and maximum X sides.
+		if( this.direction.x > 0 ) {
+			if( this.origin.x > box.max.x ) {
+			    return undefined;
+			}
+
+			d = box.max.x - this.origin.x;
+
+			if( this.direction.x > 1 || d < TMAX * this.direction.x ) {
+				t = d / this.direction.x;
+				if( tBackMin > t) {
+					tBackMin = t;
+				}
+			}
+
+			if( this.origin.x <= box.min.x ) {
+
+			    d = box.min.x - this.origin.x;
+			    t = (this.direction.x > 1 || d < TMAX * this.direction.x)? d / this.direction.x: TMAX;
+
+			    if( tFrontMax < t) {
+					tFrontMax = t;
+
+					ip.set(
+						box.min.x,
+						THREE.Math.clamp( this.origin.y + t * this.direction.y, box.min.y, box.max.y),
+						THREE.Math.clamp( this.origin.z + t * this.direction.z, box.min.z, box.max.z) );
+			    }
+			}
+		} else if( this.direction.x < 0 ) {
+			if( this.origin.x < box.min.x ) {
+				return undefined;
+			}
+
+			d = box.min.x - this.origin.x;
+
+			if( this.direction.x < -1 || d > TMAX * this.direction.x ) {
+			    t = d / this.direction.x;
+
+			    if( tBackMin > t ) {
+					tBackMin = t;
+				}
+			}
+
+			if( this.origin.x >= box.max.x ) {
+			    d = box.max.x - this.origin.x;
+				t = (this.direction.x < -1 || d > TMAX * this.direction.x)? d / this.direction.x: TMAX;
+
+				if( tFrontMax < t ) {
+					tFrontMax = t;
+
+					ip.set (
+						box.max.x,
+						THREE.Math.clamp( this.origin.y + t * this.direction.y, box.min.y, box.max.y),
+						THREE.Math.clamp( this.origin.z + t * this.direction.z, box.min.z, box.max.z) );
+				}
+			}
+		} else { // this.direction.x == 0
+
+			if( this.origin.x < box.min.x || this.origin.x > box.max.x ) {
+			    return undefined;
+			}
+		}
+
+		// Minimum and maximum Y sides.
+		if( this.direction.y > 0 ) {
+			if( this.origin.y > box.max.y ) {
+				return undefined;
+			}
+
+			d = box.max.y - this.origin.y;
+
+			if( this.direction.y > 1 || d < TMAX * this.direction.y ) {
+				t = d / this.direction.y;
+
+				if( tBackMin > t) {
+					tBackMin = t;
+				}
+			}
+
+			if( this.origin.y <= box.min.y ) {
+				d = box.min.y - this.origin.y;
+				t = (this.direction.y > 1 || d < TMAX * this.direction.y)? d / this.direction.y: TMAX;
+
+		    if( tFrontMax < t ) {
+				tFrontMax = t;
+
+				ip.set(
+					THREE.Math.clamp( this.origin.x + t * this.direction.x, box.min.x, box.max.x),
+					box.min.y,
+					THREE.Math.clamp( this.origin.z + t * this.direction.z, box.min.z, box.max.z) );
+				}
+			}
+		} else if( this.direction.y < 0 ) {
+			if( this.origin.y < box.min.y ) {
+				return undefined;
+		    }
+
+			d = box.min.y - this.origin.y;
+
+			if( this.direction.y < -1 || d > TMAX * this.direction.y ) {
+				t = d / this.direction.y;
+
+				if( tBackMin > t ) {
+					tBackMin = t;
+				}
+			}
+
+			if( this.origin.y >= box.max.y ) {
+			    d = box.max.y - this.origin.y;
+			    t = (this.direction.y < -1 || d > TMAX * this.direction.y)? d / this.direction.y: TMAX;
+
+			    if( tFrontMax < t) {
+					tFrontMax = t;
+
+					ip.set(
+						THREE.Math.clamp( this.origin.x + t * this.direction.x, box.min.x, box.max.x),
+						box.max.y,
+						THREE.Math.clamp( this.origin.z + t * this.direction.z, box.min.z, box.max.z) );
+				}
+			}
+		} else {	// this.direction.y == 0
+
+			if( this.origin.y < box.min.y || this.origin.y > box.max.y) {
+				return undefined;
+		    }
+		}
+
+		// Minimum and maximum Z sides.
+		if( this.direction.z > 0) {
+			if( this.origin.z > box.max.z ) {
+				return undefined;
+			}
+
+			d = box.max.z - this.origin.z;
+
+			if(  this.direction.z > 1 || d < TMAX * this.direction.z ) {
+			    t = d / this.direction.z;
+
+			    if( tBackMin > t ) {
+					tBackMin = t;
+				}
+			}
+
+			if( this.origin.z <= box.min.z ) {
+				d = box.min.z - this.origin.z;
+				t = (this.direction.z > 1 || d < TMAX * this.direction.z)? d / this.direction.z: TMAX;
+
+				if( tFrontMax < t ) {
+					tFrontMax = t;
+
+					ip.set(
+						THREE.Math.clamp( this.origin.x + t * this.direction.x, box.min.x, box.max.x ),
+						THREE.Math.clamp( this.origin.y + t * this.direction.y, box.min.y, box.max.y ),
+						box.min.z );
+			    }
+			}
+		} else if( this.direction.z < 0 ) {
+			if( this.origin.z < box.min.z ) {
+				return undefined;
+		    }
+
+			d = box.min.z - this.origin.z;
+
+			if( this.direction.z < -1 || d > TMAX * this.direction.z ) {
+				t = d / this.direction.z;
+
+				if( tBackMin > t ) {
+					tBackMin = t;
+				}
+			}
+
+			if( this.origin.z >= box.max.z ) {
+				d = box.max.z - this.origin.z;
+				t = (this.direction.z < -1 || d > TMAX * this.direction.z)? d / this.direction.z: TMAX;
+
+				if( tFrontMax < t ) {
+					tFrontMax = t;
+
+					ip.set(
+						THREE.Math.clamp( this.origin.x + t * this.direction.x, box.min.x, box.max.x),
+						THREE.Math.clamp( this.origin.y + t * this.direction.y, box.min.y, box.max.y),
+						box.max.z );
+				}
+			}
+		} else {	// this.direction.z == 0
+			if( this.origin.z < box.min.z || this.origin.z > box.max.z ) {
+				return undefined;
+		    }
+		}
+
+		if( tFrontMax <= tBackMin ) {
+			return ip;
+		}
+
+		return undefined;
+
+	},
+
 	isIntersectionPlane: function ( plane ) {
 
 		// check if the line and plane are non-perpendicular, if they
