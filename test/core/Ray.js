@@ -147,3 +147,31 @@ test( "intersectPlane", function() {
 	var f = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), zero3 );
 	ok( a.intersectPlane( f ) === undefined, "Passed!" );
 });
+
+
+test( "transformSelf", function() {
+	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var m = new THREE.Matrix4().identity();
+
+	ok( a.clone().transformSelf( m ).equals( a ), "Passed!" );
+
+	a = new THREE.Ray( zero3, new THREE.Vector3( 0, 0, 1 ) );
+	m.rotateByAxis( new THREE.Vector3( 0, 0, 1 ), Math.PI );
+	ok( a.clone().transformSelf( m ).equals( a ), "Passed!" );
+
+	m.identity().rotateX( Math.PI );
+	var b = a.clone();
+	b.direction.negate();
+	var a2 = a.clone().transformSelf( m );
+	ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
+	ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
+
+	a.origin = new THREE.Vector3( 0, 0, 1 );
+	b.origin = new THREE.Vector3( 0, 0, -1 );
+	var a2 = a.clone().transformSelf( m );
+	ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
+	ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
+});
+
+
+

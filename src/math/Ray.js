@@ -115,6 +115,15 @@ THREE.Ray.prototype = {
 
 	},
 
+	transformSelf: function ( matrix4 ) {
+
+		this.direction = matrix4.multiplyVector3( this.direction.addSelf( this.origin ) );
+		this.origin = matrix4.multiplyVector3( this.origin );
+		this.direction.subSelf( this.origin );
+
+		return this;
+	},
+
 	equals: function ( ray ) {
 
 		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
