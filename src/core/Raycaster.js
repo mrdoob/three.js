@@ -12,6 +12,8 @@
 
 	};
 
+	var sphere = new THREE.Sphere();
+
 	var originCopy = new THREE.Vector3();
 
 	var localOriginCopy = new THREE.Vector3();
@@ -76,15 +78,12 @@
 
 		} else if ( object instanceof THREE.Mesh ) {
 
-			// Checking boundingSphere
-
-			var scaledRadius = object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis();
-
-			// Checking distance to raycaster
-
-			var distance = raycaster.ray.distanceToPoint( object.matrixWorld.getPosition() );
-
-			if ( distance > scaledRadius) {
+			// Checking boundingSphere distance to ray
+			sphere.set(
+				object.matrixWorld.getPosition(),
+				object.geometry.boundingSphere.radius* object.matrixWorld.getMaxScaleOnAxis() );
+			
+			if ( ! raycaster.ray.isIntersectionSphere( sphere ) ) {
 
 				return intersects;
 
