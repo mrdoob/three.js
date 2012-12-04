@@ -13,13 +13,8 @@
 	};
 
 	var sphere = new THREE.Sphere();
-
-	var originCopy = new THREE.Vector3();
-
 	var localRay = new THREE.Ray();
-
-	var vector = new THREE.Vector3();
-	var normal = new THREE.Vector3();
+	var facePlane = new THREE.Plane();
 	var intersectPoint = new THREE.Vector3();
 
 	var inverseMatrix = new THREE.Matrix4();
@@ -103,8 +98,6 @@
 
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
-			originCopy.copy( raycaster.ray.origin );
-
 			inverseMatrix.getInverse( object.matrixWorld );
 
 			localRay.copy( raycaster.ray ).transformSelf( inverseMatrix );
@@ -119,26 +112,21 @@
 
 				side = material.side;
 
-				vector.sub( face.centroid, localRay.origin );
+				facePlane.setFromNormalAndCoplanarPoint( face.normal, face.centroid );
 
-				var normal = face.normal;
-				var dot = localRay.direction.dot( normal );
-
+				var planeDistance = localRay.distanceToPlane( facePlane );
+	
 				// bail if raycaster and plane are parallel
-
-				if ( Math.abs( dot ) < precision ) continue;
-
-				// calc distance to plane
-
-				var scalar = normal.dot( vector ) / dot;
-
+				if ( Math.abs( planeDistance ) < precision ) continue;
+	
 				// if negative distance, then plane is behind raycaster
+				if ( planeDistance < 0 ) continue;
 
-				if ( scalar < 0 ) continue;
+				var planeSign = localRay.direction.dot( facePlane.normal );
 
-				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? dot < 0 : dot > 0 ) ) {
+				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
 
-					intersectPoint.add( localRay.origin, localRay.direction.multiplyScalar( scalar ) );
+					intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
 
 					if ( face instanceof THREE.Face3 ) {
 
@@ -148,8 +136,9 @@
 
 						if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
-							var point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
-							distance = originCopy.distanceTo( point );
+							var point = raycaster.ray.at( planeDistance );
+							// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
+							distance = raycaster.ray.origin.distanceTo( point );
 
 							if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
@@ -174,8 +163,9 @@
 
 						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
-							var point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
-							distance = originCopy.distanceTo( point );
+							var point = raycaster.ray.at( planeDistance );
+							// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
+							distance = raycaster.ray.origin.distanceTo( point );
 
 							if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
