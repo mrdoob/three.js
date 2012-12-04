@@ -57,10 +57,10 @@ THREE.Ray.prototype = {
 
 	distanceToPoint: function ( point ) {
 
-		// NOTE: this creates a THREE.VEctor3 internally via closestPointToPoint
-		// that is never returned, can be further GC optimized
+		var directionDistance = THREE.Ray.__v1.sub( point, this.origin ).dot( this.direction );		
+		THREE.Ray.__v1.copy( this.direction ).multiplyScalar( directionDistance ).addSelf( this.origin );
 
-		return this.closestPointToPoint( point ).distanceTo( point );
+		return THREE.Ray.__v1.distanceTo( point );
 
 	},
 
