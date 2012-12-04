@@ -55,7 +55,7 @@ THREE.DOMRenderer = function () {
 
 			if ( element instanceof THREE.RenderableParticle && element.material instanceof THREE.ParticleDOMMaterial ) {
 
-				dom = element.material.domElement;
+				dom = element.material.element;
 
 				v1x = element.x * _widthHalf + _widthHalf - ( dom.offsetWidth >> 1 );
 				v1y = element.y * _heightHalf + _heightHalf - ( dom.offsetHeight >> 1 );
