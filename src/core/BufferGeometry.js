@@ -71,12 +71,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( ! this.boundingBox ) {
 
-			this.boundingBox = {
-
-				min: new THREE.Vector3( Infinity, Infinity, Infinity ),
-				max: new THREE.Vector3( -Infinity, -Infinity, -Infinity )
-
-			};
+			this.boundingBox = new THREE.Box3();
 
 		}
 
@@ -140,7 +135,9 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) this.boundingSphere = { radius: 0 };
+		if ( ! this.boundingSphere ) {
+			this.boundingSphere = new THREE.Sphere();
+		}
 
 		var positions = this.attributes[ "position" ].array;
 
