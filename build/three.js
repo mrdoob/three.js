@@ -1238,10 +1238,7 @@ THREE.Vector3.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x;
-		var dy = this.y - v.y;
-		var dz = this.z - v.z;
-
+		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
 		return dx * dx + dy * dy + dz * dz;
 
 	},
@@ -1964,13 +1961,10 @@ THREE.Box2 = function ( min, max ) {
 		this.makeEmpty();
 
 	} else {
-		this.min = min.clone();
-		if( max === undefined ) {
-			this.max = new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-		}
-		else {
-			this.max = max.clone();
-		}
+
+		this.min = min || new THREE.Vector2();
+		this.max = max || new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
 	}
 
 };
@@ -1981,8 +1975,8 @@ THREE.Box2.prototype = {
 
 	set: function ( min, max ) {
 
-		this.min.copy( min );
-		this.max.copy( max );
+		this.min = min;
+		this.max = max;
 
 		return this;
 	},
@@ -2152,8 +2146,8 @@ THREE.Box2.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ) {
+		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
+			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ) {
 
 			return false;
 
@@ -2205,7 +2199,7 @@ THREE.Box2.prototype = {
 
 	scale: function ( factor ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
+		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;
@@ -2241,17 +2235,8 @@ THREE.Box3 = function ( min, max ) {
 
 	} else {
 
-		this.min = min.clone();
-
-		if( max === undefined ) {
-
-			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-
-		} else {
-
-			this.max = max.clone();
-
-		}
+		this.min = min || new THREE.Vector3();
+		this.max = max || new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
 
 	}
 
@@ -2263,8 +2248,8 @@ THREE.Box3.prototype = {
 
 	set: function ( min, max ) {
 
-		this.min.copy( min );
-		this.max.copy( max );
+		this.min = min;
+		this.max = max;
 
 		return this;
 
@@ -2452,9 +2437,9 @@ THREE.Box3.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ||
-			 ( box.max.z < this.min.z ) || ( box.min.z > this.max.z ) ) {
+		if ( ( this.max.x < box.min.x ) || ( box.min.x > this.max.x ) ||
+			 ( this.max.y < box.min.y ) || ( box.min.y > this.max.y ) ||
+			 ( this.max.z < box.min.z ) || ( box.min.z > this.max.z ) ) {
 
 			return false;
 
@@ -2506,7 +2491,7 @@ THREE.Box3.prototype = {
 
 	scale: function ( factor ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
+		var sizeDeltaHalf = this.size().multiplyScalar( ( 1 - factor )  * 0.5 );
 		this.expandByVector( sizeDeltaHalf );
 
 		return this;
@@ -3848,17 +3833,8 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 THREE.Plane = function ( normal, constant ) {
 
-	if ( normal === undefined && constant === undefined ) {
-
-		this.normal = new THREE.Vector3();
-		this.constant = 0;
-
-	} else {
-
-		this.normal = normal.clone();
-		this.constant = constant || 0;
-
-	}
+	this.normal = normal || new THREE.Vector3();
+	this.constant = constant || 0;
 
 };
 
@@ -3868,7 +3844,7 @@ THREE.Plane.prototype = {
 
 	set: function ( normal, constant ) {
 
-		this.normal.copy( normal );
+		this.normal = normal;
 		this.constant = constant;
 
 		return this;
@@ -3886,7 +3862,7 @@ THREE.Plane.prototype = {
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
 
-		this.normal.copy( normal );
+		this.normal = normal;
 		this.constant = - point.dot( normal );
 
 		return this;
@@ -4494,19 +4470,9 @@ THREE.Rectangle = function () {
 
 THREE.Sphere = function ( center, radius ) {
 
+	this.center = center || new THREE.Vector3();
+	this.radius = radius || 0;
 
-	if ( center === undefined && radius === undefined ) {
-
-		this.center = new THREE.Vector3();
-		this.radius = 0;
-
-	} else {
-
-		this.center = center.clone();
-		this.radius = radius || 0;
-
-	}
-	
 };
 
 THREE.Sphere.prototype = {
@@ -4515,7 +4481,7 @@ THREE.Sphere.prototype = {
 
 	set: function ( center, radius ) {
 
-		this.center.copy( center );
+		this.center = center;
 		this.radius = radius;
 
 		return this;
@@ -6229,8 +6195,47 @@ THREE.Face4.prototype = {
 
 THREE.UV = function ( u, v ) {
 
-	console.warn( 'THREE.UV has been DEPRECATED. Use THREE.Vector2 instead.')
-	return new THREE.Vector2( u, v );
+	this.u = u || 0;
+	this.v = v || 0;
+
+};
+
+THREE.UV.prototype = {
+
+	constructor: THREE.UV,
+
+	set: function ( u, v ) {
+
+		this.u = u;
+		this.v = v;
+
+		return this;
+
+	},
+
+	copy: function ( uv ) {
+
+		this.u = uv.u;
+		this.v = uv.v;
+
+		return this;
+
+	},
+
+	lerpSelf: function ( uv, alpha ) {
+
+		this.u += ( uv.u - this.u ) * alpha;
+		this.v += ( uv.v - this.v ) * alpha;
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new THREE.UV( this.u, this.v );
+
+	}
 
 };
 /**
@@ -6715,10 +6720,10 @@ THREE.Geometry.prototype = {
 			z1 = vB.z - vA.z;
 			z2 = vC.z - vA.z;
 
-			s1 = uvB.x - uvA.x;
-			s2 = uvC.x - uvA.x;
-			t1 = uvB.y - uvA.y;
-			t2 = uvC.y - uvA.y;
+			s1 = uvB.u - uvA.u;
+			s2 = uvC.u - uvA.u;
+			t1 = uvB.v - uvA.v;
+			t2 = uvC.v - uvA.v;
 
 			r = 1.0 / ( s1 * t2 - s2 * t1 );
 			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
@@ -6945,7 +6950,7 @@ THREE.Geometry.prototype = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
 
 			}
 
@@ -9212,9 +9217,9 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 	function uv3 ( where, u1, v1, u2, v2, u3, v3 ) {
 
 		where.push( [
-			new THREE.Vector2( u1, v1 ),
-			new THREE.Vector2( u2, v2 ),
-			new THREE.Vector2( u3, v3 )
+			new THREE.UV( u1, v1 ),
+			new THREE.UV( u2, v2 ),
+			new THREE.UV( u3, v3 )
 		] );
 
 	};
@@ -9222,10 +9227,10 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 	function uv4 ( where, u1, v1, u2, v2, u3, v3, u4, v4 ) {
 
 		where.push( [
-			new THREE.Vector2( u1, v1 ),
-			new THREE.Vector2( u2, v2 ),
-			new THREE.Vector2( u3, v3 ),
-			new THREE.Vector2( u4, v4 )
+			new THREE.UV( u1, v1 ),
+			new THREE.UV( u2, v2 ),
+			new THREE.UV( u3, v3 ),
+			new THREE.UV( u4, v4 )
 		] );
 	};
 
@@ -9512,7 +9517,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 					u = uvLayer[ uvIndex * 2 ];
 					v = uvLayer[ uvIndex * 2 + 1 ];
 
-					geometry.faceUvs[ i ][ fi ] = new THREE.Vector2( u, v );
+					geometry.faceUvs[ i ][ fi ] = new THREE.UV( u, v );
 
 				}
 
@@ -9533,7 +9538,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 						u = uvLayer[ uvIndex * 2 ];
 						v = uvLayer[ uvIndex * 2 + 1 ];
 
-						uvs[ j ] = new THREE.Vector2( u, v );
+						uvs[ j ] = new THREE.UV( u, v );
 
 					}
 
@@ -14620,18 +14625,15 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_MAP",
 
+			"vec4 texelColor = texture2D( map, vUv );",
+
 			"#ifdef GAMMA_INPUT",
 
-				"vec4 texelColor = texture2D( map, vUv );",
 				"texelColor.xyz *= texelColor.xyz;",
 
-				"gl_FragColor = gl_FragColor * texelColor;",
-
-			"#else",
-
-				"gl_FragColor = gl_FragColor * texture2D( map, vUv );",
-
 			"#endif",
+
+			"gl_FragColor = gl_FragColor * texelColor;",
 
 		"#endif"
 
@@ -19178,8 +19180,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uvi = uv[ i ];
 
-					uvArray[ offset_uv ]     = uvi.x;
-					uvArray[ offset_uv + 1 ] = uvi.y;
+					uvArray[ offset_uv ]     = uvi.u;
+					uvArray[ offset_uv + 1 ] = uvi.v;
 
 					offset_uv += 2;
 
@@ -19199,8 +19201,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uvi = uv[ i ];
 
-					uvArray[ offset_uv ]     = uvi.x;
-					uvArray[ offset_uv + 1 ] = uvi.y;
+					uvArray[ offset_uv ]     = uvi.u;
+					uvArray[ offset_uv + 1 ] = uvi.v;
 
 					offset_uv += 2;
 
@@ -19231,8 +19233,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uv2i = uv2[ i ];
 
-					uv2Array[ offset_uv2 ]     = uv2i.x;
-					uv2Array[ offset_uv2 + 1 ] = uv2i.y;
+					uv2Array[ offset_uv2 ]     = uv2i.u;
+					uv2Array[ offset_uv2 + 1 ] = uv2i.v;
 
 					offset_uv2 += 2;
 
@@ -19252,8 +19254,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uv2i = uv2[ i ];
 
-					uv2Array[ offset_uv2 ]     = uv2i.x;
-					uv2Array[ offset_uv2 + 1 ] = uv2i.y;
+					uv2Array[ offset_uv2 ]     = uv2i.u;
+					uv2Array[ offset_uv2 + 1 ] = uv2i.v;
 
 					offset_uv2 += 2;
 
@@ -24368,7 +24370,7 @@ THREE.GeometryUtils = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
+				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
 
 			}
 
@@ -24671,8 +24673,8 @@ THREE.GeometryUtils = {
 
 				// texture repeat
 
-				if( uvs[ j ].x !== 1.0 ) uvs[ j ].x = uvs[ j ].x - Math.floor( uvs[ j ].x );
-				if( uvs[ j ].y !== 1.0 ) uvs[ j ].y = uvs[ j ].y - Math.floor( uvs[ j ].y );
+				if( uvs[ j ].u !== 1.0 ) uvs[ j ].u = uvs[ j ].u - Math.floor( uvs[ j ].u );
+				if( uvs[ j ].v !== 1.0 ) uvs[ j ].v = uvs[ j ].v - Math.floor( uvs[ j ].v );
 
 			}
 
@@ -30813,7 +30815,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
     segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
     var i, uvs = [],
-    center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
+    center = new THREE.Vector3(), centerUV = new THREE.UV( 0.5, 0.5 );
 
     this.vertices.push(center);
     uvs.push( centerUV );
@@ -30826,7 +30828,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
         vertex.y = radius * Math.sin( thetaStart + i / segments * thetaLength );
 
         this.vertices.push( vertex );
-        uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
+        uvs.push( new THREE.UV( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
 
     }
 
@@ -30945,10 +30947,10 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [
-							new THREE.Vector2( ix / gridX, 1 - iy / gridY ),
-							new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY ),
-							new THREE.Vector2( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
-							new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY )
+							new THREE.UV( ix / gridX, 1 - iy / gridY ),
+							new THREE.UV( ix / gridX, 1 - ( iy + 1 ) / gridY ),
+							new THREE.UV( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
+							new THREE.UV( ( ix + 1 ) / gridX, 1 - iy / gridY )
 						] );
 
 			}
@@ -31001,7 +31003,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.Vector2( u, 1 - v ) );
+			uvsRow.push( new THREE.UV( u, 1 - v ) );
 
 		}
 
@@ -31072,7 +31074,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 			var uv1 = uvs[ 0 ][ x ].clone();
 			var uv2 = uvs[ 0 ][ x + 1 ].clone();
-			var uv3 = new THREE.Vector2( uv2.u, 0 );
+			var uv3 = new THREE.UV( uv2.u, 0 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
@@ -31099,7 +31101,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 			var uv1 = uvs[ y ][ x + 1 ].clone();
 			var uv2 = uvs[ y ][ x ].clone();
-			var uv3 = new THREE.Vector2( uv2.u, 1 );
+			var uv3 = new THREE.UV( uv2.u, 1 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
@@ -31790,9 +31792,9 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 			cy = geometry.vertices[ indexC ].y;
 
 		return [
-			new THREE.Vector2( ax, ay ),
-			new THREE.Vector2( bx, by ),
-			new THREE.Vector2( cx, cy )
+			new THREE.UV( ax, ay ),
+			new THREE.UV( bx, by ),
+			new THREE.UV( cx, cy )
 		];
 
 	},
@@ -31825,17 +31827,17 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 		if ( Math.abs( ay - by ) < 0.01 ) {
 			return [
-				new THREE.Vector2( ax, 1 - az ),
-				new THREE.Vector2( bx, 1 - bz ),
-				new THREE.Vector2( cx, 1 - cz ),
-				new THREE.Vector2( dx, 1 - dz )
+				new THREE.UV( ax, 1 - az ),
+				new THREE.UV( bx, 1 - bz ),
+				new THREE.UV( cx, 1 - cz ),
+				new THREE.UV( dx, 1 - dz )
 			];
 		} else {
 			return [
-				new THREE.Vector2( ay, 1 - az ),
-				new THREE.Vector2( by, 1 - bz ),
-				new THREE.Vector2( cy, 1 - cz ),
-				new THREE.Vector2( dy, 1 - dz )
+				new THREE.UV( ay, 1 - az ),
+				new THREE.UV( by, 1 - bz ),
+				new THREE.UV( cy, 1 - cz ),
+				new THREE.UV( dy, 1 - dz )
 			];
 		}
 	}
@@ -32031,11 +32033,11 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.Vector2( 1 - i / _steps, k / kl ),
-				new THREE.Vector2( 1 - ( i + 1 ) / _steps, k / kl ),
-				new THREE.Vector2( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
-				new THREE.Vector2( 1 - i / _steps, ( k + 1 ) / kl )
-
+				new THREE.UV( 1 - i / _steps, k / kl ),
+				new THREE.UV( 1 - ( i + 1 ) / _steps, k / kl ),
+				new THREE.UV( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
+				new THREE.UV( 1 - i / _steps, ( k + 1 ) / kl )
+				
 			] );
 
 		}
@@ -32107,10 +32109,10 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 			this.faces.push( face );
 			this.faceVertexUvs[ 0 ].push( [
-				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
-				new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ )
+				new THREE.UV( ix / gridX, 1 - iz / gridZ ),
+				new THREE.UV( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
+				new THREE.UV( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
+				new THREE.UV( ( ix + 1 ) / gridX, 1 - iz / gridZ )
 			] );
 
 		}
@@ -32161,7 +32163,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.Vector2( u, 1 - v ) );
+			uvsRow.push( new THREE.UV( u, 1 - v ) );
 
 		}
 
@@ -32312,7 +32314,7 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 			this.vertices.push( vertex );
 
-			uvs.push( new THREE.Vector2( i / this.tubularSegments, j / this.radialSegments ) );
+			uvs.push( new THREE.UV( i / this.tubularSegments, j / this.radialSegments ) );
 			normals.push( vertex.clone().subSelf( center ).normalize() );
 
 		}
@@ -32416,10 +32418,10 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 			var c = this.grid[ ip ][ jp ];
 			var d = this.grid[ i ][ jp ];
 
-			var uva = new THREE.Vector2( i / this.radialSegments, j / this.tubularSegments );
-			var uvb = new THREE.Vector2( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
-			var uvc = new THREE.Vector2( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
-			var uvd = new THREE.Vector2( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uva = new THREE.UV( i / this.radialSegments, j / this.tubularSegments );
+			var uvb = new THREE.UV( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
+			var uvc = new THREE.UV( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uvd = new THREE.UV( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva,uvb,uvc, uvd ] );
@@ -32573,10 +32575,10 @@ THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, d
 			c = this.grid[ ip ][ jp ];
 			d = this.grid[ i ][ jp ];
 
-			uva = new THREE.Vector2( i / this.segments, j / this.radiusSegments );
-			uvb = new THREE.Vector2( ( i + 1 ) / this.segments, j / this.radiusSegments );
-			uvc = new THREE.Vector2( ( i + 1 ) / this.segments, ( j + 1 ) / this.radiusSegments );
-			uvd = new THREE.Vector2( i / this.segments, ( j + 1 ) / this.radiusSegments );
+			uva = new THREE.UV( i / this.segments, j / this.radiusSegments );
+			uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.radiusSegments );
+			uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.radiusSegments );
+			uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.radiusSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
@@ -32786,7 +32788,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		var u = azimuth( vector ) / 2 / Math.PI + 0.5;
 		var v = inclination( vector ) / Math.PI + 0.5;
-		vertex.uv = new THREE.Vector2( u, 1 - v );
+		vertex.uv = new THREE.UV( u, 1 - v );
 
 		return vertex;
 
@@ -32869,8 +32871,8 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	function correctUV( uv, vector, azimuth ) {
 
-		if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) uv = new THREE.Vector2( uv.x - 1, uv.y );
-		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new THREE.Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
+		if ( ( azimuth < 0 ) && ( uv.u === 1 ) ) uv = new THREE.UV( uv.u - 1, uv.v );
+		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new THREE.UV( azimuth / 2 / Math.PI + 0.5, uv.v );
 		return uv;
 
 	}
@@ -32996,10 +32998,10 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 			c = (i + 1) * sliceCount + j;
 			d = (i + 1) * sliceCount + j + 1;
 
-			uva = new THREE.Vector2( j / slices, i / stacks );
-			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uva = new THREE.UV( j / slices, i / stacks );
+			uvb = new THREE.UV( ( j + 1 ) / slices, i / stacks );
+			uvc = new THREE.UV( j / slices, ( i + 1 ) / stacks );
+			uvd = new THREE.UV( ( j + 1 ) / slices, ( i + 1 ) / stacks );
 
 			if ( useTris ) {
 
@@ -33197,7 +33199,7 @@ THREE.ConvexGeometry = function( vertices ) {
 	function vertexUv( vertex ) {
 
 		var mag = vertex.length();
-		return new THREE.Vector2( vertex.x / mag, vertex.y / mag );
+		return new THREE.UV( vertex.x / mag, vertex.y / mag );
 
 	}
 
@@ -34378,21 +34380,21 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// Prepare subdivided uv
 
-		avgUv = new THREE.Vector2();
+		avgUv = new THREE.UV();
 
 		if ( face instanceof THREE.Face3 ) {
 
-			avgUv.x = getUV( face.a, i ).x + getUV( face.b, i ).x + getUV( face.c, i ).x;
-			avgUv.y = getUV( face.a, i ).y + getUV( face.b, i ).y + getUV( face.c, i ).y;
-			avgUv.x /= 3;
-			avgUv.y /= 3;
+			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u;
+			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v;
+			avgUv.u /= 3;
+			avgUv.v /= 3;
 
 		} else if ( face instanceof THREE.Face4 ) {
 
-			avgUv.x = getUV( face.a, i ).x + getUV( face.b, i ).x + getUV( face.c, i ).x + getUV( face.d, i ).x;
-			avgUv.y = getUV( face.a, i ).y + getUV( face.b, i ).y + getUV( face.c, i ).y + getUV( face.d, i ).y;
-			avgUv.x /= 4;
-			avgUv.y /= 4;
+			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u + getUV( face.d, i ).u;
+			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v + getUV( face.d, i ).v;
+			avgUv.u /= 4;
+			avgUv.v /= 4;
 
 		}
 
@@ -34524,23 +34526,23 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// Prepare subdivided uv
 
-		avgUv = new THREE.Vector2();
+		avgUv = new THREE.UV();
 
-		avgUv.x = getUV(edgeVertexA, faceIndexA).x + getUV(edgeVertexB, faceIndexA).x;
-		avgUv.y = getUV(edgeVertexA, faceIndexA).y + getUV(edgeVertexB, faceIndexA).y;
-		avgUv.x /= 2;
-		avgUv.y /= 2;
+		avgUv.u = getUV(edgeVertexA, faceIndexA).u + getUV(edgeVertexB, faceIndexA).u;
+		avgUv.v = getUV(edgeVertexA, faceIndexA).v + getUV(edgeVertexB, faceIndexA).v;
+		avgUv.u /= 2;
+		avgUv.v /= 2;
 
 		addUV(edgePoints[i], faceIndexA, avgUv);
 
 		if (edge.length>=2) {
 			assert(edge.length == 2, 'did we plan for more than 2 edges?');
-			avgUv = new THREE.Vector2();
+			avgUv = new THREE.UV();
 
-			avgUv.x = getUV(edgeVertexA, faceIndexB).x + getUV(edgeVertexB, faceIndexB).x;
-			avgUv.y = getUV(edgeVertexA, faceIndexB).y + getUV(edgeVertexB, faceIndexB).y;
-			avgUv.x /= 2;
-			avgUv.y /= 2;
+			avgUv.u = getUV(edgeVertexA, faceIndexB).u + getUV(edgeVertexB, faceIndexB).u;
+			avgUv.v = getUV(edgeVertexA, faceIndexB).v + getUV(edgeVertexB, faceIndexB).v;
+			avgUv.u /= 2;
+			avgUv.v /= 2;
 
 			addUV(edgePoints[i], faceIndexB, avgUv);
 		}
