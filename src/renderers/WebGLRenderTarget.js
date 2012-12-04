@@ -39,9 +39,9 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 	tmp.wrapT = this.wrapT;
 
 	tmp.magFilter = this.magFilter;
-	tmp.anisotropy = this.anisotropy;
-
 	tmp.minFilter = this.minFilter;
+
+	tmp.anisotropy = this.anisotropy;
 
 	tmp.offset.copy( this.offset );
 	tmp.repeat.copy( this.repeat );

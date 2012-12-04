@@ -264,15 +264,20 @@
 
 							if ( data.metadata.type === 'geometry' ) {
 
-								var geometry = new THREE.GeometryLoader().parse( data );
-								geometry.sourceType = "ascii";
-								geometry.sourceFile = file.name;
+								var loader = new THREE.JSONLoader();
 
-								var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
-								mesh.name = filename;
+								loader.createModel( data, function ( geometry ) {
 
-								signals.objectAdded.dispatch( mesh );
-								signals.objectSelected.dispatch( mesh );
+									geometry.sourceType = "ascii";
+									geometry.sourceFile = file.name;
+
+									var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+									mesh.name = filename;
+
+									signals.objectAdded.dispatch( mesh );
+									signals.objectSelected.dispatch( mesh );
+
+								} );
 
 							} else if ( data.metadata.type === 'scene' ) {
 

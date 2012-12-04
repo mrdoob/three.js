@@ -738,9 +738,9 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 	function uv3 ( where, u1, v1, u2, v2, u3, v3 ) {
 
 		where.push( [
-			new THREE.UV( u1, v1 ),
-			new THREE.UV( u2, v2 ),
-			new THREE.UV( u3, v3 )
+			new THREE.Vector2( u1, v1 ),
+			new THREE.Vector2( u2, v2 ),
+			new THREE.Vector2( u3, v3 )
 		] );
 
 	};
@@ -748,10 +748,10 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 	function uv4 ( where, u1, v1, u2, v2, u3, v3, u4, v4 ) {
 
 		where.push( [
-			new THREE.UV( u1, v1 ),
-			new THREE.UV( u2, v2 ),
-			new THREE.UV( u3, v3 ),
-			new THREE.UV( u4, v4 )
+			new THREE.Vector2( u1, v1 ),
+			new THREE.Vector2( u2, v2 ),
+			new THREE.Vector2( u3, v3 ),
+			new THREE.Vector2( u4, v4 )
 		] );
 	};
 

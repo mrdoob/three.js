@@ -446,7 +446,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					}
 
-					setFillStyle( material.color.getContextStyle() );
+					setFillStyle( material.color.getStyle() );
 
 					_context.save();
 					_context.translate( v1.x, v1.y );
@@ -511,8 +511,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				setStrokeStyle( material.color.getContextStyle() );
-				setFillStyle( material.color.getContextStyle() );
+				setStrokeStyle( material.color.getStyle() );
+				setFillStyle( material.color.getStyle() );
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
@@ -541,7 +541,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setLineWidth( material.linewidth );
 				setLineCap( material.linecap );
 				setLineJoin( material.linejoin );
-				setStrokeStyle( material.color.getContextStyle() );
+				setStrokeStyle( material.color.getStyle() );
 
 				_context.stroke();
 				_bboxRect.inflate( material.linewidth * 2 );
@@ -917,7 +917,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			setLineWidth( linewidth );
 			setLineCap( linecap );
 			setLineJoin( linejoin );
-			setStrokeStyle( color.getContextStyle() );
+			setStrokeStyle( color.getStyle() );
 
 			_context.stroke();
 
@@ -927,7 +927,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function fillPath( color ) {
 
-			setFillStyle( color.getContextStyle() );
+			setFillStyle( color.getStyle() );
 			_context.fill();
 
 		}
