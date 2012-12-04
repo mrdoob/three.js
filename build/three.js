@@ -290,9 +290,9 @@ THREE.Clock.prototype.getDelta = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( hex ) {
+THREE.Color = function ( value ) {
 
-	if ( hex !== undefined ) this.setHex( hex );
+	if ( value !== undefined ) this.set( value );
 
 	return this;
 
@@ -353,6 +353,22 @@ THREE.Color.prototype = {
 		this.b = Math.sqrt( this.b );
 
 		return this;
+
+	},
+
+	set: function ( value ) {
+
+		switch ( typeof value ) {
+
+			case "number":
+				this.setHex( value );
+				break;
+
+			case "string":
+				this.setStyle( value );
+				break;
+
+		}
 
 	},
 
@@ -453,21 +469,76 @@ THREE.Color.prototype = {
 
 	},
 
-	getContextStyle: function () {
+	getStyle: function () {
 
 		return 'rgb(' + ( ( this.r * 255 ) | 0 )  + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
 
 	},
 
-	setContextStyle: function ( style ) {
+	setStyle: function ( style ) {
 
-		var color = /^rgb\((\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3})\)$/i.exec( style );
+		// rgb(255,0,0)
 
-		this.r = parseInt( color[ 1 ], 10 ) / 255;
-		this.g = parseInt( color[ 2 ], 10 ) / 255;
-		this.b = parseInt( color[ 3 ], 10 ) / 255;
+		if ( /^rgb\((\d+),(\d+),(\d+)\)$/i.test( style ) ) {
 
-		return this;
+			var color = /^rgb\((\d+),(\d+),(\d+)\)$/i.exec( style );
+
+			this.r = Math.min( 255, parseInt( color[ 1 ], 10 ) ) / 255;
+			this.g = Math.min( 255, parseInt( color[ 2 ], 10 ) ) / 255;
+			this.b = Math.min( 255, parseInt( color[ 3 ], 10 ) ) / 255;
+
+			return this;
+
+		}
+
+		// rgb(100%,0%,0%)
+
+		if ( /^rgb\((\d+)\%,(\d+)\%,(\d+)\%\)$/i.test( style ) ) {
+
+			var color = /^rgb\((\d+)\%,(\d+)\%,(\d+)\%\)$/i.exec( style );
+
+			this.r = Math.min( 100, parseInt( color[ 1 ], 10 ) ) / 100;
+			this.g = Math.min( 100, parseInt( color[ 2 ], 10 ) ) / 100;
+			this.b = Math.min( 100, parseInt( color[ 3 ], 10 ) ) / 100;
+
+			return this;
+
+		}
+
+		// #ff0000
+
+		if ( /^\#([0-9a-f]{6})$/i.test( style ) ) {
+
+			var color = /^\#([0-9a-f]{6})$/i.exec( style );
+
+			this.setHex( parseInt( color[ 1 ], 16 ) );
+
+			return this;
+
+		}
+
+		// #f00
+
+		if ( /^\#([0-9a-f])([0-9a-f])([0-9a-f])$/i.test( style ) ) {
+
+			var color = /^\#([0-9a-f])([0-9a-f])([0-9a-f])$/i.exec( style );
+
+			this.setHex( parseInt( color[ 1 ] + color[ 1 ] + color[ 2 ] + color[ 2 ] + color[ 3 ] + color[ 3 ], 16 ) );
+
+			return this;
+
+		}
+
+		// red
+
+		if ( /^(\w+)$/i.test( style ) ) {
+
+			this.setHex( THREE.ColorKeywords[ style ] );
+
+			return this;
+
+		}
+
 
 	},
 
@@ -557,6 +628,8 @@ THREE.Color.prototype = {
 	}
 
 };
+
+THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua": 0x00FFFF, "aquamarine": 0x7FFFD4, "azure": 0xF0FFFF, "beige": 0xF5F5DC, "bisque": 0xFFE4C4, "black": 0x000000, "blanchedalmond": 0xFFEBCD, "blue": 0x0000FF, "blueviolet": 0x8A2BE2, "brown": 0xA52A2A, "burlywood": 0xDEB887, "cadetblue": 0x5F9EA0, "chartreuse": 0x7FFF00, "chocolate": 0xD2691E, "coral": 0xFF7F50, "cornflowerblue": 0x6495ED, "cornsilk": 0xFFF8DC, "crimson": 0xDC143C, "cyan": 0x00FFFF, "darkblue": 0x00008B, "darkcyan": 0x008B8B, "darkgoldenrod": 0xB8860B, "darkgray": 0xA9A9A9, "darkgreen": 0x006400, "darkgrey": 0xA9A9A9, "darkkhaki": 0xBDB76B, "darkmagenta": 0x8B008B, "darkolivegreen": 0x556B2F, "darkorange": 0xFF8C00, "darkorchid": 0x9932CC, "darkred": 0x8B0000, "darksalmon": 0xE9967A, "darkseagreen": 0x8FBC8F, "darkslateblue": 0x483D8B, "darkslategray": 0x2F4F4F, "darkslategrey": 0x2F4F4F, "darkturquoise": 0x00CED1, "darkviolet": 0x9400D3, "deeppink": 0xFF1493, "deepskyblue": 0x00BFFF, "dimgray": 0x696969, "dimgrey": 0x696969, "dodgerblue": 0x1E90FF, "firebrick": 0xB22222, "floralwhite": 0xFFFAF0, "forestgreen": 0x228B22, "fuchsia": 0xFF00FF, "gainsboro": 0xDCDCDC, "ghostwhite": 0xF8F8FF, "gold": 0xFFD700, "goldenrod": 0xDAA520, "gray": 0x808080, "green": 0x008000, "greenyellow": 0xADFF2F, "grey": 0x808080, "honeydew": 0xF0FFF0, "hotpink": 0xFF69B4, "indianred": 0xCD5C5C, "indigo": 0x4B0082, "ivory": 0xFFFFF0, "khaki": 0xF0E68C, "lavender": 0xE6E6FA, "lavenderblush": 0xFFF0F5, "lawngreen": 0x7CFC00, "lemonchiffon": 0xFFFACD, "lightblue": 0xADD8E6, "lightcoral": 0xF08080, "lightcyan": 0xE0FFFF, "lightgoldenrodyellow": 0xFAFAD2, "lightgray": 0xD3D3D3, "lightgreen": 0x90EE90, "lightgrey": 0xD3D3D3, "lightpink": 0xFFB6C1, "lightsalmon": 0xFFA07A, "lightseagreen": 0x20B2AA, "lightskyblue": 0x87CEFA, "lightslategray": 0x778899, "lightslategrey": 0x778899, "lightsteelblue": 0xB0C4DE, "lightyellow": 0xFFFFE0, "lime": 0x00FF00, "limegreen": 0x32CD32, "linen": 0xFAF0E6, "magenta": 0xFF00FF, "maroon": 0x800000, "mediumaquamarine": 0x66CDAA, "mediumblue": 0x0000CD, "mediumorchid": 0xBA55D3, "mediumpurple": 0x9370DB, "mediumseagreen": 0x3CB371, "mediumslateblue": 0x7B68EE, "mediumspringgreen": 0x00FA9A, "mediumturquoise": 0x48D1CC, "mediumvioletred": 0xC71585, "midnightblue": 0x191970, "mintcream": 0xF5FFFA, "mistyrose": 0xFFE4E1, "moccasin": 0xFFE4B5, "navajowhite": 0xFFDEAD, "navy": 0x000080, "oldlace": 0xFDF5E6, "olive": 0x808000, "olivedrab": 0x6B8E23, "orange": 0xFFA500, "orangered": 0xFF4500, "orchid": 0xDA70D6, "palegoldenrod": 0xEEE8AA, "palegreen": 0x98FB98, "paleturquoise": 0xAFEEEE, "palevioletred": 0xDB7093, "papayawhip": 0xFFEFD5, "peachpuff": 0xFFDAB9, "peru": 0xCD853F, "pink": 0xFFC0CB, "plum": 0xDDA0DD, "powderblue": 0xB0E0E6, "purple": 0x800080, "red": 0xFF0000, "rosybrown": 0xBC8F8F, "royalblue": 0x4169E1, "saddlebrown": 0x8B4513, "salmon": 0xFA8072, "sandybrown": 0xF4A460, "seagreen": 0x2E8B57, "seashell": 0xFFF5EE, "sienna": 0xA0522D, "silver": 0xC0C0C0, "skyblue": 0x87CEEB, "slateblue": 0x6A5ACD, "slategray": 0x708090, "slategrey": 0x708090, "snow": 0xFFFAFA, "springgreen": 0x00FF7F, "steelblue": 0x4682B4, "tan": 0xD2B48C, "teal": 0x008080, "thistle": 0xD8BFD8, "tomato": 0xFF6347, "turquoise": 0x40E0D0, "violet": 0xEE82EE, "wheat": 0xF5DEB3, "white": 0xFFFFFF, "whitesmoke": 0xF5F5F5, "yellow": 0xFFFF00, "yellowgreen": 0x9ACD32 };
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
@@ -584,10 +657,35 @@ THREE.Vector2.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
 		this.y = v.y;
+
+		return this;
+
+	},
+
+	addScalar: function ( s ) {
+
+		this.x += s;
+		this.y += s;
 
 		return this;
 
@@ -648,6 +746,70 @@ THREE.Vector2.prototype = {
 		} else {
 
 			this.set( 0, 0 );
+
+		}
+
+		return this;
+
+	},
+
+	minSelf: function ( v ) {
+
+		if ( this.x > v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y > v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if ( this.x < v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y < v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if ( this.x < min.x ) {
+
+			this.x = min.x;
+
+		} else if ( this.x > max.x ) {
+
+			this.x = max.x;
+
+		}
+
+		if ( this.y < min.y ) {
+
+			this.y = min.y;
+
+		} else if ( this.y > max.y ) {
+
+			this.y = max.y;
 
 		}
 
@@ -728,7 +890,7 @@ THREE.Vector2.prototype = {
 };
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author kile / http://kile.stravaganza.org/
+ * @author *kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
  * @author egraether / http://egraether.com/
@@ -902,6 +1064,91 @@ THREE.Vector3.prototype = {
 
 	},
 
+	minSelf: function ( v ) {
+
+		if ( this.x > v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y > v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		if ( this.z > v.z ) {
+
+			this.z = v.z;
+
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if ( this.x < v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y < v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		if ( this.z < v.z ) {
+
+			this.z = v.z;
+
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if ( this.x < min.x ) {
+
+			this.x = min.x;
+
+		} else if ( this.x > max.x ) {
+
+			this.x = max.x;
+
+		}
+
+		if ( this.y < min.y ) {
+
+			this.y = min.y;
+
+		} else if ( this.y > max.y ) {
+
+			this.y = max.y;
+
+		}
+
+		if ( this.z < min.z ) {
+
+			this.z = min.z;
+
+		} else if ( this.z > max.z ) {
+
+			this.z = max.z;
+
+		}
+
+		return this;
+
+	},
 
 	negate: function() {
 
@@ -991,7 +1238,11 @@ THREE.Vector3.prototype = {
 
 	distanceToSquared: function ( v ) {
 
-		return new THREE.Vector3().sub( this, v ).lengthSq();
+		var dx = this.x - v.x;
+		var dy = this.y - v.y;
+		var dz = this.z - v.z;
+
+		return dx * dx + dy * dy + dz * dz;
 
 	},
 
@@ -1243,12 +1494,55 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
+	setZ: function ( z ) {
+
+		this.z = z;
+
+		return this;
+
+	},
+
+	setW: function ( w ) {
+
+		this.w = w;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
 		this.y = v.y;
 		this.z = v.z;
 		this.w = ( v.w !== undefined ) ? v.w : 1;
+
+		return this;
+
+	},
+
+	addScalar: function ( s ) {
+
+		this.x += s;
+		this.y += s;
+		this.z += s;
+		this.w += s;
 
 		return this;
 
@@ -1331,6 +1625,113 @@ THREE.Vector4.prototype = {
 
 	},
 
+	minSelf: function ( v ) {
+
+		if ( this.x > v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y > v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		if ( this.z > v.z ) {
+
+			this.z = v.z;
+
+		}
+
+		if ( this.w > v.w ) {
+
+			this.w = v.w;
+
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if ( this.x < v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y < v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		if ( this.z < v.z ) {
+
+			this.z = v.z;
+
+		}
+
+		if ( this.w < v.w ) {
+
+			this.w = v.w;
+
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if ( this.x < min.x ) {
+
+			this.x = min.x;
+
+		} else if ( this.x > max.x ) {
+
+			this.x = max.x;
+
+		}
+
+		if ( this.y < min.y ) {
+
+			this.y = min.y;
+
+		} else if ( this.y > max.y ) {
+
+			this.y = max.y;
+
+		}
+
+		if ( this.z < min.z ) {
+
+			this.z = min.z;
+
+		} else if ( this.z > max.z ) {
+
+			this.z = max.z;
+
+		}
+
+		if ( this.w < min.w ) {
+
+			this.w = min.w;
+
+		} else if ( this.w > max.w ) {
+
+			this.w = max.w;
+
+		}
+
+		return this;
+
+	},
 
 	negate: function() {
 
@@ -1382,6 +1783,12 @@ THREE.Vector4.prototype = {
 		this.w += ( v.w - this.w ) * alpha;
 
 		return this;
+
+	},
+
+	equals: function ( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
 
 	},
 
@@ -1529,7 +1936,7 @@ THREE.Vector4.prototype = {
 						 + ( m13 - m31 ) * ( m13 - m31 )
 						 + ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
 
-		if ( Math.abs( s ) < 0.001 ) s = 1; 
+		if ( Math.abs( s ) < 0.001 ) s = 1;
 
 		// prevent divide by zero, should not happen if matrix is orthogonal and should be
 		// caught by singularity test above, but I've left it in just in case
@@ -1544,6 +1951,583 @@ THREE.Vector4.prototype = {
 	}
 
 };
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Box2 = function ( min, max ) {
+
+	if ( min === undefined && max === undefined ) {
+
+		this.min = new THREE.Vector2();
+		this.max = new THREE.Vector2();
+		this.makeEmpty();
+
+	} else {
+		this.min = min.clone();
+		if( max === undefined ) {
+			this.max = new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+		}
+		else {
+			this.max = max.clone();
+		}
+	}
+
+};
+
+THREE.Box2.prototype = {
+
+	constructor: THREE.Box2,
+
+	set: function ( min, max ) {
+
+		this.min.copy( min );
+		this.max.copy( max );
+
+		return this;
+	},
+
+	setFromPoints: function ( points ) {
+
+		if ( points.length > 0 ) {
+
+			var p = points[ 0 ];
+
+			this.min.copy( p );
+			this.max.copy( p );
+
+			for ( var i = 1, il = points.length; i < il; i ++ ) {
+
+				p = points[ i ];
+
+				if ( p.x < this.min.x ) {
+
+					this.min.x = p.x;
+
+				} else if ( p.x > this.max.x ) {
+
+					this.max.x = p.x;
+
+				}
+
+				if ( p.y < this.min.y ) {
+
+					this.min.y = p.y;
+
+				} else if ( p.y > this.max.y ) {
+
+					this.max.y = p.y;
+
+				}
+
+			}
+
+		} else {
+
+			this.makeEmpty();
+
+		}
+
+		return this;
+
+	},
+
+	setFromCenterAndSize: function ( center, size ) {
+
+		var halfSize = THREE.Box2.__v1.copy( size ).multiplyScalar( 0.5 );
+		this.min.copy( center ).subSelf( halfSize );
+		this.max.copy( center ).addSelf( halfSize );
+
+		return this;
+
+	},
+
+	copy: function ( box ) {
+
+		this.min.copy( box.min );
+		this.max.copy( box.max );
+
+		return this;
+
+	},
+
+	makeEmpty: function () {
+
+		this.min.x = this.min.y = Infinity;
+		this.max.x = this.max.y = -Infinity;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
+		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
+
+	},
+
+	volume: function () {
+
+		return ( this.max.x - this.min.x ) * ( this.max.y - this.min.y );
+
+	},
+
+	center: function () {
+
+		return new THREE.Vector2().add( this.min, this.max ).multiplyScalar( 0.5 );
+
+	},
+
+	size: function () {
+
+		return new THREE.Vector2().sub( this.max, this.min );
+
+	},
+
+	expandByPoint: function ( point ) {
+
+		this.min.minSelf( point );
+		this.max.maxSelf( point );
+
+		return this;
+	},
+
+	expandByVector: function ( vector ) {
+
+		this.min.subSelf( vector );
+		this.max.addSelf( vector );
+
+		return this;
+	},
+
+	expandByScalar: function ( scalar ) {
+
+		this.min.addScalar( -scalar );
+		this.max.addScalar( scalar );
+
+		return this;
+	},
+
+	containsPoint: function ( point ) {
+
+		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
+			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	containsBox: function ( box ) {
+
+		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	getParameter: function ( point ) {
+
+		// This can potentially have a divide by zero if the box
+		// has a size dimension of 0.
+
+		return new THREE.Vector2(
+			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
+			( point.y - this.min.y ) / ( this.max.y - this.min.y )
+		);
+
+	},
+
+	isIntersection: function ( box ) {
+
+		// using 6 splitting planes to rule out intersections.
+
+		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
+			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	},
+
+	clampPoint: function ( point ) {
+
+		return new THREE.Vector2().copy( point ).clampSelf( this.min, this.max );
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		var clampedPoint = THREE.Box2.__v1.copy( point ).clampSelf( this.min, this.max );
+		return clampedPoint.subSelf( point ).length();
+
+	},
+
+	intersect: function ( box ) {
+
+		this.min.maxSelf( box.min );
+		this.max.minSelf( box.max );
+
+		return this;
+
+	},
+
+	union: function ( box ) {
+
+		this.min.minSelf( box.min );
+		this.max.maxSelf( box.max );
+
+		return this;
+
+	},
+
+	translate: function ( offset ) {
+
+		this.min.addSelf( offset );
+		this.max.addSelf( offset );
+
+		return this;
+
+	},
+
+	scale: function ( factor ) {
+
+		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
+		this.expandByVector( sizeDeltaHalf );
+
+		return this;
+
+	},
+
+	equals: function ( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Box2().copy( this );
+
+	}
+
+};
+
+THREE.Box2.__v1 = new THREE.Vector2();
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Box3 = function ( min, max ) {
+
+	if ( min === undefined && max === undefined ) {
+
+		this.min = new THREE.Vector3();
+		this.max = new THREE.Vector3();
+		this.makeEmpty();
+
+	} else {
+
+		this.min = min.clone();
+
+		if( max === undefined ) {
+
+			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
+
+		} else {
+
+			this.max = max.clone();
+
+		}
+
+	}
+
+};
+
+THREE.Box3.prototype = {
+
+	constructor: THREE.Box3,
+
+	set: function ( min, max ) {
+
+		this.min.copy( min );
+		this.max.copy( max );
+
+		return this;
+
+	},
+
+	setFromPoints: function ( points ) {
+
+		if ( points.length > 0 ) {
+
+			var p = points[ 0 ];
+
+			this.min.copy( p );
+			this.max.copy( p );
+
+			for ( var i = 1, il = points.length; i < il; i ++ ) {
+
+				p = points[ i ];
+
+				if ( p.x < this.min.x ) {
+
+					this.min.x = p.x;
+
+				} else if ( p.x > this.max.x ) {
+
+					this.max.x = p.x;
+
+				}
+
+				if ( p.y < this.min.y ) {
+
+					this.min.y = p.y;
+
+				} else if ( p.y > this.max.y ) {
+
+					this.max.y = p.y;
+
+				}
+
+				if ( p.z < this.min.z ) {
+
+					this.min.z = p.z;
+
+				} else if ( p.z > this.max.z ) {
+
+					this.max.z = p.z;
+
+				}
+
+			}
+
+		} else {
+
+			this.makeEmpty();
+
+		}
+
+		return this;
+
+	},
+
+	setFromCenterAndSize: function ( center, size ) {
+
+		var halfSize = THREE.Box3.__v1.copy( size ).multiplyScalar( 0.5 );
+
+		this.min.copy( center ).subSelf( halfSize );
+		this.max.copy( center ).addSelf( halfSize );
+
+		return this;
+
+	},
+
+	copy: function ( box ) {
+
+		this.min.copy( box.min );
+		this.max.copy( box.max );
+
+		return this;
+
+	},
+
+	makeEmpty: function () {
+
+		this.min.x = this.min.y = this.min.z = Infinity;
+		this.max.x = this.max.y = this.max.z = -Infinity;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
+
+		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
+
+	},
+
+	volume: function () {
+
+		return ( this.max.x - this.min.x ) * ( this.max.y - this.min.y ) * ( this.max.z - this.min.z );
+
+	},
+
+	center: function () {
+
+		return new THREE.Vector3().add( this.min, this.max ).multiplyScalar( 0.5 );
+
+	},
+
+	size: function () {
+
+		return new THREE.Vector3().sub( this.max, this.min );
+
+	},
+
+	expandByPoint: function ( point ) {
+
+		this.min.minSelf( point );
+		this.max.maxSelf( point );
+
+		return this;
+
+	},
+
+	expandByVector: function ( vector ) {
+
+		this.min.subSelf( vector );
+		this.max.addSelf( vector );
+
+		return this;
+
+	},
+
+	expandByScalar: function ( scalar ) {
+
+		this.min.addScalar( -scalar );
+		this.max.addScalar( scalar );
+
+		return this;
+
+	},
+
+	containsPoint: function ( point ) {
+
+		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
+			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
+			 ( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	containsBox: function ( box ) {
+
+		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
+			 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	getParameter: function ( point ) {
+
+		// This can potentially have a divide by zero if the box
+		// has a size dimension of 0.
+
+		return new THREE.Vector3(
+			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
+			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
+			( point.z - this.min.z ) / ( this.max.z - this.min.z )
+		);
+
+	},
+
+	isIntersection: function ( box ) {
+
+		// using 6 splitting planes to rule out intersections.
+
+		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
+			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ||
+			 ( box.max.z < this.min.z ) || ( box.min.z > this.max.z ) ) {
+
+			return false;
+
+		}
+
+		return true;
+
+	},
+
+	clampPoint: function ( point ) {
+
+		return new THREE.Vector3().copy( point ).clampSelf( this.min, this.max );
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		var clampedPoint = THREE.Box3.__v1.copy( point ).clampSelf( this.min, this.max );
+		return clampedPoint.subSelf( point ).length();
+
+	},
+
+	intersect: function ( box ) {
+
+		this.min.maxSelf( box.min );
+		this.max.minSelf( box.max );
+
+		return this;
+
+	},
+
+	union: function ( box ) {
+
+		this.min.minSelf( box.min );
+		this.max.maxSelf( box.max );
+
+		return this;
+
+	},
+
+	translate: function ( offset ) {
+
+		this.min.addSelf( offset );
+		this.max.addSelf( offset );
+
+		return this;
+
+	},
+
+	scale: function ( factor ) {
+
+		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
+		this.expandByVector( sizeDeltaHalf );
+
+		return this;
+
+	},
+
+	equals: function ( box ) {
+
+		return box.min.equals( this.min ) && box.max.equals( this.max );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Box3().copy( this );
+
+	}
+
+};
+
+THREE.Box3.__v1 = new THREE.Vector3();
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -2793,18 +3777,19 @@ THREE.EventTarget = function () {
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Frustum = function ( ) {
 
 	this.planes = [
 
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4(),
-		new THREE.Vector4()
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane(),
+		new THREE.Plane()
 
 	];
 
@@ -2812,7 +3797,6 @@ THREE.Frustum = function ( ) {
 
 THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 
-	var plane;
 	var planes = this.planes;
 
 	var me = m.elements;
@@ -2821,17 +3805,16 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 	var me8 = me[8], me9 = me[9], me10 = me[10], me11 = me[11];
 	var me12 = me[12], me13 = me[13], me14 = me[14], me15 = me[15];
 
-	planes[ 0 ].set( me3 - me0, me7 - me4, me11 - me8, me15 - me12 );
-	planes[ 1 ].set( me3 + me0, me7 + me4, me11 + me8, me15 + me12 );
-	planes[ 2 ].set( me3 + me1, me7 + me5, me11 + me9, me15 + me13 );
-	planes[ 3 ].set( me3 - me1, me7 - me5, me11 - me9, me15 - me13 );
-	planes[ 4 ].set( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
-	planes[ 5 ].set( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
+	planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 );
+	planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 );
+	planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 );
+	planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 );
+	planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
+	planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
 
 	for ( var i = 0; i < 6; i ++ ) {
 
-		plane = planes[ i ];
-		plane.divideScalar( Math.sqrt( plane.x * plane.x + plane.y * plane.y + plane.z * plane.z ) );
+		planes[ i ].normalize();
 
 	}
 
@@ -2839,15 +3822,17 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 
 THREE.Frustum.prototype.contains = function ( object ) {
 
-	var distance = 0.0;
 	var planes = this.planes;
+
 	var matrix = object.matrixWorld;
-	var me = matrix.elements;
+	var matrixPosition = matrix.getPosition();
 	var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+
+	var distance = 0.0;
 
 	for ( var i = 0; i < 6; i ++ ) {
 
-		distance = planes[ i ].x * me[12] + planes[ i ].y * me[13] + planes[ i ].z * me[14] + planes[ i ].w;
+		distance = planes[ i ].distanceToPoint( matrixPosition );
 		if ( distance <= radius ) return false;
 
 	}
@@ -2857,6 +3842,166 @@ THREE.Frustum.prototype.contains = function ( object ) {
 };
 
 THREE.Frustum.__v1 = new THREE.Vector3();
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Plane = function ( normal, constant ) {
+
+	if ( normal === undefined && constant === undefined ) {
+
+		this.normal = new THREE.Vector3();
+		this.constant = 0;
+
+	} else {
+
+		this.normal = normal.clone();
+		this.constant = constant || 0;
+
+	}
+
+};
+
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
+
+	set: function ( normal, constant ) {
+
+		this.normal.copy( normal );
+		this.constant = constant;
+
+		return this;
+
+	},
+
+	setComponents: function ( x, y, z, w ) {
+
+		this.normal.set( x, y, z );
+		this.constant = w;
+
+		return this;
+
+	},
+
+	setFromNormalAndCoplanarPoint: function ( normal, point ) {
+
+		this.normal.copy( normal );
+		this.constant = - point.dot( normal );
+
+		return this;
+
+	},
+
+	setFromCoplanarPoints: function ( a, b, c ) {
+
+		var normal = THREE.Plane.__v1.sub( b, a ).cross(
+					 THREE.Plane.__v2.sub( c, a ) );
+
+		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+
+		this.setFromNormalAndCoplanarPoint( normal, a );
+
+		return this;
+
+	},
+
+	copy: function ( plane ) {
+
+		this.normal.copy( plane.normal );
+		this.constant = plane.constant;
+
+		return this;
+
+	},
+
+	flip: function () {
+
+		this.normal.negate();
+
+		return this;
+
+	},
+
+	normalize: function () {
+
+		// Note: will lead to a divide by zero if the plane is invalid.
+
+		var inverseNormalLength = 1.0 / this.normal.length();
+		this.normal.multiplyScalar( inverseNormalLength );
+		this.constant *= inverseNormalLength;
+
+		return this;
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return this.normal.dot( point ) + this.constant;
+
+	},
+
+	distanceToSphere: function ( sphere ) {
+
+		return this.distanceToPoint( sphere.center ) - sphere.radius;
+
+	},
+
+	projectPoint: function ( point ) {
+
+		return this.orthoPoint( point ).subSelf( point ).negate();
+
+	},
+
+	orthoPoint: function ( point ) {
+
+		var perpendicularMagnitude = this.distanceToPoint( point );
+
+		return new THREE.Vector3().copy( this.normal ).multiplyScalar( perpendicularMagnitude );
+
+	},
+
+	intersectsLine: function ( startPoint, endPoint ) {
+
+		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
+
+		var startSign = this.distanceToPoint( startPoint );
+		var endSign = this.distanceToPoint( endPoint );
+
+		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
+
+	},
+
+	coplanarPoint: function () {
+
+		return new THREE.Vector3().copy( this.normal ).multiplyScalar( - this.constant );
+
+	},
+
+	translate: function ( offset ) {
+
+		this.constant = - offset.dot( this.normal );
+
+		return this;
+
+	},
+
+	equals: function ( plane ) {
+
+		return plane.normal.equals( this.normal ) && ( plane.constant == this.constant );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Plane().copy( this );
+
+	}
+
+};
+
+THREE.Plane.__v1 = new THREE.Vector3();
+THREE.Plane.__v2 = new THREE.Vector3();
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -3341,6 +4486,146 @@ THREE.Rectangle = function () {
 		return _isEmpty;
 
 	};
+
+};
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Sphere = function ( center, radius ) {
+
+
+	if ( center === undefined && radius === undefined ) {
+
+		this.center = new THREE.Vector3();
+		this.radius = 0;
+
+	} else {
+
+		this.center = center.clone();
+		this.radius = radius || 0;
+
+	}
+	
+};
+
+THREE.Sphere.prototype = {
+
+	constructor: THREE.Sphere,
+
+	set: function ( center, radius ) {
+
+		this.center.copy( center );
+		this.radius = radius;
+
+		return this;
+
+	},
+
+	setFromCenterAndPoints: function ( center, points ) {
+
+		var maxRadiusSq = 0;
+
+		for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+			var radiusSq = center.distanceToSquared( points[ i ] );
+			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+
+		}
+
+		this.center = center;
+		this.radius = Math.sqrt( maxRadiusSq );
+
+		return this;
+
+	},
+
+	copy: function ( sphere ) {
+
+		this.center.copy( sphere.center );
+		this.radius = sphere.radius;
+
+		return this;
+
+	},
+
+	empty: function () {
+
+		return ( this.radius <= 0 );
+
+	},
+
+	volume: function () {
+
+		return Math.PI * 4 / 3 * ( this.radius * this.radius * this.radius );
+
+	},
+
+	containsPoint: function ( point ) {
+
+		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
+
+	},
+
+	distanceToPoint: function ( point ) {
+
+		return ( point.distanceTo( this.center ) - this.radius );
+
+	},
+
+	clampPoint: function ( point ) {
+
+		var deltaLengthSq = this.center.distanceToSquared( point );
+
+		var result = new THREE.Vector3().copy( point );
+
+		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
+
+			result.subSelf( this.center ).normalize();
+			result.multiplyScalar( this.radius ).addSelf( this.center );
+
+		}
+
+		return result;
+
+	},
+
+	bounds: function () {
+
+		var box =  new THREE.Box3( this.center, this.center );
+		box.expandByScalar( this.radius );
+
+		return box;
+
+	},
+
+	translate: function ( offset ) {
+
+		this.center.addSelf( this.offset );
+
+		return this;
+
+	},
+
+	scale: function ( factor ) {
+
+		this.radius *= factor;
+
+		return this;
+
+	},
+
+	equals: function ( sphere ) {
+
+		return sphere.center.equals( this.center ) && ( sphere.radius === this.radius );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Sphere3().copy( this );
+
+	}
 
 };
 /**
@@ -4858,7 +6143,7 @@ THREE.Face3 = function ( a, b, c, normal, color, materialIndex ) {
 
 	this.vertexTangents = [];
 
-	this.materialIndex = materialIndex;
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 	this.centroid = new THREE.Vector3();
 
@@ -4908,7 +6193,7 @@ THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
 
 	this.vertexTangents = [];
 
-	this.materialIndex = materialIndex;
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
 
 	this.centroid = new THREE.Vector3();
 
@@ -4944,47 +6229,8 @@ THREE.Face4.prototype = {
 
 THREE.UV = function ( u, v ) {
 
-	this.u = u || 0;
-	this.v = v || 0;
-
-};
-
-THREE.UV.prototype = {
-
-	constructor: THREE.UV,
-
-	set: function ( u, v ) {
-
-		this.u = u;
-		this.v = v;
-
-		return this;
-
-	},
-
-	copy: function ( uv ) {
-
-		this.u = uv.u;
-		this.v = uv.v;
-
-		return this;
-
-	},
-
-	lerpSelf: function ( uv, alpha ) {
-
-		this.u += ( uv.u - this.u ) * alpha;
-		this.v += ( uv.v - this.v ) * alpha;
-
-		return this;
-
-	},
-
-	clone: function () {
-
-		return new THREE.UV( this.u, this.v );
-
-	}
+	console.warn( 'THREE.UV has been DEPRECATED. Use THREE.Vector2 instead.')
+	return new THREE.Vector2( u, v );
 
 };
 /**
@@ -4993,6 +6239,7 @@ THREE.UV.prototype = {
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author zz85 / http://www.lab4games.net/zz85/blog
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Geometry = function () {
@@ -5468,10 +6715,10 @@ THREE.Geometry.prototype = {
 			z1 = vB.z - vA.z;
 			z2 = vC.z - vA.z;
 
-			s1 = uvB.u - uvA.u;
-			s2 = uvC.u - uvA.u;
-			t1 = uvB.v - uvA.v;
-			t2 = uvC.v - uvA.v;
+			s1 = uvB.x - uvA.x;
+			s2 = uvC.x - uvA.x;
+			t1 = uvB.y - uvA.y;
+			t2 = uvC.y - uvA.y;
 
 			r = 1.0 / ( s1 * t2 - s2 * t1 );
 			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
@@ -5565,82 +6812,12 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
-
-			this.boundingBox = { min: new THREE.Vector3(), max: new THREE.Vector3() };
-
-		}
-
-		if ( this.vertices.length > 0 ) {
-
-			var position, firstPosition = this.vertices[ 0 ];
-
-			this.boundingBox.min.copy( firstPosition );
-			this.boundingBox.max.copy( firstPosition );
-
-			var min = this.boundingBox.min,
-				max = this.boundingBox.max;
-
-			for ( var v = 1, vl = this.vertices.length; v < vl; v ++ ) {
-
-				position = this.vertices[ v ];
-
-				if ( position.x < min.x ) {
-
-					min.x = position.x;
-
-				} else if ( position.x > max.x ) {
-
-					max.x = position.x;
-
-				}
-
-				if ( position.y < min.y ) {
-
-					min.y = position.y;
-
-				} else if ( position.y > max.y ) {
-
-					max.y = position.y;
-
-				}
-
-				if ( position.z < min.z ) {
-
-					min.z = position.z;
-
-				} else if ( position.z > max.z ) {
-
-					max.z = position.z;
-
-				}
-
-			}
-
-		} else {
-
-			this.boundingBox.min.set( 0, 0, 0 );
-			this.boundingBox.max.set( 0, 0, 0 );
-
-		}
-
+		this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
 	},
 
 	computeBoundingSphere: function () {
 
-		var maxRadiusSq = 0;
-
-		if ( this.boundingSphere === null ) this.boundingSphere = { radius: 0 };
-
-		for ( var i = 0, l = this.vertices.length; i < l; i ++ ) {
-
-			var radiusSq = this.vertices[ i ].lengthSq();
-			if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
-
-		}
-
-		this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
-
+		this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
 	},
 
 	/*
@@ -5768,7 +6945,7 @@ THREE.Geometry.prototype = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
 
 			}
 
@@ -8035,9 +9212,9 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 	function uv3 ( where, u1, v1, u2, v2, u3, v3 ) {
 
 		where.push( [
-			new THREE.UV( u1, v1 ),
-			new THREE.UV( u2, v2 ),
-			new THREE.UV( u3, v3 )
+			new THREE.Vector2( u1, v1 ),
+			new THREE.Vector2( u2, v2 ),
+			new THREE.Vector2( u3, v3 )
 		] );
 
 	};
@@ -8045,10 +9222,10 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 	function uv4 ( where, u1, v1, u2, v2, u3, v3, u4, v4 ) {
 
 		where.push( [
-			new THREE.UV( u1, v1 ),
-			new THREE.UV( u2, v2 ),
-			new THREE.UV( u3, v3 ),
-			new THREE.UV( u4, v4 )
+			new THREE.Vector2( u1, v1 ),
+			new THREE.Vector2( u2, v2 ),
+			new THREE.Vector2( u3, v3 ),
+			new THREE.Vector2( u4, v4 )
 		] );
 	};
 
@@ -8335,7 +9512,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 					u = uvLayer[ uvIndex * 2 ];
 					v = uvLayer[ uvIndex * 2 + 1 ];
 
-					geometry.faceUvs[ i ][ fi ] = new THREE.UV( u, v );
+					geometry.faceUvs[ i ][ fi ] = new THREE.Vector2( u, v );
 
 				}
 
@@ -8356,7 +9533,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 						u = uvLayer[ uvIndex * 2 ];
 						v = uvLayer[ uvIndex * 2 + 1 ];
 
-						uvs[ j ] = new THREE.UV( u, v );
+						uvs[ j ] = new THREE.Vector2( u, v );
 
 					}
 
@@ -8638,10 +9815,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var urlBase = THREE.Loader.prototype.extractUrlBase( url );
 
-	var dg, dm, dc, df, dt,
-		g, m, l, d, p, r, q, s, c, t, f, tt, pp, u,
-		geometry, material, camera, fog,
-		texture, images,
+	var geometry, material, camera, fog,
+		texture, images, color,
 		light, hex, intensity,
 		counter_models, counter_textures,
 		total_models, total_textures,
@@ -8737,45 +9912,52 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function handle_children( parent, children ) {
 
-		for ( var dd in children ) {
+		var mat, dst, pos, rot, scl, quat;
+
+		for ( var objID in children ) {
 
 			// check by id if child has already been handled,
 			// if not, create new object
 
-			if ( result.objects[ dd ] === undefined ) {
+			if ( result.objects[ objID ] === undefined ) {
 
-				var o = children[ dd ];
+				var objJSON = children[ objID ];
 
 				var object = null;
 
 				// meshes
 
-				if ( o.type && ( o.type in scope.hierarchyHandlerMap ) && o.loading === undefined ) {
+				if ( objJSON.type && ( objJSON.type in scope.hierarchyHandlerMap ) && objJSON.loading === undefined ) {
+
+					var reservedTypes = { "type": 1, "url": 1, "material": 1,
+										  "position": 1, "rotation": 1, "scale" : 1,
+										  "visible": 1, "children": 1, "properties": 1,
+										  "skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1 };
 
 					var loaderParameters = {};
 
-					for ( var parType in g ) {
+					for ( var parType in objJSON ) {
 
-						if ( parType !== "type" && parType !== "url" ) {
+						if ( ! ( parType in reservedTypes ) ) {
 
-							loaderParameters[ parType ] = g[ parType ];
+							loaderParameters[ parType ] = objJSON[ parType ];
 
 						}
 
 					}
 
-					material = result.materials[ o.material ];
+					material = result.materials[ objJSON.material ];
 
-					o.loading = true;
+					objJSON.loading = true;
 
-					var loader = scope.hierarchyHandlerMap[ o.type ][ "loaderObject" ];
+					var loader = scope.hierarchyHandlerMap[ objJSON.type ][ "loaderObject" ];
 
 					// OBJLoader
 
 					if ( loader.addEventListener ) {
 
-						loader.addEventListener( 'load', create_callback_hierachy( dd, parent, material, o ) );
-						loader.load( get_url( o.url, data.urlBaseType ) );
+						loader.addEventListener( 'load', create_callback_hierachy( objID, parent, material, objJSON ) );
+						loader.load( get_url( objJSON.url, data.urlBaseType ) );
 
 					} else {
 
@@ -8783,21 +9965,21 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						if ( loader.options ) {
 
-							loader.load( get_url( o.url, data.urlBaseType ), create_callback_hierachy( dd, parent, material, o ) );
+							loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ) );
 
 						// UTF8Loader
 
 						} else {
 
-							loader.load( get_url( o.url, data.urlBaseType ), create_callback_hierachy( dd, parent, material, o ), loaderParameters );
+							loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ), loaderParameters );
 
 						}
 
 					}
 
-				} else if ( o.geometry !== undefined ) {
+				} else if ( objJSON.geometry !== undefined ) {
 
-					geometry = result.geometries[ o.geometry ];
+					geometry = result.geometries[ objJSON.geometry ];
 
 					// geometry already loaded
 
@@ -8805,25 +9987,25 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						var needsTangents = false;
 
-						material = result.materials[ o.material ];
+						material = result.materials[ objJSON.material ];
 						needsTangents = material instanceof THREE.ShaderMaterial;
 
-						p = o.position;
-						r = o.rotation;
-						q = o.quaternion;
-						s = o.scale;
-						m = o.matrix;
+						pos = objJSON.position;
+						rot = objJSON.rotation;
+						scl = objJSON.scale;
+						mat = objJSON.matrix;
+						quat = objJSON.quaternion;
 
 						// turn off quaternions, for the moment
 
-						q = 0;
+						quat = 0;
 
 						// use materials from the model file
 						// if there is no material specified in the object
 
-						if ( ! o.material ) {
+						if ( ! objJSON.material ) {
 
-							material = new THREE.MeshFaceMaterial( result.face_materials[ o.geometry ] );
+							material = new THREE.MeshFaceMaterial( result.face_materials[ objJSON.geometry ] );
 
 						}
 
@@ -8833,7 +10015,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						if ( ( material instanceof THREE.MeshFaceMaterial ) && material.materials.length === 0 ) {
 
-							material = new THREE.MeshFaceMaterial( result.face_materials[ o.geometry ] );
+							material = new THREE.MeshFaceMaterial( result.face_materials[ objJSON.geometry ] );
 
 						}
 
@@ -8853,29 +10035,29 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						}
 
-						if ( o.skin ) {
+						if ( objJSON.skin ) {
 
 							object = new THREE.SkinnedMesh( geometry, material );
 
-						} else if ( o.morph ) {
+						} else if ( objJSON.morph ) {
 
 							object = new THREE.MorphAnimMesh( geometry, material );
 
-							if ( o.duration !== undefined ) {
+							if ( objJSON.duration !== undefined ) {
 
-								object.duration = o.duration;
-
-							}
-
-							if ( o.time !== undefined ) {
-
-								object.time = o.time;
+								object.duration = objJSON.duration;
 
 							}
 
-							if ( o.mirroredLoop !== undefined ) {
+							if ( objJSON.time !== undefined ) {
 
-								object.mirroredLoop = o.mirroredLoop;
+								object.time = objJSON.time;
+
+							}
+
+							if ( objJSON.mirroredLoop !== undefined ) {
+
+								object.mirroredLoop = objJSON.mirroredLoop;
 
 							}
 
@@ -8891,64 +10073,64 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						}
 
-						object.name = dd;
+						object.name = objID;
 
-						if ( m ) {
+						if ( mat ) {
 
 							object.matrixAutoUpdate = false;
 							object.matrix.set(
-								m[0], m[1], m[2], m[3],
-								m[4], m[5], m[6], m[7],
-								m[8], m[9], m[10], m[11],
-								m[12], m[13], m[14], m[15]
+								mat[0],  mat[1],  mat[2],  mat[3],
+								mat[4],  mat[5],  mat[6],  mat[7],
+								mat[8],  mat[9],  mat[10], mat[11],
+								mat[12], mat[13], mat[14], mat[15]
 							);
 
 						} else {
 
-							object.position.set( p[0], p[1], p[2] );
+							object.position.set( pos[0], pos[1], pos[2] );
 
-							if ( q ) {
+							if ( quat ) {
 
-								object.quaternion.set( q[0], q[1], q[2], q[3] );
+								object.quaternion.set( quat[0], quat[1], quat[2], quat[3] );
 								object.useQuaternion = true;
 
 							} else {
 
-								object.rotation.set( r[0], r[1], r[2] );
+								object.rotation.set( rot[0], rot[1], rot[2] );
 
 							}
 
-							object.scale.set( s[0], s[1], s[2] );
+							object.scale.set( scl[0], scl[1], scl[2] );
 
 						}
 
-						object.visible = o.visible;
-						object.castShadow = o.castShadow;
-						object.receiveShadow = o.receiveShadow;
+						object.visible = objJSON.visible;
+						object.castShadow = objJSON.castShadow;
+						object.receiveShadow = objJSON.receiveShadow;
 
 						parent.add( object );
 
-						result.objects[ dd ] = object;
+						result.objects[ objID ] = object;
 
 					}
 
 				// lights
 
-				} else if ( o.type === "DirectionalLight" || o.type === "PointLight" || o.type === "AmbientLight" ) {
+				} else if ( objJSON.type === "DirectionalLight" || objJSON.type === "PointLight" || objJSON.type === "AmbientLight" ) {
 
-					hex = ( o.color !== undefined ) ? o.color : 0xffffff;
-					intensity = ( o.intensity !== undefined ) ? o.intensity : 1;
+					hex = ( objJSON.color !== undefined ) ? objJSON.color : 0xffffff;
+					intensity = ( objJSON.intensity !== undefined ) ? objJSON.intensity : 1;
 
-					if ( o.type === "DirectionalLight" ) {
+					if ( objJSON.type === "DirectionalLight" ) {
 
-						p = o.direction;
+						pos = objJSON.direction;
 
 						light = new THREE.DirectionalLight( hex, intensity );
-						light.position.set( p[0], p[1], p[2] );
+						light.position.set( pos[0], pos[1], pos[2] );
 
-						if ( o.target ) {
+						if ( objJSON.target ) {
 
-							target_array.push( { "object": light, "targetName" : o.target } );
+							target_array.push( { "object": light, "targetName" : objJSON.target } );
 
 							// kill existing default target
 							// otherwise it gets added to scene when parent gets added
@@ -8957,15 +10139,15 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						}
 
-					} else if ( o.type === "PointLight" ) {
+					} else if ( objJSON.type === "PointLight" ) {
 
-						p = o.position;
-						d = o.distance;
+						pos = objJSON.position;
+						dst = objJSON.distance;
 
-						light = new THREE.PointLight( hex, intensity, d );
-						light.position.set( p[0], p[1], p[2] );
+						light = new THREE.PointLight( hex, intensity, dst );
+						light.position.set( pos[0], pos[1], pos[2] );
 
-					} else if ( o.type === "AmbientLight" ) {
+					} else if ( objJSON.type === "AmbientLight" ) {
 
 						light = new THREE.AmbientLight( hex );
 
@@ -8973,86 +10155,86 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					parent.add( light );
 
-					light.name = dd;
-					result.lights[ dd ] = light;
-					result.objects[ dd ] = light;
+					light.name = objID;
+					result.lights[ objID ] = light;
+					result.objects[ objID ] = light;
 
 				// cameras
 
-				} else if ( o.type === "PerspectiveCamera" || o.type === "OrthographicCamera" ) {
+				} else if ( objJSON.type === "PerspectiveCamera" || objJSON.type === "OrthographicCamera" ) {
 
-					if ( o.type === "PerspectiveCamera" ) {
+					if ( objJSON.type === "PerspectiveCamera" ) {
 
-						camera = new THREE.PerspectiveCamera( o.fov, o.aspect, o.near, o.far );
+						camera = new THREE.PerspectiveCamera( objJSON.fov, objJSON.aspect, objJSON.near, objJSON.far );
 
-					} else if ( o.type === "OrthographicCamera" ) {
+					} else if ( objJSON.type === "OrthographicCamera" ) {
 
-						camera = new THREE.OrthographicCamera( c.left, c.right, c.top, c.bottom, c.near, c.far );
+						camera = new THREE.OrthographicCamera( objJSON.left, objJSON.right, objJSON.top, objJSON.bottom, objJSON.near, objJSON.far );
 
 					}
 
-					p = o.position;
-					camera.position.set( p[0], p[1], p[2] );
+					pos = objJSON.position;
+					camera.position.set( pos[0], pos[1], pos[2] );
 					parent.add( camera );
 
-					camera.name = dd;
-					result.cameras[ dd ] = camera;
-					result.objects[ dd ] = camera;
+					camera.name = objID;
+					result.cameras[ objID ] = camera;
+					result.objects[ objID ] = camera;
 
 				// pure Object3D
 
 				} else {
 
-					p = o.position;
-					r = o.rotation;
-					q = o.quaternion;
-					s = o.scale;
+					pos = objJSON.position;
+					rot = objJSON.rotation;
+					scl = objJSON.scale;
+					quat = objJSON.quaternion;
 
 					// turn off quaternions, for the moment
 
-					q = 0;
+					quat = 0;
 
 					object = new THREE.Object3D();
-					object.name = dd;
-					object.position.set( p[0], p[1], p[2] );
+					object.name = objID;
+					object.position.set( pos[0], pos[1], pos[2] );
 
-					if ( q ) {
+					if ( quat ) {
 
-						object.quaternion.set( q[0], q[1], q[2], q[3] );
+						object.quaternion.set( quat[0], quat[1], quat[2], quat[3] );
 						object.useQuaternion = true;
 
 					} else {
 
-						object.rotation.set( r[0], r[1], r[2] );
+						object.rotation.set( rot[0], rot[1], rot[2] );
 
 					}
 
-					object.scale.set( s[0], s[1], s[2] );
-					object.visible = ( o.visible !== undefined ) ? o.visible : false;
+					object.scale.set( scl[0], scl[1], scl[2] );
+					object.visible = ( objJSON.visible !== undefined ) ? objJSON.visible : false;
 
 					parent.add( object );
 
-					result.objects[ dd ] = object;
-					result.empties[ dd ] = object;
+					result.objects[ objID ] = object;
+					result.empties[ objID ] = object;
 
 				}
 
 				if ( object ) {
 
-					if ( o.properties !== undefined )  {
+					if ( objJSON.properties !== undefined )  {
 
-						for ( var key in o.properties ) {
+						for ( var key in objJSON.properties ) {
 
-							var value = o.properties[ key ];
+							var value = objJSON.properties[ key ];
 							object.properties[ key ] = value;
 
 						}
 
 					}
 
-					if ( o.children !== undefined ) {
+					if ( objJSON.children !== undefined ) {
 
-						handle_children( object, o.children );
+						handle_children( object, objJSON.children );
 
 					}
 
@@ -9072,12 +10254,12 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
-	function handle_hierarchy( node, id, parent, material, o ) {
+	function handle_hierarchy( node, id, parent, material, obj ) {
 
-		var p = o.position;
-		var r = o.rotation;
-		var q = o.quaternion;
-		var s = o.scale;
+		var p = obj.position;
+		var r = obj.rotation;
+		var q = obj.quaternion;
+		var s = obj.scale;
 
 		node.position.set( p[0], p[1], p[2] );
 
@@ -9258,24 +10440,26 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// fogs
 
-	for ( df in data.fogs ) {
+	var fogID, fogJSON;
 
-		f = data.fogs[ df ];
+	for ( fogID in data.fogs ) {
 
-		if ( f.type === "linear" ) {
+		fogJSON = data.fogs[ fogID ];
 
-			fog = new THREE.Fog( 0x000000, f.near, f.far );
+		if ( fogJSON.type === "linear" ) {
 
-		} else if ( f.type === "exp2" ) {
+			fog = new THREE.Fog( 0x000000, fogJSON.near, fogJSON.far );
 
-			fog = new THREE.FogExp2( 0x000000, f.density );
+		} else if ( fogJSON.type === "exp2" ) {
+
+			fog = new THREE.FogExp2( 0x000000, fogJSON.density );
 
 		}
 
-		c = f.color;
-		fog.color.setRGB( c[0], c[1], c[2] );
+		color = fogJSON.color;
+		fog.color.setRGB( color[0], color[1], color[2] );
 
-		result.fogs[ df ] = fog;
+		result.fogs[ fogID ] = fog;
 
 	}
 
@@ -9285,11 +10469,13 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many geometries will be loaded asynchronously
 
-	for ( dg in data.geometries ) {
+	var geoID, geoJSON;
 
-		g = data.geometries[ dg ];
+	for ( geoID in data.geometries ) {
 
-		if ( g.type in this.geometryHandlerMap ) {
+		geoJSON = data.geometries[ geoID ];
+
+		if ( geoJSON.type in this.geometryHandlerMap ) {
 
 			counter_models += 1;
 
@@ -9301,11 +10487,13 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many hierarchies will be loaded asynchronously
 
-	for ( var dd in data.objects ) {
+	var objID, objJSON;
 
-		var o = data.objects[ dd ];
+	for ( objID in data.objects ) {
 
-		if ( o.type && ( o.type in this.hierarchyHandlerMap ) ) {
+		objJSON = data.objects[ objID ];
+
+		if ( objJSON.type && ( objJSON.type in this.hierarchyHandlerMap ) ) {
 
 			counter_models += 1;
 
@@ -9317,59 +10505,60 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	total_models = counter_models;
 
-	for ( dg in data.geometries ) {
+	for ( geoID in data.geometries ) {
 
-		g = data.geometries[ dg ];
+		geoJSON = data.geometries[ geoID ];
 
-		if ( g.type === "cube" ) {
+		if ( geoJSON.type === "cube" ) {
 
-			geometry = new THREE.CubeGeometry( g.width, g.height, g.depth, g.widthSegments, g.heightSegments, g.depthSegments );
-			result.geometries[ dg ] = geometry;
+			geometry = new THREE.CubeGeometry( geoJSON.width, geoJSON.height, geoJSON.depth, geoJSON.widthSegments, geoJSON.heightSegments, geoJSON.depthSegments );
+			result.geometries[ geoID ] = geometry;
 
-		} else if ( g.type === "plane" ) {
+		} else if ( geoJSON.type === "plane" ) {
 
-			geometry = new THREE.PlaneGeometry( g.width, g.height, g.widthSegments, g.heightSegments );
-			result.geometries[ dg ] = geometry;
+			geometry = new THREE.PlaneGeometry( geoJSON.width, geoJSON.height, geoJSON.widthSegments, geoJSON.heightSegments );
+			result.geometries[ geoID ] = geometry;
 
-		} else if ( g.type === "sphere" ) {
+		} else if ( geoJSON.type === "sphere" ) {
 
-			geometry = new THREE.SphereGeometry( g.radius, g.widthSegments, g.heightSegments );
-			result.geometries[ dg ] = geometry;
+			geometry = new THREE.SphereGeometry( geoJSON.radius, geoJSON.widthSegments, geoJSON.heightSegments );
+			result.geometries[ geoID ] = geometry;
 
-		} else if ( g.type === "cylinder" ) {
+		} else if ( geoJSON.type === "cylinder" ) {
 
-			geometry = new THREE.CylinderGeometry( g.topRad, g.botRad, g.height, g.radSegs, g.heightSegs );
-			result.geometries[ dg ] = geometry;
+			geometry = new THREE.CylinderGeometry( geoJSON.topRad, geoJSON.botRad, geoJSON.height, geoJSON.radSegs, geoJSON.heightSegs );
+			result.geometries[ geoID ] = geometry;
 
-		} else if ( g.type === "torus" ) {
+		} else if ( geoJSON.type === "torus" ) {
 
-			geometry = new THREE.TorusGeometry( g.radius, g.tube, g.segmentsR, g.segmentsT );
-			result.geometries[ dg ] = geometry;
+			geometry = new THREE.TorusGeometry( geoJSON.radius, geoJSON.tube, geoJSON.segmentsR, geoJSON.segmentsT );
+			result.geometries[ geoID ] = geometry;
 
-		} else if ( g.type === "icosahedron" ) {
+		} else if ( geoJSON.type === "icosahedron" ) {
 
-			geometry = new THREE.IcosahedronGeometry( g.radius, g.subdivisions );
-			result.geometries[ dg ] = geometry;
+			geometry = new THREE.IcosahedronGeometry( geoJSON.radius, geoJSON.subdivisions );
+			result.geometries[ geoID ] = geometry;
 
-		} else if ( g.type in this.geometryHandlerMap ) {
+		} else if ( geoJSON.type in this.geometryHandlerMap ) {
 
 			var loaderParameters = {};
-			for ( var parType in g ) {
+
+			for ( var parType in geoJSON ) {
 
 				if ( parType !== "type" && parType !== "url" ) {
 
-					loaderParameters[ parType ] = g[ parType ];
+					loaderParameters[ parType ] = geoJSON[ parType ];
 
 				}
 
 			}
 
-			var loader = this.geometryHandlerMap[ g.type ][ "loaderObject" ];
-			loader.load( get_url( g.url, data.urlBaseType ), create_callback_geometry( dg ), loaderParameters );
+			var loader = this.geometryHandlerMap[ geoJSON.type ][ "loaderObject" ];
+			loader.load( get_url( geoJSON.url, data.urlBaseType ), create_callback_geometry( geoID ), loaderParameters );
 
-		} else if ( g.type === "embedded" ) {
+		} else if ( geoJSON.type === "embedded" ) {
 
-			var modelJson = data.embeds[ g.id ],
+			var modelJson = data.embeds[ geoJSON.id ],
 				texture_path = "";
 
 			// pass metadata along to jsonLoader so it knows the format version
@@ -9379,7 +10568,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			if ( modelJson ) {
 
 				var jsonLoader = this.geometryHandlerMap[ "ascii" ][ "loaderObject" ];
-				jsonLoader.createModel( modelJson, create_callback_embed( dg ), texture_path );
+				jsonLoader.createModel( modelJson, create_callback_embed( geoID ), texture_path );
 
 			}
 
@@ -9391,15 +10580,17 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many textures will be loaded asynchronously
 
-	for ( dt in data.textures ) {
+	var textureID, textureJSON;
 
-		tt = data.textures[ dt ];
+	for ( textureID in data.textures ) {
 
-		if ( tt.url instanceof Array ) {
+		textureJSON = data.textures[ textureID ];
 
-			counter_textures += tt.url.length;
+		if ( textureJSON.url instanceof Array ) {
 
-			for( var n = 0; n < tt.url.length; n ++ ) {
+			counter_textures += textureJSON.url.length;
+
+			for( var n = 0; n < textureJSON.url.length; n ++ ) {
 
 				scope.onLoadStart();
 
@@ -9417,24 +10608,24 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	total_textures = counter_textures;
 
-	for ( dt in data.textures ) {
+	for ( textureID in data.textures ) {
 
-		tt = data.textures[ dt ];
+		textureJSON = data.textures[ textureID ];
 
-		if ( tt.mapping !== undefined && THREE[ tt.mapping ] !== undefined  ) {
+		if ( textureJSON.mapping !== undefined && THREE[ textureJSON.mapping ] !== undefined  ) {
 
-			tt.mapping = new THREE[ tt.mapping ]();
+			textureJSON.mapping = new THREE[ textureJSON.mapping ]();
 
 		}
 
-		if ( tt.url instanceof Array ) {
+		if ( textureJSON.url instanceof Array ) {
 
-			var count = tt.url.length;
+			var count = textureJSON.url.length;
 			var url_array = [];
 
 			for( var i = 0; i < count; i ++ ) {
 
-				url_array[ i ] = get_url( tt.url[ i ], data.urlBaseType );
+				url_array[ i ] = get_url( textureJSON.url[ i ], data.urlBaseType );
 
 			}
 
@@ -9442,196 +10633,199 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			if ( isCompressed ) {
 
-				texture = THREE.ImageUtils.loadCompressedTextureCube( url_array, tt.mapping, generateTextureCallback( count ) );
+				texture = THREE.ImageUtils.loadCompressedTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
 
 			} else {
 
-				texture = THREE.ImageUtils.loadTextureCube( url_array, tt.mapping, generateTextureCallback( count ) );
+				texture = THREE.ImageUtils.loadTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
 
 			}
 
 		} else {
 
-			var isCompressed = tt.url.toLowerCase().endsWith( ".dds" );
-			var fullUrl = get_url( tt.url, data.urlBaseType );
+			var isCompressed = textureJSON.url.toLowerCase().endsWith( ".dds" );
+			var fullUrl = get_url( textureJSON.url, data.urlBaseType );
 			var textureCallback = generateTextureCallback( 1 );
 
 			if ( isCompressed ) {
 
-				texture = THREE.ImageUtils.loadCompressedTexture( fullUrl, tt.mapping, textureCallback );
+				texture = THREE.ImageUtils.loadCompressedTexture( fullUrl, textureJSON.mapping, textureCallback );
 
 			} else {
 
-				texture = THREE.ImageUtils.loadTexture( fullUrl, tt.mapping, textureCallback );
+				texture = THREE.ImageUtils.loadTexture( fullUrl, textureJSON.mapping, textureCallback );
 
 			}
 
-			if ( THREE[ tt.minFilter ] !== undefined )
-				texture.minFilter = THREE[ tt.minFilter ];
+			if ( THREE[ textureJSON.minFilter ] !== undefined )
+				texture.minFilter = THREE[ textureJSON.minFilter ];
 
-			if ( THREE[ tt.magFilter ] !== undefined )
-				texture.magFilter = THREE[ tt.magFilter ];
+			if ( THREE[ textureJSON.magFilter ] !== undefined )
+				texture.magFilter = THREE[ textureJSON.magFilter ];
 
-			if ( tt.anisotropy ) texture.anisotropy = tt.anisotropy;
+			if ( textureJSON.anisotropy ) texture.anisotropy = textureJSON.anisotropy;
 
-			if ( tt.repeat ) {
+			if ( textureJSON.repeat ) {
 
-				texture.repeat.set( tt.repeat[ 0 ], tt.repeat[ 1 ] );
+				texture.repeat.set( textureJSON.repeat[ 0 ], textureJSON.repeat[ 1 ] );
 
-				if ( tt.repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
-				if ( tt.repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
+				if ( textureJSON.repeat[ 0 ] !== 1 ) texture.wrapS = THREE.RepeatWrapping;
+				if ( textureJSON.repeat[ 1 ] !== 1 ) texture.wrapT = THREE.RepeatWrapping;
 
 			}
 
-			if ( tt.offset ) {
+			if ( textureJSON.offset ) {
 
-				texture.offset.set( tt.offset[ 0 ], tt.offset[ 1 ] );
+				texture.offset.set( textureJSON.offset[ 0 ], textureJSON.offset[ 1 ] );
 
 			}
 
 			// handle wrap after repeat so that default repeat can be overriden
 
-			if ( tt.wrap ) {
+			if ( textureJSON.wrap ) {
 
 				var wrapMap = {
 				"repeat" 	: THREE.RepeatWrapping,
 				"mirror"	: THREE.MirroredRepeatWrapping
 				}
 
-				if ( wrapMap[ tt.wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ tt.wrap[ 0 ] ];
-				if ( wrapMap[ tt.wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ tt.wrap[ 1 ] ];
+				if ( wrapMap[ textureJSON.wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ textureJSON.wrap[ 0 ] ];
+				if ( wrapMap[ textureJSON.wrap[ 1 ] ] !== undefined ) texture.wrapT = wrapMap[ textureJSON.wrap[ 1 ] ];
 
 			}
 
 		}
 
-		result.textures[ dt ] = texture;
+		result.textures[ textureID ] = texture;
 
 	}
 
 	// materials
 
-	for ( dm in data.materials ) {
+	var matID, matJSON;
+	var parID;
 
-		m = data.materials[ dm ];
+	for ( matID in data.materials ) {
 
-		for ( pp in m.parameters ) {
+		matJSON = data.materials[ matID ];
 
-			if ( pp === "envMap" || pp === "map" || pp === "lightMap" || pp === "bumpMap" ) {
+		for ( parID in matJSON.parameters ) {
 
-				m.parameters[ pp ] = result.textures[ m.parameters[ pp ] ];
+			if ( parID === "envMap" || parID === "map" || parID === "lightMap" || parID === "bumpMap" ) {
 
-			} else if ( pp === "shading" ) {
+				matJSON.parameters[ parID ] = result.textures[ matJSON.parameters[ parID ] ];
 
-				m.parameters[ pp ] = ( m.parameters[ pp ] === "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
+			} else if ( parID === "shading" ) {
 
-			} else if ( pp === "side" ) {
+				matJSON.parameters[ parID ] = ( matJSON.parameters[ parID ] === "flat" ) ? THREE.FlatShading : THREE.SmoothShading;
 
-				if (  m.parameters[ pp ] == "double" ) {
+			} else if ( parID === "side" ) {
 
-					m.parameters[ pp ] = THREE.DoubleSide;
+				if ( matJSON.parameters[ parID ] == "double" ) {
 
-				} else if ( m.parameters[ pp ] == "back" ) {
+					matJSON.parameters[ parID ] = THREE.DoubleSide;
 
-					m.parameters[ pp ] = THREE.BackSide;
+				} else if ( matJSON.parameters[ parID ] == "back" ) {
+
+					matJSON.parameters[ parID ] = THREE.BackSide;
 
 				} else {
 
-					m.parameters[ pp ] = THREE.FrontSide;
+					matJSON.parameters[ parID ] = THREE.FrontSide;
 
 				}
 
-			} else if ( pp === "blending" ) {
+			} else if ( parID === "blending" ) {
 
-				m.parameters[ pp ] = m.parameters[ pp ] in THREE ? THREE[ m.parameters[ pp ] ] : THREE.NormalBlending;
+				matJSON.parameters[ parID ] = matJSON.parameters[ parID ] in THREE ? THREE[ matJSON.parameters[ parID ] ] : THREE.NormalBlending;
 
-			} else if ( pp === "combine" ) {
+			} else if ( parID === "combine" ) {
 
-				m.parameters[ pp ] = ( m.parameters[ pp ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;
+				matJSON.parameters[ parID ] = ( matJSON.parameters[ parID ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;
 
-			} else if ( pp === "vertexColors" ) {
+			} else if ( parID === "vertexColors" ) {
 
-				if ( m.parameters[ pp ] == "face" ) {
+				if ( matJSON.parameters[ parID ] == "face" ) {
 
-					m.parameters[ pp ] = THREE.FaceColors;
+					matJSON.parameters[ parID ] = THREE.FaceColors;
 
 				// default to vertex colors if "vertexColors" is anything else face colors or 0 / null / false
 
-				} else if ( m.parameters[ pp ] )   {
+				} else if ( matJSON.parameters[ parID ] )   {
 
-					m.parameters[ pp ] = THREE.VertexColors;
+					matJSON.parameters[ parID ] = THREE.VertexColors;
 
 				}
 
-			} else if ( pp === "wrapRGB" ) {
+			} else if ( parID === "wrapRGB" ) {
 
-				var v3 = m.parameters[ pp ];
-				m.parameters[ pp ] = new THREE.Vector3( v3[ 0 ], v3[ 1 ], v3[ 2 ] );
+				var v3 = matJSON.parameters[ parID ];
+				matJSON.parameters[ parID ] = new THREE.Vector3( v3[ 0 ], v3[ 1 ], v3[ 2 ] );
 
 			}
 
 		}
 
-		if ( m.parameters.opacity !== undefined && m.parameters.opacity < 1.0 ) {
+		if ( matJSON.parameters.opacity !== undefined && matJSON.parameters.opacity < 1.0 ) {
 
-			m.parameters.transparent = true;
+			matJSON.parameters.transparent = true;
 
 		}
 
-		if ( m.parameters.normalMap ) {
+		if ( matJSON.parameters.normalMap ) {
 
 			var shader = THREE.ShaderUtils.lib[ "normal" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-			var diffuse = m.parameters.color;
-			var specular = m.parameters.specular;
-			var ambient = m.parameters.ambient;
-			var shininess = m.parameters.shininess;
+			var diffuse = matJSON.parameters.color;
+			var specular = matJSON.parameters.specular;
+			var ambient = matJSON.parameters.ambient;
+			var shininess = matJSON.parameters.shininess;
 
-			uniforms[ "tNormal" ].value = result.textures[ m.parameters.normalMap ];
+			uniforms[ "tNormal" ].value = result.textures[ matJSON.parameters.normalMap ];
 
-			if ( m.parameters.normalScale ) {
+			if ( matJSON.parameters.normalScale ) {
 
-				uniforms[ "uNormalScale" ].value.set( m.parameters.normalScale[ 0 ], m.parameters.normalScale[ 1 ] );
+				uniforms[ "uNormalScale" ].value.set( matJSON.parameters.normalScale[ 0 ], matJSON.parameters.normalScale[ 1 ] );
 
 			}
 
-			if ( m.parameters.map ) {
+			if ( matJSON.parameters.map ) {
 
-				uniforms[ "tDiffuse" ].value = m.parameters.map;
+				uniforms[ "tDiffuse" ].value = matJSON.parameters.map;
 				uniforms[ "enableDiffuse" ].value = true;
 
 			}
 
-			if ( m.parameters.envMap ) {
+			if ( matJSON.parameters.envMap ) {
 
-				uniforms[ "tCube" ].value = m.parameters.envMap;
+				uniforms[ "tCube" ].value = matJSON.parameters.envMap;
 				uniforms[ "enableReflection" ].value = true;
-				uniforms[ "uReflectivity" ].value = m.parameters.reflectivity;
+				uniforms[ "uReflectivity" ].value = matJSON.parameters.reflectivity;
 
 			}
 
-			if ( m.parameters.lightMap ) {
+			if ( matJSON.parameters.lightMap ) {
 
-				uniforms[ "tAO" ].value = m.parameters.lightMap;
+				uniforms[ "tAO" ].value = matJSON.parameters.lightMap;
 				uniforms[ "enableAO" ].value = true;
 
 			}
 
-			if ( m.parameters.specularMap ) {
+			if ( matJSON.parameters.specularMap ) {
 
-				uniforms[ "tSpecular" ].value = result.textures[ m.parameters.specularMap ];
+				uniforms[ "tSpecular" ].value = result.textures[ matJSON.parameters.specularMap ];
 				uniforms[ "enableSpecular" ].value = true;
 
 			}
 
-			if ( m.parameters.displacementMap ) {
+			if ( matJSON.parameters.displacementMap ) {
 
-				uniforms[ "tDisplacement" ].value = result.textures[ m.parameters.displacementMap ];
+				uniforms[ "tDisplacement" ].value = result.textures[ matJSON.parameters.displacementMap ];
 				uniforms[ "enableDisplacement" ].value = true;
 
-				uniforms[ "uDisplacementBias" ].value = m.parameters.displacementBias;
-				uniforms[ "uDisplacementScale" ].value = m.parameters.displacementScale;
+				uniforms[ "uDisplacementBias" ].value = matJSON.parameters.displacementBias;
+				uniforms[ "uDisplacementScale" ].value = matJSON.parameters.displacementScale;
 
 			}
 
@@ -9641,9 +10835,9 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			uniforms[ "uShininess" ].value = shininess;
 
-			if ( m.parameters.opacity ) {
+			if ( matJSON.parameters.opacity ) {
 
-				uniforms[ "uOpacity" ].value = m.parameters.opacity;
+				uniforms[ "uOpacity" ].value = matJSON.parameters.opacity;
 
 			}
 
@@ -9653,33 +10847,33 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		} else {
 
-			material = new THREE[ m.type ]( m.parameters );
+			material = new THREE[ matJSON.type ]( matJSON.parameters );
 
 		}
 
-		result.materials[ dm ] = material;
+		result.materials[ matID ] = material;
 
 	}
 
 	// second pass through all materials to initialize MeshFaceMaterials
 	// that could be referring to other materials out of order
 
-	for ( dm in data.materials ) {
+	for ( matID in data.materials ) {
 
-		m = data.materials[ dm ];
+		matJSON = data.materials[ matID ];
 
-		if ( m.parameters.materials ) {
+		if ( matJSON.parameters.materials ) {
 
 			var materialArray = [];
 
-			for ( var i = 0; i < m.parameters.materials.length; i ++ ) {
+			for ( var i = 0; i < matJSON.parameters.materials.length; i ++ ) {
 
-				var label = m.parameters.materials[ i ];
+				var label = matJSON.parameters.materials[ i ];
 				materialArray.push( result.materials[ label ] );
 
 			}
 
-			result.materials[ dm ].materials = materialArray;
+			result.materials[ matID ].materials = materialArray;
 
 		}
 
@@ -9703,9 +10897,9 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	}
 
-	c = data.defaults.bgcolor;
+	color = data.defaults.bgcolor;
 	result.bgColor = new THREE.Color();
-	result.bgColor.setRGB( c[0], c[1], c[2] );
+	result.bgColor.setRGB( color[0], color[1], color[2] );
 
 	result.bgColorAlpha = data.defaults.bgalpha;
 
@@ -9826,9 +11020,9 @@ THREE.Material.prototype.setValues = function ( values ) {
 
 				currentValue.copy( newValue );
 
-			} else if ( currentValue instanceof THREE.Color && typeof( newValue ) === "number" ) {
+			} else if ( currentValue instanceof THREE.Color ) {
 
-				currentValue.setHex( newValue );
+				currentValue.set( newValue );
 
 			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 
@@ -12381,7 +13575,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					}
 
-					setFillStyle( material.color.getContextStyle() );
+					setFillStyle( material.color.getStyle() );
 
 					_context.save();
 					_context.translate( v1.x, v1.y );
@@ -12446,8 +13640,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				setStrokeStyle( material.color.getContextStyle() );
-				setFillStyle( material.color.getContextStyle() );
+				setStrokeStyle( material.color.getStyle() );
+				setFillStyle( material.color.getStyle() );
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
@@ -12476,7 +13670,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setLineWidth( material.linewidth );
 				setLineCap( material.linecap );
 				setLineJoin( material.linejoin );
-				setStrokeStyle( material.color.getContextStyle() );
+				setStrokeStyle( material.color.getStyle() );
 
 				_context.stroke();
 				_bboxRect.inflate( material.linewidth * 2 );
@@ -12852,7 +14046,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			setLineWidth( linewidth );
 			setLineCap( linecap );
 			setLineJoin( linejoin );
-			setStrokeStyle( color.getContextStyle() );
+			setStrokeStyle( color.getStyle() );
 
 			_context.stroke();
 
@@ -12862,7 +14056,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function fillPath( color ) {
 
-			setFillStyle( color.getContextStyle() );
+			setFillStyle( color.getStyle() );
 			_context.fill();
 
 		}
@@ -15774,7 +16968,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenMatrixPS = new THREE.Matrix4(),
 
-	_vector3 = new THREE.Vector4(),
+	_vector3 = new THREE.Vector3(),
 
 	// light arrays cache
 
@@ -16654,7 +17848,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			sortArray.sort( function( a, b ) { return b[ 0 ] - a[ 0 ]; } );
+			sortArray.sort( numericalSort );
 
 			for ( v = 0; v < vl; v ++ ) {
 
@@ -17984,8 +19178,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uvi = uv[ i ];
 
-					uvArray[ offset_uv ]     = uvi.u;
-					uvArray[ offset_uv + 1 ] = uvi.v;
+					uvArray[ offset_uv ]     = uvi.x;
+					uvArray[ offset_uv + 1 ] = uvi.y;
 
 					offset_uv += 2;
 
@@ -18005,8 +19199,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uvi = uv[ i ];
 
-					uvArray[ offset_uv ]     = uvi.u;
-					uvArray[ offset_uv + 1 ] = uvi.v;
+					uvArray[ offset_uv ]     = uvi.x;
+					uvArray[ offset_uv + 1 ] = uvi.y;
 
 					offset_uv += 2;
 
@@ -18037,8 +19231,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uv2i = uv2[ i ];
 
-					uv2Array[ offset_uv2 ]     = uv2i.u;
-					uv2Array[ offset_uv2 + 1 ] = uv2i.v;
+					uv2Array[ offset_uv2 ]     = uv2i.x;
+					uv2Array[ offset_uv2 + 1 ] = uv2i.y;
 
 					offset_uv2 += 2;
 
@@ -18058,8 +19252,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					uv2i = uv2[ i ];
 
-					uv2Array[ offset_uv2 ]     = uv2i.u;
-					uv2Array[ offset_uv2 + 1 ] = uv2i.v;
+					uv2Array[ offset_uv2 ]     = uv2i.x;
+					uv2Array[ offset_uv2 + 1 ] = uv2i.y;
 
 					offset_uv2 += 2;
 
@@ -19421,7 +20615,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( influence > 0 ) {
 
-					activeInfluenceIndices.push( [ i, influence ] );
+					activeInfluenceIndices.push( [ influence, i ] );
 
 				}
 
@@ -19448,7 +20642,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( activeInfluenceIndices[ m ] ) {
 
-					influenceIndex = activeInfluenceIndices[ m ][ 0 ];
+					influenceIndex = activeInfluenceIndices[ m ][ 1 ];
 
 					if ( attributes[ "morphTarget" + m ] >= 0 ) {
 
@@ -19519,7 +20713,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function numericalSort ( a, b ) {
 
-		return b[ 1 ] - a[ 1 ];
+		return b[ 0 ] - a[ 0 ];
 
 	};
 
@@ -19673,7 +20867,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// opaque pass (front-to-back order)
 
-			this.setBlending( THREE.NormalBlending );
+			this.setBlending( THREE.NoBlending );
 
 			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false, material );
@@ -19899,21 +21093,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			materialIndex = buffer.materialIndex;
 
-			if ( materialIndex >= 0 ) {
+			material = meshMaterial.materials[ materialIndex ];
 
-				material = meshMaterial.materials[ materialIndex ];
+			if ( material.transparent ) {
 
-				if ( material.transparent ) {
+				globject.transparent = material;
+				globject.opaque = null;
 
-					globject.transparent = material;
-					globject.opaque = null;
+			} else {
 
-				} else {
-
-					globject.opaque = material;
-					globject.transparent = null;
-
-				}
+				globject.opaque = material;
+				globject.transparent = null;
 
 			}
 
@@ -19946,8 +21136,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function sortFacesByMaterial ( geometry, material ) {
 
 		var f, fl, face, materialIndex, vertices,
-			materialHash, groupHash,
-			hash_map = {};
+			groupHash, hash_map = {};
 
 		var numMorphTargets = geometry.morphTargets.length;
 		var numMorphNormals = geometry.morphNormals.length;
@@ -19959,17 +21148,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 			face = geometry.faces[ f ];
-			materialIndex = usesFaceMaterial ? face.materialIndex : undefined;
+			materialIndex = usesFaceMaterial ? face.materialIndex : 0;
 
-			materialHash = ( materialIndex !== undefined ) ? materialIndex : -1;
+			if ( hash_map[ materialIndex ] === undefined ) {
 
-			if ( hash_map[ materialHash ] === undefined ) {
-
-				hash_map[ materialHash ] = { 'hash': materialHash, 'counter': 0 };
+				hash_map[ materialIndex ] = { 'hash': materialIndex, 'counter': 0 };
 
 			}
 
-			groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
+			groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
 
 			if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
@@ -19981,8 +21168,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ groupHash ].vertices + vertices > 65535 ) {
 
-				hash_map[ materialHash ].counter += 1;
-				groupHash = hash_map[ materialHash ].hash + '_' + hash_map[ materialHash ].counter;
+				hash_map[ materialIndex ].counter += 1;
+				groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
 
 				if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
@@ -22558,7 +23745,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 		}
 
@@ -22914,9 +24101,9 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 	tmp.wrapT = this.wrapT;
 
 	tmp.magFilter = this.magFilter;
-	tmp.anisotropy = this.anisotropy;
-
 	tmp.minFilter = this.minFilter;
+
+	tmp.anisotropy = this.anisotropy;
 
 	tmp.offset.copy( this.offset );
 	tmp.repeat.copy( this.repeat );
@@ -23181,7 +24368,7 @@ THREE.GeometryUtils = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
 
 			}
 
@@ -23433,26 +24620,19 @@ THREE.GeometryUtils = {
 
 	},
 
-	// Get triangle area (by Heron's formula)
-	// 	http://en.wikipedia.org/wiki/Heron%27s_formula
+	// Get triangle area (half of parallelogram)
+	//	http://mathworld.wolfram.com/TriangleArea.html
 
 	triangleArea: function ( vectorA, vectorB, vectorC ) {
 
-		var s, a, b, c,
-			tmp = THREE.GeometryUtils.__v1;
+		var tmp1 = THREE.GeometryUtils.__v1,
+			tmp2 = THREE.GeometryUtils.__v2;
 
-		tmp.sub( vectorA, vectorB );
-		a = tmp.length();
+		tmp1.sub( vectorB, vectorA );
+		tmp2.sub( vectorC, vectorA );
+		tmp1.crossSelf( tmp2 );
 
-		tmp.sub( vectorA, vectorC );
-		b = tmp.length();
-
-		tmp.sub( vectorB, vectorC );
-		c = tmp.length();
-
-		s = 0.5 * ( a + b + c );
-
-		return Math.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) );
+		return 0.5 * tmp1.length();
 
 	},
 
@@ -23491,8 +24671,8 @@ THREE.GeometryUtils = {
 
 				// texture repeat
 
-				if( uvs[ j ].u !== 1.0 ) uvs[ j ].u = uvs[ j ].u - Math.floor( uvs[ j ].u );
-				if( uvs[ j ].v !== 1.0 ) uvs[ j ].v = uvs[ j ].v - Math.floor( uvs[ j ].v );
+				if( uvs[ j ].x !== 1.0 ) uvs[ j ].x = uvs[ j ].x - Math.floor( uvs[ j ].x );
+				if( uvs[ j ].y !== 1.0 ) uvs[ j ].y = uvs[ j ].y - Math.floor( uvs[ j ].y );
 
 			}
 
@@ -24124,6 +25304,7 @@ THREE.GeometryUtils = {
 THREE.GeometryUtils.random = THREE.Math.random16;
 
 THREE.GeometryUtils.__v1 = new THREE.Vector3();
+THREE.GeometryUtils.__v2 = new THREE.Vector3();
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -29632,7 +30813,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
     segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
     var i, uvs = [],
-    center = new THREE.Vector3(), centerUV = new THREE.UV( 0.5, 0.5 );
+    center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
 
     this.vertices.push(center);
     uvs.push( centerUV );
@@ -29645,7 +30826,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
         vertex.y = radius * Math.sin( thetaStart + i / segments * thetaLength );
 
         this.vertices.push( vertex );
-        uvs.push( new THREE.UV( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
+        uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
 
     }
 
@@ -29764,10 +30945,10 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 
 				scope.faces.push( face );
 				scope.faceVertexUvs[ 0 ].push( [
-							new THREE.UV( ix / gridX, 1 - iy / gridY ),
-							new THREE.UV( ix / gridX, 1 - ( iy + 1 ) / gridY ),
-							new THREE.UV( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
-							new THREE.UV( ( ix + 1 ) / gridX, 1 - iy / gridY )
+							new THREE.Vector2( ix / gridX, 1 - iy / gridY ),
+							new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY ),
+							new THREE.Vector2( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
+							new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY )
 						] );
 
 			}
@@ -29820,7 +31001,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.UV( u, 1 - v ) );
+			uvsRow.push( new THREE.Vector2( u, 1 - v ) );
 
 		}
 
@@ -29891,7 +31072,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 			var uv1 = uvs[ 0 ][ x ].clone();
 			var uv2 = uvs[ 0 ][ x + 1 ].clone();
-			var uv3 = new THREE.UV( uv2.u, 0 );
+			var uv3 = new THREE.Vector2( uv2.u, 0 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
@@ -29918,7 +31099,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 			var uv1 = uvs[ y ][ x + 1 ].clone();
 			var uv2 = uvs[ y ][ x ].clone();
-			var uv3 = new THREE.UV( uv2.u, 1 );
+			var uv3 = new THREE.Vector2( uv2.u, 1 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
@@ -30609,9 +31790,9 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 			cy = geometry.vertices[ indexC ].y;
 
 		return [
-			new THREE.UV( ax, ay ),
-			new THREE.UV( bx, by ),
-			new THREE.UV( cx, cy )
+			new THREE.Vector2( ax, ay ),
+			new THREE.Vector2( bx, by ),
+			new THREE.Vector2( cx, cy )
 		];
 
 	},
@@ -30644,17 +31825,17 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 		if ( Math.abs( ay - by ) < 0.01 ) {
 			return [
-				new THREE.UV( ax, 1 - az ),
-				new THREE.UV( bx, 1 - bz ),
-				new THREE.UV( cx, 1 - cz ),
-				new THREE.UV( dx, 1 - dz )
+				new THREE.Vector2( ax, 1 - az ),
+				new THREE.Vector2( bx, 1 - bz ),
+				new THREE.Vector2( cx, 1 - cz ),
+				new THREE.Vector2( dx, 1 - dz )
 			];
 		} else {
 			return [
-				new THREE.UV( ay, 1 - az ),
-				new THREE.UV( by, 1 - bz ),
-				new THREE.UV( cy, 1 - cz ),
-				new THREE.UV( dy, 1 - dz )
+				new THREE.Vector2( ay, 1 - az ),
+				new THREE.Vector2( by, 1 - bz ),
+				new THREE.Vector2( cy, 1 - cz ),
+				new THREE.Vector2( dy, 1 - dz )
 			];
 		}
 	}
@@ -30850,11 +32031,11 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.UV( 1 - i / _steps, k / kl ),
-				new THREE.UV( 1 - ( i + 1 ) / _steps, k / kl ),
-				new THREE.UV( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
-				new THREE.UV( 1 - i / _steps, ( k + 1 ) / kl )
-				
+				new THREE.Vector2( 1 - i / _steps, k / kl ),
+				new THREE.Vector2( 1 - ( i + 1 ) / _steps, k / kl ),
+				new THREE.Vector2( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
+				new THREE.Vector2( 1 - i / _steps, ( k + 1 ) / kl )
+
 			] );
 
 		}
@@ -30926,10 +32107,10 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 
 			this.faces.push( face );
 			this.faceVertexUvs[ 0 ].push( [
-				new THREE.UV( ix / gridX, 1 - iz / gridZ ),
-				new THREE.UV( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.UV( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.UV( ( ix + 1 ) / gridX, 1 - iz / gridZ )
+				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
+				new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
+				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
+				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ )
 			] );
 
 		}
@@ -30980,7 +32161,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 			this.vertices.push( vertex );
 
 			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.UV( u, 1 - v ) );
+			uvsRow.push( new THREE.Vector2( u, 1 - v ) );
 
 		}
 
@@ -31131,7 +32312,7 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 			this.vertices.push( vertex );
 
-			uvs.push( new THREE.UV( i / this.tubularSegments, j / this.radialSegments ) );
+			uvs.push( new THREE.Vector2( i / this.tubularSegments, j / this.radialSegments ) );
 			normals.push( vertex.clone().subSelf( center ).normalize() );
 
 		}
@@ -31235,10 +32416,10 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 			var c = this.grid[ ip ][ jp ];
 			var d = this.grid[ i ][ jp ];
 
-			var uva = new THREE.UV( i / this.radialSegments, j / this.tubularSegments );
-			var uvb = new THREE.UV( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
-			var uvc = new THREE.UV( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
-			var uvd = new THREE.UV( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uva = new THREE.Vector2( i / this.radialSegments, j / this.tubularSegments );
+			var uvb = new THREE.Vector2( ( i + 1 ) / this.radialSegments, j / this.tubularSegments );
+			var uvc = new THREE.Vector2( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
+			var uvd = new THREE.Vector2( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva,uvb,uvc, uvd ] );
@@ -31392,10 +32573,10 @@ THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, d
 			c = this.grid[ ip ][ jp ];
 			d = this.grid[ i ][ jp ];
 
-			uva = new THREE.UV( i / this.segments, j / this.radiusSegments );
-			uvb = new THREE.UV( ( i + 1 ) / this.segments, j / this.radiusSegments );
-			uvc = new THREE.UV( ( i + 1 ) / this.segments, ( j + 1 ) / this.radiusSegments );
-			uvd = new THREE.UV( i / this.segments, ( j + 1 ) / this.radiusSegments );
+			uva = new THREE.Vector2( i / this.segments, j / this.radiusSegments );
+			uvb = new THREE.Vector2( ( i + 1 ) / this.segments, j / this.radiusSegments );
+			uvc = new THREE.Vector2( ( i + 1 ) / this.segments, ( j + 1 ) / this.radiusSegments );
+			uvd = new THREE.Vector2( i / this.segments, ( j + 1 ) / this.radiusSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
@@ -31605,7 +32786,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		var u = azimuth( vector ) / 2 / Math.PI + 0.5;
 		var v = inclination( vector ) / Math.PI + 0.5;
-		vertex.uv = new THREE.UV( u, 1 - v );
+		vertex.uv = new THREE.Vector2( u, 1 - v );
 
 		return vertex;
 
@@ -31688,8 +32869,8 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	function correctUV( uv, vector, azimuth ) {
 
-		if ( ( azimuth < 0 ) && ( uv.u === 1 ) ) uv = new THREE.UV( uv.u - 1, uv.v );
-		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new THREE.UV( azimuth / 2 / Math.PI + 0.5, uv.v );
+		if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) uv = new THREE.Vector2( uv.x - 1, uv.y );
+		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new THREE.Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
 		return uv;
 
 	}
@@ -31815,10 +32996,10 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 			c = (i + 1) * sliceCount + j;
 			d = (i + 1) * sliceCount + j + 1;
 
-			uva = new THREE.UV( j / slices, i / stacks );
-			uvb = new THREE.UV( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.UV( j / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.UV( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uva = new THREE.Vector2( j / slices, i / stacks );
+			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
+			uvc = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
+			uvd = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
 
 			if ( useTris ) {
 
@@ -32016,7 +33197,7 @@ THREE.ConvexGeometry = function( vertices ) {
 	function vertexUv( vertex ) {
 
 		var mag = vertex.length();
-		return new THREE.UV( vertex.x / mag, vertex.y / mag );
+		return new THREE.Vector2( vertex.x / mag, vertex.y / mag );
 
 	}
 
@@ -33197,21 +34378,21 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// Prepare subdivided uv
 
-		avgUv = new THREE.UV();
+		avgUv = new THREE.Vector2();
 
 		if ( face instanceof THREE.Face3 ) {
 
-			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u;
-			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v;
-			avgUv.u /= 3;
-			avgUv.v /= 3;
+			avgUv.x = getUV( face.a, i ).x + getUV( face.b, i ).x + getUV( face.c, i ).x;
+			avgUv.y = getUV( face.a, i ).y + getUV( face.b, i ).y + getUV( face.c, i ).y;
+			avgUv.x /= 3;
+			avgUv.y /= 3;
 
 		} else if ( face instanceof THREE.Face4 ) {
 
-			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u + getUV( face.d, i ).u;
-			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v + getUV( face.d, i ).v;
-			avgUv.u /= 4;
-			avgUv.v /= 4;
+			avgUv.x = getUV( face.a, i ).x + getUV( face.b, i ).x + getUV( face.c, i ).x + getUV( face.d, i ).x;
+			avgUv.y = getUV( face.a, i ).y + getUV( face.b, i ).y + getUV( face.c, i ).y + getUV( face.d, i ).y;
+			avgUv.x /= 4;
+			avgUv.y /= 4;
 
 		}
 
@@ -33343,23 +34524,23 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// Prepare subdivided uv
 
-		avgUv = new THREE.UV();
+		avgUv = new THREE.Vector2();
 
-		avgUv.u = getUV(edgeVertexA, faceIndexA).u + getUV(edgeVertexB, faceIndexA).u;
-		avgUv.v = getUV(edgeVertexA, faceIndexA).v + getUV(edgeVertexB, faceIndexA).v;
-		avgUv.u /= 2;
-		avgUv.v /= 2;
+		avgUv.x = getUV(edgeVertexA, faceIndexA).x + getUV(edgeVertexB, faceIndexA).x;
+		avgUv.y = getUV(edgeVertexA, faceIndexA).y + getUV(edgeVertexB, faceIndexA).y;
+		avgUv.x /= 2;
+		avgUv.y /= 2;
 
 		addUV(edgePoints[i], faceIndexA, avgUv);
 
 		if (edge.length>=2) {
 			assert(edge.length == 2, 'did we plan for more than 2 edges?');
-			avgUv = new THREE.UV();
+			avgUv = new THREE.Vector2();
 
-			avgUv.u = getUV(edgeVertexA, faceIndexB).u + getUV(edgeVertexB, faceIndexB).u;
-			avgUv.v = getUV(edgeVertexA, faceIndexB).v + getUV(edgeVertexB, faceIndexB).v;
-			avgUv.u /= 2;
-			avgUv.v /= 2;
+			avgUv.x = getUV(edgeVertexA, faceIndexB).x + getUV(edgeVertexB, faceIndexB).x;
+			avgUv.y = getUV(edgeVertexA, faceIndexB).y + getUV(edgeVertexB, faceIndexB).y;
+			avgUv.x /= 2;
+			avgUv.y /= 2;
 
 			addUV(edgePoints[i], faceIndexB, avgUv);
 		}

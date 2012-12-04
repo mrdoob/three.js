@@ -144,7 +144,7 @@
 				var shadowTexture = new THREE.Texture( canvas );
 				shadowTexture.needsUpdate = true;
 
-				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
+				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture, transparent: true } );
 				var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );

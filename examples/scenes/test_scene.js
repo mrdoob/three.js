@@ -353,9 +353,7 @@
 			"depth" : 10,
 			"widthSegments"  : 1,
 			"heightSegments" : 1,
-			"depthSegments"  : 1,
-			"flipped" : false,
-			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
+			"depthSegments"  : 1
 		},
 
 		"cubeNormals": {
@@ -365,9 +363,7 @@
 			"depth" : 10,
 			"widthSegments"  : 1,
 			"heightSegments" : 1,
-			"depthSegments"  : 1,
-			"flipped" : false,
-			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
+			"depthSegments"  : 1
 		},
 
 		"cubeWire": {
@@ -377,9 +373,7 @@
 			"depth" : 10,
 			"widthSegments"  : 1,
 			"heightSegments" : 1,
-			"depthSegments"  : 1,
-			"flipped" : false,
-			"sides"   : { "px": true, "nx": true, "py": true, "ny": true, "pz": true, "nz": true }
+			"depthSegments"  : 1
 		},
 
 		"plane": {

@@ -674,9 +674,9 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 			cy = geometry.vertices[ indexC ].y;
 
 		return [
-			new THREE.UV( ax, ay ),
-			new THREE.UV( bx, by ),
-			new THREE.UV( cx, cy )
+			new THREE.Vector2( ax, ay ),
+			new THREE.Vector2( bx, by ),
+			new THREE.Vector2( cx, cy )
 		];
 
 	},
@@ -709,17 +709,17 @@ THREE.ExtrudeGeometry.WorldUVGenerator = {
 
 		if ( Math.abs( ay - by ) < 0.01 ) {
 			return [
-				new THREE.UV( ax, 1 - az ),
-				new THREE.UV( bx, 1 - bz ),
-				new THREE.UV( cx, 1 - cz ),
-				new THREE.UV( dx, 1 - dz )
+				new THREE.Vector2( ax, 1 - az ),
+				new THREE.Vector2( bx, 1 - bz ),
+				new THREE.Vector2( cx, 1 - cz ),
+				new THREE.Vector2( dx, 1 - dz )
 			];
 		} else {
 			return [
-				new THREE.UV( ay, 1 - az ),
-				new THREE.UV( by, 1 - bz ),
-				new THREE.UV( cy, 1 - cz ),
-				new THREE.UV( dy, 1 - dz )
+				new THREE.Vector2( ay, 1 - az ),
+				new THREE.Vector2( by, 1 - bz ),
+				new THREE.Vector2( cy, 1 - cz ),
+				new THREE.Vector2( dy, 1 - dz )
 			];
 		}
 	}
