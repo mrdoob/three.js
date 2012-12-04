@@ -67,4 +67,20 @@ THREE.Math = {
 
 	}
 
+	degreesToRadians: function( degrees ) {
+
+	  return degrees * THREE.Math.__d2r;
+
+	};
+
+	radiansToDegrees: function( radians ) {
+
+	  return radians * THREE.Math.__r2d;
+
+	};
+
+
 };
+
+THREE.Math.__d2r =  Math.PI / 180;
+THREE.Math.__r2d =  180 / Math.PI;
