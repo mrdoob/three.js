@@ -51,11 +51,6 @@ test( "empty/makeEmpty", function() {
 	ok( a.empty(), "Passed!" );
 });
 
-test( "volume", function() {
-	var a = new THREE.Box3( zero3, one3 );
-	ok( a.volume() == 1, "Passed!" );
-});
-
 test( "center", function() {
 	var a = new THREE.Box3( zero3 );
 

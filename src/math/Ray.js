@@ -46,19 +46,6 @@ THREE.Ray.prototype = {
 
 	},
 
-	recast: function ( t ) {
-
-		return this.clone().recastSelf( t );
-
-	},
-
-	flip: function () {
-
-		this.direction.negate();
-
-		return this;
-	},
-
 	closestPointToPoint: function ( point ) {
 
 		var result = point.clone().subSelf( this.origin );

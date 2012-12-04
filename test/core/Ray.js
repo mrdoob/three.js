@@ -43,7 +43,7 @@ test( "at", function() {
 	ok( a.at( 1 ).equals( new THREE.Vector3( 1, 1, 2 ) ), "Passed!" );
 });
 
-test( "recast/recastSelf/clone", function() {
+test( "recastSelf/clone", function() {
 	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
 
 	ok( a.recastSelf( 0 ).equals( a ), "Passed!" );
@@ -55,23 +55,10 @@ test( "recast/recastSelf/clone", function() {
 	ok( c.recastSelf( 1 ).equals( new THREE.Ray( new THREE.Vector3( 1, 1, 2 ), new THREE.Vector3( 0, 0, 1 ) ) ), "Passed!" );
 
 	var d = a.clone();
-	var e = d.recast( 1 );
+	var e = d.clone().recastSelf( 1 );
 	ok( d.equals( a ), "Passed!" );
 	ok( ! e.equals( d ), "Passed!" );
 	ok( e.equals( c ), "Passed!" );
-});
-
-test( "flip", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
-
-	var b = a.clone();
-	b.flip();
-	ok( b.direction.equals( new THREE.Vector3( 0, 0, -1 ) ), "Passed!" );
-	ok( ! b.equals( a ), "Passed!" );
-
-	// and let's flip back to original direction
-	b.flip();
-	ok( b.equals( a ), "Passed!" );
 });
 
 test( "closestPointToPoint", function() {
