@@ -82,7 +82,13 @@ THREE.BufferGeometry.prototype = {
 			var bb = this.boundingBox;
 			var x, y, z;
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+			if( positions.length >= 3 ) {
+				bb.min.x = bb.max.x = positions[ 0 ];
+				bb.min.y = bb.max.y = positions[ 1 ];
+				bb.min.z = bb.max.z = positions[ 2 ];
+			}
+
+			for ( var i = 3, il = positions.length; i < il; i += 3 ) {
 
 				x = positions[ i ];
 				y = positions[ i + 1 ];
