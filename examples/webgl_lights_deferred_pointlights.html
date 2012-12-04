@@ -111,7 +111,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, additiveSpecular: false, brightness: 2 } );
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, brightness: 2 } );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -242,7 +242,7 @@
 					mapHeight.anisotropy = 4;
 					mapHeight.format = THREE.RGBFormat;
 
-					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909, wrapAround: true } );
+					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909, wrapAround: true, metal: true } );
 
 					var object = new THREE.Mesh( geometry, material );
 					object.scale.multiplyScalar( 8 );

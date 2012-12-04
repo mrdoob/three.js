@@ -14,7 +14,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var scaledWidth = Math.floor( scale * width );
 	var scaledHeight = Math.floor( scale * height );
 
-	var additiveSpecular = parameters.additiveSpecular;
 	var brightness = parameters.brightness;
 
 	this.renderer = parameters.renderer;
@@ -148,12 +147,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var specular = originalMaterial.specular !== undefined ? originalMaterial.specular : black;
 		var shininess = originalMaterial.shininess !== undefined ? originalMaterial.shininess : 1;
 		var wrapAround = originalMaterial.wrapAround !== undefined ? ( originalMaterial.wrapAround ? -1 : 1 ) : 1;
+		var additiveSpecular = originalMaterial.metal !== undefined ? ( originalMaterial.metal ? 1 : -1 ) : -1;
 
 		uniforms.emissive.value.copy( emissive );
 		uniforms.diffuse.value.copy( diffuse );
 		uniforms.specular.value.copy( specular );
 		uniforms.shininess.value = shininess;
 		uniforms.wrapAround.value = wrapAround;
+		uniforms.additiveSpecular.value = additiveSpecular;
 
 		uniforms.map.value = originalMaterial.map;
 
@@ -238,7 +239,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms:       THREE.UniformsUtils.clone( pointLightShader.uniforms ),
 			vertexShader:   pointLightShader.vertexShader,
 			fragmentShader: pointLightShader.fragmentShader,
-			defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,
@@ -280,7 +280,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms:       THREE.UniformsUtils.clone( directionalLightShader.uniforms ),
 			vertexShader:   directionalLightShader.vertexShader,
 			fragmentShader: directionalLightShader.fragmentShader,
-			defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,

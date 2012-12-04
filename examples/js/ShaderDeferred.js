@@ -20,7 +20,8 @@ THREE.ShaderDeferred = {
 				"emissive" :  { type: "c", value: new THREE.Color( 0x000000 ) },
 				"specular" :  { type: "c", value: new THREE.Color( 0x111111 ) },
 				"shininess":  { type: "f", value: 30 },
-				"wrapAround": { type: "f", value: 1 }
+				"wrapAround": 		{ type: "f", value: 1 },
+				"additiveSpecular": { type: "f", value: 1 }
 			}
 
 		] ),
@@ -32,6 +33,7 @@ THREE.ShaderDeferred = {
 			"uniform vec3 emissive;",
 			"uniform float shininess;",
 			"uniform float wrapAround;",
+			"uniform float additiveSpecular;",
 
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
@@ -78,7 +80,7 @@ THREE.ShaderDeferred = {
 
 				// specular color
 
-				"gl_FragColor.y = vec3_to_float( compressionScale * specular );",
+				"gl_FragColor.y = additiveSpecular * vec3_to_float( compressionScale * specular );",
 
 				// shininess
 
@@ -410,15 +412,17 @@ THREE.ShaderDeferred = {
 
 				"vec3 light = lightIntensity * lightColor;",
 
-				"#ifdef ADDITIVE_SPECULAR",
+				"float additiveSpecular = sign( colorMap.y );",
+
+				"if ( additiveSpecular < 0.0 ) {",
 
 					"gl_FragColor = vec4( albedo * light * diffuse, attenuation ) + vec4( light * specular, attenuation );",
 
-				"#else",
+				"} else {",
 
 					"gl_FragColor = vec4( albedo * light * ( diffuse + specular ), attenuation );",
 
-				"#endif",
+				"}",
 
 			"}"
 
