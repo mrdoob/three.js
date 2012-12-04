@@ -31,7 +31,7 @@
 			var container, stats;
 			var camera, scene, renderer;
 			var projector, plane, cube;
-			var mouse2D, mouse3D, ray,
+			var mouse2D, mouse3D, raycaster,
 			rollOveredFace, isShiftDown = false,
 			theta = 45, isCtrlDown = false;
 
@@ -196,7 +196,7 @@
 
 				event.preventDefault();
 
-				var intersects = ray.intersectObjects( scene.children );
+				var intersects = raycaster.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -276,9 +276,9 @@
 
 				}
 
-				ray = projector.pickingRay( mouse2D.clone(), camera );
+				raycaster = projector.pickingRay( mouse2D.clone(), camera );
 
-				var intersects = ray.intersectObjects( scene.children );
+				var intersects = raycaster.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 

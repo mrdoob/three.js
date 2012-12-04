@@ -159,19 +159,19 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var ray = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
 
 
 				if ( SELECTED ) {
 
-					var intersects = ray.intersectObject( plane );
+					var intersects = raycaster.intersectObject( plane );
 					SELECTED.position.copy( intersects[ 0 ].point.subSelf( offset ) );
 					return;
 
 				}
 
 
-				var intersects = ray.intersectObjects( objects );
+				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 
@@ -208,9 +208,9 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var ray = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
 
-				var intersects = ray.intersectObjects( objects );
+				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 
@@ -218,7 +218,7 @@
 
 					SELECTED = intersects[ 0 ].object;
 
-					var intersects = ray.intersectObject( plane );
+					var intersects = raycaster.intersectObject( plane );
 					offset.copy( intersects[ 0 ].point ).subSelf( plane.position );
 
 					container.style.cursor = 'move';

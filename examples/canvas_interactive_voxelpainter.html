@@ -24,7 +24,7 @@
 			var container, stats;
 			var camera, scene, renderer;
 			var projector, plane;
-			var mouse2D, mouse3D, ray, theta = 45,
+			var mouse2D, mouse3D, raycaster, theta = 45,
 			isShiftDown = false, isCtrlDown = false,
 			target = new THREE.Vector3( 0, 200, 0 );
 			var ROLLOVERED;
@@ -82,7 +82,7 @@
 				scene.add( plane );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
-				ray = new THREE.Raycaster( camera.position, null );
+				raycaster = new THREE.Raycaster( camera.position, null );
 
 				// Lights
 
@@ -141,9 +141,9 @@
 				mouse2D.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 				mouse3D = projector.unprojectVector( mouse2D.clone(), camera );
-				ray.direction = mouse3D.subSelf( camera.position ).normalize();
+				raycaster.direction = mouse3D.subSelf( camera.position ).normalize();
 
-				var intersects = ray.intersectObjects( scene.children );
+				var intersects = raycaster.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
@@ -160,7 +160,7 @@
 
 				event.preventDefault();
 
-				var intersects = ray.intersectObjects( scene.children );
+				var intersects = raycaster.intersectObjects( scene.children );
 
 				if ( intersects.length > 0 ) {
 
