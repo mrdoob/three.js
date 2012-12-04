@@ -163,32 +163,23 @@ test( "isIntersectionPlane", function() {
 test( "intersectPlane", function() {
 	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
 
-	console.log( one3 );
-	console.log( a );
-
 	// parallel plane behind
 	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 1, 1, -1 ) );
-	console.log( b );
-	console.log( a.intersectPlane( b ) );
 	ok( a.intersectPlane( b ).equals( new THREE.Vector3( 1, 1, -1 ) ), "Passed!" );
 
 	// parallel plane coincident with origin
 	var c = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 1, 1, 0 ) );
-	console.log( a.intersectPlane( c ) );
 	ok( a.intersectPlane( c ).equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
 
 	// parallel plane infront
 	var d = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 1, 1, 1 ) );
-	console.log( a.intersectPlane( d ) );
 	ok( a.intersectPlane( d ).equals( new THREE.Vector3( 1, 1, 1 ) ), "Passed!" );
 
 	// perpendical ray that overlaps exactly
 	var e = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), one3 );
-	console.log( a.intersectPlane( e ) );
 	ok( a.intersectPlane( e ).equals( a.origin ), "Passed!" );
 
 	// perpendical ray that doesn't overlap
 	var f = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 1, 0, 0 ), zero3 );
-	console.log( a.intersectPlane( f ) );
 	ok( a.intersectPlane( f ) === undefined, "Passed!" );
 });
