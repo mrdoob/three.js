@@ -65,12 +65,6 @@ THREE.Sphere.prototype = {
 
 	},
 
-	volume: function () {
-
-		return Math.PI * 4 / 3 * ( this.radius * this.radius * this.radius );
-
-	},
-
 	containsPoint: function ( point ) {
 
 		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );

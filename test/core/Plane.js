@@ -78,14 +78,6 @@ test( "setFromNormalAndCoplanarPoint", function() {
 	ok( a.constant == 0, "Passed!" );
 });
 
-test( "flip", function() {
-	var a = new THREE.Plane( one3, 0 );
-	
-	ok( a.normal.equals( one3 ), "Passed!" );
-	a.flip();
-	ok( a.normal.negate().equals( one3 ), "Passed!" );
-});
-
 test( "normalize", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), 2 );
 	

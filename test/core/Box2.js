@@ -1,4 +1,4 @@
-	/**
+/**
  * @author bhouston / http://exocortex.com
  */
 
@@ -17,7 +17,6 @@ test( "constructor", function() {
 	ok( a.min.equals( zero2 ), "Passed!" );
 	ok( a.max.equals( one2 ), "Passed!" );
 });
-
 
 test( "copy", function() {
 	var a = new THREE.Box2( zero2, one2 );
@@ -50,14 +49,6 @@ test( "empty/makeEmpty", function() {
 
 	a.makeEmpty();
 	ok( a.empty(), "Passed!" );
-});
-
-test( "volume", function() {
-	var a = new THREE.Box2( zero2, one2 );
-	ok( a.volume() == 1, "Passed!" );
-
-	a = new THREE.Box2( one2.clone().negate(), zero2 );
-	ok( a.volume() == 1, "Passed!" );
 });
 
 test( "center", function() {
