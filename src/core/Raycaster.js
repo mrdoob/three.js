@@ -122,66 +122,68 @@
 				// if negative distance, then plane is behind raycaster
 				if ( planeDistance < 0 ) continue;
 
-				var planeSign = localRay.direction.dot( facePlane.normal );
+				// check if we hit the wrong side of a single sided face
+				if( side !== THREE.DoubleSide ) {
+					var planeSign = localRay.direction.dot( facePlane.normal );
+					if( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
+						continue;
+					}
+				}
+				
+				intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
 
-				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
+				if ( face instanceof THREE.Face3 ) {
 
-					intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
+					a = vertices[ face.a ];
+					b = vertices[ face.b ];
+					c = vertices[ face.c ];
 
-					if ( face instanceof THREE.Face3 ) {
+					if ( pointInFace3( intersectPoint, a, b, c ) ) {
 
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
+						var point = raycaster.ray.at( planeDistance );
+						// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
+						distance = raycaster.ray.origin.distanceTo( point );
 
-						if ( pointInFace3( intersectPoint, a, b, c ) ) {
+						// Optimization: clipping based on distance can be done earlier if plane is normalized.
+						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
-							var point = raycaster.ray.at( planeDistance );
-							// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
-							distance = raycaster.ray.origin.distanceTo( point );
+						intersects.push( {
 
-							// Optimization: clipping based on distance can be done earlier if plane is normalized.
-							if ( distance < raycaster.near || distance > raycaster.far ) continue;
+							distance: distance,
+							point: point,
+							face: face,
+							faceIndex: f,
+							object: object
 
-							intersects.push( {
+						} );
 
-								distance: distance,
-								point: point,
-								face: face,
-								faceIndex: f,
-								object: object
+					}
 
-							} );
+				} else if ( face instanceof THREE.Face4 ) {
 
-						}
+					a = vertices[ face.a ];
+					b = vertices[ face.b ];
+					c = vertices[ face.c ];
+					d = vertices[ face.d ];
 
-					} else if ( face instanceof THREE.Face4 ) {
+					if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
 
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
-						d = vertices[ face.d ];
+						var point = raycaster.ray.at( planeDistance );
+						// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
+						distance = raycaster.ray.origin.distanceTo( point );
 
-						if ( pointInFace3( intersectPoint, a, b, d ) || pointInFace3( intersectPoint, b, c, d ) ) {
+						// Optimization: clipping based on distance can be done earlier if plane is normalized.
+						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
-							var point = raycaster.ray.at( planeDistance );
-							// Optimization: if input ray was guarrented to be normalized, we can just set distance = planeDistance
-							distance = raycaster.ray.origin.distanceTo( point );
+						intersects.push( {
 
-							// Optimization: clipping based on distance can be done earlier if plane is normalized.
-							if ( distance < raycaster.near || distance > raycaster.far ) continue;
+							distance: distance,
+							point: point,
+							face: face,
+							faceIndex: f,
+							object: object
 
-							intersects.push( {
-
-								distance: distance,
-								point: point,
-								face: face,
-								faceIndex: f,
-								object: object
-
-							} );
-
-						}
+						} );
 
 					}
 
