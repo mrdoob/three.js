@@ -152,9 +152,18 @@
 
 			function goTo( section, category, name ) {
 
+				// Fully resolve links that only provide a name
+				if(!category && !name) {
+					var location = getPageFromList(section);
+					section = location.section;
+					category = location.category;
+					name = location.name;
+				}
+
 				window.document.title = 'three.js - documentation - ' + section + ' - ' + name;
 
 				window.location.hash = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name);
+
 
 				viewer.src = pages[ section ][ category ][ name ] + '.html';
 
@@ -165,6 +174,22 @@
 				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
 				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]) );
 
+			}
+
+			function getPageFromList( name ) {
+				for ( var section in pages ) {
+				  for ( var category in pages[section] ) {
+					for ( var pageName in pages[section][category] ) {
+					  if(pageName === name) {
+						return {
+							section: section,
+							category: category,
+							name: pageName
+						};
+					  }
+					}
+				  }
+				}
 			}
 
 			window.addEventListener( 'hashchange', goToHash, false );
