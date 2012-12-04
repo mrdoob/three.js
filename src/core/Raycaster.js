@@ -16,8 +16,7 @@
 
 	var originCopy = new THREE.Vector3();
 
-	var localOriginCopy = new THREE.Vector3();
-	var localDirectionCopy = new THREE.Vector3();
+	var localRay = new THREE.Ray();
 
 	var vector = new THREE.Vector3();
 	var normal = new THREE.Vector3();
@@ -82,7 +81,7 @@
 			sphere.set(
 				object.matrixWorld.getPosition(),
 				object.geometry.boundingSphere.radius* object.matrixWorld.getMaxScaleOnAxis() );
-			
+
 			if ( ! raycaster.ray.isIntersectionSphere( sphere ) ) {
 
 				return intersects;
@@ -108,12 +107,8 @@
 
 			inverseMatrix.getInverse( object.matrixWorld );
 
-			localOriginCopy.copy( originCopy );
-			inverseMatrix.multiplyVector3( localOriginCopy );
-
-			localDirectionCopy.copy( raycaster.ray.direction );
-			inverseMatrix.rotateAxis( localDirectionCopy ).normalize();
-
+			localRay.copy( raycaster.ray ).transformSelf( inverseMatrix );
+	
 			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 				var face = geometry.faces[ f ];
@@ -124,10 +119,10 @@
 
 				side = material.side;
 
-				vector.sub( face.centroid, localOriginCopy );
+				vector.sub( face.centroid, localRay.origin );
 
 				var normal = face.normal;
-				var dot = localDirectionCopy.dot( normal );
+				var dot = localRay.direction.dot( normal );
 
 				// bail if raycaster and plane are parallel
 
@@ -143,7 +138,7 @@
 
 				if ( side === THREE.DoubleSide || ( side === THREE.FrontSide ? dot < 0 : dot > 0 ) ) {
 
-					intersectPoint.add( localOriginCopy, localDirectionCopy.multiplyScalar( scalar ) );
+					intersectPoint.add( localRay.origin, localRay.direction.multiplyScalar( scalar ) );
 
 					if ( face instanceof THREE.Face3 ) {
 
