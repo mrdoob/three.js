@@ -136,6 +136,21 @@ test( "closestPointToRay", function() {
 });
 */
 
+test( "isIntersectionSphere", function() {
+	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var b = new THREE.Sphere( zero3, 0.5 );
+	var c = new THREE.Sphere( zero3, 1.5 );
+	var d = new THREE.Sphere( one3, 0.1 );
+	var e = new THREE.Sphere( two3, 0.1 );
+	var f = new THREE.Sphere( two3, 1 );
+
+	ok( ! a.isIntersectionSphere( b ), "Passed!" );
+	ok( a.isIntersectionSphere( c ), "Passed!" );
+	ok( a.isIntersectionSphere( d ), "Passed!" );
+	ok( ! a.isIntersectionSphere( e ), "Passed!" );
+	ok( ! a.isIntersectionSphere( f ), "Passed!" );
+});
+
 test( "isIntersectionBox", function() {
 	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
 	var b = new THREE.Box3( zero3, one3 );
