@@ -98,44 +98,6 @@ test( "distanceToPoint", function() {
 	ok( c == 0, "Passed!" );
 });
 
-/*
-test( "distanceToRay", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
-	
-	// parallel ray
-	var b = new THREE.Ray( zero3, new THREE.Vector3( 0, 0, 1 ) );
-	console.log( a );
-	console.log( b );
-	console.log( a.distanceToRay( b ) );
-	console.log( a.closestPointToRay( b ) );
-	ok( a.distanceToRay( b ) == Math.sqrt( 2 ), "Passed!" );
-
-	// perpendical ray that intersects
-	var c = new THREE.Ray( one3, new THREE.Vector3( 1, 0, 0 ) );
-	ok( a.distanceToRay( c ) == 0, "Passed!" );
-
-	// perpendical ray that doesn't intersects
-	var d = new THREE.Ray( one3.clone().subSelf( new THREE.Vector3( 0, 0, -1 ) ), new THREE.Vector3( 1, 0, 0 ) );
-	ok( a.distanceToRay( d ) == 1, "Passed!" );
-});
-
-test( "closestPointToRay", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
-	
-	// parallel ray
-	var b = new THREE.Ray( zero3, new THREE.Vector3( 0, 0, 1 ) );
-	ok( a.closestPointToRay( b ).equals( one3 ), "Passed!" );
-
-	// perpendical ray that intersects
-	var c = new THREE.Ray( one3, new THREE.Vector3( 1, 0, 0 ) );
-	ok( a.closestPointToRay( c ).equals( zero3 ), "Passed!" );
-
-	// perpendical ray that doesn't intersects
-	var d = new THREE.Ray( one3.clone().subSelf( new THREE.Vector3( 0, 0, -1 ) ), new THREE.Vector3( 1, 0, 0 ) );
-	ok( a.closestPointToRay( d ).equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
-});
-*/
-
 test( "isIntersectionSphere", function() {
 	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
 	var b = new THREE.Sphere( zero3, 0.5 );
@@ -149,24 +111,6 @@ test( "isIntersectionSphere", function() {
 	ok( a.isIntersectionSphere( d ), "Passed!" );
 	ok( ! a.isIntersectionSphere( e ), "Passed!" );
 	ok( ! a.isIntersectionSphere( f ), "Passed!" );
-});
-
-test( "isIntersectionBox", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
-	var b = new THREE.Box3( zero3, one3 );
-	var c = new THREE.Box3( one3.clone().negate(), zero3 );
-
-	ok( a.isIntersectionBox( b ), "Passed!" );
-	ok( ! a.isIntersectionBox( c ), "Passed!" );
-});
-
-test( "intersectBox", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
-	var b = new THREE.Box3( zero3, one3 );
-	var c = new THREE.Box3( one3.clone().negate(), zero3 );
-
-	ok( a.intersectBox( b ).equals( one3 ), "Passed!" );
-	ok( a.intersectBox( c ) === undefined, "Passed!" );
 });
 
 test( "isIntersectionPlane", function() {
