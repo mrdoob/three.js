@@ -7,9 +7,14 @@
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
+		
+		// normalized ray.direction required for accurate distance calculations
 		if( this.ray.direction.length() > 0 ) {
-			this.ray.direction.normalize();	// required for accurate distance calculations
+
+			this.ray.direction.normalize();
+
 		}
+
 		this.near = near || 0;
 		this.far = far || Infinity;
 
@@ -112,9 +117,7 @@
 				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : object.material;
 
 				if ( material === undefined ) continue;
-
-				side = material.side;
-
+				
 				facePlane.setFromNormalAndCoplanarPoint( face.normal, face.centroid );
 
 				var planeDistance = localRay.distanceToPlane( facePlane );
@@ -126,11 +129,13 @@
 				if ( planeDistance < 0 ) continue;
 
 				// check if we hit the wrong side of a single sided face
+				side = material.side;
 				if( side !== THREE.DoubleSide ) {
+
 					var planeSign = localRay.direction.dot( facePlane.normal );
-					if( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
-						continue;
-					}
+
+					if( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) continue;
+
 				}
 
 				// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
@@ -144,9 +149,7 @@
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 
-					if ( ! pointInFace3( intersectPoint, a, b, c ) ) {
-						continue;
-					}
+					if ( ! pointInFace3( intersectPoint, a, b, c ) ) continue;
 
 				} else if ( face instanceof THREE.Face4 ) {
 
@@ -155,9 +158,8 @@
 					c = vertices[ face.c ];
 					d = vertices[ face.d ];
 
-					if ( ( ! pointInFace3( intersectPoint, a, b, d ) ) && ( ! pointInFace3( intersectPoint, b, c, d ) ) ) {
-						continue;
-					}
+					if ( ( ! pointInFace3( intersectPoint, a, b, d ) ) &&
+						 ( ! pointInFace3( intersectPoint, b, c, d ) ) ) continue;
 
 				} else {
 
@@ -201,8 +203,12 @@
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
 		this.ray.set( origin, direction );
+
+		// normalized ray.direction required for accurate distance calculations
 		if( this.ray.direction.length() > 0 ) {
-			this.ray.direction.normalize();	// required for accurate distance calculations
+
+			this.ray.direction.normalize();
+
 		}
 
 	};
