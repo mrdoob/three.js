@@ -6,8 +6,7 @@
 
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
-		this.origin = origin || new THREE.Vector3();
-		this.direction = direction || new THREE.Vector3();
+		this.ray = new THREE.Ray( origin, direction );
 		this.near = near || 0;
 		this.far = far || Infinity;
 
@@ -32,19 +31,6 @@
 
 	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
 
-	var distanceFromIntersection = function ( origin, direction, position ) {
-
-		v0.sub( position, origin );
-
-		var dot = v0.dot( direction );
-
-		var intersect = v1.add( origin, v2.copy( direction ).multiplyScalar( dot ) );
-		var distance = position.distanceTo( intersect );
-
-		return distance;
-
-	};
-
 	// http://www.blackpawn.com/texts/pointinpoly/default.html
 
 	var pointInFace3 = function ( p, a, b, c ) {
@@ -67,11 +53,11 @@
 
 	};
 
-	var intersectObject = function ( object, ray, intersects ) {
+	var intersectObject = function ( object, raycaster, intersects ) {
 
 		if ( object instanceof THREE.Particle ) {
 
-			var distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
+			var distance = raycaster.ray.distanceToPoint( object.matrixWorld.getPosition() );
 
 			if ( distance > object.scale.x ) {
 
@@ -94,9 +80,9 @@
 
 			var scaledRadius = object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis();
 
-			// Checking distance to ray
+			// Checking distance to raycaster
 
-			var distance = distanceFromIntersection( ray.origin, ray.direction, object.matrixWorld.getPosition() );
+			var distance = raycaster.ray.distanceToPoint( object.matrixWorld.getPosition() );
 
 			if ( distance > scaledRadius) {
 
@@ -115,18 +101,18 @@
 			var side = object.material.side;
 
 			var a, b, c, d;
-			var precision = ray.precision;
+			var precision = raycaster.precision;
 
 			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
-			originCopy.copy( ray.origin );
+			originCopy.copy( raycaster.ray.origin );
 
 			inverseMatrix.getInverse( object.matrixWorld );
 
 			localOriginCopy.copy( originCopy );
 			inverseMatrix.multiplyVector3( localOriginCopy );
 
-			localDirectionCopy.copy( ray.direction );
+			localDirectionCopy.copy( raycaster.ray.direction );
 			inverseMatrix.rotateAxis( localDirectionCopy ).normalize();
 
 			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
@@ -144,7 +130,7 @@
 				var normal = face.normal;
 				var dot = localDirectionCopy.dot( normal );
 
-				// bail if ray and plane are parallel
+				// bail if raycaster and plane are parallel
 
 				if ( Math.abs( dot ) < precision ) continue;
 
@@ -152,7 +138,7 @@
 
 				var scalar = normal.dot( vector ) / dot;
 
-				// if negative distance, then plane is behind ray
+				// if negative distance, then plane is behind raycaster
 
 				if ( scalar < 0 ) continue;
 
@@ -171,7 +157,7 @@
 							var point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
 							distance = originCopy.distanceTo( point );
 
-							if ( distance < ray.near || distance > ray.far ) continue;
+							if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 							intersects.push( {
 
@@ -197,7 +183,7 @@
 							var point = object.matrixWorld.multiplyVector3( intersectPoint.clone() );
 							distance = originCopy.distanceTo( point );
 
-							if ( distance < ray.near || distance > ray.far ) continue;
+							if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 							intersects.push( {
 
@@ -221,13 +207,13 @@
 
 	};
 
-	var intersectDescendants = function ( object, ray, intersects ) {
+	var intersectDescendants = function ( object, raycaster, intersects ) {
 
 		var descendants = object.getDescendants();
 
 		for ( var i = 0, l = descendants.length; i < l; i ++ ) {
 
-			intersectObject( descendants[ i ], ray, intersects );
+			intersectObject( descendants[ i ], raycaster, intersects );
 
 		}
 	};
@@ -238,8 +224,7 @@
 
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
-		this.origin = origin;
-		this.direction = direction;
+		this.ray.set( origin, direction );
 
 	};
 
