@@ -714,7 +714,7 @@ var Viewport = function ( signals ) {
 		defaultScene.add( defaultCamera );
 
 		signals.sceneAdded.dispatch( defaultScene, defaultCamera, defaultBgColor );
-		signals.objectSelected.dispatch( defaultScene.properties.defaultSelection );
+		signals.objectSelected.dispatch( defaultCamera );
 
 	} );
 
@@ -872,6 +872,8 @@ var Viewport = function ( signals ) {
 
 		var scene = new THREE.Scene();
 
+		/*
+
 		// create lights
 
 		var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
@@ -924,6 +926,8 @@ var Viewport = function ( signals ) {
 		scene.add( light3 );
 		scene.add( light4 );
 		scene.add( mesh );
+
+		*/
 
 		return scene;
 

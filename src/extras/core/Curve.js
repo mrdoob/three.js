@@ -1,7 +1,7 @@
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
- * 
+ *
  * Some common of Curve methods
  * .getPoint(t), getTangent(t)
  * .getPointAt(u), getTagentAt(u)
@@ -110,8 +110,8 @@ THREE.Curve.prototype.getLengths = function ( divisions ) {
 
 	if ( !divisions ) divisions = (this.__arcLengthDivisions) ? (this.__arcLengthDivisions): 200;
 
-	if ( this.cacheArcLengths 
-		&& ( this.cacheArcLengths.length == divisions + 1 ) 
+	if ( this.cacheArcLengths
+		&& ( this.cacheArcLengths.length == divisions + 1 )
 		&& !this.needsUpdate) {
 
 		//console.log( "cached", this.cacheArcLengths );
@@ -231,22 +231,10 @@ THREE.Curve.prototype.getUtoTmapping = function ( u, distance ) {
 
 };
 
-
-// In 2D space, there are actually 2 normal vectors,
-// and in 3D space, infinte
-// TODO this should be depreciated.
-THREE.Curve.prototype.getNormalVector = function( t ) {
-
-	var vec = this.getTangent( t );
-
-	return new THREE.Vector2( -vec.y , vec.x );
-
-};
-
 // Returns a unit vector tangent at t
-// In case any sub curve does not implement its tangent / normal finding,
-// we get 2 points with a small delta and find a gradient of the 2 points
-// which seems to make a reasonable approximation
+// In case any sub curve does not implement its tangent derivation,
+// 2 points a small delta apart will be used to find its gradient
+// which seems to give a reasonable approximation
 
 THREE.Curve.prototype.getTangent = function( t ) {
 
@@ -261,7 +249,7 @@ THREE.Curve.prototype.getTangent = function( t ) {
 
 	var pt1 = this.getPoint( t1 );
 	var pt2 = this.getPoint( t2 );
-	
+
 	var vec = pt2.clone().subSelf(pt1);
 	return vec.normalize();
 
@@ -715,7 +703,7 @@ THREE.SplineCurve3 = THREE.Curve.create(
 // 	v.z = THREE.Curve.Utils.tangentSpline( t, pt0.z, pt1.z, pt2.z, pt3.z );
 
 // 	return v;
-		
+
 // }
 
 /**************************************************************
@@ -741,7 +729,7 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
 
         intPoint = Math.floor( point );
         weight = point - intPoint;
-            
+
         intPoint += intPoint > 0 ? 0 : ( Math.floor( Math.abs( intPoint ) / points.length ) + 1 ) * points.length;
         c[ 0 ] = ( intPoint - 1 ) % points.length;
         c[ 1 ] = ( intPoint ) % points.length;
@@ -751,7 +739,7 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
         v.x = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].x, points[ c[ 1 ] ].x, points[ c[ 2 ] ].x, points[ c[ 3 ] ].x, weight );
         v.y = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].y, points[ c[ 1 ] ].y, points[ c[ 2 ] ].y, points[ c[ 3 ] ].y, weight );
         v.z = THREE.Curve.Utils.interpolate( points[ c[ 0 ] ].z, points[ c[ 1 ] ].z, points[ c[ 2 ] ].z, points[ c[ 3 ] ].z, weight );
-        
+
         return v;
 
     }

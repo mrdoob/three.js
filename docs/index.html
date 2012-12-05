@@ -104,6 +104,9 @@
 
 			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
+			var DELIMITER = '/';
+			var nameCategoryMap = {};
+
 			for ( var section in list ) {
 
 				html += '<h2>' + section + '</h2>';
@@ -122,6 +125,12 @@
 
 						html += '<li><a href="javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
 
+						nameCategoryMap[page[0]] = {
+							section: section,
+							category: category,
+							name: page[0]
+						};
+
 					}
 
 					html += '</ul>';
@@ -134,13 +143,36 @@
 
 			panel.innerHTML += html;
 
+			function encodeUrl( path ) {
+
+				return path.replace(/\ \/\ /g, '.').replace(/\ /g, '_');
+
+			}
+
+			function decodeUrl( path ) {
+
+				return path.replace(/_/g, ' ').replace(/\./g, ' / ');
+
+			}
+
 			// Page loading
 
 			function goTo( section, category, name ) {
 
-				window.document.title = 'three.js - documentation - ' + section + ' - ' + name;
+				// Fully resolve links that only provide a name
+				if(arguments.length == 1) {
+					var location = nameCategoryMap[section];
+					section = location.section;
+					category = location.category;
+					name = location.name;
+				}
 
-				window.location.hash = section + '/' + category + '/' + name.replace(/\ /g, '-');
+				var title = 'three.js - documentation - ' + section + ' - ' + name;
+				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name);
+
+				window.location.hash = url;
+				window.document.title = title;
+
 
 				viewer.src = pages[ section ][ category ][ name ] + '.html';
 
@@ -148,8 +180,8 @@
 
 			function goToHash() {
 
-				var hash = window.location.hash.substring( 1 ).split('/');
-				goTo( hash[0], hash[1], hash[2].replace(/\-/g, ' ') );
+				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
+				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]) );
 
 			}
 

@@ -50,7 +50,7 @@ THREE.OBJLoader.prototype = {
 
 		function uv( u, v ) {
 
-			return new THREE.UV( u, v );
+			return new THREE.Vector2( u, v );
 
 		}
 

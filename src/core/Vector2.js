@@ -25,10 +25,35 @@ THREE.Vector2.prototype = {
 
 	},
 
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
 		this.y = v.y;
+
+		return this;
+
+	},
+
+	addScalar: function ( s ) {
+
+		this.x += s;
+		this.y += s;
 
 		return this;
 
@@ -89,6 +114,70 @@ THREE.Vector2.prototype = {
 		} else {
 
 			this.set( 0, 0 );
+
+		}
+
+		return this;
+
+	},
+
+	minSelf: function ( v ) {
+
+		if ( this.x > v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y > v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		return this;
+
+	},
+
+	maxSelf: function ( v ) {
+
+		if ( this.x < v.x ) {
+
+			this.x = v.x;
+
+		}
+
+		if ( this.y < v.y ) {
+
+			this.y = v.y;
+
+		}
+
+		return this;
+
+	},
+
+	clampSelf: function ( min, max ) {
+
+		// This function assumes min < max, if this assumption isn't true it will not operate correctly
+
+		if ( this.x < min.x ) {
+
+			this.x = min.x;
+
+		} else if ( this.x > max.x ) {
+
+			this.x = max.x;
+
+		}
+
+		if ( this.y < min.y ) {
+
+			this.y = min.y;
+
+		} else if ( this.y > max.y ) {
+
+			this.y = max.y;
 
 		}
 

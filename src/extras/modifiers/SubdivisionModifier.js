@@ -336,21 +336,21 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// Prepare subdivided uv
 
-		avgUv = new THREE.UV();
+		avgUv = new THREE.Vector2();
 
 		if ( face instanceof THREE.Face3 ) {
 
-			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u;
-			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v;
-			avgUv.u /= 3;
-			avgUv.v /= 3;
+			avgUv.x = getUV( face.a, i ).x + getUV( face.b, i ).x + getUV( face.c, i ).x;
+			avgUv.y = getUV( face.a, i ).y + getUV( face.b, i ).y + getUV( face.c, i ).y;
+			avgUv.x /= 3;
+			avgUv.y /= 3;
 
 		} else if ( face instanceof THREE.Face4 ) {
 
-			avgUv.u = getUV( face.a, i ).u + getUV( face.b, i ).u + getUV( face.c, i ).u + getUV( face.d, i ).u;
-			avgUv.v = getUV( face.a, i ).v + getUV( face.b, i ).v + getUV( face.c, i ).v + getUV( face.d, i ).v;
-			avgUv.u /= 4;
-			avgUv.v /= 4;
+			avgUv.x = getUV( face.a, i ).x + getUV( face.b, i ).x + getUV( face.c, i ).x + getUV( face.d, i ).x;
+			avgUv.y = getUV( face.a, i ).y + getUV( face.b, i ).y + getUV( face.c, i ).y + getUV( face.d, i ).y;
+			avgUv.x /= 4;
+			avgUv.y /= 4;
 
 		}
 
@@ -482,23 +482,23 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// Prepare subdivided uv
 
-		avgUv = new THREE.UV();
+		avgUv = new THREE.Vector2();
 
-		avgUv.u = getUV(edgeVertexA, faceIndexA).u + getUV(edgeVertexB, faceIndexA).u;
-		avgUv.v = getUV(edgeVertexA, faceIndexA).v + getUV(edgeVertexB, faceIndexA).v;
-		avgUv.u /= 2;
-		avgUv.v /= 2;
+		avgUv.x = getUV(edgeVertexA, faceIndexA).x + getUV(edgeVertexB, faceIndexA).x;
+		avgUv.y = getUV(edgeVertexA, faceIndexA).y + getUV(edgeVertexB, faceIndexA).y;
+		avgUv.x /= 2;
+		avgUv.y /= 2;
 
 		addUV(edgePoints[i], faceIndexA, avgUv);
 
 		if (edge.length>=2) {
 			assert(edge.length == 2, 'did we plan for more than 2 edges?');
-			avgUv = new THREE.UV();
+			avgUv = new THREE.Vector2();
 
-			avgUv.u = getUV(edgeVertexA, faceIndexB).u + getUV(edgeVertexB, faceIndexB).u;
-			avgUv.v = getUV(edgeVertexA, faceIndexB).v + getUV(edgeVertexB, faceIndexB).v;
-			avgUv.u /= 2;
-			avgUv.v /= 2;
+			avgUv.x = getUV(edgeVertexA, faceIndexB).x + getUV(edgeVertexB, faceIndexB).x;
+			avgUv.y = getUV(edgeVertexA, faceIndexB).y + getUV(edgeVertexB, faceIndexB).y;
+			avgUv.x /= 2;
+			avgUv.y /= 2;
 
 			addUV(edgePoints[i], faceIndexB, avgUv);
 		}

@@ -6,19 +6,18 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 
 	this.renderer = renderer;
 
-	this.renderTarget1 = renderTarget;
-
-	if ( this.renderTarget1 === undefined ) {
+	if ( renderTarget === undefined ) {
 
 		var width = window.innerWidth || 1;
 		var height = window.innerHeight || 1;
+		var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 
-		this.renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
-		this.renderTarget1 = new THREE.WebGLRenderTarget( width, height, this.renderTargetParameters );
+		renderTarget = new THREE.WebGLRenderTarget( width, height, parameters );
 
 	}
 
-	this.renderTarget2 = this.renderTarget1.clone();
+	this.renderTarget1 = renderTarget;
+	this.renderTarget2 = renderTarget.clone();
 
 	this.writeBuffer = this.renderTarget1;
 	this.readBuffer = this.renderTarget2;
@@ -99,18 +98,31 @@ THREE.EffectComposer.prototype = {
 
 	reset: function ( renderTarget ) {
 
-		this.renderTarget1 = renderTarget;
+		if ( renderTarget === undefined ) {
 
-		if ( this.renderTarget1 === undefined ) {
+			renderTarget = this.renderTarget1.clone();
 
-			this.renderTarget1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, this.renderTargetParameters );
+			renderTarget.width = window.innerWidth;
+			renderTarget.height = window.innerHeight;
 
 		}
 
-		this.renderTarget2 = this.renderTarget1.clone();
+		this.renderTarget1 = renderTarget;
+		this.renderTarget2 = renderTarget.clone();
 
 		this.writeBuffer = this.renderTarget1;
 		this.readBuffer = this.renderTarget2;
+
+	},
+
+	setSize: function ( width, height ) {
+
+		var renderTarget = this.renderTarget1.clone();
+
+		renderTarget.width = width;
+		renderTarget.height = height;
+
+		this.reset( renderTarget );
 
 	}
 
