@@ -29,8 +29,6 @@ THREE.BufferGeometry = function () {
 
 	this.morphTargets = [];
 
-	THREE.GeometryLibrary[ this.id ] = this;
-
 };
 
 THREE.BufferGeometry.prototype = {
@@ -541,12 +539,6 @@ THREE.BufferGeometry.prototype = {
 
 		this.hasTangents = true;
 		this.tangentsNeedUpdate = true;
-
-	},
-
-	deallocate: function () {
-
-		delete THREE.GeometryLibrary[ this.id ];
 
 	}
 

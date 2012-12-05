@@ -35,8 +35,6 @@ THREE.Material = function () {
 
 	this.needsUpdate = true;
 
-	THREE.MaterialLibrary[ this.id ] = this;
-
 };
 
 THREE.Material.prototype.setValues = function ( values ) {
@@ -116,11 +114,4 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
-THREE.Material.prototype.deallocate = function () {
-
-	delete THREE.MaterialLibrary[ this.id ];
-
-};
-
 THREE.MaterialIdCount = 0;
-THREE.MaterialLibrary = {};
