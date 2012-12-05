@@ -19,7 +19,7 @@ THREE.Triangle3 = function ( a, b, c ) {
 };
 
 // static/instance method to calculate barycoordinates
-THREE.Triangle3.barycoordinate = function ( point, a, b, c, optionalTarget ) {
+THREE.Triangle3.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) {
 
 	THREE.Triangle3.__v0.sub( c, a );
 	THREE.Triangle3.__v1.sub( b, a );
@@ -33,23 +33,26 @@ THREE.Triangle3.barycoordinate = function ( point, a, b, c, optionalTarget ) {
 
 	var denom = ( dot00 * dot11 - dot01 * dot01 );
 
+	var result = optionalTarget || new THREE.Vector3();
+
 	// colinear or singular triangle
 	if( denom == 0 ) {
-		return false;
+		// arbitrary location outside of triangle?
+		// not sure if this is the best idea, maybe should be returning undefined
+		return result.set( -2, -1, -1 );
 	}
 
 	var invDenom = 1 / denom;
 	var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
 	var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-	var result = optionalTarget || new THREE.Vector3();
-
-	return result.set( u, v, 1 - u - v );
+	// barycoordinates must always sum to 1
+	return result.set( 1 - u - v, v, u );
 }
 
 THREE.Triangle3.containsPoint = function ( point, a, b, c ) {
 
-	var result = THREE.Triangle3.barycoordinate( point, a, b, c, THREE.Triangle3.__v3 );
+	var result = THREE.Triangle3.barycoordFromPoint( point, a, b, c, THREE.Triangle3.__v3 );
 
 	return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
 }
@@ -131,9 +134,9 @@ THREE.Triangle3.prototype = {
 
 	},
 
-	barycoordinate: function ( point, optionalTarget ) {
+	barycoordFromPoint: function ( point, optionalTarget ) {
 
-		return THREE.Triangle3.barycoordinate( point, this.a, this.b, this.c, optionalTarget );
+		return THREE.Triangle3.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
 
 	},
 

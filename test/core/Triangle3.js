@@ -115,6 +115,28 @@ test( "plane", function() {
 	ok( a.plane().normal.clone().normalize().equals( a.normal() ), "Passed!" );
 });
 
+test( "barycoordFromPoint", function() {
+	var a = new THREE.Triangle3();
+
+	var bad = new THREE.Vector3( -2, -1, -1 );
+
+	ok( a.barycoordFromPoint( a.a ).equals( bad ), "Passed!" );
+	ok( a.barycoordFromPoint( a.b ).equals( bad ), "Passed!" );
+	ok( a.barycoordFromPoint( a.c ).equals( bad ), "Passed!" );
+
+	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+	ok( a.barycoordFromPoint( a.a ).equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	ok( a.barycoordFromPoint( a.b ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	ok( a.barycoordFromPoint( a.c ).equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
+	ok( a.barycoordFromPoint( a.midpoint() ).distanceTo( new THREE.Vector3( 1/3, 1/3, 1/3 ) ) < 0.0001, "Passed!" );
+
+	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0 ), new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 2 ) );
+	ok( a.barycoordFromPoint( a.a ).equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	ok( a.barycoordFromPoint( a.b ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	ok( a.barycoordFromPoint( a.c ).equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
+	ok( a.barycoordFromPoint( a.midpoint() ).distanceTo( new THREE.Vector3( 1/3, 1/3, 1/3 ) ) < 0.0001, "Passed!" );
+});
+
 test( "containsPoint", function() {
 	var a = new THREE.Triangle3();
 
