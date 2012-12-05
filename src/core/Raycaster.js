@@ -99,7 +99,7 @@
 
 				if ( material === undefined ) continue;
 				
-				facePlane.setFromNormalAndCoplanarPoint( face.normal, face.centroid );
+				facePlane.setFromNormalAndCoplanarPoint( face.normal, vertices[face.a] );
 
 				var planeDistance = localRay.distanceToPlane( facePlane );
 	
