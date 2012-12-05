@@ -37,26 +37,6 @@
 
 	// http://www.blackpawn.com/texts/pointinpoly/default.html
 
-	var pointInFace3 = function ( p, a, b, c ) {
-
-		v0.sub( c, a );
-		v1.sub( b, a );
-		v2.sub( p, a );
-
-		var dot00 = v0.dot( v0 );
-		var dot01 = v0.dot( v1 );
-		var dot02 = v0.dot( v2 );
-		var dot11 = v1.dot( v1 );
-		var dot12 = v1.dot( v2 );
-
-		var invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
-		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
-
-	};
-
 	var intersectObject = function ( object, raycaster, intersects ) {
 
 		if ( object instanceof THREE.Particle ) {
@@ -149,7 +129,7 @@
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 
-					if ( ! pointInFace3( intersectPoint, a, b, c ) ) continue;
+					if ( ! THREE.Triangle3.containsPoint( intersectPoint, a, b, c ) ) continue;
 
 				} else if ( face instanceof THREE.Face4 ) {
 
@@ -158,8 +138,8 @@
 					c = vertices[ face.c ];
 					d = vertices[ face.d ];
 
-					if ( ( ! pointInFace3( intersectPoint, a, b, d ) ) &&
-						 ( ! pointInFace3( intersectPoint, b, c, d ) ) ) continue;
+					if ( ( ! THREE.Triangle3.containsPoint( intersectPoint, a, b, d ) ) &&
+						 ( ! THREE.Triangle3.containsPoint( intersectPoint, b, c, d ) ) ) continue;
 
 				} else {
 

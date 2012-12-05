@@ -140,7 +140,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	size: function () {
+	size: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 		return result.sub( this.max, this.min );

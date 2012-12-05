@@ -47,15 +47,15 @@ test( "area", function() {
 
 	ok( a.area() == 0, "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 1, 0, 0, ), new THREE.Vector3( 0, 1, 0, ) );
+	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 	ok( a.area() == 0.5, "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0, ), new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 0, 0, 2, ) );
-	ok( a.empty() == 2, "Passed!" );
+	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0 ), new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 2 ) );
+	ok( a.area() == 2, "Passed!" );
 
 	// colinear triangle.
-	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0, ), new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 3, 0, 0, ) );
-	ok( a.empty() == 0, "Passed!" );
+	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0 ), new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 3, 0, 0 ) );
+	ok( a.area() == 0, "Passed!" );
 });
 
 test( "midpoint", function() {
@@ -63,23 +63,22 @@ test( "midpoint", function() {
 
 	ok( a.midpoint().equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 1, 0, 0, ), new THREE.Vector3( 0, 1, 0, ) );
+	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 	ok( a.midpoint().equals( new THREE.Vector3( 1/3, 1/3, 0 ) ), "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0, ), new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 0, 0, 2, ) );
+	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0 ), new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 2 ) );
 	ok( a.midpoint().equals( new THREE.Vector3( 2/3, 0, 2/3 ) ), "Passed!" );
 });
 
 test( "normal", function() {
 	var a = new THREE.Triangle3();
 
-	// artificial normal is created in this case.
-	ok( a.normal().equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	ok( a.normal().equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 1, 0, 0, ), new THREE.Vector3( 0, 1, 0, ) );
+	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 	ok( a.normal().equals( new THREE.Vector3( 0, 0, 1 ) ), "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0, ), new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 0, 0, 2, ) );
+	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0 ), new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 2 ) );
 	ok( a.normal().equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
 });
 
@@ -90,37 +89,39 @@ test( "plane", function() {
 	ok( a.plane().distanceToPoint( a.a ) == 0, "Passed!" );
 	ok( a.plane().distanceToPoint( a.b ) == 0, "Passed!" );
 	ok( a.plane().distanceToPoint( a.c ) == 0, "Passed!" );
-	ok( a.plane().equal( a.normal() ), "Passed!" );
+	ok( a.plane().normal.equals( a.normal() ), "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 1, 0, 0, ), new THREE.Vector3( 0, 1, 0, ) );
+	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 	ok( a.plane().distanceToPoint( a.a ) == 0, "Passed!" );
 	ok( a.plane().distanceToPoint( a.b ) == 0, "Passed!" );
 	ok( a.plane().distanceToPoint( a.c ) == 0, "Passed!" );
-	ok( a.plane().equal( a.normal() ), "Passed!" );
+	ok( a.plane().normal.equals( a.normal() ), "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0, ), new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 0, 0, 2, ) );
+	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0 ), new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 2 ) );
 	ok( a.plane().distanceToPoint( a.a ) == 0, "Passed!" );
 	ok( a.plane().distanceToPoint( a.b ) == 0, "Passed!" );
 	ok( a.plane().distanceToPoint( a.c ) == 0, "Passed!" );
-	ok( a.plane().equal( a.normal() ), "Passed!" );
+	ok( a.plane().normal.clone().normalize().equals( a.normal() ), "Passed!" );
 });
 
 test( "containsPoint", function() {
 	var a = new THREE.Triangle3();
 
+	ok( ! a.containsPoint( a.a ), "Passed!" );
+	ok( ! a.containsPoint( a.b ), "Passed!" );
+	ok( ! a.containsPoint( a.c ), "Passed!" );
+
+	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
 	ok( a.containsPoint( a.a ), "Passed!" );
 	ok( a.containsPoint( a.b ), "Passed!" );
 	ok( a.containsPoint( a.c ), "Passed!" );
-
-	a = new THREE.Triangle3( new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 1, 0, 0, ), new THREE.Vector3( 0, 1, 0, ) );
-	ok( a.containsPoint( a.a ) == 0, "Passed!" );
-	ok( a.containsPoint( a.b ) == 0, "Passed!" );
-	ok( a.containsPoint( a.c ) == 0, "Passed!" );
 	ok( a.containsPoint( a.midpoint() ), "Passed!" );
+	ok( ! a.containsPoint( new THREE.Vector3( -1, -1, -1 ) ), "Passed!" );
 
-	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0, ), new THREE.Vector3( 0, 0, 0, ), new THREE.Vector3( 0, 0, 2, ) );
-	ok( a.containsPoint( a.a ) == 0, "Passed!" );
-	ok( a.containsPoint( a.b ) == 0, "Passed!" );
-	ok( a.containsPoint( a.c ) == 0, "Passed!" );
+	a = new THREE.Triangle3( new THREE.Vector3( 2, 0, 0 ), new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 2 ) );
+	ok( a.containsPoint( a.a ), "Passed!" );
+	ok( a.containsPoint( a.b ), "Passed!" );
+	ok( a.containsPoint( a.c ), "Passed!" );
 	ok( a.containsPoint( a.midpoint() ), "Passed!" );
+	ok( ! a.containsPoint( new THREE.Vector3( -1, -1, -1 ) ), "Passed!" );
 });

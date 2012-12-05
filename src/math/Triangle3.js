@@ -18,6 +18,42 @@ THREE.Triangle3 = function ( a, b, c ) {
 
 };
 
+// static/instance method to calculate barycoordinates
+THREE.Triangle3.barycoordinate = function ( point, a, b, c, optionalTarget ) {
+
+	THREE.Triangle3.__v0.sub( c, a );
+	THREE.Triangle3.__v1.sub( b, a );
+	THREE.Triangle3.__v2.sub( point, a );
+
+	var dot00 = THREE.Triangle3.__v0.dot( THREE.Triangle3.__v0 );
+	var dot01 = THREE.Triangle3.__v0.dot( THREE.Triangle3.__v1 );
+	var dot02 = THREE.Triangle3.__v0.dot( THREE.Triangle3.__v2 );
+	var dot11 = THREE.Triangle3.__v1.dot( THREE.Triangle3.__v1 );
+	var dot12 = THREE.Triangle3.__v1.dot( THREE.Triangle3.__v2 );
+
+	var denom = ( dot00 * dot11 - dot01 * dot01 );
+
+	// colinear or singular triangle
+	if( denom == 0 ) {
+		return false;
+	}
+
+	var invDenom = 1 / denom;
+	var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+	var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+	var result = optionalTarget || new THREE.Vector3();
+
+	return result.set( u, v, 1 - u - v );
+}
+
+THREE.Triangle3.containsPoint = function ( point, a, b, c ) {
+
+	var result = THREE.Triangle3.barycoordinate( point, a, b, c, THREE.Triangle3.__v3 );
+
+	return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+}
+
 THREE.Triangle3.prototype = {
 
 	constructor: THREE.Triangle3,
@@ -54,17 +90,17 @@ THREE.Triangle3.prototype = {
 
 	area: function () {
 
-		__v0.sub( this.c, this.b );
-		__v1.sub( this.a, this.b );
+		THREE.Triangle3.__v0.sub( this.c, this.b );
+		THREE.Triangle3.__v1.sub( this.a, this.b );
 
-		return __v0.cross( __v1 ).length() * 0.5;
+		return THREE.Triangle3.__v0.crossSelf( THREE.Triangle3.__v1 ).length() * 0.5;
 
 	},
 
 	midpoint: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return result.add( this.a, this.b ).addSelf( this.b ).multiplyScalar( 1 / 3 );
+		return result.add( this.a, this.b ).addSelf( this.c ).multiplyScalar( 1 / 3 );
 
 	},
 
@@ -73,19 +109,17 @@ THREE.Triangle3.prototype = {
 		var result = optionalTarget || new THREE.Vector3();
 
 		result.sub( this.c, this.b );
-		__v0.sub( this.a, this.b );
-		result.cross( __v0 );
+		THREE.Triangle3.__v0.sub( this.a, this.b );
+		result.crossSelf( THREE.Triangle3.__v0 );
 
 		var resultLengthSq = result.lengthSq();
 		if( resultLengthSq > 0 ) {
 
-			return result.multiplyScalar( 1 / resultLengthSq );
+			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
 
 		}
 
-		// It is usually best to return a non-zero normal, even if it is made up, to avoid
-		// special case code to handle zero-length normals.
-		return result.set( 1, 0, 0 );
+		return result.set( 0, 0, 0 );
 
 	},
 
@@ -97,23 +131,15 @@ THREE.Triangle3.prototype = {
 
 	},
 
+	barycoordinate: function ( point, optionalTarget ) {
+
+		return THREE.Triangle3.barycoordinate( point, this.a, this.b, this.c, optionalTarget );
+
+	},
+
 	containsPoint: function ( point ) {
 
-		__v0.sub( c, a );
-		__v1.sub( b, a );
-		__v2.sub( point, a );
-
-		var dot00 = __v0.dot( __v0 );
-		var dot01 = __v0.dot( __v1 );
-		var dot02 = __v0.dot( __v2 );
-		var dot11 = __v1.dot( __v1 );
-		var dot12 = __v1.dot( __v2 );
-
-		var invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
-		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
+		return THREE.Triangle3.containsPoint( point, this.a, this.b, this.c );
 
 	},
 
@@ -134,3 +160,4 @@ THREE.Triangle3.prototype = {
 THREE.Triangle3.__v0 = new THREE.Vector3();
 THREE.Triangle3.__v1 = new THREE.Vector3();
 THREE.Triangle3.__v2 = new THREE.Vector3();
+THREE.Triangle3.__v3 = new THREE.Vector3();
