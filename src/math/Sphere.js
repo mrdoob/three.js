@@ -1,5 +1,6 @@
 /**
  * @author bhouston / http://exocortex.com
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Sphere = function ( center, radius ) {

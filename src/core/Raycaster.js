@@ -1,5 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author bhouston / http://exocortex.com/
  */
 
 ( function ( THREE ) {

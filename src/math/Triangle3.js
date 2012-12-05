@@ -1,5 +1,6 @@
 /**
  * @author bhouston / http://exocortex.com
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Triangle3 = function ( a, b, c ) {
@@ -48,14 +49,15 @@ THREE.Triangle3.barycoordFromPoint = function ( point, a, b, c, optionalTarget )
 
 	// barycoordinates must always sum to 1
 	return result.set( 1 - u - v, v, u );
-}
+};
 
 THREE.Triangle3.containsPoint = function ( point, a, b, c ) {
 
+	// NOTE: need to use __v3 here because __v0, __v1 and __v2 are used in barycoordFromPoint.
 	var result = THREE.Triangle3.barycoordFromPoint( point, a, b, c, THREE.Triangle3.__v3 );
 
 	return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
-}
+};
 
 THREE.Triangle3.prototype = {
 
