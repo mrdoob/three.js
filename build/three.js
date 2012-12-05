@@ -4296,7 +4296,6 @@ THREE.Rectangle = function () {
 
 THREE.Sphere = function ( center, radius ) {
 
-
 	if ( center === undefined && radius === undefined ) {
 
 		this.center = new THREE.Vector3();
@@ -4308,7 +4307,7 @@ THREE.Sphere = function ( center, radius ) {
 		this.radius = radius || 0;
 
 	}
-	
+
 };
 
 THREE.Sphere.prototype = {
@@ -4321,7 +4320,6 @@ THREE.Sphere.prototype = {
 		this.radius = radius;
 
 		return this;
-
 	},
 
 	setFromCenterAndPoints: function ( center, points ) {
@@ -7106,12 +7104,30 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
+		if ( ! this.boundingBox ) {
+
+			this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
+
+		} else {
+
+			this.boundingBox.setFromPoints( this.vertices );
+
+		}
+
 	},
 
 	computeBoundingSphere: function () {
 
-		this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
+		if ( ! this.boundingSphere ) {
+
+			this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
+
+		} else {
+
+			this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
+
+		}
+
 	},
 
 	/*

@@ -4,7 +4,6 @@
 
 THREE.Sphere = function ( center, radius ) {
 
-
 	if ( center === undefined && radius === undefined ) {
 
 		this.center = new THREE.Vector3();
@@ -16,7 +15,7 @@ THREE.Sphere = function ( center, radius ) {
 		this.radius = radius || 0;
 
 	}
-	
+
 };
 
 THREE.Sphere.prototype = {
@@ -29,7 +28,6 @@ THREE.Sphere.prototype = {
 		this.radius = radius;
 
 		return this;
-
 	},
 
 	setFromCenterAndPoints: function ( center, points ) {
