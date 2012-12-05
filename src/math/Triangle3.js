@@ -68,7 +68,7 @@ THREE.Triangle3.prototype = {
 
 	},
 
-	setPointsAndIndices: function ( points, i0, i1, i2 ) {
+	setFromPointsAndIndices: function ( points, i0, i1, i2 ) {
 
 		this.a.copy( points[i0] );
 		this.b.copy( points[i1] );

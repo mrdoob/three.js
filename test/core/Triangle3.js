@@ -32,6 +32,17 @@ test( "copy", function() {
 	ok( b.c.equals( two3 ), "Passed!" );
 });
 
+test( "setFromPointsAndIndices", function() {
+	var a = new THREE.Triangle3();
+
+	var points = [ one3, one3.clone().negate(), two3 ];
+	a.setFromPointsAndIndices( points, 1, 0, 2 );
+	ok( a.a.equals( one3.clone().negate() ), "Passed!" );
+	ok( a.b.equals( one3 ), "Passed!" );
+	ok( a.c.equals( two3 ), "Passed!" );
+
+});
+
 test( "set", function() {
 	var a = new THREE.Triangle3();
 
