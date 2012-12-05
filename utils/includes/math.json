@@ -1,6 +1,5 @@
 [
 	"../src/Three.js",
-	"../src/math/Clock.js",
 	"../src/math/Color.js",
 	"../src/math/Vector2.js",
 	"../src/math/Vector3.js",

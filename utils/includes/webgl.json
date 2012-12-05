@@ -1,6 +1,5 @@
 [
 	"../src/Three.js",
-	"../src/math/Clock.js",
 	"../src/math/Color.js",
 	"../src/math/Vector2.js",
 	"../src/math/Vector3.js",
@@ -19,6 +18,7 @@
 	"../src/math/Triangle3.js",
 	"../src/math/Sphere.js",
 	"../src/math/Plane.js",
+	"../src/core/Clock.js",
 	"../src/core/EventTarget.js",
 	"../src/core/Raycaster.js",
 	"../src/core/Object3D.js",
