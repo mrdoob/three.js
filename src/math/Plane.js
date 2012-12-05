@@ -95,21 +95,22 @@ THREE.Plane.prototype = {
 
 	},
 
-	projectPoint: function ( point ) {
+	projectPoint: function ( point, optionalTarget ) {
 
-		return this.orthoPoint( point ).subSelf( point ).negate();
+		return this.orthoPoint( point, optionalTarget ).subSelf( point ).negate();
 
 	},
 
-	orthoPoint: function ( point ) {
+	orthoPoint: function ( point, optionalTarget ) {
 
 		var perpendicularMagnitude = this.distanceToPoint( point );
 
-		return new THREE.Vector3().copy( this.normal ).multiplyScalar( perpendicularMagnitude );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( perpendicularMagnitude );
 
 	},
 
-	intersectsLine: function ( startPoint, endPoint ) {
+	isIntersectionLine: function ( startPoint, endPoint ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
@@ -120,9 +121,10 @@ THREE.Plane.prototype = {
 
 	},
 
-	coplanarPoint: function () {
+	coplanarPoint: function ( optionalTarget ) {
 
-		return new THREE.Vector3().copy( this.normal ).multiplyScalar( - this.constant );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( - this.constant );
 
 	},
 

@@ -52,9 +52,10 @@ THREE.Ray.prototype = {
 
 	},
 
-	closestPointToPoint: function ( point ) {
+	closestPointToPoint: function ( point, optionalTarget ) {
 
-		var result = point.clone().subSelf( this.origin );
+		var result = optionalTarget || new THREE.Vector3();
+		result.sub( point, this.origin );
 		var directionDistance = result.dot( this.direction );
 
 		return result.copy( this.direction ).multiplyScalar( directionDistance ).addSelf( this.origin );
@@ -121,7 +122,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectPlane: function ( plane ) {
+	intersectPlane: function ( plane, optionalTarget ) {
 
 		var t = this.distanceToPlane( plane );
 
@@ -130,7 +131,7 @@ THREE.Ray.prototype = {
 			return undefined;
 		}
 
-		return this.at( t );
+		return this.at( t, optionalTarget );
 
 	},
 

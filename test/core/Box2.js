@@ -34,7 +34,7 @@ test( "copy", function() {
 test( "set", function() {
 	var a = new THREE.Box2();
 
-	a.set( zero2, one2 )
+	a.set( zero2, one2 );
 	ok( a.min.equals( zero2 ), "Passed!" );
 	ok( a.max.equals( one2 ), "Passed!" );
 });
@@ -189,7 +189,7 @@ test( "distanceToPoint", function() {
 	ok( b.distanceToPoint( new THREE.Vector2( -2, -2 ) ) == Math.sqrt( 2 ), "Passed!" );
 });
 
-test( "isIntersection", function() {
+test( "isIntersectionBox", function() {
 	var a = new THREE.Box2( zero2 );
 	var b = new THREE.Box2( zero2, one2 );
 	var c = new THREE.Box2( one2.clone().negate(), one2 );

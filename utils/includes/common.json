@@ -17,6 +17,7 @@
 	"../src/math/Math.js",
 	"../src/math/Quaternion.js",
 	"../src/math/Spline.js",
+	"../src/math/Triangle3.js",
 	"../src/math/Vertex.js",
 	"../src/math/UV.js",
 	"../src/core/EventTarget.js",
