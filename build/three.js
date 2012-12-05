@@ -4302,17 +4302,8 @@ THREE.Rectangle = function () {
 
 THREE.Sphere = function ( center, radius ) {
 
-	if ( center === undefined && radius === undefined ) {
-
-		this.center = new THREE.Vector3();
-		this.radius = 0;
-
-	} else {
-
-		this.center = center.clone();
-		this.radius = radius || 0;
-
-	}
+	this.center = center === undefined ? new THREE.Vector3() : center.clone();
+	this.radius = radius === undefined ? 0 : radius;
 
 };
 
@@ -7110,29 +7101,25 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
+		if ( this.boundingBox === null ) {
 
-			this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
-
-		} else {
-
-			this.boundingBox.setFromPoints( this.vertices );
+			this.boundingBox = new THREE.Box3();
 
 		}
+
+		this.boundingBox.setFromPoints( this.vertices );
 
 	},
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) {
+		if ( this.boundingSphere === null ) {
 
-			this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
-
-		} else {
-
-			this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
+			this.boundingSphere = new THREE.Sphere();
 
 		}
+
+		this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
 
 	},
 
@@ -7354,7 +7341,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
+		if ( this.boundingBox === null ) {
 
 			this.boundingBox = new THREE.Box3();
 
@@ -7426,8 +7413,10 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) {
+		if ( this.boundingSphere === null ) {
+
 			this.boundingSphere = new THREE.Sphere();
+
 		}
 
 		var positions = this.attributes[ "position" ].array;
@@ -7536,15 +7525,15 @@ THREE.BufferGeometry.prototype = {
 						ab.sub( pA, pB );
 						cb.crossSelf( ab );
 
-						normals[ vA * 3 ] 	  += cb.x;
+						normals[ vA * 3 ]     += cb.x;
 						normals[ vA * 3 + 1 ] += cb.y;
 						normals[ vA * 3 + 2 ] += cb.z;
 
-						normals[ vB * 3 ] 	  += cb.x;
+						normals[ vB * 3 ]     += cb.x;
 						normals[ vB * 3 + 1 ] += cb.y;
 						normals[ vB * 3 + 2 ] += cb.z;
 
-						normals[ vC * 3 ] 	  += cb.x;
+						normals[ vC * 3 ]     += cb.x;
 						normals[ vC * 3 + 1 ] += cb.y;
 						normals[ vC * 3 + 2 ] += cb.z;
 
