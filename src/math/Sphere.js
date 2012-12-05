@@ -4,17 +4,8 @@
 
 THREE.Sphere = function ( center, radius ) {
 
-	if ( center === undefined && radius === undefined ) {
-
-		this.center = new THREE.Vector3();
-		this.radius = 0;
-
-	} else {
-
-		this.center = center.clone();
-		this.radius = radius || 0;
-
-	}
+	this.center = center === undefined ? new THREE.Vector3() : center.clone();
+	this.radius = radius === undefined ? 0 : radius;
 
 };
 

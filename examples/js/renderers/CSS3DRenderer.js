@@ -146,14 +146,14 @@ THREE.CSS3DRenderer = function () {
 		this.domElement.style.oPerspective = fov + "px";
 		this.domElement.style.perspective = fov + "px";
 
+		var objects = _projector.projectScene( scene, camera, false ).objects;
+		
 		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) + " translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
 
 		this.cameraElement.style.WebkitTransform = style;
 		this.cameraElement.style.MozTransform = style;
 		this.cameraElement.style.oTransform = style;
 		this.cameraElement.style.transform = style;
-
-		var objects = _projector.projectScene( scene, camera, false ).objects;
 
 		for ( var i = 0, il = objects.length; i < il; i ++ ) {
 

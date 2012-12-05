@@ -577,29 +577,25 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
+		if ( this.boundingBox === null ) {
 
-			this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
-
-		} else {
-
-			this.boundingBox.setFromPoints( this.vertices );
+			this.boundingBox = new THREE.Box3();
 
 		}
+
+		this.boundingBox.setFromPoints( this.vertices );
 
 	},
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) {
+		if ( this.boundingSphere === null ) {
 
-			this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
-
-		} else {
-
-			this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
+			this.boundingSphere = new THREE.Sphere();
 
 		}
+
+		this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
 
 	},
 
