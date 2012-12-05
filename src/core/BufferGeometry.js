@@ -69,7 +69,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
+		if ( this.boundingBox === null ) {
 
 			this.boundingBox = new THREE.Box3();
 
@@ -141,8 +141,10 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) {
+		if ( this.boundingSphere === null ) {
+
 			this.boundingSphere = new THREE.Sphere();
+
 		}
 
 		var positions = this.attributes[ "position" ].array;
@@ -251,15 +253,15 @@ THREE.BufferGeometry.prototype = {
 						ab.sub( pA, pB );
 						cb.crossSelf( ab );
 
-						normals[ vA * 3 ] 	  += cb.x;
+						normals[ vA * 3 ]     += cb.x;
 						normals[ vA * 3 + 1 ] += cb.y;
 						normals[ vA * 3 + 2 ] += cb.z;
 
-						normals[ vB * 3 ] 	  += cb.x;
+						normals[ vB * 3 ]     += cb.x;
 						normals[ vB * 3 + 1 ] += cb.y;
 						normals[ vB * 3 + 2 ] += cb.z;
 
-						normals[ vC * 3 ] 	  += cb.x;
+						normals[ vC * 3 ]     += cb.x;
 						normals[ vC * 3 + 1 ] += cb.y;
 						normals[ vC * 3 + 2 ] += cb.z;
 
