@@ -34,19 +34,15 @@ THREE.Ray.prototype = {
 
 	at: function( t, optionalTarget ) {
 
-		if( optionalTarget === undefined ) {
-			optionalTarget = this.direction.clone();
-		}
-		else {
-			optionalTarget.copy( this.direction );
-		}
-		return optionalTarget.multiplyScalar( t ).addSelf( this.origin );
+		var result = optionalTarget || new THREE.Vector3();
+
+		return result.copy( this.direction ).multiplyScalar( t ).addSelf( this.origin );
 
 	},
 
 	recastSelf: function ( t ) {
 
-		this.origin = this.at( t );
+		this.origin.copy( this.at( t, THREE.Ray.__v1 ) );
 
 		return this;
 
