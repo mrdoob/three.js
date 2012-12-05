@@ -133,12 +133,6 @@ THREE.Box3.prototype = {
 
 	},
 
-	volume: function () {
-
-		return ( this.max.x - this.min.x ) * ( this.max.y - this.min.y ) * ( this.max.z - this.min.z );
-
-	},
-
 	center: function () {
 
 		return new THREE.Vector3().add( this.min, this.max ).multiplyScalar( 0.5 );

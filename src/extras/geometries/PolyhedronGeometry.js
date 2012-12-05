@@ -139,7 +139,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	this.computeCentroids();
 
-	this.boundingSphere = { radius: radius };
+    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 

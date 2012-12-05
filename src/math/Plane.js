@@ -71,14 +71,6 @@ THREE.Plane.prototype = {
 
 	},
 
-	flip: function () {
-
-		this.normal.negate();
-
-		return this;
-
-	},
-
 	normalize: function () {
 
 		// Note: will lead to a divide by zero if the plane is invalid.

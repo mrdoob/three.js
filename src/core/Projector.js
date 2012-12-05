@@ -65,7 +65,7 @@ THREE.Projector = function() {
 		// find direction from vector to end
 		end.subSelf( vector ).normalize();
 
-		return new THREE.Ray( vector, end );
+		return new THREE.Raycaster( vector, end );
 
 	};
 

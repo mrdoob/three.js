@@ -66,7 +66,7 @@ var Viewport = function ( signals ) {
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
 
-	var ray = new THREE.Ray();
+	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
 	var offset = new THREE.Vector3();
 
