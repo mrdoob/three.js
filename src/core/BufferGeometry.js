@@ -4,8 +4,6 @@
 
 THREE.BufferGeometry = function () {
 
-	THREE.GeometryLibrary.push( this );
-
 	this.id = THREE.GeometryIdCount ++;
 
 	// attributes
@@ -30,6 +28,8 @@ THREE.BufferGeometry = function () {
 	// for compatibility
 
 	this.morphTargets = [];
+
+	THREE.GeometryLibrary[ this.id ] = this;
 
 };
 
@@ -544,8 +544,7 @@ THREE.BufferGeometry.prototype = {
 
 	deallocate: function () {
 
-		var index = THREE.GeometryLibrary.indexOf( this );
-		if ( index !== -1 ) THREE.GeometryLibrary.splice( index, 1 );
+		delete THREE.GeometryLibrary[ this.id ];
 
 	}
 

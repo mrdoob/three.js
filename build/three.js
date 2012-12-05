@@ -5425,8 +5425,6 @@ THREE.EventTarget = function () {
 
 THREE.Object3D = function () {
 
-	THREE.Object3DLibrary.push( this );
-
 	this.id = THREE.Object3DIdCount ++;
 
 	this.name = '';
@@ -5467,6 +5465,8 @@ THREE.Object3D = function () {
 	this.frustumCulled = true;
 
 	this._vector = new THREE.Vector3();
+
+	THREE.Object3DLibrary[ this.id ] = this;
 
 };
 
@@ -5781,8 +5781,7 @@ THREE.Object3D.prototype = {
 
 	deallocate: function () {
 
-		var index = THREE.Object3DLibrary.indexOf( this );
-		if ( index !== -1 ) THREE.Object3DLibrary.splice( index, 1 );
+		delete THREE.Object3DLibrary[ this.id ];
 
 	}
 
@@ -5792,7 +5791,7 @@ THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DIdCount = 0;
-THREE.Object3DLibrary = [];
+THREE.Object3DLibrary = {};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -6539,8 +6538,6 @@ THREE.Face4.prototype = {
 
 THREE.Geometry = function () {
 
-	THREE.GeometryLibrary.push( this );
-
 	this.id = THREE.GeometryIdCount ++;
 
 	this.name = '';
@@ -6582,11 +6579,13 @@ THREE.Geometry = function () {
 
 	this.buffersNeedUpdate = false;
 
+	THREE.GeometryLibrary[ this.id ] = this;
+
 };
 
 THREE.Geometry.prototype = {
 
-	constructor : THREE.Geometry,
+	constructor: THREE.Geometry,
 
 	applyMatrix: function ( matrix ) {
 
@@ -7254,22 +7253,19 @@ THREE.Geometry.prototype = {
 
 	deallocate: function () {
 
-		var index = THREE.GeometryLibrary.indexOf( this );
-		if ( index !== -1 ) THREE.GeometryLibrary.splice( index, 1 );
+		delete THREE.GeometryLibrary[ this.id ];
 
 	}
 
 };
 
 THREE.GeometryIdCount = 0;
-THREE.GeometryLibrary = [];
+THREE.GeometryLibrary = {};
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.BufferGeometry = function () {
-
-	THREE.GeometryLibrary.push( this );
 
 	this.id = THREE.GeometryIdCount ++;
 
@@ -7295,6 +7291,8 @@ THREE.BufferGeometry = function () {
 	// for compatibility
 
 	this.morphTargets = [];
+
+	THREE.GeometryLibrary[ this.id ] = this;
 
 };
 
@@ -7809,8 +7807,7 @@ THREE.BufferGeometry.prototype = {
 
 	deallocate: function () {
 
-		var index = THREE.GeometryLibrary.indexOf( this );
-		if ( index !== -1 ) THREE.GeometryLibrary.splice( index, 1 );
+		delete THREE.GeometryLibrary[ this.id ];
 
 	}
 
@@ -11091,8 +11088,6 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
-	THREE.MaterialLibrary.push( this );
-
 	this.id = THREE.MaterialIdCount ++;
 
 	this.name = '';
@@ -11122,6 +11117,8 @@ THREE.Material = function () {
 	this.visible = true;
 
 	this.needsUpdate = true;
+
+	THREE.MaterialLibrary[ this.id ] = this;
 
 };
 
@@ -11204,13 +11201,12 @@ THREE.Material.prototype.clone = function ( material ) {
 
 THREE.Material.prototype.deallocate = function () {
 
-	var index = THREE.MaterialLibrary.indexOf( this );
-	if ( index !== -1 ) THREE.MaterialLibrary.splice( index, 1 );
+	delete THREE.MaterialLibrary[ this.id ];
 
 };
 
 THREE.MaterialIdCount = 0;
-THREE.MaterialLibrary = [];
+THREE.MaterialLibrary = {};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12137,8 +12133,6 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	THREE.TextureLibrary.push( this );
-
 	this.id = THREE.TextureIdCount ++;
 
 	this.name = '';
@@ -12169,6 +12163,8 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this.needsUpdate = false;
 	this.onUpdate = null;
+
+	THREE.TextureLibrary[ this.id ] = this;
 
 };
 
@@ -12210,15 +12206,14 @@ THREE.Texture.prototype = {
 
 	deallocate: function () {
 
-		var index = THREE.TextureLibrary.indexOf( this );
-		if ( index !== -1 ) THREE.TextureLibrary.splice( index, 1 );
+		delete THREE.TextureLibrary[ this.id ];
 
 	}
 
 };
 
 THREE.TextureIdCount = 0;
-THREE.TextureLibrary = [];
+THREE.TextureLibrary = {};
 /**
  * @author alteredq / http://alteredqualia.com/
  */
