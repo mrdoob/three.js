@@ -39,10 +39,10 @@ THREE.UVsUtils.CylinderUVGenerator.prototype = {
         u1 *= this.uRepeat;
         u2 *= this.uRepeat;
         return [
-            new THREE.UV( u1, v1 ),
-            new THREE.UV( u2, v1 ),
-            new THREE.UV( u2, v2 ),
-            new THREE.UV( u1, v2 )
+            new THREE.Vector2( u1, v1 ),
+            new THREE.Vector2( u2, v1 ),
+            new THREE.Vector2( u2, v2 ),
+            new THREE.Vector2( u1, v2 )
         ];
     },
     
@@ -133,13 +133,13 @@ THREE.UVsDebug = function(geometry) {
         for (j = 0, jl = uv.length; j < jl; j++) {
             u = uv[j];
             
-            a.x += u.u;
-            a.y += u.v;
+            a.x += u.x;
+            a.y += u.y;
             
             if (j == 0) {
-                ctx.moveTo(u.u * width, u.v * height);
+                ctx.moveTo(u.x * width, u.y * height);
             } else {
-                ctx.lineTo(u.u * width, u.v * height);
+                ctx.lineTo(u.x * width, u.y * height);
             }
         }
         
@@ -160,10 +160,10 @@ THREE.UVsDebug = function(geometry) {
         // label uv edge orders
         for (j = 0, jl = uv.length; j < jl; j++) {
             u = uv[j];
-            b.set(u.u, u.v).subSelf(a).divideScalar(4);
+            b.set(u.x, u.y).subSelf(a).divideScalar(4);
             
-            b.x = u.u - b.x;
-            b.y = u.v - b.y;
+            b.x = u.x - b.x;
+            b.y = u.y - b.y;
             ctx.fillText(abc[j]
                 + ':' + faces[i][abc[j]], b.x * width, b.y * height);
         }

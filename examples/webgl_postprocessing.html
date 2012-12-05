@@ -83,8 +83,6 @@
 
 			var materialColor, material2D, quadBG, quadMask, renderScene;
 
-			var rtParameters;
-
 			var delta = 0.01;
 
 			init();
@@ -207,7 +205,7 @@
 
 				//
 
-				rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: true };
+				var rtParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: true };
 
 				var rtWidth  = width / 2;
 				var rtHeight = height / 2;
@@ -294,8 +292,6 @@
 				halfWidth = window.innerWidth / 2;
 				halfHeight = window.innerHeight / 2;
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				cameraPerspective.aspect = window.innerWidth / window.innerHeight;
 				cameraPerspective.updateProjectionMatrix();
 
@@ -306,12 +302,14 @@
 
 				cameraOrtho.updateProjectionMatrix();
 
-				composerScene.reset( new THREE.WebGLRenderTarget( halfWidth * 2, halfHeight * 2, rtParameters ) );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				composer1.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
-				composer2.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
-				composer3.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
-				composer4.reset( new THREE.WebGLRenderTarget( halfWidth, halfHeight, rtParameters ) );
+				composerScene.setSize( halfWidth * 2, halfHeight * 2 );
+
+				composer1.setSize( halfWidth, halfHeight );
+				composer2.setSize( halfWidth, halfHeight );
+				composer3.setSize( halfWidth, halfHeight );
+				composer4.setSize( halfWidth, halfHeight );
 
 				renderScene.uniforms[ "tDiffuse" ].value = composerScene.renderTarget2;
 

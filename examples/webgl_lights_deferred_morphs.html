@@ -51,12 +51,11 @@
 
 		<script src="js/Detector.js"></script>
 
+		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
 		<script src="js/ShaderDeferred.js"></script>
-		<script src="js/DeferredHelper.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -73,12 +72,8 @@
 			var WIDTH = window.innerWidth;
 			var HEIGHT = window.innerHeight - 2 * MARGIN;
 
-			var SCALED_WIDTH = Math.floor( SCALE * WIDTH );
-			var SCALED_HEIGHT = Math.floor( SCALE * HEIGHT );
-
 			var NEAR = 1.0, FAR = 350.0;
 			var VIEW_ANGLE = 45;
-			var ASPECT = WIDTH / HEIGHT;
 
 			// controls
 
@@ -116,9 +111,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { alpha: false } );
-				renderer.setSize( WIDTH, HEIGHT );
-				renderer.setClearColorHex( 0x000000, 1 );
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, brightness: 2 } );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -129,7 +122,7 @@
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, WIDTH / HEIGHT, NEAR, FAR );
 				camera.position.z = 150;
 
 				// scene
@@ -149,11 +142,6 @@
 
 				clock = new THREE.Clock();
 
-				// deferred helper
-
-				deferredHelper = new THREE.DeferredHelper( { renderer: renderer, scene: scene, camera: camera, width: SCALED_WIDTH, height: SCALED_HEIGHT } );
-				deferredHelper.createRenderTargets();
-
 				// add lights
 
 				initLights();
@@ -165,21 +153,10 @@
 				// events
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-
-			// -----------------------------
-
-			function addObject( object, y, scale ) {
-
-				deferredHelper.addDeferredMaterials( object );
-
-				object.position.y = y;
-				object.scale.set( scale, scale, scale );
-				scene.add( object );
-
-			}
 
 			// -----------------------------
 
@@ -190,6 +167,7 @@
 				// front light
 
 				var light = new THREE.PointLight( 0xffffff, 1.5, 1.5 * distance );
+				scene.add( light );
 				lights.push( light );
 
 				// random lights
@@ -205,11 +183,26 @@
 					light.color.setRGB( c.x, c.y, c.z );
 					light.color.convertGammaToLinear();
 
+					scene.add( light );
 					lights.push( light );
 
 				}
 
-				deferredHelper.addDeferredLights( lights, true );
+				var geometry = new THREE.SphereGeometry( 0.7, 7, 7 );
+
+				for ( var i = 0; i < numLights; i ++ ) {
+
+					var light = lights[ i ];
+
+					var material = new THREE.MeshBasicMaterial();
+					material.color = light.color;
+
+					var emitter = new THREE.Mesh( geometry, material );
+					emitter.position = light.position;
+
+					scene.add( emitter );
+
+				}
 
 			}
 
@@ -222,28 +215,26 @@
 
 					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x333333, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x333333, shininess: 20, wrapAround: true, morphTargets: true, morphNormals: true, vertexColors: THREE.NoColors, shading: THREE.FlatShading } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 					meshAnim.duration = 3000;
 					meshAnim.properties.delta = -13;
 
-					var s = 1;
-					meshAnim.scale.set( s, s, s );
-					meshAnim.position.x = 180;
-					meshAnim.position.z = -10;
+					meshAnim.scale.multiplyScalar( 50 );
+					meshAnim.position.set( 180, -48, -10 );
 					meshAnim.rotation.y = -Math.PI/2;
 
+					scene.add( meshAnim );
 					morphs.push( meshAnim );
-
-					addObject( meshAnim, -48, 50 );
 
 				} );
 
 				// add box
 
-				var object = generateBox();
-				addObject( object, 0, 8 );
+				var box = generateBox();
+				box.scale.multiplyScalar( 8 );
+				scene.add( box );
 
 			}
 
@@ -318,6 +309,21 @@
 
 			// -----------------------------
 
+			function onWindowResize( event ) {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				WIDTH = window.innerWidth;
+				HEIGHT = window.innerHeight - 2 * MARGIN;
+
+				renderer.setSize( WIDTH, HEIGHT );
+
+				camera.aspect = WIDTH / HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
 			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 1;
@@ -391,8 +397,9 @@
 
 				camera.lookAt( target );
 
+				// render
 
-				deferredHelper.render();
+				renderer.render( scene, camera );
 
 			}
 

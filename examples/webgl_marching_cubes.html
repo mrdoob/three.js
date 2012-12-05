@@ -185,7 +185,7 @@
 
 			renderer.autoClear = false;
 
-			renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+			var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 			effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
@@ -235,14 +235,11 @@
 			SCREEN_WIDTH = window.innerWidth;
 			SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
 
-			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 			camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 			camera.updateProjectionMatrix();
 
-			renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-
-			composer.reset( renderTarget );
+			renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+			composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 			hblur.uniforms[ 'h' ].value = 4 / SCREEN_WIDTH;
 			vblur.uniforms[ 'v' ].value = 4 / SCREEN_HEIGHT;
