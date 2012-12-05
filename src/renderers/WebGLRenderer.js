@@ -4755,6 +4755,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			shaderID = 'particle_basic';
 
+		}	else if ( material instanceof THREE.ParticleDepthMaterial ) {
+
+			shaderID = 'particle_depth';
+
 		}
 
 		if ( shaderID ) {
@@ -5046,11 +5050,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				refreshUniformsLambert( m_uniforms, material );
 
-			} else if ( material instanceof THREE.MeshDepthMaterial ) {
+			} else if ( material instanceof THREE.MeshDepthMaterial  ) {
 
 				m_uniforms.mNear.value = camera.near;
 				m_uniforms.mFar.value = camera.far;
 				m_uniforms.opacity.value = material.opacity;
+			
+			} else if ( material instanceof THREE.ParticleDepthMaterial  ) {
+
+				m_uniforms.mNear.value = camera.near;
+				m_uniforms.mFar.value = camera.far;
+				refreshUniformsParticle( m_uniforms, material );
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 

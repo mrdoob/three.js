@@ -1717,6 +1717,12 @@ THREE.ShaderChunk = {
 
 	].join("\n"),
 
+  depthmap_fragment : [
+
+    "float depth = gl_FragCoord.z / gl_FragCoord.w;",
+	  "float color = 1.0 - smoothstep( mNear, mFar, depth );"
+	
+  ].join("\n"),
 
 };
 
@@ -1878,6 +1884,13 @@ THREE.UniformsLib = {
 
 		"shadowMatrix" : { type: "m4v", value: [] },
 
+	},
+	
+	depthmap: {
+	  "mNear": { type: "f", value: 1.0 },
+		"mFar" : { type: "f", value: 2000.0 },
+		"opacity" : { type: "f", value: 1.0 }
+		
 	}
 
 };
@@ -1886,13 +1899,7 @@ THREE.ShaderLib = {
 
 	'depth': {
 
-		uniforms: {
-
-			"mNear": { type: "f", value: 1.0 },
-			"mFar" : { type: "f", value: 2000.0 },
-			"opacity" : { type: "f", value: 1.0 }
-
-		},
+		uniforms: THREE.UniformsLib[ "depthmap" ],
 
 		vertexShader: [
 
@@ -1912,8 +1919,8 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"float depth = gl_FragCoord.z / gl_FragCoord.w;",
-				"float color = 1.0 - smoothstep( mNear, mFar, depth );",
+				THREE.ShaderChunk[ "depthmap_fragment" ],
+
 				"gl_FragColor = vec4( vec3( color ), opacity );",
 
 			"}"
@@ -2331,6 +2338,69 @@ THREE.ShaderLib = {
 				THREE.ShaderChunk[ "color_fragment" ],
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "fog_fragment" ],
+
+			"}"
+
+		].join("\n")
+
+	},
+	
+	'particle_depth': {
+
+		uniforms:  THREE.UniformsUtils.merge( [
+
+			THREE.UniformsLib[ "particle" ],
+			THREE.UniformsLib[ "depthmap" ]
+
+		] ),
+
+		vertexShader: [
+
+			"uniform float size;",
+			"uniform float scale;",
+
+			THREE.ShaderChunk[ "color_pars_vertex" ],
+
+			"void main() {",
+
+				THREE.ShaderChunk[ "color_vertex" ],
+
+				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+
+				"#ifdef USE_SIZEATTENUATION",
+					"gl_PointSize = size * ( scale / length( mvPosition.xyz ) );",
+				"#else",
+					"gl_PointSize = size;",
+				"#endif",
+
+				"gl_Position = projectionMatrix * mvPosition;",
+
+				THREE.ShaderChunk[ "worldpos_vertex" ],
+
+			"}"
+
+		].join("\n"),
+
+		fragmentShader: [
+
+			"uniform vec3 psColor;",
+			"uniform float opacity;",
+			"uniform float mNear;",
+			"uniform float mFar;",
+			
+			THREE.ShaderChunk[ "color_pars_fragment" ],
+			THREE.ShaderChunk[ "map_particle_pars_fragment" ],
+
+			"void main() {",
+
+				"gl_FragColor = vec4( psColor, opacity );",
+
+				THREE.ShaderChunk[ "map_particle_fragment" ],
+				THREE.ShaderChunk[ "depthmap_fragment" ],
+				
+				"gl_FragColor = vec4( vec3( color ), gl_FragColor.a );",
+			  // "gl_FragColor = vec4( 1.0,1.0,1.0,gl_FragColor.a );",
+				
 
 			"}"
 

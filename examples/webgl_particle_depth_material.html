@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - particles - depth</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#ff00ff;
+			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl particle depth material example by <a href="http://paulkaplan.me" alt="Paul Kaplan">Paul Kaplan</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+          <script>
+          var stats, scene, camera, renderer, controls;
+
+          window.onload = function(){
+            scene = new THREE.Scene(); 
+            camera = new THREE.PerspectiveCamera(60, 1, 1, 200);
+
+            renderer = new THREE.WebGLRenderer();
+            controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+
+            var particleGeo = new THREE.Geometry();
+
+            for(var n=0; n<1000; n++){ 
+              particleGeo.vertices.push( new THREE.Vector3( 
+                Math.random()*100-50,
+                Math.random()*100-50,
+                Math.random()*100-50 )
+              )
+            };
+
+            var particleMat = new THREE.ParticleDepthMaterial({
+              size : 20,
+              map  : THREE.ImageUtils.loadTexture('textures/sprite1.png')
+            })
+
+            var particleSystem = new THREE.ParticleSystem(particleGeo, particleMat);
+                particleSystem.sortParticles = true;
+
+            scene.add(particleSystem);
+            
+            camera.position.set(90, 90, 90);
+            
+            animate()
+            
+          }
+          
+          function animate(){
+            requestAnimationFrame(animate); 
+            render();
+
+          }
+
+          function render() {
+            renderer.render(scene, camera);
+            controls.update();
+
+          }
+          </script>
+        </body>
+        </html>

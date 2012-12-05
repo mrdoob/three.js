@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - particles - depth</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#ff00ff;
+			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl mesh depth material example by <a href="http://paulkaplan.me" alt="Paul Kaplan">Paul Kaplan</a>
+		</div>
+
+		<script src="../build/three.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		
+
+          <script>
+          var stats, scene, camera, renderer, controls;
+          
+          window.onload = function(){
+            
+            scene = new THREE.Scene(); 
+            camera = new THREE.PerspectiveCamera(60, 1, 1, 200);
+
+            renderer = new THREE.WebGLRenderer();
+            controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            
+            var depthMaterial = new THREE.MeshDepthMaterial();
+            var floor = new THREE.Mesh( new THREE.CubeGeometry(100,5,100), depthMaterial);
+                scene.add(floor);
+                
+            var cyl1 = new THREE.Mesh( new THREE.CylinderGeometry(10,10,40, 20,20), depthMaterial);
+                cyl1.position.set(-25,20,-20);
+                scene.add(cyl1);
+
+            var sphere = new THREE.Mesh( new THREE.SphereGeometry(20, 20,20), depthMaterial );
+                sphere.position.set(-25,20,20);
+                scene.add(sphere)
+
+            var cyl2 = new THREE.Mesh( new THREE.CylinderGeometry(10,10,40, 20,20), depthMaterial);
+                cyl2.position.set(25,20,20);
+                scene.add(cyl2);
+
+            var cube = new THREE.Mesh( new THREE.CubeGeometry(20,40,20), depthMaterial );
+                cube.position.set(25,20,-20);
+                scene.add(cube);
+            
+            camera.position.set(90, 90, 90);
+            
+            animate();
+          }
+          
+          function animate(){
+            requestAnimationFrame(animate); 
+            render();
+
+          }
+
+          function render() {
+            renderer.render(scene, camera);
+            controls.update();
+
+          }
+          </script>
+        </body>
+        </html>
