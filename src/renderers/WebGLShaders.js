@@ -268,18 +268,15 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_MAP",
 
+			"vec4 texelColor = texture2D( map, vUv );",
+
 			"#ifdef GAMMA_INPUT",
 
-				"vec4 texelColor = texture2D( map, vUv );",
 				"texelColor.xyz *= texelColor.xyz;",
 
-				"gl_FragColor = gl_FragColor * texelColor;",
-
-			"#else",
-
-				"gl_FragColor = gl_FragColor * texture2D( map, vUv );",
-
 			"#endif",
+
+			"gl_FragColor = gl_FragColor * texelColor;",
 
 		"#endif"
 

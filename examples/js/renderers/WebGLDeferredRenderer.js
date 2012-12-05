@@ -14,8 +14,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var scaledWidth = Math.floor( scale * width );
 	var scaledHeight = Math.floor( scale * height );
 
-	var additiveSpecular = parameters.additiveSpecular;
-	var multiply = parameters.multiply;
+	var brightness = parameters.brightness;
 
 	this.renderer = parameters.renderer;
 
@@ -23,7 +22,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		this.renderer = new THREE.WebGLRenderer( { alpha: false } );
 		this.renderer.setSize( width, height );
-		this.renderer.setClearColorHex( 0x000000, 1 );
+		this.renderer.setClearColorHex( 0x000000, 0 );
 
 		this.renderer.autoClear = false;
 
@@ -39,9 +38,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var black = new THREE.Color( 0x000000 );
 
 	var colorShader = THREE.ShaderDeferred[ "color" ];
-	var normalShader = THREE.ShaderDeferred[ "normals" ];
-	var bumpShader = THREE.ShaderDeferred[ "bump" ];
-	var clipDepthShader = THREE.ShaderDeferred[ "clipDepth" ];
+	var normalDepthShader = THREE.ShaderDeferred[ "normalDepth" ];
 
 	//
 
@@ -65,19 +62,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
-	var defaultNormalMaterial = new THREE.ShaderMaterial( {
+	var defaultNormalDepthMaterial = new THREE.ShaderMaterial( {
 
-		uniforms:       THREE.UniformsUtils.clone( normalShader.uniforms ),
-		vertexShader:   normalShader.vertexShader,
-		fragmentShader: normalShader.fragmentShader
-
-	} );
-
-	var defaultDepthMaterial = new THREE.ShaderMaterial( {
-
-		uniforms:       THREE.UniformsUtils.clone( clipDepthShader.uniforms ),
-		vertexShader:   clipDepthShader.vertexShader,
-		fragmentShader: clipDepthShader.fragmentShader
+		uniforms:       THREE.UniformsUtils.clone( normalDepthShader.uniforms ),
+		vertexShader:   normalDepthShader.vertexShader,
+		fragmentShader: normalDepthShader.fragmentShader
 
 	} );
 
@@ -88,8 +77,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		if ( object.material instanceof THREE.MeshFaceMaterial ) {
 
 			var colorMaterials = [];
-			var depthMaterials = [];
-			var normalMaterials = [];
+			var normalDepthMaterials = [];
 
 			var materials = object.material.materials;
 
@@ -98,22 +86,19 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 				var deferredMaterials = createDeferredMaterials( materials[ i ] );
 
 				colorMaterials.push( deferredMaterials.colorMaterial );
-				depthMaterials.push( deferredMaterials.depthMaterial );
-				normalMaterials.push( deferredMaterials.normalMaterial );
+				normalDepthMaterials.push( deferredMaterials.normalDepthMaterial );
 
 			}
 
 			object.properties.colorMaterial = new THREE.MeshFaceMaterial( colorMaterials );
-			object.properties.depthMaterial = new THREE.MeshFaceMaterial( depthMaterials );
-			object.properties.normalMaterial = new THREE.MeshFaceMaterial( normalMaterials );
+			object.properties.normalDepthMaterial = new THREE.MeshFaceMaterial( normalDepthMaterials );
 
 		} else {
 
 			var deferredMaterials = createDeferredMaterials( object.material );
 
 			object.properties.colorMaterial = deferredMaterials.colorMaterial;
-			object.properties.depthMaterial = deferredMaterials.depthMaterial;
-			object.properties.normalMaterial = deferredMaterials.normalMaterial;
+			object.properties.normalDepthMaterial = deferredMaterials.normalDepthMaterial;
 
 		}
 
@@ -161,11 +146,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var specular = originalMaterial.specular !== undefined ? originalMaterial.specular : black;
 		var shininess = originalMaterial.shininess !== undefined ? originalMaterial.shininess : 1;
+		var wrapAround = originalMaterial.wrapAround !== undefined ? ( originalMaterial.wrapAround ? -1 : 1 ) : 1;
+		var additiveSpecular = originalMaterial.metal !== undefined ? ( originalMaterial.metal ? 1 : -1 ) : -1;
 
 		uniforms.emissive.value.copy( emissive );
 		uniforms.diffuse.value.copy( diffuse );
 		uniforms.specular.value.copy( specular );
 		uniforms.shininess.value = shininess;
+		uniforms.wrapAround.value = wrapAround;
+		uniforms.additiveSpecular.value = additiveSpecular;
 
 		uniforms.map.value = originalMaterial.map;
 
@@ -186,77 +175,54 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		deferredMaterials.colorMaterial = material;
 
-		// normal material
+		// normal + depth material
 		// -----------------
 		//	vertex normals
 		//	morph normals
 		//	bump map
 		//	bump scale
+		//  clip depth
 
-		if ( originalMaterial.bumpMap ) {
+		if ( originalMaterial.morphTargets || originalMaterial.bumpMap ) {
 
-			var uniforms = THREE.UniformsUtils.clone( bumpShader.uniforms );
+			var uniforms = THREE.UniformsUtils.clone( normalDepthShader.uniforms );
+			var defines = { "USE_BUMPMAP": !!originalMaterial.bumpMap };
 
-			var normalMaterial = new THREE.ShaderMaterial( {
+			var normalDepthMaterial = new THREE.ShaderMaterial( {
 
-				uniforms: 		uniforms,
-				vertexShader: 	bumpShader.vertexShader,
-				fragmentShader: bumpShader.fragmentShader,
-				defines:		{ "USE_BUMPMAP": true }
-
-			} );
-
-			uniforms.bumpMap.value = originalMaterial.bumpMap;
-			uniforms.bumpScale.value = originalMaterial.bumpScale;
-
-			var offset = originalMaterial.bumpMap.offset;
-			var repeat = originalMaterial.bumpMap.repeat;
-
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
-
-			deferredMaterials.normalMaterial = normalMaterial;
-
-		} else if ( originalMaterial.morphTargets ) {
-
-			var normalMaterial = new THREE.ShaderMaterial( {
-
-				uniforms:       THREE.UniformsUtils.clone( normalShader.uniforms ),
-				vertexShader:   normalShader.vertexShader,
-				fragmentShader: normalShader.fragmentShader,
-				shading:		originalMaterial.shading
+				uniforms:       uniforms,
+				vertexShader:   normalDepthShader.vertexShader,
+				fragmentShader: normalDepthShader.fragmentShader,
+				shading:		originalMaterial.shading,
+				defines:		defines,
+				blending:		THREE.NoBlending
 
 			} );
 
-			normalMaterial.morphTargets = originalMaterial.morphTargets;
-			normalMaterial.morphNormals = originalMaterial.morphNormals;
+			if ( originalMaterial.morphTargets ) {
 
-			deferredMaterials.normalMaterial = normalMaterial;
+				normalDepthMaterial.morphTargets = originalMaterial.morphTargets;
+				normalDepthMaterial.morphNormals = originalMaterial.morphNormals;
+
+			}
+
+			if ( originalMaterial.bumpMap ) {
+
+				uniforms.bumpMap.value = originalMaterial.bumpMap;
+				uniforms.bumpScale.value = originalMaterial.bumpScale;
+
+				var offset = originalMaterial.bumpMap.offset;
+				var repeat = originalMaterial.bumpMap.repeat;
+
+				uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+
+			}
+
+			deferredMaterials.normalDepthMaterial = normalDepthMaterial;
 
 		} else {
 
-			deferredMaterials.normalMaterial = defaultNormalMaterial;
-
-		}
-
-		// depth material
-
-		if ( originalMaterial.morphTargets ) {
-
-			var depthMaterial = new THREE.ShaderMaterial( {
-
-				uniforms:       THREE.UniformsUtils.clone( clipDepthShader.uniforms ),
-				vertexShader:   clipDepthShader.vertexShader,
-				fragmentShader: clipDepthShader.fragmentShader
-
-			} );
-
-			depthMaterial.morphTargets = originalMaterial.morphTargets;
-
-			deferredMaterials.depthMaterial = depthMaterial;
-
-		} else {
-
-			deferredMaterials.depthMaterial = defaultDepthMaterial;
+			deferredMaterials.normalDepthMaterial = defaultNormalDepthMaterial;
 
 		}
 
@@ -273,7 +239,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms:       THREE.UniformsUtils.clone( pointLightShader.uniforms ),
 			vertexShader:   pointLightShader.vertexShader,
 			fragmentShader: pointLightShader.fragmentShader,
-			defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,
@@ -290,8 +255,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
 		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		materialLight.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
-		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
+		materialLight.uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 		// create light proxy mesh
 
@@ -316,7 +280,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms:       THREE.UniformsUtils.clone( directionalLightShader.uniforms ),
 			vertexShader:   directionalLightShader.vertexShader,
 			fragmentShader: directionalLightShader.fragmentShader,
-			defines:		{ "ADDITIVE_SPECULAR": additiveSpecular },
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,
@@ -332,8 +295,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
 		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
-		materialLight.uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+		materialLight.uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 		// create light proxy mesh
 
@@ -358,7 +320,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			vertexShader:   emissiveLightShader.vertexShader,
 			fragmentShader: emissiveLightShader.fragmentShader,
 			depthTest:		false,
-			depthWrite:		false
+			depthWrite:		false,
+			blending:		THREE.NoBlending
 
 		} );
 
@@ -367,7 +330,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
 		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		materialLight.uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
 
 		// create light proxy mesh
 
@@ -412,15 +374,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
-	var setMaterialDepth = function ( object ) {
+	var setMaterialNormalDepth = function ( object ) {
 
-		if ( object.material ) object.material = object.properties.depthMaterial;
-
-	};
-
-	var setMaterialNormal = function ( object ) {
-
-		if ( object.material ) object.material = object.properties.normalMaterial;
+		if ( object.material ) object.material = object.properties.normalDepthMaterial;
 
 	};
 
@@ -434,8 +390,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		scaledHeight = Math.floor( scale * height );
 
 		compColor.setSize( scaledWidth, scaledHeight );
-		compNormal.setSize( scaledWidth, scaledHeight );
-		compDepth.setSize( scaledWidth, scaledHeight );
+		compNormalDepth.setSize( scaledWidth, scaledHeight );
 		compLight.setSize( scaledWidth, scaledHeight );
 		compFinal.setSize( scaledWidth, scaledHeight );
 
@@ -447,11 +402,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms[ "viewHeight" ].value = scaledHeight;
 
 			uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-			uniforms[ 'samplerDepth' ].value = compDepth.renderTarget2;
 
-			if ( uniforms[ 'samplerNormals' ] ) {
+			if ( uniforms[ 'samplerNormalDepth' ] ) {
 
-				uniforms[ 'samplerNormals' ].value = compNormal.renderTarget2;
+				uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 			}
 
@@ -483,33 +437,33 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		lightSceneFullscreen = scene.properties.lightSceneFullscreen;
 
 		passColor.camera = camera;
-		passNormal.camera = camera;
-		passDepth.camera = camera;
+		passNormalDepth.camera = camera;
 		passLightProxy.camera = camera;
 		passLightFullscreen.camera = THREE.EffectComposer.camera;
 
 		passColor.scene = scene;
-		passNormal.scene = scene;
-		passDepth.scene = scene;
+		passNormalDepth.scene = scene;
 		passLightFullscreen.scene = lightSceneFullscreen;
 		passLightProxy.scene = lightSceneProxy;
 
 		scene.traverse( initDeferredProperties );
+
+		// update scene graph only once per frame
+
+		this.renderer.autoUpdateScene = false;
+		scene.updateMatrixWorld();
 
 		// g-buffer color
 
 		scene.traverse( setMaterialColor );
 		compColor.render();
 
-		// g-buffer depth
+		// g-buffer normals + depth
 
-		scene.traverse( setMaterialDepth );
-		compDepth.render();
+		scene.traverse( setMaterialNormalDepth );
+		compNormalDepth.render();
 
-		// g-buffer normals
-
-		scene.traverse( setMaterialNormal );
-		compNormal.render();
+		this.renderer.autoUpdateScene = true;
 
 		// light pass
 
@@ -554,32 +508,36 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// g-buffers
 
 		var rtColor   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatNearest );
-		var rtNormal  = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
-		var rtDepth   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
+		var rtNormalDepth = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
 		var rtLight   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
 		var rtFinal   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsUByte );
 
 		rtColor.generateMipmaps = false;
-		rtNormal.generateMipmaps = false;
-		rtDepth.generateMipmaps = false;
+		rtNormalDepth.generateMipmaps = false;
 		rtLight.generateMipmaps = false;
 		rtFinal.generateMipmaps = false;
 
-		// composers
+		// color composer
 
 		passColor = new THREE.RenderPass();
+		passColor.clear = true;
+
 		compColor = new THREE.EffectComposer( _this.renderer, rtColor );
 		compColor.addPass( passColor );
 
-		passNormal = new THREE.RenderPass();
-		compNormal = new THREE.EffectComposer( _this.renderer, rtNormal );
-		compNormal.addPass( passNormal );
+		// normal + depth composer
 
-		passDepth = new THREE.RenderPass();
-		compDepth = new THREE.EffectComposer( _this.renderer, rtDepth );
-		compDepth.addPass( passDepth );
+		passNormalDepth = new THREE.RenderPass();
+		passNormalDepth.clear = true;
+
+		compNormalDepth = new THREE.EffectComposer( _this.renderer, rtNormalDepth );
+		compNormalDepth.addPass( passNormalDepth );
+
+		// light composer
 
 		passLightFullscreen = new THREE.RenderPass();
+		passLightFullscreen.clear = true;
+
 		passLightProxy = new THREE.RenderPass();
 		passLightProxy.clear = false;
 
@@ -587,11 +545,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compLight.addPass( passLightFullscreen );
 		compLight.addPass( passLightProxy );
 
-		// composite
+		// final composer
 
 		compositePass = new THREE.ShaderPass( compositeShader );
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
-		compositePass.uniforms[ 'multiply' ].value = multiply;
+		compositePass.uniforms[ 'brightness' ].value = brightness;
+		compositePass.material.blending = THREE.NoBlending;
+		compositePass.clear = true;
 
 		// FXAA
 

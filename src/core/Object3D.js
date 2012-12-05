@@ -6,8 +6,6 @@
 
 THREE.Object3D = function () {
 
-	THREE.Object3DLibrary.push( this );
-
 	this.id = THREE.Object3DIdCount ++;
 
 	this.name = '';
@@ -48,6 +46,8 @@ THREE.Object3D = function () {
 	this.frustumCulled = true;
 
 	this._vector = new THREE.Vector3();
+
+	THREE.Object3DLibrary[ this.id ] = this;
 
 };
 
@@ -362,8 +362,7 @@ THREE.Object3D.prototype = {
 
 	deallocate: function () {
 
-		var index = THREE.Object3DLibrary.indexOf( this );
-		if ( index !== -1 ) THREE.Object3DLibrary.splice( index, 1 );
+		delete THREE.Object3DLibrary[ this.id ];
 
 	}
 
@@ -373,4 +372,4 @@ THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DIdCount = 0;
-THREE.Object3DLibrary = [];
+THREE.Object3DLibrary = {};

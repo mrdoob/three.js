@@ -350,11 +350,6 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 
 				/* output Triangle */
 
-				/*
-				result.push( contour[ a ] );
-				result.push( contour[ b ] );
-				result.push( contour[ c ] );
-				*/
 				result.push( [ contour[ a ],
 					contour[ b ],
 					contour[ c ] ] );
@@ -402,34 +397,6 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 
 	};
 
-	// see if p is inside triangle abc
-
-	var insideTriangle = function( ax, ay,
-								   bx, by,
-								   cx, cy,
-								   px, py ) {
-
-		  var aX, aY, bX, bY;
-		  var cX, cY, apx, apy;
-		  var bpx, bpy, cpx, cpy;
-		  var cCROSSap, bCROSScp, aCROSSbp;
-
-		  aX = cx - bx;  aY = cy - by;
-		  bX = ax - cx;  bY = ay - cy;
-		  cX = bx - ax;  cY = by - ay;
-		  apx= px  -ax;  apy= py - ay;
-		  bpx= px - bx;  bpy= py - by;
-		  cpx= px - cx;  cpy= py - cy;
-
-		  aCROSSbp = aX*bpy - aY*bpx;
-		  cCROSSap = cX*apy - cY*apx;
-		  bCROSScp = bX*cpy - bY*cpx;
-
-		  return ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) );
-
-	};
-
-
 	var snip = function ( contour, u, v, w, n, verts ) {
 
 		var p;
@@ -447,18 +414,36 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 
 		if ( EPSILON > (((bx-ax)*(cy-ay)) - ((by-ay)*(cx-ax))) ) return false;
 
-			for ( p = 0; p < n; p++ ) {
+		var aX, aY, bX, bY, cX, cY;
+		var apx, apy, bpx, bpy, cpx, cpy;
+		var cCROSSap, bCROSScp, aCROSSbp;
 
-				if( (p == u) || (p == v) || (p == w) ) continue;
+		aX = cx - bx;  aY = cy - by;
+		bX = ax - cx;  bY = ay - cy;
+		cX = bx - ax;  cY = by - ay;
 
-				px = contour[ verts[ p ] ].x
-				py = contour[ verts[ p ] ].y
+		for ( p = 0; p < n; p++ ) {
 
-				if ( insideTriangle( ax, ay, bx, by, cx, cy, px, py ) ) return false;
+			if( (p === u) || (p === v) || (p === w) ) continue;
 
-		  }
+			px = contour[ verts[ p ] ].x
+			py = contour[ verts[ p ] ].y
 
-		  return true;
+			apx = px - ax;  apy = py - ay;
+			bpx = px - bx;  bpy = py - by;
+			cpx = px - cx;  cpy = py - cy;
+
+			// see if p is inside triangle abc
+
+			aCROSSbp = aX*bpy - aY*bpx;
+			cCROSSap = cX*apy - cY*apx;
+			bCROSScp = bX*cpy - bY*cpx;
+
+			if ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) ) return false;
+
+		}
+
+		return true;
 
 	};
 

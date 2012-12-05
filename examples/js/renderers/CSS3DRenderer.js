@@ -121,10 +121,10 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 1 ] ) + ',' +
 			epsilon( elements[ 2 ] ) + ',' +
 			epsilon( elements[ 3 ] ) + ',' +
-			epsilon( elements[ 4 ] ) + ',' +
-			epsilon( elements[ 5 ] ) + ',' +
-			epsilon( elements[ 6 ] ) + ',' +
-			epsilon( elements[ 7 ] ) + ',' +
+			epsilon( - elements[ 4 ] ) + ',' +
+			epsilon( - elements[ 5 ] ) + ',' +
+			epsilon( - elements[ 6 ] ) + ',' +
+			epsilon( - elements[ 7 ] ) + ',' +
 			epsilon( elements[ 8 ] ) + ',' +
 			epsilon( elements[ 9 ] ) + ',' +
 			epsilon( elements[ 10 ] ) + ',' +
@@ -133,7 +133,7 @@ THREE.CSS3DRenderer = function () {
 			epsilon( elements[ 13 ] ) + ',' +
 			epsilon( elements[ 14 ] ) + ',' +
 			epsilon( elements[ 15 ] ) +
-		') scale3d(1,-1,1)';
+		')';
 
 	}
 
@@ -146,14 +146,14 @@ THREE.CSS3DRenderer = function () {
 		this.domElement.style.oPerspective = fov + "px";
 		this.domElement.style.perspective = fov + "px";
 
+		var objects = _projector.projectScene( scene, camera, false ).objects;
+		
 		var style = "translate3d(0,0," + fov + "px)" + getCameraCSSMatrix( camera.matrixWorldInverse ) + " translate3d(" + _widthHalf + "px," + _heightHalf + "px, 0)";
 
 		this.cameraElement.style.WebkitTransform = style;
 		this.cameraElement.style.MozTransform = style;
 		this.cameraElement.style.oTransform = style;
 		this.cameraElement.style.transform = style;
-
-		var objects = _projector.projectScene( scene, camera, false ).objects;
 
 		for ( var i = 0, il = objects.length; i < il; i ++ ) {
 

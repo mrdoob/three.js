@@ -5,8 +5,6 @@
 
 THREE.Material = function () {
 
-	THREE.MaterialLibrary.push( this );
-
 	this.id = THREE.MaterialIdCount ++;
 
 	this.name = '';
@@ -36,6 +34,8 @@ THREE.Material = function () {
 	this.visible = true;
 
 	this.needsUpdate = true;
+
+	THREE.MaterialLibrary[ this.id ] = this;
 
 };
 
@@ -118,10 +118,9 @@ THREE.Material.prototype.clone = function ( material ) {
 
 THREE.Material.prototype.deallocate = function () {
 
-	var index = THREE.MaterialLibrary.indexOf( this );
-	if ( index !== -1 ) THREE.MaterialLibrary.splice( index, 1 );
+	delete THREE.MaterialLibrary[ this.id ];
 
 };
 
 THREE.MaterialIdCount = 0;
-THREE.MaterialLibrary = [];
+THREE.MaterialLibrary = {};
