@@ -30,7 +30,7 @@ test( "copy/equals", function() {
 test( "set", function() {
 	var a = new THREE.Ray();
 
-	a.set( one3, one3 )
+	a.set( one3, one3 );
 	ok( a.origin.equals( one3 ), "Passed!" );
 	ok( a.direction.equals( one3 ), "Passed!" );
 });

@@ -32,7 +32,7 @@ test( "set", function() {
 	ok( a.x == 0, "Passed!" );
 	ok( a.y == 0, "Passed!" );
 
-	a.set( x, y )
+	a.set( x, y );
 	ok( a.x == x, "Passed!" );
 	ok( a.y == y, "Passed!" );
 });
