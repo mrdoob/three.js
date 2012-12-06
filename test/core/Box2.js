@@ -34,7 +34,7 @@ test( "copy", function() {
 test( "set", function() {
 	var a = new THREE.Box2();
 
-	a.set( zero2, one2 )
+	a.set( zero2, one2 );
 	ok( a.min.equals( zero2 ), "Passed!" );
 	ok( a.max.equals( one2 ), "Passed!" );
 });
@@ -189,23 +189,23 @@ test( "distanceToPoint", function() {
 	ok( b.distanceToPoint( new THREE.Vector2( -2, -2 ) ) == Math.sqrt( 2 ), "Passed!" );
 });
 
-test( "isIntersection", function() {
+test( "isIntersectionBox", function() {
 	var a = new THREE.Box2( zero2 );
 	var b = new THREE.Box2( zero2, one2 );
 	var c = new THREE.Box2( one2.clone().negate(), one2 );
 
-	ok( a.isIntersection( a ), "Passed!" );
-	ok( a.isIntersection( b ), "Passed!" );
-	ok( a.isIntersection( c ), "Passed!" );
+	ok( a.isIntersectionBox( a ), "Passed!" );
+	ok( a.isIntersectionBox( b ), "Passed!" );
+	ok( a.isIntersectionBox( c ), "Passed!" );
 
-	ok( b.isIntersection( a ), "Passed!" );
-	ok( c.isIntersection( a ), "Passed!" );
-	ok( b.isIntersection( c ), "Passed!" );
+	ok( b.isIntersectionBox( a ), "Passed!" );
+	ok( c.isIntersectionBox( a ), "Passed!" );
+	ok( b.isIntersectionBox( c ), "Passed!" );
 
 	b.translate( new THREE.Vector2( 2, 2 ) );
-	ok( ! a.isIntersection( b ), "Passed!" );
-	ok( ! b.isIntersection( a ), "Passed!" );
-	ok( ! b.isIntersection( c ), "Passed!" );
+	ok( ! a.isIntersectionBox( b ), "Passed!" );
+	ok( ! b.isIntersectionBox( a ), "Passed!" );
+	ok( ! b.isIntersectionBox( c ), "Passed!" );
 });
 
 test( "intersect", function() {
