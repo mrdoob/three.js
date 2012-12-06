@@ -50,8 +50,6 @@ THREE.Geometry = function () {
 
 	this.buffersNeedUpdate = false;
 
-	THREE.GeometryLibrary[ this.id ] = this;
-
 };
 
 THREE.Geometry.prototype = {
@@ -734,15 +732,8 @@ THREE.Geometry.prototype = {
 
 		return geometry;
 
-	},
-
-	deallocate: function () {
-
-		delete THREE.GeometryLibrary[ this.id ];
-
 	}
 
 };
 
 THREE.GeometryIdCount = 0;
-THREE.GeometryLibrary = {};

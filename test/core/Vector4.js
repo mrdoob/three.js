@@ -44,7 +44,7 @@ test( "set", function() {
 	ok( a.z == 0, "Passed!" );
 	ok( a.w == 1, "Passed!" );
 
-	a.set( x, y, z, w )
+	a.set( x, y, z, w );
 	ok( a.x == x, "Passed!" );
 	ok( a.y == y, "Passed!" );
 	ok( a.z == z, "Passed!" );

@@ -133,15 +133,17 @@ THREE.Box3.prototype = {
 
 	},
 
-	center: function () {
+	center: function ( optionalTarget ) {
 
-		return new THREE.Vector3().add( this.min, this.max ).multiplyScalar( 0.5 );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.add( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function () {
+	size: function ( optionalTarget ) {
 
-		return new THREE.Vector3().sub( this.max, this.min );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.sub( this.max, this.min );
 
 	},
 
@@ -213,7 +215,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersection: function ( box ) {
+	isIntersectionBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -229,8 +231,9 @@ THREE.Box3.prototype = {
 
 	},
 
-	clampPoint: function ( point ) {
+	clampPoint: function ( point, optionalTarget ) {
 
+		var result = optionalTarget || new THREE.Vector3();
 		return new THREE.Vector3().copy( point ).clampSelf( this.min, this.max );
 
 	},

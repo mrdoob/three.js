@@ -37,8 +37,6 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.needsUpdate = false;
 	this.onUpdate = null;
 
-	THREE.TextureLibrary[ this.id ] = this;
-
 };
 
 THREE.Texture.prototype = {
@@ -75,15 +73,8 @@ THREE.Texture.prototype = {
 
 		return texture;
 
-	},
-
-	deallocate: function () {
-
-		delete THREE.TextureLibrary[ this.id ];
-
 	}
 
 };
 
 THREE.TextureIdCount = 0;
-THREE.TextureLibrary = {};
