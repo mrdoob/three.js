@@ -16,5 +16,5 @@
 	"../src/math/Math.js",
 	"../src/math/Quaternion.js",
 	"../src/math/Spline.js",
-	"../src/math/Triangle3.js"
+	"../src/math/Triangle.js"
 ]

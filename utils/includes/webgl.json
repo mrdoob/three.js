@@ -15,7 +15,7 @@
 	"../src/math/Spline.js",
 	"../src/math/Box2.js",
 	"../src/math/Box3.js",
-	"../src/math/Triangle3.js",
+	"../src/math/Triangle.js",
 	"../src/math/Sphere.js",
 	"../src/math/Plane.js",
 	"../src/core/Clock.js",
