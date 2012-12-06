@@ -13,7 +13,7 @@
 	"../src/math/Frustum.js",
 	"../src/math/Rectangle.js",
 	"../src/math/Math.js",
-	"../src/math/Triangle3.js",
+	"../src/math/Triangle.js",
 	"../src/math/Quaternion.js",
 	"../src/math/Vertex.js",
 	"../src/math/UV.js",

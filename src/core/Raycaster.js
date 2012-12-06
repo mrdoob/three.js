@@ -130,7 +130,7 @@
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 
-					if ( ! THREE.Triangle3.containsPoint( intersectPoint, a, b, c ) ) continue;
+					if ( ! THREE.Triangle.containsPoint( intersectPoint, a, b, c ) ) continue;
 
 				} else if ( face instanceof THREE.Face4 ) {
 
@@ -139,8 +139,8 @@
 					c = vertices[ face.c ];
 					d = vertices[ face.d ];
 
-					if ( ( ! THREE.Triangle3.containsPoint( intersectPoint, a, b, d ) ) &&
-						 ( ! THREE.Triangle3.containsPoint( intersectPoint, b, c, d ) ) ) continue;
+					if ( ( ! THREE.Triangle.containsPoint( intersectPoint, a, b, d ) ) &&
+						 ( ! THREE.Triangle.containsPoint( intersectPoint, b, c, d ) ) ) continue;
 
 				} else {
 
