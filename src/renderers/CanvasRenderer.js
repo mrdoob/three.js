@@ -245,8 +245,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 
-				_elemBox2.addPoint( _v1.positionScreen );
-				_elemBox2.addPoint( _v2.positionScreen );
+				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
 
 				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
 
@@ -271,9 +270,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_elemBox2.addPoint( _v1.positionScreen );
-				_elemBox2.addPoint( _v2.positionScreen );
-				_elemBox2.addPoint( _v3.positionScreen );
+				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
 				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
 
@@ -304,10 +301,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_elemBox2.addPoint( _v1.positionScreen );
-				_elemBox2.addPoint( _v2.positionScreen );
-				_elemBox2.addPoint( _v3.positionScreen );
-				_elemBox2.addPoint( _v4.positionScreen );
+				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
 
 				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
 
