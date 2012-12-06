@@ -446,14 +446,12 @@ var Viewport = function ( signals ) {
 		// remove selected object from the scene
 
 		selected.parent.remove( selected );
-		selected.deallocate();
 
 		// remove eventual pure Object3D targets from the scene
 
 		if ( selected.target && !selected.target.geometry ) {
 
 			selected.target.parent.remove( selected.target );
-			selected.target.deallocate();
 
 		}
 
@@ -476,7 +474,6 @@ var Viewport = function ( signals ) {
 			var helper = helpersToRemove[ i ];
 
 			helper.parent.remove( helper );
-			helper.deallocate();
 
 		}
 
