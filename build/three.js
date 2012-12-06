@@ -91,6 +91,12 @@ THREE.CullFaceFrontBack = 3;
 THREE.FrontFaceDirectionCW = 0;
 THREE.FrontFaceDirectionCCW = 1;
 
+// SHADOWING TYPES
+
+THREE.BasicShadowMap = 0;
+THREE.PCFShadowMap = 1;
+THREE.PCFSoftShadowMap = 2;
+
 // MATERIAL CONSTANTS
 
 // side
@@ -223,70 +229,6 @@ THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 */
 /**
- * @author alteredq / http://alteredqualia.com/
- */
-
-THREE.Clock = function ( autoStart ) {
-
-	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
-
-	this.startTime = 0;
-	this.oldTime = 0;
-	this.elapsedTime = 0;
-
-	this.running = false;
-
-};
-
-THREE.Clock.prototype.start = function () {
-
-	this.startTime = Date.now();
-	this.oldTime = this.startTime;
-
-	this.running = true;
-
-};
-
-THREE.Clock.prototype.stop = function () {
-
-	this.getElapsedTime();
-
-	this.running = false;
-
-};
-
-THREE.Clock.prototype.getElapsedTime = function () {
-
-	this.getDelta();
-
-	return this.elapsedTime;
-
-};
-
-
-THREE.Clock.prototype.getDelta = function () {
-
-	var diff = 0;
-
-	if ( this.autoStart && ! this.running ) {
-
-		this.start();
-
-	}
-
-	if ( this.running ) {
-
-		var newTime = Date.now();
-		diff = 0.001 * ( newTime - this.oldTime );
-		this.oldTime = newTime;
-
-		this.elapsedTime += diff;
-
-	}
-
-	return diff;
-
-};/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -629,7 +571,30 @@ THREE.Color.prototype = {
 
 };
 
-THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua": 0x00FFFF, "aquamarine": 0x7FFFD4, "azure": 0xF0FFFF, "beige": 0xF5F5DC, "bisque": 0xFFE4C4, "black": 0x000000, "blanchedalmond": 0xFFEBCD, "blue": 0x0000FF, "blueviolet": 0x8A2BE2, "brown": 0xA52A2A, "burlywood": 0xDEB887, "cadetblue": 0x5F9EA0, "chartreuse": 0x7FFF00, "chocolate": 0xD2691E, "coral": 0xFF7F50, "cornflowerblue": 0x6495ED, "cornsilk": 0xFFF8DC, "crimson": 0xDC143C, "cyan": 0x00FFFF, "darkblue": 0x00008B, "darkcyan": 0x008B8B, "darkgoldenrod": 0xB8860B, "darkgray": 0xA9A9A9, "darkgreen": 0x006400, "darkgrey": 0xA9A9A9, "darkkhaki": 0xBDB76B, "darkmagenta": 0x8B008B, "darkolivegreen": 0x556B2F, "darkorange": 0xFF8C00, "darkorchid": 0x9932CC, "darkred": 0x8B0000, "darksalmon": 0xE9967A, "darkseagreen": 0x8FBC8F, "darkslateblue": 0x483D8B, "darkslategray": 0x2F4F4F, "darkslategrey": 0x2F4F4F, "darkturquoise": 0x00CED1, "darkviolet": 0x9400D3, "deeppink": 0xFF1493, "deepskyblue": 0x00BFFF, "dimgray": 0x696969, "dimgrey": 0x696969, "dodgerblue": 0x1E90FF, "firebrick": 0xB22222, "floralwhite": 0xFFFAF0, "forestgreen": 0x228B22, "fuchsia": 0xFF00FF, "gainsboro": 0xDCDCDC, "ghostwhite": 0xF8F8FF, "gold": 0xFFD700, "goldenrod": 0xDAA520, "gray": 0x808080, "green": 0x008000, "greenyellow": 0xADFF2F, "grey": 0x808080, "honeydew": 0xF0FFF0, "hotpink": 0xFF69B4, "indianred": 0xCD5C5C, "indigo": 0x4B0082, "ivory": 0xFFFFF0, "khaki": 0xF0E68C, "lavender": 0xE6E6FA, "lavenderblush": 0xFFF0F5, "lawngreen": 0x7CFC00, "lemonchiffon": 0xFFFACD, "lightblue": 0xADD8E6, "lightcoral": 0xF08080, "lightcyan": 0xE0FFFF, "lightgoldenrodyellow": 0xFAFAD2, "lightgray": 0xD3D3D3, "lightgreen": 0x90EE90, "lightgrey": 0xD3D3D3, "lightpink": 0xFFB6C1, "lightsalmon": 0xFFA07A, "lightseagreen": 0x20B2AA, "lightskyblue": 0x87CEFA, "lightslategray": 0x778899, "lightslategrey": 0x778899, "lightsteelblue": 0xB0C4DE, "lightyellow": 0xFFFFE0, "lime": 0x00FF00, "limegreen": 0x32CD32, "linen": 0xFAF0E6, "magenta": 0xFF00FF, "maroon": 0x800000, "mediumaquamarine": 0x66CDAA, "mediumblue": 0x0000CD, "mediumorchid": 0xBA55D3, "mediumpurple": 0x9370DB, "mediumseagreen": 0x3CB371, "mediumslateblue": 0x7B68EE, "mediumspringgreen": 0x00FA9A, "mediumturquoise": 0x48D1CC, "mediumvioletred": 0xC71585, "midnightblue": 0x191970, "mintcream": 0xF5FFFA, "mistyrose": 0xFFE4E1, "moccasin": 0xFFE4B5, "navajowhite": 0xFFDEAD, "navy": 0x000080, "oldlace": 0xFDF5E6, "olive": 0x808000, "olivedrab": 0x6B8E23, "orange": 0xFFA500, "orangered": 0xFF4500, "orchid": 0xDA70D6, "palegoldenrod": 0xEEE8AA, "palegreen": 0x98FB98, "paleturquoise": 0xAFEEEE, "palevioletred": 0xDB7093, "papayawhip": 0xFFEFD5, "peachpuff": 0xFFDAB9, "peru": 0xCD853F, "pink": 0xFFC0CB, "plum": 0xDDA0DD, "powderblue": 0xB0E0E6, "purple": 0x800080, "red": 0xFF0000, "rosybrown": 0xBC8F8F, "royalblue": 0x4169E1, "saddlebrown": 0x8B4513, "salmon": 0xFA8072, "sandybrown": 0xF4A460, "seagreen": 0x2E8B57, "seashell": 0xFFF5EE, "sienna": 0xA0522D, "silver": 0xC0C0C0, "skyblue": 0x87CEEB, "slateblue": 0x6A5ACD, "slategray": 0x708090, "slategrey": 0x708090, "snow": 0xFFFAFA, "springgreen": 0x00FF7F, "steelblue": 0x4682B4, "tan": 0xD2B48C, "teal": 0x008080, "thistle": 0xD8BFD8, "tomato": 0xFF6347, "turquoise": 0x40E0D0, "violet": 0xEE82EE, "wheat": 0xF5DEB3, "white": 0xFFFFFF, "whitesmoke": 0xF5F5F5, "yellow": 0xFFFF00, "yellowgreen": 0x9ACD32 };
+THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua": 0x00FFFF, "aquamarine": 0x7FFFD4, "azure": 0xF0FFFF,
+"beige": 0xF5F5DC, "bisque": 0xFFE4C4, "black": 0x000000, "blanchedalmond": 0xFFEBCD, "blue": 0x0000FF, "blueviolet": 0x8A2BE2,
+"brown": 0xA52A2A, "burlywood": 0xDEB887, "cadetblue": 0x5F9EA0, "chartreuse": 0x7FFF00, "chocolate": 0xD2691E, "coral": 0xFF7F50,
+"cornflowerblue": 0x6495ED, "cornsilk": 0xFFF8DC, "crimson": 0xDC143C, "cyan": 0x00FFFF, "darkblue": 0x00008B, "darkcyan": 0x008B8B,
+"darkgoldenrod": 0xB8860B, "darkgray": 0xA9A9A9, "darkgreen": 0x006400, "darkgrey": 0xA9A9A9, "darkkhaki": 0xBDB76B, "darkmagenta": 0x8B008B,
+"darkolivegreen": 0x556B2F, "darkorange": 0xFF8C00, "darkorchid": 0x9932CC, "darkred": 0x8B0000, "darksalmon": 0xE9967A, "darkseagreen": 0x8FBC8F,
+"darkslateblue": 0x483D8B, "darkslategray": 0x2F4F4F, "darkslategrey": 0x2F4F4F, "darkturquoise": 0x00CED1, "darkviolet": 0x9400D3,
+"deeppink": 0xFF1493, "deepskyblue": 0x00BFFF, "dimgray": 0x696969, "dimgrey": 0x696969, "dodgerblue": 0x1E90FF, "firebrick": 0xB22222,
+"floralwhite": 0xFFFAF0, "forestgreen": 0x228B22, "fuchsia": 0xFF00FF, "gainsboro": 0xDCDCDC, "ghostwhite": 0xF8F8FF, "gold": 0xFFD700,
+"goldenrod": 0xDAA520, "gray": 0x808080, "green": 0x008000, "greenyellow": 0xADFF2F, "grey": 0x808080, "honeydew": 0xF0FFF0, "hotpink": 0xFF69B4,
+"indianred": 0xCD5C5C, "indigo": 0x4B0082, "ivory": 0xFFFFF0, "khaki": 0xF0E68C, "lavender": 0xE6E6FA, "lavenderblush": 0xFFF0F5, "lawngreen": 0x7CFC00,
+"lemonchiffon": 0xFFFACD, "lightblue": 0xADD8E6, "lightcoral": 0xF08080, "lightcyan": 0xE0FFFF, "lightgoldenrodyellow": 0xFAFAD2, "lightgray": 0xD3D3D3,
+"lightgreen": 0x90EE90, "lightgrey": 0xD3D3D3, "lightpink": 0xFFB6C1, "lightsalmon": 0xFFA07A, "lightseagreen": 0x20B2AA, "lightskyblue": 0x87CEFA,
+"lightslategray": 0x778899, "lightslategrey": 0x778899, "lightsteelblue": 0xB0C4DE, "lightyellow": 0xFFFFE0, "lime": 0x00FF00, "limegreen": 0x32CD32,
+"linen": 0xFAF0E6, "magenta": 0xFF00FF, "maroon": 0x800000, "mediumaquamarine": 0x66CDAA, "mediumblue": 0x0000CD, "mediumorchid": 0xBA55D3,
+"mediumpurple": 0x9370DB, "mediumseagreen": 0x3CB371, "mediumslateblue": 0x7B68EE, "mediumspringgreen": 0x00FA9A, "mediumturquoise": 0x48D1CC,
+"mediumvioletred": 0xC71585, "midnightblue": 0x191970, "mintcream": 0xF5FFFA, "mistyrose": 0xFFE4E1, "moccasin": 0xFFE4B5, "navajowhite": 0xFFDEAD,
+"navy": 0x000080, "oldlace": 0xFDF5E6, "olive": 0x808000, "olivedrab": 0x6B8E23, "orange": 0xFFA500, "orangered": 0xFF4500, "orchid": 0xDA70D6,
+"palegoldenrod": 0xEEE8AA, "palegreen": 0x98FB98, "paleturquoise": 0xAFEEEE, "palevioletred": 0xDB7093, "papayawhip": 0xFFEFD5, "peachpuff": 0xFFDAB9,
+"peru": 0xCD853F, "pink": 0xFFC0CB, "plum": 0xDDA0DD, "powderblue": 0xB0E0E6, "purple": 0x800080, "red": 0xFF0000, "rosybrown": 0xBC8F8F,
+"royalblue": 0x4169E1, "saddlebrown": 0x8B4513, "salmon": 0xFA8072, "sandybrown": 0xF4A460, "seagreen": 0x2E8B57, "seashell": 0xFFF5EE,
+"sienna": 0xA0522D, "silver": 0xC0C0C0, "skyblue": 0x87CEEB, "slateblue": 0x6A5ACD, "slategray": 0x708090, "slategrey": 0x708090, "snow": 0xFFFAFA,
+"springgreen": 0x00FF7F, "steelblue": 0x4682B4, "tan": 0xD2B48C, "teal": 0x008080, "thistle": 0xD8BFD8, "tomato": 0xFF6347, "turquoise": 0x40E0D0,
+"violet": 0xEE82EE, "wheat": 0xF5DEB3, "white": 0xFFFFFF, "whitesmoke": 0xF5F5F5, "yellow": 0xFFFF00, "yellowgreen": 0x9ACD32 };
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
@@ -1985,38 +1950,39 @@ THREE.Box2.prototype = {
 		this.max.copy( max );
 
 		return this;
+
 	},
 
 	setFromPoints: function ( points ) {
 
 		if ( points.length > 0 ) {
 
-			var p = points[ 0 ];
+			var point = points[ 0 ];
 
-			this.min.copy( p );
-			this.max.copy( p );
+			this.min.copy( point );
+			this.max.copy( point );
 
 			for ( var i = 1, il = points.length; i < il; i ++ ) {
 
-				p = points[ i ];
+				point = points[ i ];
 
-				if ( p.x < this.min.x ) {
+				if ( point.x < this.min.x ) {
 
-					this.min.x = p.x;
+					this.min.x = point.x;
 
-				} else if ( p.x > this.max.x ) {
+				} else if ( point.x > this.max.x ) {
 
-					this.max.x = p.x;
+					this.max.x = point.x;
 
 				}
 
-				if ( p.y < this.min.y ) {
+				if ( point.y < this.min.y ) {
 
-					this.min.y = p.y;
+					this.min.y = point.y;
 
-				} else if ( p.y > this.max.y ) {
+				} else if ( point.y > this.max.y ) {
 
-					this.max.y = p.y;
+					this.max.y = point.y;
 
 				}
 
@@ -2068,15 +2034,17 @@ THREE.Box2.prototype = {
 
 	},
 
-	center: function () {
+	center: function ( optionalTarget ) {
 
-		return new THREE.Vector2().add( this.min, this.max ).multiplyScalar( 0.5 );
+		var result = optionalTarget || new THREE.Vector2();
+		return result.add( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function () {
+	size: function ( optionalTarget ) {
 
-		return new THREE.Vector2().sub( this.max, this.min );
+		var result = optionalTarget || new THREE.Vector2();
+		return result.sub( this.max, this.min );
 
 	},
 
@@ -2142,7 +2110,7 @@ THREE.Box2.prototype = {
 
 	},
 
-	isIntersection: function ( box ) {
+	isIntersectionBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -2157,9 +2125,10 @@ THREE.Box2.prototype = {
 
 	},
 
-	clampPoint: function ( point ) {
+	clampPoint: function ( point, optionalTarget ) {
 
-		return new THREE.Vector2().copy( point ).clampSelf( this.min, this.max );
+		var result = optionalTarget || new THREE.Vector2();
+		return result.copy( point ).clampSelf( this.min, this.max );
 
 	},
 
@@ -2356,15 +2325,17 @@ THREE.Box3.prototype = {
 
 	},
 
-	center: function () {
+	center: function ( optionalTarget ) {
 
-		return new THREE.Vector3().add( this.min, this.max ).multiplyScalar( 0.5 );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.add( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function () {
+	size: function ( optionalTarget ) {
 
-		return new THREE.Vector3().sub( this.max, this.min );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.sub( this.max, this.min );
 
 	},
 
@@ -2436,7 +2407,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	isIntersection: function ( box ) {
+	isIntersectionBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
@@ -2452,8 +2423,9 @@ THREE.Box3.prototype = {
 
 	},
 
-	clampPoint: function ( point ) {
+	clampPoint: function ( point, optionalTarget ) {
 
+		var result = optionalTarget || new THREE.Vector3();
 		return new THREE.Vector3().copy( point ).clampSelf( this.min, this.max );
 
 	},
@@ -3745,27 +3717,24 @@ THREE.Ray.prototype = {
 
 	at: function( t, optionalTarget ) {
 
-		if( optionalTarget === undefined ) {
-			optionalTarget = this.direction.clone();
-		}
-		else {
-			optionalTarget.copy( this.direction );
-		}
-		return optionalTarget.multiplyScalar( t ).addSelf( this.origin );
+		var result = optionalTarget || new THREE.Vector3();
+
+		return result.copy( this.direction ).multiplyScalar( t ).addSelf( this.origin );
 
 	},
 
 	recastSelf: function ( t ) {
 
-		this.origin = this.at( t );
+		this.origin.copy( this.at( t, THREE.Ray.__v1 ) );
 
 		return this;
 
 	},
 
-	closestPointToPoint: function ( point ) {
+	closestPointToPoint: function ( point, optionalTarget ) {
 
-		var result = point.clone().subSelf( this.origin );
+		var result = optionalTarget || new THREE.Vector3();
+		result.sub( point, this.origin );
 		var directionDistance = result.dot( this.direction );
 
 		return result.copy( this.direction ).multiplyScalar( directionDistance ).addSelf( this.origin );
@@ -3832,7 +3801,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	intersectPlane: function ( plane ) {
+	intersectPlane: function ( plane, optionalTarget ) {
 
 		var t = this.distanceToPlane( plane );
 
@@ -3841,7 +3810,7 @@ THREE.Ray.prototype = {
 			return undefined;
 		}
 
-		return this.at( t );
+		return this.at( t, optionalTarget );
 
 	},
 
@@ -3990,8 +3959,8 @@ THREE.Plane.prototype = {
 
 	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var normal = THREE.Plane.__v1.sub( b, a ).cross(
-					 THREE.Plane.__v2.sub( c, a ) );
+		var normal = THREE.Plane.__v1.sub( c, b ).crossSelf(
+					 THREE.Plane.__v2.sub( a, b ) );
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
@@ -4034,21 +4003,22 @@ THREE.Plane.prototype = {
 
 	},
 
-	projectPoint: function ( point ) {
+	projectPoint: function ( point, optionalTarget ) {
 
-		return this.orthoPoint( point ).subSelf( point ).negate();
+		return this.orthoPoint( point, optionalTarget ).subSelf( point ).negate();
 
 	},
 
-	orthoPoint: function ( point ) {
+	orthoPoint: function ( point, optionalTarget ) {
 
 		var perpendicularMagnitude = this.distanceToPoint( point );
 
-		return new THREE.Vector3().copy( this.normal ).multiplyScalar( perpendicularMagnitude );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( perpendicularMagnitude );
 
 	},
 
-	intersectsLine: function ( startPoint, endPoint ) {
+	isIntersectionLine: function ( startPoint, endPoint ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
@@ -4059,9 +4029,10 @@ THREE.Plane.prototype = {
 
 	},
 
-	coplanarPoint: function () {
+	coplanarPoint: function ( optionalTarget ) {
 
-		return new THREE.Vector3().copy( this.normal ).multiplyScalar( - this.constant );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( - this.constant );
 
 	},
 
@@ -4292,21 +4263,13 @@ THREE.Rectangle = function () {
 };
 /**
  * @author bhouston / http://exocortex.com
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Sphere = function ( center, radius ) {
 
-	if ( center === undefined && radius === undefined ) {
-
-		this.center = new THREE.Vector3();
-		this.radius = 0;
-
-	} else {
-
-		this.center = center.clone();
-		this.radius = radius || 0;
-
-	}
+	this.center = center === undefined ? new THREE.Vector3() : center.clone();
+	this.radius = radius === undefined ? 0 : radius;
 
 };
 
@@ -4367,11 +4330,12 @@ THREE.Sphere.prototype = {
 
 	},
 
-	clampPoint: function ( point ) {
+	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
-		var result = new THREE.Vector3().copy( point );
+		var result = optionalTarget || new THREE.Vector3();
+		result.copy( point );
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
 
@@ -4384,9 +4348,11 @@ THREE.Sphere.prototype = {
 
 	},
 
-	bounds: function () {
+	bounds: function ( optionalTarget ) {
 
-		var box =  new THREE.Box3( this.center, this.center );
+		var box = optionalTarget || new THREE.Box3();
+
+		box.set( this.center, this.center );
 		box.expandByScalar( this.radius );
 
 		return box;
@@ -5088,6 +5054,174 @@ THREE.Spline = function ( points ) {
 
 };
 /**
+ * @author bhouston / http://exocortex.com
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.Triangle3 = function ( a, b, c ) {
+
+	this.a = new THREE.Vector3();
+	this.b = new THREE.Vector3();
+	this.c = new THREE.Vector3();
+
+	if( a !== undefined && b !== undefined && c !== undefined ) {
+
+		this.a.copy( a );
+		this.b.copy( b );
+		this.c.copy( c );
+
+	}
+
+};
+
+// static/instance method to calculate barycoordinates
+THREE.Triangle3.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) {
+
+	THREE.Triangle3.__v0.sub( c, a );
+	THREE.Triangle3.__v1.sub( b, a );
+	THREE.Triangle3.__v2.sub( point, a );
+
+	var dot00 = THREE.Triangle3.__v0.dot( THREE.Triangle3.__v0 );
+	var dot01 = THREE.Triangle3.__v0.dot( THREE.Triangle3.__v1 );
+	var dot02 = THREE.Triangle3.__v0.dot( THREE.Triangle3.__v2 );
+	var dot11 = THREE.Triangle3.__v1.dot( THREE.Triangle3.__v1 );
+	var dot12 = THREE.Triangle3.__v1.dot( THREE.Triangle3.__v2 );
+
+	var denom = ( dot00 * dot11 - dot01 * dot01 );
+
+	var result = optionalTarget || new THREE.Vector3();
+
+	// colinear or singular triangle
+	if( denom == 0 ) {
+		// arbitrary location outside of triangle?
+		// not sure if this is the best idea, maybe should be returning undefined
+		return result.set( -2, -1, -1 );
+	}
+
+	var invDenom = 1 / denom;
+	var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+	var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+
+	// barycoordinates must always sum to 1
+	return result.set( 1 - u - v, v, u );
+};
+
+THREE.Triangle3.containsPoint = function ( point, a, b, c ) {
+
+	// NOTE: need to use __v3 here because __v0, __v1 and __v2 are used in barycoordFromPoint.
+	var result = THREE.Triangle3.barycoordFromPoint( point, a, b, c, THREE.Triangle3.__v3 );
+
+	return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+};
+
+THREE.Triangle3.prototype = {
+
+	constructor: THREE.Triangle3,
+
+	set: function ( a, b, c ) {
+
+		this.a.copy( a );
+		this.b.copy( b );
+		this.c.copy( c );
+
+		return this;
+
+	},
+
+	setFromPointsAndIndices: function ( points, i0, i1, i2 ) {
+
+		this.a.copy( points[i0] );
+		this.b.copy( points[i1] );
+		this.c.copy( points[i2] );
+
+		return this;
+
+	},
+
+	copy: function ( triangle ) {
+
+		this.a.copy( triangle.a );
+		this.b.copy( triangle.b );
+		this.c.copy( triangle.c );
+
+		return this;
+
+	},
+
+	area: function () {
+
+		THREE.Triangle3.__v0.sub( this.c, this.b );
+		THREE.Triangle3.__v1.sub( this.a, this.b );
+
+		return THREE.Triangle3.__v0.crossSelf( THREE.Triangle3.__v1 ).length() * 0.5;
+
+	},
+
+	midpoint: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.add( this.a, this.b ).addSelf( this.c ).multiplyScalar( 1 / 3 );
+
+	},
+
+	normal: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+
+		result.sub( this.c, this.b );
+		THREE.Triangle3.__v0.sub( this.a, this.b );
+		result.crossSelf( THREE.Triangle3.__v0 );
+
+		var resultLengthSq = result.lengthSq();
+		if( resultLengthSq > 0 ) {
+
+			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+
+		}
+
+		return result.set( 0, 0, 0 );
+
+	},
+
+	plane: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Plane();
+
+		return result.setFromCoplanarPoints( this.a, this.b, this.c );
+
+	},
+
+	barycoordFromPoint: function ( point, optionalTarget ) {
+
+		return THREE.Triangle3.barycoordFromPoint( point, this.a, this.b, this.c, optionalTarget );
+
+	},
+
+	containsPoint: function ( point ) {
+
+		return THREE.Triangle3.containsPoint( point, this.a, this.b, this.c );
+
+	},
+
+	equals: function ( triangle ) {
+
+		return triangle.a.equals( this.a ) && triangle.b.equals( this.b ) && triangle.c.equals( this.c );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Triangle3().copy( this );
+
+	}
+
+};
+
+THREE.Triangle3.__v0 = new THREE.Vector3();
+THREE.Triangle3.__v1 = new THREE.Vector3();
+THREE.Triangle3.__v2 = new THREE.Vector3();
+THREE.Triangle3.__v3 = new THREE.Vector3();
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -5108,6 +5242,70 @@ THREE.UV = function ( u, v ) {
 
 };
 /**
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.Clock = function ( autoStart ) {
+
+	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+
+	this.startTime = 0;
+	this.oldTime = 0;
+	this.elapsedTime = 0;
+
+	this.running = false;
+
+};
+
+THREE.Clock.prototype.start = function () {
+
+	this.startTime = Date.now();
+	this.oldTime = this.startTime;
+
+	this.running = true;
+
+};
+
+THREE.Clock.prototype.stop = function () {
+
+	this.getElapsedTime();
+
+	this.running = false;
+
+};
+
+THREE.Clock.prototype.getElapsedTime = function () {
+
+	this.getDelta();
+
+	return this.elapsedTime;
+
+};
+
+
+THREE.Clock.prototype.getDelta = function () {
+
+	var diff = 0;
+
+	if ( this.autoStart && ! this.running ) {
+
+		this.start();
+
+	}
+
+	if ( this.running ) {
+
+		var newTime = Date.now();
+		diff = 0.001 * ( newTime - this.oldTime );
+		this.oldTime = newTime;
+
+		this.elapsedTime += diff;
+
+	}
+
+	return diff;
+
+};/**
  * https://github.com/mrdoob/eventtarget.js/
  */
 
@@ -5162,6 +5360,7 @@ THREE.EventTarget = function () {
 };
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author bhouston / http://exocortex.com/
  */
 
 ( function ( THREE ) {
@@ -5198,26 +5397,6 @@ THREE.EventTarget = function () {
 	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
 
 	// http://www.blackpawn.com/texts/pointinpoly/default.html
-
-	var pointInFace3 = function ( p, a, b, c ) {
-
-		v0.sub( c, a );
-		v1.sub( b, a );
-		v2.sub( p, a );
-
-		var dot00 = v0.dot( v0 );
-		var dot01 = v0.dot( v1 );
-		var dot02 = v0.dot( v2 );
-		var dot11 = v1.dot( v1 );
-		var dot12 = v1.dot( v2 );
-
-		var invDenom = 1 / ( dot00 * dot11 - dot01 * dot01 );
-		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
-
-		return ( u >= 0 ) && ( v >= 0 ) && ( u + v < 1 );
-
-	};
 
 	var intersectObject = function ( object, raycaster, intersects ) {
 
@@ -5280,7 +5459,7 @@ THREE.EventTarget = function () {
 
 				if ( material === undefined ) continue;
 				
-				facePlane.setFromNormalAndCoplanarPoint( face.normal, face.centroid );
+				facePlane.setFromNormalAndCoplanarPoint( face.normal, vertices[face.a] );
 
 				var planeDistance = localRay.distanceToPlane( facePlane );
 	
@@ -5311,7 +5490,7 @@ THREE.EventTarget = function () {
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 
-					if ( ! pointInFace3( intersectPoint, a, b, c ) ) continue;
+					if ( ! THREE.Triangle3.containsPoint( intersectPoint, a, b, c ) ) continue;
 
 				} else if ( face instanceof THREE.Face4 ) {
 
@@ -5320,8 +5499,8 @@ THREE.EventTarget = function () {
 					c = vertices[ face.c ];
 					d = vertices[ face.d ];
 
-					if ( ( ! pointInFace3( intersectPoint, a, b, d ) ) &&
-						 ( ! pointInFace3( intersectPoint, b, c, d ) ) ) continue;
+					if ( ( ! THREE.Triangle3.containsPoint( intersectPoint, a, b, d ) ) &&
+						 ( ! THREE.Triangle3.containsPoint( intersectPoint, b, c, d ) ) ) continue;
 
 				} else {
 
@@ -5463,8 +5642,6 @@ THREE.Object3D = function () {
 	this.frustumCulled = true;
 
 	this._vector = new THREE.Vector3();
-
-	THREE.Object3DLibrary[ this.id ] = this;
 
 };
 
@@ -5775,12 +5952,6 @@ THREE.Object3D.prototype = {
 
 		return object;
 
-	},
-
-	deallocate: function () {
-
-		delete THREE.Object3DLibrary[ this.id ];
-
 	}
 
 };
@@ -5789,7 +5960,6 @@ THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DIdCount = 0;
-THREE.Object3DLibrary = {};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -6577,8 +6747,6 @@ THREE.Geometry = function () {
 
 	this.buffersNeedUpdate = false;
 
-	THREE.GeometryLibrary[ this.id ] = this;
-
 };
 
 THREE.Geometry.prototype = {
@@ -7104,29 +7272,25 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
+		if ( this.boundingBox === null ) {
 
-			this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
-
-		} else {
-
-			this.boundingBox.setFromPoints( this.vertices );
+			this.boundingBox = new THREE.Box3();
 
 		}
+
+		this.boundingBox.setFromPoints( this.vertices );
 
 	},
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) {
+		if ( this.boundingSphere === null ) {
 
-			this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
-
-		} else {
-
-			this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
+			this.boundingSphere = new THREE.Sphere();
 
 		}
+
+		this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
 
 	},
 
@@ -7265,18 +7429,11 @@ THREE.Geometry.prototype = {
 
 		return geometry;
 
-	},
-
-	deallocate: function () {
-
-		delete THREE.GeometryLibrary[ this.id ];
-
 	}
 
 };
 
 THREE.GeometryIdCount = 0;
-THREE.GeometryLibrary = {};
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -7307,8 +7464,6 @@ THREE.BufferGeometry = function () {
 	// for compatibility
 
 	this.morphTargets = [];
-
-	THREE.GeometryLibrary[ this.id ] = this;
 
 };
 
@@ -7348,7 +7503,7 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		if ( ! this.boundingBox ) {
+		if ( this.boundingBox === null ) {
 
 			this.boundingBox = new THREE.Box3();
 
@@ -7420,8 +7575,10 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( ! this.boundingSphere ) {
+		if ( this.boundingSphere === null ) {
+
 			this.boundingSphere = new THREE.Sphere();
+
 		}
 
 		var positions = this.attributes[ "position" ].array;
@@ -7530,15 +7687,15 @@ THREE.BufferGeometry.prototype = {
 						ab.sub( pA, pB );
 						cb.crossSelf( ab );
 
-						normals[ vA * 3 ] 	  += cb.x;
+						normals[ vA * 3 ]     += cb.x;
 						normals[ vA * 3 + 1 ] += cb.y;
 						normals[ vA * 3 + 2 ] += cb.z;
 
-						normals[ vB * 3 ] 	  += cb.x;
+						normals[ vB * 3 ]     += cb.x;
 						normals[ vB * 3 + 1 ] += cb.y;
 						normals[ vB * 3 + 2 ] += cb.z;
 
-						normals[ vC * 3 ] 	  += cb.x;
+						normals[ vC * 3 ]     += cb.x;
 						normals[ vC * 3 + 1 ] += cb.y;
 						normals[ vC * 3 + 2 ] += cb.z;
 
@@ -7818,12 +7975,6 @@ THREE.BufferGeometry.prototype = {
 
 		this.hasTangents = true;
 		this.tangentsNeedUpdate = true;
-
-	},
-
-	deallocate: function () {
-
-		delete THREE.GeometryLibrary[ this.id ];
 
 	}
 
@@ -11134,8 +11285,6 @@ THREE.Material = function () {
 
 	this.needsUpdate = true;
 
-	THREE.MaterialLibrary[ this.id ] = this;
-
 };
 
 THREE.Material.prototype.setValues = function ( values ) {
@@ -11215,14 +11364,7 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
-THREE.Material.prototype.deallocate = function () {
-
-	delete THREE.MaterialLibrary[ this.id ];
-
-};
-
 THREE.MaterialIdCount = 0;
-THREE.MaterialLibrary = {};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12180,8 +12322,6 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.needsUpdate = false;
 	this.onUpdate = null;
 
-	THREE.TextureLibrary[ this.id ] = this;
-
 };
 
 THREE.Texture.prototype = {
@@ -12218,18 +12358,11 @@ THREE.Texture.prototype = {
 
 		return texture;
 
-	},
-
-	deallocate: function () {
-
-		delete THREE.TextureLibrary[ this.id ];
-
 	}
 
 };
 
 THREE.TextureIdCount = 0;
-THREE.TextureLibrary = {};
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -13319,9 +13452,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_image, _uvs,
 	_uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y,
 
-	_clipRect = new THREE.Rectangle(),
-	_clearRect = new THREE.Rectangle(),
-	_bboxRect = new THREE.Rectangle(),
+	_clipBox2 = new THREE.Box2(),
+	_clearBox2 = new THREE.Box2(),
+	_elemBox2 = new THREE.Box2(),
 
 	_enableLighting = false,
 	_ambientLight = new THREE.Color(),
@@ -13380,8 +13513,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
 
-		_clipRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
-		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_clipBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clipBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
@@ -13398,7 +13533,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.copy( color );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
@@ -13407,7 +13543,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.setHex( hex );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
@@ -13421,14 +13558,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
-		if ( _clearRect.isEmpty() === false ) {
+		if ( _clearBox2.empty() === false ) {
 
-			_clearRect.minSelf( _clipRect );
-			_clearRect.inflate( 2 );
+			_clearBox2.intersect( _clipBox2 );
+			_clearBox2.expandByScalar( 2 );
 
 			if ( _clearOpacity < 1 ) {
 
-				_context.clearRect( Math.floor( _clearRect.getX() ), Math.floor( _clearRect.getY() ), Math.floor( _clearRect.getWidth() ), Math.floor( _clearRect.getHeight() ) );
+				_context.clearRect( _clearBox2.min.x | 0, _clearBox2.min.y | 0, ( _clearBox2.max.x - _clearBox2.min.x ) | 0, ( _clearBox2.max.y - _clearBox2.min.y ) | 0 );
 
 			}
 
@@ -13439,11 +13576,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				setFillStyle( 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')' );
 
-				_context.fillRect( Math.floor( _clearRect.getX() ), Math.floor( _clearRect.getY() ), Math.floor( _clearRect.getWidth() ), Math.floor( _clearRect.getHeight() ) );
+				_context.fillRect( _clearBox2.min.x | 0, _clearBox2.min.y | 0, ( _clearBox2.max.x - _clearBox2.min.x ) | 0, ( _clearBox2.max.y - _clearBox2.min.y ) | 0 );
 
 			}
 
-			_clearRect.empty();
+			_clearBox2.makeEmpty();
 
 		}
 
@@ -13474,7 +13611,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		/* DEBUG
 		_context.fillStyle = 'rgba( 0, 255, 255, 0.5 )';
-		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
+		_context.fillRect( _clipBox2.min.x, _clipBox2.min.y, _clipBox2.max.x - _clipBox2.min.x, _clipBox2.max.y - _clipBox2.min.y );
 		*/
 
 		_enableLighting = _lights.length > 0;
@@ -13493,7 +13630,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( material === undefined || material.visible === false ) continue;
 
-			_bboxRect.empty();
+			_elemBox2.makeEmpty();
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
@@ -13509,10 +13646,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 
-				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
-				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
+				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
 
-				if ( _clipRect.intersects( _bboxRect ) === true ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
 
 					renderLine( _v1, _v2, element, material, scene );
 
@@ -13535,11 +13671,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_bboxRect.add3Points( _v1.positionScreen.x, _v1.positionScreen.y,
-						      _v2.positionScreen.x, _v2.positionScreen.y,
-						      _v3.positionScreen.x, _v3.positionScreen.y );
+				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
-				if ( _clipRect.intersects( _bboxRect ) === true ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
 
@@ -13568,12 +13702,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
-				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
-				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
-				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
+				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
 
-				if ( _clipRect.intersects( _bboxRect ) === true ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
 
 					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
@@ -13581,21 +13712,21 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
+
 			/* DEBUG
 			_context.lineWidth = 1;
 			_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
-			_context.strokeRect( _bboxRect.getX(), _bboxRect.getY(), _bboxRect.getWidth(), _bboxRect.getHeight() );
+			_context.strokeRect( _elemBox2.min.x, _elemBox2.min.y, _elemBox2.max.x - _elemBox2.min.x, _elemBox2.max.y - _elemBox2.min.y );
 			*/
 
-			_clearRect.addRectangle( _bboxRect );
-
+			_clearBox2.union( _elemBox2 );
 
 		}
 
 		/* DEBUG
 		_context.lineWidth = 1;
 		_context.strokeStyle = 'rgba( 255, 0, 0, 0.5 )';
-		_context.strokeRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+		_context.strokeRect( _clearBox2.min.x, _clearBox2.min.y, _clearBox2.max.x - _clearBox2.min.x, _clearBox2.max.y - _clearBox2.min.y );
 		*/
 
 		_context.setTransform( 1, 0, 0, 1, 0, 0 );
@@ -13706,9 +13837,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 					scaleX *= element.scale.x * _canvasWidthHalf;
 					scaleY *= element.scale.y * _canvasHeightHalf;
 
-					_bboxRect.set( v1.x - scaleX, v1.y - scaleY, v1.x  + scaleX, v1.y + scaleY );
+					_elemBox2.min.set( v1.x - scaleX, v1.y - scaleY );
+					_elemBox2.max.set( v1.x + scaleX, v1.y + scaleY );
 
-					if ( _clipRect.intersects( _bboxRect ) === false ) {
+					if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
 
 						return;
 
@@ -13737,9 +13869,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					// TODO: Rotations break this...
 
-					_bboxRect.set( v1.x - width, v1.y - height, v1.x  + width, v1.y + height );
+					_elemBox2.min.set( v1.x - width, v1.y - height );
+					_elemBox2.max.set( v1.x + width, v1.y + height );
 
-					if ( _clipRect.intersects( _bboxRect ) === false ) {
+					if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
 
 						return;
 
@@ -13771,9 +13904,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				width = element.scale.x * _canvasWidthHalf;
 				height = element.scale.y * _canvasHeightHalf;
 
-				_bboxRect.set( v1.x - width, v1.y - height, v1.x + width, v1.y + height );
+				_elemBox2.min.set( v1.x - width, v1.y - height );
+				_elemBox2.max.set( v1.x + width, v1.y + height );
 
-				if ( _clipRect.intersects( _bboxRect ) === false ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
 
 					return;
 
@@ -13812,7 +13946,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setStrokeStyle( material.color.getStyle() );
 
 				_context.stroke();
-				_bboxRect.inflate( material.linewidth * 2 );
+				_elemBox2.expandByScalar( material.linewidth * 2 );
 
 			}
 
@@ -13910,7 +14044,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					if ( material.map.mapping instanceof THREE.UVMapping ) {
 
 						_uvs = element.uvs[ 0 ];
-						patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uvs[ uv1 ].u, _uvs[ uv1 ].v, _uvs[ uv2 ].u, _uvs[ uv2 ].v, _uvs[ uv3 ].u, _uvs[ uv3 ].v, material.map );
+						patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uvs[ uv1 ].x, _uvs[ uv1 ].y, _uvs[ uv2 ].x, _uvs[ uv2 ].y, _uvs[ uv3 ].x, _uvs[ uv3 ].y, material.map );
 
 					}
 
@@ -14189,7 +14323,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.stroke();
 
-			_bboxRect.inflate( linewidth * 2 );
+			_elemBox2.expandByScalar( linewidth * 2 );
 
 		}
 
@@ -16038,7 +16172,7 @@ THREE.ShaderChunk = {
 
 					"shadowCoord.z += shadowBias[ i ];",
 
-					"#ifdef SHADOWMAP_SOFT",
+					"#if defined( SHADOWMAP_TYPE_PCF )",
 
 						// Percentage-close filtering
 						// (9 pixel kernel)
@@ -16105,6 +16239,76 @@ THREE.ShaderChunk = {
 
 						"fDepth = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
 						"if ( fDepth < shadowCoord.z ) shadow += shadowDelta;",
+
+						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
+
+					"#elif defined( SHADOWMAP_TYPE_PCF_SOFT )",
+
+						// Percentage-close filtering
+						// (9 pixel kernel)
+						// http://fabiensanglard.net/shadowmappingPCF/
+
+						"float shadow = 0.0;",
+
+						"float xPixelOffset = 1.0 / shadowMapSize[ i ].x;",
+						"float yPixelOffset = 1.0 / shadowMapSize[ i ].y;",
+
+						"float dx0 = -1.0 * xPixelOffset;",
+						"float dy0 = -1.0 * yPixelOffset;",
+						"float dx1 = 1.0 * xPixelOffset;",
+						"float dy1 = 1.0 * yPixelOffset;",
+
+						"mat3 shadowKernel;",
+						"mat3 depthKernel;",
+
+						"depthKernel[0][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, dy0 ) ) );",
+						"if ( depthKernel[0][0] < shadowCoord.z ) shadowKernel[0][0] = 0.25;",
+						"else shadowKernel[0][0] = 0.0;",
+
+						"depthKernel[0][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx0, 0.0 ) ) );",
+						"if ( depthKernel[0][1] < shadowCoord.z ) shadowKernel[0][1] = 0.25;",
+						"else shadowKernel[0][1] = 0.0;",
+
+						"depthKernel[0][2] = unpackDepth( texture2D( shadowMap[ i], shadowCoord.xy + vec2( dx0, dy1 ) ) );",
+						"if ( depthKernel[0][2] < shadowCoord.z ) shadowKernel[0][2] = 0.25;",
+						"else shadowKernel[0][2] = 0.0;",
+
+						"depthKernel[1][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy0 ) ) );",
+						"if ( depthKernel[1][0] < shadowCoord.z ) shadowKernel[1][0] = 0.25;",
+						"else shadowKernel[1][0] = 0.0;",
+
+						"depthKernel[1][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy ) );",
+						"if ( depthKernel[1][1] < shadowCoord.z ) shadowKernel[1][1] = 0.25;",
+						"else shadowKernel[1][1] = 0.0;",
+
+						"depthKernel[1][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( 0.0, dy1 ) ) );",
+						"if ( depthKernel[1][2] < shadowCoord.z ) shadowKernel[1][2] = 0.25;",
+						"else shadowKernel[1][2] = 0.0;",
+
+						"depthKernel[2][0] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy0 ) ) );",
+						"if ( depthKernel[2][0] < shadowCoord.z ) shadowKernel[2][0] = 0.25;",
+						"else shadowKernel[2][0] = 0.0;",
+
+						"depthKernel[2][1] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, 0.0 ) ) );",
+						"if ( depthKernel[2][1] < shadowCoord.z ) shadowKernel[2][1] = 0.25;",
+						"else shadowKernel[2][1] = 0.0;",
+
+						"depthKernel[2][2] = unpackDepth( texture2D( shadowMap[ i ], shadowCoord.xy + vec2( dx1, dy1 ) ) );",
+						"if ( depthKernel[2][2] < shadowCoord.z ) shadowKernel[2][2] = 0.25;",
+						"else shadowKernel[2][2] = 0.0;",
+
+						"vec2 fractionalCoord = 1.0 - fract( shadowCoord.xy * shadowMapSize[i].xy );",
+
+						"shadowKernel[0] = mix( shadowKernel[1], shadowKernel[0], fractionalCoord.x );",
+						"shadowKernel[1] = mix( shadowKernel[2], shadowKernel[1], fractionalCoord.x );",
+
+						"vec4 shadowValues;",
+						"shadowValues.x = mix( shadowKernel[0][1], shadowKernel[0][0], fractionalCoord.y );",
+						"shadowValues.y = mix( shadowKernel[0][2], shadowKernel[0][1], fractionalCoord.y );",
+						"shadowValues.z = mix( shadowKernel[1][1], shadowKernel[1][0], fractionalCoord.y );",
+						"shadowValues.w = mix( shadowKernel[1][2], shadowKernel[1][1], fractionalCoord.y );",
+
+						"shadow = dot( shadowValues, vec4( 1.0 ) );",
 
 						"shadowColor = shadowColor * vec3( ( 1.0 - shadowDarkness[ i ] * shadow ) );",
 
@@ -17006,7 +17210,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
-	this.shadowMapSoft = true;
+	this.shadowMapType = THREE.PCFShadowMap;
 	this.shadowMapCullFace = THREE.CullFaceFront;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
@@ -21877,7 +22081,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			maxShadows: maxShadows,
 			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
-			shadowMapSoft: this.shadowMapSoft,
+			shadowMapType: this.shadowMapType,
 			shadowMapDebug: this.shadowMapDebug,
 			shadowMapCascade: this.shadowMapCascade,
 
@@ -23180,6 +23384,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
+
+		if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
+
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF";
+
+		} else if ( parameters.shadowMapType === THREE.PCFSoftShadowMap ) {
+
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
+
+		}
+
 		//console.log( "building new program " );
 
 		//
@@ -23232,7 +23448,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
 			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
@@ -23331,7 +23547,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
 			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
@@ -35691,7 +35907,15 @@ THREE.ShadowMapPlugin = function ( ) {
 
 			if ( ! light.shadowMap ) {
 
-				var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
+				var shadowFilter = THREE.LinearFilter;
+
+				if ( _renderer.shadowMapType === THREE.PCFSoftShadowMap ) {
+
+					shadowFilter = THREE.NearestFilter;
+
+				}
+
+				var pars = { minFilter: shadowFilter, magFilter: shadowFilter, format: THREE.RGBAFormat };
 
 				light.shadowMap = new THREE.WebGLRenderTarget( light.shadowMapWidth, light.shadowMapHeight, pars );
 				light.shadowMapSize = new THREE.Vector2( light.shadowMapWidth, light.shadowMapHeight );

@@ -111,7 +111,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapSoft = true;
+				renderer.shadowMapType = THREE.PCFShadowMap;
 
 				container.appendChild( renderer.domElement );
 

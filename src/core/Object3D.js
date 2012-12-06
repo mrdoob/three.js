@@ -47,8 +47,6 @@ THREE.Object3D = function () {
 
 	this._vector = new THREE.Vector3();
 
-	THREE.Object3DLibrary[ this.id ] = this;
-
 };
 
 
@@ -358,12 +356,6 @@ THREE.Object3D.prototype = {
 
 		return object;
 
-	},
-
-	deallocate: function () {
-
-		delete THREE.Object3DLibrary[ this.id ];
-
 	}
 
 };
@@ -372,4 +364,3 @@ THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DIdCount = 0;
-THREE.Object3DLibrary = {};
