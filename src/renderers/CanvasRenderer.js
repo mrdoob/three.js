@@ -247,7 +247,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
 
-				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
 
 					renderLine( _v1, _v2, element, material, scene );
 
@@ -272,7 +272,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
-				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
 
@@ -303,7 +303,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
 
-				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
 
 					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
@@ -439,7 +439,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_elemBox2.min.set( v1.x - scaleX, v1.y - scaleY );
 					_elemBox2.max.set( v1.x + scaleX, v1.y + scaleY );
 
-					if ( _clipBox2.isIntersection( _elemBox2 ) === false ) {
+					if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
 
 						return;
 
@@ -471,7 +471,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_elemBox2.min.set( v1.x - width, v1.y - height );
 					_elemBox2.max.set( v1.x + width, v1.y + height );
 
-					if ( _clipBox2.isIntersection( _elemBox2 ) === false ) {
+					if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
 
 						return;
 
@@ -506,7 +506,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_elemBox2.min.set( v1.x - width, v1.y - height );
 				_elemBox2.max.set( v1.x + width, v1.y + height );
 
-				if ( _clipBox2.isIntersection( _elemBox2 ) === false ) {
+				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
 
 					return;
 
