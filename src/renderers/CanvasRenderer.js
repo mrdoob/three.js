@@ -51,9 +51,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_image, _uvs,
 	_uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y,
 
-	_clipRect = new THREE.Rectangle(),
-	_clearRect = new THREE.Rectangle(),
-	_bboxRect = new THREE.Rectangle(),
+	_clipBox2 = new THREE.Box2(),
+	_clearBox2 = new THREE.Box2(),
+	_elemBox2 = new THREE.Box2(),
 
 	_enableLighting = false,
 	_ambientLight = new THREE.Color(),
@@ -112,8 +112,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
 
-		_clipRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
-		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_clipBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clipBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
@@ -130,7 +132,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.copy( color );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
@@ -139,7 +142,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.setHex( hex );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearRect.set( - _canvasWidthHalf, - _canvasHeightHalf, _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
@@ -153,14 +157,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
-		if ( _clearRect.isEmpty() === false ) {
+		if ( _clearBox2.empty() === false ) {
 
-			_clearRect.minSelf( _clipRect );
-			_clearRect.inflate( 2 );
+			_clearBox2.intersect( _clipBox2 );
+			_clearBox2.expandByScalar( 2 );
 
 			if ( _clearOpacity < 1 ) {
 
-				_context.clearRect( Math.floor( _clearRect.getX() ), Math.floor( _clearRect.getY() ), Math.floor( _clearRect.getWidth() ), Math.floor( _clearRect.getHeight() ) );
+				_context.clearRect( _clearBox2.min.x | 0, _clearBox2.min.y | 0, ( _clearBox2.max.x - _clearBox2.min.x ) | 0, ( _clearBox2.max.y - _clearBox2.min.y ) | 0 );
 
 			}
 
@@ -171,11 +175,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				setFillStyle( 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')' );
 
-				_context.fillRect( Math.floor( _clearRect.getX() ), Math.floor( _clearRect.getY() ), Math.floor( _clearRect.getWidth() ), Math.floor( _clearRect.getHeight() ) );
+				_context.fillRect( _clearBox2.min.x | 0, _clearBox2.min.y | 0, ( _clearBox2.max.x - _clearBox2.min.x ) | 0, ( _clearBox2.max.y - _clearBox2.min.y ) | 0 );
 
 			}
 
-			_clearRect.empty();
+			_clearBox2.makeEmpty();
 
 		}
 
@@ -206,7 +210,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		/* DEBUG
 		_context.fillStyle = 'rgba( 0, 255, 255, 0.5 )';
-		_context.fillRect( _clipRect.getX(), _clipRect.getY(), _clipRect.getWidth(), _clipRect.getHeight() );
+		_context.fillRect( _clipBox2.min.x, _clipBox2.min.y, _clipBox2.max.x - _clipBox2.min.x, _clipBox2.max.y - _clipBox2.min.y );
 		*/
 
 		_enableLighting = _lights.length > 0;
@@ -225,7 +229,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( material === undefined || material.visible === false ) continue;
 
-			_bboxRect.empty();
+			_elemBox2.makeEmpty();
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
@@ -241,10 +245,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 
-				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
-				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
+				_elemBox2.addPoint( _v1.positionScreen );
+				_elemBox2.addPoint( _v2.positionScreen );
 
-				if ( _clipRect.intersects( _bboxRect ) === true ) {
+				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
 
 					renderLine( _v1, _v2, element, material, scene );
 
@@ -267,11 +271,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_bboxRect.add3Points( _v1.positionScreen.x, _v1.positionScreen.y,
-						      _v2.positionScreen.x, _v2.positionScreen.y,
-						      _v3.positionScreen.x, _v3.positionScreen.y );
+				_elemBox2.addPoint( _v1.positionScreen );
+				_elemBox2.addPoint( _v2.positionScreen );
+				_elemBox2.addPoint( _v3.positionScreen );
 
-				if ( _clipRect.intersects( _bboxRect ) === true ) {
+				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
 
@@ -300,12 +304,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_bboxRect.addPoint( _v1.positionScreen.x, _v1.positionScreen.y );
-				_bboxRect.addPoint( _v2.positionScreen.x, _v2.positionScreen.y );
-				_bboxRect.addPoint( _v3.positionScreen.x, _v3.positionScreen.y );
-				_bboxRect.addPoint( _v4.positionScreen.x, _v4.positionScreen.y );
+				_elemBox2.addPoint( _v1.positionScreen );
+				_elemBox2.addPoint( _v2.positionScreen );
+				_elemBox2.addPoint( _v3.positionScreen );
+				_elemBox2.addPoint( _v4.positionScreen );
 
-				if ( _clipRect.intersects( _bboxRect ) === true ) {
+				if ( _clipBox2.isIntersection( _elemBox2 ) === true ) {
 
 					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
@@ -313,21 +317,21 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
+
 			/* DEBUG
 			_context.lineWidth = 1;
 			_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
-			_context.strokeRect( _bboxRect.getX(), _bboxRect.getY(), _bboxRect.getWidth(), _bboxRect.getHeight() );
+			_context.strokeRect( _elemBox2.min.x, _elemBox2.min.y, _elemBox2.max.x - _elemBox2.min.x, _elemBox2.max.y - _elemBox2.min.y );
 			*/
 
-			_clearRect.addRectangle( _bboxRect );
-
+			_clearBox2.union( _elemBox2 );
 
 		}
 
 		/* DEBUG
 		_context.lineWidth = 1;
 		_context.strokeStyle = 'rgba( 255, 0, 0, 0.5 )';
-		_context.strokeRect( _clearRect.getX(), _clearRect.getY(), _clearRect.getWidth(), _clearRect.getHeight() );
+		_context.strokeRect( _clearBox2.min.x, _clearBox2.min.y, _clearBox2.max.x - _clearBox2.min.x, _clearBox2.max.y - _clearBox2.min.y );
 		*/
 
 		_context.setTransform( 1, 0, 0, 1, 0, 0 );
@@ -438,9 +442,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 					scaleX *= element.scale.x * _canvasWidthHalf;
 					scaleY *= element.scale.y * _canvasHeightHalf;
 
-					_bboxRect.set( v1.x - scaleX, v1.y - scaleY, v1.x  + scaleX, v1.y + scaleY );
+					_elemBox2.min.set( v1.x - scaleX, v1.y - scaleY );
+					_elemBox2.max.set( v1.x + scaleX, v1.y + scaleY );
 
-					if ( _clipRect.intersects( _bboxRect ) === false ) {
+					if ( _clipBox2.isIntersection( _elemBox2 ) === false ) {
 
 						return;
 
@@ -469,9 +474,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					// TODO: Rotations break this...
 
-					_bboxRect.set( v1.x - width, v1.y - height, v1.x  + width, v1.y + height );
+					_elemBox2.min.set( v1.x - width, v1.y - height );
+					_elemBox2.max.set( v1.x + width, v1.y + height );
 
-					if ( _clipRect.intersects( _bboxRect ) === false ) {
+					if ( _clipBox2.isIntersection( _elemBox2 ) === false ) {
 
 						return;
 
@@ -503,9 +509,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				width = element.scale.x * _canvasWidthHalf;
 				height = element.scale.y * _canvasHeightHalf;
 
-				_bboxRect.set( v1.x - width, v1.y - height, v1.x + width, v1.y + height );
+				_elemBox2.min.set( v1.x - width, v1.y - height );
+				_elemBox2.max.set( v1.x + width, v1.y + height );
 
-				if ( _clipRect.intersects( _bboxRect ) === false ) {
+				if ( _clipBox2.isIntersection( _elemBox2 ) === false ) {
 
 					return;
 
@@ -544,7 +551,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setStrokeStyle( material.color.getStyle() );
 
 				_context.stroke();
-				_bboxRect.inflate( material.linewidth * 2 );
+				_elemBox2.expandByScalar( material.linewidth * 2 );
 
 			}
 
@@ -921,7 +928,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.stroke();
 
-			_bboxRect.inflate( linewidth * 2 );
+			_elemBox2.expandByScalar( linewidth * 2 );
 
 		}
 

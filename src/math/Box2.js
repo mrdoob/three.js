@@ -34,6 +34,30 @@ THREE.Box2.prototype = {
 		return this;
 	},
 
+	addPoint: function ( point ) {
+
+		if ( point.x < this.min.x ) {
+
+			this.min.x = point.x;
+
+		} else if ( point.x > this.max.x ) {
+
+			this.max.x = point.x;
+
+		}
+
+		if ( point.y < this.min.y ) {
+
+			this.min.y = point.y;
+
+		} else if ( point.y > this.max.y ) {
+
+			this.max.y = point.y;
+
+		}
+
+	},
+
 	setFromPoints: function ( points ) {
 
 		if ( points.length > 0 ) {
@@ -45,27 +69,7 @@ THREE.Box2.prototype = {
 
 			for ( var i = 1, il = points.length; i < il; i ++ ) {
 
-				p = points[ i ];
-
-				if ( p.x < this.min.x ) {
-
-					this.min.x = p.x;
-
-				} else if ( p.x > this.max.x ) {
-
-					this.max.x = p.x;
-
-				}
-
-				if ( p.y < this.min.y ) {
-
-					this.min.y = p.y;
-
-				} else if ( p.y > this.max.y ) {
-
-					this.max.y = p.y;
-
-				}
+				this.addPoint( points[ i ] );
 
 			}
 
