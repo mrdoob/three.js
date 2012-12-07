@@ -48,6 +48,7 @@
 	"../src/materials/MeshNormalMaterial.js",
 	"../src/materials/MeshFaceMaterial.js",
 	"../src/materials/ParticleBasicMaterial.js",
+	"../src/materials/ParticleDepthMaterial.js",
 	"../src/materials/ParticleCanvasMaterial.js",
 	"../src/materials/ParticleDOMMaterial.js",
 	"../src/materials/ShaderMaterial.js",

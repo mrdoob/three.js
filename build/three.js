@@ -10499,7 +10499,6 @@ THREE.ParticleBasicMaterial.prototype.clone = function () {
  *
  * parameters = {
  *  color: <hex>,
- *  opacity: <float>,
  *  map: new THREE.Texture( <Image> ),
  *
  *  size: <float>,
@@ -10516,10 +10515,12 @@ THREE.ParticleDepthMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff );
 
 	this.map = null;
-
+	
 	this.size = 1;
 	this.sizeAttenuation = true;
-
+	
+	this.alphaTest = 0.01;
+	
 	this.setValues( parameters );
 
 };
@@ -15497,15 +15498,14 @@ THREE.ShaderLib = {
 			THREE.ShaderChunk[ "map_particle_pars_fragment" ],
 
 			"void main() {",
-
+				
 				"gl_FragColor = vec4( psColor, opacity );",
-
+				
 				THREE.ShaderChunk[ "map_particle_fragment" ],
+				THREE.ShaderChunk[ "alphatest_fragment" ],
 				THREE.ShaderChunk[ "depthmap_fragment" ],
 				
-				"gl_FragColor = vec4( vec3( color ), gl_FragColor.a );",
-			  // "gl_FragColor = vec4( 1.0,1.0,1.0,gl_FragColor.a );",
-				
+				"gl_FragColor = vec4( vec3( color ), 1.0 );",
 
 			"}"
 
