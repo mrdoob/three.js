@@ -4,27 +4,8 @@
 
 THREE.Box3 = function ( min, max ) {
 
-	if ( min === undefined && max === undefined ) {
-
-		this.min = new THREE.Vector3();
-		this.max = new THREE.Vector3();
-		this.makeEmpty();
-
-	} else {
-
-		this.min = min.clone();
-
-		if( max === undefined ) {
-
-			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-
-		} else {
-
-			this.max = max.clone();
-
-		}
-
-	}
+	this.min = min !== undefined ? min.clone() : new THREE.Vector3( Infinity, Infinity, Infinity );
+	this.max = max !== undefined ? max.clone() : new THREE.Vector3( -Infinity, -Infinity, -Infinity );
 
 };
 
