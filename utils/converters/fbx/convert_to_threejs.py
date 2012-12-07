@@ -3,6 +3,7 @@
 import os
 import sys
 import math
+import operator
 
 # #####################################################
 # Globals
@@ -15,18 +16,28 @@ option_default_camera = False
 option_default_light = False
 
 converter = None
+global_up_vector = None
 
 # #####################################################
 # Templates
 # #####################################################
-def Vector2String(v):
-    return '[ %g, %g ]' % (v[0], v[1])
+def Vector2String(v, no_brackets = False):
+    if no_brackets:
+        return '%g,%g' % (v[0], v[1])
+    else:
+        return '[ %g, %g ]' % (v[0], v[1])
 
-def Vector3String(v):
-    return '[ %g, %g, %g ]' % (v[0], v[1], v[2])
+def Vector3String(v, no_brackets = False):
+    if no_brackets:
+        return '%g,%g,%g' % (v[0], v[1], v[2])
+    else:
+        return '[ %g, %g, %g ]' % (v[0], v[1], v[2])
 
-def ColorString(c):
-    return '[ %g, %g, %g ]' % (c[0], c[1], c[2])
+def ColorString(c, no_brackets = False):
+    if no_brackets:
+        return '%g, %g, %g' % (c[0], c[1], c[2])
+    else:
+        return '[ %g, %g, %g ]' % (c[0], c[1], c[2])
 
 def LabelString(s):
     return '"%s"' % s
@@ -48,44 +59,44 @@ def BoolString(value):
 # #####################################################
 # Helpers
 # #####################################################
-def getObjectName(o): 
+def getObjectName(o, force_prefix = False): 
     if not o:
         return ""  
     prefix = ""
-    if option_prefix:
-        prefix = "Object_"
+    if option_prefix or force_prefix:
+        prefix = "Object_%s_" % o.GetUniqueID()
     return prefix + o.GetName()
       
-def getGeometryName(g):
+def getGeometryName(g, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Geometry_"
+    if option_prefix or force_prefix:
+        prefix = "Geometry_%s_" % g.GetUniqueID()
     return prefix + g.GetName()
 
-def getEmbedName(e):
+def getEmbedName(e, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Embed_"
+    if option_prefix or force_prefix:
+        prefix = "Embed_%s_" % e.GetUniqueID()
     return prefix + e.GetName()
 
-def getMaterialName(m):
+def getMaterialName(m, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Material_"
+    if option_prefix or force_prefix:
+        prefix = "Material_%s_" % m.GetUniqueID()
     return prefix + m.GetName()
 
-def getTextureName(t):
+def getTextureName(t, force_prefix = False):
     texture_file = t.GetFileName()
     texture_id = os.path.splitext(os.path.basename(texture_file))[0]
     prefix = ""
-    if option_prefix:
-        prefix = "Texture_"
+    if option_prefix or force_prefix:
+        prefix = "Texture_%s_" % t.GetUniqueID()
     return prefix + texture_id
 
-def getFogName(f):
+def getFogName(f, force_prefix = False):
     prefix = ""
-    if option_prefix:
-        prefix = "Fog_"
+    if option_prefix or force_prefix:
+        prefix = "Fog_%s_" % f.GetUniqueID()
     return prefix + f.GetName()
 
 def getObjectVisible(n):
@@ -98,6 +109,31 @@ def getHex(c):
     color = (int(c[0]*255) << 16) + (int(c[1]*255) << 8) + int(c[2]*255)
     return color
 
+def setBit(value, position, on):
+    if on:
+        mask = 1 << position
+        return (value | mask)
+    else:
+        mask = ~(1 << position)
+        return (value & mask)
+
+def convert_fbx_color(color):
+    return [color.mRed, color.mGreen, color.mBlue, color.mAlpha]
+    
+def convert_fbx_vec2(v):
+    return [v[0], v[1]]
+
+def convert_fbx_vec3(v):
+    return [v[0], v[1], v[2]]
+    
+def generate_uvs(uv_layers):
+    layers = []
+    for uvs in uv_layers:
+        layer = ",".join(Vector2String(n, True) for n in uvs)
+        layers.append(layer)
+
+    return ",".join("[%s]" % n for n in layers)
+
 def generateMultiLineString(lines, separator, padding):
     cleanLines = []
     for i in range(len(lines)):
@@ -106,6 +142,40 @@ def generateMultiLineString(lines, separator, padding):
         cleanLines.append(line)
     return separator.join(cleanLines)
 
+def get_up_vector(scene):
+    global_settings = scene.GetGlobalSettings()
+    axis_system = global_settings.GetAxisSystem()
+    up_vector = axis_system.GetUpVector()
+    tmp = [0,0,0]
+    tmp[up_vector[0] - 1] = up_vector[1] * 1
+    return FbxVector4(tmp[0], tmp[1], tmp[2], 1)
+
+def generate_bounding_box(vertices):
+    minx = 0
+    miny = 0
+    minz = 0
+    maxx = 0
+    maxy = 0
+    maxz = 0
+
+    for vertex in vertices:
+        if vertex[0] < minx:
+            minx = vertex[0]
+        if vertex[1] < miny:
+            miny = vertex[1]
+        if vertex[2] < minz:
+            minz = vertex[2]
+
+        if vertex[0] > maxx:
+            maxx = vertex[0]
+        if vertex[1] > maxy:
+            maxy = vertex[1]
+        if vertex[2] > maxz:
+            maxz = vertex[2]
+
+    return [minx, miny, minz], [maxx, maxy, maxz]
+
+    
 # #####################################################
 # Generate - Triangles 
 # #####################################################
@@ -153,7 +223,7 @@ def generate_texture_bindings(material_property, texture_list):
                 for k in range(texture_count):
                     texture = layered_texture.GetSrcObject(FbxTexture.ClassId,k)
                     if texture:
-                        texture_id = getTextureName(texture) 
+                        texture_id = getTextureName(texture, True) 
                         texture_binding = '		"%s": "%s",' % (binding_types[str(material_property.GetName())], texture_id)
                         texture_list.append(texture_binding)
         else:
@@ -162,7 +232,7 @@ def generate_texture_bindings(material_property, texture_list):
             for j in range(texture_count):
                 texture = material_property.GetSrcObject(FbxTexture.ClassId,j)
                 if texture:
-                    texture_id = getTextureName(texture) 
+                    texture_id = getTextureName(texture, True) 
                     texture_binding = '		"%s": "%s",' % (binding_types[str(material_property.GetName())], texture_id)
                     texture_list.append(texture_binding)
 
@@ -264,7 +334,7 @@ def generate_proxy_material_string(node, material_names):
     
     output = [
 
-    '\t' + LabelString( getMaterialName( node ) ) + ': {',
+    '\t' + LabelString( getMaterialName( node, True ) ) + ': {',
     '	"type"    : "MeshFaceMaterial",',
     '	"parameters"  : {',
     '		"materials"  : ' + ArrayString( ",".join(LabelString(m) for m in material_names) ),
@@ -329,13 +399,14 @@ def generate_material_list(scene):
 # #####################################################
 def generate_texture_string(texture):
 
+    #TODO: extract more texture properties
     wrap_u = texture.GetWrapModeU()
     wrap_v = texture.GetWrapModeV()
     offset = texture.GetUVTranslation()
 
     output = [
 
-    '\t' + LabelString( getTextureName( texture ) ) + ': {',
+    '\t' + LabelString( getTextureName( texture, True ) ) + ': {',
     '	"url"    : "' + texture.GetFileName() + '",',
     '	"repeat" : ' + Vector2String( (1,1) ) + ',',
     '	"offset" : ' + Vector2String( texture.GetUVTranslation() ) + ',',
@@ -411,83 +482,32 @@ def generate_texture_list(scene):
     return texture_list
 
 # #####################################################
-# Generate - Mesh String 
+# Extract - Fbx Mesh data
 # #####################################################
-def setBit(value, position, on):
-    if on:
-        mask = 1 << position
-        return (value | mask)
-    else:
-        mask = ~(1 << position)
-        return (value & mask)
-
-def extract_color(color):
-    return [color.mRed, color.mGreen, color.mBlue]
-    
-def extract_vec2(v):
-    return [v[0], v[1]]
-
-def extract_vec3(v):
-    return [v[0], v[1], v[2]]
-    
-def join_vec2(v):
-    return "%g,%g" % (v[0], v[1])
-
-def join_vec3(v):
-    return "%g,%g,%g" % (v[0], v[1], v[2])
-
-def generate_uv(uv):
-    return "%g,%g" % (uv[0], uv[1])
-
-def generate_uvs(uv_layers):
-    layers = []
-    for uvs in uv_layers:
-        layer = ",".join(generate_uv(n) for n in uvs)
-        layers.append(layer)
-
-    return ",".join("[%s]" % n for n in layers)
-
-def extract_mesh_bounding_box(mesh):
-    control_points_count = mesh.GetControlPointsCount()
-    control_points = mesh.GetControlPoints()
-
-    minx = 0
-    miny = 0
-    minz = 0
-    maxx = 0
-    maxy = 0
-    maxz = 0
-
-    for i in range(control_points_count):
-        vertex = control_points[i]
-
-        if vertex[0] < minx:
-            minx = vertex[0]
-        if vertex[1] < miny:
-            miny = vertex[1]
-        if vertex[2] < minz:
-            minz = vertex[2]
-
-        if vertex[0] > maxx:
-            maxx = vertex[0]
-        if vertex[1] > maxy:
-            maxy = vertex[1]
-        if vertex[2] > maxz:
-            maxz = vertex[2]
-
-    return [minx, miny, minz], [maxx, maxy, maxz]
-
-def extract_vertex_positions(mesh):
+def extract_fbx_vertex_positions(mesh):
     control_points_count = mesh.GetControlPointsCount()
     control_points = mesh.GetControlPoints()
 
     positions = []
     for i in range(control_points_count):
-        positions.append(extract_vec3(control_points[i]))
+        positions.append(convert_fbx_vec3(control_points[i]))
+
+    node = mesh.GetNode()
+    if node and option_geometry:
+        # FbxMeshes are local to their node, we need the vertices in global space
+        # when scene nodes are not exported
+        transform = node.EvaluateGlobalTransform()
+        transform = FbxMatrix(transform)
+
+        for i in range(len(positions)):
+            v = positions[i]
+            position = FbxVector4(v[0], v[1], v[2])
+            position = transform.MultNormalize(position)
+            positions[i] = convert_fbx_vec3(position)
 
     return positions
 
-def extract_vertex_normals(mesh):
+def extract_fbx_vertex_normals(mesh):
 #   eNone             The mapping is undetermined.
 #   eByControlPoint   There will be one mapping coordinate for each surface control point/vertex.
 #   eByPolygonVertex  There will be one mapping coordinate for each vertex, for every polygon of which it is a part. This means that a vertex will have as many mapping coordinates as polygons of which it is a part.
@@ -517,8 +537,22 @@ def extract_vertex_normals(mesh):
 
         # values
         for i in range(normals_count):
-            normal = extract_vec3(normals_array.GetAt(i))
+            normal = convert_fbx_vec3(normals_array.GetAt(i))
             normal_values.append(normal)
+
+        node = mesh.GetNode()
+        if node and option_geometry:
+            # FbxMeshes are local to their node, we need the normals in global space
+            # when scene nodes are not exported
+            transform = node.EvaluateGlobalTransform()
+            transform.SetT(FbxVector4(0,0,0,0))
+            transform = FbxMatrix(transform)
+
+            for i in range(len(normal_values)):
+                n = normal_values[i]
+                normal = FbxVector4(n[0], n[1], n[2])
+                normal = transform.MultNormalize(normal)
+                normal_values[i] = convert_fbx_vec3(normal)
 
         # indices
         vertexId = 0
@@ -552,9 +586,17 @@ def extract_vertex_normals(mesh):
         layered_normal_values.append(normal_values)
         layered_normal_indices.append(normal_indices)
 
-    return layered_normal_values, layered_normal_indices
+    normal_values = []
+    normal_indices = []
 
-def extract_vertex_colors(mesh):
+    # Three.js only supports one layer of normals
+    if len(layered_normal_values) > 0:
+        normal_values = layered_normal_values[0]
+        normal_indices = layered_normal_indices[0]
+
+    return normal_values, normal_indices
+
+def extract_fbx_vertex_colors(mesh):
 #   eNone             The mapping is undetermined.
 #   eByControlPoint   There will be one mapping coordinate for each surface control point/vertex.
 #   eByPolygonVertex  There will be one mapping coordinate for each vertex, for every polygon of which it is a part. This means that a vertex will have as many mapping coordinates as polygons of which it is a part.
@@ -584,7 +626,7 @@ def extract_vertex_colors(mesh):
 
         # values
         for i in range(colors_count):
-            color = extract_color(colors_array.GetAt(i))
+            color = convert_fbx_color(colors_array.GetAt(i))
             color_values.append(color)
 
         # indices
@@ -616,12 +658,17 @@ def extract_vertex_colors(mesh):
                 vertexId += 1
             color_indices.append(poly_colors)
 
-        layered_color_values.append(color_values)
-        layered_color_indices.append(color_indices)
+    color_values = []
+    color_indices = []
 
-    return layered_color_values, layered_color_indices
+    # Three.js only supports one layer of colors
+    if len(layered_color_values) > 0:
+        color_values = layered_color_values[0]
+        color_indices = layered_color_indices[0]
 
-def extract_vertex_uvs(mesh):
+    return color_values, color_indices
+
+def extract_fbx_vertex_uvs(mesh):
 #   eNone             The mapping is undetermined.
 #   eByControlPoint   There will be one mapping coordinate for each surface control point/vertex.
 #   eByPolygonVertex  There will be one mapping coordinate for each vertex, for every polygon of which it is a part. This means that a vertex will have as many mapping coordinates as polygons of which it is a part.
@@ -651,7 +698,7 @@ def extract_vertex_uvs(mesh):
 
         # values
         for i in range(uvs_count):
-            uv = extract_vec2(uvs_array.GetAt(i))
+            uv = convert_fbx_vec2(uvs_array.GetAt(i))
             uv_values.append(uv)
 
         # indices
@@ -687,15 +734,426 @@ def extract_vertex_uvs(mesh):
 
     return layered_uv_values, layered_uv_indices
 
-def generate_mesh_face(mesh, vertex_indices, polygon_index, normals, colors, uv_layers, material_count, material_is_same):
-  
+# #####################################################
+# Generate - Mesh String (for scene output) 
+# #####################################################
+def generate_mesh_string_for_scene_output(node):
+    mesh = node.GetNodeAttribute()
+    mesh_list = [ mesh ]
+
+    vertices, vertex_offsets = process_mesh_vertices(mesh_list)
+    materials, material_offsets = process_mesh_materials(mesh_list)
+
+    normals_to_indices = generate_unique_normals_dictionary(mesh_list)
+    colors_to_indices = generate_unique_colors_dictionary(mesh_list)
+    uvs_to_indices_list = generate_unique_uvs_dictionary_layers(mesh_list)
+    
+    normal_values = generate_normals_from_dictionary(normals_to_indices)
+    color_values = generate_colors_from_dictionary(colors_to_indices)
+    uv_values = generate_uvs_from_dictionary_layers(uvs_to_indices_list)
+
+    faces = process_mesh_polygons(mesh_list, 
+                normals_to_indices, 
+                colors_to_indices, 
+                uvs_to_indices_list, 
+                vertex_offsets, 
+                material_offsets)
+
+    nuvs = []
+    for layer_index, uvs in enumerate(uv_values):
+        nuvs.append(str(len(uvs)))
+
+    nvertices = len(vertices)
+    nnormals = len(normal_values)
+    ncolors = len(color_values)
+    nfaces = len(faces)
+    nuvs = ",".join(nuvs)
+    
+    aabb_min, aabb_max = generate_bounding_box(vertices)
+    aabb_min = ",".join(str(f) for f in aabb_min)
+    aabb_max = ",".join(str(f) for f in aabb_max)
+
+    vertices = ",".join(Vector3String(v, True) for v in vertices)
+    normals  = ",".join(Vector3String(v, True) for v in normal_values)
+    colors   = ",".join(Vector3String(v, True) for v in color_values)
+    faces    = ",".join(faces)
+    uvs      = generate_uvs(uv_values)
+
+    output = [
+
+    '\t' + LabelString( getEmbedName( node, True ) ) + ' : {',
+    '	"metadata"  : {',
+    '		"vertices" : ' + str(nvertices) + ',',
+    '		"normals" : ' + str(nnormals) + ',',
+    '		"colors" : ' + str(ncolors) + ',',
+    '		"faces" : ' + str(nfaces) + ',',
+    '		"uvs" : ' + ArrayString(nuvs),
+    '	},',
+    '	"boundingBox"  : {',
+    '		"min" : ' + ArrayString(aabb_min) + ',',   
+    '		"max" : ' + ArrayString(aabb_max),   
+    '	},',
+    '	"scale" : ' + str( 1 ) + ',',   
+    '	"materials" : ' + ArrayString("") + ',',   
+    '	"vertices" : ' + ArrayString(vertices) + ',',   
+    '	"normals" : ' + ArrayString(normals) + ',',   
+    '	"colors" : ' + ArrayString(colors) + ',',   
+    '	"uvs" : ' + ArrayString(uvs) + ',',   
+    '	"faces" : ' + ArrayString(faces),
+    '}'
+
+    ]
+    
+    return generateMultiLineString( output, '\n\t\t', 0 )
+
+# #####################################################
+# Generate - Mesh String (for non-scene output) 
+# #####################################################
+def generate_mesh_string_for_non_scene_output(scene):
+    mesh_list = generate_mesh_list(scene)
+
+    vertices, vertex_offsets = process_mesh_vertices(mesh_list)
+    materials, material_offsets = process_mesh_materials(mesh_list)
+
+    normals_to_indices = generate_unique_normals_dictionary(mesh_list)
+    colors_to_indices = generate_unique_colors_dictionary(mesh_list)
+    uvs_to_indices_list = generate_unique_uvs_dictionary_layers(mesh_list)
+    
+    normal_values = generate_normals_from_dictionary(normals_to_indices)
+    color_values = generate_colors_from_dictionary(colors_to_indices)
+    uv_values = generate_uvs_from_dictionary_layers(uvs_to_indices_list)
+
+    faces = process_mesh_polygons(mesh_list, 
+                normals_to_indices, 
+                colors_to_indices, 
+                uvs_to_indices_list, 
+                vertex_offsets, 
+                material_offsets)
+
+    nuvs = []
+    for layer_index, uvs in enumerate(uv_values):
+        nuvs.append(str(len(uvs)))
+
+    nvertices = len(vertices)
+    nnormals = len(normal_values)
+    ncolors = len(color_values)
+    nfaces = len(faces)
+    nuvs = ",".join(nuvs)
+
+    aabb_min, aabb_max = generate_bounding_box(vertices)
+    aabb_min = ",".join(str(f) for f in aabb_min)
+    aabb_max = ",".join(str(f) for f in aabb_max)
+
+    vertices = ",".join(Vector3String(v, True) for v in vertices)
+    normals  = ",".join(Vector3String(v, True) for v in normal_values)
+    colors   = ",".join(Vector3String(v, True) for v in color_values)
+    faces    = ",".join(faces)
+    uvs      = generate_uvs(uv_values)
+
+    output = [
+
+    '{',
+    '	"metadata"  : {',
+    '		"formatVersion" : 3.2,',
+    '		"type"		: "geometry",',
+    '		"generatedBy"	: "convert-to-threejs.py"' + ',',
+    '		"vertices" : ' + str(nvertices) + ',',
+    '		"normals" : ' + str(nnormals) + ',',
+    '		"colors" : ' + str(ncolors) + ',',
+    '		"faces" : ' + str(nfaces) + ',',
+    '		"uvs" : ' + ArrayString(nuvs),
+    '	},',
+    '	"boundingBox"  : {',
+    '		"min" : ' + ArrayString(aabb_min) + ',',   
+    '		"max" : ' + ArrayString(aabb_max),   
+    '	},',
+    '	"scale" : ' + str( 1 ) + ',',   
+    '	"materials" : ' + ArrayString("") + ',',   
+    '	"vertices" : ' + ArrayString(vertices) + ',',   
+    '	"normals" : ' + ArrayString(normals) + ',',   
+    '	"colors" : ' + ArrayString(colors) + ',',   
+    '	"uvs" : ' + ArrayString(uvs) + ',',   
+    '	"faces" : ' + ArrayString(faces),
+    '}'
+
+    ]
+
+    return generateMultiLineString( output, '\n', 0 )
+
+# #####################################################
+# Process - Mesh Geometry
+# #####################################################
+def generate_normal_key(normal):
+    return (round(normal[0], 6), round(normal[1], 6), round(normal[2], 6))
+
+def generate_color_key(color):
+    return getHex(color)
+
+def generate_uv_key(uv):
+    return (round(uv[0], 6), round(uv[1], 6))
+                
+def append_non_duplicate_uvs(source_uvs, dest_uvs, counts):
+    source_layer_count = len(source_uvs)
+    for layer_index in range(source_layer_count):
+
+        dest_layer_count = len(dest_uvs)
+
+        if dest_layer_count <= layer_index:
+            dest_uv_layer = {}
+            count = 0
+            dest_uvs.append(dest_uv_layer)
+            counts.append(count)
+        else:
+            dest_uv_layer = dest_uvs[layer_index]
+            count = counts[layer_index]
+
+        source_uv_layer = source_uvs[layer_index]
+
+        for uv in source_uv_layer:
+            key = generate_uv_key(uv) 
+            if key not in dest_uv_layer:
+                dest_uv_layer[key] = count
+                count += 1
+
+        counts[layer_index] = count
+
+    return counts
+
+def generate_unique_normals_dictionary(mesh_list):
+    normals_dictionary = {}
+    nnormals = 0
+      
+    # Merge meshes, remove duplicate data
+    for mesh in mesh_list:
+        node = mesh.GetNode()
+        normal_values, normal_indices = extract_fbx_vertex_normals(mesh)
+
+        if len(normal_values) > 0:
+            for normal in normal_values:
+                key = generate_normal_key(normal) 
+                if key not in normals_dictionary:
+                    normals_dictionary[key] = nnormals
+                    nnormals += 1
+
+    return normals_dictionary
+
+def generate_unique_colors_dictionary(mesh_list):
+    colors_dictionary = {}
+    ncolors = 0
+      
+    # Merge meshes, remove duplicate data
+    for mesh in mesh_list:
+        color_values, color_indices = extract_fbx_vertex_colors(mesh)
+
+        if len(color_values) > 0:
+            for color in color_values:
+                key = generate_color_key(color) 
+                if key not in colors_dictionary:
+                    colors_dictionary[key] = count
+                    count += 1
+
+    return colors_dictionary
+
+def generate_unique_uvs_dictionary_layers(mesh_list):
+    uvs_dictionary_layers = []
+    nuvs_list = []
+
+    # Merge meshes, remove duplicate data
+    for mesh in mesh_list:
+        uv_values, uv_indices = extract_fbx_vertex_uvs(mesh)
+
+        if len(uv_values) > 0:
+            nuvs_list = append_non_duplicate_uvs(uv_values, uvs_dictionary_layers, nuvs_list)
+
+    return uvs_dictionary_layers
+
+def generate_normals_from_dictionary(normals_dictionary):
+    normal_values = []
+    for key, index in sorted(normals_dictionary.items(), key = operator.itemgetter(1)):
+        normal_values.append(key)
+
+    return normal_values
+
+def generate_colors_from_dictionary(colors_dictionary):
+    color_values = []
+    for key, index in sorted(colors_dictionary.items(), key = operator.itemgetter(1)):
+        color_values.append(key)
+
+    return color_values
+
+def generate_uvs_from_dictionary_layers(uvs_dictionary_layers):
+    uv_values = []
+    for uvs_dictionary in uvs_dictionary_layers:
+        uv_values_layer = []    
+        for key, index in sorted(uvs_dictionary.items(), key = operator.itemgetter(1)):
+            uv_values_layer.append(key)
+        uv_values.append(uv_values_layer)
+
+    return uv_values
+
+def generate_normal_indices_for_poly(poly_index, mesh_normal_values, mesh_normal_indices, normals_to_indices):
+    if len(mesh_normal_indices) <= 0:
+        return []
+
+    poly_normal_indices = mesh_normal_indices[poly_index]
+    poly_size = len(poly_normal_indices)
+
+    output_poly_normal_indices = []
+    for v in range(poly_size):
+        normal_index = poly_normal_indices[v]
+        normal_value = mesh_normal_values[normal_index]
+
+        key = generate_normal_key(normal_value)
+
+        output_index = normals_to_indices[key]
+        output_poly_normal_indices.append(output_index)
+
+    return output_poly_normal_indices
+
+def generate_color_indices_for_poly(poly_index, mesh_color_values, mesh_color_indices, colors_to_indices):
+    if len(mesh_color_indices) <= 0:
+        return []
+
+    poly_color_indices = mesh_color_indices[poly_index]
+    poly_size = len(poly_color_indices)
+
+    output_poly_color_indices = []
+    for v in range(poly_size):
+        color_index = poly_color_indices[v]
+        color_value = mesh_color_values[color_index]
+
+        key = generate_color_key(color_value)
+
+        output_index = colors_to_indices[key]
+        output_poly_color_indices.append(output_index)
+
+    return output_poly_color_indices
+
+def generate_uv_indices_for_poly(poly_index, mesh_uv_values, mesh_uv_indices, uvs_to_indices):
+    if len(mesh_uv_indices) <= 0:
+        return []
+
+    poly_uv_indices = mesh_uv_indices[poly_index]
+    poly_size = len(poly_uv_indices)
+
+    output_poly_uv_indices = []
+    for v in range(poly_size):
+        uv_index = poly_uv_indices[v]
+        uv_value = mesh_uv_values[uv_index]
+
+        key = generate_uv_key(uv_value)
+
+        output_index = uvs_to_indices[key]
+        output_poly_uv_indices.append(output_index)
+
+    return output_poly_uv_indices
+
+def process_mesh_vertices(mesh_list):
+    vertex_offset = 0
+    vertex_offset_list = [0]
+    vertices = []
+    for mesh in mesh_list:
+        node = mesh.GetNode()
+        mesh_vertices = extract_fbx_vertex_positions(mesh)
+                
+        vertices.extend(mesh_vertices[:])
+        vertex_offset += len(mesh_vertices)
+        vertex_offset_list.append(vertex_offset)
+
+    return vertices, vertex_offset_list
+
+def process_mesh_materials(mesh_list):
+    material_offset = 0
+    material_offset_list = [0]
+    materials_list = []
+
+    #TODO: remove duplicate mesh references
+    for mesh in mesh_list:
+        node = mesh.GetNode()
+                
+        material_count = node.GetMaterialCount()
+        if material_count > 0:
+            for l in range(mesh.GetLayerCount()):
+                materials = mesh.GetLayer(l).GetMaterials()
+                if materials:
+                    if materials.GetReferenceMode() == FbxLayerElement.eIndex:
+                        #Materials are in an undefined external table
+                        continue
+
+                    for i in range(material_count):
+                        material = node.GetMaterial(i)
+                        materials_list.append( material )
+
+                    material_offset += material_count
+                    material_offset_list.append(material_offset)
+
+    return materials_list, material_offset_list
+
+def process_mesh_polygons(mesh_list, normals_to_indices, colors_to_indices, uvs_to_indices_list, vertex_offset_list, material_offset_list):
+    faces = []
+    for mesh_index in range(len(mesh_list)):
+        mesh = mesh_list[mesh_index]
+        poly_count = mesh.GetPolygonCount()
+        control_points = mesh.GetControlPoints() 
+
+        normal_values, normal_indices = extract_fbx_vertex_normals(mesh)
+        color_values, color_indices = extract_fbx_vertex_colors(mesh)
+        uv_values_layers, uv_indices_layers = extract_fbx_vertex_uvs(mesh)
+
+        for poly_index in range(poly_count):
+            poly_size = mesh.GetPolygonSize(poly_index)
+
+            face_normals = generate_normal_indices_for_poly(poly_index, normal_values, normal_indices, normals_to_indices)
+            face_colors = generate_color_indices_for_poly(poly_index, color_values, color_indices, colors_to_indices)
+
+            face_uv_layers = []
+            for l in range(len(uv_indices_layers)):
+                uv_values = uv_values_layers[l]
+                uv_indices = uv_indices_layers[l]
+                face_uv_indices = generate_uv_indices_for_poly(poly_index, uv_values, uv_indices, uvs_to_indices_list[l])
+                face_uv_layers.append(face_uv_indices)
+                
+            face_vertices = []
+            for vertex_index in range(poly_size):
+                control_point_index = mesh.GetPolygonVertex(poly_index, vertex_index)
+                face_vertices.append(control_point_index)
+
+            #TODO: assign a default material to any mesh without one
+            if len(material_offset_list) <= mesh_index:
+                material_offset = 0
+            else:
+                material_offset = material_offset_list[mesh_index]
+
+            vertex_offset = vertex_offset_list[mesh_index]
+
+            face = generate_mesh_face(mesh, 
+                      poly_index, 
+                      face_vertices,
+                      face_normals,
+                      face_colors,
+                      face_uv_layers,
+                      vertex_offset,
+                      material_offset)
+
+            faces.append(face)
+
+
+    return faces
+
+def generate_mesh_face(mesh, polygon_index, vertex_indices, normals, colors, uv_layers, vertex_offset, material_offset):
     isTriangle = ( len(vertex_indices) == 3 )
     nVertices = 3 if isTriangle else 4
 
-    hasMaterial = material_count > 0
+    hasMaterial = False
+    for l in range(mesh.GetLayerCount()):
+        materials = mesh.GetLayer(l).GetMaterials()
+        if materials:
+            hasMaterial = True
+            break
+                
     hasFaceUvs = False
     hasFaceVertexUvs = len(uv_layers) > 0
-    hasFaceNormals = False # don't export any face normals (as they are computed in engine)
+    hasFaceNormals = False 
     hasFaceVertexNormals = len(normals) > 0
     hasFaceColors = False 
     hasFaceVertexColors = len(colors) > 0
@@ -724,133 +1182,69 @@ def generate_mesh_face(mesh, vertex_indices, polygon_index, normals, colors, uv_
 
     faceData.append(faceType)
 
-    # must clamp in case on polygons bigger than quads
-
+    tmp = []
     for i in range(nVertices):
-        index = vertex_indices[i]
+        tmp.append(vertex_indices[i])
+        index = vertex_indices[i] + vertex_offset
         faceData.append(index)
 
     if hasMaterial:
         material_id = 0
-        if not material_is_same:
-            for l in range(mesh.GetLayerCount()):
-                materials = mesh.GetLayer(l).GetMaterials()
-                if materials:
-                    material_id = materials.GetIndexArray().GetAt(polygon_index)
-                    break
+        for l in range(mesh.GetLayerCount()):
+            materials = mesh.GetLayer(l).GetMaterials()
+            if materials:
+                material_id = materials.GetIndexArray().GetAt(polygon_index)
+                break
+        material_id += material_offset
         faceData.append( material_id )
 
     if hasFaceVertexUvs:
-        for layer_index, uvs in enumerate(uv_layers):
-            polygon_uvs = uvs[polygon_index]
+        for polygon_uvs in uv_layers:
             for i in range(nVertices):
                 index = polygon_uvs[i]
                 faceData.append(index)
 
     if hasFaceVertexNormals:
-        polygon_normals = normals[polygon_index]
         for i in range(nVertices):
-            index = polygon_normals[i]
+            index = normals[i]
             faceData.append(index)
 
     if hasFaceVertexColors:
-        polygon_colors = colors[polygon_index]
         for i in range(nVertices):
-            index = polygon_colors[i]
+            index = colors[i]
             faceData.append(index)
 
     return ",".join( map(str, faceData) ) 
 
-def generate_mesh_faces(mesh, normals, colors, uv_layers):
-    has_same_material_for_all_polygons = True
-    for l in range(mesh.GetLayerCount()):
-        materials = mesh.GetLayer(l).GetMaterials()
-        if materials:
-            if materials.GetMappingMode() == FbxLayerElement.eByPolygon:
-                has_same_material_for_all_polygons = False
-                break
 
-    node = mesh.GetNode()
+# #####################################################
+# Generate - Mesh List 
+# #####################################################
+def generate_mesh_list_from_hierarchy(node, mesh_list):
+    if node.GetNodeAttribute() == None:
+        pass
+    else:
+        attribute_type = (node.GetNodeAttribute().GetAttributeType())
+        if attribute_type == FbxNodeAttribute.eMesh or \
+           attribute_type == FbxNodeAttribute.eNurbs or \
+           attribute_type == FbxNodeAttribute.eNurbsSurface or \
+           attribute_type == FbxNodeAttribute.ePatch:
+
+            if attribute_type != FbxNodeAttribute.eMesh:
+                converter.TriangulateInPlace(node);
+
+            mesh_list.append(node.GetNodeAttribute())
+
+    for i in range(node.GetChildCount()):
+        generate_embed_list_from_hierarchy(node.GetChild(i), mesh_list)
+
+def generate_mesh_list(scene):
+    mesh_list = []
+    node = scene.GetRootNode()
     if node:
-        material_count = node.GetMaterialCount()
-
-    poly_count = mesh.GetPolygonCount()
-    control_points = mesh.GetControlPoints() 
-
-    faces = []
-    for p in range(poly_count):
-        poly_size = mesh.GetPolygonSize(p)
-        vertex_indices = []
-        for v in range(poly_size):
-            control_point_index = mesh.GetPolygonVertex(p, v)
-            vertex_indices.append(control_point_index)
-        face = generate_mesh_face(mesh, vertex_indices, p, normals, colors, uv_layers, material_count, has_same_material_for_all_polygons)
-        faces.append(face)
-    return faces
-
-def generate_mesh_string(node):
-    mesh = node.GetNodeAttribute()
-    vertices = extract_vertex_positions(mesh)
-    aabb_min, aabb_max = extract_mesh_bounding_box(mesh)
-
-    normal_values, normal_indices = extract_vertex_normals(mesh)
-    color_values, color_indices = extract_vertex_colors(mesh)
-    uv_values, uv_indices = extract_vertex_uvs(mesh)
-
-    # Three.js only supports one layer of normals
-    if len(normal_values) > 0:
-        normal_values = normal_values[0]
-        normal_indices = normal_indices[0]
-
-    # Three.js only supports one layer of colors
-    if len(color_values) > 0:
-        color_values = color_values[0]
-        color_indices = color_indices[0]
-
-    faces = generate_mesh_faces(mesh, normal_indices, color_indices, uv_indices)
-
-    nuvs = []
-    for layer_index, uvs in enumerate(uv_values):
-        nuvs.append(str(len(uvs)))
-
-    nvertices = len(vertices)
-    nnormals = len(normal_values)
-    ncolors = len(color_values)
-    nfaces = len(faces)
-    nuvs = ",".join(nuvs)
-
-    vertices = ",".join(join_vec3(v) for v in vertices)
-    normals  = ",".join(join_vec3(v) for v in normal_values)
-    colors   = ",".join(join_vec3(v) for v in color_values)
-    faces    = ",".join(faces)
-    uvs      = generate_uvs(uv_values)
-    aabb_min = ",".join(str(f) for f in aabb_min)
-    aabb_max = ",".join(str(f) for f in aabb_max)
-
-    output = [
-    '\t' + LabelString( getEmbedName( node ) ) + ' : {',
-    '	"metadata"  : {',
-    '		"vertices" : ' + str(nvertices) + ',',
-    '		"normals" : ' + str(nnormals) + ',',
-    '		"colors" : ' + str(ncolors) + ',',
-    '		"faces" : ' + str(nfaces) + ',',
-    '		"uvs" : ' + ArrayString(nuvs),
-    '	},',
-    '	"boundingBox"  : {',
-    '		"min" : ' + ArrayString(aabb_min) + ',',   
-    '		"max" : ' + ArrayString(aabb_max),   
-    '	},',
-    '	"scale" : ' + str( 1 ) + ',',   
-    '	"materials" : ' + ArrayString("") + ',',   
-    '	"vertices" : ' + ArrayString(vertices) + ',',   
-    '	"normals" : ' + ArrayString(normals) + ',',   
-    '	"colors" : ' + ArrayString(colors) + ',',   
-    '	"uvs" : ' + ArrayString(uvs) + ',',   
-    '	"faces" : ' + ArrayString(faces),
-    '}'
-    ]
-
-    return generateMultiLineString( output, '\n\t\t', 0 )
+        for i in range(node.GetChildCount()):
+            generate_mesh_list_from_hierarchy(node.GetChild(i), mesh_list)
+    return mesh_list
 
 # #####################################################
 # Generate - Embeds 
@@ -868,7 +1262,7 @@ def generate_embed_list_from_hierarchy(node, embed_list):
             if attribute_type != FbxNodeAttribute.eMesh:
                 converter.TriangulateInPlace(node);
 
-            embed_string = generate_mesh_string(node)
+            embed_string = generate_mesh_string_for_scene_output(node)
             embed_list.append(embed_string)
 
     for i in range(node.GetChildCount()):
@@ -888,9 +1282,9 @@ def generate_embed_list(scene):
 def generate_geometry_string(node):
 
     output = [
-    '\t' + LabelString( getGeometryName( node ) ) + ' : {',
+    '\t' + LabelString( getGeometryName( node, True ) ) + ' : {',
     '	"type"  : "embedded",',
-    '	"id" : ' + LabelString( getEmbedName( node ) ),
+    '	"id" : ' + LabelString( getEmbedName( node, True ) ),
     '}'
     ]
 
@@ -971,15 +1365,27 @@ def generate_light_string(node, padding):
 
     if light_type == "directional":
 
+        # Three.js directional lights emit light from a point in 3d space to a target node or the origin.
+        # When there is no target, we need to take a point, one unit away from the origin, and move it 
+        # into the right location so that the origin acts like the target
+        
+        if node.GetTarget():
+            direction = position
+        else:
+            translation = FbxVector4(0,0,0,0)
+            scale = FbxVector4(1,1,1,1)
+            rotation = transform.GetR()
+            matrix = FbxMatrix(translation, rotation, scale)
+            direction = matrix.MultNormalize(global_up_vector) 
+
         output = [
 
         '\t\t' + LabelString( getObjectName( node ) ) + ' : {',
         '	"type"      : "DirectionalLight",',
         '	"color"     : ' + str(getHex(light.Color.Get())) + ',',
         '	"intensity" : ' + str(light.Intensity.Get()/100.0) + ',',
-        '	"direction" : ' + Vector3String( position ) + ',',
+        '	"direction" : ' + Vector3String( direction ) + ',',
         '	"target"    : ' + LabelString( getObjectName( node.GetTarget() ) ) + ( ',' if node.GetChildCount() > 0 else '' )
-
         ]
 
     elif light_type == "point":
@@ -1005,7 +1411,7 @@ def generate_light_string(node, padding):
         '	"intensity" : ' + str(light.Intensity.Get()/100.0) + ',',
         '	"position"  : ' + Vector3String( position ) + ',',
         '	"distance"  : ' + str(light.FarAttenuationEnd.Get()) + ',',
-        '	"angle"     : ' + str(light.OuterAngle.Get()) + ',',
+        '	"angle"     : ' + str((light.OuterAngle.Get()*math.pi)/180) + ',',
         '	"exponent"  : ' + str(light.DecayType.Get()) + ',',
         '	"target"    : ' + LabelString( getObjectName( node.GetTarget() ) ) + ( ',' if node.GetChildCount() > 0 else '' )
 
@@ -1087,8 +1493,6 @@ def generate_camera_string(node, padding):
 
         aspect = camera.PixelAspectRatio.Get()
         fov = camera.FieldOfView.Get()
-        fov = 75
-        far = 1000
 
         output = [
 
@@ -1150,12 +1554,12 @@ def generate_mesh_object_string(node, padding):
                     material = node.GetMaterial(i)
                     material_names.append( getMaterialName(material) )
         #If this mesh has more than one material, use a proxy material
-        material_name = getMaterialName( node ) if material_count > 1 else material_names[0] 
+        material_name = getMaterialName( node, True) if material_count > 1 else material_names[0] 
 
     output = [
 
     '\t\t' + LabelString( getObjectName( node ) ) + ' : {',
-    '	"geometry" : ' + LabelString( getGeometryName( node ) ) + ',',
+    '	"geometry" : ' + LabelString( getGeometryName( node, True ) ) + ',',
     '	"material" : ' + LabelString( material_name ) + ',',
     '	"position" : ' + Vector3String( position ) + ',',
     '	"rotation" : ' + Vector3String( rotation ) + ',',
@@ -1270,9 +1674,17 @@ def generate_scene_objects_string(scene):
     return "\n".join(object_list), object_count
 
 # #####################################################
-# Parse - Scene 
+# Parse - Geometry (non-scene output) 
+# #####################################################
+def extract_geometry(scene, filename):
+    mesh_string = generate_mesh_string_for_non_scene_output(scene)
+    return mesh_string
+
+# #####################################################
+# Parse - Scene (scene output)
 # #####################################################
 def extract_scene(scene, filename):
+    global_settings = scene.GetGlobalSettings()
     objects, nobjects = generate_scene_objects_string(scene)
 
     textures = generate_texture_list(scene)
@@ -1285,6 +1697,7 @@ def extract_scene(scene, filename):
     nmaterials = len(materials)
     ngeometries = len(geometries)
 
+    #TODO: extract actual root/scene data here
     position = Vector3String( (0,0,0) )
     rotation = Vector3String( (0,0,0) )
     scale    = Vector3String( (1,1,1) )
@@ -1292,8 +1705,13 @@ def extract_scene(scene, filename):
     camera_names = generate_camera_name_list(scene)
     scene_settings = scene.GetGlobalSettings()
 
+    #TODO: this might exist as part of the FBX spec
     bgcolor = Vector3String( (0.667,0.667,0.667) )
     bgalpha = 1
+
+    # This does not seem to be any help here
+    # global_settings.GetDefaultCamera() 
+
     defcamera = LabelString(camera_names[0] if len(camera_names) > 0 else "")
     if option_default_camera:
       defcamera = LabelString('default_camera')
@@ -1416,7 +1834,7 @@ if __name__ == "__main__":
 
     parser.add_option('-t', '--triangulate', action='store_true', dest='triangulate', help="force quad geometry into triangles", default=False)
     parser.add_option('-x', '--no-textures', action='store_true', dest='notextures', help="don't include texture references in output file", default=False)
-    parser.add_option('-p', '--no-prefix', action='store_true', dest='noprefix', help="don't prefix object names in output file", default=False)
+    parser.add_option('-p', '--prefix', action='store_true', dest='prefix', help="prefix object names in output file", default=False)
     parser.add_option('-g', '--geometry-only', action='store_true', dest='geometry', help="output geometry only", default=False)
     parser.add_option('-c', '--default-camera', action='store_true', dest='defcamera', help="include default camera in output scene", default=False)
     parser.add_option('-l', '--defualt-light', action='store_true', dest='deflight', help="include default light in output scene", default=False)
@@ -1425,7 +1843,7 @@ if __name__ == "__main__":
 
     option_triangulate = options.triangulate 
     option_textures = True if not options.notextures else False
-    option_prefix = True if not options.noprefix else False
+    option_prefix = options.prefix
     option_geometry = options.geometry 
     option_default_camera = options.defcamera 
     option_default_light = options.deflight 
@@ -1433,6 +1851,7 @@ if __name__ == "__main__":
     # Prepare the FBX SDK.
     sdk_manager, scene = InitializeSdkObjects()
     converter = FbxGeometryConverter(sdk_manager)
+    global_up_vector = get_up_vector(scene)
 
     # The converter takes an FBX file as an argument.
     if len(args) > 1:
@@ -1449,11 +1868,15 @@ if __name__ == "__main__":
             print("\nForcing geometry to triangles")
             triangulate_scene(scene)
 
-        output_content = extract_scene(scene, os.path.basename(args[0]))
+        if option_geometry:
+            output_content = extract_geometry(scene, os.path.basename(args[0]))
+        else:
+            output_content = extract_scene(scene, os.path.basename(args[0]))
+
         output_path = os.path.join(os.getcwd(), args[1])
         write_file(output_path, output_content)
+
         print("\nExported Three.js file to:\n%s\n" % output_path)
-        # SaveScene(sdk_manager, scene, args[2], 8)
 
     # Destroy all objects created by the FBX SDK.
     sdk_manager.Destroy()
