@@ -1922,21 +1922,8 @@ THREE.Vector4.prototype = {
 
 THREE.Box2 = function ( min, max ) {
 
-	if ( min === undefined && max === undefined ) {
-
-		this.min = new THREE.Vector2();
-		this.max = new THREE.Vector2();
-		this.makeEmpty();
-
-	} else {
-		this.min = min.clone();
-		if( max === undefined ) {
-			this.max = new THREE.Vector2().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-		}
-		else {
-			this.max = max.clone();
-		}
-	}
+	this.min = min !== undefined ? min.clone() : new THREE.Vector2( Infinity, Infinity );
+	this.max = max !== undefined ? max.clone() : new THREE.Vector2( -Infinity, -Infinity );
 
 };
 
@@ -2198,27 +2185,8 @@ THREE.Box2.__v1 = new THREE.Vector2();
 
 THREE.Box3 = function ( min, max ) {
 
-	if ( min === undefined && max === undefined ) {
-
-		this.min = new THREE.Vector3();
-		this.max = new THREE.Vector3();
-		this.makeEmpty();
-
-	} else {
-
-		this.min = min.clone();
-
-		if( max === undefined ) {
-
-			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-
-		} else {
-
-			this.max = max.clone();
-
-		}
-
-	}
+	this.min = min !== undefined ? min.clone() : new THREE.Vector3( Infinity, Infinity, Infinity );
+	this.max = max !== undefined ? max.clone() : new THREE.Vector3( -Infinity, -Infinity, -Infinity );
 
 };
 
@@ -4866,6 +4834,25 @@ THREE.Triangle = function ( a, b, c ) {
 
 };
 
+THREE.Triangle.normal = function( a, b, c, optionalTarget ) {
+
+	var result = optionalTarget || new THREE.Vector3();
+
+	result.sub( c, b );
+	THREE.Triangle.__v0.sub( a, b );
+	result.crossSelf( THREE.Triangle.__v0 );
+
+	var resultLengthSq = result.lengthSq();
+	if( resultLengthSq > 0 ) {
+
+		return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+
+	}
+
+	return result.set( 0, 0, 0 );
+
+};
+
 // static/instance method to calculate barycoordinates
 THREE.Triangle.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) {
 
@@ -4896,6 +4883,7 @@ THREE.Triangle.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) 
 
 	// barycoordinates must always sum to 1
 	return result.set( 1 - u - v, v, u );
+
 };
 
 THREE.Triangle.containsPoint = function ( point, a, b, c ) {
@@ -4904,6 +4892,7 @@ THREE.Triangle.containsPoint = function ( point, a, b, c ) {
 	var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, THREE.Triangle.__v3 );
 
 	return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+
 };
 
 THREE.Triangle.prototype = {
@@ -4958,20 +4947,7 @@ THREE.Triangle.prototype = {
 
 	normal: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
-
-		result.sub( this.c, this.b );
-		THREE.Triangle.__v0.sub( this.a, this.b );
-		result.crossSelf( THREE.Triangle.__v0 );
-
-		var resultLengthSq = result.lengthSq();
-		if( resultLengthSq > 0 ) {
-
-			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
-
-		}
-
-		return result.set( 0, 0, 0 );
+		return THREE.Triangle.normal( this.a, this.b, this.c, optionalTarget );
 
 	},
 
