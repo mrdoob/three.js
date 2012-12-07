@@ -19,6 +19,25 @@ THREE.Triangle = function ( a, b, c ) {
 
 };
 
+THREE.Triangle.normal = function( a, b, c, optionalTarget ) {
+
+	var result = optionalTarget || new THREE.Vector3();
+
+	result.sub( c, b );
+	THREE.Triangle.__v0.sub( a, b );
+	result.crossSelf( THREE.Triangle.__v0 );
+
+	var resultLengthSq = result.lengthSq();
+	if( resultLengthSq > 0 ) {
+
+		return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+
+	}
+
+	return result.set( 0, 0, 0 );
+
+};
+
 // static/instance method to calculate barycoordinates
 THREE.Triangle.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) {
 
@@ -49,6 +68,7 @@ THREE.Triangle.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) 
 
 	// barycoordinates must always sum to 1
 	return result.set( 1 - u - v, v, u );
+
 };
 
 THREE.Triangle.containsPoint = function ( point, a, b, c ) {
@@ -57,6 +77,7 @@ THREE.Triangle.containsPoint = function ( point, a, b, c ) {
 	var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, THREE.Triangle.__v3 );
 
 	return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+
 };
 
 THREE.Triangle.prototype = {
@@ -111,20 +132,7 @@ THREE.Triangle.prototype = {
 
 	normal: function ( optionalTarget ) {
 
-		var result = optionalTarget || new THREE.Vector3();
-
-		result.sub( this.c, this.b );
-		THREE.Triangle.__v0.sub( this.a, this.b );
-		result.crossSelf( THREE.Triangle.__v0 );
-
-		var resultLengthSq = result.lengthSq();
-		if( resultLengthSq > 0 ) {
-
-			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
-
-		}
-
-		return result.set( 0, 0, 0 );
+		return THREE.Triangle.normal( this.a, this.b, this.c, optionalTarget );
 
 	},
 

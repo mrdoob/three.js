@@ -9,7 +9,7 @@ test( "constructor", function() {
 	ok( a.min.equals( posInf3 ), "Passed!" );
 	ok( a.max.equals( negInf3 ), "Passed!" );
 
-	a = new THREE.Box3( zero3 );
+	a = new THREE.Box3( zero3, zero3 );
 	ok( a.min.equals( zero3 ), "Passed!" );
 	ok( a.max.equals( zero3 ), "Passed!" );
 
@@ -52,7 +52,7 @@ test( "empty/makeEmpty", function() {
 });
 
 test( "center", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 
 	ok( a.center().equals( zero3 ), "Passed!" );
 
@@ -62,7 +62,7 @@ test( "center", function() {
 });
 
 test( "size", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 
 	ok( a.size().equals( zero3 ), "Passed!" );
 
@@ -71,7 +71,7 @@ test( "size", function() {
 });
 
 test( "expandByPoint", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 
 	a.expandByPoint( zero3 );
 	ok( a.size().equals( zero3 ), "Passed!" );
@@ -85,7 +85,7 @@ test( "expandByPoint", function() {
 });
 
 test( "expandByVector", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 
 	a.expandByVector( zero3 );
 	ok( a.size().equals( zero3 ), "Passed!" );
@@ -96,7 +96,7 @@ test( "expandByVector", function() {
 });
 
 test( "expandByScalar", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 
 	a.expandByScalar( 0 );
 	ok( a.size().equals( zero3 ), "Passed!" );
@@ -107,7 +107,7 @@ test( "expandByScalar", function() {
 });
 
 test( "containsPoint", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 
 	ok( a.containsPoint( zero3 ), "Passed!" );
 	ok( ! a.containsPoint( one3 ), "Passed!" );
@@ -119,7 +119,7 @@ test( "containsPoint", function() {
 });
 
 test( "containsBox", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );
 	var c = new THREE.Box3( one3.clone().negate(), one3 );
 
@@ -190,7 +190,7 @@ test( "distanceToPoint", function() {
 });
 
 test( "isIntersectionBox", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );
 	var c = new THREE.Box3( one3.clone().negate(), one3 );
 
@@ -209,7 +209,7 @@ test( "isIntersectionBox", function() {
 });
 
 test( "intersect", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );
 	var c = new THREE.Box3( one3.clone().negate(), one3 );
 
@@ -222,7 +222,7 @@ test( "intersect", function() {
 });
 
 test( "union", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );
 	var c = new THREE.Box3( one3.clone().negate(), one3 );
 
@@ -233,7 +233,7 @@ test( "union", function() {
 });
 
 test( "translate", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );
 	var c = new THREE.Box3( one3.clone().negate(), one3 );
 	var d = new THREE.Box3( one3.clone().negate(), zero3 );
@@ -245,7 +245,7 @@ test( "translate", function() {
 });
 
 test( "scale", function() {
-	var a = new THREE.Box3( zero3 );
+	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );
 	var c = new THREE.Box3( one3.clone().negate(), one3 );
 	var d = new THREE.Box3( one3.clone().negate(), zero3 );
