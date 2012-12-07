@@ -30,7 +30,6 @@ THREE.Sprite.prototype.updateMatrix = function () {
 	if ( this.scale.x !== 1 || this.scale.y !== 1 ) {
 
 		this.matrix.scale( this.scale );
-		this.boundRadiusScale = Math.max( this.scale.x, this.scale.y );
 
 	}
 
