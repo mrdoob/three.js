@@ -196,8 +196,10 @@ THREE.Box2.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ) {
+		if ( ( box.max.x < this.min.x ) ||
+		     ( box.min.x > this.max.x ) ||
+		     ( box.max.y < this.min.y ) ||
+		     ( box.min.y > this.max.y ) ) {
 
 			return false;
 
