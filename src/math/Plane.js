@@ -4,17 +4,8 @@
 
 THREE.Plane = function ( normal, constant ) {
 
-	if ( normal === undefined && constant === undefined ) {
-
-		this.normal = new THREE.Vector3();
-		this.constant = 0;
-
-	} else {
-
-		this.normal = normal.clone();
-		this.constant = constant || 0;
-
-	}
+	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3();
+	this.constant = constant !== undefined ? constant : 0;
 
 };
 
