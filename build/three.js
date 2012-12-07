@@ -2114,8 +2114,10 @@ THREE.Box2.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ) {
+		if ( ( box.max.x < this.min.x ) ||
+		     ( box.min.x > this.max.x ) ||
+		     ( box.max.y < this.min.y ) ||
+		     ( box.min.y > this.max.y ) ) {
 
 			return false;
 
@@ -3912,17 +3914,8 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 THREE.Plane = function ( normal, constant ) {
 
-	if ( normal === undefined && constant === undefined ) {
-
-		this.normal = new THREE.Vector3();
-		this.constant = 0;
-
-	} else {
-
-		this.normal = normal.clone();
-		this.constant = constant || 0;
-
-	}
+	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3();
+	this.constant = constant !== undefined ? constant : 0;
 
 };
 
@@ -4060,207 +4053,6 @@ THREE.Plane.prototype = {
 
 THREE.Plane.__v1 = new THREE.Vector3();
 THREE.Plane.__v2 = new THREE.Vector3();
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Rectangle = function () {
-
-	var _left = 0;
-	var _top = 0;
-	var _right = 0;
-	var _bottom = 0;
-	var _width = 0;
-	var _height = 0;
-	var _isEmpty = true;
-
-	function resize() {
-
-		_width = _right - _left;
-		_height = _bottom - _top;
-
-	}
-
-	this.getX = function () {
-
-		return _left;
-
-	};
-
-	this.getY = function () {
-
-		return _top;
-
-	};
-
-	this.getWidth = function () {
-
-		return _width;
-
-	};
-
-	this.getHeight = function () {
-
-		return _height;
-
-	};
-
-	this.getLeft = function() {
-
-		return _left;
-
-	};
-
-	this.getTop = function() {
-
-		return _top;
-
-	};
-
-	this.getRight = function() {
-
-		return _right;
-
-	};
-
-	this.getBottom = function() {
-
-		return _bottom;
-
-	};
-
-	this.set = function ( left, top, right, bottom ) {
-
-		_isEmpty = false;
-
-		_left = left; _top = top;
-		_right = right; _bottom = bottom;
-
-		resize();
-
-	};
-
-	this.addPoint = function ( x, y ) {
-
-		if ( _isEmpty === true ) {
-
-			_isEmpty = false;
-			_left = x; _top = y;
-			_right = x; _bottom = y;
-
-			resize();
-
-		} else {
-
-			_left = _left < x ? _left : x; // Math.min( _left, x );
-			_top = _top < y ? _top : y; // Math.min( _top, y );
-			_right = _right > x ? _right : x; // Math.max( _right, x );
-			_bottom = _bottom > y ? _bottom : y; // Math.max( _bottom, y );
-
-			resize();
-		}
-
-	};
-
-	this.add3Points = function ( x1, y1, x2, y2, x3, y3 ) {
-
-		if ( _isEmpty === true ) {
-
-			_isEmpty = false;
-			_left = x1 < x2 ? ( x1 < x3 ? x1 : x3 ) : ( x2 < x3 ? x2 : x3 );
-			_top = y1 < y2 ? ( y1 < y3 ? y1 : y3 ) : ( y2 < y3 ? y2 : y3 );
-			_right = x1 > x2 ? ( x1 > x3 ? x1 : x3 ) : ( x2 > x3 ? x2 : x3 );
-			_bottom = y1 > y2 ? ( y1 > y3 ? y1 : y3 ) : ( y2 > y3 ? y2 : y3 );
-
-			resize();
-
-		} else {
-
-			_left = x1 < x2 ? ( x1 < x3 ? ( x1 < _left ? x1 : _left ) : ( x3 < _left ? x3 : _left ) ) : ( x2 < x3 ? ( x2 < _left ? x2 : _left ) : ( x3 < _left ? x3 : _left ) );
-			_top = y1 < y2 ? ( y1 < y3 ? ( y1 < _top ? y1 : _top ) : ( y3 < _top ? y3 : _top ) ) : ( y2 < y3 ? ( y2 < _top ? y2 : _top ) : ( y3 < _top ? y3 : _top ) );
-			_right = x1 > x2 ? ( x1 > x3 ? ( x1 > _right ? x1 : _right ) : ( x3 > _right ? x3 : _right ) ) : ( x2 > x3 ? ( x2 > _right ? x2 : _right ) : ( x3 > _right ? x3 : _right ) );
-			_bottom = y1 > y2 ? ( y1 > y3 ? ( y1 > _bottom ? y1 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) ) : ( y2 > y3 ? ( y2 > _bottom ? y2 : _bottom ) : ( y3 > _bottom ? y3 : _bottom ) );
-
-			resize();
-
-		};
-
-	};
-
-	this.addRectangle = function ( r ) {
-
-		if ( _isEmpty === true ) {
-
-			_isEmpty = false;
-			_left = r.getLeft(); _top = r.getTop();
-			_right = r.getRight(); _bottom = r.getBottom();
-
-			resize();
-
-		} else {
-
-			_left = _left < r.getLeft() ? _left : r.getLeft(); // Math.min(_left, r.getLeft() );
-			_top = _top < r.getTop() ? _top : r.getTop(); // Math.min(_top, r.getTop() );
-			_right = _right > r.getRight() ? _right : r.getRight(); // Math.max(_right, r.getRight() );
-			_bottom = _bottom > r.getBottom() ? _bottom : r.getBottom(); // Math.max(_bottom, r.getBottom() );
-
-			resize();
-
-		}
-
-	};
-
-	this.inflate = function ( v ) {
-
-		_left -= v; _top -= v;
-		_right += v; _bottom += v;
-
-		resize();
-
-	};
-
-	this.minSelf = function ( r ) {
-
-		_left = _left > r.getLeft() ? _left : r.getLeft(); // Math.max( _left, r.getLeft() );
-		_top = _top > r.getTop() ? _top : r.getTop(); // Math.max( _top, r.getTop() );
-		_right = _right < r.getRight() ? _right : r.getRight(); // Math.min( _right, r.getRight() );
-		_bottom = _bottom < r.getBottom() ? _bottom : r.getBottom(); // Math.min( _bottom, r.getBottom() );
-
-		resize();
-
-	};
-
-	this.intersects = function ( r ) {
-
-		// http://gamemath.com/2011/09/detecting-whether-two-boxes-overlap/
-
-		if ( _right < r.getLeft() ) return false;
-		if ( _left > r.getRight() ) return false;
-		if ( _bottom < r.getTop() ) return false;
-		if ( _top > r.getBottom() ) return false;
-
-		return true;
-
-	};
-
-	this.empty = function () {
-
-		_isEmpty = true;
-
-		_left = 0; _top = 0;
-		_right = 0; _bottom = 0;
-
-		resize();
-
-	};
-
-	this.isEmpty = function () {
-
-		return _isEmpty;
-
-	};
-
-};
 /**
  * @author bhouston / http://exocortex.com
  * @author mrdoob / http://mrdoob.com/
@@ -13450,9 +13242,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_image, _uvs,
 	_uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y,
 
-	_clipBox2 = new THREE.Box2(),
-	_clearBox2 = new THREE.Box2(),
-	_elemBox2 = new THREE.Box2(),
+	_clipBox = new THREE.Box2(),
+	_clearBox = new THREE.Box2(),
+	_elemBox = new THREE.Box2(),
 
 	_enableLighting = false,
 	_ambientLight = new THREE.Color(),
@@ -13511,10 +13303,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
 
-		_clipBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clipBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
-		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clipBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
@@ -13531,8 +13323,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.copy( color );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
@@ -13541,8 +13333,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.setHex( hex );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearBox2.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox2.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
 
@@ -13556,14 +13348,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
-		if ( _clearBox2.empty() === false ) {
+		if ( _clearBox.empty() === false ) {
 
-			_clearBox2.intersect( _clipBox2 );
-			_clearBox2.expandByScalar( 2 );
+			_clearBox.intersect( _clipBox );
+			_clearBox.expandByScalar( 2 );
 
 			if ( _clearOpacity < 1 ) {
 
-				_context.clearRect( _clearBox2.min.x | 0, _clearBox2.min.y | 0, ( _clearBox2.max.x - _clearBox2.min.x ) | 0, ( _clearBox2.max.y - _clearBox2.min.y ) | 0 );
+				_context.clearRect( _clearBox.min.x | 0, _clearBox.min.y | 0, ( _clearBox.max.x - _clearBox.min.x ) | 0, ( _clearBox.max.y - _clearBox.min.y ) | 0 );
 
 			}
 
@@ -13574,11 +13366,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				setFillStyle( 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')' );
 
-				_context.fillRect( _clearBox2.min.x | 0, _clearBox2.min.y | 0, ( _clearBox2.max.x - _clearBox2.min.x ) | 0, ( _clearBox2.max.y - _clearBox2.min.y ) | 0 );
+				_context.fillRect( _clearBox.min.x | 0, _clearBox.min.y | 0, ( _clearBox.max.x - _clearBox.min.x ) | 0, ( _clearBox.max.y - _clearBox.min.y ) | 0 );
 
 			}
 
-			_clearBox2.makeEmpty();
+			_clearBox.makeEmpty();
 
 		}
 
@@ -13609,7 +13401,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		/* DEBUG
 		_context.fillStyle = 'rgba( 0, 255, 255, 0.5 )';
-		_context.fillRect( _clipBox2.min.x, _clipBox2.min.y, _clipBox2.max.x - _clipBox2.min.x, _clipBox2.max.y - _clipBox2.min.y );
+		_context.fillRect( _clipBox.min.x, _clipBox.min.y, _clipBox.max.x - _clipBox.min.x, _clipBox.max.y - _clipBox.min.y );
 		*/
 
 		_enableLighting = _lights.length > 0;
@@ -13628,7 +13420,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( material === undefined || material.visible === false ) continue;
 
-			_elemBox2.makeEmpty();
+			_elemBox.makeEmpty();
 
 			if ( element instanceof THREE.RenderableParticle ) {
 
@@ -13644,9 +13436,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 
-				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
+				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
 
-				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
 
 					renderLine( _v1, _v2, element, material, scene );
 
@@ -13669,9 +13461,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
+				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
-				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
 
 					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
 
@@ -13700,9 +13492,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_elemBox2.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
+				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
 
-				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === true ) {
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
 
 					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
@@ -13714,17 +13506,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 			/* DEBUG
 			_context.lineWidth = 1;
 			_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
-			_context.strokeRect( _elemBox2.min.x, _elemBox2.min.y, _elemBox2.max.x - _elemBox2.min.x, _elemBox2.max.y - _elemBox2.min.y );
+			_context.strokeRect( _elemBox.min.x, _elemBox.min.y, _elemBox.max.x - _elemBox.min.x, _elemBox.max.y - _elemBox.min.y );
 			*/
 
-			_clearBox2.union( _elemBox2 );
+			_clearBox.union( _elemBox );
 
 		}
 
 		/* DEBUG
 		_context.lineWidth = 1;
 		_context.strokeStyle = 'rgba( 255, 0, 0, 0.5 )';
-		_context.strokeRect( _clearBox2.min.x, _clearBox2.min.y, _clearBox2.max.x - _clearBox2.min.x, _clearBox2.max.y - _clearBox2.min.y );
+		_context.strokeRect( _clearBox.min.x, _clearBox.min.y, _clearBox.max.x - _clearBox.min.x, _clearBox.max.y - _clearBox.min.y );
 		*/
 
 		_context.setTransform( 1, 0, 0, 1, 0, 0 );
@@ -13835,10 +13627,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 					scaleX *= element.scale.x * _canvasWidthHalf;
 					scaleY *= element.scale.y * _canvasHeightHalf;
 
-					_elemBox2.min.set( v1.x - scaleX, v1.y - scaleY );
-					_elemBox2.max.set( v1.x + scaleX, v1.y + scaleY );
+					_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
+					_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
 
-					if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
+					if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
 						return;
 
@@ -13867,10 +13659,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					// TODO: Rotations break this...
 
-					_elemBox2.min.set( v1.x - width, v1.y - height );
-					_elemBox2.max.set( v1.x + width, v1.y + height );
+					_elemBox.min.set( v1.x - width, v1.y - height );
+					_elemBox.max.set( v1.x + width, v1.y + height );
 
-					if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
+					if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
 						return;
 
@@ -13902,10 +13694,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				width = element.scale.x * _canvasWidthHalf;
 				height = element.scale.y * _canvasHeightHalf;
 
-				_elemBox2.min.set( v1.x - width, v1.y - height );
-				_elemBox2.max.set( v1.x + width, v1.y + height );
+				_elemBox.min.set( v1.x - width, v1.y - height );
+				_elemBox.max.set( v1.x + width, v1.y + height );
 
-				if ( _clipBox2.isIntersectionBox( _elemBox2 ) === false ) {
+				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
 					return;
 
@@ -13944,7 +13736,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setStrokeStyle( material.color.getStyle() );
 
 				_context.stroke();
-				_elemBox2.expandByScalar( material.linewidth * 2 );
+				_elemBox.expandByScalar( material.linewidth * 2 );
 
 			}
 
@@ -14321,7 +14113,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.stroke();
 
-			_elemBox2.expandByScalar( linewidth * 2 );
+			_elemBox.expandByScalar( linewidth * 2 );
 
 		}
 
