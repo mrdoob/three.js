@@ -35,9 +35,6 @@ THREE.Object3D = function () {
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
 
-	this.boundRadius = 0.0;
-	this.boundRadiusScale = 1.0;
-
 	this.visible = true;
 
 	this.castShadow = false;
@@ -270,7 +267,6 @@ THREE.Object3D.prototype = {
 		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
 
 			this.matrix.scale( this.scale );
-			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
 
 		}
 
@@ -336,9 +332,6 @@ THREE.Object3D.prototype = {
 
 		object.quaternion.copy( this.quaternion );
 		object.useQuaternion = this.useQuaternion;
-
-		object.boundRadius = this.boundRadius;
-		object.boundRadiusScale = this.boundRadiusScale;
 
 		object.visible = this.visible;
 

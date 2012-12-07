@@ -170,7 +170,7 @@
 						buffalo.position.x = - ( gridx - 1 ) * sepx * 0.5 + x * sepx + Math.random() * 0.5 * sepx;
 						buffalo.position.z = - ( gridz - 1 ) * sepz * 0.5 + z * sepz + Math.random() * 0.5 * sepz - 500;
 
-						buffalo.position.y = buffalo.boundRadius * 0.5;
+						buffalo.position.y = buffalo.geometry.boundingSphere.radius * 0.5;
 						buffalo.rotation.y = 0.2 - Math.random() * 0.4;
 
 						scene.add( buffalo );
