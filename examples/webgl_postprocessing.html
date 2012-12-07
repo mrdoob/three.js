@@ -53,12 +53,13 @@
 				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( var i = 0; i < 100; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
 					mesh.position.multiplyScalar( Math.random() * 400 );
 					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50;
 					object.add( mesh );
 
 				}
@@ -106,12 +107,6 @@
 
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
-				object.traverse( function ( child ) {
-					if ( child === object ) return;
-					var scale = ( Math.sin( ( child.position.distanceTo( object.position ) * 10 - time ) * 0.002 ) + 1 ) * 20;
-					child.scale.x = child.scale.y = child.scale.z = scale;
-					child.rotation.y = scale * 0.1;
-				} );
 
 				composer.render();
 
