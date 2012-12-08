@@ -26,7 +26,7 @@
 			var camera, scene, renderer;
 
 			init();
-			setInterval( render, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -87,8 +87,11 @@
 
 				//
 
-				renderer.deallocateObject( mesh );
-				renderer.deallocateTexture( texture );
+				geometry.deallocate();
+				texture.deallocate();
+
+				// renderer.deallocateObject( mesh );
+				// renderer.deallocateTexture( texture );
 
 			}
 
