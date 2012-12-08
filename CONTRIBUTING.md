@@ -1,6 +1,13 @@
 # CONTRIBUTING TO THREE.JS
 
-## Having a problem
+## 1. Index
+
+1. [Index](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#2-Index)
+2. [Having a problem](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#2-having-a-problem)
+  * [How to report](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#how-to-report)
+  * [Migrating problems](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#migrating-problems)
+
+## 2. Having a problem
 
 We use 2 different systems to have explain problems.
 
