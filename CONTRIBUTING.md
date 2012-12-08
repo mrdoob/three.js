@@ -29,5 +29,9 @@ It's hard to identify a problem without some key parts. What helps??
 
 Please check our [migrating guide](https://github.com/mrdoob/three.js/wiki/Migration) to be sure that you fixed all problems listed in there. 
 
+### Common problems
+
+[Invisible objects](https://github.com/mrdoob/three.js/wiki/Invisible-objects)
+
 
 
