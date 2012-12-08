@@ -26,12 +26,12 @@
 
 		<h3>.[page:String name]</h3>
 		<div>
-		Optional name of the object (doesn't have to be unique).
+		Optional name of the object (doesn't need to be unique).
 		</div>
 
 		<h3>.[page:Object3D parent]</h3>
 		<div>
-		Object's parent in scene graph.
+		Object's parent in the scene graph.
 		</div>
 
 		<h3>.[page:Object3D children]</h3>
@@ -46,7 +46,7 @@
 
 		<h3>.[page:Vector3 rotation]</h3>
 		<div>
-		Object's local rotation (Euler angles).
+		Object's local rotation (<a href="https://en.wikipedia.org/wiki/Euler_angles">Euler angles</a>), in radians.
 		</div>
 
 		<h3>.[page:String eulerOrder]</h3>
@@ -64,12 +64,12 @@
 		Up direction.
 		</div>
 
-		<h3>.[page:Vector3 matrix]</h3>
+		<h3>.[page:Matrix4 matrix]</h3>
 		<div>
 		Local transform.
 		</div>
 
-		<h3>.[page:Vector3 matrixRotationWorld]</h3>
+		<h3>.[page:Matrix4 matrixRotationWorld]</h3>
 		<div>
 		Global rotation.
 		</div>
@@ -85,6 +85,7 @@
 		</div>
 
 		<h3>.[page:Float boundRadius]</h3>
+		<div>Default is 0.0.</div>
 
 		<h3>.[page:Float boundRadiusScale]</h3>
 		<div>
@@ -99,16 +100,6 @@
 		<h3>.[page:Boolean visible]</h3>
 		<div>
 		Object gets rendered if *true*.
-		</div>
-
-		<h3>.[page:Boolean doubleSided]</h3>
-		<div>
-		Both sides of faces visible if *true*.
-		</div>
-
-		<h3>.[page:Boolean flipSided]</h3>
-		<div>
-		Backside of face visible if *true*.
 		</div>
 
 		<h3>.[page:Boolean castShadow]</h3>
@@ -178,6 +169,14 @@
 		</div>
 		<div>
 		Gets first child with name matching the argument. Searches whole subgraph recursively if *recursive* is true.
+		</div>
+		
+		<h3>.getDescendants( [page:Array array] )</h3>
+		<div>
+		array - optional argument that returns the the array with descendants.<br />
+		</div>
+		<div>
+		Searches whole subgraph recursively to add all objects in the array.
 		</div>
 
 		<h3>.updateMatrix()</h3>

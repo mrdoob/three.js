@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.AmbientLight = function ( hex ) {
@@ -8,5 +8,4 @@ THREE.AmbientLight = function ( hex ) {
 
 };
 
-THREE.AmbientLight.prototype = new THREE.Light();
-THREE.AmbientLight.prototype.constructor = THREE.AmbientLight; 
+THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );

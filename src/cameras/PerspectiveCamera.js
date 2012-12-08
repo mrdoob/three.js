@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
@@ -17,8 +17,7 @@ THREE.PerspectiveCamera = function ( fov, aspect, near, far ) {
 
 };
 
-THREE.PerspectiveCamera.prototype = new THREE.Camera();
-THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
+THREE.PerspectiveCamera.prototype = Object.create( THREE.Camera.prototype );
 
 
 /**
@@ -29,7 +28,7 @@ THREE.PerspectiveCamera.prototype.constructor = THREE.PerspectiveCamera;
 
 THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
-	frameHeight = frameHeight !== undefined ? frameHeight : 24;
+	if ( frameHeight === undefined ) frameHeight = 24;
 
 	this.fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
 	this.updateProjectionMatrix();

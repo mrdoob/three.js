@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -9,6 +9,8 @@
  *
  *  lightMap: new THREE.Texture( <Image> ),
  *
+ *  specularMap: new THREE.Texture( <Image> ),
+ *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
@@ -17,6 +19,7 @@
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -26,44 +29,80 @@
  *  skinning: <bool>,
  *  morphTargets: <bool>,
  *
- *	fog: <bool>
+ *  fog: <bool>
  * }
  */
 
 THREE.MeshBasicMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.color = new THREE.Color( 0xffffff ); // emissive
 
-	// color property represents emissive for MeshBasicMaterial
+	this.map = null;
 
-	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
+	this.lightMap = null;
 
-	this.map = parameters.map !== undefined ? parameters.map : null;
+	this.specularMap = null;
 
-	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
+	this.envMap = null;
+	this.combine = THREE.MultiplyOperation;
+	this.reflectivity = 1;
+	this.refractionRatio = 0.98;
 
-	this.envMap = parameters.envMap !== undefined ? parameters.envMap : null;
-	this.combine = parameters.combine !== undefined ? parameters.combine : THREE.MultiplyOperation;
-	this.reflectivity = parameters.reflectivity !== undefined ? parameters.reflectivity : 1;
-	this.refractionRatio = parameters.refractionRatio !== undefined ? parameters.refractionRatio : 0.98;
+	this.fog = true;
 
-	this.fog = parameters.fog !== undefined ? parameters.fog : true;
+	this.shading = THREE.SmoothShading;
 
-	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
+	this.wireframe = false;
+	this.wireframeLinewidth = 1;
+	this.wireframeLinecap = 'round';
+	this.wireframeLinejoin = 'round';
 
-	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
-	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
-	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
-	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
+	this.vertexColors = THREE.NoColors;
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : THREE.NoColors;
+	this.skinning = false;
+	this.morphTargets = false;
 
-	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
-	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
+	this.setValues( parameters );
 
 };
 
-THREE.MeshBasicMaterial.prototype = new THREE.Material();
-THREE.MeshBasicMaterial.prototype.constructor = THREE.MeshBasicMaterial;
+THREE.MeshBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.MeshBasicMaterial.prototype.clone = function () {
+
+	var material = new THREE.MeshBasicMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+
+	material.map = this.map;
+
+	material.lightMap = this.lightMap;
+
+	material.specularMap = this.specularMap;
+
+	material.envMap = this.envMap;
+	material.combine = this.combine;
+	material.reflectivity = this.reflectivity;
+	material.refractionRatio = this.refractionRatio;
+
+	material.fog = this.fog;
+
+	material.shading = this.shading;
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+	material.wireframeLinecap = this.wireframeLinecap;
+	material.wireframeLinejoin = this.wireframeLinejoin;
+
+	material.vertexColors = this.vertexColors;
+
+	material.skinning = this.skinning;
+	material.morphTargets = this.morphTargets;
+
+	return material;
+
+};

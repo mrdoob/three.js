@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube reflection [cars]</title>
@@ -36,7 +36,7 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl demo :
+				<a href="http://threejs.org" target="_blank">three.js</a> webgl demo :
 				texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a> :
 				<span id="car_info">
 					<span id="car_name">Bugatti Veyron model</span>
@@ -55,10 +55,10 @@
 			<div id="buttons_materials" class="bwrap"></div>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -160,18 +160,15 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// CAMERAS
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
+
 				// SCENE
 
 				scene = new THREE.Scene();
 				sceneCube = new THREE.Scene();
-
-				// CAMERAS
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				scene.add( camera );
-
-				cameraCube = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 100000 );
-				sceneCube.add( cameraCube );
 
 				// LIGHTS
 
@@ -193,26 +190,26 @@
 				// Skybox
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = textureCube;
+				shader.uniforms[ "tCube" ].value = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
-					depthWrite: false
+					depthWrite: false,
+					side: THREE.BackSide
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
-				mesh.flipSided = true;
 				sceneCube.add( mesh );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setFaceCulling( 0 );
+				renderer.setFaceCulling( THREE.CullFaceNone );
 				renderer.autoClear = false;
 
 				container.appendChild( renderer.domElement );
@@ -467,6 +464,25 @@
 
 				for( var c in CARS ) initCarButton( c );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				cameraCube.aspect = window.innerWidth / window.innerHeight;
+				cameraCube.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function initCarButton( car ) {
@@ -530,7 +546,7 @@
 
 			}
 
-			function attachButtonMaterials( materials, geometry, material_indices, car ) {
+			function attachButtonMaterials( materials, faceMaterial, material_indices, car ) {
 
 				for( var i = 0; i < materials.length; i ++ ) {
 
@@ -539,7 +555,7 @@
 
 						for ( var j = 0; j < material_indices.length; j ++ ) {
 
-							geometry.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
+							faceMaterial.materials[ material_indices [ j ] ] = materials[ this.counter ][ 1 ];
 
 						}
 
@@ -562,7 +578,7 @@
 
 				for ( var i in CARS[ car ].mmap ) {
 
-					geometry.materials[ i ] = CARS[ car ].mmap[ i ];
+					m.materials[ i ] = CARS[ car ].mmap[ i ];
 
 				}
 
@@ -579,7 +595,7 @@
 				CARS[ car ].object = mesh;
 
 				CARS[ car ].buttons = createButtons( materials.body, car );
-				attachButtonMaterials( materials.body, geometry, bm, car );
+				attachButtonMaterials( materials.body, m, bm, car );
 
 				switchCar( car );
 

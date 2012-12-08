@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - physically based shading</title>
@@ -6,39 +6,46 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 		    body {
-			color: #222;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			font-weight: bold;
+				color: #fff;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				font-weight: bold;
 
-			background-color: #fff;
-			margin: 0px;
-			overflow: hidden;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
 		    }
 
 		    #info {
-			color:#000;
-			position: relative;
-			margin: 0 auto -2.1em;
-			top: 0px;
-			width: 550px;
-			padding: 5px;
-			z-index:100;
+				position: relative;
+				margin: 0 auto -2.1em;
+				top: 0px;
+				width: 550px;
+				padding: 5px;
+				z-index:100;
 		    }
 
 		    a { color: skyblue; }
+
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #444 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl physically based shading testbed
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -47,20 +54,25 @@
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/SavePass.js"></script>
 
+		<script src="js/controls/TrackballControls.js"></script>
+
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 
-		<script src='js/DAT.GUI.min.js'></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 
 		<script>
 
 			var MARGIN = 0;
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var WIDTH = window.innerWidth || 2;
+			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
+
+			var SCREEN_WIDTH = WIDTH;
+			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
 
 			var FAR = 10000;
 
@@ -103,6 +115,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
+				// CAMERA
+
+				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
+				camera.position.set( 500, 400, 1200 );
+
 				// SCENE
 
 				scene = new THREE.Scene();
@@ -112,28 +129,6 @@
 					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
 				else
 					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
-
-
-				// CAMERA
-
-				camera = new THREE.PerspectiveCamera( 45, SCREEN_WIDTH / SCREEN_HEIGHT, 2, FAR );
-				camera.position.set( 500, 400, 1200 );
-				scene.add( camera );
-
-				controls = new THREE.TrackballControls( camera );
-				controls.target.set( 0, 120, 0 );
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.15;
-
-				controls.keys = [ 65, 83, 68 ];
 
 				// CUBE CAMERA
 
@@ -198,6 +193,7 @@
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
 				ground.position.set( 0, 0, 0 );
+				ground.rotation.x = - Math.PI / 2;
 				ground.scale.set( 1000, 1000, 1000 );
 
 				ground.receiveShadow = true;
@@ -288,7 +284,7 @@
 
 				loader.load( "models/animated/sittingBox.js", function( geometry ) {
 
-					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true  } );
+					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
 					morphMaterial.shading = THREE.FlatShading;
 
 					geometry.computeMorphNormals();
@@ -302,8 +298,6 @@
 
 					morph.castShadow = true;
 					morph.receiveShadow = true;
-
-					morph.doubleSided = true;
 
 					scene.add( morph );
 
@@ -365,6 +359,7 @@
 
 				renderer.shadowMapAutoUpdate = false;
 				renderer.shadowMapEnabled = true;
+				renderer.shadowMapType = THREE.PCFSoftShadowMap;
 
 				//
 
@@ -372,17 +367,27 @@
 				renderer.gammaOutput = true;
 				renderer.physicallyBasedShading = true;
 
+				//
+
+				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls.target.set( 0, 120, 0 );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.15;
+
+				controls.keys = [ 65, 83, 68 ];
+
+
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#222";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 				container.appendChild( stats.domElement );
 
 				// EVENTS
@@ -394,14 +399,14 @@
 
 				renderer.autoClear = false;
 
-				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
-				var effectVignette = new THREE.ShaderPass( THREE.ShaderExtras[ "vignette" ] );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				var effectVignette = new THREE.ShaderPass( THREE.VignetteShader );
 
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
 
 				var bluriness = 4;
 
@@ -437,12 +442,12 @@
 
 				tweenDirection = -1;
 
-				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
-				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.EaseOut );
+				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 
 				// GUI
 
-				gui = new DAT.GUI();
+				gui = new dat.GUI();
 
 				gui.add( shadowConfig, 'shadowCameraVisible' ).onChange( function() {
 
@@ -493,19 +498,18 @@
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-
-				composer.reset( renderTarget );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				hblur.uniforms[ 'h' ].value = 4 / SCREEN_WIDTH;
 				vblur.uniforms[ 'v' ].value = 4 / SCREEN_HEIGHT;
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
+
+				controls.handleResize();
 
 			}
 

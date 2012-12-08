@@ -1,7 +1,7 @@
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.LOD = function () {
@@ -12,9 +12,8 @@ THREE.LOD = function () {
 
 };
 
-THREE.LOD.prototype = new THREE.Object3D();
-THREE.LOD.prototype.constructor = THREE.LOD;
-THREE.LOD.prototype.supr = THREE.Object3D.prototype;
+
+THREE.LOD.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.LOD.prototype.addLevel = function ( object3D, visibleAtDistance ) {
 
@@ -74,5 +73,11 @@ THREE.LOD.prototype.update = function ( camera ) {
 		}
 
 	}
+
+};
+
+THREE.LOD.prototype.clone = function () {
+
+	// TODO
 
 };

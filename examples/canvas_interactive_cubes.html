@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - interactive - cubes</title>
@@ -15,9 +15,9 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -40,15 +40,13 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - clickable objects';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - clickable objects';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 0, 300, 500 );
 
 				scene = new THREE.Scene();
-
-				scene.add( camera );
 
 				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
 
@@ -102,6 +100,19 @@
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function onDocumentMouseDown( event ) {
@@ -111,9 +122,9 @@
 				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
 
-				var intersects = ray.intersectObjects( objects );
+				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 

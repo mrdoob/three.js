@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - shapes</title>
@@ -17,13 +17,19 @@
 	<body>
 
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
-		<script src="js/Tween.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/tween.min.js"></script>
 		<script src="js/Sparks.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FocusShader.js"></script>
+		<script src="js/shaders/HorizontalBlurShader.js"></script>
+		<script src="js/shaders/TriangleBlurShader.js"></script>
+		<script src="js/shaders/VerticalBlurShader.js"></script>
+
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
@@ -100,6 +106,9 @@
 			var _rotation = 0;
 			var timeOnShapePath = 0;
 
+			var composer;
+			var effectBlurX, effectBlurY, hblur, vblur;
+
 			init();
 			animate();
 
@@ -116,15 +125,14 @@
 				info.innerHTML = 'Three.js - simple particle systems with shapes by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br>Move your mouse. Click to pause/resume.';
 				container.appendChild( info );
 
-				// SCENE
-
-				scene = new THREE.Scene();
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 150, 400 );
-				scene.add( camera );
+
+				// SCENE
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
@@ -151,8 +159,10 @@
 
 				}
 
-				var textMaterialFront = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, opacity: 0.95 } );
-				var textMaterialSide = new THREE.MeshLambertMaterial( { color: 0xffffff } );
+				var material = new THREE.MeshFaceMaterial( [
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, opacity: 0.95 } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff } )
+				] );
 
 				var text3d = new THREE.TextGeometry( theText, {
 
@@ -170,14 +180,12 @@
 
 				});
 
-				text3d.materials = [ textMaterialFront, textMaterialSide ];
-
 				text3d.computeVertexNormals();
 				text3d.computeBoundingBox();
 
 				var centerOffset = -0.5 * ( text3d.boundingBox.max.x - text3d.boundingBox.min.x );
 
-				text = new THREE.Mesh( text3d, new THREE.MeshFaceMaterial() );
+				text = new THREE.Mesh( text3d, material );
 
 				// Potentially, we can extract the vertices or faces of the text to generate particles too.
 				// Geo > Vertices > Position
@@ -189,7 +197,7 @@
 				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
 
-						parent = new THREE.Object3D();
+				parent = new THREE.Object3D();
 				parent.add( text );
 				scene.add( parent );
 
@@ -260,7 +268,7 @@
 
 				uniforms = {
 
-					texture:   { type: "t", value: 0, texture: texture }
+					texture:   { type: "t", value: texture }
 
 				};
 
@@ -505,21 +513,21 @@
 
 				// POST PROCESSING
 
-				var effectFocus = new THREE.ShaderPass( THREE.ShaderExtras[ "focus" ] );
+				var effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
-				var effectScreen = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
+				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 				effectFilm = new THREE.FilmPass( 0.5, 0.25, 2048, false );
 
-				var shaderBlur = THREE.ShaderExtras[ "triangleBlur" ];
-				var effectBlurX = new THREE.ShaderPass( shaderBlur, 'texture' );
-				var effectBlurY = new THREE.ShaderPass( shaderBlur, 'texture' );
+				var shaderBlur = THREE.TriangleBlurShader;
+				effectBlurX = new THREE.ShaderPass( shaderBlur, 'texture' );
+				effectBlurY = new THREE.ShaderPass( shaderBlur, 'texture' );
 
 				var radius = 15;
 				var blurAmountX = radius / window.innerWidth;
 				var blurAmountY = radius / window.innerHeight;
 
-				var hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalBlur" ] );
-				var vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalBlur" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalBlurShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalBlurShader);
 
 				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
 				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
@@ -538,19 +546,49 @@
 				composer.addPass( vblur );
 				//composer.addPass( effectBlurX );
 				//composer.addPass( effectBlurY );
-				//composer.addPass( effectScreen );
+				//composer.addPass( effectCopy );
 				//composer.addPass( effectFocus );
 				//composer.addPass( effectFilm );
 
 				vblur.renderToScreen = true;
 				effectBlurY.renderToScreen = true;
 				effectFocus.renderToScreen = true;
-				effectScreen.renderToScreen = true;
+				effectCopy.renderToScreen = true;
 				effectFilm.renderToScreen = true;
 
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				//
+
+				hblur.uniforms[ 'h' ].value =  1 / window.innerWidth;
+				vblur.uniforms[ 'v' ].value =  1 / window.innerHeight;
+
+				var radius = 15;
+				var blurAmountX = radius / window.innerWidth;
+				var blurAmountY = radius / window.innerHeight;
+
+				effectBlurX.uniforms[ 'delta' ].value = new THREE.Vector2( blurAmountX, 0 );
+				effectBlurY.uniforms[ 'delta' ].value = new THREE.Vector2( 0, blurAmountY );
+
+				composer.reset();
 
 			}
 
@@ -588,7 +626,7 @@
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -601,7 +639,7 @@
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 

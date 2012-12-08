@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js misc - lights - point + directional</title>
@@ -31,13 +31,13 @@
 			<span id="rwebgl" class="button">WebGL renderer</span>
 			<br/>
 
-			<p>Best viewed in Chrome 8/9 or Firefox 4 using WebGL renderer.
+			<p>Best viewed in Chrome or Firefox using WebGL renderer.
 			<p>Canvas renderer is very slow on anything other than Chrome.
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -62,6 +62,10 @@
 			var render_canvas = 1, render_gl = 1;
 			var has_gl = 0;
 
+			var lightAdded = false;
+
+			var clock = new THREE.Clock();
+
 			var bcanvas = document.getElementById( 'rcanvas' );
 			var bwebgl = document.getElementById( 'rwebgl' );
 
@@ -79,12 +83,10 @@
 				container = document.createElement('div');
 				document.body.appendChild(container);
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
 
-				scene.add( camera );
+				scene = new THREE.Scene();
 
 				// Spheres
 
@@ -160,6 +162,23 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				SCREEN_WIDTH = window.innerWidth / 2;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				if ( canvasRenderer ) canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				if ( webglRenderer ) webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -180,25 +199,24 @@
 
 			}
 
-			var r = 0, counter = 0;
-
 			function render() {
 
-				if ( counter == 30 ) {
+				var delta = clock.getDelta();
+				var r = clock.getElapsedTime();
+
+				if ( ! lightAdded && r >= 3.0 ) {
 
 					scene.add( directionalLight );
 
 					materialTorus.needsUpdate = true;
 					materialSpheres.needsUpdate = true;
 
-				} else {
-
-					counter ++;
+					lightAdded = true;
 
 				}
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				camera.position.x += ( mouseX - camera.position.x ) * 0.05;
+				camera.position.y += ( - mouseY - camera.position.y ) * 0.05;
 
 				camera.lookAt( scene.position );
 
@@ -210,15 +228,15 @@
 
 						if ( i % 3 == 1 )
 
-							object.rotation.z += 0.05;
+							object.rotation.z += 1.5 * delta;
 
 						else if ( i % 3 == 2 )
 
-							object.rotation.y += 0.05;
+							object.rotation.y += 1.5 * delta;
 
 						else if ( i % 3 == 0 )
 
-							object.rotation.x += 0.05;
+							object.rotation.x += 1.5 * delta;
 
 					}
 
@@ -227,8 +245,6 @@
 
 				lightMesh.position.x = 200 * Math.cos( r );
 				lightMesh.position.z = 200 * Math.sin( r );
-
-				r += 0.1;
 
 				if ( render_canvas ) canvasRenderer.render( scene, camera );
 				if ( render_gl && has_gl ) webglRenderer.render( scene, camera );

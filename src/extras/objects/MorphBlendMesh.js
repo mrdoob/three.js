@@ -26,8 +26,7 @@ THREE.MorphBlendMesh = function( geometry, material ) {
 
 };
 
-THREE.MorphBlendMesh.prototype = new THREE.Mesh();
-THREE.MorphBlendMesh.prototype.constructor = THREE.MorphBlendMesh;
+THREE.MorphBlendMesh.prototype = Object.create( THREE.Mesh.prototype );
 
 THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fps ) {
 

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - materials</title>
@@ -15,9 +15,9 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -39,30 +39,27 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 				// Grid
 
+				var size = 500, step = 100;
+
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3( - 500, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 500, 0, 0 ) );
+
+				for ( var i = - size; i <= size; i += step ) {
+
+					geometry.vertices.push( new THREE.Vector3( - size, - 120, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, - 120, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, - 120, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, - 120,   size ) );
+
+				}
 
 				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
 
-				for ( var i = 0; i <= 10; i ++ ) {
-
-					var line = new THREE.Line( geometry, material );
-					line.position.y = - 120;
-					line.position.z = ( i * 100 ) - 500;
-					scene.add( line );
-
-					var line = new THREE.Line( geometry, material );
-					line.position.x = ( i * 100 ) - 500;
-					line.position.y = - 120;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.add( line );
-
-				}
+				var line = new THREE.Line( geometry, material );
+				line.type = THREE.LinePieces;
+				scene.add( line );
 
 				// Spheres
 
@@ -70,32 +67,31 @@
 
 				var materials = [
 
-					{ material: new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true } ), doubleSided: true },
-					{ material: new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending } ), doubleSided: true },
-					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } ), doubleSided: false },
-					{ material: new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: true } ), doubleSided: false },
-					{ material: new THREE.MeshDepthMaterial( { overdraw: true } ), doubleSided: false },
-					{ material: new THREE.MeshNormalMaterial( { overdraw: true } ), doubleSided: false },
-					{ material: new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ), doubleSided: false },
-					{ material: new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } ), doubleSided: false }
+					new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
+					new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending, side: THREE.DoubleSide } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, side: THREE.DoubleSide, overdraw: true } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: true } ),
+					new THREE.MeshDepthMaterial( { overdraw: true } ),
+					new THREE.MeshNormalMaterial( { overdraw: true } ),
+					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } )
 
 				];
 
 				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
 
 					var face = geometry.faces[ i ];
-					if ( Math.random() > 0.7 ) face.material = [ materials[ Math.floor( Math.random() * materials.length )  ].material ];
+					if ( Math.random() > 0.5 ) face.materialIndex = Math.floor( Math.random() * materials.length );
 
 				}
 
-				materials.push( { material: new THREE.MeshFaceMaterial(), overdraw: false, doubleSided: true } );
+				materials.push( new THREE.MeshFaceMaterial( materials ) );
 
 				objects = [];
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
-					var sphere = new THREE.Mesh( geometry, materials[ i ].material );
-					sphere.doubleSided = materials[ i ].doubleSided;
+					var sphere = new THREE.Mesh( geometry, materials[ i ] );
 
 					sphere.position.x = ( i % 5 ) * 200 - 400;
 					sphere.position.z = Math.floor( i / 5 ) * 200 - 200;
@@ -161,6 +157,19 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild(stats.domElement);
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

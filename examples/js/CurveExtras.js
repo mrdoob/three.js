@@ -16,13 +16,13 @@ THREE.Curves = {};
 
 
  THREE.Curves.GrannyKnot = THREE.Curve.create( function(){},
-                              
+
 	 function(t) {
 	    t = 2 * Math.PI * t;
 
-	    var x = -0.22 * cos(t) - 1.28 * sin(t) - 0.44 * cos(3 * t) - 0.78 * sin(3 * t);
-	    var y = -0.1 * cos(2 * t) - 0.27 * sin(2 * t) + 0.38 * cos(4 * t) + 0.46 * sin(4 * t);
-	    var z = 0.7 * cos(3 * t) - 0.4 * sin(3 * t);
+	    var x = -0.22 * Math.cos(t) - 1.28 * Math.sin(t) - 0.44 * Math.cos(3 * t) - 0.78 * Math.sin(3 * t);
+	    var y = -0.1 * Math.cos(2 * t) - 0.27 * Math.sin(2 * t) + 0.38 * Math.cos(4 * t) + 0.46 * Math.sin(4 * t);
+	    var z = 0.7 * Math.cos(3 * t) - 0.4 * Math.sin(3 * t);
 	    return new THREE.Vector3(x, y, z).multiplyScalar(20);
 	}
 );
@@ -40,7 +40,7 @@ function(t) {
 	t *= 2 * Math.PI;
 
 	var tx = 16 * Math.pow(Math.sin(t), 3);
-	ty = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t), tz = 0;
+	var ty = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t), tz = 0;
 
 	return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
 
@@ -206,9 +206,6 @@ THREE.Curves.TrefoilPolynomialKnot = THREE.Curve.create(
 
 );
 
-var sin = Math.sin,
-	pow = Math.pow,
-	cos = Math.cos;
 // var scaleTo = function(x, y) {
 //   var r = y - x;
 //   return function(t) {
@@ -234,7 +231,7 @@ THREE.Curves.FigureEightPolynomialKnot = THREE.Curve.create(
 
 		t = scaleTo(-4, 4, t);
 		var tx = 2 / 5 * t * (t * t - 7) * (t * t - 10),
-			ty = pow(t, 4) - 13 * t * t,
+			ty = Math.pow(t, 4) - 13 * t * t,
 			tz = 1 / 10 * t * (t * t - 4) * (t * t - 9) * (t * t - 12);
 
 		return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
@@ -255,9 +252,9 @@ THREE.Curves.DecoratedTorusKnot4a = THREE.Curve.create(
 
 		t *= Math.PI * 2;
 		var
-		x = cos(2 * t) * (1 + 0.6 * (cos(5 * t) + 0.75 * cos(10 * t))),
-			y = sin(2 * t) * (1 + 0.6 * (cos(5 * t) + 0.75 * cos(10 * t))),
-			z = 0.35 * sin(5 * t);
+		x = Math.cos(2 * t) * (1 + 0.6 * (Math.cos(5 * t) + 0.75 * Math.cos(10 * t))),
+			y = Math.sin(2 * t) * (1 + 0.6 * (Math.cos(5 * t) + 0.75 * Math.cos(10 * t))),
+			z = 0.35 * Math.sin(5 * t);
 
 		return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
 
@@ -276,9 +273,9 @@ THREE.Curves.DecoratedTorusKnot4b = THREE.Curve.create(
 
 	function(t) {
 		var fi = t * Math.PI * 2;
-		var x = cos(2 * fi) * (1 + 0.45 * cos(3 * fi) + 0.4 * cos(9 * fi)),
-			y = sin(2 * fi) * (1 + 0.45 * cos(3 * fi) + 0.4 * cos(9 * fi)),
-			z = 0.2 * sin(9 * fi);
+		var x = Math.cos(2 * fi) * (1 + 0.45 * Math.cos(3 * fi) + 0.4 * Math.cos(9 * fi)),
+			y = Math.sin(2 * fi) * (1 + 0.45 * Math.cos(3 * fi) + 0.4 * Math.cos(9 * fi)),
+			z = 0.2 * Math.sin(9 * fi);
 
 		return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
 
@@ -298,9 +295,9 @@ THREE.Curves.DecoratedTorusKnot5a = THREE.Curve.create(
 	function(t) {
 
 		var fi = t * Math.PI * 2;
-		var x = cos(3 * fi) * (1 + 0.3 * cos(5 * fi) + 0.5 * cos(10 * fi)),
-			y = sin(3 * fi) * (1 + 0.3 * cos(5 * fi) + 0.5 * cos(10 * fi)),
-			z = 0.2 * sin(20 * fi);
+		var x = Math.cos(3 * fi) * (1 + 0.3 * Math.cos(5 * fi) + 0.5 * Math.cos(10 * fi)),
+			y = Math.sin(3 * fi) * (1 + 0.3 * Math.cos(5 * fi) + 0.5 * Math.cos(10 * fi)),
+			z = 0.2 * Math.sin(20 * fi);
 
 		return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
 
@@ -319,9 +316,9 @@ THREE.Curves.DecoratedTorusKnot5c = THREE.Curve.create(
 	function(t) {
 
 		var fi = t * Math.PI * 2;
-		var x = cos(4 * fi) * (1 + 0.5 * (cos(5 * fi) + 0.4 * cos(20 * fi))),
-			y = sin(4 * fi) * (1 + 0.5 * (cos(5 * fi) + 0.4 * cos(20 * fi))),
-			z = 0.35 * sin(15 * fi);
+		var x = Math.cos(4 * fi) * (1 + 0.5 * (Math.cos(5 * fi) + 0.4 * Math.cos(20 * fi))),
+			y = Math.sin(4 * fi) * (1 + 0.5 * (Math.cos(5 * fi) + 0.4 * Math.cos(20 * fi))),
+			z = 0.35 * Math.sin(15 * fi);
 
 		return new THREE.Vector3(x, y, z).multiplyScalar(this.scale);
 

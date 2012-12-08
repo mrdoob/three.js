@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - vertex colors</title>
@@ -32,12 +32,12 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - vertex colors - webgl</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - vertex colors</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -61,31 +61,50 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 20, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1800;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
+				// shadow
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
+				gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				var shadowTexture = new THREE.Texture( canvas );
+				shadowTexture.needsUpdate = true;
+
+				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 				var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = - 400;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
 				mesh.position.x = 400;
+				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];
@@ -165,6 +184,22 @@
 				container.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

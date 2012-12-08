@@ -26,6 +26,11 @@
 			#loading { width: 100%; margin: 2em auto; text-align: center; position: absolute; top: 25em  }
 
 			#oldie a { color:#da0 }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
@@ -33,7 +38,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - dynamic procedural terrain using
+			<a href="http://threejs.org" target="_blank">three.js</a> - dynamic procedural terrain using
 			<a href="https://github.com/ashima/webgl-noise" target="_blank">3d simplex noise</a><br/>
 			birds by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">ro.me</a> -
 			textures by <a href="http://opengameart.org/content/dark-grass">qubodup</a> and
@@ -62,13 +67,17 @@
 			<source src="sounds/Five_Armies.ogg" type='audio/ogg'>
 		</audio>
 -->
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
 
-		<script src="js/ShaderTerrain.js"></script>
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="js/shaders/LuminosityShader.js"></script>
+		<script src="js/shaders/NormalMapShader.js"></script>
+		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -76,6 +85,11 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 		<script src="js/postprocessing/SavePass.js"></script>
+
+		<script src="js/ShaderTerrain.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragmentShaderNoise" type="x-shader/x-fragment">
 
@@ -278,17 +292,10 @@
 
 				sceneRenderTarget.add( cameraOrtho );
 
-				// SCENE (FINAL)
-
-				scene = new THREE.Scene();
-
-				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
-				scene.fog.color.setHSV( 0.102, 0.9, 0.825 );
+				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
 				camera.position.set( -1200, 800, 1200 );
-
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.target.set( 0, 0, 0 );
@@ -305,6 +312,12 @@
 
 				controls.keys = [ 65, 83, 68 ];
 
+				// SCENE (FINAL)
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
+				scene.fog.color.setHSV( 0.102, 0.9, 0.825 );
+
 				// LIGHTS
 
 				scene.add( new THREE.AmbientLight( 0x111111 ) );
@@ -320,7 +333,7 @@
 
 				// HEIGHT + NORMAL MAPS
 
-				var normalShader = THREE.ShaderExtras[ 'normalmap' ];
+				var normalShader = THREE.NormalMapShader;
 
 				var rx = 256, ry = 256;
 				var pars = { minFilter: THREE.LinearMipmapLinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
@@ -340,7 +353,7 @@
 
 				uniformsNormal.height.value = 0.05;
 				uniformsNormal.resolution.value.set( rx, ry );
-				uniformsNormal.heightMap.texture = heightMap;
+				uniformsNormal.heightMap.value = heightMap;
 
 				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
 
@@ -351,7 +364,7 @@
 				var diffuseTexture1 = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg", null, function () {
 
 					loadTextures();
-					applyShader( THREE.ShaderExtras[ 'luminosity' ], diffuseTexture1, specularMap );
+					applyShader( THREE.LuminosityShader, diffuseTexture1, specularMap );
 
 				} );
 
@@ -369,15 +382,15 @@
 
 				uniformsTerrain = THREE.UniformsUtils.clone( terrainShader.uniforms );
 
-				uniformsTerrain[ "tNormal" ].texture = normalMap;
+				uniformsTerrain[ "tNormal" ].value = normalMap;
 				uniformsTerrain[ "uNormalScale" ].value = 3.5;
 
-				uniformsTerrain[ "tDisplacement" ].texture = heightMap;
+				uniformsTerrain[ "tDisplacement" ].value = heightMap;
 
-				uniformsTerrain[ "tDiffuse1" ].texture = diffuseTexture1;
-				uniformsTerrain[ "tDiffuse2" ].texture = diffuseTexture2;
-				uniformsTerrain[ "tSpecular" ].texture = specularMap;
-				uniformsTerrain[ "tDetail" ].texture = detailTexture;
+				uniformsTerrain[ "tDiffuse1" ].value = diffuseTexture1;
+				uniformsTerrain[ "tDiffuse2" ].value = diffuseTexture2;
+				uniformsTerrain[ "tSpecular" ].value = specularMap;
+				uniformsTerrain[ "tDetail" ].value = detailTexture;
 
 				uniformsTerrain[ "enableDiffuse1" ].value = true;
 				uniformsTerrain[ "enableDiffuse2" ].value = true;
@@ -419,13 +432,11 @@
 
 				quadTarget = new THREE.Mesh( plane, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
 				quadTarget.position.z = -500;
-				quadTarget.rotation.x = Math.PI / 2;
 				sceneRenderTarget.add( quadTarget );
 
 				// TERRAIN MESH
 
 				var geometryTerrain = new THREE.PlaneGeometry( 6000, 6000, 256, 256 );
-				geometryTerrain.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 
 				geometryTerrain.computeFaceNormals();
 				geometryTerrain.computeVertexNormals();
@@ -458,13 +469,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// EVENTS
 
@@ -482,10 +487,10 @@
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 				effectBloom = new THREE.BloomPass( 0.6 );
-				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
 
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
 
 				var bluriness = 6;
 
@@ -628,13 +633,13 @@
 
 				} );
 
-				shaderMaterial.uniforms[ "tDiffuse" ].texture = texture;
+				shaderMaterial.uniforms[ "tDiffuse" ].value = texture;
 
 				var sceneTmp = new THREE.Scene();
 
 				var meshTmp = new THREE.Mesh( new THREE.PlaneGeometry( SCREEN_WIDTH, SCREEN_HEIGHT ), shaderMaterial );
 				meshTmp.position.z = -500;
-				 meshTmp.rotation.x = Math.PI / 2;
+
 				sceneTmp.add( meshTmp );
 
 				renderer.render( sceneTmp, cameraOrtho, target, true );

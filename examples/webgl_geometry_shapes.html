@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometry - shapes</title>
@@ -16,9 +16,9 @@
 	<body>
 		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 
 		<script>
@@ -54,11 +54,10 @@
 				info.innerHTML = 'Simple procedurally generated 3D shapes example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin';
 				container.appendChild( info );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 150, 500 );
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
@@ -68,9 +67,24 @@
 				parent.position.y = 50;
 				scene.add( parent );
 
-				function addGeometry( geometry, points, spacedPoints, color, x, y, z, rx, ry, rz, s ) {
+				function addShape( shape, extrudeSettings, color, x, y, z, rx, ry, rz, s ) {
+
+					var points = shape.createPointsGeometry();
+					var spacedPoints = shape.createSpacedPointsGeometry( 100 );
+
+					// flat shape
+
+					var geometry = new THREE.ShapeGeometry( shape );
+
+					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ) ] );
+					mesh.position.set( x, y, z - 125 );
+					mesh.rotation.set( rx, ry, rz );
+					mesh.scale.set( s, s, s );
+					parent.add( mesh );
 
 					// 3d shape
+
+					var geometry = new THREE.ExtrudeGeometry( shape, extrudeSettings );
 
 					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, transparent: true } ) ] );
 					mesh.position.set( x, y, z - 75 );
@@ -96,7 +110,7 @@
 
 					// vertices from real points
 
-					var pgeo = THREE.GeometryUtils.clone( points );
+					var pgeo = points.clone();
 					var particles = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.75 } ) );
 					particles.position.set( x, y, z + 75 );
 					particles.rotation.set( rx, ry, rz );
@@ -106,23 +120,22 @@
 					// transparent line from equidistance sampled points
 
 					var line = new THREE.Line( spacedPoints, new THREE.LineBasicMaterial( { color: color, opacity: 0.2 } ) );
-					line.position.set( x, y, z + 100 );
+					line.position.set( x, y, z + 125 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
 					parent.add( line );
 
 					// equidistance sampled points
 
-					var pgeo = THREE.GeometryUtils.clone( spacedPoints );
+					var pgeo = spacedPoints.clone();
 					var particles2 = new THREE.ParticleSystem( pgeo, new THREE.ParticleBasicMaterial( { color: color, size: 2, opacity: 0.5 } ) );
-					particles2.position.set( x, y, z + 100 );
+					particles2.position.set( x, y, z + 125 );
 					particles2.rotation.set( rx, ry, rz );
 					particles2.scale.set( s, s, s );
 					parent.add( particles2 );
 
 				}
 
-				var extrudeSettings = {	amount: 20,  bevelEnabled: true, bevelSegments: 2, steps: 2 }; // bevelSegments: 2, steps: 2 , bevelSegments: 5, bevelSize: 8, bevelThickness:5,
 
 				// California
 
@@ -153,9 +166,6 @@
 
 				var californiaShape = new THREE.Shape( californiaPts );
 
-				var california3d = new THREE.ExtrudeGeometry( californiaShape, { amount: 20	} );
-				var californiaPoints = californiaShape.createPointsGeometry();
-				var californiaSpacedPoints = californiaShape.createSpacedPointsGeometry( 100 );
 
 				// Triangle
 
@@ -164,10 +174,6 @@
 				triangleShape.lineTo(  40, 80 );
 				triangleShape.lineTo( 120, 80 );
 				triangleShape.lineTo(  80, 20 ); // close path
-
-				var triangle3d = triangleShape.extrude( extrudeSettings );
-				var trianglePoints = triangleShape.createPointsGeometry();
-				var triangleSpacedPoints = triangleShape.createSpacedPointsGeometry();
 
 
 				// Heart
@@ -184,11 +190,6 @@
 				heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
-				var heart3d = heartShape.extrude( extrudeSettings );
-				var heartPoints = heartShape.createPointsGeometry();
-				var heartSpacedPoints = heartShape.createSpacedPointsGeometry();
-
-				//heartShape.debug( document.getElementById("debug") );
 
 				// Square
 
@@ -201,9 +202,6 @@
 				squareShape.lineTo( sqLength, 0 );
 				squareShape.lineTo( 0, 0 );
 
-				var square3d = squareShape.extrude( extrudeSettings );
-				var squarePoints = squareShape.createPointsGeometry();
-				var squareSpacedPoints = squareShape.createSpacedPointsGeometry();
 
 				// Rectangle
 
@@ -216,20 +214,12 @@
 				rectShape.lineTo( rectLength, 0 );
 				rectShape.lineTo( 0, 0 );
 
-				var rect3d = rectShape.extrude( extrudeSettings );
-				var rectPoints = rectShape.createPointsGeometry();
-				var rectSpacedPoints = rectShape.createSpacedPointsGeometry();
 
 				// Rounded rectangle
 
 				var roundedRectShape = new THREE.Shape();
-				roundedRect( roundedRectShape, 0, 0, 50, 50, 20 );
 
-				var roundedRect3d = roundedRectShape.extrude( extrudeSettings );
-				var roundedRectPoints = roundedRectShape.createPointsGeometry();
-				var roundedRectSpacedPoints = roundedRectShape.createSpacedPointsGeometry();
-
-				function roundedRect( ctx, x, y, width, height, radius ){
+				( function roundedRect( ctx, x, y, width, height, radius ){
 
 					ctx.moveTo( x, y + radius );
 					ctx.lineTo( x, y + height - radius );
@@ -241,7 +231,8 @@
 					ctx.lineTo( x + radius, y );
 					ctx.quadraticCurveTo( x, y, x, y + radius );
 
-				}
+				} )( roundedRectShape, 0, 0, 50, 50, 20 );
+
 
 				// Circle
 
@@ -253,9 +244,6 @@
 				circleShape.quadraticCurveTo( -circleRadius, -circleRadius, -circleRadius, 0 );
 				circleShape.quadraticCurveTo( -circleRadius, circleRadius, 0, circleRadius );
 
-				var circle3d = circleShape.extrude( extrudeSettings );
-				var circlePoints = circleShape.createPointsGeometry();
-				var circleSpacedPoints = circleShape.createSpacedPointsGeometry();
 
 				// Fish
 
@@ -270,40 +258,35 @@
 				fishShape.quadraticCurveTo(x + 100, y + 10, x + 90, y + 10);
 				fishShape.quadraticCurveTo(x + 50, y + 80, x, y);
 
-				var fish3d = fishShape.extrude( extrudeSettings );
-				var fishPoints = fishShape.createPointsGeometry();
-				var fishSpacedPoints = fishShape.createSpacedPointsGeometry();
 
 				// Arc circle
 
 				var arcShape = new THREE.Shape();
 				arcShape.moveTo( 50, 10 );
-				arcShape.arc( 10, 10, 40, 0, Math.PI*2, false );
+				arcShape.absarc( 10, 10, 40, 0, Math.PI*2, false );
 
 				var holePath = new THREE.Path();
 				holePath.moveTo( 20, 10 );
-				holePath.arc( 10, 10, 10, 0, Math.PI*2, true );
+				holePath.absarc( 10, 10, 10, 0, Math.PI*2, true );
 				arcShape.holes.push( holePath );
-
-				var arc3d = arcShape.extrude( extrudeSettings );
-				var arcPoints = arcShape.createPointsGeometry();
-				var arcSpacedPoints = arcShape.createSpacedPointsGeometry();
 
 
 				// Smiley
 
 				var smileyShape = new THREE.Shape();
 				smileyShape.moveTo( 80, 40 );
-				smileyShape.arc( 40, 40, 40, 0, Math.PI*2, false );
+				smileyShape.absarc( 40, 40, 40, 0, Math.PI*2, false );
 
 				var smileyEye1Path = new THREE.Path();
 				smileyEye1Path.moveTo( 35, 20 );
-				smileyEye1Path.arc( 25, 20, 10, 0, Math.PI*2, true );
+				// smileyEye1Path.absarc( 25, 20, 10, 0, Math.PI*2, true );
+				smileyEye1Path.absellipse( 25, 20, 10, 10, 0, Math.PI*2, true );
+
 				smileyShape.holes.push( smileyEye1Path );
 
 				var smileyEye2Path = new THREE.Path();
 				smileyEye2Path.moveTo( 65, 20 );
-				smileyEye2Path.arc( 55, 20, 10, 0, Math.PI*2, true );
+				smileyEye2Path.absarc( 55, 20, 10, 0, Math.PI*2, true );
 				smileyShape.holes.push( smileyEye2Path );
 
 				var smileyMouthPath = new THREE.Path();
@@ -323,10 +306,6 @@
 				smileyShape.holes.push( smileyMouthPath );
 
 
-				var smiley3d = smileyShape.extrude( extrudeSettings );
-				var smileyPoints = smileyShape.createPointsGeometry();
-				var smileySpacedPoints = smileyShape.createSpacedPointsGeometry();
-
 				// Spline shape + path extrusion
 
 				var splinepts = [];
@@ -339,35 +318,41 @@
 				splineShape.moveTo( 0, 0 );
 				splineShape.splineThru( splinepts );
 
-				//splineShape.debug( document.getElementById("debug") );
+				// splineShape.debug( document.getElementById("debug") );
 
 				// TODO 3d path?
-				
+
 				var apath = new THREE.SplineCurve3();
 				apath.points.push(new THREE.Vector3(-50, 150, 10));
 				apath.points.push(new THREE.Vector3(-20, 180, 20));
 				apath.points.push(new THREE.Vector3(40, 220, 50));
 				apath.points.push(new THREE.Vector3(200, 290, 100));
 
+
+				var extrudeSettings = { amount: 20 }; // bevelSegments: 2, steps: 2 , bevelSegments: 5, bevelSize: 8, bevelThickness:5
+
+				// addShape( shape, color, x, y, z, rx, ry,rz, s );
+
+				addShape( californiaShape, extrudeSettings, 0xffaa00, -300, -100, 0, 0, 0, 0, 0.25 );
+
+				extrudeSettings.bevelEnabled = true;
+				extrudeSettings.bevelSegments = 2;
+				extrudeSettings.steps = 2;
+
+				addShape( triangleShape, extrudeSettings, 0xffee00, -180, 0, 0, 0, 0, 0, 1 );
+				addShape( roundedRectShape, extrudeSettings, 0x005500, -150, 150, 0, 0, 0, 0, 1 );
+				addShape( squareShape, extrudeSettings, 0x0055ff, 150, 100, 0, 0, 0, 0, 1 );
+				addShape( heartShape, extrudeSettings, 0xff1100, 60, 100, 0, 0, 0, Math.PI, 1 );
+				addShape( circleShape, extrudeSettings, 0x00ff11, 120, 250, 0, 0, 0, 0, 1 );
+				addShape( fishShape, extrudeSettings, 0x222222, -60, 200, 0, 0, 0, 0, 1 );
+				addShape( smileyShape, extrudeSettings, 0xee00ff, -200, 250, 0, 0, 0, Math.PI, 1 );
+				addShape( arcShape, extrudeSettings, 0xbb4422, 150, 0, 0, 0, 0, 0, 1 );
+
 				extrudeSettings.extrudePath = apath;
 				extrudeSettings.bevelEnabled = false;
 				extrudeSettings.steps = 20;
 
-				var splineShape3d = splineShape.extrude( extrudeSettings );
-				var splinePoints = splineShape.createPointsGeometry( );
-				var splineSpacedPoints = splineShape.createSpacedPointsGeometry( );
-
-				addGeometry( california3d, californiaPoints, californiaSpacedPoints,	0xffaa00, -300, -100, 0,     0, 0, 0, 0.25 );
-				addGeometry( triangle3d, trianglePoints, triangleSpacedPoints, 			0xffee00, -180,    0, 0,     0, 0, 0, 1 );
-				addGeometry( roundedRect3d, roundedRectPoints, roundedRectSpacedPoints,	0x005500, -150,  150, 0,     0, 0, 0, 1 );
-				addGeometry( square3d, squarePoints, squareSpacedPoints,				0x0055ff,  150,  100, 0,     0, 0, 0, 1 );
-				addGeometry( heart3d, heartPoints, heartSpacedPoints,					0xff1100,    0,  100, 0, 	 Math.PI, 0, 0, 1 );
-				addGeometry( circle3d, circlePoints, circleSpacedPoints,				0x00ff11,  120,  250, 0,     0, 0, 0, 1 );
-				addGeometry( fish3d, fishPoints, fishSpacedPoints,						0x222222,  -60,  200, 0,     0, 0, 0, 1 );
-				addGeometry( splineShape3d, splinePoints, splineSpacedPoints,			0x888888,  -50,  -100, -50,  0, 0, 0, 0.2 );
-				addGeometry( arc3d, arcPoints, arcSpacedPoints,							0xbb4422,  150,    0, 0,     0, 0, 0, 1 );
-				addGeometry( smiley3d, smileyPoints, smileySpacedPoints,				0xee00ff,  -270,    250, 0,  Math.PI, 0, 0, 1 );
-
+				addShape( splineShape, extrudeSettings, 0x888888, -50, -100, -50, 0, 0, 0, 0.2 );
 
 				//
 
@@ -384,6 +369,22 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

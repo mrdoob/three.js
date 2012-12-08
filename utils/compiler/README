@@ -146,7 +146,7 @@ the parse tree data structures were extracted and modified
 significantly for use by Google's JavaScript compiler.
 
 Local Modifications: The packages have been renamespaced. All code not
-relavant to parsing has been removed. A JSDoc parser and static typing
+relevant to parsing has been removed. A JsDoc parser and static typing
 system have been added.
 
 
@@ -171,7 +171,7 @@ lib/args4j.jar
 
 Args4j
 URL: https://args4j.dev.java.net/
-Version: 2.0.12
+Version: 2.0.16
 License: MIT
 
 Description:
@@ -187,7 +187,7 @@ lib/guava.jar
 
 Guava Libraries
 URL: http://code.google.com/p/guava-libraries/
-Version:  r08
+Version:  13.0.1
 License: Apache License 2.0
 
 Description: Google's core Java libraries.
@@ -230,7 +230,7 @@ lib/junit.jar
 
 JUnit
 URL:  http://sourceforge.net/projects/junit/
-Version:  4.8.2
+Version:  4.10
 License:  Common Public License 1.0
 
 Description: A framework for writing and running automated tests in Java.
@@ -244,7 +244,7 @@ lib/protobuf-java.jar
 
 Protocol Buffers
 URL: http://code.google.com/p/protobuf/
-Version: 2.3.0
+Version: 2.4.1
 License: New BSD License
 
 Description: Supporting libraries for protocol buffers,
@@ -281,9 +281,9 @@ Local Modifications: None
 
 ---
 Code in:
-tools/maven-ant-tasks-2.1.1.jar
+tools/maven-ant-tasks-2.1.3.jar
 URL: http://maven.apache.org
-Version 2.1.1
+Version 2.1.3
 License: Apache License 2.0
 Description:
   Maven Ant tasks are used to manage dependencies and to install/deploy to

@@ -36,12 +36,12 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src='js/DAT.GUI.min.js'></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vs" type="x-shader/x-vertex">
 
@@ -61,7 +61,7 @@
 
 			void main() {
 
-				vUv = vec2( position.x / width, 1.0 - ( position.y / height ) );
+				vUv = vec2( position.x / width, position.y / height );
 
 				vec4 color = texture2D( map, vUv );
 				float depth = ( color.r + color.g + color.b ) / 3.0;
@@ -127,7 +127,7 @@
 
 				var info = document.createElement( 'div' );
 				info.id = 'info';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - kinect';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - kinect';
 				document.body.appendChild( info );
 
 				stats = new Stats();
@@ -135,13 +135,12 @@
 				stats.domElement.style.top = '0px';
 				// container.appendChild( stats.domElement );
 
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 0, 500 );
+
 				scene = new THREE.Scene();
 				center = new THREE.Vector3();
 				center.z = - 1000;
-
-				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 0, 500 );
-				scene.add( camera );
 
 				video = document.createElement( 'video' );
 				video.addEventListener( 'loadedmetadata', function ( event ) {
@@ -149,12 +148,12 @@
 					texture = new THREE.Texture( video );
 
 					var width = 640, height = 480;
-					var nearClipping = 850/*850*/, farClipping = 4000/*4000*/;
+					var nearClipping = 850, farClipping = 4000;
 
 					geometry = new THREE.Geometry();
 
 					for ( var i = 0, l = width * height; i < l; i ++ ) {
- 
+
 						var vertex = new THREE.Vector3();
 						vertex.x = ( i % width );
 						vertex.y = Math.floor( i / width );
@@ -167,7 +166,7 @@
 
 						uniforms: {
 
-							"map": { type: "t", value: 0, texture: texture },
+							"map": { type: "t", value: texture },
 							"width": { type: "f", value: width },
 							"height": { type: "f", value: height },
 							"nearClipping": { type: "f", value: nearClipping },
@@ -179,7 +178,8 @@
 						},
 						vertexShader: document.getElementById( 'vs' ).textContent,
 						fragmentShader: document.getElementById( 'fs' ).textContent,
-						depthWrite: false
+						depthTest: false, depthWrite: false,
+						transparent: true
 
 					} );
 
@@ -199,11 +199,11 @@
 					}, 1000 / 30 );
 
 
-					var gui = new DAT.GUI();
-					gui.add( material.uniforms.nearClipping, 'value' ).name( 'nearClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
-					gui.add( material.uniforms.farClipping, 'value' ).name( 'farClipping' ).min( 1 ).max( 10000 ).step( 1.0 );
-					gui.add( material.uniforms.pointSize, 'value' ).name( 'pointSize' ).min( 1 ).max( 10 ).step( 1.0 );
-					gui.add( material.uniforms.zOffset, 'value' ).name( 'zOffset' ).min( 0 ).max( 4000 ).step( 1.0 );
+					var gui = new dat.GUI();
+					gui.add( material.uniforms.nearClipping, 'value', 1, 10000, 1.0 ).name( 'nearClipping' );
+					gui.add( material.uniforms.farClipping, 'value', 1, 10000, 1.0 ).name( 'farClipping' );
+					gui.add( material.uniforms.pointSize, 'value', 1, 10, 1.0 ).name( 'pointSize' );
+					gui.add( material.uniforms.zOffset, 'value', 0, 4000, 1.0 ).name( 'zOffset' );
 					gui.close();
 
 
@@ -219,6 +219,19 @@
 				mouse = new THREE.Vector3( 0, 0, 1 );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

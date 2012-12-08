@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  *
  * parameters = {
@@ -12,6 +12,8 @@
  *
  *  lightMap: new THREE.Texture( <Image> ),
  *
+ *  specularMap: new THREE.Texture( <Image> ),
+ *
  *  envMap: new THREE.TextureCube( [posx, negx, posy, negy, posz, negz] ),
  *  combine: THREE.Multiply,
  *  reflectivity: <float>,
@@ -20,6 +22,7 @@
  *  shading: THREE.SmoothShading,
  *  blending: THREE.NormalBlending,
  *  depthTest: <bool>,
+ *  depthWrite: <bool>,
  *
  *  wireframe: <boolean>,
  *  wireframeLinewidth: <float>,
@@ -36,44 +39,86 @@
 
 THREE.MeshLambertMaterial = function ( parameters ) {
 
-	THREE.Material.call( this, parameters );
+	THREE.Material.call( this );
 
-	parameters = parameters || {};
+	this.color = new THREE.Color( 0xffffff ); // diffuse
+	this.ambient = new THREE.Color( 0xffffff );
+	this.emissive = new THREE.Color( 0x000000 );
 
-	// color property represents diffuse for MeshLambertMaterial
-
-	this.color = parameters.color !== undefined ? new THREE.Color( parameters.color ) : new THREE.Color( 0xffffff );
-	this.ambient = parameters.ambient !== undefined ? new THREE.Color( parameters.ambient ) : new THREE.Color( 0xffffff );
-	this.emissive = parameters.emissive !== undefined ? new THREE.Color( parameters.emissive ) : new THREE.Color( 0x000000 );
-
-	this.wrapAround = parameters.wrapAround !== undefined ? parameters.wrapAround: false;
+	this.wrapAround = false;
 	this.wrapRGB = new THREE.Vector3( 1, 1, 1 );
 
-	this.map = parameters.map !== undefined ? parameters.map : null;
+	this.map = null;
 
-	this.lightMap = parameters.lightMap !== undefined ? parameters.lightMap : null;
+	this.lightMap = null;
 
-	this.envMap = parameters.envMap !== undefined ? parameters.envMap : null;
-	this.combine = parameters.combine !== undefined ? parameters.combine : THREE.MultiplyOperation;
-	this.reflectivity = parameters.reflectivity !== undefined ? parameters.reflectivity : 1;
-	this.refractionRatio = parameters.refractionRatio !== undefined ? parameters.refractionRatio : 0.98;
+	this.specularMap = null;
 
-	this.fog = parameters.fog !== undefined ? parameters.fog : true;
+	this.envMap = null;
+	this.combine = THREE.MultiplyOperation;
+	this.reflectivity = 1;
+	this.refractionRatio = 0.98;
 
-	this.shading = parameters.shading !== undefined ? parameters.shading : THREE.SmoothShading;
+	this.fog = true;
 
-	this.wireframe = parameters.wireframe !== undefined ? parameters.wireframe : false;
-	this.wireframeLinewidth = parameters.wireframeLinewidth !== undefined ? parameters.wireframeLinewidth : 1;
-	this.wireframeLinecap = parameters.wireframeLinecap !== undefined ? parameters.wireframeLinecap : 'round';
-	this.wireframeLinejoin = parameters.wireframeLinejoin !== undefined ? parameters.wireframeLinejoin : 'round';
+	this.shading = THREE.SmoothShading;
 
-	this.vertexColors = parameters.vertexColors !== undefined ? parameters.vertexColors : THREE.NoColors;
+	this.wireframe = false;
+	this.wireframeLinewidth = 1;
+	this.wireframeLinecap = 'round';
+	this.wireframeLinejoin = 'round';
 
-	this.skinning = parameters.skinning !== undefined ? parameters.skinning : false;
-	this.morphTargets = parameters.morphTargets !== undefined ? parameters.morphTargets : false;
-	this.morphNormals = parameters.morphNormals !== undefined ? parameters.morphNormals : false;
+	this.vertexColors = THREE.NoColors;
+
+	this.skinning = false;
+	this.morphTargets = false;
+	this.morphNormals = false;
+
+	this.setValues( parameters );
 
 };
 
-THREE.MeshLambertMaterial.prototype = new THREE.Material();
-THREE.MeshLambertMaterial.prototype.constructor = THREE.MeshLambertMaterial;
+THREE.MeshLambertMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.MeshLambertMaterial.prototype.clone = function () {
+
+	var material = new THREE.MeshLambertMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+	material.ambient.copy( this.ambient );
+	material.emissive.copy( this.emissive );
+
+	material.wrapAround = this.wrapAround;
+	material.wrapRGB.copy( this.wrapRGB );
+
+	material.map = this.map;
+
+	material.lightMap = this.lightMap;
+
+	material.specularMap = this.specularMap;
+
+	material.envMap = this.envMap;
+	material.combine = this.combine;
+	material.reflectivity = this.reflectivity;
+	material.refractionRatio = this.refractionRatio;
+
+	material.fog = this.fog;
+
+	material.shading = this.shading;
+
+	material.wireframe = this.wireframe;
+	material.wireframeLinewidth = this.wireframeLinewidth;
+	material.wireframeLinecap = this.wireframeLinecap;
+	material.wireframeLinejoin = this.wireframeLinejoin;
+
+	material.vertexColors = this.vertexColors;
+
+	material.skinning = this.skinning;
+	material.morphTargets = this.morphTargets;
+	material.morphNormals = this.morphNormals;
+
+	return material;
+
+};

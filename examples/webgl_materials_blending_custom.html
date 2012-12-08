@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - custom blending</title>
@@ -71,7 +71,7 @@
 			<div class="lbl" id="lbl_dst">Destination</div>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="js/Detector.js"></script>
 
 		<script>
@@ -97,15 +97,14 @@
 
 			function init() {
 
-				// SCENE
-
-				scene = new THREE.Scene();
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 70, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 1000 );
 				camera.position.z = 700;
-				scene.add( camera );
+
+				// SCENE
+
+				scene = new THREE.Scene();
 
 				// BACKGROUND IMAGES
 
@@ -178,7 +177,6 @@
 
 				var meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, -1 );
-				meshBg.rotation.x = Math.PI / 2;
 				scene.add( meshBg );
 
 				// FOREGROUND IMAGES
@@ -239,7 +237,6 @@
 
 						var mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, y, z );
-						mesh.rotation.x = Math.PI / 2;
 						mesh.matrixAutoUpdate = false;
 						mesh.updateMatrix();
 						scene.add( mesh );
@@ -260,7 +257,6 @@
 
 					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendSrc.replace( "Factor", "" ), "rgba( 0, 150, 0, 1 )" ) );
 					mesh.position.set( x, - (y - 70), z );
-					mesh.rotation.x = Math.PI / 2;
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.add( mesh );
@@ -277,7 +273,6 @@
 
 					var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blendDst.replace( "Factor", "" ), "rgba( 150, 0, 0, 1 )" ) );
 					mesh.position.set( x, - (y - 70), z );
-					mesh.rotation.x = Math.PI / 2;
 					mesh.matrixAutoUpdate = false;
 					mesh.updateMatrix();
 					scene.add( mesh );

@@ -21,12 +21,12 @@
 		<div>
 		geometry — Vertices representing the line segment(s).<br />
 		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].<br />
-		type — Connection type between vertices. Default is LineStrip.
+		type — Connection type between vertices. Default is THREE.LineStrip.
 		</div>
 
 		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
 
-		<div>Also, if no type is supplied, the default (LineStrip) will be used).</div>
+		<div>Also, if no type is supplied, the default (THREE.LineStrip) will be used).</div>
 
 		<h2>Properties</h2>
 
@@ -42,7 +42,7 @@
 
 		<h3>.[page:Integer type]</h3>
 		<div>
-		Possible values: LineStrip or LinePieces. LineStrip will draw a series of segments connecting each point (first connected to the second, the second connected to the third, and so on and so forth); and LinePieces will draw a series of pairs of segments (first connected to the second, the third connected to the fourth, and so on and so forth).</div>
+		Possible values: THREE.LineStrip or THREE.LinePieces. THREE.LineStrip will draw a series of segments connecting each point (first connected to the second, the second connected to the third, and so on and so forth); and THREE.LinePieces will draw a series of pairs of segments (first connected to the second, the third connected to the fourth, and so on and so forth).</div>
 
 		<div>
 		In OpenGL terms, LineStrip is the classic GL_LINE_STRIP and LinePieces is the equivalent to GL_LINES.

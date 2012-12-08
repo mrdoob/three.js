@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - multiple views</title>
@@ -32,12 +32,12 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - multiple views - webgl</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple views - webgl</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -108,8 +108,6 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				for (var ii =  0; ii < views.length; ++ii ) {
 
 					var view = views[ii];
@@ -120,29 +118,50 @@
 					camera.up.x = view.up[ 0 ];
 					camera.up.y = view.up[ 1 ];
 					camera.up.z = view.up[ 2 ];
-					scene.add( camera );
 					view.camera = camera;
 				}
+
+				scene = new THREE.Scene();
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
+				// shadow
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(0,0,0,0.15)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				var shadowTexture = new THREE.Texture( canvas );
+				shadowTexture.needsUpdate = true;
+
+				var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture, transparent: true } );
 				var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
 				mesh.position.y = - 250;
+				mesh.rotation.x = - Math. PI / 2;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.y = - 250;
 				mesh.position.x = - 400;
+				mesh.position.y = - 250;
+				mesh.rotation.x = - Math. PI / 2;
 				scene.add( mesh );
 
 				mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-				mesh.position.y = - 250;
 				mesh.position.x = 400;
+				mesh.position.y = - 250;
+				mesh.rotation.x = - Math. PI / 2;
 				scene.add( mesh );
 
 				var faceIndices = [ 'a', 'b', 'c', 'd' ];

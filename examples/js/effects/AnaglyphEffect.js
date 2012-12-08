@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.AnaglyphEffect = function ( renderer ) {
+THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	var eyeRight = new THREE.Matrix4();
 	var eyeLeft = new THREE.Matrix4();
@@ -17,23 +17,24 @@ THREE.AnaglyphEffect = function ( renderer ) {
 	var _cameraR = new THREE.PerspectiveCamera();
 	_cameraR.matrixAutoUpdate = false;
 
-	var _scene = new THREE.Scene();
+	var _camera = new THREE.OrthographicCamera( -1, 1, 1, - 1, 0, 1 );
 
-	var _camera = new THREE.PerspectiveCamera( 53, 1, 1, 10000 );
-	_camera.position.z = 2;
-	_scene.add( _camera );
+	var _scene = new THREE.Scene();
 
 	var _params = { minFilter: THREE.LinearFilter, magFilter: THREE.NearestFilter, format: THREE.RGBAFormat };
 
-	var _renderTargetL = new THREE.WebGLRenderTarget( 512, 512, _params );
-	var _renderTargetR = new THREE.WebGLRenderTarget( 512, 512, _params );
+	if ( width === undefined ) width = 512;
+	if ( height === undefined ) height = 512;
+
+	var _renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
+	var _renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
 	var _material = new THREE.ShaderMaterial( {
 
 		uniforms: {
 
-			"mapLeft": { type: "t", value: 0, texture: _renderTargetL },
-			"mapRight": { type: "t", value: 1, texture: _renderTargetR }
+			"mapLeft": { type: "t", value: _renderTargetL },
+			"mapRight": { type: "t", value: _renderTargetR }
 
 		},
 
@@ -43,7 +44,7 @@ THREE.AnaglyphEffect = function ( renderer ) {
 
 			"void main() {",
 
-			"	vUv = vec2( uv.x, 1.0 - uv.y );",
+			"	vUv = vec2( uv.x, uv.y );",
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
@@ -75,16 +76,15 @@ THREE.AnaglyphEffect = function ( renderer ) {
 	} );
 
 	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
-	mesh.rotation.x = Math.PI / 2;
 	_scene.add( mesh );
 
 	this.setSize = function ( width, height ) {
 
-		_renderTargetL.width = width;
-		_renderTargetL.height = height;
+		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
+		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
-		_renderTargetR.width = width;
-		_renderTargetR.height = height;
+		_material.uniforms[ "mapLeft" ].value = _renderTargetL;
+		_material.uniforms[ "mapRight" ].value = _renderTargetR;
 
 		renderer.setSize( width, height );
 
@@ -102,6 +102,8 @@ THREE.AnaglyphEffect = function ( renderer ) {
 	this.render = function ( scene, camera ) {
 
 		scene.updateMatrixWorld();
+
+		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		var hasCameraChanged = ( _aspect !== camera.aspect ) || ( _near !== camera.near ) || ( _far !== camera.far ) || ( _fov !== camera.fov );
 
@@ -158,8 +160,6 @@ THREE.AnaglyphEffect = function ( renderer ) {
 		_cameraR.far = camera.far;
 
 		renderer.render( scene, _cameraR, _renderTargetR, true );
-
-		_scene.updateMatrixWorld();
 
 		renderer.render( _scene, _camera );
 

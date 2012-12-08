@@ -4,6 +4,13 @@
 		<meta charset="utf-8">
 		<title>three.js - documentation</title>
 		<style>
+			@font-face {
+				font-family: 'inconsolata';
+				src: url('files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+			}
+
 			html {
 				height: 100%;
 			}
@@ -13,8 +20,9 @@
 				padding: 0;
 				height: 100%;
 				color: #555;
-				font-family: Arial, sans-serif;
+				font-family: 'inconsolata';
 				font-size: 15px;
+				line-height: 18px;
 				overflow: hidden;
 			}
 
@@ -36,15 +44,31 @@
 			}
 
 				#panel h1 {
-					color: #444;
-					font-size: 25px;
-					margin-top: 25px;
+					margin-top: 20px;
 					margin-left: 20px;
+					font-size: 25px;
+					font-weight: normal;
+				}
+
+				#panel h1 a {
+					color: #444;
+					text-decoration: none;
 				}
 
 				#panel h2 {
-					color: #999;
+					color: #454545;
+					font-size: 18px;
+					font-weight: normal;
+
+					margin-top: 20px;
+					margin-left: 20px;
+				}
+
+				#panel h3 {
+					color: #666;
 					font-size: 16px;
+					font-weight: normal;
+
 					margin-top: 20px;
 					margin-left: 20px;
 				}
@@ -73,24 +97,43 @@
 
 		<script src="list.js"></script>
 		<script>
-			var REVISION = '49';
+			var REVISION = '53';
 
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
-			var html = '<h1>three.js <span style="font-size: 50%; vertical-align: super;">r' + REVISION + '</span></h1>';
+			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
 
-			for ( var category in list ) {
+			var DELIMITER = '/';
+			var nameCategoryMap = {};
 
-				html += '<h2>' + category + '</h2>';
+			for ( var section in list ) {
+
+				html += '<h2>' + section + '</h2>';
 
 				html += '<ul>';
 
-				for ( var i = 0; i < list[ category ].length; i ++ ) {
+				for ( var category in list[ section ] ) {
 
-					var page = list[ category ][ i ];
+					html += '<h3>' + category + '</h3>';
 
-					html += '<li><a href="javascript:goTo(\'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+					html += '<ul>';
+
+					for ( var i = 0; i < list[ section ][ category ].length; i ++ ) {
+
+						var page = list[ section ][ category ][ i ];
+
+						html += '<li><a href="javascript:goTo(\'' + section + '\', \'' + category + '\', \'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+
+						nameCategoryMap[page[0]] = {
+							section: section,
+							category: category,
+							name: page[0]
+						};
+
+					}
+
+					html += '</ul>';
 
 				}
 
@@ -100,23 +143,48 @@
 
 			panel.innerHTML += html;
 
+			function encodeUrl( path ) {
+
+				return path.replace(/\ \/\ /g, '.').replace(/\ /g, '_');
+
+			}
+
+			function decodeUrl( path ) {
+
+				return path.replace(/_/g, ' ').replace(/\./g, ' / ');
+
+			}
+
 			// Page loading
 
-			function goTo( name ) {
+			function goTo( section, category, name ) {
 
-				var path = pages[ name ];
+				// Fully resolve links that only provide a name
+				if(arguments.length == 1) {
+					var location = nameCategoryMap[section];
+					section = location.section;
+					category = location.category;
+					name = location.name;
+				}
 
-				window.location.hash = name;
-				viewer.src = 'api/' + path + '.html';
+				var title = 'three.js - documentation - ' + section + ' - ' + name;
+				var url = encodeUrl(section) + DELIMITER + encodeUrl( category ) + DELIMITER + encodeUrl(name);
+
+				window.location.hash = url;
+				window.document.title = title;
+
+
+				viewer.src = pages[ section ][ category ][ name ] + '.html';
 
 			}
 
 			function goToHash() {
 
-				goTo( window.location.hash.substring( 1 ) );
+				var hash = window.location.hash.substring( 1 ).split(DELIMITER);
+				goTo( decodeUrl(hash[0]), decodeUrl(hash[1]), decodeUrl(hash[2]) );
 
 			}
-			
+
 			window.addEventListener( 'hashchange', goToHash, false );
 
 			if ( window.location.hash.length > 0 ) goToHash();

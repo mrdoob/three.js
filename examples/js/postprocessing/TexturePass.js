@@ -2,14 +2,17 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.TexturePass = function( texture, opacity ) {
+THREE.TexturePass = function ( texture, opacity ) {
 
-	var shader = THREE.ShaderExtras[ "screen" ];
+	if ( THREE.CopyShader === undefined )
+		console.error( "THREE.TexturePass relies on THREE.CopyShader" );
+
+	var shader = THREE.CopyShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 	this.uniforms[ "opacity" ].value = ( opacity !== undefined ) ? opacity : 1.0;
-	this.uniforms[ "tDiffuse" ].texture = texture;
+	this.uniforms[ "tDiffuse" ].value = texture;
 
 	this.material = new THREE.ShaderMaterial( {
 

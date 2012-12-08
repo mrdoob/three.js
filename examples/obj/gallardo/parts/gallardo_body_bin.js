@@ -2,7 +2,7 @@
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "gallardo_body.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 59791,

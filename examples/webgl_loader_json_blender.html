@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - collada - blender</title>
@@ -24,20 +24,26 @@
 			}
 
 			a { color: red }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
+
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+			<a href="http://threejs.org" target="_blank">three.js</a> -
 			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -56,7 +62,7 @@
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( 'models/collada/monster/monster.dae', function colladaReady( collada ) {
+			loader.load( 'models/collada/monster/monster.dae', function ( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
@@ -75,27 +81,25 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.FogExp2( 0x000000, 0.035 );
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 2, 4, 5 );
-				scene.add( camera );
 
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.035 );
 
 				// Add Blender exported Collada model
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "models/animated/monster/monster.js", function ( geometry ) {
+				loader.load( 'models/animated/monster/monster.js', function ( geometry, materials ) {
 
 					// adjust color a bit
 
-					var material = geometry.materials[ 0 ];
+					var material = materials[ 0 ];
 					material.morphTargets = true;
 					material.color.setHex( 0xffaaaa );
 					material.ambient.setHex( 0x222222 );
 
-					var faceMaterial = new THREE.MeshFaceMaterial();
+					var faceMaterial = new THREE.MeshFaceMaterial( materials );
 
 					for ( var i = 0; i < 729; i ++ ) {
 
@@ -158,13 +162,7 @@
 				// Stats
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// Events
 

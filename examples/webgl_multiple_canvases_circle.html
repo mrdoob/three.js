@@ -128,7 +128,7 @@
     </div>
   </div>
 
-	<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - multiple canvases - circle</div>
+	<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple canvases - circle</div>
   <div id="help" gstyle="display: none">
     <div>
     This example is shows how to setup multi-monitor displays like <a href="http://code.google.com/p/liquid-galaxy/">Google's Liquid Galaxy using three.js</a>.
@@ -137,7 +137,7 @@
     </div>
   </div>
 
-		<script type="text/javascript" src="../build/Three.js"></script>
+		<script type="text/javascript" src="../build/three.min.js"></script>
 
 		<script type="text/javascript" src="js/Detector.js"></script>
 
@@ -222,14 +222,32 @@
 
 					var noof_balls = 51;
 
-					var shadowMaterial = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/shadow.png' ) } );
+					// shadow
+
+					var canvas = document.createElement( 'canvas' );
+					canvas.width = 128;
+					canvas.height = 128;
+
+					var context = canvas.getContext( '2d' );
+					var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+					gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
+					gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
+
+					context.fillStyle = gradient;
+					context.fillRect( 0, 0, canvas.width, canvas.height );
+
+					var shadowTexture = new THREE.Texture( canvas );
+					shadowTexture.needsUpdate = true;
+
+					var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
 					var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
 
 					for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
 
 						var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
-						mesh.position.y = - 250;
 						mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i * 400;
+						mesh.position.y = - 250;
+						mesh.rotation.x = - Math.PI / 2;
 						scene.add( mesh );
 
 					}

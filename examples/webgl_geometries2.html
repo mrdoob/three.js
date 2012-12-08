@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - geometries</title>
@@ -15,21 +15,24 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
-		<script src="../src/core/Geometry.js"></script>
-		<script src="js/CurveExtras.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/UVsUtils.js"></script>
+		<!--
+		<script src="../src/core/Geometry.js"></script>
 		<script src="../src/extras/geometries/ParametricGeometry.js"></script>
-		<script src="../src/extras/geometries/ParametricGeometries.js"></script>
+		-->
+
+		<script src="js/CurveExtras.js"></script>
+		<script src="js/UVsUtils.js"></script>
+		<script src="js/ParametricGeometries.js"></script>
 		<script>
 
 			/* Testing the new Parametric Surfaces Geometries*/
 
-			
+
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
@@ -44,11 +47,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.y = 400;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				var light, object, materials;
 
@@ -58,9 +60,13 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
+				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 16;
+
 				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
 				];
 
 
@@ -70,12 +76,14 @@
 				var radius = 150, tube = 10, segmentsR = 50, segmentsT = 20;
 
 				var GrannyKnot =  new THREE.Curves.GrannyKnot();
+
+				var torus2 = new THREE.ParametricGeometries.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
+				var sphere2 = new THREE.ParametricGeometries.SphereGeometry( 75, 20, 10 );
+				var tube2 = new THREE.ParametricGeometries.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
+
 				// var torus = new THREE.TorusKnotGeometry( radius, tube, segmentsR, segmentsT, p , q, heightScale );
-				var torus2 = new THREE.TorusKnotGeometry2( radius, tube, segmentsR, segmentsT, p , q, heightScale );
 				// var sphere = new THREE.SphereGeometry( 75, 20, 10 );
-				var sphere2 = new THREE.SphereGeometry2( 75, 20, 10 );
-				// var tube = new THREE.TubeGeometry(GrannyKnot, 150, 2, 8, true, false);
-				var tube2 = new THREE.TubeGeometry2(GrannyKnot, 150, 2, 8, true, false);
+				// var tube = new THREE.TubeGeometry( GrannyKnot, 150, 2, 8, true, false );
 
 
 				// var benchmarkCopies = 1000;
@@ -91,26 +99,26 @@
 				var geo;
 
 				// Klein Bottle
-				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.klein, 20, 20);
+
+				geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.klein, 20, 20 );
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
-				object.children[ 0 ].doubleSided = true;
 				object.position.set( 0, 0, 0 );
-				object.scale.multiplyScalar(10);
+				object.scale.multiplyScalar( 10 );
 				scene.add( object );
 
 				// Mobius Strip
-				geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.mobius, 20, 20);
+
+				geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.mobius, 20, 20 );
 				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
-				// object.children[ 0 ].doubleSided = true;
 				object.position.set( 10, 0, 0 );
-				object.scale.multiplyScalar(100);
+				object.scale.multiplyScalar( 100 );
 				scene.add( object );
 
-				// var geo = new THREE.ParametricGeometry(THREE.ParametricGeometries.plane(200, 200), 10, 10);
-				// THREE.UVsDebug( geo );
+				var geo = new THREE.ParametricGeometry( THREE.ParametricGeometries.plane( 200, 200 ), 10, 20 );
 				// document.body.appendChild( THREE.UVsDebug( geo ));
-				// object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
-
+				object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
+				object.position.set( 0, 0, 0 );
+				scene.add( object );
 
 				// object = THREE.SceneUtils.createMultiMaterialObject( torus, materials );
 				// object.position.set( 0, 0, 0 );
@@ -128,6 +136,7 @@
 				//  scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( sphere2, materials );
+				// document.body.appendChild( THREE.UVsDebug( sphere2 ));
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
@@ -141,18 +150,15 @@
 
 
 				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 400, 400, 4, 4 ), materials );
-				// // object.children[ 0 ].doubleSided = true;
 				// object.position.set( -200, 100, 0 );
 				// scene.add( object );
 
 				// object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry2( 400, 400, 4, 4 ), materials );
-				// object.children[ 0 ].doubleSided = true;
 				// object.position.set( -200, 100, 0 );
 				// scene.add( object );
 
-				object = new THREE.AxisHelper();
+				object = new THREE.AxisHelper( 50 );
 				object.position.set( 200, 0, -200 );
-				object.scale.x = object.scale.y = object.scale.z = 0.5;
 				scene.add( object );
 
 				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
@@ -168,6 +174,19 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -195,8 +214,8 @@
 
 					var object = scene.children[ i ];
 
-					object.rotation.x += 0.01;
-					object.rotation.y += 0.005;
+					object.rotation.x = timer * 5;
+					object.rotation.y = timer * 2.5;
 
 				}
 

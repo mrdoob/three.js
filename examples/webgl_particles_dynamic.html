@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - particles - dynamic - postprocessing</title>
@@ -33,16 +33,19 @@
 
 		<div id="container"></div>
 		<div id="info">
-				<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl dynamic particles + postprocessing
+				<a href="http://threejs.org" target="_blank">three.js</a> - webgl dynamic particles + postprocessing
 				- models by <a href="http://sketchup.google.com/3dwarehouse/details?mid=2c6fd128fca34052adc5f5b98d513da1" target="_blank">Reallusion</a>
 				<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255" target="_blank">iClone</a>,
 				<a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a>
 
 			</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FilmShader.js"></script>
+		<script src="js/shaders/FocusShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
@@ -83,13 +86,13 @@
 
 				container = document.getElementById( 'container' );
 
+				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 50000 );
+				camera.position.set( 0, 700, 7000 );
+
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0x000104, 0.0000675 );
 
-				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 50000 );
-				camera.position.set( 0, 700, 7000 );
 				camera.lookAt( scene.position );
-				scene.add( camera );
 
 				//
 
@@ -149,6 +152,7 @@
 
 				var grid = new THREE.ParticleSystem( new THREE.PlaneGeometry( 15000, 15000, 64, 64 ), new THREE.ParticleBasicMaterial( { color: 0xff0000, size: 10 } ) );
 				grid.position.y = -400;
+				grid.rotation.x = - Math.PI / 2;
 				parent.add( grid );
 
 				totaln += 1;
@@ -160,7 +164,7 @@
 				var effectBloom = new THREE.BloomPass( 0.75 );
 				var effectFilm = new THREE.FilmPass( 0.5, 0.5, 1448, false );
 
-				effectFocus = new THREE.ShaderPass( THREE.ShaderExtras[ "focus" ] );
+				effectFocus = new THREE.ShaderPass( THREE.FocusShader );
 
 				effectFocus.uniforms[ "screenWidth" ].value = window.innerWidth;
 				effectFocus.uniforms[ "screenHeight" ].value = window.innerHeight;

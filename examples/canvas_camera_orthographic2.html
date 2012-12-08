@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - combo camera - orthographic + perspective</title>
@@ -20,13 +20,13 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="../src/extras/cameras/CombinedCamera.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<div style="position: absolute; top: 10px; width: 100%; text-align: center; ">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - Combo Camera<br>
+			<a href="http://threejs.org" target="_blank">three.js</a> - Combo Camera<br>
 			View: <a href="#" onclick="setOrthographic();return false;"> Orthographic</a> |
 				<a href="#" onclick="setPerspective();return false;">Perspective</a><br>
 			Lens: <a href="#" onclick="setLens(12);return false;">12mm</a> |
@@ -114,26 +114,27 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 				// Grid
 
+				var size = 500, step = 50;
+
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3( - 500, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 500, 0, 0 ) );
 
-				for ( var i = 0; i <= 20; i ++ ) {
+				for ( var i = - size; i <= size; i += step ) {
 
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
-					line.position.z = ( i * 50 ) - 500;
-					scene.add( line );
+					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
 
-					var line = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } ) );
-					line.position.x = ( i * 50 ) - 500;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.add( line );
+					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
 
 				}
+
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
+
+				var line = new THREE.Line( geometry, material );
+				line.type = THREE.LinePieces;
+				scene.add( line );
 
 				// Cubes
 

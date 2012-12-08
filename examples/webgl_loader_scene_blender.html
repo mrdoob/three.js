@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - scene loader [blender]</title>
@@ -130,7 +130,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js">three.js</a> - scene loader test [blender]
+			<a href="http://threejs.org">three.js</a> - scene loader test [blender]
 		</div>
 
 		<div id="scene_explorer">
@@ -147,10 +147,10 @@
 			</center>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -221,8 +221,9 @@
 				document.body.appendChild( container );
 
 				var loadScene = createLoadScene();
-				scene  = loadScene.scene;
+
 				camera = loadScene.camera;
+				scene = loadScene.scene;
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
@@ -278,6 +279,22 @@
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function setButtonActive( id ) {
@@ -290,11 +307,11 @@
 
 				$( "progress" ).style.display = "none";
 
-				scene = loaded.scene;
 				camera = loaded.currentCamera;
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+
+				scene = loaded.scene;
 
 				renderer.setClearColor( loaded.bgColor, loaded.bgAlpha );
 

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials</title>
@@ -15,10 +15,10 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -39,16 +39,14 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 200, 800 );
-				scene.add( camera );
 
+				scene = new THREE.Scene();
 
 				// Grid
 
-				var line_material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } ),
+				var line_material = new THREE.LineBasicMaterial( { color: 0x303030 } ),
 					geometry = new THREE.Geometry(),
 					floor = -75, step = 25;
 
@@ -98,22 +96,13 @@
 				for ( var i = 0, l = geometry_pieces.faces.length; i < l; i ++ ) {
 
 					var face = geometry_pieces.faces[ i ];
-
-					if ( Math.random() > 0.7 )  {
-
-						face.materialIndex = Math.floor( Math.random() * materials.length );
-
-					} else {
-
-						face.materialIndex = 0;
-
-					}
+					face.materialIndex = Math.floor( Math.random() * materials.length );
 
 				}
 
 				geometry_pieces.materials = materials;
 
-				materials.push( new THREE.MeshFaceMaterial() );
+				materials.push( new THREE.MeshFaceMaterial( materials ) );
 
 				objects = [];
 
@@ -175,6 +164,19 @@
 				stats.domElement.style.top = '0px';
 
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

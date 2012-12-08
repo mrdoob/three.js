@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  */
 
@@ -14,8 +14,7 @@ THREE.Camera = function () {
 
 };
 
-THREE.Camera.prototype = new THREE.Object3D();
-THREE.Camera.prototype.constructor = THREE.Camera;
+THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Camera.prototype.lookAt = function ( vector ) {
 
@@ -23,9 +22,17 @@ THREE.Camera.prototype.lookAt = function ( vector ) {
 
 	this.matrix.lookAt( this.position, vector, this.up );
 
-	if ( this.rotationAutoUpdate ) {
+	if ( this.rotationAutoUpdate === true ) {
 
-		this.rotation.getRotationFromMatrix( this.matrix );
+		if ( this.useQuaternion === false )  {
+
+			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+
+		} else {
+
+			this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+
+		}
 
 	}
 

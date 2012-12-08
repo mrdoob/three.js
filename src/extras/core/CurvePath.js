@@ -16,8 +16,7 @@ THREE.CurvePath = function () {
 	this.autoClose = false; // Automatically closes the path
 };
 
-THREE.CurvePath.prototype = new THREE.Curve();
-THREE.CurvePath.prototype.constructor = THREE.CurvePath;
+THREE.CurvePath.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.CurvePath.prototype.add = function ( curve ) {
 
@@ -141,15 +140,17 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 
 	var points = this.getPoints();
 
-	var maxX, maxY;
-	var minX, minY;
+	var maxX, maxY, maxZ;
+	var minX, minY, minZ;
 
 	maxX = maxY = Number.NEGATIVE_INFINITY;
 	minX = minY = Number.POSITIVE_INFINITY;
 
 	var p, i, il, sum;
 
-	sum = new THREE.Vector2();
+	var v3 = points[0] instanceof THREE.Vector3;
+
+	sum = v3 ? new THREE.Vector3() : new THREE.Vector2();
 
 	for ( i = 0, il = points.length; i < il; i ++ ) {
 
@@ -159,21 +160,37 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 		else if ( p.x < minX ) minX = p.x;
 
 		if ( p.y > maxY ) maxY = p.y;
-		else if ( p.y < maxY ) minY = p.y;
+		else if ( p.y < minY ) minY = p.y;
 
-		sum.addSelf( p.x, p.y );
+		if (v3) {
+
+			if ( p.z > maxZ ) maxZ = p.z;
+			else if ( p.z < minZ ) minZ = p.z;
+
+		}
+
+		sum.addSelf( p );
 
 	}
 
-	return {
+	var ret = {
 
 		minX: minX,
 		minY: minY,
 		maxX: maxX,
 		maxY: maxY,
 		centroid: sum.divideScalar( il )
-
+	
 	};
+
+	if (v3) {
+
+		ret.maxZ = maxZ;
+		ret.minZ = minZ;
+	
+	}
+
+	return ret;
 
 };
 
@@ -205,7 +222,7 @@ THREE.CurvePath.prototype.createGeometry = function( points ) {
 
 	for ( var i = 0; i < points.length; i ++ ) {
 
-		geometry.vertices.push( new THREE.Vector3( points[ i ].x, points[ i ].y, 0 ) );
+		geometry.vertices.push( new THREE.Vector3( points[ i ].x, points[ i ].y, points[ i ].z || 0) );
 
 	}
 

@@ -22,12 +22,17 @@
 
 			.h { color: skyblue }
 			.c { display: inline; margin-left: 1em }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #888 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl dynamic cube reflection demo -
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl dynamic cube reflection demo -
 			veyron by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1129" target="_blank">Troyano</a> -
 			gallardo by <a href="http://artist-3d.com/free_3d_models/dnm/model_disp.php?uid=1711" target="_blank">machman_3d</a>
 		</div>
@@ -52,12 +57,20 @@
 			</div>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/BlendShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
+		<script src="js/shaders/TriangleBlurShader.js"></script>
+		<script src="js/shaders/VignetteShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
@@ -76,15 +89,18 @@
 
 			var MARGIN = 100;
 
-			var SCREEN_WIDTH = window.innerWidth;
-			var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
+			var WIDTH = window.innerWidth || 2;
+			var HEIGHT = window.innerHeight || ( 2 + 2 * MARGIN );
+
+			var SCREEN_WIDTH = WIDTH;
+			var SCREEN_HEIGHT = HEIGHT - 2 * MARGIN;
 
 			var SHADOW_MAP_WIDTH = 1024, SHADOW_MAP_HEIGHT = 1024;
 
 			var container, stats;
 
 			var camera, cameraTarget, scene, renderer;
-			var renderTarget, renderTargetParameters;
+			var renderTarget;
 
 			var spotLight, ambientLight;
 
@@ -137,24 +153,16 @@
 
 				container = document.getElementById( 'container' );
 
-				// SCENE
+				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera.position.set( 2000, 0, 2000 );
+
+				cameraTarget = new THREE.Vector3();
 
 				scene = new THREE.Scene();
-
 				scene.fog = new THREE.Fog( 0xffffff, 3000, 10000 );
 				scene.fog.color.setHSV( 0.51, 0.5, 0.9 );
 
 				createScene();
-
-				// SCENE CAMERA
-
-				camera = new THREE.PerspectiveCamera( 18, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
-				camera.position.set( 2000, 0, 2000 );
-
-				cameraTarget = new THREE.Vector3( 0, 0, 0 );
-
-				scene.add( camera );
-
 
 				// LIGHTS
 
@@ -176,7 +184,6 @@
 				spotLight.shadowMapHeight = SHADOW_MAP_HEIGHT;
 
 				scene.add( spotLight );
-				scene.add( spotLight.target );
 
 				directionalLight2 = new THREE.PointLight( 0xff9900, 0.25 );
 				directionalLight2.position.set( 0.5, -1, 0.5 );
@@ -198,20 +205,13 @@
 
 				// SHADOW
 
-				renderer.shadowMapCullFrontFaces = false;
+				renderer.shadowMapCullFace = THREE.CullFaceBack;
 				renderer.shadowMapEnabled = true;
 
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#888";
-				stats.domElement.children[ 0 ].style.background = "#000";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// CUBE CAMERA
 
@@ -304,9 +304,13 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
-						sprite.scale.set( s, s, s );
+						var spriteWidth = 128;
+						var spriteHeight = 128;
+
+						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
 
 						object.bodyMesh.add( sprite );
@@ -369,9 +373,13 @@
 						var y = flares[ i ][ 2 ][ 1 ];
 						var z = flares[ i ][ 2 ][ 2 ];
 
-						var sprite = new THREE.Sprite( p );
+						var material = new THREE.SpriteMaterial( p );
+						var sprite = new THREE.Sprite( material );
 
-						sprite.scale.set( s, s, s );
+						var spriteWidth = 128;
+						var spriteHeight = 128;
+
+						sprite.scale.set( s * spriteWidth, s * spriteHeight, s );
 						sprite.position.set( x, y, z );
 
 						object.bodyMesh.add( sprite );
@@ -404,24 +412,24 @@
 
 				renderer.autoClear = false;
 
-				renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
+				var renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBuffer: false };
 				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
 
 				effectSave = new THREE.SavePass( new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters ) );
 
-				effectBlend = new THREE.ShaderPass( THREE.ShaderExtras[ "blend" ], "tDiffuse1" );
+				effectBlend = new THREE.ShaderPass( THREE.BlendShader, "tDiffuse1" );
 
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
-				var effectVignette = new THREE.ShaderPass( THREE.ShaderExtras[ "vignette" ] );
-				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
+				var effectVignette = new THREE.ShaderPass( THREE.VignetteShader );
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
 				effectBloom = new THREE.BloomPass( 0.75 );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / SCREEN_WIDTH, 1 / SCREEN_HEIGHT );
 
 				// tilt shift
 
-				hblur = new THREE.ShaderPass( THREE.ShaderExtras[ "horizontalTiltShift" ] );
-				vblur = new THREE.ShaderPass( THREE.ShaderExtras[ "verticalTiltShift" ] );
+				hblur = new THREE.ShaderPass( THREE.HorizontalTiltShiftShader );
+				vblur = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
 
 				var bluriness = 7;
 
@@ -451,7 +459,7 @@
 
 				// motion blur
 
-				effectBlend.uniforms[ 'tDiffuse2' ].texture = effectSave.renderTarget;
+				effectBlend.uniforms[ 'tDiffuse2' ].value = effectSave.renderTarget;
 				effectBlend.uniforms[ 'mixRatio' ].value = 0.65;
 
 				var renderModel = new THREE.RenderPass( scene, camera );
@@ -495,7 +503,7 @@
 
 				for ( var i = 0; i < sprites.length; i ++ ) {
 
-					sprites[ i ].opacity = opacity;
+					sprites[ i ].material.opacity = opacity;
 
 				}
 
@@ -517,6 +525,7 @@
 
 				ground = new THREE.Mesh( new THREE.PlaneGeometry( 50000, 50000 ), groundBasic );
 				ground.position.y = - 215;
+				ground.rotation.x = - Math.PI / 2;
 				scene.add( ground );
 
 				ground.castShadow = false;
@@ -548,24 +557,40 @@
 
 				var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: color, ambient: color } ) );
 				object.position.set( x, y, z );
-				scene.add( object );
-
 				object.castShadow = true;
 				object.receiveShadow = true;
+				scene.add( object );
 
-				var shadowTexture = THREE.ImageUtils.loadTexture( "textures/shadowAlpha.png" );
+				//
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 128;
+				canvas.height = 128;
+
+				var context = canvas.getContext( '2d' );
+				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				gradient.addColorStop( 0.1, 'rgba(0,0,0,1)' );
+				gradient.addColorStop( 1, 'rgba(0,0,0,0)' );
+
+				context.fillStyle = gradient;
+				context.fillRect( 0, 0, canvas.width, canvas.height );
+
+				//
+
+				var shadowTexture = new THREE.Texture( canvas );
+				shadowTexture.needsUpdate = true;
 
 				var shadowPlane = new THREE.PlaneGeometry( 400, 400 );
 				var shadowMaterial = new THREE.MeshBasicMaterial( {
 
-					color: 0xff0000, opacity: 0.35, transparent: true, map: shadowTexture,
+					opacity: 0.35, transparent: true, map: shadowTexture,
 					polygonOffset: false, polygonOffsetFactor: -0.5, polygonOffsetUnits: 1
 
 				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
 				shadow.position.y = sy;
-				shadow.rotation.y = Math.PI / 2;
+				shadow.rotation.x = - Math.PI / 2;
 
 				object.add( shadow );
 
@@ -579,7 +604,7 @@
 				var shadowTarget = new THREE.WebGLRenderTarget( width, height, renderTargetParameters );
 
 				var shadowMaterial = new THREE.MeshBasicMaterial( { color: 0x000000 } );
-				var shadowGeometry = THREE.GeometryUtils.clone( object.geometry );
+				var shadowGeometry = object.geometry.clone();
 
 				var shadowObject = new THREE.Mesh( shadowGeometry, shadowMaterial );
 
@@ -616,7 +641,7 @@
 
 				var renderShadow = new THREE.RenderPass( shadowScene, topCamera );
 
-				var blurShader = THREE.ShaderExtras[ "triangleBlur" ];
+				var blurShader = THREE.TriangleBlurShader;
 				var effectBlurX = new THREE.ShaderPass( blurShader, 'texture' );
 				var effectBlurY = new THREE.ShaderPass( blurShader, 'texture' );
 
@@ -671,7 +696,7 @@
 				object.bodyMesh.geometry.computeBoundingBox();
 				var bb = object.bodyMesh.geometry.boundingBox;
 
-				var ss = object.modelScale * 1.0;
+				var ss = object.modelScale * 1.1;
 				var shadowWidth  =        ss * ( bb.max.z - bb.min.z );
 				var shadowHeight = 1.25 * ss * ( bb.max.x - bb.min.x );
 
@@ -682,8 +707,9 @@
 				} );
 
 				var shadow = new THREE.Mesh( shadowPlane, shadowMaterial );
-				shadow.rotation.y = Math.PI / 2;
 				shadow.position.y = s + 10;
+				shadow.rotation.x = - Math.PI / 2;
+				shadow.rotation.z = Math.PI / 2;
 
 				object.root.add( shadow );
 
@@ -742,14 +768,11 @@
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
 				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 				camera.updateProjectionMatrix();
 
-				renderTarget = new THREE.WebGLRenderTarget( SCREEN_WIDTH, SCREEN_HEIGHT, renderTargetParameters );
-
-				composer.reset( renderTarget );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				composer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				hblur.uniforms[ 'h' ].value = 10.75 / SCREEN_WIDTH;
 				vblur.uniforms[ 'v' ].value = 10.75 / SCREEN_HEIGHT;
@@ -818,14 +841,14 @@
 
 				// BODY
 
-				var materials = car.bodyGeometry.materials;
+				var materials = car.bodyMaterials;
 
 				materials[ 0 ] = mlib.body[ 0 ][ 1 ]; 		// body
 				materials[ 1 ] = mlib[ "Dark chrome" ]; 	// front under lights, back
 
 				// WHEELS
 
-				materials = car.wheelGeometry.materials;
+				materials = car.wheelMaterials;
 
 				materials[ 0 ] = mlib[ "Chrome" ];			// insides
 				materials[ 1 ] = mlib[ "Black rough" ];	// tire
@@ -845,7 +868,7 @@
 
 				// BODY
 
-				var materials = car.bodyGeometry.materials;
+				var materials = car.bodyMaterials;
 
 				materials[ 0 ] = mlib[ "Black metal" ];	// top, front center, back sides
 				materials[ 1 ] = mlib[ "Chrome" ];			// front sides
@@ -858,7 +881,7 @@
 
 				// WHEELS
 
-				materials = car.wheelGeometry.materials;
+				materials = car.wheelMaterials;
 
 				materials[ 0 ] = mlib[ "Chrome" ];			// insides
 				materials[ 1 ] = mlib[ "Black rough" ];	// tire
@@ -903,16 +926,16 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ] = mlib[ "ChromeN" ];
-						veyron.bodyGeometry.materials[ 2 ] = mlib[ "ChromeN" ];
+						veyron.bodyMaterials[ 1 ] = mlib[ "ChromeN" ];
+						veyron.bodyMaterials[ 2 ] = mlib[ "ChromeN" ];
 
-						veyron.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
+						veyron.wheelMaterials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "ChromeN" ];
+						gallardo.wheelMaterials[ 0 ] = mlib[ "ChromeN" ];
 
 					}
 
@@ -920,22 +943,22 @@
 
 					if ( veyron.loaded ) {
 
-						veyron.bodyGeometry.materials[ 1 ] = mlib[ "Chrome" ];
-						veyron.bodyGeometry.materials[ 2 ] = mlib[ "Chrome" ];
+						veyron.bodyMaterials[ 1 ] = mlib[ "Chrome" ];
+						veyron.bodyMaterials[ 2 ] = mlib[ "Chrome" ];
 
-						veyron.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
+						veyron.wheelMaterials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 
 					if ( gallardo.loaded ) {
 
-						gallardo.wheelGeometry.materials[ 0 ] = mlib[ "Chrome" ];
+						gallardo.wheelMaterials[ 0 ] = mlib[ "Chrome" ];
 
 					}
 
 				}
 
-				effectBloom.screenUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
+				effectBloom.copyUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
 
 				ambientLight.color.setHSV( 0, 0, THREE.Math.mapLinear( vnorm, 0, 1, 0.07, 0.33 ) );
 				groundBasic.color.setHSV( 0.1, 0.45, THREE.Math.mapLinear( vnorm, 0, 1, 0.725, 0.995 ) );

@@ -1,4 +1,4 @@
-Textures from http://subtlepatterns.com/
+Texture "bright_squares256.png" from http://subtlepatterns.com/
 
 Slightly modified to have more GPU friendly sizes.
 

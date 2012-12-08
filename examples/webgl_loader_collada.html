@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - collada</title>
@@ -28,16 +28,16 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+			<a href="http://threejs.org" target="_blank">three.js</a> -
 			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/loaders/ColladaLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -51,7 +51,7 @@
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( './models/collada/monster/monster.dae', function colladaReady( collada ) {
+			loader.load( './models/collada/monster/monster.dae', function ( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
@@ -69,29 +69,29 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 2, 2, 3 );
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// Grid
 
-				var line_material = new THREE.LineBasicMaterial( { color: 0xcccccc, opacity: 0.2 } ),
-					geometry = new THREE.Geometry(),
-					floor = -0.04, step = 1, size = 14;
+				var size = 14, step = 1;
 
-				for ( var i = 0; i <= size / step * 2; i ++ ) {
+				var geometry = new THREE.Geometry();
+				var material = new THREE.LineBasicMaterial( { color: 0x303030 } );
 
-					geometry.vertices.push( new THREE.Vector3( - size, floor, i * step - size ) );
-					geometry.vertices.push( new THREE.Vector3(   size, floor, i * step - size ) );
+				for ( var i = - size; i <= size; i += step ) {
 
-					geometry.vertices.push( new THREE.Vector3( i * step - size, floor, -size ) );
-					geometry.vertices.push( new THREE.Vector3( i * step - size, floor,  size ) );
+					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
 
 				}
 
-				var line = new THREE.Line( geometry, line_material, THREE.LinePieces );
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
 				scene.add( line );
 
 				// Add the COLLADA
@@ -126,16 +126,33 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//
 
 			var t = 0;
+			var clock = new THREE.Clock();
+
 			function animate() {
+
+				var delta = clock.getDelta();
 
 				requestAnimationFrame( animate );
 
-				if ( t > 30 ) t = 0;
+				if ( t > 1 ) t = 0;
 
 				if ( skin ) {
 
@@ -152,9 +169,9 @@
 
 					}
 
-					skin.morphTargetInfluences[ Math.floor( t ) ] = 1;
+					skin.morphTargetInfluences[ Math.floor( t * 30 ) ] = 1;
 
-					t += 0.5;
+					t += delta;
 
 				}
 

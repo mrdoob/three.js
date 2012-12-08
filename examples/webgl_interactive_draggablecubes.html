@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - draggable cubes</title>
@@ -15,9 +15,11 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -37,11 +39,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.rotateSpeed = 1.0;
@@ -51,6 +50,8 @@
 				controls.noPan = false;
 				controls.staticMoving = true;
 				controls.dynamicDampingFactor = 0.3;
+
+				scene = new THREE.Scene();
 
 				scene.add( new THREE.AmbientLight( 0x505050 ) );
 
@@ -65,8 +66,8 @@
 				light.shadowBias = -0.00022;
 				light.shadowDarkness = 0.5;
 
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
+				light.shadowMapWidth = 2048;
+				light.shadowMapHeight = 2048;
 
 				scene.add( light );
 
@@ -100,7 +101,6 @@
 				}
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 2000, 2000, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.25, transparent: true, wireframe: true } ) );
-				plane.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 				plane.visible = false;
 				scene.add( plane );
 
@@ -111,7 +111,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapSoft = true;
+				renderer.shadowMapType = THREE.PCFShadowMap;
 
 				container.appendChild( renderer.domElement );
 
@@ -120,7 +120,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - draggable cubes';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - draggable cubes';
 				container.appendChild( info );
 
 				stats = new Stats();
@@ -131,6 +131,19 @@
 				renderer.domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				renderer.domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				renderer.domElement.addEventListener( 'mouseup', onDocumentMouseUp, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -146,19 +159,19 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
 
 
 				if ( SELECTED ) {
 
-					var intersects = ray.intersectObject( plane );
+					var intersects = raycaster.intersectObject( plane );
 					SELECTED.position.copy( intersects[ 0 ].point.subSelf( offset ) );
 					return;
 
 				}
 
 
-				var intersects = ray.intersectObjects( objects );
+				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 
@@ -195,9 +208,9 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var ray = new THREE.Ray( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
 
-				var intersects = ray.intersectObjects( objects );
+				var intersects = raycaster.intersectObjects( objects );
 
 				if ( intersects.length > 0 ) {
 
@@ -205,7 +218,7 @@
 
 					SELECTED = intersects[ 0 ].object;
 
-					var intersects = ray.intersectObject( plane );
+					var intersects = raycaster.intersectObject( plane );
 					offset.copy( intersects[ 0 ].point ).subSelf( plane.position );
 
 					container.style.cursor = 'move';

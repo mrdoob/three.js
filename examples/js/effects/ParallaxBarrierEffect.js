@@ -32,8 +32,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		uniforms: {
 
-			"mapLeft": { type: "t", value: 0, texture: _renderTargetL },
-			"mapRight": { type: "t", value: 1, texture: _renderTargetR }
+			"mapLeft": { type: "t", value: _renderTargetL },
+			"mapRight": { type: "t", value: _renderTargetR }
 
 		},
 
@@ -43,7 +43,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 			"void main() {",
 
-			"	vUv = vec2( uv.x, 1.0 - uv.y );",
+			"	vUv = vec2( uv.x, uv.y );",
 			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 			"}"
@@ -77,16 +77,15 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 	} );
 
 	var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), _material );
-	mesh.rotation.x = Math.PI / 2;
 	_scene.add( mesh );
 
 	this.setSize = function ( width, height ) {
 
-		_renderTargetL.width = width;
-		_renderTargetL.height = height;
+		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
+		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
-		_renderTargetR.width = width;
-		_renderTargetR.height = height;
+		_material.uniforms[ "mapLeft" ].value = _renderTargetL;
+		_material.uniforms[ "mapRight" ].value = _renderTargetR;
 
 		renderer.setSize( width, height );
 
@@ -104,6 +103,8 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 	this.render = function ( scene, camera ) {
 
 		scene.updateMatrixWorld();
+
+		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		var hasCameraChanged = ( _aspect !== camera.aspect ) || ( _near !== camera.near ) || ( _far !== camera.far ) || ( _fov !== camera.fov );
 

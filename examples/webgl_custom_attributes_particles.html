@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - custom attributes [particles]</title>
@@ -31,13 +31,13 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - custom attributes example - particles</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles</div>
 		<div id="container"></div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -89,8 +89,8 @@
 
 		var noise = [];
 
-		var WIDTH = window.innerWidth,
-			HEIGHT = window.innerHeight;
+		var WIDTH = window.innerWidth;
+		var HEIGHT = window.innerHeight;
 
 		init();
 		animate();
@@ -101,8 +101,6 @@
 			camera.position.z = 300;
 
 			scene = new THREE.Scene();
-
-			scene.add( camera );
 
 			attributes = {
 
@@ -115,7 +113,7 @@
 
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) },
 
 			};
 
@@ -182,6 +180,19 @@
 			stats.domElement.style.position = 'absolute';
 			stats.domElement.style.top = '0px';
 			container.appendChild( stats.domElement );
+
+			//
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
 		}
 

@@ -3,7 +3,7 @@
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  *
- * new THREE.ParametricGeometry( parametricFunction, uSements, ySegements, useTris );
+ * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements, useTris );
  *
  */
 
@@ -22,7 +22,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 
 	var stackCount = stacks + 1;
 	var sliceCount = slices + 1;
-	
+
 	for ( i = 0; i <= stacks; i ++ ) {
 
 		v = i / stacks;
@@ -41,6 +41,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 	var uva, uvb, uvc, uvd;
 
 	for ( i = 0; i < stacks; i ++ ) {
+
 		for ( j = 0; j < slices; j ++ ) {
 
 			a = i * sliceCount + j;
@@ -48,10 +49,10 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 			c = (i + 1) * sliceCount + j;
 			d = (i + 1) * sliceCount + j + 1;
 
-			uva = new THREE.UV( i / slices, j / stacks );
-			uvb = new THREE.UV( i / slices, ( j + 1 ) / stacks );
-			uvc = new THREE.UV( ( i + 1 ) / slices, j / stacks );
-			uvd = new THREE.UV( ( i + 1 ) / slices, ( j + 1 ) / stacks );
+			uva = new THREE.Vector2( j / slices, i / stacks );
+			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
+			uvc = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
+			uvd = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
 
 			if ( useTris ) {
 
@@ -64,12 +65,12 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 			} else {
 
 				faces.push( new THREE.Face4( a, b, d, c ) );
-				uvs.push( [ uva, uvb, uvc, uvd ] );
+				uvs.push( [ uva, uvb, uvd, uvc ] );
 
 			}
 
 		}
-		
+
 	}
 
 	// console.log(this);
@@ -77,12 +78,11 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 	// magic bullet
 	// var diff = this.mergeVertices();
 	// console.log('removed ', diff, ' vertices by merging');
-	
+
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
 
 };
 
-THREE.ParametricGeometry.prototype = new THREE.Geometry();
-THREE.ParametricGeometry.prototype.constructor = THREE.ParametricGeometry;
+THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );

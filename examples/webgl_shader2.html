@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - shaders [custom]</title>
@@ -12,7 +12,7 @@
 				text-align:center;
 				font-weight: bold;
 
-				background-color: #000000;
+				background-color: #050505;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -34,12 +34,12 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader material demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="fragment_shader4" type="x-shader/x-fragment">
 
@@ -183,6 +183,8 @@
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -190,11 +192,10 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 40, windowHalfX / windowHalfY, 1, 3000 );
 				camera.position.z = 4;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				start_time = Date.now();
 
@@ -206,10 +207,10 @@
 				uniforms2 = {
 					time: { type: "f", value: 1.0 },
 					resolution: { type: "v2", value: new THREE.Vector2() },
-					texture: { type: "t", value: 0, texture: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
+					texture: { type: "t", value: THREE.ImageUtils.loadTexture( "textures/disturb.jpg" ) }
 				};
 
-				uniforms2.texture.texture.wrapS = uniforms2.texture.texture.wrapT = THREE.Repeat;
+				uniforms2.texture.value.wrapS = uniforms2.texture.value.wrapT = THREE.RepeatWrapping;
 
 				var size = 0.75, mlib = [],
 					params = [ [ 'fragment_shader1', uniforms1 ],  [ 'fragment_shader2', uniforms2 ], [ 'fragment_shader3', uniforms1 ], [ 'fragment_shader4', uniforms1 ] ];
@@ -226,7 +227,7 @@
 
 					mlib[ i ] = material;
 
-					mesh = new THREE.Mesh( new THREE.CubeGeometry( size, size, size, 1, 1, 1, [ mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ] ], false ), new THREE.MeshFaceMaterial() );
+					mesh = new THREE.Mesh( new THREE.CubeGeometry( size, size, size ), new THREE.MeshFaceMaterial( [ mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ], mlib[ i ] ] ) );
 					mesh.position.x = i - ( params.length - 1 ) / 2;
 					mesh.position.y = i % 2 - 0.5;
 					scene.add( mesh );
@@ -257,6 +258,9 @@
 				uniforms2.resolution.value.x = window.innerWidth;
 				uniforms2.resolution.value.y = window.innerHeight;
 
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
@@ -274,13 +278,15 @@
 
 			function render() {
 
-				uniforms1.time.value += 0.05;
-				uniforms2.time.value = ( Date.now() - start_time ) / 1000;
+				var delta = clock.getDelta();
+
+				uniforms1.time.value += delta * 5;
+				uniforms2.time.value = clock.elapsedTime;
 
 				for( var i = 0; i < meshes.length; ++ i ) {
 
-					meshes[ i ].rotation.y += 0.01 * ( i % 2 ? 1 : -1 );
-					meshes[ i ].rotation.x += 0.01 * ( i % 2 ? -1 : 1 );
+					meshes[ i ].rotation.y += delta * 0.5 * ( i % 2 ? 1 : -1 );
+					meshes[ i ].rotation.x += delta * 0.5 * ( i % 2 ? -1 : 1 );
 
 				}
 

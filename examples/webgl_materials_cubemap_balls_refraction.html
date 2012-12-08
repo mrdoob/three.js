@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube refraction [balls]</title>
@@ -33,9 +33,9 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a></div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -68,15 +68,13 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				sceneCube = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
-				scene.add( camera );
 
 				cameraCube = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				sceneCube.add( cameraCube );
+
+				scene = new THREE.Scene();
+				sceneCube = new THREE.Scene();
 
 				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
 
@@ -110,19 +108,19 @@
 				// Skybox
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = textureCube;
+				shader.uniforms[ "tCube" ].value = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
-					depthWrite: false
+					depthWrite: false,
+					side: THREE.BackSide
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
-				mesh.flipSided = true;
 				sceneCube.add( mesh );
 
 				//
@@ -131,6 +129,25 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
 				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				cameraCube.aspect = window.innerWidth / window.innerHeight;
+				cameraCube.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

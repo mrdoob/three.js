@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - lines - splines</title>
@@ -40,14 +40,14 @@
 	<body>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - splines WebGL demo
+			<a href="http://threejs.org" target="_blank">three.js</a> - splines WebGL demo
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -70,11 +70,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -121,14 +120,14 @@
 
 				// lines
 
-				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3 } );
+				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
 
-				var line, p, scale = 0.3, d = 225,
-					parameters =  [ [ material, scale*1.5, [-d,0,0],  geometry ],
-									[ material, scale*1.5, [0,0,0],  geometry2 ],
-									[ material, scale*1.5, [d,0,0],  geometry3 ] ];
-
-				material.vertexColors = true;
+				var line, p, scale = 0.3, d = 225;
+				var parameters =  [
+					[ material, scale*1.5, [-d,0,0],  geometry ],
+					[ material, scale*1.5, [0,0,0],  geometry2 ],
+					[ material, scale*1.5, [d,0,0],  geometry3 ]
+				];
 
 				for ( i = 0; i < parameters.length; ++ i ) {
 
@@ -152,6 +151,22 @@
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

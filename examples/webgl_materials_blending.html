@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - blending</title>
@@ -13,7 +13,7 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="js/Detector.js"></script>
 
 		<script>
@@ -28,15 +28,14 @@
 
 			function init() {
 
-				// SCENE
-
-				scene = new THREE.Scene();
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 600;
-				scene.add( camera );
+
+				// SCENE
+
+				scene = new THREE.Scene();
 
 				// BACKGROUND
 
@@ -69,7 +68,6 @@
 
 				var meshBg = new THREE.Mesh( new THREE.PlaneGeometry( 4000, 2000 ), materialBg );
 				meshBg.position.set( 0, 0, -1 );
-				meshBg.rotation.x = Math.PI / 2;
 				scene.add( meshBg );
 
 				// OBJECTS
@@ -106,13 +104,11 @@
 
 						var mesh = new THREE.Mesh( geo1, material );
 						mesh.position.set( x, y, z );
-						mesh.rotation.x = Math.PI / 2;
 						scene.add( mesh );
 
 
 						var mesh = new THREE.Mesh( geo2, generateLabelMaterial( blending.replace( "Blending", "" ) ) );
 						mesh.position.set( x, y - 75, z );
-						mesh.rotation.x = Math.PI / 2;
 						scene.add( mesh );
 
 					}

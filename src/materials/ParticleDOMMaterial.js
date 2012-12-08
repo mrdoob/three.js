@@ -1,11 +1,15 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ParticleDOMMaterial = function ( domElement ) {
+THREE.ParticleDOMMaterial = function ( element ) {
 
-	THREE.Material.call( this );
+	this.element = element;
 
-	this.domElement = domElement;
+};
+
+THREE.ParticleDOMMaterial.prototype.clone = function(){
+
+	return new THREE.ParticleDOMMaterial( this.element );
 
 };

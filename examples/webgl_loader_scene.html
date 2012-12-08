@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - scene loader</title>
@@ -130,7 +130,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js">three.js</a> - scene loader test
+			<a href="http://threejs.org">three.js</a> - scene loader test
 		</div>
 
 		<div id="scene_explorer">
@@ -147,10 +147,21 @@
 			</center>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/loaders/ctm/lzma.js"></script>
+		<script src="js/loaders/ctm/ctm.js"></script>
+		<script src="js/loaders/ctm/CTMLoader.js"></script>
+
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/VTKLoader.js"></script>
+		<script src="js/loaders/STLLoader.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/loaders/UTF8Loader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -168,6 +179,11 @@
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
+
+			var rotatingObjects = [];
+			var morphAnimatedObjects = [];
+
+			var clock = new THREE.Clock();
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
@@ -190,14 +206,14 @@
 				for ( m in result.materials ) {
 
 					material = result.materials[ m ];
-					if ( ! ( material instanceof THREE.MeshFaceMaterial ) ) {
+					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial || material.morphTargets ) ) {
 
 						if( !material.program ) {
 
-							console.log(m);
 							renderer.initMaterial( material, result.scene.__lights, result.scene.fog );
 
 							count += 1;
+
 							if( count > pieces ) {
 
 								//console.log("xxxxxxxxx");
@@ -219,13 +235,18 @@
 				document.body.appendChild( container );
 
 				var loadScene = createLoadScene();
-				scene  = loadScene.scene;
+
 				camera = loadScene.camera;
+				scene = loadScene.scene;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
@@ -274,20 +295,9 @@
 
 				}
 
-				var callbackFinished = function( result ) {
+				var callbackFinished = function ( result ) {
 
 					loaded = result;
-
-					var mat_veyron = result.geometries[ "veyron" ].materials;
-
-					mat_veyron[ 0 ] = result.materials[ "interior" ];
-					mat_veyron[ 1 ] = result.materials[ "chrome" ];
-					mat_veyron[ 2 ] = result.materials[ "darkerchrome" ];
-					mat_veyron[ 3 ] = result.materials[ "glass" ];
-					mat_veyron[ 4 ] = result.materials[ "chrome" ];
-					mat_veyron[ 5 ] = result.materials[ "chrome" ];
-					mat_veyron[ 6 ] = result.materials[ "backlights" ];
-					mat_veyron[ 7 ] = result.materials[ "backsignals" ];
 
 					$( "message" ).style.display = "none";
 					$( "progressbar" ).style.display = "none";
@@ -296,7 +306,37 @@
 
 					handle_update( result, 1 );
 
-					console.log( result );
+					result.scene.traverse( function ( object ) {
+
+						if ( object.properties.rotating === true ) {
+
+							rotatingObjects.push( object );
+
+						}
+
+						if ( object instanceof THREE.MorphAnimMesh ) {
+
+							morphAnimatedObjects.push( object );
+
+						}
+
+						if ( object instanceof THREE.SkinnedMesh ) {
+
+							if ( object.geometry.animation ) {
+
+								THREE.AnimationHandler.add( object.geometry.animation );
+
+								var animation = new THREE.Animation( object, object.geometry.animation.name );
+								animation.JITCompile = false;
+								animation.interpolationType = THREE.AnimationHandler.LINEAR;
+
+								animation.play();
+
+							}
+
+						}
+
+					} );
 
 				}
 
@@ -304,12 +344,36 @@
 
 				var loader = new THREE.SceneLoader();
 
+				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
+				loader.addGeometryHandler( "vtk", THREE.VTKLoader );
+				loader.addGeometryHandler( "stl", THREE.STLLoader );
+
+				loader.addHierarchyHandler( "obj", THREE.OBJLoader );
+				loader.addHierarchyHandler( "dae", THREE.ColladaLoader );
+				loader.addHierarchyHandler( "utf8", THREE.UTF8Loader );
+
 				loader.callbackSync = callbackSync;
 				loader.callbackProgress = callbackProgress;
 
 				loader.load( "scenes/test_scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -323,19 +387,17 @@
 
 				$( "progress" ).style.display = "none";
 
-				scene = loaded.scene;
 				camera = loaded.currentCamera;
-
-				scene.add( camera );
-
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+
+				scene = loaded.scene;
 
 				renderer.setClearColor( loaded.bgColor, loaded.bgAlpha );
 
 			}
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -404,10 +466,33 @@
 
 			function render() {
 
+				var delta = clock.getDelta();
+
 				camera.position.x += ( mouseX - camera.position.x ) * .001;
 				camera.position.y += ( - mouseY - camera.position.y ) * .001;
 
 				camera.lookAt( scene.position );
+
+				// update skinning
+
+				THREE.AnimationHandler.update( delta * 0.75 );
+
+				for ( var i = 0; i < rotatingObjects.length; i ++ ) {
+
+					var object = rotatingObjects[ i ];
+
+					if ( object.properties.rotateX ) object.rotation.x += 1 * delta;
+					if ( object.properties.rotateY ) object.rotation.y += 0.5 * delta;
+
+				}
+
+				for ( var i = 0; i < morphAnimatedObjects.length; i ++ ) {
+
+					var object = morphAnimatedObjects[ i ];
+
+					object.updateAnimation( 1000 * delta );
+
+				}
 
 				renderer.render( scene, camera );
 

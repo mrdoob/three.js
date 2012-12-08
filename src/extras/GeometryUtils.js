@@ -20,16 +20,6 @@ THREE.GeometryUtils = {
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
-		var geo1MaterialsMap = {};
-
-		for ( var i = 0; i < geometry1.materials.length; i ++ ) {
-
-			var id = geometry1.materials[ i ].id;
-
-			geo1MaterialsMap[ id ] = i;
-
-		}
-
 		if ( object2 instanceof THREE.Mesh ) {
 
 			object2.matrixAutoUpdate && object2.updateMatrix();
@@ -95,25 +85,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			if ( face.materialIndex !== undefined ) {
-
-				var material2 = geometry2.materials[ face.materialIndex ];
-				var materialId2 = material2.id;
-
-				var materialIndex = geo1MaterialsMap[ materialId2 ];
-
-				if ( materialIndex === undefined ) {
-
-					materialIndex = geometry1.materials.length;
-					geo1MaterialsMap[ materialId2 ] = materialIndex;
-
-					geometry1.materials.push( material2 );
-
-				}
-
-				faceCopy.materialIndex = materialIndex;
-
-			}
+			faceCopy.materialIndex = face.materialIndex;
 
 			faceCopy.centroid.copy( face.centroid );
 			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
@@ -130,7 +102,7 @@ THREE.GeometryUtils = {
 
 			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
 
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
+				uvCopy.push( new THREE.Vector2( uv[ j ].x, uv[ j ].y ) );
 
 			}
 
@@ -140,61 +112,26 @@ THREE.GeometryUtils = {
 
 	},
 
-	clone: function ( geometry ) {
+	removeMaterials: function ( geometry, materialIndexArray ) {
 
-		var cloneGeo = new THREE.Geometry();
+		var materialIndexMap = {};
 
-		var i, il;
+		for ( var i = 0, il = materialIndexArray.length; i < il; i ++ ) {
 
-		var vertices = geometry.vertices,
-			faces = geometry.faces,
-			uvs = geometry.faceVertexUvs[ 0 ];
-
-		// materials
-
-		if ( geometry.materials ) {
-
-			cloneGeo.materials = geometry.materials.slice();
+			materialIndexMap[ materialIndexArray[i] ] = true;
 
 		}
 
-		// vertices
+		var face, newFaces = [];
 
-		for ( i = 0, il = vertices.length; i < il; i ++ ) {
+		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
-			var vertex = vertices[ i ];
-
-			cloneGeo.vertices.push( vertex.clone() );
-
-		}
-
-		// faces
-
-		for ( i = 0, il = faces.length; i < il; i ++ ) {
-
-			var face = faces[ i ];
-
-			cloneGeo.faces.push( face.clone() );
+			face = geometry.faces[ i ];
+			if ( ! ( face.materialIndex in materialIndexMap ) ) newFaces.push( face );
 
 		}
 
-		// uvs
-
-		for ( i = 0, il = uvs.length; i < il; i ++ ) {
-
-			var uv = uvs[ i ], uvCopy = [];
-
-			for ( var j = 0, jl = uv.length; j < jl; j ++ ) {
-
-				uvCopy.push( new THREE.UV( uv[ j ].u, uv[ j ].v ) );
-
-			}
-
-			cloneGeo.faceVertexUvs[ 0 ].push( uvCopy );
-
-		}
-
-		return cloneGeo;
+		geometry.faces = newFaces;
 
 	},
 
@@ -417,26 +354,19 @@ THREE.GeometryUtils = {
 
 	},
 
-	// Get triangle area (by Heron's formula)
-	// 	http://en.wikipedia.org/wiki/Heron%27s_formula
+	// Get triangle area (half of parallelogram)
+	//	http://mathworld.wolfram.com/TriangleArea.html
 
 	triangleArea: function ( vectorA, vectorB, vectorC ) {
 
-		var s, a, b, c,
-			tmp = THREE.GeometryUtils.__v1;
+		var tmp1 = THREE.GeometryUtils.__v1,
+			tmp2 = THREE.GeometryUtils.__v2;
 
-		tmp.sub( vectorA, vectorB );
-		a = tmp.length();
+		tmp1.sub( vectorB, vectorA );
+		tmp2.sub( vectorC, vectorA );
+		tmp1.crossSelf( tmp2 );
 
-		tmp.sub( vectorA, vectorC );
-		b = tmp.length();
-
-		tmp.sub( vectorB, vectorC );
-		c = tmp.length();
-
-		s = 0.5 * ( a + b + c );
-
-		return Math.sqrt( s * ( s - a ) * ( s - b ) * ( s - c ) );
+		return 0.5 * tmp1.length();
 
 	},
 
@@ -475,8 +405,8 @@ THREE.GeometryUtils = {
 
 				// texture repeat
 
-				if( uvs[ j ].u !== 1.0 ) uvs[ j ].u = uvs[ j ].u - Math.floor( uvs[ j ].u );
-				if( uvs[ j ].v !== 1.0 ) uvs[ j ].v = uvs[ j ].v - Math.floor( uvs[ j ].v );
+				if( uvs[ j ].x !== 1.0 ) uvs[ j ].x = uvs[ j ].x - Math.floor( uvs[ j ].x );
+				if( uvs[ j ].y !== 1.0 ) uvs[ j ].y = uvs[ j ].y - Math.floor( uvs[ j ].y );
 
 			}
 
@@ -584,13 +514,13 @@ THREE.GeometryUtils = {
 
 				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
 
-					faceUvs[ j ].push( geometry.faceUvs[ j ] );
+					faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
 
 				}
 
 				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
-					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ] );
+					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
 
 				}
 
@@ -1108,3 +1038,4 @@ THREE.GeometryUtils = {
 THREE.GeometryUtils.random = THREE.Math.random16;
 
 THREE.GeometryUtils.__v1 = new THREE.Vector3();
+THREE.GeometryUtils.__v2 = new THREE.Vector3();

@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Scene = function () {
@@ -19,8 +19,7 @@ THREE.Scene = function () {
 
 };
 
-THREE.Scene.prototype = new THREE.Object3D();
-THREE.Scene.prototype.constructor = THREE.Scene;
+THREE.Scene.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Scene.prototype.__addObject = function ( object ) {
 
@@ -29,6 +28,12 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 		if ( this.__lights.indexOf( object ) === - 1 ) {
 
 			this.__lights.push( object );
+
+		}
+
+		if ( object.target && object.target.parent === undefined ) {
+
+			this.add( object.target );
 
 		}
 

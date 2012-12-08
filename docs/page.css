@@ -1,36 +1,49 @@
+@font-face {
+	font-family: 'inconsolata';
+	src: url('files/inconsolata.woff') format('woff');
+	font-weight: normal;
+	font-style: normal;
+}
+
 body {
-	margin: 20px;
+	margin: 25px 20px;
 	color: #555;
-	font-family: Arial, sans-serif;
+	font-family: 'inconsolata';
 	font-size: 15px;
+	line-height: 18px;
 	overflow: auto;
 }
 
 a {
-	color: #2194CE;
+	color: #1184CE;
 }
 
 h1 {
-	color: #444;
+	color: #333;
 	font-size: 25px;
+	font-weight: normal;
+
 	margin-top: 10px;
 }
 
 h2 {
-	color: #8B2;
+	color: #4B0;
 	font-size: 18px;
+	font-weight: normal;
+
 	margin-top: 40px;
 }
 
 h3 {
 	color: #000;
 	font-size: 16px;
-	margin-top: 30px;
 	font-weight: normal;
+
+	margin-top: 30px;
 }
 
 div {
-	padding-left: 30px;
+	/* padding-left: 30px; */
 	margin-bottom: 20px;
 }
 
@@ -48,11 +61,15 @@ code {
 	width: -moz-calc( 100% - 40px );
 	width: calc( 100% - 40px );
 	padding: 20px;
-	white-space: pre;
+	white-space: pre-line;
 	background-color: #f9f9f9;
 	overflow: auto;
 }
 
+strong {
+	color: #000;
+	font-weight: normal;
+}
 
 #button {
 	position: fixed;

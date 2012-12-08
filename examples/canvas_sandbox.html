@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - sandbox</title>
@@ -15,9 +15,9 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -63,29 +63,28 @@
 
 				scene = new THREE.Scene();
 
-				scene.add( camera );
-
 
 				// Grid
 
+				var size = 500, step = 100;
+
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3( - 500, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 500, 0, 0 ) );
+
+				for ( var i = - size; i <= size; i += step ) {
+
+					geometry.vertices.push( new THREE.Vector3( - size, 0, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, 0, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, 0, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, 0,   size ) );
+
+				}
 
 				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.5 } );
 
-				for ( var i = 0; i <= 10; i ++ ) {
-
-					var line = new THREE.Line( geometry, material );
-					line.position.z = ( i * 100 ) - 500;
-					scene.add( line );
-
-					var line = new THREE.Line( geometry, material );
-					line.position.x = ( i * 100 ) - 500;
-					line.rotation.y = 90 * Math.PI / 180;
-					scene.add( line );
-
-				}
+				var line = new THREE.Line( geometry, material );
+				line.type = THREE.LinePieces;
+				scene.add( line );
 
 				// Spheres
 
@@ -155,6 +154,23 @@
 
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			function onDocumentKeyDown( event ) {

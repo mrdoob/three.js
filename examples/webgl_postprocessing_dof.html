@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - postprocessing - depth-of-field</title>
@@ -22,8 +22,10 @@
 
 			#info {
 				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
+				position: relative;
+				top: 0px;
+				width: 50em;
+				margin: 0 auto -2.1em;
 				padding: 5px;
 				z-index:100;
 			}
@@ -31,16 +33,17 @@
 	</head>
 
 	<body>
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/shaders/BokehShader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/ShaderExtras.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src='js/DAT.GUI.min.js'></script>
+		<script src='js/libs/dat.gui.min.js'></script>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl depth-of-field with bokeh example -
 			shader by <a href="http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html">Martins Upitis</a>
 		</div>
 
@@ -73,11 +76,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / height, 1, 3000 );
 				camera.position.z = 200;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, height );
@@ -191,7 +193,7 @@
 
 				};
 
-				var gui = new DAT.GUI();
+				var gui = new dat.GUI();
 				gui.add( effectController, "focus", 0.0, 3.0, 0.025 ).onChange( matChanger );
 				gui.add( effectController, "aperture", 0.001, 0.2, 0.001 ).onChange( matChanger );
 				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
@@ -244,12 +246,12 @@
 				postprocessing.rtTextureDepth = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 
-				var bokeh_shader = THREE.ShaderExtras[ "bokeh" ];
+				var bokeh_shader = THREE.BokehShader;
 
 				postprocessing.bokeh_uniforms = THREE.UniformsUtils.clone( bokeh_shader.uniforms );
 
-				postprocessing.bokeh_uniforms[ "tColor" ].texture = postprocessing.rtTextureColor;
-				postprocessing.bokeh_uniforms[ "tDepth" ].texture = postprocessing.rtTextureDepth;
+				postprocessing.bokeh_uniforms[ "tColor" ].value = postprocessing.rtTextureColor;
+				postprocessing.bokeh_uniforms[ "tDepth" ].value = postprocessing.rtTextureDepth;
 				postprocessing.bokeh_uniforms[ "focus" ].value = 1.1;
 				postprocessing.bokeh_uniforms[ "aspect" ].value = window.innerWidth / height;
 
@@ -263,7 +265,6 @@
 
 				postprocessing.quad = new THREE.Mesh( new THREE.PlaneGeometry( window.innerWidth, window.innerHeight ), postprocessing.materialBokeh );
 				postprocessing.quad.position.z = - 500;
-				postprocessing.quad.rotation.x = Math.PI / 2;
 				postprocessing.scene.add( postprocessing.quad );
 
 			}

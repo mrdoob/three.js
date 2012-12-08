@@ -1,14 +1,17 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type ) {
+THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureCount ++;
+	this.id = THREE.TextureIdCount ++;
+
+	this.name = '';
 
 	this.image = image;
+	this.mipmaps = [];
 
 	this.mapping = mapping !== undefined ? mapping : new THREE.UVMapping();
 
@@ -18,6 +21,8 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.magFilter = magFilter !== undefined ? magFilter : THREE.LinearFilter;
 	this.minFilter = minFilter !== undefined ? minFilter : THREE.LinearMipMapLinearFilter;
 
+	this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
+
 	this.format = format !== undefined ? format : THREE.RGBAFormat;
 	this.type = type !== undefined ? type : THREE.UnsignedByteType;
 
@@ -26,6 +31,8 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 
 	this.generateMipmaps = true;
 	this.premultiplyAlpha = false;
+	this.flipY = true;
+	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
 	this.needsUpdate = false;
 	this.onUpdate = null;
@@ -36,63 +43,38 @@ THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
 
-	clone: function () {
+	clone: function ( texture ) {
 
-		var clonedTexture = new THREE.Texture( this.image, this.mapping, this.wrapS, this.wrapT, this.magFilter, this.minFilter, this.format, this.type );
+		if ( texture === undefined ) texture = new THREE.Texture();
 
-		clonedTexture.offset.copy( this.offset );
-		clonedTexture.repeat.copy( this.repeat );
+		texture.image = this.image;
+		texture.mipmaps = this.mipmaps.slice(0);
 
-		return clonedTexture;
+		texture.mapping = this.mapping;
+
+		texture.wrapS = this.wrapS;
+		texture.wrapT = this.wrapT;
+
+		texture.magFilter = this.magFilter;
+		texture.minFilter = this.minFilter;
+
+		texture.anisotropy = this.anisotropy;
+
+		texture.format = this.format;
+		texture.type = this.type;
+
+		texture.offset.copy( this.offset );
+		texture.repeat.copy( this.repeat );
+
+		texture.generateMipmaps = this.generateMipmaps;
+		texture.premultiplyAlpha = this.premultiplyAlpha;
+		texture.flipY = this.flipY;
+		texture.unpackAlignment = this.unpackAlignment;
+
+		return texture;
 
 	}
 
 };
 
-THREE.TextureCount = 0;
-
-THREE.MultiplyOperation = 0;
-THREE.MixOperation = 1;
-
-// Mapping modes
-
-THREE.UVMapping = function () {};
-
-THREE.CubeReflectionMapping = function () {};
-THREE.CubeRefractionMapping = function () {};
-
-THREE.SphericalReflectionMapping = function () {};
-THREE.SphericalRefractionMapping = function () {};
-
-// Wrapping modes
-
-THREE.RepeatWrapping = 0;
-THREE.ClampToEdgeWrapping = 1;
-THREE.MirroredRepeatWrapping = 2;
-
-// Filters
-
-THREE.NearestFilter = 3;
-THREE.NearestMipMapNearestFilter = 4;
-THREE.NearestMipMapLinearFilter = 5;
-THREE.LinearFilter = 6;
-THREE.LinearMipMapNearestFilter = 7;
-THREE.LinearMipMapLinearFilter = 8;
-
-// Types
-
-THREE.ByteType = 9;
-THREE.UnsignedByteType = 10;
-THREE.ShortType = 11;
-THREE.UnsignedShortType = 12;
-THREE.IntType = 13;
-THREE.UnsignedIntType = 14;
-THREE.FloatType = 15;
-
-// Formats
-
-THREE.AlphaFormat = 16;
-THREE.RGBFormat = 17;
-THREE.RGBAFormat = 18;
-THREE.LuminanceFormat = 19;
-THREE.LuminanceAlphaFormat = 20;
+THREE.TextureIdCount = 0;

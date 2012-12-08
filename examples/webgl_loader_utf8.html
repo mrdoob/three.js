@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io - UTF8 loader</title>
@@ -27,16 +27,18 @@
 
 	<body>
 		<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+		<a href="http://threejs.org" target="_blank">three.js</a> -
 		<a href="http://code.google.com/p/webgl-loader/" target="_blank">UTF8 format</a> loader test -
 		models from <a href="http://www.sci.utah.edu/~wald/animrep/" target="_blank">The Utah 3D Animation Repository</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
 		<script src="js/loaders/UTF8Loader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -67,12 +69,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
-
 				camera = new THREE.PerspectiveCamera( 20, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 2000 );
 				camera.position.z = 800;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 800, 2000 );
 
 				var path = "textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
@@ -86,22 +87,48 @@
 
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x221100 );
+				var ambient = new THREE.AmbientLight( 0x222222 );
 				scene.add( ambient );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.1 );
+				directionalLight.position.set( 0, 20, 300 );
 				scene.add( directionalLight );
+
+				directionalLight.castShadow = true;
+				//directionalLight.shadowCameraVisible = true;
+
+				directionalLight.shadowMapWidth = 2048;
+				directionalLight.shadowMaHeight = 2048;
+
+				var d = 150;
+
+				directionalLight.shadowCameraLeft = -d * 1.2;
+				directionalLight.shadowCameraRight = d * 1.2;
+				directionalLight.shadowCameraTop = d;
+				directionalLight.shadowCameraBottom = -d;
+
+				directionalLight.shadowCameraNear = 200;
+				directionalLight.shadowCameraFar = 500;
+
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapType = THREE.PCFShadowMap;
 
 				// STATS
 
@@ -111,39 +138,79 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
+				var start = Date.now();
+
 				var loader = new THREE.UTF8Loader();
 
-				loader.load( "models/utf8/hand.utf8", function ( geometry ) {
+				loader.load( "models/utf8/hand.js", function ( object ) {
 
-					callbackModel( geometry, 400, 0xffffff, 125, FLOOR, 0 );
+					var end = Date.now();
+					console.log( "hand", end - start, "ms" );
 
-				}, { scale: 0.815141, offsetX: -0.371823, offsetY: -0.011920, offsetZ: -0.416061 } );
+					var s = 350;
+					object.scale.set( s, s, s );
+					object.position.x = 125;
+					object.position.y = -125;
+					scene.add( object );
 
-				loader.load( "models/utf8/ben.utf8", function ( geometry ) {
+					object.traverse( function( node ) {
 
-					callbackModel( geometry, 400, 0xffaa00, -125, FLOOR, 0 );
+						node.castShadow = true;
+						node.receiveShadow = true;
 
-				}, { scale: 0.707192, offsetX: -0.109362, offsetY: -0.006435, offsetZ: -0.268751 } );
+						if ( node.material && node.material.name === "skin" ) {
+
+							node.material.wrapAround = true;
+							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
+
+						}
+
+					} );
+
+				}, { normalizeRGB: true } );
+
+				loader.load( "models/utf8/ben_dds.js", function ( object ) {
+
+					var end = Date.now();
+					console.log( "ben", end - start, "ms" );
+
+					var s = 350;
+					object.scale.set( s, s, s );
+					object.position.x = -125;
+					object.position.y = -125;
+					scene.add( object );
+
+					object.traverse( function( node ) {
+
+						node.castShadow = true;
+						node.receiveShadow = true;
+
+						if ( node.material && ( node.material.name === "head" || node.material.name === "skinbody" ) ) {
+
+							node.material.wrapAround = true;
+							node.material.wrapRGB.set( 0.6, 0.2, 0.1 );
+
+						}
+
+					} );
+
+				}, { normalizeRGB: true } );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
-			function callbackModel( geometry, s, color, x, y, z ) {
+			function onWindowResize() {
 
-				var material = new THREE.MeshLambertMaterial( {
-					color: color,
-					map: THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" ),
-					envMap: reflectionCube,
-					combine: THREE.MixOperation,
-					reflectivity: 0.3
-				} );
-				//material.shading =  THREE.FlatShading;
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
 
-				var mesh = new THREE.Mesh( geometry, material );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
-				mesh.position.set( x, y, z );
-				mesh.scale.set( s, s, s );
-
-				scene.add( mesh );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

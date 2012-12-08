@@ -1,9 +1,9 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DirectionalLight = function ( hex, intensity, distance ) {
+THREE.DirectionalLight = function ( hex, intensity ) {
 
 	THREE.Light.call( this, hex );
 
@@ -11,7 +11,6 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
-	this.distance = ( distance !== undefined ) ? distance : 0;
 
 	this.castShadow = false;
 	this.onlyShadow = false;
@@ -59,5 +58,4 @@ THREE.DirectionalLight = function ( hex, intensity, distance ) {
 
 };
 
-THREE.DirectionalLight.prototype = new THREE.Light();
-THREE.DirectionalLight.prototype.constructor = THREE.DirectionalLight;
+THREE.DirectionalLight.prototype = Object.create( THREE.Light.prototype );

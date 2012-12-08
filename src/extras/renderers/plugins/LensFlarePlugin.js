@@ -89,8 +89,6 @@ THREE.LensFlarePlugin = function ( ) {
 		_lensFlare.uniforms.rotation       = _gl.getUniformLocation( _lensFlare.program, "rotation" );
 		_lensFlare.uniforms.screenPosition = _gl.getUniformLocation( _lensFlare.program, "screenPosition" );
 
-		_lensFlare.attributesEnabled = false;
-
 	};
 
 
@@ -129,14 +127,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 		_gl.useProgram( _lensFlare.program );
 
-		if ( ! _lensFlare.attributesEnabled ) {
-
-			_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
-			_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
-
-			_lensFlare.attributesEnabled = true;
-
-		}
+		_gl.enableVertexAttribArray( _lensFlare.attributes.vertex );
+		_gl.enableVertexAttribArray( _lensFlare.attributes.uv );
 
 		// loop through all lens flares to update their occlusion and positions
 		// setup gl and common used attribs/unforms

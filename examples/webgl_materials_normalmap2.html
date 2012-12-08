@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - normal map [Lee Perry-Smith]</title>
@@ -14,7 +14,9 @@
 				overflow:hidden;
 			}
 
-			a {	color: #ffffff;	}
+			a {
+				color: #ffffff;
+			}
 
 			#info {
 				position: absolute;
@@ -41,7 +43,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl normalmap demo.
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl normalmap demo.
 			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head.
 
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
@@ -50,19 +52,18 @@
 			</div>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
-		<script src="js/ShaderExtras.js"></script>
+		<script src="js/shaders/BleachBypassShader.js"></script>
+		<script src="js/shaders/ColorCorrectionShader.js"></script>
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/FXAAShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/FilmPass.js"></script>
-		<script src="js/postprocessing/DotScreenPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
@@ -98,13 +99,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
-				// CAMERA
-
 				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1200;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
@@ -127,11 +125,11 @@
 				var shader = THREE.ShaderUtils.lib[ "normal" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
-				uniforms[ "uNormalScale" ].value = - 0.8;
+				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniforms[ "uNormalScale" ].value.set( 0.8, 0.8 );
 
-				uniforms[ "tDiffuse" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-				uniforms[ "tSpecular" ].texture = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
+				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
+				uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
 
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;
@@ -183,9 +181,9 @@
 
 				var renderModel = new THREE.RenderPass( scene, camera );
 
-				var effectBleach = new THREE.ShaderPass( THREE.ShaderExtras[ "bleachbypass" ] );
-				var effectColor = new THREE.ShaderPass( THREE.ShaderExtras[ "colorCorrection" ] );
-				effectFXAA = new THREE.ShaderPass( THREE.ShaderExtras[ "fxaa" ] );
+				var effectBleach = new THREE.ShaderPass( THREE.BleachBypassShader );
+				var effectColor = new THREE.ShaderPass( THREE.ColorCorrectionShader );
+				effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 

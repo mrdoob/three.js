@@ -14,5 +14,5 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 
 	THREE.PolyhedronGeometry.call( this, vertices, faces, radius, detail );
 };
-THREE.OctahedronGeometry.prototype = new THREE.Geometry();
-THREE.OctahedronGeometry.prototype.constructor = THREE.OctahedronGeometry;
+
+THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );

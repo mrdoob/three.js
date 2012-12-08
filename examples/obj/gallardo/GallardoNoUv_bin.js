@@ -2,7 +2,7 @@
 
     "metadata" :
     {
-        "formatVersion" : 3,
+        "formatVersion" : 3.1,
         "sourceFile"    : "GallardoNoUv.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 77815,

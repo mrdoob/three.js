@@ -53,6 +53,14 @@ SimplexNoise.prototype.dot = function(g, x, y) {
 	return g[0]*x + g[1]*y;
 };
 
+SimplexNoise.prototype.dot3 = function(g, x, y, z) {
+  return g[0]*x + g[1]*y + g[2]*z; 
+}
+
+SimplexNoise.prototype.dot4 = function(g, x, y, z, w) {
+  return g[0]*x + g[1]*y + g[2]*z + g[3]*w;
+};
+
 SimplexNoise.prototype.noise = function(xin, yin) { 
   var n0, n1, n2; // Noise contributions from the three corners 
   // Skew the input space to determine which simplex cell we're in 
@@ -166,25 +174,25 @@ SimplexNoise.prototype.noise3d = function(xin, yin, zin) {
   if(t0<0) n0 = 0.0; 
   else { 
     t0 *= t0; 
-    n0 = t0 * t0 * this.dot(this.grad3[gi0], x0, y0, z0); 
+    n0 = t0 * t0 * this.dot3(this.grad3[gi0], x0, y0, z0); 
   }
   var t1 = 0.6 - x1*x1 - y1*y1 - z1*z1; 
   if(t1<0) n1 = 0.0; 
   else { 
     t1 *= t1; 
-    n1 = t1 * t1 * this.dot(this.grad3[gi1], x1, y1, z1); 
+    n1 = t1 * t1 * this.dot3(this.grad3[gi1], x1, y1, z1); 
   } 
   var t2 = 0.6 - x2*x2 - y2*y2 - z2*z2; 
   if(t2<0) n2 = 0.0; 
   else { 
     t2 *= t2; 
-    n2 = t2 * t2 * this.dot(this.grad3[gi2], x2, y2, z2); 
+    n2 = t2 * t2 * this.dot3(this.grad3[gi2], x2, y2, z2); 
   } 
   var t3 = 0.6 - x3*x3 - y3*y3 - z3*z3; 
   if(t3<0) n3 = 0.0; 
   else { 
     t3 *= t3; 
-    n3 = t3 * t3 * this.dot(this.grad3[gi3], x3, y3, z3); 
+    n3 = t3 * t3 * this.dot3(this.grad3[gi3], x3, y3, z3); 
   } 
   // Add contributions from each corner to get the final noise value. 
   // The result is scaled to stay just inside [-1,1] 
@@ -286,30 +294,30 @@ SimplexNoise.prototype.noise4d = function( x, y, z, w ) {
    if(t0<0) n0 = 0.0;
    else {
      t0 *= t0;
-     n0 = t0 * t0 * this.dot(grad4[gi0], x0, y0, z0, w0);
+     n0 = t0 * t0 * this.dot4(grad4[gi0], x0, y0, z0, w0);
    }
   var t1 = 0.6 - x1*x1 - y1*y1 - z1*z1 - w1*w1;
    if(t1<0) n1 = 0.0;
    else {
      t1 *= t1;
-     n1 = t1 * t1 * this.dot(grad4[gi1], x1, y1, z1, w1);
+     n1 = t1 * t1 * this.dot4(grad4[gi1], x1, y1, z1, w1);
    }
   var t2 = 0.6 - x2*x2 - y2*y2 - z2*z2 - w2*w2;
    if(t2<0) n2 = 0.0;
    else {
      t2 *= t2;
-     n2 = t2 * t2 * this.dot(grad4[gi2], x2, y2, z2, w2);
+     n2 = t2 * t2 * this.dot4(grad4[gi2], x2, y2, z2, w2);
    }   var t3 = 0.6 - x3*x3 - y3*y3 - z3*z3 - w3*w3;
    if(t3<0) n3 = 0.0;
    else {
      t3 *= t3;
-     n3 = t3 * t3 * this.dot(grad4[gi3], x3, y3, z3, w3);
+     n3 = t3 * t3 * this.dot4(grad4[gi3], x3, y3, z3, w3);
    }
   var t4 = 0.6 - x4*x4 - y4*y4 - z4*z4 - w4*w4;
    if(t4<0) n4 = 0.0;
    else {
      t4 *= t4;
-     n4 = t4 * t4 * this.dot(grad4[gi4], x4, y4, z4, w4);
+     n4 = t4 * t4 * this.dot4(grad4[gi4], x4, y4, z4, w4);
    }
    // Sum up and scale the result to cover the range [-1,1]
    return 27.0 * (n0 + n1 + n2 + n3 + n4);

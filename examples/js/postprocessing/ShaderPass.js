@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ShaderPass = function( shader, textureID ) {
+THREE.ShaderPass = function ( shader, textureID ) {
 
 	this.textureID = ( textureID !== undefined ) ? textureID : "tDiffuse";
 
@@ -30,7 +30,7 @@ THREE.ShaderPass.prototype = {
 
 		if ( this.uniforms[ this.textureID ] ) {
 
-			this.uniforms[ this.textureID ].texture = readBuffer;
+			this.uniforms[ this.textureID ].value = readBuffer;
 
 		}
 

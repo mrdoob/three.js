@@ -37,5 +37,4 @@ var Bird = function () {
 
 }
 
-Bird.prototype = new THREE.Geometry();
-Bird.prototype.constructor = Bird;
+Bird.prototype = Object.create( THREE.Geometry.prototype );

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - level-of-details</title>
@@ -32,14 +32,14 @@
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - level-of-details WebGL example
+			<a href="http://threejs.org" target="_blank">three.js</a> - level-of-details WebGL example
 		</div>
 
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -66,12 +66,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
-
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 1000;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 0, 0, 0 );
@@ -118,7 +117,6 @@
 				}
 
 
-
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -126,6 +124,22 @@
 				renderer.autoUpdateScene = false;
 
 				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -151,7 +165,15 @@
 				camera.lookAt( scene.position );
 
 				scene.updateMatrixWorld();
-				THREE.SceneUtils.traverseHierarchy( scene, function ( node ) { if ( node instanceof THREE.LOD ) node.update( camera ) } );
+				scene.traverse( function ( object ) {
+
+					if ( object instanceof THREE.LOD ) {
+
+						object.update( camera );
+
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

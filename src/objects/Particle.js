@@ -1,5 +1,5 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Particle = function ( material ) {
@@ -10,5 +10,14 @@ THREE.Particle = function ( material ) {
 
 };
 
-THREE.Particle.prototype = new THREE.Object3D();
-THREE.Particle.prototype.constructor = THREE.Particle;
+THREE.Particle.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.Particle.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Particle( this.material );
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};

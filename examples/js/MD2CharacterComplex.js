@@ -117,18 +117,18 @@ THREE.MD2CharacterComplex = function () {
 
 		for ( var i = 0; i < original.weapons.length; i ++ ) {
 
-			var mesh = createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
-			mesh.scale.set( this.scale, this.scale, this.scale );
-			mesh.visible = false;
+			var meshWeapon = createPart( original.weapons[ i ].geometry, this.skinsWeapon[ i ] );
+			meshWeapon.scale.set( this.scale, this.scale, this.scale );
+			meshWeapon.visible = false;
 
-			mesh.name = name;
+			meshWeapon.name = original.weapons[ i ].name;
 
-			this.root.add( mesh );
+			this.root.add( meshWeapon );
 
-			this.weapons[ i ] = mesh;
-			this.meshWeapon = mesh;
+			this.weapons[ i ] = meshWeapon;
+			this.meshWeapon = meshWeapon;
 
-			this.meshes.push( mesh );
+			this.meshes.push( meshWeapon );
 
 		}
 
@@ -388,7 +388,7 @@ THREE.MD2CharacterComplex = function () {
 		}
 
 
-		if ( Math.abs( this.speed ) < 0.2 * this.maxSpeed && !( controls.moveLeft || controls.moveRight ) ) {
+		if ( Math.abs( this.speed ) < 0.2 * this.maxSpeed && !( controls.moveLeft || controls.moveRight || controls.moveForward || controls.moveBackward ) ) {
 
 			if ( this.activeAnimation !== idleAnimation ) {
 
@@ -525,9 +525,9 @@ THREE.MD2CharacterComplex = function () {
 		geometry.computeMorphNormals();
 
 		var whiteMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color( 0xffffff ) );
-		var materialWireframe = new THREE.MeshPhongMaterial( { color: 0xffaa00, specular: 0x111111, shininess: 50, wireframe: true, shading: THREE.SmoothShading, map: whiteMap, morphTargets: true, morphNormals: true, perPixel: true, metal: true } );
+		var materialWireframe = new THREE.MeshPhongMaterial( { color: 0xffaa00, specular: 0x111111, shininess: 50, wireframe: true, shading: THREE.SmoothShading, map: whiteMap, morphTargets: true, morphNormals: true, metal: true } );
 
-		var materialTexture = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 50, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true, perPixel: true, metal: true } );
+		var materialTexture = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 50, wireframe: false, shading: THREE.SmoothShading, map: skinMap, morphTargets: true, morphNormals: true, metal: true } );
 		materialTexture.wrapAround = true;
 
 		//

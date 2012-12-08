@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 	<head>
@@ -10,15 +10,20 @@
 				font-family: Monospace;
 				background-color: #f0f0f0;
 				margin: 0px;
-				overflow: hidden; 
+				overflow: hidden;
 			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
 		<script src="js/effects/AsciiEffect.js"></script>
-		<script src="js/Stats.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
 		<script>
 
 			var container, stats;
@@ -34,6 +39,9 @@
 
 			function init() {
 
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
+
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
@@ -45,14 +53,13 @@
 				info.innerHTML = 'Drag to change the view';
 				container.appendChild( info );
 
-				scene = new THREE.Scene();
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
+
+				scene = new THREE.Scene();
 
 				var light = new THREE.PointLight( 0xffffff );
 				light.position.set( 500, 500, 500 );
@@ -69,19 +76,35 @@
 
 				plane = new THREE.Mesh( new THREE.PlaneGeometry( 400, 400 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
 				plane.position.y = - 200;
+				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( width, height );
 				// container.appendChild( renderer.domElement );
 
 				effect = new THREE.AsciiEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( width, height );
 				container.appendChild( effect.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

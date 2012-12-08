@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - cube refraction [balls]</title>
@@ -34,11 +34,11 @@
 
 	<body>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>
 			- O, P : change eye separation
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/effects/CrosseyedEffect.js"></script>
 
@@ -108,18 +108,18 @@
 				// Skybox
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = textureCube;
+				shader.uniforms[ "tCube" ].value = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms
+					uniforms: shader.uniforms,
+					side: THREE.BackSide
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100000, 100000, 100000 ), material );
-				mesh.flipSided = true;
 				scene.add( mesh );
 
 				//
@@ -130,8 +130,24 @@
 				effect = new THREE.CrosseyedEffect( renderer );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.separation = 90;
-				
+
 				document.addEventListener( 'keydown', onKeyDown, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2,
+				windowHalfY = window.innerHeight / 2,
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				effect.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

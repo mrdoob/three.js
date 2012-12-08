@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - dynamic cube reflection</title>
@@ -10,7 +10,7 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			
+
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
@@ -29,15 +29,15 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">J&oacute;n Ragnarsson</a>.</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank">J&oacute;n Ragnarsson</a>.</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script>
 
 			var camera, cubeCamera, scene, renderer;
 			var cube, sphere, torus;
-			
+
 			var fov = 70,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
@@ -54,11 +54,9 @@
 
 			function init() {
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.target = new THREE.Vector3( 0, 0, 0 );
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				var mesh = new THREE.Mesh( new THREE.SphereGeometry( 500, 60, 40 ), new THREE.MeshBasicMaterial( { map: texture } ) );
 				mesh.scale.x = -1;
@@ -76,7 +74,7 @@
 				//
 
 				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget } );
-				
+
 				sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 60, 40 ), material );
 				scene.add( sphere );
 
@@ -92,11 +90,11 @@
 				document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
 				document.addEventListener( 'DOMMouseScroll', onDocumentMouseWheel, false);
 				window.addEventListener( 'resize', onWindowResized, false );
-			
+
 				onWindowResized( null );
 
 			}
-			
+
 			function onWindowResized( event ) {
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -155,7 +153,7 @@
 				}
 
 				camera.projectionMatrix.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
-				
+
 			}
 
 			function animate() {
@@ -166,7 +164,7 @@
 			}
 
 			function render() {
-				
+
 				var time = Date.now();
 
 				lon += .15;
@@ -200,7 +198,7 @@
 				camera.position.y = 100 * Math.cos( phi );
 				camera.position.z = 100 * Math.sin( phi ) * Math.sin( theta );
 
-				camera.lookAt( camera.target );
+				camera.lookAt( scene.position );
 
 				sphere.visible = false; // *cough*
 
@@ -213,6 +211,6 @@
 			}
 
 		</script>
-	
+
 	</body>
 </html>

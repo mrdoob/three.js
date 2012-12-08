@@ -18,8 +18,7 @@ THREE.OrthographicCamera = function ( left, right, top, bottom, near, far ) {
 
 };
 
-THREE.OrthographicCamera.prototype = new THREE.Camera();
-THREE.OrthographicCamera.prototype.constructor = THREE.OrthographicCamera;
+THREE.OrthographicCamera.prototype = Object.create( THREE.Camera.prototype );
 
 THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 

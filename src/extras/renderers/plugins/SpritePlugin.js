@@ -18,16 +18,16 @@ THREE.SpritePlugin = function ( ) {
 		var i = 0;
 
 		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = -1;	// vertex 0
-		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;	// uv 0
+		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv 0
 
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = -1;	// vertex 1
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// uv 1
+		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 0;	// uv 1
 
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// vertex 2
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 0;	// uv 2
+		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// uv 2
 
 		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = 1;	// vertex 3
-		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv 3
+		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;	// uv 3
 
 		i = 0;
 
@@ -63,12 +63,18 @@ THREE.SpritePlugin = function ( ) {
 		_sprite.uniforms.opacity              = _gl.getUniformLocation( _sprite.program, "opacity" );
 
 		_sprite.uniforms.useScreenCoordinates = _gl.getUniformLocation( _sprite.program, "useScreenCoordinates" );
-		_sprite.uniforms.affectedByDistance   = _gl.getUniformLocation( _sprite.program, "affectedByDistance" );
+		_sprite.uniforms.sizeAttenuation   	  = _gl.getUniformLocation( _sprite.program, "sizeAttenuation" );
 		_sprite.uniforms.screenPosition    	  = _gl.getUniformLocation( _sprite.program, "screenPosition" );
 		_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 		_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
 
-		_sprite.attributesEnabled = false;
+		_sprite.uniforms.fogType 		  	  = _gl.getUniformLocation( _sprite.program, "fogType" );
+		_sprite.uniforms.fogDensity 		  = _gl.getUniformLocation( _sprite.program, "fogDensity" );
+		_sprite.uniforms.fogNear 		  	  = _gl.getUniformLocation( _sprite.program, "fogNear" );
+		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
+		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
+
+		_sprite.uniforms.alphaTest 		  	  = _gl.getUniformLocation( _sprite.program, "alphaTest" );
 
 	};
 
@@ -87,24 +93,15 @@ THREE.SpritePlugin = function ( ) {
 		var halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
 
-		var mergeWith3D = true;
-
 		// setup gl
 
 		_gl.useProgram( _sprite.program );
 
-		if ( ! _sprite.attributesEnabled ) {
-
-			_gl.enableVertexAttribArray( attributes.position );
-			_gl.enableVertexAttribArray( attributes.uv );
-
-			_sprite.attributesEnabled = true;
-
-		}
+		_gl.enableVertexAttribArray( attributes.position );
+		_gl.enableVertexAttribArray( attributes.uv );
 
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
-		_gl.depthMask( true );
 
 		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
@@ -112,25 +109,62 @@ THREE.SpritePlugin = function ( ) {
 
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
 
-		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera._projectionMatrixArray );
+		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
 		_gl.activeTexture( _gl.TEXTURE0 );
 		_gl.uniform1i( uniforms.map, 0 );
 
+		var oldFogType = 0;
+		var sceneFogType = 0;
+		var fog = scene.fog;
+
+		if ( fog ) {
+
+			_gl.uniform3f( uniforms.fogColor, fog.color.r, fog.color.g, fog.color.b );
+
+			if ( fog instanceof THREE.Fog ) {
+
+				_gl.uniform1f( uniforms.fogNear, fog.near );
+				_gl.uniform1f( uniforms.fogFar, fog.far );
+
+				_gl.uniform1i( uniforms.fogType, 1 );
+				oldFogType = 1;
+				sceneFogType = 1;
+
+			} else if ( fog instanceof THREE.FogExp2 ) {
+
+				_gl.uniform1f( uniforms.fogDensity, fog.density );
+
+				_gl.uniform1i( uniforms.fogType, 2 );
+				oldFogType = 2;
+				sceneFogType = 2;
+
+			}
+
+		} else {
+
+			_gl.uniform1i( uniforms.fogType, 0 );
+			oldFogType = 0;
+			sceneFogType = 0;
+
+		}
+
+
 		// update positions and sort
 
-		var i, sprite, screenPosition, size, scale = [];
+		var i, sprite, material, screenPosition, size, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
 			sprite = sprites[ i ];
+			material = sprite.material;
 
-			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
+			if ( ! sprite.visible || material.opacity === 0 ) continue;
 
-			if( ! sprite.useScreenCoordinates ) {
+			if ( ! material.useScreenCoordinates ) {
 
-				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld);
-				sprite.z = - sprite._modelViewMatrix.elements[14];
+				sprite._modelViewMatrix.multiply( camera.matrixWorldInverse, sprite.matrixWorld );
+				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
 
 			} else {
 
@@ -140,62 +174,75 @@ THREE.SpritePlugin = function ( ) {
 
 		}
 
-		sprites.sort( painterSort );
+		sprites.sort( painterSortStable );
 
 		// render all sprites
 
 		for( i = 0; i < nSprites; i ++ ) {
 
 			sprite = sprites[ i ];
+			material = sprite.material;
 
-			if ( ! sprite.visible || sprite.opacity === 0 ) continue;
+			if ( ! sprite.visible || material.opacity === 0 ) continue;
 
-			if ( sprite.map && sprite.map.image && sprite.map.image.width ) {
+			if ( material.map && material.map.image && material.map.image.width ) {
 
-				if ( sprite.useScreenCoordinates ) {
+				_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
+
+				if ( material.useScreenCoordinates ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
-					_gl.uniform3f( uniforms.screenPosition, ( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
-															( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
-															  Math.max( 0, Math.min( 1, sprite.position.z ) ) );
+					_gl.uniform3f(
+						uniforms.screenPosition,
+						( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
+						( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
+						Math.max( 0, Math.min( 1, sprite.position.z ) )
+					);
 
 				} else {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
-					_gl.uniform1i( uniforms.affectedByDistance, sprite.affectedByDistance ? 1 : 0 );
-					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements);
+					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
+					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
 				}
 
-				size = sprite.map.image.width / ( sprite.scaleByViewport ? viewportHeight : 1 );
+				if ( scene.fog && material.fog ) {
+
+					fogType = sceneFogType;
+
+				} else {
+
+					fogType = 0;
+
+				}
+
+				if ( oldFogType !== fogType ) {
+
+					_gl.uniform1i( uniforms.fogType, fogType );
+					oldFogType = fogType;
+
+				}
+
+				size = 1 / ( material.scaleByViewport ? viewportHeight : 1 );
 
 				scale[ 0 ] = size * invAspect * sprite.scale.x;
 				scale[ 1 ] = size * sprite.scale.y;
 
-				_gl.uniform2f( uniforms.uvScale, sprite.uvScale.x, sprite.uvScale.y );
-				_gl.uniform2f( uniforms.uvOffset, sprite.uvOffset.x, sprite.uvOffset.y );
-				_gl.uniform2f( uniforms.alignment, sprite.alignment.x, sprite.alignment.y );
+				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
+				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
+				_gl.uniform2f( uniforms.alignment, material.alignment.x, material.alignment.y );
 
-				_gl.uniform1f( uniforms.opacity, sprite.opacity );
-				_gl.uniform3f( uniforms.color, sprite.color.r, sprite.color.g, sprite.color.b );
+				_gl.uniform1f( uniforms.opacity, material.opacity );
+				_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
 				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 
-				if ( sprite.mergeWith3D && !mergeWith3D ) {
-
-					_gl.enable( _gl.DEPTH_TEST );
-					mergeWith3D = true;
-
-				} else if ( ! sprite.mergeWith3D && mergeWith3D ) {
-
-					_gl.disable( _gl.DEPTH_TEST );
-					mergeWith3D = false;
-
-				}
-
-				_renderer.setBlending( sprite.blending, sprite.blendEquation, sprite.blendSrc, sprite.blendDst );
-				_renderer.setTexture( sprite.map, 0 );
+				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+				_renderer.setDepthTest( material.depthTest );
+				_renderer.setDepthWrite( material.depthWrite );
+				_renderer.setTexture( material.map, 0 );
 
 				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 
@@ -206,8 +253,6 @@ THREE.SpritePlugin = function ( ) {
 		// restore gl
 
 		_gl.enable( _gl.CULL_FACE );
-		_gl.enable( _gl.DEPTH_TEST );
-		_gl.depthMask( true );
 
 	};
 
@@ -233,9 +278,17 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-	function painterSort ( a, b ) {
+	function painterSortStable ( a, b ) {
 
-		return b.z - a.z;
+		if ( a.z !== b.z ) {
+
+			return b.z - a.z;
+
+		} else {
+
+			return b.id - a.id;
+
+		}
 
 	};
 

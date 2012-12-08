@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - io blender - vertex colors</title>
@@ -32,12 +32,12 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -61,11 +61,10 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1800;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 ).normalize();
@@ -88,18 +87,34 @@
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
-			function createScene1( geometry ) {
+			function onWindowResize() {
 
-				geometry.materials[ 0 ].shading = THREE.FlatShading;
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function createScene1( geometry, materials ) {
+
+				materials[ 0 ].shading = THREE.FlatShading;
 
 				mesh = new THREE.Object3D();
 				mesh.position.x = 400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
 				scene.add( mesh );
 
-				var part1 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+				var part1 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh.add( part1 );
 
 				var part2 = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 0.9, shading: THREE.FlatShading, wireframe: true, wireframeLinewidth: 2, transparent: true } ) );
@@ -107,13 +122,11 @@
 
 			}
 
-			function createScene2( geometry ) {
+			function createScene2( geometry, materials ) {
 
-				geometry.materials[ 0 ].shading = THREE.FlatShading;
+				materials[ 0 ].shading = THREE.FlatShading;
 
-				var material = new THREE.MeshFaceMaterial();
-
-				mesh2 = new THREE.Mesh( geometry, material );
+				mesh2 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh2.position.x = - 400;
 				mesh2.scale.x = mesh2.scale.y = mesh2.scale.z = 250;
 				scene.add( mesh2 );

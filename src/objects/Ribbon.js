@@ -11,5 +11,14 @@ THREE.Ribbon = function ( geometry, material ) {
 
 };
 
-THREE.Ribbon.prototype = new THREE.Object3D();
-THREE.Ribbon.prototype.constructor = THREE.Ribbon;
+THREE.Ribbon.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.Ribbon.prototype.clone = function ( object ) {
+
+	if ( object === undefined ) object = new THREE.Ribbon( this.geometry, this.material );
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	return object;
+
+};

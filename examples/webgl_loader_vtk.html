@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - loaders - vtk loader</title>
@@ -27,16 +27,19 @@
 
 	<body>
 		<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> -
+		<a href="http://threejs.org" target="_blank">three.js</a> -
 		vtk format loader test -
 		model from <a href="http://www.cc.gatech.edu/projects/large_models/" target="_blank">The GeorgiaTech Lagre Geometric Model Archive</a>,
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
 		<script src="js/loaders/VTKLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -48,71 +51,95 @@
 
 			var cross;
 
+			init();
+			animate();
 
-			// scene and camera
+			function init() {
 
-			scene = new THREE.Scene();
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera.position.z = 0.2;
 
-			camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
-			camera.position.z = 0.2;
+				controls = new THREE.TrackballControls( camera );
 
+				controls.rotateSpeed = 5.0;
+				controls.zoomSpeed = 5;
+				controls.panSpeed = 2;
 
-			scene.add( camera );
+				controls.noZoom = false;
+				controls.noPan = false;
 
-			controls = new THREE.TrackballControls( camera );
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
 
-			controls.rotateSpeed = 5.0;
-			controls.zoomSpeed = 5;
-			controls.panSpeed = 2;
+				scene = new THREE.Scene();
 
-			controls.noZoom = false;
-			controls.noPan = false;
+				scene.add( camera );
 
-			controls.staticMoving = true;
-			controls.dynamicDampingFactor = 0.3;
+				// light
 
-			// light
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 200, 200, 1000 ).normalize();
 
-			var dirLight = new THREE.DirectionalLight( 0xffffff );
-			dirLight.position.set( 200, 200, 1000 ).normalize();
-			camera.add( dirLight );
-			camera.add( dirLight.target );
+				camera.add( dirLight );
+				camera.add( dirLight.target );
 
-			// renderer
+				var material = new THREE.MeshLambertMaterial( { color:0xffffff, side: THREE.DoubleSide } );
 
-			renderer = new THREE.WebGLRenderer( { antialias: false } );
-			renderer.setClearColorHex( 0x000000, 1 );
-			renderer.setSize( window.innerWidth, window.innerHeight );
+				var loader = new THREE.VTKLoader();
+				loader.addEventListener( 'load', function ( event ) {
 
-			container = document.createElement( 'div' );
-			document.body.appendChild( container );
-			container.appendChild( renderer.domElement );
+					var geometry = event.content;
 
-			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.setY( - 0.09 );
+					scene.add( mesh );
 
+				} );
+				loader.load( "models/vtk/bunny.vtk" );
 
-			var material =  new THREE.MeshLambertMaterial( { color:0xffffff} );
+				// renderer
 
-			var loader=new THREE.VTKLoader();
-			loader.load ("models/vtk/bunny.vtk", function(geom){
-				var mesh = new THREE.Mesh(geom, material );
-				mesh.doubleSided=true;
-				mesh.position.setY(-0.09);
-				scene.add( mesh );
-				animate();
-				});
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColorHex( 0x000000, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
+
 				controls.update();
 				renderer.render( scene, camera );
+
 				stats.update();
 
 			}
+
 		</script>
 
 	</body>

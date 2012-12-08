@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - shader [Monjori]</title>
@@ -34,12 +34,12 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -109,11 +109,10 @@
 
 				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.Camera();
 				camera.position.z = 1;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				uniforms = {
 					time: { type: "f", value: 1.0 },
@@ -129,7 +128,6 @@
 				} );
 
 				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), material );
-				mesh.geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
 				scene.add( mesh );
 
 				renderer = new THREE.WebGLRenderer();

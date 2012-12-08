@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - lines - cubes</title>
@@ -40,14 +40,14 @@
 	<body>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - lines WebGL demo
+			<a href="http://threejs.org" target="_blank">three.js</a> - lines WebGL demo
 			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -70,11 +70,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 700;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -125,6 +124,22 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			// port of Processing Java code by Thomas Diewald
@@ -167,6 +182,7 @@
 				}
 
 				return vec;
+
 			}
 
 			//
@@ -185,7 +201,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
@@ -196,7 +214,9 @@
 
 					mouseX = event.touches[ 0 ].pageX - windowHalfX;
 					mouseY = event.touches[ 0 ].pageY - windowHalfY;
+
 				}
+
 			}
 
 			//

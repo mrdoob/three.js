@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - lights - point lights</title>
@@ -35,11 +35,11 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - point lights WebGL demo.<br />
+			<a href="http://threejs.org" target="_blank">three.js</a> - point lights WebGL demo.<br />
 			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -52,6 +52,8 @@
 			light1, light2, light3, light4,
 			object, loader;
 
+			var clock = new THREE.Clock();
+
 			init();
 			animate();
 
@@ -59,11 +61,10 @@
 
 				var container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 100;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
@@ -116,6 +117,19 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//
@@ -131,8 +145,9 @@
 			function render() {
 
 				var time = Date.now() * 0.0005;
+				var delta = clock.getDelta();
 
-				if( object ) object.rotation.y -= 0.01;
+				if( object ) object.rotation.y -= 0.5 * delta;
 
 				light1.position.x = Math.sin( time * 0.7 ) * 30;
 				light1.position.y = Math.cos( time * 0.5 ) * 40;

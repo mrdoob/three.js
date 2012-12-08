@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - geometry - cube</title>
@@ -15,9 +15,9 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -52,30 +52,36 @@
 				info.innerHTML = 'Drag to spin the cube';
 				container.appendChild( info );
 
-				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.y = 150;
 				camera.position.z = 500;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// Cube
 
-				var materials = [];
+				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
 
-				for ( var i = 0; i < 6; i ++ ) {
+				for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
-					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } ) );
+					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
 
 				}
 
-				cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200, 1, 1, 1, materials ), new THREE.MeshFaceMaterial() );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
+
+				cube = new THREE.Mesh( geometry, material );
 				cube.position.y = 150;
 				scene.add( cube );
 
 				// Plane
 
-				plane = new THREE.Mesh( new THREE.PlaneGeometry( 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				var geometry = new THREE.PlaneGeometry( 200, 200 );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+
+				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } );
+
+				plane = new THREE.Mesh( geometry, material );
 				scene.add( plane );
 
 				renderer = new THREE.CanvasRenderer();
@@ -91,6 +97,23 @@
 				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
 			}
 
 			//
@@ -105,6 +128,7 @@
 
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
+
 			}
 
 			function onDocumentMouseMove( event ) {
@@ -112,6 +136,7 @@
 				mouseX = event.clientX - windowHalfX;
 
 				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+
 			}
 
 			function onDocumentMouseUp( event ) {
@@ -119,6 +144,7 @@
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
 			}
 
 			function onDocumentMouseOut( event ) {
@@ -126,11 +152,12 @@
 				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
 				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
 				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
 			}
 
 			function onDocumentTouchStart( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -138,11 +165,12 @@
 					targetRotationOnMouseDown = targetRotation;
 
 				}
+
 			}
 
 			function onDocumentTouchMove( event ) {
 
-				if ( event.touches.length == 1 ) {
+				if ( event.touches.length === 1 ) {
 
 					event.preventDefault();
 
@@ -150,6 +178,7 @@
 					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 
 				}
+
 			}
 
 			//

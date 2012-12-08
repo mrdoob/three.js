@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - convex geometry</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.y = 400;
+
+				scene = new THREE.Scene();
+
+				var light, object, materials;
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 1, 0 );
+				scene.add( light );
+
+				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 16;
+
+				materials = [
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1 } )
+				];
+
+
+				// tetrahedron
+
+				var points = [
+					new THREE.Vector3( 100, 0, 0 ),
+					new THREE.Vector3( 0, 100, 0 ),
+					new THREE.Vector3( 0, 0, 100 ),
+					new THREE.Vector3( 0, 0, 0 )
+				];
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.ConvexGeometry( points ), materials );
+				object.position.set( 0, 0, 0 );
+				scene.add( object );
+
+				// cube
+
+				var points = [
+					new THREE.Vector3( 50, 50, 50 ),
+					new THREE.Vector3( 50, 50, -50 ),
+					new THREE.Vector3( -50, 50, -50 ),
+					new THREE.Vector3( -50, 50, 50 ),
+					new THREE.Vector3( 50, -50, 50 ),
+					new THREE.Vector3( 50, -50, -50 ),
+					new THREE.Vector3( -50, -50, -50 ),
+					new THREE.Vector3( -50, -50, 50 ),
+				];
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.ConvexGeometry( points ), materials );
+				object.position.set( -200, 0, -200 );
+				scene.add( object );
+
+				// random convex
+
+				points = [];
+				for ( var i = 0; i < 30; i ++ ) {
+
+					points.push( randomPointInSphere( 50 ) );
+
+				}
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.ConvexGeometry( points ), materials );
+				object.position.set( -200, 0, 200 );
+				scene.add( object );
+
+
+				object = new THREE.AxisHelper( 50 );
+				object.position.set( 200, 0, -200 );
+				scene.add( object );
+
+				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
+				object.position.set( 200, 0, 400 );
+				scene.add( object );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+			function randomPointInSphere( radius ) {
+
+				return new THREE.Vector3(
+					( Math.random() - 0.5 ) * 2 * radius,
+					( Math.random() - 0.5 ) * 2 * radius,
+					( Math.random() - 0.5 ) * 2 * radius
+				);
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = Date.now() * 0.0001;
+
+				camera.position.x = Math.cos( timer ) * 800;
+				camera.position.z = Math.sin( timer ) * 800;
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+
+					var object = scene.children[ i ];
+
+					object.rotation.x = timer * 5;
+					object.rotation.y = timer * 2.5;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js canvas - materials - video</title>
@@ -15,9 +15,9 @@
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<video id="video" autoplay style="display:none">
 			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
@@ -57,15 +57,13 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> - video demo. playing <a href="http://durian.blender.org/" target="_blank">sintel</a> trailer';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.z = 1000;
 
 				scene = new THREE.Scene();
-
-				scene.add( camera );
 
 				video = document.getElementById( 'video' );
 
@@ -101,22 +99,20 @@
 				textureReflection.minFilter = THREE.LinearFilter;
 				textureReflection.magFilter = THREE.LinearFilter;
 
-				var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection, overdraw: true } );
+				var materialReflection = new THREE.MeshBasicMaterial( { map: textureReflection, side: THREE.BackSide, overdraw: true } );
 
 				//
 
 				var plane = new THREE.PlaneGeometry( 480, 204, 4, 4 );
 
 				mesh = new THREE.Mesh( plane, material );
-				mesh.rotation.x = Math.PI / 2;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
 				scene.add(mesh);
 
 				mesh = new THREE.Mesh( plane, materialReflection );
 				mesh.position.y = -306;
-				mesh.rotation.x = - Math.PI / 2;
+				mesh.rotation.x = - Math.PI;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 1.5;
-				mesh.doubleSided = true;
 				scene.add( mesh );
 
 				//
@@ -151,6 +147,7 @@
 						scene.add( particle );
 
 					}
+
 				}
 
 				renderer = new THREE.CanvasRenderer();
@@ -165,9 +162,25 @@
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
 			}
 
-			function onDocumentMouseMove(event) {
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY ) * 0.2;

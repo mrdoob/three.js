@@ -1,14 +1,15 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DCount ++;
+	this.id = THREE.Object3DIdCount ++;
 
 	this.name = '';
+	this.properties = {};
 
 	this.parent = undefined;
 	this.children = [];
@@ -17,11 +18,8 @@ THREE.Object3D = function () {
 
 	this.position = new THREE.Vector3();
 	this.rotation = new THREE.Vector3();
-	this.eulerOrder = 'XYZ';
+	this.eulerOrder = THREE.Object3D.defaultEulerOrder;
 	this.scale = new THREE.Vector3( 1, 1, 1 );
-
-	this.doubleSided = false;
-	this.flipSided = false;
 
 	this.renderDepth = null;
 
@@ -36,9 +34,6 @@ THREE.Object3D = function () {
 
 	this.quaternion = new THREE.Quaternion();
 	this.useQuaternion = false;
-
-	this.boundRadius = 0.0;
-	this.boundRadiusScale = 1.0;
 
 	this.visible = true;
 
@@ -61,7 +56,10 @@ THREE.Object3D.prototype = {
 		this.matrix.multiply( matrix, this.matrix );
 
 		this.scale.getScaleFromMatrix( this.matrix );
-		this.rotation.getRotationFromMatrix( this.matrix, this.scale );
+
+		var mat = new THREE.Matrix4().extractRotation( this.matrix );
+		this.rotation.setEulerFromRotationMatrix( mat, this.eulerOrder );
+
 		this.position.getPositionFromMatrix( this.matrix );
 
 	},
@@ -91,6 +89,18 @@ THREE.Object3D.prototype = {
 
 	},
 
+	localToWorld: function ( vector ) {
+
+		return this.matrixWorld.multiplyVector3( vector );
+
+	},
+
+	worldToLocal: function ( vector ) {
+
+		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
+
+	},
+
 	lookAt: function ( vector ) {
 
 		// TODO: Add hierarchy support.
@@ -99,7 +109,15 @@ THREE.Object3D.prototype = {
 
 		if ( this.rotationAutoUpdate ) {
 
-			this.rotation.getRotationFromMatrix( this.matrix );
+			if ( this.useQuaternion === false )  {
+
+				this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+
+			} else {
+
+				this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+
+			}
 
 		}
 
@@ -114,7 +132,7 @@ THREE.Object3D.prototype = {
 
 		}
 
-		if ( object instanceof THREE.Object3D ) { // && this.children.indexOf( object ) === - 1
+		if ( object instanceof THREE.Object3D ) {
 
 			if ( object.parent !== undefined ) {
 
@@ -174,13 +192,23 @@ THREE.Object3D.prototype = {
 
 	},
 
+	traverse: function ( callback ) {
+
+		callback( this );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].traverse( callback );
+
+		}
+
+	},
+
 	getChildByName: function ( name, recursive ) {
 
-		var c, cl, child;
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-		for ( c = 0, cl = this.children.length; c < cl; c ++ ) {
-
-			child = this.children[ c ];
+			var child = this.children[ i ];
 
 			if ( child.name === name ) {
 
@@ -188,7 +216,7 @@ THREE.Object3D.prototype = {
 
 			}
 
-			if ( recursive ) {
+			if ( recursive === true ) {
 
 				child = child.getChildByName( name, recursive );
 
@@ -206,24 +234,39 @@ THREE.Object3D.prototype = {
 
 	},
 
+	getDescendants: function ( array ) {
+
+		if ( array === undefined ) array = [];
+
+		Array.prototype.push.apply( array, this.children );
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			this.children[ i ].getDescendants( array );
+
+		}
+
+		return array;
+
+	},
+
 	updateMatrix: function () {
 
 		this.matrix.setPosition( this.position );
 
-		if ( this.useQuaternion )  {
+		if ( this.useQuaternion === false )  {
 
-			this.matrix.setRotationFromQuaternion( this.quaternion );
+			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
 
 		} else {
 
-			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
+			this.matrix.setRotationFromQuaternion( this.quaternion );
 
 		}
 
 		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
 
 			this.matrix.scale( this.scale );
-			this.boundRadiusScale = Math.max( this.scale.x, Math.max( this.scale.y, this.scale.z ) );
 
 		}
 
@@ -233,19 +276,17 @@ THREE.Object3D.prototype = {
 
 	updateMatrixWorld: function ( force ) {
 
-		this.matrixAutoUpdate && this.updateMatrix();
+		if ( this.matrixAutoUpdate === true ) this.updateMatrix();
 
-		// update matrixWorld
+		if ( this.matrixWorldNeedsUpdate === true || force === true ) {
 
-		if ( this.matrixWorldNeedsUpdate || force ) {
+			if ( this.parent === undefined ) {
 
-			if ( this.parent ) {
-
-				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+				this.matrixWorld.copy( this.matrix );
 
 			} else {
 
-				this.matrixWorld.copy( this.matrix );
+				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
 
 			}
 
@@ -263,8 +304,56 @@ THREE.Object3D.prototype = {
 
 		}
 
+	},
+
+	clone: function ( object ) {
+
+		if ( object === undefined ) object = new THREE.Object3D();
+
+		object.name = this.name;
+
+		object.up.copy( this.up );
+
+		object.position.copy( this.position );
+		if ( object.rotation instanceof THREE.Vector3 ) object.rotation.copy( this.rotation ); // because of Sprite madness
+		object.eulerOrder = this.eulerOrder;
+		object.scale.copy( this.scale );
+
+		object.renderDepth = this.renderDepth;
+
+		object.rotationAutoUpdate = this.rotationAutoUpdate;
+
+		object.matrix.copy( this.matrix );
+		object.matrixWorld.copy( this.matrixWorld );
+		object.matrixRotationWorld.copy( this.matrixRotationWorld );
+
+		object.matrixAutoUpdate = this.matrixAutoUpdate;
+		object.matrixWorldNeedsUpdate = this.matrixWorldNeedsUpdate;
+
+		object.quaternion.copy( this.quaternion );
+		object.useQuaternion = this.useQuaternion;
+
+		object.visible = this.visible;
+
+		object.castShadow = this.castShadow;
+		object.receiveShadow = this.receiveShadow;
+
+		object.frustumCulled = this.frustumCulled;
+
+		for ( var i = 0; i < this.children.length; i ++ ) {
+
+			var child = this.children[ i ];
+			object.add( child.clone() );
+
+		}
+
+		return object;
+
 	}
 
 };
 
-THREE.Object3DCount = 0;
+THREE.Object3D.__m1 = new THREE.Matrix4();
+THREE.Object3D.defaultEulerOrder = 'XYZ',
+
+THREE.Object3DIdCount = 0;

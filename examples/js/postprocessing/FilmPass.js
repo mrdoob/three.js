@@ -2,9 +2,12 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
+THREE.FilmPass = function ( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
-	var shader = THREE.ShaderExtras[ "film" ];
+	if ( THREE.FilmShader === undefined )
+		console.error( "THREE.FilmPass relies on THREE.FilmShader" );
+
+	var shader = THREE.FilmShader;
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -31,7 +34,7 @@ THREE.FilmPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta ) {
 
-		this.uniforms[ "tDiffuse" ].texture = readBuffer;
+		this.uniforms[ "tDiffuse" ].value = readBuffer;
 		this.uniforms[ "time" ].value += delta;
 
 		THREE.EffectComposer.quad.material = this.material;

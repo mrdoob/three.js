@@ -1,8 +1,10 @@
 /**
- * @author mr.doob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.RenderableParticle = function () {
+
+	this.object = null;
 
 	this.x = null;
 	this.y = null;

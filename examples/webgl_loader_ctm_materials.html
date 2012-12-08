@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - baked illumination</title>
@@ -15,7 +15,9 @@
 				font-size:13px;
 				text-align:center;
 			}
+
 			a { color:skyblue }
+
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
@@ -26,25 +28,32 @@
 				z-index:100;
 				display:block;
 			}
+
+			#stats { position: absolute; top:5px; left: 0; z-index: 100 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - baked + real-time illumination -
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - baked + real-time illumination -
 		using <a href="http://code.google.com/p/js-openctm/">js-openctm</a> -
 		camaro by <a href="http://www.turbosquid.com/3d-models/blender-camaro/411348" target="_blank">dskfnwn</a> -
 		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
 
 		<script src="js/loaders/ctm/lzma.js"></script>
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -79,19 +88,17 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				// SCENE
-
-				scene = new THREE.Scene();
-
 				// CAMERA
 
 				camera = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.set( 185, 40, 170 );
-				scene.add( camera );
 
 				controls = new THREE.TrackballControls( camera );
 				controls.dynamicDampingFactor = 0.25;
 
+				// SCENE
+
+				scene = new THREE.Scene();
 
 				// SKYBOX
 
@@ -108,19 +115,19 @@
 				textureCube = THREE.ImageUtils.loadTextureCube( urls );
 
 				var shader = THREE.ShaderUtils.lib[ "cube" ];
-				shader.uniforms[ "tCube" ].texture = textureCube;
+				shader.uniforms[ "tCube" ].value = textureCube;
 
 				var material = new THREE.ShaderMaterial( {
 
 					fragmentShader: shader.fragmentShader,
 					vertexShader: shader.vertexShader,
 					uniforms: shader.uniforms,
-					depthWrite: false
+					depthWrite: false,
+					side: THREE.BackSide
 
 				} ),
 
 				mesh = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100 ), material );
-				mesh.flipSided = true;
 				sceneCube.add( mesh );
 
 				// LIGHTS
@@ -160,14 +167,7 @@
 				// STATS
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '5px';
-				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// EVENTS
 
@@ -183,9 +183,9 @@
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				var callbackScene   = function( geometry ) {
+				var callbackScene   = function( geometry, materials ) {
 
-					createScene( geometry,  0, 0, 0, 30 );
+					createScene( geometry, materials, 0, 0, 0, 30 );
 
 					var end = Date.now();
 
@@ -198,10 +198,7 @@
 */
 				// new way via CTMLoader and separate parts
 
-				var useWorker = true,
-					useBuffers = true;
-
-				loaderCTM = new THREE.CTMLoader( renderer.context, true );
+				loaderCTM = new THREE.CTMLoader( true );
 				document.body.appendChild( loaderCTM.statusDomElement );
 
 				var position = new THREE.Vector3( -105, -78, -40 );
@@ -216,7 +213,6 @@
 						var mesh = new THREE.Mesh( geometries[ i ], materials[ i ] );
 						mesh.position = position;
 						mesh.scale = scale;
-						mesh.doubleSided = true;
 						scene.add( mesh );
 
 					}
@@ -227,7 +223,7 @@
 
 					console.log( "load time:", end - start, "ms" );
 
-				}, useWorker, useBuffers );
+				}, { useWorker: true } );
 
 			}
 
@@ -278,11 +274,12 @@
 						mm.shininess = 30;
 						mm.color.setHex( 0x404040 );
 						mm.metal = true;
-						mm.perPixel = true;
 
 						materials[ i ] = mm;
 
 					}
+
+					materials[ i ].side = THREE.DoubleSide;
 
 				}
 
@@ -290,19 +287,18 @@
 
 			//
 
-			function createScene( geometry, x, y, z, s ) {
+			function createScene( geometry, materials, x, y, z, s ) {
 
 				loader.statusDomElement.style.display = "none";
 
 				THREE.GeometryUtils.center( geometry );
-				hackMaterials( geometry.materials );
+				hackMaterials( materials );
 
-				var material = new THREE.MeshFaceMaterial();
+				var material = new THREE.MeshFaceMaterial( materials );
 
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( x, y, z );
 				mesh.scale.set( s, s, s );
-				mesh.doubleSided = true;
 				scene.add( mesh );
 
 			}

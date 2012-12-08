@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - materials - normal map</title>
@@ -40,16 +40,16 @@
 	<body>
 
 		<div id="info">
-			<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement + environment + shadow</span>) map demo.
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl (<span id="description">normal + ao + displacement + environment + shadow</span>) map demo.
 			ninja head from <a href="http://developer.amd.com/archive/gpu/MeshMapper/pages/default.aspx" target="_blank">AMD GPU MeshMapper</a>
 
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)</div>
 		</div>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -84,13 +84,10 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				scene = new THREE.Scene();
-
-				// CAMERA
-
 				camera = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
 				camera.position.z = 1500;
-				scene.add( camera );
+
+				scene = new THREE.Scene();
 
 				// LIGHTS
 
@@ -163,13 +160,16 @@
 				uniforms[ "enableDiffuse" ].value = false;
 				uniforms[ "enableSpecular" ].value = false;
 				uniforms[ "enableReflection" ].value = true;
+				uniforms[ "enableDisplacement" ].value = true;
 
-				uniforms[ "tNormal" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
-				uniforms[ "tAO" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
+				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/normal.jpg" );
+				uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/ao.jpg" );
 
-				uniforms[ "tDisplacement" ].texture = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
-				uniforms[ "uDisplacementBias" ].value = - 0.428408 * scale;
-				uniforms[ "uDisplacementScale" ].value = 2.436143 * scale;
+				uniforms[ "tDisplacement" ].value = THREE.ImageUtils.loadTexture( "textures/normal/ninja/displacement.jpg" );
+				uniforms[ "uDisplacementBias" ].value = - 0.428408;
+				uniforms[ "uDisplacementScale" ].value = 2.436143;
+
+				uniforms[ "uNormalScale" ].value.y = -1;
 
 				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
 				uniforms[ "uSpecularColor" ].value.setHex( specular );
@@ -177,7 +177,7 @@
 
 				uniforms[ "uShininess" ].value = shininess;
 
-				uniforms[ "tCube" ].texture = reflectionCube;
+				uniforms[ "tCube" ].value = reflectionCube;
 				uniforms[ "uReflectivity" ].value = 0.1;
 
 				uniforms[ "uDiffuseColor" ].value.convertGammaToLinear();
@@ -199,7 +199,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { maxLights: 8 } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
@@ -212,7 +212,7 @@
 				//
 
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapSoft = true;
+				renderer.shadowMapType = THREE.PCFShadowMap;
 
 
 				//
@@ -230,6 +230,26 @@
 					container.appendChild( stats.domElement );
 
 				}
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.left = window.innerWidth / - 2;
+				camera.right = window.innerWidth / 2;
+				camera.top = window.innerHeight / 2;
+				camera.bottom = window.innerHeight / - 2;
+
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 

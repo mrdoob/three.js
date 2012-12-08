@@ -67,25 +67,25 @@ THREE.Loader.prototype = {
 
 	},
 
-	initMaterials: function ( scope, materials, texturePath ) {
+	initMaterials: function ( materials, texturePath ) {
 
-		scope.materials = [];
+		var array = [];
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			scope.materials[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
+			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
 
 		}
 
+		return array;
+
 	},
 
-	hasNormals: function ( scope ) {
+	needsTangents: function ( materials ) {
 
-		var m, i, il = scope.materials.length;
+		for( var i = 0, il = materials.length; i < il; i ++ ) {
 
-		for( i = 0; i < il; i ++ ) {
-
-			m = scope.materials[ i ];
+			var m = materials[ i ];
 
 			if ( m instanceof THREE.ShaderMaterial ) return true;
 
@@ -116,6 +116,7 @@ THREE.Loader.prototype = {
 		function load_image( where, url ) {
 
 			var image = new Image();
+
 			image.onload = function () {
 
 				if ( !is_pow2( this.width ) || !is_pow2( this.height ) ) {
@@ -136,24 +137,39 @@ THREE.Loader.prototype = {
 				where.needsUpdate = true;
 
 			};
+
 			image.crossOrigin = _this.crossOrigin;
 			image.src = url;
 
 		}
 
-		function create_texture( where, name, sourceFile, repeat, offset, wrap ) {
+		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
-			var texture = document.createElement( 'canvas' );
+			var isCompressed = sourceFile.toLowerCase().endsWith( ".dds" );
+			var fullPath = texturePath + "/" + sourceFile;
 
-			where[ name ] = new THREE.Texture( texture );
+			if ( isCompressed ) {
+
+				var texture = THREE.ImageUtils.loadCompressedTexture( fullPath );
+
+				where[ name ] = texture;
+
+			} else {
+
+				var texture = document.createElement( 'canvas' );
+
+				where[ name ] = new THREE.Texture( texture );
+
+			}
+
 			where[ name ].sourceFile = sourceFile;
 
 			if( repeat ) {
 
 				where[ name ].repeat.set( repeat[ 0 ], repeat[ 1 ] );
 
-				if ( repeat[ 0 ] != 1 ) where[ name ].wrapS = THREE.RepeatWrapping;
-				if ( repeat[ 1 ] != 1 ) where[ name ].wrapT = THREE.RepeatWrapping;
+				if ( repeat[ 0 ] !== 1 ) where[ name ].wrapS = THREE.RepeatWrapping;
+				if ( repeat[ 1 ] !== 1 ) where[ name ].wrapT = THREE.RepeatWrapping;
 
 			}
 
@@ -175,7 +191,17 @@ THREE.Loader.prototype = {
 
 			}
 
-			load_image( where[ name ], texturePath + "/" + sourceFile );
+			if ( anisotropy ) {
+
+				where[ name ].anisotropy = anisotropy;
+
+			}
+
+			if ( ! isCompressed ) {
+
+				load_image( where[ name ], fullPath );
+
+			}
 
 		}
 
@@ -188,7 +214,7 @@ THREE.Loader.prototype = {
 		// defaults
 
 		var mtype = "MeshLambertMaterial";
-		var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, wireframe: m.wireframe };
+		var mpars = { color: 0xeeeeee, opacity: 1.0, map: null, lightMap: null, normalMap: null, bumpMap: null, wireframe: false };
 
 		// parameters from model file
 
@@ -225,9 +251,33 @@ THREE.Loader.prototype = {
 
 		}
 
+		if ( m.visible !== undefined ) {
+
+			mpars.visible = m.visible;
+
+		}
+
+		if ( m.flipSided !== undefined ) {
+
+			mpars.side = THREE.BackSide;
+
+		}
+
+		if ( m.doubleSided !== undefined ) {
+
+			mpars.side = THREE.DoubleSide;
+
+		}
+
+		if ( m.wireframe !== undefined ) {
+
+			mpars.wireframe = m.wireframe;
+
+		}
+
 		if ( m.vertexColors !== undefined ) {
 
-			if ( m.vertexColors == "face" ) {
+			if ( m.vertexColors === "face" ) {
 
 				mpars.vertexColors = THREE.FaceColors;
 
@@ -281,25 +331,39 @@ THREE.Loader.prototype = {
 
 		if ( m.mapDiffuse && texturePath ) {
 
-			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap );
+			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
 
 		}
 
 		if ( m.mapLight && texturePath ) {
 
-			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap );
+			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
+
+		}
+
+		if ( m.mapBump && texturePath ) {
+
+			create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
 
 		}
 
 		if ( m.mapNormal && texturePath ) {
 
-			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap );
+			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
 
 		}
 
 		if ( m.mapSpecular && texturePath ) {
 
-			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap );
+			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
+
+		}
+
+		//
+
+		if ( m.mapBumpScale ) {
+
+			mpars.bumpScale = m.mapBumpScale;
 
 		}
 
@@ -310,31 +374,31 @@ THREE.Loader.prototype = {
 			var shader = THREE.ShaderUtils.lib[ "normal" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-			uniforms[ "tNormal" ].texture = mpars.normalMap;
+			uniforms[ "tNormal" ].value = mpars.normalMap;
 
 			if ( m.mapNormalFactor ) {
 
-				uniforms[ "uNormalScale" ].value = m.mapNormalFactor;
+				uniforms[ "uNormalScale" ].value.set( m.mapNormalFactor, m.mapNormalFactor );
 
 			}
 
 			if ( mpars.map ) {
 
-				uniforms[ "tDiffuse" ].texture = mpars.map;
+				uniforms[ "tDiffuse" ].value = mpars.map;
 				uniforms[ "enableDiffuse" ].value = true;
 
 			}
 
 			if ( mpars.specularMap ) {
 
-				uniforms[ "tSpecular" ].texture = mpars.specularMap;
+				uniforms[ "tSpecular" ].value = mpars.specularMap;
 				uniforms[ "enableSpecular" ].value = true;
 
 			}
 
 			if ( mpars.lightMap ) {
 
-				uniforms[ "tAO" ].texture = mpars.lightMap;
+				uniforms[ "tAO" ].value = mpars.lightMap;
 				uniforms[ "enableAO" ].value = true;
 
 			}
@@ -355,6 +419,12 @@ THREE.Loader.prototype = {
 
 			var parameters = { fragmentShader: shader.fragmentShader, vertexShader: shader.vertexShader, uniforms: uniforms, lights: true, fog: true };
 			var material = new THREE.ShaderMaterial( parameters );
+
+			if ( mpars.transparent ) {
+
+				material.transparent = true;
+
+			}
 
 		} else {
 

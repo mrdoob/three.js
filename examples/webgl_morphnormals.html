@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - morph normals - horse</title>
@@ -12,14 +12,20 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+
 			a { color: #f00 }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #666 !important }
+			#stats #fps #fpsGraph { display: none }
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/Three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="js/Detector.js"></script>
-		<script src="js/Stats.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -47,19 +53,17 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - morph normals - model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - morph normals - model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>';
 				container.appendChild( info );
 
 				//
 
-				scene1 = new THREE.Scene();
-				scene2 = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 40, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				camera.position.y = 300;
-				scene1.add( camera );
-
 				camera.target = new THREE.Vector3( 0, 150, 0 );
+
+				scene1 = new THREE.Scene();
+				scene2 = new THREE.Scene();
 
 				//
 
@@ -107,7 +111,7 @@
 					morphColorsToFaceColors( geometry );
 					geometry.computeMorphNormals();
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading, perPixel: false } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, morphTargets: true, morphNormals: true, vertexColors: THREE.FaceColors, shading: THREE.SmoothShading } );
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 					meshAnim.duration = 5000;
@@ -136,13 +140,6 @@
 				//
 
 				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#666";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
-
 				container.appendChild( stats.domElement );
 
 				//
