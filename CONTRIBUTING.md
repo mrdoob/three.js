@@ -1,6 +1,6 @@
-# Contributing??
+# CONTRIBUTING TO THREE.JS
 
-## Having a problem??
+## Having a problem
 
 We use 2 different systems to have explain problems.
 
@@ -9,7 +9,7 @@ We use 2 different systems to have explain problems.
 
 If you are not sure which problem you encountered, then we would like to report it to stackoverflow. For a more extensive explanation, see [issue 1979](https://github.com/mrdoob/three.js/issues/1979).
 
-### How to report??
+### How to report.
 
 It's hard to identify a problem without some key parts. What helps??
 
