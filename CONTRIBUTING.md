@@ -3,18 +3,18 @@
 ## 1. Index
 
 1. [Index](#1-index)
-2. [Having a problem](#2-having-a-problem)
+2. [Before you create a new Issue.](#2-before-you-create-a-new-issue)
   * [How to report](#how-to-report)
   * [Migrating problems](#migrating-problems)
 
-## 2. Having a problem
+## 2. Before you create a new Issue.
 
-We use 2 different systems to have explain problems.
+We use both, stackoverflow and github issues. Where should you be posting?
 
-* [stackoverflow](http://stackoverflow.com/questions/tagged/three.js): This is used when you have a problem in your program. Here we help you out to get further with three.js
-* [github issues](https://github.com/mrdoob/three.js/issues): This is used to identify problems and features for three.js itself. This is used by the developers of three.js.
+* [Stackoverflow](http://stackoverflow.com/questions/tagged/three.js): By default you should be using stackoverflow. Feel free to ask a question whenever you need help either because you're stuck or you don't know what the right approach would be.
+* [Github issues](https://github.com/mrdoob/three.js/issues): If you're certain that you have found a bug or there is a feature request you would like to make.
 
-If you are not sure which problem you encountered, then we would like to report it to stackoverflow. For a more extensive explanation, see [issue 1979](https://github.com/mrdoob/three.js/issues/1979).
+For a more extensive explanation, see [issue 1979](https://github.com/mrdoob/three.js/issues/1979).
 
 ### How to report.
 
