@@ -2,10 +2,10 @@
 
 ## 1. Index
 
-1. [Index](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#2-Index)
-2. [Having a problem](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#2-having-a-problem)
-  * [How to report](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#how-to-report)
-  * [Migrating problems](https://github.com/gero3/three.js/blob/patch-6/CONTRIBUTING.md#migrating-problems)
+1. [Index](#2-Index)
+2. [Having a problem](#2-having-a-problem)
+  * [How to report](#how-to-report)
+  * [Migrating problems](#migrating-problems)
 
 ## 2. Having a problem
 
