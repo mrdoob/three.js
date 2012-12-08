@@ -2,7 +2,7 @@
 
 ## 1. Index
 
-1. [Index](#1-Index)
+1. [Index](#1-index)
 2. [Having a problem](#2-having-a-problem)
   * [How to report](#how-to-report)
   * [Migrating problems](#migrating-problems)
