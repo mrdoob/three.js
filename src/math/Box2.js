@@ -237,15 +237,6 @@ THREE.Box2.prototype = {
 
 	},
 
-	scale: function ( factor ) {
-
-		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
-		this.expandByVector( sizeDeltaHalf );
-
-		return this;
-
-	},
-
 	equals: function ( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
