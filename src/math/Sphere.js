@@ -98,7 +98,7 @@ THREE.Sphere.prototype = {
 
 	transform: function ( matrix ) {
 		
-		this.center = matrix.multipleVector3( this.center );
+		this.center = matrix.multiplyVector3( this.center );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
@@ -107,15 +107,7 @@ THREE.Sphere.prototype = {
 
 	translate: function ( offset ) {
 
-		this.center.addSelf( this.offset );
-
-		return this;
-
-	},
-
-	scale: function ( factor ) {
-
-		this.radius *= factor;
+		this.center.addSelf( offset );
 
 		return this;
 
@@ -129,7 +121,7 @@ THREE.Sphere.prototype = {
 
 	clone: function () {
 
-		return new THREE.Sphere3().copy( this );
+		return new THREE.Sphere().copy( this );
 
 	}
 
