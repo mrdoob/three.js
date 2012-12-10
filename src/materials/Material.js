@@ -5,6 +5,8 @@
 
 THREE.Material = function () {
 
+	THREE.EventTarget.call( this );
+
 	this.id = THREE.MaterialIdCount ++;
 
 	this.name = '';
@@ -111,6 +113,12 @@ THREE.Material.prototype.clone = function ( material ) {
 	material.visible = this.visible;
 
 	return material;
+
+};
+
+THREE.Material.prototype.deallocate = function () {
+
+	this.dispatchEvent( { type: 'deallocate' } );
 
 };
 

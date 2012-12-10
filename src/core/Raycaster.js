@@ -89,7 +89,7 @@
 
 			inverseMatrix.getInverse( object.matrixWorld );
 
-			localRay.copy( raycaster.ray ).transformSelf( inverseMatrix );
+			localRay.copy( raycaster.ray ).transform( inverseMatrix );
 	
 			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 

@@ -6,6 +6,8 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
+	THREE.EventTarget.call( this );
+
 	this.id = THREE.TextureIdCount ++;
 
 	this.name = '';
@@ -72,6 +74,12 @@ THREE.Texture.prototype = {
 		texture.unpackAlignment = this.unpackAlignment;
 
 		return texture;
+
+	},
+
+	deallocate: function () {
+
+		this.dispatchEvent( { type: 'deallocate' } );
 
 	}
 
