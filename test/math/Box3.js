@@ -247,7 +247,7 @@ test( "transform", function() {
 	var m = new THREE.Matrix4();
 
 	var t1 = new THREE.Vector3( 1, -2, 1 );
-	m.makeTranslation( t1.x, t1.y, t1.z );
+	m.makeTranslation( t1 );
 	ok( compareBox( a.clone().transform( m ), a.clone().translate( t1 ) ), "Passed!" );
 	ok( compareBox( b.clone().transform( m ), b.clone().translate( t1 ) ), "Passed!" );
 	ok( compareBox( c.clone().transform( m ), c.clone().translate( t1 ) ), "Passed!" );

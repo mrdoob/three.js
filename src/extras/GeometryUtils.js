@@ -383,7 +383,7 @@ THREE.GeometryUtils = {
 		offset.add( bb.min, bb.max );
 		offset.multiplyScalar( -0.5 );
 
-		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset ) );
 		geometry.computeBoundingBox();
 
 		return offset;

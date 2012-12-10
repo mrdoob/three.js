@@ -159,6 +159,6 @@ test( "transform/translate", function() {
 	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
 	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), -1 ) ), "Passed!" );
 
-	m.makeTranslation( 1, 1, 1 );
+	m.makeTranslation( new THREE.Vector3( 1, 1, 1 ) );
 	ok( comparePlane( a.clone().transform( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });
