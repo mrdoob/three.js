@@ -244,19 +244,31 @@ THREE.Box3.prototype = {
 
 	},
 
-	translate: function ( offset ) {
+	transform: function ( matrix ) {
+		
+		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+		var newPoints = [
+			matrix.multiplyVector3( THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ) ), // 000
+			matrix.multiplyVector3( THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ) ), // 001
+			matrix.multiplyVector3( THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ) ), // 010
+			matrix.multiplyVector3( THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ) ), // 011
+			matrix.multiplyVector3( THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ) ), // 100
+			matrix.multiplyVector3( THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ) ), // 101
+			matrix.multiplyVector3( THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ) ), // 110
+			matrix.multiplyVector3( THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ) )  // 111
+		];
 
-		this.min.addSelf( offset );
-		this.max.addSelf( offset );
+		this.makeEmpty();
+		this.setFromPoints( newPoints );
 
 		return this;
 
 	},
 
-	scale: function ( factor ) {
+	translate: function ( offset ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
-		this.expandByVector( sizeDeltaHalf );
+		this.min.addSelf( offset );
+		this.max.addSelf( offset );
 
 		return this;
 
@@ -276,4 +288,11 @@ THREE.Box3.prototype = {
 
 };
 
+THREE.Box3.__v0 = new THREE.Vector3();
 THREE.Box3.__v1 = new THREE.Vector3();
+THREE.Box3.__v2 = new THREE.Vector3();
+THREE.Box3.__v3 = new THREE.Vector3();
+THREE.Box3.__v4 = new THREE.Vector3();
+THREE.Box3.__v5 = new THREE.Vector3();
+THREE.Box3.__v6 = new THREE.Vector3();
+THREE.Box3.__v7 = new THREE.Vector3();

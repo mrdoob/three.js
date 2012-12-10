@@ -232,6 +232,28 @@ test( "union", function() {
 	ok( b.clone().union( c ).equals( c ), "Passed!" );
 });
 
+var compareBox = function ( a, b, threshold ) {
+	threshold = threshold || 0.0001;
+	return ( a.min.distanceTo( b.min ) < threshold &&
+	a.max.distanceTo( b.max ) < threshold );
+};
+
+test( "transform", function() {
+	var a = new THREE.Box3( zero3, zero3 );
+	var b = new THREE.Box3( zero3, one3 );
+	var c = new THREE.Box3( one3.clone().negate(), one3 );
+	var d = new THREE.Box3( one3.clone().negate(), zero3 );
+
+	var m = new THREE.Matrix4();
+
+	var t1 = new THREE.Vector3( 1, -2, 1 );
+	m.makeTranslation( t1.x, t1.y, t1.z );
+	ok( compareBox( a.clone().transform( m ), a.clone().translate( t1 ) ), "Passed!" );
+	ok( compareBox( b.clone().transform( m ), b.clone().translate( t1 ) ), "Passed!" );
+	ok( compareBox( c.clone().transform( m ), c.clone().translate( t1 ) ), "Passed!" );
+	ok( compareBox( d.clone().transform( m ), d.clone().translate( t1 ) ), "Passed!" );
+});
+
 test( "translate", function() {
 	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );
@@ -242,16 +264,4 @@ test( "translate", function() {
 	ok( a.clone().translate( one3 ).translate( one3.clone().negate() ).equals( a ), "Passed!" );
 	ok( d.clone().translate( one3 ).equals( b ), "Passed!" );
 	ok( b.clone().translate( one3.clone().negate() ).equals( d ), "Passed!" );
-});
-
-test( "scale", function() {
-	var a = new THREE.Box3( zero3, zero3 );
-	var b = new THREE.Box3( zero3, one3 );
-	var c = new THREE.Box3( one3.clone().negate(), one3 );
-	var d = new THREE.Box3( one3.clone().negate(), zero3 );
-
-	ok( a.clone().scale( 0 ).equals( a ), "Passed!" );
-	ok( c.clone().scale( 0 ).equals( a ), "Passed!" );
-	ok( b.clone().scale( 3 ).equals( new THREE.Box3( new THREE.Vector3( -1, -1, -1 ), new THREE.Vector3( 2, 2, 2 ) ) ), "Passed!" );
-	ok( d.clone().scale( 3 ).equals( new THREE.Box3( new THREE.Vector3( 2, 2, 2 ).negate(), new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });
