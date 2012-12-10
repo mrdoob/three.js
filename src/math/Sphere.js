@@ -96,6 +96,15 @@ THREE.Sphere.prototype = {
 
 	},
 
+	transform: function ( matrix ) {
+		
+		this.center = matrix.multipleVector3( this.center );
+		this.radius = this.radius * matrix.getMaxScaleOnAxis();
+
+		return this;
+
+	},
+
 	translate: function ( offset ) {
 
 		this.center.addSelf( this.offset );
