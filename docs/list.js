@@ -26,7 +26,7 @@ var list = {
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Projector", "api/core/Projector" ],
 			[ "Quaternion", "api/core/Quaternion" ],
-			[ "Ray", "api/core/Ray" ],
+			[ "Raycaster", "api/core/Raycaster" ],
 			[ "Rectangle", "api/core/Rectangle" ],
 			[ "Spline", "api/core/Spline" ],
 			[ "UV", "api/core/UV" ],

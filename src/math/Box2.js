@@ -2,35 +2,16 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Box3 = function ( min, max ) {
+THREE.Box2 = function ( min, max ) {
 
-	if ( min === undefined && max === undefined ) {
-
-		this.min = new THREE.Vector3();
-		this.max = new THREE.Vector3();
-		this.makeEmpty();
-
-	} else {
-
-		this.min = min.clone();
-
-		if( max === undefined ) {
-
-			this.max = new THREE.Vector3().copy( this.min ); // This is done on purpose so you can make a box using a single point and then expand it.
-
-		} else {
-
-			this.max = max.clone();
-
-		}
-
-	}
+	this.min = min !== undefined ? min.clone() : new THREE.Vector2( Infinity, Infinity );
+	this.max = max !== undefined ? max.clone() : new THREE.Vector2( -Infinity, -Infinity );
 
 };
 
-THREE.Box3.prototype = {
+THREE.Box2.prototype = {
 
-	constructor: THREE.Box3,
+	constructor: THREE.Box2,
 
 	set: function ( min, max ) {
 
@@ -45,42 +26,32 @@ THREE.Box3.prototype = {
 
 		if ( points.length > 0 ) {
 
-			var p = points[ 0 ];
+			var point = points[ 0 ];
 
-			this.min.copy( p );
-			this.max.copy( p );
+			this.min.copy( point );
+			this.max.copy( point );
 
 			for ( var i = 1, il = points.length; i < il; i ++ ) {
 
-				p = points[ i ];
+				point = points[ i ];
 
-				if ( p.x < this.min.x ) {
+				if ( point.x < this.min.x ) {
 
-					this.min.x = p.x;
+					this.min.x = point.x;
 
-				} else if ( p.x > this.max.x ) {
+				} else if ( point.x > this.max.x ) {
 
-					this.max.x = p.x;
-
-				}
-
-				if ( p.y < this.min.y ) {
-
-					this.min.y = p.y;
-
-				} else if ( p.y > this.max.y ) {
-
-					this.max.y = p.y;
+					this.max.x = point.x;
 
 				}
 
-				if ( p.z < this.min.z ) {
+				if ( point.y < this.min.y ) {
 
-					this.min.z = p.z;
+					this.min.y = point.y;
 
-				} else if ( p.z > this.max.z ) {
+				} else if ( point.y > this.max.y ) {
 
-					this.max.z = p.z;
+					this.max.y = point.y;
 
 				}
 
@@ -98,8 +69,7 @@ THREE.Box3.prototype = {
 
 	setFromCenterAndSize: function ( center, size ) {
 
-		var halfSize = THREE.Box3.__v1.copy( size ).multiplyScalar( 0.5 );
-
+		var halfSize = THREE.Box2.__v1.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).subSelf( halfSize );
 		this.max.copy( center ).addSelf( halfSize );
 
@@ -118,8 +88,8 @@ THREE.Box3.prototype = {
 
 	makeEmpty: function () {
 
-		this.min.x = this.min.y = this.min.z = Infinity;
-		this.max.x = this.max.y = this.max.z = -Infinity;
+		this.min.x = this.min.y = Infinity;
+		this.max.x = this.max.y = -Infinity;
 
 		return this;
 
@@ -129,25 +99,21 @@ THREE.Box3.prototype = {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
-		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
+		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y );
 
 	},
 
-	volume: function () {
+	center: function ( optionalTarget ) {
 
-		return ( this.max.x - this.min.x ) * ( this.max.y - this.min.y ) * ( this.max.z - this.min.z );
-
-	},
-
-	center: function () {
-
-		return new THREE.Vector3().add( this.min, this.max ).multiplyScalar( 0.5 );
+		var result = optionalTarget || new THREE.Vector2();
+		return result.add( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
-	size: function () {
+	size: function ( optionalTarget ) {
 
-		return new THREE.Vector3().sub( this.max, this.min );
+		var result = optionalTarget || new THREE.Vector2();
+		return result.sub( this.max, this.min );
 
 	},
 
@@ -157,7 +123,6 @@ THREE.Box3.prototype = {
 		this.max.maxSelf( point );
 
 		return this;
-
 	},
 
 	expandByVector: function ( vector ) {
@@ -166,7 +131,6 @@ THREE.Box3.prototype = {
 		this.max.addSelf( vector );
 
 		return this;
-
 	},
 
 	expandByScalar: function ( scalar ) {
@@ -175,14 +139,12 @@ THREE.Box3.prototype = {
 		this.max.addScalar( scalar );
 
 		return this;
-
 	},
 
 	containsPoint: function ( point ) {
 
 		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
-			 ( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
+			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
 
 			return true;
 
@@ -195,8 +157,7 @@ THREE.Box3.prototype = {
 	containsBox: function ( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) &&
-			 ( this.min.z <= box.min.z ) && ( box.max.z <= this.max.z ) ) {
+			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
 
 			return true;
 
@@ -211,21 +172,21 @@ THREE.Box3.prototype = {
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		return new THREE.Vector3(
+		return new THREE.Vector2(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
-			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
-			( point.z - this.min.z ) / ( this.max.z - this.min.z )
+			( point.y - this.min.y ) / ( this.max.y - this.min.y )
 		);
 
 	},
 
-	isIntersection: function ( box ) {
+	isIntersectionBox: function ( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ||
-			 ( box.max.z < this.min.z ) || ( box.min.z > this.max.z ) ) {
+		if ( ( box.max.x < this.min.x ) ||
+		     ( box.min.x > this.max.x ) ||
+		     ( box.max.y < this.min.y ) ||
+		     ( box.min.y > this.max.y ) ) {
 
 			return false;
 
@@ -235,15 +196,16 @@ THREE.Box3.prototype = {
 
 	},
 
-	clampPoint: function ( point ) {
+	clampPoint: function ( point, optionalTarget ) {
 
-		return new THREE.Vector3().copy( point ).clampSelf( this.min, this.max );
+		var result = optionalTarget || new THREE.Vector2();
+		return result.copy( point ).clampSelf( this.min, this.max );
 
 	},
 
 	distanceToPoint: function ( point ) {
 
-		var clampedPoint = THREE.Box3.__v1.copy( point ).clampSelf( this.min, this.max );
+		var clampedPoint = THREE.Box2.__v1.copy( point ).clampSelf( this.min, this.max );
 		return clampedPoint.subSelf( point ).length();
 
 	},
@@ -292,10 +254,10 @@ THREE.Box3.prototype = {
 
 	clone: function () {
 
-		return new THREE.Box3().copy( this );
+		return new THREE.Box2().copy( this );
 
 	}
 
 };
 
-THREE.Box3.__v1 = new THREE.Vector3();
+THREE.Box2.__v1 = new THREE.Vector2();

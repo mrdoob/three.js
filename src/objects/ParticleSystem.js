@@ -21,8 +21,6 @@ THREE.ParticleSystem = function ( geometry, material ) {
 
 		}
 
-		this.boundRadius = geometry.boundingSphere.radius;
-
 	}
 
 	this.frustumCulled = false;

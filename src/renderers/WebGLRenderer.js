@@ -53,7 +53,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.shadowMapEnabled = false;
 	this.shadowMapAutoUpdate = true;
-	this.shadowMapSoft = true;
+	this.shadowMapType = THREE.PCFShadowMap;
 	this.shadowMapCullFace = THREE.CullFaceFront;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
@@ -197,6 +197,52 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _supportsBoneTextures = _supportsVertexTextures && _glExtensionTextureFloat;
 
 	var _compressedTextureFormats = _glExtensionCompressedTextureS3TC ? _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS ) : [];
+
+	//
+
+	var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
+	var _vertexShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_FLOAT );
+	var _vertexShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_FLOAT );
+
+	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
+	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
+	var _fragmentShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_FLOAT );
+
+	var _vertexShaderPrecisionHighpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_INT );
+	var _vertexShaderPrecisionMediumpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_INT );
+	var _vertexShaderPrecisionLowpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_INT );
+
+	var _fragmentShaderPrecisionHighpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_INT );
+	var _fragmentShaderPrecisionMediumpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_INT );
+	var _fragmentShaderPrecisionLowpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_INT );
+
+	// clamp precision to maximum available
+
+	var highpAvailable = _vertexShaderPrecisionHighpFloat.precision > 0 && _fragmentShaderPrecisionHighpFloat.precision > 0;
+	var mediumpAvailable = _vertexShaderPrecisionMediumpFloat.precision > 0 && _fragmentShaderPrecisionMediumpFloat.precision > 0;
+
+	if ( _precision === "highp" && ! highpAvailable ) {
+
+		if ( mediumpAvailable ) {
+
+			_precision = "mediump";
+			console.warn( "WebGLRenderer: highp not supported, using mediump" );
+
+		} else {
+
+			_precision = "lowp";
+			console.warn( "WebGLRenderer: highp and mediump not supported, using lowp" );
+
+		}
+
+	}
+
+	if ( _precision === "mediump" && ! mediumpAvailable ) {
+
+		_precision = "lowp";
+		console.warn( "WebGLRenderer: mediump not supported, using lowp" );
+
+	}
 
 	// API
 
@@ -4924,7 +4970,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			maxShadows: maxShadows,
 			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
-			shadowMapSoft: this.shadowMapSoft,
+			shadowMapType: this.shadowMapType,
 			shadowMapDebug: this.shadowMapDebug,
 			shadowMapCascade: this.shadowMapCascade,
 
@@ -5458,7 +5504,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( textureUnit >= _maxTextures ) {
 
-			console.warn( "Trying to use " + textureUnit + " texture units while this GPU supports only " + _maxTextures );
+			console.warn( "WebGLRenderer: trying to use " + textureUnit + " texture units while this GPU supports only " + _maxTextures );
 
 		}
 
@@ -5770,7 +5816,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
+				_direction.copy( light.matrixWorld.getPosition() );
+				_direction.subSelf( light.target.matrixWorld.getPosition() );
+				_direction.normalize();
+
+				// skip lights with undefined direction
+				// these create troubles in OpenGL (making pixel black)
+
+				if ( _direction.x === 0 && _direction.y === 0 && _direction.z === 0 ) continue;
+
 				dirOffset = dirLength * 3;
+
+				dirPositions[ dirOffset ]     = _direction.x;
+				dirPositions[ dirOffset + 1 ] = _direction.y;
+				dirPositions[ dirOffset + 2 ] = _direction.z;
 
 				if ( _this.gammaInput ) {
 
@@ -5781,14 +5840,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 					setColorLinear( dirColors, dirOffset, color, intensity );
 
 				}
-
-				_direction.copy( light.matrixWorld.getPosition() );
-				_direction.subSelf( light.target.matrixWorld.getPosition() );
-				_direction.normalize();
-
-				dirPositions[ dirOffset ]     = _direction.x;
-				dirPositions[ dirOffset + 1 ] = _direction.y;
-				dirPositions[ dirOffset + 2 ] = _direction.z;
 
 				dirLength += 1;
 
@@ -5865,10 +5916,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
-				skyColor = light.color;
-				groundColor = light.groundColor;
+				_direction.copy( light.matrixWorld.getPosition() );
+				_direction.normalize();
+
+				// skip lights with undefined direction
+				// these create troubles in OpenGL (making pixel black)
+
+				if ( _direction.x === 0 && _direction.y === 0 && _direction.z === 0 ) continue;
 
 				hemiOffset = hemiLength * 3;
+
+				hemiPositions[ hemiOffset ]     = _direction.x;
+				hemiPositions[ hemiOffset + 1 ] = _direction.y;
+				hemiPositions[ hemiOffset + 2 ] = _direction.z;
+
+				skyColor = light.color;
+				groundColor = light.groundColor;
 
 				if ( _this.gammaInput ) {
 
@@ -5884,13 +5947,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_direction.copy( light.matrixWorld.getPosition() );
-				_direction.normalize();
-
-				hemiPositions[ hemiOffset ]     = _direction.x;
-				hemiPositions[ hemiOffset + 1 ] = _direction.y;
-				hemiPositions[ hemiOffset + 2 ] = _direction.z;
-
 				hemiLength += 1;
 
 			}
@@ -5901,22 +5957,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		// (this is to avoid if in shader)
 
 		for ( l = dirLength * 3, ll = Math.max( dirColors.length, dirCount * 3 ); l < ll; l ++ ) dirColors[ l ] = 0.0;
-		for ( l = dirLength * 3, ll = Math.max( dirPositions.length, dirCount * 3 ); l < ll; l ++ ) dirPositions[ l ] = 0.0;
-
 		for ( l = pointLength * 3, ll = Math.max( pointColors.length, pointCount * 3 ); l < ll; l ++ ) pointColors[ l ] = 0.0;
-		for ( l = pointLength * 3, ll = Math.max( pointPositions.length, pointCount * 3 ); l < ll; l ++ ) pointPositions[ l ] = 0.0;
-		for ( l = pointLength, ll = Math.max( pointDistances.length, pointCount ); l < ll; l ++ ) pointDistances[ l ] = 0.0;
-
 		for ( l = spotLength * 3, ll = Math.max( spotColors.length, spotCount * 3 ); l < ll; l ++ ) spotColors[ l ] = 0.0;
-		for ( l = spotLength * 3, ll = Math.max( spotPositions.length, spotCount * 3 ); l < ll; l ++ ) spotPositions[ l ] = 0.0;
-		for ( l = spotLength * 3, ll = Math.max( spotDirections.length, spotCount * 3 ); l < ll; l ++ ) spotDirections[ l ] = 0.0;
-		for ( l = spotLength, ll = Math.max( spotAnglesCos.length, spotCount ); l < ll; l ++ ) spotAnglesCos[ l ] = 0.0;
-		for ( l = spotLength, ll = Math.max( spotExponents.length, spotCount ); l < ll; l ++ ) spotExponents[ l ] = 0.0;
-		for ( l = spotLength, ll = Math.max( spotDistances.length, spotCount ); l < ll; l ++ ) spotDistances[ l ] = 0.0;
-
 		for ( l = hemiLength * 3, ll = Math.max( hemiSkyColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiSkyColors[ l ] = 0.0;
 		for ( l = hemiLength * 3, ll = Math.max( hemiGroundColors.length, hemiCount * 3 ); l < ll; l ++ ) hemiGroundColors[ l ] = 0.0;
-		for ( l = hemiLength * 3, ll = Math.max( hemiPositions.length, hemiCount * 3 ); l < ll; l ++ ) hemiPositions[ l ] = 0.0;
 
 		zlights.directional.length = dirLength;
 		zlights.point.length = pointLength;
@@ -6227,6 +6271,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
+
+		if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
+
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF";
+
+		} else if ( parameters.shadowMapType === THREE.PCFSoftShadowMap ) {
+
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
+
+		}
+
 		//console.log( "building new program " );
 
 		//
@@ -6279,7 +6335,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
 			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 
@@ -6378,7 +6434,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
 
 			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-			parameters.shadowMapSoft ? "#define SHADOWMAP_SOFT" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
 			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
 			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
 

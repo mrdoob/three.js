@@ -1,22 +1,13 @@
 /**
  * @author bhouston / http://exocortex.com
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Sphere = function ( center, radius ) {
 
+	this.center = center === undefined ? new THREE.Vector3() : center.clone();
+	this.radius = radius === undefined ? 0 : radius;
 
-	if ( center === undefined && radius === undefined ) {
-
-		this.center = new THREE.Vector3();
-		this.radius = 0;
-
-	} else {
-
-		this.center = center.clone();
-		this.radius = radius || 0;
-
-	}
-	
 };
 
 THREE.Sphere.prototype = {
@@ -29,7 +20,6 @@ THREE.Sphere.prototype = {
 		this.radius = radius;
 
 		return this;
-
 	},
 
 	setFromCenterAndPoints: function ( center, points ) {
@@ -65,12 +55,6 @@ THREE.Sphere.prototype = {
 
 	},
 
-	volume: function () {
-
-		return Math.PI * 4 / 3 * ( this.radius * this.radius * this.radius );
-
-	},
-
 	containsPoint: function ( point ) {
 
 		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
@@ -83,11 +67,12 @@ THREE.Sphere.prototype = {
 
 	},
 
-	clampPoint: function ( point ) {
+	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
 
-		var result = new THREE.Vector3().copy( point );
+		var result = optionalTarget || new THREE.Vector3();
+		result.copy( point );
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
 
@@ -100,9 +85,11 @@ THREE.Sphere.prototype = {
 
 	},
 
-	bounds: function () {
+	bounds: function ( optionalTarget ) {
 
-		var box =  new THREE.Box3( this.center, this.center );
+		var box = optionalTarget || new THREE.Box3();
+
+		box.set( this.center, this.center );
 		box.expandByScalar( this.radius );
 
 		return box;

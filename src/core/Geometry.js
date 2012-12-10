@@ -9,8 +9,6 @@
 
 THREE.Geometry = function () {
 
-	THREE.GeometryLibrary.push( this );
-
 	this.id = THREE.GeometryIdCount ++;
 
 	this.name = '';
@@ -56,7 +54,7 @@ THREE.Geometry = function () {
 
 THREE.Geometry.prototype = {
 
-	constructor : THREE.Geometry,
+	constructor: THREE.Geometry,
 
 	applyMatrix: function ( matrix ) {
 
@@ -577,12 +575,26 @@ THREE.Geometry.prototype = {
 
 	computeBoundingBox: function () {
 
-		this.boundingBox = new THREE.Box3().setFromPoints( this.vertices );
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new THREE.Box3();
+
+		}
+
+		this.boundingBox.setFromPoints( this.vertices );
+
 	},
 
 	computeBoundingSphere: function () {
 
-		this.boundingSphere = new THREE.Sphere().setFromCenterAndPoints( new THREE.Vector3(), this.vertices );
+		if ( this.boundingSphere === null ) {
+
+			this.boundingSphere = new THREE.Sphere();
+
+		}
+
+		this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
+
 	},
 
 	/*
@@ -720,16 +732,8 @@ THREE.Geometry.prototype = {
 
 		return geometry;
 
-	},
-
-	deallocate: function () {
-
-		var index = THREE.GeometryLibrary.indexOf( this );
-		if ( index !== -1 ) THREE.GeometryLibrary.splice( index, 1 );
-
 	}
 
 };
 
 THREE.GeometryIdCount = 0;
-THREE.GeometryLibrary = [];

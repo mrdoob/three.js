@@ -4,17 +4,8 @@
 
 THREE.Plane = function ( normal, constant ) {
 
-	if ( normal === undefined && constant === undefined ) {
-
-		this.normal = new THREE.Vector3();
-		this.constant = 0;
-
-	} else {
-
-		this.normal = normal.clone();
-		this.constant = constant || 0;
-
-	}
+	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3();
+	this.constant = constant !== undefined ? constant : 0;
 
 };
 
@@ -51,8 +42,8 @@ THREE.Plane.prototype = {
 
 	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var normal = THREE.Plane.__v1.sub( b, a ).cross(
-					 THREE.Plane.__v2.sub( c, a ) );
+		var normal = THREE.Plane.__v1.sub( c, b ).crossSelf(
+					 THREE.Plane.__v2.sub( a, b ) );
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
@@ -66,14 +57,6 @@ THREE.Plane.prototype = {
 
 		this.normal.copy( plane.normal );
 		this.constant = plane.constant;
-
-		return this;
-
-	},
-
-	flip: function () {
-
-		this.normal.negate();
 
 		return this;
 
@@ -103,21 +86,22 @@ THREE.Plane.prototype = {
 
 	},
 
-	projectPoint: function ( point ) {
+	projectPoint: function ( point, optionalTarget ) {
 
-		return this.orthoPoint( point ).subSelf( point ).negate();
+		return this.orthoPoint( point, optionalTarget ).subSelf( point ).negate();
 
 	},
 
-	orthoPoint: function ( point ) {
+	orthoPoint: function ( point, optionalTarget ) {
 
 		var perpendicularMagnitude = this.distanceToPoint( point );
 
-		return new THREE.Vector3().copy( this.normal ).multiplyScalar( perpendicularMagnitude );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( perpendicularMagnitude );
 
 	},
 
-	intersectsLine: function ( startPoint, endPoint ) {
+	isIntersectionLine: function ( startPoint, endPoint ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
@@ -128,9 +112,10 @@ THREE.Plane.prototype = {
 
 	},
 
-	coplanarPoint: function () {
+	coplanarPoint: function ( optionalTarget ) {
 
-		return new THREE.Vector3().copy( this.normal ).multiplyScalar( - this.constant );
+		var result = optionalTarget || new THREE.Vector3();
+		return result.copy( this.normal ).multiplyScalar( - this.constant );
 
 	},
 

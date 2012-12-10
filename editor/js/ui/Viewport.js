@@ -66,7 +66,7 @@ var Viewport = function ( signals ) {
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
 
-	var ray = new THREE.Ray();
+	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
 	var offset = new THREE.Vector3();
 
@@ -446,14 +446,12 @@ var Viewport = function ( signals ) {
 		// remove selected object from the scene
 
 		selected.parent.remove( selected );
-		selected.deallocate();
 
 		// remove eventual pure Object3D targets from the scene
 
 		if ( selected.target && !selected.target.geometry ) {
 
 			selected.target.parent.remove( selected.target );
-			selected.target.deallocate();
 
 		}
 
@@ -476,7 +474,6 @@ var Viewport = function ( signals ) {
 			var helper = helpersToRemove[ i ];
 
 			helper.parent.remove( helper );
-			helper.deallocate();
 
 		}
 
@@ -714,7 +711,7 @@ var Viewport = function ( signals ) {
 		defaultScene.add( defaultCamera );
 
 		signals.sceneAdded.dispatch( defaultScene, defaultCamera, defaultBgColor );
-		signals.objectSelected.dispatch( defaultScene.properties.defaultSelection );
+		signals.objectSelected.dispatch( defaultCamera );
 
 	} );
 
@@ -872,6 +869,8 @@ var Viewport = function ( signals ) {
 
 		var scene = new THREE.Scene();
 
+		/*
+
 		// create lights
 
 		var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
@@ -924,6 +923,8 @@ var Viewport = function ( signals ) {
 		scene.add( light3 );
 		scene.add( light4 );
 		scene.add( mesh );
+
+		*/
 
 		return scene;
 

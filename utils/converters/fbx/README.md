@@ -16,10 +16,11 @@ convert_to_threejs.py [source_file] [output_file] [options]
 
 Options:
   -t, --triangulate     force quad geometry into triangles
-  -x, --no-textures     don't include texture references in the output file
-  -p, --no-prefix       don't prefix object names in the output file
+  -p, --prefix          prefix object names in the output file
+  -g, --geometry-only   output geometry only
   -c, --default-camera  include a default camera in the output scene
   -l, --defualt-light   include a default light in the output scene
+  -x, --no-textures     don't include texture references in the output file
 ```
 
 ## Supported Features
@@ -35,9 +36,11 @@ Options:
 
 ## Current Limitations
 
-* No skeletal animation support
+* No animation support
 * Only Lambert and Phong materials are supported
-* Some camera and light properties are not converted correctly
+* Some camera properties are not converted correctly
+* Some light properties are not converted correctly
+* Some material properties are not converted correctly
 
 ## Dependencies
 
@@ -64,9 +67,3 @@ tar jxf ./Python-2.6.8.tar.bz2
 cd ./Python-2.6.8
 ./configure --prefix=/opt/python2.6.8 && make && make install
 ```
-
-## Todo List
-
-* fix light and camera conversion (some properties are not correctly converted)
-* add support for skeletal animations
-* add support for fog conversion

@@ -65,6 +65,21 @@ THREE.Math = {
 
 		return ( x < 0 ) ? -1 : ( ( x > 0 ) ? 1 : 0 );
 
+	},
+
+	degreesToRadians: function ( degrees ) {
+
+		return degrees * THREE.Math.__d2r;
+
+	},
+
+	radiansToDegrees: function ( radians ) {
+
+		return radians * THREE.Math.__r2d;
+
 	}
 
 };
+
+THREE.Math.__d2r =  Math.PI / 180;
+THREE.Math.__r2d =  180 / Math.PI;
