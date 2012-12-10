@@ -4,9 +4,16 @@
 
 module( "Plane" );
 
+var comparePlane = function ( a, b, threshold ) {
+	threshold = threshold || 0.0001;
+	return ( a.normal.distanceTo( b.normal ) < threshold &&
+	Math.abs( a.constant - b.constant ) < threshold );
+};
+
+
 test( "constructor", function() {
 	var a = new THREE.Plane();
-	ok( a.normal.x == 0, "Passed!" );
+	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 0, "Passed!" );
 	ok( a.normal.z == 0, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
@@ -45,7 +52,7 @@ test( "copy", function() {
 
 test( "set", function() {
 	var a = new THREE.Plane();
-	ok( a.normal.x == 0, "Passed!" );
+	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 0, "Passed!" );
 	ok( a.normal.z == 0, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
@@ -59,7 +66,7 @@ test( "set", function() {
 
 test( "setComponents", function() {
 	var a = new THREE.Plane();
-	ok( a.normal.x == 0, "Passed!" );
+	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 0, "Passed!" );
 	ok( a.normal.z == 0, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
@@ -74,7 +81,7 @@ test( "setComponents", function() {
 test( "setFromNormalAndCoplanarPoint", function() {
 	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( one3, zero3 );
 	
-	ok( a.normal.equals( one3 ), "Passed!" );
+	ok( a.normal.equals( one3.clone().normalize() ), "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 });
 
@@ -85,4 +92,73 @@ test( "normalize", function() {
 	ok( a.normal.length() == 1, "Passed!" );
 	ok( a.normal.equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
 	ok( a.constant == 1, "Passed!" );
+});
+
+test( "distanceToPoint", function() {
+	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), -2 );
+	
+	a.normalize();
+	ok( a.distanceToPoint( a.projectPoint( zero3.clone() ) ) === 0, "Passed!" );
+	ok( a.distanceToPoint( new THREE.Vector3( 4, 0, 0 ) ) === 3, "Passed!" );
+});
+
+test( "distanceToSphere", function() {
+	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+
+	var b = new THREE.Sphere( new THREE.Vector3( 2, 0, 0 ), 1 );
+	
+	ok( a.distanceToSphere( b ) === 1, "Passed!" );
+
+	a.set( new THREE.Vector3( 1, 0, 0 ), 2 );
+	ok( a.distanceToSphere( b ) === 3, "Passed!" );
+	a.set( new THREE.Vector3( 1, 0, 0 ), -2 );
+	ok( a.distanceToSphere( b ) === -1, "Passed!" );
+});
+
+test( "projectPoint", function() {
+	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+
+	ok( a.projectPoint( new THREE.Vector3( 10, 0, 0 ) ).equals( zero3 ), "Passed!" );
+	ok( a.projectPoint( new THREE.Vector3( -10, 0, 0 ) ).equals( zero3 ), "Passed!" );
+
+	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
+	ok( a.projectPoint( new THREE.Vector3( 0, 0, 0 ) ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	ok( a.projectPoint( new THREE.Vector3( 0, 1, 0 ) ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+	
+});
+
+test( "orthoPoint", function() {
+	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+
+	ok( a.orthoPoint( new THREE.Vector3( 10, 0, 0 ) ).equals( new THREE.Vector3( 10, 0, 0 ) ), "Passed!" );
+	ok( a.orthoPoint( new THREE.Vector3( -10, 0, 0 ) ).equals( new THREE.Vector3( -10, 0, 0 ) ), "Passed!" );
+});
+
+/*
+test( "isIntersectionLine", function() {
+});
+*/
+
+test( "coplanarPoint", function() {
+	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+	ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );
+
+	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
+	ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );
+});
+
+test( "transform/translate", function() {
+
+	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
+
+	var m = new THREE.Matrix4();
+	m.makeRotationZ( Math.PI * 0.5 );
+
+	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 ) ), "Passed!" );
+
+	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
+	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), -1 ) ), "Passed!" );
+
+	m.makeTranslation( 1, 1, 1 );
+	ok( comparePlane( a.clone().transform( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });

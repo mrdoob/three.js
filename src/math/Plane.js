@@ -4,7 +4,7 @@
 
 THREE.Plane = function ( normal, constant ) {
 
-	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3();
+	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3( 1, 0, 0 );
 	this.constant = constant !== undefined ? constant : 0;
 
 };
@@ -33,8 +33,8 @@ THREE.Plane.prototype = {
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
 
-		this.normal.copy( normal );
-		this.constant = - point.dot( normal );
+		this.normal.copy( normal ).normalize();
+		this.constant = - point.dot( this.normal );	// must be this.normal, not normal, as this.normal is normalized
 
 		return this;
 
@@ -43,7 +43,7 @@ THREE.Plane.prototype = {
 	setFromCoplanarPoints: function ( a, b, c ) {
 
 		var normal = THREE.Plane.__v1.sub( c, b ).crossSelf(
-					 THREE.Plane.__v2.sub( a, b ) );
+					 THREE.Plane.__v2.sub( a, b ) ).normalize();
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
@@ -121,16 +121,17 @@ THREE.Plane.prototype = {
 
 	transform: function( matrix, optionalNormalMatrix ) {
 
+		var newNormal = THREE.Plane.__v1, newCoplanarPoint = THREE.Plane.__v2;
+
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		THREE.Plane.__v1 = optionalNormalMatrix.multiplyVector3( this.normal );
+		newNormal = optionalNormalMatrix.multiplyVector3( newNormal.copy( this.normal ) );
 
-		// compute new co-planar point.
-		THREE.Plane.__v2 = this.projectPoint( THREE.Plane.__vZero, THREE.Plane.__v2 );
-		THREE.Plane.__v2 = matrix.multiplyVector3( THREE.Plane.__v2 );
+		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
+		newCoplanarPoint = matrix.multiplyVector3( newCoplanarPoint );
 
-		this.setFromNormalAndCoplanarPoint( THREE.Plane.__v1, THREE.Plane.__v2 )
+		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 
 		return this;
 		
@@ -138,7 +139,7 @@ THREE.Plane.prototype = {
 
 	translate: function ( offset ) {
 
-		this.constant = - offset.dot( this.normal );
+		this.constant = this.constant - offset.dot( this.normal );
 
 		return this;
 
