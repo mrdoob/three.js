@@ -448,6 +448,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	/*
 	this.deallocateMaterial = function ( material ) {
 
 		var program = material.program;
@@ -510,6 +511,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+	*/
 
 	// Rendering
 
@@ -549,6 +551,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_this.info.memory.textures --;
 
+
+	};
+
+	var onMaterialDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onMaterialDeallocate );
+
+		deallocateMaterial( this );
 
 	};
 
@@ -634,7 +644,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateGeometry = function ( geometry ) {
 
-		delete geometry.__webglInit;
+		geometry.__webglInit = undefined;
 
 		if ( geometry.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglVertexBuffer );
 		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
@@ -708,7 +718,70 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	}
+	};
+
+	var deallocateMaterial = function ( material ) {
+
+		var program = material.program;
+
+		if ( program === undefined ) return;
+
+		material.program = undefined;
+
+		// only deallocate GL program if this was the last use of shared program
+		// assumed there is only single copy of any program in the _programs list
+		// (that's how it's constructed)
+
+		var i, il, programInfo;
+		var deleteProgram = false;
+
+		for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+			programInfo = _programs[ i ];
+
+			if ( programInfo.program === program ) {
+
+				programInfo.usedTimes --;
+
+				if ( programInfo.usedTimes === 0 ) {
+
+					deleteProgram = true;
+
+				}
+
+				break;
+
+			}
+
+		}
+
+		if ( deleteProgram === true ) {
+
+			// avoid using array.splice, this is costlier than creating new array from scratch
+
+			var newPrograms = [];
+
+			for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+				programInfo = _programs[ i ];
+
+				if ( programInfo.program !== program ) {
+
+					newPrograms.push( programInfo );
+
+				}
+
+			}
+
+			_programs = newPrograms;
+
+			_gl.deleteProgram( program );
+
+			_this.info.memory.programs --;
+
+		}
+
+	};
 
 	//
 
@@ -4997,6 +5070,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Materials
 
 	this.initMaterial = function ( material, lights, fog, object ) {
+
+		material.addEventListener( 'deallocate', onMaterialDeallocate );
 
 		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
 

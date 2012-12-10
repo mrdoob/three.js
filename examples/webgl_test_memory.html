@@ -85,13 +85,10 @@
 
 				scene.remove( mesh );
 
-				//
+				// force deallocate
 
 				geometry.deallocate();
 				texture.deallocate();
-
-				// renderer.deallocateObject( mesh );
-				// renderer.deallocateTexture( texture );
 
 			}
 
