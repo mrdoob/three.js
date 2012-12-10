@@ -366,6 +366,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Deallocation
 
+	/*
 	this.deallocateObject = function ( object ) {
 
 		if ( ! object.__webglInit ) return;
@@ -421,6 +422,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.memory.textures --;
 
 	};
+	*/
 
 	this.deallocateRenderTarget = function ( renderTarget ) {
 
@@ -632,6 +634,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	var deallocateGeometry = function ( geometry ) {
 
+		delete geometry.__webglInit;
+
 		if ( geometry.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglVertexBuffer );
 		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
 		if ( geometry.__webglTangentBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglTangentBuffer );
@@ -681,17 +685,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		// custom attributes
-
-		if ( geometry.__webglCustomAttributesList !== undefined ) {
-
-			for ( var id in geometry.__webglCustomAttributesList ) {
-
-				_gl.deleteBuffer( geometry.__webglCustomAttributesList[ id ].buffer );
-
-			}
-
-		}
+		deleteCustomAttributesBuffers( geometry );
 
 	};
 
@@ -718,6 +712,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	//
 
+	/*
 	function deleteParticleBuffers ( geometry ) {
 
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
@@ -795,6 +790,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.memory.geometries --;
 
 	};
+	*/
 
 	function deleteCustomAttributesBuffers( geometry ) {
 
@@ -4595,8 +4591,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
-			if ( object.geometry !== undefined ) {
+			if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
 
+				object.geometry.__webglInit = true;
 				object.geometry.addEventListener( 'deallocate', onGeometryDeallocate );
 
 			}
