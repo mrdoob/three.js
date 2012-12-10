@@ -2155,15 +2155,6 @@ THREE.Box2.prototype = {
 
 	},
 
-	scale: function ( factor ) {
-
-		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
-		this.expandByVector( sizeDeltaHalf );
-
-		return this;
-
-	},
-
 	equals: function ( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
@@ -2425,19 +2416,31 @@ THREE.Box3.prototype = {
 
 	},
 
-	translate: function ( offset ) {
+	transform: function ( matrix ) {
+		
+		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+		var newPoints = [
+			matrix.multiplyVector3( THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ) ), // 000
+			matrix.multiplyVector3( THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ) ), // 001
+			matrix.multiplyVector3( THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ) ), // 010
+			matrix.multiplyVector3( THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ) ), // 011
+			matrix.multiplyVector3( THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ) ), // 100
+			matrix.multiplyVector3( THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ) ), // 101
+			matrix.multiplyVector3( THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ) ), // 110
+			matrix.multiplyVector3( THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ) )  // 111
+		];
 
-		this.min.addSelf( offset );
-		this.max.addSelf( offset );
+		this.makeEmpty();
+		this.setFromPoints( newPoints );
 
 		return this;
 
 	},
 
-	scale: function ( factor ) {
+	translate: function ( offset ) {
 
-		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
-		this.expandByVector( sizeDeltaHalf );
+		this.min.addSelf( offset );
+		this.max.addSelf( offset );
 
 		return this;
 
@@ -2457,7 +2460,14 @@ THREE.Box3.prototype = {
 
 };
 
+THREE.Box3.__v0 = new THREE.Vector3();
 THREE.Box3.__v1 = new THREE.Vector3();
+THREE.Box3.__v2 = new THREE.Vector3();
+THREE.Box3.__v3 = new THREE.Vector3();
+THREE.Box3.__v4 = new THREE.Vector3();
+THREE.Box3.__v5 = new THREE.Vector3();
+THREE.Box3.__v6 = new THREE.Vector3();
+THREE.Box3.__v7 = new THREE.Vector3();
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -3171,7 +3181,7 @@ THREE.Matrix4.prototype = {
 		mRotation.identity();
 		mRotation.setRotationFromQuaternion( rotation );
 
-		mScale.makeScale( scale.x, scale.y, scale.z );
+		mScale.makeScale( scale );
 
 		this.multiply( mRotation, mScale );
 
@@ -3472,13 +3482,13 @@ THREE.Matrix4.prototype = {
 
 	//
 
-	makeTranslation: function ( x, y, z ) {
+	makeTranslation: function ( offset ) {
 
 		this.set(
 
-			1, 0, 0, x,
-			0, 1, 0, y,
-			0, 0, 1, z,
+			1, 0, 0, offset.x,
+			0, 1, 0, offset.y,
+			0, 0, 1, offset.z,
 			0, 0, 0, 1
 
 		);
@@ -3561,13 +3571,13 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	makeScale: function ( x, y, z ) {
+	makeScale: function ( factor ) {
 
 		this.set(
 
-			x, 0, 0, 0,
-			0, y, 0, 0,
-			0, 0, z, 0,
+			factor.x, 0, 0, 0,
+			0, factor.y, 0, 0,
+			0, 0, factor.z, 0,
 			0, 0, 0, 1
 
 		);
@@ -3784,7 +3794,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	transformSelf: function ( matrix4 ) {
+	transform: function ( matrix4 ) {
 
 		this.direction = matrix4.multiplyVector3( this.direction.addSelf( this.origin ) );
 		this.origin = matrix4.multiplyVector3( this.origin );
@@ -3882,7 +3892,7 @@ THREE.Frustum.__v1 = new THREE.Vector3();
 
 THREE.Plane = function ( normal, constant ) {
 
-	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3();
+	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3( 1, 0, 0 );
 	this.constant = constant !== undefined ? constant : 0;
 
 };
@@ -3911,8 +3921,8 @@ THREE.Plane.prototype = {
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
 
-		this.normal.copy( normal );
-		this.constant = - point.dot( normal );
+		this.normal.copy( normal ).normalize();
+		this.constant = - point.dot( this.normal );	// must be this.normal, not normal, as this.normal is normalized
 
 		return this;
 
@@ -3921,7 +3931,7 @@ THREE.Plane.prototype = {
 	setFromCoplanarPoints: function ( a, b, c ) {
 
 		var normal = THREE.Plane.__v1.sub( c, b ).crossSelf(
-					 THREE.Plane.__v2.sub( a, b ) );
+					 THREE.Plane.__v2.sub( a, b ) ).normalize();
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
@@ -3997,9 +4007,27 @@ THREE.Plane.prototype = {
 
 	},
 
+	transform: function( matrix, optionalNormalMatrix ) {
+
+		var newNormal = THREE.Plane.__v1, newCoplanarPoint = THREE.Plane.__v2;
+
+		// compute new normal based on theory here:
+		// http://www.songho.ca/opengl/gl_normaltransform.html
+		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
+		newNormal = optionalNormalMatrix.multiplyVector3( newNormal.copy( this.normal ) );
+
+		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
+		newCoplanarPoint = matrix.multiplyVector3( newCoplanarPoint );
+
+		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
+
+		return this;
+		
+	},
+
 	translate: function ( offset ) {
 
-		this.constant = - offset.dot( this.normal );
+		this.constant = this.constant - offset.dot( this.normal );
 
 		return this;
 
@@ -4019,6 +4047,7 @@ THREE.Plane.prototype = {
 
 };
 
+THREE.Plane.__vZero = new THREE.Vector3( 0, 0, 0 );
 THREE.Plane.__v1 = new THREE.Vector3();
 THREE.Plane.__v2 = new THREE.Vector3();
 /**
@@ -4119,17 +4148,18 @@ THREE.Sphere.prototype = {
 
 	},
 
-	translate: function ( offset ) {
-
-		this.center.addSelf( this.offset );
+	transform: function ( matrix ) {
+		
+		this.center = matrix.multiplyVector3( this.center );
+		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
 
 	},
 
-	scale: function ( factor ) {
+	translate: function ( offset ) {
 
-		this.radius *= factor;
+		this.center.addSelf( offset );
 
 		return this;
 
@@ -4143,7 +4173,7 @@ THREE.Sphere.prototype = {
 
 	clone: function () {
 
-		return new THREE.Sphere3().copy( this );
+		return new THREE.Sphere().copy( this );
 
 	}
 
@@ -5105,7 +5135,7 @@ THREE.EventTarget = function () {
 
 			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
 
-				listenerArray[ i ]( event );
+				listenerArray[ i ].call( this, event );
 
 			}
 
@@ -5217,7 +5247,7 @@ THREE.EventTarget = function () {
 
 			inverseMatrix.getInverse( object.matrixWorld );
 
-			localRay.copy( raycaster.ray ).transformSelf( inverseMatrix );
+			localRay.copy( raycaster.ray ).transform( inverseMatrix );
 	
 			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -6465,6 +6495,8 @@ THREE.Face4.prototype = {
 
 THREE.Geometry = function () {
 
+	THREE.EventTarget.call( this );
+
 	this.id = THREE.GeometryIdCount ++;
 
 	this.name = '';
@@ -7187,6 +7219,12 @@ THREE.Geometry.prototype = {
 		}
 
 		return geometry;
+
+	},
+
+	deallocate: function () {
+
+		this.dispatchEvent( { type: 'deallocate' } );
 
 	}
 
@@ -11014,6 +11052,8 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
+	THREE.EventTarget.call( this );
+
 	this.id = THREE.MaterialIdCount ++;
 
 	this.name = '';
@@ -11120,6 +11160,12 @@ THREE.Material.prototype.clone = function ( material ) {
 	material.visible = this.visible;
 
 	return material;
+
+};
+
+THREE.Material.prototype.deallocate = function () {
+
+	this.dispatchEvent( { type: 'deallocate' } );
 
 };
 
@@ -12050,6 +12096,8 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
+	THREE.EventTarget.call( this );
+
 	this.id = THREE.TextureIdCount ++;
 
 	this.name = '';
@@ -12116,6 +12164,12 @@ THREE.Texture.prototype = {
 		texture.unpackAlignment = this.unpackAlignment;
 
 		return texture;
+
+	},
+
+	deallocate: function () {
+
+		this.dispatchEvent( { type: 'deallocate' } );
 
 	}
 
@@ -17276,6 +17330,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Deallocation
 
+	/*
 	this.deallocateObject = function ( object ) {
 
 		if ( ! object.__webglInit ) return;
@@ -17331,6 +17386,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.memory.textures --;
 
 	};
+	*/
 
 	this.deallocateRenderTarget = function ( renderTarget ) {
 
@@ -17356,6 +17412,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	/*
 	this.deallocateMaterial = function ( material ) {
 
 		var program = material.program;
@@ -17418,6 +17475,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+	*/
 
 	// Rendering
 
@@ -17434,6 +17492,37 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldFlipSided = -1;
 
 		this.shadowMapPlugin.update( scene, camera );
+
+	};
+
+	// Events
+
+	var onGeometryDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onGeometryDeallocate );
+
+		deallocateGeometry( this );
+
+		_this.info.memory.geometries --;
+
+	};
+
+	var onTextureDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onTextureDeallocate );
+
+		deallocateTexture( this );
+
+		_this.info.memory.textures --;
+
+
+	};
+
+	var onMaterialDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onMaterialDeallocate );
+
+		deallocateMaterial( this );
 
 	};
 
@@ -17517,6 +17606,150 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer deallocation
 
+	var deallocateGeometry = function ( geometry ) {
+
+		geometry.__webglInit = undefined;
+
+		if ( geometry.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglVertexBuffer );
+		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
+		if ( geometry.__webglTangentBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglTangentBuffer );
+		if ( geometry.__webglColorBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglColorBuffer );
+		if ( geometry.__webglUVBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglUVBuffer );
+		if ( geometry.__webglUV2Buffer !== undefined ) _gl.deleteBuffer( geometry.__webglUV2Buffer );
+
+		if ( geometry.__webglSkinIndicesBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglSkinIndicesBuffer );
+		if ( geometry.__webglSkinWeightsBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglSkinWeightsBuffer );
+
+		if ( geometry.__webglFaceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglFaceBuffer );
+		if ( geometry.__webglLineBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineBuffer );
+
+		if ( geometry.__webglLineDistanceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineDistanceBuffer );
+
+		// geometry groups
+
+		if ( geometry.geometryGroups !== undefined ) {
+
+			for ( var g in geometry.geometryGroups ) {
+
+				var geometryGroup = geometry.geometryGroups[ g ];
+
+				if ( geometryGroup.numMorphTargets !== undefined ) {
+
+					for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
+
+						_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
+
+					}
+
+				}
+
+				if ( geometryGroup.numMorphNormals !== undefined ) {
+
+					for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
+
+						_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
+
+					}
+
+				}
+
+				deleteCustomAttributesBuffers( geometryGroup );
+
+			}
+
+		}
+
+		deleteCustomAttributesBuffers( geometry );
+
+	};
+
+	var deallocateTexture = function ( texture ) {
+
+		if ( texture.image && texture.image.__webglTextureCube ) {
+
+			// cube texture
+
+			_gl.deleteTexture( texture.image.__webglTextureCube );
+
+		} else {
+
+			// 2D texture
+
+			if ( ! texture.__webglInit ) return;
+
+			texture.__webglInit = false;
+			_gl.deleteTexture( texture.__webglTexture );
+
+		}
+
+	};
+
+	var deallocateMaterial = function ( material ) {
+
+		var program = material.program;
+
+		if ( program === undefined ) return;
+
+		material.program = undefined;
+
+		// only deallocate GL program if this was the last use of shared program
+		// assumed there is only single copy of any program in the _programs list
+		// (that's how it's constructed)
+
+		var i, il, programInfo;
+		var deleteProgram = false;
+
+		for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+			programInfo = _programs[ i ];
+
+			if ( programInfo.program === program ) {
+
+				programInfo.usedTimes --;
+
+				if ( programInfo.usedTimes === 0 ) {
+
+					deleteProgram = true;
+
+				}
+
+				break;
+
+			}
+
+		}
+
+		if ( deleteProgram === true ) {
+
+			// avoid using array.splice, this is costlier than creating new array from scratch
+
+			var newPrograms = [];
+
+			for ( i = 0, il = _programs.length; i < il; i ++ ) {
+
+				programInfo = _programs[ i ];
+
+				if ( programInfo.program !== program ) {
+
+					newPrograms.push( programInfo );
+
+				}
+
+			}
+
+			_programs = newPrograms;
+
+			_gl.deleteProgram( program );
+
+			_this.info.memory.programs --;
+
+		}
+
+	};
+
+	//
+
+	/*
 	function deleteParticleBuffers ( geometry ) {
 
 		_gl.deleteBuffer( geometry.__webglVertexBuffer );
@@ -17594,6 +17827,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_this.info.memory.geometries --;
 
 	};
+	*/
 
 	function deleteCustomAttributesBuffers( geometry ) {
 
@@ -21394,6 +21628,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
+			if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
+
+				object.geometry.__webglInit = true;
+				object.geometry.addEventListener( 'deallocate', onGeometryDeallocate );
+
+			}
+
 			if ( object instanceof THREE.Mesh ) {
 
 				geometry = object.geometry;
@@ -21793,6 +22034,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Materials
 
 	this.initMaterial = function ( material, lights, fog, object ) {
+
+		material.addEventListener( 'deallocate', onMaterialDeallocate );
 
 		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
 
@@ -23570,6 +23813,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( ! texture.__webglInit ) {
 
 				texture.__webglInit = true;
+
+				texture.addEventListener( 'deallocate', onTextureDeallocate );
+
 				texture.__webglTexture = _gl.createTexture();
 
 				_this.info.memory.textures ++;
@@ -24798,7 +25044,7 @@ THREE.GeometryUtils = {
 		offset.add( bb.min, bb.max );
 		offset.multiplyScalar( -0.5 );
 
-		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset ) );
 		geometry.computeBoundingBox();
 
 		return offset;
