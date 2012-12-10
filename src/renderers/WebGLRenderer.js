@@ -5240,7 +5240,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			if ( material.program ) _this.deallocateMaterial( material );
+			if ( material.program ) deallocateMaterial( material );
 
 			_this.initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;

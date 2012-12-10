@@ -7237,6 +7237,8 @@ THREE.GeometryIdCount = 0;
 
 THREE.BufferGeometry = function () {
 
+	THREE.EventTarget.call( this );
+
 	this.id = THREE.GeometryIdCount ++;
 
 	// attributes
@@ -7772,6 +7774,12 @@ THREE.BufferGeometry.prototype = {
 
 		this.hasTangents = true;
 		this.tangentsNeedUpdate = true;
+
+	},
+
+	deallocate: function () {
+
+		this.dispatchEvent( { type: 'deallocate' } );
 
 	}
 
@@ -22204,7 +22212,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.needsUpdate ) {
 
-			if ( material.program ) _this.deallocateMaterial( material );
+			if ( material.program ) deallocateMaterial( material );
 
 			_this.initMaterial( material, lights, fog, object );
 			material.needsUpdate = false;

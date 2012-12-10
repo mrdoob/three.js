@@ -4,6 +4,8 @@
 
 THREE.BufferGeometry = function () {
 
+	THREE.EventTarget.call( this );
+
 	this.id = THREE.GeometryIdCount ++;
 
 	// attributes
@@ -539,6 +541,12 @@ THREE.BufferGeometry.prototype = {
 
 		this.hasTangents = true;
 		this.tangentsNeedUpdate = true;
+
+	},
+
+	deallocate: function () {
+
+		this.dispatchEvent( { type: 'deallocate' } );
 
 	}
 
