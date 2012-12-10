@@ -587,7 +587,7 @@ THREE.Matrix4.prototype = {
 		mRotation.identity();
 		mRotation.setRotationFromQuaternion( rotation );
 
-		mScale.makeScale( scale.x, scale.y, scale.z );
+		mScale.makeScale( scale );
 
 		this.multiply( mRotation, mScale );
 
@@ -888,13 +888,13 @@ THREE.Matrix4.prototype = {
 
 	//
 
-	makeTranslation: function ( x, y, z ) {
+	makeTranslation: function ( offset ) {
 
 		this.set(
 
-			1, 0, 0, x,
-			0, 1, 0, y,
-			0, 0, 1, z,
+			1, 0, 0, offset.x,
+			0, 1, 0, offset.y,
+			0, 0, 1, offset.z,
 			0, 0, 0, 1
 
 		);
@@ -977,13 +977,13 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	makeScale: function ( x, y, z ) {
+	makeScale: function ( factor ) {
 
 		this.set(
 
-			x, 0, 0, 0,
-			0, y, 0, 0,
-			0, 0, z, 0,
+			factor.x, 0, 0, 0,
+			0, factor.y, 0, 0,
+			0, 0, factor.z, 0,
 			0, 0, 0, 1
 
 		);

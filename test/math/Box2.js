@@ -243,15 +243,3 @@ test( "translate", function() {
 	ok( d.clone().translate( one2 ).equals( b ), "Passed!" );
 	ok( b.clone().translate( one2.clone().negate() ).equals( d ), "Passed!" );
 });
-
-test( "scale", function() {
-	var a = new THREE.Box2( zero2, zero2 );
-	var b = new THREE.Box2( zero2, one2 );
-	var c = new THREE.Box2( one2.clone().negate(), one2 );
-	var d = new THREE.Box2( one2.clone().negate(), zero2 );
-
-	ok( a.clone().scale( 0 ).equals( a ), "Passed!" );
-	ok( c.clone().scale( 0 ).equals( a ), "Passed!" );
-	ok( b.clone().scale( 3 ).equals( new THREE.Box2( new THREE.Vector2( -1, -1, -1 ), new THREE.Vector2( 2, 2, 2 ) ) ), "Passed!" );
-	ok( d.clone().scale( 3 ).equals( new THREE.Box2( new THREE.Vector2( 2, 2, 2 ).negate(), new THREE.Vector2( 1, 1, 1 ) ) ), "Passed!" );
-});

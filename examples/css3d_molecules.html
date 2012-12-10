@@ -361,7 +361,7 @@
 				loader.load( url, function ( geometry, geometryBonds ) {
 
 					var offset = THREE.GeometryUtils.center( geometry );
-					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
+					geometryBonds.applyMatrix( new THREE.Matrix4().makeTranslation( offset ) );
 
 					for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 

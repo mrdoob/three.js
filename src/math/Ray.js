@@ -131,7 +131,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	transformSelf: function ( matrix4 ) {
+	transform: function ( matrix4 ) {
 
 		this.direction = matrix4.multiplyVector3( this.direction.addSelf( this.origin ) );
 		this.origin = matrix4.multiplyVector3( this.origin );
