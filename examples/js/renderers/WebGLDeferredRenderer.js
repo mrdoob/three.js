@@ -477,6 +477,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// clear shared depth buffer
 
 		this.renderer.autoClearDepth = true;
+		this.renderer.autoClearStencil = true;
+
+		// write 1 to shared stencil buffer
+		// for non-background pixels
+
+		gl.enable( gl.STENCIL_TEST );
+		gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
+		gl.stencilFunc( gl.ALWAYS, 1, 0xffffffff );
+		gl.clearStencil( 0 );
 
 		compColor.render();
 
@@ -489,7 +498,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		//  just write color pixel if depth is the same)
 
 		this.renderer.autoClearDepth = false;
+		this.renderer.autoClearStencil = false;
 		gl.depthFunc( gl.EQUAL );
+
+		// just touch foreground pixels (stencil == 1)
+		// both in normalDepth and light passes
+
+		gl.stencilFunc( gl.EQUAL, 1, 0xffffffff );
+		gl.stencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
 
 		compNormalDepth.render();
 
@@ -525,10 +541,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// 4) composite pass
 
-		// return back to normal depth handling state
+		// return back to usual depth and stencil handling state
 
 		this.renderer.autoClearDepth = true;
+		this.renderer.autoClearStencil = true;
 		gl.depthFunc( gl.LEQUAL );
+		gl.disable( gl.STENCIL_TEST );
 
 		compFinal.render( 0.1 );
 
@@ -536,10 +554,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var createRenderTargets = function ( ) {
 
-		var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
+		var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: true,
 									format: THREE.RGBAFormat, type: THREE.FloatType };
 
-		var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: false,
+		var rtParamsFloatNearest = { minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter, stencilBuffer: true,
 									 format: THREE.RGBAFormat, type: THREE.FloatType };
 
 		var rtParamsUByte = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: false,
