@@ -118,10 +118,7 @@ THREE.ShaderDeferred = {
 				THREE.ShaderChunk[ "lightmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
-				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
-				THREE.ShaderChunk[ "skinnormal_vertex" ],
-				THREE.ShaderChunk[ "defaultnormal_vertex" ],
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
