@@ -364,155 +364,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	// Deallocation
-
-	/*
-	this.deallocateObject = function ( object ) {
-
-		if ( ! object.__webglInit ) return;
-
-		object.__webglInit = false;
-
-		delete object._modelViewMatrix;
-		delete object._normalMatrix;
-
-		if ( object instanceof THREE.Mesh ) {
-
-			for ( var g in object.geometry.geometryGroups ) {
-
-				deleteMeshBuffers( object.geometry.geometryGroups[ g ] );
-
-			}
-
-		} else if ( object instanceof THREE.Ribbon ) {
-
-			deleteRibbonBuffers( object.geometry );
-
-		} else if ( object instanceof THREE.Line ) {
-
-			deleteLineBuffers( object.geometry );
-
-		} else if ( object instanceof THREE.ParticleSystem ) {
-
-			deleteParticleBuffers( object.geometry );
-
-		}
-
-	};
-
-	this.deallocateTexture = function ( texture ) {
-
-		// cube texture
-
-		if ( texture.image && texture.image.__webglTextureCube ) {
-
-			_gl.deleteTexture( texture.image.__webglTextureCube );
-
-		// 2D texture
-
-		} else {
-
-			if ( ! texture.__webglInit ) return;
-
-			texture.__webglInit = false;
-			_gl.deleteTexture( texture.__webglTexture );
-
-		}
-
-		_this.info.memory.textures --;
-
-	};
-	*/
-
-	this.deallocateRenderTarget = function ( renderTarget ) {
-
-		if ( !renderTarget || ! renderTarget.__webglTexture ) return;
-
-		_gl.deleteTexture( renderTarget.__webglTexture );
-
-		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				_gl.deleteFramebuffer( renderTarget.__webglFramebuffer[ i ] );
-				_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer[ i ] );
-
-			}
-
-		} else {
-
-			_gl.deleteFramebuffer( renderTarget.__webglFramebuffer );
-			_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer );
-
-		}
-
-	};
-
-	/*
-	this.deallocateMaterial = function ( material ) {
-
-		var program = material.program;
-
-		if ( ! program ) return;
-
-		material.program = undefined;
-
-		// only deallocate GL program if this was the last use of shared program
-		// assumed there is only single copy of any program in the _programs list
-		// (that's how it's constructed)
-
-		var i, il, programInfo;
-		var deleteProgram = false;
-
-		for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-			programInfo = _programs[ i ];
-
-			if ( programInfo.program === program ) {
-
-				programInfo.usedTimes --;
-
-				if ( programInfo.usedTimes === 0 ) {
-
-					deleteProgram = true;
-
-				}
-
-				break;
-
-			}
-
-		}
-
-		if ( deleteProgram ) {
-
-			// avoid using array.splice, this is costlier than creating new array from scratch
-
-			var newPrograms = [];
-
-			for ( i = 0, il = _programs.length; i < il; i ++ ) {
-
-				programInfo = _programs[ i ];
-
-				if ( programInfo.program !== program ) {
-
-					newPrograms.push( programInfo );
-
-				}
-
-			}
-
-			_programs = newPrograms;
-
-			_gl.deleteProgram( program );
-
-			_this.info.memory.programs --;
-
-		}
-
-	};
-	*/
-
 	// Rendering
 
 	this.updateShadowMap = function ( scene, camera ) {
@@ -528,37 +379,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_oldFlipSided = -1;
 
 		this.shadowMapPlugin.update( scene, camera );
-
-	};
-
-	// Events
-
-	var onGeometryDeallocate = function () {
-
-		this.removeEventListener( 'deallocate', onGeometryDeallocate );
-
-		deallocateGeometry( this );
-
-		_this.info.memory.geometries --;
-
-	};
-
-	var onTextureDeallocate = function () {
-
-		this.removeEventListener( 'deallocate', onTextureDeallocate );
-
-		deallocateTexture( this );
-
-		_this.info.memory.textures --;
-
-
-	};
-
-	var onMaterialDeallocate = function () {
-
-		this.removeEventListener( 'deallocate', onMaterialDeallocate );
-
-		deallocateMaterial( this );
 
 	};
 
@@ -640,6 +460,47 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// Events
+
+	var onGeometryDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onGeometryDeallocate );
+
+		deallocateGeometry( this );
+
+		_this.info.memory.geometries --;
+
+	};
+
+	var onTextureDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onTextureDeallocate );
+
+		deallocateTexture( this );
+
+		_this.info.memory.textures --;
+
+
+	};
+
+	var onRenderTargetDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onRenderTargetDeallocate );
+
+		deallocateRenderTarget( this );
+
+		_this.info.memory.textures --;
+
+	};
+
+	var onMaterialDeallocate = function () {
+
+		this.removeEventListener( 'deallocate', onMaterialDeallocate );
+
+		deallocateMaterial( this );
+
+	};
+
 	// Buffer deallocation
 
 	var deallocateGeometry = function ( geometry ) {
@@ -715,6 +576,30 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			texture.__webglInit = false;
 			_gl.deleteTexture( texture.__webglTexture );
+
+		}
+
+	};
+
+	var deallocateRenderTarget = function ( renderTarget ) {
+
+		if ( !renderTarget || ! renderTarget.__webglTexture ) return;
+
+		_gl.deleteTexture( renderTarget.__webglTexture );
+
+		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				_gl.deleteFramebuffer( renderTarget.__webglFramebuffer[ i ] );
+				_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer[ i ] );
+
+			}
+
+		} else {
+
+			_gl.deleteFramebuffer( renderTarget.__webglFramebuffer );
+			_gl.deleteRenderbuffer( renderTarget.__webglRenderbuffer );
 
 		}
 
@@ -7113,6 +6998,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
+
+			renderTarget.addEventListener( 'deallocate', onRenderTargetDeallocate );
 
 			renderTarget.__webglTexture = _gl.createTexture();
 

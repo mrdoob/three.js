@@ -5,6 +5,8 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	THREE.EventTarget.call( this );
+
 	this.width = width;
 	this.height = height;
 
@@ -55,5 +57,11 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 	tmp.generateMipmaps = this.generateMipmaps;
 
 	return tmp;
+
+};
+
+THREE.WebGLRenderTarget.prototype.deallocate = function () {
+
+	this.dispatchEvent( { type: 'deallocate' } );
 
 };
