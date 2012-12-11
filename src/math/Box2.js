@@ -144,7 +144,7 @@ THREE.Box2.prototype = {
 	containsPoint: function ( point ) {
 
 		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
+		     ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
 
 			return true;
 
@@ -157,7 +157,7 @@ THREE.Box2.prototype = {
 	containsBox: function ( box ) {
 
 		if ( ( this.min.x <= box.min.x ) && ( box.max.x <= this.max.x ) &&
-			 ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
+		     ( this.min.y <= box.min.y ) && ( box.max.y <= this.max.y ) ) {
 
 			return true;
 
