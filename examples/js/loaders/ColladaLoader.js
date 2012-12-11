@@ -3104,27 +3104,28 @@ THREE.ColladaLoader = function () {
 
 						if ( cot.isTexture() ) {
 
-							if ( this.effect.sampler && this.effect.surface ) {
+							var samplerId = cot.texture;
+							var surfaceId = this.effect.sampler[samplerId].source;
+              
 
-								if ( this.effect.sampler.source == this.effect.surface.sid ) {
+							if (surfaceId) {
 
-									var image = images[this.effect.surface.init_from];
+								var surface = this.effect.surface[surfaceId];
+								var image = images[surface.init_from];
 
-									if ( image ) {
+								if (image) {
 
-										var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-										texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-										texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-										texture.offset.x = cot.texOpts.offsetU;
-										texture.offset.y = cot.texOpts.offsetV;
-										texture.repeat.x = cot.texOpts.repeatU;
-										texture.repeat.y = cot.texOpts.repeatV;
-										props['map'] = texture;
+									var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+									texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+									texture.offset.x = cot.texOpts.offsetU;
+									texture.offset.y = cot.texOpts.offsetV;
+									texture.repeat.x = cot.texOpts.repeatU;
+									texture.repeat.y = cot.texOpts.repeatV;
+									props['map'] = texture;
 
-										// Texture with baked lighting?
-										if ( prop === 'emission' ) props[ 'emissive' ] = 0xffffff;
-
-									}
+									// Texture with baked lighting?
+									if (prop === 'emission') props['emissive'] = 0xffffff;
 
 								}
 
@@ -3325,8 +3326,8 @@ THREE.ColladaLoader = function () {
 		this.id = "";
 		this.name = "";
 		this.shader = null;
-		this.surface = null;
-		this.sampler = null;
+		this.surface = {};
+		this.sampler = {};
 
 	};
 
@@ -3385,14 +3386,12 @@ THREE.ColladaLoader = function () {
 
 				case 'surface':
 
-					this.surface = ( new Surface( this ) ).parse( child );
-					this.surface.sid = sid;
+					this.surface[sid] = ( new Surface( this ) ).parse( child );
 					break;
 
 				case 'sampler2D':
 
-					this.sampler = ( new Sampler2D( this ) ).parse( child );
-					this.sampler.sid = sid;
+					this.sampler[sid] = ( new Sampler2D( this ) ).parse( child );
 					break;
 
 				case 'extra':
