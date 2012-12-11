@@ -31,6 +31,8 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.generateMipmaps = true;
 
+	this.shareDepthFrom = null;
+
 };
 
 THREE.WebGLRenderTarget.prototype.clone = function() {
@@ -55,6 +57,8 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 	tmp.stencilBuffer = this.stencilBuffer;
 
 	tmp.generateMipmaps = this.generateMipmaps;
+
+	tmp.shareDepthFrom = this.shareDepthFrom;
 
 	return tmp;
 

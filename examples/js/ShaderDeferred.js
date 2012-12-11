@@ -316,7 +316,7 @@ THREE.ShaderDeferred = {
 				"float z = normalDepth.w;",
 				"float lightZ = clipPos.z / clipPos.w;",
 
-				"if ( z == 0.0 || lightZ > z ) discard;",
+				//"if ( z == 0.0 || lightZ > z ) discard;",
 
 				"float x = texCoord.x * 2.0 - 1.0;",
 				"float y = texCoord.y * 2.0 - 1.0;",

@@ -30,6 +30,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	this.domElement = this.renderer.domElement;
 
+	//
+
+	var gl = this.renderer.context;
 
 	//
 
@@ -196,7 +199,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 				fragmentShader: normalDepthShader.fragmentShader,
 				shading:		originalMaterial.shading,
 				defines:		defines,
-				blending:		THREE.NoBlending
+				blending:		THREE.NoBlending,
+				depthWrite:		false
 
 			} );
 
@@ -290,7 +294,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,
-			transparent:	true
+			transparent:	true,
+
+			//side: THREE.BackSide
 
 		} );
 
@@ -401,6 +407,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compLight.setSize( scaledWidth, scaledHeight );
 		compFinal.setSize( scaledWidth, scaledHeight );
 
+		compNormalDepth.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+		compLight.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+
 		for ( var i = 0, il = lightMaterials.length; i < il; i ++ ) {
 
 			var uniforms = lightMaterials[ i ].uniforms;
@@ -456,23 +465,37 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		scene.traverse( initDeferredProperties );
 
 		// update scene graph only once per frame
+		// (both color and normalDepth passes use exactly the same scene state)
 
 		this.renderer.autoUpdateScene = false;
 		scene.updateMatrixWorld();
 
-		// g-buffer color
+		// 1) g-buffer color pass
 
 		scene.traverse( setMaterialColor );
+
+		// clear shared depth buffer
+
+		this.renderer.autoClearDepth = true;
+
 		compColor.render();
 
-		// g-buffer normals + depth
+		// 2) g-buffer normals + depth pass
 
 		scene.traverse( setMaterialNormalDepth );
+
+		// do not touch shared depth buffer in this pass
+		// (no depth clearing, no depth writing,
+		//  just write color pixel if depth is the same)
+
+		this.renderer.autoClearDepth = false;
+		gl.depthFunc( gl.EQUAL );
+
 		compNormalDepth.render();
 
-		this.renderer.autoUpdateScene = true;
+		// 3) light pass
 
-		// light pass
+		this.renderer.autoUpdateScene = true;
 
 		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
 
@@ -493,9 +516,19 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
+		// still no touching shared depth buffer
+		// (write light proxy color pixel if in front of scene pixel)
+
+		gl.depthFunc( gl.LEQUAL );
+
 		compLight.render();
 
-		// composite pass
+		// 4) composite pass
+
+		// return back to normal depth handling state
+
+		this.renderer.autoClearDepth = true;
+		gl.depthFunc( gl.LEQUAL );
 
 		compFinal.render( 0.1 );
 
@@ -515,7 +548,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// g-buffers
 
 		var rtColor   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatNearest );
-		var rtNormalDepth = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
+		var rtNormalDepth = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatNearest );
 		var rtLight   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsFloatLinear );
 		var rtFinal   = new THREE.WebGLRenderTarget( scaledWidth, scaledHeight, rtParamsUByte );
 
@@ -540,6 +573,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compNormalDepth = new THREE.EffectComposer( _this.renderer, rtNormalDepth );
 		compNormalDepth.addPass( passNormalDepth );
 
+		compNormalDepth.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+
 		// light composer
 
 		passLightFullscreen = new THREE.RenderPass();
@@ -551,6 +586,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compLight = new THREE.EffectComposer( _this.renderer, rtLight );
 		compLight.addPass( passLightFullscreen );
 		compLight.addPass( passLightProxy );
+
+		compLight.renderTarget2.shareDepthFrom = compColor.renderTarget2;
 
 		// final composer
 
