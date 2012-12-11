@@ -118,14 +118,10 @@ THREE.ShaderDeferred = {
 				THREE.ShaderChunk[ "lightmap_vertex" ],
 				THREE.ShaderChunk[ "color_vertex" ],
 
-				"#ifdef USE_ENVMAP",
-
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
 				THREE.ShaderChunk[ "skinbase_vertex" ],
 				THREE.ShaderChunk[ "skinnormal_vertex" ],
 				THREE.ShaderChunk[ "defaultnormal_vertex" ],
-
-				"#endif",
 
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
 				THREE.ShaderChunk[ "skinning_vertex" ],
@@ -199,26 +195,18 @@ THREE.ShaderDeferred = {
 			"#endif",
 
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 
 			"void main() {",
 
 				THREE.ShaderChunk[ "morphnormal_vertex" ],
+				THREE.ShaderChunk[ "skinbase_vertex" ],
+				THREE.ShaderChunk[ "skinnormal_vertex" ],
+				THREE.ShaderChunk[ "defaultnormal_vertex" ],
+
 				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "skinning_vertex" ],
 				THREE.ShaderChunk[ "default_vertex" ],
-
-				"vec3 objectNormal;",
-
-				"#if !defined( USE_SKINNING ) && defined( USE_MORPHNORMALS )",
-
-					"objectNormal = morphedNormal;",
-
-				"#endif",
-
-				"#if !defined( USE_SKINNING ) && ! defined( USE_MORPHNORMALS )",
-
-					"objectNormal = normal;",
-
-				"#endif",
 
 				"normalView = normalize( normalMatrix * objectNormal );",
 

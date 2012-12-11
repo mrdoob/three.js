@@ -161,6 +161,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		material.vertexColors = originalMaterial.vertexColors;
 		material.morphTargets = originalMaterial.morphTargets;
 		material.morphNormals = originalMaterial.morphNormals;
+		material.skinning = originalMaterial.skinning;
 
 		material.alphaTest = originalMaterial.alphaTest;
 
@@ -183,7 +184,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		//	bump scale
 		//  clip depth
 
-		if ( originalMaterial.morphTargets || originalMaterial.bumpMap ) {
+		if ( originalMaterial.morphTargets || originalMaterial.skinning || originalMaterial.bumpMap ) {
 
 			var uniforms = THREE.UniformsUtils.clone( normalDepthShader.uniforms );
 			var defines = { "USE_BUMPMAP": !!originalMaterial.bumpMap };
@@ -203,6 +204,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 				normalDepthMaterial.morphTargets = originalMaterial.morphTargets;
 				normalDepthMaterial.morphNormals = originalMaterial.morphNormals;
+
+			}
+
+			if ( originalMaterial.skinning ) {
+
+				normalDepthMaterial.skinning = originalMaterial.skinning;
 
 			}
 

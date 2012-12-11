@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
-		<title>three.js webgl - deferred rendering [morphs]</title>
+		<title>three.js webgl - deferred rendering [morphing + skinning]</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -39,8 +39,8 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl deferred rendering with morph animation -
-			character from <a href="http://www.sintel.org/">Sintel</a>
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl deferred rendering with morphing and skinning animations -
+			characters from <a href="http://www.sintel.org/">Sintel</a> and by <a href="http://opengameart.org/content/walk-cycles">Clint Bellanger</a>
 		</div>
 		<div id="container"></div>
 
@@ -99,6 +99,10 @@
 			// morphs
 
 			var morphs = [];
+
+			// skins
+
+			var skins = [];
 
 			//
 
@@ -206,6 +210,23 @@
 
 			}
 
+			function ensureLoop( animation ) {
+
+				for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
+
+					var bone = animation.hierarchy[ i ];
+
+					var first = bone.keys[ 0 ];
+					var last = bone.keys[ bone.keys.length - 1 ];
+
+					last.pos = first.pos;
+					last.rot = first.rot;
+					last.scl = first.scl;
+
+				}
+
+			}
+
 			function initObjects() {
 
 				// add animated model
@@ -227,6 +248,58 @@
 
 					scene.add( meshAnim );
 					morphs.push( meshAnim );
+
+				} );
+
+				loader.load( "models/skinned/human_walk_0_female.js", function( geometry, materials ) {
+
+					geometry.computeVertexNormals();
+					geometry.computeBoundingBox();
+
+					ensureLoop( geometry.animation );
+					THREE.AnimationHandler.add( geometry.animation );
+
+					for ( var i = 0, il = materials.length; i < il; i ++ ) {
+
+						var originalMaterial = materials[ i ];
+						originalMaterial.skinning = true;
+
+						originalMaterial.map = undefined;
+						originalMaterial.shading = THREE.SmoothShading;
+						originalMaterial.color.setHSV( 0.01, 0.515, 0.5 );
+						originalMaterial.ambient.copy( originalMaterial.color );
+						originalMaterial.specular.setHSV( 0, 0, 0.1 );
+						originalMaterial.shininess = 75;
+
+						originalMaterial.wrapAround = true;
+						originalMaterial.wrapRGB.set( 1, 0.5, 0.5 );
+
+					}
+
+					var s = 18.5;
+
+					var material = new THREE.MeshFaceMaterial( materials );
+					var mesh = new THREE.SkinnedMesh( geometry, material, false );
+					mesh.scale.set( s, s, s );
+
+					mesh.rotation.y = Math.PI/2;
+
+					mesh.position.x = -100;
+					mesh.position.y = -geometry.boundingBox.min.y * s - 48;
+					mesh.position.z = 18;
+
+					mesh.properties.delta = 25;
+
+					scene.add( mesh );
+					skins.push( mesh );
+
+
+					animation = new THREE.Animation( mesh, "ActionFemale" );
+					animation.JITCompile = false;
+					animation.interpolationType = THREE.AnimationHandler.LINEAR;
+
+					animation.play( true );
+					animation.update( 0 );
 
 				} );
 
@@ -377,11 +450,24 @@
 
 				for ( var i = 0; i < morphs.length; i ++ ) {
 
-					morph = morphs[ i ];
+					var morph = morphs[ i ];
 					morph.updateAnimation( 1000 * delta );
 
 					morph.position.x += morph.properties.delta * delta;
 					if ( morph.position.x < -50 ) morph.position.x = 200;
+
+				}
+
+				// update skins
+
+				THREE.AnimationHandler.update( 0.4 * delta );
+
+				for ( var i = 0; i < skins.length; i ++ ) {
+
+					var skin = skins[ i ];
+
+					skin.position.x += skin.properties.delta * delta;
+					if ( skin.position.x > 200 ) skin.position.x = -200;
 
 				}
 
