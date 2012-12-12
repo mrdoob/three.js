@@ -14,8 +14,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var scaledWidth = Math.floor( scale * width );
 	var scaledHeight = Math.floor( scale * height );
 
-	var brightness = parameters.brightness;
-
+	var brightness = parameters.brightness !== undefined ?  parameters.brightness : 1;
 	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
 
 	this.renderer = parameters.renderer;
