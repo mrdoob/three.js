@@ -1,6 +1,6 @@
 # The issues section is for bug reports and feature requests only. If you need help, please use [stackoverflow](http://stackoverflow.com/questions/tagged/three.js).
 
-## How to report a bug?
+## How to report a bug on [stackoverflow](http://stackoverflow.com/questions/tagged/three.js)?
 
 * Tell us the revision number of three.js you use.
 * Try checking your application with the latest `dev` branch version of three.js (often problems are already fixed there). See [migration guide](https://github.com/mrdoob/three.js/wiki/Migration).
