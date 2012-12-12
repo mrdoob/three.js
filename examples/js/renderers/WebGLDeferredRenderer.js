@@ -168,10 +168,36 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.alphaTest = originalMaterial.alphaTest;
 
-		if ( originalMaterial.bumpMap ) {
+		// uv repeat and offset setting priorities
+		//	1. color map
+		//	2. specular map
+		//	3. normal map
+		//	4. bump map
 
-			var offset = originalMaterial.bumpMap.offset;
-			var repeat = originalMaterial.bumpMap.repeat;
+		var uvScaleMap;
+
+		if ( originalMaterial.map ) {
+
+			uvScaleMap = originalMaterial.map;
+
+		} else if ( originalMaterial.specularMap ) {
+
+			uvScaleMap = originalMaterial.specularMap;
+
+		} else if ( originalMaterial.normalMap ) {
+
+			uvScaleMap = originalMaterial.normalMap;
+
+		} else if ( originalMaterial.bumpMap ) {
+
+			uvScaleMap = originalMaterial.bumpMap;
+
+		}
+
+		if ( uvScaleMap !== undefined ) {
+
+			var offset = uvScaleMap.offset;
+			var repeat = uvScaleMap.repeat;
 
 			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
 
