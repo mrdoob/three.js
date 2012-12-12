@@ -253,7 +253,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,
-			transparent:	true
+			transparent:	true,
+
+			side: THREE.BackSide
 
 		} );
 
@@ -294,9 +296,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,
-			transparent:	true,
-
-			//side: THREE.BackSide
+			transparent:	true
 
 		} );
 
@@ -535,7 +535,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// still no touching shared depth buffer
 		// (write light proxy color pixel if in front of scene pixel)
 
-		gl.depthFunc( gl.LEQUAL );
+		gl.depthFunc( gl.GEQUAL );
 
 		compLight.render();
 
