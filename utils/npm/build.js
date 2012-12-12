@@ -1,3 +1,11 @@
+/**
+ * Builds node_modules three and three-math
+ *
+ * Expects a single command line argument that is the build version in the format 0.54.4-dev
+ *
+ * @author bhouston / http://exocortex.com
+ */
+
 var fs = require( "fs" );
 var cp = require('child_process');
 
