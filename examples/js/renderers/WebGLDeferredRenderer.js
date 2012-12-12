@@ -16,11 +16,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var brightness = parameters.brightness;
 
+	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
+
 	this.renderer = parameters.renderer;
 
 	if ( this.renderer === undefined ) {
 
-		this.renderer = new THREE.WebGLRenderer( { alpha: false } );
+		this.renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
 		this.renderer.setSize( width, height );
 		this.renderer.setClearColorHex( 0x000000, 0 );
 
@@ -459,7 +461,30 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
-	//
+	// external API
+
+	this.setAntialias = function ( enabled ) {
+
+		antialias = enabled;
+
+		if ( antialias ) {
+
+			effectFXAA.enabled = true;
+			compositePass.renderToScreen = false;
+
+		} else {
+
+			effectFXAA.enabled = false;
+			compositePass.renderToScreen = true;
+		}
+
+	};
+
+	this.getAntialias = function () {
+
+		return antialias;
+
+	};
 
 	this.setSize = function ( width, height ) {
 
@@ -619,6 +644,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
+	//
+
 	var createRenderTargets = function ( ) {
 
 		var rtParamsFloatLinear = { minFilter: THREE.NearestFilter, magFilter: THREE.LinearFilter, stencilBuffer: true,
@@ -693,6 +720,17 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compFinal = new THREE.EffectComposer( _this.renderer, rtFinal );
 		compFinal.addPass( compositePass );
 		compFinal.addPass( effectFXAA );
+
+		if ( antialias ) {
+
+			effectFXAA.enabled = true;
+			compositePass.renderToScreen = false;
+
+		} else {
+
+			effectFXAA.enabled = false;
+			compositePass.renderToScreen = true;
+		}
 
 	};
 
