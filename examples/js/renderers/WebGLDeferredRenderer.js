@@ -74,6 +74,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	} );
 
+	var defaultNormalDepthMaterialWireframe = defaultNormalDepthMaterial.clone();
+	defaultNormalDepthMaterialWireframe.wireframe = true;
+
 	//
 
 	var initDeferredMaterials = function ( object ) {
@@ -168,6 +171,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		material.skinning = originalMaterial.skinning;
 
 		material.alphaTest = originalMaterial.alphaTest;
+		material.wireframe = originalMaterial.wireframe;
 
 		// uv repeat and offset setting priorities
 		//	1. color map
@@ -256,11 +260,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			}
 
+			normalDepthMaterial.wireframe = originalMaterial.wireframe;
+
 			deferredMaterials.normalDepthMaterial = normalDepthMaterial;
 
 		} else {
 
-			deferredMaterials.normalDepthMaterial = defaultNormalDepthMaterial;
+			deferredMaterials.normalDepthMaterial = originalMaterial.wireframe ? defaultNormalDepthMaterialWireframe : defaultNormalDepthMaterial;
 
 		}
 
