@@ -36,7 +36,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
-	var geometryLight = new THREE.SphereGeometry( 1, 16, 8 );
+	var geometryLightSphere = new THREE.SphereGeometry( 1, 16, 8 );
+	var geometryLightPlane = new THREE.PlaneGeometry( 2, 2 );
 
 	var black = new THREE.Color( 0x000000 );
 
@@ -285,8 +286,28 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		} );
 
+		// infinite pointlights use full-screen quad proxy
+		// regular pointlights use sphere proxy
+
+		var distance, geometry;
+
+		if ( light.distance > 0 ) {
+
+			distance = light.distance;
+			geometry = geometryLightSphere;
+
+		} else {
+
+			distance = Infinity;
+			geometry = geometryLightPlane;
+
+			materialLight.depthTest = false;
+			materialLight.side = THREE.FrontSide;
+
+		}
+
 		materialLight.uniforms[ "lightPos" ].value = light.position;
-		materialLight.uniforms[ "lightRadius" ].value = light.distance;
+		materialLight.uniforms[ "lightRadius" ].value = distance;
 		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
 		materialLight.uniforms[ "lightColor" ].value = light.color;
 
@@ -298,9 +319,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// create light proxy mesh
 
-		var meshLight = new THREE.Mesh( geometryLight, materialLight );
-		meshLight.position = light.position;
-		meshLight.scale.multiplyScalar( light.distance );
+		var meshLight = new THREE.Mesh( geometry, materialLight );
+
+		if ( light.distance > 0 ) {
+
+			meshLight.position = light.position;
+			meshLight.scale.multiplyScalar( distance );
+
+		}
 
 		// keep reference for size reset
 
@@ -338,8 +364,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// create light proxy mesh
 
-		var geometryLight = new THREE.PlaneGeometry( 2, 2 );
-		var meshLight = new THREE.Mesh( geometryLight, materialLight );
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
 
 		// keep reference for size reset
 
@@ -372,8 +397,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// create light proxy mesh
 
-		var geometryLight = new THREE.PlaneGeometry( 2, 2 );
-		var meshLight = new THREE.Mesh( geometryLight, materialLight );
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
 
 		// keep reference for size reset
 
@@ -392,7 +416,16 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		if ( object instanceof THREE.PointLight ) {
 
 			var meshLight = createDeferredPointLight( object );
-			lightSceneProxy.add( meshLight );
+
+			if ( object.distance > 0 ) {
+
+				lightSceneProxy.add( meshLight );
+
+			} else {
+
+				lightSceneFullscreen.add( meshLight );
+
+			}
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
@@ -554,6 +587,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			var uniforms = lightSceneFullscreen.children[ i ].material.uniforms;
 
+			if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
 			if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = camera.matrixWorldInverse;
 
 		}
