@@ -74,13 +74,35 @@ THREE.ShaderDeferred = {
 
 				"const float compressionScale = 0.999;",
 
+				//
+
+				"vec3 diffuseMapColor;",
+
+				"#ifdef USE_MAP",
+
+					"diffuseMapColor = texelColor.xyz;",
+
+				"#else",
+
+					"diffuseMapColor = vec3( 1.0 );",
+
+				"#endif",
+
 				// diffuse color
 
 				"gl_FragColor.x = vec3_to_float( compressionScale * gl_FragColor.xyz );",
 
 				// specular color
 
-				"gl_FragColor.y = additiveSpecular * vec3_to_float( compressionScale * specular );",
+				"if ( additiveSpecular < 0.0 ) {",
+
+					"gl_FragColor.y = vec3_to_float( compressionScale * specular );",
+
+				"} else {",
+
+					"gl_FragColor.y = vec3_to_float( compressionScale * specular * diffuseMapColor );",
+
+				"}",
 
 				// shininess
 
@@ -88,15 +110,7 @@ THREE.ShaderDeferred = {
 
 				// emissive color
 
-				"#ifdef USE_MAP",
-
-					"gl_FragColor.w = vec3_to_float( compressionScale * emissive * texelColor.xyz );",
-
-				"#else",
-
-					"gl_FragColor.w = vec3_to_float( compressionScale * emissive );",
-
-				"#endif",
+				"gl_FragColor.w = vec3_to_float( compressionScale * emissive * diffuseMapColor );",
 
 			"}"
 
@@ -396,18 +410,7 @@ THREE.ShaderDeferred = {
 				// combine
 
 				"vec3 light = lightIntensity * lightColor;",
-
-				"float additiveSpecular = sign( colorMap.y );",
-
-				"if ( additiveSpecular < 0.0 ) {",
-
-					"gl_FragColor = vec4( albedo * light * diffuse, attenuation ) + vec4( light * specular, attenuation );",
-
-				"} else {",
-
-					"gl_FragColor = vec4( albedo * light * ( diffuse + specular ), attenuation );",
-
-				"}",
+				"gl_FragColor = vec4( albedo * light * diffuse, attenuation ) + vec4( light * specular, attenuation );",
 
 			"}"
 
