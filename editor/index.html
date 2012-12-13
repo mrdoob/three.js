@@ -129,11 +129,6 @@
 			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
 			document.body.appendChild( viewport.dom );
 
-			// set focus on Viewport to get hotkeys working
-			// right from the initial page load
-
-			viewport.dom.focus();
-
 			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
