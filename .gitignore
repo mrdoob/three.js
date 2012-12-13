@@ -1,4 +1,4 @@
 .DS_Store
 *.swp
 .project
-utils/node_modules/*
+utils/npm/node_modules/*
