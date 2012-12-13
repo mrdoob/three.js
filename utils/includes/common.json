@@ -19,7 +19,7 @@
 	"../src/math/Vertex.js",
 	"../src/math/UV.js",
 	"../src/core/Clock.js",
-	"../src/core/EventTarget.js",
+	"../src/core/EventDispatcher.js",
 	"../src/core/Raycaster.js",
 	"../src/core/Object3D.js",
 	"../src/core/Projector.js",

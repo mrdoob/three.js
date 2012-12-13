@@ -569,7 +569,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			var result;
 
-			// loaders which use EventTarget
+			// loaders which use EventDispatcher
 
 			if ( event.content ) {
 

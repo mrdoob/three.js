@@ -6,7 +6,7 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.TextureIdCount ++;
 
@@ -79,7 +79,7 @@ THREE.Texture.prototype = {
 
 	deallocate: function () {
 
-		this.dispatchEvent( { type: 'deallocate', target: this } );
+		this.dispatchEvent( { type: 'deallocate' } );
 
 	}
 

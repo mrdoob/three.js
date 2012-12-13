@@ -9,7 +9,7 @@
 
 THREE.Geometry = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.GeometryIdCount ++;
 
@@ -738,7 +738,7 @@ THREE.Geometry.prototype = {
 
 	deallocate: function () {
 
-		this.dispatchEvent( { type: 'deallocate', target: this } );
+		this.dispatchEvent( { type: 'deallocate' } );
 
 	}
 
