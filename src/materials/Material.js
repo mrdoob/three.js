@@ -116,9 +116,9 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
-THREE.Material.prototype.deallocate = function () {
+THREE.Material.prototype.dispose = function () {
 
-	this.dispatchEvent( { type: 'deallocate' } );
+	this.dispatchEvent( { type: 'dispose' } );
 
 };
 

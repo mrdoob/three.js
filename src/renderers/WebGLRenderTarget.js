@@ -64,8 +64,8 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 
 };
 
-THREE.WebGLRenderTarget.prototype.deallocate = function () {
+THREE.WebGLRenderTarget.prototype.dispose = function () {
 
-	this.dispatchEvent( { type: 'deallocate' } );
+	this.dispatchEvent( { type: 'dispose' } );
 
 };

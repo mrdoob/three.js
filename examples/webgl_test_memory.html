@@ -85,10 +85,10 @@
 
 				scene.remove( mesh );
 
-				// force deallocate
+				// clean up
 
-				geometry.deallocate();
-				texture.deallocate();
+				geometry.dispose();
+				texture.dispose();
 
 			}
 

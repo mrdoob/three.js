@@ -462,11 +462,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 
-	var onGeometryDeallocate = function ( event ) {
+	var onGeometryDispose = function ( event ) {
 
 		var geometry = event.target;
 
-		geometry.removeEventListener( 'deallocate', onGeometryDeallocate );
+		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		deallocateGeometry( geometry );
 
@@ -474,11 +474,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onTextureDeallocate = function ( event ) {
+	var onTextureDispose = function ( event ) {
 
 		var texture = event.target;
 
-		texture.removeEventListener( 'deallocate', onTextureDeallocate );
+		texture.removeEventListener( 'dispose', onTextureDispose );
 
 		deallocateTexture( texture );
 
@@ -487,11 +487,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onRenderTargetDeallocate = function ( event ) {
+	var onRenderTargetDispose = function ( event ) {
 
 		var renderTarget = event.target;
 
-		renderTarget.removeEventListener( 'deallocate', onRenderTargetDeallocate );
+		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 
 		deallocateRenderTarget( renderTarget );
 
@@ -499,11 +499,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onMaterialDeallocate = function ( event ) {
+	var onMaterialDispose = function ( event ) {
 
 		var material = event.target;
 
-		material.removeEventListener( 'deallocate', onMaterialDeallocate );
+		material.removeEventListener( 'dispose', onMaterialDispose );
 
 		deallocateMaterial( material );
 
@@ -4560,7 +4560,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
 
 				object.geometry.__webglInit = true;
-				object.geometry.addEventListener( 'deallocate', onGeometryDeallocate );
+				object.geometry.addEventListener( 'dispose', onGeometryDispose );
 
 			}
 
@@ -4964,7 +4964,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		material.addEventListener( 'deallocate', onMaterialDeallocate );
+		material.addEventListener( 'dispose', onMaterialDispose );
 
 		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
 
@@ -6743,7 +6743,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				texture.__webglInit = true;
 
-				texture.addEventListener( 'deallocate', onTextureDeallocate );
+				texture.addEventListener( 'dispose', onTextureDispose );
 
 				texture.__webglTexture = _gl.createTexture();
 
@@ -7007,7 +7007,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
 
-			renderTarget.addEventListener( 'deallocate', onRenderTargetDeallocate );
+			renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
 			renderTarget.__webglTexture = _gl.createTexture();
 
