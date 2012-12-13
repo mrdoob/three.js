@@ -498,7 +498,7 @@ THREE.ShaderDeferred = {
 				"viewPos.xyz /= viewPos.w;",
 				"viewPos.w = 1.0;",
 
-				"vec3 lightDir = normalize( lightView );",
+				"vec3 dirVector = normalize( lightView );",
 
 				// normal
 
@@ -509,35 +509,46 @@ THREE.ShaderDeferred = {
 				"vec4 colorMap = texture2D( samplerColor, texCoord );",
 				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
 				"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
-				"float shininess = colorMap.z;",
+				"float shininess = abs( colorMap.z );",
+				"float wrapAround = sign( colorMap.z );",
+
+				"vec3 diffuse;",
+
+				"float dotProduct = dot( normal, dirVector );",
+
+				"float diffuseFull = max( dotProduct, 0.0 );",
 
 				// wrap around lighting
 
-				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );",
-				"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );",
+				"if ( wrapAround < 0.0 ) {",
 
-				"const vec3 wrapRGB = vec3( 0.2, 0.2, 0.2 );",
-				"vec3 diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
+					"float diffuseHalf = max( 0.5 + 0.5 * dotProduct, 0.0 );",
+
+					"const vec3 wrapRGB = vec3( 0.2, 0.2, 0.2 );",
+					"diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
 
 				// simple lighting
 
-				//"float diffuseFull = max( dot( normal, lightDir ), 0.0 );",
-				//"vec3 diffuse = vec3 ( diffuseFull );",
+				"} else {",
+
+					"diffuse = vec3 ( diffuseFull );",
+
+				"}",
 
 				// specular
 
-				"vec3 halfVector = normalize( lightDir + normalize( viewPos.xyz ) );",
+				"vec3 halfVector = normalize( dirVector - normalize( viewPos.xyz ) );",
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
 
 				// simple specular
 
-				//"vec3 specular = specularIntensity * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;",
+				//"vec3 specular = specularColor * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;",
 
 				// physically based specular
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDir, halfVector ), 5.0 );",
+				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( dirVector, halfVector ), 5.0 );",
 				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;",
 
 				// combine
