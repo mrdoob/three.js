@@ -7224,7 +7224,7 @@ THREE.Geometry.prototype = {
 
 	deallocate: function () {
 
-		this.dispatchEvent( { type: 'deallocate' } );
+		this.dispatchEvent( { type: 'deallocate', target: this } );
 
 	}
 
@@ -7779,7 +7779,7 @@ THREE.BufferGeometry.prototype = {
 
 	deallocate: function () {
 
-		this.dispatchEvent( { type: 'deallocate' } );
+		this.dispatchEvent( { type: 'deallocate', target: this } );
 
 	}
 
@@ -11173,7 +11173,7 @@ THREE.Material.prototype.clone = function ( material ) {
 
 THREE.Material.prototype.deallocate = function () {
 
-	this.dispatchEvent( { type: 'deallocate' } );
+	this.dispatchEvent( { type: 'deallocate', target: this } );
 
 };
 
@@ -12177,7 +12177,7 @@ THREE.Texture.prototype = {
 
 	deallocate: function () {
 
-		this.dispatchEvent( { type: 'deallocate' } );
+		this.dispatchEvent( { type: 'deallocate', target: this } );
 
 	}
 
@@ -17434,42 +17434,50 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 
-	var onGeometryDeallocate = function () {
+	var onGeometryDeallocate = function ( event ) {
 
-		this.removeEventListener( 'deallocate', onGeometryDeallocate );
+		var geometry = event.target;
 
-		deallocateGeometry( this );
+		geometry.removeEventListener( 'deallocate', onGeometryDeallocate );
+
+		deallocateGeometry( geometry );
 
 		_this.info.memory.geometries --;
 
 	};
 
-	var onTextureDeallocate = function () {
+	var onTextureDeallocate = function ( event ) {
 
-		this.removeEventListener( 'deallocate', onTextureDeallocate );
+		var texture = event.target;
 
-		deallocateTexture( this );
+		texture.removeEventListener( 'deallocate', onTextureDeallocate );
+
+		deallocateTexture( texture );
 
 		_this.info.memory.textures --;
 
 
 	};
 
-	var onRenderTargetDeallocate = function () {
+	var onRenderTargetDeallocate = function ( event ) {
 
-		this.removeEventListener( 'deallocate', onRenderTargetDeallocate );
+		var renderTarget = event.target;
 
-		deallocateRenderTarget( this );
+		renderTarget.removeEventListener( 'deallocate', onRenderTargetDeallocate );
+
+		deallocateRenderTarget( renderTarget );
 
 		_this.info.memory.textures --;
 
 	};
 
-	var onMaterialDeallocate = function () {
+	var onMaterialDeallocate = function ( event ) {
 
-		this.removeEventListener( 'deallocate', onMaterialDeallocate );
+		var material = event.target;
 
-		deallocateMaterial( this );
+		material.removeEventListener( 'deallocate', onMaterialDeallocate );
+
+		deallocateMaterial( material );
 
 	};
 
@@ -24444,7 +24452,7 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 
 THREE.WebGLRenderTarget.prototype.deallocate = function () {
 
-	this.dispatchEvent( { type: 'deallocate' } );
+	this.dispatchEvent( { type: 'deallocate', target: this } );
 
 };
 /**
