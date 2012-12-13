@@ -9,14 +9,14 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 	var scope = this;
 
-	this.radius = radius || 200;
+	this.radius = radius || 100;
 	this.tube = tube || 40;
 	this.radialSegments = radialSegments || 64;
 	this.tubularSegments = tubularSegments || 8;
 	this.p = p || 2;
 	this.q = q || 3;
 	this.heightScale = heightScale || 1;
-	this.grid = new Array(this.radialSegments);
+	this.grid = new Array( this.radialSegments );
 
 	var tang = new THREE.Vector3();
 	var n = new THREE.Vector3();
