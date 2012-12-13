@@ -14,8 +14,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var scaledWidth = Math.floor( scale * width );
 	var scaledHeight = Math.floor( scale * height );
 
-	var brightness = parameters.brightness;
-
+	var brightness = parameters.brightness !== undefined ?  parameters.brightness : 1;
 	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
 
 	this.renderer = parameters.renderer;
@@ -158,9 +157,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var wrapAround = originalMaterial.wrapAround !== undefined ? ( originalMaterial.wrapAround ? -1 : 1 ) : 1;
 		var additiveSpecular = originalMaterial.metal !== undefined ? ( originalMaterial.metal ? 1 : -1 ) : -1;
 
-		uniforms.emissive.value.copy( emissive );
-		uniforms.diffuse.value.copy( diffuse );
-		uniforms.specular.value.copy( specular );
+		uniforms.emissive.value.copyGammaToLinear( emissive );
+		uniforms.diffuse.value.copyGammaToLinear( diffuse );
+		uniforms.specular.value.copyGammaToLinear( specular );
 		uniforms.shininess.value = shininess;
 		uniforms.wrapAround.value = wrapAround;
 		uniforms.additiveSpecular.value = additiveSpecular;
@@ -314,10 +313,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
+		// linear space
+
+		var intensity = light.intensity * light.intensity;
+
 		materialLight.uniforms[ "lightPos" ].value = light.position;
 		materialLight.uniforms[ "lightRadius" ].value = distance;
-		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
-		materialLight.uniforms[ "lightColor" ].value = light.color;
+		materialLight.uniforms[ "lightIntensity" ].value = intensity;
+		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
 
 		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
@@ -361,9 +364,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		} );
 
+		// linear space
+
+		var intensity = light.intensity * light.intensity;
+
 		materialLight.uniforms[ "lightDir" ].value = light.position;
-		materialLight.uniforms[ "lightIntensity" ].value = light.intensity;
-		materialLight.uniforms[ "lightColor" ].value = light.color;
+		materialLight.uniforms[ "lightIntensity" ].value = intensity;
+		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
 
 		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;

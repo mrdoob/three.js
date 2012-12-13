@@ -111,7 +111,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, brightness: 2, antialias: true } );
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true } );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -178,9 +178,7 @@
 					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
 
 					c.set( Math.random(), Math.random(), Math.random() ).normalize();
-
 					light.color.setRGB( c.x, c.y, c.z );
-					light.color.convertGammaToLinear();
 
 					scene.add( light );
 					lights.push( light );
