@@ -339,6 +339,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
+
 		// keep reference for size reset
 
 		lightMaterials.push( materialLight );
@@ -381,6 +385,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// create light proxy mesh
 
 		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
+
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
 
 		// keep reference for size reset
 
@@ -533,6 +541,43 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
+	function updateLightProxy ( lightProxy, camera ) {
+
+		var uniforms = lightProxy.material.uniforms;
+
+		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
+		if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = camera.matrixWorldInverse;
+
+		var originalLight = lightProxy.properties.originalLight;
+
+		if ( originalLight ) {
+
+			if ( uniforms[ "lightColor" ] ) uniforms[ "lightColor" ].value.copyGammaToLinear( originalLight.color );
+			if ( uniforms[ "lightIntensity" ] ) uniforms[ "lightIntensity" ].value = originalLight.intensity * originalLight.intensity;
+
+			lightProxy.visible = originalLight.visible;
+
+			if ( originalLight instanceof THREE.PointLight ) {
+
+				var distance = originalLight.distance;
+
+				// skip infinite pointlights
+				// right now you can't switch between infinite and finite pointlights
+				// it's just too messy as they use different proxies
+
+				if ( distance > 0 ) {
+
+					lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
+					if ( uniforms[ "lightRadius" ] ) uniforms[ "lightRadius" ].value = distance;
+
+				}
+
+			}
+
+		}
+
+	};
+
 	this.render = function ( scene, camera ) {
 
 		// setup deferred properties
@@ -615,19 +660,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		for ( var i = 0, il = lightSceneProxy.children.length; i < il; i ++ ) {
 
-			var uniforms = lightSceneProxy.children[ i ].material.uniforms;
-
-			uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
-			uniforms[ "matView" ].value = camera.matrixWorldInverse;
+			var lightProxy = lightSceneProxy.children[ i ];
+			updateLightProxy( lightProxy, camera );
 
 		}
 
 		for ( var i = 0, il = lightSceneFullscreen.children.length; i < il; i ++ ) {
 
-			var uniforms = lightSceneFullscreen.children[ i ].material.uniforms;
-
-			if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
-			if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = camera.matrixWorldInverse;
+			var lightProxy = lightSceneFullscreen.children[ i ];
+			updateLightProxy( lightProxy, camera );
 
 		}
 
