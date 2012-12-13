@@ -546,7 +546,7 @@ THREE.BufferGeometry.prototype = {
 
 	deallocate: function () {
 
-		this.dispatchEvent( { type: 'deallocate' } );
+		this.dispatchEvent( { type: 'deallocate', target: this } );
 
 	}
 

@@ -66,6 +66,6 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 
 THREE.WebGLRenderTarget.prototype.deallocate = function () {
 
-	this.dispatchEvent( { type: 'deallocate' } );
+	this.dispatchEvent( { type: 'deallocate', target: this } );
 
 };

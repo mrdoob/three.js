@@ -118,7 +118,7 @@ THREE.Material.prototype.clone = function ( material ) {
 
 THREE.Material.prototype.deallocate = function () {
 
-	this.dispatchEvent( { type: 'deallocate' } );
+	this.dispatchEvent( { type: 'deallocate', target: this } );
 
 };
 
