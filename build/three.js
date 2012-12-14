@@ -5104,10 +5104,10 @@ THREE.Clock.prototype.getDelta = function () {
 	return diff;
 
 };/**
- * https://github.com/mrdoob/eventtarget.js/
+ * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-THREE.EventTarget = function () {
+THREE.EventDispatcher = function () {
 
 	var listeners = {};
 
@@ -5127,22 +5127,6 @@ THREE.EventTarget = function () {
 
 	};
 
-	this.dispatchEvent = function ( event ) {
-
-		var listenerArray = listeners[ event.type ];
-
-		if ( listenerArray !== undefined ) {
-
-			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
-
-				listenerArray[ i ].call( this, event );
-
-			}
-
-		}
-
-	};
-
 	this.removeEventListener = function ( type, listener ) {
 
 		var index = listeners[ type ].indexOf( listener );
@@ -5155,8 +5139,25 @@ THREE.EventTarget = function () {
 
 	};
 
-};
-/**
+	this.dispatchEvent = function ( event ) {
+
+		var listenerArray = listeners[ event.type ];
+
+		if ( listenerArray !== undefined ) {
+			
+			event.target = this;
+
+			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
+
+				listenerArray[ i ].call( this, event );
+
+			}
+
+		}
+
+	};
+
+};/**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
  */
@@ -6495,7 +6496,7 @@ THREE.Face4.prototype = {
 
 THREE.Geometry = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.GeometryIdCount ++;
 
@@ -7222,9 +7223,9 @@ THREE.Geometry.prototype = {
 
 	},
 
-	deallocate: function () {
+	dispose: function () {
 
-		this.dispatchEvent( { type: 'deallocate', target: this } );
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -7237,7 +7238,7 @@ THREE.GeometryIdCount = 0;
 
 THREE.BufferGeometry = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.GeometryIdCount ++;
 
@@ -7777,9 +7778,9 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	deallocate: function () {
+	dispose: function () {
 
-		this.dispatchEvent( { type: 'deallocate', target: this } );
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -9342,7 +9343,7 @@ THREE.BinaryLoader.prototype.createBinModel = function ( data, callback, texture
 
 THREE.ImageLoader = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.crossOrigin = null;
 
@@ -9811,7 +9812,7 @@ THREE.JSONLoader.prototype.createModel = function ( json, callback, texturePath 
 
 THREE.LoadingMonitor = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	var scope = this;
 
@@ -10412,7 +10413,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			var result;
 
-			// loaders which use EventTarget
+			// loaders which use EventDispatcher
 
 			if ( event.content ) {
 
@@ -11015,7 +11016,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 THREE.TextureLoader = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.crossOrigin = null;
 
@@ -11060,7 +11061,7 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.MaterialIdCount ++;
 
@@ -11171,9 +11172,9 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
-THREE.Material.prototype.deallocate = function () {
+THREE.Material.prototype.dispose = function () {
 
-	this.dispatchEvent( { type: 'deallocate', target: this } );
+	this.dispatchEvent( { type: 'dispose' } );
 
 };
 
@@ -12104,7 +12105,7 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.TextureIdCount ++;
 
@@ -12175,9 +12176,9 @@ THREE.Texture.prototype = {
 
 	},
 
-	deallocate: function () {
+	dispose: function () {
 
-		this.dispatchEvent( { type: 'deallocate', target: this } );
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 
@@ -17434,11 +17435,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Events
 
-	var onGeometryDeallocate = function ( event ) {
+	var onGeometryDispose = function ( event ) {
 
 		var geometry = event.target;
 
-		geometry.removeEventListener( 'deallocate', onGeometryDeallocate );
+		geometry.removeEventListener( 'dispose', onGeometryDispose );
 
 		deallocateGeometry( geometry );
 
@@ -17446,11 +17447,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onTextureDeallocate = function ( event ) {
+	var onTextureDispose = function ( event ) {
 
 		var texture = event.target;
 
-		texture.removeEventListener( 'deallocate', onTextureDeallocate );
+		texture.removeEventListener( 'dispose', onTextureDispose );
 
 		deallocateTexture( texture );
 
@@ -17459,11 +17460,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onRenderTargetDeallocate = function ( event ) {
+	var onRenderTargetDispose = function ( event ) {
 
 		var renderTarget = event.target;
 
-		renderTarget.removeEventListener( 'deallocate', onRenderTargetDeallocate );
+		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
 
 		deallocateRenderTarget( renderTarget );
 
@@ -17471,11 +17472,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	var onMaterialDeallocate = function ( event ) {
+	var onMaterialDispose = function ( event ) {
 
 		var material = event.target;
 
-		material.removeEventListener( 'deallocate', onMaterialDeallocate );
+		material.removeEventListener( 'dispose', onMaterialDispose );
 
 		deallocateMaterial( material );
 
@@ -21532,7 +21533,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
 
 				object.geometry.__webglInit = true;
-				object.geometry.addEventListener( 'deallocate', onGeometryDeallocate );
+				object.geometry.addEventListener( 'dispose', onGeometryDispose );
 
 			}
 
@@ -21936,7 +21937,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.initMaterial = function ( material, lights, fog, object ) {
 
-		material.addEventListener( 'deallocate', onMaterialDeallocate );
+		material.addEventListener( 'dispose', onMaterialDispose );
 
 		var u, a, identifiers, i, parameters, maxLightCount, maxBones, maxShadows, shaderID;
 
@@ -23715,7 +23716,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				texture.__webglInit = true;
 
-				texture.addEventListener( 'deallocate', onTextureDeallocate );
+				texture.addEventListener( 'dispose', onTextureDispose );
 
 				texture.__webglTexture = _gl.createTexture();
 
@@ -23979,7 +23980,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
 
-			renderTarget.addEventListener( 'deallocate', onRenderTargetDeallocate );
+			renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
 			renderTarget.__webglTexture = _gl.createTexture();
 
@@ -24391,7 +24392,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.width = width;
 	this.height = height;
@@ -24450,9 +24451,9 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 
 };
 
-THREE.WebGLRenderTarget.prototype.deallocate = function () {
+THREE.WebGLRenderTarget.prototype.dispose = function () {
 
-	this.dispatchEvent( { type: 'deallocate', target: this } );
+	this.dispatchEvent( { type: 'dispose' } );
 
 };
 /**
@@ -32667,14 +32668,14 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 
 	var scope = this;
 
-	this.radius = radius || 200;
+	this.radius = radius || 100;
 	this.tube = tube || 40;
 	this.radialSegments = radialSegments || 64;
 	this.tubularSegments = tubularSegments || 8;
 	this.p = p || 2;
 	this.q = q || 3;
 	this.heightScale = heightScale || 1;
-	this.grid = new Array(this.radialSegments);
+	this.grid = new Array( this.radialSegments );
 
 	var tang = new THREE.Vector3();
 	var n = new THREE.Vector3();
