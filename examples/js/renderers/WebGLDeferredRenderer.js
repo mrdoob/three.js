@@ -174,6 +174,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.alphaTest = originalMaterial.alphaTest;
 		material.wireframe = originalMaterial.wireframe;
+		material.transparent = originalMaterial.transparent;
 
 		// uv repeat and offset setting priorities
 		//	1. color map
@@ -270,6 +271,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			deferredMaterials.normalDepthMaterial = originalMaterial.wireframe ? defaultNormalDepthMaterialWireframe : defaultNormalDepthMaterial;
 
 		}
+
+		deferredMaterials.normalDepthMaterial.transparent = originalMaterial.transparent;
 
 		return deferredMaterials;
 
@@ -466,13 +469,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var setMaterialColor = function ( object ) {
 
-		if ( object.material ) object.material = object.properties.colorMaterial;
+		if ( object.material ) {
+
+			object.material = object.properties.colorMaterial;
+			if ( object.material.transparent ) object.visible = false;
+
+		}
 
 	};
 
 	var setMaterialNormalDepth = function ( object ) {
 
-		if ( object.material ) object.material = object.properties.normalDepthMaterial;
+		if ( object.material ) {
+
+			object.material = object.properties.normalDepthMaterial;
+			if ( object.material.transparent ) object.visible = false;
+
+		}
 
 	};
 
