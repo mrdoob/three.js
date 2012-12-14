@@ -10378,6 +10378,9 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		node.scale.set( s[0], s[1], s[2] );
 
+		// override children materials
+		// if object material was specified in JSON explicitly
+
 		if ( material ) {
 
 			node.traverse( function ( child )  {
@@ -10387,6 +10390,17 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			} );
 
 		}
+
+		// override children visibility
+		// with root node visibility as specified in JSON
+
+		var visible = ( obj.visible !== undefined ) ? obj.visible : true;
+
+		node.traverse( function ( child )  {
+
+			child.visible = visible;
+
+		} );
 
 		parent.add( node );
 
