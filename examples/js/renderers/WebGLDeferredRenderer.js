@@ -67,6 +67,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
+	var invisibleMaterial = new THREE.ShaderMaterial();
+	invisibleMaterial.visible = false;
+
+
 	var defaultNormalDepthMaterial = new THREE.ShaderMaterial( {
 
 		uniforms:       THREE.UniformsUtils.clone( normalDepthShader.uniforms ),
@@ -94,8 +98,17 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 				var deferredMaterials = createDeferredMaterials( materials[ i ] );
 
-				colorMaterials.push( deferredMaterials.colorMaterial );
-				normalDepthMaterials.push( deferredMaterials.normalDepthMaterial );
+				if ( deferredMaterials.transparent ) {
+
+					colorMaterials.push( invisibleMaterial );
+					normalDepthMaterials.push( invisibleMaterial );
+
+				} else {
+
+					colorMaterials.push( deferredMaterials.colorMaterial );
+					normalDepthMaterials.push( deferredMaterials.normalDepthMaterial );
+
+				}
 
 			}
 
@@ -108,6 +121,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			object.properties.colorMaterial = deferredMaterials.colorMaterial;
 			object.properties.normalDepthMaterial = deferredMaterials.normalDepthMaterial;
+			object.properties.transparent = deferredMaterials.transparent;
 
 		}
 
@@ -174,7 +188,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		material.alphaTest = originalMaterial.alphaTest;
 		material.wireframe = originalMaterial.wireframe;
-		material.transparent = originalMaterial.transparent;
 
 		// uv repeat and offset setting priorities
 		//	1. color map
@@ -272,7 +285,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-		deferredMaterials.normalDepthMaterial.transparent = originalMaterial.transparent;
+		deferredMaterials.transparent = originalMaterial.transparent;
 
 		return deferredMaterials;
 
@@ -471,8 +484,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( object.material ) {
 
-			object.material = object.properties.colorMaterial;
-			if ( object.material.transparent ) object.visible = false;
+			if ( object.properties.transparent ) {
+
+				object.material = invisibleMaterial;
+
+			} else {
+
+				object.material = object.properties.colorMaterial;
+
+			}
 
 		}
 
@@ -482,8 +502,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( object.material ) {
 
-			object.material = object.properties.normalDepthMaterial;
-			if ( object.material.transparent ) object.visible = false;
+			if ( object.properties.transparent ) {
+
+				object.material = invisibleMaterial;
+
+			} else {
+
+				object.material = object.properties.normalDepthMaterial;
+
+			}
 
 		}
 
