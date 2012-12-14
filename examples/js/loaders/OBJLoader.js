@@ -4,7 +4,7 @@
 
 THREE.OBJLoader = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 };
 

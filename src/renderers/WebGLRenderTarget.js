@@ -5,7 +5,7 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.width = width;
 	this.height = height;
@@ -64,8 +64,8 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 
 };
 
-THREE.WebGLRenderTarget.prototype.deallocate = function () {
+THREE.WebGLRenderTarget.prototype.dispose = function () {
 
-	this.dispatchEvent( { type: 'deallocate', target: this } );
+	this.dispatchEvent( { type: 'dispose' } );
 
 };

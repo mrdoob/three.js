@@ -4,7 +4,7 @@
 
 THREE.TrackballControls = function ( object, domElement ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	var _this = this;
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };

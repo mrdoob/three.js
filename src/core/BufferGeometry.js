@@ -4,7 +4,7 @@
 
 THREE.BufferGeometry = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.GeometryIdCount ++;
 
@@ -544,9 +544,9 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	deallocate: function () {
+	dispose: function () {
 
-		this.dispatchEvent( { type: 'deallocate', target: this } );
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

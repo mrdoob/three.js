@@ -5,7 +5,7 @@
 
 THREE.Material = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.MaterialIdCount ++;
 
@@ -116,9 +116,9 @@ THREE.Material.prototype.clone = function ( material ) {
 
 };
 
-THREE.Material.prototype.deallocate = function () {
+THREE.Material.prototype.dispose = function () {
 
-	this.dispatchEvent( { type: 'deallocate', target: this } );
+	this.dispatchEvent( { type: 'dispose' } );
 
 };
 

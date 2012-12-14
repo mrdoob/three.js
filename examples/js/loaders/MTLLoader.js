@@ -6,7 +6,8 @@
 
 THREE.MTLLoader = function( baseUrl, options ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
+	
 	this.baseUrl = baseUrl;
 	this.options = options;
 
@@ -149,7 +150,7 @@ THREE.MTLLoader.prototype = {
 
 THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	this.baseUrl = baseUrl;
 	this.options = options;

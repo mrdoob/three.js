@@ -16,6 +16,7 @@ var list = {
 		"Core": [
 			[ "Clock", "api/core/Clock" ],
 			[ "Color", "api/core/Color" ],
+			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
 			[ "Face4", "api/core/Face4" ],
 			[ "Frustum", "api/core/Frustum" ],
@@ -139,7 +140,6 @@ var list = {
 			[ "BufferGeometry", "api/extras/core/BufferGeometry" ],
 			[ "Curve", "api/extras/core/Curve" ],
 			[ "CurvePath", "api/extras/core/CurvePath" ],
-			[ "EventTarget", "api/extras/core/EventTarget" ],
 			[ "Gyroscope", "api/extras/core/Gyroscope" ],
 			[ "Path", "api/extras/core/Path" ],
 			[ "Shape", "api/extras/core/Shape" ]
