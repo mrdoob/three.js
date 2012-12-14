@@ -10025,51 +10025,55 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				// meshes
 
-				if ( objJSON.type && ( objJSON.type in scope.hierarchyHandlerMap ) && objJSON.loading === undefined ) {
+				if ( objJSON.type && ( objJSON.type in scope.hierarchyHandlerMap ) ) {
 
-					var reservedTypes = { "type": 1, "url": 1, "material": 1,
-										  "position": 1, "rotation": 1, "scale" : 1,
-										  "visible": 1, "children": 1, "properties": 1,
-										  "skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1 };
+					if ( objJSON.loading === undefined ) {
 
-					var loaderParameters = {};
+						var reservedTypes = { "type": 1, "url": 1, "material": 1,
+											  "position": 1, "rotation": 1, "scale" : 1,
+											  "visible": 1, "children": 1, "properties": 1,
+											  "skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1 };
 
-					for ( var parType in objJSON ) {
+						var loaderParameters = {};
 
-						if ( ! ( parType in reservedTypes ) ) {
+						for ( var parType in objJSON ) {
 
-							loaderParameters[ parType ] = objJSON[ parType ];
+							if ( ! ( parType in reservedTypes ) ) {
+
+								loaderParameters[ parType ] = objJSON[ parType ];
+
+							}
 
 						}
 
-					}
+						material = result.materials[ objJSON.material ];
 
-					material = result.materials[ objJSON.material ];
+						objJSON.loading = true;
 
-					objJSON.loading = true;
+						var loader = scope.hierarchyHandlerMap[ objJSON.type ][ "loaderObject" ];
 
-					var loader = scope.hierarchyHandlerMap[ objJSON.type ][ "loaderObject" ];
+						// OBJLoader
 
-					// OBJLoader
+						if ( loader.addEventListener ) {
 
-					if ( loader.addEventListener ) {
-
-						loader.addEventListener( 'load', create_callback_hierachy( objID, parent, material, objJSON ) );
-						loader.load( get_url( objJSON.url, data.urlBaseType ) );
-
-					} else {
-
-						// ColladaLoader
-
-						if ( loader.options ) {
-
-							loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ) );
-
-						// UTF8Loader
+							loader.addEventListener( 'load', create_callback_hierachy( objID, parent, material, objJSON ) );
+							loader.load( get_url( objJSON.url, data.urlBaseType ) );
 
 						} else {
 
-							loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ), loaderParameters );
+							// ColladaLoader
+
+							if ( loader.options ) {
+
+								loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ) );
+
+							// UTF8Loader
+
+							} else {
+
+								loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ), loaderParameters );
+
+							}
 
 						}
 
@@ -10385,6 +10389,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		}
 
 		parent.add( node );
+
+		node.name = id;
 
 		result.objects[ id ] = node;
 		handle_objects();
