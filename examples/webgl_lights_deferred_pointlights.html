@@ -240,7 +240,7 @@
 					mapHeight.anisotropy = 4;
 					mapHeight.format = THREE.RGBFormat;
 
-					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909, wrapAround: true, metal: true } );
+					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x333333, wrapAround: true, metal: true } );
 
 					var object = new THREE.Mesh( geometry, material );
 					object.scale.multiplyScalar( 8 );

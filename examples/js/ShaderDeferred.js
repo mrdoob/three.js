@@ -410,7 +410,7 @@ THREE.ShaderDeferred = {
 				// combine
 
 				"vec3 light = lightIntensity * lightColor;",
-				"gl_FragColor = vec4( albedo * light * diffuse, attenuation ) + vec4( light * specular, attenuation );",
+				"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
 
 			"}"
 
@@ -554,7 +554,7 @@ THREE.ShaderDeferred = {
 				// combine
 
 				"vec3 light = lightIntensity * lightColor;",
-				"gl_FragColor = vec4( albedo * light * diffuse, 1.0 ) + vec4( light * specular, 1.0 );",
+				"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), 1.0 );",
 
 			"}"
 

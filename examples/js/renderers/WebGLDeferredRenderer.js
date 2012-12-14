@@ -71,7 +71,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		uniforms:       THREE.UniformsUtils.clone( normalDepthShader.uniforms ),
 		vertexShader:   normalDepthShader.vertexShader,
-		fragmentShader: normalDepthShader.fragmentShader
+		fragmentShader: normalDepthShader.fragmentShader,
+		blending:		THREE.NoBlending
 
 	} );
 
@@ -231,8 +232,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 				fragmentShader: normalDepthShader.fragmentShader,
 				shading:		originalMaterial.shading,
 				defines:		defines,
-				blending:		THREE.NoBlending,
-				depthWrite:		false
+				blending:		THREE.NoBlending
 
 			} );
 
@@ -632,29 +632,36 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		compColor.render();
 
-		// 2) g-buffer normals + depth pass
-
-		scene.traverse( setMaterialNormalDepth );
-
-		// do not touch shared depth buffer in this pass
-		// (no depth clearing, no depth writing,
-		//  just write color pixel if depth is the same)
-
-		this.renderer.autoClearDepth = false;
-		this.renderer.autoClearStencil = false;
-		gl.depthFunc( gl.EQUAL );
-
 		// just touch foreground pixels (stencil == 1)
 		// both in normalDepth and light passes
 
 		gl.stencilFunc( gl.EQUAL, 1, 0xffffffff );
 		gl.stencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
 
+		// 2) g-buffer normals + depth pass
+
+		scene.traverse( setMaterialNormalDepth );
+
+		// must use clean slate depth buffer
+		// otherwise there are z-fighting glitches
+		// not enough precision between two geometry passes
+		// just to use EQUAL depth test
+
+		this.renderer.autoClearDepth = true;
+		this.renderer.autoClearStencil = false;
+
 		compNormalDepth.render();
 
 		// 3) light pass
 
+		// do not clear depth buffer in this pass
+		// depth from geometry pass is used for light culling
+		// (write light proxy color pixel if behind scene pixel)
+
+		this.renderer.autoClearDepth = false;
 		this.renderer.autoUpdateScene = true;
+
+		gl.depthFunc( gl.GEQUAL );
 
 		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
 
@@ -671,11 +678,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			updateLightProxy( lightProxy, camera );
 
 		}
-
-		// still no touching shared depth buffer
-		// (write light proxy color pixel if behind scene pixel)
-
-		gl.depthFunc( gl.GEQUAL );
 
 		compLight.render();
 
