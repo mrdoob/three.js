@@ -22,15 +22,23 @@ THREE.EventTarget = function () {
 
 	};
 
+
 	this.dispatchEvent = function ( event ) {
 
-		for ( var listener in listeners[ event.type ] ) {
+		var listener, i, length, ref;
 
-			listeners[ event.type ][ listener ]( event );
+		ref = listeners[ event.type ];
+		
+		for (i = 0, length = ref.length; i < length; i++) {
+		
+			listener = ref[ i ];
+		
+			listener( event );
 
 		}
 
 	};
+
 
 	this.removeEventListener = function ( type, listener ) {
 
