@@ -226,7 +226,7 @@ THREE.Box3.prototype = {
 
 	},
 
-	boundingSphere: function ( optionalTarget ) {
+	getBoundingSphere: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Sphere();
 		
