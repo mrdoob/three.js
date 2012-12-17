@@ -208,6 +208,16 @@ test( "isIntersectionBox", function() {
 	ok( ! b.isIntersectionBox( c ), "Passed!" );
 });
 
+test( "boundingSphere", function() {
+	var a = new THREE.Box3( zero3, zero3 );
+	var b = new THREE.Box3( zero3, one3 );
+	var c = new THREE.Box3( one3.clone().negate(), one3 );
+
+	ok( a.boundingSphere().equals( new THREE.Sphere( zero3, 0 ) ), "Passed!" );
+	ok( b.boundingSphere().equals( new THREE.Sphere( one3.clone().multiplyScalar( 0.5 ), Math.sqrt( 3 ) * 0.5 ) ), "Passed!" );
+	ok( c.boundingSphere().equals( new THREE.Sphere( zero3, Math.sqrt( 12 ) * 0.5 ) ), "Passed!" );
+});
+
 test( "intersect", function() {
 	var a = new THREE.Box3( zero3, zero3 );
 	var b = new THREE.Box3( zero3, one3 );

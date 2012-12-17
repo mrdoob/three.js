@@ -67,13 +67,13 @@ test( "clampPoint", function() {
 	ok( a.clampPoint( new THREE.Vector3( 1, 1, -3 ) ).equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
 });
 
-test( "bounds", function() {
+test( "boundingBox", function() {
 	var a = new THREE.Sphere( one3, 1 );
 
-	ok( a.bounds().equals( new THREE.Box3( zero3, two3 ) ), "Passed!" );
+	ok( a.boundingBox().equals( new THREE.Box3( zero3, two3 ) ), "Passed!" );
 
 	a.set( zero3, 0 )
-	ok( a.bounds().equals( new THREE.Box3( zero3, zero3 ) ), "Passed!" );
+	ok( a.boundingBox().equals( new THREE.Box3( zero3, zero3 ) ), "Passed!" );
 });
 
 test( "transform", function() {
@@ -83,7 +83,7 @@ test( "transform", function() {
 	var t1 = new THREE.Vector3( 1, -2, 1 );
 	m.makeTranslation( t1 );
 
-	ok( a.clone().transform( m ).bounds().equals( a.bounds().transform( m ) ), "Passed!" );
+	ok( a.clone().transform( m ).boundingBox().equals( a.boundingBox().transform( m ) ), "Passed!" );
 });
 
 test( "translate", function() {

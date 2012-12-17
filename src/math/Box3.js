@@ -226,6 +226,17 @@ THREE.Box3.prototype = {
 
 	},
 
+	boundingSphere: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Sphere();
+		
+		result.center = this.center();
+		result.radius = this.size( THREE.Box3.__v0 ).length() * 0.5;;
+
+		return result;
+
+	},
+
 	intersect: function ( box ) {
 
 		this.min.maxSelf( box.min );
