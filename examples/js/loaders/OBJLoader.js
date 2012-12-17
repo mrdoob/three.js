@@ -12,14 +12,18 @@ THREE.OBJLoader.prototype = {
 
 	constructor: THREE.OBJLoader,
 
-	load: function ( url ) {
+	load: function ( url, callback ) {
 
 		var scope = this;
 		var request = new XMLHttpRequest();
 
 		request.addEventListener( 'load', function ( event ) {
 
-			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
+			var hierarchy = scope.parse( event.target.responseText );
+
+			scope.dispatchEvent( { type: 'load', content: hierarchy } );
+
+			if ( callback ) callback( hierarchy );
 
 		}, false );
 
