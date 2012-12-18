@@ -176,6 +176,8 @@ THREE.ShaderDeferred = {
 
 				"}",
 
+				"gl_FragColor.y *= additiveSpecular;",
+
 				// shininess
 
 				"gl_FragColor.z = wrapAround * shininess;",
@@ -449,6 +451,7 @@ THREE.ShaderDeferred = {
 				"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
 				"float shininess = abs( colorMap.z );",
 				"float wrapAround = sign( colorMap.z );",
+				"float additiveSpecular = sign( colorMap.y );",
 
 				// light
 
@@ -492,7 +495,17 @@ THREE.ShaderDeferred = {
 				// combine
 
 				"vec3 light = lightIntensity * lightColor;",
-				"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
+
+				"if ( additiveSpecular < 0.0 ) {",
+
+					"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
+
+				"} else {",
+
+					"gl_FragColor = vec4( light * albedo * ( diffuse + specular ), attenuation );",
+
+				"}",
+
 
 			"}"
 
