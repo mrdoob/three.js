@@ -677,7 +677,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// write 1 to shared stencil buffer
 		// for non-background pixels
 
-		gl.enable( gl.STENCIL_TEST );
+		//gl.enable( gl.STENCIL_TEST );
 		gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
 		gl.stencilFunc( gl.ALWAYS, 1, 0xffffffff );
 		gl.clearStencil( 0 );
