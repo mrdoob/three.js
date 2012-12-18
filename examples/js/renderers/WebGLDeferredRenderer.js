@@ -7,12 +7,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var _this = this;
 
-	var width = parameters.width !== undefined ? parameters.width : 800;
-	var height = parameters.height !== undefined ? parameters.height : 600;
-	var scale = parameters.scale !== undefined ? parameters.scale : 1;
+	var fullWidth = parameters.width !== undefined ? parameters.width : 800;
+	var fullHeight = parameters.height !== undefined ? parameters.height : 600;
+	var currentScale = parameters.scale !== undefined ? parameters.scale : 1;
 
-	var scaledWidth = Math.floor( scale * width );
-	var scaledHeight = Math.floor( scale * height );
+	var scaledWidth = Math.floor( currentScale * fullWidth );
+	var scaledHeight = Math.floor( currentScale * fullHeight );
 
 	var brightness = parameters.brightness !== undefined ? parameters.brightness : 1;
 	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
@@ -22,7 +22,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	if ( this.renderer === undefined ) {
 
 		this.renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
-		this.renderer.setSize( width, height );
+		this.renderer.setSize( fullWidth, fullHeight );
 		this.renderer.setClearColorHex( 0x000000, 0 );
 
 		this.renderer.autoClear = false;
@@ -553,12 +553,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
-	this.setSize = function ( width, height ) {
+	this.setScale = function ( scale ) {
 
-		this.renderer.setSize( width, height );
+		currentScale = scale;
 
-		scaledWidth = Math.floor( scale * width );
-		scaledHeight = Math.floor( scale * height );
+		scaledWidth = Math.floor( currentScale * fullWidth );
+		scaledHeight = Math.floor( currentScale * fullHeight );
 
 		compNormalDepth.setSize( scaledWidth, scaledHeight );
 		compColor.setSize( scaledWidth, scaledHeight );
@@ -582,7 +582,18 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
 
-		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / fullWidth, 1 / fullHeight );
+
+	};
+
+	this.setSize = function ( width, height ) {
+
+		fullWidth = width;
+		fullHeight = height;
+
+		this.renderer.setSize( fullWidth, fullHeight );
+
+		this.setScale( currentScale );
 
 	};
 
@@ -814,7 +825,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// FXAA
 
 		effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / fullWidth, 1 / fullHeight );
 		effectFXAA.renderToScreen = true;
 
 		//
