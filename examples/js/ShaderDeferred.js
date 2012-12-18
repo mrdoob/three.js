@@ -21,7 +21,11 @@ THREE.ShaderDeferred = {
 				"specular" :  { type: "c", value: new THREE.Color( 0x111111 ) },
 				"shininess":  { type: "f", value: 30 },
 				"wrapAround": 		{ type: "f", value: 1 },
-				"additiveSpecular": { type: "f", value: 1 }
+				"additiveSpecular": { type: "f", value: 1 },
+
+				"samplerNormalDepth": { type: "t", value: null },
+				"viewWidth": 		{ type: "f", value: 800 },
+				"viewHeight": 		{ type: "f", value: 600 }
 			}
 
 		] ),
@@ -38,7 +42,25 @@ THREE.ShaderDeferred = {
 			THREE.ShaderChunk[ "color_pars_fragment" ],
 			THREE.ShaderChunk[ "map_pars_fragment" ],
 			THREE.ShaderChunk[ "lightmap_pars_fragment" ],
-			THREE.ShaderChunk[ "envmap_pars_fragment" ],
+
+			"#ifdef USE_ENVMAP",
+
+				"varying vec3 vWorldPosition;",
+
+				"uniform float reflectivity;",
+				"uniform samplerCube envMap;",
+				"uniform float flipEnvMap;",
+				"uniform int combine;",
+
+				"uniform bool useRefract;",
+				"uniform float refractionRatio;",
+
+				"uniform sampler2D samplerNormalDepth;",
+				"uniform float viewHeight;",
+				"uniform float viewWidth;",
+
+			"#endif",
+
 			THREE.ShaderChunk[ "fog_pars_fragment" ],
 			THREE.ShaderChunk[ "shadowmap_pars_fragment" ],
 			THREE.ShaderChunk[ "specularmap_pars_fragment" ],
@@ -63,11 +85,61 @@ THREE.ShaderDeferred = {
 				THREE.ShaderChunk[ "specularmap_fragment" ],
 				THREE.ShaderChunk[ "lightmap_fragment" ],
 				THREE.ShaderChunk[ "color_fragment" ],
-				THREE.ShaderChunk[ "envmap_fragment" ],
+
+				"#ifdef USE_ENVMAP",
+
+					"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
+					"vec4 normalDepth = texture2D( samplerNormalDepth, texCoord );",
+					"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
+
+					"vec3 reflectVec;",
+
+					"vec3 cameraToVertex = normalize( vWorldPosition - cameraPosition );",
+
+					"if ( useRefract ) {",
+
+						"reflectVec = refract( cameraToVertex, normal, refractionRatio );",
+
+					"} else { ",
+
+						"reflectVec = reflect( cameraToVertex, normal );",
+
+					"}",
+
+					"#ifdef DOUBLE_SIDED",
+
+						"float flipNormal = ( -1.0 + 2.0 * float( gl_FrontFacing ) );",
+						"vec4 cubeColor = textureCube( envMap, flipNormal * vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+
+					"#else",
+
+						"vec4 cubeColor = textureCube( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ) );",
+
+					"#endif",
+
+					"#ifdef GAMMA_INPUT",
+
+						"cubeColor.xyz *= cubeColor.xyz;",
+
+					"#endif",
+
+					"if ( combine == 1 ) {",
+
+						"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularStrength * reflectivity );",
+
+					"} else if ( combine == 2 ) {",
+
+						"gl_FragColor.xyz += cubeColor.xyz * specularStrength * reflectivity;",
+
+					"} else {",
+
+						"gl_FragColor.xyz = mix( gl_FragColor.xyz, gl_FragColor.xyz * cubeColor.xyz, specularStrength * reflectivity );",
+
+					"}",
+
+				"#endif",
+
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
-
-				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
-
 				THREE.ShaderChunk[ "fog_fragment" ],
 
 				//
@@ -120,11 +192,16 @@ THREE.ShaderDeferred = {
 
 			THREE.ShaderChunk[ "map_pars_vertex" ],
 			THREE.ShaderChunk[ "lightmap_pars_vertex" ],
-			THREE.ShaderChunk[ "envmap_pars_vertex" ],
 			THREE.ShaderChunk[ "color_pars_vertex" ],
 			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
 			THREE.ShaderChunk[ "skinning_pars_vertex" ],
 			THREE.ShaderChunk[ "shadowmap_pars_vertex" ],
+
+			"#ifdef USE_ENVMAP",
+
+				"varying vec3 vWorldPosition;",
+
+			"#endif",
 
 			"void main() {",
 
@@ -139,8 +216,13 @@ THREE.ShaderDeferred = {
 				THREE.ShaderChunk[ "default_vertex" ],
 
 				THREE.ShaderChunk[ "worldpos_vertex" ],
-				THREE.ShaderChunk[ "envmap_vertex" ],
 				THREE.ShaderChunk[ "shadowmap_vertex" ],
+
+				"#ifdef USE_ENVMAP",
+
+					"vWorldPosition = worldPosition.xyz;",
+
+				"#endif",
 
 			"}"
 

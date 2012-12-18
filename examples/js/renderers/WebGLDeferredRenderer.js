@@ -63,7 +63,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	//
 
 	var lightSceneFullscreen, lightSceneProxy;
-	var lightMaterials = [];
+
+	//
+
+	var resizableMaterials = [];
 
 	//
 
@@ -140,7 +143,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// 	morphs
 
 		var uniforms = THREE.UniformsUtils.clone( colorShader.uniforms );
-		var defines = { "USE_MAP": !! originalMaterial.map, "GAMMA_INPUT": true };
+		var defines = { "USE_MAP": !! originalMaterial.map, "USE_ENVMAP": !! originalMaterial.envMap, "GAMMA_INPUT": true };
 
 		var material = new THREE.ShaderMaterial( {
 
@@ -177,6 +180,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		uniforms.additiveSpecular.value = additiveSpecular;
 
 		uniforms.map.value = originalMaterial.map;
+
+		if ( originalMaterial.envMap ) {
+
+			uniforms.envMap.value = originalMaterial.envMap;
+			uniforms.useRefract.value = originalMaterial.envMap.mapping instanceof THREE.CubeRefractionMapping;
+			uniforms.refractionRatio.value = originalMaterial.refractionRatio;
+			uniforms.combine.value = originalMaterial.combine;
+			uniforms.reflectivity.value = originalMaterial.reflectivity;
+			uniforms.flipEnvMap.value = ( originalMaterial.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
+
+			uniforms.samplerNormalDepth.value = compNormalDepth.renderTarget2;
+			uniforms.viewWidth.value = scaledWidth;
+			uniforms.viewHeight.value = scaledHeight;
+
+			resizableMaterials.push( material );
+
+		}
 
 		material.vertexColors = originalMaterial.vertexColors;
 		material.morphTargets = originalMaterial.morphTargets;
@@ -352,7 +372,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		lightMaterials.push( materialLight );
+		resizableMaterials.push( materialLight );
 
 		return meshLight;
 
@@ -399,7 +419,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		lightMaterials.push( materialLight );
+		resizableMaterials.push( materialLight );
 
 		return meshLight;
 
@@ -432,7 +452,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		lightMaterials.push( materialLight );
+		resizableMaterials.push( materialLight );
 
 		return meshLight;
 
@@ -547,20 +567,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compColor.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 		compLight.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 
-		for ( var i = 0, il = lightMaterials.length; i < il; i ++ ) {
+		for ( var i = 0, il = resizableMaterials.length; i < il; i ++ ) {
 
-			var uniforms = lightMaterials[ i ].uniforms;
+			var uniforms = resizableMaterials[ i ].uniforms;
 
 			uniforms[ "viewWidth" ].value = scaledWidth;
 			uniforms[ "viewHeight" ].value = scaledHeight;
 
-			uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-
-			if ( uniforms[ 'samplerNormalDepth' ] ) {
-
-				uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
-
-			}
+			if ( uniforms[ 'samplerColor' ] ) uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+			if ( uniforms[ 'samplerNormalDepth' ] ) uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 		}
 
