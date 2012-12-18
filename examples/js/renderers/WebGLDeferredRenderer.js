@@ -343,8 +343,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// linear space
 
 		var intensity = light.intensity * light.intensity;
+		var position = light.matrixWorld.getPosition();
 
-		materialLight.uniforms[ "lightPos" ].value = light.position;
+		materialLight.uniforms[ "lightPos" ].value.copy( position );
 		materialLight.uniforms[ "lightRadius" ].value = distance;
 		materialLight.uniforms[ "lightIntensity" ].value = intensity;
 		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
@@ -361,7 +362,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( light.distance > 0 ) {
 
-			meshLight.position = light.position;
+			meshLight.position.copy( position );
 			meshLight.scale.multiplyScalar( distance );
 
 		}
@@ -615,6 +616,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 					lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
 					if ( uniforms[ "lightRadius" ] ) uniforms[ "lightRadius" ].value = distance;
+
+					var position = originalLight.matrixWorld.getPosition();
+					uniforms[ "lightPos" ].value.copy( position );
+
+					lightProxy.position.copy( position );
 
 				}
 
