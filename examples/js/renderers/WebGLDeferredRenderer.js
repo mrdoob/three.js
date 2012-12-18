@@ -80,9 +80,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	} );
 
-	var defaultNormalDepthMaterialWireframe = defaultNormalDepthMaterial.clone();
-	defaultNormalDepthMaterialWireframe.wireframe = true;
-
 	//
 
 	var initDeferredMaterials = function ( object ) {
@@ -250,18 +247,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			} );
 
-			if ( originalMaterial.morphTargets ) {
-
-				normalDepthMaterial.morphTargets = originalMaterial.morphTargets;
-				normalDepthMaterial.morphNormals = originalMaterial.morphNormals;
-
-			}
-
-			if ( originalMaterial.skinning ) {
-
-				normalDepthMaterial.skinning = originalMaterial.skinning;
-
-			}
+			normalDepthMaterial.morphTargets = originalMaterial.morphTargets;
+			normalDepthMaterial.morphNormals = originalMaterial.morphNormals;
+			normalDepthMaterial.skinning = originalMaterial.skinning;
 
 			if ( originalMaterial.bumpMap ) {
 
@@ -275,15 +263,18 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			}
 
-			normalDepthMaterial.wireframe = originalMaterial.wireframe;
-
-			deferredMaterials.normalDepthMaterial = normalDepthMaterial;
-
 		} else {
 
-			deferredMaterials.normalDepthMaterial = originalMaterial.wireframe ? defaultNormalDepthMaterialWireframe : defaultNormalDepthMaterial;
+			var normalDepthMaterial = defaultNormalDepthMaterial.clone();
 
 		}
+
+		normalDepthMaterial.wireframe = originalMaterial.wireframe;
+		normalDepthMaterial.vertexColors = originalMaterial.vertexColors;
+
+		deferredMaterials.normalDepthMaterial = normalDepthMaterial;
+
+		//
 
 		deferredMaterials.transparent = originalMaterial.transparent;
 
@@ -548,13 +539,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		scaledWidth = Math.floor( scale * width );
 		scaledHeight = Math.floor( scale * height );
 
-		compColor.setSize( scaledWidth, scaledHeight );
 		compNormalDepth.setSize( scaledWidth, scaledHeight );
+		compColor.setSize( scaledWidth, scaledHeight );
 		compLight.setSize( scaledWidth, scaledHeight );
 		compFinal.setSize( scaledWidth, scaledHeight );
 
-		compNormalDepth.renderTarget2.shareDepthFrom = compColor.renderTarget2;
-		compLight.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+		compColor.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
+		compLight.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 
 		for ( var i = 0, il = lightMaterials.length; i < il; i ++ ) {
 
@@ -653,9 +644,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		this.renderer.autoUpdateScene = false;
 		scene.updateMatrixWorld();
 
-		// 1) g-buffer color pass
+		// 1) g-buffer normals + depth pass
 
-		scene.traverse( setMaterialColor );
+		scene.traverse( setMaterialNormalDepth );
 
 		// clear shared depth buffer
 
@@ -670,17 +661,17 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		gl.stencilFunc( gl.ALWAYS, 1, 0xffffffff );
 		gl.clearStencil( 0 );
 
-		compColor.render();
+		compNormalDepth.render();
 
 		// just touch foreground pixels (stencil == 1)
-		// both in normalDepth and light passes
+		// both in color and light passes
 
 		gl.stencilFunc( gl.EQUAL, 1, 0xffffffff );
 		gl.stencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
 
-		// 2) g-buffer normals + depth pass
+		// 2) g-buffer color pass
 
-		scene.traverse( setMaterialNormalDepth );
+		scene.traverse( setMaterialColor );
 
 		// must use clean slate depth buffer
 		// otherwise there are z-fighting glitches
@@ -690,7 +681,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		this.renderer.autoClearDepth = true;
 		this.renderer.autoClearStencil = false;
 
-		compNormalDepth.render();
+		compColor.render();
 
 		// 3) light pass
 
@@ -759,14 +750,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rtLight.generateMipmaps = false;
 		rtFinal.generateMipmaps = false;
 
-		// color composer
-
-		passColor = new THREE.RenderPass();
-		passColor.clear = true;
-
-		compColor = new THREE.EffectComposer( _this.renderer, rtColor );
-		compColor.addPass( passColor );
-
 		// normal + depth composer
 
 		passNormalDepth = new THREE.RenderPass();
@@ -775,7 +758,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compNormalDepth = new THREE.EffectComposer( _this.renderer, rtNormalDepth );
 		compNormalDepth.addPass( passNormalDepth );
 
-		compNormalDepth.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+		// color composer
+
+		passColor = new THREE.RenderPass();
+		passColor.clear = true;
+
+		compColor = new THREE.EffectComposer( _this.renderer, rtColor );
+		compColor.addPass( passColor );
+
+		compColor.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 
 		// light composer
 
@@ -789,7 +780,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compLight.addPass( passLightFullscreen );
 		compLight.addPass( passLightProxy );
 
-		compLight.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+		compLight.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 
 		// final composer
 
