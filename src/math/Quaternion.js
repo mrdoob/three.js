@@ -2,6 +2,8 @@
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author bhouston / http://exocortex.com
+ * @author Hasan Kamal-Al-Deen / hasank1987@gmail.com
  */
 
 THREE.Quaternion = function( x, y, z, w ) {
