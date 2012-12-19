@@ -6,6 +6,55 @@
  */
 
 
+THREE.DeferredShaderChunk = {
+
+	// decode float to vec3
+
+	unpackFloat: [
+
+		"vec3 float_to_vec3( float data ) {",
+
+			"vec3 uncompressed;",
+			"uncompressed.x = fract( data );",
+			"float zInt = floor( data / 255.0 );",
+			"uncompressed.z = fract( zInt / 255.0 );",
+			"uncompressed.y = fract( floor( data - ( zInt * 255.0 ) ) / 255.0 );",
+			"return uncompressed;",
+
+		"}"
+
+	].join("\n"),
+
+	unpackColorMap: [
+
+		"vec4 colorMap = texture2D( samplerColor, texCoord );",
+
+		"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
+		"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
+		"float shininess = abs( colorMap.z );",
+		"float wrapAround = sign( colorMap.z );",
+		"float additiveSpecular = sign( colorMap.y );"
+
+	].join("\n"),
+
+	combine: [
+
+		"vec3 light = lightIntensity * lightColor;",
+
+		"if ( additiveSpecular < 0.0 ) {",
+
+			"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
+
+		"} else {",
+
+			"gl_FragColor = vec4( light * albedo * ( diffuse + specular ), attenuation );",
+
+		"}"
+
+	].join("\n")
+
+};
+
 THREE.ShaderDeferred = {
 
 	"color" : {
@@ -394,16 +443,7 @@ THREE.ShaderDeferred = {
 
 			"uniform mat4 matProjInverse;",
 
-			"vec3 float_to_vec3( float data ) {",
-
-				"vec3 uncompressed;",
-				"uncompressed.x = fract( data );",
-				"float zInt = floor( data / 255.0 );",
-				"uncompressed.z = fract( zInt / 255.0 );",
-				"uncompressed.y = fract( floor( data - ( zInt * 255.0 ) ) / 255.0 );",
-				"return uncompressed;",
-
-			"}",
+			THREE.DeferredShaderChunk[ "unpackFloat" ],
 
 			"void main() {",
 
@@ -445,13 +485,7 @@ THREE.ShaderDeferred = {
 
 				// color
 
-				"vec4 colorMap = texture2D( samplerColor, texCoord );",
-
-				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
-				"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
-				"float shininess = abs( colorMap.z );",
-				"float wrapAround = sign( colorMap.z );",
-				"float additiveSpecular = sign( colorMap.y );",
+				THREE.DeferredShaderChunk[ "unpackColorMap" ],
 
 				// light
 
@@ -494,17 +528,7 @@ THREE.ShaderDeferred = {
 
 				// combine
 
-				"vec3 light = lightIntensity * lightColor;",
-
-				"if ( additiveSpecular < 0.0 ) {",
-
-					"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
-
-				"} else {",
-
-					"gl_FragColor = vec4( light * albedo * ( diffuse + specular ), attenuation );",
-
-				"}",
+				THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
@@ -562,16 +586,7 @@ THREE.ShaderDeferred = {
 
 			"uniform mat4 matProjInverse;",
 
-			"vec3 float_to_vec3( float data ) {",
-
-				"vec3 uncompressed;",
-				"uncompressed.x = fract( data );",
-				"float zInt = floor( data / 255.0 );",
-				"uncompressed.z = fract( zInt / 255.0 );",
-				"uncompressed.y = fract( floor( data - ( zInt * 255.0 ) ) / 255.0 );",
-				"return uncompressed;",
-
-			"}",
+			THREE.DeferredShaderChunk[ "unpackFloat" ],
 
 			"void main() {",
 
@@ -596,13 +611,7 @@ THREE.ShaderDeferred = {
 
 				// color
 
-				"vec4 colorMap = texture2D( samplerColor, texCoord );",
-
-				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
-				"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
-				"float shininess = abs( colorMap.z );",
-				"float wrapAround = sign( colorMap.z );",
-				"float additiveSpecular = sign( colorMap.y );",
+				THREE.DeferredShaderChunk[ "unpackColorMap" ],
 
 				//
 
@@ -645,20 +654,11 @@ THREE.ShaderDeferred = {
 
 					// combine
 
-					"vec3 light = lightIntensity * lightColor;",
+					"const float attenuation = 1.0;",
 
-					"if ( additiveSpecular < 0.0 ) {",
-
-						"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), 1.0 );",
-
-					"} else {",
-
-						"gl_FragColor = vec4( light * albedo * ( diffuse + specular ), 1.0 );",
-
-					"}",
+					THREE.DeferredShaderChunk[ "combine" ],
 
 					"return;",
-
 
 				"}",
 
@@ -711,16 +711,7 @@ THREE.ShaderDeferred = {
 
 			"uniform mat4 matProjInverse;",
 
-			"vec3 float_to_vec3( float data ) {",
-
-				"vec3 uncompressed;",
-				"uncompressed.x = fract( data );",
-				"float zInt = floor( data / 255.0 );",
-				"uncompressed.z = fract( zInt / 255.0 );",
-				"uncompressed.y = fract( floor( data - ( zInt * 255.0 ) ) / 255.0 );",
-				"return uncompressed;",
-
-			"}",
+			THREE.DeferredShaderChunk[ "unpackFloat" ],
 
 			"void main() {",
 
@@ -746,11 +737,7 @@ THREE.ShaderDeferred = {
 
 				// color
 
-				"vec4 colorMap = texture2D( samplerColor, texCoord );",
-				"vec3 albedo = float_to_vec3( abs( colorMap.x ) );",
-				"vec3 specularColor = float_to_vec3( abs( colorMap.y ) );",
-				"float shininess = abs( colorMap.z );",
-				"float wrapAround = sign( colorMap.z );",
+				THREE.DeferredShaderChunk[ "unpackColorMap" ],
 
 				"vec3 diffuse;",
 
@@ -793,8 +780,9 @@ THREE.ShaderDeferred = {
 
 				// combine
 
-				"vec3 light = lightIntensity * lightColor;",
-				"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), 1.0 );",
+				"const float attenuation = 1.0;",
+
+				THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
