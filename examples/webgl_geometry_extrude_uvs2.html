@@ -66,8 +66,7 @@
 	function updateRotation() {
 		rX = (rX + 3600) % 360;
 		rY = (rY + 3600) % 360;
-		var torad = Math.PI / 180.0;
-		testMesh.rotation.set(rY *torad, 0, rX *torad);
+		testMesh.rotation.set( THREE.Math.degToRad( rY ), 0, THREE.Math.degToRad( rX ) );
 	}
 
 	function render() {

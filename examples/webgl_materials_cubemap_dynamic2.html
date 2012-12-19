@@ -170,8 +170,8 @@
 				lon += .15;
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = ( 90 - lat ) * Math.PI / 180;
-				theta = lon * Math.PI / 180;
+				phi = THREE.Math.degToRad( 90 - lat );
+				theta = THREE.Math.degToRad( lon );
 
 				sphere.position.x = Math.sin( time * 0.001 ) * 30;
 				sphere.position.y = Math.sin( time * 0.0011 ) * 30;
