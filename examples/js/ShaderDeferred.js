@@ -366,12 +366,11 @@ THREE.ShaderDeferred = {
 
 			samplerNormalDepth: { type: "t", value: null },
 			samplerColor: 		{ type: "t", value: null },
-			matView: 		{ type: "m4", value: new THREE.Matrix4() },
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
 
-			lightPos: 		{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
+			lightPositionVS:{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
 			lightRadius: 	{ type: "f", value: 1.0 }
@@ -380,7 +379,6 @@ THREE.ShaderDeferred = {
 
 		fragmentShader : [
 
-			"varying vec3 lightView;",
 			"varying vec4 clipPos;",
 
 			"uniform sampler2D samplerColor;",
@@ -392,6 +390,7 @@ THREE.ShaderDeferred = {
 			"uniform float viewWidth;",
 
 			"uniform vec3 lightColor;",
+			"uniform vec3 lightPositionVS;",
 
 			"uniform mat4 matProjInverse;",
 
@@ -426,7 +425,7 @@ THREE.ShaderDeferred = {
 				"viewPos.xyz /= viewPos.w;",
 				"viewPos.w = 1.0;",
 
-				"vec3 lightDir = lightView - viewPos.xyz;",
+				"vec3 lightDir = lightPositionVS - viewPos.xyz;",
 				"float dist = length( lightDir );",
 
 				"if ( dist > lightRadius ) discard;",
@@ -513,16 +512,12 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
-			"varying vec3 lightView;",
 			"varying vec4 clipPos;",
-			"uniform vec3 lightPos;",
-			"uniform mat4 matView;",
 
 			"void main() { ",
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 				"gl_Position = projectionMatrix * mvPosition;",
-				"lightView = vec3( matView * vec4( lightPos, 1.0 ) );",
 				"clipPos = gl_Position;",
 
 			"}"

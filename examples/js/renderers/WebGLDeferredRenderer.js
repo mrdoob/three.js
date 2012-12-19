@@ -323,10 +323,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
 			uniforms[ "lightRadius" ].value = distance;
 
-			var position = light.matrixWorld.getPosition();
-			uniforms[ "lightPos" ].value.copy( position );
+			positionVS.copy( light.matrixWorld.getPosition() );
+			camera.matrixWorldInverse.multiplyVector3( positionVS );
+			uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
-			lightProxy.position.copy( position );
+			lightProxy.position.copy( light.matrixWorld.getPosition() );
 
 		} else {
 
