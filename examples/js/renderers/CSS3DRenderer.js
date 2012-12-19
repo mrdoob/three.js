@@ -139,7 +139,7 @@ THREE.CSS3DRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		var fov = 0.5 / Math.tan( camera.fov * Math.PI / 360 ) * _height;
+		var fov = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * _height;
 
 		this.domElement.style.WebkitPerspective = fov + "px";
 		this.domElement.style.MozPerspective = fov + "px";

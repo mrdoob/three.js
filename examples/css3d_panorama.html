@@ -192,8 +192,8 @@
 
 				lon +=  0.1;
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = ( 90 - lat ) * Math.PI / 180;
-				theta = lon * Math.PI / 180;
+				phi = THREE.Math.degToRad( 90 - lat );
+				theta = THREE.Math.degToRad( lon );
 
 				target.x = Math.sin( phi ) * Math.cos( theta );
 				target.y = Math.cos( phi );
