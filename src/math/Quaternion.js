@@ -174,6 +174,28 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	add: function ( a, b ) {
+
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+		this.z = a.z + b.z;
+		this.w = a.w + b.w;
+
+		return this;
+
+	},
+
+	addSelf: function ( v ) {
+
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+		this.w += v.w;
+
+		return this;
+
+	},
+
 	inverse: function () {
 
 		this.conjugate().normalize();
@@ -277,6 +299,55 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	toEuler: function ( order, optionalTarget ) {
+
+	    var result = optionalTarget || new THREE.Vector3();
+
+	    var qx = this.x,
+	    	qy = this.y,
+	    	qz = this.z,
+	    	qw = this.w;
+	    var sqx = qx*qx,
+	        sqy = qy*qy,
+	        sqz = qz*qz,
+	        sqw = qw*qw;
+
+		if ( order === undefined || order === 'XYZ' ) {
+
+	        var test = qw*qy - qx*qz;
+
+		    if (test > 0.4999) {
+
+		        result.x = 0;
+		        result.y = 90;
+		        result.z = -2 * Math.atan2(qx, qw);
+
+		    } else if (test < -0.4999) {
+
+		        result.x = 0;
+		        result.y = -90;
+		        result.z = 2 * Math.atan2(qx, qw);
+
+		    } else {
+
+		        result.x = Math.atan2(2 * (qw*qx + qy*qz), sqw - sqx - sqy + sqz);
+		        result.y = Math.asin(2 * (qw*qy - qx*qz));
+		        result.z = Math.atan2(2 * (qx*qy + qw*qz), sqw + sqx - sqy - sqz);
+
+		    }
+
+		}
+		else {
+
+			// TODO: support more Euler orders.			
+			throw new Error( "Euler order not supported: " + order );
+
+		}
+
+	    return result;
+
+	},
+
 	slerpSelf: function ( qb, t ) {
 
 		var x = this.x, y = this.y, z = this.z, w = this.w;
@@ -337,6 +408,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	equals: function ( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+
+	},
+
 	clone: function () {
 
 		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
@@ -347,58 +424,6 @@ THREE.Quaternion.prototype = {
 
 THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
-	// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
-
-	var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
-
-	if ( cosHalfTheta < 0 ) {
-
-		qm.w = -qb.w;
-		qm.x = -qb.x;
-		qm.y = -qb.y;
-		qm.z = -qb.z;
-
-		cosHalfTheta = -cosHalfTheta;
-
-	} else {
-
-		qm.copy( qb );
-
-	}
-
-	if ( Math.abs( cosHalfTheta ) >= 1.0 ) {
-
-		qm.w = qa.w;
-		qm.x = qa.x;
-		qm.y = qa.y;
-		qm.z = qa.z;
-
-		return qm;
-
-	}
-
-	var halfTheta = Math.acos( cosHalfTheta );
-	var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
-
-	if ( Math.abs( sinHalfTheta ) < 0.001 ) {
-
-		qm.w = 0.5 * ( qa.w + qm.w );
-		qm.x = 0.5 * ( qa.x + qm.x );
-		qm.y = 0.5 * ( qa.y + qm.y );
-		qm.z = 0.5 * ( qa.z + qm.z );
-
-		return qm;
-
-	}
-
-	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta;
-	var ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
-
-	qm.w = ( qa.w * ratioA + qm.w * ratioB );
-	qm.x = ( qa.x * ratioA + qm.x * ratioB );
-	qm.y = ( qa.y * ratioA + qm.y * ratioB );
-	qm.z = ( qa.z * ratioA + qm.z * ratioB );
-
-	return qm;
+	return qm.copy( qa ).slerpSelf( qb, t );
 
 }
