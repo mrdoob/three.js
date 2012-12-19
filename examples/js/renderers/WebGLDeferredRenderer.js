@@ -40,6 +40,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var positionVS = new THREE.Vector3();
 	var directionVS = new THREE.Vector3();
 
+	var direction = new THREE.Vector3();
+
+	//
+
 	var geometryLightSphere = new THREE.SphereGeometry( 1, 16, 8 );
 	var geometryLightPlane = new THREE.PlaneGeometry( 2, 2 );
 
@@ -130,7 +134,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		}
 
 	};
-
 
 	var createDeferredMaterials = function ( originalMaterial ) {
 
@@ -306,6 +309,42 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
+	var updatePointLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		// skip infinite pointlights
+		// right now you can't switch between infinite and finite pointlights
+		// it's just too messy as they use different proxies
+
+		var distance = light.distance;
+
+		if ( distance > 0 ) {
+
+			lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
+			uniforms[ "lightRadius" ].value = distance;
+
+			var position = light.matrixWorld.getPosition();
+			uniforms[ "lightPos" ].value.copy( position );
+
+			lightProxy.position.copy( position );
+
+		} else {
+
+			uniforms[ "lightRadius" ].value = Infinity;
+
+		}
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+
+	};
+
 	var createDeferredPointLight = function ( light ) {
 
 		// setup light material
@@ -327,32 +366,20 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// infinite pointlights use full-screen quad proxy
 		// regular pointlights use sphere proxy
 
-		var distance, geometry;
+		var  geometry;
 
 		if ( light.distance > 0 ) {
 
-			distance = light.distance;
 			geometry = geometryLightSphere;
 
 		} else {
 
-			distance = Infinity;
 			geometry = geometryLightPlane;
 
 			materialLight.depthTest = false;
 			materialLight.side = THREE.FrontSide;
 
 		}
-
-		// linear space
-
-		var intensity = light.intensity * light.intensity;
-		var position = light.matrixWorld.getPosition();
-
-		materialLight.uniforms[ "lightPos" ].value.copy( position );
-		materialLight.uniforms[ "lightRadius" ].value = distance;
-		materialLight.uniforms[ "lightIntensity" ].value = intensity;
-		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
 
 		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
@@ -364,13 +391,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var meshLight = new THREE.Mesh( geometry, materialLight );
 
-		if ( light.distance > 0 ) {
-
-			meshLight.position.copy( position );
-			meshLight.scale.multiplyScalar( distance );
-
-		}
-
 		// keep reference for color and intensity updates
 
 		meshLight.properties.originalLight = light;
@@ -379,7 +399,39 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		resizableMaterials.push( materialLight );
 
+		// sync proxy uniforms to the original light
+
+		updatePointLightProxy( meshLight );
+
 		return meshLight;
+
+	};
+
+	var updateSpotLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		positionVS.copy( light.matrixWorld.getPosition() );
+		camera.matrixWorldInverse.multiplyVector3( positionVS );
+
+		directionVS.copy( light.matrixWorld.getPosition() );
+		directionVS.subSelf( light.target.matrixWorld.getPosition() );
+		directionVS.normalize();
+		camera.matrixWorldInverse.rotateAxis( directionVS );
+
+		uniforms[ "lightPositionVS" ].value.copy( positionVS );
+		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
+
+		uniforms[ "lightAngle" ].value = light.angle;
+		uniforms[ "lightDistance" ].value = light.distance;
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
 
 	};
 
@@ -402,25 +454,70 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		} );
 
-		// linear space
+		uniforms[ "viewWidth" ].value = scaledWidth;
+		uniforms[ "viewHeight" ].value = scaledHeight;
+
+		uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+
+		// create light proxy mesh
+
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
+
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
+
+		// keep reference for size reset
+
+		resizableMaterials.push( materialLight );
+
+		// sync proxy uniforms to the original light
+
+		updateSpotLightProxy( meshLight );
+
+		return meshLight;
+
+	};
+
+	var updateDirectionalLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		direction.copy( light.matrixWorld.getPosition() );
+		direction.subSelf( light.target.matrixWorld.getPosition() );
+		direction.normalize();
+
+		uniforms[ "lightDir" ].value.copy( direction );
+
+		// linear space colors
 
 		var intensity = light.intensity * light.intensity;
 
-		positionVS.copy( light.matrixWorld.getPosition() );
-		camera.matrixWorldInverse.multiplyVector3( positionVS );
-
-		directionVS.copy( light.matrixWorld.getPosition() );
-		directionVS.subSelf( light.target.matrixWorld.getPosition() );
-		directionVS.normalize();
-		camera.matrixWorldInverse.rotateAxis( directionVS );
-
-		uniforms[ "lightPositionVS" ].value.copy( positionVS );
-		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
-
 		uniforms[ "lightIntensity" ].value = intensity;
-		uniforms[ "lightAngle" ].value = light.angle;
-		uniforms[ "lightDistance" ].value = light.distance;
 		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+
+	};
+
+	var createDeferredDirectionalLight = function ( light ) {
+
+		// setup light material
+
+		var uniforms = THREE.UniformsUtils.clone( directionalLightShader.uniforms );
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       uniforms,
+			vertexShader:   directionalLightShader.vertexShader,
+			fragmentShader: directionalLightShader.fragmentShader,
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			depthTest:		false,
+			transparent:	true
+
+		} );
 
 		uniforms[ "viewWidth" ].value = scaledWidth;
 		uniforms[ "viewHeight" ].value = scaledHeight;
@@ -440,52 +537,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		resizableMaterials.push( materialLight );
 
-		return meshLight;
+		// sync proxy uniforms to the original light
 
-	};
-
-	var createDeferredDirectionalLight = function ( light ) {
-
-		// setup light material
-
-		var materialLight = new THREE.ShaderMaterial( {
-
-			uniforms:       THREE.UniformsUtils.clone( directionalLightShader.uniforms ),
-			vertexShader:   directionalLightShader.vertexShader,
-			fragmentShader: directionalLightShader.fragmentShader,
-
-			blending:		THREE.AdditiveBlending,
-			depthWrite:		false,
-			depthTest:		false,
-			transparent:	true
-
-		} );
-
-		// linear space
-
-		var intensity = light.intensity * light.intensity;
-
-		materialLight.uniforms[ "lightDir" ].value = light.position;
-		materialLight.uniforms[ "lightIntensity" ].value = intensity;
-		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
-
-		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
-		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
-
-		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		materialLight.uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
-
-		// create light proxy mesh
-
-		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
-
-		// keep reference for color and intensity updates
-
-		meshLight.properties.originalLight = light;
-
-		// keep reference for size reset
-
-		resizableMaterials.push( materialLight );
+		updateDirectionalLightProxy( meshLight );
 
 		return meshLight;
 
@@ -505,7 +559,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			blending:		THREE.NoBlending
 
 		} );
-
 
 		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
@@ -680,44 +733,17 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( originalLight ) {
 
-			if ( uniforms[ "lightColor" ] ) uniforms[ "lightColor" ].value.copyGammaToLinear( originalLight.color );
-			if ( uniforms[ "lightIntensity" ] ) uniforms[ "lightIntensity" ].value = originalLight.intensity * originalLight.intensity;
-
-			lightProxy.visible = originalLight.visible;
-
 			if ( originalLight instanceof THREE.PointLight ) {
 
-				var distance = originalLight.distance;
-
-				// skip infinite pointlights
-				// right now you can't switch between infinite and finite pointlights
-				// it's just too messy as they use different proxies
-
-				if ( distance > 0 ) {
-
-					lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
-					if ( uniforms[ "lightRadius" ] ) uniforms[ "lightRadius" ].value = distance;
-
-					var position = originalLight.matrixWorld.getPosition();
-					uniforms[ "lightPos" ].value.copy( position );
-
-					lightProxy.position.copy( position );
-
-				}
+				updatePointLightProxy( lightProxy );
 
 			} else if ( originalLight instanceof THREE.SpotLight ) {
 
-				positionVS.copy( originalLight.matrixWorld.getPosition() );
-				camera.matrixWorldInverse.multiplyVector3( positionVS );
+				updateSpotLightProxy( lightProxy );
 
-				directionVS.copy( originalLight.matrixWorld.getPosition() );
-				directionVS.subSelf( originalLight.target.matrixWorld.getPosition() );
-				directionVS.normalize();
-				camera.matrixWorldInverse.rotateAxis( directionVS );
+			} else if ( originalLight instanceof THREE.DirectionalLight ) {
 
-				uniforms[ "lightPositionVS" ].value.copy( positionVS );
-				uniforms[ "lightDirectionVS" ].value.copy( directionVS );
-				uniforms[ "lightAngle" ].value = originalLight.angle;
+				updateDirectionalLightProxy( lightProxy );
 
 			}
 
