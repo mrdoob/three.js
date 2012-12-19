@@ -49,6 +49,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var emissiveLightShader = THREE.ShaderDeferred[ "emissiveLight" ];
 	var pointLightShader = THREE.ShaderDeferred[ "pointLight" ];
+	var spotLightShader = THREE.ShaderDeferred[ "spotLight" ];
 	var directionalLightShader = THREE.ShaderDeferred[ "directionalLight" ];
 
 	var compositeShader = THREE.ShaderDeferred[ "composite" ];
@@ -379,6 +380,56 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
+	var createDeferredSpotLight = function ( light ) {
+
+		// setup light material
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       THREE.UniformsUtils.clone( spotLightShader.uniforms ),
+			vertexShader:   spotLightShader.vertexShader,
+			fragmentShader: spotLightShader.fragmentShader,
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			depthTest:		false,
+			transparent:	true
+
+		} );
+
+		// linear space
+
+		var intensity = light.intensity * light.intensity;
+
+		materialLight.uniforms[ "lightPositionWS" ].value.copy( light.matrixWorld.getPosition() );
+		materialLight.uniforms[ "lightTargetWS" ].value.copy( light.target.matrixWorld.getPosition() );
+		materialLight.uniforms[ "lightIntensity" ].value = intensity;
+		materialLight.uniforms[ "lightAngle" ].value = light.angle;
+		materialLight.uniforms[ "lightDistance" ].value = light.distance;
+		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+
+		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
+		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
+
+		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		materialLight.uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+
+		// create light proxy mesh
+
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
+
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
+
+		// keep reference for size reset
+
+		resizableMaterials.push( materialLight );
+
+		return meshLight;
+
+	};
+
 	var createDeferredDirectionalLight = function ( light ) {
 
 		// setup light material
@@ -478,6 +529,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 				lightSceneFullscreen.add( meshLight );
 
 			}
+
+		} else if ( object instanceof THREE.SpotLight ) {
+
+			var meshLight = createDeferredSpotLight( object );
+			lightSceneFullscreen.add( meshLight );
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
@@ -634,6 +690,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 					lightProxy.position.copy( position );
 
 				}
+
+			} else if ( originalLight instanceof THREE.SpotLight ) {
+
+				uniforms[ "lightPositionWS" ].value.copy( originalLight.matrixWorld.getPosition() );
+				uniforms[ "lightTargetWS" ].value.copy( originalLight.target.matrixWorld.getPosition() );
+				uniforms[ "lightAngle" ].value = originalLight.angle;
 
 			}
 
