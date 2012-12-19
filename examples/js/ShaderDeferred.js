@@ -536,12 +536,11 @@ THREE.ShaderDeferred = {
 
 			samplerNormalDepth: { type: "t", value: null },
 			samplerColor: 		{ type: "t", value: null },
-			matView: 		{ type: "m4", value: new THREE.Matrix4() },
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
-			lightPositionWS:{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
-			lightTargetWS: 	{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightPositionVS :{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightDirectionVS:{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
 			lightDistance: 	{ type: "f", value: 1.0 },
@@ -550,6 +549,9 @@ THREE.ShaderDeferred = {
 		},
 
 		fragmentShader : [
+
+			"uniform vec3 lightPositionVS;",
+			"uniform vec3 lightDirectionVS;",
 
 			"uniform sampler2D samplerColor;",
 			"uniform sampler2D samplerNormalDepth;",
@@ -562,9 +564,6 @@ THREE.ShaderDeferred = {
 			"uniform vec3 lightColor;",
 
 			"uniform mat4 matProjInverse;",
-
-			"varying vec3 vLightPositionVS;",
-			"varying vec3 vLightDirectionVS;",
 
 			"vec3 float_to_vec3( float data ) {",
 
@@ -610,10 +609,10 @@ THREE.ShaderDeferred = {
 
 				//
 
-				"vec3 surfToLight = normalize( vLightPositionVS.xyz - positionVS.xyz );",
+				"vec3 surfToLight = normalize( lightPositionVS.xyz - positionVS.xyz );",
 				"float dotProduct = max( dot( normal, surfToLight ), 0.0 );",
 
-				"float rho = dot( vLightDirectionVS, -surfToLight );",
+				"float rho = dot( lightDirectionVS, surfToLight );",
 				"float rhoMax = cos( lightAngle * 0.5 );",
 
 				"if ( rho > rhoMax ) {",
@@ -674,23 +673,9 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
-			"uniform vec3 lightPositionWS;",
-			"uniform vec3 lightTargetWS;",
-
-			"uniform mat4 matView;",
-
-			"varying vec3 vLightPositionVS;",
-			"varying vec3 vLightDirectionVS;",
-
 			"void main() { ",
 
-				"vec4 quadPosition = vec4( sign( position.xy ), 0.0, 1.0 );",
-				"gl_Position = quadPosition;",
-
-				"vLightPositionVS = vec3( matView * vec4( lightPositionWS, 1.0 ) );",
-
-				"vec3 lightDirectionWS = lightTargetWS - lightPositionWS;"+
-				"vLightDirectionVS = normalize( mat3( matView ) * lightDirectionWS );",
+				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 

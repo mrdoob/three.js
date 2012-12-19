@@ -37,6 +37,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
+	var positionVS = new THREE.Vector3();
+	var directionVS = new THREE.Vector3();
+
 	var geometryLightSphere = new THREE.SphereGeometry( 1, 16, 8 );
 	var geometryLightPlane = new THREE.PlaneGeometry( 2, 2 );
 
@@ -384,9 +387,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// setup light material
 
+		var uniforms = THREE.UniformsUtils.clone( spotLightShader.uniforms );
+
 		var materialLight = new THREE.ShaderMaterial( {
 
-			uniforms:       THREE.UniformsUtils.clone( spotLightShader.uniforms ),
+			uniforms:       uniforms,
 			vertexShader:   spotLightShader.vertexShader,
 			fragmentShader: spotLightShader.fragmentShader,
 
@@ -401,18 +406,27 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var intensity = light.intensity * light.intensity;
 
-		materialLight.uniforms[ "lightPositionWS" ].value.copy( light.matrixWorld.getPosition() );
-		materialLight.uniforms[ "lightTargetWS" ].value.copy( light.target.matrixWorld.getPosition() );
-		materialLight.uniforms[ "lightIntensity" ].value = intensity;
-		materialLight.uniforms[ "lightAngle" ].value = light.angle;
-		materialLight.uniforms[ "lightDistance" ].value = light.distance;
-		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+		positionVS.copy( light.matrixWorld.getPosition() );
+		camera.matrixWorldInverse.multiplyVector3( positionVS );
 
-		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
-		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
+		directionVS.copy( light.matrixWorld.getPosition() );
+		directionVS.subSelf( light.target.matrixWorld.getPosition() );
+		directionVS.normalize();
+		camera.matrixWorldInverse.rotateAxis( directionVS );
 
-		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		materialLight.uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+		uniforms[ "lightPositionVS" ].value.copy( positionVS );
+		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightAngle" ].value = light.angle;
+		uniforms[ "lightDistance" ].value = light.distance;
+		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+
+		uniforms[ "viewWidth" ].value = scaledWidth;
+		uniforms[ "viewHeight" ].value = scaledHeight;
+
+		uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 		// create light proxy mesh
 
@@ -693,8 +707,16 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			} else if ( originalLight instanceof THREE.SpotLight ) {
 
-				uniforms[ "lightPositionWS" ].value.copy( originalLight.matrixWorld.getPosition() );
-				uniforms[ "lightTargetWS" ].value.copy( originalLight.target.matrixWorld.getPosition() );
+				positionVS.copy( originalLight.matrixWorld.getPosition() );
+				camera.matrixWorldInverse.multiplyVector3( positionVS );
+
+				directionVS.copy( originalLight.matrixWorld.getPosition() );
+				directionVS.subSelf( originalLight.target.matrixWorld.getPosition() );
+				directionVS.normalize();
+				camera.matrixWorldInverse.rotateAxis( directionVS );
+
+				uniforms[ "lightPositionVS" ].value.copy( positionVS );
+				uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 				uniforms[ "lightAngle" ].value = originalLight.angle;
 
 			}
