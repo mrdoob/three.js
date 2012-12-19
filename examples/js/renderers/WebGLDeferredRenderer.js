@@ -40,8 +40,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var positionVS = new THREE.Vector3();
 	var directionVS = new THREE.Vector3();
 
-	var direction = new THREE.Vector3();
-
 	//
 
 	var geometryLightSphere = new THREE.SphereGeometry( 1, 16, 8 );
@@ -485,11 +483,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.properties.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		direction.copy( light.matrixWorld.getPosition() );
-		direction.subSelf( light.target.matrixWorld.getPosition() );
-		direction.normalize();
+		directionVS.copy( light.matrixWorld.getPosition() );
+		directionVS.subSelf( light.target.matrixWorld.getPosition() );
+		directionVS.normalize();
+		camera.matrixWorldInverse.rotateAxis( directionVS );
 
-		uniforms[ "lightDir" ].value.copy( direction );
+		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 
 		// linear space colors
 

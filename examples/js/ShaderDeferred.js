@@ -370,6 +370,7 @@ THREE.ShaderDeferred = {
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
+
 			lightPos: 		{ type: "v3", value: new THREE.Vector3( 0, 0, 0 ) },
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
@@ -539,6 +540,7 @@ THREE.ShaderDeferred = {
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
+
 			lightPositionVS :{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
 			lightDirectionVS:{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
@@ -689,20 +691,17 @@ THREE.ShaderDeferred = {
 
 			samplerNormalDepth: { type: "t", value: null },
 			samplerColor: 		{ type: "t", value: null },
-			matView: 		{ type: "m4", value: new THREE.Matrix4() },
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
-			lightDir: 		{ type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+
+			lightDirectionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 }
 
 		},
 
 		fragmentShader : [
-
-			"varying vec3 lightView;",
-			"varying vec4 clipPos;",
 
 			"uniform sampler2D samplerColor;",
 			"uniform sampler2D samplerNormalDepth;",
@@ -713,6 +712,7 @@ THREE.ShaderDeferred = {
 			"uniform float viewWidth;",
 
 			"uniform vec3 lightColor;",
+			"uniform vec3 lightDirectionVS;",
 
 			"uniform mat4 matProjInverse;",
 
@@ -745,8 +745,6 @@ THREE.ShaderDeferred = {
 				"viewPos.xyz /= viewPos.w;",
 				"viewPos.w = 1.0;",
 
-				"vec3 dirVector = normalize( lightView );",
-
 				// normal
 
 				"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
@@ -761,7 +759,7 @@ THREE.ShaderDeferred = {
 
 				"vec3 diffuse;",
 
-				"float dotProduct = dot( normal, dirVector );",
+				"float dotProduct = dot( normal, lightDirectionVS );",
 
 				"float diffuseFull = max( dotProduct, 0.0 );",
 
@@ -784,7 +782,7 @@ THREE.ShaderDeferred = {
 
 				// specular
 
-				"vec3 halfVector = normalize( dirVector - normalize( viewPos.xyz ) );",
+				"vec3 halfVector = normalize( lightDirectionVS - normalize( viewPos.xyz ) );",
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
 
 				// simple specular
@@ -795,7 +793,7 @@ THREE.ShaderDeferred = {
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( dirVector, halfVector ), 5.0 );",
+				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDirectionVS, halfVector ), 5.0 );",
 				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;",
 
 				// combine
@@ -809,17 +807,9 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
-			"varying vec3 lightView;",
-			"varying vec4 clipPos;",
-			"uniform vec3 lightDir;",
-			"uniform mat4 matView;",
-
 			"void main() { ",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"gl_Position = projectionMatrix * mvPosition;",
-				"lightView = vec3( matView * vec4( lightDir, 0.0 ) );",
-				"clipPos = gl_Position;",
+				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
@@ -872,8 +862,7 @@ THREE.ShaderDeferred = {
 
 			"void main() { ",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
-				"gl_Position = projectionMatrix * mvPosition;",
+				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
 
