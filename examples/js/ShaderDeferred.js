@@ -25,6 +25,30 @@ THREE.DeferredShaderChunk = {
 
 	].join("\n"),
 
+	computeVertexPositionVS: [
+
+		"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
+
+		"vec4 normalDepth = texture2D( samplerNormalDepth, texCoord );",
+		"float z = normalDepth.w;",
+
+		"if ( z == 0.0 ) discard;",
+
+		"vec2 xy = texCoord * 2.0 - 1.0;",
+
+		"vec4 vertexPositionProjected = vec4( xy, z, 1.0 );",
+		"vec4 vertexPositionVS = matProjInverse * vertexPositionProjected;",
+		"vertexPositionVS.xyz /= vertexPositionVS.w;",
+		"vertexPositionVS.w = 1.0;",
+
+	].join("\n"),
+
+	computeNormal: [
+
+		"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
+
+	].join("\n"),
+
 	unpackColorMap: [
 
 		"vec4 colorMap = texture2D( samplerColor, texCoord );",
@@ -419,8 +443,6 @@ THREE.ShaderDeferred = {
 
 		fragmentShader : [
 
-			"varying vec4 clipPos;",
-
 			"uniform sampler2D samplerColor;",
 			"uniform sampler2D samplerNormalDepth;",
 
@@ -438,57 +460,31 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
+				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
 
-				"vec4 normalDepth = texture2D( samplerNormalDepth, texCoord );",
+				// bail out early when pixel outside of light sphere
 
-				"float z = normalDepth.w;",
-				"float lightZ = clipPos.z / clipPos.w;",
+				"vec3 lightDirection = lightPositionVS - vertexPositionVS.xyz;",
+				"float distance = length( lightDirection );",
 
-				//"if ( z == 0.0 || lightZ > z ) discard;",
+				"if ( distance > lightRadius ) discard;",
 
-				"float x = texCoord.x * 2.0 - 1.0;",
-				"float y = texCoord.y * 2.0 - 1.0;",
-
-				"vec4 projectedPos = vec4( x, y, z, 1.0 );",
-
-				"vec4 viewPos = matProjInverse * projectedPos;",
-				"viewPos.xyz /= viewPos.w;",
-				"viewPos.w = 1.0;",
-
-				"vec3 lightDir = lightPositionVS - viewPos.xyz;",
-				"float dist = length( lightDir );",
-
-				"if ( dist > lightRadius ) discard;",
-
-				"lightDir = normalize( lightDir );",
-
-				"float cutoff = 0.3;",
-				"float denom = dist/lightRadius + 1.0;",
-				"float attenuation = 1.0 / ( denom * denom );",
-				"attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );",
-				"attenuation = max( attenuation, 0.0 );",
-				"attenuation *= attenuation;",
-
-				// normal
-
-				"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
-
-				// color
-
+				THREE.DeferredShaderChunk[ "computeNormal" ],
 				THREE.DeferredShaderChunk[ "unpackColorMap" ],
 
-				// light
+				// compute light
+
+				"lightDirection = normalize( lightDirection );",
 
 				"vec3 diffuse;",
 
-				"float diffuseFull = max( dot( normal, lightDir ), 0.0 );",
+				"float diffuseFull = max( dot( normal, lightDirection ), 0.0 );",
 
 				"if ( wrapAround < 0.0 ) {",
 
 					// wrap around lighting
 
-					"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDir ), 0.0 );",
+					"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDirection ), 0.0 );",
 
 					"const vec3 wrapRGB = vec3( 0.6, 0.2, 0.2 );",
 					"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
@@ -503,7 +499,7 @@ THREE.ShaderDeferred = {
 
 				// specular
 
-				"vec3 halfVector = normalize( lightDir - normalize( viewPos.xyz ) );",
+				"vec3 halfVector = normalize( lightDirection - normalize( vertexPositionVS.xyz ) );",
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
 
 				// simple specular
@@ -514,10 +510,17 @@ THREE.ShaderDeferred = {
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDir, halfVector ), 5.0 );",
+				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDirection, halfVector ), 5.0 );",
 				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;",
 
 				// combine
+
+				"float cutoff = 0.3;",
+				"float denom = distance / lightRadius + 1.0;",
+				"float attenuation = 1.0 / ( denom * denom );",
+				"attenuation = ( attenuation - cutoff ) / ( 1.0 - cutoff );",
+				"attenuation = max( attenuation, 0.0 );",
+				"attenuation *= attenuation;",
 
 				THREE.DeferredShaderChunk[ "combine" ],
 
@@ -527,13 +530,12 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
-			"varying vec4 clipPos;",
-
 			"void main() { ",
+
+				// sphere proxy needs real position
 
 				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 				"gl_Position = projectionMatrix * mvPosition;",
-				"clipPos = gl_Position;",
 
 			"}"
 
@@ -581,32 +583,13 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
-
-				"vec4 normalDepth = texture2D( samplerNormalDepth, texCoord );",
-				"float z = normalDepth.w;",
-
-				"if ( z == 0.0 ) discard;",
-
-				"float x = texCoord.x * 2.0 - 1.0;",
-				"float y = texCoord.y * 2.0 - 1.0;",
-
-				"vec4 projectedPos = vec4( x, y, z, 1.0 );",
-				"vec4 positionVS = matProjInverse * projectedPos;",
-				"positionVS.xyz /= positionVS.w;",
-				"positionVS.w = 1.0;",
-
-				// normal
-
-				"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
-
-				// color
-
+				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+				THREE.DeferredShaderChunk[ "computeNormal" ],
 				THREE.DeferredShaderChunk[ "unpackColorMap" ],
 
-				//
+				// compute light
 
-				"vec3 surfToLight = normalize( lightPositionVS.xyz - positionVS.xyz );",
+				"vec3 surfToLight = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 				"float dotProduct = max( dot( normal, surfToLight ), 0.0 );",
 
 				"float rho = dot( lightDirectionVS, surfToLight );",
@@ -636,7 +619,7 @@ THREE.ShaderDeferred = {
 
 					"float diffuse = spot * dotProduct;",
 
-					"vec3 halfVector = normalize( surfToLight - normalize( positionVS.xyz ) );",
+					"vec3 halfVector = normalize( surfToLight - normalize( vertexPositionVS.xyz ) );",
 					"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
 
 					// simple specular
@@ -662,6 +645,8 @@ THREE.ShaderDeferred = {
 		vertexShader : [
 
 			"void main() { ",
+
+				// full screen quad proxy
 
 				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
@@ -706,56 +691,37 @@ THREE.ShaderDeferred = {
 
 			"void main() {",
 
-				"vec2 texCoord = gl_FragCoord.xy / vec2( viewWidth, viewHeight );",
-
-				"vec4 normalDepth = texture2D( samplerNormalDepth, texCoord );",
-				"float z = normalDepth.w;",
-
-				"if ( z == 0.0 ) discard;",
-
-				"float x = texCoord.x * 2.0 - 1.0;",
-				"float y = texCoord.y * 2.0 - 1.0;",
-
-				"vec4 projectedPos = vec4( x, y, z, 1.0 );",
-
-				"vec4 viewPos = matProjInverse * projectedPos;",
-				"viewPos.xyz /= viewPos.w;",
-				"viewPos.w = 1.0;",
-
-				// normal
-
-				"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
-
-				// color
-
+				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+				THREE.DeferredShaderChunk[ "computeNormal" ],
 				THREE.DeferredShaderChunk[ "unpackColorMap" ],
+
+				// compute light
 
 				"vec3 diffuse;",
 
 				"float dotProduct = dot( normal, lightDirectionVS );",
-
 				"float diffuseFull = max( dotProduct, 0.0 );",
 
-				// wrap around lighting
-
 				"if ( wrapAround < 0.0 ) {",
+
+					// wrap around lighting
 
 					"float diffuseHalf = max( 0.5 + 0.5 * dotProduct, 0.0 );",
 
 					"const vec3 wrapRGB = vec3( 0.2, 0.2, 0.2 );",
-					"diffuse = mix( vec3 ( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
-
-				// simple lighting
+					"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
 
 				"} else {",
 
-					"diffuse = vec3 ( diffuseFull );",
+					// simple lighting
+
+					"diffuse = vec3( diffuseFull );",
 
 				"}",
 
 				// specular
 
-				"vec3 halfVector = normalize( lightDirectionVS - normalize( viewPos.xyz ) );",
+				"vec3 halfVector = normalize( lightDirectionVS - normalize( vertexPositionVS.xyz ) );",
 				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
 
 				// simple specular
@@ -783,6 +749,8 @@ THREE.ShaderDeferred = {
 
 			"void main() { ",
 
+				// full screen quad proxy
+
 				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
@@ -808,16 +776,7 @@ THREE.ShaderDeferred = {
 			"uniform float viewHeight;",
 			"uniform float viewWidth;",
 
-			"vec3 float_to_vec3( float data ) {",
-
-				"vec3 uncompressed;",
-				"uncompressed.x = fract( data );",
-				"float zInt = floor( data / 255.0 );",
-				"uncompressed.z = fract( zInt / 255.0 );",
-				"uncompressed.y = fract( floor( data - ( zInt * 255.0 ) ) / 255.0 );",
-				"return uncompressed;",
-
-			"}",
+			THREE.DeferredShaderChunk[ "unpackFloat" ],
 
 			"void main() {",
 
@@ -835,6 +794,8 @@ THREE.ShaderDeferred = {
 		vertexShader : [
 
 			"void main() { ",
+
+				// full screen quad proxy
 
 				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
