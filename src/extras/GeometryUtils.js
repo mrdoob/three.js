@@ -1031,7 +1031,21 @@ THREE.GeometryUtils = {
 		geometry.faces = faces;
 		geometry.faceVertexUvs = faceVertexUvs;
 
-	}
+	},
+	
+	setMaterialIndex: function ( geometry, index, startFace, endFace ){
+		
+		var faces = geometry.faces;
+		var start = startFace || 0;
+		var end = endFace || faces.length - 1;
+		
+		for ( var i = start; i <= end; i ++ ) {
+		
+			faces[i].materialIndex = index;
+
+		}
+		
+    }
 
 };
 

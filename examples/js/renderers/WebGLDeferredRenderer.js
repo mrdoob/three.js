@@ -7,14 +7,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var _this = this;
 
-	var width = parameters.width;
-	var height = parameters.height;
-	var scale = parameters.scale;
+	var fullWidth = parameters.width !== undefined ? parameters.width : 800;
+	var fullHeight = parameters.height !== undefined ? parameters.height : 600;
+	var currentScale = parameters.scale !== undefined ? parameters.scale : 1;
 
-	var scaledWidth = Math.floor( scale * width );
-	var scaledHeight = Math.floor( scale * height );
+	var scaledWidth = Math.floor( currentScale * fullWidth );
+	var scaledHeight = Math.floor( currentScale * fullHeight );
 
-	var brightness = parameters.brightness !== undefined ?  parameters.brightness : 1;
+	var brightness = parameters.brightness !== undefined ? parameters.brightness : 1;
 	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
 
 	this.renderer = parameters.renderer;
@@ -22,7 +22,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	if ( this.renderer === undefined ) {
 
 		this.renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
-		this.renderer.setSize( width, height );
+		this.renderer.setSize( fullWidth, fullHeight );
 		this.renderer.setClearColorHex( 0x000000, 0 );
 
 		this.renderer.autoClear = false;
@@ -34,6 +34,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	//
 
 	var gl = this.renderer.context;
+
+	//
+
+	var positionVS = new THREE.Vector3();
+	var directionVS = new THREE.Vector3();
 
 	//
 
@@ -49,7 +54,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var emissiveLightShader = THREE.ShaderDeferred[ "emissiveLight" ];
 	var pointLightShader = THREE.ShaderDeferred[ "pointLight" ];
+	var spotLightShader = THREE.ShaderDeferred[ "spotLight" ];
 	var directionalLightShader = THREE.ShaderDeferred[ "directionalLight" ];
+	var hemisphereLightShader = THREE.ShaderDeferred[ "hemisphereLight" ];
 
 	var compositeShader = THREE.ShaderDeferred[ "composite" ];
 
@@ -63,7 +70,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	//
 
 	var lightSceneFullscreen, lightSceneProxy;
-	var lightMaterials = [];
+
+	//
+
+	var resizableMaterials = [];
 
 	//
 
@@ -79,9 +89,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		blending:		THREE.NoBlending
 
 	} );
-
-	var defaultNormalDepthMaterialWireframe = defaultNormalDepthMaterial.clone();
-	defaultNormalDepthMaterialWireframe.wireframe = true;
 
 	//
 
@@ -127,7 +134,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
-
 	var createDeferredMaterials = function ( originalMaterial ) {
 
 		var deferredMaterials = {};
@@ -143,7 +149,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// 	morphs
 
 		var uniforms = THREE.UniformsUtils.clone( colorShader.uniforms );
-		var defines = { "USE_MAP": !! originalMaterial.map, "GAMMA_INPUT": true };
+		var defines = { "USE_MAP": !! originalMaterial.map, "USE_ENVMAP": !! originalMaterial.envMap, "GAMMA_INPUT": true };
 
 		var material = new THREE.ShaderMaterial( {
 
@@ -180,6 +186,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		uniforms.additiveSpecular.value = additiveSpecular;
 
 		uniforms.map.value = originalMaterial.map;
+
+		if ( originalMaterial.envMap ) {
+
+			uniforms.envMap.value = originalMaterial.envMap;
+			uniforms.useRefract.value = originalMaterial.envMap.mapping instanceof THREE.CubeRefractionMapping;
+			uniforms.refractionRatio.value = originalMaterial.refractionRatio;
+			uniforms.combine.value = originalMaterial.combine;
+			uniforms.reflectivity.value = originalMaterial.reflectivity;
+			uniforms.flipEnvMap.value = ( originalMaterial.envMap instanceof THREE.WebGLRenderTargetCube ) ? 1 : -1;
+
+			uniforms.samplerNormalDepth.value = compNormalDepth.renderTarget2;
+			uniforms.viewWidth.value = scaledWidth;
+			uniforms.viewHeight.value = scaledHeight;
+
+			resizableMaterials.push( material );
+
+		}
 
 		material.vertexColors = originalMaterial.vertexColors;
 		material.morphTargets = originalMaterial.morphTargets;
@@ -250,18 +273,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			} );
 
-			if ( originalMaterial.morphTargets ) {
-
-				normalDepthMaterial.morphTargets = originalMaterial.morphTargets;
-				normalDepthMaterial.morphNormals = originalMaterial.morphNormals;
-
-			}
-
-			if ( originalMaterial.skinning ) {
-
-				normalDepthMaterial.skinning = originalMaterial.skinning;
-
-			}
+			normalDepthMaterial.morphTargets = originalMaterial.morphTargets;
+			normalDepthMaterial.morphNormals = originalMaterial.morphNormals;
+			normalDepthMaterial.skinning = originalMaterial.skinning;
 
 			if ( originalMaterial.bumpMap ) {
 
@@ -275,19 +289,59 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			}
 
-			normalDepthMaterial.wireframe = originalMaterial.wireframe;
-
-			deferredMaterials.normalDepthMaterial = normalDepthMaterial;
-
 		} else {
 
-			deferredMaterials.normalDepthMaterial = originalMaterial.wireframe ? defaultNormalDepthMaterialWireframe : defaultNormalDepthMaterial;
+			var normalDepthMaterial = defaultNormalDepthMaterial.clone();
 
 		}
+
+		normalDepthMaterial.wireframe = originalMaterial.wireframe;
+		normalDepthMaterial.vertexColors = originalMaterial.vertexColors;
+
+		deferredMaterials.normalDepthMaterial = normalDepthMaterial;
+
+		//
 
 		deferredMaterials.transparent = originalMaterial.transparent;
 
 		return deferredMaterials;
+
+	};
+
+	var updatePointLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		// skip infinite pointlights
+		// right now you can't switch between infinite and finite pointlights
+		// it's just too messy as they use different proxies
+
+		var distance = light.distance;
+
+		if ( distance > 0 ) {
+
+			lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
+			uniforms[ "lightRadius" ].value = distance;
+
+			positionVS.copy( light.matrixWorld.getPosition() );
+			camera.matrixWorldInverse.multiplyVector3( positionVS );
+			uniforms[ "lightPositionVS" ].value.copy( positionVS );
+
+			lightProxy.position.copy( light.matrixWorld.getPosition() );
+
+		} else {
+
+			uniforms[ "lightRadius" ].value = Infinity;
+
+		}
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
 
 	};
 
@@ -312,31 +366,20 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// infinite pointlights use full-screen quad proxy
 		// regular pointlights use sphere proxy
 
-		var distance, geometry;
+		var  geometry;
 
 		if ( light.distance > 0 ) {
 
-			distance = light.distance;
 			geometry = geometryLightSphere;
 
 		} else {
 
-			distance = Infinity;
 			geometry = geometryLightPlane;
 
 			materialLight.depthTest = false;
 			materialLight.side = THREE.FrontSide;
 
 		}
-
-		// linear space
-
-		var intensity = light.intensity * light.intensity;
-
-		materialLight.uniforms[ "lightPos" ].value = light.position;
-		materialLight.uniforms[ "lightRadius" ].value = distance;
-		materialLight.uniforms[ "lightIntensity" ].value = intensity;
-		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
 
 		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
@@ -348,34 +391,61 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		var meshLight = new THREE.Mesh( geometry, materialLight );
 
-		if ( light.distance > 0 ) {
-
-			meshLight.position = light.position;
-			meshLight.scale.multiplyScalar( distance );
-
-		}
-
 		// keep reference for color and intensity updates
 
 		meshLight.properties.originalLight = light;
 
 		// keep reference for size reset
 
-		lightMaterials.push( materialLight );
+		resizableMaterials.push( materialLight );
+
+		// sync proxy uniforms to the original light
+
+		updatePointLightProxy( meshLight );
 
 		return meshLight;
 
 	};
 
-	var createDeferredDirectionalLight = function ( light ) {
+	var updateSpotLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		positionVS.copy( light.matrixWorld.getPosition() );
+		camera.matrixWorldInverse.multiplyVector3( positionVS );
+
+		directionVS.copy( light.matrixWorld.getPosition() );
+		directionVS.subSelf( light.target.matrixWorld.getPosition() );
+		directionVS.normalize();
+		camera.matrixWorldInverse.rotateAxis( directionVS );
+
+		uniforms[ "lightPositionVS" ].value.copy( positionVS );
+		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
+
+		uniforms[ "lightAngle" ].value = light.angle;
+		uniforms[ "lightDistance" ].value = light.distance;
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+
+	};
+
+	var createDeferredSpotLight = function ( light ) {
 
 		// setup light material
 
+		var uniforms = THREE.UniformsUtils.clone( spotLightShader.uniforms );
+
 		var materialLight = new THREE.ShaderMaterial( {
 
-			uniforms:       THREE.UniformsUtils.clone( directionalLightShader.uniforms ),
-			vertexShader:   directionalLightShader.vertexShader,
-			fragmentShader: directionalLightShader.fragmentShader,
+			uniforms:       uniforms,
+			vertexShader:   spotLightShader.vertexShader,
+			fragmentShader: spotLightShader.fragmentShader,
 
 			blending:		THREE.AdditiveBlending,
 			depthWrite:		false,
@@ -384,19 +454,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		} );
 
-		// linear space
+		uniforms[ "viewWidth" ].value = scaledWidth;
+		uniforms[ "viewHeight" ].value = scaledHeight;
 
-		var intensity = light.intensity * light.intensity;
-
-		materialLight.uniforms[ "lightDir" ].value = light.position;
-		materialLight.uniforms[ "lightIntensity" ].value = intensity;
-		materialLight.uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
-
-		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
-		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
-
-		materialLight.uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-		materialLight.uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+		uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 		// create light proxy mesh
 
@@ -408,7 +470,143 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		lightMaterials.push( materialLight );
+		resizableMaterials.push( materialLight );
+
+		// sync proxy uniforms to the original light
+
+		updateSpotLightProxy( meshLight );
+
+		return meshLight;
+
+	};
+
+	var updateDirectionalLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		directionVS.copy( light.matrixWorld.getPosition() );
+		directionVS.subSelf( light.target.matrixWorld.getPosition() );
+		directionVS.normalize();
+		camera.matrixWorldInverse.rotateAxis( directionVS );
+
+		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+
+	};
+
+	var createDeferredDirectionalLight = function ( light ) {
+
+		// setup light material
+
+		var uniforms = THREE.UniformsUtils.clone( directionalLightShader.uniforms );
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       uniforms,
+			vertexShader:   directionalLightShader.vertexShader,
+			fragmentShader: directionalLightShader.fragmentShader,
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			depthTest:		false,
+			transparent:	true
+
+		} );
+
+		uniforms[ "viewWidth" ].value = scaledWidth;
+		uniforms[ "viewHeight" ].value = scaledHeight;
+
+		uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+
+		// create light proxy mesh
+
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
+
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
+
+		// keep reference for size reset
+
+		resizableMaterials.push( materialLight );
+
+		// sync proxy uniforms to the original light
+
+		updateDirectionalLightProxy( meshLight );
+
+		return meshLight;
+
+	};
+
+	var updateHemisphereLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		directionVS.copy( light.matrixWorld.getPosition() );
+		directionVS.normalize();
+		camera.matrixWorldInverse.rotateAxis( directionVS );
+
+		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColorSky" ].value.copyGammaToLinear( light.color );
+		uniforms[ "lightColorGround" ].value.copyGammaToLinear( light.groundColor );
+
+	};
+
+	var createDeferredHemisphereLight = function ( light ) {
+
+		// setup light material
+
+		var uniforms = THREE.UniformsUtils.clone( hemisphereLightShader.uniforms );
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       uniforms,
+			vertexShader:   hemisphereLightShader.vertexShader,
+			fragmentShader: hemisphereLightShader.fragmentShader,
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			depthTest:		false,
+			transparent:	true
+
+		} );
+
+		uniforms[ "viewWidth" ].value = scaledWidth;
+		uniforms[ "viewHeight" ].value = scaledHeight;
+
+		uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+
+		// create light proxy mesh
+
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
+
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
+
+		// keep reference for size reset
+
+		resizableMaterials.push( materialLight );
+
+		// sync proxy uniforms to the original light
+
+		updateHemisphereLightProxy( meshLight );
 
 		return meshLight;
 
@@ -429,7 +627,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		} );
 
-
 		materialLight.uniforms[ "viewWidth" ].value = scaledWidth;
 		materialLight.uniforms[ "viewHeight" ].value = scaledHeight;
 
@@ -441,7 +638,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		lightMaterials.push( materialLight );
+		resizableMaterials.push( materialLight );
 
 		return meshLight;
 
@@ -467,9 +664,19 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			}
 
+		} else if ( object instanceof THREE.SpotLight ) {
+
+			var meshLight = createDeferredSpotLight( object );
+			lightSceneFullscreen.add( meshLight );
+
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
 			var meshLight = createDeferredDirectionalLight( object );
+			lightSceneFullscreen.add( meshLight );
+
+		} else if ( object instanceof THREE.HemisphereLight ) {
+
+			var meshLight = createDeferredHemisphereLight( object );
 			lightSceneFullscreen.add( meshLight );
 
 		}
@@ -541,41 +748,47 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
-	this.setSize = function ( width, height ) {
+	this.setScale = function ( scale ) {
 
-		this.renderer.setSize( width, height );
+		currentScale = scale;
 
-		scaledWidth = Math.floor( scale * width );
-		scaledHeight = Math.floor( scale * height );
+		scaledWidth = Math.floor( currentScale * fullWidth );
+		scaledHeight = Math.floor( currentScale * fullHeight );
 
-		compColor.setSize( scaledWidth, scaledHeight );
 		compNormalDepth.setSize( scaledWidth, scaledHeight );
+		compColor.setSize( scaledWidth, scaledHeight );
 		compLight.setSize( scaledWidth, scaledHeight );
 		compFinal.setSize( scaledWidth, scaledHeight );
 
-		compNormalDepth.renderTarget2.shareDepthFrom = compColor.renderTarget2;
-		compLight.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+		compColor.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
+		compLight.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 
-		for ( var i = 0, il = lightMaterials.length; i < il; i ++ ) {
+		for ( var i = 0, il = resizableMaterials.length; i < il; i ++ ) {
 
-			var uniforms = lightMaterials[ i ].uniforms;
+			var uniforms = resizableMaterials[ i ].uniforms;
 
 			uniforms[ "viewWidth" ].value = scaledWidth;
 			uniforms[ "viewHeight" ].value = scaledHeight;
 
-			uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-
-			if ( uniforms[ 'samplerNormalDepth' ] ) {
-
-				uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
-
-			}
+			if ( uniforms[ 'samplerColor' ] ) uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+			if ( uniforms[ 'samplerNormalDepth' ] ) uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
 
 		}
 
 		compositePass.uniforms[ 'samplerLight' ].value = compLight.renderTarget2;
 
-		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / fullWidth, 1 / fullHeight );
+
+	};
+
+	this.setSize = function ( width, height ) {
+
+		fullWidth = width;
+		fullHeight = height;
+
+		this.renderer.setSize( fullWidth, fullHeight );
+
+		this.setScale( currentScale );
 
 	};
 
@@ -592,25 +805,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( originalLight ) {
 
-			if ( uniforms[ "lightColor" ] ) uniforms[ "lightColor" ].value.copyGammaToLinear( originalLight.color );
-			if ( uniforms[ "lightIntensity" ] ) uniforms[ "lightIntensity" ].value = originalLight.intensity * originalLight.intensity;
-
 			lightProxy.visible = originalLight.visible;
 
 			if ( originalLight instanceof THREE.PointLight ) {
 
-				var distance = originalLight.distance;
+				updatePointLightProxy( lightProxy );
 
-				// skip infinite pointlights
-				// right now you can't switch between infinite and finite pointlights
-				// it's just too messy as they use different proxies
+			} else if ( originalLight instanceof THREE.SpotLight ) {
 
-				if ( distance > 0 ) {
+				updateSpotLightProxy( lightProxy );
 
-					lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
-					if ( uniforms[ "lightRadius" ] ) uniforms[ "lightRadius" ].value = distance;
+			} else if ( originalLight instanceof THREE.DirectionalLight ) {
 
-				}
+				updateDirectionalLightProxy( lightProxy );
+
+			} else if ( originalLight instanceof THREE.HemisphereLight ) {
+
+				updateHemisphereLightProxy( lightProxy );
 
 			}
 
@@ -653,9 +864,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		this.renderer.autoUpdateScene = false;
 		scene.updateMatrixWorld();
 
-		// 1) g-buffer color pass
+		// 1) g-buffer normals + depth pass
 
-		scene.traverse( setMaterialColor );
+		scene.traverse( setMaterialNormalDepth );
 
 		// clear shared depth buffer
 
@@ -665,22 +876,22 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// write 1 to shared stencil buffer
 		// for non-background pixels
 
-		gl.enable( gl.STENCIL_TEST );
+		//gl.enable( gl.STENCIL_TEST );
 		gl.stencilOp( gl.REPLACE, gl.REPLACE, gl.REPLACE );
 		gl.stencilFunc( gl.ALWAYS, 1, 0xffffffff );
 		gl.clearStencil( 0 );
 
-		compColor.render();
+		compNormalDepth.render();
 
 		// just touch foreground pixels (stencil == 1)
-		// both in normalDepth and light passes
+		// both in color and light passes
 
 		gl.stencilFunc( gl.EQUAL, 1, 0xffffffff );
 		gl.stencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
 
-		// 2) g-buffer normals + depth pass
+		// 2) g-buffer color pass
 
-		scene.traverse( setMaterialNormalDepth );
+		scene.traverse( setMaterialColor );
 
 		// must use clean slate depth buffer
 		// otherwise there are z-fighting glitches
@@ -690,7 +901,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		this.renderer.autoClearDepth = true;
 		this.renderer.autoClearStencil = false;
 
-		compNormalDepth.render();
+		compColor.render();
 
 		// 3) light pass
 
@@ -759,14 +970,6 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		rtLight.generateMipmaps = false;
 		rtFinal.generateMipmaps = false;
 
-		// color composer
-
-		passColor = new THREE.RenderPass();
-		passColor.clear = true;
-
-		compColor = new THREE.EffectComposer( _this.renderer, rtColor );
-		compColor.addPass( passColor );
-
 		// normal + depth composer
 
 		passNormalDepth = new THREE.RenderPass();
@@ -775,7 +978,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compNormalDepth = new THREE.EffectComposer( _this.renderer, rtNormalDepth );
 		compNormalDepth.addPass( passNormalDepth );
 
-		compNormalDepth.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+		// color composer
+
+		passColor = new THREE.RenderPass();
+		passColor.clear = true;
+
+		compColor = new THREE.EffectComposer( _this.renderer, rtColor );
+		compColor.addPass( passColor );
+
+		compColor.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 
 		// light composer
 
@@ -789,7 +1000,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compLight.addPass( passLightFullscreen );
 		compLight.addPass( passLightProxy );
 
-		compLight.renderTarget2.shareDepthFrom = compColor.renderTarget2;
+		compLight.renderTarget2.shareDepthFrom = compNormalDepth.renderTarget2;
 
 		// final composer
 
@@ -802,7 +1013,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// FXAA
 
 		effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
-		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+		effectFXAA.uniforms[ 'resolution' ].value.set( 1 / fullWidth, 1 / fullHeight );
 		effectFXAA.renderToScreen = true;
 
 		//

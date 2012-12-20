@@ -10052,28 +10052,18 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						var loader = scope.hierarchyHandlerMap[ objJSON.type ][ "loaderObject" ];
 
+						// ColladaLoader
+
+						if ( loader.options ) {
+
+							loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ) );
+
+						// UTF8Loader
 						// OBJLoader
-
-						if ( loader.addEventListener ) {
-
-							loader.addEventListener( 'load', create_callback_hierachy( objID, parent, material, objJSON ) );
-							loader.load( get_url( objJSON.url, data.urlBaseType ) );
 
 						} else {
 
-							// ColladaLoader
-
-							if ( loader.options ) {
-
-								loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ) );
-
-							// UTF8Loader
-
-							} else {
-
-								loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ), loaderParameters );
-
-							}
+							loader.load( get_url( objJSON.url, data.urlBaseType ), create_callback_hierachy( objID, parent, material, objJSON ), loaderParameters );
 
 						}
 
@@ -10859,7 +10849,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			} else if ( parID === "combine" ) {
 
-				matJSON.parameters[ parID ] = ( matJSON.parameters[ parID ] == "MixOperation" ) ? THREE.MixOperation : THREE.MultiplyOperation;
+				matJSON.parameters[ parID ] = matJSON.parameters[ parID ] in THREE ? THREE[ matJSON.parameters[ parID ] ] : THREE.MultiplyOperation;
 
 			} else if ( parID === "vertexColors" ) {
 
