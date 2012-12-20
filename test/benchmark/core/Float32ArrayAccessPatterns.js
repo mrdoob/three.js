@@ -1,4 +1,3 @@
-
 var array = new Float32Array( 10000 * 3 );
 
 for( var j = 0, jl = array.length; j < jl; j ++ ) {
@@ -143,13 +142,30 @@ suite.add('Vector3ArrayVector3Copy', function() {
   Vector3ArrayVector3CopyTest( array );
 });
 
+var chart, bar;
+
 suite.on('cycle', function(event, bench) {
   console.log(String(event.target));
+
+  var data=bar.data;
+  data.values.push(event.target.times.elapsed);
+  data.labels.push(event.target.name);
 });
 
 suite.on('complete', function() {
   console.log('Fastest is ' + this.filter('fastest').pluck('name'));
   console.log( "Done" );
+
+  chart.draw();
+
 });
+
+chart = new Tee.Chart("chart");
+chart.title.text = document.title;
+chart.legend.visible = false;
+
+bar = new Tee.HorizBar(chart);
+bar.marks.style = "value";
+chart.addSeries(bar);
 
 suite.run(true);
