@@ -8,6 +8,20 @@ var orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
 var eulerAngles = new THREE.Vector3( 0.1, -0.3, 0.25 );
 
 
+
+var qSub = function ( a, b ) {
+	var result = new THREE.Quaternion();
+	result.copy( a );
+
+	result.x -= b.x;
+	result.y -= b.y;
+	result.z -= b.z;
+	result.w -= b.w;
+
+	return result;
+
+};
+
 test( "constructor", function() {
 	var a = new THREE.Quaternion();
 	ok( a.x == 0, "Passed!" );
@@ -100,43 +114,9 @@ test( "setFromEuler/setFromRotationMatrix", function() {
 		var m = new THREE.Matrix4().setRotationFromEuler( eulerAngles, orders[i] );
 		var q2 = new THREE.Quaternion().setFromRotationMatrix( m );
 
-		ok( q.subSelf( q2 ).length() < 0.001, "Passed!" );
+		ok( qSub( q, q2 ).length() < 0.001, "Passed!" );
 	}
 
-});
-
-test( "add/addSelf", function() {
-	var a = new THREE.Quaternion( x, y, z, w );
-	var b = new THREE.Quaternion( -x, -y, -z, -w );
-
-	a.addSelf( b );
-	ok( a.x == 0, "Passed!" );
-	ok( a.y == 0, "Passed!" );
-	ok( a.z == 0, "Passed!" );
-	ok( a.w == 0, "Passed!" );
-
-	var c = new THREE.Quaternion().add( b, b );
-	ok( c.x == -2*x, "Passed!" );
-	ok( c.y == -2*y, "Passed!" );	
-	ok( c.z == -2*z, "Passed!" );
-	ok( c.w == -2*w, "Passed!" );	
-});
-
-test( "sub/subSelf", function() {
-	var a = new THREE.Quaternion( x, y, z, w );
-	var b = new THREE.Quaternion( -x, -y, -z, -w );
-
-	a.subSelf( b );
-	ok( a.x == 2*x, "Passed!" );
-	ok( a.y == 2*y, "Passed!" );
-	ok( a.z == 2*z, "Passed!" );
-	ok( a.w == 2*w, "Passed!" );
-
-	var c = new THREE.Quaternion().sub( b, b );
-	ok( c.x == 0, "Passed!" );
-	ok( c.y == 0, "Passed!" );	
-	ok( c.z == 0, "Passed!" );
-	ok( c.w == 0, "Passed!" );	
 });
 
 test( "normalize/length/lengthSq", function() {
@@ -189,7 +169,7 @@ test( "multiply/multiplySelf", function() {
 
 	var qFromM = new THREE.Quaternion().setFromRotationMatrix( m );
 
-	ok( q.subSelf( qFromM ).length() < 0.001, "Passed!" );
+	ok( qSub( q, qFromM ).length() < 0.001, "Passed!" );
 });
 
 test( "multiplyVector3", function() {

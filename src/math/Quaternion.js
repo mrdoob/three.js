@@ -175,50 +175,6 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	add: function ( a, b ) {
-
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-		this.z = a.z + b.z;
-		this.w = a.w + b.w;
-
-		return this;
-
-	},
-
-	addSelf: function ( v ) {
-
-		this.x += v.x;
-		this.y += v.y;
-		this.z += v.z;
-		this.w += v.w;
-
-		return this;
-
-	},
-
-	sub: function ( a, b ) {
-
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-		this.z = a.z - b.z;
-		this.w = a.w - b.w;
-
-		return this;
-
-	},
-
-	subSelf: function ( v ) {
-
-		this.x -= v.x;
-		this.y -= v.y;
-		this.z -= v.z;
-		this.w -= v.w;
-
-		return this;
-
-	},
-
 	inverse: function () {
 
 		this.conjugate().normalize();
