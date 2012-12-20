@@ -55,11 +55,15 @@ THREE.Vector3.prototype = {
 	},
 
 	setComponent: function ( index, value ) {
+
 		this[ THREE.Vector3.__indexToName[ index ] ] = value;
+		
 	},
 
 	getComponent: function ( index ) {
+
 		return this[ THREE.Vector3.__indexToName[ index ] ];
+
 	},
 
 	copy: function ( v ) {
