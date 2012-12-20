@@ -478,15 +478,16 @@ THREE.ShaderDeferred = {
 
 				"vec3 diffuse;",
 
-				"float diffuseFull = max( dot( normal, lightDirection ), 0.0 );",
+				"float dotProduct = dot( normal, lightDirection );",
+				"float diffuseFull = max( dotProduct, 0.0 );",
 
 				"if ( wrapAround < 0.0 ) {",
 
 					// wrap around lighting
 
-					"float diffuseHalf = max( 0.5 + 0.5 * dot( normal, lightDirection ), 0.0 );",
+					"float diffuseHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
 
-					"const vec3 wrapRGB = vec3( 0.6, 0.2, 0.2 );",
+					"const vec3 wrapRGB = vec3( 1.0, 1.0, 1.0 );",
 					"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
 
 				"} else {",
@@ -590,7 +591,7 @@ THREE.ShaderDeferred = {
 				// compute light
 
 				"vec3 surfToLight = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
-				"float dotProduct = max( dot( normal, surfToLight ), 0.0 );",
+				"float dotProduct = dot( normal, surfToLight );",
 
 				"float rho = dot( lightDirectionVS, surfToLight );",
 				"float rhoMax = cos( lightAngle * 0.5 );",
@@ -617,7 +618,28 @@ THREE.ShaderDeferred = {
 
 					"}",
 
-					"float diffuse = spot * dotProduct;",
+					//
+
+					"vec3 diffuse;",
+
+					"float diffuseFull = spot * max( dotProduct, 0.0 );",
+
+					"if ( wrapAround < 0.0 ) {",
+
+						// wrap around lighting
+
+						"float diffuseHalf = spot * max( 0.5 * dotProduct + 0.5, 0.0 );",
+
+						"const vec3 wrapRGB = vec3( 1.0, 1.0, 1.0 );",
+						"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
+
+					"} else {",
+
+						// simple lighting
+
+						"diffuse = vec3( diffuseFull );",
+
+					"}",
 
 					"vec3 halfVector = normalize( surfToLight - normalize( vertexPositionVS.xyz ) );",
 					"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
@@ -706,9 +728,9 @@ THREE.ShaderDeferred = {
 
 					// wrap around lighting
 
-					"float diffuseHalf = max( 0.5 + 0.5 * dotProduct, 0.0 );",
+					"float diffuseHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
 
-					"const vec3 wrapRGB = vec3( 0.2, 0.2, 0.2 );",
+					"const vec3 wrapRGB = vec3( 1.0, 1.0, 1.0 );",
 					"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
 
 				"} else {",
