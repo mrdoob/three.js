@@ -85,7 +85,7 @@ THREE.Sphere.prototype = {
 
 	},
 
-	bounds: function ( optionalTarget ) {
+	getBoundingBox: function ( optionalTarget ) {
 
 		var box = optionalTarget || new THREE.Box3();
 
