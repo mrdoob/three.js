@@ -1565,6 +1565,9 @@ def export_mesh(objects,
 # Scene exporter - render elements
 # #####################################################
 
+def generate_quat(quat):
+    return TEMPLATE_VEC4 % (quat.x, quat.y, quat.z, quat.w)
+
 def generate_vec4(vec):
     return TEMPLATE_VEC4 % (vec[0], vec[1], vec[2], vec[3])
 
@@ -1664,7 +1667,7 @@ def generate_objects(data):
 
             "position"    : generate_vec3(position),
             "rotation"    : generate_vec3(rotation),
-            "quaternion"  : generate_vec4(quaternion),
+            "quaternion"  : generate_quat(quaternion),
             "scale"       : generate_vec3(scale),
 
             "castShadow"  : generate_bool_property(castShadow),
@@ -1692,7 +1695,7 @@ def generate_objects(data):
 
             "position"    : generate_vec3(position),
             "rotation"    : generate_vec3(rotation),
-            "quaternion"  : generate_vec4(quaternion),
+            "quaternion"  : generate_quat(quaternion),
             "scale"       : generate_vec3(scale)
             }
             chunks.append(object_string)
