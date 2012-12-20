@@ -117,7 +117,7 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 			var projectionMatrix = camera.projectionMatrix.clone();
 			var eyeSep = focalLength / 30 * 0.5;
 			var eyeSepOnProjection = eyeSep * _near / focalLength;
-			var ymax = _near * Math.tan( _fov * Math.PI / 360 );
+			var ymax = _near * Math.tan( THREE.Math.degToRad( _fov * 0.5 ) );
 			var xmin, xmax;
 
 			// translate xOffset

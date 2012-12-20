@@ -195,10 +195,10 @@
 
 			function render() {
 
-				theta += 0.2;
+				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
-				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
+				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 
 				camera.lookAt( camera.target );
 

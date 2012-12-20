@@ -41,8 +41,7 @@ THREE.PathControls = function ( object, domElement ) {
 	this.phi = 0;
 	this.theta = 0;
 
-	var PI2 = Math.PI * 2,
-		PI180 = Math.PI / 180;
+	var PI2 = Math.PI * 2;
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
@@ -81,8 +80,8 @@ THREE.PathControls = function ( object, domElement ) {
 		this.lon = Math.max( 0, Math.min( 360, this.lon ) );
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
 
-		this.phi = ( 90 - this.lat ) * PI180;
-		this.theta = this.lon * PI180;
+		this.phi = THREE.Math.degToRad( 90 - this.lat );
+		this.theta = THREE.Math.degToRad( this.lon );
 
 		this.phi = normalize_angle_rad( this.phi );
 

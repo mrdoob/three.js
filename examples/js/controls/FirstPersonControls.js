@@ -231,8 +231,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed; // * this.invertVertical?-1:1;
 
 			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
-			this.phi = ( 90 - this.lat ) * Math.PI / 180;
-			this.theta = this.lon * Math.PI / 180;
+			this.phi = THREE.Math.degToRad( 90 - this.lat );
+			this.theta = THREE.Math.degToRad( this.lon );
 
 			var targetPosition = this.target,
 				position = this.object.position;
@@ -255,9 +255,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed * verticalLookRatio;
 
 		this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
-		this.phi = ( 90 - this.lat ) * Math.PI / 180;
+		this.phi = THREE.Math.degToRad( 90 - this.lat );
 
-		this.theta = this.lon * Math.PI / 180;
+		this.theta = THREE.Math.degToRad( this.lon );
 
 		if ( this.constrainVertical ) {
 
