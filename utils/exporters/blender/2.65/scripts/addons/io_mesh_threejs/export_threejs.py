@@ -86,7 +86,7 @@ TEMPLATE_SCENE_ASCII = """\
 "metadata" :
 {
 	"formatVersion" : 3.2,
-	"type" 			: "scene",
+	"type"          : "scene",
 	"sourceFile"    : "%(fname)s",
 	"generatedBy"   : "Blender 2.65 Exporter",
 	"objects"       : %(nobjects)s,
