@@ -3,7 +3,6 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://exocortex.com
- * @author Hasan Kamal-Al-Deen / hasank1987@gmail.com
  */
 
 THREE.Quaternion = function( x, y, z, w ) {
@@ -319,55 +318,6 @@ THREE.Quaternion.prototype = {
 		dest.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
 
 		return dest;
-
-	},
-
-	toEuler: function ( order, optionalTarget ) {
-
-	    var result = optionalTarget || new THREE.Vector3();
-
-	    var qx = this.x,
-	    	qy = this.y,
-	    	qz = this.z,
-	    	qw = this.w;
-	    var sqx = qx*qx,
-	        sqy = qy*qy,
-	        sqz = qz*qz,
-	        sqw = qw*qw;
-
-		if ( order === undefined || order === 'XYZ' ) {
-
-	        var test = qw*qy - qx*qz;
-
-		    if (test > 0.4999) {
-
-		        result.x = 0;
-		        result.y = 90;
-		        result.z = -2 * Math.atan2(qx, qw);
-
-		    } else if (test < -0.4999) {
-
-		        result.x = 0;
-		        result.y = -90;
-		        result.z = 2 * Math.atan2(qx, qw);
-
-		    } else {
-
-		        result.x = Math.atan2(2 * (qw*qx + qy*qz), sqw - sqx - sqy + sqz);
-		        result.y = Math.asin(2 * (qw*qy - qx*qz));
-		        result.z = Math.atan2(2 * (qx*qy + qw*qz), sqw + sqx - sqy - sqz);
-
-		    }
-
-		}
-		else {
-
-			// TODO: support more Euler orders.			
-			throw new Error( "Euler order not supported: " + order );
-
-		}
-
-	    return result;
 
 	},
 

@@ -77,14 +77,17 @@ test( "setFromAxisAngle", function() {
 });
 
 
-test( "setFromEuler/toEuler", function() {
+test( "setFromEuler/setEulerFromQuaternion", function() {
 
 	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
 
-	for( var i = 0; i < angles.length; i ++ ) {
-		// check only supported toEuler format
-		var eulers2 = new THREE.Quaternion().setFromEuler( angles[i], "XYZ" ).toEuler( "XYZ" );
-		ok( eulers2.distanceTo( angles[i] ) < 0.001, "Passed!" );
+	// ensure euler conversion to/from Quaternion matches.
+	for( var i = 0; i < orders.length; i ++ ) {
+		for( var j = 0; j < angles.length; j ++ ) {
+			var eulers2 = new THREE.Vector3().setEulerFromQuaternion( new THREE.Quaternion().setFromEuler( angles[j], orders[i] ), orders[i] );
+		
+			ok( eulers2.distanceTo( angles[j] ) < 0.001, "Passed!" );
+		}
 	}
 
 });
