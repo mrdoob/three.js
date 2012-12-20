@@ -4,6 +4,10 @@
 
 module( "Quaternion" );
 
+var orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
+var eulerAngles = new THREE.Vector3( 0.1, -0.3, 0.25 );
+
+
 test( "constructor", function() {
 	var a = new THREE.Quaternion();
 	ok( a.x == 0, "Passed!" );
@@ -72,21 +76,34 @@ test( "setFromAxisAngle", function() {
 	ok( a.equals( b1 ), "Passed!" );
 });
 
-test( "setFromRotationMatrix", function() {
 
-	// TODO: find cases to validate.
-	ok( true, "Passed!" );
+test( "setFromEuler/toEuler", function() {
+
+	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+
+	for( var i = 0; i < angles.length; i ++ ) {
+		// check only supported toEuler format
+		var eulers2 = new THREE.Quaternion().setFromEuler( angles[i], "XYZ" ).toEuler( "XYZ" );
+		console.log( eulerAngles)
+		ok( eulers2.distanceTo( angles[i] ) < 0.001, "Passed!" );
+	}
 
 });
 
-test( "fromEuler/toEuler", function() {
+test( "setFromEuler/setFromRotationMatrix", function() {
 
-	// TODO: find cases to validate.
-	ok( true, "Passed!" );
+	// ensure euler conversion for Quaternion matches that of Matrix4
+	for( var i = 0; i < orders.length; i ++ ) {
+		var q = new THREE.Quaternion().setFromEuler( eulerAngles, orders[i] );
+		var m = new THREE.Matrix4().setRotationFromEuler( eulerAngles, orders[i] );
+		var q2 = new THREE.Quaternion().setFromRotationMatrix( m );
+
+		ok( q.subSelf( q2 ).length() < 0.001, "Passed!" );
+	}
 
 });
 
-test( "add", function() {
+test( "add/addSelf", function() {
 	var a = new THREE.Quaternion( x, y, z, w );
 	var b = new THREE.Quaternion( -x, -y, -z, -w );
 
@@ -103,17 +120,38 @@ test( "add", function() {
 	ok( c.w == -2*w, "Passed!" );	
 });
 
-test( "normalize/length", function() {
+test( "sub/subSelf", function() {
+	var a = new THREE.Quaternion( x, y, z, w );
+	var b = new THREE.Quaternion( -x, -y, -z, -w );
+
+	a.subSelf( b );
+	ok( a.x == 2*x, "Passed!" );
+	ok( a.y == 2*y, "Passed!" );
+	ok( a.z == 2*z, "Passed!" );
+	ok( a.w == 2*w, "Passed!" );
+
+	var c = new THREE.Quaternion().sub( b, b );
+	ok( c.x == 0, "Passed!" );
+	ok( c.y == 0, "Passed!" );	
+	ok( c.z == 0, "Passed!" );
+	ok( c.w == 0, "Passed!" );	
+});
+
+test( "normalize/length/lengthSq", function() {
 	var a = new THREE.Quaternion( x, y, z, w );
 	var b = new THREE.Quaternion( -x, -y, -z, -w );
 
 	ok( a.length() != 1, "Passed!");
+	ok( a.lengthSq() != 1, "Passed!");
 	a.normalize();
 	ok( a.length() == 1, "Passed!");
+	ok( a.lengthSq() == 1, "Passed!");
 
 	a.set( 0, 0, 0, 0 );
+	ok( a.lengthSq() == 0, "Passed!");
 	ok( a.length() == 0, "Passed!");
 	a.normalize();
+	ok( a.lengthSq() == 1, "Passed!");
 	ok( a.length() == 1, "Passed!");
 });
 
@@ -132,23 +170,43 @@ test( "inverse/conjugate", function() {
 
 
 test( "multiply/multiplySelf", function() {
+	
+	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
 
-	// TODO: find cases to validate.
-	ok( true, "Passed!" );
+	var q1 = new THREE.Quaternion().setFromEuler( angles[0], "XYZ" );
+	var q2 = new THREE.Quaternion().setFromEuler( angles[1], "XYZ" );
+	var q3 = new THREE.Quaternion().setFromEuler( angles[2], "XYZ" );
 
+	var q = new THREE.Quaternion().multiply( q1, q2 ).multiplySelf( q3 );
+
+	var m1 = new THREE.Matrix4().setRotationFromEuler( angles[0], "XYZ" );
+	var m2 = new THREE.Matrix4().setRotationFromEuler( angles[1], "XYZ" );
+	var m3 = new THREE.Matrix4().setRotationFromEuler( angles[2], "XYZ" );
+
+	var m = new THREE.Matrix4().multiply( m1, m2 ).multiplySelf( m3 );
+
+	var qFromM = new THREE.Quaternion().setFromRotationMatrix( m );
+
+	ok( q.subSelf( qFromM ).length() < 0.001, "Passed!" );
 });
 
 test( "multiplyVector3", function() {
 	
-	// TODO: find cases to validate.
-	ok( true, "Passed!" );
+	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
 
-});
+	// ensure euler conversion for Quaternion matches that of Matrix4
+	for( var i = 0; i < orders.length; i ++ ) {
+		for( var j = 0; j < angles.length; j ++ ) {
+			var q = new THREE.Quaternion().setFromEuler( angles[j], orders[i] );
+			var m = new THREE.Matrix4().setRotationFromEuler( angles[j], orders[i] );
 
-test( "slerpSelf/slerp", function() {
-
-	// TODO: find cases to validate.
-	ok( true, "Passed!" );
+			var v0 = new THREE.Vector3(1, 0, 0);
+			var qv = q.multiplyVector3( v0.clone() );
+			var mv = m.multiplyVector3( v0.clone() );
+		
+			ok( qv.distanceTo( mv ) < 0.001, "Passed!" );
+		}
+	}
 
 });
 
