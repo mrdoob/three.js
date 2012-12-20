@@ -40,16 +40,7 @@ THREE.DeferredShaderChunk = {
 	combine: [
 
 		"vec3 light = lightIntensity * lightColor;",
-
-		"if ( additiveSpecular < 0.0 ) {",
-
-			"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
-
-		"} else {",
-
-			"gl_FragColor = vec4( light * albedo * ( diffuse + specular ), attenuation );",
-
-		"}"
+		"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
 
 	].join("\n")
 
