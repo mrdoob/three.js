@@ -39,13 +39,13 @@ THREE.DeferredShaderChunk = {
 		"vec4 vertexPositionProjected = vec4( xy, z, 1.0 );",
 		"vec4 vertexPositionVS = matProjInverse * vertexPositionProjected;",
 		"vertexPositionVS.xyz /= vertexPositionVS.w;",
-		"vertexPositionVS.w = 1.0;",
+		"vertexPositionVS.w = 1.0;"
 
 	].join("\n"),
 
 	computeNormal: [
 
-		"vec3 normal = normalDepth.xyz * 2.0 - 1.0;",
+		"vec3 normal = normalDepth.xyz * 2.0 - 1.0;"
 
 	].join("\n"),
 
@@ -61,10 +61,54 @@ THREE.DeferredShaderChunk = {
 
 	].join("\n"),
 
+	computeDiffuse: [
+
+		"float dotProduct = dot( normal, lightVector );",
+		"float diffuseFull = max( dotProduct, 0.0 );",
+
+		"vec3 diffuse;",
+
+		"if ( wrapAround < 0.0 ) {",
+
+			// wrap around lighting
+
+			"float diffuseHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
+
+			"const vec3 wrapRGB = vec3( 1.0, 1.0, 1.0 );",
+			"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
+
+		"} else {",
+
+			// simple lighting
+
+			"diffuse = vec3( diffuseFull );",
+
+		"}"
+
+	].join("\n"),
+
+	computeSpecular: [
+
+		"vec3 halfVector = normalize( lightVector - normalize( vertexPositionVS.xyz ) );",
+		"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
+
+		// simple specular
+
+		//"vec3 specular = specularColor * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;",
+
+		// physically based specular
+
+		"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+
+		"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightVector, halfVector ), 5.0 );",
+		"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;"
+
+	].join("\n"),
+
 	combine: [
 
 		"vec3 light = lightIntensity * lightColor;",
-		"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );",
+		"gl_FragColor = vec4( light * ( albedo * diffuse + specular ), attenuation );"
 
 	].join("\n")
 
@@ -464,8 +508,8 @@ THREE.ShaderDeferred = {
 
 				// bail out early when pixel outside of light sphere
 
-				"vec3 lightDirection = lightPositionVS - vertexPositionVS.xyz;",
-				"float distance = length( lightDirection );",
+				"vec3 lightVector = lightPositionVS - vertexPositionVS.xyz;",
+				"float distance = length( lightVector );",
 
 				"if ( distance > lightRadius ) discard;",
 
@@ -474,45 +518,10 @@ THREE.ShaderDeferred = {
 
 				// compute light
 
-				"lightDirection = normalize( lightDirection );",
+				"lightVector = normalize( lightVector );",
 
-				"vec3 diffuse;",
-
-				"float dotProduct = dot( normal, lightDirection );",
-				"float diffuseFull = max( dotProduct, 0.0 );",
-
-				"if ( wrapAround < 0.0 ) {",
-
-					// wrap around lighting
-
-					"float diffuseHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
-
-					"const vec3 wrapRGB = vec3( 1.0, 1.0, 1.0 );",
-					"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
-
-				"} else {",
-
-					// simple lighting
-
-					"diffuse = vec3( diffuseFull );",
-
-				"}",
-
-				// specular
-
-				"vec3 halfVector = normalize( lightDirection - normalize( vertexPositionVS.xyz ) );",
-				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
-
-				// simple specular
-
-				//"vec3 specular = max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;",
-
-				// physically based specular
-
-				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDirection, halfVector ), 5.0 );",
-				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;",
+				THREE.DeferredShaderChunk[ "computeDiffuse" ],
+				THREE.DeferredShaderChunk[ "computeSpecular" ],
 
 				// combine
 
@@ -590,10 +599,9 @@ THREE.ShaderDeferred = {
 
 				// compute light
 
-				"vec3 surfToLight = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
-				"float dotProduct = dot( normal, surfToLight );",
+				"vec3 lightVector = normalize( lightPositionVS.xyz - vertexPositionVS.xyz );",
 
-				"float rho = dot( lightDirectionVS, surfToLight );",
+				"float rho = dot( lightDirectionVS, lightVector );",
 				"float rhoMax = cos( lightAngle * 0.5 );",
 
 				"if ( rho > rhoMax ) {",
@@ -618,35 +626,12 @@ THREE.ShaderDeferred = {
 
 					"}",
 
-					//
 
-					"vec3 diffuse;",
+					THREE.DeferredShaderChunk[ "computeDiffuse" ],
 
-					"float diffuseFull = spot * max( dotProduct, 0.0 );",
+					"diffuse *= spot;",
 
-					"if ( wrapAround < 0.0 ) {",
-
-						// wrap around lighting
-
-						"float diffuseHalf = spot * max( 0.5 * dotProduct + 0.5, 0.0 );",
-
-						"const vec3 wrapRGB = vec3( 1.0, 1.0, 1.0 );",
-						"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
-
-					"} else {",
-
-						// simple lighting
-
-						"diffuse = vec3( diffuseFull );",
-
-					"}",
-
-					"vec3 halfVector = normalize( surfToLight - normalize( vertexPositionVS.xyz ) );",
-					"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
-
-					// simple specular
-
-					"vec3 specular = max( pow( dotNormalHalf, shininess ), 0.0 ) * spot * diffuse * specularColor;",
+					THREE.DeferredShaderChunk[ "computeSpecular" ],
 
 					// combine
 
@@ -719,43 +704,10 @@ THREE.ShaderDeferred = {
 
 				// compute light
 
-				"vec3 diffuse;",
+				"vec3 lightVector = lightDirectionVS;",
 
-				"float dotProduct = dot( normal, lightDirectionVS );",
-				"float diffuseFull = max( dotProduct, 0.0 );",
-
-				"if ( wrapAround < 0.0 ) {",
-
-					// wrap around lighting
-
-					"float diffuseHalf = max( 0.5 * dotProduct + 0.5, 0.0 );",
-
-					"const vec3 wrapRGB = vec3( 1.0, 1.0, 1.0 );",
-					"diffuse = mix( vec3( diffuseFull ), vec3( diffuseHalf ), wrapRGB );",
-
-				"} else {",
-
-					// simple lighting
-
-					"diffuse = vec3( diffuseFull );",
-
-				"}",
-
-				// specular
-
-				"vec3 halfVector = normalize( lightDirectionVS - normalize( vertexPositionVS.xyz ) );",
-				"float dotNormalHalf = max( dot( normal, halfVector ), 0.0 );",
-
-				// simple specular
-
-				//"vec3 specular = specularColor * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse;",
-
-				// physically based specular
-
-				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-				"vec3 schlick = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightDirectionVS, halfVector ), 5.0 );",
-				"vec3 specular = schlick * max( pow( dotNormalHalf, shininess ), 0.0 ) * diffuse * specularNormalization;",
+				THREE.DeferredShaderChunk[ "computeDiffuse" ],
+				THREE.DeferredShaderChunk[ "computeSpecular" ],
 
 				// combine
 
