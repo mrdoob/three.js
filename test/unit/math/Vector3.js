@@ -59,6 +59,20 @@ test( "setX,setY,setZ", function() {
 	ok( a.z == z, "Passed!" );
 });
 
+test( "setComponent,getComponent", function() {
+	var a = new THREE.Vector3();
+	ok( a.x == 0, "Passed!" );
+	ok( a.y == 0, "Passed!" );
+	ok( a.z == 0, "Passed!" );
+
+	a.setComponent( 0, 1 );
+	a.setComponent( 1, 2 );
+	a.setComponent( 2, 3 );
+	ok( a.getComponent( 0 ) == 1, "Passed!" );
+	ok( a.getComponent( 1 ) == 2, "Passed!" );
+	ok( a.getComponent( 2 ) == 3, "Passed!" );
+});
+
 test( "add", function() {
 	var a = new THREE.Vector3( x, y, z );
 	var b = new THREE.Vector3( -x, -y, -z );
