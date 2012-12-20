@@ -733,6 +733,104 @@ THREE.ShaderDeferred = {
 
 	},
 
+	"hemisphereLight" : {
+
+		uniforms: {
+
+			samplerNormalDepth: { type: "t", value: null },
+			samplerColor: 		{ type: "t", value: null },
+			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			viewWidth: 		{ type: "f", value: 800 },
+			viewHeight: 	{ type: "f", value: 600 },
+
+			lightDirectionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightColorSky: 	  { type: "c", value: new THREE.Color( 0x000000 ) },
+			lightColorGround: { type: "c", value: new THREE.Color( 0x000000 ) },
+			lightIntensity:   { type: "f", value: 1.0 }
+
+		},
+
+		fragmentShader : [
+
+			"uniform sampler2D samplerColor;",
+			"uniform sampler2D samplerNormalDepth;",
+
+			"uniform float lightRadius;",
+			"uniform float lightIntensity;",
+			"uniform float viewHeight;",
+			"uniform float viewWidth;",
+
+			"uniform vec3 lightColorSky;",
+			"uniform vec3 lightColorGround;",
+			"uniform vec3 lightDirectionVS;",
+
+			"uniform mat4 matProjInverse;",
+
+			THREE.DeferredShaderChunk[ "unpackFloat" ],
+
+			"void main() {",
+
+				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+				THREE.DeferredShaderChunk[ "computeNormal" ],
+				THREE.DeferredShaderChunk[ "unpackColorMap" ],
+
+				// compute light
+
+				"vec3 lightVector = lightDirectionVS;",
+
+				// diffuse
+
+				"float dotProduct = dot( normal, lightVector );",
+				"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
+
+				"vec3 hemiColor = mix( lightColorGround, lightColorSky, hemiDiffuseWeight );",
+
+				"vec3 diffuse = hemiColor;",
+
+				// specular (sky light)
+
+				"vec3 hemiHalfVectorSky = normalize( lightVector - vertexPositionVS.xyz );",
+				"float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
+				"float hemiSpecularWeightSky = max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
+
+				// specular (ground light)
+
+				"vec3 lVectorGround = -lightVector;",
+
+				"vec3 hemiHalfVectorGround = normalize( lVectorGround - vertexPositionVS.xyz );",
+				"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
+				"float hemiSpecularWeightGround = max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
+
+				"float dotProductGround = dot( normal, lVectorGround );",
+
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+
+				"vec3 schlickSky = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lightVector, hemiHalfVectorSky ), 5.0 );",
+				"vec3 schlickGround = specularColor + vec3( 1.0 - specularColor ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+				"vec3 specular = hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
+
+				// combine
+
+				"gl_FragColor = vec4( lightIntensity * ( albedo * diffuse + specular ), 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		vertexShader : [
+
+			"void main() { ",
+
+				// full screen quad proxy
+
+				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+
+			"}"
+
+		].join("\n")
+
+	},
+
 	"emissiveLight" : {
 
 		uniforms: {

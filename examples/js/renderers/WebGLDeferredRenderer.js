@@ -56,6 +56,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var pointLightShader = THREE.ShaderDeferred[ "pointLight" ];
 	var spotLightShader = THREE.ShaderDeferred[ "spotLight" ];
 	var directionalLightShader = THREE.ShaderDeferred[ "directionalLight" ];
+	var hemisphereLightShader = THREE.ShaderDeferred[ "hemisphereLight" ];
 
 	var compositeShader = THREE.ShaderDeferred[ "composite" ];
 
@@ -545,6 +546,72 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
+	var updateHemisphereLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		directionVS.copy( light.matrixWorld.getPosition() );
+		directionVS.normalize();
+		camera.matrixWorldInverse.rotateAxis( directionVS );
+
+		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColorSky" ].value.copyGammaToLinear( light.color );
+		uniforms[ "lightColorGround" ].value.copyGammaToLinear( light.groundColor );
+
+	};
+
+	var createDeferredHemisphereLight = function ( light ) {
+
+		// setup light material
+
+		var uniforms = THREE.UniformsUtils.clone( hemisphereLightShader.uniforms );
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       uniforms,
+			vertexShader:   hemisphereLightShader.vertexShader,
+			fragmentShader: hemisphereLightShader.fragmentShader,
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			depthTest:		false,
+			transparent:	true
+
+		} );
+
+		uniforms[ "viewWidth" ].value = scaledWidth;
+		uniforms[ "viewHeight" ].value = scaledHeight;
+
+		uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+
+		// create light proxy mesh
+
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
+
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
+
+		// keep reference for size reset
+
+		resizableMaterials.push( materialLight );
+
+		// sync proxy uniforms to the original light
+
+		updateHemisphereLightProxy( meshLight );
+
+		return meshLight;
+
+	};
+
 	var createDeferredEmissiveLight = function () {
 
 		// setup light material
@@ -605,6 +672,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
 			var meshLight = createDeferredDirectionalLight( object );
+			lightSceneFullscreen.add( meshLight );
+
+		} else if ( object instanceof THREE.HemisphereLight ) {
+
+			var meshLight = createDeferredHemisphereLight( object );
 			lightSceneFullscreen.add( meshLight );
 
 		}
@@ -733,6 +805,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( originalLight ) {
 
+			lightProxy.visible = originalLight.visible;
+
 			if ( originalLight instanceof THREE.PointLight ) {
 
 				updatePointLightProxy( lightProxy );
@@ -744,6 +818,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			} else if ( originalLight instanceof THREE.DirectionalLight ) {
 
 				updateDirectionalLightProxy( lightProxy );
+
+			} else if ( originalLight instanceof THREE.HemisphereLight ) {
+
+				updateHemisphereLightProxy( lightProxy );
 
 			}
 
