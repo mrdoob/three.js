@@ -36,16 +36,23 @@ var a = [];
 
 for ( var i = 0; i < 100000; i ++ ) {
     
-    var x = Math.random(); 
-    var y = Math.random();
-    var z = Math.random();
-    
-    a[ i ] = new THREE.Vector3( x, y, z );
+    a[ i ] = new THREE.Vector3( i * 0.01, i * 2, i * -1.3 );
     
 }
 
 
 var suite = new Benchmark.Suite;
+
+suite.add('NoCallTest', function() {
+
+    var result = 0;
+
+    for ( var i = 0; i < 100000; i ++ ) {
+        var v = a[i];
+        result += Math.sqrt( v.x * v.x + v.y * v.y + v.z * v.z );
+    }
+
+});
 
 suite.add('InlineCallTest', function() {
 
