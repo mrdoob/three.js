@@ -39,7 +39,7 @@ THREE.EventDispatcher = function () {
 		var listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
-			
+
 			event.target = this;
 
 			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {

@@ -740,6 +740,12 @@ THREE.Geometry.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
+		for ( var property in this ) {
+
+			delete this[ property ];
+
+		}
+
 	}
 
 };

@@ -120,6 +120,12 @@ THREE.Material.prototype.dispose = function () {
 
 	this.dispatchEvent( { type: 'dispose' } );
 
+	for ( var property in this ) {
+
+		delete this[ property ];
+
+	}
+
 };
 
 THREE.MaterialIdCount = 0;
