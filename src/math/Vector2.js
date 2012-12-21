@@ -118,7 +118,7 @@ THREE.Vector2.prototype = {
 
 	divideScalar: function ( s ) {
 
-		if ( s ) {
+		if ( s !== 0 ) {
 
 			this.x /= s;
 			this.y /= s;
@@ -244,7 +244,7 @@ THREE.Vector2.prototype = {
 
 		var oldLength = this.length();
 		
-		if( oldLength ) {
+		if ( oldLength !== 0 && l !== oldLength  ) {
 
 			this.multiplyScalar( l / oldLength );
 		}
