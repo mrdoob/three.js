@@ -205,7 +205,7 @@ THREE.Vector2.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y );
 
 	},
 
@@ -230,7 +230,14 @@ THREE.Vector2.prototype = {
 
 	setLength: function ( l ) {
 
-		return this.normalize().multiplyScalar( l );
+		var oldLength = this.length();
+		
+		if( oldLength ) {
+
+			this.multiplyScalar( l / oldLength );
+		}
+
+		return this;
 
 	},
 

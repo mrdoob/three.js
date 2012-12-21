@@ -254,6 +254,11 @@ test( "setLength", function() {
 	ok( a.length() == x, "Passed!" );
 	a.setLength( y );
 	ok( a.length() == y, "Passed!" );
+
+	a = new THREE.Vector4( 0, 0, 0, 0 );
+	ok( a.length() == 0, "Passed!" );
+	a.setLength( y );
+	ok( a.length() == 0, "Passed!" );
 });
 
 test( "lerpSelf/clone", function() {
