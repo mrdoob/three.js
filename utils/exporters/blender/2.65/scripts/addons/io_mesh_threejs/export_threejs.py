@@ -1645,7 +1645,7 @@ def generate_objects(data):
                 matrix_world = obj.matrix_world
 
             position, quaternion, scale = matrix_world.decompose()
-            rotation = quaternion.to_euler("XYZ")
+            rotation = quaternion.to_euler("ZYX")
 
             # use empty material string for multi-material objects
             # this will trigger use of MeshFaceMaterial in SceneLoader
@@ -1695,7 +1695,7 @@ def generate_objects(data):
                 matrix_world = obj.matrix_world
 
             position, quaternion, scale = matrix_world.decompose()
-            rotation = quaternion.to_euler("XYZ")
+            rotation = quaternion.to_euler("ZYX")
 
             group_string = ""
             if len(group_ids) > 0:
