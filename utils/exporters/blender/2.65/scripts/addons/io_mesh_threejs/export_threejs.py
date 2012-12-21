@@ -67,6 +67,8 @@ DEFAULTS = {
  }
 }
 
+ROTATE_X_PI2 = mathutils.Quaternion((1.0, 0.0, 0.0), math.radians(-90.0)).to_matrix().to_4x4()
+
 # default colors for debugging (each material gets one distinct color):
 # white, red, green, blue, yellow, cyan, magenta
 COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
@@ -1637,7 +1639,12 @@ def generate_objects(data):
             material_ids = generate_material_id_list(obj.material_slots)
             group_ids = generate_group_id_list(obj)
 
-            position, quaternion, scale = obj.matrix_world.decompose()
+            if data["flipyz"]:
+                matrix_world = ROTATE_X_PI2 * obj.matrix_world
+            else:
+                matrix_world = obj.matrix_world
+
+            position, quaternion, scale = matrix_world.decompose()
             rotation = quaternion.to_euler("XYZ")
 
             # use empty material string for multi-material objects
@@ -1682,7 +1689,12 @@ def generate_objects(data):
             object_id = obj.name
             group_ids = generate_group_id_list(obj)
 
-            position, quaternion, scale = obj.matrix_world.decompose()
+            if data["flipyz"]:
+                matrix_world = ROTATE_X_PI2 * obj.matrix_world
+            else:
+                matrix_world = obj.matrix_world
+
+            position, quaternion, scale = matrix_world.decompose()
             rotation = quaternion.to_euler("XYZ")
 
             group_string = ""
