@@ -51,6 +51,26 @@ THREE.Vector3.prototype = {
         }
 
     },
+
+
+    getComponent3: function ( index ) {
+
+        if ( index === 0 ) return this.x;
+        if ( index === 1 ) return this.y;
+        if ( index === 2 ) return this.z;
+
+        throw new Error( "index is out of range: " + index );
+
+    },
+
+    getComponent4: function ( index ) {
+
+        if ( index === 0 ) return this.x;
+        else if ( index === 1 ) return this.y;
+        else if ( index === 2 ) return this.z;
+        else throw new Error( "index is out of range: " + index );
+
+    }
 };
 
 
@@ -88,6 +108,30 @@ suite.add('SwitchStatement', function() {
     for ( var i = 0; i < 100000; i ++ ) {
 
         result += a[i].getComponent2( i % 3 );
+
+    }
+
+});
+
+suite.add('IfAndReturnSeries', function() {
+
+    var result = 0;
+
+    for ( var i = 0; i < 100000; i ++ ) {
+
+        result += a[i].getComponent3( i % 3 );
+
+    }
+
+});
+
+suite.add('IfReturnElseSeries', function() {
+
+    var result = 0;
+
+    for ( var i = 0; i < 100000; i ++ ) {
+
+        result += a[i].getComponent4( i % 3 );
 
     }
 
