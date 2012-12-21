@@ -604,46 +604,39 @@ THREE.ShaderDeferred = {
 				"float rho = dot( lightDirectionVS, lightVector );",
 				"float rhoMax = cos( lightAngle * 0.5 );",
 
-				"if ( rho > rhoMax ) {",
+				"if ( rho <= rhoMax ) discard;",
 
-					"float theta = rhoMax + 0.0001;",
-					"float phi = rhoMax + 0.05;",
-					"float falloff = 4.0;",
+				"float theta = rhoMax + 0.0001;",
+				"float phi = rhoMax + 0.05;",
+				"float falloff = 4.0;",
 
-					"float spot = 0.0;",
+				"float spot = 0.0;",
 
-					"if ( rho >= phi ) {",
+				"if ( rho >= phi ) {",
 
-						"spot = 1.0;",
+					"spot = 1.0;",
 
-					"} else if ( rho <= theta ) {",
+				"} else if ( rho <= theta ) {",
 
-						"spot = 0.0;",
+					"spot = 0.0;",
 
-					"} else { ",
+				"} else { ",
 
-						"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
-
-					"}",
-
-
-					THREE.DeferredShaderChunk[ "computeDiffuse" ],
-
-					"diffuse *= spot;",
-
-					THREE.DeferredShaderChunk[ "computeSpecular" ],
-
-					// combine
-
-					"const float attenuation = 1.0;",
-
-					THREE.DeferredShaderChunk[ "combine" ],
-
-					"return;",
+					"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
 
 				"}",
 
-				"gl_FragColor = vec4( 0.0 );",
+				THREE.DeferredShaderChunk[ "computeDiffuse" ],
+
+				"diffuse *= spot;",
+
+				THREE.DeferredShaderChunk[ "computeSpecular" ],
+
+				// combine
+
+				"const float attenuation = 1.0;",
+
+				THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
