@@ -62,6 +62,18 @@ THREE.Vector4.prototype = {
 
 	},
 
+	setComponent: function ( index, value ) {
+
+		this[ THREE.Vector4.__indexToName[ index ] ] = value;
+
+	},
+
+	getComponent: function ( index ) {
+
+		return this[ THREE.Vector4.__indexToName[ index ] ];
+		
+	},
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -493,4 +505,11 @@ THREE.Vector4.prototype = {
 
 	}
 
+};
+
+THREE.Vector4.__indexToName = {
+  0: 'x',
+  1: 'y',
+  2: 'z',
+  3: 'w'
 };

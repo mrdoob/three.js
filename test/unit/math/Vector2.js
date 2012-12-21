@@ -48,6 +48,17 @@ test( "setX,setY", function() {
 	ok( a.y == y, "Passed!" );
 });
 
+test( "setComponent,getComponent", function() {
+	var a = new THREE.Vector2();
+	ok( a.x == 0, "Passed!" );
+	ok( a.y == 0, "Passed!" );
+
+	a.setComponent( 0, 1 );
+	a.setComponent( 1, 2 );
+	ok( a.getComponent( 0 ) == 1, "Passed!" );
+	ok( a.getComponent( 1 ) == 2, "Passed!" );
+});
+
 test( "add", function() {
 	var a = new THREE.Vector2( x, y );
 	var b = new THREE.Vector2( -x, -y );
