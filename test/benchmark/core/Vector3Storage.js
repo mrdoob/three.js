@@ -35,12 +35,30 @@ THREE.Vector3X.prototype = {
     
     length: function () {
 
-            return Math.sqrt( this[0] * this[0] + this[1] * this[1] + this[2] * this[2] );
+            return Math.sqrt( this.elements[0] * this.elements[0] + this.elements[1] * this.elements[1] + this.elements[2] * this.elements[2] );
 
     }
     
 };
 
+
+THREE.Vector3Y = function ( x, y, z ) {
+
+    this.elements = [ x || 0, y || 1, z || 2 ];
+
+};
+
+THREE.Vector3Y.prototype = {
+
+    constructor: THREE.Vector3Y,
+    
+    length: function () {
+
+            return Math.sqrt( this.elements[0] * this.elements[0] + this.elements[1] * this.elements[1] + this.elements[2] * this.elements[2] );
+
+    }
+    
+};
 
 
 var suite = new Benchmark.Suite;
@@ -65,6 +83,21 @@ suite.add('Vector3-Float32Array', function() {
     var array = [];
     for ( var i = 0; i < 100000; i ++ ) {
         var v = new THREE.Vector3X( i, i, i );
+        array.push( v );
+    }
+
+    var result = 0;
+    for ( var i = 0; i < 100000; i ++ ) {
+        var v = array[i];
+        result += v.length();
+    }
+});
+
+suite.add('Vector3-Array', function() {
+
+    var array = [];
+    for ( var i = 0; i < 100000; i ++ ) {
+        var v = new THREE.Vector3Y( i, i, i );
         array.push( v );
     }
 
