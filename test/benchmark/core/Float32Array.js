@@ -16,7 +16,7 @@ for( var j = 0, jl = input.length/3; j < jl; j ++ ) {
 
 var suite = new Benchmark.Suite;
 
-suite.add('Float32ArrayFloat32ArrayCopyTest', function() {
+suite.add('Float32Array-Float32Array', function() {
 	var value3 = new Float32Array( 3 );
 	for (var i = 0, il = input.length / 3; i < il; i += 3) {
 	  value3[0] = input[i + 0];
@@ -31,7 +31,7 @@ suite.add('Float32ArrayFloat32ArrayCopyTest', function() {
 	}
 });
 
-suite.add('Float32ArrayArrayCopyTest', function() {
+suite.add('Float32Array-Array', function() {
 	var value2 = [0,0,0];
 	for (var i = 0, il = input.length / 3; i < il; i += 3) {
 	  value2[0] = input[i + 0];
@@ -46,7 +46,7 @@ suite.add('Float32ArrayArrayCopyTest', function() {
 	}
 });
 
-suite.add('Float32CopyArray', function() {
+suite.add('Float32Array-Literal', function() {
 	var x, y, z;
 	for (var i = 0, il = input.length / 3; i < il; i += 3) {
 	  x = input[i + 0];
@@ -61,7 +61,7 @@ suite.add('Float32CopyArray', function() {
 	}
 });
 
-suite.add('Float32ArrayVector3CopyTest', function() {
+suite.add('Float32Array-Vector3', function() {
 	var value = new THREE.Vector3();
 	for (var i = 0, il = input.length / 3; i < il; i += 3) {
 	  value.x = input[i + 0];
@@ -76,7 +76,7 @@ suite.add('Float32ArrayVector3CopyTest', function() {
 	}
 });
 
-suite.add('Vector3ArrayVector3Direct', function() {
+suite.add('Vector3Array-Direct', function() {
 	for (var i = 0, il = inputVectors.length; i < il; i ++ ) {
 		outputVectors[i].copy( inputVectors[i] );
 		outputVectors[i].x *= 1.01;
@@ -85,7 +85,7 @@ suite.add('Vector3ArrayVector3Direct', function() {
 	}
 });
 
-suite.add('Vector3ArrayVector3Copy', function() {
+suite.add('Vector3Array-Vector3', function() {
 	var value = new THREE.Vector3();
 	for (var i = 0, il = inputVectors.length; i < il; i ++ ) {
 	  value.copy( inputVectors[i] );
