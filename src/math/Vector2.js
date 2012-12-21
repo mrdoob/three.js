@@ -41,17 +41,29 @@ THREE.Vector2.prototype = {
 
 	},
 
-	setComponent: function ( index, value ) {
 
-		this[ THREE.Vector2.__indexToName[ index ] ] = value;
+    setComponent: function ( index, value ) {
 
-	},
+        switch( index ) {
 
-	getComponent: function ( index ) {
+            case 0: this.x = value; break;
+            case 1: this.y = value; break;
+            default: throw new Error( "index is out of range: " + index );
 
-		return this[ THREE.Vector2.__indexToName[ index ] ];
-		
-	},
+        }
+
+    },
+
+    getComponent: function ( index ) {
+
+        switch( index ) {
+
+            case 0: return this.x;
+            case 1: return this.y;
+            default: throw new Error( "index is out of range: " + index );
+
+    	}
+    },
 
 	copy: function ( v ) {
 
@@ -274,9 +286,4 @@ THREE.Vector2.prototype = {
 
 	}
 
-};
-
-THREE.Vector2.__indexToName = {
-  0: 'x',
-  1: 'y'
 };
