@@ -831,16 +831,15 @@ THREE.ShaderDeferred = {
 			samplerNormalDepth: { type: "t", value: null },
 			samplerColor: 		{ type: "t", value: null },
 			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
-			matView: 		{ type: "m4", value: new THREE.Matrix4() },
 			viewWidth: 		{ type: "f", value: 800 },
 			viewHeight: 	{ type: "f", value: 600 },
 
-			lightPosition:  { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightNormalVS: 	 { type: "v3", value: new THREE.Vector3( 0, -1, 0 ) },
+			lightRightVS:  	 { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
+
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
-
-			lightRight:  { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
-			lightNormal: { type: "v3", value: new THREE.Vector3( 0, -1, 0 ) },
 
 			lightWidth: { type: "f", value: 1.0 },
 			lightHeight: { type: "f", value: 1.0 }
@@ -849,9 +848,9 @@ THREE.ShaderDeferred = {
 
 		fragmentShader : [
 
-			"varying vec3 lightPosVS;",
-			"varying vec3 lightNormalVS;",
-			"varying vec3 lightRightVS;",
+			"uniform vec3 lightPositionVS;",
+			"uniform vec3 lightNormalVS;",
+			"uniform vec3 lightRightVS;",
 
 			"uniform sampler2D samplerColor;",
 			"uniform sampler2D samplerNormalDepth;",
@@ -906,12 +905,12 @@ THREE.ShaderDeferred = {
 				"float h = lightHeight;",
 
 				"vec3 lightUpVS = normalize( cross( lightRightVS, lightNormalVS ) );",
-				"vec3 proj = projectOnPlane( vertexPositionVS.xyz, lightPosVS, lightNormalVS );",
-				"vec3 dir = proj - lightPosVS;",
+				"vec3 proj = projectOnPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS );",
+				"vec3 dir = proj - lightPositionVS;",
 
 				"vec2 diagonal = vec2( dot( dir, lightRightVS ), dot( dir, lightUpVS ) );",
 				"vec2 nearest2D = vec2( clamp( diagonal.x, -w, w ), clamp( diagonal.y, -h, h ) );",
-				"vec3 nearestPointInside = vec3( lightPosVS ) + ( lightRightVS * nearest2D.x + lightUpVS * nearest2D.y );",
+				"vec3 nearestPointInside = vec3( lightPositionVS ) + ( lightRightVS * nearest2D.x + lightUpVS * nearest2D.y );",
 
 				"float dist = distance( vertexPositionVS.xyz, nearestPointInside );",
 				"float attenuation = calculateAttenuation( dist );",
@@ -921,17 +920,17 @@ THREE.ShaderDeferred = {
 
 				"float NdotL = dot( lightNormalVS, -lightDir );",
 
-				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPosVS, lightNormalVS ) ) {",
+				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS ) ) {",
 
 					"color.xyz = vec3( lightColor * attenuation * NdotL * 1.5 );",
 
+					"gl_FragColor = vec4( color, 1.0 );",
+
 				"} else {",
 
-					"color.xyz = vec3( 0.0 );",
+					"discard;",
 
 				"}",
-
-				"gl_FragColor = vec4( color, 1.0 );",
 
 			"}"
 
@@ -939,26 +938,13 @@ THREE.ShaderDeferred = {
 
 		vertexShader : [
 
-		"varying vec3 lightPosVS;",
-		"varying vec3 lightNormalVS;",
-		"varying vec3 lightRightVS;",
+			"void main() {",
 
-		"uniform vec3 lightPosition;",
-		"uniform vec3 lightNormal;",
-		"uniform vec3 lightRight;",
+				// full screen quad proxy
 
-		"uniform mat4 matView;",
+				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
-		"void main() {",
-
-			"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );",
-			"gl_Position = pos;",
-
-			"lightNormalVS = normalize( mat3( matView ) * lightNormal );",
-			"lightRightVS = normalize( mat3( matView ) * lightRight ); ",
-			"lightPosVS = vec3( matView * vec4( lightPosition, 1.0 ) );",
-
-		 "}"
+			"}"
 
 		].join("\n")
 

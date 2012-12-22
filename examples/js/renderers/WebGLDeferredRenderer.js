@@ -40,8 +40,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var positionVS = new THREE.Vector3();
 	var directionVS = new THREE.Vector3();
 
-	var right = new THREE.Vector3();
-	var normal = new THREE.Vector3();
+	var rightVS = new THREE.Vector3();
+	var normalVS = new THREE.Vector3();
 
 	//
 
@@ -416,13 +416,16 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.properties.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		positionVS.copy( light.matrixWorld.getPosition() );
-		camera.matrixWorldInverse.multiplyVector3( positionVS );
+		var viewMatrix = camera.matrixWorldInverse;
+		var modelMatrix = light.matrixWorld;
 
-		directionVS.copy( light.matrixWorld.getPosition() );
+		positionVS.copy( modelMatrix.getPosition() );
+		viewMatrix.multiplyVector3( positionVS );
+
+		directionVS.copy( modelMatrix.getPosition() );
 		directionVS.subSelf( light.target.matrixWorld.getPosition() );
 		directionVS.normalize();
-		camera.matrixWorldInverse.rotateAxis( directionVS );
+		viewMatrix.rotateAxis( directionVS );
 
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
@@ -621,17 +624,23 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.properties.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		uniforms[ "lightPosition" ].value.copy( light.matrixWorld.getPosition() );
+		var modelMatrix = light.matrixWorld;
+		var viewMatrix = camera.matrixWorldInverse;
 
-		var matrix = light.matrixWorld;
+		positionVS.copy( modelMatrix.getPosition() );
+		viewMatrix.multiplyVector3( positionVS );
+		uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
-		right.copy( light.right );
-		normal.copy( light.normal );
-		matrix.rotateAxis( right );
-		matrix.rotateAxis( normal );
+		rightVS.copy( light.right );
+		normalVS.copy( light.normal );
+		modelMatrix.rotateAxis( rightVS );
+		modelMatrix.rotateAxis( normalVS );
 
-		uniforms[ "lightRight" ].value.copy( right );
-		uniforms[ "lightNormal" ].value.copy( normal );
+		viewMatrix.rotateAxis( rightVS );
+		viewMatrix.rotateAxis( normalVS );
+
+		uniforms[ "lightRightVS" ].value.copy( rightVS );
+		uniforms[ "lightNormalVS" ].value.copy( normalVS );
 
 		uniforms[ "lightWidth" ].value = light.width;
 		uniforms[ "lightHeight" ].value = light.height;
