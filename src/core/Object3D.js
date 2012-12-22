@@ -349,6 +349,16 @@ THREE.Object3D.prototype = {
 
 		return object;
 
+	},
+
+	dispose: function () {
+
+		for ( var property in this ) {
+
+			delete this[ property ];
+
+		}
+
 	}
 
 };

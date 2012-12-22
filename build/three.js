@@ -5108,7 +5108,7 @@ THREE.EventDispatcher = function () {
 		var listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
-			
+
 			event.target = this;
 
 			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
@@ -5121,7 +5121,8 @@ THREE.EventDispatcher = function () {
 
 	};
 
-};/**
+};
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
  */
@@ -5707,6 +5708,16 @@ THREE.Object3D.prototype = {
 		}
 
 		return object;
+
+	},
+
+	dispose: function () {
+
+		for ( var property in this ) {
+
+			delete this[ property ];
+
+		}
 
 	}
 
@@ -7190,6 +7201,12 @@ THREE.Geometry.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+		for ( var property in this ) {
+
+			delete this[ property ];
+
+		}
 
 	}
 
@@ -11161,6 +11178,12 @@ THREE.Material.prototype.dispose = function () {
 
 	this.dispatchEvent( { type: 'dispose' } );
 
+	for ( var property in this ) {
+
+		delete this[ property ];
+
+	}
+
 };
 
 THREE.MaterialIdCount = 0;
@@ -12164,6 +12187,12 @@ THREE.Texture.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
+
+		for ( var property in this ) {
+
+			delete this[ property ];
+
+		}
 
 	}
 
