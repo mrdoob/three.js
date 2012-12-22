@@ -24,220 +24,6 @@ UI.Element.prototype = {
 
 	},
 
-	setLeft: function () {
-
-		this.setStyle( 'left', arguments );
-
-		return this;
-
-	},
-
-	setTop: function () {
-
-		this.setStyle( 'top', arguments );
-
-		return this;
-
-	},
-
-	setRight: function () {
-
-		this.setStyle( 'right', arguments );
-
-		return this;
-
-	},
-
-	setBottom: function () {
-
-		this.setStyle( 'bottom', arguments );
-
-		return this;
-
-	},
-
-	setWidth: function () {
-
-		this.setStyle( 'width', arguments );
-
-		return this;
-
-	},
-
-	setHeight: function () {
-
-		this.setStyle( 'height', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setBorder: function () {
-
-		this.setStyle( 'border', arguments );
-
-		return this;
-
-	},
-
-	setBorderTop: function () {
-
-		this.setStyle( 'borderTop', arguments );
-
-		return this;
-
-	},
-
-	setBorderBottom: function () {
-
-		this.setStyle( 'borderBottom', arguments );
-
-		return this;
-
-	},
-
-	setBorderLeft: function () {
-
-		this.setStyle( 'borderLeft', arguments );
-
-		return this;
-
-	},
-
-	setBorderRight: function () {
-
-		this.setStyle( 'borderRight', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setMargin: function () {
-
-		this.setStyle( 'margin', arguments );
-
-		return this;
-
-	},
-
-	setMarginTop: function () {
-
-		this.setStyle( 'marginTop', arguments );
-
-		return this;
-
-	},
-
-	setMarginBottom: function () {
-
-		this.setStyle( 'marginBottom', arguments );
-
-		return this;
-
-	},
-
-	setMarginLeft: function () {
-
-		this.setStyle( 'marginLeft', arguments );
-
-		return this;
-
-	},
-
-	setMarginRight: function () {
-
-		this.setStyle( 'marginRight', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setPadding: function () {
-
-		this.setStyle( 'padding', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setFloat: function () {
-
-		this.setStyle( 'float', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setFontSize: function () {
-
-		this.setStyle( 'fontSize', arguments );
-
-		return this;
-
-	},
-
-	setFontWeight: function () {
-
-		this.setStyle( 'fontWeight', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setColor: function () {
-
-		this.setStyle( 'color', arguments );
-
-		return this;
-
-	},
-
-	setBackgroundColor: function () {
-
-		this.setStyle( 'backgroundColor', arguments );
-
-		return this;
-
-	},
-
-	setDisplay: function () {
-
-		this.setStyle( 'display', arguments );
-
-		return this;
-
-	},
-
-	setOverflow: function () {
-
-		this.setStyle( 'overflow', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setCursor: function () {
-
-		this.setStyle( 'cursor', arguments );
-
-		return this;
-
-	},
-
 	// content
 
 	setTextContent: function ( value ) {
@@ -275,6 +61,24 @@ UI.Element.prototype = {
 	}
 
 }
+
+var properties = [ 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
+'borderTop', 'borderRight', 'borderBottom', 'margin', 'marginLeft', 'marginTop', 'marginRight',
+'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+'backgroundColor', 'fontSize', 'fontWeight', 'display', 'overflow', 'cursor' ];
+
+properties.forEach( function ( property ) {
+
+	var method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
+
+	UI.Element.prototype[ method ] = function () {
+
+		this.setStyle( property, arguments );
+		return this;
+
+	};
+
+} );
 
 
 // Panel
