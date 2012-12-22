@@ -12,8 +12,6 @@ UI.Element.prototype = {
 
 	},
 
-	// styles
-
 	setStyle: function ( style, array ) {
 
 		for ( var i = 0; i < array.length; i ++ ) {
@@ -24,43 +22,17 @@ UI.Element.prototype = {
 
 	},
 
-	// content
-
 	setTextContent: function ( value ) {
 
 		this.dom.textContent = value;
 
 		return this;
 
-	},
-
-	// events
-
-	onMouseOver: function ( callback ) {
-
-		this.dom.addEventListener( 'mouseover', callback, false );
-
-		return this;
-
-	},
-
-	onMouseOut: function ( callback ) {
-
-		this.dom.addEventListener( 'mouseout', callback, false );
-
-		return this;
-
-	},
-
-	onClick: function ( callback ) {
-
-		this.dom.addEventListener( 'click', callback, false );
-
-		return this;
-
 	}
 
 }
+
+// properties
 
 var properties = [ 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'margin', 'marginLeft', 'marginTop', 'marginRight',
@@ -74,6 +46,23 @@ properties.forEach( function ( property ) {
 	UI.Element.prototype[ method ] = function () {
 
 		this.setStyle( property, arguments );
+		return this;
+
+	};
+
+} );
+
+// events
+
+var events = [ 'MouseOver', 'MouseOut', 'Click' ];
+
+events.forEach( function ( event ) {
+
+	var method = 'on' + event;
+
+	UI.Element.prototype[ method ] = function ( callback ) {
+
+		this.dom.addEventListener( event.toLowerCase(), callback, false );
 		return this;
 
 	};
