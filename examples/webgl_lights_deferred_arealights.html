@@ -225,15 +225,86 @@
 			function initObjects() {
 
 				var loader = new THREE.BinaryLoader();
-				loader.load( "obj/box/box.js", function( geometry, materials ) {
+				loader.load( "obj/box/box.js", function ( geometry, materials ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: 0xffaa55, specular: 0x888888, shininess: 10 } ) );
-					object.position.x = 0;
-					object.position.y = 0;
+					var material = new THREE.MeshPhongMaterial( { color: 0xffaa55, specular: 0x888888, shininess: 10 } );
+					var object = new THREE.Mesh( geometry, material );
 					object.scale.multiplyScalar( 2 );
 					scene.add( object );
 
 				} );
+
+				/*
+				var loader = new THREE.BinaryLoader();
+				loader.load( "obj/veyron/VeyronNoUv_bin.js", function ( geometry ) {
+
+					var r = "textures/cube/Bridge2/";
+					var urls = [
+						r + "posx.jpg", r + "negx.jpg",
+						r + "posy.jpg", r + "negy.jpg",
+						r + "posz.jpg", r + "negz.jpg"
+					];
+
+					var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+					textureCube.format = THREE.RGBFormat;
+
+					var materials = [
+						// tires + inside
+						new THREE.MeshLambertMaterial( {
+							color: 0x050505
+						} ),
+						// wheels + extras chrome
+						new THREE.MeshLambertMaterial( {
+							color: 0xffffff,
+							envMap: textureCube
+						} ),
+						// back / top / front torso
+						new THREE.MeshLambertMaterial( {
+							color: 0x000000,
+							ambient: 0x000000,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.15
+						} ),
+						// glass
+						new THREE.MeshLambertMaterial( {
+							color: 0x101046,
+							envMap: textureCube,
+							opacity: 0.25,
+							transparent: true
+						} ),
+						// sides torso
+						new THREE.MeshLambertMaterial( {
+							color: 0xffffff,
+							envMap: textureCube
+						} ),
+						// engine
+						new THREE.MeshLambertMaterial( {
+							color: 0xffffff,
+							envMap: textureCube
+						} ),
+						// backlights
+						new THREE.MeshLambertMaterial( {
+							color: 0xff0000,
+							opacity: 0.5,
+							transparent: true
+						} ),
+						// backsignals
+						new THREE.MeshLambertMaterial( {
+							color: 0xffbb00,
+							opacity: 0.5,
+							transparent: true
+						} )
+					];
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+					object.position.y = 5;
+					object.rotation.y = Math.PI / 4;
+					object.scale.multiplyScalar( 0.1 );
+					scene.add( object );
+
+				} );
+				*/
 
 			}
 
