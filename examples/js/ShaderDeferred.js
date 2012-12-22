@@ -583,8 +583,8 @@ THREE.ShaderDeferred = {
 			"uniform float viewHeight;",
 			"uniform float viewWidth;",
 
-		    "uniform float lightAngle;"+
-			"uniform float lightIntensity;"+
+			"uniform float lightAngle;",
+			"uniform float lightIntensity;",
 			"uniform vec3 lightColor;",
 
 			"uniform mat4 matProjInverse;",
@@ -819,6 +819,146 @@ THREE.ShaderDeferred = {
 				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
 
 			"}"
+
+		].join("\n")
+
+	},
+
+	"areaLight" : {
+
+		uniforms: {
+
+			samplerNormalDepth: { type: "t", value: null },
+			samplerColor: 		{ type: "t", value: null },
+			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			matView: 		{ type: "m4", value: new THREE.Matrix4() },
+			viewWidth: 		{ type: "f", value: 800 },
+			viewHeight: 	{ type: "f", value: 600 },
+
+			lightPosition:  { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
+			lightIntensity: { type: "f", value: 1.0 },
+
+			lightRight:  { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
+			lightNormal: { type: "v3", value: new THREE.Vector3( 0, -1, 0 ) },
+
+			lightWidth: { type: "f", value: 1.0 },
+			lightHeight: { type: "f", value: 1.0 }
+
+		},
+
+		fragmentShader : [
+
+			"varying vec3 lightPosVS;",
+			"varying vec3 lightNormalVS;",
+			"varying vec3 lightRightVS;",
+
+			"uniform sampler2D samplerColor;",
+			"uniform sampler2D samplerNormalDepth;",
+
+			"uniform float lightWidth;",
+			"uniform float lightHeight;",
+
+			"uniform float lightIntensity;",
+			"uniform vec3 lightColor;",
+
+			"uniform float viewHeight;",
+			"uniform float viewWidth;",
+
+			"uniform mat4 matProjInverse;",
+
+			THREE.DeferredShaderChunk[ "unpackFloat" ],
+
+			"vec3 projectOnPlane( vec3 point, vec3 planeCenter, vec3 planeNorm ) {",
+
+				"return point - dot( point - planeCenter, planeNorm ) * planeNorm;",
+
+			"}",
+
+			"bool sideOfPlane( vec3 point, vec3 planeCenter, vec3 planeNorm ) {",
+
+				"return ( dot( point - planeCenter, planeNorm ) >= 0.0 );",
+
+			"}",
+
+			"vec3 linePlaneIntersect( vec3 lp, vec3 lv, vec3 pc, vec3 pn ) {",
+
+				"return lp + lv * ( dot( pn, pc - lp ) / dot( pn, lv ) );",
+
+			"}",
+
+			"float calculateAttenuation( float dist ) {",
+
+				"float constAtten = 1.5;",
+				"float linAtten = 0.5;",
+				"float quadAtten = 0.1;",
+				"return ( 1.0 / ( constAtten + linAtten * dist + quadAtten * dist * dist ) );",
+
+			"}",
+
+			"void main() {",
+
+				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+				THREE.DeferredShaderChunk[ "computeNormal" ],
+				THREE.DeferredShaderChunk[ "unpackColorMap" ],
+
+				"float w = lightWidth;",
+				"float h = lightHeight;",
+
+				"vec3 lightUpVS = normalize( cross( lightRightVS, lightNormalVS ) );",
+				"vec3 proj = projectOnPlane( vertexPositionVS.xyz, lightPosVS, lightNormalVS );",
+				"vec3 dir = proj - lightPosVS;",
+
+				"vec2 diagonal = vec2( dot( dir, lightRightVS ), dot( dir, lightUpVS ) );",
+				"vec2 nearest2D = vec2( clamp( diagonal.x, -w, w ), clamp( diagonal.y, -h, h ) );",
+				"vec3 nearestPointInside = vec3( lightPosVS ) + ( lightRightVS * nearest2D.x + lightUpVS * nearest2D.y );",
+
+				"float dist = distance( vertexPositionVS.xyz, nearestPointInside );",
+				"float attenuation = calculateAttenuation( dist );",
+
+				"vec3 lightDir = normalize( nearestPointInside - vertexPositionVS.xyz );",
+				"vec3 color = vec3( 0.0 );",
+
+				"float NdotL = dot( lightNormalVS, -lightDir );",
+
+				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPosVS, lightNormalVS ) ) {",
+
+					"color.xyz = vec3( lightColor * attenuation * NdotL * 1.5 );",
+
+				"} else {",
+
+					"color.xyz = vec3( 0.0 );",
+
+				"}",
+
+				"gl_FragColor = vec4( color, 1.0 );",
+
+			"}"
+
+		].join("\n"),
+
+		vertexShader : [
+
+		"varying vec3 lightPosVS;",
+		"varying vec3 lightNormalVS;",
+		"varying vec3 lightRightVS;",
+
+		"uniform vec3 lightPosition;",
+		"uniform vec3 lightNormal;",
+		"uniform vec3 lightRight;",
+
+		"uniform mat4 matView;",
+
+		"void main() {",
+
+			"vec4 pos = vec4( sign( position.xy ), 0.0, 1.0 );",
+			"gl_Position = pos;",
+
+			"lightNormalVS = normalize( mat3( matView ) * lightNormal );",
+			"lightRightVS = normalize( mat3( matView ) * lightRight ); ",
+			"lightPosVS = vec3( matView * vec4( lightPosition, 1.0 ) );",
+
+		 "}"
 
 		].join("\n")
 

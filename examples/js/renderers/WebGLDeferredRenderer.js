@@ -40,6 +40,9 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var positionVS = new THREE.Vector3();
 	var directionVS = new THREE.Vector3();
 
+	var right = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+
 	//
 
 	var geometryLightSphere = new THREE.SphereGeometry( 1, 16, 8 );
@@ -57,6 +60,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var spotLightShader = THREE.ShaderDeferred[ "spotLight" ];
 	var directionalLightShader = THREE.ShaderDeferred[ "directionalLight" ];
 	var hemisphereLightShader = THREE.ShaderDeferred[ "hemisphereLight" ];
+	var areaLightShader = THREE.ShaderDeferred[ "areaLight" ];
 
 	var compositeShader = THREE.ShaderDeferred[ "composite" ];
 
@@ -612,6 +616,80 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
+	var updateAreaLightProxy = function ( lightProxy ) {
+
+		var light = lightProxy.properties.originalLight;
+		var uniforms = lightProxy.material.uniforms;
+
+		uniforms[ "lightPosition" ].value.copy( light.matrixWorld.getPosition() );
+
+		var matrix = light.matrixWorld;
+
+		right.copy( light.right );
+		normal.copy( light.normal );
+		matrix.rotateAxis( right );
+		matrix.rotateAxis( normal );
+
+		uniforms[ "lightRight" ].value.copy( right );
+		uniforms[ "lightNormal" ].value.copy( normal );
+
+		uniforms[ "lightWidth" ].value = light.width;
+		uniforms[ "lightHeight" ].value = light.height;
+
+		// linear space colors
+
+		var intensity = light.intensity * light.intensity;
+
+		uniforms[ "lightIntensity" ].value = intensity;
+		uniforms[ "lightColor" ].value.copyGammaToLinear( light.color );
+
+	};
+
+	var createDeferredAreaLight = function ( light ) {
+
+		// setup light material
+
+		var uniforms = THREE.UniformsUtils.clone( areaLightShader.uniforms );
+
+		var materialLight = new THREE.ShaderMaterial( {
+
+			uniforms:       uniforms,
+			vertexShader:   areaLightShader.vertexShader,
+			fragmentShader: areaLightShader.fragmentShader,
+
+			blending:		THREE.AdditiveBlending,
+			depthWrite:		false,
+			depthTest:		false,
+			transparent:	true
+
+		} );
+
+		uniforms[ "viewWidth" ].value = scaledWidth;
+		uniforms[ "viewHeight" ].value = scaledHeight;
+
+		uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
+		uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+
+		// create light proxy mesh
+
+		var meshLight = new THREE.Mesh( geometryLightPlane, materialLight );
+
+		// keep reference for color and intensity updates
+
+		meshLight.properties.originalLight = light;
+
+		// keep reference for size reset
+
+		resizableMaterials.push( materialLight );
+
+		// sync proxy uniforms to the original light
+
+		updateAreaLightProxy( meshLight );
+
+		return meshLight;
+
+	};
+
 	var createDeferredEmissiveLight = function () {
 
 		// setup light material
@@ -652,32 +730,37 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.PointLight ) {
 
-			var meshLight = createDeferredPointLight( object );
+			var proxy = createDeferredPointLight( object );
 
 			if ( object.distance > 0 ) {
 
-				lightSceneProxy.add( meshLight );
+				lightSceneProxy.add( proxy );
 
 			} else {
 
-				lightSceneFullscreen.add( meshLight );
+				lightSceneFullscreen.add( proxy );
 
 			}
 
 		} else if ( object instanceof THREE.SpotLight ) {
 
-			var meshLight = createDeferredSpotLight( object );
-			lightSceneFullscreen.add( meshLight );
+			var proxy = createDeferredSpotLight( object );
+			lightSceneFullscreen.add( proxy );
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
-			var meshLight = createDeferredDirectionalLight( object );
-			lightSceneFullscreen.add( meshLight );
+			var proxy = createDeferredDirectionalLight( object );
+			lightSceneFullscreen.add( proxy );
 
 		} else if ( object instanceof THREE.HemisphereLight ) {
 
-			var meshLight = createDeferredHemisphereLight( object );
-			lightSceneFullscreen.add( meshLight );
+			var proxy = createDeferredHemisphereLight( object );
+			lightSceneFullscreen.add( proxy );
+
+		} else if ( object instanceof THREE.AreaLight ) {
+
+			var proxy = createDeferredAreaLight( object );
+			lightSceneFullscreen.add( proxy );
 
 		}
 
@@ -794,34 +877,38 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
-	function updateLightProxy ( lightProxy, camera ) {
+	function updateLightProxy ( proxy, camera ) {
 
-		var uniforms = lightProxy.material.uniforms;
+		var uniforms = proxy.material.uniforms;
 
 		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
 		if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = camera.matrixWorldInverse;
 
-		var originalLight = lightProxy.properties.originalLight;
+		var originalLight = proxy.properties.originalLight;
 
 		if ( originalLight ) {
 
-			lightProxy.visible = originalLight.visible;
+			proxy.visible = originalLight.visible;
 
 			if ( originalLight instanceof THREE.PointLight ) {
 
-				updatePointLightProxy( lightProxy );
+				updatePointLightProxy( proxy );
 
 			} else if ( originalLight instanceof THREE.SpotLight ) {
 
-				updateSpotLightProxy( lightProxy );
+				updateSpotLightProxy( proxy );
 
 			} else if ( originalLight instanceof THREE.DirectionalLight ) {
 
-				updateDirectionalLightProxy( lightProxy );
+				updateDirectionalLightProxy( proxy );
 
 			} else if ( originalLight instanceof THREE.HemisphereLight ) {
 
-				updateHemisphereLightProxy( lightProxy );
+				updateHemisphereLightProxy( proxy );
+
+			} else if ( originalLight instanceof THREE.AreaLight ) {
+
+				updateAreaLightProxy( proxy );
 
 			}
 
@@ -918,15 +1005,15 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		for ( var i = 0, il = lightSceneProxy.children.length; i < il; i ++ ) {
 
-			var lightProxy = lightSceneProxy.children[ i ];
-			updateLightProxy( lightProxy, camera );
+			var proxy = lightSceneProxy.children[ i ];
+			updateLightProxy( proxy, camera );
 
 		}
 
 		for ( var i = 0, il = lightSceneFullscreen.children.length; i < il; i ++ ) {
 
-			var lightProxy = lightSceneFullscreen.children[ i ];
-			updateLightProxy( lightProxy, camera );
+			var proxy = lightSceneFullscreen.children[ i ];
+			updateLightProxy( proxy, camera );
 
 		}
 

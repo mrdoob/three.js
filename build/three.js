@@ -7958,6 +7958,25 @@ THREE.AmbientLight = function ( hex ) {
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
 /**
+ * @author MPanknin / http://www.redplant.de/
+ */
+
+THREE.AreaLight = function ( hex ) {
+
+	THREE.Light.call( this, hex );
+
+	this.normal = new THREE.Vector3( 0, -1, 0 );
+	this.right = new THREE.Vector3( 1, 0, 0 );
+
+	this.intensity = 1.0;
+	this.width = 1.0;
+	this.height = 1.0;
+
+};
+
+THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
+
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
