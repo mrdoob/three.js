@@ -837,6 +837,7 @@ THREE.ShaderDeferred = {
 			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
 			lightNormalVS: 	 { type: "v3", value: new THREE.Vector3( 0, -1, 0 ) },
 			lightRightVS:  	 { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
+			lightUpVS:  	 { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
 
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
@@ -851,6 +852,7 @@ THREE.ShaderDeferred = {
 			"uniform vec3 lightPositionVS;",
 			"uniform vec3 lightNormalVS;",
 			"uniform vec3 lightRightVS;",
+			"uniform vec3 lightUpVS;",
 
 			"uniform sampler2D samplerColor;",
 			"uniform sampler2D samplerNormalDepth;",
@@ -904,7 +906,6 @@ THREE.ShaderDeferred = {
 				"float w = lightWidth;",
 				"float h = lightHeight;",
 
-				"vec3 lightUpVS = normalize( cross( lightRightVS, lightNormalVS ) );",
 				"vec3 proj = projectOnPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS );",
 				"vec3 dir = proj - lightPositionVS;",
 
@@ -912,23 +913,18 @@ THREE.ShaderDeferred = {
 				"vec2 nearest2D = vec2( clamp( diagonal.x, -w, w ), clamp( diagonal.y, -h, h ) );",
 				"vec3 nearestPointInside = vec3( lightPositionVS ) + ( lightRightVS * nearest2D.x + lightUpVS * nearest2D.y );",
 
-				"float dist = distance( vertexPositionVS.xyz, nearestPointInside );",
-				"float attenuation = calculateAttenuation( dist );",
-
 				"vec3 lightDir = normalize( nearestPointInside - vertexPositionVS.xyz );",
-
-				"vec3 diffuse = vec3( 0.0 );",
-				"vec3 specular = vec3( 0.0 );",
-
 				"float NdotL = dot( lightNormalVS, -lightDir );",
 
 				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS ) ) {",
 
 					// diffuse
 
-					"diffuse = lightColor * vec3( NdotL * 1.5 );",
+					"vec3 diffuse = vec3( NdotL );",
 
 					// specular
+
+					"vec3 specular = vec3( 0.0 );",
 
 					"vec3 R = reflect( normalize( -vertexPositionVS.xyz ), normal );",
 					"vec3 E = linePlaneIntersect( vertexPositionVS.xyz, R, vec3( lightPositionVS ), lightNormalVS );",
@@ -946,6 +942,9 @@ THREE.ShaderDeferred = {
 					"}",
 
 					// combine
+
+					"float dist = distance( vertexPositionVS.xyz, nearestPointInside );",
+					"float attenuation = calculateAttenuation( dist );",
 
 					THREE.DeferredShaderChunk[ "combine" ],
 

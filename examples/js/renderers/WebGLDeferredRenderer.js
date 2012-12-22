@@ -42,6 +42,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var rightVS = new THREE.Vector3();
 	var normalVS = new THREE.Vector3();
+	var upVS = new THREE.Vector3();
 
 	//
 
@@ -639,8 +640,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		viewMatrix.rotateAxis( rightVS );
 		viewMatrix.rotateAxis( normalVS );
 
+		upVS.cross( rightVS, normalVS );
+		upVS.normalize();
+
 		uniforms[ "lightRightVS" ].value.copy( rightVS );
 		uniforms[ "lightNormalVS" ].value.copy( normalVS );
+		uniforms[ "lightUpVS" ].value.copy( upVS );
 
 		uniforms[ "lightWidth" ].value = light.width;
 		uniforms[ "lightHeight" ].value = light.height;
