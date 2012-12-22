@@ -842,8 +842,12 @@ THREE.ShaderDeferred = {
 			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
 			lightIntensity: { type: "f", value: 1.0 },
 
-			lightWidth: { type: "f", value: 1.0 },
-			lightHeight: { type: "f", value: 1.0 }
+			lightWidth:  { type: "f", value: 1.0 },
+			lightHeight: { type: "f", value: 1.0 },
+
+			constantAttenuation:  { type: "f", value: 1.5 },
+			linearAttenuation:    { type: "f", value: 0.5 },
+			quadraticAttenuation: { type: "f", value: 0.1 }
 
 		},
 
@@ -859,6 +863,10 @@ THREE.ShaderDeferred = {
 
 			"uniform float lightWidth;",
 			"uniform float lightHeight;",
+
+			"uniform float constantAttenuation;",
+			"uniform float linearAttenuation;",
+			"uniform float quadraticAttenuation;",
 
 			"uniform float lightIntensity;",
 			"uniform vec3 lightColor;",
@@ -890,10 +898,7 @@ THREE.ShaderDeferred = {
 
 			"float calculateAttenuation( float dist ) {",
 
-				"float constAtten = 1.5;",
-				"float linAtten = 0.5;",
-				"float quadAtten = 0.1;",
-				"return ( 1.0 / ( constAtten + linAtten * dist + quadAtten * dist * dist ) );",
+				"return ( 1.0 / ( constantAttenuation + linearAttenuation * dist + quadraticAttenuation * dist * dist ) );",
 
 			"}",
 

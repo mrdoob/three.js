@@ -650,6 +650,10 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		uniforms[ "lightWidth" ].value = light.width;
 		uniforms[ "lightHeight" ].value = light.height;
 
+		uniforms[ "constantAttenuation" ].value = light.constantAttenuation;
+		uniforms[ "linearAttenuation" ].value = light.linearAttenuation;
+		uniforms[ "quadraticAttenuation" ].value = light.quadraticAttenuation;
+
 		// linear space colors
 
 		var intensity = light.intensity * light.intensity;

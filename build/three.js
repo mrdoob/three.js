@@ -7991,6 +7991,10 @@ THREE.AreaLight = function ( hex, intensity ) {
 	this.width = 1.0;
 	this.height = 1.0;
 
+	this.constantAttenuation = 1.5;
+	this.linearAttenuation = 0.5;
+	this.quadraticAttenuation = 0.1;
+
 };
 
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
