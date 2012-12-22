@@ -77,9 +77,8 @@ UI.Panel = function ( position ) {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'div' );
+	dom.className = 'Panel';
 	dom.style.position = position || 'relative';
-	dom.style.marginBottom = '10px';
-
 	dom.style.userSelect = 'none';
 	dom.style.WebkitUserSelect = 'none';
 	dom.style.MozUserSelect = 'none';
@@ -111,6 +110,7 @@ UI.Text = function ( position ) {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'span' );
+	dom.className = 'Text';
 	dom.style.position = position || 'relative';
 	dom.style.cursor = 'default';
 
@@ -140,6 +140,7 @@ UI.Input = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
+	dom.className = 'Input';
 	dom.style.position = position || 'relative';
 	dom.style.padding = '2px';
 	dom.style.marginTop = '-2px';
@@ -194,6 +195,7 @@ UI.Select = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'select' );
+	dom.className = 'Select';
 	dom.style.position = position || 'relative';
 	dom.style.width = '64px';
 	dom.style.height = '16px';
@@ -276,6 +278,7 @@ UI.FancySelect = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'div' );
+	dom.className = 'FancySelect';
 	dom.style.position = position || 'relative';
 	dom.style.background = '#fff';
 	dom.style.border = '1px solid #ccc';
@@ -398,8 +401,9 @@ UI.Checkbox = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
-	dom.type = 'checkbox';
+	dom.className = 'Checkbox';
 	dom.style.position = position || 'relative';
+	dom.type = 'checkbox';
 
 	this.dom = dom;
 
@@ -449,13 +453,14 @@ UI.Color = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
-	dom.type = 'color';
+	dom.className = 'Color';
 	dom.style.position = position || 'relative';
 	dom.style.width = '64px';
 	dom.style.height = '16px';
 	dom.style.border = '0px';
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
+	dom.type = 'color';
 
 	this.dom = dom;
 
@@ -519,6 +524,7 @@ UI.Number = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
+	dom.className = 'Number';
 	dom.style.position = position || 'relative';
 	dom.style.color = '#0080f0';
 	dom.style.fontSize = '12px';
@@ -679,6 +685,7 @@ UI.Break = function () {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'br' );
+	dom.className = 'Break';
 
 	this.dom = dom;
 
@@ -696,6 +703,7 @@ UI.HorizontalRule = function ( position ) {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'hr' );
+	dom.className = 'HorizontalRule';
 	dom.style.position = position || 'relative';
 
 	this.dom = dom;
@@ -716,6 +724,7 @@ UI.Button = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'button' );
+	dom.className = 'Button';
 	dom.style.position = position || 'relative';
 
 	this.dom = dom;

@@ -3,6 +3,10 @@
 	<head>
 		<title>three.js editor</title>
 		<style>
+			html, body {
+				height: 100%;
+			}
+
 			body {
 				font-family: Arial, sans-serif;
 				font-size: 14px;
@@ -53,6 +57,16 @@
 								color: #fff;
 								background-color: #08f;
 							}
+
+			.sidebar {
+				width: 300px;
+				background-color: #eee;
+				overflow: auto;
+			}
+
+				.sidebar .Panel {
+					margin-bottom: 10px;
+				}
 
 		</style>
 	</head>
@@ -125,8 +139,9 @@
 
 			var viewport = new Viewport( signals );
 			viewport.setTop( '32px' );
-			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
-			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			viewport.setLeft( '0px' );
+			viewport.setRight( '300px' );
+			viewport.setBottom( '0px' );
 			document.body.appendChild( viewport.dom );
 
 			var menubar = new Menubar( signals );
@@ -135,9 +150,9 @@
 			document.body.appendChild( menubar.dom );
 
 			var sidebar = new Sidebar( signals );
-			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			sidebar.setRight( '0px' );
 			sidebar.setTop( '32px' );
-			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			sidebar.setBottom( '0px' );
 			document.body.appendChild( sidebar.dom );
 
 			document.addEventListener( 'drop', function ( event ) {
