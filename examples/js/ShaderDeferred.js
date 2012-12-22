@@ -916,15 +916,21 @@ THREE.ShaderDeferred = {
 				"float attenuation = calculateAttenuation( dist );",
 
 				"vec3 lightDir = normalize( nearestPointInside - vertexPositionVS.xyz );",
-				"vec3 color = vec3( 0.0 );",
+				"vec3 diffuse = vec3( 0.0 );",
 
 				"float NdotL = dot( lightNormalVS, -lightDir );",
 
 				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS ) ) {",
 
-					"color.xyz = vec3( lightColor * attenuation * NdotL * 1.5 );",
+					"diffuse = vec3( lightColor * attenuation * NdotL * 1.5 );",
 
-					"gl_FragColor = vec4( color, 1.0 );",
+					//
+
+					"vec3 specular = vec3( 0.0 );",
+
+					"const float attenuation = 1.0;",
+
+					THREE.DeferredShaderChunk[ "combine" ],
 
 				"} else {",
 

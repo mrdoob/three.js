@@ -182,7 +182,7 @@
 
 			function initLights() {
 
-				var areaLight1 = new THREE.AreaLight( 0xffffff );
+				var areaLight1 = new THREE.AreaLight( 0xffffff, 1 );
 				areaLight1.position.set( 0.0001, 10.0001, -19.5001 );
 				areaLight1.rotation.set( -0.74719, 0.0001, 0.0001 );
 				areaLight1.width = 10;
@@ -195,7 +195,7 @@
 
 				//
 
-				var areaLight2 = new THREE.AreaLight( 0x00ff00 );
+				var areaLight2 = new THREE.AreaLight( 0x33ff66, 1.5 );
 				areaLight2.position.set( -19.0001, 3.0001, 0.0001 );
 				areaLight2.rotation.set( -1.5707, 0.0001, 1.5707 );
 				areaLight2.width = 8;
@@ -208,7 +208,7 @@
 
 				//
 
-				var areaLight3 = new THREE.AreaLight( 0x0000ff );
+				var areaLight3 = new THREE.AreaLight( 0x3366ff, 1.5 );
 				areaLight3.position.set( 19.0001, 3.0001, 0.0001 );
 				areaLight3.rotation.set( 1.5707, 0.0001, -1.5707 );
 				areaLight3.width = 8;
@@ -228,7 +228,7 @@
 				var loader = new THREE.BinaryLoader();
 				loader.load( "obj/box/box.js", function( geometry, materials ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( ) );
+					var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: 0xffaa55 } ) );
 					object.position.x = 0;
 					object.position.y = 0;
 					object.scale.multiplyScalar( 2 );
