@@ -228,7 +228,7 @@
 				var loader = new THREE.BinaryLoader();
 				loader.load( "obj/box/box.js", function( geometry, materials ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: 0xffaa55 } ) );
+					var object = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial( { color: 0xffaa55, specular: 0x888888, shininess: 100 } ) );
 					object.position.x = 0;
 					object.position.y = 0;
 					object.scale.multiplyScalar( 2 );

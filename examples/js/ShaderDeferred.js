@@ -916,19 +916,36 @@ THREE.ShaderDeferred = {
 				"float attenuation = calculateAttenuation( dist );",
 
 				"vec3 lightDir = normalize( nearestPointInside - vertexPositionVS.xyz );",
+
 				"vec3 diffuse = vec3( 0.0 );",
+				"vec3 specular = vec3( 0.0 );",
 
 				"float NdotL = dot( lightNormalVS, -lightDir );",
 
 				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS ) ) {",
 
-					"diffuse = vec3( lightColor * attenuation * NdotL * 1.5 );",
+					// diffuse
 
-					//
+					"diffuse = lightColor * vec3( NdotL * 1.5 );",
 
-					"vec3 specular = vec3( 0.0 );",
+					// specular
 
-					"const float attenuation = 1.0;",
+					"vec3 R = reflect( normalize( -vertexPositionVS.xyz ), normal );",
+					"vec3 E = linePlaneIntersect( vertexPositionVS.xyz, R, vec3( lightPositionVS ), lightNormalVS );",
+
+					"float specAngle = dot( R, lightNormalVS );",
+
+					"if ( specAngle > 0.0 ) {",
+
+						"vec3 dirSpec = E - vec3( lightPositionVS );",
+						"vec2 dirSpec2D = vec2( dot( dirSpec, lightRightVS ), dot( dirSpec, lightUpVS ) );",
+						"vec2 nearestSpec2D = vec2( clamp( dirSpec2D.x, -w, w ), clamp( dirSpec2D.y, -h, h ) );",
+						"float specFactor = 1.0 - clamp( length( nearestSpec2D - dirSpec2D ) * shininess, 0.0, 1.0 );",
+						"specular = specularColor * specFactor * specAngle;",
+
+					"}",
+
+					// combine
 
 					THREE.DeferredShaderChunk[ "combine" ],
 
