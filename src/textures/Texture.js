@@ -83,7 +83,7 @@ THREE.Texture.prototype = {
 
 		for ( var property in this ) {
 
-			delete this[ property ];
+			this[ property ] = null;
 
 		}
 

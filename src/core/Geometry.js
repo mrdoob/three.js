@@ -742,7 +742,7 @@ THREE.Geometry.prototype = {
 
 		for ( var property in this ) {
 
-			delete this[ property ];
+			this[ property ] = null;
 
 		}
 

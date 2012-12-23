@@ -122,7 +122,7 @@ THREE.Material.prototype.dispose = function () {
 
 	for ( var property in this ) {
 
-		delete this[ property ];
+		this[ property ] = null;
 
 	}
 
