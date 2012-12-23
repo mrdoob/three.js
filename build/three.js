@@ -638,6 +638,30 @@ THREE.Vector2.prototype = {
 
 	},
 
+
+    setComponent: function ( index, value ) {
+
+        switch( index ) {
+
+            case 0: this.x = value; break;
+            case 1: this.y = value; break;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
+
+    getComponent: function ( index ) {
+
+        switch( index ) {
+
+            case 0: return this.x;
+            case 1: return this.y;
+            default: throw new Error( "index is out of range: " + index );
+
+    	}
+    },
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -703,7 +727,7 @@ THREE.Vector2.prototype = {
 
 	divideScalar: function ( s ) {
 
-		if ( s ) {
+		if ( s !== 0 ) {
 
 			this.x /= s;
 			this.y /= s;
@@ -802,7 +826,7 @@ THREE.Vector2.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y );
 
 	},
 
@@ -827,7 +851,14 @@ THREE.Vector2.prototype = {
 
 	setLength: function ( l ) {
 
-		return this.normalize().multiplyScalar( l );
+		var oldLength = this.length();
+		
+		if ( oldLength !== 0 && l !== oldLength  ) {
+
+			this.multiplyScalar( l / oldLength );
+		}
+
+		return this;
 
 	},
 
@@ -852,8 +883,7 @@ THREE.Vector2.prototype = {
 
 	}
 
-};
-/**
+};/**
  * @author mrdoob / http://mrdoob.com/
  * @author *kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
@@ -908,6 +938,32 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+
+    setComponent: function ( index, value ) {
+
+        switch( index ) {
+
+            case 0: this.x = value; break;
+            case 1: this.y = value; break;
+            case 2: this.z = value; break;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
+
+    getComponent: function ( index ) {
+
+        switch( index ) {
+
+            case 0: return this.x;
+            case 1: return this.y;
+            case 2: return this.z;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
 
 	copy: function ( v ) {
 
@@ -1011,7 +1067,7 @@ THREE.Vector3.prototype = {
 
 	divideScalar: function ( s ) {
 
-		if ( s ) {
+		if ( s !== 0 ) {
 
 			this.x /= s;
 			this.y /= s;
@@ -1135,7 +1191,7 @@ THREE.Vector3.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
 
 	},
 
@@ -1153,7 +1209,14 @@ THREE.Vector3.prototype = {
 
 	setLength: function ( l ) {
 
-		return this.normalize().multiplyScalar( l );
+		var oldLength = this.length();
+		
+		if ( oldLength !== 0 && l !== oldLength  ) {
+
+			this.multiplyScalar( l / oldLength );
+		}
+
+		return this;
 
 	},
 
@@ -1426,8 +1489,7 @@ THREE.Vector3.prototype = {
 
 	}
 
-};
-/**
+};/**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
@@ -1490,6 +1552,34 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
+
+    setComponent: function ( index, value ) {
+
+        switch( index ) {
+
+            case 0: this.x = value; break;
+            case 1: this.y = value; break;
+            case 2: this.z = value; break;
+            case 3: this.w = value; break;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
+
+    getComponent: function ( index ) {
+
+        switch( index ) {
+
+            case 0: return this.x;
+            case 1: return this.y;
+            case 2: return this.z;
+            case 3: return this.w;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
 
 	copy: function ( v ) {
 
@@ -1570,7 +1660,7 @@ THREE.Vector4.prototype = {
 
 	divideScalar: function ( s ) {
 
-		if ( s ) {
+		if ( s !== 0 ) {
 
 			this.x /= s;
 			this.y /= s;
@@ -1712,13 +1802,13 @@ THREE.Vector4.prototype = {
 
 	lengthSq: function () {
 
-		return this.dot( this );
+		return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
 
 	},
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
 	},
 
@@ -1736,8 +1826,15 @@ THREE.Vector4.prototype = {
 
 	setLength: function ( l ) {
 
-		return this.normalize().multiplyScalar( l );
+		var oldLength = this.length();
+		
+		if ( oldLength !== 0 && l !== oldLength  ) {
 
+			this.multiplyScalar( l / oldLength );
+		}
+
+		return this;
+		
 	},
 
 	lerpSelf: function ( v, alpha ) {
@@ -1915,8 +2012,7 @@ THREE.Vector4.prototype = {
 
 	}
 
-};
-/**
+};/**
  * @author bhouston / http://exocortex.com
  */
 
@@ -4476,7 +4572,7 @@ THREE.Quaternion.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
 	},
 
@@ -5715,7 +5811,7 @@ THREE.Object3D.prototype = {
 
 		for ( var property in this ) {
 
-			delete this[ property ];
+			this[ property ] = null;
 
 		}
 
@@ -7204,7 +7300,7 @@ THREE.Geometry.prototype = {
 
 		for ( var property in this ) {
 
-			delete this[ property ];
+			this[ property ] = null;
 
 		}
 
@@ -11186,7 +11282,7 @@ THREE.Material.prototype.dispose = function () {
 
 	for ( var property in this ) {
 
-		delete this[ property ];
+		this[ property ] = null;
 
 	}
 
@@ -12196,7 +12292,7 @@ THREE.Texture.prototype = {
 
 		for ( var property in this ) {
 
-			delete this[ property ];
+			this[ property ] = null;
 
 		}
 
