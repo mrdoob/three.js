@@ -20,6 +20,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+	_devicePixelRatio = parameters.devicePixelRatio !== undefined
+				? parameters.devicePixelRatio
+				: window.devicePixelRatio !== undefined
+					? window.devicePixelRatio
+					: 1,
 
 	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
 	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
@@ -266,8 +271,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		_canvas.width = width;
-		_canvas.height = height;
+		_canvas.width = width * _devicePixelRatio;
+		_canvas.height = height * _devicePixelRatio;
+
+		_canvas.style.width = width + 'px';
+		_canvas.style.height = height + 'px';
 
 		this.setViewport( 0, 0, _canvas.width, _canvas.height );
 
