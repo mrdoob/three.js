@@ -69,6 +69,23 @@ test( "setX,setY,setZ,setW", function() {
 	ok( a.w == w, "Passed!" );
 });
 
+test( "setComponent,getComponent", function() {
+	var a = new THREE.Vector4();
+	ok( a.x == 0, "Passed!" );
+	ok( a.y == 0, "Passed!" );
+	ok( a.z == 0, "Passed!" );
+	ok( a.w == 1, "Passed!" );
+
+	a.setComponent( 0, 1 );
+	a.setComponent( 1, 2 );
+	a.setComponent( 2, 3 );
+	a.setComponent( 3, 4 );
+	ok( a.getComponent( 0 ) == 1, "Passed!" );
+	ok( a.getComponent( 1 ) == 2, "Passed!" );
+	ok( a.getComponent( 2 ) == 3, "Passed!" );
+	ok( a.getComponent( 3 ) == 4, "Passed!" );
+});
+
 test( "add", function() {
 	var a = new THREE.Vector4( x, y, z, w );
 	var b = new THREE.Vector4( -x, -y, -z, -w );
@@ -254,6 +271,11 @@ test( "setLength", function() {
 	ok( a.length() == x, "Passed!" );
 	a.setLength( y );
 	ok( a.length() == y, "Passed!" );
+
+	a = new THREE.Vector4( 0, 0, 0, 0 );
+	ok( a.length() == 0, "Passed!" );
+	a.setLength( y );
+	ok( a.length() == 0, "Passed!" );
 });
 
 test( "lerpSelf/clone", function() {
