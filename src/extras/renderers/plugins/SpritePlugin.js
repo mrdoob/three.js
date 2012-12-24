@@ -189,21 +189,27 @@ THREE.SpritePlugin = function ( ) {
 
 				_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 
-				if ( material.useScreenCoordinates ) {
+				if ( material.useScreenCoordinates === true ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
 					_gl.uniform3f(
 						uniforms.screenPosition,
-						( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
-						( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
+						( ( sprite.position.x * _renderer.devicePixelRatio ) - halfViewportWidth  ) / halfViewportWidth,
+						( halfViewportHeight - ( sprite.position.y * _renderer.devicePixelRatio ) ) / halfViewportHeight,
 						Math.max( 0, Math.min( 1, sprite.position.z ) )
 					);
+
+					scale[ 0 ] = _renderer.devicePixelRatio;
+					scale[ 1 ] = _renderer.devicePixelRatio;
 
 				} else {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
 					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
+
+					scale[ 0 ] = 1;
+					scale[ 1 ] = 1;
 
 				}
 
@@ -226,8 +232,8 @@ THREE.SpritePlugin = function ( ) {
 
 				size = 1 / ( material.scaleByViewport ? viewportHeight : 1 );
 
-				scale[ 0 ] = size * invAspect * sprite.scale.x;
-				scale[ 1 ] = size * sprite.scale.y;
+				scale[ 0 ] *= size * invAspect * sprite.scale.x
+				scale[ 1 ] *= size * sprite.scale.y;
 
 				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
 				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );

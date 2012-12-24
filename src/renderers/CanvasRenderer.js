@@ -19,12 +19,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
 	_context = _canvas.getContext( '2d' ),
 
-	_devicePixelRatio = parameters.devicePixelRatio !== undefined
-				? parameters.devicePixelRatio
-				: window.devicePixelRatio !== undefined
-					? window.devicePixelRatio
-					: 1,
-
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearOpacity = 0,
 
@@ -95,6 +89,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 
+	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
+				? parameters.devicePixelRatio
+				: window.devicePixelRatio !== undefined
+					? window.devicePixelRatio
+					: 1;
+
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
@@ -112,8 +112,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		_canvasWidth = width * _devicePixelRatio;
-		_canvasHeight = height * _devicePixelRatio;
+		_canvasWidth = width * this.devicePixelRatio;
+		_canvasHeight = height * this.devicePixelRatio;
 
 		_canvasWidthHalf = Math.floor( _canvasWidth / 2 );
 		_canvasHeightHalf = Math.floor( _canvasHeight / 2 );
