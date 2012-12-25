@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '54dev' };
+var THREE = THREE || { REVISION: '54' };
 
 self.console = self.console || {
 
@@ -5805,16 +5805,6 @@ THREE.Object3D.prototype = {
 
 		return object;
 
-	},
-
-	dispose: function () {
-
-		for ( var property in this ) {
-
-			this[ property ] = null;
-
-		}
-
 	}
 
 };
@@ -7297,12 +7287,6 @@ THREE.Geometry.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
-
-		for ( var property in this ) {
-
-			this[ property ] = null;
-
-		}
 
 	}
 
@@ -11280,12 +11264,6 @@ THREE.Material.prototype.dispose = function () {
 
 	this.dispatchEvent( { type: 'dispose' } );
 
-	for ( var property in this ) {
-
-		this[ property ] = null;
-
-	}
-
 };
 
 THREE.MaterialIdCount = 0;
@@ -12289,12 +12267,6 @@ THREE.Texture.prototype = {
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
-
-		for ( var property in this ) {
-
-			this[ property ] = null;
-
-		}
 
 	}
 
