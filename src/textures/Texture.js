@@ -81,12 +81,6 @@ THREE.Texture.prototype = {
 
 		this.dispatchEvent( { type: 'dispose' } );
 
-		for ( var property in this ) {
-
-			this[ property ] = null;
-
-		}
-
 	}
 
 };
