@@ -26,7 +26,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 		var pt = new THREE.Vector3(
 			radius * Math.sin( theta ),
 			0,
-			radius * Math.cos( theta )
+			- radius * Math.cos( theta )
 		);
 
 		points.push( pt );
