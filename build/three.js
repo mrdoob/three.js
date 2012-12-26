@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '54dev' };
+var THREE = THREE || { REVISION: '54' };
 
 self.console = self.console || {
 
@@ -638,6 +638,30 @@ THREE.Vector2.prototype = {
 
 	},
 
+
+    setComponent: function ( index, value ) {
+
+        switch( index ) {
+
+            case 0: this.x = value; break;
+            case 1: this.y = value; break;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
+
+    getComponent: function ( index ) {
+
+        switch( index ) {
+
+            case 0: return this.x;
+            case 1: return this.y;
+            default: throw new Error( "index is out of range: " + index );
+
+    	}
+    },
+
 	copy: function ( v ) {
 
 		this.x = v.x;
@@ -703,7 +727,7 @@ THREE.Vector2.prototype = {
 
 	divideScalar: function ( s ) {
 
-		if ( s ) {
+		if ( s !== 0 ) {
 
 			this.x /= s;
 			this.y /= s;
@@ -802,7 +826,7 @@ THREE.Vector2.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y );
 
 	},
 
@@ -827,7 +851,14 @@ THREE.Vector2.prototype = {
 
 	setLength: function ( l ) {
 
-		return this.normalize().multiplyScalar( l );
+		var oldLength = this.length();
+		
+		if ( oldLength !== 0 && l !== oldLength  ) {
+
+			this.multiplyScalar( l / oldLength );
+		}
+
+		return this;
 
 	},
 
@@ -852,8 +883,7 @@ THREE.Vector2.prototype = {
 
 	}
 
-};
-/**
+};/**
  * @author mrdoob / http://mrdoob.com/
  * @author *kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
@@ -908,6 +938,32 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+
+    setComponent: function ( index, value ) {
+
+        switch( index ) {
+
+            case 0: this.x = value; break;
+            case 1: this.y = value; break;
+            case 2: this.z = value; break;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
+
+    getComponent: function ( index ) {
+
+        switch( index ) {
+
+            case 0: return this.x;
+            case 1: return this.y;
+            case 2: return this.z;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
 
 	copy: function ( v ) {
 
@@ -1011,7 +1067,7 @@ THREE.Vector3.prototype = {
 
 	divideScalar: function ( s ) {
 
-		if ( s ) {
+		if ( s !== 0 ) {
 
 			this.x /= s;
 			this.y /= s;
@@ -1135,7 +1191,7 @@ THREE.Vector3.prototype = {
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
 
 	},
 
@@ -1153,7 +1209,14 @@ THREE.Vector3.prototype = {
 
 	setLength: function ( l ) {
 
-		return this.normalize().multiplyScalar( l );
+		var oldLength = this.length();
+		
+		if ( oldLength !== 0 && l !== oldLength  ) {
+
+			this.multiplyScalar( l / oldLength );
+		}
+
+		return this;
 
 	},
 
@@ -1426,8 +1489,7 @@ THREE.Vector3.prototype = {
 
 	}
 
-};
-/**
+};/**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
@@ -1490,6 +1552,34 @@ THREE.Vector4.prototype = {
 		return this;
 
 	},
+
+    setComponent: function ( index, value ) {
+
+        switch( index ) {
+
+            case 0: this.x = value; break;
+            case 1: this.y = value; break;
+            case 2: this.z = value; break;
+            case 3: this.w = value; break;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
+
+    getComponent: function ( index ) {
+
+        switch( index ) {
+
+            case 0: return this.x;
+            case 1: return this.y;
+            case 2: return this.z;
+            case 3: return this.w;
+            default: throw new Error( "index is out of range: " + index );
+
+        }
+
+    },
 
 	copy: function ( v ) {
 
@@ -1570,7 +1660,7 @@ THREE.Vector4.prototype = {
 
 	divideScalar: function ( s ) {
 
-		if ( s ) {
+		if ( s !== 0 ) {
 
 			this.x /= s;
 			this.y /= s;
@@ -1712,13 +1802,13 @@ THREE.Vector4.prototype = {
 
 	lengthSq: function () {
 
-		return this.dot( this );
+		return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
 
 	},
 
 	length: function () {
 
-		return Math.sqrt( this.lengthSq() );
+		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
 	},
 
@@ -1736,8 +1826,15 @@ THREE.Vector4.prototype = {
 
 	setLength: function ( l ) {
 
-		return this.normalize().multiplyScalar( l );
+		var oldLength = this.length();
+		
+		if ( oldLength !== 0 && l !== oldLength  ) {
 
+			this.multiplyScalar( l / oldLength );
+		}
+
+		return this;
+		
 	},
 
 	lerpSelf: function ( v, alpha ) {
@@ -1915,8 +2012,7 @@ THREE.Vector4.prototype = {
 
 	}
 
-};
-/**
+};/**
  * @author bhouston / http://exocortex.com
  */
 
@@ -2398,6 +2494,17 @@ THREE.Box3.prototype = {
 
 	},
 
+	getBoundingSphere: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Sphere();
+		
+		result.center = this.center();
+		result.radius = this.size( THREE.Box3.__v0 ).length() * 0.5;;
+
+		return result;
+
+	},
+
 	intersect: function ( box ) {
 
 		this.min.maxSelf( box.min );
@@ -2663,6 +2770,143 @@ THREE.Matrix4.prototype = {
 			me[3], me[7], me[11], me[15]
 
 		);
+
+		return this;
+
+	},
+
+	setRotationFromEuler: function ( v, order ) {
+
+		var te = this.elements;
+
+		var x = v.x, y = v.y, z = v.z;
+		var a = Math.cos( x ), b = Math.sin( x );
+		var c = Math.cos( y ), d = Math.sin( y );
+		var e = Math.cos( z ), f = Math.sin( z );
+
+		if ( order === undefined || order === 'XYZ' ) {
+
+			var ae = a * e, af = a * f, be = b * e, bf = b * f;
+
+			te[0] = c * e;
+			te[4] = - c * f;
+			te[8] = d;
+
+			te[1] = af + be * d;
+			te[5] = ae - bf * d;
+			te[9] = - b * c;
+
+			te[2] = bf - ae * d;
+			te[6] = be + af * d;
+			te[10] = a * c;
+
+		} else if ( order === 'YXZ' ) {
+
+			var ce = c * e, cf = c * f, de = d * e, df = d * f;
+
+			te[0] = ce + df * b;
+			te[4] = de * b - cf;
+			te[8] = a * d;
+
+			te[1] = a * f;
+			te[5] = a * e;
+			te[9] = - b;
+
+			te[2] = cf * b - de;
+			te[6] = df + ce * b;
+			te[10] = a * c;
+
+		} else if ( order === 'ZXY' ) {
+
+			var ce = c * e, cf = c * f, de = d * e, df = d * f;
+
+			te[0] = ce - df * b;
+			te[4] = - a * f;
+			te[8] = de + cf * b;
+
+			te[1] = cf + de * b;
+			te[5] = a * e;
+			te[9] = df - ce * b;
+
+			te[2] = - a * d;
+			te[6] = b;
+			te[10] = a * c;
+
+		} else if ( order === 'ZYX' ) {
+
+			var ae = a * e, af = a * f, be = b * e, bf = b * f;
+
+			te[0] = c * e;
+			te[4] = be * d - af;
+			te[8] = ae * d + bf;
+
+			te[1] = c * f;
+			te[5] = bf * d + ae;
+			te[9] = af * d - be;
+
+			te[2] = - d;
+			te[6] = b * c;
+			te[10] = a * c;
+
+		} else if ( order === 'YZX' ) {
+
+			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+
+			te[0] = c * e;
+			te[4] = bd - ac * f;
+			te[8] = bc * f + ad;
+
+			te[1] = f;
+			te[5] = a * e;
+			te[9] = - b * e;
+
+			te[2] = - d * e;
+			te[6] = ad * f + bc;
+			te[10] = ac - bd * f;
+
+		} else if ( order === 'XZY' ) {
+
+			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+
+			te[0] = c * e;
+			te[4] = - f;
+			te[8] = d * e;
+
+			te[1] = ac * f + bd;
+			te[5] = a * e;
+			te[9] = ad * f - bc;
+
+			te[2] = bc * f - ad;
+			te[6] = b * e;
+			te[10] = bd * f + ac;
+
+		}
+
+		return this;
+
+	},
+
+	setRotationFromQuaternion: function ( q ) {
+
+		var te = this.elements;
+
+		var x = q.x, y = q.y, z = q.z, w = q.w;
+		var x2 = x + x, y2 = y + y, z2 = z + z;
+		var xx = x * x2, xy = x * y2, xz = x * z2;
+		var yy = y * y2, yz = y * z2, zz = z * z2;
+		var wx = w * x2, wy = w * y2, wz = w * z2;
+
+		te[0] = 1 - ( yy + zz );
+		te[4] = xy - wz;
+		te[8] = xz + wy;
+
+		te[1] = xy + wz;
+		te[5] = 1 - ( xx + zz );
+		te[9] = yz - wx;
+
+		te[2] = xz - wy;
+		te[6] = yz + wx;
+		te[10] = 1 - ( xx + yy );
 
 		return this;
 
@@ -3029,144 +3273,6 @@ THREE.Matrix4.prototype = {
 		te[11] = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
 		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
 		this.multiplyScalar( 1 / m.determinant() );
-
-		return this;
-
-	},
-
-	setRotationFromEuler: function ( v, order ) {
-
-		var te = this.elements;
-
-		var x = v.x, y = v.y, z = v.z;
-		var a = Math.cos( x ), b = Math.sin( x );
-		var c = Math.cos( y ), d = Math.sin( y );
-		var e = Math.cos( z ), f = Math.sin( z );
-
-		if ( order === undefined || order === 'XYZ' ) {
-
-			var ae = a * e, af = a * f, be = b * e, bf = b * f;
-
-			te[0] = c * e;
-			te[4] = - c * f;
-			te[8] = d;
-
-			te[1] = af + be * d;
-			te[5] = ae - bf * d;
-			te[9] = - b * c;
-
-			te[2] = bf - ae * d;
-			te[6] = be + af * d;
-			te[10] = a * c;
-
-		} else if ( order === 'YXZ' ) {
-
-			var ce = c * e, cf = c * f, de = d * e, df = d * f;
-
-			te[0] = ce + df * b;
-			te[4] = de * b - cf;
-			te[8] = a * d;
-
-			te[1] = a * f;
-			te[5] = a * e;
-			te[9] = - b;
-
-			te[2] = cf * b - de;
-			te[6] = df + ce * b;
-			te[10] = a * c;
-
-		} else if ( order === 'ZXY' ) {
-
-			var ce = c * e, cf = c * f, de = d * e, df = d * f;
-
-			te[0] = ce - df * b;
-			te[4] = - a * f;
-			te[8] = de + cf * b;
-
-			te[1] = cf + de * b;
-			te[5] = a * e;
-			te[9] = df - ce * b;
-
-			te[2] = - a * d;
-			te[6] = b;
-			te[10] = a * c;
-
-		} else if ( order === 'ZYX' ) {
-
-			var ae = a * e, af = a * f, be = b * e, bf = b * f;
-
-			te[0] = c * e;
-			te[4] = be * d - af;
-			te[8] = ae * d + bf;
-
-			te[1] = c * f;
-			te[5] = bf * d + ae;
-			te[9] = af * d - be;
-
-			te[2] = - d;
-			te[6] = b * c;
-			te[10] = a * c;
-
-		} else if ( order === 'YZX' ) {
-
-			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
-
-			te[0] = c * e;
-			te[4] = bd - ac * f;
-			te[8] = bc * f + ad;
-
-			te[1] = f;
-			te[5] = a * e;
-			te[9] = - b * e;
-
-			te[2] = - d * e;
-			te[6] = ad * f + bc;
-			te[10] = ac - bd * f;
-
-		} else if ( order === 'XZY' ) {
-
-			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
-
-			te[0] = c * e;
-			te[4] = - f;
-			te[8] = d * e;
-
-			te[1] = ac * f + bd;
-			te[5] = a * e;
-			te[9] = ad * f - bc;
-
-			te[2] = bc * f - ad;
-			te[6] = b * e;
-			te[10] = bd * f + ac;
-
-		}
-
-		return this;
-
-	},
-
-
-	setRotationFromQuaternion: function ( q ) {
-
-		var te = this.elements;
-
-		var x = q.x, y = q.y, z = q.z, w = q.w;
-		var x2 = x + x, y2 = y + y, z2 = z + z;
-		var xx = x * x2, xy = x * y2, xz = x * z2;
-		var yy = y * y2, yz = y * z2, zz = z * z2;
-		var wx = w * x2, wy = w * y2, wz = w * z2;
-
-		te[0] = 1 - ( yy + zz );
-		te[4] = xy - wz;
-		te[8] = xz + wy;
-
-		te[1] = xy + wz;
-		te[5] = 1 - ( xx + zz );
-		te[9] = yz - wx;
-
-		te[2] = xz - wy;
-		te[6] = yz + wx;
-		te[10] = 1 - ( xx + yy );
 
 		return this;
 
@@ -3608,7 +3714,7 @@ THREE.Matrix4.prototype = {
 
 	makePerspective: function ( fov, aspect, near, far ) {
 
-		var ymax = near * Math.tan( fov * Math.PI / 360 );
+		var ymax = near * Math.tan( THREE.Math.degToRad( fov * 0.5 ) );
 		var ymin = - ymax;
 		var xmin = ymin * aspect;
 		var xmax = ymax * aspect;
@@ -4137,7 +4243,7 @@ THREE.Sphere.prototype = {
 
 	},
 
-	bounds: function ( optionalTarget ) {
+	getBoundingBox: function ( optionalTarget ) {
 
 		var box = optionalTarget || new THREE.Box3();
 
@@ -4247,13 +4353,13 @@ THREE.Math = {
 
 	},
 
-	degreesToRadians: function ( degrees ) {
+	degToRad: function ( degrees ) {
 
 		return degrees * THREE.Math.__d2r;
 
 	},
 
-	radiansToDegrees: function ( radians ) {
+	radToDeg: function ( radians ) {
 
 		return radians * THREE.Math.__r2d;
 
@@ -4267,6 +4373,7 @@ THREE.Math.__r2d =  180 / Math.PI;
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Quaternion = function( x, y, z, w ) {
@@ -4457,6 +4564,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	lengthSq: function () {
+
+		return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
+
+	},
+
 	length: function () {
 
 		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
@@ -4465,7 +4578,7 @@ THREE.Quaternion.prototype = {
 
 	normalize: function () {
 
-		var l = Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
+		var l = this.length();
 
 		if ( l === 0 ) {
 
@@ -4491,21 +4604,14 @@ THREE.Quaternion.prototype = {
 
 	multiply: function ( a, b ) {
 
-		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
-		var qax = a.x, qay = a.y, qaz = a.z, qaw = a.w,
-		qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
-
-		this.x =  qax * qbw + qay * qbz - qaz * qby + qaw * qbx;
-		this.y = -qax * qbz + qay * qbw + qaz * qbx + qaw * qby;
-		this.z =  qax * qby - qay * qbx + qaz * qbw + qaw * qbz;
-		this.w = -qax * qbx - qay * qby - qaz * qbz + qaw * qbw;
-
-		return this;
+		this.copy( a );
+		return this.multiplySelf( b );
 
 	},
 
 	multiplySelf: function ( b ) {
 
+		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 		var qax = this.x, qay = this.y, qaz = this.z, qaw = this.w,
 		qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
 
@@ -4602,6 +4708,12 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	equals: function ( v ) {
+
+		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+
+	},
+
 	clone: function () {
 
 		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
@@ -4612,59 +4724,7 @@ THREE.Quaternion.prototype = {
 
 THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
-	// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
-
-	var cosHalfTheta = qa.w * qb.w + qa.x * qb.x + qa.y * qb.y + qa.z * qb.z;
-
-	if ( cosHalfTheta < 0 ) {
-
-		qm.w = -qb.w;
-		qm.x = -qb.x;
-		qm.y = -qb.y;
-		qm.z = -qb.z;
-
-		cosHalfTheta = -cosHalfTheta;
-
-	} else {
-
-		qm.copy( qb );
-
-	}
-
-	if ( Math.abs( cosHalfTheta ) >= 1.0 ) {
-
-		qm.w = qa.w;
-		qm.x = qa.x;
-		qm.y = qa.y;
-		qm.z = qa.z;
-
-		return qm;
-
-	}
-
-	var halfTheta = Math.acos( cosHalfTheta );
-	var sinHalfTheta = Math.sqrt( 1.0 - cosHalfTheta * cosHalfTheta );
-
-	if ( Math.abs( sinHalfTheta ) < 0.001 ) {
-
-		qm.w = 0.5 * ( qa.w + qm.w );
-		qm.x = 0.5 * ( qa.x + qm.x );
-		qm.y = 0.5 * ( qa.y + qm.y );
-		qm.z = 0.5 * ( qa.z + qm.z );
-
-		return qm;
-
-	}
-
-	var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta;
-	var ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
-
-	qm.w = ( qa.w * ratioA + qm.w * ratioB );
-	qm.x = ( qa.x * ratioA + qm.x * ratioB );
-	qm.y = ( qa.y * ratioA + qm.y * ratioB );
-	qm.z = ( qa.z * ratioA + qm.z * ratioB );
-
-	return qm;
+	return qm.copy( qa ).slerpSelf( qb, t );
 
 }
 /**
@@ -5144,7 +5204,7 @@ THREE.EventDispatcher = function () {
 		var listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
-			
+
 			event.target = this;
 
 			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
@@ -5157,7 +5217,8 @@ THREE.EventDispatcher = function () {
 
 	};
 
-};/**
+};
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
  */
@@ -7884,7 +7945,7 @@ THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight 
 
 	if ( frameHeight === undefined ) frameHeight = 24;
 
-	this.fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
+	this.fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
 	this.updateProjectionMatrix();
 
 }
@@ -7945,7 +8006,7 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 	if ( this.fullWidth ) {
 
 		var aspect = this.fullWidth / this.fullHeight;
-		var top = Math.tan( this.fov * Math.PI / 360 ) * this.near;
+		var top = Math.tan( THREE.Math.degToRad( this.fov * 0.5 ) ) * this.near;
 		var bottom = -top;
 		var left = aspect * bottom;
 		var right = aspect * top;
@@ -7993,6 +8054,31 @@ THREE.AmbientLight = function ( hex ) {
 };
 
 THREE.AmbientLight.prototype = Object.create( THREE.Light.prototype );
+/**
+ * @author MPanknin / http://www.redplant.de/
+ * @author alteredq / http://alteredqualia.com/
+ */
+
+THREE.AreaLight = function ( hex, intensity ) {
+
+	THREE.Light.call( this, hex );
+
+	this.normal = new THREE.Vector3( 0, -1, 0 );
+	this.right = new THREE.Vector3( 1, 0, 0 );
+
+	this.intensity = ( intensity !== undefined ) ? intensity : 1;
+
+	this.width = 1.0;
+	this.height = 1.0;
+
+	this.constantAttenuation = 1.5;
+	this.linearAttenuation = 0.5;
+	this.quadraticAttenuation = 0.1;
+
+};
+
+THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -10088,10 +10174,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 						mat = objJSON.matrix;
 						quat = objJSON.quaternion;
 
-						// turn off quaternions, for the moment
-
-						quat = 0;
-
 						// use materials from the model file
 						// if there is no material specified in the object
 
@@ -10281,10 +10363,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					rot = objJSON.rotation;
 					scl = objJSON.scale;
 					quat = objJSON.quaternion;
-
-					// turn off quaternions, for the moment
-
-					quat = 0;
 
 					object = new THREE.Object3D();
 					object.name = objID;
@@ -13239,7 +13317,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
 
-	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	_canvas = parameters.canvas !== undefined
+			? parameters.canvas
+			: document.createElement( 'canvas' ),
 
 	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
 	_context = _canvas.getContext( '2d' ),
@@ -13314,6 +13394,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 
+	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
+				? parameters.devicePixelRatio
+				: window.devicePixelRatio !== undefined
+					? window.devicePixelRatio
+					: 1;
+
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
@@ -13331,13 +13417,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		_canvasWidth = width;
-		_canvasHeight = height;
+		_canvasWidth = width * this.devicePixelRatio;
+		_canvasHeight = height * this.devicePixelRatio;
+
 		_canvasWidthHalf = Math.floor( _canvasWidth / 2 );
 		_canvasHeightHalf = Math.floor( _canvasHeight / 2 );
 
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
+
+		_canvas.style.width = width + 'px';
+		_canvas.style.height = height + 'px';
 
 		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
 		_clipBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
@@ -13422,11 +13512,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		var e, el, element, material;
+		if ( this.autoClear === true ) {
 
-		this.autoClear === true
-			? this.clear()
-			: _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+			this.clear();
+
+		}
+
+		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
@@ -13448,11 +13540,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		for ( e = 0, el = _elements.length; e < el; e++ ) {
+		for ( var e = 0, el = _elements.length; e < el; e++ ) {
 
-			element = _elements[ e ];
+			var element = _elements[ e ];
 
-			material = element.material;
+			var material = element.material;
 
 			if ( material === undefined || material.visible === false ) continue;
 
@@ -17011,6 +17103,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.context = null;
+	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
+				? parameters.devicePixelRatio
+				: window.devicePixelRatio !== undefined
+					? window.devicePixelRatio
+					: 1;
 
 	// clearing
 
@@ -17249,8 +17346,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		_canvas.width = width;
-		_canvas.height = height;
+		_canvas.width = width * this.devicePixelRatio;
+		_canvas.height = height * this.devicePixelRatio;
+
+		_canvas.style.width = width + 'px';
+		_canvas.style.height = height + 'px';
 
 		this.setViewport( 0, 0, _canvas.width, _canvas.height );
 
@@ -25644,7 +25744,21 @@ THREE.GeometryUtils = {
 		geometry.faces = faces;
 		geometry.faceVertexUvs = faceVertexUvs;
 
-	}
+	},
+	
+	setMaterialIndex: function ( geometry, index, startFace, endFace ){
+		
+		var faces = geometry.faces;
+		var start = startFace || 0;
+		var end = endFace || faces.length - 1;
+		
+		for ( var i = start; i <= end; i ++ ) {
+		
+			faces[i].materialIndex = index;
+
+		}
+		
+    }
 
 };
 
@@ -30998,7 +31112,7 @@ THREE.CombinedCamera.prototype.setLens = function ( focalLength, frameHeight ) {
 
 	if ( frameHeight === undefined ) frameHeight = 24;
 
-	var fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
+	var fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
 
 	this.setFov( fov );
 
@@ -35751,21 +35865,27 @@ THREE.SpritePlugin = function ( ) {
 
 				_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
 
-				if ( material.useScreenCoordinates ) {
+				if ( material.useScreenCoordinates === true ) {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
 					_gl.uniform3f(
 						uniforms.screenPosition,
-						( sprite.position.x - halfViewportWidth  ) / halfViewportWidth,
-						( halfViewportHeight - sprite.position.y ) / halfViewportHeight,
+						( ( sprite.position.x * _renderer.devicePixelRatio ) - halfViewportWidth  ) / halfViewportWidth,
+						( halfViewportHeight - ( sprite.position.y * _renderer.devicePixelRatio ) ) / halfViewportHeight,
 						Math.max( 0, Math.min( 1, sprite.position.z ) )
 					);
+
+					scale[ 0 ] = _renderer.devicePixelRatio;
+					scale[ 1 ] = _renderer.devicePixelRatio;
 
 				} else {
 
 					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
 					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
+
+					scale[ 0 ] = 1;
+					scale[ 1 ] = 1;
 
 				}
 
@@ -35788,8 +35908,8 @@ THREE.SpritePlugin = function ( ) {
 
 				size = 1 / ( material.scaleByViewport ? viewportHeight : 1 );
 
-				scale[ 0 ] = size * invAspect * sprite.scale.x;
-				scale[ 1 ] = size * sprite.scale.y;
+				scale[ 0 ] *= size * invAspect * sprite.scale.x
+				scale[ 1 ] *= size * sprite.scale.y;
 
 				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
 				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
@@ -35854,7 +35974,8 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-};/**
+};
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 

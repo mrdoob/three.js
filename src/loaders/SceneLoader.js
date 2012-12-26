@@ -244,10 +244,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 						mat = objJSON.matrix;
 						quat = objJSON.quaternion;
 
-						// turn off quaternions, for the moment
-
-						quat = 0;
-
 						// use materials from the model file
 						// if there is no material specified in the object
 
@@ -437,10 +433,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					rot = objJSON.rotation;
 					scl = objJSON.scale;
 					quat = objJSON.quaternion;
-
-					// turn off quaternions, for the moment
-
-					quat = 0;
 
 					object = new THREE.Object3D();
 					object.name = objID;

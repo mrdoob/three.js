@@ -67,6 +67,8 @@ DEFAULTS = {
  }
 }
 
+ROTATE_X_PI2 = mathutils.Quaternion((1.0, 0.0, 0.0), math.radians(-90.0)).to_matrix().to_4x4()
+
 # default colors for debugging (each material gets one distinct color):
 # white, red, green, blue, yellow, cyan, magenta
 COLORS = [0xeeeeee, 0xee0000, 0x00ee00, 0x0000ee, 0xeeee00, 0x00eeee, 0xee00ee]
@@ -86,7 +88,7 @@ TEMPLATE_SCENE_ASCII = """\
 "metadata" :
 {
 	"formatVersion" : 3.2,
-	"type" 			: "scene",
+	"type"          : "scene",
 	"sourceFile"    : "%(fname)s",
 	"generatedBy"   : "Blender 2.65 Exporter",
 	"objects"       : %(nobjects)s,
@@ -1565,6 +1567,9 @@ def export_mesh(objects,
 # Scene exporter - render elements
 # #####################################################
 
+def generate_quat(quat):
+    return TEMPLATE_VEC4 % (quat.x, quat.y, quat.z, quat.w)
+
 def generate_vec4(vec):
     return TEMPLATE_VEC4 % (vec[0], vec[1], vec[2], vec[3])
 
@@ -1634,8 +1639,13 @@ def generate_objects(data):
             material_ids = generate_material_id_list(obj.material_slots)
             group_ids = generate_group_id_list(obj)
 
-            position, quaternion, scale = obj.matrix_world.decompose()
-            rotation = quaternion.to_euler("XYZ")
+            if data["flipyz"]:
+                matrix_world = ROTATE_X_PI2 * obj.matrix_world
+            else:
+                matrix_world = obj.matrix_world
+
+            position, quaternion, scale = matrix_world.decompose()
+            rotation = quaternion.to_euler("ZYX")
 
             # use empty material string for multi-material objects
             # this will trigger use of MeshFaceMaterial in SceneLoader
@@ -1664,7 +1674,7 @@ def generate_objects(data):
 
             "position"    : generate_vec3(position),
             "rotation"    : generate_vec3(rotation),
-            "quaternion"  : generate_vec4(quaternion),
+            "quaternion"  : generate_quat(quaternion),
             "scale"       : generate_vec3(scale),
 
             "castShadow"  : generate_bool_property(castShadow),
@@ -1679,8 +1689,13 @@ def generate_objects(data):
             object_id = obj.name
             group_ids = generate_group_id_list(obj)
 
-            position, quaternion, scale = obj.matrix_world.decompose()
-            rotation = quaternion.to_euler("XYZ")
+            if data["flipyz"]:
+                matrix_world = ROTATE_X_PI2 * obj.matrix_world
+            else:
+                matrix_world = obj.matrix_world
+
+            position, quaternion, scale = matrix_world.decompose()
+            rotation = quaternion.to_euler("ZYX")
 
             group_string = ""
             if len(group_ids) > 0:
@@ -1692,7 +1707,7 @@ def generate_objects(data):
 
             "position"    : generate_vec3(position),
             "rotation"    : generate_vec3(rotation),
-            "quaternion"  : generate_vec4(quaternion),
+            "quaternion"  : generate_quat(quaternion),
             "scale"       : generate_vec3(scale)
             }
             chunks.append(object_string)
