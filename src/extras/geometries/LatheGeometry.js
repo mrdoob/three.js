@@ -21,18 +21,24 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 	var inversePointLength = 1.0 / points.length;
 	var inverseSegments = 1.0 / segments;
 
-	var matrix = new THREE.Matrix4();
-
 	for ( var i = 0, il = segments; i <= il; i ++ ) {
 
-		// simplify this to be cos/sin within the main loop, this matrix
-		// is wasteful.
 		var phi = phiStart + i * inverseSegments * phiLength;
-		matrix.makeRotationZ( phi );
-	
+
+		var c = Math.cos( phi ),
+			s = Math.sin( phi );
+
 		for ( var j = 0, jl = points.length; j < jl; j ++ ) {
 
-			this.vertices.push( matrix.multiplyVector3( points[ j ].clone() ) );
+			var pt = points[ j ];
+
+			var vertex = new THREE.Vector3();
+
+			vertex.x = c * pt.x - s * pt.y;
+			vertex.y = s * pt.x + c * pt.y;
+			vertex.z = pt.z;
+
+			this.vertices.push( vertex );
 
 		}
 
