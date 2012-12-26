@@ -4,90 +4,43 @@
 
 THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
-	THREE.Geometry.call( this );
+	//THREE.Geometry.call( this );
 
-	this.radius = radius || 50;
+	radius = radius || 50;
 
-	this.widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-	this.heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
+	widthSegments = Math.max( 3, Math.floor( widthSegments || 8 ) );
+	heightSegments = Math.max( 2, Math.floor( heightSegments || 6 ) );
 
-	phiStart = phiStart !== undefined ? phiStart : 0;
-	phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+	phiStart = THREE.Math.clamp( phiStart || 0, 0, Math.PI * 2 );
+	phiLength = THREE.Math.clamp( phiLength || Math.PI * 2, 0, Math.PI * 2 - phiStart );
 
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+	thetaStart = THREE.Math.clamp( thetaStart || 0, 0, Math.PI );
+	thetaLength = THREE.Math.clamp( thetaLength || Math.PI, 0, Math.PI - thetaStart );
 
-	var x, y, vertices = [], uvs = [];
+	var inverseHeightSegments = 1.0 / heightSegments;
+	var points = [];
 
-	for ( y = 0; y <= this.heightSegments; y ++ ) {
+	for( var i = 0, il = heightSegments; i <= il; i ++ ) {
+		
+		var theta = thetaStart + i * inverseHeightSegments * thetaLength;
 
-		var verticesRow = [];
-		var uvsRow = [];
+		var pt = new THREE.Vector3(
+			radius * Math.sin( theta ),
+			0,
+			radius * Math.cos( theta )
+		);
 
-		for ( x = 0; x <= this.widthSegments; x ++ ) {
-
-			var u = x / this.widthSegments;
-			var v = y / this.heightSegments;
-
-			var vertex = new THREE.Vector3();
-			vertex.x = - this.radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-			vertex.y = this.radius * Math.cos( thetaStart + v * thetaLength );
-			vertex.z = this.radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-
-			this.vertices.push( vertex );
-
-			verticesRow.push( this.vertices.length - 1 );
-			uvsRow.push( new THREE.Vector2( u, 1 - v ) );
-
-		}
-
-		vertices.push( verticesRow );
-		uvs.push( uvsRow );
-
+		points.push( pt );
 	}
 
-	for ( y = 0; y < this.heightSegments; y ++ ) {
+	THREE.LatheGeometry.call( this, points, widthSegments, phiStart, phiLength );
 
-		for ( x = 0; x < this.widthSegments; x ++ ) {
+	//this.mergeVertices();
 
-			var v1 = vertices[ y ][ x + 1 ];
-			var v2 = vertices[ y ][ x ];
-			var v3 = vertices[ y + 1 ][ x ];
-			var v4 = vertices[ y + 1 ][ x + 1 ];
-
-			var n1 = this.vertices[ v1 ].clone().normalize();
-			var n2 = this.vertices[ v2 ].clone().normalize();
-			var n3 = this.vertices[ v3 ].clone().normalize();
-			var n4 = this.vertices[ v4 ].clone().normalize();
-
-			var uv1 = uvs[ y ][ x + 1 ].clone();
-			var uv2 = uvs[ y ][ x ].clone();
-			var uv3 = uvs[ y + 1 ][ x ].clone();
-			var uv4 = uvs[ y + 1 ][ x + 1 ].clone();
-
-			if ( Math.abs( this.vertices[ v1 ].y ) === this.radius ) {
-
-				this.faces.push( new THREE.Face3( v1, v3, v4, [ n1, n3, n4 ] ) );
-				this.faceVertexUvs[ 0 ].push( [ uv1, uv3, uv4 ] );
-
-			} else if ( Math.abs( this.vertices[ v3 ].y ) === this.radius ) {
-
-				this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
-				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
-
-			} else {
-
-				this.faces.push( new THREE.Face4( v1, v2, v3, v4, [ n1, n2, n3, n4 ] ) );
-				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3, uv4 ] );
-
-			}
-
-		}
-
-	}
-
-	this.computeCentroids();
-	this.computeFaceNormals();
+	// remember these because well, someone at some time wanted to remember them.
+	this.radius = radius;
+	this.widthSegments = widthSegments;
+	this.heightSegments = heightSegments;
 
     this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
