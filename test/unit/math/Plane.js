@@ -159,11 +159,6 @@ test( "orthoPoint", function() {
 	ok( a.orthoPoint( new THREE.Vector3( -10, 0, 0 ) ).equals( new THREE.Vector3( -10, 0, 0 ) ), "Passed!" );
 });
 
-/*
-test( "isIntersectionLine", function() {
-});
-*/
-
 test( "coplanarPoint", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 	ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );

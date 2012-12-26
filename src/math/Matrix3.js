@@ -3,15 +3,64 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.Matrix3 = function () {
+THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 	this.elements = new Float32Array(9);
 
+	this.set(
+
+		( n11 !== undefined ) ? n11 : 1, n12 || 0, n13 || 0,
+		n21 || 0, ( n22 !== undefined ) ? n22 : 1, n23 || 0,
+		n31 || 0, n32 || 0, ( n33 !== undefined ) ? n33 : 1
+
+	);
 };
 
 THREE.Matrix3.prototype = {
 
 	constructor: THREE.Matrix3,
+
+	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+
+		var te = this.elements;
+
+		te[0] = n11; te[3] = n12; te[6] = n13;
+		te[1] = n21; te[4] = n22; te[7] = n23;
+		te[2] = n31; te[5] = n32; te[8] = n33;
+
+		return this;
+
+	},
+
+	identity: function () {
+
+		this.set(
+
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
+
+		);
+
+		return this;
+
+	},
+
+	copy: function ( m ) {
+
+		var me = m.elements;
+
+		this.set(
+
+			me[0], me[3], me[6],
+			me[1], me[4], me[7],
+			me[2], me[5], me[8]
+
+		);
+
+		return this;
+
+	},
 
 	multiplyVector3: function ( v ) {
 
@@ -49,40 +98,75 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	getInverse: function ( matrix ) {
+	multiplyScalar: function ( s ) {
+
+		var te = this.elements;
+
+		te[0] *= s; te[3] *= s; te[6] *= s;
+		te[1] *= s; te[4] *= s; te[7] *= s;
+		te[2] *= s; te[5] *= s; te[8] *= s;
+
+		return this;
+
+	},
+
+	determinant: function () {
+		var te = this.elements;
+		
+		var a = te[0], b = te[1], c = te[2],
+			d = te[3], e = te[4], f = te[5],
+			g = te[6], h = te[7], i = te[8];
+
+		return a*e*i - a*f*h - b*d*i + b*f*g + c*d*h - c*e*g;
+	},
+
+	getInverse: function ( matrix, throwOnInvertible ) {
 
 		// input: THREE.Matrix4
 		// ( based on http://code.google.com/p/webgl-mjs/ )
 
 		var me = matrix.elements;
+		var te = this.elements;
+	
+		te[ 0 ] =   me[10] * me[5] - me[6] * me[9];
+		te[ 1 ] = - me[10] * me[1] + me[2] * me[9];
+		te[ 2 ] =   me[6] * me[1] - me[2] * me[5];
+		te[ 3 ] = - me[10] * me[4] + me[6] * me[8];
+		te[ 4 ] =   me[10] * me[0] - me[2] * me[8];
+		te[ 5 ] = - me[6] * me[0] + me[2] * me[4];
+		te[ 6 ] =   me[9] * me[4] - me[5] * me[8];
+		te[ 7 ] = - me[9] * me[0] + me[1] * me[8];
+		te[ 8 ] =   me[5] * me[0] - me[1] * me[4];
 
-		var a11 =   me[10] * me[5] - me[6] * me[9];
-		var a21 = - me[10] * me[1] + me[2] * me[9];
-		var a31 =   me[6] * me[1] - me[2] * me[5];
-		var a12 = - me[10] * me[4] + me[6] * me[8];
-		var a22 =   me[10] * me[0] - me[2] * me[8];
-		var a32 = - me[6] * me[0] + me[2] * me[4];
-		var a13 =   me[9] * me[4] - me[5] * me[8];
-		var a23 = - me[9] * me[0] + me[1] * me[8];
-		var a33 =   me[5] * me[0] - me[1] * me[4];
+		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
 
-		var det = me[0] * a11 + me[1] * a12 + me[2] * a13;
+		console.log( "optimized det: " + det );
+		console.log( "matrix.determinant(): " + matrix.determinant() );
 
 		// no inverse
 
 		if ( det === 0 ) {
 
-			console.warn( "Matrix3.getInverse(): determinant == 0" );
+			var msg = "Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
+			if( throwOnInvertible || false ) {
+
+				throw new Error( msg ); 
+
+			}
+			else {
+
+				console.warn( msg );
+
+			}
+
+			this.identity();
+
+			return this;
+			
 		}
 
-		var idet = 1.0 / det;
-
-		var m = this.elements;
-
-		m[ 0 ] = idet * a11; m[ 1 ] = idet * a21; m[ 2 ] = idet * a31;
-		m[ 3 ] = idet * a12; m[ 4 ] = idet * a22; m[ 5 ] = idet * a32;
-		m[ 6 ] = idet * a13; m[ 7 ] = idet * a23; m[ 8 ] = idet * a33;
+		this.multiplyScalar( 1.0 / det );
 
 		return this;
 
@@ -117,6 +201,20 @@ THREE.Matrix3.prototype = {
 		r[ 8 ] = m[ 8 ];
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		var te = this.elements;
+
+		return new THREE.Matrix3(
+
+			te[0], te[3], te[6],
+			te[1], te[4], te[7],
+			te[2], te[5], te[8]
+
+		);
 
 	}
 
