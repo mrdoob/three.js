@@ -614,7 +614,7 @@ THREE.Geometry.prototype = {
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
-		var abcd = 'abcd', o, k, j, jl, u;
+		var abcd = 'abcd', o, k, j, jl, u, vn;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -660,6 +660,8 @@ THREE.Geometry.prototype = {
 
 				o = [ face.a, face.b, face.c, face.d ];
 
+				vn = [ 0, 1, 2, 3 ];
+
 				for ( k = 3; k > 0; k -- ) {
 
 					if ( o.indexOf( face[ abcd[ k ] ] ) !== k ) {
@@ -667,6 +669,7 @@ THREE.Geometry.prototype = {
 						// console.log('faces', face.a, face.b, face.c, face.d, 'dup at', k);
 
 						o.splice( k, 1 );
+						vn.splice( k, 1 );
 
 						this.faces[ i ] = new THREE.Face3( o[0], o[1], o[2], face.normal, face.color, face.materialIndex );
 
@@ -677,7 +680,21 @@ THREE.Geometry.prototype = {
 
 						}
 
-						this.faces[ i ].vertexColors = face.vertexColors;
+						if( face.vertexNormals && face.vertexNormals.length > 0) {
+							for ( j = 0, jl = 3; j < jl; j ++ ) {
+
+								this.faces[ i ].vertexNormals[ j ] = face.vertexNormals[ vn[j] ];
+
+							}
+						}
+
+						if( face.vertexColors && face.vertexColors.length > 0 ) {
+							for ( j = 0, jl = 3; j < jl; j ++ ) {
+
+								this.faces[ i ].vertexColors[ j ] = face.vertexColors[ vn[ j ] ];
+
+							}
+						}
 
 						break;
 					}
