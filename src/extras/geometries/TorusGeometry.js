@@ -4,68 +4,54 @@
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
  */
 
-THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, arc ) {
+THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
 	THREE.Geometry.call( this );
 
-	var scope = this;
+	radius = radius || 100;
+	tube = tube || 40;
 
-	this.radius = radius || 100;
-	this.tube = tube || 40;
-	this.radialSegments = radialSegments || 8;
-	this.tubularSegments = tubularSegments || 6;
-	this.arc = arc || Math.PI * 2;
+	radialSegments = Math.max( radialSegments || 8, 3 );
+	tubularSegments = Math.max( tubularSegments || 6, 3 );
 
-	var center = new THREE.Vector3(), uvs = [], normals = [];
+	phiStart = THREE.Math.clamp( phiStart || 0, 0, Math.PI * 2 );
+	phiLength = THREE.Math.clamp( phiLength || Math.PI * 2, 0, Math.PI * 2 - phiStart );
 
-	for ( var j = 0; j <= this.radialSegments; j ++ ) {
+	thetaStart = THREE.Math.clamp( thetaStart || 0, 0, Math.PI * 2 );
+	thetaLength = THREE.Math.clamp( thetaLength || Math.PI * 2, 0, Math.PI * 2 - thetaStart );
 
-		for ( var i = 0; i <= this.tubularSegments; i ++ ) {
+	var inverseTubularSegments = 1.0 / tubularSegments;
+	var points = [];
 
-			var u = i / this.tubularSegments * this.arc;
-			var v = j / this.radialSegments * Math.PI * 2;
+	for ( var i = 0, il = tubularSegments; i <= il; i ++ ) {
 
-			center.x = this.radius * Math.cos( u );
-			center.y = this.radius * Math.sin( u );
+		var theta = thetaStart + i * inverseTubularSegments * thetaLength;
 
-			var vertex = new THREE.Vector3();
-			vertex.x = ( this.radius + this.tube * Math.cos( v ) ) * Math.cos( u );
-			vertex.y = ( this.radius + this.tube * Math.cos( v ) ) * Math.sin( u );
-			vertex.z = this.tube * Math.sin( v );
+		var pt = new THREE.Vector3(
+			this.radius + this.tube * Math.sin( theta ),
+			0,
+			this.tube * Math.cos( theta )
+		);
 
-			this.vertices.push( vertex );
-
-			uvs.push( new THREE.Vector2( i / this.tubularSegments, j / this.radialSegments ) );
-			normals.push( vertex.clone().subSelf( center ).normalize() );
-
-		}
+		points.push( pt );
 	}
 
+	THREE.LatheGeometry.call( this, points, radialSegments, phiStart, phiLength );
 
-	for ( var j = 1; j <= this.radialSegments; j ++ ) {
+	// remembering these, not sure why though.
+    this.radius = radius;
+	this.tube = tube;
+	this.radialSegments = radialSegments;
+	this.tubularSegments = tubularSegments;
 
-		for ( var i = 1; i <= this.tubularSegments; i ++ ) {
+	this.phiStart = phiStart;
+	this.phiLength = phiLength;
 
-			var a = ( this.tubularSegments + 1 ) * j + i - 1;
-			var b = ( this.tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( this.tubularSegments + 1 ) * ( j - 1 ) + i;
-			var d = ( this.tubularSegments + 1 ) * j + i;
+	this.thetaStart = thetaStart;
+	this.thetaLength = thetaLength;
 
-			var face = new THREE.Face4( a, b, c, d, [ normals[ a ], normals[ b ], normals[ c ], normals[ d ] ] );
-			face.normal.addSelf( normals[ a ] );
-			face.normal.addSelf( normals[ b ] );
-			face.normal.addSelf( normals[ c ] );
-			face.normal.addSelf( normals[ d ] );
-			face.normal.normalize();
 
-			this.faces.push( face );
-
-			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
-		}
-
-	}
-
-	this.computeCentroids();
+    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius + tube );
 
 };
 
