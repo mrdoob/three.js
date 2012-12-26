@@ -140,9 +140,6 @@ THREE.Matrix3.prototype = {
 
 		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 3 ] + me[ 2 ] * te[ 6 ];
 
-		console.log( "optimized det: " + det );
-		console.log( "matrix.determinant(): " + matrix.determinant() );
-
 		// no inverse
 
 		if ( det === 0 ) {
