@@ -2,6 +2,7 @@
  * @author oosmoxiecode
  * @author mrdoob / http://mrdoob.com/
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3DLite/src/away3dlite/primitives/Torus.as?r=2888
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, phiStart, phiLength, thetaStart, thetaLength ) {
