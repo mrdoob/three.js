@@ -7,6 +7,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
+ * @author bhouston / http://exocortex.com
  */
 
 
