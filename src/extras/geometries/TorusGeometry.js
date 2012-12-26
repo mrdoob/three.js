@@ -6,8 +6,6 @@
 
 THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
-	THREE.Geometry.call( this );
-
 	radius = radius || 100;
 	tube = tube || 40;
 
@@ -28,14 +26,15 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 		var theta = thetaStart + i * inverseTubularSegments * thetaLength;
 
 		var pt = new THREE.Vector3(
-			this.radius + this.tube * Math.sin( theta ),
+			radius + tube * Math.cos( theta ),
 			0,
-			this.tube * Math.cos( theta )
+			tube * Math.sin( theta )
 		);
 
 		points.push( pt );
 	}
 
+	console.log( points );
 	THREE.LatheGeometry.call( this, points, radialSegments, phiStart, phiLength );
 
 	// remembering these, not sure why though.
