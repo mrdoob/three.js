@@ -5,8 +5,6 @@
 
 THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength ) {
 
-	//THREE.Geometry.call( this );
-
 	radius = radius || 50;
 
 	widthSegments = Math.max( 3, Math.floor( widthSegments || 8 ) );
@@ -35,8 +33,6 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 	}
 
 	THREE.LatheGeometry.call( this, points, widthSegments, phiStart, phiLength );
-
-	//this.mergeVertices();
 
 	// remember these because well, someone at some time wanted to remember them.
 	this.radius = radius;

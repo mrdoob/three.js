@@ -35,21 +35,17 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 		points.push( pt );
 	}
 
-	console.log( points );
 	THREE.LatheGeometry.call( this, points, radialSegments, phiStart, phiLength );
 
-	// remembering these, not sure why though.
+	// remember these because well, someone at some time wanted to remember them.
     this.radius = radius;
 	this.tube = tube;
 	this.radialSegments = radialSegments;
 	this.tubularSegments = tubularSegments;
-
 	this.phiStart = phiStart;
 	this.phiLength = phiLength;
-
 	this.thetaStart = thetaStart;
 	this.thetaLength = thetaLength;
-
 
     this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius + tube );
 

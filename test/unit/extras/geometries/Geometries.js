@@ -52,7 +52,7 @@ var isVertexColorsConsistent = function( geometry ) {
 };
 
 test( "torus", function() {
-	var a = new THREE.TorusGeometry( 1, 0.2, 10, 10, 2*Math.PI );
+	var a = new THREE.TorusGeometry( 1, 0.2, 10, 10, 0, 2*Math.PI );
 	ok( a.boundingSphere.center.equals( zero3 ), "Passed!" );
 	ok( a.boundingSphere.radius == 1.2, "Passed!" );
 	ok( a.vertices.length == 121, "Passed!" );

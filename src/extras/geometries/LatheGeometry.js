@@ -58,7 +58,7 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 
-			var u0 = 1 - i * inverseSegments;
+			var u0 = i * inverseSegments;
 			var v0 = j * inversePointLength;
 			var u1 = u0 + inverseSegments;
 			var v1 = v0 + inversePointLength;
