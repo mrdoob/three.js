@@ -20,6 +20,9 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
 	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
 	
+	var _currentWidth = 0,
+		_currentHeight = 0;
+	
 	
 	var _gl;
 
@@ -30,11 +33,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
 	initGL();
 
-	setDefaultGLState();
-
-	this.context = _gl;
-
-	
+	setDefaultGLState();	
 	
 	var _maxTextures = _gl.getParameter( _gl.MAX_TEXTURE_IMAGE_UNITS );
 	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
@@ -72,14 +71,6 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		_oldPolygonOffsetFactor = null,
 		_oldPolygonOffsetUnits = null,
 		_currentFramebuffer = null;
-		
-	this.autoScaleCubemaps = true;
-	this.supportsBoneTextures = _supportsBoneTextures;
-	this.precision = _precision;
-	this.maxVertexUniformVectors = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );
-	
-	this.currentWidth = 0;
-	this.currentHeight = 0;
 	
 	function initGL () {
 
@@ -171,39 +162,39 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	this.getContext = function () {
+	function getContext() {
 
 		return _gl;
 
 	};
-	this.getDomElement = function(){
+	function getDomElement(){
 		
 		return _canvas;
 		
 	}
 
-	this.supportsVertexTextures = function () {
+	function supportsVertexTextures() {
 
 		return _supportsVertexTextures;
 
 	};
 
-	this.getMaxAnisotropy  = function () {
+	function getMaxAnisotropy() {
 
 		return _maxAnisotropy;
 
 	};
 
-	this.setSize = function ( width, height ) {
+	function setSize( width, height ) {
 
 		_canvas.width = width;
 		_canvas.height = height;
 
-		this.setViewport( 0, 0, _canvas.width, _canvas.height );
+		setViewport( 0, 0, _canvas.width, _canvas.height );
 
 	};
 
-	this.setViewport = function ( x, y, width, height ) {
+	function setViewport( x, y, width, height ) {
 
 		_viewportX = x !== undefined ? x : 0;
 		_viewportY = y !== undefined ? y : 0;
@@ -215,13 +206,13 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 
-	this.setScissor = function ( x, y, width, height ) {
+	function setScissor( x, y, width, height ) {
 
 		_gl.scissor( x, y, width, height );
 
 	};
 
-	this.enableScissorTest = function ( enable ) {
+	function enableScissorTest( enable ) {
 
 		enable ? _gl.enable( _gl.SCISSOR_TEST ) : _gl.disable( _gl.SCISSOR_TEST );
 
@@ -229,7 +220,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	// Clearing
 
-	this.setClearColorHex = function ( hex, alpha ) {
+	function setClearColorHex( hex, alpha ) {
 
 		_clearColor.setHex( hex );
 		_clearAlpha = alpha;
@@ -238,7 +229,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 
-	this.setClearColor = function ( color, alpha ) {
+	function setClearColor( color, alpha ) {
 
 		_clearColor.copy( color );
 		_clearAlpha = alpha;
@@ -247,19 +238,19 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 
-	this.getClearColor = function () {
+	function getClearColor() {
 
 		return _clearColor;
 
 	};
 
-	this.getClearAlpha = function () {
+	function getClearAlpha() {
 
 		return _clearAlpha;
 
 	};
 
-	this.clear = function ( color, depth, stencil ) {
+	function clear( color, depth, stencil ) {
 
 		var bits = 0;
 
@@ -271,94 +262,94 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 
-	this.clearTarget = function ( renderTarget, color, depth, stencil ) {
+	function clearTarget( renderTarget, color, depth, stencil ) {
 
-		this.setRenderTarget( renderTarget );
-		this.clear( color, depth, stencil );
+		setRenderTarget( renderTarget );
+		clear( color, depth, stencil );
 
 	};
 	
-	this.deleteBuffer = function(buffer){
+	function deleteBuffer(buffer){
 		_gl.deleteBuffer(buffer);
 	};
 	
-	this.deleteTexture = function(texture){
+	function deleteTexture(texture){
 		_gl.deleteTexture( texture );
 	};
 	
-	this.deleteFramebuffer = function(Framebuffer){
+	function deleteFramebuffer(Framebuffer){
 		_gl.deleteFramebuffer(Framebuffer);
 	};
 	
-	this.deleteRenderbuffer = function(RenderBuffer){
+	function deleteRenderbuffer(RenderBuffer){
 		_gl.deleteRenderbuffer(RenderBuffer);
 	};
 	
-	this.deleteProgram = function(RenderBuffer){
+	function deleteProgram(RenderBuffer){
 		_gl.deleteProgram(RenderBuffer);
 	};
 	
-	this.createBuffer = function(){
+	function createBuffer(){
 		return _gl.createBuffer();
 	};
 	
-	this.setStaticArrayBuffer = function(buffer,data){
+	function setStaticArrayBuffer(buffer,data){
 		
-		this.bindArrayBuffer( buffer );
+		bindArrayBuffer( buffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, data, _gl.STATIC_DRAW );
 		
 	};
 	
-	this.setStaticIndexBuffer = function(buffer,data){
+	function setStaticIndexBuffer(buffer,data){
 		
-		this.bindElementArrayBuffer( buffer );
+		bindElementArrayBuffer( buffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, data, _gl.STATIC_DRAW );
 		
 	};
 	
-	this.setDynamicArrayBuffer = function(buffer,data){
+	function setDynamicArrayBuffer(buffer,data){
 		
-		this.bindArrayBuffer( buffer );
+		bindArrayBuffer( buffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, data, _gl.DYNAMIC_DRAW );
 		
 	};
 	
-	this.setDynamicIndexBuffer = function(buffer,data){
+	function setDynamicIndexBuffer(buffer,data){
 		
-		this.bindElementArrayBuffer( buffer );
+		bindElementArrayBuffer( buffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, data, _gl.DYNAMIC_DRAW );
 		
 	};
 	
-	this.drawTriangles = function(count){
+	function drawTriangles(count){
 		_gl.drawArrays( _gl.TRIANGLES, 0, count );
 	};
 	
-	this.drawLines = function(count){
+	function drawLines(count){
 		_gl.drawArrays( _gl.LINES, 0, count );
 	};
 	
-	this.drawLineStrip = function(count){
+	function drawLineStrip(count){
 		_gl.drawArrays( _gl.LINE_STRIP, 0, count );
 	};
 	
-	this.drawPoints = function(count){
+	function drawPoints(count){
 		_gl.drawArrays( _gl.POINTS, 0, count );
 	};
 	
-	this.drawTriangleElements = function(buffer,count,offset){
-		this.bindElementArrayBuffer( buffer );
+	function drawTriangleElements(buffer,count,offset){
+		bindElementArrayBuffer( buffer );
 		_gl.drawElements( _gl.TRIANGLES, count, _gl.UNSIGNED_SHORT, offset ); // 2 bytes per Uint16
 	};
 	
-	this.drawLineElements = function(buffer,count,offset){
-		this.bindElementArrayBuffer(  buffer );
+	function drawLineElements(buffer,count,offset){
+		bindElementArrayBuffer(  buffer );
 		_gl.drawElements( _gl.LINES, count, _gl.UNSIGNED_SHORT, offset ); // 2 bytes per Uint16
 	};
 	
 	
-	var _boundBuffer =undefined;
-	this.bindArrayBuffer = function(buffer){
+	var _boundBuffer;
+	function bindArrayBuffer(buffer){
 		if (_boundBuffer != buffer){
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
 			_boundBuffer = buffer;
@@ -366,7 +357,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		
 	};
 	
-	this.bindElementArrayBuffer = function(buffer){
+	function bindElementArrayBuffer(buffer){
 		
 		if (_boundBuffer != buffer){
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer );
@@ -376,7 +367,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	};
 	
 	
-	this.enableAttribute = function enableAttribute( attribute ) {
+	function enableAttribute( attribute ) {
 
 		if ( ! _enabledAttributes[ attribute ] ) {
 
@@ -389,7 +380,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
 	
 
-	this.disableAttributes = function disableAttributes() {
+	function disableAttributes() {
 
 		for ( var attribute in _enabledAttributes ) {
 
@@ -404,133 +395,137 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	this.getAttribLocation = function( program, id ){
+	function getAttribLocation( program, id ){
 		return _gl.getAttribLocation( program, id );
 	}
 	
-	this.setFloatAttribute = function(index,buffer,size,offset){
+	function setFloatAttribute(index,buffer,size,offset){
 		
-		this.bindArrayBuffer( buffer );
-		this.enableAttribute( index );
+		bindArrayBuffer( buffer );
+		enableAttribute( index );
 		_gl.vertexAttribPointer( index, size, _gl.FLOAT, false, 0, offset );
 		
 	};
 	
-	this.getUniformLocation= function( program, id ){
+	function getUniformLocation( program, id ){
 		
 		return _gl.getUniformLocation( program, id );
 		
 	}
 	
-	this.uniform1i = function(uniform,value){
+	function uniform1i(uniform,value){
 		
 		_gl.uniform1i( uniform, value );
 		
 	};	
 	
-	this.uniform1f = function(uniform,value){
+	function uniform1f(uniform,value){
 		
 		_gl.uniform1f( uniform, value );
 		
 	};
 	
-	this.uniform2f = function(uniform,value1, value2){
+	function uniform2f(uniform,value1, value2){
 		
 		_gl.uniform2f( location, value1, value2 );
 		
 	};
 	
-	this.uniform3f = function(uniform, value1, value2, value3){
+	function uniform3f(uniform, value1, value2, value3){
 		
 		_gl.uniform3f( uniform, value1, value2, value3 );
 		
 	};
 	
-	this.uniform4f = function(uniform, value1, value2, value3, value4){
+	function uniform4f(uniform, value1, value2, value3, value4){
 		
 		_gl.uniform4f( uniform, value1, value2, value3, value4);
 		
 	};
 	
-	this.uniform1iv = function(uniform,value){
+	function uniform1iv(uniform,value){
 		
 		_gl.uniform1iv( uniform, value );
 		
 	};
 	
-	this.uniform2iv = function(uniform,value){
+	function uniform2iv(uniform,value){
 		
 		_gl.uniform2iv( uniform, value );
 		
 	};
 	
-	this.uniform3iv = function(uniform,value){
+	function uniform3iv(uniform,value){
 		
 		_gl.uniform3iv( uniform, value );
 		
 	};
 	
-	this.uniform1fv = function(uniform,value){
+	function uniform1fv(uniform,value){
 		
 		_gl.uniform1fv( uniform, value );
 		
 	};
 	
-	this.uniform2fv = function(uniform,value){
+	function uniform2fv(uniform,value){
 		
 		_gl.uniform2fv( uniform, value );
 		
 	};
 	
-	this.uniform3fv = function(uniform,value){
+	function uniform3fv(uniform,value){
 		
 		_gl.uniform3fv( uniform, value );
 		
 	};
 	
-	this.uniform4fv = function(uniform,value){
+	function uniform4fv(uniform,value){
 		
 		_gl.uniform3fv( uniform, value );
 		
 	};
 	
-	this.uniformMatrix3fv = function(location,value){
+	function uniformMatrix3fv(location,value){
 		
 		_gl.uniformMatrix3fv( location, false, value );
 		
 	};
 	
-	this.uniformMatrix4fv = function(location,value){
+	function uniformMatrix4fv(location,value){
 		
 		_gl.uniformMatrix4fv( location, false, value );
 		
 	};
 	
-	this.useProgram = function(program){
+	function useProgram(program){
 	
 		_gl.useProgram( program );
 	
 	};
 	
-	this.setFaceCulling = function ( cullFace, frontFace ) {
-			
-		if ( cullFace ) {
+	function setFaceCulling( cullFace, frontFaceDirection ) {
 
-			if ( !frontFace || frontFace === "ccw" ) {
+		if ( cullFace === THREE.CullFaceNone ) {
 
-				_gl.frontFace( _gl.CCW );
+			_gl.disable( _gl.CULL_FACE );
 
-			} else {
+		} else {
+
+			if ( frontFaceDirection === THREE.FrontFaceDirectionCW ) {
 
 				_gl.frontFace( _gl.CW );
 
+			} else {
+
+				_gl.frontFace( _gl.CCW );
+
 			}
 
-			if( cullFace === "back" ) {
+			if ( cullFace === THREE.CullFaceBack ) {
 
 				_gl.cullFace( _gl.BACK );
 
-			} else if( cullFace === "front" ) {
+			} else if ( cullFace === THREE.CullFaceFront ) {
 
 				_gl.cullFace( _gl.FRONT );
 
@@ -542,15 +537,11 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 			_gl.enable( _gl.CULL_FACE );
 
-		} else {
-
-			_gl.disable( _gl.CULL_FACE );
-
 		}
 
 	};
 	
-	this.setMaterialFaces = function ( material ) {
+	function setMaterialFaces( material ) {
 
 		var doubleSided = material.side === THREE.DoubleSide;
 		var flipSided = material.side === THREE.BackSide;
@@ -589,7 +580,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	this.setPolygonOffset = function setPolygonOffset ( polygonoffset, factor, units ) {
+	function setPolygonOffset ( polygonoffset, factor, units ) {
 
 		if ( _oldPolygonOffset !== polygonoffset ) {
 
@@ -618,10 +609,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	
-	
-	
-	this.setBlending = function ( blending, blendEquation, blendSrc, blendDst ) {
+	function setBlending( blending, blendEquation, blendSrc, blendDst ) {
 
 		if ( blending !== _oldBlending ) {
 
@@ -696,7 +684,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
 	
 
-	this.setDepthTest = function ( depthTest ) {
+	function setDepthTest( depthTest ) {
 
 		if ( _oldDepthTest !== depthTest ) {
 
@@ -716,7 +704,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 
-	this.setDepthWrite = function ( depthWrite ) {
+	function setDepthWrite( depthWrite ) {
 
 		if ( _oldDepthWrite !== depthWrite ) {
 
@@ -728,7 +716,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	};
 	
 	
-	this.setTexture = function ( texture, slot ) {
+	function setTexture( texture, slot ) {
 
 		if ( texture.needsUpdate ) {
 
@@ -788,7 +776,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	this.setCubeTexture = function( texture, slot ,autoScaleCubemaps) {
+	function setCubeTexture( texture, slot ,autoScaleCubemaps) {
 
 		if ( texture.image.length === 6 ) {
 
@@ -953,7 +941,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	};
 
 	
-	this.setRenderTarget = function ( renderTarget ) {
+	function setRenderTarget( renderTarget ) {
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
 
@@ -1067,8 +1055,8 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 		}
 
-		this.currentWidth = width;
-		this.currentHeight = height;
+		_currentWidth = width;
+		_currentHeight = height;
 
 	};
 	
@@ -1101,7 +1089,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	this.updateRenderTargetMipmap = function updateRenderTargetMipmap ( renderTarget ) {
+	function updateRenderTargetMipmap ( renderTarget ) {
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
 
@@ -1119,7 +1107,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	this.setCubeTextureDynamic = function setCubeTextureDynamic ( texture, slot ) {
+	function setCubeTextureDynamic ( texture, slot ) {
 
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 		_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.__webglTexture );
@@ -1131,7 +1119,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
 	
 	// Map three.js constants to WebGL constants
-	var paramThreeToGL = this.paramThreeToGL = function paramThreeToGL ( p ) {
+	function paramThreeToGL ( p ) {
 
 		if ( p === THREE.RepeatWrapping ) return _gl.REPEAT;
 		if ( p === THREE.ClampToEdgeWrapping ) return _gl.CLAMP_TO_EDGE;
@@ -1194,7 +1182,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	};
 	
 	
-	this.compileShader = function(vertexShader, fragmentShader){
+	function compileShader(vertexShader, fragmentShader){
 		
 		var program = _gl.createProgram();
 
@@ -1221,7 +1209,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		
 	};
 	
-	this.resetState = function(){
+	function resetState(){
 		
 		_oldBlending = -1;
 		_oldDepthTest = -1;
@@ -1280,7 +1268,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
 	
 	
-	var setLineWidth = this.setLineWidth = function setLineWidth ( width ) {
+	function setLineWidth ( width ) {
 
 		if ( width !== _oldLineWidth ) {
 
@@ -1291,6 +1279,97 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
+	
+	
+	this.context = _gl;
+	
+	this.autoScaleCubemaps = true;
+	this.supportsBoneTextures = _supportsBoneTextures;
+	this.precision = _precision;
+	this.maxVertexUniformVectors = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );	
+	
+	// Methods
+	this.getContext = getContext;
+	this.getDomElement = getDomElement;
+	this.supportsVertexTextures = supportsVertexTextures;
+	this.getMaxAnisotropy  = getMaxAnisotropy;
+	
+	this.setSize = setSize;
+	this.setViewport = setViewport;
+	this.setScissor = setScissor;
+	this.enableScissorTest = enableScissorTest;
+	
+	this.setClearColorHex = setClearColorHex;
+	this.setClearColor = setClearColor;
+	this.getClearColor = getClearColor;
+	this.getClearAlpha = getClearAlpha;
+	this.clear = clear;
+	this.clearTarget = clearTarget;
+	
+	this.deleteBuffer = deleteBuffer;
+	this.deleteTexture = deleteTexture;
+	this.deleteFramebuffer = deleteFramebuffer;
+	this.deleteRenderbuffer = deleteRenderbuffer;
+	this.deleteProgram = deleteProgram;
+	
+	this.createBuffer = createBuffer;
+	this.setStaticArrayBuffer = setStaticArrayBuffer;
+	this.setStaticIndexBuffer = setStaticIndexBuffer;
+	this.setDynamicArrayBuffer = setDynamicArrayBuffer;
+	this.setDynamicIndexBuffer = setDynamicIndexBuffer;
+	
+	this.drawTriangles = drawTriangles;
+	this.drawLines = drawLines;
+	this.drawLineStrip = drawLineStrip;
+	this.drawPoints = drawPoints;
+	this.drawTriangleElements = drawTriangleElements;
+	this.drawLineElements = drawLineElements;
+	
+	this.bindArrayBuffer = bindArrayBuffer;
+	this.bindElementArrayBuffer = bindElementArrayBuffer;
+	
+	this.enableAttribute = enableAttribute;
+	this.disableAttributes = disableAttributes;
+	this.getAttribLocation = getAttribLocation;
+	this.setFloatAttribute = setFloatAttribute;
+	
+	this.getUniformLocation= getUniformLocation;
+		
+	this.uniform1i = uniform1i;
+	this.uniform1f = uniform1f;
+	this.uniform2f = uniform2f;
+	this.uniform3f = uniform3f;
+	this.uniform4f = uniform4f;
+	this.uniform1iv = uniform1iv;
+	this.uniform2iv = uniform2iv;
+	this.uniform3iv = uniform3iv;
+	this.uniform1fv = uniform1fv;
+	this.uniform2fv = uniform2fv;
+	this.uniform3fv = uniform3fv;
+	this.uniform4fv = uniform4fv;
+	this.uniformMatrix3fv = uniformMatrix3fv;
+	this.uniformMatrix4fv = uniformMatrix4fv;
+	
+	this.useProgram = useProgram;
+	this.compileShader = compileShader;
+	
+	this.setFaceCulling = setFaceCulling;
+	this.setMaterialFaces = setMaterialFaces;
+	this.setPolygonOffset = setPolygonOffset;	
+	this.setBlending = setBlending;
+	this.setDepthTest = setDepthTest;
+	this.setDepthWrite = setDepthWrite;
+	
+	this.setTexture = setTexture;
+	this.setCubeTexture = setCubeTexture;
+	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
+	this.setCubeTextureDynamic = setCubeTextureDynamic;
+	
+	this.paramThreeToGL = paramThreeToGL;
+	this.setLineWidth = setLineWidth;
+	this.resetState = resetState;
+	
 };
+
 
 
