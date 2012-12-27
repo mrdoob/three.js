@@ -218,6 +218,16 @@
 			
 				for( var f = 0, fl = originalGeometry.faces.length; f < fl; f ++ ) {
 					var face = originalGeometry.faces[ f ];
+					var arrow = new THREE.ArrowHelper( 
+							face.normal,
+							face.centroid,
+							normalLength,
+							0x3333FF );
+					mesh.add( arrow );
+				}
+
+				for( var f = 0, fl = originalGeometry.faces.length; f < fl; f ++ ) {
+					var face = originalGeometry.faces[ f ];
 					if( face.vertexNormals === undefined ) {
 						continue;
 					}
