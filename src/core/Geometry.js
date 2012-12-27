@@ -616,6 +616,9 @@ THREE.Geometry.prototype = {
 		var i,il, face;
 		var abcd = 'abcd', o, k, j, jl, u, vn;
 
+		// reset cache of vertices as it now will be changing.
+		this.__tmpVertices = undefined;
+
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			v = this.vertices[ i ];
