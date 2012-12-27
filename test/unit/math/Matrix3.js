@@ -4,8 +4,8 @@
 
 module( "Matrix3" );
 
-var matrixEquals = function( a, b, tolerance ) {
-	tolerance = tolerance || 0;
+var matrixEquals3 = function( a, b, tolerance ) {
+	tolerance = tolerance || 0.0001;
 	if( a.elements.length != b.elements.length ) {
 		return false;
 	}	
@@ -16,6 +16,24 @@ var matrixEquals = function( a, b, tolerance ) {
 		}
 	}
 	return true;
+};
+
+
+var toMatrix4 = function( m3 ) {
+	var result = new THREE.Matrix4();
+	var re = result.elements;
+	var me = m3.elements;
+	re[0] = me[0];
+	re[1] = me[1];
+	re[2] = me[2];
+	re[4] = me[3];
+	re[5] = me[4];
+	re[6] = me[5];
+	re[8] = me[6];
+	re[9] = me[7];
+	re[10] = me[8];
+
+	return result;
 };
 
 test( "constructor", function() {
@@ -33,18 +51,18 @@ test( "constructor", function() {
 	ok( b.elements[7] == 5 );
 	ok( b.elements[8] == 8 );
 
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals3( a, b ), "Passed!" );
 });
 
 test( "copy", function() {
 	var a = new THREE.Matrix3( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 	var b = new THREE.Matrix3().copy( a );
 
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals3( a, b ), "Passed!" );
 
 	// ensure that it is a true copy
 	a.elements[0] = 2;
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals3( a, b ), "Passed!" );
 });
 
 test( "set", function() {
@@ -76,10 +94,10 @@ test( "identity", function() {
 	ok( b.elements[8] == 8 );
 
 	var a = new THREE.Matrix3();
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals3( a, b ), "Passed!" );
 
 	b.identity();
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals3( a, b ), "Passed!" );
 });
 
 test( "multiplyScalar", function() {
@@ -117,16 +135,16 @@ test( "determinant", function() {
 	ok( a.determinant() == 0, "Passed!" );
 });
 
+
 test( "getInverse", function() {
+	var identity = new THREE.Matrix4();
 	var a = new THREE.Matrix4();
 	var b = new THREE.Matrix3( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	var c = new THREE.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals3( a, b ), "Passed!" );
 	b.getInverse( a, false );
-	console.log( a );
-	console.log( b );
-	ok( matrixEquals( b, new THREE.Matrix3() ), "Passed!" );
+	ok( matrixEquals3( b, new THREE.Matrix3() ), "Passed!" );
 
 	try { 
 		b.getInverse( c, true );
@@ -135,27 +153,53 @@ test( "getInverse", function() {
 	catch( err ) {
 		ok( true, "Passed!" );
 	}
+
+	var testMatrices = [
+		new THREE.Matrix4().makeRotationX( 0.3 ),
+		new THREE.Matrix4().makeRotationX( -0.3 ),
+		new THREE.Matrix4().makeRotationY( 0.3 ),
+		new THREE.Matrix4().makeRotationY( -0.3 ),
+		new THREE.Matrix4().makeRotationZ( 0.3 ),
+		new THREE.Matrix4().makeRotationZ( -0.3 ),
+		new THREE.Matrix4().makeScale( new THREE.Vector3( 1, 2, 3 ) ),
+		new THREE.Matrix4().makeScale( new THREE.Vector3( 1/8, 1/2, 1/3 ) )
+		];
+
+	for( var i = 0, il = testMatrices.length; i < il; i ++ ) {
+		var m = testMatrices[i];
+		var mInverse3 = new THREE.Matrix3().getInverse( m );
+	
+		var mInverse = toMatrix4( mInverse3 );
+		
+		// the determinant of the inverse should be the reciprocal
+		ok( Math.abs( m.determinant() * mInverse3.determinant() - 1 ) < 0.0001, "Passed!" );
+		ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, "Passed!" );
+
+		var mProduct = new THREE.Matrix4().multiply( m, mInverse );
+		ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, "Passed!" );
+		ok( matrixEquals3( mProduct, identity ), "Passed!" );
+	}
 });
 
 test( "transpose", function() {
 	var a = new THREE.Matrix3();
 	var b = a.clone().transpose();
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals3( a, b ), "Passed!" );
 
 	b = new THREE.Matrix3( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 	c = b.clone().transpose();
-	ok( ! matrixEquals( b, c ), "Passed!" ); 
+	ok( ! matrixEquals3( b, c ), "Passed!" ); 
 	c.transpose();
-	ok( matrixEquals( b, c ), "Passed!" ); 
+	ok( matrixEquals3( b, c ), "Passed!" ); 
 });
 
 test( "clone", function() {
 	var a = new THREE.Matrix3( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
 	var b = a.clone();
 
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals3( a, b ), "Passed!" );
 
 	// ensure that it is a true copy
 	a.elements[0] = 2;
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals3( a, b ), "Passed!" );
 });

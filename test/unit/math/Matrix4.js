@@ -4,8 +4,8 @@
 
 module( "Matrix4" );
 
-var matrixEquals = function( a, b, tolerance ) {
-	tolerance = tolerance || 0;
+var matrixEquals4 = function( a, b, tolerance ) {
+	tolerance = tolerance || 0.0001;
 	if( a.elements.length != b.elements.length ) {
 		return false;
 	}	
@@ -40,18 +40,18 @@ test( "constructor", function() {
 	ok( b.elements[14] == 11 );
 	ok( b.elements[15] == 15 );
 
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals4( a, b ), "Passed!" );
 });
 
 test( "copy", function() {
 	var a = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	var b = new THREE.Matrix4().copy( a );
 
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals4( a, b ), "Passed!" );
 
 	// ensure that it is a true copy
 	a.elements[0] = 2;
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals4( a, b ), "Passed!" );
 });
 
 test( "set", function() {
@@ -97,10 +97,10 @@ test( "identity", function() {
 	ok( b.elements[15] == 15 );
 
 	var a = new THREE.Matrix4();
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals4( a, b ), "Passed!" );
 
 	b.identity();
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals4( a, b ), "Passed!" );
 });
 
 test( "multiplyScalar", function() {
@@ -153,13 +153,15 @@ test( "determinant", function() {
 });
 
 test( "getInverse", function() {
+	var identity = new THREE.Matrix4();
+
 	var a = new THREE.Matrix4();
 	var b = new THREE.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	var c = new THREE.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals4( a, b ), "Passed!" );
 	b.getInverse( a, false );
-	ok( matrixEquals( b, new THREE.Matrix4() ), "Passed!" );
+	ok( matrixEquals4( b, new THREE.Matrix4() ), "Passed!" );
 
 	try { 
 		b.getInverse( c, true );
@@ -168,27 +170,56 @@ test( "getInverse", function() {
 	catch( err ) {
 		ok( true, "Passed!" );
 	}
+
+	var testMatrices = [
+		new THREE.Matrix4().makeRotationX( 0.3 ),
+		new THREE.Matrix4().makeRotationX( -0.3 ),
+		new THREE.Matrix4().makeRotationY( 0.3 ),
+		new THREE.Matrix4().makeRotationY( -0.3 ),
+		new THREE.Matrix4().makeRotationZ( 0.3 ),
+		new THREE.Matrix4().makeRotationZ( -0.3 ),
+		new THREE.Matrix4().makeScale( new THREE.Vector3( 1, 2, 3 ) ),
+		new THREE.Matrix4().makeScale( new THREE.Vector3( 1/8, 1/2, 1/3 ) ),
+		new THREE.Matrix4().makeFrustum( -1, 1, -1, 1, 1, 1000 ),
+		new THREE.Matrix4().makeFrustum( -16, 16, -9, 9, 0.1, 10000 ),
+		new THREE.Matrix4().makeTranslation( new THREE.Vector3( 1, 2, 3 ) )
+		];
+
+	for( var i = 0, il = testMatrices.length; i < il; i ++ ) {
+		var m = testMatrices[i];
+
+		var mInverse = new THREE.Matrix4().getInverse( m );
+
+		// the determinant of the inverse should be the reciprocal
+		ok( Math.abs( m.determinant() * mInverse.determinant() - 1  ) < 0.0001, "Passed!" );
+
+		var mProduct = new THREE.Matrix4().multiply( m, mInverse );
+
+		// the determinant of the identity matrix is 1
+		ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, "Passed!" );
+		ok( matrixEquals4( mProduct, identity ), "Passed!" );
+	}
 });
 
 test( "transpose", function() {
 	var a = new THREE.Matrix4();
 	var b = a.clone().transpose();
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals4( a, b ), "Passed!" );
 
 	b = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	c = b.clone().transpose();
-	ok( ! matrixEquals( b, c ), "Passed!" ); 
+	ok( ! matrixEquals4( b, c ), "Passed!" ); 
 	c.transpose();
-	ok( matrixEquals( b, c ), "Passed!" ); 
+	ok( matrixEquals4( b, c ), "Passed!" ); 
 });
 
 test( "clone", function() {
 	var a = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	var b = a.clone();
 
-	ok( matrixEquals( a, b ), "Passed!" );
+	ok( matrixEquals4( a, b ), "Passed!" );
 
 	// ensure that it is a true copy
 	a.elements[0] = 2;
-	ok( ! matrixEquals( a, b ), "Passed!" );
+	ok( ! matrixEquals4( a, b ), "Passed!" );
 });
