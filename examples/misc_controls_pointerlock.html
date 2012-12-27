@@ -193,7 +193,7 @@
 				scene.add( controls.getObject() );
 
 				ray = new THREE.Raycaster();
-				ray.direction.set( 0, -1, 0 );
+				ray.ray.direction.set( 0, -1, 0 );
 
 				// floor
 
@@ -284,8 +284,8 @@
 
 				controls.isOnObject( false );
 
-				ray.origin.copy( controls.getObject().position );
-				ray.origin.y -= 10;
+				ray.ray.origin.copy( controls.getObject().position );
+				ray.ray.origin.y -= 10;
 
 				var intersections = ray.intersectObjects( objects );
 
