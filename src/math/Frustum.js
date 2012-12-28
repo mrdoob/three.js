@@ -23,12 +23,14 @@ THREE.Frustum.prototype = {
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
 
-		this.planes[0].copy( p0 );
-		this.planes[1].copy( p1 );
-		this.planes[2].copy( p2 );
-		this.planes[3].copy( p3 );
-		this.planes[4].copy( p4 );
-		this.planes[5].copy( p5 );
+		var planes = this.planes;
+
+		planes[0].copy( p0 );
+		planes[1].copy( p1 );
+		planes[2].copy( p2 );
+		planes[3].copy( p3 );
+		planes[4].copy( p4 );
+		planes[5].copy( p5 );
 		
 		return this;	
 
@@ -36,9 +38,11 @@ THREE.Frustum.prototype = {
 
 	copy: function ( frustum ) {
 
+		var planes = this.planes;
+	
 		for( var i = 0; i < 6; i ++ ) {
 
-			this.planes[i].copy( frustum.planes[i] );
+			planes[i].copy( frustum.planes[i] );
 
 		}
 
@@ -49,25 +53,18 @@ THREE.Frustum.prototype = {
 	setFromMatrix: function ( m ) {
 
 		var planes = this.planes;
-
 		var me = m.elements;
 		var me0 = me[0], me1 = me[1], me2 = me[2], me3 = me[3];
 		var me4 = me[4], me5 = me[5], me6 = me[6], me7 = me[7];
 		var me8 = me[8], me9 = me[9], me10 = me[10], me11 = me[11];
 		var me12 = me[12], me13 = me[13], me14 = me[14], me15 = me[15];
 
-		planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 );
-		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 );
-		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 );
-		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 );
-		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 );
-		planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 );
-
-		for ( var i = 0; i < 6; i ++ ) {
-
-			planes[ i ].normalize();
-
-		}
+		planes[ 0 ].setComponents( me3 - me0, me7 - me4, me11 - me8, me15 - me12 ).normalize();
+		planes[ 1 ].setComponents( me3 + me0, me7 + me4, me11 + me8, me15 + me12 ).normalize();
+		planes[ 2 ].setComponents( me3 + me1, me7 + me5, me11 + me9, me15 + me13 ).normalize();
+		planes[ 3 ].setComponents( me3 - me1, me7 - me5, me11 - me9, me15 - me13 ).normalize();
+		planes[ 4 ].setComponents( me3 - me2, me7 - me6, me11 - me10, me15 - me14 ).normalize();
+		planes[ 5 ].setComponents( me3 + me2, me7 + me6, me11 + me10, me15 + me14 ).normalize();
 
 		return this;
 
@@ -75,30 +72,24 @@ THREE.Frustum.prototype = {
 
 	contains: function ( object ) {
 
-		var planes = this.planes;
-
 		var matrix = object.matrixWorld;
-		var matrixPosition = matrix.getPosition();
-		var radius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
 
-		var distance = 0.0;
+		var sphere = THREE.Frustum.__s0.set(
+			matrix.getPosition(), 
+			- object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis()
+			);
 
-		for ( var i = 0; i < 6; i ++ ) {
-
-			distance = planes[ i ].distanceToPoint( matrixPosition );
-			if ( distance <= radius ) return false;
-
-		}
-
-		return true;
+		return this.containsSphere( sphere );
 
 	},
 
 	containsSphere: function ( sphere ) {
 		
+		var planes = this.planes;
+		
 		for ( var i = 0; i < 6; i ++ ) {
 
-			var distance = this.planes[ i ].distanceToPoint( sphere.center );
+			var distance = planes[ i ].distanceToPoint( sphere.center );
 
 			if( distance <= sphere.radius ) {
 
@@ -114,9 +105,11 @@ THREE.Frustum.prototype = {
 
 	containsPoint: function ( point ) {
 		
+		var planes = this.planes;
+
 		for ( var i = 0; i < 6; i ++ ) {
 
-			if( this.planes[ i ].distanceToPoint( point ) < 0 ) {
+			if( planes[ i ].distanceToPoint( point ) < 0 ) {
 
 				return false;
 
@@ -130,12 +123,13 @@ THREE.Frustum.prototype = {
 
 	containsAnyPoints: function ( points ) {
 
-		var p0 = this.planes[ 0 ];
-		var p1 = this.planes[ 1 ];
-		var p2 = this.planes[ 2 ];
-		var p3 = this.planes[ 3 ];
-		var p4 = this.planes[ 4 ];
-		var p5 = this.planes[ 5 ];
+		var planes = this.planes;
+		var p0 = planes[ 0 ];
+		var p1 = planes[ 1 ];
+		var p2 = planes[ 2 ];
+		var p3 = planes[ 3 ];
+		var p4 = planes[ 4 ];
+		var p5 = planes[ 5 ];
 			
 		for( var j = 0, jl = points.length; j < jl; j ++ ) {
 
@@ -175,11 +169,13 @@ THREE.Frustum.prototype = {
 
 	clone: function () {
 
+		var planes = this.planes;
 		return new THREE.Frustum(
-			this.planes[0], this.planes[1], this.planes[2], 
-			this.planes[3], this.planes[4], this.planes[5] );
+			planes[0], planes[1], planes[2], 
+			planes[3], planes[4], planes[5] );
 
 	}
 
 };
 
+THREE.Frustum.__s0 = new THREE.Sphere();
