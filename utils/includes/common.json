@@ -77,6 +77,8 @@
 	"../src/renderers/CanvasRenderer.js",
 	"../src/renderers/WebGLShaders.js",
 	"../src/renderers/WebGLRenderer.js",
+	"../src/renderers/WebGLRenderer2.js",
+	"../src/renderers/webgl/renderer.js",
 	"../src/renderers/WebGLRenderTarget.js",
 	"../src/renderers/WebGLRenderTargetCube.js",
 	"../src/renderers/renderables/RenderableVertex.js",

@@ -3,8 +3,6 @@
 
 THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
-	
-
 	parameters = parameters || {};
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
@@ -18,7 +16,10 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 
 	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
-	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
+	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0,
+	_autoScaleCubemaps = true;
+	
+	this.devicePixelRatio = parameters.devicePixelRatio !== undefined ? parameters.devicePixelRatio : window.devicePixelRatio !== undefined ? window.devicePixelRatio : 1;
 	
 	var _currentWidth = 0,
 		_currentHeight = 0;
@@ -46,6 +47,50 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	var _supportsBoneTextures = _supportsVertexTextures && _glExtensionTextureFloat;
 
 	var _compressedTextureFormats = _glExtensionCompressedTextureS3TC ? _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS ) : [];
+	
+		var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
+	var _vertexShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_FLOAT );
+	var _vertexShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_FLOAT );
+
+	var _fragmentShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_FLOAT );
+	var _fragmentShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_FLOAT );
+	var _fragmentShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_FLOAT );
+
+	var _vertexShaderPrecisionHighpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_INT );
+	var _vertexShaderPrecisionMediumpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_INT );
+	var _vertexShaderPrecisionLowpInt = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_INT );
+
+	var _fragmentShaderPrecisionHighpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.HIGH_INT );
+	var _fragmentShaderPrecisionMediumpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.MEDIUM_INT );
+	var _fragmentShaderPrecisionLowpInt = _gl.getShaderPrecisionFormat( _gl.FRAGMENT_SHADER, _gl.LOW_INT );
+
+	// clamp precision to maximum available
+
+	var highpAvailable = _vertexShaderPrecisionHighpFloat.precision > 0 && _fragmentShaderPrecisionHighpFloat.precision > 0;
+	var mediumpAvailable = _vertexShaderPrecisionMediumpFloat.precision > 0 && _fragmentShaderPrecisionMediumpFloat.precision > 0;
+
+	if ( _precision === "highp" && ! highpAvailable ) {
+
+		if ( mediumpAvailable ) {
+
+			_precision = "mediump";
+			console.warn( "WebGLRenderer: highp not supported, using mediump" );
+
+		} else {
+
+			_precision = "lowp";
+			console.warn( "WebGLRenderer: highp and mediump not supported, using lowp" );
+
+		}
+
+	}
+
+	if ( _precision === "mediump" && ! mediumpAvailable ) {
+
+		_precision = "lowp";
+		console.warn( "WebGLRenderer: mediump not supported, using lowp" );
+
+	}
 	
 	var _enabledAttributes = {}, 
 		_oldBlending, 
@@ -91,9 +136,9 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		_glExtensionTextureFloat = _gl.getExtension( 'OES_texture_float' );
 		_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
 
-		_glExtensionTextureFilterAnisotropic =	_gl.getExtension( 'EXT_texture_filter_anisotropic' ) ||
-												_gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) ||
-												_gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) ||
+											   _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) ||
+											   _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
 
 
 		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) ||
@@ -167,11 +212,24 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return _gl;
 
 	};
+	
 	function getDomElement(){
 		
 		return _canvas;
 		
-	}
+	};
+	
+	function getCurrentWidth(){
+		
+		return _currentWidth;
+		
+	};
+	
+	function getCurrentHeight(){
+		
+		return _currentHeight;
+		
+	};
 
 	function supportsVertexTextures() {
 
@@ -723,7 +781,12 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 			if ( ! texture.__webglInit ) {
 
 				texture.__webglInit = true;
+
+				//texture.addEventListener( 'dispose', onTextureDispose );
+
 				texture.__webglTexture = _gl.createTexture();
+
+				//_this.info.memory.textures ++;
 
 			}
 
@@ -732,6 +795,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 			_gl.pixelStorei( _gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, texture.premultiplyAlpha );
+			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = texture.image,
 			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
@@ -740,9 +804,35 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 			setTextureParameters( _gl.TEXTURE_2D, texture, isImagePowerOfTwo );
 
-			if ( texture instanceof THREE.CompressedTexture ) {
+			var mipmap, mipmaps = texture.mipmaps;
 
-				var mipmap, mipmaps = texture.mipmaps;
+			if ( texture instanceof THREE.DataTexture ) {
+
+				// use manually created mipmaps if available
+				// if there are no manual mipmaps
+				// set 0 level mipmap and then use GL to generate other mipmap levels
+
+				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
+
+					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+						mipmap = mipmaps[ i ];
+						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+
+					}
+
+					texture.generateMipmaps = false;
+
+				} else {
+
+					_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
+
+				}
+
+			} else if ( texture instanceof THREE.CompressedTexture ) {
+
+				// compressed textures can only use manually created mipmaps
+				// WebGL can't generate mipmaps for DDS textures
 
 				for( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
@@ -751,13 +841,28 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 				}
 
-			} else if ( texture instanceof THREE.DataTexture ) {
+			} else { // regular Texture (image, video, canvas)
 
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, image.width, image.height, 0, glFormat, glType, image.data );
+				// use manually created mipmaps if available
+				// if there are no manual mipmaps
+				// set 0 level mipmap and then use GL to generate other mipmap levels
 
-			} else {
+				if ( mipmaps.length > 0 && isImagePowerOfTwo ) {
 
-				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+
+						mipmap = mipmaps[ i ];
+						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap );
+
+					}
+
+					texture.generateMipmaps = false;
+
+				} else {
+
+					_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, texture.image );
+
+				}
 
 			}
 
@@ -776,7 +881,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 	
-	function setCubeTexture( texture, slot ,autoScaleCubemaps) {
+	function setCubeTexture ( texture, slot ) {
 
 		if ( texture.image.length === 6 ) {
 
@@ -785,6 +890,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 				if ( ! texture.image.__webglTextureCube ) {
 
 					texture.image.__webglTextureCube = _gl.createTexture();
+
 
 				}
 
@@ -799,7 +905,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					if ( autoScaleCubemaps && ! isCompressed ) {
+					if ( _autoScaleCubemaps && ! isCompressed ) {
 
 						cubeImage[ i ] = clampToMaxSize( texture.image[ i ], _maxCubemapSize );
 
@@ -950,7 +1056,11 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 			if ( renderTarget.depthBuffer === undefined ) renderTarget.depthBuffer = true;
 			if ( renderTarget.stencilBuffer === undefined ) renderTarget.stencilBuffer = true;
 
+			//renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
+
 			renderTarget.__webglTexture = _gl.createTexture();
+
+			//_this.info.memory.textures ++;
 
 			// Setup texture, create render and frame buffers
 
@@ -983,7 +1093,16 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 			} else {
 
 				renderTarget.__webglFramebuffer = _gl.createFramebuffer();
-				renderTarget.__webglRenderbuffer = _gl.createRenderbuffer();
+
+				if ( renderTarget.shareDepthFrom ) {
+
+					renderTarget.__webglRenderbuffer = renderTarget.shareDepthFrom.__webglRenderbuffer;
+
+				} else {
+
+					renderTarget.__webglRenderbuffer = _gl.createRenderbuffer();
+
+				}
 
 				_gl.bindTexture( _gl.TEXTURE_2D, renderTarget.__webglTexture );
 				setTextureParameters( _gl.TEXTURE_2D, renderTarget, isTargetPowerOfTwo );
@@ -991,7 +1110,24 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 				_gl.texImage2D( _gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 
 				setupFrameBuffer( renderTarget.__webglFramebuffer, renderTarget, _gl.TEXTURE_2D );
-				setupRenderBuffer( renderTarget.__webglRenderbuffer, renderTarget );
+
+				if ( renderTarget.shareDepthFrom ) {
+
+					if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
+
+						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTarget.__webglRenderbuffer );
+
+					} else if ( renderTarget.depthBuffer && renderTarget.stencilBuffer ) {
+
+						_gl.framebufferRenderbuffer( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, _gl.RENDERBUFFER, renderTarget.__webglRenderbuffer );
+
+					}
+
+				} else {
+
+					setupRenderBuffer( renderTarget.__webglRenderbuffer, renderTarget );
+
+				}
 
 				if ( isTargetPowerOfTwo ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
@@ -1010,7 +1146,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 			}
 
 			_gl.bindRenderbuffer( _gl.RENDERBUFFER, null );
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null);
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
 
 		}
 
@@ -1283,7 +1419,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
 	this.context = _gl;
 	
-	this.autoScaleCubemaps = true;
+	this.autoScaleCubemaps = _autoScaleCubemaps;
 	this.supportsBoneTextures = _supportsBoneTextures;
 	this.precision = _precision;
 	this.maxVertexUniformVectors = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );	
@@ -1291,9 +1427,12 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	// Methods
 	this.getContext = getContext;
 	this.getDomElement = getDomElement;
+	this.getCurrentWidth = getCurrentWidth;
+	this.getCurrentHeight = getCurrentHeight;
 	this.supportsVertexTextures = supportsVertexTextures;
 	this.getMaxAnisotropy  = getMaxAnisotropy;
 	
+	this.setRenderTarget = setRenderTarget;
 	this.setSize = setSize;
 	this.setViewport = setViewport;
 	this.setScissor = setScissor;
