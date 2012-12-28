@@ -42,6 +42,8 @@ THREE.Frustum.prototype.setFromMatrix = function ( m ) {
 
 	}
 
+	return this;
+
 };
 
 THREE.Frustum.prototype.contains = function ( object ) {
@@ -65,4 +67,37 @@ THREE.Frustum.prototype.contains = function ( object ) {
 
 };
 
-THREE.Frustum.__v1 = new THREE.Vector3();
+
+THREE.Frustum.prototype.containsSphere = function ( sphere ) {
+	
+	for ( var i = 0; i < 6; i ++ ) {
+
+		var distance = this.planes[ i ].distanceToPoint( sphere.center );
+
+		if( distance <= sphere.radius ) {
+
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+};
+
+THREE.Frustum.prototype.containsPoint = function ( point ) {
+	
+	for ( var i = 0; i < 6; i ++ ) {
+
+		if( this.planes[ i ].distanceToPoint( point ) < 0 ) {
+
+			return false;
+
+		}
+
+	}
+
+	return true;
+
+};
