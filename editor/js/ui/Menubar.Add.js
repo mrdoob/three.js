@@ -137,9 +137,10 @@ Menubar.Add = function ( signals ) {
 		var tube = 40;
 		var radialSegments = 8;
 		var tubularSegments = 6;
-		var arc = Math.PI * 2;
+		var phiStart = 0;
+		var phiLength = Math.PI * 2;
 
-		var geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
+		var geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, phiStart, phiLength );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Torus ' + mesh.id;
 
