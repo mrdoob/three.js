@@ -1,6 +1,7 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
+ * @author bhouston / https://exocortex.com
  *
  * Creates an arrow for visualizing directions
  *
@@ -42,34 +43,37 @@ THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
-	var matrix = THREE.ArrowHelper.__m0;
-	var yAxis = THREE.ArrowHelper.__vYAxis;
-	var yAxisNeg = THREE.ArrowHelper.__vYAxisNeg;
+    var d = dir.clone().normalize();
 
-	var axis = dir.clone().normalize();
+    if ( d.y > 0.99999 ) {
 
-	if( axis.distanceTo( yAxis ) < 0.001 ) {
+        this.rotation.set( 0, 0, 0 );
+ 
+    }
 
-		matrix.identity();
+    else if ( d.y < - 0.99999 ) {
+
+        this.rotation.set( Math.PI, 0, 0 );
+        return;
+
+    }
+
+    else {
+
+	    var axis = THREE.ArrowHelper.__v1.set( d.z, 0, - d.x );
+
+	    var radians = Math.acos( d.y );
+
+	    var matrix = THREE.ArrowHelper.__m1.makeRotationAxis( axis.normalize(), radians );
+
+	    this.rotation.setEulerFromRotationMatrix( matrix, this.eulerOrder );
 
 	}
-	else if( axis.distanceTo( yAxisNeg ) < 0.001 ) {
-
-		matrix.makeRotationZ( Math.PI );
-
-	}
-	else {
-
-		var perpendicularAxis = THREE.ArrowHelper.__v0.copy( yAxis ).crossSelf( axis );
-		var radians = Math.acos( yAxis.dot( axis ) );
-		matrix.makeRotationAxis( perpendicularAxis.normalize(), radians );
-
-	}
-
-	this.rotation.setEulerFromRotationMatrix( matrix, this.eulerOrder );
 
 };
 
+THREE.ArrowHelper.__v1 = new THREE.Vector3();
+THREE.ArrowHelper.__m1 = new THREE.Matrix4();
 THREE.ArrowHelper.prototype.setLength = function ( length ) {
 
 	this.scale.set( length, length, length );
