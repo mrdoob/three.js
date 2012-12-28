@@ -150,6 +150,10 @@ test( "determinant", function() {
 
 	a.elements[0] = 0;
 	ok( a.determinant() == 0, "Passed!" );
+
+	// calculated via http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/fourD/index.htm
+	a.set( 2, 3, 4, 5, -1, -21, -3, -4, 6, 7, 8, 10, -8, -9, -10, -12 );
+	ok( a.determinant() == 76, "Passed!" );
 });
 
 test( "getInverse", function() {

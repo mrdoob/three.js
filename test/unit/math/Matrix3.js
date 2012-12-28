@@ -133,6 +133,10 @@ test( "determinant", function() {
 
 	a.elements[0] = 0;
 	ok( a.determinant() == 0, "Passed!" );
+
+	// calculated via http://www.euclideanspace.com/maths/algebra/matrix/functions/determinant/threeD/index.htm
+	a.set( 2, 3, 4, 5, 13, 7, 8, 9, 11 );
+	ok( a.determinant() == -73, "Passed!" );
 });
 
 
