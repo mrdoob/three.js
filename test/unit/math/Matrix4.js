@@ -217,6 +217,42 @@ test( "transpose", function() {
 	ok( matrixEquals4( b, c ), "Passed!" ); 
 });
 
+// this function is a duplicate of that in ArrowHelper.
+var makeBasis = function ( axis ) {
+
+	var matrix = new THREE.Matrix4();
+
+	if( axis.distanceTo( new THREE.Vector3( 0, 1, 0 ) ) < 0.001 ) {
+		matrix.identity();
+	}
+	else if( axis.distanceTo( new THREE.Vector3( 0, -1, 0 ) ) < 0.001 ) {
+		matrix.makeRotationZ( Math.PI );
+	}
+	else {
+		var perpendicularAxis = new THREE.Vector3( 0, 1, 0 ).crossSelf( axis );
+		perpendicularAxis.normalize();
+		var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( perpendicularAxis ) );
+		matrix.makeRotationAxis( perpendicularAxis, radians );
+	}
+
+	return matrix;
+}
+
+test( "makeBasis", function() {
+	var axes = [
+		new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ),
+		new THREE.Vector3( -1, 0, 0 ), new THREE.Vector3( 0, -1, 0 ), new THREE.Vector3( 0, 0, -1 )
+	];
+
+	var v = new THREE.Vector3( 0, 1, 0 );
+	for( var i = 0, il = axes.length; i < il; i ++ ) {
+		var v0 = axes[i];
+		var m = makeBasis( v0 );
+		var v1 = m.multiplyVector3( v.clone() );
+		ok( v1.distanceTo( v0 ) < 0.001, "Passed!" );
+	}
+});
+
 test( "clone", function() {
 	var a = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	var b = a.clone();
