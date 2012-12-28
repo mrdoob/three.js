@@ -489,7 +489,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	
 	function uniform2f(uniform,value1, value2){
 		
-		_gl.uniform2f( location, value1, value2 );
+		_gl.uniform2f( uniform, value1, value2 );
 		
 	};
 	
