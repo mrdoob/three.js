@@ -416,34 +416,42 @@ THREE.Matrix4.prototype = {
 		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
 
 		return (
-			
-			+n11 * n23 * n34 * n42
-			-n11 * n24 * n33 * n42
-			+n11 * n24 * n32 * n43
-			-n11 * n22 * n34 * n43
-			-n11 * n23 * n32 * n44
-			+n11 * n22 * n33 * n44
 
-			+n14 * n21 * n33 * n42
-			-n13 * n21 * n34 * n42
-			-n14 * n21 * n32 * n43
-			+n12 * n21 * n34 * n43
-			+n13 * n21 * n32 * n44
-			-n12 * n21 * n33 * n44
+			+n11 * (
+				+n23 * n34 * n42
+				-n24 * n33 * n42
+				+n24 * n32 * n43
+				-n22 * n34 * n43
+				-n23 * n32 * n44
+				+n22 * n33 * n44
+				)
 
-			+n13 * n24 * n31 * n42
-			-n14 * n23 * n31 * n42
-			+n14 * n22 * n31 * n43
-			-n12 * n24 * n31 * n43
-			-n13 * n22 * n31 * n44
-			+n12 * n23 * n31 * n44
+			+n21 * (
+				+n14 * n33 * n42
+				-n13 * n34 * n42
+				-n14 * n32 * n43
+				+n12 * n34 * n43
+				+n13 * n32 * n44
+				-n12 * n33 * n44
+				)
 
-			+n14 * n23 * n32 * n41
-			-n13 * n24 * n32 * n41
-			-n14 * n22 * n33 * n41
-			+n12 * n24 * n33 * n41
-			+n13 * n22 * n34 * n41
-			-n12 * n23 * n34 * n41
+			+n31 * (
+				+n13 * n24 * n42
+				-n14 * n23 * n42
+				+n14 * n22 * n43
+				-n12 * n24 * n43
+				-n13 * n22 * n44
+				+n12 * n23 * n44
+				)
+
+			+n41 * (
+				+n14 * n23 * n32
+				-n13 * n24 * n32
+				-n14 * n22 * n33
+				+n12 * n24 * n33
+				+n13 * n22 * n34
+				-n12 * n23 * n34
+				)
 
 		);
 
