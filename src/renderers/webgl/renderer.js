@@ -383,6 +383,10 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		_gl.drawArrays( _gl.TRIANGLES, 0, count );
 	};
 	
+	function drawTriangleStrip(count){
+		_gl.drawArrays( _gl.TRIANGLE_STRIP, 0, count );
+	};
+	
 	function drawLines(count){
 		_gl.drawArrays( _gl.LINES, 0, count );
 	};
@@ -1458,6 +1462,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	this.setDynamicIndexBuffer = setDynamicIndexBuffer;
 	
 	this.drawTriangles = drawTriangles;
+	this.drawTriangleStrip = drawTriangleStrip;
 	this.drawLines = drawLines;
 	this.drawLineStrip = drawLineStrip;
 	this.drawPoints = drawPoints;

@@ -902,11 +902,11 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 			
 			if ( a === "index" ) {
 
-				renderer.setStaticIndexBuffer(attribute.buffer,attribute.data);
+				renderer.setStaticIndexBuffer(attribute.buffer,attribute.array);
 
 			} else {
 
-				renderer.setStaticArrayBuffer(attribute.buffer,attribute.data);
+				renderer.setStaticArrayBuffer(attribute.buffer,attribute.array);
 
 			}
 
@@ -3522,7 +3522,7 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
-			renderer.drawLineStrip(geometryGroup.__webglVertexCount);
+			renderer.drawTriangleStrip(geometryGroup.__webglVertexCount);
 
 			_this.info.render.calls ++;
 
