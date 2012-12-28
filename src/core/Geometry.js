@@ -662,7 +662,7 @@ THREE.Geometry.prototype = {
 
 						dupIndex = n;
 						faceIndicesToRemove.push( i );
-						breal;
+						break;
 
 					}
 				}
@@ -730,11 +730,11 @@ THREE.Geometry.prototype = {
 
 		}
 
-		for( var i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+		for( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
 
 			this.faces.splice( i, 1 );
 			
-			for ( var j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
+			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
 
 				this.faceVertexUvs[ j ].splice( i, 1 );
 

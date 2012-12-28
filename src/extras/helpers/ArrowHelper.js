@@ -43,7 +43,7 @@ THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
-    var d = dir.clone().normalize();
+    var d = THREE.ArrowHelper.__v1.copy( dir ).normalize();
 
     if ( d.y > 0.99999 ) {
 
@@ -60,20 +60,18 @@ THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
     else {
 
-	    var axis = THREE.ArrowHelper.__v1.set( d.z, 0, - d.x );
+	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x );
 
 	    var radians = Math.acos( d.y );
 
-	    var matrix = THREE.ArrowHelper.__m1.makeRotationAxis( axis.normalize(), radians );
+	    var quat = THREE.ArrowHelper.__q1.setFromAxisAngle( axis.normalize(), radians );
 
-	    this.rotation.setEulerFromRotationMatrix( matrix, this.eulerOrder );
+	    this.rotation.setEulerFromQuaternion( quat, this.eulerOrder );
 
 	}
 
 };
 
-THREE.ArrowHelper.__v1 = new THREE.Vector3();
-THREE.ArrowHelper.__m1 = new THREE.Matrix4();
 THREE.ArrowHelper.prototype.setLength = function ( length ) {
 
 	this.scale.set( length, length, length );
@@ -87,7 +85,6 @@ THREE.ArrowHelper.prototype.setColor = function ( hex ) {
 
 };
 
-THREE.ArrowHelper.__m0 = new THREE.Matrix4();
-THREE.ArrowHelper.__v0 = new THREE.Vector3();
-THREE.ArrowHelper.__vYAxis = new THREE.Vector3( 0, 1, 0 );
-THREE.ArrowHelper.__vYAxisNeg = new THREE.Vector3( 0, -1, 0 );
+THREE.ArrowHelper.__v1 = new THREE.Vector3();
+THREE.ArrowHelper.__v2 = new THREE.Vector3();
+THREE.ArrowHelper.__q1 = new THREE.Quaternion();
