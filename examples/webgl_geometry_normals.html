@@ -168,7 +168,7 @@
 
 				// scale geometry to a uniform size
 				geometry.computeBoundingSphere();
-				console.log( geometry );
+				
 				var scaleFactor = 200 / geometry.boundingSphere.radius;
 				geometry.applyMatrix( new THREE.Matrix4().makeScale( new THREE.Vector3( scaleFactor, scaleFactor, scaleFactor ) ) );
 
@@ -178,9 +178,10 @@
 			
 				// in case of duplicated vertices
 				geometry.mergeVertices();
+				geometry.computeCentroids();
+				geometry.computeFaceNormals();
 				geometry.computeVertexNormals( true );
 			
-
 				updateInfo();
 
 				var faceABCD = "abcd";
@@ -217,8 +218,8 @@
 				var fvNames = [ 'a', 'b', 'c', 'd' ];
 
 			
-				for( var f = 0, fl = originalGeometry.faces.length; f < fl; f ++ ) {
-					var face = originalGeometry.faces[ f ];
+				for( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
+					var face = geometry.faces[ f ];
 					var arrow = new THREE.ArrowHelper( 
 							face.normal,
 							face.centroid,
