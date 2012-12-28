@@ -164,14 +164,13 @@ THREE.Plane.prototype = {
 
 	transform: function( matrix, optionalNormalMatrix ) {
 
-		var newNormal = THREE.Plane.__v1, newCoplanarPoint = THREE.Plane.__v2;
-
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		newNormal = optionalNormalMatrix.multiplyVector3( newNormal.copy( this.normal ) );
 
-		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
+		var newNormal = optionalNormalMatrix.multiplyVector3( THREE.Plane.__v1.copy( this.normal ) );
+
+		var newCoplanarPoint = this.coplanarPoint( THREE.Plane.__v2 );	// __v2 is the optionalTarget
 		newCoplanarPoint = matrix.multiplyVector3( newCoplanarPoint );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
