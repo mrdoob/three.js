@@ -74,6 +74,15 @@ THREE.Plane.prototype = {
 
 	},
 
+	flip: function () {
+
+		this.constant *= -1;
+		this.normal.negate();
+
+		return this;
+
+	},
+
 	distanceToPoint: function ( point ) {
 
 		return this.normal.dot( point ) + this.constant;
