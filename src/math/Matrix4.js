@@ -7,6 +7,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
+ * @author bhouston / http://exocortex.com
  */
 
 
@@ -415,35 +416,39 @@ THREE.Matrix4.prototype = {
 		//( based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm )
 
 		return (
-			n14 * n23 * n32 * n41-
-			n13 * n24 * n32 * n41-
-			n14 * n22 * n33 * n41+
-			n12 * n24 * n33 * n41+
+			n41 * (
+		      +n14 * n23 * n32
+		      -n13 * n24 * n32
+		      -n14 * n22 * n33
+		      +n12 * n24 * n33
+		      +n13 * n22 * n34
+		      -n12 * n23 * n34
+		      ) +
+			n42 * (
+		      +n11 * n23 * n34
+		      -n11 * n24 * n33
+		      +n14 * n21 * n33
+		      -n13 * n21 * n34
+		      +n13 * n24 * n31
+		      -n14 * n23 * n31
+		      ) +
+			n43 * (
+		      +n11 * n24 * n32
+		      -n11 * n22 * n34
+		      -n14 * n21 * n32
+		      +n12 * n21 * n34
+		      +n14 * n22 * n31
+		      -n12 * n24 * n31
+		      ) +
+		    n44 * (
+		      -n13 * n22 * n31
+		      -n11 * n23 * n32
+		      +n11 * n22 * n33
+		      +n13 * n21 * n32
+		      -n12 * n21 * n33
+		      +n12 * n23 * n31
+		      )
 
-			n13 * n22 * n34 * n41-
-			n12 * n23 * n34 * n41-
-			n14 * n23 * n31 * n42+
-			n13 * n24 * n31 * n42+
-
-			n14 * n21 * n33 * n42-
-			n11 * n24 * n33 * n42-
-			n13 * n21 * n34 * n42+
-			n11 * n23 * n34 * n42+
-
-			n14 * n22 * n31 * n43-
-			n12 * n24 * n31 * n43-
-			n14 * n21 * n32 * n43+
-			n11 * n24 * n32 * n43+
-
-			n12 * n21 * n34 * n43-
-			n11 * n22 * n34 * n43-
-			n13 * n22 * n31 * n44+
-			n12 * n23 * n31 * n44+
-
-			n13 * n21 * n32 * n44-
-			n11 * n23 * n32 * n44-
-			n12 * n21 * n33 * n44+
-			n11 * n22 * n33 * n44
 		);
 
 	},
@@ -544,7 +549,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	getInverse: function ( m ) {
+	getInverse: function ( m, throwOnInvertible ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 		var te = this.elements;
@@ -571,7 +576,30 @@ THREE.Matrix4.prototype = {
 		te[7] = n12*n33*n41 - n13*n32*n41 + n13*n31*n42 - n11*n33*n42 - n12*n31*n43 + n11*n32*n43;
 		te[11] = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
 		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
-		this.multiplyScalar( 1 / m.determinant() );
+
+		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 4 ] + me[ 2 ] * te[ 8 ] + me[ 3 ] * te[ 12 ];
+
+		if( det == 0 ) {
+
+			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
+
+			if( throwOnInvertible || false ) {
+
+				throw new Error( msg ); 
+
+			}
+			else {
+
+				console.warn( msg );
+
+			}
+
+			this.identity();
+
+			return this;
+		}
+
+		this.multiplyScalar( 1 / det );
 
 		return this;
 
@@ -1041,7 +1069,6 @@ THREE.Matrix4.prototype = {
 		return this;
 
 	},
-
 
 	clone: function () {
 
