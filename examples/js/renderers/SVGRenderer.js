@@ -383,7 +383,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGB( 0.5 * element.normalModelView.x + 0.5, 0.5 * element.normalModelView.y + 0.5, 0.5 * element.normalModelView.z + 0.5 );
+			_color.r = 0.5 * element.normalModelView.x + 0.5;
+			_color.g = 0.5 * element.normalModelView.y + 0.5;
+			_color.b = 0.5 * element.normalModelView.z + 0.5;
 
 		}
 
@@ -459,7 +461,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGB( 0.5 * element.normalModelView.x + 0.5, 0.5 * element.normalModelView.y + 0.5, 0.5 * element.normalModelView.z + 0.5 );
+			_color.r = 0.5 * element.normalModelView.x + 0.5;
+			_color.g = 0.5 * element.normalModelView.y + 0.5;
+			_color.b = 0.5 * element.normalModelView.z + 0.5;
 
 		}
 
