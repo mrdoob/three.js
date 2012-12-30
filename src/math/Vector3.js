@@ -170,7 +170,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyMatrix3: function ( m ) {
+	applyMatrix3: function ( m ) {
 
 		var x = this.x;
 		var y = this.y;
@@ -186,7 +186,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyMatrix4: function ( m ) {
+	applyMatrix4: function ( m ) {
 
 		var x = this.x;
 		var y = this.y;
@@ -203,7 +203,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyQuaternion: function ( q ) {
+	applyQuaternion: function ( q ) {
 
 		var x = this.x;
 		var y = this.y;

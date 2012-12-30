@@ -167,7 +167,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	multiplyMatrix4: function ( m ) {
+	applyMatrix4: function ( m ) {
 
 		var x = this.x;
 		var y = this.y;

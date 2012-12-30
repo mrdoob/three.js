@@ -173,7 +173,7 @@
 					} else {
 
 						var normal = interect.face.normal.clone();
-						normal.multiplyMatrix4( interect.object.matrixRotationWorld );
+						normal.applyMatrix4( interect.object.matrixRotationWorld );
 
 						var position = new THREE.Vector3().add( interect.point, normal );
 

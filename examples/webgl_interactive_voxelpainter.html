@@ -174,7 +174,7 @@
 			function setVoxelPosition( intersector ) {
 
 				tmpVec.copy( intersector.face.normal );
-				tmpVec.multiplyMatrix4( intersector.object.matrixRotationWorld );
+				tmpVec.applyMatrix4( intersector.object.matrixRotationWorld );
 
 				voxelPosition.add( intersector.point, tmpVec );
 

@@ -40,7 +40,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) vertexCopy.multiplyMatrix4( matrix );
+			if ( matrix ) vertexCopy.applyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
 
@@ -68,7 +68,7 @@ THREE.GeometryUtils = {
 
 			if ( normalMatrix ) {
 
-				faceCopy.normal.multiplyMatrix3( normalMatrix ).normalize();
+				faceCopy.normal.applyMatrix3( normalMatrix ).normalize();
 
 			}
 
@@ -78,7 +78,7 @@ THREE.GeometryUtils = {
 
 				if ( normalMatrix ) {
 
-					normal.multiplyMatrix3( normalMatrix ).normalize();
+					normal.applyMatrix3( normalMatrix ).normalize();
 
 				}
 
@@ -101,7 +101,7 @@ THREE.GeometryUtils = {
 
 			if ( matrix ) {
 
-				faceCopy.centroid.multiplyMatrix4( matrix );
+				faceCopy.centroid.applyMatrix4( matrix );
 
 			}
 

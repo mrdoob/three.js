@@ -1158,7 +1158,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertex = vertices[ v ];
 
 				_vector3.copy( vertex );
-				_vector3.multiplyMatrix4( _projScreenMatrixPS );
+				_vector3.applyMatrix4( _projScreenMatrixPS );
 
 				sortArray[ v ] = [ _vector3.z, v ];
 
@@ -4124,7 +4124,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.multiplyMatrix4( _projScreenMatrix );
+							_vector3.applyMatrix4( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
 

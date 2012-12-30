@@ -175,8 +175,8 @@
 				light.right.set( 1, 0, 0 );
 				light.normal.set( 0, -1, 0 );
 
-				light.right.multiplyMatrix4( matrix );
-				light.normal.multiplyMatrix4( matrix );
+				light.right.applyMatrix4( matrix );
+				light.normal.applyMatrix4( matrix );
 
 			}
 

@@ -160,10 +160,10 @@ THREE.Plane.prototype = {
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		newNormal.copy( this.normal ).multiplyMatrix3( optionalNormalMatrix );
+		newNormal.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
-		newCoplanarPoint.multiplyMatrix4( matrix );
+		newCoplanarPoint.applyMatrix4( matrix );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 

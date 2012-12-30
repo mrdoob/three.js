@@ -42,7 +42,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 
-		return vector.multiplyMatrix4( _viewProjectionMatrix );
+		return vector.applyMatrix4( _viewProjectionMatrix );
 
 	};
 
@@ -52,7 +52,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiply( camera.matrixWorld, camera.projectionMatrixInverse );
 
-		return vector.multiplyMatrix4( _viewProjectionMatrix );
+		return vector.applyMatrix4( _viewProjectionMatrix );
 
 	};
 
@@ -106,7 +106,7 @@ THREE.Projector = function() {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.multiplyMatrix4( _viewProjectionMatrix );
+							_vector3.applyMatrix4( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
 						}
@@ -129,7 +129,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.multiplyMatrix4( _viewProjectionMatrix );
+						_vector3.applyMatrix4( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -148,7 +148,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.multiplyMatrix4( _viewProjectionMatrix );
+						_vector3.applyMatrix4( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -227,10 +227,10 @@ THREE.Projector = function() {
 					_vertex = getNextVertexInPool();
 					_vertex.positionWorld.copy( vertices[ v ] );
 
-					_vertex.positionWorld.multiplyMatrix4( _modelMatrix );
+					_vertex.positionWorld.applyMatrix4( _modelMatrix );
 
 					_vertex.positionScreen.copy( _vertex.positionWorld );
-					_vertex.positionScreen.multiplyMatrix4( _viewProjectionMatrix );
+					_vertex.positionScreen.applyMatrix4( _viewProjectionMatrix );
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
 					_vertex.positionScreen.y /= _vertex.positionScreen.w;
@@ -328,14 +328,14 @@ THREE.Projector = function() {
 
 					}
 
-					_face.normalModel.multiplyMatrix3( _normalMatrix );
+					_face.normalModel.applyMatrix3( _normalMatrix );
 					_face.normalModel.normalize();
 
 					_face.normalModelView.copy( _face.normalModel );
-					_face.normalModelView.multiplyMatrix3( _normalViewMatrix );
+					_face.normalModelView.applyMatrix3( _normalViewMatrix );
 
 					_face.centroidModel.copy( face.centroid );
-					_face.centroidModel.multiplyMatrix4( _modelMatrix );
+					_face.centroidModel.applyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
@@ -350,12 +350,12 @@ THREE.Projector = function() {
 
 						}
 
-						normalModel.multiplyMatrix3( _normalMatrix );
+						normalModel.applyMatrix3( _normalMatrix );
 						normalModel.normalize();
 
 						var normalModelView = _face.vertexNormalsModelView[ n ];
 						normalModelView.copy( normalModel );
-						normalModelView.multiplyMatrix3( _normalViewMatrix );
+						normalModelView.applyMatrix3( _normalViewMatrix );
 
 					}
 
@@ -379,7 +379,7 @@ THREE.Projector = function() {
 					_face.material = material;
 
 					_centroid.copy( _face.centroidModel )
-					_centroid.multiplyMatrix4( _viewProjectionMatrix );
+					_centroid.applyMatrix4( _viewProjectionMatrix );
 
 					_face.z = _centroid.z;
 
@@ -395,7 +395,7 @@ THREE.Projector = function() {
 
 				v1 = getNextVertexInPool();
 				v1.positionScreen.copy( vertices[ 0 ] );
-				v1.positionScreen.multiplyMatrix4( _modelViewProjectionMatrix );
+				v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
 
 				// Handle LineStrip and LinePieces
 				var step = object.type === THREE.LinePieces ? 2 : 1;
@@ -404,7 +404,7 @@ THREE.Projector = function() {
 
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ v ] );
-					v1.positionScreen.multiplyMatrix4( _modelViewProjectionMatrix );
+					v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
 
 					if ( ( v + 1 ) % step > 0 ) continue;
 
@@ -446,7 +446,7 @@ THREE.Projector = function() {
 			if ( object instanceof THREE.Particle ) {
 
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
-				_vector4.multiplyMatrix4( _viewProjectionMatrix );
+				_vector4.applyMatrix4( _viewProjectionMatrix );
 
 				_vector4.z /= _vector4.w;
 
