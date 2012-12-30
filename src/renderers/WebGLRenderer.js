@@ -269,6 +269,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getPrecision = function () {
+
+		return _precision;
+
+	};
+
 	this.setSize = function ( width, height ) {
 
 		_canvas.width = width * this.devicePixelRatio;

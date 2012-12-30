@@ -639,28 +639,29 @@ THREE.Vector2.prototype = {
 	},
 
 
-    setComponent: function ( index, value ) {
+	setComponent: function ( index, value ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: this.x = value; break;
-            case 1: this.y = value; break;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: this.x = value; break;
+			case 1: this.y = value; break;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
-    getComponent: function ( index ) {
+	getComponent: function ( index ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: return this.x;
-            case 1: return this.y;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: return this.x;
+			case 1: return this.y;
+			default: throw new Error( "index is out of range: " + index );
 
-    	}
-    },
+		}
+
+	},
 
 	copy: function ( v ) {
 
@@ -883,7 +884,8 @@ THREE.Vector2.prototype = {
 
 	}
 
-};/**
+};
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author *kile / http://kile.stravaganza.org/
  * @author philogb / http://blog.thejit.org/
@@ -939,31 +941,31 @@ THREE.Vector3.prototype = {
 
 	},
 
-    setComponent: function ( index, value ) {
+	setComponent: function ( index, value ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: this.x = value; break;
-            case 1: this.y = value; break;
-            case 2: this.z = value; break;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: this.x = value; break;
+			case 1: this.y = value; break;
+			case 2: this.z = value; break;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
-    getComponent: function ( index ) {
+	getComponent: function ( index ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: return this.x;
-            case 1: return this.y;
-            case 2: return this.z;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: return this.x;
+			case 1: return this.y;
+			case 2: return this.z;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
 	copy: function ( v ) {
 
@@ -1210,7 +1212,7 @@ THREE.Vector3.prototype = {
 	setLength: function ( l ) {
 
 		var oldLength = this.length();
-		
+
 		if ( oldLength !== 0 && l !== oldLength  ) {
 
 			this.multiplyScalar( l / oldLength );
@@ -1489,7 +1491,8 @@ THREE.Vector3.prototype = {
 
 	}
 
-};/**
+};
+/**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
  * @author mikael emtinger / http://gomo.se/
@@ -1553,33 +1556,33 @@ THREE.Vector4.prototype = {
 
 	},
 
-    setComponent: function ( index, value ) {
+	setComponent: function ( index, value ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: this.x = value; break;
-            case 1: this.y = value; break;
-            case 2: this.z = value; break;
-            case 3: this.w = value; break;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: this.x = value; break;
+			case 1: this.y = value; break;
+			case 2: this.z = value; break;
+			case 3: this.w = value; break;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
-    getComponent: function ( index ) {
+	getComponent: function ( index ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: return this.x;
-            case 1: return this.y;
-            case 2: return this.z;
-            case 3: return this.w;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: return this.x;
+			case 1: return this.y;
+			case 2: return this.z;
+			case 3: return this.w;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
 	copy: function ( v ) {
 
@@ -1827,14 +1830,14 @@ THREE.Vector4.prototype = {
 	setLength: function ( l ) {
 
 		var oldLength = this.length();
-		
-		if ( oldLength !== 0 && l !== oldLength  ) {
+
+		if ( oldLength !== 0 && l !== oldLength ) {
 
 			this.multiplyScalar( l / oldLength );
 		}
 
 		return this;
-		
+
 	},
 
 	lerpSelf: function ( v, alpha ) {
@@ -2012,7 +2015,8 @@ THREE.Vector4.prototype = {
 
 	}
 
-};/**
+};
+/**
  * @author bhouston / http://exocortex.com
  */
 
@@ -2689,13 +2693,15 @@ THREE.Matrix3.prototype = {
 	},
 
 	determinant: function () {
+
 		var te = this.elements;
-		
+
 		var a = te[0], b = te[1], c = te[2],
 			d = te[3], e = te[4], f = te[5],
 			g = te[6], h = te[7], i = te[8];
 
 		return a*e*i - a*f*h - b*d*i + b*f*g + c*d*h - c*e*g;
+
 	},
 
 	getInverse: function ( matrix, throwOnInvertible ) {
@@ -2705,7 +2711,7 @@ THREE.Matrix3.prototype = {
 
 		var me = matrix.elements;
 		var te = this.elements;
-	
+
 		te[ 0 ] =   me[10] * me[5] - me[6] * me[9];
 		te[ 1 ] = - me[10] * me[1] + me[2] * me[9];
 		te[ 2 ] =   me[6] * me[1] - me[2] * me[5];
@@ -2724,12 +2730,11 @@ THREE.Matrix3.prototype = {
 
 			var msg = "Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-			if( throwOnInvertible || false ) {
+			if ( throwOnInvertible || false ) {
 
 				throw new Error( msg ); 
 
-			}
-			else {
+			} else {
 
 				console.warn( msg );
 
@@ -2738,7 +2743,7 @@ THREE.Matrix3.prototype = {
 			this.identity();
 
 			return this;
-			
+
 		}
 
 		this.multiplyScalar( 1.0 / det );
@@ -2795,7 +2800,8 @@ THREE.Matrix3.prototype = {
 
 };
 
-THREE.Matrix3.__v1 = new THREE.Vector3();/**
+THREE.Matrix3.__v1 = new THREE.Vector3();
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
@@ -3214,37 +3220,37 @@ THREE.Matrix4.prototype = {
 
 		return (
 			n41 * (
-		      +n14 * n23 * n32
-		      -n13 * n24 * n32
-		      -n14 * n22 * n33
-		      +n12 * n24 * n33
-		      +n13 * n22 * n34
-		      -n12 * n23 * n34
-		      ) +
+				+n14 * n23 * n32
+				-n13 * n24 * n32
+				-n14 * n22 * n33
+				+n12 * n24 * n33
+				+n13 * n22 * n34
+				-n12 * n23 * n34
+			) +
 			n42 * (
-		      +n11 * n23 * n34
-		      -n11 * n24 * n33
-		      +n14 * n21 * n33
-		      -n13 * n21 * n34
-		      +n13 * n24 * n31
-		      -n14 * n23 * n31
-		      ) +
+				+n11 * n23 * n34
+				-n11 * n24 * n33
+				+n14 * n21 * n33
+				-n13 * n21 * n34
+				+n13 * n24 * n31
+				-n14 * n23 * n31
+			) +
 			n43 * (
-		      +n11 * n24 * n32
-		      -n11 * n22 * n34
-		      -n14 * n21 * n32
-		      +n12 * n21 * n34
-		      +n14 * n22 * n31
-		      -n12 * n24 * n31
-		      ) +
-		    n44 * (
-		      -n13 * n22 * n31
-		      -n11 * n23 * n32
-		      +n11 * n22 * n33
-		      +n13 * n21 * n32
-		      -n12 * n21 * n33
-		      +n12 * n23 * n31
-		      )
+				+n11 * n24 * n32
+				-n11 * n22 * n34
+				-n14 * n21 * n32
+				+n12 * n21 * n34
+				+n14 * n22 * n31
+				-n12 * n24 * n31
+			) +
+			n44 * (
+				-n13 * n22 * n31
+				-n11 * n23 * n32
+				+n11 * n22 * n33
+				+n13 * n21 * n32
+				-n12 * n21 * n33
+				+n12 * n23 * n31
+			)
 
 		);
 
@@ -3272,7 +3278,7 @@ THREE.Matrix4.prototype = {
 		var te = this.elements;
 		flat[ 0 ] = te[0]; flat[ 1 ] = te[1]; flat[ 2 ] = te[2]; flat[ 3 ] = te[3];
 		flat[ 4 ] = te[4]; flat[ 5 ] = te[5]; flat[ 6 ] = te[6]; flat[ 7 ] = te[7];
-		flat[ 8 ]  = te[8]; flat[ 9 ]  = te[9]; flat[ 10 ] = te[10]; flat[ 11 ] = te[11];
+		flat[ 8 ] = te[8]; flat[ 9 ] = te[9]; flat[ 10 ] = te[10]; flat[ 11 ] = te[11];
 		flat[ 12 ] = te[12]; flat[ 13 ] = te[13]; flat[ 14 ] = te[14]; flat[ 15 ] = te[15];
 
 		return flat;
@@ -3376,16 +3382,15 @@ THREE.Matrix4.prototype = {
 
 		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 4 ] + me[ 2 ] * te[ 8 ] + me[ 3 ] * te[ 12 ];
 
-		if( det == 0 ) {
+		if ( det == 0 ) {
 
 			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-			if( throwOnInvertible || false ) {
+			if ( throwOnInvertible || false ) {
 
 				throw new Error( msg ); 
 
-			}
-			else {
+			} else {
 
 				console.warn( msg );
 
@@ -3702,9 +3707,9 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		var scaleXSq =  te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
-		var scaleYSq =  te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
-		var scaleZSq =  te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
+		var scaleXSq = te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
+		var scaleYSq = te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
+		var scaleZSq = te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
 
 		return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
 
@@ -3827,10 +3832,10 @@ THREE.Matrix4.prototype = {
 		var c = - ( far + near ) / ( far - near );
 		var d = - 2 * far * near / ( far - near );
 
-		te[0] = x;  te[4] = 0;  te[8] = a;   te[12] = 0;
-		te[1] = 0;  te[5] = y;  te[9] = b;   te[13] = 0;
-		te[2] = 0;  te[6] = 0;  te[10] = c;   te[14] = d;
-		te[3] = 0;  te[7] = 0;  te[11] = - 1; te[15] = 0;
+		te[0] = x;	te[4] = 0;	te[8] = a;	te[12] = 0;
+		te[1] = 0;	te[5] = y;	te[9] = b;	te[13] = 0;
+		te[2] = 0;	te[6] = 0;	te[10] = c;	te[14] = d;
+		te[3] = 0;	te[7] = 0;	te[11] = - 1;	te[15] = 0;
 
 		return this;
 
@@ -3858,10 +3863,10 @@ THREE.Matrix4.prototype = {
 		var y = ( top + bottom ) / h;
 		var z = ( far + near ) / p;
 
-		te[0] = 2 / w; te[4] = 0;     te[8] = 0;      te[12] = -x;
-		te[1] = 0;     te[5] = 2 / h; te[9] = 0;      te[13] = -y;
-		te[2] = 0;     te[6] = 0;     te[10] = -2 / p; te[14] = -z;
-		te[3] = 0;     te[7] = 0;     te[11] = 0;      te[15] = 1;
+		te[0] = 2 / w;	te[4] = 0;	te[8] = 0;	te[12] = -x;
+		te[1] = 0;	te[5] = 2 / h;	te[9] = 0;	te[13] = -y;
+		te[2] = 0;	te[6] = 0;	te[10] = -2/p;	te[14] = -z;
+		te[3] = 0;	te[7] = 0;	te[11] = 0;	te[15] = 1;
 
 		return this;
 
@@ -17518,6 +17523,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.getMaxAnisotropy  = function () {
 
 		return _maxAnisotropy;
+
+	};
+
+	this.getPrecision = function () {
+
+		return _precision;
 
 	};
 
@@ -35071,12 +35082,14 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 
 THREE.LensFlarePlugin = function ( ) {
 
-	var _gl, _renderer, _lensFlare = {};
+	var _gl, _renderer, _precision, _lensFlare = {};
 
 	this.init = function ( renderer ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+
+		_precision = renderer.getPrecision();
 
 		_lensFlare.vertices = new Float32Array( 8 + 8 );
 		_lensFlare.faces = new Uint16Array( 6 );
@@ -35131,12 +35144,12 @@ THREE.LensFlarePlugin = function ( ) {
 		if ( _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) <= 0 ) {
 
 			_lensFlare.hasVertexTexture = false;
-			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlare" ] );
+			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlare" ], _precision );
 
 		} else {
 
 			_lensFlare.hasVertexTexture = true;
-			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ] );
+			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ], _precision );
 
 		}
 
@@ -35340,15 +35353,17 @@ THREE.LensFlarePlugin = function ( ) {
 
 	};
 
-	function createProgram ( shader ) {
+	function createProgram ( shader, precision ) {
 
 		var program = _gl.createProgram();
 
 		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
 		var vertexShader = _gl.createShader( _gl.VERTEX_SHADER );
 
-		_gl.shaderSource( fragmentShader, shader.fragmentShader );
-		_gl.shaderSource( vertexShader, shader.vertexShader );
+		var prefix = "precision " + precision + " float;\n";
+
+		_gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
+		_gl.shaderSource( vertexShader, prefix + shader.vertexShader );
 
 		_gl.compileShader( fragmentShader );
 		_gl.compileShader( vertexShader );
@@ -35862,12 +35877,14 @@ THREE.ShadowMapPlugin.__projector = new THREE.Projector();
 
 THREE.SpritePlugin = function ( ) {
 
-	var _gl, _renderer, _sprite = {};
+	var _gl, _renderer, _precision, _sprite = {};
 
 	this.init = function ( renderer ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+
+		_precision = renderer.getPrecision();
 
 		_sprite.vertices = new Float32Array( 8 + 8 );
 		_sprite.faces    = new Uint16Array( 6 );
@@ -35900,7 +35917,7 @@ THREE.SpritePlugin = function ( ) {
 		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _sprite.faces, _gl.STATIC_DRAW );
 
-		_sprite.program = createProgram( THREE.ShaderSprite[ "sprite" ] );
+		_sprite.program = createProgram( THREE.ShaderSprite[ "sprite" ], _precision );
 
 		_sprite.attributes = {};
 		_sprite.uniforms = {};
@@ -36119,15 +36136,17 @@ THREE.SpritePlugin = function ( ) {
 
 	};
 
-	function createProgram ( shader ) {
+	function createProgram ( shader, precision ) {
 
 		var program = _gl.createProgram();
 
 		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
 		var vertexShader = _gl.createShader( _gl.VERTEX_SHADER );
 
-		_gl.shaderSource( fragmentShader, shader.fragmentShader );
-		_gl.shaderSource( vertexShader, shader.vertexShader );
+		var prefix = "precision " + precision + " float;\n";
+
+		_gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
+		_gl.shaderSource( vertexShader, prefix + shader.vertexShader );
 
 		_gl.compileShader( fragmentShader );
 		_gl.compileShader( vertexShader );
@@ -36367,10 +36386,11 @@ THREE.ShaderFlares = {
 
 		vertexShader: [
 
+			"uniform lowp int renderType;",
+
 			"uniform vec3 screenPosition;",
 			"uniform vec2 scale;",
 			"uniform float rotation;",
-			"uniform int renderType;",
 
 			"uniform sampler2D occlusionMap;",
 
@@ -36416,11 +36436,10 @@ THREE.ShaderFlares = {
 
 		fragmentShader: [
 
-			"precision mediump float;",
+			"uniform lowp int renderType;",
 
 			"uniform sampler2D map;",
 			"uniform float opacity;",
-			"uniform int renderType;",
 			"uniform vec3 color;",
 
 			"varying vec2 vUV;",
@@ -36461,10 +36480,11 @@ THREE.ShaderFlares = {
 
 		vertexShader: [
 
+			"uniform lowp int renderType;",
+
 			"uniform vec3 screenPosition;",
 			"uniform vec2 scale;",
 			"uniform float rotation;",
-			"uniform int renderType;",
 
 			"attribute vec2 position;",
 			"attribute vec2 uv;",
@@ -36494,10 +36514,11 @@ THREE.ShaderFlares = {
 
 			"precision mediump float;",
 
+			"uniform lowp int renderType;",
+
 			"uniform sampler2D map;",
 			"uniform sampler2D occlusionMap;",
 			"uniform float opacity;",
-			"uniform int renderType;",
 			"uniform vec3 color;",
 
 			"varying vec2 vUV;",
@@ -36599,8 +36620,6 @@ THREE.ShaderSprite = {
 		].join( "\n" ),
 
 		fragmentShader: [
-
-			"precision mediump float;",
 
 			"uniform vec3 color;",
 			"uniform sampler2D map;",
