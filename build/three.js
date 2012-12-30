@@ -1057,6 +1057,67 @@ THREE.Vector3.prototype = {
 
 	},
 
+	multiplyMatrix3: function ( m ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[3] * y + e[6] * z;
+		this.y = e[1] * x + e[4] * y + e[7] * z;
+		this.z = e[2] * x + e[5] * y + e[8] * z;
+
+		return this;
+
+	},
+
+	multiplyMatrix4: function ( m ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+
+		var e = m.elements;
+		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] );
+
+		this.x = ( e[0] * x + e[4] * y + e[8] * z + e[12] ) * d;
+		this.y = ( e[1] * x + e[5] * y + e[9] * z + e[13] ) * d;
+		this.z = ( e[2] * x + e[6] * y + e[10] * z + e[14] ) * d;
+
+		return this;
+
+	},
+
+	multiplyQuaternion: function ( q ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+
+		var qx = q.x;
+		var qy = q.y;
+		var qz = q.z;
+		var qw = q.w;
+
+		// calculate quat * vector
+
+		var ix =  qw * x + qy * z - qz * y;
+		var iy =  qw * y + qz * x - qx * z;
+		var iz =  qw * z + qx * y - qy * x;
+		var iw = -qx * x - qy * y - qz * z;
+
+		// calculate result * inverse quat
+
+		this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+		this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+		this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+		return this;
+
+	},
+
 	divideSelf: function ( v ) {
 
 		this.x /= v.x;
@@ -1656,6 +1717,24 @@ THREE.Vector4.prototype = {
 		this.y *= s;
 		this.z *= s;
 		this.w *= s;
+
+		return this;
+
+	},
+
+	multiplyMatrix4: function ( m ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+		var w = this.w;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[4] * y + e[8] * z + e[12] * w;
+		this.y = e[1] * x + e[5] * y + e[9] * z + e[13] * w;
+		this.z = e[2] * x + e[6] * y + e[10] * z + e[14] * w;
+		this.w = e[3] * x + e[7] * y + e[11] * z + e[15] * w;
 
 		return this;
 
@@ -2528,17 +2607,18 @@ THREE.Box3.prototype = {
 	},
 
 	transform: function ( matrix ) {
-		
+
 		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 		var newPoints = [
-			matrix.multiplyVector3( THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ) ), // 000
-			matrix.multiplyVector3( THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ) ), // 001
-			matrix.multiplyVector3( THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ) ), // 010
-			matrix.multiplyVector3( THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ) ), // 011
-			matrix.multiplyVector3( THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ) ), // 100
-			matrix.multiplyVector3( THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ) ), // 101
-			matrix.multiplyVector3( THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ) ), // 110
-			matrix.multiplyVector3( THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ) )  // 111
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).multiplyMatrix4( matrix ),
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).multiplyMatrix4( matrix ), // 000
+			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).multiplyMatrix4( matrix ), // 001
+			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).multiplyMatrix4( matrix ), // 010
+			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).multiplyMatrix4( matrix ), // 011
+			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).multiplyMatrix4( matrix ), // 100
+			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).multiplyMatrix4( matrix ), // 101
+			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).multiplyMatrix4( matrix ), // 110
+			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).multiplyMatrix4( matrix )  // 111
 		];
 
 		this.makeEmpty();
@@ -2641,20 +2721,6 @@ THREE.Matrix3.prototype = {
 		);
 
 		return this;
-
-	},
-
-	multiplyVector3: function ( v ) {
-
-		var te = this.elements;
-
-		var vx = v.x, vy = v.y, vz = v.z;
-
-		v.x = te[0] * vx + te[3] * vy + te[6] * vz;
-		v.y = te[1] * vx + te[4] * vy + te[7] * vz;
-		v.z = te[2] * vx + te[5] * vy + te[8] * vz;
-
-		return v;
 
 	},
 
@@ -3122,35 +3188,6 @@ THREE.Matrix4.prototype = {
 		te[3] *= s; te[7] *= s; te[11] *= s; te[15] *= s;
 
 		return this;
-
-	},
-
-	multiplyVector3: function ( v ) {
-
-		var te = this.elements;
-
-		var vx = v.x, vy = v.y, vz = v.z;
-		var d = 1 / ( te[3] * vx + te[7] * vy + te[11] * vz + te[15] );
-
-		v.x = ( te[0] * vx + te[4] * vy + te[8] * vz + te[12] ) * d;
-		v.y = ( te[1] * vx + te[5] * vy + te[9] * vz + te[13] ) * d;
-		v.z = ( te[2] * vx + te[6] * vy + te[10] * vz + te[14] ) * d;
-
-		return v;
-
-	},
-
-	multiplyVector4: function ( v ) {
-
-		var te = this.elements;
-		var vx = v.x, vy = v.y, vz = v.z, vw = v.w;
-
-		v.x = te[0] * vx + te[4] * vy + te[8] * vz + te[12] * vw;
-		v.y = te[1] * vx + te[5] * vy + te[9] * vz + te[13] * vw;
-		v.z = te[2] * vx + te[6] * vy + te[10] * vz + te[14] * vw;
-		v.w = te[3] * vx + te[7] * vy + te[11] * vz + te[15] * vw;
-
-		return v;
 
 	},
 
@@ -4030,8 +4067,8 @@ THREE.Ray.prototype = {
 
 	transform: function ( matrix4 ) {
 
-		this.direction = matrix4.multiplyVector3( this.direction.addSelf( this.origin ) );
-		this.origin = matrix4.multiplyVector3( this.origin );
+		this.direction.addSelf( this.origin ).multiplyMatrix4( matrix4 );
+		this.origin.multiplyMatrix4( matrix4 );
 		this.direction.subSelf( this.origin );
 
 		return this;
@@ -4052,7 +4089,8 @@ THREE.Ray.prototype = {
 };
 
 THREE.Ray.__v1 = new THREE.Vector3();
-THREE.Ray.__v2 = new THREE.Vector3();/**
+THREE.Ray.__v2 = new THREE.Vector3();
+/**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author bhouston / http://exocortex.com
@@ -4275,22 +4313,22 @@ THREE.Plane.prototype = {
 
 	},
 
-	transform: function( matrix, optionalNormalMatrix ) {
+	transform: function ( matrix, optionalNormalMatrix ) {
 
 		var newNormal = THREE.Plane.__v1, newCoplanarPoint = THREE.Plane.__v2;
 
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		newNormal = optionalNormalMatrix.multiplyVector3( newNormal.copy( this.normal ) );
+		newNormal.copy( this.normal ).multiplyMatrix3( optionalNormalMatrix );
 
 		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
-		newCoplanarPoint = matrix.multiplyVector3( newCoplanarPoint );
+		newCoplanarPoint.multiplyMatrix4( matrix );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 
 		return this;
-		
+
 	},
 
 	translate: function ( offset ) {
@@ -4417,8 +4455,8 @@ THREE.Sphere.prototype = {
 	},
 
 	transform: function ( matrix ) {
-		
-		this.center = matrix.multiplyVector3( this.center );
+
+		this.center.multiplyMatrix4( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
@@ -4783,30 +4821,6 @@ THREE.Quaternion.prototype = {
 		this.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
 		return this;
-
-	},
-
-	multiplyVector3: function ( vector, dest ) {
-
-		if ( !dest ) { dest = vector; }
-
-		var x    = vector.x,  y  = vector.y,  z  = vector.z,
-			qx   = this.x, qy = this.y, qz = this.z, qw = this.w;
-
-		// calculate quat * vector
-
-		var ix =  qw * x + qy * z - qz * y,
-			iy =  qw * y + qz * x - qx * z,
-			iz =  qw * z + qx * y - qy * x,
-			iw = -qx * x - qy * y - qz * z;
-
-		// calculate result * inverse quat
-
-		dest.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
-		dest.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
-		dest.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
-
-		return dest;
 
 	},
 
@@ -5709,13 +5723,13 @@ THREE.Object3D.prototype = {
 
 	localToWorld: function ( vector ) {
 
-		return this.matrixWorld.multiplyVector3( vector );
+		return vector.multiplyMatrix4( this.matrixWorld );
 
 	},
 
 	worldToLocal: function ( vector ) {
 
-		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
+		return vector.multiplyMatrix4( THREE.Object3D.__m1.getInverse( this.matrixWorld ) );
 
 	},
 
@@ -6018,9 +6032,8 @@ THREE.Projector = function() {
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 		_viewProjectionMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
-		_viewProjectionMatrix.multiplyVector3( vector );
 
-		return vector;
+		return vector.multiplyMatrix4( _viewProjectionMatrix );
 
 	};
 
@@ -6029,9 +6042,8 @@ THREE.Projector = function() {
 		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
 
 		_viewProjectionMatrix.multiply( camera.matrixWorld, camera.projectionMatrixInverse );
-		_viewProjectionMatrix.multiplyVector3( vector );
 
-		return vector;
+		return vector.multiplyMatrix4( _viewProjectionMatrix );
 
 	};
 
@@ -6085,7 +6097,7 @@ THREE.Projector = function() {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_viewProjectionMatrix.multiplyVector3( _vector3 );
+							_vector3.multiplyMatrix4( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
 						}
@@ -6108,7 +6120,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_viewProjectionMatrix.multiplyVector3( _vector3 );
+						_vector3.multiplyMatrix4( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -6127,7 +6139,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_viewProjectionMatrix.multiplyVector3( _vector3 );
+						_vector3.multiplyMatrix4( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -6206,10 +6218,10 @@ THREE.Projector = function() {
 					_vertex = getNextVertexInPool();
 					_vertex.positionWorld.copy( vertices[ v ] );
 
-					_modelMatrix.multiplyVector3( _vertex.positionWorld );
+					_vertex.positionWorld.multiplyMatrix4( _modelMatrix );
 
 					_vertex.positionScreen.copy( _vertex.positionWorld );
-					_viewProjectionMatrix.multiplyVector4( _vertex.positionScreen );
+					_vertex.positionScreen.multiplyMatrix4( _viewProjectionMatrix );
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
 					_vertex.positionScreen.y /= _vertex.positionScreen.w;
@@ -6307,14 +6319,14 @@ THREE.Projector = function() {
 
 					}
 
-					_normalMatrix.multiplyVector3( _face.normalModel );
+					_face.normalModel.multiplyMatrix3( _normalMatrix );
 					_face.normalModel.normalize();
 
 					_face.normalModelView.copy( _face.normalModel );
-					_normalViewMatrix.multiplyVector3( _face.normalModelView );
+					_face.normalModelView.multiplyMatrix3( _normalViewMatrix );
 
 					_face.centroidModel.copy( face.centroid );
-					_modelMatrix.multiplyVector3( _face.centroidModel );
+					_face.centroidModel.multiplyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
@@ -6329,12 +6341,12 @@ THREE.Projector = function() {
 
 						}
 
-						_normalMatrix.multiplyVector3( normalModel )
+						normalModel.multiplyMatrix3( _normalMatrix );
 						normalModel.normalize();
 
 						var normalModelView = _face.vertexNormalsModelView[ n ];
 						normalModelView.copy( normalModel );
-						_normalViewMatrix.multiplyVector3( normalModelView )
+						normalModelView.multiplyMatrix3( _normalViewMatrix );
 
 					}
 
@@ -6358,7 +6370,7 @@ THREE.Projector = function() {
 					_face.material = material;
 
 					_centroid.copy( _face.centroidModel )
-					_viewProjectionMatrix.multiplyVector3( _centroid );
+					_centroid.multiplyMatrix4( _viewProjectionMatrix );
 
 					_face.z = _centroid.z;
 
@@ -6374,8 +6386,7 @@ THREE.Projector = function() {
 
 				v1 = getNextVertexInPool();
 				v1.positionScreen.copy( vertices[ 0 ] );
-
-				_modelViewProjectionMatrix.multiplyVector4( v1.positionScreen );
+				v1.positionScreen.multiplyMatrix4( _modelViewProjectionMatrix );
 
 				// Handle LineStrip and LinePieces
 				var step = object.type === THREE.LinePieces ? 2 : 1;
@@ -6384,8 +6395,7 @@ THREE.Projector = function() {
 
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ v ] );
-
-					_modelViewProjectionMatrix.multiplyVector4( v1.positionScreen );
+					v1.positionScreen.multiplyMatrix4( _modelViewProjectionMatrix );
 
 					if ( ( v + 1 ) % step > 0 ) continue;
 
@@ -6427,7 +6437,7 @@ THREE.Projector = function() {
 			if ( object instanceof THREE.Particle ) {
 
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
-				_viewProjectionMatrix.multiplyVector4( _vector4 );
+				_vector4.multiplyMatrix4( _viewProjectionMatrix );
 
 				_vector4.z /= _vector4.w;
 
@@ -6799,31 +6809,27 @@ THREE.Geometry.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		var normalMatrix = new THREE.Matrix3();
-
-		normalMatrix.getInverse( matrix ).transpose();
+		var normalMatrix = new THREE.Matrix3().getInverse( matrix ).transpose();
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			var vertex = this.vertices[ i ];
-
-			matrix.multiplyVector3( vertex );
+			vertex.multiplyMatrix4( matrix );
 
 		}
 
 		for ( var i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			var face = this.faces[ i ];
-
-			normalMatrix.multiplyVector3( face.normal ).normalize();
+			face.normal.multiplyMatrix3( normalMatrix ).normalize();
 
 			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
-				normalMatrix.multiplyVector3( face.vertexNormals[ j ] ).normalize();
+				face.vertexNormals[ j ].multiplyMatrix3( normalMatrix ).normalize();
 
 			}
 
-			matrix.multiplyVector3( face.centroid );
+			face.centroid.multiplyMatrix4( matrix );
 
 		}
 
@@ -18415,7 +18421,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertex = vertices[ v ];
 
 				_vector3.copy( vertex );
-				_projScreenMatrixPS.multiplyVector3( _vector3 );
+				_vector3.multiplyMatrix4( _projScreenMatrixPS );
 
 				sortArray[ v ] = [ _vector3.z, v ];
 
@@ -21381,7 +21387,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_projScreenMatrix.multiplyVector3( _vector3 );
+							_vector3.multiplyMatrix4( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
 
@@ -24943,7 +24949,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) matrix.multiplyVector3( vertexCopy );
+			if ( matrix ) vertexCopy.multiplyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
 
@@ -24969,13 +24975,13 @@ THREE.GeometryUtils = {
 
 			faceCopy.normal.copy( face.normal );
 
-			if ( matrixRotation ) matrixRotation.multiplyVector3( faceCopy.normal );
+			if ( matrixRotation ) faceCopy.normal.multiplyMatrix4( matrixRotation );
 
 			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
 
 				normal = faceVertexNormals[ j ].clone();
 
-				if ( matrixRotation ) matrixRotation.multiplyVector3( normal );
+				if ( matrixRotation ) normal.multiplyMatrix4( matrixRotation );
 
 				faceCopy.vertexNormals.push( normal );
 
@@ -24993,7 +24999,7 @@ THREE.GeometryUtils = {
 			faceCopy.materialIndex = face.materialIndex;
 
 			faceCopy.centroid.copy( face.centroid );
-			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
+			if ( matrix ) faceCopy.centroid.multiplyMatrix4( matrix );
 
 			faces1.push( faceCopy );
 
@@ -32637,7 +32643,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 		for ( var j = 0; j < _newV.length; j ++ ) {
 
-			_newV[ j ] = _matrix.multiplyVector3( _newV[ j ].clone() );
+			_newV[ j ] = _newV[ j ].clone().multiplyMatrix4( _matrix );
 			this.vertices.push( _newV[ j ] );
 
 		}
@@ -33330,7 +33336,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 			theta = Math.acos( tangents[ i-1 ].dot( tangents[ i ] ) );
 
-			mat.makeRotationAxis( vec, theta ).multiplyVector3( normals[ i ] );
+			normals[ i ].multiplyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
 		}
 
@@ -33355,7 +33361,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		for ( i = 1; i < numpoints; i++ ) {
 
 			// twist a little...
-			mat.makeRotationAxis( tangents[ i ], theta * i ).multiplyVector3( normals[ i ] );
+			normals[ i ].multiplyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
 			binormals[ i ].cross( tangents[ i ], normals[ i ] );
 
 		}
@@ -35237,8 +35243,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
-			camera.matrixWorldInverse.multiplyVector3( tempPosition );
-			camera.projectionMatrix.multiplyVector3( tempPosition );
+			tempPosition.multiplyMatrix4( camera.matrixWorldInverse );
+			tempPosition.multiplyMatrix4( camera.projectionMatrix );
 
 			// setup arrays for gl programs
 
@@ -35377,7 +35383,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 	};
 
-};/**
+};
+/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -35830,7 +35837,7 @@ THREE.ShadowMapPlugin = function ( ) {
 			p.copy( pointsFrustum[ i ] );
 			THREE.ShadowMapPlugin.__projector.unprojectVector( p, camera );
 
-			shadowCamera.matrixWorldInverse.multiplyVector3( p );
+			p.multiplyMatrix4( shadowCamera.matrixWorldInverse );
 
 			if ( p.x < _min.x ) _min.x = p.x;
 			if ( p.x > _max.x ) _max.x = p.x;
