@@ -444,7 +444,7 @@ THREE.ColladaLoader = function () {
 
 			for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
-				skin.bindShapeMatrix.multiplyVector3( geometry.vertices[ i ] );
+				geometry.vertices[ i ].multiplyMatrix4( skin.bindShapeMatrix );
 
 			}
 
@@ -575,7 +575,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < geometry.vertices.length; i ++ ) {
 
-			skinController.skin.bindShapeMatrix.multiplyVector3( geometry.vertices[i] );
+			geometry.vertices[i].multiplyMatrix4( skinController.skin.bindShapeMatrix );
 
 		}
 
@@ -619,7 +619,7 @@ THREE.ColladaLoader = function () {
 					v.y = o.y;
 					v.z = o.z;
 
-					bones[i].skinningMatrix.multiplyVector3(v);
+					v.multiplyMatrix4( bones[i].skinningMatrix );
 
 					s.x += (v.x * weight);
 					s.y += (v.y * weight);
@@ -849,7 +849,9 @@ THREE.ColladaLoader = function () {
 		if ( options.centerGeometry && obj.geometry ) {
 
 			var delta = THREE.GeometryUtils.center( obj.geometry );
-			obj.quaternion.multiplyVector3( delta.multiplySelf( obj.scale ) );
+			delta.multiplySelf( obj.scale );
+			delta.multiplyQuaternion( obj.quaternion );
+
 			obj.position.subSelf( delta );
 
 		}

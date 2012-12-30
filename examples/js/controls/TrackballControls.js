@@ -135,10 +135,10 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			quaternion.setFromAxisAngle( axis, -angle );
 
-			quaternion.multiplyVector3( _eye );
-			quaternion.multiplyVector3( _this.object.up );
+			_eye.multiplyQuaternion( quaternion );
+			_this.object.up.multiplyQuaternion( quaternion );
 
-			quaternion.multiplyVector3( _rotateEnd );
+			_rotateEnd.multiplyQuaternion( quaternion );
 
 			if ( _this.staticMoving ) {
 
@@ -147,7 +147,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 			} else {
 
 				quaternion.setFromAxisAngle( axis, angle * ( _this.dynamicDampingFactor - 1.0 ) );
-				quaternion.multiplyVector3( _rotateStart );
+				_rotateStart.multiplyQuaternion( quaternion );
 
 			}
 

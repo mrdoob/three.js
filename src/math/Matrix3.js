@@ -63,20 +63,6 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	multiplyVector3: function ( v ) {
-
-		var te = this.elements;
-
-		var vx = v.x, vy = v.y, vz = v.z;
-
-		v.x = te[0] * vx + te[3] * vy + te[6] * vz;
-		v.y = te[1] * vx + te[4] * vy + te[7] * vz;
-		v.z = te[2] * vx + te[5] * vy + te[8] * vz;
-
-		return v;
-
-	},
-
 	multiplyVector3Array: function ( a ) {
 
 		var tmp = THREE.Matrix3.__v1;

@@ -167,6 +167,24 @@ THREE.Vector4.prototype = {
 
 	},
 
+	multiplyMatrix4: function ( m ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+		var w = this.w;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[4] * y + e[8] * z + e[12] * w;
+		this.y = e[1] * x + e[5] * y + e[9] * z + e[13] * w;
+		this.z = e[2] * x + e[6] * y + e[10] * z + e[14] * w;
+		this.w = e[3] * x + e[7] * y + e[11] * z + e[15] * w;
+
+		return this;
+
+	},
+
 	divideScalar: function ( s ) {
 
 		if ( s !== 0 ) {

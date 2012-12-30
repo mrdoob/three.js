@@ -153,22 +153,22 @@ THREE.Plane.prototype = {
 
 	},
 
-	transform: function( matrix, optionalNormalMatrix ) {
+	transform: function ( matrix, optionalNormalMatrix ) {
 
 		var newNormal = THREE.Plane.__v1, newCoplanarPoint = THREE.Plane.__v2;
 
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		newNormal = optionalNormalMatrix.multiplyVector3( newNormal.copy( this.normal ) );
+		newNormal.copy( this.normal ).multiplyMatrix3( optionalNormalMatrix );
 
 		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
-		newCoplanarPoint = matrix.multiplyVector3( newCoplanarPoint );
+		newCoplanarPoint.multiplyMatrix4( matrix );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 
 		return this;
-		
+
 	},
 
 	translate: function ( offset ) {
