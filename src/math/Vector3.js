@@ -54,31 +54,31 @@ THREE.Vector3.prototype = {
 
 	},
 
-    setComponent: function ( index, value ) {
+	setComponent: function ( index, value ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: this.x = value; break;
-            case 1: this.y = value; break;
-            case 2: this.z = value; break;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: this.x = value; break;
+			case 1: this.y = value; break;
+			case 2: this.z = value; break;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
-    getComponent: function ( index ) {
+	getComponent: function ( index ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: return this.x;
-            case 1: return this.y;
-            case 2: return this.z;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: return this.x;
+			case 1: return this.y;
+			case 2: return this.z;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
 	copy: function ( v ) {
 
@@ -325,7 +325,7 @@ THREE.Vector3.prototype = {
 	setLength: function ( l ) {
 
 		var oldLength = this.length();
-		
+
 		if ( oldLength !== 0 && l !== oldLength  ) {
 
 			this.multiplyScalar( l / oldLength );
