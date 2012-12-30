@@ -330,7 +330,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms[ "lightRadius" ].value = distance;
 
 			positionVS.copy( light.matrixWorld.getPosition() );
-			camera.matrixWorldInverse.multiplyVector3( positionVS );
+			positionVS.multiplyMatrix4( camera.matrixWorldInverse );
+
 			uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
 			lightProxy.position.copy( light.matrixWorld.getPosition() );
@@ -421,7 +422,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var modelMatrix = light.matrixWorld;
 
 		positionVS.copy( modelMatrix.getPosition() );
-		viewMatrix.multiplyVector3( positionVS );
+		positionVS.multiplyMatrix4( viewMatrix );
 
 		directionVS.copy( modelMatrix.getPosition() );
 		directionVS.subSelf( light.target.matrixWorld.getPosition() );
@@ -629,7 +630,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var viewMatrix = camera.matrixWorldInverse;
 
 		positionVS.copy( modelMatrix.getPosition() );
-		viewMatrix.multiplyVector3( positionVS );
+		positionVS.multiplyMatrix4( viewMatrix );
+
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
 		rightVS.copy( light.right );

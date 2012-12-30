@@ -133,8 +133,8 @@ THREE.Ray.prototype = {
 
 	transform: function ( matrix4 ) {
 
-		this.direction = matrix4.multiplyVector3( this.direction.addSelf( this.origin ) );
-		this.origin = matrix4.multiplyVector3( this.origin );
+		this.direction.addSelf( this.origin ).multiplyMatrix4( matrix4 );
+		this.origin.multiplyMatrix4( matrix4 );
 		this.direction.subSelf( this.origin );
 
 		return this;

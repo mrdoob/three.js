@@ -38,7 +38,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) matrix.multiplyVector3( vertexCopy );
+			if ( matrix ) vertexCopy.multiplyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
 
@@ -64,13 +64,13 @@ THREE.GeometryUtils = {
 
 			faceCopy.normal.copy( face.normal );
 
-			if ( matrixRotation ) matrixRotation.multiplyVector3( faceCopy.normal );
+			if ( matrixRotation ) faceCopy.normal.multiplyMatrix4( matrixRotation );
 
 			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
 
 				normal = faceVertexNormals[ j ].clone();
 
-				if ( matrixRotation ) matrixRotation.multiplyVector3( normal );
+				if ( matrixRotation ) normal.multiplyMatrix4( matrixRotation );
 
 				faceCopy.vertexNormals.push( normal );
 
@@ -88,7 +88,7 @@ THREE.GeometryUtils = {
 			faceCopy.materialIndex = face.materialIndex;
 
 			faceCopy.centroid.copy( face.centroid );
-			if ( matrix ) matrix.multiplyVector3( faceCopy.centroid );
+			if ( matrix ) faceCopy.centroid.multiplyMatrix4( matrix );
 
 			faces1.push( faceCopy );
 
