@@ -724,13 +724,42 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				_color.r = 0.5 * element.normalModelView.x + 0.5;
-				_color.g = 0.5 * element.normalModelView.y + 0.5;
-				_color.b = 0.5 * element.normalModelView.z + 0.5;
+				if ( material.shading == THREE.FlatShading ) {
 
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					_color.r = 0.5 * element.normalModelView.x + 0.5;
+					_color.g = 0.5 * element.normalModelView.y + 0.5;
+					_color.b = 0.5 * element.normalModelView.z + 0.5;
+
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
+
+				} else if ( material.shading == THREE.SmoothShading ) {
+
+					_vector3.copy( element.vertexNormalsModelView[ uv1 ] );
+					_color1.r = 0.5 * _vector3.x + 0.5;
+					_color1.g = 0.5 * _vector3.y + 0.5;
+					_color1.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ uv2 ] );
+					_color2.r = 0.5 * _vector3.x + 0.5;
+					_color2.g = 0.5 * _vector3.y + 0.5;
+					_color2.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ uv3 ] );
+					_color3.r = 0.5 * _vector3.x + 0.5;
+					_color3.g = 0.5 * _vector3.y + 0.5;
+					_color3.b = 0.5 * _vector3.z + 0.5;
+
+					_color4.r = ( _color2.r + _color3.r ) * 0.5;
+					_color4.g = ( _color2.g + _color3.g ) * 0.5;
+					_color4.b = ( _color2.b + _color3.b ) * 0.5;
+
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, 0, 0, 1, 0, 0, 1, _image );
+
+				}
 
 			}
 
@@ -868,15 +897,51 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				_color.r = 0.5 * element.normalModelView.x + 0.5;
-				_color.g = 0.5 * element.normalModelView.y + 0.5;
-				_color.b = 0.5 * element.normalModelView.z + 0.5;
+				if ( material.shading == THREE.FlatShading ) {
 
-				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+					_color.r = 0.5 * element.normalModelView.x + 0.5;
+					_color.g = 0.5 * element.normalModelView.y + 0.5;
+					_color.b = 0.5 * element.normalModelView.z + 0.5;
 
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
+
+				} else if ( material.shading == THREE.SmoothShading ) {
+
+					_vector3.copy( element.vertexNormalsModelView[ 0 ] );
+					_color1.r = 0.5 * _vector3.x + 0.5;
+					_color1.g = 0.5 * _vector3.y + 0.5;
+					_color1.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 1 ] );
+					_color2.r = 0.5 * _vector3.x + 0.5;
+					_color2.g = 0.5 * _vector3.y + 0.5;
+					_color2.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 3 ] );
+					_color3.r = 0.5 * _vector3.x + 0.5;
+					_color3.g = 0.5 * _vector3.y + 0.5;
+					_color3.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 2 ] );
+					_color4.r = 0.5 * _vector3.x + 0.5;
+					_color4.g = 0.5 * _vector3.y + 0.5;
+					_color4.b = 0.5 * _vector3.z + 0.5;
+
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+					drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
+
+					drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
+					clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
+
+				}
+
+
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
