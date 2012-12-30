@@ -6181,7 +6181,7 @@ THREE.Projector = function() {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
-		_viewMatrix.getInverse( camera.matrixWorld );
+		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiply( camera.projectionMatrix, _viewMatrix );
 
 		_normalViewMatrix.getInverse( _viewMatrix );
@@ -12174,21 +12174,6 @@ THREE.ParticleCanvasMaterial.prototype.clone = function () {
 	material.program = this.program;
 
 	return material;
-
-};
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.ParticleDOMMaterial = function ( element ) {
-
-	this.element = element;
-
-};
-
-THREE.ParticleDOMMaterial.prototype.clone = function(){
-
-	return new THREE.ParticleDOMMaterial( this.element );
 
 };
 /**
@@ -22017,7 +22002,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					addBuffer( scene.__webglObjects, geometry, object );
 
-				} else {
+				} else if ( geometry instanceof THREE.Geometry ) {
 
 					for ( g in geometry.geometryGroups ) {
 
