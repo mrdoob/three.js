@@ -190,7 +190,7 @@ THREE.Projector = function() {
 
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
-		_viewMatrix.getInverse( camera.matrixWorld );
+		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiply( camera.projectionMatrix, _viewMatrix );
 
 		_normalViewMatrix.getInverse( _viewMatrix );
