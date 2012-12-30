@@ -1,6 +1,0 @@
-module( "Color" );
-
-test( "constructor", function(){
-    var c = new Color()
-    ok(c, "Passed!")
-});
