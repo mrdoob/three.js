@@ -853,8 +853,8 @@ THREE.Vector2.prototype = {
 	setLength: function ( l ) {
 
 		var oldLength = this.length();
-		
-		if ( oldLength !== 0 && l !== oldLength  ) {
+
+		if ( oldLength !== 0 && l !== oldLength ) {
 
 			this.multiplyScalar( l / oldLength );
 		}
@@ -1057,7 +1057,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyMatrix3: function ( m ) {
+	applyMatrix3: function ( m ) {
 
 		var x = this.x;
 		var y = this.y;
@@ -1073,7 +1073,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyMatrix4: function ( m ) {
+	applyMatrix4: function ( m ) {
 
 		var x = this.x;
 		var y = this.y;
@@ -1090,7 +1090,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyQuaternion: function ( q ) {
+	applyQuaternion: function ( q ) {
 
 		var x = this.x;
 		var y = this.y;
@@ -1722,7 +1722,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	multiplyMatrix4: function ( m ) {
+	applyMatrix4: function ( m ) {
 
 		var x = this.x;
 		var y = this.y;
@@ -2610,15 +2610,15 @@ THREE.Box3.prototype = {
 
 		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 		var newPoints = [
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).multiplyMatrix4( matrix ),
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).multiplyMatrix4( matrix ), // 000
-			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).multiplyMatrix4( matrix ), // 001
-			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).multiplyMatrix4( matrix ), // 010
-			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).multiplyMatrix4( matrix ), // 011
-			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).multiplyMatrix4( matrix ), // 100
-			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).multiplyMatrix4( matrix ), // 101
-			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).multiplyMatrix4( matrix ), // 110
-			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).multiplyMatrix4( matrix )  // 111
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ),
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 000
+			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 001
+			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 010
+			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ), // 011
+			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 100
+			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 101
+			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 110
+			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix )  // 111
 		];
 
 		this.makeEmpty();
@@ -4067,8 +4067,8 @@ THREE.Ray.prototype = {
 
 	transform: function ( matrix4 ) {
 
-		this.direction.addSelf( this.origin ).multiplyMatrix4( matrix4 );
-		this.origin.multiplyMatrix4( matrix4 );
+		this.direction.addSelf( this.origin ).applyMatrix4( matrix4 );
+		this.origin.applyMatrix4( matrix4 );
 		this.direction.subSelf( this.origin );
 
 		return this;
@@ -4320,10 +4320,10 @@ THREE.Plane.prototype = {
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		newNormal.copy( this.normal ).multiplyMatrix3( optionalNormalMatrix );
+		newNormal.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
-		newCoplanarPoint.multiplyMatrix4( matrix );
+		newCoplanarPoint.applyMatrix4( matrix );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 
@@ -4456,7 +4456,7 @@ THREE.Sphere.prototype = {
 
 	transform: function ( matrix ) {
 
-		this.center.multiplyMatrix4( matrix );
+		this.center.applyMatrix4( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
@@ -5723,13 +5723,13 @@ THREE.Object3D.prototype = {
 
 	localToWorld: function ( vector ) {
 
-		return vector.multiplyMatrix4( this.matrixWorld );
+		return vector.applyMatrix4( this.matrixWorld );
 
 	},
 
 	worldToLocal: function ( vector ) {
 
-		return vector.multiplyMatrix4( THREE.Object3D.__m1.getInverse( this.matrixWorld ) );
+		return vector.applyMatrix4( THREE.Object3D.__m1.getInverse( this.matrixWorld ) );
 
 	},
 
@@ -6033,7 +6033,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
 
-		return vector.multiplyMatrix4( _viewProjectionMatrix );
+		return vector.applyMatrix4( _viewProjectionMatrix );
 
 	};
 
@@ -6043,7 +6043,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiply( camera.matrixWorld, camera.projectionMatrixInverse );
 
-		return vector.multiplyMatrix4( _viewProjectionMatrix );
+		return vector.applyMatrix4( _viewProjectionMatrix );
 
 	};
 
@@ -6097,7 +6097,7 @@ THREE.Projector = function() {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.multiplyMatrix4( _viewProjectionMatrix );
+							_vector3.applyMatrix4( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
 						}
@@ -6120,7 +6120,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.multiplyMatrix4( _viewProjectionMatrix );
+						_vector3.applyMatrix4( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -6139,7 +6139,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.multiplyMatrix4( _viewProjectionMatrix );
+						_vector3.applyMatrix4( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -6218,10 +6218,10 @@ THREE.Projector = function() {
 					_vertex = getNextVertexInPool();
 					_vertex.positionWorld.copy( vertices[ v ] );
 
-					_vertex.positionWorld.multiplyMatrix4( _modelMatrix );
+					_vertex.positionWorld.applyMatrix4( _modelMatrix );
 
 					_vertex.positionScreen.copy( _vertex.positionWorld );
-					_vertex.positionScreen.multiplyMatrix4( _viewProjectionMatrix );
+					_vertex.positionScreen.applyMatrix4( _viewProjectionMatrix );
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
 					_vertex.positionScreen.y /= _vertex.positionScreen.w;
@@ -6319,14 +6319,14 @@ THREE.Projector = function() {
 
 					}
 
-					_face.normalModel.multiplyMatrix3( _normalMatrix );
+					_face.normalModel.applyMatrix3( _normalMatrix );
 					_face.normalModel.normalize();
 
 					_face.normalModelView.copy( _face.normalModel );
-					_face.normalModelView.multiplyMatrix3( _normalViewMatrix );
+					_face.normalModelView.applyMatrix3( _normalViewMatrix );
 
 					_face.centroidModel.copy( face.centroid );
-					_face.centroidModel.multiplyMatrix4( _modelMatrix );
+					_face.centroidModel.applyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
@@ -6341,12 +6341,12 @@ THREE.Projector = function() {
 
 						}
 
-						normalModel.multiplyMatrix3( _normalMatrix );
+						normalModel.applyMatrix3( _normalMatrix );
 						normalModel.normalize();
 
 						var normalModelView = _face.vertexNormalsModelView[ n ];
 						normalModelView.copy( normalModel );
-						normalModelView.multiplyMatrix3( _normalViewMatrix );
+						normalModelView.applyMatrix3( _normalViewMatrix );
 
 					}
 
@@ -6370,7 +6370,7 @@ THREE.Projector = function() {
 					_face.material = material;
 
 					_centroid.copy( _face.centroidModel )
-					_centroid.multiplyMatrix4( _viewProjectionMatrix );
+					_centroid.applyMatrix4( _viewProjectionMatrix );
 
 					_face.z = _centroid.z;
 
@@ -6386,7 +6386,7 @@ THREE.Projector = function() {
 
 				v1 = getNextVertexInPool();
 				v1.positionScreen.copy( vertices[ 0 ] );
-				v1.positionScreen.multiplyMatrix4( _modelViewProjectionMatrix );
+				v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
 
 				// Handle LineStrip and LinePieces
 				var step = object.type === THREE.LinePieces ? 2 : 1;
@@ -6395,7 +6395,7 @@ THREE.Projector = function() {
 
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ v ] );
-					v1.positionScreen.multiplyMatrix4( _modelViewProjectionMatrix );
+					v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
 
 					if ( ( v + 1 ) % step > 0 ) continue;
 
@@ -6437,7 +6437,7 @@ THREE.Projector = function() {
 			if ( object instanceof THREE.Particle ) {
 
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
-				_vector4.multiplyMatrix4( _viewProjectionMatrix );
+				_vector4.applyMatrix4( _viewProjectionMatrix );
 
 				_vector4.z /= _vector4.w;
 
@@ -6814,22 +6814,22 @@ THREE.Geometry.prototype = {
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			var vertex = this.vertices[ i ];
-			vertex.multiplyMatrix4( matrix );
+			vertex.applyMatrix4( matrix );
 
 		}
 
 		for ( var i = 0, il = this.faces.length; i < il; i ++ ) {
 
 			var face = this.faces[ i ];
-			face.normal.multiplyMatrix3( normalMatrix ).normalize();
+			face.normal.applyMatrix3( normalMatrix ).normalize();
 
 			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
 
-				face.vertexNormals[ j ].multiplyMatrix3( normalMatrix ).normalize();
+				face.vertexNormals[ j ].applyMatrix3( normalMatrix ).normalize();
 
 			}
 
-			face.centroid.multiplyMatrix4( matrix );
+			face.centroid.applyMatrix4( matrix );
 
 		}
 
@@ -14226,13 +14226,42 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				_color.r = 0.5 * element.normalModelView.x + 0.5;
-				_color.g = 0.5 * element.normalModelView.y + 0.5;
-				_color.b = 0.5 * element.normalModelView.z + 0.5;
+				if ( material.shading == THREE.FlatShading ) {
 
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					_color.r = 0.5 * element.normalModelView.x + 0.5;
+					_color.g = 0.5 * element.normalModelView.y + 0.5;
+					_color.b = 0.5 * element.normalModelView.z + 0.5;
+
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
+
+				} else if ( material.shading == THREE.SmoothShading ) {
+
+					_vector3.copy( element.vertexNormalsModelView[ uv1 ] );
+					_color1.r = 0.5 * _vector3.x + 0.5;
+					_color1.g = 0.5 * _vector3.y + 0.5;
+					_color1.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ uv2 ] );
+					_color2.r = 0.5 * _vector3.x + 0.5;
+					_color2.g = 0.5 * _vector3.y + 0.5;
+					_color2.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ uv3 ] );
+					_color3.r = 0.5 * _vector3.x + 0.5;
+					_color3.g = 0.5 * _vector3.y + 0.5;
+					_color3.b = 0.5 * _vector3.z + 0.5;
+
+					_color4.r = ( _color2.r + _color3.r ) * 0.5;
+					_color4.g = ( _color2.g + _color3.g ) * 0.5;
+					_color4.b = ( _color2.b + _color3.b ) * 0.5;
+
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, 0, 0, 1, 0, 0, 1, _image );
+
+				}
 
 			}
 
@@ -14370,15 +14399,51 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				_color.r = 0.5 * element.normalModelView.x + 0.5;
-				_color.g = 0.5 * element.normalModelView.y + 0.5;
-				_color.b = 0.5 * element.normalModelView.z + 0.5;
+				if ( material.shading == THREE.FlatShading ) {
 
-				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+					_color.r = 0.5 * element.normalModelView.x + 0.5;
+					_color.g = 0.5 * element.normalModelView.y + 0.5;
+					_color.b = 0.5 * element.normalModelView.z + 0.5;
 
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
+
+				} else if ( material.shading == THREE.SmoothShading ) {
+
+					_vector3.copy( element.vertexNormalsModelView[ 0 ] );
+					_color1.r = 0.5 * _vector3.x + 0.5;
+					_color1.g = 0.5 * _vector3.y + 0.5;
+					_color1.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 1 ] );
+					_color2.r = 0.5 * _vector3.x + 0.5;
+					_color2.g = 0.5 * _vector3.y + 0.5;
+					_color2.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 3 ] );
+					_color3.r = 0.5 * _vector3.x + 0.5;
+					_color3.g = 0.5 * _vector3.y + 0.5;
+					_color3.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 2 ] );
+					_color4.r = 0.5 * _vector3.x + 0.5;
+					_color4.g = 0.5 * _vector3.y + 0.5;
+					_color4.b = 0.5 * _vector3.z + 0.5;
+
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+					drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
+
+					drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
+					clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
+
+				}
+
+
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -18421,7 +18486,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertex = vertices[ v ];
 
 				_vector3.copy( vertex );
-				_vector3.multiplyMatrix4( _projScreenMatrixPS );
+				_vector3.applyMatrix4( _projScreenMatrixPS );
 
 				sortArray[ v ] = [ _vector3.z, v ];
 
@@ -21387,7 +21452,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.multiplyMatrix4( _projScreenMatrix );
+							_vector3.applyMatrix4( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
 
@@ -24920,7 +24985,7 @@ THREE.GeometryUtils = {
 
 	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
 
-		var matrix, matrixRotation,
+		var matrix, normalMatrix,
 		vertexOffset = geometry1.vertices.length,
 		uvPosition = geometry1.faceVertexUvs[ 0 ].length,
 		geometry2 = object2 instanceof THREE.Mesh ? object2.geometry : object2,
@@ -24936,8 +25001,10 @@ THREE.GeometryUtils = {
 			object2.matrixAutoUpdate && object2.updateMatrix();
 
 			matrix = object2.matrix;
-			matrixRotation = new THREE.Matrix4();
-			matrixRotation.extractRotation( matrix, object2.scale );
+
+			normalMatrix = new THREE.Matrix3();
+			normalMatrix.getInverse( matrix );
+			normalMatrix.transpose();
 
 		}
 
@@ -24949,7 +25016,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) vertexCopy.multiplyMatrix4( matrix );
+			if ( matrix ) vertexCopy.applyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
 
@@ -24975,13 +25042,21 @@ THREE.GeometryUtils = {
 
 			faceCopy.normal.copy( face.normal );
 
-			if ( matrixRotation ) faceCopy.normal.multiplyMatrix4( matrixRotation );
+			if ( normalMatrix ) {
+
+				faceCopy.normal.applyMatrix3( normalMatrix ).normalize();
+
+			}
 
 			for ( var j = 0, jl = faceVertexNormals.length; j < jl; j ++ ) {
 
 				normal = faceVertexNormals[ j ].clone();
 
-				if ( matrixRotation ) normal.multiplyMatrix4( matrixRotation );
+				if ( normalMatrix ) {
+
+					normal.applyMatrix3( normalMatrix ).normalize();
+
+				}
 
 				faceCopy.vertexNormals.push( normal );
 
@@ -24999,7 +25074,12 @@ THREE.GeometryUtils = {
 			faceCopy.materialIndex = face.materialIndex;
 
 			faceCopy.centroid.copy( face.centroid );
-			if ( matrix ) faceCopy.centroid.multiplyMatrix4( matrix );
+
+			if ( matrix ) {
+
+				faceCopy.centroid.applyMatrix4( matrix );
+
+			}
 
 			faces1.push( faceCopy );
 
@@ -32643,7 +32723,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 		for ( var j = 0; j < _newV.length; j ++ ) {
 
-			_newV[ j ] = _newV[ j ].clone().multiplyMatrix4( _matrix );
+			_newV[ j ] = _newV[ j ].clone().applyMatrix4( _matrix );
 			this.vertices.push( _newV[ j ] );
 
 		}
@@ -33336,7 +33416,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 			theta = Math.acos( tangents[ i-1 ].dot( tangents[ i ] ) );
 
-			normals[ i ].multiplyMatrix4( mat.makeRotationAxis( vec, theta ) );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
 		}
 
@@ -33361,7 +33441,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		for ( i = 1; i < numpoints; i++ ) {
 
 			// twist a little...
-			normals[ i ].multiplyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
 			binormals[ i ].cross( tangents[ i ], normals[ i ] );
 
 		}
@@ -35243,8 +35323,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
-			tempPosition.multiplyMatrix4( camera.matrixWorldInverse );
-			tempPosition.multiplyMatrix4( camera.projectionMatrix );
+			tempPosition.applyMatrix4( camera.matrixWorldInverse );
+			tempPosition.applyMatrix4( camera.projectionMatrix );
 
 			// setup arrays for gl programs
 
@@ -35837,7 +35917,7 @@ THREE.ShadowMapPlugin = function ( ) {
 			p.copy( pointsFrustum[ i ] );
 			THREE.ShadowMapPlugin.__projector.unprojectVector( p, camera );
 
-			p.multiplyMatrix4( shadowCamera.matrixWorldInverse );
+			p.applyMatrix4( shadowCamera.matrixWorldInverse );
 
 			if ( p.x < _min.x ) _min.x = p.x;
 			if ( p.x > _max.x ) _max.x = p.x;
