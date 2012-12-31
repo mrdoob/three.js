@@ -34,8 +34,6 @@
 
 	};
 
-	// http://www.blackpawn.com/texts/pointinpoly/default.html
-
 	var intersectObject = function ( object, raycaster, intersects ) {
 
 		if ( object instanceof THREE.Particle ) {

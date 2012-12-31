@@ -39,6 +39,7 @@ THREE.Triangle.normal = function( a, b, c, optionalTarget ) {
 };
 
 // static/instance method to calculate barycoordinates
+// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 THREE.Triangle.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) {
 
 	THREE.Triangle.__v0.sub( c, a );
