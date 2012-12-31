@@ -610,7 +610,7 @@ THREE.Geometry.prototype = {
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
-		var abcd = 'abcd', o, k, j, jl, u, vn;
+		var indices, k, j, jl, u;
 
 		// reset cache of vertices as it now will be changing.
 		this.__tmpVertices = undefined;
@@ -650,14 +650,14 @@ THREE.Geometry.prototype = {
 				face.b = changes[ face.b ];
 				face.c = changes[ face.c ];
 
-				o = [ face.a, face.b, face.c ];
+				indices = [ face.a, face.b, face.c ];
 
 				var dupIndex = -1;
 				
 				// if any duplicate vertices are found in a Face3
 				// we have to remove the face as nothing can be saved
 				for( var n = 0; n < 3; n ++ ) {
-					if( o[ n ] == o[ ( n + 1 ) % 3 ] ) {
+					if( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
 
 						dupIndex = n;
 						faceIndicesToRemove.push( i );
@@ -675,12 +675,12 @@ THREE.Geometry.prototype = {
 
 				// check dups in (a, b, c, d) and convert to -> face3
 
-				o = [ face.a, face.b, face.c, face.d ];
+				indices = [ face.a, face.b, face.c, face.d ];
 
 				var dupIndex = -1;
 
 				for( var n = 0; n < 4; n ++ ) {
-					if( o[ n ] == o[ ( n + 1 ) % 4 ] ) {
+					if( indices[ n ] == indices[ ( n + 1 ) % 4 ] ) {
 
 
 						// if more than one duplicated vertex is found
@@ -699,9 +699,9 @@ THREE.Geometry.prototype = {
 
 				if( dupIndex >= 0 ) {
 
-					o.splice( dupIndex, 1 );
+					indices.splice( dupIndex, 1 );
 
-					var newFace = new THREE.Face3( o[0], o[1], o[2], face.normal, face.color, face.materialIndex );
+					var newFace = new THREE.Face3( indices[0], indices[1], indices[2], face.normal, face.color, face.materialIndex );
 
 					for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
 
