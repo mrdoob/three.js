@@ -74,7 +74,7 @@ THREE.Plane.prototype = {
 
 	},
 
-	flip: function () {
+	negate: function () {
 
 		this.constant *= -1;
 		this.normal.negate();
