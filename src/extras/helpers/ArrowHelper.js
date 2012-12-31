@@ -49,20 +49,16 @@ THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
         this.rotation.set( 0, 0, 0 );
  
-    }
-    else if ( d.y < - 0.999 ) {
+    } else if ( d.y < - 0.999 ) {
 
         this.rotation.set( Math.PI, 0, 0 );
 
-    }
-    else {
+    } else {
 
-	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x );
-
+	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x ).normalize();
 	    var radians = Math.acos( d.y );
-
-	    var quat = THREE.ArrowHelper.__q1.setFromAxisAngle( axis.normalize(), radians );
-
+	    var quat = THREE.ArrowHelper.__q1.setFromAxisAngle( axis, radians );
+	    
 	    this.rotation.setEulerFromQuaternion( quat, this.eulerOrder );
 
 	}
