@@ -70,7 +70,7 @@ THREE.Frustum.prototype = {
 
 	},
 
-	contains: function ( object ) {
+	intersectsObject: function ( object ) {
 
 		// this method is expanded inlined for performance reasons.
 		var matrix = object.matrixWorld;
@@ -94,7 +94,7 @@ THREE.Frustum.prototype = {
 
 	},
 
-	containsSphere: function ( sphere ) {
+	intersectsSphere: function ( sphere ) {
 		
 		var planes = this.planes;
 		var center = sphere.center;
@@ -132,52 +132,6 @@ THREE.Frustum.prototype = {
 
 		return true;
 
-	},
-
-	containsAnyPoints: function ( points ) {
-
-		var planes = this.planes;
-		var p0 = planes[ 0 ];
-		var p1 = planes[ 1 ];
-		var p2 = planes[ 2 ];
-		var p3 = planes[ 3 ];
-		var p4 = planes[ 4 ];
-		var p5 = planes[ 5 ];
-			
-		for( var j = 0, jl = points.length; j < jl; j ++ ) {
-
-			var pt = points[j];
-
-			if(
-				( p0.distanceToPoint( pt ) >= 0 ) && 
-				( p1.distanceToPoint( pt ) >= 0 ) && 
-				( p2.distanceToPoint( pt ) >= 0 ) && 
-				( p3.distanceToPoint( pt ) >= 0 ) && 
-				( p4.distanceToPoint( pt ) >= 0 ) && 
-				( p5.distanceToPoint( pt ) >= 0 )
-				) {
-
-				return true;
-
-			}
-
-		}
-
-		return false;
-	},
-
-	transform: function ( matrix, optionalNormalMatrix ) {
-
-		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-
-		for( var i = 0; i < 6; i ++ ) {
-
-			this.planes[i].transform( matrix, optionalNormalMatrix );
-
-		}
-
-		return this;
-		
 	},
 
 	clone: function () {
