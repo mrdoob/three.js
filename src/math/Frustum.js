@@ -72,12 +72,8 @@ THREE.Frustum.prototype = {
 
 	contains: function ( object ) {
 
-		var matrix = object.matrixWorld;
-
-		var sphere = THREE.Frustum.__s0.set(
-			matrix.getPosition(), 
-			- object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis()
-			);
+		var sphere = THREE.Frustum.__s0.copy( object.geometry.boundingSphere );
+		sphere.transform( object.matrixWorld );
 
 		return this.containsSphere( sphere );
 
@@ -86,12 +82,14 @@ THREE.Frustum.prototype = {
 	containsSphere: function ( sphere ) {
 		
 		var planes = this.planes;
+		var center = sphere.center;
+		var negRadius = -sphere.radius;
 		
 		for ( var i = 0; i < 6; i ++ ) {
 
-			var distance = planes[ i ].distanceToPoint( sphere.center );
+			var distance = planes[ i ].distanceToPoint( center );
 
-			if( distance <= sphere.radius ) {
+			if( distance < negRadius ) {
 
 				return false;
 
