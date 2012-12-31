@@ -583,8 +583,8 @@ THREE.ShaderDeferred = {
 			"uniform float viewHeight;",
 			"uniform float viewWidth;",
 
-		    "uniform float lightAngle;"+
-			"uniform float lightIntensity;"+
+			"uniform float lightAngle;",
+			"uniform float lightIntensity;",
 			"uniform vec3 lightColor;",
 
 			"uniform mat4 matProjInverse;",
@@ -604,46 +604,39 @@ THREE.ShaderDeferred = {
 				"float rho = dot( lightDirectionVS, lightVector );",
 				"float rhoMax = cos( lightAngle * 0.5 );",
 
-				"if ( rho > rhoMax ) {",
+				"if ( rho <= rhoMax ) discard;",
 
-					"float theta = rhoMax + 0.0001;",
-					"float phi = rhoMax + 0.05;",
-					"float falloff = 4.0;",
+				"float theta = rhoMax + 0.0001;",
+				"float phi = rhoMax + 0.05;",
+				"float falloff = 4.0;",
 
-					"float spot = 0.0;",
+				"float spot = 0.0;",
 
-					"if ( rho >= phi ) {",
+				"if ( rho >= phi ) {",
 
-						"spot = 1.0;",
+					"spot = 1.0;",
 
-					"} else if ( rho <= theta ) {",
+				"} else if ( rho <= theta ) {",
 
-						"spot = 0.0;",
+					"spot = 0.0;",
 
-					"} else { ",
+				"} else { ",
 
-						"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
-
-					"}",
-
-
-					THREE.DeferredShaderChunk[ "computeDiffuse" ],
-
-					"diffuse *= spot;",
-
-					THREE.DeferredShaderChunk[ "computeSpecular" ],
-
-					// combine
-
-					"const float attenuation = 1.0;",
-
-					THREE.DeferredShaderChunk[ "combine" ],
-
-					"return;",
+					"spot = pow( ( rho - theta ) / ( phi - theta ), falloff );",
 
 				"}",
 
-				"gl_FragColor = vec4( 0.0 );",
+				THREE.DeferredShaderChunk[ "computeDiffuse" ],
+
+				"diffuse *= spot;",
+
+				THREE.DeferredShaderChunk[ "computeSpecular" ],
+
+				// combine
+
+				"const float attenuation = 1.0;",
+
+				THREE.DeferredShaderChunk[ "combine" ],
 
 			"}"
 
@@ -820,6 +813,159 @@ THREE.ShaderDeferred = {
 		vertexShader : [
 
 			"void main() { ",
+
+				// full screen quad proxy
+
+				"gl_Position = vec4( sign( position.xy ), 0.0, 1.0 );",
+
+			"}"
+
+		].join("\n")
+
+	},
+
+	"areaLight" : {
+
+		uniforms: {
+
+			samplerNormalDepth: { type: "t", value: null },
+			samplerColor: 		{ type: "t", value: null },
+			matProjInverse: { type: "m4", value: new THREE.Matrix4() },
+			viewWidth: 		{ type: "f", value: 800 },
+			viewHeight: 	{ type: "f", value: 600 },
+
+			lightPositionVS: { type: "v3", value: new THREE.Vector3( 0, 1, 0 ) },
+			lightNormalVS: 	 { type: "v3", value: new THREE.Vector3( 0, -1, 0 ) },
+			lightRightVS:  	 { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
+			lightUpVS:  	 { type: "v3", value: new THREE.Vector3( 1, 0, 0 ) },
+
+			lightColor: 	{ type: "c", value: new THREE.Color( 0x000000 ) },
+			lightIntensity: { type: "f", value: 1.0 },
+
+			lightWidth:  { type: "f", value: 1.0 },
+			lightHeight: { type: "f", value: 1.0 },
+
+			constantAttenuation:  { type: "f", value: 1.5 },
+			linearAttenuation:    { type: "f", value: 0.5 },
+			quadraticAttenuation: { type: "f", value: 0.1 }
+
+		},
+
+		fragmentShader : [
+
+			"uniform vec3 lightPositionVS;",
+			"uniform vec3 lightNormalVS;",
+			"uniform vec3 lightRightVS;",
+			"uniform vec3 lightUpVS;",
+
+			"uniform sampler2D samplerColor;",
+			"uniform sampler2D samplerNormalDepth;",
+
+			"uniform float lightWidth;",
+			"uniform float lightHeight;",
+
+			"uniform float constantAttenuation;",
+			"uniform float linearAttenuation;",
+			"uniform float quadraticAttenuation;",
+
+			"uniform float lightIntensity;",
+			"uniform vec3 lightColor;",
+
+			"uniform float viewHeight;",
+			"uniform float viewWidth;",
+
+			"uniform mat4 matProjInverse;",
+
+			THREE.DeferredShaderChunk[ "unpackFloat" ],
+
+			"vec3 projectOnPlane( vec3 point, vec3 planeCenter, vec3 planeNorm ) {",
+
+				"return point - dot( point - planeCenter, planeNorm ) * planeNorm;",
+
+			"}",
+
+			"bool sideOfPlane( vec3 point, vec3 planeCenter, vec3 planeNorm ) {",
+
+				"return ( dot( point - planeCenter, planeNorm ) >= 0.0 );",
+
+			"}",
+
+			"vec3 linePlaneIntersect( vec3 lp, vec3 lv, vec3 pc, vec3 pn ) {",
+
+				"return lp + lv * ( dot( pn, pc - lp ) / dot( pn, lv ) );",
+
+			"}",
+
+			"float calculateAttenuation( float dist ) {",
+
+				"return ( 1.0 / ( constantAttenuation + linearAttenuation * dist + quadraticAttenuation * dist * dist ) );",
+
+			"}",
+
+			"void main() {",
+
+				THREE.DeferredShaderChunk[ "computeVertexPositionVS" ],
+				THREE.DeferredShaderChunk[ "computeNormal" ],
+				THREE.DeferredShaderChunk[ "unpackColorMap" ],
+
+				"float w = lightWidth;",
+				"float h = lightHeight;",
+
+				"vec3 proj = projectOnPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS );",
+				"vec3 dir = proj - lightPositionVS;",
+
+				"vec2 diagonal = vec2( dot( dir, lightRightVS ), dot( dir, lightUpVS ) );",
+				"vec2 nearest2D = vec2( clamp( diagonal.x, -w, w ), clamp( diagonal.y, -h, h ) );",
+				"vec3 nearestPointInside = vec3( lightPositionVS ) + ( lightRightVS * nearest2D.x + lightUpVS * nearest2D.y );",
+
+				"vec3 lightDir = normalize( nearestPointInside - vertexPositionVS.xyz );",
+				"float NdotL = dot( lightNormalVS, -lightDir );",
+
+				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS ) ) {",
+
+					// diffuse
+
+					"vec3 diffuse = vec3( NdotL );",
+
+					// specular
+
+					"vec3 specular = vec3( 0.0 );",
+
+					"vec3 R = reflect( normalize( -vertexPositionVS.xyz ), normal );",
+					"vec3 E = linePlaneIntersect( vertexPositionVS.xyz, R, vec3( lightPositionVS ), lightNormalVS );",
+
+					"float specAngle = dot( R, lightNormalVS );",
+
+					"if ( specAngle > 0.0 ) {",
+
+						"vec3 dirSpec = E - vec3( lightPositionVS );",
+						"vec2 dirSpec2D = vec2( dot( dirSpec, lightRightVS ), dot( dirSpec, lightUpVS ) );",
+						"vec2 nearestSpec2D = vec2( clamp( dirSpec2D.x, -w, w ), clamp( dirSpec2D.y, -h, h ) );",
+						"float specFactor = 1.0 - clamp( length( nearestSpec2D - dirSpec2D ) * shininess, 0.0, 1.0 );",
+						"specular = specularColor * specFactor * specAngle;",
+
+					"}",
+
+					// combine
+
+					"float dist = distance( vertexPositionVS.xyz, nearestPointInside );",
+					"float attenuation = calculateAttenuation( dist );",
+
+					THREE.DeferredShaderChunk[ "combine" ],
+
+				"} else {",
+
+					"discard;",
+
+				"}",
+
+			"}"
+
+		].join("\n"),
+
+		vertexShader : [
+
+			"void main() {",
 
 				// full screen quad proxy
 

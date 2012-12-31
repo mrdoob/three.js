@@ -388,6 +388,14 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.cloneSelectedObject.add( function () {
+
+		if ( selected === camera ) return;
+
+		signals.objectAdded.dispatch( selected.clone() );
+
+	} );
+
 	signals.removeSelectedObject.add( function () {
 
 		if ( selected === camera ) return;

@@ -12,7 +12,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_renderData, _elements, _lights,
 	_projector = new THREE.Projector(),
 
-	_canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	_canvas = parameters.canvas !== undefined
+			? parameters.canvas
+			: document.createElement( 'canvas' ),
 
 	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
 	_context = _canvas.getContext( '2d' ),
@@ -87,6 +89,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 
+	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
+				? parameters.devicePixelRatio
+				: window.devicePixelRatio !== undefined
+					? window.devicePixelRatio
+					: 1;
+
 	this.autoClear = true;
 	this.sortObjects = true;
 	this.sortElements = true;
@@ -104,13 +112,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setSize = function ( width, height ) {
 
-		_canvasWidth = width;
-		_canvasHeight = height;
+		_canvasWidth = width * this.devicePixelRatio;
+		_canvasHeight = height * this.devicePixelRatio;
+
 		_canvasWidthHalf = Math.floor( _canvasWidth / 2 );
 		_canvasHeightHalf = Math.floor( _canvasHeight / 2 );
 
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
+
+		_canvas.style.width = width + 'px';
+		_canvas.style.height = height + 'px';
 
 		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
 		_clipBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
@@ -195,11 +207,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		var e, el, element, material;
+		if ( this.autoClear === true ) {
 
-		this.autoClear === true
-			? this.clear()
-			: _context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
+			this.clear();
+
+		}
+
+		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
@@ -221,11 +235,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		for ( e = 0, el = _elements.length; e < el; e++ ) {
+		for ( var e = 0, el = _elements.length; e < el; e++ ) {
 
-			element = _elements[ e ];
+			var element = _elements[ e ];
 
-			material = element.material;
+			var material = element.material;
 
 			if ( material === undefined || material.visible === false ) continue;
 
@@ -586,9 +600,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _ambientLight.b;
 
-						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color3 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsModel[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsModel[ 1 ], _color2 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsModel[ 2 ], _color3 );
 
 						_color1.r = _color1.r * _diffuseColor.r + _emissiveColor.r;
 						_color1.g = _color1.g * _diffuseColor.g + _emissiveColor.g;
@@ -616,7 +630,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidModel, element.normalModel, _color );
 
 						_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
 						_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
@@ -652,19 +666,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					if ( material.envMap.mapping instanceof THREE.SphericalReflectionMapping ) {
 
-						var cameraMatrix = camera.matrixWorldInverse;
+						_vector3.copy( element.vertexNormalsModelView[ uv1 ] );
+						_uv1x = 0.5 * _vector3.x + 0.5;
+						_uv1y = 0.5 * _vector3.y + 0.5;
 
-						_vector3.copy( element.vertexNormalsWorld[ uv1 ] );
-						_uv1x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
-						_uv1y = ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
+						_vector3.copy( element.vertexNormalsModelView[ uv2 ] );
+						_uv2x = 0.5 * _vector3.x + 0.5;
+						_uv2y = 0.5 * _vector3.y + 0.5;
 
-						_vector3.copy( element.vertexNormalsWorld[ uv2 ] );
-						_uv2x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
-						_uv2y = ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
-
-						_vector3.copy( element.vertexNormalsWorld[ uv3 ] );
-						_uv3x = ( _vector3.x * cameraMatrix.elements[0] + _vector3.y * cameraMatrix.elements[4] + _vector3.z * cameraMatrix.elements[8] ) * 0.5 + 0.5;
-						_uv3y = ( _vector3.x * cameraMatrix.elements[1] + _vector3.y * cameraMatrix.elements[5] + _vector3.z * cameraMatrix.elements[9] ) * 0.5 + 0.5;
+						_vector3.copy( element.vertexNormalsModelView[ uv3 ] );
+						_uv3x = 0.5 * _vector3.x + 0.5;
+						_uv3y = 0.5 * _vector3.y + 0.5;
 
 						patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
@@ -712,13 +724,42 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				_color.r = normalToComponent( element.normalWorld.x );
-				_color.g = normalToComponent( element.normalWorld.y );
-				_color.b = normalToComponent( element.normalWorld.z );
+				if ( material.shading == THREE.FlatShading ) {
 
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					_color.r = 0.5 * element.normalModelView.x + 0.5;
+					_color.g = 0.5 * element.normalModelView.y + 0.5;
+					_color.b = 0.5 * element.normalModelView.z + 0.5;
+
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
+
+				} else if ( material.shading == THREE.SmoothShading ) {
+
+					_vector3.copy( element.vertexNormalsModelView[ uv1 ] );
+					_color1.r = 0.5 * _vector3.x + 0.5;
+					_color1.g = 0.5 * _vector3.y + 0.5;
+					_color1.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ uv2 ] );
+					_color2.r = 0.5 * _vector3.x + 0.5;
+					_color2.g = 0.5 * _vector3.y + 0.5;
+					_color2.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ uv3 ] );
+					_color3.r = 0.5 * _vector3.x + 0.5;
+					_color3.g = 0.5 * _vector3.y + 0.5;
+					_color3.b = 0.5 * _vector3.z + 0.5;
+
+					_color4.r = ( _color2.r + _color3.r ) * 0.5;
+					_color4.g = ( _color2.g + _color3.g ) * 0.5;
+					_color4.b = ( _color2.b + _color3.b ) * 0.5;
+
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, 0, 0, 1, 0, 0, 1, _image );
+
+				}
 
 			}
 
@@ -771,10 +812,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color1.g = _color2.g = _color3.g = _color4.g = _ambientLight.g;
 						_color1.b = _color2.b = _color3.b = _color4.b = _ambientLight.b;
 
-						calculateLight( element.v1.positionWorld, element.vertexNormalsWorld[ 0 ], _color1 );
-						calculateLight( element.v2.positionWorld, element.vertexNormalsWorld[ 1 ], _color2 );
-						calculateLight( element.v4.positionWorld, element.vertexNormalsWorld[ 3 ], _color3 );
-						calculateLight( element.v3.positionWorld, element.vertexNormalsWorld[ 2 ], _color4 );
+						calculateLight( element.v1.positionWorld, element.vertexNormalsModel[ 0 ], _color1 );
+						calculateLight( element.v2.positionWorld, element.vertexNormalsModel[ 1 ], _color2 );
+						calculateLight( element.v4.positionWorld, element.vertexNormalsModel[ 3 ], _color3 );
+						calculateLight( element.v3.positionWorld, element.vertexNormalsModel[ 2 ], _color4 );
 
 						_color1.r = _color1.r * _diffuseColor.r + _emissiveColor.r;
 						_color1.g = _color1.g * _diffuseColor.g + _emissiveColor.g;
@@ -808,7 +849,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 						_color.g = _ambientLight.g;
 						_color.b = _ambientLight.b;
 
-						calculateLight( element.centroidWorld, element.normalWorld, _color );
+						calculateLight( element.centroidModel, element.normalModel, _color );
 
 						_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
 						_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
@@ -856,15 +897,51 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-				_color.r = normalToComponent( element.normalWorld.x );
-				_color.g = normalToComponent( element.normalWorld.y );
-				_color.b = normalToComponent( element.normalWorld.z );
+				if ( material.shading == THREE.FlatShading ) {
 
-				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+					_color.r = 0.5 * element.normalModelView.x + 0.5;
+					_color.g = 0.5 * element.normalModelView.y + 0.5;
+					_color.b = 0.5 * element.normalModelView.z + 0.5;
 
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
+					drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
+
+					material.wireframe === true
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
+
+				} else if ( material.shading == THREE.SmoothShading ) {
+
+					_vector3.copy( element.vertexNormalsModelView[ 0 ] );
+					_color1.r = 0.5 * _vector3.x + 0.5;
+					_color1.g = 0.5 * _vector3.y + 0.5;
+					_color1.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 1 ] );
+					_color2.r = 0.5 * _vector3.x + 0.5;
+					_color2.g = 0.5 * _vector3.y + 0.5;
+					_color2.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 3 ] );
+					_color3.r = 0.5 * _vector3.x + 0.5;
+					_color3.g = 0.5 * _vector3.y + 0.5;
+					_color3.b = 0.5 * _vector3.z + 0.5;
+
+					_vector3.copy( element.vertexNormalsModelView[ 2 ] );
+					_color4.r = 0.5 * _vector3.x + 0.5;
+					_color4.g = 0.5 * _vector3.y + 0.5;
+					_color4.b = 0.5 * _vector3.z + 0.5;
+
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+
+					drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
+
+					drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
+					clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
+
+				}
+
+
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -1096,13 +1173,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			var x = ( value - min ) / ( max - min );
 			return x * x * ( 3 - 2 * x );
-
-		}
-
-		function normalToComponent( normal ) {
-
-			var component = ( normal + 1 ) * 0.5;
-			return component < 0 ? 0 : ( component > 1 ? 1 : component );
 
 		}
 

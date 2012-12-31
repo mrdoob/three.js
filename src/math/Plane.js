@@ -162,21 +162,20 @@ THREE.Plane.prototype = {
 
 	},
 
-	transform: function( matrix, optionalNormalMatrix ) {
+	transform: function ( matrix, optionalNormalMatrix ) {
 
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
+		var newNormal = THREE.Plane.__v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
-		var newNormal = optionalNormalMatrix.multiplyVector3( THREE.Plane.__v1.copy( this.normal ) );
-
-		var newCoplanarPoint = this.coplanarPoint( THREE.Plane.__v2 );	// __v2 is the optionalTarget
-		newCoplanarPoint = matrix.multiplyVector3( newCoplanarPoint );
+		var newCoplanarPoint = this.coplanarPoint( THREE.Plane.__v2 );
+		newCoplanarPoint.applyMatrix4( matrix );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 
 		return this;
-		
+
 	},
 
 	translate: function ( offset ) {

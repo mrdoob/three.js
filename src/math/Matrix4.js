@@ -322,35 +322,6 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiplyVector3: function ( v ) {
-
-		var te = this.elements;
-
-		var vx = v.x, vy = v.y, vz = v.z;
-		var d = 1 / ( te[3] * vx + te[7] * vy + te[11] * vz + te[15] );
-
-		v.x = ( te[0] * vx + te[4] * vy + te[8] * vz + te[12] ) * d;
-		v.y = ( te[1] * vx + te[5] * vy + te[9] * vz + te[13] ) * d;
-		v.z = ( te[2] * vx + te[6] * vy + te[10] * vz + te[14] ) * d;
-
-		return v;
-
-	},
-
-	multiplyVector4: function ( v ) {
-
-		var te = this.elements;
-		var vx = v.x, vy = v.y, vz = v.z, vw = v.w;
-
-		v.x = te[0] * vx + te[4] * vy + te[8] * vz + te[12] * vw;
-		v.y = te[1] * vx + te[5] * vy + te[9] * vz + te[13] * vw;
-		v.z = te[2] * vx + te[6] * vy + te[10] * vz + te[14] * vw;
-		v.w = te[3] * vx + te[7] * vy + te[11] * vz + te[15] * vw;
-
-		return v;
-
-	},
-
 	multiplyVector3Array: function ( a ) {
 
 		var tmp = THREE.Matrix4.__v1;
@@ -417,37 +388,37 @@ THREE.Matrix4.prototype = {
 
 		return (
 			n41 * (
-		      +n14 * n23 * n32
-		      -n13 * n24 * n32
-		      -n14 * n22 * n33
-		      +n12 * n24 * n33
-		      +n13 * n22 * n34
-		      -n12 * n23 * n34
-		      ) +
+				+n14 * n23 * n32
+				-n13 * n24 * n32
+				-n14 * n22 * n33
+				+n12 * n24 * n33
+				+n13 * n22 * n34
+				-n12 * n23 * n34
+			) +
 			n42 * (
-		      +n11 * n23 * n34
-		      -n11 * n24 * n33
-		      +n14 * n21 * n33
-		      -n13 * n21 * n34
-		      +n13 * n24 * n31
-		      -n14 * n23 * n31
-		      ) +
+				+n11 * n23 * n34
+				-n11 * n24 * n33
+				+n14 * n21 * n33
+				-n13 * n21 * n34
+				+n13 * n24 * n31
+				-n14 * n23 * n31
+			) +
 			n43 * (
-		      +n11 * n24 * n32
-		      -n11 * n22 * n34
-		      -n14 * n21 * n32
-		      +n12 * n21 * n34
-		      +n14 * n22 * n31
-		      -n12 * n24 * n31
-		      ) +
-		    n44 * (
-		      -n13 * n22 * n31
-		      -n11 * n23 * n32
-		      +n11 * n22 * n33
-		      +n13 * n21 * n32
-		      -n12 * n21 * n33
-		      +n12 * n23 * n31
-		      )
+				+n11 * n24 * n32
+				-n11 * n22 * n34
+				-n14 * n21 * n32
+				+n12 * n21 * n34
+				+n14 * n22 * n31
+				-n12 * n24 * n31
+			) +
+			n44 * (
+				-n13 * n22 * n31
+				-n11 * n23 * n32
+				+n11 * n22 * n33
+				+n13 * n21 * n32
+				-n12 * n21 * n33
+				+n12 * n23 * n31
+			)
 
 		);
 
@@ -475,7 +446,7 @@ THREE.Matrix4.prototype = {
 		var te = this.elements;
 		flat[ 0 ] = te[0]; flat[ 1 ] = te[1]; flat[ 2 ] = te[2]; flat[ 3 ] = te[3];
 		flat[ 4 ] = te[4]; flat[ 5 ] = te[5]; flat[ 6 ] = te[6]; flat[ 7 ] = te[7];
-		flat[ 8 ]  = te[8]; flat[ 9 ]  = te[9]; flat[ 10 ] = te[10]; flat[ 11 ] = te[11];
+		flat[ 8 ] = te[8]; flat[ 9 ] = te[9]; flat[ 10 ] = te[10]; flat[ 11 ] = te[11];
 		flat[ 12 ] = te[12]; flat[ 13 ] = te[13]; flat[ 14 ] = te[14]; flat[ 15 ] = te[15];
 
 		return flat;
@@ -579,16 +550,15 @@ THREE.Matrix4.prototype = {
 
 		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 4 ] + me[ 2 ] * te[ 8 ] + me[ 3 ] * te[ 12 ];
 
-		if( det == 0 ) {
+		if ( det == 0 ) {
 
 			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
 
-			if( throwOnInvertible || false ) {
+			if ( throwOnInvertible || false ) {
 
 				throw new Error( msg ); 
 
-			}
-			else {
+			} else {
 
 				console.warn( msg );
 
@@ -905,9 +875,9 @@ THREE.Matrix4.prototype = {
 
 		var te = this.elements;
 
-		var scaleXSq =  te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
-		var scaleYSq =  te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
-		var scaleZSq =  te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
+		var scaleXSq = te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
+		var scaleYSq = te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
+		var scaleZSq = te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
 
 		return Math.sqrt( Math.max( scaleXSq, Math.max( scaleYSq, scaleZSq ) ) );
 
@@ -1030,10 +1000,10 @@ THREE.Matrix4.prototype = {
 		var c = - ( far + near ) / ( far - near );
 		var d = - 2 * far * near / ( far - near );
 
-		te[0] = x;  te[4] = 0;  te[8] = a;   te[12] = 0;
-		te[1] = 0;  te[5] = y;  te[9] = b;   te[13] = 0;
-		te[2] = 0;  te[6] = 0;  te[10] = c;   te[14] = d;
-		te[3] = 0;  te[7] = 0;  te[11] = - 1; te[15] = 0;
+		te[0] = x;	te[4] = 0;	te[8] = a;	te[12] = 0;
+		te[1] = 0;	te[5] = y;	te[9] = b;	te[13] = 0;
+		te[2] = 0;	te[6] = 0;	te[10] = c;	te[14] = d;
+		te[3] = 0;	te[7] = 0;	te[11] = - 1;	te[15] = 0;
 
 		return this;
 
@@ -1061,10 +1031,10 @@ THREE.Matrix4.prototype = {
 		var y = ( top + bottom ) / h;
 		var z = ( far + near ) / p;
 
-		te[0] = 2 / w; te[4] = 0;     te[8] = 0;      te[12] = -x;
-		te[1] = 0;     te[5] = 2 / h; te[9] = 0;      te[13] = -y;
-		te[2] = 0;     te[6] = 0;     te[10] = -2 / p; te[14] = -z;
-		te[3] = 0;     te[7] = 0;     te[11] = 0;      te[15] = 1;
+		te[0] = 2 / w;	te[4] = 0;	te[8] = 0;	te[12] = -x;
+		te[1] = 0;	te[5] = 2 / h;	te[9] = 0;	te[13] = -y;
+		te[2] = 0;	te[6] = 0;	te[10] = -2/p;	te[14] = -z;
+		te[3] = 0;	te[7] = 0;	te[11] = 0;	te[15] = 1;
 
 		return this;
 

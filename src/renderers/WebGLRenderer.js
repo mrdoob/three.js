@@ -28,6 +28,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.domElement = _canvas;
 	this.context = null;
+	this.devicePixelRatio = parameters.devicePixelRatio !== undefined
+				? parameters.devicePixelRatio
+				: window.devicePixelRatio !== undefined
+					? window.devicePixelRatio
+					: 1;
 
 	// clearing
 
@@ -264,10 +269,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.getPrecision = function () {
+
+		return _precision;
+
+	};
+
 	this.setSize = function ( width, height ) {
 
-		_canvas.width = width;
-		_canvas.height = height;
+		_canvas.width = width * this.devicePixelRatio;
+		_canvas.height = height * this.devicePixelRatio;
+
+		_canvas.style.width = width + 'px';
+		_canvas.style.height = height + 'px';
 
 		this.setViewport( 0, 0, _canvas.width, _canvas.height );
 
@@ -1144,7 +1158,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertex = vertices[ v ];
 
 				_vector3.copy( vertex );
-				_projScreenMatrixPS.multiplyVector3( _vector3 );
+				_vector3.applyMatrix4( _projScreenMatrixPS );
 
 				sortArray[ v ] = [ _vector3.z, v ];
 
@@ -4110,7 +4124,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_projScreenMatrix.multiplyVector3( _vector3 );
+							_vector3.applyMatrix4( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
 
@@ -4675,7 +4689,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					addBuffer( scene.__webglObjects, geometry, object );
 
-				} else {
+				} else if ( geometry instanceof THREE.Geometry ) {
 
 					for ( g in geometry.geometryGroups ) {
 

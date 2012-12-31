@@ -256,17 +256,18 @@ THREE.Box3.prototype = {
 	},
 
 	transform: function ( matrix ) {
-		
+
 		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 		var newPoints = [
-			matrix.multiplyVector3( THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ) ), // 000
-			matrix.multiplyVector3( THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ) ), // 001
-			matrix.multiplyVector3( THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ) ), // 010
-			matrix.multiplyVector3( THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ) ), // 011
-			matrix.multiplyVector3( THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ) ), // 100
-			matrix.multiplyVector3( THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ) ), // 101
-			matrix.multiplyVector3( THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ) ), // 110
-			matrix.multiplyVector3( THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ) )  // 111
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ),
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 000
+			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 001
+			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 010
+			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ), // 011
+			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 100
+			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 101
+			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 110
+			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix )  // 111
 		];
 
 		this.makeEmpty();

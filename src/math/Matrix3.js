@@ -63,20 +63,6 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	multiplyVector3: function ( v ) {
-
-		var te = this.elements;
-
-		var vx = v.x, vy = v.y, vz = v.z;
-
-		v.x = te[0] * vx + te[3] * vy + te[6] * vz;
-		v.y = te[1] * vx + te[4] * vy + te[7] * vz;
-		v.z = te[2] * vx + te[5] * vy + te[8] * vz;
-
-		return v;
-
-	},
-
 	multiplyVector3Array: function ( a ) {
 
 		var tmp = THREE.Matrix3.__v1;
@@ -112,13 +98,15 @@ THREE.Matrix3.prototype = {
 	},
 
 	determinant: function () {
+
 		var te = this.elements;
-		
+
 		var a = te[0], b = te[1], c = te[2],
 			d = te[3], e = te[4], f = te[5],
 			g = te[6], h = te[7], i = te[8];
 
 		return a*e*i - a*f*h - b*d*i + b*f*g + c*d*h - c*e*g;
+
 	},
 
 	getInverse: function ( matrix, throwOnInvertible ) {
@@ -128,7 +116,7 @@ THREE.Matrix3.prototype = {
 
 		var me = matrix.elements;
 		var te = this.elements;
-	
+
 		te[ 0 ] =   me[10] * me[5] - me[6] * me[9];
 		te[ 1 ] = - me[10] * me[1] + me[2] * me[9];
 		te[ 2 ] =   me[6] * me[1] - me[2] * me[5];
@@ -147,12 +135,11 @@ THREE.Matrix3.prototype = {
 
 			var msg = "Matrix3.getInverse(): can't invert matrix, determinant is 0";
 
-			if( throwOnInvertible || false ) {
+			if ( throwOnInvertible || false ) {
 
 				throw new Error( msg ); 
 
-			}
-			else {
+			} else {
 
 				console.warn( msg );
 
@@ -161,7 +148,7 @@ THREE.Matrix3.prototype = {
 			this.identity();
 
 			return this;
-			
+
 		}
 
 		this.multiplyScalar( 1.0 / det );
