@@ -190,5 +190,3 @@ THREE.Frustum.prototype = {
 	}
 
 };
-
-THREE.Frustum.__s0 = new THREE.Sphere();
