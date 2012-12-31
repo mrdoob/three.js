@@ -45,19 +45,16 @@ THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
     var d = THREE.ArrowHelper.__v1.copy( dir ).normalize();
 
-    if ( d.y > 0.99999 ) {
+    if ( d.y > 0.999 ) {
 
         this.rotation.set( 0, 0, 0 );
  
     }
-
-    else if ( d.y < - 0.99999 ) {
+    else if ( d.y < - 0.999 ) {
 
         this.rotation.set( Math.PI, 0, 0 );
-        return;
 
     }
-
     else {
 
 	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x );
