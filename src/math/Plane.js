@@ -74,6 +74,15 @@ THREE.Plane.prototype = {
 
 	},
 
+	negate: function () {
+
+		this.constant *= -1;
+		this.normal.negate();
+
+		return this;
+
+	},
+
 	distanceToPoint: function ( point ) {
 
 		return this.normal.dot( point ) + this.constant;
@@ -155,14 +164,12 @@ THREE.Plane.prototype = {
 
 	transform: function ( matrix, optionalNormalMatrix ) {
 
-		var newNormal = THREE.Plane.__v1, newCoplanarPoint = THREE.Plane.__v2;
-
 		// compute new normal based on theory here:
 		// http://www.songho.ca/opengl/gl_normaltransform.html
 		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		newNormal.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
+		var newNormal = THREE.Plane.__v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
-		newCoplanarPoint = this.coplanarPoint( newCoplanarPoint );
+		var newCoplanarPoint = this.coplanarPoint( THREE.Plane.__v2 );
 		newCoplanarPoint.applyMatrix4( matrix );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );

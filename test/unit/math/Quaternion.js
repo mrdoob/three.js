@@ -183,8 +183,8 @@ test( "multiplyVector3", function() {
 			var m = new THREE.Matrix4().setRotationFromEuler( angles[j], orders[i] );
 
 			var v0 = new THREE.Vector3(1, 0, 0);
-			var qv = q.multiplyVector3( v0.clone() );
-			var mv = m.multiplyVector3( v0.clone() );
+			var qv = v0.clone().applyQuaternion( q );
+			var mv = v0.clone().applyMatrix4( m );
 		
 			ok( qv.distanceTo( mv ) < 0.001, "Passed!" );
 		}

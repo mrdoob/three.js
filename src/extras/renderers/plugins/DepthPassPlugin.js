@@ -88,7 +88,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
 
 					object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld );
 

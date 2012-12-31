@@ -94,6 +94,18 @@ test( "normalize", function() {
 	ok( a.constant == 1, "Passed!" );
 });
 
+test( "negate/distanceToPoint", function() {
+	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), -2 );
+	
+	a.normalize();
+	ok( a.distanceToPoint( new THREE.Vector3( 4, 0, 0 ) ) === 3, "Passed!" );
+	ok( a.distanceToPoint( new THREE.Vector3( 1, 0, 0 ) ) === 0, "Passed!" );
+
+	a.negate();
+	ok( a.distanceToPoint( new THREE.Vector3( 4, 0, 0 ) ) === -3, "Passed!" );
+	ok( a.distanceToPoint( new THREE.Vector3( 1, 0, 0 ) ) === 0, "Passed!" );
+});
+
 test( "distanceToPoint", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 2, 0, 0 ), -2 );
 	
