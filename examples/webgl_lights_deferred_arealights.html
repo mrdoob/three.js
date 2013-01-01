@@ -54,11 +54,13 @@
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
 
 
 		<script>
@@ -113,6 +115,11 @@
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
+
+				// effects
+
+				var bloomEffect = new THREE.BloomPass( 0.75 );
+				renderer.addEffect( bloomEffect );
 
 				// camera
 

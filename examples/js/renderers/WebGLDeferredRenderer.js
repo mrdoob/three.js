@@ -205,7 +205,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms.viewWidth.value = scaledWidth;
 			uniforms.viewHeight.value = scaledHeight;
 
-			resizableMaterials.push( material );
+			resizableMaterials.push( { "material": material } );
 
 		}
 
@@ -402,7 +402,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		resizableMaterials.push( materialLight );
+		resizableMaterials.push( { "material": materialLight } );
 
 		// sync proxy uniforms to the original light
 
@@ -478,7 +478,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		resizableMaterials.push( materialLight );
+		resizableMaterials.push( { "material": materialLight } );
 
 		// sync proxy uniforms to the original light
 
@@ -544,7 +544,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		resizableMaterials.push( materialLight );
+		resizableMaterials.push( { "material": materialLight } );
 
 		// sync proxy uniforms to the original light
 
@@ -610,7 +610,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		resizableMaterials.push( materialLight );
+		resizableMaterials.push( { "material": materialLight } );
 
 		// sync proxy uniforms to the original light
 
@@ -698,7 +698,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		resizableMaterials.push( materialLight );
+		resizableMaterials.push( { "material": materialLight } );
 
 		// sync proxy uniforms to the original light
 
@@ -734,7 +734,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for size reset
 
-		resizableMaterials.push( materialLight );
+		resizableMaterials.push( { "material": materialLight } );
 
 		return meshLight;
 
@@ -849,6 +849,25 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	};
 
+	this.addEffect = function ( effect, normalDepthUniform, colorUniform ) {
+
+		if ( effect.material && effect.uniforms ) {
+
+			if ( normalDepthUniform ) effect.uniforms[ normalDepthUniform ].value = compNormalDepth.renderTarget2;
+			if ( colorUniform )    	  effect.uniforms[ colorUniform ].value = compColor.renderTarget2;
+
+			if ( normalDepthUniform || colorUniform ) {
+
+				resizableMaterials.push( { "material": effect.material, "normalDepth": normalDepthUniform, "color": colorUniform } );
+
+			}
+
+		}
+
+		compFinal.insertPass( effect, -1 );
+
+	};
+
 	this.setScale = function ( scale ) {
 
 		currentScale = scale;
@@ -866,13 +885,19 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		for ( var i = 0, il = resizableMaterials.length; i < il; i ++ ) {
 
-			var uniforms = resizableMaterials[ i ].uniforms;
+			var materialEntry = resizableMaterials[ i ];
 
-			uniforms[ "viewWidth" ].value = scaledWidth;
-			uniforms[ "viewHeight" ].value = scaledHeight;
+			var material = materialEntry.material;
+			var uniforms = material.uniforms;
 
-			if ( uniforms[ 'samplerColor' ] ) uniforms[ 'samplerColor' ].value = compColor.renderTarget2;
-			if ( uniforms[ 'samplerNormalDepth' ] ) uniforms[ 'samplerNormalDepth' ].value = compNormalDepth.renderTarget2;
+			var colorLabel = materialEntry.color !== undefined ? materialEntry.color : 'samplerColor';
+			var normalDepthLabel = materialEntry.normalDepth !== undefined ? materialEntry.normalDepth : 'samplerNormalDepth';
+
+			if ( uniforms[ colorLabel ] ) uniforms[ colorLabel ].value = compColor.renderTarget2;
+			if ( uniforms[ normalDepthLabel ] ) uniforms[ normalDepthLabel ].value = compNormalDepth.renderTarget2;
+
+			if ( uniforms[ 'viewWidth' ] ) uniforms[ "viewWidth" ].value = scaledWidth;
+			if ( uniforms[ 'viewHeight' ] ) uniforms[ "viewHeight" ].value = scaledHeight;
 
 		}
 
