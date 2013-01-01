@@ -292,7 +292,15 @@ THREE.ShaderDeferred = {
 
 				// emissive color
 
-				"gl_FragColor.w = vec3_to_float( compressionScale * emissive * diffuseMapColor );",
+				"#ifdef USE_COLOR",
+
+					"gl_FragColor.w = vec3_to_float( compressionScale * emissive * diffuseMapColor * vColor );",
+
+				"#else",
+
+					"gl_FragColor.w = vec3_to_float( compressionScale * emissive * diffuseMapColor );",
+
+				"#endif",
 
 			"}"
 
@@ -919,13 +927,15 @@ THREE.ShaderDeferred = {
 				"vec3 nearestPointInside = vec3( lightPositionVS ) + ( lightRightVS * nearest2D.x + lightUpVS * nearest2D.y );",
 
 				"vec3 lightDir = normalize( nearestPointInside - vertexPositionVS.xyz );",
-				"float NdotL = dot( lightNormalVS, -lightDir );",
+				"float NdotL = max( dot( lightNormalVS, -lightDir ), 0.0 );",
+				"float NdotL2 = max( dot( normal, lightDir ), 0.0 );",
 
-				"if ( NdotL != 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS ) ) {",
+				//"if ( NdotL2 * NdotL > 0.0 && sideOfPlane( vertexPositionVS.xyz, lightPositionVS, lightNormalVS ) ) {",
+				"if ( NdotL2 * NdotL > 0.0 ) {",
 
 					// diffuse
 
-					"vec3 diffuse = vec3( NdotL );",
+					"vec3 diffuse = vec3( sqrt( NdotL * NdotL2 ) );",
 
 					// specular
 
@@ -941,8 +951,8 @@ THREE.ShaderDeferred = {
 						"vec3 dirSpec = E - vec3( lightPositionVS );",
 						"vec2 dirSpec2D = vec2( dot( dirSpec, lightRightVS ), dot( dirSpec, lightUpVS ) );",
 						"vec2 nearestSpec2D = vec2( clamp( dirSpec2D.x, -w, w ), clamp( dirSpec2D.y, -h, h ) );",
-						"float specFactor = 1.0 - clamp( length( nearestSpec2D - dirSpec2D ) * shininess, 0.0, 1.0 );",
-						"specular = specularColor * specFactor * specAngle;",
+						"float specFactor = 1.0 - clamp( length( nearestSpec2D - dirSpec2D ) * 0.05 * shininess, 0.0, 1.0 );",
+						"specular = specularColor * specFactor * specAngle * diffuse;",
 
 					"}",
 
