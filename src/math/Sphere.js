@@ -67,6 +67,12 @@ THREE.Sphere.prototype = {
 
 	},
 
+	isIntersectionSphere: function(sphere) {
+
+		return ( sphere.center.distanceToSquared( this.center ) <= ( this.radius * this.radius + sphere.radius * sphere.radius) );
+		
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
