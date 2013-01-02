@@ -67,9 +67,11 @@ THREE.Sphere.prototype = {
 
 	},
 
-	isIntersectionSphere: function(sphere) {
+	isIntersectionSphere: function( sphere ) {
 
-		return ( sphere.center.distanceToSquared( this.center ) <= ( this.radius * this.radius + sphere.radius * sphere.radius) );
+		var radiusSum = this.radius + sphere.radius;
+
+		return ( sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum ) );
 		
 	},
 
