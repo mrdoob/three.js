@@ -451,10 +451,78 @@ THREE.ShaderDeferred = {
 			"uniform sampler2D samplerLight;",
 			"uniform float brightness;",
 
+			// tonemapping operators
+			// based on John Hable's HLSL snippets
+			// from http://filmicgames.com/archives/75
+
+			"#ifdef TONEMAP_UNCHARTED",
+
+				"const float A = 0.15;",
+				"const float B = 0.50;",
+				"const float C = 0.10;",
+				"const float D = 0.20;",
+				"const float E = 0.02;",
+				"const float F = 0.30;",
+				"const float W = 11.2;",
+
+				"vec3 Uncharted2Tonemap( vec3 x ) {",
+
+				   "return ( ( x * ( A * x + C * B ) + D * E ) / ( x * ( A * x + B ) + D * F ) ) - E / F;",
+
+				"}",
+
+			"#endif",
+
 			"void main() {",
 
-				"vec3 color = texture2D( samplerLight, texCoord ).xyz;",
-				"gl_FragColor = vec4( brightness * sqrt( color ), 1.0 );",
+				"vec3 inColor = texture2D( samplerLight, texCoord ).xyz;",
+				"inColor *= brightness;",
+
+				"vec3 outColor;",
+
+				"#if defined( TONEMAP_SIMPLE )",
+
+					"outColor = sqrt( inColor );",
+
+				"#elif defined( TONEMAP_LINEAR )",
+
+					// simple linear to gamma conversion
+
+					"outColor = pow( inColor, vec3( 1.0 / 2.2 ) );",
+
+				"#elif defined( TONEMAP_REINHARD )",
+
+					// Reinhard operator
+
+					"inColor = inColor / ( 1.0 + inColor );",
+					"outColor = pow( inColor, vec3( 1.0 / 2.2 ) );",
+
+				"#elif defined( TONEMAP_FILMIC )",
+
+					// filmic operator by Jim Hejl and Richard Burgess-Dawson
+
+					"vec3 x = max( vec3( 0.0 ), inColor - 0.004 );",
+					"outColor = ( x * ( 6.2 * x + 0.5 ) ) / ( x * ( 6.2 * x + 1.7 ) + 0.06 );",
+
+				"#elif defined( TONEMAP_UNCHARTED )",
+
+					// tonemapping operator from Uncharted 2 by John Hable
+
+					"float ExposureBias = 2.0;",
+					"vec3 curr = Uncharted2Tonemap( ExposureBias * inColor );",
+
+					"vec3 whiteScale = vec3( 1.0 ) / Uncharted2Tonemap( vec3( W ) );",
+					"vec3 color = curr * whiteScale;",
+
+					"outColor = pow( color, vec3( 1.0 / 2.2 ) );",
+
+				"#else",
+
+					"outColor = inColor;",
+
+				"#endif",
+
+				"gl_FragColor = vec4( outColor, 1.0 );",
 
 			"}"
 

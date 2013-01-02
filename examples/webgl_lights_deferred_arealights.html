@@ -107,7 +107,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true } );
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true, tonemapping: THREE.FilmicOperator, brightness: 2.5 } );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -118,7 +118,7 @@
 
 				// effects
 
-				var bloomEffect = new THREE.BloomPass( 0.75 );
+				var bloomEffect = new THREE.BloomPass( 0.65 );
 				renderer.addEffect( bloomEffect );
 
 				// camera

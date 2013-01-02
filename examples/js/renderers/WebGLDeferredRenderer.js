@@ -15,6 +15,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	var scaledHeight = Math.floor( currentScale * fullHeight );
 
 	var brightness = parameters.brightness !== undefined ? parameters.brightness : 1;
+	var tonemapping = parameters.tonemapping !== undefined ? parameters.tonemapping : THREE.SimpleOperator;
 	var antialias = parameters.antialias !== undefined ? parameters.antialias : false;
 
 	this.renderer = parameters.renderer;
@@ -1140,6 +1141,20 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		compositePass.material.blending = THREE.NoBlending;
 		compositePass.clear = true;
 
+		var defines;
+
+		switch ( tonemapping ) {
+
+			case THREE.SimpleOperator:    defines = { "TONEMAP_SIMPLE": true };    break;
+			case THREE.LinearOperator:    defines = { "TONEMAP_LINEAR": true };    break;
+			case THREE.ReinhardOperator:  defines = { "TONEMAP_REINHARD": true };  break;
+			case THREE.FilmicOperator:    defines = { "TONEMAP_FILMIC": true };    break;
+			case THREE.UnchartedOperator: defines = { "TONEMAP_UNCHARTED": true }; break;
+
+		}
+
+		compositePass.material.defines = defines;
+
 		// FXAA
 
 		effectFXAA = new THREE.ShaderPass( THREE.FXAAShader );
@@ -1161,6 +1176,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			effectFXAA.enabled = false;
 			compositePass.renderToScreen = true;
+
 		}
 
 	};
@@ -1170,3 +1186,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 	createRenderTargets();
 
 };
+
+// tonemapping operator types
+
+THREE.NoOperator = 0;
+THREE.SimpleOperator = 1;
+THREE.LinearOperator = 2;
+THREE.ReinhardOperator = 3;
+THREE.FilmicOperator = 4;
+THREE.UnchartedOperator = 5;
