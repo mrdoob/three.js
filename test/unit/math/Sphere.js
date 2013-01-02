@@ -60,6 +60,15 @@ test( "distanceToPoint", function() {
 	ok( a.distanceToPoint( one3 ) === -1, "Passed!" );
 });
 
+test( "isIntersectionSphere", function() {
+	var a = new THREE.Sphere( one3, 1 );
+	var b = new THREE.Sphere( zero3, 1 );
+	var c = new THREE.Sphere( zero3, 0.25 );
+
+	ok( a.isIntersectionSphere( b ) , "Passed!" );
+	ok( ! a.isIntersectionSphere( c ) , "Passed!" );
+});
+
 test( "clampPoint", function() {
 	var a = new THREE.Sphere( one3, 1 );
 
