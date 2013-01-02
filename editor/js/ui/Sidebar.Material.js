@@ -1,8 +1,9 @@
 Sidebar.Material = function ( signals ) {
 
-    var materials = {
+    var materialClasses = {
 
 		'LineBasicMaterial': THREE.LineBasicMaterial,
+		'LineDashedMaterial': THREE.LineDashedMaterial,
 		'MeshBasicMaterial': THREE.MeshBasicMaterial,
 		'MeshDepthMaterial': THREE.MeshDepthMaterial,
 		'MeshFaceMaterial': THREE.MeshFaceMaterial,
@@ -11,7 +12,6 @@ Sidebar.Material = function ( signals ) {
 		'MeshPhongMaterial': THREE.MeshPhongMaterial,
 		'ParticleBasicMaterial': THREE.ParticleBasicMaterial,
 		'ParticleCanvasMaterial': THREE.ParticleCanvasMaterial,
-		'ParticleDOMMaterial': THREE.ParticleDOMMaterial,
 		'ShaderMaterial': THREE.ShaderMaterial,
 		'Material': THREE.Material
 
@@ -41,6 +41,7 @@ Sidebar.Material = function ( signals ) {
 	var materialClass = new UI.Select( 'absolute' ).setOptions( {
 
 		'LineBasicMaterial': 'LineBasicMaterial',
+		'LineDashedMaterial': 'LineDashedMaterial',
 		'MeshBasicMaterial': 'MeshBasicMaterial',
 		'MeshDepthMaterial': 'MeshDepthMaterial',
 		'MeshFaceMaterial': 'MeshFaceMaterial',
@@ -229,9 +230,9 @@ Sidebar.Material = function ( signals ) {
 
 			material.name = materialName.getValue();
 
-			if ( material instanceof materials[ materialClass.getValue() ] == false ) {
+			if ( material instanceof materialClasses[ materialClass.getValue() ] == false ) {
 
-				material = new materials[ materialClass.getValue() ]();
+				material = new materialClasses[ materialClass.getValue() ]();
 				selected.material = material;
 
 			}
@@ -452,9 +453,9 @@ Sidebar.Material = function ( signals ) {
 
 	function getMaterialInstanceName( material ) {
 
-		for ( var key in materials ) {
+		for ( var key in materialClasses ) {
 
-			if ( material instanceof materials[ key ] ) return key;
+			if ( material instanceof materialClasses[ key ] ) return key;
 
 		}
 

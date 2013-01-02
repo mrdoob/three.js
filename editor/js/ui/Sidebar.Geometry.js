@@ -1,7 +1,8 @@
 Sidebar.Geometry = function ( signals ) {
 
-	var geometries = {
+	var geometryClasses = {
 
+		"CircleGeometry": THREE.CircleGeometry,
 		"ConvexGeometry": THREE.ConvexGeometry,
 		"CubeGeometry": THREE.CubeGeometry,
 		"CylinderGeometry": THREE.CylinderGeometry,
@@ -12,6 +13,7 @@ Sidebar.Geometry = function ( signals ) {
 		"ParametricGeometry": THREE.ParametricGeometry,
 		"PlaneGeometry": THREE.PlaneGeometry,
 		"PolyhedronGeometry": THREE.PolyhedronGeometry,
+		"ShapeGeometry": THREE.ShapeGeometry,
 		"SphereGeometry": THREE.SphereGeometry,
 		"TetrahedronGeometry": THREE.TetrahedronGeometry,
 		"TextGeometry": THREE.TextGeometry,
@@ -110,9 +112,9 @@ Sidebar.Geometry = function ( signals ) {
 
 	function getGeometryInstanceName( geometry ) {
 
-		for ( var key in geometries ) {
+		for ( var key in geometryClasses ) {
 
-			if ( geometry instanceof geometries[ key ] ) return key;
+			if ( geometry instanceof geometryClasses[ key ] ) return key;
 
 		}
 
