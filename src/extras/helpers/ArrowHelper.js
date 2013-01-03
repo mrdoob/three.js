@@ -16,8 +16,8 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 	THREE.Object3D.call( this );
 
-	if ( hex === undefined ) hex = 0xffff00;
 	if ( length === undefined ) length = 20;
+	if ( hex === undefined ) hex = 0xffff00;
 
 	var lineGeometry = new THREE.Geometry();
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
@@ -57,9 +57,9 @@ THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
 	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x ).normalize();
 	    var radians = Math.acos( d.y );
-	    var quat = THREE.ArrowHelper.__q1.setFromAxisAngle( axis, radians );
-	    
-	    this.rotation.setEulerFromQuaternion( quat, this.eulerOrder );
+	    var quaternion = THREE.ArrowHelper.__q1.setFromAxisAngle( axis, radians );
+
+	    this.rotation.setEulerFromQuaternion( quaternion, this.eulerOrder );
 
 	}
 
