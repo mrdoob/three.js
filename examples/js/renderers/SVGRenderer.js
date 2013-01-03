@@ -339,9 +339,7 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_color.r *= element.color.r;
-				_color.g *= element.color.g;
-				_color.b *= element.color.b;
+				_color.multiply( element.color );
 
 			}
 
@@ -352,23 +350,17 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_diffuseColor.r *= element.color.r;
-				_diffuseColor.g *= element.color.g;
-				_diffuseColor.b *= element.color.b;
+				_diffuseColor.multiply( element.color );
 
 			}
 
 			if ( _enableLighting ) {
 
-				_color.r = _ambientLight.r;
-				_color.g = _ambientLight.g;
-				_color.b = _ambientLight.b;
+				_color.copy( _ambientLight );
 
 				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
-				_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
-				_color.b = _color.b * _diffuseColor.b + _emissiveColor.b;
+				_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 			} else {
 
@@ -383,9 +375,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.r = 0.5 * element.normalModelView.x + 0.5;
-			_color.g = 0.5 * element.normalModelView.y + 0.5;
-			_color.b = 0.5 * element.normalModelView.z + 0.5;
+			var normal = element.normalModelView;
+
+			_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 		}
 
@@ -417,9 +409,7 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_color.r *= element.color.r;
-				_color.g *= element.color.g;
-				_color.b *= element.color.b;
+				_color.multiply( element.color );
 
 			}
 
@@ -430,23 +420,17 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_diffuseColor.r *= element.color.r;
-				_diffuseColor.g *= element.color.g;
-				_diffuseColor.b *= element.color.b;
+				_diffuseColor.multiply( element.color );
 
 			}
 
 			if ( _enableLighting ) {
 
-				_color.r = _ambientLight.r;
-				_color.g = _ambientLight.g;
-				_color.b = _ambientLight.b;
+				_color.copy( _ambientLight );
 
 				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
-				_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
-				_color.b = _color.b * _diffuseColor.b + _emissiveColor.b;
+				_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 			} else {
 
@@ -461,9 +445,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.r = 0.5 * element.normalModelView.x + 0.5;
-			_color.g = 0.5 * element.normalModelView.y + 0.5;
-			_color.b = 0.5 * element.normalModelView.z + 0.5;
+			var normal = element.normalModelView;
+
+			_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 		}
 

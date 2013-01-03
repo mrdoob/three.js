@@ -16,13 +16,10 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	// color
 
-	this.color = light.color.clone();
-
 	var intensity = THREE.Math.clamp( light.intensity, 0, 1 );
 
-	this.color.r *= intensity;
-	this.color.g *= intensity;
-	this.color.b *= intensity;
+	this.color = light.color.clone();
+	this.color.multiplyScalar( intensity );
 
 	var hexColor = this.color.getHex();
 
@@ -74,12 +71,10 @@ THREE.PointLightHelper.prototype.update = function () {
 
 	// update sphere and rays colors to light color * light intensity
 
-	this.color.copy( this.light.color );
-
 	var intensity = THREE.Math.clamp( this.light.intensity, 0, 1 );
-	this.color.r *= intensity;
-	this.color.g *= intensity;
-	this.color.b *= intensity;
+
+	this.color.copy( this.light.color );
+	this.color.multiplyScalar( intensity );
 
 	this.lightSphere.material.color.copy( this.color );
 	this.lightRays.material.color.copy( this.color );
