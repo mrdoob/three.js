@@ -28567,7 +28567,7 @@ THREE.LineCurve3 = THREE.Curve.create(
 		var r = new THREE.Vector3();
 
 
-		r.sub( this.v2, this.v1 ); // diff
+		r.subVectors( this.v2, this.v1 ); // diff
 		r.multiplyScalar( t );
 		r.add( this.v1 );
 
