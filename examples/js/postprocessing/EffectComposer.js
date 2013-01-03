@@ -47,6 +47,12 @@ THREE.EffectComposer.prototype = {
 
 	},
 
+	insertPass: function ( pass, index ) {
+
+		this.passes.splice( index, 0, pass );
+
+	},
+
 	render: function ( delta ) {
 
 		this.writeBuffer = this.renderTarget1;
