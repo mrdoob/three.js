@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
+ * @author gero3 / https://github.com/gero3/
  */
 
 THREE.WebGLRenderer2 = function ( parameters ) {
@@ -3294,4 +3295,4 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 
 };
 
-THREE.WebGLRenderer = THREE.WebGLRenderer2;
+//THREE.WebGLRenderer = THREE.WebGLRenderer2;
