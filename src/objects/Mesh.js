@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
+ * @author jonobr1 / http://jonobr1.com/
  */
 
 THREE.Mesh = function ( geometry, material ) {
@@ -21,29 +22,50 @@ THREE.Mesh = function ( geometry, material ) {
 
 		}
 
-		// setup morph targets
+		this.updateMorphTargets();
 
-		if ( this.geometry.morphTargets.length ) {
+	}
+
+};
+
+THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.Mesh.prototype.updateMorphTargets = function() {
+
+	// setup morph targets
+
+	var morphTargetAmount = this.geometry.morphTargets.length;
+
+	if (!!morphTargetAmount) {
+
+		// Initialize variables for morph targets if they don't exist.
+
+		if ( !this.morphTargetInfluences ) {
 
 			this.morphTargetBase = -1;
 			this.morphTargetForcedOrder = [];
 			this.morphTargetInfluences = [];
 			this.morphTargetDictionary = {};
 
-			for( var m = 0; m < this.geometry.morphTargets.length; m ++ ) {
+		}
 
-				this.morphTargetInfluences.push( 0 );
-				this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+		// Make sure that the influences amount is identical to geometry's
+		// morph target amount.
 
-			}
+		if ( this.morphTargetInfluences.length !== morphTargetAmount ) {
+			this.morphTargetInfluences.length = morphTargetAmount;
+		}
+
+		for ( var m = 0; m < morphTargetAmount; m++ ) {
+
+			this.morphTargetInfluences[ m ] = this.morphTargetInfluences[ m ] || 0;
+			this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
 
 		}
 
 	}
 
-}
-
-THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
+};
 
 THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
@@ -53,9 +75,9 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 	}
 
-	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
+	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning -1." );
 
-	return 0;
+	return -1;	// Easier comparator similar to ecmascript 5 indexOf.
 
 };
 
