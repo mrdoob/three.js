@@ -77,8 +77,6 @@ THREE.Vector2.prototype = {
 
 	add: function ( v ) {
 
-		if ( arguments.length > 1 ) debugger;
-
 		this.x += v.x;
 		this.y += v.y;
 

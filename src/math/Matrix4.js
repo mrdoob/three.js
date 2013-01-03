@@ -250,8 +250,6 @@ THREE.Matrix4.prototype = {
 
 	multiply: function ( m ) {
 
-		if ( arguments.length > 1 ) debugger;
-
 		return this.multiplyMatrices( this, m );
 
 	},

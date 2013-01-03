@@ -233,9 +233,8 @@ THREE.Quaternion.prototype = {
 
 	multiply: function ( b ) {
 
-		if ( arguments.length > 1 ) debugger;
-
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
+
 		var qax = this.x, qay = this.y, qaz = this.z, qaw = this.w,
 		qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
 

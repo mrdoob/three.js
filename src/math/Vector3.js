@@ -92,8 +92,6 @@ THREE.Vector3.prototype = {
 
 	add: function ( v ) {
 
-		if ( arguments.length > 1 ) debugger;
-
 		this.x += v.x;
 		this.y += v.y;
 		this.z += v.z;
@@ -124,8 +122,6 @@ THREE.Vector3.prototype = {
 
 	sub: function ( v ) {
 
-		if ( arguments.length > 1 ) debugger;
-
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
@@ -145,8 +141,6 @@ THREE.Vector3.prototype = {
 	},
 
 	multiply: function ( v ) {
-
-		if ( arguments.length > 1 ) debugger;
 
 		this.x *= v.x;
 		this.y *= v.y;
@@ -413,8 +407,6 @@ THREE.Vector3.prototype = {
 	},
 
 	cross: function ( v ) {
-
-		if ( arguments.length > 1 ) debugger;
 
 		var x = this.x, y = this.y, z = this.z;
 

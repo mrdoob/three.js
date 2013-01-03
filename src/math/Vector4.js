@@ -103,8 +103,6 @@ THREE.Vector4.prototype = {
 
 	add: function ( v ) {
 
-		if ( arguments.length > 1 ) debugger;
-
 		this.x += v.x;
 		this.y += v.y;
 		this.z += v.z;
