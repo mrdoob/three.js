@@ -12,9 +12,7 @@ THREE.Mesh = function ( geometry, material ) {
 	this.geometry = geometry;
 	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
 
-	if ( this.geometry ) {
-
-		// calc bound radius
+	if ( this.geometry !== undefined ) {
 
 		if ( this.geometry.boundingSphere === null ) {
 
@@ -30,35 +28,18 @@ THREE.Mesh = function ( geometry, material ) {
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Mesh.prototype.updateMorphTargets = function() {
+THREE.Mesh.prototype.updateMorphTargets = function () {
 
-	// setup morph targets
+	if ( this.geometry.morphTargets.length > 0 ) {
 
-	var morphTargetAmount = this.geometry.morphTargets.length;
+		this.morphTargetBase = -1;
+		this.morphTargetForcedOrder = [];
+		this.morphTargetInfluences = [];
+		this.morphTargetDictionary = {};
 
-	if (!!morphTargetAmount) {
+		for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
 
-		// Initialize variables for morph targets if they don't exist.
-
-		if ( !this.morphTargetInfluences ) {
-
-			this.morphTargetBase = -1;
-			this.morphTargetForcedOrder = [];
-			this.morphTargetInfluences = [];
-			this.morphTargetDictionary = {};
-
-		}
-
-		// Make sure that the influences amount is identical to geometry's
-		// morph target amount.
-
-		if ( this.morphTargetInfluences.length !== morphTargetAmount ) {
-			this.morphTargetInfluences.length = morphTargetAmount;
-		}
-
-		for ( var m = 0; m < morphTargetAmount; m++ ) {
-
-			this.morphTargetInfluences[ m ] = this.morphTargetInfluences[ m ] || 0;
+			this.morphTargetInfluences.push( 0 );
 			this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
 
 		}
@@ -75,9 +56,9 @@ THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 
 	}
 
-	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning -1." );
+	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
 
-	return -1;	// Easier comparator similar to ecmascript 5 indexOf.
+	return 0;
 
 };
 
