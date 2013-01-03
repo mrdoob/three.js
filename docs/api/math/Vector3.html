@@ -18,7 +18,7 @@
 		var b = new THREE.Vector3( 0, 1, 0 );
 
 		var c = new THREE.Vector3();
-		c.cross( a, b );
+		c.crossVectors( a, b );
 		</code>
 
 
@@ -63,24 +63,24 @@
 		Copies value of *v* to this vector.
 		</div>
 
-		<h3>.add( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
-		<div>
-		Sets this vector to *a + b*.
-		</div>
-
-		<h3>.addSelf( [page:Vector3 v] ) [page:Vector3]</h3>
+		<h3>.add( [page:Vector3 v] ) [page:Vector3]</h3>
 		<div>
 		Adds *v* to this vector.
 		</div>
 
-		<h3>.sub( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
+		<h3>.addVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
 		<div>
-		Sets this vector to *a - b*.
+		Sets this vector to *a + b*.
 		</div>
 
-		<h3>.subSelf( [page:Vector3 v] ) [page:Vector3]</h3>
+		<h3>.sub( [page:Vector3 v] ) [page:Vector3]</h3>
 		<div>
 		Subtracts *v* from this vector.
+		</div>
+
+		<h3>.subVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector to *a - b*.
 		</div>
 
 		<h3>.multiplyScalar( [page:Float s] ) [page:Vector3]</h3>
@@ -145,14 +145,14 @@
 		Normalizes this vector and multiplies it by *l*.
 		</div>
 
-		<h3>.cross( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
-		<div>
-		Sets this vector to cross product of *a* and *b*.
-		</div>
-
-		<h3>.crossSelf( [page:Vector3 v] ) [page:Vector3]</h3>
+		<h3>.cross( [page:Vector3 v] ) [page:Vector3]</h3>
 		<div>
 		Sets this vector to cross product of itself and *v*.
+		</div>
+
+		<h3>.crossVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector to cross product of *a* and *b*.
 		</div>
 
 		<h3>.getPositionFromMatrix( [page:Matrix4 m] ) [page:Vector3]</h3>
