@@ -79,6 +79,7 @@
 	"../src/renderers/WebGLRenderer.js",
 	"../src/renderers/WebGLRenderer2.js",
 	"../src/renderers/webgl/renderer.js",
+	"../src/renderers/webgl/shaderBuilder.js",
 	"../src/renderers/webgl/Objects/Object3DRenderer.js",
 	"../src/renderers/webgl/Objects/MeshRenderer.js",
 	"../src/renderers/webgl/Objects/ParticleRenderer.js",
