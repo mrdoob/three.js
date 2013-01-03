@@ -31,22 +31,22 @@ THREE.Frustum.prototype = {
 		planes[3].copy( p3 );
 		planes[4].copy( p4 );
 		planes[5].copy( p5 );
-		
-		return this;	
+
+		return this;
 
 	},
 
 	copy: function ( frustum ) {
 
 		var planes = this.planes;
-	
+
 		for( var i = 0; i < 6; i ++ ) {
 
 			planes[i].copy( frustum.planes[i] );
 
 		}
 
-		return this;	
+		return this;
 
 	},
 
@@ -77,7 +77,7 @@ THREE.Frustum.prototype = {
 		var planes = this.planes;
 		var center = matrix.getPosition();
 		var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
-		
+
 		for ( var i = 0; i < 6; i ++ ) {
 
 			var distance = planes[ i ].distanceToPoint( center );
@@ -95,11 +95,11 @@ THREE.Frustum.prototype = {
 	},
 
 	intersectsSphere: function ( sphere ) {
-		
+
 		var planes = this.planes;
 		var center = sphere.center;
 		var negRadius = -sphere.radius;
-		
+
 		for ( var i = 0; i < 6; i ++ ) {
 
 			var distance = planes[ i ].distanceToPoint( center );
@@ -117,7 +117,7 @@ THREE.Frustum.prototype = {
 	},
 
 	containsPoint: function ( point ) {
-		
+
 		var planes = this.planes;
 
 		for ( var i = 0; i < 6; i ++ ) {
@@ -137,9 +137,8 @@ THREE.Frustum.prototype = {
 	clone: function () {
 
 		var planes = this.planes;
-		return new THREE.Frustum(
-			planes[0], planes[1], planes[2], 
-			planes[3], planes[4], planes[5] );
+
+		return new THREE.Frustum( planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] );
 
 	}
 
