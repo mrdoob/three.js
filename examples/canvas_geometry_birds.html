@@ -183,7 +183,7 @@
 
 						var steer = new THREE.Vector3();
 
-						steer.sub( this.position, target );
+						steer.subVectors( this.position, target );
 						steer.multiplyScalar( 0.5 / distance );
 
 						_acceleration.add( steer );
@@ -196,7 +196,7 @@
 
 					var steer = new THREE.Vector3();
 
-					steer.sub( target, this.position );
+					steer.subVectors( target, this.position );
 					steer.multiplyScalar( amount );
 
 					return steer;
@@ -272,7 +272,7 @@
 
 					}
 
-					steer.sub( posSum, this.position );
+					steer.subVectors( posSum, this.position );
 
 					var l = steer.length();
 
@@ -301,7 +301,7 @@
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
-							repulse.sub( this.position, boid.position );
+							repulse.subVectors( this.position, boid.position );
 							repulse.normalize();
 							repulse.divideScalar( distance );
 							posSum.add( repulse );

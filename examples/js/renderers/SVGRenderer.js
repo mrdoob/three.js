@@ -249,7 +249,7 @@ THREE.SVGRenderer = function () {
 
 				lightPosition = light.matrixWorld.getPosition();
 
-				amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
+				amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
 				if ( amount <= 0 ) continue;
 

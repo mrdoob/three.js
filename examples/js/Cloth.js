@@ -250,7 +250,7 @@ function simulate(time) {
 			;i<il;i++) {
 		particle = particles[i];
 		pos = particle.position;
-		diff.sub(pos, ballPosition);
+		diff.subVectors(pos, ballPosition);
 		if (diff.length() < ballSize) {
 			// collided
 			diff.normalize().multiplyScalar(ballSize);
