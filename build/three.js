@@ -7448,7 +7448,10 @@ THREE.Geometry.prototype = {
 		var precisionPoints = 4; // number of decimal points, eg. 4 for epsilon of 0.0001
 		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
-		var abcd = 'abcd', o, k, j, jl, u;
+		var indices, k, j, jl, u;
+
+		// reset cache of vertices as it now will be changing.
+		this.__tmpVertices = undefined;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -7471,7 +7474,9 @@ THREE.Geometry.prototype = {
 		};
 
 
-		// Start to patch face indices
+		// if faces are completely degenerate after merging vertices, we
+		// have to remove them from the geometry.
+		var faceIndicesToRemove = [];
 
 		for( i = 0, il = this.faces.length; i < il; i ++ ) {
 
@@ -7483,6 +7488,22 @@ THREE.Geometry.prototype = {
 				face.b = changes[ face.b ];
 				face.c = changes[ face.c ];
 
+				indices = [ face.a, face.b, face.c ];
+
+				var dupIndex = -1;
+				
+				// if any duplicate vertices are found in a Face3
+				// we have to remove the face as nothing can be saved
+				for( var n = 0; n < 3; n ++ ) {
+					if( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+
+						dupIndex = n;
+						faceIndicesToRemove.push( i );
+						break;
+
+					}
+				}
+
 			} else if ( face instanceof THREE.Face4 ) {
 
 				face.a = changes[ face.a ];
@@ -7492,31 +7513,71 @@ THREE.Geometry.prototype = {
 
 				// check dups in (a, b, c, d) and convert to -> face3
 
-				o = [ face.a, face.b, face.c, face.d ];
+				indices = [ face.a, face.b, face.c, face.d ];
 
-				for ( k = 3; k > 0; k -- ) {
+				var dupIndex = -1;
 
-					if ( o.indexOf( face[ abcd[ k ] ] ) !== k ) {
+				for( var n = 0; n < 4; n ++ ) {
+					if( indices[ n ] == indices[ ( n + 1 ) % 4 ] ) {
 
-						// console.log('faces', face.a, face.b, face.c, face.d, 'dup at', k);
 
-						o.splice( k, 1 );
+						// if more than one duplicated vertex is found
+						// we can't generate any valid Face3's, thus
+						// we need to remove this face complete.
+						if( dupIndex >= 0 ) {
 
-						this.faces[ i ] = new THREE.Face3( o[0], o[1], o[2], face.normal, face.color, face.materialIndex );
-
-						for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
-
-							u = this.faceVertexUvs[ j ][ i ];
-							if ( u ) u.splice( k, 1 );
+							faceIndicesToRemove.push( i );
 
 						}
 
-						this.faces[ i ].vertexColors = face.vertexColors;
+						dupIndex = n;
 
-						break;
+					}
+				}
+
+				if( dupIndex >= 0 ) {
+
+					indices.splice( dupIndex, 1 );
+
+					var newFace = new THREE.Face3( indices[0], indices[1], indices[2], face.normal, face.color, face.materialIndex );
+
+					for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
+
+						u = this.faceVertexUvs[ j ][ i ];
+
+						if ( u ) {
+							u.splice( dupIndex, 1 );
+						}
+
 					}
 
+					if( face.vertexNormals && face.vertexNormals.length > 0) {
+
+						newFace.vertexNormals = face.vertexNormals;
+						newFace.vertexNormals.splice( dupIndex, 1 );
+
+					}
+
+					if( face.vertexColors && face.vertexColors.length > 0 ) {
+
+						newFace.vertexColors = face.vertexColors;
+						newFace.vertexColors.splice( dupIndex, 1 );
+					}
+
+					this.faces[ i ] = newFace;
 				}
+
+			}
+
+		}
+
+		for( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+
+			this.faces.splice( i, 1 );
+			
+			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
+
+				this.faceVertexUvs[ j ].splice( i, 1 );
 
 			}
 
