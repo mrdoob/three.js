@@ -135,7 +135,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.update = function () {
 
 		var position = this.object.position;
-		var offset = position.clone().subSelf( this.center )
+		var offset = position.clone().sub( this.center )
 
 		// angle from z-axis around y-axis
 
@@ -169,7 +169,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
 
-		position.copy( this.center ).addSelf( offset );
+		position.copy( this.center ).add( offset );
 
 		this.object.lookAt( this.center );
 
@@ -232,7 +232,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( state === STATE.ROTATE ) {
 
 			rotateEnd.set( event.clientX, event.clientY );
-			rotateDelta.sub( rotateEnd, rotateStart );
+			rotateDelta.subVectors( rotateEnd, rotateStart );
 
 			scope.rotateLeft( 2 * Math.PI * rotateDelta.x / PIXELS_PER_ROUND * scope.userRotateSpeed );
 			scope.rotateUp( 2 * Math.PI * rotateDelta.y / PIXELS_PER_ROUND * scope.userRotateSpeed );
@@ -242,7 +242,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 		} else if ( state === STATE.ZOOM ) {
 
 			zoomEnd.set( event.clientX, event.clientY );
-			zoomDelta.sub( zoomEnd, zoomStart );
+			zoomDelta.subVectors( zoomEnd, zoomStart );
 
 			if ( zoomDelta.y > 0 ) {
 

@@ -84,8 +84,8 @@ THREE.Sphere.prototype = {
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
 
-			result.subSelf( this.center ).normalize();
-			result.multiplyScalar( this.radius ).addSelf( this.center );
+			result.sub( this.center ).normalize();
+			result.multiplyScalar( this.radius ).add( this.center );
 
 		}
 
@@ -115,7 +115,7 @@ THREE.Sphere.prototype = {
 
 	translate: function ( offset ) {
 
-		this.center.addSelf( offset );
+		this.center.add( offset );
 
 		return this;
 

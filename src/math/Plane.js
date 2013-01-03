@@ -42,8 +42,7 @@ THREE.Plane.prototype = {
 
 	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var normal = THREE.Plane.__v1.sub( c, b ).crossSelf(
-					 THREE.Plane.__v2.sub( a, b ) ).normalize();
+		var normal = THREE.Plane.__v1.subVectors( c, b ).cross( THREE.Plane.__v2.subVectors( a, b ) ).normalize();
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
@@ -97,7 +96,7 @@ THREE.Plane.prototype = {
 
 	projectPoint: function ( point, optionalTarget ) {
 
-		return this.orthoPoint( point, optionalTarget ).subSelf( point ).negate();
+		return this.orthoPoint( point, optionalTarget ).sub( point ).negate();
 
 	},
 
@@ -125,7 +124,7 @@ THREE.Plane.prototype = {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		var direction = THREE.Plane.__v1.sub( endPoint, startPoint );
+		var direction = THREE.Plane.__v1.subVectors( endPoint, startPoint );
 
 		var denominator = this.normal.dot( direction );
 
@@ -151,7 +150,7 @@ THREE.Plane.prototype = {
 
 		}
 
-		return result.copy( direction ).multiplyScalar( t ).addSelf( startPoint );
+		return result.copy( direction ).multiplyScalar( t ).add( startPoint );
 
 	},
 

@@ -178,12 +178,12 @@ THREE.GeometryUtils = {
 		tmp.copy( vectorB );
 		tmp.multiplyScalar( b );
 
-		point.addSelf( tmp );
+		point.add( tmp );
 
 		tmp.copy( vectorC );
 		tmp.multiplyScalar( c );
 
-		point.addSelf( tmp );
+		point.add( tmp );
 
 		return point;
 
@@ -377,9 +377,9 @@ THREE.GeometryUtils = {
 		var tmp1 = THREE.GeometryUtils.__v1,
 			tmp2 = THREE.GeometryUtils.__v2;
 
-		tmp1.sub( vectorB, vectorA );
-		tmp2.sub( vectorC, vectorA );
-		tmp1.crossSelf( tmp2 );
+		tmp1.subVectors( vectorB, vectorA );
+		tmp2.subVectors( vectorC, vectorA );
+		tmp1.cross( tmp2 );
 
 		return 0.5 * tmp1.length();
 
@@ -395,7 +395,7 @@ THREE.GeometryUtils = {
 
 		var offset = new THREE.Vector3();
 
-		offset.add( bb.min, bb.max );
+		offset.addVectors( bb.min, bb.max );
 		offset.multiplyScalar( -0.5 );
 
 		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset ) );
@@ -671,7 +671,7 @@ THREE.GeometryUtils = {
 					if ( dab >= dbc && dab >= dac ) {
 
 						vm = va.clone();
-						vm.lerpSelf( vb, 0.5 );
+						vm.lerp( vb, 0.5 );
 
 						triA.a = a;
 						triA.b = m;
@@ -684,7 +684,7 @@ THREE.GeometryUtils = {
 						if ( face.vertexNormals.length === 3 ) {
 
 							vnm = face.vertexNormals[ 0 ].clone();
-							vnm.lerpSelf( face.vertexNormals[ 1 ], 0.5 );
+							vnm.lerp( face.vertexNormals[ 1 ], 0.5 );
 
 							triA.vertexNormals[ 1 ].copy( vnm );
 							triB.vertexNormals[ 0 ].copy( vnm );
@@ -694,7 +694,7 @@ THREE.GeometryUtils = {
 						if ( face.vertexColors.length === 3 ) {
 
 							vcm = face.vertexColors[ 0 ].clone();
-							vcm.lerpSelf( face.vertexColors[ 1 ], 0.5 );
+							vcm.lerp( face.vertexColors[ 1 ], 0.5 );
 
 							triA.vertexColors[ 1 ].copy( vcm );
 							triB.vertexColors[ 0 ].copy( vcm );
@@ -706,7 +706,7 @@ THREE.GeometryUtils = {
 					} else if ( dbc >= dab && dbc >= dac ) {
 
 						vm = vb.clone();
-						vm.lerpSelf( vc, 0.5 );
+						vm.lerp( vc, 0.5 );
 
 						triA.a = a;
 						triA.b = b;
@@ -719,7 +719,7 @@ THREE.GeometryUtils = {
 						if ( face.vertexNormals.length === 3 ) {
 
 							vnm = face.vertexNormals[ 1 ].clone();
-							vnm.lerpSelf( face.vertexNormals[ 2 ], 0.5 );
+							vnm.lerp( face.vertexNormals[ 2 ], 0.5 );
 
 							triA.vertexNormals[ 2 ].copy( vnm );
 
@@ -732,7 +732,7 @@ THREE.GeometryUtils = {
 						if ( face.vertexColors.length === 3 ) {
 
 							vcm = face.vertexColors[ 1 ].clone();
-							vcm.lerpSelf( face.vertexColors[ 2 ], 0.5 );
+							vcm.lerp( face.vertexColors[ 2 ], 0.5 );
 
 							triA.vertexColors[ 2 ].copy( vcm );
 
@@ -747,7 +747,7 @@ THREE.GeometryUtils = {
 					} else {
 
 						vm = va.clone();
-						vm.lerpSelf( vc, 0.5 );
+						vm.lerp( vc, 0.5 );
 
 						triA.a = a;
 						triA.b = b;
@@ -760,7 +760,7 @@ THREE.GeometryUtils = {
 						if ( face.vertexNormals.length === 3 ) {
 
 							vnm = face.vertexNormals[ 0 ].clone();
-							vnm.lerpSelf( face.vertexNormals[ 2 ], 0.5 );
+							vnm.lerp( face.vertexNormals[ 2 ], 0.5 );
 
 							triA.vertexNormals[ 2 ].copy( vnm );
 							triB.vertexNormals[ 0 ].copy( vnm );
@@ -770,7 +770,7 @@ THREE.GeometryUtils = {
 						if ( face.vertexColors.length === 3 ) {
 
 							vcm = face.vertexColors[ 0 ].clone();
-							vcm.lerpSelf( face.vertexColors[ 2 ], 0.5 );
+							vcm.lerp( face.vertexColors[ 2 ], 0.5 );
 
 							triA.vertexColors[ 2 ].copy( vcm );
 							triB.vertexColors[ 0 ].copy( vcm );
@@ -801,7 +801,7 @@ THREE.GeometryUtils = {
 							if ( edge === 0 ) {
 
 								uvM = uvA.clone();
-								uvM.lerpSelf( uvB, 0.5 );
+								uvM.lerp( uvB, 0.5 );
 
 								uvsTriA = [ uvA.clone(), uvM.clone(), uvC.clone() ];
 								uvsTriB = [ uvM.clone(), uvB.clone(), uvC.clone() ];
@@ -811,7 +811,7 @@ THREE.GeometryUtils = {
 							} else if ( edge === 1 ) {
 
 								uvM = uvB.clone();
-								uvM.lerpSelf( uvC, 0.5 );
+								uvM.lerp( uvC, 0.5 );
 
 								uvsTriA = [ uvA.clone(), uvB.clone(), uvM.clone() ];
 								uvsTriB = [ uvM.clone(), uvC.clone(), uvA.clone() ];
@@ -821,7 +821,7 @@ THREE.GeometryUtils = {
 							} else {
 
 								uvM = uvA.clone();
-								uvM.lerpSelf( uvC, 0.5 );
+								uvM.lerp( uvC, 0.5 );
 
 								uvsTriA = [ uvA.clone(), uvB.clone(), uvM.clone() ];
 								uvsTriB = [ uvM.clone(), uvB.clone(), uvC.clone() ];
@@ -874,10 +874,10 @@ THREE.GeometryUtils = {
 					if ( ( dab >= dbc && dab >= dcd && dab >= dad ) || ( dcd >= dbc && dcd >= dab && dcd >= dad ) ) {
 
 						vm1 = va.clone();
-						vm1.lerpSelf( vb, 0.5 );
+						vm1.lerp( vb, 0.5 );
 
 						vm2 = vc.clone();
-						vm2.lerpSelf( vd, 0.5 );
+						vm2.lerp( vd, 0.5 );
 
 						quadA.a = a;
 						quadA.b = m1;
@@ -892,10 +892,10 @@ THREE.GeometryUtils = {
 						if ( face.vertexNormals.length === 4 ) {
 
 							vnm1 = face.vertexNormals[ 0 ].clone();
-							vnm1.lerpSelf( face.vertexNormals[ 1 ], 0.5 );
+							vnm1.lerp( face.vertexNormals[ 1 ], 0.5 );
 
 							vnm2 = face.vertexNormals[ 2 ].clone();
-							vnm2.lerpSelf( face.vertexNormals[ 3 ], 0.5 );
+							vnm2.lerp( face.vertexNormals[ 3 ], 0.5 );
 
 							quadA.vertexNormals[ 1 ].copy( vnm1 );
 							quadA.vertexNormals[ 2 ].copy( vnm2 );
@@ -908,10 +908,10 @@ THREE.GeometryUtils = {
 						if ( face.vertexColors.length === 4 ) {
 
 							vcm1 = face.vertexColors[ 0 ].clone();
-							vcm1.lerpSelf( face.vertexColors[ 1 ], 0.5 );
+							vcm1.lerp( face.vertexColors[ 1 ], 0.5 );
 
 							vcm2 = face.vertexColors[ 2 ].clone();
-							vcm2.lerpSelf( face.vertexColors[ 3 ], 0.5 );
+							vcm2.lerp( face.vertexColors[ 3 ], 0.5 );
 
 							quadA.vertexColors[ 1 ].copy( vcm1 );
 							quadA.vertexColors[ 2 ].copy( vcm2 );
@@ -926,10 +926,10 @@ THREE.GeometryUtils = {
 					} else {
 
 						vm1 = vb.clone();
-						vm1.lerpSelf( vc, 0.5 );
+						vm1.lerp( vc, 0.5 );
 
 						vm2 = vd.clone();
-						vm2.lerpSelf( va, 0.5 );
+						vm2.lerp( va, 0.5 );
 
 						quadA.a = a;
 						quadA.b = b;
@@ -944,10 +944,10 @@ THREE.GeometryUtils = {
 						if ( face.vertexNormals.length === 4 ) {
 
 							vnm1 = face.vertexNormals[ 1 ].clone();
-							vnm1.lerpSelf( face.vertexNormals[ 2 ], 0.5 );
+							vnm1.lerp( face.vertexNormals[ 2 ], 0.5 );
 
 							vnm2 = face.vertexNormals[ 3 ].clone();
-							vnm2.lerpSelf( face.vertexNormals[ 0 ], 0.5 );
+							vnm2.lerp( face.vertexNormals[ 0 ], 0.5 );
 
 							quadA.vertexNormals[ 2 ].copy( vnm1 );
 							quadA.vertexNormals[ 3 ].copy( vnm2 );
@@ -960,10 +960,10 @@ THREE.GeometryUtils = {
 						if ( face.vertexColors.length === 4 ) {
 
 							vcm1 = face.vertexColors[ 1 ].clone();
-							vcm1.lerpSelf( face.vertexColors[ 2 ], 0.5 );
+							vcm1.lerp( face.vertexColors[ 2 ], 0.5 );
 
 							vcm2 = face.vertexColors[ 3 ].clone();
-							vcm2.lerpSelf( face.vertexColors[ 0 ], 0.5 );
+							vcm2.lerp( face.vertexColors[ 0 ], 0.5 );
 
 							quadA.vertexColors[ 2 ].copy( vcm1 );
 							quadA.vertexColors[ 3 ].copy( vcm2 );
@@ -998,10 +998,10 @@ THREE.GeometryUtils = {
 							if ( edge === 0 ) {
 
 								uvM1 = uvA.clone();
-								uvM1.lerpSelf( uvB, 0.5 );
+								uvM1.lerp( uvB, 0.5 );
 
 								uvM2 = uvC.clone();
-								uvM2.lerpSelf( uvD, 0.5 );
+								uvM2.lerp( uvD, 0.5 );
 
 								uvsQuadA = [ uvA.clone(), uvM1.clone(), uvM2.clone(), uvD.clone() ];
 								uvsQuadB = [ uvM1.clone(), uvB.clone(), uvC.clone(), uvM2.clone() ];
@@ -1011,10 +1011,10 @@ THREE.GeometryUtils = {
 							} else {
 
 								uvM1 = uvB.clone();
-								uvM1.lerpSelf( uvC, 0.5 );
+								uvM1.lerp( uvC, 0.5 );
 
 								uvM2 = uvD.clone();
-								uvM2.lerpSelf( uvA, 0.5 );
+								uvM2.lerp( uvA, 0.5 );
 
 								uvsQuadA = [ uvA.clone(), uvB.clone(), uvM1.clone(), uvM2.clone() ];
 								uvsQuadB = [ uvM2.clone(), uvM1.clone(), uvC.clone(), uvD.clone() ];

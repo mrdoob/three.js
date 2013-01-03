@@ -90,17 +90,9 @@ THREE.Vector3.prototype = {
 
 	},
 
-	add: function ( a, b ) {
+	add: function ( v ) {
 
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-		this.z = a.z + b.z;
-
-		return this;
-
-	},
-
-	addSelf: function ( v ) {
+		if ( arguments.length > 1 ) debugger;
 
 		this.x += v.x;
 		this.y += v.y;
@@ -120,17 +112,19 @@ THREE.Vector3.prototype = {
 
 	},
 
-	sub: function ( a, b ) {
+	addVectors: function ( a, b ) {
 
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-		this.z = a.z - b.z;
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+		this.z = a.z + b.z;
 
 		return this;
 
 	},
 
-	subSelf: function ( v ) {
+	sub: function ( v ) {
+
+		if ( arguments.length > 1 ) debugger;
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -140,17 +134,19 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiply: function ( a, b ) {
+	subVectors: function ( a, b ) {
 
-		this.x = a.x * b.x;
-		this.y = a.y * b.y;
-		this.z = a.z * b.z;
+		this.x = a.x - b.x;
+		this.y = a.y - b.y;
+		this.z = a.z - b.z;
 
 		return this;
 
 	},
 
-	multiplySelf: function ( v ) {
+	multiply: function ( v ) {
+
+		if ( arguments.length > 1 ) debugger;
 
 		this.x *= v.x;
 		this.y *= v.y;
@@ -165,6 +161,16 @@ THREE.Vector3.prototype = {
 		this.x *= s;
 		this.y *= s;
 		this.z *= s;
+
+		return this;
+
+	},
+
+	multiplyVectors: function ( a, b ) {
+
+		this.x = a.x * b.x;
+		this.y = a.y * b.y;
+		this.z = a.z * b.z;
 
 		return this;
 
@@ -231,7 +237,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	divideSelf: function ( v ) {
+	divide: function ( v ) {
 
 		this.x /= v.x;
 		this.y /= v.y;
@@ -261,7 +267,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	minSelf: function ( v ) {
+	min: function ( v ) {
 
 		if ( this.x > v.x ) {
 
@@ -285,7 +291,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	maxSelf: function ( v ) {
+	max: function ( v ) {
 
 		if ( this.x < v.x ) {
 
@@ -309,7 +315,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	clampSelf: function ( min, max ) {
+	clamp: function ( min, max ) {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
@@ -396,7 +402,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	lerpSelf: function ( v, alpha ) {
+	lerp: function ( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
 		this.y += ( v.y - this.y ) * alpha;
@@ -406,23 +412,25 @@ THREE.Vector3.prototype = {
 
 	},
 
-	cross: function ( a, b ) {
+	cross: function ( v ) {
 
-		this.x = a.y * b.z - a.z * b.y;
-		this.y = a.z * b.x - a.x * b.z;
-		this.z = a.x * b.y - a.y * b.x;
-
-		return this;
-
-	},
-
-	crossSelf: function ( v ) {
+		if ( arguments.length > 1 ) debugger;
 
 		var x = this.x, y = this.y, z = this.z;
 
 		this.x = y * v.z - z * v.y;
 		this.y = z * v.x - x * v.z;
 		this.z = x * v.y - y * v.x;
+
+		return this;
+
+	},
+
+	crossVectors: function ( a, b ) {
+
+		this.x = a.y * b.z - a.z * b.y;
+		this.y = a.z * b.x - a.x * b.z;
+		this.z = a.x * b.y - a.y * b.x;
 
 		return this;
 

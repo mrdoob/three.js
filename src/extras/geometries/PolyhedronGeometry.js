@@ -62,7 +62,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		if ( detail < 1 ) {
 
 			var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-			face.centroid.addSelf( v1 ).addSelf( v2 ).addSelf( v3 ).divideScalar( 3 );
+			face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
 			face.normal = face.centroid.clone().normalize();
 			that.faces.push( face );
 
@@ -100,7 +100,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 			// generate mean point and project to surface with prepare()
 
 			midpoints[ v1.index ][ v2.index ] = midpoints[ v2.index ][ v1.index ] = mid = prepare(
-				new THREE.Vector3().add( v1, v2 ).divideScalar( 2 )
+				new THREE.Vector3().addVectors( v1, v2 ).divideScalar( 2 )
 			);
 		}
 

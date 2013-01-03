@@ -425,7 +425,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		positionVS.applyMatrix4( viewMatrix );
 
 		directionVS.copy( modelMatrix.getPosition() );
-		directionVS.subSelf( light.target.matrixWorld.getPosition() );
+		directionVS.sub( light.target.matrixWorld.getPosition() );
 		directionVS.normalize();
 		viewMatrix.rotateAxis( directionVS );
 
@@ -495,7 +495,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var uniforms = lightProxy.material.uniforms;
 
 		directionVS.copy( light.matrixWorld.getPosition() );
-		directionVS.subSelf( light.target.matrixWorld.getPosition() );
+		directionVS.sub( light.target.matrixWorld.getPosition() );
 		directionVS.normalize();
 		camera.matrixWorldInverse.rotateAxis( directionVS );
 
@@ -642,7 +642,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		viewMatrix.rotateAxis( rightVS );
 		viewMatrix.rotateAxis( normalVS );
 
-		upVS.cross( rightVS, normalVS );
+		upVS.crossVectors( rightVS, normalVS );
 		upVS.normalize();
 
 		uniforms[ "lightRightVS" ].value.copy( rightVS );

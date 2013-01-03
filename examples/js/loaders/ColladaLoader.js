@@ -472,7 +472,7 @@ THREE.ColladaLoader = function () {
 
 		if ( parent ) {
 
-			node.world.multiply( parent, node.world );
+			node.world.multiplyMatrices( parent, node.world );
 
 		}
 
@@ -514,7 +514,7 @@ THREE.ColladaLoader = function () {
 
 				bone.invBindMatrix = inv;
 				bone.skinningMatrix = new THREE.Matrix4();
-				bone.skinningMatrix.multiply(bone.world, inv); // (IBMi * JMi)
+				bone.skinningMatrix.multiplyMatrices(bone.world, inv); // (IBMi * JMi)
 
 				bone.weights = [];
 
@@ -849,10 +849,10 @@ THREE.ColladaLoader = function () {
 		if ( options.centerGeometry && obj.geometry ) {
 
 			var delta = THREE.GeometryUtils.center( obj.geometry );
-			delta.multiplySelf( obj.scale );
+			delta.multiply( obj.scale );
 			delta.applyQuaternion( obj.quaternion );
 
-			obj.position.subSelf( delta );
+			obj.position.sub( delta );
 
 		}
 
@@ -1948,22 +1948,26 @@ THREE.ColladaLoader = function () {
 
 			case 'matrix':
 
-				matrix.multiplySelf( this.obj );
+				matrix.multiply( this.obj );
+
 				break;
 
 			case 'translate':
 
 				matrix.translate( this.obj );
+
 				break;
 
 			case 'rotate':
 
 				matrix.rotateByAxis( this.obj, this.angle );
+
 				break;
 
 			case 'scale':
 
 				matrix.scale( this.obj );
+
 				break;
 
 		}

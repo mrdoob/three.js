@@ -175,7 +175,7 @@
 						var normal = interect.face.normal.clone();
 						normal.applyMatrix4( interect.object.matrixRotationWorld );
 
-						var position = new THREE.Vector3().add( interect.point, normal );
+						var position = new THREE.Vector3().addVectors( interect.point, normal );
 
 						var geometry = new THREE.CubeGeometry( 50, 50, 50 );
 

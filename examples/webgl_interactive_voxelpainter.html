@@ -176,7 +176,7 @@
 				tmpVec.copy( intersector.face.normal );
 				tmpVec.applyMatrix4( intersector.object.matrixRotationWorld );
 
-				voxelPosition.add( intersector.point, tmpVec );
+				voxelPosition.addVectors( intersector.point, tmpVec );
 
 				voxelPosition.x = Math.floor( voxelPosition.x / 50 ) * 50 + 25;
 				voxelPosition.y = Math.floor( voxelPosition.y / 50 ) * 50 + 25;

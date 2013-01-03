@@ -247,7 +247,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 						forwardPoint = this.interpolateCatmullRom( this.points, scale * 1.01 );
 
 						this.target.set( forwardPoint[ 0 ], forwardPoint[ 1 ], forwardPoint[ 2 ] );
-						this.target.subSelf( vector );
+						this.target.sub( vector );
 						this.target.y = 0;
 						this.target.normalize();
 

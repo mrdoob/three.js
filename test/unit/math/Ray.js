@@ -43,19 +43,19 @@ test( "at", function() {
 	ok( a.at( 1 ).equals( new THREE.Vector3( 1, 1, 2 ) ), "Passed!" );
 });
 
-test( "recastSelf/clone", function() {
+test( "recast/clone", function() {
 	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
 
-	ok( a.recastSelf( 0 ).equals( a ), "Passed!" );
+	ok( a.recast( 0 ).equals( a ), "Passed!" );
 
 	var b = a.clone();
-	ok( b.recastSelf( -1 ).equals( new THREE.Ray( new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ) ), "Passed!" );
+	ok( b.recast( -1 ).equals( new THREE.Ray( new THREE.Vector3( 1, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ) ), "Passed!" );
 
 	var c = a.clone();
-	ok( c.recastSelf( 1 ).equals( new THREE.Ray( new THREE.Vector3( 1, 1, 2 ), new THREE.Vector3( 0, 0, 1 ) ) ), "Passed!" );
+	ok( c.recast( 1 ).equals( new THREE.Ray( new THREE.Vector3( 1, 1, 2 ), new THREE.Vector3( 0, 0, 1 ) ) ), "Passed!" );
 
 	var d = a.clone();
-	var e = d.clone().recastSelf( 1 );
+	var e = d.clone().recast( 1 );
 	ok( d.equals( a ), "Passed!" );
 	ok( ! e.equals( d ), "Passed!" );
 	ok( e.equals( c ), "Passed!" );
@@ -102,17 +102,17 @@ test( "isIntersectionSphere", function() {
 
 test( "isIntersectionPlane", function() {
 	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
-	
+
 	// parallel plane behind
-	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().subSelf( new THREE.Vector3( 0, 0, -1 ) ) );
+	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, -1 ) ) );
 	ok( a.isIntersectionPlane( b ), "Passed!" );
 
 	// parallel plane coincident with origin
-	var c = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().subSelf( new THREE.Vector3( 0, 0, 0 ) ) );
+	var c = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, 0 ) ) );
 	ok( a.isIntersectionPlane( c ), "Passed!" );
 
 	// parallel plane infront
-	var d = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().subSelf( new THREE.Vector3( 0, 0, 1 ) ) );
+	var d = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, 1 ) ) );
 	ok( a.isIntersectionPlane( d ), "Passed!" );
 
 	// perpendical ray that overlaps exactly

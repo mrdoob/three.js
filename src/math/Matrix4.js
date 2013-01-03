@@ -220,7 +220,7 @@ THREE.Matrix4.prototype = {
 		var y = THREE.Matrix4.__v2;
 		var z = THREE.Matrix4.__v3;
 
-		z.sub( eye, target ).normalize();
+		z.subVectors( eye, target ).normalize();
 
 		if ( z.length() === 0 ) {
 
@@ -228,16 +228,16 @@ THREE.Matrix4.prototype = {
 
 		}
 
-		x.cross( up, z ).normalize();
+		x.crossVectors( up, z ).normalize();
 
 		if ( x.length() === 0 ) {
 
 			z.x += 0.0001;
-			x.cross( up, z ).normalize();
+			x.crossVectors( up, z ).normalize();
 
 		}
 
-		y.cross( z, x );
+		y.crossVectors( z, x );
 
 
 		te[0] = x.x; te[4] = y.x; te[8] = z.x;
@@ -248,7 +248,15 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiply: function ( a, b ) {
+	multiply: function ( m ) {
+
+		if ( arguments.length > 1 ) debugger;
+
+		return this.multiplyMatrices( this, m );
+
+	},
+
+	multiplyMatrices: function ( a, b ) {
 
 		var ae = a.elements;
 		var be = b.elements;
@@ -288,17 +296,11 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiplySelf: function ( m ) {
-
-		return this.multiply( this, m );
-
-	},
-
 	multiplyToArray: function ( a, b, r ) {
 
 		var te = this.elements;
 
-		this.multiply( a, b );
+		this.multiplyMatrices( a, b );
 
 		r[ 0 ] = te[0]; r[ 1 ] = te[1]; r[ 2 ] = te[2]; r[ 3 ] = te[3];
 		r[ 4 ] = te[4]; r[ 5 ] = te[5]; r[ 6 ] = te[6]; r[ 7 ] = te[7];
@@ -586,7 +588,7 @@ THREE.Matrix4.prototype = {
 
 		mScale.makeScale( scale );
 
-		this.multiply( mRotation, mScale );
+		this.multiplyMatrices( mRotation, mScale );
 
 		te[12] = translation.x;
 		te[13] = translation.y;

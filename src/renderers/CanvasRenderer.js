@@ -405,7 +405,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					var lightPosition = light.matrixWorld.getPosition();
 
-					var amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
+					var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
 					if ( amount <= 0 ) continue;
 

@@ -106,9 +106,9 @@
 					var v1 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
 					var v2 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
 
-					v0.addSelf( v );
-					v1.addSelf( v );
-					v2.addSelf( v );
+					v0.add( v );
+					v1.add( v );
+					v2.add( v );
 
 					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, i );
 

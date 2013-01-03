@@ -374,7 +374,7 @@ THREE.Color.prototype = {
 
 	},
 
-	lerpSelf: function ( color, alpha ) {
+	lerp: function ( color, alpha ) {
 
 		this.r += ( color.r - this.r ) * alpha;
 		this.g += ( color.g - this.g ) * alpha;

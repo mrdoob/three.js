@@ -17,7 +17,7 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 	// direction
 
 	this.direction = new THREE.Vector3();
-	this.direction.sub( light.target.position, light.position );
+	this.direction.subVectors( light.target.position, light.position );
 
 	// color
 
@@ -87,7 +87,7 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	// update arrow orientation
 	// pointing from light to target
 
-	this.direction.sub( this.light.target.position, this.light.position );
+	this.direction.subVectors( this.light.target.position, this.light.position );
 
 	// update arrow, spheres, rays and line colors to light color * light intensity
 

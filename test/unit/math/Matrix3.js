@@ -8,7 +8,7 @@ var matrixEquals3 = function( a, b, tolerance ) {
 	tolerance = tolerance || 0.0001;
 	if( a.elements.length != b.elements.length ) {
 		return false;
-	}	
+	}
 	for( var i = 0, il = a.elements.length; i < il; i ++ ) {
 		var delta = a.elements[i] - b.elements[i];
 		if( delta > tolerance ) {
@@ -145,7 +145,7 @@ test( "getInverse", function() {
 	var a = new THREE.Matrix4();
 	var b = new THREE.Matrix3( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 	var c = new THREE.Matrix4( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-	
+
 	ok( ! matrixEquals3( a, b ), "Passed!" );
 	b.getInverse( a, false );
 	ok( matrixEquals3( b, new THREE.Matrix3() ), "Passed!" );
@@ -172,14 +172,14 @@ test( "getInverse", function() {
 	for( var i = 0, il = testMatrices.length; i < il; i ++ ) {
 		var m = testMatrices[i];
 		var mInverse3 = new THREE.Matrix3().getInverse( m );
-	
+
 		var mInverse = toMatrix4( mInverse3 );
-		
+
 		// the determinant of the inverse should be the reciprocal
 		ok( Math.abs( m.determinant() * mInverse3.determinant() - 1 ) < 0.0001, "Passed!" );
 		ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, "Passed!" );
 
-		var mProduct = new THREE.Matrix4().multiply( m, mInverse );
+		var mProduct = new THREE.Matrix4().multiplyMatrices( m, mInverse );
 		ok( Math.abs( mProduct.determinant() - 1 ) < 0.0001, "Passed!" );
 		ok( matrixEquals3( mProduct, identity ), "Passed!" );
 	}

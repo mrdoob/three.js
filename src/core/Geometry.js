@@ -97,17 +97,17 @@ THREE.Geometry.prototype = {
 
 			if ( face instanceof THREE.Face3 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ] );
-				face.centroid.addSelf( this.vertices[ face.b ] );
-				face.centroid.addSelf( this.vertices[ face.c ] );
+				face.centroid.add( this.vertices[ face.a ] );
+				face.centroid.add( this.vertices[ face.b ] );
+				face.centroid.add( this.vertices[ face.c ] );
 				face.centroid.divideScalar( 3 );
 
 			} else if ( face instanceof THREE.Face4 ) {
 
-				face.centroid.addSelf( this.vertices[ face.a ] );
-				face.centroid.addSelf( this.vertices[ face.b ] );
-				face.centroid.addSelf( this.vertices[ face.c ] );
-				face.centroid.addSelf( this.vertices[ face.d ] );
+				face.centroid.add( this.vertices[ face.a ] );
+				face.centroid.add( this.vertices[ face.b ] );
+				face.centroid.add( this.vertices[ face.c ] );
+				face.centroid.add( this.vertices[ face.d ] );
 				face.centroid.divideScalar( 4 );
 
 			}
@@ -129,9 +129,9 @@ THREE.Geometry.prototype = {
 			vB = this.vertices[ face.b ];
 			vC = this.vertices[ face.c ];
 
-			cb.sub( vC, vB );
-			ab.sub( vA, vB );
-			cb.crossSelf( ab );
+			cb.subVectors( vC, vB );
+			ab.subVectors( vA, vB );
+			cb.cross( ab );
 
 			cb.normalize();
 
@@ -206,13 +206,13 @@ THREE.Geometry.prototype = {
 					vB = this.vertices[ face.b ];
 					vC = this.vertices[ face.c ];
 
-					cb.sub( vC, vB );
-					ab.sub( vA, vB );
-					cb.crossSelf( ab );
+					cb.subVectors( vC, vB );
+					ab.subVectors( vA, vB );
+					cb.cross( ab );
 
-					vertices[ face.a ].addSelf( cb );
-					vertices[ face.b ].addSelf( cb );
-					vertices[ face.c ].addSelf( cb );
+					vertices[ face.a ].add( cb );
+					vertices[ face.b ].add( cb );
+					vertices[ face.c ].add( cb );
 
 				} else if ( face instanceof THREE.Face4 ) {
 
@@ -223,23 +223,23 @@ THREE.Geometry.prototype = {
 
 					// abd
 
-					db.sub( vD, vB );
-					ab.sub( vA, vB );
-					db.crossSelf( ab );
+					db.subVectors( vD, vB );
+					ab.subVectors( vA, vB );
+					db.cross( ab );
 
-					vertices[ face.a ].addSelf( db );
-					vertices[ face.b ].addSelf( db );
-					vertices[ face.d ].addSelf( db );
+					vertices[ face.a ].add( db );
+					vertices[ face.b ].add( db );
+					vertices[ face.d ].add( db );
 
 					// bcd
 
-					dc.sub( vD, vC );
-					bc.sub( vB, vC );
-					dc.crossSelf( bc );
+					dc.subVectors( vD, vC );
+					bc.subVectors( vB, vC );
+					dc.cross( bc );
 
-					vertices[ face.b ].addSelf( dc );
-					vertices[ face.c ].addSelf( dc );
-					vertices[ face.d ].addSelf( dc );
+					vertices[ face.b ].add( dc );
+					vertices[ face.c ].add( dc );
+					vertices[ face.d ].add( dc );
 
 				}
 
@@ -253,16 +253,16 @@ THREE.Geometry.prototype = {
 
 				if ( face instanceof THREE.Face3 ) {
 
-					vertices[ face.a ].addSelf( face.normal );
-					vertices[ face.b ].addSelf( face.normal );
-					vertices[ face.c ].addSelf( face.normal );
+					vertices[ face.a ].add( face.normal );
+					vertices[ face.b ].add( face.normal );
+					vertices[ face.c ].add( face.normal );
 
 				} else if ( face instanceof THREE.Face4 ) {
 
-					vertices[ face.a ].addSelf( face.normal );
-					vertices[ face.b ].addSelf( face.normal );
-					vertices[ face.c ].addSelf( face.normal );
-					vertices[ face.d ].addSelf( face.normal );
+					vertices[ face.a ].add( face.normal );
+					vertices[ face.b ].add( face.normal );
+					vertices[ face.c ].add( face.normal );
+					vertices[ face.d ].add( face.normal );
 
 				}
 
@@ -489,13 +489,13 @@ THREE.Geometry.prototype = {
 					  ( s1 * y2 - s2 * y1 ) * r,
 					  ( s1 * z2 - s2 * z1 ) * r );
 
-			tan1[ a ].addSelf( sdir );
-			tan1[ b ].addSelf( sdir );
-			tan1[ c ].addSelf( sdir );
+			tan1[ a ].add( sdir );
+			tan1[ b ].add( sdir );
+			tan1[ c ].add( sdir );
 
-			tan2[ a ].addSelf( tdir );
-			tan2[ b ].addSelf( tdir );
-			tan2[ c ].addSelf( tdir );
+			tan2[ a ].add( tdir );
+			tan2[ b ].add( tdir );
+			tan2[ c ].add( tdir );
 
 		}
 
@@ -534,11 +534,11 @@ THREE.Geometry.prototype = {
 				// Gram-Schmidt orthogonalize
 
 				tmp.copy( t );
-				tmp.subSelf( n.multiplyScalar( n.dot( t ) ) ).normalize();
+				tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
 
 				// Calculate handedness
 
-				tmp2.cross( face.vertexNormals[ i ], t );
+				tmp2.crossVectors( face.vertexNormals[ i ], t );
 				test = tmp2.dot( tan2[ vertexIndex ] );
 				w = (test < 0.0) ? -1.0 : 1.0;
 
@@ -653,11 +653,11 @@ THREE.Geometry.prototype = {
 				indices = [ face.a, face.b, face.c ];
 
 				var dupIndex = -1;
-				
+
 				// if any duplicate vertices are found in a Face3
 				// we have to remove the face as nothing can be saved
-				for( var n = 0; n < 3; n ++ ) {
-					if( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+				for ( var n = 0; n < 3; n ++ ) {
+					if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
 
 						dupIndex = n;
 						faceIndicesToRemove.push( i );
@@ -679,14 +679,14 @@ THREE.Geometry.prototype = {
 
 				var dupIndex = -1;
 
-				for( var n = 0; n < 4; n ++ ) {
-					if( indices[ n ] == indices[ ( n + 1 ) % 4 ] ) {
+				for ( var n = 0; n < 4; n ++ ) {
 
+					if ( indices[ n ] == indices[ ( n + 1 ) % 4 ] ) {
 
 						// if more than one duplicated vertex is found
 						// we can't generate any valid Face3's, thus
 						// we need to remove this face complete.
-						if( dupIndex >= 0 ) {
+						if ( dupIndex >= 0 ) {
 
 							faceIndicesToRemove.push( i );
 
@@ -697,7 +697,7 @@ THREE.Geometry.prototype = {
 					}
 				}
 
-				if( dupIndex >= 0 ) {
+				if ( dupIndex >= 0 ) {
 
 					indices.splice( dupIndex, 1 );
 
@@ -733,10 +733,10 @@ THREE.Geometry.prototype = {
 
 		}
 
-		for( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
 
 			this.faces.splice( i, 1 );
-			
+
 			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
 
 				this.faceVertexUvs[ j ].splice( i, 1 );

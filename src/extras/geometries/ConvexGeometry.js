@@ -125,9 +125,9 @@ THREE.ConvexGeometry = function( vertices ) {
 		var cb = new THREE.Vector3();
 		var ab = new THREE.Vector3();
 
-		cb.sub( vc, vb );
-		ab.sub( va, vb );
-		cb.crossSelf( ab );
+		cb.subVectors( vc, vb );
+		ab.subVectors( va, vb );
+		cb.cross( ab );
 
 		cb.normalize();
 
