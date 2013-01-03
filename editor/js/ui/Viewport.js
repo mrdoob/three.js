@@ -312,9 +312,8 @@ var Viewport = function ( signals ) {
 		} else if ( object instanceof THREE.SpotLight ) {
 
 			var sphereSize = 5;
-			var arrowLength = 30;
 
-			var lightGizmo = new THREE.SpotLightHelper( object, sphereSize, arrowLength );
+			var lightGizmo = new THREE.SpotLightHelper( object, sphereSize );
 			sceneHelpers.add( lightGizmo );
 			sceneHelpers.add( lightGizmo.targetSphere );
 			sceneHelpers.add( lightGizmo.targetLine );
