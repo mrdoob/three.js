@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">This is a utility class to handle values in <a href="https://en.wikipedia.org/wiki/RGB_color_model">RGB</a> and <a href="https://en.wikipedia.org/wiki/HSL_and_HSV">HSV</a> color spaces.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>.adjustHSV( [page:Color color], [page:Number h], [page:Number s], [page:Number v] )</h3>
+		
+		<div class="desc">Taking a color as input, converts it to HSV, and applies the h, s, v parameters in place, i.e. no new color is returned but the original object is modified.</div>
+		
+		<div>
+		[page:Color color] — source color to be adjusted<br />
+		[page:Number h] — hue change amount<br />
+		[page:Number s] — saturation change amount<br />
+		[page:Number v] — value change amount
+		</div>
+		
+		<h3>.rgbToHsv( [page:Color color], [page:Object hsv] )</h3>
+		
+		<div class="desc">Converts an RGB color into an HSV triplet and returns the converted color.</div>
+		
+		<div>
+		[page:Color color] — source color to be converted<br />
+		[page:Object hsv] — object in which the return value will be stored, if not null
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

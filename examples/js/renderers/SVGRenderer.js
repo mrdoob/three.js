@@ -364,7 +364,7 @@ THREE.SVGRenderer = function () {
 				_color.g = _ambientLight.g;
 				_color.b = _ambientLight.b;
 
-				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
 				_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
 				_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
@@ -383,7 +383,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGB( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ) );
+			_color.r = 0.5 * element.normalModelView.x + 0.5;
+			_color.g = 0.5 * element.normalModelView.y + 0.5;
+			_color.b = 0.5 * element.normalModelView.z + 0.5;
 
 		}
 
@@ -440,7 +442,7 @@ THREE.SVGRenderer = function () {
 				_color.g = _ambientLight.g;
 				_color.b = _ambientLight.b;
 
-				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
 				_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
 				_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
@@ -459,7 +461,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGB( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ) );
+			_color.r = 0.5 * element.normalModelView.x + 0.5;
+			_color.g = 0.5 * element.normalModelView.y + 0.5;
+			_color.b = 0.5 * element.normalModelView.z + 0.5;
 
 		}
 
@@ -534,13 +538,6 @@ THREE.SVGRenderer = function () {
 		}
 
 		return _svgCirclePool[ id ];
-
-	}
-
-	function normalToComponent( normal ) {
-
-		var component = ( normal + 1 ) * 0.5;
-		return component < 0 ? 0 : ( component > 1 ? 1 : component );
 
 	}
 

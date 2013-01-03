@@ -34,10 +34,6 @@
 
 	};
 
-	var v0 = new THREE.Vector3(), v1 = new THREE.Vector3(), v2 = new THREE.Vector3();
-
-	// http://www.blackpawn.com/texts/pointinpoly/default.html
-
 	var intersectObject = function ( object, raycaster, intersects ) {
 
 		if ( object instanceof THREE.Particle ) {
