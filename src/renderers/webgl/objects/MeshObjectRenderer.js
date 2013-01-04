@@ -1,13 +1,13 @@
 
 
-THREE.MeshRenderer = function(lowlevelrenderer, info){
-	THREE.Object3DRenderer.call( this, lowlevelrenderer, info );
+THREE.WebGLRenderer2.MeshObjectRenderer = function(lowlevelrenderer, info){
+	THREE.WebGLRenderer2.Object3DObjectRenderer.call( this, lowlevelrenderer, info );
 };
 
 
-THREE.MeshRenderer.prototype = Object.create( THREE.Object3DRenderer.prototype );
+THREE.WebGLRenderer2.MeshObjectRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DObjectRenderer.prototype );
 
-THREE.MeshRenderer.prototype.createBuffers = function( geometryGroup ) {
+THREE.WebGLRenderer2.MeshObjectRenderer.prototype.createBuffers = function( geometryGroup ) {
 
 	var renderer = this.renderer;
 	geometryGroup.__webglVertexBuffer = renderer.createBuffer();
@@ -53,7 +53,7 @@ THREE.MeshRenderer.prototype.createBuffers = function( geometryGroup ) {
 
 };
 
-THREE.MeshRenderer.prototype.initBuffers = function( geometryGroup, object ) {
+THREE.WebGLRenderer2.MeshObjectRenderer.prototype.initBuffers = function( geometryGroup, object ) {
 
 	var geometry = object.geometry,
 		faces3 = geometryGroup.faces3,
@@ -207,7 +207,7 @@ THREE.MeshRenderer.prototype.initBuffers = function( geometryGroup, object ) {
 
 
 
-THREE.MeshRenderer.prototype.setBuffers = function( geometryGroup, object, dispose, material ) {
+THREE.WebGLRenderer2.MeshObjectRenderer.prototype.setBuffers = function( geometryGroup, object, dispose, material ) {
 
 	if ( ! geometryGroup.__inittedArrays ) {
 

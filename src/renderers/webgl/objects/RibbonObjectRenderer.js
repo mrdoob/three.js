@@ -1,13 +1,12 @@
 
 
-THREE.RibbonRenderer = function(lowlevelrenderer, info){
-	THREE.Object3DRenderer.call( this, lowlevelrenderer, info );
+THREE.WebGLRenderer2.RibbonObjectRenderer = function(lowlevelrenderer, info){
+	THREE.WebGLRenderer2.Object3DObjectRenderer.call( this, lowlevelrenderer, info );
 };
 
+THREE.WebGLRenderer2.RibbonObjectRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DObjectRenderer.prototype );
 
-THREE.RibbonRenderer.prototype = Object.create( THREE.Object3DRenderer.prototype );
-
-THREE.RibbonRenderer.prototype.createBuffers = function( geometry ) {
+THREE.WebGLRenderer2.RibbonObjectRenderer.prototype.createBuffers = function( geometry ) {
 	
 	var renderer = this.renderer;
 	geometry.__webglVertexBuffer = renderer.createBuffer();
@@ -17,7 +16,7 @@ THREE.RibbonRenderer.prototype.createBuffers = function( geometry ) {
 	this.info.memory.geometries ++;
 };
 
-THREE.RibbonRenderer.prototype.initBuffers = function( geometry, object ) {
+THREE.WebGLRenderer2.RibbonObjectRenderer.prototype.initBuffers = function( geometry, object ) {
 	
 	var nvertices = geometry.vertices.length;
 	
@@ -32,7 +31,7 @@ THREE.RibbonRenderer.prototype.initBuffers = function( geometry, object ) {
 };
 
 
-THREE.RibbonRenderer.prototype.setBuffers = function( geometry, object , projectionScreenMatrix) {
+THREE.WebGLRenderer2.RibbonObjectRenderer.prototype.setBuffers = function( geometry, object , projectionScreenMatrix) {
 	
 	var renderer = this.renderer;
 	var v, c, n, vertex, offset, color, normal,

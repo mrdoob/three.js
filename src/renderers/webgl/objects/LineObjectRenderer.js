@@ -1,13 +1,13 @@
 
 
-THREE.LineRenderer = function(lowlevelrenderer, info){
-	THREE.Object3DRenderer.call( this, lowlevelrenderer, info );
+THREE.WebGLRenderer2.LineObjectRenderer = function(lowlevelrenderer, info){
+	THREE.WebGLRenderer2.Object3DObjectRenderer.call( this, lowlevelrenderer, info );
 };
 
 
-THREE.LineRenderer.prototype = Object.create( THREE.Object3DRenderer.prototype );
+THREE.WebGLRenderer2.LineObjectRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DObjectRenderer.prototype );
 
-THREE.LineRenderer.prototype.createBuffers = function( geometry ) {
+THREE.WebGLRenderer2.LineObjectRenderer.prototype.createBuffers = function( geometry ) {
 	
 	var renderer = this.renderer;
 	geometry.__webglVertexBuffer = renderer.createBuffer();
@@ -17,7 +17,7 @@ THREE.LineRenderer.prototype.createBuffers = function( geometry ) {
 	this.info.memory.geometries ++;
 };
 
-THREE.LineRenderer.prototype.initBuffers = function( geometry, object ) {
+THREE.WebGLRenderer2.LineObjectRenderer.prototype.initBuffers = function( geometry, object ) {
 
 	var nvertices = geometry.vertices.length;
 
@@ -31,7 +31,7 @@ THREE.LineRenderer.prototype.initBuffers = function( geometry, object ) {
 };
 
 
-THREE.LineRenderer.prototype.setBuffers = function( geometry, object) {
+THREE.WebGLRenderer2.LineObjectRenderer.prototype.setBuffers = function( geometry, object) {
 	
 	var renderer = this.renderer;
 	var v, c, d, vertex, offset, color,

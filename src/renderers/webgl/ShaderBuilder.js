@@ -1,12 +1,12 @@
 
-THREE.ShaderBuilder = function(renderer,info){
+THREE.WebGLRenderer2.ShaderBuilder = function(renderer,info){
 	this.renderer = renderer;
 	this.info = info;
 	this.programs = [],
 	this.programs_counter = 0;
 }
 
-THREE.ShaderBuilder.prototype.buildProgram = function ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
+THREE.WebGLRenderer2.ShaderBuilder.prototype.buildProgram = function ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
 
 		var renderer = this.renderer;
 		var p, pl, d, program, code;
@@ -306,7 +306,7 @@ THREE.ShaderBuilder.prototype.buildProgram = function ( shaderID, fragmentShader
 
 	};
 	
-THREE.ShaderBuilder.prototype.generateDefines = function( defines ) {
+THREE.WebGLRenderer2.ShaderBuilder.prototype.generateDefines = function( defines ) {
 
 	var value, chunk, chunks = [];
 
@@ -326,7 +326,7 @@ THREE.ShaderBuilder.prototype.generateDefines = function( defines ) {
 
 	// Shader parameters cache
 
-THREE.ShaderBuilder.prototype.cacheUniformLocations = function( program, identifiers ) {
+THREE.WebGLRenderer2.ShaderBuilder.prototype.cacheUniformLocations = function( program, identifiers ) {
 
 	var i, l, id, renderer = this.renderer;
 
@@ -339,7 +339,7 @@ THREE.ShaderBuilder.prototype.cacheUniformLocations = function( program, identif
 
 };
 
-THREE.ShaderBuilder.prototype.cacheAttributeLocations = function( program, identifiers ) {
+THREE.WebGLRenderer2.ShaderBuilder.prototype.cacheAttributeLocations = function( program, identifiers ) {
 
 	var i, l, id, renderer = this.renderer;
 
@@ -352,7 +352,7 @@ THREE.ShaderBuilder.prototype.cacheAttributeLocations = function( program, ident
 
 };
 
-THREE.ShaderBuilder.prototype.removeProgram = function( program ) {
+THREE.WebGLRenderer2.ShaderBuilder.prototype.removeProgram = function( program ) {
 
 	var i, il, programInfo;
 	var deleteProgram = false;

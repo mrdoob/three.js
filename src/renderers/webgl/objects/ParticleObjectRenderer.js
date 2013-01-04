@@ -1,12 +1,12 @@
 
 
-THREE.ParticleRenderer = function(lowlevelrenderer, info){
-	THREE.Object3DRenderer.call( this, lowlevelrenderer, info );
+THREE.WebGLRenderer2.ParticleObjectRenderer = function(lowlevelrenderer, info){
+	THREE.WebGLRenderer2.Object3DObjectRenderer.call( this, lowlevelrenderer, info );
 };
 
-THREE.ParticleRenderer.prototype = Object.create( THREE.Object3DRenderer.prototype );
+THREE.WebGLRenderer2.ParticleObjectRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DObjectRenderer.prototype );
 
-THREE.ParticleRenderer.prototype.createBuffers = function( geometry ) {
+THREE.WebGLRenderer2.ParticleObjectRenderer.prototype.createBuffers = function( geometry ) {
 	
 	var renderer = this.renderer;
 	geometry.__webglVertexBuffer = renderer.createBuffer();
@@ -15,7 +15,7 @@ THREE.ParticleRenderer.prototype.createBuffers = function( geometry ) {
 	this.info.memory.geometries ++;
 };
 
-THREE.ParticleRenderer.prototype.initBuffers = function( geometry, object ) {
+THREE.WebGLRenderer2.ParticleObjectRenderer.prototype.initBuffers = function( geometry, object ) {
 
 	var nvertices = geometry.vertices.length;
 
@@ -31,7 +31,7 @@ THREE.ParticleRenderer.prototype.initBuffers = function( geometry, object ) {
 };
 
 
-THREE.ParticleRenderer.prototype.setBuffers = function( geometry, object , projectionScreenMatrix) {
+THREE.WebGLRenderer2.ParticleObjectRenderer.prototype.setBuffers = function( geometry, object , projectionScreenMatrix) {
 
 	var renderer = this.renderer;
 	var v, c, vertex, offset, index, color,
@@ -56,8 +56,8 @@ THREE.ParticleRenderer.prototype.setBuffers = function( geometry, object , proje
 	a, ca, cal, value,
 	customAttribute;
 	
-	var _projScreenMatrixPS = THREE.ParticleRenderer._m1,
-		_vector3 = THREE.ParticleRenderer._v1;
+	var _projScreenMatrixPS = THREE.WebGLRenderer2.ParticleObjectRenderer._m1,
+		_vector3 = THREE.WebGLRenderer2.ParticleObjectRenderer._v1;
 
 	if ( object.sortParticles ) {
 
@@ -354,5 +354,5 @@ THREE.ParticleRenderer.prototype.setBuffers = function( geometry, object , proje
 
 };
 
-THREE.ParticleRenderer._m1 = new THREE.Matrix4();
-THREE.ParticleRenderer._v1 = new THREE.Vector3();
+THREE.WebGLRenderer2.ParticleObjectRenderer._m1 = new THREE.Matrix4();
+THREE.WebGLRenderer2.ParticleObjectRenderer._v1 = new THREE.Vector3();
