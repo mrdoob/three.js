@@ -2,10 +2,7 @@
 
 THREE.ParticleRenderer = function(lowlevelrenderer, info){
 	THREE.Object3DRenderer.call( this, lowlevelrenderer, info );
-	
-
 };
-
 
 THREE.ParticleRenderer.prototype = Object.create( THREE.Object3DRenderer.prototype );
 
@@ -72,7 +69,7 @@ THREE.ParticleRenderer.prototype.setBuffers = function( geometry, object , proje
 			vertex = vertices[ v ];
 
 			_vector3.copy( vertex );
-			_projScreenMatrixPS.multiplyVector3( _vector3 );
+			_vector3.applyMatrix4(_projScreenMatrixPS);
 
 			sortArray[ v ] = [ _vector3.z, v ];
 

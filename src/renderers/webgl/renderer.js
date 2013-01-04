@@ -218,6 +218,12 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return _canvas;
 		
 	};
+
+	function getPrecision() {
+
+		return _precision;
+
+	};
 	
 	function getCurrentWidth(){
 		
@@ -1431,6 +1437,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	// Methods
 	this.getContext = getContext;
 	this.getDomElement = getDomElement;
+	this.getPrecision = getPrecision;
 	this.getCurrentWidth = getCurrentWidth;
 	this.getCurrentHeight = getCurrentHeight;
 	this.supportsVertexTextures = supportsVertexTextures;

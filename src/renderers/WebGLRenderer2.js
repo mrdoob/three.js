@@ -147,9 +147,11 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 
 	this.context = renderer.getContext();
 	this.domElement = renderer.getDomElement();
+	this.getPrecision = renderer.getPrecision;
 
 	// low level API
 
+	this.getPrecision = renderer.getPrecision;
 	this.getContext = renderer.getContext;
 	this.supportsVertexTextures = renderer.supportsVertexTextures;
 	this.getMaxAnisotropy  = renderer.getMaxAnisotropy;
@@ -1248,7 +1250,7 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
 
 					setupMatrices( object, camera );
 
@@ -1265,7 +1267,7 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_projScreenMatrix.multiplyVector3( _vector3 );
+							_vector3.applyMatrix4(_projScreenMatrix);
 
 							webglObject.z = _vector3.z;
 
@@ -1818,7 +1820,7 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 
 					addBuffer( scene.__webglObjects, geometry, object );
 
-				} else {
+				} else if ( geometry instanceof THREE.Geometry ) {
 
 					for ( g in geometry.geometryGroups ) {
 
@@ -3294,5 +3296,3 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 	this.addPostPlugin( new THREE.LensFlarePlugin() );
 
 };
-
-//THREE.WebGLRenderer = THREE.WebGLRenderer2;
