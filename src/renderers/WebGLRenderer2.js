@@ -35,10 +35,10 @@ THREE.WebGLRenderer2 = function ( parameters ) {
 
 
 	var renderer = new THREE.WebGLRenderer2.LowLevelRenderer(parameters);
-	var meshRenderer = new THREE.WebGLRenderer2.MeshObjectRenderer(renderer, info);
-	var particleRenderer = new THREE.WebGLRenderer2.ParticleObjectRenderer(renderer, info);
-	var lineRenderer = new THREE.WebGLRenderer2.LineObjectRenderer(renderer, info);
-	var ribbonRenderer = new THREE.WebGLRenderer2.RibbonObjectRenderer(renderer, info);
+	var meshRenderer = new THREE.WebGLRenderer2.MeshRenderer(renderer, info);
+	var particleRenderer = new THREE.WebGLRenderer2.ParticleRenderer(renderer, info);
+	var lineRenderer = new THREE.WebGLRenderer2.LineRenderer(renderer, info);
+	var ribbonRenderer = new THREE.WebGLRenderer2.RibbonRenderer(renderer, info);
 	
 	var shaderBuilder = new THREE.WebGLRenderer2.ShaderBuilder(renderer, info);
 	
