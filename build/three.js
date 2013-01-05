@@ -33255,7 +33255,7 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 
 	this.targetSphere = null;
 
-	if ( light.target.properties.targetInverse ) {
+	if ( light.target.properties.targetInverse !== undefined ) {
 
 		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
 		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
@@ -33303,16 +33303,21 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	this.lightSphere.material.color.copy( this.color );
 	this.lightRays.material.color.copy( this.color );
 
-	this.targetSphere.material.color.copy( this.color );
-	this.targetLine.material.color.copy( this.color );
+	// Only update targetSphere and targetLine if available
+	if ( this.targetSphere !== null ) {
 
-	// update target line vertices
+		this.targetSphere.material.color.copy( this.color );
+		this.targetLine.material.color.copy( this.color );
 
-	this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
-	this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+		// update target line vertices
 
-	this.targetLine.geometry.computeLineDistances();
-	this.targetLine.geometry.verticesNeedUpdate = true;
+		this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
+		this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+
+		this.targetLine.geometry.computeLineDistances();
+		this.targetLine.geometry.verticesNeedUpdate = true;
+
+	}
 
 }
 
@@ -33602,7 +33607,7 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 
 	this.targetSphere = null;
 
-	if ( light.target.properties.targetInverse ) {
+	if ( light.target.properties.targetInverse !== undefined ) {
 
 		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
 		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
@@ -33659,16 +33664,21 @@ THREE.SpotLightHelper.prototype.update = function () {
 	this.lightRays.material.color.copy( this.color );
 	this.lightCone.material.color.copy( this.color );
 
-	this.targetSphere.material.color.copy( this.color );
-	this.targetLine.material.color.copy( this.color );
+	// Only update targetSphere and targetLine if available
+	if ( this.targetSphere !== null ) {
 
-	// update target line vertices
+		this.targetSphere.material.color.copy( this.color );
+		this.targetLine.material.color.copy( this.color );
 
-	this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
-	this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+		// update target line vertices
 
-	this.targetLine.geometry.computeLineDistances();
-	this.targetLine.geometry.verticesNeedUpdate = true;
+		this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
+		this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+
+		this.targetLine.geometry.computeLineDistances();
+		this.targetLine.geometry.verticesNeedUpdate = true;
+
+	}
 
 };
 /**
