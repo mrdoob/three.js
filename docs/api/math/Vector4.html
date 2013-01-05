@@ -40,24 +40,24 @@
 		Copies value of *v* to this vector.
 		</div>
 
-		<h3>.add( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
-		<div>
-		Sets this vector to *a + b*.
-		</div>
-
-		<h3>.addSelf( [page:Vector4 v] ) [page:Vector4]</h3>
+		<h3>.add( [page:Vector4 v] ) [page:Vector4]</h3>
 		<div>
 		Adds *v* to this vector.
 		</div>
 
-		<h3>.sub( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
+		<h3>.addVectors( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
 		<div>
-		Sets this vector to *a - b*.
+		Sets this vector to *a + b*.
 		</div>
 
-		<h3>.subSelf( [page:Vector4 v] ) [page:Vector4]</h3>
+		<h3>.sub( [page:Vector4 v] ) [page:Vector4]</h3>
 		<div>
 		Subtracts *v* from this vector.
+		</div>
+
+		<h3>.subVectors( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
+		<div>
+		Sets this vector to *a - b*.
 		</div>
 
 		<h3>.multiplyScalar( [page:Float s] ) [page:Vector4]</h3>
@@ -101,7 +101,7 @@
 		Normalizes this vector and multiplies it by *l*.
 		</div>
 
-		<h3>.lerpSelf( [page:Vector4 v], [page:Float alpha] ) [page:Vector4]</h3>
+		<h3>.lerp( [page:Vector4 v], [page:Float alpha] ) [page:Vector4]</h3>
 		<div>
 		Linearly interpolate between this vector and *v* with *alpha* factor.
 		</div>

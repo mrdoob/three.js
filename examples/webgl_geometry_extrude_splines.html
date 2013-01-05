@@ -203,26 +203,26 @@
 
 			scene = new THREE.Scene();
 
-			var light = new THREE.DirectionalLight(0xffffff);
-			light.position.set(0, 0, 1);
-			scene.add(light);
+			var light = new THREE.DirectionalLight( 0xffffff );
+			light.position.set( 0, 0, 1 );
+			scene.add( light );
 
 			parent = new THREE.Object3D();
 			parent.position.y = 100;
 			scene.add( parent );
 
-			splineCamera = new THREE.PerspectiveCamera(84, window.innerWidth / window.innerHeight, 0.01, 1000);
-			parent.add(splineCamera);
+			splineCamera = new THREE.PerspectiveCamera( 84, window.innerWidth / window.innerHeight, 0.01, 1000 );
+			parent.add( splineCamera );
 
-			cameraHelper = new THREE.CameraHelper(splineCamera);
-			scene.add(cameraHelper);
+			cameraHelper = new THREE.CameraHelper( splineCamera );
+			scene.add( cameraHelper );
 
 			addTube();
 
 			// Debug point
 
 			cameraEye = new THREE.Mesh( new THREE.SphereGeometry( 5 ), new THREE.MeshBasicMaterial( { color: 0xdddddd } ) );
-			parent.add(cameraEye);
+			parent.add( cameraEye );
 
 			cameraHelper.visible = showCameraHelper;
 			cameraEye.visible = showCameraHelper;
@@ -320,7 +320,7 @@
 				event.preventDefault();
 
 				mouseX = event.touches[ 0 ].pageX - windowHalfX;
-				targetRotation = targetRotationOnMouseDown + (mouseX - mouseXOnMouseDown) * 0.05;
+				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
 
 			}
 
@@ -330,7 +330,7 @@
 
 		function animate() {
 
-			requestAnimationFrame(animate);
+			requestAnimationFrame( animate );
 
 			render();
 			stats.update();
@@ -342,45 +342,45 @@
 			// Try Animate Camera Along Spline
 			var time = Date.now();
 			var looptime = 20 * 1000;
-			var t = (time % looptime) / looptime;
+			var t = ( time % looptime ) / looptime;
 
-			var pos = tube.path.getPointAt(t);
-			pos.multiplyScalar(scale);
+			var pos = tube.path.getPointAt( t );
+			pos.multiplyScalar( scale );
 
 			// interpolation
 			var segments = tube.tangents.length;
 			var pickt = t * segments;
-			var pick = Math.floor(pickt);
-			var pickNext = (pick + 1) % segments;
+			var pick = Math.floor( pickt );
+			var pickNext = ( pick + 1 ) % segments;
 
-			binormal.sub(tube.binormals[pickNext], tube.binormals[pick]);
-			binormal.multiplyScalar(pickt - pick).addSelf(tube.binormals[pick]);
+			binormal.subVectors( tube.binormals[ pickNext ], tube.binormals[ pick ] );
+			binormal.multiplyScalar( pickt - pick ).add( tube.binormals[ pick ] );
 
 
-			var dir = tube.path.getTangentAt(t);
+			var dir = tube.path.getTangentAt( t );
 
 			var offset = 15;
 
-			normal.copy(binormal).crossSelf(dir);
+			normal.copy( binormal ).cross( dir );
 
 			// We move on a offset on its binormal
-			pos.addSelf(normal.clone().multiplyScalar(offset));
+			pos.add( normal.clone().multiplyScalar( offset ) );
 
 			splineCamera.position = pos;
 			cameraEye.position = pos;
 
 
 			// Camera Orientation 1 - default look at
-			// splineCamera.lookAt(lookAt);
+			// splineCamera.lookAt( lookAt );
 
 			// Using arclength for stablization in look ahead.
-			var lookAt = tube.path.getPointAt((t + 30/tube.path.getLength()) % 1).multiplyScalar(scale);
+			var lookAt = tube.path.getPointAt( ( t + 30 / tube.path.getLength() ) % 1 ).multiplyScalar( scale );
 
 			// Camera Orientation 2 - up orientation via normal
 			if (!lookAhead)
-			lookAt.copy(pos).addSelf(dir);
+			lookAt.copy( pos ).add( dir );
 			splineCamera.matrix.lookAt(splineCamera.position, lookAt, normal);
-			splineCamera.rotation.setEulerFromRotationMatrix(splineCamera.matrix, splineCamera.eulerOrder);
+			splineCamera.rotation.setEulerFromRotationMatrix( splineCamera.matrix, splineCamera.eulerOrder );
 
 			cameraHelper.update();
 

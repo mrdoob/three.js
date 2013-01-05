@@ -70,8 +70,8 @@ THREE.Box2.prototype = {
 	setFromCenterAndSize: function ( center, size ) {
 
 		var halfSize = THREE.Box2.__v1.copy( size ).multiplyScalar( 0.5 );
-		this.min.copy( center ).subSelf( halfSize );
-		this.max.copy( center ).addSelf( halfSize );
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
 
 		return this;
 
@@ -106,29 +106,29 @@ THREE.Box2.prototype = {
 	center: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector2();
-		return result.add( this.min, this.max ).multiplyScalar( 0.5 );
+		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
 	size: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector2();
-		return result.sub( this.max, this.min );
+		return result.subVectors( this.max, this.min );
 
 	},
 
 	expandByPoint: function ( point ) {
 
-		this.min.minSelf( point );
-		this.max.maxSelf( point );
+		this.min.min( point );
+		this.max.max( point );
 
 		return this;
 	},
 
 	expandByVector: function ( vector ) {
 
-		this.min.subSelf( vector );
-		this.max.addSelf( vector );
+		this.min.sub( vector );
+		this.max.add( vector );
 
 		return this;
 	},
@@ -199,21 +199,21 @@ THREE.Box2.prototype = {
 	clampPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector2();
-		return result.copy( point ).clampSelf( this.min, this.max );
+		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
 	distanceToPoint: function ( point ) {
 
-		var clampedPoint = THREE.Box2.__v1.copy( point ).clampSelf( this.min, this.max );
-		return clampedPoint.subSelf( point ).length();
+		var clampedPoint = THREE.Box2.__v1.copy( point ).clamp( this.min, this.max );
+		return clampedPoint.sub( point ).length();
 
 	},
 
 	intersect: function ( box ) {
 
-		this.min.maxSelf( box.min );
-		this.max.minSelf( box.max );
+		this.min.max( box.min );
+		this.max.min( box.max );
 
 		return this;
 
@@ -221,8 +221,8 @@ THREE.Box2.prototype = {
 
 	union: function ( box ) {
 
-		this.min.minSelf( box.min );
-		this.max.maxSelf( box.max );
+		this.min.min( box.min );
+		this.max.max( box.max );
 
 		return this;
 
@@ -230,8 +230,8 @@ THREE.Box2.prototype = {
 
 	translate: function ( offset ) {
 
-		this.min.addSelf( offset );
-		this.max.addSelf( offset );
+		this.min.add( offset );
+		this.max.add( offset );
 
 		return this;
 

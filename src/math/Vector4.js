@@ -62,33 +62,33 @@ THREE.Vector4.prototype = {
 
 	},
 
-    setComponent: function ( index, value ) {
+	setComponent: function ( index, value ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: this.x = value; break;
-            case 1: this.y = value; break;
-            case 2: this.z = value; break;
-            case 3: this.w = value; break;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: this.x = value; break;
+			case 1: this.y = value; break;
+			case 2: this.z = value; break;
+			case 3: this.w = value; break;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
-    getComponent: function ( index ) {
+	getComponent: function ( index ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: return this.x;
-            case 1: return this.y;
-            case 2: return this.z;
-            case 3: return this.w;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: return this.x;
+			case 1: return this.y;
+			case 2: return this.z;
+			case 3: return this.w;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
 	copy: function ( v ) {
 
@@ -96,6 +96,17 @@ THREE.Vector4.prototype = {
 		this.y = v.y;
 		this.z = v.z;
 		this.w = ( v.w !== undefined ) ? v.w : 1;
+
+		return this;
+
+	},
+
+	add: function ( v ) {
+
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
+		this.w += v.w;
 
 		return this;
 
@@ -112,7 +123,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	add: function ( a, b ) {
+	addVectors: function ( a, b ) {
 
 		this.x = a.x + b.x;
 		this.y = a.y + b.y;
@@ -123,34 +134,23 @@ THREE.Vector4.prototype = {
 
 	},
 
-	addSelf: function ( v ) {
-
-		this.x += v.x;
-		this.y += v.y;
-		this.z += v.z;
-		this.w += v.w;
-
-		return this;
-
-	},
-
-	sub: function ( a, b ) {
-
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-		this.z = a.z - b.z;
-		this.w = a.w - b.w;
-
-		return this;
-
-	},
-
-	subSelf: function ( v ) {
+	sub: function ( v ) {
 
 		this.x -= v.x;
 		this.y -= v.y;
 		this.z -= v.z;
 		this.w -= v.w;
+
+		return this;
+
+	},
+
+	subVectors: function ( a, b ) {
+
+		this.x = a.x - b.x;
+		this.y = a.y - b.y;
+		this.z = a.z - b.z;
+		this.w = a.w - b.w;
 
 		return this;
 
@@ -162,6 +162,24 @@ THREE.Vector4.prototype = {
 		this.y *= s;
 		this.z *= s;
 		this.w *= s;
+
+		return this;
+
+	},
+
+	applyMatrix4: function ( m ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+		var w = this.w;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[4] * y + e[8] * z + e[12] * w;
+		this.y = e[1] * x + e[5] * y + e[9] * z + e[13] * w;
+		this.z = e[2] * x + e[6] * y + e[10] * z + e[14] * w;
+		this.w = e[3] * x + e[7] * y + e[11] * z + e[15] * w;
 
 		return this;
 
@@ -189,7 +207,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	minSelf: function ( v ) {
+	min: function ( v ) {
 
 		if ( this.x > v.x ) {
 
@@ -219,7 +237,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	maxSelf: function ( v ) {
+	max: function ( v ) {
 
 		if ( this.x < v.x ) {
 
@@ -249,7 +267,7 @@ THREE.Vector4.prototype = {
 
 	},
 
-	clampSelf: function ( min, max ) {
+	clamp: function ( min, max ) {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
@@ -336,17 +354,17 @@ THREE.Vector4.prototype = {
 	setLength: function ( l ) {
 
 		var oldLength = this.length();
-		
-		if ( oldLength !== 0 && l !== oldLength  ) {
+
+		if ( oldLength !== 0 && l !== oldLength ) {
 
 			this.multiplyScalar( l / oldLength );
 		}
 
 		return this;
-		
+
 	},
 
-	lerpSelf: function ( v, alpha ) {
+	lerp: function ( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
 		this.y += ( v.y - this.y ) * alpha;

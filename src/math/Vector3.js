@@ -54,31 +54,31 @@ THREE.Vector3.prototype = {
 
 	},
 
-    setComponent: function ( index, value ) {
+	setComponent: function ( index, value ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: this.x = value; break;
-            case 1: this.y = value; break;
-            case 2: this.z = value; break;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: this.x = value; break;
+			case 1: this.y = value; break;
+			case 2: this.z = value; break;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
-    getComponent: function ( index ) {
+	getComponent: function ( index ) {
 
-        switch( index ) {
+		switch ( index ) {
 
-            case 0: return this.x;
-            case 1: return this.y;
-            case 2: return this.z;
-            default: throw new Error( "index is out of range: " + index );
+			case 0: return this.x;
+			case 1: return this.y;
+			case 2: return this.z;
+			default: throw new Error( "index is out of range: " + index );
 
-        }
+		}
 
-    },
+	},
 
 	copy: function ( v ) {
 
@@ -90,17 +90,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	add: function ( a, b ) {
-
-		this.x = a.x + b.x;
-		this.y = a.y + b.y;
-		this.z = a.z + b.z;
-
-		return this;
-
-	},
-
-	addSelf: function ( v ) {
+	add: function ( v ) {
 
 		this.x += v.x;
 		this.y += v.y;
@@ -120,17 +110,17 @@ THREE.Vector3.prototype = {
 
 	},
 
-	sub: function ( a, b ) {
+	addVectors: function ( a, b ) {
 
-		this.x = a.x - b.x;
-		this.y = a.y - b.y;
-		this.z = a.z - b.z;
+		this.x = a.x + b.x;
+		this.y = a.y + b.y;
+		this.z = a.z + b.z;
 
 		return this;
 
 	},
 
-	subSelf: function ( v ) {
+	sub: function ( v ) {
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -140,17 +130,17 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiply: function ( a, b ) {
+	subVectors: function ( a, b ) {
 
-		this.x = a.x * b.x;
-		this.y = a.y * b.y;
-		this.z = a.z * b.z;
+		this.x = a.x - b.x;
+		this.y = a.y - b.y;
+		this.z = a.z - b.z;
 
 		return this;
 
 	},
 
-	multiplySelf: function ( v ) {
+	multiply: function ( v ) {
 
 		this.x *= v.x;
 		this.y *= v.y;
@@ -170,7 +160,78 @@ THREE.Vector3.prototype = {
 
 	},
 
-	divideSelf: function ( v ) {
+	multiplyVectors: function ( a, b ) {
+
+		this.x = a.x * b.x;
+		this.y = a.y * b.y;
+		this.z = a.z * b.z;
+
+		return this;
+
+	},
+
+	applyMatrix3: function ( m ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[3] * y + e[6] * z;
+		this.y = e[1] * x + e[4] * y + e[7] * z;
+		this.z = e[2] * x + e[5] * y + e[8] * z;
+
+		return this;
+
+	},
+
+	applyMatrix4: function ( m ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+
+		var e = m.elements;
+		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] );
+
+		this.x = ( e[0] * x + e[4] * y + e[8] * z + e[12] ) * d;
+		this.y = ( e[1] * x + e[5] * y + e[9] * z + e[13] ) * d;
+		this.z = ( e[2] * x + e[6] * y + e[10] * z + e[14] ) * d;
+
+		return this;
+
+	},
+
+	applyQuaternion: function ( q ) {
+
+		var x = this.x;
+		var y = this.y;
+		var z = this.z;
+
+		var qx = q.x;
+		var qy = q.y;
+		var qz = q.z;
+		var qw = q.w;
+
+		// calculate quat * vector
+
+		var ix =  qw * x + qy * z - qz * y;
+		var iy =  qw * y + qz * x - qx * z;
+		var iz =  qw * z + qx * y - qy * x;
+		var iw = -qx * x - qy * y - qz * z;
+
+		// calculate result * inverse quat
+
+		this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+		this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+		this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+		return this;
+
+	},
+
+	divide: function ( v ) {
 
 		this.x /= v.x;
 		this.y /= v.y;
@@ -200,7 +261,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	minSelf: function ( v ) {
+	min: function ( v ) {
 
 		if ( this.x > v.x ) {
 
@@ -224,7 +285,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	maxSelf: function ( v ) {
+	max: function ( v ) {
 
 		if ( this.x < v.x ) {
 
@@ -248,7 +309,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	clampSelf: function ( min, max ) {
+	clamp: function ( min, max ) {
 
 		// This function assumes min < max, if this assumption isn't true it will not operate correctly
 
@@ -325,7 +386,7 @@ THREE.Vector3.prototype = {
 	setLength: function ( l ) {
 
 		var oldLength = this.length();
-		
+
 		if ( oldLength !== 0 && l !== oldLength  ) {
 
 			this.multiplyScalar( l / oldLength );
@@ -335,7 +396,7 @@ THREE.Vector3.prototype = {
 
 	},
 
-	lerpSelf: function ( v, alpha ) {
+	lerp: function ( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
 		this.y += ( v.y - this.y ) * alpha;
@@ -345,23 +406,23 @@ THREE.Vector3.prototype = {
 
 	},
 
-	cross: function ( a, b ) {
-
-		this.x = a.y * b.z - a.z * b.y;
-		this.y = a.z * b.x - a.x * b.z;
-		this.z = a.x * b.y - a.y * b.x;
-
-		return this;
-
-	},
-
-	crossSelf: function ( v ) {
+	cross: function ( v ) {
 
 		var x = this.x, y = this.y, z = this.z;
 
 		this.x = y * v.z - z * v.y;
 		this.y = z * v.x - x * v.z;
 		this.z = x * v.y - y * v.x;
+
+		return this;
+
+	},
+
+	crossVectors: function ( a, b ) {
+
+		this.x = a.y * b.z - a.z * b.y;
+		this.y = a.z * b.x - a.x * b.z;
+		this.z = a.x * b.y - a.y * b.x;
 
 		return this;
 

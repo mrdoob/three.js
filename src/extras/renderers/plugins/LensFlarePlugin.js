@@ -5,12 +5,14 @@
 
 THREE.LensFlarePlugin = function ( ) {
 
-	var _gl, _renderer, _lensFlare = {};
+	var _gl, _renderer, _precision, _lensFlare = {};
 
 	this.init = function ( renderer ) {
 
 		_gl = renderer.context;
 		_renderer = renderer;
+
+		_precision = renderer.getPrecision();
 
 		_lensFlare.vertices = new Float32Array( 8 + 8 );
 		_lensFlare.faces = new Uint16Array( 6 );
@@ -65,12 +67,12 @@ THREE.LensFlarePlugin = function ( ) {
 		if ( _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS ) <= 0 ) {
 
 			_lensFlare.hasVertexTexture = false;
-			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlare" ] );
+			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlare" ], _precision );
 
 		} else {
 
 			_lensFlare.hasVertexTexture = true;
-			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ] );
+			_lensFlare.program = createProgram( THREE.ShaderFlares[ "lensFlareVertexTexture" ], _precision );
 
 		}
 
@@ -158,8 +160,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
-			camera.matrixWorldInverse.multiplyVector3( tempPosition );
-			camera.projectionMatrix.multiplyVector3( tempPosition );
+			tempPosition.applyMatrix4( camera.matrixWorldInverse );
+			tempPosition.applyMatrix4( camera.projectionMatrix );
 
 			// setup arrays for gl programs
 
@@ -274,15 +276,17 @@ THREE.LensFlarePlugin = function ( ) {
 
 	};
 
-	function createProgram ( shader ) {
+	function createProgram ( shader, precision ) {
 
 		var program = _gl.createProgram();
 
 		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
 		var vertexShader = _gl.createShader( _gl.VERTEX_SHADER );
 
-		_gl.shaderSource( fragmentShader, shader.fragmentShader );
-		_gl.shaderSource( vertexShader, shader.vertexShader );
+		var prefix = "precision " + precision + " float;\n";
+
+		_gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
+		_gl.shaderSource( vertexShader, prefix + shader.vertexShader );
 
 		_gl.compileShader( fragmentShader );
 		_gl.compileShader( vertexShader );

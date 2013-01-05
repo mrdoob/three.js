@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author mikael emtinger / http://gomo.se/
+ * @author jonobr1 / http://jonobr1.com/
  */
 
 THREE.Mesh = function ( geometry, material ) {
@@ -11,9 +12,7 @@ THREE.Mesh = function ( geometry, material ) {
 	this.geometry = geometry;
 	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
 
-	if ( this.geometry ) {
-
-		// calc bound radius
+	if ( this.geometry !== undefined ) {
 
 		if ( this.geometry.boundingSphere === null ) {
 
@@ -21,29 +20,33 @@ THREE.Mesh = function ( geometry, material ) {
 
 		}
 
-		// setup morph targets
+		this.updateMorphTargets();
 
-		if ( this.geometry.morphTargets.length ) {
+	}
 
-			this.morphTargetBase = -1;
-			this.morphTargetForcedOrder = [];
-			this.morphTargetInfluences = [];
-			this.morphTargetDictionary = {};
+};
 
-			for( var m = 0; m < this.geometry.morphTargets.length; m ++ ) {
+THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 
-				this.morphTargetInfluences.push( 0 );
-				this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+THREE.Mesh.prototype.updateMorphTargets = function () {
 
-			}
+	if ( this.geometry.morphTargets.length > 0 ) {
+
+		this.morphTargetBase = -1;
+		this.morphTargetForcedOrder = [];
+		this.morphTargetInfluences = [];
+		this.morphTargetDictionary = {};
+
+		for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
+
+			this.morphTargetInfluences.push( 0 );
+			this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
 
 		}
 
 	}
 
-}
-
-THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
+};
 
 THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
 

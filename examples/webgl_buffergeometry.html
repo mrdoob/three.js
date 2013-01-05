@@ -173,9 +173,9 @@
 					pB.set( bx, by, bz );
 					pC.set( cx, cy, cz );
 
-					cb.sub( pC, pB );
-					ab.sub( pA, pB );
-					cb.crossSelf( ab );
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
 
 					cb.normalize();
 

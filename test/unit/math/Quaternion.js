@@ -86,7 +86,7 @@ test( "setFromAxisAngle", function() {
 	var b2 = new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), -Math.PI );
 	ok( ! a.equals( b2 ), "Passed!" );
 
-	b1.multiplySelf( b2 );
+	b1.multiply( b2 );
 	ok( a.equals( b1 ), "Passed!" );
 });
 
@@ -99,7 +99,7 @@ test( "setFromEuler/setEulerFromQuaternion", function() {
 	for( var i = 0; i < orders.length; i ++ ) {
 		for( var j = 0; j < angles.length; j ++ ) {
 			var eulers2 = new THREE.Vector3().setEulerFromQuaternion( new THREE.Quaternion().setFromEuler( angles[j], orders[i] ), orders[i] );
-		
+
 			ok( eulers2.distanceTo( angles[j] ) < 0.001, "Passed!" );
 		}
 	}
@@ -151,21 +151,21 @@ test( "inverse/conjugate", function() {
 });
 
 
-test( "multiply/multiplySelf", function() {
-	
+test( "multiplyQuaternions/multiply", function() {
+
 	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
 
 	var q1 = new THREE.Quaternion().setFromEuler( angles[0], "XYZ" );
 	var q2 = new THREE.Quaternion().setFromEuler( angles[1], "XYZ" );
 	var q3 = new THREE.Quaternion().setFromEuler( angles[2], "XYZ" );
 
-	var q = new THREE.Quaternion().multiply( q1, q2 ).multiplySelf( q3 );
+	var q = new THREE.Quaternion().multiplyQuaternions( q1, q2 ).multiply( q3 );
 
 	var m1 = new THREE.Matrix4().setRotationFromEuler( angles[0], "XYZ" );
 	var m2 = new THREE.Matrix4().setRotationFromEuler( angles[1], "XYZ" );
 	var m3 = new THREE.Matrix4().setRotationFromEuler( angles[2], "XYZ" );
 
-	var m = new THREE.Matrix4().multiply( m1, m2 ).multiplySelf( m3 );
+	var m = new THREE.Matrix4().multiplyMatrices( m1, m2 ).multiply( m3 );
 
 	var qFromM = new THREE.Quaternion().setFromRotationMatrix( m );
 
@@ -183,8 +183,8 @@ test( "multiplyVector3", function() {
 			var m = new THREE.Matrix4().setRotationFromEuler( angles[j], orders[i] );
 
 			var v0 = new THREE.Vector3(1, 0, 0);
-			var qv = q.multiplyVector3( v0.clone() );
-			var mv = m.multiplyVector3( v0.clone() );
+			var qv = v0.clone().applyQuaternion( q );
+			var mv = v0.clone().applyMatrix4( m );
 		
 			ok( qv.distanceTo( mv ) < 0.001, "Passed!" );
 		}

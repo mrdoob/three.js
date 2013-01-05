@@ -63,26 +63,26 @@ test( "add", function() {
 	var a = new THREE.Vector2( x, y );
 	var b = new THREE.Vector2( -x, -y );
 
-	a.addSelf( b );
+	a.add( b );
 	ok( a.x == 0, "Passed!" );
 	ok( a.y == 0, "Passed!" );
 
-	var c = new THREE.Vector2().add( b, b );
+	var c = new THREE.Vector2().addVectors( b, b );
 	ok( c.x == -2*x, "Passed!" );
-	ok( c.y == -2*y, "Passed!" );	
+	ok( c.y == -2*y, "Passed!" );
 });
 
 test( "sub", function() {
 	var a = new THREE.Vector2( x, y );
 	var b = new THREE.Vector2( -x, -y );
 
-	a.subSelf( b );
+	a.sub( b );
 	ok( a.x == 2*x, "Passed!" );
 	ok( a.y == 2*y, "Passed!" );
 
-	var c = new THREE.Vector2().sub( a, a );
+	var c = new THREE.Vector2().subVectors( a, a );
 	ok( c.x == 0, "Passed!" );
-	ok( c.y == 0, "Passed!" );	
+	ok( c.y == 0, "Passed!" );
 });
 
 test( "multiply/divide", function() {
@@ -95,7 +95,7 @@ test( "multiply/divide", function() {
 
 	b.multiplyScalar( -2 );
 	ok( b.x == 2*x, "Passed!" );
-	ok( b.y == 2*y, "Passed!" );	
+	ok( b.y == 2*y, "Passed!" );
 
 	a.divideScalar( -2 );
 	ok( a.x == x, "Passed!" );
@@ -103,7 +103,7 @@ test( "multiply/divide", function() {
 
 	b.divideScalar( -2 );
 	ok( b.x == -x, "Passed!" );
-	ok( b.y == -y, "Passed!" );	
+	ok( b.y == -y, "Passed!" );
 });
 
 
@@ -112,23 +112,23 @@ test( "min/max/clamp", function() {
 	var b = new THREE.Vector2( -x, -y );
 	var c = new THREE.Vector2();
 
-	c.copy( a ).minSelf( b );
+	c.copy( a ).min( b );
 	ok( c.x == -x, "Passed!" );
 	ok( c.y == -y, "Passed!" );
 
-	c.copy( a ).maxSelf( b );
+	c.copy( a ).max( b );
 	ok( c.x == x, "Passed!" );
 	ok( c.y == y, "Passed!" );
 
 	c.set( -2*x, 2*y );
-	c.clampSelf( b, a );
+	c.clamp( b, a );
 	ok( c.x == -x, "Passed!" );
-	ok( c.y == y, "Passed!" );	
+	ok( c.y == y, "Passed!" );
 });
 
 test( "negate", function() {
 	var a = new THREE.Vector2( x, y );
-	
+
 	a.negate();
 	ok( a.x == -x, "Passed!" );
 	ok( a.y == -y, "Passed!" );
@@ -138,7 +138,7 @@ test( "dot", function() {
 	var a = new THREE.Vector2( x, y );
 	var b = new THREE.Vector2( -x, -y );
 	var c = new THREE.Vector2();
-	
+
 	var result = a.dot( b );
 	ok( result == (-x*x-y*y), "Passed!" );
 
@@ -150,7 +150,7 @@ test( "length/lengthSq", function() {
 	var a = new THREE.Vector2( x, 0 );
 	var b = new THREE.Vector2( 0, -y );
 	var c = new THREE.Vector2();
-	
+
 	ok( a.length() == x, "Passed!" );
 	ok( a.lengthSq() == x*x, "Passed!" );
 	ok( b.length() == y, "Passed!" );
@@ -167,7 +167,7 @@ test( "normalize", function() {
 	var a = new THREE.Vector2( x, 0 );
 	var b = new THREE.Vector2( 0, -y );
 	var c = new THREE.Vector2();
-	
+
 	a.normalize();
 	ok( a.length() == 1, "Passed!" );
 	ok( a.x == 1, "Passed!" );
@@ -181,7 +181,7 @@ test( "distanceTo/distanceToSquared", function() {
 	var a = new THREE.Vector2( x, 0 );
 	var b = new THREE.Vector2( 0, -y );
 	var c = new THREE.Vector2();
-	
+
 	ok( a.distanceTo( c ) == x, "Passed!" );
 	ok( a.distanceToSquared( c ) == x*x, "Passed!" );
 
@@ -191,7 +191,7 @@ test( "distanceTo/distanceToSquared", function() {
 
 test( "setLength", function() {
 	var a = new THREE.Vector2( x, 0 );
-	
+
 	ok( a.length() == x, "Passed!" );
 	a.setLength( y );
 	ok( a.length() == y, "Passed!" );
@@ -202,25 +202,25 @@ test( "setLength", function() {
 	ok( a.length() == 0, "Passed!" );
 });
 
-test( "lerpSelf/clone", function() {
+test( "lerp/clone", function() {
 	var a = new THREE.Vector2( x, 0 );
 	var b = new THREE.Vector2( 0, -y );
-	
-	ok( a.lerpSelf( a, 0 ).equals( a.lerpSelf( a, 0.5 ) ), "Passed!" );
-	ok( a.lerpSelf( a, 0 ).equals( a.lerpSelf( a, 1 ) ), "Passed!" );
 
-	ok( a.clone().lerpSelf( b, 0 ).equals( a ), "Passed!" );
+	ok( a.lerp( a, 0 ).equals( a.lerp( a, 0.5 ) ), "Passed!" );
+	ok( a.lerp( a, 0 ).equals( a.lerp( a, 1 ) ), "Passed!" );
 
-	ok( a.clone().lerpSelf( b, 0.5 ).x == x*0.5, "Passed!" );
-	ok( a.clone().lerpSelf( b, 0.5 ).y == -y*0.5, "Passed!" );
+	ok( a.clone().lerp( b, 0 ).equals( a ), "Passed!" );
 
-	ok( a.clone().lerpSelf( b, 1 ).equals( b ), "Passed!" );
+	ok( a.clone().lerp( b, 0.5 ).x == x*0.5, "Passed!" );
+	ok( a.clone().lerp( b, 0.5 ).y == -y*0.5, "Passed!" );
+
+	ok( a.clone().lerp( b, 1 ).equals( b ), "Passed!" );
 });
 
 test( "equals", function() {
 	var a = new THREE.Vector2( x, 0 );
 	var b = new THREE.Vector2( 0, -y );
-	
+
 	ok( a.x != b.x, "Passed!" );
 	ok( a.y != b.y, "Passed!" );
 

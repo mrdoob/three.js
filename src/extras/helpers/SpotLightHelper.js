@@ -4,7 +4,7 @@
  *	- shows spot light color, intensity, position, orientation, light cone and target
  */
 
-THREE.SpotLightHelper = function ( light, sphereSize, arrowLength ) {
+THREE.SpotLightHelper = function ( light, sphereSize ) {
 
 	THREE.Object3D.call( this );
 
@@ -17,17 +17,14 @@ THREE.SpotLightHelper = function ( light, sphereSize, arrowLength ) {
 	// direction
 
 	this.direction = new THREE.Vector3();
-	this.direction.sub( light.target.position, light.position );
+	this.direction.subVectors( light.target.position, light.position );
 
 	// color
 
-	this.color = light.color.clone();
-
 	var intensity = THREE.Math.clamp( light.intensity, 0, 1 );
 
-	this.color.r *= intensity;
-	this.color.g *= intensity;
-	this.color.b *= intensity;
+	this.color = light.color.clone();
+	this.color.multiplyScalar( intensity );
 
 	var hexColor = this.color.getHex();
 
@@ -46,7 +43,6 @@ THREE.SpotLightHelper = function ( light, sphereSize, arrowLength ) {
 	var raysMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
 	var coneMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.3, transparent: true } );
 
-	this.lightArrow = new THREE.ArrowHelper( this.direction, null, arrowLength, hexColor );
 	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 	this.lightCone = new THREE.Mesh( coneGeometry, coneMaterial );
 
@@ -54,14 +50,10 @@ THREE.SpotLightHelper = function ( light, sphereSize, arrowLength ) {
 	var coneWidth = coneLength * Math.tan( light.angle * 0.5 ) * 2;
 	this.lightCone.scale.set( coneWidth, coneWidth, coneLength );
 
-	this.lightArrow.cone.material.fog = false;
-	this.lightArrow.line.material.fog = false;
-
 	this.lightRays = new THREE.Line( raysGeometry, raysMaterial, THREE.LinePieces );
 
 	this.gyroscope = new THREE.Gyroscope();
 
-	this.gyroscope.add( this.lightArrow );
 	this.gyroscope.add( this.lightSphere );
 	this.gyroscope.add( this.lightRays );
 
@@ -114,8 +106,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 	// update arrow orientation
 	// pointing from light to target
 
-	this.direction.sub( this.light.target.position, this.light.position );
-	this.lightArrow.setDirection( this.direction );
+	this.direction.subVectors( this.light.target.position, this.light.position );
 
 	// update light cone orientation and size
 
@@ -127,14 +118,11 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 	// update arrow, spheres, rays and line colors to light color * light intensity
 
-	this.color.copy( this.light.color );
-
 	var intensity = THREE.Math.clamp( this.light.intensity, 0, 1 );
-	this.color.r *= intensity;
-	this.color.g *= intensity;
-	this.color.b *= intensity;
 
-	this.lightArrow.setColor( this.color.getHex() );
+	this.color.copy( this.light.color );
+	this.color.multiplyScalar( intensity );
+
 	this.lightSphere.material.color.copy( this.color );
 	this.lightRays.material.color.copy( this.color );
 	this.lightCone.material.color.copy( this.color );
@@ -150,5 +138,4 @@ THREE.SpotLightHelper.prototype.update = function () {
 	this.targetLine.geometry.computeLineDistances();
 	this.targetLine.geometry.verticesNeedUpdate = true;
 
-}
-
+};

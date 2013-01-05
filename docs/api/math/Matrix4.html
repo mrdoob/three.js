@@ -30,8 +30,8 @@
 		m2.makeRotationY( beta );
 		m3.makeRotationZ( gamma );
 
-		m.multiply( m1, m2 );
-		m.multiplySelf( m3 );
+		m.multiplyMatrices( m1, m2 );
+		m.multiply( m3 );
 		</code>
 
 
@@ -68,14 +68,14 @@
 		Constructs a rotation matrix, looking from *eye* towards *center* with defined *up* vector.
 		</div>
 
-		<h3>.multiply( [page:Matrix4 a], [page:Matrix4 b] ) [page:Matrix4]</h3>
-		<div>
-		Sets this matrix to *a x b*.
-		</div>
-
-		<h3>.multiplySelf( [page:Matrix4 m] ) [page:Matrix4]</h3>
+		<h3>.multiply( [page:Matrix4 m] ) [page:Matrix4]</h3>
 		<div>
 		Multiplies this matrix by *m*.
+		</div>
+
+		<h3>.multiplyMatrices( [page:Matrix4 a], [page:Matrix4 b] ) [page:Matrix4]</h3>
+		<div>
+		Sets this matrix to *a x b*.
 		</div>
 
 		<h3>.multiplyToArray( [page:Matrix4 a], [page:Matrix4 b], [page:Array r] ) [page:Matrix4]</h3>

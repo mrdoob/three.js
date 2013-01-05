@@ -269,7 +269,7 @@ THREE.Car = function () {
 
 				var bb = scope.wheelGeometry.boundingBox;
 
-				scope.wheelOffset.add( bb.min, bb.max );
+				scope.wheelOffset.addVectors( bb.min, bb.max );
 				scope.wheelOffset.multiplyScalar( 0.5 );
 
 				scope.wheelDiameter = bb.max.y - bb.min.y;
@@ -295,9 +295,9 @@ THREE.Car = function () {
 
 			// front left wheel
 
-			delta.multiply( scope.wheelOffset, new THREE.Vector3( s, s, s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, s ) );
 
-			scope.frontLeftWheelRoot.position.addSelf( delta );
+			scope.frontLeftWheelRoot.position.add( delta );
 
 			scope.frontLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 			scope.frontLeftWheelMesh.scale.set( s, s, s );
@@ -307,9 +307,9 @@ THREE.Car = function () {
 
 			// front right wheel
 
-			delta.multiply( scope.wheelOffset, new THREE.Vector3( -s, s, s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, s ) );
 
-			scope.frontRightWheelRoot.position.addSelf( delta );
+			scope.frontRightWheelRoot.position.add( delta );
 
 			scope.frontRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
@@ -321,24 +321,24 @@ THREE.Car = function () {
 
 			// back left wheel
 
-			delta.multiply( scope.wheelOffset, new THREE.Vector3( s, s, -s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( s, s, -s ) );
 			delta.z -= scope.backWheelOffset;
 
 			scope.backLeftWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
-			scope.backLeftWheelMesh.position.addSelf( delta );
+			scope.backLeftWheelMesh.position.add( delta );
 			scope.backLeftWheelMesh.scale.set( s, s, s );
 
 			scope.root.add( scope.backLeftWheelMesh );
 
 			// back right wheel
 
-			delta.multiply( scope.wheelOffset, new THREE.Vector3( -s, s, -s ) );
+			delta.multiplyVectors( scope.wheelOffset, new THREE.Vector3( -s, s, -s ) );
 			delta.z -= scope.backWheelOffset;
 
 			scope.backRightWheelMesh = new THREE.Mesh( scope.wheelGeometry, wheelFaceMaterial );
 
-			scope.backRightWheelMesh.position.addSelf( delta );
+			scope.backRightWheelMesh.position.add( delta );
 			scope.backRightWheelMesh.scale.set( s, s, s );
 			scope.backRightWheelMesh.rotation.z = Math.PI;
 

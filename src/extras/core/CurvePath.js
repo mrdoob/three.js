@@ -162,14 +162,14 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 		if ( p.y > maxY ) maxY = p.y;
 		else if ( p.y < minY ) minY = p.y;
 
-		if (v3) {
+		if ( v3 ) {
 
 			if ( p.z > maxZ ) maxZ = p.z;
 			else if ( p.z < minZ ) minZ = p.z;
 
 		}
 
-		sum.addSelf( p );
+		sum.add( p );
 
 	}
 
@@ -180,14 +180,14 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 		maxX: maxX,
 		maxY: maxY,
 		centroid: sum.divideScalar( il )
-	
+
 	};
 
-	if (v3) {
+	if ( v3 ) {
 
 		ret.maxZ = maxZ;
 		ret.minZ = minZ;
-	
+
 	}
 
 	return ret;

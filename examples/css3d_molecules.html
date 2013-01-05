@@ -409,7 +409,7 @@
 						start.multiplyScalar( 75 );
 						end.multiplyScalar( 75 );
 
-						tmpVec1.sub( end, start );
+						tmpVec1.subVectors( end, start );
 						var bondLength = tmpVec1.length() - 50;
 
 
@@ -421,14 +421,14 @@
 
 						var object = new THREE.CSS3DObject( bond );
 						object.position.copy( start );
-						object.position.lerpSelf( end, 0.5 );
+						object.position.lerp( end, 0.5 );
 
 						object.properties.bondLengthShort = bondLength + "px";
 						object.properties.bondLengthFull = ( bondLength + 55 ) + "px";
 
 						//
 
-						var axis = tmpVec2.set( 0, 1, 0 ).crossSelf( tmpVec1 );
+						var axis = tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
 						var radians = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
 
 						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
@@ -450,7 +450,7 @@
 
 						var joint = new THREE.Object3D( bond );
 						joint.position.copy( start );
-						joint.position.lerpSelf( end, 0.5 );
+						joint.position.lerp( end, 0.5 );
 
 						joint.matrix.copy( objMatrix );
 						joint.rotation.setEulerFromRotationMatrix( joint.matrix, joint.eulerOrder );

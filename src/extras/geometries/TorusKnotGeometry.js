@@ -34,11 +34,11 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 			var p2 = getPos( u + 0.01, v, this.q, this.p, this.radius, this.heightScale );
 			var cx, cy;
 
-			tang.sub( p2, p1 );
-			n.add( p2, p1 );
+			tang.subVectors( p2, p1 );
+			n.addVectors( p2, p1 );
 
-			bitan.cross( tang, n );
-			n.cross( bitan, tang );
+			bitan.crossVectors( tang, n );
+			n.crossVectors( bitan, tang );
 			bitan.normalize();
 			n.normalize();
 

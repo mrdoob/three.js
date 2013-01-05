@@ -14,7 +14,7 @@ THREE.Bone = function( belongsToSkin ) {
 
 THREE.Bone.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate ) {
+THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 
 	// update local
 
@@ -30,7 +30,7 @@ THREE.Bone.prototype.update = function( parentSkinMatrix, forceUpdate ) {
 
 		if( parentSkinMatrix ) {
 
-			this.skinMatrix.multiply( parentSkinMatrix, this.matrix );
+			this.skinMatrix.multiplyMatrices( parentSkinMatrix, this.matrix );
 
 		} else {
 

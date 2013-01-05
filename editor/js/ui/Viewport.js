@@ -96,7 +96,7 @@ var Viewport = function ( signals ) {
 
 			projector.unprojectVector( vector, camera );
 
-			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 			var intersects = ray.intersectObjects( objects, true );
 
@@ -126,7 +126,7 @@ var Viewport = function ( signals ) {
 				signals.objectSelected.dispatch( selected );
 
 				var intersects = ray.intersectObject( intersectionPlane );
-				offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
+				offset.copy( intersects[ 0 ].point ).sub( intersectionPlane.position );
 
 				document.addEventListener( 'mousemove', onMouseMove, false );
 				document.addEventListener( 'mouseup', onMouseUp, false );
@@ -153,13 +153,13 @@ var Viewport = function ( signals ) {
 
 		projector.unprojectVector( vector, camera );
 
-		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+		ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 		var intersects = ray.intersectObject( intersectionPlane );
 
 		if ( intersects.length > 0 ) {
 
-			intersects[ 0 ].point.subSelf( offset );
+			intersects[ 0 ].point.sub( offset );
 
 			if ( picked.properties.isGizmo ) {
 
@@ -199,7 +199,7 @@ var Viewport = function ( signals ) {
 
 			projector.unprojectVector( vector, camera );
 
-			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			ray.set( camera.position, vector.sub( camera.position ).normalize() );
 			var intersects = ray.intersectObjects( objects, true );
 
 			if ( intersects.length > 0 && ! controls.enabled ) {
@@ -312,9 +312,8 @@ var Viewport = function ( signals ) {
 		} else if ( object instanceof THREE.SpotLight ) {
 
 			var sphereSize = 5;
-			var arrowLength = 30;
 
-			var lightGizmo = new THREE.SpotLightHelper( object, sphereSize, arrowLength );
+			var lightGizmo = new THREE.SpotLightHelper( object, sphereSize );
 			sceneHelpers.add( lightGizmo );
 			sceneHelpers.add( lightGizmo.targetSphere );
 			sceneHelpers.add( lightGizmo.targetLine );
@@ -385,6 +384,14 @@ var Viewport = function ( signals ) {
 		}
 
 		render();
+
+	} );
+
+	signals.cloneSelectedObject.add( function () {
+
+		if ( selected === camera ) return;
+
+		signals.objectAdded.dispatch( selected.clone() );
 
 	} );
 

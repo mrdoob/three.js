@@ -20,8 +20,6 @@
 		<script src="js/controls/TrackballControls.js"></script>
 
 		<script src="js/renderers/SoftwareRenderer.js"></script>
-		<script src="js/renderers/SoftwareRenderer2.js"></script>
-		<script src="js/renderers/SoftwareRenderer3.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -70,7 +68,7 @@
 				plane.rotation.x = - Math.PI / 2;
 				scene.add( plane );
 
-				renderer = new THREE.SoftwareRenderer3();
+				renderer = new THREE.SoftwareRenderer();
 				renderer.setSize( window.innerWidth || 2, window.innerHeight || 2 );
 
 				container.appendChild( renderer.domElement );

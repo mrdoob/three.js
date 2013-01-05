@@ -20,7 +20,7 @@ THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
 
 		if ( this.parent ) {
 
-			this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 			this.matrixWorld.decompose( this.translationWorld, this.rotationWorld, this.scaleWorld );
 			this.matrix.decompose( this.translationObject, this.rotationObject, this.scaleObject );

@@ -36,11 +36,11 @@ THREE.Ray.prototype = {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		return result.copy( this.direction ).multiplyScalar( t ).addSelf( this.origin );
+		return result.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
 	},
 
-	recastSelf: function ( t ) {
+	recast: function ( t ) {
 
 		this.origin.copy( this.at( t, THREE.Ray.__v1 ) );
 
@@ -51,20 +51,39 @@ THREE.Ray.prototype = {
 	closestPointToPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		result.sub( point, this.origin );
+		result.copy( point );
+		result.sub( this.origin );
 		var directionDistance = result.dot( this.direction );
 
-		return result.copy( this.direction ).multiplyScalar( directionDistance ).addSelf( this.origin );
+		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 	},
 
 	distanceToPoint: function ( point ) {
 
-		var directionDistance = THREE.Ray.__v1.sub( point, this.origin ).dot( this.direction );		
-		THREE.Ray.__v1.copy( this.direction ).multiplyScalar( directionDistance ).addSelf( this.origin );
+		var directionDistance = THREE.Ray.__v1.copy( point ).sub( this.origin ).dot( this.direction );		
+		THREE.Ray.__v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 		return THREE.Ray.__v1.distanceTo( point );
 
+	},
+
+	distanceToRay : function ( otherRay ) {
+		var origin0 = this.origin;
+		var direction0 = this.direction;
+		var origin1 = otherRay.origin;
+		var direction1 = otherRay.direction;
+		
+		var diffOrigins = origin1.clone().sub(origin0);
+		var directionPerpendicular = direction0.clone().cross( direction1 );
+		if( directionPerpendicular.length() == 0 ) { // direction0 is parallel to direction1
+			return diffOrigins.cross( direction0 ).length() / direction0.length();  
+		} else {
+			// see e.g. http://nibis.ni.schule.de/~lbs-gym/Vektorpdf/windschiefeGeraden.pdf
+			directionPerpendicular.normalize();
+			directionPerpendicular.multiply( diffOrigins );
+			return Math.abs(directionPerpendicular.x + directionPerpendicular.y + directionPerpendicular.z);
+		}
 	},
 
 	isIntersectionSphere: function( sphere ) {
@@ -133,9 +152,9 @@ THREE.Ray.prototype = {
 
 	transform: function ( matrix4 ) {
 
-		this.direction = matrix4.multiplyVector3( this.direction.addSelf( this.origin ) );
-		this.origin = matrix4.multiplyVector3( this.origin );
-		this.direction.subSelf( this.origin );
+		this.direction = this.direction.add( this.origin ).applyMatrix4( matrix4 );
+		this.origin = this.origin.applyMatrix4( matrix4 );
+		this.direction.sub( this.origin );
 
 		return this;
 	},
