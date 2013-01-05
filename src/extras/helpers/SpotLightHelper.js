@@ -92,11 +92,6 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 		this.targetLine.properties.isGizmo = true;
 
 	}
-	else {
-
-		this.targetSphere = null;
-
-	}
 
 	//
 
