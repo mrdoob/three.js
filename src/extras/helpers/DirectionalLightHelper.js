@@ -51,7 +51,7 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 
 	this.targetSphere = null;
 
-	if ( light.target.properties.targetInverse ) {
+	if ( light.target.properties.targetInverse !== undefined ) {
 
 		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
 		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
@@ -100,7 +100,7 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	this.lightRays.material.color.copy( this.color );
 
 	// Only update targetSphere and targetLine if available
-	if ( this.targetSphere ) {
+	if ( this.targetSphere !== null ) {
 
 		this.targetSphere.material.color.copy( this.color );
 		this.targetLine.material.color.copy( this.color );

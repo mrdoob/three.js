@@ -70,7 +70,7 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 
 	this.targetSphere = null;
 
-	if ( light.target.properties.targetInverse ) {
+	if ( light.target.properties.targetInverse !== undefined ) {
 
 		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
 		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
@@ -128,7 +128,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 	this.lightCone.material.color.copy( this.color );
 
 	// Only update targetSphere and targetLine if available
-	if ( this.targetSphere ) {
+	if ( this.targetSphere !== null ) {
 
 		this.targetSphere.material.color.copy( this.color );
 		this.targetLine.material.color.copy( this.color );
@@ -140,7 +140,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 		this.targetLine.geometry.computeLineDistances();
 		this.targetLine.geometry.verticesNeedUpdate = true;
-	
+
 	}
 
 };
