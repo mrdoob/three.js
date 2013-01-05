@@ -127,15 +127,20 @@ THREE.SpotLightHelper.prototype.update = function () {
 	this.lightRays.material.color.copy( this.color );
 	this.lightCone.material.color.copy( this.color );
 
-	this.targetSphere.material.color.copy( this.color );
-	this.targetLine.material.color.copy( this.color );
+	// Only update targetSphere and targetLine if available
+	if ( this.targetSphere ) {
 
-	// update target line vertices
+		this.targetSphere.material.color.copy( this.color );
+		this.targetLine.material.color.copy( this.color );
 
-	this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
-	this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+		// update target line vertices
 
-	this.targetLine.geometry.computeLineDistances();
-	this.targetLine.geometry.verticesNeedUpdate = true;
+		this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
+		this.targetLine.geometry.vertices[ 1 ].copy( this.light.target.position );
+
+		this.targetLine.geometry.computeLineDistances();
+		this.targetLine.geometry.verticesNeedUpdate = true;
+	
+	}
 
 };
