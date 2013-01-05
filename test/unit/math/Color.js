@@ -7,61 +7,66 @@ test( "constructor", function(){
     ok( c.b, "Blue: " + c.g );
 });
 
-test( "copy", function(){
+test( "copyHex", function(){
     var c = new THREE.Color();
-    var c2 = new THREE.Color('red');
+    var c2 = new THREE.Color(0xF5FFFA);
     c.copy(c2);
-    ok( c.r == 1, "Red c: " + c.r + " Red c2: " + c2.r);
-    ok( c.g == 0, "Green c: " + c.g + " Green c2: " + c2.g);
-    ok( c.b == 0, "Blue c: " + c.g + " Blue c2: " + c2.b);
+    ok(c.getHex() == c2.getHex(), "Hex c: " + c.getHex() + " Hex c2: " + c2.getHex());
+});
+
+test( "copyColorString", function(){
+    var c = new THREE.Color();
+    var c2 = new THREE.Color('ivory');
+    c.copy(c2);
+    ok(c.getHex() == c2.getHex(), "Hex c: " + c.getHex() + " Hex c2: " + c2.getHex());
 });
 
 test( "setRGB", function(){
     var c = new THREE.Color()
-    c.setRGB(0, 1, 1);
-    ok( c.r == 0, "Red: " + c.r );
-    ok( c.g == 1, "Green: " + c.g );
+    c.setRGB(255, 2, 1);
+    ok( c.r == 255, "Red: " + c.r );
+    ok( c.g == 2, "Green: " + c.g );
     ok( c.b == 1, "Blue: " + c.b );
 });
 
 test( "copyGammaToLinear", function(){
     var c = new THREE.Color();
     var c2 = new THREE.Color();
-    c2.setRGB(2, 2, 2)
+    c2.setRGB(2, 4, 8)
     c.copyGammaToLinear(c2)
     ok( c.r == 4, "Red c: " + c.r + " Red c2: " + c2.r);
-    ok( c.g == 4, "Green c: " + c.g + " Green c2: " + c2.g);
-    ok( c.b == 4, "Blue c: " + c.g + " Blue c2: " + c2.b);
+    ok( c.g == 16, "Green c: " + c.g + " Green c2: " + c2.g);
+    ok( c.b == 64, "Blue c: " + c.b + " Blue c2: " + c2.b);
 });
 
 test( "copyLinearToGamma", function(){
     var c = new THREE.Color();
     var c2 = new THREE.Color();
-    c2.setRGB(4, 4, 4)
+    c2.setRGB(4, 9, 16)
     c.copyLinearToGamma(c2)
     ok( c.r == 2, "Red c: " + c.r + " Red c2: " + c2.r);
-    ok( c.g == 2, "Green c: " + c.g + " Green c2: " + c2.g);
-    ok( c.b == 2, "Blue c: " + c.g + " Blue c2: " + c2.b);
+    ok( c.g == 3, "Green c: " + c.g + " Green c2: " + c2.g);
+    ok( c.b == 4, "Blue c: " + c.b + " Blue c2: " + c2.b);
 });
 
 
 test( "convertGammaToLinear", function(){
     var c = new THREE.Color();
-    c.setRGB(2, 2, 2)
+    c.setRGB(2, 4, 8)
     c.convertGammaToLinear()
     ok( c.r == 4, "Red: " + c.r );
-    ok( c.g == 4, "Green: " + c.g );
-    ok( c.b == 4, "Blue: " + c.b );
+    ok( c.g == 16, "Green: " + c.g );
+    ok( c.b == 64, "Blue: " + c.b );
 });
 
 
 test( "convertLinearToGamma", function(){
     var c = new THREE.Color();
-    c.setRGB(4, 4, 4)
+    c.setRGB(4, 9, 16)
     c.convertLinearToGamma()
     ok( c.r == 2, "Red: " + c.r );
-    ok( c.g == 2, "Green: " + c.g );
-    ok( c.b == 2, "Blue: " + c.b );
+    ok( c.g == 3, "Green: " + c.g );
+    ok( c.b == 4, "Blue: " + c.b );
 });
 
 test("setWithNum", function(){
@@ -75,19 +80,15 @@ test("setWithNum", function(){
 
 test( "setWithString", function(){
     var c = new THREE.Color();
-    c.set('red');
-    ok( c.r == 1, "Red: " + c.r );
-    ok( c.g == 0, "Green: " + c.g );
-    ok( c.b == 0, "Blue: " + c.b );
+    c.set('silver');
+    ok(c.getHex() == 0xC0C0C0, "Hex c: " + c.getHex());
 });
 
 
 test( "clone", function(){
-    var c = new THREE.Color('red');
+    var c = new THREE.Color('teal');
     var c2 = c.clone();
-    ok( c2.r == 1, "Red c: " + c.r + " Red c2: " + c2.r);
-    ok( c2.g == 0, "Green c: " + c.g + " Green c2: " + c2.g);
-    ok( c2.b == 0, "Blue c: " + c.g + " Blue c2: " + c2.b);
+    ok(c2.getHex() == 0x008080, "Hex c2: " + c2.getHex());
 });
 
 test( "lerpSelf", function(){
@@ -110,36 +111,30 @@ test( "setStyleRGBRed", function(){
     ok( c.b == 0, "Blue: " + c.b );
 });
 
-test( "setStyleRGBPercentRed", function(){
+test( "setStyleRGBPercent", function(){
     var c = new THREE.Color();
-    c.setStyle('rgb(100%,0%,0%)');
+    c.setStyle('rgb(100%,50%,10%)');
     ok( c.r == 1, "Red: " + c.r );
-    ok( c.g == 0, "Green: " + c.g );
-    ok( c.b == 0, "Blue: " + c.b );
+    ok( c.g == 0.5, "Green: " + c.g );
+    ok( c.b == 0.1, "Blue: " + c.b );
 });
 
-test( "setStyleHexRed", function(){
+test( "setStyleHexSkyBlue", function(){
     var c = new THREE.Color();
-    c.setStyle('#ff0000');
-    ok( c.r == 1, "Red: " + c.r );
-    ok( c.g == 0, "Green: " + c.g );
-    ok( c.b == 0, "Blue: " + c.b );
+    c.setStyle('#87CEEB');
+    ok(c.getHex() == 0x87CEEB, "Hex c: " + c.getHex());
 });
 
-test( "setStyleHex2Red", function(){
+test( "setStyleHex2Olive", function(){
     var c = new THREE.Color();
-    c.setStyle('#f00');
-    ok( c.r == 1, "Red: " + c.r );
-    ok( c.g == 0, "Green: " + c.g );
-    ok( c.b == 0, "Blue: " + c.b );
+    c.setStyle('#F00');
+    ok(c.getHex() == 0xFF0000, "Hex c: " + c.getHex());
 });
 
 test( "setStyleColorName", function(){
     var c = new THREE.Color();
-    c.setStyle('red');
-    ok( c.r == 1, "Red: " + c.r );
-    ok( c.g == 0, "Green: " + c.g );
-    ok( c.b == 0, "Blue: " + c.b );
+    c.setStyle('powderblue');
+    ok(c.getHex() == 0xB0E0E6, "Hex c: " + c.getHex());
 });
 
 
@@ -151,31 +146,30 @@ test( "getHex", function(){
 
 test( "setHex", function(){
     var c = new THREE.Color();
-    c.setHex(0xFF0000);
-    ok( c.r == 1, "Red: " + c.r );
-    ok( c.g == 0, "Green: " + c.g );
-    ok( c.b == 0, "Blue: " + c.b );
+    c.setHex(0xFA8072);
+    ok( c.getHex() == 0xFA8072, "Hex: " + c.getHex());
 });
 
 test( "getHexString", function(){
-    var c = new THREE.Color('red');
+    var c = new THREE.Color('tomato');
     var res = c.getHexString();
-    ok( res == 'ff0000', "Hex: " + res );
+    ok( res == 'ff6347', "Hex: " + res );
 });
 
 test( "getStyle", function(){
-    var c = new THREE.Color('red');    
+    var c = new THREE.Color('plum');    
     var res = c.getStyle();
-    ok( res == 'rgb(255,0,0)', "style: " + res );
+    ok( res == 'rgb(221,160,221)', "style: " + res );
 });
 
 test( "getHSV", function(){
-    var c = new THREE.Color('red');    
+    var c = new THREE.Color('maroon');    
     var hsv = c.getHSV();
 
     ok( hsv.h == 0, "hue: " + hsv.h );
     ok( hsv.s == 1, "saturation: " + hsv.s );
-    ok( hsv.v == 1, "value: " + hsv.v );
+    ok( (Math.round(parseFloat(hsv.v)*100)/100) == 0.5, 
+	"value: " + hsv.v );
 });
 
 test( "setHSV", function(){
