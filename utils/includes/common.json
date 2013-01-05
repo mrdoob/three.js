@@ -38,7 +38,6 @@
 	"../src/lights/PointLight.js",
 	"../src/lights/SpotLight.js",
 	"../src/loaders/Loader.js",
-	"../src/loaders/BinaryLoader.js",
 	"../src/loaders/ImageLoader.js",
 	"../src/loaders/JSONLoader.js",
 	"../src/loaders/LoadingMonitor.js",

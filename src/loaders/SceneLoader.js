@@ -15,7 +15,6 @@ THREE.SceneLoader = function () {
 	this.hierarchyHandlerMap = {};
 
 	this.addGeometryHandler( "ascii", THREE.JSONLoader );
-	this.addGeometryHandler( "binary", THREE.BinaryLoader );
 
 };
 
