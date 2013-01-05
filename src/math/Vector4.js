@@ -101,7 +101,14 @@ THREE.Vector4.prototype = {
 
 	},
 
-	add: function ( v ) {
+	add: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector4\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			return this.addVectors( v, w );
+
+		}
 
 		this.x += v.x;
 		this.y += v.y;
@@ -134,7 +141,14 @@ THREE.Vector4.prototype = {
 
 	},
 
-	sub: function ( v ) {
+	sub: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector4\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			return this.subVectors( v, w );
+
+		}
 
 		this.x -= v.x;
 		this.y -= v.y;

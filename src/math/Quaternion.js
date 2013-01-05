@@ -231,12 +231,25 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	multiply: function ( b ) {
+	multiply: function ( q, p ) {
+
+		if ( p !== undefined ) {
+
+			console.warn( 'DEPRECATED: Quaternion\'s .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			return this.multiplyQuaternions( q, p );
+
+		}
+
+		return this.multiplyQuaternions( this, q );
+
+	},
+
+	multiplyQuaternions: function ( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 
-		var qax = this.x, qay = this.y, qaz = this.z, qaw = this.w,
-		qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
+		var qax = a.x, qay = a.y, qaz = a.z, qaw = a.w;
+		var qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
 
 		this.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
 		this.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
@@ -244,12 +257,6 @@ THREE.Quaternion.prototype = {
 		this.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
 		return this;
-
-	},
-
-	multiplyQuaternions: function ( a, b ) {
-
-		return this.copy( a ).multiply( b );
 
 	},
 

@@ -248,7 +248,14 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiply: function ( m ) {
+	multiply: function ( m, n ) {
+
+		if ( n !== undefined ) {
+
+			console.warn( 'DEPRECATED: Matrix4\'s .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
+			return this.multiplyMatrices( m, n );
+
+		}
 
 		return this.multiplyMatrices( this, m );
 

@@ -723,7 +723,14 @@ THREE.Vector2.prototype = {
 
 	},
 
-	add: function ( v ) {
+	add: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector2\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			return this.addVectors( v, w );
+
+		}
 
 		this.x += v.x;
 		this.y += v.y;
@@ -750,7 +757,14 @@ THREE.Vector2.prototype = {
 
 	},
 
-	sub: function ( v ) {
+	sub: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector2\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			return this.subVectors( v, w );
+
+		}
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -1028,7 +1042,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	add: function ( v ) {
+	add: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			return this.addVectors( v, w );
+
+		}
 
 		this.x += v.x;
 		this.y += v.y;
@@ -1058,7 +1079,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	sub: function ( v ) {
+	sub: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			return this.subVectors( v, w );
+
+		}
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -1078,7 +1106,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiply: function ( v ) {
+	multiply: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			return this.multiplyVectors( v, w );
+
+		}
 
 		this.x *= v.x;
 		this.y *= v.y;
@@ -1344,7 +1379,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	cross: function ( v ) {
+	cross: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
+			return this.crossVectors( v, w );
+
+		}
 
 		var x = this.x, y = this.y, z = this.z;
 
@@ -1707,7 +1749,14 @@ THREE.Vector4.prototype = {
 
 	},
 
-	add: function ( v ) {
+	add: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector4\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			return this.addVectors( v, w );
+
+		}
 
 		this.x += v.x;
 		this.y += v.y;
@@ -1740,7 +1789,14 @@ THREE.Vector4.prototype = {
 
 	},
 
-	sub: function ( v ) {
+	sub: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector4\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			return this.subVectors( v, w );
+
+		}
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -3168,7 +3224,14 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	multiply: function ( m ) {
+	multiply: function ( m, n ) {
+
+		if ( n !== undefined ) {
+
+			console.warn( 'DEPRECATED: Matrix4\'s .multiply() now only accepts one argument. Use .multiplyMatrices( a, b ) instead.' );
+			return this.multiplyMatrices( m, n );
+
+		}
 
 		return this.multiplyMatrices( this, m );
 
@@ -4944,12 +5007,25 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	multiply: function ( b ) {
+	multiply: function ( q, p ) {
+
+		if ( p !== undefined ) {
+
+			console.warn( 'DEPRECATED: Quaternion\'s .multiply() now only accepts one argument. Use .multiplyQuaternions( a, b ) instead.' );
+			return this.multiplyQuaternions( q, p );
+
+		}
+
+		return this.multiplyQuaternions( this, q );
+
+	},
+
+	multiplyQuaternions: function ( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 
-		var qax = this.x, qay = this.y, qaz = this.z, qaw = this.w,
-		qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
+		var qax = a.x, qay = a.y, qaz = a.z, qaw = a.w;
+		var qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
 
 		this.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
 		this.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
@@ -4957,12 +5033,6 @@ THREE.Quaternion.prototype = {
 		this.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
 
 		return this;
-
-	},
-
-	multiplyQuaternions: function ( a, b ) {
-
-		return this.copy( a ).multiply( b );
 
 	},
 

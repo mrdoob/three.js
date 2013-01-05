@@ -90,7 +90,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	add: function ( v ) {
+	add: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .add() now only accepts one argument. Use .addVectors( a, b ) instead.' );
+			return this.addVectors( v, w );
+
+		}
 
 		this.x += v.x;
 		this.y += v.y;
@@ -120,7 +127,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	sub: function ( v ) {
+	sub: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .sub() now only accepts one argument. Use .subVectors( a, b ) instead.' );
+			return this.subVectors( v, w );
+
+		}
 
 		this.x -= v.x;
 		this.y -= v.y;
@@ -140,7 +154,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiply: function ( v ) {
+	multiply: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .multiply() now only accepts one argument. Use .multiplyVectors( a, b ) instead.' );
+			return this.multiplyVectors( v, w );
+
+		}
 
 		this.x *= v.x;
 		this.y *= v.y;
@@ -406,7 +427,14 @@ THREE.Vector3.prototype = {
 
 	},
 
-	cross: function ( v ) {
+	cross: function ( v, w ) {
+
+		if ( w !== undefined ) {
+
+			console.warn( 'DEPRECATED: Vector3\'s .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
+			return this.crossVectors( v, w );
+
+		}
 
 		var x = this.x, y = this.y, z = this.z;
 
