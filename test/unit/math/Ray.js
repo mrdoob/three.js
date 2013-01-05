@@ -85,6 +85,33 @@ test( "distanceToPoint", function() {
 	ok( c == 0, "Passed!" );
 });
 
+test("distanceToRay", function () {
+	var o0 = new THREE.Vector3( 1, 2, 3 );
+	var d0 = new THREE.Vector3( 4, 5, 6 );
+	var ray0 = new THREE.Ray( o0, d0 );
+
+	var o1 = new THREE.Vector3( 7, 8, 9 );
+	var d1 = new THREE.Vector3( 8, 10, 12 );
+	
+	var ray01 = new THREE.Ray( o0, d1 );
+	var ray1 = new THREE.Ray( o1, d1 );
+
+	var d = ray0.distanceToRay( ray01 );
+	ok(d==0,"Passed!");
+	ok(ray01.distanceToRay( ray0 ) == 0,"Passed!");
+	
+	d = ray0.distanceToRay( ray1 );
+	var ddo = o1.clone().sub(o0);
+	var dd = o1.length();
+	ok(d<=dd,"Passed!");
+	ok(d==ray1.distanceToRay( ray0 ),"Passed!");
+	
+	d1.z = 0; // so d1 is no more parallel to d0
+	d = ray0.distanceToRay( ray01 );
+	ok(d==0,"Passed!");
+	ok(ray01.distanceToRay( ray0 ) == 0,"Passed!");
+});
+
 test( "isIntersectionSphere", function() {
 	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
 	var b = new THREE.Sphere( zero3, 0.5 );

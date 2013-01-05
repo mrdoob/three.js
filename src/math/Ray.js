@@ -51,7 +51,8 @@ THREE.Ray.prototype = {
 	closestPointToPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		result.subVectors( point, this.origin );
+		result.copy( point );
+		result.sub( this.origin );
 		var directionDistance = result.dot( this.direction );
 
 		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
@@ -60,11 +61,29 @@ THREE.Ray.prototype = {
 
 	distanceToPoint: function ( point ) {
 
-		var directionDistance = THREE.Ray.__v1.subVectors( point, this.origin ).dot( this.direction );
+		var directionDistance = THREE.Ray.__v1.copy( point ).sub( this.origin ).dot( this.direction );		
 		THREE.Ray.__v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 		return THREE.Ray.__v1.distanceTo( point );
 
+	},
+
+	distanceToRay : function ( otherRay ) {
+		var origin0 = this.origin;
+		var direction0 = this.direction;
+		var origin1 = otherRay.origin;
+		var direction1 = otherRay.direction;
+		
+		var diffOrigins = origin1.clone().sub(origin0);
+		var directionPerpendicular = direction0.clone().cross( direction1 );
+		if( directionPerpendicular.length() == 0 ) { // direction0 is parallel to direction1
+			return diffOrigins.cross( direction0 ).length() / direction0.length();  
+		} else {
+			// see e.g. http://nibis.ni.schule.de/~lbs-gym/Vektorpdf/windschiefeGeraden.pdf
+			directionPerpendicular.normalize();
+			directionPerpendicular.multiply( diffOrigins );
+			return Math.abs(directionPerpendicular.x + directionPerpendicular.y + directionPerpendicular.z);
+		}
 	},
 
 	isIntersectionSphere: function( sphere ) {
@@ -133,8 +152,8 @@ THREE.Ray.prototype = {
 
 	transform: function ( matrix4 ) {
 
-		this.direction.add( this.origin ).applyMatrix4( matrix4 );
-		this.origin.applyMatrix4( matrix4 );
+		this.direction = this.direction.add( this.origin ).applyMatrix4( matrix4 );
+		this.origin = this.origin.applyMatrix4( matrix4 );
 		this.direction.sub( this.origin );
 
 		return this;
