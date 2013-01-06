@@ -6434,8 +6434,9 @@ THREE.Projector = function() {
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
 					_vertex.positionScreen.y /= _vertex.positionScreen.w;
+					_vertex.positionScreen.z /= _vertex.positionScreen.w;
 
-					_vertex.visible = _vertex.positionScreen.z > near && _vertex.positionScreen.z < far;
+					_vertex.visible = _vertex.positionScreen.z > -1 && _vertex.positionScreen.z < 1;
 
 				}
 
