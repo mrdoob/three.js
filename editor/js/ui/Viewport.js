@@ -667,16 +667,16 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.exportGeometry.add( function () {
+	signals.exportGeometry.add( function ( object ) {
 
-		if ( !selected.geometry ) {
+		if ( selected.geometry === undefined ) {
 
 			console.warn( "Selected object doesn't have any geometry" );
 			return;
 
 		}
 
-		var output = new THREE.GeometryExporter().parse( selected.geometry );
+		var output = new object.exporter().parse( selected.geometry );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
