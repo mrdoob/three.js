@@ -161,18 +161,18 @@ THREE.GeometryExporter.prototype = {
 
 		//
 
-		var output = [
-			'{',
-			'	"metadata": {',
-			'		"formatVersion" : 3.1,',
-			'		"generatedBy"	: "GeometryExporter"',
-			'	},',
-			'	"vertices": ' + JSON.stringify( vertices ) + ',',
-			'	"normals": ' + JSON.stringify( normals ) + ',',
-			'	"uvs": ' + JSON.stringify( uvs ) + ',',
-			'	"faces": ' + JSON.stringify( faces ),
-			'}'
-		].join( '\n' );
+		var output = JSON.stringify( {
+			metadata: {
+				formatVersion: 3.1,
+				generatedBy: "GeometryExporter",
+			},
+			vertices: vertices,
+			normals: normals,
+			uvs: uvs,
+			faces: faces
+		}, null, '\t' );
+
+		// output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		return output;
 
