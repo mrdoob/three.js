@@ -52,8 +52,6 @@ THREE.ColladaLoader = function () {
 	var colladaUp = 'Y';
 	var upConversion = null;
 
-	var TO_RADIANS = Math.PI / 180;
-
 	function load ( url, readyCallback, progressCallback ) {
 
 		var length = 0;
@@ -446,7 +444,7 @@ THREE.ColladaLoader = function () {
 
 			for ( var i = 0; i < geometry.vertices.length; i ++ ) {
 
-				skin.bindShapeMatrix.multiplyVector3( geometry.vertices[ i ] );
+				geometry.vertices[ i ].applyMatrix4( skin.bindShapeMatrix );
 
 			}
 
@@ -474,7 +472,7 @@ THREE.ColladaLoader = function () {
 
 		if ( parent ) {
 
-			node.world.multiply( parent, node.world );
+			node.world.multiplyMatrices( parent, node.world );
 
 		}
 
@@ -516,7 +514,7 @@ THREE.ColladaLoader = function () {
 
 				bone.invBindMatrix = inv;
 				bone.skinningMatrix = new THREE.Matrix4();
-				bone.skinningMatrix.multiply(bone.world, inv); // (IBMi * JMi)
+				bone.skinningMatrix.multiplyMatrices(bone.world, inv); // (IBMi * JMi)
 
 				bone.weights = [];
 
@@ -577,7 +575,7 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < geometry.vertices.length; i ++ ) {
 
-			skinController.skin.bindShapeMatrix.multiplyVector3( geometry.vertices[i] );
+			geometry.vertices[i].applyMatrix4( skinController.skin.bindShapeMatrix );
 
 		}
 
@@ -621,7 +619,7 @@ THREE.ColladaLoader = function () {
 					v.y = o.y;
 					v.z = o.z;
 
-					bones[i].skinningMatrix.multiplyVector3(v);
+					v.applyMatrix4( bones[i].skinningMatrix );
 
 					s.x += (v.x * weight);
 					s.y += (v.y * weight);
@@ -851,8 +849,10 @@ THREE.ColladaLoader = function () {
 		if ( options.centerGeometry && obj.geometry ) {
 
 			var delta = THREE.GeometryUtils.center( obj.geometry );
-			obj.quaternion.multiplyVector3( delta.multiplySelf( obj.scale ) );
-			obj.position.subSelf( delta );
+			delta.multiply( obj.scale );
+			delta.applyQuaternion( obj.quaternion );
+
+			obj.position.sub( delta );
 
 		}
 
@@ -989,25 +989,25 @@ THREE.ColladaLoader = function () {
 
 					if ( value instanceof THREE.Matrix4 ) {
 
-						matrix = matrix.multiply( matrix, value );
+						matrix.multiplyMatrices( matrix, value );
 
 					} else {
 
 						// FIXME: handle other types
 
-						matrix = matrix.multiply( matrix, transform.matrix );
+						matrix.multiplyMatrices( matrix, transform.matrix );
 
 					}
 
 				} else {
 
-					matrix = matrix.multiply( matrix, transform.matrix );
+					matrix.multiplyMatrices( matrix, transform.matrix );
 
 				}
 
 			} else {
 
-				matrix = matrix.multiply( matrix, transform.matrix );
+				matrix.multiplyMatrices( matrix, transform.matrix );
 
 			}
 
@@ -1920,7 +1920,7 @@ THREE.ColladaLoader = function () {
 
 			case 'rotate':
 
-				this.angle = this.data[3] * TO_RADIANS;
+				this.angle = THREE.Math.degToRad( this.data[3] );
 
 			case 'translate':
 
@@ -1948,22 +1948,26 @@ THREE.ColladaLoader = function () {
 
 			case 'matrix':
 
-				matrix.multiplySelf( this.obj );
+				matrix.multiply( this.obj );
+
 				break;
 
 			case 'translate':
 
 				matrix.translate( this.obj );
+
 				break;
 
 			case 'rotate':
 
 				matrix.rotateByAxis( this.obj, this.angle );
+
 				break;
 
 			case 'scale':
 
 				matrix.scale( this.obj );
+
 				break;
 
 		}
@@ -2101,7 +2105,7 @@ THREE.ColladaLoader = function () {
 
 					case 'ANGLE':
 
-						this.angle = data * TO_RADIANS;
+						this.angle = THREE.Math.degToRad( data );
 						break;
 
 					default:
@@ -2109,7 +2113,7 @@ THREE.ColladaLoader = function () {
 						this.obj.x = data[ 0 ];
 						this.obj.y = data[ 1 ];
 						this.obj.z = data[ 2 ];
-						this.angle = data[ 3 ] * TO_RADIANS;
+						this.angle = THREE.Math.degToRad( data[ 3 ] );
 						break;
 
 				}
@@ -3104,27 +3108,28 @@ THREE.ColladaLoader = function () {
 
 						if ( cot.isTexture() ) {
 
-							if ( this.effect.sampler && this.effect.surface ) {
+							var samplerId = cot.texture;
+							var surfaceId = this.effect.sampler[samplerId].source;
+              
 
-								if ( this.effect.sampler.source == this.effect.surface.sid ) {
+							if (surfaceId) {
 
-									var image = images[this.effect.surface.init_from];
+								var surface = this.effect.surface[surfaceId];
+								var image = images[surface.init_from];
 
-									if ( image ) {
+								if (image) {
 
-										var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
-										texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-										texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
-										texture.offset.x = cot.texOpts.offsetU;
-										texture.offset.y = cot.texOpts.offsetV;
-										texture.repeat.x = cot.texOpts.repeatU;
-										texture.repeat.y = cot.texOpts.repeatV;
-										props['map'] = texture;
+									var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+									texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+									texture.offset.x = cot.texOpts.offsetU;
+									texture.offset.y = cot.texOpts.offsetV;
+									texture.repeat.x = cot.texOpts.repeatU;
+									texture.repeat.y = cot.texOpts.repeatV;
+									props['map'] = texture;
 
-										// Texture with baked lighting?
-										if ( prop === 'emission' ) props[ 'emissive' ] = 0xffffff;
-
-									}
+									// Texture with baked lighting?
+									if (prop === 'emission') props['emissive'] = 0xffffff;
 
 								}
 
@@ -3192,21 +3197,21 @@ THREE.ColladaLoader = function () {
 
 			case 'constant':
 
-				props.color = props.emission;
+				if (props.emissive != undefined) props.color = props.emissive;
 				this.material = new THREE.MeshBasicMaterial( props );
 				break;
 
 			case 'phong':
 			case 'blinn':
 
-				props.color = props.diffuse;
+				if (props.diffuse != undefined) props.color = props.diffuse;
 				this.material = new THREE.MeshPhongMaterial( props );
 				break;
 
 			case 'lambert':
 			default:
 
-				props.color = props.diffuse;
+				if (props.diffuse != undefined) props.color = props.diffuse;
 				this.material = new THREE.MeshLambertMaterial( props );
 				break;
 
@@ -3325,8 +3330,8 @@ THREE.ColladaLoader = function () {
 		this.id = "";
 		this.name = "";
 		this.shader = null;
-		this.surface = null;
-		this.sampler = null;
+		this.surface = {};
+		this.sampler = {};
 
 	};
 
@@ -3385,14 +3390,12 @@ THREE.ColladaLoader = function () {
 
 				case 'surface':
 
-					this.surface = ( new Surface( this ) ).parse( child );
-					this.surface.sid = sid;
+					this.surface[sid] = ( new Surface( this ) ).parse( child );
 					break;
 
 				case 'sampler2D':
 
-					this.sampler = ( new Sampler2D( this ) ).parse( child );
-					this.sampler.sid = sid;
+					this.sampler[sid] = ( new Sampler2D( this ) ).parse( child );
 					break;
 
 				case 'extra':

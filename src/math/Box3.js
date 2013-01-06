@@ -81,8 +81,8 @@ THREE.Box3.prototype = {
 
 		var halfSize = THREE.Box3.__v1.copy( size ).multiplyScalar( 0.5 );
 
-		this.min.copy( center ).subSelf( halfSize );
-		this.max.copy( center ).addSelf( halfSize );
+		this.min.copy( center ).sub( halfSize );
+		this.max.copy( center ).add( halfSize );
 
 		return this;
 
@@ -117,21 +117,21 @@ THREE.Box3.prototype = {
 	center: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return result.add( this.min, this.max ).multiplyScalar( 0.5 );
+		return result.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
 	},
 
 	size: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return result.sub( this.max, this.min );
+		return result.subVectors( this.max, this.min );
 
 	},
 
 	expandByPoint: function ( point ) {
 
-		this.min.minSelf( point );
-		this.max.maxSelf( point );
+		this.min.min( point );
+		this.max.max( point );
 
 		return this;
 
@@ -139,8 +139,8 @@ THREE.Box3.prototype = {
 
 	expandByVector: function ( vector ) {
 
-		this.min.subSelf( vector );
-		this.max.addSelf( vector );
+		this.min.sub( vector );
+		this.max.add( vector );
 
 		return this;
 
@@ -215,21 +215,32 @@ THREE.Box3.prototype = {
 	clampPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return new THREE.Vector3().copy( point ).clampSelf( this.min, this.max );
+		return new THREE.Vector3().copy( point ).clamp( this.min, this.max );
 
 	},
 
 	distanceToPoint: function ( point ) {
 
-		var clampedPoint = THREE.Box3.__v1.copy( point ).clampSelf( this.min, this.max );
-		return clampedPoint.subSelf( point ).length();
+		var clampedPoint = THREE.Box3.__v1.copy( point ).clamp( this.min, this.max );
+		return clampedPoint.sub( point ).length();
+
+	},
+
+	getBoundingSphere: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Sphere();
+
+		result.center = this.center();
+		result.radius = this.size( THREE.Box3.__v0 ).length() * 0.5;
+
+		return result;
 
 	},
 
 	intersect: function ( box ) {
 
-		this.min.maxSelf( box.min );
-		this.max.minSelf( box.max );
+		this.min.max( box.min );
+		this.max.min( box.max );
 
 		return this;
 
@@ -237,8 +248,30 @@ THREE.Box3.prototype = {
 
 	union: function ( box ) {
 
-		this.min.minSelf( box.min );
-		this.max.maxSelf( box.max );
+		this.min.min( box.min );
+		this.max.max( box.max );
+
+		return this;
+
+	},
+
+	transform: function ( matrix ) {
+
+		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+		var newPoints = [
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ),
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 000
+			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 001
+			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 010
+			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ), // 011
+			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 100
+			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 101
+			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 110
+			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix )  // 111
+		];
+
+		this.makeEmpty();
+		this.setFromPoints( newPoints );
 
 		return this;
 
@@ -246,17 +279,8 @@ THREE.Box3.prototype = {
 
 	translate: function ( offset ) {
 
-		this.min.addSelf( offset );
-		this.max.addSelf( offset );
-
-		return this;
-
-	},
-
-	scale: function ( factor ) {
-
-		var sizeDeltaHalf = this.size().multiplyScalar( ( factor - 1 )  * 0.5 );
-		this.expandByVector( sizeDeltaHalf );
+		this.min.add( offset );
+		this.max.add( offset );
 
 		return this;
 
@@ -276,4 +300,11 @@ THREE.Box3.prototype = {
 
 };
 
+THREE.Box3.__v0 = new THREE.Vector3();
 THREE.Box3.__v1 = new THREE.Vector3();
+THREE.Box3.__v2 = new THREE.Vector3();
+THREE.Box3.__v3 = new THREE.Vector3();
+THREE.Box3.__v4 = new THREE.Vector3();
+THREE.Box3.__v5 = new THREE.Vector3();
+THREE.Box3.__v6 = new THREE.Vector3();
+THREE.Box3.__v7 = new THREE.Vector3();

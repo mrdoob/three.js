@@ -131,7 +131,7 @@
 				for ( var i = 0; i < N; i ++ ) {
 
 					var mesh = meshes[ i ];
-					renderer.deallocateMaterial( mesh.material );
+					mesh.material.dispose();
 
 				}
 

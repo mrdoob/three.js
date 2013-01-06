@@ -36,11 +36,11 @@ THREE.Ray.prototype = {
 
 		var result = optionalTarget || new THREE.Vector3();
 
-		return result.copy( this.direction ).multiplyScalar( t ).addSelf( this.origin );
+		return result.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
 	},
 
-	recastSelf: function ( t ) {
+	recast: function ( t ) {
 
 		this.origin.copy( this.at( t, THREE.Ray.__v1 ) );
 
@@ -51,17 +51,17 @@ THREE.Ray.prototype = {
 	closestPointToPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		result.sub( point, this.origin );
+		result.subVectors( point, this.origin );
 		var directionDistance = result.dot( this.direction );
 
-		return result.copy( this.direction ).multiplyScalar( directionDistance ).addSelf( this.origin );
+		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 	},
 
 	distanceToPoint: function ( point ) {
 
-		var directionDistance = THREE.Ray.__v1.sub( point, this.origin ).dot( this.direction );		
-		THREE.Ray.__v1.copy( this.direction ).multiplyScalar( directionDistance ).addSelf( this.origin );
+		var directionDistance = THREE.Ray.__v1.subVectors( point, this.origin ).dot( this.direction );
+		THREE.Ray.__v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 		return THREE.Ray.__v1.distanceTo( point );
 
@@ -131,11 +131,11 @@ THREE.Ray.prototype = {
 
 	},
 
-	transformSelf: function ( matrix4 ) {
+	transform: function ( matrix4 ) {
 
-		this.direction = matrix4.multiplyVector3( this.direction.addSelf( this.origin ) );
-		this.origin = matrix4.multiplyVector3( this.origin );
-		this.direction.subSelf( this.origin );
+		this.direction.add( this.origin ).applyMatrix4( matrix4 );
+		this.origin.applyMatrix4( matrix4 );
+		this.direction.sub( this.origin );
 
 		return this;
 	},

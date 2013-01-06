@@ -83,9 +83,9 @@
 					object.position.y = Math.random() * 600 - 300;
 					object.position.z = Math.random() * 800 - 400;
 
-					object.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
-					object.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
-					object.rotation.z = ( Math.random() * 360 ) * Math.PI / 180;
+					object.rotation.x = Math.random() * 2 * Math.PI;
+					object.rotation.y = Math.random() * 2 * Math.PI;
+					object.rotation.z = Math.random() * 2 * Math.PI;
 
 					object.scale.x = Math.random() * 2 + 1;
 					object.scale.y = Math.random() * 2 + 1;
@@ -159,13 +159,13 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
 
 				if ( SELECTED ) {
 
 					var intersects = raycaster.intersectObject( plane );
-					SELECTED.position.copy( intersects[ 0 ].point.subSelf( offset ) );
+					SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
 					return;
 
 				}
@@ -208,7 +208,7 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -219,7 +219,7 @@
 					SELECTED = intersects[ 0 ].object;
 
 					var intersects = raycaster.intersectObject( plane );
-					offset.copy( intersects[ 0 ].point ).subSelf( plane.position );
+					offset.copy( intersects[ 0 ].point ).sub( plane.position );
 
 					container.style.cursor = 'move';
 

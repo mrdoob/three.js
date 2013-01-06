@@ -53,7 +53,7 @@ THREE.Object3D.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		this.matrix.multiply( matrix, this.matrix );
+		this.matrix.multiplyMatrices( matrix, this.matrix );
 
 		this.scale.getScaleFromMatrix( this.matrix );
 
@@ -67,7 +67,7 @@ THREE.Object3D.prototype = {
 	translate: function ( distance, axis ) {
 
 		this.matrix.rotateAxis( axis );
-		this.position.addSelf( axis.multiplyScalar( distance ) );
+		this.position.add( axis.multiplyScalar( distance ) );
 
 	},
 
@@ -91,13 +91,13 @@ THREE.Object3D.prototype = {
 
 	localToWorld: function ( vector ) {
 
-		return this.matrixWorld.multiplyVector3( vector );
+		return vector.applyMatrix4( this.matrixWorld );
 
 	},
 
 	worldToLocal: function ( vector ) {
 
-		return THREE.Object3D.__m1.getInverse( this.matrixWorld ).multiplyVector3( vector );
+		return vector.applyMatrix4( THREE.Object3D.__m1.getInverse( this.matrixWorld ) );
 
 	},
 
@@ -286,7 +286,7 @@ THREE.Object3D.prototype = {
 
 			} else {
 
-				this.matrixWorld.multiply( this.parent.matrixWorld, this.matrix );
+				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
 			}
 

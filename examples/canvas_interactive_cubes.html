@@ -61,9 +61,9 @@
 					object.scale.y = Math.random() * 2 + 1;
 					object.scale.z = Math.random() * 2 + 1;
 
-					object.rotation.x = ( Math.random() * 360 ) * Math.PI / 180;
-					object.rotation.y = ( Math.random() * 360 ) * Math.PI / 180;
-					object.rotation.z = ( Math.random() * 360 ) * Math.PI / 180;
+					object.rotation.x = Math.random() * 2 * Math.PI;
+					object.rotation.y = Math.random() * 2 * Math.PI;
+					object.rotation.z = Math.random() * 2 * Math.PI;
 
 					scene.add( object );
 
@@ -122,7 +122,7 @@
 				var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -163,11 +163,11 @@
 
 			function render() {
 
-				theta += 0.2;
+				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( theta * Math.PI / 360 );
-				camera.position.y = radius * Math.sin( theta * Math.PI / 360 );
-				camera.position.z = radius * Math.cos( theta * Math.PI / 360 );
+				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );

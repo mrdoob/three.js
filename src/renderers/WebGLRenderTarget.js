@@ -5,6 +5,8 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	THREE.EventDispatcher.call( this );
+
 	this.width = width;
 	this.height = height;
 
@@ -28,6 +30,8 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 	this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 
 	this.generateMipmaps = true;
+
+	this.shareDepthFrom = null;
 
 };
 
@@ -54,6 +58,14 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 
 	tmp.generateMipmaps = this.generateMipmaps;
 
+	tmp.shareDepthFrom = this.shareDepthFrom;
+
 	return tmp;
+
+};
+
+THREE.WebGLRenderTarget.prototype.dispose = function () {
+
+	this.dispatchEvent( { type: 'dispose' } );
 
 };

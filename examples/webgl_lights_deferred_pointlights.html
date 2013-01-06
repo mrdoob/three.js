@@ -47,8 +47,8 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/loaders/BinaryLoader.js"></script>
+		<!-- <script src="js/loaders/UTF8Loader.js"></script> -->
 
 		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
 		<script src="js/ShaderDeferred.js"></script>
@@ -61,16 +61,14 @@
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
 
-		<!--
-		<script src="js/loaders/UTF8Loader.js"></script>
-		<script src="js/loaders/MTLLoader.js"></script>
-		-->
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var SCALE = 0.75;
+			var SCALE = 1;
 			var MARGIN = 100;
 
 			var WIDTH = window.innerWidth;
@@ -111,7 +109,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, brightness: 2 } );
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true } );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -178,9 +176,7 @@
 					var light = new THREE.PointLight( 0xffffff, 2.0, distance );
 
 					c.set( Math.random(), Math.random(), Math.random() ).normalize();
-
 					light.color.setRGB( c.x, c.y, c.z );
-					light.color.convertGammaToLinear();
 
 					scene.add( light );
 					lights.push( light );
@@ -242,7 +238,7 @@
 					mapHeight.anisotropy = 4;
 					mapHeight.format = THREE.RGBFormat;
 
-					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x090909, wrapAround: true, metal: true } );
+					var material = new THREE.MeshPhongMaterial( { map: mapColor, bumpMap: mapHeight, bumpScale: 2.5, shininess: 75, specular: 0x333333, wrapAround: true, metal: true } );
 
 					var object = new THREE.Mesh( geometry, material );
 					object.scale.multiplyScalar( 8 );

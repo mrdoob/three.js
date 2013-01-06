@@ -4,6 +4,8 @@
 
 THREE.BufferGeometry = function () {
 
+	THREE.EventDispatcher.call( this );
+
 	this.id = THREE.GeometryIdCount ++;
 
 	// attributes
@@ -247,9 +249,9 @@ THREE.BufferGeometry.prototype = {
 						z = positions[ vC * 3 + 2 ];
 						pC.set( x, y, z );
 
-						cb.sub( pC, pB );
-						ab.sub( pA, pB );
-						cb.crossSelf( ab );
+						cb.subVectors( pC, pB );
+						ab.subVectors( pA, pB );
+						cb.cross( ab );
 
 						normals[ vA * 3 ]     += cb.x;
 						normals[ vA * 3 + 1 ] += cb.y;
@@ -288,9 +290,9 @@ THREE.BufferGeometry.prototype = {
 					z = positions[ i + 8 ];
 					pC.set( x, y, z );
 
-					cb.sub( pC, pB );
-					ab.sub( pA, pB );
-					cb.crossSelf( ab );
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
+					cb.cross( ab );
 
 					normals[ i ] 	 = cb.x;
 					normals[ i + 1 ] = cb.y;
@@ -450,13 +452,13 @@ THREE.BufferGeometry.prototype = {
 				( s1 * z2 - s2 * z1 ) * r
 			);
 
-			tan1[ a ].addSelf( sdir );
-			tan1[ b ].addSelf( sdir );
-			tan1[ c ].addSelf( sdir );
+			tan1[ a ].add( sdir );
+			tan1[ b ].add( sdir );
+			tan1[ c ].add( sdir );
 
-			tan2[ a ].addSelf( tdir );
-			tan2[ b ].addSelf( tdir );
-			tan2[ c ].addSelf( tdir );
+			tan2[ a ].add( tdir );
+			tan2[ b ].add( tdir );
+			tan2[ c ].add( tdir );
 
 		}
 
@@ -502,11 +504,11 @@ THREE.BufferGeometry.prototype = {
 			// Gram-Schmidt orthogonalize
 
 			tmp.copy( t );
-			tmp.subSelf( n.multiplyScalar( n.dot( t ) ) ).normalize();
+			tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
 
 			// Calculate handedness
 
-			tmp2.cross( n2, t );
+			tmp2.crossVectors( n2, t );
 			test = tmp2.dot( tan2[ v ] );
 			w = ( test < 0.0 ) ? -1.0 : 1.0;
 
@@ -539,6 +541,12 @@ THREE.BufferGeometry.prototype = {
 
 		this.hasTangents = true;
 		this.tangentsNeedUpdate = true;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

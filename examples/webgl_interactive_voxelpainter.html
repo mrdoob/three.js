@@ -33,7 +33,7 @@
 			var projector, plane, cube;
 			var mouse2D, mouse3D, raycaster,
 			rollOveredFace, isShiftDown = false,
-			theta = 45, isCtrlDown = false;
+			theta = 45 * 0.5, isCtrlDown = false;
 
 			var rollOverMesh, rollOverMaterial, voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3();
 			var cubeGeo, cubeMaterial;
@@ -174,8 +174,9 @@
 			function setVoxelPosition( intersector ) {
 
 				tmpVec.copy( intersector.face.normal );
+				tmpVec.applyMatrix4( intersector.object.matrixRotationWorld );
 
-				voxelPosition.add( intersector.point, intersector.object.matrixRotationWorld.multiplyVector3( tmpVec ) );
+				voxelPosition.addVectors( intersector.point, tmpVec );
 
 				voxelPosition.x = Math.floor( voxelPosition.x / 50 ) * 50 + 25;
 				voxelPosition.y = Math.floor( voxelPosition.y / 50 ) * 50 + 25;
@@ -272,7 +273,7 @@
 
 				if ( isShiftDown ) {
 
-					theta += mouse2D.x * 3;
+					theta += mouse2D.x * 1.5;
 
 				}
 
@@ -292,8 +293,8 @@
 
 				}
 
-				camera.position.x = 1400 * Math.sin( theta * Math.PI / 360 );
-				camera.position.z = 1400 * Math.cos( theta * Math.PI / 360 );
+				camera.position.x = 1400 * Math.sin( THREE.Math.degToRad( theta ) );
+				camera.position.z = 1400 * Math.cos( THREE.Math.degToRad( theta ) );
 
 				camera.lookAt( scene.position );
 

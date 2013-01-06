@@ -153,6 +153,7 @@
 		<script src="js/loaders/ctm/ctm.js"></script>
 		<script src="js/loaders/ctm/CTMLoader.js"></script>
 
+		<script src="js/loaders/BinaryLoader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
 		<script src="js/loaders/STLLoader.js"></script>
@@ -344,6 +345,7 @@
 
 				var loader = new THREE.SceneLoader();
 
+				loader.addGeometryHandler( "binary", THREE.BinaryLoader );
 				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
 				loader.addGeometryHandler( "vtk", THREE.VTKLoader );
 				loader.addGeometryHandler( "stl", THREE.STLLoader );

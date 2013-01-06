@@ -160,7 +160,7 @@ THREE.UVsDebug = function(geometry) {
         // label uv edge orders
         for (j = 0, jl = uv.length; j < jl; j++) {
             u = uv[j];
-            b.set(u.x, u.y).subSelf(a).divideScalar(4);
+            b.set(u.x, u.y).sub(a).divideScalar(4);
             
             b.x = u.x - b.x;
             b.y = u.y - b.y;

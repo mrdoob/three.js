@@ -114,9 +114,9 @@
 
 					var rotation = new THREE.Vector3();
 
-					rotation.x = ( Math.random() * 2 * Math.PI );
-					rotation.y = ( Math.random() * 2 * Math.PI );
-					rotation.z = ( Math.random() * 2 * Math.PI );
+					rotation.x = Math.random() * 2 * Math.PI;
+					rotation.y = Math.random() * 2 * Math.PI;
+					rotation.z = Math.random() * 2 * Math.PI;
 
 					var scale = new THREE.Vector3();
 
@@ -229,7 +229,7 @@
 
 						highlightBox.position.copy( data.position );
 						highlightBox.rotation.copy( data.rotation );
-						highlightBox.scale.copy( data.scale ).addSelf( offset );
+						highlightBox.scale.copy( data.scale ).add( offset );
 						highlightBox.visible = true;
 
 					}

@@ -118,7 +118,7 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 			var projectionMatrix = camera.projectionMatrix.clone();
 			var eyeSep = focalLength / 30 * 0.5;
 			var eyeSepOnProjection = eyeSep * _near / focalLength;
-			var ymax = _near * Math.tan( _fov * Math.PI / 360 );
+			var ymax = _near * Math.tan( THREE.Math.degToRad( _fov * 0.5 ) );
 			var xmin, xmax;
 
 			// translate xOffset
@@ -148,14 +148,14 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		}
 
-		_cameraL.matrixWorld.copy( camera.matrixWorld ).multiplySelf( eyeLeft );
+		_cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
 		_cameraL.position.copy( camera.position );
 		_cameraL.near = camera.near;
 		_cameraL.far = camera.far;
 
 		renderer.render( scene, _cameraL, _renderTargetL, true );
 
-		_cameraR.matrixWorld.copy( camera.matrixWorld ).multiplySelf( eyeRight );
+		_cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
 		_cameraR.position.copy( camera.position );
 		_cameraR.near = camera.near;
 		_cameraR.far = camera.far;

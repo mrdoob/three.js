@@ -100,34 +100,37 @@
 				var light = new THREE.Color( 0xffffff );
 				var shadow = new THREE.Color( 0x505050 );
 
+				var matrix = new THREE.Matrix4();
+				var vector = new THREE.Vector3();
+
 				var pxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pxGeometry.faces[ 0 ].materialIndex = 1;
 				pxGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
-				pxGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI / 2 ) );
-				pxGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 50, 0, 0 ) );
+				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
+				pxGeometry.applyMatrix( matrix.makeTranslation( vector.set( 50, 0, 0 ) ) );
 
 				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nxGeometry.faces[ 0 ].materialIndex = 1;
 				nxGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
-				nxGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( - Math.PI / 2 ) );
-				nxGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( - 50, 0, 0 ) );
+				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
+				nxGeometry.applyMatrix( matrix.makeTranslation( vector.set( - 50, 0, 0 ) ) );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pyGeometry.faces[ 0 ].materialIndex = 0;
 				pyGeometry.faces[ 0 ].vertexColors = [ light, light, light, light ];
-				pyGeometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
-				pyGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 50, 0 ) );
+				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
+				pyGeometry.applyMatrix( matrix.makeTranslation( vector.set( 0, 50, 0 ) ) );
 
 				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.faces[ 0 ].materialIndex = 1;
 				pzGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
-				pzGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, 50 ) );
+				pzGeometry.applyMatrix( matrix.makeTranslation( vector.set( 0, 0, 50 ) ) );
 
 				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nzGeometry.faces[ 0 ].materialIndex = 1;
 				nzGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
-				nzGeometry.applyMatrix( new THREE.Matrix4().makeRotationY( Math.PI ) );
-				nzGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0, -50 ) );
+				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
+				nzGeometry.applyMatrix( matrix.makeTranslation( vector.set( 0, 0, -50 ) ) );
 
 				//
 

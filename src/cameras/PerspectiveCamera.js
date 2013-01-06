@@ -30,7 +30,7 @@ THREE.PerspectiveCamera.prototype.setLens = function ( focalLength, frameHeight 
 
 	if ( frameHeight === undefined ) frameHeight = 24;
 
-	this.fov = 2 * Math.atan( frameHeight / ( focalLength * 2 ) ) * ( 180 / Math.PI );
+	this.fov = 2 * THREE.Math.radToDeg( Math.atan( frameHeight / ( focalLength * 2 ) ) );
 	this.updateProjectionMatrix();
 
 }
@@ -91,7 +91,7 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 	if ( this.fullWidth ) {
 
 		var aspect = this.fullWidth / this.fullHeight;
-		var top = Math.tan( this.fov * Math.PI / 360 ) * this.near;
+		var top = Math.tan( THREE.Math.degToRad( this.fov * 0.5 ) ) * this.near;
 		var bottom = -top;
 		var left = aspect * bottom;
 		var right = aspect * top;

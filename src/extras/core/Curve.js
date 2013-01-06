@@ -250,7 +250,7 @@ THREE.Curve.prototype.getTangent = function( t ) {
 	var pt1 = this.getPoint( t1 );
 	var pt2 = this.getPoint( t2 );
 
-	var vec = pt2.clone().subSelf(pt1);
+	var vec = pt2.clone().sub(pt1);
 	return vec.normalize();
 
 };
@@ -278,8 +278,8 @@ THREE.LineCurve.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.LineCurve.prototype.getPoint = function ( t ) {
 
-	var point = this.v2.clone().subSelf(this.v1);
-	point.multiplyScalar( t ).addSelf( this.v1 );
+	var point = this.v2.clone().sub(this.v1);
+	point.multiplyScalar( t ).add( this.v1 );
 
 	return point;
 
@@ -295,7 +295,7 @@ THREE.LineCurve.prototype.getPointAt = function ( u ) {
 
 THREE.LineCurve.prototype.getTangent = function( t ) {
 
-	var tangent = this.v2.clone().subSelf(this.v1);
+	var tangent = this.v2.clone().sub(this.v1);
 
 	return tangent.normalize();
 
@@ -562,9 +562,9 @@ THREE.LineCurve3 = THREE.Curve.create(
 		var r = new THREE.Vector3();
 
 
-		r.sub( this.v2, this.v1 ); // diff
+		r.subVectors( this.v2, this.v1 ); // diff
 		r.multiplyScalar( t );
-		r.addSelf( this.v1 );
+		r.add( this.v1 );
 
 		return r;
 

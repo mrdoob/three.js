@@ -67,6 +67,14 @@ THREE.Sphere.prototype = {
 
 	},
 
+	intersectsSphere: function ( sphere ) {
+
+		var radiusSum = this.radius + sphere.radius;
+
+		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
+
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
@@ -76,8 +84,8 @@ THREE.Sphere.prototype = {
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
 
-			result.subSelf( this.center ).normalize();
-			result.multiplyScalar( this.radius ).addSelf( this.center );
+			result.sub( this.center ).normalize();
+			result.multiplyScalar( this.radius ).add( this.center );
 
 		}
 
@@ -85,7 +93,7 @@ THREE.Sphere.prototype = {
 
 	},
 
-	bounds: function ( optionalTarget ) {
+	getBoundingBox: function ( optionalTarget ) {
 
 		var box = optionalTarget || new THREE.Box3();
 
@@ -96,17 +104,18 @@ THREE.Sphere.prototype = {
 
 	},
 
-	translate: function ( offset ) {
+	transform: function ( matrix ) {
 
-		this.center.addSelf( this.offset );
+		this.center.applyMatrix4( matrix );
+		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
 
 	},
 
-	scale: function ( factor ) {
+	translate: function ( offset ) {
 
-		this.radius *= factor;
+		this.center.add( offset );
 
 		return this;
 
@@ -120,7 +129,7 @@ THREE.Sphere.prototype = {
 
 	clone: function () {
 
-		return new THREE.Sphere3().copy( this );
+		return new THREE.Sphere().copy( this );
 
 	}
 

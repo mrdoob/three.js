@@ -26,7 +26,7 @@
 			var camera, scene, renderer;
 
 			init();
-			setInterval( render, 1000 / 60 );
+			animate();
 
 			function init() {
 
@@ -85,10 +85,11 @@
 
 				scene.remove( mesh );
 
-				//
+				// clean up
 
-				renderer.deallocateObject( mesh );
-				renderer.deallocateTexture( texture );
+				geometry.dispose();
+				material.dispose();
+				texture.dispose();
 
 			}
 

@@ -67,7 +67,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
 		// render depth map
@@ -88,9 +88,9 @@ THREE.DepthPassPlugin = function ( ) {
 
 			if ( object.visible ) {
 
-				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.contains( object ) ) {
+				if ( ! ( object instanceof THREE.Mesh || object instanceof THREE.ParticleSystem ) || ! ( object.frustumCulled ) || _frustum.intersectsObject( object ) ) {
 
-					object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld );
+					object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
 					webglObject.render = true;
 
@@ -167,7 +167,7 @@ THREE.DepthPassPlugin = function ( ) {
 
 			if ( object.visible ) {
 
-				object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld );
+				object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
 				_renderer.renderImmediateObject( camera, scene.__lights, fog, _depthMaterial, object );
 

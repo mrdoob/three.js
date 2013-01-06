@@ -67,13 +67,13 @@ THREE.Math = {
 
 	},
 
-	degreesToRadians: function ( degrees ) {
+	degToRad: function ( degrees ) {
 
 		return degrees * THREE.Math.__d2r;
 
 	},
 
-	radiansToDegrees: function ( radians ) {
+	radToDeg: function ( radians ) {
 
 		return radians * THREE.Math.__r2d;
 

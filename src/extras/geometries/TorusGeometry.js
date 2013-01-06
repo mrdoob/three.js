@@ -36,7 +36,7 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 			this.vertices.push( vertex );
 
 			uvs.push( new THREE.Vector2( i / this.tubularSegments, j / this.radialSegments ) );
-			normals.push( vertex.clone().subSelf( center ).normalize() );
+			normals.push( vertex.clone().sub( center ).normalize() );
 
 		}
 	}
@@ -52,10 +52,10 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 			var d = ( this.tubularSegments + 1 ) * j + i;
 
 			var face = new THREE.Face4( a, b, c, d, [ normals[ a ], normals[ b ], normals[ c ], normals[ d ] ] );
-			face.normal.addSelf( normals[ a ] );
-			face.normal.addSelf( normals[ b ] );
-			face.normal.addSelf( normals[ c ] );
-			face.normal.addSelf( normals[ d ] );
+			face.normal.add( normals[ a ] );
+			face.normal.add( normals[ b ] );
+			face.normal.add( normals[ c ] );
+			face.normal.add( normals[ d ] );
 			face.normal.normalize();
 
 			this.faces.push( face );

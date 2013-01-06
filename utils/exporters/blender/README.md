@@ -2,8 +2,6 @@
 
 Imports and exports Three.js' ASCII JSON format.
 
-Assumes Blender version 2.60.
-
 ## Installation
 
 Copy the io_mesh_threejs folder to the scripts/addons folder. If it doesn't exist, create it. The full path is OS-dependent (see below).
@@ -17,21 +15,20 @@ Goto Usage.
 
 Should look like this:
 
-    C:\Users\USERNAME\AppData\Roaming\Blender Foundation\Blender\2.60\scripts\addons
+    C:\Users\USERNAME\AppData\Roaming\Blender Foundation\Blender\2.6X\scripts\addons
 
 ### OSX
 
 Depends on where blender.app is. Assuming you copied it to your Applications folder:
 
-    /Applications/Blender/blender.app/Contents/MacOS/2.60/scripts/addons
+    /Applications/Blender/blender.app/Contents/MacOS/2.6X/scripts/addons
 
 ### Linux
 
 By default, this should look like:
 
-    /home/USERNAME/.blender/2.60/scripts/addons
+    /home/USERNAME/.blender/2.6X/scripts/addons
 
 ## Usage
 
 Use the regular Import and Export menu within Blender, select `Three.js (js)`.
-

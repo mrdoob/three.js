@@ -298,7 +298,7 @@
 
 				dPlanet = camera.position.length();
 
-				dMoonVec.sub( camera.position, meshMoon.position );
+				dMoonVec.subVectors( camera.position, meshMoon.position );
 				dMoon = dMoonVec.length();
 
 				if ( dMoon < dPlanet ) {

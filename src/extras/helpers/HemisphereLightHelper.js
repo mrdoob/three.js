@@ -21,20 +21,14 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 	// sky color
 
 	this.color = light.color.clone();
-
-	this.color.r *= intensity;
-	this.color.g *= intensity;
-	this.color.b *= intensity;
+	this.color.multiplyScalar( intensity );
 
 	var hexColor = this.color.getHex();
 
 	// ground color
 
 	this.groundColor = light.groundColor.clone();
-
-	this.groundColor.r *= intensity;
-	this.groundColor.g *= intensity;
-	this.groundColor.b *= intensity;
+	this.groundColor.multiplyScalar( intensity );
 
 	var hexColorGround = this.groundColor.getHex();
 
@@ -104,15 +98,10 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 	var intensity = THREE.Math.clamp( this.light.intensity, 0, 1 );
 
 	this.color.copy( this.light.color );
+	this.color.multiplyScalar( intensity );
+
 	this.groundColor.copy( this.light.groundColor );
-
-	this.color.r *= intensity;
-	this.color.g *= intensity;
-	this.color.b *= intensity;
-
-	this.groundColor.r *= intensity;
-	this.groundColor.g *= intensity;
-	this.groundColor.b *= intensity;
+	this.groundColor.multiplyScalar( intensity );
 
 	this.lightSphere.material.materials[ 0 ].color.copy( this.color );
 	this.lightSphere.material.materials[ 1 ].color.copy( this.groundColor );

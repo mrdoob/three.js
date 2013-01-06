@@ -1236,7 +1236,7 @@ def generate_mesh_list_from_hierarchy(node, mesh_list):
             mesh_list.append(node.GetNodeAttribute())
 
     for i in range(node.GetChildCount()):
-        generate_embed_list_from_hierarchy(node.GetChild(i), mesh_list)
+        generate_mesh_list_from_hierarchy(node.GetChild(i), mesh_list)
 
 def generate_mesh_list(scene):
     mesh_list = []

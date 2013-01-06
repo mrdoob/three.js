@@ -17,7 +17,7 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/renderers/SVGRenderer.js"></script>
-		<script src="js/renderers/SoftwareRenderer3.js"></script>
+		<script src="js/renderers/SoftwareRenderer.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="obj/Qrcode.js"></script>
@@ -33,7 +33,7 @@
 			var camera, scene;
 			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
 
-			var mesh, group, qrcode;
+			var mesh, group;
 
 			var mouseX = 0, mouseY = 0;
 
@@ -55,7 +55,7 @@
 
 				// QRCODE
 
-				qrcode = mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshLambertMaterial( { /*emissive: 0xff0000,*/ vertexColors: THREE.FaceColors } ) );
+				mesh = new THREE.Mesh( new Qrcode(), new THREE.MeshLambertMaterial( { /*emissive: 0xff0000,*/ vertexColors: THREE.FaceColors } ) );
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 2;
 				scene.add( mesh );
 
@@ -106,9 +106,9 @@
 					var v1 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
 					var v2 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
 
-					v0.addSelf( v );
-					v1.addSelf( v );
-					v2.addSelf( v );
+					v0.add( v );
+					v1.add( v );
+					v2.add( v );
 
 					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, i );
 
@@ -146,7 +146,7 @@
 				svgRenderer.setQuality( 'low' );
 				container.appendChild( svgRenderer.domElement );
 
-				softwareRenderer = new THREE.SoftwareRenderer3();
+				softwareRenderer = new THREE.SoftwareRenderer();
 				softwareRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( softwareRenderer.domElement );
 
@@ -210,11 +210,6 @@
 				camera.lookAt( scene.position );
 
 				group.rotation.y += 0.01;
-
-				/*
-				qrcode.rotation.x += 0.01;
-				qrcode.rotation.z += 0.02;
-				*/
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );

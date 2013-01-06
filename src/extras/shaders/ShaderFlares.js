@@ -9,10 +9,11 @@ THREE.ShaderFlares = {
 
 		vertexShader: [
 
+			"uniform lowp int renderType;",
+
 			"uniform vec3 screenPosition;",
 			"uniform vec2 scale;",
 			"uniform float rotation;",
-			"uniform int renderType;",
 
 			"uniform sampler2D occlusionMap;",
 
@@ -58,11 +59,10 @@ THREE.ShaderFlares = {
 
 		fragmentShader: [
 
-			"precision mediump float;",
+			"uniform lowp int renderType;",
 
 			"uniform sampler2D map;",
 			"uniform float opacity;",
-			"uniform int renderType;",
 			"uniform vec3 color;",
 
 			"varying vec2 vUV;",
@@ -103,10 +103,11 @@ THREE.ShaderFlares = {
 
 		vertexShader: [
 
+			"uniform lowp int renderType;",
+
 			"uniform vec3 screenPosition;",
 			"uniform vec2 scale;",
 			"uniform float rotation;",
-			"uniform int renderType;",
 
 			"attribute vec2 position;",
 			"attribute vec2 uv;",
@@ -136,10 +137,11 @@ THREE.ShaderFlares = {
 
 			"precision mediump float;",
 
+			"uniform lowp int renderType;",
+
 			"uniform sampler2D map;",
 			"uniform sampler2D occlusionMap;",
 			"uniform float opacity;",
-			"uniform int renderType;",
 			"uniform vec3 color;",
 
 			"varying vec2 vUV;",
