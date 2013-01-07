@@ -64,51 +64,48 @@
 				scene = new THREE.Scene();
 
 
-        var segments = 10000;
+				var segments = 10000;
 
-        var geometry = new THREE.BufferGeometry();
-        var material = new THREE.LineBasicMaterial({ vertexColors: true });
+				var geometry = new THREE.BufferGeometry();
+				var material = new THREE.LineBasicMaterial({ vertexColors: true });
 
-        geometry.attributes = {
-          position: {
-            itemSize: 3,
-            array: new Float32Array(segments * 3),
-            numItems: segments * 3
-          },
-          color: {
-            itemSize: 3,
-            array: new Float32Array(segments * 3),
-            numItems: segments * 3
-          }
-        };
+				geometry.attributes = {
+					position: {
+						itemSize: 3,
+						array: new Float32Array(segments * 3),
+						numItems: segments * 3
+					},
+					color: {
+						itemSize: 3,
+						array: new Float32Array(segments * 3),
+						numItems: segments * 3
+					}
+				};
 
-        var positions = geometry.attributes.position.array;
-        var colors = geometry.attributes.color.array;
+				var positions = geometry.attributes.position.array;
+				var colors = geometry.attributes.color.array;
 
-        var r = 800;
-        
-        for (i = 0; i < segments; i++) {
+				var r = 800;
 
-          var lat = i/segments*Math.PI*2;
-          var lon = i/segments*Math.PI*2000;
+				for ( var i = 0; i < segments; i ++ ) {
 
-          x = Math.random()*r-r/2;
-          y = Math.random()*r-r/2;
-          z = Math.random()*r-r/2;
+					var x = Math.random() * r - r / 2;
+					var y = Math.random() * r - r / 2;
+					var z = Math.random() * r - r / 2;
 
-          // positions
+					// positions
 
-          positions[ i*3 ] = x;
-          positions[ i*3 + 1 ] = y;
-          positions[ i*3 + 2 ] = z;
+					positions[ i * 3 ] = x;
+					positions[ i * 3 + 1 ] = y;
+					positions[ i * 3 + 2 ] = z;
 
-          // colors
+					// colors
 
-          colors[ i*3 ] = ( x / r ) + 0.5;
-          colors[ i*3 + 1 ] = ( y / r ) + 0.5;
-          colors[ i*3 + 2 ] = ( z / r ) + 0.5;
+					colors[ i * 3 ] = ( x / r ) + 0.5;
+					colors[ i * 3 + 1 ] = ( y / r ) + 0.5;
+					colors[ i * 3 + 2 ] = ( z / r ) + 0.5;
 
-        }
+				}
 
 				geometry.computeBoundingSphere();
 
