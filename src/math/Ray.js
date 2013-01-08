@@ -4,9 +4,8 @@
 
 THREE.Ray = function ( origin, direction ) {
 
-
-	this.origin = origin !== undefined ? origin.clone() : new THREE.Vector3();
-	this.direction = direction !== undefined ? direction.clone() : new THREE.Vector3();
+	this.origin = ( origin !== undefined ) ? origin : new THREE.Vector3();
+	this.direction = ( direction !== undefined ) ? direction : new THREE.Vector3();
 
 };
 
