@@ -2208,8 +2208,8 @@ THREE.Vector4.prototype = {
 
 THREE.Box2 = function ( min, max ) {
 
-	this.min = min !== undefined ? min.clone() : new THREE.Vector2( Infinity, Infinity );
-	this.max = max !== undefined ? max.clone() : new THREE.Vector2( -Infinity, -Infinity );
+	this.min = ( min !== undefined ) ? min : new THREE.Vector2( Infinity, Infinity );
+	this.max = ( max !== undefined ) ? max : new THREE.Vector2( -Infinity, -Infinity );
 
 };
 
@@ -2462,8 +2462,8 @@ THREE.Box2.__v1 = new THREE.Vector2();
 
 THREE.Box3 = function ( min, max ) {
 
-	this.min = min !== undefined ? min.clone() : new THREE.Vector3( Infinity, Infinity, Infinity );
-	this.max = max !== undefined ? max.clone() : new THREE.Vector3( -Infinity, -Infinity, -Infinity );
+	this.min = ( min !== undefined ) ? min : new THREE.Vector3( Infinity, Infinity, Infinity );
+	this.max = ( max !== undefined ) ? max : new THREE.Vector3( -Infinity, -Infinity, -Infinity );
 
 };
 
@@ -4052,9 +4052,8 @@ THREE.Matrix4.__m2 = new THREE.Matrix4();
 
 THREE.Ray = function ( origin, direction ) {
 
-
-	this.origin = origin !== undefined ? origin.clone() : new THREE.Vector3();
-	this.direction = direction !== undefined ? direction.clone() : new THREE.Vector3();
+	this.origin = ( origin !== undefined ) ? origin : new THREE.Vector3();
+	this.direction = ( direction !== undefined ) ? direction : new THREE.Vector3();
 
 };
 
@@ -4211,8 +4210,8 @@ THREE.Ray.__v2 = new THREE.Vector3();
 
 THREE.Sphere = function ( center, radius ) {
 
-	this.center = center === undefined ? new THREE.Vector3() : center.clone();
-	this.radius = radius === undefined ? 0 : radius;
+	this.center = ( center !== undefined ) ? center : new THREE.Vector3();
+	this.radius = ( radius !== undefined ) ? radius : 0;
 
 };
 
@@ -4478,9 +4477,7 @@ THREE.Frustum.prototype = {
 
 	clone: function () {
 
-		var planes = this.planes;
-
-		return new THREE.Frustum( planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] );
+		return new THREE.Frustum().copy( this );
 
 	}
 
@@ -4491,8 +4488,8 @@ THREE.Frustum.prototype = {
 
 THREE.Plane = function ( normal, constant ) {
 
-	this.normal = normal !== undefined ? normal.clone() : new THREE.Vector3( 1, 0, 0 );
-	this.constant = constant !== undefined ? constant : 0;
+	this.normal = ( normal !== undefined ) ? normal : new THREE.Vector3( 1, 0, 0 );
+	this.constant = ( constant !== undefined ) ? constant : 0;
 
 };
 
@@ -5298,17 +5295,9 @@ THREE.Spline = function ( points ) {
 
 THREE.Triangle = function ( a, b, c ) {
 
-	this.a = new THREE.Vector3();
-	this.b = new THREE.Vector3();
-	this.c = new THREE.Vector3();
-
-	if( a !== undefined && b !== undefined && c !== undefined ) {
-
-		this.a.copy( a );
-		this.b.copy( b );
-		this.c.copy( c );
-
-	}
+	this.a = ( a !== undefined ) ? a : new THREE.Vector3();
+	this.b = ( b !== undefined ) ? b : new THREE.Vector3();
+	this.c = ( c !== undefined ) ? c : new THREE.Vector3();
 
 };
 
