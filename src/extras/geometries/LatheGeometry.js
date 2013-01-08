@@ -18,7 +18,7 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 	phiStart = phiStart || 0;
 	phiLength = phiLength || 2 * Math.PI;
 
-	var inversePointLength = 1.0 / points.length;
+	var inversePointLength = 1.0 / ( points.length - 1 );
 	var inverseSegments = 1.0 / segments;
 
 	for ( var i = 0, il = segments; i <= il; i ++ ) {
@@ -58,9 +58,9 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 
-			var u0 = 1 - i * inverseSegments;
+			var u0 = i * inverseSegments;
 			var v0 = j * inversePointLength;
-			var u1 = u0 - inverseSegments;
+			var u1 = u0 + inverseSegments;
 			var v1 = v0 + inversePointLength;
 
 			this.faceVertexUvs[ 0 ].push( [
@@ -76,6 +76,7 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	}
 
+	this.mergeVertices();
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();
