@@ -9,13 +9,13 @@ test( "constructor/equals", function() {
 	ok( a.origin.equals( zero3 ), "Passed!" );
 	ok( a.direction.equals( zero3 ), "Passed!" );
 
-	a = new THREE.Ray( two3, one3 );
+	a = new THREE.Ray( two3.clone(), one3.clone() );
 	ok( a.origin.equals( two3 ), "Passed!" );
 	ok( a.direction.equals( one3 ), "Passed!" );
 });
 
 test( "copy/equals", function() {
-	var a = new THREE.Ray( zero3, one3 );
+	var a = new THREE.Ray( zero3.clone(), one3.clone() );
 	var b = new THREE.Ray().copy( a );
 	ok( b.origin.equals( zero3 ), "Passed!" );
 	ok( b.direction.equals( one3 ), "Passed!" );
@@ -36,7 +36,7 @@ test( "set", function() {
 });
 
 test( "at", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 
 	ok( a.at( 0 ).equals( one3 ), "Passed!" );
 	ok( a.at( -1 ).equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
@@ -44,7 +44,7 @@ test( "at", function() {
 });
 
 test( "recast/clone", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 
 	ok( a.recast( 0 ).equals( a ), "Passed!" );
 
@@ -62,7 +62,7 @@ test( "recast/clone", function() {
 });
 
 test( "closestPointToPoint", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 
 	// nearby the ray
 	var b = a.closestPointToPoint( zero3 );
@@ -74,7 +74,7 @@ test( "closestPointToPoint", function() {
 });
 
 test( "distanceToPoint", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 
 	// nearby the ray
 	var b = a.distanceToPoint( zero3 );
@@ -86,7 +86,7 @@ test( "distanceToPoint", function() {
 });
 
 test( "isIntersectionSphere", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	var b = new THREE.Sphere( zero3, 0.5 );
 	var c = new THREE.Sphere( zero3, 1.5 );
 	var d = new THREE.Sphere( one3, 0.1 );
@@ -101,7 +101,7 @@ test( "isIntersectionSphere", function() {
 });
 
 test( "isIntersectionPlane", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 
 	// parallel plane behind
 	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), one3.clone().sub( new THREE.Vector3( 0, 0, -1 ) ) );
@@ -125,7 +125,7 @@ test( "isIntersectionPlane", function() {
 });
 
 test( "intersectPlane", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 
 	// parallel plane behind
 	var b = new THREE.Plane().setFromNormalAndCoplanarPoint( new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 1, 1, -1 ) );
@@ -150,12 +150,12 @@ test( "intersectPlane", function() {
 
 
 test( "transform", function() {
-	var a = new THREE.Ray( one3, new THREE.Vector3( 0, 0, 1 ) );
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	var m = new THREE.Matrix4().identity();
 
 	ok( a.clone().transform( m ).equals( a ), "Passed!" );
 
-	a = new THREE.Ray( zero3, new THREE.Vector3( 0, 0, 1 ) );
+	a = new THREE.Ray( zero3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	m.rotateByAxis( new THREE.Vector3( 0, 0, 1 ), Math.PI );
 	ok( a.clone().transform( m ).equals( a ), "Passed!" );
 
