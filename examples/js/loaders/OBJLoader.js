@@ -76,6 +76,9 @@ THREE.OBJLoader.prototype = {
 		var normals = [];
 		var uvs = [];
 
+		// fixes
+		data = data.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
+
 		var pattern, result;
 
 		// v float float float

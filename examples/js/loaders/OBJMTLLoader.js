@@ -257,6 +257,9 @@ THREE.OBJMTLLoader.prototype = {
 
 		};
 
+		// fixes
+		data = data.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
+
 		var lines = data.split( "\n" );
 
 		for ( var i = 0; i < lines.length; i ++ ) {
