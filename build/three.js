@@ -6425,16 +6425,13 @@ THREE.Projector = function() {
 				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					_vertex = getNextVertexInPool();
-					_vertex.positionWorld.copy( vertices[ v ] );
 
+					_vertex.positionWorld.copy( vertices[ v ] );
 					_vertex.positionWorld.applyMatrix4( _modelMatrix );
 
 					_vertex.positionScreen.copy( _vertex.positionWorld );
 					_vertex.positionScreen.applyMatrix4( _viewProjectionMatrix );
-
-					_vertex.positionScreen.x /= _vertex.positionScreen.w;
-					_vertex.positionScreen.y /= _vertex.positionScreen.w;
-					_vertex.positionScreen.z /= _vertex.positionScreen.w;
+					_vertex.positionScreen.multiplyScalar( 1 / _vertex.positionScreen.w );
 
 					_vertex.visible = _vertex.positionScreen.z > -1 && _vertex.positionScreen.z < 1;
 
