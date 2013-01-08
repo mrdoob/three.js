@@ -151,6 +151,6 @@ test( "clone", function() {
 	ok( a.planes[5].equals( p5 ), "Passed!" );
 
 	// ensure it is a true copy by modifying source
-	b.planes[0] = p1;
-	ok( a.planes[0].equals( p0 ), "Passed!" );
+	a.planes[0].copy( p1 );
+	ok( b.planes[0].equals( p0 ), "Passed!" );
 });

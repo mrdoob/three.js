@@ -5,17 +5,9 @@
 
 THREE.Triangle = function ( a, b, c ) {
 
-	this.a = new THREE.Vector3();
-	this.b = new THREE.Vector3();
-	this.c = new THREE.Vector3();
-
-	if( a !== undefined && b !== undefined && c !== undefined ) {
-
-		this.a.copy( a );
-		this.b.copy( b );
-		this.c.copy( c );
-
-	}
+	this.a = ( a !== undefined ) ? a : new THREE.Vector3();
+	this.b = ( b !== undefined ) ? b : new THREE.Vector3();
+	this.c = ( c !== undefined ) ? c : new THREE.Vector3();
 
 };
 

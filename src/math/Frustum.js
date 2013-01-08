@@ -136,9 +136,7 @@ THREE.Frustum.prototype = {
 
 	clone: function () {
 
-		var planes = this.planes;
-
-		return new THREE.Frustum( planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] );
+		return new THREE.Frustum().copy( this );
 
 	}
 

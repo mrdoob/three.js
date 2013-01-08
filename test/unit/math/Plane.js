@@ -18,13 +18,13 @@ test( "constructor", function() {
 	ok( a.normal.z == 0, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 
-	a = new THREE.Plane( one3, 0 );
+	a = new THREE.Plane( one3.clone(), 0 );
 	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 1, "Passed!" );
 	ok( a.normal.z == 1, "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 
-	a = new THREE.Plane( one3, 1 );
+	a = new THREE.Plane( one3.clone(), 1 );
 	ok( a.normal.x == 1, "Passed!" );
 	ok( a.normal.y == 1, "Passed!" );
 	ok( a.normal.z == 1, "Passed!" );
