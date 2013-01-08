@@ -91,11 +91,11 @@ test( "clone", function(){
     ok(c2.getHex() == 0x008080, "Hex c2: " + c2.getHex());
 });
 
-test( "lerpSelf", function(){
+test( "lerp", function(){
     var c = new THREE.Color();
     var c2 = new THREE.Color();
     c.setRGB(0, 0, 0);
-    c.lerpSelf(c2, 2);
+    c.lerp(c2, 2);
     ok( c.r == 2, "Red: " + c.r );
     ok( c.g == 2, "Green: " + c.g );
     ok( c.b == 2, "Blue: " + c.b );
