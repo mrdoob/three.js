@@ -8,12 +8,12 @@ THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
 
 	this.planes = [
 
-		( p0 !== undefined ) ? p0 : new THREE.Plane(),
-		( p1 !== undefined ) ? p1 : new THREE.Plane(),
-		( p2 !== undefined ) ? p2 : new THREE.Plane(),
-		( p3 !== undefined ) ? p3 : new THREE.Plane(),
-		( p4 !== undefined ) ? p4 : new THREE.Plane(),
-		( p5 !== undefined ) ? p5 : new THREE.Plane()
+		( p0 !== undefined ) ? p0.clone() : new THREE.Plane(),
+		( p1 !== undefined ) ? p1.clone() : new THREE.Plane(),
+		( p2 !== undefined ) ? p2.clone() : new THREE.Plane(),
+		( p3 !== undefined ) ? p3.clone() : new THREE.Plane(),
+		( p4 !== undefined ) ? p4.clone() : new THREE.Plane(),
+		( p5 !== undefined ) ? p5.clone() : new THREE.Plane()
 
 	];
 
@@ -136,9 +136,7 @@ THREE.Frustum.prototype = {
 
 	clone: function () {
 
-		var planes = this.planes;
-
-		return new THREE.Frustum( planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] );
+		return new THREE.Frustum().copy( this );
 
 	}
 

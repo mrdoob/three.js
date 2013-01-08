@@ -42,6 +42,9 @@ test( "constructor", function() {
 	ok( a.planes[3].equals( p3 ), "Passed!" );
 	ok( a.planes[4].equals( p4 ), "Passed!" );
 	ok( a.planes[5].equals( p5 ), "Passed!" );
+
+	p0.copy( p1 );
+	ok( ! a.planes[0].equals( p0 ), "Passed!" );
 });
 
 test( "copy", function() {
@@ -151,6 +154,6 @@ test( "clone", function() {
 	ok( a.planes[5].equals( p5 ), "Passed!" );
 
 	// ensure it is a true copy by modifying source
-	b.planes[0] = p1;
+	b.planes[0].copy( p1 );
 	ok( a.planes[0].equals( p0 ), "Passed!" );
 });
