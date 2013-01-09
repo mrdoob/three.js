@@ -6,7 +6,7 @@
  * @author gero3 / https://github.com/gero3/
  */
 
-THREE.WebGLRenderer2 = function ( parameters ) {
+THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 
 	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
 
