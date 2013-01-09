@@ -91,11 +91,15 @@
 
 					var object = event.content;
 
-					for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+					object.traverse( function ( child ) {
 
-						object.children[ i ].material.map = texture;
+						if ( child instanceof THREE.Mesh ) {
 
-					}
+							child.material.map = texture;
+
+						}
+
+					} );
 
 					object.position.y = - 80;
 					scene.add( object );
