@@ -69,7 +69,7 @@ function Particle(x, y, z, mass) {
 
 // Force -> Acceleration
 Particle.prototype.addForce = function(force) {
-	this.a.addSelf(
+	this.a.add(
 		this.tmp2.copy(force).multiplyScalar(this.invMass)
 	);
 };
@@ -77,10 +77,10 @@ Particle.prototype.addForce = function(force) {
 
 // Performs verlet integration
 Particle.prototype.integrate = function(timesq) {
-	var newPos = this.tmp.sub(this.position, this.previous);
-	newPos.multiplyScalar(DRAG).addSelf(this.position);
-	newPos.addSelf(this.a.multiplyScalar(timesq));
-	
+	var newPos = this.tmp.subVectors(this.position, this.previous);
+	newPos.multiplyScalar(DRAG).add(this.position);
+	newPos.add(this.a.multiplyScalar(timesq));
+
 	this.tmp = this.previous;
 	this.previous = this.position;
 	this.position = newPos;
@@ -92,13 +92,13 @@ Particle.prototype.integrate = function(timesq) {
 var diff = new THREE.Vector3();
 
 function satisifyConstrains(p1, p2, distance) {
-	diff.sub(p2.position, p1.position);
+	diff.subVectors(p2.position, p1.position);
 	var currentDist = diff.length();
 	if (currentDist==0) return; // prevents division by 0
 	var correction = diff.multiplyScalar(1 - distance/currentDist);
 	var correctionHalf = correction.multiplyScalar(0.5);
-	p1.position.addSelf(correctionHalf);
-	p2.position.subSelf(correctionHalf);
+	p1.position.add(correctionHalf);
+	p2.position.sub(correctionHalf);
 }
 
 
@@ -250,11 +250,11 @@ function simulate(time) {
 			;i<il;i++) {
 		particle = particles[i];
 		pos = particle.position;
-		diff.sub(pos, ballPosition);
+		diff.subVectors(pos, ballPosition);
 		if (diff.length() < ballSize) {
 			// collided
 			diff.normalize().multiplyScalar(ballSize);
-			pos.copy(ballPosition).addSelf(diff);
+			pos.copy(ballPosition).add(diff);
 		}
 	}
 

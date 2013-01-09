@@ -20,7 +20,7 @@
 
 THREE.STLLoader = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 };
 
@@ -35,7 +35,11 @@ THREE.STLLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
+			var geometry = scope.parse( event.target.responseText );
+
+			scope.dispatchEvent( { type: 'load', content: geometry } );
+
+			if ( callback ) callback( geometry );
 
 		}, false );
 
@@ -50,16 +54,6 @@ THREE.STLLoader.prototype = {
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
 		}, false );
-
-		if ( callback ) {
-
-			scope.addEventListener( 'load', function ( event ) {
-
-				callback( event.content );
-
-			} );
-
-		}
 
 		request.open( 'GET', url, true );
 		request.send( null );
@@ -91,9 +85,7 @@ THREE.STLLoader.prototype = {
 
 			while( ( result = patternVertex.exec( text ) ) != null ) {
 
-				geometry.vertices.push(
-					new THREE.Vector3( result[ 1 ], result[ 3 ], result[ 5 ] )
-				);
+				geometry.vertices.push(	new THREE.Vector3( result[ 1 ], result[ 3 ], result[ 5 ] ) );
 
 			}
 

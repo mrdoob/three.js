@@ -15,20 +15,26 @@ Menubar.Add = function ( signals ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	// add sphere
+	// add plane
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Sphere' );
+	option.setTextContent( 'Plane' );
 	option.onClick( function () {
 
-		var radius = 75;
-		var widthSegments = 32;
-		var heightSegments = 16;
+		var width = 200;
+		var height = 200;
 
-		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+		var widthSegments = 1;
+		var heightSegments = 1;
+
+		var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+		geometry.name = 'Plane ' + geometry.id;
+
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Sphere ' + mesh.id;
+		mesh.name = 'Plane ' + mesh.id;
+
+		mesh.rotation.x = - Math.PI/2;
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -51,6 +57,8 @@ Menubar.Add = function ( signals ) {
 		var depthSegments = 1;
 
 		var geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+		geometry.name = 'Cube ' + geometry.id;
+
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Cube ' + mesh.id;
 
@@ -60,24 +68,118 @@ Menubar.Add = function ( signals ) {
 	} );
 	options.add( option );
 
-	// add plane
+	// add cylinder
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Plane' );
+	option.setTextContent( 'Cylinder' );
 	option.onClick( function () {
 
-		var width = 200;
-		var height = 200;
-
-		var widthSegments = 1;
+		var radiusTop = 20;
+		var radiusBottom = 20;
+		var height = 100;
+		var radiusSegments = 8;
 		var heightSegments = 1;
+		var openEnded = false;
 
-		var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+		var geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded );
+		geometry.name = 'Cylinder ' + geometry.id;
+
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Plane ' + mesh.id;
+		mesh.name = 'Cylinder ' + mesh.id;
 
-		mesh.rotation.x = - Math.PI/2;
+		signals.objectAdded.dispatch( mesh );
+
+	} );
+	options.add( option );
+
+	// add sphere
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Sphere' );
+	option.onClick( function () {
+
+		var radius = 75;
+		var widthSegments = 32;
+		var heightSegments = 16;
+
+		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+		geometry.name = 'Sphere ' + geometry.id;
+
+		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+		mesh.name = 'Sphere ' + mesh.id;
+
+		signals.objectAdded.dispatch( mesh );
+
+	} );
+	options.add( option );
+
+	// add icosahedron
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Icosahedron' );
+	option.onClick( function () {
+
+		var radius = 75;
+		var detail = 2;
+
+		var geometry = new THREE.IcosahedronGeometry ( radius, detail );
+		geometry.name = 'Icosahedron ' + geometry.id;
+
+		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+		mesh.name = 'Icosahedron ' + mesh.id;
+
+		signals.objectAdded.dispatch( mesh );
+
+	} );
+	options.add( option );
+
+	// add torus
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Torus' );
+	option.onClick( function () {
+
+		var radius = 100;
+		var tube = 40;
+		var radialSegments = 8;
+		var tubularSegments = 6;
+		var arc = Math.PI * 2;
+
+		var geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
+		geometry.name = 'Torus ' + geometry.id;
+
+		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+		mesh.name = 'Torus ' + mesh.id;
+
+		signals.objectAdded.dispatch( mesh );
+
+	} );
+	options.add( option );
+
+	// add torus
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'TorusKnot' );
+	option.onClick( function () {
+
+		var radius = 100;
+		var tube = 40;
+		var radialSegments = 64;
+		var tubularSegments = 8;
+		var p = 2;
+		var q = 3;
+		var heightScale = 1;
+
+		var geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
+		geometry.name = 'TorusKnot ' + geometry.id;
+
+		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
+		mesh.name = 'TorusKnot ' + mesh.id;
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -87,29 +189,6 @@ Menubar.Add = function ( signals ) {
 	// divider
 
 	options.add( new UI.HorizontalRule() );
-
-	// add directional light
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Directional light' );
-	option.onClick( function () {
-
-		var color = 0xffffff;
-		var intensity = 1;
-
-		var light = new THREE.DirectionalLight( color, intensity );
-		light.name = 'Light ' + light.id;
-		light.target.name = 'Light ' + light.id + ' target';
-
-		light.target.properties.targetInverse = light;
-
-		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
-
-		signals.objectAdded.dispatch( light );
-
-	} );
-	options.add( option );
 
 	// add point light
 
@@ -150,6 +229,29 @@ Menubar.Add = function ( signals ) {
 		light.target.properties.targetInverse = light;
 
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
+
+		signals.objectAdded.dispatch( light );
+
+	} );
+	options.add( option );
+
+	// add directional light
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Directional light' );
+	option.onClick( function () {
+
+		var color = 0xffffff;
+		var intensity = 1;
+
+		var light = new THREE.DirectionalLight( color, intensity );
+		light.name = 'Light ' + light.id;
+		light.target.name = 'Light ' + light.id + ' target';
+
+		light.target.properties.targetInverse = light;
+
+		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
 		signals.objectAdded.dispatch( light );
 

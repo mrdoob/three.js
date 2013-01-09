@@ -54,12 +54,23 @@
 								background-color: #08f;
 							}
 
+			.sidebar {
+				width: 300px;
+				background-color: #eee;
+				overflow: auto;
+			}
+
+				.sidebar .Panel {
+					margin-bottom: 10px;
+				}
+
 		</style>
 	</head>
 	<body>
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/controls/TrackballControls.js"></script>
+		<script src="../examples/js/loaders/BinaryLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
@@ -70,6 +81,7 @@
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/SceneExporter.js"></script>
+		<script src="../examples/js/exporters/OBJExporter.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
@@ -98,6 +110,7 @@
 
 				// actions
 
+				cloneSelectedObject: new SIGNALS.Signal(),
 				removeSelectedObject: new SIGNALS.Signal(),
 				exportGeometry: new SIGNALS.Signal(),
 				exportScene: new SIGNALS.Signal(),
@@ -125,14 +138,10 @@
 
 			var viewport = new Viewport( signals );
 			viewport.setTop( '32px' );
-			viewport.setWidth( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
-			viewport.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			viewport.setLeft( '0px' );
+			viewport.setRight( '300px' );
+			viewport.setBottom( '0px' );
 			document.body.appendChild( viewport.dom );
-
-			// set focus on Viewport to get hotkeys working
-			// right from the initial page load
-
-			viewport.dom.focus();
 
 			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
@@ -140,9 +149,9 @@
 			document.body.appendChild( menubar.dom );
 
 			var sidebar = new Sidebar( signals );
-			sidebar.setLeft( '-webkit-calc(100% - 300px)', '-moz-calc(100% - 300px)', 'calc(100% - 300px)' );
+			sidebar.setRight( '0px' );
 			sidebar.setTop( '32px' );
-			sidebar.setHeight( '-webkit-calc(100% - 32px)', '-moz-calc(100% - 32px)', 'calc(100% - 32px)' );
+			sidebar.setBottom( '0px' );
 			document.body.appendChild( sidebar.dom );
 
 			document.addEventListener( 'drop', function ( event ) {
@@ -218,6 +227,7 @@
 						break;
 
 					case 'js':
+					case 'json':
 
 						var reader = new FileReader();
 						reader.addEventListener( 'load', function ( event ) {
@@ -264,15 +274,20 @@
 
 							if ( data.metadata.type === 'geometry' ) {
 
-								var geometry = new THREE.GeometryLoader().parse( data );
-								geometry.sourceType = "ascii";
-								geometry.sourceFile = file.name;
+								var loader = new THREE.JSONLoader();
 
-								var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
-								mesh.name = filename;
+								loader.createModel( data, function ( geometry ) {
 
-								signals.objectAdded.dispatch( mesh );
-								signals.objectSelected.dispatch( mesh );
+									geometry.sourceType = "ascii";
+									geometry.sourceFile = file.name;
+
+									var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+									mesh.name = filename;
+
+									signals.objectAdded.dispatch( mesh );
+									signals.objectSelected.dispatch( mesh );
+
+								} );
 
 							} else if ( data.metadata.type === 'scene' ) {
 

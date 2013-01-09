@@ -66,7 +66,7 @@ var Viewport = function ( signals ) {
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
 
-	var ray = new THREE.Ray();
+	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
 	var offset = new THREE.Vector3();
 
@@ -96,7 +96,7 @@ var Viewport = function ( signals ) {
 
 			projector.unprojectVector( vector, camera );
 
-			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 			var intersects = ray.intersectObjects( objects, true );
 
@@ -126,7 +126,7 @@ var Viewport = function ( signals ) {
 				signals.objectSelected.dispatch( selected );
 
 				var intersects = ray.intersectObject( intersectionPlane );
-				offset.copy( intersects[ 0 ].point ).subSelf( intersectionPlane.position );
+				offset.copy( intersects[ 0 ].point ).sub( intersectionPlane.position );
 
 				document.addEventListener( 'mousemove', onMouseMove, false );
 				document.addEventListener( 'mouseup', onMouseUp, false );
@@ -153,13 +153,13 @@ var Viewport = function ( signals ) {
 
 		projector.unprojectVector( vector, camera );
 
-		ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+		ray.set( camera.position, vector.sub( camera.position ).normalize() );
 
 		var intersects = ray.intersectObject( intersectionPlane );
 
 		if ( intersects.length > 0 ) {
 
-			intersects[ 0 ].point.subSelf( offset );
+			intersects[ 0 ].point.sub( offset );
 
 			if ( picked.properties.isGizmo ) {
 
@@ -199,7 +199,7 @@ var Viewport = function ( signals ) {
 
 			projector.unprojectVector( vector, camera );
 
-			ray.set( camera.position, vector.subSelf( camera.position ).normalize() );
+			ray.set( camera.position, vector.sub( camera.position ).normalize() );
 			var intersects = ray.intersectObjects( objects, true );
 
 			if ( intersects.length > 0 && ! controls.enabled ) {
@@ -312,9 +312,8 @@ var Viewport = function ( signals ) {
 		} else if ( object instanceof THREE.SpotLight ) {
 
 			var sphereSize = 5;
-			var arrowLength = 30;
 
-			var lightGizmo = new THREE.SpotLightHelper( object, sphereSize, arrowLength );
+			var lightGizmo = new THREE.SpotLightHelper( object, sphereSize );
 			sceneHelpers.add( lightGizmo );
 			sceneHelpers.add( lightGizmo.targetSphere );
 			sceneHelpers.add( lightGizmo.targetLine );
@@ -388,6 +387,14 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.cloneSelectedObject.add( function () {
+
+		if ( selected === camera ) return;
+
+		signals.objectAdded.dispatch( selected.clone() );
+
+	} );
+
 	signals.removeSelectedObject.add( function () {
 
 		if ( selected === camera ) return;
@@ -446,14 +453,12 @@ var Viewport = function ( signals ) {
 		// remove selected object from the scene
 
 		selected.parent.remove( selected );
-		selected.deallocate();
 
 		// remove eventual pure Object3D targets from the scene
 
 		if ( selected.target && !selected.target.geometry ) {
 
 			selected.target.parent.remove( selected.target );
-			selected.target.deallocate();
 
 		}
 
@@ -476,7 +481,6 @@ var Viewport = function ( signals ) {
 			var helper = helpersToRemove[ i ];
 
 			helper.parent.remove( helper );
-			helper.deallocate();
 
 		}
 
@@ -663,16 +667,16 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.exportGeometry.add( function () {
+	signals.exportGeometry.add( function ( object ) {
 
-		if ( !selected.geometry ) {
+		if ( selected.geometry === undefined ) {
 
 			console.warn( "Selected object doesn't have any geometry" );
 			return;
 
 		}
 
-		var output = new THREE.GeometryExporter().parse( selected.geometry );
+		var output = new object.exporter().parse( selected.geometry );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
@@ -714,7 +718,7 @@ var Viewport = function ( signals ) {
 		defaultScene.add( defaultCamera );
 
 		signals.sceneAdded.dispatch( defaultScene, defaultCamera, defaultBgColor );
-		signals.objectSelected.dispatch( defaultScene.properties.defaultSelection );
+		signals.objectSelected.dispatch( defaultCamera );
 
 	} );
 
@@ -872,6 +876,8 @@ var Viewport = function ( signals ) {
 
 		var scene = new THREE.Scene();
 
+		/*
+
 		// create lights
 
 		var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
@@ -924,6 +930,8 @@ var Viewport = function ( signals ) {
 		scene.add( light3 );
 		scene.add( light4 );
 		scene.add( mesh );
+
+		*/
 
 		return scene;
 

@@ -3,7 +3,7 @@
 	"metadata" :
 	{
 		"formatVersion" : 3.1,
-		"generatedBy"   : "Blender 2.64 Exporter",
+		"generatedBy"   : "Blender 2.65 Exporter",
 		"vertices"      : 8,
 		"faces"         : 6,
 		"normals"       : 0,

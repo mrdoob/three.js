@@ -13,7 +13,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
     segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
     var i, uvs = [],
-    center = new THREE.Vector3(), centerUV = new THREE.UV( 0.5, 0.5 );
+    center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
 
     this.vertices.push(center);
     uvs.push( centerUV );
@@ -26,7 +26,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
         vertex.y = radius * Math.sin( thetaStart + i / segments * thetaLength );
 
         this.vertices.push( vertex );
-        uvs.push( new THREE.UV( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
+        uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
 
     }
 
@@ -46,7 +46,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
     this.computeCentroids();
     this.computeFaceNormals();
 
-    this.boundingSphere = { radius: radius };
+    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 

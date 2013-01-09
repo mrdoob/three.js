@@ -4,7 +4,7 @@
 
 THREE.OBJLoader = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 };
 
@@ -12,14 +12,18 @@ THREE.OBJLoader.prototype = {
 
 	constructor: THREE.OBJLoader,
 
-	load: function ( url ) {
+	load: function ( url, callback ) {
 
 		var scope = this;
 		var request = new XMLHttpRequest();
 
 		request.addEventListener( 'load', function ( event ) {
 
-			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
+			var hierarchy = scope.parse( event.target.responseText );
+
+			scope.dispatchEvent( { type: 'load', content: hierarchy } );
+
+			if ( callback ) callback( hierarchy );
 
 		}, false );
 
@@ -50,7 +54,7 @@ THREE.OBJLoader.prototype = {
 
 		function uv( u, v ) {
 
-			return new THREE.UV( u, v );
+			return new THREE.Vector2( u, v );
 
 		}
 
@@ -71,6 +75,9 @@ THREE.OBJLoader.prototype = {
 		var vertices = [];
 		var normals = [];
 		var uvs = [];
+
+		// fixes
+		data = data.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
 
 		var pattern, result;
 

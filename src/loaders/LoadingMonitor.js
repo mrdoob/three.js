@@ -4,7 +4,7 @@
 
 THREE.LoadingMonitor = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 	var scope = this;
 

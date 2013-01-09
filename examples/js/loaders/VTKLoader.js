@@ -4,7 +4,7 @@
 
 THREE.VTKLoader = function () {
 
-	THREE.EventTarget.call( this );
+	THREE.EventDispatcher.call( this );
 
 };
 
@@ -19,7 +19,11 @@ THREE.VTKLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-			scope.dispatchEvent( { type: 'load', content: scope.parse( event.target.responseText ) } );
+			var geometry = scope.parse( event.target.responseText );
+
+			scope.dispatchEvent( { type: 'load', content: geometry } );
+
+			if ( callback ) callback( geometry );
 
 		}, false );
 
@@ -34,16 +38,6 @@ THREE.VTKLoader.prototype = {
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
 		}, false );
-
-		if ( callback ) {
-
-			scope.addEventListener( 'load', function ( event ) {
-
-				callback( event.content );
-
-			} );
-
-		}
 
 		request.open( 'GET', url, true );
 		request.send( null );

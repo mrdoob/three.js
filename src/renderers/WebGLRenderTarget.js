@@ -5,6 +5,8 @@
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
+	THREE.EventDispatcher.call( this );
+
 	this.width = width;
 	this.height = height;
 
@@ -29,6 +31,8 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 	this.generateMipmaps = true;
 
+	this.shareDepthFrom = null;
+
 };
 
 THREE.WebGLRenderTarget.prototype.clone = function() {
@@ -39,9 +43,9 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 	tmp.wrapT = this.wrapT;
 
 	tmp.magFilter = this.magFilter;
-	tmp.anisotropy = this.anisotropy;
-
 	tmp.minFilter = this.minFilter;
+
+	tmp.anisotropy = this.anisotropy;
 
 	tmp.offset.copy( this.offset );
 	tmp.repeat.copy( this.repeat );
@@ -54,6 +58,14 @@ THREE.WebGLRenderTarget.prototype.clone = function() {
 
 	tmp.generateMipmaps = this.generateMipmaps;
 
+	tmp.shareDepthFrom = this.shareDepthFrom;
+
 	return tmp;
+
+};
+
+THREE.WebGLRenderTarget.prototype.dispose = function () {
+
+	this.dispatchEvent( { type: 'dispose' } );
 
 };

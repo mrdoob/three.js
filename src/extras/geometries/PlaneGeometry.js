@@ -63,10 +63,10 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments, u
 
 			//START_VEROLD_MOD
 			this.faceVertexUvs[ 0 ].push( [
-				new THREE.UV( ix / gridX * uvMult, 1 - iz  * uvMult / gridZ ),
-				new THREE.UV( ix / gridX * uvMult, 1 - ( iz + 1 )  * uvMult / gridZ ),
-				new THREE.UV( ( ix + 1 )  * uvMult / gridX, 1 - ( iz + 1 ) * uvMult/ gridZ ),
-				new THREE.UV( ( ix + 1 )  * uvMult / gridX, 1 - iz  * uvMult / gridZ )
+				new THREE.Vector2( ix / gridX * uvMult, 1 - iz  * uvMult / gridZ ),
+				new THREE.Vector2( ix / gridX * uvMult, 1 - ( iz + 1 )  * uvMult / gridZ ),
+				new THREE.Vector2( ( ix + 1 )  * uvMult / gridX, 1 - ( iz + 1 ) * uvMult/ gridZ ),
+				new THREE.Vector2( ( ix + 1 )  * uvMult / gridX, 1 - iz  * uvMult / gridZ )
 			] );
 			//END_VEROLD_MOD
 

@@ -48,6 +48,8 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/loaders/BinaryLoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -212,7 +214,7 @@
 				//
 
 				renderer.shadowMapEnabled = true;
-				renderer.shadowMapSoft = true;
+				renderer.shadowMapType = THREE.PCFShadowMap;
 
 
 				//

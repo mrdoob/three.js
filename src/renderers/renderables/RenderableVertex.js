@@ -16,4 +16,4 @@ THREE.RenderableVertex.prototype.copy = function ( vertex ) {
 	this.positionWorld.copy( vertex.positionWorld );
 	this.positionScreen.copy( vertex.positionScreen );
 
-}
+};

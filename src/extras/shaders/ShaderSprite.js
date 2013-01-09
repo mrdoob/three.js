@@ -57,8 +57,6 @@ THREE.ShaderSprite = {
 
 		fragmentShader: [
 
-			"precision mediump float;",
-
 			"uniform vec3 color;",
 			"uniform sampler2D map;",
 			"uniform float opacity;",

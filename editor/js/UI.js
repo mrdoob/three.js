@@ -12,8 +12,6 @@ UI.Element.prototype = {
 
 	},
 
-	// styles
-
 	setStyle: function ( style, array ) {
 
 		for ( var i = 0; i < array.length; i ++ ) {
@@ -24,257 +22,52 @@ UI.Element.prototype = {
 
 	},
 
-	setLeft: function () {
-
-		this.setStyle( 'left', arguments );
-
-		return this;
-
-	},
-
-	setTop: function () {
-
-		this.setStyle( 'top', arguments );
-
-		return this;
-
-	},
-
-	setRight: function () {
-
-		this.setStyle( 'right', arguments );
-
-		return this;
-
-	},
-
-	setBottom: function () {
-
-		this.setStyle( 'bottom', arguments );
-
-		return this;
-
-	},
-
-	setWidth: function () {
-
-		this.setStyle( 'width', arguments );
-
-		return this;
-
-	},
-
-	setHeight: function () {
-
-		this.setStyle( 'height', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setBorder: function () {
-
-		this.setStyle( 'border', arguments );
-
-		return this;
-
-	},
-
-	setBorderTop: function () {
-
-		this.setStyle( 'borderTop', arguments );
-
-		return this;
-
-	},
-
-	setBorderBottom: function () {
-
-		this.setStyle( 'borderBottom', arguments );
-
-		return this;
-
-	},
-
-	setBorderLeft: function () {
-
-		this.setStyle( 'borderLeft', arguments );
-
-		return this;
-
-	},
-
-	setBorderRight: function () {
-
-		this.setStyle( 'borderRight', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setMargin: function () {
-
-		this.setStyle( 'margin', arguments );
-
-		return this;
-
-	},
-
-	setMarginTop: function () {
-
-		this.setStyle( 'marginTop', arguments );
-
-		return this;
-
-	},
-
-	setMarginBottom: function () {
-
-		this.setStyle( 'marginBottom', arguments );
-
-		return this;
-
-	},
-
-	setMarginLeft: function () {
-
-		this.setStyle( 'marginLeft', arguments );
-
-		return this;
-
-	},
-
-	setMarginRight: function () {
-
-		this.setStyle( 'marginRight', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setPadding: function () {
-
-		this.setStyle( 'padding', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setFloat: function () {
-
-		this.setStyle( 'float', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setFontSize: function () {
-
-		this.setStyle( 'fontSize', arguments );
-
-		return this;
-
-	},
-
-	setFontWeight: function () {
-
-		this.setStyle( 'fontWeight', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setColor: function () {
-
-		this.setStyle( 'color', arguments );
-
-		return this;
-
-	},
-
-	setBackgroundColor: function () {
-
-		this.setStyle( 'backgroundColor', arguments );
-
-		return this;
-
-	},
-
-	setDisplay: function () {
-
-		this.setStyle( 'display', arguments );
-
-		return this;
-
-	},
-
-	setOverflow: function () {
-
-		this.setStyle( 'overflow', arguments );
-
-		return this;
-
-	},
-
-	//
-
-	setCursor: function () {
-
-		this.setStyle( 'cursor', arguments );
-
-		return this;
-
-	},
-
-	// content
-
 	setTextContent: function ( value ) {
 
 		this.dom.textContent = value;
 
 		return this;
 
-	},
-
-	// events
-
-	onMouseOver: function ( callback ) {
-
-		this.dom.addEventListener( 'mouseover', callback, false );
-
-		return this;
-
-	},
-
-	onMouseOut: function ( callback ) {
-
-		this.dom.addEventListener( 'mouseout', callback, false );
-
-		return this;
-
-	},
-
-	onClick: function ( callback ) {
-
-		this.dom.addEventListener( 'click', callback, false );
-
-		return this;
-
 	}
 
 }
+
+// properties
+
+var properties = [ 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
+'borderTop', 'borderRight', 'borderBottom', 'margin', 'marginLeft', 'marginTop', 'marginRight',
+'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+'backgroundColor', 'fontSize', 'fontWeight', 'display', 'overflow', 'cursor' ];
+
+properties.forEach( function ( property ) {
+
+	var method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
+
+	UI.Element.prototype[ method ] = function () {
+
+		this.setStyle( property, arguments );
+		return this;
+
+	};
+
+} );
+
+// events
+
+var events = [ 'MouseOver', 'MouseOut', 'Click' ];
+
+events.forEach( function ( event ) {
+
+	var method = 'on' + event;
+
+	UI.Element.prototype[ method ] = function ( callback ) {
+
+		this.dom.addEventListener( event.toLowerCase(), callback, false );
+		return this;
+
+	};
+
+} );
 
 
 // Panel
@@ -284,9 +77,8 @@ UI.Panel = function ( position ) {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'div' );
+	dom.className = 'Panel';
 	dom.style.position = position || 'relative';
-	dom.style.marginBottom = '10px';
-
 	dom.style.userSelect = 'none';
 	dom.style.WebkitUserSelect = 'none';
 	dom.style.MozUserSelect = 'none';
@@ -318,6 +110,7 @@ UI.Text = function ( position ) {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'span' );
+	dom.className = 'Text';
 	dom.style.position = position || 'relative';
 	dom.style.cursor = 'default';
 
@@ -347,6 +140,7 @@ UI.Input = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
+	dom.className = 'Input';
 	dom.style.position = position || 'relative';
 	dom.style.padding = '2px';
 	dom.style.marginTop = '-2px';
@@ -401,6 +195,7 @@ UI.Select = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'select' );
+	dom.className = 'Select';
 	dom.style.position = position || 'relative';
 	dom.style.width = '64px';
 	dom.style.height = '16px';
@@ -483,6 +278,7 @@ UI.FancySelect = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'div' );
+	dom.className = 'FancySelect';
 	dom.style.position = position || 'relative';
 	dom.style.background = '#fff';
 	dom.style.border = '1px solid #ccc';
@@ -605,8 +401,9 @@ UI.Checkbox = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
-	dom.type = 'checkbox';
+	dom.className = 'Checkbox';
 	dom.style.position = position || 'relative';
+	dom.type = 'checkbox';
 
 	this.dom = dom;
 
@@ -656,13 +453,14 @@ UI.Color = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
-	dom.type = 'color';
+	dom.className = 'Color';
 	dom.style.position = position || 'relative';
 	dom.style.width = '64px';
 	dom.style.height = '16px';
 	dom.style.border = '0px';
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
+	dom.type = 'color';
 
 	this.dom = dom;
 
@@ -726,6 +524,7 @@ UI.Number = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
+	dom.className = 'Number';
 	dom.style.position = position || 'relative';
 	dom.style.color = '#0080f0';
 	dom.style.fontSize = '12px';
@@ -886,6 +685,7 @@ UI.Break = function () {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'br' );
+	dom.className = 'Break';
 
 	this.dom = dom;
 
@@ -903,6 +703,7 @@ UI.HorizontalRule = function ( position ) {
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'hr' );
+	dom.className = 'HorizontalRule';
 	dom.style.position = position || 'relative';
 
 	this.dom = dom;
@@ -923,6 +724,7 @@ UI.Button = function ( position ) {
 	var scope = this;
 
 	var dom = document.createElement( 'button' );
+	dom.className = 'Button';
 	dom.style.position = position || 'relative';
 
 	this.dom = dom;

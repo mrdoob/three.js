@@ -62,7 +62,7 @@
 				this.setWorldSize = function ( width, height, depth ) {
 
 					_width = width;
-					_height = height;vector
+					_height = height;
 					_depth = depth;
 
 				}
@@ -74,32 +74,32 @@
 						vector.set( - _width, this.position.y, this.position.z );
 						vector = this.avoid( vector );
 						vector.multiplyScalar( 5 );
-						_acceleration.addSelf( vector );
+						_acceleration.add( vector );
 
 						vector.set( _width, this.position.y, this.position.z );
 						vector = this.avoid( vector );
 						vector.multiplyScalar( 5 );
-						_acceleration.addSelf( vector );
+						_acceleration.add( vector );
 
 						vector.set( this.position.x, - _height, this.position.z );
 						vector = this.avoid( vector );
 						vector.multiplyScalar( 5 );
-						_acceleration.addSelf( vector );
+						_acceleration.add( vector );
 
 						vector.set( this.position.x, _height, this.position.z );
 						vector = this.avoid( vector );
 						vector.multiplyScalar( 5 );
-						_acceleration.addSelf( vector );
+						_acceleration.add( vector );
 
 						vector.set( this.position.x, this.position.y, - _depth );
 						vector = this.avoid( vector );
 						vector.multiplyScalar( 5 );
-						_acceleration.addSelf( vector );
+						_acceleration.add( vector );
 
 						vector.set( this.position.x, this.position.y, _depth );
 						vector = this.avoid( vector );
 						vector.multiplyScalar( 5 );
-						_acceleration.addSelf( vector );
+						_acceleration.add( vector );
 
 					}/* else {
 
@@ -122,19 +122,19 @@
 
 					if ( _goal ) {
 
-						_acceleration.addSelf( this.reach( _goal, 0.005 ) );
+						_acceleration.add( this.reach( _goal, 0.005 ) );
 
 					}
 
-					_acceleration.addSelf( this.alignment( boids ) );
-					_acceleration.addSelf( this.cohesion( boids ) );
-					_acceleration.addSelf( this.separation( boids ) );
+					_acceleration.add( this.alignment( boids ) );
+					_acceleration.add( this.cohesion( boids ) );
+					_acceleration.add( this.separation( boids ) );
 
 				}
 
 				this.move = function () {
 
-					this.velocity.addSelf( _acceleration );
+					this.velocity.add( _acceleration );
 
 					var l = this.velocity.length();
 
@@ -144,7 +144,7 @@
 
 					}
 
-					this.position.addSelf( this.velocity );
+					this.position.add( this.velocity );
 					_acceleration.set( 0, 0, 0 );
 
 				}
@@ -167,7 +167,7 @@
 					var steer = new THREE.Vector3();
 
 					steer.copy( this.position );
-					steer.subSelf( target );
+					steer.sub( target );
 
 					steer.multiplyScalar( 1 / this.position.distanceToSquared( target ) );
 
@@ -183,10 +183,10 @@
 
 						var steer = new THREE.Vector3();
 
-						steer.sub( this.position, target );
+						steer.subVectors( this.position, target );
 						steer.multiplyScalar( 0.5 / distance );
 
-						_acceleration.addSelf( steer );
+						_acceleration.add( steer );
 
 					}
 
@@ -196,7 +196,7 @@
 
 					var steer = new THREE.Vector3();
 
-					steer.sub( target, this.position );
+					steer.subVectors( target, this.position );
 					steer.multiplyScalar( amount );
 
 					return steer;
@@ -218,7 +218,7 @@
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
-							velSum.addSelf( boid.velocity );
+							velSum.add( boid.velocity );
 							count++;
 
 						}
@@ -259,7 +259,7 @@
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
-							posSum.addSelf( boid.position );
+							posSum.add( boid.position );
 							count++;
 
 						}
@@ -272,7 +272,7 @@
 
 					}
 
-					steer.sub( posSum, this.position );
+					steer.subVectors( posSum, this.position );
 
 					var l = steer.length();
 
@@ -301,10 +301,10 @@
 
 						if ( distance > 0 && distance <= _neighborhoodRadius ) {
 
-							repulse.sub( this.position, boid.position );
+							repulse.subVectors( this.position, boid.position );
 							repulse.normalize();
 							repulse.divideScalar( distance );
-							posSum.addSelf( repulse );
+							posSum.add( repulse );
 
 						}
 

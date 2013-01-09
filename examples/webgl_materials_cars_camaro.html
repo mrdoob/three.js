@@ -34,6 +34,8 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/loaders/BinaryLoader.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -115,26 +117,109 @@
 
 				var camaroMaterials = {
 
-					body: [],
-					chrome: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube } ),
-					darkchrome: new THREE.MeshLambertMaterial( { color: 0x444444, envMap: textureCube } ),
-					glass: new THREE.MeshBasicMaterial( { color: 0x223344, envMap: textureCube, opacity: 0.25, combine: THREE.MixOperation, reflectivity: 0.25, transparent: true } ),
-					tire: new THREE.MeshLambertMaterial( { color: 0x050505 } ),
-					interior: new THREE.MeshPhongMaterial( { color: 0x050505, shininess: 20 } ),
-					black: new THREE.MeshLambertMaterial( { color: 0x000000 } )
+					body: {
 
-				}
+						Orange: new THREE.MeshLambertMaterial( {
+							color: 0xff6600,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.3
+						} ),
 
-				camaroMaterials.body.push( [ "Orange", new THREE.MeshLambertMaterial( { color: 0xff6600, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
-				camaroMaterials.body.push( [ "Blue", new THREE.MeshLambertMaterial( { color: 0x226699, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.3 } ) ] );
-				camaroMaterials.body.push( [ "Red", new THREE.MeshLambertMaterial( { color: 0x660000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "Black", new THREE.MeshLambertMaterial( { color: 0x000000, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "White", new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
+						Blue: new THREE.MeshLambertMaterial( {
+							color: 0x226699,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.3
+						} ),
 
-				camaroMaterials.body.push( [ "Carmine", new THREE.MeshPhongMaterial( { color: 0x770000, specular:0xffaaaa, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
-				camaroMaterials.body.push( [ "Gold", new THREE.MeshPhongMaterial( { color: 0xaa9944, specular:0xbbaa99, shininess:50, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
-				camaroMaterials.body.push( [ "Bronze", new THREE.MeshPhongMaterial( { color: 0x150505, specular:0xee6600, shininess:10, envMap: textureCube, combine: THREE.MixOperation, reflectivity: 0.5 } ) ] );
-				camaroMaterials.body.push( [ "Chrome", new THREE.MeshPhongMaterial( { color: 0xffffff, specular:0xffffff, envMap: textureCube, combine: THREE.MultiplyOperation } ) ] );
+						Red: new THREE.MeshLambertMaterial( {
+							color: 0x660000,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						Black: new THREE.MeshLambertMaterial( {
+							color: 0x000000,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						White: new THREE.MeshLambertMaterial( {
+							color: 0xffffff,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						Carmine: new THREE.MeshPhongMaterial( {
+							color: 0x770000,
+							specular: 0xffaaaa,
+							envMap: textureCube,
+							combine: THREE.MultiplyOperation
+						} ),
+
+						Gold: new THREE.MeshPhongMaterial( {
+							color: 0xaa9944,
+							specular: 0xbbaa99,
+							shininess: 50,
+							envMap: textureCube,
+							combine: THREE.MultiplyOperation
+						} ),
+
+						Bronze: new THREE.MeshPhongMaterial( {
+							color: 0x150505,
+							specular: 0xee6600,
+							shininess: 10,
+							envMap: textureCube,
+							combine: THREE.MixOperation,
+							reflectivity: 0.5
+						} ),
+
+						Chrome: new THREE.MeshPhongMaterial( {
+							color: 0xffffff,
+							specular:0xffffff,
+							envMap: textureCube,
+							combine: THREE.MultiplyOperation
+						} )
+
+					},
+
+					chrome: new THREE.MeshLambertMaterial( {
+						color: 0xffffff,
+						envMap: textureCube
+					} ),
+
+					darkchrome: new THREE.MeshLambertMaterial( {
+						color: 0x444444,
+						envMap: textureCube
+					} ),
+
+					glass: new THREE.MeshBasicMaterial( {
+						color: 0x223344,
+						envMap: textureCube,
+						opacity: 0.25,
+						combine: THREE.MixOperation,
+						reflectivity: 0.25,
+						transparent: true
+					} ),
+
+					tire: new THREE.MeshLambertMaterial( {
+						color: 0x050505
+					} ),
+
+					interior: new THREE.MeshPhongMaterial( {
+						color: 0x050505,
+						shininess: 20
+					} ),
+
+					black: new THREE.MeshLambertMaterial( {
+						color: 0x000000
+					} )
+
+				};
 
 				var loader = new THREE.BinaryLoader();
 				loader.load( "obj/camaro/CamaroNoUv_bin.js", function( geometry ) { createScene( geometry, camaroMaterials ) } );
@@ -157,25 +242,20 @@
 
 			}
 
-			function $( id ) { return document.getElementById( id ) }
-
-
 			function createButtons( materials, faceMaterial ) {
 
-				var i, src = "", parent = $( "buttons" );
+				var buttons = document.getElementById( "buttons" );
 
-				for( i = 0; i < materials.length; i ++ ) {
+				for ( var key in materials ) {
 
-					src += '<button id="m' + i + '">' + materials[ i ][ 0 ] + '</button>';
+					var button = document.createElement( 'button' );
+					button.textContent = key;
+					button.addEventListener( 'click', function ( event ) {
 
-				}
+						faceMaterial.materials[ 0 ] = materials[ this.textContent ];
 
-				parent.innerHTML = src;
-
-				for( i = 0; i < materials.length; i ++ ) {
-
-					$( "m" + i ).counter = i;
-					$( "m" + i ).addEventListener( 'click', function() { faceMaterial.materials[ 0 ] = materials[ this.counter ][ 1 ] }, false );
+					}, false );
+					buttons.appendChild( button );
 
 				}
 
@@ -185,7 +265,7 @@
 
 				var s = 75, m = new THREE.MeshFaceMaterial();
 
-				m.materials[ 0 ] = materials.body[ 0 ][ 1 ]; // car body
+				m.materials[ 0 ] = materials.body[ "Orange" ]; // car body
 				m.materials[ 1 ] = materials.chrome; // wheels chrome
 				m.materials[ 2 ] = materials.chrome; // grille chrome
 				m.materials[ 3 ] = materials.darkchrome; // door lines

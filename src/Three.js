@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '54dev' };
+var THREE = THREE || { REVISION: '55dev' };
 
 self.console = self.console || {
 
@@ -90,6 +90,12 @@ THREE.CullFaceFrontBack = 3;
 
 THREE.FrontFaceDirectionCW = 0;
 THREE.FrontFaceDirectionCCW = 1;
+
+// SHADOWING TYPES
+
+THREE.BasicShadowMap = 0;
+THREE.PCFShadowMap = 1;
+THREE.PCFSoftShadowMap = 2;
 
 // MATERIAL CONSTANTS
 
