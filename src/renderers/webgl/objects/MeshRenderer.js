@@ -1,11 +1,11 @@
 
 
 THREE.WebGLRenderer2.MeshRenderer = function(lowlevelrenderer, info){
-	THREE.WebGLRenderer2.Object3DObjectRenderer.call( this, lowlevelrenderer, info );
+	THREE.WebGLRenderer2.Object3DRenderer.call( this, lowlevelrenderer, info );
 };
 
 
-THREE.WebGLRenderer2.MeshRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DObjectRenderer.prototype );
+THREE.WebGLRenderer2.MeshRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DRenderer.prototype );
 
 THREE.WebGLRenderer2.MeshRenderer.prototype.createBuffers = function( geometryGroup ) {
 

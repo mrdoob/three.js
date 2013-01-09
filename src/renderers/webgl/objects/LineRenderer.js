@@ -1,11 +1,11 @@
 
 
 THREE.WebGLRenderer2.LineRenderer = function(lowlevelrenderer, info){
-	THREE.WebGLRenderer2.Object3DObjectRenderer.call( this, lowlevelrenderer, info );
+	THREE.WebGLRenderer2.Object3DRenderer.call( this, lowlevelrenderer, info );
 };
 
 
-THREE.WebGLRenderer2.LineRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DObjectRenderer.prototype );
+THREE.WebGLRenderer2.LineRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DRenderer.prototype );
 
 THREE.WebGLRenderer2.LineRenderer.prototype.createBuffers = function( geometry ) {
 	
