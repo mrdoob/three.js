@@ -1211,7 +1211,7 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		_projScreenMatrix.multiply( camera.projectionMatrix, camera.matrixWorldInverse );
+		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
 
 		// update WebGL objects
@@ -2944,7 +2944,7 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 
 	function setupMatrices ( object, camera ) {
 
-		object._modelViewMatrix.multiply( camera.matrixWorldInverse, object.matrixWorld );
+		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
 
 		object._normalMatrix.getInverse( object._modelViewMatrix );
 		object._normalMatrix.transpose();
@@ -3048,7 +3048,7 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 				if ( ! light.visible ) continue;
 
 				_direction.copy( light.matrixWorld.getPosition() );
-				_direction.subSelf( light.target.matrixWorld.getPosition() );
+				_direction.sub( light.target.matrixWorld.getPosition() );
 				_direction.normalize();
 
 				// skip lights with undefined direction
@@ -3129,7 +3129,7 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 				spotDistances[ spotLength ] = distance;
 
 				_direction.copy( position );
-				_direction.subSelf( light.target.matrixWorld.getPosition() );
+				_direction.sub( light.target.matrixWorld.getPosition() );
 				_direction.normalize();
 
 				spotDirections[ spotOffset ]     = _direction.x;

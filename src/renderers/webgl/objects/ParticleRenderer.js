@@ -55,14 +55,13 @@ THREE.WebGLRenderer2.ParticleRenderer.prototype.setBuffers = function( geometry,
 	i, il,
 	a, ca, cal, value,
 	customAttribute;
-	
+
 	var _projScreenMatrixPS = THREE.WebGLRenderer2.ParticleRenderer._m1,
 		_vector3 = THREE.WebGLRenderer2.ParticleRenderer._v1;
 
 	if ( object.sortParticles ) {
 
-		_projScreenMatrixPS.copy( projectionScreenMatrix );
-		_projScreenMatrixPS.multiplySelf( object.matrixWorld );
+		_projScreenMatrixPS.multiplyMatrices( projectionScreenMatrix, object.matrixWorld );
 
 		for ( v = 0; v < vl; v ++ ) {
 
