@@ -339,7 +339,7 @@ THREE.Matrix4.prototype = {
 			tmp.y = a[ i + 1 ];
 			tmp.z = a[ i + 2 ];
 
-			this.multiplyVector3( tmp );
+			tmp.applyMatrix4(this);
 
 			a[ i ]     = tmp.x;
 			a[ i + 1 ] = tmp.y;
