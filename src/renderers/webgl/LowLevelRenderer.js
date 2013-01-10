@@ -242,6 +242,24 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return _supportsVertexTextures;
 
 	};
+	
+	function supportsFloatTextures() {
+
+		return _glExtensionTextureFloat;
+
+	};
+
+	function supportsStandardDerivatives() {
+
+		return _glExtensionStandardDerivatives;
+
+	};
+
+	function supportsCompressedTextureS3TC() {
+
+		return _glExtensionCompressedTextureS3TC;
+
+	};
 
 	function getMaxAnisotropy() {
 
@@ -1441,6 +1459,9 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	this.getCurrentWidth = getCurrentWidth;
 	this.getCurrentHeight = getCurrentHeight;
 	this.supportsVertexTextures = supportsVertexTextures;
+	this.supportsFloatTextures = supportsFloatTextures;
+	this.supportsStandardDerivatives = supportsStandardDerivatives;
+	this.supportsCompressedTextureS3TC = supportsCompressedTextureS3TC;
 	this.getMaxAnisotropy  = getMaxAnisotropy;
 	
 	this.setRenderTarget = setRenderTarget;
