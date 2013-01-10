@@ -154,6 +154,9 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 	this.getPrecision = renderer.getPrecision;
 	this.getContext = renderer.getContext;
 	this.supportsVertexTextures = renderer.supportsVertexTextures;
+	this.supportsFloatTextures = renderer.supportsFloatTextures;
+	this.supportsStandardDerivatives = renderer.supportsStandardDerivatives;
+	this.supportsCompressedTextureS3TC = renderer.supportsCompressedTextureS3TC;
 	this.getMaxAnisotropy  = renderer.getMaxAnisotropy;
 	this.setSize = renderer.setSize;
 	this.setViewport = renderer.setViewport;
