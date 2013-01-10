@@ -40,22 +40,20 @@ THREE.SoftwareRenderer = function () {
 
 	this.setSize = function ( width, height ) {
 
-		canvas.width = width;
-		canvas.height = height;
+		canvasWidth = width | 0;
+		canvasHeight = height | 0;
 
-		canvasWidth = canvas.width;
-		canvasHeight = canvas.height;
+		canvasWidthHalf = canvasWidth / 2;
+		canvasHeightHalf = canvasHeight / 2;
 
-		canvasWidthHalf = width / 2;
-		canvasHeightHalf = height / 2;
+		canvas.width = canvasWidth;
+		canvas.height = canvasHeight;
 
-		imagedata = context.getImageData( 0, 0, width, height );
+		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
 		data = imagedata.data;
 
 		canvasWBlocks = Math.floor( ( canvasWidth + blocksize - 1 ) / blocksize );
 		canvasHBlocks = Math.floor( ( canvasHeight + blocksize - 1 ) / blocksize );
-
-		console.log( canvasWBlocks, canvasHBlocks );
 
 		block_full = new Uint8Array( canvasWBlocks * canvasHBlocks )
 
@@ -104,9 +102,11 @@ THREE.SoftwareRenderer = function () {
 					- v2.y * canvasHeightHalf + canvasHeightHalf,
 					v3.x * canvasWidthHalf + canvasWidthHalf,
 					- v3.y * canvasHeightHalf + canvasHeightHalf,
-					0.5 * element.normalModelView.x + 0.5,
-					0.5 * element.normalModelView.y + 0.5,
-					0.5 * element.normalModelView.z + 0.5
+					function ( offset, cx1, cx2, scale ) {
+						var u = cx1 * scale; // 0-255!
+						var v = cx2 * scale; // 0-255!
+						drawPixel( offset, u, v, 0 );
+					}
 				)
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
@@ -123,9 +123,9 @@ THREE.SoftwareRenderer = function () {
 					- v2.y * canvasHeightHalf + canvasHeightHalf,
 					v3.x * canvasWidthHalf + canvasWidthHalf,
 					- v3.y * canvasHeightHalf + canvasHeightHalf,
-					0.5 * element.normalModelView.x + 0.5,
-					0.5 * element.normalModelView.y + 0.5,
-					0.5 * element.normalModelView.z + 0.5
+					function ( offset, cx1, cx2, scale ) {
+						drawPixel( offset, 0, 255, 0 );
+					}
 				);
 
 				drawTriangle(
@@ -135,9 +135,9 @@ THREE.SoftwareRenderer = function () {
 					- v4.y * canvasHeightHalf + canvasHeightHalf,
 					v1.x * canvasWidthHalf + canvasWidthHalf,
 					- v1.y * canvasHeightHalf + canvasHeightHalf,
-					0.5 * element.normalModelView.x + 0.5,
-					0.5 * element.normalModelView.y + 0.5,
-					0.5 * element.normalModelView.z + 0.5
+					function ( offset, cx1, cx2, scale ) {
+						drawPixel( offset, 0, 0, 255 )
+					}
 				);
 
 			}
@@ -162,6 +162,7 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
+	/*
 	function drawPixel( x, y, r, g, b ) {
 
 		var offset = ( x + y * canvasWidth ) * 4;
@@ -174,6 +175,7 @@ THREE.SoftwareRenderer = function () {
 		data[ offset + 3 ] = 255;
 
 	}
+	*/
 
 	function clearRectangle( x1, y1, x2, y2 ) {
 
@@ -199,7 +201,7 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
-	function drawTriangle( x1, y1, x2, y2, x3, y3, r, g, b ) {
+	function drawTriangle( x1, y1, x2, y2, x3, y3, callback ) {
 
 		// https://gist.github.com/2486101
 		// explanation: ttp://pouet.net/topic.php?which=8760&page=1
@@ -284,10 +286,10 @@ THREE.SoftwareRenderer = function () {
 		var e3x = qstep * dy31;
 		var x0 = minx;
 
-		for (var y0 = miny; y0 < maxy; y0 += q) {
+		for ( var y0 = miny; y0 < maxy; y0 += q ) {
 
 			// New block line - keep hunting for tri outer edge in old block line dir
-			while (x0 >= minx && x0 < maxx && cb1 >= nmax1 && cb2 >= nmax2 && cb3 >= nmax3) {
+			while ( x0 >= minx && x0 < maxx && cb1 >= nmax1 && cb2 >= nmax2 && cb3 >= nmax3 ) {
 
 				x0 += qstep;
 				cb1 += e1x;
@@ -325,10 +327,10 @@ THREE.SoftwareRenderer = function () {
 				if (block_full[blockInd]) continue;
 
 				// Offset at top-left corner
-				var offset = (x0 + y0 * canvasWidth) * 4;
+				var offset = ( x0 + y0 * canvasWidth ) * 4;
 
 				// Accept whole block when fully covered
-				if (cb1 >= nmin1 && cb2 >= nmin2 && cb3 >= nmin3) {
+				if ( cb1 >= nmin1 && cb2 >= nmin2 && cb3 >= nmin3 ) {
 
 					var cy1 = cb1;
 					var cy2 = cb2;
@@ -340,14 +342,9 @@ THREE.SoftwareRenderer = function () {
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
-							if (!data[offset + 3]) {
+							if ( data[ offset + 3 ] === 0 ) {
 
-								var u = cx1 * scale; // 0-255!
-								var v = cx2 * scale; // 0-255!
-								data[offset] = u;
-								data[offset + 1] = v;
-								data[offset + 2] = 0;
-								data[offset + 3] = 255;
+								callback( offset, cx1, cx2, scale );
 
 							}
 
@@ -379,14 +376,9 @@ THREE.SoftwareRenderer = function () {
 
 						for ( var ix = 0; ix < q; ix ++ ) {
 
-							if ( (cx1 | cx2 | cx3) >= 0 && !data[offset+3]) {
+							if ( ( cx1 | cx2 | cx3 ) >= 0 && data[ offset + 3 ] === 0 ) {
 
-								var u = cx1 * scale; // 0-255!
-								var v = cx2 * scale; // 0-255!
-								data[offset] = u;
-								data[offset + 1] = v;
-								data[offset + 2] = 0;
-								data[offset + 3] = 255;
+								callback( offset, cx1, cx2, scale );
 
 							}
 
@@ -414,6 +406,15 @@ THREE.SoftwareRenderer = function () {
 			cb3 += q*dx31;
 
 		}
+
+	}
+
+	function drawPixel( offset, r, g, b ) {
+
+		data[ offset ] = r;
+		data[ offset + 1 ] = g;
+		data[ offset + 2 ] = b;
+		data[ offset + 3 ] = 255;
 
 	}
 
