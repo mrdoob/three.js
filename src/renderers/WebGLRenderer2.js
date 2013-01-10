@@ -858,7 +858,7 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 
 			}
 
-    }
+		}
 
 	};
 
