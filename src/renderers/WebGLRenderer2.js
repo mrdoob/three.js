@@ -829,7 +829,36 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 
 			}
 
-		}
+		} else if ( object instanceof THREE.Line ) {
+
+			if ( updateBuffers ) {
+
+				// vertices
+
+				var position = geometry.attributes[ "position" ];
+				var positionSize = position.itemSize;
+				renderer.setFloatAttribute(attributes.position , position.buffer, positionSize, 0);
+
+				// colors
+
+				var color = geometry.attributes[ "color" ];
+
+				if ( attributes.color >= 0 && color ) {
+
+					var colorSize = color.itemSize;
+					renderer.setFloatAttribute(attributes.color , color.buffer, colorSize, 0);
+
+				}
+
+				// render lines
+				renderer.drawLineStrip(position.numItems / 3);
+
+				_this.info.render.calls ++;
+				_this.info.render.points += position.numItems;
+
+			}
+
+    }
 
 	};
 
@@ -1769,17 +1798,26 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 				}
 
 			} else if ( object instanceof THREE.Line ) {
-
+				
+				
 				geometry = object.geometry;
 
 				if ( ! geometry.__webglVertexBuffer ) {
 
-					lineRenderer.createBuffers( geometry );
-					lineRenderer.initBuffers( geometry, object );
+					if ( geometry instanceof THREE.Geometry ) {
 
-					geometry.verticesNeedUpdate = true;
-					geometry.colorsNeedUpdate = true;
-					geometry.lineDistancesNeedUpdate = true;
+						lineRenderer.createBuffers( geometry );
+						lineRenderer.initBuffers( geometry, object );
+
+						geometry.verticesNeedUpdate = true;
+						geometry.colorsNeedUpdate = true;
+						geometry.lineDistancesNeedUpdate = true;
+
+					} else if ( geometry instanceof THREE.BufferGeometry ) {
+
+						initDirectBuffers( geometry );
+
+					}
 
 				}
 
@@ -1971,23 +2009,38 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 			material.attributes && clearCustomAttributes( material );
 
 		} else if ( object instanceof THREE.Line ) {
+			
+			if ( geometry instanceof THREE.BufferGeometry ) {
 
-			material = getBufferMaterial( object, geometry );
+				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate ) {
 
-			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+					setDirectBuffers( geometry,  !geometry.dynamic );
 
-			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
+				}
 
-				lineRenderer.setBuffers( geometry);
+				geometry.verticesNeedUpdate = false;
+				geometry.colorsNeedUpdate = false;
+
+			} else {
+
+				material = getBufferMaterial( object, geometry );
+	
+				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+	
+				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
+	
+					lineRenderer.setBuffers( geometry);
+	
+				}
+	
+				geometry.verticesNeedUpdate = false;
+				geometry.colorsNeedUpdate = false;
+				geometry.lineDistancesNeedUpdate = false;
+	
+				material.attributes && clearCustomAttributes( material );
 
 			}
-
-			geometry.verticesNeedUpdate = false;
-			geometry.colorsNeedUpdate = false;
-			geometry.lineDistancesNeedUpdate = false;
-
-			material.attributes && clearCustomAttributes( material );
-
+			
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
