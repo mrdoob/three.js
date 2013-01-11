@@ -686,13 +686,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				var depth;
 
-				depth = 1 - smoothstep( v1.positionScreen.z, _near, _far );
+				depth = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
 				_color1.setRGB( depth, depth, depth );
 
-				depth = 1 - smoothstep( v2.positionScreen.z, _near, _far )
+				depth = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far )
 				_color2.setRGB( depth, depth, depth );
 
-				depth = 1 - smoothstep( v3.positionScreen.z, _near, _far );
+				depth = 1 - smoothstep( v3.positionScreen.z * v3.positionScreen.w, _near, _far );
 				_color3.setRGB( depth, depth, depth );
 
 				_color4.addColors( _color2, _color3 ).multiplyScalar( 0.5 );
@@ -894,10 +894,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_near = camera.near;
 				_far = camera.far;
 
-				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z, _near, _far );
-				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z, _near, _far );
-				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z, _near, _far );
-				_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z, _near, _far );
+				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
+				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far );
+				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z * v4.positionScreen.w, _near, _far );
+				_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z * v3.positionScreen.w, _near, _far );
 
 				_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 

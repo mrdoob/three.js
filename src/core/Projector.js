@@ -173,7 +173,7 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
-		var near = camera.near, far = camera.far, visible = false,
+		var visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, faceVertexUvs, uvs,
@@ -231,7 +231,10 @@ THREE.Projector = function() {
 
 					_vertex.positionScreen.copy( _vertex.positionWorld );
 					_vertex.positionScreen.applyMatrix4( _viewProjectionMatrix );
-					_vertex.positionScreen.multiplyScalar( 1 / _vertex.positionScreen.w );
+
+					_vertex.positionScreen.x /= _vertex.positionScreen.w;
+					_vertex.positionScreen.y /= _vertex.positionScreen.w;
+					_vertex.positionScreen.z /= _vertex.positionScreen.w;
 
 					_vertex.visible = _vertex.positionScreen.z > -1 && _vertex.positionScreen.z < 1;
 
