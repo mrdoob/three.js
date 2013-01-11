@@ -158,7 +158,11 @@ THREE.SoftwareRenderer = function () {
 		var width = Math.max( rectx2, prevrectx2 ) - x;
 		var height = Math.max( recty2, prevrecty2 ) - y;
 
-		context.putImageData( imagedata, 0, 0, x, y, width, height );
+		if ( x !== Infinity ) {
+
+			context.putImageData( imagedata, 0, 0, x, y, width, height );
+
+		}
 
 		prevrectx1 = rectx1; prevrecty1 = recty1;
 		prevrectx2 = rectx2; prevrecty2 = recty2;
@@ -198,7 +202,7 @@ THREE.SoftwareRenderer = function () {
 	function drawTriangle( x1, y1, x2, y2, x3, y3, shader ) {
 
 		// https://gist.github.com/2486101
-		// explanation: ttp://pouet.net/topic.php?which=8760&page=1
+		// explanation: http://pouet.net/topic.php?which=8760&page=1
 
 		// 28.4 fixed-point coordinates
 
