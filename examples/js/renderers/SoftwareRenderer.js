@@ -40,8 +40,8 @@ THREE.SoftwareRenderer = function () {
 
 	this.setSize = function ( width, height ) {
 
-		canvasWidth = width | 0;
-		canvasHeight = height | 0;
+		canvasWidth = Math.floor( width / blocksize ) * blocksize;
+		canvasHeight = Math.floor( height / blocksize ) * blocksize;
 
 		canvasWidthHalf = canvasWidth / 2;
 		canvasHeightHalf = canvasHeight / 2;
