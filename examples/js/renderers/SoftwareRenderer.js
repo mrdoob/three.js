@@ -105,7 +105,10 @@ THREE.SoftwareRenderer = function () {
 					function ( offset, cx1, cx2, scale ) {
 						var u = cx1 * scale; // 0-255!
 						var v = cx2 * scale; // 0-255!
-						drawPixel( offset, u, v, 0 );
+						data[ offset ] = u;
+						data[ offset + 1 ] = v;
+						data[ offset + 2 ] = 0;
+						data[ offset + 3 ] = 255;
 					}
 				)
 
@@ -124,7 +127,10 @@ THREE.SoftwareRenderer = function () {
 					v3.x * canvasWidthHalf + canvasWidthHalf,
 					- v3.y * canvasHeightHalf + canvasHeightHalf,
 					function ( offset, cx1, cx2, scale ) {
-						drawPixel( offset, 0, 255, 0 );
+						data[ offset ] = 0;
+						data[ offset + 1 ] = 255;
+						data[ offset + 2 ] = 0;
+						data[ offset + 3 ] = 255;
 					}
 				);
 
@@ -136,7 +142,10 @@ THREE.SoftwareRenderer = function () {
 					v1.x * canvasWidthHalf + canvasWidthHalf,
 					- v1.y * canvasHeightHalf + canvasHeightHalf,
 					function ( offset, cx1, cx2, scale ) {
-						drawPixel( offset, 0, 0, 255 )
+						data[ offset ] = 0;
+						data[ offset + 1 ] = 0;
+						data[ offset + 2 ] = 255;
+						data[ offset + 3 ] = 255;
 					}
 				);
 
@@ -162,21 +171,6 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
-	/*
-	function drawPixel( x, y, r, g, b ) {
-
-		var offset = ( x + y * canvasWidth ) * 4;
-
-		if ( data[ offset + 3 ] ) return;
-
-		data[ offset ] = r;
-		data[ offset + 1 ] = g;
-		data[ offset + 2 ] = b;
-		data[ offset + 3 ] = 255;
-
-	}
-	*/
-
 	function clearRectangle( x1, y1, x2, y2 ) {
 
 		var xmin = Math.max( Math.min( x1, x2 ), 0 );
@@ -201,7 +195,7 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
-	function drawTriangle( x1, y1, x2, y2, x3, y3, callback ) {
+	function drawTriangle( x1, y1, x2, y2, x3, y3, shader ) {
 
 		// https://gist.github.com/2486101
 		// explanation: ttp://pouet.net/topic.php?which=8760&page=1
@@ -344,7 +338,7 @@ THREE.SoftwareRenderer = function () {
 
 							if ( data[ offset + 3 ] === 0 ) {
 
-								callback( offset, cx1, cx2, scale );
+								shader( offset, cx1, cx2, scale );
 
 							}
 
@@ -378,7 +372,7 @@ THREE.SoftwareRenderer = function () {
 
 							if ( ( cx1 | cx2 | cx3 ) >= 0 && data[ offset + 3 ] === 0 ) {
 
-								callback( offset, cx1, cx2, scale );
+								shader( offset, cx1, cx2, scale );
 
 							}
 
@@ -406,15 +400,6 @@ THREE.SoftwareRenderer = function () {
 			cb3 += q*dx31;
 
 		}
-
-	}
-
-	function drawPixel( offset, r, g, b ) {
-
-		data[ offset ] = r;
-		data[ offset + 1 ] = g;
-		data[ offset + 2 ] = b;
-		data[ offset + 3 ] = 255;
 
 	}
 
