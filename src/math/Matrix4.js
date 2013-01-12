@@ -329,6 +329,20 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	multiplyVector3: function ( vector ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use is now vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
+
+	},
+
+	multiplyVector4: function ( vector ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector4() has been removed. Use is now vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
+
+	},
+
 	multiplyVector3Array: function ( a ) {
 
 		var tmp = THREE.Matrix4.__v1;
