@@ -2831,6 +2831,13 @@ THREE.Matrix3.prototype = {
 
 	},
 
+	multiplyVector3: function ( vector ) {
+
+		console.warn( 'DEPRECATED: Matrix3\'s .multiplyVector3() has been removed. Use is now vector.applyMatrix3( matrix ) instead.' );
+		return vector.applyMatrix3( this );
+
+	},
+
 	multiplyVector3Array: function ( a ) {
 
 		var tmp = THREE.Matrix3.__v1;
@@ -2841,7 +2848,7 @@ THREE.Matrix3.prototype = {
 			tmp.y = a[ i + 1 ];
 			tmp.z = a[ i + 2 ];
 
-			this.multiplyVector3( tmp );
+			tmp.applyMatrix3(this);
 
 			a[ i ]     = tmp.x;
 			a[ i + 1 ] = tmp.y;
@@ -3305,6 +3312,20 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	multiplyVector3: function ( vector ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use is now vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
+
+	},
+
+	multiplyVector4: function ( vector ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector4() has been removed. Use is now vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
+
+	},
+
 	multiplyVector3Array: function ( a ) {
 
 		var tmp = THREE.Matrix4.__v1;
@@ -3315,7 +3336,7 @@ THREE.Matrix4.prototype = {
 			tmp.y = a[ i + 1 ];
 			tmp.z = a[ i + 2 ];
 
-			this.multiplyVector3( tmp );
+			tmp.applyMatrix4(this);
 
 			a[ i ]     = tmp.x;
 			a[ i + 1 ] = tmp.y;
@@ -5033,6 +5054,13 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	multiplyVector3: function ( vector ) {
+
+		console.warn( 'DEPRECATED: Quaternion\'s .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		return vector.applyQuaternion( this );
+
+	},
+
 	slerp: function ( qb, t ) {
 
 		var x = this.x, y = this.y, z = this.z, w = this.w;
@@ -6362,7 +6390,7 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
-		var near = camera.near, far = camera.far, visible = false,
+		var visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, faceVertexUvs, uvs,
@@ -6420,7 +6448,10 @@ THREE.Projector = function() {
 
 					_vertex.positionScreen.copy( _vertex.positionWorld );
 					_vertex.positionScreen.applyMatrix4( _viewProjectionMatrix );
-					_vertex.positionScreen.multiplyScalar( 1 / _vertex.positionScreen.w );
+
+					_vertex.positionScreen.x /= _vertex.positionScreen.w;
+					_vertex.positionScreen.y /= _vertex.positionScreen.w;
+					_vertex.positionScreen.z /= _vertex.positionScreen.w;
 
 					_vertex.visible = _vertex.positionScreen.z > -1 && _vertex.positionScreen.z < 1;
 
@@ -13665,13 +13696,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				var depth;
 
-				depth = 1 - smoothstep( v1.positionScreen.z, _near, _far );
+				depth = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
 				_color1.setRGB( depth, depth, depth );
 
-				depth = 1 - smoothstep( v2.positionScreen.z, _near, _far )
+				depth = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far )
 				_color2.setRGB( depth, depth, depth );
 
-				depth = 1 - smoothstep( v3.positionScreen.z, _near, _far );
+				depth = 1 - smoothstep( v3.positionScreen.z * v3.positionScreen.w, _near, _far );
 				_color3.setRGB( depth, depth, depth );
 
 				_color4.addColors( _color2, _color3 ).multiplyScalar( 0.5 );
@@ -13873,10 +13904,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_near = camera.near;
 				_far = camera.far;
 
-				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z, _near, _far );
-				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z, _near, _far );
-				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z, _near, _far );
-				_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z, _near, _far );
+				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
+				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far );
+				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z * v4.positionScreen.w, _near, _far );
+				_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z * v3.positionScreen.w, _near, _far );
 
 				_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 
