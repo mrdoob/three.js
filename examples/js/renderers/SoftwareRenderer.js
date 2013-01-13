@@ -40,6 +40,11 @@ THREE.SoftwareRenderer = function () {
 
 	this.autoClear = true;
 
+	// WebGLRenderer compatibility
+
+	this.supportsVertexTextures = function () {};
+	this.setFaceCulling = function () {};
+
 	this.setSize = function ( width, height ) {
 
 		canvasWBlocks = Math.floor( width / blockSize );
@@ -150,8 +155,6 @@ THREE.SoftwareRenderer = function () {
 		recty2 = 0;
 
 		if ( this.autoClear ) this.clear();
-
-		finishClear();
 
 		var renderData = projector.projectScene( scene, camera );
 		var elements = renderData.elements;
