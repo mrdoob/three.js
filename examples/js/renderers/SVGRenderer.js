@@ -165,11 +165,7 @@ THREE.SVGRenderer = function () {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
-
-					renderFace3( _v1, _v2, _v3, element, material, scene );
-
-				}
+				renderFace3( _v1, _v2, _v3, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -187,11 +183,7 @@ THREE.SVGRenderer = function () {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
-
-					renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
-
-				}
+				renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 			}
 

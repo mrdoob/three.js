@@ -2484,42 +2484,42 @@ THREE.Box3.prototype = {
 
 		if ( points.length > 0 ) {
 
-			var p = points[ 0 ];
+			var point = points[ 0 ];
 
-			this.min.copy( p );
-			this.max.copy( p );
+			this.min.copy( point );
+			this.max.copy( point );
 
 			for ( var i = 1, il = points.length; i < il; i ++ ) {
 
-				p = points[ i ];
+				point = points[ i ];
 
-				if ( p.x < this.min.x ) {
+				if ( point.x < this.min.x ) {
 
-					this.min.x = p.x;
+					this.min.x = point.x;
 
-				} else if ( p.x > this.max.x ) {
+				} else if ( point.x > this.max.x ) {
 
-					this.max.x = p.x;
-
-				}
-
-				if ( p.y < this.min.y ) {
-
-					this.min.y = p.y;
-
-				} else if ( p.y > this.max.y ) {
-
-					this.max.y = p.y;
+					this.max.x = point.x;
 
 				}
 
-				if ( p.z < this.min.z ) {
+				if ( point.y < this.min.y ) {
 
-					this.min.z = p.z;
+					this.min.y = point.y;
 
-				} else if ( p.z > this.max.z ) {
+				} else if ( point.y > this.max.y ) {
 
-					this.max.z = p.z;
+					this.max.y = point.y;
+
+				}
+
+				if ( point.z < this.min.z ) {
+
+					this.min.z = point.z;
+
+				} else if ( point.z > this.max.z ) {
+
+					this.max.z = point.z;
 
 				}
 
@@ -13143,10 +13143,15 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_canvas.style.width = width + 'px';
 		_canvas.style.height = height + 'px';
 
-		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clipBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
-		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clipBox.set(
+			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
+			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
+		);
+
+		_clearBox.set(
+			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
+			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
+		);
 
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
@@ -13163,8 +13168,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.copy( color );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox.set(
+			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
+			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
+		);
 
 	};
 
@@ -13173,8 +13180,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.setHex( hex );
 		_clearOpacity = opacity !== undefined ? opacity : 1;
 
-		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox.max.set( _canvasWidthHalf, _canvasHeightHalf );
+		_clearBox.set(
+			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
+			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
+		);
 
 	};
 
@@ -13195,7 +13204,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( _clearOpacity < 1 ) {
 
-				_context.clearRect( _clearBox.min.x | 0, _clearBox.min.y | 0, ( _clearBox.max.x - _clearBox.min.x ) | 0, ( _clearBox.max.y - _clearBox.min.y ) | 0 );
+				_context.clearRect(
+					_clearBox.min.x | 0,
+					_clearBox.min.y | 0,
+					( _clearBox.max.x - _clearBox.min.x ) | 0,
+					( _clearBox.max.y - _clearBox.min.y ) | 0
+				);
 
 			}
 
@@ -13206,7 +13220,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				setFillStyle( 'rgba(' + Math.floor( _clearColor.r * 255 ) + ',' + Math.floor( _clearColor.g * 255 ) + ',' + Math.floor( _clearColor.b * 255 ) + ',' + _clearOpacity + ')' );
 
-				_context.fillRect( _clearBox.min.x | 0, _clearBox.min.y | 0, ( _clearBox.max.x - _clearBox.min.x ) | 0, ( _clearBox.max.y - _clearBox.min.y ) | 0 );
+				_context.fillRect(
+					_clearBox.min.x | 0,
+					_clearBox.min.y | 0,
+					( _clearBox.max.x - _clearBox.min.x ) | 0,
+					( _clearBox.max.y - _clearBox.min.y ) | 0
+				);
 
 			}
 
@@ -13242,7 +13261,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_lights = _renderData.lights;
 
 		/* DEBUG
-		_context.fillStyle = 'rgba( 0, 255, 255, 0.5 )';
+		setFillStyle( 'rgba( 0, 255, 255, 0.5 )' );
 		_context.fillRect( _clipBox.min.x, _clipBox.min.y, _clipBox.max.x - _clipBox.min.x, _clipBox.max.y - _clipBox.min.y );
 		*/
 
@@ -13286,7 +13305,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-
 			} else if ( element instanceof THREE.RenderableFace3 ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
@@ -13309,11 +13327,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
-
-					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
-
-				}
+				renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -13345,18 +13359,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
-
-					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
-
-				}
+				renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
 
 			}
 
-
 			/* DEBUG
-			_context.lineWidth = 1;
-			_context.strokeStyle = 'rgba( 0, 255, 0, 0.5 )';
+			setLineWidth( 1 );
+			setStrokeStyle( 'rgba( 0, 255, 0, 0.5 )' );
 			_context.strokeRect( _elemBox.min.x, _elemBox.min.y, _elemBox.max.x - _elemBox.min.x, _elemBox.max.y - _elemBox.min.y );
 			*/
 
@@ -13365,8 +13374,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		}
 
 		/* DEBUG
-		_context.lineWidth = 1;
-		_context.strokeStyle = 'rgba( 255, 0, 0, 0.5 )';
+		setLineWidth( 1 );
+		setStrokeStyle( 'rgba( 255, 0, 0, 0.5 )' );
 		_context.strokeRect( _clearBox.min.x, _clearBox.min.y, _clearBox.max.x - _clearBox.min.x, _clearBox.max.y - _clearBox.min.y );
 		*/
 
