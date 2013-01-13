@@ -236,7 +236,9 @@ THREE.Projector = function() {
 					_vertex.positionScreen.y /= _vertex.positionScreen.w;
 					_vertex.positionScreen.z /= _vertex.positionScreen.w;
 
-					_vertex.visible = _vertex.positionScreen.z > -1 && _vertex.positionScreen.z < 1;
+					_vertex.visible = ! ( _vertex.positionScreen.x < -1 || _vertex.positionScreen.x > 1 ||
+							  _vertex.positionScreen.y < -1 || _vertex.positionScreen.y > 1 ||
+							  _vertex.positionScreen.z < -1 || _vertex.positionScreen.z > 1 );
 
 				}
 
@@ -258,7 +260,7 @@ THREE.Projector = function() {
 						v2 = _vertexPool[ face.b ];
 						v3 = _vertexPool[ face.c ];
 
-						if ( v1.visible === true && v2.visible === true && v3.visible === true ) {
+						if ( v1.visible === true || v2.visible === true || v3.visible === true ) {
 
 							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
@@ -290,7 +292,7 @@ THREE.Projector = function() {
 						v3 = _vertexPool[ face.c ];
 						v4 = _vertexPool[ face.d ];
 
-						if ( v1.visible === true && v2.visible === true && v3.visible === true && v4.visible === true ) {
+						if ( v1.visible === true || v2.visible === true || v3.visible === true || v4.visible === true ) {
 
 							visible = ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||

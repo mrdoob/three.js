@@ -112,6 +112,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
+	// WebGLRenderer compatibility
+
+	this.supportsVertexTextures = function () {};
+	this.setFaceCulling = function () {};
+
 	this.setSize = function ( width, height ) {
 
 		_canvasWidth = width * this.devicePixelRatio;
@@ -274,6 +279,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
+				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
+
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
@@ -297,6 +306,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3; _v4 = element.v4;
+
+				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
+				if ( _v4.positionScreen.z < -1 || _v4.positionScreen.z > 1 ) continue;
 
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
