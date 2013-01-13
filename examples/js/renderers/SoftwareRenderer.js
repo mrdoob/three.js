@@ -11,6 +11,8 @@ THREE.SoftwareRenderer = function () {
 	var canvas = document.createElement( 'canvas' );
 	var context = canvas.getContext( '2d' );
 
+	var shaders = {};
+
 	var canvasWidth, canvasHeight;
 	var canvasWBlocks, canvasHBlocks;
 	var viewportXScale, viewportYScale, viewportZScale;
@@ -99,54 +101,6 @@ THREE.SoftwareRenderer = function () {
 
 	};
 
-	function clearBlock( blockX, blockY ) {
-		var zoffset = blockX * blockSize + blockY * blockSize * canvasWidth;
-		var poffset = zoffset * 4 + 3;
-
-		var zlinestep = canvasWidth - blockSize;
-		var plinestep = zlinestep * 4;
-
-		for ( var y = 0; y < blockSize; y ++ ) {
-
-			for ( var x = 0; x < blockSize; x ++ ) {
-
-				zbuffer[ zoffset ] = maxZVal;
-				data[ poffset ] = 0;
-
-				zoffset ++;
-				poffset += 4;
-
-			}
-
-			zoffset += zlinestep;
-			poffset += plinestep;
-
-		}
-
-	}
-
-	function finishClear( ) {
-
-		var block = 0;
-
-		for ( var y = 0; y < canvasHBlocks; y ++ ) {
-
-			for ( var x = 0; x < canvasWBlocks; x ++ ) {
-
-				if ( blockFlags[ block ] & BLOCK_NEEDCLEAR ) {
-
-					clearBlock( x, y );
-					blockFlags[ block ] = BLOCK_ISCLEAR;
-
-				}
-
-				block ++;
-			}
-
-		}
-
-	}
-
 	this.render = function ( scene, camera ) {
 
 		rectx1 = Infinity;
@@ -162,6 +116,7 @@ THREE.SoftwareRenderer = function () {
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
 
 			var element = elements[ e ];
+			var shader = getMaterialShader( element.material );
 
 			if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -169,15 +124,7 @@ THREE.SoftwareRenderer = function () {
 					element.v1.positionScreen,
 					element.v2.positionScreen,
 					element.v3.positionScreen,
-					function ( offset, u, v ) {
-
-						data[ offset ] = u * 255;
-						data[ offset + 1 ] = v * 255;
-						data[ offset + 2 ] = 0;
-						data[ offset + 3 ] = 255;
-
-					}
-
+					shader
 				)
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
@@ -186,28 +133,14 @@ THREE.SoftwareRenderer = function () {
 					element.v1.positionScreen,
 					element.v2.positionScreen,
 					element.v4.positionScreen,
-					function ( offset, u, v ) {
-
-						data[ offset ] = u * 255;
-						data[ offset + 1 ] = v * 255;
-						data[ offset + 2 ] = 0;
-						data[ offset + 3 ] = 255;
-					}
+					shader
 				);
 
 				drawTriangle(
 					element.v2.positionScreen,
 					element.v3.positionScreen,
 					element.v4.positionScreen,
-					function ( offset, u, v ) {
-
-						data[ offset ] = u * 255;
-						data[ offset + 1 ] = v * 255;
-						data[ offset + 2 ] = 0;
-						data[ offset + 3 ] = 255;
-
-					}
-
+					shader
 				);
 
 			}
@@ -245,6 +178,59 @@ THREE.SoftwareRenderer = function () {
 		prevrectx2 = rectx2; prevrecty2 = recty2;
 
 	};
+
+	function getMaterialShader( material ) {
+
+		var id = material.id;
+		var shader = shaders[ id ];
+
+		if ( shaders[ id ] === undefined ) {
+
+			if ( material instanceof THREE.MeshBasicMaterial ) {
+
+				shader = new Function(
+						'buffer, offset, u, v',
+						[
+							'buffer[ offset ] = ' + ( material.color.r * 255 ) + ';',
+							'buffer[ offset + 1 ] = ' + ( material.color.g * 255 ) + ';',
+							'buffer[ offset + 2 ] = ' + ( material.color.b * 255 ) + ';',
+							'buffer[ offset + 3 ] = ' + ( material.opacity * 255 ) + ';',
+						].join('\n')
+					);
+
+			} else if ( material instanceof THREE.MeshLambertMaterial ) {
+
+				shader = new Function(
+						'buffer, offset, u, v',
+						[
+							'buffer[ offset ] = ' + ( material.color.r * 255 ) + ';',
+							'buffer[ offset + 1 ] = ' + ( material.color.g * 255 ) + ';',
+							'buffer[ offset + 2 ] = ' + ( material.color.b * 255 ) + ';',
+							'buffer[ offset + 3 ] = ' + ( material.opacity * 255 ) + ';',
+						].join('\n')
+					);
+
+			} else {
+
+				shader = new Function(
+						'buffer, offset, u, v',
+						[
+							'buffer[ offset ] = u * 255;',
+							'buffer[ offset + 1 ] = v * 255;',
+							'buffer[ offset + 2 ] = 0;',
+							'buffer[ offset + 3 ] = 255;'
+						].join('\n')
+					);
+
+			}
+
+			shaders[ id ] = shader;
+
+		}
+
+		return shader;
+
+	}
 
 	function clearRectangle( x1, y1, x2, y2 ) {
 
@@ -461,7 +447,7 @@ THREE.SoftwareRenderer = function () {
 								zbuffer[ offset ] = z;
 								var u = cx1 * scale;
 								var v = cx2 * scale;
-								shader( offset * 4, u, v );
+								shader( data, offset * 4, u, v );
 							}
 
 							cx1 += dy12;
@@ -503,7 +489,7 @@ THREE.SoftwareRenderer = function () {
 									var v = cx2 * scale;
 
 									zbuffer[ offset ] = z;
-									shader( offset * 4, u, v );
+									shader( data, offset * 4, u, v );
 
 								}
 
@@ -534,6 +520,55 @@ THREE.SoftwareRenderer = function () {
 			cb2 += q*dx23;
 			cb3 += q*dx31;
 			cbz += q*dzdy;
+		}
+
+	}
+
+	function clearBlock( blockX, blockY ) {
+
+		var zoffset = blockX * blockSize + blockY * blockSize * canvasWidth;
+		var poffset = zoffset * 4 + 3;
+
+		var zlinestep = canvasWidth - blockSize;
+		var plinestep = zlinestep * 4;
+
+		for ( var y = 0; y < blockSize; y ++ ) {
+
+			for ( var x = 0; x < blockSize; x ++ ) {
+
+				zbuffer[ zoffset ] = maxZVal;
+				data[ poffset ] = 0;
+
+				zoffset ++;
+				poffset += 4;
+
+			}
+
+			zoffset += zlinestep;
+			poffset += plinestep;
+
+		}
+
+	}
+
+	function finishClear( ) {
+
+		var block = 0;
+
+		for ( var y = 0; y < canvasHBlocks; y ++ ) {
+
+			for ( var x = 0; x < canvasWBlocks; x ++ ) {
+
+				if ( blockFlags[ block ] & BLOCK_NEEDCLEAR ) {
+
+					clearBlock( x, y );
+					blockFlags[ block ] = BLOCK_ISCLEAR;
+
+				}
+
+				block ++;
+			}
+
 		}
 
 	}
