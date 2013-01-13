@@ -217,8 +217,9 @@ THREE.SoftwareRenderer = function () {
 		var y = Math.min( recty1, prevrecty1 );
 		var width = Math.max( rectx2, prevrectx2 ) - x;
 		var height = Math.max( recty2, prevrecty2 ) - y;
-		
-		/*// debug; draw zbuffer
+
+		/*
+		// debug; draw zbuffer
 
 		for ( var i = 0, l = zbuffer.length; i < l; i++ ) {
 
@@ -228,7 +229,8 @@ THREE.SoftwareRenderer = function () {
 			data[ o + 1 ] = v;
 			data[ o + 2 ] = v;
 			data[ o + 3 ] = 255;
-		}*/
+		}
+		*/
 
 		if ( x !== Infinity ) {
 
@@ -340,7 +342,7 @@ THREE.SoftwareRenderer = function () {
 
 		// Z at top/left corner of rast area
 
-		var cz = z1 + ((minx << subpixelBits) - x1) * dzdx + ((miny << subpixelBits) - y1) * dzdy;
+		var cz = ( z1 + ((minx << subpixelBits) - x1) * dzdx + ((miny << subpixelBits) - y1) * dzdy ) | 0;
 
 		// Z pixel steps
 
