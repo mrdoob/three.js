@@ -143,14 +143,14 @@ THREE.Box2.prototype = {
 
 	containsPoint: function ( point ) {
 
-		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-		     ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
+		if ( point.x < this.min.x || point.x > this.max.x ||
+		     point.y < this.min.y || point.y > this.max.y ) {
 
-			return true;
+			return false;
 
 		}
 
-		return false;
+		return true;
 
 	},
 
@@ -183,10 +183,8 @@ THREE.Box2.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) ||
-		     ( box.min.x > this.max.x ) ||
-		     ( box.max.y < this.min.y ) ||
-		     ( box.min.y > this.max.y ) ) {
+		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
+		     box.max.y < this.min.y || box.min.y > this.max.y ) {
 
 			return false;
 
