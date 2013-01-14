@@ -18,6 +18,9 @@ THREE.Projector = function() {
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 
+	_clipBox = new THREE.Box3( new THREE.Vector3( -1, -1, -1 ), new THREE.Vector3( 1, 1, 1 ) ),
+	_boundingBox = new THREE.Box3(),
+
 	_viewMatrix = new THREE.Matrix4(),
 	_viewProjectionMatrix = new THREE.Matrix4(),
 
@@ -260,7 +263,8 @@ THREE.Projector = function() {
 						v2 = _vertexPool[ face.b ];
 						v3 = _vertexPool[ face.c ];
 
-						if ( v1.visible === true || v2.visible === true || v3.visible === true ) {
+						if ( v1.visible === true || v2.visible === true || v3.visible === true ||
+							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( [ v1.positionScreen, v2.positionScreen, v3.positionScreen ] ) ) ) {
 
 							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
@@ -292,7 +296,8 @@ THREE.Projector = function() {
 						v3 = _vertexPool[ face.c ];
 						v4 = _vertexPool[ face.d ];
 
-						if ( v1.visible === true || v2.visible === true || v3.visible === true || v4.visible === true ) {
+						if ( v1.visible === true || v2.visible === true || v3.visible === true || v4.visible === true ||
+							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( [ v1.positionScreen, v2.positionScreen, v3.positionScreen, v4.positionScreen ] ) ) ) {
 
 							visible = ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||

@@ -258,6 +258,10 @@ THREE.SoftwareRenderer = function () {
 
 	function drawTriangle( v1, v2, v3, shader ) {
 
+		// TODO: Implement per-pixel z-clipping
+
+		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 || v3.z < -1 || v3.z > 1 ) return;
+
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
 
