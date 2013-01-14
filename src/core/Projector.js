@@ -229,19 +229,16 @@ THREE.Projector = function() {
 
 					_vertex = getNextVertexInPool();
 
-					_vertex.positionWorld.copy( vertices[ v ] );
-					_vertex.positionWorld.applyMatrix4( _modelMatrix );
-
-					_vertex.positionScreen.copy( _vertex.positionWorld );
-					_vertex.positionScreen.applyMatrix4( _viewProjectionMatrix );
+					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
+					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
 					_vertex.positionScreen.y /= _vertex.positionScreen.w;
 					_vertex.positionScreen.z /= _vertex.positionScreen.w;
 
 					_vertex.visible = ! ( _vertex.positionScreen.x < -1 || _vertex.positionScreen.x > 1 ||
-							  _vertex.positionScreen.y < -1 || _vertex.positionScreen.y > 1 ||
-							  _vertex.positionScreen.z < -1 || _vertex.positionScreen.z > 1 );
+							      _vertex.positionScreen.y < -1 || _vertex.positionScreen.y > 1 ||
+							      _vertex.positionScreen.z < -1 || _vertex.positionScreen.z > 1 );
 
 				}
 
@@ -336,14 +333,11 @@ THREE.Projector = function() {
 
 					}
 
-					_face.normalModel.applyMatrix3( _normalMatrix );
-					_face.normalModel.normalize();
+					_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-					_face.normalModelView.copy( _face.normalModel );
-					_face.normalModelView.applyMatrix3( _normalViewMatrix );
+					_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
 
-					_face.centroidModel.copy( face.centroid );
-					_face.centroidModel.applyMatrix4( _modelMatrix );
+					_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
@@ -358,12 +352,10 @@ THREE.Projector = function() {
 
 						}
 
-						normalModel.applyMatrix3( _normalMatrix );
-						normalModel.normalize();
+						normalModel.applyMatrix3( _normalMatrix ).normalize();
 
 						var normalModelView = _face.vertexNormalsModelView[ n ];
-						normalModelView.copy( normalModel );
-						normalModelView.applyMatrix3( _normalViewMatrix );
+						normalModelView.copy( normalModel ).applyMatrix3( _normalViewMatrix );
 
 					}
 
@@ -386,8 +378,7 @@ THREE.Projector = function() {
 					_face.color = face.color;
 					_face.material = material;
 
-					_centroid.copy( _face.centroidModel )
-					_centroid.applyMatrix4( _viewProjectionMatrix );
+					_centroid.copy( _face.centroidModel ).applyMatrix4( _viewProjectionMatrix );
 
 					_face.z = _centroid.z;
 
@@ -402,8 +393,7 @@ THREE.Projector = function() {
 				vertices = object.geometry.vertices;
 
 				v1 = getNextVertexInPool();
-				v1.positionScreen.copy( vertices[ 0 ] );
-				v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
+				v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
 				// Handle LineStrip and LinePieces
 				var step = object.type === THREE.LinePieces ? 2 : 1;
@@ -411,8 +401,7 @@ THREE.Projector = function() {
 				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ v ] );
-					v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
+					v1.positionScreen.copy( vertices[ v ] ).applyMatrix4( _modelViewProjectionMatrix );
 
 					if ( ( v + 1 ) % step > 0 ) continue;
 
