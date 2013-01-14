@@ -79,9 +79,10 @@ test( "setComponents", function() {
 });
 
 test( "setFromNormalAndCoplanarPoint", function() {
-	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( one3, zero3 );
+	var normal = one3.clone().normalize();
+	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( normal, zero3 );
 	
-	ok( a.normal.equals( one3.clone().normalize() ), "Passed!" );
+	ok( a.normal.equals( normal ), "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 });
 

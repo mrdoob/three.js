@@ -4536,7 +4536,7 @@ THREE.Plane.prototype = {
 
 	setFromNormalAndCoplanarPoint: function ( normal, point ) {
 
-		this.normal.copy( normal ).normalize();
+		this.normal.copy( normal );
 		this.constant = - point.dot( this.normal );	// must be this.normal, not normal, as this.normal is normalized
 
 		return this;
@@ -4545,7 +4545,7 @@ THREE.Plane.prototype = {
 
 	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var normal = THREE.Plane.__v1.subVectors( c, b ).cross( THREE.Plane.__v2.subVectors( a, b ) );
+		var normal = THREE.Plane.__v1.subVectors( c, b ).cross( THREE.Plane.__v2.subVectors( a, b ) ).normalize();
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
