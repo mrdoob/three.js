@@ -346,3 +346,5 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	return qm.copy( qa ).slerp( qb, t );
 
 }
+
+THREE.Vector3.__q1 = new THREE.Quaternion(); // to be moved to Vector3.js
