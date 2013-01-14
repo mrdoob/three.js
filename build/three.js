@@ -3588,7 +3588,7 @@ THREE.Matrix4.prototype = {
 		mRotation.identity();
 		mRotation.setRotationFromQuaternion( rotation );
 
-		mScale.makeScale( scale );
+		mScale.makeScale( scale.x, scale.y, scale.z );
 
 		this.multiplyMatrices( mRotation, mScale );
 
@@ -3889,13 +3889,13 @@ THREE.Matrix4.prototype = {
 
 	//
 
-	makeTranslation: function ( offset ) {
+	makeTranslation: function ( x, y, z ) {
 
 		this.set(
 
-			1, 0, 0, offset.x,
-			0, 1, 0, offset.y,
-			0, 0, 1, offset.z,
+			1, 0, 0, x,
+			0, 1, 0, y,
+			0, 0, 1, z,
 			0, 0, 0, 1
 
 		);
@@ -3978,13 +3978,13 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	makeScale: function ( factor ) {
+	makeScale: function ( x, y, z ) {
 
 		this.set(
 
-			factor.x, 0, 0, 0,
-			0, factor.y, 0, 0,
-			0, 0, factor.z, 0,
+			x, 0, 0, 0,
+			0, y, 0, 0,
+			0, 0, z, 0,
 			0, 0, 0, 1
 
 		);
@@ -24935,7 +24935,7 @@ THREE.GeometryUtils = {
 		offset.addVectors( bb.min, bb.max );
 		offset.multiplyScalar( -0.5 );
 
-		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset ) );
+		geometry.applyMatrix( new THREE.Matrix4().makeTranslation( offset.x, offset.y, offset.z ) );
 		geometry.computeBoundingBox();
 
 		return offset;
