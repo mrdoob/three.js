@@ -19,7 +19,7 @@ THREE.SoftwareRenderer = function () {
 	var viewportXOffs, viewportYOffs, viewportZOffs;
 
 	var imagedata, data, zbuffer;
-	var numBlocks, blockMaxZ, blockFlags;
+	var numBlocks, blockMaxZ, blockMinZ, blockFlags;
 
 	var BLOCK_ISCLEAR = (1 << 0);
 	var BLOCK_NEEDCLEAR = (1 << 1);
@@ -63,15 +63,16 @@ THREE.SoftwareRenderer = function () {
 		viewportYOffs  =  fixScale * canvasHeight / 2 + 0.5;
 		viewportZOffs  =             maxZVal      / 2 + 0.5;
 
-		canvas.width = canvasWidth;
-		canvas.height = canvasHeight;
+		canvas.width   = canvasWidth;
+		canvas.height  = canvasHeight;
 
-		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
-		data = imagedata.data;
-		zbuffer = new Int32Array( data.length / 4 );
+		imagedata   = context.getImageData( 0, 0, canvasWidth, canvasHeight );
+		data        = imagedata.data;
+		zbuffer     = new Int32Array( data.length / 4 );
 
-		numBlocks = canvasWBlocks * canvasHBlocks;
-		blockMaxZ = new Int32Array( numBlocks );
+		numBlocks  = canvasWBlocks * canvasHBlocks;
+		blockMaxZ  = new Int32Array( numBlocks );
+		blockMinZ  = new Int32Array( numBlocks );
 		blockFlags = new Uint8Array( numBlocks );
 
 		for ( var i = 0, l = zbuffer.length; i < l; i ++ ) {
@@ -94,12 +95,60 @@ THREE.SoftwareRenderer = function () {
 
 		for ( var i = 0; i < numBlocks; i ++ ) {
 
-			blockMaxZ[ i ] = maxZVal;
+			blockMaxZ [ i ] = maxZVal;
+			blockMinZ [ i ] = 0;
 			blockFlags[ i ] = (blockFlags[ i ] & BLOCK_ISCLEAR) ? BLOCK_ISCLEAR : BLOCK_NEEDCLEAR;
 
 		}
 
 	};
+
+	function clearBlock( blockX, blockY ) {
+		var coffset = blockX * blockSize + blockY * blockSize * canvasWidth;
+		var poffset = coffset * 4 + 3;
+		var zoffset = ((canvasWBlocks * blockY) +  blockX ) * (blockSize*blockSize);    // z wil be linear per tile
+
+		var plinestep = (canvasWidth - blockSize) * 4; 
+
+		for ( var y = 0; y < blockSize; y ++ ) {
+
+			for ( var x = 0; x < blockSize; x ++ ) {
+
+				zbuffer[ zoffset ] = maxZVal;
+				data[ poffset ] = 0;
+
+				zoffset ++;
+				poffset += 4;
+
+			}
+
+			poffset += plinestep;
+
+		}
+
+	}
+
+	function finishClear( ) {
+
+		var block = 0;
+
+		for ( var y = 0; y < canvasHBlocks; y ++ ) {
+
+			for ( var x = 0; x < canvasWBlocks; x ++ ) {
+
+				if ( blockFlags[ block ] & BLOCK_NEEDCLEAR ) {
+
+					clearBlock( x, y );
+					blockFlags[ block ] = BLOCK_ISCLEAR;
+
+				}
+
+				block ++;
+			}
+
+		}
+
+	}
 
 	this.render = function ( scene, camera ) {
 
@@ -116,7 +165,7 @@ THREE.SoftwareRenderer = function () {
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
 
 			var element = elements[ e ];
-			var shader = getMaterialShader( element.material );
+			var shader  = getMaterialShader( element.material );
 
 			if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -144,16 +193,15 @@ THREE.SoftwareRenderer = function () {
 				);
 
 			}
-
 		}
 
-		finishClear();
+	   finishClear();
 
 		var x = Math.min( rectx1, prevrectx1 );
 		var y = Math.min( recty1, prevrecty1 );
 		var width = Math.max( rectx2, prevrectx2 ) - x;
 		var height = Math.max( recty2, prevrecty2 ) - y;
-
+		
 		/*
 		// debug; draw zbuffer
 
@@ -232,35 +280,8 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
-	function clearRectangle( x1, y1, x2, y2 ) {
-
-		var xmin = Math.max( Math.min( x1, x2 ), 0 );
-		var xmax = Math.min( Math.max( x1, x2 ), canvasWidth );
-		var ymin = Math.max( Math.min( y1, y2 ), 0 );
-		var ymax = Math.min( Math.max( y1, y2 ), canvasHeight );
-
-		var offset = ( xmin + ymin * canvasWidth - 1 ) * 4 + 3;
-		var linestep = ( canvasWidth - ( xmax - xmin ) ) * 4;
-
-		for ( var y = ymin; y < ymax; y ++ ) {
-
-			for ( var x = xmin; x < xmax; x ++ ) {
-
-				data[ offset += 4 ] = 0;
-
-			}
-
-			offset += linestep;
-
-		}
-
-	}
 
 	function drawTriangle( v1, v2, v3, shader ) {
-
-		// TODO: Implement per-pixel z-clipping
-
-		if ( v1.z < -1 || v1.z > 1 || v2.z < -1 || v2.z > 1 || v3.z < -1 || v3.z > 1 ) return;
 
 		// https://gist.github.com/2486101
 		// explanation: http://pouet.net/topic.php?which=8760&page=1
@@ -425,13 +446,28 @@ THREE.SoftwareRenderer = function () {
 				blockFlags[ blockId ] = bflags & ~( BLOCK_ISCLEAR | BLOCK_NEEDCLEAR );
 
 				// Offset at top-left corner
-				var offset = x0 + y0 * canvasWidth;
+				var offsetC = x0 + y0 * canvasWidth;
+				var offsetZ = blockId * blockSize * blockSize;
+
+				//  skip ztest if (blockMinZ[ blockId ] > maxz)
+				var skipZ = false;
 
 				// Accept whole block when fully covered
 				if ( cb1 >= nmin1 && cb2 >= nmin2 && cb3 >= nmin3 ) {
 
 					var maxz = cbz + nmaxz;
-					blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );
+
+					if(blockMinZ[ blockId ] > maxz)
+					{
+						blockMaxZ[ blockId ] = maxz;
+						skipZ = true;
+					}
+					else
+					{
+						blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );
+					}
+
+					blockMinZ[ blockId ] = Math.min( blockMinZ[ blockId ], minz );
 
 					var cy1 = cb1;
 					var cy2 = cb2;
@@ -443,33 +479,43 @@ THREE.SoftwareRenderer = function () {
 						var cx2 = cy2;
 						var cxz = cyz;
 
-						for ( var ix = 0; ix < q; ix ++ ) {
-
-							var z = cxz;
-
-							if ( z < zbuffer[ offset ] ) {
-								zbuffer[ offset ] = z;
+						// Skip Z
+						if(skipZ) {
+							for ( var ix = 0; ix < q; ix ++ ) {
+								zbuffer[ offsetZ ] = cxz;
 								var u = cx1 * scale;
 								var v = cx2 * scale;
-								shader( data, offset * 4, u, v );
+								shader( data, offsetC * 4, u, v );
+								
+								cx1 += dy12;
+								cx2 += dy23;
+								cxz += dzdx;
+								offsetZ++;
+								offsetC++;
 							}
-
-							cx1 += dy12;
-							cx2 += dy23;
-							cxz += dzdx;
-							offset++;
-
+						} else {
+						// Use Z
+							for ( var ix = 0; ix < q; ix ++ ) {
+								var z = cxz;
+								if ( z < zbuffer[ offsetZ ] ) {
+									zbuffer[ offsetZ ] = z;
+									var u = cx1 * scale;
+									var v = cx2 * scale;
+									shader( data, offsetC * 4, u, v );
+									}
+								cx1 += dy12;
+								cx2 += dy23;
+								cxz += dzdx;
+								offsetZ++;
+								offsetC++;
+							}
 						}
-
 						cy1 += dx12;
 						cy2 += dx23;
 						cyz += dzdy;
-						offset += linestep;
-
+						offsetC += linestep;
 					}
-
 				} else { // Partially covered block
-
 					var cy1 = cb1;
 					var cy2 = cb2;
 					var cy3 = cb3;
@@ -487,23 +533,21 @@ THREE.SoftwareRenderer = function () {
 							if ( ( cx1 | cx2 | cx3 ) >= 0 ) {
 
 								var z = cxz;
-
-								if ( z < zbuffer[ offset ] ) {
+								if ( z < zbuffer[ offsetZ ] ) {
 									var u = cx1 * scale;
 									var v = cx2 * scale;
 
-									zbuffer[ offset ] = z;
-									shader( data, offset * 4, u, v );
-
+									zbuffer[ offsetZ ] = z;
+									shader( data, offsetC * 4, u, v );
 								}
-
 							}
 
 							cx1 += dy12;
 							cx2 += dy23;
 							cx3 += dy31;
 							cxz += dzdx;
-							offset++;
+							offsetC++;
+							offsetZ++;
 
 						}
 
@@ -511,7 +555,7 @@ THREE.SoftwareRenderer = function () {
 						cy2 += dx23;
 						cy3 += dx31;
 						cyz += dzdy;
-						offset += linestep;
+						offsetC += linestep;
 
 					}
 
@@ -524,55 +568,6 @@ THREE.SoftwareRenderer = function () {
 			cb2 += q*dx23;
 			cb3 += q*dx31;
 			cbz += q*dzdy;
-		}
-
-	}
-
-	function clearBlock( blockX, blockY ) {
-
-		var zoffset = blockX * blockSize + blockY * blockSize * canvasWidth;
-		var poffset = zoffset * 4 + 3;
-
-		var zlinestep = canvasWidth - blockSize;
-		var plinestep = zlinestep * 4;
-
-		for ( var y = 0; y < blockSize; y ++ ) {
-
-			for ( var x = 0; x < blockSize; x ++ ) {
-
-				zbuffer[ zoffset ] = maxZVal;
-				data[ poffset ] = 0;
-
-				zoffset ++;
-				poffset += 4;
-
-			}
-
-			zoffset += zlinestep;
-			poffset += plinestep;
-
-		}
-
-	}
-
-	function finishClear( ) {
-
-		var block = 0;
-
-		for ( var y = 0; y < canvasHBlocks; y ++ ) {
-
-			for ( var x = 0; x < canvasWBlocks; x ++ ) {
-
-				if ( blockFlags[ block ] & BLOCK_NEEDCLEAR ) {
-
-					clearBlock( x, y );
-					blockFlags[ block ] = BLOCK_ISCLEAR;
-
-				}
-
-				block ++;
-			}
-
 		}
 
 	}
