@@ -1650,7 +1650,7 @@ def generate_objects(data):
             # use empty material string for multi-material objects
             # this will trigger use of MeshFaceMaterial in SceneLoader
 
-            material_string = ""
+            material_string = '""'
             if len(material_ids) == 1:
                 material_string = generate_string_list(material_ids)
 
