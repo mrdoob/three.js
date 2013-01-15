@@ -2481,7 +2481,7 @@ THREE.ShaderLib = {
 	//		- point and directional lights (use with "lights: true" material option)
 	 ------------------------------------------------------------------------- */
 
-	'normal2' : {
+	'normalmap' : {
 
 		uniforms: THREE.UniformsUtils.merge( [
 

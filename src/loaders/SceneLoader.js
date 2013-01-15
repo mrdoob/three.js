@@ -1048,7 +1048,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		if ( matJSON.parameters.normalMap ) {
 
-			var shader = THREE.ShaderLib[ "normal2" ];
+			var shader = THREE.ShaderLib[ "normalmap" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			var diffuse = matJSON.parameters.color;
