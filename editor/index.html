@@ -258,7 +258,15 @@
 
 							// 3.0
 
-							var data = JSON.parse( contents );
+							try {
+
+								var data = JSON.parse( contents );
+
+							} catch ( error ) {
+
+								return alert( error );
+
+							}
 
 							if ( data.metadata === undefined ) { // 2.0
 
