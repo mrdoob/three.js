@@ -2242,11 +2242,6 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
     for obj in sceneobjects:
       objects.append(obj)
 
-    # get linked group objcts
-    for group in bpy.data.groups:
-       for object in group.objects:
-          objects.append(object)
-
     scene_text = ""
     data = {
     "scene"        : scene,
