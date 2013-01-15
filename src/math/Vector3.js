@@ -252,6 +252,26 @@ THREE.Vector3.prototype = {
 
 	},
 
+	applyEuler: function ( v, eulerOrder ) {
+
+		var quaternion = THREE.Vector3.__q1.setFromEuler( v, eulerOrder );
+
+		this.applyQuaternion( quaternion );
+
+		return this;
+
+	},
+
+	applyAxisAngle: function ( axis, angle ) {
+
+		var quaternion = THREE.Vector3.__q1.setFromAxisAngle( axis, angle );
+
+		this.applyQuaternion( quaternion );
+
+		return this;
+
+	},
+
 	divide: function ( v ) {
 
 		this.x /= v.x;
