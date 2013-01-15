@@ -187,45 +187,42 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	};
 
 	this.update = function( delta ) {
-		var actualMoveSpeed = 0;
 
 		if ( this.freeze ) {
 
 			return;
 
+		}
+
+		if ( this.heightSpeed ) {
+
+			var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
+			var heightDelta = y - this.heightMin;
+
+			this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
+
 		} else {
 
-			if ( this.heightSpeed ) {
+			this.autoSpeedFactor = 0.0;
 
-				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
-				var heightDelta = y - this.heightMin;
+		}
 
-				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
+		var actualMoveSpeed = delta * this.movementSpeed;
 
-			} else {
+		if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
+		if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
 
-				this.autoSpeedFactor = 0.0;
+		if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
+		if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
 
-			}
+		if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
+		if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
 
-			actualMoveSpeed = delta * this.movementSpeed;
+		var actualLookSpeed = delta * this.lookSpeed;
 
-			if ( this.moveForward || ( this.autoForward && !this.moveBackward ) ) this.object.translateZ( - ( actualMoveSpeed + this.autoSpeedFactor ) );
-			if ( this.moveBackward ) this.object.translateZ( actualMoveSpeed );
+		if ( !this.activeLook ) {
 
-			if ( this.moveLeft ) this.object.translateX( - actualMoveSpeed );
-			if ( this.moveRight ) this.object.translateX( actualMoveSpeed );
-
-			if ( this.moveUp ) this.object.translateY( actualMoveSpeed );
-			if ( this.moveDown ) this.object.translateY( - actualMoveSpeed );
-
-			var actualLookSpeed = delta * this.lookSpeed;
-
-			if ( !this.activeLook ) {
-
-				actualLookSpeed = 0;
-
-			}
+			actualLookSpeed = 0;
 
 		}
 
