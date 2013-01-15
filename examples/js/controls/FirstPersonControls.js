@@ -227,20 +227,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			}
 
-			this.lon += this.mouseX * actualLookSpeed;
-			if( this.lookVertical ) this.lat -= this.mouseY * actualLookSpeed; // * this.invertVertical?-1:1;
-
-			this.lat = Math.max( - 85, Math.min( 85, this.lat ) );
-			this.phi = THREE.Math.degToRad( 90 - this.lat );
-			this.theta = THREE.Math.degToRad( this.lon );
-
-			var targetPosition = this.target,
-				position = this.object.position;
-
-			targetPosition.x = position.x + 100 * Math.sin( this.phi ) * Math.cos( this.theta );
-			targetPosition.y = position.y + 100 * Math.cos( this.phi );
-			targetPosition.z = position.z + 100 * Math.sin( this.phi ) * Math.sin( this.theta );
-
 		}
 
 		var verticalLookRatio = 1;
