@@ -95,8 +95,8 @@ THREE.RollControls = function ( object, domElement ) {
 		zTemp.copy( this.forward );
 		yTemp.set( 0, 1, 0 );
 
-		xTemp.cross( yTemp, zTemp ).normalize();
-		yTemp.cross( zTemp, xTemp ).normalize();
+		xTemp.crossVectors( yTemp, zTemp ).normalize();
+		yTemp.crossVectors( zTemp, xTemp ).normalize();
 
 		this.object.matrix.elements[0] = xTemp.x; this.object.matrix.elements[4] = yTemp.x; this.object.matrix.elements[8] = zTemp.x;
 		this.object.matrix.elements[1] = xTemp.y; this.object.matrix.elements[5] = yTemp.y; this.object.matrix.elements[9] = zTemp.y;
@@ -110,7 +110,7 @@ THREE.RollControls = function ( object, domElement ) {
 
 		// multiply camera with roll
 
-		this.object.matrix.multiplySelf( rollMatrix );
+		this.object.matrix.multiply( rollMatrix );
 		this.object.matrixWorldNeedsUpdate = true;
 
 		// set position
@@ -154,7 +154,7 @@ THREE.RollControls = function ( object, domElement ) {
 		xTemp.set( this.object.matrix.elements[0], this.object.matrix.elements[1], this.object.matrix.elements[2] );
 		xTemp.multiplyScalar( amount );
 
-		this.forward.subSelf( xTemp );
+		this.forward.sub( xTemp );
 		this.forward.normalize();
 
 	};
@@ -166,7 +166,7 @@ THREE.RollControls = function ( object, domElement ) {
 		yTemp.set( this.object.matrix.elements[4], this.object.matrix.elements[5], this.object.matrix.elements[6] );
 		yTemp.multiplyScalar( amount );
 
-		this.forward.addSelf( yTemp );
+		this.forward.add( yTemp );
 		this.forward.normalize();
 
 	};

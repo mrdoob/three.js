@@ -70,6 +70,7 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/controls/TrackballControls.js"></script>
+		<script src="../examples/js/loaders/BinaryLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
@@ -80,6 +81,7 @@
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/SceneExporter.js"></script>
+		<script src="../examples/js/exporters/OBJExporter.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
@@ -108,6 +110,7 @@
 
 				// actions
 
+				cloneSelectedObject: new SIGNALS.Signal(),
 				removeSelectedObject: new SIGNALS.Signal(),
 				exportGeometry: new SIGNALS.Signal(),
 				exportScene: new SIGNALS.Signal(),
@@ -224,6 +227,7 @@
 						break;
 
 					case 'js':
+					case 'json':
 
 						var reader = new FileReader();
 						reader.addEventListener( 'load', function ( event ) {

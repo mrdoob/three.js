@@ -178,24 +178,6 @@
 
 				var start = Date.now();
 
-				// classic way via BinaryLoader
-/*
-				loader = new THREE.BinaryLoader( true );
-				document.body.appendChild( loader.statusDomElement );
-
-				var callbackScene   = function( geometry, materials ) {
-
-					createScene( geometry, materials, 0, 0, 0, 30 );
-
-					var end = Date.now();
-
-					console.log( "load time:", end - start, "ms" );
-
-				};
-
-				loader.load( "obj/camaro_bake/camaro_bake.js", callbackScene );
-
-*/
 				// new way via CTMLoader and separate parts
 
 				loaderCTM = new THREE.CTMLoader( true );

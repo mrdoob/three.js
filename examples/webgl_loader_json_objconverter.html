@@ -181,16 +181,12 @@
 				bcanvas.addEventListener("click", toggleCanvas, false);
 				bwebgl.addEventListener("click", toggleWebGL, false);
 
-				//var loader = new THREE.BinaryLoader(),
 				var loader = new THREE.JSONLoader();
 				var callbackMale = function ( geometry, materials ) { createScene( geometry, materials, 90, FLOOR, 50, 105 ) };
 				var callbackFemale = function ( geometry, materials ) { createScene( geometry, materials, -80, FLOOR, 50, 0 ) };
 
 				loader.load( "obj/male02/Male02_dds.js", callbackMale );
 				loader.load( "obj/female02/Female02_slim.js", callbackFemale );
-
-				//loader.load( "obj/male02/Male02_bin.js", callbackMale );
-				//loader.load( "obj/female02/Female02_bin.js", callbackFemale );
 
 				//
 

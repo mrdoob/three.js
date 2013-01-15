@@ -46,20 +46,23 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="js/loaders/BinaryLoader.js"></script>
 
 		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
 		<script src="js/ShaderDeferred.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="js/shaders/ConvolutionShader.js"></script>
 
 		<script src="js/postprocessing/EffectComposer.js"></script>
 		<script src="js/postprocessing/RenderPass.js"></script>
 		<script src="js/postprocessing/ShaderPass.js"></script>
 		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/BloomPass.js"></script>
 
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -105,7 +108,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true } );
+				renderer = new THREE.WebGLDeferredRenderer( { width: WIDTH, height: HEIGHT, scale: SCALE, antialias: true, tonemapping: THREE.FilmicOperator, brightness: 2.5 } );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";
@@ -113,6 +116,11 @@
 
 				var container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
+
+				// effects
+
+				var bloomEffect = new THREE.BloomPass( 0.65 );
+				renderer.addEffect( bloomEffect );
 
 				// camera
 
@@ -156,7 +164,15 @@
 			function createAreaEmitter( light ) {
 
 				var geometry = new THREE.CubeGeometry( 1, 1, 1 );
-				var material = new THREE.MeshBasicMaterial( { color: light.color.getHex() } );
+				var material = new THREE.MeshBasicMaterial( { color: light.color.getHex(), vertexColors: THREE.FaceColors } );
+
+				var backColor = 0x222222;
+
+				geometry.faces[ 5 ].color.setHex( backColor );
+				geometry.faces[ 4 ].color.setHex( backColor );
+				geometry.faces[ 2 ].color.setHex( backColor );
+				geometry.faces[ 1 ].color.setHex( backColor );
+				geometry.faces[ 0 ].color.setHex( backColor );
 
 				var emitter = new THREE.Mesh( geometry, material );
 
@@ -174,15 +190,16 @@
 
 				light.right.set( 1, 0, 0 );
 				light.normal.set( 0, -1, 0 );
-				light.right = matrix.multiplyVector3( light.right );
-				light.normal = matrix.multiplyVector3( light.normal );
+
+				light.right.applyMatrix4( matrix );
+				light.normal.applyMatrix4( matrix );
 
 			}
 
 			function initLights() {
 
 				areaLight1 = new THREE.AreaLight( 0xffffff, 1 );
-				areaLight1.position.set( 0.0001, 10.0001, -19.5001 );
+				areaLight1.position.set( 0.0001, 10.0001, -18.5001 );
 				areaLight1.rotation.set( -0.74719, 0.0001, 0.0001 );
 				areaLight1.width = 10;
 				areaLight1.height = 1;
@@ -227,7 +244,7 @@
 				var loader = new THREE.BinaryLoader();
 				loader.load( "obj/box/box.js", function ( geometry, materials ) {
 
-					var material = new THREE.MeshPhongMaterial( { color: 0xffaa55, specular: 0x888888, shininess: 10 } );
+					var material = new THREE.MeshPhongMaterial( { color: 0xffaa55, specular: 0x888888, shininess: 200 } );
 					var object = new THREE.Mesh( geometry, material );
 					object.scale.multiplyScalar( 2 );
 					scene.add( object );
@@ -362,13 +379,13 @@
 
 				var time = Date.now();
 
-				areaLight1.position.x = Math.sin( Date.now() * 0.001 ) * 10;
+				areaLight1.position.x = Math.sin( Date.now() * 0.001 ) * 9;
 				areaLight1.position.y = Math.sin( Date.now() * 0.0013 ) * 5 + 5;
 
-				areaLight2.position.y = Math.sin( Date.now() * 0.0011 ) * 5 + 5;
+				areaLight2.position.y = Math.sin( Date.now() * 0.0011 ) * 3 + 5;
 				areaLight2.position.z = Math.sin( Date.now() * 0.00113 ) * 10;
 
-				areaLight3.position.y = Math.sin( Date.now() * 0.00111 ) * 5 + 5;
+				areaLight3.position.y = Math.sin( Date.now() * 0.00111 ) * 3 + 5;
 				areaLight3.position.z = Math.sin( Date.now() * 0.001113 ) * 10;
 
 				// render

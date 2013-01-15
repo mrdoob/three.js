@@ -91,31 +91,30 @@
 				// sides
 
 				var matrix = new THREE.Matrix4();
-				var vector = new THREE.Vector3();
 
 				var pxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pxGeometry.faces[ 0 ].materialIndex = 1;
 				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
-				pxGeometry.applyMatrix( matrix.makeTranslation( vector.set( 50, 0, 0 ) ) );
+				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
 
 				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nxGeometry.faces[ 0 ].materialIndex = 1;
 				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
-				nxGeometry.applyMatrix( matrix.makeTranslation( vector.set( - 50, 0, 0 ) ) );
+				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pyGeometry.faces[ 0 ].materialIndex = 0;
 				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
-				pyGeometry.applyMatrix( matrix.makeTranslation( vector.set( 0, 50, 0 ) ) );
+				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
 
 				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.faces[ 0 ].materialIndex = 1;
-				pzGeometry.applyMatrix( matrix.makeTranslation( vector.set( 0, 0, 50 ) ) );
+				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
 
 				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nzGeometry.faces[ 0 ].materialIndex = 1;
 				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
-				nzGeometry.applyMatrix( matrix.makeTranslation( vector.set( 0, 0, -50 ) ) );
+				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
 				//
 
 				var geometry = new THREE.Geometry();

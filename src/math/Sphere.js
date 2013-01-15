@@ -5,8 +5,8 @@
 
 THREE.Sphere = function ( center, radius ) {
 
-	this.center = center === undefined ? new THREE.Vector3() : center.clone();
-	this.radius = radius === undefined ? 0 : radius;
+	this.center = ( center !== undefined ) ? center : new THREE.Vector3();
+	this.radius = ( radius !== undefined ) ? radius : 0;
 
 };
 
@@ -67,6 +67,14 @@ THREE.Sphere.prototype = {
 
 	},
 
+	intersectsSphere: function ( sphere ) {
+
+		var radiusSum = this.radius + sphere.radius;
+
+		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
+
+	},
+
 	clampPoint: function ( point, optionalTarget ) {
 
 		var deltaLengthSq = this.center.distanceToSquared( point );
@@ -76,8 +84,8 @@ THREE.Sphere.prototype = {
 
 		if ( deltaLengthSq > ( this.radius * this.radius ) ) {
 
-			result.subSelf( this.center ).normalize();
-			result.multiplyScalar( this.radius ).addSelf( this.center );
+			result.sub( this.center ).normalize();
+			result.multiplyScalar( this.radius ).add( this.center );
 
 		}
 
@@ -97,8 +105,8 @@ THREE.Sphere.prototype = {
 	},
 
 	transform: function ( matrix ) {
-		
-		this.center = matrix.multiplyVector3( this.center );
+
+		this.center.applyMatrix4( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
@@ -107,7 +115,7 @@ THREE.Sphere.prototype = {
 
 	translate: function ( offset ) {
 
-		this.center.addSelf( offset );
+		this.center.add( offset );
 
 		return this;
 

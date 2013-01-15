@@ -160,17 +160,22 @@
 
 				if ( intersects.length > 0 ) {
 
+					var interect = intersects[ 0 ];
+
 					if ( isCtrlDown ) {
 
-						if ( intersects[ 0 ].object != plane ) {
+						if ( interect.object != plane ) {
 
-							scene.remove( intersects[ 0 ].object );
+							scene.remove( interect.object );
 
 						}
 
 					} else {
 
-						var position = new THREE.Vector3().add( intersects[ 0 ].point, intersects[ 0 ].object.matrixRotationWorld.multiplyVector3( intersects[ 0 ].face.normal.clone() ) );
+						var normal = interect.face.normal.clone();
+						normal.applyMatrix4( interect.object.matrixRotationWorld );
+
+						var position = new THREE.Vector3().addVectors( interect.point, normal );
 
 						var geometry = new THREE.CubeGeometry( 50, 50, 50 );
 

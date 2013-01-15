@@ -5,17 +5,9 @@
 
 THREE.Triangle = function ( a, b, c ) {
 
-	this.a = new THREE.Vector3();
-	this.b = new THREE.Vector3();
-	this.c = new THREE.Vector3();
-
-	if( a !== undefined && b !== undefined && c !== undefined ) {
-
-		this.a.copy( a );
-		this.b.copy( b );
-		this.c.copy( c );
-
-	}
+	this.a = ( a !== undefined ) ? a : new THREE.Vector3();
+	this.b = ( b !== undefined ) ? b : new THREE.Vector3();
+	this.c = ( c !== undefined ) ? c : new THREE.Vector3();
 
 };
 
@@ -23,9 +15,9 @@ THREE.Triangle.normal = function( a, b, c, optionalTarget ) {
 
 	var result = optionalTarget || new THREE.Vector3();
 
-	result.sub( c, b );
-	THREE.Triangle.__v0.sub( a, b );
-	result.crossSelf( THREE.Triangle.__v0 );
+	result.subVectors( c, b );
+	THREE.Triangle.__v0.subVectors( a, b );
+	result.cross( THREE.Triangle.__v0 );
 
 	var resultLengthSq = result.lengthSq();
 	if( resultLengthSq > 0 ) {
@@ -39,11 +31,12 @@ THREE.Triangle.normal = function( a, b, c, optionalTarget ) {
 };
 
 // static/instance method to calculate barycoordinates
+// based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 THREE.Triangle.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) {
 
-	THREE.Triangle.__v0.sub( c, a );
-	THREE.Triangle.__v1.sub( b, a );
-	THREE.Triangle.__v2.sub( point, a );
+	THREE.Triangle.__v0.subVectors( c, a );
+	THREE.Triangle.__v1.subVectors( b, a );
+	THREE.Triangle.__v2.subVectors( point, a );
 
 	var dot00 = THREE.Triangle.__v0.dot( THREE.Triangle.__v0 );
 	var dot01 = THREE.Triangle.__v0.dot( THREE.Triangle.__v1 );
@@ -116,17 +109,17 @@ THREE.Triangle.prototype = {
 
 	area: function () {
 
-		THREE.Triangle.__v0.sub( this.c, this.b );
-		THREE.Triangle.__v1.sub( this.a, this.b );
+		THREE.Triangle.__v0.subVectors( this.c, this.b );
+		THREE.Triangle.__v1.subVectors( this.a, this.b );
 
-		return THREE.Triangle.__v0.crossSelf( THREE.Triangle.__v1 ).length() * 0.5;
+		return THREE.Triangle.__v0.cross( THREE.Triangle.__v1 ).length() * 0.5;
 
 	},
 
 	midpoint: function ( optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return result.add( this.a, this.b ).addSelf( this.c ).multiplyScalar( 1 / 3 );
+		return result.addVectors( this.a, this.b ).add( this.c ).multiplyScalar( 1 / 3 );
 
 	},
 

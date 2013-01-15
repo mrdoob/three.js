@@ -37,7 +37,6 @@
 	"../examples/js/postprocessing/TexturePass.js",
 
 	"../examples/js/renderers/CSS3DRenderer.js",
-	"../examples/js/renderers/DOMRenderer.js",
 	"../examples/js/renderers/SVGRenderer.js",
 
 	"../examples/js/shaders/BasicShader.js",

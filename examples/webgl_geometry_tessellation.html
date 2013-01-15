@@ -41,6 +41,9 @@
 
 		<script src="js/controls/TrackballControls.js"></script>
 
+		<script src="js/modifiers/ExplodeModifier.js"></script>
+		<script src="js/modifiers/TessellateModifier.js"></script>
+
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
@@ -160,10 +163,16 @@
 
 			THREE.GeometryUtils.center( geometry );
 
-			var i, n = 6, maxEdgeLength = 4;
-			for ( i = 0; i < n; i ++ ) THREE.GeometryUtils.tessellate( geometry, maxEdgeLength );
+			var tessellateModifier = new THREE.TessellateModifier( 4 );
 
-			THREE.GeometryUtils.explode( geometry );
+			for ( var i = 0; i < 6; i ++ ) {
+
+				tessellateModifier.modify( geometry );
+
+			}
+
+			var explodeModifier = new THREE.ExplodeModifier();
+			explodeModifier.modify( geometry );
 
 			var vertices = geometry.vertices;
 

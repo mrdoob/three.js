@@ -147,14 +147,14 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 		}
 
-		_cameraL.matrixWorld.copy( camera.matrixWorld ).multiplySelf( eyeLeft );
+		_cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
 		_cameraL.position.copy( camera.position );
 		_cameraL.near = camera.near;
 		_cameraL.far = camera.far;
 
 		renderer.render( scene, _cameraL, _renderTargetL, true );
 
-		_cameraR.matrixWorld.copy( camera.matrixWorld ).multiplySelf( eyeRight );
+		_cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
 		_cameraR.position.copy( camera.position );
 		_cameraR.near = camera.near;
 		_cameraR.far = camera.far;

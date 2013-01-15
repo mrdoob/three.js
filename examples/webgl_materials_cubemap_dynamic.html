@@ -616,7 +616,7 @@
 				var bb = shadowObject.geometry.boundingBox;
 
 				var dimensions = new THREE.Vector3();
-				dimensions.sub( bb.max, bb.min );
+				dimensions.subVectors( bb.max, bb.min );
 
 				var margin = 0.15,
 

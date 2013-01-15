@@ -38,7 +38,7 @@ Menubar.File = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Geometry' );
-	option.onClick( function () { signals.exportGeometry.dispatch(); } );
+	option.onClick( function () { signals.exportGeometry.dispatch( { exporter: THREE.GeometryExporter } ); } );
 	options.add( option );
 
 	// export scene
@@ -49,15 +49,13 @@ Menubar.File = function ( signals ) {
 	option.onClick( function () { signals.exportScene.dispatch(); } );
 	options.add( option );
 
-	/*
 	// export OBJ
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export OBJ' );
-	option.onClick( function () { alert( 'Export OBJ' ) } );
+	option.onClick( function () { signals.exportGeometry.dispatch( { exporter: THREE.OBJExporter } ); } );
 	options.add( option );
-	*/
 
 	//
 

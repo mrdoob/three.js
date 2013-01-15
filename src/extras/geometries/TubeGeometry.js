@@ -181,8 +181,8 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		normals[ 0 ] = new THREE.Vector3();
 		binormals[ 0 ] = new THREE.Vector3();
 		if (lastBinormal===undefined) lastBinormal = new THREE.Vector3( 0, 0, 1 );
-		normals[ 0 ].cross( lastBinormal, tangents[ 0 ] ).normalize();
-		binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] ).normalize();
+		normals[ 0 ].crossVectors( lastBinormal, tangents[ 0 ] ).normalize();
+		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
 	}
 
 	function initialNormal2() {
@@ -190,11 +190,11 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		// This uses the Frenet-Serret formula for deriving binormal
 		var t2 = path.getTangentAt( epsilon );
 
-		normals[ 0 ] = new THREE.Vector3().sub( t2, tangents[ 0 ] ).normalize();
-		binormals[ 0 ] = new THREE.Vector3().cross( tangents[ 0 ], normals[ 0 ] );
+		normals[ 0 ] = new THREE.Vector3().subVectors( t2, tangents[ 0 ] ).normalize();
+		binormals[ 0 ] = new THREE.Vector3().crossVectors( tangents[ 0 ], normals[ 0 ] );
 
-		normals[ 0 ].cross( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
-		binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] ).normalize();
+		normals[ 0 ].crossVectors( binormals[ 0 ], tangents[ 0 ] ).normalize(); // last binormal x tangent
+		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] ).normalize();
 
 	}
 
@@ -223,10 +223,10 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 			normal.set( 0, 0, 1 );
 		}
 
-		vec.cross( tangents[ 0 ], normal ).normalize();
+		vec.crossVectors( tangents[ 0 ], normal ).normalize();
 
-		normals[ 0 ].cross( tangents[ 0 ], vec );
-		binormals[ 0 ].cross( tangents[ 0 ], normals[ 0 ] );
+		normals[ 0 ].crossVectors( tangents[ 0 ], vec );
+		binormals[ 0 ].crossVectors( tangents[ 0 ], normals[ 0 ] );
 	}
 
 
@@ -238,7 +238,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 		binormals[ i ] = binormals[ i-1 ].clone();
 
-		vec.cross( tangents[ i-1 ], tangents[ i ] );
+		vec.crossVectors( tangents[ i-1 ], tangents[ i ] );
 
 		if ( vec.length() > epsilon ) {
 
@@ -246,11 +246,11 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 			theta = Math.acos( tangents[ i-1 ].dot( tangents[ i ] ) );
 
-			mat.makeRotationAxis( vec, theta ).multiplyVector3( normals[ i ] );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
 		}
 
-		binormals[ i ].cross( tangents[ i ], normals[ i ] );
+		binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
 
 	}
 
@@ -262,7 +262,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		theta = Math.acos( normals[ 0 ].dot( normals[ numpoints-1 ] ) );
 		theta /= ( numpoints - 1 );
 
-		if ( tangents[ 0 ].dot( vec.cross( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
+		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
 
 			theta = -theta;
 
@@ -271,8 +271,8 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		for ( i = 1; i < numpoints; i++ ) {
 
 			// twist a little...
-			mat.makeRotationAxis( tangents[ i ], theta * i ).multiplyVector3( normals[ i ] );
-			binormals[ i ].cross( tangents[ i ], normals[ i ] );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
+			binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
 
 		}
 

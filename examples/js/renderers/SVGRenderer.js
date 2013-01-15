@@ -60,6 +60,11 @@ THREE.SVGRenderer = function () {
 
 	};
 
+	// WebGLRenderer compatibility
+
+	this.supportsVertexTextures = function () {};
+	this.setFaceCulling = function () {};
+
 	this.setSize = function( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
@@ -150,21 +155,26 @@ THREE.SVGRenderer = function () {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
+				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
+
 				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= - _svgHeightHalf;
 				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
 				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
-
-					renderFace3( _v1, _v2, _v3, element, material, scene );
-
-				}
+				renderFace3( _v1, _v2, _v3, element, material, scene );
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3; _v4 = element.v4;
+
+				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
+				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
+				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
+				if ( _v4.positionScreen.z < -1 || _v4.positionScreen.z > 1 ) continue;
 
 				_v1.positionScreen.x *= _svgWidthHalf; _v1.positionScreen.y *= -_svgHeightHalf;
 				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= -_svgHeightHalf;
@@ -173,11 +183,7 @@ THREE.SVGRenderer = function () {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
 
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
-
-					renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
-
-				}
+				renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
 
 			}
 
@@ -249,7 +255,7 @@ THREE.SVGRenderer = function () {
 
 				lightPosition = light.matrixWorld.getPosition();
 
-				amount = normal.dot( _vector3.sub( lightPosition, position ).normalize() );
+				amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
 				if ( amount <= 0 ) continue;
 
@@ -339,9 +345,7 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_color.r *= element.color.r;
-				_color.g *= element.color.g;
-				_color.b *= element.color.b;
+				_color.multiply( element.color );
 
 			}
 
@@ -352,23 +356,17 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_diffuseColor.r *= element.color.r;
-				_diffuseColor.g *= element.color.g;
-				_diffuseColor.b *= element.color.b;
+				_diffuseColor.multiply( element.color );
 
 			}
 
 			if ( _enableLighting ) {
 
-				_color.r = _ambientLight.r;
-				_color.g = _ambientLight.g;
-				_color.b = _ambientLight.b;
+				_color.copy( _ambientLight );
 
-				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
-				_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
-				_color.b = _color.b * _diffuseColor.b + _emissiveColor.b;
+				_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 			} else {
 
@@ -383,7 +381,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGB( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ) );
+			var normal = element.normalModelView;
+
+			_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 		}
 
@@ -415,9 +415,7 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_color.r *= element.color.r;
-				_color.g *= element.color.g;
-				_color.b *= element.color.b;
+				_color.multiply( element.color );
 
 			}
 
@@ -428,23 +426,17 @@ THREE.SVGRenderer = function () {
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
-				_diffuseColor.r *= element.color.r;
-				_diffuseColor.g *= element.color.g;
-				_diffuseColor.b *= element.color.b;
+				_diffuseColor.multiply( element.color );
 
 			}
 
 			if ( _enableLighting ) {
 
-				_color.r = _ambientLight.r;
-				_color.g = _ambientLight.g;
-				_color.b = _ambientLight.b;
+				_color.copy( _ambientLight );
 
-				calculateLight( _lights, element.centroidWorld, element.normalWorld, _color );
+				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				_color.r = _color.r * _diffuseColor.r + _emissiveColor.r;
-				_color.g = _color.g * _diffuseColor.g + _emissiveColor.g;
-				_color.b = _color.b * _diffuseColor.b + _emissiveColor.b;
+				_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 			} else {
 
@@ -459,7 +451,9 @@ THREE.SVGRenderer = function () {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			_color.setRGB( normalToComponent( element.normalWorld.x ), normalToComponent( element.normalWorld.y ), normalToComponent( element.normalWorld.z ) );
+			var normal = element.normalModelView;
+
+			_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 		}
 
@@ -534,13 +528,6 @@ THREE.SVGRenderer = function () {
 		}
 
 		return _svgCirclePool[ id ];
-
-	}
-
-	function normalToComponent( normal ) {
-
-		var component = ( normal + 1 ) * 0.5;
-		return component < 0 ? 0 : ( component > 1 ? 1 : component );
 
 	}
 

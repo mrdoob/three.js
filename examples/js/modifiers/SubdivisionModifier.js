@@ -27,7 +27,7 @@
  */
 
 
-THREE.SubdivisionModifier = function( subdivisions ) {
+THREE.SubdivisionModifier = function ( subdivisions ) {
 
 	this.subdivisions = (subdivisions === undefined ) ? 1 : subdivisions;
 
@@ -452,21 +452,21 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		if (edge.length==1) {
 
-			avg.addSelf(originalPoints[edgeVertexA]);
-			avg.addSelf(originalPoints[edgeVertexB]);
-			avg.multiplyScalar(0.5);
+			avg.add( originalPoints[ edgeVertexA ] );
+			avg.add( originalPoints[ edgeVertexB ] );
+			avg.multiplyScalar( 0.5 );
 
 			sharpVertices[newPoints.length] = true;
 
 		} else {
 
-			avg.addSelf(facePoints[faceIndexA]);
-			avg.addSelf(facePoints[faceIndexB]);
+			avg.add( facePoints[ faceIndexA ] );
+			avg.add( facePoints[ faceIndexB ] );
 
-			avg.addSelf(originalPoints[edgeVertexA]);
-			avg.addSelf(originalPoints[edgeVertexB]);
+			avg.add( originalPoints[ edgeVertexA ] );
+			avg.add( originalPoints[ edgeVertexB ] );
 
-			avg.multiplyScalar(0.25);
+			avg.multiplyScalar( 0.25 );
 
 		}
 
@@ -589,7 +589,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		var f = 0; // this counts number of faces, original vertex is connected to (also known as valance?)
 		for (j in vertexFaceMap[i]) {
-			F.addSelf(facePoints[j]);
+			F.add(facePoints[j]);
 			f++;
 		}
 
@@ -636,8 +636,8 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 				edge = vertexEdgeMap[i][j];
 				bb_edge = edgeFaceMap[orderedKey(edge[0], edge[1])].length == 1
 				if (bb_edge) {
-					var midPt = originalPoints[edge[0]].clone().addSelf(originalPoints[edge[1]]).divideScalar(2);
-					R.addSelf(midPt);
+					var midPt = originalPoints[edge[0]].clone().add(originalPoints[edge[1]]).divideScalar(2);
+					R.add(midPt);
 					boundary_edges++;
 				}
 			}
@@ -649,28 +649,28 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 		} else {
 			for (j=0; j<n;j++) {
 				edge = vertexEdgeMap[i][j];
-				var midPt = originalPoints[edge[0]].clone().addSelf(originalPoints[edge[1]]).divideScalar(2);
-				R.addSelf(midPt);
+				var midPt = originalPoints[edge[0]].clone().add(originalPoints[edge[1]]).divideScalar(2);
+				R.add(midPt);
 			}
 
 			R.divideScalar(n);
 		}
 
 		// Sum the formula
-		newPos.addSelf(originalPoints[i]);
+		newPos.add(originalPoints[i]);
 
 
 		if (boundary_case) {
 
 			newPos.divideScalar(2);
-			newPos.addSelf(R);
+			newPos.add(R);
 
 		} else {
 
 			newPos.multiplyScalar(n - 3);
 
-			newPos.addSelf(F);
-			newPos.addSelf(R.multiplyScalar(2));
+			newPos.add(F);
+			newPos.add(R.multiplyScalar(2));
 			newPos.divideScalar(n);
 
 		}

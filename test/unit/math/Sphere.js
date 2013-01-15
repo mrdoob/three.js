@@ -60,6 +60,15 @@ test( "distanceToPoint", function() {
 	ok( a.distanceToPoint( one3 ) === -1, "Passed!" );
 });
 
+test( "intersectsSphere", function() {
+	var a = new THREE.Sphere( one3, 1 );
+	var b = new THREE.Sphere( zero3, 1 );
+	var c = new THREE.Sphere( zero3, 0.25 );
+
+	ok( a.intersectsSphere( b ) , "Passed!" );
+	ok( ! a.intersectsSphere( c ) , "Passed!" );
+});
+
 test( "clampPoint", function() {
 	var a = new THREE.Sphere( one3, 1 );
 
@@ -79,9 +88,7 @@ test( "getBoundingBox", function() {
 test( "transform", function() {
 	var a = new THREE.Sphere( one3, 1 );
 
-	var m = new THREE.Matrix4();
-	var t1 = new THREE.Vector3( 1, -2, 1 );
-	m.makeTranslation( t1 );
+	var m = new THREE.Matrix4().makeTranslation( 1, -2, 1 );
 
 	ok( a.clone().transform( m ).getBoundingBox().equals( a.getBoundingBox().transform( m ) ), "Passed!" );
 });

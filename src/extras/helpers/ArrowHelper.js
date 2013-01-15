@@ -1,6 +1,7 @@
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
+ * @author bhouston / https://exocortex.com
  *
  * Creates an arrow for visualizing directions
  *
@@ -15,8 +16,8 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 	THREE.Object3D.call( this );
 
-	if ( hex === undefined ) hex = 0xffff00;
 	if ( length === undefined ) length = 20;
+	if ( hex === undefined ) hex = 0xffff00;
 
 	var lineGeometry = new THREE.Geometry();
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
@@ -42,13 +43,25 @@ THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
 
-	var axis = new THREE.Vector3( 0, 1, 0 ).crossSelf( dir );
+    var d = THREE.ArrowHelper.__v1.copy( dir ).normalize();
 
-	var radians = Math.acos( new THREE.Vector3( 0, 1, 0 ).dot( dir.clone().normalize() ) );
+    if ( d.y > 0.999 ) {
 
-	this.matrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
+        this.rotation.set( 0, 0, 0 );
+ 
+    } else if ( d.y < - 0.999 ) {
 
-	this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+        this.rotation.set( Math.PI, 0, 0 );
+
+    } else {
+
+	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x ).normalize();
+	    var radians = Math.acos( d.y );
+	    var quaternion = THREE.ArrowHelper.__q1.setFromAxisAngle( axis, radians );
+
+	    this.rotation.setEulerFromQuaternion( quaternion, this.eulerOrder );
+
+	}
 
 };
 
@@ -64,3 +77,7 @@ THREE.ArrowHelper.prototype.setColor = function ( hex ) {
 	this.cone.material.color.setHex( hex );
 
 };
+
+THREE.ArrowHelper.__v1 = new THREE.Vector3();
+THREE.ArrowHelper.__v2 = new THREE.Vector3();
+THREE.ArrowHelper.__q1 = new THREE.Quaternion();

@@ -1,55 +1,74 @@
 /**
  * @author astrodud / http://astrodud.isgreat.org/
  * @author zz85 / https://github.com/zz85
+ * @author bhouston / http://exocortex.com
  */
 
-THREE.LatheGeometry = function ( points, steps, angle ) {
+// points - to create a closed torus, one must use a set of points 
+//    like so: [ a, b, c, d, a ], see first is the same as last.
+// segments - the number of circumference segments to create
+// phiStart - the starting radian
+// phiLength - the radian (0 to 2*PI) range of the lathed section
+//    2*pi is a closed lathe, less than 2PI is a portion.
+THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 
 	THREE.Geometry.call( this );
 
-	var _steps = steps || 12;
-	var _angle = angle || 2 * Math.PI;
+	segments = segments || 12;
+	phiStart = phiStart || 0;
+	phiLength = phiLength || 2 * Math.PI;
 
-	var _newV = [];
-	var _matrix = new THREE.Matrix4().makeRotationZ( _angle / _steps );
+	var inversePointLength = 1.0 / ( points.length - 1 );
+	var inverseSegments = 1.0 / segments;
 
-	for ( var j = 0; j < points.length; j ++ ) {
+	for ( var i = 0, il = segments; i <= il; i ++ ) {
 
-		_newV[ j ] = points[ j ].clone();
-		this.vertices.push( _newV[ j ] );
+		var phi = phiStart + i * inverseSegments * phiLength;
 
-	}
+		var c = Math.cos( phi ),
+			s = Math.sin( phi );
 
-	var i, il = _steps + 1;
+		for ( var j = 0, jl = points.length; j < jl; j ++ ) {
 
-	for ( i = 0; i < il; i ++ ) {
+			var pt = points[ j ];
 
-		for ( var j = 0; j < _newV.length; j ++ ) {
+			var vertex = new THREE.Vector3();
 
-			_newV[ j ] = _matrix.multiplyVector3( _newV[ j ].clone() );
-			this.vertices.push( _newV[ j ] );
+			vertex.x = c * pt.x - s * pt.y;
+			vertex.y = s * pt.x + c * pt.y;
+			vertex.z = pt.z;
+
+			this.vertices.push( vertex );
 
 		}
 
 	}
 
-	for ( i = 0; i < _steps; i ++ ) {
+	var np = points.length;
 
-		for ( var k = 0, kl = points.length; k < kl - 1; k ++ ) {
+	for ( var i = 0, il = segments; i < il; i ++ ) {
 
-			var a = i * kl + k;
-			var b = ( ( i + 1 ) % il ) * kl + k;
-			var c = ( ( i + 1 ) % il ) * kl + ( k + 1 ) % kl;
-			var d = i * kl + ( k + 1 ) % kl;
+		for ( var j = 0, jl = points.length - 1; j < jl; j ++ ) {
+
+			var base = j + np * i;
+			var a = base;
+			var b = base + np;
+			var c = base + 1 + np;
+			var d = base + 1;
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 
+			var u0 = i * inverseSegments;
+			var v0 = j * inversePointLength;
+			var u1 = u0 + inverseSegments;
+			var v1 = v0 + inversePointLength;
+
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.Vector2( 1 - i / _steps, k / kl ),
-				new THREE.Vector2( 1 - ( i + 1 ) / _steps, k / kl ),
-				new THREE.Vector2( 1 - ( i + 1 ) / _steps, ( k + 1 ) / kl ),
-				new THREE.Vector2( 1 - i / _steps, ( k + 1 ) / kl )
+				new THREE.Vector2( u0, v0 ), 
+				new THREE.Vector2( u1, v0 ),
+				new THREE.Vector2( u1, v1 ),
+				new THREE.Vector2( u0, v1 )
 
 			] );
 
@@ -57,6 +76,7 @@ THREE.LatheGeometry = function ( points, steps, angle ) {
 
 	}
 
+	this.mergeVertices();
 	this.computeCentroids();
 	this.computeFaceNormals();
 	this.computeVertexNormals();

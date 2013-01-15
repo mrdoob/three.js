@@ -14,11 +14,11 @@
 
 		<h2>Example</h2>
 
-		<code>var q = new THREE.Quaternion();
-		q.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
+		<code>var quaternion = new THREE.Quaternion();
+		quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
 
-		var v = new THREE.Vector3( 1, 0, 0 );
-		q.multiplyVector3( v );
+		var vector = new THREE.Vector3( 1, 0, 0 );
+		vector.applyQuaternion( quaternion );
 		</code>
 
 
@@ -94,15 +94,15 @@
 		Normalizes this quaternion.
 		</div>
 
-		<h3>.multiply( [page:Quaternion a], [page:Quaternion b] ) [page:Quaternion]</h3>
+		<h3>.multiply( [page:Quaternion b] ) [page:Quaternion]</h3>
+		<div>
+		Multiplies this quaternion by *b*.
+		</div>
+
+		<h3>.multiplyQuaternions( [page:Quaternion a], [page:Quaternion b] ) [page:Quaternion]</h3>
 		<div>
 		Sets this quaternion to *a x b*<br />
 		Adapted from [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm].
-		</div>
-
-		<h3>.multiplySelf( [page:Quaternion b] ) [page:Quaternion]</h3>
-		<div>
-		Multiplies this quaternion by *b*.
 		</div>
 
 		<h3>.multiplyVector3( [page:Vector3 vector], [page:Vector3 dest] ) [page:Quaternion]</h3>

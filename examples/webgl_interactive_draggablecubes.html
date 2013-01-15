@@ -159,13 +159,13 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
 
 				if ( SELECTED ) {
 
 					var intersects = raycaster.intersectObject( plane );
-					SELECTED.position.copy( intersects[ 0 ].point.subSelf( offset ) );
+					SELECTED.position.copy( intersects[ 0 ].point.sub( offset ) );
 					return;
 
 				}
@@ -208,7 +208,7 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 0.5 );
 				projector.unprojectVector( vector, camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.subSelf( camera.position ).normalize() );
+				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( objects );
 
@@ -219,7 +219,7 @@
 					SELECTED = intersects[ 0 ].object;
 
 					var intersects = raycaster.intersectObject( plane );
-					offset.copy( intersects[ 0 ].point ).subSelf( plane.position );
+					offset.copy( intersects[ 0 ].point ).sub( plane.position );
 
 					container.style.cursor = 'move';
 
