@@ -431,7 +431,7 @@ THREE.SoftwareRenderer = function () {
 				if ( cb1 >= nmin1 && cb2 >= nmin2 && cb3 >= nmin3 ) {
 
 					var maxz = cbz + nmaxz;
-					blockMaxZ[ blockId ] = Math.min( blockMaxZ[ blockId ], maxz );
+					blockMaxZ[ blockId ] = Math.max( blockMaxZ[ blockId ], maxz );
 
 					var cy1 = cb1;
 					var cy2 = cb2;
