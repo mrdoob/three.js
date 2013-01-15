@@ -7,6 +7,7 @@
 	"../src/math/Math.js",
 	"../src/math/Matrix3.js",
 	"../src/math/Matrix4.js",
+	"../src/math/Box3.js",
 	"../src/math/Frustum.js",
 	"../src/math/Sphere.js",
 	"../src/math/Plane.js",
