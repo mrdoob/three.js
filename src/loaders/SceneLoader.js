@@ -111,7 +111,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		cameras: {},
 		lights: {},
 		fogs: {},
-		empties: {}
+		empties: {},
+		groups: {}
 
 	};
 
@@ -481,6 +482,23 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			}
 
+			if ( objJSON.groups !== undefined ) {
+
+				for ( var i = 0; i < objJSON.groups.length; i ++ ) {
+
+					var groupID = objJSON.groups[i];
+
+					if ( result.groups[groupID] === undefined ) {
+
+						result.groups[groupID] = [];
+
+					}
+
+					result.groups[groupID].push(objID);
+
+				}
+
+			}
 		}
 
 	};
