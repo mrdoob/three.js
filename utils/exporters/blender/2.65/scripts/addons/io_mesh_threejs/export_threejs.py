@@ -2353,7 +2353,7 @@ def save(operator, context, filepath = "",
                                                         option_animation_skeletal,
                                                         option_frame_step)
 
-                        embeds[name] = model_string
+                        embeds[object.data.name] = model_string
 
                     else:
 
