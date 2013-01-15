@@ -117,7 +117,7 @@
 
 				var moonTexture = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
 
-				var shader = THREE.ShaderUtils.lib[ "normal" ];
+				var shader = THREE.ShaderLib[ "normal2" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "tNormal" ].value = normalTexture;

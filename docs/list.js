@@ -132,8 +132,7 @@ var list = {
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
 			[ "ImageUtils", "api/extras/ImageUtils" ],
-			[ "SceneUtils", "api/extras/SceneUtils" ],
-			[ "ShaderUtils", "api/extras/ShaderUtils" ]
+			[ "SceneUtils", "api/extras/SceneUtils" ]
 		],
 
 		"Extras / Animation": [
