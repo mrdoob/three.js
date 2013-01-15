@@ -2310,11 +2310,6 @@ def save(operator, context, filepath = "",
     for obj in sceneobjects:
       objects.append(obj)
 
-    # get objects in linked groups
-    for group in bpy.data.groups:
-       for object in group.objects:
-          objects.append(object)
-
     if option_export_scene:
 
         geo_set = set()
