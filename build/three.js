@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '55dev' };
+var THREE = THREE || { REVISION: '55' };
 
 self.console = self.console || {
 
@@ -9116,7 +9116,7 @@ THREE.Loader.prototype = {
 
 		if ( m.mapNormal ) {
 
-			var shader = THREE.ShaderLib[ "normal2" ];
+			var shader = THREE.ShaderLib[ "normalmap" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ "tNormal" ].value = mpars.normalMap;
@@ -10738,7 +10738,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		if ( matJSON.parameters.normalMap ) {
 
-			var shader = THREE.ShaderLib[ "normal2" ];
+			var shader = THREE.ShaderLib[ "normalmap" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			var diffuse = matJSON.parameters.color;
@@ -16809,7 +16809,7 @@ THREE.ShaderLib = {
 	//		- point and directional lights (use with "lights: true" material option)
 	 ------------------------------------------------------------------------- */
 
-	'normal2' : {
+	'normalmap' : {
 
 		uniforms: THREE.UniformsUtils.merge( [
 
