@@ -55,12 +55,12 @@
 
 				scene = new THREE.Scene();
 
-				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 150 ), new THREE.MeshBasicMaterial() );
+				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 150 ), new THREE.MeshBasicMaterial( { color: 0x0000ff } ) );
 				scene.add( torus );
 
 				// Plane
 
-				cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200 ), new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } ) );
+				cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200 ), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
 				scene.add( cube );
 
 				renderer = new THREE.SoftwareRenderer();
