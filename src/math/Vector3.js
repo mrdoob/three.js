@@ -714,3 +714,5 @@ THREE.Vector3.prototype = {
 	}
 
 };
+
+THREE.Vector3.__q1 = new THREE.Quaternion();
