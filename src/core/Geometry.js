@@ -65,7 +65,7 @@ THREE.Geometry.prototype = {
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			var vertex = this.vertices[ i ];
-			vertex.applyMatrix4( matrix );
+			vertex.projectPoint( matrix );
 
 		}
 
@@ -80,7 +80,7 @@ THREE.Geometry.prototype = {
 
 			}
 
-			face.centroid.applyMatrix4( matrix );
+			face.centroid.projectPoint( matrix );
 
 		}
 

@@ -106,7 +106,7 @@ THREE.Sphere.prototype = {
 
 	transform: function ( matrix ) {
 
-		this.center.applyMatrix4( matrix );
+		this.center.projectPoint( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;

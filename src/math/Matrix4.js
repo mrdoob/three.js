@@ -331,14 +331,14 @@ THREE.Matrix4.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use is now vector.applyMatrix4( matrix ) instead.' );
-		return vector.applyMatrix4( this );
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.projectPoint( matrix ) instead.' );
+		return vector.projectPoint( this );
 
 	},
 
 	multiplyVector4: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector4() has been removed. Use is now vector.applyMatrix4( matrix ) instead.' );
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector4() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
 		return vector.applyMatrix4( this );
 
 	},
@@ -353,7 +353,7 @@ THREE.Matrix4.prototype = {
 			tmp.y = a[ i + 1 ];
 			tmp.z = a[ i + 2 ];
 
-			tmp.applyMatrix4(this);
+			tmp.projectPoint( this );
 
 			a[ i ]     = tmp.x;
 			a[ i + 1 ] = tmp.y;

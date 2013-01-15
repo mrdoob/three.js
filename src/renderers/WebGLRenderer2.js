@@ -1299,7 +1299,7 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.applyMatrix4(_projScreenMatrix);
+							_vector3.projectPoint(_projScreenMatrix);
 
 							webglObject.z = _vector3.z;
 
