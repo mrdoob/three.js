@@ -767,6 +767,10 @@ var Viewport = function ( signals ) {
 			controls.object = camera;
 			controls.update();
 
+		} else {
+
+			scene.add( camera );
+
 		}
 
 		if ( newClearColor ) {
@@ -806,7 +810,7 @@ var Viewport = function ( signals ) {
 		}
 
 		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( null );
+		signals.objectSelected.dispatch( camera );
 
 	} );
 
