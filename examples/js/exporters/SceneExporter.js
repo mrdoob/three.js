@@ -151,8 +151,6 @@ THREE.SceneExporter.prototype = {
 
 		} );
 
-		var bgcolor = ColorString( clearColor );
-		var bgalpha = clearAlpha;
 		var defcamera = LabelString( activeCamera ? getObjectName( activeCamera ) : "" );
 		var deffog = LabelString( scene.fog ? getFogName( scene.fog ) : "" );
 
@@ -743,8 +741,6 @@ THREE.SceneExporter.prototype = {
 			'',
 			'	"defaults" :',
 			'	{',
-			'		"bgcolor" : ' + bgcolor + ',',
-			'		"bgalpha" : ' + bgalpha + ',',
 			'		"camera"  : ' + defcamera + ',',
 			'		"fog"  	  : ' + deffog,
 			'	}',

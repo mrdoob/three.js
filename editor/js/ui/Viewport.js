@@ -722,7 +722,7 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.sceneAdded.add( function ( newScene, newCamera, newClearColor ) {
+	signals.sceneAdded.add( function ( newScene, newCamera ) {
 
 		scene = newScene;
 
@@ -770,12 +770,6 @@ var Viewport = function ( signals ) {
 		} else {
 
 			scene.add( camera );
-
-		}
-
-		if ( newClearColor ) {
-
-			signals.clearColorChanged.dispatch( newClearColor.getHex() );
 
 		}
 

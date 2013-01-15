@@ -1152,12 +1152,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	}
 
-	color = data.defaults.bgcolor;
-	result.bgColor = new THREE.Color();
-	result.bgColor.setRGB( color[0], color[1], color[2] );
-
-	result.bgColorAlpha = data.defaults.bgalpha;
-
 	// synchronous callback
 
 	scope.callbackSync( result );
