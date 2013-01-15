@@ -193,9 +193,9 @@ THREE.SoftwareRenderer = function () {
 				);
 
 			}
-
 		   finishClear();
 		}
+
 
 		var x = Math.min( rectx1, prevrectx1 );
 		var y = Math.min( recty1, prevrecty1 );
