@@ -231,7 +231,7 @@ THREE.Projector = function() {
 
 					_vertex = getNextVertexInPool();
 
-					_vertex.positionWorld.copy( vertices[ v ] ).projectPoint( _modelMatrix );
+					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
 					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
@@ -348,7 +348,7 @@ THREE.Projector = function() {
 
 					_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
 
-					_face.centroidModel.copy( face.centroid ).projectPoint( _modelMatrix );
+					_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
