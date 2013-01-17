@@ -9,7 +9,7 @@ THREE.Box2 = function ( min, max ) {
 
 };
 
-THREE.Box2.prototype = {
+THREE.extend( THREE.Box2.prototype, {
 
 	constructor: THREE.Box2,
 
@@ -259,4 +259,4 @@ THREE.Box2.prototype = {
 
 	}
 
-};
+} );

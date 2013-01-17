@@ -9,7 +9,7 @@ THREE.Ray = function ( origin, direction ) {
 
 };
 
-THREE.Ray.prototype = {
+THREE.extend( THREE.Ray.prototype, {
 
 	constructor: THREE.Ray,
 
@@ -39,13 +39,19 @@ THREE.Ray.prototype = {
 
 	},
 
-	recast: function ( t ) {
+	recast: function() {
 
-		this.origin.copy( this.at( t, THREE.Ray.__v1 ) );
+		var v1 = new THREE.Vector3();
 
-		return this;
+		return function ( t ) {
 
-	},
+			this.origin.copy( this.at( t, v1 ) );
+
+			return this;
+
+		};
+
+	}(),
 
 	closestPointToPoint: function ( point, optionalTarget ) {
 
@@ -157,4 +163,4 @@ THREE.Ray.prototype = {
 
 	}
 
-};
+} );

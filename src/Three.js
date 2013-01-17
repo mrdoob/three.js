@@ -46,6 +46,28 @@ String.prototype.trim = String.prototype.trim || function () {
 };
 
 
+THREE.extend = function ( target, other ) {
+
+	target = target || {};
+
+	for (var prop in other) {
+
+		if ( typeof other[prop] === 'object' ) {
+
+			target[prop] = THREE.extend( target[prop], other[prop] );
+
+		} else {
+
+			target[prop] = other[prop];
+
+		}
+
+	}
+
+	return target;
+	
+};
+
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
 

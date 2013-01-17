@@ -25,7 +25,7 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 };
 
-THREE.Matrix4.prototype = {
+THREE.extend( THREE.Matrix4.prototype, {
 
 	constructor: THREE.Matrix4,
 
@@ -657,7 +657,8 @@ THREE.Matrix4.prototype = {
 
 		var x = new THREE.Vector3(),
 			y = new THREE.Vector3(),
-			z = new THREE.Vector3();
+			z = new THREE.Vector3(),
+			matrix = new THREE.Matrix4();
 		
 		return function ( translation, rotation, scale ) {
 
@@ -681,9 +682,7 @@ THREE.Matrix4.prototype = {
 			translation.z = te[14];
 
 			// scale the rotation part
-
-			var matrix = THREE.Matrix4.__m1;
-
+		
 			matrix.copy( this );
 
 			matrix.elements[0] /= scale.x;
@@ -1116,4 +1115,4 @@ THREE.Matrix4.prototype = {
 
 	}
 
-};
+} );

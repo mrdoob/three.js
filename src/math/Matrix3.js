@@ -17,7 +17,7 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 	);
 };
 
-THREE.Matrix3.prototype = {
+THREE.extend( THREE.Matrix3.prototype, {
 
 	constructor: THREE.Matrix3,
 
@@ -214,4 +214,4 @@ THREE.Matrix3.prototype = {
 
 	}
 
-};
+} );

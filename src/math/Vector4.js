@@ -15,7 +15,7 @@ THREE.Vector4 = function ( x, y, z, w ) {
 
 };
 
-THREE.Vector4.prototype = {
+THREE.extend( THREE.Vector4.prototype, {
 
 	constructor: THREE.Vector4,
 
@@ -553,4 +553,4 @@ THREE.Vector4.prototype = {
 
 	}
 
-};
+} );

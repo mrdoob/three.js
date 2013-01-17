@@ -92,7 +92,7 @@ THREE.Triangle.containsPoint = function() {
 
 }();
 
-THREE.Triangle.prototype = {
+THREE.extend( THREE.Triangle.prototype, {
 
 	constructor: THREE.Triangle,
 
@@ -187,4 +187,4 @@ THREE.Triangle.prototype = {
 
 	}
 
-};
+} );
