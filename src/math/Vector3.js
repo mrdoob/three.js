@@ -268,25 +268,37 @@ THREE.Vector3.prototype = {
 
 	},
 
-	applyEuler: function ( v, eulerOrder ) {
+	applyEuler: function() {
 
-		var quaternion = THREE.Vector3.__q1.setFromEuler( v, eulerOrder );
+		var q1 = new THREE.Quaternion();
+		
+		return function ( v, eulerOrder ) {
 
-		this.applyQuaternion( quaternion );
+			var quaternion = q1.setFromEuler( v, eulerOrder );
 
-		return this;
+			this.applyQuaternion( quaternion );
 
-	},
+			return this;
 
-	applyAxisAngle: function ( axis, angle ) {
+		};
 
-		var quaternion = THREE.Vector3.__q1.setFromAxisAngle( axis, angle );
+	}(),
 
-		this.applyQuaternion( quaternion );
+	applyAxisAngle: function() {
 
-		return this;
+		var q1 = new THREE.Quaternion();
+		
+		return function ( axis, angle ) {
 
-	},
+			var quaternion = q1.setFromAxisAngle( axis, angle );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
 
 	divide: function ( v ) {
 
@@ -731,4 +743,3 @@ THREE.Vector3.prototype = {
 
 };
 
-THREE.Vector3.__q1 = new THREE.Quaternion();

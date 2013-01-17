@@ -40,17 +40,25 @@ THREE.Plane.prototype = {
 
 	},
 
-	setFromCoplanarPoints: function ( a, b, c ) {
+	setFromCoplanarPoints: function() {
 
-		var normal = THREE.Plane.__v1.subVectors( c, b ).cross( THREE.Plane.__v2.subVectors( a, b ) ).normalize();
+		var v1 = new THREE.Vector3(),
+			v2 = new THREE.Vector3();
+		
+		return function ( a, b, c ) {
 
-		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
+			var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
 
-		this.setFromNormalAndCoplanarPoint( normal, a );
+			// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
-		return this;
+			this.setFromNormalAndCoplanarPoint( normal, a );
 
-	},
+			return this;
+
+		};
+
+	}(),
+
 
 	copy: function ( plane ) {
 
@@ -120,39 +128,46 @@ THREE.Plane.prototype = {
 
 	},
 
-	intersectLine: function ( startPoint, endPoint, optionalTarget ) {
+	intersectLine: function() {
 
-		var result = optionalTarget || new THREE.Vector3();
+		var v1 = new THREE.Vector3();
+		
+		return function ( startPoint, endPoint, optionalTarget ) {
 
-		var direction = THREE.Plane.__v1.subVectors( endPoint, startPoint );
+			var result = optionalTarget || new THREE.Vector3();
 
-		var denominator = this.normal.dot( direction );
+			var direction = v1.subVectors( endPoint, startPoint );
 
-		if ( denominator == 0 ) {
+			var denominator = this.normal.dot( direction );
 
-			// line is coplanar, return origin
-			if( this.distanceToPoint( startPoint ) == 0 ) {
+			if ( denominator == 0 ) {
 
-				return result.copy( startPoint );
+				// line is coplanar, return origin
+				if( this.distanceToPoint( startPoint ) == 0 ) {
+
+					return result.copy( startPoint );
+
+				}
+
+				// Unsure if this is the correct method to handle this case.
+				return undefined;
 
 			}
 
-			// Unsure if this is the correct method to handle this case.
-			return undefined;
+			var t = - ( startPoint.dot( this.normal ) + this.constant ) / denominator;
 
-		}
+			if( t < 0 || t > 1 ) {
 
-		var t = - ( startPoint.dot( this.normal ) + this.constant ) / denominator;
+				return undefined;
 
-		if( t < 0 || t > 1 ) {
+			}
 
-			return undefined;
+			return result.copy( direction ).multiplyScalar( t ).add( startPoint );
 
-		}
+		};
 
-		return result.copy( direction ).multiplyScalar( t ).add( startPoint );
+	}(),
 
-	},
 
 	coplanarPoint: function ( optionalTarget ) {
 
@@ -161,21 +176,28 @@ THREE.Plane.prototype = {
 
 	},
 
-	transform: function ( matrix, optionalNormalMatrix ) {
+	transform: function() {
 
-		// compute new normal based on theory here:
-		// http://www.songho.ca/opengl/gl_normaltransform.html
-		optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
-		var newNormal = THREE.Plane.__v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
+		var v1 = new THREE.Vector3(),
+			v2 = new THREE.Vector3();
+		
+		return function ( matrix, optionalNormalMatrix ) {
 
-		var newCoplanarPoint = this.coplanarPoint( THREE.Plane.__v2 );
-		newCoplanarPoint.applyMatrix4( matrix );
+			// compute new normal based on theory here:
+			// http://www.songho.ca/opengl/gl_normaltransform.html
+			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
+			var newNormal = v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
-		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
+			var newCoplanarPoint = this.coplanarPoint( v2 );
+			newCoplanarPoint.applyMatrix4( matrix );
 
-		return this;
+			this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 
-	},
+			return this;
+
+		};
+
+	}(),
 
 	translate: function ( offset ) {
 
@@ -198,7 +220,3 @@ THREE.Plane.prototype = {
 	}
 
 };
-
-THREE.Plane.__vZero = new THREE.Vector3( 0, 0, 0 );
-THREE.Plane.__v1 = new THREE.Vector3();
-THREE.Plane.__v2 = new THREE.Vector3();
