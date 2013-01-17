@@ -45,7 +45,7 @@ String.prototype.trim = String.prototype.trim || function () {
 
 };
 
-
+// based on http://stackoverflow.com/a/12317051
 THREE.extend = function ( target, other ) {
 
 	target = target || {};
@@ -65,7 +65,7 @@ THREE.extend = function ( target, other ) {
 	}
 
 	return target;
-	
+
 };
 
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
