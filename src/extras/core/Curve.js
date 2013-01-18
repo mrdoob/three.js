@@ -324,34 +324,36 @@ THREE.QuadraticBezierCurve = function ( v0, v1, v2 ) {
 
 THREE.QuadraticBezierCurve.prototype = Object.create( THREE.Curve.prototype );
 
+THREE.extend( THREE.QuadraticBezierCurve.prototype, {
 
-THREE.QuadraticBezierCurve.prototype.getPoint = function ( t ) {
+	getPoint: function ( t ) {
 
-	var tx, ty;
+		var tx, ty;
 
-	tx = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
-	ty = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
+		tx = THREE.Shape.Utils.b2( t, this.v0.x, this.v1.x, this.v2.x );
+		ty = THREE.Shape.Utils.b2( t, this.v0.y, this.v1.y, this.v2.y );
 
-	return new THREE.Vector2( tx, ty );
+		return new THREE.Vector2( tx, ty );
 
-};
+	},
 
+	getTangent: function( t ) {
 
-THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
+		var tx, ty;
 
-	var tx, ty;
+		tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
+		ty = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y );
 
-	tx = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.x, this.v1.x, this.v2.x );
-	ty = THREE.Curve.Utils.tangentQuadraticBezier( t, this.v0.y, this.v1.y, this.v2.y );
+		// returns unit vector
 
-	// returns unit vector
+		var tangent = new THREE.Vector2( tx, ty );
+		tangent.normalize();
 
-	var tangent = new THREE.Vector2( tx, ty );
-	tangent.normalize();
+		return tangent;
 
-	return tangent;
+	}
 
-};
+} );
 
 
 /**************************************************************
@@ -369,30 +371,35 @@ THREE.CubicBezierCurve = function ( v0, v1, v2, v3 ) {
 
 THREE.CubicBezierCurve.prototype = Object.create( THREE.Curve.prototype );
 
-THREE.CubicBezierCurve.prototype.getPoint = function ( t ) {
 
-	var tx, ty;
+THREE.extend( THREE.CubicBezierCurve.prototype, {
 
-	tx = THREE.Shape.Utils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
-	ty = THREE.Shape.Utils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
+	getPoint: function ( t ) {
 
-	return new THREE.Vector2( tx, ty );
+		var tx, ty;
 
-};
+		tx = THREE.Shape.Utils.b3( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
+		ty = THREE.Shape.Utils.b3( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
 
-THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
+		return new THREE.Vector2( tx, ty );
 
-	var tx, ty;
+	},
 
-	tx = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
-	ty = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
+	getTangent: function( t ) {
 
-	var tangent = new THREE.Vector2( tx, ty );
-	tangent.normalize();
+		var tx, ty;
 
-	return tangent;
+		tx = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.x, this.v1.x, this.v2.x, this.v3.x );
+		ty = THREE.Curve.Utils.tangentCubicBezier( t, this.v0.y, this.v1.y, this.v2.y, this.v3.y );
 
-};
+		var tangent = new THREE.Vector2( tx, ty );
+		tangent.normalize();
+
+		return tangent;
+
+	}
+
+} );
 
 
 /**************************************************************
