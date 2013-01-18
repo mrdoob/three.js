@@ -265,7 +265,7 @@ THREE.extend( THREE.Curve.prototype, {
 
 	}
 
-};
+} );
 
 /**************************************************************
  *	Line
@@ -307,7 +307,7 @@ THREE.extend( THREE.LineCurve.prototype, {
 
 	}
 
-};
+} );
 
 /**************************************************************
  *	Quadratic Bezier curve

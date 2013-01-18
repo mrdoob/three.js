@@ -236,4 +236,4 @@ THREE.extend( THREE.CombinedCamera.prototype, {
 
 	}
 
-};
+} );

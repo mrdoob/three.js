@@ -271,4 +271,4 @@ THREE.extend( THREE.CurvePath.prototype, {
 
 	}
 
-};
+} );

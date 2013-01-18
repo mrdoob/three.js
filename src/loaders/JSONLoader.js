@@ -428,4 +428,4 @@ THREE.extend( THREE.JSONLoader.prototype, {
 
 	}
 
-};
+} );
