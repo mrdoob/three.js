@@ -3,8 +3,8 @@
 import sys
 
 if sys.version_info < (2, 7):
-	print("ERROR: The build script requires Python 2.7 or higher.")
-	print("You can get an updated version here: http://www.python.org/download/releases/")
+	print("This script requires at least Python 2.7.")
+	print("Please, update to a newer version: http://www.python.org/download/releases/")
 	exit()
 
 
