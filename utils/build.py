@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 
+import sys
+
+if sys.version_info < (2, 7):
+	print("ERROR: The build script requires Python 2.7 or higher.")
+	print("You can get an updated version here: http://www.python.org/download/releases/")
+	exit()
+
+
 import argparse
 import json
 import os
 import shutil
-import sys
 import tempfile
 
 
