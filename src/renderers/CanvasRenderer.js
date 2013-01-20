@@ -92,18 +92,23 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_gradientMapQuality --; // Fix UVs
 
 	// dash+gap fallbacks for Firefox and everything else
-	if( ! _context.setLineDash ) {
-		if( 'mozDash' in _context ) {
-			_context.setLineDash = function( values ) {
-				if( values[0] == null || values[1] == null) {
-					_context.mozDash = null;
-				} else {
-					_context.mozDash = values;
-				}
+
+	if ( _context.setLineDash === undefined ) {
+
+		if ( _context.mozDash !== undefined ) {
+
+			_context.setLineDash = function ( values ) {
+
+				_context.mozDash = values[ 0 ] !== null ? values : null;
+
 			}
+
 		} else {
-			_context.setLineDash = function( values ) {}
+
+			_context.setLineDash = function ( values ) {}
+
 		}
+
 	}
 
 	this.domElement = _canvas;
@@ -1291,12 +1296,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function setDashAndGap( dashSizeValue, gapSizeValue ) {
 
-		if( _contextDashSize !== dashSizeValue || _contextGapSize !== gapSizeValue ) {
-			
-			_context.setLineDash([ dashSizeValue, gapSizeValue ]);
+		if ( _contextDashSize !== dashSizeValue || _contextGapSize !== gapSizeValue ) {
+
+			_context.setLineDash( [ dashSizeValue, gapSizeValue ] );
 			_contextDashSize = dashSizeValue;
 			_contextGapSize = gapSizeValue;
-		
+
 		}
 
 	}
