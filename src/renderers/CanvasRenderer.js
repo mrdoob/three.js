@@ -29,6 +29,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_contextLineWidth = null,
 	_contextLineCap = null,
 	_contextLineJoin = null,
+	_contextDashSize = null,
+	_contextGapSize = 0,
 
 	_v1, _v2, _v3, _v4,
 	_v5 = new THREE.RenderableVertex(),
@@ -88,6 +90,21 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_gradientMapContext.scale( _gradientMapQuality, _gradientMapQuality );
 
 	_gradientMapQuality --; // Fix UVs
+
+	// dash+gap fallbacks for Firefox and everything else
+	if( ! _context.setLineDash ) {
+		if( 'mozDash' in _context ) {
+			_context.setLineDash = function( values ) {
+				if( values[0] == null || values[1] == null) {
+					_context.mozDash = null;
+				} else {
+					_context.mozDash = values;
+				}
+			}
+		} else {
+			_context.setLineDash = function( values ) {}
+		}
+	}
 
 	this.domElement = _canvas;
 
@@ -573,6 +590,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setLineCap( material.linecap );
 				setLineJoin( material.linejoin );
 				setStrokeStyle( material.color.getStyle() );
+				setDashAndGap( null, null );
+
+				_context.stroke();
+				_elemBox.expandByScalar( material.linewidth * 2 );
+
+			} else if ( material instanceof THREE.LineDashedMaterial ) {
+
+				setLineWidth( material.linewidth );
+				setLineCap( material.linecap );
+				setLineJoin( material.linejoin );
+				setStrokeStyle( material.color.getStyle() );
+				setDashAndGap( material.dashSize, material.gapSize );
 
 				_context.stroke();
 				_elemBox.expandByScalar( material.linewidth * 2 );
@@ -1256,6 +1285,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.fillStyle = value;
 			_contextFillStyle = value;
 
+		}
+
+	}
+
+	function setDashAndGap( dashSizeValue, gapSizeValue ) {
+
+		if( _contextDashSize !== dashSizeValue || _contextGapSize !== gapSizeValue ) {
+			
+			_context.setLineDash([ dashSizeValue, gapSizeValue ]);
+			_contextDashSize = dashSizeValue;
+			_contextGapSize = gapSizeValue;
+		
 		}
 
 	}
