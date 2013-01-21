@@ -17,7 +17,7 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 	);
 };
 
-THREE.Matrix3.prototype = {
+THREE.extend( THREE.Matrix3.prototype, {
 
 	constructor: THREE.Matrix3,
 
@@ -70,27 +70,31 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	multiplyVector3Array: function ( a ) {
+	multiplyVector3Array: function() {
 
-		var tmp = THREE.Matrix3.__v1;
+		var v1 = new THREE.Vector3();
+		
+		return function ( a ) {
 
-		for ( var i = 0, il = a.length; i < il; i += 3 ) {
+			for ( var i = 0, il = a.length; i < il; i += 3 ) {
 
-			tmp.x = a[ i ];
-			tmp.y = a[ i + 1 ];
-			tmp.z = a[ i + 2 ];
+				v1.x = a[ i ];
+				v1.y = a[ i + 1 ];
+				v1.z = a[ i + 2 ];
 
-			tmp.applyMatrix3(this);
+				v1.applyMatrix3(this);
 
-			a[ i ]     = tmp.x;
-			a[ i + 1 ] = tmp.y;
-			a[ i + 2 ] = tmp.z;
+				a[ i ]     = v1.x;
+				a[ i + 1 ] = v1.y;
+				a[ i + 2 ] = v1.z;
 
-		}
+			}
 
-		return a;
+			return a;
 
-	},
+		};
+
+	}(),
 
 	multiplyScalar: function ( s ) {
 
@@ -210,6 +214,4 @@ THREE.Matrix3.prototype = {
 
 	}
 
-};
-
-THREE.Matrix3.__v1 = new THREE.Vector3();
+} );
