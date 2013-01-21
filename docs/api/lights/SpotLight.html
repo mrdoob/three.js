@@ -47,6 +47,12 @@ scene.add( spotLight );</code>
 			Default — *new THREE.Vector3()*.
 		</div>
 
+		<h3>.[page:Object3D target]</h3>
+		<div>
+			Spotlight focus points at target.position.<br />
+			Default position — *(0,0,0)*.
+		</div>
+
 		<h3>.[page:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
@@ -57,6 +63,18 @@ scene.add( spotLight );</code>
 		<div>
 			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
 			Default — *0.0*.
+		</div>
+
+		<h3>.[page:Float angle]</h3>
+		<div>
+			Maximum extent of the spotlight, in radians, from its direction.<br />
+			Default — *Math.PI/2*.
+		</div>
+
+		<h3>.[page:Float exponent]</h3>
+		<div>
+			Rapidity of the falloff of light from its target direction.<br />
+			Default — *10.0*.
 		</div>
 
 		<h3>.[page:Boolean castShadow]</h3>
