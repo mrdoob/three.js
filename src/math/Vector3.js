@@ -17,8 +17,6 @@ THREE.Vector3 = function ( x, y, z ) {
 
 THREE.extend( THREE.Vector3.prototype, {
 
-	constructor: THREE.Vector3,
-
 	set: function ( x, y, z ) {
 
 		this.x = x;
@@ -270,7 +268,7 @@ THREE.extend( THREE.Vector3.prototype, {
 	applyEuler: function() {
 
 		var q1 = new THREE.Quaternion();
-		
+
 		return function ( v, eulerOrder ) {
 
 			var quaternion = q1.setFromEuler( v, eulerOrder );
@@ -286,7 +284,7 @@ THREE.extend( THREE.Vector3.prototype, {
 	applyAxisAngle: function() {
 
 		var q1 = new THREE.Quaternion();
-		
+
 		return function ( axis, angle ) {
 
 			var quaternion = q1.setFromAxisAngle( axis, angle );

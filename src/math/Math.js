@@ -80,7 +80,7 @@ THREE.Math = {
 	}(),
 
 	radToDeg: function() {
-		
+
 		var radianToDegreesFactor = 180 / Math.PI;
 
 		return function ( radians ) {

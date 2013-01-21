@@ -14,8 +14,6 @@ THREE.Vector2 = function ( x, y ) {
 
 THREE.extend( THREE.Vector2.prototype, {
 
-	constructor: THREE.Vector2,
-
 	set: function ( x, y ) {
 
 		this.x = x;

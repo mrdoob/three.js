@@ -11,8 +11,6 @@ THREE.Ray = function ( origin, direction ) {
 
 THREE.extend( THREE.Ray.prototype, {
 
-	constructor: THREE.Ray,
-
 	set: function ( origin, direction ) {
 
 		this.origin.copy( origin );
@@ -133,7 +131,7 @@ THREE.extend( THREE.Ray.prototype, {
 
 		var t = this.distanceToPlane( plane );
 
-		if( t === undefined ) {
+		if ( t === undefined ) {
 
 			return undefined;
 		}

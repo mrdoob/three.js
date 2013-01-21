@@ -11,8 +11,6 @@ THREE.Box3 = function ( min, max ) {
 
 THREE.extend( THREE.Box3.prototype, {
 
-	constructor: THREE.Box3,
-
 	set: function ( min, max ) {
 
 		this.min.copy( min );
@@ -80,7 +78,7 @@ THREE.extend( THREE.Box3.prototype, {
 	setFromCenterAndSize: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function ( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
@@ -228,7 +226,7 @@ THREE.extend( THREE.Box3.prototype, {
 	distanceToPoint: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function ( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
@@ -241,7 +239,7 @@ THREE.extend( THREE.Box3.prototype, {
 	getBoundingSphere: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function ( optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Sphere();
@@ -297,7 +295,7 @@ THREE.extend( THREE.Box3.prototype, {
 			points[5].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
 			points[6].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
 			points[7].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
-			
+
 			this.makeEmpty();
 			this.setFromPoints( points );
 

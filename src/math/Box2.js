@@ -11,8 +11,6 @@ THREE.Box2 = function ( min, max ) {
 
 THREE.extend( THREE.Box2.prototype, {
 
-	constructor: THREE.Box2,
-
 	set: function ( min, max ) {
 
 		this.min.copy( min );
@@ -70,7 +68,7 @@ THREE.extend( THREE.Box2.prototype, {
 	setFromCenterAndSize: function() {
 
 		var v1 = new THREE.Vector2();
-		
+
 		return function ( center, size ) {
 
 			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
@@ -210,7 +208,7 @@ THREE.extend( THREE.Box2.prototype, {
 	distanceToPoint: function() {
 
 		var v1 = new THREE.Vector2();
-		
+
 		return function ( point ) {
 
 			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );

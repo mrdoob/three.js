@@ -12,8 +12,6 @@ THREE.Sphere = function ( center, radius ) {
 
 THREE.extend( THREE.Sphere.prototype, {
 
-	constructor: THREE.Sphere,
-
 	set: function ( center, radius ) {
 
 		this.center.copy( center );

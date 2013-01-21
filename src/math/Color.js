@@ -12,10 +12,7 @@ THREE.Color = function ( value ) {
 
 THREE.extend( THREE.Color.prototype, {
 
-	constructor: THREE.Color,
-
 	r: 1, g: 1, b: 1,
-
 
 	set: function ( value ) {
 

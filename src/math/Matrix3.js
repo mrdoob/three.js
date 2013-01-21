@@ -19,8 +19,6 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 THREE.extend( THREE.Matrix3.prototype, {
 
-	constructor: THREE.Matrix3,
-
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 		var te = this.elements;
@@ -73,7 +71,7 @@ THREE.extend( THREE.Matrix3.prototype, {
 	multiplyVector3Array: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function ( a ) {
 
 			for ( var i = 0, il = a.length; i < il; i += 3 ) {

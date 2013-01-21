@@ -27,8 +27,6 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 THREE.extend( THREE.Matrix4.prototype, {
 
-	constructor: THREE.Matrix4,
-
 	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
 		var te = this.elements;
@@ -213,14 +211,14 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	lookAt: function() {
 
-		var x = new THREE.Vector3(),
-			y = new THREE.Vector3(),
-			z = new THREE.Vector3();
-		
+		var x = new THREE.Vector3();
+		var y = new THREE.Vector3();
+		var z = new THREE.Vector3();
+
 		return function ( eye, target, up ) {
 
 			var te = this.elements;
-		
+
 			z.subVectors( eye, target ).normalize();
 
 			if ( z.length() === 0 ) {
@@ -349,7 +347,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 	multiplyVector3Array: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function ( a ) {
 
 			for ( var i = 0, il = a.length; i < il; i += 3 ) {
@@ -511,7 +509,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 	getPosition: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function () {
 
 			var te = this.elements;
@@ -536,7 +534,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 	getColumnX: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function () {
 
 			var te = this.elements;
@@ -549,7 +547,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 	getColumnY: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function () {
 
 			var te = this.elements;
@@ -562,7 +560,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 	getColumnZ: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function() {
 
 			var te = this.elements;
@@ -635,7 +633,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 		return function ( translation, rotation, scale ) {
 
 			var te = this.elements;
-			
+
 			mRotation.identity();
 			mRotation.setRotationFromQuaternion( rotation );
 
@@ -659,12 +657,12 @@ THREE.extend( THREE.Matrix4.prototype, {
 			y = new THREE.Vector3(),
 			z = new THREE.Vector3(),
 			matrix = new THREE.Matrix4();
-		
+
 		return function ( translation, rotation, scale ) {
 
 			var te = this.elements;
 
-			// grab the axis vectors		
+			// grab the axis vectors
 			x.set( te[0], te[1], te[2] );
 			y.set( te[4], te[5], te[6] );
 			z.set( te[8], te[9], te[10] );
@@ -682,7 +680,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 			translation.z = te[14];
 
 			// scale the rotation part
-		
+
 			matrix.copy( this );
 
 			matrix.elements[0] /= scale.x;
@@ -721,7 +719,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 	extractRotation: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function ( m ) {
 
 			var te = this.elements;

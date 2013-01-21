@@ -128,9 +128,9 @@ THREE.extend( THREE.Triangle.prototype, {
 
 	area: function() {
 
-		var v0 = new THREE.Vector3(),
-			v1 = new THREE.Vector3();
-		
+		var v0 = new THREE.Vector3();
+		var v1 = new THREE.Vector3();
+
 		return function () {
 
 			v0.subVectors( this.c, this.b );

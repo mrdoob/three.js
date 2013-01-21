@@ -11,8 +11,6 @@ THREE.Plane = function ( normal, constant ) {
 
 THREE.extend( THREE.Plane.prototype, {
 
-	constructor: THREE.Plane,
-
 	set: function ( normal, constant ) {
 
 		this.normal.copy( normal );
@@ -42,9 +40,9 @@ THREE.extend( THREE.Plane.prototype, {
 
 	setFromCoplanarPoints: function() {
 
-		var v1 = new THREE.Vector3(),
-			v2 = new THREE.Vector3();
-		
+		var v1 = new THREE.Vector3();
+		var v2 = new THREE.Vector3();
+
 		return function ( a, b, c ) {
 
 			var normal = v1.subVectors( c, b ).cross( v2.subVectors( a, b ) ).normalize();
@@ -131,7 +129,7 @@ THREE.extend( THREE.Plane.prototype, {
 	intersectLine: function() {
 
 		var v1 = new THREE.Vector3();
-		
+
 		return function ( startPoint, endPoint, optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
@@ -178,9 +176,9 @@ THREE.extend( THREE.Plane.prototype, {
 
 	transform: function() {
 
-		var v1 = new THREE.Vector3(),
-			v2 = new THREE.Vector3();
-		
+		var v1 = new THREE.Vector3();
+		var v2 = new THREE.Vector3();
+
 		return function ( matrix, optionalNormalMatrix ) {
 
 			// compute new normal based on theory here:
