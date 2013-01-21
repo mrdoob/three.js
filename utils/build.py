@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 
+import sys
+
+if sys.version_info < (2, 7):
+	print("This script requires at least Python 2.7.")
+	print("Please, update to a newer version: http://www.python.org/download/releases/")
+	exit()
+
+
 import argparse
 import json
 import os
 import shutil
-import sys
 import tempfile
 
 

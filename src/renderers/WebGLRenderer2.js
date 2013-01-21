@@ -162,8 +162,14 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 	this.setViewport = renderer.setViewport;
 	this.setScissor = renderer.setScissor;
 	this.enableScissorTest = renderer.enableScissorTest;
+	this.setDepthWrite = renderer.setDepthWrite;
 	this.setDepthTest = renderer.setDepthTest;
 	this.setRenderTarget = renderer.setRenderTarget;
+	this.setBlending = renderer.setBlending;
+	this.setTexture = renderer.setTexture;
+	this.setMaterialFaces = renderer.setMaterialFaces;
+	this.setFaceCulling = renderer.setFaceCulling;
+	
 
 	// Clearing
 

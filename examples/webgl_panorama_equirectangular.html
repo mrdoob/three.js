@@ -39,6 +39,7 @@
 			var camera, scene, renderer;
 
 			var fov = 70,
+			maxFOV = 120, minFOV = 20,
 			texture_placeholder,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
@@ -126,19 +127,19 @@
 
 				if ( event.wheelDeltaY ) {
 
-					fov -= event.wheelDeltaY * 0.05;
+					if ((event.wheelDeltaY<0 && fov<maxFOV)||(event.wheelDeltaY>0 && fov>minFOV))fov -= event.wheelDeltaY * 0.05;
 
 				// Opera / Explorer 9
 
 				} else if ( event.wheelDelta ) {
 
-					fov -= event.wheelDelta * 0.05;
+					if ((event.wheelDelta<0 && fov<maxFOV)||(event.wheelDelta>0 && fov>minFOV))fov -= event.wheelDelta * 0.05;
 
 				// Firefox
 
 				} else if ( event.detail ) {
 
-					fov += event.detail * 1.0;
+					if ((event.detail>0 && fov<maxFOV)||(event.detail<0 && fov>minFOV))fov += event.detail * 1.0;
 
 				}
 
