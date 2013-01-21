@@ -28,46 +28,50 @@ THREE.Mesh = function ( geometry, material ) {
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Mesh.prototype.updateMorphTargets = function () {
+THREE.extend( THREE.Mesh.prototype, {
 
-	if ( this.geometry.morphTargets.length > 0 ) {
+	updateMorphTargets: function () {
 
-		this.morphTargetBase = -1;
-		this.morphTargetForcedOrder = [];
-		this.morphTargetInfluences = [];
-		this.morphTargetDictionary = {};
+		if ( this.geometry.morphTargets.length > 0 ) {
 
-		for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
+			this.morphTargetBase = -1;
+			this.morphTargetForcedOrder = [];
+			this.morphTargetInfluences = [];
+			this.morphTargetDictionary = {};
 
-			this.morphTargetInfluences.push( 0 );
-			this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+			for ( var m = 0, ml = this.geometry.morphTargets.length; m < ml; m ++ ) {
+
+				this.morphTargetInfluences.push( 0 );
+				this.morphTargetDictionary[ this.geometry.morphTargets[ m ].name ] = m;
+
+			}
 
 		}
 
+	},
+
+	getMorphTargetIndexByName: function ( name ) {
+
+		if ( this.morphTargetDictionary[ name ] !== undefined ) {
+
+			return this.morphTargetDictionary[ name ];
+
+		}
+
+		console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
+
+		return 0;
+
+	},
+
+	clone: function ( object ) {
+
+		if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
+
+		THREE.Object3D.prototype.clone.call( this, object );
+
+		return object;
+
 	}
 
-};
-
-THREE.Mesh.prototype.getMorphTargetIndexByName = function ( name ) {
-
-	if ( this.morphTargetDictionary[ name ] !== undefined ) {
-
-		return this.morphTargetDictionary[ name ];
-
-	}
-
-	console.log( "THREE.Mesh.getMorphTargetIndexByName: morph target " + name + " does not exist. Returning 0." );
-
-	return 0;
-
-};
-
-THREE.Mesh.prototype.clone = function ( object ) {
-
-	if ( object === undefined ) object = new THREE.Mesh( this.geometry, this.material );
-
-	THREE.Object3D.prototype.clone.call( this, object );
-
-	return object;
-
-};
+});

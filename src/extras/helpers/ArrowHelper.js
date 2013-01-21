@@ -41,43 +41,50 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
+THREE.extend( THREE.ArrowHelper.prototype, {
 
-    var d = THREE.ArrowHelper.__v1.copy( dir ).normalize();
+	setDirection: function() {
 
-    if ( d.y > 0.999 ) {
+		var v1 = new THREE.Vector3(),
+			v2 = new THREE.Vector3(),
+			q1 = new THREE.Quaternion();
 
-        this.rotation.set( 0, 0, 0 );
- 
-    } else if ( d.y < - 0.999 ) {
+		return function ( dir ) {
 
-        this.rotation.set( Math.PI, 0, 0 );
+		    var d = v1.copy( dir ).normalize();
 
-    } else {
+		    if ( d.y > 0.999 ) {
 
-	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x ).normalize();
-	    var radians = Math.acos( d.y );
-	    var quaternion = THREE.ArrowHelper.__q1.setFromAxisAngle( axis, radians );
+		        this.rotation.set( 0, 0, 0 );
+		 
+		    } else if ( d.y < - 0.999 ) {
 
-	    this.rotation.setEulerFromQuaternion( quaternion, this.eulerOrder );
+		        this.rotation.set( Math.PI, 0, 0 );
+
+		    } else {
+
+			    var axis = v2.set( d.z, 0, - d.x ).normalize();
+			    var radians = Math.acos( d.y );
+			    var quaternion = q1.setFromAxisAngle( axis, radians );
+
+			    this.rotation.setEulerFromQuaternion( quaternion, this.eulerOrder );
+
+			}
+		};
+
+	}(),
+
+	setLength: function ( length ) {
+
+		this.scale.set( length, length, length );
+
+	},
+
+	setColor: function ( hex ) {
+
+		this.line.material.color.setHex( hex );
+		this.cone.material.color.setHex( hex );
 
 	}
 
-};
-
-THREE.ArrowHelper.prototype.setLength = function ( length ) {
-
-	this.scale.set( length, length, length );
-
-};
-
-THREE.ArrowHelper.prototype.setColor = function ( hex ) {
-
-	this.line.material.color.setHex( hex );
-	this.cone.material.color.setHex( hex );
-
-};
-
-THREE.ArrowHelper.__v1 = new THREE.Vector3();
-THREE.ArrowHelper.__v2 = new THREE.Vector3();
-THREE.ArrowHelper.__q1 = new THREE.Quaternion();
+} );

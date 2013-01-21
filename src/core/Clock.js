@@ -14,52 +14,55 @@ THREE.Clock = function ( autoStart ) {
 
 };
 
-THREE.Clock.prototype.start = function () {
+THREE.Clock.prototype = {
 
-	this.startTime = Date.now();
-	this.oldTime = this.startTime;
+	start: function () {
 
-	this.running = true;
+		this.startTime = Date.now();
+		this.oldTime = this.startTime;
 
-};
+		this.running = true;
 
-THREE.Clock.prototype.stop = function () {
+	},
 
-	this.getElapsedTime();
+	stop: function () {
 
-	this.running = false;
+		this.getElapsedTime();
 
-};
+		this.running = false;
 
-THREE.Clock.prototype.getElapsedTime = function () {
+	},
 
-	this.getDelta();
+	getElapsedTime: function () {
 
-	return this.elapsedTime;
+		this.getDelta();
 
-};
+		return this.elapsedTime;
 
+	},
 
-THREE.Clock.prototype.getDelta = function () {
+	getDelta: function () {
 
-	var diff = 0;
+		var diff = 0;
 
-	if ( this.autoStart && ! this.running ) {
+		if ( this.autoStart && ! this.running ) {
 
-		this.start();
+			this.start();
+
+		}
+
+		if ( this.running ) {
+
+			var newTime = Date.now();
+			diff = 0.001 * ( newTime - this.oldTime );
+			this.oldTime = newTime;
+
+			this.elapsedTime += diff;
+
+		}
+
+		return diff;
 
 	}
-
-	if ( this.running ) {
-
-		var newTime = Date.now();
-		diff = 0.001 * ( newTime - this.oldTime );
-		this.oldTime = newTime;
-
-		this.elapsedTime += diff;
-
-	}
-
-	return diff;
 
 };

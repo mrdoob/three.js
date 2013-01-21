@@ -15,204 +15,189 @@ THREE.AnimationMorphTarget = function( root, data ) {
 	this.influence = 1;
 }
 
-/*
- * Play
- */
+THREE.extend( THREE.AnimationMorphTarget.prototype, {
 
-THREE.AnimationMorphTarget.prototype.play = function( loop, startTimeMS ) {
+	play: function( loop, startTimeMS ) {
 
-	if( !this.isPlaying ) {
+		if( !this.isPlaying ) {
 
-		this.isPlaying = true;
-		this.loop = loop !== undefined ? loop : true;
-		this.currentTime = startTimeMS !== undefined ? startTimeMS : 0;
+			this.isPlaying = true;
+			this.loop = loop !== undefined ? loop : true;
+			this.currentTime = startTimeMS !== undefined ? startTimeMS : 0;
 
 
-		// reset key cache
+			// reset key cache
 
-		for ( var h = 0; h < this.hierarchy.length; h++ ) {
+			for ( var h = 0; h < this.hierarchy.length; h++ ) {
 
-			if ( this.hierarchy[ h ].animationCache === undefined ) {
+				if ( this.hierarchy[ h ].animationCache === undefined ) {
 
-				this.hierarchy[ h ].animationCache = {};
-				this.hierarchy[ h ].animationCache.prevKey = 0;
-				this.hierarchy[ h ].animationCache.nextKey = 0;
+					this.hierarchy[ h ].animationCache = {};
+					this.hierarchy[ h ].animationCache.prevKey = 0;
+					this.hierarchy[ h ].animationCache.nextKey = 0;
+				}
+
+				this.hierarchy[ h ].animationCache.prevKey = this.data.hierarchy[ h ].keys[ 0 ];
+				this.hierarchy[ h ].animationCache.nextKey = this.data.hierarchy[ h ].keys[ 1 ];
 			}
 
-			this.hierarchy[ h ].animationCache.prevKey = this.data.hierarchy[ h ].keys[ 0 ];
-			this.hierarchy[ h ].animationCache.nextKey = this.data.hierarchy[ h ].keys[ 1 ];
+			this.update( 0 );
 		}
 
-		this.update( 0 );
-	}
-
-	this.isPaused = false;
-	THREE.AnimationHandler.addToUpdate( this );
-}
-
-
-/*
- * Pause
- */
-
-THREE.AnimationMorphTarget.prototype.pause = function() {
-
-	if( this.isPaused ) {
-		
+		this.isPaused = false;
 		THREE.AnimationHandler.addToUpdate( this );
+	},
+
+	pause: function() {
+
+		if( this.isPaused ) {
+			
+			THREE.AnimationHandler.addToUpdate( this );
+			
+		} else {
+			
+			THREE.AnimationHandler.removeFromUpdate( this );
+			
+		}
 		
-	} else {
+		this.isPaused = !this.isPaused;
+	},
+
+	stop: function() {
+
+		this.isPlaying = false;
+		this.isPaused  = false;
 		
 		THREE.AnimationHandler.removeFromUpdate( this );
 		
-	}
-	
-	this.isPaused = !this.isPaused;
-}
-
-
-/*
- * Stop
- */
-
-THREE.AnimationMorphTarget.prototype.stop = function() {
-
-	this.isPlaying = false;
-	this.isPaused  = false;
-	
-	THREE.AnimationHandler.removeFromUpdate( this );
-	
-	
-	// reset JIT matrix and remove cache
-	
-	for ( var h = 0; h < this.hierarchy.length; h++ ) {
 		
-		if ( this.hierarchy[ h ].animationCache !== undefined ) {
+		// reset JIT matrix and remove cache
+		
+		for ( var h = 0; h < this.hierarchy.length; h++ ) {
 			
-			delete this.hierarchy[ h ].animationCache;	
+			if ( this.hierarchy[ h ].animationCache !== undefined ) {
+				
+				delete this.hierarchy[ h ].animationCache;	
+			}
+
 		}
 
-	}
+	},
 
-}
+	update: function( deltaTimeMS ) {
 
+		// early out
 
-/*
- * Update
- */
-
-THREE.AnimationMorphTarget.prototype.update = function( deltaTimeMS ) {
-
-	// early out
-
-	if( !this.isPlaying ) return;
+		if( !this.isPlaying ) return;
 
 
-	// vars
+		// vars
 
-	var scale;
-	var vector;
-	var prevXYZ, nextXYZ;
-	var prevKey, nextKey;
-	var object;
-	var animationCache;
-	var currentTime, unloopedCurrentTime;
-	
+		var scale;
+		var vector;
+		var prevXYZ, nextXYZ;
+		var prevKey, nextKey;
+		var object;
+		var animationCache;
+		var currentTime, unloopedCurrentTime;
+		
 
-	// update time
-	
-	this.currentTime += deltaTimeMS * this.timeScale;
+		// update time
+		
+		this.currentTime += deltaTimeMS * this.timeScale;
 
-	unloopedCurrentTime = this.currentTime;
-	currentTime         = this.currentTime = this.currentTime % this.data.length;
-
-
-	// update
-
-	for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
-
-		object = this.hierarchy[ h ];
-		animationCache = object.animationCache;
+		unloopedCurrentTime = this.currentTime;
+		currentTime         = this.currentTime = this.currentTime % this.data.length;
 
 
-		// get keys
+		// update
 
-		prevKey = animationCache.prevKey;
-		nextKey = animationCache.nextKey;
+		for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
+
+			object = this.hierarchy[ h ];
+			animationCache = object.animationCache;
 
 
-		// switch keys?
+			// get keys
 
-		if ( nextKey.time <= unloopedCurrentTime ) {
+			prevKey = animationCache.prevKey;
+			nextKey = animationCache.nextKey;
 
-			// did we loop?
 
-			if ( currentTime < unloopedCurrentTime ) {
+			// switch keys?
 
-				if ( this.loop ) {
+			if ( nextKey.time <= unloopedCurrentTime ) {
 
-					prevKey = this.data.hierarchy[ h ].keys[ 0 ];
-					nextKey = this.data.hierarchy[ h ].keys[ 1 ];
+				// did we loop?
 
-					while( nextKey.time < currentTime ) {
+				if ( currentTime < unloopedCurrentTime ) {
 
-						prevKey = nextKey;
-						nextKey = this.data.hierarchy[ h ].keys[ nextKey.index + 1 ];
+					if ( this.loop ) {
+
+						prevKey = this.data.hierarchy[ h ].keys[ 0 ];
+						nextKey = this.data.hierarchy[ h ].keys[ 1 ];
+
+						while( nextKey.time < currentTime ) {
+
+							prevKey = nextKey;
+							nextKey = this.data.hierarchy[ h ].keys[ nextKey.index + 1 ];
+
+						}
+
+					} else {
+
+						this.stop();
+						return;
 
 					}
 
 				} else {
 
-					this.stop();
-					return;
+					do {
+
+						prevKey = nextKey;
+						nextKey = this.data.hierarchy[ h ].keys[ nextKey.index + 1 ];
+
+					} while( nextKey.time < currentTime )
 
 				}
 
-			} else {
-
-				do {
-
-					prevKey = nextKey;
-					nextKey = this.data.hierarchy[ h ].keys[ nextKey.index + 1 ];
-
-				} while( nextKey.time < currentTime )
+				animationCache.prevKey = prevKey;
+				animationCache.nextKey = nextKey;
 
 			}
 
-			animationCache.prevKey = prevKey;
-			animationCache.nextKey = nextKey;
 
-		}
+			// calc scale and check for error
 
+			scale = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
 
-		// calc scale and check for error
+			if ( scale < 0 || scale > 1 ) {
 
-		scale = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
+				console.log( "THREE.AnimationMorphTarget.update: Warning! Scale out of bounds:" + scale ); 
+				scale = scale < 0 ? 0 : 1;
 
-		if ( scale < 0 || scale > 1 ) {
-
-			console.log( "THREE.AnimationMorphTarget.update: Warning! Scale out of bounds:" + scale ); 
-			scale = scale < 0 ? 0 : 1;
-
-		}
+			}
 
 
-		// interpolate
-		
-		var pi, pmti = prevKey.morphTargetsInfluences;
-		var ni, nmti = nextKey.morphTargetsInfluences;
-		var mt, i;
-		
-		for( mt in pmti ) {
+			// interpolate
 			
-			pi = pmti[ mt ];
-			ni = nmti[ mt ];
-			i = this.root.getMorphTargetIndexByName( mt );
+			var pi, pmti = prevKey.morphTargetsInfluences;
+			var ni, nmti = nextKey.morphTargetsInfluences;
+			var mt, i;
 			
-			this.root.morphTargetInfluences[ i ] = ( pi + ( ni - pi ) * scale ) * this.influence;
+			for( mt in pmti ) {
+				
+				pi = pmti[ mt ];
+				ni = nmti[ mt ];
+				i = this.root.getMorphTargetIndexByName( mt );
+				
+				this.root.morphTargetInfluences[ i ] = ( pi + ( ni - pi ) * scale ) * this.influence;
+			}
+
 		}
 
 	}
 
-};
+});
 

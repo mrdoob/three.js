@@ -28,280 +28,284 @@ THREE.MorphBlendMesh = function( geometry, material ) {
 
 THREE.MorphBlendMesh.prototype = Object.create( THREE.Mesh.prototype );
 
-THREE.MorphBlendMesh.prototype.createAnimation = function ( name, start, end, fps ) {
+THREE.extend( THREE.MorphBlendMesh.prototype, {
 
-	var animation = {
+	createAnimation: function ( name, start, end, fps ) {
 
-		startFrame: start,
-		endFrame: end,
+		var animation = {
 
-		length: end - start + 1,
+			startFrame: start,
+			endFrame: end,
 
-		fps: fps,
-		duration: ( end - start ) / fps,
+			length: end - start + 1,
 
-		lastFrame: 0,
-		currentFrame: 0,
+			fps: fps,
+			duration: ( end - start ) / fps,
 
-		active: false,
+			lastFrame: 0,
+			currentFrame: 0,
 
-		time: 0,
-		direction: 1,
-		weight: 1,
+			active: false,
 
-		directionBackwards: false,
-		mirroredLoop: false
+			time: 0,
+			direction: 1,
+			weight: 1,
 
-	};
+			directionBackwards: false,
+			mirroredLoop: false
 
-	this.animationsMap[ name ] = animation;
-	this.animationsList.push( animation );
+		};
 
-};
+		this.animationsMap[ name ] = animation;
+		this.animationsList.push( animation );
 
-THREE.MorphBlendMesh.prototype.autoCreateAnimations = function ( fps ) {
+	},
 
-	var pattern = /([a-z]+)(\d+)/;
+	autoCreateAnimations: function ( fps ) {
 
-	var firstAnimation, frameRanges = {};
+		var pattern = /([a-z]+)(\d+)/;
 
-	var geometry = this.geometry;
+		var firstAnimation, frameRanges = {};
 
-	for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
+		var geometry = this.geometry;
 
-		var morph = geometry.morphTargets[ i ];
-		var chunks = morph.name.match( pattern );
+		for ( var i = 0, il = geometry.morphTargets.length; i < il; i ++ ) {
 
-		if ( chunks && chunks.length > 1 ) {
+			var morph = geometry.morphTargets[ i ];
+			var chunks = morph.name.match( pattern );
 
-			var name = chunks[ 1 ];
-			var num = chunks[ 2 ];
+			if ( chunks && chunks.length > 1 ) {
 
-			if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: -Infinity };
+				var name = chunks[ 1 ];
+				var num = chunks[ 2 ];
 
-			var range = frameRanges[ name ];
+				if ( ! frameRanges[ name ] ) frameRanges[ name ] = { start: Infinity, end: -Infinity };
 
-			if ( i < range.start ) range.start = i;
-			if ( i > range.end ) range.end = i;
+				var range = frameRanges[ name ];
 
-			if ( ! firstAnimation ) firstAnimation = name;
+				if ( i < range.start ) range.start = i;
+				if ( i > range.end ) range.end = i;
 
-		}
-
-	}
-
-	for ( var name in frameRanges ) {
-
-		var range = frameRanges[ name ];
-		this.createAnimation( name, range.start, range.end, fps );
-
-	}
-
-	this.firstAnimation = firstAnimation;
-
-};
-
-THREE.MorphBlendMesh.prototype.setAnimationDirectionForward = function ( name ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.direction = 1;
-		animation.directionBackwards = false;
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.setAnimationDirectionBackward = function ( name ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.direction = -1;
-		animation.directionBackwards = true;
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.setAnimationFPS = function ( name, fps ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.fps = fps;
-		animation.duration = ( animation.end - animation.start ) / animation.fps;
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.setAnimationDuration = function ( name, duration ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.duration = duration;
-		animation.fps = ( animation.end - animation.start ) / animation.duration;
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.setAnimationWeight = function ( name, weight ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.weight = weight;
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.setAnimationTime = function ( name, time ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.time = time;
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.getAnimationTime = function ( name ) {
-
-	var time = 0;
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		time = animation.time;
-
-	}
-
-	return time;
-
-};
-
-THREE.MorphBlendMesh.prototype.getAnimationDuration = function ( name ) {
-
-	var duration = -1;
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		duration = animation.duration;
-
-	}
-
-	return duration;
-
-};
-
-THREE.MorphBlendMesh.prototype.playAnimation = function ( name ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.time = 0;
-		animation.active = true;
-
-	} else {
-
-		console.warn( "animation[" + name + "] undefined" );
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.stopAnimation = function ( name ) {
-
-	var animation = this.animationsMap[ name ];
-
-	if ( animation ) {
-
-		animation.active = false;
-
-	}
-
-};
-
-THREE.MorphBlendMesh.prototype.update = function ( delta ) {
-
-	for ( var i = 0, il = this.animationsList.length; i < il; i ++ ) {
-
-		var animation = this.animationsList[ i ];
-
-		if ( ! animation.active ) continue;
-
-		var frameTime = animation.duration / animation.length;
-
-		animation.time += animation.direction * delta;
-
-		if ( animation.mirroredLoop ) {
-
-			if ( animation.time > animation.duration || animation.time < 0 ) {
-
-				animation.direction *= -1;
-
-				if ( animation.time > animation.duration ) {
-
-					animation.time = animation.duration;
-					animation.directionBackwards = true;
-
-				}
-
-				if ( animation.time < 0 ) {
-
-					animation.time = 0;
-					animation.directionBackwards = false;
-
-				}
+				if ( ! firstAnimation ) firstAnimation = name;
 
 			}
 
+		}
+
+		for ( var name in frameRanges ) {
+
+			var range = frameRanges[ name ];
+			this.createAnimation( name, range.start, range.end, fps );
+
+		}
+
+		this.firstAnimation = firstAnimation;
+
+	},
+
+	setAnimationDirectionForward: function ( name ) {
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			animation.direction = 1;
+			animation.directionBackwards = false;
+
+		}
+
+	},
+
+	setAnimationDirectionBackward: function ( name ) {
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			animation.direction = -1;
+			animation.directionBackwards = true;
+
+		}
+
+	},
+
+	setAnimationFPS: function ( name, fps ) {
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			animation.fps = fps;
+			animation.duration = ( animation.end - animation.start ) / animation.fps;
+
+		}
+
+	},
+
+	setAnimationDuration: function ( name, duration ) {
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			animation.duration = duration;
+			animation.fps = ( animation.end - animation.start ) / animation.duration;
+
+		}
+
+	},
+
+	setAnimationWeight: function ( name, weight ) {
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			animation.weight = weight;
+
+		}
+
+	},
+
+	setAnimationTime: function ( name, time ) {
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			animation.time = time;
+
+		}
+
+	},
+
+	getAnimationTime: function ( name ) {
+
+		var time = 0;
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			time = animation.time;
+
+		}
+
+		return time;
+
+	},
+
+	getAnimationDuration: function ( name ) {
+
+		var duration = -1;
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			duration = animation.duration;
+
+		}
+
+		return duration;
+
+	},
+
+	playAnimation: function ( name ) {
+
+		var animation = this.animationsMap[ name ];
+
+		if ( animation ) {
+
+			animation.time = 0;
+			animation.active = true;
+
 		} else {
 
-			animation.time = animation.time % animation.duration;
-
-			if ( animation.time < 0 ) animation.time += animation.duration;
+			console.warn( "animation[" + name + "] undefined" );
 
 		}
 
-		var keyframe = animation.startFrame + THREE.Math.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
-		var weight = animation.weight;
+	},
 
-		if ( keyframe !== animation.currentFrame ) {
+	stopAnimation: function ( name ) {
 
-			this.morphTargetInfluences[ animation.lastFrame ] = 0;
-			this.morphTargetInfluences[ animation.currentFrame ] = 1 * weight;
+		var animation = this.animationsMap[ name ];
 
-			this.morphTargetInfluences[ keyframe ] = 0;
+		if ( animation ) {
 
-			animation.lastFrame = animation.currentFrame;
-			animation.currentFrame = keyframe;
+			animation.active = false;
 
 		}
 
-		var mix = ( animation.time % frameTime ) / frameTime;
+	},
 
-		if ( animation.directionBackwards ) mix = 1 - mix;
+	update: function ( delta ) {
 
-		this.morphTargetInfluences[ animation.currentFrame ] = mix * weight;
-		this.morphTargetInfluences[ animation.lastFrame ] = ( 1 - mix ) * weight;
+		for ( var i = 0, il = this.animationsList.length; i < il; i ++ ) {
+
+			var animation = this.animationsList[ i ];
+
+			if ( ! animation.active ) continue;
+
+			var frameTime = animation.duration / animation.length;
+
+			animation.time += animation.direction * delta;
+
+			if ( animation.mirroredLoop ) {
+
+				if ( animation.time > animation.duration || animation.time < 0 ) {
+
+					animation.direction *= -1;
+
+					if ( animation.time > animation.duration ) {
+
+						animation.time = animation.duration;
+						animation.directionBackwards = true;
+
+					}
+
+					if ( animation.time < 0 ) {
+
+						animation.time = 0;
+						animation.directionBackwards = false;
+
+					}
+
+				}
+
+			} else {
+
+				animation.time = animation.time % animation.duration;
+
+				if ( animation.time < 0 ) animation.time += animation.duration;
+
+			}
+
+			var keyframe = animation.startFrame + THREE.Math.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
+			var weight = animation.weight;
+
+			if ( keyframe !== animation.currentFrame ) {
+
+				this.morphTargetInfluences[ animation.lastFrame ] = 0;
+				this.morphTargetInfluences[ animation.currentFrame ] = 1 * weight;
+
+				this.morphTargetInfluences[ keyframe ] = 0;
+
+				animation.lastFrame = animation.currentFrame;
+				animation.currentFrame = keyframe;
+
+			}
+
+			var mix = ( animation.time % frameTime ) / frameTime;
+
+			if ( animation.directionBackwards ) mix = 1 - mix;
+
+			this.morphTargetInfluences[ animation.currentFrame ] = mix * weight;
+			this.morphTargetInfluences[ animation.lastFrame ] = ( 1 - mix ) * weight;
+
+		}
 
 	}
 
-};
+} );

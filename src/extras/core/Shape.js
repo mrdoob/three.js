@@ -18,104 +18,107 @@ THREE.Shape = function ( ) {
 
 THREE.Shape.prototype = Object.create( THREE.Path.prototype );
 
-// Convenience method to return ExtrudeGeometry
+THREE.extend( THREE.Shape.prototype, {
 
-THREE.Shape.prototype.extrude = function ( options ) {
+	// Convenience method to return ExtrudeGeometry
 
-	var extruded = new THREE.ExtrudeGeometry( this, options );
-	return extruded;
+	extrude: function ( options ) {
 
-};
+		var extruded = new THREE.ExtrudeGeometry( this, options );
+		return extruded;
 
-// Convenience method to return ShapeGeometry
+	},
 
-THREE.Shape.prototype.makeGeometry = function ( options ) {
+	// Convenience method to return ShapeGeometry
 
-	var geometry = new THREE.ShapeGeometry( this, options );
-	return geometry;
+	makeGeometry: function ( options ) {
 
-};
+		var geometry = new THREE.ShapeGeometry( this, options );
+		return geometry;
 
-// Get points of holes
+	},
 
-THREE.Shape.prototype.getPointsHoles = function ( divisions ) {
+	// Get points of holes
 
-	var i, il = this.holes.length, holesPts = [];
+	getPointsHoles: function ( divisions ) {
 
-	for ( i = 0; i < il; i ++ ) {
+		var i, il = this.holes.length, holesPts = [];
 
-		holesPts[ i ] = this.holes[ i ].getTransformedPoints( divisions, this.bends );
+		for ( i = 0; i < il; i ++ ) {
+
+			holesPts[ i ] = this.holes[ i ].getTransformedPoints( divisions, this.bends );
+
+		}
+
+		return holesPts;
+
+	},
+
+	// Get points of holes (spaced by regular distance)
+
+	getSpacedPointsHoles: function ( divisions ) {
+
+		var i, il = this.holes.length, holesPts = [];
+
+		for ( i = 0; i < il; i ++ ) {
+
+			holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
+
+		}
+
+		return holesPts;
+
+	},
+
+	// Get points of shape and holes (keypoints based on segments parameter)
+
+	extractAllPoints: function ( divisions ) {
+
+		return {
+
+			shape: this.getTransformedPoints( divisions ),
+			holes: this.getPointsHoles( divisions )
+
+		};
+
+	},
+
+	extractPoints: function ( divisions ) {
+
+		if (this.useSpacedPoints) {
+			return this.extractAllSpacedPoints(divisions);
+		}
+
+		return this.extractAllPoints(divisions);
+
+	},
+
+	//
+	// THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
+	//
+	// 	return {
+	//
+	// 		shape: this.transform( bend, divisions ),
+	// 		holes: this.getPointsHoles( divisions, bend )
+	//
+	// 	};
+	//
+	// };
+
+	// Get points of shape and holes (spaced by regular distance)
+
+	extractAllSpacedPoints: function ( divisions ) {
+
+		return {
+
+			shape: this.getTransformedSpacedPoints( divisions ),
+			holes: this.getSpacedPointsHoles( divisions )
+
+		};
 
 	}
 
-	return holesPts;
-
-};
-
-// Get points of holes (spaced by regular distance)
-
-THREE.Shape.prototype.getSpacedPointsHoles = function ( divisions ) {
-
-	var i, il = this.holes.length, holesPts = [];
-
-	for ( i = 0; i < il; i ++ ) {
-
-		holesPts[ i ] = this.holes[ i ].getTransformedSpacedPoints( divisions, this.bends );
-
-	}
-
-	return holesPts;
-
-};
-
-
-// Get points of shape and holes (keypoints based on segments parameter)
-
-THREE.Shape.prototype.extractAllPoints = function ( divisions ) {
-
-	return {
-
-		shape: this.getTransformedPoints( divisions ),
-		holes: this.getPointsHoles( divisions )
-
-	};
-
-};
-
-THREE.Shape.prototype.extractPoints = function ( divisions ) {
-
-	if (this.useSpacedPoints) {
-		return this.extractAllSpacedPoints(divisions);
-	}
-
-	return this.extractAllPoints(divisions);
-
-};
-
-//
-// THREE.Shape.prototype.extractAllPointsWithBend = function ( divisions, bend ) {
-//
-// 	return {
-//
-// 		shape: this.transform( bend, divisions ),
-// 		holes: this.getPointsHoles( divisions, bend )
-//
-// 	};
-//
-// };
-
-// Get points of shape and holes (spaced by regular distance)
-
-THREE.Shape.prototype.extractAllSpacedPoints = function ( divisions ) {
-
-	return {
-
-		shape: this.getTransformedSpacedPoints( divisions ),
-		holes: this.getSpacedPointsHoles( divisions )
-
-	};
-
-};
+} );
 
 /**************************************************************
  *	Utils
