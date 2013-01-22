@@ -8,7 +8,7 @@
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
-		
+
 		// normalized ray.direction required for accurate distance calculations
 		if( this.ray.direction.length() > 0 ) {
 
