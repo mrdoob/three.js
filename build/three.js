@@ -1612,6 +1612,25 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	}(),
 
+	transformDirection: function ( m ) {
+
+		// input: THREE.Matrix4 affine matrix
+		// vector interpreted as a direction
+
+		var x = this.x, y = this.y, z = this.z;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[4] * y + e[8]  * z;
+		this.y = e[1] * x + e[5] * y + e[9]  * z;
+		this.z = e[2] * x + e[6] * y + e[10] * z;
+
+		this.normalize();
+
+		return this;
+
+	},
+
 	divide: function ( v ) {
 
 		this.x /= v.x;
@@ -3365,7 +3384,6 @@ THREE.extend( THREE.Matrix3.prototype, {
 
 	},
 
-
 	transpose: function () {
 
 		var tmp, m = this.elements;
@@ -3378,6 +3396,15 @@ THREE.extend( THREE.Matrix3.prototype, {
 
 	},
 
+	getNormalMatrix: function ( m ) {
+
+		// input: THREE.Matrix4
+
+		this.getInverse( m ).transpose();
+
+		return this;
+
+	},
 
 	transposeIntoArray: function ( r ) {
 
@@ -5797,7 +5824,7 @@ THREE.EventDispatcher = function () {
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
-		
+
 		// normalized ray.direction required for accurate distance calculations
 		if( this.ray.direction.length() > 0 ) {
 
@@ -6384,7 +6411,7 @@ THREE.Object3DIdCount = 0;
  * @author julianwa / https://github.com/julianwa
  */
 
-THREE.Projector = function() {
+THREE.Projector = function () {
 
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
@@ -28765,7 +28792,7 @@ THREE.Path.prototype.toShapes = function() {
 // STEP 3a - Extract points from each shape, turn to vertices
 // STEP 3b - Triangulate each shape, add faces.
 
-THREE.Shape = function ( ) {
+THREE.Shape = function () {
 
 	THREE.Path.apply( this, arguments );
 	this.holes = [];
@@ -33958,7 +33985,7 @@ THREE.SpotLightHelper.prototype.update = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ImmediateRenderObject = function ( ) {
+THREE.ImmediateRenderObject = function () {
 
 	THREE.Object3D.call( this );
 
@@ -34368,7 +34395,7 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LensFlarePlugin = function ( ) {
+THREE.LensFlarePlugin = function () {
 
 	var _gl, _renderer, _precision, _lensFlare = {};
 
@@ -34670,7 +34697,7 @@ THREE.LensFlarePlugin = function ( ) {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ShadowMapPlugin = function ( ) {
+THREE.ShadowMapPlugin = function () {
 
 	var _gl,
 	_renderer,
@@ -35164,7 +35191,7 @@ THREE.ShadowMapPlugin.__projector = new THREE.Projector();
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpritePlugin = function ( ) {
+THREE.SpritePlugin = function () {
 
 	var _gl, _renderer, _precision, _sprite = {};
 
@@ -35468,7 +35495,7 @@ THREE.SpritePlugin = function ( ) {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DepthPassPlugin = function ( ) {
+THREE.DepthPassPlugin = function () {
 
 	this.enabled = false;
 	this.renderTarget = null;
