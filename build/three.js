@@ -1523,6 +1523,23 @@ THREE.Vector3.prototype = {
 
 	},
 
+	applyProjection: function ( m ) {
+
+		// input: THREE.Matrix4 projection matrix
+
+		var x = this.x, y = this.y, z = this.z;
+
+		var e = m.elements;
+		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] ); // perspective divide
+
+		this.x = ( e[0] * x + e[4] * y + e[8]  * z + e[12] ) * d;
+		this.y = ( e[1] * x + e[5] * y + e[9]  * z + e[13] ) * d;
+		this.z = ( e[2] * x + e[6] * y + e[10] * z + e[14] ) * d;
+
+		return this;
+
+	},
+
 	applyQuaternion: function ( q ) {
 
 		var x = this.x;
@@ -1566,23 +1583,6 @@ THREE.Vector3.prototype = {
 		var quaternion = THREE.Vector3.__q1.setFromAxisAngle( axis, angle );
 
 		this.applyQuaternion( quaternion );
-
-		return this;
-
-	},
-
-	projectPoint: function ( m ) {
-
-		// input: THREE.Matrix4 projection matrix
-
-		var x = this.x, y = this.y, z = this.z;
-
-		var e = m.elements;
-		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] ); // perspective divide
-
-		this.x = ( e[0] * x + e[4] * y + e[8]  * z + e[12] ) * d;
-		this.y = ( e[1] * x + e[5] * y + e[9]  * z + e[13] ) * d;
-		this.z = ( e[2] * x + e[6] * y + e[10] * z + e[14] ) * d;
 
 		return this;
 
@@ -3101,15 +3101,15 @@ THREE.Box3.prototype = {
 
 		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
 		var newPoints = [
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).projectPoint( matrix ),
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).projectPoint( matrix ), // 000
-			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).projectPoint( matrix ), // 001
-			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).projectPoint( matrix ), // 010
-			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).projectPoint( matrix ), // 011
-			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).projectPoint( matrix ), // 100
-			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).projectPoint( matrix ), // 101
-			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).projectPoint( matrix ), // 110
-			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).projectPoint( matrix )  // 111
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ),
+			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 000
+			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 001
+			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 010
+			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ), // 011
+			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 100
+			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 101
+			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 110
+			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix )  // 111
 		];
 
 		this.makeEmpty();
@@ -3698,8 +3698,8 @@ THREE.Matrix4.prototype = {
 
 	multiplyVector3: function ( vector ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.projectPoint( matrix ) instead.' );
-		return vector.projectPoint( this );
+		console.warn( 'DEPRECATED: Matrix4\'s .multiplyVector3() has been removed. Use vector.applyMatrix4( matrix ) or vector.applyProjection( matrix ) instead.' );
+		return vector.applyProjection( this );
 
 	},
 
@@ -3720,7 +3720,7 @@ THREE.Matrix4.prototype = {
 			tmp.y = a[ i + 1 ];
 			tmp.z = a[ i + 2 ];
 
-			tmp.projectPoint( this );
+			tmp.applyProjection( this );
 
 			a[ i ]     = tmp.x;
 			a[ i + 1 ] = tmp.y;
@@ -4585,8 +4585,8 @@ THREE.Ray.prototype = {
 
 	transform: function ( matrix4 ) {
 
-		this.direction.add( this.origin ).projectPoint( matrix4 );
-		this.origin.projectPoint( matrix4 );
+		this.direction.add( this.origin ).applyMatrix4( matrix4 );
+		this.origin.applyMatrix4( matrix4 );
 		this.direction.sub( this.origin );
 
 		return this;
@@ -4716,7 +4716,7 @@ THREE.Sphere.prototype = {
 
 	transform: function ( matrix ) {
 
-		this.center.projectPoint( matrix );
+		this.center.applyMatrix4( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
 
 		return this;
@@ -5058,7 +5058,7 @@ THREE.Plane.prototype = {
 		var newNormal = THREE.Plane.__v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 		var newCoplanarPoint = this.coplanarPoint( THREE.Plane.__v2 );
-		newCoplanarPoint.projectPoint( matrix );
+		newCoplanarPoint.applyMatrix4( matrix );
 
 		this.setFromNormalAndCoplanarPoint( newNormal, newCoplanarPoint );
 
@@ -5985,13 +5985,13 @@ THREE.Object3D.prototype = {
 
 	localToWorld: function ( vector ) {
 
-		return vector.projectPoint( this.matrixWorld );
+		return vector.applyMatrix4( this.matrixWorld );
 
 	},
 
 	worldToLocal: function ( vector ) {
 
-		return vector.projectPoint( THREE.Object3D.__m1.getInverse( this.matrixWorld ) );
+		return vector.applyMatrix4( THREE.Object3D.__m1.getInverse( this.matrixWorld ) );
 
 	},
 
@@ -6300,7 +6300,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
-		return vector.projectPoint( _viewProjectionMatrix );
+		return vector.applyProjection( _viewProjectionMatrix );
 
 	};
 
@@ -6310,7 +6310,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, camera.projectionMatrixInverse );
 
-		return vector.projectPoint( _viewProjectionMatrix );
+		return vector.applyProjection( _viewProjectionMatrix );
 
 	};
 
@@ -6364,7 +6364,7 @@ THREE.Projector = function() {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.projectPoint( _viewProjectionMatrix );
+							_vector3.applyProjection( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
 						}
@@ -6387,7 +6387,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.projectPoint( _viewProjectionMatrix );
+						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -6406,7 +6406,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.projectPoint( _viewProjectionMatrix );
+						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -6484,7 +6484,7 @@ THREE.Projector = function() {
 
 					_vertex = getNextVertexInPool();
 
-					_vertex.positionWorld.copy( vertices[ v ] ).projectPoint( _modelMatrix );
+					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
 					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
@@ -6601,7 +6601,7 @@ THREE.Projector = function() {
 
 					_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
 
-					_face.centroidModel.copy( face.centroid ).projectPoint( _modelMatrix );
+					_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
@@ -6642,7 +6642,7 @@ THREE.Projector = function() {
 					_face.color = face.color;
 					_face.material = material;
 
-					_centroid.copy( _face.centroidModel ).projectPoint( _viewProjectionMatrix );
+					_centroid.copy( _face.centroidModel ).applyProjection( _viewProjectionMatrix );
 
 					_face.z = _centroid.z;
 
@@ -7084,7 +7084,7 @@ THREE.Geometry.prototype = {
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			var vertex = this.vertices[ i ];
-			vertex.projectPoint( matrix );
+			vertex.applyMatrix4( matrix );
 
 		}
 
@@ -7099,7 +7099,7 @@ THREE.Geometry.prototype = {
 
 			}
 
-			face.centroid.projectPoint( matrix );
+			face.centroid.applyMatrix4( matrix );
 
 		}
 
@@ -18720,7 +18720,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertex = vertices[ v ];
 
 				_vector3.copy( vertex );
-				_vector3.projectPoint( _projScreenMatrixPS );
+				_vector3.applyProjection( _projScreenMatrixPS );
 
 				sortArray[ v ] = [ _vector3.z, v ];
 
@@ -21722,7 +21722,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.projectPoint( _projScreenMatrix );
+							_vector3.applyProjection( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
 
@@ -25309,7 +25309,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) vertexCopy.projectPoint( matrix );
+			if ( matrix ) vertexCopy.applyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
 
@@ -25370,7 +25370,7 @@ THREE.GeometryUtils = {
 
 			if ( matrix ) {
 
-				faceCopy.centroid.projectPoint( matrix );
+				faceCopy.centroid.applyMatrix4( matrix );
 
 			}
 
@@ -32459,7 +32459,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 			theta = Math.acos( tangents[ i-1 ].dot( tangents[ i ] ) );
 
-			normals[ i ].projectPoint( mat.makeRotationAxis( vec, theta ) );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
 		}
 
@@ -32484,7 +32484,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		for ( i = 1; i < numpoints; i++ ) {
 
 			// twist a little...
-			normals[ i ].projectPoint( mat.makeRotationAxis( tangents[ i ], theta * i ) );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
 			binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
 
 		}
@@ -34352,8 +34352,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
-			tempPosition.projectPoint( camera.matrixWorldInverse );
-			tempPosition.projectPoint( camera.projectionMatrix );
+			tempPosition.applyMatrix4( camera.matrixWorldInverse );
+			tempPosition.applyProjection( camera.projectionMatrix );
 
 			// setup arrays for gl programs
 
@@ -34946,7 +34946,7 @@ THREE.ShadowMapPlugin = function ( ) {
 			p.copy( pointsFrustum[ i ] );
 			THREE.ShadowMapPlugin.__projector.unprojectVector( p, camera );
 
-			p.projectPoint( shadowCamera.matrixWorldInverse );
+			p.applyMatrix4( shadowCamera.matrixWorldInverse );
 
 			if ( p.x < _min.x ) _min.x = p.x;
 			if ( p.x > _max.x ) _max.x = p.x;

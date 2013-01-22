@@ -246,7 +246,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 			theta = Math.acos( tangents[ i-1 ].dot( tangents[ i ] ) );
 
-			normals[ i ].projectPoint( mat.makeRotationAxis( vec, theta ) );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
 		}
 
@@ -271,7 +271,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 		for ( i = 1; i < numpoints; i++ ) {
 
 			// twist a little...
-			normals[ i ].projectPoint( mat.makeRotationAxis( tangents[ i ], theta * i ) );
+			normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
 			binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
 
 		}

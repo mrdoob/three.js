@@ -68,7 +68,7 @@ THREE.WebGLRenderer2.ParticleRenderer.prototype.setBuffers = function( geometry,
 			vertex = vertices[ v ];
 
 			_vector3.copy( vertex );
-			_vector3.projectPoint(_projScreenMatrixPS);
+			_vector3.applyProjection(_projScreenMatrixPS);
 
 			sortArray[ v ] = [ _vector3.z, v ];
 

@@ -47,7 +47,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
-		return vector.projectPoint( _viewProjectionMatrix );
+		return vector.applyProjection( _viewProjectionMatrix );
 
 	};
 
@@ -57,7 +57,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, camera.projectionMatrixInverse );
 
-		return vector.projectPoint( _viewProjectionMatrix );
+		return vector.applyProjection( _viewProjectionMatrix );
 
 	};
 
@@ -111,7 +111,7 @@ THREE.Projector = function() {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.projectPoint( _viewProjectionMatrix );
+							_vector3.applyProjection( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
 						}
@@ -134,7 +134,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.projectPoint( _viewProjectionMatrix );
+						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -153,7 +153,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.projectPoint( _viewProjectionMatrix );
+						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -231,7 +231,7 @@ THREE.Projector = function() {
 
 					_vertex = getNextVertexInPool();
 
-					_vertex.positionWorld.copy( vertices[ v ] ).projectPoint( _modelMatrix );
+					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
 					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
 					_vertex.positionScreen.x /= _vertex.positionScreen.w;
@@ -348,7 +348,7 @@ THREE.Projector = function() {
 
 					_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
 
-					_face.centroidModel.copy( face.centroid ).projectPoint( _modelMatrix );
+					_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
@@ -389,7 +389,7 @@ THREE.Projector = function() {
 					_face.color = face.color;
 					_face.material = material;
 
-					_centroid.copy( _face.centroidModel ).projectPoint( _viewProjectionMatrix );
+					_centroid.copy( _face.centroidModel ).applyProjection( _viewProjectionMatrix );
 
 					_face.z = _centroid.z;
 

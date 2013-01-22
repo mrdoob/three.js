@@ -40,7 +40,7 @@ THREE.GeometryUtils = {
 
 			var vertexCopy = vertex.clone();
 
-			if ( matrix ) vertexCopy.projectPoint( matrix );
+			if ( matrix ) vertexCopy.applyMatrix4( matrix );
 
 			vertices1.push( vertexCopy );
 
@@ -101,7 +101,7 @@ THREE.GeometryUtils = {
 
 			if ( matrix ) {
 
-				faceCopy.centroid.projectPoint( matrix );
+				faceCopy.centroid.applyMatrix4( matrix );
 
 			}
 

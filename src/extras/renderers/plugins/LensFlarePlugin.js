@@ -160,8 +160,8 @@ THREE.LensFlarePlugin = function ( ) {
 
 			tempPosition.set( flare.matrixWorld.elements[12], flare.matrixWorld.elements[13], flare.matrixWorld.elements[14] );
 
-			tempPosition.projectPoint( camera.matrixWorldInverse );
-			tempPosition.projectPoint( camera.projectionMatrix );
+			tempPosition.applyMatrix4( camera.matrixWorldInverse );
+			tempPosition.applyProjection( camera.projectionMatrix );
 
 			// setup arrays for gl programs
 
