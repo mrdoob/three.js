@@ -166,7 +166,6 @@ THREE.extend( THREE.Matrix3.prototype, {
 
 	},
 
-
 	transpose: function () {
 
 		var tmp, m = this.elements;
@@ -179,6 +178,15 @@ THREE.extend( THREE.Matrix3.prototype, {
 
 	},
 
+	getNormalMatrix: function ( m ) {
+
+		// input: THREE.Matrix4
+
+		this.getInverse( m ).transpose();
+
+		return this;
+
+	},
 
 	transposeIntoArray: function ( r ) {
 
