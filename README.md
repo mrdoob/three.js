@@ -66,6 +66,40 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 ### Change log ###
 
 
+2013 01 15 - **r55** (406,462 KB, gzip: 96,542 KB)
+
+* Added `set()`, `identity()`, `copy()`, `multiplyScalar()`, `determinant()`, `getInverse()` and `clone()` to `Matrix3`. ([bhouston](http://github.com/bhouston))
+* Added a refactored `WebGLRenderer` under the `WebGLRenderer2` name (may become `WebGLRenderer` next release). ([gero3](http://github.com/gero3))
+* Optimised `Matrix4`'s `determinant()`. ([bhouston](http://github.com/bhouston))
+* Added `negate()` to `Plane`. ([bhouston](http://github.com/bhouston))
+* Added `containsPoint()` and `intersectsObject()` to `Frustum`. ([bhouston](http://github.com/bhouston))
+* Fixed `MeshNormalMaterial` rendering in `CanvasRenderer` and `SVGRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Moved `Matrix*/Quaternion`'s `multiply*` to `Vector*`'s `.apply*`. ([mrdoob](http://github.com/mrdoob))
+* Added `MeshNormalMaterial` with `SmoothShading` support to `CanvasRenderer`. ([mrdoob](http://github.com/mrdoob))
+* Added `Edit / Clone` to the editor. ([mrdoob](http://github.com/mrdoob))
+* Fixes to `ArrowHelper`. ([bhouston](http://github.com/bhouston) and [WestLangley](http://github.com/WestLangley))
+* Improved `Geometry`'s `mergeVertices()`. ([bhouston](http://github.com/bhouston))
+* Improved `LatheGeometry`. ([bhouston](http://github.com/bhouston) and [WestLangley](http://github.com/WestLangley))
+* Added `insertPass` to `EffectComposer`. ([alteredq](http://github.com/alteredq))
+* Added support for `BufferGeometry` support to `Line`. ([arodic](http://github.com/arodic))
+* Added `intersectsSphere` to `Sphere`. ([Fox32](http://github.com/Fox32))
+* Added Tone Mapping to `WebGLDeferredRenderer`. ([alteredq](http://github.com/alteredq))
+* Made `updateMorphTargets` a public method of `Mesh`. ([jonobr1](http://github.com/jonobr1))
+* Added `add()`, `addColors()`, `addScalar()`, `multiply()` and `multiplyScalar()` to `Color`. ([mrdoob](http://github.com/mrdoob))
+* Renamed `Vector*/Matrix*/Quaternion`'s `add()/sub()/cross()...` to `addVectors()/subVectors()/crossVectors()...`. ([mrdoob](http://github.com/mrdoob))
+* Renamed `Vector*/Matrix*/Quaternion`'s `addSelf()/subSelf()/crossSelf()...` to `add()/sub()/cross()...`. ([mrdoob](http://github.com/mrdoob))
+* Moved `GeometryUtils`'s `explode()` and `tessellate()` to `ExplodeModifier` and `TessellateModifier`. ([mrdoob](http://github.com/mrdoob))
+* Moved `BinaryLoader` out of the lib to examples folder. ([mrdoob](http://github.com/mrdoob))
+* Added `OBJExporter`. ([mrdoob](http://github.com/mrdoob))
+* Implemented pinch gesture to `TrackballControls`. ([ericnoble](http://github.com/ericnoble) and [mrdoob](http://github.com/mrdoob))
+* Firefox support in `OrbitControls`.. ([mrdoob](http://github.com/mrdoob))
+* Added zbuffer to `SoftwareRenderer` and started adding material handling. ([rygorous](http://github.com/rygorous) and [mrdoob](http://github.com/mrdoob))
+* Moved `CanvasRenderer/SVGRenderer` x/y clipping to `Projector`. ([mrdoob](http://github.com/mrdoob))
+* Added `applyEuler()` and `applyAxisAngle()` in `Vector3`. ([WestLangley](http://github.com/WestLangley))
+* Improvements to `FirstPersonControls`. ([RommelVR](http://github.com/RommelVR))
+
+
+
 2012 12 25 - **r54** (411,352 KB, gzip: 98,639 KB)
 
 * Added nodejs, perl, python and ruby based localhost server. ([zz85](http://github.com/zz85))

@@ -15,10 +15,7 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
-
-THREE.Vector3.prototype = {
-
-	constructor: THREE.Vector3,
+THREE.extend( THREE.Vector3.prototype, {
 
 	set: function ( x, y, z ) {
 
@@ -209,15 +206,31 @@ THREE.Vector3.prototype = {
 
 	applyMatrix4: function ( m ) {
 
-		var x = this.x;
-		var y = this.y;
-		var z = this.z;
+		// input: THREE.Matrix4 affine matrix
+
+		var x = this.x, y = this.y, z = this.z;
 
 		var e = m.elements;
-		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] );
 
-		this.x = ( e[0] * x + e[4] * y + e[8] * z + e[12] ) * d;
-		this.y = ( e[1] * x + e[5] * y + e[9] * z + e[13] ) * d;
+		this.x = e[0] * x + e[4] * y + e[8]  * z + e[12];
+		this.y = e[1] * x + e[5] * y + e[9]  * z + e[13];
+		this.z = e[2] * x + e[6] * y + e[10] * z + e[14];
+
+		return this;
+
+	},
+
+	applyProjection: function ( m ) {
+
+		// input: THREE.Matrix4 projection matrix
+
+		var x = this.x, y = this.y, z = this.z;
+
+		var e = m.elements;
+		var d = 1 / ( e[3] * x + e[7] * y + e[11] * z + e[15] ); // perspective divide
+
+		this.x = ( e[0] * x + e[4] * y + e[8]  * z + e[12] ) * d;
+		this.y = ( e[1] * x + e[5] * y + e[9]  * z + e[13] ) * d;
 		this.z = ( e[2] * x + e[6] * y + e[10] * z + e[14] ) * d;
 
 		return this;
@@ -247,6 +260,57 @@ THREE.Vector3.prototype = {
 		this.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
 		this.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
 		this.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+		return this;
+
+	},
+
+	applyEuler: function() {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( v, eulerOrder ) {
+
+			var quaternion = q1.setFromEuler( v, eulerOrder );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	applyAxisAngle: function() {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( axis, angle ) {
+
+			var quaternion = q1.setFromAxisAngle( axis, angle );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	transformDirection: function ( m ) {
+
+		// input: THREE.Matrix4 affine matrix
+		// vector interpreted as a direction
+
+		var x = this.x, y = this.y, z = this.z;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[4] * y + e[8]  * z;
+		this.y = e[1] * x + e[5] * y + e[9]  * z;
+		this.z = e[2] * x + e[6] * y + e[10] * z;
+
+		this.normalize();
 
 		return this;
 
@@ -693,4 +757,4 @@ THREE.Vector3.prototype = {
 
 	}
 
-};
+} );

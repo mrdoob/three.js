@@ -202,8 +202,9 @@
 
 			}
 
-			function animate( timestamp ) {
+			function animate() {
 
+				var timestamp = Date.now();
 				var frameTime = ( timestamp - lastTimestamp ) * 0.001; // seconds
 
 				if ( progress >= 0 && progress < 48 ) {

@@ -88,9 +88,7 @@ test( "getBoundingBox", function() {
 test( "transform", function() {
 	var a = new THREE.Sphere( one3, 1 );
 
-	var m = new THREE.Matrix4();
-	var t1 = new THREE.Vector3( 1, -2, 1 );
-	m.makeTranslation( t1 );
+	var m = new THREE.Matrix4().makeTranslation( 1, -2, 1 );
 
 	ok( a.clone().transform( m ).getBoundingBox().equals( a.getBoundingBox().transform( m ) ), "Passed!" );
 });

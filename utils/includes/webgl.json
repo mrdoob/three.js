@@ -1,6 +1,7 @@
 [
 	"../src/Three.js",
 	"../src/math/Color.js",
+	"../src/math/Quaternion.js",
 	"../src/math/Vector2.js",
 	"../src/math/Vector3.js",
 	"../src/math/Vector4.js",
@@ -8,7 +9,6 @@
 	"../src/math/Matrix4.js",
 	"../src/math/Frustum.js",
 	"../src/math/Math.js",
-	"../src/math/Quaternion.js",
 	"../src/math/Vertex.js",
 	"../src/math/UV.js",
 	"../src/math/Spline.js",

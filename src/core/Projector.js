@@ -18,6 +18,11 @@ THREE.Projector = function() {
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 
+	_clipBox = new THREE.Box3( new THREE.Vector3( -1, -1, -1 ), new THREE.Vector3( 1, 1, 1 ) ),
+	_boundingBox = new THREE.Box3(),
+	_points3 = new Array( 3 ),
+	_points4 = new Array( 4 ),
+
 	_viewMatrix = new THREE.Matrix4(),
 	_viewProjectionMatrix = new THREE.Matrix4(),
 
@@ -42,7 +47,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 
-		return vector.applyMatrix4( _viewProjectionMatrix );
+		return vector.applyProjection( _viewProjectionMatrix );
 
 	};
 
@@ -52,7 +57,7 @@ THREE.Projector = function() {
 
 		_viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, camera.projectionMatrixInverse );
 
-		return vector.applyMatrix4( _viewProjectionMatrix );
+		return vector.applyProjection( _viewProjectionMatrix );
 
 	};
 
@@ -106,7 +111,7 @@ THREE.Projector = function() {
 						} else {
 
 							_vector3.copy( object.matrixWorld.getPosition() );
-							_vector3.applyMatrix4( _viewProjectionMatrix );
+							_vector3.applyProjection( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
 						}
@@ -129,7 +134,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.applyMatrix4( _viewProjectionMatrix );
+						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -148,7 +153,7 @@ THREE.Projector = function() {
 					} else {
 
 						_vector3.copy( object.matrixWorld.getPosition() );
-						_vector3.applyMatrix4( _viewProjectionMatrix );
+						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
 					}
@@ -173,7 +178,7 @@ THREE.Projector = function() {
 
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
-		var near = camera.near, far = camera.far, visible = false,
+		var visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
 		geometry, vertices, vertex, vertexPositionScreen,
 		faces, face, faceVertexNormals, faceVertexUvs, uvs,
@@ -226,14 +231,16 @@ THREE.Projector = function() {
 
 					_vertex = getNextVertexInPool();
 
-					_vertex.positionWorld.copy( vertices[ v ] );
-					_vertex.positionWorld.applyMatrix4( _modelMatrix );
+					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
+					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
-					_vertex.positionScreen.copy( _vertex.positionWorld );
-					_vertex.positionScreen.applyMatrix4( _viewProjectionMatrix );
-					_vertex.positionScreen.multiplyScalar( 1 / _vertex.positionScreen.w );
+					_vertex.positionScreen.x /= _vertex.positionScreen.w;
+					_vertex.positionScreen.y /= _vertex.positionScreen.w;
+					_vertex.positionScreen.z /= _vertex.positionScreen.w;
 
-					_vertex.visible = _vertex.positionScreen.z > -1 && _vertex.positionScreen.z < 1;
+					_vertex.visible = ! ( _vertex.positionScreen.x < -1 || _vertex.positionScreen.x > 1 ||
+							      _vertex.positionScreen.y < -1 || _vertex.positionScreen.y > 1 ||
+							      _vertex.positionScreen.z < -1 || _vertex.positionScreen.z > 1 );
 
 				}
 
@@ -255,7 +262,12 @@ THREE.Projector = function() {
 						v2 = _vertexPool[ face.b ];
 						v3 = _vertexPool[ face.c ];
 
-						if ( v1.visible === true && v2.visible === true && v3.visible === true ) {
+						_points3[ 0 ] = v1.positionScreen;
+						_points3[ 1 ] = v2.positionScreen;
+						_points3[ 2 ] = v3.positionScreen;
+
+						if ( v1.visible === true || v2.visible === true || v3.visible === true ||
+							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
 
 							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
@@ -287,7 +299,13 @@ THREE.Projector = function() {
 						v3 = _vertexPool[ face.c ];
 						v4 = _vertexPool[ face.d ];
 
-						if ( v1.visible === true && v2.visible === true && v3.visible === true && v4.visible === true ) {
+						_points4[ 0 ] = v1.positionScreen;
+						_points4[ 1 ] = v2.positionScreen;
+						_points4[ 2 ] = v3.positionScreen;
+						_points4[ 3 ] = v4.positionScreen;
+
+						if ( v1.visible === true || v2.visible === true || v3.visible === true || v4.visible === true ||
+							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points4 ) ) ) {
 
 							visible = ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
 								( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||
@@ -326,14 +344,11 @@ THREE.Projector = function() {
 
 					}
 
-					_face.normalModel.applyMatrix3( _normalMatrix );
-					_face.normalModel.normalize();
+					_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-					_face.normalModelView.copy( _face.normalModel );
-					_face.normalModelView.applyMatrix3( _normalViewMatrix );
+					_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
 
-					_face.centroidModel.copy( face.centroid );
-					_face.centroidModel.applyMatrix4( _modelMatrix );
+					_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 					faceVertexNormals = face.vertexNormals;
 
@@ -348,12 +363,10 @@ THREE.Projector = function() {
 
 						}
 
-						normalModel.applyMatrix3( _normalMatrix );
-						normalModel.normalize();
+						normalModel.applyMatrix3( _normalMatrix ).normalize();
 
 						var normalModelView = _face.vertexNormalsModelView[ n ];
-						normalModelView.copy( normalModel );
-						normalModelView.applyMatrix3( _normalViewMatrix );
+						normalModelView.copy( normalModel ).applyMatrix3( _normalViewMatrix );
 
 					}
 
@@ -376,8 +389,7 @@ THREE.Projector = function() {
 					_face.color = face.color;
 					_face.material = material;
 
-					_centroid.copy( _face.centroidModel )
-					_centroid.applyMatrix4( _viewProjectionMatrix );
+					_centroid.copy( _face.centroidModel ).applyProjection( _viewProjectionMatrix );
 
 					_face.z = _centroid.z;
 
@@ -392,8 +404,7 @@ THREE.Projector = function() {
 				vertices = object.geometry.vertices;
 
 				v1 = getNextVertexInPool();
-				v1.positionScreen.copy( vertices[ 0 ] );
-				v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
+				v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
 				// Handle LineStrip and LinePieces
 				var step = object.type === THREE.LinePieces ? 2 : 1;
@@ -401,8 +412,7 @@ THREE.Projector = function() {
 				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ v ] );
-					v1.positionScreen.applyMatrix4( _modelViewProjectionMatrix );
+					v1.positionScreen.copy( vertices[ v ] ).applyMatrix4( _modelViewProjectionMatrix );
 
 					if ( ( v + 1 ) % step > 0 ) continue;
 

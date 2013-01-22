@@ -79,9 +79,10 @@ test( "setComponents", function() {
 });
 
 test( "setFromNormalAndCoplanarPoint", function() {
-	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( one3, zero3 );
+	var normal = one3.clone().normalize();
+	var a = new THREE.Plane().setFromNormalAndCoplanarPoint( normal, zero3 );
 	
-	ok( a.normal.equals( one3.clone().normalize() ), "Passed!" );
+	ok( a.normal.equals( normal ), "Passed!" );
 	ok( a.constant == 0, "Passed!" );
 });
 
@@ -191,6 +192,6 @@ test( "transform/translate", function() {
 	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
 	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), -1 ) ), "Passed!" );
 
-	m.makeTranslation( new THREE.Vector3( 1, 1, 1 ) );
+	m.makeTranslation( 1, 1, 1 );
 	ok( comparePlane( a.clone().transform( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });

@@ -14,9 +14,7 @@ THREE.Quaternion = function( x, y, z, w ) {
 
 };
 
-THREE.Quaternion.prototype = {
-
-	constructor: THREE.Quaternion,
+THREE.extend( THREE.Quaternion.prototype, {
 
 	set: function ( x, y, z, w ) {
 
@@ -260,6 +258,13 @@ THREE.Quaternion.prototype = {
 
 	},
 
+	multiplyVector3: function ( vector ) {
+
+		console.warn( 'DEPRECATED: Quaternion\'s .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.' );
+		return vector.applyQuaternion( this );
+
+	},
+
 	slerp: function ( qb, t ) {
 
 		var x = this.x, y = this.y, z = this.z, w = this.w;
@@ -332,7 +337,7 @@ THREE.Quaternion.prototype = {
 
 	}
 
-}
+} );
 
 THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 

@@ -258,7 +258,16 @@
 
 							// 3.0
 
-							var data = JSON.parse( contents );
+							try {
+
+								var data = JSON.parse( contents );
+
+							} catch ( error ) {
+
+								alert( error );
+								return;
+
+							}
 
 							if ( data.metadata === undefined ) { // 2.0
 
@@ -299,7 +308,7 @@
 
 									if ( resetScene ) {
 
-										signals.sceneAdded.dispatch( result.scene, result.currentCamera, result.bgColor );
+										signals.sceneAdded.dispatch( result.scene, result.currentCamera );
 
 									} else {
 

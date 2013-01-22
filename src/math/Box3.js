@@ -9,9 +9,7 @@ THREE.Box3 = function ( min, max ) {
 
 };
 
-THREE.Box3.prototype = {
-
-	constructor: THREE.Box3,
+THREE.extend( THREE.Box3.prototype, {
 
 	set: function ( min, max ) {
 
@@ -26,42 +24,42 @@ THREE.Box3.prototype = {
 
 		if ( points.length > 0 ) {
 
-			var p = points[ 0 ];
+			var point = points[ 0 ];
 
-			this.min.copy( p );
-			this.max.copy( p );
+			this.min.copy( point );
+			this.max.copy( point );
 
 			for ( var i = 1, il = points.length; i < il; i ++ ) {
 
-				p = points[ i ];
+				point = points[ i ];
 
-				if ( p.x < this.min.x ) {
+				if ( point.x < this.min.x ) {
 
-					this.min.x = p.x;
+					this.min.x = point.x;
 
-				} else if ( p.x > this.max.x ) {
+				} else if ( point.x > this.max.x ) {
 
-					this.max.x = p.x;
-
-				}
-
-				if ( p.y < this.min.y ) {
-
-					this.min.y = p.y;
-
-				} else if ( p.y > this.max.y ) {
-
-					this.max.y = p.y;
+					this.max.x = point.x;
 
 				}
 
-				if ( p.z < this.min.z ) {
+				if ( point.y < this.min.y ) {
 
-					this.min.z = p.z;
+					this.min.y = point.y;
 
-				} else if ( p.z > this.max.z ) {
+				} else if ( point.y > this.max.y ) {
 
-					this.max.z = p.z;
+					this.max.y = point.y;
+
+				}
+
+				if ( point.z < this.min.z ) {
+
+					this.min.z = point.z;
+
+				} else if ( point.z > this.max.z ) {
+
+					this.max.z = point.z;
 
 				}
 
@@ -77,16 +75,22 @@ THREE.Box3.prototype = {
 
 	},
 
-	setFromCenterAndSize: function ( center, size ) {
+	setFromCenterAndSize: function() {
 
-		var halfSize = THREE.Box3.__v1.copy( size ).multiplyScalar( 0.5 );
+		var v1 = new THREE.Vector3();
 
-		this.min.copy( center ).sub( halfSize );
-		this.max.copy( center ).add( halfSize );
+		return function ( center, size ) {
 
-		return this;
+			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
-	},
+			this.min.copy( center ).sub( halfSize );
+			this.max.copy( center ).add( halfSize );
+
+			return this;
+
+		};
+
+	}(),
 
 	copy: function ( box ) {
 
@@ -157,15 +161,15 @@ THREE.Box3.prototype = {
 
 	containsPoint: function ( point ) {
 
-		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-			 ( this.min.y <= point.y ) && ( point.y <= this.max.y ) &&
-			 ( this.min.z <= point.z ) && ( point.z <= this.max.z ) ) {
+		if ( point.x < this.min.x || point.x > this.max.x ||
+		     point.y < this.min.y || point.y > this.max.y ||
+		     point.z < this.min.z || point.z > this.max.z ) {
 
-			return true;
+			return false;
 
 		}
 
-		return false;
+		return true;
 
 	},
 
@@ -200,9 +204,9 @@ THREE.Box3.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) || ( box.min.x > this.max.x ) ||
-			 ( box.max.y < this.min.y ) || ( box.min.y > this.max.y ) ||
-			 ( box.max.z < this.min.z ) || ( box.min.z > this.max.z ) ) {
+		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
+		     box.max.y < this.min.y || box.min.y > this.max.y ||
+		     box.max.z < this.min.z || box.min.z > this.max.z ) {
 
 			return false;
 
@@ -215,27 +219,39 @@ THREE.Box3.prototype = {
 	clampPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return new THREE.Vector3().copy( point ).clamp( this.min, this.max );
+		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
-	distanceToPoint: function ( point ) {
+	distanceToPoint: function() {
 
-		var clampedPoint = THREE.Box3.__v1.copy( point ).clamp( this.min, this.max );
-		return clampedPoint.sub( point ).length();
+		var v1 = new THREE.Vector3();
 
-	},
+		return function ( point ) {
 
-	getBoundingSphere: function ( optionalTarget ) {
+			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+			return clampedPoint.sub( point ).length();
 
-		var result = optionalTarget || new THREE.Sphere();
+		};
 
-		result.center = this.center();
-		result.radius = this.size( THREE.Box3.__v0 ).length() * 0.5;
+	}(),
 
-		return result;
+	getBoundingSphere: function() {
 
-	},
+		var v1 = new THREE.Vector3();
+
+		return function ( optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Sphere();
+
+			result.center = this.center();
+			result.radius = this.size( v1 ).length() * 0.5;
+
+			return result;
+
+		};
+
+	}(),
 
 	intersect: function ( box ) {
 
@@ -255,27 +271,39 @@ THREE.Box3.prototype = {
 
 	},
 
-	transform: function ( matrix ) {
+	transform: function() {
 
-		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-		var newPoints = [
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ),
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 000
-			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 001
-			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 010
-			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ), // 011
-			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 100
-			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 101
-			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 110
-			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix )  // 111
-		];
+		var points = [
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3()
+			];
 
-		this.makeEmpty();
-		this.setFromPoints( newPoints );
+		return function ( matrix ) {
 
-		return this;
+			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+			points[0].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+			points[1].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+			points[2].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+			points[3].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+			points[4].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+			points[5].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+			points[6].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+			points[7].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
 
-	},
+			this.makeEmpty();
+			this.setFromPoints( points );
+
+			return this;
+
+		};
+
+	}(),
 
 	translate: function ( offset ) {
 
@@ -298,13 +326,4 @@ THREE.Box3.prototype = {
 
 	}
 
-};
-
-THREE.Box3.__v0 = new THREE.Vector3();
-THREE.Box3.__v1 = new THREE.Vector3();
-THREE.Box3.__v2 = new THREE.Vector3();
-THREE.Box3.__v3 = new THREE.Vector3();
-THREE.Box3.__v4 = new THREE.Vector3();
-THREE.Box3.__v5 = new THREE.Vector3();
-THREE.Box3.__v6 = new THREE.Vector3();
-THREE.Box3.__v7 = new THREE.Vector3();
+} );

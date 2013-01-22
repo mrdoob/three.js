@@ -9,9 +9,7 @@ THREE.Box2 = function ( min, max ) {
 
 };
 
-THREE.Box2.prototype = {
-
-	constructor: THREE.Box2,
+THREE.extend( THREE.Box2.prototype, {
 
 	set: function ( min, max ) {
 
@@ -67,15 +65,21 @@ THREE.Box2.prototype = {
 
 	},
 
-	setFromCenterAndSize: function ( center, size ) {
+	setFromCenterAndSize: function() {
 
-		var halfSize = THREE.Box2.__v1.copy( size ).multiplyScalar( 0.5 );
-		this.min.copy( center ).sub( halfSize );
-		this.max.copy( center ).add( halfSize );
+		var v1 = new THREE.Vector2();
 
-		return this;
+		return function ( center, size ) {
 
-	},
+			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
+			this.min.copy( center ).sub( halfSize );
+			this.max.copy( center ).add( halfSize );
+
+			return this;
+
+		};
+
+	}(),
 
 	copy: function ( box ) {
 
@@ -143,14 +147,14 @@ THREE.Box2.prototype = {
 
 	containsPoint: function ( point ) {
 
-		if ( ( this.min.x <= point.x ) && ( point.x <= this.max.x ) &&
-		     ( this.min.y <= point.y ) && ( point.y <= this.max.y ) ) {
+		if ( point.x < this.min.x || point.x > this.max.x ||
+		     point.y < this.min.y || point.y > this.max.y ) {
 
-			return true;
+			return false;
 
 		}
 
-		return false;
+		return true;
 
 	},
 
@@ -183,10 +187,8 @@ THREE.Box2.prototype = {
 
 		// using 6 splitting planes to rule out intersections.
 
-		if ( ( box.max.x < this.min.x ) ||
-		     ( box.min.x > this.max.x ) ||
-		     ( box.max.y < this.min.y ) ||
-		     ( box.min.y > this.max.y ) ) {
+		if ( box.max.x < this.min.x || box.min.x > this.max.x ||
+		     box.max.y < this.min.y || box.min.y > this.max.y ) {
 
 			return false;
 
@@ -203,12 +205,18 @@ THREE.Box2.prototype = {
 
 	},
 
-	distanceToPoint: function ( point ) {
+	distanceToPoint: function() {
 
-		var clampedPoint = THREE.Box2.__v1.copy( point ).clamp( this.min, this.max );
-		return clampedPoint.sub( point ).length();
+		var v1 = new THREE.Vector2();
 
-	},
+		return function ( point ) {
+
+			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+			return clampedPoint.sub( point ).length();
+
+		};
+
+	}(),
 
 	intersect: function ( box ) {
 
@@ -249,6 +257,4 @@ THREE.Box2.prototype = {
 
 	}
 
-};
-
-THREE.Box2.__v1 = new THREE.Vector2();
+} );

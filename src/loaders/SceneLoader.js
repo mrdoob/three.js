@@ -111,7 +111,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		cameras: {},
 		lights: {},
 		fogs: {},
-		empties: {}
+		empties: {},
+		groups: {}
 
 	};
 
@@ -466,6 +467,24 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 							var value = objJSON.properties[ key ];
 							object.properties[ key ] = value;
+
+						}
+
+					}
+
+					if ( objJSON.groups !== undefined ) {
+
+						for ( var i = 0; i < objJSON.groups.length; i ++ ) {
+
+							var groupID = objJSON.groups[ i ];
+
+							if ( result.groups[ groupID ] === undefined ) {
+
+								result.groups[ groupID ] = [];
+
+							}
+
+							result.groups[ groupID ].push( objID );
 
 						}
 
@@ -1029,7 +1048,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		if ( matJSON.parameters.normalMap ) {
 
-			var shader = THREE.ShaderUtils.lib[ "normal" ];
+			var shader = THREE.ShaderLib[ "normalmap" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			var diffuse = matJSON.parameters.color;
@@ -1151,12 +1170,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		result.scene.fog = result.fogs[ data.defaults.fog ];
 
 	}
-
-	color = data.defaults.bgcolor;
-	result.bgColor = new THREE.Color();
-	result.bgColor.setRGB( color[0], color[1], color[2] );
-
-	result.bgColorAlpha = data.defaults.bgalpha;
 
 	// synchronous callback
 

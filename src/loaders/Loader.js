@@ -371,7 +371,7 @@ THREE.Loader.prototype = {
 
 		if ( m.mapNormal ) {
 
-			var shader = THREE.ShaderUtils.lib[ "normal" ];
+			var shader = THREE.ShaderLib[ "normalmap" ];
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ "tNormal" ].value = mpars.normalMap;

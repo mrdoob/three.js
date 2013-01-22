@@ -722,7 +722,7 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.sceneAdded.add( function ( newScene, newCamera, newClearColor ) {
+	signals.sceneAdded.add( function ( newScene, newCamera ) {
 
 		scene = newScene;
 
@@ -767,11 +767,9 @@ var Viewport = function ( signals ) {
 			controls.object = camera;
 			controls.update();
 
-		}
+		} else {
 
-		if ( newClearColor ) {
-
-			signals.clearColorChanged.dispatch( newClearColor.getHex() );
+			scene.add( camera );
 
 		}
 
@@ -806,7 +804,7 @@ var Viewport = function ( signals ) {
 		}
 
 		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( null );
+		signals.objectSelected.dispatch( camera );
 
 	} );
 

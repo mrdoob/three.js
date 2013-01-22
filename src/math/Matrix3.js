@@ -17,9 +17,7 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 	);
 };
 
-THREE.Matrix3.prototype = {
-
-	constructor: THREE.Matrix3,
+THREE.extend( THREE.Matrix3.prototype, {
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -63,27 +61,38 @@ THREE.Matrix3.prototype = {
 
 	},
 
-	multiplyVector3Array: function ( a ) {
+	multiplyVector3: function ( vector ) {
 
-		var tmp = THREE.Matrix3.__v1;
-
-		for ( var i = 0, il = a.length; i < il; i += 3 ) {
-
-			tmp.x = a[ i ];
-			tmp.y = a[ i + 1 ];
-			tmp.z = a[ i + 2 ];
-
-			this.multiplyVector3( tmp );
-
-			a[ i ]     = tmp.x;
-			a[ i + 1 ] = tmp.y;
-			a[ i + 2 ] = tmp.z;
-
-		}
-
-		return a;
+		console.warn( 'DEPRECATED: Matrix3\'s .multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.' );
+		return vector.applyMatrix3( this );
 
 	},
+
+	multiplyVector3Array: function() {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( a ) {
+
+			for ( var i = 0, il = a.length; i < il; i += 3 ) {
+
+				v1.x = a[ i ];
+				v1.y = a[ i + 1 ];
+				v1.z = a[ i + 2 ];
+
+				v1.applyMatrix3(this);
+
+				a[ i ]     = v1.x;
+				a[ i + 1 ] = v1.y;
+				a[ i + 2 ] = v1.z;
+
+			}
+
+			return a;
+
+		};
+
+	}(),
 
 	multiplyScalar: function ( s ) {
 
@@ -157,7 +166,6 @@ THREE.Matrix3.prototype = {
 
 	},
 
-
 	transpose: function () {
 
 		var tmp, m = this.elements;
@@ -170,6 +178,15 @@ THREE.Matrix3.prototype = {
 
 	},
 
+	getNormalMatrix: function ( m ) {
+
+		// input: THREE.Matrix4
+
+		this.getInverse( m ).transpose();
+
+		return this;
+
+	},
 
 	transposeIntoArray: function ( r ) {
 
@@ -203,6 +220,4 @@ THREE.Matrix3.prototype = {
 
 	}
 
-};
-
-THREE.Matrix3.__v1 = new THREE.Vector3();
+} );
