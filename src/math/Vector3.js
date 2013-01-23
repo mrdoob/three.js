@@ -265,7 +265,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	applyEuler: function() {
+	applyEuler: function () {
 
 		var q1 = new THREE.Quaternion();
 
@@ -281,7 +281,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	}(),
 
-	applyAxisAngle: function() {
+	applyAxisAngle: function () {
 
 		var q1 = new THREE.Quaternion();
 
@@ -432,7 +432,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	negate: function() {
+	negate: function () {
 
 		return this.multiplyScalar( - 1 );
 

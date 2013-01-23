@@ -436,7 +436,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					var lightPosition = light.matrixWorld.getPosition().normalize();
+					var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld ).normalize();
 
 					var amount = normal.dot( lightPosition );
 
@@ -448,7 +448,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else if ( light instanceof THREE.PointLight ) {
 
-					var lightPosition = light.matrixWorld.getPosition();
+					var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld );
 
 					var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
