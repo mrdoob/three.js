@@ -15,10 +15,7 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
-
-THREE.Vector3.prototype = {
-
-	constructor: THREE.Vector3,
+THREE.extend( THREE.Vector3.prototype, {
 
 	set: function ( x, y, z ) {
 
@@ -268,21 +265,52 @@ THREE.Vector3.prototype = {
 
 	},
 
-	applyEuler: function ( v, eulerOrder ) {
+	applyEuler: function() {
 
-		var quaternion = THREE.Vector3.__q1.setFromEuler( v, eulerOrder );
+		var q1 = new THREE.Quaternion();
 
-		this.applyQuaternion( quaternion );
+		return function ( v, eulerOrder ) {
 
-		return this;
+			var quaternion = q1.setFromEuler( v, eulerOrder );
 
-	},
+			this.applyQuaternion( quaternion );
 
-	applyAxisAngle: function ( axis, angle ) {
+			return this;
 
-		var quaternion = THREE.Vector3.__q1.setFromAxisAngle( axis, angle );
+		};
 
-		this.applyQuaternion( quaternion );
+	}(),
+
+	applyAxisAngle: function() {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( axis, angle ) {
+
+			var quaternion = q1.setFromAxisAngle( axis, angle );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	transformDirection: function ( m ) {
+
+		// input: THREE.Matrix4 affine matrix
+		// vector interpreted as a direction
+
+		var x = this.x, y = this.y, z = this.z;
+
+		var e = m.elements;
+
+		this.x = e[0] * x + e[4] * y + e[8]  * z;
+		this.y = e[1] * x + e[5] * y + e[9]  * z;
+		this.z = e[2] * x + e[6] * y + e[10] * z;
+
+		this.normalize();
 
 		return this;
 
@@ -729,6 +757,4 @@ THREE.Vector3.prototype = {
 
 	}
 
-};
-
-THREE.Vector3.__q1 = new THREE.Quaternion();
+} );

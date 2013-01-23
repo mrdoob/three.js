@@ -11,69 +11,88 @@ THREE.Triangle = function ( a, b, c ) {
 
 };
 
-THREE.Triangle.normal = function( a, b, c, optionalTarget ) {
+THREE.Triangle.normal = function() {
 
-	var result = optionalTarget || new THREE.Vector3();
+	var v0 = new THREE.Vector3();
 
-	result.subVectors( c, b );
-	THREE.Triangle.__v0.subVectors( a, b );
-	result.cross( THREE.Triangle.__v0 );
+	return function( a, b, c, optionalTarget ) {
 
-	var resultLengthSq = result.lengthSq();
-	if( resultLengthSq > 0 ) {
+		var result = optionalTarget || new THREE.Vector3();
 
-		return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
+		result.subVectors( c, b );
+		v0.subVectors( a, b );
+		result.cross( v0 );
 
-	}
+		var resultLengthSq = result.lengthSq();
+		if( resultLengthSq > 0 ) {
 
-	return result.set( 0, 0, 0 );
+			return result.multiplyScalar( 1 / Math.sqrt( resultLengthSq ) );
 
-};
+		}
+
+		return result.set( 0, 0, 0 );
+
+	};
+
+}();
 
 // static/instance method to calculate barycoordinates
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
-THREE.Triangle.barycoordFromPoint = function ( point, a, b, c, optionalTarget ) {
+THREE.Triangle.barycoordFromPoint = function() {
 
-	THREE.Triangle.__v0.subVectors( c, a );
-	THREE.Triangle.__v1.subVectors( b, a );
-	THREE.Triangle.__v2.subVectors( point, a );
+	var v0 = new THREE.Vector3(),
+		v1 = new THREE.Vector3(),
+		v2 = new THREE.Vector3();
 
-	var dot00 = THREE.Triangle.__v0.dot( THREE.Triangle.__v0 );
-	var dot01 = THREE.Triangle.__v0.dot( THREE.Triangle.__v1 );
-	var dot02 = THREE.Triangle.__v0.dot( THREE.Triangle.__v2 );
-	var dot11 = THREE.Triangle.__v1.dot( THREE.Triangle.__v1 );
-	var dot12 = THREE.Triangle.__v1.dot( THREE.Triangle.__v2 );
+	return function ( point, a, b, c, optionalTarget ) {
 
-	var denom = ( dot00 * dot11 - dot01 * dot01 );
+		v0.subVectors( c, a );
+		v1.subVectors( b, a );
+		v2.subVectors( point, a );
 
-	var result = optionalTarget || new THREE.Vector3();
+		var dot00 = v0.dot( v0 );
+		var dot01 = v0.dot( v1 );
+		var dot02 = v0.dot( v2 );
+		var dot11 = v1.dot( v1 );
+		var dot12 = v1.dot( v2 );
 
-	// colinear or singular triangle
-	if( denom == 0 ) {
-		// arbitrary location outside of triangle?
-		// not sure if this is the best idea, maybe should be returning undefined
-		return result.set( -2, -1, -1 );
-	}
+		var denom = ( dot00 * dot11 - dot01 * dot01 );
 
-	var invDenom = 1 / denom;
-	var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-	var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+		var result = optionalTarget || new THREE.Vector3();
 
-	// barycoordinates must always sum to 1
-	return result.set( 1 - u - v, v, u );
+		// colinear or singular triangle
+		if( denom == 0 ) {
+			// arbitrary location outside of triangle?
+			// not sure if this is the best idea, maybe should be returning undefined
+			return result.set( -2, -1, -1 );
+		}
 
-};
+		var invDenom = 1 / denom;
+		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
-THREE.Triangle.containsPoint = function ( point, a, b, c ) {
+		// barycoordinates must always sum to 1
+		return result.set( 1 - u - v, v, u );
 
-	// NOTE: need to use __v3 here because __v0, __v1 and __v2 are used in barycoordFromPoint.
-	var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, THREE.Triangle.__v3 );
+	};
 
-	return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+}();
 
-};
+THREE.Triangle.containsPoint = function() {
 
-THREE.Triangle.prototype = {
+	var v1 = new THREE.Vector3();
+
+	return function ( point, a, b, c ) {
+
+		var result = THREE.Triangle.barycoordFromPoint( point, a, b, c, v1 );
+
+		return ( result.x >= 0 ) && ( result.y >= 0 ) && ( ( result.x + result.y ) <= 1 );
+
+	};
+
+}();
+
+THREE.extend( THREE.Triangle.prototype, {
 
 	constructor: THREE.Triangle,
 
@@ -107,14 +126,21 @@ THREE.Triangle.prototype = {
 
 	},
 
-	area: function () {
+	area: function() {
 
-		THREE.Triangle.__v0.subVectors( this.c, this.b );
-		THREE.Triangle.__v1.subVectors( this.a, this.b );
+		var v0 = new THREE.Vector3();
+		var v1 = new THREE.Vector3();
 
-		return THREE.Triangle.__v0.cross( THREE.Triangle.__v1 ).length() * 0.5;
+		return function () {
 
-	},
+			v0.subVectors( this.c, this.b );
+			v1.subVectors( this.a, this.b );
+
+			return v0.cross( v1 ).length() * 0.5;
+
+		};
+
+	}(),
 
 	midpoint: function ( optionalTarget ) {
 
@@ -161,9 +187,4 @@ THREE.Triangle.prototype = {
 
 	}
 
-};
-
-THREE.Triangle.__v0 = new THREE.Vector3();
-THREE.Triangle.__v1 = new THREE.Vector3();
-THREE.Triangle.__v2 = new THREE.Vector3();
-THREE.Triangle.__v3 = new THREE.Vector3();
+} );

@@ -9,9 +9,7 @@ THREE.Box3 = function ( min, max ) {
 
 };
 
-THREE.Box3.prototype = {
-
-	constructor: THREE.Box3,
+THREE.extend( THREE.Box3.prototype, {
 
 	set: function ( min, max ) {
 
@@ -77,16 +75,22 @@ THREE.Box3.prototype = {
 
 	},
 
-	setFromCenterAndSize: function ( center, size ) {
+	setFromCenterAndSize: function() {
 
-		var halfSize = THREE.Box3.__v1.copy( size ).multiplyScalar( 0.5 );
+		var v1 = new THREE.Vector3();
 
-		this.min.copy( center ).sub( halfSize );
-		this.max.copy( center ).add( halfSize );
+		return function ( center, size ) {
 
-		return this;
+			var halfSize = v1.copy( size ).multiplyScalar( 0.5 );
 
-	},
+			this.min.copy( center ).sub( halfSize );
+			this.max.copy( center ).add( halfSize );
+
+			return this;
+
+		};
+
+	}(),
 
 	copy: function ( box ) {
 
@@ -215,27 +219,39 @@ THREE.Box3.prototype = {
 	clampPoint: function ( point, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
-		return new THREE.Vector3().copy( point ).clamp( this.min, this.max );
+		return result.copy( point ).clamp( this.min, this.max );
 
 	},
 
-	distanceToPoint: function ( point ) {
+	distanceToPoint: function() {
 
-		var clampedPoint = THREE.Box3.__v1.copy( point ).clamp( this.min, this.max );
-		return clampedPoint.sub( point ).length();
+		var v1 = new THREE.Vector3();
 
-	},
+		return function ( point ) {
 
-	getBoundingSphere: function ( optionalTarget ) {
+			var clampedPoint = v1.copy( point ).clamp( this.min, this.max );
+			return clampedPoint.sub( point ).length();
 
-		var result = optionalTarget || new THREE.Sphere();
+		};
 
-		result.center = this.center();
-		result.radius = this.size( THREE.Box3.__v0 ).length() * 0.5;
+	}(),
 
-		return result;
+	getBoundingSphere: function() {
 
-	},
+		var v1 = new THREE.Vector3();
+
+		return function ( optionalTarget ) {
+
+			var result = optionalTarget || new THREE.Sphere();
+
+			result.center = this.center();
+			result.radius = this.size( v1 ).length() * 0.5;
+
+			return result;
+
+		};
+
+	}(),
 
 	intersect: function ( box ) {
 
@@ -255,27 +271,39 @@ THREE.Box3.prototype = {
 
 	},
 
-	transform: function ( matrix ) {
+	transform: function() {
 
-		// NOTE: I am using a binary pattern to specify all 2^3 combinations below
-		var newPoints = [
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ),
-			THREE.Box3.__v0.set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 000
-			THREE.Box3.__v1.set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 001
-			THREE.Box3.__v2.set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 010
-			THREE.Box3.__v3.set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ), // 011
-			THREE.Box3.__v4.set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ), // 100
-			THREE.Box3.__v5.set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ), // 101
-			THREE.Box3.__v6.set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ), // 110
-			THREE.Box3.__v7.set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix )  // 111
-		];
+		var points = [
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3(),
+			new THREE.Vector3()
+			];
 
-		this.makeEmpty();
-		this.setFromPoints( newPoints );
+		return function ( matrix ) {
 
-		return this;
+			// NOTE: I am using a binary pattern to specify all 2^3 combinations below
+			points[0].set( this.min.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 000
+			points[1].set( this.min.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 001
+			points[2].set( this.min.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 010
+			points[3].set( this.min.x, this.max.y, this.max.z ).applyMatrix4( matrix ); // 011
+			points[4].set( this.max.x, this.min.y, this.min.z ).applyMatrix4( matrix ); // 100
+			points[5].set( this.max.x, this.min.y, this.max.z ).applyMatrix4( matrix ); // 101
+			points[6].set( this.max.x, this.max.y, this.min.z ).applyMatrix4( matrix ); // 110
+			points[7].set( this.max.x, this.max.y, this.max.z ).applyMatrix4( matrix );  // 111
 
-	},
+			this.makeEmpty();
+			this.setFromPoints( points );
+
+			return this;
+
+		};
+
+	}(),
 
 	translate: function ( offset ) {
 
@@ -298,13 +326,4 @@ THREE.Box3.prototype = {
 
 	}
 
-};
-
-THREE.Box3.__v0 = new THREE.Vector3();
-THREE.Box3.__v1 = new THREE.Vector3();
-THREE.Box3.__v2 = new THREE.Vector3();
-THREE.Box3.__v3 = new THREE.Vector3();
-THREE.Box3.__v4 = new THREE.Vector3();
-THREE.Box3.__v5 = new THREE.Vector3();
-THREE.Box3.__v6 = new THREE.Vector3();
-THREE.Box3.__v7 = new THREE.Vector3();
+} );
