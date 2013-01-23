@@ -1580,7 +1580,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	applyEuler: function() {
+	applyEuler: function () {
 
 		var q1 = new THREE.Quaternion();
 
@@ -1596,7 +1596,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	}(),
 
-	applyAxisAngle: function() {
+	applyAxisAngle: function () {
 
 		var q1 = new THREE.Quaternion();
 
@@ -1747,7 +1747,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	negate: function() {
+	negate: function () {
 
 		return this.multiplyScalar( - 1 );
 
@@ -3972,45 +3972,6 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	},
 
-	getColumnX: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function () {
-
-			var te = this.elements;
-			return v1.set( te[0], te[1], te[2] );
-
-		};
-
-	}(),
-
-	getColumnY: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function () {
-
-			var te = this.elements;
-			return v1.set( te[4], te[5], te[6] );
-
-		};
-
-	}(),
-
-	getColumnZ: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function() {
-
-			var te = this.elements;
-			return v1.set( te[8], te[9], te[10] );
-
-		};
-
-	}(),
-
 	getInverse: function ( m, throwOnInvertible ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
@@ -4925,29 +4886,37 @@ THREE.extend( THREE.Frustum.prototype, {
 
 	},
 
-	intersectsObject: function ( object ) {
+	intersectsObject: function () {
 
-		// this method is expanded inlined for performance reasons.
-		var matrix = object.matrixWorld;
-		var planes = this.planes;
-		var center = matrix.getPosition();
-		var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+		var center = new THREE.Vector3();
 
-		for ( var i = 0; i < 6; i ++ ) {
+		return function ( object ) {
 
-			var distance = planes[ i ].distanceToPoint( center );
+			// this method is expanded inlined for performance reasons.
 
-			if( distance < negRadius ) {
+			var matrix = object.matrixWorld;
+			var planes = this.planes;
+			var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
 
-				return false;
+			center.getPositionFromMatrix( matrix );
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				var distance = planes[ i ].distanceToPoint( center );
+
+				if ( distance < negRadius ) {
+
+					return false;
+
+				}
 
 			}
 
-		}
+			return true;
 
-		return true;
+		};
 
-	},
+	}(),
 
 	intersectsSphere: function ( sphere ) {
 
@@ -4959,7 +4928,7 @@ THREE.extend( THREE.Frustum.prototype, {
 
 			var distance = planes[ i ].distanceToPoint( center );
 
-			if( distance < negRadius ) {
+			if ( distance < negRadius ) {
 
 				return false;
 
@@ -4977,7 +4946,7 @@ THREE.extend( THREE.Frustum.prototype, {
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			if( planes[ i ].distanceToPoint( point ) < 0 ) {
+			if ( planes[ i ].distanceToPoint( point ) < 0 ) {
 
 				return false;
 
@@ -4995,7 +4964,8 @@ THREE.extend( THREE.Frustum.prototype, {
 
 	}
 
-} );/**
+} );
+/**
  * @author bhouston / http://exocortex.com
  */
 
@@ -5876,7 +5846,7 @@ THREE.EventDispatcher = function () {
 			// Checking boundingSphere distance to ray
 			sphere.set(
 				object.matrixWorld.getPosition(),
-				object.geometry.boundingSphere.radius* object.matrixWorld.getMaxScaleOnAxis() );
+				object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
 
 			if ( ! raycaster.ray.isIntersectionSphere( sphere ) ) {
 
@@ -5902,7 +5872,7 @@ THREE.EventDispatcher = function () {
 			inverseMatrix.getInverse( object.matrixWorld );
 
 			localRay.copy( raycaster.ray ).transform( inverseMatrix );
-	
+
 			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 				var face = geometry.faces[ f ];
@@ -5910,14 +5880,14 @@ THREE.EventDispatcher = function () {
 				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : object.material;
 
 				if ( material === undefined ) continue;
-				
+
 				facePlane.setFromNormalAndCoplanarPoint( face.normal, vertices[face.a] );
 
 				var planeDistance = localRay.distanceToPlane( facePlane );
-	
+
 				// bail if raycaster and plane are parallel
 				if ( Math.abs( planeDistance ) < precision ) continue;
-	
+
 				// if negative distance, then plane is behind raycaster
 				if ( planeDistance < 0 ) continue;
 
@@ -5933,7 +5903,7 @@ THREE.EventDispatcher = function () {
 
 				// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
 				if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
-				
+
 				intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
 
 				if ( face instanceof THREE.Face3 ) {
@@ -6517,7 +6487,7 @@ THREE.Projector = function () {
 
 						} else {
 
-							_vector3.copy( object.matrixWorld.getPosition() );
+							_vector3.getPositionFromMatrix( object.matrixWorld );
 							_vector3.applyProjection( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
@@ -6540,7 +6510,7 @@ THREE.Projector = function () {
 
 					} else {
 
-						_vector3.copy( object.matrixWorld.getPosition() );
+						_vector3.getPositionFromMatrix( object.matrixWorld );
 						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
@@ -6559,7 +6529,7 @@ THREE.Projector = function () {
 
 					} else {
 
-						_vector3.copy( object.matrixWorld.getPosition() );
+						_vector3.getPositionFromMatrix( object.matrixWorld );
 						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
@@ -13655,7 +13625,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( light instanceof THREE.DirectionalLight ) {
 
-					var lightPosition = light.matrixWorld.getPosition().normalize();
+					var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld ).normalize();
 
 					var amount = normal.dot( lightPosition );
 
@@ -13667,7 +13637,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				} else if ( light instanceof THREE.PointLight ) {
 
-					var lightPosition = light.matrixWorld.getPosition();
+					var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld );
 
 					var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
@@ -34891,7 +34861,7 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
-			shadowCamera.position.copy( light.matrixWorld.getPosition() );
+			shadowCamera.position.getPositionFromMatrix( light.matrixWorld );
 			shadowCamera.lookAt( light.target.matrixWorld.getPosition() );
 			shadowCamera.updateMatrixWorld();
 
