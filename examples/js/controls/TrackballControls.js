@@ -67,11 +67,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		this.screen.width = window.innerWidth;
-		this.screen.height = window.innerHeight;
+                var rect = this.domElement.getBoundingClientRect();
+                
+		this.screen.width = rect.width;
+		this.screen.height = rect.height;
 
-		this.screen.offsetLeft = 0;
-		this.screen.offsetTop = 0;
+		this.screen.offsetLeft = rect.left;
+		this.screen.offsetTop = rect.top;
 
 		this.radius = ( this.screen.width + this.screen.height ) / 4;
 
