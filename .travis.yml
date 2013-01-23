@@ -1,5 +1,4 @@
 language: node_js
 node_js:
   - 0.8
-  - 0.6
 script: ./utils/build_and_test.sh
