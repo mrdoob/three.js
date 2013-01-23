@@ -24,7 +24,9 @@ var Car = function () {
 };
 	
 var car = new Car();
-car.addEventListener( 'start', function ( event ) { alert( event.message ); } );
+car.addEventListener( 'start', function ( event ) { 
+    alert( event.message ); 
+} );
 car.start();
 	    </code>
 
@@ -38,7 +40,7 @@ car.start();
 
 		<h2>Methods</h2>
 
-		<h3>.addEventListener( [page:String type], [page:Function listener] </h3>
+		<h3>.addEventListener( [page:String type], [page:Function listener] )</h3>
 		<div>
 		type - The type of event to listen to.<br />
 		listener - The function that gets called when the event is fired.
@@ -47,7 +49,7 @@ car.start();
 		Adds a listener to an event type.
 		</div>
 
-		<h3>.removeEventListener( [page:String type], [page:Function listener] </h3>
+		<h3>.removeEventListener( [page:String type], [page:Function listener] )</h3>
 		<div>
 		type - The type of the listener that gets removed.<br />
 		listener - The listener function that gets removed.
@@ -56,7 +58,7 @@ car.start();
 		Removes a listener from an event type.
 		</div>
 
-		<h3>.dispatchEvent( [page:String type]</h3>
+		<h3>.dispatchEvent( [page:String type] )</h3>
 		<div>
 		type - The type of event that gets fired.
 		</div>
