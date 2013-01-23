@@ -1,2 +1,3 @@
+cd utils
 python build.py --include common --include extras --minify --output ../build/three.min.js
 node ../test/runner.js
