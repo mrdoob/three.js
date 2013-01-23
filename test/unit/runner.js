@@ -72,6 +72,14 @@ var afterRead = function(data){
 	}
 	
 	eval( threejsSource + ";" + constantsSource + ";" + data);
+	if (errors.length > 0){
+		console.log("There are " + errors.length + " errors:");
+		console.log(errors);
+		process.exit(errors.length);
+	} else {
+		console.log("There are no errors.");
+		process.exit(0);
+	}
 	console.log(errors);
 };
 	
