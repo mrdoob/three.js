@@ -15,28 +15,28 @@ test( "constructor", function() {
 
 	a = new THREE.Box3( zero3.clone(), one3.clone() );
 	ok( a.min.equals( zero3 ), "Passed!" );
-	ok( a.max.equals( one3 ), "Passed!" );
+	ok( a.max.equals( one3.clone() ), "Passed!" );
 });
 
 test( "copy", function() {
 	var a = new THREE.Box3( zero3.clone(), one3.clone() );
 	var b = new THREE.Box3().copy( a );
 	ok( b.min.equals( zero3 ), "Passed!" );
-	ok( b.max.equals( one3 ), "Passed!" );
+	ok( b.max.equals( one3.clone() ), "Passed!" );
 
 	// ensure that it is a true copy
 	a.min = zero3;
 	a.max = one3;
 	ok( b.min.equals( zero3 ), "Passed!" );
-	ok( b.max.equals( one3 ), "Passed!" );
+	ok( b.max.equals( one3.clone() ), "Passed!" );
 });
 
 test( "set", function() {
 	var a = new THREE.Box3();
 
-	a.set( zero3, one3 );
+	a.set( zero3, one3.clone() );
 	ok( a.min.equals( zero3 ), "Passed!" );
-	ok( a.max.equals( one3 ), "Passed!" );
+	ok( a.max.equals( one3.clone() ), "Passed!" );
 });
 
 test( "empty/makeEmpty", function() {
@@ -67,7 +67,7 @@ test( "size", function() {
 	ok( a.size().equals( zero3 ), "Passed!" );
 
 	a = new THREE.Box3( zero3.clone(), one3.clone() );
-	ok( a.size().equals( one3 ), "Passed!" );
+	ok( a.size().equals( one3.clone() ), "Passed!" );
 });
 
 test( "expandByPoint", function() {
@@ -76,8 +76,8 @@ test( "expandByPoint", function() {
 	a.expandByPoint( zero3 );
 	ok( a.size().equals( zero3 ), "Passed!" );
 
-	a.expandByPoint( one3 );
-	ok( a.size().equals( one3 ), "Passed!" );
+	a.expandByPoint( one3.clone() );
+	ok( a.size().equals( one3.clone() ), "Passed!" );
 
 	a.expandByPoint( one3.clone().negate() );
 	ok( a.size().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
@@ -90,7 +90,7 @@ test( "expandByVector", function() {
 	a.expandByVector( zero3 );
 	ok( a.size().equals( zero3 ), "Passed!" );
 
-	a.expandByVector( one3 );
+	a.expandByVector( one3.clone() );
 	ok( a.size().equals( one3.clone().multiplyScalar( 2 ) ), "Passed!" );
 	ok( a.center().equals( zero3 ), "Passed!" );
 });
@@ -110,11 +110,11 @@ test( "containsPoint", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 
 	ok( a.containsPoint( zero3 ), "Passed!" );
-	ok( ! a.containsPoint( one3 ), "Passed!" );
+	ok( ! a.containsPoint( one3.clone() ), "Passed!" );
 
 	a.expandByScalar( 1 );
 	ok( a.containsPoint( zero3 ), "Passed!" );
-	ok( a.containsPoint( one3 ), "Passed!" );
+	ok( a.containsPoint( one3.clone() ), "Passed!" );
 	ok( a.containsPoint( one3.clone().negate() ), "Passed!" );
 });
 
@@ -269,8 +269,8 @@ test( "translate", function() {
 	var c = new THREE.Box3( one3.clone().negate(), one3.clone() );
 	var d = new THREE.Box3( one3.clone().negate(), zero3.clone() );
 
-	ok( a.clone().translate( one3 ).equals( new THREE.Box3( one3, one3 ) ), "Passed!" );
-	ok( a.clone().translate( one3 ).translate( one3.clone().negate() ).equals( a ), "Passed!" );
-	ok( d.clone().translate( one3 ).equals( b ), "Passed!" );
+	ok( a.clone().translate( one3.clone() ).equals( new THREE.Box3( one3.clone(), one3.clone() ) ), "Passed!" );
+	ok( a.clone().translate( one3.clone() ).translate( one3.clone().negate() ).equals( a ), "Passed!" );
+	ok( d.clone().translate( one3.clone() ).equals( b ), "Passed!" );
 	ok( b.clone().translate( one3.clone().negate() ).equals( d ), "Passed!" );
 });
