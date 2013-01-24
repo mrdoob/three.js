@@ -9,7 +9,10 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">Base class for geometries</div>
+		<div class="desc">
+		Base class for geometries.<br />
+		A geometry holds all data nessecary to describe a 3D model.
+		</div>
 
 
 		<h2>Example</h2>
@@ -44,42 +47,51 @@
 
 		<h3>.[page:Array vertices]</h3>
 		<div>
-		Array of [page:Vector3 vertices].
+		Array of [page:Vector3 vertices].<br />
+		The array of vertices hold every position of points of the model.<br />
+		To signal an update in this array, [page:Geometry Geometry.verticesNeedUpdate] needs to be set to true.
 		</div>
 
 		<h3>.[page:Array colors]</h3>
 		<div>
 		Array of vertex [page:Color colors], matching number and order of vertices.<br />
 		Used in [page:ParticleSystem], [page:Line] and [page:Ribbon].<br />
-		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.
+		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.<br />
+		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
 		</div>
 
-		<h3>.[page:Array materials]</h3>
+		<h3>.[page:Array normals]</h3>
 		<div>
-		Array of [page:Material materials].
+		Array of vertex [page:Vector3 normals], matching number and order of vertices.<br />
+		[link:http://en.wikipedia.org/wiki/Normal_(geometry) Normal vectors] are  nessecary for lighting <br />
+		To signal an update in this array, [page:Geometry Geometry.normalsNeedUpdate] needs to be set to true.
 		</div>
 
 		<h3>.[page:Array faces]</h3>
 		<div>
-		Array of [page:Face3 triangles] or/and [page:Face4 quads].
+		Array of [page:Face3 triangles] or/and [page:Face4 quads].<br />
+		The array of faces describe how each vertex in the model is connected with each other.<br />
+		To signal an update in this array, [page:Geometry Geometry.elementsNeedUpdate] needs to be set to true.
 		</div>
 
 		<h3>.[page:Array faceUvs]</h3>
 		<div>
 		Array of face [page:UV] layers.<br />
-		Each UV layer is an array of [page:UV] matching order and number of faces.
+		Each UV layer is an array of [page:UV] matching order and number of faces.<br />
+		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
 		</div>
 
 		<h3>.[page:Array faceVertexUvs]</h3>
 		<div>
 		Array of face [page:UV] layers.<br />
-		Each UV layer is an array of [page:UV] matching order and number of vertices in faces.
+		Each UV layer is an array of [page:UV] matching order and number of vertices in faces.<br />
+		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
 		</div>
 
 		<h3>.[page:Array morphTargets]</h3>
 		<div>
 		Array of morph targets. Each morph target is a Javascript object:
-		<code>{ name: "targetName", vertices: [ new THREE.Vertex(), ... ] }</code>
+		<code>{ name: "targetName", vertices: [ new THREE.Vector3(), ... ] }</code>
 		Morph vertices match number and order of primary vertices.
 		</div>
 
@@ -88,6 +100,12 @@
 		Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:
 		<code>morphColor = { name: "colorName", colors: [ new THREE.Color(), ... ] }</code>
 		Morph colors can match either number and order of faces (face colors) or number of vertices (vertex colors).
+		</div>
+
+		<h3>.[page:Array morphColors]</h3>
+		<div>
+		Array of morph normals. Morph Normals have similar structure as morph targets, each normal set is a Javascript object:
+		<code>morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }</code>
 		</div>
 
 		<h3>.[page:Array skinWeights]</h3>
@@ -120,9 +138,49 @@
 		<h3>.[page:Boolean dynamic]</h3>
 		<div>
 		Set to *true* if attribute buffers will need to change in runtime (using "dirty" flags).<br/>
-		Unless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.
+		Unless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.<br/>
+		Defaults to true.
 		</div>
-
+		
+		<h3>.verticesNeedUpdate</h3>
+		<div>
+		Set to *true* if the vertices array has been updated.
+		</div>
+		
+		<h3>.elementsNeedUpdate</h3>
+		<div>
+		Set to *true* if the faces array has been updated.
+		</div>
+		
+		<h3>.uvsNeedUpdate</h3>
+		<div>
+		Set to *true* if the uvs array has been updated.
+		</div>
+		
+		<h3>.normalsNeedUpdate</h3>
+		<div>
+		Set to *true* if the normals array has been updated.
+		</div>
+		
+		<h3>.tangentsNeedUpdate</h3>
+		<div>
+		Set to *true* if the tangents in the faces has been updated.
+		</div>
+		
+		<h3>.colorsNeedUpdate</h3>
+		<div>
+		Set to *true* if the colors array has been updated.
+		</div>
+		
+		<h3>.lineDistancesNeedUpdate</h3>
+		<div>
+		Set to *true* if the linedistances array has been updated.
+		</div>
+		
+		<h3>.buffersNeedUpdate</h3>
+		<div>
+		Set to *true* if an array has changed in length.
+		</div>
 
 		<h2>Methods</h2>
 
@@ -145,6 +203,11 @@
 		<div>
 		Computes vertex normals by averaging face normals.<br />
 		Face normals must be existing / computed beforehand.
+		</div>
+
+		<h3>.computeMorphNormals()</h3>
+		<div>
+		Computes morph normals.
 		</div>
 
 		<h3>.computeTangents()</h3>
@@ -170,6 +233,17 @@
 		<div>
 		Checks for duplicate vertices using hashmap.<br />
 		Duplicated vertices are removed and faces' vertices are updated.
+		</div>
+		
+		<h3>.clone()</h3>
+		<div>
+		Creates a new clone of the Geometry.
+		</div>
+		
+		<h3>.dispose()</h3>
+		<div>
+		Removes The object from memory. <br />
+		Don't forget to call this method when you remove an geometry because it can cuase meomory leaks. 
 		</div>
 
 
