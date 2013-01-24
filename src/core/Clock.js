@@ -16,7 +16,7 @@ THREE.Clock = function ( autoStart ) {
 
 THREE.Clock.prototype.start = function () {
 
-	this.startTime = Date.now();
+	this.startTime = performance.now !== undefined ? performance.now() : Date.now();
 	this.oldTime = this.startTime;
 
 	this.running = true;
@@ -52,7 +52,7 @@ THREE.Clock.prototype.getDelta = function () {
 
 	if ( this.running ) {
 
-		var newTime = Date.now();
+		var newTime = performance.now !== undefined ? performance.now() : Date.now();
 		diff = 0.001 * ( newTime - this.oldTime );
 		this.oldTime = newTime;
 
