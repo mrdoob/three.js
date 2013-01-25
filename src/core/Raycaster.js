@@ -10,7 +10,7 @@
 		this.ray = new THREE.Ray( origin, direction );
 
 		// normalized ray.direction required for accurate distance calculations
-		if( this.ray.direction.length() > 0 ) {
+		if( this.ray.direction.lengthSq() > 0 ) {
 
 			this.ray.direction.normalize();
 
