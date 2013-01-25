@@ -20,9 +20,23 @@
 		<h2>Methods</h2>
 
 		<h3>.projectVector( [page:Vector3 vector], [page:Camera camera] ) [page:Vector3]</h3>
+		<div>
+		[page:Vector3 vector] — vector to project.<br />
+		[page:Camera camera] — camera to use in the projection.<br />
+		</div>
+		<div>
+		Projects a vector with the camera. Caution, this method changes 'vector'.
+		</div>
 
 		<h3>.unprojectVector( [page:Vector3 vector], [page:Camera camera] ) [page:Vector3]</h3>
-
+		<div>
+		[page:Vector3 vector] — vector to unproject.<br />
+		[page:Camera camera] — camera to use in the projection.<br />
+		</div>
+		<div>
+		Unprojects a vector with the camera. Caution, this method changes 'vector'. 
+		</div>
+		
 		<h3>.pickingRay( [page:Vector3 vector], [page:Camera camera] ) [page:Raycaster]</h3>
 		<div>
 		Translates a 2D point from NDC (<em>Normalized Device Coordinates</em>) to a [page:Raycaster] that can be used for picking. NDC range from [-1..1] in x (left to right) and [1.0 .. -1.0] in y (top to bottom).
