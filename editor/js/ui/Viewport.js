@@ -688,10 +688,7 @@ var Viewport = function ( signals ) {
 
 	signals.exportScene.add( function () {
 
-		var clearColor = renderer.getClearColor();
-		var clearAlpha = renderer.getClearAlpha();
-
-		var output = new THREE.SceneExporter().parse( scene, clearColor, clearAlpha );
+		var output = new THREE.SceneExporter().parse( scene );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
