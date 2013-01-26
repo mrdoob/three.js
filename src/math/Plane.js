@@ -202,3 +202,8 @@ THREE.Plane.prototype = {
 THREE.Plane.__vZero = new THREE.Vector3( 0, 0, 0 );
 THREE.Plane.__v1 = new THREE.Vector3();
 THREE.Plane.__v2 = new THREE.Vector3();
+
+// convenience planes
+THREE.Plane.XY = new THREE.Plane( new THREE.Vector3( 0, 0, 1 ) );
+THREE.Plane.XZ = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ) );
+THREE.Plane.YZ = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ) );
