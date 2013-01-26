@@ -31,10 +31,14 @@ THREE.SceneExporter2.prototype = {
 			if ( object instanceof THREE.PerspectiveCamera ) {
 
 				data.type = 'PerspectiveCamera';
+				data.position = object.position.toArray();
+				data.rotation = object.rotation.toArray();
 
 			} else if ( object instanceof THREE.OrthographicCamera ) {
 
 				data.type = 'OrthographicCamera';
+				data.position = object.position.toArray();
+				data.rotation = object.rotation.toArray();
 
 			} else if ( object instanceof THREE.AmbientLight ) {
 
@@ -43,14 +47,17 @@ THREE.SceneExporter2.prototype = {
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
 				data.type = 'DirectionalLight';
+				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.PointLight ) {
 
 				data.type = 'PointLight';
+				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
 				data.type = 'SpotLight';
+				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
@@ -59,10 +66,16 @@ THREE.SceneExporter2.prototype = {
 			} else if ( object instanceof THREE.Mesh ) {
 
 				data.type = 'Mesh';
+				data.position = object.position.toArray();
+				data.rotation = object.rotation.toArray();
+				data.scale = object.scale.toArray();
 
 			} else {
 
 				data.type = 'Object3D';
+				data.position = object.position.toArray();
+				data.rotation = object.rotation.toArray();
+				data.scale = object.scale.toArray();
 
 			}
 
@@ -84,7 +97,7 @@ THREE.SceneExporter2.prototype = {
 
 		}
 
-		output.graph = parseObject( scene ).children;
+		output.scene = parseObject( scene ).children;
 
 		return JSON.stringify( output, null, '\t' );
 

@@ -393,6 +393,12 @@ THREE.extend( THREE.Vector4.prototype, {
 
 	},
 
+	toArray: function () {
+
+		return [ this.x, this.y, this.z, this.w ];
+		
+	},
+
 	clone: function () {
 
 		return new THREE.Vector4( this.x, this.y, this.z, this.w );

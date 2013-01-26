@@ -751,6 +751,12 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+	toArray: function () {
+
+		return [ this.x, this.y, this.z ];
+		
+	},
+
 	clone: function () {
 
 		return new THREE.Vector3( this.x, this.y, this.z );

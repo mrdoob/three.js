@@ -293,6 +293,12 @@ THREE.extend( THREE.Vector2.prototype, {
 
 	},
 
+	toArray: function () {
+
+		return [ this.x, this.y ];
+		
+	},
+
 	clone: function () {
 
 		return new THREE.Vector2( this.x, this.y );
