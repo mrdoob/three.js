@@ -14,7 +14,7 @@ THREE.SceneExporter2.prototype = {
 			metadata: {
 				formatVersion : 4.0,
 				type : "scene",
-				generatedBy : "SceneExporter2"
+				generatedBy : "SceneExporter"
 			}
 		};
 
@@ -22,46 +22,61 @@ THREE.SceneExporter2.prototype = {
 
 		var parseObject = function ( object ) {
 
-			var data = {
-
-				name: object.name
-
-			};
+			var data = { name: object.name };
 
 			if ( object instanceof THREE.PerspectiveCamera ) {
 
 				data.type = 'PerspectiveCamera';
+				data.fov = object.fov;
+				data.aspect = object.aspect;
+				data.near = object.near;
+				data.far = object.far;
 				data.position = object.position.toArray();
 				data.rotation = object.rotation.toArray();
 
 			} else if ( object instanceof THREE.OrthographicCamera ) {
 
 				data.type = 'OrthographicCamera';
+				data.left = object.left;
+				data.right = object.right;
+				data.top = object.top;
+				data.bottom = object.bottom;
+				data.near = object.near;
+				data.far = object.far;
 				data.position = object.position.toArray();
 				data.rotation = object.rotation.toArray();
 
 			} else if ( object instanceof THREE.AmbientLight ) {
 
 				data.type = 'AmbientLight';
+				data.color = object.color.getHex();
+				data.intensity = object.intensity;
 
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
 				data.type = 'DirectionalLight';
+				data.color = object.color.getHex();
+				data.intensity = object.intensity;
 				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.PointLight ) {
 
 				data.type = 'PointLight';
+				data.color = object.color.getHex();
+				data.intensity = object.intensity;
 				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
 				data.type = 'SpotLight';
+				data.color = object.color.getHex();	
+				data.intensity = object.intensity;
 				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
 				data.type = 'HemisphereLight';
+				data.color = object.color.getHex();
 
 			} else if ( object instanceof THREE.Mesh ) {
 
