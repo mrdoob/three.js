@@ -1,70 +1,76 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 	<head>
 		<title>three.js webgl - trackball controls</title>
+
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
 		<style>
-			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#000;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-			#controlarea {
-				text-align:left;
-				position: relative;
-				 width: 100%;
-				padding: 5px;	
-				border: 5px;		
-			}
-
-			a {
-				color: red;
-			}
+		 html {
+			height: 100%;
+			min-height: 100%;
+			margin: 0 0 0 0 ;
+			overflow: hidden;
+		}
+		body {
+			height: 100%;
+			min-height: 100%;
+			margin: 0 0 0 0 ;
+		}
+		#footer {
+		
+			position: absolute;
+			width: 100%;
+			height: 30px;
+			bottom: 0;
+			left: 0;
+			margin:0;
+			padding:0;
+		}
+		#info {
+			position: absolute;
+			width: 100%;
+			top: 0;
+			text-align: center;
+			font-family: monospace;
+			font-size: 12;
+			font-weight: bold;
+		}
 		</style>
 	</head>
 
 	<body>
-		
-		
-		<div id="container" tabindex="0" style="width:600px;height:200px">
-
-		</div>
-	
 		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example</br>
-			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
-		</div>	
-
-		<div id="controlarea">
-This test that the  THREE.TrackballControls processes the key-event correctly and do not propagate key event
-when the controlled domElement ( parent of the canvas) has focus.
-			<ul>
+				<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example<br/>
+				MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+				<br/>
+				This test that the  THREE.TrackballControls processes the key-event correctly and do not propagate key event
+				when the controlled domElement ( parent of the canvas) has focus.
+				<ul style="text-align:left" >
 				<li>set the focus to one input field below 
 				<li>press the left mouse button inside the WebGl view and start twiddling about to rotate the view
 				<li>while moving the mouse with the left button pressed, press the "D" key to pan the view		
 				<li>verify that the input field are not garbaged with unwanted characters.
-			</ul>
-			<input value="some value" >
-			<textarea id="mytextarea">
-			</textarea>
-		<div>
+				</ul>					
+		</div>		
+ 			
+		<div id="container" tabindex="0" >
+		
+		</div>
+
+		<div id="footer">
+				<input value="> <type some command here >" style="width:100%;" >
+
+				
+		</div>
 
 
+<!---
+	
+-->
 
 		<script src="../build/three.min.js"></script>
 
@@ -76,6 +82,8 @@ when the controlled domElement ( parent of the canvas) has focus.
 		<script>
 
 	window.onload=function() {
+
+		var footerHeight = 30;
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
@@ -163,15 +171,16 @@ when the controlled domElement ( parent of the canvas) has focus.
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
+				onWindowResize();
 			}
 
 			function onWindowResize() {
 			
-				camera.aspect = container.clientWidth / container.clientHeight;
+				camera.aspect =  window.innerWidth / ( window.innerHeight - footerHeight);
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( container.clientWidth, container.clientHeight );
+				// renderer.setPosition(0,0);
+				renderer.setSize( window.innerWidth, window.innerHeight- footerHeight )
 
 				controls.handleResize();
 

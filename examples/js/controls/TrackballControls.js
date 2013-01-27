@@ -369,7 +369,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	function mousemove( event ) {
 
-		if ( ! _this.enabled ) return;
+		if (  _this.enabled === false) return;
+		event.preventDefault();
+		event.stopPropagation();
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
