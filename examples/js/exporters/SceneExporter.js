@@ -8,7 +8,7 @@ THREE.SceneExporter.prototype = {
 
 	constructor: THREE.SceneExporter,
 
-	parse: function ( scene, clearColor, clearAlpha ) {
+	parse: function ( scene ) {
 
 		var position = Vector3String( scene.position );
 		var rotation = Vector3String( scene.rotation );

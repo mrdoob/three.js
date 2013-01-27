@@ -110,8 +110,8 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 		oldSoundPosition.copy( soundPosition );
 		oldCameraPosition.copy( cameraPosition );
 
-		soundPosition.copy( this.matrixWorld.getPosition() );
-		cameraPosition.copy( camera.matrixWorld.getPosition() );
+		soundPosition.getPositionFromMatrix( this.matrixWorld );
+		cameraPosition.getPositionFromMatrix( camera.matrixWorld );
 
 		soundDelta.subVectors( soundPosition, oldSoundPosition );
 		cameraDelta.subVectors( cameraPosition, oldCameraPosition );

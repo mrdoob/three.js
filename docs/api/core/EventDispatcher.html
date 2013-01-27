@@ -9,24 +9,61 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">JavaScript events for custom objects</div>
+		
+		<h2>Example</h2>
 
+		<code>
+var Car = function () {
+
+	EventDispatcher.call( this );
+	this.start = function () { 
+		this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } ); 
+	};
+	
+};
+	
+var car = new Car();
+car.addEventListener( 'start', function ( event ) { 
+    alert( event.message ); 
+} );
+car.start();
+	    </code>
 
 		<h2>Constructor</h2>
 
 		<h3>[name]()</h3>
-
-
-		<h2>Properties</h2>
-
-		<h3>.[page:Vector3 todo]</h3>
+		<div>
+		Creates eventDispatcher object. It needs to be call with '.call' to add the functionality to an object.
+		</div>
 
 
 		<h2>Methods</h2>
 
-		<h3>.todo( [page:Vector3 todo] )</h3>
+		<h3>.addEventListener( [page:String type], [page:Function listener] )</h3>
 		<div>
-		todo — todo<br />
+		type - The type of event to listen to.<br />
+		listener - The function that gets called when the event is fired.
+		</div>
+		<div>
+		Adds a listener to an event type.
+		</div>
+
+		<h3>.removeEventListener( [page:String type], [page:Function listener] )</h3>
+		<div>
+		type - The type of the listener that gets removed.<br />
+		listener - The listener function that gets removed.
+		</div>
+		<div>
+		Removes a listener from an event type.
+		</div>
+
+		<h3>.dispatchEvent( [page:String type] )</h3>
+		<div>
+		type - The type of event that gets fired.
+		</div>
+		<div>
+		Fire an event type.
 		</div>
 
 

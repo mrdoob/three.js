@@ -14,9 +14,7 @@ THREE.Quaternion = function( x, y, z, w ) {
 
 };
 
-THREE.Quaternion.prototype = {
-
-	constructor: THREE.Quaternion,
+THREE.extend( THREE.Quaternion.prototype, {
 
 	set: function ( x, y, z, w ) {
 
@@ -339,7 +337,7 @@ THREE.Quaternion.prototype = {
 
 	}
 
-}
+} );
 
 THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
