@@ -293,15 +293,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.setSize = function ( width, height ) {
+	this.setSize = function ( width, height, autoResize ) {
+
+		if ( autoResize === undefined ) {
+			autoResize = true;	
+		}
 
 		_canvas.width = width * this.devicePixelRatio;
 		_canvas.height = height * this.devicePixelRatio;
-
-		_canvas.style.width = width + 'px';
-		_canvas.style.height = height + 'px';
+			
+		if ( autoResize ){
+			
+			_canvas.style.width = width + 'px';
+			_canvas.style.height = height + 'px';
+		
+		}
 
 		this.setViewport( 0, 0, _canvas.width, _canvas.height );
+		
 
 	};
 
