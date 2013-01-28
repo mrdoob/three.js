@@ -197,8 +197,10 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.object.matrix.setPosition( this.object.position );
 		this.object.matrix.setRotationFromQuaternion( this.object.quaternion );
 		this.object.matrixWorldNeedsUpdate = true;
-
-
+		
+		// reflect rotation in the object's properties
+		this.object.rotation.setEulerFromRotationMatrix( this.object.matrix );
+		
 	};
 
 	this.updateMovementVector = function() {
