@@ -1,0 +1,37 @@
+// ThreeJsExportScript.mel
+// Author: Chris Lewis
+// Email: clewis1@c.ringling.edu
+
+global proc int ThreeJsExportScript(string $parent, string $action, string $settings, string $callback)
+{
+    if ($action == "post")
+    {
+        setParent $parent;
+        columnLayout -adj true;
+        checkBox -v true -l "Vertices" vertsCb;
+        checkBox -v true -l "Faces" facesCb;
+        checkBox -v true -l "Normals" normalsCb;
+        checkBox -v true -l "UVs" uvsCb;
+        checkBox -v false -l "Material Indices" materialsCb;
+        checkBox -v false -l "Colors" colorsCb;
+    }
+    else if ($action == "query")
+    {
+        string $option = "\"";
+        if (`checkBox -q -v vertsCb`)
+            $option += "vertices ";
+        if (`checkBox -q -v facesCb`)
+            $option += "faces ";
+        if (`checkBox -q -v normalsCb`)
+            $option += "normals ";
+        if (`checkBox -q -v uvsCb`)
+            $option += "uvs ";
+        if (`checkBox -q -v materialsCb`)
+            $option += "materials ";
+        if (`checkBox -q -v colorsCb`)
+            $option += "colors ";
+        $option += "\"";
+        eval($callback + $option);
+    }
+    return 1;
+}
