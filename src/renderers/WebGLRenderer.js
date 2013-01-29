@@ -7471,7 +7471,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 		
-		if (! _gl.getShaderPrecisionFormat ) {
+		if ( _gl.getShaderPrecisionFormat === undefined ) {
 			
 			_gl.getShaderPrecisionFormat = function() { 
 				

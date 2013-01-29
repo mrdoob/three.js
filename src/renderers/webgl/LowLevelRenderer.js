@@ -169,7 +169,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 		}
 		
-		if (! _gl.getShaderPrecisionFormat ) {
+		if ( _gl.getShaderPrecisionFormat === undefined ) {
 			
 			_gl.getShaderPrecisionFormat = function() { 
 				
@@ -180,10 +180,10 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 				};
 				
 			}
+			
 		}
 
 	};
-	
 	
 	function setDefaultGLState () {
 
