@@ -20,30 +20,106 @@ self.Float32Array = self.Float32Array || Array;
 
 // Shims for "startsWith", "endsWith", and "trim" for browsers where this is not yet implemented
 // not sure we should have this, or at least not have it here
+// Taken from ES6-shim 0.6.0 (https://github.com/paulmillr/es6-shim/).
+(function() {
+	// Define configurable, writable and non-enumerable props
+	// if they don’t exists.
+	var defineProperties = function(object, map) {
+		Object.keys(map).forEach(function(name) {
+			var method = map[name];
+			if (!object[name]) {
+				Object.defineProperty(object, name, {
+					configurable: true,
+					enumerable: false,
+					writable: true,
+					value: method
+				});
+			}
+		});
+	};
 
-// http://stackoverflow.com/questions/646628/javascript-startswith
-// http://stackoverflow.com/questions/498970/how-do-i-trim-a-string-in-javascript
-// http://wiki.ecmascript.org/doku.php?id=harmony%3astring_extras
+	defineProperties(String.prototype, {
+		startsWith: function(searchString) {
+			var position = arguments[1];
 
-String.prototype.startsWith = String.prototype.startsWith || function ( str ) {
+			// Let searchStr be ToString(searchString).
+			var searchStr = searchString.toString();
 
-	return this.slice( 0, str.length ) === str;
+			// ReturnIfAbrupt(searchStr).
 
-};
+			// Let S be the result of calling ToString,
+			// giving it the this value as its argument.
+			var s = this.toString();
 
-String.prototype.endsWith = String.prototype.endsWith || function ( str ) {
+			// ReturnIfAbrupt(S).
 
-	var t = String( str );
-	var index = this.lastIndexOf( t );
-	return ( -1 < index && index ) === (this.length - t.length);
+			// Let pos be ToInteger(position).
+			// (If position is undefined, this step produces the value 0).
+			var pos = (position === undefined) ? 0 : Number.toInteger(position);
+			// ReturnIfAbrupt(pos).
 
-};
+			// Let len be the number of elements in S.
+			var len = s.length;
 
-String.prototype.trim = String.prototype.trim || function () {
+			// Let start be min(max(pos, 0), len).
+			var start = Math.min(Math.max(pos, 0), len);
 
-	return this.replace( /^\s+|\s+$/g, '' );
+			// Let searchLength be the number of elements in searchString.
+			var searchLength = searchString.length;
 
-};
+			// If searchLength+start is greater than len, return false.
+			if ((searchLength + start) > len) return false;
+
+			// If the searchLength sequence of elements of S starting at
+			// start is the same as the full element sequence of searchString,
+			// return true.
+			var index = ''.indexOf.call(s, searchString, start);
+			return index === start;
+		},
+
+		endsWith: function(searchString) {
+			var endPosition = arguments[1];
+
+			// ReturnIfAbrupt(CheckObjectCoercible(this value)).
+			// Let S be the result of calling ToString, giving it the this value as its argument.
+			// ReturnIfAbrupt(S).
+			var s = this.toString();
+
+			// Let searchStr be ToString(searchString).
+			// ReturnIfAbrupt(searchStr).
+			var searchStr = searchString.toString();
+
+			// Let len be the number of elements in S.
+			var len = s.length;
+
+			// If endPosition is undefined, let pos be len, else let pos be ToInteger(endPosition).
+			// ReturnIfAbrupt(pos).
+			var pos = (endPosition === undefined) ?
+			  len :
+			  Number.toInteger(endPosition);
+
+			// Let end be min(max(pos, 0), len).
+			var end = Math.min(Math.max(pos, 0), len);
+
+			// Let searchLength be the number of elements in searchString.
+			var searchLength = searchString.length;
+
+			// Let start be end - searchLength.
+			var start = end - searchLength;
+
+			// If start is less than 0, return false.
+			if (start < 0) return false;
+
+			// If the searchLength sequence of elements of S starting at start is the same as the full element sequence of searchString, return true.
+			// Otherwise, return false.
+			var index = ''.indexOf.call(s, searchString, start);
+			return index === start;
+		},
+		trim: function() {
+			return this.replace( /^\s+|\s+$/g, '' );
+		}
+	});
+})();
 
 
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
