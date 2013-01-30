@@ -315,10 +315,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.setPrecision = function( precision ) {
 		_precision = precision !== undefined ? precision : 'highp';
 	};
-
-	this.setMaxLights = function( maxLights ) {
-		_maxLights = maxLights !== undefined ? maxLights : 4;
-	};
 	//END_VEROLD_MOD
 
 
