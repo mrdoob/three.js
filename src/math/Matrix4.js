@@ -531,45 +531,6 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	},
 
-	getColumnX: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function () {
-
-			var te = this.elements;
-			return v1.set( te[0], te[1], te[2] );
-
-		};
-
-	}(),
-
-	getColumnY: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function () {
-
-			var te = this.elements;
-			return v1.set( te[4], te[5], te[6] );
-
-		};
-
-	}(),
-
-	getColumnZ: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function() {
-
-			var te = this.elements;
-			return v1.set( te[8], te[9], te[10] );
-
-		};
-
-	}(),
-
 	getInverse: function ( m, throwOnInvertible ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm

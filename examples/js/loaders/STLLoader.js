@@ -74,18 +74,18 @@ THREE.STLLoader.prototype = {
 			// Normal
 			var patternNormal = /normal[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
 
-			while( ( result = patternNormal.exec( text ) ) != null ) {
+			while ( ( result = patternNormal.exec( text ) ) != null ) {
 
-				var normal = new THREE.Vector3( result[ 1 ], result[ 3 ], result[ 5 ] );
+				var normal = new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
 
 			}
 
 			// Vertex
 			var patternVertex = /vertex[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
 
-			while( ( result = patternVertex.exec( text ) ) != null ) {
+			while ( ( result = patternVertex.exec( text ) ) != null ) {
 
-				geometry.vertices.push(	new THREE.Vector3( result[ 1 ], result[ 3 ], result[ 5 ] ) );
+				geometry.vertices.push( new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) ) );
 
 			}
 

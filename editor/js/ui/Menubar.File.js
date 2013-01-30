@@ -46,7 +46,15 @@ Menubar.File = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Scene' );
-	option.onClick( function () { signals.exportScene.dispatch(); } );
+	option.onClick( function () { signals.exportScene.dispatch( { exporter: THREE.SceneExporter } ); } );
+	options.add( option );
+
+	// export scene 2
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export Scene 2' );
+	option.onClick( function () { signals.exportScene.dispatch( { exporter: THREE.SceneExporter2 } ); } );
 	options.add( option );
 
 	// export OBJ
