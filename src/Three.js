@@ -38,6 +38,16 @@ self.Float32Array = self.Float32Array || Array;
 		});
 	};
 
+	defineProperties(Number, {
+		toInteger: function(value) {
+			var number = +value;
+			if (number !== number) return +0;
+			if (number === 0 || !Number.isFinite(number)) return number;
+			var sign = (number < 0) ? -1 : 1;
+			return sign * Math.floor(Math.abs(number));
+		}
+	});
+
 	defineProperties(String.prototype, {
 		startsWith: function(searchString) {
 			var position = arguments[1];
