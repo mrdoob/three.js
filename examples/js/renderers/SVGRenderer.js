@@ -230,18 +230,16 @@ THREE.SVGRenderer = function () {
 
 	function calculateLight( lights, position, normal, color ) {
 
-		var l, ll, light, lightColor, lightPosition, amount;
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
 
-		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			light = lights[ l ];
-			lightColor = light.color;
+			var light = lights[ l ];
+			var lightColor = light.color;
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				lightPosition = light.matrixWorld.getPosition().normalize();
+				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld ).normalize();
 
-				amount = normal.dot( lightPosition );
+				var amount = normal.dot( lightPosition );
 
 				if ( amount <= 0 ) continue;
 
@@ -253,9 +251,9 @@ THREE.SVGRenderer = function () {
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				lightPosition = light.matrixWorld.getPosition();
+				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld );
 
-				amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
+				var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
 				if ( amount <= 0 ) continue;
 

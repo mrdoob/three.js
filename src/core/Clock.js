@@ -14,52 +14,57 @@ THREE.Clock = function ( autoStart ) {
 
 };
 
-THREE.Clock.prototype.start = function () {
+THREE.extend( THREE.Clock.prototype, {
 
-	this.startTime = Date.now();
-	this.oldTime = this.startTime;
+	start: function () {
 
-	this.running = true;
+		this.startTime = window.performance !== undefined && window.performance.now !== undefined
+					? window.performance.now()
+					: Date.now();
 
-};
+		this.oldTime = this.startTime;
+		this.running = true;
+	},
 
-THREE.Clock.prototype.stop = function () {
+	stop: function () {
 
-	this.getElapsedTime();
+		this.getElapsedTime();
+		this.running = false;
 
-	this.running = false;
+	},
 
-};
+	getElapsedTime: function () {
 
-THREE.Clock.prototype.getElapsedTime = function () {
+		this.getDelta();
+		return this.elapsedTime;
 
-	this.getDelta();
+	},
 
-	return this.elapsedTime;
+	getDelta: function () {
 
-};
+		var diff = 0;
 
+		if ( this.autoStart && ! this.running ) {
 
-THREE.Clock.prototype.getDelta = function () {
+			this.start();
 
-	var diff = 0;
+		}
 
-	if ( this.autoStart && ! this.running ) {
+		if ( this.running ) {
 
-		this.start();
+			var newTime = window.performance !== undefined && window.performance.now !== undefined
+					? window.performance.now()
+					: Date.now();
+
+			diff = 0.001 * ( newTime - this.oldTime );
+			this.oldTime = newTime;
+
+			this.elapsedTime += diff;
+
+		}
+
+		return diff;
 
 	}
 
-	if ( this.running ) {
-
-		var newTime = Date.now();
-		diff = 0.001 * ( newTime - this.oldTime );
-		this.oldTime = newTime;
-
-		this.elapsedTime += diff;
-
-	}
-
-	return diff;
-
-};
+} );
