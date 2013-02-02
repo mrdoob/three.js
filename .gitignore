@@ -2,3 +2,4 @@
 *.swp
 .project
 utils/npm/node_modules/*
+utils/node_modules/*

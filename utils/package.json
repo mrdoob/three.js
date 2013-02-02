@@ -1,7 +1,7 @@
 {
-    "name": "three.js",
-    "description": "JavaScript 3D library",
-    "version": "50dev",
+    "name": "three-util",
+    "description": "Build System for the Three.js JavaScript 3D library",
+    "version": "0.1.1",
     "homepage" : "http://mrdoob.github.com/three.js/",
     "author": "three.js contributors",
     "help": {
@@ -17,8 +17,10 @@
         "type" : "git",
          "url" : "git://github.com/mrdoob/three.js.git"
     },
+
     "licenses": [{
         "type": "The MIT License",
         "url": "https://raw.github.com/mrdoob/three.js/master/LICENSE"
     }]
+    
 }
