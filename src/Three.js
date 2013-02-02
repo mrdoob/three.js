@@ -45,16 +45,16 @@ String.prototype.trim = String.prototype.trim || function () {
 
 };
 
-// based on http://stackoverflow.com/a/12317051
-THREE.extend = function ( target, other ) {
+// based on https://github.com/documentcloud/underscore/blob/bf657be243a075b5e72acc8a83e6f12a564d8f55/underscore.js#L767
+THREE.extend = function ( obj, source ) {
 
-	for (var prop in other) {
+	for (var prop in source) {
 
-		target[prop] = other[prop];
+		obj[prop] = source[prop];
 
 	}
 
-	return target;
+	return obj;
 
 };
 
