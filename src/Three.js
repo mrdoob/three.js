@@ -48,9 +48,27 @@ String.prototype.trim = String.prototype.trim || function () {
 // based on https://github.com/documentcloud/underscore/blob/bf657be243a075b5e72acc8a83e6f12a564d8f55/underscore.js#L767
 THREE.extend = function ( obj, source ) {
 
-	for (var prop in source) {
+	// ECMAScript5 compatibility based on: http://www.nczonline.net/blog/2012/12/11/are-your-mixins-ecmascript-5-compatible/
+	if ( Object.keys ) {
 
-		obj[prop] = source[prop];
+        Object.keys( source ).forEach( 
+			function ( prop ) {
+					Object.defineProperty( obj, prop, Object.getOwnPropertyDescriptor( source, prop ) );
+				}
+			);
+
+    }
+    else {
+
+		for ( var prop in source ) {
+
+			if ( source.hasOwnProperty( prop ) ) {
+
+				obj[prop] = source[prop];
+
+            }
+
+		}
 
 	}
 
