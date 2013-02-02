@@ -48,19 +48,9 @@ String.prototype.trim = String.prototype.trim || function () {
 // based on http://stackoverflow.com/a/12317051
 THREE.extend = function ( target, other ) {
 
-	target = target || {};
-
 	for (var prop in other) {
 
-		if ( typeof other[prop] === 'object' ) {
-
-			target[prop] = THREE.extend( target[prop], other[prop] );
-
-		} else {
-
-			target[prop] = other[prop];
-
-		}
+		target[prop] = other[prop];
 
 	}
 
