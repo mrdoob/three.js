@@ -1,11 +1,22 @@
-var fs = require("fs");
-var path = require("path");
-var argparse =  require( "argparse" );
-var uglify = require("uglify-js2");
-var spawn = require('child_process').spawn;
+var fs, path, argparse, uglify, spawn;
+try {
+    fs = require("fs");
+    path = require("path");
+    argparse =  require( "argparse" );
+    uglify = require("uglify-js2");
+    spawn = require('child_process').spawn;
+}
+catch( e ) {
+    console.log( "!!!" );
+    console.log( "!!! Please run 'npm install' to install dependencies prior to running build.js" );
+    console.log( "!!!" );
+    console.log( e );
+}
 
 function main(){
+
     "use strict";
+    
     var parser = new argparse.ArgumentParser();
     parser.addArgument(['--include'], {"action":'append', 'required':true});
     parser.addArgument(['--externs'], {"action":'append', "defaultValue":['./externs/common.js']});
@@ -48,15 +59,16 @@ function main(){
         });
         
         
-        fs.writeFileSync(output,result.code + sourcemapping,'utf8');
+        fs.writeFileSync(output,'// three.js - http://github.com/mrdoob/three.js\n' + result.code + sourcemapping,'utf8');
         
-
         if (args.sourcemaps){
             fs.writeFileSync(sourcemap,result.map,'utf8');
         }
     
     }
+
 }
+
 main();
 
 
