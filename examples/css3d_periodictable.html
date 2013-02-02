@@ -293,7 +293,6 @@
 				for ( var i = 0; i < objects.length; i ++ ) {
 
 					var item = table[ i ];
-					var object = objects[ i ];
 
 					var object = new THREE.Object3D();
 					object.position.x = ( item[ 3 ] * 160 ) - 1540;
@@ -308,8 +307,6 @@
 				var vector = new THREE.Vector3();
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-					var object = objects[ i ];
 
 					var phi = Math.acos( -1 + ( 2 * i ) / l );
 					var theta = Math.sqrt( l * Math.PI ) * phi;
@@ -334,8 +331,6 @@
 
 				for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-					var object = objects[ i ];
-
 					var phi = i * 0.175 + Math.PI;
 
 					var object = new THREE.Object3D();
@@ -357,8 +352,6 @@
 				// grid
 
 				for ( var i = 0; i < objects.length; i ++ ) {
-
-					var object = objects[ i ];
 
 					var object = new THREE.Object3D();
 
