@@ -548,9 +548,9 @@ THREE.extend( THREE.Vector3.prototype, {
 
 		return function ( normal ) {
 
-		    v1.copy( this ).ortho( normal ).multiplyScalar( -2 );
+		    v1.copy( this ).project( normal ).multiplyScalar( 2 );
 
-		    return this.add( v1 );
+		    return this.subVectors( v1, this );
 
 		}
 
