@@ -520,6 +520,42 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+
+	project: function( normal ) {
+
+		var cosTheta = this.dot( normal );
+		return this.copy( normal ).multiplyScalar( cosTheta );
+
+	},
+	
+	ortho: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function( normal ) {
+
+			v1.copy( this ).project( normal );
+
+			return this.sub( v1 );
+
+		}
+
+	}(),
+
+	reflect: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( normal ) {
+
+		    v1.copy( this ).ortho( normal ).multiplyScalar( -2 );
+
+		    return this.add( v1 );
+
+		}
+
+	}(),
+
 	angleTo: function ( v ) {
 
 		return Math.acos( this.dot( v ) / this.length() / v.length() );
