@@ -521,20 +521,20 @@ THREE.extend( THREE.Vector3.prototype, {
 	},
 
 
-	project: function( normal ) {
+	projectOn: function( normal ) {
 
 		var d = this.dot( normal );
 		return this.copy( normal ).multiplyScalar( d );
 
 	},
 	
-	ortho: function () {
+	orthoTo: function () {
 
 		var v1 = new THREE.Vector3();
 
 		return function( normal ) {
 
-			v1.copy( this ).project( normal );
+			v1.copy( this ).projectOn( normal );
 
 			return this.sub( v1 );
 
@@ -548,7 +548,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 		return function ( normal ) {
 
-		    v1.copy( this ).project( normal ).multiplyScalar( 2 );
+		    v1.copy( this ).projectOn( normal ).multiplyScalar( 2 );
 
 		    return this.subVectors( v1, this );
 
