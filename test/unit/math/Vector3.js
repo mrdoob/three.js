@@ -239,21 +239,21 @@ test( "setLength", function() {
 
 });
 
-test( "projectOn", function() {
+test( "projectOnUnit", function() {
 	var a = new THREE.Vector3( 1, 0, 0 );
 	var b = new THREE.Vector3();
 	var normal = new THREE.Vector3( 1, 0, 0 );
 
-	ok( b.copy( a ).projectOn( normal ).equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+	ok( b.copy( a ).projectOnUnit( normal ).equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
 
 	a.set( 0, 1, 0 );
-	ok( b.copy( a ).projectOn( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	ok( b.copy( a ).projectOnUnit( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 
 	a.set( 0, 0, -1 );
-	ok( b.copy( a ).projectOn( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	ok( b.copy( a ).projectOnUnit( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 
 	a.set( -1, 0, 0 );
-	ok( b.copy( a ).projectOn( normal ).equals( new THREE.Vector3( -1, 0, 0 ) ), "Passed!" );
+	ok( b.copy( a ).projectOnUnit( normal ).equals( new THREE.Vector3( -1, 0, 0 ) ), "Passed!" );
 
 });
 

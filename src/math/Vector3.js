@@ -520,12 +520,25 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	projectOn: function( unitNormal ) {
+	projectOnUnit: function( unitNormal ) {
 
 		var d = this.dot( unitNormal );
 		return this.copy( unitNormal ).multiplyScalar( d );
 
 	},
+
+	projectOnVector: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function( vector ) {
+
+			v1.copy( vector ).normalize();
+			return this.projectOnUnit( v1 );
+
+		};
+
+	}(),
 
 	reflect: function () {
 
@@ -533,7 +546,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 		return function ( unitNormal ) {
 
-		    v1.copy( this ).projectOn( unitNormal ).multiplyScalar( 2 );
+		    v1.copy( this ).projectOnUnit( unitNormal ).multiplyScalar( 2 );
 
 		    return this.subVectors( v1, this );
 
