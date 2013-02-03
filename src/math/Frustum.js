@@ -19,7 +19,7 @@ THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
 
 };
 
-THREE.Frustum.prototype = {
+THREE.extend( THREE.Frustum.prototype, {
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
 
@@ -70,29 +70,37 @@ THREE.Frustum.prototype = {
 
 	},
 
-	intersectsObject: function ( object ) {
+	intersectsObject: function () {
 
-		// this method is expanded inlined for performance reasons.
-		var matrix = object.matrixWorld;
-		var planes = this.planes;
-		var center = matrix.getPosition();
-		var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+		var center = new THREE.Vector3();
 
-		for ( var i = 0; i < 6; i ++ ) {
+		return function ( object ) {
 
-			var distance = planes[ i ].distanceToPoint( center );
+			// this method is expanded inlined for performance reasons.
 
-			if( distance < negRadius ) {
+			var matrix = object.matrixWorld;
+			var planes = this.planes;
+			var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
 
-				return false;
+			center.getPositionFromMatrix( matrix );
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				var distance = planes[ i ].distanceToPoint( center );
+
+				if ( distance < negRadius ) {
+
+					return false;
+
+				}
 
 			}
 
-		}
+			return true;
 
-		return true;
+		};
 
-	},
+	}(),
 
 	intersectsSphere: function ( sphere ) {
 
@@ -104,7 +112,7 @@ THREE.Frustum.prototype = {
 
 			var distance = planes[ i ].distanceToPoint( center );
 
-			if( distance < negRadius ) {
+			if ( distance < negRadius ) {
 
 				return false;
 
@@ -122,7 +130,7 @@ THREE.Frustum.prototype = {
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			if( planes[ i ].distanceToPoint( point ) < 0 ) {
+			if ( planes[ i ].distanceToPoint( point ) < 0 ) {
 
 				return false;
 
@@ -136,10 +144,8 @@ THREE.Frustum.prototype = {
 
 	clone: function () {
 
-		var planes = this.planes;
-
-		return new THREE.Frustum( planes[0], planes[1], planes[2], planes[3], planes[4], planes[5] );
+		return new THREE.Frustum().copy( this );
 
 	}
 
-};
+} );

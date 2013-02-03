@@ -32,8 +32,6 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 	var length = 0;
 
-	xhr.withCredentials = this.withCredentials;
-
 	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState === xhr.DONE ) {
@@ -86,6 +84,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 	};
 
 	xhr.open( "GET", url, true );
+	xhr.withCredentials = this.withCredentials;
 	xhr.send( null );
 
 };

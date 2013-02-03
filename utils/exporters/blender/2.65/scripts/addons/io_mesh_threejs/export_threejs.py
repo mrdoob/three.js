@@ -1650,7 +1650,7 @@ def generate_objects(data):
             # use empty material string for multi-material objects
             # this will trigger use of MeshFaceMaterial in SceneLoader
 
-            material_string = ""
+            material_string = '""'
             if len(material_ids) == 1:
                 material_string = generate_string_list(material_ids)
 
@@ -2242,11 +2242,6 @@ def export_scene(scene, filepath, flipyz, option_colors, option_lights, option_c
     for obj in sceneobjects:
       objects.append(obj)
 
-    # get linked group objcts
-    for group in bpy.data.groups:
-       for object in group.objects:
-          objects.append(object)
-
     scene_text = ""
     data = {
     "scene"        : scene,
@@ -2315,11 +2310,6 @@ def save(operator, context, filepath = "",
     for obj in sceneobjects:
       objects.append(obj)
 
-    # get objects in linked groups
-    for group in bpy.data.groups:
-       for object in group.objects:
-          objects.append(object)
-
     if option_export_scene:
 
         geo_set = set()
@@ -2363,7 +2353,7 @@ def save(operator, context, filepath = "",
                                                         option_animation_skeletal,
                                                         option_frame_step)
 
-                        embeds[name] = model_string
+                        embeds[object.data.name] = model_string
 
                     else:
 

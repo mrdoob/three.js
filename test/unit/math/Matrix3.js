@@ -165,8 +165,8 @@ test( "getInverse", function() {
 		new THREE.Matrix4().makeRotationY( -0.3 ),
 		new THREE.Matrix4().makeRotationZ( 0.3 ),
 		new THREE.Matrix4().makeRotationZ( -0.3 ),
-		new THREE.Matrix4().makeScale( new THREE.Vector3( 1, 2, 3 ) ),
-		new THREE.Matrix4().makeScale( new THREE.Vector3( 1/8, 1/2, 1/3 ) )
+		new THREE.Matrix4().makeScale( 1, 2, 3 ),
+		new THREE.Matrix4().makeScale( 1/8, 1/2, 1/3 )
 		];
 
 	for( var i = 0, il = testMatrices.length; i < il; i ++ ) {

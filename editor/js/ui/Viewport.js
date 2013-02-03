@@ -676,7 +676,8 @@ var Viewport = function ( signals ) {
 
 		}
 
-		var output = new object.exporter().parse( selected.geometry );
+		var exporter = new object.exporter();
+		var output = exporter.parse( selected.geometry );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
@@ -686,12 +687,10 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.exportScene.add( function () {
+	signals.exportScene.add( function ( object ) {
 
-		var clearColor = renderer.getClearColor();
-		var clearAlpha = renderer.getClearAlpha();
-
-		var output = new THREE.SceneExporter().parse( scene, clearColor, clearAlpha );
+		var exporter = new object.exporter();
+		var output = exporter.parse( scene );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
@@ -722,7 +721,7 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.sceneAdded.add( function ( newScene, newCamera, newClearColor ) {
+	signals.sceneAdded.add( function ( newScene, newCamera ) {
 
 		scene = newScene;
 
@@ -767,11 +766,9 @@ var Viewport = function ( signals ) {
 			controls.object = camera;
 			controls.update();
 
-		}
+		} else {
 
-		if ( newClearColor ) {
-
-			signals.clearColorChanged.dispatch( newClearColor.getHex() );
+			scene.add( camera );
 
 		}
 
@@ -806,7 +803,7 @@ var Viewport = function ( signals ) {
 		}
 
 		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( null );
+		signals.objectSelected.dispatch( camera );
 
 	} );
 

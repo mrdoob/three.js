@@ -155,7 +155,7 @@
 
 				// normal map shader
 
-				var shader = THREE.ShaderUtils.lib[ "normal" ];
+				var shader = THREE.ShaderLib[ "normalmap" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 				uniforms[ "enableAO" ].value = true;

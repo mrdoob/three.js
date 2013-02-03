@@ -5,14 +5,12 @@
 
 THREE.Sphere = function ( center, radius ) {
 
-	this.center = center === undefined ? new THREE.Vector3() : center.clone();
-	this.radius = radius === undefined ? 0 : radius;
+	this.center = ( center !== undefined ) ? center : new THREE.Vector3();
+	this.radius = ( radius !== undefined ) ? radius : 0;
 
 };
 
-THREE.Sphere.prototype = {
-
-	constructor: THREE.Sphere,
+THREE.extend( THREE.Sphere.prototype, {
 
 	set: function ( center, radius ) {
 
@@ -133,4 +131,4 @@ THREE.Sphere.prototype = {
 
 	}
 
-};
+} );

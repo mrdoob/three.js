@@ -11,11 +11,11 @@
 
 		<div>The goal of this section is to give a brief introduction to Three.js. We will start by setting up a scene, with a spinning cube. A working example is provided at the bottom of the page, if you get stuck, and need help.</div>
 
-		<h2>What is Three.js</h2>
+		<h2>What is Three.js?</h2>
 
 		<div>If you're reading this, you probably have some understanding of what Three.js is, and what it helps you with, but let's try to describe it briefly anyway.</div>
 
-		<div>Three.js is a a library that makes WebGL - 3D in the browser - very easy. While a simple cube in raw WebGL would turn out hundreds of lines of Javascript and shader code, a Three.js equivalent is only a fraction of that.</div>
+		<div>Three.js is a library that makes WebGL - 3D in the browser - very easy. While a simple cube in raw WebGL would turn out hundreds of lines of Javascript and shader code, a Three.js equivalent is only a fraction of that.</div>
 
 		<h2>Before we start</h2>
 		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, and open it in your browser.</div>
@@ -56,7 +56,7 @@
 
 		<div>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, Three.js comes with a few others, often used as fallbacks for users with older browsers or for some reason don't have WebGL support.</div>
 
-		<div>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the are we want to fill with our game - in this case, the width and height of the browser window. For performance intensive games, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, for half the resolution. This does not mean that the game will only fill half the window, but rather look a bit blurry and scaled up.</div>
+		<div>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our game - in this case, the width and height of the browser window. For performance intensive games, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, for half the resolution. This does not mean that the game will only fill half the window, but rather look a bit blurry and scaled up.</div>
 
 		<div>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</div>
 

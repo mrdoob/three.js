@@ -146,7 +146,7 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
                 #  - to preserve vertex normals from the original data
                 #    call me.update() before setting them
 
-                me.faces[fi].use_smooth = True
+                me.tessfaces[fi].use_smooth = True
 
                 if not recalculate_normals:
                     for j in range(len(vertexNormals[fi])):
@@ -168,7 +168,7 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
                             #y = -y
                             #z = -z
 
-                        vi = me.faces[fi].vertices[j]
+                        vi = me.tessfaces[fi].vertices[j]
 
                         me.vertices[vi].normal.x = x
                         me.vertices[vi].normal.y = y
@@ -273,7 +273,7 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
 
             if faceMaterials[fi] >= 0:
 
-                me.faces[fi].material_index = faceMaterials[fi]
+                me.tessfaces[fi].material_index = faceMaterials[fi]
 
     # Create a new object
 
