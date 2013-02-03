@@ -257,24 +257,6 @@ test( "projectOn", function() {
 
 });
 
-test( "orthoTo", function() {
-	var a = new THREE.Vector3( 1, 0, 0 );
-	var b = new THREE.Vector3();
-	var normal = new THREE.Vector3( 1, 0, 0 );
-
-	ok( b.copy( a ).orthoTo( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
-
-	a.set( 0, 1, 0 );
-	ok( b.copy( a ).orthoTo( normal ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
-
-	a.set( 0, 0, -1 );
-	ok( b.copy( a ).orthoTo( normal ).equals( new THREE.Vector3( 0, 0, -1 ) ), "Passed!" );
-
-	a.set( -1, 0, 0 );
-	ok( b.copy( a ).orthoTo( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
-
-});
-
 test( "reflect", function() {
 	var a = new THREE.Vector3( 1, 0, 0 );
 	var normal = new THREE.Vector3( 1, 0, 0 );
