@@ -523,8 +523,8 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	project: function( normal ) {
 
-		var cosTheta = this.dot( normal );
-		return this.copy( normal ).multiplyScalar( cosTheta );
+		var d = this.dot( normal );
+		return this.copy( normal ).multiplyScalar( d );
 
 	},
 	
