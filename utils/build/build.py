@@ -20,7 +20,7 @@ def main(argv=None):
 	parser.add_argument('--include', action='append', required=True)
 	parser.add_argument('--externs', action='append', default=['externs/common.js'])
 	parser.add_argument('--minify', action='store_true', default=False)
-	parser.add_argument('--output', default='../build/three.js')
+	parser.add_argument('--output', default='../../build/three.js')
 	parser.add_argument('--sourcemaps', action='store_true', default=False)
 
 	args = parser.parse_args()
@@ -47,6 +47,7 @@ def main(argv=None):
 	for include in args.include:
 		with open('includes/' + include + '.json','r') as f: files = json.load(f)
 		for filename in files:
+			filename = '../../' + filename;
 			sources.append(filename)
 			with open(filename, 'r') as f: tmp.write(f.read())
 
