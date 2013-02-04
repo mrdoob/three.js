@@ -12,7 +12,9 @@ THREE.ShadowMapPlugin = function () {
 	_projScreenMatrix = new THREE.Matrix4(),
 
 	_min = new THREE.Vector3(),
-	_max = new THREE.Vector3();
+	_max = new THREE.Vector3(),
+
+	_matrixPosition = new THREE.Vector3();
 
 	this.init = function ( renderer ) {
 
@@ -197,7 +199,8 @@ THREE.ShadowMapPlugin = function () {
 			shadowCamera = light.shadowCamera;
 
 			shadowCamera.position.getPositionFromMatrix( light.matrixWorld );
-			shadowCamera.lookAt( light.target.matrixWorld.getPosition() );
+			_matrixPosition.getPositionFromMatrix( light.target.matrixWorld );
+			shadowCamera.lookAt( _matrixPosition );
 			shadowCamera.updateMatrixWorld();
 
 			shadowCamera.matrixWorldInverse.getInverse( shadowCamera.matrixWorld );
