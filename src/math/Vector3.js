@@ -520,6 +520,48 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+	projectOnVector: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function( vector ) {
+
+			v1.copy( vector ).normalize();
+			var d = this.dot( v1 );
+			return this.copy( v1 ).multiplyScalar( d );
+
+		};
+
+	}(),
+
+	projectOnPlane: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function( planeNormal ) {
+
+			v1.copy( this ).projectOnVector( planeNormal );
+
+			return this.sub( v1 );
+
+		}
+
+	}(),
+
+	reflect: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( vector ) {
+
+		    v1.copy( this ).projectOnVector( vector ).multiplyScalar( 2 );
+
+		    return this.subVectors( v1, this );
+
+		}
+
+	}(),
+
 	angleTo: function ( v ) {
 
 		return Math.acos( this.dot( v ) / this.length() / v.length() );
