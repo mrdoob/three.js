@@ -87,7 +87,7 @@ var buildModule = function ( name, version ) {
 // TODO: make this non-Windows specific.
 var cmdExe = "cmd.exe";
 var args = [ "/c", "build_all.bat" ];
-var opts = { "cwd": ".." };
+var opts = { "cwd": "../build" };
 var buildAll = cp.spawn( cmdExe, args, opts );
 
 buildAll.stdout.on('data', function (data) {
