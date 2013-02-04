@@ -155,14 +155,14 @@
 			sidebar.setBottom( '0px' );
 			document.body.appendChild( sidebar.dom );
 
-            document.addEventListener( 'dragover', function ( event ) {
+			document.addEventListener( 'dragover', function ( event ) {
             
-                event.stopPropagation();
-                event.preventDefault();
+				event.stopPropagation();
+				event.preventDefault();
                 
-                event.dataTransfer.dropEffect = 'copy';
+				event.dataTransfer.dropEffect = 'copy';
             
-            }, false );
+			}, false );
 
 			document.addEventListener( 'drop', function ( event ) {
 
@@ -179,7 +179,7 @@
 
 			}, false );
 
-            var addFileObject = function ( data, filename ) {
+			var addFileObject = function ( data, filename ) {
             
 				if ( data.metadata === undefined ) { // 2.0
 
@@ -429,7 +429,7 @@
 
 				}
 
-			}
+			};
 
 			// create default scene
 
