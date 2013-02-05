@@ -155,8 +155,18 @@
 			sidebar.setBottom( '0px' );
 			document.body.appendChild( sidebar.dom );
 
+			document.addEventListener( 'dragover', function ( event ) {
+            
+				event.stopPropagation();
+				event.preventDefault();
+                
+				event.dataTransfer.dropEffect = 'copy';
+            
+			}, false );
+
 			document.addEventListener( 'drop', function ( event ) {
 
+				event.stopPropagation();
 				event.preventDefault();
 
 				var file = event.dataTransfer.files[ 0 ];
@@ -168,6 +178,62 @@
 				parseFile( file, filename, extension );
 
 			}, false );
+
+			var addFileObject = function ( data, filename ) {
+            
+				if ( data.metadata === undefined ) { // 2.0
+
+					data.metadata = { type: 'geometry' };
+
+				}
+
+				if ( data.metadata.type === undefined ) { // 3.0
+
+					data.metadata.type = 'geometry';
+
+				}
+
+				if ( data.metadata.type === 'geometry' ) {
+
+					var loader = new THREE.JSONLoader();
+
+					loader.createModel( data, function ( geometry ) {
+
+						geometry.sourceType = "ascii";
+						geometry.sourceFile = filename;
+
+						var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+						mesh.name = filename;
+
+						signals.objectAdded.dispatch( mesh );
+						signals.objectSelected.dispatch( mesh );
+
+					} );
+
+				} else if ( data.metadata.type === 'scene' ) {
+
+					new THREE.SceneLoader().parse( data, function ( result ) {
+
+						result.scene.name = filename;
+
+						var resetScene = true;
+
+						if ( resetScene ) {
+
+							signals.sceneAdded.dispatch( result.scene, result.currentCamera );
+
+						} else {
+
+							signals.objectAdded.dispatch( result.scene );
+							signals.objectSelected.dispatch( result.scene );
+
+						}
+
+					}, '' );
+
+				}
+            
+            };
 
 			var parseFile = function ( file, filename, extension ) {
 
@@ -247,7 +313,7 @@
 								worker.onmessage = function ( event ) {
 
 									event.data.metadata = { 'format': 2 };
-									parseFile( JSON.stringify( event.data ), extension );
+									addFileObject( event.data, filename );
 
 								};
 
@@ -269,58 +335,8 @@
 								return;
 
 							}
-
-							if ( data.metadata === undefined ) { // 2.0
-
-								data.metadata = { type: 'geometry' };
-
-							}
-
-							if ( data.metadata.type === undefined ) { // 3.0
-
-								data.metadata.type = 'geometry';
-
-							}
-
-							if ( data.metadata.type === 'geometry' ) {
-
-								var loader = new THREE.JSONLoader();
-
-								loader.createModel( data, function ( geometry ) {
-
-									geometry.sourceType = "ascii";
-									geometry.sourceFile = file.name;
-
-									var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
-									mesh.name = filename;
-
-									signals.objectAdded.dispatch( mesh );
-									signals.objectSelected.dispatch( mesh );
-
-								} );
-
-							} else if ( data.metadata.type === 'scene' ) {
-
-								new THREE.SceneLoader().parse( data, function ( result ) {
-
-									result.scene.name = filename;
-
-									var resetScene = true;
-
-									if ( resetScene ) {
-
-										signals.sceneAdded.dispatch( result.scene, result.currentCamera );
-
-									} else {
-
-										signals.objectAdded.dispatch( result.scene );
-										signals.objectSelected.dispatch( result.scene );
-
-									}
-
-								}, '' );
-
-							}
+							
+							addFileObject( data, filename );
 
 						}, false );
 						reader.readAsText( file );
@@ -413,7 +429,7 @@
 
 				}
 
-			}
+			};
 
 			// create default scene
 
