@@ -418,6 +418,9 @@ THREE.OBJLoader.prototype = {
 
 		}
 
+		// add the last group
+		meshN( undefined, undefined );
+
 		return group;
 
 	}
