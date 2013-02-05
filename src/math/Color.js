@@ -97,9 +97,9 @@ THREE.extend( THREE.Color.prototype, {
 
 			q = ( 2.0 * l ) - p;
 
-			this.r = f( p, q, h + 1.0/3 );
-			this.g = f( p, q, h );
-			this.b = f( p, q, h - 1.0/3 );
+			this.r = f( q, p, h + 1.0/3 );
+			this.g = f( q, p, h );
+			this.b = f( q, p, h - 1.0/3 );
 
 		}
 
