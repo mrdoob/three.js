@@ -155,6 +155,13 @@
 			sidebar.setBottom( '0px' );
 			document.body.appendChild( sidebar.dom );
 
+			document.addEventListener( 'dragover', function ( event ) {
+
+				event.preventDefault();
+				event.dataTransfer.dropEffect = 'copy';
+
+			}, false );
+
 			document.addEventListener( 'drop', function ( event ) {
 
 				event.preventDefault();
