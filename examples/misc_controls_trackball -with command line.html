@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+	<head>
+		<title>three.js webgl - trackball controls</title>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+		<style>
+		 html {
+			height: 100%;
+			min-height: 100%;
+			margin: 0 0 0 0 ;
+			overflow: hidden;
+		}
+		body {
+			height: 100%;
+			min-height: 100%;
+			margin: 0 0 0 0 ;
+		}
+		#footer {
+		
+			position: absolute;
+			width: 100%;
+			height: 30px;
+			bottom: 0;
+			left: 0;
+			margin:0;
+			padding:0;
+		}
+		#info {
+			position: absolute;
+			width: 100%;
+			top: 0;
+			text-align: center;
+			font-family: monospace;
+			font-size: 12;
+			font-weight: bold;
+		}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+				<a href="http://threejs.org" target="_blank">three.js</a> - trackball controls example<br/>
+				MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+				<br/>
+				This test that the  THREE.TrackballControls processes the key-event correctly and do not propagate key event
+				when the controlled domElement ( parent of the canvas) has focus.
+				<ul style="text-align:left" >
+				<li>set the focus to one input field below 
+				<li>press the left mouse button inside the WebGl view and start twiddling about to rotate the view
+				<li>while moving the mouse with the left button pressed, press the "D" key to pan the view		
+				<li>verify that the input field are not garbaged with unwanted characters.
+				</ul>					
+		</div>		
+ 			
+		<div id="container" tabindex="0" >
+		
+		</div>
+
+		<div id="footer">
+				<input value="> <type some command here >" style="width:100%;" >
+
+				
+		</div>
+
+
+<!---
+	
+-->
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/TrackballControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+	window.onload=function() {
+
+		var footerHeight = 30;
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, controls, scene, renderer;
+
+			var cross;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 60, container.clientWidth / container.clientHeight, 1, 1000 );
+				camera.position.z = 500;
+
+				controls = new THREE.TrackballControls( camera , container);
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.keys = [ 65, 83, 68 ];
+
+				controls.addEventListener( 'change', render );
+
+				// world
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
+
+				var geometry = new THREE.CylinderGeometry( 0, 10, 30, 4, 1 );
+				var material =  new THREE.MeshLambertMaterial( { color:0xffffff, shading: THREE.FlatShading } );
+
+				for ( var i = 0; i < 500; i ++ ) {
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.x = ( Math.random() - 0.5 ) * 1000;
+					mesh.position.y = ( Math.random() - 0.5 ) * 1000;
+					mesh.position.z = ( Math.random() - 0.5 ) * 1000;
+					mesh.updateMatrix();
+					mesh.matrixAutoUpdate = false;
+					scene.add( mesh );
+
+				}
+
+
+				// lights
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				light = new THREE.DirectionalLight( 0x002288 );
+				light.position.set( -1, -1, -1 );
+				scene.add( light );
+
+				light = new THREE.AmbientLight( 0x222222 );
+				scene.add( light );
+
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
+				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setSize( container.clientWidth, container.clientHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				onWindowResize();
+			}
+
+			function onWindowResize() {
+			
+				camera.aspect =  window.innerWidth / ( window.innerHeight - footerHeight);
+				camera.updateProjectionMatrix();
+
+				// renderer.setPosition(0,0);
+				renderer.setSize( window.innerWidth, window.innerHeight- footerHeight )
+
+				controls.handleResize();
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				controls.update();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+				stats.update();
+
+			}
+
+}
+
+		</script>
+
+	</body>
+</html>
