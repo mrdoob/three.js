@@ -43,13 +43,13 @@ THREE.extend( THREE.Line3.prototype, {
 
 	},
 
-	distanceSq: function ( optionalTarget ) {
+	distanceSq: function () {
 
 		return this.start.distanceToSquared( this.end );
 
 	},
 
-	distance: function ( optionalTarget ) {
+	distance: function () {
 
 		return this.start.distanceTo( this.end );
 
