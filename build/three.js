@@ -489,12 +489,6 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
-	getStyle: function () {
-
-		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
-
-	},
-
 	getHSL: function () {
 
 		var hsl = { h: 0, s: 0, l: 0 };
@@ -543,6 +537,12 @@ THREE.extend( THREE.Color.prototype, {
 		};
 
 	}(),
+
+	getStyle: function () {
+
+		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+
+	},
 
 	offsetHSL: function ( h, s, l ) {
 
