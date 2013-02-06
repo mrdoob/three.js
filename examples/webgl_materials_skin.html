@@ -178,10 +178,8 @@
 
 				// POSTPROCESSING
 
-				var renderModelUV = new THREE.RenderPass( scene, camera, materialUV, new THREE.Color( 0xca9c8d ) );
+				var renderModelUV = new THREE.RenderPass( scene, camera, materialUV, new THREE.Color( 0x575757 ) );
 				var renderModel = new THREE.RenderPass( scene, camera );
-
-				THREE.ColorUtils.adjustHSV( renderModelUV.clearColor, 0, -0.5, -0.45 );
 
 				var effectCopy = new THREE.ShaderPass( THREE.CopyShader );
 
