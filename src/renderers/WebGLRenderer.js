@@ -3676,6 +3676,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render lines
 
+				setLineWidth( material.linewidth );
+
 				_gl.drawArrays( _gl.LINE_STRIP, 0, position.numItems / 3 );
 
 				_this.info.render.calls ++;
