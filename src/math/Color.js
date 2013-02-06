@@ -56,50 +56,29 @@ THREE.extend( THREE.Color.prototype, {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		var f = function ( v1, v2, vh ) {
-			var r;
-
-			if ( vh < 0 ) {
-				vh += 1;
-			}
-
-			if ( vh > 1 ) {
-				vh -= 1;
-			}
-
-			if ( vh < 1.0/6 ) {
-				r = v1 + ( v2 - v1 ) * 6 * vh;
-			} else if ( vh < 1.0/2 ) {
-				r = v2;
-			} else if ( vh < 2.0/3 ) {
-				r = v1 + ( v2 - v1 ) * 6 * ( 2.0/3 - vh );
-			} else {
-				r = v1;
-			}
-
-			return r;
-
-		};
-
 		if ( s === 0 ) {
 
 			this.r = this.g = this.b = l;
 
 		} else {
 
-			var p, q;
+			var hue2rgb = function ( p, q, t ) {
 
-			if ( l <= 0.5 ) {
-				p = l * ( 1.0 + s );
-			} else {
-				p = l + s - ( l * s );
-			}
+				if ( t < 0 ) t += 1;
+				if ( t > 1 ) t -= 1;
+				if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+				if ( t < 1 / 2 ) return q;
+				if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+				return p;
 
-			q = ( 2.0 * l ) - p;
+			};
 
-			this.r = f( q, p, h + 1.0/3 );
-			this.g = f( q, p, h );
-			this.b = f( q, p, h - 1.0/3 );
+			var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+			var q = ( 2 * l ) - p;
+
+			this.r = hue2rgb( q, p, h + 1 / 3 );
+			this.g = hue2rgb( q, p, h );
+			this.b = hue2rgb( q, p, h - 1 / 3 );
 
 		}
 
@@ -307,16 +286,16 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
-	getHSL: function (hsl) {
+	getHSL: function ( hsl ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
 
-		var r = this.r;
-		var g = this.g;
-		var b = this.b;
+		if ( hsl === undefined ) hsl = { h: 0, s: 0, l: 0 };
 
-		var max = Math.max( Math.max( r, g ), b );
-		var min = Math.min( Math.min( r, g ), b );
+		var r = this.r, g = this.g, b = this.b;
+
+		var max = Math.max( r, g, b );
+		var min = Math.min( r, g, b );
 
 		var hue, saturation;
 		var lightness = ( min + max ) / 2.0;
@@ -330,34 +309,18 @@ THREE.extend( THREE.Color.prototype, {
 
 			var delta = max - min;
 
-			if ( lightness <= 0.5 ) {
-				saturation = delta / ( max + min );
-			} else {
-				saturation = delta / ( 2 - max - min );
-			}
+			saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
 
-			if ( r == max ) {
-				hue = ( g - b ) / delta;
-			} else if ( g == max ) {
-				hue = 2 + ( ( b - r ) / delta );
-			} else {
-				hue = 4 + ( ( r - g ) / delta );
+			switch ( max ) {
+
+				case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
+				case g: hue = ( b - r ) / delta + 2; break;
+				case b: hue = ( r - g ) / delta + 4; break;
+
 			}
 
 			hue /= 6;
 
-			if ( hue < 0 ) {
-				hue += 1;
-			}
-
-			if ( hue > 1 ) {
-				hue -= 1;
-			}
-
-		}
-
-		if ( hsl === undefined ) {
-			hsl = { h: 0, s: 0, l: 0 };
 		}
 
 		hsl.h = hue;
