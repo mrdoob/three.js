@@ -860,6 +860,7 @@ THREE.WebGLRenderer = THREE.WebGLRenderer2 = function ( parameters ) {
 				}
 
 				// render lines
+				renderer.setLineWidth( material.linewidth );
 				renderer.drawLineStrip(position.numItems / 3);
 
 				_this.info.render.calls ++;
