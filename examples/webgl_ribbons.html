@@ -56,7 +56,7 @@
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
 			var container, stats;
-			var camera, scene, renderer, ribbon, geometry, geometry2, materials = [], ribbons = [],
+			var camera, scene, renderer, ribbon, geometry, geometry2, ribbons = [],
 				parameters, i, i2, h, color, x, y, z, z2, s, n, n2, nribbons, grid;
 
 			var mouseX = 0, mouseY = 0;
@@ -108,7 +108,7 @@
 					if( i2 % 4 <= 2 ) h -= 0.15;
 
 					color = new THREE.Color( 0xffffff );
-					color.setHSV( 0.1 , 0, h );
+					color.setHSL( 0.1, 0, h );
 					geometry.colors.push( color );
 					geometry2.colors.push( color );
 
@@ -125,9 +125,9 @@
 				for ( i = 0; i < xgrid; i ++ )
 				for ( j = 0; j < ygrid; j ++ ) {
 
-					materials[ c ] = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true, side: THREE.DoubleSide } );
+					var material = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true, side: THREE.DoubleSide } );
 
-					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, materials[ c ] );
+					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, material );
 					ribbon.rotation.x = 0;
 					ribbon.rotation.y = Math.PI / 2;
 					ribbon.rotation.z = Math.PI;
@@ -135,9 +135,8 @@
 					x = 40 * ( i - xgrid/2 );
 					y = 40 * ( j - ygrid/2 );
 					z = 0;
-					ribbon.position.set( x, y, z );
 
-					materials[c].color.setHSV( i / xgrid, 0.3 +  0.7 * j / ygrid, 1 );
+					ribbon.position.set( x, y, z );
 
 					ribbon.matrixAutoUpdate = false;
 
@@ -295,10 +294,10 @@
 				geometry.verticesNeedUpdate = true;
 				geometry2.verticesNeedUpdate = true;
 
-				for( i = 0; i < nribbons; i++ ) {
+				for ( i = 0; i < nribbons; i++ ) {
 
 					h = ( 360 * ( i / nribbons + time ) % 360 ) / 360;
-					materials[ i ].color.setHSV( h, 0.5 + 0.5 * ( i % 20 / 20 ), 1 );
+					ribbons[ i ].material.color.setHSL( h, ( i % 20 / 20 ) * 0.3 + 0.7, 0.6 );
 
 				}
 

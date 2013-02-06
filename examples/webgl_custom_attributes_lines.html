@@ -174,10 +174,10 @@
 
 			for( var v = 0; v < vertices.length; v ++ ) {
 
-				displacement[ v ] = new THREE.Vector3( 0, 0, 0 );
+				displacement[ v ] = new THREE.Vector3();
 
 				color[ v ] = new THREE.Color( 0xffffff );
-				color[ v ].setHSV( v / vertices.length, 0.9, 0.9 );
+				color[ v ].setHSL( v / vertices.length, 0.5, 0.5 );
 
 			}
 
@@ -227,7 +227,7 @@
 			object.rotation.y = 0.25 * time;
 
 			uniforms.amplitude.value = 0.5 * Math.sin( 0.5 * time );
-			THREE.ColorUtils.adjustHSV( uniforms.color.value, 0.0005, 0, 0 );
+			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
 
 			var nx, ny, nz, value;
 

@@ -24,12 +24,22 @@
 			}
 
 			a { color: skyblue }
+			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
+			.highlight { background:orange; color:#fff; }
+
+			span {
+				display: inline-block;
+				width: 60px;
+				float: left;
+				text-align: center;
+			}
+
 		</style>
 	</head>
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> -
-			STL loader test by <a href="https://github.com/aleeper">aleeper</a>
+			STL loader test by <a href="https://github.com/aleeper">aleeper</a>. PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -45,7 +55,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, cameraTarget, scene, renderer;
 
 			init();
 			animate();
@@ -56,33 +66,15 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
-				camera.position.set( 3, 0.5, 3 );
+				camera.position.set( 3, 0.15, 3 );
+
+				cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
 
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0xffffff, 2, 15 );
 				scene.fog.color.setHSV( 0.06, 0.2, 0.45 );
 
-				// Grid
-
-				var size = 20, step = 0.25;
-
-				var geometry = new THREE.Geometry();
-				var material = new THREE.LineBasicMaterial( { color: 0x000000 } );
-
-				for ( var i = - size; i <= size; i += step ) {
-
-					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
-					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
-
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
-					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
-
-				}
-
-				var line = new THREE.Line( geometry, material, THREE.LinePieces );
-				line.position.y = -0.46;
-				scene.add( line );
 
 				// Ground
 
@@ -93,7 +85,8 @@
 
 				plane.receiveShadow = true;
 
-				// Object
+
+				// ASCII file
 
 				var loader = new THREE.STLLoader();
 				loader.addEventListener( 'load', function ( event ) {
@@ -102,13 +95,59 @@
 					var material = new THREE.MeshPhongMaterial( { ambient: 0xff5533, color: 0xff5533, specular: 0x111111, shininess: 200 } );
 					var mesh = new THREE.Mesh( geometry, material );
 
+					mesh.position.set( 0, - 0.25, 0.6 );
+					mesh.rotation.set( 0, - Math.PI / 2, 0 );
+					mesh.scale.set( 0.5, 0.5, 0.5 );
+
 					mesh.castShadow = true;
 					mesh.receiveShadow = true;
 
 					scene.add( mesh );
 
 				} );
-				loader.load( './models/stl/slotted_disk.stl' );
+				loader.load( './models/stl/ascii/slotted_disk.stl' );
+
+
+				// Binary files
+
+				var material = new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+
+				var loader = new THREE.STLLoader();
+				loader.addEventListener( 'load', function ( event ) {
+
+					var geometry = event.content;
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.set( 0, - 0.37, - 0.6 );
+					mesh.rotation.set( - Math.PI / 2, 0, 0 );
+					mesh.scale.set( 2, 2, 2 );
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					scene.add( mesh );
+
+				} );
+				loader.load( './models/stl/binary/pr2_head_pan.stl' );
+
+				var loader = new THREE.STLLoader();
+				loader.addEventListener( 'load', function ( event ) {
+
+					var geometry = event.content;
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.set( 0.136, - 0.37, - 0.6 );
+					mesh.rotation.set( - Math.PI / 2, 0.3, 0 );
+					mesh.scale.set( 2, 2, 2 );
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					scene.add( mesh );
+
+				} );
+				loader.load( './models/stl/binary/pr2_head_tilt.stl' );
+
 
 				// Lights
 
@@ -119,7 +158,7 @@
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0x111111, clearAlpha: 1, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -153,7 +192,7 @@
 				scene.add( directionalLight );
 
 				directionalLight.castShadow = true;
-				//directionalLight.shadowCameraVisible = true;
+				// directionalLight.shadowCameraVisible = true;
 
 				var d = 1;
 				directionalLight.shadowCameraLeft = -d;
@@ -164,8 +203,8 @@
 				directionalLight.shadowCameraNear = 1;
 				directionalLight.shadowCameraFar = 4;
 
-				directionalLight.shadowMapWidth = 2048;
-				directionalLight.shadowMapHeight = 2048;
+				directionalLight.shadowMapWidth = 1024;
+				directionalLight.shadowMapHeight = 1024;
 
 				directionalLight.shadowBias = -0.005;
 				directionalLight.shadowDarkness = 0.15;
@@ -181,8 +220,6 @@
 
 			}
 
-			//
-
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -196,10 +233,10 @@
 
 				var timer = Date.now() * 0.0005;
 
-				camera.position.x = Math.cos( timer ) * 5;
-				camera.position.z = Math.sin( timer ) * 5;
+				camera.position.x = Math.cos( timer ) * 3;
+				camera.position.z = Math.sin( timer ) * 3;
 
-				camera.lookAt( scene.position );
+				camera.lookAt( cameraTarget );
 
 				renderer.render( scene, camera );
 
