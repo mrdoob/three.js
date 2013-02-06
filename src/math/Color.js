@@ -86,69 +86,6 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
-	setHSV: function ( h, s, v ) {
-
-		// based on MochiKit implementation by Bob Ippolito
-		// h,s,v ranges are < 0.0 - 1.0 >
-
-		var i, f, p, q, t;
-
-		if ( v === 0 ) {
-
-			this.r = this.g = this.b = 0;
-
-		} else {
-
-			i = Math.floor( h * 6 );
-			f = ( h * 6 ) - i;
-			p = v * ( 1 - s );
-			q = v * ( 1 - ( s * f ) );
-			t = v * ( 1 - ( s * ( 1 - f ) ) );
-
-			if ( i === 0 ) {
-
-				this.r = v;
-				this.g = t;
-				this.b = p;
-
-			} else if ( i === 1 ) {
-
-				this.r = q;
-				this.g = v;
-				this.b = p;
-
-			} else if ( i === 2 ) {
-
-				this.r = p;
-				this.g = v;
-				this.b = t;
-
-			} else if ( i === 3 ) {
-
-				this.r = p;
-				this.g = q;
-				this.b = v;
-
-			} else if ( i === 4 ) {
-
-				this.r = t;
-				this.g = p;
-				this.b = v;
-
-			} else if ( i === 5 ) {
-
-				this.r = v;
-				this.g = p;
-				this.b = q;
-
-			}
-
-		}
-
-		return this;
-
-	},
-
 	setStyle: function ( style ) {
 
 		// rgb(255,0,0)
@@ -286,117 +223,64 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
-	getHSL: function ( hsl ) {
+	getHSL: function () {
 
-		// h,s,l ranges are in 0.0 - 1.0
+		var hsl = { h: 0, s: 0, l: 0 };
 
-		if ( hsl === undefined ) hsl = { h: 0, s: 0, l: 0 };
+		return function () {
 
-		var r = this.r, g = this.g, b = this.b;
+			// h,s,l ranges are in 0.0 - 1.0
 
-		var max = Math.max( r, g, b );
-		var min = Math.min( r, g, b );
+			var r = this.r, g = this.g, b = this.b;
 
-		var hue, saturation;
-		var lightness = ( min + max ) / 2.0;
+			var max = Math.max( r, g, b );
+			var min = Math.min( r, g, b );
 
-		if ( min === max ) {
+			var hue, saturation;
+			var lightness = ( min + max ) / 2.0;
 
-			hue = 0;
-			saturation = 0;
+			if ( min === max ) {
 
-		} else {
+				hue = 0;
+				saturation = 0;
 
-			var delta = max - min;
+			} else {
 
-			saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
+				var delta = max - min;
 
-			switch ( max ) {
+				saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
 
-				case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
-				case g: hue = ( b - r ) / delta + 2; break;
-				case b: hue = ( r - g ) / delta + 4; break;
+				switch ( max ) {
 
-			}
+					case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
+					case g: hue = ( b - r ) / delta + 2; break;
+					case b: hue = ( r - g ) / delta + 4; break;
 
-			hue /= 6;
+				}
 
-		}
-
-		hsl.h = hue;
-		hsl.s = saturation;
-		hsl.l = lightness;
-
-		return hsl;
-
-	},
-
-	getHSV: function ( hsv ) {
-
-		// based on MochiKit implementation by Bob Ippolito
-		// h,s,v ranges are < 0.0 - 1.0 >
-
-		var r = this.r;
-		var g = this.g;
-		var b = this.b;
-
-		var max = Math.max( Math.max( r, g ), b );
-		var min = Math.min( Math.min( r, g ), b );
-
-		var hue;
-		var saturation;
-		var value = max;
-
-		if ( min === max )	{
-
-			hue = 0;
-			saturation = 0;
-
-		} else {
-
-			var delta = ( max - min );
-			saturation = delta / max;
-
-			if ( r === max ) {
-
-				hue = ( g - b ) / delta;
-
-			} else if ( g === max ) {
-
-				hue = 2 + ( ( b - r ) / delta );
-
-			} else	{
-
-				hue = 4 + ( ( r - g ) / delta );
-			}
-
-			hue /= 6;
-
-			if ( hue < 0 ) {
-
-				hue += 1;
+				hue /= 6;
 
 			}
 
-			if ( hue > 1 ) {
+			hsl.h = hue;
+			hsl.s = saturation;
+			hsl.l = lightness;
 
-				hue -= 1;
+			return hsl;
 
-			}
+		};
 
-		}
+	}(),
 
-		if ( hsv === undefined ) {
+	offsetHSL: function ( h, s, l ) {
 
-			hsv = { h: 0, s: 0, v: 0 };
+		var hsl = this.getHSL();
 
-		}
+		hsl.h += h; hsl.s += s; hsl.l += l;
 
-		hsv.h = hue;
-		hsv.s = saturation;
-		hsv.v = value;
+		this.setHSL( hsl.h, hsl.s, hsl.l );
 
-		return hsv;
+		return this;
 
 	},
 

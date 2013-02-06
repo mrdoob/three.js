@@ -180,25 +180,3 @@ test( "setHSL", function () {
     ok( hsl.s == 1.00, "saturation: " + hsl.s );
     ok( hsl.l == 0.25, "lightness: " + hsl.l );
 });
-
-test( "getHSV", function(){
-    var c = new THREE.Color('maroon');
-    var hsv = c.getHSV();
-
-    ok( hsv.h == 0, "hue: " + hsv.h );
-    ok( hsv.s == 1, "saturation: " + hsv.s );
-    ok( (Math.round(parseFloat(hsv.v)*100)/100) == 0.5, 
-	"value: " + hsv.v );
-});
-
-test( "setHSV", function(){
-    var c = new THREE.Color();
-    c.setHSV(0, 1, 1);
-    var hsv = c.getHSV();
-    ok( hsv.h == 0, "hue: " + hsv.h );
-    ok( hsv.s == 1, "saturation: " + hsv.s );
-    ok( hsv.v == 1, "value: " + hsv.v );
-});
-
-// xxx todo more hsv tests
-
