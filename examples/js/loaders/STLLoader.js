@@ -7,8 +7,8 @@
  * Supports both binary and ASCII encoded files, with automatic detection of type.
  *
  * Limitations: Binary decoding ignores header. There doesn't seem to be much of a use for it.
- *              There is perhaps some question as to how valid it is to always assume little-endian-ness.
- *              ASCII decoding assumes file is UTF-8. Seems to work for the examples...
+ *				There is perhaps some question as to how valid it is to always assume little-endian-ness.
+ *				ASCII decoding assumes file is UTF-8. Seems to work for the examples...
  *
  * Usage:
  * 	var loader = new THREE.STLLoader();
@@ -61,47 +61,44 @@ THREE.STLLoader.prototype = {
 		}, false );
 
 		request.open( 'GET', url, true );
-        request.responseType = "arraybuffer";
+		request.responseType = "arraybuffer";
 		request.send( null );
 
 	},
 
-    bin2str: function (buf) {
+	bin2str: function (buf) {
 
-        var array_buffer = new Uint8Array(buf);
-        var str = '';
-        for(var i = 0; i < buf.byteLength; i++) {
-            str += String.fromCharCode(array_buffer[i]); // implicitly assumes little-endian
-        }
-        return str
+		var array_buffer = new Uint8Array(buf);
+		var str = '';
+		for(var i = 0; i < buf.byteLength; i++) {
+			str += String.fromCharCode(array_buffer[i]); // implicitly assumes little-endian
+		}
+		return str
+
+	},
+
+	isASCII: function(buf){
+
+		var dv = new DataView(buf);
+		var str = '';
+		for(var i = 0; i < 5; i++) {
+			str += String.fromCharCode(dv.getUint8(i, true)); // assume little-endian
+		}
+		return (str.toLowerCase() === 'solid'); // All ASCII stl files begin with 'solid'
 
     },
 
-    isASCII: function(buf){
+	parse: function (buf) {
 
-        var dv = new DataView(buf);
-        var str = '';
-        for(var i = 0; i < 5; i++) {
-            str += String.fromCharCode(dv.getUint8(i, true)); // assume little-endian
-        }
-        return (str.toLowerCase() == 'solid'); // All ASCII stl files begin with 'solid'
-
-    },
-
-
-    parse: function (buf) {
-
-        if( this.isASCII(buf) )
-        {
-            var str = this.bin2str(buf);
-            console.log("Detected ASCII stl file.");
-            return this.parseASCII(str);
-        }
-        else
-        {
-            console.log("Detected Binary stl file.");
-            return this.parseBinary(buf);
-        }
+		if( this.isASCII(buf) )
+		{
+			var str = this.bin2str(buf);
+			return this.parseASCII(str);
+		}
+		else
+		{
+			return this.parseBinary(buf);
+		}
 
     },
 
@@ -146,51 +143,53 @@ THREE.STLLoader.prototype = {
 
 	},
 
-    parseBinary: function (buf) {
+	parseBinary: function (buf) {
 
-        // STL binary format specification, as per http://en.wikipedia.org/wiki/STL_(file_format)
-        //
-        // UINT8[80] – Header
-        // UINT32 – Number of triangles
-        //
-        // foreach triangle
-        //   REAL32[3] – Normal vector
-        //   REAL32[3] – Vertex 1
-        //   REAL32[3] – Vertex 2
-        //   REAL32[3] – Vertex 3
-        //   UINT16 – Attribute byte count
-        // end
-        //
+		// STL binary format specification, as per http://en.wikipedia.org/wiki/STL_(file_format)
+		//
+		// UINT8[80] – Header
+		// UINT32 – Number of triangles
+		//
+		// foreach triangle
+		//   REAL32[3] – Normal vector
+		//   REAL32[3] – Vertex 1
+		//   REAL32[3] – Vertex 2
+		//   REAL32[3] – Vertex 3
+		//   UINT16 – Attribute byte count
+		// end
+		//
 
-        var geometry = new THREE.Geometry();
+		var geometry = new THREE.Geometry();
 
-        var header_length = 80;
-        var data_offset = 84;
-        var face_length = 12*4 + 2;
+		var headerLength = 80;
+		var dataOffset = 84;
+		var faceLength = 12*4 + 2;
 
-        var header        = new Uint8Array(buf, 0, header_length);
-        var num_triangles = new Uint32Array(buf, header_length, 1);
+		var le = true; // is little-endian  // This might be processor dependent...
 
-        var le = true; // is little-endian?  // This might be processor dependent...
-        for (var i = 0; i < num_triangles[0]; i++) {
+		// var header = new Uint8Array(buf, 0, headerLength); // not presently used
+		var dvTriangleCount = new DataView(buf, headerLength, 4);
+		var numTriangles = dvTriangleCount.getUint32(0, le);
 
-            var dv = new DataView(buf, data_offset + i*face_length, face_length);
+		for (var i = 0; i < numTriangles; i++) {
 
-            var normal = new THREE.Vector3( dv.getFloat32(0, le), dv.getFloat32(4, le), dv.getFloat32(8, le) );
+			var dv = new DataView(buf, dataOffset + i*faceLength, faceLength);
 
-            for(var v = 3; v < 12; v+=3) {
+			var normal = new THREE.Vector3( dv.getFloat32(0, le), dv.getFloat32(4, le), dv.getFloat32(8, le) );
 
-                geometry.vertices.push( new THREE.Vector3( dv.getFloat32(v*4, le), dv.getFloat32((v+1)*4, le), dv.getFloat32( (v+2)*4, le ) ) );
+			for(var v = 3; v < 12; v+=3) {
 
-            }
-            var len = geometry.vertices.length;
-            geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal ) );
-        }
+				geometry.vertices.push( new THREE.Vector3( dv.getFloat32(v*4, le), dv.getFloat32((v+1)*4, le), dv.getFloat32( (v+2)*4, le ) ) );
 
-        geometry.computeCentroids();
-        geometry.computeBoundingSphere();
+			}
+			var len = geometry.vertices.length;
+			geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal ) );
+		}
 
-        return geometry;
-    }
+		geometry.computeCentroids();
+		geometry.computeBoundingSphere();
+
+		return geometry;
+	}
 
 };
