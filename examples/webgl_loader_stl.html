@@ -24,12 +24,33 @@
 			}
 
 			a { color: skyblue }
+			.button { background:#999; color:#eee; padding:0.2em 0.5em; cursor:pointer }
+			.highlight { background:orange; color:#fff; }
+
+			span {
+				display: inline-block;
+				width: 60px;
+				float: left;
+				text-align: center;
+			}
+
 		</style>
 	</head>
 	<body>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> -
 			STL loader test by <a href="https://github.com/aleeper">aleeper</a>
+
+			<p></p>
+			<div style="display:inline-block; width:310px; text-align: left" >
+				<span id="clickBinary" class="button highlight" >Binary</span>
+				&nbsp- PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
+			</div>
+			<p></p>
+			<div style="display:inline-block; width:310px; text-align: left" >
+				<span id="clickASCII" class="button" >ASCII</span>
+				&nbsp- A simple CAD part.
+			</div>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -45,7 +66,9 @@
 
 			var container, stats;
 
-			var camera, scene, renderer, objects;
+			var camera, scene, renderer, objects = [];
+
+            var buttonBinary, buttonASCII;
 
 			init();
 			animate();
@@ -54,6 +77,12 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
+
+				// Set up buttons
+				buttonBinary= document.getElementById('clickBinary');
+				buttonBinary.addEventListener( "click", loadBinaryExample, false );
+				buttonASCII  = document.getElementById('clickASCII');
+				buttonASCII.addEventListener( "click", loadASCIIExample, false );
 
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 15 );
 				camera.position.set( 3, 0.5, 3 );
@@ -94,21 +123,7 @@
 				plane.receiveShadow = true;
 
 				// Object
-
-				var loader = new THREE.STLLoader();
-				loader.addEventListener( 'load', function ( event ) {
-
-					var geometry = event.content;
-					var material = new THREE.MeshPhongMaterial( { ambient: 0xff5533, color: 0xff5533, specular: 0x111111, shininess: 200 } );
-					var mesh = new THREE.Mesh( geometry, material );
-
-					mesh.castShadow = true;
-					mesh.receiveShadow = true;
-
-					scene.add( mesh );
-
-				} );
-				loader.load( './models/stl/slotted_disk.stl' );
+				loadBinaryExample();
 
 				// Lights
 
@@ -181,7 +196,69 @@
 
 			}
 
-			//
+			function loadBinaryExample() {
+				buttonBinary.className = "button highlight";
+				buttonASCII.className = "button";
+
+				// Clear out old objects
+				for(var i = 0; i < objects.length; i++)
+					scene.remove(objects[i]);
+
+				var scale = 2.0;
+				var material = new THREE.MeshPhongMaterial( { ambient: 0x555555, color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+
+				loadFile('./models/stl/binary/pr2_head_pan.stl', scale, new THREE.Vector3(0,0,0), new THREE.Vector3(-Math.PI/2, 0, 0), material);
+				loadFile('./models/stl/binary/pr2_head_tilt.stl', scale, new THREE.Vector3(0.068*scale, 0, 0), new THREE.Vector3(-Math.PI/2, 0.3, 0), material);
+
+			}
+
+			function loadASCIIExample() {
+				buttonBinary.className = "button";
+				buttonASCII.className = "button highlight";
+
+				// Clear out old objects
+				for(var i = 0; i < objects.length; i++)
+					scene.remove(objects[i]);
+
+				loadFile('./models/stl/ascii/slotted_disk.stl', 1.0, null, new THREE.Vector3(-Math.PI/2, 0, 0));
+
+			}
+
+			function loadFile( filename, scale, offset, rotate, material ) {
+
+				if(scale == null)
+					scale = 1.0;
+
+				if(offset == null)
+					offset = new THREE.Vector3(0,0,0);
+
+				if(rotate == null)
+					rotate = new THREE.Vector3(0,0,0);
+
+				if(material == null)
+					material = new THREE.MeshPhongMaterial( { ambient: 0xff5533, color: 0xff5533, specular: 0x111111, shininess: 200 } );
+
+
+				var loader = new THREE.STLLoader();
+				loader.addEventListener( 'load', function ( event ) {
+
+					var geometry = event.content;
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.scale = new THREE.Vector3(scale, scale, scale);
+					mesh.position = offset;
+					mesh.rotation = rotate;
+
+					mesh.castShadow = true;
+					mesh.receiveShadow = true;
+
+					objects.push(mesh);
+					scene.add( objects[ objects.length - 1 ] );
+
+				} );
+				loader.load( filename );
+
+			}
 
 			function animate() {
 
@@ -196,8 +273,8 @@
 
 				var timer = Date.now() * 0.0005;
 
-				camera.position.x = Math.cos( timer ) * 5;
-				camera.position.z = Math.sin( timer ) * 5;
+				camera.position.x = Math.cos( timer ) * 3;
+				camera.position.z = Math.sin( timer ) * 3;
 
 				camera.lookAt( scene.position );
 
