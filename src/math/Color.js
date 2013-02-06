@@ -52,6 +52,61 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
+	setHSL: function ( h, s, l ) {
+
+		// h,s,l ranges are in 0.0 - 1.0
+
+		var f = function ( v1, v2, vh ) {
+			var r;
+
+			if ( vh < 0 ) {
+				vh += 1;
+			}
+
+			if ( vh > 1 ) {
+				vh -= 1;
+			}
+
+			if ( vh < 1.0/6 ) {
+				r = v1 + ( v2 - v1 ) * 6 * vh;
+			} else if ( vh < 1.0/2 ) {
+				r = v2;
+			} else if ( vh < 2.0/3 ) {
+				r = v1 + ( v2 - v1 ) * 6 * ( 2.0/3 - vh );
+			} else {
+				r = v1;
+			}
+
+			return r;
+
+		};
+
+		if ( s === 0 ) {
+
+			this.r = this.g = this.b = l;
+
+		} else {
+
+			var p, q;
+
+			if ( l <= 0.5 ) {
+				p = l * ( 1.0 + s );
+			} else {
+				p = l + s - ( l * s );
+			}
+
+			q = ( 2.0 * l ) - p;
+
+			this.r = f( q, p, h + 1.0/3 );
+			this.g = f( q, p, h );
+			this.b = f( q, p, h - 1.0/3 );
+
+		}
+
+		return this;
+
+	},
+
 	setHSV: function ( h, s, v ) {
 
 		// based on MochiKit implementation by Bob Ippolito
@@ -248,7 +303,68 @@ THREE.extend( THREE.Color.prototype, {
 
 	getStyle: function () {
 
-		return 'rgb(' + ( ( this.r * 255 ) | 0 )  + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+
+	},
+
+	getHSL: function (hsl) {
+
+		// h,s,l ranges are in 0.0 - 1.0
+
+		var r = this.r;
+		var g = this.g;
+		var b = this.b;
+
+		var max = Math.max( Math.max( r, g ), b );
+		var min = Math.min( Math.min( r, g ), b );
+
+		var hue, saturation;
+		var lightness = ( min + max ) / 2.0;
+
+		if ( min === max ) {
+
+			hue = 0;
+			saturation = 0;
+
+		} else {
+
+			var delta = max - min;
+
+			if ( lightness <= 0.5 ) {
+				saturation = delta / ( max + min );
+			} else {
+				saturation = delta / ( 2 - max - min );
+			}
+
+			if ( r == max ) {
+				hue = ( g - b ) / delta;
+			} else if ( g == max ) {
+				hue = 2 + ( ( b - r ) / delta );
+			} else {
+				hue = 4 + ( ( r - g ) / delta );
+			}
+
+			hue /= 6;
+
+			if ( hue < 0 ) {
+				hue += 1;
+			}
+
+			if ( hue > 1 ) {
+				hue -= 1;
+			}
+
+		}
+
+		if ( hsl === undefined ) {
+			hsl = { h: 0, s: 0, l: 0 };
+		}
+
+		hsl.h = hue;
+		hsl.s = saturation;
+		hsl.l = lightness;
+
+		return hsl;
 
 	},
 
