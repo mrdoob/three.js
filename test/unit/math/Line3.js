@@ -39,7 +39,7 @@ test( "at", function() {
 	var a = new THREE.Line3( one3.clone(), new THREE.Vector3( 1, 1, 2 ) );
 
 	ok( a.at( -1 ).distanceTo( new THREE.Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
-	ok( a.at( 0 ).distanceTo( one3 ) < 0.0001, "Passed!" );
+	ok( a.at( 0 ).distanceTo( one3.clone() ) < 0.0001, "Passed!" );
 	ok( a.at( 1 ).distanceTo( new THREE.Vector3( 1, 1, 2 ) ) < 0.0001, "Passed!" );
 	ok( a.at( 2 ).distanceTo( new THREE.Vector3( 1, 1, 3 ) ) < 0.0001, "Passed!" );
 });
@@ -49,8 +49,7 @@ test( "closestPointToPoint", function() {
 	var a = new THREE.Line3( one3.clone(), new THREE.Vector3( 1, 1, 2 ) );
 
 	// nearby the ray
-	var b1 = a.closestPointToPoint( zero3 );
-	console.log( b1 );
+	var b1 = a.closestPointToPoint( zero3.clone() );
 	ok( b1.distanceTo( new THREE.Vector3( 1, 1, 1 ) ) < 0.0001, "Passed!" );
 
 	// nearby the ray
@@ -58,6 +57,6 @@ test( "closestPointToPoint", function() {
 	ok( b.distanceTo( new THREE.Vector3( 1, 1, 2 ) ) < 0.0001, "Passed!" );
 
 	// exactly on the ray
-	var c = a.closestPointToPoint( one3 );
-	ok( c.distanceTo( one3 ) < 0.0001, "Passed!" );
+	var c = a.closestPointToPoint( one3.clone() );
+	ok( c.distanceTo( one3.clone() ) < 0.0001, "Passed!" );
 });
