@@ -68,9 +68,9 @@ THREE.extend( THREE.Line3.prototype, {
 		var startP = new THREE.Vector3();
 		var startEnd = new THREE.Vector3();
 
-		return function ( point, optionalTarget ) {
+		return function ( point, clampToLine, optionalTarget ) {
 
-			var result = optionalTarget || new THREE.Vector3();
+			var result = optionalTarget || new THREE.Vector3();			
 
 			startP.subVectors( point, this.start );
 			startEnd.subVectors( this.end, this.start );
@@ -79,7 +79,12 @@ THREE.extend( THREE.Line3.prototype, {
 			var startEnd_startP = startEnd.dot( startP );
 
 			var t = startEnd_startP / startEnd2;
-	        t = THREE.Math.clamp( t, 0, 1 );
+
+			if( clampToLine ) {
+				
+	        	t = THREE.Math.clamp( t, 0, 1 );
+
+	        }
 
 	        return result.copy( startEnd ).multiplyScalar( t ).add( this.start );
 
