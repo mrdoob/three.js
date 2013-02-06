@@ -2,9 +2,9 @@
  * @author aleeper / http://adamleeper.com/
  * @author mrdoob / http://mrdoob.com/
  *
- * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
+ * Description: A THREE loader for STL files, as created by Solidworks and other CAD programs.
  *
- * Limitations: Currently supports ASCII format only
+ * Limitations: Currently supports ASCII and binary format
  *
  * Usage:
  * 	var loader = new THREE.STLLoader();
@@ -32,6 +32,7 @@ THREE.STLLoader.prototype = {
 
 		var scope = this;
 		var request = new XMLHttpRequest();
+		request.overrideMimeType("text/plain; charset=x-user-defined")
 
 		request.addEventListener( 'load', function ( event ) {
 
@@ -64,6 +65,9 @@ THREE.STLLoader.prototype = {
 
 		var geometry = new THREE.Geometry();
 
+		if(data[0].toUpperCase() == 'S')
+		{
+		
 		var patternFace = /facet([\s\S]*?)endfacet/g;
 		var result;
 
@@ -92,6 +96,56 @@ THREE.STLLoader.prototype = {
 			var len = geometry.vertices.length;
 			geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal ) );
 
+		}
+		
+		}
+		else
+		{
+			var buf = new ArrayBuffer(data.length);
+			var bbuf = new Int8Array(buf);
+			for(var i=0; i < data.length; ++i)
+			{
+				bbuf[i] = data.charCodeAt(i) & 0xff;
+			}
+			var headerEnd = 80;
+			
+			var numFacets = new Uint32Array(bbuf.buffer, headerEnd, 1)[0];
+			var offset = headerEnd + 4; //
+		
+			var facetSize = 50;
+			var slideBuf = new Int8Array(facetSize);
+			var n =  new Float32Array(slideBuf.buffer, 0, 3);
+			var v1 = new Float32Array(slideBuf.buffer, 12, 3);
+			var v2 = new Float32Array(slideBuf.buffer, 24, 3);
+			var v3 = new Float32Array(slideBuf.buffer, 36, 3);
+			var bc = new Int16Array(slideBuf.buffer, 48, 1);
+			for(var i=0; i < numFacets; ++i)
+			{			
+				for(var j=0; j < facetSize; ++j)
+				{
+					slideBuf[j] = bbuf[offset+j];
+				}
+				
+				var normal = new THREE.Vector3(n[0], n[1], n[2]);
+				var vt1 = new THREE.Vector3(v1[0], v1[1], v1[2]);
+				var vt2 = new THREE.Vector3(v2[0], v2[1], v2[2]);
+				var vt3 = new THREE.Vector3(v3[0], v3[1], v3[2]);
+
+				geometry.vertices.push(vt1);
+				geometry.vertices.push(vt2);
+				geometry.vertices.push(vt3);
+				
+				var len = geometry.vertices.length;
+				geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal) );
+				
+				offset += facetSize;
+			}
+		
+			delete slideBuf;
+			delete bbuf;
+			delete buf;
+			buf = null;
+		}
 		}
 
 		geometry.computeCentroids();
