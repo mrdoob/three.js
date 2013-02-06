@@ -128,7 +128,6 @@ var list = {
 		],
 
 		"Extras": [
-			[ "ColorUtils", "api/extras/ColorUtils" ],
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
 			[ "ImageUtils", "api/extras/ImageUtils" ],

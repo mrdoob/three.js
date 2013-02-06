@@ -157,29 +157,26 @@ test( "getHexString", function(){
 });
 
 test( "getStyle", function(){
-    var c = new THREE.Color('plum');    
+    var c = new THREE.Color('plum');
     var res = c.getStyle();
     ok( res == 'rgb(221,160,221)', "style: " + res );
 });
 
-test( "getHSV", function(){
-    var c = new THREE.Color('maroon');    
-    var hsv = c.getHSV();
+test( "getHSL", function () {
+    var c = new THREE.Color( 0x80ffff );
+    var hsl = c.getHSL();
 
-    ok( hsv.h == 0, "hue: " + hsv.h );
-    ok( hsv.s == 1, "saturation: " + hsv.s );
-    ok( (Math.round(parseFloat(hsv.v)*100)/100) == 0.5, 
-	"value: " + hsv.v );
+    ok( hsl.h == 0.5, "hue: " + hsl.h );
+    ok( hsl.s == 1.0, "saturation: " + hsl.s );
+    ok( (Math.round(parseFloat(hsl.l)*100)/100) == 0.75, "lightness: " + hsl.l );
 });
 
-test( "setHSV", function(){
-    var c = new THREE.Color();    
-    c.setHSV(0, 1, 1);
-    var hsv = c.getHSV();
-    ok( hsv.h == 0, "hue: " + hsv.h );
-    ok( hsv.s == 1, "saturation: " + hsv.s );
-    ok( hsv.v == 1, "value: " + hsv.v );
+test( "setHSL", function () {
+    var c = new THREE.Color();
+    c.setHSL(0.75, 1.0, 0.25);
+    var hsl = c.getHSL();
+
+    ok( hsl.h == 0.75, "hue: " + hsl.h );
+    ok( hsl.s == 1.00, "saturation: " + hsl.s );
+    ok( hsl.l == 0.25, "lightness: " + hsl.l );
 });
-
-// xxx todo more hsv tests
-

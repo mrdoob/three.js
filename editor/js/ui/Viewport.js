@@ -676,7 +676,8 @@ var Viewport = function ( signals ) {
 
 		}
 
-		var output = new object.exporter().parse( selected.geometry );
+		var exporter = new object.exporter();
+		var output = exporter.parse( selected.geometry );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
@@ -686,12 +687,10 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.exportScene.add( function () {
+	signals.exportScene.add( function ( object ) {
 
-		var clearColor = renderer.getClearColor();
-		var clearAlpha = renderer.getClearAlpha();
-
-		var output = new THREE.SceneExporter().parse( scene, clearColor, clearAlpha );
+		var exporter = new object.exporter();
+		var output = exporter.parse( scene );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );

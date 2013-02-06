@@ -142,14 +142,12 @@
 				function addLight( h, s, v, x, y, z ) {
 
 					var light = new THREE.PointLight( 0xffffff, 1.5, 4500 );
+					light.color.setHSV( h, s, v );
 					light.position.set( x, y, z );
 					scene.add( light );
 
-					light.color.setHSV( h, s, v );
-
 					var flareColor = new THREE.Color( 0xffffff );
-					flareColor.copy( light.color );
-					THREE.ColorUtils.adjustHSV( flareColor, 0, -0.5, 0.5 );
+					flareColor.setHSV( h, s - 0.5, v + 0.5 );
 
 					var lensFlare = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
 
