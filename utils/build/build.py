@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 
+import sys
+
+if sys.version_info < (2, 7):
+	print("This script requires at least Python 2.7.")
+	print("Please, update to a newer version: http://www.python.org/download/releases/")
+	exit()
+
 import argparse
 import json
 import os
 import shutil
-import sys
 import tempfile
 
 
@@ -14,7 +20,7 @@ def main(argv=None):
 	parser.add_argument('--include', action='append', required=True)
 	parser.add_argument('--externs', action='append', default=['externs/common.js'])
 	parser.add_argument('--minify', action='store_true', default=False)
-	parser.add_argument('--output', default='../build/three.js')
+	parser.add_argument('--output', default='../../build/three.js')
 	parser.add_argument('--sourcemaps', action='store_true', default=False)
 
 	args = parser.parse_args()
@@ -41,6 +47,7 @@ def main(argv=None):
 	for include in args.include:
 		with open('includes/' + include + '.json','r') as f: files = json.load(f)
 		for filename in files:
+			filename = '../../' + filename;
 			sources.append(filename)
 			with open(filename, 'r') as f: tmp.write(f.read())
 
@@ -49,8 +56,8 @@ def main(argv=None):
 	# save
 
 	if args.minify is False:
-			shutil.copy(path, output)
-			os.chmod(output, 0o664); # temp files would usually get 0600
+		shutil.copy(path, output)
+		os.chmod(output, 0o664); # temp files would usually get 0600
 
 	else:
 

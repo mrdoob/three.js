@@ -4,7 +4,7 @@
  * @author julianwa / https://github.com/julianwa
  */
 
-THREE.Projector = function() {
+THREE.Projector = function () {
 
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
@@ -110,7 +110,7 @@ THREE.Projector = function() {
 
 						} else {
 
-							_vector3.copy( object.matrixWorld.getPosition() );
+							_vector3.getPositionFromMatrix( object.matrixWorld );
 							_vector3.applyProjection( _viewProjectionMatrix );
 							_object.z = _vector3.z;
 
@@ -133,7 +133,7 @@ THREE.Projector = function() {
 
 					} else {
 
-						_vector3.copy( object.matrixWorld.getPosition() );
+						_vector3.getPositionFromMatrix( object.matrixWorld );
 						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 
@@ -152,7 +152,7 @@ THREE.Projector = function() {
 
 					} else {
 
-						_vector3.copy( object.matrixWorld.getPosition() );
+						_vector3.getPositionFromMatrix( object.matrixWorld );
 						_vector3.applyProjection( _viewProjectionMatrix );
 						_object.z = _vector3.z;
 

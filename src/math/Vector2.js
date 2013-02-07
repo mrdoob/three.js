@@ -12,9 +12,7 @@ THREE.Vector2 = function ( x, y ) {
 
 };
 
-THREE.Vector2.prototype = {
-
-	constructor: THREE.Vector2,
+THREE.extend( THREE.Vector2.prototype, {
 
 	set: function ( x, y ) {
 
@@ -295,10 +293,16 @@ THREE.Vector2.prototype = {
 
 	},
 
+	toArray: function () {
+
+		return [ this.x, this.y ];
+		
+	},
+
 	clone: function () {
 
 		return new THREE.Vector2( this.x, this.y );
 
 	}
 
-};
+} );
