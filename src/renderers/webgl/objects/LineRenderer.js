@@ -1,163 +1,137 @@
 
+THREE.WebGLRenderer.LineRenderer = function ( lowlevelrenderer, info ) {
 
-THREE.WebGLRenderer.LineRenderer = function(lowlevelrenderer, info){
 	THREE.WebGLRenderer.Object3DRenderer.call( this, lowlevelrenderer, info );
-};
 
+};
 
 THREE.WebGLRenderer.LineRenderer.prototype = Object.create( THREE.WebGLRenderer.Object3DRenderer.prototype );
 
-THREE.WebGLRenderer.LineRenderer.prototype.createBuffers = function( geometry ) {
+THREE.extend( THREE.WebGLRenderer.LineRenderer.prototype, {
 
-	var renderer = this.renderer;
-	geometry.__webglVertexBuffer = renderer.createBuffer();
-	geometry.__webglColorBuffer = renderer.createBuffer();
-	geometry.__webglLineDistanceBuffer = renderer.createBuffer();
+	createBuffers: function ( geometry ) {
 
-	this.info.memory.geometries ++;
-};
+		var renderer = this.renderer;
+		geometry.__webglVertexBuffer = renderer.createBuffer();
+		geometry.__webglColorBuffer = renderer.createBuffer();
+		geometry.__webglLineDistanceBuffer = renderer.createBuffer();
 
-THREE.WebGLRenderer.LineRenderer.prototype.initBuffers = function( geometry, object ) {
+		this.info.memory.geometries ++;
 
-	var nvertices = geometry.vertices.length;
+	},
 
-	geometry.__vertexArray = new Float32Array( nvertices * 3 );
-	geometry.__colorArray = new Float32Array( nvertices * 3 );
-	geometry.__lineDistanceArray = new Float32Array( nvertices * 1 );
+	initBuffers: function ( geometry, object ) {
 
-	geometry.__webglLineCount = nvertices;
+		var nvertices = geometry.vertices.length;
 
-	this.initCustomAttributes ( geometry, object );
-};
+		geometry.__vertexArray = new Float32Array( nvertices * 3 );
+		geometry.__colorArray = new Float32Array( nvertices * 3 );
+		geometry.__lineDistanceArray = new Float32Array( nvertices * 1 );
 
+		geometry.__webglLineCount = nvertices;
 
-THREE.WebGLRenderer.LineRenderer.prototype.setBuffers = function( geometry, object) {
+		this.initCustomAttributes ( geometry, object );
 
-	var renderer = this.renderer;
-	var v, c, d, vertex, offset, color,
+	},
 
-	vertices = geometry.vertices,
-	colors = geometry.colors,
-	lineDistances = geometry.lineDistances,
+	setBuffers: function ( geometry, object ) {
 
-	vl = vertices.length,
-	cl = colors.length,
-	dl = lineDistances.length,
+		var renderer = this.renderer;
+		var v, c, d, vertex, offset, color,
 
-	vertexArray = geometry.__vertexArray,
-	colorArray = geometry.__colorArray,
-	lineDistanceArray = geometry.__lineDistanceArray,
+		vertices = geometry.vertices,
+		colors = geometry.colors,
+		lineDistances = geometry.lineDistances,
 
-	dirtyVertices = geometry.verticesNeedUpdate,
-	dirtyColors = geometry.colorsNeedUpdate,
-	dirtyLineDistances = geometry.lineDistancesNeedUpdate,
+		vl = vertices.length,
+		cl = colors.length,
+		dl = lineDistances.length,
 
-	customAttributes = geometry.__webglCustomAttributesList,
+		vertexArray = geometry.__vertexArray,
+		colorArray = geometry.__colorArray,
+		lineDistanceArray = geometry.__lineDistanceArray,
 
-	i, il,
-	a, ca, cal, value,
-	customAttribute;
+		dirtyVertices = geometry.verticesNeedUpdate,
+		dirtyColors = geometry.colorsNeedUpdate,
+		dirtyLineDistances = geometry.lineDistancesNeedUpdate,
 
-	if ( dirtyVertices ) {
+		customAttributes = geometry.__webglCustomAttributesList,
 
-		for ( v = 0; v < vl; v ++ ) {
+		i, il,
+		a, ca, cal, value,
+		customAttribute;
 
-			vertex = vertices[ v ];
+		if ( dirtyVertices ) {
 
-			offset = v * 3;
+			for ( v = 0; v < vl; v ++ ) {
 
-			vertexArray[ offset ]     = vertex.x;
-			vertexArray[ offset + 1 ] = vertex.y;
-			vertexArray[ offset + 2 ] = vertex.z;
+				vertex = vertices[ v ];
 
-		}
+				offset = v * 3;
 
-		renderer.setDynamicArrayBuffer(geometry.__webglVertexBuffer,vertexArray);
+				vertexArray[ offset ]     = vertex.x;
+				vertexArray[ offset + 1 ] = vertex.y;
+				vertexArray[ offset + 2 ] = vertex.z;
 
-	}
+			}
 
-	if ( dirtyColors ) {
-
-		for ( c = 0; c < cl; c ++ ) {
-
-			color = colors[ c ];
-
-			offset = c * 3;
-
-			colorArray[ offset ]     = color.r;
-			colorArray[ offset + 1 ] = color.g;
-			colorArray[ offset + 2 ] = color.b;
+			renderer.setDynamicArrayBuffer(geometry.__webglVertexBuffer,vertexArray);
 
 		}
 
-		renderer.setDynamicArrayBuffer(geometry.__webglColorBuffer,colorArray);
+		if ( dirtyColors ) {
 
-	}
+			for ( c = 0; c < cl; c ++ ) {
 
-	if ( dirtyLineDistances ) {
+				color = colors[ c ];
 
-		for ( d = 0; d < dl; d ++ ) {
+				offset = c * 3;
 
-			lineDistanceArray[ d ] = lineDistances[ d ];
+				colorArray[ offset ]     = color.r;
+				colorArray[ offset + 1 ] = color.g;
+				colorArray[ offset + 2 ] = color.b;
+
+			}
+
+			renderer.setDynamicArrayBuffer(geometry.__webglColorBuffer,colorArray);
 
 		}
 
-		renderer.setDynamicArrayBuffer( geometry.__webglLineDistanceBuffer,lineDistanceArray);
+		if ( dirtyLineDistances ) {
 
-	}
+			for ( d = 0; d < dl; d ++ ) {
 
-	if ( customAttributes ) {
+				lineDistanceArray[ d ] = lineDistances[ d ];
 
-		for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
+			}
 
-			customAttribute = customAttributes[ i ];
+			renderer.setDynamicArrayBuffer( geometry.__webglLineDistanceBuffer,lineDistanceArray);
 
-			if ( customAttribute.needsUpdate &&
-				 ( customAttribute.boundTo === undefined ||
-				   customAttribute.boundTo === "vertices" ) ) {
+		}
 
-				offset = 0;
+		if ( customAttributes ) {
 
-				cal = customAttribute.value.length;
+			for ( i = 0, il = customAttributes.length; i < il; i ++ ) {
 
-				if ( customAttribute.size === 1 ) {
+				customAttribute = customAttributes[ i ];
 
-					for ( ca = 0; ca < cal; ca ++ ) {
+				if ( customAttribute.needsUpdate &&
+					 ( customAttribute.boundTo === undefined ||
+					   customAttribute.boundTo === "vertices" ) ) {
 
-						customAttribute.array[ ca ] = customAttribute.value[ ca ];
+					offset = 0;
 
-					}
+					cal = customAttribute.value.length;
 
-				} else if ( customAttribute.size === 2 ) {
-
-					for ( ca = 0; ca < cal; ca ++ ) {
-
-						value = customAttribute.value[ ca ];
-
-						customAttribute.array[ offset ] 	= value.x;
-						customAttribute.array[ offset + 1 ] = value.y;
-
-						offset += 2;
-
-					}
-
-				} else if ( customAttribute.size === 3 ) {
-
-					if ( customAttribute.type === "c" ) {
+					if ( customAttribute.size === 1 ) {
 
 						for ( ca = 0; ca < cal; ca ++ ) {
 
-							value = customAttribute.value[ ca ];
-
-							customAttribute.array[ offset ] 	= value.r;
-							customAttribute.array[ offset + 1 ] = value.g;
-							customAttribute.array[ offset + 2 ] = value.b;
-
-							offset += 3;
+							customAttribute.array[ ca ] = customAttribute.value[ ca ];
 
 						}
 
-					} else {
+					} else if ( customAttribute.size === 2 ) {
 
 						for ( ca = 0; ca < cal; ca ++ ) {
 
@@ -165,36 +139,68 @@ THREE.WebGLRenderer.LineRenderer.prototype.setBuffers = function( geometry, obje
 
 							customAttribute.array[ offset ] 	= value.x;
 							customAttribute.array[ offset + 1 ] = value.y;
-							customAttribute.array[ offset + 2 ] = value.z;
 
-							offset += 3;
+							offset += 2;
+
+						}
+
+					} else if ( customAttribute.size === 3 ) {
+
+						if ( customAttribute.type === "c" ) {
+
+							for ( ca = 0; ca < cal; ca ++ ) {
+
+								value = customAttribute.value[ ca ];
+
+								customAttribute.array[ offset ] 	= value.r;
+								customAttribute.array[ offset + 1 ] = value.g;
+								customAttribute.array[ offset + 2 ] = value.b;
+
+								offset += 3;
+
+							}
+
+						} else {
+
+							for ( ca = 0; ca < cal; ca ++ ) {
+
+								value = customAttribute.value[ ca ];
+
+								customAttribute.array[ offset ] 	= value.x;
+								customAttribute.array[ offset + 1 ] = value.y;
+								customAttribute.array[ offset + 2 ] = value.z;
+
+								offset += 3;
+
+							}
+
+						}
+
+					} else if ( customAttribute.size === 4 ) {
+
+						for ( ca = 0; ca < cal; ca ++ ) {
+
+							value = customAttribute.value[ ca ];
+
+							customAttribute.array[ offset ] 	 = value.x;
+							customAttribute.array[ offset + 1  ] = value.y;
+							customAttribute.array[ offset + 2  ] = value.z;
+							customAttribute.array[ offset + 3  ] = value.w;
+
+							offset += 4;
 
 						}
 
 					}
 
-				} else if ( customAttribute.size === 4 ) {
-
-					for ( ca = 0; ca < cal; ca ++ ) {
-
-						value = customAttribute.value[ ca ];
-
-						customAttribute.array[ offset ] 	 = value.x;
-						customAttribute.array[ offset + 1  ] = value.y;
-						customAttribute.array[ offset + 2  ] = value.z;
-						customAttribute.array[ offset + 3  ] = value.w;
-
-						offset += 4;
-
-					}
+					renderer.setDynamicArrayBuffer( customAttribute.buffer,customAttribute.array);
 
 				}
-
-				renderer.setDynamicArrayBuffer( customAttribute.buffer,customAttribute.array);
 
 			}
 
 		}
 
 	}
-};
+
+} );
