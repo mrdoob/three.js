@@ -21130,7 +21130,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 /*global THREE:false */
 
-THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
+THREE.WebGLRenderer.LowLevelRenderer = function ( parameters ) {
 
 	parameters = parameters || {};
 
@@ -21310,7 +21310,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setDefaultGLState () {
 
@@ -21331,7 +21331,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
 
 	// Fallback filters for non-power-of-2 textures
 
@@ -21345,67 +21345,67 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		return _gl.LINEAR;
 
-	};
+	}
 
 	function getContext() {
 
 		return _gl;
 
-	};
+	}
 
 	function getDomElement(){
 
 		return _canvas;
 
-	};
+	}
 
 	function getPrecision() {
 
 		return _precision;
 
-	};
+	}
 
 	function getCurrentWidth(){
 
 		return _currentWidth;
 
-	};
+	}
 
 	function getCurrentHeight(){
 
 		return _currentHeight;
 
-	};
+	}
 
 	function supportsVertexTextures() {
 
 		return _supportsVertexTextures;
 
-	};
+	}
 
 	function supportsFloatTextures() {
 
 		return _glExtensionTextureFloat;
 
-	};
+	}
 
 	function supportsStandardDerivatives() {
 
 		return _glExtensionStandardDerivatives;
 
-	};
+	}
 
 	function supportsCompressedTextureS3TC() {
 
 		return _glExtensionCompressedTextureS3TC;
 
-	};
+	}
 
 	function getMaxAnisotropy() {
 
 		return _maxAnisotropy;
 
-	};
+	}
 
 	function setSize( width, height ) {
 
@@ -21414,7 +21414,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		setViewport( 0, 0, _canvas.width, _canvas.height );
 
-	};
+	}
 
 	function setViewport( x, y, width, height ) {
 
@@ -21426,19 +21426,19 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
-	};
+	}
 
 	function setScissor( x, y, width, height ) {
 
 		_gl.scissor( x, y, width, height );
 
-	};
+	}
 
 	function enableScissorTest( enable ) {
 
 		enable ? _gl.enable( _gl.SCISSOR_TEST ) : _gl.disable( _gl.SCISSOR_TEST );
 
-	};
+	}
 
 	// Clearing
 
@@ -21449,7 +21449,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
 
 	function setClearColor( color, alpha ) {
 
@@ -21458,19 +21458,19 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
-	};
+	}
 
 	function getClearColor() {
 
 		return _clearColor;
 
-	};
+	}
 
 	function getClearAlpha() {
 
 		return _clearAlpha;
 
-	};
+	}
 
 	function clear( color, depth, stencil ) {
 
@@ -21482,115 +21482,146 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		_gl.clear( bits );
 
-	};
+	}
 
 	function clearTarget( renderTarget, color, depth, stencil ) {
 
 		setRenderTarget( renderTarget );
 		clear( color, depth, stencil );
 
-	};
+	}
 
 	function deleteBuffer(buffer){
+
 		_gl.deleteBuffer(buffer);
-	};
+
+	}
 
 	function deleteTexture(texture){
+
 		_gl.deleteTexture( texture );
-	};
+
+	}
 
 	function deleteFramebuffer(Framebuffer){
+
 		_gl.deleteFramebuffer(Framebuffer);
-	};
+
+	}
 
 	function deleteRenderbuffer(RenderBuffer){
+
 		_gl.deleteRenderbuffer(RenderBuffer);
-	};
+
+	}
 
 	function deleteProgram(RenderBuffer){
+
 		_gl.deleteProgram(RenderBuffer);
-	};
+
+	}
 
 	function createBuffer(){
+
 		return _gl.createBuffer();
-	};
+
+	}
 
 	function setStaticArrayBuffer(buffer,data){
 
 		bindArrayBuffer( buffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, data, _gl.STATIC_DRAW );
 
-	};
+	}
 
 	function setStaticIndexBuffer(buffer,data){
 
 		bindElementArrayBuffer( buffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, data, _gl.STATIC_DRAW );
 
-	};
+	}
 
 	function setDynamicArrayBuffer(buffer,data){
 
 		bindArrayBuffer( buffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, data, _gl.DYNAMIC_DRAW );
 
-	};
+	}
 
 	function setDynamicIndexBuffer(buffer,data){
 
 		bindElementArrayBuffer( buffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, data, _gl.DYNAMIC_DRAW );
 
-	};
+	}
 
 	function drawTriangles(count){
+
 		_gl.drawArrays( _gl.TRIANGLES, 0, count );
-	};
+
+	}
 
 	function drawTriangleStrip(count){
+
 		_gl.drawArrays( _gl.TRIANGLE_STRIP, 0, count );
-	};
+
+	}
 
 	function drawLines(count){
+
 		_gl.drawArrays( _gl.LINES, 0, count );
-	};
+
+	}
 
 	function drawLineStrip(count){
+
 		_gl.drawArrays( _gl.LINE_STRIP, 0, count );
-	};
+
+	}
 
 	function drawPoints(count){
+
 		_gl.drawArrays( _gl.POINTS, 0, count );
-	};
+
+	}
 
 	function drawTriangleElements(buffer,count,offset){
+
 		bindElementArrayBuffer( buffer );
 		_gl.drawElements( _gl.TRIANGLES, count, _gl.UNSIGNED_SHORT, offset ); // 2 bytes per Uint16
-	};
+
+	}
 
 	function drawLineElements(buffer,count,offset){
+
 		bindElementArrayBuffer(  buffer );
 		_gl.drawElements( _gl.LINES, count, _gl.UNSIGNED_SHORT, offset ); // 2 bytes per Uint16
-	};
 
+	}
 
 	var _boundBuffer;
+
 	function bindArrayBuffer(buffer){
+
 		if (_boundBuffer != buffer){
+
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
 			_boundBuffer = buffer;
+
 		}
 
-	};
+	}
 
 	function bindElementArrayBuffer(buffer){
 
 		if (_boundBuffer != buffer){
+
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer );
 			_boundBuffer = buffer;
+
 		}
 
-	};
+	}
 
 	function enableAttribute( attribute ) {
 
@@ -21601,7 +21632,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function disableAttributes() {
 
@@ -21616,10 +21647,12 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function getAttribLocation( program, id ){
+
 		return _gl.getAttribLocation( program, id );
+
 	}
 
 	function setFloatAttribute(index,buffer,size,offset){
@@ -21628,7 +21661,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 		enableAttribute( index );
 		_gl.vertexAttribPointer( index, size, _gl.FLOAT, false, 0, offset );
 
-	};
+	}
 
 	function getUniformLocation( program, id ){
 
@@ -21640,91 +21673,91 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		_gl.uniform1i( uniform, value );
 
-	};
+	}
 
 	function uniform1f(uniform,value){
 
 		_gl.uniform1f( uniform, value );
 
-	};
+	}
 
 	function uniform2f(uniform,value1, value2){
 
 		_gl.uniform2f( uniform, value1, value2 );
 
-	};
+	}
 
 	function uniform3f(uniform, value1, value2, value3){
 
 		_gl.uniform3f( uniform, value1, value2, value3 );
 
-	};
+	}
 
 	function uniform4f(uniform, value1, value2, value3, value4){
 
 		_gl.uniform4f( uniform, value1, value2, value3, value4);
 
-	};
+	}
 
 	function uniform1iv(uniform,value){
 
 		_gl.uniform1iv( uniform, value );
 
-	};
+	}
 
 	function uniform2iv(uniform,value){
 
 		_gl.uniform2iv( uniform, value );
 
-	};
+	}
 
 	function uniform3iv(uniform,value){
 
 		_gl.uniform3iv( uniform, value );
 
-	};
+	}
 
 	function uniform1fv(uniform,value){
 
 		_gl.uniform1fv( uniform, value );
 
-	};
+	}
 
 	function uniform2fv(uniform,value){
 
 		_gl.uniform2fv( uniform, value );
 
-	};
+	}
 
 	function uniform3fv(uniform,value){
 
 		_gl.uniform3fv( uniform, value );
 
-	};
+	}
 
 	function uniform4fv(uniform,value){
 
 		_gl.uniform3fv( uniform, value );
 
-	};
+	}
 
 	function uniformMatrix3fv(location,value){
 
 		_gl.uniformMatrix3fv( location, false, value );
 
-	};
+	}
 
 	function uniformMatrix4fv(location,value){
 
 		_gl.uniformMatrix4fv( location, false, value );
 
-	};
+	}
 
 	function useProgram(program){
 
 		_gl.useProgram( program );
 
-	};
+	}
 
 	function setFaceCulling( cullFace, frontFaceDirection ) {
 
@@ -21762,7 +21795,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setMaterialFaces( material ) {
 
@@ -21801,7 +21834,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setPolygonOffset ( polygonoffset, factor, units ) {
 
@@ -21830,7 +21863,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setBlending( blending, blendEquation, blendSrc, blendDst ) {
 
@@ -21903,7 +21936,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setDepthTest( depthTest ) {
 
@@ -21923,7 +21956,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setDepthWrite( depthWrite ) {
 
@@ -21934,7 +21967,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setTexture( texture, slot ) {
 
@@ -22041,7 +22074,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setCubeTexture ( texture, slot ) {
 
@@ -22126,7 +22159,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	// Textures
 
@@ -22134,7 +22167,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		return ( value & ( value - 1 ) ) === 0;
 
-	};
+	}
 
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
 
@@ -22167,14 +22200,14 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setupFrameBuffer ( framebuffer, renderTarget, textureTarget ) {
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, renderTarget.__webglTexture, 0 );
 
-	};
+	}
 
 	function setupRenderBuffer ( renderbuffer, renderTarget  ) {
 
@@ -22202,7 +22235,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setRenderTarget( renderTarget ) {
 
@@ -22351,7 +22384,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 		_currentWidth = width;
 		_currentHeight = height;
 
-	};
+	}
 
 	function clampToMaxSize ( image, maxSize ) {
 
@@ -22377,7 +22410,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		return canvas;
 
-	};
+	}
 
 	function updateRenderTargetMipmap ( renderTarget ) {
 
@@ -22395,14 +22428,14 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
 	function setCubeTextureDynamic ( texture, slot ) {
 
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 		_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.__webglTexture );
 
-	};
+	}
 
 	// Map three.js constants to WebGL constants
 	function paramThreeToGL ( p ) {
@@ -22465,7 +22498,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		return 0;
 
-	};
+	}
 
 	function compileShader(vertexShader, fragmentShader){
 
@@ -22492,7 +22525,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		return program;
 
-	};
+	}
 
 	function resetState(){
 
@@ -22531,7 +22564,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		return shader;
 
-	};
+	}
 
 	function addLineNumbers ( string ) {
 
@@ -22548,7 +22581,7 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		return chunks.join( "\n" );
 
-	};
+	}
 
 	function setLineWidth ( width ) {
 
@@ -22560,511 +22593,522 @@ THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
 
 		}
 
-	};
+	}
 
-	this.context = _gl;
+	return {
 
-	this.autoScaleCubemaps = _autoScaleCubemaps;
-	this.supportsBoneTextures = _supportsBoneTextures;
-	this.precision = _precision;
-	this.maxVertexUniformVectors = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );	
+		context: _gl,
 
-	// Methods
-	this.getContext = getContext;
-	this.getDomElement = getDomElement;
-	this.getPrecision = getPrecision;
-	this.getCurrentWidth = getCurrentWidth;
-	this.getCurrentHeight = getCurrentHeight;
-	this.supportsVertexTextures = supportsVertexTextures;
-	this.supportsFloatTextures = supportsFloatTextures;
-	this.supportsStandardDerivatives = supportsStandardDerivatives;
-	this.supportsCompressedTextureS3TC = supportsCompressedTextureS3TC;
-	this.getMaxAnisotropy  = getMaxAnisotropy;
+		autoScaleCubemaps: _autoScaleCubemaps,
+		supportsBoneTextures: _supportsBoneTextures,
+		precision: _precision,
+		maxVertexUniformVectors: _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS ),
 
-	this.setRenderTarget = setRenderTarget;
-	this.setSize = setSize;
-	this.setViewport = setViewport;
-	this.setScissor = setScissor;
-	this.enableScissorTest = enableScissorTest;
+		// Methods
 
-	this.setClearColorHex = setClearColorHex;
-	this.setClearColor = setClearColor;
-	this.getClearColor = getClearColor;
-	this.getClearAlpha = getClearAlpha;
-	this.clear = clear;
-	this.clearTarget = clearTarget;
+		getContext: getContext,
+		getDomElement: getDomElement,
+		getPrecision: getPrecision,
+		getCurrentWidth: getCurrentWidth,
+		getCurrentHeight: getCurrentHeight,
+		supportsVertexTextures: supportsVertexTextures,
+		supportsFloatTextures: supportsFloatTextures,
+		supportsStandardDerivatives: supportsStandardDerivatives,
+		supportsCompressedTextureS3TC: supportsCompressedTextureS3TC,
+		getMaxAnisotropy: getMaxAnisotropy,
 
-	this.deleteBuffer = deleteBuffer;
-	this.deleteTexture = deleteTexture;
-	this.deleteFramebuffer = deleteFramebuffer;
-	this.deleteRenderbuffer = deleteRenderbuffer;
-	this.deleteProgram = deleteProgram;
+		setRenderTarget: setRenderTarget,
+		setSize: setSize,
+		setViewport: setViewport,
+		setScissor: setScissor,
+		enableScissorTest: enableScissorTest,
 
-	this.createBuffer = createBuffer;
-	this.setStaticArrayBuffer = setStaticArrayBuffer;
-	this.setStaticIndexBuffer = setStaticIndexBuffer;
-	this.setDynamicArrayBuffer = setDynamicArrayBuffer;
-	this.setDynamicIndexBuffer = setDynamicIndexBuffer;
+		setClearColorHex: setClearColorHex,
+		setClearColor: setClearColor,
+		getClearColor: getClearColor,
+		getClearAlpha: getClearAlpha,
+		clear: clear,
+		clearTarget: clearTarget,
 
-	this.drawTriangles = drawTriangles;
-	this.drawTriangleStrip = drawTriangleStrip;
-	this.drawLines = drawLines;
-	this.drawLineStrip = drawLineStrip;
-	this.drawPoints = drawPoints;
-	this.drawTriangleElements = drawTriangleElements;
-	this.drawLineElements = drawLineElements;
+		deleteBuffer: deleteBuffer,
+		deleteTexture: deleteTexture,
+		deleteFramebuffer: deleteFramebuffer,
+		deleteRenderbuffer: deleteRenderbuffer,
+		deleteProgram: deleteProgram,
 
-	this.bindArrayBuffer = bindArrayBuffer;
-	this.bindElementArrayBuffer = bindElementArrayBuffer;
+		createBuffer: createBuffer,
+		setStaticArrayBuffer: setStaticArrayBuffer,
+		setStaticIndexBuffer: setStaticIndexBuffer,
+		setDynamicArrayBuffer: setDynamicArrayBuffer,
+		setDynamicIndexBuffer: setDynamicIndexBuffer,
 
-	this.enableAttribute = enableAttribute;
-	this.disableAttributes = disableAttributes;
-	this.getAttribLocation = getAttribLocation;
-	this.setFloatAttribute = setFloatAttribute;
+		drawTriangles: drawTriangles,
+		drawTriangleStrip: drawTriangleStrip,
+		drawLines: drawLines,
+		drawLineStrip: drawLineStrip,
+		drawPoints: drawPoints,
+		drawTriangleElements: drawTriangleElements,
+		drawLineElements: drawLineElements,
 
-	this.getUniformLocation= getUniformLocation;
+		bindArrayBuffer: bindArrayBuffer,
+		bindElementArrayBuffer: bindElementArrayBuffer,
 
-	this.uniform1i = uniform1i;
-	this.uniform1f = uniform1f;
-	this.uniform2f = uniform2f;
-	this.uniform3f = uniform3f;
-	this.uniform4f = uniform4f;
-	this.uniform1iv = uniform1iv;
-	this.uniform2iv = uniform2iv;
-	this.uniform3iv = uniform3iv;
-	this.uniform1fv = uniform1fv;
-	this.uniform2fv = uniform2fv;
-	this.uniform3fv = uniform3fv;
-	this.uniform4fv = uniform4fv;
-	this.uniformMatrix3fv = uniformMatrix3fv;
-	this.uniformMatrix4fv = uniformMatrix4fv;
+		enableAttribute: enableAttribute,
+		disableAttributes: disableAttributes,
+		getAttribLocation: getAttribLocation,
+		setFloatAttribute: setFloatAttribute,
 
-	this.useProgram = useProgram;
-	this.compileShader = compileShader;
+		getUniformLocation: getUniformLocation,
 
-	this.setFaceCulling = setFaceCulling;
-	this.setMaterialFaces = setMaterialFaces;
-	this.setPolygonOffset = setPolygonOffset;
-	this.setBlending = setBlending;
-	this.setDepthTest = setDepthTest;
-	this.setDepthWrite = setDepthWrite;
+		uniform1i: uniform1i,
+		uniform1f: uniform1f,
+		uniform2f: uniform2f,
+		uniform3f: uniform3f,
+		uniform4f: uniform4f,
+		uniform1iv: uniform1iv,
+		uniform2iv: uniform2iv,
+		uniform3iv: uniform3iv,
+		uniform1fv: uniform1fv,
+		uniform2fv: uniform2fv,
+		uniform3fv: uniform3fv,
+		uniform4fv: uniform4fv,
+		uniformMatrix3fv: uniformMatrix3fv,
+		uniformMatrix4fv: uniformMatrix4fv,
 
-	this.setTexture = setTexture;
-	this.setCubeTexture = setCubeTexture;
-	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
-	this.setCubeTextureDynamic = setCubeTextureDynamic;
+		useProgram: useProgram,
+		compileShader: compileShader,
 
-	this.paramThreeToGL = paramThreeToGL;
-	this.setLineWidth = setLineWidth;
-	this.resetState = resetState;
+		setFaceCulling: setFaceCulling,
+		setMaterialFaces: setMaterialFaces,
+		setPolygonOffset: setPolygonOffset,
+		setBlending: setBlending,
+		setDepthTest: setDepthTest,
+		setDepthWrite: setDepthWrite,
+
+		setTexture: setTexture,
+		setCubeTexture: setCubeTexture,
+		updateRenderTargetMipmap: updateRenderTargetMipmap,
+		setCubeTextureDynamic: setCubeTextureDynamic,
+
+		paramThreeToGL: paramThreeToGL,
+		setLineWidth: setLineWidth,
+		resetState: resetState
+
+	}
 
 };
 
-THREE.WebGLRenderer.ShaderBuilder = function(renderer,info){
+THREE.WebGLRenderer.ShaderBuilder = function ( renderer, info ) {
+
 	this.renderer = renderer;
 	this.info = info;
 	this.programs = [],
 	this.programs_counter = 0;
-}
 
-THREE.WebGLRenderer.ShaderBuilder.prototype.buildProgram = function ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
+};
 
-	var renderer = this.renderer;
-	var p, pl, d, program, code;
-	var chunks = [];
+THREE.extend( THREE.WebGLRenderer.ShaderBuilder.prototype, {
 
-	// Generate code
+	buildProgram: function ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
 
-	if ( shaderID ) {
+		var renderer = this.renderer;
+		var p, pl, d, program, code;
+		var chunks = [];
 
-		chunks.push( shaderID );
+		// Generate code
 
-	} else {
+		if ( shaderID ) {
 
-		chunks.push( fragmentShader );
-		chunks.push( vertexShader );
+			chunks.push( shaderID );
 
-	}
+		} else {
 
-	for ( d in defines ) {
-
-		chunks.push( d );
-		chunks.push( defines[ d ] );
-
-	}
-
-	for ( p in parameters ) {
-
-		chunks.push( p );
-		chunks.push( parameters[ p ] );
-
-	}
-
-	code = chunks.join();
-
-	// Check if code has been already compiled
-
-	for ( p = 0, pl = this.programs.length; p < pl; p ++ ) {
-
-		var programInfo = this.programs[ p ];
-
-		if ( programInfo.code === code ) {
-
-			//console.log( "Code already compiled." /*: \n\n" + code*/ );
-
-			programInfo.usedTimes ++;
-
-			return programInfo.program;
+			chunks.push( fragmentShader );
+			chunks.push( vertexShader );
 
 		}
 
-	}
+		for ( d in defines ) {
 
-	var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
+			chunks.push( d );
+			chunks.push( defines[ d ] );
 
-	if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
+		}
 
-		shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF";
+		for ( p in parameters ) {
 
-	} else if ( parameters.shadowMapType === THREE.PCFSoftShadowMap ) {
+			chunks.push( p );
+			chunks.push( parameters[ p ] );
 
-		shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
+		}
 
-	}
+		code = chunks.join();
 
-	//console.log( "building new program " );
+		// Check if code has been already compiled
 
-	//
+		for ( p = 0, pl = this.programs.length; p < pl; p ++ ) {
 
-	var customDefines = this.generateDefines( defines );
+			var programInfo = this.programs[ p ];
 
-	//
+			if ( programInfo.code === code ) {
 
-	var prefix_vertex = [
+				//console.log( "Code already compiled." /*: \n\n" + code*/ );
 
-		"precision " + renderer.precision + " float;",
+				programInfo.usedTimes ++;
 
-		customDefines,
-
-		renderer.supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
-
-		parameters.gammaInput ? "#define GAMMA_INPUT" : "",
-		parameters.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-		parameters.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
-
-		"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
-		"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
-		"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
-		"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
-
-		"#define MAX_SHADOWS " + parameters.maxShadows,
-
-		"#define MAX_BONES " + parameters.maxBones,
-
-		parameters.map ? "#define USE_MAP" : "",
-		parameters.envMap ? "#define USE_ENVMAP" : "",
-		parameters.lightMap ? "#define USE_LIGHTMAP" : "",
-		parameters.bumpMap ? "#define USE_BUMPMAP" : "",
-		parameters.normalMap ? "#define USE_NORMALMAP" : "",
-		parameters.specularMap ? "#define USE_SPECULARMAP" : "",
-		parameters.vertexColors ? "#define USE_COLOR" : "",
-
-		parameters.skinning ? "#define USE_SKINNING" : "",
-		parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
-		parameters.boneTextureWidth ? "#define N_BONE_PIXEL_X " + parameters.boneTextureWidth.toFixed( 1 ) : "",
-		parameters.boneTextureHeight ? "#define N_BONE_PIXEL_Y " + parameters.boneTextureHeight.toFixed( 1 ) : "",
-
-		parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
-		parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
-		parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
-		parameters.wrapAround ? "#define WRAP_AROUND" : "",
-		parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-		parameters.flipSided ? "#define FLIP_SIDED" : "",
-
-		parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-		parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
-		parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
-		parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
-
-		parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
-
-		"uniform mat4 modelMatrix;",
-		"uniform mat4 modelViewMatrix;",
-		"uniform mat4 projectionMatrix;",
-		"uniform mat4 viewMatrix;",
-		"uniform mat3 normalMatrix;",
-		"uniform vec3 cameraPosition;",
-
-		"attribute vec3 position;",
-		"attribute vec3 normal;",
-		"attribute vec2 uv;",
-		"attribute vec2 uv2;",
-
-		"#ifdef USE_COLOR",
-
-			"attribute vec3 color;",
-
-		"#endif",
-
-		"#ifdef USE_MORPHTARGETS",
-
-			"attribute vec3 morphTarget0;",
-			"attribute vec3 morphTarget1;",
-			"attribute vec3 morphTarget2;",
-			"attribute vec3 morphTarget3;",
-
-			"#ifdef USE_MORPHNORMALS",
-
-				"attribute vec3 morphNormal0;",
-				"attribute vec3 morphNormal1;",
-				"attribute vec3 morphNormal2;",
-				"attribute vec3 morphNormal3;",
-
-			"#else",
-
-				"attribute vec3 morphTarget4;",
-				"attribute vec3 morphTarget5;",
-				"attribute vec3 morphTarget6;",
-				"attribute vec3 morphTarget7;",
-
-			"#endif",
-
-		"#endif",
-
-		"#ifdef USE_SKINNING",
-
-			"attribute vec4 skinIndex;",
-			"attribute vec4 skinWeight;",
-
-		"#endif",
-
-		""
-
-	].join("\n");
-
-	var prefix_fragment = [
-
-		"precision " + renderer.precision + " float;",
-
-		( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
-
-		customDefines,
-
-		"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
-		"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
-		"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
-		"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
-
-		"#define MAX_SHADOWS " + parameters.maxShadows,
-
-		parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
-
-		parameters.gammaInput ? "#define GAMMA_INPUT" : "",
-		parameters.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-
-		( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
-		( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
-
-		parameters.map ? "#define USE_MAP" : "",
-		parameters.envMap ? "#define USE_ENVMAP" : "",
-		parameters.lightMap ? "#define USE_LIGHTMAP" : "",
-		parameters.bumpMap ? "#define USE_BUMPMAP" : "",
-		parameters.normalMap ? "#define USE_NORMALMAP" : "",
-		parameters.specularMap ? "#define USE_SPECULARMAP" : "",
-		parameters.vertexColors ? "#define USE_COLOR" : "",
-
-		parameters.metal ? "#define METAL" : "",
-		parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
-		parameters.wrapAround ? "#define WRAP_AROUND" : "",
-		parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
-		parameters.flipSided ? "#define FLIP_SIDED" : "",
-
-		parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
-		parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
-		parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
-		parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
-
-		"uniform mat4 viewMatrix;",
-		"uniform vec3 cameraPosition;",
-		""
-
-	].join("\n");
-	
-
-	program = renderer.compileShader(prefix_vertex + vertexShader, prefix_fragment + fragmentShader);
-	
-	//console.log( prefix_fragment + fragmentShader );
-	//console.log( prefix_vertex + vertexShader );
-
-	program.uniforms = {};
-	program.attributes = {};
-
-	var identifiers, u, a, i;
-
-	// cache uniform locations
-
-	identifiers = [
-
-		'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'modelMatrix', 'cameraPosition',
-		'morphTargetInfluences'
-
-	];
-
-	if ( parameters.useVertexTexture ) {
-
-		identifiers.push( 'boneTexture' );
-
-	} else {
-
-		identifiers.push( 'boneGlobalMatrices' );
-
-	}
-
-	for ( u in uniforms ) {
-
-		identifiers.push( u );
-
-	}
-
-	this.cacheUniformLocations( program, identifiers );
-
-	// cache attributes locations
-
-	identifiers = [
-
-		"position", "normal", "uv", "uv2", "tangent", "color",
-		"skinIndex", "skinWeight", "lineDistance"
-
-	];
-
-	for ( i = 0; i < parameters.maxMorphTargets; i ++ ) {
-
-		identifiers.push( "morphTarget" + i );
-
-	}
-
-	for ( i = 0; i < parameters.maxMorphNormals; i ++ ) {
-
-		identifiers.push( "morphNormal" + i );
-
-	}
-
-	for ( a in attributes ) {
-
-		identifiers.push( a );
-
-	}
-
-	this.cacheAttributeLocations( program, identifiers );
-
-	program.id = this.programs_counter ++;
-
-	this.programs.push( { program: program, code: code, usedTimes: 1 } );
-
-	this.info.memory.programs = this.programs.length;
-
-	return program;
-
-};
-
-THREE.WebGLRenderer.ShaderBuilder.prototype.generateDefines = function( defines ) {
-
-	var value, chunk, chunks = [];
-
-	for ( var d in defines ) {
-
-		value = defines[ d ];
-		if ( value === false ) continue;
-
-		chunk = "#define " + d + " " + value;
-		chunks.push( chunk );
-
-	}
-
-	return chunks.join( "\n" );
-
-};
-
-	// Shader parameters cache
-
-THREE.WebGLRenderer.ShaderBuilder.prototype.cacheUniformLocations = function( program, identifiers ) {
-
-	var i, l, id, renderer = this.renderer;
-
-	for( i = 0, l = identifiers.length; i < l; i ++ ) {
-
-		id = identifiers[ i ];
-		program.uniforms[ id ] = renderer.getUniformLocation( program, id );
-
-	}
-
-};
-
-THREE.WebGLRenderer.ShaderBuilder.prototype.cacheAttributeLocations = function( program, identifiers ) {
-
-	var i, l, id, renderer = this.renderer;
-
-	for( i = 0, l = identifiers.length; i < l; i ++ ) {
-
-		id = identifiers[ i ];
-		program.attributes[ id ] = renderer.getAttribLocation( program, id );
-
-	}
-
-};
-
-THREE.WebGLRenderer.ShaderBuilder.prototype.removeProgram = function( program ) {
-
-	var i, il, programInfo;
-	var deleteProgram = false;
-	var programs = this.programs;
-
-	for ( i = 0, il = programs.length; i < il; i ++ ) {
-
-		programInfo = programs[ i ];
-
-		if ( programInfo.program === program ) {
-
-			programInfo.usedTimes --;
-
-			if ( programInfo.usedTimes === 0 ) {
-
-				deleteProgram = true;
+				return programInfo.program;
 
 			}
 
-			break;
+		}
+
+		var shadowMapTypeDefine = "SHADOWMAP_TYPE_BASIC";
+
+		if ( parameters.shadowMapType === THREE.PCFShadowMap ) {
+
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF";
+
+		} else if ( parameters.shadowMapType === THREE.PCFSoftShadowMap ) {
+
+			shadowMapTypeDefine = "SHADOWMAP_TYPE_PCF_SOFT";
 
 		}
 
-	}
+		//console.log( "building new program " );
 
-	if ( deleteProgram === true ) {
+		//
 
-		// avoid using array.splice, this is costlier than creating new array from scratch
+		var customDefines = this.generateDefines( defines );
 
-		var newPrograms = [];
+		//
+
+		var prefix_vertex = [
+
+			"precision " + renderer.precision + " float;",
+
+			customDefines,
+
+			renderer.supportsVertexTextures ? "#define VERTEX_TEXTURES" : "",
+
+			parameters.gammaInput ? "#define GAMMA_INPUT" : "",
+			parameters.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+			parameters.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
+
+			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
+			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
+			"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
+
+			"#define MAX_SHADOWS " + parameters.maxShadows,
+
+			"#define MAX_BONES " + parameters.maxBones,
+
+			parameters.map ? "#define USE_MAP" : "",
+			parameters.envMap ? "#define USE_ENVMAP" : "",
+			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.normalMap ? "#define USE_NORMALMAP" : "",
+			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
+			parameters.vertexColors ? "#define USE_COLOR" : "",
+
+			parameters.skinning ? "#define USE_SKINNING" : "",
+			parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
+			parameters.boneTextureWidth ? "#define N_BONE_PIXEL_X " + parameters.boneTextureWidth.toFixed( 1 ) : "",
+			parameters.boneTextureHeight ? "#define N_BONE_PIXEL_Y " + parameters.boneTextureHeight.toFixed( 1 ) : "",
+
+			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
+			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
+			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
+			parameters.wrapAround ? "#define WRAP_AROUND" : "",
+			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
+			parameters.flipSided ? "#define FLIP_SIDED" : "",
+
+			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
+			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
+
+			parameters.sizeAttenuation ? "#define USE_SIZEATTENUATION" : "",
+
+			"uniform mat4 modelMatrix;",
+			"uniform mat4 modelViewMatrix;",
+			"uniform mat4 projectionMatrix;",
+			"uniform mat4 viewMatrix;",
+			"uniform mat3 normalMatrix;",
+			"uniform vec3 cameraPosition;",
+
+			"attribute vec3 position;",
+			"attribute vec3 normal;",
+			"attribute vec2 uv;",
+			"attribute vec2 uv2;",
+
+			"#ifdef USE_COLOR",
+
+				"attribute vec3 color;",
+
+			"#endif",
+
+			"#ifdef USE_MORPHTARGETS",
+
+				"attribute vec3 morphTarget0;",
+				"attribute vec3 morphTarget1;",
+				"attribute vec3 morphTarget2;",
+				"attribute vec3 morphTarget3;",
+
+				"#ifdef USE_MORPHNORMALS",
+
+					"attribute vec3 morphNormal0;",
+					"attribute vec3 morphNormal1;",
+					"attribute vec3 morphNormal2;",
+					"attribute vec3 morphNormal3;",
+
+				"#else",
+
+					"attribute vec3 morphTarget4;",
+					"attribute vec3 morphTarget5;",
+					"attribute vec3 morphTarget6;",
+					"attribute vec3 morphTarget7;",
+
+				"#endif",
+
+			"#endif",
+
+			"#ifdef USE_SKINNING",
+
+				"attribute vec4 skinIndex;",
+				"attribute vec4 skinWeight;",
+
+			"#endif",
+
+			""
+
+		].join("\n");
+
+		var prefix_fragment = [
+
+			"precision " + renderer.precision + " float;",
+
+			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
+
+			customDefines,
+
+			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
+			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
+			"#define MAX_SPOT_LIGHTS " + parameters.maxSpotLights,
+			"#define MAX_HEMI_LIGHTS " + parameters.maxHemiLights,
+
+			"#define MAX_SHADOWS " + parameters.maxShadows,
+
+			parameters.alphaTest ? "#define ALPHATEST " + parameters.alphaTest: "",
+
+			parameters.gammaInput ? "#define GAMMA_INPUT" : "",
+			parameters.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+
+			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
+			( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
+
+			parameters.map ? "#define USE_MAP" : "",
+			parameters.envMap ? "#define USE_ENVMAP" : "",
+			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
+			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
+			parameters.normalMap ? "#define USE_NORMALMAP" : "",
+			parameters.specularMap ? "#define USE_SPECULARMAP" : "",
+			parameters.vertexColors ? "#define USE_COLOR" : "",
+
+			parameters.metal ? "#define METAL" : "",
+			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
+			parameters.wrapAround ? "#define WRAP_AROUND" : "",
+			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
+			parameters.flipSided ? "#define FLIP_SIDED" : "",
+
+			parameters.shadowMapEnabled ? "#define USE_SHADOWMAP" : "",
+			parameters.shadowMapEnabled ? "#define " + shadowMapTypeDefine : "",
+			parameters.shadowMapDebug ? "#define SHADOWMAP_DEBUG" : "",
+			parameters.shadowMapCascade ? "#define SHADOWMAP_CASCADE" : "",
+
+			"uniform mat4 viewMatrix;",
+			"uniform vec3 cameraPosition;",
+			""
+
+		].join("\n");
+
+		program = renderer.compileShader(prefix_vertex + vertexShader, prefix_fragment + fragmentShader);
+
+		//console.log( prefix_fragment + fragmentShader );
+		//console.log( prefix_vertex + vertexShader );
+
+		program.uniforms = {};
+		program.attributes = {};
+
+		var identifiers, u, a, i;
+
+		// cache uniform locations
+
+		identifiers = [
+
+			'viewMatrix', 'modelViewMatrix', 'projectionMatrix', 'normalMatrix', 'modelMatrix', 'cameraPosition',
+			'morphTargetInfluences'
+
+		];
+
+		if ( parameters.useVertexTexture ) {
+
+			identifiers.push( 'boneTexture' );
+
+		} else {
+
+			identifiers.push( 'boneGlobalMatrices' );
+
+		}
+
+		for ( u in uniforms ) {
+
+			identifiers.push( u );
+
+		}
+
+		this.cacheUniformLocations( program, identifiers );
+
+		// cache attributes locations
+
+		identifiers = [
+
+			"position", "normal", "uv", "uv2", "tangent", "color",
+			"skinIndex", "skinWeight", "lineDistance"
+
+		];
+
+		for ( i = 0; i < parameters.maxMorphTargets; i ++ ) {
+
+			identifiers.push( "morphTarget" + i );
+
+		}
+
+		for ( i = 0; i < parameters.maxMorphNormals; i ++ ) {
+
+			identifiers.push( "morphNormal" + i );
+
+		}
+
+		for ( a in attributes ) {
+
+			identifiers.push( a );
+
+		}
+
+		this.cacheAttributeLocations( program, identifiers );
+
+		program.id = this.programs_counter ++;
+
+		this.programs.push( { program: program, code: code, usedTimes: 1 } );
+
+		this.info.memory.programs = this.programs.length;
+
+		return program;
+
+	},
+
+	generateDefines: function ( defines ) {
+
+		var value, chunk, chunks = [];
+
+		for ( var d in defines ) {
+
+			value = defines[ d ];
+			if ( value === false ) continue;
+
+			chunk = "#define " + d + " " + value;
+			chunks.push( chunk );
+
+		}
+
+		return chunks.join( "\n" );
+
+	},
+
+	// Shader parameters cache
+
+	cacheUniformLocations: function ( program, identifiers ) {
+
+		var i, l, id, renderer = this.renderer;
+
+		for ( i = 0, l = identifiers.length; i < l; i ++ ) {
+
+			id = identifiers[ i ];
+			program.uniforms[ id ] = renderer.getUniformLocation( program, id );
+
+		}
+
+	},
+
+	cacheAttributeLocations: function ( program, identifiers ) {
+
+		var i, l, id, renderer = this.renderer;
+
+		for( i = 0, l = identifiers.length; i < l; i ++ ) {
+
+			id = identifiers[ i ];
+			program.attributes[ id ] = renderer.getAttribLocation( program, id );
+
+		}
+
+	},
+
+	removeProgram: function ( program ) {
+
+		var i, il, programInfo;
+		var deleteProgram = false;
+		var programs = this.programs;
 
 		for ( i = 0, il = programs.length; i < il; i ++ ) {
 
 			programInfo = programs[ i ];
 
-			if ( programInfo.program !== program ) {
+			if ( programInfo.program === program ) {
 
-				newPrograms.push( programInfo );
+				programInfo.usedTimes --;
+
+				if ( programInfo.usedTimes === 0 ) {
+
+					deleteProgram = true;
+
+				}
+
+				break;
 
 			}
 
 		}
 
-		programs = newPrograms;
+		if ( deleteProgram === true ) {
 
-		this.renderer.deleteProgram( program );
+			// avoid using array.splice, this is costlier than creating new array from scratch
 
-		this.info.memory.programs --;
+			var newPrograms = [];
+
+			for ( i = 0, il = programs.length; i < il; i ++ ) {
+
+				programInfo = programs[ i ];
+
+				if ( programInfo.program !== program ) {
+
+					newPrograms.push( programInfo );
+
+				}
+
+			}
+
+			programs = newPrograms;
+
+			this.renderer.deleteProgram( program );
+
+			this.info.memory.programs --;
+
+		}
 
 	}
-}
+
+} );
 
 THREE.WebGLRenderer.Object3DRenderer = function ( lowlevelrenderer, info ) {
 

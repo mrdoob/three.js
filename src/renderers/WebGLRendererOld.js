@@ -5,7 +5,7 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.WebGLRendererOld = function ( parameters ) {
+THREE.WebGLRenderer = function ( parameters ) {
 
 	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
 
