@@ -174,7 +174,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 	},
 
-	transform: function() {
+	applyMatrix4: function() {
 
 		var v1 = new THREE.Vector3();
 		var v2 = new THREE.Vector3();

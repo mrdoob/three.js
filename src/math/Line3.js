@@ -100,7 +100,7 @@ THREE.extend( THREE.Line3.prototype, {
 
 	},
 
-	transform: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		this.start.applyMatrix4( matrix );
 		this.end.applyMatrix4( matrix );

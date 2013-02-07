@@ -271,7 +271,7 @@ THREE.extend( THREE.Box3.prototype, {
 
 	},
 
-	transform: function() {
+	applyMatrix4: function() {
 
 		var points = [
 			new THREE.Vector3(),

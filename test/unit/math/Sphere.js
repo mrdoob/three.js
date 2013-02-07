@@ -85,12 +85,12 @@ test( "getBoundingBox", function() {
 	ok( a.getBoundingBox().equals( new THREE.Box3( zero3, zero3 ) ), "Passed!" );
 });
 
-test( "transform", function() {
+test( "applyMatrix4", function() {
 	var a = new THREE.Sphere( one3.clone(), 1 );
 
 	var m = new THREE.Matrix4().makeTranslation( 1, -2, 1 );
 
-	ok( a.clone().transform( m ).getBoundingBox().equals( a.getBoundingBox().transform( m ) ), "Passed!" );
+	ok( a.clone().applyMatrix4( m ).getBoundingBox().equals( a.getBoundingBox().applyMatrix4( m ) ), "Passed!" );
 });
 
 test( "translate", function() {

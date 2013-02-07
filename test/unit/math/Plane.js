@@ -153,7 +153,6 @@ test( "isInterestionLine/intersectLine", function() {
 
 });
 
-
 test( "projectPoint", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 
@@ -181,18 +180,18 @@ test( "coplanarPoint", function() {
 	ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );
 });
 
-test( "transform/translate", function() {
+test( "applyMatrix4/translate", function() {
 
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 
 	var m = new THREE.Matrix4();
 	m.makeRotationZ( Math.PI * 0.5 );
 
-	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 ) ), "Passed!" );
+	ok( comparePlane( a.clone().applyMatrix4( m ), new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 ) ), "Passed!" );
 
 	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
-	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), -1 ) ), "Passed!" );
+	ok( comparePlane( a.clone().applyMatrix4( m ), new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), -1 ) ), "Passed!" );
 
 	m.makeTranslation( 1, 1, 1 );
-	ok( comparePlane( a.clone().transform( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
+	ok( comparePlane( a.clone().applyMatrix4( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });
