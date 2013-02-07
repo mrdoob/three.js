@@ -2,21 +2,21 @@
  * @author bhouston / http://exocortex.com
  */
 
-module( "Line3" );
+module( "LineSegment" );
 
 test( "constructor/equals", function() {
-	var a = new THREE.Line3();
+	var a = new THREE.LineSegment();
 	ok( a.start.equals( zero3 ), "Passed!" );
 	ok( a.end.equals( zero3 ), "Passed!" );
 
-	a = new THREE.Line3( two3.clone(), one3.clone() );
+	a = new THREE.LineSegment( two3.clone(), one3.clone() );
 	ok( a.start.equals( two3 ), "Passed!" );
 	ok( a.end.equals( one3 ), "Passed!" );
 });
 
 test( "copy/equals", function() {
-	var a = new THREE.Line3( zero3.clone(), one3.clone() );
-	var b = new THREE.Line3().copy( a );
+	var a = new THREE.LineSegment( zero3.clone(), one3.clone() );
+	var b = new THREE.LineSegment().copy( a );
 	ok( b.start.equals( zero3 ), "Passed!" );
 	ok( b.end.equals( one3 ), "Passed!" );
 
@@ -28,7 +28,7 @@ test( "copy/equals", function() {
 });
 
 test( "set", function() {
-	var a = new THREE.Line3();
+	var a = new THREE.LineSegment();
 
 	a.set( one3, one3 );
 	ok( a.start.equals( one3 ), "Passed!" );
@@ -36,7 +36,7 @@ test( "set", function() {
 });
 
 test( "at", function() {
-	var a = new THREE.Line3( one3.clone(), new THREE.Vector3( 1, 1, 2 ) );
+	var a = new THREE.LineSegment( one3.clone(), new THREE.Vector3( 1, 1, 2 ) );
 
 	ok( a.at( -1 ).distanceTo( new THREE.Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
 	ok( a.at( 0 ).distanceTo( one3.clone() ) < 0.0001, "Passed!" );
@@ -45,7 +45,7 @@ test( "at", function() {
 });
 
 test( "closestPointToPoint/closestPointToPointParameter", function() {
-	var a = new THREE.Line3( one3.clone(), new THREE.Vector3( 1, 1, 2 ) );
+	var a = new THREE.LineSegment( one3.clone(), new THREE.Vector3( 1, 1, 2 ) );
 
 	// nearby the ray
 	ok( a.closestPointToPointParameter( zero3.clone(), true ) == 0, "Passed!" );
