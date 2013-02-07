@@ -1,11 +1,11 @@
 
 
-THREE.WebGLRenderer2.Object3DRenderer = function(lowlevelrenderer, info){
+THREE.WebGLRenderer.Object3DRenderer = function(lowlevelrenderer, info){
 	this.renderer = lowlevelrenderer;
 	this.info = info;
 };
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.getBufferMaterial = function( object, geometryGroup ) {
+THREE.WebGLRenderer.Object3DRenderer.prototype.getBufferMaterial = function( object, geometryGroup ) {
 
 	return object.material instanceof THREE.MeshFaceMaterial
 		? object.material.materials[ geometryGroup.materialIndex ]
@@ -13,7 +13,7 @@ THREE.WebGLRenderer2.Object3DRenderer.prototype.getBufferMaterial = function( ob
 
 };
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessUVType = function( material ) {
+THREE.WebGLRenderer.Object3DRenderer.prototype.bufferGuessUVType = function( material ) {
 
 	// material must use some texture to require uvs
 
@@ -27,7 +27,7 @@ THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessUVType = function( ma
 
 };
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessNormalType = function ( material ) {
+THREE.WebGLRenderer.Object3DRenderer.prototype.bufferGuessNormalType = function ( material ) {
 
 	// only MeshBasicMaterial and MeshDepthMaterial don't need normals
 
@@ -49,14 +49,14 @@ THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessNormalType = function
 
 };
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.materialNeedsSmoothNormals = function ( material ) {
+THREE.WebGLRenderer.Object3DRenderer.prototype.materialNeedsSmoothNormals = function ( material ) {
 
 	return material && material.shading !== undefined && material.shading === THREE.SmoothShading;
 
 };
 
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessVertexColorType = function ( material ) {
+THREE.WebGLRenderer.Object3DRenderer.prototype.bufferGuessVertexColorType = function ( material ) {
 
 	if ( material.vertexColors ) {
 
@@ -69,7 +69,7 @@ THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessVertexColorType = fun
 };
 
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.initCustomAttributes = function( geometry, object ) {
+THREE.WebGLRenderer.Object3DRenderer.prototype.initCustomAttributes = function( geometry, object ) {
 
 	var nvertices = geometry.vertices.length;
 
@@ -117,7 +117,7 @@ THREE.WebGLRenderer2.Object3DRenderer.prototype.initCustomAttributes = function(
 
 };
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.numericalSort = function( a, b ) {
+THREE.WebGLRenderer.Object3DRenderer.prototype.numericalSort = function( a, b ) {
 
 	return b[ 0 ] - a[ 0 ];
 

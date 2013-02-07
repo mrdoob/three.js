@@ -1,12 +1,12 @@
 
-THREE.WebGLRenderer2.ShaderBuilder = function(renderer,info){
+THREE.WebGLRenderer.ShaderBuilder = function(renderer,info){
 	this.renderer = renderer;
 	this.info = info;
 	this.programs = [],
 	this.programs_counter = 0;
 }
 
-THREE.WebGLRenderer2.ShaderBuilder.prototype.buildProgram = function ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
+THREE.WebGLRenderer.ShaderBuilder.prototype.buildProgram = function ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
 
 	var renderer = this.renderer;
 	var p, pl, d, program, code;
@@ -305,8 +305,8 @@ THREE.WebGLRenderer2.ShaderBuilder.prototype.buildProgram = function ( shaderID,
 	return program;
 
 };
-	
-THREE.WebGLRenderer2.ShaderBuilder.prototype.generateDefines = function( defines ) {
+
+THREE.WebGLRenderer.ShaderBuilder.prototype.generateDefines = function( defines ) {
 
 	var value, chunk, chunks = [];
 
@@ -326,7 +326,7 @@ THREE.WebGLRenderer2.ShaderBuilder.prototype.generateDefines = function( defines
 
 	// Shader parameters cache
 
-THREE.WebGLRenderer2.ShaderBuilder.prototype.cacheUniformLocations = function( program, identifiers ) {
+THREE.WebGLRenderer.ShaderBuilder.prototype.cacheUniformLocations = function( program, identifiers ) {
 
 	var i, l, id, renderer = this.renderer;
 
@@ -339,7 +339,7 @@ THREE.WebGLRenderer2.ShaderBuilder.prototype.cacheUniformLocations = function( p
 
 };
 
-THREE.WebGLRenderer2.ShaderBuilder.prototype.cacheAttributeLocations = function( program, identifiers ) {
+THREE.WebGLRenderer.ShaderBuilder.prototype.cacheAttributeLocations = function( program, identifiers ) {
 
 	var i, l, id, renderer = this.renderer;
 
@@ -352,7 +352,7 @@ THREE.WebGLRenderer2.ShaderBuilder.prototype.cacheAttributeLocations = function(
 
 };
 
-THREE.WebGLRenderer2.ShaderBuilder.prototype.removeProgram = function( program ) {
+THREE.WebGLRenderer.ShaderBuilder.prototype.removeProgram = function( program ) {
 
 	var i, il, programInfo;
 	var deleteProgram = false;

@@ -1,14 +1,14 @@
 
 
-THREE.WebGLRenderer2.LineRenderer = function(lowlevelrenderer, info){
-	THREE.WebGLRenderer2.Object3DRenderer.call( this, lowlevelrenderer, info );
+THREE.WebGLRenderer.LineRenderer = function(lowlevelrenderer, info){
+	THREE.WebGLRenderer.Object3DRenderer.call( this, lowlevelrenderer, info );
 };
 
 
-THREE.WebGLRenderer2.LineRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DRenderer.prototype );
+THREE.WebGLRenderer.LineRenderer.prototype = Object.create( THREE.WebGLRenderer.Object3DRenderer.prototype );
 
-THREE.WebGLRenderer2.LineRenderer.prototype.createBuffers = function( geometry ) {
-	
+THREE.WebGLRenderer.LineRenderer.prototype.createBuffers = function( geometry ) {
+
 	var renderer = this.renderer;
 	geometry.__webglVertexBuffer = renderer.createBuffer();
 	geometry.__webglColorBuffer = renderer.createBuffer();
@@ -17,7 +17,7 @@ THREE.WebGLRenderer2.LineRenderer.prototype.createBuffers = function( geometry )
 	this.info.memory.geometries ++;
 };
 
-THREE.WebGLRenderer2.LineRenderer.prototype.initBuffers = function( geometry, object ) {
+THREE.WebGLRenderer.LineRenderer.prototype.initBuffers = function( geometry, object ) {
 
 	var nvertices = geometry.vertices.length;
 
@@ -31,8 +31,8 @@ THREE.WebGLRenderer2.LineRenderer.prototype.initBuffers = function( geometry, ob
 };
 
 
-THREE.WebGLRenderer2.LineRenderer.prototype.setBuffers = function( geometry, object) {
-	
+THREE.WebGLRenderer.LineRenderer.prototype.setBuffers = function( geometry, object) {
+
 	var renderer = this.renderer;
 	var v, c, d, vertex, offset, color,
 
@@ -71,7 +71,7 @@ THREE.WebGLRenderer2.LineRenderer.prototype.setBuffers = function( geometry, obj
 			vertexArray[ offset + 2 ] = vertex.z;
 
 		}
-		
+
 		renderer.setDynamicArrayBuffer(geometry.__webglVertexBuffer,vertexArray);
 
 	}
@@ -89,7 +89,7 @@ THREE.WebGLRenderer2.LineRenderer.prototype.setBuffers = function( geometry, obj
 			colorArray[ offset + 2 ] = color.b;
 
 		}
-		
+
 		renderer.setDynamicArrayBuffer(geometry.__webglColorBuffer,colorArray);
 
 	}
@@ -101,7 +101,7 @@ THREE.WebGLRenderer2.LineRenderer.prototype.setBuffers = function( geometry, obj
 			lineDistanceArray[ d ] = lineDistances[ d ];
 
 		}
-		
+
 		renderer.setDynamicArrayBuffer( geometry.__webglLineDistanceBuffer,lineDistanceArray);
 
 	}

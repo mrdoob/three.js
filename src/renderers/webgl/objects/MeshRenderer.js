@@ -1,13 +1,13 @@
 
 
-THREE.WebGLRenderer2.MeshRenderer = function(lowlevelrenderer, info){
-	THREE.WebGLRenderer2.Object3DRenderer.call( this, lowlevelrenderer, info );
+THREE.WebGLRenderer.MeshRenderer = function(lowlevelrenderer, info){
+	THREE.WebGLRenderer.Object3DRenderer.call( this, lowlevelrenderer, info );
 };
 
 
-THREE.WebGLRenderer2.MeshRenderer.prototype = Object.create( THREE.WebGLRenderer2.Object3DRenderer.prototype );
+THREE.WebGLRenderer.MeshRenderer.prototype = Object.create( THREE.WebGLRenderer.Object3DRenderer.prototype );
 
-THREE.WebGLRenderer2.MeshRenderer.prototype.createBuffers = function( geometryGroup ) {
+THREE.WebGLRenderer.MeshRenderer.prototype.createBuffers = function( geometryGroup ) {
 
 	var renderer = this.renderer;
 	geometryGroup.__webglVertexBuffer = renderer.createBuffer();
@@ -53,7 +53,7 @@ THREE.WebGLRenderer2.MeshRenderer.prototype.createBuffers = function( geometryGr
 
 };
 
-THREE.WebGLRenderer2.MeshRenderer.prototype.initBuffers = function( geometryGroup, object ) {
+THREE.WebGLRenderer.MeshRenderer.prototype.initBuffers = function( geometryGroup, object ) {
 
 	var geometry = object.geometry,
 		faces3 = geometryGroup.faces3,
@@ -207,7 +207,7 @@ THREE.WebGLRenderer2.MeshRenderer.prototype.initBuffers = function( geometryGrou
 
 
 
-THREE.WebGLRenderer2.MeshRenderer.prototype.setBuffers = function( geometryGroup, object, dispose, material ) {
+THREE.WebGLRenderer.MeshRenderer.prototype.setBuffers = function( geometryGroup, object, dispose, material ) {
 
 	if ( ! geometryGroup.__inittedArrays ) {
 
@@ -728,7 +728,7 @@ THREE.WebGLRenderer2.MeshRenderer.prototype.setBuffers = function( geometryGroup
 		}
 
 		if ( offset_color > 0 ) {
-			
+
 			renderer.setDynamicArrayBuffer( geometryGroup.__webglColorBuffer, colorArray);
 
 		}
@@ -800,7 +800,7 @@ THREE.WebGLRenderer2.MeshRenderer.prototype.setBuffers = function( geometryGroup
 			offset_tangent += 16;
 
 		}
-		
+
 		renderer.setDynamicArrayBuffer( geometryGroup.__webglTangentBuffer, tangentArray);
 
 	}
@@ -880,9 +880,9 @@ THREE.WebGLRenderer2.MeshRenderer.prototype.setBuffers = function( geometryGroup
 			}
 
 		}
-		
+
 		renderer.setDynamicArrayBuffer( geometryGroup.__webglNormalBuffer, normalArray);
-		
+
 	}
 
 	if ( dirtyUvs && obj_uvs && uvType ) {
@@ -930,7 +930,7 @@ THREE.WebGLRenderer2.MeshRenderer.prototype.setBuffers = function( geometryGroup
 		}
 
 		if ( offset_uv > 0 ) {
-			
+
 			renderer.setDynamicArrayBuffer( geometryGroup.__webglUVBuffer, uvArray);
 
 		}

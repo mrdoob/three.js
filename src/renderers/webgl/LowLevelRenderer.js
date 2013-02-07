@@ -1,8 +1,8 @@
 
 /*global THREE:false */
 
-THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
-	
+THREE.WebGLRenderer.LowLevelRenderer = function(parameters){
+
 	parameters = parameters || {};
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
@@ -18,24 +18,22 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
 	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0,
 	_autoScaleCubemaps = true;
-	
+
 	this.devicePixelRatio = parameters.devicePixelRatio !== undefined ? parameters.devicePixelRatio : window.devicePixelRatio !== undefined ? window.devicePixelRatio : 1;
-	
-	var _currentWidth = 0,
-		_currentHeight = 0;
-	
-	
+
+	var _currentWidth = 0, _currentHeight = 0;
+
 	var _gl;
 
 	var _glExtensionTextureFloat;
 	var _glExtensionStandardDerivatives;
 	var _glExtensionTextureFilterAnisotropic;
 	var _glExtensionCompressedTextureS3TC;
-	
+
 	initGL();
 
-	setDefaultGLState();	
-	
+	setDefaultGLState();
+
 	var _maxTextures = _gl.getParameter( _gl.MAX_TEXTURE_IMAGE_UNITS );
 	var _maxVertexTextures = _gl.getParameter( _gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS );
 	var _maxTextureSize = _gl.getParameter( _gl.MAX_TEXTURE_SIZE );
@@ -47,8 +45,8 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	var _supportsBoneTextures = _supportsVertexTextures && _glExtensionTextureFloat;
 
 	var _compressedTextureFormats = _glExtensionCompressedTextureS3TC ? _gl.getParameter( _gl.COMPRESSED_TEXTURE_FORMATS ) : [];
-	
-		var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
+
+	var _vertexShaderPrecisionHighpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.HIGH_FLOAT );
 	var _vertexShaderPrecisionMediumpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.MEDIUM_FLOAT );
 	var _vertexShaderPrecisionLowpFloat = _gl.getShaderPrecisionFormat( _gl.VERTEX_SHADER, _gl.LOW_FLOAT );
 
@@ -91,21 +89,21 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		console.warn( "WebGLRenderer: mediump not supported, using lowp" );
 
 	}
-	
-	var _enabledAttributes = {}, 
-		_oldBlending, 
+
+	var _enabledAttributes = {},
+		_oldBlending,
 		_oldBlendEquation,
 		_oldBlendSrc,
 		_oldBlendDst,
-		
+
 		_oldDoubleSided = -1,
 		_oldFlipSided = -1,
 
 		_oldDepthTest = -1,
 		_oldDepthWrite = -1,
-		
+
 		_oldLineWidth = -1,
-		
+
 		_viewportX = 0,
 		_viewportY = 0,
 		_viewportWidth = 0,
@@ -116,7 +114,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		_oldPolygonOffsetFactor = null,
 		_oldPolygonOffsetUnits = null,
 		_currentFramebuffer = null;
-	
+
 	function initGL () {
 
 		try {
@@ -168,23 +166,23 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
 
 		}
-		
+
 		if ( _gl.getShaderPrecisionFormat === undefined ) {
-			
+
 			_gl.getShaderPrecisionFormat = function() { 
-				
+
 				return {
 					"rangeMin"  : 1,
 					"rangeMax"  : 1,
 					"precision" : 1
 				};
-				
+
 			}
-			
+
 		}
 
 	};
-	
+
 	function setDefaultGLState () {
 
 		_gl.clearColor( 0, 0, 0, 1 );
@@ -205,7 +203,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};
-	
+
 	// Fallback filters for non-power-of-2 textures
 
 	function filterFallback ( f ) {
@@ -219,17 +217,17 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return _gl.LINEAR;
 
 	};
-	
+
 	function getContext() {
 
 		return _gl;
 
 	};
-	
+
 	function getDomElement(){
-		
+
 		return _canvas;
-		
+
 	};
 
 	function getPrecision() {
@@ -237,17 +235,17 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return _precision;
 
 	};
-	
+
 	function getCurrentWidth(){
-		
+
 		return _currentWidth;
-		
+
 	};
-	
+
 	function getCurrentHeight(){
-		
+
 		return _currentHeight;
-		
+
 	};
 
 	function supportsVertexTextures() {
@@ -255,7 +253,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return _supportsVertexTextures;
 
 	};
-	
+
 	function supportsFloatTextures() {
 
 		return _glExtensionTextureFloat;
@@ -363,109 +361,108 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		clear( color, depth, stencil );
 
 	};
-	
+
 	function deleteBuffer(buffer){
 		_gl.deleteBuffer(buffer);
 	};
-	
+
 	function deleteTexture(texture){
 		_gl.deleteTexture( texture );
 	};
-	
+
 	function deleteFramebuffer(Framebuffer){
 		_gl.deleteFramebuffer(Framebuffer);
 	};
-	
+
 	function deleteRenderbuffer(RenderBuffer){
 		_gl.deleteRenderbuffer(RenderBuffer);
 	};
-	
+
 	function deleteProgram(RenderBuffer){
 		_gl.deleteProgram(RenderBuffer);
 	};
-	
+
 	function createBuffer(){
 		return _gl.createBuffer();
 	};
-	
+
 	function setStaticArrayBuffer(buffer,data){
-		
+
 		bindArrayBuffer( buffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, data, _gl.STATIC_DRAW );
-		
+
 	};
-	
+
 	function setStaticIndexBuffer(buffer,data){
-		
+
 		bindElementArrayBuffer( buffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, data, _gl.STATIC_DRAW );
-		
+
 	};
-	
+
 	function setDynamicArrayBuffer(buffer,data){
-		
+
 		bindArrayBuffer( buffer );
 		_gl.bufferData( _gl.ARRAY_BUFFER, data, _gl.DYNAMIC_DRAW );
-		
+
 	};
-	
+
 	function setDynamicIndexBuffer(buffer,data){
-		
+
 		bindElementArrayBuffer( buffer );
 		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, data, _gl.DYNAMIC_DRAW );
-		
+
 	};
-	
+
 	function drawTriangles(count){
 		_gl.drawArrays( _gl.TRIANGLES, 0, count );
 	};
-	
+
 	function drawTriangleStrip(count){
 		_gl.drawArrays( _gl.TRIANGLE_STRIP, 0, count );
 	};
-	
+
 	function drawLines(count){
 		_gl.drawArrays( _gl.LINES, 0, count );
 	};
-	
+
 	function drawLineStrip(count){
 		_gl.drawArrays( _gl.LINE_STRIP, 0, count );
 	};
-	
+
 	function drawPoints(count){
 		_gl.drawArrays( _gl.POINTS, 0, count );
 	};
-	
+
 	function drawTriangleElements(buffer,count,offset){
 		bindElementArrayBuffer( buffer );
 		_gl.drawElements( _gl.TRIANGLES, count, _gl.UNSIGNED_SHORT, offset ); // 2 bytes per Uint16
 	};
-	
+
 	function drawLineElements(buffer,count,offset){
 		bindElementArrayBuffer(  buffer );
 		_gl.drawElements( _gl.LINES, count, _gl.UNSIGNED_SHORT, offset ); // 2 bytes per Uint16
 	};
-	
-	
+
+
 	var _boundBuffer;
 	function bindArrayBuffer(buffer){
 		if (_boundBuffer != buffer){
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
 			_boundBuffer = buffer;
 		}
-		
+
 	};
-	
+
 	function bindElementArrayBuffer(buffer){
-		
+
 		if (_boundBuffer != buffer){
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, buffer );
 			_boundBuffer = buffer;
 		}
-		
+
 	};
-	
-	
+
 	function enableAttribute( attribute ) {
 
 		if ( ! _enabledAttributes[ attribute ] ) {
@@ -476,8 +473,6 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
-	
 
 	function disableAttributes() {
 
@@ -493,115 +488,115 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
+
 	function getAttribLocation( program, id ){
 		return _gl.getAttribLocation( program, id );
 	}
-	
+
 	function setFloatAttribute(index,buffer,size,offset){
-		
+
 		bindArrayBuffer( buffer );
 		enableAttribute( index );
 		_gl.vertexAttribPointer( index, size, _gl.FLOAT, false, 0, offset );
-		
+
 	};
-	
+
 	function getUniformLocation( program, id ){
-		
+
 		return _gl.getUniformLocation( program, id );
-		
+
 	}
-	
+
 	function uniform1i(uniform,value){
-		
+
 		_gl.uniform1i( uniform, value );
-		
-	};	
-	
+
+	};
+
 	function uniform1f(uniform,value){
-		
+
 		_gl.uniform1f( uniform, value );
-		
+
 	};
-	
+
 	function uniform2f(uniform,value1, value2){
-		
+
 		_gl.uniform2f( uniform, value1, value2 );
-		
+
 	};
-	
+
 	function uniform3f(uniform, value1, value2, value3){
-		
+
 		_gl.uniform3f( uniform, value1, value2, value3 );
-		
+
 	};
-	
+
 	function uniform4f(uniform, value1, value2, value3, value4){
-		
+
 		_gl.uniform4f( uniform, value1, value2, value3, value4);
-		
+
 	};
-	
+
 	function uniform1iv(uniform,value){
-		
+
 		_gl.uniform1iv( uniform, value );
-		
+
 	};
-	
+
 	function uniform2iv(uniform,value){
-		
+
 		_gl.uniform2iv( uniform, value );
-		
+
 	};
-	
+
 	function uniform3iv(uniform,value){
-		
+
 		_gl.uniform3iv( uniform, value );
-		
+
 	};
-	
+
 	function uniform1fv(uniform,value){
-		
+
 		_gl.uniform1fv( uniform, value );
-		
+
 	};
-	
+
 	function uniform2fv(uniform,value){
-		
+
 		_gl.uniform2fv( uniform, value );
-		
+
 	};
-	
+
 	function uniform3fv(uniform,value){
-		
+
 		_gl.uniform3fv( uniform, value );
-		
+
 	};
-	
+
 	function uniform4fv(uniform,value){
-		
+
 		_gl.uniform3fv( uniform, value );
-		
+
 	};
-	
+
 	function uniformMatrix3fv(location,value){
-		
+
 		_gl.uniformMatrix3fv( location, false, value );
-		
+
 	};
-	
+
 	function uniformMatrix4fv(location,value){
-		
+
 		_gl.uniformMatrix4fv( location, false, value );
-		
+
 	};
-	
+
 	function useProgram(program){
-	
+
 		_gl.useProgram( program );
-	
+
 	};
-	
+
 	function setFaceCulling( cullFace, frontFaceDirection ) {
 
 		if ( cullFace === THREE.CullFaceNone ) {
@@ -639,7 +634,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
+
 	function setMaterialFaces( material ) {
 
 		var doubleSided = material.side === THREE.DoubleSide;
@@ -678,7 +673,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
+
 	function setPolygonOffset ( polygonoffset, factor, units ) {
 
 		if ( _oldPolygonOffset !== polygonoffset ) {
@@ -707,7 +702,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
+
 	function setBlending( blending, blendEquation, blendSrc, blendDst ) {
 
 		if ( blending !== _oldBlending ) {
@@ -780,8 +775,6 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
-	
 
 	function setDepthTest( depthTest ) {
 
@@ -813,8 +806,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
-	
+
 	function setTexture( texture, slot ) {
 
 		if ( texture.needsUpdate ) {
@@ -921,7 +913,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
+
 	function setCubeTexture ( texture, slot ) {
 
 		if ( texture.image.length === 6 ) {
@@ -1006,17 +998,15 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
-	// Textures
 
+	// Textures
 
 	function isPowerOfTwo ( value ) {
 
 		return ( value & ( value - 1 ) ) === 0;
 
 	};
-	
-	
+
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
 
 		if ( isImagePowerOfTwo ) {
@@ -1049,16 +1039,14 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
-	
+
 	function setupFrameBuffer ( framebuffer, renderTarget, textureTarget ) {
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, textureTarget, renderTarget.__webglTexture, 0 );
 
 	};
-	
-	
+
 	function setupRenderBuffer ( renderbuffer, renderTarget  ) {
 
 		_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderbuffer );
@@ -1087,7 +1075,6 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 
 	};
 
-	
 	function setRenderTarget( renderTarget ) {
 
 		var isCube = ( renderTarget instanceof THREE.WebGLRenderTargetCube );
@@ -1236,9 +1223,6 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		_currentHeight = height;
 
 	};
-	
-	
-	
 
 	function clampToMaxSize ( image, maxSize ) {
 
@@ -1265,7 +1249,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return canvas;
 
 	};
-	
+
 	function updateRenderTargetMipmap ( renderTarget ) {
 
 		if ( renderTarget instanceof THREE.WebGLRenderTargetCube ) {
@@ -1283,18 +1267,14 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
+
 	function setCubeTextureDynamic ( texture, slot ) {
 
 		_gl.activeTexture( _gl.TEXTURE0 + slot );
 		_gl.bindTexture( _gl.TEXTURE_CUBE_MAP, texture.__webglTexture );
 
-	}; 
+	};
 
-
-	
-	
-	
 	// Map three.js constants to WebGL constants
 	function paramThreeToGL ( p ) {
 
@@ -1357,10 +1337,9 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return 0;
 
 	};
-	
-	
+
 	function compileShader(vertexShader, fragmentShader){
-		
+
 		var program = _gl.createProgram();
 
 		var glFragmentShader = getShader( "fragment", fragmentShader );
@@ -1383,19 +1362,19 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		_gl.deleteShader( glVertexShader );
 
 		return program;
-		
+
 	};
-	
+
 	function resetState(){
-		
+
 		_oldBlending = -1;
 		_oldDepthTest = -1;
 		_oldDepthWrite = -1;
 		_oldDoubleSided = -1;
 		_oldFlipSided = -1;
-		
+
 	}
-	
+
 	function getShader ( type, string ) {
 
 		var shader;
@@ -1424,7 +1403,6 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return shader;
 
 	};
-	
 
 	function addLineNumbers ( string ) {
 
@@ -1442,9 +1420,7 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		return chunks.join( "\n" );
 
 	};
-	
-	
-	
+
 	function setLineWidth ( width ) {
 
 		if ( width !== _oldLineWidth ) {
@@ -1456,15 +1432,14 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 		}
 
 	};
-	
-	
+
 	this.context = _gl;
-	
+
 	this.autoScaleCubemaps = _autoScaleCubemaps;
 	this.supportsBoneTextures = _supportsBoneTextures;
 	this.precision = _precision;
 	this.maxVertexUniformVectors = _gl.getParameter( _gl.MAX_VERTEX_UNIFORM_VECTORS );	
-	
+
 	// Methods
 	this.getContext = getContext;
 	this.getDomElement = getDomElement;
@@ -1476,32 +1451,32 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	this.supportsStandardDerivatives = supportsStandardDerivatives;
 	this.supportsCompressedTextureS3TC = supportsCompressedTextureS3TC;
 	this.getMaxAnisotropy  = getMaxAnisotropy;
-	
+
 	this.setRenderTarget = setRenderTarget;
 	this.setSize = setSize;
 	this.setViewport = setViewport;
 	this.setScissor = setScissor;
 	this.enableScissorTest = enableScissorTest;
-	
+
 	this.setClearColorHex = setClearColorHex;
 	this.setClearColor = setClearColor;
 	this.getClearColor = getClearColor;
 	this.getClearAlpha = getClearAlpha;
 	this.clear = clear;
 	this.clearTarget = clearTarget;
-	
+
 	this.deleteBuffer = deleteBuffer;
 	this.deleteTexture = deleteTexture;
 	this.deleteFramebuffer = deleteFramebuffer;
 	this.deleteRenderbuffer = deleteRenderbuffer;
 	this.deleteProgram = deleteProgram;
-	
+
 	this.createBuffer = createBuffer;
 	this.setStaticArrayBuffer = setStaticArrayBuffer;
 	this.setStaticIndexBuffer = setStaticIndexBuffer;
 	this.setDynamicArrayBuffer = setDynamicArrayBuffer;
 	this.setDynamicIndexBuffer = setDynamicIndexBuffer;
-	
+
 	this.drawTriangles = drawTriangles;
 	this.drawTriangleStrip = drawTriangleStrip;
 	this.drawLines = drawLines;
@@ -1509,17 +1484,17 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	this.drawPoints = drawPoints;
 	this.drawTriangleElements = drawTriangleElements;
 	this.drawLineElements = drawLineElements;
-	
+
 	this.bindArrayBuffer = bindArrayBuffer;
 	this.bindElementArrayBuffer = bindElementArrayBuffer;
-	
+
 	this.enableAttribute = enableAttribute;
 	this.disableAttributes = disableAttributes;
 	this.getAttribLocation = getAttribLocation;
 	this.setFloatAttribute = setFloatAttribute;
-	
+
 	this.getUniformLocation= getUniformLocation;
-		
+
 	this.uniform1i = uniform1i;
 	this.uniform1f = uniform1f;
 	this.uniform2f = uniform2f;
@@ -1534,27 +1509,24 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 	this.uniform4fv = uniform4fv;
 	this.uniformMatrix3fv = uniformMatrix3fv;
 	this.uniformMatrix4fv = uniformMatrix4fv;
-	
+
 	this.useProgram = useProgram;
 	this.compileShader = compileShader;
-	
+
 	this.setFaceCulling = setFaceCulling;
 	this.setMaterialFaces = setMaterialFaces;
-	this.setPolygonOffset = setPolygonOffset;	
+	this.setPolygonOffset = setPolygonOffset;
 	this.setBlending = setBlending;
 	this.setDepthTest = setDepthTest;
 	this.setDepthWrite = setDepthWrite;
-	
+
 	this.setTexture = setTexture;
 	this.setCubeTexture = setCubeTexture;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
 	this.setCubeTextureDynamic = setCubeTextureDynamic;
-	
+
 	this.paramThreeToGL = paramThreeToGL;
 	this.setLineWidth = setLineWidth;
 	this.resetState = resetState;
-	
+
 };
-
-
-
