@@ -286,7 +286,7 @@ test( "reflect", function() {
 	ok( b.copy( a ).reflect( normal ).equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
 
 	a.set( 1, -1, 0 );
-	normal.set( 0, -1, 0 )
+	normal.set( 0, -1, 0 );
 	ok( b.copy( a ).reflect(  normal ).equals( new THREE.Vector3( -1, -1, 0 ) ), "Passed!" );
 });
 
@@ -303,7 +303,7 @@ test( "angleTo", function() {
 	equal( x.angleTo( z ), Math.PI / 2 );
 	equal( z.angleTo( x ), Math.PI / 2 );
 
-	ok( Math.abs( x.angleTo( new THREE.Vector3( 1, 1, 0 ) ) - ( Math.PI / 4 ) < 0.0000001 ) );
+	ok( Math.abs( x.angleTo( new THREE.Vector3( 1, 1, 0 ) ) - ( Math.PI / 4 ) ) < 0.0000001 );
 });
 
 test( "lerp/clone", function() {
