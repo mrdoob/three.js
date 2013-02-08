@@ -60,8 +60,7 @@ THREE.extend = function ( obj, source ) {
 
 		}
 
-    }
-    else {
+	} else {
 
 		var safeHasOwnProperty = {}.hasOwnProperty;
 
@@ -71,7 +70,7 @@ THREE.extend = function ( obj, source ) {
 
 				obj[prop] = source[prop];
 
-            }
+			}
 
 		}
 
@@ -101,7 +100,7 @@ THREE.extend = function ( obj, source ) {
 
 	if ( window.requestAnimationFrame === undefined ) {
 
-		window.requestAnimationFrame = function ( callback, element ) {
+		window.requestAnimationFrame = function ( callback ) {
 
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
 			var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
@@ -4343,7 +4342,6 @@ THREE.extend( THREE.Matrix4.prototype, {
 		var m11 = te[0], m21 = te[1], m31 = te[2], m41 = te[3];
 		var m12 = te[4], m22 = te[5], m32 = te[6], m42 = te[7];
 		var m13 = te[8], m23 = te[9], m33 = te[10], m43 = te[11];
-		var m14 = te[12], m24 = te[13], m34 = te[14], m44 = te[15];
 
 		te[0] = r11 * m11 + r21 * m12 + r31 * m13;
 		te[1] = r11 * m21 + r21 * m22 + r31 * m23;
@@ -6468,9 +6466,7 @@ THREE.Projector = function () {
 	_frustum = new THREE.Frustum(),
 
 	_clippedVertex1PositionScreen = new THREE.Vector4(),
-	_clippedVertex2PositionScreen = new THREE.Vector4(),
-
-	_face3VertexNormals;
+	_clippedVertex2PositionScreen = new THREE.Vector4();
 
 	this.projectVector = function ( vector, camera ) {
 
@@ -6611,8 +6607,7 @@ THREE.Projector = function () {
 
 		var visible = false,
 		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
-		geometry, vertices, vertex, vertexPositionScreen,
-		faces, face, faceVertexNormals, faceVertexUvs, uvs,
+		geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
 		v1, v2, v3, v4, isFaceMaterial, objectMaterials;
 
 		_face3Count = 0;
@@ -7315,16 +7310,15 @@ THREE.Geometry.prototype = {
 
 	computeFaceNormals: function () {
 
-		var n, nl, v, vl, vertex, f, fl, face, vA, vB, vC,
-		cb = new THREE.Vector3(), ab = new THREE.Vector3();
+		var cb = new THREE.Vector3(), ab = new THREE.Vector3();
 
-		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+		for ( var f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-			face = this.faces[ f ];
+			var face = this.faces[ f ];
 
-			vA = this.vertices[ face.a ];
-			vB = this.vertices[ face.b ];
-			vC = this.vertices[ face.c ];
+			var vA = this.vertices[ face.a ];
+			var vB = this.vertices[ face.b ];
+			var vC = this.vertices[ face.c ];
 
 			cb.subVectors( vC, vB );
 			ab.subVectors( vA, vB );
@@ -8490,7 +8484,6 @@ THREE.BufferGeometry.prototype = {
 		var tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
 		var n = new THREE.Vector3(), n2 = new THREE.Vector3();
 		var w, t, test;
-		var nx, ny, nz;
 
 		function handleVertex( v ) {
 
@@ -13309,7 +13302,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_directionalLights = new THREE.Color(),
 	_pointLights = new THREE.Color(),
 
-	_pi2 = Math.PI * 2,
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 
 	_pixelMap, _pixelMapContext, _pixelMapImage, _pixelMapData,
@@ -13348,7 +13340,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		} else {
 
-			_context.setLineDash = function ( values ) {}
+			_context.setLineDash = function () {}
 
 		}
 
@@ -13541,7 +13533,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
-				renderParticle( _v1, element, material, scene );
+				renderParticle( _v1, element, material );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -13554,7 +13546,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
 
-					renderLine( _v1, _v2, element, material, scene );
+					renderLine( _v1, _v2, element, material );
 
 				}
 
@@ -13580,7 +13572,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
 
-				renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material, scene );
+				renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material );
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -13711,7 +13703,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function renderParticle( v1, element, material, scene ) {
+		function renderParticle( v1, element, material ) {
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );
@@ -13823,7 +13815,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function renderLine( v1, v2, element, material, scene ) {
+		function renderLine( v1, v2, element, material ) {
 
 			setOpacity( material.opacity );
 			setBlending( material.blending );
@@ -13858,7 +13850,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function renderFace3( v1, v2, v3, uv1, uv2, uv3, element, material, scene ) {
+		function renderFace3( v1, v2, v3, uv1, uv2, uv3, element, material ) {
 
 			_this.info.render.vertices += 3;
 			_this.info.render.faces ++;
@@ -14038,7 +14030,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		function renderFace4( v1, v2, v3, v4, v5, v6, element, material, scene ) {
+		function renderFace4( v1, v2, v3, v4, v5, v6, element, material ) {
 
 			_this.info.render.vertices += 4;
 			_this.info.render.faces ++;
@@ -14050,8 +14042,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				// Let renderFace3() handle this
 
-				renderFace3( v1, v2, v4, 0, 1, 3, element, material, scene );
-				renderFace3( v5, v3, v6, 1, 2, 3, element, material, scene );
+				renderFace3( v1, v2, v4, 0, 1, 3, element, material );
+				renderFace3( v5, v3, v6, 1, 2, 3, element, material );
 
 				return;
 
