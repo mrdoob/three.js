@@ -482,7 +482,7 @@
 
 		"disk": {
 			"type": "stl",
-			"url" : "models/stl/slotted_disk.stl"
+			"url" : "models/stl/ascii/slotted_disk.stl"
 		},
 
 		"colorcube": {
