@@ -3,7 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.LensFlarePlugin = function ( ) {
+THREE.LensFlarePlugin = function () {
 
 	var _gl, _renderer, _precision, _lensFlare = {};
 

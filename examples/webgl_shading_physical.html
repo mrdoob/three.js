@@ -125,11 +125,6 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x00aaff, 1000, FAR );
 
-				if ( DAY )
-					scene.fog.color.setHSV( 0.13, 0.25, 0.99 );
-				else
-					scene.fog.color.setHSV( 0.13, 0.25, 0.1 );
-
 				// CUBE CAMERA
 
 				cubeCamera = new THREE.CubeCamera( 1, FAR, 128 );
@@ -187,7 +182,6 @@
 				// GROUND
 
 				var groundMaterial = new THREE.MeshPhongMaterial( { shininess: 80, ambient: 0x444444, color: 0xffffff, specular: 0xffffff, map: textureSquares } );
-				//groundMaterial.color.setHSV( 0.1, 0.1, 0.99 );
 
 				var planeGeometry = new THREE.PlaneGeometry( 100, 100 );
 
@@ -231,8 +225,6 @@
 				function addObjectColor( geometry, color, x, y, z, ry ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffffff, ambient: 0x444444 } );
-					//var material = new THREE.MeshPhongMaterial( { color: color, ambient: color } );
-					//THREE.ColorUtils.adjustHSV( material.ambient, 0, 0, -0.5 );
 
 					return addObject( geometry, material, x, y, z, ry );
 
@@ -242,7 +234,7 @@
 
 					var tmpMesh = new THREE.Mesh( geometry, material );
 
-					THREE.ColorUtils.adjustHSV( tmpMesh.material.color, 0.1, -0.1, 0 );
+					tmpMesh.material.color.offsetHSL( 0.1, -0.1, 0 );
 
 					tmpMesh.position.set( x, y, z );
 
@@ -317,8 +309,7 @@
 
 				}
 
-				ambientLight = new THREE.AmbientLight( 0xffffff );
-				ambientLight.color.setHSV( 0.1, 0.9, 0.25 );
+				ambientLight = new THREE.AmbientLight( 0x3f2806 );
 				scene.add( ambientLight );
 
 				pointLight = new THREE.PointLight( 0xffaa00, pointIntensity, 5000 );
@@ -345,8 +336,6 @@
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x00aaff, clearAlpha: 1, antialias: false } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-				if ( scene.fog )
 				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.domElement.style.position = "absolute";
@@ -442,7 +431,7 @@
 
 				tweenDirection = -1;
 
-				tweenDay = new TWEEN.Tween( parameters ).to( { control: 100 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
+				tweenDay = new TWEEN.Tween( parameters ).to( { control: 1 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 				tweenNight = new TWEEN.Tween( parameters ).to( { control: 0 }, 1000 ).easing( TWEEN.Easing.Exponential.Out );
 
 				// GUI
@@ -565,13 +554,13 @@
 
 				if ( morph ) morph.updateAnimation( delta );
 
-				scene.fog.color.setHSV( 0.13, 0.25, THREE.Math.mapLinear( parameters.control, 0, 100, 0.1, 0.99 ) );
+				scene.fog.color.setHSL( 0.63, 0.05, parameters.control );
 				renderer.setClearColor( scene.fog.color, 1 );
 
-				sunLight.intensity = THREE.Math.mapLinear( parameters.control, 0, 100, 0.3, 1 );
-				pointLight.intensity = THREE.Math.mapLinear( parameters.control, 0, 100, 1, 0.5 );
+				sunLight.intensity = parameters.control * 0.7 + 0.3;
+				pointLight.intensity = - parameters.control * 0.5 + 1;
 
-				pointLight.color.setHSV( 0.1, THREE.Math.mapLinear( parameters.control, 0, 100, 0.99, 0 ), 0.9 );
+				pointLight.color.setHSL( 0.1, 0.75, parameters.control * 0.5 + 0.5 );
 
 				sunLight.shadowDarkness = shadowConfig.shadowDarkness * sunLight.intensity;
 

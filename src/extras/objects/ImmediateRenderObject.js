@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.ImmediateRenderObject = function ( ) {
+THREE.ImmediateRenderObject = function () {
 
 	THREE.Object3D.call( this );
 

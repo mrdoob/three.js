@@ -168,9 +168,22 @@ THREE.WebGLRenderer2.LowLevelRenderer = function(parameters){
 			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
 
 		}
+		
+		if ( _gl.getShaderPrecisionFormat === undefined ) {
+			
+			_gl.getShaderPrecisionFormat = function() { 
+				
+				return {
+					"rangeMin"  : 1,
+					"rangeMax"  : 1,
+					"precision" : 1
+				};
+				
+			}
+			
+		}
 
 	};
-	
 	
 	function setDefaultGLState () {
 

@@ -8,9 +8,9 @@
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
-		
+
 		// normalized ray.direction required for accurate distance calculations
-		if( this.ray.direction.length() > 0 ) {
+		if( this.ray.direction.lengthSq() > 0 ) {
 
 			this.ray.direction.normalize();
 
@@ -25,6 +25,7 @@
 	var localRay = new THREE.Ray();
 	var facePlane = new THREE.Plane();
 	var intersectPoint = new THREE.Vector3();
+	var matrixPosition = new THREE.Vector3();
 
 	var inverseMatrix = new THREE.Matrix4();
 
@@ -38,7 +39,8 @@
 
 		if ( object instanceof THREE.Particle ) {
 
-			var distance = raycaster.ray.distanceToPoint( object.matrixWorld.getPosition() );
+			matrixPosition.getPositionFromMatrix( object.matrixWorld );
+			var distance = raycaster.ray.distanceToPoint( matrixPosition );
 
 			if ( distance > object.scale.x ) {
 
@@ -58,9 +60,10 @@
 		} else if ( object instanceof THREE.Mesh ) {
 
 			// Checking boundingSphere distance to ray
+			matrixPosition.getPositionFromMatrix( object.matrixWorld );
 			sphere.set(
-				object.matrixWorld.getPosition(),
-				object.geometry.boundingSphere.radius* object.matrixWorld.getMaxScaleOnAxis() );
+				matrixPosition,
+				object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
 
 			if ( ! raycaster.ray.isIntersectionSphere( sphere ) ) {
 
@@ -86,7 +89,7 @@
 			inverseMatrix.getInverse( object.matrixWorld );
 
 			localRay.copy( raycaster.ray ).transform( inverseMatrix );
-	
+
 			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 				var face = geometry.faces[ f ];
@@ -94,14 +97,14 @@
 				var material = isFaceMaterial === true ? objectMaterials[ face.materialIndex ] : object.material;
 
 				if ( material === undefined ) continue;
-				
+
 				facePlane.setFromNormalAndCoplanarPoint( face.normal, vertices[face.a] );
 
 				var planeDistance = localRay.distanceToPlane( facePlane );
-	
+
 				// bail if raycaster and plane are parallel
 				if ( Math.abs( planeDistance ) < precision ) continue;
-	
+
 				// if negative distance, then plane is behind raycaster
 				if ( planeDistance < 0 ) continue;
 
@@ -117,7 +120,7 @@
 
 				// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
 				if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
-				
+
 				intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
 
 				if ( face instanceof THREE.Face3 ) {

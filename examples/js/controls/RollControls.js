@@ -1,6 +1,10 @@
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
+ *
+ * Eye is fixed in position, camera's up is fixed to +Y, direction is constantly 
+ * updated, with direction of mouse on screen compared to screen's center determining
+ * the direction of drift.
  */
 
 THREE.RollControls = function ( object, domElement ) {

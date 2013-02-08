@@ -131,10 +131,6 @@
 				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
 				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
 
-				var cube = new THREE.CubeGeometry( 5, 40, 5 );
-				var material_cube = new THREE.MeshLambertMaterial( { color: 0xffff00, shading: THREE.FlatShading } );
-				material_cube.color.setHSV( 0.1, 0.7, 1 );
-
 				// sound spheres
 
 				var s = 1;
@@ -162,10 +158,9 @@
 
 				// ground
 
-				var material_wireframe = new THREE.MeshLambertMaterial( { color: 0xffaa00, wireframe: true, wireframeLinewidth: 1 } );
-				material_wireframe.color.setHSV( 0.1, 0.2, 0.5 );
+				var material = new THREE.MeshLambertMaterial( { color: 0x7f7566, wireframe: true, wireframeLinewidth: 1 } );
 
-				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 100, 100 ), material_wireframe );
+				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 100, 100 ), material );
 				mesh.position.y = 0.1;
 				mesh.rotation.x = - Math.PI / 2;
 				scene.add( mesh );
@@ -210,8 +205,8 @@
 
 				controls.update( delta );
 
-				material_sphere1.color.setHSV( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 1 );
-				material_sphere2.color.setHSV( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 1 );
+				material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 0.5 );
+				material_sphere2.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
 
 				renderer.render( scene, camera );
 
