@@ -518,7 +518,7 @@ THREE.OBJMTLLoader.prototype = {
 
 				}
 
-			} else if ( line.startsWith( "o " ) ) {
+			} else if ( /^o /.test( line ) ) {
 
 				// object
 
@@ -526,19 +526,19 @@ THREE.OBJMTLLoader.prototype = {
 				object.name = line.substring( 2 ).trim();
 				group.add( object );
 
-			} else if ( line.startsWith( "g " ) ) {
+			} else if ( /^g /.test( line ) ) {
 
 				// group
 
 				meshN( line.substring( 2 ).trim(), undefined );
 
-			} else if ( line.startsWith( "usemtl " ) ) {
+			} else if ( /^usemtl /.test( line ) ) {
 
 				// material
 
 				meshN( undefined, line.substring( 7 ).trim() );
 
-			} else if ( line.startsWith( "mtllib ") ) {
+			} else if ( /^mtllib /.test( line ) ) {
 
 				// mtl file
 
@@ -550,7 +550,7 @@ THREE.OBJMTLLoader.prototype = {
 
 				}
 
-			} else if ( line.startsWith( "s ") ) {
+			} else if ( /^s /.test( line ) ) {
 
 				// Smooth shading
 

@@ -903,7 +903,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			}
 
-			var isCompressed = url_array[ 0 ].endsWith( ".dds" );
+			var isCompressed = /\.dds$/i.test( url_array[ 0 ] );
 
 			if ( isCompressed ) {
 
@@ -917,7 +917,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		} else {
 
-			var isCompressed = textureJSON.url.toLowerCase().endsWith( ".dds" );
+			var isCompressed = /\.dds$/i.test( textureJSON.url );
 			var fullUrl = get_url( textureJSON.url, data.urlBaseType );
 			var textureCallback = generateTextureCallback( 1 );
 
