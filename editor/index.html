@@ -255,12 +255,12 @@
 
 								var loader = new THREE.JSONLoader();
 
-								loader.createModel( data, function ( geometry ) {
+								loader.createModel( data, function ( geometry, materials ) {
 
 									geometry.sourceType = "ascii";
 									geometry.sourceFile = file.name;
 
-									var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+									var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 									mesh.name = filename;
 
 									signals.objectAdded.dispatch( mesh );
