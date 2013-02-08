@@ -186,7 +186,7 @@ THREE.STLLoader.prototype = {
 			
 			var bc = dv.getUint16(48, le);
 			var face = new THREE.Face3( len - 3, len - 2, len - 1, normal);
-			handleAttr(bc, face);
+			if(handleAttr) handleAttr(bc, face);
 			
 			geometry.faces.push( face );
 		}
