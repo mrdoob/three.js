@@ -60,8 +60,7 @@ THREE.extend = function ( obj, source ) {
 
 		}
 
-    }
-    else {
+	} else {
 
 		var safeHasOwnProperty = {}.hasOwnProperty;
 
@@ -71,7 +70,7 @@ THREE.extend = function ( obj, source ) {
 
 				obj[prop] = source[prop];
 
-            }
+			}
 
 		}
 
@@ -101,7 +100,7 @@ THREE.extend = function ( obj, source ) {
 
 	if ( window.requestAnimationFrame === undefined ) {
 
-		window.requestAnimationFrame = function ( callback, element ) {
+		window.requestAnimationFrame = function ( callback ) {
 
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
 			var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
