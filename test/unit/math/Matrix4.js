@@ -217,6 +217,31 @@ test( "transpose", function() {
 	ok( matrixEquals4( b, c ), "Passed!" ); 
 });
 
+
+test("makeTranslation", function() {
+  var a = new THREE.Matrix4();
+  var b = a.makeTranslation(1,2,3);
+  var c = new THREE.Matrix4(
+    1, 0, 0, 1,
+    0, 1, 0, 2,
+    0, 0, 1, 3,
+    0, 0, 0, 1
+  );
+  ok( matrixEquals4( c, a ), "Set the matrix as a translation matrix" );
+  ok( a === b,               "Return a pointer to the matrix once transformed" );
+
+  var v = new THREE.Vector3(4,5,6);
+  a.makeTranslation(v);
+  c = new THREE.Matrix4(
+    1, 0, 0, 4,
+    0, 1, 0, 5,
+    0, 0, 1, 6,
+    0, 0, 0, 1
+  );
+  ok( matrixEquals4( c, a ), "Accept a Vector3 as single parameter" );
+});
+
+
 test( "clone", function() {
 	var a = new THREE.Matrix4( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
 	var b = a.clone();
