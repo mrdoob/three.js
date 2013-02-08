@@ -32,7 +32,7 @@ THREE.STLLoader.prototype = {
 
 	constructor: THREE.STLLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, callback, handleAttr ) {
 
 		var scope = this;
 		var request = new XMLHttpRequest();
@@ -40,7 +40,7 @@ THREE.STLLoader.prototype = {
 		request.addEventListener( 'load', function ( event ) {
 
             var geometry;
-            geometry = scope.parse( event.target.response );
+            geometry = scope.parse( event.target.response, handleAttr );
 
 			scope.dispatchEvent( { type: 'load', content: geometry } );
 
@@ -88,7 +88,7 @@ THREE.STLLoader.prototype = {
 
     },
 
-	parse: function (buf) {
+	parse: function (buf, handleAttr) {
 
 		if( this.isASCII(buf) )
 		{
@@ -97,7 +97,7 @@ THREE.STLLoader.prototype = {
 		}
 		else
 		{
-			return this.parseBinary(buf);
+			return this.parseBinary(buf, handleAttr);
 		}
 
     },
@@ -143,7 +143,7 @@ THREE.STLLoader.prototype = {
 
 	},
 
-	parseBinary: function (buf) {
+	parseBinary: function (buf, handleAttr) {
 
 		// STL binary format specification, as per http://en.wikipedia.org/wiki/STL_(file_format)
 		//
@@ -170,7 +170,7 @@ THREE.STLLoader.prototype = {
 		// var header = new Uint8Array(buf, 0, headerLength); // not presently used
 		var dvTriangleCount = new DataView(buf, headerLength, 4);
 		var numTriangles = dvTriangleCount.getUint32(0, le);
-
+		
 		for (var i = 0; i < numTriangles; i++) {
 
 			var dv = new DataView(buf, dataOffset + i*faceLength, faceLength);
@@ -180,10 +180,15 @@ THREE.STLLoader.prototype = {
 			for(var v = 3; v < 12; v+=3) {
 
 				geometry.vertices.push( new THREE.Vector3( dv.getFloat32(v*4, le), dv.getFloat32((v+1)*4, le), dv.getFloat32( (v+2)*4, le ) ) );
-
 			}
+			
 			var len = geometry.vertices.length;
-			geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal ) );
+			
+			var bc = dv.getUint16(48, le);
+			var face = new THREE.Face3( len - 3, len - 2, len - 1, normal);
+			handleAttr(bc, face);
+			
+			geometry.faces.push( face );
 		}
 
 		geometry.computeCentroids();
