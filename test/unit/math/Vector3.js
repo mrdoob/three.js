@@ -290,6 +290,22 @@ test( "reflect", function() {
 	ok( b.copy( a ).reflect(  normal ).equals( new THREE.Vector3( -1, -1, 0 ) ), "Passed!" );
 });
 
+test( "angleTo", function() {
+	var a = new THREE.Vector3( 0, -0.18851655680720186, 0.9820700116639124 );
+
+	equal( a.angleTo( a ),  0 );
+
+	var x = new THREE.Vector3( 1, 0, 0 );
+	var y = new THREE.Vector3( 0, 1, 0 );
+	var z = new THREE.Vector3( 0, 0, 1 );
+
+	equal( x.angleTo( y ), Math.PI / 2 );
+	equal( x.angleTo( z ), Math.PI / 2 );
+	equal( z.angleTo( x ), Math.PI / 2 );
+
+	ok( Math.abs( x.angleTo( new THREE.Vector3( 1, 1, 0 ) ) - ( Math.PI / 4 ) < 0.0000001 ) );
+});
+
 test( "lerp/clone", function() {
 	var a = new THREE.Vector3( x, 0, z );
 	var b = new THREE.Vector3( 0, -y, 0 );
