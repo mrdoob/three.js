@@ -8806,7 +8806,7 @@ THREE.Loader.prototype = {
 
 	extractUrlBase: function ( url ) {
 
-		var parts = url.split( '/' );
+		var parts = url.toString().split( '/' );
 		parts.pop();
 		return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
 
