@@ -292,8 +292,10 @@ test( "reflect", function() {
 
 test( "angleTo", function() {
 	var a = new THREE.Vector3( 0, -0.18851655680720186, 0.9820700116639124 );
+	var b = new THREE.Vector3( 0, 0.18851655680720186, -0.9820700116639124 );
 
-	equal( a.angleTo( a ),  0 );
+	equal( a.angleTo( a ), 0 );
+	equal( a.angleTo( b ), Math.PI );
 
 	var x = new THREE.Vector3( 1, 0, 0 );
 	var y = new THREE.Vector3( 0, 1, 0 );
