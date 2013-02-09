@@ -564,17 +564,11 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	angleTo: function ( v ) {
 
-		// clamp, to handle numerical problems
-
-		function clamp( x ) {
-
-			return Math.min( Math.max( x, -1 ), 1 );
-
-		}
-
 		var theta = this.dot( v ) / ( this.length() * v.length() );
 
-		return Math.acos( clamp ( theta ) );
+		// clamp, to handle numerical problems
+
+		return Math.acos( THREE.Math.clamp ( theta, -1, 1 ) );
 
 	},
 
