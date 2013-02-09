@@ -568,7 +568,7 @@ THREE.extend( THREE.Vector3.prototype, {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( THREE.Math.clamp ( theta, -1, 1 ) );
+		return Math.acos( THREE.Math.clamp( theta, -1, 1 ) );
 
 	},
 
