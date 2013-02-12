@@ -296,7 +296,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		_this.object.lookAt( _this.target );
 
-		//_this.dispatchEvent( changeEvent ); // not sure what this is for
+		_this.dispatchEvent( changeEvent );
 
 		lastPosition.copy( _this.object.position );
 
