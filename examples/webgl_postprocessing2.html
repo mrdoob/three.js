@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+
+			div {
+				position: absolute;
+				z-index: 10;
+				color: #fff;
+				font-family: monospace;
+				text-align: center;
+				margin: 10px;
+				width: 100%;
+			}
+
+			label, input {
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/shaders/CopyShader.js"></script>
+		<script src="js/shaders/DotScreenShader.js"></script>
+		<script src="js/shaders/RGBShiftShader.js"></script>
+		<script src="js/shaders/EdgeShader.js"></script>
+		<script src="js/shaders/EdgeShader2.js"></script>
+
+		<script src="js/postprocessing/EffectComposer.js"></script>
+		<script src="js/postprocessing/RenderPass.js"></script>
+		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="js/postprocessing/ShaderPass.js"></script>
+
+		<div>
+			<label for="dotScreen">Dot Screen:</label><input id="dotScreen" type="checkbox" onchange="updateOptions()"/><br />
+			<label for="rgbShift">RGB Shift:</label><input id="rgbShift" type="checkbox" onchange="updateOptions()" /><br />
+			<label for="edge">Edge Detection (Frei-Chen Filter):</label><input id="edge" type="checkbox" checked onchange="updateOptions()" /><br />
+			<label for="edge2">Edge Detection (Sobel Filter):</label><input id="edge2" type="checkbox" onchange="updateOptions()" /><br />
+
+		</div>
+
+		<script>
+
+			var camera, scene, renderer, composer;
+			var object, light;
+
+			var dotScreenEffect, rgbShiftEffect, edgeEffect, edgeEffect2;
+
+			init();
+			animate();
+
+			function updateOptions() {
+				var dotScreen = document.getElementById('dotScreen');
+				var rgbShift = document.getElementById('rgbShift');
+				var edge = document.getElementById('edge');
+				var edge2 = document.getElementById('edge2');
+
+				dotScreenEffect.enabled = dotScreen.checked;
+				rgbShiftEffect.enabled = rgbShift.checked;
+				edgeEffect.enabled = edge.checked;
+				edgeEffect2.enabled = edge2.checked;
+
+			}
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 400;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
+
+				object = new THREE.Object3D();
+				scene.add( object );
+
+				var geometry = new THREE.SphereGeometry( 1, 4, 4 );
+				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.FlatShading } );
+
+				for ( var i = 0; i < 100; i ++ ) {
+					material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random(), shading: THREE.FlatShading } );
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.set( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 ).normalize();
+					mesh.position.multiplyScalar( Math.random() * 400 );
+					mesh.rotation.set( Math.random() * 2, Math.random() * 2, Math.random() * 2 );
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50;
+					object.add( mesh );
+
+				}
+
+				scene.add( new THREE.AmbientLight( 0x222222 ) );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 );
+				scene.add( light );
+
+				// postprocessing
+
+				composer = new THREE.EffectComposer( renderer );
+				composer.addPass( new THREE.RenderPass( scene, camera ) );
+
+				dotScreenEffect = new THREE.ShaderPass( THREE.DotScreenShader );
+				dotScreenEffect.uniforms[ 'scale' ].value = 4;
+				composer.addPass( dotScreenEffect );
+
+				rgbShiftEffect = new THREE.ShaderPass( THREE.RGBShiftShader );
+				rgbShiftEffect.uniforms[ 'amount' ].value = 0.0015;
+				composer.addPass( rgbShiftEffect );
+
+				edgeEffect = new THREE.ShaderPass( THREE.EdgeShader );
+				edgeEffect.uniforms[ 'aspect' ].value.x = window.innerWidth;
+				edgeEffect.uniforms[ 'aspect' ].value.y = window.innerHeight;
+				composer.addPass( edgeEffect );
+
+				edgeEffect2 = new THREE.ShaderPass( THREE.EdgeShader2 );
+				edgeEffect2.uniforms[ 'aspect' ].value.x = window.innerWidth;
+				edgeEffect2.uniforms[ 'aspect' ].value.y = window.innerHeight;
+				composer.addPass( edgeEffect2 );
+
+				var effect = new THREE.ShaderPass( THREE.CopyShader);
+				effect.renderToScreen = true;
+				composer.addPass( effect );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				updateOptions();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				edgeEffect.uniforms[ 'aspect' ].value.x = window.innerWidth;
+				edgeEffect.uniforms[ 'aspect' ].value.y = window.innerHeight;
+				edgeEffect2.uniforms[ 'aspect' ].value.x = window.innerWidth;
+				edgeEffect2.uniforms[ 'aspect' ].value.y = window.innerHeight;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var time = Date.now();
+
+				object.rotation.x += 0.005;
+				object.rotation.y += 0.01;
+
+				composer.render();
+				// renderer.render(scene, camera);
+
+			}
+
+		</script>
+	</body>
+</html>
