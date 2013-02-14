@@ -131,7 +131,7 @@ test( "distanceToSphere", function() {
 test( "isInterestionLine/intersectLine", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 
-	var l1 = new THREE.LineSegment( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) );
+	var l1 = new THREE.Line3( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) );
 	ok( a.isIntersectionLine( l1 ), "Passed!" );
 	ok( a.intersectLine( l1 ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 

@@ -2,14 +2,14 @@
  * @author bhouston / http://exocortex.com
  */
 
-THREE.LineSegment = function ( start, end ) {
+THREE.Line3 = function ( start, end ) {
 
 	this.start = ( start !== undefined ) ? start : new THREE.Vector3();
 	this.end = ( end !== undefined ) ? end : new THREE.Vector3();
 
 };
 
-THREE.extend( THREE.LineSegment.prototype, {
+THREE.extend( THREE.Line3.prototype, {
 
 	set: function ( start, end ) {
 
@@ -117,7 +117,7 @@ THREE.extend( THREE.LineSegment.prototype, {
 
 	clone: function () {
 
-		return new THREE.LineSegment().copy( this );
+		return new THREE.Line3().copy( this );
 
 	}
 
