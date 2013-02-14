@@ -149,26 +149,26 @@ test( "intersectPlane", function() {
 });
 
 
-test( "transform", function() {
+test( "applyMatrix4", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	var m = new THREE.Matrix4().identity();
 
-	ok( a.clone().transform( m ).equals( a ), "Passed!" );
+	ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
 
 	a = new THREE.Ray( zero3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	m.rotateByAxis( new THREE.Vector3( 0, 0, 1 ), Math.PI );
-	ok( a.clone().transform( m ).equals( a ), "Passed!" );
+	ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
 
 	m.identity().rotateX( Math.PI );
 	var b = a.clone();
 	b.direction.negate();
-	var a2 = a.clone().transform( m );
+	var a2 = a.clone().applyMatrix4( m );
 	ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
 	ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
 
 	a.origin = new THREE.Vector3( 0, 0, 1 );
 	b.origin = new THREE.Vector3( 0, 0, -1 );
-	var a2 = a.clone().transform( m );
+	var a2 = a.clone().applyMatrix4( m );
 	ok( a2.origin.distanceTo( b.origin ) < 0.0001, "Passed!" );
 	ok( a2.direction.distanceTo( b.direction ) < 0.0001, "Passed!" );
 });
