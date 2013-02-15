@@ -65,7 +65,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 ### Change log ###
 
-2013 02 15 - **r56** (407,609 KB, gzip: 96,870 KB)
+2013 02 15 - **r56** (408,927 KB, gzip: 97,095 KB)
 
 * Added `LineDashedMaterial` support to `CanvasRenderer`. ([sole](http://github.com/sole))
 * Documentation improvements. ([gero3](http://github.com/gero3), [erich666](http://github.com/erich666), [Stompfrog](http://github.com/Stompfrog), [morenoh149](http://github.com/morenoh149), [chrmoritz](http://github.com/chrmoritz) and [mrdoob](http://github.com/mrdoob))
