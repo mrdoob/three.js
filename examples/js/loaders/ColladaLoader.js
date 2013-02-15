@@ -847,6 +847,7 @@ THREE.ColladaLoader = function () {
 		obj.scale = props[ 2 ];
 
     // unit conversion
+    obj.position.multiplyScalar(colladaUnit);
     obj.scale.multiplyScalar(colladaUnit);
 
 		if ( options.centerGeometry && obj.geometry ) {
