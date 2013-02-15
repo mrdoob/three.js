@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '56dev' };
+var THREE = THREE || { REVISION: '56' };
 
 self.console = self.console || {
 
@@ -3185,7 +3185,7 @@ THREE.extend( THREE.Box3.prototype, {
 
 	},
 
-	transform: function() {
+	applyMatrix4: function() {
 
 		var points = [
 			new THREE.Vector3(),
@@ -4684,7 +4684,7 @@ THREE.extend( THREE.Ray.prototype, {
 
 	},
 
-	transform: function ( matrix4 ) {
+	applyMatrix4: function ( matrix4 ) {
 
 		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
@@ -4810,7 +4810,7 @@ THREE.extend( THREE.Sphere.prototype, {
 
 	},
 
-	transform: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		this.center.applyMatrix4( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
@@ -5108,12 +5108,12 @@ THREE.extend( THREE.Plane.prototype, {
 
 	},
 
-	isIntersectionLine: function ( startPoint, endPoint ) {
+	isIntersectionLine: function ( line ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
-		var startSign = this.distanceToPoint( startPoint );
-		var endSign = this.distanceToPoint( endPoint );
+		var startSign = this.distanceToPoint( line.start );
+		var endSign = this.distanceToPoint( line.end );
 
 		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
 
@@ -5123,20 +5123,20 @@ THREE.extend( THREE.Plane.prototype, {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( startPoint, endPoint, optionalTarget ) {
+		return function ( line, optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
 
-			var direction = v1.subVectors( endPoint, startPoint );
+			var direction = line.delta( v1 );
 
 			var denominator = this.normal.dot( direction );
 
 			if ( denominator == 0 ) {
 
 				// line is coplanar, return origin
-				if( this.distanceToPoint( startPoint ) == 0 ) {
+				if( this.distanceToPoint( line.start ) == 0 ) {
 
-					return result.copy( startPoint );
+					return result.copy( line.start );
 
 				}
 
@@ -5145,7 +5145,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			}
 
-			var t = - ( startPoint.dot( this.normal ) + this.constant ) / denominator;
+			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
 			if( t < 0 || t > 1 ) {
 
@@ -5153,7 +5153,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			}
 
-			return result.copy( direction ).multiplyScalar( t ).add( startPoint );
+			return result.copy( direction ).multiplyScalar( t ).add( line.start );
 
 		};
 
@@ -5167,7 +5167,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 	},
 
-	transform: function() {
+	applyMatrix4: function() {
 
 		var v1 = new THREE.Vector3();
 		var v2 = new THREE.Vector3();
@@ -5238,6 +5238,30 @@ THREE.Math = {
 	mapLinear: function ( x, a1, a2, b1, b2 ) {
 
 		return b1 + ( x - a1 ) * ( b2 - b1 ) / ( a2 - a1 );
+
+	},
+
+	// http://en.wikipedia.org/wiki/Smoothstep
+
+	smoothstep: function ( x, min, max ) {
+
+		if ( x <= min ) return 0;
+		if ( x >= max ) return 1;
+
+		x = ( x - min )/( max - min );
+
+		return x*x*(3 - 2*x);
+
+	},
+
+	smootherstep: function ( x, min, max ) {
+
+		if ( x <= min ) return 0;
+		if ( x >= max ) return 1;
+
+		x = ( x - min )/( max - min );
+
+		return x*x*x*(x*(x*6 - 15) + 10);
 
 	},
 
@@ -5906,7 +5930,7 @@ THREE.EventDispatcher = function () {
 
 			inverseMatrix.getInverse( object.matrixWorld );
 
-			localRay.copy( raycaster.ray ).transform( inverseMatrix );
+			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 			for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -13225,6 +13249,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	console.log( 'THREE.CanvasRenderer', THREE.REVISION );
 
+	var smoothstep = THREE.Math.smoothstep;
+
 	parameters = parameters || {};
 
 	var _this = this,
@@ -13959,17 +13985,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_near = camera.near;
 				_far = camera.far;
 
-				var depth;
-
-				depth = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
-				_color1.setRGB( depth, depth, depth );
-
-				depth = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far )
-				_color2.setRGB( depth, depth, depth );
-
-				depth = 1 - smoothstep( v3.positionScreen.z * v3.positionScreen.w, _near, _far );
-				_color3.setRGB( depth, depth, depth );
-
+				_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
+				_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far );
+				_color3.r = _color3.g = _color3.b = 1 - smoothstep( v3.positionScreen.z * v3.positionScreen.w, _near, _far );
 				_color4.addColors( _color2, _color3 ).multiplyScalar( 0.5 );
 
 				_image = getGradientTexture( _color1, _color2, _color3, _color4 );
@@ -14387,13 +14405,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_gradientMapContext.drawImage( _pixelMap, 0, 0 );
 
 			return _gradientMap;
-
-		}
-
-		function smoothstep( value, min, max ) {
-
-			var x = ( value - min ) / ( max - min );
-			return x * x * ( 3 - 2 * x );
 
 		}
 
