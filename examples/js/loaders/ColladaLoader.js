@@ -47,7 +47,6 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	// TODO: support unit conversion as well
 	var colladaUnit = 1.0;
 	var colladaUp = 'Y';
 	var upConversion = null;
@@ -846,6 +845,9 @@ THREE.ColladaLoader = function () {
 		obj.quaternion = props[ 1 ];
 		obj.useQuaternion = true;
 		obj.scale = props[ 2 ];
+
+    // unit conversion
+    obj.scale.multiplyScalar(colladaUnit);
 
 		if ( options.centerGeometry && obj.geometry ) {
 
