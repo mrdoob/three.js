@@ -20,7 +20,8 @@
 		<h2>Before we start</h2>
 		<div>Before you can use Three.js, you need somewhere to display it. Save the following HTML to a file on your computer, and open it in your browser.</div>
 
-		<code>&lt;html&gt;
+		<code>
+		&lt;html&gt;
 			&lt;head&gt;
 				&lt;title&gt;My first Three.js app&lt;/title&gt;
 				&lt;style&gt;canvas { width: 100%; height: 100% }&lt;/style&gt;
@@ -40,12 +41,13 @@
 
 		<div>To actually be able to display anything with Three.js, we need three things: A scene, a camera, and a renderer so we can render the scene with the camera.</div>
 
-		<code>var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+		<code>
+		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-			var renderer = new THREE.WebGLRenderer();
-			renderer.setSize(window.innerWidth, window.innerHeight);
-			document.body.appendChild(renderer.domElement);
+		var renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
 		</code>
 
 		<div>Let's take a moment to explain what's going on here. We have now set up the scene, our camera and the renderer. There are a few different cameras in Three.js, but we'll go more into that later. For now, let's use a PerspectiveCamera. The first attribute is the <strong>field of view</strong>.</div>
@@ -62,12 +64,13 @@
 
 		<div><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</div>
 
-		<code>var geometry = new THREE.CubeGeometry(1,1,1);
-			var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-			var cube = new THREE.Mesh(geometry, material);
-			scene.add(cube);
+		<code>
+		var geometry = new THREE.CubeGeometry(1,1,1);
+		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+		var cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
 
-			camera.position.z = 5;
+		camera.position.z = 5;
 		</code>
 
 		<div>To create a cube, we need a <strong>CubeGeometry</strong>. This is an object that contains all the points (<strong>vertices</strong>) and fill (<strong>faces</strong>) of the cube. We'll explore this more in the future.</div>
@@ -82,11 +85,12 @@
 
 		<div>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render loop</strong>.</div>
 
-		<code>function render() {
-				requestAnimationFrame(render);
-				renderer.render(scene, camera);
-			}
-			render();
+		<code>
+		function render() {
+			requestAnimationFrame(render);
+			renderer.render(scene, camera);
+		}
+		render();
 		</code>
 
 		<div>This will create a loop that causes the renderer to draw the scene 60 times per second. If you're new to writing games in the browser, you might say "why don't we just  create a <strong>setInterval</strong>? The thing is - we could, but <strong>requestAnimationFrame</strong> has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</div>
@@ -97,8 +101,10 @@
 
 		<div>Add the following right above the <strong>renderer.render</strong> call in your <strong>render</strong> function:</div>
 
-		<code>cube.rotation.x += 0.1;
-			cube.rotation.y += 0.1;</code>
+		<code>
+		cube.rotation.x += 0.1;
+		cube.rotation.y += 0.1;
+		</code>
 
 		<div>This will be run every frame (60 times per second), and give the cube a nice rotation animation. Basically anything you want to move or change while the game / app is running, has to go through the render loop. You can of course call other functions from there, so that you don't end up with a <strong>render</strong> function that's hundreds of lines.
 		</div>
@@ -108,40 +114,41 @@
 
 		<div>The full code is available below. Play around with it to get a better understanding of how it works.</div>
 
-		<code>&lthtml&gt
-				&lthead&gt
-					&lttitle&gtMy first Three.js app&lt/title&gt
-					&ltstyle&gtcanvas { width: 100%; height: 100% }&lt/style&gt
-				&lt/head&gt
-				&ltbody&gt
-					&ltscript src="https://raw.github.com/mrdoob/three.js/master/build/three.js"&gt&lt/script&gt
-					&ltscript&gt
-						var scene = new THREE.Scene();
-						var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+		<code>
+		&lt;html&gt;
+			&lt;head&gt;
+				&lt;title&gt;My first Three.js app&lt;/title&gt;
+				&lt;style&gt;canvas { width: 100%; height: 100% }&lt;/style&gt;
+			&lt;/head&gt;
+			&lt;body&gt;
+				&lt;script src="https://raw.github.com/mrdoob/three.js/master/build/three.js"&gt;&lt;/script&gt;
+				&lt;script&gt;
+					var scene = new THREE.Scene();
+					var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 
-						var renderer = new THREE.WebGLRenderer();
-						renderer.setSize(window.innerWidth, window.innerHeight);
-						document.body.appendChild(renderer.domElement);
+					var renderer = new THREE.WebGLRenderer();
+					renderer.setSize(window.innerWidth, window.innerHeight);
+					document.body.appendChild(renderer.domElement);
 
-						var geometry = new THREE.CubeGeometry(1,1,1);
-						var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
-						var cube = new THREE.Mesh(geometry, material);
-						scene.add(cube);
+					var geometry = new THREE.CubeGeometry(1,1,1);
+					var material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+					var cube = new THREE.Mesh(geometry, material);
+					scene.add(cube);
 
-						camera.position.z = 5;
+					camera.position.z = 5;
 
-						function render() {
-							requestAnimationFrame(render);
+					function render() {
+						requestAnimationFrame(render);
 
-							cube.rotation.x += 0.1;
-							cube.rotation.y += 0.1;
+						cube.rotation.x += 0.1;
+						cube.rotation.y += 0.1;
 
-							renderer.render(scene, camera);
-						}
-						render();
-					&lt/script&gt
-				&lt/body&gt
-			&lt/html&gt
+						renderer.render(scene, camera);
+					}
+					render();
+				&lt;/script&gt;
+			&lt;/body&gt;
+		&lt;/html&gt;
 		</code>
 	</body>
 </html>

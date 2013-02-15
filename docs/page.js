@@ -29,6 +29,21 @@ var onDocumentLoad = function ( event ) {
 
 	document.body.innerHTML = text;
 
+	// handle code snippets formatting
+
+	var elements = document.getElementsByTagName( 'code' );
+
+	for ( var i = 0; i < elements.length; i ++ ) {
+
+		var element = elements[ i ];
+
+		text = element.textContent.trim();
+		text = text.replace( /^\t\t/gm, '' );
+
+		element.textContent = text;
+
+	}
+
 	// Edit button
 
 	var button = document.createElement( 'div' );

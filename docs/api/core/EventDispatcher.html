@@ -10,25 +10,29 @@
 		<h1>[name]</h1>
 
 		<div class="desc">JavaScript events for custom objects</div>
-		
+
 		<h2>Example</h2>
 
 		<code>
-var Car = function () {
+		var Car = function () {
 
-	EventDispatcher.call( this );
-	this.start = function () { 
-		this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } ); 
-	};
-	
-};
-	
-var car = new Car();
-car.addEventListener( 'start', function ( event ) { 
-    alert( event.message ); 
-} );
-car.start();
-	    </code>
+			EventDispatcher.call( this );
+			this.start = function () {
+
+				this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+
+			};
+
+		};
+
+		var car = new Car();
+		car.addEventListener( 'start', function ( event ) {
+
+			alert( event.message );
+
+		} );
+		car.start();
+		</code>
 
 		<h2>Constructor</h2>
 
