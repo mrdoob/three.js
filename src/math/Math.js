@@ -30,40 +30,28 @@ THREE.Math = {
 
 	// http://en.wikipedia.org/wiki/Smoothstep
 
-	smoothStep: function ( x, min, max ) {
+	smoothstep: function ( x, min, max ) {
 
-		if( x <= min ) {
-			return 0;
-		}
-		if( x >= max ) {
-			return 1;
-		}
+		if ( x <= min ) return 0;
+		if ( x >= max ) return 1;
 
-		// normalize
 		x = ( x - min )/( max - min );
 
 		return x*x*(3 - 2*x);
 
 	},
 
-	// http://en.wikipedia.org/wiki/Smoothstep
+	smootherstep: function ( x, min, max ) {
 
-	smootherStep: function ( x, min, max ) {
+		if ( x <= min ) return 0;
+		if ( x >= max ) return 1;
 
-		if( x <= min ) {
-			return 0;
-		}
-		if( x >= max ) {
-			return 1;
-		}
-
-		// normalize
 		x = ( x - min )/( max - min );
 
 		return x*x*x*(x*(x*6 - 15) + 10);
 
 	},
-	
+
 	// Random float from <0, 1> with 16 bits of randomness
 	// (standard Math.random() creates repetitive patterns when applied over larger space)
 
