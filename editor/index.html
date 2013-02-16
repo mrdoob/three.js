@@ -81,8 +81,10 @@
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/SceneExporter.js"></script>
-		<script src="../examples/js/exporters/SceneExporter2.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
+
+		<script src="../examples/js/loaders/SceneLoader2.js"></script>
+		<script src="../examples/js/exporters/SceneExporter2.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
@@ -94,6 +96,7 @@
 		<script src="js/ui/Menubar.Add.js"></script>
 		<script src="js/ui/Menubar.Help.js"></script>
 		<script src="js/ui/Sidebar.js"></script>
+		<script src="js/ui/Sidebar.Renderer.js"></script>
 		<script src="js/ui/Sidebar.Scene.js"></script>
 		<script src="js/ui/Sidebar.Object3D.js"></script>
 		<script src="js/ui/Sidebar.Geometry.js"></script>
@@ -251,6 +254,12 @@
 
 							}
 
+							if ( data.metadata.version === undefined ) {
+
+								data.metadata.version = data.metadata.formatVersion;
+
+							}
+
 							if ( data.metadata.type === 'geometry' ) {
 
 								var loader = new THREE.JSONLoader();
@@ -270,7 +279,19 @@
 
 							} else if ( data.metadata.type === 'scene' ) {
 
-								new THREE.SceneLoader().parse( data, function ( result ) {
+								var loader;
+
+								if ( data.metadata.version < 4 ) {
+
+									loader = new THREE.SceneLoader();
+
+								} else {
+
+									loader = new THREE.SceneLoader2();
+
+								}
+
+								loader.parse( data, function ( result ) {
 
 									result.scene.name = filename;
 
@@ -309,7 +330,7 @@
 
 								worker.onmessage = function ( event ) {
 
-									event.data.metadata = { format: 2 };
+									event.data.metadata = { version: 2 };
 									handleJSON( event.data );
 
 								};
@@ -320,7 +341,7 @@
 
 							}
 
-							// 3.0
+							// >= 3.0
 
 							var data;
 

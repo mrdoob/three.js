@@ -26,16 +26,6 @@ Sidebar.Scene = function ( signals ) {
 	container.add( outliner );
 	container.add( new UI.Break() );
 
-	// clear color
-
-	var clearColorRow = new UI.Panel();
-	var clearColor = new UI.Color( 'absolute' ).setLeft( '100px' ).setValue( '#aaaaaa' ).onChange( updateClearColor );
-
-	clearColorRow.add( new UI.Text().setValue( 'Clear color' ).setColor( '#666' ) );
-	clearColorRow.add( clearColor );
-
-	container.add( clearColorRow );
-
 	// fog
 
 	var fogTypeRow = new UI.Panel();
@@ -63,18 +53,6 @@ Sidebar.Scene = function ( signals ) {
 	fogColorRow.add( fogColor );
 
 	container.add( fogColorRow );
-
-	// clear color lock
-
-	var colorLockEnabled = true;
-
-	var colorLockRow = new UI.Panel();
-	colorLockRow.setDisplay( 'inline-block' ).setLeft( '100px' ).setMargin( '0px' );
-
-	var colorLock = new UI.Checkbox( 'relative' ).setLeft( '10px' ).setValue( colorLockEnabled ).onChange( updateColorLock );
-	colorLockRow.add( colorLock );
-
-	fogColorRow.add( colorLockRow );
 
 	// fog near
 
@@ -143,12 +121,6 @@ Sidebar.Scene = function ( signals ) {
 
 	}
 
-	function updateClearColor() {
-
-		signals.clearColorChanged.dispatch( clearColor.getHexValue() );
-
-	}
-
 	function updateFogType() {
 
 		var type = fogType.getValue();
@@ -200,25 +172,11 @@ Sidebar.Scene = function ( signals ) {
 
 		signals.fogColorChanged.dispatch( fogColor.getHexValue() );
 
-		if ( colorLockEnabled )  {
-
-			clearColor.setValue( fogColor.getValue() );
-			updateClearColor();
-
-		}
-
 	}
 
 	function updateFogParameters() {
 
 		signals.fogParametersChanged.dispatch( fogNear.getValue(), fogFar.getValue(), fogDensity.getValue() );
-
-	}
-
-	function updateColorLock() {
-
-		colorLockEnabled = colorLock.getValue();
-		updateFogColor();
 
 	}
 
@@ -276,12 +234,6 @@ Sidebar.Scene = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		outliner.setValue( object !== null ? object.id : null );
-
-	} );
-
-	signals.clearColorChanged.add( function ( color ) {
-
-		clearColor.setHexValue( color );
 
 	} );
 

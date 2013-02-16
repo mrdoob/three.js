@@ -19,11 +19,11 @@ THREE.OBJLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-			var hierarchy = scope.parse( event.target.responseText );
+			var response = scope.parse( event.target.responseText );
 
-			scope.dispatchEvent( { type: 'load', content: hierarchy } );
+			scope.dispatchEvent( { type: 'load', content: response } );
 
-			if ( callback ) callback( hierarchy );
+			if ( callback ) callback( response );
 
 		}, false );
 
