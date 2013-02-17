@@ -78,26 +78,40 @@ THREE.ColladaLoader = function () {
 
 			var request = new XMLHttpRequest();
 
+			
 			request.onreadystatechange = function() {
 
 				if( request.readyState == 4 ) {
 
 					if( request.status == 0 || request.status == 200 ) {
 
-
-						if ( request.responseXML ) {
-
+						if ( isIE ) {
+						
+							// @see http://blogs.msdn.com/b/ie/archive/2012/07/19/xmlhttprequest-responsexml-in-ie10-release-preview.aspx
+							// @see http://blogs.msdn.com/b/xmlteam/archive/2006/10/23/using-the-right-version-of-msxml-in-internet-explorer.aspx
+							// @see http://msdn.microsoft.com/en-us/library/windows/desktop/ms754585(v=vs.85).aspx
+							readyCallbackFunc = readyCallback;
+							var xmlDoc = new ActiveXObject("Msxml2.DOMDocument.3.0");
+							xmlDoc.async = false;
+							xmlDoc.loadXML(request.responseText);
+							parse( xmlDoc, undefined, url );
+							
+						}
+						else if ( request.responseXML ) {
+						
 							readyCallbackFunc = readyCallback;
 							parse( request.responseXML, undefined, url );
 
-						} else if ( request.responseText ) {
-
+						}
+						else if ( request.responseText ) {
+						
 							readyCallbackFunc = readyCallback;
 							var xmlParser = new DOMParser();
 							var responseXML = xmlParser.parseFromString( request.responseText, "application/xml" );
 							parse( responseXML, undefined, url );
-
-						} else {
+							
+						}
+						else {
 
 							console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
 
