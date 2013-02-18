@@ -268,19 +268,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		return _glExtensionTextureFloat;
 
 	};
-	
+
 	this.supportsStandardDerivatives = function () {
 
 		return _glExtensionStandardDerivatives;
 
 	};
-	
+
 	this.supportsCompressedTextureS3TC = function () {
 
 		return _glExtensionCompressedTextureS3TC;
 
 	};
-	
+
 	this.getMaxAnisotropy  = function () {
 
 		return _maxAnisotropy;
@@ -3487,8 +3487,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( updateBuffers ) {
 
-					var attributeItem, attributeName, attributePointer;
-
 					for ( attributeName in geometryAttributes ) {
 
 						if ( attributeName === 'index') continue;
@@ -3529,8 +3527,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( attributeName in geometryAttributes ) {
 
-					if ( attributeName === 'index') continue;
-
 					attributePointer = programAttributes[ attributeName ];
 					attributeItem = geometryAttributes[ attributeName ];
 					attributeSize = attributeItem.itemSize;
@@ -3562,8 +3558,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( attributeName in geometryAttributes ) {
 
-					if ( attributeName === 'index') continue;
-
 					attributePointer = programAttributes[ attributeName ];
 					attributeItem = geometryAttributes[ attributeName ];
 					attributeSize = attributeItem.itemSize;
@@ -3591,7 +3585,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-    }
+    	}
 
 	};
 
@@ -7380,17 +7374,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
 
 		}
-		
+
 		if ( _gl.getShaderPrecisionFormat === undefined ) {
-			
-			_gl.getShaderPrecisionFormat = function() { 
-				
+
+			_gl.getShaderPrecisionFormat = function() {
+
 				return {
 					"rangeMin"  : 1,
 					"rangeMax"  : 1,
 					"precision" : 1
 				};
-				
+
 			}
 		}
 
