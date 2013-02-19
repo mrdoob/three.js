@@ -82,6 +82,8 @@
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/SceneExporter.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
+		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
 		<script src="../examples/js/loaders/SceneLoader2.js"></script>
 		<script src="../examples/js/exporters/SceneExporter2.js"></script>
@@ -123,6 +125,7 @@
 
 				// notifications
 
+				rendererChanged: new SIGNALS.Signal(),
 				sceneAdded: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),

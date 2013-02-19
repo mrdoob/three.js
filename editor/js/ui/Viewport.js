@@ -346,6 +346,21 @@ var Viewport = function ( signals ) {
 
 	// signals
 
+	signals.rendererChanged.add( function ( object ) {
+
+		container.dom.removeChild( renderer.domElement );
+
+		renderer = object;
+		renderer.autoClear = false;
+		renderer.autoUpdateScene = false;
+		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+
+		container.dom.appendChild( renderer.domElement );
+
+		render();
+
+	} );
+
 	signals.objectAdded.add( function ( object ) {
 
 		object.traverse( handleAddition );
