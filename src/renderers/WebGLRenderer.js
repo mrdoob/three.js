@@ -3246,8 +3246,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( ! attributeItem.needsUpdate ) continue;
 
-			// console.log( attributeName );
-
 			if ( attributeName === 'index' ) {
 
 				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
@@ -3263,55 +3261,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			attributeItem.needsUpdate = false;
 
 		}
-
-		// var index = attributes[ "index" ];
-		// var position = attributes[ "position" ];
-		// var normal = attributes[ "normal" ];
-		// var uv = attributes[ "uv" ];
-		// var color = attributes[ "color" ];
-		// var tangent = attributes[ "tangent" ];
-
-		// if ( geometry.elementsNeedUpdate && index !== undefined ) {
-
-		// 	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-		// 	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, index.array, hint );
-
-		// }
-
-		// if ( geometry.verticesNeedUpdate && position !== undefined ) {
-
-		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, position.buffer );
-		// 	_gl.bufferData( _gl.ARRAY_BUFFER, position.array, hint );
-
-		// }
-
-		// if ( geometry.normalsNeedUpdate && normal !== undefined ) {
-
-		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, normal.buffer );
-		// 	_gl.bufferData( _gl.ARRAY_BUFFER, normal.array, hint );
-
-		// }
-
-		// if ( geometry.uvsNeedUpdate && uv !== undefined ) {
-
-		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, uv.buffer );
-		// 	_gl.bufferData( _gl.ARRAY_BUFFER, uv.array, hint );
-
-		// }
-
-		// if ( geometry.colorsNeedUpdate && color !== undefined ) {
-
-		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, color.buffer );
-		// 	_gl.bufferData( _gl.ARRAY_BUFFER, color.array, hint );
-
-		// }
-
-		// if ( geometry.tangentsNeedUpdate && tangent !== undefined ) {
-
-		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, tangent.buffer );
-		// 	_gl.bufferData( _gl.ARRAY_BUFFER, tangent.array, hint );
-
-		// }
 
 		if ( dispose ) {
 
@@ -4756,21 +4705,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-				// if ( geometry.verticesNeedUpdate || geometry.elementsNeedUpdate ||
-				// 	 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-				// 	 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate ) {
-
-				// 	setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
-
-				// }
-
-				// geometry.verticesNeedUpdate = false;
-				// geometry.elementsNeedUpdate = false;
-				// geometry.uvsNeedUpdate = false;
-				// geometry.normalsNeedUpdate = false;
-				// geometry.colorsNeedUpdate = false;
-				// geometry.tangentsNeedUpdate = false;
-
 			} else {
 
 				// check all geometry groups
@@ -4837,15 +4771,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-				// if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate ) {
-
-				// 	setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
-
-				// }
-
-				// geometry.verticesNeedUpdate = false;
-				// geometry.colorsNeedUpdate = false;
-
 			} else {
 
 				material = getBufferMaterial( object, geometry );
@@ -4871,15 +4796,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
 				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
-
-				// if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate ) {
-
-				// 	setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
-
-				// }
-
-				// geometry.verticesNeedUpdate = false;
-				// geometry.colorsNeedUpdate = false;
 
 			} else {
 
