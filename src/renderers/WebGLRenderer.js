@@ -3238,54 +3238,80 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = geometry.attributes;
 
-		var index = attributes[ "index" ];
-		var position = attributes[ "position" ];
-		var normal = attributes[ "normal" ];
-		var uv = attributes[ "uv" ];
-		var color = attributes[ "color" ];
-		var tangent = attributes[ "tangent" ];
+		var attributeName, attributeItem;
 
-		if ( geometry.elementsNeedUpdate && index !== undefined ) {
+		for ( attributeName in attributes ) {
 
-			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, index.array, hint );
+			attributeItem = attributes[ attributeName ];
 
-		}
+			if ( ! attributeItem.needsUpdate ) continue;
 
-		if ( geometry.verticesNeedUpdate && position !== undefined ) {
+			// console.log( attributeName );
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, position.buffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, position.array, hint );
+			if ( attributeName === 'index' ) {
 
-		}
+				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
+				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
 
-		if ( geometry.normalsNeedUpdate && normal !== undefined ) {
+			} else {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, normal.buffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, normal.array, hint );
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+				_gl.bufferData( _gl.ARRAY_BUFFER, attributeItem.array, hint );
+
+			}
+
+			attributeItem.needsUpdate = false;
 
 		}
 
-		if ( geometry.uvsNeedUpdate && uv !== undefined ) {
+		// var index = attributes[ "index" ];
+		// var position = attributes[ "position" ];
+		// var normal = attributes[ "normal" ];
+		// var uv = attributes[ "uv" ];
+		// var color = attributes[ "color" ];
+		// var tangent = attributes[ "tangent" ];
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, uv.buffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, uv.array, hint );
+		// if ( geometry.elementsNeedUpdate && index !== undefined ) {
 
-		}
+		// 	_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+		// 	_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, index.array, hint );
 
-		if ( geometry.colorsNeedUpdate && color !== undefined ) {
+		// }
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, color.buffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, color.array, hint );
+		// if ( geometry.verticesNeedUpdate && position !== undefined ) {
 
-		}
+		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, position.buffer );
+		// 	_gl.bufferData( _gl.ARRAY_BUFFER, position.array, hint );
 
-		if ( geometry.tangentsNeedUpdate && tangent !== undefined ) {
+		// }
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, tangent.buffer );
-			_gl.bufferData( _gl.ARRAY_BUFFER, tangent.array, hint );
+		// if ( geometry.normalsNeedUpdate && normal !== undefined ) {
 
-		}
+		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, normal.buffer );
+		// 	_gl.bufferData( _gl.ARRAY_BUFFER, normal.array, hint );
+
+		// }
+
+		// if ( geometry.uvsNeedUpdate && uv !== undefined ) {
+
+		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, uv.buffer );
+		// 	_gl.bufferData( _gl.ARRAY_BUFFER, uv.array, hint );
+
+		// }
+
+		// if ( geometry.colorsNeedUpdate && color !== undefined ) {
+
+		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, color.buffer );
+		// 	_gl.bufferData( _gl.ARRAY_BUFFER, color.array, hint );
+
+		// }
+
+		// if ( geometry.tangentsNeedUpdate && tangent !== undefined ) {
+
+		// 	_gl.bindBuffer( _gl.ARRAY_BUFFER, tangent.buffer );
+		// 	_gl.bufferData( _gl.ARRAY_BUFFER, tangent.array, hint );
+
+		// }
 
 		if ( dispose ) {
 
@@ -4601,14 +4627,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( geometry instanceof THREE.Geometry ) {
 
-            createLineBuffers( geometry );
-            initLineBuffers( geometry, object );
+						createLineBuffers( geometry );
+						initLineBuffers( geometry, object );
 
-            geometry.verticesNeedUpdate = true;
-            geometry.colorsNeedUpdate = true;
-            geometry.lineDistancesNeedUpdate = true;
+						geometry.verticesNeedUpdate = true;
+						geometry.colorsNeedUpdate = true;
+						geometry.lineDistancesNeedUpdate = true;
 
-          } else if ( geometry instanceof THREE.BufferGeometry ) {
+					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 						initDirectBuffers( geometry );
 
@@ -4728,20 +4754,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				if ( geometry.verticesNeedUpdate || geometry.elementsNeedUpdate ||
-					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-					 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate ) {
+				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-					setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+				// if ( geometry.verticesNeedUpdate || geometry.elementsNeedUpdate ||
+				// 	 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
+				// 	 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate ) {
 
-				}
+				// 	setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-				geometry.verticesNeedUpdate = false;
-				geometry.elementsNeedUpdate = false;
-				geometry.uvsNeedUpdate = false;
-				geometry.normalsNeedUpdate = false;
-				geometry.colorsNeedUpdate = false;
-				geometry.tangentsNeedUpdate = false;
+				// }
+
+				// geometry.verticesNeedUpdate = false;
+				// geometry.elementsNeedUpdate = false;
+				// geometry.uvsNeedUpdate = false;
+				// geometry.normalsNeedUpdate = false;
+				// geometry.colorsNeedUpdate = false;
+				// geometry.tangentsNeedUpdate = false;
 
 			} else {
 
@@ -4805,49 +4833,53 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-      if ( geometry instanceof THREE.BufferGeometry ) {
+			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate ) {
+				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-					setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+				// if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate ) {
+
+				// 	setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+
+				// }
+
+				// geometry.verticesNeedUpdate = false;
+				// geometry.colorsNeedUpdate = false;
+
+			} else {
+
+				material = getBufferMaterial( object, geometry );
+
+				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
+
+				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
+
+					setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
 				}
 
 				geometry.verticesNeedUpdate = false;
 				geometry.colorsNeedUpdate = false;
+				geometry.lineDistancesNeedUpdate = false;
 
-			} else {
+				material.attributes && clearCustomAttributes( material );
 
-        material = getBufferMaterial( object, geometry );
-
-        customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-        if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
-
-          setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
-
-        }
-
-        geometry.verticesNeedUpdate = false;
-        geometry.colorsNeedUpdate = false;
-        geometry.lineDistancesNeedUpdate = false;
-
-        material.attributes && clearCustomAttributes( material );
-
-      }
+			}
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
-				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate ) {
+				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-					setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+				// if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate ) {
 
-				}
+				// 	setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-				geometry.verticesNeedUpdate = false;
-				geometry.colorsNeedUpdate = false;
+				// }
+
+				// geometry.verticesNeedUpdate = false;
+				// geometry.colorsNeedUpdate = false;
 
 			} else {
 
