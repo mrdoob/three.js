@@ -3399,7 +3399,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( material.visible === false ) return;
 
 		var program, programAttributes, linewidth, primitives, a, attribute, geometryAttributes;
-		var attributeItem, attributeName, attributePointer;
+		var attributeItem, attributeName, attributePointer, attributeSize;
 
 		program = setProgram( camera, lights, fog, material, object );
 
