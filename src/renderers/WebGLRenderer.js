@@ -4509,9 +4509,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( object instanceof THREE.Mesh ) {
+			geometry = object.geometry;
 
-				geometry = object.geometry;
+			if ( geometry instanceof THREE.BufferGeometry ) {
+
+				initDirectBuffers( geometry );
+
+			} else if ( object instanceof THREE.Mesh ) {
+
 				material = object.material;
 
 				if ( geometry instanceof THREE.Geometry ) {
@@ -4547,15 +4552,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					}
 
-				} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-					initDirectBuffers( geometry );
-
 				}
 
 			} else if ( object instanceof THREE.Ribbon ) {
-
-				geometry = object.geometry;
 
 				if ( ! geometry.__webglVertexBuffer ) {
 
@@ -4570,8 +4569,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				geometry = object.geometry;
-
 				if ( ! geometry.__webglVertexBuffer ) {
 
 					if ( geometry instanceof THREE.Geometry ) {
@@ -4583,17 +4580,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 						geometry.colorsNeedUpdate = true;
 						geometry.lineDistancesNeedUpdate = true;
 
-					} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-						initDirectBuffers( geometry );
-
 					}
 
 				}
 
 			} else if ( object instanceof THREE.ParticleSystem ) {
-
-				geometry = object.geometry;
 
 				if ( ! geometry.__webglVertexBuffer ) {
 
@@ -4605,13 +4596,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						geometry.verticesNeedUpdate = true;
 						geometry.colorsNeedUpdate = true;
 
-					} else if ( geometry instanceof THREE.BufferGeometry ) {
-
-						initDirectBuffers( geometry );
-
 					}
-
-
 				}
 
 			}
@@ -4699,53 +4684,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var geometry = object.geometry,
 			geometryGroup, customAttributesDirty, material;
 
-		if ( object instanceof THREE.Mesh ) {
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			if ( geometry instanceof THREE.BufferGeometry ) {
+			setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
-				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+		} else if ( object instanceof THREE.Mesh ) {
 
-			} else {
+			// check all geometry groups
 
-				// check all geometry groups
+			for( var i = 0, il = geometry.geometryGroupsList.length; i < il; i ++ ) {
 
-				for( var i = 0, il = geometry.geometryGroupsList.length; i < il; i ++ ) {
+				geometryGroup = geometry.geometryGroupsList[ i ];
 
-					geometryGroup = geometry.geometryGroupsList[ i ];
+				material = getBufferMaterial( object, geometryGroup );
 
-					material = getBufferMaterial( object, geometryGroup );
+				if ( geometry.buffersNeedUpdate ) {
 
-					if ( geometry.buffersNeedUpdate ) {
-
-						initMeshBuffers( geometryGroup, object );
-
-					}
-
-					customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-					if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
-						 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
-						 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate || customAttributesDirty ) {
-
-						setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic, material );
-
-					}
+					initMeshBuffers( geometryGroup, object );
 
 				}
 
-				geometry.verticesNeedUpdate = false;
-				geometry.morphTargetsNeedUpdate = false;
-				geometry.elementsNeedUpdate = false;
-				geometry.uvsNeedUpdate = false;
-				geometry.normalsNeedUpdate = false;
-				geometry.colorsNeedUpdate = false;
-				geometry.tangentsNeedUpdate = false;
+				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-				geometry.buffersNeedUpdate = false;
+				if ( geometry.verticesNeedUpdate || geometry.morphTargetsNeedUpdate || geometry.elementsNeedUpdate ||
+					 geometry.uvsNeedUpdate || geometry.normalsNeedUpdate ||
+					 geometry.colorsNeedUpdate || geometry.tangentsNeedUpdate || customAttributesDirty ) {
 
-				material.attributes && clearCustomAttributes( material );
+					setMeshBuffers( geometryGroup, object, _gl.DYNAMIC_DRAW, !geometry.dynamic, material );
+
+				}
 
 			}
+
+			geometry.verticesNeedUpdate = false;
+			geometry.morphTargetsNeedUpdate = false;
+			geometry.elementsNeedUpdate = false;
+			geometry.uvsNeedUpdate = false;
+			geometry.normalsNeedUpdate = false;
+			geometry.colorsNeedUpdate = false;
+			geometry.tangentsNeedUpdate = false;
+
+			geometry.buffersNeedUpdate = false;
+
+			material.attributes && clearCustomAttributes( material );
 
 		} else if ( object instanceof THREE.Ribbon ) {
 
@@ -4767,54 +4748,39 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			if ( geometry instanceof THREE.BufferGeometry ) {
+			material = getBufferMaterial( object, geometry );
 
-				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-			} else {
+			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
 
-				material = getBufferMaterial( object, geometry );
-
-				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || geometry.lineDistancesNeedUpdate || customAttributesDirty ) {
-
-					setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
-
-				}
-
-				geometry.verticesNeedUpdate = false;
-				geometry.colorsNeedUpdate = false;
-				geometry.lineDistancesNeedUpdate = false;
-
-				material.attributes && clearCustomAttributes( material );
+				setLineBuffers( geometry, _gl.DYNAMIC_DRAW );
 
 			}
+
+			geometry.verticesNeedUpdate = false;
+			geometry.colorsNeedUpdate = false;
+			geometry.lineDistancesNeedUpdate = false;
+
+			material.attributes && clearCustomAttributes( material );
+
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
-			if ( geometry instanceof THREE.BufferGeometry ) {
+			material = getBufferMaterial( object, geometry );
 
-				setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+			customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
 
-			} else {
+			if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || object.sortParticles || customAttributesDirty ) {
 
-				material = getBufferMaterial( object, geometry );
-
-				customAttributesDirty = material.attributes && areCustomAttributesDirty( material );
-
-				if ( geometry.verticesNeedUpdate || geometry.colorsNeedUpdate || object.sortParticles || customAttributesDirty ) {
-
-					setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
-
-				}
-
-				geometry.verticesNeedUpdate = false;
-				geometry.colorsNeedUpdate = false;
-
-				material.attributes && clearCustomAttributes( material );
+				setParticleBuffers( geometry, _gl.DYNAMIC_DRAW, object );
 
 			}
+
+			geometry.verticesNeedUpdate = false;
+			geometry.colorsNeedUpdate = false;
+
+			material.attributes && clearCustomAttributes( material );
 
 		}
 
