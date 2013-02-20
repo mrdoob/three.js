@@ -204,6 +204,7 @@ THREE.extend( THREE.WebGLRenderer.ShaderBuilder.prototype, {
 
 			parameters.gammaInput ? "#define GAMMA_INPUT" : "",
 			parameters.gammaOutput ? "#define GAMMA_OUTPUT" : "",
+    		parameters.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
 
 			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 			( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
@@ -399,7 +400,7 @@ THREE.extend( THREE.WebGLRenderer.ShaderBuilder.prototype, {
 
 			}
 
-			programs = newPrograms;
+			this.programs = newPrograms;
 
 			this.renderer.deleteProgram( program );
 
