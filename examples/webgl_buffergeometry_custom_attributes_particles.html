@@ -138,7 +138,7 @@
 			var radius = 200;
 
 			geometry = new THREE.BufferGeometry();
-			geometry.dynamic = true;
+			// geometry.dynamic = true;
 			geometry.attributes = {
 
 				position: {
@@ -154,7 +154,8 @@
 				size: {
 					itemSize: 1,
 					array: new Float32Array( particles ),
-					numItems: particles * 1
+					numItems: particles * 1,
+					dynamic: true
 				},
 
 			}
@@ -166,7 +167,6 @@
 
 			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
 
-			sphere.dynamic = true;
 			//sphere.sortParticles = true;
 
 			var color = new THREE.Color( 0xffaa00 );;

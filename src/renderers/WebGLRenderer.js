@@ -3244,29 +3244,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			attributeItem = attributes[ attributeName ];
 
-			if ( ! attributeItem.needsUpdate ) continue;
+			if ( attributeItem.needsUpdate ) {
 
-			if ( attributeName === 'index' ) {
+				if ( attributeName === 'index' ) {
 
-				_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
-				_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
+					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
+					_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
 
-			} else {
+				} else {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-				_gl.bufferData( _gl.ARRAY_BUFFER, attributeItem.array, hint );
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+					_gl.bufferData( _gl.ARRAY_BUFFER, attributeItem.array, hint );
+
+				}
+
+				attributeItem.needsUpdate = false;
 
 			}
 
-			attributeItem.needsUpdate = false;
+			if ( dispose && ! attributeItem.dynamic ) {
 
-		}
-
-		if ( dispose ) {
-
-			for ( var i in geometry.attributes ) {
-
-				delete geometry.attributes[ i ].array;
+				delete attributeItem.array;
 
 			}
 
