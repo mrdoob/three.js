@@ -76,6 +76,15 @@ THREE.OBJLoader.prototype = {
 
 		}
 
+		function linegeom( a, b ) {
+
+			var geometry = new THREE.Geometry();
+			geometry.vertices.push(a);
+			geometry.vertices.push(b);
+			return new THREE.Line(geometry);
+
+		}
+
 		function meshN( meshName, materialName ) {
 
 			if ( geometry.vertices.length > 0 ) {
@@ -129,6 +138,10 @@ THREE.OBJLoader.prototype = {
 		// vt float float
 
 		var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/;
+
+		// f vertex vertex ...
+
+		var line_pattern = /f( +[\d]+)( [\d]+)?/;
 
 		// f vertex vertex vertex ...
 
@@ -188,6 +201,15 @@ THREE.OBJLoader.prototype = {
 				uvs.push( uv(
 					parseFloat( result[ 1 ] ),
 					parseFloat( result[ 2 ] )
+				) );
+
+			} else if ( ( result = line_pattern.exec(line) ) !== null ) {
+
+				// ["f 1 2", "1", "2"]
+
+				group.add( linegeom(
+					vertices[ parseInt( result[ 1 ] ) - 1 ],
+					vertices[ parseInt( result[ 2 ] ) - 1 ]
 				) );
 
 			} else if ( ( result = face_pattern1.exec( line ) ) !== null ) {
