@@ -4511,7 +4511,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			geometry = object.geometry;
 
-			if ( geometry instanceof THREE.BufferGeometry ) {
+			if ( geometry === undefined ) {
+
+				// fail silently for now
+
+			} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 				initDirectBuffers( geometry );
 
@@ -4519,36 +4523,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				material = object.material;
 
-				if ( geometry instanceof THREE.Geometry ) {
+				if ( geometry.geometryGroups === undefined ) {
 
-					if ( geometry.geometryGroups === undefined ) {
+					sortFacesByMaterial( geometry, material );
 
-						sortFacesByMaterial( geometry, material );
+				}
 
-					}
+				// create separate VBOs per geometry chunk
 
-					// create separate VBOs per geometry chunk
+				for ( g in geometry.geometryGroups ) {
 
-					for ( g in geometry.geometryGroups ) {
+					geometryGroup = geometry.geometryGroups[ g ];
 
-						geometryGroup = geometry.geometryGroups[ g ];
+					// initialise VBO on the first access
 
-						// initialise VBO on the first access
+					if ( ! geometryGroup.__webglVertexBuffer ) {
 
-						if ( ! geometryGroup.__webglVertexBuffer ) {
+						createMeshBuffers( geometryGroup );
+						initMeshBuffers( geometryGroup, object );
 
-							createMeshBuffers( geometryGroup );
-							initMeshBuffers( geometryGroup, object );
-
-							geometry.verticesNeedUpdate = true;
-							geometry.morphTargetsNeedUpdate = true;
-							geometry.elementsNeedUpdate = true;
-							geometry.uvsNeedUpdate = true;
-							geometry.normalsNeedUpdate = true;
-							geometry.tangentsNeedUpdate = true;
-							geometry.colorsNeedUpdate = true;
-
-						}
+						geometry.verticesNeedUpdate = true;
+						geometry.morphTargetsNeedUpdate = true;
+						geometry.elementsNeedUpdate = true;
+						geometry.uvsNeedUpdate = true;
+						geometry.normalsNeedUpdate = true;
+						geometry.tangentsNeedUpdate = true;
+						geometry.colorsNeedUpdate = true;
 
 					}
 
@@ -4571,16 +4571,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! geometry.__webglVertexBuffer ) {
 
-					if ( geometry instanceof THREE.Geometry ) {
+					createLineBuffers( geometry );
+					initLineBuffers( geometry, object );
 
-						createLineBuffers( geometry );
-						initLineBuffers( geometry, object );
-
-						geometry.verticesNeedUpdate = true;
-						geometry.colorsNeedUpdate = true;
-						geometry.lineDistancesNeedUpdate = true;
-
-					}
+					geometry.verticesNeedUpdate = true;
+					geometry.colorsNeedUpdate = true;
+					geometry.lineDistancesNeedUpdate = true;
 
 				}
 
@@ -4588,15 +4584,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! geometry.__webglVertexBuffer ) {
 
-					if ( geometry instanceof THREE.Geometry ) {
+					createParticleBuffers( geometry );
+					initParticleBuffers( geometry, object );
 
-						createParticleBuffers( geometry );
-						initParticleBuffers( geometry, object );
+					geometry.verticesNeedUpdate = true;
+					geometry.colorsNeedUpdate = true;
 
-						geometry.verticesNeedUpdate = true;
-						geometry.colorsNeedUpdate = true;
-
-					}
 				}
 
 			}
