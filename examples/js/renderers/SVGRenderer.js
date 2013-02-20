@@ -17,7 +17,6 @@ THREE.SVGRenderer = function () {
 	_clipBox = new THREE.Box2(),
 	_elemBox = new THREE.Box2(),
 
-	_enableLighting = false,
 	_color = new THREE.Color(),
 	_diffuseColor = new THREE.Color(),
 	_emissiveColor = new THREE.Color(),
@@ -111,13 +110,7 @@ THREE.SVGRenderer = function () {
 
 		_pathCount = 0; _circleCount = 0; _lineCount = 0;
 
-		_enableLighting = _lights.length > 0;
-
-		if ( _enableLighting ) {
-
-			 calculateLights( _lights );
-
-		}
+		calculateLights( _lights );
 
 		for ( e = 0, el = _elements.length; e < el; e ++ ) {
 
@@ -283,23 +276,15 @@ THREE.SVGRenderer = function () {
 
 		if ( material instanceof THREE.ParticleCircleMaterial ) {
 
-			if ( _enableLighting ) {
+			_color.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
+			_color.g = _ambientLight.g + _directionalLights.g + _pointLights.g;
+			_color.b = _ambientLight.b + _directionalLights.b + _pointLights.b;
 
-				_color.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
-				_color.g = _ambientLight.g + _directionalLights.g + _pointLights.g;
-				_color.b = _ambientLight.b + _directionalLights.b + _pointLights.b;
+			_color.r = material.color.r * _color.r;
+			_color.g = material.color.g * _color.g;
+			_color.b = material.color.b * _color.b;
 
-				_color.r = material.color.r * _color.r;
-				_color.g = material.color.g * _color.g;
-				_color.b = material.color.b * _color.b;
-
-				_color.updateStyleString();
-
-			} else {
-
-				_color = material.color;
-
-			}
+			_color.updateStyleString();
 
 			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
 
@@ -358,19 +343,11 @@ THREE.SVGRenderer = function () {
 
 			}
 
-			if ( _enableLighting ) {
+			_color.copy( _ambientLight );
 
-				_color.copy( _ambientLight );
+			calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
-
-				_color.multiply( _diffuseColor ).add( _emissiveColor );
-
-			} else {
-
-				_color.copy( _diffuseColor );
-
-			}
+			_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -428,19 +405,11 @@ THREE.SVGRenderer = function () {
 
 			}
 
-			if ( _enableLighting ) {
+			_color.copy( _ambientLight );
 
-				_color.copy( _ambientLight );
+			calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
-
-				_color.multiply( _diffuseColor ).add( _emissiveColor );
-
-			} else {
-
-				_color.copy( _diffuseColor );
-
-			}
+			_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
