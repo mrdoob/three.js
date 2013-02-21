@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '56' };
+var THREE = THREE || { REVISION: '57dev' };
 
 self.console = self.console || {
 
@@ -13430,7 +13430,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_clearBox = new THREE.Box2(),
 	_elemBox = new THREE.Box2(),
 
-	_enableLighting = false,
 	_ambientLight = new THREE.Color(),
 	_directionalLights = new THREE.Color(),
 	_pointLights = new THREE.Color(),
@@ -13643,13 +13642,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_context.fillRect( _clipBox.min.x, _clipBox.min.y, _clipBox.max.x - _clipBox.min.x, _clipBox.max.y - _clipBox.min.y );
 		*/
 
-		_enableLighting = _lights.length > 0;
-
-		if ( _enableLighting === true ) {
-
-			 calculateLights();
-
-		}
+		calculateLights();
 
 		for ( var e = 0, el = _elements.length; e < el; e++ ) {
 
@@ -14008,46 +14001,36 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				if ( _enableLighting === true ) {
+				if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 3 ) {
 
-					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 3 ) {
+					_color1.copy( _ambientLight );
+					_color2.copy( _ambientLight );
+					_color3.copy( _ambientLight );
 
-						_color1.copy( _ambientLight );
-						_color2.copy( _ambientLight );
-						_color3.copy( _ambientLight );
+					calculateLight( element.v1.positionWorld, element.vertexNormalsModel[ 0 ], _color1 );
+					calculateLight( element.v2.positionWorld, element.vertexNormalsModel[ 1 ], _color2 );
+					calculateLight( element.v3.positionWorld, element.vertexNormalsModel[ 2 ], _color3 );
 
-						calculateLight( element.v1.positionWorld, element.vertexNormalsModel[ 0 ], _color1 );
-						calculateLight( element.v2.positionWorld, element.vertexNormalsModel[ 1 ], _color2 );
-						calculateLight( element.v3.positionWorld, element.vertexNormalsModel[ 2 ], _color3 );
+					_color1.multiply( _diffuseColor ).add( _emissiveColor );
+					_color2.multiply( _diffuseColor ).add( _emissiveColor );
+					_color3.multiply( _diffuseColor ).add( _emissiveColor );
+					_color4.addColors( _color2, _color3 ).multiplyScalar( 0.5 );
 
-						_color1.multiply( _diffuseColor ).add( _emissiveColor );
-						_color2.multiply( _diffuseColor ).add( _emissiveColor );
-						_color3.multiply( _diffuseColor ).add( _emissiveColor );
-						_color4.addColors( _color2, _color3 ).multiplyScalar( 0.5 );
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 
-						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
-
-						clipImage( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, 0, 0, 1, 0, 0, 1, _image );
-
-					} else {
-
-						_color.copy( _ambientLight );
-
-						calculateLight( element.centroidModel, element.normalModel, _color );
-
-						_color.multiply( _diffuseColor ).add( _emissiveColor );
-
-						material.wireframe === true
-							? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-							: fillPath( _color );
-
-					}
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, 0, 0, 1, 0, 0, 1, _image );
 
 				} else {
 
+					_color.copy( _ambientLight );
+
+					calculateLight( element.centroidModel, element.normalModel, _color );
+
+					_color.multiply( _diffuseColor ).add( _emissiveColor );
+
 					material.wireframe === true
-						? strokePath( material.color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-						: fillPath( material.color );
+						? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
+						: fillPath( _color );
 
 				}
 
@@ -14192,54 +14175,40 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				if ( _enableLighting === true ) {
+				if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
 
-					if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
+					_color1.copy( _ambientLight );
+					_color2.copy( _ambientLight );
+					_color3.copy( _ambientLight );
+					_color4.copy( _ambientLight );
 
-						_color1.copy( _ambientLight );
-						_color2.copy( _ambientLight );
-						_color3.copy( _ambientLight );
-						_color4.copy( _ambientLight );
+					calculateLight( element.v1.positionWorld, element.vertexNormalsModel[ 0 ], _color1 );
+					calculateLight( element.v2.positionWorld, element.vertexNormalsModel[ 1 ], _color2 );
+					calculateLight( element.v4.positionWorld, element.vertexNormalsModel[ 3 ], _color3 );
+					calculateLight( element.v3.positionWorld, element.vertexNormalsModel[ 2 ], _color4 );
 
-						calculateLight( element.v1.positionWorld, element.vertexNormalsModel[ 0 ], _color1 );
-						calculateLight( element.v2.positionWorld, element.vertexNormalsModel[ 1 ], _color2 );
-						calculateLight( element.v4.positionWorld, element.vertexNormalsModel[ 3 ], _color3 );
-						calculateLight( element.v3.positionWorld, element.vertexNormalsModel[ 2 ], _color4 );
+					_color1.multiply( _diffuseColor ).add( _emissiveColor );
+					_color2.multiply( _diffuseColor ).add( _emissiveColor );
+					_color3.multiply( _diffuseColor ).add( _emissiveColor );
+					_color4.multiply( _diffuseColor ).add( _emissiveColor );
 
-						_color1.multiply( _diffuseColor ).add( _emissiveColor );
-						_color2.multiply( _diffuseColor ).add( _emissiveColor );
-						_color3.multiply( _diffuseColor ).add( _emissiveColor );
-						_color4.multiply( _diffuseColor ).add( _emissiveColor );
+					_image = getGradientTexture( _color1, _color2, _color3, _color4 );
 
-						_image = getGradientTexture( _color1, _color2, _color3, _color4 );
+					// TODO: UVs are incorrect, v4->v3?
 
-						// TODO: UVs are incorrect, v4->v3?
+					drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
+					clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
 
-						drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
-						clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
-
-						drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
-						clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
-
-					} else {
-
-						_color.copy( _ambientLight );
-
-						calculateLight( element.centroidModel, element.normalModel, _color );
-
-						_color.multiply( _diffuseColor ).add( _emissiveColor );
-
-						drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
-
-						material.wireframe === true
-							? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-							: fillPath( _color );
-
-					}
+					drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
+					clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
 
 				} else {
 
-					_color.addColors( _diffuseColor, _emissiveColor );
+					_color.copy( _ambientLight );
+
+					calculateLight( element.centroidModel, element.normalModel, _color );
+
+					_color.multiply( _diffuseColor ).add( _emissiveColor );
 
 					drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
 
@@ -14303,8 +14272,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 					clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
 
 				}
-
-
 
 			} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
