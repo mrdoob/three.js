@@ -351,6 +351,12 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
+	equals: function ( c ) {
+
+		return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
+
+	},
+
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );
