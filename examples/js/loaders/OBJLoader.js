@@ -153,6 +153,7 @@ THREE.OBJLoader.prototype = {
 		for ( var i = 0; i < lines.length; i ++ ) {
 
 			var line = lines[ i ];
+			line = line.replace( /\s+/g, ' ' ); 	// remove extra whitespaces if more than 1 whitespace between vertices on a line
 			line = line.trim();
 
 			var result;
