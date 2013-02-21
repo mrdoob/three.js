@@ -151,6 +151,10 @@ THREE.ColladaLoader = function () {
 
 		}
 
+    // unit conversion
+    scene.position.multiplyScalar(colladaUnit);
+    scene.scale.multiplyScalar(colladaUnit);
+
 		createAnimations();
 
 		var result = {
@@ -846,9 +850,9 @@ THREE.ColladaLoader = function () {
 		obj.useQuaternion = true;
 		obj.scale = props[ 2 ];
 
-    // unit conversion
-    obj.position.multiplyScalar(colladaUnit);
-    obj.scale.multiplyScalar(colladaUnit);
+
+
+
 
 		if ( options.centerGeometry && obj.geometry ) {
 
