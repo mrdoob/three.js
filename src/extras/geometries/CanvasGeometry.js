@@ -220,9 +220,9 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 		faces.push(ff);
 		uvs = fUvs[i];
 		fUvs.push([
-			new THREE.Vector2(uvs[2].x,uvs[2].y),
-			new THREE.Vector2(uvs[1].x,uvs[1].y),
-			new THREE.Vector2(uvs[0].x,uvs[0].y)
+			uvs[2].clone(),
+			uvs[1].clone(),
+			uvs[0].clone()
 		]);
 	}
 	
