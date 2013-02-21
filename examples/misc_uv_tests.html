@@ -1,111 +1,199 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset=utf-8 />
-<title>three.js - uv mapping tests</title>
-<style>
-  article, aside, figure, footer, header, hgroup, 
-  menu, nav, section { display: block; }
-</style>
+  <meta charset=utf-8/>
+  <title>three.js - uv mapping tests</title>
+  <style>
+    article, aside, figure, footer, header, hgroup, menu, nav, section {
+      display: block;
+    }
+
+    canvas {
+      border: 1px dotted #cbcbcb;
+    }
+  </style>
   <script src="../build/three.min.js"></script>
   <script src="js/UVsUtils.js"></script>
 
 </head>
 <body>
-  <b id="hello">Doing UV wrap tests here!</b>
-  <i>Please wait while it loads</i>
-  <script>
-/* 
- * This is to help debug UVs problems in geometry, 
- * as well as allow a new user to visualize what UVs are about. 
- */
+<h1 id="hello">UV Wrap Tests</h1>
+<i class="info">Please wait while it loads</i>
+
+<script type="text/javascript">
+
+  // MAN
+  // Use the anchors, eg: /misc_uv_tests.html#Tetrahedron-detail-2 to access directly the UV map you're testing
+
+  // TOOLS
+
+  /*
+   * This is to help debug UVs problems in geometry,
+   * as well as allow a new user to visualize what UVs are about.
+   */
+  function printUVMapping( command, geometry ) {
+
+    var d = document.createElement( 'div' );
+    d.innerHTML = '<pre>' + command + '</pre>';
+    d.appendChild( THREE.UVsDebug( geometry ) );
+    document.body.appendChild( d );
+
+  }
+
+  /**
+   * Rough testing of passed command
+   * Prints the UV Mapping
+   *
+   * THINK : third parameter for assertion: cached uvmap built once it works
+   *
+   * @param description Will be slugified and id'ed so you can anchor to it
+   * @param script     String, will be evaled, must return a THREE.Geometry
+   */
+  function analyseGeometryGivingScript( description, script ) {
+
+    describe( description, 3 );
+    var geometry = eval( script );
+    printUVMapping( script, geometry );
+
+  }
 
 
-function test(name, geometry) {
-  
-  var d = document.createElement('div');
-  d.innerHTML = '<br><br>' + name + '<br>';
-  d.appendChild(THREE.UVsDebug(geometry));
-  document.body.appendChild(d);
-  
-}
+  /**
+   * Describe a section of the tests
+   * Will simply create an html header with a # anchor
+   *
+   * @param sectionName
+   * @param depth Optional, default 2
+   */
+  function describe( sectionName, depth ) {
+
+    depth = (depth || 2);
+    var header = document.createElement( 'h' + depth );
+    header.id = slugify( sectionName ); // so we can anchor to it during tests
+    header.innerHTML = sectionName;
+    document.body.appendChild( header );
+
+  }
 
 
-test('new THREE.PlaneGeometry( 100, 100, 4, 4 )', new THREE.PlaneGeometry( 100, 100, 4, 4 ));
-test('new THREE.SphereGeometry( 75, 12, 6 )', new THREE.SphereGeometry( 75, 12, 6 ));
+  /**
+   * Transform text into a URL slug: spaces turned into dashes, remove non alnum
+   * @param text
+   */
+  function slugify( text ) {
 
-test('new THREE.IcosahedronGeometry( 30, 1 )', new THREE.IcosahedronGeometry( 30, 1 ));
-test('new THREE.OctahedronGeometry( 30, 2 )', new THREE.OctahedronGeometry( 30, 2 ));
+    text = text.replace( /[^-a-zA-Z0-9,&\s]+/ig, '' );
+    text = text.replace( /-/gi, "_" );
+    text = text.replace( /\s/gi, "-" );
 
-test('new THREE.CylinderGeometry( 25, 75, 100, 10, 5 )', new THREE.CylinderGeometry( 25, 75, 100, 10, 5 ));
+    return text;
 
-test('new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 )', new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ));
+  }
 
-var points = [];
 
-for ( var i = 0; i < 10; i ++ ) {
+  // TESTS
+
+  var detail, detailRange = [0, 1, 2, 3];
+
+  describe( 'Planes' );
+  printUVMapping( 'new THREE.PlaneGeometry( 100, 100, 1, 1 )', new THREE.PlaneGeometry( 100, 100, 1, 1 ) );
+  printUVMapping( 'new THREE.PlaneGeometry( 100, 100, 4, 4 )', new THREE.PlaneGeometry( 100, 100, 4, 4 ) );
+
+
+  describe( 'Spheres' );
+  printUVMapping( 'new THREE.SphereGeometry( 50, 3, 2 )', new THREE.SphereGeometry( 50, 3, 2 ) );
+  printUVMapping( 'new THREE.SphereGeometry( 50, 8, 6 )', new THREE.SphereGeometry( 50, 8, 6 ) );
+  printUVMapping( 'new THREE.SphereGeometry( 50, 16, 12 )', new THREE.SphereGeometry( 50, 12, 6 ) );
+
+  describe( 'Tetrahedrons' );
+  for ( detail in detailRange ) {
+    analyseGeometryGivingScript( 'Tetrahedron detail ' + detail, 'new THREE.TetrahedronGeometry( 1, ' + detail + ' )' );
+  }
+
+  describe( 'Octahedrons' );
+  for ( detail in detailRange ) {
+    analyseGeometryGivingScript( 'Octahedron detail ' + detail, 'new THREE.OctahedronGeometry( 1, ' + detail + ' )' );
+  }
+
+  describe( 'Icosahedrons' );
+  for ( detail in detailRange ) {
+    analyseGeometryGivingScript( 'Icosahedron detail ' + detail, 'new THREE.IcosahedronGeometry( 1, ' + detail + ' )' );
+  }
+
+  describe( 'Cylinders' );
+  printUVMapping( 'new THREE.CylinderGeometry( 25, 75, 100, 10, 5 )', new THREE.CylinderGeometry( 25, 75, 100, 10, 5 ) );
+
+  describe( 'Cubes' );
+  printUVMapping( 'new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 )', new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ) );
+
+
+  describe( 'Others' );
+
+  var points = [];
+
+  for ( var i = 0; i < 10; i++ ) {
 
     points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
 
-}
-
-
-test('new THREE.LatheGeometry( points, 8 )', new THREE.LatheGeometry( points, 8 ));
-test('new THREE.TorusGeometry( 50, 20, 8, 8 )', new THREE.TorusGeometry( 50, 20, 8, 8 ));
-test('new THREE.TorusKnotGeometry( 50, 10, 12, 6 )', new THREE.TorusKnotGeometry( 50, 10, 12, 6 ));
-
-/*
-Not sure how UVs for ExtrudeGeometry are done currently...
-*/
-
-var pts = [], starPoints = 5, l;
-for (i=0; i<starPoints*2;i++) {
-  if (i%2==1) {
-    l = 5;
-  } else {
-    l = 10;
   }
 
-  var a = i / starPoints * Math.PI;
-  pts.push(new THREE.Vector2(Math.cos(a) * l,Math.sin(a) * l ));
-}
-var starShape = new THREE.Shape(pts);
-var extrudeSettings = { amount: 200,  bevelEnabled: true, bevelSegments: 2, steps: 10 }; 
 
-test('new THREE.ExtrudeGeometry(starShape, extrudeSettings);', new THREE.ExtrudeGeometry(starShape, extrudeSettings));
+  printUVMapping( 'new THREE.LatheGeometry( points, 8 )', new THREE.LatheGeometry( points, 8 ) );
+  printUVMapping( 'new THREE.TorusGeometry( 50, 20, 8, 8 )', new THREE.TorusGeometry( 50, 20, 8, 8 ) );
+  printUVMapping( 'new THREE.TorusKnotGeometry( 50, 10, 12, 6 )', new THREE.TorusKnotGeometry( 50, 10, 12, 6 ) );
 
-var uvGenerator = new THREE.UVsUtils.CylinderUVGenerator();
-		testShape = setupShape(8, 3);
-		holeShape = setupShape(8, 2);
-		testShape.holes.push(holeShape);
+  /*
+   Not sure how UVs for ExtrudeGeometry are done currently...
+   */
 
-function setupShape(n, r) {
-		// Make shape
-		var sh = new THREE.Shape();
-		for (var i = 0; i < n;i++) {
-			var method = i ? 'lineTo' : 'moveTo';
-			var a = (i/n) * Math.PI * 2;
-			var x = Math.cos(a) * r;
-			var y = Math.sin(a) * r;
-			sh[method](x, y);
-		}
+  var pts = [], starPoints = 5, l;
+  for ( i = 0; i < starPoints * 2; i++ ) {
+    if ( i % 2 == 1 ) {
+      l = 5;
+    } else {
+      l = 10;
+    }
 
-		return sh;
-	}
+    var a = i / starPoints * Math.PI;
+    pts.push( new THREE.Vector2( Math.cos( a ) * l, Math.sin( a ) * l ) );
+  }
+  var starShape = new THREE.Shape( pts );
+  var extrudeSettings = { amount: 200, bevelEnabled: true, bevelSegments: 2, steps: 10 };
 
-var exoption = {
-	bevelEnabled: true,
-	bevelSize: 1,
-	amount: 3,
-	extrudeMaterial: 0,
-	material: 1,
-	uvGenerator: uvGenerator
-};
+  printUVMapping( 'new THREE.ExtrudeGeometry(starShape, extrudeSettings);', new THREE.ExtrudeGeometry( starShape, extrudeSettings ) );
 
-var geom = testShape.extrude(exoption);
-test('new THREE.ExtrudeGeometry with CylinderUVGenerator;', geom);
+  var uvGenerator = new THREE.UVsUtils.CylinderUVGenerator();
+  testShape = setupShape( 8, 3 );
+  holeShape = setupShape( 8, 2 );
+  testShape.holes.push( holeShape );
+
+  function setupShape( n, r ) {
+    // Make shape
+    var sh = new THREE.Shape();
+    for ( var i = 0; i < n; i++ ) {
+      var method = i ? 'lineTo' : 'moveTo';
+      var a = (i / n) * Math.PI * 2;
+      var x = Math.cos( a ) * r;
+      var y = Math.sin( a ) * r;
+      sh[method]( x, y );
+    }
+
+    return sh;
+  }
+
+  var exoption = {
+    bevelEnabled: true,
+    bevelSize: 1,
+    amount: 3,
+    extrudeMaterial: 0,
+    material: 1,
+    uvGenerator: uvGenerator
+  };
+
+  var geom = testShape.extrude( exoption );
+  printUVMapping( 'new THREE.ExtrudeGeometry with CylinderUVGenerator;', geom );
 
 
-  </script>
+</script>
 </body>
 </html>
