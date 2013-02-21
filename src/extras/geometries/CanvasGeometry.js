@@ -2,8 +2,7 @@
  * @author wizgrav / http://www.revoxel.com,
  * Running Image Triangulation and Extrusion
  * An efficient method for extruding bitmaps
- * You can read more about it on this paper
- *
+ 
  * options = {
  *	offset: <int> // Test offset. 3 bytes for Alpha.
  *  height: <float>, // thickness to extrude bitmap
@@ -53,8 +52,8 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 		fc=new THREE.Face3(nb,na,pb,null, null, mtl);
 		fc.normal.set(nx,ny,0).normalize();
 		fs.push(fc);
-		uvs.push([new THREE.UV(0,0),new THREE.UV(0,0),new THREE.UV(0,0)]);
-		uvs.push([new THREE.UV(0,0),new THREE.UV(0,0),new THREE.UV(0,0)]);
+		uvs.push([new THREE.Vector2(0,0),new THREE.Vector2(0,0),new THREE.Vector2(0,0)]);
+		uvs.push([new THREE.Vector2(0,0),new THREE.Vector2(0,0),new THREE.Vector2(0,0)]);
 	};
 	
 	var ctx = canvas.getContext("2d");
@@ -112,9 +111,9 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 									f.normal.set(0,0,1);
 									faces.push(f);
 									fUvs.push([
-										new THREE.UV(vertices[t].x,pv),
-										new THREE.UV(vertices[n-1].x,nv),
-										new THREE.UV(vs.x,nv)
+										new THREE.Vector2(vertices[t].x,pv),
+										new THREE.Vector2(vertices[n-1].x,nv),
+										new THREE.Vector2(vs.x,nv)
 									]);
 									vertices[n-1].z=0;
 									pl=0;
@@ -128,18 +127,18 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 									f.normal.set(0,0,1);
 									faces.push(f);
 									fUvs.push([
-										new THREE.UV(vertices[t].x,pv),
-										new THREE.UV(vertices[t-1].x,pv),
-										new THREE.UV(vs.x,nv)
+										new THREE.Vector2(vertices[t].x,pv),
+										new THREE.Vector2(vertices[t-1].x,pv),
+										new THREE.Vector2(vs.x,nv)
 									]);
 								}
 								f= new THREE.Face3( t, n,n+1,null, null, material);
 								f.normal.set(0,0,1);
 								faces.push(f);
 								fUvs.push([
-									new THREE.UV(vertices[t].x,pv),
-									new THREE.UV(vs.x,nv),
-									new THREE.UV(ve.x,nv)
+									new THREE.Vector2(vertices[t].x,pv),
+									new THREE.Vector2(vs.x,nv),
+									new THREE.Vector2(ve.x,nv)
 								]);
 								checked = 1;
 							}else{
@@ -147,9 +146,9 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 								f.normal.set(0,0,1);
 								faces.push(f);
 								fUvs.push([
-									new THREE.UV(vertices[t-1].x,pv),
-									new THREE.UV(vertices[t-2].x,pv),
-									new THREE.UV(ve.x,nv)
+									new THREE.Vector2(vertices[t-1].x,pv),
+									new THREE.Vector2(vertices[t-2].x,pv),
+									new THREE.Vector2(ve.x,nv)
 								]);
 								if(vertices[t-2].z){ 
 									side.push([t-2,t-1,0,1]);
@@ -160,9 +159,9 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 								f.normal.set(0,0,1);
 								faces.push(f);
 								fUvs.push([
-									new THREE.UV(vertices[t].x,pv),
-									new THREE.UV(vertices[t-1].x,pv),
-									new THREE.UV(ve.x,nv)
+									new THREE.Vector2(vertices[t].x,pv),
+									new THREE.Vector2(vertices[t-1].x,pv),
+									new THREE.Vector2(ve.x,nv)
 								]);
 							}
 							parent=t;
@@ -221,9 +220,9 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 		faces.push(ff);
 		uvs = fUvs[i];
 		fUvs.push([
-			new THREE.UV(uvs[2].u,uvs[2].v),
-			new THREE.UV(uvs[1].u,uvs[1].v),
-			new THREE.UV(uvs[0].u,uvs[0].v)
+			new THREE.Vector2(uvs[2].x,uvs[2].y),
+			new THREE.Vector2(uvs[1].x,uvs[1].y),
+			new THREE.Vector2(uvs[0].x,uvs[0].y)
 		]);
 	}
 	
