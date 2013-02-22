@@ -152,7 +152,6 @@ THREE.ColladaLoader = function () {
 		}
 
 		// unit conversion
-		scene.position.multiplyScalar( colladaUnit );
 		scene.scale.multiplyScalar( colladaUnit );
 
 		createAnimations();
