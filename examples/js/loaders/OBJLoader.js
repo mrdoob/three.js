@@ -50,6 +50,8 @@ THREE.OBJLoader.prototype = {
 
 		data = data.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
 
+		data = data.replace( /f( +[\d]+)( [\d]+)?/g, "l $1 $2" ); // fix blender's "faces" with two vertices, which are actually lines
+
 		//
 
 		function vector( x, y, z ) {
@@ -76,12 +78,14 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		function linegeom( a, b ) {
+		function linegeom( vtcs ) {
 
 			var geometry = new THREE.Geometry();
-			geometry.vertices.push(a);
-			geometry.vertices.push(b);
-			return new THREE.Line(geometry);
+			for (var v = 0; v < vtcs.length; v++) {
+				geometry.vertices.push( vtcs[ v ] );
+			}
+
+			return new THREE.Line( geometry );
 
 		}
 
@@ -139,9 +143,9 @@ THREE.OBJLoader.prototype = {
 
 		var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/;
 
-		// f vertex vertex ...
+		// l vertex vertex vertex vertex vertex ...
 
-		var line_pattern = /f( +[\d]+)( [\d]+)?/;
+		var line_pattern = /l(( +\d+)+)/;
 
 		// f vertex vertex vertex ...
 
@@ -203,14 +207,24 @@ THREE.OBJLoader.prototype = {
 					parseFloat( result[ 2 ] )
 				) );
 
-			} else if ( ( result = line_pattern.exec(line) ) !== null ) {
+			} else if ( ( result = line_pattern.exec( line ) ) !== null ) {
 
-				// ["f 1 2", "1", "2"]
+				// can't find a good way to get a match with all numbers in the result using regex
 
-				group.add( linegeom(
-					vertices[ parseInt( result[ 1 ] ) - 1 ],
-					vertices[ parseInt( result[ 2 ] ) - 1 ]
-				) );
+				var line_vertices = [];
+				var line_parts = line.split(/ +/);
+
+				for (var l = 1; l < line_parts.length; l++) {
+
+					if (line_parts[ l ]) {
+
+						line_vertices.push( vertices[ parseInt( line_parts[ l ] ) - 1 ] );
+
+					}
+
+				}
+
+				group.add( linegeom( line_vertices ) );
 
 			} else if ( ( result = face_pattern1.exec( line ) ) !== null ) {
 
