@@ -46,26 +46,20 @@ THREE.ColorConverter = {
 
 	},
 
-	toHSV: function () {
+	toHSV: function( color ) {
 
-		var hsv = { h: 0, s: 0, v: 0 };
+		var hsl = color.getHSL();
 
-		return function( color ) {
+		// based on https://gist.github.com/xpansive/1337890#file-index-js
+		hsl.s *= ( hsl.l < 0.5 ) ? hsl.l : ( 1 - hsl.l );
 
-			var hsl = color.getHSL();
-
-			// based on https://gist.github.com/xpansive/1337890#file-index-js
-			hsl.s *= ( hsl.l < 0.5 ) ? hsl.l : ( 1 - hsl.l );
-
-			hsv.h = hsl.h;
-			hsv.s = 2 * hsl.s / ( hsl.l + hsl.s );
-			hsv.v = hsl.l + hsl.s;
-			
-			return hsv;
-			
-		}
+		return {
+			h: hsl.h,
+			s: 2 * hsl.s / ( hsl.l + hsl.s ),
+			v: hsl.l + hsl.s
+		};
 		
-	}(),
+	},
 
 	fromStyle: function ( color, style ) {
 
