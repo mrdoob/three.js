@@ -13956,7 +13956,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setLineCap( material.linecap );
 				setLineJoin( material.linejoin );
 				setStrokeStyle( material.color.getStyle() );
-				setDashAndGap( null, null );
 
 				_context.stroke();
 				_elemBox.expandByScalar( material.linewidth * 2 );
@@ -13970,7 +13969,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setDashAndGap( material.dashSize, material.gapSize );
 
 				_context.stroke();
+
 				_elemBox.expandByScalar( material.linewidth * 2 );
+
+				setDashAndGap( null, null );
 
 			}
 
