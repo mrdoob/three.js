@@ -989,7 +989,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		passColor.camera = currentCamera;
 		passNormalDepth.camera = currentCamera;
 		passLightProxy.camera = currentCamera;
-		passLightFullscreen.camera = THREE.EffectComposer.camera;
+		passLightFullscreen.camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
 
 		passColor.scene = scene;
 		passNormalDepth.scene = scene;
