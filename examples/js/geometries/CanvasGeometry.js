@@ -302,5 +302,6 @@ THREE.CanvasGeometry.prototype.run = function ( canvas, options ) {
 		pe += vl;
 	
 	}
+	this.userdata = { "trace" : side}
 
 };
