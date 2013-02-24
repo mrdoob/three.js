@@ -594,6 +594,12 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
+	equals: function ( c ) {
+
+		return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
+
+	},
+
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );
@@ -6203,6 +6209,7 @@ THREE.EventDispatcher = function () {
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.Object3D = function () {
@@ -6252,18 +6259,33 @@ THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix: function () {
 
-		this.matrix.multiplyMatrices( matrix, this.matrix );
+		var m1 = new THREE.Matrix4();
 
-		this.scale.getScaleFromMatrix( this.matrix );
+		return function ( matrix ) {
 
-		var mat = new THREE.Matrix4().extractRotation( this.matrix );
-		this.rotation.setEulerFromRotationMatrix( mat, this.eulerOrder );
+			this.matrix.multiplyMatrices( matrix, this.matrix );
 
-		this.position.getPositionFromMatrix( this.matrix );
+			this.position.getPositionFromMatrix( this.matrix );
 
-	},
+			this.scale.getScaleFromMatrix( this.matrix );
+
+			m1.extractRotation( this.matrix );
+
+			if ( this.useQuaternion === true )  {
+
+				this.quaternion.setFromRotationMatrix( m1 );
+
+			} else {
+
+				this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
+
+			}
+
+		}
+
+	}(),
 
 	translate: function ( distance, axis ) {
 
@@ -6296,33 +6318,41 @@ THREE.Object3D.prototype = {
 
 	},
 
-	worldToLocal: function ( vector ) {
+	worldToLocal: function () {
 
-		return vector.applyMatrix4( THREE.Object3D.__m1.getInverse( this.matrixWorld ) );
+		var m1 = new THREE.Matrix4();
 
-	},
+		return function ( vector ) {
 
-	lookAt: function ( vector ) {
+			return vector.applyMatrix4( m1.getInverse( this.matrixWorld ) );
 
-		// TODO: Add hierarchy support.
+		};
 
-		this.matrix.lookAt( vector, this.position, this.up );
+	}(),
 
-		if ( this.rotationAutoUpdate ) {
+	lookAt: function () {
 
-			if ( this.useQuaternion === false )  {
+		// This routine does not support objects with rotated and/or translated parent(s)
 
-				this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+		var m1 = new THREE.Matrix4();
+
+		return function ( vector ) {
+
+			m1.lookAt( vector, this.position, this.up );
+
+			if ( this.useQuaternion === true )  {
+
+				this.quaternion.setFromRotationMatrix( m1 );
 
 			} else {
 
-				this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+				this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
 
 			}
 
-		}
+		};
 
-	},
+	}(),
 
 	add: function ( object ) {
 
@@ -6554,7 +6584,6 @@ THREE.Object3D.prototype = {
 
 };
 
-THREE.Object3D.__m1 = new THREE.Matrix4();
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DIdCount = 0;
@@ -8680,7 +8709,8 @@ THREE.BufferGeometry.prototype = {
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
- */
+ * @author WestLangley / http://github.com/WestLangley
+*/
 
 THREE.Camera = function () {
 
@@ -8695,27 +8725,29 @@ THREE.Camera = function () {
 
 THREE.Camera.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Camera.prototype.lookAt = function ( vector ) {
+THREE.Camera.prototype.lookAt = function () {
 
-	// TODO: Add hierarchy support.
+	// This routine does not support cameras with rotated and/or translated parent(s)
 
-	this.matrix.lookAt( this.position, vector, this.up );
+	var m1 = new THREE.Matrix4();
 
-	if ( this.rotationAutoUpdate === true ) {
+	return function ( vector ) {
 
-		if ( this.useQuaternion === false )  {
+		m1.lookAt( this.position, vector, this.up );
 
-			this.rotation.setEulerFromRotationMatrix( this.matrix, this.eulerOrder );
+		if ( this.useQuaternion === true )  {
+
+			this.quaternion.setFromRotationMatrix( m1 );
 
 		} else {
 
-			this.quaternion.copy( this.matrix.decompose()[ 1 ] );
+			this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
 
 		}
 
-	}
+	};
 
-};
+}();
 /**
  * @author alteredq / http://alteredqualia.com/
  */
