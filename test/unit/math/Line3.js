@@ -55,7 +55,6 @@ test( "closestPointToPoint/closestPointToPointParameter", function() {
 	// nearby the ray
 	ok( a.closestPointToPointParameter( zero3.clone(), false ) == -1, "Passed!" );
 	var b2 = a.closestPointToPoint( zero3.clone(), false );
-	console.log( b2 );
 	ok( b2.distanceTo( new THREE.Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
 
 	// nearby the ray
