@@ -1,43 +1,9 @@
 /**
  * @author bhouston / http://exocortex.com/
+ * @author zz85 / http://github.com/zz85
  */
 
 THREE.ColorConverter = {
-
-	fromRGB: function ( color, r, g, b ) {
-
-		return color.setRGB( r, g, b );
-
-	},
-
-	fromHex: function ( color, hex ) {
-
-		return color.setHex( hex );
-
-	},
-
-	toHex: function ( color ) {
-
-		return color.getHex();
-
-	},
-	 
-	toHexString: function ( color ) {
-
-		return color.getHexString( color );
-
-	},
-
-	fromHSL: function ( color, h, s, l ) {
-
-		return color.setHSL( h, s, l );
-	},
-
-	toHSL: function ( color ) {
-
-		return color.getHSL( color );
-
-	},
 
 	fromHSV: function ( color, h, s, v ) {
 
@@ -58,19 +24,6 @@ THREE.ColorConverter = {
 			s: 2 * hsl.s / ( hsl.l + hsl.s ),
 			v: hsl.l + hsl.s
 		};
-		
-	},
-
-	fromStyle: function ( color, style ) {
-
-		return color.setStyle( style );
-
-	},
-
-	toStyle: function ( color ) {
-
-		return color.getStyle( color );
-
 	}
 
 };
