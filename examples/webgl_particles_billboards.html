@@ -83,7 +83,7 @@
 				}
 
 				material = new THREE.ParticleBasicMaterial( { size: 35, sizeAttenuation: false, map: sprite, transparent: true } );
-				THREE.ColorConverter.fromHSV( material.color,  1.0, 0.2, 0.8 );
+				THREE.ColorConverter.setHSV( material.color,  1.0, 0.2, 0.8 );
 
 				particles = new THREE.ParticleSystem( geometry, material );
 				particles.sortParticles = true;
@@ -179,7 +179,7 @@
 				camera.lookAt( scene.position );
 
 				h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
-				THREE.ColorConverter.fromHSV( material.color,  h, 0.75, 0.8 );
+				THREE.ColorConverter.setHSV( material.color,  h, 0.75, 0.8 );
 
 				renderer.render( scene, camera );
 

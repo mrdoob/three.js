@@ -101,14 +101,14 @@
 					geometry.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					THREE.ColorConverter.fromHSV( colors[ i ],  0.6, ( 200 + position.x ) / 400, 1.0 );
+					THREE.ColorConverter.setHSV( colors[ i ],  0.6, ( 200 + position.x ) / 400, 1.0 );
 
 					colors2[ i ] = new THREE.Color( 0xffffff );
-					//THREE.ColorConverter.fromHSV( colors2[ i ],  0.1, 1.0, ( 200 + position.x ) / 400 );
-					THREE.ColorConverter.fromHSV( colors2[ i ],  0.9, ( 200 + position.y ) / 400, 1.0 );
+					//THREE.ColorConverter.setHSV( colors2[ i ],  0.1, 1.0, ( 200 + position.x ) / 400 );
+					THREE.ColorConverter.setHSV( colors2[ i ],  0.9, ( 200 + position.y ) / 400, 1.0 );
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
-					THREE.ColorConverter.fromHSV( colors3[ i ],  i / ( points.length * n_sub ), 1.0, 1.0 );
+					THREE.ColorConverter.setHSV( colors3[ i ],  i / ( points.length * n_sub ), 1.0, 1.0 );
 
 
 				}

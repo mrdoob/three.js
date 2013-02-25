@@ -244,7 +244,7 @@
 						p = smooth.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
-						THREE.ColorConverter.fromHSV( color,  ( p.y ) / 200 + 0.5, 1.0, 1.0 );
+						THREE.ColorConverter.setHSV( color,  ( p.y ) / 200 + 0.5, 1.0, 1.0 );
 
 						f.vertexColors[ j ] = color;
 

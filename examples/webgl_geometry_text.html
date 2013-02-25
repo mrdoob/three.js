@@ -218,7 +218,7 @@
 
 				} else {
 
-					THREE.ColorConverter.fromHSV( pointLight.color,  Math.random(), 0.95, 0.85 );
+					THREE.ColorConverter.setHSV( pointLight.color,  Math.random(), 0.95, 0.85 );
 					hex = decimalToHex( pointLight.color.getHex() );
 
 				}
@@ -266,7 +266,7 @@
 
 				document.getElementById( "color" ).addEventListener( 'click', function() {
 
-					THREE.ColorConverter.fromHSV( pointLight.color,  Math.random(), 0.95, 0.85 );
+					THREE.ColorConverter.setHSV( pointLight.color,  Math.random(), 0.95, 0.85 );
 					hex = decimalToHex( pointLight.color.getHex() );
 
 					updatePermalink();

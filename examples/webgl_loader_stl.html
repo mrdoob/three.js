@@ -74,7 +74,7 @@
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0xffffff, 2, 15 );
-				THREE.ColorConverter.fromHSV( scene.fog.color,  0.06, 0.2, 0.45 );
+				THREE.ColorConverter.setHSV( scene.fog.color,  0.06, 0.2, 0.45 );
 
 
 				// Ground

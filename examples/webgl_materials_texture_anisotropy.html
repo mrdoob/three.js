@@ -95,7 +95,7 @@
 				scene2 = new THREE.Scene();
 
 				scene1.fog = new THREE.Fog( 0xffffff, 1, 25000 );
-				THREE.ColorConverter.fromHSV( scene1.fog.color, 0.6, 0.05, 1 );
+				THREE.ColorConverter.setHSV( scene1.fog.color, 0.6, 0.05, 1 );
 				scene2.fog = scene1.fog;
 
 				scene1.add( new THREE.AmbientLight( 0xeef0ff ) );

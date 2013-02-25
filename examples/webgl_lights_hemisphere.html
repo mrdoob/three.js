@@ -114,7 +114,7 @@
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0xffffff, 1, 5000 );
-				THREE.ColorConverter.fromHSV( scene.fog.color,  0.6, 0, 1 );
+				THREE.ColorConverter.setHSV( scene.fog.color,  0.6, 0, 1 );
 
 				/*
 				controls = new THREE.TrackballControls( camera );
@@ -133,15 +133,15 @@
 				// LIGHTS
 
 				hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-				THREE.ColorConverter.fromHSV( hemiLight.color,  0.6, 0.75, 1 );
-				THREE.ColorConverter.fromHSV( hemiLight.groundColor,  0.095, 0.5, 1 );
+				THREE.ColorConverter.setHSV( hemiLight.color,  0.6, 0.75, 1 );
+				THREE.ColorConverter.setHSV( hemiLight.groundColor,  0.095, 0.5, 1 );
 				hemiLight.position.set( 0, 500, 0 );
 				scene.add( hemiLight );
 
 				//
 
 				dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-				THREE.ColorConverter.fromHSV( dirLight.color,  0.1, 0.1, 1 );
+				THREE.ColorConverter.setHSV( dirLight.color,  0.1, 0.1, 1 );
 				dirLight.position.set( -1, 1.75, 1 );
 				dirLight.position.multiplyScalar( 50 );
 				scene.add( dirLight );
@@ -167,7 +167,7 @@
 
 				var groundGeo = new THREE.PlaneGeometry( 10000, 10000 );
 				var groundMat = new THREE.MeshPhongMaterial( { ambient: 0xffffff, color: 0xffffff, specular: 0x050505 } );
-				THREE.ColorConverter.fromHSV( groundMat.color,  0.095, 0.5, 1 );
+				THREE.ColorConverter.setHSV( groundMat.color,  0.095, 0.5, 1 );
 
 				var ground = new THREE.Mesh( groundGeo, groundMat );
 				ground.rotation.x = -Math.PI/2;

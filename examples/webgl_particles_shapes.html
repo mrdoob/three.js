@@ -360,7 +360,7 @@
 					values_size[ v ] = 50;
 
 					values_color[ v ] = new THREE.Color( 0xffffff );
-					THREE.ColorConverter.fromHSV( values_color[ v ], 0, 0, 0 );
+					THREE.ColorConverter.setHSV( values_color[ v ], 0, 0, 0 );
 
 					particles.vertices[ v ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
@@ -433,9 +433,9 @@
 
 						particles.vertices[ target ] = p.position;
 
-						THREE.ColorConverter.fromHSV( values_color[ target ], hue, 0.8, 0.15 );
+						THREE.ColorConverter.setHSV( values_color[ target ], hue, 0.8, 0.15 );
 
-						THREE.ColorConverter.fromHSV( pointLight.color, hue, 0.8, 0.95 );
+						THREE.ColorConverter.setHSV( pointLight.color, hue, 0.8, 0.95 );
 
 
 					};
@@ -450,7 +450,7 @@
 
 						// Hide the particle
 
-						THREE.ColorConverter.fromHSV( values_color[ target ], 0, 0, 0 );
+						THREE.ColorConverter.setHSV( values_color[ target ], 0, 0, 0 );
 						particles.vertices[ target ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
 						// Mark particle system as available by returning to pool

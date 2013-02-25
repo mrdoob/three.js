@@ -88,7 +88,7 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
-				THREE.ColorConverter.fromHSV( scene.fog.color,  0.51, 0.6, 0.025 );
+				THREE.ColorConverter.setHSV( scene.fog.color,  0.51, 0.6, 0.025 );
 
 				// world
 
@@ -121,7 +121,7 @@
 				// lights
 
 				var ambient = new THREE.AmbientLight( 0xffffff );
-				THREE.ColorConverter.fromHSV( ambient.color,  0.1, 0.5, 0.3 );
+				THREE.ColorConverter.setHSV( ambient.color,  0.1, 0.5, 0.3 );
 				scene.add( ambient );
 
 
@@ -129,7 +129,7 @@
 				dirLight.position.set( 0, -1, 0 ).normalize();
 				scene.add( dirLight );
 
-				THREE.ColorConverter.fromHSV( dirLight.color,  0.1, 0.725, 0.9 );
+				THREE.ColorConverter.setHSV( dirLight.color,  0.1, 0.725, 0.9 );
 
 				// lens flares
 
@@ -144,12 +144,12 @@
 				function addLight( h, s, v, x, y, z ) {
 
 					var light = new THREE.PointLight( 0xffffff, 1.5, 4500 );
-					THREE.ColorConverter.fromHSV( light.color,  h, s, v );
+					THREE.ColorConverter.setHSV( light.color,  h, s, v );
 					light.position.set( x, y, z );
 					scene.add( light );
 
 					var flareColor = new THREE.Color( 0xffffff );
-					THREE.ColorConverter.fromHSV( flareColor,  h, s - 0.5, v + 0.5 );
+					THREE.ColorConverter.setHSV( flareColor,  h, s - 0.5, v + 0.5 );
 
 					var lensFlare = new THREE.LensFlare( textureFlare0, 700, 0.0, THREE.AdditiveBlending, flareColor );
 

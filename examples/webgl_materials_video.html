@@ -147,7 +147,7 @@
 					material.hue = i/xgrid;
 					material.saturation = 1 - j/ygrid;
 
-					THREE.ColorConverter.fromHSV( material.color, material.hue, material.saturation, 1 );
+					THREE.ColorConverter.setHSV( material.color, material.hue, material.saturation, 1 );
 
 					mesh = new THREE.Mesh( geometry, material );
 
@@ -264,7 +264,7 @@
 					material = materials[ i ];
 
 					h = ( 360 * ( material.hue + time ) % 360 ) / 360;
-					THREE.ColorConverter.fromHSV( material.color, h, material.saturation, 1 );
+					THREE.ColorConverter.setHSV( material.color, h, material.saturation, 1 );
 
 				}
 

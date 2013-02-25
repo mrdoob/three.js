@@ -211,7 +211,7 @@
 					colors[ v ] = new THREE.Color();
 					displacement[ v ] = new THREE.Vector3();
 
-					THREE.ColorConverter.fromHSV( colors[ v ],  h, s, 1 );
+					THREE.ColorConverter.setHSV( colors[ v ],  h, s, 1 );
 					colors[ v ].convertGammaToLinear();
 
 					displacement[ v ].set( x, y, z );

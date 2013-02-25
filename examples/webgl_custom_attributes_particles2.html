@@ -152,12 +152,12 @@
 
 				if ( v < vc1 ) {
 
-					THREE.ColorConverter.fromHSV( values_color[ v ],  0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].y + radius ) / ( 2 *radius ) );
+					THREE.ColorConverter.setHSV( values_color[ v ],  0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].y + radius ) / ( 2 *radius ) );
 
 				} else {
 
 					values_size[ v ] = 40;
-					THREE.ColorConverter.fromHSV( values_color[ v ],  0.6, 0.75, 0.5 + vertices[ v ].y / ( 0.8 * radius ) );
+					THREE.ColorConverter.setHSV( values_color[ v ],  0.6, 0.75, 0.5 + vertices[ v ].y / ( 0.8 * radius ) );
 
 				}
 

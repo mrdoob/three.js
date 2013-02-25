@@ -277,13 +277,13 @@
 			dottedMaterial2 = createShaderMaterial( "dotted", light, ambientLight );
 
 			hatchingMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			THREE.ColorConverter.fromHSV( hatchingMaterial2.uniforms.uLineColor1.value,  0, 0.9, 0.9 );
-			THREE.ColorConverter.fromHSV( hatchingMaterial2.uniforms.uLineColor2.value,  0, 0.9, 0.9 );
-			THREE.ColorConverter.fromHSV( hatchingMaterial2.uniforms.uLineColor3.value,  0, 0.9, 0.9 );
-			THREE.ColorConverter.fromHSV( hatchingMaterial2.uniforms.uLineColor4.value,  0.1, 0.9, 0.9 );
+			THREE.ColorConverter.setHSV( hatchingMaterial2.uniforms.uLineColor1.value,  0, 0.9, 0.9 );
+			THREE.ColorConverter.setHSV( hatchingMaterial2.uniforms.uLineColor2.value,  0, 0.9, 0.9 );
+			THREE.ColorConverter.setHSV( hatchingMaterial2.uniforms.uLineColor3.value,  0, 0.9, 0.9 );
+			THREE.ColorConverter.setHSV( hatchingMaterial2.uniforms.uLineColor4.value,  0.1, 0.9, 0.9 );
 
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			THREE.ColorConverter.fromHSV( dottedMaterial2.uniforms.uLineColor1.value,  0.05, 1.0, 1.0 );
+			THREE.ColorConverter.setHSV( dottedMaterial2.uniforms.uLineColor1.value,  0.05, 1.0, 1.0 );
 
 			var texture = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -609,26 +609,26 @@
 
 				if ( current_material === "dotted2" ) {
 
-					THREE.ColorConverter.fromHSV( effect.material.uniforms.uLineColor1.value,  effectController.hue, effectController.saturation, effectController.value );
+					THREE.ColorConverter.setHSV( effect.material.uniforms.uLineColor1.value,  effectController.hue, effectController.saturation, effectController.value );
 
 				} else if ( current_material === "hatching2" ) {
 
 					u = effect.material.uniforms;
 
-					THREE.ColorConverter.fromHSV( u.uLineColor1.value,  effectController.hue, effectController.saturation, effectController.value );
-					THREE.ColorConverter.fromHSV( u.uLineColor2.value,  effectController.hue, effectController.saturation, effectController.value );
-					THREE.ColorConverter.fromHSV( u.uLineColor3.value,  effectController.hue, effectController.saturation, effectController.value );
-					THREE.ColorConverter.fromHSV( u.uLineColor4.value,  ( effectController.hue + 0.2 % 1.0 ), effectController.saturation, effectController.value );
+					THREE.ColorConverter.setHSV( u.uLineColor1.value,  effectController.hue, effectController.saturation, effectController.value );
+					THREE.ColorConverter.setHSV( u.uLineColor2.value,  effectController.hue, effectController.saturation, effectController.value );
+					THREE.ColorConverter.setHSV( u.uLineColor3.value,  effectController.hue, effectController.saturation, effectController.value );
+					THREE.ColorConverter.setHSV( u.uLineColor4.value,  ( effectController.hue + 0.2 % 1.0 ), effectController.saturation, effectController.value );
 
 				} else {
 
-					THREE.ColorConverter.fromHSV( effect.material.uniforms.uBaseColor.value,  effectController.hue, effectController.saturation, effectController.value );
+					THREE.ColorConverter.setHSV( effect.material.uniforms.uBaseColor.value,  effectController.hue, effectController.saturation, effectController.value );
 
 				}
 
 			} else {
 
-				THREE.ColorConverter.fromHSV( effect.material.color,  effectController.hue, effectController.saturation, effectController.value );
+				THREE.ColorConverter.setHSV( effect.material.color,  effectController.hue, effectController.saturation, effectController.value );
 
 			}
 
@@ -637,7 +637,7 @@
 			light.position.set( effectController.lx, effectController.ly, effectController.lz );
 			light.position.normalize();
 
-			THREE.ColorConverter.fromHSV( pointLight.color,  effectController.lhue, effectController.lsaturation, effectController.lvalue );
+			THREE.ColorConverter.setHSV( pointLight.color,  effectController.lhue, effectController.lsaturation, effectController.lvalue );
 
 			// render
 

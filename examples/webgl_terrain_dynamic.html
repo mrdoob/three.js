@@ -317,7 +317,7 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
-				THREE.ColorConverter.fromHSV( scene.fog.color, 0.102, 0.9, 0.825 );
+				THREE.ColorConverter.setHSV( scene.fog.color, 0.102, 0.9, 0.825 );
 
 				// LIGHTS
 
@@ -704,7 +704,7 @@
 					var valNorm = ( lightVal - fLow ) / ( fHigh - fLow );
 
 					var sat = THREE.Math.mapLinear( valNorm, 0, 1, 0.95, 0.25 );
-					THREE.ColorConverter.fromHSV( scene.fog.color, 0.1, sat, lightVal );
+					THREE.ColorConverter.setHSV( scene.fog.color, 0.1, sat, lightVal );
 
 					renderer.setClearColor( scene.fog.color, 1 );
 

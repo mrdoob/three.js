@@ -209,17 +209,17 @@
 							p = geometry1.vertices[ vertexIndex ];
 
 							color = new THREE.Color( 0xffffff );
-							THREE.ColorConverter.fromHSV( color, ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
+							THREE.ColorConverter.setHSV( color, ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
 
 							f1.vertexColors[ j ] = color;
 
 							color = new THREE.Color( 0xffffff );
-							THREE.ColorConverter.fromHSV( color, 0.0, ( p.y / radius + 1 ) / 2, 1.0 );
+							THREE.ColorConverter.setHSV( color, 0.0, ( p.y / radius + 1 ) / 2, 1.0 );
 
 							f2.vertexColors[ j ] = color;
 
 							color = new THREE.Color( 0xffffff );
-							THREE.ColorConverter.fromHSV( color, 0.125 * vertexIndex / geometry1.vertices.length, 1.0, 1.0 );
+							THREE.ColorConverter.setHSV( color, 0.125 * vertexIndex / geometry1.vertices.length, 1.0, 1.0 );
 
 							f3.vertexColors[ j ] = color;
 

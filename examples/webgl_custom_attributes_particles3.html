@@ -212,12 +212,12 @@
 
 				if ( v < vc1 ) {
 
-					THREE.ColorConverter.fromHSV( values_color[ v ],  0.5 + 0.2 * ( v / vc1 ), 0.99, 1.0 );
+					THREE.ColorConverter.setHSV( values_color[ v ],  0.5 + 0.2 * ( v / vc1 ), 0.99, 1.0 );
 
 				} else {
 
 					values_size[ v ] = 55;
-					THREE.ColorConverter.fromHSV( values_color[ v ],  0.1, 0.99, 1.0 );
+					THREE.ColorConverter.setHSV( values_color[ v ],  0.1, 0.99, 1.0 );
 
 				}
 
