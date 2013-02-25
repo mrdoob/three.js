@@ -692,7 +692,9 @@ var Viewport = function ( signals ) {
 		}
 
 		var exporter = new object.exporter();
-		var output = exporter.parse( selected.geometry );
+		
+		var output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
@@ -705,7 +707,9 @@ var Viewport = function ( signals ) {
 	signals.exportScene.add( function ( object ) {
 
 		var exporter = new object.exporter();
-		var output = exporter.parse( scene );
+
+		var output = JSON.stringify( exporter.parse( scene ), null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
