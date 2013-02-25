@@ -8,6 +8,7 @@
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
  * @author bhouston / http://exocortex.com
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 
@@ -589,24 +590,24 @@ THREE.extend( THREE.Matrix4.prototype, {
 	},
 
 	compose: function() {
-
+	
 		var mRotation = new THREE.Matrix4(),
 			mScale = new THREE.Matrix4();
 		
-		return function ( translation, rotation, scale ) {
+		return function ( position, quaternion, scale ) {
 
 			var te = this.elements;
 
 			mRotation.identity();
-			mRotation.setRotationFromQuaternion( rotation );
+			mRotation.setRotationFromQuaternion( quaternion );
 
 			mScale.makeScale( scale.x, scale.y, scale.z );
 
 			this.multiplyMatrices( mRotation, mScale );
 
-			te[12] = translation.x;
-			te[13] = translation.y;
-			te[14] = translation.z;
+			te[12] = position.x;
+			te[13] = position.y;
+			te[14] = position.z;
 
 			return this;
 
@@ -621,7 +622,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 			z = new THREE.Vector3(),
 			matrix = new THREE.Matrix4();
 
-		return function ( translation, rotation, scale ) {
+		return function ( position, quaternion, scale ) {
 
 			var te = this.elements;
 
@@ -630,17 +631,17 @@ THREE.extend( THREE.Matrix4.prototype, {
 			y.set( te[4], te[5], te[6] );
 			z.set( te[8], te[9], te[10] );
 
-			translation = ( translation instanceof THREE.Vector3 ) ? translation : new THREE.Vector3();
-			rotation = ( rotation instanceof THREE.Quaternion ) ? rotation : new THREE.Quaternion();
+			position = ( position instanceof THREE.Vector3 ) ? position : new THREE.Vector3();
+			quaternion = ( quaternion instanceof THREE.Quaternion ) ? quaternion : new THREE.Quaternion();
 			scale = ( scale instanceof THREE.Vector3 ) ? scale : new THREE.Vector3();
 
 			scale.x = x.length();
 			scale.y = y.length();
 			scale.z = z.length();
 
-			translation.x = te[12];
-			translation.y = te[13];
-			translation.z = te[14];
+			position.x = te[12];
+			position.y = te[13];
+			position.z = te[14];
 
 			// scale the rotation part
 
@@ -658,9 +659,9 @@ THREE.extend( THREE.Matrix4.prototype, {
 			matrix.elements[9] /= scale.z;
 			matrix.elements[10] /= scale.z;
 
-			rotation.setFromRotationMatrix( matrix );
+			quaternion.setFromRotationMatrix( matrix );
 
-			return [ translation, rotation, scale ];
+			return [ position, quaternion, scale ];
 
 		};
 
