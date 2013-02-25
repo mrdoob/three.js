@@ -45,6 +45,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -104,13 +105,13 @@
 					geometry.vertices.push( points[ i ] );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSV( 0.6, ( 200 + points[ i ].x ) / 400, 1.0 );
+					THREE.ColorConverter.fromHSV( colors[ i ],  0.6, ( 200 + points[ i ].x ) / 400, 1.0 );
 
 					colors2[ i ] = new THREE.Color( 0xffffff );
-					colors2[ i ].setHSV( 0.3, 1.0, ( 200 + points[ i ].x ) / 400 );
+					THREE.ColorConverter.fromHSV( colors2[ i ],  0.3, 1.0, ( 200 + points[ i ].x ) / 400 );
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSV( i / points.length, 1.0, 1.0 );
+					THREE.ColorConverter.fromHSV( colors3[ i ],  i / points.length, 1.0, 1.0 );
 
 				}
 

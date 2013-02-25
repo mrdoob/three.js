@@ -25,6 +25,7 @@
 
 	<body>
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
@@ -93,7 +94,7 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xfafafa, 1000, 10000 );
-				scene.fog.color.setHSV( 0.6, 0.125, 1 );
+				THREE.ColorConverter.fromHSV( scene.fog.color, 0.6, 0.125, 1 );
 
 				// CONTROLS
 
@@ -108,8 +109,8 @@
 
 
 				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.25 );
-				hemiLight.color.setHSV( 0.6, 0.45, 1 );
-				hemiLight.groundColor.setHSV( 0.1, 0.45, 0.95 );
+				THREE.ColorConverter.fromHSV( hemiLight.color, 0.6, 0.45, 1 );
+				THREE.ColorConverter.fromHSV( hemiLight.groundColor, 0.1, 0.45, 0.95 );
 				hemiLight.position.y = 500;
 				scene.add( hemiLight );
 

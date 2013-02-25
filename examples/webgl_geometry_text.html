@@ -39,6 +39,7 @@
 
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -217,7 +218,7 @@
 
 				} else {
 
-					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
+					THREE.ColorConverter.fromHSV( pointLight.color,  Math.random(), 0.95, 0.85 );
 					hex = decimalToHex( pointLight.color.getHex() );
 
 				}
@@ -265,7 +266,7 @@
 
 				document.getElementById( "color" ).addEventListener( 'click', function() {
 
-					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
+					THREE.ColorConverter.fromHSV( pointLight.color,  Math.random(), 0.95, 0.85 );
 					hex = decimalToHex( pointLight.color.getHex() );
 
 					updatePermalink();

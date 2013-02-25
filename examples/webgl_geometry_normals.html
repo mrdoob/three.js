@@ -16,6 +16,7 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
@@ -214,7 +215,7 @@
 						p = geometry.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( ( p.y ) / 400 + 0.5, 1.0, 1.0 );
+						THREE.ColorConverter.fromHSV( color,  ( p.y ) / 400 + 0.5, 1.0, 1.0 );
 
 						f.vertexColors[ j ] = color;
 

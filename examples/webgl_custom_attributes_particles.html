@@ -35,6 +35,7 @@
 		<div id="container"></div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -162,9 +163,9 @@
 				values_color[ v ] = new THREE.Color( 0xffaa00 );
 
 				if ( vertices[ v ].x < 0 )
-					values_color[ v ].setHSV( 0.5 + 0.1 * ( v / vertices.length ), 0.7, 0.9 );
+					THREE.ColorConverter.fromHSV( values_color[ v ],  0.5 + 0.1 * ( v / vertices.length ), 0.7, 0.9 );
 				else
-					values_color[ v ].setHSV( 0.0 + 0.1 * ( v / vertices.length ), 0.9, 0.9 );
+					THREE.ColorConverter.fromHSV( values_color[ v ],  0.0 + 0.1 * ( v / vertices.length ), 0.9, 0.9 );
 
 			}
 

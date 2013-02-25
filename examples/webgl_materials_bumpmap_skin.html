@@ -47,6 +47,8 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/math/ColorConverter.js"></script>
+
 		<script src="js/ShaderSkin.js"></script>
 
 		<script src="js/shaders/CopyShader.js"></script>
@@ -142,7 +144,7 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.85 );
 				directionalLight.position.set( 1, -0.5, 1 );
-				directionalLight.color.setHSV( 0.6, 0.3, 1 );
+				THREE.ColorConverter.fromHSV( directionalLight.color,  0.6, 0.3, 1 );
 				scene.add( directionalLight );
 
 				directionalLight.position.multiplyScalar( 500 );
@@ -184,7 +186,7 @@
 				container.appendChild( renderer.domElement );
 
 				var color = new THREE.Color();
-				color.setHSV( 0.6, 0.15, 0.35 );
+				THREE.ColorConverter.fromHSV( color,  0.6, 0.15, 0.35 );
 				renderer.setClearColor( color, 1 );
 
 				renderer.shadowMapEnabled = true;

@@ -18,6 +18,7 @@
 		<script src="../build/three.min.js"></script>
 
 		<script src="js/modifiers/SubdivisionModifier.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -243,7 +244,7 @@
 						p = smooth.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( ( p.y ) / 200 + 0.5, 1.0, 1.0 );
+						THREE.ColorConverter.fromHSV( color,  ( p.y ) / 200 + 0.5, 1.0, 1.0 );
 
 						f.vertexColors[ j ] = color;
 
