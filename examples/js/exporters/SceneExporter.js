@@ -747,7 +747,7 @@ THREE.SceneExporter.prototype = {
 			'}'
 		].join( '\n' );
 
-		return output;
+		return JSON.parse( output );
 
 	}
 
