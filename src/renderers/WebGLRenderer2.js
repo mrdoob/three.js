@@ -486,54 +486,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = geometry.attributes;
 
-		var index = attributes[ "index" ];
-		var position = attributes[ "position" ];
-		var normal = attributes[ "normal" ];
-		var uv = attributes[ "uv" ];
-		var color = attributes[ "color" ];
-		var tangent = attributes[ "tangent" ];
+		var attributeName, attributeItem;
 
-		if ( geometry.elementsNeedUpdate && index !== undefined ) {
+		for ( attributeName in attributes ) {
 
-			renderer.setDynamicIndexBuffer(	index.buffer, index.array);
+			attributeItem = attributes[ attributeName ];
 
-		}
+			if ( attributeItem.needsUpdate ) {
 
-		if ( geometry.verticesNeedUpdate && position !== undefined ) {
+				if ( attributeName === 'index' ) {
 
-			renderer.setDynamicArrayBuffer( position.buffer,  position.array);
+					renderer.setDynamicIndexBuffer(	attributeItem.buffer, attributeItem.array );
 
-		}
+				} else {
 
-		if ( geometry.normalsNeedUpdate && normal !== undefined ) {
+					renderer.setDynamicArrayBuffer( attributeItem.buffer,  attributeItem.array );
 
-			renderer.setDynamicArrayBuffer( normal.buffer,  normal.array);
+				}
 
-		}
+				attributeItem.needsUpdate = false;
 
-		if ( geometry.uvsNeedUpdate && uv !== undefined ) {
+			}
 
-			renderer.setDynamicArrayBuffer( uv.buffer,  uv.array);
+			if ( dispose && ! attributeItem.dynamic ) {
 
-		}
-
-		if ( geometry.colorsNeedUpdate && color !== undefined ) {
-
-			renderer.setDynamicArrayBuffer( color.buffer,  color.array);
-
-		}
-
-		if ( geometry.tangentsNeedUpdate && tangent !== undefined ) {
-
-			renderer.setDynamicArrayBuffer( tangent.buffer, tangent.array);
-
-		}
-
-		if ( dispose ) {
-
-			for ( var i in geometry.attributes ) {
-
-				delete geometry.attributes[ i ].array;
+				delete attributeItem.array;
 
 			}
 
