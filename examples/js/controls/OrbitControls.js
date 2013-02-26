@@ -57,6 +57,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var thetaDelta = 0;
 	var scale = 1;
 
+	var defaultUp = new THREE.Vector3( 0, 1, 0); // y-up is assumed
+	var unitZ = new THREE.Vector3( 0, 0, 1); // Needed for the case when camera.up = [0, -1, 0]
+
 	var lastPosition = new THREE.Vector3();
 
 	var STATE = { NONE : -1, ROTATE : 0, ZOOM : 1, PAN : 2 };
@@ -67,9 +70,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 	var changeEvent = { type: 'change' };
 
 	this.move = function ( delta ) {
-		var x_axis = new THREE.Vector3(); x_axis.getBasisXFromMatrix4(scope.object.matrix);
-		var y_axis = new THREE.Vector3(); y_axis.getBasisYFromMatrix4(scope.object.matrix);
-		var z_axis = new THREE.Vector3(); z_axis.getBasisZFromMatrix4(scope.object.matrix);
+		var objectMatrix = this.object.matrix;
+		var rotationMat = new THREE.Matrix4();
+		rotationMat.extractRotation(objectMatrix);
+		var x_axis = new THREE.Vector3(); x_axis.getBasisComponentFromMatrix(0, rotationMat, false);
+		var y_axis = new THREE.Vector3(); y_axis.getBasisComponentFromMatrix(1, rotationMat, false);
+		var z_axis = new THREE.Vector3(); z_axis.getBasisComponentFromMatrix(2, rotationMat, false);
 
 		var offset = new THREE.Vector3();
 		offset.add(		x_axis.clone().multiplyScalar(delta.x))
@@ -158,17 +164,24 @@ THREE.OrbitControls = function ( object, domElement ) {
 		var position = this.object.position;
 		var offset = position.clone().sub( this.center );
 
-		var assumedUp = new THREE.Vector3( 0, 1, 0);
-		var angle = this.object.up.angleTo(assumedUp);
-		if(angle > 0.0001) {
+		// If the camera "up" vector is not [0,1,0], rotate local
+		// frame for the purposes of the subsequent polar calculations.
+		var didRotate = false;
+		var angle = this.object.up.angleTo(defaultUp);
+		if ( angle > EPS ) {
+
+			var didRotate = true;
 			var rotAxis;
-			if(angle < Math.PI - 0.0001)
-				rotAxis = this.object.up.clone().cross(assumedUp).normalize();
+
+			if(angle < Math.PI - EPS)
+				rotAxis = this.object.up.clone().cross(defaultUp).normalize();
 			else
-				rotAxis = new THREE.Vector3(0,0,1); // Just pick an axis for the PI rotation
+				rotAxis = unitZ;
+
 			var quat = new THREE.Quaternion();
 			quat.setFromAxisAngle(rotAxis, angle);
 			offset.applyQuaternion(quat);
+
 		}
 
 		// angle from z-axis around y-axis
@@ -202,8 +215,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
-		if(angle > 0.0001) {
+
+		// If we originally applied a local rotation, now we rotate back!
+		if ( didRotate ) {
+
 			offset.applyQuaternion(quat.inverse());
+
 		}
 
 		position.copy( this.center ).add( offset );
@@ -311,16 +328,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			moveVec.multiplyScalar(0.0006 * offset.length());
 
-//            var fovY = scope.camera.fov;
-//            var fovX = fovY*scope.camera.aspect;
-
-			// Is there a clean way of getting this? The camera would need a pointer to the renderer used...
-//            var width = camera_->getViewport()->getActualWidth();
-//            var height = camera_->getViewport()->getActualHeight();
-
-//            move( -((float)diff_x / (float)width) * distance * tan( fovX / 2.0f ) * 2.0f,
-//                ((float)diff_y / (float)height) * distance * tan( fovY / 2.0f ) * 2.0f,
-//                0.0f );
+			// TODO this is the code lifted from Rviz (www.ros.org/wiki/rviz)
+			// which has the effect of making the cursor move at the same speed as the background
+			// If we don't maintain a pointer to the render window though, we can't do much...
+			/*
+			var fovY = scope.camera.fov;
+			var fovX = fovY*scope.camera.aspect;
+			var width = camera_->getViewport()->getActualWidth();
+			var height = camera_->getViewport()->getActualHeight();
+			move( -((float)diff_x / (float)width) * distance * tan( fovX / 2.0f ) * 2.0f,
+				((float)diff_y / (float)height) * distance * tan( fovY / 2.0f ) * 2.0f,
+				0.0f );*/
 
 			scope.move(moveVec);
 
