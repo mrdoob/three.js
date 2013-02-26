@@ -4077,7 +4077,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			return b.id - a.id;
+			return a.id - b.id;
 
 		}
 
