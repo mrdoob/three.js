@@ -598,6 +598,66 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+	getBasisXFromMatrix3: function ( m ) {
+
+		this.x = m.elements[0];
+		this.y = m.elements[1];
+		this.z = m.elements[2];
+
+		return this;
+
+	},
+
+	getBasisYFromMatrix3: function ( m ) {
+
+		this.x = m.elements[3];
+		this.y = m.elements[4];
+		this.z = m.elements[5];
+
+		return this;
+
+	},
+
+	getBasisZFromMatrix3: function ( m ) {
+
+		this.x = m.elements[6];
+		this.y = m.elements[7];
+		this.z = m.elements[8];
+
+		return this;
+
+	},
+
+	getBasisXFromMatrix4: function ( m ) {
+
+		this.x = m.elements[0];
+		this.y = m.elements[1];
+		this.z = m.elements[2];
+
+		return this;
+
+	},
+
+	getBasisYFromMatrix4: function ( m ) {
+
+		this.x = m.elements[4];
+		this.y = m.elements[5];
+		this.z = m.elements[6];
+
+		return this;
+
+	},
+
+	getBasisZFromMatrix4: function ( m ) {
+
+		this.x = m.elements[8];
+		this.y = m.elements[9];
+		this.z = m.elements[10];
+
+		return this;
+
+	},
+
 	setEulerFromRotationMatrix: function ( m, order ) {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
