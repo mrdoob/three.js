@@ -598,6 +598,23 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+	getBasisComponentFromMatrix: function ( index, m, matrixNeedsScale ) {
+
+		if( matrixNeedsScale === true || matrixNeedsScale === undefined  )
+			var r = m.clone().extractRotation( m );
+		else
+			var r = m;
+
+		var j = index * 4;
+
+		this.x = r.elements[j];
+		this.y = r.elements[j+1];
+		this.z = r.elements[j+2];
+
+		return this;
+
+	},
+
 	setEulerFromRotationMatrix: function ( m, order ) {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)

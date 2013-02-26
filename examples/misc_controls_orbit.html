@@ -35,7 +35,17 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - orbit controls example
+			<br/> Camera "up" axis:
+			<select id="cameraUpSelect" onchange="upVectorChanged()">
+				<option value="+X">+X</option>
+				<option value="+Y" selected="selected">+Y</option>
+				<option value="+Z">+Z</option>
+				<option value="-X">-X</option>
+				<option value="-Y">-Y</option>
+				<option value="-Z">-Z</option>
+			</select>
 		</div>
+
 
 		<script src="../build/three.min.js"></script>
 
@@ -60,9 +70,11 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.up.set( 0, 1, 0).normalize(); // Change this to try different up directions.
 				camera.position.z = 500;
 
-				controls = new THREE.OrbitControls( camera );
+				controls = new THREE.OrbitControls( camera, document.getElementById( 'container' ) );
+				controls.allowPan = true;
 				controls.addEventListener( 'change', render );
 
 				scene = new THREE.Scene();
@@ -118,6 +130,25 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function upVectorChanged() {
+
+				switch ( document.getElementById("cameraUpSelect").value ) {
+					case "+X":
+						camera.up.set(1,0,0); break;
+					case "+Y":
+						camera.up.set(0,1,0); break;
+					case "+Z":
+						camera.up.set(0,0,1); break;
+					case "-X":
+						camera.up.set(-1,0,0); break;
+					case "-Y":
+						camera.up.set(0,-1,0); break;
+					case "-Z":
+						camera.up.set(0,0,-1); break;
+				}
 
 			}
 
