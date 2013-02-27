@@ -23,15 +23,6 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
    
     for( i = 0; i <= phiSegments; i++) {//concentric circles inside ring
 
-        //Accounts for special case when inner radius is zero and we only have a single point in the first cirlce
-        if( innerRadius === 0 && i === 0 ) {
-            var vertex = new THREE.Vector3();
-            this.vertices.push( vertex );
-            uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
-            radius += radiusStep;
-            continue;
-        }
-        
         for( o = 0; o <= thetaSegments; o++) {//number of segments per circle
 
             var vertex = new THREE.Vector3();
@@ -47,7 +38,7 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 
     }
 
-    var n = new THREE.Vector3( 0, 0, 1 ), mod = 0;
+    var n = new THREE.Vector3( 0, 0, 1 );
     
     for( i = 0; i < phiSegments; i++) {//concentric circles inside ring
 
@@ -55,31 +46,16 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
             
             var v1, v2, v3;
 
-            //Accounts for special case when inner radius is zero and we only have a single point in the first cirlce
-            if( innerRadius === 0 && i === 0 ) {
-
-                v1 = 0;
-                v2 = o+1;
-                v3 = o+2;
-                this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
-                this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
-                
-            }else if( innerRadius === 0 && i !== 0 ) {
-
-                mod = -thetaSegments ;
-
-            }
-
-            v1 = o + (thetaSegments * i) + i + mod;
-            v3 = o + (thetaSegments * i) + thetaSegments + 1 + i + mod;
-            v2 = o + (thetaSegments * i) + thetaSegments + i + mod;
+            v1 = o + (thetaSegments * i) + i;
+            v2 = o + (thetaSegments * i) + thetaSegments + i;
+            v3 = o + (thetaSegments * i) + thetaSegments + 1 + i;
             
             this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
             this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
             
-            v1 = o + (thetaSegments * i) + i + mod;
-            v2 = o + (thetaSegments * i) + thetaSegments + 1 + i + mod;
-            v3 = o + (thetaSegments * i) + 1 + i + mod;
+            v1 = o + (thetaSegments * i) + i;
+            v2 = o + (thetaSegments * i) + thetaSegments + 1 + i;
+            v3 = o + (thetaSegments * i) + 1 + i;
             
             this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
             this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
