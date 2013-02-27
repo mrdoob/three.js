@@ -1,4 +1,6 @@
 /**
+ * ColladaLoader for three.js ( with IE9+ support )
+ *
  * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
  */
 
@@ -51,6 +53,23 @@ THREE.ColladaLoader = function () {
 	var colladaUp = 'Y';
 	var upConversion = null;
 
+	// is this ie ?.. ie has a non standard way of interacting with xpath expressions (no .evaluate support)
+	var isIE = !!(window.ActiveXObject);
+	
+	// Cross browser XPATH selectors (chrome, ff, opera, safari, IE9+)
+	function XMLSelectNodes(xmlDoc, xmlChildDoc, elementPath) {
+		if (!isIE)
+		{
+			var nodes = xmlDoc.evaluate(elementPath, xmlChildDoc, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+			return nodes;
+		}
+		else
+		{
+			elementPath = elementPath.split('dae:').join('');
+			return xmlChildDoc.selectNodes(elementPath);
+		}
+	};
+
 	function load ( url, readyCallback, progressCallback ) {
 
 		var length = 0;
@@ -59,26 +78,40 @@ THREE.ColladaLoader = function () {
 
 			var request = new XMLHttpRequest();
 
+			
 			request.onreadystatechange = function() {
 
 				if( request.readyState == 4 ) {
 
 					if( request.status == 0 || request.status == 200 ) {
 
-
-						if ( request.responseXML ) {
-
+						if ( isIE ) {
+						
+							// @see http://blogs.msdn.com/b/ie/archive/2012/07/19/xmlhttprequest-responsexml-in-ie10-release-preview.aspx
+							// @see http://blogs.msdn.com/b/xmlteam/archive/2006/10/23/using-the-right-version-of-msxml-in-internet-explorer.aspx
+							// @see http://msdn.microsoft.com/en-us/library/windows/desktop/ms754585(v=vs.85).aspx
+							readyCallbackFunc = readyCallback;
+							var xmlDoc = new ActiveXObject("Msxml2.DOMDocument.3.0");
+							xmlDoc.async = false;
+							xmlDoc.loadXML(request.responseText);
+							parse( xmlDoc, undefined, url );
+							
+						}
+						else if ( request.responseXML ) {
+						
 							readyCallbackFunc = readyCallback;
 							parse( request.responseXML, undefined, url );
 
-						} else if ( request.responseText ) {
-
+						}
+						else if ( request.responseText ) {
+						
 							readyCallbackFunc = readyCallback;
 							var xmlParser = new DOMParser();
 							var responseXML = xmlParser.parseFromString( request.responseText, "application/xml" );
 							parse( responseXML, undefined, url );
-
-						} else {
+							
+						}
+						else {
 
 							console.error( "ColladaLoader: Empty or non-existing file (" + url + ")" );
 
@@ -130,6 +163,7 @@ THREE.ColladaLoader = function () {
 
 		parseAsset();
 		setUpConversion();
+
 		images = parseLib( "//dae:library_images/dae:image", _Image, "image" );
 		materials = parseLib( "//dae:library_materials/dae:material", Material, "material" );
 		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
@@ -194,9 +228,9 @@ THREE.ColladaLoader = function () {
 
 	function parseAsset () {
 
-		var elements = COLLADA.evaluate( '//dae:asset', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+		var elements = XMLSelectNodes(COLLADA, COLLADA, '//dae:asset');
 
-		var element = elements.iterateNext();
+		var element = (isIE)?elements.item(0):elements.iterateNext();
 
 		if ( element && element.childNodes ) {
 
@@ -220,7 +254,8 @@ THREE.ColladaLoader = function () {
 
 					case 'up_axis':
 
-						colladaUp = child.textContent.charAt(0);
+						colladaUp = ((isIE)?child.text:child.textContent).charAt(0);
+						
 						break;
 
 				}
@@ -233,30 +268,52 @@ THREE.ColladaLoader = function () {
 
 	function parseLib ( q, classSpec, prefix ) {
 
-		var elements = COLLADA.evaluate(q, COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null) ;
+		var elements = XMLSelectNodes(COLLADA, COLLADA, q);
 
-		var lib = {};
-		var element = elements.iterateNext();
-		var i = 0;
+		if (isIE)
+		{
+			var lib = {};
+			var i = 0;
+			
+			while ( elements.item(i) != null ) {
+			
+				var daeElement = ( new classSpec() ).parse( elements.item(i) );
+				if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
+				lib[ daeElement.id ] = daeElement;
 
-		while ( element ) {
 
-			var daeElement = ( new classSpec() ).parse( element );
-			if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
-			lib[ daeElement.id ] = daeElement;
+				i++;
+			}
 
-			element = elements.iterateNext();
-
+			return lib;
 		}
+		else
+		{
+			var lib = {};
+			var element = elements.iterateNext();
+			var i = 0;
 
-		return lib;
+			while ( element ) {
+
+				var daeElement = ( new classSpec() ).parse( element );
+				if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
+				lib[ daeElement.id ] = daeElement;
+
+				element = elements.iterateNext();
+
+			}
+
+			return lib;
+		}
 
 	};
 
 	function parseScene() {
 
-		var sceneElement = COLLADA.evaluate( './/dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
-
+		var sceneElements = XMLSelectNodes(COLLADA, COLLADA, './/dae:scene/dae:instance_visual_scene');
+		var sceneElement = (isIE)?sceneElements.item(0):sceneElements.iterateNext();
+		
+		
 		if ( sceneElement ) {
 
 			var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
@@ -267,7 +324,6 @@ THREE.ColladaLoader = function () {
 			return null;
 
 		}
-
 	};
 
 	function createAnimations() {
@@ -885,7 +941,7 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-		return COLLADA.evaluate( './/dae:library_nodes//dae:node[@id=\'' + id + '\']', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
+		return XMLSelectNodes(COLLADA, COLLADA, './/dae:library_nodes//dae:node[@id=\'' + id + '\']');
 
 	};
 
@@ -1254,7 +1310,7 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'init_from' ) {
 
-				this.init_from = child.textContent;
+				this.init_from = ((isIE)?child.text:child.textContent);
 
 			}
 
@@ -1434,7 +1490,7 @@ THREE.ColladaLoader = function () {
 
 				case 'bind_shape_matrix':
 
-					var f = _floats(child.textContent);
+					var f = _floats(((isIE)?child.text:child.textContent));
 					this.bindShapeMatrix = getConvertedMat4( f );
 					break;
 
@@ -1521,12 +1577,12 @@ THREE.ColladaLoader = function () {
 
 				case 'v':
 
-					v = _ints( child.textContent );
+					v = _ints( ((isIE)?child.text:child.textContent) );
 					break;
 
 				case 'vcount':
 
-					vcount = _ints( child.textContent );
+					vcount = _ints( ((isIE)?child.text:child.textContent) );
 					break;
 
 				default:
@@ -1905,7 +1961,7 @@ THREE.ColladaLoader = function () {
 
 		this.sid = element.getAttribute( 'sid' );
 		this.type = element.nodeName;
-		this.data = _floats( element.textContent );
+		this.data = _floats( (isIE)?element.text:element.textContent );
 		this.convert();
 
 		return this;
@@ -2149,24 +2205,36 @@ THREE.ColladaLoader = function () {
 
 				case 'skeleton':
 
-					this.skeleton.push( child.textContent.replace(/^#/, '') );
+					this.skeleton.push( ((isIE)?child.text:child.textContent).replace(/^#/, '') );
 					break;
 
 				case 'bind_material':
 
-					var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+					var instances = XMLSelectNodes(COLLADA, COLLADA, './/dae:instance_material');
 
 					if ( instances ) {
 
-						var instance = instances.iterateNext();
-
-						while ( instance ) {
-
-							this.instance_material.push( (new InstanceMaterial()).parse(instance) );
-							instance = instances.iterateNext();
-
+					
+						if (isIE)
+						{
+							var j = 0;
+							while (instances.item(j) != null)
+							{
+								this.instance_material.push( (new InstanceMaterial()).parse(instances.item(j)) );
+								j++;
+							}
 						}
+						else
+						{
+							var instance = instances.iterateNext();
 
+							while ( instance ) {
+
+								this.instance_material.push( (new InstanceMaterial()).parse(instance) );
+								instance = instances.iterateNext();
+
+							}
+						}
 					}
 
 					break;
@@ -2218,19 +2286,31 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'bind_material' ) {
 
-				var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+				var instances = XMLSelectNodes(COLLADA, child, './/dae:instance_material');
 
-				if ( instances ) {
+				if ( instances )
+				{
 
-					var instance = instances.iterateNext();
-
-					while ( instance ) {
-
-						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
-						instance = instances.iterateNext();
-
+					if (isIE)
+					{
+						var j = 0;
+						while (instances.item(j) != null)
+						{
+							this.instance_material.push( (new InstanceMaterial()).parse(instances.item(j)) );
+							j++;
+						}
 					}
+					else
+					{
+						var instance = instances.iterateNext();
 
+						while ( instance ) {
+
+							this.instance_material.push( (new InstanceMaterial()).parse(instance) );
+							instance = instances.iterateNext();
+
+						}
+					}
 				}
 
 				break;
@@ -2655,12 +2735,12 @@ THREE.ColladaLoader = function () {
 
 				case 'vcount':
 
-					this.vcount = _ints( child.textContent );
+					this.vcount = _ints( ((isIE)?child.text:child.textContent) );
 					break;
 
 				case 'p':
 
-					this.p.push( _ints( child.textContent ) );
+					this.p.push( _ints( ((isIE)?child.text:child.textContent) ) );
 					break;
 
 				case 'ph':
@@ -2804,26 +2884,26 @@ THREE.ColladaLoader = function () {
 
 				case 'bool_array':
 
-					this.data = _bools( child.textContent );
+					this.data = _bools( ((isIE)?child.text:child.textContent) );
 					this.type = child.nodeName;
 					break;
 
 				case 'float_array':
 
-					this.data = _floats( child.textContent );
+					this.data = _floats( ((isIE)?child.text:child.textContent) );
 					this.type = child.nodeName;
 					break;
 
 				case 'int_array':
 
-					this.data = _ints( child.textContent );
+					this.data = _ints( ((isIE)?child.text:child.textContent) );
 					this.type = child.nodeName;
 					break;
 
 				case 'IDREF_array':
 				case 'Name_array':
 
-					this.data = _strings( child.textContent );
+					this.data = _strings( ((isIE)?child.text:child.textContent) );
 					this.type = child.nodeName;
 					break;
 
@@ -2957,7 +3037,7 @@ THREE.ColladaLoader = function () {
 
 				case 'color':
 
-					var rgba = _floats( child.textContent );
+					var rgba = _floats( ((isIE)?child.text:child.textContent) );
 					this.color = new THREE.Color(0);
 					this.color.setRGB( rgba[0], rgba[1], rgba[2] );
 					this.color.a = rgba[3];
@@ -3020,17 +3100,17 @@ THREE.ColladaLoader = function () {
 				case 'repeatU':
 				case 'repeatV':
 
-					this.texOpts[ child.nodeName ] = parseFloat( child.textContent );
+					this.texOpts[ child.nodeName ] = parseFloat( ((isIE)?child.text:child.textContent) );
 					break;
 
 				case 'wrapU':
 				case 'wrapV':
 
-					this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					this.texOpts[ child.nodeName ] = parseInt( ((isIE)?child.text:child.textContent) );
 					break;
 
 				default:
-					this.texOpts[ child.nodeName ] = child.textContent;
+					this.texOpts[ child.nodeName ] = ((isIE)?child.text:child.textContent);
 					break;
 
 			}
@@ -3075,7 +3155,7 @@ THREE.ColladaLoader = function () {
 					var f = evaluateXPath( child, './/dae:float' );
 
 					if ( f.length > 0 )
-						this[ child.nodeName ] = parseFloat( f[ 0 ].textContent );
+						this[ child.nodeName ] = parseFloat( (isIE)?f[0].text:f[0].textContent );
 
 					break;
 
@@ -3242,12 +3322,12 @@ THREE.ColladaLoader = function () {
 
 				case 'init_from':
 
-					this.init_from = child.textContent;
+					this.init_from = ((isIE)?child.text:child.textContent);
 					break;
 
 				case 'format':
 
-					this.format = child.textContent;
+					this.format = ((isIE)?child.text:child.textContent);
 					break;
 
 				default:
@@ -3286,32 +3366,32 @@ THREE.ColladaLoader = function () {
 
 				case 'source':
 
-					this.source = child.textContent;
+					this.source = ((isIE)?child.text:child.textContent);
 					break;
 
 				case 'minfilter':
 
-					this.minfilter = child.textContent;
+					this.minfilter = ((isIE)?child.text:child.textContent);
 					break;
 
 				case 'magfilter':
 
-					this.magfilter = child.textContent;
+					this.magfilter = ((isIE)?child.text:child.textContent);
 					break;
 
 				case 'mipfilter':
 
-					this.mipfilter = child.textContent;
+					this.mipfilter = ((isIE)?child.text:child.textContent);
 					break;
 
 				case 'wrap_s':
 
-					this.wrap_s = child.textContent;
+					this.wrap_s = ((isIE)?child.text:child.textContent);
 					break;
 
 				case 'wrap_t':
 
-					this.wrap_t = child.textContent;
+					this.wrap_t = ((isIE)?child.text:child.textContent);
 					break;
 
 				default:
@@ -3969,19 +4049,19 @@ THREE.ColladaLoader = function () {
 							switch ( param.nodeName ) {
 
 								case 'yfov':
-									this.yfov = param.textContent;
+									this.yfov = (isIE)?param.text:param.textContent;
 									break;
 								case 'xfov':
-									this.xfov = param.textContent;
+									this.xfov = (isIE)?param.text:param.textContent;
 									break;
 								case 'znear':
-									this.znear = param.textContent;
+									this.znear = (isIE)?param.text:param.textContent;
 									break;
 								case 'zfar':
-									this.zfar = param.textContent;
+									this.zfar = (isIE)?param.text:param.textContent;
 									break;
 								case 'aspect_ratio':
-									this.aspect_ratio = param.textContent;
+									this.aspect_ratio = (isIE)?param.text:param.textContent;
 									break;
 
 							}
@@ -3999,19 +4079,19 @@ THREE.ColladaLoader = function () {
 							switch ( param.nodeName ) {
 
 								case 'xmag':
-									this.xmag = param.textContent;
+									this.xmag = (isIE)?param.text:param.textContent;
 									break;
 								case 'ymag':
-									this.ymag = param.textContent;
+									this.ymag = (isIE)?param.text:param.textContent;
 									break;
 								case 'znear':
-									this.znear = param.textContent;
+									this.znear = (isIE)?param.text:param.textContent;
 									break;
 								case 'zfar':
-									this.zfar = param.textContent;
+									this.zfar = (isIE)?param.text:param.textContent;
 									break;
 								case 'aspect_ratio':
-									this.aspect_ratio = param.textContent;
+									this.aspect_ratio = (isIE)?param.text:param.textContent;
 									break;
 
 							}
@@ -4130,7 +4210,7 @@ THREE.ColladaLoader = function () {
 
 	function _attr_as_float( element, name, defaultValue ) {
 
-		if ( element.hasAttribute( name ) ) {
+		if ( element.getAttribute( name ) != null ) {
 
 			return parseFloat( element.getAttribute( name ) );
 
@@ -4144,7 +4224,7 @@ THREE.ColladaLoader = function () {
 
 	function _attr_as_int( element, name, defaultValue ) {
 
-		if ( element.hasAttribute( name ) ) {
+		if ( element.getAttribute( name ) != null ) {
 
 			return parseInt( element.getAttribute( name ), 10) ;
 
@@ -4158,7 +4238,7 @@ THREE.ColladaLoader = function () {
 
 	function _attr_as_string( element, name, defaultValue ) {
 
-		if ( element.hasAttribute( name ) ) {
+		if ( element.getAttribute( name ) != null ) {
 
 			return element.getAttribute( name );
 
@@ -4202,34 +4282,46 @@ THREE.ColladaLoader = function () {
 	};
 
 	function evaluateXPath( node, query ) {
-
-		var instances = COLLADA.evaluate( query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
-		var inst = instances.iterateNext();
+		
+		var instances = XMLSelectNodes(COLLADA, node, query);
+		
 		var result = [];
 
-		while ( inst ) {
+		if (isIE)
+		{
+			var j = 0;
+			while (instances.item(j) != null)
+			{
+				result.push( instances.item(j) );
+				j++;
+			}
+		}
+		else
+		{
+			var inst = instances.iterateNext();
 
-			result.push( inst );
-			inst = instances.iterateNext();
+			while ( inst ) {
 
+				result.push( inst );
+				inst = instances.iterateNext();
+
+			}
 		}
 
 		return result;
-
 	};
 
 	function extractDoubleSided( obj, element ) {
 
 		obj.doubleSided = false;
 
-		var node = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+		var node = XMLSelectNodes(COLLADA, element, './/dae:extra//dae:double_sided');
 
 		if ( node ) {
 
-			node = node.iterateNext();
+			node = (isIE)?node.item(0):node.iterateNext();
 
-			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
+			if ( node && parseInt( (isIE)?node.text:node.textContent, 10 ) === 1 ) {
 
 				obj.doubleSided = true;
 
