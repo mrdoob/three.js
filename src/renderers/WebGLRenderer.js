@@ -4700,14 +4700,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( geometry instanceof THREE.Geometry ) {
 
-            createLineBuffers( geometry );
-            initLineBuffers( geometry, object );
+						createLineBuffers( geometry );
+						initLineBuffers( geometry, object );
 
-            geometry.verticesNeedUpdate = true;
-            geometry.colorsNeedUpdate = true;
-            geometry.lineDistancesNeedUpdate = true;
+						geometry.verticesNeedUpdate = true;
+						geometry.colorsNeedUpdate = true;
+						geometry.lineDistancesNeedUpdate = true;
 
-          } else if ( geometry instanceof THREE.BufferGeometry ) {
+					} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 						initDirectBuffers( geometry );
 

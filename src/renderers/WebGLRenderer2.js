@@ -1728,7 +1728,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Objects adding
 
-	function addObject ( object, scene ) {
+	function addObject( object, scene ) {
 
 		var g, geometry, material, geometryGroup;
 
