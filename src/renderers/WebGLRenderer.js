@@ -4795,10 +4795,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objlist.push(
 			{
+				id: null,
 				buffer: buffer,
 				object: object,
 				opaque: null,
-				transparent: null
+				transparent: null,
+				render: false,
+				z: 0
 			}
 		);
 
