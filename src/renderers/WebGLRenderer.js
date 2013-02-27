@@ -4071,7 +4071,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function painterSortStable ( a, b ) {
 
-		if ( a.z !== b.z ) {
+        if ( a.z === undefined ){
+
+            return -1;
+
+        } else if (b.z === undefined ){
+
+            return 1;
+
+        } else if ( a.z !== b.z ) {
 
 			return b.z - a.z;
 
