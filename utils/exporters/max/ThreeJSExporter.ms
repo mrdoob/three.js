@@ -14,7 +14,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 {
 \"sourceFile\": \"%\",
 \"generatedBy\": \"3ds max ThreeJSExporter\",
-\"formatVersion\": 3,
+\"formatVersion\": 3.1,
 \"vertices\": %,
 \"normals\": %,
 \"colors\": %,
@@ -57,7 +57,7 @@ rollout ThreeJSExporter "ThreeJSExporter"
 		label dummy2 "--------------------------------------------------------" align:#left
 
 		checkbox flipYZ "Flip YZ" checked:true enabled:true
-		checkbox flipUV "Flip UV" checked:true enabled:true
+		checkbox flipUV "Flip UV" checked:false enabled:true
 		checkbox flipFace "Flip all faces" checked:false enabled:true
 		checkbox autoflipFace "Try fixing flipped faces" checked:false enabled:true
 
