@@ -2,7 +2,7 @@
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
  * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / https://github.com/WestLangley
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.OrbitControls = function ( object, domElement ) {
@@ -22,6 +22,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.userRotate = true;
 	this.userRotateSpeed = 1.0;
 
+	this.userPan = true;
+	this.userPanSpeed = 1.0;
+
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
@@ -30,6 +33,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
+
+	this.keys = { LEFT : 37 /* <- */, RIGHT : 39 /* -> */ };
 
 	// internals
 
@@ -132,10 +137,22 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+	this.pan = function ( dist ) {
+
+		// make sure minPolarAngle > 0, maxPolarAngle < pi, minDistance > 0
+
+		var delta = new THREE.Vector3();
+		delta.set( this.object.position.z - this.center.z, 0, - this.object.position.x + this.center.x ).setLength( dist );
+
+		this.object.position.add( delta );
+		this.center.add( delta );
+
+	};
+
 	this.update = function () {
 
 		var position = this.object.position;
-		var offset = position.clone().sub( this.center )
+		var offset = position.clone().sub( this.center );
 
 		// angle from z-axis around y-axis
 
@@ -299,9 +316,26 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
+	function onKeyDown( event ) {
+
+		if ( ! scope.userPan ) return;
+
+		if ( event.keyCode === scope.keys.LEFT ) {
+
+			scope.pan( - scope.userPanSpeed );
+
+		} else if ( event.keyCode === scope.keys.RIGHT ) {
+
+			scope.pan( scope.userPanSpeed );
+
+		}
+
+	}
+
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+	this.domElement.addEventListener( 'keydown', onKeyDown, false );
 
 };
