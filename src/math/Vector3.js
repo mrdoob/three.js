@@ -791,31 +791,15 @@ THREE.extend( THREE.Vector3.prototype, {
 		return this;
 	},
 
-	getColumnX: function ( m ) {
+	getColumnFromMatrix: function ( index, matrix ) {
 
-		this.x = m.elements[0];
-		this.y = m.elements[1];
-		this.z = m.elements[2];
+		var offset = index * 4;
 
-		return this;
+		var me = matrix.elements;
 
-	},
-
-	getColumnY: function ( m ) {
-
-		this.x = m.elements[4];
-		this.y = m.elements[5];
-		this.z = m.elements[6];
-
-		return this;
-
-	},
-
-	getColumnZ: function ( m ) {
-
-		this.x = m.elements[8];
-		this.y = m.elements[9];
-		this.z = m.elements[10];
+		this.x = me[ offset ];
+		this.y = me[ offset + 1 ];
+		this.z = me[ offset + 2 ];
 
 		return this;
 
