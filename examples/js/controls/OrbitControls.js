@@ -139,7 +139,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.pan = function ( distance ) {
 
-		this.object.matrix.rotateAxis( distance );
+		distance.transformDirection( this.object.matrix );
+		distance.multiplyScalar( scope.userPanSpeed );
+
 		this.object.position.add( distance );
 		this.center.add( distance );
 
@@ -278,7 +280,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 			var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-			scope.pan( new THREE.Vector3( - movementX * scope.userPanSpeed, movementY * scope.userPanSpeed, 0 ) );
+			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
 
 		}
 
@@ -330,16 +332,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
-				scope.pan( new THREE.Vector3( 0, scope.userPanSpeed, 0 ) );
+				scope.pan( new THREE.Vector3( 0, 1, 0 ) );
 				break;
 			case scope.keys.BOTTOM:
-				scope.pan( new THREE.Vector3( 0, - scope.userPanSpeed, 0 ) );
+				scope.pan( new THREE.Vector3( 0, - 1, 0 ) );
 				break;
 			case scope.keys.LEFT:
-				scope.pan( new THREE.Vector3( - scope.userPanSpeed, 0, 0 ) );
+				scope.pan( new THREE.Vector3( - 1, 0, 0 ) );
 				break;
 			case scope.keys.RIGHT:
-				scope.pan( new THREE.Vector3( scope.userPanSpeed, 0, 0 ) );
+				scope.pan( new THREE.Vector3( 1, 0, 0 ) );
 				break;
 		}
 
