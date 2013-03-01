@@ -1876,16 +1876,6 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	getPositionFromMatrix: function ( m ) {
-
-		this.x = m.elements[12];
-		this.y = m.elements[13];
-		this.z = m.elements[14];
-
-		return this;
-
-	},
-
 	setEulerFromRotationMatrix: function ( m, order ) {
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
@@ -2066,6 +2056,16 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+	getPositionFromMatrix: function ( m ) {
+
+		this.x = m.elements[12];
+		this.y = m.elements[13];
+		this.z = m.elements[14];
+
+		return this;
+
+	},
+
 	getScaleFromMatrix: function ( m ) {
 
 		var sx = this.set( m.elements[0], m.elements[1], m.elements[2] ).length();
@@ -2077,6 +2077,20 @@ THREE.extend( THREE.Vector3.prototype, {
 		this.z = sz;
 
 		return this;
+	},
+
+	getColumnFromMatrix: function ( index, matrix ) {
+
+		var offset = index * 4;
+
+		var me = matrix.elements;
+
+		this.x = me[ offset ];
+		this.y = me[ offset + 1 ];
+		this.z = me[ offset + 2 ];
+
+		return this;
+
 	},
 
 	equals: function ( v ) {
