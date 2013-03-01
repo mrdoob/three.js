@@ -373,16 +373,9 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	rotateAxis: function ( v ) {
 
-		var te = this.elements;
-		var vx = v.x, vy = v.y, vz = v.z;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
 
-		v.x = vx * te[0] + vy * te[4] + vz * te[8];
-		v.y = vx * te[1] + vy * te[5] + vz * te[9];
-		v.z = vx * te[2] + vy * te[6] + vz * te[10];
-
-		v.normalize();
-
-		return v;
+		v.transformDirection( this );
 
 	},
 
@@ -590,10 +583,10 @@ THREE.extend( THREE.Matrix4.prototype, {
 	},
 
 	compose: function() {
-	
-		var mRotation = new THREE.Matrix4(),
-			mScale = new THREE.Matrix4();
-		
+
+		var mRotation = new THREE.Matrix4();
+		var mScale = new THREE.Matrix4();
+
 		return function ( position, quaternion, scale ) {
 
 			var te = this.elements;
