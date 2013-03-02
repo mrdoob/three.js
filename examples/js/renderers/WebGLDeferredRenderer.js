@@ -430,7 +430,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		tempVS.getPositionFromMatrix( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
-		viewMatrix.rotateAxis( directionVS );
+		directionVS.transformDirection( viewMatrix );
 
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
@@ -501,7 +501,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		tempVS.getPositionFromMatrix( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
-		camera.matrixWorldInverse.rotateAxis( directionVS );
+		directionVS.transformDirection( camera.matrixWorldInverse );
 
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 
@@ -566,7 +566,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		directionVS.getPositionFromMatrix( light.matrixWorld );
 		directionVS.normalize();
-		camera.matrixWorldInverse.rotateAxis( directionVS );
+		directionVS.transformDirection( camera.matrixWorldInverse );
 
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 
@@ -639,12 +639,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
 		rightVS.copy( light.right );
-		normalVS.copy( light.normal );
-		modelMatrix.rotateAxis( rightVS );
-		modelMatrix.rotateAxis( normalVS );
+		rightVS.transformDirection( modelMatrix );
+		rightVS.transformDirection( viewMatrix );
 
-		viewMatrix.rotateAxis( rightVS );
-		viewMatrix.rotateAxis( normalVS );
+		normalVS.copy( light.normal );
+		normalVS.transformDirection( modelMatrix );
+		normalVS.transformDirection( viewMatrix );
 
 		upVS.crossVectors( rightVS, normalVS );
 		upVS.normalize();
