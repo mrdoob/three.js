@@ -6297,8 +6297,10 @@ THREE.Object3D.prototype = {
 
 	translate: function ( distance, axis ) {
 
-		this.matrix.rotateAxis( axis );
-		this.position.add( axis.multiplyScalar( distance ) );
+		axis.transformDirection( this.matrix );
+		axis.multiplyScalar( distance );
+
+		this.position.add( axis );
 
 	},
 
