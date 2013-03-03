@@ -61,6 +61,7 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple canvases - complex</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -192,17 +193,17 @@
 							p = geometry1.vertices[ vertexIndex ];
 
 							color = new THREE.Color( 0xffffff );
-							color.setHSV( ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
+							THREE.ColorConverter.setHSV( color, ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
 
 							f1.vertexColors[ j ] = color;
 
 							color = new THREE.Color( 0xffffff );
-							color.setHSV( 0.0, ( p.y/ radius + 1 ) / 2, 1.0 );
+							THREE.ColorConverter.setHSV( color, 0.0, ( p.y/ radius + 1 ) / 2, 1.0 );
 
 							f2.vertexColors[ j ] = color;
 
 							color = new THREE.Color( 0xffffff );
-							color.setHSV( 0.125 * vertexIndex / geometry1.vertices.length, 1.0, 1.0 );
+							THREE.ColorConverter.setHSV( color, 0.125 * vertexIndex / geometry1.vertices.length, 1.0, 1.0 );
 
 							f3.vertexColors[ j ] = color;
 

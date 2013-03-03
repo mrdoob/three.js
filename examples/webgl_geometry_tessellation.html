@@ -38,6 +38,7 @@
 		<div id="container"></div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/controls/TrackballControls.js"></script>
 
@@ -210,7 +211,7 @@
 					colors[ v ] = new THREE.Color();
 					displacement[ v ] = new THREE.Vector3();
 
-					colors[ v ].setHSV( h, s, 1 );
+					THREE.ColorConverter.setHSV( colors[ v ],  h, s, 1 );
 					colors[ v ].convertGammaToLinear();
 
 					displacement[ v ].set( x, y, z );

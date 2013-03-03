@@ -37,6 +37,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -91,7 +92,7 @@
 					//materials[i] = new THREE.ParticleBasicMaterial( { color: color, size: size } );
 
 					materials[i] = new THREE.ParticleBasicMaterial( { size: size } );
-					materials[i].color.setHSV( color[0], color[1], color[2] );
+					THREE.ColorConverter.setHSV( materials[i].color, color[0], color[1], color[2] );
 
 					particles = new THREE.ParticleSystem( geometry, materials[i] );
 
@@ -204,7 +205,7 @@
 					color = parameters[i][0];
 
 					h = ( 360 * ( color[0] + time ) % 360 ) / 360;
-					materials[i].color.setHSV( h, color[1], color[2] );
+					THREE.ColorConverter.setHSV( materials[i].color, h, color[1], color[2] );
 
 				}
 

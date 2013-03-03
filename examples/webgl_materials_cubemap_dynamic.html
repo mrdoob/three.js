@@ -59,6 +59,8 @@
 
 		<script src="../build/three.min.js"></script>
 
+		<script src="js/math/ColorConverter.js"></script>
+
 		<script src="js/loaders/BinaryLoader.js"></script>
 
 		<script src="js/shaders/BleachBypassShader.js"></script>
@@ -161,7 +163,7 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 3000, 10000 );
-				scene.fog.color.setHSV( 0.51, 0.5, 0.9 );
+				THREE.ColorConverter.setHSV( scene.fog.color, 0.51, 0.5, 0.9 );
 
 				createScene();
 
@@ -522,7 +524,7 @@
 				texture.repeat.set( 50, 50 );
 
 				groundBasic = new THREE.MeshBasicMaterial( { color: 0xffffff, map: texture } );
-				groundBasic.color.setHSV( 0.1, 0.45, 0.995 );
+				THREE.ColorConverter.setHSV( groundBasic.color,  0.1, 0.45, 0.995 );
 
 				ground = new THREE.Mesh( new THREE.PlaneGeometry( 50000, 50000 ), groundBasic );
 				ground.position.y = - 215;
@@ -907,7 +909,7 @@
 				// day / night
 
 				v = THREE.Math.clamp( v + 0.5 * delta * vdir, 0.1, 0.9 );
-				scene.fog.color.setHSV( 0.51, 0.5, v );
+				THREE.ColorConverter.setHSV( scene.fog.color,  0.51, 0.5, v );
 
 				renderer.setClearColor( scene.fog.color, 1 );
 
@@ -961,8 +963,8 @@
 
 				effectBloom.copyUniforms[ "opacity" ].value = THREE.Math.mapLinear( vnorm, 0, 1, 1, 0.75 );
 
-				ambientLight.color.setHSV( 0, 0, THREE.Math.mapLinear( vnorm, 0, 1, 0.07, 0.33 ) );
-				groundBasic.color.setHSV( 0.1, 0.45, THREE.Math.mapLinear( vnorm, 0, 1, 0.725, 0.995 ) );
+				THREE.ColorConverter.setHSV( ambientLight.color,  0, 0, THREE.Math.mapLinear( vnorm, 0, 1, 0.07, 0.33 ) );
+				THREE.ColorConverter.setHSV( groundBasic.color,  0.1, 0.45, THREE.Math.mapLinear( vnorm, 0, 1, 0.725, 0.995 ) );
 
 				// blur
 

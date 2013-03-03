@@ -49,6 +49,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -99,7 +100,7 @@
 				//
 
 				pointLight = new THREE.PointLight( 0xffffff, 1.5, 1000 );
-				pointLight.color.setHSV( 0.05, 0.05, 1 );
+				THREE.ColorConverter.setHSV( pointLight.color,  0.05, 0.05, 1 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
@@ -108,7 +109,7 @@
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1.5 );
 				spotLight.position.set( 0.05, 0.05, 1 );
-				spotLight.color.setHSV( 0.6, 0.05, 1 );
+				THREE.ColorConverter.setHSV( spotLight.color,  0.6, 0.05, 1 );
 				scene.add( spotLight );
 
 				spotLight.position.multiplyScalar( 700 );
@@ -132,7 +133,7 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				directionalLight.position.set( 1, -0.5, 1 );
-				directionalLight.color.setHSV( 0.6, 0.05, 1 );
+				THREE.ColorConverter.setHSV( directionalLight.color,  0.6, 0.05, 1 );
 				scene.add( directionalLight );
 
 				directionalLight.position.multiplyScalar( 500 );
@@ -158,7 +159,7 @@
 
 				directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1.2 );
 				directionalLight2.position.set( 1, -0.5, -1 );
-				directionalLight2.color.setHSV( 0.08, 0.35, 1 );
+				THREE.ColorConverter.setHSV( directionalLight2.color,  0.08, 0.35, 1 );
 				scene.add( directionalLight2 );
 
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );

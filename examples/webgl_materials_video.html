@@ -38,6 +38,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/shaders/ConvolutionShader.js"></script>
 		<script src="js/shaders/CopyShader.js"></script>
@@ -146,7 +147,7 @@
 					material.hue = i/xgrid;
 					material.saturation = 1 - j/ygrid;
 
-					material.color.setHSV( material.hue, material.saturation, 1 );
+					THREE.ColorConverter.setHSV( material.color, material.hue, material.saturation, 1 );
 
 					mesh = new THREE.Mesh( geometry, material );
 
@@ -263,7 +264,7 @@
 					material = materials[ i ];
 
 					h = ( 360 * ( material.hue + time ) % 360 ) / 360;
-					material.color.setHSV( h, material.saturation, 1 );
+					THREE.ColorConverter.setHSV( material.color, h, material.saturation, 1 );
 
 				}
 

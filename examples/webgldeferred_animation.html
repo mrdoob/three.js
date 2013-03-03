@@ -48,6 +48,7 @@
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -264,9 +265,9 @@
 
 						originalMaterial.map = undefined;
 						originalMaterial.shading = THREE.SmoothShading;
-						originalMaterial.color.setHSV( 0.01, 0.515, 0.5 );
+						THREE.ColorConverter.setHSV( originalMaterial.color, 0.01, 0.515, 0.5 );
 						originalMaterial.ambient.copy( originalMaterial.color );
-						originalMaterial.specular.setHSV( 0, 0, 0.1 );
+						THREE.ColorConverter.setHSV( originalMaterial.specular, 0, 0, 0.1 );
 						originalMaterial.shininess = 75;
 
 						originalMaterial.wrapAround = true;

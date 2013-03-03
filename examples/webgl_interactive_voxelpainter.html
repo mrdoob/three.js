@@ -18,6 +18,7 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -75,7 +76,7 @@
 
 				cubeGeo = new THREE.CubeGeometry( 50, 50, 50 );
 				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, ambient: 0x00ff80, shading: THREE.FlatShading, map: THREE.ImageUtils.loadTexture( "textures/square-outline-textured.png" ) } );
-				cubeMaterial.color.setHSV( 0.1, 0.7, 1.0 );
+				THREE.ColorConverter.setHSV( cubeMaterial.color,  0.1, 0.7, 1.0 );
 				cubeMaterial.ambient = cubeMaterial.color;
 
 				// picking

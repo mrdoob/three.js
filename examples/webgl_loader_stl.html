@@ -43,6 +43,7 @@
 		</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="js/math/ColorConverter.js"></script>
 
 		<script src="js/loaders/STLLoader.js"></script>
 
@@ -73,7 +74,7 @@
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0xffffff, 2, 15 );
-				scene.fog.color.setHSV( 0.06, 0.2, 0.45 );
+				THREE.ColorConverter.setHSV( scene.fog.color,  0.06, 0.2, 0.45 );
 
 
 				// Ground
