@@ -249,7 +249,7 @@
 
 				} );
 
-				loader.load( "models/skinned/human_walk_0_female.js", function( geometry, materials ) {
+				loader.load( "models/skinned/human_walk_0_female.js", function ( geometry, materials ) {
 
 					geometry.computeVertexNormals();
 					geometry.computeBoundingBox();
@@ -264,9 +264,9 @@
 
 						originalMaterial.map = undefined;
 						originalMaterial.shading = THREE.SmoothShading;
-						originalMaterial.color.setHSV( 0.01, 0.515, 0.5 );
+						originalMaterial.color.setHSL( 0.01, 0.3, 0.3 );
 						originalMaterial.ambient.copy( originalMaterial.color );
-						originalMaterial.specular.setHSV( 0, 0, 0.1 );
+						originalMaterial.specular.setHSL( 0, 0, 0.1 );
 						originalMaterial.shininess = 75;
 
 						originalMaterial.wrapAround = true;
