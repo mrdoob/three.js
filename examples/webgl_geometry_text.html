@@ -217,7 +217,7 @@
 
 				} else {
 
-					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
+					pointLight.color.setHSL( Math.random(), 1, 0.5 );
 					hex = decimalToHex( pointLight.color.getHex() );
 
 				}
@@ -265,7 +265,7 @@
 
 				document.getElementById( "color" ).addEventListener( 'click', function() {
 
-					pointLight.color.setHSV( Math.random(), 0.95, 0.85 );
+					pointLight.color.setHSL( Math.random(), 1, 0.5 );
 					hex = decimalToHex( pointLight.color.getHex() );
 
 					updatePermalink();

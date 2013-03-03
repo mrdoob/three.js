@@ -170,7 +170,7 @@
 				if ( window.group !== undefined ) {
 
 					scene.remove( group );
-	
+
 				}
 
 
@@ -181,20 +181,20 @@
 
 				// scale geometry to a uniform size
 				geometry.computeBoundingSphere();
-				
+
 				var scaleFactor = 160 / geometry.boundingSphere.radius;
 				geometry.applyMatrix( new THREE.Matrix4().makeScale( scaleFactor, scaleFactor, scaleFactor ) );
 
 				var originalGeometry = geometry.clone();
 				originalGeometry.computeFaceNormals();
 				originalGeometry.computeVertexNormals( true );
-			
+
 				// in case of duplicated vertices
 				geometry.mergeVertices();
 				geometry.computeCentroids();
 				geometry.computeFaceNormals();
 				geometry.computeVertexNormals( true );
-			
+
 				updateInfo();
 
 				var faceABCD = "abcd";
@@ -214,7 +214,7 @@
 						p = geometry.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( ( p.y ) / 400 + 0.5, 1.0, 1.0 );
+						color.setHSL( ( p.y ) / 400 + 0.5, 1.0, 0.5 );
 
 						f.vertexColors[ j ] = color;
 
