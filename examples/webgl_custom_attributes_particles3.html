@@ -211,12 +211,12 @@
 
 				if ( v < vc1 ) {
 
-					values_color[ v ].setHSV( 0.5 + 0.2 * ( v / vc1 ), 0.99, 1.0 );
+					values_color[ v ].setHSL( 0.5 + 0.2 * ( v / vc1 ), 1, 0.5 );
 
 				} else {
 
 					values_size[ v ] = 55;
-					values_color[ v ].setHSV( 0.1, 0.99, 1.0 );
+					values_color[ v ].setHSL( 0.1, 1, 0.5 );
 
 				}
 
