@@ -43,8 +43,6 @@ THREE.Object3D = function () {
 
 	this.frustumCulled = true;
 
-	this._vector = new THREE.Vector3();
-
 };
 
 
@@ -80,32 +78,71 @@ THREE.Object3D.prototype = {
 
 	}(),
 
-	translate: function ( distance, axis ) {
+	translate: function () {
 
-		axis.transformDirection( this.matrix );
-		axis.multiplyScalar( distance );
+		var v1 = new THREE.Vector3();
 
-		this.position.add( axis );
+		return function ( distance, axis ) {
 
-	},
+			// axis is assumed to be normalized
 
-	translateX: function ( distance ) {
+			v1.copy( axis );
 
-		this.translate( distance, this._vector.set( 1, 0, 0 ) );
+			if ( this.useQuaternion === true ) {
 
-	},
+				v1.applyQuaternion( this.quaternion );
 
-	translateY: function ( distance ) {
+			} else {
 
-		this.translate( distance, this._vector.set( 0, 1, 0 ) );
+				v1.applyEuler( this.rotation, this.eulerOrder );
 
-	},
+			}
 
-	translateZ: function ( distance ) {
+			v1.multiplyScalar( distance );
 
-		this.translate( distance, this._vector.set( 0, 0, 1 ) );
+			this.position.add( v1 );
 
-	},
+			return this;
+
+		};
+
+	}(),
+
+	translateX: function () {
+
+		var v1 = new THREE.Vector3( 1, 0, 0 );
+
+		return function ( distance ) {
+
+			return this.translate( distance, v1 );
+
+		};
+
+	}(),
+
+	translateY: function () {
+
+		var v1 = new THREE.Vector3( 0, 1, 0 );
+
+		return function ( distance ) {
+
+			return this.translate( distance, v1 );
+
+		};
+
+	}(),
+
+	translateZ: function () {
+
+		var v1 = new THREE.Vector3( 0, 0, 1 );
+
+		return function ( distance ) {
+
+			return this.translate( distance, v1 );
+
+		};
+
+	}(),
 
 	localToWorld: function ( vector ) {
 
