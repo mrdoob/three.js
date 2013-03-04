@@ -330,7 +330,7 @@ Sidebar.Object3D = function ( signals ) {
 
 	function updateTransformRows() {
 
-		if ( selected instanceof THREE.Light || ( selected instanceof THREE.Object3D && selected.properties.targetInverse ) ) {
+		if ( selected instanceof THREE.Light || ( selected instanceof THREE.Object3D && selected.userData.targetInverse ) ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );

@@ -74,13 +74,13 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 
 	//
 
-	this.lightSphere.properties.isGizmo = true;
-	this.lightSphere.properties.gizmoSubject = light;
-	this.lightSphere.properties.gizmoRoot = this;
+	this.lightSphere.userData.isGizmo = true;
+	this.lightSphere.userData.gizmoSubject = light;
+	this.lightSphere.userData.gizmoRoot = this;
 
 	//
 
-	this.properties.isGizmo = true;
+	this.userData.isGizmo = true;
 
 	//
 

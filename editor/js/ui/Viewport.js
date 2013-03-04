@@ -108,10 +108,10 @@ var Viewport = function ( signals ) {
 
 				var root;
 
-				if ( picked.properties.isGizmo ) {
+				if ( picked.userData.isGizmo ) {
 
-					root = picked.properties.gizmoRoot;
-					selected = picked.properties.gizmoSubject;
+					root = picked.userData.gizmoRoot;
+					selected = picked.userData.gizmoSubject;
 
 				} else {
 
@@ -161,11 +161,11 @@ var Viewport = function ( signals ) {
 
 			intersects[ 0 ].point.sub( offset );
 
-			if ( picked.properties.isGizmo ) {
+			if ( picked.userData.isGizmo ) {
 
-				picked.properties.gizmoRoot.position.copy( intersects[ 0 ].point );
-				picked.properties.gizmoSubject.position.copy( intersects[ 0 ].point );
-				signals.objectChanged.dispatch( picked.properties.gizmoSubject );
+				picked.userData.gizmoRoot.position.copy( intersects[ 0 ].point );
+				picked.userData.gizmoSubject.position.copy( intersects[ 0 ].point );
+				signals.objectChanged.dispatch( picked.userData.gizmoSubject );
 
 			} else {
 
@@ -212,9 +212,9 @@ var Viewport = function ( signals ) {
 
 			}
 
-			if ( selected.properties.isGizmo ) {
+			if ( selected.userData.isGizmo ) {
 
-				signals.objectSelected.dispatch( selected.properties.gizmoSubject );
+				signals.objectSelected.dispatch( selected.userData.gizmoSubject );
 
 			} else {
 
@@ -289,9 +289,9 @@ var Viewport = function ( signals ) {
 			sceneHelpers.add( lightGizmo.targetSphere );
 			sceneHelpers.add( lightGizmo.targetLine );
 
-			object.properties.helper = lightGizmo;
-			object.properties.pickingProxy = lightGizmo.lightSphere;
-			object.target.properties.pickingProxy = lightGizmo.targetSphere;
+			object.userData.helper = lightGizmo;
+			object.userData.pickingProxy = lightGizmo.lightSphere;
+			object.target.userData.pickingProxy = lightGizmo.targetSphere;
 
 			objects.push( lightGizmo.lightSphere );
 			objects.push( lightGizmo.targetSphere );
@@ -304,8 +304,8 @@ var Viewport = function ( signals ) {
 			var lightGizmo = new THREE.PointLightHelper( object, sphereSize );
 			sceneHelpers.add( lightGizmo );
 
-			object.properties.helper = lightGizmo;
-			object.properties.pickingProxy = lightGizmo.lightSphere;
+			object.userData.helper = lightGizmo;
+			object.userData.pickingProxy = lightGizmo.lightSphere;
 
 			objects.push( lightGizmo.lightSphere );
 
@@ -318,9 +318,9 @@ var Viewport = function ( signals ) {
 			sceneHelpers.add( lightGizmo.targetSphere );
 			sceneHelpers.add( lightGizmo.targetLine );
 
-			object.properties.helper = lightGizmo;
-			object.properties.pickingProxy = lightGizmo.lightSphere;
-			object.target.properties.pickingProxy = lightGizmo.targetSphere;
+			object.userData.helper = lightGizmo;
+			object.userData.pickingProxy = lightGizmo.lightSphere;
+			object.target.userData.pickingProxy = lightGizmo.targetSphere;
 
 			objects.push( lightGizmo.lightSphere );
 			objects.push( lightGizmo.targetSphere );
@@ -334,8 +334,8 @@ var Viewport = function ( signals ) {
 			var lightGizmo = new THREE.HemisphereLightHelper( object, sphereSize, arrowLength );
 			sceneHelpers.add( lightGizmo );
 
-			object.properties.helper = lightGizmo;
-			object.properties.pickingProxy = lightGizmo.lightSphere;
+			object.userData.helper = lightGizmo;
+			object.userData.pickingProxy = lightGizmo.lightSphere;
 
 			objects.push( lightGizmo.lightSphere );
 
@@ -390,11 +390,11 @@ var Viewport = function ( signals ) {
 					object instanceof THREE.PointLight ||
 					object instanceof THREE.SpotLight ) {
 
-			object.properties.helper.update();
+			object.userData.helper.update();
 
-		} else if ( object.properties.targetInverse ) {
+		} else if ( object.userData.targetInverse ) {
 
-			object.properties.targetInverse.properties.helper.update();
+			object.userData.targetInverse.userData.helper.update();
 
 		}
 
@@ -426,7 +426,7 @@ var Viewport = function ( signals ) {
 
 		var toRemove = {};
 
-		var proxyObject = selected.properties.pickingProxy ? selected.properties.pickingProxy : selected;
+		var proxyObject = selected.userData.pickingProxy ? selected.userData.pickingProxy : selected;
 
 		proxyObject.traverse( function ( child ) {
 
@@ -438,7 +438,7 @@ var Viewport = function ( signals ) {
 
 		if ( selected.target && !selected.target.geometry ) {
 
-			toRemove[ selected.target.properties.pickingProxy.id ] = true;
+			toRemove[ selected.target.userData.pickingProxy.id ] = true;
 
 		}
 
@@ -481,12 +481,12 @@ var Viewport = function ( signals ) {
 
 		var helpersToRemove = [];
 
-		if ( selected.properties.helper ) {
+		if ( selected.userData.helper ) {
 
-			helpersToRemove.push( selected.properties.helper );
+			helpersToRemove.push( selected.userData.helper );
 
-			if ( selected.properties.helper.targetLine ) helpersToRemove.push( selected.properties.helper.targetLine );
-			if ( selected.target && !selected.target.geometry ) helpersToRemove.push( selected.properties.helper.targetSphere );
+			if ( selected.userData.helper.targetLine ) helpersToRemove.push( selected.userData.helper.targetLine );
+			if ( selected.target && !selected.target.geometry ) helpersToRemove.push( selected.userData.helper.targetSphere );
 
 
 		}
@@ -527,9 +527,9 @@ var Viewport = function ( signals ) {
 
 				geometry = object.geometry;
 
-			} else if ( object.properties.pickingProxy ) {
+			} else if ( object.userData.pickingProxy ) {
 
-				geometry = object.properties.pickingProxy.geometry;
+				geometry = object.userData.pickingProxy.geometry;
 
 			}
 
@@ -742,7 +742,7 @@ var Viewport = function ( signals ) {
 
 		sceneHelpers.traverse( function ( child ) {
 
-			if ( child.properties.isGizmo ) {
+			if ( child.userData.isGizmo ) {
 
 				toRemove[ child.id ] = child;
 
@@ -769,7 +769,7 @@ var Viewport = function ( signals ) {
 		if ( newCamera ) {
 
 			camera = newCamera;
-			camera.properties.active = true;
+			camera.userData.active = true;
 
 			camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
 			camera.updateProjectionMatrix();
@@ -880,68 +880,7 @@ var Viewport = function ( signals ) {
 
 	function createDefaultScene() {
 
-		// create scene
-
-		var scene = new THREE.Scene();
-
-		/*
-
-		// create lights
-
-		var light1 = new THREE.DirectionalLight( 0xffffff, 0.8 );
-		light1.position.set( 1, 0.5, 0 ).multiplyScalar( 400 );
-
-		var light2 = new THREE.SpotLight( 0xffffff, 1.5, 500, Math.PI * 0.025 );
-		light2.position.set( - 1, 0.5, 1 ).multiplyScalar( 300 );
-
-		var light3 = new THREE.PointLight( 0xffaa00, 0.75 );
-		light3.position.set( -250, 200, -200 );
-
-		//var light4 = new THREE.AmbientLight( 0x111111 );
-		var light4 = new THREE.HemisphereLight( 0x00aaff, 0xff0000, 0.75 );
-		light4.position.y = 250;
-
-		light1.target.properties.targetInverse = light1;
-		light2.target.properties.targetInverse = light2;
-
-		// create objects
-
-		var geometry = new THREE.SphereGeometry( 75, 25, 15 );
-
-		var material = new THREE.MeshPhongMaterial();
-		material.color.setHSV( Math.random(), Math.random(), 1 );
-
-		var mesh = new THREE.Mesh( geometry, material );
-
-		// set default names
-
-		light1.name = "Light 1";
-		light1.target.name = "Light 1 Target";
-
-		light2.name = "Light 2";
-		light2.target.name = "Light 2 Target";
-
-		light3.name = "Light 3";
-
-		light4.name = "Light 4";
-
-		mesh.name = "Sphere";
-
-		// set default selection
-
-		scene.properties.defaultSelection = mesh;
-
-		// add to scene
-
-		scene.add( light1 );
-		scene.add( light2 );
-		scene.add( light3 );
-		scene.add( light4 );
-		scene.add( mesh );
-
-		*/
-
-		return scene;
+		return new THREE.Scene();
 
 	}
 
@@ -951,7 +890,7 @@ var Viewport = function ( signals ) {
 		camera.position.set( 500, 250, 500 );
 
 		camera.name = "Camera";
-		camera.properties.active = true;
+		camera.userData.active = true;
 
 		return camera;
 

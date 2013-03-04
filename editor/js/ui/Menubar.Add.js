@@ -226,7 +226,7 @@ Menubar.Add = function ( signals ) {
 		light.name = 'Light ' + light.id;
 		light.target.name = 'Light ' + light.id + ' target';
 
-		light.target.properties.targetInverse = light;
+		light.target.userData.targetInverse = light;
 
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
@@ -249,7 +249,7 @@ Menubar.Add = function ( signals ) {
 		light.name = 'Light ' + light.id;
 		light.target.name = 'Light ' + light.id + ' target';
 
-		light.target.properties.targetInverse = light;
+		light.target.userData.targetInverse = light;
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
