@@ -175,7 +175,7 @@ Sidebar.Object3D = function ( signals ) {
 	var objectUserDataRow = new UI.Panel();
 	objectUserDataRow.add( new UI.Text().setValue( 'User data' ).setColor( '#666' ) );
 
-	var objectUserData = new UI.TextArea( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+	var objectUserData = new UI.TextArea( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 	objectUserDataRow.add( objectUserData );
 
 	container.add( objectUserDataRow );
@@ -254,8 +254,6 @@ Sidebar.Object3D = function ( signals ) {
 			selected.scale.y = objectScaleY.getValue();
 			selected.scale.z = objectScaleZ.getValue();
 
-			selected.visible = objectVisible.getValue();
-
 			if ( selected.fov !== undefined ) {
 
 				selected.fov = objectFov.getValue();
@@ -307,6 +305,19 @@ Sidebar.Object3D = function ( signals ) {
 			if ( selected.exponent !== undefined ) {
 
 				selected.exponent = objectExponent.getValue();
+
+			}
+
+			selected.visible = objectVisible.getValue();
+
+			try {
+
+				selected.userData = JSON.parse( objectUserData.getValue() );
+				// objectUserData.setValue( JSON.stringify( selected.userData, null, '  ' ) );
+
+			} catch ( error ) {
+
+				console.log( error );
 
 			}
 
@@ -445,7 +456,17 @@ Sidebar.Object3D = function ( signals ) {
 			}
 
 			objectVisible.setValue( object.visible );
-			objectUserData.setValue( JSON.stringify( object.userData ) );
+
+			try {
+
+				console.log( object.userData );
+				objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
+
+			} catch ( error ) {
+
+				console.log( error );
+
+			}
 
 			updateRows();
 			updateTransformRows();

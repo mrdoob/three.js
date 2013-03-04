@@ -684,7 +684,7 @@ var Viewport = function ( signals ) {
 		}
 
 		var exporter = new object.exporter();
-		
+
 		var output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
@@ -769,7 +769,6 @@ var Viewport = function ( signals ) {
 		if ( newCamera ) {
 
 			camera = newCamera;
-			camera.userData.active = true;
 
 			camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
 			camera.updateProjectionMatrix();
@@ -887,10 +886,9 @@ var Viewport = function ( signals ) {
 	function createDefaultCamera() {
 
 		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
-		camera.position.set( 500, 250, 500 );
 
 		camera.name = "Camera";
-		camera.userData.active = true;
+		camera.position.set( 500, 250, 500 );
 
 		return camera;
 
