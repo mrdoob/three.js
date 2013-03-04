@@ -70,17 +70,6 @@ Sidebar.Object3D = function ( signals ) {
 
 	container.add( objectScaleRow );
 
-
-	// visible
-
-	var objectVisibleRow = new UI.Panel();
-	var objectVisible = new UI.Checkbox( 'absolute' ).setLeft( '100px' ).onChange( update );
-
-	objectVisibleRow.add( new UI.Text().setValue( 'Visible' ).setColor( '#666' ) );
-	objectVisibleRow.add( objectVisible );
-
-	container.add( objectVisibleRow );
-
 	// fov
 
 	var objectFovRow = new UI.Panel();
@@ -170,6 +159,27 @@ Sidebar.Object3D = function ( signals ) {
 	objectExponentRow.add( objectExponent );
 
 	container.add( objectExponentRow );
+
+	// visible
+
+	var objectVisibleRow = new UI.Panel();
+	var objectVisible = new UI.Checkbox( 'absolute' ).setLeft( '100px' ).onChange( update );
+
+	objectVisibleRow.add( new UI.Text().setValue( 'Visible' ).setColor( '#666' ) );
+	objectVisibleRow.add( objectVisible );
+
+	container.add( objectVisibleRow );
+
+	// user data
+
+	var objectUserDataRow = new UI.Panel();
+	objectUserDataRow.add( new UI.Text().setValue( 'User data' ).setColor( '#666' ) );
+
+	var objectUserData = new UI.TextArea( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+	objectUserDataRow.add( objectUserData );
+
+	container.add( objectUserDataRow );
+
 
 	//
 
@@ -435,6 +445,7 @@ Sidebar.Object3D = function ( signals ) {
 			}
 
 			objectVisible.setValue( object.visible );
+			objectUserData.setValue( JSON.stringify( object.userData ) );
 
 			updateRows();
 			updateTransformRows();

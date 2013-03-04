@@ -186,6 +186,61 @@ UI.Input.prototype.onChange = function ( callback ) {
 };
 
 
+// TextArea
+
+UI.TextArea = function ( position ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'textarea' );
+	dom.className = 'TextArea';
+	dom.style.position = position || 'relative';
+	dom.style.padding = '2px';
+	dom.style.marginTop = '-2px';
+	dom.style.marginLeft = '-2px';
+	dom.style.border = '1px solid #ccc';
+
+	this.dom = dom;
+
+	this.onChangeCallback = null;
+
+	this.dom.addEventListener( 'change', function ( event ) {
+
+		if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+	}, false );
+
+	return this;
+
+};
+
+UI.TextArea.prototype = Object.create( UI.Element.prototype );
+
+UI.TextArea.prototype.getValue = function () {
+
+	return this.dom.value;
+
+};
+
+UI.TextArea.prototype.setValue = function ( value ) {
+
+	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.TextArea.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+
 // Select
 
 UI.Select = function ( position ) {
