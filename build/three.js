@@ -6101,7 +6101,6 @@ THREE.Object3D = function () {
 	this.id = THREE.Object3DIdCount ++;
 
 	this.name = '';
-	this.properties = {};
 
 	this.parent = undefined;
 	this.children = [];
@@ -6133,6 +6132,8 @@ THREE.Object3D = function () {
 	this.receiveShadow = false;
 
 	this.frustumCulled = true;
+
+	this.userData = {};
 
 };
 
@@ -33926,15 +33927,15 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 	this.add( this.lightSphere );
 	this.add( this.lightRays );
 
-	this.lightSphere.properties.isGizmo = true;
-	this.lightSphere.properties.gizmoSubject = light;
-	this.lightSphere.properties.gizmoRoot = this;
+	this.lightSphere.userData.isGizmo = true;
+	this.lightSphere.userData.gizmoSubject = light;
+	this.lightSphere.userData.gizmoRoot = this;
 
 	// light target helper
 
 	this.targetSphere = null;
 
-	if ( light.target.properties.targetInverse !== undefined ) {
+	if ( light.target.userData.targetInverse !== undefined ) {
 
 		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
 		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
@@ -33942,9 +33943,9 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 		this.targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
 		this.targetSphere.position = light.target.position;
 
-		this.targetSphere.properties.isGizmo = true;
-		this.targetSphere.properties.gizmoSubject = light.target;
-		this.targetSphere.properties.gizmoRoot = this.targetSphere;
+		this.targetSphere.userData.isGizmo = true;
+		this.targetSphere.userData.gizmoSubject = light.target;
+		this.targetSphere.userData.gizmoRoot = this.targetSphere;
 
 		var lineMaterial = new THREE.LineDashedMaterial( { color: hexColor, dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
 		var lineGeometry = new THREE.Geometry();
@@ -33953,13 +33954,13 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 		lineGeometry.computeLineDistances();
 
 		this.targetLine = new THREE.Line( lineGeometry, lineMaterial );
-		this.targetLine.properties.isGizmo = true;
+		this.targetLine.userData.isGizmo = true;
 
 	}
 
 	//
 
-	this.properties.isGizmo = true;
+	this.userData.isGizmo = true;
 
 }
 
@@ -34076,13 +34077,13 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 
 	//
 
-	this.lightSphere.properties.isGizmo = true;
-	this.lightSphere.properties.gizmoSubject = light;
-	this.lightSphere.properties.gizmoRoot = this;
+	this.lightSphere.userData.isGizmo = true;
+	this.lightSphere.userData.gizmoSubject = light;
+	this.lightSphere.userData.gizmoRoot = this;
 
 	//
 
-	this.properties.isGizmo = true;
+	this.userData.isGizmo = true;
 
 	//
 
@@ -34172,13 +34173,13 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	//
 
-	this.lightSphere.properties.isGizmo = true;
-	this.lightSphere.properties.gizmoSubject = light;
-	this.lightSphere.properties.gizmoRoot = this;
+	this.lightSphere.userData.isGizmo = true;
+	this.lightSphere.userData.gizmoSubject = light;
+	this.lightSphere.userData.gizmoRoot = this;
 
 	//
 
-	this.properties.isGizmo = true;
+	this.userData.isGizmo = true;
 
 }
 
@@ -34278,15 +34279,15 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 
 	this.lookAt( light.target.position );
 
-	this.lightSphere.properties.isGizmo = true;
-	this.lightSphere.properties.gizmoSubject = light;
-	this.lightSphere.properties.gizmoRoot = this;
+	this.lightSphere.userData.isGizmo = true;
+	this.lightSphere.userData.gizmoSubject = light;
+	this.lightSphere.userData.gizmoRoot = this;
 
 	// light target helper
 
 	this.targetSphere = null;
 
-	if ( light.target.properties.targetInverse !== undefined ) {
+	if ( light.target.userData.targetInverse !== undefined ) {
 
 		var targetGeo = new THREE.SphereGeometry( sphereSize, 8, 4 );
 		var targetMaterial = new THREE.MeshBasicMaterial( { color: hexColor, wireframe: true, fog: false } );
@@ -34294,9 +34295,9 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 		this.targetSphere = new THREE.Mesh( targetGeo, targetMaterial );
 		this.targetSphere.position = light.target.position;
 
-		this.targetSphere.properties.isGizmo = true;
-		this.targetSphere.properties.gizmoSubject = light.target;
-		this.targetSphere.properties.gizmoRoot = this.targetSphere;
+		this.targetSphere.userData.isGizmo = true;
+		this.targetSphere.userData.gizmoSubject = light.target;
+		this.targetSphere.userData.gizmoRoot = this.targetSphere;
 
 		var lineMaterial = new THREE.LineDashedMaterial( { color: hexColor, dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
 		var lineGeometry = new THREE.Geometry();
@@ -34305,13 +34306,13 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 		lineGeometry.computeLineDistances();
 
 		this.targetLine = new THREE.Line( lineGeometry, lineMaterial );
-		this.targetLine.properties.isGizmo = true;
+		this.targetLine.userData.isGizmo = true;
 
 	}
 
 	//
 
-	this.properties.isGizmo = true;
+	this.userData.isGizmo = true;
 
 }
 
