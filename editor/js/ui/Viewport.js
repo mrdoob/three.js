@@ -518,7 +518,6 @@ var Viewport = function ( signals ) {
 		selectionAxis.visible = false;
 
 		var geometry;
-		var hasRotation;
 
 		if ( object !== null ) {
 
@@ -527,14 +526,15 @@ var Viewport = function ( signals ) {
 			if ( object.geometry ) {
 
 				geometry = object.geometry;
-				hasRotation = true;
 
 			} else if ( object.properties.pickingProxy ) {
 
 				geometry = object.properties.pickingProxy.geometry;
-				hasRotation = false;
 
 			}
+
+			selectionAxis.matrixWorld = object.matrixWorld;
+			selectionAxis.visible = true;
 
 		}
 
@@ -584,15 +584,7 @@ var Viewport = function ( signals ) {
 			selectionBox.geometry.verticesNeedUpdate = true;
 
 			selectionBox.matrixWorld = object.matrixWorld;
-			selectionAxis.matrixWorld = object.matrixWorld;
-
 			selectionBox.visible = true;
-
-		}
-
-		if ( hasRotation ) {
-
-			selectionAxis.visible = true;
 
 		}
 
