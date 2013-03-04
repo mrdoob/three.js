@@ -313,7 +313,6 @@ Sidebar.Object3D = function ( signals ) {
 			try {
 
 				selected.userData = JSON.parse( objectUserData.getValue() );
-				// objectUserData.setValue( JSON.stringify( selected.userData, null, '  ' ) );
 
 			} catch ( error ) {
 
@@ -459,7 +458,6 @@ Sidebar.Object3D = function ( signals ) {
 
 			try {
 
-				console.log( object.userData );
 				objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
 
 			} catch ( error ) {
