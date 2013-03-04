@@ -238,7 +238,7 @@
 					var meshAnim = new THREE.MorphAnimMesh( geometry, material );
 
 					meshAnim.duration = 3000;
-					meshAnim.properties.delta = -13;
+					meshAnim.userData.delta = -13;
 
 					meshAnim.scale.multiplyScalar( 50 );
 					meshAnim.position.set( 180, -48, -10 );
@@ -286,7 +286,7 @@
 					mesh.position.y = -geometry.boundingBox.min.y * s - 48;
 					mesh.position.z = 18;
 
-					mesh.properties.delta = 25;
+					mesh.userData.delta = 25;
 
 					scene.add( mesh );
 					skins.push( mesh );
@@ -451,7 +451,7 @@
 					var morph = morphs[ i ];
 					morph.updateAnimation( 1000 * delta );
 
-					morph.position.x += morph.properties.delta * delta;
+					morph.position.x += morph.userData.delta * delta;
 					if ( morph.position.x < -50 ) morph.position.x = 200;
 
 				}
@@ -464,7 +464,7 @@
 
 					var skin = skins[ i ];
 
-					skin.position.x += skin.properties.delta * delta;
+					skin.position.x += skin.userData.delta * delta;
 					if ( skin.position.x > 200 ) skin.position.x = -200;
 
 				}

@@ -307,7 +307,7 @@
 
 					result.scene.traverse( function ( object ) {
 
-						if ( object.properties.rotating === true ) {
+						if ( object.userData.rotating === true ) {
 
 							rotatingObjects.push( object );
 
@@ -479,8 +479,8 @@
 
 					var object = rotatingObjects[ i ];
 
-					if ( object.properties.rotateX ) object.rotation.x += 1 * delta;
-					if ( object.properties.rotateY ) object.rotation.y += 0.5 * delta;
+					if ( object.userData.rotateX ) object.rotation.x += 1 * delta;
+					if ( object.userData.rotateY ) object.rotation.y += 0.5 * delta;
 
 				}
 

@@ -187,7 +187,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						var reservedTypes = { "type": 1, "url": 1, "material": 1,
 											  "position": 1, "rotation": 1, "scale" : 1,
-											  "visible": 1, "children": 1, "properties": 1,
+											  "visible": 1, "children": 1, "userData": 1,
 											  "skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1 };
 
 						var loaderParameters = {};
@@ -461,12 +461,12 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				if ( object ) {
 
-					if ( objJSON.properties !== undefined )  {
+					if ( objJSON.userData !== undefined )  {
 
-						for ( var key in objJSON.properties ) {
+						for ( var key in objJSON.userData ) {
 
-							var value = objJSON.properties[ key ];
-							object.properties[ key ] = value;
+							var value = objJSON.userData[ key ];
+							object.userData[ key ] = value;
 
 						}
 
@@ -682,7 +682,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			}
 
-			ta.object.target.properties.targetInverse = ta.object;
+			ta.object.target.userData.targetInverse = ta.object;
 
 		}
 
