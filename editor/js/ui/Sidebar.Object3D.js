@@ -25,9 +25,9 @@ Sidebar.Object3D = function ( signals ) {
 	// name
 
 	var objectNameRow = new UI.Panel();
-	var objectName = new UI.Input().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
-	objectNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
+	objectNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectNameRow.add( objectName );
 
 	container.add( objectNameRow );
@@ -35,11 +35,11 @@ Sidebar.Object3D = function ( signals ) {
 	// position
 
 	var objectPositionRow = new UI.Panel();
-	var objectPositionX = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '50px' ).onChange( update );
-	var objectPositionY = new UI.Number().setPosition( 'absolute' ).setLeft( '160px' ).setWidth( '50px' ).onChange( update );
-	var objectPositionZ = new UI.Number().setPosition( 'absolute' ).setLeft( '220px' ).setWidth( '50px' ).onChange( update );
+	var objectPositionX = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectPositionY = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectPositionZ = new UI.Number().setWidth( '50px' ).onChange( update );
 
-	objectPositionRow.add( new UI.Text().setValue( 'Position' ).setColor( '#666' ) );
+	objectPositionRow.add( new UI.Text( 'Position' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
 
 	container.add( objectPositionRow );
@@ -47,11 +47,11 @@ Sidebar.Object3D = function ( signals ) {
 	// rotation
 
 	var objectRotationRow = new UI.Panel();
-	var objectRotationX = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '50px' ).onChange( update );
-	var objectRotationY = new UI.Number().setPosition( 'absolute' ).setLeft( '160px' ).setWidth( '50px' ).onChange( update );
-	var objectRotationZ = new UI.Number().setPosition( 'absolute' ).setLeft( '220px' ).setWidth( '50px' ).onChange( update );
+	var objectRotationX = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectRotationY = new UI.Number().setWidth( '50px' ).onChange( update );
+	var objectRotationZ = new UI.Number().setWidth( '50px' ).onChange( update );
 
-	objectRotationRow.add( new UI.Text().setValue( 'Rotation' ).setColor( '#666' ) );
+	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
 
 	container.add( objectRotationRow );
@@ -60,11 +60,11 @@ Sidebar.Object3D = function ( signals ) {
 
 	var objectScaleRow = new UI.Panel();
 	var objectScaleLock = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '75px' ).onChange( updateScaleLock );
-	var objectScaleX = new UI.Number().setPosition( 'absolute' ).setValue( 1 ).setLeft( '100px' ).setWidth( '50px' ).onChange( updateScaleX );
-	var objectScaleY = new UI.Number().setPosition( 'absolute' ).setValue( 1 ).setLeft( '160px' ).setWidth( '50px' ).onChange( updateScaleY );
-	var objectScaleZ = new UI.Number().setPosition( 'absolute' ).setValue( 1 ).setLeft( '220px' ).setWidth( '50px' ).onChange( updateScaleZ );
+	var objectScaleX = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleX );
+	var objectScaleY = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleY );
+	var objectScaleZ = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleZ );
 
-	objectScaleRow.add( new UI.Text().setValue( 'Scale' ).setColor( '#666' ) );
+	objectScaleRow.add( new UI.Text( 'Scale' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectScaleRow.add( objectScaleLock );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
 
@@ -73,9 +73,9 @@ Sidebar.Object3D = function ( signals ) {
 	// fov
 
 	var objectFovRow = new UI.Panel();
-	var objectFov = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var objectFov = new UI.Number().onChange( update );
 
-	objectFovRow.add( new UI.Text().setValue( 'Fov' ).setColor( '#666' ) );
+	objectFovRow.add( new UI.Text( 'Fov' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectFovRow.add( objectFov );
 
 	container.add( objectFovRow );
@@ -83,9 +83,9 @@ Sidebar.Object3D = function ( signals ) {
 	// near
 
 	var objectNearRow = new UI.Panel();
-	var objectNear = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var objectNear = new UI.Number().onChange( update );
 
-	objectNearRow.add( new UI.Text().setValue( 'Near' ).setColor( '#666' ) );
+	objectNearRow.add( new UI.Text( 'Near' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectNearRow.add( objectNear );
 
 	container.add( objectNearRow );
@@ -93,9 +93,9 @@ Sidebar.Object3D = function ( signals ) {
 	// far
 
 	var objectFarRow = new UI.Panel();
-	var objectFar = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var objectFar = new UI.Number().onChange( update );
 
-	objectFarRow.add( new UI.Text().setValue( 'Far' ).setColor( '#666' ) );
+	objectFarRow.add( new UI.Text( 'Far' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectFarRow.add( objectFar );
 
 	container.add( objectFarRow );
@@ -103,9 +103,9 @@ Sidebar.Object3D = function ( signals ) {
 	// intensity
 
 	var objectIntensityRow = new UI.Panel();
-	var objectIntensity = new UI.Number().setPosition( 'absolute' ).setRange( 0, Infinity ).setLeft( '100px' ).onChange( update );
+	var objectIntensity = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
-	objectIntensityRow.add( new UI.Text().setValue( 'Intensity' ).setColor( '#666' ) );
+	objectIntensityRow.add( new UI.Text( 'Intensity' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectIntensityRow.add( objectIntensity );
 
 	container.add( objectIntensityRow );
@@ -113,9 +113,9 @@ Sidebar.Object3D = function ( signals ) {
 	// color
 
 	var objectColorRow = new UI.Panel();
-	var objectColor = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var objectColor = new UI.Color().onChange( update );
 
-	objectColorRow.add( new UI.Text().setValue( 'Color' ).setColor( '#666' ) );
+	objectColorRow.add( new UI.Text( 'Color' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectColorRow.add( objectColor );
 
 	container.add( objectColorRow );
@@ -123,9 +123,9 @@ Sidebar.Object3D = function ( signals ) {
 	// ground color
 
 	var objectGroundColorRow = new UI.Panel();
-	var objectGroundColor = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var objectGroundColor = new UI.Color().onChange( update );
 
-	objectGroundColorRow.add( new UI.Text().setValue( 'Ground color' ).setColor( '#666' ) );
+	objectGroundColorRow.add( new UI.Text( 'Ground color' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectGroundColorRow.add( objectGroundColor );
 
 	container.add( objectGroundColorRow );
@@ -133,9 +133,9 @@ Sidebar.Object3D = function ( signals ) {
 	// distance
 
 	var objectDistanceRow = new UI.Panel();
-	var objectDistance = new UI.Number().setPosition( 'absolute' ).setRange( 0, Infinity ).setLeft( '100px' ).onChange( update );
+	var objectDistance = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
-	objectDistanceRow.add( new UI.Text().setValue( 'Distance' ).setColor( '#666' ) );
+	objectDistanceRow.add( new UI.Text( 'Distance' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectDistanceRow.add( objectDistance );
 
 	container.add( objectDistanceRow );
@@ -143,9 +143,9 @@ Sidebar.Object3D = function ( signals ) {
 	// angle
 
 	var objectAngleRow = new UI.Panel();
-	var objectAngle = new UI.Number().setPosition( 'absolute' ).setPrecision( 3 ).setRange( 0, Math.PI * 2 ).setLeft( '100px' ).onChange( update );
+	var objectAngle = new UI.Number().setPrecision( 3 ).setRange( 0, Math.PI * 2 ).onChange( update );
 
-	objectAngleRow.add( new UI.Text().setValue( 'Angle' ).setColor( '#666' ) );
+	objectAngleRow.add( new UI.Text( 'Angle' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectAngleRow.add( objectAngle );
 
 	container.add( objectAngleRow );
@@ -153,9 +153,9 @@ Sidebar.Object3D = function ( signals ) {
 	// exponent
 
 	var objectExponentRow = new UI.Panel();
-	var objectExponent = new UI.Number().setPosition( 'absolute' ).setRange( 0, Infinity ).setLeft( '100px' ).onChange( update );
+	var objectExponent = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
-	objectExponentRow.add( new UI.Text().setValue( 'Exponent' ).setColor( '#666' ) );
+	objectExponentRow.add( new UI.Text( 'Exponent' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectExponentRow.add( objectExponent );
 
 	container.add( objectExponentRow );
@@ -163,9 +163,9 @@ Sidebar.Object3D = function ( signals ) {
 	// visible
 
 	var objectVisibleRow = new UI.Panel();
-	var objectVisible = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var objectVisible = new UI.Checkbox().onChange( update );
 
-	objectVisibleRow.add( new UI.Text().setValue( 'Visible' ).setColor( '#666' ) );
+	objectVisibleRow.add( new UI.Text( 'Visible' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectVisibleRow.add( objectVisible );
 
 	container.add( objectVisibleRow );
@@ -173,9 +173,9 @@ Sidebar.Object3D = function ( signals ) {
 	// user data
 
 	var objectUserDataRow = new UI.Panel();
-	objectUserDataRow.add( new UI.Text().setValue( 'User data' ).setWidth( '100px' ).setColor( '#666' ) );
-
 	var objectUserData = new UI.TextArea().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+
+	objectUserDataRow.add( new UI.Text( 'User data' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectUserDataRow.add( objectUserData );
 
 	container.add( objectUserDataRow );

@@ -104,7 +104,7 @@ UI.Panel.prototype.add = function () {
 
 // Text
 
-UI.Text = function () {
+UI.Text = function ( text ) {
 
 	UI.Element.call( this );
 
@@ -115,6 +115,7 @@ UI.Text = function () {
 	dom.style.verticalAlign = 'top';
 
 	this.dom = dom;
+	this.setValue( text );
 
 	return this;
 
@@ -124,7 +125,11 @@ UI.Text.prototype = Object.create( UI.Element.prototype );
 
 UI.Text.prototype.setValue = function ( value ) {
 
-	this.dom.textContent = value;
+	if ( value !== undefined ) {
+
+		this.dom.textContent = value;
+
+	}
 
 	return this;
 
@@ -445,7 +450,7 @@ UI.FancySelect.prototype.onChange = function ( callback ) {
 
 // Checkbox
 
-UI.Checkbox = function () {
+UI.Checkbox = function ( boolean ) {
 
 	UI.Element.call( this );
 
@@ -456,6 +461,7 @@ UI.Checkbox = function () {
 	dom.type = 'checkbox';
 
 	this.dom = dom;
+	this.setValue( boolean );
 
 	this.onChangeCallback = null;
 
@@ -479,7 +485,11 @@ UI.Checkbox.prototype.getValue = function () {
 
 UI.Checkbox.prototype.setValue = function ( value ) {
 
-	this.dom.checked = value;
+	if ( value !== undefined ) {
+
+		this.dom.checked = value;
+
+	}
 
 	return this;
 
@@ -566,7 +576,7 @@ UI.Color.prototype.onChange = function ( callback ) {
 
 // Number
 
-UI.Number = function () {
+UI.Number = function ( number ) {
 
 	UI.Element.call( this );
 
@@ -585,6 +595,7 @@ UI.Number = function () {
 	dom.value = '0.00';
 
 	this.dom = dom;
+	this.setValue( number );
 
 	this.min = - Infinity;
 	this.max = Infinity;
@@ -688,7 +699,11 @@ UI.Number.prototype.getValue = function () {
 
 UI.Number.prototype.setValue = function ( value ) {
 
-	this.dom.value = value.toFixed( this.precision );
+	if ( value !== undefined ) {
+
+		this.dom.value = value.toFixed( this.precision );
+
+	}
 
 	return this;
 

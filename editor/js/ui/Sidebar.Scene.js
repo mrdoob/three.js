@@ -19,7 +19,7 @@ Sidebar.Scene = function ( signals ) {
 	container.setPadding( '10px' );
 	container.setBorderTop( '1px solid #ccc' );
 
-	container.add( new UI.Text().setValue( 'SCENE' ).setColor( '#666' ) );
+	container.add( new UI.Text( 'SCENE' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	var outliner = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( updateOutliner );
@@ -29,15 +29,15 @@ Sidebar.Scene = function ( signals ) {
 	// fog
 
 	var fogTypeRow = new UI.Panel();
-	var fogType = new UI.Select().setPosition( 'absolute' ).setOptions( {
+	var fogType = new UI.Select().setOptions( {
 
 		'None': 'None',
 		'Fog': 'Linear',
 		'FogExp2': 'Exponential'
 
-	} ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateFogType );
+	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateFogType );
 
-	fogTypeRow.add( new UI.Text().setValue( 'Fog' ).setColor( '#666' ) );
+	fogTypeRow.add( new UI.Text( 'Fog' ).setWidth( '90px' ).setColor( '#666' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );
@@ -47,9 +47,9 @@ Sidebar.Scene = function ( signals ) {
 	var fogColorRow = new UI.Panel();
 	fogColorRow.setDisplay( 'none' );
 
-	var fogColor = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).setValue( '#aaaaaa' ).onChange( updateFogColor );
+	var fogColor = new UI.Color().setValue( '#aaaaaa' ).onChange( updateFogColor );
 
-	fogColorRow.add( new UI.Text().setValue( 'Fog color' ).setColor( '#666' ) );
+	fogColorRow.add( new UI.Text( 'Fog color' ).setWidth( '90px' ).setColor( '#666' ) );
 	fogColorRow.add( fogColor );
 
 	container.add( fogColorRow );
@@ -59,9 +59,9 @@ Sidebar.Scene = function ( signals ) {
 	var fogNearRow = new UI.Panel();
 	fogNearRow.setDisplay( 'none' );
 
-	var fogNear = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 1 ).onChange( updateFogParameters );
+	var fogNear = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( updateFogParameters );
 
-	fogNearRow.add( new UI.Text().setValue( 'Fog near' ).setColor( '#666' ) );
+	fogNearRow.add( new UI.Text( 'Fog near' ).setWidth( '90px' ).setColor( '#666' ) );
 	fogNearRow.add( fogNear );
 
 	container.add( fogNearRow );
@@ -71,9 +71,9 @@ Sidebar.Scene = function ( signals ) {
 
 	// fog far
 
-	var fogFar = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 5000 ).onChange( updateFogParameters );
+	var fogFar = new UI.Number( 5000 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( updateFogParameters );
 
-	fogFarRow.add( new UI.Text().setValue( 'Fog far' ).setColor( '#666' ) );
+	fogFarRow.add( new UI.Text( 'Fog far' ).setWidth( '90px' ).setColor( '#666' ) );
 	fogFarRow.add( fogFar );
 
 	container.add( fogFarRow );
@@ -83,9 +83,9 @@ Sidebar.Scene = function ( signals ) {
 	var fogDensityRow = new UI.Panel();
 	fogDensityRow.setDisplay( 'none' );
 
-	var fogDensity = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).setValue( 0.00025 ).onChange( updateFogParameters );
+	var fogDensity = new UI.Number( 0.00025 ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).onChange( updateFogParameters );
 
-	fogDensityRow.add( new UI.Text().setValue( 'Fog density' ).setColor( '#666' ) );
+	fogDensityRow.add( new UI.Text( 'Fog density' ).setWidth( '90px' ).setColor( '#666' ) );
 	fogDensityRow.add( fogDensity );
 
 	container.add( fogDensityRow );

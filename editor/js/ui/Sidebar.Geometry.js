@@ -29,15 +29,15 @@ Sidebar.Geometry = function ( signals ) {
 	container.setDisplay( 'none' );
 	container.setPadding( '10px' );
 
-	container.add( new UI.Text().setValue( 'GEOMETRY' ).setColor( '#666' ) );
+	container.add( new UI.Text( 'GEOMETRY' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// name
 
 	var geometryNameRow = new UI.Panel();
-	var geometryName = new UI.Input().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var geometryName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
-	geometryNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
+	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
@@ -45,9 +45,9 @@ Sidebar.Geometry = function ( signals ) {
 	// class
 
 	var geometryClassRow = new UI.Panel();
-	var geometryClass = new UI.Text().setPosition( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryClass = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
 
-	geometryClassRow.add( new UI.Text().setValue( 'Class' ).setColor( '#666' ) );
+	geometryClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
 	geometryClassRow.add( geometryClass );
 
 	container.add( geometryClassRow );
@@ -55,9 +55,9 @@ Sidebar.Geometry = function ( signals ) {
 	// vertices
 
 	var geometryVerticesRow = new UI.Panel();
-	var geometryVertices = new UI.Text().setPosition( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryVertices = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
 
-	geometryVerticesRow.add( new UI.Text().setValue( 'Vertices' ).setColor( '#666' ) );
+	geometryVerticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ).setColor( '#666' ) );
 	geometryVerticesRow.add( geometryVertices );
 
 	container.add( geometryVerticesRow );
@@ -65,9 +65,9 @@ Sidebar.Geometry = function ( signals ) {
 	// faces
 
 	var geometryFacesRow = new UI.Panel();
-	var geometryFaces = new UI.Text().setPosition( 'absolute' ).setLeft( '100px' ).setColor( '#444' ).setFontSize( '12px' );
+	var geometryFaces = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
 
-	geometryFacesRow.add( new UI.Text().setValue( 'Faces' ).setColor( '#666' ) );
+	geometryFacesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ).setColor( '#666' ) );
 	geometryFacesRow.add( geometryFaces );
 
 	container.add( geometryFacesRow );
