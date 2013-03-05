@@ -29,7 +29,7 @@ Sidebar.Scene = function ( signals ) {
 	// fog
 
 	var fogTypeRow = new UI.Panel();
-	var fogType = new UI.Select( 'absolute' ).setOptions( {
+	var fogType = new UI.Select().setPosition( 'absolute' ).setOptions( {
 
 		'None': 'None',
 		'Fog': 'Linear',
@@ -47,7 +47,7 @@ Sidebar.Scene = function ( signals ) {
 	var fogColorRow = new UI.Panel();
 	fogColorRow.setDisplay( 'none' );
 
-	var fogColor = new UI.Color( 'absolute' ).setLeft( '100px' ).setValue( '#aaaaaa' ).onChange( updateFogColor );
+	var fogColor = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).setValue( '#aaaaaa' ).onChange( updateFogColor );
 
 	fogColorRow.add( new UI.Text().setValue( 'Fog color' ).setColor( '#666' ) );
 	fogColorRow.add( fogColor );
@@ -59,7 +59,7 @@ Sidebar.Scene = function ( signals ) {
 	var fogNearRow = new UI.Panel();
 	fogNearRow.setDisplay( 'none' );
 
-	var fogNear = new UI.Number( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 1 ).onChange( updateFogParameters );
+	var fogNear = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 1 ).onChange( updateFogParameters );
 
 	fogNearRow.add( new UI.Text().setValue( 'Fog near' ).setColor( '#666' ) );
 	fogNearRow.add( fogNear );
@@ -71,7 +71,7 @@ Sidebar.Scene = function ( signals ) {
 
 	// fog far
 
-	var fogFar = new UI.Number( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 5000 ).onChange( updateFogParameters );
+	var fogFar = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, Infinity ).setValue( 5000 ).onChange( updateFogParameters );
 
 	fogFarRow.add( new UI.Text().setValue( 'Fog far' ).setColor( '#666' ) );
 	fogFarRow.add( fogFar );
@@ -83,7 +83,7 @@ Sidebar.Scene = function ( signals ) {
 	var fogDensityRow = new UI.Panel();
 	fogDensityRow.setDisplay( 'none' );
 
-	var fogDensity = new UI.Number( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).setValue( 0.00025 ).onChange( updateFogParameters );
+	var fogDensity = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).setValue( 0.00025 ).onChange( updateFogParameters );
 
 	fogDensityRow.add( new UI.Text().setValue( 'Fog density' ).setColor( '#666' ) );
 	fogDensityRow.add( fogDensity );

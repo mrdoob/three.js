@@ -1,6 +1,7 @@
 var Viewport = function ( signals ) {
 
-	var container = new UI.Panel( 'absolute' );
+	var container = new UI.Panel();
+	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
 
 	// settings

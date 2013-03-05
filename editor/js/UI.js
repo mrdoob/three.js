@@ -34,7 +34,7 @@ UI.Element.prototype = {
 
 // properties
 
-var properties = [ 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
+var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
 'borderTop', 'borderRight', 'borderBottom', 'margin', 'marginLeft', 'marginTop', 'marginRight',
 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
 'backgroundColor', 'fontSize', 'fontWeight', 'display', 'overflow', 'cursor' ];
@@ -72,13 +72,12 @@ events.forEach( function ( event ) {
 
 // Panel
 
-UI.Panel = function ( position ) {
+UI.Panel = function () {
 
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Panel';
-	dom.style.position = position || 'relative';
 	dom.style.userSelect = 'none';
 	dom.style.WebkitUserSelect = 'none';
 	dom.style.MozUserSelect = 'none';
@@ -105,14 +104,15 @@ UI.Panel.prototype.add = function () {
 
 // Text
 
-UI.Text = function ( position ) {
+UI.Text = function () {
 
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'span' );
 	dom.className = 'Text';
-	dom.style.position = position || 'relative';
 	dom.style.cursor = 'default';
+	dom.style.display = 'inline-block';
+	dom.style.verticalAlign = 'top';
 
 	this.dom = dom;
 
@@ -133,7 +133,7 @@ UI.Text.prototype.setValue = function ( value ) {
 
 // Input
 
-UI.Input = function ( position ) {
+UI.Input = function () {
 
 	UI.Element.call( this );
 
@@ -141,7 +141,6 @@ UI.Input = function ( position ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Input';
-	dom.style.position = position || 'relative';
 	dom.style.padding = '2px';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLeft = '-2px';
@@ -188,7 +187,7 @@ UI.Input.prototype.onChange = function ( callback ) {
 
 // TextArea
 
-UI.TextArea = function ( position ) {
+UI.TextArea = function () {
 
 	UI.Element.call( this );
 
@@ -196,7 +195,6 @@ UI.TextArea = function ( position ) {
 
 	var dom = document.createElement( 'textarea' );
 	dom.className = 'TextArea';
-	dom.style.position = position || 'relative';
 	dom.style.padding = '2px';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLeft = '-2px';
@@ -243,7 +241,7 @@ UI.TextArea.prototype.onChange = function ( callback ) {
 
 // Select
 
-UI.Select = function ( position ) {
+UI.Select = function () {
 
 	UI.Element.call( this );
 
@@ -251,7 +249,6 @@ UI.Select = function ( position ) {
 
 	var dom = document.createElement( 'select' );
 	dom.className = 'Select';
-	dom.style.position = position || 'relative';
 	dom.style.width = '64px';
 	dom.style.height = '16px';
 	dom.style.border = '0px';
@@ -326,7 +323,7 @@ UI.Select.prototype.onChange = function ( callback ) {
 
 // FancySelect
 
-UI.FancySelect = function ( position ) {
+UI.FancySelect = function () {
 
 	UI.Element.call( this );
 
@@ -334,7 +331,6 @@ UI.FancySelect = function ( position ) {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'FancySelect';
-	dom.style.position = position || 'relative';
 	dom.style.background = '#fff';
 	dom.style.border = '1px solid #ccc';
 	dom.style.padding = '0';
@@ -449,7 +445,7 @@ UI.FancySelect.prototype.onChange = function ( callback ) {
 
 // Checkbox
 
-UI.Checkbox = function ( position ) {
+UI.Checkbox = function () {
 
 	UI.Element.call( this );
 
@@ -457,7 +453,6 @@ UI.Checkbox = function ( position ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Checkbox';
-	dom.style.position = position || 'relative';
 	dom.type = 'checkbox';
 
 	this.dom = dom;
@@ -501,7 +496,7 @@ UI.Checkbox.prototype.onChange = function ( callback ) {
 
 // Color
 
-UI.Color = function ( position ) {
+UI.Color = function () {
 
 	UI.Element.call( this );
 
@@ -509,7 +504,6 @@ UI.Color = function ( position ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Color';
-	dom.style.position = position || 'relative';
 	dom.style.width = '64px';
 	dom.style.height = '16px';
 	dom.style.border = '0px';
@@ -572,7 +566,7 @@ UI.Color.prototype.onChange = function ( callback ) {
 
 // Number
 
-UI.Number = function ( position ) {
+UI.Number = function () {
 
 	UI.Element.call( this );
 
@@ -580,7 +574,6 @@ UI.Number = function ( position ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.position = position || 'relative';
 	dom.style.color = '#0080f0';
 	dom.style.fontSize = '12px';
 	dom.style.backgroundColor = 'transparent';
@@ -753,13 +746,12 @@ UI.Break.prototype = Object.create( UI.Element.prototype );
 
 // HorizontalRule
 
-UI.HorizontalRule = function ( position ) {
+UI.HorizontalRule = function () {
 
 	UI.Element.call( this );
 
 	var dom = document.createElement( 'hr' );
 	dom.className = 'HorizontalRule';
-	dom.style.position = position || 'relative';
 
 	this.dom = dom;
 
@@ -772,7 +764,7 @@ UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
 
 // Button
 
-UI.Button = function ( position ) {
+UI.Button = function () {
 
 	UI.Element.call( this );
 
@@ -780,7 +772,6 @@ UI.Button = function ( position ) {
 
 	var dom = document.createElement( 'button' );
 	dom.className = 'Button';
-	dom.style.position = position || 'relative';
 
 	this.dom = dom;
 

@@ -19,7 +19,7 @@ Sidebar.Renderer = function ( signals ) {
 	// class
 
 	var rendererClassRow = new UI.Panel();
-	var rendererClass = new UI.Select( 'absolute' ).setOptions( {
+	var rendererClass = new UI.Select().setPosition( 'absolute' ).setOptions( {
 
 		'WebGLRenderer': 'WebGLRenderer',
 		'CanvasRenderer': 'CanvasRenderer',
@@ -36,7 +36,7 @@ Sidebar.Renderer = function ( signals ) {
 	// clear color
 
 	var clearColorRow = new UI.Panel();
-	var clearColor = new UI.Color( 'absolute' ).setLeft( '100px' ).setValue( '#aaaaaa' ).onChange( updateClearColor );
+	var clearColor = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).setValue( '#aaaaaa' ).onChange( updateClearColor );
 
 	clearColorRow.add( new UI.Text().setValue( 'Clear color' ).setColor( '#666' ) );
 	clearColorRow.add( clearColor );

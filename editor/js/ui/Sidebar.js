@@ -1,6 +1,7 @@
 var Sidebar = function ( signals ) {
 
-	var container = new UI.Panel( 'absolute' );
+	var container = new UI.Panel();
+	container.setPosition( 'absolute' );
 	container.setClass( 'sidebar' );
 
 	container.add( new Sidebar.Renderer( signals ) );

@@ -28,7 +28,7 @@ Sidebar.Material = function ( signals ) {
 	// name
 
 	var materialNameRow = new UI.Panel();
-	var materialName = new UI.Input( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var materialName = new UI.Input().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialNameRow.add( new UI.Text().setValue( 'Name' ).setColor( '#666' ) );
 	materialNameRow.add( materialName );
@@ -38,7 +38,7 @@ Sidebar.Material = function ( signals ) {
 	// class
 
 	var materialClassRow = new UI.Panel();
-	var materialClass = new UI.Select( 'absolute' ).setOptions( {
+	var materialClass = new UI.Select().setPosition( 'absolute' ).setOptions( {
 
 		'LineBasicMaterial': 'LineBasicMaterial',
 		'LineDashedMaterial': 'LineDashedMaterial',
@@ -59,7 +59,7 @@ Sidebar.Material = function ( signals ) {
 	// color
 
 	var materialColorRow = new UI.Panel();
-	var materialColor = new UI.Color( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var materialColor = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
 
 	materialColorRow.add( new UI.Text().setValue( 'Color' ).setColor( '#666' ) );
 	materialColorRow.add( materialColor );
@@ -69,7 +69,7 @@ Sidebar.Material = function ( signals ) {
 	// ambient
 
 	var materialAmbientRow = new UI.Panel();
-	var materialAmbient = new UI.Color( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var materialAmbient = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
 
 	materialAmbientRow.add( new UI.Text().setValue( 'Ambient' ).setColor( '#666' ) );
 	materialAmbientRow.add( materialAmbient );
@@ -79,7 +79,7 @@ Sidebar.Material = function ( signals ) {
 	// emissive
 
 	var materialEmissiveRow = new UI.Panel();
-	var materialEmissive = new UI.Color( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var materialEmissive = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
 
 	materialEmissiveRow.add( new UI.Text().setValue( 'Emissive' ).setColor( '#666' ) );
 	materialEmissiveRow.add( materialEmissive );
@@ -89,7 +89,7 @@ Sidebar.Material = function ( signals ) {
 	// specular
 
 	var materialSpecularRow = new UI.Panel();
-	var materialSpecular = new UI.Color( 'absolute' ).setLeft( '100px' ).onChange( update );
+	var materialSpecular = new UI.Color().setPosition( 'absolute' ).setLeft( '100px' ).onChange( update );
 
 	materialSpecularRow.add( new UI.Text().setValue( 'Specular' ).setColor( '#666' ) );
 	materialSpecularRow.add( materialSpecular );
@@ -99,7 +99,7 @@ Sidebar.Material = function ( signals ) {
 	// shininess
 
 	var materialShininessRow = new UI.Panel();
-	var materialShininess = new UI.Number( 'absolute' ).setValue( 30 ).setLeft( '100px' ).onChange( update );
+	var materialShininess = new UI.Number().setPosition( 'absolute' ).setValue( 30 ).setLeft( '100px' ).onChange( update );
 
 	materialShininessRow.add( new UI.Text().setValue( 'Shininess' ).setColor( '#666' ) );
 	materialShininessRow.add( materialShininess );
@@ -109,8 +109,8 @@ Sidebar.Material = function ( signals ) {
 	// map
 
 	var materialMapRow = new UI.Panel();
-	var materialMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
+	var materialMapEnabled = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialMap = new UI.Texture().setPosition( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialMapRow.add( new UI.Text().setValue( 'Map' ).setColor( '#666' ) );
 	materialMapRow.add( materialMapEnabled );
@@ -121,8 +121,8 @@ Sidebar.Material = function ( signals ) {
 	// light map
 
 	var materialLightMapRow = new UI.Panel();
-	var materialLightMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialLightMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
+	var materialLightMapEnabled = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialLightMap = new UI.Texture().setPosition( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialLightMapRow.add( new UI.Text().setValue( 'Light Map' ).setColor( '#666' ) );
 	materialLightMapRow.add( materialLightMapEnabled );
@@ -133,9 +133,9 @@ Sidebar.Material = function ( signals ) {
 	// bump map
 
 	var materialBumpMapRow = new UI.Panel();
-	var materialBumpMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialBumpMap = new UI.Texture( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
-	var materialBumpScale = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).onChange( update );
+	var materialBumpMapEnabled = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialBumpMap = new UI.Texture().setPosition( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
+	var materialBumpScale = new UI.Number().setPosition( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).onChange( update );
 
 	materialBumpMapRow.add( new UI.Text().setValue( 'Bump Map' ).setColor( '#666' ) );
 	materialBumpMapRow.add( materialBumpMapEnabled );
@@ -147,8 +147,8 @@ Sidebar.Material = function ( signals ) {
 	// normal map
 
 	var materialNormalMapRow = new UI.Panel();
-	var materialNormalMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialNormalMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
+	var materialNormalMapEnabled = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialNormalMap = new UI.Texture().setPosition( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialNormalMapRow.add( new UI.Text().setValue( 'Normal Map' ).setColor( '#666' ) );
 	materialNormalMapRow.add( materialNormalMapEnabled );
@@ -159,8 +159,8 @@ Sidebar.Material = function ( signals ) {
 	// specular map
 
 	var materialSpecularMapRow = new UI.Panel();
-	var materialSpecularMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialSpecularMap = new UI.Texture( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
+	var materialSpecularMapEnabled = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialSpecularMap = new UI.Texture().setPosition( 'absolute' ).setLeft( '130px' ).setColor( '#444' ).onChange( update );
 
 	materialSpecularMapRow.add( new UI.Text().setValue( 'Specular Map' ).setColor( '#666' ) );
 	materialSpecularMapRow.add( materialSpecularMapEnabled );
@@ -171,9 +171,9 @@ Sidebar.Material = function ( signals ) {
 	// env map
 
 	var materialEnvMapRow = new UI.Panel();
-	var materialEnvMapEnabled = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialEnvMap = new UI.CubeTexture( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
-	var materialReflectivity = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).onChange( update );
+	var materialEnvMapEnabled = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialEnvMap = new UI.CubeTexture().setPosition( 'absolute' ).setLeft( '170px' ).setColor( '#444' ).onChange( update );
+	var materialReflectivity = new UI.Number().setPosition( 'absolute' ).setValue( 1 ).setLeft( '130px' ).setWidth( '30px' ).onChange( update );
 
 
 	materialEnvMapRow.add( new UI.Text().setValue( 'Env Map' ).setColor( '#666' ) );
@@ -186,7 +186,7 @@ Sidebar.Material = function ( signals ) {
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
-	var materialOpacity = new UI.Number( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
+	var materialOpacity = new UI.Number().setPosition( 'absolute' ).setLeft( '100px' ).setWidth( '60px' ).setRange( 0, 1 ).onChange( update );
 
 	materialOpacityRow.add( new UI.Text().setValue( 'Opacity' ).setColor( '#666' ) );
 	materialOpacityRow.add( materialOpacity );
@@ -196,7 +196,7 @@ Sidebar.Material = function ( signals ) {
 	// transparent
 
 	var materialTransparentRow = new UI.Panel();
-	var materialTransparent = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialTransparent = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
 
 	materialTransparentRow.add( new UI.Text().setValue( 'Transparent' ).setColor( '#666' ) );
 	materialTransparentRow.add( materialTransparent );
@@ -206,8 +206,8 @@ Sidebar.Material = function ( signals ) {
 	// wireframe
 
 	var materialWireframeRow = new UI.Panel();
-	var materialWireframe = new UI.Checkbox( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
-	var materialWireframeLinewidth = new UI.Number( 'absolute' ).setValue( 1 ).setLeft( '120px' ).setRange( 0, 100 ).onChange( update );
+	var materialWireframe = new UI.Checkbox().setPosition( 'absolute' ).setValue( false ).setLeft( '100px' ).onChange( update );
+	var materialWireframeLinewidth = new UI.Number().setPosition( 'absolute' ).setValue( 1 ).setLeft( '120px' ).setRange( 0, 100 ).onChange( update );
 
 	materialWireframeRow.add( new UI.Text().setValue( 'Wireframe' ).setColor( '#666' ) );
 	materialWireframeRow.add( materialWireframe );
