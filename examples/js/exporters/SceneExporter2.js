@@ -105,7 +105,7 @@ THREE.SceneExporter2.prototype = {
 			} else if ( object instanceof THREE.SpotLight ) {
 
 				data.type = 'SpotLight';
-				data.color = object.color.getHex();	
+				data.color = object.color.getHex();
 				data.intensity = object.intensity;
 				data.position = object.position.toArray();
 
@@ -130,6 +130,8 @@ THREE.SceneExporter2.prototype = {
 				data.scale = object.scale.toArray();
 
 			}
+
+			data.userData = object.userData;
 
 			// parse children
 
