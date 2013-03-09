@@ -266,19 +266,19 @@
 							if ( data.metadata.type === 'geometry' ) {
 
 								var loader = new THREE.JSONLoader();
+								var result = loader.parse( data );
 
-								loader.createModel( data, function ( geometry, materials ) {
+								var geometry = result.geometry;
+								var materials = result.materials;
 
-									geometry.sourceType = "ascii";
-									geometry.sourceFile = file.name;
+								geometry.sourceType = "ascii";
+								geometry.sourceFile = file.name;
 
-									var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-									mesh.name = filename;
+								var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+								mesh.name = filename;
 
-									signals.objectAdded.dispatch( mesh );
-									signals.objectSelected.dispatch( mesh );
-
-								} );
+								signals.objectAdded.dispatch( mesh );
+								signals.objectSelected.dispatch( mesh );
 
 							} else if ( data.metadata.type === 'scene' ) {
 
