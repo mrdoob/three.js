@@ -4,14 +4,12 @@ var Viewport = function ( signals ) {
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
 
-	// settings
+	var objects = [];
 
-	var enableHelpersFog = true;
 
 	// helpers
 
-	var objects = [];
-
+	var helpers = {};
 	var sceneHelpers = new THREE.Scene();
 
 	var size = 500, step = 25;
@@ -274,13 +272,18 @@ var Viewport = function ( signals ) {
 
 	var handleAddition = function ( object ) {
 
-		// add to picking list
-
-		objects.push( object );
-
 		// create helpers for invisible object types (lights, cameras, targets)
 
-		if ( object instanceof THREE.DirectionalLight ) {
+		if ( object instanceof THREE.PointLight ) {
+
+			var helper = new THREE.PointLightHelper( object, 5 );
+
+			sceneHelpers.add( helper );
+			objects.push( helper );
+
+			helpers[ object.id ] = helper;
+
+		} else if ( object instanceof THREE.DirectionalLight ) {
 
 			var sphereSize = 5;
 			var arrowLength = 30;
@@ -297,18 +300,6 @@ var Viewport = function ( signals ) {
 			objects.push( lightGizmo.lightSphere );
 			objects.push( lightGizmo.targetSphere );
 			objects.push( lightGizmo.targetLine );
-
-		} else if ( object instanceof THREE.PointLight ) {
-
-			var sphereSize = 5;
-
-			var lightGizmo = new THREE.PointLightHelper( object, sphereSize );
-			sceneHelpers.add( lightGizmo );
-
-			object.userData.helper = lightGizmo;
-			object.userData.pickingProxy = lightGizmo.lightSphere;
-
-			objects.push( lightGizmo.lightSphere );
 
 		} else if ( object instanceof THREE.SpotLight ) {
 
@@ -340,6 +331,12 @@ var Viewport = function ( signals ) {
 
 			objects.push( lightGizmo.lightSphere );
 
+		} else {
+
+			// add to picking list
+
+			objects.push( object );
+
 		}
 
 	};
@@ -368,7 +365,7 @@ var Viewport = function ( signals ) {
 
 		scene.add( object );
 
-		if ( object instanceof THREE.Light && ! ( object instanceof THREE.AmbientLight ) )  {
+		if ( object instanceof THREE.Light )  {
 
 			updateMaterials( scene );
 
@@ -386,9 +383,12 @@ var Viewport = function ( signals ) {
 
 			object.updateProjectionMatrix();
 
+		} else if ( object instanceof THREE.PointLight ) {
+
+			helpers[ object.id ].update();
+
 		} else if ( object instanceof THREE.DirectionalLight ||
 					object instanceof THREE.HemisphereLight ||
-					object instanceof THREE.PointLight ||
 					object instanceof THREE.SpotLight ) {
 
 			object.userData.helper.update();
@@ -500,7 +500,7 @@ var Viewport = function ( signals ) {
 
 		}
 
-		if ( selected instanceof THREE.Light && ! ( selected instanceof THREE.AmbientLight ) )  {
+		if ( selected instanceof THREE.Light )  {
 
 			updateMaterials( scene );
 
@@ -518,74 +518,64 @@ var Viewport = function ( signals ) {
 		selectionBox.visible = false;
 		selectionAxis.visible = false;
 
-		var geometry;
-
 		if ( object !== null ) {
 
-			selected = object;
+			if ( object.geometry !== undefined ) {
 
-			if ( object.geometry ) {
+				var geometry = object.geometry;
 
-				geometry = object.geometry;
+				if ( geometry.boundingBox === null ) {
 
-			} else if ( object.userData.pickingProxy ) {
+					geometry.computeBoundingBox();
 
-				geometry = object.userData.pickingProxy.geometry;
+				}
+
+				var vertices = selectionBox.geometry.vertices;
+
+				vertices[ 0 ].x = geometry.boundingBox.max.x;
+				vertices[ 0 ].y = geometry.boundingBox.max.y;
+				vertices[ 0 ].z = geometry.boundingBox.max.z;
+
+				vertices[ 1 ].x = geometry.boundingBox.max.x;
+				vertices[ 1 ].y = geometry.boundingBox.max.y;
+				vertices[ 1 ].z = geometry.boundingBox.min.z;
+
+				vertices[ 2 ].x = geometry.boundingBox.max.x;
+				vertices[ 2 ].y = geometry.boundingBox.min.y;
+				vertices[ 2 ].z = geometry.boundingBox.max.z;
+
+				vertices[ 3 ].x = geometry.boundingBox.max.x;
+				vertices[ 3 ].y = geometry.boundingBox.min.y;
+				vertices[ 3 ].z = geometry.boundingBox.min.z;
+
+				vertices[ 4 ].x = geometry.boundingBox.min.x;
+				vertices[ 4 ].y = geometry.boundingBox.max.y;
+				vertices[ 4 ].z = geometry.boundingBox.min.z;
+
+				vertices[ 5 ].x = geometry.boundingBox.min.x;
+				vertices[ 5 ].y = geometry.boundingBox.max.y;
+				vertices[ 5 ].z = geometry.boundingBox.max.z;
+
+				vertices[ 6 ].x = geometry.boundingBox.min.x;
+				vertices[ 6 ].y = geometry.boundingBox.min.y;
+				vertices[ 6 ].z = geometry.boundingBox.min.z;
+
+				vertices[ 7 ].x = geometry.boundingBox.min.x;
+				vertices[ 7 ].y = geometry.boundingBox.min.y;
+				vertices[ 7 ].z = geometry.boundingBox.max.z;
+
+				selectionBox.geometry.computeBoundingSphere();
+				selectionBox.geometry.verticesNeedUpdate = true;
+
+				selectionBox.matrixWorld = object.matrixWorld;
+				selectionBox.visible = true;
 
 			}
 
 			selectionAxis.matrixWorld = object.matrixWorld;
 			selectionAxis.visible = true;
 
-		}
-
-		if ( geometry ) {
-
-			if ( geometry.boundingBox === null ) {
-
-				geometry.computeBoundingBox();
-
-			}
-
-			var vertices = selectionBox.geometry.vertices;
-
-			vertices[ 0 ].x = geometry.boundingBox.max.x;
-			vertices[ 0 ].y = geometry.boundingBox.max.y;
-			vertices[ 0 ].z = geometry.boundingBox.max.z;
-
-			vertices[ 1 ].x = geometry.boundingBox.max.x;
-			vertices[ 1 ].y = geometry.boundingBox.max.y;
-			vertices[ 1 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 2 ].x = geometry.boundingBox.max.x;
-			vertices[ 2 ].y = geometry.boundingBox.min.y;
-			vertices[ 2 ].z = geometry.boundingBox.max.z;
-
-			vertices[ 3 ].x = geometry.boundingBox.max.x;
-			vertices[ 3 ].y = geometry.boundingBox.min.y;
-			vertices[ 3 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 4 ].x = geometry.boundingBox.min.x;
-			vertices[ 4 ].y = geometry.boundingBox.max.y;
-			vertices[ 4 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 5 ].x = geometry.boundingBox.min.x;
-			vertices[ 5 ].y = geometry.boundingBox.max.y;
-			vertices[ 5 ].z = geometry.boundingBox.max.z;
-
-			vertices[ 6 ].x = geometry.boundingBox.min.x;
-			vertices[ 6 ].y = geometry.boundingBox.min.y;
-			vertices[ 6 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 7 ].x = geometry.boundingBox.min.x;
-			vertices[ 7 ].y = geometry.boundingBox.min.y;
-			vertices[ 7 ].z = geometry.boundingBox.max.z;
-
-			selectionBox.geometry.computeBoundingSphere();
-			selectionBox.geometry.verticesNeedUpdate = true;
-
-			selectionBox.matrixWorld = object.matrixWorld;
-			selectionBox.visible = true;
+			selected = object;
 
 		}
 
@@ -626,13 +616,6 @@ var Viewport = function ( signals ) {
 			}
 
 			updateMaterials( scene );
-
-			if ( enableHelpersFog )	{
-
-				sceneHelpers.fog = scene.fog;
-				updateMaterials( sceneHelpers );
-
-			}
 
 			oldFogType = fogType;
 
@@ -803,13 +786,6 @@ var Viewport = function ( signals ) {
 		} else {
 
 			oldFogType = "None";
-
-		}
-
-		if ( enableHelpersFog )	{
-
-			sceneHelpers.fog = scene.fog;
-			updateMaterials( sceneHelpers );
 
 		}
 
