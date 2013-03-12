@@ -9,7 +9,9 @@ var Viewport = function ( signals ) {
 
 	// helpers
 
-	var helpers = {};
+	var helpersToObjects = {};
+	var objectsToHelpers = {};
+
 	var sceneHelpers = new THREE.Scene();
 
 	var size = 500, step = 25;
@@ -103,23 +105,15 @@ var Viewport = function ( signals ) {
 
 				controls.enabled = false;
 
-				picked = intersects[ 0 ].object;
+				selected = intersects[ 0 ].object;
 
-				var root;
+				if ( helpersToObjects[ selected.id ] !== undefined ) {
 
-				if ( picked.userData.isGizmo ) {
-
-					root = picked.userData.gizmoRoot;
-					selected = picked.userData.gizmoSubject;
-
-				} else {
-
-					root = picked;
-					selected = picked;
+					selected = helpersToObjects[ selected.id ];
 
 				}
 
-				intersectionPlane.position.copy( root.position );
+				intersectionPlane.position.copy( selected.position );
 				intersectionPlane.lookAt( camera.position );
 
 				signals.objectSelected.dispatch( selected );
@@ -160,18 +154,8 @@ var Viewport = function ( signals ) {
 
 			intersects[ 0 ].point.sub( offset );
 
-			if ( picked.userData.isGizmo ) {
-
-				picked.userData.gizmoRoot.position.copy( intersects[ 0 ].point );
-				picked.userData.gizmoSubject.position.copy( intersects[ 0 ].point );
-				signals.objectChanged.dispatch( picked.userData.gizmoSubject );
-
-			} else {
-
-				picked.position.copy( intersects[ 0 ].point );
-				signals.objectChanged.dispatch( picked );
-
-			}
+			selected.position.copy( intersects[ 0 ].point );
+			signals.objectChanged.dispatch( selected );
 
 			render();
 
@@ -205,21 +189,19 @@ var Viewport = function ( signals ) {
 
 				selected = intersects[ 0 ].object;
 
+				if ( helpersToObjects[ selected.id ] !== undefined ) {
+
+					selected = helpersToObjects[ selected.id ];
+
+				}
+
 			} else {
 
 				selected = camera;
 
 			}
 
-			if ( selected.userData.isGizmo ) {
-
-				signals.objectSelected.dispatch( selected.userData.gizmoSubject );
-
-			} else {
-
-				signals.objectSelected.dispatch( selected );
-
-			}
+			signals.objectSelected.dispatch( selected );
 
 		}
 
@@ -276,12 +258,15 @@ var Viewport = function ( signals ) {
 
 		if ( object instanceof THREE.PointLight ) {
 
-			var helper = new THREE.PointLightHelper( object, 5 );
+			var helper = new THREE.PointLightHelper( object, 10 );
 
 			sceneHelpers.add( helper );
 			objects.push( helper );
 
-			helpers[ object.id ] = helper;
+			objectsToHelpers[ object.id ] = helper;
+			helpersToObjects[ helper.id ] = object;
+
+			console.lo
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
@@ -385,7 +370,7 @@ var Viewport = function ( signals ) {
 
 		} else if ( object instanceof THREE.PointLight ) {
 
-			helpers[ object.id ].update();
+			objectsToHelpers[ object.id ].update();
 
 		} else if ( object instanceof THREE.DirectionalLight ||
 					object instanceof THREE.HemisphereLight ||
