@@ -266,8 +266,6 @@ var Viewport = function ( signals ) {
 			objectsToHelpers[ object.id ] = helper;
 			helpersToObjects[ helper.id ] = object;
 
-			console.lo
-
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
 			var sphereSize = 5;
