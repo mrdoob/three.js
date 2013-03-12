@@ -31,7 +31,6 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 	// light helper
 
 	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
-	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
 	var coneGeometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 8, 1, true );
 
 	var coneMatrix = new THREE.Matrix4();
@@ -40,7 +39,6 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 	coneGeometry.applyMatrix( coneMatrix );
 
 	var bulbMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
-	var raysMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
 	var coneMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.3, transparent: true } );
 
 	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
@@ -50,12 +48,9 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 	var coneWidth = coneLength * Math.tan( light.angle * 0.5 ) * 2;
 	this.lightCone.scale.set( coneWidth, coneWidth, coneLength );
 
-	this.lightRays = new THREE.Line( raysGeometry, raysMaterial, THREE.LinePieces );
-
 	this.gyroscope = new THREE.Gyroscope();
 
 	this.gyroscope.add( this.lightSphere );
-	this.gyroscope.add( this.lightRays );
 
 	this.add( this.gyroscope );
 	this.add( this.lightCone );
@@ -116,7 +111,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 	var coneWidth = coneLength * Math.tan( this.light.angle * 0.5 ) * 2;
 	this.lightCone.scale.set( coneWidth, coneWidth, coneLength );
 
-	// update arrow, spheres, rays and line colors to light color * light intensity
+	// update arrow, spheres and line colors to light color * light intensity
 
 	var intensity = THREE.Math.clamp( this.light.intensity, 0, 1 );
 
@@ -124,7 +119,6 @@ THREE.SpotLightHelper.prototype.update = function () {
 	this.color.multiplyScalar( intensity );
 
 	this.lightSphere.material.color.copy( this.color );
-	this.lightRays.material.color.copy( this.color );
 	this.lightCone.material.color.copy( this.color );
 
 	// Only update targetSphere and targetLine if available
