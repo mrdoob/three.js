@@ -268,51 +268,38 @@ var Viewport = function ( signals ) {
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
-			var sphereSize = 5;
-			var arrowLength = 30;
+			var helper = new THREE.DirectionalLightHelper( object, 10 );
+			sceneHelpers.add( helper.lightSphere );
+			sceneHelpers.add( helper.targetLine );
 
-			var lightGizmo = new THREE.DirectionalLightHelper( object, sphereSize, arrowLength );
-			sceneHelpers.add( lightGizmo );
-			sceneHelpers.add( lightGizmo.targetSphere );
-			sceneHelpers.add( lightGizmo.targetLine );
+			objectsToHelpers[ object.id ] = helper.lightSphere;
+			helpersToObjects[ helper.lightSphere.id ] = object;
 
-			object.userData.helper = lightGizmo;
-			object.userData.pickingProxy = lightGizmo.lightSphere;
-			object.target.userData.pickingProxy = lightGizmo.targetSphere;
-
-			objects.push( lightGizmo.lightSphere );
-			objects.push( lightGizmo.targetSphere );
-			objects.push( lightGizmo.targetLine );
+			objects.push( helper.lightSphere );
+			objects.push( helper.targetLine );
 
 		} else if ( object instanceof THREE.SpotLight ) {
 
 			var sphereSize = 5;
 
-			var lightGizmo = new THREE.SpotLightHelper( object, sphereSize );
-			sceneHelpers.add( lightGizmo );
-			sceneHelpers.add( lightGizmo.targetSphere );
-			sceneHelpers.add( lightGizmo.targetLine );
+			var helper = new THREE.SpotLightHelper( object, sphereSize );
+			sceneHelpers.add( helper );
+			sceneHelpers.add( helper.targetSphere );
+			sceneHelpers.add( helper.targetLine );
 
-			object.userData.helper = lightGizmo;
-			object.userData.pickingProxy = lightGizmo.lightSphere;
-			object.target.userData.pickingProxy = lightGizmo.targetSphere;
-
-			objects.push( lightGizmo.lightSphere );
-			objects.push( lightGizmo.targetSphere );
-			objects.push( lightGizmo.targetLine );
+			objects.push( helper.lightSphere );
+			objects.push( helper.targetSphere );
+			objects.push( helper.targetLine );
 
 		} else if ( object instanceof THREE.HemisphereLight ) {
 
 			var sphereSize = 5;
 			var arrowLength = 30;
 
-			var lightGizmo = new THREE.HemisphereLightHelper( object, sphereSize, arrowLength );
-			sceneHelpers.add( lightGizmo );
+			var helper = new THREE.HemisphereLightHelper( object, sphereSize, arrowLength );
+			sceneHelpers.add( helper );
 
-			object.userData.helper = lightGizmo;
-			object.userData.pickingProxy = lightGizmo.lightSphere;
-
-			objects.push( lightGizmo.lightSphere );
+			objects.push( helper.lightSphere );
 
 		} else {
 
@@ -366,19 +353,9 @@ var Viewport = function ( signals ) {
 
 			object.updateProjectionMatrix();
 
-		} else if ( object instanceof THREE.PointLight ) {
+		} else if ( object instanceof THREE.PointLight || object instanceof THREE.DirectionalLight || object instanceof THREE.HemisphereLight || object instanceof THREE.SpotLight ) {
 
 			objectsToHelpers[ object.id ].update();
-
-		} else if ( object instanceof THREE.DirectionalLight ||
-					object instanceof THREE.HemisphereLight ||
-					object instanceof THREE.SpotLight ) {
-
-			object.userData.helper.update();
-
-		} else if ( object.userData.targetInverse ) {
-
-			object.userData.targetInverse.userData.helper.update();
 
 		}
 
