@@ -33924,17 +33924,11 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 	// light helper
 
 	var bulbGeometry = new THREE.SphereGeometry( sphereSize, 16, 8 );
-	var raysGeometry = new THREE.AsteriskGeometry( sphereSize * 1.25, sphereSize * 2.25 );
-
 	var bulbMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false } );
-	var raysMaterial = new THREE.LineBasicMaterial( { color: hexColor, fog: false } );
 
 	this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 
-	this.lightRays = new THREE.Line( raysGeometry, raysMaterial, THREE.LinePieces );
-
 	this.add( this.lightSphere );
-	this.add( this.lightRays );
 
 	this.lightSphere.userData.isGizmo = true;
 	this.lightSphere.userData.gizmoSubject = light;
@@ -33982,7 +33976,7 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 
 	this.direction.subVectors( this.light.target.position, this.light.position );
 
-	// update arrow, spheres, rays and line colors to light color * light intensity
+	// update arrow, spheres and line colors to light color * light intensity
 
 	var intensity = THREE.Math.clamp( this.light.intensity, 0, 1 );
 
@@ -33990,7 +33984,6 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	this.color.multiplyScalar( intensity );
 
 	this.lightSphere.material.color.copy( this.color );
-	this.lightRays.material.color.copy( this.color );
 
 	// Only update targetSphere and targetLine if available
 	if ( this.targetSphere !== null ) {
@@ -34127,8 +34120,7 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 
 /**
  * @author alteredq / http://alteredqualia.com/
- *
- *	- shows point light color, intensity, position and distance
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.PointLightHelper = function ( light, sphereSize ) {
