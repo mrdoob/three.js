@@ -5,9 +5,19 @@
 
 THREE.PointLightHelper = function ( light, sphereSize ) {
 
-	/*
-	// light helper
+	THREE.Object3D.call( this );
 
+	this.light = light;
+
+	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
+	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
+	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+	this.lightSphere = new THREE.Mesh( geometry, material );
+	this.lightSphere.position.copy( this.light.position );
+	this.add( this.lightSphere );
+
+	/*
 	var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
 	var distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
@@ -26,27 +36,17 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	}
 
-	this.add( this.lightSphere );
-	this.add( this.lightRays );
 	this.add( this.lightDistance );
 	*/
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { color: light.color.getHex(), fog: false, wireframe: true } );
-
-	THREE.Mesh.call( this, geometry, material );
-
-	this.light = light;
-	this.position = light.position;
-
 }
 
-THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
+THREE.PointLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.PointLightHelper.prototype.update = function () {
 
-	this.material.color.copy( this.light.color );
-	this.material.color.multiplyScalar( THREE.Math.clamp( this.light.intensity, 0, 1 ) );
+	this.lightSphere.position.copy( this.light.position );
+	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	/*
 	this.lightDistance.material.color.copy( this.color );

@@ -234,66 +234,6 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	var handleAddition = function ( object ) {
-
-		// create helpers for invisible object types (lights, cameras, targets)
-
-		if ( object instanceof THREE.PointLight ) {
-
-			var helper = new THREE.PointLightHelper( object, 10 );
-
-			sceneHelpers.add( helper );
-			objects.push( helper );
-
-			objectsToHelpers[ object.id ] = helper;
-			helpersToObjects[ helper.id ] = object;
-
-		} else if ( object instanceof THREE.DirectionalLight ) {
-
-			var helper = new THREE.DirectionalLightHelper( object, 10 );
-			sceneHelpers.add( helper.lightSphere );
-			sceneHelpers.add( helper.targetLine );
-
-			objectsToHelpers[ object.id ] = helper.lightSphere;
-			helpersToObjects[ helper.lightSphere.id ] = object;
-
-			objects.push( helper.lightSphere );
-			objects.push( helper.targetLine );
-
-		} else if ( object instanceof THREE.SpotLight ) {
-
-			var sphereSize = 5;
-
-			var helper = new THREE.SpotLightHelper( object, sphereSize );
-			sceneHelpers.add( helper );
-			sceneHelpers.add( helper.targetSphere );
-			sceneHelpers.add( helper.targetLine );
-
-			objects.push( helper.lightSphere );
-			objects.push( helper.targetSphere );
-			objects.push( helper.targetLine );
-
-		} else if ( object instanceof THREE.HemisphereLight ) {
-
-			var sphereSize = 5;
-			var arrowLength = 30;
-
-			var helper = new THREE.HemisphereLightHelper( object, sphereSize, arrowLength );
-			sceneHelpers.add( helper );
-
-			objects.push( helper.lightSphere );
-
-		} else {
-
-			// add to picking list
-
-			objects.push( object );
-
-		}
-
-	};
-
-
 	// signals
 
 	signals.rendererChanged.add( function ( object ) {
@@ -313,8 +253,60 @@ var Viewport = function ( signals ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		object.traverse( handleAddition );
+		// handle children
+
+		object.traverse( function ( object ) {
+
+			// create helpers for invisible object types (lights, cameras, targets)
+
+			if ( object instanceof THREE.PointLight ) {
+
+				var helper = new THREE.PointLightHelper( object, 10 );
+				sceneHelpers.add( helper );
+
+				objectsToHelpers[ object.id ] = helper;
+				helpersToObjects[ helper.lightSphere.id ] = object;
+
+				objects.push( helper.lightSphere );
+
+			} else if ( object instanceof THREE.DirectionalLight ) {
+
+				var helper = new THREE.DirectionalLightHelper( object, 10 );
+				sceneHelpers.add( helper );
+
+				objectsToHelpers[ object.id ] = helper;
+				helpersToObjects[ helper.lightSphere.id ] = object;
+
+				objects.push( helper.lightSphere );
+
+			} else if ( object instanceof THREE.SpotLight ) {
+
+				var helper = new THREE.SpotLightHelper( object, 5 );
+				sceneHelpers.add( helper );
+
+				objects.push( helper.lightSphere );
+				objects.push( helper.targetSphere );
+
+			} else if ( object instanceof THREE.HemisphereLight ) {
+
+				var helper = new THREE.HemisphereLightHelper( object, 5, 30 );
+				sceneHelpers.add( helper );
+
+				objects.push( helper.lightSphere );
+
+			} else {
+
+				// add to picking list
+
+				objects.push( object );
+
+			}
+
+		} );
+
 		scene.add( object );
+
+		// TODO: Add support for hierarchies with lights
 
 		if ( object instanceof THREE.Light )  {
 
@@ -333,7 +325,10 @@ var Viewport = function ( signals ) {
 
 			object.updateProjectionMatrix();
 
-		} else if ( object instanceof THREE.PointLight || object instanceof THREE.DirectionalLight || object instanceof THREE.HemisphereLight || object instanceof THREE.SpotLight ) {
+		} else if ( object instanceof THREE.PointLight ||
+			    object instanceof THREE.DirectionalLight ||
+			    object instanceof THREE.HemisphereLight ||
+			    object instanceof THREE.SpotLight ) {
 
 			objectsToHelpers[ object.id ].update();
 

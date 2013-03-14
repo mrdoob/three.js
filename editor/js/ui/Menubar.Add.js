@@ -202,7 +202,7 @@ Menubar.Add = function ( signals ) {
 		var distance = 0;
 
 		var light = new THREE.PointLight( color, intensity, distance );
-		light.name = 'Light ' + light.id;
+		light.name = 'PointLight ' + light.id;
 
 		signals.objectAdded.dispatch( light );
 
@@ -223,8 +223,8 @@ Menubar.Add = function ( signals ) {
 		var exponent = 10;
 
 		var light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
-		light.name = 'Light ' + light.id;
-		light.target.name = 'Light ' + light.id + ' target';
+		light.name = 'SpotLight ' + light.id;
+		light.target.name = 'SpotLight ' + light.id + ' target';
 
 		light.target.userData.targetInverse = light;
 
@@ -246,8 +246,8 @@ Menubar.Add = function ( signals ) {
 		var intensity = 1;
 
 		var light = new THREE.DirectionalLight( color, intensity );
-		light.name = 'Light ' + light.id;
-		light.target.name = 'Light ' + light.id + ' target';
+		light.name = 'DirectionalLight ' + light.id;
+		light.target.name = 'DirectionalLight ' + light.id + ' target';
 
 		light.target.userData.targetInverse = light;
 
@@ -270,7 +270,7 @@ Menubar.Add = function ( signals ) {
 		var intensity = 1;
 
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
-		light.name = 'Light ' + light.id;
+		light.name = 'HemisphereLight ' + light.id;
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
@@ -289,7 +289,7 @@ Menubar.Add = function ( signals ) {
 		var color = 0x222222;
 
 		var light = new THREE.AmbientLight( color );
-		light.name = 'Light ' + light.id;
+		light.name = 'AmbientLight ' + light.id;
 
 		signals.objectAdded.dispatch( light );
 
