@@ -65,6 +65,26 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 ### Change log ###
 
+
+2013 03 15 - **r57** (403,596 KB, gzip: 96,362 KB)
+
+* Added Renderer panel to the editor. ([mrdoob](http://github.com/mrdoob))
+* Added support for custom attributes to `BufferGeometry`. ([zz85](http://github.com/zz85))
+* `CanvasRenderer` and `SVGRenderer` behave like `WebGLRenderer` with `MeshLambertMaterial` and no lights. ([mrdoob](http://github.com/mrdoob))
+* Added `ColorConverter` in examples folder. ([bhouston](http://github.com/bhouston) and [zz85](http://github.com/zz85))
+* Fixed `SVGRenderer` when autoClear false. ([mrdoob](http://github.com/mrdoob))
+* Made `WebGLRenderer` sorting truly stable. ([wereHamster](http://github.com/wereHamster) and [mrdoob](http://github.com/mrdoob))
+* Improved `Object3D` and `Camera` `lookAt()`. ([WestLangley](http://github.com/WestLangley))
+* Added `RingGeometry`. ([merpnderp](http://github.com/merpnderp))
+* Made `OBJLoader` and `OBJMTLLoader` more robust. ([mrdoob](http://github.com/mrdoob))
+* Added pan to `OrbitControls`. ([WestLangley](http://github.com/WestLangley) and [mrdoob](http://github.com/mrdoob))
+* Added `.getColumnFromMatrix()` to `Vector3`. ([WestLangley](http://github.com/WestLangley))
+* Renamed `Object3D` `properties` to `userData`. ([mrdoob](http://github.com/mrdoob))
+* Simplified `PointLightHelper`, `DirectionalLightHelper`, `SpotLightHelper` and `HemisphereLightHelper`. ([mrdoob](http://github.com/mrdoob))
+* Added `GridHelper`. ([mrdoob](http://github.com/mrdoob))
+* Added `.clone()` method to `AmbientLight`, `PointLight`, `DirectionalLight`, `SpotLight` and `HemisphereLight`. ([mrdoob](http://github.com/mrdoob))
+
+
 2013 02 15 - **r56** (408,927 KB, gzip: 97,095 KB)
 
 * Added `LineDashedMaterial` support to `CanvasRenderer`. ([sole](http://github.com/sole))
@@ -85,7 +105,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Removed `setHSV()`, `getHSV()` from `Color`. ([mrdoob](http://github.com/mrdoob))
 * Replaced `ColorUtils.adjustHSV()` with `Color`'s `.offsetHSL()`. ([mrdoob](http://github.com/mrdoob))
 * Added `Line3`. ([bhouston](http://github.com/bhouston))
-* Addded `linewidth` support to `BufferGeometry` lines. ([arodic](http://github.com/arodic))
+* Added `linewidth` support to `BufferGeometry` lines. ([arodic](http://github.com/arodic))
 * Renamed `Box3`/`Line3`/`Plane`/`Ray`/`Sphere`'s `.transform()` to `applyMatrix4()`. ([bhouston](http://github.com/bhouston))
 * Added `smoothstep` and `smootherstep` to `Math`. ([bhouston](http://github.com/bhouston))
 * Improvements to the editor. ([drewnoakes](http://github.com/drewnoakes))
