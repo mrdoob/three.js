@@ -50,6 +50,7 @@ THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype
 THREE.DirectionalLightHelper.prototype.update = function () {
 
 	this.lightSphere.position.copy( this.light.position );
+
 	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.targetLine.geometry.computeLineDistances();

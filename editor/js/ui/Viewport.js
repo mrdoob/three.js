@@ -281,16 +281,22 @@ var Viewport = function ( signals ) {
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
-				var helper = new THREE.SpotLightHelper( object, 5 );
+				var helper = new THREE.SpotLightHelper( object, 10 );
 				sceneHelpers.add( helper );
+
+				objectsToHelpers[ object.id ] = helper;
+				helpersToObjects[ helper.lightSphere.id ] = object;
 
 				objects.push( helper.lightSphere );
 				objects.push( helper.targetSphere );
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
-				var helper = new THREE.HemisphereLightHelper( object, 5, 30 );
+				var helper = new THREE.HemisphereLightHelper( object, 10 );
 				sceneHelpers.add( helper );
+
+				objectsToHelpers[ object.id ] = helper;
+				helpersToObjects[ helper.lightSphere.id ] = object;
 
 				objects.push( helper.lightSphere );
 
