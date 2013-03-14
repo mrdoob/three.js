@@ -288,7 +288,6 @@ var Viewport = function ( signals ) {
 				helpersToObjects[ helper.lightSphere.id ] = object;
 
 				objects.push( helper.lightSphere );
-				objects.push( helper.targetSphere );
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
@@ -331,10 +330,9 @@ var Viewport = function ( signals ) {
 
 			object.updateProjectionMatrix();
 
-		} else if ( object instanceof THREE.PointLight ||
-			    object instanceof THREE.DirectionalLight ||
-			    object instanceof THREE.HemisphereLight ||
-			    object instanceof THREE.SpotLight ) {
+		}
+
+		if ( objectsToHelpers[ object.id ] !== undefined ) {
 
 			objectsToHelpers[ object.id ].update();
 
@@ -375,14 +373,14 @@ var Viewport = function ( signals ) {
 			delete objectsToHelpers[ selected.id ];
 			delete helpersToObjects[ helper.id ];
 
-			updateMaterials( scene );
-
 			if ( selected instanceof THREE.DirectionalLight ||
 			     selected instanceof THREE.SpotLight ) {
 
 				selected.target.parent.remove( selected.target );
 
 			}
+
+			updateMaterials( scene );
 
 		} else {
 

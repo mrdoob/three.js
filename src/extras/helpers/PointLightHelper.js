@@ -14,7 +14,7 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.position.copy( this.light.position );
+	this.lightSphere.position = this.light.position;
 	this.add( this.lightSphere );
 
 	/*
@@ -39,13 +39,11 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 	this.add( this.lightDistance );
 	*/
 
-}
+};
 
 THREE.PointLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.PointLightHelper.prototype.update = function () {
-
-	this.lightSphere.position.copy( this.light.position );
 
 	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
@@ -66,5 +64,5 @@ THREE.PointLightHelper.prototype.update = function () {
 	}
 	*/
 
-}
+};
 

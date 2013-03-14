@@ -25,21 +25,20 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 	materialGround.color.copy( light.groundColor ).multiplyScalar( light.intensity );
 
 	this.lightSphere = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( [ materialSky, materialGround ] ) );
-	this.lightSphere.position.copy( light.position );
+	this.lightSphere.position = light.position;
 	this.lightSphere.lookAt( new THREE.Vector3() );
 	this.add( this.lightSphere );
 
-}
+};
 
 THREE.HemisphereLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.HemisphereLightHelper.prototype.update = function () {
 
-	this.lightSphere.position.copy( this.light.position );
 	this.lightSphere.lookAt( new THREE.Vector3() );
 
 	this.lightSphere.material.materials[ 0 ].color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 	this.lightSphere.material.materials[ 1 ].color.copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
 
-}
+};
 
