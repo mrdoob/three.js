@@ -9082,6 +9082,19 @@ THREE.PointLight = function ( hex, intensity, distance ) {
 };
 
 THREE.PointLight.prototype = Object.create( THREE.Light.prototype );
+
+THREE.PointLight.prototype.clone = function () {
+
+	var light = new THREE.PointLight();
+
+	light.color.copy( this.color );
+	light.position.copy( this.position );
+	light.intensity = this.intensity;
+	light.distance = this.distance;
+
+	return light;
+
+};
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -11974,7 +11987,7 @@ THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshDepthMaterial.prototype.clone = function () {
 
-	var material = new THREE.LineBasicMaterial();
+	var material = new THREE.MeshDepthMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
