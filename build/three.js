@@ -8953,6 +8953,18 @@ THREE.Light = function ( hex ) {
 };
 
 THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.Light.prototype.clone = function ( light ) {
+
+	if ( light === undefined ) light = new THREE.Light();
+
+	THREE.Object3D.prototype.clone.call( this, light );
+
+	light.color.copy( this.color );
+
+	return light;
+
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -9087,7 +9099,8 @@ THREE.PointLight.prototype.clone = function () {
 
 	var light = new THREE.PointLight();
 
-	light.color.copy( this.color );
+	THREE.Light.prototype.clone.call( this, light );
+
 	light.position.copy( this.position );
 	light.intensity = this.intensity;
 	light.distance = this.distance;
