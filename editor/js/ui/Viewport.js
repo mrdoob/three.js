@@ -75,7 +75,6 @@ var Viewport = function ( signals ) {
 	var offset = new THREE.Vector3();
 
 	var cameraChanged = false;
-	var helpersVisible = true;
 
 	//
 
@@ -601,13 +600,6 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.toggleHelpers.add( function () {
-
-		helpersVisible = !helpersVisible;
-		render();
-
-	} );
-
 	//
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
@@ -682,12 +674,7 @@ var Viewport = function ( signals ) {
 
 		renderer.clear();
 		renderer.render( scene, camera );
-
-		if ( helpersVisible ) {
-
-			renderer.render( sceneHelpers, camera );
-
-		}
+		renderer.render( sceneHelpers, camera );
 
 	}
 
