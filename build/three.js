@@ -295,13 +295,6 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
-	setHSV: function ( h, s, v ) {
-
-		console.log( 'DEPRECATED: Color\'s .setHSV() will be removed. Use .setHSL( h, s, l ) instead.' );
-		return this.setHSL(h,s*v/((h=(2-s)*v)<1?h:2-h),h/2); // https://gist.github.com/xpansive/1337890
-
-	},
-
 	setHSL: function ( h, s, l ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
