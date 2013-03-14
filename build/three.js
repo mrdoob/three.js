@@ -33633,8 +33633,8 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 	this.add( this.lightSphere );
 
 	var lineGeometry = new THREE.Geometry();
-	lineGeometry.vertices.push( this.light.position.clone() );
-	lineGeometry.vertices.push( new THREE.Vector3() );
+	lineGeometry.vertices.push( this.light.position );
+	lineGeometry.vertices.push( this.light.target.position );
 	lineGeometry.computeLineDistances();
 
 	var lineMaterial = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
@@ -33665,7 +33665,6 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 	this.lightSphere.position.copy( this.light.position );
 	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.targetLine.geometry.vertices[ 0 ].copy( this.light.position );
 	this.targetLine.geometry.computeLineDistances();
 	this.targetLine.geometry.verticesNeedUpdate = true;
 	this.targetLine.material.color.copy( this.lightSphere.material.color );
