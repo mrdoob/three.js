@@ -6950,7 +6950,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_gl.mrt = _gl.getExtension( "EXT_draw_buffers" );
 				_gl.dtx  = _gl.getExtension( "WEBGL_depth_texture");
-				console.log(_gl.dtx);
 				window.dtx = _gl.dtx;
 
 		    if (!_gl.mrt) {
