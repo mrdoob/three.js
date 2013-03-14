@@ -843,7 +843,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				var jsonLoader = this.geometryHandlerMap[ "ascii" ][ "loaderObject" ];
 				var model = jsonLoader.parse( modelJson, texture_path );
-				create_callback_embed( geoID )( model.geometry, model.material );
+				create_callback_embed( geoID )( model.geometry, model.materials );
 
 			}
 
