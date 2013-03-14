@@ -6,12 +6,24 @@ THREE.HemisphereLight = function ( skyColorHex, groundColorHex, intensity ) {
 
 	THREE.Light.call( this, skyColorHex );
 
+	this.position.set( 0, 100, 0 );
+
 	this.groundColor = new THREE.Color( groundColorHex );
-
-	this.position = new THREE.Vector3( 0, 100, 0 );
-
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 
 };
 
 THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
+
+THREE.HemisphereLight.prototype.clone = function () {
+
+	var light = new THREE.PointLight();
+
+	THREE.Light.prototype.clone.call( this, light );
+
+	light.groundColor.copy( this.groundColor );
+	light.intensity = this.intensity;
+
+	return light;
+
+};

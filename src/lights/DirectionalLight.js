@@ -7,7 +7,7 @@ THREE.DirectionalLight = function ( hex, intensity ) {
 
 	THREE.Light.call( this, hex );
 
-	this.position = new THREE.Vector3( 0, 1, 0 );
+	this.position.set( 0, 1, 0 );
 	this.target = new THREE.Object3D();
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
