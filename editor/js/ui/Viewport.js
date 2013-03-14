@@ -377,49 +377,28 @@ var Viewport = function ( signals ) {
 
 		var name = selected.name ?  '"' + selected.name + '"': "selected object";
 
-		if ( ! confirm( 'Delete ' + name + '?' ) ) {
+		if ( confirm( 'Delete ' + name + '?' ) === false ) return;
 
-			return;
+		var object = selected;
 
-		}
+		if ( selected instanceof THREE.Light ) {
 
-		// remove proxies from picking list
+			var helper = objectsToHelpers[ object.id ];
 
-		var toRemove = {};
+			objects.splice( objects.indexOf( helper ), 1 );
 
-		var proxyObject = selected.userData.pickingProxy ? selected.userData.pickingProxy : selected;
+			helper.parent.remove( helper );
+			object.parent.remove( object );
 
-		proxyObject.traverse( function ( child ) {
+			delete objectsToHelpers[ object.id ];
+			delete helpersToObjects[ helper.id ];
 
-			toRemove[ child.id ] = true;
+		} else {
 
-		} );
-
-		// remove eventual pure Object3D target proxies from picking list
-
-		if ( selected.target && !selected.target.geometry ) {
-
-			toRemove[ selected.target.userData.pickingProxy.id ] = true;
+			object.parent.remove( object );
+			objects.splice( objects.indexOf( object ), 1 );
 
 		}
-
-		//
-
-		var newObjects = [];
-
-		for ( var i = 0; i < objects.length; i ++ ) {
-
-			var object = objects[ i ];
-
-			if ( ! ( object.id in toRemove ) ) {
-
-				newObjects.push( object );
-
-			}
-
-		}
-
-		objects = newObjects;
 
 		// clean selection highlight
 
@@ -428,39 +407,8 @@ var Viewport = function ( signals ) {
 
 		// remove selected object from the scene
 
-		selected.parent.remove( selected );
 
-		// remove eventual pure Object3D targets from the scene
-
-		if ( selected.target && !selected.target.geometry ) {
-
-			selected.target.parent.remove( selected.target );
-
-		}
-
-		// remove eventual helpers for the object from helpers scene
-
-		var helpersToRemove = [];
-
-		if ( selected.userData.helper ) {
-
-			helpersToRemove.push( selected.userData.helper );
-
-			if ( selected.userData.helper.targetLine ) helpersToRemove.push( selected.userData.helper.targetLine );
-			if ( selected.target && !selected.target.geometry ) helpersToRemove.push( selected.userData.helper.targetSphere );
-
-
-		}
-
-		for ( var i = 0; i < helpersToRemove.length; i ++ ) {
-
-			var helper = helpersToRemove[ i ];
-
-			helper.parent.remove( helper );
-
-		}
-
-		if ( selected instanceof THREE.Light )  {
+		if ( object instanceof THREE.Light )  {
 
 			updateMaterials( scene );
 
