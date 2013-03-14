@@ -367,7 +367,10 @@ var Viewport = function ( signals ) {
 
 		if ( selected === camera ) return;
 
-		signals.objectAdded.dispatch( selected.clone() );
+		var object = selected.clone();
+
+		signals.objectAdded.dispatch( object );
+		signals.objectSelected.dispatch( object );
 
 	} );
 
