@@ -10999,7 +10999,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				var jsonLoader = this.geometryHandlerMap[ "ascii" ][ "loaderObject" ];
 				var model = jsonLoader.parse( modelJson, texture_path );
-				create_callback_embed( geoID )( model.geometry, model.material );
+				create_callback_embed( geoID )( model.geometry, model.materials );
 
 			}
 
@@ -18925,7 +18925,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			normalType = bufferGuessNormalType( material ),
 			vertexColorType = bufferGuessVertexColorType( material );
 
-		//console.log( "uvType", uvType, "normalType", normalType, "vertexColorType", vertexColorType, object, geometryGroup, material );
+		// console.log( "uvType", uvType, "normalType", normalType, "vertexColorType", vertexColorType, object, geometryGroup, material );
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
 
@@ -19097,7 +19097,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function bufferGuessVertexColorType ( material ) {
+	function bufferGuessVertexColorType( material ) {
 
 		if ( material.vertexColors ) {
 
@@ -19109,11 +19109,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function bufferGuessUVType ( material ) {
+	function bufferGuessUVType( material ) {
 
 		// material must use some texture to require uvs
 
-		if ( material.map || material.lightMap || material.bumpMap || material.normalMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
+		if ( material.map ||
+		     material.lightMap ||
+		     material.bumpMap ||
+		     material.normalMap ||
+		     material.specularMap ||
+		     material instanceof THREE.ShaderMaterial ) {
 
 			return true;
 
@@ -24255,7 +24260,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( programInfo.code === code ) {
 
-				//console.log( "Code already compiled." /*: \n\n" + code*/ );
+				// console.log( "Code already compiled." /*: \n\n" + code*/ );
 
 				programInfo.usedTimes ++;
 
@@ -24277,7 +24282,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		//console.log( "building new program " );
+		// console.log( "building new program " );
 
 		//
 
@@ -24457,8 +24462,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.deleteShader( glFragmentShader );
 		_gl.deleteShader( glVertexShader );
 
-		//console.log( prefix_fragment + fragmentShader );
-		//console.log( prefix_vertex + vertexShader );
+		// console.log( prefix_fragment + fragmentShader );
+		// console.log( prefix_vertex + vertexShader );
 
 		program.uniforms = {};
 		program.attributes = {};
