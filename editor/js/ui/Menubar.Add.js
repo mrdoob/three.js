@@ -160,7 +160,7 @@ Menubar.Add = function ( signals ) {
 	} );
 	options.add( option );
 
-	// add torus
+	// add torus knot
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
@@ -224,9 +224,7 @@ Menubar.Add = function ( signals ) {
 
 		var light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
 		light.name = 'SpotLight ' + light.id;
-		light.target.name = 'SpotLight ' + light.id + ' target';
-
-		light.target.userData.targetInverse = light;
+		light.target.name = 'SpotLight ' + light.id + ' Target';
 
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
@@ -247,9 +245,7 @@ Menubar.Add = function ( signals ) {
 
 		var light = new THREE.DirectionalLight( color, intensity );
 		light.name = 'DirectionalLight ' + light.id;
-		light.target.name = 'DirectionalLight ' + light.id + ' target';
-
-		light.target.userData.targetInverse = light;
+		light.target.name = 'DirectionalLight ' + light.id + ' Target';
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 

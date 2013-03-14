@@ -361,7 +361,7 @@ var Viewport = function ( signals ) {
 
 			var helper = objectsToHelpers[ selected.id ];
 
-			objects.splice( objects.indexOf( helper ), 1 );
+			objects.splice( objects.indexOf( helper.lightSphere ), 1 );
 
 			helper.parent.remove( helper );
 			selected.parent.remove( selected );
@@ -370,6 +370,13 @@ var Viewport = function ( signals ) {
 			delete helpersToObjects[ helper.id ];
 
 			updateMaterials( scene );
+
+			if ( selected instanceof THREE.DirectionalLight ||
+			     selected instanceof THREE.SpotLight ) {
+
+				selected.target.parent.remove( selected.target );
+
+			}
 
 		} else {
 
@@ -389,6 +396,7 @@ var Viewport = function ( signals ) {
 
 		}
 
+		signals.sceneChanged.dispatch( scene );
 		signals.objectSelected.dispatch( null );
 
 	} );
