@@ -19,7 +19,9 @@ THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
 
 };
 
-THREE.extend( THREE.Frustum.prototype, {
+THREE.Frustum.prototype = {
+
+	constructor: THREE.Frustum,
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
 
@@ -148,4 +150,4 @@ THREE.extend( THREE.Frustum.prototype, {
 
 	}
 
-} );
+};

@@ -569,7 +569,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_geometry( id ) {
 
-		return function( geo, mat ) {
+		return function ( geo, mat ) {
 
 			handle_mesh( geo, mat, id );
 
@@ -585,7 +585,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_hierachy( id, parent, material, obj ) {
 
-		return function( event ) {
+		return function ( event ) {
 
 			var result;
 
@@ -624,7 +624,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_embed( id ) {
 
-		return function( geo, mat ) {
+		return function ( geo, mat ) {
 
 			result.geometries[ id ] = geo;
 			result.face_materials[ id ] = mat;
@@ -702,7 +702,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var generateTextureCallback = function ( count ) {
 
-		return function() {
+		return function () {
 
 			callbackTexture( count );
 

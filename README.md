@@ -66,7 +66,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 ### Change log ###
 
 
-2013 03 15 - **r57** (403,596 KB, gzip: 96,362 KB)
+2013 03 15 - **r57** (403,818 KB, gzip: 96,416 KB)
 
 * Added Renderer panel to the editor. ([mrdoob](http://github.com/mrdoob))
 * Added support for custom attributes to `BufferGeometry`. ([zz85](http://github.com/zz85))

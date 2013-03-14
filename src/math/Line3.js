@@ -9,7 +9,9 @@ THREE.Line3 = function ( start, end ) {
 
 };
 
-THREE.extend( THREE.Line3.prototype, {
+THREE.Line3.prototype = {
+
+	constructor: THREE.Line3,
 
 	set: function ( start, end ) {
 
@@ -121,4 +123,4 @@ THREE.extend( THREE.Line3.prototype, {
 
 	}
 
-} );
+};

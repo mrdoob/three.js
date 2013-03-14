@@ -10,7 +10,9 @@ THREE.Color = function ( value ) {
 
 };
 
-THREE.extend( THREE.Color.prototype, {
+THREE.Color.prototype = {
+
+	constructor: THREE.Color,
 
 	r: 1, g: 1, b: 1,
 
@@ -356,7 +358,7 @@ THREE.extend( THREE.Color.prototype, {
 
 	}
 
-} );
+};
 
 THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua": 0x00FFFF, "aquamarine": 0x7FFFD4, "azure": 0xF0FFFF,
 "beige": 0xF5F5DC, "bisque": 0xFFE4C4, "black": 0x000000, "blanchedalmond": 0xFFEBCD, "blue": 0x0000FF, "blueviolet": 0x8A2BE2,

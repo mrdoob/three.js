@@ -9,7 +9,9 @@ THREE.Ray = function ( origin, direction ) {
 
 };
 
-THREE.extend( THREE.Ray.prototype, {
+THREE.Ray.prototype = {
+
+	constructor: THREE.Ray,
 
 	set: function ( origin, direction ) {
 
@@ -161,4 +163,4 @@ THREE.extend( THREE.Ray.prototype, {
 
 	}
 
-} );
+};

@@ -9,7 +9,9 @@ THREE.Plane = function ( normal, constant ) {
 
 };
 
-THREE.extend( THREE.Plane.prototype, {
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
 
 	set: function ( normal, constant ) {
 
@@ -217,4 +219,4 @@ THREE.extend( THREE.Plane.prototype, {
 
 	}
 
-} );
+};

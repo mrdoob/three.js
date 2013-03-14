@@ -253,7 +253,9 @@ THREE.Color = function ( value ) {
 
 };
 
-THREE.extend( THREE.Color.prototype, {
+THREE.Color.prototype = {
+
+	constructor: THREE.Color,
 
 	r: 1, g: 1, b: 1,
 
@@ -599,7 +601,7 @@ THREE.extend( THREE.Color.prototype, {
 
 	}
 
-} );
+};
 
 THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua": 0x00FFFF, "aquamarine": 0x7FFFD4, "azure": 0xF0FFFF,
 "beige": 0xF5F5DC, "bisque": 0xFFE4C4, "black": 0x000000, "blanchedalmond": 0xFFEBCD, "blue": 0x0000FF, "blueviolet": 0x8A2BE2,
@@ -641,7 +643,9 @@ THREE.Quaternion = function( x, y, z, w ) {
 
 };
 
-THREE.extend( THREE.Quaternion.prototype, {
+THREE.Quaternion.prototype = {
+
+	constructor: THREE.Quaternion,
 
 	set: function ( x, y, z, w ) {
 
@@ -964,7 +968,7 @@ THREE.extend( THREE.Quaternion.prototype, {
 
 	}
 
-} );
+};
 
 THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
@@ -985,7 +989,9 @@ THREE.Vector2 = function ( x, y ) {
 
 };
 
-THREE.extend( THREE.Vector2.prototype, {
+THREE.Vector2.prototype = {
+
+	constructor: THREE.Vector2,
 
 	set: function ( x, y ) {
 
@@ -1269,7 +1275,7 @@ THREE.extend( THREE.Vector2.prototype, {
 	toArray: function () {
 
 		return [ this.x, this.y ];
-		
+
 	},
 
 	clone: function () {
@@ -1278,7 +1284,7 @@ THREE.extend( THREE.Vector2.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author *kile / http://kile.stravaganza.org/
@@ -1296,7 +1302,9 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
-THREE.extend( THREE.Vector3.prototype, {
+THREE.Vector3.prototype = {
+
+	constructor: THREE.Vector3,
 
 	set: function ( x, y, z ) {
 
@@ -1546,38 +1554,6 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	applyEuler: function () {
-
-		var q1 = new THREE.Quaternion();
-
-		return function ( v, eulerOrder ) {
-
-			var quaternion = q1.setFromEuler( v, eulerOrder );
-
-			this.applyQuaternion( quaternion );
-
-			return this;
-
-		};
-
-	}(),
-
-	applyAxisAngle: function () {
-
-		var q1 = new THREE.Quaternion();
-
-		return function ( axis, angle ) {
-
-			var quaternion = q1.setFromAxisAngle( axis, angle );
-
-			this.applyQuaternion( quaternion );
-
-			return this;
-
-		};
-
-	}(),
-
 	transformDirection: function ( m ) {
 
 		// input: THREE.Matrix4 affine matrix
@@ -1800,48 +1776,6 @@ THREE.extend( THREE.Vector3.prototype, {
 		return this;
 
 	},
-
-	projectOnVector: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function( vector ) {
-
-			v1.copy( vector ).normalize();
-			var d = this.dot( v1 );
-			return this.copy( v1 ).multiplyScalar( d );
-
-		};
-
-	}(),
-
-	projectOnPlane: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function( planeNormal ) {
-
-			v1.copy( this ).projectOnVector( planeNormal );
-
-			return this.sub( v1 );
-
-		}
-
-	}(),
-
-	reflect: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function ( vector ) {
-
-		    v1.copy( this ).projectOnVector( vector ).multiplyScalar( 2 );
-
-		    return this.subVectors( v1, this );
-
-		}
-
-	}(),
 
 	angleTo: function ( v ) {
 
@@ -2095,7 +2029,7 @@ THREE.extend( THREE.Vector3.prototype, {
 	toArray: function () {
 
 		return [ this.x, this.y, this.z ];
-		
+
 	},
 
 	clone: function () {
@@ -2103,6 +2037,84 @@ THREE.extend( THREE.Vector3.prototype, {
 		return new THREE.Vector3( this.x, this.y, this.z );
 
 	}
+
+};
+
+THREE.extend( THREE.Vector3.prototype, {
+
+	applyEuler: function () {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( v, eulerOrder ) {
+
+			var quaternion = q1.setFromEuler( v, eulerOrder );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	applyAxisAngle: function () {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( axis, angle ) {
+
+			var quaternion = q1.setFromAxisAngle( axis, angle );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	projectOnVector: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( vector ) {
+
+			v1.copy( vector ).normalize();
+			var d = this.dot( v1 );
+			return this.copy( v1 ).multiplyScalar( d );
+
+		};
+
+	}(),
+
+	projectOnPlane: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( planeNormal ) {
+
+			v1.copy( this ).projectOnVector( planeNormal );
+
+			return this.sub( v1 );
+
+		}
+
+	}(),
+
+	reflect: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( vector ) {
+
+		    v1.copy( this ).projectOnVector( vector ).multiplyScalar( 2 );
+
+		    return this.subVectors( v1, this );
+
+		}
+
+	}()
 
 } );
 /**
@@ -2122,7 +2134,9 @@ THREE.Vector4 = function ( x, y, z, w ) {
 
 };
 
-THREE.extend( THREE.Vector4.prototype, {
+THREE.Vector4.prototype = {
+
+	constructor: THREE.Vector4,
 
 	set: function ( x, y, z, w ) {
 
@@ -2655,7 +2669,7 @@ THREE.extend( THREE.Vector4.prototype, {
 	toArray: function () {
 
 		return [ this.x, this.y, this.z, this.w ];
-		
+
 	},
 
 	clone: function () {
@@ -2664,7 +2678,7 @@ THREE.extend( THREE.Vector4.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -2676,7 +2690,9 @@ THREE.Line3 = function ( start, end ) {
 
 };
 
-THREE.extend( THREE.Line3.prototype, {
+THREE.Line3.prototype = {
+
+	constructor: THREE.Line3,
 
 	set: function ( start, end ) {
 
@@ -2788,7 +2804,7 @@ THREE.extend( THREE.Line3.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -2800,7 +2816,9 @@ THREE.Box2 = function ( min, max ) {
 
 };
 
-THREE.extend( THREE.Box2.prototype, {
+THREE.Box2.prototype = {
+
+	constructor: THREE.Box2,
 
 	set: function ( min, max ) {
 
@@ -2856,7 +2874,7 @@ THREE.extend( THREE.Box2.prototype, {
 
 	},
 
-	setFromCenterAndSize: function() {
+	setFromCenterAndSize: function () {
 
 		var v1 = new THREE.Vector2();
 
@@ -2996,7 +3014,7 @@ THREE.extend( THREE.Box2.prototype, {
 
 	},
 
-	distanceToPoint: function() {
+	distanceToPoint: function () {
 
 		var v1 = new THREE.Vector2();
 
@@ -3048,7 +3066,7 @@ THREE.extend( THREE.Box2.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -3060,7 +3078,9 @@ THREE.Box3 = function ( min, max ) {
 
 };
 
-THREE.extend( THREE.Box3.prototype, {
+THREE.Box3.prototype = {
+
+	constructor: THREE.Box3,
 
 	set: function ( min, max ) {
 
@@ -3333,7 +3353,7 @@ THREE.extend( THREE.Box3.prototype, {
 			new THREE.Vector3(),
 			new THREE.Vector3(),
 			new THREE.Vector3()
-			];
+		];
 
 		return function ( matrix ) {
 
@@ -3377,7 +3397,7 @@ THREE.extend( THREE.Box3.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -3397,7 +3417,9 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 	);
 };
 
-THREE.extend( THREE.Matrix3.prototype, {
+THREE.Matrix3.prototype = {
+
+	constructor: THREE.Matrix3,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -3600,7 +3622,7 @@ THREE.extend( THREE.Matrix3.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -3629,7 +3651,9 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 };
 
-THREE.extend( THREE.Matrix4.prototype, {
+THREE.Matrix4.prototype = {
+
+	constructor: THREE.Matrix4,
 
 	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
@@ -4185,84 +4209,6 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	},
 
-	compose: function() {
-
-		var mRotation = new THREE.Matrix4();
-		var mScale = new THREE.Matrix4();
-
-		return function ( position, quaternion, scale ) {
-
-			var te = this.elements;
-
-			mRotation.identity();
-			mRotation.setRotationFromQuaternion( quaternion );
-
-			mScale.makeScale( scale.x, scale.y, scale.z );
-
-			this.multiplyMatrices( mRotation, mScale );
-
-			te[12] = position.x;
-			te[13] = position.y;
-			te[14] = position.z;
-
-			return this;
-
-		};
-
-	}(),
-
-	decompose: function() {
-
-		var x = new THREE.Vector3(),
-			y = new THREE.Vector3(),
-			z = new THREE.Vector3(),
-			matrix = new THREE.Matrix4();
-
-		return function ( position, quaternion, scale ) {
-
-			var te = this.elements;
-
-			// grab the axis vectors
-			x.set( te[0], te[1], te[2] );
-			y.set( te[4], te[5], te[6] );
-			z.set( te[8], te[9], te[10] );
-
-			position = ( position instanceof THREE.Vector3 ) ? position : new THREE.Vector3();
-			quaternion = ( quaternion instanceof THREE.Quaternion ) ? quaternion : new THREE.Quaternion();
-			scale = ( scale instanceof THREE.Vector3 ) ? scale : new THREE.Vector3();
-
-			scale.x = x.length();
-			scale.y = y.length();
-			scale.z = z.length();
-
-			position.x = te[12];
-			position.y = te[13];
-			position.z = te[14];
-
-			// scale the rotation part
-
-			matrix.copy( this );
-
-			matrix.elements[0] /= scale.x;
-			matrix.elements[1] /= scale.x;
-			matrix.elements[2] /= scale.x;
-
-			matrix.elements[4] /= scale.y;
-			matrix.elements[5] /= scale.y;
-			matrix.elements[6] /= scale.y;
-
-			matrix.elements[8] /= scale.z;
-			matrix.elements[9] /= scale.z;
-			matrix.elements[10] /= scale.z;
-
-			quaternion.setFromRotationMatrix( matrix );
-
-			return [ position, quaternion, scale ];
-
-		};
-
-	}(),
-
 	extractPosition: function ( m ) {
 
 		var te = this.elements;
@@ -4672,6 +4618,88 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	}
 
+};
+
+THREE.extend( THREE.Matrix4.prototype, {
+
+	compose: function() {
+
+		var mRotation = new THREE.Matrix4();
+		var mScale = new THREE.Matrix4();
+
+		return function ( position, quaternion, scale ) {
+
+			var te = this.elements;
+
+			mRotation.identity();
+			mRotation.setRotationFromQuaternion( quaternion );
+
+			mScale.makeScale( scale.x, scale.y, scale.z );
+
+			this.multiplyMatrices( mRotation, mScale );
+
+			te[12] = position.x;
+			te[13] = position.y;
+			te[14] = position.z;
+
+			return this;
+
+		};
+
+	}(),
+
+	decompose: function() {
+
+		var x = new THREE.Vector3();
+		var y = new THREE.Vector3();
+		var z = new THREE.Vector3();
+		var matrix = new THREE.Matrix4();
+
+		return function ( position, quaternion, scale ) {
+
+			var te = this.elements;
+
+			// grab the axis vectors
+			x.set( te[0], te[1], te[2] );
+			y.set( te[4], te[5], te[6] );
+			z.set( te[8], te[9], te[10] );
+
+			position = ( position instanceof THREE.Vector3 ) ? position : new THREE.Vector3();
+			quaternion = ( quaternion instanceof THREE.Quaternion ) ? quaternion : new THREE.Quaternion();
+			scale = ( scale instanceof THREE.Vector3 ) ? scale : new THREE.Vector3();
+
+			scale.x = x.length();
+			scale.y = y.length();
+			scale.z = z.length();
+
+			position.x = te[12];
+			position.y = te[13];
+			position.z = te[14];
+
+			// scale the rotation part
+
+			matrix.copy( this );
+
+			matrix.elements[0] /= scale.x;
+			matrix.elements[1] /= scale.x;
+			matrix.elements[2] /= scale.x;
+
+			matrix.elements[4] /= scale.y;
+			matrix.elements[5] /= scale.y;
+			matrix.elements[6] /= scale.y;
+
+			matrix.elements[8] /= scale.z;
+			matrix.elements[9] /= scale.z;
+			matrix.elements[10] /= scale.z;
+
+			quaternion.setFromRotationMatrix( matrix );
+
+			return [ position, quaternion, scale ];
+
+		};
+
+	}()
+
 } );
 /**
  * @author bhouston / http://exocortex.com
@@ -4684,7 +4712,9 @@ THREE.Ray = function ( origin, direction ) {
 
 };
 
-THREE.extend( THREE.Ray.prototype, {
+THREE.Ray.prototype = {
+
+	constructor: THREE.Ray,
 
 	set: function ( origin, direction ) {
 
@@ -4836,7 +4866,7 @@ THREE.extend( THREE.Ray.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author bhouston / http://exocortex.com
  * @author mrdoob / http://mrdoob.com/
@@ -4849,7 +4879,9 @@ THREE.Sphere = function ( center, radius ) {
 
 };
 
-THREE.extend( THREE.Sphere.prototype, {
+THREE.Sphere.prototype = {
+
+	constructor: THREE.Sphere,
 
 	set: function ( center, radius ) {
 
@@ -4970,7 +5002,7 @@ THREE.extend( THREE.Sphere.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -4992,7 +5024,9 @@ THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
 
 };
 
-THREE.extend( THREE.Frustum.prototype, {
+THREE.Frustum.prototype = {
+
+	constructor: THREE.Frustum,
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
 
@@ -5121,7 +5155,7 @@ THREE.extend( THREE.Frustum.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -5133,7 +5167,9 @@ THREE.Plane = function ( normal, constant ) {
 
 };
 
-THREE.extend( THREE.Plane.prototype, {
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
 
 	set: function ( normal, constant ) {
 
@@ -5341,7 +5377,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -5653,7 +5689,7 @@ THREE.Triangle.normal = function() {
 
 	var v0 = new THREE.Vector3();
 
-	return function( a, b, c, optionalTarget ) {
+	return function ( a, b, c, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -5678,9 +5714,9 @@ THREE.Triangle.normal = function() {
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 THREE.Triangle.barycoordFromPoint = function() {
 
-	var v0 = new THREE.Vector3(),
-		v1 = new THREE.Vector3(),
-		v2 = new THREE.Vector3();
+	var v0 = new THREE.Vector3();
+	var v1 = new THREE.Vector3();
+	var v2 = new THREE.Vector3();
 
 	return function ( point, a, b, c, optionalTarget ) {
 
@@ -5730,7 +5766,7 @@ THREE.Triangle.containsPoint = function() {
 
 }();
 
-THREE.extend( THREE.Triangle.prototype, {
+THREE.Triangle.prototype = {
 
 	constructor: THREE.Triangle,
 
@@ -5825,7 +5861,7 @@ THREE.extend( THREE.Triangle.prototype, {
 
 	}
 
-} );
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -10725,7 +10761,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_geometry( id ) {
 
-		return function( geo, mat ) {
+		return function ( geo, mat ) {
 
 			handle_mesh( geo, mat, id );
 
@@ -10741,7 +10777,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_hierachy( id, parent, material, obj ) {
 
-		return function( event ) {
+		return function ( event ) {
 
 			var result;
 
@@ -10780,7 +10816,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	function create_callback_embed( id ) {
 
-		return function( geo, mat ) {
+		return function ( geo, mat ) {
 
 			result.geometries[ id ] = geo;
 			result.face_materials[ id ] = mat;
@@ -10858,7 +10894,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	var generateTextureCallback = function ( count ) {
 
-		return function() {
+		return function () {
 
 			callbackTexture( count );
 
