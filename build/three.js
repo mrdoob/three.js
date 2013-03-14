@@ -33629,12 +33629,12 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 	this.add( this.targetSphere );
 	*/
 
-	var geometry = new THREE.Geometry();
+	geometry = new THREE.Geometry();
 	geometry.vertices.push( this.light.position );
 	geometry.vertices.push( this.light.target.position );
 	geometry.computeLineDistances();
 
-	var material = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
+	material = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.targetLine = new THREE.Line( geometry, material );
@@ -33814,10 +33814,10 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 	this.lightSphere.position = this.light.position;
 	this.add( this.lightSphere );
 
-	var geometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 8, 1, true );
+	geometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 8, 1, true );
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ).translate( new THREE.Vector3( 0, -0.5, 0 ) ) );
 
-	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true, opacity: 0.3, transparent: true } );
+	material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true, opacity: 0.3, transparent: true } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.lightCone = new THREE.Mesh( geometry, material );

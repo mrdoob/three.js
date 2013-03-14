@@ -23,12 +23,12 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 	this.add( this.targetSphere );
 	*/
 
-	var geometry = new THREE.Geometry();
+	geometry = new THREE.Geometry();
 	geometry.vertices.push( this.light.position );
 	geometry.vertices.push( this.light.target.position );
 	geometry.computeLineDistances();
 
-	var material = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
+	material = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.targetLine = new THREE.Line( geometry, material );
