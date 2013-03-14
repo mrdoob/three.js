@@ -25,14 +25,6 @@ Menubar.File = function ( signals ) {
 	options.add( option );
 	*/
 
-	// reset scene
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Reset' );
-	option.onClick( function () { signals.resetScene.dispatch(); } );
-	options.add( option );
-
 	// export geometry
 
 	var option = new UI.Panel();

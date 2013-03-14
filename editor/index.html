@@ -121,12 +121,10 @@
 				exportGeometry: new SIGNALS.Signal(),
 				exportScene: new SIGNALS.Signal(),
 				toggleHelpers: new SIGNALS.Signal(),
-				resetScene: new SIGNALS.Signal(),
 
 				// notifications
 
 				rendererChanged: new SIGNALS.Signal(),
-				sceneAdded: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
 				objectSelected: new SIGNALS.Signal(),
@@ -298,18 +296,8 @@
 
 									result.scene.name = filename;
 
-									var resetScene = true;
-
-									if ( resetScene ) {
-
-										signals.sceneAdded.dispatch( result.scene, result.currentCamera );
-
-									} else {
-
-										signals.objectAdded.dispatch( result.scene );
-										signals.objectSelected.dispatch( result.scene );
-
-									}
+									signals.objectAdded.dispatch( result.scene );
+									signals.objectSelected.dispatch( result.scene );
 
 								}, '' );
 
@@ -453,10 +441,6 @@
 				}
 
 			}
-
-			// create default scene
-
-			signals.resetScene.dispatch();
 
 			//
 

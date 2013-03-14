@@ -48,10 +48,13 @@ var Viewport = function ( signals ) {
 	selectionAxis.visible = false;
 	sceneHelpers.add( selectionAxis );
 
-	// default dummy scene and camera
+	//
 
 	var scene = new THREE.Scene();
-	var camera = new THREE.Camera();
+
+	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
+	camera.position.set( 500, 250, 500 );
+	camera.lookAt( scene.position );
 
 	// fog
 
@@ -332,7 +335,6 @@ var Viewport = function ( signals ) {
 	signals.objectAdded.add( function ( object ) {
 
 		object.traverse( handleAddition );
-
 		scene.add( object );
 
 		if ( object instanceof THREE.Light )  {
@@ -341,9 +343,8 @@ var Viewport = function ( signals ) {
 
 		}
 
-		render();
-
 		signals.sceneChanged.dispatch( scene );
+		signals.objectSelected.dispatch( object );
 
 	} );
 
@@ -382,44 +383,38 @@ var Viewport = function ( signals ) {
 
 		if ( confirm( 'Delete ' + name + '?' ) === false ) return;
 
-		var object = selected;
-
 		if ( selected instanceof THREE.Light ) {
 
-			var helper = objectsToHelpers[ object.id ];
+			var helper = objectsToHelpers[ selected.id ];
 
 			objects.splice( objects.indexOf( helper ), 1 );
 
 			helper.parent.remove( helper );
-			object.parent.remove( object );
+			selected.parent.remove( selected );
 
-			delete objectsToHelpers[ object.id ];
+			delete objectsToHelpers[ selected.id ];
 			delete helpersToObjects[ helper.id ];
-
-		} else {
-
-			object.parent.remove( object );
-			objects.splice( objects.indexOf( object ), 1 );
-
-		}
-
-		// clean selection highlight
-
-		selectionBox.visible = false;
-		selectionAxis.visible = false;
-
-		// remove selected object from the scene
-
-
-		if ( object instanceof THREE.Light )  {
 
 			updateMaterials( scene );
 
+		} else {
+
+			selected.traverse( function ( object ) {
+
+				var index = objects.indexOf( object );
+
+				if ( index !== -1 ) {
+
+					objects.splice( index, 1 )
+
+				}
+
+			} );
+
+			selected.parent.remove( selected );
+
 		}
 
-		render();
-
-		signals.sceneChanged.dispatch( scene );
 		signals.objectSelected.dispatch( null );
 
 	} );
@@ -613,98 +608,6 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.resetScene.add( function () {
-
-		var defaultScene = createDefaultScene();
-		var defaultCamera = createDefaultCamera();
-		var defaultBgColor = new THREE.Color( 0xaaaaaa );
-
-		defaultCamera.lookAt( defaultScene.position );
-		defaultScene.add( defaultCamera );
-
-		signals.sceneAdded.dispatch( defaultScene, defaultCamera, defaultBgColor );
-		signals.objectSelected.dispatch( defaultCamera );
-
-	} );
-
-	signals.sceneAdded.add( function ( newScene, newCamera ) {
-
-		scene = newScene;
-
-		// remove old gizmos
-
-		var toRemove = {};
-
-		sceneHelpers.traverse( function ( child ) {
-
-			if ( child.userData.isGizmo ) {
-
-				toRemove[ child.id ] = child;
-
-			}
-
-		} );
-
-		for ( var id in toRemove ) {
-
-			sceneHelpers.remove( toRemove[ id ] );
-
-		}
-
-		// reset picking list
-
-		objects = [];
-
-		// add new gizmos and fill picking list
-
-		scene.traverse( handleAddition );
-
-		//
-
-		if ( newCamera ) {
-
-			camera = newCamera;
-
-			camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-			camera.updateProjectionMatrix();
-
-			controls.object = camera;
-			controls.update();
-
-		} else {
-
-			scene.add( camera );
-
-		}
-
-		if ( newScene.fog ) {
-
-			oldFogColor = newScene.fog.color.getHex();
-
-			if ( newScene.fog instanceof THREE.Fog ) {
-
-				oldFogType = "Fog";
-				oldFogNear = newScene.fog.near;
-				oldFogFar = newScene.fog.far;
-
-			} else if ( newScene.fog instanceof THREE.FogExp2 ) {
-
-				oldFogType = "FogExp2";
-				oldFogDensity = newScene.fog.density;
-
-			}
-
-		} else {
-
-			oldFogType = "None";
-
-		}
-
-		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( camera );
-
-	} );
-
 	//
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
@@ -762,23 +665,6 @@ var Viewport = function ( signals ) {
 			if ( root.fog.density !== undefined ) root.fog.density = oldFogDensity;
 
 		}
-
-	}
-
-	function createDefaultScene() {
-
-		return new THREE.Scene();
-
-	}
-
-	function createDefaultCamera() {
-
-		var camera = new THREE.PerspectiveCamera( 50, 1, 1, 5000 );
-
-		camera.name = "Camera";
-		camera.position.set( 500, 250, 500 );
-
-		return camera;
 
 	}
 
