@@ -6,7 +6,6 @@ var Viewport = function ( signals ) {
 
 	var objects = [];
 
-
 	// helpers
 
 	var helpersToObjects = {};
@@ -14,26 +13,7 @@ var Viewport = function ( signals ) {
 
 	var sceneHelpers = new THREE.Scene();
 
-	var size = 500, step = 25;
-	var geometry = new THREE.Geometry();
-	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
-	var color1 = new THREE.Color( 0x444444 ), color2 = new THREE.Color( 0x888888 );
-
-	for ( var i = - size; i <= size; i += step ) {
-
-		geometry.vertices.push( new THREE.Vector3( -size, 0, i ) );
-		geometry.vertices.push( new THREE.Vector3(  size, 0, i ) );
-
-		geometry.vertices.push( new THREE.Vector3( i, 0, -size ) );
-		geometry.vertices.push( new THREE.Vector3( i, 0,  size ) );
-
-		var color = i === 0 ? color1 : color2;
-
-		geometry.colors.push( color, color, color, color );
-
-	}
-
-	var grid = new THREE.Line( geometry, material, THREE.LinePieces );
+	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
 
 	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true, fog: false } ) );
