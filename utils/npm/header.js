@@ -9,7 +9,7 @@ if( window.performance === undefined ) {
 
 }
 
-if( window.performance.now === undefined ) {
+if( ( window.performance.now === undefined ) && ( process !== undefined ) && ( process.hrtime !== undefined ) ) {
 
 	window.performance.now = function () {
 
