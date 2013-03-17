@@ -630,15 +630,7 @@ THREE.Matrix4.prototype = {
 
 	translate: function ( v ) {
 
-		var te = this.elements;
-		var x = v.x, y = v.y, z = v.z;
-
-		te[12] = te[0] * x + te[4] * y + te[8] * z + te[12];
-		te[13] = te[1] * x + te[5] * y + te[9] * z + te[13];
-		te[14] = te[2] * x + te[6] * y + te[10] * z + te[14];
-		te[15] = te[3] * x + te[7] * y + te[11] * z + te[15];
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .translate() has been removed.');
 
 	},
 
