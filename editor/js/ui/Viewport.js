@@ -617,13 +617,13 @@ var Viewport = function ( signals ) {
 
 				node.material.needsUpdate = true;
 
-			}
+				if ( node.material instanceof THREE.MeshFaceMaterial ) {
 
-			if ( node.geometry && node.geometry.materials ) {
+					for ( var i = 0; i < node.material.materials.length; i ++ ) {
 
-				for ( var i = 0; i < node.geometry.materials.length; i ++ ) {
+						node.material.materials[ i ].needsUpdate = true;
 
-					node.geometry.materials[ i ].needsUpdate = true;
+					}
 
 				}
 
