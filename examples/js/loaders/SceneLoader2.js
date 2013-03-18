@@ -53,7 +53,7 @@ THREE.SceneLoader2.prototype = {
 
 			console.log( json.geometries[ i ] );
 
-			geometries.push( loader.createModel( json.geometries[ i ] ) );
+			geometries.push( loader.parse( json.geometries[ i ] ) );
 
 		}
 
