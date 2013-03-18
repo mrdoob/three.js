@@ -1272,6 +1272,13 @@ THREE.Vector2.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y ];
@@ -2026,6 +2033,14 @@ THREE.Vector3.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y, this.z ];
@@ -2663,6 +2678,15 @@ THREE.Vector4.prototype = {
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+
+	},
+
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+		this.w = array[ 3 ];
 
 	},
 
