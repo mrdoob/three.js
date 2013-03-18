@@ -10,7 +10,7 @@ THREE.SceneLoader2 = function () {
 
 THREE.SceneLoader2.prototype = {
 
-	constructor: THREE.SceneExporter2,
+	constructor: THREE.SceneLoader2,
 
 	load: function ( url ) {
 
