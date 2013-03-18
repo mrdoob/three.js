@@ -11968,8 +11968,6 @@ THREE.MeshDepthMaterial = function ( parameters ) {
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
-	this.morphTargets = false;
-
 	this.setValues( parameters );
 
 };
@@ -21899,7 +21897,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			return b.id - a.id;
+			return a.id - b.id;
 
 		}
 
@@ -21981,6 +21979,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			webglObject = renderList[ i ];
 			object = webglObject.object;
 
+			webglObject.id = i;
 			webglObject.render = false;
 
 			if ( object.visible ) {
@@ -22007,8 +22006,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							webglObject.z = _vector3.z;
 
 						}
-
-						webglObject.id = object.id;
 
 					}
 
