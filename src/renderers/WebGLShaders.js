@@ -2448,12 +2448,14 @@ THREE.ShaderLib = {
 
 			"varying vec3 vNormal;",
 
+			THREE.ShaderChunk[ "morphtarget_pars_vertex" ],
+
 			"void main() {",
 
-				"vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
 				"vNormal = normalize( normalMatrix * normal );",
 
-				"gl_Position = projectionMatrix * mvPosition;",
+				THREE.ShaderChunk[ "morphtarget_vertex" ],
+				THREE.ShaderChunk[ "default_vertex" ],
 
 			"}"
 
