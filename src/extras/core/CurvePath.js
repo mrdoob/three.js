@@ -143,8 +143,8 @@ THREE.CurvePath.prototype.getBoundingBox = function () {
 	var maxX, maxY, maxZ;
 	var minX, minY, minZ;
 
-	maxX = maxY = Number.NEGATIVE_INFINITY;
-	minX = minY = Number.POSITIVE_INFINITY;
+	maxX = maxY = maxZ = Number.NEGATIVE_INFINITY;
+	minX = minY = minZ = Number.POSITIVE_INFINITY;
 
 	var p, i, il, sum;
 
