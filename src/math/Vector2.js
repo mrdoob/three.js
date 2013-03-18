@@ -295,6 +295,13 @@ THREE.Vector2.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y ];

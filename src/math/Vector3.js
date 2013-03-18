@@ -739,6 +739,14 @@ THREE.Vector3.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y, this.z ];
