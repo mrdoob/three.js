@@ -44,20 +44,42 @@ THREE.SceneLoader2.prototype = {
 
 	parse: function ( json ) {
 
-		console.log( json );
+		// console.log( json );
+
+		var scene = new THREE.Scene();
 
 		var geometries = [];
 		var loader = new THREE.JSONLoader();
 
 		for ( var i = 0, l = json.geometries.length; i < l; i ++ ) {
 
-			console.log( json.geometries[ i ] );
-
 			geometries.push( loader.parse( json.geometries[ i ] ) );
 
 		}
 
-		console.log( geometries );
+		// TODO: Implement hierarchy
+
+		for ( var i = 0, l = json.scene.length; i < l; i ++ ) {
+
+			var object = json.scene[ i ];
+
+			switch ( object.type ) {
+
+				case "Mesh":
+
+					var mesh = new THREE.Mesh( geometries[ object.geometry ].geometry ); // TODO: Material
+					mesh.position.fromArray( object.position );
+					mesh.rotation.fromArray( object.rotation );
+					mesh.scale.fromArray( object.scale );
+					scene.add( mesh );
+
+					break;
+
+			}
+
+		}
+
+		return scene;
 
 	}
 

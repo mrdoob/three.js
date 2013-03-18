@@ -284,21 +284,25 @@
 								if ( data.metadata.version < 4 ) {
 
 									loader = new THREE.SceneLoader();
+									loader.parse( data, function ( result ) {
+
+										result.scene.name = filename;
+
+										signals.objectAdded.dispatch( result.scene );
+										signals.objectSelected.dispatch( result.scene );
+
+									}, '' );
 
 								} else {
 
 									loader = new THREE.SceneLoader2();
 
+									var scene = loader.parse( data );
+
+									signals.objectAdded.dispatch( scene );
+									signals.objectSelected.dispatch( scene );
+
 								}
-
-								loader.parse( data, function ( result ) {
-
-									result.scene.name = filename;
-
-									signals.objectAdded.dispatch( result.scene );
-									signals.objectSelected.dispatch( result.scene );
-
-								}, '' );
 
 							}
 
