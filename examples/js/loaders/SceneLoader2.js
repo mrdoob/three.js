@@ -57,27 +57,58 @@ THREE.SceneLoader2.prototype = {
 
 		}
 
-		// TODO: Implement hierarchy
+		var parseObject = function ( array, parent ) {
 
-		for ( var i = 0, l = json.scene.length; i < l; i ++ ) {
+			for ( var i = 0, l = array.length; i < l; i ++ ) {
 
-			var object = json.scene[ i ];
+				var object;
+				var data = array[ i ];
 
-			switch ( object.type ) {
+				switch ( data.type ) {
 
-				case "Mesh":
+					case "PerspectiveCamera":
 
-					var mesh = new THREE.Mesh( geometries[ object.geometry ].geometry ); // TODO: Material
-					mesh.position.fromArray( object.position );
-					mesh.rotation.fromArray( object.rotation );
-					mesh.scale.fromArray( object.scale );
-					scene.add( mesh );
+						object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+						object.name = data.name;
+						object.position.fromArray( data.position );
+						object.rotation.fromArray( data.rotation );
+						object.userData = data.userData;
+						parent.add( object );
 
-					break;
+						break;
+
+					case "Mesh":
+
+						object = new THREE.Mesh( geometries[ data.geometry ].geometry ); // TODO: Material
+						object.name = data.name;
+						object.position.fromArray( data.position );
+						object.rotation.fromArray( data.rotation );
+						object.scale.fromArray( data.scale );
+						object.userData = data.userData;
+						parent.add( object );
+
+						break;
+
+					default:
+
+						object = new THREE.Object3D();
+						object.name = data.name;
+						object.userData = data.userData;
+						parent.add( object );
+
+				}
+
+				if ( data.children !== undefined ) {
+
+					parseObject( data.children, object );
+
+				}
 
 			}
 
 		}
+
+		parseObject( json.scene, scene );
 
 		return scene;
 
