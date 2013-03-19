@@ -5267,10 +5267,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// uv repeat and offset setting priorities
-		//	1. color map
-		//	2. specular map
-		//	3. normal map
-		//	4. bump map
+		//  1. material override
+		//	2. color map
+		//	3. specular map
+		//	4. normal map
+		//	5. bump map
 
 		var uvScaleMap;
 
