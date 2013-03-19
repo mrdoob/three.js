@@ -448,6 +448,37 @@
 
 			}
 
+			// localStorage
+
+			if ( localStorage.threejsEditor !== undefined ) {
+
+				var loader = new THREE.SceneLoader2();
+
+				var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
+
+				while ( scene.children.length > 0 ) {
+
+					signals.objectAdded.dispatch( scene.children[ 0 ] );
+
+				}
+
+			}
+
+			var timeout;
+			var sceneExporter = new THREE.SceneExporter2();
+
+			signals.sceneChanged.add( function ( scene ) {
+
+				clearTimeout( timeout );
+
+				timeout = setTimeout( function () {
+
+					localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
+
+				}, 5000 );
+
+			} );
+
 			//
 
 			var onWindowResize = function ( event ) {

@@ -25,6 +25,28 @@ Menubar.File = function ( signals ) {
 	options.add( option );
 	*/
 
+	// reset
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Reset' );
+	option.onClick( function () {
+
+		if ( confirm( 'Are you sure?' ) ) {
+
+			if ( localStorage.threejsEditor !== undefined ) {
+
+				delete localStorage.threejsEditor;
+
+			}
+
+			location.reload();
+
+		}
+
+	} );
+	options.add( option );
+
 	// export geometry
 
 	var option = new UI.Panel();

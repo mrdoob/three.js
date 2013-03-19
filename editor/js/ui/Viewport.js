@@ -338,6 +338,8 @@ var Viewport = function ( signals ) {
 
 		}
 
+		signals.sceneChanged.dispatch( scene );
+
 		render();
 
 	} );
@@ -349,7 +351,6 @@ var Viewport = function ( signals ) {
 		var object = selected.clone();
 
 		signals.objectAdded.dispatch( object );
-		signals.objectSelected.dispatch( object );
 
 	} );
 
