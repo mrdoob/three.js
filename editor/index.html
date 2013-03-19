@@ -299,8 +299,11 @@
 
 									var scene = loader.parse( data );
 
-									signals.objectAdded.dispatch( scene );
-									signals.objectSelected.dispatch( scene );
+									while ( scene.children.length > 0 ) {
+
+										signals.objectAdded.dispatch( scene.children[ 0 ] );
+
+									}
 
 								}
 
