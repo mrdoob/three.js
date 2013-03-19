@@ -55,6 +55,8 @@ Menubar.File = function ( signals ) {
 	option.onClick( function () { signals.exportGeometry.dispatch( { exporter: THREE.GeometryExporter } ); } );
 	options.add( option );
 
+	/*
+
 	// export scene
 
 	var option = new UI.Panel();
@@ -62,6 +64,8 @@ Menubar.File = function ( signals ) {
 	option.setTextContent( 'Export Scene' );
 	option.onClick( function () { signals.exportScene.dispatch( { exporter: THREE.SceneExporter } ); } );
 	options.add( option );
+
+	*/
 
 	// export scene 2
 

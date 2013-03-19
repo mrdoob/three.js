@@ -287,10 +287,13 @@
 									loader = new THREE.SceneLoader();
 									loader.parse( data, function ( result ) {
 
-										result.scene.name = filename;
+										var scene = result.scene;
 
-										signals.objectAdded.dispatch( result.scene );
-										signals.objectSelected.dispatch( result.scene );
+										while ( scene.children.length > 0 ) {
+
+											signals.objectAdded.dispatch( scene.children[ 0 ] );
+
+										}
 
 									}, '' );
 
