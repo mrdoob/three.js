@@ -1945,37 +1945,43 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Transform.prototype.apply = function ( matrix ) {
+	Transform.prototype.apply = function () {
 
-		switch ( this.type ) {
+		var m1 = new THREE.Matrix4();
 
-			case 'matrix':
+		return function ( matrix ) {
 
-				matrix.multiply( this.obj );
+			switch ( this.type ) {
 
-				break;
+				case 'matrix':
 
-			case 'translate':
+					matrix.multiply( this.obj );
 
-				matrix.translate( this.obj );
+					break;
 
-				break;
+				case 'translate':
 
-			case 'rotate':
+					matrix.multiply( m1.makeTranslation( this.obj.x, this.obj.y, this.obj.z ) );
 
-				matrix.rotateByAxis( this.obj, this.angle );
+					break;
 
-				break;
+				case 'rotate':
 
-			case 'scale':
+					matrix.multiply( m1.makeRotationAxis( this.obj, this.angle ) );
 
-				matrix.scale( this.obj );
+					break;
 
-				break;
+				case 'scale':
 
-		}
+					matrix.scale( this.obj );
 
-	};
+					break;
+
+			}
+
+		};
+
+	}();
 
 	Transform.prototype.update = function ( data, member ) {
 

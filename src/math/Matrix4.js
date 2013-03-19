@@ -597,7 +597,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	extractRotation: function() {
+	extractRotation: function () {
 
 		var v1 = new THREE.Vector3();
 
