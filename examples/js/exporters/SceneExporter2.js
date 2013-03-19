@@ -158,12 +158,17 @@ THREE.SceneExporter2.prototype = {
 				data.type = 'SpotLight';
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
+				data.distance = object.distance;
+				data.angle = object.angle;
+				data.exponent = object.exponent;
 				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
 				data.type = 'HemisphereLight';
 				data.color = object.color.getHex();
+				data.groundColor = object.groundColor.getHex();
+				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.Mesh ) {
 

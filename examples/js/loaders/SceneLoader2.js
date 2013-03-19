@@ -173,14 +173,15 @@ THREE.SceneLoader2.prototype = {
 
 					case 'SpotLight':
 
-						object = new THREE.SpotLight( data.color, data.intensity );
+						object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
 						object.position.fromArray( data.position );
 
 						break;
 
 					case 'HemisphereLight':
 
-						object = new THREE.HemisphereLight( data.color );
+						object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
+						object.position.fromArray( data.position );
 
 						break;
 
