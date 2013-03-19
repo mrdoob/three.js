@@ -174,4 +174,4 @@ THREE.GeometryExporter.prototype = {
 
 	}
 
-}
+};
