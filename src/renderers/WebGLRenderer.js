@@ -5273,29 +5273,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		//	4. normal map
 		//	5. bump map
 
-		var uvScaleMap;
-
-		if ( material.uvScaleMap ) {
-
-			uvScaleMap = material.uvScaleMap;
-
-		} else if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.specularMap ) {
-
-			uvScaleMap = material.specularMap;
-
-		} else if ( material.normalMap ) {
-
-			uvScaleMap = material.normalMap;
-
-		} else if ( material.bumpMap ) {
-
-			uvScaleMap = material.bumpMap;
-
-		}
+		var uvScaleMap =
+				material.uvScaleMap ||
+				material.map ||
+				material.specularMap ||
+				material.normalMap ||
+				material.bumpMap;
 
 		if ( uvScaleMap !== undefined ) {
 
