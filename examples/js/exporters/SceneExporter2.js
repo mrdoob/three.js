@@ -37,14 +37,48 @@ THREE.SceneExporter2.prototype = {
 
 				geometries[ geometry.id ] = output.geometries.length;
 
-				output.geometries.push( geometryExporter.parse( geometry ) );
+				var data = { name: geometry.name };
+
+				if ( geometry instanceof THREE.PlaneGeometry ) {
+
+					data.type = 'PlaneGeometry';
+					data.width = geometry.width;
+					data.height = geometry.height;
+					data.widthSegments = geometry.widthSegments;
+					data.heightSegments = geometry.heightSegments;
+
+				} else if ( geometry instanceof THREE.CubeGeometry ) {
+
+					data.type = 'CubeGeometry';
+					data.width = geometry.width;
+					data.height = geometry.height;
+					data.depth = geometry.depth;
+					data.widthSegments = geometry.widthSegments;
+					data.heightSegments = geometry.heightSegments;
+					data.depthSegments = geometry.depthSegments;
+
+				} else if ( geometry instanceof THREE.SphereGeometry ) {
+
+					data.type = 'SphereGeometry';
+					data.radius = geometry.radius;
+					data.widthSegments = geometry.widthSegments;
+					data.heightSegments = geometry.heightSegments;
+
+				} else if ( geometry instanceof THREE.Geometry ) {
+
+					data.type = 'Geometry';
+					data.data = geometryExporter.parse( geometry );
+
+				}
+
+				output.geometries.push( data );
 
 			}
 
 			return geometries[ geometry.id ];
 
 		};
-		
+
 		/*
 		var materials = {};
 		var materialExporter = new THREE.MaterialExporter();

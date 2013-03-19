@@ -55,7 +55,55 @@ THREE.SceneLoader2.prototype = {
 
 		for ( var i = 0, l = json.geometries.length; i < l; i ++ ) {
 
-			geometries.push( loader.parse( json.geometries[ i ] ) );
+			var geometry;
+			var data = json.geometries[ i ];
+
+			switch ( data.type ) {
+
+				case 'PlaneGeometry':
+
+					geometry = new THREE.PlaneGeometry(
+						data.width,
+						data.height,
+						data.widthSegments,
+						data.heightSegments
+					);
+
+					break;
+
+				case 'CubeGeometry':
+
+					geometry = new THREE.CubeGeometry(
+						data.width,
+						data.height,
+						data.depth,
+						data.widthSegments,
+						data.heightSegments,
+						data.depthSegments
+					);
+
+					break;
+
+				case 'SphereGeometry':
+
+					geometry = new THREE.SphereGeometry(
+						data.radius,
+						data.widthSegments,
+						data.heightSegments
+					);
+
+					break;
+
+				case 'Geometry':
+
+					geometry = loader.parse( data.data ).geometry;
+
+					break;
+
+			}
+
+			geometry.name = data.name;
+			geometries.push( geometry );
 
 		}
 
@@ -75,91 +123,73 @@ THREE.SceneLoader2.prototype = {
 					case 'PerspectiveCamera':
 
 						object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-						object.name = data.name;
 						object.position.fromArray( data.position );
 						object.rotation.fromArray( data.rotation );
-						object.userData = data.userData;
-						parent.add( object );
 
 						break;
 
 					case 'OrthographicCamera':
 
 						object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-						object.name = data.name;
 						object.position.fromArray( data.position );
 						object.rotation.fromArray( data.rotation );
-						object.userData = data.userData;
-						parent.add( object );
 
 						break;
 
 					case 'AmbientLight':
 
 						object = new THREE.AmbientLight( data.color );
-						object.name = data.name;
-						parent.add( object );
 
 						break;
 
 					case 'DirectionalLight':
 
 						object = new THREE.DirectionalLight( data.color, data.intensity );
-						object.name = data.name;
 						object.position.fromArray( data.position );
-						parent.add( object );
 
 						break;
 
 					case 'PointLight':
 
 						object = new THREE.PointLight( data.color, data.intensity );
-						object.name = data.name;
 						object.position.fromArray( data.position );
-						parent.add( object );
 
 						break;
 
 					case 'SpotLight':
 
 						object = new THREE.SpotLight( data.color, data.intensity );
-						object.name = data.name;
 						object.position.fromArray( data.position );
-						parent.add( object );
 
 						break;
 
 					case 'HemisphereLight':
 
 						object = new THREE.HemisphereLight( data.color );
-						object.name = data.name;
-						parent.add( object );
 
 						break;
 
 					case 'Mesh':
 
-						object = new THREE.Mesh( geometries[ data.geometry ].geometry ); // TODO: Material
-						object.name = data.name;
+						object = new THREE.Mesh( geometries[ data.geometry ] ); // TODO: Material
 						object.position.fromArray( data.position );
 						object.rotation.fromArray( data.rotation );
 						object.scale.fromArray( data.scale );
-						object.userData = data.userData;
-						parent.add( object );
 
 						break;
 
 					default:
 
 						object = new THREE.Object3D();
-						object.name = data.name;
 						object.position.fromArray( data.position );
 						object.rotation.fromArray( data.rotation );
 						object.scale.fromArray( data.scale );
-						object.userData = data.userData;
-						parent.add( object );
 
 				}
+
+				object.name = data.name;
+				object.userData = data.userData;
+				parent.add( object );
 
 				if ( data.children !== undefined ) {
 
