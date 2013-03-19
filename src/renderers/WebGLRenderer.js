@@ -5274,9 +5274,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var uvScaleMap;
 
-    if ( material.offset && material.repeat ) {
+		if ( material.uvScaleMap ) {
 
-    	uvScaleMap = material;
+			uvScaleMap = material.uvScaleMap;
 
 		} else if ( material.map ) {
 
