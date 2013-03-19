@@ -10,6 +10,8 @@ THREE.SceneExporter2.prototype = {
 
 	parse: function ( scene ) {
 
+		// console.log( scene );
+
 		var output = {
 			metadata: {
 				version: 4.0,
@@ -17,8 +19,6 @@ THREE.SceneExporter2.prototype = {
 				generator: 'SceneExporter'
 			}
 		};
-
-		console.log( scene );
 
 		//
 
@@ -79,16 +79,34 @@ THREE.SceneExporter2.prototype = {
 
 		};
 
-		/*
+		//
+
 		var materials = {};
 		var materialExporter = new THREE.MaterialExporter();
 
 		var parseMaterial = function ( material ) {
 
+			if ( materials[ material.id ] === undefined ) {
 
+				if ( output.materials === undefined ) {
+
+					output.materials = [];
+
+				}
+
+				materials[ material.id ] = output.materials.length;
+
+				var data = { name: material.name, data: materialExporter.parse( material ) };
+
+				output.materials.push( data );
+
+			}
+
+			return materials[ material.id ];
 
 		};
-		*/
+
+		//
 
 		var parseObject = function ( object ) {
 
@@ -154,6 +172,7 @@ THREE.SceneExporter2.prototype = {
 				data.rotation = object.rotation.toArray();
 				data.scale = object.scale.toArray();
 				data.geometry = parseGeometry( object.geometry );
+				data.material = parseMaterial( object.material );
 
 			} else {
 

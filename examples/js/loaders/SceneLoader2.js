@@ -109,6 +109,21 @@ THREE.SceneLoader2.prototype = {
 
 		// materials
 
+		var materials = [];
+		var loader = new THREE.MaterialLoader();
+
+		for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
+
+			var material;
+			var data = json.materials[ i ];
+
+			material = loader.parse( data.data );
+
+			material.name = data.name;
+			materials.push( material );
+
+		}
+
 		// objects
 
 		var parseObject = function ( array, parent ) {
@@ -171,7 +186,7 @@ THREE.SceneLoader2.prototype = {
 
 					case 'Mesh':
 
-						object = new THREE.Mesh( geometries[ data.geometry ] ); // TODO: Material
+						object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
 						object.position.fromArray( data.position );
 						object.rotation.fromArray( data.rotation );
 						object.scale.fromArray( data.scale );
