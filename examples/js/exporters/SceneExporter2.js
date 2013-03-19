@@ -86,7 +86,6 @@ THREE.SceneExporter2.prototype = {
 
 				data.type = 'AmbientLight';
 				data.color = object.color.getHex();
-				data.intensity = object.intensity;
 
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
