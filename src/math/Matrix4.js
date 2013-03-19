@@ -75,6 +75,50 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	copyPosition: function ( m ) {
+
+		var te = this.elements;
+		var me = m.elements;
+
+		te[12] = me[12];
+		te[13] = me[13];
+		te[14] = me[14];
+
+		return this;
+
+	},
+
+	copyRotation: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( m ) {
+
+			var te = this.elements;
+			var me = m.elements;
+
+			var scaleX = 1 / v1.set( me[0], me[1], me[2] ).length();
+			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
+			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
+
+			te[0] = me[0] * scaleX;
+			te[1] = me[1] * scaleX;
+			te[2] = me[2] * scaleX;
+
+			te[4] = me[4] * scaleY;
+			te[5] = me[5] * scaleY;
+			te[6] = me[6] * scaleY;
+
+			te[8] = me[8] * scaleZ;
+			te[9] = me[9] * scaleZ;
+			te[10] = me[10] * scaleZ;
+
+			return this;
+
+		};
+
+	}(),
+
 	setRotationFromEuler: function ( v, order ) {
 
 		var te = this.elements;
@@ -586,47 +630,17 @@ THREE.Matrix4.prototype = {
 
 	extractPosition: function ( m ) {
 
-		var te = this.elements;
-		var me = m.elements;
-
-		te[12] = me[12];
-		te[13] = me[13];
-		te[14] = me[14];
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
+		return this.copyPosition( m );
 
 	},
 
-	extractRotation: function () {
+	extractRotation: function ( m ) {
 
-		var v1 = new THREE.Vector3();
+		console.warn( 'DEPRECATED: Matrix4\'s .extractRotation() has been renamed to .copyRotation().' );
+		return this.copyRotation( m );
 
-		return function ( m ) {
-
-			var te = this.elements;
-			var me = m.elements;
-
-			var scaleX = 1 / v1.set( me[0], me[1], me[2] ).length();
-			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
-			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
-
-			te[0] = me[0] * scaleX;
-			te[1] = me[1] * scaleX;
-			te[2] = me[2] * scaleX;
-
-			te[4] = me[4] * scaleY;
-			te[5] = me[5] * scaleY;
-			te[6] = me[6] * scaleY;
-
-			te[8] = me[8] * scaleZ;
-			te[9] = me[9] * scaleZ;
-			te[10] = me[10] * scaleZ;
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	translate: function ( v ) {
 

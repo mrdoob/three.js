@@ -63,6 +63,16 @@
 		Copies a matrix *m* into this matrix.
 		</div>
 
+		<h3>.copyPosition( [page:Matrix4 m] ) [page:Matrix4]</h3>
+		<div>
+		Copies the translation component of the supplied matrix *m* into this matrix translation component.
+		</div>
+
+		<h3>.copyRotation( [page:Matrix4 m] ) [page:Matrix4]</h3>
+		<div>
+		Copies the rotation component of the supplied matrix *m* into this matrix rotation component.
+		</div>
+
 		<h3>.lookAt( [page:Vector3 eye], [page:Vector3 center], [page:Vector3 up], ) [page:Matrix4]</h3>
 		<div>
 		Constructs a rotation matrix, looking from *eye* towards *center* with defined *up* vector.
@@ -194,16 +204,6 @@
 		<div>
 		Decomposes this matrix into the *translation*, *rotation* and *scale* components.<br />
 		If parameters are not passed, new instances will be created.
-		</div>
-
-		<h3>.extractPosition( [page:Matrix4 m] ) [page:Matrix4]</h3>
-		<div>
-		Copies the translation component of the supplied matrix *m* into this matrix translation component.
-		</div>
-
-		<h3>.extractRotation( [page:Matrix4 m] ) [page:Matrix4]</h3>
-		<div>
-		Copies the rotation component of the supplied matrix *m* into this matrix rotation component.
 		</div>
 
 		<h3>.makeTranslation( [page:Float x], [page:Float y], [page:Float z] ) [page:Matrix4]</h3>

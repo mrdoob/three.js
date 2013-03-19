@@ -84,7 +84,7 @@
 			var a, b, c, d;
 			var precision = raycaster.precision;
 
-			object.matrixRotationWorld.extractRotation( object.matrixWorld );
+			object.matrixRotationWorld.copyRotation( object.matrixWorld );
 
 			inverseMatrix.getInverse( object.matrixWorld );
 

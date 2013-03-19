@@ -63,7 +63,7 @@ THREE.Object3D.prototype = {
 
 			this.scale.getScaleFromMatrix( this.matrix );
 
-			m1.extractRotation( this.matrix );
+			m1.copyRotation( this.matrix );
 
 			if ( this.useQuaternion === true )  {
 

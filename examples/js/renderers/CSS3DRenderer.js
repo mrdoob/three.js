@@ -169,7 +169,7 @@ THREE.CSS3DRenderer = function () {
 
 					_tmpMatrix.copy( camera.matrixWorldInverse );
 					_tmpMatrix.transpose();
-					_tmpMatrix.extractPosition( object.matrixWorld );
+					_tmpMatrix.copyPosition( object.matrixWorld );
 					_tmpMatrix.scale( object.scale );
 
 					_tmpMatrix.elements[ 3 ] = 0;
