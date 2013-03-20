@@ -64,6 +64,15 @@ THREE.SceneExporter2.prototype = {
 					data.widthSegments = geometry.widthSegments;
 					data.heightSegments = geometry.heightSegments;
 
+				} else if ( geometry instanceof THREE.TorusGeometry ) {
+
+					data.type = 'TorusGeometry';
+					data.radius = geometry.radius;
+					data.tube = geometry.tube;
+					data.radialSegments = geometry.radialSegments;
+					data.tubularSegments = geometry.tubularSegments;
+					data.arc = geometry.arc;
+
 				} else if ( geometry instanceof THREE.Geometry ) {
 
 					data.type = 'Geometry';

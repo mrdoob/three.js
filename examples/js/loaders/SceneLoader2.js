@@ -94,6 +94,18 @@ THREE.SceneLoader2.prototype = {
 
 					break;
 
+				case 'TorusGeometry':
+
+					geometry = new THREE.TorusGeometry(
+						data.radius,
+						data.tube,
+						data.radialSegments,
+						data.tubularSegments,
+						data.arc
+					);
+
+					break;
+
 				case 'Geometry':
 
 					geometry = loader.parse( data.data ).geometry;
