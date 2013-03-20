@@ -894,29 +894,25 @@ THREE.Matrix4.prototype = {
 
 THREE.extend( THREE.Matrix4.prototype, {
 
-	compose: function() {
+	compose: function ( position, quaternion, scale ) {
 
-		var mRotation = new THREE.Matrix4();
-		var mScale = new THREE.Matrix4();
+		var te = this.elements;
 
-		return function ( position, quaternion, scale ) {
+		this.makeRotationFromQuaternion( quaternion );
+	
+		if ( scale.x !== 1 || scale.y !== 1 || scale.z !== 1 ) {
 
-			var te = this.elements;
+			this.scale( scale );
 
-			mRotation.makeRotationFromQuaternion( quaternion );
+		}
 		
-			mScale.makeScale( scale.x, scale.y, scale.z );
-			this.multiplyMatrices( mRotation, mScale );
+		te[12] = position.x;
+		te[13] = position.y;
+		te[14] = position.z;
 
-			te[12] = position.x;
-			te[13] = position.y;
-			te[14] = position.z;
+		return this;
 
-			return this;
-
-		};
-
-	}(),
+	},
 
 	decompose: function() {
 
