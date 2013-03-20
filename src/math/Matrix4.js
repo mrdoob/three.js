@@ -894,11 +894,31 @@ THREE.Matrix4.prototype = {
 
 THREE.extend( THREE.Matrix4.prototype, {
 
-	compose: function ( position, quaternion, scale ) {
+	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
 
 		var te = this.elements;
 
 		this.makeRotationFromQuaternion( quaternion );
+	
+		if ( scale.x !== 1 || scale.y !== 1 || scale.z !== 1 ) {
+
+			this.scale( scale );
+
+		}
+		
+		te[12] = position.x;
+		te[13] = position.y;
+		te[14] = position.z;
+
+		return this;
+
+	},
+
+	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
+
+		var te = this.elements;
+
+		this.makeRotationFromEuler( rotation, eulerOrder );
 	
 		if ( scale.x !== 1 || scale.y !== 1 || scale.z !== 1 ) {
 

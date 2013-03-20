@@ -319,11 +319,14 @@ THREE.Object3D.prototype = {
 		// if we are not using a quaternion directly, convert Euler rotation to this.quaternion.
 		if ( this.useQuaternion === false )  {
 
-			this.quaternion.setFromEuler( this.rotation, this.eulerOrder );
+			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.eulerOrder, this.scale );
 
 		} 
+		else {
 		
-		this.matrix.compose( this.position, this.quaternion, this.scale );
+			this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
+
+		}
 
 		this.matrixWorldNeedsUpdate = true;
 
