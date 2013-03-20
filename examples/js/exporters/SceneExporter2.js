@@ -93,6 +93,17 @@ THREE.SceneExporter2.prototype = {
 					data.tubularSegments = geometry.tubularSegments;
 					data.arc = geometry.arc;
 
+				} else if ( geometry instanceof THREE.TorusKnotGeometry ) {
+
+					data.type = 'TorusKnotGeometry';
+					data.radius = geometry.radius;
+					data.tube = geometry.tube;
+					data.radialSegments = geometry.radialSegments;
+					data.tubularSegments = geometry.tubularSegments;
+					data.p = geometry.p;
+					data.q = geometry.q;
+					data.heightScale = geometry.heightScale;
+
 				} else if ( geometry instanceof THREE.Geometry ) {
 
 					data.type = 'Geometry';

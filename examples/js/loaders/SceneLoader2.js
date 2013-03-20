@@ -132,6 +132,20 @@ THREE.SceneLoader2.prototype = {
 
 					break;
 
+				case 'TorusKnotGeometry':
+
+					geometry = new THREE.TorusKnotGeometry(
+						data.radius,
+						data.tube,
+						data.radialSegments,
+						data.tubularSegments,
+						data.p,
+						data.q,
+						data.heightScale
+					);
+
+					break;
+
 				case 'Geometry':
 
 					geometry = loader.parse( data.data ).geometry;

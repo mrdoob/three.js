@@ -133,6 +133,11 @@ Sidebar.Geometry = function ( signals ) {
 				parameters = new Sidebar.Geometry.TorusGeometry( signals, object );
 				container.add( parameters );
 
+			} else if ( selected instanceof THREE.TorusKnotGeometry ) {
+
+				parameters = new Sidebar.Geometry.TorusKnotGeometry( signals, object );
+				container.add( parameters );
+
 			}
 
 		} else {
