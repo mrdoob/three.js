@@ -57,6 +57,16 @@ THREE.SceneExporter2.prototype = {
 					data.heightSegments = geometry.heightSegments;
 					data.depthSegments = geometry.depthSegments;
 
+				} else if ( geometry instanceof THREE.CylinderGeometry ) {
+
+					data.type = 'CylinderGeometry';
+					data.radiusTop = geometry.radiusTop;
+					data.radiusBottom = geometry.radiusBottom;
+					data.height = geometry.height;
+					data.radiusSegments = geometry.radiusSegments;
+					data.heightSegments = geometry.heightSegments;
+					data.openEnded = data.openEnded;
+
 				} else if ( geometry instanceof THREE.SphereGeometry ) {
 
 					data.type = 'SphereGeometry';

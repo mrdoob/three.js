@@ -113,6 +113,11 @@ Sidebar.Geometry = function ( signals ) {
 				parameters = new Sidebar.Geometry.CubeGeometry( signals, object );
 				container.add( parameters );
 
+			} else if ( selected instanceof THREE.CylinderGeometry ) {
+
+				parameters = new Sidebar.Geometry.CylinderGeometry( signals, object );
+				container.add( parameters );
+
 			} else if ( selected instanceof THREE.TorusGeometry ) {
 
 				parameters = new Sidebar.Geometry.TorusGeometry( signals, object );

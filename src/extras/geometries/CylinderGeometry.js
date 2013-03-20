@@ -6,27 +6,30 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 	THREE.Geometry.call( this );
 
-	radiusTop = radiusTop !== undefined ? radiusTop : 20;
-	radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
-	height = height !== undefined ? height : 100;
+	this.radiusTop = radiusTop = radiusTop !== undefined ? radiusTop : 20;
+	this.radiusBottom = radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
+	this.height = height = height !== undefined ? height : 100;
+
+	this.radiusSegments = radiusSegments = radiusSegments || 8;
+	this.heightSegments = heightSegments = heightSegments || 1;
+
+	this.openEnded = openEnded = openEnded !== undefined ? openEnded : false;
 
 	var heightHalf = height / 2;
-	var segmentsX = radiusSegments || 8;
-	var segmentsY = heightSegments || 1;
 
 	var x, y, vertices = [], uvs = [];
 
-	for ( y = 0; y <= segmentsY; y ++ ) {
+	for ( y = 0; y <= heightSegments; y ++ ) {
 
 		var verticesRow = [];
 		var uvsRow = [];
 
-		var v = y / segmentsY;
+		var v = y / heightSegments;
 		var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
-		for ( x = 0; x <= segmentsX; x ++ ) {
+		for ( x = 0; x <= radiusSegments; x ++ ) {
 
-			var u = x / segmentsX;
+			var u = x / radiusSegments;
 
 			var vertex = new THREE.Vector3();
 			vertex.x = radius * Math.sin( u * Math.PI * 2 );
@@ -48,7 +51,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 	var tanTheta = ( radiusBottom - radiusTop ) / height;
 	var na, nb;
 
-	for ( x = 0; x < segmentsX; x ++ ) {
+	for ( x = 0; x < radiusSegments; x ++ ) {
 
 		if ( radiusTop !== 0 ) {
 
@@ -65,7 +68,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 		na.setY( Math.sqrt( na.x * na.x + na.z * na.z ) * tanTheta ).normalize();
 		nb.setY( Math.sqrt( nb.x * nb.x + nb.z * nb.z ) * tanTheta ).normalize();
 
-		for ( y = 0; y < segmentsY; y ++ ) {
+		for ( y = 0; y < heightSegments; y ++ ) {
 
 			var v1 = vertices[ y ][ x ];
 			var v2 = vertices[ y + 1 ][ x ];
@@ -91,11 +94,11 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 	// top cap
 
-	if ( !openEnded && radiusTop > 0 ) {
+	if ( openEnded === false && radiusTop > 0 ) {
 
 		this.vertices.push( new THREE.Vector3( 0, heightHalf, 0 ) );
 
-		for ( x = 0; x < segmentsX; x ++ ) {
+		for ( x = 0; x < radiusSegments; x ++ ) {
 
 			var v1 = vertices[ 0 ][ x ];
 			var v2 = vertices[ 0 ][ x + 1 ];
@@ -118,11 +121,11 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 	// bottom cap
 
-	if ( !openEnded && radiusBottom > 0 ) {
+	if ( openEnded === false && radiusBottom > 0 ) {
 
 		this.vertices.push( new THREE.Vector3( 0, - heightHalf, 0 ) );
 
-		for ( x = 0; x < segmentsX; x ++ ) {
+		for ( x = 0; x < radiusSegments; x ++ ) {
 
 			var v1 = vertices[ y ][ x + 1 ];
 			var v2 = vertices[ y ][ x ];

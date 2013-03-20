@@ -84,6 +84,19 @@ THREE.SceneLoader2.prototype = {
 
 					break;
 
+				case 'CylinderGeometry':
+
+					geometry = new THREE.CylinderGeometry(
+						data.radiusTop,
+						data.radiusBottom,
+						data.height,
+						data.radiusSegments,
+						data.heightSegments,
+						data.openEnded
+					);
+
+					break;
+
 				case 'SphereGeometry':
 
 					geometry = new THREE.SphereGeometry(
