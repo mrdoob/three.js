@@ -8,15 +8,56 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 
 	// radius
 
-	var objectRadiusRow = new UI.Panel();
-	var objectRadius = new UI.Number( geometry.radius ).onChange( update );
+	var radiusRow = new UI.Panel();
+	var radius = new UI.Number( geometry.radius ).onChange( update );
 
-	objectRadiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ).setColor( '#666' ) );
-	objectRadiusRow.add( objectRadius );
+	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ).setColor( '#666' ) );
+	radiusRow.add( radius );
 
-	container.add( objectRadiusRow );
+	container.add( radiusRow );
 
-	// 
+	// tube
+
+	var tubeRow = new UI.Panel();
+	var tube = new UI.Number( geometry.tube ).onChange( update );
+
+	tubeRow.add( new UI.Text( 'Tube' ).setWidth( '90px' ).setColor( '#666' ) );
+	tubeRow.add( tube );
+
+	container.add( tubeRow );
+
+	// radialSegments
+
+	var radialSegmentsRow = new UI.Panel();
+	var radialSegments = new UI.Integer( geometry.radialSegments ).setRange( 1, Infinity ).onChange( update );
+
+	radialSegmentsRow.add( new UI.Text( 'Radial Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	radialSegmentsRow.add( radialSegments );
+
+	container.add( radialSegmentsRow );
+
+	// tubularSegments
+
+	var tubularSegmentsRow = new UI.Panel();
+	var tubularSegments = new UI.Integer( geometry.tubularSegments ).setRange( 1, Infinity ).onChange( update );
+
+	tubularSegmentsRow.add( new UI.Text( 'Tubular Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	tubularSegmentsRow.add( tubularSegments );
+
+	container.add( tubularSegmentsRow );
+
+	// arc
+
+	var arcRow = new UI.Panel();
+	var arc = new UI.Number( geometry.arc ).onChange( update );
+
+	arcRow.add( new UI.Text( 'Arc' ).setWidth( '90px' ).setColor( '#666' ) );
+	arcRow.add( arc );
+
+	container.add( arcRow );
+
+
+	//
 
 	function update() {
 
@@ -24,7 +65,13 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 
 		object.geometry.dispose();
 
-		object.geometry = new THREE.TorusGeometry( objectRadius.getValue(), 40, 8, 6, Math.PI * 2 );
+		object.geometry = new THREE.TorusGeometry(
+			radius.getValue(),
+			tube.getValue(),
+			radialSegments.getValue(),
+			tubularSegments.getValue(),
+			arc.getValue()
+		);
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );
