@@ -72,6 +72,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 			tubularSegments.getValue(),
 			arc.getValue()
 		);
+
 		object.geometry.computeBoundingSphere();
 
 		signals.objectChanged.dispatch( object );

@@ -92,9 +92,7 @@ Sidebar.Geometry = function ( signals ) {
 
 			objectType.setValue( getGeometryInstanceName( object.geometry ) );
 
-			geometryName.setValue( object.geometry.name );
-			geometryVertices.setValue( object.geometry.vertices.length );
-			geometryFaces.setValue( object.geometry.faces.length );
+			updateFields( selected );
 
 			//
 
@@ -105,7 +103,17 @@ Sidebar.Geometry = function ( signals ) {
 
 			}
 
-			if ( selected instanceof THREE.TorusGeometry ) {
+			if ( selected instanceof THREE.PlaneGeometry ) {
+
+				parameters = new Sidebar.Geometry.PlaneGeometry( signals, object );
+				container.add( parameters );
+
+			} else if ( selected instanceof THREE.CubeGeometry ) {
+
+				parameters = new Sidebar.Geometry.CubeGeometry( signals, object );
+				container.add( parameters );
+
+			} else if ( selected instanceof THREE.TorusGeometry ) {
 
 				parameters = new Sidebar.Geometry.TorusGeometry( signals, object );
 				container.add( parameters );
@@ -121,6 +129,26 @@ Sidebar.Geometry = function ( signals ) {
 		}
 
 	} );
+
+	signals.objectChanged.add( function ( object ) {
+
+		if ( object && object.geometry ) {
+
+			updateFields( object.geometry );
+
+		}
+
+	} );
+
+	//
+
+	function updateFields( geometry ) {
+
+		geometryName.setValue( geometry.name );
+		geometryVertices.setValue( geometry.vertices.length );
+		geometryFaces.setValue( geometry.faces.length );
+
+	}
 
 	function getGeometryInstanceName( geometry ) {
 
