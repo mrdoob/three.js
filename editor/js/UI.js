@@ -35,9 +35,9 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'margin', 'marginLeft', 'marginTop', 'marginRight',
+'borderTop', 'borderRight', 'borderBottom', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight',
 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'fontSize', 'fontWeight', 'display', 'overflow', 'cursor' ];
+'backgroundColor', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
 
@@ -101,6 +101,18 @@ UI.Panel.prototype.add = function () {
 
 };
 
+
+UI.Panel.prototype.remove = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.dom.removeChild( arguments[ i ].dom );
+
+	}
+
+	return this;
+
+};
 
 // Text
 
