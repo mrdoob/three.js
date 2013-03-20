@@ -102,7 +102,11 @@ THREE.SceneLoader2.prototype = {
 					geometry = new THREE.SphereGeometry(
 						data.radius,
 						data.widthSegments,
-						data.heightSegments
+						data.heightSegments,
+						data.phiStart,
+						data.phiLength,
+						data.thetaStart,
+						data.thetaLength
 					);
 
 					break;

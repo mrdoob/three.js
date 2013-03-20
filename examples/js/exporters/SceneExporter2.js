@@ -73,6 +73,10 @@ THREE.SceneExporter2.prototype = {
 					data.radius = geometry.radius;
 					data.widthSegments = geometry.widthSegments;
 					data.heightSegments = geometry.heightSegments;
+					data.phiStart = geometry.phiStart;
+					data.phiLength = geometry.phiLength;
+					data.thetaStart = geometry.thetaStart;
+					data.thetaLength = geometry.thetaLength;
 
 				} else if ( geometry instanceof THREE.TorusGeometry ) {
 
