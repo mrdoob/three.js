@@ -119,7 +119,7 @@ THREE.SceneExporter2.prototype = {
 
 		var parseObject = function ( object ) {
 
-			var data = { name: object.name };
+			var data = { name: object.name, visible: object.visible, userData: object.userData };
 
 			if ( object instanceof THREE.PerspectiveCamera ) {
 
@@ -196,8 +196,6 @@ THREE.SceneExporter2.prototype = {
 				data.scale = object.scale.toArray();
 
 			}
-
-			data.userData = object.userData;
 
 			// parse children
 

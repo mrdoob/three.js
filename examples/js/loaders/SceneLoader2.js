@@ -216,6 +216,7 @@ THREE.SceneLoader2.prototype = {
 				}
 
 				object.name = data.name;
+				object.visible = data.visible;
 				object.userData = data.userData;
 				parent.add( object );
 
