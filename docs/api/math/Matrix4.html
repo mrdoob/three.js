@@ -175,19 +175,19 @@
 		Based on [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm].
 		</div>
 
-		<h3>.setRotationFromEuler( [page:Vector3 v], [page:String order] ) [page:Matrix4]</h3>
+		<h3>.makeRotationFromEuler( [page:Vector3 v], [page:String order] ) [page:Matrix4]</h3>
 		<div>
 		v — Rotation vector.
 		order — The order of rotations. Eg. "XYZ".
 		</div>
 		<div>
-		Sets the rotation submatrix of this matrix to the rotation specified by Euler angles.<br />
+		Sets the rotation submatrix of this matrix to the rotation specified by Euler angles, the rest of the matrix is identity.<br />
 		Default order is *"XYZ"*.
 		</div>
 
-		<h3>.setRotationFromQuaternion( [page:Quaternion q] ) [page:Matrix4]</h3>
+		<h3>.makeRotationFromQuaternion( [page:Quaternion q] ) [page:Matrix4]</h3>
 		<div>
-		Sets the rotation submatrix of this matrix to the rotation specified by *q*.
+		Sets the rotation submatrix of this matrix to the rotation specified by *q*. The rest of the matrix is identity.
 		</div>
 
 		<h3>.scale( [page:Vector3 v] ) [page:Matrix4]</h3>

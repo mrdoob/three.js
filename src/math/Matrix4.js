@@ -903,11 +903,9 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 			var te = this.elements;
 
-			mRotation.identity();
-			mRotation.setRotationFromQuaternion( quaternion );
-
+			mRotation.makeRotationFromQuaternion( quaternion );
+		
 			mScale.makeScale( scale.x, scale.y, scale.z );
-
 			this.multiplyMatrices( mRotation, mScale );
 
 			te[12] = position.x;
