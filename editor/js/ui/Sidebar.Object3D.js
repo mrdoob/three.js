@@ -18,7 +18,7 @@ Sidebar.Object3D = function ( signals ) {
 	container.setDisplay( 'none' );
 	container.setPadding( '10px' );
 
-	var objectType = new UI.Text().setColor( '#666' );
+	var objectType = new UI.Text().setColor( '#666' ).setTextTransform( 'uppercase' );
 	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
 
@@ -384,7 +384,7 @@ Sidebar.Object3D = function ( signals ) {
 
 			container.setDisplay( 'block' );
 
-			objectType.setValue( getObjectInstanceName( object ).toUpperCase() );
+			objectType.setValue( getObjectInstanceName( object ) );
 
 			objectName.setValue( object.name );
 

@@ -29,7 +29,8 @@ Sidebar.Geometry = function ( signals ) {
 	container.setDisplay( 'none' );
 	container.setPadding( '10px' );
 
-	container.add( new UI.Text( 'GEOMETRY' ).setColor( '#666' ) );
+	var objectType = new UI.Text().setColor( '#666' ).setTextTransform( 'uppercase' );
+	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// name
@@ -41,16 +42,6 @@ Sidebar.Geometry = function ( signals ) {
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
-
-	// class
-
-	var geometryClassRow = new UI.Panel();
-	var geometryClass = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
-
-	geometryClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
-	geometryClassRow.add( geometryClass );
-
-	container.add( geometryClassRow );
 
 	// vertices
 
@@ -71,6 +62,10 @@ Sidebar.Geometry = function ( signals ) {
 	geometryFacesRow.add( geometryFaces );
 
 	container.add( geometryFacesRow );
+
+	// parameters
+
+	var parameters;
 
 
 	//
@@ -95,10 +90,27 @@ Sidebar.Geometry = function ( signals ) {
 
 			container.setDisplay( 'block' );
 
+			objectType.setValue( getGeometryInstanceName( object.geometry ) );
+
 			geometryName.setValue( object.geometry.name );
-			geometryClass.setValue( getGeometryInstanceName( object.geometry ) );
 			geometryVertices.setValue( object.geometry.vertices.length );
 			geometryFaces.setValue( object.geometry.faces.length );
+
+			//
+
+			if ( parameters !== undefined ) {
+
+				container.remove( parameters );
+				parameters = undefined;
+
+			}
+
+			if ( selected instanceof THREE.TorusGeometry ) {
+
+				parameters = new Sidebar.Geometry.TorusGeometry( signals, object );
+				container.add( parameters );
+
+			}
 
 		} else {
 

@@ -324,6 +324,26 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.objectSelected.add( function ( object ) {
+
+		selectionBox.visible = false;
+		selectionAxis.visible = false;
+
+		if ( object !== null ) {
+
+			updateSelectionBox( object );
+
+			selectionAxis.matrixWorld = object.matrixWorld;
+			selectionAxis.visible = true;
+
+			selected = object;
+
+		}
+
+		render();
+
+	} );
+
 	signals.objectChanged.add( function ( object ) {
 
 		if ( object instanceof THREE.Camera ) {
@@ -337,6 +357,8 @@ var Viewport = function ( signals ) {
 			objectsToHelpers[ object.id ].update();
 
 		}
+
+		updateSelectionBox( object );
 
 		signals.sceneChanged.dispatch( scene );
 
@@ -403,76 +425,6 @@ var Viewport = function ( signals ) {
 
 		signals.sceneChanged.dispatch( scene );
 		signals.objectSelected.dispatch( null );
-
-	} );
-
-	signals.objectSelected.add( function ( object ) {
-
-		selectionBox.visible = false;
-		selectionAxis.visible = false;
-
-		if ( object !== null ) {
-
-			if ( object.geometry !== undefined ) {
-
-				var geometry = object.geometry;
-
-				if ( geometry.boundingBox === null ) {
-
-					geometry.computeBoundingBox();
-
-				}
-
-				var vertices = selectionBox.geometry.vertices;
-
-				vertices[ 0 ].x = geometry.boundingBox.max.x;
-				vertices[ 0 ].y = geometry.boundingBox.max.y;
-				vertices[ 0 ].z = geometry.boundingBox.max.z;
-
-				vertices[ 1 ].x = geometry.boundingBox.max.x;
-				vertices[ 1 ].y = geometry.boundingBox.max.y;
-				vertices[ 1 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 2 ].x = geometry.boundingBox.max.x;
-				vertices[ 2 ].y = geometry.boundingBox.min.y;
-				vertices[ 2 ].z = geometry.boundingBox.max.z;
-
-				vertices[ 3 ].x = geometry.boundingBox.max.x;
-				vertices[ 3 ].y = geometry.boundingBox.min.y;
-				vertices[ 3 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 4 ].x = geometry.boundingBox.min.x;
-				vertices[ 4 ].y = geometry.boundingBox.max.y;
-				vertices[ 4 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 5 ].x = geometry.boundingBox.min.x;
-				vertices[ 5 ].y = geometry.boundingBox.max.y;
-				vertices[ 5 ].z = geometry.boundingBox.max.z;
-
-				vertices[ 6 ].x = geometry.boundingBox.min.x;
-				vertices[ 6 ].y = geometry.boundingBox.min.y;
-				vertices[ 6 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 7 ].x = geometry.boundingBox.min.x;
-				vertices[ 7 ].y = geometry.boundingBox.min.y;
-				vertices[ 7 ].z = geometry.boundingBox.max.z;
-
-				selectionBox.geometry.computeBoundingSphere();
-				selectionBox.geometry.verticesNeedUpdate = true;
-
-				selectionBox.matrixWorld = object.matrixWorld;
-				selectionBox.visible = true;
-
-			}
-
-			selectionAxis.matrixWorld = object.matrixWorld;
-			selectionAxis.visible = true;
-
-			selected = object;
-
-		}
-
-		render();
 
 	} );
 
@@ -609,6 +561,62 @@ var Viewport = function ( signals ) {
 	signals.sceneChanged.dispatch( scene );
 
 	//
+
+	function updateSelectionBox( object ) {
+
+		if ( object.geometry !== undefined ) {
+
+			var geometry = object.geometry;
+
+			if ( geometry.boundingBox === null ) {
+
+				geometry.computeBoundingBox();
+
+			}
+
+			var vertices = selectionBox.geometry.vertices;
+
+			vertices[ 0 ].x = geometry.boundingBox.max.x;
+			vertices[ 0 ].y = geometry.boundingBox.max.y;
+			vertices[ 0 ].z = geometry.boundingBox.max.z;
+
+			vertices[ 1 ].x = geometry.boundingBox.max.x;
+			vertices[ 1 ].y = geometry.boundingBox.max.y;
+			vertices[ 1 ].z = geometry.boundingBox.min.z;
+
+			vertices[ 2 ].x = geometry.boundingBox.max.x;
+			vertices[ 2 ].y = geometry.boundingBox.min.y;
+			vertices[ 2 ].z = geometry.boundingBox.max.z;
+
+			vertices[ 3 ].x = geometry.boundingBox.max.x;
+			vertices[ 3 ].y = geometry.boundingBox.min.y;
+			vertices[ 3 ].z = geometry.boundingBox.min.z;
+
+			vertices[ 4 ].x = geometry.boundingBox.min.x;
+			vertices[ 4 ].y = geometry.boundingBox.max.y;
+			vertices[ 4 ].z = geometry.boundingBox.min.z;
+
+			vertices[ 5 ].x = geometry.boundingBox.min.x;
+			vertices[ 5 ].y = geometry.boundingBox.max.y;
+			vertices[ 5 ].z = geometry.boundingBox.max.z;
+
+			vertices[ 6 ].x = geometry.boundingBox.min.x;
+			vertices[ 6 ].y = geometry.boundingBox.min.y;
+			vertices[ 6 ].z = geometry.boundingBox.min.z;
+
+			vertices[ 7 ].x = geometry.boundingBox.min.x;
+			vertices[ 7 ].y = geometry.boundingBox.min.y;
+			vertices[ 7 ].z = geometry.boundingBox.max.z;
+
+			selectionBox.geometry.computeBoundingSphere();
+			selectionBox.geometry.verticesNeedUpdate = true;
+
+			selectionBox.matrixWorld = object.matrixWorld;
+			selectionBox.visible = true;
+
+		}
+
+	}
 
 	function updateMaterials( root ) {
 
