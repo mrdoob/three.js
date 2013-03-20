@@ -78,6 +78,12 @@ THREE.SceneExporter2.prototype = {
 					data.thetaStart = geometry.thetaStart;
 					data.thetaLength = geometry.thetaLength;
 
+				} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
+
+					data.type = 'IcosahedronGeometry';
+					data.radius = geometry.radius;
+					data.detail = geometry.detail;
+
 				} else if ( geometry instanceof THREE.TorusGeometry ) {
 
 					data.type = 'TorusGeometry';

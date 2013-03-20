@@ -123,6 +123,11 @@ Sidebar.Geometry = function ( signals ) {
 				parameters = new Sidebar.Geometry.SphereGeometry( signals, object );
 				container.add( parameters );
 
+			} else if ( selected instanceof THREE.IcosahedronGeometry ) {
+
+				parameters = new Sidebar.Geometry.IcosahedronGeometry( signals, object );
+				container.add( parameters );
+
 			} else if ( selected instanceof THREE.TorusGeometry ) {
 
 				parameters = new Sidebar.Geometry.TorusGeometry( signals, object );

@@ -111,6 +111,15 @@ THREE.SceneLoader2.prototype = {
 
 					break;
 
+				case 'IcosahedronGeometry':
+
+					geometry = new THREE.IcosahedronGeometry(
+						data.radius,
+						data.detail
+					);
+
+					break;
+
 				case 'TorusGeometry':
 
 					geometry = new THREE.TorusGeometry(
