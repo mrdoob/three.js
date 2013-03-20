@@ -33073,6 +33073,9 @@ THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
 
 THREE.IcosahedronGeometry = function ( radius, detail ) {
 
+	this.radius = radius;
+	this.detail = detail;
+
 	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
 	var vertices = [
