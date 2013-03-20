@@ -31,7 +31,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 	var widthSegmentsRow = new UI.Panel();
 	var widthSegments = new UI.Integer( geometry.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
-	widthSegmentsRow.add( new UI.Text( 'Width Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	widthSegmentsRow.add( new UI.Text( 'Width segments' ).setWidth( '90px' ).setColor( '#666' ) );
 	widthSegmentsRow.add( widthSegments );
 
 	container.add( widthSegmentsRow );
@@ -41,7 +41,7 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 	var heightSegmentsRow = new UI.Panel();
 	var heightSegments = new UI.Integer( geometry.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
-	heightSegmentsRow.add( new UI.Text( 'Height Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ).setColor( '#666' ) );
 	heightSegmentsRow.add( heightSegments );
 
 	container.add( heightSegmentsRow );

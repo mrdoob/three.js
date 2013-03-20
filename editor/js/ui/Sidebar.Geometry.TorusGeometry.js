@@ -31,7 +31,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 	var radialSegmentsRow = new UI.Panel();
 	var radialSegments = new UI.Integer( geometry.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
-	radialSegmentsRow.add( new UI.Text( 'Radial Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ).setColor( '#666' ) );
 	radialSegmentsRow.add( radialSegments );
 
 	container.add( radialSegmentsRow );
@@ -41,7 +41,7 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 	var tubularSegmentsRow = new UI.Panel();
 	var tubularSegments = new UI.Integer( geometry.tubularSegments ).setRange( 1, Infinity ).onChange( update );
 
-	tubularSegmentsRow.add( new UI.Text( 'Tubular Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	tubularSegmentsRow.add( new UI.Text( 'Tubular segments' ).setWidth( '90px' ).setColor( '#666' ) );
 	tubularSegmentsRow.add( tubularSegments );
 
 	container.add( tubularSegmentsRow );
