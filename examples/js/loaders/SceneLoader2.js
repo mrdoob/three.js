@@ -255,9 +255,10 @@ THREE.SceneLoader2.prototype = {
 
 				}
 
-				object.name = data.name;
-				object.visible = data.visible;
-				object.userData = data.userData;
+				if ( data.name !== undefined ) object.name = data.name;
+				if ( data.visible !== undefined ) object.visible = data.visible;
+				if ( data.userData !== undefined ) object.userData = data.userData;
+
 				parent.add( object );
 
 				if ( data.children !== undefined ) {

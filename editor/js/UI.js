@@ -35,7 +35,7 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight',
+'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight',
 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
 'backgroundColor', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
 
@@ -221,6 +221,12 @@ UI.TextArea = function () {
 
 	this.onChangeCallback = null;
 
+	this.dom.addEventListener( 'keyup', function ( event ) {
+
+		if ( scope.onKeyUpCallback ) scope.onKeyUpCallback();
+
+	}, false );
+
 	this.dom.addEventListener( 'change', function ( event ) {
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
@@ -242,6 +248,14 @@ UI.TextArea.prototype.getValue = function () {
 UI.TextArea.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.TextArea.prototype.onKeyUp = function ( callback ) {
+
+	this.onKeyUpCallback = callback;
 
 	return this;
 

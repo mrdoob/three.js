@@ -173,7 +173,23 @@ Sidebar.Object3D = function ( signals ) {
 	// user data
 
 	var objectUserDataRow = new UI.Panel();
-	var objectUserData = new UI.TextArea().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	objectUserData.onKeyUp( function () {
+
+		try {
+
+			JSON.parse( objectUserData.getValue() );
+			objectUserData.setBorderColor( '#ccc' );
+			objectUserData.setBackgroundColor( '' );
+
+		} catch ( error ) {
+
+			objectUserData.setBorderColor( '#f00' );
+			objectUserData.setBackgroundColor( 'rgba(255,0,0,0.25)' );
+
+		}
+
+	} );
 
 	objectUserDataRow.add( new UI.Text( 'User data' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectUserDataRow.add( objectUserData );
@@ -465,6 +481,9 @@ Sidebar.Object3D = function ( signals ) {
 				console.log( error );
 
 			}
+
+			objectUserData.setBorderColor( '#ccc' );
+			objectUserData.setBackgroundColor( '' );
 
 			updateRows();
 			updateTransformRows();
