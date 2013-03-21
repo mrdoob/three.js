@@ -924,11 +924,10 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 		this.makeRotationFromQuaternion( quaternion );
 	
-		if ( scale.x !== 1 || scale.y !== 1 || scale.z !== 1 ) {
-
-			this.scale( scale );
-
-		}
+		var sx = scale.x, sy = scale.y, sz = scale.z;
+		te[0] *= sx; te[4] *= sy; te[8] *= sz;
+		te[1] *= sx; te[5] *= sy; te[9] *= sz;
+		te[2] *= sx; te[6] *= sy; te[10] *= sz;
 		
 		te[12] = position.x;
 		te[13] = position.y;
@@ -944,11 +943,10 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 		this.makeRotationFromEuler( rotation, eulerOrder );
 	
-		if ( scale.x !== 1 || scale.y !== 1 || scale.z !== 1 ) {
-
-			this.scale( scale );
-
-		}
+		var sx = scale.x, sy = scale.y, sz = scale.z;
+		te[0] *= sx; te[4] *= sy; te[8] *= sz;
+		te[1] *= sx; te[5] *= sy; te[9] *= sz;
+		te[2] *= sx; te[6] *= sy; te[10] *= sz;
 		
 		te[12] = position.x;
 		te[13] = position.y;
