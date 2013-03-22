@@ -507,15 +507,25 @@ var Viewport = function ( signals ) {
 
 		if ( selected.geometry === undefined ) {
 
-			console.warn( "Selected object doesn't have any geometry" );
+			alert( "Selected object doesn't have any geometry" );
 			return;
 
 		}
 
 		var exporter = new object.exporter();
 
-		var output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+		var output;
+
+		if ( exporter instanceof THREE.GeometryExporter ) {
+
+			output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		} else {
+
+			output = exporter.parse( selected.geometry );
+
+		}
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
