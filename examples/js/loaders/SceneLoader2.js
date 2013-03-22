@@ -154,7 +154,7 @@ THREE.SceneLoader2.prototype = {
 
 			}
 
-			geometry.name = data.name;
+			if ( data.name !== undefined ) geometry.name = data.name;
 			geometries.push( geometry );
 
 		}
@@ -166,12 +166,11 @@ THREE.SceneLoader2.prototype = {
 
 		for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
 
-			var material;
 			var data = json.materials[ i ];
+			var material = loader.parse( data.data );
 
-			material = loader.parse( data.data );
+			if ( data.name !== undefined ) material.name = data.name;
 
-			material.name = data.name;
 			materials.push( material );
 
 		}

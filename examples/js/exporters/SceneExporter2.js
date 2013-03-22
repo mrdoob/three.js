@@ -37,7 +37,9 @@ THREE.SceneExporter2.prototype = {
 
 				geometries[ geometry.id ] = output.geometries.length;
 
-				var data = { name: geometry.name };
+				var data = {};
+
+				if ( geometry.name !== "" ) data.name = geometry.name;
 
 				if ( geometry instanceof THREE.PlaneGeometry ) {
 
@@ -136,7 +138,10 @@ THREE.SceneExporter2.prototype = {
 
 				materials[ material.id ] = output.materials.length;
 
-				var data = { name: material.name, data: materialExporter.parse( material ) };
+				var data = {};
+
+				if ( material.name !== "" ) data.name = material.name;
+				data.data = materialExporter.parse( material );
 
 				output.materials.push( data );
 
@@ -150,7 +155,12 @@ THREE.SceneExporter2.prototype = {
 
 		var parseObject = function ( object ) {
 
-			var data = { name: object.name, visible: object.visible, userData: object.userData };
+			var data = {};
+
+			if ( object.name !== "" ) data.name = object.name;
+			if ( object.visible !== true ) data.visible = object.visible;
+
+			data.userData = object.userData;
 
 			if ( object instanceof THREE.PerspectiveCamera ) {
 
