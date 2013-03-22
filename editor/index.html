@@ -68,7 +68,7 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 		<script src="../examples/js/controls/TrackballControls.js"></script>
 		<script src="../examples/js/loaders/BinaryLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
@@ -274,12 +274,14 @@
 								var result = loader.parse( data );
 
 								var geometry = result.geometry;
-								var materials = result.materials;
+								var material = result.materials !== undefined
+											? new THREE.MeshFaceMaterial( result.materials )
+											: new THREE.MeshPhongMaterial();
 
 								geometry.sourceType = "ascii";
 								geometry.sourceFile = file.name;
 
-								var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+								var mesh = new THREE.Mesh( geometry, material );
 								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
