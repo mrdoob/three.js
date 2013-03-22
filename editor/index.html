@@ -207,7 +207,9 @@
 								geometry.sourceType = "ctm";
 								geometry.sourceFile = file.name;
 
-								var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+								var material = new THREE.MeshPhongMaterial();
+
+								var mesh = new THREE.Mesh( geometry, material );
 								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
@@ -402,7 +404,9 @@
 							geometry.sourceType = "stl";
 							geometry.sourceFile = file.name;
 
-							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+							var material = new THREE.MeshPhongMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
 							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
@@ -446,7 +450,9 @@
 							geometry.sourceType = "vtk";
 							geometry.sourceFile = file.name;
 
-							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+							var material = new THREE.MeshPhongMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
 							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
@@ -497,12 +503,6 @@
 			var onWindowResize = function ( event ) {
 
 				signals.windowResize.dispatch();
-
-			};
-
-			var createDummyMaterial = function () {
-
-				return new THREE.MeshPhongMaterial();
 
 			};
 
