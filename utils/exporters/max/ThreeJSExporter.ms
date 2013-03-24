@@ -483,15 +483,24 @@ rollout ThreeJSExporter "ThreeJSExporter"
 				DumpColor mat.diffuse  "colorDiffuse"
 				DumpColor mat.ambient  "colorAmbient"
 				DumpColor mat.specular "colorSpecular"
-				DumpColor mat.selfIllumColor  "colorEmissive"
+				
+				sICol = mat.selfIllumColor
+				-- check if the self Illumination color is black
+				if(mat.selfIllumColor  == (color 0 0 0) ) then				
+				(					
+					al = mat.diffuse.a
+					sICol = mat.diffuse * (mat.selfIllumAmount /100)
+					sICol.a = al					
+				)
+				DumpColor sICol "emissive"
 								
 				t = mat.opacity / 100
 				s = mat.glossiness
-				il = mat.selfIllumAmount /100
+				
 
 				Format "\"transparency\"  : %,\n" t to:ostream
 				Format "\"specularCoef\"  : %,\n" s to:ostream
-				Format "\"Emissive\"  : %,\n" il to:ostream
+				
 				
 				-- maps
 
