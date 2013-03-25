@@ -4,6 +4,8 @@
  * Depth-of-field shader with bokeh
  * ported from GLSL shader by Martins Upitis
  * http://blenderartists.org/forum/showthread.php?237488-GLSL-depth-of-field-with-bokeh-v2-4-(update)
+ *
+ * Requires #define RINGS and SAMPLES integers
  */
 
 
@@ -91,8 +93,8 @@ THREE.BokehShader = {
 		"//------------------------------------------",
 		"//user variables",
 
-		"const int samples = #SAMPLES#; //samples on the first ring",
-		"const int rings = #RINGS#; //ring count",
+		"const int samples = SAMPLES; //samples on the first ring",
+		"const int rings = RINGS; //ring count",
 
 		"const int maxringsamples = rings * samples;",
 
@@ -371,35 +373,6 @@ THREE.BokehShader = {
 			"gl_FragColor.a = 1.0;",
 		"} "
 
-	].join("\n"),
-
-	generate: function(rings, samples) {
-
-		var frag = THREE.BokehShader.fragmentShader;
-		frag = frag
-			.replace(/#RINGS#/, rings)
-			.replace(/#SAMPLES#/, samples);
-
-		/*
-		var unboxing = false;
-		if (unboxing) {
-			var codegen = [];
-			for (var i=1;i<=rings;i++) {
-				var ringsamples = i * samples;
-				var a = 'if (i==?) {'.replace('?', i);
-				codegen.push( i == 1 ? a : '  ' + a); //else
-				codegen.push('for (int j = 0 ; j < ?; j++) '.replace('?', ringsamples));
-				codegen.push('\ts += gather(float(i), float(j), ?, col, w, h, blur);'.replace('?', ringsamples))
-				codegen.push('}');
-			}
-
-			codegen = codegen.join('\n');
-
-			frag = frag.replace(/\/[*]unboxstart[*]\/([\s\S]*)\/[*]unboxend[*]\//m, codegen);
-		}
-		*/
-
-		return frag;
-	}
+	].join("\n")
 
 };

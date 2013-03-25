@@ -432,7 +432,6 @@ Use WEBGL Depth buffer support?
 				postprocessing.rtTextureColor = new THREE.WebGLRenderTarget( window.innerWidth, height, pars );
 
 
-				var fragmentShader = THREE.BokehShader.generate(shaderSettings.rings, shaderSettings.samples);
 
 				var bokeh_shader = THREE.BokehShader;
 
@@ -449,7 +448,11 @@ Use WEBGL Depth buffer support?
 
 					uniforms: postprocessing.bokeh_uniforms,
 					vertexShader: bokeh_shader.vertexShader,
-					fragmentShader: fragmentShader
+					fragmentShader: bokeh_shader.fragmentShader,
+					defines: {
+						RINGS: shaderSettings.rings,
+						SAMPLES: shaderSettings.samples
+					}
 
 				} );
 
@@ -460,9 +463,9 @@ Use WEBGL Depth buffer support?
 			}
 
 			function shaderUpdate() {
-				var fragmentShader = THREE.BokehShader.generate(shaderSettings.rings, shaderSettings.samples);
+				postprocessing.materialBokeh.defines.RINGS = shaderSettings.rings;
+				postprocessing.materialBokeh.defines.SAMPLES = shaderSettings.samples;
 
-				postprocessing.materialBokeh.fragmentShader = fragmentShader;
 				postprocessing.materialBokeh.needsUpdate = true;
 
 			}
