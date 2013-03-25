@@ -441,6 +441,8 @@ THREE.Object3D.prototype = {
 
 		object.frustumCulled = this.frustumCulled;
 
+		object.userData = JSON.parse( JSON.stringify( this.userData ) );
+
 		for ( var i = 0; i < this.children.length; i ++ ) {
 
 			var child = this.children[ i ];
