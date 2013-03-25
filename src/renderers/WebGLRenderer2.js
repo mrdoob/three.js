@@ -1321,7 +1321,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_lightsNeedUpdate = true;
 			renderer.resetState();
 
-			plugins[ i ].render( scene, camera, renderer.getCurrentWidth(), renderer.getCurrentWidth() );
+			plugins[ i ].render( scene, camera, renderer.getCurrentWidth(), renderer.getCurrentHeight() );
 
 			// reset state after plugin (anything could have changed)
 
