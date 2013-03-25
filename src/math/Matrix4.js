@@ -425,18 +425,10 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	crossVector: function ( a ) {
+	crossVector: function ( vector ) {
 
-		var te = this.elements;
-		var v = new THREE.Vector4();
-
-		v.x = te[0] * a.x + te[4] * a.y + te[8] * a.z + te[12] * a.w;
-		v.y = te[1] * a.x + te[5] * a.y + te[9] * a.z + te[13] * a.w;
-		v.z = te[2] * a.x + te[6] * a.y + te[10] * a.z + te[14] * a.w;
-
-		v.w = ( a.w ) ? te[3] * a.x + te[7] * a.y + te[11] * a.z + te[15] * a.w : 1;
-
-		return v;
+		console.warn( 'DEPRECATED: Matrix4\'s .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
 
 	},
 
