@@ -16,6 +16,8 @@ var Viewport = function ( signals ) {
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
 
+	var modifierAxis = new THREE.Vector3( 1, 1, 1 );
+
 	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true, fog: false } ) );
 	selectionBox.matrixAutoUpdate = false;
 	selectionBox.visible = false;
@@ -46,7 +48,7 @@ var Viewport = function ( signals ) {
 
 	// object picking
 
-	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000, 8, 8 ) );
+	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 5000, 5000, 8, 8 ) );
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
 
@@ -134,9 +136,12 @@ var Viewport = function ( signals ) {
 
 		if ( intersects.length > 0 ) {
 
-			intersects[ 0 ].point.sub( offset );
+			var point = intersects[ 0 ].point.sub( offset );
 
-			selected.position.copy( intersects[ 0 ].point );
+			selected.position.x = modifierAxis.x === 1 ? point.x : intersectionPlane.position.x;
+			selected.position.y = modifierAxis.y === 1 ? point.y : intersectionPlane.position.y;
+			selected.position.z = modifierAxis.z === 1 ? point.z : intersectionPlane.position.z;
+
 			signals.objectChanged.dispatch( selected );
 
 			render();
@@ -235,6 +240,12 @@ var Viewport = function ( signals ) {
 	} );
 
 	// signals
+
+	signals.modifierAxisChanged.add( function ( axis ) {
+
+		modifierAxis.copy( axis );
+
+	} );
 
 	signals.rendererChanged.add( function ( object ) {
 
