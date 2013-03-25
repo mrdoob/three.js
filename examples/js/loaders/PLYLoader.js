@@ -36,8 +36,7 @@ THREE.PLYLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-            var geometry;
-            geometry = scope.parse( event.target.response );
+			var geometry = scope.parse( event.target.response );
 
 			scope.dispatchEvent( { type: 'load', content: geometry } );
 
@@ -70,7 +69,7 @@ THREE.PLYLoader.prototype = {
 		for(var i = 0; i < buf.byteLength; i++) {
 			str += String.fromCharCode(array_buffer[i]); // implicitly assumes little-endian
 		}
-		
+
 		return str;
 
 	},
@@ -79,23 +78,28 @@ THREE.PLYLoader.prototype = {
 
 		// currently only supports ASCII encoded files.
 		return true;
-		
-    },
 
-	parse: function (buf) {
+	},
 
-		if( this.isASCII(buf) )	{
-			var str = this.bin2str(buf);
-			return this.parseASCII(str);
+	parse: function ( data ) {
+
+		if ( data instanceof ArrayBuffer ) {
+
+			return this.isASCII( data )
+				? this.parseASCII( this.bin2str( data ) )
+				: this.parseBinary( data );
+
 		} else {
-			return this.parseBinary(buf);
+
+			return this.parseASCII( data );
+
 		}
 
-    },
+	},
 
 	parseASCII: function ( data ) {
 
-		// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)	
+		// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)
 
 		var geometry = new THREE.Geometry();
 
@@ -106,13 +110,13 @@ THREE.PLYLoader.prototype = {
 		if ( ( result = patternHeader.exec( data ) ) != null ) {
 			header = result [ 1 ];
 		}
-		
+
 		var patternBody = /end_header([\s\S]*)$/;
 		var body = "";
 		if ( ( result = patternBody.exec( data ) ) != null ) {
 			body = result [ 1 ];
 		}
-		
+
 		var patternVertexCount = /element[\s]+vertex[\s]+(\d+)/g;
 		var vertexCount = 0;
 		if ( ( result = patternVertexCount.exec( header ) ) != null ) {
@@ -124,9 +128,9 @@ THREE.PLYLoader.prototype = {
 		if ( ( result = patternFaceCount.exec( header ) ) != null ) {
 			faceCount = parseInt( result[ 1 ] );
 		}
-		
+
 		if ( vertexCount != 0 && faceCount != 0 ) {
-			// Vertex			
+			// Vertex
 			// assume x y z
 			var patternVertex = /([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
 			for ( var i = 0; i < vertexCount; i++) {
@@ -137,7 +141,7 @@ THREE.PLYLoader.prototype = {
 					return geometry;
 				}
 			}
-			
+
 			// Face
 			// assume 3 index0 index1 index2
 			var patternFace = /3[\s]+([-+]?[0-9]+)[\s]+([-+]?[0-9]+)[\s]+([-+]?[0-9]+)/g;
@@ -149,7 +153,7 @@ THREE.PLYLoader.prototype = {
 					return geometry;
 				}
 			}
-			
+
 		} else {
 			console.error( 'Header error: vertexCount(' + vertexCount + '), faceCount(' + faceCount + ').' );
 		}
@@ -165,7 +169,7 @@ THREE.PLYLoader.prototype = {
 
 		// not supported yet
 		console.error('Not supported yet.');
-		
+
 	}
 
 
