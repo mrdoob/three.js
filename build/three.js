@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '57' };
+var THREE = THREE || { REVISION: '58dev' };
 
 self.console = self.console || {
 
@@ -4074,18 +4074,10 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	crossVector: function ( a ) {
+	crossVector: function ( vector ) {
 
-		var te = this.elements;
-		var v = new THREE.Vector4();
-
-		v.x = te[0] * a.x + te[4] * a.y + te[8] * a.z + te[12] * a.w;
-		v.y = te[1] * a.x + te[5] * a.y + te[9] * a.z + te[13] * a.w;
-		v.z = te[2] * a.x + te[6] * a.y + te[10] * a.z + te[14] * a.w;
-
-		v.w = ( a.w ) ? te[3] * a.x + te[7] * a.y + te[11] * a.z + te[15] * a.w : 1;
-
-		return v;
+		console.warn( 'DEPRECATED: Matrix4\'s .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
 
 	},
 
@@ -6222,13 +6214,45 @@ THREE.Object3D.prototype = {
 
 	}(),
 
-	translate: function () {
+	rotateOnAxis: function() {
+
+		// rotate object on axis in object space
+		// axis is assumed to be normalized
+
+		var q1 = new THREE.Quaternion();
+		var q2 = new THREE.Quaternion();
+
+		return function ( axis, angle ) {
+
+			q1.setFromAxisAngle( axis, angle );
+
+			if ( this.useQuaternion === true ) {
+
+				this.quaternion.multiply( q1 );
+
+			} else {
+
+				q2.setFromEuler( this.rotation, this.eulerOrder );
+				q2.multiply( q1 );
+
+				this.rotation.setEulerFromQuaternion( q2, this.eulerOrder );
+
+			}
+
+			return this;
+
+		}
+
+	}(),
+
+	translateOnAxis: function () {
+
+		// translate object by distance along axis in object space
+		// axis is assumed to be normalized
 
 		var v1 = new THREE.Vector3();
 
-		return function ( distance, axis ) {
-
-			// axis is assumed to be normalized
+		return function ( axis, distance ) {
 
 			v1.copy( axis );
 
@@ -6242,15 +6266,20 @@ THREE.Object3D.prototype = {
 
 			}
 
-			v1.multiplyScalar( distance );
-
-			this.position.add( v1 );
+			this.position.add( v1.multiplyScalar( distance ) );
 
 			return this;
 
-		};
+		}
 
 	}(),
+
+	translate: function ( distance, axis ) {
+
+		console.warn( 'DEPRECATED: Object3D\'s .translate() has been removed. Use .translateOnAxis( axis, distance ) instead. Note args have been changed.' );
+		return this.translateOnAxis( axis, distance );
+
+	},
 
 	translateX: function () {
 
@@ -6258,7 +6287,7 @@ THREE.Object3D.prototype = {
 
 		return function ( distance ) {
 
-			return this.translate( distance, v1 );
+			return this.translateOnAxis( v1, distance );
 
 		};
 
@@ -6270,7 +6299,7 @@ THREE.Object3D.prototype = {
 
 		return function ( distance ) {
 
-			return this.translate( distance, v1 );
+			return this.translateOnAxis( v1, distance );
 
 		};
 
@@ -6282,7 +6311,7 @@ THREE.Object3D.prototype = {
 
 		return function ( distance ) {
 
-			return this.translate( distance, v1 );
+			return this.translateOnAxis( v1, distance );
 
 		};
 
