@@ -1,7 +1,7 @@
 /**
- * @author clockworkgeek / https://github.com/clockworkgeek
- * @author timothypratley / https://github.com/timothypratley
- */
+* @author clockworkgeek / https://github.com/clockworkgeek
+* @author timothypratley / https://github.com/timothypratley
+*/
 
 THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
@@ -20,11 +20,17 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	var midpoints = [], p = this.vertices;
 
+	var f = []
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-		make( p[ faces[ i ][ 0 ] ], p[ faces[ i ][ 1 ] ], p[ faces[ i ][ 2 ] ], detail );
-
+		var v1 = p[ faces[ i ][ 0 ] ];
+		var v2 = p[ faces[ i ][ 1 ] ];
+		var v3 = p[ faces[ i ][ 2 ] ];
+	  f[ i ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
 	}
+
+	for ( var i = 0, l = f.length; i < l; i ++ ) {
+	subdivide(f[ i ], detail);
+}
 
 	this.mergeVertices();
 
@@ -57,55 +63,66 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	// Approximate a curved face with recursively sub-divided triangles.
 
-	function make( v1, v2, v3, detail ) {
+	function make( v1, v2, v3 ) {
+		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+		face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
+		face.normal = face.centroid.clone().normalize();
+		that.faces.push( face );
 
-		if ( detail < 1 ) {
-
-			var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
-			face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
-			face.normal = face.centroid.clone().normalize();
-			that.faces.push( face );
-
-			var azi = azimuth( face.centroid );
-			that.faceVertexUvs[ 0 ].push( [
-				correctUV( v1.uv, v1, azi ),
-				correctUV( v2.uv, v2, azi ),
-				correctUV( v3.uv, v3, azi )
-			] );
-
-		} else {
-
-			detail -= 1;
-
-			// split triangle into 4 smaller triangles
-
-			make( v1, midpoint( v1, v2 ), midpoint( v1, v3 ), detail ); // top quadrant
-			make( midpoint( v1, v2 ), v2, midpoint( v2, v3 ), detail ); // left quadrant
-			make( midpoint( v1, v3 ), midpoint( v2, v3 ), v3, detail ); // right quadrant
-			make( midpoint( v1, v2 ), midpoint( v2, v3 ), midpoint( v1, v3 ), detail ); // center quadrant
-
-		}
-
+		var azi = azimuth( face.centroid );
+		that.faceVertexUvs[ 0 ].push( [
+			correctUV( v1.uv, v1, azi ),
+			correctUV( v2.uv, v2, azi ),
+			correctUV( v3.uv, v3, azi )
+		] );
 	}
 
-	function midpoint( v1, v2 ) {
 
-		if ( !midpoints[ v1.index ] ) midpoints[ v1.index ] = [];
-		if ( !midpoints[ v2.index ] ) midpoints[ v2.index ] = [];
 
-		var mid = midpoints[ v1.index ][ v2.index ];
+	// Analytically subdivide a face to the required detail level.
 
-		if ( mid === undefined ) {
+	function subdivide(face, detail ) {
+		var cols = Math.pow(2, detail);
+		var cells = Math.pow(4, detail);
+		var a = prepare( that.vertices[ face.a ] );
+		var b = prepare( that.vertices[ face.b ] );
+		var c = prepare( that.vertices[ face.c ] );
+		var v = [];
 
-			// generate mean point and project to surface with prepare()
+		// Construct all of the vertices for this subdivision.
 
-			midpoints[ v1.index ][ v2.index ] = midpoints[ v2.index ][ v1.index ] = mid = prepare(
-				new THREE.Vector3().addVectors( v1, v2 ).divideScalar( 2 )
-			);
+		for ( var i = 0 ; i <= cols; i ++ ) {
+			v[ i ] = [];
+			var aj = prepare( a.clone().lerp( c, i / cols ) );
+			var bj = prepare( b.clone().lerp( c, i / cols ) );
+			var rows = cols - i;
+			for ( var j = 0; j <= rows; j ++) {
+				if ( j == 0 && i == cols ) {
+					v[ i ][ j ] = aj;
+				} else {
+					v[ i ][ j ] = prepare( aj.clone().lerp( bj, j / rows ) );
+				}
+			}
 		}
 
-		return mid;
+		// Construct all of the faces.
 
+		for ( var i = 0; i < cols ; i ++ ) {
+			for ( var j = 0; j < 2 * (cols - i) - 1; j ++ ) {
+				var k = Math.floor( j / 2 );
+				if ( j % 2 == 0 ) {
+					make(
+            v[ i ][ k + 1],
+            v[ i + 1 ][ k ], 
+            v[ i ][ k ]);
+				} else {
+					make(
+						v[ i ][ k + 1 ],
+						v[ i + 1][ k + 1],
+						v[ i + 1 ][ k ]);
+				}
+			}
+		}
 	}
 
 
@@ -139,7 +156,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	this.computeCentroids();
 
-    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 
