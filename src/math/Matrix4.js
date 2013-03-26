@@ -920,18 +920,9 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
 
-		var te = this.elements;
-
 		this.makeRotationFromQuaternion( quaternion );
-	
-		var sx = scale.x, sy = scale.y, sz = scale.z;
-		te[0] *= sx; te[4] *= sy; te[8] *= sz;
-		te[1] *= sx; te[5] *= sy; te[9] *= sz;
-		te[2] *= sx; te[6] *= sy; te[10] *= sz;
-		
-		te[12] = position.x;
-		te[13] = position.y;
-		te[14] = position.z;
+		this.scale( scale );
+		this.setPosition( position );
 
 		return this;
 
@@ -939,18 +930,9 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
 
-		var te = this.elements;
-
 		this.makeRotationFromEuler( rotation, eulerOrder );
-	
-		var sx = scale.x, sy = scale.y, sz = scale.z;
-		te[0] *= sx; te[4] *= sy; te[8] *= sz;
-		te[1] *= sx; te[5] *= sy; te[9] *= sz;
-		te[2] *= sx; te[6] *= sy; te[10] *= sz;
-		
-		te[12] = position.x;
-		te[13] = position.y;
-		te[14] = position.z;
+		this.scale( scale );
+		this.setPosition( position );
 
 		return this;
 
