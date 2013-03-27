@@ -20,17 +20,22 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	var midpoints = [], p = this.vertices;
 
-	var f = []
+	var f = [];
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
 		var v1 = p[ faces[ i ][ 0 ] ];
 		var v2 = p[ faces[ i ][ 1 ] ];
 		var v3 = p[ faces[ i ][ 2 ] ];
-	  f[ i ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+
+		f[ i ] = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
+
 	}
 
 	for ( var i = 0, l = f.length; i < l; i ++ ) {
-	subdivide(f[ i ], detail);
-}
+
+		subdivide(f[ i ], detail);
+
+	}
 
 	this.mergeVertices();
 
@@ -64,24 +69,27 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	// Approximate a curved face with recursively sub-divided triangles.
 
 	function make( v1, v2, v3 ) {
+
 		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
 		face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
 		face.normal.copy( face.centroid ).normalize();
 		that.faces.push( face );
 
 		var azi = azimuth( face.centroid );
+
 		that.faceVertexUvs[ 0 ].push( [
 			correctUV( v1.uv, v1, azi ),
 			correctUV( v2.uv, v2, azi ),
 			correctUV( v3.uv, v3, azi )
 		] );
-	}
 
+	}
 
 
 	// Analytically subdivide a face to the required detail level.
 
 	function subdivide(face, detail ) {
+
 		var cols = Math.pow(2, detail);
 		var cells = Math.pow(4, detail);
 		var a = prepare( that.vertices[ face.a ] );
@@ -92,37 +100,59 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		// Construct all of the vertices for this subdivision.
 
 		for ( var i = 0 ; i <= cols; i ++ ) {
+
 			v[ i ] = [];
+
 			var aj = prepare( a.clone().lerp( c, i / cols ) );
 			var bj = prepare( b.clone().lerp( c, i / cols ) );
 			var rows = cols - i;
+
 			for ( var j = 0; j <= rows; j ++) {
+
 				if ( j == 0 && i == cols ) {
+
 					v[ i ][ j ] = aj;
+
 				} else {
+
 					v[ i ][ j ] = prepare( aj.clone().lerp( bj, j / rows ) );
+
 				}
+
 			}
+
 		}
 
 		// Construct all of the faces.
 
 		for ( var i = 0; i < cols ; i ++ ) {
+
 			for ( var j = 0; j < 2 * (cols - i) - 1; j ++ ) {
+
 				var k = Math.floor( j / 2 );
+
 				if ( j % 2 == 0 ) {
+
 					make(
-            v[ i ][ k + 1],
-            v[ i + 1 ][ k ], 
-            v[ i ][ k ]);
+						v[ i ][ k + 1],
+						v[ i + 1 ][ k ],
+						v[ i ][ k ]
+					);
+
 				} else {
+
 					make(
 						v[ i ][ k + 1 ],
 						v[ i + 1][ k + 1],
-						v[ i + 1 ][ k ]);
+						v[ i + 1 ][ k ]
+					);
+
 				}
+
 			}
+
 		}
+
 	}
 
 
