@@ -134,37 +134,12 @@ Sidebar.Scene = function ( signals ) {
 
 		var type = fogType.getValue();
 
-		if ( type === "None" ) {
+		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
 
-			fogColorRow.setDisplay( 'none' );
+		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
 
-		} else {
-
-			fogColorRow.setDisplay( '' );
-
-		}
-
-		if ( type === "Fog" ) {
-
-			fogNearRow.setDisplay( '' );
-			fogFarRow.setDisplay( '' );
-
-		} else {
-
-			fogNearRow.setDisplay( 'none' );
-			fogFarRow.setDisplay( 'none' );
-
-		}
-
-		if ( type === "FogExp2" ) {
-
-			fogDensityRow.setDisplay( '' );
-
-		} else {
-
-			fogDensityRow.setDisplay( 'none' );
-
-		}
+		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
 
 	}
 
