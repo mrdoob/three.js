@@ -1,7 +1,7 @@
 /**
-* @author clockworkgeek / https://github.com/clockworkgeek
-* @author timothypratley / https://github.com/timothypratley
-*/
+ * @author clockworkgeek / https://github.com/clockworkgeek
+ * @author timothypratley / https://github.com/timothypratley
+ */
 
 THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
@@ -66,7 +66,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 	function make( v1, v2, v3 ) {
 		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
 		face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
-		face.normal = face.centroid.clone().normalize();
+		face.normal.copy( face.centroid ).normalize();
 		that.faces.push( face );
 
 		var azi = azimuth( face.centroid );
