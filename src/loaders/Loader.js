@@ -312,6 +312,9 @@ THREE.Loader.prototype = {
 			mpars.ambient = rgb2hex( m.colorAmbient );
 
 		}
+                if (m.emissive !== undefined) {
+		    mpars.emissive = rgb2hex(m.emissive);		    
+		}
 
 		// modifiers
 
