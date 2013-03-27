@@ -135,10 +135,8 @@ Sidebar.Scene = function ( signals ) {
 		var type = fogType.getValue();
 
 		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
-
 		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
 		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
-
 		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
 
 	}
@@ -163,19 +161,19 @@ Sidebar.Scene = function ( signals ) {
 
 		var options = {};
 
-		( function createList( object, pad ) {
+		( function addObjects( objects, pad ) {
 
-			for ( var key in object.children ) {
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-				var child = object.children[ key ];
+				var object = objects[ i ];
 
-				options[ child.id ] = pad + child.name + ' <span style="color: #aaa">- ' + getObjectType( child ) + '</span>';
+				options[ object.id ] = pad + object.name + ' <span style="color: #aaa">- ' + getObjectType( object ) + '</span>';
 
-				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
+				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
 
 			}
 
-		} )( scene, '' );
+		} )( scene.children, '' );
 
 		outliner.setOptions( options );
 
