@@ -540,17 +540,29 @@
 
 			//
 
+			document.addEventListener( 'keydown', function ( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 46: // delete
+
+						signals.removeSelectedObject.dispatch();
+
+						break;
+
+				}
+
+			}, false );
+
 			var onWindowResize = function ( event ) {
 
 				signals.windowResize.dispatch();
 
 			};
 
-			//
+			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
-
-			window.addEventListener( 'resize', onWindowResize, false );
 
 		</script>
 	</body>

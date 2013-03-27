@@ -1,18 +1,5 @@
 Sidebar.Scene = function ( signals ) {
 
-	var objectTypes = {
-
-		'PerspectiveCamera': THREE.PerspectiveCamera,
-		'AmbientLight': THREE.AmbientLight,
-		'DirectionalLight': THREE.DirectionalLight,
-		'HemisphereLight': THREE.HemisphereLight,
-		'PointLight': THREE.PointLight,
-		'SpotLight': THREE.SpotLight,
-		'Mesh': THREE.Mesh,
-		'Object3D': THREE.Object3D
-
-	};
-
 	var selected = null;
 
 	var container = new UI.Panel();
@@ -96,9 +83,23 @@ Sidebar.Scene = function ( signals ) {
 
 	function getObjectType( object ) {
 
-		for ( var type in objectTypes ) {
+		var objects = {
 
-			if ( object instanceof objectTypes[ type ] ) return type;
+			'Scene': THREE.Scene,
+			'PerspectiveCamera': THREE.PerspectiveCamera,
+			'AmbientLight': THREE.AmbientLight,
+			'DirectionalLight': THREE.DirectionalLight,
+			'HemisphereLight': THREE.HemisphereLight,
+			'PointLight': THREE.PointLight,
+			'SpotLight': THREE.SpotLight,
+			'Mesh': THREE.Mesh,
+			'Object3D': THREE.Object3D
+
+		};
+
+		for ( var type in objects ) {
+
+			if ( object instanceof objects[ type ] ) return type;
 
 		}
 
@@ -161,6 +162,8 @@ Sidebar.Scene = function ( signals ) {
 
 		var options = {};
 
+		options[ scene.id ] = scene.name + ' <span style="color: #aaa">- ' + getObjectType( scene ) + '</span>';
+
 		( function addObjects( objects, pad ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
@@ -173,7 +176,7 @@ Sidebar.Scene = function ( signals ) {
 
 			}
 
-		} )( scene.children, '' );
+		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
 
 		outliner.setOptions( options );
 

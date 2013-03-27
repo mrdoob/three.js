@@ -196,26 +196,6 @@ var Viewport = function ( signals ) {
 
 	};
 
-	var onKeyDown = function ( event ) {
-
-		switch ( event.keyCode ) {
-
-			case 27: // esc
-
-				signals.toggleHelpers.dispatch();
-
-				break;
-
-			case 46: // delete
-
-				signals.removeSelectedObject.dispatch();
-
-				break;
-
-		}
-
-	};
-
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'click', onClick, false );
 
@@ -389,11 +369,13 @@ var Viewport = function ( signals ) {
 
 	signals.removeSelectedObject.add( function () {
 
-		if ( selected === camera ) return;
+		if ( selected.parent === undefined ) return;
 
 		var name = selected.name ?  '"' + selected.name + '"': "selected object";
 
 		if ( confirm( 'Delete ' + name + '?' ) === false ) return;
+
+		var parent = selected.parent;
 
 		if ( selected instanceof THREE.Light ) {
 
@@ -435,7 +417,7 @@ var Viewport = function ( signals ) {
 		}
 
 		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( null );
+		signals.objectSelected.dispatch( parent );
 
 	} );
 
@@ -569,13 +551,6 @@ var Viewport = function ( signals ) {
 	container.dom.appendChild( renderer.domElement );
 
 	animate();
-
-	// set up for hotkeys
-	// must be done here, otherwise it doesn't work
-
-	container.dom.tabIndex = 1;
-	container.dom.style.outline = 'transparent';
-	container.dom.addEventListener( 'keydown', onKeyDown, false );
 
 	// must come after listeners are registered
 
