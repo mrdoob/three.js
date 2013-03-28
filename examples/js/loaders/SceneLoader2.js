@@ -44,10 +44,6 @@ THREE.SceneLoader2.prototype = {
 
 	parse: function ( json ) {
 
-		// console.log( json );
-
-		var scene = new THREE.Scene();
-
 		// geometries
 
 		var geometries = [];
@@ -177,102 +173,105 @@ THREE.SceneLoader2.prototype = {
 
 		// objects
 
-		var parseObject = function ( array, parent ) {
+		var parseObject = function ( data ) {
 
-			for ( var i = 0, l = array.length; i < l; i ++ ) {
+			var object;
 
-				var object;
-				var data = array[ i ];
+			switch ( data.type ) {
 
-				switch ( data.type ) {
+				case 'Scene':
 
-					case 'PerspectiveCamera':
+					object = new THREE.Scene();
 
-						object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-						object.position.fromArray( data.position );
-						object.rotation.fromArray( data.rotation );
+					break;
 
-						break;
+				case 'PerspectiveCamera':
 
-					case 'OrthographicCamera':
+					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
 
-						object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-						object.position.fromArray( data.position );
-						object.rotation.fromArray( data.rotation );
+					break;
 
-						break;
+				case 'OrthographicCamera':
 
-					case 'AmbientLight':
+					object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
 
-						object = new THREE.AmbientLight( data.color );
+					break;
 
-						break;
+				case 'AmbientLight':
 
-					case 'DirectionalLight':
+					object = new THREE.AmbientLight( data.color );
 
-						object = new THREE.DirectionalLight( data.color, data.intensity );
-						object.position.fromArray( data.position );
+					break;
 
-						break;
+				case 'DirectionalLight':
 
-					case 'PointLight':
+					object = new THREE.DirectionalLight( data.color, data.intensity );
+					object.position.fromArray( data.position );
 
-						object = new THREE.PointLight( data.color, data.intensity );
-						object.position.fromArray( data.position );
+					break;
 
-						break;
+				case 'PointLight':
 
-					case 'SpotLight':
+					object = new THREE.PointLight( data.color, data.intensity );
+					object.position.fromArray( data.position );
 
-						object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
-						object.position.fromArray( data.position );
+					break;
 
-						break;
+				case 'SpotLight':
 
-					case 'HemisphereLight':
+					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
+					object.position.fromArray( data.position );
 
-						object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
-						object.position.fromArray( data.position );
+					break;
 
-						break;
+				case 'HemisphereLight':
 
-					case 'Mesh':
+					object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
+					object.position.fromArray( data.position );
 
-						object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
-						object.position.fromArray( data.position );
-						object.rotation.fromArray( data.rotation );
-						object.scale.fromArray( data.scale );
+					break;
 
-						break;
+				case 'Mesh':
 
-					default:
+					object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
+					object.scale.fromArray( data.scale );
 
-						object = new THREE.Object3D();
-						object.position.fromArray( data.position );
-						object.rotation.fromArray( data.rotation );
-						object.scale.fromArray( data.scale );
+					break;
 
-				}
+				default:
 
-				if ( data.name !== undefined ) object.name = data.name;
-				if ( data.visible !== undefined ) object.visible = data.visible;
-				if ( data.userData !== undefined ) object.userData = data.userData;
+					object = new THREE.Object3D();
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
+					object.scale.fromArray( data.scale );
 
-				parent.add( object );
+			}
 
-				if ( data.children !== undefined ) {
+			if ( data.name !== undefined ) object.name = data.name;
+			if ( data.visible !== undefined ) object.visible = data.visible;
+			if ( data.userData !== undefined ) object.userData = data.userData;
 
-					parseObject( data.children, object );
+			if ( data.children !== undefined ) {
+
+				for ( var i = 0, l = data.children.length; i < l; i ++ ) {
+
+					object.add( parseObject( data.children[ i ] ) );
 
 				}
 
 			}
 
+			return object;
+
 		}
 
-		parseObject( json.scene, scene );
-
-		return scene;
+		return parseObject( json.scene );
 
 	}
 

@@ -157,12 +157,15 @@ THREE.SceneExporter2.prototype = {
 
 			var data = {};
 
-			if ( object.name !== "" ) data.name = object.name;
+			if ( object.name !== '' ) data.name = object.name;
+			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
 			if ( object.visible !== true ) data.visible = object.visible;
 
-			data.userData = object.userData;
+			if ( object instanceof THREE.Scene ) {
 
-			if ( object instanceof THREE.PerspectiveCamera ) {
+				data.type = 'Scene';
+
+			} else if ( object instanceof THREE.PerspectiveCamera ) {
 
 				data.type = 'PerspectiveCamera';
 				data.fov = object.fov;
@@ -256,7 +259,7 @@ THREE.SceneExporter2.prototype = {
 
 		}
 
-		output.scene = parseObject( scene ).children;
+		output.scene = parseObject( scene );
 
 		return output;
 
