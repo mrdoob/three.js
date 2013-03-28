@@ -7,7 +7,7 @@ THREE.GeometryUtils = {
 
 	// Merge two geometries or geometry and geometry from object (using object's transform)
 
-	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
+	merge: function ( geometry1, object2 /* mesh | geometry */, materialOffset ) {
 
 		var matrix, normalMatrix,
 		vertexOffset = geometry1.vertices.length,
@@ -19,6 +19,8 @@ THREE.GeometryUtils = {
 		faces2 = geometry2.faces,
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
+
+		materialOffset = materialOffset !== undefined ? materialOffset : 0;
 
 		if ( object2 instanceof THREE.Mesh ) {
 
@@ -95,7 +97,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			faceCopy.materialIndex = face.materialIndex;
+			faceCopy.materialIndex = face.materialIndex + materialOffset;
 
 			faceCopy.centroid.copy( face.centroid );
 
