@@ -9734,16 +9734,22 @@ THREE.JSONLoader = function ( showStatus ) {
 
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
 
-THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
+THREE.JSONLoader.prototype.load = function ( url, callback, texturePath, callbackProgress ) {
 
 	var scope = this;
 
 	// todo: unify load API to for easier SceneLoader use
 
 	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
+	var _callbackProgress = function (){ return scope.updateProgress.apply(scope, arguments)};
+	
+	if (typeof callbackProgress !== "undefined") {
+	    alert(typeof callbackProgress);
+	    _callbackProgress = function () { return callbackProgress.apply(scope, arguments); }
+	}
 
 	this.onLoadStart();
-	this.loadAjaxJSON( this, url, callback, texturePath );
+	this.loadAjaxJSON( this, url, callback, texturePath, _callbackProgress );
 
 };
 
@@ -9752,7 +9758,7 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 	var xhr = new XMLHttpRequest();
 
 	var length = 0;
-
+	
 	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState === xhr.DONE ) {
@@ -9792,7 +9798,6 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 					length = xhr.getResponseHeader( "Content-Length" );
 
 				}
-
 				callbackProgress( { total: length, loaded: xhr.responseText.length } );
 
 			}
