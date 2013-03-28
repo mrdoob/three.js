@@ -255,7 +255,7 @@ Sidebar.Object3D = function ( signals ) {
 
 				if ( selected.parent.id !== newParentId && selected.id !== newParentId ) {
 
-					var parent = scene.getObjectById( newParentId );
+					var parent = scene.getObjectById( newParentId, true );
 
 					if ( parent === undefined ) {
 
