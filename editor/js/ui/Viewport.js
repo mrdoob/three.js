@@ -61,7 +61,7 @@ var Viewport = function ( signals ) {
 	//
 
 	var picked = null;
-	var selected = camera;
+	var selected = null;
 
 	// events
 
@@ -551,10 +551,6 @@ var Viewport = function ( signals ) {
 	container.dom.appendChild( renderer.domElement );
 
 	animate();
-
-	// must come after listeners are registered
-
-	signals.sceneChanged.dispatch( scene );
 
 	//
 
