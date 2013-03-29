@@ -13,16 +13,21 @@ THREE.JSONLoader = function ( showStatus ) {
 
 THREE.JSONLoader.prototype = Object.create( THREE.Loader.prototype );
 
-THREE.JSONLoader.prototype.load = function ( url, callback, texturePath ) {
+THREE.JSONLoader.prototype.load = function ( url, callback, texturePath, callbackProgress ) {
 
 	var scope = this;
 
 	// todo: unify load API to for easier SceneLoader use
 
 	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
+        if (typeof callbackProgress !== "undefined") {
+            var _callbackProgress = function () { return callbackProgress.apply(scope, arguments); }
+        } else {
+            var _callbackProgress = function (){ return scope.updateProgress.apply(scope, arguments)};
+        }
 
 	this.onLoadStart();
-	this.loadAjaxJSON( this, url, callback, texturePath );
+	this.loadAjaxJSON( this, url, callback, texturePath, _callbackProgress );
 
 };
 
