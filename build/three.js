@@ -5847,11 +5847,17 @@ THREE.extend( THREE.Clock.prototype, {
  * https://github.com/mrdoob/eventdispatcher.js/
  */
 
-THREE.EventDispatcher = function () {
+THREE.EventDispatcher = function () {}
 
-	var listeners = {};
+THREE.EventDispatcher.prototype = {
 
-	this.addEventListener = function ( type, listener ) {
+	constructor: THREE.EventDispatcher,
+
+	addEventListener: function ( type, listener ) {
+
+		if ( this._listeners === undefined ) this._listeners = {};
+
+		var listeners = this._listeners;
 
 		if ( listeners[ type ] === undefined ) {
 
@@ -5865,10 +5871,29 @@ THREE.EventDispatcher = function () {
 
 		}
 
-	};
+	},
 
-	this.removeEventListener = function ( type, listener ) {
+	hasEventListener: function ( type, listener ) {
 
+		if ( this._listeners === undefined ) return false;
+
+		var listeners = this._listeners;
+
+		if ( listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1 ) {
+
+			return true;
+
+		}
+
+		return false;
+
+	},
+
+	removeEventListener: function ( type, listener ) {
+
+		if ( this._listeners === undefined ) return;
+
+		var listeners = this._listeners;
 		var index = listeners[ type ].indexOf( listener );
 
 		if ( index !== - 1 ) {
@@ -5877,10 +5902,13 @@ THREE.EventDispatcher = function () {
 
 		}
 
-	};
+	},
 
-	this.dispatchEvent = function ( event ) {
+	dispatchEvent: function ( event ) {
 
+		if ( this._listeners === undefined ) return;
+
+		var listeners = this._listeners;
 		var listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
@@ -5895,7 +5923,7 @@ THREE.EventDispatcher = function () {
 
 		}
 
-	};
+	}
 
 };
 /**
@@ -7405,8 +7433,6 @@ THREE.Face4.prototype = {
 
 THREE.Geometry = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.id = THREE.GeometryIdCount ++;
 
 	this.name = '';
@@ -8196,14 +8222,14 @@ THREE.Geometry.prototype = {
 
 };
 
+THREE.extend( THREE.Geometry.prototype, THREE.EventDispatcher.prototype );
+
 THREE.GeometryIdCount = 0;
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.BufferGeometry = function () {
-
-	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.GeometryIdCount ++;
 
@@ -8234,7 +8260,7 @@ THREE.BufferGeometry = function () {
 
 THREE.BufferGeometry.prototype = {
 
-	constructor : THREE.BufferGeometry,
+	constructor: THREE.BufferGeometry,
 
 	applyMatrix: function ( matrix ) {
 
@@ -8710,7 +8736,7 @@ THREE.BufferGeometry.prototype = {
 			test = tmp2.dot( tan2[ v ] );
 			w = ( test < 0.0 ) ? -1.0 : 1.0;
 
-			tangents[ v * 4 ] 	  = tmp.x;
+			tangents[ v * 4 ]     = tmp.x;
 			tangents[ v * 4 + 1 ] = tmp.y;
 			tangents[ v * 4 + 2 ] = tmp.z;
 			tangents[ v * 4 + 3 ] = w;
@@ -8750,6 +8776,7 @@ THREE.BufferGeometry.prototype = {
 
 };
 
+THREE.extend( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -9651,41 +9678,35 @@ THREE.Loader.prototype = {
 
 THREE.ImageLoader = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.crossOrigin = null;
 
 };
 
-THREE.ImageLoader.prototype = {
+THREE.ImageLoader.prototype.load = function ( url, image ) {
 
-	constructor: THREE.ImageLoader,
+	var scope = this;
 
-	load: function ( url, image ) {
+	if ( image === undefined ) image = new Image();
 
-		var scope = this;
+	image.addEventListener( 'load', function () {
 
-		if ( image === undefined ) image = new Image();
+		scope.dispatchEvent( { type: 'load', content: image } );
 
-		image.addEventListener( 'load', function () {
+	}, false );
 
-			scope.dispatchEvent( { type: 'load', content: image } );
+	image.addEventListener( 'error', function () {
 
-		}, false );
+		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-		image.addEventListener( 'error', function () {
+	}, false );
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+	if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
 
-		}, false );
+	image.src = url;
 
-		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+};
 
-		image.src = url;
-
-	}
-
-}
+THREE.extend( THREE.ImageLoader.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -10132,8 +10153,6 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 THREE.LoadingMonitor = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	var scope = this;
 
 	var loaded = 0;
@@ -10162,15 +10181,19 @@ THREE.LoadingMonitor = function () {
 	};
 
 };
+
+THREE.extend( THREE.LoadingMonitor.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MaterialLoader = function () {
+THREE.GeometryLoader = function () {};
+THREE.extend( THREE.GeometryLoader.prototype, THREE.EventDispatcher.prototype );
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
 
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.MaterialLoader = function () {};
 
 THREE.MaterialLoader.prototype = {
 
@@ -10288,6 +10311,8 @@ THREE.MaterialLoader.prototype = {
 	}
 
 };
+
+THREE.extend( THREE.MaterialLoader.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -11489,52 +11514,44 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 THREE.TextureLoader = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.crossOrigin = null;
 
 };
 
-THREE.TextureLoader.prototype = {
+THREE.TextureLoader.prototype.load = function ( url ) {
 
-	constructor: THREE.TextureLoader,
+	var scope = this;
 
-	load: function ( url ) {
+	var image = new Image();
 
-		var scope = this;
+	image.addEventListener( 'load', function () {
 
-		var image = new Image();
+		var texture = new THREE.Texture( image );
+		texture.needsUpdate = true;
 
-		image.addEventListener( 'load', function () {
+		scope.dispatchEvent( { type: 'load', content: texture } );
 
-			var texture = new THREE.Texture( image );
-			texture.needsUpdate = true;
+	}, false );
 
-			scope.dispatchEvent( { type: 'load', content: texture } );
+	image.addEventListener( 'error', function () {
 
-		}, false );
+		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-		image.addEventListener( 'error', function () {
+	}, false );
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+	if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
 
-		}, false );
+	image.src = url;
 
-		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+};
 
-		image.src = url;
-
-	}
-
-}
+THREE.extend( THREE.TextureLoader.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Material = function () {
-
-	THREE.EventDispatcher.call( this );
 
 	this.id = THREE.MaterialIdCount ++;
 
@@ -11568,88 +11585,96 @@ THREE.Material = function () {
 
 };
 
-THREE.Material.prototype.setValues = function ( values ) {
+THREE.Material.prototype = {
 
-	if ( values === undefined ) return;
+	constructor: THREE.Material,
 
-	for ( var key in values ) {
+	setValues: function ( values ) {
 
-		var newValue = values[ key ];
+		if ( values === undefined ) return;
 
-		if ( newValue === undefined ) {
+		for ( var key in values ) {
 
-			console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
-			continue;
+			var newValue = values[ key ];
 
-		}
+			if ( newValue === undefined ) {
 
-		if ( key in this ) {
+				console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
+				continue;
 
-			var currentValue = this[ key ];
+			}
 
-			if ( currentValue instanceof THREE.Color && newValue instanceof THREE.Color ) {
+			if ( key in this ) {
 
-				currentValue.copy( newValue );
+				var currentValue = this[ key ];
 
-			} else if ( currentValue instanceof THREE.Color ) {
+				if ( currentValue instanceof THREE.Color && newValue instanceof THREE.Color ) {
 
-				currentValue.set( newValue );
+					currentValue.copy( newValue );
 
-			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+				} else if ( currentValue instanceof THREE.Color ) {
 
-				currentValue.copy( newValue );
+					currentValue.set( newValue );
 
-			} else {
+				} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 
-				this[ key ] = newValue;
+					currentValue.copy( newValue );
+
+				} else {
+
+					this[ key ] = newValue;
+
+				}
 
 			}
 
 		}
 
+	},
+
+	clone: function ( material ) {
+
+		if ( material === undefined ) material = new THREE.Material();
+
+		material.name = this.name;
+
+		material.side = this.side;
+
+		material.opacity = this.opacity;
+		material.transparent = this.transparent;
+
+		material.blending = this.blending;
+
+		material.blendSrc = this.blendSrc;
+		material.blendDst = this.blendDst;
+		material.blendEquation = this.blendEquation;
+
+		material.depthTest = this.depthTest;
+		material.depthWrite = this.depthWrite;
+
+		material.polygonOffset = this.polygonOffset;
+		material.polygonOffsetFactor = this.polygonOffsetFactor;
+		material.polygonOffsetUnits = this.polygonOffsetUnits;
+
+		material.alphaTest = this.alphaTest;
+
+		material.overdraw = this.overdraw;
+
+		material.visible = this.visible;
+
+		return material;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
 };
 
-THREE.Material.prototype.clone = function ( material ) {
-
-	if ( material === undefined ) material = new THREE.Material();
-
-	material.name = this.name;
-
-	material.side = this.side;
-
-	material.opacity = this.opacity;
-	material.transparent = this.transparent;
-
-	material.blending = this.blending;
-
-	material.blendSrc = this.blendSrc;
-	material.blendDst = this.blendDst;
-	material.blendEquation = this.blendEquation;
-
-	material.depthTest = this.depthTest;
-	material.depthWrite = this.depthWrite;
-
-	material.polygonOffset = this.polygonOffset;
-	material.polygonOffsetFactor = this.polygonOffsetFactor;
-	material.polygonOffsetUnits = this.polygonOffsetUnits;
-
-	material.alphaTest = this.alphaTest;
-
-	material.overdraw = this.overdraw;
-
-	material.visible = this.visible;
-
-	return material;
-
-};
-
-THREE.Material.prototype.dispose = function () {
-
-	this.dispatchEvent( { type: 'dispose' } );
-
-};
+THREE.extend( THREE.Material.prototype, THREE.EventDispatcher.prototype );
 
 THREE.MaterialIdCount = 0;
 /**
@@ -12565,8 +12590,6 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	THREE.EventDispatcher.call( this );
-
 	this.id = THREE.TextureIdCount ++;
 
 	this.name = '';
@@ -12643,6 +12666,8 @@ THREE.Texture.prototype = {
 	}
 
 };
+
+THREE.extend( THREE.Texture.prototype, THREE.EventDispatcher.prototype );
 
 THREE.TextureIdCount = 0;
 /**
@@ -25537,8 +25562,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
-	THREE.EventDispatcher.call( this );
-
 	this.width = width;
 	this.height = height;
 
@@ -25567,40 +25590,48 @@ THREE.WebGLRenderTarget = function ( width, height, options ) {
 
 };
 
-THREE.WebGLRenderTarget.prototype.clone = function() {
+THREE.WebGLRenderTarget.prototype = {
 
-	var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
+	constructor: THREE.WebGLRenderTarget,
 
-	tmp.wrapS = this.wrapS;
-	tmp.wrapT = this.wrapT;
+	clone: function () {
 
-	tmp.magFilter = this.magFilter;
-	tmp.minFilter = this.minFilter;
+		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
 
-	tmp.anisotropy = this.anisotropy;
+		tmp.wrapS = this.wrapS;
+		tmp.wrapT = this.wrapT;
 
-	tmp.offset.copy( this.offset );
-	tmp.repeat.copy( this.repeat );
+		tmp.magFilter = this.magFilter;
+		tmp.minFilter = this.minFilter;
 
-	tmp.format = this.format;
-	tmp.type = this.type;
+		tmp.anisotropy = this.anisotropy;
 
-	tmp.depthBuffer = this.depthBuffer;
-	tmp.stencilBuffer = this.stencilBuffer;
+		tmp.offset.copy( this.offset );
+		tmp.repeat.copy( this.repeat );
 
-	tmp.generateMipmaps = this.generateMipmaps;
+		tmp.format = this.format;
+		tmp.type = this.type;
 
-	tmp.shareDepthFrom = this.shareDepthFrom;
+		tmp.depthBuffer = this.depthBuffer;
+		tmp.stencilBuffer = this.stencilBuffer;
 
-	return tmp;
+		tmp.generateMipmaps = this.generateMipmaps;
+
+		tmp.shareDepthFrom = this.shareDepthFrom;
+
+		return tmp;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
+	}
 
 };
 
-THREE.WebGLRenderTarget.prototype.dispose = function () {
-
-	this.dispatchEvent( { type: 'dispose' } );
-
-};
+THREE.extend( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author alteredq / http://alteredqualia.com
  */
