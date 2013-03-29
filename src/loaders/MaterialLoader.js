@@ -2,11 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MaterialLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.MaterialLoader = function () {};
 
 THREE.MaterialLoader.prototype = {
 
@@ -124,3 +120,5 @@ THREE.MaterialLoader.prototype = {
 	}
 
 };
+
+THREE.extend( THREE.MaterialLoader.prototype, THREE.EventDispatcher.prototype );

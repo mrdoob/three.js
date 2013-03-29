@@ -22,11 +22,7 @@
  */
 
 
-THREE.STLLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.STLLoader = function () {};
 
 THREE.STLLoader.prototype = {
 
@@ -193,3 +189,5 @@ THREE.STLLoader.prototype = {
 	}
 
 };
+
+THREE.extend( THREE.STLLoader.prototype, THREE.EventDispatcher.prototype );

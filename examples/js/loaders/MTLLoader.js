@@ -6,14 +6,14 @@
 
 THREE.MTLLoader = function( baseUrl, options ) {
 
-	THREE.EventDispatcher.call( this );
-	
 	this.baseUrl = baseUrl;
 	this.options = options;
 
 };
 
 THREE.MTLLoader.prototype = {
+
+	constructor: THREE.MTLLoader,
 
 	/**
 	 * Loads a MTL file
@@ -131,6 +131,8 @@ THREE.MTLLoader.prototype = {
 
 };
 
+THREE.extend( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype );
+
 /**
  * Create a new THREE-MTLLoader.MaterialCreator
  * @param baseUrl - Url relative to which textures are loaded
@@ -150,8 +152,6 @@ THREE.MTLLoader.prototype = {
 
 THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 
-	THREE.EventDispatcher.call( this );
-
 	this.baseUrl = baseUrl;
 	this.options = options;
 	this.materialsInfo = {};
@@ -165,6 +165,8 @@ THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 };
 
 THREE.MTLLoader.MaterialCreator.prototype = {
+
+	constructor: THREE.MTLLoader.MaterialCreator,
 
 	setMaterials: function( materialsInfo ) {
 

@@ -4,8 +4,6 @@
 
 THREE.LoadingMonitor = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	var scope = this;
 
 	var loaded = 0;
@@ -34,3 +32,5 @@ THREE.LoadingMonitor = function () {
 	};
 
 };
+
+THREE.extend( THREE.LoadingMonitor.prototype, THREE.EventDispatcher.prototype );

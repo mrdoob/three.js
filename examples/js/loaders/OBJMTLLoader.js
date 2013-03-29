@@ -5,11 +5,7 @@
  * @author angelxuanchang
  */
 
-THREE.OBJMTLLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.OBJMTLLoader = function () {};
 
 THREE.OBJMTLLoader.prototype = {
 
@@ -561,12 +557,14 @@ THREE.OBJMTLLoader.prototype = {
 			}
 
 		}
-		
+
 		//Add last object
 		meshN(undefined, undefined);
-		
+
 		return group;
 
 	}
 
 };
+
+THREE.extend( THREE.OBJMTLLoader.prototype, THREE.EventDispatcher.prototype );

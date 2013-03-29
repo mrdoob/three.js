@@ -9,8 +9,6 @@
 
 THREE.Geometry = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.id = THREE.GeometryIdCount ++;
 
 	this.name = '';
@@ -799,5 +797,7 @@ THREE.Geometry.prototype = {
 	}
 
 };
+
+THREE.extend( THREE.Geometry.prototype, THREE.EventDispatcher.prototype );
 
 THREE.GeometryIdCount = 0;

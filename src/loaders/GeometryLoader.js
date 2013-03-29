@@ -2,8 +2,5 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.GeometryLoader = function () {};
+THREE.extend( THREE.GeometryLoader.prototype, THREE.EventDispatcher.prototype );

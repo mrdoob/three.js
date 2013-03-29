@@ -7,8 +7,6 @@
 
 THREE.OrbitControls = function ( object, domElement ) {
 
-	THREE.EventDispatcher.call( this );
-
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
@@ -354,3 +352,5 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'keydown', onKeyDown, false );
 
 };
+
+THREE.extend( THREE.OrbitControls.prototype, THREE.EventDispatcher.prototype );

@@ -4,41 +4,35 @@
 
 THREE.TextureLoader = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.crossOrigin = null;
 
 };
 
-THREE.TextureLoader.prototype = {
+THREE.TextureLoader.prototype.load = function ( url ) {
 
-	constructor: THREE.TextureLoader,
+	var scope = this;
 
-	load: function ( url ) {
+	var image = new Image();
 
-		var scope = this;
+	image.addEventListener( 'load', function () {
 
-		var image = new Image();
+		var texture = new THREE.Texture( image );
+		texture.needsUpdate = true;
 
-		image.addEventListener( 'load', function () {
+		scope.dispatchEvent( { type: 'load', content: texture } );
 
-			var texture = new THREE.Texture( image );
-			texture.needsUpdate = true;
+	}, false );
 
-			scope.dispatchEvent( { type: 'load', content: texture } );
+	image.addEventListener( 'error', function () {
 
-		}, false );
+		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-		image.addEventListener( 'error', function () {
+	}, false );
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+	if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
 
-		}, false );
+	image.src = url;
 
-		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+};
 
-		image.src = url;
-
-	}
-
-}
+THREE.extend( THREE.TextureLoader.prototype, THREE.EventDispatcher.prototype );

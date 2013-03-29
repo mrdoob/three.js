@@ -4,38 +4,32 @@
 
 THREE.ImageLoader = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.crossOrigin = null;
 
 };
 
-THREE.ImageLoader.prototype = {
+THREE.ImageLoader.prototype.load = function ( url, image ) {
 
-	constructor: THREE.ImageLoader,
+	var scope = this;
 
-	load: function ( url, image ) {
+	if ( image === undefined ) image = new Image();
 
-		var scope = this;
+	image.addEventListener( 'load', function () {
 
-		if ( image === undefined ) image = new Image();
+		scope.dispatchEvent( { type: 'load', content: image } );
 
-		image.addEventListener( 'load', function () {
+	}, false );
 
-			scope.dispatchEvent( { type: 'load', content: image } );
+	image.addEventListener( 'error', function () {
 
-		}, false );
+		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-		image.addEventListener( 'error', function () {
+	}, false );
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+	if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
 
-		}, false );
+	image.src = url;
 
-		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+};
 
-		image.src = url;
-
-	}
-
-}
+THREE.extend( THREE.ImageLoader.prototype, THREE.EventDispatcher.prototype );

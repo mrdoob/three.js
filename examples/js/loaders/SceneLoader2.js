@@ -2,11 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SceneLoader2 = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.SceneLoader2 = function () {};
 
 THREE.SceneLoader2.prototype = {
 
@@ -275,4 +271,6 @@ THREE.SceneLoader2.prototype = {
 
 	}
 
-}
+};
+
+THREE.extend( THREE.SceneLoader2.prototype, THREE.EventDispatcher.prototype );

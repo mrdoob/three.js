@@ -2,11 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.OBJLoader = function () {};
 
 THREE.OBJLoader.prototype = {
 
@@ -425,4 +421,6 @@ THREE.OBJLoader.prototype = {
 
 	}
 
-}
+};
+
+THREE.extend( THREE.OBJLoader.prototype, THREE.EventDispatcher.prototype );

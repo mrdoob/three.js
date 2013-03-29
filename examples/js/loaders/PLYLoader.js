@@ -19,11 +19,7 @@
  */
 
 
-THREE.PLYLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.PLYLoader = function () {};
 
 THREE.PLYLoader.prototype = {
 
@@ -174,3 +170,5 @@ THREE.PLYLoader.prototype = {
 
 
 };
+
+THREE.extend( THREE.PLYLoader.prototype, THREE.EventDispatcher.prototype );
