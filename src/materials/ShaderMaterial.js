@@ -41,6 +41,8 @@ THREE.ShaderMaterial = function ( parameters ) {
 
 	this.shading = THREE.SmoothShading;
 
+	this.linewidth = 1;
+
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
 
