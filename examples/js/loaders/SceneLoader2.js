@@ -163,7 +163,7 @@ THREE.SceneLoader2.prototype = {
 		for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
 
 			var data = json.materials[ i ];
-			var material = loader.parse( data.data );
+			var material = loader.parse( data );
 
 			if ( data.name !== undefined ) material.name = data.name;
 

@@ -111,6 +111,8 @@ THREE.SceneExporter2.prototype = {
 					data.type = 'Geometry';
 					data.data = geometryExporter.parse( geometry );
 
+					delete data.data.metadata;
+
 				}
 
 				output.geometries.push( data );
@@ -138,10 +140,11 @@ THREE.SceneExporter2.prototype = {
 
 				materials[ material.id ] = output.materials.length;
 
-				var data = {};
+				var data = materialExporter.parse( material );
 
 				if ( material.name !== "" ) data.name = material.name;
-				data.data = materialExporter.parse( material );
+
+				delete data.metadata;
 
 				output.materials.push( data );
 
@@ -240,8 +243,6 @@ THREE.SceneExporter2.prototype = {
 				data.scale = object.scale.toArray();
 
 			}
-
-			// parse children
 
 			if ( object.children.length > 0 ) {
 
