@@ -3730,6 +3730,13 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	extractPosition: function ( m ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
+		return this.copyPosition( m );
+
+	},
+
 	copyPosition: function ( m ) {
 
 		var te = this.elements;
@@ -3743,7 +3750,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	copyRotation: function () {
+	extractRotation: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -4272,20 +4279,6 @@ THREE.Matrix4.prototype = {
 		this.multiplyScalar( 1 / det );
 
 		return this;
-
-	},
-
-	extractPosition: function ( m ) {
-
-		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
-		return this.copyPosition( m );
-
-	},
-
-	extractRotation: function ( m ) {
-
-		console.warn( 'DEPRECATED: Matrix4\'s .extractRotation() has been renamed to .copyRotation().' );
-		return this.copyRotation( m );
 
 	},
 
@@ -6025,7 +6018,7 @@ THREE.EventDispatcher.prototype = {
 			var a, b, c, d;
 			var precision = raycaster.precision;
 
-			object.matrixRotationWorld.copyRotation( object.matrixWorld );
+			object.matrixRotationWorld.extractRotation( object.matrixWorld );
 
 			inverseMatrix.getInverse( object.matrixWorld );
 
@@ -6239,7 +6232,7 @@ THREE.Object3D.prototype = {
 
 			this.scale.getScaleFromMatrix( this.matrix );
 
-			m1.copyRotation( this.matrix );
+			m1.extractRotation( this.matrix );
 
 			if ( this.useQuaternion === true )  {
 

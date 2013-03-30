@@ -75,6 +75,13 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	extractPosition: function ( m ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
+		return this.copyPosition( m );
+
+	},
+
 	copyPosition: function ( m ) {
 
 		var te = this.elements;
@@ -88,7 +95,7 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	copyRotation: function () {
+	extractRotation: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -617,20 +624,6 @@ THREE.Matrix4.prototype = {
 		this.multiplyScalar( 1 / det );
 
 		return this;
-
-	},
-
-	extractPosition: function ( m ) {
-
-		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
-		return this.copyPosition( m );
-
-	},
-
-	extractRotation: function ( m ) {
-
-		console.warn( 'DEPRECATED: Matrix4\'s .extractRotation() has been renamed to .copyRotation().' );
-		return this.copyRotation( m );
 
 	},
 
