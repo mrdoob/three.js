@@ -844,7 +844,18 @@ THREE.ColladaLoader = function () {
 		for ( i = 0; i < node.lights.length; i ++ ) {
 
 			var params = lights[node.lights[i].url];
-			obj = new THREE.PointLight(params.color);
+
+			switch ( params.technique ) {
+
+				case 'point':
+					obj = new THREE.PointLight(params.color);
+					break;
+
+				case 'directional':
+					obj = new THREE.DirectionalLight(params.color);
+					break;
+
+			}
 
 		}
 
@@ -4101,6 +4112,7 @@ THREE.ColladaLoader = function () {
 			switch ( child.nodeName ) {
 
 				case 'point':
+				case 'directional':
 
 					this.technique = child.nodeName;
 
