@@ -1277,6 +1277,8 @@ THREE.Vector2.prototype = {
 		this.x = array[ 0 ];
 		this.y = array[ 1 ];
 
+		return this;
+
 	},
 
 	toArray: function () {
@@ -2039,6 +2041,8 @@ THREE.Vector3.prototype = {
 		this.y = array[ 1 ];
 		this.z = array[ 2 ];
 
+		return this;
+
 	},
 
 	toArray: function () {
@@ -2687,6 +2691,8 @@ THREE.Vector4.prototype = {
 		this.y = array[ 1 ];
 		this.z = array[ 2 ];
 		this.w = array[ 3 ];
+
+		return this;
 
 	},
 

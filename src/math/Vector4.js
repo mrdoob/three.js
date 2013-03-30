@@ -554,6 +554,8 @@ THREE.Vector4.prototype = {
 		this.z = array[ 2 ];
 		this.w = array[ 3 ];
 
+		return this;
+
 	},
 
 	toArray: function () {

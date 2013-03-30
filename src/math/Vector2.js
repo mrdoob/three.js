@@ -300,6 +300,8 @@ THREE.Vector2.prototype = {
 		this.x = array[ 0 ];
 		this.y = array[ 1 ];
 
+		return this;
+
 	},
 
 	toArray: function () {
