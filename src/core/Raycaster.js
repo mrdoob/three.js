@@ -10,7 +10,7 @@
 		this.ray = new THREE.Ray( origin, direction );
 
 		// normalized ray.direction required for accurate distance calculations
-		if( this.ray.direction.lengthSq() > 0 ) {
+		if ( this.ray.direction.lengthSq() > 0 ) {
 
 			this.ray.direction.normalize();
 
@@ -56,6 +56,13 @@
 				object: object
 
 			} );
+
+		} else if ( object instanceof THREE.LOD ) {
+
+			matrixPosition.getPositionFromMatrix( object.matrixWorld );
+			var distance = raycaster.ray.origin.distanceTo( matrixPosition );
+
+			intersectObject( object.getObjectForDistance( distance ), raycaster, intersects );
 
 		} else if ( object instanceof THREE.Mesh ) {
 
@@ -110,11 +117,11 @@
 
 				// check if we hit the wrong side of a single sided face
 				side = material.side;
-				if( side !== THREE.DoubleSide ) {
+				if ( side !== THREE.DoubleSide ) {
 
 					var planeSign = localRay.direction.dot( facePlane.normal );
 
-					if( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) continue;
+					if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) continue;
 
 				}
 
@@ -185,7 +192,7 @@
 		this.ray.set( origin, direction );
 
 		// normalized ray.direction required for accurate distance calculations
-		if( this.ray.direction.length() > 0 ) {
+		if ( this.ray.direction.length() > 0 ) {
 
 			this.ray.direction.normalize();
 
