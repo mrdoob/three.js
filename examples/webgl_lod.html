@@ -81,8 +81,6 @@
 				light.position.set( 0, 0, 1 ).normalize();
 				scene.add( light );
 
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
-
 				var geometry = [
 
 					[ new THREE.IcosahedronGeometry( 100, 4 ), 50 ],
@@ -92,6 +90,8 @@
 					[ new THREE.IcosahedronGeometry( 100, 0 ), 8000 ]
 
 				];
+
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
 
 				var i, j, mesh, lod;
 
