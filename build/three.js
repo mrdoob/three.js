@@ -5788,7 +5788,9 @@ THREE.Clock = function ( autoStart ) {
 
 };
 
-THREE.extend( THREE.Clock.prototype, {
+THREE.Clock.prototype = {
+
+	constructor: THREE.Clock,
 
 	start: function () {
 
@@ -5841,7 +5843,7 @@ THREE.extend( THREE.Clock.prototype, {
 
 	}
 
-} );
+};
 /**
  * https://github.com/mrdoob/eventdispatcher.js/
  */
@@ -7482,6 +7484,11 @@ THREE.Geometry.prototype = {
 
 	constructor: THREE.Geometry,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	applyMatrix: function ( matrix ) {
 
 		var normalMatrix = new THREE.Matrix3().getInverse( matrix ).transpose();
@@ -8224,8 +8231,6 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.extend( THREE.Geometry.prototype, THREE.EventDispatcher.prototype );
-
 THREE.GeometryIdCount = 0;
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -8263,6 +8268,11 @@ THREE.BufferGeometry = function () {
 THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	applyMatrix: function ( matrix ) {
 
@@ -8777,8 +8787,6 @@ THREE.BufferGeometry.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.BufferGeometry.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -9684,31 +9692,40 @@ THREE.ImageLoader = function () {
 
 };
 
-THREE.ImageLoader.prototype.load = function ( url, image ) {
+THREE.ImageLoader.prototype = {
 
-	var scope = this;
+	constructor: THREE.ImageLoader,
 
-	if ( image === undefined ) image = new Image();
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
-	image.addEventListener( 'load', function () {
+	load: function ( url, image ) {
 
-		scope.dispatchEvent( { type: 'load', content: image } );
+		var scope = this;
 
-	}, false );
+		if ( image === undefined ) image = new Image();
 
-	image.addEventListener( 'error', function () {
+		image.addEventListener( 'load', function () {
 
-		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+			scope.dispatchEvent( { type: 'load', content: image } );
 
-	}, false );
+		}, false );
 
-	if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+		image.addEventListener( 'error', function () {
 
-	image.src = url;
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-};
+		}, false );
 
-THREE.extend( THREE.ImageLoader.prototype, THREE.EventDispatcher.prototype );
+		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+
+		image.src = url;
+
+	}
+
+}
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -10184,13 +10201,31 @@ THREE.LoadingMonitor = function () {
 
 };
 
-THREE.extend( THREE.LoadingMonitor.prototype, THREE.EventDispatcher.prototype );
+THREE.LoadingMonitor.prototype = {
+
+	constructor: THREE.LoadingMonitor,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
+
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.GeometryLoader = function () {};
-THREE.extend( THREE.GeometryLoader.prototype, THREE.EventDispatcher.prototype );
+THREE.GeometryLoader.prototype = {
+
+	constructor: THREE.GeometryLoader,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
+
+};
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -10200,6 +10235,11 @@ THREE.MaterialLoader = function () {};
 THREE.MaterialLoader.prototype = {
 
 	constructor: THREE.MaterialLoader,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	load: function ( url ) {
 
@@ -10313,8 +10353,6 @@ THREE.MaterialLoader.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.MaterialLoader.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -11520,34 +11558,43 @@ THREE.TextureLoader = function () {
 
 };
 
-THREE.TextureLoader.prototype.load = function ( url ) {
+THREE.TextureLoader.prototype = {
 
-	var scope = this;
+	constructor: THREE.TextureLoader,
 
-	var image = new Image();
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
-	image.addEventListener( 'load', function () {
+	load: function ( url ) {
 
-		var texture = new THREE.Texture( image );
-		texture.needsUpdate = true;
+		var scope = this;
 
-		scope.dispatchEvent( { type: 'load', content: texture } );
+		var image = new Image();
 
-	}, false );
+		image.addEventListener( 'load', function () {
 
-	image.addEventListener( 'error', function () {
+			var texture = new THREE.Texture( image );
+			texture.needsUpdate = true;
 
-		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+			scope.dispatchEvent( { type: 'load', content: texture } );
 
-	}, false );
+		}, false );
 
-	if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+		image.addEventListener( 'error', function () {
 
-	image.src = url;
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+
+		}, false );
+
+		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+
+		image.src = url;
+
+	}
 
 };
-
-THREE.extend( THREE.TextureLoader.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -11590,6 +11637,11 @@ THREE.Material = function () {
 THREE.Material.prototype = {
 
 	constructor: THREE.Material,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	setValues: function ( values ) {
 
@@ -11675,8 +11727,6 @@ THREE.Material.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.Material.prototype, THREE.EventDispatcher.prototype );
 
 THREE.MaterialIdCount = 0;
 /**
@@ -12631,6 +12681,11 @@ THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	clone: function ( texture ) {
 
 		if ( texture === undefined ) texture = new THREE.Texture();
@@ -12670,8 +12725,6 @@ THREE.Texture.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.Texture.prototype, THREE.EventDispatcher.prototype );
 
 THREE.TextureIdCount = 0;
 /**
@@ -25617,6 +25670,11 @@ THREE.WebGLRenderTarget.prototype = {
 
 	constructor: THREE.WebGLRenderTarget,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	clone: function () {
 
 		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
@@ -25653,8 +25711,6 @@ THREE.WebGLRenderTarget.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototype );
 /**
  * @author alteredq / http://alteredqualia.com
  */

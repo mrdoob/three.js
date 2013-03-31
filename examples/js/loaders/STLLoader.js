@@ -28,6 +28,11 @@ THREE.STLLoader.prototype = {
 
 	constructor: THREE.STLLoader,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	load: function ( url, callback ) {
 
 		var scope = this;
@@ -35,8 +40,7 @@ THREE.STLLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-            var geometry;
-            geometry = scope.parse( event.target.response );
+			var geometry = scope.parse( event.target.response );
 
 			scope.dispatchEvent( { type: 'load', content: geometry } );
 
@@ -82,7 +86,7 @@ THREE.STLLoader.prototype = {
 		}
 		return (str.toLowerCase() === 'solid'); // All ASCII stl files begin with 'solid'
 
-    },
+	},
 
 	parse: function (buf) {
 
@@ -96,7 +100,7 @@ THREE.STLLoader.prototype = {
 			return this.parseBinary(buf);
 		}
 
-    },
+	},
 
 	parseASCII: function ( data ) {
 
@@ -189,5 +193,3 @@ THREE.STLLoader.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.STLLoader.prototype, THREE.EventDispatcher.prototype );

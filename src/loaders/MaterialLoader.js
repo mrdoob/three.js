@@ -8,6 +8,11 @@ THREE.MaterialLoader.prototype = {
 
 	constructor: THREE.MaterialLoader,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	load: function ( url ) {
 
 		var scope = this;
@@ -120,5 +125,3 @@ THREE.MaterialLoader.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.MaterialLoader.prototype, THREE.EventDispatcher.prototype );

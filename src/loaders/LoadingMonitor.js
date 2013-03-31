@@ -33,4 +33,13 @@ THREE.LoadingMonitor = function () {
 
 };
 
-THREE.extend( THREE.LoadingMonitor.prototype, THREE.EventDispatcher.prototype );
+THREE.LoadingMonitor.prototype = {
+
+	constructor: THREE.LoadingMonitor,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
+
+};

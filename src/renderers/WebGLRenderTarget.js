@@ -37,6 +37,11 @@ THREE.WebGLRenderTarget.prototype = {
 
 	constructor: THREE.WebGLRenderTarget,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	clone: function () {
 
 		var tmp = new THREE.WebGLRenderTarget( this.width, this.height );
@@ -73,5 +78,3 @@ THREE.WebGLRenderTarget.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.WebGLRenderTarget.prototype, THREE.EventDispatcher.prototype );

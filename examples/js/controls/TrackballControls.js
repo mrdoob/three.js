@@ -534,4 +534,4 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 };
 
-THREE.extend( THREE.TrackballControls.prototype, THREE.EventDispatcher.prototype );
+THREE.TrackballControls.prototype = Object.create( THREE.EventDispatcher.prototype );

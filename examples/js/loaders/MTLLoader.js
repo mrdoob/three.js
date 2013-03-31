@@ -15,6 +15,11 @@ THREE.MTLLoader.prototype = {
 
 	constructor: THREE.MTLLoader,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	/**
 	 * Loads a MTL file
 	 *
@@ -130,8 +135,6 @@ THREE.MTLLoader.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.MTLLoader.prototype, THREE.EventDispatcher.prototype );
 
 /**
  * Create a new THREE-MTLLoader.MaterialCreator

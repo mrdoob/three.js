@@ -41,6 +41,11 @@ THREE.Material.prototype = {
 
 	constructor: THREE.Material,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
@@ -125,7 +130,5 @@ THREE.Material.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.Material.prototype, THREE.EventDispatcher.prototype );
 
 THREE.MaterialIdCount = 0;

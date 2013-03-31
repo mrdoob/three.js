@@ -8,6 +8,11 @@ THREE.VTKLoader.prototype = {
 
 	constructor: THREE.VTKLoader,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	load: function ( url, callback ) {
 
 		var scope = this;
@@ -109,6 +114,4 @@ THREE.VTKLoader.prototype = {
 
 	}
 
-}
-
-THREE.extend( THREE.VTKLoader.prototype, THREE.EventDispatcher.prototype );
+};

@@ -25,6 +25,11 @@ THREE.PLYLoader.prototype = {
 
 	constructor: THREE.PLYLoader,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	load: function ( url, callback ) {
 
 		var scope = this;
@@ -170,5 +175,3 @@ THREE.PLYLoader.prototype = {
 
 
 };
-
-THREE.extend( THREE.PLYLoader.prototype, THREE.EventDispatcher.prototype );

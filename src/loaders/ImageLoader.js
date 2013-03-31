@@ -8,28 +8,37 @@ THREE.ImageLoader = function () {
 
 };
 
-THREE.ImageLoader.prototype.load = function ( url, image ) {
+THREE.ImageLoader.prototype = {
 
-	var scope = this;
+	constructor: THREE.ImageLoader,
 
-	if ( image === undefined ) image = new Image();
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
-	image.addEventListener( 'load', function () {
+	load: function ( url, image ) {
 
-		scope.dispatchEvent( { type: 'load', content: image } );
+		var scope = this;
 
-	}, false );
+		if ( image === undefined ) image = new Image();
 
-	image.addEventListener( 'error', function () {
+		image.addEventListener( 'load', function () {
 
-		scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+			scope.dispatchEvent( { type: 'load', content: image } );
 
-	}, false );
+		}, false );
 
-	if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+		image.addEventListener( 'error', function () {
 
-	image.src = url;
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
 
-};
+		}, false );
 
-THREE.extend( THREE.ImageLoader.prototype, THREE.EventDispatcher.prototype );
+		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
+
+		image.src = url;
+
+	}
+
+}

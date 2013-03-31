@@ -8,6 +8,11 @@ THREE.SceneLoader2.prototype = {
 
 	constructor: THREE.SceneLoader2,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	load: function ( url ) {
 
 		var scope = this;
@@ -272,5 +277,3 @@ THREE.SceneLoader2.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.SceneLoader2.prototype, THREE.EventDispatcher.prototype );

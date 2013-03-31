@@ -11,6 +11,11 @@ THREE.OBJMTLLoader.prototype = {
 
 	constructor: THREE.OBJMTLLoader,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	/**
 	 * Load a Wavefront OBJ file with materials (MTL file)
 	 *
@@ -566,5 +571,3 @@ THREE.OBJMTLLoader.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.OBJMTLLoader.prototype, THREE.EventDispatcher.prototype );
