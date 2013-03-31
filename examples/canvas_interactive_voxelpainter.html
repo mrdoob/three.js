@@ -173,8 +173,7 @@
 
 					} else {
 
-						normalMatrix.getInverse( intersect.object.matrixWorld );
-						normalMatrix.transpose();
+						normalMatrix.getNormalMatrix( intersect.object.matrixWorld );
 
 						var normal = intersect.face.normal.clone();
 						normal.applyMatrix3( normalMatrix ).normalize();

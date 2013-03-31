@@ -57,8 +57,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( normalArray !== undefined ) {
 
-			var normalMatrix = new THREE.Matrix3();
-			normalMatrix.getInverse( matrix ).transpose();
+			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 			normalMatrix.multiplyVector3Array( normalArray );
 

@@ -5233,7 +5233,7 @@ THREE.Plane.prototype = {
 
 			// compute new normal based on theory here:
 			// http://www.songho.ca/opengl/gl_normaltransform.html
-			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
+			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getNormalMatrix( matrix );
 			var newNormal = v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 			var newCoplanarPoint = this.coplanarPoint( v2 );
@@ -6860,8 +6860,7 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_normalViewMatrix.getInverse( _viewMatrix );
-		_normalViewMatrix.transpose();
+		_normalViewMatrix.getNormalMatrix( _viewMatrix );
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
@@ -6883,8 +6882,7 @@ THREE.Projector = function () {
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
 
-				_normalMatrix.getInverse( _modelMatrix );
-				_normalMatrix.transpose();
+				_normalMatrix.getNormalMatrix( _modelMatrix );
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				objectMaterials = isFaceMaterial === true ? object.material : null;
@@ -7491,7 +7489,7 @@ THREE.Geometry.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		var normalMatrix = new THREE.Matrix3().getInverse( matrix ).transpose();
+		var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
@@ -8291,8 +8289,7 @@ THREE.BufferGeometry.prototype = {
 
 		if ( normalArray !== undefined ) {
 
-			var normalMatrix = new THREE.Matrix3();
-			normalMatrix.getInverse( matrix ).transpose();
+			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 			normalMatrix.multiplyVector3Array( normalArray );
 
@@ -24000,9 +23997,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setupMatrices ( object, camera ) {
 
 		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
-		object._normalMatrix.getInverse( object._modelViewMatrix );
-		object._normalMatrix.transpose();
+		object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 	};
 
@@ -25868,9 +25863,7 @@ THREE.GeometryUtils = {
 
 			matrix = object2.matrix;
 
-			normalMatrix = new THREE.Matrix3();
-			normalMatrix.getInverse( matrix );
-			normalMatrix.transpose();
+			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 		}
 

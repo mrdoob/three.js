@@ -143,8 +143,7 @@
 
 			function setVoxelPosition( intersector ) {
 
-				normalMatrix.getInverse( intersector.object.matrixWorld );
-				normalMatrix.transpose();
+				normalMatrix.getNormalMatrix( intersector.object.matrixWorld );
 
 				tmpVec.copy( intersector.face.normal );
 				tmpVec.applyMatrix3( normalMatrix ).normalize();

@@ -28,9 +28,7 @@ THREE.GeometryUtils = {
 
 			matrix = object2.matrix;
 
-			normalMatrix = new THREE.Matrix3();
-			normalMatrix.getInverse( matrix );
-			normalMatrix.transpose();
+			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 		}
 
