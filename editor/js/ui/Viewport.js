@@ -20,6 +20,7 @@ var Viewport = function ( signals ) {
 
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.color.setHex( 0xffff00 );
+	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
 	var selectionAxis = new THREE.AxisHelper( 100 );
