@@ -47,128 +47,136 @@ THREE.SceneLoader2.prototype = {
 
 		// geometries
 
-		var geometries = [];
-		var loader = new THREE.JSONLoader();
+		if ( json.geometries !== undefined ) {
 
-		for ( var i = 0, l = json.geometries.length; i < l; i ++ ) {
+			var geometries = [];
+			var loader = new THREE.JSONLoader();
 
-			var geometry;
-			var data = json.geometries[ i ];
+			for ( var i = 0, l = json.geometries.length; i < l; i ++ ) {
 
-			switch ( data.type ) {
+				var geometry;
+				var data = json.geometries[ i ];
 
-				case 'PlaneGeometry':
+				switch ( data.type ) {
 
-					geometry = new THREE.PlaneGeometry(
-						data.width,
-						data.height,
-						data.widthSegments,
-						data.heightSegments
-					);
+					case 'PlaneGeometry':
 
-					break;
+						geometry = new THREE.PlaneGeometry(
+							data.width,
+							data.height,
+							data.widthSegments,
+							data.heightSegments
+						);
 
-				case 'CubeGeometry':
+						break;
 
-					geometry = new THREE.CubeGeometry(
-						data.width,
-						data.height,
-						data.depth,
-						data.widthSegments,
-						data.heightSegments,
-						data.depthSegments
-					);
+					case 'CubeGeometry':
 
-					break;
+						geometry = new THREE.CubeGeometry(
+							data.width,
+							data.height,
+							data.depth,
+							data.widthSegments,
+							data.heightSegments,
+							data.depthSegments
+						);
 
-				case 'CylinderGeometry':
+						break;
 
-					geometry = new THREE.CylinderGeometry(
-						data.radiusTop,
-						data.radiusBottom,
-						data.height,
-						data.radiusSegments,
-						data.heightSegments,
-						data.openEnded
-					);
+					case 'CylinderGeometry':
 
-					break;
+						geometry = new THREE.CylinderGeometry(
+							data.radiusTop,
+							data.radiusBottom,
+							data.height,
+							data.radiusSegments,
+							data.heightSegments,
+							data.openEnded
+						);
 
-				case 'SphereGeometry':
+						break;
 
-					geometry = new THREE.SphereGeometry(
-						data.radius,
-						data.widthSegments,
-						data.heightSegments,
-						data.phiStart,
-						data.phiLength,
-						data.thetaStart,
-						data.thetaLength
-					);
+					case 'SphereGeometry':
 
-					break;
+						geometry = new THREE.SphereGeometry(
+							data.radius,
+							data.widthSegments,
+							data.heightSegments,
+							data.phiStart,
+							data.phiLength,
+							data.thetaStart,
+							data.thetaLength
+						);
 
-				case 'IcosahedronGeometry':
+						break;
 
-					geometry = new THREE.IcosahedronGeometry(
-						data.radius,
-						data.detail
-					);
+					case 'IcosahedronGeometry':
 
-					break;
+						geometry = new THREE.IcosahedronGeometry(
+							data.radius,
+							data.detail
+						);
 
-				case 'TorusGeometry':
+						break;
 
-					geometry = new THREE.TorusGeometry(
-						data.radius,
-						data.tube,
-						data.radialSegments,
-						data.tubularSegments,
-						data.arc
-					);
+					case 'TorusGeometry':
 
-					break;
+						geometry = new THREE.TorusGeometry(
+							data.radius,
+							data.tube,
+							data.radialSegments,
+							data.tubularSegments,
+							data.arc
+						);
 
-				case 'TorusKnotGeometry':
+						break;
 
-					geometry = new THREE.TorusKnotGeometry(
-						data.radius,
-						data.tube,
-						data.radialSegments,
-						data.tubularSegments,
-						data.p,
-						data.q,
-						data.heightScale
-					);
+					case 'TorusKnotGeometry':
 
-					break;
+						geometry = new THREE.TorusKnotGeometry(
+							data.radius,
+							data.tube,
+							data.radialSegments,
+							data.tubularSegments,
+							data.p,
+							data.q,
+							data.heightScale
+						);
 
-				case 'Geometry':
+						break;
 
-					geometry = loader.parse( data.data ).geometry;
+					case 'Geometry':
 
-					break;
+						geometry = loader.parse( data.data ).geometry;
+
+						break;
+
+				}
+
+				if ( data.name !== undefined ) geometry.name = data.name;
+				geometries.push( geometry );
 
 			}
-
-			if ( data.name !== undefined ) geometry.name = data.name;
-			geometries.push( geometry );
 
 		}
 
 		// materials
 
-		var materials = [];
-		var loader = new THREE.MaterialLoader();
+		if ( json.materials !== undefined ) {
 
-		for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
+			var materials = [];
+			var loader = new THREE.MaterialLoader();
 
-			var data = json.materials[ i ];
-			var material = loader.parse( data );
+			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
 
-			if ( data.name !== undefined ) material.name = data.name;
+				var data = json.materials[ i ];
+				var material = loader.parse( data );
 
-			materials.push( material );
+				if ( data.name !== undefined ) material.name = data.name;
+
+				materials.push( material );
+
+			}
 
 		}
 
