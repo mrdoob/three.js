@@ -116,7 +116,8 @@ THREE.SoftwareRenderer = function () {
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
 
 			var element = elements[ e ];
-			var shader = getMaterialShader( element.material );
+			var material = element.material;
+			var shader = getMaterialShader( material );
 
 			if ( element instanceof THREE.RenderableFace3 ) {
 
@@ -124,7 +125,7 @@ THREE.SoftwareRenderer = function () {
 					element.v1.positionScreen,
 					element.v2.positionScreen,
 					element.v3.positionScreen,
-					shader
+					shader, material
 				)
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
@@ -133,14 +134,14 @@ THREE.SoftwareRenderer = function () {
 					element.v1.positionScreen,
 					element.v2.positionScreen,
 					element.v4.positionScreen,
-					shader
+					shader, material
 				);
 
 				drawTriangle(
 					element.v2.positionScreen,
 					element.v3.positionScreen,
 					element.v4.positionScreen,
-					shader
+					shader, material
 				);
 
 			}
@@ -189,24 +190,24 @@ THREE.SoftwareRenderer = function () {
 			if ( material instanceof THREE.MeshBasicMaterial ) {
 
 				shader = new Function(
-						'buffer, offset, u, v',
+						'buffer, offset, u, v, material',
 						[
-							'buffer[ offset ] = ' + ( material.color.r * 255 ) + ';',
-							'buffer[ offset + 1 ] = ' + ( material.color.g * 255 ) + ';',
-							'buffer[ offset + 2 ] = ' + ( material.color.b * 255 ) + ';',
-							'buffer[ offset + 3 ] = ' + ( material.opacity * 255 ) + ';',
+							'buffer[ offset ] = material.color.r * 255;',
+							'buffer[ offset + 1 ] = material.color.g * 255;',
+							'buffer[ offset + 2 ] = material.color.b * 255;',
+							'buffer[ offset + 3 ] = material.opacity * 255;',
 						].join('\n')
 					);
 
 			} else if ( material instanceof THREE.MeshLambertMaterial ) {
 
 				shader = new Function(
-						'buffer, offset, u, v',
+						'buffer, offset, u, v, material',
 						[
-							'buffer[ offset ] = ' + ( material.color.r * 255 ) + ';',
-							'buffer[ offset + 1 ] = ' + ( material.color.g * 255 ) + ';',
-							'buffer[ offset + 2 ] = ' + ( material.color.b * 255 ) + ';',
-							'buffer[ offset + 3 ] = ' + ( material.opacity * 255 ) + ';',
+							'buffer[ offset ] = material.color.r * 255;',
+							'buffer[ offset + 1 ] = material.color.g * 255;',
+							'buffer[ offset + 2 ] = material.color.b * 255;',
+							'buffer[ offset + 3 ] = material.opacity * 255;',
 						].join('\n')
 					);
 
@@ -256,7 +257,7 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
-	function drawTriangle( v1, v2, v3, shader ) {
+	function drawTriangle( v1, v2, v3, shader, material ) {
 
 		// TODO: Implement per-pixel z-clipping
 
@@ -451,7 +452,7 @@ THREE.SoftwareRenderer = function () {
 								zbuffer[ offset ] = z;
 								var u = cx1 * scale;
 								var v = cx2 * scale;
-								shader( data, offset * 4, u, v );
+								shader( data, offset * 4, u, v, material );
 							}
 
 							cx1 += dy12;
@@ -493,7 +494,7 @@ THREE.SoftwareRenderer = function () {
 									var v = cx2 * scale;
 
 									zbuffer[ offset ] = z;
-									shader( data, offset * 4, u, v );
+									shader( data, offset * 4, u, v, material );
 
 								}
 
