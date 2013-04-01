@@ -18,9 +18,8 @@ var Viewport = function ( signals ) {
 
 	var modifierAxis = new THREE.Vector3( 1, 1, 1 );
 
-	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true, fog: false } ) );
-	selectionBox.matrixAutoUpdate = false;
-	selectionBox.visible = false;
+	var selectionBox = new THREE.BoxHelper();
+	selectionBox.material.color.setHex( 0xffff00 );
 	sceneHelpers.add( selectionBox );
 
 	var selectionAxis = new THREE.AxisHelper( 100 );
@@ -322,7 +321,12 @@ var Viewport = function ( signals ) {
 
 		if ( object !== null ) {
 
-			updateSelectionBox( object );
+			if ( object.geometry !== undefined ) {
+
+				selectionBox.update( object );
+				selectionBox.visible = true;
+
+			}
 
 			selectionAxis.matrixWorld = object.matrixWorld;
 			selectionAxis.visible = true;
@@ -343,13 +347,17 @@ var Viewport = function ( signals ) {
 
 		}
 
+		if ( object.geometry !== undefined ) {
+
+			selectionBox.update( object );
+
+		}
+
 		if ( objectsToHelpers[ object.id ] !== undefined ) {
 
 			objectsToHelpers[ object.id ].update();
 
 		}
-
-		updateSelectionBox( object );
 
 		signals.sceneChanged.dispatch( scene );
 
@@ -553,62 +561,6 @@ var Viewport = function ( signals ) {
 	animate();
 
 	//
-
-	function updateSelectionBox( object ) {
-
-		if ( object.geometry !== undefined ) {
-
-			var geometry = object.geometry;
-
-			if ( geometry.boundingBox === null ) {
-
-				geometry.computeBoundingBox();
-
-			}
-
-			var vertices = selectionBox.geometry.vertices;
-
-			vertices[ 0 ].x = geometry.boundingBox.max.x;
-			vertices[ 0 ].y = geometry.boundingBox.max.y;
-			vertices[ 0 ].z = geometry.boundingBox.max.z;
-
-			vertices[ 1 ].x = geometry.boundingBox.max.x;
-			vertices[ 1 ].y = geometry.boundingBox.max.y;
-			vertices[ 1 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 2 ].x = geometry.boundingBox.max.x;
-			vertices[ 2 ].y = geometry.boundingBox.min.y;
-			vertices[ 2 ].z = geometry.boundingBox.max.z;
-
-			vertices[ 3 ].x = geometry.boundingBox.max.x;
-			vertices[ 3 ].y = geometry.boundingBox.min.y;
-			vertices[ 3 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 4 ].x = geometry.boundingBox.min.x;
-			vertices[ 4 ].y = geometry.boundingBox.max.y;
-			vertices[ 4 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 5 ].x = geometry.boundingBox.min.x;
-			vertices[ 5 ].y = geometry.boundingBox.max.y;
-			vertices[ 5 ].z = geometry.boundingBox.max.z;
-
-			vertices[ 6 ].x = geometry.boundingBox.min.x;
-			vertices[ 6 ].y = geometry.boundingBox.min.y;
-			vertices[ 6 ].z = geometry.boundingBox.min.z;
-
-			vertices[ 7 ].x = geometry.boundingBox.min.x;
-			vertices[ 7 ].y = geometry.boundingBox.min.y;
-			vertices[ 7 ].z = geometry.boundingBox.max.z;
-
-			selectionBox.geometry.computeBoundingSphere();
-			selectionBox.geometry.verticesNeedUpdate = true;
-
-			selectionBox.matrixWorld = object.matrixWorld;
-			selectionBox.visible = true;
-
-		}
-
-	}
 
 	function updateMaterials( root ) {
 
