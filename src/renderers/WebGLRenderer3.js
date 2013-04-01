@@ -248,7 +248,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	this.render = function ( scene, camera ) {
 
-		this.clear();
+		if ( this.autoClear === true ) this.clear();
 
 		scene.updateMatrixWorld();
 
@@ -262,6 +262,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
 
 			var object = scene.children[ i ];
+
+			if ( object.visible === false ) continue;
 
 			if ( object instanceof THREE.Mesh ) {
 
