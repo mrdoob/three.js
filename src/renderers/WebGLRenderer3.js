@@ -37,6 +37,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	}
 
+	var precision = 'highp';
 	var extensions = {};
 
 	if ( gl !== null ) {
@@ -62,7 +63,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		gl.blendEquation( gl.FUNC_ADD );
 		gl.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
 
-		gl.clearColor( 1, 0, 0, 1 );
+		gl.clearColor( 0, 0, 0, 1 );
 
 	}
 
@@ -85,11 +86,19 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		var vertices = geometry.vertices;
 		var faces = geometry.faces;
 
+		//
+
 		var positions = [];
+		var addPosition = function ( position ) {
 
-		function addVertex( vertex ) {
+			positions.push( position.x, position.y, position.z );
 
-			positions.push( vertex.x, vertex.y, vertex.z );
+		}
+
+		var colors = [];
+		var addColor = function ( color ) {
+
+			colors.push( color.r, color.g, color.b );
 
 		}
 
@@ -97,15 +106,23 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			var face = faces[ i ];
 
-			addVertex( vertices[ face.a ] );
-			addVertex( vertices[ face.b ] );
-			addVertex( vertices[ face.c ] );
+			addPosition( vertices[ face.a ] );
+			addPosition( vertices[ face.b ] );
+			addPosition( vertices[ face.c ] );
+
+			addColor( new THREE.Color( 0xffffff * Math.random() ) );
+			addColor( new THREE.Color( 0xffffff * Math.random() ) );
+			addColor( new THREE.Color( 0xffffff * Math.random() ) );
 
 			if ( face instanceof THREE.Face4 ) {
 
-				addVertex( vertices[ face.a ] );
-				addVertex( vertices[ face.c ] );
-				addVertex( vertices[ face.d ] );
+				addPosition( vertices[ face.a ] );
+				addPosition( vertices[ face.c ] );
+				addPosition( vertices[ face.d ] );
+
+				addColor( new THREE.Color( 0xffffff * Math.random() ) );
+				addColor( new THREE.Color( 0xffffff * Math.random() ) );
+				addColor( new THREE.Color( 0xffffff * Math.random() ) );
 
 			}
 
@@ -113,11 +130,15 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		var buffer = {
 			positions: gl.createBuffer(),
+			colors: gl.createBuffer(),
 			count: positions.length / 3
 		};
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
 		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions ), gl.STATIC_DRAW );
+
+		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.colors );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( colors ), gl.STATIC_DRAW );
 
 		buffers[ geometry.id ] = buffer;
 
@@ -140,16 +161,22 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		var program = gl.createProgram();
 
 		var vertexShader = [
+			'precision ' + precision + ' float;',
+			'attribute vec3 position;',
+			'attribute vec3 color;',
 			'uniform mat4 modelViewMatrix;',
 			'uniform mat4 projectionMatrix;',
-			'attribute vec3 position;',
+			'varying vec3 vColor;',
 			'void main() {',
+			'	vColor = color;',
 			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
 			'}'
 		].join( '\n' );
 		var fragmentShader = [
+			'precision ' + precision + ' float;',
+			'varying vec3 vColor;',
 			'void main() {',
-			'	gl_FragColor = vec4(0,1,0,1);',
+			'	gl_FragColor = vec4(vColor,1);',
 			'}'
 		].join( '\n' );
 
@@ -244,9 +271,11 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 					gl.useProgram( program );
 
-					locations.position = gl.getAttribLocation( program, 'position' );
 					locations.modelViewMatrix = gl.getUniformLocation( program, 'modelViewMatrix' );
 					locations.projectionMatrix = gl.getUniformLocation( program, 'projectionMatrix' );
+
+					locations.position = gl.getAttribLocation( program, 'position' );
+					locations.color = gl.getAttribLocation( program, 'color' );
 
 					gl.uniformMatrix4fv( locations.projectionMatrix, false, camera.projectionMatrix.elements );
 
@@ -261,6 +290,10 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
 					gl.enableVertexAttribArray( locations.position );
 					gl.vertexAttribPointer( locations.position, 3, gl.FLOAT, false, 0, 0 );
+
+					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.colors );
+					gl.enableVertexAttribArray( locations.color );
+					gl.vertexAttribPointer( locations.color, 3, gl.FLOAT, false, 0, 0 );
 
 					currentBuffer = buffer;
 
