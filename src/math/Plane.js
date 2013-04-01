@@ -9,7 +9,9 @@ THREE.Plane = function ( normal, constant ) {
 
 };
 
-THREE.extend( THREE.Plane.prototype, {
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
 
 	set: function ( normal, constant ) {
 
@@ -115,12 +117,12 @@ THREE.extend( THREE.Plane.prototype, {
 
 	},
 
-	isIntersectionLine: function ( startPoint, endPoint ) {
+	isIntersectionLine: function ( line ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
-		var startSign = this.distanceToPoint( startPoint );
-		var endSign = this.distanceToPoint( endPoint );
+		var startSign = this.distanceToPoint( line.start );
+		var endSign = this.distanceToPoint( line.end );
 
 		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
 
@@ -130,20 +132,20 @@ THREE.extend( THREE.Plane.prototype, {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( startPoint, endPoint, optionalTarget ) {
+		return function ( line, optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
 
-			var direction = v1.subVectors( endPoint, startPoint );
+			var direction = line.delta( v1 );
 
 			var denominator = this.normal.dot( direction );
 
 			if ( denominator == 0 ) {
 
 				// line is coplanar, return origin
-				if( this.distanceToPoint( startPoint ) == 0 ) {
+				if( this.distanceToPoint( line.start ) == 0 ) {
 
-					return result.copy( startPoint );
+					return result.copy( line.start );
 
 				}
 
@@ -152,7 +154,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			}
 
-			var t = - ( startPoint.dot( this.normal ) + this.constant ) / denominator;
+			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
 			if( t < 0 || t > 1 ) {
 
@@ -160,7 +162,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			}
 
-			return result.copy( direction ).multiplyScalar( t ).add( startPoint );
+			return result.copy( direction ).multiplyScalar( t ).add( line.start );
 
 		};
 
@@ -174,7 +176,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 	},
 
-	transform: function() {
+	applyMatrix4: function() {
 
 		var v1 = new THREE.Vector3();
 		var v2 = new THREE.Vector3();
@@ -183,7 +185,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			// compute new normal based on theory here:
 			// http://www.songho.ca/opengl/gl_normaltransform.html
-			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
+			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getNormalMatrix( matrix );
 			var newNormal = v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 			var newCoplanarPoint = this.coplanarPoint( v2 );
@@ -217,4 +219,4 @@ THREE.extend( THREE.Plane.prototype, {
 
 	}
 
-} );
+};

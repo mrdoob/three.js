@@ -92,8 +92,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xfafafa, 1000, 10000 );
-				scene.fog.color.setHSV( 0.6, 0.125, 1 );
+				scene.fog = new THREE.Fog( 0xffffff, 1000, 10000 );
 
 				// CONTROLS
 
@@ -108,8 +107,8 @@
 
 
 				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 1.25 );
-				hemiLight.color.setHSV( 0.6, 0.45, 1 );
-				hemiLight.groundColor.setHSV( 0.1, 0.45, 0.95 );
+				hemiLight.color.setHSL( 0.6, 1, 0.75 );
+				hemiLight.groundColor.setHSL( 0.1, 0.8, 0.7 );
 				hemiLight.position.y = 500;
 				scene.add( hemiLight );
 

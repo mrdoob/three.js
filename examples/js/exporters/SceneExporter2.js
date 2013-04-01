@@ -10,21 +10,165 @@ THREE.SceneExporter2.prototype = {
 
 	parse: function ( scene ) {
 
+		// console.log( scene );
+
 		var output = {
 			metadata: {
-				formatVersion : 4.0,
-				type : "scene",
-				generatedBy : "SceneExporter"
+				version: 4.0,
+				type: 'scene',
+				generator: 'SceneExporter'
 			}
 		};
 
-		console.log( scene );
+		//
+
+		var geometries = {};
+		var geometryExporter = new THREE.GeometryExporter();
+
+		var parseGeometry = function ( geometry ) {
+
+			if ( geometries[ geometry.id ] === undefined ) {
+
+				if ( output.geometries === undefined ) {
+
+					output.geometries = [];
+
+				}
+
+				geometries[ geometry.id ] = output.geometries.length;
+
+				var data = {};
+
+				if ( geometry.name !== "" ) data.name = geometry.name;
+
+				if ( geometry instanceof THREE.PlaneGeometry ) {
+
+					data.type = 'PlaneGeometry';
+					data.width = geometry.width;
+					data.height = geometry.height;
+					data.widthSegments = geometry.widthSegments;
+					data.heightSegments = geometry.heightSegments;
+
+				} else if ( geometry instanceof THREE.CubeGeometry ) {
+
+					data.type = 'CubeGeometry';
+					data.width = geometry.width;
+					data.height = geometry.height;
+					data.depth = geometry.depth;
+					data.widthSegments = geometry.widthSegments;
+					data.heightSegments = geometry.heightSegments;
+					data.depthSegments = geometry.depthSegments;
+
+				} else if ( geometry instanceof THREE.CylinderGeometry ) {
+
+					data.type = 'CylinderGeometry';
+					data.radiusTop = geometry.radiusTop;
+					data.radiusBottom = geometry.radiusBottom;
+					data.height = geometry.height;
+					data.radiusSegments = geometry.radiusSegments;
+					data.heightSegments = geometry.heightSegments;
+					data.openEnded = data.openEnded;
+
+				} else if ( geometry instanceof THREE.SphereGeometry ) {
+
+					data.type = 'SphereGeometry';
+					data.radius = geometry.radius;
+					data.widthSegments = geometry.widthSegments;
+					data.heightSegments = geometry.heightSegments;
+					data.phiStart = geometry.phiStart;
+					data.phiLength = geometry.phiLength;
+					data.thetaStart = geometry.thetaStart;
+					data.thetaLength = geometry.thetaLength;
+
+				} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
+
+					data.type = 'IcosahedronGeometry';
+					data.radius = geometry.radius;
+					data.detail = geometry.detail;
+
+				} else if ( geometry instanceof THREE.TorusGeometry ) {
+
+					data.type = 'TorusGeometry';
+					data.radius = geometry.radius;
+					data.tube = geometry.tube;
+					data.radialSegments = geometry.radialSegments;
+					data.tubularSegments = geometry.tubularSegments;
+					data.arc = geometry.arc;
+
+				} else if ( geometry instanceof THREE.TorusKnotGeometry ) {
+
+					data.type = 'TorusKnotGeometry';
+					data.radius = geometry.radius;
+					data.tube = geometry.tube;
+					data.radialSegments = geometry.radialSegments;
+					data.tubularSegments = geometry.tubularSegments;
+					data.p = geometry.p;
+					data.q = geometry.q;
+					data.heightScale = geometry.heightScale;
+
+				} else if ( geometry instanceof THREE.Geometry ) {
+
+					data.type = 'Geometry';
+					data.data = geometryExporter.parse( geometry );
+
+					delete data.data.metadata;
+
+				}
+
+				output.geometries.push( data );
+
+			}
+
+			return geometries[ geometry.id ];
+
+		};
+
+		//
+
+		var materials = {};
+		var materialExporter = new THREE.MaterialExporter();
+
+		var parseMaterial = function ( material ) {
+
+			if ( materials[ material.id ] === undefined ) {
+
+				if ( output.materials === undefined ) {
+
+					output.materials = [];
+
+				}
+
+				materials[ material.id ] = output.materials.length;
+
+				var data = materialExporter.parse( material );
+
+				if ( material.name !== "" ) data.name = material.name;
+
+				delete data.metadata;
+
+				output.materials.push( data );
+
+			}
+
+			return materials[ material.id ];
+
+		};
+
+		//
 
 		var parseObject = function ( object ) {
 
-			var data = { name: object.name };
+			var data = {};
 
-			if ( object instanceof THREE.PerspectiveCamera ) {
+			if ( object.name !== '' ) data.name = object.name;
+			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
+			if ( object.visible !== true ) data.visible = object.visible;
+
+			if ( object instanceof THREE.Scene ) {
+
+				data.type = 'Scene';
+
+			} else if ( object instanceof THREE.PerspectiveCamera ) {
 
 				data.type = 'PerspectiveCamera';
 				data.fov = object.fov;
@@ -50,7 +194,6 @@ THREE.SceneExporter2.prototype = {
 
 				data.type = 'AmbientLight';
 				data.color = object.color.getHex();
-				data.intensity = object.intensity;
 
 			} else if ( object instanceof THREE.DirectionalLight ) {
 
@@ -69,14 +212,19 @@ THREE.SceneExporter2.prototype = {
 			} else if ( object instanceof THREE.SpotLight ) {
 
 				data.type = 'SpotLight';
-				data.color = object.color.getHex();	
+				data.color = object.color.getHex();
 				data.intensity = object.intensity;
+				data.distance = object.distance;
+				data.angle = object.angle;
+				data.exponent = object.exponent;
 				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
 				data.type = 'HemisphereLight';
 				data.color = object.color.getHex();
+				data.groundColor = object.groundColor.getHex();
+				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.Mesh ) {
 
@@ -84,6 +232,8 @@ THREE.SceneExporter2.prototype = {
 				data.position = object.position.toArray();
 				data.rotation = object.rotation.toArray();
 				data.scale = object.scale.toArray();
+				data.geometry = parseGeometry( object.geometry );
+				data.material = parseMaterial( object.material );
 
 			} else {
 
@@ -93,8 +243,6 @@ THREE.SceneExporter2.prototype = {
 				data.scale = object.scale.toArray();
 
 			}
-
-			// parse children
 
 			if ( object.children.length > 0 ) {
 
@@ -112,9 +260,9 @@ THREE.SceneExporter2.prototype = {
 
 		}
 
-		output.scene = parseObject( scene ).children;
+		output.scene = parseObject( scene );
 
-		return JSON.stringify( output, null, '\t' );
+		return output;
 
 	}
 

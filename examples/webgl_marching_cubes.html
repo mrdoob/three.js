@@ -276,13 +276,13 @@
 			dottedMaterial2 = createShaderMaterial( "dotted", light, ambientLight );
 
 			hatchingMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			hatchingMaterial2.uniforms.uLineColor1.value.setHSV( 0, 0.9, 0.9 );
-			hatchingMaterial2.uniforms.uLineColor2.value.setHSV( 0, 0.9, 0.9 );
-			hatchingMaterial2.uniforms.uLineColor3.value.setHSV( 0, 0.9, 0.9 );
-			hatchingMaterial2.uniforms.uLineColor4.value.setHSV( 0.1, 0.9, 0.9 );
+			hatchingMaterial2.uniforms.uLineColor1.value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms.uLineColor2.value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms.uLineColor3.value.setHSL( 0, 0.8, 0.5 );
+			hatchingMaterial2.uniforms.uLineColor4.value.setHSL( 0.1, 0.8, 0.5 );
 
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
-			dottedMaterial2.uniforms.uLineColor1.value.setHSV( 0.05, 1.0, 1.0 );
+			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
 
 			var texture = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -292,85 +292,85 @@
 			"chrome" :
 			{
 				m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: reflectionCube } ),
-				h: 0, s: 0, v: 1
+				h: 0, s: 0, l: 1
 			},
 
 			"liquid" :
 			{
 				m: new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: refractionCube, refractionRatio: 0.85 } ),
-				h: 0, s: 0, v: 1
+				h: 0, s: 0, l: 1
 			},
 
 			"shiny"  :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x550000, specular: 0x440000, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3, metal: true } ),
-				h: 0, s: 0.9, v: 0.3
+				h: 0, s: 0.8, l: 0.2
 			},
 
 			"matte" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1 } ),
-				h: 0, s: 0, v: 1
+				h: 0, s: 0, l: 1
 			},
 
 			"flat" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x111111, shininess: 1, shading: THREE.FlatShading } ),
-				h: 0, s: 0, v: 1
+				h: 0, s: 0, l: 1
 			},
 
 			"textured" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, shininess: 1, map: texture } ),
-				h: 0, s: 0, v: 1
+				h: 0, s: 0, l: 1
 			},
 
 			"colors" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors } ),
-				h: 0, s: 0, v: 1
+				h: 0, s: 0, l: 1
 			},
 
 			"plastic" :
 			{
 				m: new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x888888, ambient: 0x000000, shininess: 250 } ),
-				h: 0.6, s: 0.9, v: 0.2
+				h: 0.6, s: 0.8, l: 0.1
 			},
 
 			"toon1"  :
 			{
 				m: toonMaterial1,
-				h: 0.2, s: 0.5, v: 1
+				h: 0.2, s: 1, l: 0.75
 			},
 
 			"toon2" :
 			{
 				m: toonMaterial2,
-				h: 0.4, s: 0.5, v: 1
+				h: 0.4, s: 1, l: 0.75
 			},
 
 			"hatching" :
 			{
 				m: hatchingMaterial,
-				h: 0.2, s: 0.2, v: 1
+				h: 0.2, s: 1, l: 0.9
 			},
 
 			"hatching2" :
 			{
 				m: hatchingMaterial2,
-				h: 0.0, s: 0.9, v: 0.9
+				h: 0.0, s: 0.8, l: 0.5
 			},
 
 			"dotted" :
 			{
 				m: dottedMaterial,
-				h: 0.2, s: 0.2, v: 1
+				h: 0.2, s: 1, l: 0.9
 			},
 
 			"dotted2" :
 			{
 				m: dottedMaterial2,
-				h: 0.1, s: 1.0, v: 1
+				h: 0.1, s: 1, l: 0.5
 			}
 
 			};
@@ -410,7 +410,7 @@
 					var mat_old = materials[ current_material ];
 					mat_old.h = m_h.getValue();
 					mat_old.s = m_s.getValue();
-					mat_old.v = m_v.getValue();
+					mat_old.l = m_l.getValue();
 
 					current_material = id;
 
@@ -419,7 +419,7 @@
 
 					m_h.setValue( mat.h );
 					m_s.setValue( mat.s );
-					m_v.setValue( mat.v );
+					m_l.setValue( mat.l );
 
 					if ( current_material === "textured" ) {
 
@@ -447,24 +447,24 @@
 
 			effectController = {
 
-			material:   "shiny",
+			material: "shiny",
 
-			speed :   1.0,
-			numBlobs:   10,
+			speed: 1.0,
+			numBlobs: 10,
 			resolution: 28,
-			isolation:  80,
+			isolation: 80,
 
 			floor: true,
 			wallx: false,
 			wallz: false,
 
-			hue:    0.0,
-			saturation: 0.9,
-			value:    0.3,
+			hue: 0.0,
+			saturation: 0.8,
+			lightness: 0.1,
 
-			lhue:     0.04,
+			lhue: 0.04,
 			lsaturation: 1.0,
-			lvalue:     1.0,
+			llightness: 0.5,
 
 			lx: 0.5,
 			ly: 0.5,
@@ -477,7 +477,7 @@
 
 			};
 
-			var h, m_h, m_s, m_v;
+			var h, m_h, m_s, m_l;
 
 			var gui = new dat.GUI();
 
@@ -498,7 +498,7 @@
 
 			m_h = h.add( effectController, "hue", 0.0, 1.0, 0.025 );
 			m_s = h.add( effectController, "saturation", 0.0, 1.0, 0.025 );
-			m_v = h.add( effectController, "value", 0.0, 1.0, 0.025 );
+			m_l = h.add( effectController, "lightness", 0.0, 1.0, 0.025 );
 
 			// light (point)
 
@@ -506,7 +506,7 @@
 
 			h.add( effectController, "lhue", 0.0, 1.0, 0.025 ).name("hue");
 			h.add( effectController, "lsaturation", 0.0, 1.0, 0.025 ).name("saturation");
-			h.add( effectController, "lvalue", 0.0, 1.0, 0.025 ).name("value");
+			h.add( effectController, "llightness", 0.0, 1.0, 0.025 ).name("lightness");
 
 			// light (directional)
 
@@ -608,26 +608,26 @@
 
 				if ( current_material === "dotted2" ) {
 
-					effect.material.uniforms.uLineColor1.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
+					effect.material.uniforms.uLineColor1.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 
 				} else if ( current_material === "hatching2" ) {
 
 					u = effect.material.uniforms;
 
-					u.uLineColor1.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
-					u.uLineColor2.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
-					u.uLineColor3.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
-					u.uLineColor4.value.setHSV( ( effectController.hue + 0.2 % 1.0 ), effectController.saturation, effectController.value );
+					u.uLineColor1.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+					u.uLineColor2.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+					u.uLineColor3.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+					u.uLineColor4.value.setHSL( ( effectController.hue + 0.2 % 1.0 ), effectController.saturation, effectController.lightness );
 
 				} else {
 
-					effect.material.uniforms.uBaseColor.value.setHSV( effectController.hue, effectController.saturation, effectController.value );
+					effect.material.uniforms.uBaseColor.value.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 
 				}
 
 			} else {
 
-				effect.material.color.setHSV( effectController.hue, effectController.saturation, effectController.value );
+				effect.material.color.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 
 			}
 
@@ -636,7 +636,7 @@
 			light.position.set( effectController.lx, effectController.ly, effectController.lz );
 			light.position.normalize();
 
-			pointLight.color.setHSV( effectController.lhue, effectController.lsaturation, effectController.lvalue );
+			pointLight.color.setHSL( effectController.lhue, effectController.lsaturation, effectController.llightness );
 
 			// render
 

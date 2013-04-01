@@ -29,24 +29,24 @@ THREE.GeometryExporter.prototype = {
 			var face = geometry.faces[ i ];
 
 			var isTriangle = face instanceof THREE.Face3;
-			var hasMaterial = face.materialIndex !== undefined;
-			var hasFaceUv = geometry.faceUvs[ 0 ][ i ] !== undefined;
-			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
+			var hasMaterial = false; // face.materialIndex !== undefined;
+			var hasFaceUv = false; // geometry.faceUvs[ 0 ][ i ] !== undefined;
+			var hasFaceVertexUv = false; // geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
 			var hasFaceNormal = face.normal.length() > 0;
 			var hasFaceVertexNormal = face.vertexNormals[ 0 ] !== undefined;
-			var hasFaceColor = face.color;
-			var hasFaceVertexColor = face.vertexColors[ 0 ] !== undefined;
+			var hasFaceColor = false; // face.color;
+			var hasFaceVertexColor = false; // face.vertexColors[ 0 ] !== undefined;
 
 			var faceType = 0;
 
 			faceType = setBit( faceType, 0, ! isTriangle );
-			// faceType = setBit( faceType, 1, hasMaterial );
-			// faceType = setBit( faceType, 2, hasFaceUv );
-			// faceType = setBit( faceType, 3, hasFaceVertexUv );
+			faceType = setBit( faceType, 1, hasMaterial );
+			faceType = setBit( faceType, 2, hasFaceUv );
+			faceType = setBit( faceType, 3, hasFaceVertexUv );
 			faceType = setBit( faceType, 4, hasFaceNormal );
 			faceType = setBit( faceType, 5, hasFaceVertexNormal );
-			// faceType = setBit( faceType, 6, hasFaceColor );
-			// faceType = setBit( faceType, 7, hasFaceVertexColor );
+			faceType = setBit( faceType, 6, hasFaceColor );
+			faceType = setBit( faceType, 7, hasFaceVertexColor );
 
 			faces.push( faceType );
 
@@ -161,21 +161,17 @@ THREE.GeometryExporter.prototype = {
 
 		//
 
-		var output = JSON.stringify( {
+		return {
 			metadata: {
-				formatVersion: 3.1,
-				generatedBy: "GeometryExporter",
+				version: 4,
+				generator: "GeometryExporter",
 			},
 			vertices: vertices,
 			normals: normals,
 			uvs: uvs,
 			faces: faces
-		}, null, '\t' );
-
-		// output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		return output;
+		};
 
 	}
 
-}
+};

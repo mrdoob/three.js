@@ -38,7 +38,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 
 		try {
 
-			this.context = new webkitAudioContext();
+			THREE.AudioObject.prototype.context = new webkitAudioContext();
 
 		} catch( error ) {
 
@@ -119,8 +119,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 		cameraUp.copy( camera.up );
 
 		cameraFront.set( 0, 0, -1 );
-		camera.matrixWorld.rotateAxis( cameraFront );
-		cameraFront.normalize();
+		cameraFront.transformDirection( camera.matrixWorld );
 
 		this.listener.setPosition( cameraPosition.x, cameraPosition.y, cameraPosition.z );
 		this.listener.setVelocity( cameraDelta.x, cameraDelta.y, cameraDelta.z );
@@ -132,8 +131,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 		if ( this.directionalSource ) {
 
 			soundFront.set( 0, 0, -1 );
-			this.matrixWorld.rotateAxis( soundFront );
-			soundFront.normalize();
+			soundFront.transformDirection( this.matrixWorld );
 
 			soundUp.copy( this.up );
 			this.panner.setOrientation( soundFront.x, soundFront.y, soundFront.z, soundUp.x, soundUp.y, soundUp.z );

@@ -131,27 +131,27 @@ test( "distanceToSphere", function() {
 test( "isInterestionLine/intersectLine", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 
-	ok( a.isIntersectionLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ), "Passed!" );
-	ok( a.intersectLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+	var l1 = new THREE.Line3( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) );
+	ok( a.isIntersectionLine( l1 ), "Passed!" );
+	ok( a.intersectLine( l1 ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
 
 	a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), -3 );
 
-	ok( a.isIntersectionLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ), "Passed!" );
-	ok( a.intersectLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ).equals( new THREE.Vector3( 3, 0, 0 ) ), "Passed!" );
+	ok( a.isIntersectionLine( l1 ), "Passed!" );
+	ok( a.intersectLine( l1 ).equals( new THREE.Vector3( 3, 0, 0 ) ), "Passed!" );
 
 
 	a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), -11 );
 
-	ok( ! a.isIntersectionLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ), "Passed!" );
-	ok( a.intersectLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ) === undefined, "Passed!" );
+	ok( ! a.isIntersectionLine( l1 ), "Passed!" );
+	ok( a.intersectLine( l1 ) === undefined, "Passed!" );
 	
 	a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 11 );
 
-	ok( ! a.isIntersectionLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ), "Passed!" );
-	ok( a.intersectLine( new THREE.Vector3( -10, 0, 0 ), new THREE.Vector3( 10, 0, 0 ) ) === undefined, "Passed!" );
+	ok( ! a.isIntersectionLine( l1 ), "Passed!" );
+	ok( a.intersectLine( l1 ) === undefined, "Passed!" );
 
 });
-
 
 test( "projectPoint", function() {
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
@@ -180,18 +180,18 @@ test( "coplanarPoint", function() {
 	ok( a.distanceToPoint( a.coplanarPoint() ) === 0, "Passed!" );
 });
 
-test( "transform/translate", function() {
+test( "applyMatrix4/translate", function() {
 
 	var a = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), 0 );
 
 	var m = new THREE.Matrix4();
 	m.makeRotationZ( Math.PI * 0.5 );
 
-	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 ) ), "Passed!" );
+	ok( comparePlane( a.clone().applyMatrix4( m ), new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), 0 ) ), "Passed!" );
 
 	a = new THREE.Plane( new THREE.Vector3( 0, 1, 0 ), -1 );
-	ok( comparePlane( a.clone().transform( m ), new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), -1 ) ), "Passed!" );
+	ok( comparePlane( a.clone().applyMatrix4( m ), new THREE.Plane( new THREE.Vector3( -1, 0, 0 ), -1 ) ), "Passed!" );
 
 	m.makeTranslation( 1, 1, 1 );
-	ok( comparePlane( a.clone().transform( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
+	ok( comparePlane( a.clone().applyMatrix4( m ), a.clone().translate( new THREE.Vector3( 1, 1, 1 ) ) ), "Passed!" );
 });

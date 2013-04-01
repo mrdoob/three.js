@@ -82,20 +82,12 @@
 				scene = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0xffffff, 2000, 10000 );
-				scene.fog.color.setHSV( 0.6, 0, 1 );
 
 				scene.add( camera );
 
 				// GROUND
 
-				/*
-				var groundTexture = THREE.ImageUtils.loadTexture( "textures/terrain/grasslight-big.jpg" );
-				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-				groundTexture.repeat.set( 16, 16 );
-				groundTexture.anisotropy = 4;
-				*/
-
-				var groundMaterial = new THREE.MeshPhongMaterial( { /*map: groundTexture,*/ emissive: 0xbbbbbb } );
+				var groundMaterial = new THREE.MeshPhongMaterial( { emissive: 0xbbbbbb } );
 				var planeGeometry = new THREE.PlaneGeometry( 16000, 16000 );
 
 				var ground = new THREE.Mesh( planeGeometry, groundMaterial );
@@ -112,10 +104,8 @@
 				scene.add( ambient );
 
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1.6 );
-				light.position.set( 0, 140, 500 );
-				light.position.multiplyScalar( 1.1 );
-				light.color.setHSV( 0.6, 0.075, 1 );
+				var light = new THREE.DirectionalLight( 0xebf3ff, 1.6 );
+				light.position.set( 0, 140, 500 ).multiplyScalar( 1.1 );
 				scene.add( light );
 
 				light.castShadow = true;
@@ -135,9 +125,8 @@
 
 				//
 
-				var light = new THREE.DirectionalLight( 0xffffff, 1 );
+				var light = new THREE.DirectionalLight( 0x497f13, 1 );
 				light.position.set( 0, -1, 0 );
-				light.color.setHSV( 0.25, 0.85, 0.5 );
 				scene.add( light );
 
 				// RENDERER
@@ -233,9 +222,9 @@
 					m.skinning = true;
 					m.morphTargets = true;
 
-					m.specular.setHSV( 0, 0, 0.1 );
+					m.specular.setHSL( 0, 0, 0.1 );
 
-					m.color.setHSV( 0.6, 0, 0.6 );
+					m.color.setHSL( 0.6, 0, 0.6 );
 					m.ambient.copy( m.color );
 
 					//m.map = map;

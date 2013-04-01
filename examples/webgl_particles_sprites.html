@@ -86,11 +86,11 @@
 
 				}
 
-				parameters = [ [ [1.0, 0.2, 1.0], sprite2, 20 ],
-							   [ [0.95, 0.1, 1], sprite3, 15 ],
-							   [ [0.90, 0.05, 1], sprite1, 10 ],
-							   [ [0.85, 0, 0.8], sprite5, 8 ],
-							   [ [0.80, 0, 0.7], sprite4, 5 ],
+				parameters = [ [ [1.0, 0.2, 0.5], sprite2, 20 ],
+							   [ [0.95, 0.1, 0.5], sprite3, 15 ],
+							   [ [0.90, 0.05, 0.5], sprite1, 10 ],
+							   [ [0.85, 0, 0.5], sprite5, 8 ],
+							   [ [0.80, 0, 0.5], sprite4, 5 ],
 							   ];
 
 				for ( i = 0; i < parameters.length; i ++ ) {
@@ -100,7 +100,7 @@
 					size   = parameters[i][2];
 
 					materials[i] = new THREE.ParticleBasicMaterial( { size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent : true } );
-					materials[i].color.setHSV( color[0], color[1], color[2] );
+					materials[i].color.setHSL( color[0], color[1], color[2] );
 
 					particles = new THREE.ParticleSystem( geometry, materials[i] );
 
@@ -213,7 +213,7 @@
 					color = parameters[i][0];
 
 					h = ( 360 * ( color[0] + time ) % 360 ) / 360;
-					materials[i].color.setHSV( h, color[1], color[2] );
+					materials[i].color.setHSL( h, color[1], color[2] );
 
 				}
 

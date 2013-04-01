@@ -2,12 +2,10 @@
  * @author qiao / https://github.com/qiao
  * @author mrdoob / http://mrdoob.com
  * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / https://github.com/WestLangley
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.OrbitControls = function ( object, domElement ) {
-
-	THREE.EventDispatcher.call( this );
 
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
@@ -22,6 +20,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.userRotate = true;
 	this.userRotateSpeed = 1.0;
 
+	this.userPan = true;
+	this.userPanSpeed = 2.0;
+
 	this.autoRotate = false;
 	this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
 
@@ -30,6 +31,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
+
+	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
 	// internals
 
@@ -52,7 +55,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var lastPosition = new THREE.Vector3();
 
-	var STATE = { NONE : -1, ROTATE : 0, ZOOM : 1 };
+	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
 
 	// events
@@ -132,10 +135,20 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+	this.pan = function ( distance ) {
+
+		distance.transformDirection( this.object.matrix );
+		distance.multiplyScalar( scope.userPanSpeed );
+
+		this.object.position.add( distance );
+		this.center.add( distance );
+
+	};
+
 	this.update = function () {
 
 		var position = this.object.position;
-		var offset = position.clone().sub( this.center )
+		var offset = position.clone().sub( this.center );
 
 		// angle from z-axis around y-axis
 
@@ -206,7 +219,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		if ( event.button === 0 || event.button === 2 ) {
+		if ( event.button === 0 ) {
 
 			state = STATE.ROTATE;
 
@@ -217,6 +230,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 			state = STATE.ZOOM;
 
 			zoomStart.set( event.clientX, event.clientY );
+
+		} else if ( event.button === 2 ) {
+
+			state = STATE.PAN;
 
 		}
 
@@ -255,6 +272,13 @@ THREE.OrbitControls = function ( object, domElement ) {
 			}
 
 			zoomStart.copy( zoomEnd );
+
+		} else if ( state === STATE.PAN ) {
+
+			var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+			var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+
+			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
 
 		}
 
@@ -299,9 +323,34 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
+	function onKeyDown( event ) {
+
+		if ( ! scope.userPan ) return;
+
+		switch ( event.keyCode ) {
+
+			case scope.keys.UP:
+				scope.pan( new THREE.Vector3( 0, 1, 0 ) );
+				break;
+			case scope.keys.BOTTOM:
+				scope.pan( new THREE.Vector3( 0, - 1, 0 ) );
+				break;
+			case scope.keys.LEFT:
+				scope.pan( new THREE.Vector3( - 1, 0, 0 ) );
+				break;
+			case scope.keys.RIGHT:
+				scope.pan( new THREE.Vector3( 1, 0, 0 ) );
+				break;
+		}
+
+	}
+
 	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+	this.domElement.addEventListener( 'keydown', onKeyDown, false );
 
 };
+
+THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );

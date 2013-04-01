@@ -25,12 +25,26 @@ Menubar.File = function ( signals ) {
 	options.add( option );
 	*/
 
-	// reset scene
+	// reset
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Reset' );
-	option.onClick( function () { signals.resetScene.dispatch(); } );
+	option.onClick( function () {
+
+		if ( confirm( 'Are you sure?' ) ) {
+
+			if ( localStorage.threejsEditor !== undefined ) {
+
+				delete localStorage.threejsEditor;
+
+			}
+
+			location.reload();
+
+		}
+
+	} );
 	options.add( option );
 
 	// export geometry
@@ -41,6 +55,8 @@ Menubar.File = function ( signals ) {
 	option.onClick( function () { signals.exportGeometry.dispatch( { exporter: THREE.GeometryExporter } ); } );
 	options.add( option );
 
+	/*
+
 	// export scene
 
 	var option = new UI.Panel();
@@ -48,6 +64,8 @@ Menubar.File = function ( signals ) {
 	option.setTextContent( 'Export Scene' );
 	option.onClick( function () { signals.exportScene.dispatch( { exporter: THREE.SceneExporter } ); } );
 	options.add( option );
+
+	*/
 
 	// export scene 2
 

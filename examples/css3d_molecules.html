@@ -257,7 +257,7 @@
 					} else {
 
 						object.element.style.display = "";
-						object.element.style.height = object.properties.bondLengthFull;
+						object.element.style.height = object.userData.bondLengthFull;
 						object.visible = true;
 
 					}
@@ -277,7 +277,7 @@
 
 					if ( ! ( object instanceof THREE.CSS3DSprite ) ) {
 
-						object.element.style.height = object.properties.bondLengthShort;
+						object.element.style.height = object.userData.bondLengthShort;
 
 					}
 
@@ -348,9 +348,9 @@
 
 					}
 
-					if ( object.properties.joint ) {
+					if ( object.userData.joint ) {
 
-						object.properties.joint.parent.remove( object.properties.joint );
+						object.userData.joint.parent.remove( object.userData.joint );
 
 					}
 
@@ -423,8 +423,8 @@
 						object.position.copy( start );
 						object.position.lerp( end, 0.5 );
 
-						object.properties.bondLengthShort = bondLength + "px";
-						object.properties.bondLengthFull = ( bondLength + 55 ) + "px";
+						object.userData.bondLengthShort = bondLength + "px";
+						object.userData.bondLengthFull = ( bondLength + 55 ) + "px";
 
 						//
 
@@ -464,10 +464,10 @@
 						object.matrixAutoUpdate = false;
 						object.updateMatrix();
 
-						object.properties.bondLengthShort = bondLength + "px";
-						object.properties.bondLengthFull = ( bondLength + 55 ) + "px";
+						object.userData.bondLengthShort = bondLength + "px";
+						object.userData.bondLengthFull = ( bondLength + 55 ) + "px";
 
-						object.properties.joint = joint;
+						object.userData.joint = joint;
 
 						joint.add( object );
 						root.add( joint );

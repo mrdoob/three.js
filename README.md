@@ -66,6 +66,54 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 ### Change log ###
 
 
+2013 03 15 - **r57** (403,818 KB, gzip: 96,416 KB)
+
+* Added Renderer panel to the editor. ([mrdoob](http://github.com/mrdoob))
+* Added support for custom attributes to `BufferGeometry`. ([zz85](http://github.com/zz85))
+* `CanvasRenderer` and `SVGRenderer` behave like `WebGLRenderer` with `MeshLambertMaterial` and no lights. ([mrdoob](http://github.com/mrdoob))
+* Added `ColorConverter` in examples folder. ([bhouston](http://github.com/bhouston) and [zz85](http://github.com/zz85))
+* Fixed `SVGRenderer` when autoClear false. ([mrdoob](http://github.com/mrdoob))
+* Made `WebGLRenderer` sorting truly stable. ([wereHamster](http://github.com/wereHamster) and [mrdoob](http://github.com/mrdoob))
+* Improved `Object3D` and `Camera` `lookAt()`. ([WestLangley](http://github.com/WestLangley))
+* Added `RingGeometry`. ([merpnderp](http://github.com/merpnderp))
+* Made `OBJLoader` and `OBJMTLLoader` more robust. ([mrdoob](http://github.com/mrdoob))
+* Added pan to `OrbitControls`. ([WestLangley](http://github.com/WestLangley) and [mrdoob](http://github.com/mrdoob))
+* Added `.getColumnFromMatrix()` to `Vector3`. ([WestLangley](http://github.com/WestLangley))
+* Renamed `Object3D` `properties` to `userData`. ([mrdoob](http://github.com/mrdoob))
+* Simplified `PointLightHelper`, `DirectionalLightHelper`, `SpotLightHelper` and `HemisphereLightHelper`. ([mrdoob](http://github.com/mrdoob))
+* Added `GridHelper`. ([mrdoob](http://github.com/mrdoob))
+* Added `.clone()` method to `AmbientLight`, `PointLight`, `DirectionalLight`, `SpotLight` and `HemisphereLight`. ([mrdoob](http://github.com/mrdoob))
+
+
+2013 02 15 - **r56** (408,927 KB, gzip: 97,095 KB)
+
+* Added `LineDashedMaterial` support to `CanvasRenderer`. ([sole](http://github.com/sole))
+* Documentation improvements. ([gero3](http://github.com/gero3), [erich666](http://github.com/erich666), [Stompfrog](http://github.com/Stompfrog), [morenoh149](http://github.com/morenoh149), [chrmoritz](http://github.com/chrmoritz) and [mrdoob](http://github.com/mrdoob))
+* Added `Matrix3.getNormalMatrix()` and `Vector3.transformDirection()`. ([WestLangley](http://github.com/WestLangley))
+* Added [generator](https://github.com/mrdoob/three.js/blob/master/utils/sublime.py) for [Sublime Text 2 completion file](https://github.com/mrdoob/three.js/tree/master/utils/editors/sublimetext2). ([mrdoob](http://github.com/mrdoob))
+* Removed `Matrix4`'s `getPosition()` and `getColumn*()`. ([mrdoob](http://github.com/mrdoob) and [bhouston](http://github.com/bhouston))
+* [Blender exporter](https://github.com/mrdoob/three.js/tree/master/utils/exporters/blender) improvements. ([migvel](http://github.com/migvel))
+* Added `Vector*.toArray()`. ([mrdoob](http://github.com/mrdoob))
+* Added [Maya exporter](https://github.com/mrdoob/three.js/tree/master/utils/exporters/maya) for JSON format. ([etic](http://github.com/etic))
+* Improvements to `FlyControls`. ([WestLangley](http://github.com/WestLangley))
+* Improvements to `OBJLoader` and `OBJMTLLoader`. ([edwardsp](http://github.com/edwardsp) and [Fktrcfylh](http://github.com/Fktrcfylh))
+* Added `.reflect()`, `projectOnVector()` and `projectOnPlane()` to `Vector3`. ([bhouston](http://github.com/bhouston))
+* Added `OculusRiftEffect`. ([troffmo5](http://github.com/troffmo5))
+* Fixed loading of JSON format 2.0 files in the editor.  ([mrdoob](http://github.com/mrdoob) and [drewnoakes](http://github.com/drewnoakes))
+* Added `setHSL()` and `getHSL()` to `Color`.  ([pksunkara](http://github.com/pksunkara) and [mrdoob](http://github.com/mrdoob))
+* Added binary files support to `STLLoader`.  ([aleeper](http://github.com/aleeper))
+* Removed `setHSV()`, `getHSV()` from `Color`. ([mrdoob](http://github.com/mrdoob))
+* Replaced `ColorUtils.adjustHSV()` with `Color`'s `.offsetHSL()`. ([mrdoob](http://github.com/mrdoob))
+* Added `Line3`. ([bhouston](http://github.com/bhouston))
+* Added `linewidth` support to `BufferGeometry` lines. ([arodic](http://github.com/arodic))
+* Renamed `Box3`/`Line3`/`Plane`/`Ray`/`Sphere`'s `.transform()` to `applyMatrix4()`. ([bhouston](http://github.com/bhouston))
+* Added `smoothstep` and `smootherstep` to `Math`. ([bhouston](http://github.com/bhouston))
+* Improvements to the editor. ([drewnoakes](http://github.com/drewnoakes))
+* Added `.reset()` to `TrackballControls`. ([WestLangley](http://github.com/WestLangley))
+* Added two edge detection shader effects. ([zz85](http://github.com/zz85))
+* Unit conversion handling in`ColladaLoader`. ([jihoonl](http://github.com/jihoonl))
+
+
 2013 01 15 - **r55** (406,462 KB, gzip: 96,542 KB)
 
 * Added `set()`, `identity()`, `copy()`, `multiplyScalar()`, `determinant()`, `getInverse()` and `clone()` to `Matrix3`. ([bhouston](http://github.com/bhouston))
