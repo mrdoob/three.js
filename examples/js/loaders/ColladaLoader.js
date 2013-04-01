@@ -847,6 +847,10 @@ THREE.ColladaLoader = function () {
 
 			switch ( params.technique ) {
 
+				case 'ambient':
+					obj = new THREE.AmbientLight(params.color);
+					break;
+
 				case 'point':
 					obj = new THREE.PointLight(params.color);
 					break;
@@ -4111,6 +4115,7 @@ THREE.ColladaLoader = function () {
 
 			switch ( child.nodeName ) {
 
+				case 'ambient':
 				case 'point':
 				case 'directional':
 
