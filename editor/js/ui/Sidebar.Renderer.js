@@ -5,7 +5,8 @@ Sidebar.Renderer = function ( signals ) {
 		'CanvasRenderer': THREE.CanvasRenderer,
 		'SoftwareRenderer': THREE.SoftwareRenderer,
 		'SVGRenderer': THREE.SVGRenderer,
-		'WebGLRenderer': THREE.WebGLRenderer
+		'WebGLRenderer': THREE.WebGLRenderer,
+		'WebGLRenderer3': THREE.WebGLRenderer3
 
 	};
 
@@ -22,6 +23,7 @@ Sidebar.Renderer = function ( signals ) {
 	var rendererClass = new UI.Select().setOptions( {
 
 		'WebGLRenderer': 'WebGLRenderer',
+		'WebGLRenderer3': 'WebGLRenderer3',
 		'CanvasRenderer': 'CanvasRenderer',
 		'SoftwareRenderer': 'SoftwareRenderer',
 		'SVGRenderer': 'SVGRenderer',

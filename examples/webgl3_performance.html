@@ -19,11 +19,9 @@
 		<script src="../build/three.min.js"></script>
 		<script src="../src/renderers/WebGLRenderer3.js"></script>
 
-		<script src="js/libs/stats.min.js"></script>
-
 		<script>
 
-			var container, stats;
+			var container;
 
 			var camera, scene, renderer;
 
@@ -82,12 +80,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
-
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -118,9 +110,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
-				stats.update();
 
 			}
 

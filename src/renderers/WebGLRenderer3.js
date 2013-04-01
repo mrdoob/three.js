@@ -112,11 +112,11 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		}
 
 		var buffer = {
-			data: gl.createBuffer(),
+			positions: gl.createBuffer(),
 			count: positions.length / 3
 		};
 
-		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.data );
+		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
 		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions ), gl.STATIC_DRAW );
 
 		buffers[ geometry.id ] = buffer;
@@ -236,39 +236,43 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			var object = scene.children[ i ];
 
-			var program = getProgram( object.material );
+			if ( object instanceof THREE.Mesh ) {
 
-			if ( program !== currentProgram ) {
+				var program = getProgram( object.material );
 
-				gl.useProgram( program );
+				if ( program !== currentProgram ) {
 
-				locations.position = gl.getAttribLocation( program, 'position' );
-				locations.modelViewMatrix = gl.getUniformLocation( program, 'modelViewMatrix' );
-				locations.projectionMatrix = gl.getUniformLocation( program, 'projectionMatrix' );
+					gl.useProgram( program );
 
-				gl.uniformMatrix4fv( locations.projectionMatrix, false, camera.projectionMatrix.elements );
+					locations.position = gl.getAttribLocation( program, 'position' );
+					locations.modelViewMatrix = gl.getUniformLocation( program, 'modelViewMatrix' );
+					locations.projectionMatrix = gl.getUniformLocation( program, 'projectionMatrix' );
 
-				currentProgram = program;
+					gl.uniformMatrix4fv( locations.projectionMatrix, false, camera.projectionMatrix.elements );
+
+					currentProgram = program;
+
+				}
+
+				var buffer = getBuffer( object.geometry );
+
+				if ( buffer !== currentBuffer ) {
+
+					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
+					gl.enableVertexAttribArray( locations.position );
+					gl.vertexAttribPointer( locations.position, 3, gl.FLOAT, false, 0, 0 );
+
+					currentBuffer = buffer;
+
+				}
+
+				modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
+				gl.uniformMatrix4fv( locations.modelViewMatrix, false, modelViewMatrix.elements );
+
+				gl.drawArrays( gl.TRIANGLES, 0, buffer.count );
 
 			}
-
-			var buffer = getBuffer( object.geometry );
-
-			if ( buffer !== currentBuffer ) {
-
-				gl.bindBuffer( gl.ARRAY_BUFFER, buffer.data );
-				gl.enableVertexAttribArray( locations.position );
-				gl.vertexAttribPointer( locations.position, 3, gl.FLOAT, false, 0, 0 );
-
-				currentBuffer = buffer;
-
-			}
-
-			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
-			gl.uniformMatrix4fv( locations.modelViewMatrix, false, modelViewMatrix.elements );
-
-			gl.drawArrays( gl.TRIANGLES, 0, buffer.count );
 
 		}
 
