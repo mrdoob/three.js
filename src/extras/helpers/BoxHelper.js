@@ -1,5 +1,4 @@
 /**
- * @author sroucheray / http://sroucheray.org/
  * @author mrdoob / http://mrdoob.com/
  */
 
