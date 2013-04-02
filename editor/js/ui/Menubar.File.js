@@ -11,6 +11,9 @@ Menubar.File = function ( signals ) {
 
 	//
 
+	var selectedObject;
+	var scene;
+
 	var options = new UI.Panel();
 	options.setClass( 'options' );
 	container.add( options );
@@ -52,7 +55,11 @@ Menubar.File = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Geometry' );
-	option.onClick( function () { signals.exportGeometry.dispatch( { exporter: THREE.GeometryExporter } ); } );
+	option.onClick( function () {
+
+		exportGeometry( THREE.GeometryExporter );
+
+	} );
 	options.add( option );
 
 	/*
@@ -62,7 +69,11 @@ Menubar.File = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Scene' );
-	option.onClick( function () { signals.exportScene.dispatch( { exporter: THREE.SceneExporter } ); } );
+	option.onClick( function () {
+
+		exportScene( THREE.SceneExporter );
+
+	} );
 	options.add( option );
 
 	*/
@@ -72,7 +83,11 @@ Menubar.File = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export Scene 2' );
-	option.onClick( function () { signals.exportScene.dispatch( { exporter: THREE.SceneExporter2 } ); } );
+	option.onClick( function () {
+
+		exportScene( THREE.SceneExporter2 );
+
+	} );
 	options.add( option );
 
 	// export OBJ
@@ -80,10 +95,73 @@ Menubar.File = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export OBJ' );
-	option.onClick( function () { signals.exportGeometry.dispatch( { exporter: THREE.OBJExporter } ); } );
+	option.onClick( function () {
+
+		exportGeometry( THREE.OBJExporter );
+
+	} );
 	options.add( option );
 
-	//
+	var exportGeometry = function ( exporterClass ) {
+
+		if ( selectedObject.geometry === undefined ) {
+
+			alert( "Selected object doesn't have any geometry" );
+			return;
+
+		}
+
+		var exporter = new exporterClass();
+
+		var output;
+
+		if ( exporter instanceof THREE.GeometryExporter ) {
+
+			output = JSON.stringify( exporter.parse( selectedObject.geometry ), null, '\t' );
+			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		} else {
+
+			output = exporter.parse( selectedObject.geometry );
+
+		}
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	};
+
+	var exportScene = function ( exporterClass ) {
+
+		var exporter = new exporterClass();
+
+		var output = JSON.stringify( exporter.parse( scene ), null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	};
+
+	// signals
+
+	signals.objectSelected.add( function ( object ) {
+
+		selectedObject = object;
+
+	} );
+
+	signals.sceneChanged.add( function ( object ) {
+
+		scene = object;
+
+	} );
 
 	return container;
 

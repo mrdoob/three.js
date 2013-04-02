@@ -508,53 +508,6 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.exportGeometry.add( function ( object ) {
-
-		if ( selected.geometry === undefined ) {
-
-			alert( "Selected object doesn't have any geometry" );
-			return;
-
-		}
-
-		var exporter = new object.exporter();
-
-		var output;
-
-		if ( exporter instanceof THREE.GeometryExporter ) {
-
-			output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		} else {
-
-			output = exporter.parse( selected.geometry );
-
-		}
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	} );
-
-	signals.exportScene.add( function ( object ) {
-
-		var exporter = new object.exporter();
-
-		var output = JSON.stringify( exporter.parse( scene ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	} );
-
 	//
 
 	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
