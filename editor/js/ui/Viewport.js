@@ -4,6 +4,7 @@ var Viewport = function ( signals ) {
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
 
+	var clearColor = 0xAAAAAA;
 	var objects = [];
 
 	// helpers
@@ -232,6 +233,7 @@ var Viewport = function ( signals ) {
 		container.dom.removeChild( renderer.domElement );
 
 		renderer = object;
+		renderer.setClearColor( clearColor );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
@@ -438,9 +440,10 @@ var Viewport = function ( signals ) {
 
 	signals.clearColorChanged.add( function ( color ) {
 
-		renderer.setClearColorHex( color, 1 );
-
+		renderer.setClearColor( color );
 		render();
+
+		clearColor = color;
 
 	} );
 
@@ -554,7 +557,8 @@ var Viewport = function ( signals ) {
 
 	//
 
-	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
+	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+	renderer.setClearColor( clearColor );
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );

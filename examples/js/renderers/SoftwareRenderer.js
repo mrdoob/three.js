@@ -47,6 +47,12 @@ THREE.SoftwareRenderer = function () {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
+	this.setClearColor = function ( color, alpha ) {
+
+		// TODO
+
+	};
+
 	this.setSize = function ( width, height ) {
 
 		canvasWBlocks = Math.floor( width / blockSize );

@@ -67,6 +67,9 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	}
 
+	var clearColor = new THREE.Color( 0x000000 );
+	var clearAlpha = 1;
+
 	//
 
 	var modelViewMatrix = new THREE.Matrix4();
@@ -224,6 +227,15 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	this.domElement = canvas;
 	this.extensions = extensions;
+
+	this.setClearColor = function ( color, alpha ) {
+
+		clearColor.set( color );
+		clearAlpha = alpha !== undefined ? alpha : 1;
+
+		gl.clearColor( clearColor.r, clearColor.g, clearColor.b, clearAlpha );
+
+	};
 
 	this.setSize = function ( width, height ) {
 
