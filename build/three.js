@@ -10241,7 +10241,43 @@ THREE.GeometryLoader.prototype = {
 	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
 	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
 	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
+	load: function ( url ) {
+
+		var scope = this;
+		var request = new XMLHttpRequest();
+
+		request.addEventListener( 'load', function ( event ) {
+
+			var response = scope.parse( JSON.parse( event.target.responseText ) );
+
+			scope.dispatchEvent( { type: 'load', content: response } );
+
+		}, false );
+
+		request.addEventListener( 'progress', function ( event ) {
+
+			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
+
+		}, false );
+
+		request.addEventListener( 'error', function () {
+
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+
+		}, false );
+
+		request.open( 'GET', url, true );
+		request.send( null );
+
+	},
+
+	parse: function ( json ) {
+
+		
+
+	}
 
 };
 /**
@@ -18304,8 +18340,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 
-	_clearColor = parameters.clearColor !== undefined ? new THREE.Color( parameters.clearColor ) : new THREE.Color( 0x000000 ),
-	_clearAlpha = parameters.clearAlpha !== undefined ? parameters.clearAlpha : 0;
+	_clearColor = new THREE.Color( 0x000000 ),
+	_clearAlpha = 0;
+
+	if ( parameters.clearColor !== undefined ) {
+
+		console.warn( 'DEPRECATED: clearColor in WebGLRenderer constructor parameters is being removed. Use .setClearColor() instead.' );
+		_clearColor.setHex( parameters.clearColor );
+
+	}
+
+	if ( parameters.clearAlpha !== undefined ) {
+
+		console.warn( 'DEPRECATED: clearAlpha in WebGLRenderer constructor parameters is being removed. Use .setClearColor() instead.' );
+		_clearAlpha = parameters.clearAlpha;
+
+	}
 
 	// public properties
 
