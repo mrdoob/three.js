@@ -4,6 +4,14 @@ var Viewport = function ( signals ) {
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
 
+	var info = new UI.Text();
+	info.setPosition( 'absolute' );
+	info.setRight( '5px' );
+	info.setBottom( '5px' );
+	info.setFontSize( '12px' );
+	info.setColor( '#ffffff' );
+	container.add( info );
+
 	var clearColor = 0xAAAAAA;
 	var objects = [];
 
@@ -312,6 +320,8 @@ var Viewport = function ( signals ) {
 
 		}
 
+		updateInfo();
+
 		signals.sceneChanged.dispatch( scene );
 		signals.objectSelected.dispatch( object );
 
@@ -362,9 +372,10 @@ var Viewport = function ( signals ) {
 
 		}
 
-		signals.sceneChanged.dispatch( scene );
-
+		updateInfo();
 		render();
+
+		signals.sceneChanged.dispatch( scene );
 
 	} );
 
@@ -424,6 +435,8 @@ var Viewport = function ( signals ) {
 			} );
 
 			selected.parent.remove( selected );
+
+			updateInfo();
 
 		}
 
@@ -519,6 +532,28 @@ var Viewport = function ( signals ) {
 	animate();
 
 	//
+
+	function updateInfo() {
+
+		var objects = 0;
+		var vertices = 0;
+		var faces = 0;
+
+		scene.traverse( function ( object ) {
+
+			if ( object instanceof THREE.Mesh ) {
+
+				objects ++;
+				vertices += object.geometry.vertices.length;
+				faces += object.geometry.faces.length;
+
+			}
+
+		} );
+
+		info.setValue( 'objects: ' + objects + ', vertices: ' + vertices + ', faces: ' + faces );
+
+	}
 
 	function updateMaterials( root ) {
 
