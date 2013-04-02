@@ -10,6 +10,14 @@ THREE.GeometryExporter.prototype = {
 
 	parse: function ( geometry ) {
 
+		var output = {
+			metadata: {
+				version: 4.0,
+				type: 'geometry',
+				generator: 'GeometryExporter'
+			}
+		};
+
 		var vertices = [];
 
 		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
@@ -144,33 +152,29 @@ THREE.GeometryExporter.prototype = {
 
 		function getNormalIndex( x, y, z ) {
 
-				var hash = x.toString() + y.toString() + z.toString();
+			var hash = x.toString() + y.toString() + z.toString();
 
-				if ( normalsHash[ hash ] !== undefined ) {
-
-					return normalsHash[ hash ];
-
-				}
-
-				normalsHash[ hash ] = normals.length / 3;
-				normals.push( x, y, z );
+			if ( normalsHash[ hash ] !== undefined ) {
 
 				return normalsHash[ hash ];
 
+			}
+
+			normalsHash[ hash ] = normals.length / 3;
+			normals.push( x, y, z );
+
+			return normalsHash[ hash ];
+
 		}
+
+		output.vertices = vertices;
+		output.normals = normals;
+		output.uvs = uvs;
+		output.faces = faces;
 
 		//
 
-		return {
-			metadata: {
-				version: 4,
-				generator: "GeometryExporter",
-			},
-			vertices: vertices,
-			normals: normals,
-			uvs: uvs,
-			faces: faces
-		};
+		return output;
 
 	}
 
