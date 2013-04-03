@@ -33,7 +33,8 @@
 			rollOveredFace, isShiftDown = false,
 			theta = 45 * 0.5, isCtrlDown = false;
 
-			var rollOverMesh, rollOverMaterial, voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3();
+			var rollOverMesh, rollOverMaterial;
+			var voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3(), normalMatrix = new THREE.Matrix3();
 			var cubeGeo, cubeMaterial;
 			var i, intersector;
 
@@ -142,8 +143,10 @@
 
 			function setVoxelPosition( intersector ) {
 
+				normalMatrix.getNormalMatrix( intersector.object.matrixWorld );
+
 				tmpVec.copy( intersector.face.normal );
-				tmpVec.applyMatrix4( intersector.object.matrixRotationWorld );
+				tmpVec.applyMatrix3( normalMatrix ).normalize();
 
 				voxelPosition.addVectors( intersector.point, tmpVec );
 

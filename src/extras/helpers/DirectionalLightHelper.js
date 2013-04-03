@@ -14,7 +14,8 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.position = this.light.position;
+	this.lightSphere.matrixWorld = this.light.matrixWorld;
+	this.lightSphere.matrixAutoUpdate = false;
 	this.add( this.lightSphere );
 
 	/*

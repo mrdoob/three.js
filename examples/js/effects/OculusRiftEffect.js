@@ -19,13 +19,14 @@ THREE.OculusRiftEffect = function ( renderer ) {
 
 	var _pCamera = new THREE.PerspectiveCamera();
 	_pCamera.matrixAutoUpdate = false;
-	_pCamera.target = new THREE.Vector3();
 
 	var _scene = new THREE.Scene();
 
 	var _oCamera = new THREE.OrthographicCamera( -1, 1, 1, -1, 1, 1000 );
 	_oCamera.position.z = 1;
 	_scene.add( _oCamera );
+
+	var _offset = new THREE.Matrix4();
 
 	// pre-render hooks
 	this.preLeftRender = function() {};
@@ -99,9 +100,8 @@ THREE.OculusRiftEffect = function ( renderer ) {
 		// Render left
 		this.preLeftRender();
 
-		var offset = new THREE.Vector3(-this.separation,0,0);
-		_pCamera.matrix.copy(camera.matrix);
-		_pCamera.matrix.translate(offset);
+		_offset.elements[12] = -this.separation; // set x offset
+		_pCamera.matrix.copy(camera.matrix).multiply(_offset);
 		_pCamera.matrixWorldNeedsUpdate = true;
 
 		renderer.setViewport( 0, 0, _width, _height );
@@ -111,9 +111,8 @@ THREE.OculusRiftEffect = function ( renderer ) {
 		// Render right
 		this.preRightRender();
 
-		offset.set(this.separation,0,0);
-		_pCamera.matrix.copy(camera.matrix);
-		_pCamera.matrix.translate(offset);
+		_offset.elements[12] = this.separation; // set x offset
+		_pCamera.matrix.copy(camera.matrix).multiply(_offset);
 		_pCamera.matrixWorldNeedsUpdate = true;
 
 		renderer.setViewport( _width, 0, _width, _height );

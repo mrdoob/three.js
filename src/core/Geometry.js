@@ -9,8 +9,6 @@
 
 THREE.Geometry = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.id = THREE.GeometryIdCount ++;
 
 	this.name = '';
@@ -58,9 +56,14 @@ THREE.Geometry.prototype = {
 
 	constructor: THREE.Geometry,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	applyMatrix: function ( matrix ) {
 
-		var normalMatrix = new THREE.Matrix3().getInverse( matrix ).transpose();
+		var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 		for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 

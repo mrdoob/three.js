@@ -1321,7 +1321,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_lightsNeedUpdate = true;
 			renderer.resetState();
 
-			plugins[ i ].render( scene, camera, renderer.getCurrentWidth(), renderer.getCurrentWidth() );
+			plugins[ i ].render( scene, camera, renderer.getCurrentWidth(), renderer.getCurrentHeight() );
 
 			// reset state after plugin (anything could have changed)
 
@@ -2917,9 +2917,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setupMatrices ( object, camera ) {
 
 		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
-		object._normalMatrix.getInverse( object._modelViewMatrix );
-		object._normalMatrix.transpose();
+		object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 	};
 

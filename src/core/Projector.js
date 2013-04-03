@@ -195,8 +195,7 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_normalViewMatrix.getInverse( _viewMatrix );
-		_normalViewMatrix.transpose();
+		_normalViewMatrix.getNormalMatrix( _viewMatrix );
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
@@ -218,8 +217,7 @@ THREE.Projector = function () {
 				faces = geometry.faces;
 				faceVertexUvs = geometry.faceVertexUvs;
 
-				_normalMatrix.getInverse( _modelMatrix );
-				_normalMatrix.transpose();
+				_normalMatrix.getNormalMatrix( _modelMatrix );
 
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				objectMaterials = isFaceMaterial === true ? object.material : null;

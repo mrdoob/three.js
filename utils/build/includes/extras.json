@@ -34,6 +34,7 @@
 	"src/extras/geometries/ConvexGeometry.js",
 	"src/extras/helpers/AxisHelper.js",
 	"src/extras/helpers/ArrowHelper.js",
+	"src/extras/helpers/BoxHelper.js",
 	"src/extras/helpers/CameraHelper.js",
 	"src/extras/helpers/DirectionalLightHelper.js",
 	"src/extras/helpers/GridHelper.js",

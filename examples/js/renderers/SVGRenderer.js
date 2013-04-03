@@ -63,6 +63,12 @@ THREE.SVGRenderer = function () {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
+	this.setClearColor = function ( color, alpha ) {
+
+		// TODO
+
+	};
+
 	this.setSize = function( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;

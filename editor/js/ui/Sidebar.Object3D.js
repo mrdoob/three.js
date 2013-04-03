@@ -1,26 +1,23 @@
 Sidebar.Object3D = function ( signals ) {
 
-	var objects = {
-
-		'PerspectiveCamera': THREE.PerspectiveCamera,
-		'AmbientLight': THREE.AmbientLight,
-		'DirectionalLight': THREE.DirectionalLight,
-		'HemisphereLight': THREE.HemisphereLight,
-		'PointLight': THREE.PointLight,
-		'SpotLight': THREE.SpotLight,
-		'Mesh': THREE.Mesh,
-		'Object3D': THREE.Object3D
-
-	};
-
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
-	container.setDisplay( 'none' );
 	container.setPadding( '10px' );
+	container.setDisplay( 'none' );
 
-	var objectType = new UI.Text().setColor( '#666' );
+	var objectType = new UI.Text().setColor( '#666' ).setTextTransform( 'uppercase' );
 	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
+
+	// parent
+
+	var objectParentRow = new UI.Panel();
+	var objectParent = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+
+	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectParentRow.add( objectParent );
+
+	container.add( objectParentRow );
 
 	// name
 
@@ -173,7 +170,23 @@ Sidebar.Object3D = function ( signals ) {
 	// user data
 
 	var objectUserDataRow = new UI.Panel();
-	var objectUserData = new UI.TextArea().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectUserData = new UI.TextArea().setWidth( '150px' ).setHeight( '40px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	objectUserData.onKeyUp( function () {
+
+		try {
+
+			JSON.parse( objectUserData.getValue() );
+			objectUserData.setBorderColor( '#ccc' );
+			objectUserData.setBackgroundColor( '' );
+
+		} catch ( error ) {
+
+			objectUserData.setBorderColor( '#f00' );
+			objectUserData.setBackgroundColor( 'rgba(255,0,0,0.25)' );
+
+		}
+
+	} );
 
 	objectUserDataRow.add( new UI.Text( 'User data' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectUserDataRow.add( objectUserData );
@@ -184,6 +197,8 @@ Sidebar.Object3D = function ( signals ) {
 	//
 
 	var selected = null;
+
+	var scene = null;
 
 	var uniformScale = 1;
 
@@ -233,6 +248,26 @@ Sidebar.Object3D = function ( signals ) {
 		if ( selected ) {
 
 			selected.name = objectName.getValue();
+
+			if ( selected.parent !== undefined ) {
+
+				var newParentId = parseInt( objectParent.getValue() );
+
+				if ( selected.parent.id !== newParentId && selected.id !== newParentId ) {
+
+					var parent = scene.getObjectById( newParentId, true );
+
+					if ( parent === undefined ) {
+
+						parent = scene;
+
+					}
+
+					parent.add( selected );
+
+				}
+
+			}
 
 			selected.position.x = objectPositionX.getValue();
 			selected.position.y = objectPositionY.getValue();
@@ -329,6 +364,7 @@ Sidebar.Object3D = function ( signals ) {
 	function updateRows() {
 
 		var properties = {
+			'parent': objectParentRow,
 			'fov': objectFovRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
@@ -366,6 +402,20 @@ Sidebar.Object3D = function ( signals ) {
 
 	function getObjectInstanceName( object ) {
 
+		var objects = {
+
+			'Scene': THREE.Scene,
+			'PerspectiveCamera': THREE.PerspectiveCamera,
+			'AmbientLight': THREE.AmbientLight,
+			'DirectionalLight': THREE.DirectionalLight,
+			'HemisphereLight': THREE.HemisphereLight,
+			'PointLight': THREE.PointLight,
+			'SpotLight': THREE.SpotLight,
+			'Mesh': THREE.Mesh,
+			'Object3D': THREE.Object3D
+
+		};
+
 		for ( var key in objects ) {
 
 			if ( object instanceof objects[ key ] ) return key;
@@ -376,133 +426,49 @@ Sidebar.Object3D = function ( signals ) {
 
 	// events
 
-	signals.objectSelected.add( function ( object ) {
+	signals.sceneChanged.add( function ( object ) {
 
-		selected = object;
+		scene = object;
 
-		if ( object ) {
+		var options = {};
 
-			container.setDisplay( 'block' );
+		options[ scene.id ] = 'Scene';
 
-			objectType.setValue( getObjectInstanceName( object ).toUpperCase() );
+		( function addObjects( objects ) {
 
-			objectName.setValue( object.name );
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-			objectPositionX.setValue( object.position.x );
-			objectPositionY.setValue( object.position.y );
-			objectPositionZ.setValue( object.position.z );
+				var object = objects[ i ];
 
-			objectRotationX.setValue( object.rotation.x );
-			objectRotationY.setValue( object.rotation.y );
-			objectRotationZ.setValue( object.rotation.z );
+				options[ object.id ] = object.name;
 
-			objectScaleX.setValue( object.scale.x );
-			objectScaleY.setValue( object.scale.y );
-			objectScaleZ.setValue( object.scale.z );
-
-			if ( object.fov !== undefined ) {
-
-				objectFov.setValue( object.fov );
+				addObjects( object.children );
 
 			}
 
-			if ( object.near !== undefined ) {
+		} )( object.children );
 
-				objectNear.setValue( object.near );
-
-			}
-
-			if ( object.far !== undefined ) {
-
-				objectFar.setValue( object.far );
-
-			}
-
-			if ( object.intensity !== undefined ) {
-
-				objectIntensity.setValue( object.intensity );
-
-			}
-
-			if ( object.color !== undefined ) {
-
-				objectColor.setValue( '#' + object.color.getHexString() );
-
-			}
-
-			if ( object.groundColor !== undefined ) {
-
-				objectGroundColor.setValue( '#' + object.groundColor.getHexString() );
-
-			}
-
-			if ( object.distance !== undefined ) {
-
-				objectDistance.setValue( object.distance );
-
-			}
-
-			if ( object.angle !== undefined ) {
-
-				objectAngle.setValue( object.angle );
-
-			}
-
-			if ( object.exponent !== undefined ) {
-
-				objectExponent.setValue( object.exponent );
-
-			}
-
-			objectVisible.setValue( object.visible );
-
-			try {
-
-				objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
-
-			} catch ( error ) {
-
-				console.log( error );
-
-			}
-
-			updateRows();
-			updateTransformRows();
-
-		} else {
-
-			container.setDisplay( 'none' );
-
-		}
+		objectParent.setOptions( options );
 
 	} );
 
+	signals.objectSelected.add( updateUI );
+	signals.objectChanged.add( updateUI );
+	signals.cameraChanged.add( updateUI );
 
-	signals.cameraChanged.add( function ( camera ) {
-
-		if ( camera && camera === selected ) {
-
-			refreshObjectUI( camera );
-
-		}
-
-	} );
-
-	signals.objectChanged.add( function ( object ) {
-
-		if ( object ) {
-
-			refreshObjectUI( object );
-
-		}
-
-	} );
-
-	function refreshObjectUI( object ) {
+	function updateUI( object ) {
 
 		container.setDisplay( 'block' );
 
-		objectType.setValue( getObjectInstanceName( object ).toUpperCase() );
+		selected = object
+
+		objectType.setValue( getObjectInstanceName( object ) );
+
+		if ( object.parent !== undefined ) {
+
+			objectParent.setValue( object.parent.id );
+
+		}
 
 		objectName.setValue( object.name );
 
@@ -573,6 +539,22 @@ Sidebar.Object3D = function ( signals ) {
 		}
 
 		objectVisible.setValue( object.visible );
+
+		try {
+
+			objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
+
+		} catch ( error ) {
+
+			console.log( error );
+
+		}
+
+		objectUserData.setBorderColor( '#ccc' );
+		objectUserData.setBackgroundColor( '' );
+
+		updateRows();
+		updateTransformRows();
 
 	}
 
