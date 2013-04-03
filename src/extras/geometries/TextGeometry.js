@@ -38,6 +38,8 @@
 
 THREE.TextGeometry = function ( text, parameters ) {
 
+	parameters = parameters || {};
+
 	var textShapes = THREE.FontUtils.generateShapes( text, parameters );
 
 	// translate parameters to ExtrudeGeometry API

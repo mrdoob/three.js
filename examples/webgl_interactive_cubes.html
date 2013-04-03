@@ -22,9 +22,10 @@
 		<script>
 
 			var container, stats;
-			var camera, scene, projector, renderer;
+			var camera, scene, projector, raycaster, renderer;
 
-			var mouse = { x: 0, y: 0 }, INTERSECTED;
+			var mouse = new THREE.Vector2(), INTERSECTED;
+			var radius = 100, theta = 0;
 
 			init();
 			animate();
@@ -43,7 +44,6 @@
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 300, 500 );
 
 				scene = new THREE.Scene();
 
@@ -78,6 +78,7 @@
 				}
 
 				projector = new THREE.Projector();
+				raycaster = new THREE.Raycaster();
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.sortObjects = false;
@@ -127,9 +128,6 @@
 
 			}
 
-			var radius = 100;
-			var theta = 0;
-
 			function render() {
 
 				theta += 0.1;
@@ -137,7 +135,6 @@
 				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
 				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
 				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
-
 				camera.lookAt( scene.position );
 
 				// find intersections
@@ -145,7 +142,7 @@
 				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
 				projector.unprojectVector( vector, camera );
 
-				var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
 
 				var intersects = raycaster.intersectObjects( scene.children );
 

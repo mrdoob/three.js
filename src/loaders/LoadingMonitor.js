@@ -4,8 +4,6 @@
 
 THREE.LoadingMonitor = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	var scope = this;
 
 	var loaded = 0;
@@ -32,5 +30,16 @@ THREE.LoadingMonitor = function () {
 		loader.addEventListener( 'load', onLoad, false );
 
 	};
+
+};
+
+THREE.LoadingMonitor.prototype = {
+
+	constructor: THREE.LoadingMonitor,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
 
 };

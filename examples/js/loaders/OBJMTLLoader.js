@@ -5,15 +5,16 @@
  * @author angelxuanchang
  */
 
-THREE.OBJMTLLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.OBJMTLLoader = function () {};
 
 THREE.OBJMTLLoader.prototype = {
 
 	constructor: THREE.OBJMTLLoader,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	/**
 	 * Load a Wavefront OBJ file with materials (MTL file)
@@ -561,10 +562,10 @@ THREE.OBJMTLLoader.prototype = {
 			}
 
 		}
-		
+
 		//Add last object
 		meshN(undefined, undefined);
-		
+
 		return group;
 
 	}

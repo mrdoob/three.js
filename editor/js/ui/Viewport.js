@@ -4,6 +4,15 @@ var Viewport = function ( signals ) {
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#aaa' );
 
+	var info = new UI.Text();
+	info.setPosition( 'absolute' );
+	info.setRight( '5px' );
+	info.setBottom( '5px' );
+	info.setFontSize( '12px' );
+	info.setColor( '#ffffff' );
+	container.add( info );
+
+	var clearColor = 0xAAAAAA;
 	var objects = [];
 
 	// helpers
@@ -16,8 +25,10 @@ var Viewport = function ( signals ) {
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
 
-	var selectionBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: 0xffff00, wireframe: true, fog: false } ) );
-	selectionBox.matrixAutoUpdate = false;
+	var modifierAxis = new THREE.Vector3( 1, 1, 1 );
+
+	var selectionBox = new THREE.BoxHelper();
+	selectionBox.material.color.setHex( 0xffff00 );
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
@@ -46,7 +57,7 @@ var Viewport = function ( signals ) {
 
 	// object picking
 
-	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 10000, 10000, 8, 8 ) );
+	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 5000, 5000, 8, 8 ) );
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
 
@@ -59,7 +70,7 @@ var Viewport = function ( signals ) {
 	//
 
 	var picked = null;
-	var selected = camera;
+	var selected = null;
 
 	// events
 
@@ -134,9 +145,12 @@ var Viewport = function ( signals ) {
 
 		if ( intersects.length > 0 ) {
 
-			intersects[ 0 ].point.sub( offset );
+			var point = intersects[ 0 ].point.sub( offset );
 
-			selected.position.copy( intersects[ 0 ].point );
+			selected.position.x = modifierAxis.x === 1 ? point.x : intersectionPlane.position.x;
+			selected.position.y = modifierAxis.y === 1 ? point.y : intersectionPlane.position.y;
+			selected.position.z = modifierAxis.z === 1 ? point.z : intersectionPlane.position.z;
+
 			signals.objectChanged.dispatch( selected );
 
 			render();
@@ -191,26 +205,6 @@ var Viewport = function ( signals ) {
 
 	};
 
-	var onKeyDown = function ( event ) {
-
-		switch ( event.keyCode ) {
-
-			case 27: // esc
-
-				signals.toggleHelpers.dispatch();
-
-				break;
-
-			case 46: // delete
-
-				signals.removeSelectedObject.dispatch();
-
-				break;
-
-		}
-
-	};
-
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'click', onClick, false );
 
@@ -236,11 +230,18 @@ var Viewport = function ( signals ) {
 
 	// signals
 
+	signals.modifierAxisChanged.add( function ( axis ) {
+
+		modifierAxis.copy( axis );
+
+	} );
+
 	signals.rendererChanged.add( function ( object ) {
 
 		container.dom.removeChild( renderer.domElement );
 
 		renderer = object;
+		renderer.setClearColor( clearColor );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
@@ -319,8 +320,35 @@ var Viewport = function ( signals ) {
 
 		}
 
+		updateInfo();
+
 		signals.sceneChanged.dispatch( scene );
 		signals.objectSelected.dispatch( object );
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
+		selectionBox.visible = false;
+		selectionAxis.visible = false;
+
+		if ( object !== null ) {
+
+			if ( object.geometry !== undefined ) {
+
+				selectionBox.update( object );
+				selectionBox.visible = true;
+
+			}
+
+			selectionAxis.matrixWorld = object.matrixWorld;
+			selectionAxis.visible = true;
+
+			selected = object;
+
+		}
+
+		render();
 
 	} );
 
@@ -332,13 +360,22 @@ var Viewport = function ( signals ) {
 
 		}
 
+		if ( object.geometry !== undefined ) {
+
+			selectionBox.update( object );
+
+		}
+
 		if ( objectsToHelpers[ object.id ] !== undefined ) {
 
 			objectsToHelpers[ object.id ].update();
 
 		}
 
+		updateInfo();
 		render();
+
+		signals.sceneChanged.dispatch( scene );
 
 	} );
 
@@ -349,17 +386,18 @@ var Viewport = function ( signals ) {
 		var object = selected.clone();
 
 		signals.objectAdded.dispatch( object );
-		signals.objectSelected.dispatch( object );
 
 	} );
 
 	signals.removeSelectedObject.add( function () {
 
-		if ( selected === camera ) return;
+		if ( selected.parent === undefined ) return;
 
 		var name = selected.name ?  '"' + selected.name + '"': "selected object";
 
 		if ( confirm( 'Delete ' + name + '?' ) === false ) return;
+
+		var parent = selected.parent;
 
 		if ( selected instanceof THREE.Light ) {
 
@@ -398,80 +436,12 @@ var Viewport = function ( signals ) {
 
 			selected.parent.remove( selected );
 
+			updateInfo();
+
 		}
 
 		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( null );
-
-	} );
-
-	signals.objectSelected.add( function ( object ) {
-
-		selectionBox.visible = false;
-		selectionAxis.visible = false;
-
-		if ( object !== null ) {
-
-			if ( object.geometry !== undefined ) {
-
-				var geometry = object.geometry;
-
-				if ( geometry.boundingBox === null ) {
-
-					geometry.computeBoundingBox();
-
-				}
-
-				var vertices = selectionBox.geometry.vertices;
-
-				vertices[ 0 ].x = geometry.boundingBox.max.x;
-				vertices[ 0 ].y = geometry.boundingBox.max.y;
-				vertices[ 0 ].z = geometry.boundingBox.max.z;
-
-				vertices[ 1 ].x = geometry.boundingBox.max.x;
-				vertices[ 1 ].y = geometry.boundingBox.max.y;
-				vertices[ 1 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 2 ].x = geometry.boundingBox.max.x;
-				vertices[ 2 ].y = geometry.boundingBox.min.y;
-				vertices[ 2 ].z = geometry.boundingBox.max.z;
-
-				vertices[ 3 ].x = geometry.boundingBox.max.x;
-				vertices[ 3 ].y = geometry.boundingBox.min.y;
-				vertices[ 3 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 4 ].x = geometry.boundingBox.min.x;
-				vertices[ 4 ].y = geometry.boundingBox.max.y;
-				vertices[ 4 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 5 ].x = geometry.boundingBox.min.x;
-				vertices[ 5 ].y = geometry.boundingBox.max.y;
-				vertices[ 5 ].z = geometry.boundingBox.max.z;
-
-				vertices[ 6 ].x = geometry.boundingBox.min.x;
-				vertices[ 6 ].y = geometry.boundingBox.min.y;
-				vertices[ 6 ].z = geometry.boundingBox.min.z;
-
-				vertices[ 7 ].x = geometry.boundingBox.min.x;
-				vertices[ 7 ].y = geometry.boundingBox.min.y;
-				vertices[ 7 ].z = geometry.boundingBox.max.z;
-
-				selectionBox.geometry.computeBoundingSphere();
-				selectionBox.geometry.verticesNeedUpdate = true;
-
-				selectionBox.matrixWorld = object.matrixWorld;
-				selectionBox.visible = true;
-
-			}
-
-			selectionAxis.matrixWorld = object.matrixWorld;
-			selectionAxis.visible = true;
-
-			selected = object;
-
-		}
-
-		render();
+		signals.objectSelected.dispatch( parent );
 
 	} );
 
@@ -483,9 +453,10 @@ var Viewport = function ( signals ) {
 
 	signals.clearColorChanged.add( function ( color ) {
 
-		renderer.setClearColorHex( color, 1 );
-
+		renderer.setClearColor( color );
 		render();
+
+		clearColor = color;
 
 	} );
 
@@ -550,64 +521,39 @@ var Viewport = function ( signals ) {
 
 	} );
 
-	signals.exportGeometry.add( function ( object ) {
-
-		if ( selected.geometry === undefined ) {
-
-			console.warn( "Selected object doesn't have any geometry" );
-			return;
-
-		}
-
-		var exporter = new object.exporter();
-
-		var output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	} );
-
-	signals.exportScene.add( function ( object ) {
-
-		var exporter = new object.exporter();
-
-		var output = JSON.stringify( exporter.parse( scene ), null, '\t' );
-		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		window.open( objectURL, '_blank' );
-		window.focus();
-
-	} );
-
 	//
 
-	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xaaaaaa, clearAlpha: 1 } );
+	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+	renderer.setClearColor( clearColor );
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );
 
 	animate();
 
-	// set up for hotkeys
-	// must be done here, otherwise it doesn't work
-
-	container.dom.tabIndex = 1;
-	container.dom.style.outline = 'transparent';
-	container.dom.addEventListener( 'keydown', onKeyDown, false );
-
-	// must come after listeners are registered
-
-	signals.sceneChanged.dispatch( scene );
-
 	//
+
+	function updateInfo() {
+
+		var objects = 0;
+		var vertices = 0;
+		var faces = 0;
+
+		scene.traverse( function ( object ) {
+
+			if ( object instanceof THREE.Mesh ) {
+
+				objects ++;
+				vertices += object.geometry.vertices.length;
+				faces += object.geometry.faces.length;
+
+			}
+
+		} );
+
+		info.setValue( 'objects: ' + objects + ', vertices: ' + vertices + ', faces: ' + faces );
+
+	}
 
 	function updateMaterials( root ) {
 
@@ -617,13 +563,13 @@ var Viewport = function ( signals ) {
 
 				node.material.needsUpdate = true;
 
-			}
+				if ( node.material instanceof THREE.MeshFaceMaterial ) {
 
-			if ( node.geometry && node.geometry.materials ) {
+					for ( var i = 0; i < node.material.materials.length; i ++ ) {
 
-				for ( var i = 0; i < node.geometry.materials.length; i ++ ) {
+						node.material.materials[ i ].needsUpdate = true;
 
-					node.geometry.materials[ i ].needsUpdate = true;
+					}
 
 				}
 
