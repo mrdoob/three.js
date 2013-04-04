@@ -207,6 +207,7 @@ THREE.SceneExporter2.prototype = {
 				data.type = 'PointLight';
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
+				data.distance = object.distance;
 				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.SpotLight ) {

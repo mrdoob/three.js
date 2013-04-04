@@ -225,7 +225,7 @@ THREE.SceneLoader2.prototype = {
 
 				case 'PointLight':
 
-					object = new THREE.PointLight( data.color, data.intensity );
+					object = new THREE.PointLight( data.color, data.intensity, data.distance );
 					object.position.fromArray( data.position );
 
 					break;
