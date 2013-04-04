@@ -7,6 +7,8 @@ THREE.DirectionalLightHelper = function ( light, sphereSize ) {
 
 	THREE.Object3D.call( this );
 
+	this.matrixAutoUpdate = false;
+
 	this.light = light;
 
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
