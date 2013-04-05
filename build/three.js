@@ -15980,7 +15980,7 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_NORMALMAP",
 
-			"normal = perturbNormal2Arb( -viewPosition, normal );",
+			"normal = perturbNormal2Arb( -vViewPosition, normal );",
 
 		"#elif defined( USE_BUMPMAP )",
 
