@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading a complete scene out of a JSON file.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Function onLoadStart]</h3>
+		<div>Will be called when load starts.</div>
+		<div>The default is a function with empty body.</div>
+
+		<h3>.[page:Function onLoadProgress]</h3>
+		<div>Will be called while load progresses.</div>
+		<div>The default is a function with empty body.</div>
+		
+		<h3>.[page:Function onLoadComplete]</h3>
+		<div>Will be called when each element in the scene completes loading.</div>
+		<div>The default is a function with empty body.</div>
+		
+		<h3>.[page:Function callbackSync]</h3>
+		<div>Will be called when load completes.</div>
+		<div>The default is a function with empty body.</div>
+		
+		<h3>.[page:Function callbackProgress]</h3>
+		<div>Will be called as load progresses.</div>
+		<div>The default is a function with empty body.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>.load( [page:String url], [page:Function callbackFinished] )</h3>
+		<div>
+		url — required<br />
+		callbackFinished — required. This function will be called with the loaded model as an instance of [page:Scene scene] when the load is completed.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js - documentation</title>
+		<style>
+			@font-face {
+				font-family: 'inconsolata';
+				src: url('files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+			}
+
+			html {
+				height: 100%;
+			}
+
+			body {
+				margin: 0;
+				padding: 0;
+				height: 100%;
+				color: #555;
+				font-family: 'inconsolata';
+				font-size: 15px;
+				overflow: hidden;
+			}
+
+			a {
+
+				color: #2194CE;
+
+			}
+
+			#panel	{
+
+				position: fixed;
+
+				width: 260px;
+				height: 100%;
+
+				overflow: auto;
+
+			}
+
+				#panel h1 {
+					color: #333;
+					font-size: 25px;
+					font-weight: normal;
+
+					margin-top: 25px;
+					margin-left: 20px;
+				}
+
+				#panel h2 {
+					color: #666;
+					font-size: 16px;
+					font-weight: normal;
+
+					margin-top: 20px;
+					margin-left: 20px;
+				}
+
+				#panel ul {
+					list-style-type: none;
+					padding: 0px;
+					margin-left: 20px;
+				}
+
+			#viewer {
+				border: 0px;
+				margin-left: 260px;
+				width: -webkit-calc(100% - 260px);
+				width: -moz-calc(100% - 260px);
+				width: calc(100% - 260px);
+				height: 100%;
+				overflow: auto;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="panel"></div>
+		<iframe id="viewer"></iframe>
+
+		<script src="list.js"></script>
+		<script>
+			var REVISION = '51';
+
+			var panel = document.getElementById( 'panel' );
+			var viewer = document.getElementById( 'viewer' );
+
+			var html = '<h1>three.js<span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
+
+			for ( var category in list ) {
+
+				html += '<h2>' + category + '</h2>';
+
+				html += '<ul>';
+
+				for ( var i = 0; i < list[ category ].length; i ++ ) {
+
+					var page = list[ category ][ i ];
+
+					html += '<li><a href="javascript:goTo(\'' + page[ 0 ] + '\')">' + page[ 0 ] + '</a></li>';
+
+				}
+
+				html += '</ul>';
+
+			}
+
+			panel.innerHTML += html;
+
+			// Page loading
+
+			function goTo( name ) {
+
+				var path = pages[ name ];
+
+				window.document.title = 'three.js - documentation - ' + name;
+
+				window.location.hash = name;
+				viewer.src = 'api/' + path + '.html';
+
+			}
+
+			function goToHash() {
+
+				goTo( window.location.hash.substring( 1 ) );
+
+			}
+
+			window.addEventListener( 'hashchange', goToHash, false );
+
+			if ( window.location.hash.length > 0 ) goToHash();
+
+		</script>
+	</body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - io - scene loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				z-index:100;
+			}
+
+			#progress {
+				color:red;
+				top:7em;
+				width: 100%;
+				font-size:3em;
+				font-variant:small-caps;
+				font-weight:bold;
+				position:absolute;
+				z-index:100;
+				text-align: center;
+				text-shadow: #000 0px 0px 10px;
+				display:none;
+			}
+
+			#start {
+				color:#fff;
+				text-shadow: #000 0px 0px 2px;
+				padding:0.1em 0.3em;
+				width:3em;
+				text-align: center;
+				display:none;
+			}
+
+			.shadow {
+				-moz-box-shadow: 0px 0px 5px #000;
+				-webkit-box-shadow: 0px 0px 5px #000;
+				box-shadow: 0px 0px 5px #000;
+			}
+
+			#progressbar {
+				text-align: center;
+				background: white;
+				width: 250px;
+				height: 10px;
+			}
+
+			#bar {
+				background:#d00;
+				width:50px;
+				height:10px;
+			}
+
+			.enabled {
+				color: lime!important;
+				cursor:pointer;
+			}
+
+			.enabled:hover {
+				text-shadow: #0f0 0px 0px 5px !important;
+			}
+
+			.disabled {
+				background:gray;
+				cursor:default;
+			}
+
+			a { color:red }
+			canvas { pointer-events:none; z-index:10; }
+
+			#scene_explorer {
+				background:transparent;
+				color:#fff;
+				width:200px;
+				position:absolute;
+				text-align:left;
+				top:0px;
+				z-index:200;
+				overflow:auto;
+			}
+
+			#section_exp {
+				background:rgba(0,0,50,0.5);
+				padding:0.5em 0;
+				display:none;
+			}
+
+			#scene_explorer h3 {
+				font-size:1em;
+				padding:0;
+				margin:0;
+				color:orange;
+			}
+
+			#scene_explorer a {
+				color:#555;
+				font-weight:bold;
+				text-decoration:none;
+				font-size:1.2em;
+				font-family:Monospace;
+			}
+			#scene_explorer a:hover {
+				background:#555;
+				color:rgba(0,0,50,1);
+			}
+
+			.part {
+				display:none;
+				padding:0 0 0.5em 2em;
+			}
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org">three.js</a> - scene loader test
+		</div>
+
+		<div id="scene_explorer">
+			<a id="plus_exp" href="#">[+]</a>
+			<div id="section_exp"></div>
+		</div>
+
+		<div id="progress">
+			<span id="message">Loading ...</span>
+
+			<center>
+				<div id="progressbar" class="shadow"><div id="bar" class="shadow"></div></div>
+				<div id="start" class="disabled">Start</div>
+			</center>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/loaders/ctm/lzma.js"></script>
+		<script src="js/loaders/ctm/ctm.js"></script>
+		<script src="js/loaders/ctm/CTMLoader.js"></script>
+
+		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/VTKLoader.js"></script>
+		<script src="js/loaders/STLLoader.js"></script>
+		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/loaders/UTF8Loader.js"></script>
+		<script src="js/loaders/MTLLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container,stats;
+
+			var camera, scene, loaded;
+			var renderer;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var rotatingObjects = [];
+			var morphAnimatedObjects = [];
+
+			var clock = new THREE.Clock();
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			animate();
+
+			function $( id ) {
+
+				return document.getElementById( id );
+
+			}
+
+			function handle_update( result, pieces ) {
+
+				refreshSceneView( result );
+				//renderer.initWebGLObjects( result.scene );
+
+				var m, material, count = 0;
+
+				for ( m in result.materials ) {
+
+					material = result.materials[ m ];
+					if ( ! ( material instanceof THREE.MeshFaceMaterial || material instanceof THREE.ShaderMaterial || material.morphTargets ) ) {
+
+						if( !material.program ) {
+
+							renderer.initMaterial( material, result.scene.__lights, result.scene.fog );
+
+							count += 1;
+
+							if( count > pieces ) {
+
+								//console.log("xxxxxxxxx");
+								break;
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var loadScene = createLoadScene();
+
+				camera = loadScene.camera;
+				scene = loadScene.scene;
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer.domElement.style.position = "relative";
+				container.appendChild( renderer.domElement );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.right = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
+
+				$( "start" ).addEventListener( 'click', onStartClick, false );
+
+				var callbackProgress = function( progress, result ) {
+
+					var bar = 250,
+						total = progress.totalModels + progress.totalTextures,
+						loaded = progress.loadedModels + progress.loadedTextures;
+
+					if ( total )
+						bar = Math.floor( bar * loaded / total );
+
+					$( "bar" ).style.width = bar + "px";
+
+					count = 0;
+					for ( var m in result.materials ) count++;
+
+					handle_update( result, Math.floor( count/total ) );
+
+				}
+
+				var callbackSync = function( result ) {
+
+					/*
+
+					// uncomment to see progressive scene loading
+
+					scene = result.scene;
+					camera = result.currentCamera;
+
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+
+					*/
+
+					//handle_update( result, 1 );
+
+				}
+
+				var callbackFinished = function ( result ) {
+
+					loaded = result;
+
+					$( "message" ).style.display = "none";
+					$( "progressbar" ).style.display = "none";
+					$( "start" ).style.display = "block";
+					$( "start" ).className = "enabled";
+
+					handle_update( result, 1 );
+
+					result.scene.traverse( function ( object ) {
+
+						if ( object.userData.rotating === true ) {
+
+							rotatingObjects.push( object );
+
+						}
+
+						if ( object instanceof THREE.MorphAnimMesh ) {
+
+							morphAnimatedObjects.push( object );
+
+						}
+
+						if ( object instanceof THREE.SkinnedMesh ) {
+
+							if ( object.geometry.animation ) {
+
+								THREE.AnimationHandler.add( object.geometry.animation );
+
+								var animation = new THREE.Animation( object, object.geometry.animation.name );
+								animation.JITCompile = false;
+								animation.interpolationType = THREE.AnimationHandler.LINEAR;
+
+								animation.play();
+
+							}
+
+						}
+
+					} );
+
+				}
+
+				$( "progress" ).style.display = "block";
+
+				var loader = new THREE.SceneLoader();
+
+				loader.addGeometryHandler( "binary", THREE.BinaryLoader );
+				loader.addGeometryHandler( "ctm", THREE.CTMLoader );
+				loader.addGeometryHandler( "vtk", THREE.VTKLoader );
+				loader.addGeometryHandler( "stl", THREE.STLLoader );
+
+				loader.addHierarchyHandler( "obj", THREE.OBJLoader );
+				loader.addHierarchyHandler( "dae", THREE.ColladaLoader );
+				loader.addHierarchyHandler( "utf8", THREE.UTF8Loader );
+
+				loader.callbackSync = callbackSync;
+				loader.callbackProgress = callbackProgress;
+
+				loader.load( "scenes/test_scene.js", callbackFinished );
+
+				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function setButtonActive( id ) {
+
+				$( "start" ).style.backgroundColor = "green";
+
+			}
+
+			function onStartClick() {
+
+				$( "progress" ).style.display = "none";
+
+				camera = loaded.currentCamera;
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				scene = loaded.scene;
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			function createLoadScene() {
+
+				var result = {
+
+					scene:  new THREE.Scene(),
+					camera: new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 1, 1000 )
+
+				};
+
+				result.camera.position.z = 100;
+				result.scene.add( result.camera );
+
+				var object, geometry, material, light, count = 500, range = 200;
+
+				material = new THREE.MeshLambertMaterial( { color:0xffffff } );
+				geometry = new THREE.CubeGeometry( 5, 5, 5 );
+
+				for( var i = 0; i < count; i++ ) {
+
+					object = new THREE.Mesh( geometry, material );
+
+					object.position.x = ( Math.random() - 0.5 ) * range;
+					object.position.y = ( Math.random() - 0.5 ) * range;
+					object.position.z = ( Math.random() - 0.5 ) * range;
+
+					object.rotation.x = Math.random() * 6;
+					object.rotation.y = Math.random() * 6;
+					object.rotation.z = Math.random() * 6;
+
+					object.matrixAutoUpdate = false;
+					object.updateMatrix();
+
+					result.scene.add( object );
+
+				}
+
+				result.scene.matrixAutoUpdate = false;
+
+				light = new THREE.PointLight( 0xffffff );
+				result.scene.add( light );
+
+				light = new THREE.DirectionalLight( 0x111111 );
+				light.position.x = 1;
+				result.scene.add( light );
+
+				return result;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var delta = clock.getDelta();
+
+				camera.position.x += ( mouseX - camera.position.x ) * .001;
+				camera.position.y += ( - mouseY - camera.position.y ) * .001;
+
+				camera.lookAt( scene.position );
+
+				// update skinning
+
+				THREE.AnimationHandler.update( delta * 0.75 );
+
+				for ( var i = 0; i < rotatingObjects.length; i ++ ) {
+
+					var object = rotatingObjects[ i ];
+
+					if ( object.userData.rotateX ) object.rotation.x += 1 * delta;
+					if ( object.userData.rotateY ) object.rotation.y += 0.5 * delta;
+
+				}
+
+				for ( var i = 0; i < morphAnimatedObjects.length; i ++ ) {
+
+					var object = morphAnimatedObjects[ i ];
+
+					object.updateAnimation( 1000 * delta );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+			// Scene explorer user interface
+
+			function toggle( id ) {
+
+				var scn = $( "section_" + id ).style,
+					btn = $( "plus_" + id );
+
+				if ( scn.display == "block" ) {
+
+					scn.display = "none";
+					btn.innerHTML = "[+]";
+
+				}
+				else {
+
+					scn.display = "block";
+					btn.innerHTML = "[-]";
+
+				}
+
+			}
+
+			function createToggle( label ) { return function() { toggle( label ) } };
+
+			function refreshSceneView( result ) {
+
+				$( "section_exp" ).innerHTML = generateSceneView( result );
+
+				var config = [ "obj", "geo", "mat", "tex", "lit", "cam" ];
+
+				for ( var i = 0; i < config.length; i++ )
+					$( "plus_" + config[i] ).addEventListener( 'click', createToggle( config[i] ), false );
+
+			}
+
+			function generateSection( label, id, objects ) {
+
+				var html = "";
+
+				html += "<h3><a id='plus_" + id + "' href='#'>[+]</a> " + label + "</h3>";
+				html += "<div id='section_" + id + "' class='part'>";
+
+				for( var o in objects ) {
+
+					html += o + "<br/>";
+
+				}
+				html += "</div>";
+
+				return html;
+
+			}
+
+			function generateSceneView( result ) {
+
+				var config = [
+				[ "Objects",    "obj", result.objects ],
+				[ "Geometries", "geo", result.geometries ],
+				[ "Materials",  "mat", result.materials ],
+				[ "Textures",   "tex", result.textures ],
+				[ "Lights",     "lit", result.lights ],
+				[ "Cameras",    "cam", result.cameras ]
+				];
+
+				var html = "";
+
+				for ( var i = 0; i < config.length; i++ )
+					html += generateSection( config[i][0], config[i][1], config[i][2] );
+
+				return html;
+
+			}
+
+		</script>
+
+	</body>
+</html>

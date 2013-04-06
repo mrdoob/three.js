@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - geometry - Subdivisions with Catmull-Clark</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/modifiers/SubdivisionModifier.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script src="fonts/helvetiker_regular.typeface.js"></script>
+
+		<script>
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var cube, plane;
+
+			var targetYRotation = targetXRotation = 0;
+			var targetYRotationOnMouseDown = targetXRotationOnMouseDown = 0;
+
+			var mouseX = 0, mouseY = 0;
+			var mouseXOnMouseDown = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+
+			// Create new object by parameters
+
+			var createSomething = function( klass, args ) {
+
+				var F = function( klass, args ) {
+
+				    return klass.apply( this, args );
+
+				}
+
+				F.prototype = klass.prototype;
+
+				return new F( klass, args );
+
+			};
+
+
+			// Cube
+
+			var materials = [];
+
+			for ( var i = 0; i < 6; i ++ ) {
+
+				materials.push( [ new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: false } ) ] );
+
+			}
+
+
+
+			var geometriesParams = [
+
+				{ type: 'CubeGeometry', args: [ 200, 200, 200, 2, 2, 2, materials ] },
+				{ type: 'TorusGeometry', args: [ 100, 60, 4, 8, Math.PI*2 ] },
+				{ type: 'TorusKnotGeometry', args: [  ], scale:0.25, meshScale:4 },
+				{ type: 'SphereGeometry', args: [ 100, 3, 3 ], meshScale:2 },
+				{ type: 'IcosahedronGeometry', args: [ 100, 1 ], meshScale:2 },
+				{ type: 'CylinderGeometry', args: [ 25, 75, 200, 8, 3 ]} ,
+				{ type: 'OctahedronGeometry', args: [200, 0], meshScale:2 },
+				{ type: 'LatheGeometry', args: [ [
+					new THREE.Vector3(0,0,0),
+					new THREE.Vector3(0,50,50),
+					new THREE.Vector3(0,10,100),
+					new THREE.Vector3(0,50,150),
+					new THREE.Vector3(0,0,200) ] ]},
+				{ type: 'TextGeometry', args: ['&', {
+										size: 200,
+										height: 50,
+										curveSegments: 1,
+										font: "helvetiker"
+
+									}]},
+				{ type: 'PlaneGeometry', args: [ 200, 200, 4, 4 ] }
+
+			];
+
+			var loader = new THREE.JSONLoader();
+			loader.load( 'obj/WaltHeadLo.js', function ( geometry ) {
+
+				geometriesParams.push({type: 'WaltHead', args: [ ], meshScale: 6 });
+
+				THREE.WaltHead = function() {
+					return geometry.clone();
+				};
+
+				updateInfo()
+
+			});
+
+			var loader2 = new THREE.JSONLoader();
+			loader2.load( 'obj/Suzanne.js', function ( geometry ) {
+
+				geometriesParams.push({type: 'Suzanne', args: [ ], scale: 100, meshScale:2 });
+
+				THREE.Suzanne = function() {
+					return geometry.clone();
+				};
+
+				updateInfo()
+
+			} );
+
+
+			var info;
+			var subdivisions = 2;
+			var geometryIndex = 0;
+
+			// start scene
+
+			init();
+			animate();
+
+			function nextSubdivision( x ) {
+
+				subdivisions = Math.max( 0, subdivisions + x );
+				addStuff();
+
+			}
+
+			function nextGeometry() {
+
+				geometryIndex ++;
+
+				if ( geometryIndex > geometriesParams.length - 1 ) {
+
+					geometryIndex = 0;
+
+				}
+
+				addStuff();
+
+			}
+
+			function switchGeometry(i) {
+
+				geometryIndex = i;
+
+				addStuff();
+			}
+
+			function updateInfo() {
+
+				var params = geometriesParams[ geometryIndex ];
+
+				var dropdown = '<select id="dropdown" onchange="switchGeometry(this.value)">';
+
+				for (  i = 0; i < geometriesParams.length; i ++ ) {
+					dropdown += '<option value="' + i + '"';
+
+					dropdown += (geometryIndex == i)  ? ' selected' : '';
+
+					dropdown += '>' + geometriesParams[i].type + '</option>';
+				}
+
+				dropdown += '</select>';
+
+				info.innerHTML = 'Drag to spin THREE.' + params.type +
+
+				 	'<br><br>Subdivisions: '  + subdivisions +
+					' <a href="#" onclick="nextSubdivision(1); return false;">more</a>/<a href="#" onclick="nextSubdivision(-1); return false;">less</a>' +
+					'<br>Geometry: ' + dropdown + ' <a href="#" onclick="nextGeometry();return false;">next</a>' +
+					'<br><br>Vertices count: before ' + geometry.vertices.length + ' after ' + smooth.vertices.length +
+					'<br>Face count: before ' + geometry.faces.length + ' after ' + smooth.faces.length
+				; //+ params.args;
+			}
+
+			function addStuff() {
+
+				if ( cube ) {
+
+					scene.remove( group );
+					scene.remove( cube );
+
+				}
+
+
+				var modifier = new THREE.SubdivisionModifier( subdivisions );
+
+
+				var params = geometriesParams[ geometryIndex ];
+
+				geometry = createSomething( THREE[ params.type ], params.args );
+
+				// Scale Geometry
+
+				if ( params.scale ) {
+
+					geometry.applyMatrix( new THREE.Matrix4().makeScale( params.scale, params.scale, params.scale ) );
+
+				}
+
+				// Cloning original geometry for debuging
+
+				smooth = geometry.clone();
+
+				// mergeVertices(); is run in case of duplicated vertices
+				smooth.mergeVertices();
+
+				smooth.computeCentroids();
+				smooth.computeFaceNormals();
+				smooth.computeVertexNormals();
+
+				modifier.modify( smooth );
+
+				updateInfo();
+
+				var faceABCD = "abcd";
+				var color, f, p, n, vertexIndex;
+
+				for ( i = 0; i < smooth.faces.length; i ++ ) {
+
+					f  = smooth.faces[ i ];
+
+
+					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+
+					for( var j = 0; j < n; j++ ) {
+
+						vertexIndex = f[ faceABCD.charAt( j ) ];
+
+						p = smooth.vertices[ vertexIndex ];
+
+						color = new THREE.Color( 0xffffff );
+						color.setHSL( ( p.y ) / 200 + 0.5, 1.0, 0.5 );
+
+						f.vertexColors[ j ] = color;
+
+					}
+
+				}
+
+
+				group = new THREE.Object3D();
+				group.add( new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xfefefe, wireframe: true, opacity: 0.5 } ) ) );
+				scene.add( group );
+
+
+				var debugNewPoints = false;
+				var debugOldPoints = false;
+
+				// Debug new Points
+
+				if (debugNewPoints) {
+					var PI2 = Math.PI * 2;
+					var program = function ( context ) {
+
+						context.beginPath();
+						context.arc( 0, 0, 1, 0, PI2, true );
+						context.closePath();
+						context.fill();
+
+					}
+
+					for ( var i = 0; i < smooth.vertices.length; i++ ) {
+
+						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
+						particle.position = smooth.vertices[ i ];
+						var pos = smooth.vertices.position
+						particle.scale.x = particle.scale.y = 5;
+						group.add( particle );
+					}
+
+				}
+
+
+				//Debug original points
+
+				if (debugOldPoints) {
+
+					var drawText = function(i) {
+
+						return function ( context ) {
+
+							context.beginPath();
+							context.scale(0.1,-0.1);
+
+							context.fillText(i, 0,0);
+
+						};
+
+					}
+
+					for ( var i = 0; i < geometry.vertices.length; i++ ) {
+
+						particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: drawText(i) } ) );
+						particle.position = smooth.vertices[ i ];
+						var pos = geometry.vertices.position
+						particle.scale.x = particle.scale.y = 30;
+						group.add( particle );
+					}
+				}
+
+
+				var meshmaterials = [
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+					new THREE.MeshBasicMaterial( { color: 0x405040, wireframe: true, opacity: 0.8, transparent: true } )
+				];
+
+				cube = THREE.SceneUtils.createMultiMaterialObject( smooth, meshmaterials );
+
+				var meshScale =  params.meshScale ? params.meshScale : 1;
+
+				cube.scale.x = meshScale;
+				cube.scale.y = meshScale;
+				cube.scale.z = meshScale;
+
+				scene.add( cube );
+
+				group.scale.copy( cube.scale );
+
+			}
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '10px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = 'Drag to spin the geometry ';
+				container.appendChild( info );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.z = 500;
+
+				scene = new THREE.Scene();
+
+				var light = new THREE.PointLight( 0xffffff, 1.5 );
+				light.position.set( 1000, 1000, 2000 );
+				scene.add( light );
+
+				addStuff();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } ); // WebGLRenderer CanvasRenderer
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function onDocumentMouseDown( event ) {
+
+				//event.preventDefault();
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+
+				mouseXOnMouseDown = event.clientX - windowHalfX;
+				mouseYOnMouseDown = event.clientY - windowHalfY;
+				targetYRotationOnMouseDown = targetYRotation;
+				targetXRotationOnMouseDown = targetXRotation;
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+				mouseY = event.clientY - windowHalfY;
+
+				targetYRotation = targetYRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+				targetXRotation = targetXRotationOnMouseDown + ( mouseY - mouseYOnMouseDown ) * 0.02;
+
+			}
+
+			function onDocumentMouseUp( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+			}
+
+			function onDocumentMouseOut( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotationOnMouseDown = targetRotation;
+
+				}
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
+
+				}
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				group.rotation.x = cube.rotation.x += ( targetXRotation - cube.rotation.x ) * 0.05;
+				group.rotation.y = cube.rotation.y += ( targetYRotation - cube.rotation.y ) * 0.05;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
+

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js editor</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				font-size: 14px;
+				margin: 0;
+				overflow: hidden;
+			}
+
+			hr {
+				border: 0px;
+				border-top: 1px solid #ccc;
+			}
+
+			.menubar {
+				background-color: #eee;
+				padding: 0px;
+				margin: 0px;
+			}
+
+				.menubar .menu {
+					float: left;
+					width: 50px;
+					cursor: pointer;
+				}
+
+					.menubar .menu .options {
+						display: none;
+						padding: 5px 0px;
+						background-color: #fff;
+						width: 140px;
+					}
+
+					.menubar .menu:hover .options {
+						display: block;
+					}
+
+						.menubar .menu .options hr {
+							border-color: #ddd;
+						}
+
+						.menubar .menu .options .option {
+							color: #666;
+							background-color: transparent;
+							padding: 5px 10px;
+							margin: 0px !important;
+						}
+
+							.menubar .menu .options .option:hover {
+								color: #fff;
+								background-color: #08f;
+							}
+
+			.sidebar {
+				width: 300px;
+				background-color: #eee;
+				overflow: auto;
+			}
+
+				.sidebar .Panel {
+					margin-bottom: 10px;
+				}
+
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+		<script src="../examples/js/controls/TrackballControls.js"></script>
+		<script src="../examples/js/loaders/BinaryLoader.js"></script>
+		<script src="../examples/js/loaders/ColladaLoader.js"></script>
+		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/STLLoader.js"></script>
+		<script src="../examples/js/loaders/UTF8Loader.js"></script>
+		<script src="../examples/js/loaders/VTKLoader.js"></script>
+		<script src="../examples/js/loaders/ctm/lzma.js"></script>
+		<script src="../examples/js/loaders/ctm/ctm.js"></script>
+		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
+		<script src="../examples/js/exporters/GeometryExporter.js"></script>
+		<script src="../examples/js/exporters/SceneExporter.js"></script>
+		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
+		<script src="../examples/js/renderers/SVGRenderer.js"></script>
+
+		<script src="../examples/js/loaders/SceneLoader2.js"></script>
+		<script src="../examples/js/exporters/SceneExporter2.js"></script>
+
+		<script src="js/libs/signals.min.js"></script>
+
+		<script src="js/UI.js"></script>
+		<script src="js/UI.three.js"></script>
+		<script src="js/ui/Menubar.js"></script>
+		<script src="js/ui/Menubar.File.js"></script>
+		<script src="js/ui/Menubar.Edit.js"></script>
+		<script src="js/ui/Menubar.Add.js"></script>
+		<script src="js/ui/Menubar.Help.js"></script>
+		<script src="js/ui/Sidebar.js"></script>
+		<script src="js/ui/Sidebar.Renderer.js"></script>
+		<script src="js/ui/Sidebar.Scene.js"></script>
+		<script src="js/ui/Sidebar.Object3D.js"></script>
+		<script src="js/ui/Sidebar.Geometry.js"></script>
+		<script src="js/ui/Sidebar.Material.js"></script>
+		<script src="js/ui/Viewport.js"></script>
+
+		<script>
+
+			window.URL = window.URL || window.webkitURL;
+			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
+
+			var SIGNALS = signals;
+
+			var signals = {
+
+				// actions
+
+				cloneSelectedObject: new SIGNALS.Signal(),
+				removeSelectedObject: new SIGNALS.Signal(),
+				exportGeometry: new SIGNALS.Signal(),
+				exportScene: new SIGNALS.Signal(),
+
+				// notifications
+
+				rendererChanged: new SIGNALS.Signal(),
+				sceneChanged: new SIGNALS.Signal(),
+				objectAdded: new SIGNALS.Signal(),
+				objectSelected: new SIGNALS.Signal(),
+				objectChanged: new SIGNALS.Signal(),
+				materialChanged: new SIGNALS.Signal(),
+				clearColorChanged: new SIGNALS.Signal(),
+				cameraChanged: new SIGNALS.Signal(),
+				fogTypeChanged: new SIGNALS.Signal(),
+				fogColorChanged: new SIGNALS.Signal(),
+				fogParametersChanged: new SIGNALS.Signal(),
+				windowResize: new SIGNALS.Signal()
+
+			};
+
+			//
+
+			var viewport = new Viewport( signals );
+			viewport.setTop( '32px' );
+			viewport.setLeft( '0px' );
+			viewport.setRight( '300px' );
+			viewport.setBottom( '0px' );
+			document.body.appendChild( viewport.dom );
+
+			var menubar = new Menubar( signals );
+			menubar.setWidth( '100%' );
+			menubar.setHeight( '32px' );
+			document.body.appendChild( menubar.dom );
+
+			var sidebar = new Sidebar( signals );
+			sidebar.setRight( '0px' );
+			sidebar.setTop( '32px' );
+			sidebar.setBottom( '0px' );
+			document.body.appendChild( sidebar.dom );
+
+			document.addEventListener( 'dragover', function ( event ) {
+
+				event.preventDefault();
+				event.dataTransfer.dropEffect = 'copy';
+
+			}, false );
+
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+
+				var file = event.dataTransfer.files[ 0 ];
+
+				var chunks = file.name.split( '.' );
+				var extension = chunks.pop().toLowerCase();
+				var filename = chunks.join( '.' );
+
+				parseFile( file, filename, extension );
+
+			}, false );
+
+			var parseFile = function ( file, filename, extension ) {
+
+				switch ( extension ) {
+
+					case 'ctm':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var stream = new CTM.Stream( contents );
+							stream.offset = 0;
+
+							var loader = new THREE.CTMLoader();
+							loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
+
+								geometry.sourceType = "ctm";
+								geometry.sourceFile = file.name;
+
+								var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+								mesh.name = filename;
+
+								signals.objectAdded.dispatch( mesh );
+								signals.objectSelected.dispatch( mesh );
+
+							} );
+
+						}, false );
+						reader.readAsBinaryString( file );
+
+						break;
+
+					case 'dae':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var parser = new DOMParser();
+							var xml = parser.parseFromString( contents, 'text/xml' );
+
+							var loader = new THREE.ColladaLoader();
+							loader.parse( xml, function ( collada ) {
+
+								collada.scene.name = filename;
+
+								signals.objectAdded.dispatch( collada.scene );
+								signals.objectSelected.dispatch( collada.scene );
+
+							} );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+					case 'js':
+					case 'json':
+
+						var handleJSON = function ( data ) {
+
+							if ( data.metadata === undefined ) { // 2.0
+
+								data.metadata = { type: 'geometry' };
+
+							}
+
+							if ( data.metadata.type === undefined ) { // 3.0
+
+								data.metadata.type = 'geometry';
+
+							}
+
+							if ( data.metadata.version === undefined ) {
+
+								data.metadata.version = data.metadata.formatVersion;
+
+							}
+
+							if ( data.metadata.type === 'geometry' ) {
+
+								var loader = new THREE.JSONLoader();
+								var result = loader.parse( data );
+
+								var geometry = result.geometry;
+								var materials = result.materials;
+
+								geometry.sourceType = "ascii";
+								geometry.sourceFile = file.name;
+
+								var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
+								mesh.name = filename;
+
+								signals.objectAdded.dispatch( mesh );
+								signals.objectSelected.dispatch( mesh );
+
+							} else if ( data.metadata.type === 'scene' ) {
+
+								var loader;
+
+								if ( data.metadata.version < 4 ) {
+
+									loader = new THREE.SceneLoader();
+
+								} else {
+
+									loader = new THREE.SceneLoader2();
+
+								}
+
+								loader.parse( data, function ( result ) {
+
+									result.scene.name = filename;
+
+									signals.objectAdded.dispatch( result.scene );
+									signals.objectSelected.dispatch( result.scene );
+
+								}, '' );
+
+							}
+
+						};
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							// 2.0
+
+							if ( contents.indexOf( 'postMessage' ) !== -1 ) {
+
+								var blob = new Blob( [ contents ], { type: 'text/javascript' } );
+								var url = URL.createObjectURL( blob );
+
+								var worker = new Worker( url );
+
+								worker.onmessage = function ( event ) {
+
+									event.data.metadata = { version: 2 };
+									handleJSON( event.data );
+
+								};
+
+								worker.postMessage( Date.now() );
+
+								return;
+
+							}
+
+							// >= 3.0
+
+							var data;
+
+							try {
+
+								data = JSON.parse( contents );
+
+							} catch ( error ) {
+
+								alert( error );
+								return;
+
+							}
+
+							handleJSON( data );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+					case 'obj':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var object = new THREE.OBJLoader().parse( contents );
+							object.name = filename;
+
+							signals.objectAdded.dispatch( object );
+							signals.objectSelected.dispatch( object );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+					case 'stl':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var geometry = new THREE.STLLoader().parse( contents );
+							geometry.sourceType = "stl";
+							geometry.sourceFile = file.name;
+
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+							mesh.name = filename;
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+					/*
+					case 'utf8':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var geometry = new THREE.UTF8Loader().parse( contents );
+							var material = new THREE.MeshLambertMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
+
+						}, false );
+						reader.readAsBinaryString( file );
+
+						break;
+					*/
+
+					case 'vtk':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							var geometry = new THREE.VTKLoader().parse( contents );
+							geometry.sourceType = "vtk";
+							geometry.sourceFile = file.name;
+
+							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+							mesh.name = filename;
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
+				}
+
+			}
+
+			//
+
+			var onWindowResize = function ( event ) {
+
+				signals.windowResize.dispatch();
+
+			};
+
+			var createDummyMaterial = function () {
+
+				return new THREE.MeshPhongMaterial();
+
+			};
+
+			//
+
+			onWindowResize();
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		</script>
+	</body>
+</html>

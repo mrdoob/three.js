@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - grass</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#030;
+				color:#fff;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+				font-family:georgia;
+				text-align:center;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var camera, scene, renderer,
+			mesh, levels = [];
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 75, 100 );
+
+				scene = new THREE.Scene();
+
+				var geometry = new THREE.PlaneGeometry( 100, 100 );
+
+				var bitmap = generateTextureBase();
+
+				for ( var i = 0; i < 15; i ++ ) {
+
+					mesh = levels[ i ] = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: new THREE.Texture( generateTextureLevel( bitmap ) ), transparent: true, depthWrite: false, depthTest: false } ) );
+					mesh.material.map.needsUpdate = true;
+
+					mesh.position.y = i * 0.25;
+					mesh.rotation.x = - Math.PI / 2;
+
+					scene.add( mesh );
+
+				}
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.sortObjects = false;
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function generateTextureBase() {
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = 512;
+				canvas.height = 512;
+
+				var context = canvas.getContext( '2d' );
+
+				for ( var i = 0; i < 20000; i ++ ) {
+
+					context.fillStyle = 'rgba(0,' + Math.floor( Math.random() * 64 + 32 ) + ',16,1)';
+					context.beginPath();
+					context.arc( Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 1 + 0.5, 0, Math.PI * 2, true );
+					context.closePath();
+					context.fill();
+
+				}
+
+				context.globalAlpha = 0.075;
+				context.globalCompositeOperation = 'lighter';
+
+				return canvas;
+
+			}
+
+			function generateTextureLevel( texture ) {
+
+				texture.getContext( '2d' ).drawImage( texture, 0, 0 );
+
+				var canvas = document.createElement( 'canvas' );
+				canvas.width = texture.width;
+				canvas.height = texture.height;
+
+				canvas.getContext( '2d' ).drawImage( texture, 0, 0 );
+
+				return canvas;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+
+			}
+
+			function render() {
+
+				var time = Date.now() / 6000;
+
+				camera.position.x = 80 * Math.cos( time );
+				camera.position.z = 80 * Math.sin( time );
+
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = levels.length; i < l; i ++ ) {
+
+					mesh = levels[ i ];
+					mesh.position.x = Math.sin( time * 4 ) * i * i * 0.005;
+					mesh.position.z = Math.cos( time * 6 ) * i * i * 0.005;
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading an [page:Image image].</div>
+		<div class="desc">Unlike other loaders, this one emits events instead of using predefined callbacks. So if you're interested in getting notified when <em>things</em> happen, you need to add listeners to the object.</div>
+		
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>Methods</h2>
+
+		<h3>.load( [page:String url] )</h3>
+		<div>
+		url — required
+		</div>
+		
+		<div class="desc">Begin loading from <em>url</em></div>
+
+		<h2>Events</h2>
+		
+		<h3>load</h3>
+		<div class="desc">
+		Dispatched when the image has completed loading
+		</div>
+		<div>
+		content — loaded image
+		</div>
+		
+		<h3>error</h3>
+		<div class="desc">
+		Dispatched when the image can't be loaded
+		</div>
+		<div>
+		message — error message
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

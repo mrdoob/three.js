@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A LoadingMonitor keeps track of loaded and pending data.</div>
+		<div class="desc">To keep track of a loader, just add it to the monitor:</div>
+<code>monitor.add( imageLoader );
+</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>Events</h2>
+		
+		<h3>progress</h3>
+		<div class="desc">
+		Dispatched each time a monitored loader completes loading
+		</div>
+		<div>
+		loaded — number of completed loaders<br />
+		total — total number of loaders monitored by this monitor
+		</div>
+		
+		<h3>load</h3>
+		<div id="desc">
+		Dispatched when all loaders have completed loading
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>.add( [page:Loader loader] )</h3>
+		<div>
+		loader — required. Loader to be monitored.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

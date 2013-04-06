@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">The default material used by [page:ParticleSystem particle] systems.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Object parameters] )</h3>
+
+		<div>parameters is an object with one or more properties defining the material's appearance.</div>
+		
+		<div>
+		color — Particle color in hexadecimal. Default is 0xffffff.<br />
+		map — a [page:Texture texture]. Default is null. // TODO: specify what is its purpose<br />
+		size — Define size of particles. Default is 1.0.<br />
+		sizeAttenuation — Enable/disable size attenuation with distance.<br />
+		vertexColors — Define whether the material uses vertex colors, or not. Default is false.<br />
+		fog — Define whether the material color is affected by global fog settings. Default is true.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Number color]</h3>
+		
+		<div>Sets the color of the particles. Default is 0xffffff.</div>
+		
+		<h3>.[page:Texture map]</h3>
+		
+		<div>Sets the color of the particles using data from a texture (?).</div>
+		
+		<h3>.[page:Number size]</h3>
+		
+		<div>Sets the size of the particles. Default is 1.0.</div>
+
+		<h3>.[page:Boolean sizeAttenuation]</h3>
+		
+		<div>Specify whether particles' size will get smaller with the distance. Default is true.</div>
+
+		<h3>.[page:Boolean vertexColors]</h3>
+		<div>Define whether the material uses vertex colors, or not. Default is false.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+
+		<h3>.[page:Boolean fog]</h3>
+		<div>Define whether the material color is affected by global fog settings.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

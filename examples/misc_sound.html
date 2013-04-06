@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js misc - sound</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+				text-align:center;
+			}
+
+			a {
+				color:#0078ff;
+			}
+
+			#info {
+				color:#fff;
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index:100;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl 3d sounds example -
+			music by <a href="http://www.newgrounds.com/audio/listen/358232" target="_blank">larrylarrybb</a> and
+			<a href="http://www.newgrounds.com/audio/listen/376737" target="_blank">skullbeatz</a> <br/><br/>
+
+			navigate with WASD / arrows / mouse
+		</div>
+
+
+		<div id="container"></div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/controls/FirstPersonControls.js"></script>
+
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container;
+			var camera, controls, scene, renderer;
+			var light, pointLight;
+
+			var mesh;
+			var material_sphere1, material_sphere2;
+
+			var sound1, sound2;
+
+			var clock = new THREE.Clock();
+
+			var Sound = function ( sources, radius, volume ) {
+
+				var audio = document.createElement( 'audio' );
+
+				for ( var i = 0; i < sources.length; i ++ ) {
+
+					var source = document.createElement( 'source' );
+					source.src = sources[ i ];
+
+					audio.appendChild( source );
+
+				}
+
+				this.position = new THREE.Vector3();
+
+				this.play = function () {
+
+					audio.play();
+
+				}
+
+				this.update = function ( camera ) {
+
+					var distance = this.position.distanceTo( camera.position );
+
+					if ( distance <= radius ) {
+
+						audio.volume = volume * ( 1 - distance / radius );
+
+					} else {
+
+						audio.volume = 0;
+
+					}
+
+				}
+
+			}
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 25, 0 );
+
+				controls = new THREE.FirstPersonControls( camera );
+
+				controls.movementSpeed = 70;
+				controls.lookSpeed = 0.05;
+				controls.noFly = true;
+				controls.lookVertical = false;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.0035 );
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0.5, 1 ).normalize();
+				scene.add( light );
+
+				var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+
+				material_sphere1 = new THREE.MeshLambertMaterial( { color: 0xffaa00, shading: THREE.FlatShading } );
+				material_sphere2 = new THREE.MeshLambertMaterial( { color: 0xff2200, shading: THREE.FlatShading } );
+
+				// sound spheres
+
+				var s = 1;
+
+				var mesh1 = new THREE.Mesh( sphere, material_sphere1 );
+				mesh1.position.set( -250, 30, 0 );
+				mesh1.scale.set( s, s, s );
+				scene.add( mesh1 );
+
+				sound1 = new Sound( [ 'sounds/358232_j_s_song.mp3', 'sounds/358232_j_s_song.ogg' ], 275, 1 );
+				sound1.position.copy( mesh1.position );
+				sound1.play();
+
+				//
+
+				var mesh2 = new THREE.Mesh( sphere, material_sphere2 );
+				mesh2.position.set( 250, 30, 0 );
+				mesh2.scale.set( s, s, s );
+				scene.add( mesh2 );
+
+				sound2 = new Sound( [ 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3', 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' ], 275, 1 );
+				sound2.position.copy( mesh2.position );
+				sound2.play();
+
+
+				// ground
+
+				var material = new THREE.MeshLambertMaterial( { color: 0x7f7566, wireframe: true, wireframeLinewidth: 1 } );
+
+				mesh = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 100, 100 ), material );
+				mesh.position.y = 0.1;
+				mesh.rotation.x = - Math.PI / 2;
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.innerHTML = "";
+				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+
+			function render() {
+
+				var delta = clock.getDelta(),
+					time = clock.getElapsedTime() * 5;
+
+				controls.update( delta );
+
+				material_sphere1.color.setHSL( 0.0, 0.3 + 0.7 * ( 1 + Math.cos( time ) ) / 2, 0.5 );
+				material_sphere2.color.setHSL( 0.1, 0.3 + 0.7 * ( 1 + Math.sin( time ) ) / 2, 0.5 );
+
+				renderer.render( scene, camera );
+
+				sound1.update( camera );
+				sound2.update( camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,110 @@
+<h1>[name]</h1>
+
+<div class="desc">A 4x4 Matrix.</div>
+
+
+<h2>Example</h2>
+
+<code>// Simple rig for rotating around 3 axes
+
+var m = new THREE.Matrix4();
+
+var m1 = new THREE.Matrix4();
+var m2 = new THREE.Matrix4();
+var m3 = new THREE.Matrix4();
+
+var alpha = 0;
+var beta = Math.PI;
+var gamma = Math.PI/2;
+
+m1.setRotationX( alpha );
+m2.setRotationY( beta );
+m3.setRotationZ( gamma );
+
+m.multiply( m1, m2 );
+m.multiplySelf( m3 );
+</code>
+
+
+<h2>Constructor</h2>
+
+<h3>[name]( [page:Float n11], [page:Float n12], [page:Float n13], [page:Float n14], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n24], [page:Float n31], [page:Float n32], [page:Float n33], [page:Float n34], [page:Float n41], [page:Float n42], [page:Float n43], [page:Float n44] )</h3>
+
+
+<h2>Properties</h2>
+
+<h3>.[page:Float n11]</h3>
+
+<h3>.[page:Float n12]</h3>
+
+<h3>.[page:Float n13]</h3>
+
+<h3>.[page:Float n14]</h3>
+
+<h3>.[page:Float n21]</h3>
+
+<h3>.[page:Float n22]</h3>
+
+<h3>.[page:Float n23]</h3>
+
+<h3>.[page:Float n24]</h3>
+
+<h3>.[page:Float n31]</h3>
+
+<h3>.[page:Float n32]</h3>
+
+<h3>.[page:Float n33]</h3>
+
+<h3>.[page:Float n34]</h3>
+
+<h3>.[page:Float n41]</h3>
+
+<h3>.[page:Float n42]</h3>
+
+<h3>.[page:Float n43]</h3>
+
+<h3>.[page:Float n44]</h3>
+
+
+<h2>Methods</h2>
+
+<h3>.set( [page:Float n11], [page:Float n12], [page:Float n13], [page:Float n14], [page:Float n21], [page:Float n22], [page:Float n23], [page:Float n24], [page:Float n31], [page:Float n32], [page:Float n33], [page:Float n34], [page:Float n41], [page:Float n42], [page:Float n43], [page:Float n44] ) [page:Matrix4]</h3>
+<div>
+Sets all fields of this matrix.
+</div>
+
+<h3>.identity() [page:Matrix4]</h3>
+<div>
+Resets this matrix to identity.
+</div>
+
+<h3>.copy( [page:Matrix4 m] ) [page:Matrix4]</h3>
+<div>
+Copies a matrix <strong>m</strong> into this matrix.
+</div>
+
+<h3>.lookAt( [page:Vector3 eye], [page:Vector3 center], [page:Vector3 up], ) [page:Matrix4]</h3>
+<div>
+Constructs a rotation matrix, looking from <strong>eye</strong> towards <strong>center</strong> with defined <strong>up</strong> vector.
+</div>
+
+<h3>.multiply( [page:Matrix4 a], [page:Matrix4 b] ) [page:Matrix4]</h3>
+<div>
+Sets this matrix to <strong>a * b</strong>.
+</div>
+
+<h3>.multiplySelf( [page:Matrix4 m] ) [page:Matrix4]</h3>
+<div>
+Multiplies this matrix by <strong>m</strong>.
+</div>
+
+<h3>.multiplyToArray( [page:Matrix4 a], [page:Matrix4 b], [page:Array r] ) [page:Matrix4]</h3>
+<div>
+Sets this matrix to <strong>a * b</strong> and sets result into flat array <strong>r</strong>.<br />
+Destination array can be regular Array or TypedArray.
+</div>
+
+
+<h2>Source</h2>
+
+<a href="https://github.com/mrdoob/three.js/blob/master/src/[path].js" target="_blank">src/[path].js</a>

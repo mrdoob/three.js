@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js canvas - depth material</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var cube, plane, objects = [];
+
+			var targetRotation = 0;
+			var targetRotationOnMouseDown = 0;
+
+			var mouseX = 0;
+			var mouseXOnMouseDown = 0;
+
+			var moveForward = false;
+			var moveBackwards = false;
+			var moveLeft = false;
+			var moveRight = false;
+			var moveUp = false;
+			var moveDown = false;
+
+			var targetMoveLeft = false;
+			var targetMoveRight = false;
+
+			var debugContext;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 1000, 1000, 1000 );
+				camera.target = new THREE.Vector3( 0, 150, 0 );
+
+				scene = new THREE.Scene();
+
+				// Plane
+
+				var material = new THREE.MeshDepthMaterial( { side: THREE.DoubleSide, overdraw: true } );
+
+				plane = new THREE.Mesh( new THREE.PlaneGeometry( 1000, 1000, 10, 10 ), material );
+				plane.position.y = - 100;
+				plane.rotation.x = - Math.PI / 2;
+				scene.add( plane );
+
+				// Cubes
+
+				geometry = new THREE.CubeGeometry( 100, 100, 100 );
+				material = new THREE.MeshDepthMaterial( { overdraw: true } );
+
+				for ( var i = 0; i < 20; i ++ ) {
+
+					cube = new THREE.Mesh( geometry, material );
+
+					cube.position.x = ( i % 5 ) * 200 - 400;
+					cube.position.z = Math.floor( i / 5 ) * 200 - 350;
+
+					cube.rotation.x = Math.random() * 200 - 100;
+					cube.rotation.y = Math.random() * 200 - 100;
+					cube.rotation.z = Math.random() * 200 - 100;
+
+					scene.add( cube );
+
+					objects.push( cube );
+
+				}
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				var debugCanvas = document.createElement( 'canvas' );
+				debugCanvas.width = 512;
+				debugCanvas.height = 512;
+				debugCanvas.style.position = 'absolute';
+				debugCanvas.style.top = '0px';
+				debugCanvas.style.left = '0px';
+
+				container.appendChild( debugCanvas );
+
+				debugContext = debugCanvas.getContext( '2d' );
+				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
+				debugContext.strokeStyle = '#808080';
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
+
+				document.addEventListener( 'keydown', onDocumentKeyDown, false );
+				document.addEventListener( 'keyup', onDocumentKeyUp, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentKeyDown( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 38: moveForward = true; break; // up
+					case 40: moveBackwards = true; break; // down
+					case 37: moveLeft = true; break; // left
+					case 39: moveRight = true; break; // right
+					case 87: moveUp = true; break; // w
+					case 83: moveDown = true; break; // s
+					case 65: targetMoveLeft = true; break; // a
+					case 68: targetMoveRight = true; break; // d
+
+				}
+
+			}
+
+			function onDocumentKeyUp( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 38: moveForward = false; break; // up
+					case 40: moveBackwards = false; break; // down
+					case 37: moveLeft = false; break; // left
+					case 39: moveRight = false; break; // right
+					case 87: moveUp = false; break; // w
+					case 83: moveDown = false; break; // s
+					case 65: targetMoveLeft = false; break; // a
+					case 68: targetMoveRight = false; break; // d
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				if ( moveForward ) camera.position.z -= 10;
+				if ( moveBackwards ) camera.position.z += 10;
+
+				if ( moveLeft ) camera.position.x -= 10;
+				if ( moveRight ) camera.position.x += 10;
+
+				if ( moveUp ) camera.position.y += 10;
+				if ( moveDown ) camera.position.y -= 10;
+
+				if ( targetMoveLeft ) camera.target.x -= 10;
+				if ( targetMoveRight ) camera.target.x += 10;
+
+				camera.lookAt( camera.target );
+
+				debugContext.clearRect( - 256, - 256, 512, 512 );
+
+				debugContext.beginPath();
+
+				// center
+				debugContext.moveTo( - 10, 0 );
+				debugContext.lineTo( 10, 0 );
+				debugContext.moveTo( 0, - 10 );
+				debugContext.lineTo( 0, 10 );
+
+				// camera
+
+				debugContext.moveTo( camera.position.x * 0.1, camera.position.z * 0.1 );
+				debugContext.lineTo( camera.target.x * 0.1, camera.target.z * 0.1 );
+				debugContext.rect( camera.position.x * 0.1 - 5, camera.position.z * 0.1 - 5, 10, 10 );
+				debugContext.rect( camera.target.x * 0.1 - 5, camera.target.z * 0.1 - 5, 10, 10 );
+				debugContext.rect( - 50, - 50, 100, 100 );
+
+				for ( var i = 0; i < objects.length; i++ ) {
+
+					var object = objects[ i ];
+
+					object.rotation.x += 0.01;
+					object.rotation.y += 0.005;
+					object.position.y = Math.sin( object.rotation.x ) * 200 + 200;
+
+					debugContext.rect( object.position.x * 0.1 - 5, object.position.z * 0.1 - 5, 10, 10 );
+
+				}
+
+				debugContext.closePath();
+				debugContext.stroke();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

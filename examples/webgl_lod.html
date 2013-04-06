@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - level-of-details</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family: Monospace;
+				font-size: 13px;
+				text-align: center;
+				z-index:100;
+			}
+
+			a { color:red }
+
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - level-of-details WebGL example
+		</div>
+
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var geometry, objects;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 15000 );
+				camera.position.z = 1000;
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
+
+				var light = new THREE.PointLight( 0xff2200 );
+				light.position.set( 0, 0, 0 );
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 ).normalize();
+				scene.add( light );
+
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
+
+				var geometry = [
+
+					[ new THREE.SphereGeometry( 100, 64, 32 ), 300 ],
+					[ new THREE.SphereGeometry( 100, 32, 16 ), 1000 ],
+					[ new THREE.SphereGeometry( 100, 16, 8 ), 2000 ],
+					[ new THREE.SphereGeometry( 100, 8, 4 ), 10000 ]
+
+				];
+
+				var i, j, mesh, lod;
+
+				for ( j = 0; j < 1000; j ++ ) {
+
+					lod = new THREE.LOD();
+
+					for ( i = 0; i < geometry.length; i ++ ) {
+
+						mesh = new THREE.Mesh( geometry[ i ][ 0 ], material );
+						mesh.scale.set( 1.5, 1.5, 1.5 );
+						mesh.updateMatrix();
+						mesh.matrixAutoUpdate = false;
+						lod.addLevel( mesh, geometry[ i ][ 1 ] );
+
+					}
+
+					lod.position.x = 10000 * ( 0.5 - Math.random() );
+					lod.position.y =  7500 * ( 0.5 - Math.random() );
+					lod.position.z = 10000 * ( 0.5 - Math.random() );
+					lod.updateMatrix();
+					lod.matrixAutoUpdate = false;
+					scene.add( lod );
+
+				}
+
+
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.sortObjects = false;
+				renderer.autoUpdateScene = false;
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .005;
+				camera.position.y += ( - mouseY - camera.position.y ) * .01;
+
+				camera.lookAt( scene.position );
+
+				scene.updateMatrixWorld();
+				scene.traverse( function ( object ) {
+
+					if ( object instanceof THREE.LOD ) {
+
+						object.update( camera );
+
+					}
+
+				} );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

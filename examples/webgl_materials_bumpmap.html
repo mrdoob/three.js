@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - bump map [Lee Perry-Smith]</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#000;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			a {	color: #ffffff;	}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				color: #ffffff;
+				padding: 5px;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				z-index:1000;
+			}
+
+			#oldie {
+				background:rgb(200,100,0) !important;
+				color:#fff;
+			}
+
+			#vt { display:none }
+			#vt, #vt a { color:orange; }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - webgl bump mapping without tangents using <a href="http://mmikkelsen3d.blogspot.sk/2011/07/derivative-maps.html">Morten Mikkelsen's</a> method -
+			<a href="http://www.ir-ltd.net/infinite-3d-head-scan-released/" target="_blank">Lee Perry-Smith</a> head
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var statsEnabled = true;
+
+			var container, stats, loader;
+
+			var camera, scene, renderer;
+
+			var mesh;
+
+			var directionalLight, directionalLight2, pointLight, ambientLight, spotLight;
+
+			var mouseX = 0;
+			var mouseY = 0;
+
+			var targetX = 0;
+			var targetY = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 1200;
+
+				scene = new THREE.Scene();
+
+				// LIGHTS
+
+				ambientLight = new THREE.AmbientLight( 0x444444 );
+				scene.add( ambientLight );
+
+				//
+
+				pointLight = new THREE.PointLight( 0xffffff, 1.5, 1000 );
+				pointLight.color.setHSL( 0.05, 1, 0.95 );
+				pointLight.position.set( 0, 0, 600 );
+
+				scene.add( pointLight );
+
+				// shadow for PointLight
+
+				spotLight = new THREE.SpotLight( 0xffffff, 1.5 );
+				spotLight.position.set( 0.05, 0.05, 1 );
+				spotLight.color.setHSL( 0.6, 1, 0.95 );
+				scene.add( spotLight );
+
+				spotLight.position.multiplyScalar( 700 );
+
+				spotLight.castShadow = true;
+				spotLight.onlyShadow = true;
+				// spotLight.shadowCameraVisible = true;
+
+				spotLight.shadowMapWidth = 2048;
+				spotLight.shadowMapHeight = 2048;
+
+				spotLight.shadowCameraNear = 200;
+				spotLight.shadowCameraFar = 1500;
+
+				spotLight.shadowCameraFov = 40;
+
+				spotLight.shadowBias = -0.005;
+				spotLight.shadowDarkness = 0.35;
+
+				//
+
+				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				directionalLight.position.set( 1, -0.5, 1 );
+				directionalLight.color.setHSL( 0.6, 1, 0.95 );
+				scene.add( directionalLight );
+
+				directionalLight.position.multiplyScalar( 500 );
+
+				directionalLight.castShadow = true;
+				// directionalLight.shadowCameraVisible = true;
+
+				directionalLight.shadowMapWidth = 2048;
+				directionalLight.shadowMapHeight = 2048;
+
+				directionalLight.shadowCameraNear = 200;
+				directionalLight.shadowCameraFar = 1500;
+
+				directionalLight.shadowCameraLeft = -500;
+				directionalLight.shadowCameraRight = 500;
+				directionalLight.shadowCameraTop = 500;
+				directionalLight.shadowCameraBottom = -500;
+
+				directionalLight.shadowBias = -0.005;
+				directionalLight.shadowDarkness = 0.35;
+
+				//
+
+				directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1.2 );
+				directionalLight2.position.set( 1, -0.5, -1 );
+				directionalLight2.color.setHSL( 0.08, 1, 0.825 );
+				scene.add( directionalLight2 );
+
+				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+
+				mapHeight.anisotropy = 4;
+				mapHeight.repeat.set( 0.998, 0.998 );
+				mapHeight.offset.set( 0.001, 0.001 )
+				mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
+				mapHeight.format = THREE.RGBFormat;
+
+				var material = new THREE.MeshPhongMaterial( { ambient: 0x552811, color: 0x552811, specular: 0x333333, shininess: 25, bumpMap: mapHeight, bumpScale: 19, metal: false } );
+
+				loader = new THREE.JSONLoader( true );
+				document.body.appendChild( loader.statusDomElement );
+
+				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
+
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x060708, clearAlpha: 1, alpha: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.shadowMapEnabled = true;
+				renderer.shadowMapCullFace = THREE.CullFaceBack;
+
+				//
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+				//
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					container.appendChild( stats.domElement );
+
+				}
+
+				// EVENTS
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function createScene( geometry, scale, material ) {
+
+				mesh = new THREE.Mesh( geometry, material );
+
+				mesh.position.y = - 50;
+				mesh.scale.set( scale, scale, scale );
+
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+
+				scene.add( mesh );
+
+				loader.statusDomElement.style.display = "none";
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = ( event.clientX - windowHalfX );
+				mouseY = ( event.clientY - windowHalfY );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			function render() {
+
+				targetX = mouseX * .001;
+				targetY = mouseY * .001;
+
+				if ( mesh ) {
+
+					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
+					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
+
+				}
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

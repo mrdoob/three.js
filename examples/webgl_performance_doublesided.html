@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - performance</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #eee !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh, geometry;
+
+			var mouseX = 0, mouseY = 0;
+
+			var SCREEN_WIDTH = window.innerWidth,
+				SCREEN_HEIGHT = window.innerHeight;
+
+			var windowHalfX = SCREEN_WIDTH / 2;
+			var windowHalfY = SCREEN_HEIGHT / 2;
+
+			var FANCY = true;
+
+			init();
+			animate();
+
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 50, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 20000 );
+				camera.position.z = 3200;
+
+				scene = new THREE.Scene();
+
+				var light = new THREE.PointLight( 0x0011ff, 1, 5500 );
+				light.position.set( 4000, 0, 0 );
+				scene.add( light );
+
+				var light = new THREE.PointLight( 0xff1100, 1, 5500 );
+				light.position.set( -4000, 0, 0 );
+				scene.add( light );
+
+				if ( FANCY ) {
+
+					var light = new THREE.PointLight( 0xffaa00, 2, 3000 );
+					light.position.set( 0, 0, 0 );
+					scene.add( light );
+
+					var path = "textures/cube/SwedishRoyalCastle/";
+					var format = '.jpg';
+					var urls = [
+							path + 'px' + format, path + 'nx' + format,
+							path + 'py' + format, path + 'ny' + format,
+							path + 'pz' + format, path + 'nz' + format
+						];
+
+					var reflectionCube = THREE.ImageUtils.loadTextureCube( urls );
+					reflectionCube.format = THREE.RGBFormat;
+
+					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shininess: 100, envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.1, side: THREE.DoubleSide } );
+					material.wrapAround = true;
+					material.wrapRGB.set( 0.5, 0.5, 0.5 );
+
+				} else {
+
+					var material = new THREE.MeshPhongMaterial( { specular: 0xffffff, shading: THREE.SmoothShading, doubleSided: true } );
+
+				}
+
+				var geometry = new THREE.SphereGeometry( 1, 32, 16, 0, Math.PI );
+
+				for ( var i = 0; i < 5000; i ++ ) {
+
+					var mesh = new THREE.Mesh( geometry, material );
+
+					mesh.position.x = Math.random() * 10000 - 5000;
+					mesh.position.y = Math.random() * 10000 - 5000;
+					mesh.position.z = Math.random() * 10000 - 5000;
+
+					mesh.rotation.x = Math.random() * 2 * Math.PI;
+					mesh.rotation.y = Math.random() * 2 * Math.PI;
+					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 50 + 100;
+
+					mesh.matrixAutoUpdate = false;
+					mesh.updateMatrix();
+
+					scene.add( mesh );
+
+				}
+
+				renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, antialias: FANCY } );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = FANCY;
+
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+				windowHalfX = SCREEN_WIDTH / 2;
+				windowHalfY = SCREEN_HEIGHT / 2;
+
+			}
+
+			function onDocumentMouseMove(event) {
+
+				mouseX = ( event.clientX - windowHalfX ) * 10;
+				mouseY = ( event.clientY - windowHalfY ) * 10;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

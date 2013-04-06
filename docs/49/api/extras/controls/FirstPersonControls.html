@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">An extra add-on for creating and using mouse and keyboard controls akin to those found in <a href="http://en.wikipedia.org/wiki/First-person_shooter">First-Person Shooters</a> (hence the class name).</div>
+
+		<div class="desc">Once attached to a camera object, the position of the camera and its lookAt target can be controlled using the mouse and certain keys (depending on the chosen configuration).</div>
+
+		<div class="desc">The default behaviour is to "pan around" when moving the mouse, and translate forwards or backwards with the left and right buttons pressed. Additionally, the following keys are also enabled:<br /><br />
+		W — moves forward (equivalent to pressing the left button)<br />
+		A — moves leftwards<br />
+		S — moves backwards (equivalent to pressing the right button)<br />
+		D — moves rightwards<br />
+		R — moves up<br />
+		F — moves down<br />
+		Q — toggle freezing (when "frozen", no changes in the camera position or target will happen)<br />
+		</div>
+
+		<div class="desc">The camera 'target' is always 100 units ahead of the camera.</div>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Object object], [page:Element domElement] )</h3>
+
+		<div>
+		object — A camera or another object with similar behaviour (has a <em>position</em> property and a <em>lookAt</em> method).<br />
+		domElement — the element that contains the canvas or WebGL renderer holding the camera we'll control (optional, will use document if nothing is specified)<br />
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Object object]</h3>
+		<div>
+		The camera or object whose <em>position</em> properties will be modified.
+		</div>
+
+		<h3>.[page:Element domElement]</h3>
+		<div>
+		Used for determining the viewport dimensions. If nothing is specified, the current HTML document will be used. Else, the specified element dimensions (offsetWidth and offsetHeight) will be used. Additionally, allowing the element to get focused via tabbing is disabled.
+		</div>
+
+		<h3>.[page:Float movementSpeed]</h3>
+
+		<div>Configure how fast will the camera translations be. Default is 1.0.</div>
+
+		<h3>.[page:Float lookSpeed]</h3>
+
+		<div>Configure how fast will the camera move to 'look around'. Default is 0.005.</div>
+
+		<h3>.[page:Boolean lookVertical]</h3>
+		<div>
+		Allows the camera to change its vertical angle, thus modifying the camera pitch.
+		If disabled, the mouse movements will only change the yaw.
+		</div>
+		<div>
+		Default is true.
+		</div>
+
+		<h3>.[page:Boolean autoForward]</h3>
+		<div>
+		Toggle between automatically moving forward without user intervention (i.e. without pressing the left button or the W key) or not. If in <em>autoForward</em> mode, pressing the right button or the S key will still go backwards (temporarily stopping the forward motion).
+		</div>
+		<div>
+		Default is false.
+		</div>
+
+		<h3>.[page:Boolean activeLook]</h3>
+		<div>
+		If true, left clicking moves forward and right clicking moves backwards, and moving the mouse around changes the point of view.<br />
+		If false, nothing happens on mouse events.
+		</div>
+
+		<div>Default is true.</div>
+
+		<h3>.[page:Boolean heightSpeed]</h3>
+
+		<div>??? TODO</div>
+
+		<div>
+		Default is false.
+		</div>
+
+		<h3>.[page:Float heightCoef]</h3>
+
+		<div>??? TODO</div>
+
+		<div>
+		Default is 1.0.
+		</div>
+
+		<h3>.[page:Float heightMin]</h3>
+
+		<div>??? TODO</div>
+
+		<div>
+		Default is 0.0.
+		</div>
+
+		<h3>.[page:Boolean constrainVertical]</h3>
+
+		<div>Limit camera's pitch range. If true, the pitch angle can only be in the [verticalMin, verticalMax] range.</div>
+
+		<div>
+		Default is false.
+		</div>
+
+		<h3>.[page:Float verticalMin]</h3>
+
+		<div>See <em>constrainVertical</em> property.</div>
+
+		<div>
+		Default is 0.0.
+		</div>
+
+		<h3>.[page:Float verticalMax]</h3>
+
+		<div>See <em>constrainVertical</em> property.</div>
+
+		<div>
+		Default is Math.PI.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>.update( [page:Float delta] )</h3>
+		<div>
+		Update values using delta as time difference<br />
+		<br />
+		delta — time elapsed since the last time update was called.<br />
+		</div>
+
+		<h3>.handleResize( )</h3>
+		<div>
+		Recalculate viewport dimensions.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

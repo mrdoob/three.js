@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Represents a spline.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Array points] )</h3>
+		
+		<div>Initialises the spline with *points*, which are the places through which the spline will go.</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Vector3 todo]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>.initFromArray( [page:Array a] )</h3>
+		<div>
+		a — array of triplets containing x, y, z coordinates<br />
+		</div>
+		<div>Initialises using the data in the array as a series of points. Each value in *a* must be another array with three values, where a[n] is v, the value for the *nth* point, and v[0], v[1] and v[2] are the x, y and z coordinates of that point n, respectively.
+		</div>
+
+		<h3>.getPoint( [page:Integer k] )</h3>
+		<div>
+		k — point index
+		</div>
+		<div>Return the interpolated point at *k*.</div>
+		
+		<h3>.getControlPointsArray( )</h3>
+		<div>Returns an array with triplets of x, y, z coordinates that correspond to the current control points.
+		</div>
+		
+		<h3>.getLength( [page:Integer nSubDivisions] )</h3>
+		<div>
+		nSubDivisions — number of subdivisions between control points. Default is *100*.
+		</div>
+		<div>Returns the length of the spline when using nSubDivisions.</div>
+		
+		<h3>.reparametrizeByArcLength( [page:Float samplingCoef] )</h3>
+		<div>
+		samplingCoef — TODO
+		</div>
+		<div>TODO ???</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

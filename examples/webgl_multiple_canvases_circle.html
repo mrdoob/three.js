@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>three.js webgl - multiple canvases - circle</title>
+  <style type="text/css" media="screen">
+    body {
+      background-color: #555;
+      color: white;
+			font-family:Monospace;
+			font-size:13px;
+			text-align:center;
+			margin: 0px;
+		  overflow: hidden;
+			width: 100%;
+			height: 100%;
+    }
+
+    #container {
+      width: 100%;
+      height: 700px;
+      -webkit-perspective: 800px;
+      -webkit-perspective-origin: 50% 225px;
+			-moz-perspective: 800px;
+			-moz-perspective-origin: 50% 225px;
+			perspective: 800px;
+			perspective-origin: 50% 225px;
+    }
+    #stage {
+      width: 100%;
+      height: 100%;
+      -webkit-transform-style: preserve-3d;
+      -moz-transform-style: preserve-3d;
+      transform-style: preserve-3d;
+    }
+
+    #shape {
+      position: relative;
+      top: 160px;
+      margin: 0 auto;
+      height: 200px;
+      width: 200px;
+      -webkit-transform: translateZ(-0px);
+      -webkit-transform-style: preserve-3d;
+			-moz-transform: translateZ(-0px);
+			-moz-transform-style: preserve-3d;
+			transform: translateZ(-0px);
+			transform-style: preserve-3d;
+    }
+
+    .ring {
+      position: absolute;
+      height: 300px;
+      width: 200px;
+      text-align: center;
+      font-family: Times, serif;
+      font-size: 124pt;
+      color: black;
+      background-color: #fff;
+    }
+
+    #shape {
+      border: 0px;
+      background-color: rgba(255, 255, 255, 0);
+    }
+
+    .ring > .r1 {
+      -webkit-transform: rotateY(300deg) translateZ(-380px);
+      -moz-transform: rotateY(300deg) translateZ(-380px);
+      transform: rotateY(300deg) translateZ(-380px);
+    }
+
+    .ring > .r2 {
+      -webkit-transform: rotateY(330deg) translateZ(-380px);
+      -moz-transform: rotateY(330deg) translateZ(-380px);
+      transform: rotateY(330deg) translateZ(-380px);
+    }
+
+    .ring > .r3 {
+      -webkit-transform: rotateY(0deg) translateZ(-380px);
+      -moz-transform: rotateY(0deg) translateZ(-380px);
+      transform: rotateY(0deg) translateZ(-380px);
+    }
+
+    .ring > .r4 {
+      -webkit-transform: rotateY(30deg) translateZ(-380px);
+      -moz-transform: rotateY(30deg) translateZ(-380px);
+      transform: rotateY(30deg) translateZ(-380px);
+    }
+
+    .ring > .r5 {
+      -webkit-transform: rotateY(60deg) translateZ(-380px);
+      -moz-transform: rotateY(60deg) translateZ(-380px);
+      transform: rotateY(60deg) translateZ(-380px);
+    }
+
+  	#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+		}
+
+    #help {
+				position: absolute;
+				top: 50px; width: 100%;
+        text-align: center;
+    }
+    #help>div {
+        margin: auto;
+        padding: 1em;
+        background-color: rgba(0,0,0,0.3);
+        width: 50%;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div id="container">
+    <div id="stage">
+      <div id="shape" class="ring backfaces">
+        <div id="container1" class="ring r1"></div>
+        <div id="container2" class="ring r2"></div>
+        <div id="container3" class="ring r3"></div>
+        <div id="container4" class="ring r4"></div>
+        <div id="container5" class="ring r5"></div>
+      </div>
+    </div>
+  </div>
+
+	<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - multiple canvases - circle</div>
+  <div id="help" gstyle="display: none">
+    <div>
+    This example is shows how to setup multi-monitor displays like <a href="http://code.google.com/p/liquid-galaxy/">Google's Liquid Galaxy using three.js</a>.
+    Here 5 monitors are simulated using 3d css. WebGL is then rendered onto each one.<br/>
+    Note: 3d css support required! Use Chrome, Safari or Firefox 10
+    </div>
+  </div>
+
+		<script type="text/javascript" src="../build/three.min.js"></script>
+
+		<script type="text/javascript" src="js/Detector.js"></script>
+
+		<script type="text/javascript">
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var apps = [];
+
+			init();
+			animate();
+
+			function init() {
+
+				function degToRad( d ) {
+
+					return d * Math.PI / 180;
+
+				}
+
+				var rot = degToRad( 30 );
+
+				var fudge = 0.45; // I don't know why this is needed :-(
+
+				apps.push( new App( 'container1', rot * -2 * fudge ) );
+				apps.push( new App( 'container2', rot * -1 * fudge ) );
+				apps.push( new App( 'container3', rot *  0 * fudge ) );
+				apps.push( new App( 'container4', rot *  1 * fudge ) );
+				apps.push( new App( 'container5', rot *  2 * fudge ) );
+
+			}
+
+			function animate() {
+
+				for ( var i = 0; i < apps.length; ++ i ) {
+
+					apps[ i ].animate();
+
+				}
+
+				requestAnimationFrame( animate );
+
+			}
+
+			function App( containerId, rotateY ) {
+
+				var container;
+
+				var virtualCamera, camera, scene, renderer;
+
+				var mesh1, light;
+
+				var mouseX = 0, mouseY = 0;
+				var cameraZ = 1800;
+
+				var windowHalfX = window.innerWidth / 2;
+				var windowHalfY = window.innerHeight / 2;
+
+				init();
+
+				function init() {
+
+					container = document.getElementById( containerId );
+
+					camera = new THREE.PerspectiveCamera( 20, container.clientWidth / container.clientHeight, 1, 20000 );
+					camera.rotation.setY( rotateY );
+
+					// Think of the virtual camera as a post with 5 cameras on it (even though those cameras happen to live in difference scenes)
+					// You need to move the post (ie, the virtualCamera) to move all 5 cameras together.
+
+					virtualCamera = new THREE.Camera();
+					virtualCamera.add( camera );
+					virtualCamera.position.z = cameraZ;
+
+					scene = new THREE.Scene();
+
+					scene.add( virtualCamera );
+
+					light = new THREE.DirectionalLight( 0xffffff );
+					light.position.set( 0, 0, 1 ).normalize();
+					scene.add( light );
+
+					var noof_balls = 51;
+
+					// shadow
+
+					var canvas = document.createElement( 'canvas' );
+					canvas.width = 128;
+					canvas.height = 128;
+
+					var context = canvas.getContext( '2d' );
+					var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+					gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
+					gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
+
+					context.fillStyle = gradient;
+					context.fillRect( 0, 0, canvas.width, canvas.height );
+
+					var shadowTexture = new THREE.Texture( canvas );
+					shadowTexture.needsUpdate = true;
+
+					var shadowMaterial = new THREE.MeshBasicMaterial( { map: shadowTexture } );
+					var shadowGeo = new THREE.PlaneGeometry( 300, 300, 1, 1 );
+
+					for ( var i = 0; i < noof_balls; i ++ ) { // create shadows
+
+						var mesh = new THREE.Mesh( shadowGeo, shadowMaterial );
+						mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i * 400;
+						mesh.position.y = - 250;
+						mesh.rotation.x = - Math.PI / 2;
+						scene.add( mesh );
+
+					}
+
+					var faceIndices = [ 'a', 'b', 'c', 'd' ];
+
+					var color, f1, p, n, vertexIndex,
+
+					radius = 200,
+					geometry1 = new THREE.IcosahedronGeometry( radius, 1 );
+
+					for ( var i = 0; i < geometry1.faces.length; i ++ ) {
+
+						f1 = geometry1.faces[ i ];
+
+						n = ( f1 instanceof THREE.Face3 ) ? 3 : 4;
+
+						for( var j = 0; j < n; j ++ ) {
+
+							vertexIndex = f1[ faceIndices[ j ] ];
+
+							p = geometry1.vertices[ vertexIndex ];
+
+							color = new THREE.Color( 0xffffff );
+							color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
+
+							f1.vertexColors[ j ] = color;
+
+							color = new THREE.Color( 0xffffff );
+							color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
+
+						}
+
+					}
+
+
+					var materials = [
+
+						new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+						new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true } )
+
+					];
+
+					for ( var i = 0; i < noof_balls; i ++ ) { // create balls
+
+						var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry1, materials );
+
+						mesh.position.x = - ( noof_balls - 1 ) / 2 *400 + i *400;
+						mesh.rotation.x = i * 0.5;
+						scene.add( mesh );
+
+					}
+
+					renderer = new THREE.WebGLRenderer( { antialias: true } );
+					renderer.setSize( container.clientWidth, container.clientHeight );
+
+					container.appendChild( renderer.domElement );
+
+					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+					document.addEventListener( 'mousewheel', onDocumentMouseWheel, false );
+
+				}
+
+				function onDocumentMouseMove ( event ) {
+
+					mouseX = ( event.clientX - windowHalfX );
+					mouseY = ( event.clientY - windowHalfY );
+
+				}
+
+				function onDocumentMouseWheel ( event ) {
+
+					var delta = 0;
+
+					if ( event.wheelDelta ) {
+
+						delta = event.wheelDelta / 120;
+						if ( window.opera ) delta = -delta;
+
+					} else if ( event.detail ) {
+
+						delta = -event.detail / 3;
+
+					}
+
+					if ( delta ) {
+
+						if ( delta < 0 ) {
+
+							cameraZ -= 200;
+
+						} else {
+
+							cameraZ += 200;
+
+						}
+
+					}
+
+				}
+
+				this.animate = function() {
+
+					render();
+
+				};
+
+				function render() {
+
+					virtualCamera.position.x = -mouseX * 4;
+					virtualCamera.position.y = -mouseY * 4;
+					virtualCamera.position.z = cameraZ;
+
+					virtualCamera.lookAt( scene.position );
+
+					renderer.render( scene, camera );
+
+				}
+
+			}
+
+		</script>
+</body>
+</html>
+

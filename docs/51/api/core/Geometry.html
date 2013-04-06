@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Base class for geometries</div>
+
+
+		<h2>Example</h2>
+
+		<code>var geometry = new THREE.Geometry()
+
+		geometry.vertices.push( new THREE.Vector3( -10,  10, 0 ) );
+		geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
+		geometry.vertices.push( new THREE.Vector3(  10, -10, 0 ) );
+
+		geometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+
+		geometry.computeBoundingSphere();
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Integer id]</h3>
+		<div>
+		Unique number of this geometry instance
+		</div>
+		
+		<h3>.[page:String name]</h3>
+		<div>
+		Name for this geometry. Default is an empty string.
+		</div>
+
+		<h3>.[page:Array vertices]</h3>
+		<div>
+		Array of [page:Vector3 vertices].
+		</div>
+
+		<h3>.[page:Array colors]</h3>
+		<div>
+		Array of vertex [page:Color colors], matching number and order of vertices.<br />
+		Used in [page:ParticleSystem], [page:Line] and [page:Ribbon].<br />
+		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.
+		</div>
+
+		<h3>.[page:Array materials]</h3>
+		<div>
+		Array of [page:Material materials].
+		</div>
+
+		<h3>.[page:Array faces]</h3>
+		<div>
+		Array of [page:Face3 triangles] or/and [page:Face4 quads].
+		</div>
+
+		<h3>.[page:Array faceUvs]</h3>
+		<div>
+		Array of face [page:UV] layers.<br />
+		Each UV layer is an array of [page:UV] matching order and number of faces.
+		</div>
+
+		<h3>.[page:Array faceVertexUvs]</h3>
+		<div>
+		Array of face [page:UV] layers.<br />
+		Each UV layer is an array of [page:UV] matching order and number of vertices in faces.
+		</div>
+
+		<h3>.[page:Array morphTargets]</h3>
+		<div>
+		Array of morph targets. Each morph target is a Javascript object:
+		<code>{ name: "targetName", vertices: [ new THREE.Vertex(), ... ] }</code>
+		Morph vertices match number and order of primary vertices.
+		</div>
+
+		<h3>.[page:Array morphColors]</h3>
+		<div>
+		Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:
+		<code>morphColor = { name: "colorName", colors: [ new THREE.Color(), ... ] }</code>
+		Morph colors can match either number and order of faces (face colors) or number of vertices (vertex colors).
+		</div>
+
+		<h3>.[page:Array skinWeights]</h3>
+		<div>
+		Array of skinning weights, matching number and order of vertices.
+		</div>
+
+		<h3>.[page:Array skinIndices]</h3>
+		<div>
+		Array of skinning indices, matching number and order of vertices.
+		</div>
+
+		<h3>.[page:Object boundingBox]</h3>
+		<div>
+		Bounding box.
+		<code>{ min: new THREE.Vector3(), max: new THREE.Vector3() }</code>
+		</div>
+
+		<h3>.[page:Object boundingSphere]</h3>
+		<div>
+		Bounding sphere.
+		<code>{ radius: float }</code>
+		</div>
+
+		<h3>.[page:Boolean hasTangents]</h3>
+		<div>
+		True if geometry has tangents. Set in [page:Geometry Geometry.computeTangents].
+		</div>
+
+		<h3>.[page:Boolean dynamic]</h3>
+		<div>
+		Set to *true* if attribute buffers will need to change in runtime (using "dirty" flags).<br/>
+		Unless set to true internal typed arrays corresponding to buffers will be deleted once sent to GPU.
+		</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
+		<div>
+		Bakes matrix transform directly into vertex coordinates.
+		</div>
+
+		<h3>.computeCentroids()</h3>
+		<div>
+		Computes centroids for all faces.
+		</div>
+
+		<h3>.computeFaceNormals()</h3>
+		<div>
+		Computes face normals.
+		</div>
+
+		<h3>.computeVertexNormals()</h3>
+		<div>
+		Computes vertex normals by averaging face normals.<br />
+		Face normals must be existing / computed beforehand.
+		</div>
+
+		<h3>.computeTangents()</h3>
+		<div>
+		Computes vertex tangents.<br />
+		Based on [link:http://www.terathon.com/code/tangent.html]<br />
+		Geometry must have vertex [page:UV UVs] (layer 0 will be used).
+		</div>
+
+		<h3>.computeBoundingBox()</h3>
+		<div>
+		Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.
+		</div>
+
+		<h3>.computeBoundingSphere()</h3>
+		<div>
+		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.
+		</div>
+		
+		<div>Neither bounding boxes or bounding spheres are computed by default. They need to be explicitly computed, otherwise they are *null*.</div>
+
+		<h3>.mergeVertices()</h3>
+		<div>
+		Checks for duplicate vertices using hashmap.<br />
+		Duplicated vertices are removed and faces' vertices are updated.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

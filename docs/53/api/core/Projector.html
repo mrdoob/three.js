@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Projects points between spaces.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>.projectVector( [page:Vector3 vector], [page:Camera camera] ) [page:Vector3]</h3>
+
+		<h3>.unprojectVector( [page:Vector3 vector], [page:Camera camera] ) [page:Vector3]</h3>
+
+		<h3>.pickingRay( [page:Vector3 vector], [page:Camera camera] ) [page:Ray]</h3>
+		<div>
+		Translates a 2D point from NDC (<em>Normalized Device Coordinates</em>) to a [page:Ray] that can be used for picking. NDC range from [-1..1] in x (left to right) and [1.0 .. -1.0] in y (top to bottom).
+		</div>
+
+		<h3>.projectScene( [page:Scene scene], [page:Camera camera], [page:Boolean sort] ) [page:Object]</h3>
+		<div>
+		[page:Scene scene] — scene to project.<br />
+		[page:Camera camera] — camera to use in the projection.<br />
+		[page:Boolean sort] — select whether to sort elements using the <a href="http://en.wikipedia.org/wiki/Painter%27s_algorithm">Painter's algorithm</a>.
+		</div>
+		
+		<div>
+		Transforms a 3D [page:Scene scene] object into 2D render data that can be rendered in a screen with your renderer of choice, projecting and clipping things out according to the used camera.
+		</div>
+		<div>
+		If the <em>scene</em> were a real scene, this method would be the equivalent of taking a picture with the <em>camera</em> (and developing the film would be the next step, using a Renderer).
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

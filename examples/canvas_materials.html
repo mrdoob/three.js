@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js canvas - materials</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #202020;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var container, stats;
+
+			var camera, scene, renderer, objects;
+			var particleLight, pointLight;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 0, 200, 800 );
+
+				scene = new THREE.Scene();
+
+				// Grid
+
+				var size = 500, step = 100;
+
+				var geometry = new THREE.Geometry();
+
+				for ( var i = - size; i <= size; i += step ) {
+
+					geometry.vertices.push( new THREE.Vector3( - size, - 120, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, - 120, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, - 120, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, - 120,   size ) );
+
+				}
+
+				var material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 0.2 } );
+
+				var line = new THREE.Line( geometry, material );
+				line.type = THREE.LinePieces;
+				scene.add( line );
+
+				// Spheres
+
+				var geometry = new THREE.SphereGeometry( 100, 14, 7 );
+
+				var materials = [
+
+					new THREE.MeshBasicMaterial( { color: 0x00ffff, wireframe: true, side: THREE.DoubleSide } ),
+					new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.AdditiveBlending, side: THREE.DoubleSide } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, side: THREE.DoubleSide, overdraw: true } ),
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.SmoothShading, overdraw: true } ),
+					new THREE.MeshDepthMaterial( { overdraw: true } ),
+					new THREE.MeshNormalMaterial( { overdraw: true } ),
+					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading, overdraw: true } ),
+					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( 'textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( 'textures/envmap.png', new THREE.SphericalReflectionMapping() ) } )
+
+				];
+
+				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+
+					var face = geometry.faces[ i ];
+					if ( Math.random() > 0.5 ) face.materialIndex = Math.floor( Math.random() * materials.length );
+
+				}
+
+				materials.push( new THREE.MeshFaceMaterial( materials ) );
+
+				objects = [];
+
+				for ( var i = 0, l = materials.length; i < l; i ++ ) {
+
+					var sphere = new THREE.Mesh( geometry, materials[ i ] );
+
+					sphere.position.x = ( i % 5 ) * 200 - 400;
+					sphere.position.z = Math.floor( i / 5 ) * 200 - 200;
+
+					sphere.rotation.x = Math.random() * 200 - 100;
+					sphere.rotation.y = Math.random() * 200 - 100;
+					sphere.rotation.z = Math.random() * 200 - 100;
+
+					objects.push( sphere );
+
+					scene.add( sphere );
+
+				}
+
+				var PI2 = Math.PI * 2;
+				var program = function ( context ) {
+
+					context.beginPath();
+					context.arc( 0, 0, 1, 0, PI2, true );
+					context.closePath();
+					context.fill();
+
+				}
+
+				particleLight = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0xffffff, program: program } ) );
+				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
+				scene.add( particleLight );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( Math.random() * 0x202020 ) );
+
+				var directionalLight = new THREE.DirectionalLight( Math.random() * 0xffffff );
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.add( directionalLight );
+
+				pointLight = new THREE.PointLight( 0xffffff, 1 );
+				scene.add( pointLight );
+
+				renderer = new THREE.CanvasRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				var debugCanvas = document.createElement( 'canvas' );
+				debugCanvas.width = 512;
+				debugCanvas.height = 512;
+				debugCanvas.style.position = 'absolute';
+				debugCanvas.style.top = '0px';
+				debugCanvas.style.left = '0px';
+
+				container.appendChild( debugCanvas );
+
+				debugContext = debugCanvas.getContext( '2d' );
+				debugContext.setTransform( 1, 0, 0, 1, 256, 256 );
+				debugContext.strokeStyle = '#000000';
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild(stats.domElement);
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function loadImage( path ) {
+
+				var image = document.createElement( 'img' );
+				var texture = new THREE.Texture( image, THREE.UVMapping )
+
+				image.onload = function () { texture.needsUpdate = true; };
+				image.src = path;
+
+				return texture;
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var timer = Date.now() * 0.0001;
+
+				camera.position.x = Math.cos( timer ) * 1000;
+				camera.position.z = Math.sin( timer ) * 1000;
+				camera.lookAt( scene.position );
+
+				for ( var i = 0, l = objects.length; i < l; i++ ) {
+
+					var object = objects[ i ];
+
+					object.rotation.x += 0.01;
+					object.rotation.y += 0.005;
+
+				}
+
+				particleLight.position.x = Math.sin( timer * 7 ) * 300;
+				particleLight.position.y = Math.cos( timer * 5 ) * 400;
+				particleLight.position.z = Math.cos( timer * 3 ) * 300;
+
+				pointLight.position.x = particleLight.position.x;
+				pointLight.position.y = particleLight.position.y;
+				pointLight.position.z = particleLight.position.z;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

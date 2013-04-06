@@ -1,74 +1,521 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js - JavaScript 3D library</title>
+		<style>
+			@font-face {
+				font-family: 'inconsolata';
+				src: url('files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+			}
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Three.js : JavaScript 3D library." />
+			body {
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+				background-color: #ffffff;
 
-    <title>Three.js</title>
-  </head>
+				margin: 0px;
+				padding: 19px 0px 30px 180px;
 
-  <body>
+				font-family: 'inconsolata';
+				font-size: 15px;
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/mrdoob/three.js">View on GitHub</a>
+			}
 
-          <h1 id="project_title">Three.js</h1>
-          <h2 id="project_tagline">JavaScript 3D library.</h2>
+			h1 {
+				color: #444;
+				font-size: 25px;
+				font-weight: normal;
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/mrdoob/three.js/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/mrdoob/three.js/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+				margin-top: 5px;
+				margin-bottom: 20px;
+			}
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>Welcome to GitHub Pages.</h3>
+			h2 {
+				color: #999;
+				font-size: 18px;
+				font-weight: normal;
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+				margin-top: 12px;
+			}
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+			hr {
+				border: 0px;
+				height: 1px;
+				background-color: #ccc;
+				margin: 30px 0px;
+			}
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+			a {
+				color: #2194CE;
+				font-size: 15px;
+			}
 
-<h3>Designer Templates</h3>
+			#panel	{
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+				position: fixed;
 
-<h3>Rather Drive Stick?</h3>
+				left: 0px;
+				top: 0px;
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+				width: 140px;
+				height: 100%;
 
-<h3>Authors and Contributors</h3>
+				padding: 20px 20px 0px 20px;
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+			}
 
-<h3>Support or Contact</h3>
+			.images {
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-    </div>
+				line-height: 0px;
+				margin-bottom: 40px;
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Three.js maintained by <a href="https://github.com/mrdoob">mrdoob</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
+			}
 
-    
+		</style>
+	</head>
+	<body>
 
-  </body>
+		<script type="text/javascript">
+
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-86951-15']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+
+		</script>
+
+		<div id="panel">
+			<h1>three.js<span style="font-size: 50%; vertical-align: super;"> r57</span></h1>
+
+			<a href="http://github.com/mrdoob/three.js/zipball/master">download</a><br /><br />
+
+			<a href="http://www.aerotwist.com/lab/getting-started-with-three-js/">getting started</a><br />
+			<a href="docs/">documentation</a><br />
+			<a href="http://webchat.freenode.net/?channels=three.js">chat</a><br />
+			<a href="http://stackoverflow.com/questions/tagged/three.js">help</a><br /><br />
+
+			<a href="http://github.com/mrdoob/three.js/">github</a><br />
+			<a href="http://github.com/mrdoob/three.js/contributors">contributors</a><br />
+			<a href="http://github.com/mrdoob/three.js/wiki">wiki</a><br />
+			<a href="http://github.com/mrdoob/three.js/issues">issues</a><br /><br />
+
+			<a href="editor/">editor</a> (beta)
+
+			<hr />
+
+			<center>
+			<a href="http://www.udacity.com/overview/Course/cs291/" target="_blank"><img src="files/udacity.png" width="121" height="152" style="border:1px solid #ccc" /></a><br /><br />
+
+			<a href="http://shop.oreilly.com/product/0636920024729.do" target="_blank"><img src="files/webglbook.png" width="100" height="132" style="border:1px solid #ccc" /></a>
+			</center>
+
+		</div>
+
+		<h2>featured projects</h2>
+		<div id="featured" class="images"></div>
+		<script>
+
+		var files = [
+
+			[ "wwmaze", "http://chrome.com/maze/" ],
+			[ "paleodictyon", "http://antivj.com/paleodictyon_app/" ],
+			[ "findyourwaytooz", "http://www.findyourwaytooz.com/" ],
+			[ "voxeljs", "http://voxeljs.com/" ],
+			[ "neverseenthesky", "http://christmasexperiments.com/23/" ],
+			[ "zeitgeist2012", "http://www.google.com/zeitgeist/2012/#explore" ],
+			[ "zoetrope", "http://lab.sehsucht.de/" ],
+			[ "thecarpandtheseagull", "http://thecarpandtheseagull.thecreatorsproject.com/" ],
+			[ "100000stars", "http://workshop.chromeexperiments.com/stars/" ],
+			[ "theywilleatyou", "http://theywilleatyou.com/" ],
+			[ "blast", "http://blast.hellohikimori.com/" ],
+			[ "hexgl", "http://hexgl.bkcore.com/" ],
+			[ "armsglobe", "http://workshop.chromeexperiments.com/projects/armsglobe/" ],
+			[ "carvisualizer", "http://carvisualizer.plus360degrees.com/threejs/" ],
+			[ "chromeweblab", "http://www.chromeweblab.com/" ],
+			[ "lightgraffiti", "http://lightgraffiti.littlesun.com/" ],
+			[ "tntfortwo", "http://www.pajamaclubmusic.com/3d/" ],
+			[ "chaostoperfection", "http://www.chaostoperfection.com/" ],
+			[ "livecodelab", "http://www.sketchpatch.net/labs/livecodelabIntro.html" ],
+			[ "kaiopua", "http://collinhover.github.com/kaiopua/" ],
+			[ "physijs", "http://chandlerprall.github.com/Physijs/" ],
+			[ "googlecube", "http://www.playmapscube.com/" ],
+			[ "triggerrally", "http://triggerrally.com/" ],
+			[ "zombiesvscow", "http://yagiz.me/zombiesvscow/" ],
+			[ "threefab", "http://blackjk3.github.com/threefab/" ],
+			[ "nyancat", "http://dl.dropbox.com/u/6213850/WebGL/nyanCat/nyan.html" ],
+			[ "threenodes", "http://idflood.github.com/ThreeNodes.js/public/index.html" ],
+			[ "f50", "http://www.adidas.com/football/uk/pages/f50/" ],
+			[ "lights", "http://lights.elliegoulding.com/" ],
+			[ "beanstalk", "http://inear.se/beanstalk/" ],
+			[ "missioncontrol", "http://superfad.com/missioncontrol/" ],
+			[ "rome", "http://ro.me/" ],
+			[ "globe", "http://data-arts.appspot.com/globe" ],
+			[ "helloracer", "http://helloracer.com/webgl/" ]
+
+		];
+
+		var element = document.getElementById( 'featured' );
+
+		for ( var i = 0; i < 15; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="' + file[ 1 ] + '" target="_blank"><img src="files/projects/' + file[ 0 ] + '.png" width="200" height="150"></a>';
+
+		}
+
+		for ( var i = 15; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="' + file[ 1 ] + '" name="extra" style="display:none" target="_blank"><img src="files/projects/' + file[ 0 ] + '.png" width="200" height="150"></a>';
+
+		}
+
+		var button = document.createElement( 'div' );
+		button.style.display = 'inline-table';
+		button.style.textAlign = 'center';
+		button.style.backgroundColor = '#f0f0f0';
+		button.style.width = '200px';
+		button.style.height = '150px';
+		button.style.cursor = 'pointer';
+		button.addEventListener( 'click', toggle, false );
+		element.appendChild( button );
+
+		var text = document.createElement( 'div' );
+		text.style.display = 'table-cell';
+		text.style.verticalAlign = 'middle';
+		text.style.color = '#2194CE';
+		text.style.textDecoration = 'underline';
+		text.textContent = 'more';
+		button.appendChild( text );
+
+		var visible = false;
+
+		function toggle() {
+
+			visible = !visible;
+
+			var elements = document.getElementsByName( 'extra' );
+
+			for ( var i = 0; i < elements.length; i ++ ) {
+
+				var element = elements[ i ];
+				element.style.display = visible === true ? 'inline' : 'none';
+
+			}
+
+			text.textContent = visible === true ? 'less' : 'more';
+
+		}
+
+
+		</script>
+
+
+		<h2>webgl examples</h2>
+		<div id="webgl" class="images"></div>
+		<script>
+
+		var files = [
+
+			"webgl_animation_cloth",
+			"webgl_animation_skinning",
+			"webgl_animation_skinning_morph",
+			"webgl_buffergeometry",
+			"webgl_buffergeometry_lines",
+			"webgl_buffergeometry_particles",
+			"webgl_camera",
+			"webgl_custom_attributes",
+			"webgl_custom_attributes_lines",
+			"webgl_custom_attributes_particles",
+			"webgl_custom_attributes_particles2",
+			"webgl_custom_attributes_particles3",
+			"webgl_geometries",
+			// "webgl_geometries2",
+			"webgl_geometry_colors",
+			"webgl_geometry_colors_blender",
+			"webgl_geometry_convex",
+			"webgl_geometry_cube",
+			"webgl_geometry_dynamic",
+			"webgl_geometry_extrude_shapes",
+			"webgl_geometry_extrude_splines",
+			// "webgl_geometry_extrude_uvs2",
+			"webgl_geometry_hierarchy",
+			"webgl_geometry_hierarchy2",
+			"webgl_geometry_large_mesh",
+			"webgl_geometry_minecraft",
+			"webgl_geometry_minecraft_ao",
+			"webgl_geometry_shapes",
+			"webgl_geometry_subdivision",
+			"webgl_geometry_terrain",
+			"webgl_geometry_terrain_fog",
+			"webgl_geometry_tessellation",
+			"webgl_geometry_text",
+			"webgl_hdr",
+			"webgl_interactive_cubes",
+			"webgl_interactive_cubes_gpu",
+			"webgl_interactive_draggablecubes",
+			"webgl_interactive_voxelpainter",
+			"webgl_kinect",
+			"webgl_lensflares",
+			"webgl_lights_pointlights",
+			"webgl_lights_pointlights2",
+			"webgl_lines_colors",
+			"webgl_lines_cubes",
+			"webgl_lines_sphere",
+			"webgl_lines_splines",
+			"webgl_loader_collada",
+			"webgl_loader_collada_keyframe",
+			"webgl_loader_ctm",
+			"webgl_loader_ctm_materials",
+			"webgl_loader_json_blender",
+			"webgl_loader_json_objconverter",
+			"webgl_loader_obj",
+			"webgl_loader_scene",
+			"webgl_loader_scene_blender",
+			"webgl_loader_utf8",
+			"webgl_loader_vtk",
+			"webgl_lod",
+			"webgl_marching_cubes",
+			"webgl_materials",
+			"webgl_materials2",
+			"webgl_materials_blending",
+			"webgl_materials_blending_custom",
+			"webgl_materials_bumpmap",
+			"webgl_materials_bumpmap_skin",
+			"webgl_materials_cars",
+			"webgl_materials_cars_anaglyph",
+			"webgl_materials_cars_camaro",
+			"webgl_materials_cars_camaro_crosseyed",
+			"webgl_materials_cars_parallaxbarrier",
+			"webgl_materials_cubemap",
+			"webgl_materials_cubemap_balls_reflection",
+			"webgl_materials_cubemap_balls_reflection_anaglyph",
+			"webgl_materials_cubemap_balls_refraction",
+			"webgl_materials_cubemap_balls_refraction_crosseyed",
+			"webgl_materials_cubemap_dynamic",
+			"webgl_materials_cubemap_dynamic2",
+			"webgl_materials_cubemap_escher",
+			"webgl_materials_cubemap_refraction",
+			"webgl_materials_grass",
+			"webgl_materials_normalmap",
+			"webgl_materials_normalmap2",
+			"webgl_materials_shaders",
+			"webgl_materials_shaders_fresnel",
+			"webgl_materials_skin",
+			"webgl_materials_texture_anisotropy",
+			"webgl_materials_texture_filters",
+			"webgl_materials_video",
+			"webgl_materials_wireframe",
+			"webgl_morphnormals",
+			"webgl_morphtargets",
+			"webgl_morphtargets_horse",
+			"webgl_morphtargets_md2",
+			"webgl_morphtargets_md2_control",
+			"webgl_multiple_canvases_circle",
+			"webgl_multiple_canvases_complex",
+			"webgl_multiple_canvases_grid",
+			"webgl_multiple_views",
+			"webgl_panorama_equirectangular",
+			"webgl_particles_billboards",
+			"webgl_particles_billboards_colors",
+			"webgl_particles_dynamic",
+			"webgl_particles_random",
+			"webgl_particles_shapes",
+			"webgl_particles_sprites",
+			"webgl_performance",
+			"webgl_performance_doublesided",
+			"webgl_performance_static",
+			"webgl_postprocessing",
+			"webgl_postprocessing_dof",
+			"webgl_postprocessing_godrays",
+			"webgl_ribbons",
+			"webgl_rtt",
+			"webgl_sandbox",
+			"webgl_shader",
+			"webgl_shader2",
+			"webgl_shader_lava",
+			"webgl_shading_physical",
+			"webgl_shadowmap",
+			"webgl_shadowmap_performance",
+			"webgl_sprites",
+			"webgl_terrain_dynamic",
+			"webgl_test_memory",
+			"webgl_test_memory2",
+			"webgl_trails"
+
+		];
+
+		var element = document.getElementById( 'webgl' );
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="examples/' + file + '.html" target="_blank"><img src="files/examples/' + file + '.png" width="200" height="150"></a>';
+
+		}
+
+		</script>
+
+
+		<h2>webgl deferred examples</h2>
+		<div id="deferred" class="images"></div>
+		<script>
+
+		var files = [
+
+			"webgldeferred_animation",
+			"webgldeferred_arealights",
+			"webgldeferred_pointlights"
+
+		];
+
+		var element = document.getElementById( 'deferred' );
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="examples/' + file + '.html" target="_blank"><img src="files/examples/' + file + '.png" width="200" height="150"></a>';
+
+		}
+
+		</script>
+
+
+		<h2>css3d examples</h2>
+		<div id="css3d" class="images"></div>
+		<script>
+
+		var files = [
+
+			"css3d_molecules",
+			"css3d_panorama",
+			"css3d_periodictable",
+			"css3d_sandbox",
+			"css3d_youtube"
+
+		];
+
+		var element = document.getElementById( 'css3d' );
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="examples/' + file + '.html" target="_blank"><img src="files/examples/' + file + '.png" width="200" height="150"></a>';
+
+		}
+
+		</script>
+
+
+		<h2>canvas examples</h2>
+		<div id="canvas" class="images"></div>
+		<script>
+
+		var files = [
+
+			"canvas_ascii_effect",
+			"canvas_camera_orthographic",
+			"canvas_camera_orthographic2",
+			"canvas_geometry_birds",
+			"canvas_geometry_cube",
+			"canvas_geometry_earth",
+			"canvas_geometry_hierarchy",
+			"canvas_geometry_panorama",
+			"canvas_geometry_panorama_fisheye",
+			"canvas_geometry_terrain",
+			"canvas_geometry_text",
+			"canvas_interactive_cubes",
+			"canvas_interactive_cubes_tween",
+			"canvas_interactive_particles",
+			"canvas_interactive_voxelpainter",
+			"canvas_lights_pointlights",
+			"canvas_lights_pointlights_smooth",
+			"canvas_lines",
+			"canvas_lines_sphere",
+			"canvas_materials",
+			"canvas_materials_depth",
+			"canvas_materials_normal",
+			"canvas_materials_reflection",
+			"canvas_materials_video",
+			"canvas_particles_floor",
+			"canvas_particles_random",
+			"canvas_particles_shapes",
+			"canvas_particles_sprites",
+			"canvas_particles_waves",
+			"canvas_performance",
+			"canvas_sandbox"
+
+		];
+
+		var element = document.getElementById( 'canvas' );
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="examples/' + file + '.html" target="_blank"><img src="files/examples/' + file + '.png" width="200" height="150"></a>';
+
+		}
+
+		</script>
+
+
+		<h2>software examples</h2>
+		<div id="software" class="images"></div>
+		<script>
+
+		var files = [
+
+			"software_sandbox"
+
+		];
+
+		var element = document.getElementById( 'software' );
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="examples/' + file + '.html" target="_blank"><img src="files/examples/' + file + '.png" width="200" height="150"></a>';
+
+		}
+
+		</script>
+
+
+		<h2>misc examples</h2>
+		<div id="misc" class="images"></div>
+		<script>
+
+		var files = [
+
+			"misc_controls_fly",
+			"misc_controls_path",
+			"misc_controls_orbit",
+			"misc_controls_trackball",
+			"misc_controls_pointerlock",
+			"misc_lights_test",
+			"misc_lookat",
+			"misc_sound",
+			"misc_ubiquity_test"
+
+		];
+
+		var element = document.getElementById( 'misc' );
+
+		for ( var i = 0; i < files.length; i ++ ) {
+
+			var file = files[ i ];
+			element.innerHTML += '<a href="examples/' + file + '.html" target="_blank"><img src="files/examples/' + file + '.png" width="200" height="150"></a>';
+
+		}
+
+		</script>
+
+	</body>
 </html>

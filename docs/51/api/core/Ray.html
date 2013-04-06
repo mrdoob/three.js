@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Representation of a ray in space.</div>
+		<div class="desc">Pretty useful for detecting collisions between objects in a scene.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Vector3 origin], [page:Vector3 direction], [page:Number near], [page:Number far])</h3>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Vector3 origin]</h3>
+		
+		<div>
+		Where does the ray start. Default is *0, 0, 0*.
+		</div>
+
+		<h3>.[page:Vector3 direction]</h3>
+		<div>
+		A vector pointing in the direction the ray goes. Default is *0, 0, 0*.
+		</div>
+		
+		<h3>.[page:Number near]</h3>
+		<div>
+		Defines the closest distance that will be checked for intersections, starting from origin. Default is *0*.
+		</div>
+		
+		<h3>.[page:Number far]</h3>
+		<div>
+		Defines the furthest distance that will be checked for intersections, starting from origin. Default is *Infinity*.
+		</div>
+		
+		<div>Hence, intersections will only be checked in the range *(near, far)*.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>.setPrecision( [page:Float value] )</h3>
+		
+		<div>Defines the maximum precision used when determining intersections. This is specially important when checking collisions between almost parallel objects, and can make the difference between reporting a collision or not.</div>
+		<div>Default is *0.0001*</div>
+
+		<h3>.intersectObject( [page:Object3D object] ) [page:Object]</h3>
+		
+		<div>Determines whether the ray intersects *object*. The result is an array containing tuples of the form</div>
+<code>
+{
+	distance: // distance between the origin and the intersected object,
+	point: // exact point where the intersection occurs,
+	face: // exact face that the ray intersected,
+	object: // the intersected object
+}
+</code>
+
+		<div>Note that even if we're checking only an object against a ray, the ray can intersect the object in more than one point. Hence, the return value is an array and not a single tuple.</div>
+
+		<h3>.intersectObjects( [page:Array objects] ) [page:Array]</h3>
+		
+		<div>Goes through the *objects* array, and determine whether they ray intersects them. The result is an array that contains similar tuples to the ones returned by intersectObject</div>
+
+The entries in the returned array are sorted by ascending distance (i.e. closest objects first).
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
