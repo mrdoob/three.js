@@ -131,7 +131,7 @@ THREE.SoftwareRenderer = function () {
 					element.v1.positionScreen,
 					element.v2.positionScreen,
 					element.v3.positionScreen,
-					shader, material
+					shader, element, material
 				)
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
@@ -140,14 +140,14 @@ THREE.SoftwareRenderer = function () {
 					element.v1.positionScreen,
 					element.v2.positionScreen,
 					element.v4.positionScreen,
-					shader, material
+					shader, element, material
 				);
 
 				drawTriangle(
 					element.v2.positionScreen,
 					element.v3.positionScreen,
 					element.v4.positionScreen,
-					shader, material
+					shader, element, material
 				);
 
 			}
@@ -193,41 +193,44 @@ THREE.SoftwareRenderer = function () {
 
 		if ( shaders[ id ] === undefined ) {
 
-			if ( material instanceof THREE.MeshBasicMaterial ) {
+			if ( material instanceof THREE.MeshBasicMaterial ||
+			     material instanceof THREE.MeshLambertMaterial ||
+			     material instanceof THREE.MeshPhongMaterial ) {
 
-				shader = new Function(
-						'buffer, offset, u, v, material',
-						[
-							'buffer[ offset ] = material.color.r * 255;',
-							'buffer[ offset + 1 ] = material.color.g * 255;',
-							'buffer[ offset + 2 ] = material.color.b * 255;',
-							'buffer[ offset + 3 ] = material.opacity * 255;',
-						].join('\n')
-					);
+				var string;
 
-			} else if ( material instanceof THREE.MeshLambertMaterial ) {
+				if ( material.vertexColors === THREE.FaceColors ) {
 
-				shader = new Function(
-						'buffer, offset, u, v, material',
-						[
-							'buffer[ offset ] = material.color.r * 255;',
-							'buffer[ offset + 1 ] = material.color.g * 255;',
-							'buffer[ offset + 2 ] = material.color.b * 255;',
-							'buffer[ offset + 3 ] = material.opacity * 255;',
-						].join('\n')
-					);
+					string = [
+						'buffer[ offset ] = face.color.r * 255;',
+						'buffer[ offset + 1 ] = face.color.g * 255;',
+						'buffer[ offset + 2 ] = face.color.b * 255;',
+						'buffer[ offset + 3 ] = material.opacity * 255;',
+					].join('\n');
+
+				} else {
+
+					string = [
+						'buffer[ offset ] = material.color.r * 255;',
+						'buffer[ offset + 1 ] = material.color.g * 255;',
+						'buffer[ offset + 2 ] = material.color.b * 255;',
+						'buffer[ offset + 3 ] = material.opacity * 255;',
+					].join('\n');
+
+				}
+
+				shader = new Function( 'buffer, offset, u, v, face, material', string );
 
 			} else {
 
-				shader = new Function(
-						'buffer, offset, u, v',
-						[
-							'buffer[ offset ] = u * 255;',
-							'buffer[ offset + 1 ] = v * 255;',
-							'buffer[ offset + 2 ] = 0;',
-							'buffer[ offset + 3 ] = 255;'
-						].join('\n')
-					);
+				var string = [
+					'buffer[ offset ] = u * 255;',
+					'buffer[ offset + 1 ] = v * 255;',
+					'buffer[ offset + 2 ] = 0;',
+					'buffer[ offset + 3 ] = 255;'
+				].join('\n');
+
+				shader = new Function( 'buffer, offset, u, v', string );
 
 			}
 
@@ -246,7 +249,7 @@ THREE.SoftwareRenderer = function () {
 		var ymin = Math.max( Math.min( y1, y2 ), 0 );
 		var ymax = Math.min( Math.max( y1, y2 ), canvasHeight );
 
-		var offset = ( xmin + ymin * canvasWidth - 1 ) * 4 + 3;
+		var offset = ( xmin + ymin * canvasWidth ) * 4 + 3;
 		var linestep = ( canvasWidth - ( xmax - xmin ) ) * 4;
 
 		for ( var y = ymin; y < ymax; y ++ ) {
@@ -263,7 +266,7 @@ THREE.SoftwareRenderer = function () {
 
 	}
 
-	function drawTriangle( v1, v2, v3, shader, material ) {
+	function drawTriangle( v1, v2, v3, shader, face, material ) {
 
 		// TODO: Implement per-pixel z-clipping
 
@@ -458,7 +461,7 @@ THREE.SoftwareRenderer = function () {
 								zbuffer[ offset ] = z;
 								var u = cx1 * scale;
 								var v = cx2 * scale;
-								shader( data, offset * 4, u, v, material );
+								shader( data, offset * 4, u, v, face, material );
 							}
 
 							cx1 += dy12;
@@ -500,7 +503,7 @@ THREE.SoftwareRenderer = function () {
 									var v = cx2 * scale;
 
 									zbuffer[ offset ] = z;
-									shader( data, offset * 4, u, v, material );
+									shader( data, offset * 4, u, v, face, material );
 
 								}
 
