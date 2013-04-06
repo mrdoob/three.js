@@ -5,13 +5,13 @@ three.js
 
 The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt;, CSS3D and WebGL renderers.
 
-[Examples](http://mrdoob.github.com/three.js/) — [Documentation](http://mrdoob.github.com/three.js/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
+[Examples](http://threejs.org/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
 
 
 ### Usage ###
 
-Download the [minified library](http://mrdoob.github.com/three.js/build/three.min.js) and include it in your html.
-Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file). 
+Download the [minified library](http://threejs.org/build/three.min.js) and include it in your html.
+Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file).
 
 ```html
 <script src="js/three.min.js"></script>
@@ -180,7 +180,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 2012 11 15 - **r53** (392,799 KB, gzip: 96,044 KB)
 
-* Lots of improvements to [editor](http://mrdoob.github.com/three.js/editor/). Including possibility to export geometry and scene. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Lots of improvements to [editor](http://threejs.org/editor/). Including possibility to export geometry and scene. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
 * `Sprite` no longer gets its size from the texture. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
 * Improved `CSS3DRenderer`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 * Added support for vertex normals in `Ribbon`. ([alteredq](http://github.com/alteredq))
@@ -213,7 +213,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added `Object3D.defaultEulerOrder`. ([mrdoob](http://github.com/mrdoob))
 * Replaced `SceneUtils.traverseHierarchy` and `SceneUtils.showHierarchy` with `object.traverse`. ([mrdoob](http://github.com/mrdoob))
 * Added `PointerLockControls`. ([mrdoob](http://github.com/mrdoob))
-* Completed more [documentation](http://mrdoob.github.com/three.js/docs/) pages. ([sole](http://github.com/sole))
+* Completed more [documentation](http://threejs.org/docs/) pages. ([sole](http://github.com/sole))
 * Split `SceneUtils.cloneObject` into `*.clone()`. ([mrdoob](http://github.com/mrdoob))
 * Simplified `AxisHelper`. ([mrdoob](http://github.com/mrdoob))
 * Added `GeometryExporter`. ([mrdoob](http://github.com/mrdoob))
@@ -221,9 +221,9 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added `GeometryLibrary`, `MaterialLibrary`, `TextureLibrary` and `ObjectLibrary` (bear in mind that you can't rely on the GC now. Call `*.deallocate()` for removing). ([mrdoob](http://github.com/mrdoob))
 * Moved `*Controls` out of the lib. ([mrdoob](http://github.com/mrdoob))
 * Fixed shadows getting animated when skinning / morphing was disabled. ([alteredq](http://github.com/alteredq))
-* Added `Manual` section to the [documentation](http://mrdoob.github.com/three.js/docs/) pages. ([oal](http://github.com/oal))
+* Added `Manual` section to the [documentation](http://threejs.org/docs/) pages. ([oal](http://github.com/oal))
 * Added `.angleTo()` to `Vector3`. ([Wilt](http://github.com/Wilt))
-* Many improvements to the [editor](http://mrdoob.github.com/three.js/editor/). ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Many improvements to the [editor](http://threejs.org/editor/). ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 
 
 2012 09 15 - **r51** (405,491 KB, gzip: 99,389 KB)
@@ -239,7 +239,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added support to normals maps in `MeshPhongMaterial`. ([crobi](http://github.com/crobi) and [alteredq](http://github.com/alteredq))
 * Added handling of `BufferGeometry` for `ParticleSystems`. ([alteredq](http://github.com/alteredq))
 * Added support for compressed textures and cube maps to `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
-* Outliner and Material panel improvements to the [editor](http://mrdoob.github.com/three.js/editor/). ([mrdoob](http://github.com/mrdoob))
+* Outliner and Material panel improvements to the [editor](http://threejs.org/editor/). ([mrdoob](http://github.com/mrdoob))
 * Added material.emissive support to `CanvasRenderer` and `SVGRenderer`. ([mrdoob](http://github.com/mrdoob))
 * Added handling of multiple UV layers and anisotropy to Blender exporter. ([alteredq](http://github.com/alteredq))
 * Handling bump and anisotropy in `Loader` and `SceneLoader`. ([alteredq](http://github.com/alteredq))
@@ -273,7 +273,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added `OrbitControls`. ([qiao](http://github.com/qiao), [mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 * Completed some more documentation pages. ([mrdoob](http://github.com/mrdoob), [phenomnomnominal](http://github.com/phenomnomnominal), [FuzzYspo0N](http://github.com/FuzzYspo0N), [poeschko](http://github.com/poeschko), [wwwtyro](http://github.com/wwwtyro), [maximeq](http://github.com/maximeq) and [alteredq](http://github.com/alteredq))
 * Completed lots more documentation pages. ([sole](http://github.com/sole))
-* Started reworking [GUI](http://mrdoob.github.com/three.js/gui/). ([mrdoob](http://github.com/mrdoob))
+* Started reworking [GUI](http://threejs.org/gui/). ([mrdoob](http://github.com/mrdoob))
 * Improved python build system. ([gero3](http://github.com/gero3))
 * Made `VTKLoader` parsing more robust. ([mrdoob](http://github.com/mrdoob))
 * Added `recursive` flag to `Ray`. ([mrdoob](http://github.com/mrdoob))

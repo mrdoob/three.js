@@ -18,7 +18,7 @@
         "math"
     ],
 
-    "homepage" : "http://mrdoob.github.com/three.js/",
+    "homepage" : "http://threejs.org/",
 
     "bugs" : {
         "url" : "https://github.com/mrdoob/three.js/issues"
