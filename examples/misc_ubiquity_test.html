@@ -52,6 +52,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.autoUpdate = false;
 
 				// QRCODE
 
@@ -229,6 +230,8 @@
 				camera.lookAt( scene.position );
 
 				group.rotation.y += 0.01;
+
+				scene.updateMatrixWorld();
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );

@@ -6874,8 +6874,7 @@ THREE.Projector = function () {
 
 		_renderData.elements.length = 0;
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
@@ -13718,6 +13717,7 @@ THREE.Scene = function () {
 	this.fog = null;
 	this.overrideMaterial = null;
 
+	this.autoUpdate = true; // checked by the renderer
 	this.matrixAutoUpdate = false;
 
 	this.__objects = [];
@@ -18377,9 +18377,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
-
 	this.autoUpdateObjects = true;
-	this.autoUpdateScene = true;
 
 	// physically based shading
 
@@ -22325,7 +22323,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 
@@ -35238,7 +35236,7 @@ THREE.ShadowMapPlugin = function () {
 
 				scene.add( light.shadowCamera );
 
-				if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
+				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 			}
 
@@ -35923,7 +35921,7 @@ THREE.DepthPassPlugin = function () {
 
 		// update scene
 
-		if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 

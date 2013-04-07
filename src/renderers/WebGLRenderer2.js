@@ -52,9 +52,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
-
 	this.autoUpdateObjects = true;
-	this.autoUpdateScene = true;
 
 	// physically based shading
 
@@ -1150,7 +1148,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 

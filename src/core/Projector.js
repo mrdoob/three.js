@@ -188,8 +188,7 @@ THREE.Projector = function () {
 
 		_renderData.elements.length = 0;
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === undefined ) camera.updateMatrixWorld();
 
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
