@@ -3804,6 +3804,14 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromEuler: function ( v, order ) {
 
+		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromEuler() has been deprecated in favor of makeRotationFromEuler.  Please update your code.' );
+		
+		return this.makeRotationFromEuler( v, order );
+
+	},
+
+	makeRotationFromEuler: function ( v, order ) {
+
 		var te = this.elements;
 
 		var x = v.x, y = v.y, z = v.z;
@@ -3909,11 +3917,30 @@ THREE.Matrix4.prototype = {
 
 		}
 
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
+
 		return this;
 
 	},
 
 	setRotationFromQuaternion: function ( q ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromQuaternion() has been deprecated in favor of makeRotationFromQuaternion.  Please update your code.' );
+		
+		return this.makeRotationFromQuaternion( q );
+
+	},
+
+	makeRotationFromQuaternion: function ( q ) {
 
 		var te = this.elements;
 
@@ -3934,6 +3961,17 @@ THREE.Matrix4.prototype = {
 		te[2] = xz - wy;
 		te[6] = yz + wx;
 		te[10] = 1 - ( xx + yy );
+
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
 
 		return this;
 
@@ -4533,31 +4571,33 @@ THREE.Matrix4.prototype = {
 
 THREE.extend( THREE.Matrix4.prototype, {
 
-	compose: function() {
+	compose: function ( position, quaternion, scale ) {
 
-		var mRotation = new THREE.Matrix4();
-		var mScale = new THREE.Matrix4();
+		console.warn( 'DEPRECATED: Matrix4\'s .compose() has been deprecated in favor of makeFromPositionQuaternionScale.  Please update your code.' );
+		
+		return this.makeFromPositionQuaternionScale( position, quaternion, scale );
 
-		return function ( position, quaternion, scale ) {
+	},
 
-			var te = this.elements;
+	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
 
-			mRotation.identity();
-			mRotation.setRotationFromQuaternion( quaternion );
+		this.makeRotationFromQuaternion( quaternion );
+		this.scale( scale );
+		this.setPosition( position );
 
-			mScale.makeScale( scale.x, scale.y, scale.z );
+		return this;
 
-			this.multiplyMatrices( mRotation, mScale );
+	},
 
-			te[12] = position.x;
-			te[13] = position.y;
-			te[14] = position.z;
+	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
 
-			return this;
+		this.makeRotationFromEuler( rotation, eulerOrder );
+		this.scale( scale );
+		this.setPosition( position );
 
-		};
+		return this;
 
-	}(),
+	},
 
 	decompose: function() {
 
@@ -6579,21 +6619,15 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.setPosition( this.position );
-
+		// if we are not using a quaternion directly, convert Euler rotation to this.quaternion.
 		if ( this.useQuaternion === false )  {
 
-			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
+			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.eulerOrder, this.scale );
 
-		} else {
-
-			this.matrix.setRotationFromQuaternion( this.quaternion );
-
-		}
-
-		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
-
-			this.matrix.scale( this.scale );
+		} 
+		else {
+		
+			this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
 
 		}
 
@@ -13681,16 +13715,9 @@ THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Sprite.prototype.updateMatrix = function () {
 
-	this.matrix.setPosition( this.position );
-
 	this.rotation3d.set( 0, 0, this.rotation );
-	this.matrix.setRotationFromEuler( this.rotation3d );
-
-	if ( this.scale.x !== 1 || this.scale.y !== 1 ) {
-
-		this.matrix.scale( this.scale );
-
-	}
+	this.quaterion.setFromEuler( this.rotation3d, this.eulerOrder );
+	this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
 
 	this.matrixWorldNeedsUpdate = true;
 
@@ -28625,7 +28652,7 @@ THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
 			this.matrixWorld.decompose( this.translationWorld, this.rotationWorld, this.scaleWorld );
 			this.matrix.decompose( this.translationObject, this.rotationObject, this.scaleObject );
 
-			this.matrixWorld.compose( this.translationWorld, this.rotationObject, this.scaleWorld );
+			this.matrixWorld.makeFromPositionQuaternionScale( this.translationWorld, this.rotationObject, this.scaleWorld );
 
 
 		} else {
