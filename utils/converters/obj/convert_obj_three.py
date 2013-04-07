@@ -46,16 +46,16 @@ How to use generated JS file in your HTML document
         // load ascii model
 
         var jsonLoader = new THREE.JSONLoader();
-        jsonLoader.load( "Model_ascii.js", function( geometry ) { createScene( geometry ) } );
+        jsonLoader.load( "Model_ascii.js", createScene );
 
         // load binary model
 
         var binLoader = new THREE.BinaryLoader();
-        binLoader.load( "Model_bin.js", function( geometry ) { createScene( geometry) } );
+        binLoader.load( "Model_bin.js", createScene );
 
-        function createScene( geometry ) {
+        function createScene( geometry, materials ) {
 
-            var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial() );
+            var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 
         }
 
