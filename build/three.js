@@ -14108,11 +14108,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		if ( this.autoClear === true ) {
-
-			this.clear();
-
-		}
+		if ( this.autoClear === true ) this.clear();
 
 		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
@@ -14154,7 +14150,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 
-				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen ] );
+				_elemBox.setFromPoints( [
+					_v1.positionScreen,
+					_v2.positionScreen
+				] );
 
 				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
 
@@ -14182,9 +14181,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
+				_elemBox.setFromPoints( [
+					_v1.positionScreen,
+					_v2.positionScreen,
+					_v3.positionScreen
+				] );
 
-				renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material );
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+
+					renderFace3( _v1, _v2, _v3, 0, 1, 2, element, material );
+
+				}
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -14214,9 +14221,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
+				_elemBox.setFromPoints( [
+					_v1.positionScreen,
+					_v2.positionScreen,
+					_v3.positionScreen,
+					_v4.positionScreen
+				] );
 
-				renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material, scene );
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+
+					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material );
+
+				}
 
 			}
 
@@ -14340,6 +14356,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
+						_elemBox.makeEmpty();
 						return;
 
 					}
@@ -14372,6 +14389,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
+						_elemBox.makeEmpty();
 						return;
 
 					}
@@ -14407,6 +14425,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
+					_elemBox.makeEmpty();
 					return;
 
 				}

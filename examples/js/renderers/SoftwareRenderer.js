@@ -114,7 +114,7 @@ THREE.SoftwareRenderer = function () {
 		rectx2 = 0;
 		recty2 = 0;
 
-		if ( this.autoClear ) this.clear();
+		if ( this.autoClear === true ) this.clear();
 
 		var renderData = projector.projectScene( scene, camera );
 		var elements = renderData.elements;
