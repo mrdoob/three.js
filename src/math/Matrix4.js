@@ -129,7 +129,7 @@ THREE.Matrix4.prototype = {
 	setRotationFromEuler: function ( v, order ) {
 
 		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromEuler() has been deprecated in favor of makeRotationFromEuler.  Please update your code.' );
-		
+
 		return this.makeRotationFromEuler( v, order );
 
 	},
@@ -259,7 +259,7 @@ THREE.Matrix4.prototype = {
 	setRotationFromQuaternion: function ( q ) {
 
 		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromQuaternion() has been deprecated in favor of makeRotationFromQuaternion.  Please update your code.' );
-		
+
 		return this.makeRotationFromQuaternion( q );
 
 	},
@@ -825,6 +825,34 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	compose: function ( position, quaternion, scale ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .compose() has been deprecated in favor of makeFromPositionQuaternionScale. Please update your code.' );
+
+		return this.makeFromPositionQuaternionScale( position, quaternion, scale );
+
+	},
+
+	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
+
+		this.makeRotationFromQuaternion( quaternion );
+		this.scale( scale );
+		this.setPosition( position );
+
+		return this;
+
+	},
+
+	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
+
+		this.makeRotationFromEuler( rotation, eulerOrder );
+		this.scale( scale );
+		this.setPosition( position );
+
+		return this;
+
+	},
+
 	makeFrustum: function ( left, right, bottom, top, near, far ) {
 
 		var te = this.elements;
@@ -894,34 +922,6 @@ THREE.Matrix4.prototype = {
 };
 
 THREE.extend( THREE.Matrix4.prototype, {
-
-	compose: function ( position, quaternion, scale ) {
-
-		console.warn( 'DEPRECATED: Matrix4\'s .compose() has been deprecated in favor of makeFromPositionQuaternionScale.  Please update your code.' );
-		
-		return this.makeFromPositionQuaternionScale( position, quaternion, scale );
-
-	},
-
-	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
-
-		this.makeRotationFromQuaternion( quaternion );
-		this.scale( scale );
-		this.setPosition( position );
-
-		return this;
-
-	},
-
-	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
-
-		this.makeRotationFromEuler( rotation, eulerOrder );
-		this.scale( scale );
-		this.setPosition( position );
-
-		return this;
-
-	},
 
 	decompose: function() {
 
