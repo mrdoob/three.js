@@ -155,6 +155,8 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		// Render left
 		this.preLeftRender();
 
+		pCamera.projectionMatrix.copy(left.proj);
+
 		pCamera.matrix.copy(camera.matrix).multiply(left.tranform);
 		pCamera.matrixWorldNeedsUpdate = true;
 
@@ -168,7 +170,7 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		// Render right
 		this.preRightRender();
 
-		pCamera.projectionMatrix.copy(right.proj);		
+		pCamera.projectionMatrix.copy(right.proj);
 
 		pCamera.matrix.copy(camera.matrix).multiply(right.tranform);
 		pCamera.matrixWorldNeedsUpdate = true;
