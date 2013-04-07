@@ -389,21 +389,15 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.setPosition( this.position );
-
+		// if we are not using a quaternion directly, convert Euler rotation to this.quaternion.
 		if ( this.useQuaternion === false )  {
 
-			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
+			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.eulerOrder, this.scale );
 
-		} else {
-
-			this.matrix.setRotationFromQuaternion( this.quaternion );
-
-		}
-
-		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
-
-			this.matrix.scale( this.scale );
+		} 
+		else {
+		
+			this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
 
 		}
 
