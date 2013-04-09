@@ -148,9 +148,9 @@ var Viewport = function ( signals ) {
 			var point = intersects[ 0 ].point.sub( offset );
 
 			if (snapDist) {
-				point.x = point.x - point.x % snapDist;
-				point.y = point.y - point.y % snapDist;
-				point.z = point.z - point.z % snapDist;
+				point.x = Math.round( point.x / snapDist ) * snapDist;
+				point.y = Math.round( point.y / snapDist ) * snapDist;
+				point.z = Math.round( point.z / snapDist ) * snapDist;
 			}
 
 			selected.position.x = modifierAxis.x === 1 ? point.x : intersectionPlane.position.x;
