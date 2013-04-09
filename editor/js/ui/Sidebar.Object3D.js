@@ -452,15 +452,23 @@ Sidebar.Object3D = function ( signals ) {
 
 	} );
 
-	signals.objectSelected.add( updateUI );
-	signals.objectChanged.add( updateUI );
-	signals.cameraChanged.add( updateUI );
+	signals.objectSelected.add( function ( object ) {
 
-	function updateUI( object ) {
+		selected = object;
+		updateUI();
+
+	} );
+	signals.objectChanged.add( function ( object ) {
+
+		if ( selected === object ) updateUI();
+
+	} );
+
+	function updateUI() {
 
 		container.setDisplay( 'block' );
 
-		selected = object
+		var object = selected;
 
 		objectType.setValue( getObjectInstanceName( object ) );
 

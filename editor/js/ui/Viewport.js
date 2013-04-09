@@ -98,7 +98,9 @@ var Viewport = function ( signals ) {
 
 			if ( intersects.length > 0 ) {
 
-				if ( intersects[ 0 ].object === selected ) {
+				var object = intersects[ 0 ].object;
+
+				if ( selected === object || selected === helpersToObjects[ object.id ] ) {
 
 					intersectionPlane.position.copy( selected.position );
 					intersectionPlane.lookAt( camera.position );
@@ -160,7 +162,7 @@ var Viewport = function ( signals ) {
 
 		onMouseUpPosition.set( event.layerX, event.layerY );
 
-		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 2 ) {
+		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 1 ) {
 
 			var vector = new THREE.Vector3(
 				( event.layerX / container.dom.offsetWidth ) * 2 - 1,
@@ -196,6 +198,8 @@ var Viewport = function ( signals ) {
 
 			}
 
+			render();
+
 		}
 
 		document.removeEventListener( 'mousemove', onMouseMove );
@@ -212,7 +216,8 @@ var Viewport = function ( signals ) {
 	controls.userPanSpeed = 4.0;
 	controls.addEventListener( 'change', function () {
 
-		signals.cameraChanged.dispatch( camera );
+		signals.objectChanged.dispatch( camera );
+
 		render();
 
 	} );
