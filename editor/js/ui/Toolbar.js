@@ -8,6 +8,13 @@ var Toolbar = function ( signals ) {
 	buttons.setPadding( '7px' );
 	container.add( buttons );
 
+	var snap = new UI.Checkbox( true ).onChange( update );
+	buttons.add( snap );
+	buttons.add( new UI.Text( 'snap: ' ) );
+	var snapDist = new UI.Number( 25 ).onChange( update );
+	snapDist.dom.style.width = '42px';
+	buttons.add( snapDist );
+
 	var x = new UI.Checkbox( true ).onChange( update );
 	buttons.add( x );
 	buttons.add( new UI.Text( 'x' ) );
@@ -29,7 +36,11 @@ var Toolbar = function ( signals ) {
 
 		signals.modifierAxisChanged.dispatch( axis );
 
+		signals.snapChanged.dispatch( snap.getValue() === true ? snapDist.getValue() : null );
+
 	}
+
+	update();
 
 	return container;
 
