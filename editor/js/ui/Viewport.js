@@ -59,7 +59,7 @@ var Viewport = function ( signals ) {
 
 	// object picking
 
-	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 5000, 5000, 8, 8 ) );
+	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 5000, 5000 ) );
 	intersectionPlane.visible = false;
 	sceneHelpers.add( intersectionPlane );
 
@@ -212,8 +212,7 @@ var Viewport = function ( signals ) {
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
-	var controls = new THREE.OrbitControls( camera, container.dom );
-	controls.userPanSpeed = 4.0;
+	var controls = new THREE.EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
 		signals.objectChanged.dispatch( camera );
@@ -580,7 +579,6 @@ var Viewport = function ( signals ) {
 	function animate() {
 
 		requestAnimationFrame( animate );
-		controls.update();
 
 	}
 
