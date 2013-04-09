@@ -211,14 +211,8 @@ var Viewport = function ( signals ) {
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
-	var controls = new THREE.TrackballControls( camera, container.dom );
-	controls.rotateSpeed = 1.0;
-	controls.zoomSpeed = 1.2;
-	controls.panSpeed = 0.8;
-	controls.noZoom = false;
-	controls.noPan = false;
-	controls.staticMoving = true;
-	controls.dynamicDampingFactor = 0.3;
+	var controls = new THREE.OrbitControls( camera, container.dom );
+	controls.userPanSpeed = 4.0;
 	controls.addEventListener( 'change', function () {
 
 		cameraChanged = true;
