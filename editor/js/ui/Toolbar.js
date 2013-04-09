@@ -40,6 +40,8 @@ var Toolbar = function ( signals ) {
 
 	}
 
+	update();
+
 	return container;
 
 }
