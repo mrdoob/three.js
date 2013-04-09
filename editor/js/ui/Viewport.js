@@ -26,6 +26,7 @@ var Viewport = function ( signals ) {
 	sceneHelpers.add( grid );
 
 	var modifierAxis = new THREE.Vector3( 1, 1, 1 );
+	var snapDist = null;
 
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.color.setHex( 0xffff00 );
@@ -146,9 +147,16 @@ var Viewport = function ( signals ) {
 
 			var point = intersects[ 0 ].point.sub( offset );
 
+			if (snapDist) {
+				point.x = point.x - point.x % snapDist;
+				point.y = point.y - point.y % snapDist;
+				point.z = point.z - point.z % snapDist;
+			}
+
 			selected.position.x = modifierAxis.x === 1 ? point.x : intersectionPlane.position.x;
 			selected.position.y = modifierAxis.y === 1 ? point.y : intersectionPlane.position.y;
 			selected.position.z = modifierAxis.z === 1 ? point.z : intersectionPlane.position.z;
+
 
 			signals.objectChanged.dispatch( selected );
 
@@ -224,6 +232,12 @@ var Viewport = function ( signals ) {
 	signals.modifierAxisChanged.add( function ( axis ) {
 
 		modifierAxis.copy( axis );
+
+	} );
+
+	signals.snapChanged.add( function ( dist ) {
+
+		snapDist = dist;
 
 	} );
 
