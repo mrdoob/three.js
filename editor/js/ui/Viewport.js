@@ -65,26 +65,26 @@ var Viewport = function ( signals ) {
 	var projector = new THREE.Projector();
 	var offset = new THREE.Vector3();
 
-	var cameraChanged = false;
-
-	//
-
-	var picked = null;
-	var selected = null;
+	var selected = camera;
 
 	// events
 
+	var onMouseDownPosition = new THREE.Vector2();
+	var onMouseUpPosition = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
+
+		event.preventDefault();
 
 		container.dom.focus();
 
-		event.preventDefault();
+		onMouseDownPosition.set( event.layerX, event.layerY );
 
 		if ( event.button === 0 ) {
 
 			var vector = new THREE.Vector3(
-				( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
-				- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+				( event.layerX / container.dom.offsetWidth ) * 2 - 1,
+				- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
 				0.5
 			);
 
@@ -96,26 +96,21 @@ var Viewport = function ( signals ) {
 
 			if ( intersects.length > 0 ) {
 
-				controls.enabled = false;
+				if ( intersects[ 0 ].object === selected ) {
 
-				selected = intersects[ 0 ].object;
+					intersectionPlane.position.copy( selected.position );
+					intersectionPlane.lookAt( camera.position );
+					intersectionPlane.updateMatrixWorld();
 
-				if ( helpersToObjects[ selected.id ] !== undefined ) {
+					var intersects = ray.intersectObject( intersectionPlane );
 
-					selected = helpersToObjects[ selected.id ];
+					offset.copy( intersects[ 0 ].point ).sub( intersectionPlane.position );
+
+					document.addEventListener( 'mousemove', onMouseMove, false );
+
+					controls.enabled = false;
 
 				}
-
-				intersectionPlane.position.copy( selected.position );
-				intersectionPlane.lookAt( camera.position );
-
-				signals.objectSelected.dispatch( selected );
-
-				var intersects = ray.intersectObject( intersectionPlane );
-				offset.copy( intersects[ 0 ].point ).sub( intersectionPlane.position );
-
-				document.addEventListener( 'mousemove', onMouseMove, false );
-				document.addEventListener( 'mouseup', onMouseUp, false );
 
 			} else {
 
@@ -125,15 +120,15 @@ var Viewport = function ( signals ) {
 
 		}
 
-		cameraChanged = false;
+		document.addEventListener( 'mouseup', onMouseUp, false );
 
 	};
 
 	var onMouseMove = function ( event ) {
 
 		var vector = new THREE.Vector3(
-			( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
-			- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+			( event.layerX / container.dom.offsetWidth ) * 2 - 1,
+			- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
 			0.5
 		);
 
@@ -161,27 +156,23 @@ var Viewport = function ( signals ) {
 
 	var onMouseUp = function ( event ) {
 
-		document.removeEventListener( 'mousemove', onMouseMove );
-		document.removeEventListener( 'mouseup', onMouseUp );
+		onMouseUpPosition.set( event.layerX, event.layerY );
 
-	};
-
-	var onClick = function ( event ) {
-
-		if ( event.button == 0 && cameraChanged === false ) {
+		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 2 ) {
 
 			var vector = new THREE.Vector3(
-				( ( event.clientX - container.dom.offsetLeft ) / container.dom.offsetWidth ) * 2 - 1,
-				- ( ( event.clientY - container.dom.offsetTop ) / container.dom.offsetHeight ) * 2 + 1,
+				( event.layerX / container.dom.offsetWidth ) * 2 - 1,
+				- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
 				0.5
 			);
 
 			projector.unprojectVector( vector, camera );
 
 			ray.set( camera.position, vector.sub( camera.position ).normalize() );
+
 			var intersects = ray.intersectObjects( objects, true );
 
-			if ( intersects.length > 0 && ! controls.enabled ) {
+			if ( intersects.length > 0 ) {
 
 				selected = intersects[ 0 ].object;
 
@@ -191,22 +182,26 @@ var Viewport = function ( signals ) {
 
 				}
 
+				signals.objectSelected.dispatch( selected );
+
 			} else {
+
+				controls.enabled = true;
 
 				selected = camera;
 
-			}
+				signals.objectSelected.dispatch( selected );
 
-			signals.objectSelected.dispatch( selected );
+			}
 
 		}
 
-		controls.enabled = true;
+		document.removeEventListener( 'mousemove', onMouseMove );
+		document.removeEventListener( 'mouseup', onMouseUp );
 
 	};
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
-	container.dom.addEventListener( 'click', onClick, false );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
@@ -214,8 +209,6 @@ var Viewport = function ( signals ) {
 	var controls = new THREE.OrbitControls( camera, container.dom );
 	controls.userPanSpeed = 4.0;
 	controls.addEventListener( 'change', function () {
-
-		cameraChanged = true;
 
 		signals.cameraChanged.dispatch( camera );
 		render();
