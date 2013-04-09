@@ -265,6 +265,8 @@ Sidebar.Object3D = function ( signals ) {
 
 					parent.add( selected );
 
+					signals.sceneChanged.dispatch( scene );
+
 				}
 
 			}
@@ -292,6 +294,7 @@ Sidebar.Object3D = function ( signals ) {
 			if ( selected.fov !== undefined ) {
 
 				selected.fov = objectFov.getValue();
+				selected.updateProjectionMatrix();
 
 			}
 

@@ -218,8 +218,6 @@ var Viewport = function ( signals ) {
 
 		signals.objectChanged.dispatch( camera );
 
-		render();
-
 	} );
 
 	// signals
@@ -348,15 +346,10 @@ var Viewport = function ( signals ) {
 
 	signals.objectChanged.add( function ( object ) {
 
-		if ( object instanceof THREE.Camera ) {
-
-			object.updateProjectionMatrix();
-
-		}
-
 		if ( object.geometry !== undefined ) {
 
 			selectionBox.update( object );
+			updateInfo();
 
 		}
 
@@ -366,10 +359,7 @@ var Viewport = function ( signals ) {
 
 		}
 
-		updateInfo();
 		render();
-
-		signals.sceneChanged.dispatch( scene );
 
 	} );
 
