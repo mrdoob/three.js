@@ -7,6 +7,8 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 
 	THREE.Object3D.call( this );
 
+	this.matrixAutoUpdate = false;
+
 	this.light = light;
 
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
@@ -14,11 +16,13 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.position = this.light.position;
+	this.lightSphere.matrixWorld = this.light.matrixWorld;
+	this.lightSphere.matrixAutoUpdate = false;
 	this.add( this.lightSphere );
 
 	geometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 8, 1, true );
-	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ).translate( new THREE.Vector3( 0, -0.5, 0 ) ) );
+	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -0.5, 0 ) );
+	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
 	material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true, opacity: 0.3, transparent: true } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );

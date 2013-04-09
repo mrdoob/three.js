@@ -6,33 +6,33 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 	THREE.Geometry.call( this );
 
-	this.radius = radius || 50;
+	this.radius = radius = radius || 50;
 
-	this.widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
-	this.heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
+	this.widthSegments = widthSegments = Math.max( 3, Math.floor( widthSegments ) || 8 );
+	this.heightSegments = heightSegments = Math.max( 2, Math.floor( heightSegments ) || 6 );
 
-	phiStart = phiStart !== undefined ? phiStart : 0;
-	phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
+	this.phiStart = phiStart = phiStart !== undefined ? phiStart : 0;
+	this.phiLength = phiLength = phiLength !== undefined ? phiLength : Math.PI * 2;
 
-	thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
+	this.thetaStart = thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	this.thetaLength = thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
 	var x, y, vertices = [], uvs = [];
 
-	for ( y = 0; y <= this.heightSegments; y ++ ) {
+	for ( y = 0; y <= heightSegments; y ++ ) {
 
 		var verticesRow = [];
 		var uvsRow = [];
 
-		for ( x = 0; x <= this.widthSegments; x ++ ) {
+		for ( x = 0; x <= widthSegments; x ++ ) {
 
-			var u = x / this.widthSegments;
-			var v = y / this.heightSegments;
+			var u = x / widthSegments;
+			var v = y / heightSegments;
 
 			var vertex = new THREE.Vector3();
-			vertex.x = - this.radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-			vertex.y = this.radius * Math.cos( thetaStart + v * thetaLength );
-			vertex.z = this.radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
+			vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
+			vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
 
 			this.vertices.push( vertex );
 
@@ -89,7 +89,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 	this.computeCentroids();
 	this.computeFaceNormals();
 
-    this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 

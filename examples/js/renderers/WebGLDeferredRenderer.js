@@ -997,7 +997,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// update scene graph only once per frame
 		// (both color and normalDepth passes use exactly the same scene state)
 
-		this.renderer.autoUpdateScene = false;
+		scene.autoUpdate = false;
 		scene.updateMatrixWorld();
 
 		// 1) g-buffer normals + depth pass
@@ -1046,7 +1046,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// (write light proxy color pixel if behind scene pixel)
 
 		this.renderer.autoClearDepth = false;
-		this.renderer.autoUpdateScene = true;
+
+		scene.autoUpdate = true;
 
 		gl.depthFunc( gl.GEQUAL );
 

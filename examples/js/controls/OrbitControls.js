@@ -7,12 +7,12 @@
 
 THREE.OrbitControls = function ( object, domElement ) {
 
-	THREE.EventDispatcher.call( this );
-
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
+
+	this.enabled = true;
 
 	this.center = new THREE.Vector3();
 
@@ -217,7 +217,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseDown( event ) {
 
-		if ( !scope.userRotate ) return;
+		if ( scope.enabled === false ) return;
+		if ( scope.userRotate === false ) return;
 
 		event.preventDefault();
 
@@ -245,6 +246,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	}
 
 	function onMouseMove( event ) {
+
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 
@@ -288,7 +291,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		if ( ! scope.userRotate ) return;
+		if ( scope.enabled === false ) return;
+		if ( scope.userRotate === false ) return;
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
@@ -299,7 +303,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseWheel( event ) {
 
-		if ( ! scope.userZoom ) return;
+		if ( scope.enabled === false ) return;
+		if ( scope.userZoom === false ) return;
 
 		var delta = 0;
 
@@ -327,7 +332,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onKeyDown( event ) {
 
-		if ( ! scope.userPan ) return;
+		if ( scope.enabled === false ) return;
+		if ( scope.userPan === false ) return;
 
 		switch ( event.keyCode ) {
 
@@ -354,3 +360,5 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.domElement.addEventListener( 'keydown', onKeyDown, false );
 
 };
+
+THREE.OrbitControls.prototype = Object.create( THREE.EventDispatcher.prototype );

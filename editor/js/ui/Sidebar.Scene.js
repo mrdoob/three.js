@@ -1,18 +1,5 @@
 Sidebar.Scene = function ( signals ) {
 
-	var objectTypes = {
-
-		'PerspectiveCamera': THREE.PerspectiveCamera,
-		'AmbientLight': THREE.AmbientLight,
-		'DirectionalLight': THREE.DirectionalLight,
-		'HemisphereLight': THREE.HemisphereLight,
-		'PointLight': THREE.PointLight,
-		'SpotLight': THREE.SpotLight,
-		'Mesh': THREE.Mesh,
-		'Object3D': THREE.Object3D
-
-	};
-
 	var selected = null;
 
 	var container = new UI.Panel();
@@ -96,9 +83,23 @@ Sidebar.Scene = function ( signals ) {
 
 	function getObjectType( object ) {
 
-		for ( var type in objectTypes ) {
+		var objects = {
 
-			if ( object instanceof objectTypes[ type ] ) return type;
+			'Scene': THREE.Scene,
+			'PerspectiveCamera': THREE.PerspectiveCamera,
+			'AmbientLight': THREE.AmbientLight,
+			'DirectionalLight': THREE.DirectionalLight,
+			'HemisphereLight': THREE.HemisphereLight,
+			'PointLight': THREE.PointLight,
+			'SpotLight': THREE.SpotLight,
+			'Mesh': THREE.Mesh,
+			'Object3D': THREE.Object3D
+
+		};
+
+		for ( var type in objects ) {
+
+			if ( object instanceof objects[ type ] ) return type;
 
 		}
 
@@ -134,37 +135,10 @@ Sidebar.Scene = function ( signals ) {
 
 		var type = fogType.getValue();
 
-		if ( type === "None" ) {
-
-			fogColorRow.setDisplay( 'none' );
-
-		} else {
-
-			fogColorRow.setDisplay( '' );
-
-		}
-
-		if ( type === "Fog" ) {
-
-			fogNearRow.setDisplay( '' );
-			fogFarRow.setDisplay( '' );
-
-		} else {
-
-			fogNearRow.setDisplay( 'none' );
-			fogFarRow.setDisplay( 'none' );
-
-		}
-
-		if ( type === "FogExp2" ) {
-
-			fogDensityRow.setDisplay( '' );
-
-		} else {
-
-			fogDensityRow.setDisplay( 'none' );
-
-		}
+		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
+		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
+		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
 
 	}
 
@@ -188,19 +162,21 @@ Sidebar.Scene = function ( signals ) {
 
 		var options = {};
 
-		( function createList( object, pad ) {
+		options[ scene.id ] = scene.name + ' <span style="color: #aaa">- ' + getObjectType( scene ) + '</span>';
 
-			for ( var key in object.children ) {
+		( function addObjects( objects, pad ) {
 
-				var child = object.children[ key ];
+			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-				options[ child.id ] = pad + child.name + ' <span style="color: #aaa">- ' + getObjectType( child ) + '</span>';
+				var object = objects[ i ];
 
-				createList( child, pad + '&nbsp;&nbsp;&nbsp;' );
+				options[ object.id ] = pad + object.name + ' <span style="color: #aaa">- ' + getObjectType( object ) + '</span>';
+
+				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
 
 			}
 
-		} )( scene, '' );
+		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
 
 		outliner.setOptions( options );
 

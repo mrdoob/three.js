@@ -27,6 +27,7 @@
 			var mouse2D, mouse3D, raycaster, theta = 45,
 			isShiftDown = false, isCtrlDown = false,
 			target = new THREE.Vector3( 0, 200, 0 );
+			var normalMatrix = new THREE.Matrix3();
 			var ROLLOVERED;
 
 			init();
@@ -160,22 +161,24 @@
 
 				if ( intersects.length > 0 ) {
 
-					var interect = intersects[ 0 ];
+					var intersect = intersects[ 0 ];
 
 					if ( isCtrlDown ) {
 
-						if ( interect.object != plane ) {
+						if ( intersect.object != plane ) {
 
-							scene.remove( interect.object );
+							scene.remove( intersect.object );
 
 						}
 
 					} else {
 
-						var normal = interect.face.normal.clone();
-						normal.applyMatrix4( interect.object.matrixRotationWorld );
+						normalMatrix.getNormalMatrix( intersect.object.matrixWorld );
 
-						var position = new THREE.Vector3().addVectors( interect.point, normal );
+						var normal = intersect.face.normal.clone();
+						normal.applyMatrix3( normalMatrix ).normalize();
+
+						var position = new THREE.Vector3().addVectors( intersect.point, normal );
 
 						var geometry = new THREE.CubeGeometry( 50, 50, 50 );
 

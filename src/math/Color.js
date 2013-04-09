@@ -18,17 +18,21 @@ THREE.Color.prototype = {
 
 	set: function ( value ) {
 
-		switch ( typeof value ) {
+		if ( value instanceof THREE.Color ) {
 
-			case "number":
-				this.setHex( value );
-				break;
+			this.copy( value );
 
-			case "string":
-				this.setStyle( value );
-				break;
+		} else if ( typeof value === 'number' ) {
+
+			this.setHex( value );
+
+		} else if ( typeof value === 'string' ) {
+
+			this.setStyle( value );
 
 		}
+
+		return this;
 
 	},
 

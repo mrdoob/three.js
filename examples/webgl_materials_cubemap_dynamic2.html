@@ -75,13 +75,13 @@
 
 				var material = new THREE.MeshBasicMaterial( { envMap: cubeCamera.renderTarget } );
 
-				sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 60, 40 ), material );
+				sphere = new THREE.Mesh( new THREE.SphereGeometry( 20, 30, 15 ), material );
 				scene.add( sphere );
 
 				cube = new THREE.Mesh( new THREE.CubeGeometry( 20, 20, 20 ), material );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 20, 5, 100, 100 ), material );
+				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 20, 5, 100, 25 ), material );
 				scene.add( torus );
 
 				//
