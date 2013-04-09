@@ -29,7 +29,7 @@ THREE.MeshDepthMaterial.prototype = Object.create( THREE.Material.prototype );
 
 THREE.MeshDepthMaterial.prototype.clone = function () {
 
-	var material = new THREE.LineBasicMaterial();
+	var material = new THREE.MeshDepthMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 

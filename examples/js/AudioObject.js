@@ -38,7 +38,7 @@ THREE.AudioObject = function ( url, volume, playbackRate, loop ) {
 
 		try {
 
-			this.context = new webkitAudioContext();
+			THREE.AudioObject.prototype.context = new webkitAudioContext();
 
 		} catch( error ) {
 

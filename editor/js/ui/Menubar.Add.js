@@ -29,8 +29,6 @@ Menubar.Add = function ( signals ) {
 		var heightSegments = 1;
 
 		var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
-		geometry.name = 'Plane ' + geometry.id;
-
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Plane ' + mesh.id;
 
@@ -57,8 +55,6 @@ Menubar.Add = function ( signals ) {
 		var depthSegments = 1;
 
 		var geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
-		geometry.name = 'Cube ' + geometry.id;
-
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Cube ' + mesh.id;
 
@@ -83,8 +79,6 @@ Menubar.Add = function ( signals ) {
 		var openEnded = false;
 
 		var geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded );
-		geometry.name = 'Cylinder ' + geometry.id;
-
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Cylinder ' + mesh.id;
 
@@ -105,8 +99,6 @@ Menubar.Add = function ( signals ) {
 		var heightSegments = 16;
 
 		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
-		geometry.name = 'Sphere ' + geometry.id;
-
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Sphere ' + mesh.id;
 
@@ -126,8 +118,6 @@ Menubar.Add = function ( signals ) {
 		var detail = 2;
 
 		var geometry = new THREE.IcosahedronGeometry ( radius, detail );
-		geometry.name = 'Icosahedron ' + geometry.id;
-
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Icosahedron ' + mesh.id;
 
@@ -150,8 +140,6 @@ Menubar.Add = function ( signals ) {
 		var arc = Math.PI * 2;
 
 		var geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
-		geometry.name = 'Torus ' + geometry.id;
-
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Torus ' + mesh.id;
 
@@ -160,7 +148,7 @@ Menubar.Add = function ( signals ) {
 	} );
 	options.add( option );
 
-	// add torus
+	// add torus knot
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
@@ -176,8 +164,6 @@ Menubar.Add = function ( signals ) {
 		var heightScale = 1;
 
 		var geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
-		geometry.name = 'TorusKnot ' + geometry.id;
-
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'TorusKnot ' + mesh.id;
 
@@ -202,7 +188,7 @@ Menubar.Add = function ( signals ) {
 		var distance = 0;
 
 		var light = new THREE.PointLight( color, intensity, distance );
-		light.name = 'Light ' + light.id;
+		light.name = 'PointLight ' + light.id;
 
 		signals.objectAdded.dispatch( light );
 
@@ -223,10 +209,8 @@ Menubar.Add = function ( signals ) {
 		var exponent = 10;
 
 		var light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
-		light.name = 'Light ' + light.id;
-		light.target.name = 'Light ' + light.id + ' target';
-
-		light.target.userData.targetInverse = light;
+		light.name = 'SpotLight ' + light.id;
+		light.target.name = 'SpotLight ' + light.id + ' Target';
 
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
@@ -246,10 +230,8 @@ Menubar.Add = function ( signals ) {
 		var intensity = 1;
 
 		var light = new THREE.DirectionalLight( color, intensity );
-		light.name = 'Light ' + light.id;
-		light.target.name = 'Light ' + light.id + ' target';
-
-		light.target.userData.targetInverse = light;
+		light.name = 'DirectionalLight ' + light.id;
+		light.target.name = 'DirectionalLight ' + light.id + ' Target';
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
@@ -270,7 +252,7 @@ Menubar.Add = function ( signals ) {
 		var intensity = 1;
 
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
-		light.name = 'Light ' + light.id;
+		light.name = 'HemisphereLight ' + light.id;
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
@@ -289,7 +271,7 @@ Menubar.Add = function ( signals ) {
 		var color = 0x222222;
 
 		var light = new THREE.AmbientLight( color );
-		light.name = 'Light ' + light.id;
+		light.name = 'AmbientLight ' + light.id;
 
 		signals.objectAdded.dispatch( light );
 

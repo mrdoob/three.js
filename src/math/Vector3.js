@@ -15,7 +15,9 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
-THREE.extend( THREE.Vector3.prototype, {
+THREE.Vector3.prototype = {
+
+	constructor: THREE.Vector3,
 
 	set: function ( x, y, z ) {
 
@@ -265,38 +267,6 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	applyEuler: function () {
-
-		var q1 = new THREE.Quaternion();
-
-		return function ( v, eulerOrder ) {
-
-			var quaternion = q1.setFromEuler( v, eulerOrder );
-
-			this.applyQuaternion( quaternion );
-
-			return this;
-
-		};
-
-	}(),
-
-	applyAxisAngle: function () {
-
-		var q1 = new THREE.Quaternion();
-
-		return function ( axis, angle ) {
-
-			var quaternion = q1.setFromAxisAngle( axis, angle );
-
-			this.applyQuaternion( quaternion );
-
-			return this;
-
-		};
-
-	}(),
-
 	transformDirection: function ( m ) {
 
 		// input: THREE.Matrix4 affine matrix
@@ -519,48 +489,6 @@ THREE.extend( THREE.Vector3.prototype, {
 		return this;
 
 	},
-
-	projectOnVector: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function( vector ) {
-
-			v1.copy( vector ).normalize();
-			var d = this.dot( v1 );
-			return this.copy( v1 ).multiplyScalar( d );
-
-		};
-
-	}(),
-
-	projectOnPlane: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function( planeNormal ) {
-
-			v1.copy( this ).projectOnVector( planeNormal );
-
-			return this.sub( v1 );
-
-		}
-
-	}(),
-
-	reflect: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function ( vector ) {
-
-		    v1.copy( this ).projectOnVector( vector ).multiplyScalar( 2 );
-
-		    return this.subVectors( v1, this );
-
-		}
-
-	}(),
 
 	angleTo: function ( v ) {
 
@@ -811,10 +739,20 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+
+		return this;
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y, this.z ];
-		
+
 	},
 
 	clone: function () {
@@ -822,5 +760,83 @@ THREE.extend( THREE.Vector3.prototype, {
 		return new THREE.Vector3( this.x, this.y, this.z );
 
 	}
+
+};
+
+THREE.extend( THREE.Vector3.prototype, {
+
+	applyEuler: function () {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( v, eulerOrder ) {
+
+			var quaternion = q1.setFromEuler( v, eulerOrder );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	applyAxisAngle: function () {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( axis, angle ) {
+
+			var quaternion = q1.setFromAxisAngle( axis, angle );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	projectOnVector: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( vector ) {
+
+			v1.copy( vector ).normalize();
+			var d = this.dot( v1 );
+			return this.copy( v1 ).multiplyScalar( d );
+
+		};
+
+	}(),
+
+	projectOnPlane: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( planeNormal ) {
+
+			v1.copy( this ).projectOnVector( planeNormal );
+
+			return this.sub( v1 );
+
+		}
+
+	}(),
+
+	reflect: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( vector ) {
+
+		    v1.copy( this ).projectOnVector( vector ).multiplyScalar( 2 );
+
+		    return this.subVectors( v1, this );
+
+		}
+
+	}()
 
 } );

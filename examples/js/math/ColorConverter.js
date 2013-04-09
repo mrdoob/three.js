@@ -1,52 +1,18 @@
 /**
  * @author bhouston / http://exocortex.com/
+ * @author zz85 / http://github.com/zz85
  */
 
 THREE.ColorConverter = {
 
-	fromRGB: function ( color, r, g, b ) {
-
-		return color.setRGB( r, g, b );
-
-	},
-
-	fromHex: function ( color, hex ) {
-
-		return color.setHex( hex );
-
-	},
-
-	toHex: function ( color ) {
-
-		return color.getHex();
-
-	},
-	 
-	toHexString: function ( color ) {
-
-		return color.getHexString( color );
-
-	},
-
-	fromHSL: function ( color, h, s, l ) {
-
-		return color.setHSL( h, s, l );
-	},
-
-	toHSL: function ( color ) {
-
-		return color.getHSL( color );
-
-	},
-
-	fromHSV: function ( color, h, s, v ) {
+	setHSV: function ( color, h, s, v ) {
 
 		// https://gist.github.com/xpansive/1337890#file-index-js
 		return color.setHSL( h, ( s * v ) / ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) ), h * 0.5 );
 
 	},
 
-	toHSV: function( color ) {
+	getHSV: function( color ) {
 
 		var hsl = color.getHSL();
 
@@ -58,19 +24,35 @@ THREE.ColorConverter = {
 			s: 2 * hsl.s / ( hsl.l + hsl.s ),
 			v: hsl.l + hsl.s
 		};
-		
 	},
 
-	fromStyle: function ( color, style ) {
+	// where c, m, y, k is between 0 and 1
+	
+	setCMYK: function ( color, c, m, y, k ) {
 
-		return color.setStyle( style );
+		var r = ( 1 - c ) * ( 1 - k );
+		var g = ( 1 - m ) * ( 1 - k );
+		var b = ( 1 - y ) * ( 1 - k );
+
+		return color.setRGB( r, g, b );
 
 	},
 
-	toStyle: function ( color ) {
+	getCMYK: function ( color ) {
 
-		return color.getStyle( color );
+		var r = color.r;
+		var g = color.g;
+		var b = color.b;
+		var k = 1 - Math.max(r, g, b);
+		var c = ( 1 - r - k ) / ( 1 - k );
+		var m = ( 1 - g - k ) / ( 1 - k );
+		var y = ( 1 - b - k ) / ( 1 - k );
+
+		return {
+			c: c, m: m, y: y, k: k
+		};
 
 	}
+
 
 };

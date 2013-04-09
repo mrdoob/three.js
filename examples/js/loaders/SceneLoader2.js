@@ -2,15 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SceneLoader2 = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.SceneLoader2 = function () {};
 
 THREE.SceneLoader2.prototype = {
 
-	constructor: THREE.SceneExporter2,
+	constructor: THREE.SceneLoader2,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	load: function ( url ) {
 
@@ -44,116 +45,243 @@ THREE.SceneLoader2.prototype = {
 
 	parse: function ( json ) {
 
-		console.log( json );
+		// geometries
 
-		/*
-		var output = {
-			metadata: {
-				formatVersion : 4.0,
-				type : "scene",
-				generatedBy : "SceneExporter"
+		if ( json.geometries !== undefined ) {
+
+			var geometries = [];
+			var loader = new THREE.JSONLoader();
+
+			for ( var i = 0, l = json.geometries.length; i < l; i ++ ) {
+
+				var geometry;
+				var data = json.geometries[ i ];
+
+				switch ( data.type ) {
+
+					case 'PlaneGeometry':
+
+						geometry = new THREE.PlaneGeometry(
+							data.width,
+							data.height,
+							data.widthSegments,
+							data.heightSegments
+						);
+
+						break;
+
+					case 'CubeGeometry':
+
+						geometry = new THREE.CubeGeometry(
+							data.width,
+							data.height,
+							data.depth,
+							data.widthSegments,
+							data.heightSegments,
+							data.depthSegments
+						);
+
+						break;
+
+					case 'CylinderGeometry':
+
+						geometry = new THREE.CylinderGeometry(
+							data.radiusTop,
+							data.radiusBottom,
+							data.height,
+							data.radiusSegments,
+							data.heightSegments,
+							data.openEnded
+						);
+
+						break;
+
+					case 'SphereGeometry':
+
+						geometry = new THREE.SphereGeometry(
+							data.radius,
+							data.widthSegments,
+							data.heightSegments,
+							data.phiStart,
+							data.phiLength,
+							data.thetaStart,
+							data.thetaLength
+						);
+
+						break;
+
+					case 'IcosahedronGeometry':
+
+						geometry = new THREE.IcosahedronGeometry(
+							data.radius,
+							data.detail
+						);
+
+						break;
+
+					case 'TorusGeometry':
+
+						geometry = new THREE.TorusGeometry(
+							data.radius,
+							data.tube,
+							data.radialSegments,
+							data.tubularSegments,
+							data.arc
+						);
+
+						break;
+
+					case 'TorusKnotGeometry':
+
+						geometry = new THREE.TorusKnotGeometry(
+							data.radius,
+							data.tube,
+							data.radialSegments,
+							data.tubularSegments,
+							data.p,
+							data.q,
+							data.heightScale
+						);
+
+						break;
+
+					case 'Geometry':
+
+						geometry = loader.parse( data.data ).geometry;
+
+						break;
+
+				}
+
+				if ( data.name !== undefined ) geometry.name = data.name;
+				geometries.push( geometry );
+
 			}
-		};
 
-		console.log( scene );
+		}
 
-		var parseObject = function ( object ) {
+		// materials
 
-			var data = { name: object.name };
+		if ( json.materials !== undefined ) {
 
-			if ( object instanceof THREE.PerspectiveCamera ) {
+			var materials = [];
+			var loader = new THREE.MaterialLoader();
 
-				data.type = 'PerspectiveCamera';
-				data.fov = object.fov;
-				data.aspect = object.aspect;
-				data.near = object.near;
-				data.far = object.far;
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
+			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
 
-			} else if ( object instanceof THREE.OrthographicCamera ) {
+				var data = json.materials[ i ];
+				var material = loader.parse( data );
 
-				data.type = 'OrthographicCamera';
-				data.left = object.left;
-				data.right = object.right;
-				data.top = object.top;
-				data.bottom = object.bottom;
-				data.near = object.near;
-				data.far = object.far;
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
+				if ( data.name !== undefined ) material.name = data.name;
 
-			} else if ( object instanceof THREE.AmbientLight ) {
-
-				data.type = 'AmbientLight';
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-
-			} else if ( object instanceof THREE.DirectionalLight ) {
-
-				data.type = 'DirectionalLight';
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.position = object.position.toArray();
-
-			} else if ( object instanceof THREE.PointLight ) {
-
-				data.type = 'PointLight';
-				data.color = object.color.getHex();
-				data.intensity = object.intensity;
-				data.position = object.position.toArray();
-
-			} else if ( object instanceof THREE.SpotLight ) {
-
-				data.type = 'SpotLight';
-				data.color = object.color.getHex();	
-				data.intensity = object.intensity;
-				data.position = object.position.toArray();
-
-			} else if ( object instanceof THREE.HemisphereLight ) {
-
-				data.type = 'HemisphereLight';
-				data.color = object.color.getHex();
-
-			} else if ( object instanceof THREE.Mesh ) {
-
-				data.type = 'Mesh';
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
-				data.scale = object.scale.toArray();
-
-			} else {
-
-				data.type = 'Object3D';
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
-				data.scale = object.scale.toArray();
+				materials.push( material );
 
 			}
 
-			// parse children
+		}
 
-			if ( object.children.length > 0 ) {
+		// objects
 
-				data.children = [];
+		var parseObject = function ( data ) {
 
-				for ( var i = 0; i < object.children.length; i ++ ) {
+			var object;
 
-					data.children.push( parseObject( object.children[ i ] ) );
+			switch ( data.type ) {
+
+				case 'Scene':
+
+					object = new THREE.Scene();
+
+					break;
+
+				case 'PerspectiveCamera':
+
+					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
+
+					break;
+
+				case 'OrthographicCamera':
+
+					object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
+
+					break;
+
+				case 'AmbientLight':
+
+					object = new THREE.AmbientLight( data.color );
+
+					break;
+
+				case 'DirectionalLight':
+
+					object = new THREE.DirectionalLight( data.color, data.intensity );
+					object.position.fromArray( data.position );
+
+					break;
+
+				case 'PointLight':
+
+					object = new THREE.PointLight( data.color, data.intensity, data.distance );
+					object.position.fromArray( data.position );
+
+					break;
+
+				case 'SpotLight':
+
+					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
+					object.position.fromArray( data.position );
+
+					break;
+
+				case 'HemisphereLight':
+
+					object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
+					object.position.fromArray( data.position );
+
+					break;
+
+				case 'Mesh':
+
+					object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
+					object.scale.fromArray( data.scale );
+
+					break;
+
+				default:
+
+					object = new THREE.Object3D();
+					object.position.fromArray( data.position );
+					object.rotation.fromArray( data.rotation );
+					object.scale.fromArray( data.scale );
+
+			}
+
+			if ( data.name !== undefined ) object.name = data.name;
+			if ( data.visible !== undefined ) object.visible = data.visible;
+			if ( data.userData !== undefined ) object.userData = data.userData;
+
+			if ( data.children !== undefined ) {
+
+				for ( var i = 0, l = data.children.length; i < l; i ++ ) {
+
+					object.add( parseObject( data.children[ i ] ) );
 
 				}
 
 			}
 
-			return data;
+			return object;
 
 		}
 
-		output.scene = parseObject( scene ).children;
-
-		return JSON.stringify( output, null, '\t' );
-		*/
+		return parseObject( json.scene );
 
 	}
 
-}
+};

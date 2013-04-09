@@ -177,7 +177,7 @@ THREE.ShadowMapPlugin = function () {
 
 				scene.add( light.shadowCamera );
 
-				if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
+				if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 			}
 

@@ -15,7 +15,7 @@ THREE.Triangle.normal = function() {
 
 	var v0 = new THREE.Vector3();
 
-	return function( a, b, c, optionalTarget ) {
+	return function ( a, b, c, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -40,9 +40,9 @@ THREE.Triangle.normal = function() {
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 THREE.Triangle.barycoordFromPoint = function() {
 
-	var v0 = new THREE.Vector3(),
-		v1 = new THREE.Vector3(),
-		v2 = new THREE.Vector3();
+	var v0 = new THREE.Vector3();
+	var v1 = new THREE.Vector3();
+	var v2 = new THREE.Vector3();
 
 	return function ( point, a, b, c, optionalTarget ) {
 
@@ -92,7 +92,7 @@ THREE.Triangle.containsPoint = function() {
 
 }();
 
-THREE.extend( THREE.Triangle.prototype, {
+THREE.Triangle.prototype = {
 
 	constructor: THREE.Triangle,
 
@@ -187,4 +187,4 @@ THREE.extend( THREE.Triangle.prototype, {
 
 	}
 
-} );
+};

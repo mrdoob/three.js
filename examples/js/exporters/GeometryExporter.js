@@ -10,6 +10,14 @@ THREE.GeometryExporter.prototype = {
 
 	parse: function ( geometry ) {
 
+		var output = {
+			metadata: {
+				version: 4.0,
+				type: 'geometry',
+				generator: 'GeometryExporter'
+			}
+		};
+
 		var vertices = [];
 
 		for ( var i = 0; i < geometry.vertices.length; i ++ ) {
@@ -29,24 +37,24 @@ THREE.GeometryExporter.prototype = {
 			var face = geometry.faces[ i ];
 
 			var isTriangle = face instanceof THREE.Face3;
-			var hasMaterial = face.materialIndex !== undefined;
-			var hasFaceUv = geometry.faceUvs[ 0 ][ i ] !== undefined;
-			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
+			var hasMaterial = false; // face.materialIndex !== undefined;
+			var hasFaceUv = false; // geometry.faceUvs[ 0 ][ i ] !== undefined;
+			var hasFaceVertexUv = false; // geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
 			var hasFaceNormal = face.normal.length() > 0;
 			var hasFaceVertexNormal = face.vertexNormals[ 0 ] !== undefined;
-			var hasFaceColor = face.color;
-			var hasFaceVertexColor = face.vertexColors[ 0 ] !== undefined;
+			var hasFaceColor = false; // face.color;
+			var hasFaceVertexColor = false; // face.vertexColors[ 0 ] !== undefined;
 
 			var faceType = 0;
 
 			faceType = setBit( faceType, 0, ! isTriangle );
-			// faceType = setBit( faceType, 1, hasMaterial );
-			// faceType = setBit( faceType, 2, hasFaceUv );
-			// faceType = setBit( faceType, 3, hasFaceVertexUv );
+			faceType = setBit( faceType, 1, hasMaterial );
+			faceType = setBit( faceType, 2, hasFaceUv );
+			faceType = setBit( faceType, 3, hasFaceVertexUv );
 			faceType = setBit( faceType, 4, hasFaceNormal );
 			faceType = setBit( faceType, 5, hasFaceVertexNormal );
-			// faceType = setBit( faceType, 6, hasFaceColor );
-			// faceType = setBit( faceType, 7, hasFaceVertexColor );
+			faceType = setBit( faceType, 6, hasFaceColor );
+			faceType = setBit( faceType, 7, hasFaceVertexColor );
 
 			faces.push( faceType );
 
@@ -144,34 +152,30 @@ THREE.GeometryExporter.prototype = {
 
 		function getNormalIndex( x, y, z ) {
 
-				var hash = x.toString() + y.toString() + z.toString();
+			var hash = x.toString() + y.toString() + z.toString();
 
-				if ( normalsHash[ hash ] !== undefined ) {
-
-					return normalsHash[ hash ];
-
-				}
-
-				normalsHash[ hash ] = normals.length / 3;
-				normals.push( x, y, z );
+			if ( normalsHash[ hash ] !== undefined ) {
 
 				return normalsHash[ hash ];
 
+			}
+
+			normalsHash[ hash ] = normals.length / 3;
+			normals.push( x, y, z );
+
+			return normalsHash[ hash ];
+
 		}
+
+		output.vertices = vertices;
+		output.normals = normals;
+		output.uvs = uvs;
+		output.faces = faces;
 
 		//
 
-		return {
-			metadata: {
-				version: 4,
-				generator: "GeometryExporter",
-			},
-			vertices: vertices,
-			normals: normals,
-			uvs: uvs,
-			faces: faces
-		};
+		return output;
 
 	}
 
-}
+};

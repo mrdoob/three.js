@@ -9,7 +9,9 @@ THREE.Plane = function ( normal, constant ) {
 
 };
 
-THREE.extend( THREE.Plane.prototype, {
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
 
 	set: function ( normal, constant ) {
 
@@ -183,7 +185,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			// compute new normal based on theory here:
 			// http://www.songho.ca/opengl/gl_normaltransform.html
-			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
+			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getNormalMatrix( matrix );
 			var newNormal = v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 			var newCoplanarPoint = this.coplanarPoint( v2 );
@@ -217,4 +219,4 @@ THREE.extend( THREE.Plane.prototype, {
 
 	}
 
-} );
+};

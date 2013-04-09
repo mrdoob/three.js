@@ -27,7 +27,6 @@ THREE.Object3D = function () {
 
 	this.matrix = new THREE.Matrix4();
 	this.matrixWorld = new THREE.Matrix4();
-	this.matrixRotationWorld = new THREE.Matrix4();
 
 	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = true;
@@ -79,13 +78,45 @@ THREE.Object3D.prototype = {
 
 	}(),
 
-	translate: function () {
+	rotateOnAxis: function() {
+
+		// rotate object on axis in object space
+		// axis is assumed to be normalized
+
+		var q1 = new THREE.Quaternion();
+		var q2 = new THREE.Quaternion();
+
+		return function ( axis, angle ) {
+
+			q1.setFromAxisAngle( axis, angle );
+
+			if ( this.useQuaternion === true ) {
+
+				this.quaternion.multiply( q1 );
+
+			} else {
+
+				q2.setFromEuler( this.rotation, this.eulerOrder );
+				q2.multiply( q1 );
+
+				this.rotation.setEulerFromQuaternion( q2, this.eulerOrder );
+
+			}
+
+			return this;
+
+		}
+
+	}(),
+
+	translateOnAxis: function () {
+
+		// translate object by distance along axis in object space
+		// axis is assumed to be normalized
 
 		var v1 = new THREE.Vector3();
 
-		return function ( distance, axis ) {
-
-			// axis is assumed to be normalized
+		return function ( axis, distance ) {
 
 			v1.copy( axis );
 
@@ -99,15 +130,20 @@ THREE.Object3D.prototype = {
 
 			}
 
-			v1.multiplyScalar( distance );
-
-			this.position.add( v1 );
+			this.position.add( v1.multiplyScalar( distance ) );
 
 			return this;
 
-		};
+		}
 
 	}(),
+
+	translate: function ( distance, axis ) {
+
+		console.warn( 'DEPRECATED: Object3D\'s .translate() has been removed. Use .translateOnAxis( axis, distance ) instead. Note args have been changed.' );
+		return this.translateOnAxis( axis, distance );
+
+	},
 
 	translateX: function () {
 
@@ -115,7 +151,7 @@ THREE.Object3D.prototype = {
 
 		return function ( distance ) {
 
-			return this.translate( distance, v1 );
+			return this.translateOnAxis( v1, distance );
 
 		};
 
@@ -127,7 +163,7 @@ THREE.Object3D.prototype = {
 
 		return function ( distance ) {
 
-			return this.translate( distance, v1 );
+			return this.translateOnAxis( v1, distance );
 
 		};
 
@@ -139,7 +175,7 @@ THREE.Object3D.prototype = {
 
 		return function ( distance ) {
 
-			return this.translate( distance, v1 );
+			return this.translateOnAxis( v1, distance );
 
 		};
 
@@ -268,7 +304,37 @@ THREE.Object3D.prototype = {
 
 	},
 
-	getChildByName: function ( name, recursive ) {
+	getObjectById: function ( id, recursive ) {
+
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
+
+			var child = this.children[ i ];
+
+			if ( child.id === id ) {
+
+				return child;
+
+			}
+
+			if ( recursive === true ) {
+
+				child = child.getObjectById( id, recursive );
+
+				if ( child !== undefined ) {
+
+					return child;
+
+				}
+
+			}
+
+		}
+
+		return undefined;
+
+	},
+
+	getObjectByName: function ( name, recursive ) {
 
 		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
@@ -282,7 +348,7 @@ THREE.Object3D.prototype = {
 
 			if ( recursive === true ) {
 
-				child = child.getChildByName( name, recursive );
+				child = child.getObjectByName( name, recursive );
 
 				if ( child !== undefined ) {
 
@@ -295,6 +361,13 @@ THREE.Object3D.prototype = {
 		}
 
 		return undefined;
+
+	},
+
+	getChildByName: function ( name, recursive ) {
+
+		console.warn( 'DEPRECATED: Object3D\'s .getChildByName() has been renamed to .getObjectByName().' );
+		return this.getObjectByName( name, recursive );
 
 	},
 
@@ -316,21 +389,15 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.setPosition( this.position );
+		// if we are not using a quaternion directly, convert Euler rotation to this.quaternion.
 
 		if ( this.useQuaternion === false )  {
 
-			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
+			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.eulerOrder, this.scale );
 
 		} else {
 
-			this.matrix.setRotationFromQuaternion( this.quaternion );
-
-		}
-
-		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
-
-			this.matrix.scale( this.scale );
+			this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
 
 		}
 
@@ -389,7 +456,6 @@ THREE.Object3D.prototype = {
 
 		object.matrix.copy( this.matrix );
 		object.matrixWorld.copy( this.matrixWorld );
-		object.matrixRotationWorld.copy( this.matrixRotationWorld );
 
 		object.matrixAutoUpdate = this.matrixAutoUpdate;
 		object.matrixWorldNeedsUpdate = this.matrixWorldNeedsUpdate;
@@ -403,6 +469,8 @@ THREE.Object3D.prototype = {
 		object.receiveShadow = this.receiveShadow;
 
 		object.frustumCulled = this.frustumCulled;
+
+		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
 		for ( var i = 0; i < this.children.length; i ++ ) {
 

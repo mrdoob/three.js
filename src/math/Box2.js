@@ -9,7 +9,9 @@ THREE.Box2 = function ( min, max ) {
 
 };
 
-THREE.extend( THREE.Box2.prototype, {
+THREE.Box2.prototype = {
+
+	constructor: THREE.Box2,
 
 	set: function ( min, max ) {
 
@@ -65,7 +67,7 @@ THREE.extend( THREE.Box2.prototype, {
 
 	},
 
-	setFromCenterAndSize: function() {
+	setFromCenterAndSize: function () {
 
 		var v1 = new THREE.Vector2();
 
@@ -205,7 +207,7 @@ THREE.extend( THREE.Box2.prototype, {
 
 	},
 
-	distanceToPoint: function() {
+	distanceToPoint: function () {
 
 		var v1 = new THREE.Vector2();
 
@@ -257,4 +259,4 @@ THREE.extend( THREE.Box2.prototype, {
 
 	}
 
-} );
+};

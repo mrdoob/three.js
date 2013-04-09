@@ -9,10 +9,21 @@ THREE.Mesh = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
-	this.geometry = geometry;
-	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
+	this.geometry = null;
+	this.material = null;
 
-	if ( this.geometry !== undefined ) {
+	this.setGeometry( geometry );
+	this.setMaterial( material );
+
+};
+
+THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.Mesh.prototype.setGeometry = function ( geometry ) {
+
+	if ( geometry !== undefined ) {
+
+		this.geometry = geometry;
 
 		if ( this.geometry.boundingSphere === null ) {
 
@@ -26,7 +37,19 @@ THREE.Mesh = function ( geometry, material ) {
 
 };
 
-THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
+THREE.Mesh.prototype.setMaterial = function ( material ) {
+
+	if ( material !== undefined ) {
+
+		this.material = material;
+
+	} else {
+
+		this.material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
+
+	}
+
+};
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
