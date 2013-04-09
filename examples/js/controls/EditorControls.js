@@ -139,15 +139,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
 
-			delta = - event.wheelDelta;
+			delta = - event.wheelDelta * 0.1;
 
 		} else if ( event.detail ) { // Firefox
 
-			delta = event.detail;
+			delta = event.detail * 5;
 
 		}
 
-		scope.pan( new THREE.Vector3( 0, 0, delta * 0.1 ) );
+		scope.pan( new THREE.Vector3( 0, 0, delta ) );
 
 	}
 
