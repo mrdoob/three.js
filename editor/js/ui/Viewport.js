@@ -72,7 +72,30 @@ var Viewport = function ( signals ) {
 
 	// events
 
+	var getIntersects = function ( event, object ) {
+
+		var vector = new THREE.Vector3(
+			( event.layerX / container.dom.offsetWidth ) * 2 - 1,
+			- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
+			0.5
+		);
+
+		projector.unprojectVector( vector, camera );
+
+		ray.set( camera.position, vector.sub( camera.position ).normalize() );
+
+		if ( object instanceof Array ) {
+
+			return ray.intersectObjects( object, true );
+
+		}
+
+		return ray.intersectObject( object, true );
+
+	};
+
 	var onMouseDownPosition = new THREE.Vector2();
+	var onMouseMovePosition = new THREE.Vector2();
 	var onMouseUpPosition = new THREE.Vector2();
 
 	var onMouseDown = function ( event ) {
@@ -85,17 +108,7 @@ var Viewport = function ( signals ) {
 
 		if ( event.button === 0 ) {
 
-			var vector = new THREE.Vector3(
-				( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-				- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-				0.5
-			);
-
-			projector.unprojectVector( vector, camera );
-
-			ray.set( camera.position, vector.sub( camera.position ).normalize() );
-
-			var intersects = ray.intersectObjects( objects, true );
+			var intersects = getIntersects( event, objects );
 
 			if ( intersects.length > 0 ) {
 
@@ -123,44 +136,40 @@ var Viewport = function ( signals ) {
 
 			}
 
-		}
+			document.addEventListener( 'mouseup', onMouseUp, false );
 
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		}
 
 	};
 
 	var onMouseMove = function ( event ) {
 
-		var vector = new THREE.Vector3(
-			( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-			- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
+		onMouseMovePosition.set( event.layerX, event.layerY );
 
-		projector.unprojectVector( vector, camera );
+		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) > 1 ) {
 
-		ray.set( camera.position, vector.sub( camera.position ).normalize() );
+			var intersects = getIntersects( event, intersectionPlane );
 
-		var intersects = ray.intersectObject( intersectionPlane );
+			if ( intersects.length > 0 ) {
 
-		if ( intersects.length > 0 ) {
+				var point = intersects[ 0 ].point.sub( offset );
 
-			var point = intersects[ 0 ].point.sub( offset );
+				if (snapDist) {
+					point.x = Math.round( point.x / snapDist ) * snapDist;
+					point.y = Math.round( point.y / snapDist ) * snapDist;
+					point.z = Math.round( point.z / snapDist ) * snapDist;
+				}
 
-			if (snapDist) {
-				point.x = Math.round( point.x / snapDist ) * snapDist;
-				point.y = Math.round( point.y / snapDist ) * snapDist;
-				point.z = Math.round( point.z / snapDist ) * snapDist;
+				selected.position.x = modifierAxis.x === 1 ? point.x : intersectionPlane.position.x;
+				selected.position.y = modifierAxis.y === 1 ? point.y : intersectionPlane.position.y;
+				selected.position.z = modifierAxis.z === 1 ? point.z : intersectionPlane.position.z;
+
+
+				signals.objectChanged.dispatch( selected );
+
+				render();
+
 			}
-
-			selected.position.x = modifierAxis.x === 1 ? point.x : intersectionPlane.position.x;
-			selected.position.y = modifierAxis.y === 1 ? point.y : intersectionPlane.position.y;
-			selected.position.z = modifierAxis.z === 1 ? point.z : intersectionPlane.position.z;
-
-
-			signals.objectChanged.dispatch( selected );
-
-			render();
 
 		}
 
@@ -172,17 +181,7 @@ var Viewport = function ( signals ) {
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 1 ) {
 
-			var vector = new THREE.Vector3(
-				( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-				- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-				0.5
-			);
-
-			projector.unprojectVector( vector, camera );
-
-			ray.set( camera.position, vector.sub( camera.position ).normalize() );
-
-			var intersects = ray.intersectObjects( objects, true );
+			var intersects = getIntersects( event, objects );
 
 			if ( intersects.length > 0 ) {
 
@@ -215,7 +214,21 @@ var Viewport = function ( signals ) {
 
 	};
 
+	var onDoubleClick = function ( event ) {
+
+		var intersects = getIntersects( event, objects );
+
+		if ( intersects.length > 0 && intersects[ 0 ].object === selected ) {
+
+			controls.focus( selected );
+			controls.enabled = true;
+
+		}
+
+	};
+
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'dblclick', onDoubleClick, false );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.

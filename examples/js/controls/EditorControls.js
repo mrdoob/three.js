@@ -28,6 +28,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var changeEvent = { type: 'change' };
 
+	this.focus = function ( object ) {
+
+		this.center.getPositionFromMatrix( object.matrixWorld );
+		this.object.lookAt( this.center );
+
+		this.dispatchEvent( changeEvent );
+
+	};
+
 	this.pan = function ( distance ) {
 
 		normalMatrix.getNormalMatrix( this.object.matrix );
