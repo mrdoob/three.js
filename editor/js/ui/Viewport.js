@@ -25,8 +25,15 @@ var Viewport = function ( signals ) {
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
 
-	var modifierAxis = new THREE.Vector3( 1, 1, 1 );
-	var snapDist = null;
+	//
+
+	var scene = new THREE.Scene();
+
+	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
+	camera.position.set( 500, 250, 500 );
+	camera.lookAt( scene.position );
+
+	//
 
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.color.setHex( 0xffff00 );
@@ -35,20 +42,8 @@ var Viewport = function ( signals ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var selectionAxis = new THREE.AxisHelper( 100 );
-	selectionAxis.material.depthTest = false;
-	selectionAxis.material.transparent = true;
-	selectionAxis.matrixAutoUpdate = false;
-	selectionAxis.visible = false;
-	sceneHelpers.add( selectionAxis );
-
-	//
-
-	var scene = new THREE.Scene();
-
-	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
-	camera.position.set( 500, 250, 500 );
-	camera.lookAt( scene.position );
+	var transformControls = new THREE.TransformControls( camera, container.dom );
+	sceneHelpers.add( transformControls.gizmo );
 
 	// fog
 
@@ -60,13 +55,9 @@ var Viewport = function ( signals ) {
 
 	// object picking
 
-	var intersectionPlane = new THREE.Mesh( new THREE.PlaneGeometry( 5000, 5000 ) );
-	intersectionPlane.visible = false;
-	sceneHelpers.add( intersectionPlane );
-
 	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
-	var offset = new THREE.Vector3();
+	//var offset = new THREE.Vector3();
 
 	var selected = camera;
 
@@ -83,86 +74,59 @@ var Viewport = function ( signals ) {
 
 		onMouseDownPosition.set( event.layerX, event.layerY );
 
-		if ( event.button === 0 ) {
-
-			var vector = new THREE.Vector3(
-				( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-				- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-				0.5
-			);
-
-			projector.unprojectVector( vector, camera );
-
-			ray.set( camera.position, vector.sub( camera.position ).normalize() );
-
-			var intersects = ray.intersectObjects( objects, true );
-
-			if ( intersects.length > 0 ) {
-
-				var object = intersects[ 0 ].object;
-
-				if ( selected === object || selected === helpersToObjects[ object.id ] ) {
-
-					intersectionPlane.position.copy( selected.position );
-					intersectionPlane.lookAt( camera.position );
-					intersectionPlane.updateMatrixWorld();
-
-					var intersects = ray.intersectObject( intersectionPlane );
-
-					offset.copy( intersects[ 0 ].point ).sub( intersectionPlane.position );
-
-					document.addEventListener( 'mousemove', onMouseMove, false );
-
-					controls.enabled = false;
-
-				}
-
-			} else {
-
-				controls.enabled = true;
-
-			}
-
+	  controls.enabled = true;
+		if ( transformControls.active ) {
+			controls.enabled = false;
 		}
+		// if ( event.button === 0 ) {
 
+		// 	var vector = new THREE.Vector3(
+		// 		( event.layerX / container.dom.offsetWidth ) * 2 - 1,
+		// 		- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
+		// 		0.5
+		// 	);
+
+		// 	projector.unprojectVector( vector, camera );
+
+		// 	ray.set( camera.position, vector.sub( camera.position ).normalize() );
+
+		// 	var intersects = ray.intersectObjects( objects, true );
+
+		// 	if ( intersects.length > 0 ) {
+
+		// 		var object = intersects[ 0 ].object;
+
+		// 		if ( selected === object || selected === helpersToObjects[ object.id ] ) {
+
+		// 			intersectionPlane.position.copy( selected.position );
+		// 			intersectionPlane.lookAt( camera.position );
+		// 			intersectionPlane.updateMatrixWorld();
+
+		// 			var intersects = ray.intersectObject( intersectionPlane );
+
+		// 			offset.copy( intersects[ 0 ].point ).sub( intersectionPlane.position );
+
+		// 			controls.enabled = false;
+
+		// 		}
+
+		// 	} else {
+
+		// 		controls.enabled = true;
+
+		// 	}
+
+		// }
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
 	};
 
 	var onMouseMove = function ( event ) {
 
-		var vector = new THREE.Vector3(
-			( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-			- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
-
-		projector.unprojectVector( vector, camera );
-
-		ray.set( camera.position, vector.sub( camera.position ).normalize() );
-
-		var intersects = ray.intersectObject( intersectionPlane );
-
-		if ( intersects.length > 0 ) {
-
-			var point = intersects[ 0 ].point.sub( offset );
-
-			if (snapDist) {
-				point.x = point.x - point.x % snapDist;
-				point.y = point.y - point.y % snapDist;
-				point.z = point.z - point.z % snapDist;
-			}
-
-			selected.position.x = modifierAxis.x === 1 ? point.x : intersectionPlane.position.x;
-			selected.position.y = modifierAxis.y === 1 ? point.y : intersectionPlane.position.y;
-			selected.position.z = modifierAxis.z === 1 ? point.z : intersectionPlane.position.z;
-
-
-			signals.objectChanged.dispatch( selected );
-
-			render();
-
-		}
+		signals.objectChanged.dispatch( selected );
+		render();
 
 	};
 
@@ -231,13 +195,13 @@ var Viewport = function ( signals ) {
 
 	signals.modifierAxisChanged.add( function ( axis ) {
 
-		modifierAxis.copy( axis );
+		transformControls.modifierAxis.copy( axis );
 
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
 
-		snapDist = dist;
+		transformControls.snapDist = dist;
 
 	} );
 
@@ -335,7 +299,7 @@ var Viewport = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
-		selectionAxis.visible = false;
+		transformControls.visible = false;
 
 		if ( object !== null ) {
 
@@ -346,8 +310,7 @@ var Viewport = function ( signals ) {
 
 			}
 
-			selectionAxis.matrixWorld = object.matrixWorld;
-			selectionAxis.visible = true;
+			transformControls.attatch(object);
 
 			selected = object;
 
