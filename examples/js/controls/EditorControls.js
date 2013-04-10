@@ -50,6 +50,18 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	};
 
+	this.zoom = function ( distance ) {
+
+		normalMatrix.getNormalMatrix( this.object.matrix );
+
+		distance.applyMatrix3( normalMatrix );
+
+		this.object.position.add( distance );
+
+		this.dispatchEvent( changeEvent );
+
+	};
+
 	this.rotate = function ( delta ) {
 
 		var position = this.object.position;
@@ -119,7 +131,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( state === STATE.ZOOM ) {
 
-			scope.pan( new THREE.Vector3( 0, 0, movementY ) );
+			scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
 
 		} else if ( state === STATE.PAN ) {
 
@@ -156,7 +168,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
-		scope.pan( new THREE.Vector3( 0, 0, delta ) );
+		scope.zoom( new THREE.Vector3( 0, 0, delta ) );
 
 	}
 
