@@ -1,6 +1,7 @@
 /**
  * @author aleeper / http://adamleeper.com/
  * @author mrdoob / http://mrdoob.com/
+ * @author gero3 / https://github.com/gero3
  *
  * Description: A THREE loader for STL ASCII files, as created by Solidworks and other CAD programs.
  *
@@ -31,165 +32,249 @@ THREE.STLLoader.prototype = {
 	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
 	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
 	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
+};
 
-	load: function ( url, callback ) {
+THREE.STLLoader.prototype.load = function (url) {
+    var scope = this;
+    console.log("Attempting to load URL: [" + url + "]");
+    
+    var xhr = new XMLHttpRequest();
+    
+    function onloaded( event ) {
+    
+        if ( event.target.status === 200 || event.target.status === 0 ) {
+                var data = event.target.responseText;
+                return scope.dispatchEvent({
+                    type: 'load',
+                    content: scope.parse(data)
+                });
+        } else {
 
-		var scope = this;
-		var request = new XMLHttpRequest();
+            scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']',
+                response: event.target.responseText } );
+    
+        }
+    
+    }
+    
+    xhr.addEventListener( 'load', onloaded, false );
+    
+    xhr.addEventListener( 'progress', function ( event ) {
+    
+        scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
+    
+    }, false );
+    
+    xhr.addEventListener( 'error', function () {
+    
+        scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+    
+    }, false );
+    
+    xhr.overrideMimeType('text/plain; charset=x-user-defined');
+    xhr.open( 'GET', url, true );
+    xhr.send( null );
+};
 
-		request.addEventListener( 'load', function ( event ) {
+THREE.STLLoader.prototype.parse = function (data) {
+    var isBinary,
+        _this = this;
+    isBinary = function (data) {
+        // TODO: Is this safer then the previous check which is checking 
+        // if solid is at the start of ASCII file???
+        var expect, face_size, n_faces, reader;
+        reader = new THREE.STLLoader.BinaryReader(data);
+        reader.seek(80);
+        face_size = (32 / 8 * 3) + ((32 / 8 * 3) * 3) + (16 / 8);
+        n_faces = reader.readUInt32();
+        expect = 80 + (32 / 8) + (n_faces * face_size);
+        return expect === reader.getSize();
+    };
+    if (isBinary(data)) {
+        return this.parseBinary(data);
+    } else {
+        return this.parseASCII(data);
+    }
+};
 
-			var geometry = scope.parse( event.target.response );
+THREE.STLLoader.prototype.parseBinary = function (data) {
+    var face, geometry, n_faces, readFloat3, reader, _fn, _i;
+    reader = new THREE.STLLoader.BinaryReader(data);
+    readFloat3 = function () {
+        return [reader.readFloat(), reader.readFloat(), reader.readFloat()];
+    };
+    reader.seek(80);
+    n_faces = reader.readUInt32();
+    geometry = new THREE.Geometry();
+    _fn = function (face) {
+        var length, normal, v1, _j;
+        v1 = readFloat3();
+        normal = new THREE.Vector3(v1[0],v1[1],v1[2]);
+        for (_j = 1; _j <= 3; _j++) {
+            v1 = readFloat3();
+            geometry.vertices.push(new THREE.Vector3(v1[0],v1[1],v1[2]));
+        }
+        reader.readUInt16();
+        length = geometry.vertices.length;
+        return geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
+    };
+    for (face = _i = 0; 0 <= n_faces ? _i < n_faces : _i > n_faces; face = 0 <= n_faces ? ++_i : --_i) {
+        _fn(face);
+    }
+    geometry.computeCentroids();
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    return geometry;
+};
 
-			scope.dispatchEvent( { type: 'load', content: geometry } );
+THREE.STLLoader.prototype.parseASCII = function (data) {
+    var geometry, length, normal, patternFace, patternNormal, patternVertex, result, text;
+    geometry = new THREE.Geometry();
+    patternFace = /facet([\s\S]*?)endfacet/g;
+    while (((result = patternFace.exec(data)) != null)) {
+        text = result[0];
+        patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
+        while (((result = patternNormal.exec(text)) != null)) {
+            normal = new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5]));
+        }
+        patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
+        while (((result = patternVertex.exec(text)) != null)) {
+            geometry.vertices.push(new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5])));
+        }
+        length = geometry.vertices.length;
+        geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
+    }
+    geometry.computeCentroids();
+    geometry.computeBoundingBox();
+    geometry.computeBoundingSphere();
+    return geometry;
+};
 
-			if ( callback ) callback( geometry );
 
-		}, false );
+// BinaryReader
+// Refactored by Vjeux <vjeuxx@gmail.com>
+// http://blog.vjeux.com/2010/javascript/javascript-binary-reader.html
 
-		request.addEventListener( 'progress', function ( event ) {
+// Original
+//+ Jonas Raoni Soares Silva
+//@ http://jsfromhell.com/classes/binary-parser [rev. #1]
 
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
+THREE.STLLoader.BinaryReader = function (data) {
+    this._buffer = data;
+    this._pos = 0;
+};
 
-		}, false );
+THREE.STLLoader.BinaryReader.prototype = {
 
-		request.addEventListener( 'error', function () {
+    /* Public */
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+	readInt8:	function (){ return this._decodeInt(8, true); },
+	readUInt8:	function (){ return this._decodeInt(8, false); },
+	readInt16:	function (){ return this._decodeInt(16, true); },
+	readUInt16:	function (){ return this._decodeInt(16, false); },
+	readInt32:	function (){ return this._decodeInt(32, true); },
+	readUInt32:	function (){ return this._decodeInt(32, false); },
 
-		}, false );
+	readFloat:	function (){ return this._decodeFloat(23, 8); },
+	readDouble:	function (){ return this._decodeFloat(52, 11); },
 
-		request.open( 'GET', url, true );
-		request.responseType = "arraybuffer";
-		request.send( null );
-
+	readChar:	function () { return this.readString(1); },
+	readString: function (length) {
+		this._checkSize(length * 8);
+		var result = this._buffer.substr(this._pos, length);
+		this._pos += length;
+		return result;
 	},
 
-	bin2str: function (buf) {
-
-		var array_buffer = new Uint8Array(buf);
-		var str = '';
-		for(var i = 0; i < buf.byteLength; i++) {
-			str += String.fromCharCode(array_buffer[i]); // implicitly assumes little-endian
-		}
-		return str
-
+	seek: function (pos) {
+		this._pos = pos;
+		this._checkSize(0);
 	},
 
-	isASCII: function(buf){
-
-		var dv = new DataView(buf);
-		var str = '';
-		for(var i = 0; i < 5; i++) {
-			str += String.fromCharCode(dv.getUint8(i, true)); // assume little-endian
-		}
-		return (str.toLowerCase() === 'solid'); // All ASCII stl files begin with 'solid'
-
+	getPosition: function () {
+		return this._pos;
 	},
 
-	parse: function (buf) {
-
-		if( this.isASCII(buf) )
-		{
-			var str = this.bin2str(buf);
-			return this.parseASCII(str);
-		}
-		else
-		{
-			return this.parseBinary(buf);
-		}
-
+	getSize: function () {
+		return this._buffer.length;
 	},
 
-	parseASCII: function ( data ) {
 
-		var geometry = new THREE.Geometry();
+	/* Private */
 
-		var patternFace = /facet([\s\S]*?)endfacet/g;
-		var result;
+	_decodeFloat: function(precisionBits, exponentBits){
+		var length = precisionBits + exponentBits + 1;
+		var size = length >> 3;
+		this._checkSize(length);
 
-		while ( ( result = patternFace.exec( data ) ) != null ) {
-
-			var text = result[ 0 ];
-
-			// Normal
-			var patternNormal = /normal[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
-
-			while ( ( result = patternNormal.exec( text ) ) != null ) {
-
-				var normal = new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
-
+		var bias = Math.pow(2, exponentBits - 1) - 1;
+		var signal = this._readBits(precisionBits + exponentBits, 1, size);
+		var exponent = this._readBits(precisionBits, exponentBits, size);
+		var significand = 0;
+		var divisor = 2;
+    // var curByte = length + (-precisionBits >> 3) - 1;
+		var curByte = 0;
+		do {
+			var byteValue = this._readByte(++curByte, size);
+			var startBit = precisionBits % 8 || 8;
+			var mask = 1 << startBit;
+			while (mask >>= 1) {
+				if (byteValue & mask) {
+					significand += 1 / divisor;
+				}
+				divisor *= 2;
 			}
+		} while (precisionBits -= startBit);
 
-			// Vertex
-			var patternVertex = /vertex[\s]+([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
+		this._pos += size;
 
-			while ( ( result = patternVertex.exec( text ) ) != null ) {
-
-				geometry.vertices.push( new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) ) );
-
-			}
-
-			var len = geometry.vertices.length;
-			geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal ) );
-
-		}
-
-		geometry.computeCentroids();
-		geometry.computeBoundingSphere();
-
-		return geometry;
-
+		return exponent == (bias << 1) + 1 ? significand ? NaN : signal ? -Infinity : +Infinity
+			: (1 + signal * -2) * (exponent || significand ? !exponent ? Math.pow(2, -bias + 1) * significand
+			: Math.pow(2, exponent - bias) * (1 + significand) : 0);
 	},
 
-	parseBinary: function (buf) {
+	_decodeInt: function(bits, signed){
+		var x = this._readBits(0, bits, bits / 8), max = Math.pow(2, bits);
+		var result = signed && x >= max / 2 ? x - max : x;
 
-		// STL binary format specification, as per http://en.wikipedia.org/wiki/STL_(file_format)
-		//
-		// UINT8[80] – Header
-		// UINT32 – Number of triangles
-		//
-		// foreach triangle
-		//   REAL32[3] – Normal vector
-		//   REAL32[3] – Vertex 1
-		//   REAL32[3] – Vertex 2
-		//   REAL32[3] – Vertex 3
-		//   UINT16 – Attribute byte count
-		// end
-		//
+		this._pos += bits / 8;
+		return result;
+	},
 
-		var geometry = new THREE.Geometry();
+	//shl fix: Henri Torgemane ~1996 (compressed by Jonas Raoni)
+	_shl: function (a, b){
+		for (++b; --b; a = ((a %= 0x7fffffff + 1) & 0x40000000) == 0x40000000 ? a * 2 : (a - 0x40000000) * 2 + 0x7fffffff + 1);
+		return a;
+	},
 
-		var headerLength = 80;
-		var dataOffset = 84;
-		var faceLength = 12*4 + 2;
+	_readByte: function (i, size) {
+		return this._buffer.charCodeAt(this._pos + size - i - 1) & 0xff;
+	},
 
-		var le = true; // is little-endian  // This might be processor dependent...
+	_readBits: function (start, length, size) {
+		var offsetLeft = (start + length) % 8;
+		var offsetRight = start % 8;
+		var curByte = size - (start >> 3) - 1;
+		var lastByte = size + (-(start + length) >> 3);
+		var diff = curByte - lastByte;
 
-		// var header = new Uint8Array(buf, 0, headerLength); // not presently used
-		var dvTriangleCount = new DataView(buf, headerLength, 4);
-		var numTriangles = dvTriangleCount.getUint32(0, le);
+		var sum = (this._readByte(curByte, size) >> offsetRight) & ((1 << (diff ? 8 - offsetRight : length)) - 1);
 
-		for (var i = 0; i < numTriangles; i++) {
-
-			var dv = new DataView(buf, dataOffset + i*faceLength, faceLength);
-
-			var normal = new THREE.Vector3( dv.getFloat32(0, le), dv.getFloat32(4, le), dv.getFloat32(8, le) );
-
-			for(var v = 3; v < 12; v+=3) {
-
-				geometry.vertices.push( new THREE.Vector3( dv.getFloat32(v*4, le), dv.getFloat32((v+1)*4, le), dv.getFloat32( (v+2)*4, le ) ) );
-
-			}
-			var len = geometry.vertices.length;
-			geometry.faces.push( new THREE.Face3( len - 3, len - 2, len - 1, normal ) );
+		if (diff && offsetLeft) {
+			sum += (this._readByte(lastByte++, size) & ((1 << offsetLeft) - 1)) << (diff-- << 3) - offsetRight;
 		}
 
-		geometry.computeCentroids();
-		geometry.computeBoundingSphere();
+		while (diff) {
+			sum += this._shl(this._readByte(lastByte++, size), (diff-- << 3) - offsetRight);
+		}
 
-		return geometry;
+		return sum;
+	},
+
+	_checkSize: function (neededBits) {
+		if (!(this._pos + Math.ceil(neededBits / 8) < this._buffer.length)) {
+			throw new Error("Index out of bound");
+		}
 	}
-
 };
