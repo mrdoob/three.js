@@ -316,7 +316,7 @@
 				pointLight.position.set( 0, 0, 0 );
 				scene.add( pointLight );
 
-				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI, 1 );
+				sunLight = new THREE.SpotLight( 0xffffff, sunIntensity, 0, Math.PI/2, 1 );
 				sunLight.position.set( 1000, 2000, 1000 );
 
 				sunLight.castShadow = true;
