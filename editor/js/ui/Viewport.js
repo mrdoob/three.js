@@ -57,7 +57,6 @@ var Viewport = function ( signals ) {
 
 	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
-	//var offset = new THREE.Vector3();
 
 	var selected = camera;
 
@@ -97,56 +96,18 @@ var Viewport = function ( signals ) {
 
 		onMouseDownPosition.set( event.layerX, event.layerY );
 
-	  controls.enabled = true;
-		if ( transformControls.active ) {
-			controls.enabled = false;
-		}
-		// if ( event.button === 0 ) {
-
-		// 	var vector = new THREE.Vector3(
-		// 		( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-		// 		- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-		// 		0.5
-		// 	);
-
-		// 	projector.unprojectVector( vector, camera );
-
-		// 	ray.set( camera.position, vector.sub( camera.position ).normalize() );
-
-		// 	var intersects = ray.intersectObjects( objects, true );
-
-		// 	if ( intersects.length > 0 ) {
-
-		// 		var object = intersects[ 0 ].object;
-
-		// 		if ( selected === object || selected === helpersToObjects[ object.id ] ) {
-
-		// 			intersectionPlane.position.copy( selected.position );
-		// 			intersectionPlane.lookAt( camera.position );
-		// 			intersectionPlane.updateMatrixWorld();
-
-		// 			var intersects = ray.intersectObject( intersectionPlane );
-
-		// 			offset.copy( intersects[ 0 ].point ).sub( intersectionPlane.position );
-
-		// 			controls.enabled = false;
-
-		// 		}
-
-		// 	} else {
-
-		// 		controls.enabled = true;
-
-		// 	}
-
-		// }
+		if ( !transformControls.active ) controls.enabled = true;
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
+		render();
+
 	};
 
 	var onMouseMove = function ( event ) {
+
+		if ( transformControls.active ) controls.enabled = false;
 
 		signals.objectChanged.dispatch( selected );
 		render();
@@ -182,6 +143,8 @@ var Viewport = function ( signals ) {
 				signals.objectSelected.dispatch( selected );
 
 			}
+
+			controls.enabled = false;
 
 			render();
 
@@ -332,7 +295,7 @@ var Viewport = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
-		transformControls.visible = false;
+		transformControls.detatch();
 
 		if ( object !== null ) {
 
@@ -343,9 +306,9 @@ var Viewport = function ( signals ) {
 
 			}
 
-			transformControls.attatch(object);
-
 			selected = object;
+
+			if ( !(selected instanceof THREE.PerspectiveCamera) ) transformControls.attatch(object);
 
 		}
 
