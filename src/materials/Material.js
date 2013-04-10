@@ -65,11 +65,7 @@ THREE.Material.prototype = {
 
 				var currentValue = this[ key ];
 
-				if ( currentValue instanceof THREE.Color && newValue instanceof THREE.Color ) {
-
-					currentValue.copy( newValue );
-
-				} else if ( currentValue instanceof THREE.Color ) {
+				if ( currentValue instanceof THREE.Color ) {
 
 					currentValue.set( newValue );
 
