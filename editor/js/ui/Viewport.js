@@ -520,7 +520,18 @@ var Viewport = function ( signals ) {
 
 	//
 
-	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+	var renderer;
+
+	if ( System.support.webgl === true ) {
+
+		renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+
+	} else {
+
+		renderer = new THREE.CanvasRenderer();
+
+	}
+
 	renderer.setClearColor( clearColor );
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
