@@ -409,7 +409,10 @@ var Viewport = function ( signals ) {
 
 		var parent = selected.parent;
 
-		if ( selected instanceof THREE.Light ) {
+		if ( selected instanceof THREE.PointLight ||
+		     selected instanceof THREE.DirectionalLight ||
+		     selected instanceof THREE.SpotLight ||
+		     selected instanceof THREE.HemisphereLight ) {
 
 			var helper = objectsToHelpers[ selected.id ];
 
