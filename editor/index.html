@@ -56,6 +56,7 @@
 
 			.toolbar {
 				background-color: #999;
+				color: #333;
 			}
 
 			.sidebar {
@@ -73,6 +74,8 @@
 	<body>
 
 		<script src="../build/three.js"></script>
+		<script src="../examples/js/libs/system.min.js"></script>
+
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
 		<script src="../examples/js/loaders/BinaryLoader.js"></script>
@@ -455,7 +458,7 @@
 							signals.objectSelected.dispatch( mesh );
 
 						}, false );
-						reader.readAsText( file );
+						reader.readAsBinaryString(file);
 
 						break;
 

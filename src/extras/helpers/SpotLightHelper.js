@@ -1,7 +1,8 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
- */
+ * @author WestLangley / http://github.com/WestLangley
+*/
 
 THREE.SpotLightHelper = function ( light, sphereSize ) {
 
@@ -31,7 +32,7 @@ THREE.SpotLightHelper = function ( light, sphereSize ) {
 	this.lightCone.position = this.light.position;
 
 	var coneLength = light.distance ? light.distance : 10000;
-	var coneWidth = coneLength * Math.tan( light.angle * 0.5 ) * 2;
+	var coneWidth = coneLength * Math.tan( light.angle );
 
 	this.lightCone.scale.set( coneWidth, coneWidth, coneLength );
 	this.lightCone.lookAt( this.light.target.position );
@@ -45,7 +46,7 @@ THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 THREE.SpotLightHelper.prototype.update = function () {
 
 	var coneLength = this.light.distance ? this.light.distance : 10000;
-	var coneWidth = coneLength * Math.tan( this.light.angle * 0.5 ) * 2;
+	var coneWidth = coneLength * Math.tan( this.light.angle );
 
 	this.lightCone.scale.set( coneWidth, coneWidth, coneLength );
 	this.lightCone.lookAt( this.light.target.position );

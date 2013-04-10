@@ -140,7 +140,7 @@ Sidebar.Object3D = function ( signals ) {
 	// angle
 
 	var objectAngleRow = new UI.Panel();
-	var objectAngle = new UI.Number().setPrecision( 3 ).setRange( 0, Math.PI * 2 ).onChange( update );
+	var objectAngle = new UI.Number().setPrecision( 3 ).setRange( 0, Math.PI / 2 ).onChange( update );
 
 	objectAngleRow.add( new UI.Text( 'Angle' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectAngleRow.add( objectAngle );

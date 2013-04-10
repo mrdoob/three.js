@@ -63,7 +63,30 @@ var Viewport = function ( signals ) {
 
 	// events
 
+	var getIntersects = function ( event, object ) {
+
+		var vector = new THREE.Vector3(
+			( event.layerX / container.dom.offsetWidth ) * 2 - 1,
+			- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
+			0.5
+		);
+
+		projector.unprojectVector( vector, camera );
+
+		ray.set( camera.position, vector.sub( camera.position ).normalize() );
+
+		if ( object instanceof Array ) {
+
+			return ray.intersectObjects( object, true );
+
+		}
+
+		return ray.intersectObject( object, true );
+
+	};
+
 	var onMouseDownPosition = new THREE.Vector2();
+	var onMouseMovePosition = new THREE.Vector2();
 	var onMouseUpPosition = new THREE.Vector2();
 
 	var onMouseDown = function ( event ) {
@@ -136,17 +159,7 @@ var Viewport = function ( signals ) {
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 1 ) {
 
-			var vector = new THREE.Vector3(
-				( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-				- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-				0.5
-			);
-
-			projector.unprojectVector( vector, camera );
-
-			ray.set( camera.position, vector.sub( camera.position ).normalize() );
-
-			var intersects = ray.intersectObjects( objects, true );
+			var intersects = getIntersects( event, objects );
 
 			if ( intersects.length > 0 ) {
 
@@ -179,7 +192,21 @@ var Viewport = function ( signals ) {
 
 	};
 
+	var onDoubleClick = function ( event ) {
+
+		var intersects = getIntersects( event, objects );
+
+		if ( intersects.length > 0 && intersects[ 0 ].object === selected ) {
+
+			controls.focus( selected );
+			controls.enabled = true;
+
+		}
+
+	};
+
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
+	container.dom.addEventListener( 'dblclick', onDoubleClick, false );
 
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
@@ -202,6 +229,12 @@ var Viewport = function ( signals ) {
 	signals.snapChanged.add( function ( dist ) {
 
 		transformControls.snapDist = dist;
+
+	} );
+
+	signals.snapChanged.add( function ( dist ) {
+
+		snapDist = dist;
 
 	} );
 
@@ -359,7 +392,10 @@ var Viewport = function ( signals ) {
 
 		var parent = selected.parent;
 
-		if ( selected instanceof THREE.Light ) {
+		if ( selected instanceof THREE.PointLight ||
+		     selected instanceof THREE.DirectionalLight ||
+		     selected instanceof THREE.SpotLight ||
+		     selected instanceof THREE.HemisphereLight ) {
 
 			var helper = objectsToHelpers[ selected.id ];
 
@@ -483,7 +519,18 @@ var Viewport = function ( signals ) {
 
 	//
 
-	var renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+	var renderer;
+
+	if ( System.support.webgl === true ) {
+
+		renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+
+	} else {
+
+		renderer = new THREE.CanvasRenderer();
+
+	}
+
 	renderer.setClearColor( clearColor );
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;

@@ -7,47 +7,69 @@
 
 THREE.EditorControls = function ( object, domElement ) {
 
-	this.object = object;
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
 
 	this.enabled = true;
 
-	this.center = new THREE.Vector3();
-
 	// internals
 
 	var scope = this;
-	var normalMatrix = new THREE.Matrix3();
+	var vector = new THREE.Vector3();
 
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
+
+	var center = new THREE.Vector3();
+	var normalMatrix = new THREE.Matrix3();
 
 	// events
 
 	var changeEvent = { type: 'change' };
 
+	this.focus = function ( target ) {
+
+		center.getPositionFromMatrix( target.matrixWorld );
+		object.lookAt( center );
+
+		scope.dispatchEvent( changeEvent );
+
+	};
+
 	this.pan = function ( distance ) {
 
-		normalMatrix.getNormalMatrix( this.object.matrix );
+		normalMatrix.getNormalMatrix( object.matrix );
 
 		distance.applyMatrix3( normalMatrix );
+		distance.multiplyScalar( vector.copy( center ).sub( object.position ).length() * 0.001 );
 
-		this.object.position.add( distance );
-		this.center.add( distance );
+		object.position.add( distance );
+		center.add( distance );
 
-		this.dispatchEvent( changeEvent );
+		scope.dispatchEvent( changeEvent );
+
+	};
+
+	this.zoom = function ( distance ) {
+
+		normalMatrix.getNormalMatrix( object.matrix );
+
+		distance.applyMatrix3( normalMatrix );
+		distance.multiplyScalar( vector.copy( center ).sub( object.position ).length() * 0.001 );
+
+		object.position.add( distance );
+
+		scope.dispatchEvent( changeEvent );
 
 	};
 
 	this.rotate = function ( delta ) {
 
-		var position = this.object.position;
-		var offset = position.clone().sub( this.center );
+		vector.copy( object.position ).sub( center );
 
-		var theta = Math.atan2( offset.x, offset.z );
-		var phi = Math.atan2( Math.sqrt( offset.x * offset.x + offset.z * offset.z ), offset.y );
+		var theta = Math.atan2( vector.x, vector.z );
+		var phi = Math.atan2( Math.sqrt( vector.x * vector.x + vector.z * vector.z ), vector.y );
 
 		theta += delta.x;
 		phi += delta.y;
@@ -56,17 +78,17 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		phi = Math.max( EPS, Math.min( Math.PI - EPS, phi ) );
 
-		var radius = offset.length();
+		var radius = vector.length();
 
-		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
-		offset.y = radius * Math.cos( phi );
-		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
+		vector.x = radius * Math.sin( phi ) * Math.sin( theta );
+		vector.y = radius * Math.cos( phi );
+		vector.z = radius * Math.sin( phi ) * Math.cos( theta );
 
-		position.copy( this.center ).add( offset );
+		object.position.copy( center ).add( vector );
 
-		this.object.lookAt( this.center );
+		object.lookAt( center );
 
-		this.dispatchEvent( changeEvent );
+		scope.dispatchEvent( changeEvent );
 
 	};
 
@@ -110,11 +132,11 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		} else if ( state === STATE.ZOOM ) {
 
-			scope.pan( new THREE.Vector3( 0, 0, movementY ) );
+			scope.zoom( new THREE.Vector3( 0, 0, movementY ) );
 
 		} else if ( state === STATE.PAN ) {
 
-			scope.pan( new THREE.Vector3( - movementX * 0.5, movementY * 0.5, 0 ) );
+			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
 
 		}
 
@@ -139,22 +161,22 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( event.wheelDelta ) { // WebKit / Opera / Explorer 9
 
-			delta = - event.wheelDelta * 0.1;
+			delta = - event.wheelDelta;
 
 		} else if ( event.detail ) { // Firefox
 
-			delta = event.detail * 5;
+			delta = event.detail * 10;
 
 		}
 
-		scope.pan( new THREE.Vector3( 0, 0, delta ) );
+		scope.zoom( new THREE.Vector3( 0, 0, delta ) );
 
 	}
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
-	this.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	this.domElement.addEventListener( 'mousewheel', onMouseWheel, false );
-	this.domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+	domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	domElement.addEventListener( 'mousedown', onMouseDown, false );
+	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
+	domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
 
 };
 
