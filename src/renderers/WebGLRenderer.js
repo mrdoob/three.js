@@ -6947,74 +6947,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				glFormat = paramThreeToGL( renderTarget.format ),
 				glType = paramThreeToGL( renderTarget.type );
 
-<<<<<<< HEAD
-			if (isArray) {
-
-				_gl.mrt = _gl.getExtension( "EXT_draw_buffers" );
-				_gl.dtx  = _gl.getExtension( "WEBGL_depth_texture");
-				window.dtx = _gl.dtx;
-
-		    if (!_gl.mrt) {
-		      alert('No EXT_draw_buffers');
-		    }
-		    if (!_gl.dtx) {
-		      alert('No WEBGL_depth_texture');
-		    }
-
-		    renderTarget.__webglFramebuffer = _gl.createFramebuffer();
-    		_gl.bindFramebuffer(_gl.FRAMEBUFFER, renderTarget.__webglFramebuffer);
-
-				renderTarget.__attatchments = []
-		    for ( var i = 0; i < renderTarget.color.length; ++i ) {
-		     renderTarget.__attatchments.push(_gl.COLOR_ATTACHMENT0 + i);
-		    }
-
-		    _gl.mrt.drawBuffersEXT(renderTarget.__attatchments);
-
-		    renderTarget.__webglTexture = [];
-		    for ( var j = 0; j < renderTarget.color.length; ++j ) {
-		      
-		      glFormat = paramThreeToGL( renderTarget.color[j].format ),
-					glType = paramThreeToGL( renderTarget.color[j].type );
-
-		      renderTarget.color[j].__webglTexture = _gl.createTexture();
-		      _this.info.memory.textures ++;
-
-		      _gl.bindTexture(_gl.TEXTURE_2D, renderTarget.color[j].__webglTexture);
-		      setTextureParameters( _gl.TEXTURE_2D, renderTarget.color[j], isTargetPowerOfTwo );
-
-		      _gl.texImage2D(_gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null);
-		     	_gl.framebufferTexture2D(_gl.FRAMEBUFFER, renderTarget.__attatchments[j], _gl.TEXTURE_2D, renderTarget.color[j].__webglTexture, 0);
-					
-		    }
-
-		    renderTarget.__webglRenderbuffer = _gl.createRenderbuffer();
-		    _gl.bindRenderbuffer(_gl.RENDERBUFFER, renderTarget.__webglRenderbuffer );
-				_gl.renderbufferStorage(_gl.RENDERBUFFER, _gl.DEPTH_COMPONENT16, renderTarget.width, renderTarget.height);
-
-				_gl.framebufferRenderbuffer(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.RENDERBUFFER, renderTarget.__webglRenderbuffer);
-
-
-		    if ( renderTarget.depth ) {
-		    
-		    	renderTarget.depth.__webglTexture = _gl.createTexture();
-			    _this.info.memory.textures ++;
-
-					_gl.bindTexture(_gl.TEXTURE_2D, renderTarget.depth.__webglTexture);
-					setTextureParameters( _gl.TEXTURE_2D, renderTarget.depth, isTargetPowerOfTwo );
-					_gl.texImage2D(_gl.TEXTURE_2D, 0, _gl.DEPTH_COMPONENT, renderTarget.width, renderTarget.height, 0, _gl.DEPTH_COMPONENT, _gl.UNSIGNED_SHORT, null);
-
-					_gl.framebufferTexture2D(_gl.FRAMEBUFFER, _gl.DEPTH_ATTACHMENT, _gl.TEXTURE_2D, renderTarget.depth.__webglTexture, 0);
-
-				}
-
-			} else if ( isCube ) {
-
-				renderTarget.__webglTexture = _gl.createTexture();
-				_this.info.memory.textures ++;
-=======
 			if ( isCube ) {
->>>>>>> parent of 8433fd0... aded multiple render targets with EXT_draw_buffers extension
 
 				renderTarget.__webglFramebuffer = [];
 				renderTarget.__webglRenderbuffer = [];
