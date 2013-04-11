@@ -18,6 +18,7 @@ THREE.ColladaLoader = function () {
 	var materials = {};
 	var effects = {};
 	var cameras = {};
+	var lights = {};
 
 	var animData;
 	var visualScenes;
@@ -135,6 +136,7 @@ THREE.ColladaLoader = function () {
 		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
 		geometries = parseLib( "//dae:library_geometries/dae:geometry", Geometry, "geometry" );
 		cameras = parseLib( ".//dae:library_cameras/dae:camera", Camera, "camera" );
+		lights = parseLib( ".//dae:library_lights/dae:light", Light, "light" );
 		controllers = parseLib( "//dae:library_controllers/dae:controller", Controller, "controller" );
 		animations = parseLib( "//dae:library_animations/dae:animation", Animation, "animation" );
 		visualScenes = parseLib( ".//dae:library_visual_scenes/dae:visual_scene", VisualScene, "visual_scene" );
@@ -166,6 +168,7 @@ THREE.ColladaLoader = function () {
 				images: images,
 				materials: materials,
 				cameras: cameras,
+				lights: lights,
 				effects: effects,
 				geometries: geometries,
 				controllers: controllers,
@@ -833,10 +836,30 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < node.cameras.length; i ++ ) {
 
-			var instance_camera = node.cameras[i];
-			var cparams = cameras[instance_camera.url];
+			var params = cameras[node.cameras[i].url];
+			obj = new THREE.PerspectiveCamera(params.fov, params.aspect_ratio, params.znear, params.zfar);
 
-			obj = new THREE.PerspectiveCamera(cparams.fov, cparams.aspect_ratio, cparams.znear, cparams.zfar);
+		}
+
+		for ( i = 0; i < node.lights.length; i ++ ) {
+
+			var params = lights[node.lights[i].url];
+
+			switch ( params.technique ) {
+
+				case 'ambient':
+					obj = new THREE.AmbientLight(params.color);
+					break;
+
+				case 'point':
+					obj = new THREE.PointLight(params.color);
+					break;
+
+				case 'directional':
+					obj = new THREE.DirectionalLight(params.color);
+					break;
+
+			}
 
 		}
 
@@ -1802,6 +1825,7 @@ THREE.ColladaLoader = function () {
 		this.transforms = [];
 		this.geometries = [];
 		this.cameras = [];
+		this.lights = [];
 		this.controllers = [];
 		this.matrix = new THREE.Matrix4();
 
@@ -1822,6 +1846,11 @@ THREE.ColladaLoader = function () {
 					this.cameras.push( ( new InstanceCamera() ).parse( child ) );
 					break;
 
+				case 'instance_light':
+
+					this.lights.push( ( new InstanceLight() ).parse( child ) );
+					break;
+
 				case 'instance_controller':
 
 					this.controllers.push( ( new InstanceController() ).parse( child ) );
@@ -1830,10 +1859,6 @@ THREE.ColladaLoader = function () {
 				case 'instance_geometry':
 
 					this.geometries.push( ( new InstanceGeometry() ).parse( child ) );
-					break;
-
-				case 'instance_light':
-
 					break;
 
 				case 'instance_node':
@@ -1945,37 +1970,43 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	Transform.prototype.apply = function ( matrix ) {
+	Transform.prototype.apply = function () {
 
-		switch ( this.type ) {
+		var m1 = new THREE.Matrix4();
 
-			case 'matrix':
+		return function ( matrix ) {
 
-				matrix.multiply( this.obj );
+			switch ( this.type ) {
 
-				break;
+				case 'matrix':
 
-			case 'translate':
+					matrix.multiply( this.obj );
 
-				matrix.translate( this.obj );
+					break;
 
-				break;
+				case 'translate':
 
-			case 'rotate':
+					matrix.multiply( m1.makeTranslation( this.obj.x, this.obj.y, this.obj.z ) );
 
-				matrix.rotateByAxis( this.obj, this.angle );
+					break;
 
-				break;
+				case 'rotate':
 
-			case 'scale':
+					matrix.multiply( m1.makeRotationAxis( this.obj, this.angle ) );
 
-				matrix.scale( this.obj );
+					break;
 
-				break;
+				case 'scale':
 
-		}
+					matrix.scale( this.obj );
 
-	};
+					break;
+
+			}
+
+		};
+
+	}();
 
 	Transform.prototype.update = function ( data, member ) {
 
@@ -2924,7 +2955,7 @@ THREE.ColladaLoader = function () {
 
 	function ColorOrTexture () {
 
-		this.color = new THREE.Color( 0 );
+		this.color = new THREE.Color();
 		this.color.setRGB( Math.random(), Math.random(), Math.random() );
 		this.color.a = 1.0;
 
@@ -2958,7 +2989,7 @@ THREE.ColladaLoader = function () {
 				case 'color':
 
 					var rgba = _floats( child.textContent );
-					this.color = new THREE.Color(0);
+					this.color = new THREE.Color();
 					this.color.setRGB( rgba[0], rgba[1], rgba[2] );
 					this.color.a = rgba[3];
 					break;
@@ -3910,6 +3941,8 @@ THREE.ColladaLoader = function () {
 
 	};
 
+	// Camera
+
 	function Camera() {
 
 		this.id = "";
@@ -3931,11 +3964,7 @@ THREE.ColladaLoader = function () {
 			switch ( child.nodeName ) {
 
 				case 'optics':
-
 					this.parseOptics( child );
-					break;
-
-				default:
 					break;
 
 			}
@@ -4037,6 +4066,91 @@ THREE.ColladaLoader = function () {
 	};
 
 	InstanceCamera.prototype.parse = function ( element ) {
+
+		this.url = element.getAttribute('url').replace(/^#/, '');
+
+		return this;
+
+	};
+
+	// Light
+
+	function Light() {
+
+		this.id = "";
+		this.name = "";
+		this.technique = "";
+
+	};
+
+	Light.prototype.parse = function ( element ) {
+
+		this.id = element.getAttribute( 'id' );
+		this.name = element.getAttribute( 'name' );
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[ i ];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'technique_common':
+					this.parseTechnique( child );
+					break;
+
+			}
+
+		}
+
+		return this;
+
+	};
+
+	Light.prototype.parseTechnique = function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[ i ];
+
+			switch ( child.nodeName ) {
+
+				case 'ambient':
+				case 'point':
+				case 'directional':
+
+					this.technique = child.nodeName;
+
+					for ( var k = 0; k < child.childNodes.length; k ++ ) {
+
+						var param = child.childNodes[ k ];
+
+						switch ( param.nodeName ) {
+
+							case 'color':
+								var vector = new THREE.Vector3().fromArray( _floats( param.textContent ) );
+								this.color = new THREE.Color().setRGB( vector.x, vector.y, vector.z );
+								break;
+
+						}
+
+					}
+
+				break;
+
+			}
+
+		}
+
+	};
+
+	function InstanceLight() {
+
+		this.url = "";
+
+	};
+
+	InstanceLight.prototype.parse = function ( element ) {
 
 		this.url = element.getAttribute('url').replace(/^#/, '');
 

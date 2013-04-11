@@ -27,7 +27,7 @@ Depends on where blender.app is. Assuming you copied it to your Applications fol
 
 By default, this should look like:
 
-    /home/USERNAME/.blender/2.6X/scripts/addons
+    /home/USERNAME/.config/blender/2.6X/scripts/addons
 
 ## Usage
 

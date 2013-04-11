@@ -14,7 +14,9 @@ THREE.Clock = function ( autoStart ) {
 
 };
 
-THREE.extend( THREE.Clock.prototype, {
+THREE.Clock.prototype = {
+
+	constructor: THREE.Clock,
 
 	start: function () {
 
@@ -67,4 +69,4 @@ THREE.extend( THREE.Clock.prototype, {
 
 	}
 
-} );
+};

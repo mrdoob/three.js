@@ -61,7 +61,7 @@ THREE.DepthPassPlugin = function () {
 
 		// update scene
 
-		if ( _renderer.autoUpdateScene ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 

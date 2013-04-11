@@ -35,9 +35,8 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'margin', 'marginLeft', 'marginTop', 'marginRight',
-'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
-'backgroundColor', 'fontSize', 'fontWeight', 'display', 'overflow', 'cursor' ];
+'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
 
@@ -101,6 +100,18 @@ UI.Panel.prototype.add = function () {
 
 };
 
+
+UI.Panel.prototype.remove = function () {
+
+	for ( var i = 0; i < arguments.length; i ++ ) {
+
+		this.dom.removeChild( arguments[ i ].dom );
+
+	}
+
+	return this;
+
+};
 
 // Text
 
@@ -209,6 +220,12 @@ UI.TextArea = function () {
 
 	this.onChangeCallback = null;
 
+	this.dom.addEventListener( 'keyup', function ( event ) {
+
+		if ( scope.onKeyUpCallback ) scope.onKeyUpCallback();
+
+	}, false );
+
 	this.dom.addEventListener( 'change', function ( event ) {
 
 		if ( scope.onChangeCallback ) scope.onChangeCallback();
@@ -230,6 +247,14 @@ UI.TextArea.prototype.getValue = function () {
 UI.TextArea.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
+
+	return this;
+
+};
+
+UI.TextArea.prototype.onKeyUp = function ( callback ) {
+
+	this.onKeyUpCallback = callback;
 
 	return this;
 
@@ -594,14 +619,14 @@ UI.Number = function ( number ) {
 	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
-	this.dom = dom;
-	this.setValue( number );
-
 	this.min = - Infinity;
 	this.max = Infinity;
 
 	this.precision = 2;
 	this.step = 1;
+
+	this.dom = dom;
+	this.setValue( number );
 
 	this.onChangeCallback = null;
 
@@ -623,16 +648,18 @@ UI.Number = function ( number ) {
 
 	var onMouseMove = function ( event ) {
 
+		var currentValue = dom.value;
+
 		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
 		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
 
 		distance += movementX - movementY;
 
-		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 10 : 100 ) ) * scope.step;
+		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
-		if ( scope.onChangeCallback ) scope.onChangeCallback();
+		if ( currentValue !== dom.value && scope.onChangeCallback ) scope.onChangeCallback();
 
 	};
 
@@ -722,9 +749,148 @@ UI.Number.prototype.setPrecision = function ( precision ) {
 
 	this.precision = precision;
 
-	if ( precision > 2 ) {
+	return this;
 
-		this.step = Math.pow( 10, -( precision - 1 ) );
+};
+
+UI.Number.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+
+// Integer
+
+UI.Integer = function ( number ) {
+
+	UI.Element.call( this );
+
+	var scope = this;
+
+	var dom = document.createElement( 'input' );
+	dom.className = 'Number';
+	dom.style.color = '#0080f0';
+	dom.style.fontSize = '12px';
+	dom.style.backgroundColor = 'transparent';
+	dom.style.border = '1px solid transparent';
+	dom.style.marginTop = '-2px';
+	dom.style.marginLegt = '-2px';
+	dom.style.padding = '2px';
+	dom.style.cursor = 'col-resize';
+	dom.value = '0.00';
+
+	this.min = - Infinity;
+	this.max = Infinity;
+
+	this.step = 1;
+
+	this.dom = dom;
+	this.setValue( number );
+
+	this.onChangeCallback = null;
+
+	var distance = 0;
+	var onMouseDownValue = 0;
+
+	var onMouseDown = function ( event ) {
+
+		event.preventDefault();
+
+		distance = 0;
+
+		onMouseDownValue = parseFloat( dom.value );
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'mouseup', onMouseUp, false );
+
+	};
+
+	var onMouseMove = function ( event ) {
+
+		var currentValue = dom.value;
+
+		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
+		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+
+		distance += movementX - movementY;
+
+		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
+
+		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ) | 0;
+
+		if ( currentValue !== dom.value && scope.onChangeCallback ) scope.onChangeCallback();
+
+	};
+
+	var onMouseUp = function ( event ) {
+
+		document.removeEventListener( 'mousemove', onMouseMove, false );
+		document.removeEventListener( 'mouseup', onMouseUp, false );
+
+		if ( Math.abs( distance ) < 2 ) {
+
+			dom.focus();
+			dom.select();
+
+		}
+
+	};
+
+	var onChange = function ( event ) {
+
+		var number = parseInt( dom.value );
+
+		if ( isNaN( number ) === false ) {
+
+			dom.value = number;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback();
+
+		}
+
+	};
+
+	var onFocus = function ( event ) {
+
+		dom.style.backgroundColor = '';
+		dom.style.borderColor = '#ccc';
+		dom.style.cursor = '';
+
+	};
+
+	var onBlur = function ( event ) {
+
+		dom.style.backgroundColor = 'transparent';
+		dom.style.borderColor = 'transparent';
+		dom.style.cursor = 'col-resize';
+
+	};
+
+	dom.addEventListener( 'mousedown', onMouseDown, false );
+	dom.addEventListener( 'change', onChange, false );
+	dom.addEventListener( 'focus', onFocus, false );
+	dom.addEventListener( 'blur', onBlur, false );
+
+	return this;
+
+};
+
+UI.Integer.prototype = Object.create( UI.Element.prototype );
+
+UI.Integer.prototype.getValue = function () {
+
+	return parseInt( this.dom.value );
+
+};
+
+UI.Integer.prototype.setValue = function ( value ) {
+
+	if ( value !== undefined ) {
+
+		this.dom.value = value | 0;
 
 	}
 
@@ -732,7 +898,16 @@ UI.Number.prototype.setPrecision = function ( precision ) {
 
 };
 
-UI.Number.prototype.onChange = function ( callback ) {
+UI.Integer.prototype.setRange = function ( min, max ) {
+
+	this.min = min;
+	this.max = max;
+
+	return this;
+
+};
+
+UI.Integer.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 

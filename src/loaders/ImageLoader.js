@@ -4,8 +4,6 @@
 
 THREE.ImageLoader = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.crossOrigin = null;
 
 };
@@ -13,6 +11,11 @@ THREE.ImageLoader = function () {
 THREE.ImageLoader.prototype = {
 
 	constructor: THREE.ImageLoader,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	load: function ( url, image ) {
 

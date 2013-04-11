@@ -78,7 +78,11 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 
 		} else if ( xhr.readyState === xhr.HEADERS_RECEIVED ) {
 
-			length = xhr.getResponseHeader( "Content-Length" );
+			if ( callbackProgress !== undefined ) {
+
+				length = xhr.getResponseHeader( "Content-Length" );
+
+			}
 
 		}
 
@@ -174,7 +178,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 			type = faces[ offset ++ ];
 
 
-			isQuad          	= isBitSet( type, 0 );
+			isQuad              = isBitSet( type, 0 );
 			hasMaterial         = isBitSet( type, 1 );
 			hasFaceUv           = isBitSet( type, 2 );
 			hasFaceVertexUv     = isBitSet( type, 3 );
@@ -419,17 +423,22 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	};
 
-	var materials = this.initMaterials( json.materials, texturePath );
+	if ( json.materials === undefined ) {
 
-	if ( this.needsTangents( materials ) ) {
+		return { geometry: geometry };
 
-		geometry.computeTangents();
+	} else {
+
+		var materials = this.initMaterials( json.materials, texturePath );
+
+		if ( this.needsTangents( materials ) ) {
+
+			geometry.computeTangents();
+
+		}
+
+		return { geometry: geometry, materials: materials };
 
 	}
-
-	return {
-		geometry: geometry,
-		materials: materials
-	};
 
 };

@@ -4,8 +4,6 @@
 
 THREE.TrackballControls = function ( object, domElement ) {
 
-	THREE.EventDispatcher.call( this );
-
 	var _this = this;
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4, TOUCH_PAN: 5 };
 
@@ -535,3 +533,5 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.handleResize();
 
 };
+
+THREE.TrackballControls.prototype = Object.create( THREE.EventDispatcher.prototype );

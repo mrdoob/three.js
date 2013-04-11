@@ -2,10 +2,11 @@ Sidebar.Renderer = function ( signals ) {
 
 	var rendererClasses = {
 
+		'WebGLRenderer': THREE.WebGLRenderer,
+		'WebGLRenderer3': THREE.WebGLRenderer3,
 		'CanvasRenderer': THREE.CanvasRenderer,
 		'SoftwareRenderer': THREE.SoftwareRenderer,
-		'SVGRenderer': THREE.SVGRenderer,
-		'WebGLRenderer': THREE.WebGLRenderer
+		'SVGRenderer': THREE.SVGRenderer
 
 	};
 
@@ -18,15 +19,18 @@ Sidebar.Renderer = function ( signals ) {
 
 	// class
 
+	var options = {};
+
+	for ( var key in rendererClasses ) {
+
+		if ( key.indexOf( 'WebGL' ) >= 0 && System.support.webgl === false ) continue;
+
+		options[ key ] = key;
+
+	}
+
 	var rendererClassRow = new UI.Panel();
-	var rendererClass = new UI.Select().setOptions( {
-
-		'WebGLRenderer': 'WebGLRenderer',
-		'CanvasRenderer': 'CanvasRenderer',
-		'SoftwareRenderer': 'SoftwareRenderer',
-		'SVGRenderer': 'SVGRenderer',
-
-	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateRenderer );
+	var rendererClass = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateRenderer );
 
 	rendererClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
 	rendererClassRow.add( rendererClass );
