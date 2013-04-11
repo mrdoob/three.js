@@ -1,6 +1,6 @@
 
 var window = window || {};
-var self = self || {};
+var self = self || window;
 
 // High-resulution counter: emulate window.performance.now() for THREE.CLOCK
 if( window.performance === undefined ) {
