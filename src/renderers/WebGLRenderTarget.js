@@ -2,40 +2,6 @@
  * @author szimek / https://github.com/szimek/
  * @author alteredq / http://alteredqualia.com/
  */
-THREE.WebGLRenderTargetArray = function( width, height, length, bindDepth ){
-	
-	THREE.EventDispatcher.call( this );
-
-	this.generateMipmaps = true;
-	this.width = width;
-	this.height = height;
-	this.color = [];
-
-	for (var i = 0; i < length; ++i) {
-			this.color.push(new THREE.WebGLRenderTarget(width, height));
-	}
-
-	if (bindDepth) {
-
-		this.depth = new THREE.WebGLRenderTarget(width, height, {
-			magFilter: THREE.LinearFilter,
-			minFilter: THREE.LinearFilter// TODO LinearMipMapLinearFilter crshes webkit
-		});
-	
-	}
-
-}
-
-THREE.WebGLRenderTargetArray.prototype = Object.create( Array.prototype );
-
-THREE.WebGLRenderTarget.prototype.dispose = function () {
-
-	for (var i in this){
-		this[i].dispatchEvent( { type: 'dispose' } );
-	}
-
-
-};
 
 THREE.WebGLRenderTarget = function ( width, height, options ) {
 
