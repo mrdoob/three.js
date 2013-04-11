@@ -6,6 +6,7 @@
 if (typeof exports !== 'undefined') {
   if (typeof module !== 'undefined' && module.exports) {
     exports = module.exports = THREE;
+    THREE.self = self;
   }
   exports.THREE = THREE;
 } else {
