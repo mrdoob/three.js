@@ -81,8 +81,6 @@ THREE.STLLoader.prototype.parse = function (data) {
     var isBinary,
         _this = this;
     isBinary = function (data) {
-        // TODO: Is this safer then the previous check which is checking 
-        // if solid is at the start of ASCII file???
         var expect, face_size, n_faces, reader;
         reader = new THREE.STLLoader.BinaryReader(data);
         reader.seek(80);
@@ -99,32 +97,33 @@ THREE.STLLoader.prototype.parse = function (data) {
 };
 
 THREE.STLLoader.prototype.parseBinary = function (data) {
-    var face, geometry, n_faces, readFloat3, reader, _fn, _i;
+    var face, geometry, n_faces, reader, length, normal, i;
+    
     reader = new THREE.STLLoader.BinaryReader(data);
-    readFloat3 = function () {
-        return [reader.readFloat(), reader.readFloat(), reader.readFloat()];
-    };
     reader.seek(80);
     n_faces = reader.readUInt32();
     geometry = new THREE.Geometry();
-    _fn = function (face) {
-        var length, normal, v1, _j;
-        v1 = readFloat3();
-        normal = new THREE.Vector3(v1[0],v1[1],v1[2]);
-        for (_j = 1; _j <= 3; _j++) {
-            v1 = readFloat3();
-            geometry.vertices.push(new THREE.Vector3(v1[0],v1[1],v1[2]));
+    
+    for (face = 0; face < n_faces; face++) {
+
+        normal = new THREE.Vector3(reader.readFloat(),reader.readFloat(),reader.readFloat());
+        
+        for (i = 1; i <= 3; i++) {
+            
+            geometry.vertices.push(new THREE.Vector3(reader.readFloat(),reader.readFloat(),reader.readFloat()));
+            
         }
-        reader.readUInt16();
+        
+        reader.readUInt16(); // attr doesn't get used yet.
         length = geometry.vertices.length;
-        return geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
-    };
-    for (face = _i = 0; 0 <= n_faces ? _i < n_faces : _i > n_faces; face = 0 <= n_faces ? ++_i : --_i) {
-        _fn(face);
+        geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
+        
     }
+    
     geometry.computeCentroids();
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
+    
     return geometry;
 };
 
@@ -132,33 +131,32 @@ THREE.STLLoader.prototype.parseASCII = function (data) {
     var geometry, length, normal, patternFace, patternNormal, patternVertex, result, text;
     geometry = new THREE.Geometry();
     patternFace = /facet([\s\S]*?)endfacet/g;
+    
     while (((result = patternFace.exec(data)) != null)) {
+        
         text = result[0];
         patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
         while (((result = patternNormal.exec(text)) != null)) {
             normal = new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5]));
         }
+        
         patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
         while (((result = patternVertex.exec(text)) != null)) {
             geometry.vertices.push(new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5])));
         }
+        
         length = geometry.vertices.length;
         geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
+        
     }
+    
     geometry.computeCentroids();
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
+    
     return geometry;
 };
 
-
-// BinaryReader
-// Refactored by Vjeux <vjeuxx@gmail.com>
-// http://blog.vjeux.com/2010/javascript/javascript-binary-reader.html
-
-// Original
-//+ Jonas Raoni Soares Silva
-//@ http://jsfromhell.com/classes/binary-parser [rev. #1]
 
 THREE.STLLoader.BinaryReader = function (data) {
     this._buffer = data;
