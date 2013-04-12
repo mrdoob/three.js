@@ -5,26 +5,42 @@
 
 THREE.AxisHelper = function ( size ) {
 
+	THREE.Object3D.call( this );
+
 	size = size || 1;
 
-	var geometry = new THREE.Geometry();
+	var lineGeometry, line;
 
-	geometry.vertices.push(
-		new THREE.Vector3(), new THREE.Vector3( size, 0, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, size, 0 ),
-		new THREE.Vector3(), new THREE.Vector3( 0, 0, size )
-	);
+	// x
 
-	geometry.colors.push(
-		new THREE.Color( 0xff0000 ), new THREE.Color( 0xffaa00 ),
-		new THREE.Color( 0x00ff00 ), new THREE.Color( 0xaaff00 ),
-		new THREE.Color( 0x0000ff ), new THREE.Color( 0x00aaff )
-	);
+	lineGeometry = new THREE.Geometry();
+	lineGeometry.vertices.push( new THREE.Vector3() );
+	lineGeometry.vertices.push( new THREE.Vector3( size, 0, 0 ) );
 
-	var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+	line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : 0xff0000 } ) );
+	line.matrixAutoUpdate = false;
+	this.add( line );
 
-	THREE.Line.call( this, geometry, material, THREE.LinePieces );
+	// y
+
+	lineGeometry = new THREE.Geometry();
+	lineGeometry.vertices.push( new THREE.Vector3() );
+	lineGeometry.vertices.push( new THREE.Vector3( 0, size, 0 ) );
+	
+	line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : 0x00ff00 } ) );
+	line.matrixAutoUpdate = false;
+	this.add( line );
+
+	// z
+
+	lineGeometry = new THREE.Geometry();
+	lineGeometry.vertices.push( new THREE.Vector3() );
+	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, size ) );
+	
+	line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color : 0x0000ff } ) );
+	line.matrixAutoUpdate = false;
+	this.add( line );
 
 };
 
-THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.AxisHelper.prototype = Object.create( THREE.Object3D.prototype );
