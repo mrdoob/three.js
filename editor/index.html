@@ -95,10 +95,10 @@
 		<!-- WIP -->
 
 		<script src="../src/renderers/WebGLRenderer3.js"></script>
-		<script src="../examples/js/loaders/SceneLoader2.js"></script>
+		<script src="../examples/js/loaders/ObjectLoader.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/MaterialExporter.js"></script>
-		<script src="../examples/js/exporters/SceneExporter2.js"></script>
+		<script src="../examples/js/exporters/ObjectExporter.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
@@ -307,30 +307,25 @@
 								signals.objectAdded.dispatch( mesh );
 								signals.objectSelected.dispatch( mesh );
 
+							} else if ( data.metadata.type === 'object' ) {
+
+								var loader = new THREE.ObjectLoader();
+								var scene = loader.parse( data );
+
+								while ( scene.children.length > 0 ) {
+
+									signals.objectAdded.dispatch( scene.children[ 0 ] );
+
+								}
+
 							} else if ( data.metadata.type === 'scene' ) {
 
-								var loader;
+								// DEPRECATED
 
-								if ( data.metadata.version < 4 ) {
+								var loader = new THREE.SceneLoader();
+								loader.parse( data, function ( result ) {
 
-									loader = new THREE.SceneLoader();
-									loader.parse( data, function ( result ) {
-
-										var scene = result.scene;
-
-										while ( scene.children.length > 0 ) {
-
-											signals.objectAdded.dispatch( scene.children[ 0 ] );
-
-										}
-
-									}, '' );
-
-								} else {
-
-									loader = new THREE.SceneLoader2();
-
-									var scene = loader.parse( data );
+									var scene = result.scene;
 
 									while ( scene.children.length > 0 ) {
 
@@ -338,7 +333,7 @@
 
 									}
 
-								}
+								}, '' );
 
 							}
 
@@ -515,8 +510,7 @@
 
 			if ( localStorage.threejsEditor !== undefined ) {
 
-				var loader = new THREE.SceneLoader2();
-
+				var loader = new THREE.ObjectLoader();
 				var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
 
 				while ( scene.children.length > 0 ) {
@@ -528,7 +522,7 @@
 			}
 
 			var timeout;
-			var sceneExporter = new THREE.SceneExporter2();
+			var sceneExporter = new THREE.ObjectExporter();
 
 			signals.sceneChanged.add( function ( scene ) {
 

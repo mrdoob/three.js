@@ -2,11 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SceneLoader2 = function () {};
+THREE.ObjectLoader = function () {};
 
-THREE.SceneLoader2.prototype = {
+THREE.ObjectLoader.prototype = {
 
-	constructor: THREE.SceneLoader2,
+	constructor: THREE.ObjectLoader,
 
 	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
 	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
@@ -280,7 +280,7 @@ THREE.SceneLoader2.prototype = {
 
 		}
 
-		return parseObject( json.scene );
+		return parseObject( json.object );
 
 	}
 

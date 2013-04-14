@@ -2,21 +2,21 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.SceneExporter2 = function () {};
+THREE.ObjectExporter = function () {};
 
-THREE.SceneExporter2.prototype = {
+THREE.ObjectExporter.prototype = {
 
-	constructor: THREE.SceneExporter2,
+	constructor: THREE.ObjectExporter,
 
-	parse: function ( scene ) {
+	parse: function ( object ) {
 
-		// console.log( scene );
+		// console.log( object );
 
 		var output = {
 			metadata: {
 				version: 4.0,
-				type: 'scene',
-				generator: 'SceneExporter'
+				type: 'object',
+				generator: 'ObjectExporter'
 			}
 		};
 
@@ -261,7 +261,7 @@ THREE.SceneExporter2.prototype = {
 
 		}
 
-		output.scene = parseObject( scene );
+		output.object = parseObject( object );
 
 		return output;
 

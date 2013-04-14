@@ -78,14 +78,26 @@ Menubar.File = function ( signals ) {
 
 	*/
 
-	// export scene 2
+	// export object
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Scene 2' );
+	option.setTextContent( 'Export Object' );
 	option.onClick( function () {
 
-		exportScene( THREE.SceneExporter2 );
+		exportObject( THREE.ObjectExporter );
+
+	} );
+	options.add( option );
+
+	// export scene
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export Scene' );
+	option.onClick( function () {
+
+		exportScene( THREE.ObjectExporter );
 
 	} );
 	options.add( option );
@@ -125,6 +137,21 @@ Menubar.File = function ( signals ) {
 			output = exporter.parse( selectedObject.geometry );
 
 		}
+
+		var blob = new Blob( [ output ], { type: 'text/plain' } );
+		var objectURL = URL.createObjectURL( blob );
+
+		window.open( objectURL, '_blank' );
+		window.focus();
+
+	};
+
+	var exportObject = function ( exporterClass ) {
+
+		var exporter = new exporterClass();
+
+		var output = JSON.stringify( exporter.parse( selectedObject ), null, '\t' );
+		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
 		var objectURL = URL.createObjectURL( blob );
