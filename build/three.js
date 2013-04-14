@@ -33819,8 +33819,8 @@ THREE.AxisHelper = function ( size ) {
 THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
 /**
  * @author WestLangley / http://github.com/WestLangley
- * @author zz85 / https://github.com/zz85
- * @author bhouston / https://exocortex.com
+ * @author zz85 / http://github.com/zz85
+ * @author bhouston / http://exocortex.com
  *
  * Creates an arrow for visualizing directions
  *
@@ -33833,25 +33833,31 @@ THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
 
 THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
+	// dir is assumed to be normalized
+
 	THREE.Object3D.call( this );
 
-	if ( length === undefined ) length = 20;
 	if ( hex === undefined ) hex = 0xffff00;
+	if ( length === undefined ) length = 1;
+
+	this.position = origin;
+
+	this.useQuaternion = true;
 
 	var lineGeometry = new THREE.Geometry();
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 1, 0 ) );
 
 	this.line = new THREE.Line( lineGeometry, new THREE.LineBasicMaterial( { color: hex } ) );
+	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
 	var coneGeometry = new THREE.CylinderGeometry( 0, 0.05, 0.25, 5, 1 );
+	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.875, 0 ) );
 
 	this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: hex } ) );
-	this.cone.position.set( 0, 1, 0 );
+	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
-
-	if ( origin instanceof THREE.Vector3 ) this.position = origin;
 
 	this.setDirection( dir );
 	this.setLength( length );
@@ -33860,29 +33866,36 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 THREE.ArrowHelper.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.ArrowHelper.prototype.setDirection = function ( dir ) {
+THREE.ArrowHelper.prototype.setDirection = function () {
 
-    var d = THREE.ArrowHelper.__v1.copy( dir ).normalize();
+	var axis = new THREE.Vector3();
+	var radians;
 
-    if ( d.y > 0.999 ) {
+	return function ( dir ) {
 
-        this.rotation.set( 0, 0, 0 );
- 
-    } else if ( d.y < - 0.999 ) {
+		// dir is assumed to be normalized
 
-        this.rotation.set( Math.PI, 0, 0 );
+		if ( dir.y > 0.999 ) {
 
-    } else {
+			this.quaternion.set( 0, 0, 0, 1 );
 
-	    var axis = THREE.ArrowHelper.__v2.set( d.z, 0, - d.x ).normalize();
-	    var radians = Math.acos( d.y );
-	    var quaternion = THREE.ArrowHelper.__q1.setFromAxisAngle( axis, radians );
+		} else if ( dir.y < - 0.999 ) {
 
-	    this.rotation.setEulerFromQuaternion( quaternion, this.eulerOrder );
+			this.quaternion.set( 1, 0, 0, 0 );
 
-	}
+		} else {
 
-};
+			axis.set( dir.z, 0, - dir.x ).normalize();
+
+			radians = Math.acos( dir.y );
+
+			this.quaternion.setFromAxisAngle( axis, radians );
+
+		}
+
+	};
+
+}();
 
 THREE.ArrowHelper.prototype.setLength = function ( length ) {
 
@@ -33896,10 +33909,6 @@ THREE.ArrowHelper.prototype.setColor = function ( hex ) {
 	this.cone.material.color.setHex( hex );
 
 };
-
-THREE.ArrowHelper.__v1 = new THREE.Vector3();
-THREE.ArrowHelper.__v2 = new THREE.Vector3();
-THREE.ArrowHelper.__q1 = new THREE.Quaternion();
 /**
  * @author mrdoob / http://mrdoob.com/
  */
