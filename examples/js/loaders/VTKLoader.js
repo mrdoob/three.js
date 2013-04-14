@@ -68,11 +68,15 @@ THREE.VTKLoader.prototype = {
 
 		var pattern, result;
 
-		// float float float
+		pattern = /POINTS[\s]+([\d]+)/g
+		result = pattern.exec( data );
+		var numV = parseInt(result[1]);
+		pattern = /([\+|\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\+|\-]?[\d]+[\.]?[\d|\-|e]*)[ ]+([\+|\-]?[\d]+[\.]?[\d|\-|e]*)/g;
 
-		pattern = /([\+|\-]?[\d]+[\.][\d|\-|e]+)[ ]+([\+|\-]?[\d]+[\.][\d|\-|e]+)[ ]+([\+|\-]?[\d]+[\.][\d|\-|e]+)/g;
+		// float/int  float/int  float/int
+		while ( numV--) {
 
-		while ( ( result = pattern.exec( data ) ) != null ) {
+			result = pattern.exec( data );
 
 			// ["1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
