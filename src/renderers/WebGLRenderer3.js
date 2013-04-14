@@ -237,10 +237,17 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	};
 
-	this.setSize = function ( width, height ) {
+	this.setSize = function ( width, height, updateStyle ) {
 
 		canvas.width = width;
 		canvas.height = height;
+
+		if ( updateStyle !== false ) {
+
+			canvas.style.width = width + 'px';
+			canvas.style.height = height + 'px';
+
+		}
 
 		gl.viewport( 0, 0, canvas.width, canvas.height );
 
