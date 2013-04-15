@@ -407,6 +407,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				} else if ( objJSON.type === "PerspectiveCamera" || objJSON.type === "OrthographicCamera" ) {
 
+					pos = objJSON.position;
+					rot = objJSON.rotation;
+					quat = objJSON.quaternion;
+
 					if ( objJSON.type === "PerspectiveCamera" ) {
 
 						camera = new THREE.PerspectiveCamera( objJSON.fov, objJSON.aspect, objJSON.near, objJSON.far );
@@ -417,11 +421,22 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					}
 
-					pos = objJSON.position;
+					camera.name = objID;
 					camera.position.set( pos[0], pos[1], pos[2] );
+
+					if ( quat !== undefined ) {
+
+						camera.quaternion.set( quat[0], quat[1], quat[2], quat[3] );
+						camera.useQuaternion = true;
+
+					} else if ( rot !== undefined ) {
+
+						camera.rotation.set( rot[0], rot[1], rot[2] );
+
+					}
+
 					parent.add( camera );
 
-					camera.name = objID;
 					result.cameras[ objID ] = camera;
 					result.objects[ objID ] = camera;
 
