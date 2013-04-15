@@ -142,8 +142,6 @@ THREE.ObjectExporter.prototype = {
 
 				var data = materialExporter.parse( material );
 
-				if ( material.name !== "" ) data.name = material.name;
-
 				delete data.metadata;
 
 				output.materials.push( data );

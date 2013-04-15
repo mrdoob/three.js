@@ -18,6 +18,8 @@ THREE.MaterialExporter.prototype = {
 			}
 		};
 
+		if ( material.name !== "" ) output.name = material.name;
+
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 
 			output.type = 'MeshBasicMaterial';
