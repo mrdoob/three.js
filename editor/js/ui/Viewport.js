@@ -270,6 +270,18 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.sceneAdded.add( function ( object ) {
+
+		scene.userData = JSON.parse( JSON.stringify( object.userData ) );
+
+		while ( object.children.length > 0 ) {
+
+			signals.objectAdded.dispatch( object.children[ 0 ] );
+
+		}
+
+	} );
+
 	signals.objectAdded.add( function ( object ) {
 
 		// handle children
@@ -386,6 +398,8 @@ var Viewport = function ( signals ) {
 		}
 
 		render();
+
+		signals.sceneChanged.dispatch( scene );
 
 	} );
 
