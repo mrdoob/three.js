@@ -429,7 +429,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_pointLights.add( lightColor );
 
-				}
+				}setStrokeStyle
 
 			}
 
@@ -602,14 +602,40 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.lineTo( v2.positionScreen.x, v2.positionScreen.y );
 
 			if ( material instanceof THREE.LineBasicMaterial ) {
+                
+                setLineWidth( material.linewidth );
+    			setLineCap( material.linecap );
+    			setLineJoin( material.linejoin );
+                
+                if (material.vertexColors !== THREE.VertexColors){
 
-				setLineWidth( material.linewidth );
-				setLineCap( material.linecap );
-				setLineJoin( material.linejoin );
-				setStrokeStyle( material.color.getStyle() );
+    				setStrokeStyle( material.color.getStyle() );
+    
 
-				_context.stroke();
-				_elemBox.expandByScalar( material.linewidth * 2 );
+                } else {
+                
+                    var colorStyle1 = element.vertexColors[0].getStyle();
+                    var colorStyle2 = element.vertexColors[1].getStyle();
+                    
+                    if (colorStyle1 === colorStyle2){
+                        
+                        setStrokeStyle( colorStyle1 );
+                        
+                    }else {
+                
+                        var grad= _context.createLinearGradient(v1.positionScreen.x, 
+                                                            v1.positionScreen.y, 
+                                                            v2.positionScreen.x, 
+                                                            v2.positionScreen.y);
+                        grad.addColorStop(0, colorStyle1);
+                        grad.addColorStop(1, colorStyle2);
+                        setStrokeStyle(grad);
+                        
+                    }
+                    
+			    }
+                _context.stroke();
+    			_elemBox.expandByScalar( material.linewidth * 2 );
 
 			} else if ( material instanceof THREE.LineDashedMaterial ) {
 

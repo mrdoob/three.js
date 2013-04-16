@@ -428,7 +428,13 @@ THREE.Projector = function () {
 						_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
 
 						_line.material = object.material;
-
+                        
+                        if (object.material.vertexColors === THREE.VertexColors){
+                            
+                            _line.vertexColors[0].set(object.geometry.colors[v]);
+                            _line.vertexColors[1].set(object.geometry.colors[v-1]);
+                            
+                        }
 						_renderData.elements.push( _line );
 
 					}
