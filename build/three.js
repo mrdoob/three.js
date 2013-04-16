@@ -7149,6 +7149,13 @@ THREE.Projector = function () {
 
 						_line.material = object.material;
 
+						if ( object.material.vertexColors === THREE.VertexColors ) {
+
+							_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
+							_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );
+
+						}
+
 						_renderData.elements.push( _line );
 
 					}
@@ -14096,7 +14103,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	};
 
-	this.getMaxAnisotropy  = function () {
+	this.getMaxAnisotropy = function () {
 
 		return 0;
 
@@ -14506,7 +14513,36 @@ THREE.CanvasRenderer = function ( parameters ) {
 				setLineWidth( material.linewidth );
 				setLineCap( material.linecap );
 				setLineJoin( material.linejoin );
-				setStrokeStyle( material.color.getStyle() );
+
+				if ( material.vertexColors !== THREE.VertexColors ) {
+
+					setStrokeStyle( material.color.getStyle() );
+
+				} else {
+
+					var colorStyle1 = element.vertexColors[0].getStyle();
+					var colorStyle2 = element.vertexColors[1].getStyle();
+
+					if ( colorStyle1 === colorStyle2 ) {
+
+						setStrokeStyle( colorStyle1 );
+
+					} else {
+
+						var grad = _context.createLinearGradient(
+							v1.positionScreen.x,
+							v1.positionScreen.y,
+							v2.positionScreen.x,
+							v2.positionScreen.y
+						);
+
+						grad.addColorStop( 0, colorStyle1 );
+						grad.addColorStop( 1, colorStyle2 );
+						setStrokeStyle( grad );
+
+					}
+
+				}
 
 				_context.stroke();
 				_elemBox.expandByScalar( material.linewidth * 2 );
@@ -15056,7 +15092,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		function expand( v1, v2 ) {
 
-			var x = v2.x - v1.x, y =  v2.y - v1.y,
+			var x = v2.x - v1.x, y = v2.y - v1.y,
 			det = x * x + y * y, idet;
 
 			if ( det === 0 ) return;
@@ -25945,6 +25981,7 @@ THREE.RenderableLine = function () {
 	this.v1 = new THREE.RenderableVertex();
 	this.v2 = new THREE.RenderableVertex();
 
+	this.vertexColors = [ new THREE.Color(), new THREE.Color() ];
 	this.material = null;
 
 };
