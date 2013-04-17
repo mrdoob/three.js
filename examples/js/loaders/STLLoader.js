@@ -36,21 +36,22 @@ THREE.STLLoader.prototype = {
 
 };
 
-THREE.STLLoader.prototype.load = function (url) {
+THREE.STLLoader.prototype.load = function (url, callback) {
 
 	var scope = this;
-	console.log("Attempting to load URL: [" + url + "]");
 
 	var xhr = new XMLHttpRequest();
 
 	function onloaded( event ) {
 
 		if ( event.target.status === 200 || event.target.status === 0 ) {
-				var data = event.target.responseText;
-				return scope.dispatchEvent({
-					type: 'load',
-					content: scope.parse(data)
-				});
+
+				var geometry = scope.parse( event.target.responseText );
+
+				scope.dispatchEvent( { type: 'load', content: geometry } );
+
+				if ( callback ) callback( geometry );
+
 		} else {
 
 			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']',
