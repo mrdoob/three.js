@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -120,11 +120,6 @@
 		Transposes this matrix.
 		</div>
 
-		<h3>.flatten() [page:Array]</h3>
-		<div>
-		Flattens this matrix into internal [page:Matrix4 Matrix4.flat] array.
-		</div>
-
 		<h3>.flattenToArray( [page:Array flat] ) [page:Array]</h3>
 		<div>
 		Flattens this matrix into supplied *flat* array.
@@ -143,24 +138,6 @@
 		<h3>.getPosition() [page:Vector3]</h3>
 		<div>
 		Returns position component from this matrix.<br />
-		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
-		</div>
-
-		<h3>.getColumnX() [page:Vector3]</h3>
-		<div>
-		Returns x column component from this matrix.<br />
-		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
-		</div>
-
-		<h3>.getColumnY() [page:Vector3]</h3>
-		<div>
-		Returns y column component from this matrix.<br />
-		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
-		</div>
-
-		<h3>.getColumnZ() [page:Vector3]</h3>
-		<div>
-		Returns z column component from this matrix.<br />
 		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
 		</div>
 
@@ -268,6 +245,111 @@
 		<h3>.clone() [page:Matrix4]</h3>
 		<div>
 		Clones this matrix.
+		</div>
+
+		<h3>.compose([page:todo position], [page:todo quaternion], [page:todo scale]) [page:todo]</h3>
+		<div>
+		position -- todo <br />
+		quaternion -- todo <br />
+		scale -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.rotateAxis([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setRotationFromEuler([page:todo v], [page:todo order]) [page:todo]</h3>
+		<div>
+		v -- todo <br />
+		order -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.crossVector([page:todo vector]) [page:todo]</h3>
+		<div>
+		vector -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.rotateByAxis([page:todo axis], [page:todo angle]) [page:todo]</h3>
+		<div>
+		axis -- todo <br />
+		angle -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setRotationFromQuaternion([page:todo q]) [page:todo]</h3>
+		<div>
+		q -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.extractPosition([page:todo m]) [page:todo]</h3>
+		<div>
+		m -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.rotateX([page:todo angle]) [page:todo]</h3>
+		<div>
+		angle -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.rotateY([page:todo angle]) [page:todo]</h3>
+		<div>
+		angle -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.rotateZ([page:todo angle]) [page:todo]</h3>
+		<div>
+		angle -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.multiplyVector3Array([page:todo a]) [page:todo]</h3>
+		<div>
+		a -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.getMaxScaleOnAxis() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.translate([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
 		</div>
 
 		<h2>Source</h2>
