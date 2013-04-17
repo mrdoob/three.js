@@ -14057,7 +14057,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
 
-		if ( updateStyle !== false ) {
+		if ( this.devicePixelRatio !== 1 && updateStyle !== false ) {
 
 			_canvas.style.width = width + 'px';
 			_canvas.style.height = height + 'px';
@@ -18730,7 +18730,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_canvas.width = width * this.devicePixelRatio;
 		_canvas.height = height * this.devicePixelRatio;
 
-		if ( updateStyle !== false ) {
+		if ( this.devicePixelRatio !== 1 && updateStyle !== false ) {
 
 			_canvas.style.width = width + 'px';
 			_canvas.style.height = height + 'px';
