@@ -69,7 +69,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 2013 04 17 - **r58** (411,339 KB, gzip: 97,298 KB)
 
 * Removed `Matrix4`'s ` translate()`, `rotateX()`, `rotateY()`, `rotateZ()` and `rotateByAxis()`. ([mrdoob](http://github.com/mrdoob))
-* Documentation improvements. ([yurifury](http://github.com/yurifury), [tmcw](http://github.com/tmcw), [deepan2k5](http://github.com/deepan2k5), [cjshannon](http://github.com/cjshannon), [sh0ot1e](http://github.com/sh0ot1e)  )
+* Documentation improvements. ([yurifury](http://github.com/yurifury), [tmcw](http://github.com/tmcw), [deepan2k5](http://github.com/deepan2k5), [cjshannon](http://github.com/cjshannon) and [sh0ot1e](http://github.com/sh0ot1e))
 * Improvements to `WebGLRenderer` stable z sorting.([wereHamster](http://github.com/wereHamster) and [mrdoob](http://github.com/mrdoob))
 * Lots of progress in `SceneLoader2` and `SceneExporter2`, now known as `ObjectLoader` and `ObjectExporter`. ([mrdoob](http://github.com/mrdoob))
 * Added morphTargets support to `MeshNormalMaterial`. ([mrdoob](http://github.com/mrdoob))
