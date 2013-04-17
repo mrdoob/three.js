@@ -428,7 +428,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		_zoomStart.y += ( 1 / delta ) * 0.05;
+		_zoomStart.y += delta * 0.01;
 
 	}
 
