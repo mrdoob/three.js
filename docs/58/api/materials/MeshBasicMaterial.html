@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A material for drawing geometries in a simple shaded (flat or wireframe) way.</div>
+		<div class="desc">The default will render as flat polygons. To draw the mesh as wireframe, simply set the 'wireframe' property to true.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Object parameters] )</h3>
+
+		<div>parameters is an object with one or more properties defining the material's appearance.</div>
+		<div>
+		color — geometry color in hexadecimal. Default is 0xffffff.<br />
+		wireframe — render geometry as wireframe. Default is false.<br />
+		wireframeLinewidth — Line thickness. Default is 1.<br />
+		wireframeLinecap — Define appearance of line ends. Default is 'round'.<br />
+		wireframeLinejoin — Define appearance of line joints. Default is 'round'.<br />
+		shading — Define shading type. Default is THREE.SmoothShading.<br />
+		vertexColors — Define whether the material uses vertex colors, or not. Default is false.<br />
+		fog — Define whether the material color is affected by global fog settings. Default is true.<br />
+		lightMap — TODO. Default is null.<br />
+		specularMap — TODO. Default is null.<br />
+		envMap — TODO. Default is null.<br />
+		skinning — TODO. Default is false.<br />
+		morphTargets — TODO. Default is false.
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Integer color]</h3>
+		<div>Sets the color of the geometry. Default is 0xffffff.</div>
+		
+		<h3>.[page:Boolean wireframe]</h3>
+		<div>Render geometry as wireframe. Default is false (i.e. render as flat polygons).</div>
+
+		<h3>.[page:Float wireframeLinewidth]</h3>
+		<div>Controls wireframe thickness. Default is 1.</div>
+		
+		<h3>.[page:String wireframeLinecap]</h3>
+		<div>Define appearance of line ends. Possible values are "butt", "round" and "square". Default is 'round'.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+
+		<h3>.[page:String wireframeLinejoin]</h3>
+		<div>Define appearance of line joints. Possible values are "round", "bevel" and "miter". Default is 'round'.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer.</div>
+		
+		<h3>.[page:String shading]</h3>
+		<div>Define shading type. Default is THREE.SmoothShading.</div>
+
+		<h3>.[page:Boolean vertexColors]</h3>
+		<div>Define whether the material uses vertex colors, or not. Default is false.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+
+		<h3>.[page:Boolean fog]</h3>
+		<div>Define whether the material color is affected by global fog settings.</div>
+		<div>This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer.</div>
+
+		<h3>.[page:Texture lightMap]</h3>
+		<div>Set light map. Default is null.</div>
+
+		<h3>.[page:Texture specularMap]</h3>
+		<div>Set specular map. Default is null.</div>
+
+		<h3>.[page:TextureCube envMap]</h3>
+		<div>Set env map. Default is null.</div>
+
+		<h3>.[page:Boolean skinning]</h3>
+		<div>Define whether the material uses skinning. Default is false.</div>
+	
+		<h3>.[page:Boolean morphTargets]</h3>
+		<div>Define whether the material uses morphTargets. Default is false.</div>	
+		
+		<h3>.[page:object map]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:number combine]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:number reflectivity]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:number refractionRatio]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h2>Methods</h2>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

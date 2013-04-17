@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">A line or a series of lines.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Geometry geometry], [page:Material material], [page:Integer type] )</h3>
+
+		<div>
+		geometry — Vertices representing the line segment(s).<br />
+		material — Material for the line. Default is [page:LineBasicMaterial LineBasicMaterial].<br />
+		type — Connection type between vertices. Default is THREE.LineStrip.
+		</div>
+
+		<div>If no material is supplied, a randomized line material will be created and assigned to the object.</div>
+
+		<div>Also, if no type is supplied, the default (THREE.LineStrip) will be used).</div>
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Geometry geometry]</h3>
+		<div>
+		Vertices representing the line segment(s).
+		</div>
+
+		<h3>.[page:Material material]</h3>
+		<div>
+		Material for the line.
+		</div>
+
+		<h3>.[page:Integer type]</h3>
+		<div>
+		Possible values: THREE.LineStrip or THREE.LinePieces. THREE.LineStrip will draw a series of segments connecting each point (first connected to the second, the second connected to the third, and so on and so forth); and THREE.LinePieces will draw a series of pairs of segments (first connected to the second, the third connected to the fourth, and so on and so forth).</div>
+
+		<div>
+		In OpenGL terms, LineStrip is the classic GL_LINE_STRIP and LinePieces is the equivalent to GL_LINES.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

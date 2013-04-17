@@ -122,49 +122,55 @@
 				nribbons = xgrid * ygrid;
 
 				c = 0;
-				for ( i = 0; i < xgrid; i ++ )
-				for ( j = 0; j < ygrid; j ++ ) {
 
-					var material = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true, side: THREE.DoubleSide } );
+				var rotationMatrix = new THREE.Matrix4();
 
-					ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, material );
-					ribbon.rotation.x = 0;
-					ribbon.rotation.y = Math.PI / 2;
-					ribbon.rotation.z = Math.PI;
+				for ( i = 0; i < xgrid; i ++ ) {
+					for ( j = 0; j < ygrid; j ++ ) {
 
-					x = 40 * ( i - xgrid/2 );
-					y = 40 * ( j - ygrid/2 );
-					z = 0;
+						var material = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true, side: THREE.DoubleSide } );
 
-					ribbon.position.set( x, y, z );
+						ribbon = new THREE.Ribbon( i % 2 ? geometry : geometry2, material );
+						ribbon.rotation.x = 0;
+						ribbon.rotation.y = Math.PI / 2;
+						ribbon.rotation.z = Math.PI;
 
-					ribbon.matrixAutoUpdate = false;
+						x = 40 * ( i - xgrid/2 );
+						y = 40 * ( j - ygrid/2 );
+						z = 0;
 
-					// manually create local matrix
+						ribbon.position.set( x, y, z );
 
-					ribbon.matrix.setPosition( ribbon.position );
-					ribbon.matrixRotationWorld.setRotationFromEuler( ribbon.rotation );
+						ribbon.matrixAutoUpdate = false;
 
-					ribbon.matrix.elements[ 0 ] = ribbon.matrixRotationWorld.elements[ 0 ];
-					ribbon.matrix.elements[ 4 ] = ribbon.matrixRotationWorld.elements[ 4 ];
-					ribbon.matrix.elements[ 8 ] = ribbon.matrixRotationWorld.elements[ 8 ];
+						// manually create local matrix
 
-					ribbon.matrix.elements[ 1 ] = ribbon.matrixRotationWorld.elements[ 1 ];
-					ribbon.matrix.elements[ 5 ] = ribbon.matrixRotationWorld.elements[ 5 ];
-					ribbon.matrix.elements[ 9 ] = ribbon.matrixRotationWorld.elements[ 9 ];
+						ribbon.matrix.setPosition( ribbon.position );
 
-					ribbon.matrix.elements[ 2 ] = ribbon.matrixRotationWorld.elements[ 2 ];
-					ribbon.matrix.elements[ 6 ] = ribbon.matrixRotationWorld.elements[ 6 ];
-					ribbon.matrix.elements[ 10 ] = ribbon.matrixRotationWorld.elements[ 10 ];
+						rotationMatrix.makeRotationFromEuler( ribbon.rotation );
 
-					ribbon.matrix.multiply( tmpRot );
+						ribbon.matrix.elements[ 0 ] = rotationMatrix.elements[ 0 ];
+						ribbon.matrix.elements[ 4 ] = rotationMatrix.elements[ 4 ];
+						ribbon.matrix.elements[ 8 ] = rotationMatrix.elements[ 8 ];
 
-					ribbon.matrix.scale( ribbon.scale );
+						ribbon.matrix.elements[ 1 ] = rotationMatrix.elements[ 1 ];
+						ribbon.matrix.elements[ 5 ] = rotationMatrix.elements[ 5 ];
+						ribbon.matrix.elements[ 9 ] = rotationMatrix.elements[ 9 ];
 
-					ribbons.push( ribbon );
-					scene.add( ribbon );
+						ribbon.matrix.elements[ 2 ] = rotationMatrix.elements[ 2 ];
+						ribbon.matrix.elements[ 6 ] = rotationMatrix.elements[ 6 ];
+						ribbon.matrix.elements[ 10 ] = rotationMatrix.elements[ 10 ];
 
-					c ++;
+						ribbon.matrix.multiply( tmpRot );
+
+						ribbon.matrix.scale( ribbon.scale );
+
+						ribbons.push( ribbon );
+						scene.add( ribbon );
+
+						c ++;
+
+					}
 
 				}
 

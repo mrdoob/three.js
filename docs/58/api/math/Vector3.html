@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">3D vector.</div>
+
+
+		<h2>Example</h2>
+
+		<code>var a = new THREE.Vector3( 1, 0, 0 );
+		var b = new THREE.Vector3( 0, 1, 0 );
+
+		var c = new THREE.Vector3();
+		c.crossVectors( a, b );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Float x], [page:Float y], [page:Float z] )</h3>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Float x]</h3>
+
+		<h3>.[page:Float y]</h3>
+
+		<h3>.[page:Float z]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>.set( [page:Float x], [page:Float y], [page:Float z] ) [page:Vector3]</h3>
+		<div>
+		Sets value of this vector.
+		</div>
+
+		<h3>.setX( [page:Float x] ) [page:Vector3]</h3>
+		<div>
+		Sets x value of this vector.
+		</div>
+
+		<h3>.setY( [page:Float y] ) [page:Vector3]</h3>
+		<div>
+		Sets y value of this vector.
+		</div>
+
+		<h3>.setZ( [page:Float z] ) [page:Vector3]</h3>
+		<div>
+		Sets z value of this vector.
+		</div>
+
+		<h3>.copy( [page:Vector3 v] ) [page:Vector3]</h3>
+		<div>
+		Copies value of *v* to this vector.
+		</div>
+
+		<h3>.add( [page:Vector3 v] ) [page:Vector3]</h3>
+		<div>
+		Adds *v* to this vector.
+		</div>
+
+		<h3>.addVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector to *a + b*.
+		</div>
+
+		<h3>.sub( [page:Vector3 v] ) [page:Vector3]</h3>
+		<div>
+		Subtracts *v* from this vector.
+		</div>
+
+		<h3>.subVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector to *a - b*.
+		</div>
+
+		<h3>.multiplyScalar( [page:Float s] ) [page:Vector3]</h3>
+		<div>
+		Multiplies this vector by scalar *s*.
+		</div>
+
+		<h3>.divideScalar( [page:Float s] ) [page:Vector3]</h3>
+		<div>
+		Divides this vector by scalar *s*.<br />
+		Set vector to *( 0, 0, 0 )* if *s == 0*.
+		</div>
+
+		<h3>.negate() [page:Vector3]</h3>
+		<div>
+		Inverts this vector.
+		</div>
+
+		<h3>.dot( [page:Vector3 v] ) [page:Float]</h3>
+		<div>
+		Computes dot product of this vector and *v*.
+		</div>
+
+		<h3>.lengthSq() [page:Float]</h3>
+		<div>
+		Computes squared length of this vector.
+		</div>
+
+		<h3>.length() [page:Float]</h3>
+		<div>
+		Computes length of this vector.
+		</div>
+
+		<h3>.lengthManhattan() [page:Float]</h3>
+		<div>
+		Computes Manhattan length of this vector.<br />
+		[link:http://en.wikipedia.org/wiki/Taxicab_geometry]
+		</div>
+
+		<h3>.normalize() [page:Vector3]</h3>
+		<div>
+		Normalizes this vector.
+		</div>
+
+		<h3>.distanceTo( [page:Vector3 v] ) [page:Float]</h3>
+		<div>
+		Computes distance of this vector to *v*.
+		</div>
+
+		<h3>.distanceToSquared( [page:Vector3 v] ) [page:Float]</h3>
+		<div>
+		Computes squared distance of this vector to *v*.
+		</div>
+
+		<h3>.setLength( [page:Float l] ) [page:Vector3]</h3>
+		<div>
+		Normalizes this vector and multiplies it by *l*.
+		</div>
+
+		<h3>.cross( [page:Vector3 v] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector to cross product of itself and *v*.
+		</div>
+
+		<h3>.crossVectors( [page:Vector3 a], [page:Vector3 b] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector to cross product of *a* and *b*.
+		</div>
+
+		<h3>.getPositionFromMatrix( [page:Matrix4 m] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector extracting position from matrix transform.
+		</div>
+
+		<h3>.getScaleFromMatrix( [page:Matrix4 m] ) [page:Vector3]</h3>
+		<div>
+		Sets this vector extracting scale from matrix transform.
+		</div>
+
+		<h3>.equals( [page:Vector3 v] ) [page:Vector3]</h3>
+		<div>
+		Checks for strict equality of this vector and *v*.
+		</div>
+
+		<h3>.clone() [page:Vector3]</h3>
+		<div>
+		Clones this vector.
+		</div>
+
+
+		<h3>.clamp([page:todo min], [page:todo max]) [page:todo]</h3>
+		<div>
+		min -- todo <br />
+		max -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.applyMatrix3([page:todo m]) [page:todo]</h3>
+		<div>
+		m -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.applyMatrix4([page:todo m]) [page:todo]</h3>
+		<div>
+		m -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.projectOnPlane([page:todo planeNormal]) [page:todo]</h3>
+		<div>
+		planeNormal -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.projectOnVector([page:todo vector]) [page:todo]</h3>
+		<div>
+		vector -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.addScalar([page:todo s]) [page:todo]</h3>
+		<div>
+		s -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.divide([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.min([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setComponent([page:todo index], [page:todo value]) [page:todo]</h3>
+		<div>
+		index -- todo <br />
+		value -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.transformDirection([page:todo m]) [page:todo]</h3>
+		<div>
+		m -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.multiplyVectors([page:todo a], [page:todo b]) [page:todo]</h3>
+		<div>
+		a -- todo <br />
+		b -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.getComponent([page:todo index]) [page:todo]</h3>
+		<div>
+		index -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.applyAxisAngle([page:todo axis], [page:todo angle]) [page:todo]</h3>
+		<div>
+		axis -- todo <br />
+		angle -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.lerp([page:todo v], [page:todo alpha]) [page:todo]</h3>
+		<div>
+		v -- todo <br />
+		alpha -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.max([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.angleTo([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.getColumnFromMatrix([page:todo index], [page:todo matrix]) [page:todo]</h3>
+		<div>
+		index -- todo <br />
+		matrix -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.reflect([page:todo vector]) [page:todo]</h3>
+		<div>
+		vector -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.fromArray([page:todo array]) [page:todo]</h3>
+		<div>
+		array -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.multiply([page:todo v], [page:todo w]) [page:todo]</h3>
+		<div>
+		v -- todo <br />
+		w -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.applyProjection([page:todo m]) [page:todo]</h3>
+		<div>
+		m -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setEulerFromRotationMatrix([page:todo m], [page:todo order]) [page:todo]</h3>
+		<div>
+		m -- todo <br />
+		order -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.toArray() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.applyEuler([page:todo v], [page:todo eulerOrder]) [page:todo]</h3>
+		<div>
+		v -- todo <br />
+		eulerOrder -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.applyQuaternion([page:todo q]) [page:todo]</h3>
+		<div>
+		q -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setEulerFromQuaternion([page:todo q], [page:todo order]) [page:todo]</h3>
+		<div>
+		q -- todo <br />
+		order -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

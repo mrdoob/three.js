@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Camera with orthographic projection.</div>
+
+
+		<h2>Example</h2>
+
+		<code>var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+scene.add( camera );</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Float left], [page:Float right], [page:Float top], [page:Float bottom], [page:Float near], [page:Float far] )</h3>
+		<div>
+		left — Camera frustum left plane.<br />
+		right — Camera frustum right plane.<br />
+		top — Camera frustum top plane.<br />
+		bottom — Camera frustum bottom plane.<br />
+		near — Camera frustum near plane.<br />
+		far — Camera frustum far plane.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Float left]</h3>
+		<div>Camera frustum left plane.</div>
+
+		<h3>.[page:Float right]</h3>
+		<div>Camera frustum right plane.</div>
+
+		<h3>.[page:Float top]</h3>
+		<div>Camera frustum top plane.</div>
+
+		<h3>.[page:Float bottom]</h3>
+		<div>Camera frustum bottom plane.</div>
+
+		<h3>.[page:Float near]</h3>
+		<div>Camera frustum near plane.</div>
+
+		<h3>.[page:Float far]</h3>
+		<div>Camera frustum far plane.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>.updateProjectionMatrix()</h3>
+		<div>
+		Updates the camera projection matrix. Must be called after change of parameters.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

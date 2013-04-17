@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">This class contains the parameters that define exponential fog, i.e., that grows exponentially denser with the distance.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Integer hex], [page:Float density])</h3>
+
+		<div>The hex parameter is passed to the [page:Color] constructor to set the color property.  Hex can be a hexadecimal integer or a CSS-style string.</div>
+		<h2>Properties</h2>
+
+		<h3>.[page:String name]</h3>
+		<div>Default is the empty string.</div>
+
+		<h3>.[page:Color color]</h3>
+		<div>Fog color. Example: If set to black, far away objects will be rendered black.</div>
+
+		<h3>.[page:Float density]</h3>
+		<div>Defines how fast the fog will grow dense.</div>
+		<div>Default is 0.00025.</div>
+
+		<h2>Methods</h2>
+		
+		<h3>.clone() [page:FogExp2]</h3>
+		<div>Returns a copy of this.</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

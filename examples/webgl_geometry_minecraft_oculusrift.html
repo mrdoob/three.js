@@ -11,7 +11,7 @@
 				font-size:13px;
 				text-align:center;
 
-				background-color: #bfd1e5;
+				background-color: #000000;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -39,7 +39,7 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo [oculus rift]. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward, o,p: distortion [<span id='distVal'>0</span>], k,l; eye separation [<span id='sepVal'>0</span>], n,m; fov [<span id='fovVal'>0</span>])</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - <a href="http://www.minecraft.net/" target="_blank">minecraft</a> demo for oculus rift. featuring <a href="http://painterlypack.net/" target="_blank">painterly pack</a><br />(left click: forward, right click: backward, h: hide text)</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -94,26 +94,31 @@
 				var matrix = new THREE.Matrix4();
 
 				var pxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pxGeometry.faces[ 0 ].materialIndex = 1;
+				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
 				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
 
 				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nxGeometry.faces[ 0 ].materialIndex = 1;
+				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
 				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pyGeometry.faces[ 0 ].materialIndex = 0;
+				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
+				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
 				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
 				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
 
 				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pzGeometry.faces[ 0 ].materialIndex = 1;
+				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
 
 				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nzGeometry.faces[ 0 ].materialIndex = 1;
+				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
 				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
 				//
@@ -171,18 +176,11 @@
 
 				}
 
-				var textureGrass = THREE.ImageUtils.loadTexture( 'textures/minecraft/grass.png' );
-				textureGrass.magFilter = THREE.NearestFilter;
-				textureGrass.minFilter = THREE.LinearMipMapLinearFilter;
+				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
+				texture.magFilter = THREE.NearestFilter;
+				texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-				var textureGrassDirt = THREE.ImageUtils.loadTexture( 'textures/minecraft/grass_dirt.png' );
-				textureGrassDirt.magFilter = THREE.NearestFilter;
-				textureGrassDirt.minFilter = THREE.LinearMipMapLinearFilter;
-
-				var material1 = new THREE.MeshLambertMaterial( { map: textureGrass, ambient: 0xbbbbbb } );
-				var material2 = new THREE.MeshLambertMaterial( { map: textureGrassDirt, ambient: 0xbbbbbb } );
-
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( [ material1, material2 ] ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, ambient: 0xbbbbbb } ) );
 				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );
@@ -194,19 +192,12 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				effect = new THREE.OculusRiftEffect( renderer );
+				renderer.setClearColor(new THREE.Color(0xbfd1e5));
+
+				// Here is the effect for the Oculus Rift
+				// worldScale 100 means that 100 Units == 1m
+				effect = new THREE.OculusRiftEffect( renderer, {worldScale: 100} );
 				effect.setSize( window.innerWidth, window.innerHeight );
-
-				// Right Oculus Parameters are yet to be determined
-				effect.separation = 20;
-				effect.distortion = 0.1;
-				effect.fov = 110;
-
-
-				document.getElementById( 'distVal' ).innerHTML = effect.distortion.toFixed(2);
-				document.getElementById( 'sepVal' ).innerHTML = effect.separation;
-				document.getElementById( 'fovVal' ).innerHTML = effect.fov;
-
 
 				container.innerHTML = "";
 
@@ -220,6 +211,8 @@
 				// GUI
 				window.addEventListener( 'resize', onWindowResize, false );
 				document.addEventListener( 'keydown', keyPressed, false );
+
+				guiVisible = true;
 
 			}
 
@@ -235,14 +228,10 @@
 			}
 
 			function keyPressed (event) {
-				switch ( event.keyCode ) {
-					case 79: /*O*/ effect.distortion -= 0.01; document.getElementById( 'distVal' ).innerHTML = effect.distortion.toFixed(2); break;
-					case 80: /*P*/ effect.distortion += 0.01; document.getElementById( 'distVal' ).innerHTML = effect.distortion.toFixed(2); break;
-					case 75: /*K*/ effect.separation -= 1; document.getElementById( 'sepVal' ).innerHTML = effect.separation; break;
-					case 76: /*L*/ effect.separation += 1; document.getElementById( 'sepVal' ).innerHTML = effect.separation; break;
-					case 78: /*N*/ effect.fov -= 1; document.getElementById( 'fovVal' ).innerHTML = effect.fov; break;
-					case 77: /*M*/ effect.fov += 1; document.getElementById( 'fovVal' ).innerHTML = effect.fov; break;
-
+				if (event.keyCode === 72) { // H
+					guiVisible = !guiVisible;
+					document.getElementById('info').style.display = guiVisible ? "block" : "none";
+					stats.domElement.style.display = guiVisible ? "block" : "none";
 				}
 			}
 

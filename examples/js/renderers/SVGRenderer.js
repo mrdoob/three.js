@@ -63,6 +63,12 @@ THREE.SVGRenderer = function () {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
+	this.setClearColor = function ( color, alpha ) {
+
+		// TODO
+
+	};
+
 	this.setSize = function( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
@@ -154,9 +160,17 @@ THREE.SVGRenderer = function () {
 				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
 				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
 
-				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
+				_elemBox.setFromPoints( [
+					_v1.positionScreen,
+					_v2.positionScreen,
+					_v3.positionScreen
+				] );
 
-				renderFace3( _v1, _v2, _v3, element, material );
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+
+					renderFace3( _v1, _v2, _v3, element, material );
+
+				}
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -172,9 +186,18 @@ THREE.SVGRenderer = function () {
 				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= -_svgHeightHalf;
 				_v4.positionScreen.x *= _svgWidthHalf; _v4.positionScreen.y *= -_svgHeightHalf;
 
-				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
+				_elemBox.setFromPoints( [
+					_v1.positionScreen,
+					_v2.positionScreen,
+					_v3.positionScreen,
+					_v4.positionScreen
+				] );
 
-				renderFace4( _v1, _v2, _v3, _v4, element, material );
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+
+					renderFace4( _v1, _v2, _v3, _v4, element, material );
+
+				}
 
 			}
 

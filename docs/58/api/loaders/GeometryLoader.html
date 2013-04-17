@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">A loader for loading a geometry out of a JSON file.</div>
+		<div class="desc">Unlike other loaders, this one emits events instead of using predefined callbacks. So if you're interested in getting notified when <em>things</em> happen, you need to add listeners to the object.</div>
+		<div class="desc">Possible events:<br />
+			<ul>
+				<li>type: error, message: error message</li>
+				<li>type: load, content: loaded geometry</li>
+			</ul>
+		</div>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		
+		<h2>Properties</h2>
+		
+
+		<h2>Methods</h2>
+
+		<h3>.load( [page:String url] )</h3>
+		<div>
+		url — required
+		</div>
+		
+		<div class="desc">Begin loading from <em>url</em></div>
+
+
+		<h3>.parse( [page:Object data], [page:LoadingMonitor monitor] )</h3>
+		<div>
+		data — required<br />
+		monitor — optional
+		</div>
+		
+		<div class="desc">Parses the geometry in the <em>data</em> object, optionally monitoring its progress via the <em>monitor</em> object, if provided.</div>
+
+		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
+		<div>
+		event -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

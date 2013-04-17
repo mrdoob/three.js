@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">An extensible curve object which contains methods for interpolation.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Vector3 todo]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>.getPoint ( t )</h3>
+		<div>Returns a vector for point t of the curve where t is between 0 and 1</div>
+
+		<h3>.getPointAt ( u )</h3>
+		<div>Returns a vector for point at relative position in curve according to arc length</div>
+
+		<h3>.getPoints ( divisions )</h3>
+		<div>Get sequence of points using getPoint( t ) </div>
+
+		<h3>.getSpacedPoints ( divisions )</h3>
+		<div>Get sequence of equi-spaced points using getPointAt( u )</div>
+
+		<h3>.getLength ()</h3>
+		<div>Get total curve arc length</div>
+
+		<h3>.getLengths ( divisions )</h3>
+		<div>Get list of cumulative segment lengths</div>
+
+		<h3>.updateArcLengths ()</h3>
+		<div>Update the cumlative segment distance cache</div>
+
+		<h3>.getUtoTmapping ( u, distance )</h3>
+		<div>Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant</div>
+
+		<h3>.getTangent ( t )</h3>
+		<div>Returns a unit vector tangent at t. If the subclassed curve do not implement its tangent derivation, 2 points a small delta apart will be used to find its gradient which seems to give a reasonable approximation</div>
+
+		<h3>.getTangentAt ( u )</h3>
+		<div>Returns tangent at equidistant point u on the curve</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

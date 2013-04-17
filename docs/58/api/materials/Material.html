@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Materials describe the appearance of [page:Object objects]. They are defined in a (mostly) renderer-independent way, so you don't have to rewrite materials if you decide to use a different renderer.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [page:Object parameters] )</h3>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Integer id]</h3>
+		<div>
+		Unique number of this material instance.
+		</div>
+
+		<h3>.[page:String name]</h3>
+		<div>
+		Material name. Default is an empty string.
+		</div>
+
+		<h3>.[page:Number opacity]</h3>
+		<div>
+		Opacity. Default is *1*.
+		</div>
+
+		<h3>.[page:Boolean transparent]</h3>
+		<div>
+		Defines whether this material is transparent. This has an effect on rendering, as transparent objects need an special treatment, and are rendered after the opaque (i.e. non transparent) objects. For a working example of this behaviour, check the [page:WebGLRenderer WebGLRenderer] code.
+		</div>
+		<div>Default is *false*.</div>
+
+		<h3>.[page:Blending blending]</h3>
+		<div>
+		Which blending to use when displaying objects with this material. Default is [page:NormalBlending].
+		</div>
+
+		<h3>.[page:Integer blendSrc]</h3>
+		<div>
+		Blending source. It's one of the blending mode constants defined in [page:Three Three.js]. Default is *SrcAlphaFactor*.
+		</div>
+
+		<h3>.[page:Integer blendDst]</h3>
+		<div>
+		Blending destination. It's one of the blending mode constants defined in [page:Three Three.js]. Default is *OneMinusSrcAlphaFactor*.
+		</div>
+
+		<h3>.[page:Integer blendEquation]</h3>
+		<div>
+		Blending equation to use when applying blending. It's one of the constants defined in [page:Three Three.js]. Default is *AddEquation*.
+		</div>
+
+		<h3>.[page:Boolean depthTest]</h3>
+		<div>
+		Whether to have depth test enabled when rendering this material. Default is *true*.
+		</div>
+
+		<h3>.[page:Boolean depthWrite]</h3>
+		<div>
+		Whether rendering this material has any effect on the depth buffer. Default is *true*.
+		</div>
+		<div>
+		When drawing 2D overlays it can be useful to disable the depth writing in order to layer several things together without creating z-index artifacts.
+		</div>
+
+		<h3>.[page:Boolean polygonOffset]</h3>
+		<div>
+		Whether to use polygon offset. Default is *false*. This corresponds to the *POLYGON_OFFSET_FILL* WebGL feature.
+		</div>
+
+		<h3>.[page:Integer polygonOffsetFactor]</h3>
+		<div>
+		Sets the polygon offset factor. Default is *0*.
+		</div>
+
+		<h3>.[page:Integer polygonOffsetUnits]</h3>
+		<div>
+		Sets the polygon offset units. Default is *0*.
+		</div>
+
+		<h3>.[page:Number alphaTest]</h3>
+		<div>
+		Sets the alpha value to be used when running an alpha test. Default is *0*.
+		</div>
+
+		<h3>.[page:Boolean overdraw]</h3>
+		<div>
+		Enables/disables overdraw. If enabled, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the [page:CanvasRenderer]. Default is *false*.
+		</div>
+
+		<h3>.[page:Boolean visible]</h3>
+		<div>
+		Defines whether this material is visible. Default is *true*.
+		</div>
+
+		<h3>.[page:Enum side]</h3>
+		<div>
+		Defines which of the face sides will be rendered - front, back or both.
+		</div>
+		<div>
+		Default is *THREE.FrontSide*. Other options are *THREE.BackSide* and *THREE.DoubleSide*.
+		</div>
+
+		<h3>.[page:Boolean needsUpdate]</h3>
+		<div>
+		Specifies that the material needs to be updated, WebGL wise. Set it to true if you made changes that need to be reflected in WebGL.
+		</div>
+		<div>
+		This property is automatically set to *true* when instancing a new material.
+		</div>
+
+		<h2>Methods</h2>
+		
+		<h3>.clone([page:todo material]) [page:todo]</h3>
+		<div>
+		material -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.dispose() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
+		<div>
+		event -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setValues([page:todo values]) [page:todo]</h3>
+		<div>
+		values -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
