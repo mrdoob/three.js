@@ -23,6 +23,12 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	var canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' );
 
+	var devicePixelRatio = parameters.devicePixelRatio !== undefined
+				? parameters.devicePixelRatio
+				: window.devicePixelRatio !== undefined
+					? window.devicePixelRatio
+					: 1;
+
 	var gl;
 
 	try {
@@ -242,7 +248,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		canvas.width = width;
 		canvas.height = height;
 
-		if ( updateStyle !== false ) {
+		if ( devicePixelRatio !== 1 && updateStyle !== false ) {
 
 			canvas.style.width = width + 'px';
 			canvas.style.height = height + 'px';
