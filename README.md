@@ -101,8 +101,8 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Fixed bug in Phong shader when using normal maps with derivative tangents. ([WestLangley](http://github.com/WestLangley))
 * Added support for `FaceColors` to `SoftwareRenderer`.
 * Updated `convert_obj_three.py` docstring with current loader interface. ([wilsaj](http://github.com/wilsaj))
-* Updated OculusRiftEffect. Now it should work with the original OculusRift. ([troffmo5](http://github.com/troffmo5))
-* Fixed vertex normals and UVs for CircleGeometry. ([WestLangley](http://github.com/WestLangley))
+* Updated `OculusRiftEffect`. Now it should work with the original OculusRift. ([troffmo5](http://github.com/troffmo5))
+* Fixed vertex normals and UVs for `CircleGeometry`. ([WestLangley](http://github.com/WestLangley))
 * Added snapping to the editor. ([arodic](http://github.com/arodic))
 * Fixed `SpotLight`'s `angle` and `SpotlightHelper`'s cone size bug. ([WestLangley](http://github.com/WestLangley))
 * Using `CanvasRenderer` in the editor when there is no WebGL support. ([mrdoob](http://github.com/mrdoob))
