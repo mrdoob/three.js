@@ -34158,6 +34158,8 @@ THREE.CameraHelper = function ( camera ) {
 
 	this.pointMap = pointMap;
 
+	this.update();
+
 };
 
 THREE.CameraHelper.prototype = Object.create( THREE.Line.prototype );
