@@ -2016,9 +2016,15 @@ def generate_material_string(material):
 def generate_materials_scene(data):
     chunks = []
 
-    # TODO: extract just materials actually used by some objects in the scene
+    def material_is_used(mat):
+        minimum_users = 1
+        if mat.use_fake_user:
+            minimum_users = 2 #we must ignore the "fake user" in this case
+        return mat.users >= minimum_users
+    
+    used_materials = [m for m in bpy.data.materials if material_is_used(m)]
 
-    for m in bpy.data.materials:
+    for m in used_materials:
         material = extract_material_data(m, data["use_colors"])
         material_string = generate_material_string(material)
         chunks.append(material_string)
