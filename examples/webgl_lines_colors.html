@@ -104,13 +104,13 @@
 					geometry.vertices.push( points[ i ] );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSV( 0.6, ( 200 + points[ i ].x ) / 400, 1.0 );
+					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, ( 200 - points[ i ].x ) / 400 ) * 0.5 + 0.5 );
 
 					colors2[ i ] = new THREE.Color( 0xffffff );
-					colors2[ i ].setHSV( 0.3, 1.0, ( 200 + points[ i ].x ) / 400 );
+					colors2[ i ].setHSL( 0.3, 1.0, Math.max( 0, ( 200 + points[ i ].x ) / 400 ) * 0.5 );
 
 					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSV( i / points.length, 1.0, 1.0 );
+					colors3[ i ].setHSL( i / points.length, 1.0, 0.5 );
 
 				}
 

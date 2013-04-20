@@ -142,7 +142,7 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 0.85 );
 				directionalLight.position.set( 1, -0.5, 1 );
-				directionalLight.color.setHSV( 0.6, 0.3, 1 );
+				directionalLight.color.setHSL( 0.6, 1, 0.85 );
 				scene.add( directionalLight );
 
 				directionalLight.position.multiplyScalar( 500 );
@@ -184,7 +184,7 @@
 				container.appendChild( renderer.domElement );
 
 				var color = new THREE.Color();
-				color.setHSV( 0.6, 0.15, 0.35 );
+				color.setHSL( 0.6, 0.1, 0.3 );
 				renderer.setClearColor( color, 1 );
 
 				renderer.shadowMapEnabled = true;

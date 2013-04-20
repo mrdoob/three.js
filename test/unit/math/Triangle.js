@@ -10,14 +10,14 @@ test( "constructor", function() {
 	ok( a.b.equals( zero3 ), "Passed!" );
 	ok( a.c.equals( zero3 ), "Passed!" );
 
-	a = new THREE.Triangle( one3.clone().negate(), one3, two3 );
+	a = new THREE.Triangle( one3.clone().negate(), one3.clone(), two3.clone() );
 	ok( a.a.equals( one3.clone().negate() ), "Passed!" );
 	ok( a.b.equals( one3 ), "Passed!" );
 	ok( a.c.equals( two3 ), "Passed!" );
 });
 
 test( "copy", function() {
-	var a = new THREE.Triangle( one3.clone().negate(), one3, two3 );
+	var a = new THREE.Triangle( one3.clone().negate(), one3.clone(), two3.clone() );
 	var b = new THREE.Triangle().copy( a );
 	ok( b.a.equals( one3.clone().negate() ), "Passed!" );
 	ok( b.b.equals( one3 ), "Passed!" );

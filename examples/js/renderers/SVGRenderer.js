@@ -17,10 +17,8 @@ THREE.SVGRenderer = function () {
 	_clipBox = new THREE.Box2(),
 	_elemBox = new THREE.Box2(),
 
-	_enableLighting = false,
 	_color = new THREE.Color(),
 	_diffuseColor = new THREE.Color(),
-	_emissiveColor = new THREE.Color(),
 	_ambientLight = new THREE.Color(),
 	_directionalLights = new THREE.Color(),
 	_pointLights = new THREE.Color(),
@@ -65,6 +63,12 @@ THREE.SVGRenderer = function () {
 	this.supportsVertexTextures = function () {};
 	this.setFaceCulling = function () {};
 
+	this.setClearColor = function ( color, alpha ) {
+
+		// TODO
+
+	};
+
 	this.setSize = function( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
@@ -80,6 +84,10 @@ THREE.SVGRenderer = function () {
 	};
 
 	this.clear = function () {
+
+		_pathCount = 0;
+		_circleCount = 0;
+		_lineCount = 0;
 
 		while ( _svg.childNodes.length > 0 ) {
 
@@ -98,9 +106,7 @@ THREE.SVGRenderer = function () {
 
 		}
 
-		var e, el, element, material;
-
-		this.autoClear && this.clear();
+		if ( this.autoClear === true ) this.clear();
 
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
@@ -109,21 +115,12 @@ THREE.SVGRenderer = function () {
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
 
-		_pathCount = 0; _circleCount = 0; _lineCount = 0;
+		calculateLights( _lights );
 
-		_enableLighting = _lights.length > 0;
+		for ( var e = 0, el = _elements.length; e < el; e ++ ) {
 
-		if ( _enableLighting ) {
-
-			 calculateLights( _lights );
-
-		}
-
-		for ( e = 0, el = _elements.length; e < el; e ++ ) {
-
-			element = _elements[ e ];
-
-			material = element.material;
+			var element = _elements[ e ];
+			var material = element.material;
 
 			if ( material === undefined || material.visible === false ) continue;
 
@@ -134,7 +131,7 @@ THREE.SVGRenderer = function () {
 				_v1 = element;
 				_v1.x *= _svgWidthHalf; _v1.y *= -_svgHeightHalf;
 
-				renderParticle( _v1, element, material, scene );
+				renderParticle( _v1, element, material );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -147,7 +144,7 @@ THREE.SVGRenderer = function () {
 
 				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
 
-					renderLine( _v1, _v2, element, material, scene );
+					renderLine( _v1, _v2, element, material );
 
 				}
 
@@ -163,9 +160,17 @@ THREE.SVGRenderer = function () {
 				_v2.positionScreen.x *= _svgWidthHalf; _v2.positionScreen.y *= - _svgHeightHalf;
 				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= - _svgHeightHalf;
 
-				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen ] );
+				_elemBox.setFromPoints( [
+					_v1.positionScreen,
+					_v2.positionScreen,
+					_v3.positionScreen
+				] );
 
-				renderFace3( _v1, _v2, _v3, element, material, scene );
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+
+					renderFace3( _v1, _v2, _v3, element, material );
+
+				}
 
 			} else if ( element instanceof THREE.RenderableFace4 ) {
 
@@ -181,9 +186,18 @@ THREE.SVGRenderer = function () {
 				_v3.positionScreen.x *= _svgWidthHalf; _v3.positionScreen.y *= -_svgHeightHalf;
 				_v4.positionScreen.x *= _svgWidthHalf; _v4.positionScreen.y *= -_svgHeightHalf;
 
-				_elemBox.setFromPoints( [ _v1.positionScreen, _v2.positionScreen, _v3.positionScreen, _v4.positionScreen ] );
+				_elemBox.setFromPoints( [
+					_v1.positionScreen,
+					_v2.positionScreen,
+					_v3.positionScreen,
+					_v4.positionScreen
+				] );
 
-				renderFace4( _v1, _v2, _v3, _v4, element, material, scene );
+				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
+
+					renderFace4( _v1, _v2, _v3, _v4, element, material );
+
+				}
 
 			}
 
@@ -193,16 +207,14 @@ THREE.SVGRenderer = function () {
 
 	function calculateLights( lights ) {
 
-		var l, ll, light, lightColor;
-
 		_ambientLight.setRGB( 0, 0, 0 );
 		_directionalLights.setRGB( 0, 0, 0 );
 		_pointLights.setRGB( 0, 0, 0 );
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( var l = 0, ll = lights.length; l < ll; l++ ) {
 
-			light = lights[ l ];
-			lightColor = light.color;
+			var light = lights[ l ];
+			var lightColor = light.color;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
@@ -273,7 +285,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function renderParticle( v1, element, material, scene ) {
+	function renderParticle( v1, element, material ) {
 
 		/*
 		_svgNode = getCircleNode( _circleCount++ );
@@ -283,23 +295,15 @@ THREE.SVGRenderer = function () {
 
 		if ( material instanceof THREE.ParticleCircleMaterial ) {
 
-			if ( _enableLighting ) {
+			_color.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
+			_color.g = _ambientLight.g + _directionalLights.g + _pointLights.g;
+			_color.b = _ambientLight.b + _directionalLights.b + _pointLights.b;
 
-				_color.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
-				_color.g = _ambientLight.g + _directionalLights.g + _pointLights.g;
-				_color.b = _ambientLight.b + _directionalLights.b + _pointLights.b;
+			_color.r = material.color.r * _color.r;
+			_color.g = material.color.g * _color.g;
+			_color.b = material.color.b * _color.b;
 
-				_color.r = material.color.r * _color.r;
-				_color.g = material.color.g * _color.g;
-				_color.b = material.color.b * _color.b;
-
-				_color.updateStyleString();
-
-			} else {
-
-				_color = material.color;
-
-			}
+			_color.updateStyleString();
 
 			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
 
@@ -310,7 +314,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function renderLine ( v1, v2, element, material, scene ) {
+	function renderLine ( v1, v2, element, material ) {
 
 		_svgNode = getLineNode( _lineCount ++ );
 
@@ -329,7 +333,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function renderFace3( v1, v2, v3, element, material, scene ) {
+	function renderFace3( v1, v2, v3, element, material ) {
 
 		_this.info.render.vertices += 3;
 		_this.info.render.faces ++;
@@ -347,10 +351,9 @@ THREE.SVGRenderer = function () {
 
 			}
 
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
+		} else if ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
 
 			_diffuseColor.copy( material.color );
-			_emissiveColor.copy( material.emissive );
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
@@ -358,19 +361,11 @@ THREE.SVGRenderer = function () {
 
 			}
 
-			if ( _enableLighting ) {
+			_color.copy( _ambientLight );
 
-				_color.copy( _ambientLight );
+			calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
-
-				_color.multiply( _diffuseColor ).add( _emissiveColor );
-
-			} else {
-
-				_color.copy( _diffuseColor );
-
-			}
+			_color.multiply( _diffuseColor ).add( material.emissive );
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
@@ -399,7 +394,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function renderFace4( v1, v2, v3, v4, element, material, scene ) {
+	function renderFace4( v1, v2, v3, v4, element, material ) {
 
 		_this.info.render.vertices += 4;
 		_this.info.render.faces ++;
@@ -417,10 +412,9 @@ THREE.SVGRenderer = function () {
 
 			}
 
-		} else if ( material instanceof THREE.MeshLambertMaterial ) {
+		} else if ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
 
 			_diffuseColor.copy( material.color );
-			_emissiveColor.copy( material.emissive );
 
 			if ( material.vertexColors === THREE.FaceColors ) {
 
@@ -428,19 +422,11 @@ THREE.SVGRenderer = function () {
 
 			}
 
-			if ( _enableLighting ) {
+			_color.copy( _ambientLight );
 
-				_color.copy( _ambientLight );
+			calculateLight( _lights, element.centroidModel, element.normalModel, _color );
 
-				calculateLight( _lights, element.centroidModel, element.normalModel, _color );
-
-				_color.multiply( _diffuseColor ).add( _emissiveColor );
-
-			} else {
-
-				_color.copy( _diffuseColor );
-
-			}
+			_color.multiply( _diffuseColor ).add( material.emissive );
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 

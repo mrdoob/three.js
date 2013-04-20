@@ -59,7 +59,7 @@
 					bottom: 0,
 					width: 0.5,
 					height: 1.0,
-					background: { r: 0.5, g: 0.5, b: 0.7, a: 1 },
+					background: new THREE.Color().setRGB( 0.5, 0.5, 0.7 ),
 					eye: [ 0, 300, 1800 ],
 					up: [ 0, 1, 0 ],
 					fov: 30,
@@ -74,7 +74,7 @@
 					bottom: 0,
 					width: 0.5,
 					height: 0.5,
-					background: { r: 0.7, g: 0.5, b: 0.5, a: 1 },
+					background: new THREE.Color().setRGB( 0.7, 0.5, 0.5 ),
 					eye: [ 0, 1800, 0 ],
 					up: [ 0, 0, 1 ],
 					fov: 45,
@@ -89,7 +89,7 @@
 					bottom: 0.5,
 					width: 0.5,
 					height: 0.5,
-					background: { r: 0.5, g: 0.7, b: 0.7, a: 1 },
+					background: new THREE.Color().setRGB( 0.5, 0.7, 0.7 ),
 					eye: [ 1400, 800, 1400 ],
 					up: [ 0, 1, 0 ],
 					fov: 60,
@@ -189,17 +189,17 @@
 						p = geometry.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
+						color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
 
 						f.vertexColors[ j ] = color;
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( 0.0, ( p.y / radius + 1 ) / 2, 1.0 );
+						color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
 
 						f2.vertexColors[ j ] = color;
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 1.0 );
+						color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
 
 						f3.vertexColors[ j ] = color;
 
@@ -230,7 +230,7 @@
 				group3.rotation.x = 0;
 				scene.add( group3 );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -290,7 +290,7 @@
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
 					renderer.enableScissorTest ( true );
-					renderer.setClearColor( view.background, view.background.a );
+					renderer.setClearColor( view.background );
 
 					camera.aspect = width / height;
 					camera.updateProjectionMatrix();

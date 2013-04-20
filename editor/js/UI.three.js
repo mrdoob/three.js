@@ -12,8 +12,6 @@ UI.Texture = function ( position ) {
 	this.dom = document.createElement( 'input' );
 	this.dom.type = 'file';
 	this.dom.style.position = position || 'relative';
-	this.dom.style.marginTop = '-2px';
-	this.dom.style.marginLeft = '-2px';
 
 	this.onChangeCallback = null;
 
@@ -112,8 +110,6 @@ UI.CubeTexture = function ( position ) {
 	this.dom = document.createElement( 'input' );
 	this.dom.type = 'file';
 	this.dom.style.position = position || 'relative';
-	this.dom.style.marginTop = '-2px';
-	this.dom.style.marginLeft = '-2px';
 
 	this.onChangeCallback = null;
 

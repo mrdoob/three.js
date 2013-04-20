@@ -2,15 +2,16 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJLoader = function () {
-
-	THREE.EventDispatcher.call( this );
-
-};
+THREE.OBJLoader = function () {};
 
 THREE.OBJLoader.prototype = {
 
 	constructor: THREE.OBJLoader,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	load: function ( url, callback ) {
 
@@ -19,11 +20,11 @@ THREE.OBJLoader.prototype = {
 
 		request.addEventListener( 'load', function ( event ) {
 
-			var hierarchy = scope.parse( event.target.responseText );
+			var response = scope.parse( event.target.responseText );
 
-			scope.dispatchEvent( { type: 'load', content: hierarchy } );
+			scope.dispatchEvent( { type: 'load', content: response } );
 
-			if ( callback ) callback( hierarchy );
+			if ( callback ) callback( response );
 
 		}, false );
 
@@ -120,31 +121,31 @@ THREE.OBJLoader.prototype = {
 
 		// v float float float
 
-		var vertex_pattern = /v( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/;
+		var vertex_pattern = /v( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
 
 		// vn float float float
 
-		var normal_pattern = /vn( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/;
+		var normal_pattern = /vn( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
 
 		// vt float float
 
-		var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( [\d|\.|\+|\-|e]+)/;
+		var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/
 
 		// f vertex vertex vertex ...
 
-		var face_pattern1 = /f( +[\d]+)( [\d]+)( [\d]+)( [\d]+)?/;
+		var face_pattern1 = /f( +\d+)( +\d+)( +\d+)( +\d+)?/
 
 		// f vertex/uv vertex/uv vertex/uv ...
 
-		var face_pattern2 = /f( +([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))( ([\d]+)\/([\d]+))?/;
+		var face_pattern2 = /f( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))( +(\d+)\/(\d+))?/;
 
 		// f vertex/uv/normal vertex/uv/normal vertex/uv/normal ...
 
-		var face_pattern3 = /f( +([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))( ([\d]+)\/([\d]+)\/([\d]+))?/;
+		var face_pattern3 = /f( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))( +(\d+)\/(\d+)\/(\d+))?/;
 
 		// f vertex//normal vertex//normal vertex//normal ...
 
-		var face_pattern4 = /f( +([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))( ([\d]+)\/\/([\d]+))?/;
+		var face_pattern4 = /f( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))( +(\d+)\/\/(\d+))?/;
 
 		//
 
@@ -382,7 +383,7 @@ THREE.OBJLoader.prototype = {
 
 				}
 
-			} else if ( line.startsWith( "o " ) ) {
+			} else if ( /^o /.test( line ) ) {
 
 				// object
 
@@ -390,23 +391,23 @@ THREE.OBJLoader.prototype = {
 				object.name = line.substring( 2 ).trim();
 				group.add( object );
 
-			} else if ( line.startsWith( "g " ) ) {
+			} else if ( /^g /.test( line ) ) {
 
 				// group
 
 				meshN( line.substring( 2 ).trim(), undefined );
 
-			} else if ( line.startsWith( "usemtl " ) ) {
+			} else if ( /^usemtl /.test( line ) ) {
 
 				// material
 
 				meshN( undefined, line.substring( 7 ).trim() );
 
-			} else if ( line.startsWith( "mtllib ") ) {
+			} else if ( /^mtllib /.test( line ) ) {
 
 				// mtl file
 
-			} else if ( line.startsWith( "s ") ) {
+			} else if ( /^s /.test( line ) ) {
 
 				// smooth shading
 
@@ -418,8 +419,11 @@ THREE.OBJLoader.prototype = {
 
 		}
 
+		// add the last group
+		meshN( undefined, undefined );
+
 		return group;
 
 	}
 
-}
+};

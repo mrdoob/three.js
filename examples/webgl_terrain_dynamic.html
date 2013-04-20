@@ -316,7 +316,6 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x050505, 2000, 4000 );
-				scene.fog.color.setHSV( 0.102, 0.9, 0.825 );
 
 				// LIGHTS
 
@@ -696,14 +695,13 @@
 
 					var time = Date.now() * 0.001;
 
-					var fLow = 0.4, fHigh = 0.825;
+					var fLow = 0.1, fHigh = 0.8;
 
 					lightVal = THREE.Math.clamp( lightVal + 0.5 * delta * lightDir, fLow, fHigh );
 
 					var valNorm = ( lightVal - fLow ) / ( fHigh - fLow );
 
-					var sat = THREE.Math.mapLinear( valNorm, 0, 1, 0.95, 0.25 );
-					scene.fog.color.setHSV( 0.1, sat, lightVal );
+					scene.fog.color.setHSL( 0.1, 0.5, lightVal );
 
 					renderer.setClearColor( scene.fog.color, 1 );
 

@@ -4,8 +4,6 @@
 
 THREE.TrackballControls = function ( object, domElement ) {
 
-	THREE.EventDispatcher.call( this );
-
 	var _this = this;
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4, TOUCH_PAN: 5 };
 
@@ -57,6 +55,12 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	_panStart = new THREE.Vector2(),
 	_panEnd = new THREE.Vector2();
+
+	// for reset
+
+	this.target0 = this.target.clone();
+	this.position0 = this.object.position.clone();
+	this.up0 = this.object.up.clone();
 
 	// events
 
@@ -277,6 +281,25 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	};
 
+	this.reset = function () {
+
+		_state = STATE.NONE;
+		_prevState = STATE.NONE;
+
+		_this.target.copy( _this.target0 );
+		_this.object.position.copy( _this.position0 );
+		_this.object.up.copy( _this.up0 );
+
+		_eye.subVectors( _this.object.position, _this.target );
+
+		_this.object.lookAt( _this.target );
+
+		_this.dispatchEvent( changeEvent );
+
+		lastPosition.copy( _this.object.position );
+
+	};
+
 	// listeners
 
 	function keydown( event ) {
@@ -405,7 +428,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		_zoomStart.y += ( 1 / delta ) * 0.05;
+		_zoomStart.y += delta * 0.01;
 
 	}
 
@@ -510,3 +533,5 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.handleResize();
 
 };
+
+THREE.TrackballControls.prototype = Object.create( THREE.EventDispatcher.prototype );

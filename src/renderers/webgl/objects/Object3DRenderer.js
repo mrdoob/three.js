@@ -1,124 +1,127 @@
 
+THREE.WebGLRenderer.Object3DRenderer = function ( lowlevelrenderer, info ) {
 
-THREE.WebGLRenderer2.Object3DRenderer = function(lowlevelrenderer, info){
 	this.renderer = lowlevelrenderer;
 	this.info = info;
-};
-
-THREE.WebGLRenderer2.Object3DRenderer.prototype.getBufferMaterial = function( object, geometryGroup ) {
-
-	return object.material instanceof THREE.MeshFaceMaterial
-		? object.material.materials[ geometryGroup.materialIndex ]
-		: object.material;
 
 };
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessUVType = function( material ) {
+THREE.extend( THREE.WebGLRenderer.Object3DRenderer.prototype, {
 
-	// material must use some texture to require uvs
+	getBufferMaterial: function ( object, geometryGroup ) {
 
-	if ( material.map || material.lightMap || material.bumpMap || material.normalMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
+		return object.material instanceof THREE.MeshFaceMaterial
+			? object.material.materials[ geometryGroup.materialIndex ]
+			: object.material;
 
-		return true;
+	},
 
-	}
+	bufferGuessUVType: function ( material ) {
 
-	return false;
+		// material must use some texture to require uvs
 
-};
+		if ( material.map || material.lightMap || material.bumpMap || material.normalMap || material.specularMap || material instanceof THREE.ShaderMaterial ) {
 
-THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessNormalType = function ( material ) {
+			return true;
 
-	// only MeshBasicMaterial and MeshDepthMaterial don't need normals
-
-	if ( ( material instanceof THREE.MeshBasicMaterial && !material.envMap ) || material instanceof THREE.MeshDepthMaterial ) {
+		}
 
 		return false;
 
-	}
+	},
 
-	if ( this.materialNeedsSmoothNormals( material ) ) {
+	bufferGuessNormalType: function ( material ) {
 
-		return THREE.SmoothShading;
+		// only MeshBasicMaterial and MeshDepthMaterial don't need normals
 
-	} else {
+		if ( ( material instanceof THREE.MeshBasicMaterial && !material.envMap ) || material instanceof THREE.MeshDepthMaterial ) {
 
-		return THREE.FlatShading;
-
-	}
-
-};
-
-THREE.WebGLRenderer2.Object3DRenderer.prototype.materialNeedsSmoothNormals = function ( material ) {
-
-	return material && material.shading !== undefined && material.shading === THREE.SmoothShading;
-
-};
-
-
-THREE.WebGLRenderer2.Object3DRenderer.prototype.bufferGuessVertexColorType = function ( material ) {
-
-	if ( material.vertexColors ) {
-
-		return material.vertexColors;
-
-	}
-
-	return false;
-
-};
-
-
-THREE.WebGLRenderer2.Object3DRenderer.prototype.initCustomAttributes = function( geometry, object ) {
-
-	var nvertices = geometry.vertices.length;
-
-	var material = object.material;
-
-	if ( material.attributes ) {
-
-		if ( geometry.__webglCustomAttributesList === undefined ) {
-
-			geometry.__webglCustomAttributesList = [];
+			return false;
 
 		}
 
-		for ( var a in material.attributes ) {
+		if ( this.materialNeedsSmoothNormals( material ) ) {
 
-			var attribute = material.attributes[ a ];
+			return THREE.SmoothShading;
 
-			if ( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
+		} else {
 
-				attribute.__webglInitialized = true;
+			return THREE.FlatShading;
 
-				var size = 1;		// "f" and "i"
+		}
 
-				if ( attribute.type === "v2" ) size = 2;
-				else if ( attribute.type === "v3" ) size = 3;
-				else if ( attribute.type === "v4" ) size = 4;
-				else if ( attribute.type === "c"  ) size = 3;
+	},
 
-				attribute.size = size;
+	materialNeedsSmoothNormals: function ( material ) {
 
-				attribute.array = new Float32Array( nvertices * size );
+		return material && material.shading !== undefined && material.shading === THREE.SmoothShading;
 
-				attribute.buffer = this.renderer.createBuffer();
-				attribute.buffer.belongsToAttribute = a;
+	},
 
-				attribute.needsUpdate = true;
+	bufferGuessVertexColorType: function ( material ) {
+
+		if ( material.vertexColors ) {
+
+			return material.vertexColors;
+
+		}
+
+		return false;
+
+	},
+
+	initCustomAttributes: function ( geometry, object ) {
+
+		var nvertices = geometry.vertices.length;
+
+		var material = object.material;
+
+		if ( material.attributes ) {
+
+			if ( geometry.__webglCustomAttributesList === undefined ) {
+
+				geometry.__webglCustomAttributesList = [];
 
 			}
 
-			geometry.__webglCustomAttributesList.push( attribute );
+			for ( var a in material.attributes ) {
+
+				var attribute = material.attributes[ a ];
+
+				if ( !attribute.__webglInitialized || attribute.createUniqueBuffers ) {
+
+					attribute.__webglInitialized = true;
+
+					var size = 1;		// "f" and "i"
+
+					if ( attribute.type === "v2" ) size = 2;
+					else if ( attribute.type === "v3" ) size = 3;
+					else if ( attribute.type === "v4" ) size = 4;
+					else if ( attribute.type === "c"  ) size = 3;
+
+					attribute.size = size;
+
+					attribute.array = new Float32Array( nvertices * size );
+
+					attribute.buffer = this.renderer.createBuffer();
+					attribute.buffer.belongsToAttribute = a;
+
+					attribute.needsUpdate = true;
+
+				}
+
+				geometry.__webglCustomAttributesList.push( attribute );
+
+			}
 
 		}
 
+	},
+
+	numericalSort: function ( a, b ) {
+
+		return b[ 0 ] - a[ 0 ];
+
 	}
 
-};
-
-THREE.WebGLRenderer2.Object3DRenderer.prototype.numericalSort = function( a, b ) {
-
-	return b[ 0 ] - a[ 0 ];
-
-};
+} );

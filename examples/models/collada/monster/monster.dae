@@ -1312,20 +1312,6 @@
       <instance_animation url="#Bip01_R_Toe0Nub-node-transform"/>
     </animation_clip>
   </library_animation_clips>
-  <library_lights>
-    <light id="ambient-environment-light" name="Ambient">
-      <technique_common>
-        <ambient>
-          <color>0.486275 0.486275 0.486275</color>
-        </ambient>
-      </technique_common>
-      <extra>
-        <technique profile="FCOLLADA">
-          <intensity>1</intensity>
-        </technique>
-      </extra>
-    </light>
-  </library_lights>
   <library_images>
     <image id="monster.jpg" name="monster_jpg">
       <init_from>./monster.jpg</init_from>
@@ -1918,9 +1904,6 @@
             </technique_common>
           </bind_material>
         </instance_controller>
-      </node>
-      <node id="VisualSceneNode" type="NODE">
-        <instance_light url="#ambient-environment-light"/>
       </node>
       <extra>
         <technique profile="FCOLLADA">

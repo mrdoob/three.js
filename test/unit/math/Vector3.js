@@ -239,6 +239,75 @@ test( "setLength", function() {
 
 });
 
+test( "projectOnVector", function() {
+	var a = new THREE.Vector3( 1, 0, 0 );
+	var b = new THREE.Vector3();
+	var normal = new THREE.Vector3( 10, 0, 0 );
+
+	ok( b.copy( a ).projectOnVector( normal ).equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+
+	a.set( 0, 1, 0 );
+	ok( b.copy( a ).projectOnVector( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+
+	a.set( 0, 0, -1 );
+	ok( b.copy( a ).projectOnVector( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+
+	a.set( -1, 0, 0 );
+	ok( b.copy( a ).projectOnVector( normal ).equals( new THREE.Vector3( -1, 0, 0 ) ), "Passed!" );
+
+});
+
+test( "projectOnPlane", function() {
+	var a = new THREE.Vector3( 1, 0, 0 );
+	var b = new THREE.Vector3();
+	var normal = new THREE.Vector3( 1, 0, 0 );
+
+	ok( b.copy( a ).projectOnPlane( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+
+	a.set( 0, 1, 0 );
+	ok( b.copy( a ).projectOnPlane( normal ).equals( new THREE.Vector3( 0, 1, 0 ) ), "Passed!" );
+
+	a.set( 0, 0, -1 );
+	ok( b.copy( a ).projectOnPlane( normal ).equals( new THREE.Vector3( 0, 0, -1 ) ), "Passed!" );
+
+	a.set( -1, 0, 0 );
+	ok( b.copy( a ).projectOnPlane( normal ).equals( new THREE.Vector3( 0, 0, 0 ) ), "Passed!" );
+
+});
+
+test( "reflect", function() {
+	var a = new THREE.Vector3( 1, 0, 0 );
+	var normal = new THREE.Vector3( 1, 0, 0 );
+	var b = new THREE.Vector3( 0, 0, 0 );
+
+	ok( b.copy( a ).reflect( normal ).equals( new THREE.Vector3( 1, 0, 0 ) ), "Passed!" );
+
+	a.set( 1, -1, 0 );
+	ok( b.copy( a ).reflect( normal ).equals( new THREE.Vector3( 1, 1, 0 ) ), "Passed!" );
+
+	a.set( 1, -1, 0 );
+	normal.set( 0, -1, 0 );
+	ok( b.copy( a ).reflect(  normal ).equals( new THREE.Vector3( -1, -1, 0 ) ), "Passed!" );
+});
+
+test( "angleTo", function() {
+	var a = new THREE.Vector3( 0, -0.18851655680720186, 0.9820700116639124 );
+	var b = new THREE.Vector3( 0, 0.18851655680720186, -0.9820700116639124 );
+
+	equal( a.angleTo( a ), 0 );
+	equal( a.angleTo( b ), Math.PI );
+
+	var x = new THREE.Vector3( 1, 0, 0 );
+	var y = new THREE.Vector3( 0, 1, 0 );
+	var z = new THREE.Vector3( 0, 0, 1 );
+
+	equal( x.angleTo( y ), Math.PI / 2 );
+	equal( x.angleTo( z ), Math.PI / 2 );
+	equal( z.angleTo( x ), Math.PI / 2 );
+
+	ok( Math.abs( x.angleTo( new THREE.Vector3( 1, 1, 0 ) ) - ( Math.PI / 4 ) ) < 0.0000001 );
+});
+
 test( "lerp/clone", function() {
 	var a = new THREE.Vector3( x, 0, z );
 	var b = new THREE.Vector3( 0, -y, 0 );

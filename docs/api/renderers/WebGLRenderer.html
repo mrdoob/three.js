@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -207,22 +207,17 @@
 		<h3>.enableScissorTest( [page:Boolean enable] )</h3>
 		<div>Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
 
+		<h3>.setClearColor( [page:Color color], [page:Float alpha] )</h3>
+		<div>Sets the clear color and opacity.</div>
 
-		<h3>.setClearColorHex( [page:Integer hex], [page:Float alpha] )</h3>
-		<div>Sets the clear color, using hex for the color and alpha for the opacity.</div>
-
-		<code>// Creates a renderer with black background
+		<code>// Creates a renderer with red background
 		var renderer = new THREE.WebGLRenderer();
 		renderer.setSize(200, 100);
-		renderer.setClearColorHex(0x000000, 1);
+		renderer.setClearColor(0xff0000, 1);
 		</code>
-
-		<h3>.setClearColor( [page:Color color], [page:Float alpha] )</h3>
-		<div>Sets the clear color, using color for the color and alpha for the opacity.</div>
 
 		<h3>.getClearColor() [page:Color]</h3>
 		<div>Returns a [page:Color THREE.Color] instance with the current clear color.</div>
-
 
 		<h3>.getClearAlpha() [page:Float]</h3>
 		<div>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</div>
@@ -230,7 +225,6 @@
 		<h3>.clear( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
 		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
 		<div>If no parameters are passed, no buffer will be cleared.</div>
-
 
 		<h3>.addPostPlugin( plugin )</h3>
 		<div>Initialises the postprocessing plugin, and adds it to the renderPluginsPost array.</div>

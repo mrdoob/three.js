@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -32,12 +32,6 @@ scene.add( directionalLight );</code>
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Vector3 position]</h3>
-		<div>
-			Direction of the light is normalized vector from *position* to *(0,0,0)*.<br />
-			Default — *new THREE.Vector3()*.
-		</div>
-
 		<h3>.[page:Object3D target]</h3>
 		<div>
 			Target used for shadow camera orientation.
@@ -53,12 +47,6 @@ scene.add( directionalLight );</code>
 		<div>
 			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
 			Default — *0.0*.
-		</div>
-
-		<h3>.[page:Boolean castShadow]</h3>
-		<div>
-			If set to *true* light will cast dynamic shadows. *Warning*: This is expensive and requires tweaking to get shadows looking right.<br />
-			Default — *false*.
 		</div>
 
 		<h3>.[page:Boolean onlyShadow]</h3>
@@ -210,6 +198,8 @@ scene.add( directionalLight );</code>
 			??? <br />
 			Default — *null*.
 		</div>
+		
+		<h2>Methods</h2>
 
 
 		<h2>Source</h2>

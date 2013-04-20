@@ -132,17 +132,17 @@
 						p = geometry.vertices[ vertexIndex ];
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( ( p.y / radius + 1 ) / 2, 1.0, 1.0 );
+						color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
 
 						f.vertexColors[ j ] = color;
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( 0.0, ( p.y / radius + 1 ) / 2, 1.0 );
+						color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
 
 						f2.vertexColors[ j ] = color;
 
 						color = new THREE.Color( 0xffffff );
-						color.setHSV( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 1.0 );
+						color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
 
 						f3.vertexColors[ j ] = color;
 

@@ -143,7 +143,7 @@ THREE.SceneExporter.prototype = {
 
 		scene.traverse( function ( node ) {
 
-			if ( node instanceof THREE.Camera && node.properties.active ) {
+			if ( node instanceof THREE.Camera && node.userData.active ) {
 
 				activeCamera = node;
 
@@ -747,7 +747,7 @@ THREE.SceneExporter.prototype = {
 			'}'
 		].join( '\n' );
 
-		return output;
+		return JSON.parse( output );
 
 	}
 

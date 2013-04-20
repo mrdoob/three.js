@@ -248,7 +248,7 @@ var compareBox = function ( a, b, threshold ) {
 	a.max.distanceTo( b.max ) < threshold );
 };
 
-test( "transform", function() {
+test( "applyMatrix4", function() {
 	var a = new THREE.Box3( zero3.clone(), zero3.clone() );
 	var b = new THREE.Box3( zero3.clone(), one3.clone() );
 	var c = new THREE.Box3( one3.clone().negate(), one3.clone() );
@@ -257,10 +257,10 @@ test( "transform", function() {
 	var m = new THREE.Matrix4().makeTranslation( 1, -2, 1 );
 	var t1 = new THREE.Vector3( 1, -2, 1 );
 
-	ok( compareBox( a.clone().transform( m ), a.clone().translate( t1 ) ), "Passed!" );
-	ok( compareBox( b.clone().transform( m ), b.clone().translate( t1 ) ), "Passed!" );
-	ok( compareBox( c.clone().transform( m ), c.clone().translate( t1 ) ), "Passed!" );
-	ok( compareBox( d.clone().transform( m ), d.clone().translate( t1 ) ), "Passed!" );
+	ok( compareBox( a.clone().applyMatrix4( m ), a.clone().translate( t1 ) ), "Passed!" );
+	ok( compareBox( b.clone().applyMatrix4( m ), b.clone().translate( t1 ) ), "Passed!" );
+	ok( compareBox( c.clone().applyMatrix4( m ), c.clone().translate( t1 ) ), "Passed!" );
+	ok( compareBox( d.clone().applyMatrix4( m ), d.clone().translate( t1 ) ), "Passed!" );
 });
 
 test( "translate", function() {

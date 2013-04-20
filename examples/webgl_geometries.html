@@ -58,12 +58,11 @@
 					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
 				];
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
-				object.position.set( -200, 0, 400 );
-				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), materials );
-				object.position.set( 0, 0, 400 );
+				//
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 75, 20, 10 ), materials );
+				object.position.set( -400, 0, 200 );
 				scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.IcosahedronGeometry( 75, 1 ), materials );
@@ -79,17 +78,31 @@
 				object.position.set( 200, 0, 200 );
 				scene.add( object );
 
+
+				//
+
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 100, 100, 4, 4 ), materials );
+				object.position.set( -400, 0, 0 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
 
-				object2 = THREE.SceneUtils.createMultiMaterialObject( new THREE.CircleGeometry( 50, 10, 0, Math.PI ), materials );
-				object2.rotation.x = Math.PI/2;
-				object.add( object2 );
-
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 75, 20, 10 ), materials );
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), materials );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), materials );
+				object.position.set( 200, 0, 0 );
+				scene.add( object );
+
+				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), materials );
+				object.position.set( 400, 0, 0 );
+				scene.add( object );
+
+
+				//
 
 				var points = [];
 
@@ -100,7 +113,7 @@
 				}
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.LatheGeometry( points, 20 ), materials );
-				object.position.set( 200, 0, 0 );
+				object.position.set( -400, 0, -200 );
 				scene.add( object );
 
 				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TorusGeometry( 50, 20, 20, 20 ), materials );
@@ -116,8 +129,9 @@
 				scene.add( object );
 
 				object = new THREE.ArrowHelper( new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 0 ), 50 );
-				object.position.set( 200, 0, 400 );
+				object.position.set( 400, 0, -200 );
 				scene.add( object );
+
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

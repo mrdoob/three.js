@@ -52,6 +52,7 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
+				scene.autoUpdate = false;
 
 				// QRCODE
 
@@ -96,37 +97,56 @@
 				// POLYFIELD
 
 				var geometry = new THREE.Geometry();
-				var materials = [];
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, side: THREE.DoubleSide } );
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					var v = new THREE.Vector3( Math.random() * 1000 - 500, Math.random() * 1000 - 500, Math.random() * 1000 - 500 );
+					var v = new THREE.Vector3(
+						Math.random() * 1000 - 500,
+						Math.random() * 1000 - 500,
+						Math.random() * 1000 - 500
+					);
 
-					var v0 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
-					var v1 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
-					var v2 = new THREE.Vector3( Math.random() * 100 - 50, Math.random() * 100 - 50, Math.random() * 100 - 50 );
+					var v0 = new THREE.Vector3(
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50
+					);
+
+					var v1 = new THREE.Vector3(
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50
+					);
+
+					var v2 = new THREE.Vector3(
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50,
+						Math.random() * 100 - 50
+					);
 
 					v0.add( v );
 					v1.add( v );
 					v2.add( v );
 
-					var face = new THREE.Face3( geometry.vertices.push( v0 ) - 1, geometry.vertices.push( v1 ) - 1, geometry.vertices.push( v2 ) - 1, null, null, i );
+					var face = new THREE.Face3(
+						geometry.vertices.push( v0 ) - 1,
+						geometry.vertices.push( v1 ) - 1,
+						geometry.vertices.push( v2 ) - 1,
+						null,
+						new THREE.Color( Math.random() * 0xffffff )
+					);
 
 					geometry.faces.push( face );
-
-					materials.push( new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, side: THREE.DoubleSide } ) );
 
 				}
 
 				geometry.computeFaceNormals();
 				geometry.computeCentroids();
 
-				group = new THREE.Object3D();
-				group.scale.x = group.scale.y = group.scale.z = 2;
+				group = new THREE.Mesh( geometry, material );
+				group.scale.set( 2, 2, 2 );
 				scene.add( group );
-
-				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-				group.add( mesh );
 
 				// LIGHTS
 
@@ -210,6 +230,8 @@
 				camera.lookAt( scene.position );
 
 				group.rotation.y += 0.01;
+
+				scene.updateMatrixWorld();
 
 				canvasRenderer.render( scene, camera );
 				svgRenderer.render( scene, camera );

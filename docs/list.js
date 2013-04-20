@@ -128,7 +128,6 @@ var list = {
 		],
 
 		"Extras": [
-			[ "ColorUtils", "api/extras/ColorUtils" ],
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
 			[ "ImageUtils", "api/extras/ImageUtils" ],
@@ -156,7 +155,6 @@ var list = {
 		],
 
 		"Extras / Geometries": [
-			[ "AsteriskGeometry", "api/extras/geometries/AsteriskGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "ConvexGeometry", "api/extras/geometries/ConvexGeometry" ],
 			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],

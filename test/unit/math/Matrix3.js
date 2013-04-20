@@ -191,7 +191,7 @@ test( "transpose", function() {
 	ok( matrixEquals3( a, b ), "Passed!" );
 
 	b = new THREE.Matrix3( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
-	c = b.clone().transpose();
+	var c = b.clone().transpose();
 	ok( ! matrixEquals3( b, c ), "Passed!" ); 
 	c.transpose();
 	ok( matrixEquals3( b, c ), "Passed!" ); 
