@@ -2,6 +2,9 @@ Menubar.Help = function ( signals ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
+	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
+	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
+	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
 	title.setTextContent( 'Help' ).setColor( '#666' );
@@ -13,6 +16,7 @@ Menubar.Help = function ( signals ) {
 
 	var options = new UI.Panel();
 	options.setClass( 'options' );
+	options.setDisplay( 'none' );
 	container.add( options );
 
 	// source code
