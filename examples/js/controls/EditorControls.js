@@ -92,6 +92,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	};
 
+	// mouse
+
 	function onMouseDown( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -123,8 +125,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || event.oMovementX || 0;
+		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || event.oMovementY || 0;
 
 		if ( state === STATE.ROTATE ) {
 
@@ -177,6 +179,70 @@ THREE.EditorControls = function ( object, domElement ) {
 	domElement.addEventListener( 'mousedown', onMouseDown, false );
 	domElement.addEventListener( 'mousewheel', onMouseWheel, false );
 	domElement.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
+
+	// touch
+
+	var touch = new THREE.Vector3();
+	var prevTouch = new THREE.Vector3();
+	var prevDistance = null;
+
+	function touchStart( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		var touches = event.touches;
+
+		switch ( touches.length ) {
+
+			case 2:
+				var dx = touches[ 0 ].pageX - touches[ 1 ].pageX;
+				var dy = touches[ 0 ].pageY - touches[ 1 ].pageY;
+				prevDistance = Math.sqrt( dx * dx + dy * dy );
+				break;
+
+		}
+
+		prevTouch.set( touches[ 0 ].pageX, touches[ 0 ].pageY, 0 );
+
+	}
+
+	function touchMove( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		var touches = event.touches;
+
+		touch.set( touches[ 0 ].pageX, touches[ 0 ].pageY, 0 );
+
+		switch ( touches.length ) {
+
+			case 1:
+				scope.rotate( touch.sub( prevTouch ).multiplyScalar( - 0.005 ) );
+				break;
+
+			case 2:
+				var dx = touches[ 0 ].pageX - touches[ 1 ].pageX;
+				var dy = touches[ 0 ].pageY - touches[ 1 ].pageY;
+				var distance = Math.sqrt( dx * dx + dy * dy );
+				scope.zoom( new THREE.Vector3( 0, 0, prevDistance - distance ) );
+				prevDistance = distance;
+				break;
+
+			case 3:
+				scope.pan( touch.sub( prevTouch ).setX( - touch.x ) );
+				break;
+
+		}
+
+		prevTouch.set( touches[ 0 ].pageX, touches[ 0 ].pageY, 0 );
+
+	}
+
+	domElement.addEventListener( 'touchstart', touchStart, false );
+	domElement.addEventListener( 'touchmove', touchMove, false );
 
 };
 
