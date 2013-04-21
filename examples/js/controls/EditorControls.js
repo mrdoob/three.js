@@ -7,7 +7,7 @@
 
 THREE.EditorControls = function ( object, domElement ) {
 
-	domElement = ( domElement !== undefined ) ? domElement : document;
+	var domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
 
@@ -112,8 +112,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		domElement.addEventListener( 'mousemove', onMouseMove, false );
+		domElement.addEventListener( 'mouseup', onMouseUp, false );
+		domElement.addEventListener( 'mouseout', onMouseUp, false );
 
 	}
 
@@ -146,8 +147,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		domElement.removeEventListener( 'mouseup', onMouseUp, false );
+		domElement.removeEventListener( 'mouseout', onMouseUp, false );
 
 		state = STATE.NONE;
 

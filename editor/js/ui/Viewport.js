@@ -42,7 +42,7 @@ var Viewport = function ( signals ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var transformControls = new THREE.TransformControls( camera, container.dom );
+	var transformControls = new THREE.TransformControls( camera, container.dom, render );
 	sceneHelpers.add( transformControls.gizmo );
 	transformControls.hide();
 
@@ -104,6 +104,7 @@ var Viewport = function ( signals ) {
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
+		document.addEventListener( 'mouseout', onMouseUp, false );
 
 		render();
 
