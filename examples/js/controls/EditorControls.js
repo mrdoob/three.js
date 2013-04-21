@@ -7,7 +7,7 @@
 
 THREE.EditorControls = function ( object, domElement ) {
 
-	var domElement = ( domElement !== undefined ) ? domElement : document;
+	domElement = ( domElement !== undefined ) ? domElement : document;
 
 	// API
 
