@@ -38,7 +38,7 @@
 			var grid, box;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -55,7 +55,7 @@
 
 				scene = new THREE.Scene();
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
+				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif', new THREE.UVMapping(), render );
 				texture.anisotropy = renderer.getMaxAnisotropy();
 
 				grid = new THREE.Mesh(
@@ -89,6 +89,7 @@
 				for ( var i = 0; i < box.length; i++ ){
 
 					var translateLocal = new THREE.TransformControls( camera, renderer.domElement );
+					translateLocal.addEventListener( 'change', render );
 					scene.add( translateLocal.gizmo );
 					translateLocal.attatch( box[i] );
 
@@ -107,9 +108,9 @@
 
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
+				// requestAnimationFrame( animate );
 				renderer.render( scene, camera );
 
 			}

@@ -42,7 +42,12 @@ var Viewport = function ( signals ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var transformControls = new THREE.TransformControls( camera, container.dom, render );
+	var transformControls = new THREE.TransformControls( camera, container.dom );
+	transformControls.addEventListener( 'change', function () {
+
+		signals.objectChanged.dispatch( selected );
+
+	} );
 	sceneHelpers.add( transformControls.gizmo );
 	transformControls.hide();
 
@@ -97,22 +102,21 @@ var Viewport = function ( signals ) {
 
 		onMouseDownPosition.set( event.layerX, event.layerY );
 
-		setTimeout( function(){ 
-			if ( transformControls.active ) controls.enabled = false;
-			else controls.enabled = true;
+		setTimeout( function (){
+
+			controls.enabled = transformControls.active === false;
+
 		}, 10 );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 		document.addEventListener( 'mouseout', onMouseUp, false );
 
-		render();
-
 	};
 
 	var onMouseMove = function ( event ) {
 
-		signals.objectChanged.dispatch( selected );
+		// signals.objectChanged.dispatch( selected );
 
 	};
 
@@ -322,7 +326,11 @@ var Viewport = function ( signals ) {
 
 			selected = object;
 
-			if ( !(selected instanceof THREE.PerspectiveCamera) ) transformControls.attatch(object);
+			if ( selected instanceof THREE.PerspectiveCamera === false ) {
+
+				transformControls.attatch(object);
+
+			}
 
 		}
 

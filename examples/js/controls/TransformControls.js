@@ -4,7 +4,7 @@
 
  //"use strict";
 
-THREE.TransformControls = function ( camera, domElement, callback ) {
+THREE.TransformControls = function ( camera, domElement ) {
 
 	// TODO: Choose a better fitting intersection plane when looking at grazing angles
 	// TODO: Make non-uniform scale and rotate play nice in hierarchies
@@ -12,7 +12,6 @@ THREE.TransformControls = function ( camera, domElement, callback ) {
 
 	this.camera = camera;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
-	this.callback = callback ? callback : function() {}
 
 	this.active = false;
 	this.mode = 'translate';
@@ -24,6 +23,8 @@ THREE.TransformControls = function ( camera, domElement, callback ) {
 	this.gizmo = new THREE.Object3D();
 
 	var scope = this;
+
+	var changeEvent = { type: 'change' };
 
 	var showPickers = false; // debug
 
@@ -85,7 +86,7 @@ THREE.TransformControls = function ( camera, domElement, callback ) {
 		this.gizmo.add( displayAxes["translate"] );
 		this.gizmo.add( displayAxes["rotate"] );
 		this.gizmo.add( displayAxes["scale"] );
-		
+
 		pickerAxes["translate"] = new THREE.Object3D();
 		pickerAxes["rotate"] = new THREE.Object3D();
 		pickerAxes["scale"] = new THREE.Object3D();
@@ -198,7 +199,7 @@ THREE.TransformControls = function ( camera, domElement, callback ) {
 		mesh.name = 'TZ';
 		displayAxes['translate'].add( mesh );
 
-		geometry = new THREE.CylinderGeometry( 0.04, 0.04, 0.8, 4, 1, false );
+		geometry = new THREE.CylinderGeometry( 0.1, 0.1, 0.8, 4, 1, false );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
 		mesh.position.x = 0.6;
@@ -443,8 +444,6 @@ THREE.TransformControls = function ( camera, domElement, callback ) {
 			}
 
 		}
-
-		this.callback();
 
 	}
 
@@ -745,9 +744,10 @@ THREE.TransformControls = function ( camera, domElement, callback ) {
 
 			}
 
-		}
+			scope.updateGizmo();
+			scope.dispatchEvent( changeEvent );
 
-		scope.updateGizmo();
+		}
 
 	}
 
@@ -799,6 +799,7 @@ THREE.TransformControls = function ( camera, domElement, callback ) {
 		}
 
 		scope.updateMode();
+		scope.dispatchEvent( changeEvent );
 
 	}
 
