@@ -91,7 +91,6 @@ var Viewport = function ( signals ) {
 	};
 
 	var onMouseDownPosition = new THREE.Vector2();
-	var onMouseMovePosition = new THREE.Vector2();
 	var onMouseUpPosition = new THREE.Vector2();
 
 	var onMouseDown = function ( event ) {
@@ -100,21 +99,14 @@ var Viewport = function ( signals ) {
 
 		onMouseDownPosition.set( event.layerX, event.layerY );
 
-		setTimeout( function (){
-
-			controls.enabled = transformControls.active === false;
-
-		}, 10 );
-
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
-		document.addEventListener( 'mouseout', onMouseUp, false );
 
 	};
 
 	var onMouseMove = function ( event ) {
 
-		// signals.objectChanged.dispatch( selected );
+		controls.enabled = transformControls.active === false;
 
 	};
 
