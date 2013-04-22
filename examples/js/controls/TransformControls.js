@@ -107,7 +107,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		var LineMaterial = function ( color ) {
 			var material = new THREE.LineBasicMaterial();
-			material.side = THREE.DoubleSide;
 			material.transparent = true;
 			material.depthTest = false;
 			material.depthWrite = false;
@@ -128,20 +127,28 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		var geometry, mesh;
 
-		// line axes
+		// Line axes
 
-		mesh = new THREE.Line( new THREE.Geometry(), LineMaterial( red ) );
-		mesh.geometry.vertices = [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) ];
-		displayAxes['translate'].add( mesh );
-		displayAxes['scale'].add( mesh.clone() );
+		var redColor = new THREE.Color( 0xff0000 );
+		var greenColor = new THREE.Color( 0x00ff00 );
+		var blueColor = new THREE.Color( 0x0000ff );
 
-		mesh = new THREE.Line( new THREE.Geometry(), LineMaterial( green ) );
-		mesh.geometry.vertices = [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) ];
-		displayAxes['translate'].add( mesh );
-		displayAxes['scale'].add( mesh.clone() );
-
-		mesh = new THREE.Line( new THREE.Geometry(), LineMaterial( blue ) );
-		mesh.geometry.vertices = [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+		geometry = new THREE.Geometry();
+		geometry.vertices.push(
+			new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ),
+			new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ),
+			new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 1 )
+		);
+		geometry.colors.push(
+			redColor, redColor, greenColor, greenColor, blueColor, blueColor
+		);
+		material = new THREE.LineBasicMaterial( {
+			vertexColors: THREE.VertexColors,
+			depthTest: false,
+			depthWrite: false,
+			transparent: true
+		} );
+		mesh = new THREE.Line( geometry, material, THREE.LinePieces );
 		displayAxes['translate'].add( mesh );
 		displayAxes['scale'].add( mesh.clone() );
 
