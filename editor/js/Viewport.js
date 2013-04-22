@@ -99,6 +99,8 @@ var Viewport = function ( signals ) {
 
 		onMouseDownPosition.set( event.layerX, event.layerY );
 
+		controls.enabled = true;
+
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
@@ -132,19 +134,17 @@ var Viewport = function ( signals ) {
 
 			} else {
 
-				controls.enabled = true;
-
 				selected = camera;
 
 				signals.objectSelected.dispatch( selected );
 
 			}
 
-			controls.enabled = false;
-
 			render();
 
 		}
+
+		controls.enabled = false;
 
 		document.removeEventListener( 'mousemove', onMouseMove );
 		document.removeEventListener( 'mouseup', onMouseUp );
