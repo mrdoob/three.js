@@ -6669,7 +6669,19 @@ THREE.Object3D.prototype = {
 
 	clone: function ( object ) {
 
-		if ( object === undefined ) object = new THREE.Object3D();
+		if ( object === undefined ) {
+
+      		if ( this instanceof THREE.Scene ) {
+
+        		object = new THREE.Scene();
+
+    		} else {
+
+        		object = new THREE.Object3D();
+
+      		}
+
+    	}
 
 		object.name = this.name;
 
