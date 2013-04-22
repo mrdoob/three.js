@@ -310,8 +310,17 @@ var Loader = function ( signals ) {
           signals.objectSelected.dispatch( mesh );
 
         }, false );
-        reader.readAsBinaryString(file);
+        
+        if (reader.readAsBinaryString) {
 
+            reader.readAsBinaryStrings(file);
+
+        } else {
+            
+            reader.readAsArrayBuffer(file);
+            
+        }
+            
         break;
 
       /*
