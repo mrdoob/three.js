@@ -1,376 +1,376 @@
 
 var Loader = function ( signals ) {
 
-  scope = this;
+	scope = this;
 
-  var sceneExporter = new THREE.ObjectExporter();
+	var sceneExporter = new THREE.ObjectExporter();
 
-  document.addEventListener( 'dragover', function ( event ) {
+	document.addEventListener( 'dragover', function ( event ) {
 
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'copy';
+		event.preventDefault();
+		event.dataTransfer.dropEffect = 'copy';
 
-  }, false );
+	}, false );
 
-  document.addEventListener( 'drop', function ( event ) {
+	document.addEventListener( 'drop', function ( event ) {
 
-    event.preventDefault();
+		event.preventDefault();
 
-    var file = event.dataTransfer.files[ 0 ];
+		var file = event.dataTransfer.files[ 0 ];
 
-    var chunks = file.name.split( '.' );
-    var extension = chunks.pop().toLowerCase();
-    var filename = chunks.join( '.' );
+		var chunks = file.name.split( '.' );
+		var extension = chunks.pop().toLowerCase();
+		var filename = chunks.join( '.' );
 
-    scope.parseFile( file, filename, extension );
+		scope.parseFile( file, filename, extension );
 
-  }, false );
+	}, false );
 
-  var timeout;
+	var timeout;
 
-  signals.sceneChanged.add( function ( scene ) {
+	signals.sceneChanged.add( function ( scene ) {
 
-    clearTimeout( timeout );
+		clearTimeout( timeout );
 
-    timeout = setTimeout( function () {
+		timeout = setTimeout( function () {
 
-      scope.saveLocalStorage( scene );
+			scope.saveLocalStorage( scene );
 
-    }, 3000 );
+		}, 3000 );
 
-  } );
+	} );
 
-  this.loadLocalStorage = function() {
+	this.loadLocalStorage = function() {
 
-    if ( localStorage.threejsEditor !== undefined ) {
+		if ( localStorage.threejsEditor !== undefined ) {
 
-      var loader = new THREE.ObjectLoader();
-      var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
+			var loader = new THREE.ObjectLoader();
+			var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
 
-      signals.sceneAdded.dispatch( scene );
+			signals.sceneAdded.dispatch( scene );
 
-    }
+		}
 
-  };
+	};
 
-  this.saveLocalStorage = function ( scene ) {
+	this.saveLocalStorage = function ( scene ) {
 
-    localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
+		localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
 
-  }
+	}
 
-  this.handleJSON = function ( data ) {
+	this.handleJSON = function ( data ) {
 
-    if ( data.metadata === undefined ) { // 2.0
+		if ( data.metadata === undefined ) { // 2.0
 
-      data.metadata = { type: 'geometry' };
+			data.metadata = { type: 'geometry' };
 
-    }
+		}
 
-    if ( data.metadata.type === undefined ) { // 3.0
+		if ( data.metadata.type === undefined ) { // 3.0
 
-      data.metadata.type = 'geometry';
+			data.metadata.type = 'geometry';
 
-    }
+		}
 
-    if ( data.metadata.version === undefined ) {
+		if ( data.metadata.version === undefined ) {
 
-      data.metadata.version = data.metadata.formatVersion;
+			data.metadata.version = data.metadata.formatVersion;
 
-    }
+		}
 
-    if ( data.metadata.type === 'geometry' ) {
+		if ( data.metadata.type === 'geometry' ) {
 
-      var loader = new THREE.JSONLoader();
-      var result = loader.parse( data );
+			var loader = new THREE.JSONLoader();
+			var result = loader.parse( data );
 
-      var geometry = result.geometry;
-      var material = result.materials !== undefined
-            ? new THREE.MeshFaceMaterial( result.materials )
-            : new THREE.MeshPhongMaterial();
+			var geometry = result.geometry;
+			var material = result.materials !== undefined
+						? new THREE.MeshFaceMaterial( result.materials )
+						: new THREE.MeshPhongMaterial();
 
-      geometry.sourceType = "ascii";
-      geometry.sourceFile = file.name;
+			geometry.sourceType = "ascii";
+			geometry.sourceFile = file.name;
 
-      var mesh = new THREE.Mesh( geometry, material );
-      mesh.name = filename;
+			var mesh = new THREE.Mesh( geometry, material );
+			mesh.name = filename;
 
-      signals.objectAdded.dispatch( mesh );
-      signals.objectSelected.dispatch( mesh );
+			signals.objectAdded.dispatch( mesh );
+			signals.objectSelected.dispatch( mesh );
 
-    } else if ( data.metadata.type === 'object' ) {
+		} else if ( data.metadata.type === 'object' ) {
 
-      var loader = new THREE.ObjectLoader();
-      var result = loader.parse( data );
+			var loader = new THREE.ObjectLoader();
+			var result = loader.parse( data );
 
-      if ( result instanceof THREE.Scene ) {
+			if ( result instanceof THREE.Scene ) {
 
-        signals.sceneAdded.dispatch( result );
+				signals.sceneAdded.dispatch( result );
 
-      } else {
+			} else {
 
-        signals.objectAdded.dispatch( result );
+				signals.objectAdded.dispatch( result );
 
-      }
+			}
 
-    } else if ( data.metadata.type === 'scene' ) {
+		} else if ( data.metadata.type === 'scene' ) {
 
-      // DEPRECATED
+			// DEPRECATED
 
-      var loader = new THREE.SceneLoader();
-      loader.parse( data, function ( result ) {
+			var loader = new THREE.SceneLoader();
+			loader.parse( data, function ( result ) {
 
-        var scene = result.scene;
+				var scene = result.scene;
 
-        while ( scene.children.length > 0 ) {
+				while ( scene.children.length > 0 ) {
 
-          signals.objectAdded.dispatch( scene.children[ 0 ] );
+					signals.objectAdded.dispatch( scene.children[ 0 ] );
 
-        }
+				}
 
-      }, '' );
+			}, '' );
 
-    }
+		}
 
-  };
+	};
 
-  this.parseFile = function ( file, filename, extension ) {
+	this.parseFile = function ( file, filename, extension ) {
 
-    switch ( extension ) {
+		switch ( extension ) {
 
-      case 'ctm':
+			case 'ctm':
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-          var contents = event.target.result;
+					var contents = event.target.result;
 
-          var stream = new CTM.Stream( contents );
-          stream.offset = 0;
+					var stream = new CTM.Stream( contents );
+					stream.offset = 0;
 
-          var loader = new THREE.CTMLoader();
-          loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
+					var loader = new THREE.CTMLoader();
+					loader.createModelClassic( new CTM.File( stream ), function( geometry ) {
 
-            geometry.sourceType = "ctm";
-            geometry.sourceFile = file.name;
+						geometry.sourceType = "ctm";
+						geometry.sourceFile = file.name;
 
-            var material = new THREE.MeshPhongMaterial();
+						var material = new THREE.MeshPhongMaterial();
 
-            var mesh = new THREE.Mesh( geometry, material );
-            mesh.name = filename;
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.name = filename;
 
-            signals.objectAdded.dispatch( mesh );
-            signals.objectSelected.dispatch( mesh );
+						signals.objectAdded.dispatch( mesh );
+						signals.objectSelected.dispatch( mesh );
 
-          } );
+					} );
 
-        }, false );
-        reader.readAsBinaryString( file );
+				}, false );
+				reader.readAsBinaryString( file );
 
-        break;
+				break;
 
-      case 'dae':
+			case 'dae':
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-          var contents = event.target.result;
+					var contents = event.target.result;
 
-          var parser = new DOMParser();
-          var xml = parser.parseFromString( contents, 'text/xml' );
+					var parser = new DOMParser();
+					var xml = parser.parseFromString( contents, 'text/xml' );
 
-          var loader = new THREE.ColladaLoader();
-          loader.parse( xml, function ( collada ) {
+					var loader = new THREE.ColladaLoader();
+					loader.parse( xml, function ( collada ) {
 
-            collada.scene.name = filename;
+						collada.scene.name = filename;
 
-            signals.objectAdded.dispatch( collada.scene );
-            signals.objectSelected.dispatch( collada.scene );
+						signals.objectAdded.dispatch( collada.scene );
+						signals.objectSelected.dispatch( collada.scene );
 
-          } );
+					} );
 
-        }, false );
-        reader.readAsText( file );
+				}, false );
+				reader.readAsText( file );
 
-        break;
+				break;
 
-      case 'js':
-      case 'json':
+			case 'js':
+			case 'json':
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-          var contents = event.target.result;
+					var contents = event.target.result;
 
-          // 2.0
+					// 2.0
 
-          if ( contents.indexOf( 'postMessage' ) !== -1 ) {
+					if ( contents.indexOf( 'postMessage' ) !== -1 ) {
 
-            var blob = new Blob( [ contents ], { type: 'text/javascript' } );
-            var url = URL.createObjectURL( blob );
+						var blob = new Blob( [ contents ], { type: 'text/javascript' } );
+						var url = URL.createObjectURL( blob );
 
-            var worker = new Worker( url );
+						var worker = new Worker( url );
 
-            worker.onmessage = function ( event ) {
+						worker.onmessage = function ( event ) {
 
-              event.data.metadata = { version: 2 };
-              scope.handleJSON( event.data );
+							event.data.metadata = { version: 2 };
+							scope.handleJSON( event.data );
 
-            };
+						};
 
-            worker.postMessage( Date.now() );
+						worker.postMessage( Date.now() );
 
-            return;
+						return;
 
-          }
+					}
 
-          // >= 3.0
+					// >= 3.0
 
-          var data;
+					var data;
 
-          try {
+					try {
 
-            data = JSON.parse( contents );
+						data = JSON.parse( contents );
 
-          } catch ( error ) {
+					} catch ( error ) {
 
-            alert( error );
-            return;
+						alert( error );
+						return;
 
-          }
+					}
 
-          scope.handleJSON( data );
+					scope.handleJSON( data );
 
-        }, false );
-        reader.readAsText( file );
+				}, false );
+				reader.readAsText( file );
 
-        break;
+				break;
 
-      case 'obj':
+			case 'obj':
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-          var contents = event.target.result;
+					var contents = event.target.result;
 
-          var object = new THREE.OBJLoader().parse( contents );
-          object.name = filename;
+					var object = new THREE.OBJLoader().parse( contents );
+					object.name = filename;
 
-          signals.objectAdded.dispatch( object );
-          signals.objectSelected.dispatch( object );
+					signals.objectAdded.dispatch( object );
+					signals.objectSelected.dispatch( object );
 
-        }, false );
-        reader.readAsText( file );
+				}, false );
+				reader.readAsText( file );
 
-        break;
+				break;
 
-      case 'ply':
+			case 'ply':
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-          var contents = event.target.result;
+					var contents = event.target.result;
 
-          console.log( contents );
+					console.log( contents );
 
-          var geometry = new THREE.PLYLoader().parse( contents );
-          geometry.sourceType = "ply";
-          geometry.sourceFile = file.name;
+					var geometry = new THREE.PLYLoader().parse( contents );
+					geometry.sourceType = "ply";
+					geometry.sourceFile = file.name;
 
-          var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshPhongMaterial();
 
-          var mesh = new THREE.Mesh( geometry, material );
-          mesh.name = filename;
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.name = filename;
 
-          signals.objectAdded.dispatch( mesh );
-          signals.objectSelected.dispatch( mesh );
+					signals.objectAdded.dispatch( mesh );
+					signals.objectSelected.dispatch( mesh );
 
-        }, false );
-        reader.readAsText( file );
+				}, false );
+				reader.readAsText( file );
 
-        break;
+				break;
 
-      case 'stl':
+			case 'stl':
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-          var contents = event.target.result;
+					var contents = event.target.result;
 
-          var geometry = new THREE.STLLoader().parse( contents );
-          geometry.sourceType = "stl";
-          geometry.sourceFile = file.name;
+					var geometry = new THREE.STLLoader().parse( contents );
+					geometry.sourceType = "stl";
+					geometry.sourceFile = file.name;
 
-          var material = new THREE.MeshPhongMaterial();
+					var material = new THREE.MeshPhongMaterial();
 
-          var mesh = new THREE.Mesh( geometry, material );
-          mesh.name = filename;
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.name = filename;
 
-          signals.objectAdded.dispatch( mesh );
-          signals.objectSelected.dispatch( mesh );
+					signals.objectAdded.dispatch( mesh );
+					signals.objectSelected.dispatch( mesh );
 
-        }, false );
-        
-        if (reader.readAsBinaryString) {
+				}, false );
 
-            reader.readAsBinaryStrings(file);
+				if ( reader.readAsBinaryString !== undefined ) {
 
-        } else {
-            
-            reader.readAsArrayBuffer(file);
-            
-        }
-            
-        break;
+					reader.readAsBinaryString( file );
 
-      /*
-      case 'utf8':
+				} else {
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+					reader.readAsArrayBuffer( file );
 
-          var contents = event.target.result;
+				}
 
-          var geometry = new THREE.UTF8Loader().parse( contents );
-          var material = new THREE.MeshLambertMaterial();
+				break;
 
-          var mesh = new THREE.Mesh( geometry, material );
+			/*
+			case 'utf8':
 
-          signals.objectAdded.dispatch( mesh );
-          signals.objectSelected.dispatch( mesh );
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-        }, false );
-        reader.readAsBinaryString( file );
+					var contents = event.target.result;
 
-        break;
-      */
+					var geometry = new THREE.UTF8Loader().parse( contents );
+					var material = new THREE.MeshLambertMaterial();
 
-      case 'vtk':
+					var mesh = new THREE.Mesh( geometry, material );
 
-        var reader = new FileReader();
-        reader.addEventListener( 'load', function ( event ) {
+					signals.objectAdded.dispatch( mesh );
+					signals.objectSelected.dispatch( mesh );
 
-          var contents = event.target.result;
+				}, false );
+				reader.readAsBinaryString( file );
 
-          var geometry = new THREE.VTKLoader().parse( contents );
-          geometry.sourceType = "vtk";
-          geometry.sourceFile = file.name;
+				break;
+			*/
 
-          var material = new THREE.MeshPhongMaterial();
+			case 'vtk':
 
-          var mesh = new THREE.Mesh( geometry, material );
-          mesh.name = filename;
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
 
-          signals.objectAdded.dispatch( mesh );
-          signals.objectSelected.dispatch( mesh );
+					var contents = event.target.result;
 
-        }, false );
-        reader.readAsText( file );
+					var geometry = new THREE.VTKLoader().parse( contents );
+					geometry.sourceType = "vtk";
+					geometry.sourceFile = file.name;
 
-        break;
+					var material = new THREE.MeshPhongMaterial();
 
-    }
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.name = filename;
 
-  }
+					signals.objectAdded.dispatch( mesh );
+					signals.objectSelected.dispatch( mesh );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+		}
+
+	}
 
 }
