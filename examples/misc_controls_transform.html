@@ -35,7 +35,7 @@
 		<script>
 
 			var camera, scene, renderer;
-			var grid, box;
+			var controls = [];
 
 			init();
 			render();
@@ -54,44 +54,30 @@
 				camera.lookAt( new THREE.Vector3( 0, 700, 0 ) );
 
 				scene = new THREE.Scene();
+				scene.add( new THREE.GridHelper( 500, 100 ) );
 
 				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif', new THREE.UVMapping(), render );
 				texture.anisotropy = renderer.getMaxAnisotropy();
 
-				grid = new THREE.Mesh(
-					new THREE.PlaneGeometry( 1000, 1000, 10, 10 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe:true } )
-				);
-				grid.rotation.x = Math.PI/2;
-				scene.add(grid);
+				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
-				box = [];
+				var parent = scene;
 
-				box[0] = new THREE.Mesh(
-					new THREE.CubeGeometry( 200, 200, 200 ),
-					new THREE.MeshBasicMaterial( { map: texture } )
-				);
-				box[0].position.set( 0, 100, 0 );
-				scene.add( box[0] );
+				for ( var i = 0; i < 4; i ++ ) {
 
-				box[1] = box[0].clone();
-				box[1].position.set( 0, 350, 0 );
-				box[0].add( box[1] );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.position.y = i > 0 ? 350 : 100;
+					parent.add( mesh );
 
-				box[2] = box[1].clone();
-				box[2].position.set( 0, 350, 0 );
-				box[1].add( box[2] );
+					var control = new THREE.TransformControls( camera, renderer.domElement );
+					control.addEventListener( 'change', render );
+					control.attatch( mesh );
+					scene.add( control.gizmo );
 
-				box[3] = box[2].clone();
-				box[3].position.set( 0, 350, 0 );
-				box[2].add( box[3] );
+					controls.push( control );
 
-				for ( var i = 0; i < box.length; i++ ){
-
-					var translateLocal = new THREE.TransformControls( camera, renderer.domElement );
-					translateLocal.addEventListener( 'change', render );
-					scene.add( translateLocal.gizmo );
-					translateLocal.attatch( box[i] );
+					parent = mesh;
 
 				}
 
@@ -106,11 +92,18 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
 			function render() {
 
-				// requestAnimationFrame( animate );
+				for ( var i = 0, j = controls.length; i < j; i ++ ) {
+
+					controls[ i ].update();
+
+				}
+
 				renderer.render( scene, camera );
 
 			}
