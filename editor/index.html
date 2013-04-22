@@ -16,6 +16,14 @@
 				border-top: 1px solid #ccc;
 			}
 
+			button {
+
+				position: relative;
+				left: -3px;
+				top: -3px;
+
+			}
+
 			.menubar {
 				background-color: #eee;
 				padding: 0px;
@@ -139,7 +147,7 @@
 
 				// notifications
 
-				modifierAxisChanged: new SIGNALS.Signal(),
+				transformModeChanged: new SIGNALS.Signal(),
 				snapChanged: new SIGNALS.Signal(),
 				rendererChanged: new SIGNALS.Signal(),
 				sceneAdded: new SIGNALS.Signal(),

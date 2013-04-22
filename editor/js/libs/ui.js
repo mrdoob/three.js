@@ -955,7 +955,7 @@ UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
 
 // Button
 
-UI.Button = function () {
+UI.Button = function ( value ) {
 
 	UI.Element.call( this );
 
@@ -965,6 +965,7 @@ UI.Button = function () {
 	dom.className = 'Button';
 
 	this.dom = dom;
+	this.dom.textContent = value;
 
 	return this;
 

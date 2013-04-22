@@ -189,9 +189,11 @@ var Viewport = function ( signals ) {
 
 	// signals
 
-	signals.modifierAxisChanged.add( function ( axis ) {
+	signals.transformModeChanged.add( function ( mode ) {
 
-		transformControls.modifierAxis.copy( axis );
+		transformControls.mode = mode;
+		transformControls.updateMode();
+		render();
 
 	} );
 
