@@ -553,7 +553,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 			scope.updateGizmo();
 
-			intersect = intersectObjects( pickerAxes[scope.mode].children );
+			intersect = intersectObjects( event, pickerAxes[scope.mode].children );
 
 			if ( intersect ) {
 
@@ -561,7 +561,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				scope.setIntersectionPlane();
 
-				planeIntersect = intersectObjects( [intersectionPlanes[currentPlane]] );
+				planeIntersect = intersectObjects( event, [intersectionPlanes[currentPlane]] );
 
 				if ( planeIntersect ) {
 
@@ -592,7 +592,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( scope.active ) {
 
-			planeIntersect = intersectObjects( [intersectionPlanes[currentPlane]] );
+			planeIntersect = intersectObjects( event, [intersectionPlanes[currentPlane]] );
 
 			if ( planeIntersect ) {
 
@@ -803,7 +803,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	}
 
-	function intersectObjects( objects ) {
+	function intersectObjects( event, objects ) {
 
 		pointerVector.set(
 			( event.layerX / scope.domElement.offsetWidth ) * 2 - 1,
