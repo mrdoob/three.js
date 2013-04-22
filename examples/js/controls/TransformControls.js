@@ -553,8 +553,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		event.preventDefault();
 
-		scope.domElement.focus();
-
 		if ( event.button === 0 ) {
 
 			intersect = intersectObjects( event, pickerAxes[scope.mode].children );
@@ -765,6 +763,10 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onKeyDown( event ) {
 
+		var currentMode = scope.mode;
+		var currentSpace = scope.space;
+		var currentScale = scope.scale;
+
 		if ( event.keyCode == 87 ) { // W
 
 			if ( scope.mode == 'translate' ) scope.space = ( scope.space == 'world' ) ? 'local' : 'world';
@@ -799,8 +801,12 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		scope.setMode( scope.mode );
-		scope.dispatchEvent( changeEvent );
+		if ( scope.mode !== currentMode || scope.space !== currentSpace || scope.scale !== currentScale ) {
+
+			scope.setMode( scope.mode );
+			scope.dispatchEvent( changeEvent );
+
+		}
 
 	}
 

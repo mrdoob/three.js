@@ -98,8 +98,6 @@ var Viewport = function ( signals ) {
 
 		event.preventDefault();
 
-		container.dom.focus();
-
 		onMouseDownPosition.set( event.layerX, event.layerY );
 
 		setTimeout( function (){
