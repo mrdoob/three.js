@@ -184,6 +184,7 @@ var Viewport = function ( signals ) {
 	controls.addEventListener( 'change', function () {
 
 		signals.objectChanged.dispatch( camera );
+		transformControls.update();
 
 	} );
 
@@ -191,8 +192,7 @@ var Viewport = function ( signals ) {
 
 	signals.transformModeChanged.add( function ( mode ) {
 
-		transformControls.mode = mode;
-		transformControls.updateMode();
+		transformControls.setMode( mode );
 		render();
 
 	} );
@@ -345,6 +345,7 @@ var Viewport = function ( signals ) {
 		if ( object.geometry !== undefined ) {
 
 			selectionBox.update( object );
+			transformControls.update();
 			updateInfo();
 
 		}

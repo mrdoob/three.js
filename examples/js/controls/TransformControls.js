@@ -350,11 +350,10 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	}
 
-
 	this.attatch = function ( object ) {
 
 		this.object = object;
-	 	this.updateMode();
+	 	this.setMode( scope.mode );
 
 		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 		document.addEventListener( 'keydown', onKeyDown, false );
@@ -370,7 +369,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	}
 
-	this.updateGizmo = function() {
+	this.update = function () {
 
 		this.object.updateMatrixWorld();
 		worldPosition.getPositionFromMatrix( this.object.matrixWorld );
@@ -478,7 +477,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	}
 
-	this.updateMode = function() {
+	this.setMode = function ( value ) {
+
+		scope.mode = value;
 
 		this.hide();
 
@@ -496,7 +497,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	 	}
 
-	 	scope.updateGizmo();
+	 	scope.update();
 
 	}
 
@@ -544,7 +545,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		scope.updateGizmo();
+		scope.update();
 
 	}
 
@@ -554,11 +555,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		scope.domElement.focus();
 
-		scope.updateGizmo();
-
 		if ( event.button === 0 ) {
-
-			scope.updateGizmo();
 
 			intersect = intersectObjects( event, pickerAxes[scope.mode].children );
 
@@ -751,7 +748,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 			}
 
-			scope.updateGizmo();
+			scope.update();
 			scope.dispatchEvent( changeEvent );
 
 		}
@@ -770,7 +767,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onKeyDown( event ) {
 
- 
 		if ( event.keyCode == 87 ) { // W
 
 			if ( scope.mode == 'translate' ) scope.space = ( scope.space == 'world' ) ? 'local' : 'world';
@@ -805,7 +801,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		scope.updateMode();
+		scope.setMode( scope.mode );
 		scope.dispatchEvent( changeEvent );
 
 	}
