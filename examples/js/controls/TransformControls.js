@@ -588,7 +588,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
-		document.addEventListener( 'mouseout', onMouseUp, false );
 
 	};
 
@@ -761,7 +760,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
-		document.removeEventListener( 'mouseout', onMouseUp, false );
 
 	}
 
