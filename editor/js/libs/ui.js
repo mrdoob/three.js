@@ -206,6 +206,12 @@ UI.TextArea = function () {
 	dom.style.marginLeft = '-2px';
 	dom.style.border = '1px solid #ccc';
 
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
+
 	this.dom = dom;
 
 	return this;
@@ -525,6 +531,12 @@ UI.Number = function ( number ) {
 	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
+
 	this.min = - Infinity;
 	this.max = Infinity;
 
@@ -678,6 +690,12 @@ UI.Integer = function ( number ) {
 	dom.style.padding = '2px';
 	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
+
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
 
 	this.min = - Infinity;
 	this.max = Infinity;
