@@ -3,7 +3,7 @@
  * @author Larry Battle / http://bateru.com/news
  */
 
-var THREE = THREE || { REVISION: '58' };
+var THREE = THREE || { REVISION: '59dev' };
 
 self.console = self.console || {
 
@@ -6279,6 +6279,11 @@ THREE.Object3D = function () {
 THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	applyMatrix: function () {
 
@@ -34315,11 +34320,10 @@ THREE.GridHelper = function ( size, step ) {
 
 	for ( var i = - size; i <= size; i += step ) {
 
-		geometry.vertices.push( new THREE.Vector3( -size, 0, i ) );
-		geometry.vertices.push( new THREE.Vector3(  size, 0, i ) );
-
-		geometry.vertices.push( new THREE.Vector3( i, 0, -size ) );
-		geometry.vertices.push( new THREE.Vector3( i, 0,  size ) );
+		geometry.vertices.push(
+			new THREE.Vector3( - size, 0, i ), new THREE.Vector3( size, 0, i ),
+			new THREE.Vector3( i, 0, - size ), new THREE.Vector3( i, 0, size )
+		);
 
 		var color = i === 0 ? color1 : color2;
 
