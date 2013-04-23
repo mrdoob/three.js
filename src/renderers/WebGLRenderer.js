@@ -20,6 +20,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+	_occlusionCulling = parameters.occlusionCulling !== undefined ? parameters.occlusionCulling : false,
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -167,6 +168,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_projScreenMatrix = new THREE.Matrix4(),
 	_projScreenMatrixPS = new THREE.Matrix4(),
+	_objectProjScreenMatrix = new THREE.Matrix4(),
+	
+	_occlusionBuffers = null,
 
 	_vector3 = new THREE.Vector3(),
 
@@ -331,6 +335,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
+		setupOcclusionBuffers( );
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
@@ -4121,7 +4126,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setDepthWrite( material.depthWrite );
 			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
 			
-//			occludeObjects( scene.__webglObjects );
+			occludeObjects( scene.__webglObjects );
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
@@ -4134,8 +4139,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			this.setBlending( THREE.NoBlending );
 			
-//			occludeObjects( scene.__webglObjects );
-
+			occludeObjects( scene.__webglObjects );
+				
 			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false, material );
 
@@ -4210,42 +4215,269 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 	
+	function setupOcclusionBuffers ( ) {
+		
+		if ( !_occlusionCulling ) return;
+			
+		_occlusionBuffers = [];
+
+		for ( var i = 0, bufferWidth = _viewportWidth, bufferHeight = _viewportHeight; bufferWidth > 1 || bufferHeight > 1 ; i++, bufferWidth = ((bufferWidth + 1) & ~1) >> 1, bufferHeight = ((bufferHeight + 1) & ~1) >> 1 ) {
+
+			var buffer;
+
+			if ( typeof Uint16Array !== 'undefined' ) {
+				
+				buffer = new Uint16Array(bufferWidth * bufferHeight);
+				
+			}
+			else {
+				
+				buffer = [];
+				buffer.length = bufferWidth * bufferHeight;
+				
+			}
+
+			_occlusionBuffers.push(buffer);
+			
+		}
+		
+	}
+	
+	function clearOcclusionBuffers ( ) {
+		
+		var buffer;
+		
+		for ( var i = 0; i < _occlusionBuffers.length ; i++) {
+			
+			buffer = _occlusionBuffers[ i ];
+			
+			for (var j = 0, bufferLength = buffer.length; j < bufferLength ; j++ ) {
+				
+				buffer[j] = 0xffff;
+				
+			}
+			
+		}
+		
+	}
+	
 	function occludeObjects ( renderList ) {
 		
-		var webglObject, object;
+		if ( ! _occlusionCulling ) return;
+		
+		var webglObject, object, positions;
 		
 		var anyOccludersProcessed = false;
 		
+		var debugCanvas = window.overlayCanvas, debugContext;
+		if (debugCanvas) {
+			debugCanvas.width = _viewportWidth;
+			debugCanvas.height = _viewportHeight;
+			debugContext = debugCanvas.getContext('2d');
+			debugContext.fillStyle = 'rgba(0,0,0,0)';
+			debugContext.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+
+			debugContext.fillStyle = 'rgba(255,0,255,0.25)';
+		}
+		
+		var halfWidth = _viewportWidth / 2;
+		var halfHeight = _viewportHeight / 2;
+		
+		var pa = new THREE.Vector3();
+		var pb = new THREE.Vector3();
+		var pc = new THREE.Vector3();
+		
+		function sortByY() {
+			var temp;
+			if (pa.y < pb.y) {
+				if (pc.y < pa.y) {
+					temp = pa;
+					pa = pc;
+					pc = temp;
+				}
+			}
+			else {
+				if (pb.y < pc.y) {
+					temp = pa;
+					pa = pb;
+					pb = temp;
+				}
+				else {
+					temp = pa;
+					pa = pc;
+					pc = temp;
+				}
+			}
+			if (pc.y < pb.y) {
+				temp = pb;
+				pb = pc;
+				pc = temp;
+			}
+		}
+		
 		for (var i = 0, end = renderList.length; i !== end; i++) {
+			
 			webglObject = renderList[ i ];
 			object = webglObject.object;
 			
 			if (webglObject.render && ((object.occludable && anyOccludersProcessed) || object.occluder)) {
 				
-				//TODO: Calculate object's screen matrix from _projScreenMatrix
+				object.updateMatrixWorld();
+				
+				_objectProjScreenMatrix.multiplyMatrices(_projScreenMatrix, object.matrixWorld);
 				
 				if (object.occludable && anyOccludersProcessed) {
-					//Project vertices (OR optionally bounding box corners) into view space
-					//Test each point against each level of occlusionBuffer mipmap from broadest to narrowest
-					//If any vertex closer than occlusionBuffer point, stop testing, we have to draw
-					//If all vertices further than Z value, object is occluded!
+					
+					if (object instanceof THREE.Mesh && object.geometry instanceof THREE.BufferGeometry && !object.geometry.attributes.index) {
+						//Project vertices (OR optionally bounding box corners) into view space
+						//Test each point against each level of occlusionBuffer mipmap from broadest to narrowest
+						//If any vertex closer than occlusionBuffer point, stop testing, we have to draw
+						//If all vertices further than Z value, object is occluded!
+						
+					}
+					else {
+						console.log("Unsupported occludable");
+					}
+					
 				}
 				if (object.occluder) {
-					console.log("Occluder positions: ", object.geometryAttributes.position.buffer);
-					if (!anyOccludersProcessed) {
-						//Ensure occlusion buffer exists
-						//Create mipmapped occlusionBuffers array, one element per pixel
-						//Clear occlusionBuffers with far plane value
+					
+					if (object instanceof THREE.Mesh && object.geometry instanceof THREE.BufferGeometry && !object.geometry.attributes.index) {
+						
+						if (!anyOccludersProcessed) {
+							
+							if ( ! _occlusionBuffers ) {
+								
+								setupOcclusionBuffers();
+								
+							}
+							
+							clearOcclusionBuffers();
+						}
+						
+						//Project vertices into view space
+						positions = object.geometry.attributes.position.array;
+						
+						for ( var j = 0, k = 0, numElements = positions.length ; j + 8 < numElements ; j += 9, k = j ) {
+							
+							//Project triangle corners, skip near the near/far planes for simplicity
+							pa.set(	positions[ k++ ], positions[ k++ ], positions[ k++ ]).applyProjection(_objectProjScreenMatrix); 
+							if (pa.z <= 0 || pa.z >= 1) continue;
+							
+							pb.set(	positions[ k++ ], positions[ k++ ], positions[ k++ ]).applyProjection(_objectProjScreenMatrix);
+							if (pb.z <= 0 || pb.z >= 1) continue;
+							
+							pc.set(	positions[ k++ ], positions[ k++ ], positions[ k++ ]).applyProjection(_objectProjScreenMatrix);
+							if (pc.z <= 0 || pc.z >= 1) continue;
+							
+							//Check off-screen
+							if ((pa.x <= -1 && pb.x <= -1 && pc.x <= -1) || 
+								(pa.y <= -1 && pb.y <= -1 && pc.y <= -1) || 
+								(pa.x >= 1 && pb.x >= 1 && pc.x >= 1) || 
+								(pa.y >= 1 && pb.y >= 1 && pc.y >= 1)) {
+							
+								continue;
+							
+							}
+								
+							//Check winding - skip back-facing triangles
+							var vabx = pb.x - pa.x;
+							var vaby = pb.y - pa.y;
+							var vacx = pc.x - pa.x;
+							var vacy = pc.y - pa.y;
+							if (vabx * vacy <= vaby * vacx) {
+								continue;
+							}
+							
+							//Convert to screen coordinates
+							pa.x = (halfWidth  + pa.x * halfWidth );
+							pa.y = (halfHeight - pa.y * halfHeight);
+							pb.x = (halfWidth  + pb.x * halfWidth );
+							pb.y = (halfHeight - pb.y * halfHeight);
+							pc.x = (halfWidth  + pc.x * halfWidth );
+							pc.y = (halfHeight - pc.y * halfHeight);
+							
+							var max_z = pa.z;
+							if (pb.z > max_z) max_z = pb.z;
+							if (pc.z > max_z) max_z = pc.z;
+
+							sortByY();
+							
+							var y0 = pa.y;
+							var y1 = pb.y;
+							var y2 = pc.y;
+							
+							vabx = pb.x - pa.x;
+							vaby = pb.y - pa.y;
+							vacx = pc.x - pa.x;
+							vacy = pc.y - pa.y;
+							
+							//Figure out left/right
+							var grad_ab = vabx / vaby;
+							var grad_ac = vacx / vacy;
+							var grad_l0, grad_r0, grad_l1, grad_r1;
+							if (grad_ab < grad_ac) {
+								grad_l0 = grad_ab;
+								grad_r0 = grad_ac;
+								grad_l1 = (pc.x - pb.x) / (pc.y - pb.y);
+								grad_r1 = grad_ac;
+							}
+							else {
+								grad_r0 = grad_ab;
+								grad_l0 = grad_ac;
+								grad_r1 = (pc.x - pb.x) / (pc.y - pb.y);
+								grad_l1 = grad_ac;
+							}
+							
+							var y, xl, xr;
+							for (y = y0, xl = pa.x, xr = pa.x; y <= y1; y++, xl += grad_l0, xr += grad_r0) {
+								
+								debugContext.fillRect(xl, y, xr-xl, 1);
+//								for (var x = x0; x <= x1; x++) {
+//									debugContext.fillRect(x, y, 1, 1);
+//								}
+							}
+							for (; y <= y2; y++, xl += grad_l1, xr += grad_r1) {
+								
+								debugContext.fillRect(xl, y, xr-xl, 1);
+//								for (var x = x0; x <= x1; x++) {
+//									debugContext.fillRect(x, y, 1, 1);
+//								}
+								
+							}
+							
+							
+							//Rasterize triangles, for each pixel, if closer than occlusionBuffer value:
+								//Set finest occlusionBuffers Z value
+								//If there were any changes to occlusion buffer, propagate changes along coarser mipmaps
+								
+							if (debugContext) {
+								function debugVec(v) {
+									debugContext.fillText(v.x.toFixed(1) + "," + v.y.toFixed(1) + "," + ((v.z * 0x10000)|0), v.x, v.y);
+								}
+								debugVec(pa);
+								debugVec(pb);
+								debugVec(pc);
+							}
+							break;
+//							console.log("Screen positions: " + _vector3.x.toFixed(2) + "," + _vector3.y.toFixed(2) + "," + _vector3.z.toFixed(2) );
+						}
+						
+						anyOccludersProcessed = true;
+						
 					}
-					//Project vertices into view space
-					//Rasterize triangles, for each pixel, if closer than occlusionBuffer value:
-						//Set finest occlusionBuffers Z value
-						//If there were any changes to occlusion buffer, propagate changes along coarser mipmaps
-					anyOccludersProcessed = true;
+					else {
+						
+						console.log("Unsupported occludable");
+						
+					}
+					
 				}
 				
 			}
+			
 		}
+		
 	}
 
 	function renderObjects ( renderList, reverse, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
