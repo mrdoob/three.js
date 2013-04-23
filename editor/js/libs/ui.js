@@ -162,6 +162,12 @@ UI.Input = function () {
 	dom.style.marginLeft = '-2px';
 	dom.style.border = '1px solid #ccc';
 
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
+
 	this.dom = dom;
 
 	return this;
