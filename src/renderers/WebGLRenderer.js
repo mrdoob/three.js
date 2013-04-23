@@ -4120,6 +4120,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setDepthTest( material.depthTest );
 			this.setDepthWrite( material.depthWrite );
 			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+			
+//			occludeObjects( scene.__webglObjects );
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
@@ -4131,6 +4133,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// opaque pass (front-to-back order)
 
 			this.setBlending( THREE.NoBlending );
+			
+//			occludeObjects( scene.__webglObjects );
 
 			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false, material );
@@ -4205,6 +4209,44 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 	};
+	
+	function occludeObjects ( renderList ) {
+		
+		var webglObject, object;
+		
+		var anyOccludersProcessed = false;
+		
+		for (var i = 0, end = renderList.length; i !== end; i++) {
+			webglObject = renderList[ i ];
+			object = webglObject.object;
+			
+			if (webglObject.render && ((object.occludable && anyOccludersProcessed) || object.occluder)) {
+				
+				//TODO: Calculate object's screen matrix from _projScreenMatrix
+				
+				if (object.occludable && anyOccludersProcessed) {
+					//Project vertices (OR optionally bounding box corners) into view space
+					//Test each point against each level of occlusionBuffer mipmap from broadest to narrowest
+					//If any vertex closer than occlusionBuffer point, stop testing, we have to draw
+					//If all vertices further than Z value, object is occluded!
+				}
+				if (object.occluder) {
+					console.log("Occluder positions: ", object.geometryAttributes.position.buffer);
+					if (!anyOccludersProcessed) {
+						//Ensure occlusion buffer exists
+						//Create mipmapped occlusionBuffers array, one element per pixel
+						//Clear occlusionBuffers with far plane value
+					}
+					//Project vertices into view space
+					//Rasterize triangles, for each pixel, if closer than occlusionBuffer value:
+						//Set finest occlusionBuffers Z value
+						//If there were any changes to occlusion buffer, propagate changes along coarser mipmaps
+					anyOccludersProcessed = true;
+				}
+				
+			}
+		}
+	}
 
 	function renderObjects ( renderList, reverse, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
 
