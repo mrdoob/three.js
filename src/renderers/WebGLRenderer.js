@@ -21,6 +21,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 	_occlusionCulling = parameters.occlusionCulling !== undefined ? parameters.occlusionCulling : false,
+	_occlusionBufferWidth = parameters.occlusionBufferWidth !== undefined ? parameters.occlusionBufferWidth : 256,
+	_occlusionBufferHeight = parameters.occlusionBufferHeight !== undefined ? parameters.occlusionBufferHeight : 256,
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -170,7 +172,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_projScreenMatrixPS = new THREE.Matrix4(),
 	_objectProjScreenMatrix = new THREE.Matrix4(),
 	
-	_occlusionBuffers = null,
+	_occlusionBuffer = null,
 
 	_vector3 = new THREE.Vector3(),
 
@@ -4218,27 +4220,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setupOcclusionBuffers ( ) {
 		
 		if ( !_occlusionCulling ) return;
-			
-		_occlusionBuffers = [];
 
-		for ( var i = 0, bufferWidth = _viewportWidth, bufferHeight = _viewportHeight; bufferWidth > 1 || bufferHeight > 1 ; i++, bufferWidth = ((bufferWidth + 1) & ~1) >> 1, bufferHeight = ((bufferHeight + 1) & ~1) >> 1 ) {
+		var length = _occlusionBufferWidth * _occlusionBufferHeight;
+		
+		if ( typeof Uint16Array !== 'undefined' ) {
 
-			var buffer;
+			_occlusionBuffer = new Uint16Array(length);
 
-			if ( typeof Uint16Array !== 'undefined' ) {
-				
-				buffer = new Uint16Array(bufferWidth * bufferHeight);
-				
-			}
-			else {
-				
-				buffer = [];
-				buffer.length = bufferWidth * bufferHeight;
-				
+		}
+		else {
+
+			_occlusionBuffer = [];
+			while (length -- > 0) {
+				_occlusionBuffer.push(0);
 			}
 
-			_occlusionBuffers.push(buffer);
-			
 		}
 		
 	}
@@ -4247,16 +4243,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		var buffer;
 		
-		for ( var i = 0; i < _occlusionBuffers.length ; i++) {
-			
-			buffer = _occlusionBuffers[ i ];
-			
-			for (var j = 0, bufferLength = buffer.length; j < bufferLength ; j++ ) {
-				
-				buffer[j] = 0xffff;
-				
-			}
-			
+		buffer = _occlusionBuffer;
+
+		for (var j = 0, bufferLength = buffer.length; j < bufferLength ; j++ ) {
+
+			buffer[j] = 0xffff;
+
 		}
 		
 	}
@@ -4270,37 +4262,56 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var anyOccludersProcessed = false;
 		
 		var debugCanvas = window.overlayCanvas, debugContext, debugImageData;
-		var buffer = _occlusionBuffers[0];
+		var buffer = _occlusionBuffer;
 		if (debugCanvas) {
-			debugCanvas.width = _viewportWidth;
-			debugCanvas.height = _viewportHeight;
+			debugCanvas.width = _occlusionBufferWidth;
+			debugCanvas.height = _occlusionBufferHeight;
 			debugContext = debugCanvas.getContext('2d');
 			debugContext.fillStyle = 'rgba(0,0,0,0)';
-			debugContext.clearRect(0, 0, debugCanvas.width, debugCanvas.height);
+			debugContext.clearRect(0, 0, _occlusionBufferWidth, _occlusionBufferHeight);
 
 			debugContext.fillStyle = 'rgba(255,0,255,0.25)';
-			debugImageData = debugContext.createImageData(_viewportWidth, _viewportHeight);
+			debugImageData = debugContext.createImageData(_occlusionBufferWidth, _occlusionBufferHeight);
 			buffer = debugImageData.data;
 		}
-		
-		var halfWidth = _viewportWidth / 2;
-		var halfHeight = _viewportHeight / 2;
 		
 		var pa = new THREE.Vector3();
 		var pb = new THREE.Vector3();
 		var pc = new THREE.Vector3();
 		
-		function sortByY() {
+		function fillTriangle(pa, pb, pc, buff, buffWidth, buffHeight) {
+		
+			//Check off-screen
+			if ((pa.x <= -1 && pb.x <= -1 && pc.x <= -1) || 
+				(pa.y <= -1 && pb.y <= -1 && pc.y <= -1) || 
+				(pa.x >= 1 && pb.x >= 1 && pc.x >= 1) || 
+				(pa.y >= 1 && pb.y >= 1 && pc.y >= 1)) {
+
+				return;
+
+			}
+
+			//Check winding - skip back-facing triangles
+			var vabx = pb.x - pa.x;
+			var vaby = pb.y - pa.y;
+			var vacx = pc.x - pa.x;
+			var vacy = pc.y - pa.y;
+			if (vabx * vacy <= vaby * vacx) {
+
+				return;
+
+			}
+			
 			var temp;
-			if (pa.y < pb.y) {
-				if (pc.y < pa.y) {
+			if (pa.y > pb.y) {
+				if (pc.y > pa.y) {
 					temp = pa;
 					pa = pc;
 					pc = temp;
 				}
 			}
 			else {
-				if (pb.y < pc.y) {
+				if (pb.y > pc.y) {
 					temp = pa;
 					pa = pb;
 					pb = temp;
@@ -4311,10 +4322,157 @@ THREE.WebGLRenderer = function ( parameters ) {
 					pc = temp;
 				}
 			}
-			if (pc.y < pb.y) {
+			if (pc.y > pb.y) {
 				temp = pb;
 				pb = pc;
 				pc = temp;
+			}
+		
+			var halfWidth = buffWidth / 2;
+			var halfHeight = buffHeight / 2;
+
+			//Convert to screen coordinates
+			var pax = Math.round(halfWidth  + pa.x * halfWidth )|0,
+				pay = Math.round(halfHeight - pa.y * halfHeight)|0,
+				paz = (pa.z*0x10000)|0,
+				pbx = Math.round(halfWidth  + pb.x * halfWidth )|0,
+				pby = Math.round(halfHeight - pb.y * halfHeight)|0,
+				pbz = (pb.z*0x10000)|0,
+				pcx = Math.round(halfWidth  + pc.x * halfWidth )|0,
+				pcy = Math.round(halfHeight - pc.y * halfHeight)|0,
+				pcz = (pc.z*0x10000)|0;
+
+			var max_z = paz, min_z = paz;
+			if (pbz > max_z) max_z = pbz; else if (pbz < min_z) min_z = pbz;
+			if (pcz > max_z) max_z = pcz; else if (pcz < min_z) min_z = pcz;
+
+			var y0 = pay;
+			var y1 = pby;
+			var y2 = pcy;
+
+			vabx = pbx - pax;
+			vaby = pby - pay;
+			vacx = pcx - pax;
+			vacy = pcy - pay;
+
+			//Figure out left/right
+			var grad_ab16 = ((vabx<<16) / vaby)|0;
+			var grad_ac16 = ((vacx<<16) / vacy)|0;
+			var grad_l16, grad_r16;
+			if (grad_ab16 < grad_ac16) {
+				grad_l16 = grad_ab16;
+				grad_r16 = grad_ac16;
+			}
+			else {
+				grad_r16 = grad_ab16;
+				grad_l16 = grad_ac16;
+			}
+
+			function fillrow(buff, yoff, xl16, xr16, max_z) {
+//									debugContext.fillRect(xl, y, xr-xl, 1);
+				var x = (xl16 >> 16) + 1;
+				if (xl16 < 0) x = 0;
+				var xstop = xr16 >> 16;
+				if (xstop >= buffWidth) xstop = buffWidth;
+
+				if (x < xstop) {
+
+					var idx = yoff + x;
+					var idxstop = xr16 >> 16;
+					if (idxstop > buffWidth) {
+						idxstop = buffWidth;
+					}
+					idxstop += yoff;
+
+					for (; idx !== idxstop; idx++) {
+//										//If closer than occlusionBuffer value:
+//										if (max_z < buff[idx]) {
+//											//Set finest occlusionBuffers Z value
+//											buff[idx] = max_z;
+//										}
+						buff[idx<<2] = 255;
+						buff[(idx<<2)+2] = 128;
+						buff[(idx<<2)+3] = 128;
+					}
+				}
+			}
+
+			//Scan triangle from pay -> pby
+			var y, yoff, xl16, xr16;
+
+			if ( y1 >= 0 ) {
+
+				if ( y0 >= 0 ) {
+
+					y = (y0|0);
+					yoff = (y0|0)*buffWidth;
+					xl16 = pax << 16;
+					xr16 = pax << 16;
+
+				}
+				else {
+
+					//Fast-forward to 0
+					y=0;
+					yoff = 0;
+					xl16 = (pax << 16) - (y0 * grad_l16);
+					xr16 = (pax << 16) - (y0 * grad_r16);
+
+				}
+				var ystop = Math.min(y1, buffHeight);
+				for (; y < ystop; yoff+=buffWidth, y++, xl16 += grad_l16, xr16 += grad_r16) {
+					fillrow(buff, yoff, xl16, xr16, max_z);
+				}
+
+				if (grad_ab16 < grad_ac16) {
+
+					grad_l16 = ((pcx - pbx << 16) / (pcy - pby))|0;
+					grad_r16 = grad_ac16;
+					xl16 = pbx << 16;
+
+				}
+				else {
+
+					grad_r16 = ((pcx - pbx << 16) / (pcy - pby))|0;
+					grad_l16 = grad_ac16;
+					xr16 = pbx << 16;
+
+				}
+			}
+			else if (y1 < buffWidth) {
+
+				//Fast forward to 0
+
+				if (grad_ab16 < grad_ac16) {
+
+					grad_l16 = ((pcx - pbx << 16) / (pcy - pby))|0;
+					grad_r16 = grad_ac16;
+					xl16 = (pbx << 16) - y1 * grad_l16;
+					xr16 = (pax << 16) - y0 * grad_r16;
+
+				}
+				else {
+
+					grad_r16 = ((pcx - pbx << 16) / (pcy - pby))|0;
+					grad_l16 = grad_ac16;
+					xl16 = (pax << 16) - y0 * grad_l16;
+					xr16 = (pbx << 16) - y1 * grad_r16;
+
+				}
+				yoff = 0;
+				y=0;
+			}
+
+			if (y1 < buffHeight) {
+
+				var ystop = Math.min(y2, buffHeight);
+				//Scan triangle from pby -> pcy
+				for (; y < ystop; yoff+=buffWidth, y++, xl16 += grad_l16, xr16 += grad_r16) {
+
+					fillrow(buff, yoff, xl16, xr16, max_z);
+
+				}
+
 			}
 		}
 		
@@ -4349,7 +4507,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						
 						if (!anyOccludersProcessed) {
 							
-							if ( ! _occlusionBuffers ) {
+							if ( ! _occlusionBuffer ) {
 								
 								setupOcclusionBuffers();
 								
@@ -4373,166 +4531,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 							pc.set(	positions[ k++ ], positions[ k++ ], positions[ k++ ]).applyProjection(_objectProjScreenMatrix);
 							if (pc.z <= 0 || pc.z >= 1) continue;
 							
-							//Check off-screen
-							if ((pa.x <= -1 && pb.x <= -1 && pc.x <= -1) || 
-								(pa.y <= -1 && pb.y <= -1 && pc.y <= -1) || 
-								(pa.x >= 1 && pb.x >= 1 && pc.x >= 1) || 
-								(pa.y >= 1 && pb.y >= 1 && pc.y >= 1)) {
+							fillTriangle(pa, pb, pc, buffer, _occlusionBufferWidth, _occlusionBufferHeight);
 							
-								continue;
-							
-							}
-								
-							//Check winding - skip back-facing triangles
-							var vabx = pb.x - pa.x;
-							var vaby = pb.y - pa.y;
-							var vacx = pc.x - pa.x;
-							var vacy = pc.y - pa.y;
-							if (vabx * vacy <= vaby * vacx) {
-								
-								continue;
-								
-							}
-							
-							//Convert to screen coordinates
-							pa.x = (halfWidth  + pa.x * halfWidth );
-							pa.y = (halfHeight - pa.y * halfHeight);
-							pb.x = (halfWidth  + pb.x * halfWidth );
-							pb.y = (halfHeight - pb.y * halfHeight);
-							pc.x = (halfWidth  + pc.x * halfWidth );
-							pc.y = (halfHeight - pc.y * halfHeight);
-							
-							var max_z = pa.z, min_z = pa.z;
-							if (pb.z > max_z) max_z = pb.z; else if (pb.z < min_z) min_z = pb.z;
-							if (pc.z > max_z) max_z = pc.z; else if (pc.z < min_z) min_z = pc.z;
-
-							sortByY();
-							
-							var y0 = pa.y;
-							var y1 = pb.y;
-							var y2 = pc.y;
-							
-							vabx = pb.x - pa.x;
-							vaby = pb.y - pa.y;
-							vacx = pc.x - pa.x;
-							vacy = pc.y - pa.y;
-							
-							//Figure out left/right
-							var grad_ab = vabx / vaby;
-							var grad_ac = vacx / vacy;
-							var grad_l, grad_r;
-							if (grad_ab < grad_ac) {
-								grad_l = grad_ab;
-								grad_r = grad_ac;
-							}
-							else {
-								grad_r = grad_ab;
-								grad_l = grad_ac;
-							}
-							
-							//Scan triangle from pa.y -> pb.y
-							var y, yoff, xl, xr, buff = buffer;
-							
-							if ( y1 >= 0 ) {
-								
-								if ( y0 >= 0 ) {
-
-									y = (y0|0);
-									yoff = (y0|0)*_viewportWidth;
-									xl = pa.x;
-									xr = pa.x;
-
-								}
-								else {
-
-									//Fast-forward to 0
-									y=0;
-									yoff = 0;
-									xl = pa.x - y0 * grad_l;
-									xr = pa.x - y0 * grad_r;
-
-								}
-								var ystop = Math.min(y1, _viewportHeight);
-								for (; y < ystop; yoff+=_viewportWidth, y++, xl += grad_l, xr += grad_r) {
-
-//									debugContext.fillRect(xl, y, xr-xl, 1);
-									var xstop = Math.min(_viewportWidth, xr+1);
-									for (var x = Math.max(xl,0), idx = yoff + x; x < xstop; x++, idx++) {
-//										//If closer than occlusionBuffer value:
-//										if (max_z < buff[idx]) {
-//											//Set finest occlusionBuffers Z value
-//											buff[idx] = max_z;
-//										}
-										buff[idx<<2] = 255;
-										buff[(idx<<2)+2] = 255;
-										buff[(idx<<2)+3] = 128;
-									}
-
-								}
-							
-								if (grad_ab < grad_ac) {
-
-									grad_l = (pc.x - pb.x) / (pc.y - pb.y);
-									grad_r = grad_ac;
-									xl = pb.x;
-
-								}
-								else {
-
-									grad_r = (pc.x - pb.x) / (pc.y - pb.y);
-									grad_l = grad_ac;
-									xr = pb.x;
-
-								}
-							}
-							else if (y1 < _viewportWidth) {
-								
-								//Fast forward to 0
-								
-								if (grad_ab < grad_ac) {
-									
-									grad_l = (pc.x - pb.x) / (pc.y - pb.y);
-									grad_r = grad_ac;
-									xl = pb.x - y1 * grad_l;
-									xr = pa.x - y0 * grad_r;
-									
-								}
-								else {
-									
-									grad_r = (pc.x - pb.x) / (pc.y - pb.y);
-									grad_l = grad_ac;
-									xl = pa.x - y0 * grad_l;
-									xr = pb.x - y1 * grad_r;
-									
-								}
-								yoff = 0;
-								y=0;
-							}
-							
-							if (y1 < _viewportHeight) {
-								
-								var ystop = Math.min(y2, _viewportHeight);
-								//Scan triangle from pb.y -> pc.y
-								for (; y < ystop; yoff+=_viewportWidth, y++, xl += grad_l, xr += grad_r) {
-
-//									debugContext.fillRect(xl, y, xr-xl, 1);
-
-									var xstop = Math.min(_viewportWidth, xr+1);
-									for (var x = Math.max(xl,0), idx = yoff + x; x < xstop; x++, idx++) {
-//										//If closer than occlusionBuffer value:
-//										if (max_z < buff[idx]) {
-//											//Set finest occlusionBuffers Z value
-//											buff[idx] = max_z;
-//										}
-										buff[idx<<2] = 255;
-										buff[(idx<<2)+2] = 255;
-										buff[(idx<<2)+3] = 128;
-
-									}
-
-								}
-								
-							}
 							//If there were any changes to occlusion buffer, propagate changes along coarser mipmaps
 								
 							if (debugContext) {
