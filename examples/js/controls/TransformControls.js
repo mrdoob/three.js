@@ -6,7 +6,6 @@
 
 THREE.TransformControls = function ( camera, domElement ) {
 
-	// TODO: Choose a better fitting intersection plane when looking at grazing angles
 	// TODO: Make non-uniform scale and rotate play nice in hierarchies
 	// TODO: ADD RXYZ contol
 
@@ -15,7 +14,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	this.active = false;
 	this.mode = 'translate';
-	this.space = 'world';
+	this.space = 'local';
 	this.scale = 1;
 
 	this.snapDist = null;
@@ -76,6 +75,28 @@ THREE.TransformControls = function ( camera, domElement ) {
 	var intersect, planeIntersect;
 
 	var object, name;
+
+	// intersection planes
+	{
+
+		var planes = new THREE.Object3D();
+		this.gizmo.add(planes);
+
+		for ( var i in intersectionPlaneList ){
+
+			intersectionPlanes[intersectionPlaneList[i]] = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ) );
+			intersectionPlanes[intersectionPlaneList[i]].material.side = THREE.DoubleSide;
+			intersectionPlanes[intersectionPlaneList[i]].visible = false;
+			planes.add(intersectionPlanes[intersectionPlaneList[i]]);
+
+		}
+
+		intersectionPlanes['YZ'].rotation.set( 0, Math.PI/2, 0 );
+		intersectionPlanes['XZ'].rotation.set( -Math.PI/2, 0, 0 );
+		bakeTransformations(intersectionPlanes['YZ']);
+		bakeTransformations(intersectionPlanes['XZ']);
+
+	}
 
 	// gizmo geometry
 	{
@@ -159,17 +180,17 @@ THREE.TransformControls = function ( camera, domElement ) {
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
 
-		geometry = new THREE.PlaneGeometry( 0.2, 0.2 );
+		geometry = new THREE.PlaneGeometry( 0.3, 0.3 );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( yellow ) );
-		mesh.position.set( 0.1, 0.1, 0 );
+		mesh.position.set( 0.15, 0.15, 0 );
 		bakeTransformations( mesh );
 		mesh.name = 'TXY';
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( cyan ) );
-		mesh.position.set( 0, 0.1, 0.1 );
+		mesh.position.set( 0, 0.15, 0.15 );
 		mesh.rotation.y = Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'TYZ';
@@ -177,7 +198,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		pickerAxes['translate'].add( mesh.clone() );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( magenta ) );
-		mesh.position.set( 0.1, 0, 0.1 );
+		mesh.position.set( 0.15, 0, 0.15 );
 		mesh.rotation.x = Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'TXZ';
@@ -187,42 +208,42 @@ THREE.TransformControls = function ( camera, domElement ) {
 		geometry = new THREE.CylinderGeometry( 0, 0.05, 0.2, 4, 1, true );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
-		mesh.position.x = 0.9;
+		mesh.position.x = 1.1;
 		mesh.rotation.z = -Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'TX';
 		displayAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
-		mesh.position.y = 0.9;
+		mesh.position.y = 1.1;
 		bakeTransformations( mesh );
 		mesh.name = 'TY';
 		displayAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
-		mesh.position.z = 0.9;
+		mesh.position.z = 1.1;
 		mesh.rotation.x = Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'TZ';
 		displayAxes['translate'].add( mesh );
 
-		geometry = new THREE.CylinderGeometry( 0.1, 0.1, 0.8, 4, 1, false );
+		geometry = new THREE.CylinderGeometry( 0.2, 0.1, 0.8, 4, 1, false );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
-		mesh.position.x = 0.6;
+		mesh.position.x = 0.7;
 		mesh.rotation.z = -Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'TX';
 		pickerAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
-		mesh.position.y = 0.6;
+		mesh.position.y = 0.7;
 		bakeTransformations( mesh );
 		mesh.name = 'TY';
 		pickerAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
-		mesh.position.z = 0.6;
+		mesh.position.z = 0.7;
 		mesh.rotation.x = Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'TZ';
@@ -230,29 +251,29 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		// scale manipulators
 
-		geometry = new THREE.CubeGeometry( 0.1, 0.1, 0.1 );
+		geometry = new THREE.CubeGeometry( 0.125, 0.125, 0.125 );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( white ) );
 		mesh.name = 'SXYZ';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
-		mesh.position.set( 1, 0, 0 );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( [1,0,0,0.25] ) );
+		mesh.position.set( 1.05, 0, 0 );
 		bakeTransformations( mesh );
 		mesh.name = 'SX';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
-		mesh.position.set( 0, 1, 0 );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( [0,1,0,0.25] ) );
+		mesh.position.set( 0, 1.05, 0 );
 		bakeTransformations( mesh );
 		mesh.name = 'SY';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
-		mesh.position.set( 0, 0, 1 );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( [0,0,1,0.25] ) );
+		mesh.position.set( 0, 0, 1.05 );
 		bakeTransformations( mesh );
 		mesh.name = 'SZ';
 		displayAxes['scale'].add( mesh );
@@ -289,11 +310,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 		mesh.name = 'RXYZE';
 		displayAxes['rotate'].add( mesh );
 
-		mesh = new THREE.Line( Circle( 1.1, 'z' ), LineMaterial( [1,1,0,1] ) );
+		mesh = new THREE.Line( Circle( 1.25, 'z' ), LineMaterial( [1,1,0,0.25] ) );
 		mesh.name = 'RE';
 		displayAxes['rotate'].add( mesh );
 
-		geometry = new THREE.TorusGeometry( 1, 0.05, 4, 6, Math.PI );
+		geometry = new THREE.TorusGeometry( 1, 0.15, 4, 6, Math.PI );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( cyan ) );
 		mesh.rotation.z = -Math.PI/2;
@@ -316,37 +337,18 @@ THREE.TransformControls = function ( camera, domElement ) {
 		pickerAxes['rotate'].add( mesh );
 
 		mesh = new THREE.Mesh( new THREE.SphereGeometry( 0.95, 12, 12 ), HandleMaterial( white ) );
-		mesh.name = 'RXYZ';
+		mesh.name = 'RXYZE';
 		pickerAxes['rotate'].add( mesh );
 
-		mesh = new THREE.Mesh( new THREE.TorusGeometry( 1.12, 0.07, 4, 12 ), HandleMaterial( yellow ) );
+		intersectionPlanes['SPHERE'] = new THREE.Mesh( new THREE.SphereGeometry( 0.95, 12, 12 ) );
+		intersectionPlanes['SPHERE'].visible = false;
+		planes.add(intersectionPlanes['SPHERE']);
+
+		mesh = new THREE.Mesh( new THREE.TorusGeometry( 1.30, 0.15, 4, 12 ), HandleMaterial( yellow ) );
 		mesh.name = 'RE';
 		pickerAxes['rotate'].add( mesh );
 
 		mesh = null;
-
-	}
-
-	// intersection planes
-	{
-
-		var planes = new THREE.Object3D();
-		this.gizmo.add(planes);
-
-		for ( var i in intersectionPlaneList ){
-
-			intersectionPlanes[intersectionPlaneList[i]] = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ) );
-			intersectionPlanes[intersectionPlaneList[i]].material.side = THREE.DoubleSide;
-			intersectionPlanes[intersectionPlaneList[i]].name = intersectionPlaneList[i];
-			intersectionPlanes[intersectionPlaneList[i]].visible = false;
-			planes.add(intersectionPlanes[intersectionPlaneList[i]]);
-
-		}
-
-		intersectionPlanes['YZ'].rotation.set( 0, Math.PI/2, 0 );
-		intersectionPlanes['XZ'].rotation.set( -Math.PI/2, 0, 0 );
-		bakeTransformations(intersectionPlanes['YZ']);
-		bakeTransformations(intersectionPlanes['XZ']);
 
 	}
 
@@ -356,6 +358,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 	 	this.setMode( scope.mode );
 
 		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
+		this.domElement.addEventListener( 'mousemove', onMouseHover, false );
 		document.addEventListener( 'keydown', onKeyDown, false );
 
 	}
@@ -365,6 +368,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 	 	this.hide();
 
 		this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
+		this.domElement.removeEventListener( 'mousemove', onMouseHover, false );
 		document.removeEventListener( 'keydown', onKeyDown, false );
 
 	}
@@ -379,7 +383,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		camPosition.getPositionFromMatrix( this.camera.matrixWorld );
 		camRotation.setEulerFromRotationMatrix( tempMatrix.extractRotation( this.camera.matrixWorld ));
 
-		scale = worldPosition.distanceTo( camPosition ) / 10 * this.scale;
+		scale = worldPosition.distanceTo( camPosition ) / 6 * this.scale;
 		this.gizmo.position.copy( worldPosition )
 		this.gizmo.scale.set( scale, scale, scale );
 
@@ -503,13 +507,42 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	this.setIntersectionPlane = function () {
 
-		if ( isActive("X") || isActive("Y") ) {
+		eye.copy( camPosition ).sub( worldPosition ).normalize();
+
+		if ( this.space == 'local' ) {
+
+			eye.applyMatrix4( tempMatrix.getInverse( scope.object.matrixWorld ) );
+		
+		}
+
+		if ( isActive("X") ) {
+
+			if ( eye.y > eye.z ) currentPlane = 'XZ';
+			else currentPlane = 'XY';
+
+		}
+
+		if ( isActive("Y") ) {
+
+			if ( eye.x > eye.z ) currentPlane = 'YZ';
+			else currentPlane = 'XY';
+
+		}
+
+		if ( isActive("Z") ) {
+
+			if ( eye.x > eye.y ) currentPlane = 'YZ';
+			else currentPlane = 'XZ';
+
+		}
+
+		if ( isActive("XY") ) {
 
 			currentPlane = 'XY';
 
 		}
 
-		if ( isActive("Z") ) {
+		if ( isActive("YZ") ) {
 
 			currentPlane = 'YZ';
 
@@ -545,9 +578,53 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		scope.update();
+		if ( isActive("RXYZ") ) {
+
+			currentPlane = 'SPHERE';
+
+		}
 
 	}
+
+	function onMouseHover( event ) {
+
+		event.preventDefault();
+
+		if ( event.button === 0 && !scope.active ) {
+
+			intersect = intersectObjects( event, pickerAxes[scope.mode].children );
+
+			for ( var i in displayAxes[scope.mode].children ) {
+
+	 			var axis = displayAxes[scope.mode].children[i];
+	 			
+	 			if ( intersect && axis.name == intersect.object.name ) {
+
+	 				axis.material.color.setRGB(1,1,0);
+	 				axis.material.opacity = 1;
+	 			
+	 			} else if ( axis.material.origColor ) {
+
+	 				axis.material.color.copy( axis.material.origColor );
+	 				axis.material.opacity = axis.material.origOpacity;
+	 					
+	 			} else {
+
+	 				axis.material.origColor = axis.material.color.clone();
+	 				axis.material.origOpacity = axis.material.opacity;
+
+	 			}
+
+		 	}
+
+		 	scope.dispatchEvent( changeEvent );
+
+		}
+
+		document.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'mouseup', onMouseUp, false );
+
+	};
 
 	function onMouseDown( event ) {
 
@@ -561,6 +638,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				scope.active = intersect.object.name;
 
+				scope.update();
 				scope.setIntersectionPlane();
 
 				planeIntersect = intersectObjects( event, [intersectionPlanes[currentPlane]] );
@@ -695,9 +773,18 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
 
-					} else if ( scope.active == "RXYZ" ) {
+					} else if ( scope.active == "RXYZE" ) {
 
-						// TODO
+						quaternionE.setFromEuler( point.clone().cross(tempVector).normalize() ); // rotation axis
+
+						tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
+						quaternionX.setFromAxisAngle( quaternionE, - point.clone().angleTo(tempVector) );
+						quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
+
+						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
+						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
+
+						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
 
 					} else if ( scope.space == 'local' ) {
 
