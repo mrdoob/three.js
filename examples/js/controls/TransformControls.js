@@ -13,8 +13,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
 	this.active = false;
-	this.mode = 'rotate';
-	this.space = 'world';
+	this.mode = 'translate';
+	this.space = 'local';
 	this.scale = 1;
 
 	this.snapDist = null;
