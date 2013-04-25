@@ -50,12 +50,12 @@
 
 			var container, stats;
 
-			var camera, controls, scene, renderer;
+			var camera, controls, scene, renderer, renderQueued;
 
 			var cross;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -63,7 +63,7 @@
 				camera.position.z = 500;
 
 				controls = new THREE.OrbitControls( camera );
-				controls.addEventListener( 'change', render );
+				controls.addEventListener( 'change', queueRender );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
@@ -132,14 +132,20 @@
 
 			}
 
-			function animate() {
+			function queueRender() {
 
-				requestAnimationFrame( animate );
-				controls.update();
+                if ( ! renderQueued ) {
+
+                  renderQueued = true;
+                  requestAnimationFrame( render );
+
+                }
 
 			}
 
 			function render() {
+
+                renderQueued = false;
 
 				renderer.render( scene, camera );
 				stats.update();
