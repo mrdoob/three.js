@@ -53,7 +53,7 @@ properties.forEach( function ( property ) {
 
 // events
 
-var events = [ 'MouseOver', 'MouseOut', 'Click' ];
+var events = [ 'KeyUp', 'KeyDown', 'MouseOver', 'MouseOut', 'Click', 'Change' ];
 
 events.forEach( function ( event ) {
 
@@ -162,15 +162,13 @@ UI.Input = function () {
 	dom.style.marginLeft = '-2px';
 	dom.style.border = '1px solid #ccc';
 
-	this.dom = dom;
+	dom.addEventListener( 'keydown', function ( event ) {
 
-	this.onChangeCallback = null;
-
-	this.dom.addEventListener( 'change', function ( event ) {
-
-		if ( scope.onChangeCallback ) scope.onChangeCallback();
+		event.stopPropagation();
 
 	}, false );
+
+	this.dom = dom;
 
 	return this;
 
@@ -192,14 +190,6 @@ UI.Input.prototype.setValue = function ( value ) {
 
 };
 
-UI.Input.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-
-	return this;
-
-};
-
 
 // TextArea
 
@@ -216,21 +206,13 @@ UI.TextArea = function () {
 	dom.style.marginLeft = '-2px';
 	dom.style.border = '1px solid #ccc';
 
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
+
 	this.dom = dom;
-
-	this.onChangeCallback = null;
-
-	this.dom.addEventListener( 'keyup', function ( event ) {
-
-		if ( scope.onKeyUpCallback ) scope.onKeyUpCallback();
-
-	}, false );
-
-	this.dom.addEventListener( 'change', function ( event ) {
-
-		if ( scope.onChangeCallback ) scope.onChangeCallback();
-
-	}, false );
 
 	return this;
 
@@ -247,22 +229,6 @@ UI.TextArea.prototype.getValue = function () {
 UI.TextArea.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
-
-	return this;
-
-};
-
-UI.TextArea.prototype.onKeyUp = function ( callback ) {
-
-	this.onKeyUpCallback = callback;
-
-	return this;
-
-};
-
-UI.TextArea.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
 
 	return this;
 
@@ -285,14 +251,6 @@ UI.Select = function () {
 	dom.style.padding = '0px';
 
 	this.dom = dom;
-
-	this.onChangeCallback = null;
-
-	this.dom.addEventListener( 'change', function ( event ) {
-
-		if ( scope.onChangeCallback ) scope.onChangeCallback();
-
-	}, false );
 
 	return this;
 
@@ -343,14 +301,6 @@ UI.Select.prototype.setValue = function ( value ) {
 
 };
 
-UI.Select.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-
-	return this;
-
-};
-
 // FancySelect
 
 UI.FancySelect = function () {
@@ -369,8 +319,6 @@ UI.FancySelect = function () {
 
 	this.dom = dom;
 
-	this.onChangeCallback = null;
-
 	this.options = [];
 	this.selectedValue = null;
 
@@ -383,6 +331,9 @@ UI.FancySelect.prototype = Object.create( UI.Element.prototype );
 UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	var scope = this;
+
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
 
 	while ( scope.dom.children.length > 0 ) {
 
@@ -406,7 +357,7 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 			scope.selectedValue = value;
 
-			if ( scope.onChangeCallback ) scope.onChangeCallback();
+			scope.dom.dispatchEvent( changeEvent );
 
 		}
 
@@ -465,14 +416,6 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 };
 
-UI.FancySelect.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-
-	return this;
-
-};
-
 // Checkbox
 
 UI.Checkbox = function ( boolean ) {
@@ -487,14 +430,6 @@ UI.Checkbox = function ( boolean ) {
 
 	this.dom = dom;
 	this.setValue( boolean );
-
-	this.onChangeCallback = null;
-
-	this.dom.addEventListener( 'change', function ( event ) {
-
-		if ( scope.onChangeCallback ) scope.onChangeCallback();
-
-	}, false );
 
 	return this;
 
@@ -520,14 +455,6 @@ UI.Checkbox.prototype.setValue = function ( value ) {
 
 };
 
-UI.Checkbox.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-
-	return this;
-
-};
-
 
 // Color
 
@@ -548,14 +475,6 @@ UI.Color = function () {
 	try { dom.type = 'color'; } catch ( exception ) {}
 
 	this.dom = dom;
-
-	this.onChangeCallback = null;
-
-	this.dom.addEventListener( 'change', function ( event ) {
-
-		if ( scope.onChangeCallback ) scope.onChangeCallback();
-
-	}, false );
 
 	return this;
 
@@ -591,14 +510,6 @@ UI.Color.prototype.setHexValue = function ( hex ) {
 
 };
 
-UI.Color.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-
-	return this;
-
-};
-
 
 // Number
 
@@ -620,6 +531,12 @@ UI.Number = function ( number ) {
 	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
+
 	this.min = - Infinity;
 	this.max = Infinity;
 
@@ -629,7 +546,8 @@ UI.Number = function ( number ) {
 	this.dom = dom;
 	this.setValue( number );
 
-	this.onChangeCallback = null;
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
 
 	var distance = 0;
 	var onMouseDownValue = 0;
@@ -660,7 +578,7 @@ UI.Number = function ( number ) {
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
-		if ( currentValue !== dom.value && scope.onChangeCallback ) scope.onChangeCallback();
+		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
 
 	};
 
@@ -685,8 +603,6 @@ UI.Number = function ( number ) {
 		if ( isNaN( number ) === false ) {
 
 			dom.value = number;
-
-			if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 		}
 
@@ -754,14 +670,6 @@ UI.Number.prototype.setPrecision = function ( precision ) {
 
 };
 
-UI.Number.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-
-	return this;
-
-};
-
 
 // Integer
 
@@ -783,6 +691,12 @@ UI.Integer = function ( number ) {
 	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
+	dom.addEventListener( 'keydown', function ( event ) {
+
+		event.stopPropagation();
+
+	}, false );
+
 	this.min = - Infinity;
 	this.max = Infinity;
 
@@ -791,7 +705,8 @@ UI.Integer = function ( number ) {
 	this.dom = dom;
 	this.setValue( number );
 
-	this.onChangeCallback = null;
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
 
 	var distance = 0;
 	var onMouseDownValue = 0;
@@ -822,7 +737,7 @@ UI.Integer = function ( number ) {
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ) | 0;
 
-		if ( currentValue !== dom.value && scope.onChangeCallback ) scope.onChangeCallback();
+		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
 
 	};
 
@@ -847,8 +762,6 @@ UI.Integer = function ( number ) {
 		if ( isNaN( number ) === false ) {
 
 			dom.value = number;
-
-			if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 		}
 
@@ -908,14 +821,6 @@ UI.Integer.prototype.setRange = function ( min, max ) {
 
 };
 
-UI.Integer.prototype.onChange = function ( callback ) {
-
-	this.onChangeCallback = callback;
-
-	return this;
-
-};
-
 
 // Break
 
@@ -955,7 +860,7 @@ UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
 
 // Button
 
-UI.Button = function () {
+UI.Button = function ( value ) {
 
 	UI.Element.call( this );
 
@@ -965,6 +870,7 @@ UI.Button = function () {
 	dom.className = 'Button';
 
 	this.dom = dom;
+	this.dom.textContent = value;
 
 	return this;
 

@@ -50,6 +50,11 @@ THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
 
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+
 	applyMatrix: function () {
 
 		var m1 = new THREE.Matrix4();
