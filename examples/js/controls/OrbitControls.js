@@ -4,9 +4,11 @@
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  */
+"use strict";
 
 THREE.OrbitControls = function ( object, domElement ) {
 
+	var self = this;
 	this.object = object;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 
@@ -192,7 +194,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		phiDelta = 0;
 		scale = 1;
 
-		if ( lastPosition.distanceTo( this.object.position ) > 0 ) {
+		var delta = lastPosition.distanceTo( this.object.position );
+		if ( delta > 0 ) {
 
 			this.dispatchEvent( changeEvent );
 
@@ -240,8 +243,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		self.domElement.addEventListener( 'mousemove', onMouseMove, false );
+		self.domElement.addEventListener( 'mouseup', onMouseUp, false );
 
 	}
 
@@ -287,6 +290,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
+		self.update();
+
 	}
 
 	function onMouseUp( event ) {
@@ -294,8 +299,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.userRotate === false ) return;
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		self.domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		self.domElement.removeEventListener( 'mouseup', onMouseUp, false );
 
 		state = STATE.NONE;
 
@@ -328,6 +333,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
+		self.update();
+
 	}
 
 	function onKeyDown( event ) {
@@ -335,20 +342,32 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 		if ( scope.userPan === false ) return;
 
+		var needUpdate = false;
+
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
 				scope.pan( new THREE.Vector3( 0, 1, 0 ) );
+				needUpdate = true;
 				break;
 			case scope.keys.BOTTOM:
 				scope.pan( new THREE.Vector3( 0, - 1, 0 ) );
+				needUpdate = true;
 				break;
 			case scope.keys.LEFT:
 				scope.pan( new THREE.Vector3( - 1, 0, 0 ) );
+				needUpdate = true;
 				break;
 			case scope.keys.RIGHT:
 				scope.pan( new THREE.Vector3( 1, 0, 0 ) );
+				needUpdate = true;
 				break;
+		}
+
+		if ( needUpdate ) {
+
+			self.update();
+
 		}
 
 	}
