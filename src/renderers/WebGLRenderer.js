@@ -174,6 +174,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_objectProjScreenMatrix = new THREE.Matrix4(),
 	
 	_occlusionBuffer = null,
+	_occlusionVerticesTemp = null,
 
 	_vector3 = new THREE.Vector3(),
 
@@ -4223,22 +4224,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		if ( ! _occlusionCulling ) return;
 
-		var length = _occlusionBufferWidth * _occlusionBufferHeight;
-		
-		if ( typeof Uint16Array !== 'undefined' ) {
-
-			_occlusionBuffer = new Uint16Array(length);
-
-		}
-		else {
-
-			_occlusionBuffer = [];
-			while (length -- > 0) {
-				_occlusionBuffer.push(0);
-			}
-
-		}
-		
+		_occlusionBuffer = new Uint16Array(_occlusionBufferWidth * _occlusionBufferHeight);
+		_occlusionVerticesTemp = new Float32Array(48);
 	}
 	
 	function clearOcclusionBuffers ( ) {
@@ -4259,7 +4246,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		if ( ! _occlusionCulling ) return;
 		
-		var webglObject, object, positions;
+		var webglObject, object, vertexArray;
 		
 		var anyOccludersProcessed = false;
 		
@@ -4544,34 +4531,46 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				if (object.occluder || (object.occludable && anyOccludersProcessed)) {
 					
+					if (!anyOccludersProcessed) {
+						if ( ! _occlusionBuffer ) {
+							setupOcclusionBuffers();
+						}
+						clearOcclusionBuffers();
+					}
+
+					var vertexArray;
+					var faceArray;
+					
+					_occlusionVerticesTemp;
+					
 					if (object instanceof THREE.Mesh && object.geometry instanceof THREE.BufferGeometry && !object.geometry.attributes.index) {
 						
-						if (!anyOccludersProcessed) {
-							
-							if ( ! _occlusionBuffer ) {
-								
-								setupOcclusionBuffers();
-								
-							}
-							
-							clearOcclusionBuffers();
-						}
-						
 						//Project vertices into view space
-						positions = object.geometry.attributes.position.array;
+//						positions = object.geometry.attributes.position.array;
+						vertexArray = object.geometry.attributes.position.array;
+						
+					}
+					else if (object instanceof THREE.Mesh) {
+						for ( g in object.geometry.geometryGroups ) {
+							var geometryGroup = geometry.geometryGroups[ g ];
+							vertexArray = geometryGroup.__vertexArray;
+						}
+					}
+					
+					if (vertexArray) {
 						
 						var isOccluded = true;
 						
-						for ( var j = 0, k = 0, numElements = positions.length ; j + 8 < numElements && (isOccluded || object.occluder) ; j += 9, k = j ) {
+						for ( var j = 0, k = 0, numElements = vertexArray.length ; j + 8 < numElements && (isOccluded || object.occluder) ; j += 9, k = j ) {
 							
 							//Project triangle corners, skip near the near/far planes for simplicity
-							pa.set(	positions[ k++ ], positions[ k++ ], positions[ k++ ]).applyProjection(_objectProjScreenMatrix); 
+							pa.set(	vertexArray[ k++ ], vertexArray[ k++ ], vertexArray[ k++ ]).applyProjection(_objectProjScreenMatrix); 
 							if (pa.z <= 0 || pa.z >= 1) { isOccluded = false; continue; }
 							
-							pb.set(	positions[ k++ ], positions[ k++ ], positions[ k++ ]).applyProjection(_objectProjScreenMatrix);
+							pb.set(	vertexArray[ k++ ], vertexArray[ k++ ], vertexArray[ k++ ]).applyProjection(_objectProjScreenMatrix);
 							if (pb.z <= 0 || pb.z >= 1) { isOccluded = false; continue; }
 							
-							pc.set(	positions[ k++ ], positions[ k++ ], positions[ k++ ]).applyProjection(_objectProjScreenMatrix);
+							pc.set(	vertexArray[ k++ ], vertexArray[ k++ ], vertexArray[ k++ ]).applyProjection(_objectProjScreenMatrix);
 							if (pc.z <= 0 || pc.z >= 1) { isOccluded = false; continue; }
 							
 							if (! processTriangle(pa, pb, pc, buffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
@@ -4580,13 +4579,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 						
 						if (isOccluded) {
-//							console.log("Object occluded! ", (object && object.adust_object && object.adust_object.config));
 							webglObject.render = false;
 							_this.info.render.occlusions ++;
 						}
 						
 						anyOccludersProcessed = true;
-						
 					}
 					else {
 						
