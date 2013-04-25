@@ -729,6 +729,24 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
+    function traverse_json_hierarchy( objJSON, callback ) {
+
+        callback( objJSON );
+
+        if ( objJSON.children !== undefined ) {
+
+            var objChildID;
+
+            for ( objChildID in objJSON.children ) {
+
+                traverse_json_hierarchy( objJSON.children[ objChildID ], callback );
+
+            }
+
+        }
+
+    };
+
 	// first go synchronous elements
 
 	// fogs
@@ -780,21 +798,23 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many hierarchies will be loaded asynchronously
 
-	var objID, objJSON;
+	var objID;
 
 	for ( objID in data.objects ) {
 
-		objJSON = data.objects[ objID ];
+        traverse_json_hierarchy( data.objects[ objID ], function ( objJSON ) {
 
-		if ( objJSON.type && ( objJSON.type in this.hierarchyHandlerMap ) ) {
+            if ( objJSON.type && ( objJSON.type in scope.hierarchyHandlerMap ) ) {
 
-			counter_models += 1;
+                counter_models += 1;
 
-			scope.onLoadStart();
+                scope.onLoadStart();
 
-		}
+            }
 
-	}
+        });
+
+    }
 
 	total_models = counter_models;
 
