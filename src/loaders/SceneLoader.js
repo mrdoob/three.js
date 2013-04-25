@@ -173,11 +173,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			// check by id if child has already been handled,
 			// if not, create new object
 
-			if ( result.objects[ objID ] === undefined ) {
+            var object = result.objects[ objID ];
+            var objJSON = children[ objID ];
 
-				var objJSON = children[ objID ];
-
-				var object = null;
+			if ( object === undefined ) {
 
 				// meshes
 
@@ -505,15 +504,16 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					}
 
-					if ( objJSON.children !== undefined ) {
-
-						handle_children( object, objJSON.children );
-
-					}
-
 				}
 
 			}
+
+            if ( object !== undefined && objJSON.children !== undefined )
+            {
+
+                handle_children( object, objJSON.children );
+
+            }
 
 		}
 
