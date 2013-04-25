@@ -42,13 +42,21 @@ var Loader = function ( signals ) {
 
 	this.loadLocalStorage = function() {
 
-		if ( localStorage.threejsEditor !== undefined ) {
-
-			var loader = new THREE.ObjectLoader();
-			var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
-
-			signals.sceneAdded.dispatch( scene );
-
+		try {
+	
+			if ( localStorage.threejsEditor !== undefined ) {
+	
+				var loader = new THREE.ObjectLoader();
+				var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
+	
+				signals.sceneAdded.dispatch( scene );
+	
+			}
+			
+		} catch ( e ) {
+			
+			console.warn( "Unable to load object from localStorage." );
+			
 		}
 
 	};
