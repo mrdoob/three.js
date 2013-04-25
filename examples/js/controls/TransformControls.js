@@ -4,13 +4,13 @@
 
  //"use strict";
 
-THREE.TransformControls = function ( camera, domElement ) {
+THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	// TODO: Make non-uniform scale and rotate play nice in hierarchies
 	// TODO: ADD RXYZ contol
-
 	this.camera = camera;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	this.document = ( doc !== undefined ) ? doc : document;
 
 	this.active = false;
 	this.mode = 'translate';
@@ -359,7 +359,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		this.domElement.addEventListener( 'mousedown', onMouseDown, false );
 		this.domElement.addEventListener( 'mousemove', onMouseHover, false );
-		document.addEventListener( 'keydown', onKeyDown, false );
+		this.document.addEventListener( 'keydown', onKeyDown, false );
 
 	}
 
@@ -369,7 +369,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
 		this.domElement.removeEventListener( 'mousemove', onMouseHover, false );
-		document.removeEventListener( 'keydown', onKeyDown, false );
+		this.document.removeEventListener( 'keydown', onKeyDown, false );
 
 	}
 
@@ -621,8 +621,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		scope.document.addEventListener( 'mousemove', onMouseMove, false );
+		scope.document.addEventListener( 'mouseup', onMouseUp, false );
 
 	};
 
@@ -662,8 +662,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		}
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		scope.document.addEventListener( 'mousemove', onMouseMove, false );
+		scope.document.addEventListener( 'mouseup', onMouseUp, false );
 
 	};
 
@@ -843,8 +843,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		scope.active = false;
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		scope.document.removeEventListener( 'mousemove', onMouseMove, false );
+		scope.document.removeEventListener( 'mouseup', onMouseUp, false );
 
 	}
 
