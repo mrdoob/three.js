@@ -4356,7 +4356,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			function fillRow(buff, yoff, x, xr, max_z) {
 				if (x < 0) x = 0;
-				xr++;
 				if (xr >= buffWidth) xr = buffWidth;
 
 				if (x < xr) {
@@ -4376,7 +4375,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			function testRow(buff, yoff, x, xr, min_z) {
 				if (x < 0) x = 0;
-				xr++;
 				if (xr >= buffWidth) xr = buffWidth;
 
 				if (x < xr) {
@@ -4396,7 +4394,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			function fillAndTestRow(buff, yoff, x, xr, min_z, max_z) {
 				if (x < 0) x = 0;
-				xr++;
 				if (xr >= buffWidth) xr = buffWidth;
 
 				var isOccluded = true;
@@ -4407,14 +4404,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 					xr += yoff;
 
 					for (; x !== xr; x++) {
-						var buff_x = buff[x];
 						//If closer than occlusionBuffer value:
-						if (min_z < buff_x) {
-							//If closer than occlusionBuffer value:
-							if (max_z < buff_x) {
-								//Set finest occlusionBuffers Z value
-								buff[x] = max_z;
-							}
+						if (min_z < buff[x]) {
 							isOccluded = false;
 							//Switch to test mode
 							break;
@@ -4433,13 +4424,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			//Scan triangle from pay -> pby
-			var y, yoff, ystop, xl16, xr16, isOccluded = true;
+			var y, yoff, xl16, xr16, isOccluded = true;
 			
-			function doScan() {
+			function doScan(ystop) {
 				if (occludable) {
 					if (occluder) {
 						for (; y < ystop; yoff+=buffWidth, y++, xl16 += grad_l16, xr16 += grad_r16) {
-							if (! fillAndTestRow(buff, yoff, xl16>>16, xr16>>16, min_z, max_z)) {
+							if (! fillAndTestRow(buff, yoff, xl16+0x8000>>16, xr16+0x8000>>16, min_z, max_z)) {
 								//Oh well, not occluded, the fill will continue below
 								isOccluded = false;
 								break;
@@ -4448,7 +4439,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 					else {
 						for (; y < ystop; yoff+=buffWidth, y++, xl16 += grad_l16, xr16 += grad_r16) {
-							if (! testRow(buff, yoff, xl16>>16, xr16>>16, min_z)) {
+							if (! testRow(buff, yoff, xl16+0x8000>>16, xr16+0x8000>>16, min_z)) {
 								return false;
 							}
 						}
@@ -4456,7 +4447,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 				if (occluder) {
 					for (; y < ystop; yoff+=buffWidth, y++, xl16 += grad_l16, xr16 += grad_r16) {
-						fillRow(buff, yoff, xl16>>16, xr16>>16, max_z);
+						fillRow(buff, yoff, xl16+0x8000>>16, xr16+0x8000>>16, max_z);
 					}
 				}
 			}
@@ -4485,8 +4476,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 				}
 				else {
-					ystop = Math.min(y1, buffHeight);
-					doScan();
+					doScan(Math.min(y1, buffHeight));
 				}
 
 				if (grad_ab16 < grad_ac16) {
@@ -4524,8 +4514,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			if (y1 < buffHeight) {
-				ystop = Math.min(y2, buffHeight);
-				doScan();
+				doScan(Math.min(y2, buffHeight));
 			}
 			
 			return isOccluded;
