@@ -4542,53 +4542,88 @@ THREE.WebGLRenderer = function ( parameters ) {
 					var faceArray;
 					
 					_occlusionVerticesTemp;
+						
+					var isOccluded = true;
 					
 					if (object instanceof THREE.Mesh && object.geometry instanceof THREE.BufferGeometry && !object.geometry.attributes.index) {
 						
 						//Project vertices into view space
-//						positions = object.geometry.attributes.position.array;
 						vertexArray = object.geometry.attributes.position.array;
 						
+						if (object.geometry.attributes.index) {
+							faceArray = object.geometry.attributes.index.array;
+						}
 					}
 					else if (object instanceof THREE.Mesh) {
 						for ( g in object.geometry.geometryGroups ) {
-							var geometryGroup = geometry.geometryGroups[ g ];
+							var geometryGroup = object.geometry.geometryGroups[ g ];
 							vertexArray = geometryGroup.__vertexArray;
+							faceArray = geometryGroup.__faceArray;
 						}
 					}
 					
 					if (vertexArray) {
-						
-						var isOccluded = true;
-						
-						for ( var j = 0, k = 0, numElements = vertexArray.length ; j + 8 < numElements && (isOccluded || object.occluder) ; j += 9, k = j ) {
-							
-							//Project triangle corners, skip near the near/far planes for simplicity
-							pa.set(	vertexArray[ k++ ], vertexArray[ k++ ], vertexArray[ k++ ]).applyProjection(_objectProjScreenMatrix); 
-							if (pa.z <= 0 || pa.z >= 1) { isOccluded = false; continue; }
-							
-							pb.set(	vertexArray[ k++ ], vertexArray[ k++ ], vertexArray[ k++ ]).applyProjection(_objectProjScreenMatrix);
-							if (pb.z <= 0 || pb.z >= 1) { isOccluded = false; continue; }
-							
-							pc.set(	vertexArray[ k++ ], vertexArray[ k++ ], vertexArray[ k++ ]).applyProjection(_objectProjScreenMatrix);
-							if (pc.z <= 0 || pc.z >= 1) { isOccluded = false; continue; }
-							
-							if (! processTriangle(pa, pb, pc, buffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
-								isOccluded = false;
+
+						if (faceArray) {
+
+							if (_occlusionVerticesTemp.length < vertexArray.length) {
+								_occlusionVerticesTemp = new Float32Array(vertexArray.length);
+							}
+
+							for (var j = 0, numElements = vertexArray.length; j < numElements && (isOccluded || object.occluder); j += 3) {
+
+								//Project triangle corners, skip near the near/far planes for simplicity
+								pa.set(vertexArray[ j ], vertexArray[ j + 1 ], vertexArray[ j + 2 ]).applyProjection(_objectProjScreenMatrix);
+								if (pa.z <= 0 || pa.z >= 1) {
+									isOccluded = false;
+								}
+
+								_occlusionVerticesTemp[ j ] = pa.x;
+								_occlusionVerticesTemp[ j + 1 ] = pa.y;
+								_occlusionVerticesTemp[ j + 2 ] = pa.z;
+
+							}
+
+							for (var j = 0, numElements = faceArray.length; j < numElements; j += 3) {
+								var aoff = faceArray[j  ] * 3;
+								var boff = faceArray[j + 1] * 3;
+								var coff = faceArray[j + 2] * 3;
+								pa.set(_occlusionVerticesTemp[aoff], _occlusionVerticesTemp[aoff + 1], _occlusionVerticesTemp[aoff + 2]);
+								pb.set(_occlusionVerticesTemp[boff], _occlusionVerticesTemp[boff + 1], _occlusionVerticesTemp[boff + 2]);
+								pc.set(_occlusionVerticesTemp[coff], _occlusionVerticesTemp[coff + 1], _occlusionVerticesTemp[coff + 2]);
+
+								if (!processTriangle(pa, pb, pc, buffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
+									isOccluded = false;
+								}
 							}
 						}
-						
-						if (isOccluded) {
-							webglObject.render = false;
-							_this.info.render.occlusions ++;
+						else {
+							for (var j = 0, numElements = vertexArray.length; j < numElements && (isOccluded || object.occluder); j += 9) {
+
+								//Project triangle corners, skip near the near/far planes for simplicity
+								pa.set(vertexArray[ j   ], vertexArray[ j+1 ], vertexArray[ j+2 ]).applyProjection(_objectProjScreenMatrix);
+								if (pa.z <= 0 || pa.z >= 1) {isOccluded = false; continue;}
+								pb.set(vertexArray[ j+3 ], vertexArray[ j+4 ], vertexArray[ j+5 ]).applyProjection(_objectProjScreenMatrix);
+								if (pb.z <= 0 || pb.z >= 1) {isOccluded = false; continue;}
+								pc.set(vertexArray[ j+6 ], vertexArray[ j+7 ], vertexArray[ j+8 ]).applyProjection(_objectProjScreenMatrix);
+								if (pc.z <= 0 || pc.z >= 1) {isOccluded = false; continue;}
+
+								if (!processTriangle(pa, pb, pc, buffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
+									isOccluded = false;
+								}
+							}
 						}
 						
 						anyOccludersProcessed = true;
 					}
 					else {
-						
+						isOccluded = false;
 						console.log("Unsupported occluder");
+					}
 						
+					if (object.occludable && isOccluded) {
+//						webglObject.render = false;
+						_this.info.render.occlusions ++;
 					}
 					
 				}
