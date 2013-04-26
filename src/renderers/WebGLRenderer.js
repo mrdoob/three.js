@@ -4410,11 +4410,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 						var buff_x = buff[x];
 						//If closer than occlusionBuffer value:
 						if (min_z < buff_x) {
+							//If closer than occlusionBuffer value:
 							if (max_z < buff_x) {
 								//Set finest occlusionBuffers Z value
 								buff[x] = max_z;
 							}
 							isOccluded = false;
+							//Switch to test mode
+							break;
+						}
+					}
+
+					for (; x !== xr; x++) {
+						//If closer than occlusionBuffer value:
+						if (max_z < buff[x]) {
+							//Set finest occlusionBuffers Z value
+							buff[x] = max_z;
 						}
 					}
 				}
