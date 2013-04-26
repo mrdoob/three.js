@@ -3972,9 +3972,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function painterSortStable ( a, b ) {
 
-		if ( a.z !== b.z ) {
+		var az = a.z !== undefined ? a.z : 2;
+		var bz = b.z !== undefined ? b.z : 2;
 
-			return b.z - a.z;
+		if ( az !== bz ) {
+
+			return bz - az;
 
 		} else {
 
@@ -4251,7 +4254,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var anyOccludersProcessed = false;
 		
 		var debugCanvas = window.overlayCanvas, debugContext, debugImageData;
-		var buffer = _occlusionBuffer;
 		if (debugCanvas) {
 			debugCanvas.width = _occlusionBufferWidth;
 			debugCanvas.height = _occlusionBufferHeight;
@@ -4518,7 +4520,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			return isOccluded;
 		}
 		
-		for (var i = 0, end = renderList.length; i !== end; i++) {
+		for (var i = renderList.length - 1; i !== -1; i--) {
 			
 			webglObject = renderList[ i ];
 			object = webglObject.object;
@@ -4592,7 +4594,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 								pb.set(_occlusionVerticesTemp[boff], _occlusionVerticesTemp[boff + 1], _occlusionVerticesTemp[boff + 2]);
 								pc.set(_occlusionVerticesTemp[coff], _occlusionVerticesTemp[coff + 1], _occlusionVerticesTemp[coff + 2]);
 
-								if (!processTriangle(pa, pb, pc, buffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
+								if (!processTriangle(pa, pb, pc, _occlusionBuffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
 									isOccluded = false;
 								}
 							}
@@ -4608,7 +4610,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 								pc.set(vertexArray[ j+6 ], vertexArray[ j+7 ], vertexArray[ j+8 ]).applyProjection(_objectProjScreenMatrix);
 								if (pc.z <= 0 || pc.z >= 1) {isOccluded = false; continue;}
 
-								if (!processTriangle(pa, pb, pc, buffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
+								if (!processTriangle(pa, pb, pc, _occlusionBuffer, _occlusionBufferWidth, _occlusionBufferHeight, object.occluder, object.occludable)) {
 									isOccluded = false;
 								}
 							}
@@ -4622,7 +4624,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 						
 					if (object.occludable && isOccluded) {
-//						webglObject.render = false;
+						webglObject.render = false;
 						_this.info.render.occlusions ++;
 					}
 					
@@ -4648,12 +4650,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		
 		
 		if (debugCanvas) {
-			for (var i = 0, o = 0; i < buffer.length; i++) {
-				var b = buffer[i];
-				debugImageData.data[o++] = ((0xffff - b)>>8)&255;
-				debugImageData.data[o++] = (0xffff - b)&255;
-				debugImageData.data[o++] = (b>>8)&255;
-				debugImageData.data[o++] = b < 0xffff ? 128 : 0;
+			var hueModulo = (256 * 6);
+			for (var i = 0, o = 0; i < _occlusionBuffer.length; i++) {
+				var z = _occlusionBuffer[i];
+				var r=0,g=0,b=0,zcol = (z<<3) % hueModulo;
+				switch (zcol >> 8) {
+					case 0: r = 255; g =  zcol & 255; break;
+					case 1: g = 255; r = ~zcol & 255; break;
+					case 2: g = 255; b =  zcol & 255; break;
+					case 3: b = 255; g = ~zcol & 255; break;
+					case 4: b = 255; r =  zcol & 255; break;
+					case 5: r = 255; b = ~zcol & 255; break;
+				}
+				
+				debugImageData.data[o++] = r;
+				debugImageData.data[o++] = g;
+				debugImageData.data[o++] = b;
+				debugImageData.data[o++] = z < 0xffff ? 128 : 0;
 			}
 			debugContext.putImageData(debugImageData, 0, 0);
 		}
@@ -4678,11 +4691,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		for ( var i = start; i !== end; i += delta ) {
-
+			
 			webglObject = renderList[ i ];
 
 			if ( webglObject.render ) {
-
+				
 				object = webglObject.object;
 				buffer = webglObject.buffer;
 
