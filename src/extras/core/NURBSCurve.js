@@ -150,7 +150,6 @@ THREE.NURBSCurve.Utils = {
 	*/
 	calcBSplinePoint: function( p, U, P, u ) {
 		var span = this.findSpan(p, u, U);
-		//console.log("u=" + u + " p=" + p + " span=" + span + " U=" + U);
 		var N = this.calcBasisFunctions(span, u, p, U);
 		var C = new THREE.Vector4(0, 0, 0, 0);
 
@@ -162,7 +161,6 @@ THREE.NURBSCurve.Utils = {
 			C.y += point.y * wNj;
 			C.z += point.z * wNj;
 			C.w += point.w * Nj;
-			//console.log("C=" + C.toArray());
 		}
 
 		return C;
@@ -309,10 +307,6 @@ THREE.NURBSCurve.Utils = {
 				point.add(Pw[span - p + j].clone().multiplyScalar(nders[k][j]));
 			}
 
-			//point.x /= w;
-			//point.y /= w;
-			//point.z /= w;
-
 			CK[k] = point;
 		}
 
@@ -359,24 +353,22 @@ THREE.NURBSCurve.Utils = {
 	*/
 	calcRationalCurveDerivatives: function ( Pders ) {
 		var nd = Pders.length;
-		var Aders = [];//new Point[nd];
-		var wders = [];//new double[nd];
-		//var n = Pders[0].size() - 1;
+		var Aders = [];
+		var wders = [];
 
 		for (var i = 0; i < nd; ++i) {
 			var point = Pders[i];
-			Aders[i] = new THREE.Vector3(point.x, point.y, point.z);//new PointImpl(Arrays.copyOf(Pders[i].getArrayCopy(), n));
-			wders[i] = point.w;//Pders[i].get(n);
+			Aders[i] = new THREE.Vector3(point.x, point.y, point.z);
+			wders[i] = point.w;
 		}
 
-		var CK = [];//new Point[nd];
+		var CK = [];
 
 		for (var k = 0; k < nd; ++k) {
 			var v = Aders[k].clone();
 
 			for (var i = 1; i <= k; ++i) {
 				v.sub(CK[k - i].clone().multiplyScalar(this.calcKoverI(k,i) * wders[i]));
-				//v = v.minus(CK[k - i].times(BSplineUtils.calcKoverI(k, i) * wders[i]));
 			}
 
 			CK[k] = v.divideScalar(wders[0]);
