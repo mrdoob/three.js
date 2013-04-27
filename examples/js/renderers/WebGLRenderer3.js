@@ -345,6 +345,9 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		modelViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		frustum.setFromMatrix( modelViewProjectionMatrix );
 
+		currentBuffer = undefined;
+		currentProgram = undefined;
+
 		renderObject( scene, camera );
 
 	};
