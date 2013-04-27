@@ -246,7 +246,8 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 THREE.NotOccludable = 0;
 THREE.AABBOccludable = 1;
 THREE.VertexOccludable = 2;
-THREE.FillOccludable = 3;/**
+THREE.FillOccludable = 3;
+THREE.EdgeOccludable = 4;/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -22733,7 +22734,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 		}
 		
-		function processTriangle(pa, pb, pc, buff, buffWidth, buffHeight, occluder, occludable) {
+		function processTriangleFill(pa, pb, pc, buff, buffWidth, buffHeight, occluder, occludable) {
 			
 			//TODO: Candidate for asm.js ?
 		
@@ -23008,7 +23009,147 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 			
 			return isOccluded;
+			
 		}
+		
+		function testTriangleEdges(pa, pb, pc, buff, buffWidth, buffHeight) {
+			
+			//TODO: Candidate for asm.js ?
+		
+			//Check off-screen
+			if ((pa.x <= -1 && pb.x <= -1 && pc.x <= -1) || 
+				(pa.y <= -1 && pb.y <= -1 && pc.y <= -1) || 
+				(pa.x >= 1 && pb.x >= 1 && pc.x >= 1) || 
+				(pa.y >= 1 && pb.y >= 1 && pc.y >= 1)) {
+
+				return true;
+
+			}
+
+			//Check winding - skip back-facing triangles
+			var vabx = pb.x - pa.x;
+			var vaby = pb.y - pa.y;
+			var vacx = pc.x - pa.x;
+			var vacy = pc.y - pa.y;
+			if ( vabx * vacy <= vaby * vacx ) return true;
+			
+			var halfWidth = buffWidth / 2;
+			var halfHeight = buffHeight / 2;
+
+			//Convert to screen coordinates
+			var pax = ( ( 1 + pa.x ) * halfWidth  ) | 0,
+				pay = ( ( 1 - pa.y ) * halfHeight ) | 0,
+				pbx = ( ( 1 + pb.x ) * halfWidth  ) | 0,
+				pby = ( ( 1 - pb.y ) * halfHeight ) | 0,
+				pcx = ( ( 1 + pc.x ) * halfWidth  ) | 0,
+				pcy = ( ( 1 - pc.y ) * halfHeight ) | 0,
+				paz = ( pa.z * 0x10000 ) | 0,
+				pbz = ( pb.z * 0x10000 ) | 0,
+				pcz = ( pc.z * 0x10000 ) | 0;
+		
+			function scanLine(x, y, bx, by, min_z) {
+				
+				//Trivial, completely off-screen line cases
+				
+				if ( x < 0 && bx < 0) return true;
+				if ( y < 0 && by < 0) return true;
+				if ( x > buffWidth && bx > buffWidth ) return true;
+				if ( y > buffHeight && by > buffHeight ) return true;
+				
+				var dx,dy,sx,sy,syoff,err,e2;
+				
+				var yoff = y * buffWidth;
+				
+				if ( x < bx ) {
+					
+					dx = bx - x;
+					sx = 1;
+					
+				}
+				else {
+					
+					dx = x - bx;
+					sx = -1;
+					
+				}
+				
+				if ( y < by ) {
+					
+					dy = by - y;
+					sy = 1;
+					syoff = buffWidth;
+					
+				}
+				else {
+					
+					dy = y - by;
+					sy = -1;
+					syoff = -buffWidth;
+					
+				}
+				
+				err = (dx > dy ? dx : -dy) >> 1;
+				
+				var onScreen = x >= 0 && x < buffWidth && y >= 0 && y < buffHeight;
+
+				while (true) {
+					
+					if ( onScreen && min_z < buff[ yoff + x ] ) {
+						
+						return false;
+						
+					}
+					
+					if ( x === bx && y === by ) return true;
+					
+					e2 = err;
+					
+					if (e2 > -dy) {
+						
+						err -= dy;
+						x += sx;
+						
+						if ( onScreen ) {
+
+							if ( x < 0 || x >= buffWidth ) return true;
+
+						}
+						else if ( x >= 0 && x < buffWidth ) {
+							
+							onScreen = true;
+							
+						}
+						
+					}
+					if (e2 < dx) {
+						
+						err += dx;
+						y += sy;
+						yoff += syoff;
+						
+						if ( onScreen ) {
+
+							if ( y < 0 || y >= buffHeight ) return true;
+
+						}
+						else if ( y >= 0 && y < buffHeight ) {
+							
+							onScreen = true;
+							
+						}
+						
+					}
+				}
+				
+			}
+			
+			if ( ! scanLine(pax, pay, pbx, pby, paz < pbz ? paz : pbz) ) return false;
+			if ( ! scanLine(pbx, pby, pcx, pcy, pbz < pcz ? pbz : pcz) ) return false;
+			if ( ! scanLine(pcx, pcy, pax, pay, pcz < paz ? pcz : paz) ) return false;
+			
+			return true;
+		}
+		
 		
 		for (var i = renderList.length - 1; i !== -1; i--) {
 			
@@ -23034,9 +23175,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					clearOcclusionBuffers();
+					
 				}
 
-				function processFillTrianglesIndexed(vertexArray, faceArray) {
+				function processTrianglesIndexed(vertexArray, faceArray, edgeMode) {
 
 					if (_occlusionVerticesTemp.length < vertexArray.length) {
 
@@ -23073,16 +23215,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 						
 						voff = faceArray[ j++ ] * 3;
 						pc.set(_occlusionVerticesTemp[ voff++ ], _occlusionVerticesTemp[ voff++ ], _occlusionVerticesTemp[ voff++ ]);
+						
+						if ( isOccluder || !edgeMode ) {
+							
+							if ( ! processTriangleFill(pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight, isOccluder, isOccluded ) ) {
 
-						if ( ! processTriangle(pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight, isOccluder, isOccluded ) ) {
+								isOccluded = false;
 
-							isOccluded = false;
-
+							}
+							
 						}
+						else {
+							
+							if ( ! testTriangleEdges(pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight) ) {
+								
+								isOccluded = false;
+								
+							}
+							
+						}
+
 					}
+					
 				}
 
-				function processFillTriangles(vertexArray) {
+				function processTriangles(vertexArray, edgeMode) {
 
 					for (var j = 0, numElements = vertexArray.length; j < numElements && ( isOccluded || isOccluder ); j += 9) {
 
@@ -23096,7 +23253,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						pc.set(vertexArray[ j+6 ], vertexArray[ j+7 ], vertexArray[ j+8 ]).applyProjection(_objectProjScreenMatrix);
 						if (pc.z <= 0 || pc.z >= 1) { isOccluded = false; continue; }
 
-						if ( ! processTriangle(pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight, isOccluder, isOccluded ) ) {
+						if ( ! processTriangleFill(pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight, isOccluder, isOccluded ) ) {
 							
 							isOccluded = false;
 							
@@ -23212,12 +23369,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 						
 						if ( object.geometry.attributes.index ) {
 
-							processFillTrianglesIndexed( object.geometry.attributes.position.array, object.geometry.attributes.index.array );
+							processTrianglesIndexed( object.geometry.attributes.position.array, object.geometry.attributes.index.array );
 
 						}
 						else {
 
-							processFillTriangles( object.geometry.attributes.position.array );
+							processTriangles( object.geometry.attributes.position.array );
 
 						}
 						
@@ -23261,7 +23418,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						for ( var g in object.geometry.geometryGroups ) {
 
 							var geometryGroup = object.geometry.geometryGroups[ g ];
-							processFillTrianglesIndexed( geometryGroup.__vertexArray, geometryGroup.__faceArray );
+							processTrianglesIndexed( geometryGroup.__vertexArray, geometryGroup.__faceArray );
 
 						}
 						
@@ -23292,6 +23449,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							processAABBPoints( object.geometry );
 
+						}
+						else if ( object.occlusion === THREE.EdgeOccludable ) {
+							
+							_this.info.occlusion.tested++;
+
+							for ( var g in object.geometry.geometryGroups ) {
+
+								var geometryGroup = object.geometry.geometryGroups[ g ];
+								processTrianglesEdgesIndexed( geometryGroup.__vertexArray, geometryGroup.__faceArray );
+
+							}
+							
 						}
 						
 					}
