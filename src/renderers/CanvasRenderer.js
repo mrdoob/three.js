@@ -622,15 +622,23 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					} else {
 
-						var grad = _context.createLinearGradient(
-							v1.positionScreen.x,
-							v1.positionScreen.y,
-							v2.positionScreen.x,
-							v2.positionScreen.y
-						);
+						try {
 
-						grad.addColorStop( 0, colorStyle1 );
-						grad.addColorStop( 1, colorStyle2 );
+							var grad = _context.createLinearGradient(
+								v1.positionScreen.x,
+								v1.positionScreen.y,
+								v2.positionScreen.x,
+								v2.positionScreen.y
+							);
+							grad.addColorStop( 0, colorStyle1 );
+							grad.addColorStop( 1, colorStyle2 );
+
+						} catch ( exception ) {
+
+							grad = colorStyle1;
+
+						}
+
 						setStrokeStyle( grad );
 
 					}

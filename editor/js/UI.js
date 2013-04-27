@@ -544,7 +544,8 @@ UI.Color = function () {
 	dom.style.border = '0px';
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
-	dom.type = 'color';
+
+	try { dom.type = 'color'; } catch ( exception ) {}
 
 	this.dom = dom;
 
@@ -965,14 +966,6 @@ UI.Button = function () {
 
 	this.dom = dom;
 
-	this.onClickCallback = null;
-
-	this.dom.addEventListener( 'click', function ( event ) {
-
-		scope.onClickCallback();
-
-	}, false );
-
 	return this;
 
 };
@@ -982,14 +975,6 @@ UI.Button.prototype = Object.create( UI.Element.prototype );
 UI.Button.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
-
-	return this;
-
-};
-
-UI.Button.prototype.onClick = function ( callback ) {
-
-	this.onClickCallback = callback;
 
 	return this;
 
