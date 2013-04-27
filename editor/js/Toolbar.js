@@ -8,21 +8,28 @@ var Toolbar = function ( signals ) {
 	buttons.setPadding( '7px' );
 	container.add( buttons );
 
-	// axis
+	// translate / rotate / scale
 
-	var x = new UI.Checkbox( true ).onChange( update );
-	buttons.add( x );
-	buttons.add( new UI.Text( 'x' ) );
+	var translate = new UI.Button( 'translate' ).onClick( function () {
 
-	var y = new UI.Checkbox( true ).setMarginLeft( '10px' ).onChange( update );
-	buttons.add( y );
-	buttons.add( new UI.Text( 'y ' ) );
+		signals.transformModeChanged.dispatch( 'translate' );
 
-	var z = new UI.Checkbox( true ).setMarginLeft( '10px' ).onChange( update );
-	buttons.add( z );
-	buttons.add( new UI.Text( 'z ' ) );
+	} );
+	buttons.add( translate );
 
-	buttons.add( new UI.Text().setWidth( '25px' ) );
+	var rotate = new UI.Button( 'rotate' ).onClick( function () {
+
+		signals.transformModeChanged.dispatch( 'rotate' );
+
+	} );
+	buttons.add( rotate );
+
+	var scale = new UI.Button( 'scale' ).onClick( function () {
+
+		signals.transformModeChanged.dispatch( 'scale' );
+
+	} );
+	buttons.add( scale );
 
 	// grid
 
@@ -36,13 +43,6 @@ var Toolbar = function ( signals ) {
 	buttons.add( new UI.Text( 'snap' ) );
 
 	function update() {
-
-		var axis = new THREE.Vector3();
-		axis.x = x.getValue() === true ? 1 : 0;
-		axis.y = y.getValue() === true ? 1 : 0;
-		axis.z = z.getValue() === true ? 1 : 0;
-
-		signals.modifierAxisChanged.dispatch( axis );
 
 		signals.snapChanged.dispatch( snap.getValue() === true ? grid.getValue() : null );
 

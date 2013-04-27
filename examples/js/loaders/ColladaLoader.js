@@ -716,7 +716,6 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		// FIXME: multi-material mesh?
 		// geometries
 
 		var double_sided_materials = {};
@@ -756,15 +755,15 @@ THREE.ColladaLoader = function () {
 
 						if ( geometry.doubleSided ) {
 
-							if ( !( material3js in double_sided_materials ) ) {
+							if ( !( instance_material.symbol in double_sided_materials ) ) {
 
 								var _copied_material = material3js.clone();
 								_copied_material.side = THREE.DoubleSide;
-								double_sided_materials[ material3js ] = _copied_material;
+								double_sided_materials[ instance_material.symbol ] = _copied_material;
 
 							}
 
-							material3js = double_sided_materials[ material3js ];
+							material3js = double_sided_materials[ instance_material.symbol ];
 
 						}
 
@@ -3143,11 +3142,11 @@ THREE.ColladaLoader = function () {
 						if ( cot.isTexture() ) {
 
 							var samplerId = cot.texture;
-							var surfaceId = this.effect.sampler[samplerId].source;
+							var surfaceId = this.effect.sampler[samplerId];
 
-							if ( surfaceId ) {
+							if ( surfaceId !== undefined && surfaceId.source !== undefined ) {
 
-								var surface = this.effect.surface[surfaceId];
+								var surface = this.effect.surface[surfaceId.source];
 								var image = images[surface.init_from];
 
 								if (image) {
