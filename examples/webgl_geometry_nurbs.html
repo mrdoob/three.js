@@ -85,18 +85,24 @@
 				var nurbsKnots = [];
 				var nurbsDegree = 3;
 
-				for ( var i = 1, j = 20; i < j; i ++ ) {
+				for ( var i = 0; i <= nurbsDegree; i ++ ) {
+
+					nurbsKnots.push( 0 );
+
+				}
+
+				for ( var i = 0, j = 20; i < j; i ++ ) {
 
 					nurbsControlPoints.push(
-						new THREE.Vector4 (
+						new THREE.Vector4(
 							Math.random() * 400 - 200,
 							Math.random() * 400,
 							Math.random() * 400 - 200,
-							1
+							1 // weight of control point: higher means stronger attraction
 						)
 					);
 
-					var knot = ( i - nurbsDegree ) / ( j - nurbsDegree * 2 );
+					var knot = ( i + 1 ) / ( j - nurbsDegree );
 					nurbsKnots.push( THREE.Math.clamp( knot, 0, 1 ) );
 
 				}
