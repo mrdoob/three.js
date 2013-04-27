@@ -5072,18 +5072,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							processAABBPoints( object.geometry );
 
 						}
-						else if ( object.occlusion === THREE.EdgeOccludable ) {
-							
-							_this.info.occlusion.tested++;
-
-							for ( var g in object.geometry.geometryGroups ) {
-
-								var geometryGroup = object.geometry.geometryGroups[ g ];
-								processTrianglesEdgesIndexed( geometryGroup.__vertexArray, geometryGroup.__faceArray );
-
-							}
-							
-						}
 						
 					}
 					
