@@ -78,7 +78,9 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	//
 
+	var frustum = new THREE.Frustum();
 	var modelViewMatrix = new THREE.Matrix4();
+	var modelViewProjectionMatrix = new THREE.Matrix4();
 
 	// buffers
 
@@ -281,6 +283,9 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
+		modelViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		frustum.setFromMatrix( modelViewProjectionMatrix );
+
 		var currentBuffer, currentProgram;
 		var locations = {};
 
@@ -290,7 +295,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			if ( object.visible === false ) continue;
 
-			if ( object instanceof THREE.Mesh ) {
+			if ( object instanceof THREE.Mesh && frustum.intersectsObject( object ) === true ) {
 
 				var program = getProgram( object.material );
 
