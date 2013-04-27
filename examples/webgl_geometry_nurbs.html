@@ -28,6 +28,7 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="../src/extras/core/NURBSCurve.js"></script>
+		<script src="../src/extras/core/NURBSSurface.js"></script>
 
 		<script src="js/libs/stats.min.js"></script>
 
@@ -69,6 +70,8 @@
 				camera.position.set( 0, 150, 500 );
 
 				scene = new THREE.Scene();
+
+				scene.add( new THREE.AmbientLight( 0x404040 ) );
 
 				var light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 0, 1 );
@@ -120,6 +123,53 @@
 
 				parent.add( nurbsLine );
 				parent.add( nurbsControlPointsLine );
+
+				// NURBS Surface
+
+				var nsControlPoints = [
+					[
+						new THREE.Vector4 ( -200, -200, 100, 1 ),
+						new THREE.Vector4 ( -200, -100, -200, 1 ),
+						new THREE.Vector4 ( -200, 100, 250, 1 ),
+						new THREE.Vector4 ( -200, 200, -100, 1 )
+					],
+					[
+						new THREE.Vector4 ( 0, -200, 0, 1 ),
+						new THREE.Vector4 ( 0, -100, -100, 1 ),
+						new THREE.Vector4 ( 0, 100, 150, 1 ),
+						new THREE.Vector4 ( 0, 200, 0, 1 )
+					],
+					[
+						new THREE.Vector4 ( 200, -200, -100, 1 ),
+						new THREE.Vector4 ( 200, -100, 200, 1 ),
+						new THREE.Vector4 ( 200, 100, -250, 1 ),
+						new THREE.Vector4 ( 200, 200, 100, 1 )
+					]
+				];
+				var degree1 = 2;
+				var degree2 = 3;
+				var knots1 = [0, 0, 0, 1, 1, 1];
+				var knots2 = [0, 0, 0, 0, 1, 1, 1, 1];
+				var nurbsSurface = new THREE.NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
+
+				var map = THREE.ImageUtils.loadTexture( 'textures/ash_uvgrid01.jpg' );
+				map.wrapS = map.wrapT = THREE.RepeatWrapping;
+				map.anisotropy = 16;
+
+				var materials = [
+					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } ),
+					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
+				];
+
+				getSurfacePoint = function(u, v) {
+					return nurbsSurface.getPoint(u, v);
+				};
+
+				var geo = new THREE.ParametricGeometry( getSurfacePoint, 50, 50 );
+				var object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
+				object.position.set( 0, 100, 0 );
+				object.scale.multiplyScalar( 1 );
+				parent.add( object );
 
 				//
 
