@@ -22,6 +22,8 @@
 		<script>
 
 			var container, stats, occlusionStats;
+			
+			var occlusionOverlay;
 
 			var camera, scene, renderer;
 			
@@ -94,8 +96,9 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = true;
-				renderer.occlusionCulling = true;
-				renderer.occlusionBufferMaxFill = 0.9;
+				renderer.objectCuller = new THREE.OcclusionCuller( {
+					occlusionBufferMaxFill: 0.9
+				} );
 
 				container.appendChild( renderer.domElement );
 
@@ -182,23 +185,26 @@
 
 				if ( debugMode & 2 ) {
 
-					if ( ! window.threejsOcclusionOverlayCanvas ) {
-						var overlayCanvas = document.createElement('CANVAS');
-						overlayCanvas.style.position = 'absolute';
-						overlayCanvas.style.top = '0';
-						overlayCanvas.style.left = '0';
-						overlayCanvas.style.bottom = '0';
-						overlayCanvas.style.right = '0';
-						overlayCanvas.style.width = '100%';
-						overlayCanvas.style.height = '100%';
-						container.appendChild(overlayCanvas);
-						window.threejsOcclusionOverlayCanvas = overlayCanvas;
+					if ( ! occlusionOverlay ) {
+						
+						occlusionOverlay = document.createElement('CANVAS');
+						occlusionOverlay.style.position = 'absolute';
+						occlusionOverlay.style.top = '0';
+						occlusionOverlay.style.left = '0';
+						occlusionOverlay.style.bottom = '0';
+						occlusionOverlay.style.right = '0';
+						occlusionOverlay.style.width = '100%';
+						occlusionOverlay.style.height = '100%';
+						container.appendChild( occlusionOverlay );
+						
 					}
 					
 				}
-				else if ( window.threejsOcclusionOverlayCanvas ) {
-					window.threejsOcclusionOverlayCanvas.parentNode.removeChild(window.threejsOcclusionOverlayCanvas);
-					window.threejsOcclusionOverlayCanvas = null;
+				else if ( occlusionOverlay ) {
+					
+					occlusionOverlay.parentNode.removeChild( occlusionOverlay );
+					occlusionOverlay = null;
+					
 				}
 
 			}
@@ -221,6 +227,10 @@
 				camera.lookAt( scene.position );
 
 				renderer.render( scene, camera );
+				
+				if ( occlusionOverlay ) {
+					renderer.objectCuller.renderDebug( occlusionOverlay );
+				}
 
 				var occlusionStatsText = '';
 
