@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+	<!-- based on canvas_geometry_shapes.html -->
+	<head>
+		<title>three.js canvas - geometry - NURBS</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #f0f0f0;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+				text-align:center;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="debug" style="position:absolute; left:100px"></canvas>
+
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - NURBS curve example</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+    		<script src="../src/extras/core/NURBSUtils.js"></script>
+    		<script src="../src/extras/core/NURBSCurve.js"></script>
+
+		<script>
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var text, plane;
+
+			var targetRotation = 0;
+			var targetRotationOnMouseDown = 0;
+
+			var mouseX = 0;
+			var mouseXOnMouseDown = 0;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '30px';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.innerHTML = 'Drag to spin';
+				container.appendChild( info );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 150, 500 );
+
+				scene = new THREE.Scene();
+
+				parent = new THREE.Object3D();
+				parent.position.y = 50;
+				scene.add( parent );
+
+				// NURBS curve
+
+				var nurbsControlPoints = [];
+				nurbsControlPoints.push( new THREE.Vector4 ( 200, 100, 100, 1 ) );
+				nurbsControlPoints.push( new THREE.Vector4 ( 100, 300, -200, 1 ) );
+				nurbsControlPoints.push( new THREE.Vector4 ( -100, 200, -40, 5 ) );
+				nurbsControlPoints.push( new THREE.Vector4 ( -200, 350, 250, 1 ) );
+				nurbsControlPoints.push( new THREE.Vector4 ( 0, 0, 0, 1 ) );
+				var nurbsKnots = [0.0, 0.0, 0.0, 0.0, 0.5, 1.0, 1.0, 1.0, 1.0];
+				var nurbsDegree = 3;
+				var nurbsCurve = new THREE.NURBSCurve(nurbsDegree, nurbsKnots, nurbsControlPoints);
+
+				var posX = 0;
+				var posY = -100;
+				var posZ = 0;
+
+				var rotX = 0;
+				var rotY = 0;
+				var rotZ = 0;
+
+				var scaleX = 1;
+				var scaleY = 1;
+				var scaleZ = 1;
+
+				var nurbsGeometry = new THREE.Geometry();
+				nurbsGeometry.vertices = nurbsCurve.getPoints(100);
+				var nurbsMaterial = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333, transparent: true } );
+				var nurbsLine = new THREE.Line( nurbsGeometry, nurbsMaterial );
+				nurbsLine.position.set( posX, posY, posZ );
+				nurbsLine.rotation.set( rotX, rotY, rotZ );
+				nurbsLine.scale.set( scaleX, scaleY, scaleZ );
+
+				var nurbsControlPointsGeometry = new THREE.Geometry();
+				nurbsControlPointsGeometry.vertices = nurbsCurve.controlPoints;
+				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { linewidth: 2, color: 0x333333, transparent: true } );
+				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
+				nurbsControlPointsLine.position.set( posX, posY, posZ );
+				nurbsControlPointsLine.rotation.set( rotX, rotY, rotZ );
+				nurbsControlPointsLine.scale.set( scaleX, scaleY, scaleZ );
+
+				parent.add( nurbsLine );
+				parent.add( nurbsControlPointsLine );
+
+				//
+
+				renderer = new THREE.CanvasRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+				renderer.sortElements = false;
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
+				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function onDocumentMouseDown( event ) {
+
+				event.preventDefault();
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+
+				mouseXOnMouseDown = event.clientX - windowHalfX;
+				targetRotationOnMouseDown = targetRotation;
+
+			}
+
+			function onDocumentMouseMove( event ) {
+
+				mouseX = event.clientX - windowHalfX;
+
+				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+
+			}
+
+			function onDocumentMouseUp( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
+			}
+
+			function onDocumentMouseOut( event ) {
+
+				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
+				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+
+			}
+
+			function onDocumentTouchStart( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotationOnMouseDown = targetRotation;
+
+				}
+
+			}
+
+			function onDocumentTouchMove( event ) {
+
+				if ( event.touches.length == 1 ) {
+
+					event.preventDefault();
+
+					mouseX = event.touches[ 0 ].pageX - windowHalfX;
+					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
+
+				}
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
