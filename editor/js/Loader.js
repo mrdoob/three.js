@@ -204,6 +204,7 @@ var Loader = function ( signals ) {
 
 			case 'js':
 			case 'json':
+			case '3js':
 
 				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
