@@ -273,6 +273,65 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	};
 
+	var currentBuffer, currentProgram;
+	var locations = {};
+
+	var renderObject = function ( object, camera ) {
+
+		if ( object.visible === false ) return;
+
+		if ( object instanceof THREE.Mesh && frustum.intersectsObject( object ) === true ) {
+
+			var program = getProgram( object.material );
+
+			if ( program !== currentProgram ) {
+
+				gl.useProgram( program );
+
+				locations.modelViewMatrix = gl.getUniformLocation( program, 'modelViewMatrix' );
+				locations.projectionMatrix = gl.getUniformLocation( program, 'projectionMatrix' );
+
+				locations.position = gl.getAttribLocation( program, 'position' );
+				locations.color = gl.getAttribLocation( program, 'color' );
+
+				gl.uniformMatrix4fv( locations.projectionMatrix, false, camera.projectionMatrix.elements );
+
+				currentProgram = program;
+
+			}
+
+			var buffer = getBuffer( object.geometry );
+
+			if ( buffer !== currentBuffer ) {
+
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
+				gl.enableVertexAttribArray( locations.position );
+				gl.vertexAttribPointer( locations.position, 3, gl.FLOAT, false, 0, 0 );
+
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer.colors );
+				gl.enableVertexAttribArray( locations.color );
+				gl.vertexAttribPointer( locations.color, 3, gl.FLOAT, false, 0, 0 );
+
+				currentBuffer = buffer;
+
+			}
+
+			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+
+			gl.uniformMatrix4fv( locations.modelViewMatrix, false, modelViewMatrix.elements );
+
+			gl.drawArrays( gl.TRIANGLES, 0, buffer.count );
+
+		}
+
+		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+			renderObject( object.children[ i ], camera );
+
+		}
+
+	};
+
 	this.render = function ( scene, camera ) {
 
 		if ( this.autoClear === true ) this.clear();
@@ -286,60 +345,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		modelViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		frustum.setFromMatrix( modelViewProjectionMatrix );
 
-		var currentBuffer, currentProgram;
-		var locations = {};
-
-		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
-
-			var object = scene.children[ i ];
-
-			if ( object.visible === false ) continue;
-
-			if ( object instanceof THREE.Mesh && frustum.intersectsObject( object ) === true ) {
-
-				var program = getProgram( object.material );
-
-				if ( program !== currentProgram ) {
-
-					gl.useProgram( program );
-
-					locations.modelViewMatrix = gl.getUniformLocation( program, 'modelViewMatrix' );
-					locations.projectionMatrix = gl.getUniformLocation( program, 'projectionMatrix' );
-
-					locations.position = gl.getAttribLocation( program, 'position' );
-					locations.color = gl.getAttribLocation( program, 'color' );
-
-					gl.uniformMatrix4fv( locations.projectionMatrix, false, camera.projectionMatrix.elements );
-
-					currentProgram = program;
-
-				}
-
-				var buffer = getBuffer( object.geometry );
-
-				if ( buffer !== currentBuffer ) {
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
-					gl.enableVertexAttribArray( locations.position );
-					gl.vertexAttribPointer( locations.position, 3, gl.FLOAT, false, 0, 0 );
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.colors );
-					gl.enableVertexAttribArray( locations.color );
-					gl.vertexAttribPointer( locations.color, 3, gl.FLOAT, false, 0, 0 );
-
-					currentBuffer = buffer;
-
-				}
-
-				modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
-				gl.uniformMatrix4fv( locations.modelViewMatrix, false, modelViewMatrix.elements );
-
-				gl.drawArrays( gl.TRIANGLES, 0, buffer.count );
-
-			}
-
-		}
+		renderObject( scene, camera );
 
 	};
 
