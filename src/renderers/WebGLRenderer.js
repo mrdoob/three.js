@@ -4767,7 +4767,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object = webglObject.object;
 
 			//isOccluded is true until we can prove we have to render the object
-			isOccluded = object.occludable !== THREE.NotOccludable && occlusionBufferFilled > 0;
+			isOccluded = object.occludable && occlusionBufferFilled > 0;
 			isOccluder = object.occluder && occlusionBufferFilled < occlusionBufferFillThreshold;
 			
 			if ( webglObject.render && ( isOccluded || isOccluder ) ) {
