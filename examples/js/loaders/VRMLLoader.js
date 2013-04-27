@@ -49,7 +49,7 @@ THREE.VRMLLoader.prototype = {
 
 		var parseV1 = function ( lines, scene ) {
 
-			console.wrn( 'VRML V1.0 not supported yet' );
+			console.warn( 'VRML V1.0 not supported yet' );
 
 		};
 
