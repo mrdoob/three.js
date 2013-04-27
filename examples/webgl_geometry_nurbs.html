@@ -85,7 +85,7 @@
 				var nurbsKnots = [];
 				var nurbsDegree = 3;
 
-				for ( var i = 0, j = 20; i < j; i ++ ) {
+				for ( var i = 1, j = 20; i < j; i ++ ) {
 
 					nurbsControlPoints.push(
 						new THREE.Vector4 (
@@ -96,12 +96,8 @@
 						)
 					);
 
-					var knot = i / j;
-
-					if ( i < nurbsDegree ) knot = 0;
-					if ( i >= j - nurbsDegree ) knot = 1;
-
-					nurbsKnots.push( knot );
+					var knot = ( i - nurbsDegree ) / ( j - nurbsDegree * 2 );
+					nurbsKnots.push( THREE.Math.clamp( knot, 0, 1 ) );
 
 				}
 
@@ -159,7 +155,7 @@
 				};
 
 				var geometry = new THREE.ParametricGeometry( getSurfacePoint, 20, 20 );
-				var material = new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } );
+				var material = new THREE.MeshLambertMaterial( { map: map, side: THREE.DoubleSide } );
 				var object = new THREE.Mesh( geometry, material );
 				object.position.set( - 200, 100, 0 );
 				object.scale.multiplyScalar( 1 );
