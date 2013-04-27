@@ -88,6 +88,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.renderPluginsPre = [];
 	this.renderPluginsPost = [];
+	
+	// Occlusion culling 
+	
+	this.objectCuller = null;
 
 	// info
 
@@ -330,7 +334,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_viewportHeight = height !== undefined ? height : _canvas.height;
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
-
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
@@ -3963,9 +3966,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function painterSortStable ( a, b ) {
 
-		if ( a.z !== b.z ) {
+		var az = a.z !== undefined ? a.z : 2;
+		var bz = b.z !== undefined ? b.z : 2;
 
-			return b.z - a.z;
+		if ( az !== bz ) {
+
+			return bz - az;
 
 		} else {
 
@@ -4120,6 +4126,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			this.setDepthTest( material.depthTest );
 			this.setDepthWrite( material.depthWrite );
 			setPolygonOffset( material.polygonOffset, material.polygonOffsetFactor, material.polygonOffsetUnits );
+			
+			if ( this.objectCuller !== null ) {
+				
+				this.objectCuller.cullObjects( scene.__webglObjects, _projScreenMatrix, _viewportWidth, _viewportHeight );
+				
+			}
 
 			renderObjects( scene.__webglObjects, false, "", camera, lights, fog, true, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "", camera, lights, fog, false, material );
@@ -4131,7 +4143,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// opaque pass (front-to-back order)
 
 			this.setBlending( THREE.NoBlending );
-
+			
+			if ( this.objectCuller !== null ) {
+				
+				this.objectCuller.cullObjects( scene.__webglObjects, _projScreenMatrix, _viewportWidth, _viewportHeight );
+				
+			}
+				
 			renderObjects( scene.__webglObjects, true, "opaque", camera, lights, fog, false, material );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "opaque", camera, lights, fog, false, material );
 
@@ -4224,11 +4242,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		for ( var i = start; i !== end; i += delta ) {
-
+			
 			webglObject = renderList[ i ];
 
 			if ( webglObject.render ) {
-
+				
 				object = webglObject.object;
 				buffer = webglObject.buffer;
 
