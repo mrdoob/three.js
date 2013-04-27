@@ -247,3 +247,4 @@ THREE.NotOccludable = 0;
 THREE.AABBOccludable = 1;
 THREE.VertexOccludable = 2;
 THREE.FillOccludable = 3;
+THREE.EdgeOccludable = 4;
