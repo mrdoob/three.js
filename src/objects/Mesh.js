@@ -11,6 +11,9 @@ THREE.Mesh = function ( geometry, material ) {
 
 	this.geometry = null;
 	this.material = null;
+	
+	this.occludable = THREE.NotOccludable;
+	this.occluder = false;
 
 	this.setGeometry( geometry );
 	this.setMaterial( material );
