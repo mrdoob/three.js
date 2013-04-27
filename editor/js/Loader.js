@@ -104,7 +104,6 @@ var Loader = function ( signals ) {
 			mesh.name = filename;
 
 			signals.objectAdded.dispatch( mesh );
-			signals.objectSelected.dispatch( mesh );
 
 		} else if ( data.metadata.type === 'object' ) {
 
@@ -168,7 +167,6 @@ var Loader = function ( signals ) {
 						mesh.name = filename;
 
 						signals.objectAdded.dispatch( mesh );
-						signals.objectSelected.dispatch( mesh );
 
 					} );
 
@@ -193,7 +191,6 @@ var Loader = function ( signals ) {
 						collada.scene.name = filename;
 
 						signals.objectAdded.dispatch( collada.scene );
-						signals.objectSelected.dispatch( collada.scene );
 
 					} );
 
@@ -266,7 +263,6 @@ var Loader = function ( signals ) {
 					object.name = filename;
 
 					signals.objectAdded.dispatch( object );
-					signals.objectSelected.dispatch( object );
 
 				}, false );
 				reader.readAsText( file );
@@ -292,7 +288,6 @@ var Loader = function ( signals ) {
 					mesh.name = filename;
 
 					signals.objectAdded.dispatch( mesh );
-					signals.objectSelected.dispatch( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -316,7 +311,6 @@ var Loader = function ( signals ) {
 					mesh.name = filename;
 
 					signals.objectAdded.dispatch( mesh );
-					signals.objectSelected.dispatch( mesh );
 
 				}, false );
 
@@ -346,7 +340,6 @@ var Loader = function ( signals ) {
 					var mesh = new THREE.Mesh( geometry, material );
 
 					signals.objectAdded.dispatch( mesh );
-					signals.objectSelected.dispatch( mesh );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -371,7 +364,22 @@ var Loader = function ( signals ) {
 					mesh.name = filename;
 
 					signals.objectAdded.dispatch( mesh );
-					signals.objectSelected.dispatch( mesh );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
+			case 'wrl':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var result = new THREE.VRMLLoader().parse( contents );
+
+					signals.sceneAdded.dispatch( result );
 
 				}, false );
 				reader.readAsText( file );
