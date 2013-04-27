@@ -36,8 +36,7 @@
 			var container, stats;
 
 			var camera, scene, renderer;
-
-			var text, plane;
+			var group;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -69,59 +68,58 @@
 
 				scene = new THREE.Scene();
 
-				parent = new THREE.Object3D();
-				parent.position.y = 50;
-				scene.add( parent );
+				group = new THREE.Object3D();
+				group.position.y = 50;
+				scene.add( group );
 
 				// NURBS curve
 
 				var nurbsControlPoints = [];
-				nurbsControlPoints.push( new THREE.Vector4 ( 200, 100, 100, 1 ) );
-				nurbsControlPoints.push( new THREE.Vector4 ( 100, 300, -200, 1 ) );
-				nurbsControlPoints.push( new THREE.Vector4 ( -100, 200, -40, 5 ) );
-				nurbsControlPoints.push( new THREE.Vector4 ( -200, 350, 250, 1 ) );
-				nurbsControlPoints.push( new THREE.Vector4 ( 0, 0, 0, 1 ) );
-				var nurbsKnots = [0.0, 0.0, 0.0, 0.0, 0.5, 1.0, 1.0, 1.0, 1.0];
+				var nurbsKnots = [];
 				var nurbsDegree = 3;
+
+				for ( var i = 0, j = 20; i < j; i ++ ) {
+
+					nurbsControlPoints.push(
+						new THREE.Vector4 (
+							Math.random() * 400 - 200,
+							Math.random() * 400,
+							Math.random() * 400 - 200,
+							1
+						)
+					);
+
+					var knot = i / j;
+
+					if ( i < nurbsDegree ) knot = 0;
+					if ( i >= j - nurbsDegree ) knot = 1;
+
+					nurbsKnots.push( knot );
+
+				}
+
 				var nurbsCurve = new THREE.NURBSCurve(nurbsDegree, nurbsKnots, nurbsControlPoints);
 
-				var posX = 0;
-				var posY = -100;
-				var posZ = 0;
-
-				var rotX = 0;
-				var rotY = 0;
-				var rotZ = 0;
-
-				var scaleX = 1;
-				var scaleY = 1;
-				var scaleZ = 1;
-
 				var nurbsGeometry = new THREE.Geometry();
-				nurbsGeometry.vertices = nurbsCurve.getPoints(100);
-				var nurbsMaterial = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333, transparent: true } );
+				nurbsGeometry.vertices = nurbsCurve.getPoints( 200 );
+				var nurbsMaterial = new THREE.LineBasicMaterial( { linewidth: 10, color: 0x333333 } );
+
 				var nurbsLine = new THREE.Line( nurbsGeometry, nurbsMaterial );
-				nurbsLine.position.set( posX, posY, posZ );
-				nurbsLine.rotation.set( rotX, rotY, rotZ );
-				nurbsLine.scale.set( scaleX, scaleY, scaleZ );
+				nurbsLine.position.set( 0, -100, 0 );
+				group.add( nurbsLine );
 
 				var nurbsControlPointsGeometry = new THREE.Geometry();
 				nurbsControlPointsGeometry.vertices = nurbsCurve.controlPoints;
-				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { linewidth: 2, color: 0x333333, transparent: true } );
-				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
-				nurbsControlPointsLine.position.set( posX, posY, posZ );
-				nurbsControlPointsLine.rotation.set( rotX, rotY, rotZ );
-				nurbsControlPointsLine.scale.set( scaleX, scaleY, scaleZ );
+				var nurbsControlPointsMaterial = new THREE.LineBasicMaterial( { linewidth: 2, color: 0x333333, opacity: 0.25 } );
 
-				parent.add( nurbsLine );
-				parent.add( nurbsControlPointsLine );
+				var nurbsControlPointsLine = new THREE.Line( nurbsControlPointsGeometry, nurbsControlPointsMaterial );
+				nurbsControlPointsLine.position.copy( nurbsLine.position );
+				group.add( nurbsControlPointsLine );
 
 				//
 
-				renderer = new THREE.CanvasRenderer( { antialias: true } );
+				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.sortObjects = false;
-				renderer.sortElements = false;
 				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
@@ -229,7 +227,7 @@
 
 			function render() {
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}
