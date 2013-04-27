@@ -236,9 +236,9 @@
 
 //				console.log(renderer.info);
 
-				for ( var stat in renderer.info.occlusion ) {
+				for ( var stat in renderer.objectCuller.info ) {
 					
-					occlusionStatsText += stat + ": " + renderer.info.occlusion[ stat ] + "\n";
+					occlusionStatsText += stat + ": " + renderer.objectCuller.info[ stat ] + "\n";
 				}
 				if ( occlusionStats.textContent !== occlusionStatsText ) {
 					
