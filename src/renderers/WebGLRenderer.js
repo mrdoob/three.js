@@ -4362,27 +4362,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if (pbz > max_z) max_z = pbz; else if (pbz < min_z) min_z = pbz;
 			if (pcz > max_z) max_z = pcz; else if (pcz < min_z) min_z = pcz;
 
-			var y0 = pay|0;
-			var y1 = pby|0;
-
-			vabx = pbx - pax;
-			vaby = pby - pay;
-			vacx = pcx - pax;
-			vacy = pcy - pay;
-
-			//Figure out left/right
-			var grad_ab16 = (+vabx * +0x10000 / +vaby)|0;
-			var grad_ac16 = (+vacx * +0x10000 / +vacy)|0;
-			var grad_l16, grad_r16;
-			if (grad_ab16 < grad_ac16) {
-				grad_l16 = grad_ab16;
-				grad_r16 = grad_ac16;
-			}
-			else {
-				grad_r16 = grad_ab16;
-				grad_l16 = grad_ac16;
-			}
-
 			function fillRow(buff, yoff, x, xr, max_z) {
 				if (x < 0) x = 0;
 				if (xr >= buffWidth) xr = buffWidth;
@@ -4506,43 +4485,85 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 			}
 
+			var y0 = pay|0;
+			var y1 = pby|0;
+
+			vabx = pbx - pax;
+			vaby = pby - pay;
+			vacx = pcx - pax;
+			vacy = pcy - pay;
+
+			//Figure out left/right
+			var grad_ab16 = (+vabx * +0x10000 / +vaby)|0;
+			var grad_ac16 = (+vacx * +0x10000 / +vacy)|0;
+			var grad_l16, grad_r16;
+			if (grad_ab16 < grad_ac16) {
+				grad_l16 = grad_ab16;
+				grad_r16 = grad_ac16;
+			}
+			else {
+				grad_r16 = grad_ab16;
+				grad_l16 = grad_ac16;
+			}
+
 			if ( y1 >= 0 ) {
 				if ( y0 >= 0 ) {
-					y = (y0|0);
-					yoff = (y0|0)*buffWidth;
+					
+					y = ( y0 | 0);
+					yoff = ( y0 | 0 ) * buffWidth;
 					xl16 = pax << 16;
 					xr16 = pax << 16;
+					
 				}
 				else {
+					
 					//Fast-forward to 0
 					y=0;
 					yoff = 0;
-					xl16 = (pax << 16) - (y0 * grad_l16);
-					xr16 = (pax << 16) - (y0 * grad_r16);
+					xl16 = ( pax << 16 ) - ( y0 * grad_l16 );
+					xr16 = ( pax << 16 ) - ( y0 * grad_r16 );
+					
 				}
 				
 				if ( y1 === y0) {
-					if (pax < pbx) {
+					
+					if ( pax < pbx ) {
+						
 						xr16 = pbx << 16;
+						grad_r16 = ( ( pcx - pbx ) * 0x10000 / ( pcy - pby ) ) | 0;
+						grad_l16 = grad_ac16;
+						
 					}
 					else {
+						
 						xl16 = pbx << 16;
+						grad_l16 = ( ( pcx - pbx ) * 0x10000 / ( pcy - pby ) ) | 0;
+						grad_r16 = grad_ac16;
+						
 					}
+					
 				}
 				else {
+					
 					doScan(y1 > buffHeight ? buffHeight : (y1|0));
-				}
 
-				if (grad_ab16 < grad_ac16) {
-					grad_l16 = ((pcx - pbx) * 0x10000 / (pcy - pby))|0;
-					grad_r16 = grad_ac16;
-					xl16 = pbx << 16;
+					if ( grad_ab16 < grad_ac16 ) {
+						
+						grad_l16 = ( ( pcx - pbx ) * 0x10000 / ( pcy - pby ) ) | 0;
+						grad_r16 = grad_ac16;
+						xl16 = pbx << 16;
+						
+					}
+					else {
+						
+						grad_r16 = ( ( pcx - pbx ) * 0x10000 / ( pcy - pby ) ) | 0;
+						grad_l16 = grad_ac16;
+						xr16 = pbx << 16;
+						
+					}
+					
 				}
-				else {
-					grad_r16 = ((pcx - pbx) * 0x10000 / (pcy - pby))|0;
-					grad_l16 = grad_ac16;
-					xr16 = pbx << 16;
-				}
+				
 			}
 			else if (y1 < buffWidth) {
 				
