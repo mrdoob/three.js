@@ -93,8 +93,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 	this.occlusionCulling = parameters.occlusionCulling !== undefined ? parameters.occlusionCulling : false;
 	this.occlusionBufferMaxFill = parameters.occlusionBufferMaxFill !== undefined ? parameters.occlusionBufferMaxFill : 1;
-	this.occlusionBufferWidth = parameters.occlusionBufferWidth !== undefined ? parameters.occlusionBufferWidth : 256;
-	this.occlusionBufferHeight = parameters.occlusionBufferHeight !== undefined ? parameters.occlusionBufferHeight : 256;
+	this.occlusionPixelTolerance = parameters.occlusionPixelTolerance !== undefined ? parameters.occlusionPixelTolerance : 4;
 
 	// info
 
@@ -350,8 +349,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_viewportHeight = height !== undefined ? height : _canvas.height;
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
-
-		setupOcclusionBuffers( );
 	};
 
 	this.setScissor = function ( x, y, width, height ) {
@@ -4238,32 +4235,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 	
-	function setupOcclusionBuffers() {
-		
-		if ( ! _this.occlusionCulling ) return;
-
-		_occlusionBuffer = new Uint16Array(_this.occlusionBufferWidth * _this.occlusionBufferHeight);
-		_occlusionVerticesTemp = new Float32Array(48);
-	}
-	
-	function clearOcclusionBuffers() {
-		
-		var buffer;
-		buffer = _occlusionBuffer;
-
-		for (var j = 0, bufferLength = buffer.length; j < bufferLength ; j++ ) {
-
-			buffer[j] = 0xffff;
-
-		}
-
-	}
-	
 	function occludeObjects( renderList ) {
 		
 		if ( ! _this.occlusionCulling ) return;
 		
 		var webglObject, object, isOccluded, isOccluder;
+		
+		var occlusionBufferWidth = Math.ceil(_viewportWidth / _this.occlusionPixelTolerance) | 0;
+		var occlusionBufferHeight = Math.ceil(_viewportHeight / _this.occlusionPixelTolerance) | 0;
 		
 		var debugCanvas = window.threejsOcclusionOverlayCanvas,
 			debugContext,
@@ -4271,14 +4250,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	
 		if ( debugCanvas ) {
 			
-			debugCanvas.width = _this.occlusionBufferWidth;
-			debugCanvas.height = _this.occlusionBufferHeight;
+			debugCanvas.width = occlusionBufferWidth;
+			debugCanvas.height = occlusionBufferHeight;
 			debugContext = debugCanvas.getContext( '2d' );
 			debugContext.fillStyle = 'rgba(0,0,0,0)';
-			debugContext.clearRect( 0, 0, _this.occlusionBufferWidth, _this.occlusionBufferHeight );
+			debugContext.clearRect( 0, 0, occlusionBufferWidth, occlusionBufferHeight );
 
 			debugContext.fillStyle = 'rgba(255,0,255,0.25)';
-			debugImageData = debugContext.createImageData( _this.occlusionBufferWidth, _this.occlusionBufferHeight );
+			debugImageData = debugContext.createImageData( occlusionBufferWidth, occlusionBufferHeight );
 			
 		}
 		
@@ -4286,15 +4265,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var pb = new THREE.Vector3();
 		var pc = new THREE.Vector3();
 		
-		var occlusionBufferSize = _this.occlusionBufferWidth * _this.occlusionBufferHeight;
+		var occlusionBufferSize = occlusionBufferWidth * occlusionBufferHeight;
 		var occlusionBufferFilled = 0;
-		var occlusionBufferFillThreshold = ( _this.occlusionBufferMaxFill * occlusionBufferSize ) |0;
+		var occlusionBufferFillThreshold = ( _this.occlusionBufferMaxFill * occlusionBufferSize ) | 0;
 
-		//Size incorrect, will get recreated on demand below
-		if ( _occlusionBuffer !== null && _occlusionBuffer.length !== occlusionBufferSize ) {
+		//Size incorrect, reallocate
+		if ( _occlusionBuffer === null || _occlusionBuffer.length !== occlusionBufferSize ) {
 			
-			_occlusionBuffer = null;
+			_occlusionBuffer = new Uint16Array( occlusionBufferSize );
 			
+		}
+
+		if ( ! _occlusionVerticesTemp ) {
+
+			_occlusionVerticesTemp = new Float32Array(48);
+
 		}
 		
 		function processTriangleFill( pa, pb, pc, buff, buffWidth, buffHeight, occluder, occludable ) {
@@ -4344,8 +4329,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				pc = temp;
 			}
 		
-			var halfWidth = buffWidth / 2;
-			var halfHeight = buffHeight / 2;
+			var halfWidth = buffWidth >> 1;
+			var halfHeight = buffHeight >> 1;
 
 			//Convert to screen coordinates
 			var pax = ( 1 + pa.x ) * halfWidth,
@@ -4656,8 +4641,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			var vacy = pc.y - pa.y;
 			if ( vabx * vacy <= vaby * vacx ) return true;
 			
-			var halfWidth = buffWidth / 2;
-			var halfHeight = buffHeight / 2;
+			var halfWidth = buffWidth >> 1;
+			var halfHeight = buffHeight >> 1;
 
 			//Convert to screen coordinates
 			var pax = ( ( 1 + pa.x ) * halfWidth  ) | 0,
@@ -4793,13 +4778,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				
 				if ( occlusionBufferFilled === 0 ) {
 
-					if ( ! _occlusionBuffer ) {
+					for (var j = 0, bufferLength = _occlusionBuffer.length; j < bufferLength ; j++ ) {
 
-						setupOcclusionBuffers();
+						_occlusionBuffer[j] = 0xffff;
 
 					}
-
-					clearOcclusionBuffers();
 					
 				}
 
@@ -4843,7 +4826,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						
 						if ( isOccluder || ! edgeMode ) {
 							
-							if ( ! processTriangleFill(pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight, isOccluder, isOccluded ) ) {
+							if ( ! processTriangleFill(pa, pb, pc, _occlusionBuffer, occlusionBufferWidth, occlusionBufferHeight, isOccluder, isOccluded ) ) {
 
 								isOccluded = false;
 
@@ -4852,7 +4835,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 						else {
 							
-							if ( ! testTriangleEdges(pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight ) ) {
+							if ( ! testTriangleEdges(pa, pb, pc, _occlusionBuffer, occlusionBufferWidth, occlusionBufferHeight ) ) {
 								
 								isOccluded = false;
 								
@@ -4881,7 +4864,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						
 						if ( isOccluder || !edgeMode ) {
 							
-							if ( ! processTriangleFill( pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight, isOccluder, isOccluded ) ) {
+							if ( ! processTriangleFill( pa, pb, pc, _occlusionBuffer, occlusionBufferWidth, occlusionBufferHeight, isOccluder, isOccluded ) ) {
 
 								isOccluded = false;
 
@@ -4890,7 +4873,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 						}
 						else {
 							
-							if ( ! testTriangleEdges( pa, pb, pc, _occlusionBuffer, _this.occlusionBufferWidth, _this.occlusionBufferHeight ) ) {
+							if ( ! testTriangleEdges( pa, pb, pc, _occlusionBuffer, occlusionBufferWidth, occlusionBufferHeight ) ) {
 								
 								isOccluded = false;
 								
@@ -4925,15 +4908,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 						//Check on-screen
 						else if (pa.x >= -1 && pa.y >= -1 && pa.x < 1 && pa.y < 1 ){
 							
-							var halfWidth = _this.occlusionBufferWidth / 2;
-							var halfHeight = _this.occlusionBufferHeight / 2;
+							var halfWidth = occlusionBufferWidth >> 1;
+							var halfHeight = occlusionBufferHeight >> 1;
 
 							//Convert to screen coordinates
 							var sx = ( ( 1 + pa.x ) * halfWidth ) | 0,
 								sy = ( ( 1 - pa.y ) * halfHeight ) | 0,
 								sz = ( pa.z*0x10000 ) | 0;
 
-							var buff = _occlusionBuffer[ sy * _this.occlusionBufferWidth + sx ];
+							var buff = _occlusionBuffer[ sy * occlusionBufferWidth + sx ];
 
 							if (sz < buff) {
 
