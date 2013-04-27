@@ -24,6 +24,8 @@
 			var container, stats, occlusionStats;
 
 			var camera, scene, renderer;
+			
+			var zoom = 1500;
 
 			var geometry;
 
@@ -36,6 +38,7 @@
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 			document.addEventListener( 'click', onDocumentClick, false );
+			document.addEventListener( 'mousewheel', onDocumentWheel, false );
 
 			init();
 			animate();
@@ -54,11 +57,13 @@
 				var geometry = new THREE.CubeGeometry( 100, 100, 100 );
 				var material = new THREE.MeshNormalMaterial();
 				
-				for ( var gz = -10; gz < 10 ; gz++ ) {
+				var extents = 10;
+				
+				for ( var gz = -extents; gz <= extents ; gz++ ) {
 					
 					if ( gz % 3 === 0 ) continue;
 
-					for ( var gx = -10; gx < 10 ; gx++ ) {
+					for ( var gx = -extents; gx <= extents ; gx++ ) {
 						
 						if ( gx % 3 === 0 ) continue;
 						
@@ -90,6 +95,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = true;
 				renderer.occlusionCulling = true;
+				renderer.occlusionBufferMaxFill = 0.9;
 
 				container.appendChild( renderer.domElement );
 
@@ -131,10 +137,28 @@
 			}
 
 			function onDocumentMouseMove(event) {
-
+				
+//				if ( debugMode & 1 ) return;
+				
 				mouseX = event.clientX / window.innerWidth;
 				mouseY = event.clientY / window.innerHeight;
 
+			}
+
+			function onDocumentWheel(event) {
+
+				var delta = event.detail || event.wheelDelta || event.wheelDeltaY;
+
+				if ( delta > 0) {
+					
+					zoom *= 15/16;
+					
+				}
+				else if ( delta < 0 ) {
+					
+					zoom *= 17/16;
+					
+				}
 			}
 			
 			function onDocumentClick(event) {
@@ -190,9 +214,9 @@
 
 			function render() {
 				
-				camera.position.x = Math.cos(mouseX * Math.PI) * 2000;
-				camera.position.y = mouseY * 1000;
-				camera.position.z = Math.sin(mouseX * Math.PI) * 2000;
+				camera.position.x = Math.cos(mouseX * 4 * Math.PI) * zoom;
+				camera.position.y = mouseY * zoom;
+				camera.position.z = Math.sin(mouseX * 4 * Math.PI) * zoom;
 
 				camera.lookAt( scene.position );
 
