@@ -92,7 +92,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// Occlusion culling 
 	
 	this.occlusionCulling = parameters.occlusionCulling !== undefined ? parameters.occlusionCulling : false;
-	this.occlusionBufferMaxFill = parameters.occlusionBufferMaxFill !== undefined ? parameters.occlusionBufferMaxFill : 1;
+	this.occlusionBufferMaxFill = parameters.occlusionBufferMaxFill !== undefined ? parameters.occlusionBufferMaxFill : 0.99;
 	this.occlusionPixelTolerance = parameters.occlusionPixelTolerance !== undefined ? parameters.occlusionPixelTolerance : 4;
 
 	// info
@@ -4698,7 +4698,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 				}
 				
-				err = ( dx > dy ? dx : -dy ) >> 1;
+				err = dx - dy;
 				
 				var onScreen = x >= 0 && x < buffWidth && y >= 0 && y < buffHeight;
 
@@ -4706,14 +4706,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 					
 					if ( onScreen && min_z < buff[ yoff + x ] ) {
 						
+//						buff[ yoff + x ] = 0xfffe;
 						return false;
 						
 					}
 					
 					if ( x === bx && y === by ) return true;
 					
-					e2 = err;
-					
+					e2 = err<<1;
 					if ( e2 > -dy ) {
 						
 						err -= dy;
