@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-	<!-- based on webgl_geometry_shapes.html -->
+	<!-- based on webgl_geometry_shapes.html and webgl_geometries2.html -->
 	<head>
 		<title>three.js webgl - geometry - NURBS</title>
 		<meta charset="utf-8">
@@ -24,9 +24,10 @@
 	<body>
 		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - NURBS curve example</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - NURBS curve and surface example</div>
 
 		<script src="../build/three.min.js"></script>
+		<script src="../src/extras/core/NURBSUtils.js"></script>
 		<script src="../src/extras/core/NURBSCurve.js"></script>
 		<script src="../src/extras/core/NURBSSurface.js"></script>
 
@@ -124,7 +125,7 @@
 				parent.add( nurbsLine );
 				parent.add( nurbsControlPointsLine );
 
-				// NURBS Surface
+				// NURBS surface
 
 				var nsControlPoints = [
 					[
@@ -135,8 +136,8 @@
 					],
 					[
 						new THREE.Vector4 ( 0, -200, 0, 1 ),
-						new THREE.Vector4 ( 0, -100, -100, 1 ),
-						new THREE.Vector4 ( 0, 100, 150, 1 ),
+						new THREE.Vector4 ( 0, -100, -100, 5 ),
+						new THREE.Vector4 ( 0, 100, 150, 5 ),
 						new THREE.Vector4 ( 0, 200, 0, 1 )
 					],
 					[
@@ -165,7 +166,7 @@
 					return nurbsSurface.getPoint(u, v);
 				};
 
-				var geo = new THREE.ParametricGeometry( getSurfacePoint, 50, 50 );
+				var geo = new THREE.ParametricGeometry( getSurfacePoint, 20, 20 );
 				var object = THREE.SceneUtils.createMultiMaterialObject( geo, materials );
 				object.position.set( 0, 100, 0 );
 				object.scale.multiplyScalar( 1 );
