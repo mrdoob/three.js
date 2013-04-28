@@ -72,9 +72,6 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 	var intersectionPlanes = {};
 	var intersectionPlaneList = ['XY','YZ','XZ','XYZE']; // E
 	var currentPlane = 'XY';
-	var intersect, planeIntersect;
-
-	var object, name;
 
 	// intersection planes
 	{
@@ -115,44 +112,40 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		this.gizmo.add( pickerAxes["rotate"] );
 		this.gizmo.add( pickerAxes["scale"] );
 
-		var HandleMaterial = function ( color ) {
+		var HandleMaterial = function ( color, opacity ) {
 			var material = new THREE.MeshBasicMaterial();
+			material.color = color;
 			material.side = THREE.DoubleSide;
-			material.transparent = true;
 			material.depthTest = false;
 			material.depthWrite = false;
-			material.color.setRGB( color[0], color[1], color[2] );
-			material.opacity = color[3];
+			material.opacity = opacity !== undefined ? opacity : 1;
+			material.transparent = true;
 			return material;
 		}
 
-		var LineMaterial = function ( color ) {
+		var LineMaterial = function ( color, opacity ) {
 			var material = new THREE.LineBasicMaterial();
-			material.transparent = true;
+			material.color = color;
 			material.depthTest = false;
 			material.depthWrite = false;
-			material.color.setRGB( color[0], color[1], color[2] );
-			material.opacity = color[3];
+			material.opacity = opacity !== undefined ? opacity : 1;
+			material.transparent = true;
 			return material;
 		}
 
 		// materials by color
-		var white = [1,1,1,0.2];
-		var gray = [0.5,0.5,0.5,1];
-		var red = [1,0,0,1];
-		var green = [0,1,0,1];
-		var blue = [0,0,1,1];
-		var cyan = [0,1,1,0.2];
-		var magenta = [1,0,1,0.2];
-		var yellow = [1,1,0,0.2];
+		var white = new THREE.Color( 0xffffff );
+		var gray = new THREE.Color( 0x808080 );
+		var red = new THREE.Color( 0xff0000 );
+		var green = new THREE.Color( 0x00ff00 );
+		var blue = new THREE.Color( 0x0000ff );
+		var cyan = new THREE.Color( 0x00ffff );
+		var magenta = new THREE.Color( 0xff00ff );
+		var yellow = new THREE.Color( 0xffff00 );
 
 		var geometry, mesh;
 
 		// Line axes
-
-		var redColor = new THREE.Color( 0xff0000 );
-		var greenColor = new THREE.Color( 0x00ff00 );
-		var blueColor = new THREE.Color( 0x0000ff );
 
 		geometry = new THREE.Geometry();
 		geometry.vertices.push(
@@ -161,7 +154,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 			new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 1 )
 		);
 		geometry.colors.push(
-			redColor, redColor, greenColor, greenColor, blueColor, blueColor
+			red, red, green, green, blue, blue
 		);
 		material = new THREE.LineBasicMaterial( {
 			vertexColors: THREE.VertexColors,
@@ -175,21 +168,21 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		// Translate handles
 
-		mesh = new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), HandleMaterial( white ) );
+		mesh = new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), HandleMaterial( white, 0.25 ) );
 		mesh.name = 'TXYZ';
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
 
 		geometry = new THREE.PlaneGeometry( 0.3, 0.3 );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( yellow ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( yellow, 0.25 ) );
 		mesh.position.set( 0.15, 0.15, 0 );
 		bakeTransformations( mesh );
 		mesh.name = 'TXY';
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( cyan ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( cyan, 0.25 ) );
 		mesh.position.set( 0, 0.15, 0.15 );
 		mesh.rotation.y = Math.PI/2;
 		bakeTransformations( mesh );
@@ -197,7 +190,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( magenta ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( magenta, 0.25 ) );
 		mesh.position.set( 0.15, 0, 0.15 );
 		mesh.rotation.x = Math.PI/2;
 		bakeTransformations( mesh );
@@ -253,26 +246,26 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		geometry = new THREE.CubeGeometry( 0.125, 0.125, 0.125 );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( white ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( white, 0.25 ) );
 		mesh.name = 'SXYZ';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( [1,0,0,0.25] ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
 		mesh.position.set( 1.05, 0, 0 );
 		bakeTransformations( mesh );
 		mesh.name = 'SX';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( [0,1,0,0.25] ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
 		mesh.position.set( 0, 1.05, 0 );
 		bakeTransformations( mesh );
 		mesh.name = 'SY';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( [0,0,1,0.25] ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
 		mesh.position.set( 0, 0, 1.05 );
 		bakeTransformations( mesh );
 		mesh.name = 'SZ';
@@ -310,33 +303,33 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		mesh.name = 'RXYZE';
 		displayAxes['rotate'].add( mesh );
 
-		mesh = new THREE.Line( Circle( 1.25, 'z' ), LineMaterial( [1,1,0,0.25] ) );
+		mesh = new THREE.Line( Circle( 1.25, 'z' ), LineMaterial( yellow, 0.25 ) );
 		mesh.name = 'RE';
 		displayAxes['rotate'].add( mesh );
 
 		geometry = new THREE.TorusGeometry( 1, 0.15, 4, 6, Math.PI );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( cyan ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
 		mesh.rotation.z = -Math.PI/2;
 		mesh.rotation.y = -Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'RX';
 		pickerAxes['rotate'].add( mesh );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( magenta ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
 		mesh.rotation.z = Math.PI;
 		mesh.rotation.x = -Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'RY';
 		pickerAxes['rotate'].add( mesh );
 
-		mesh = new THREE.Mesh( geometry, HandleMaterial( yellow ) );
+		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
 		mesh.rotation.z = -Math.PI/2;
 		bakeTransformations( mesh );
 		mesh.name = 'RZ';
 		pickerAxes['rotate'].add( mesh );
 
-		mesh = new THREE.Mesh( new THREE.SphereGeometry( 0.95, 12, 12 ), HandleMaterial( white ) );
+		mesh = new THREE.Mesh( new THREE.SphereGeometry( 0.95, 12, 12 ), HandleMaterial( white, 0.25 ) );
 		mesh.name = 'RXYZE';
 		pickerAxes['rotate'].add( mesh );
 
@@ -344,7 +337,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		intersectionPlanes['SPHERE'].visible = false;
 		planes.add(intersectionPlanes['SPHERE']);
 
-		mesh = new THREE.Mesh( new THREE.TorusGeometry( 1.30, 0.15, 4, 12 ), HandleMaterial( yellow ) );
+		mesh = new THREE.Mesh( new THREE.TorusGeometry( 1.30, 0.15, 4, 12 ), HandleMaterial( yellow, 0.25 ) );
 		mesh.name = 'RE';
 		pickerAxes['rotate'].add( mesh );
 
@@ -391,8 +384,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 			for ( var j in this.gizmo.children[i].children ) {
 
-				object = this.gizmo.children[i].children[j];
-				name = object.name;
+				var object = this.gizmo.children[i].children[j];
+				var name = object.name;
 
 				if ( name.search('E') != -1 ){
 
@@ -459,25 +452,25 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	this.hide = function () {
 
-	 	for ( var i in displayAxes ) {
+		for ( var i in displayAxes ) {
 
-		 	for ( var j in displayAxes[i].children ) {
+			for ( var j in displayAxes[i].children ) {
 
-		 		displayAxes[i].children[j].visible = false;
+				displayAxes[i].children[j].visible = false;
 
-		 	}
+			}
 
-	 	}
+		}
 
-	 	for ( var i in pickerAxes ) {
+		for ( var i in pickerAxes ) {
 
-		 	for ( var j in pickerAxes[i].children ) {
+			for ( var j in pickerAxes[i].children ) {
 
-		 		pickerAxes[i].children[j].visible = false;
+				pickerAxes[i].children[j].visible = false;
 
-		 	}
+			}
 
-	 	}
+		}
 
 	}
 
@@ -489,19 +482,19 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		if ( scope.mode == 'scale' ) scope.space = 'local';
 
-	 	for ( var i in displayAxes[this.mode].children ) {
+		for ( var i in displayAxes[this.mode].children ) {
 
- 			displayAxes[this.mode].children[i].visible = true;
+			displayAxes[this.mode].children[i].visible = true;
 
-	 	}
+		}
 
-	 	for ( var i in pickerAxes[this.mode].children ) {
+		for ( var i in pickerAxes[this.mode].children ) {
 
- 			pickerAxes[this.mode].children[i].visible = showPickers;
+			pickerAxes[this.mode].children[i].visible = showPickers;
 
-	 	}
+		}
 
-	 	scope.update();
+		scope.update();
 
 	}
 
@@ -512,7 +505,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		if ( this.space == 'local' ) {
 
 			eye.applyMatrix4( tempMatrix.getInverse( scope.object.matrixWorld ) );
-		
+
 		}
 
 		if ( isActive("X") ) {
@@ -586,38 +579,50 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	}
 
+	var hovered = null;
+	var hoveredColor = new THREE.Color();
+	var hoveredOpacity = 1;
+
 	function onMouseHover( event ) {
 
 		event.preventDefault();
 
-		if ( event.button === 0 && !scope.active ) {
+		if ( event.button === 0 && scope.active === false ) {
 
-			intersect = intersectObjects( event, pickerAxes[scope.mode].children );
+			var intersect = intersectObjects( event, pickerAxes[scope.mode].children );
 
-			for ( var i in displayAxes[scope.mode].children ) {
+			if ( intersect ) {
 
-	 			var axis = displayAxes[scope.mode].children[i];
-	 			
-	 			if ( intersect && axis.name == intersect.object.name ) {
+				if ( hovered !== intersect.object ) {
 
-	 				axis.material.color.setRGB(1,1,0);
-	 				axis.material.opacity = 1;
-	 			
-	 			} else if ( axis.material.origColor ) {
+					if ( hovered !== null ) {
 
-	 				axis.material.color.copy( axis.material.origColor );
-	 				axis.material.opacity = axis.material.origOpacity;
-	 					
-	 			} else {
+						hovered.material.color.copy( hoveredColor );
+						hovered.material.opacity = hoveredOpacity;
 
-	 				axis.material.origColor = axis.material.color.clone();
-	 				axis.material.origOpacity = axis.material.opacity;
+					}
 
-	 			}
+					hovered = intersect.object;
+					hoveredColor.copy( hovered.material.color );
+					hoveredOpacity = hovered.material.opacity;
 
-		 	}
+					hovered.material.color.setRGB( 1, 1, 0 );
+					hovered.material.opacity = 1;
 
-		 	scope.dispatchEvent( changeEvent );
+					scope.dispatchEvent( changeEvent );
+
+				}
+
+			} else if ( hovered !== null ) {
+
+				hovered.material.color.copy( hoveredColor );
+				hovered.material.opacity = hoveredOpacity;
+
+				hovered = null;
+
+				scope.dispatchEvent( changeEvent );
+
+			}
 
 		}
 
@@ -632,7 +637,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		if ( event.button === 0 ) {
 
-			intersect = intersectObjects( event, pickerAxes[scope.mode].children );
+			var intersect = intersectObjects( event, pickerAxes[scope.mode].children );
 
 			if ( intersect ) {
 
@@ -641,7 +646,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 				scope.update();
 				scope.setIntersectionPlane();
 
-				planeIntersect = intersectObjects( event, [intersectionPlanes[currentPlane]] );
+				var planeIntersect = intersectObjects( event, [intersectionPlanes[currentPlane]] );
 
 				if ( planeIntersect ) {
 
@@ -671,7 +676,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		if ( scope.active ) {
 
-			planeIntersect = intersectObjects( event, [intersectionPlanes[currentPlane]] );
+			var planeIntersect = intersectObjects( event, [intersectionPlanes[currentPlane]] );
 
 			if ( planeIntersect ) {
 
@@ -914,8 +919,10 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 	}
 
 	function isActive( name ) {
+
 		if ( scope.active.search( name ) != -1 ) return true;
 		else return false;
+
 	}
 
 	function bakeTransformations( object ) {
