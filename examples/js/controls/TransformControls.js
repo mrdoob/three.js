@@ -8,11 +8,16 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	// TODO: Make non-uniform scale and rotate play nice in hierarchies
 	// TODO: ADD RXYZ contol
+
 	this.camera = camera;
 	this.domElement = ( domElement !== undefined ) ? domElement : document;
 	this.document = ( doc !== undefined ) ? doc : document;
 
+	this.object = undefined;
+
 	this.active = false;
+	this.hovered = false;
+
 	this.mode = 'translate';
 	this.space = 'local';
 	this.scale = 1;
@@ -358,6 +363,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	this.detatch = function ( object ) {
 
+		this.object = undefined;
+
 	 	this.hide();
 
 		this.domElement.removeEventListener( 'mousedown', onMouseDown, false );
@@ -367,6 +374,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 	}
 
 	this.update = function () {
+
+		if ( this.object === undefined ) return;
 
 		this.object.updateMatrixWorld();
 		worldPosition.getPositionFromMatrix( this.object.matrixWorld );
@@ -613,6 +622,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 				}
 
+				scope.hovered = true;
+
 			} else if ( hovered !== null ) {
 
 				hovered.material.color.copy( hoveredColor );
@@ -621,6 +632,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 				hovered = null;
 
 				scope.dispatchEvent( changeEvent );
+
+				scope.hovered = false;
 
 			}
 

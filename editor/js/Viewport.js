@@ -99,16 +99,12 @@ var Viewport = function ( signals ) {
 
 		onMouseDownPosition.set( event.layerX, event.layerY );
 
-		controls.enabled = true;
+		if ( transformControls.hovered === false ) {
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+			controls.enabled = true;
+			document.addEventListener( 'mouseup', onMouseUp, false );
 
-	};
-
-	var onMouseMove = function ( event ) {
-
-		controls.enabled = transformControls.active === false;
+		}
 
 	};
 
@@ -146,7 +142,6 @@ var Viewport = function ( signals ) {
 
 		controls.enabled = false;
 
-		document.removeEventListener( 'mousemove', onMouseMove );
 		document.removeEventListener( 'mouseup', onMouseUp );
 
 	};
@@ -158,7 +153,6 @@ var Viewport = function ( signals ) {
 		if ( intersects.length > 0 && intersects[ 0 ].object === selected ) {
 
 			controls.focus( selected );
-			controls.enabled = true;
 
 		}
 
@@ -177,6 +171,7 @@ var Viewport = function ( signals ) {
 		transformControls.update();
 
 	} );
+	controls.enabled = false;
 
 	// signals
 
