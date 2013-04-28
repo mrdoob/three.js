@@ -34,6 +34,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_contextDashSize = null,
 	_contextGapSize = 0,
 
+	_camera,
+
 	_v1, _v2, _v3, _v4,
 	_v5 = new THREE.RenderableVertex(),
 	_v6 = new THREE.RenderableVertex(),
@@ -264,6 +266,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_renderData = _projector.projectScene( scene, camera, this.sortObjects, this.sortElements );
 		_elements = _renderData.elements;
 		_lights = _renderData.lights;
+		_camera = camera;
 
 		/* DEBUG
 		setFillStyle( 'rgba( 0, 255, 255, 0.5 )' );
@@ -781,8 +784,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-			_near = camera.near;
-			_far = camera.far;
+			_near = _camera.near;
+			_far = _camera.far;
 
 			_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
 			_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far );
@@ -967,8 +970,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
-			_near = camera.near;
-			_far = camera.far;
+			_near = _camera.near;
+			_far = _camera.far;
 
 			_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
 			_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far );
