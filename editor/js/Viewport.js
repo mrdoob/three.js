@@ -167,8 +167,8 @@ var Viewport = function ( signals ) {
 	var controls = new THREE.EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
-		signals.objectChanged.dispatch( camera );
 		transformControls.update();
+		signals.objectChanged.dispatch( camera );
 
 	} );
 	controls.enabled = false;
