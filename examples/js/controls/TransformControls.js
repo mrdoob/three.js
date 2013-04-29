@@ -350,7 +350,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	}
 
-	this.attatch = function ( object ) {
+	this.attach = function ( object ) {
 
 		this.object = object;
 	 	this.setMode( scope.mode );
@@ -361,7 +361,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	}
 
-	this.detatch = function ( object ) {
+	this.detach = function ( object ) {
 
 		this.object = undefined;
 
