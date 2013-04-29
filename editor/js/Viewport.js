@@ -300,7 +300,7 @@ var Viewport = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
-		transformControls.detatch();
+		transformControls.detach();
 
 		if ( object !== null ) {
 
