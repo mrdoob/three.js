@@ -72,7 +72,7 @@
 
 					var control = new THREE.TransformControls( camera, renderer.domElement );
 					control.addEventListener( 'change', render );
-					control.attatch( mesh );
+					control.attach( mesh );
 					control.scale = 0.65;
 					scene.add( control.gizmo );
 
