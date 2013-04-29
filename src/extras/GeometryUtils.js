@@ -555,23 +555,6 @@ THREE.GeometryUtils = {
 
 	},
 
-	bakeObjectTransformIntoGeometry: function ( object ) {
-
-		// NOTE: this does not bake the transform into the children of this object
-
-		// this is a trick to bake the transform in the resulting merged geometry.
-		var tempGeometry = new THREE.Geometry();
-		THREE.GeometryUtils.merge( tempGeometry, object );
-		object.setGeometry( tempGeometry );
-
-		// reset transform to identify after baking.
-		object.position.set( 0, 0, 0 );
-		object.rotation.set( 0, 0, 0 );
-		object.quaternion.set( 0, 0, 0, 1 );
-		object.scale.set( 1, 1, 1 );
-
-	},
-
 	setMaterialIndex: function ( geometry, index, startFace, endFace ){
 
 		var faces = geometry.faces;
