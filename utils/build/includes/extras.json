@@ -37,6 +37,7 @@
 	"src/extras/helpers/BoxHelper.js",
 	"src/extras/helpers/CameraHelper.js",
 	"src/extras/helpers/DirectionalLightHelper.js",
+	"src/extras/helpers/FaceNormalsHelper.js",
 	"src/extras/helpers/GridHelper.js",
 	"src/extras/helpers/HemisphereLightHelper.js",
 	"src/extras/helpers/PointLightHelper.js",
