@@ -85,7 +85,7 @@ THREE.CSS3DRenderer = function () {
 
 		return Math.abs( value ) < 0.000001 ? 0 : value;
 
-        };
+	};
 
 	var getCameraCSSMatrix = function ( matrix ) {
 
@@ -140,6 +140,8 @@ THREE.CSS3DRenderer = function () {
 	var renderObject = function ( object, camera ) {
 
 		if ( object instanceof THREE.CSS3DObject ) {
+
+			var style;
 
 			if ( object instanceof THREE.CSS3DSprite ) {
 
