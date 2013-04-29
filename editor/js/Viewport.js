@@ -315,7 +315,7 @@ var Viewport = function ( signals ) {
 
 			if ( selected instanceof THREE.PerspectiveCamera === false ) {
 
-				transformControls.attatch(object);
+				transformControls.attach(object);
 
 			}
 

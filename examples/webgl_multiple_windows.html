@@ -614,7 +614,7 @@
 					control.document = window.document;
 					control.camera = window.currentCamera;
 
-					control.attatch( object );
+					control.attach( object );
 					control.update();
 
 				} );
@@ -628,7 +628,7 @@
 				var container = window.container;
 				var control = new THREE.TransformControls( camera, container, window.document );
 				control.addEventListener( 'change', windowManager.__proto__.updateAllWindows.bind( windowManager ));
-				control.attatch( object );
+				control.attach( object );
 				control.scale = 0.65;
 				this.scene.add( control.gizmo );
 
