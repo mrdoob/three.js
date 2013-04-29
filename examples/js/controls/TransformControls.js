@@ -95,8 +95,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		intersectionPlanes['YZ'].rotation.set( 0, Math.PI/2, 0 );
 		intersectionPlanes['XZ'].rotation.set( -Math.PI/2, 0, 0 );
-		bakeTransformations(intersectionPlanes['YZ']);
-		bakeTransformations(intersectionPlanes['XZ']);
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry(intersectionPlanes['YZ']);
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry(intersectionPlanes['XZ']);
 
 	}
 
@@ -182,7 +182,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( yellow, 0.25 ) );
 		mesh.position.set( 0.15, 0.15, 0 );
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TXY';
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
@@ -190,7 +190,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		mesh = new THREE.Mesh( geometry, HandleMaterial( cyan, 0.25 ) );
 		mesh.position.set( 0, 0.15, 0.15 );
 		mesh.rotation.y = Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TYZ';
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
@@ -198,7 +198,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		mesh = new THREE.Mesh( geometry, HandleMaterial( magenta, 0.25 ) );
 		mesh.position.set( 0.15, 0, 0.15 );
 		mesh.rotation.x = Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TXZ';
 		displayAxes['translate'].add( mesh );
 		pickerAxes['translate'].add( mesh.clone() );
@@ -208,20 +208,20 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
 		mesh.position.x = 1.1;
 		mesh.rotation.z = -Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TX';
 		displayAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
 		mesh.position.y = 1.1;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TY';
 		displayAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
 		mesh.position.z = 1.1;
 		mesh.rotation.x = Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TZ';
 		displayAxes['translate'].add( mesh );
 
@@ -230,20 +230,20 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
 		mesh.position.x = 0.7;
 		mesh.rotation.z = -Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TX';
 		pickerAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
 		mesh.position.y = 0.7;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TY';
 		pickerAxes['translate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
 		mesh.position.z = 0.7;
 		mesh.rotation.x = Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'TZ';
 		pickerAxes['translate'].add( mesh );
 
@@ -258,21 +258,21 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
 		mesh.position.set( 1.05, 0, 0 );
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'SX';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
 		mesh.position.set( 0, 1.05, 0 );
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'SY';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
 		mesh.position.set( 0, 0, 1.05 );
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'SZ';
 		displayAxes['scale'].add( mesh );
 		pickerAxes['scale'].add( mesh.clone() );
@@ -317,20 +317,20 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		mesh = new THREE.Mesh( geometry, HandleMaterial( red ) );
 		mesh.rotation.z = -Math.PI/2;
 		mesh.rotation.y = -Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'RX';
 		pickerAxes['rotate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( green ) );
 		mesh.rotation.z = Math.PI;
 		mesh.rotation.x = -Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'RY';
 		pickerAxes['rotate'].add( mesh );
 
 		mesh = new THREE.Mesh( geometry, HandleMaterial( blue ) );
 		mesh.rotation.z = -Math.PI/2;
-		bakeTransformations( mesh );
+		THREE.GeometryUtils.bakeObjectTransformIntoGeometry( mesh );
 		mesh.name = 'RZ';
 		pickerAxes['rotate'].add( mesh );
 
@@ -935,17 +935,6 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		if ( scope.active.search( name ) != -1 ) return true;
 		else return false;
-
-	}
-
-	function bakeTransformations( object ) {
-
-		var tempGeometry = new THREE.Geometry();
-		THREE.GeometryUtils.merge( tempGeometry, object );
-		object.setGeometry( tempGeometry );
-		object.position.set( 0, 0, 0 );
-		object.rotation.set( 0, 0, 0 );
-		object.scale.set( 1, 1, 1 );
 
 	}
 
