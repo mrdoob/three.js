@@ -94,3 +94,26 @@ THREE.Mesh.prototype.clone = function ( object ) {
 	return object;
 
 };
+
+THREE.Mesh.prototype.bakeTransform = function () {
+
+	// NOTE: this does not bake transform into child nodes
+
+	// this is a trick to bake the transform in the resulting merged geometry.
+	var tempGeometry = new THREE.Geometry();
+	THREE.GeometryUtils.merge( tempGeometry, this );
+	this.setGeometry( tempGeometry );
+
+	/*this.updateMatrix();
+	this.updateMatrixWorld();
+	this.geometry.applyMatrix( this.matrix );*/
+
+	// reset transform to identify after baking.
+	this.position.set( 0, 0, 0 );
+	this.rotation.set( 0, 0, 0 );
+	this.quaternion.set( 0, 0, 0, 1 );
+	this.scale.set( 1, 1, 1 );
+	this.matrix.identity();
+	this.updateMatrixWorld( true );
+
+};
