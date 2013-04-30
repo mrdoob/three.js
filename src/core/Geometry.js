@@ -620,7 +620,7 @@ THREE.Geometry.prototype = {
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			v = this.vertices[ i ];
-			key = (( v.x * precision ) | 0 ) + '_' + (( v.y * precision ) | 0 ) + '_' + (( v.z * precision ) | 0 );
+			key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
 
 			if ( verticesMap[ key ] === undefined ) {
 
