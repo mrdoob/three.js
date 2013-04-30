@@ -1,5 +1,6 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author bhouston / http://exocortex.com
  */
 
 THREE.Clock = function ( autoStart ) {
@@ -14,15 +15,25 @@ THREE.Clock = function ( autoStart ) {
 
 };
 
+THREE.Clock.now = (function() {
+
+	if ( self.performance !== undefined && self.performance.now !== undefined ) {
+
+    	return self.performance.now;
+
+	}
+
+	return Date.now;
+
+})();
+
 THREE.Clock.prototype = {
 
 	constructor: THREE.Clock,
 
 	start: function () {
 
-		this.startTime = window.performance !== undefined && window.performance.now !== undefined
-					? window.performance.now()
-					: Date.now();
+		this.startTime = THREE.Clock.now();
 
 		this.oldTime = this.startTime;
 		this.running = true;
@@ -54,9 +65,7 @@ THREE.Clock.prototype = {
 
 		if ( this.running ) {
 
-			var newTime = window.performance !== undefined && window.performance.now !== undefined
-					? window.performance.now()
-					: Date.now();
+			var newTime = THREE.Clock.now();
 
 			diff = 0.001 * ( newTime - this.oldTime );
 			this.oldTime = newTime;
