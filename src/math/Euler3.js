@@ -223,6 +223,12 @@ THREE.Euler3.prototype = {
 
 	},
 
+	clamp: function() {
+
+		// todo
+		
+	},
+
 	reorder: function( newOrder ) {
 
 		// todo.
@@ -232,7 +238,7 @@ THREE.Euler3.prototype = {
 	alternativeSolution: function() {
 
 		// todo.
-		
+
 	},
 
 	equals: function ( e ) {
