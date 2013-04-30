@@ -103,8 +103,8 @@ THREE.TrackballControls = function(object, domElement) {
     this.getMouseInContainer = function(clientX, clientY) {
         if (!_this.domElement) {
             return new THREE.Vector2(
-			(clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft) / _this.radius,
-			(_this.screen.height * 0.5 + _this.screen.offsetTop - clientY) / _this.radius);
+			(clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft) / (_this.screen.width * 0.5),
+			(_this.screen.height * 0.5 + _this.screen.offsetTop - clientY) / (_this.screen.height* 0.5));
         }
 
         var totalOffsetX = 0;
@@ -125,8 +125,8 @@ THREE.TrackballControls = function(object, domElement) {
         containerY = clientY - totalOffsetY;
         var localRadius = (_this.domElement.offsetWidth + _this.domElement.offsetHeight) / 4;
         return new THREE.Vector2(
-			(containerX - _this.domElement.offsetWidth * 0.5) / localRadius,
-			(_this.domElement.offsetHeight * 0.5 - containerY) / localRadius);
+			(containerX - _this.domElement.offsetWidth * 0.5) / (_this.domElement.offsetWidth*.5),
+			(_this.domElement.offsetHeight * 0.5 - containerY) / (_this.domElement.offsetHeight * .5));
     };
 
     this.getMouseProjectionOnBall = function(clientX, clientY) {
