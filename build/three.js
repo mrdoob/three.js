@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Larry Battle / http://bateru.com/news
+ * @author bhouston / http://exocortex.com
  */
 
 var THREE = THREE || { REVISION: '59dev' };
@@ -64,25 +65,25 @@ THREE.extend = function ( obj, source ) {
 
 // requestAnimationFrame polyfill by Erik Möller
 // fixes from Paul Irish and Tino Zijdel
-
+// using 'self' instead of 'window' for compatibility with both NodeJS and IE10.
 ( function () {
 
 	var lastTime = 0;
 	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-	for ( var x = 0; x < vendors.length && !window.requestAnimationFrame; ++ x ) {
+	for ( var x = 0; x < vendors.length && !self.requestAnimationFrame; ++ x ) {
 
-		window.requestAnimationFrame = window[ vendors[ x ] + 'RequestAnimationFrame' ];
-		window.cancelAnimationFrame = window[ vendors[ x ] + 'CancelAnimationFrame' ] || window[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
+		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
 
 	}
 
-	if ( window.requestAnimationFrame === undefined ) {
+	if ( self.requestAnimationFrame === undefined && self['setTimeout'] !== undefined ) {
 
-		window.requestAnimationFrame = function ( callback ) {
+		self.requestAnimationFrame = function ( callback ) {
 
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-			var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
+			var id = self.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
 			lastTime = currTime + timeToCall;
 			return id;
 
@@ -90,7 +91,11 @@ THREE.extend = function ( obj, source ) {
 
 	}
 
-	window.cancelAnimationFrame = window.cancelAnimationFrame || function ( id ) { window.clearTimeout( id ) };
+	if( self.cancelAnimationFrame === undefined && self['clearTimeout'] !== undefined ) {
+
+		self.cancelAnimationFrame = function ( id ) { self.clearTimeout( id ) };
+
+	}
 
 }() );
 
@@ -5855,8 +5860,8 @@ THREE.Clock.prototype = {
 
 	start: function () {
 
-		this.startTime = window.performance !== undefined && window.performance.now !== undefined
-					? window.performance.now()
+		this.startTime = self.performance !== undefined && self.performance.now !== undefined
+					? self.performance.now()
 					: Date.now();
 
 		this.oldTime = this.startTime;
@@ -5889,8 +5894,8 @@ THREE.Clock.prototype = {
 
 		if ( this.running ) {
 
-			var newTime = window.performance !== undefined && window.performance.now !== undefined
-					? window.performance.now()
+			var newTime = self.performance !== undefined && self.performance.now !== undefined
+					? self.performance.now()
 					: Date.now();
 
 			diff = 0.001 * ( newTime - this.oldTime );
@@ -8082,7 +8087,7 @@ THREE.Geometry.prototype = {
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			v = this.vertices[ i ];
-			key = [ Math.round( v.x * precision ), Math.round( v.y * precision ), Math.round( v.z * precision ) ].join( '_' );
+			key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
 
 			if ( verticesMap[ key ] === undefined ) {
 
@@ -11740,7 +11745,7 @@ THREE.Material = function () {
 
 	this.alphaTest = 0;
 
-	this.overdraw = false; // Boolean for fixing antialiasing gaps in CanvasRenderer
+	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
 
@@ -11783,6 +11788,11 @@ THREE.Material.prototype = {
 				} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 
 					currentValue.copy( newValue );
+
+				} else if ( key == 'overdraw') {
+
+					// ensure overdraw is backwards-compatable with legacy boolean type
+					this[ key ] = Number(newValue);
 
 				} else {
 
@@ -14230,11 +14240,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
 				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
 
-				if ( material.overdraw === true ) {
+				if ( material.overdraw > 0 ) {
 
-					expand( _v1.positionScreen, _v2.positionScreen );
-					expand( _v2.positionScreen, _v3.positionScreen );
-					expand( _v3.positionScreen, _v1.positionScreen );
+					expand( _v1.positionScreen, _v2.positionScreen, material.overdraw );
+					expand( _v2.positionScreen, _v3.positionScreen, material.overdraw );
+					expand( _v3.positionScreen, _v1.positionScreen, material.overdraw );
 
 				}
 
@@ -14267,14 +14277,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v5.positionScreen.copy( _v2.positionScreen );
 				_v6.positionScreen.copy( _v4.positionScreen );
 
-				if ( material.overdraw === true ) {
+				if ( material.overdraw > 0 ) {
 
-					expand( _v1.positionScreen, _v2.positionScreen );
-					expand( _v2.positionScreen, _v4.positionScreen );
-					expand( _v4.positionScreen, _v1.positionScreen );
+					expand( _v1.positionScreen, _v2.positionScreen, material.overdraw );
+					expand( _v2.positionScreen, _v4.positionScreen, material.overdraw );
+					expand( _v4.positionScreen, _v1.positionScreen, material.overdraw );
 
-					expand( _v3.positionScreen, _v5.positionScreen );
-					expand( _v3.positionScreen, _v6.positionScreen );
+					expand( _v3.positionScreen, _v5.positionScreen, material.overdraw );
+					expand( _v3.positionScreen, _v6.positionScreen, material.overdraw );
 
 				}
 
@@ -15104,14 +15114,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	// Hide anti-alias gaps
 
-	function expand( v1, v2 ) {
+	function expand( v1, v2, pixels ) {
 
 		var x = v2.x - v1.x, y = v2.y - v1.y,
 		det = x * x + y * y, idet;
 
 		if ( det === 0 ) return;
 
-		idet = 1 / Math.sqrt( det );
+		idet = pixels / Math.sqrt( det );
 
 		x *= idet; y *= idet;
 
