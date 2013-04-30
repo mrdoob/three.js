@@ -516,6 +516,18 @@ THREE.Vector3.prototype = {
 
 	},
 
+	setEulerFromRotationMatrix: function ( m, order ) {
+
+		console.error( "REMOVED: Vector3\'s setEulerFromRotationMatrix has been removed in favor of Euler.setFromRotationMatrix(), please update your code.");
+
+	},
+
+	setEulerFromQuaternion: function ( q, order ) {
+
+		console.error( "REMOVED: Vector3\'s setEulerFromQuaternion: has been removed in favor of Euler.setFromQuaternion(), please update your code.");
+		
+	},
+
 	getPositionFromMatrix: function ( m ) {
 
 		this.x = m.elements[12];
