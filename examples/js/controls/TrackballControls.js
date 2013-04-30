@@ -24,6 +24,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
+	this.noRoll = false;
 
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
@@ -135,8 +136,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 		);
 
 		var length = mouseOnBall.length();
-
-		if ( length > 1.0 ) {
+		if ( _this.noRoll ) {
+			if ( length < Math.SQRT1_2 ) {
+				mouseOnBall.z = Math.sqrt( 1.0 - length * length );
+			} else {
+				mouseOnBall.z = .5 / length
+			}
+		} else if ( length > 1.0 ) {
 
 			mouseOnBall.normalize();
 
