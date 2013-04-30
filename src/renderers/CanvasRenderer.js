@@ -321,9 +321,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( material.overdraw === true ) {
 
-					expand( _v1.positionScreen, _v2.positionScreen );
-					expand( _v2.positionScreen, _v3.positionScreen );
-					expand( _v3.positionScreen, _v1.positionScreen );
+					expand( _v1.positionScreen, _v2.positionScreen, material.overdraw );
+					expand( _v2.positionScreen, _v3.positionScreen, material.overdraw );
+					expand( _v3.positionScreen, _v1.positionScreen, material.overdraw );
 
 				}
 
@@ -356,14 +356,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_v5.positionScreen.copy( _v2.positionScreen );
 				_v6.positionScreen.copy( _v4.positionScreen );
 
-				if ( material.overdraw === true ) {
+				if ( material.overdraw > 0 ) {
 
-					expand( _v1.positionScreen, _v2.positionScreen );
-					expand( _v2.positionScreen, _v4.positionScreen );
-					expand( _v4.positionScreen, _v1.positionScreen );
+					expand( _v1.positionScreen, _v2.positionScreen, material.overdraw );
+					expand( _v2.positionScreen, _v4.positionScreen, material.overdraw );
+					expand( _v4.positionScreen, _v1.positionScreen, material.overdraw );
 
-					expand( _v3.positionScreen, _v5.positionScreen );
-					expand( _v3.positionScreen, _v6.positionScreen );
+					expand( _v3.positionScreen, _v5.positionScreen, material.overdraw );
+					expand( _v3.positionScreen, _v6.positionScreen, material.overdraw );
 
 				}
 
@@ -1191,14 +1191,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		// Hide anti-alias gaps
 
-		function expand( v1, v2 ) {
+		function expand( v1, v2, pixels ) {
 
 			var x = v2.x - v1.x, y = v2.y - v1.y,
 			det = x * x + y * y, idet;
 
 			if ( det === 0 ) return;
 
-			idet = 1 / Math.sqrt( det );
+			idet = pixels / Math.sqrt( det );
 
 			x *= idet; y *= idet;
 
