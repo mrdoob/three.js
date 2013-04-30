@@ -33,7 +33,7 @@ THREE.Camera.prototype.lookAt = function () {
 
 		} else {
 
-			this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
+			this.rotation.setFromRotationMatrix( m1, this.rotation.Order );
 
 		}
 

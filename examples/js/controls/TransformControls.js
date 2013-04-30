@@ -379,11 +379,11 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		this.object.updateMatrixWorld();
 		worldPosition.getPositionFromMatrix( this.object.matrixWorld );
-		worldRotation.setEulerFromRotationMatrix( tempMatrix.extractRotation(this.object.matrixWorld ));
+		worldRotation.setFromRotationMatrix( tempMatrix.extractRotation(this.object.matrixWorld ));
 
 		this.camera.updateMatrixWorld();
 		camPosition.getPositionFromMatrix( this.camera.matrixWorld );
-		camRotation.setEulerFromRotationMatrix( tempMatrix.extractRotation( this.camera.matrixWorld ));
+		camRotation.setFromRotationMatrix( tempMatrix.extractRotation( this.camera.matrixWorld ));
 
 		scale = worldPosition.distanceTo( camPosition ) / 6 * this.scale;
 		this.gizmo.position.copy( worldPosition )
@@ -399,7 +399,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 				if ( name.search('E') != -1 ){
 
 					lookAtMatrix.lookAt( camPosition, worldPosition, tempVector.set( 0, 1, 0 ));
-					object.rotation.setEulerFromRotationMatrix( lookAtMatrix );
+					object.rotation.setFromRotationMatrix( lookAtMatrix );
 
 				} else {
 
@@ -431,7 +431,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						}
 
-						object.rotation.setEulerFromQuaternion( tempQuaternion );
+						object.rotation.setFromQuaternion( tempQuaternion );
 
 					} else if ( this.space == 'world' ) {
 
@@ -789,7 +789,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionE );
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
+						scope.object.rotation.setFromQuaternion( tempQuaternion );
 
 					} else if ( scope.active == "RXYZE" ) {
 
@@ -802,7 +802,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
+						scope.object.rotation.setFromQuaternion( tempQuaternion );
 
 					} else if ( scope.space == 'local' ) {
 
@@ -822,7 +822,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						if ( scope.active == "RY" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionY );
 						if ( scope.active == "RZ" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionZ );
 
-						scope.object.rotation.setEulerFromQuaternion( quaternionXYZ );
+						scope.object.rotation.setFromQuaternion( quaternionXYZ );
 
 					} else if ( scope.space == 'world' ) {
 
@@ -842,7 +842,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
+						scope.object.rotation.setFromQuaternion( tempQuaternion );
 
 					}
 

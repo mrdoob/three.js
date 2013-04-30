@@ -1,21 +1,25 @@
 /**
+ * @author mrdoob / http://mrdoob.com/
+ * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Euler3 = function ( x, y, z, order ) {
+THREE.Euler = function ( x, y, z, order ) {
 
 	this.x = x || 0;
 	this.y = y || 0;
 	this.z = z || 0;
-	this.order = order || "XYZ";
+	this.order = order || THREE.Euler.DefaultOrder;
 
 };
 
-THREE.Euler3.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+THREE.Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
-THREE.Euler3.prototype = {
+THREE.Euler.DefaultOrder = 'XYZ';
 
-	constructor: THREE.Euler3,
+THREE.Euler.prototype = {
+
+	constructor: THREE.Euler,
 
 	set: function ( x, y, z, order ) {
 
@@ -226,30 +230,50 @@ THREE.Euler3.prototype = {
 	clamp: function() {
 
 		// todo
+		console.error( "ERROR: Euler.clamp() is not yet implemented.");
 		
 	},
 
 	reorder: function( newOrder ) {
 
 		// todo.
+		console.error( "ERROR: Euler.reorder() is not yet implemented.");
 
 	},
 
 	alternativeSolution: function() {
 
 		// todo.
+		console.error( "ERROR: Euler.alternativeSolution() is not yet implemented.");
 
 	},
 
-	equals: function ( e ) {
+	fromArray: function ( array ) {
 
-		return ( ( e.x === this.x ) && ( e.y === this.y ) && ( e.z === this.z ) && ( e.order === this.order ) );
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+		this.order = array[ 3 ];
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		return [ this.x, this.y, this.z, this.order ];
+
+	},
+
+	equals: function ( rotation ) {
+
+		return ( ( rotation.x === this.x ) && ( rotation.y === this.y ) && ( rotation.z === this.z ) && ( rotation.order === this.order ) );
 
 	},
 
 	clone: function () {
 
-		return new THREE.Euler3( this.x, this.y, this.z, this.order );
+		return new THREE.Euler( this.x, this.y, this.z, this.order );
 
 	}
 

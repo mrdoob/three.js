@@ -17,8 +17,7 @@ THREE.Object3D = function () {
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
-	this.rotation = new THREE.Vector3();
-	this.eulerOrder = THREE.Object3D.defaultEulerOrder;
+	this.rotation = new THREE.Euler();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	this.renderDepth = null;
@@ -75,7 +74,7 @@ THREE.Object3D.prototype = {
 
 			} else {
 
-				this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
+				this.rotation.setFromRotationMatrix( m1, this.rotation.order );
 
 			}
 
@@ -101,10 +100,10 @@ THREE.Object3D.prototype = {
 
 			} else {
 
-				q2.setFromEuler( this.rotation, this.eulerOrder );
+				q2.setFromEuler( this.rotation );
 				q2.multiply( q1 );
 
-				this.rotation.setEulerFromQuaternion( q2, this.eulerOrder );
+				this.rotation.setFromQuaternion( q2, this.rotation.order );
 
 			}
 
@@ -131,7 +130,7 @@ THREE.Object3D.prototype = {
 
 			} else {
 
-				v1.applyEuler( this.rotation, this.eulerOrder );
+				v1.applyEuler( this.rotation );
 
 			}
 
@@ -220,7 +219,7 @@ THREE.Object3D.prototype = {
 
 			} else {
 
-				this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
+				this.rotation.setFromRotationMatrix( m1, this.rotation.order );
 
 			}
 
@@ -398,7 +397,7 @@ THREE.Object3D.prototype = {
 
 		if ( this.useQuaternion === false )  {
 
-			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.eulerOrder, this.scale );
+			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.scale );
 
 		} else {
 
@@ -451,8 +450,7 @@ THREE.Object3D.prototype = {
 		object.up.copy( this.up );
 
 		object.position.copy( this.position );
-		if ( object.rotation instanceof THREE.Vector3 ) object.rotation.copy( this.rotation ); // because of Sprite madness
-		object.eulerOrder = this.eulerOrder;
+		if ( object.rotation instanceof THREE.Euler ) object.rotation.copy( this.rotation ); // because of Sprite madness
 		object.scale.copy( this.scale );
 
 		object.renderDepth = this.renderDepth;
