@@ -137,7 +137,7 @@ THREE.TrackballControls = function(object, domElement) {
         var length = mouseOnBall.length();
 
         if (_this.noRoll) {
-            if (length < 0.70710678118654752440) {
+            if (length < Math.SQRT1_2) {
                 mouseOnBall.z = Math.sqrt(1.0 - length * length)
             } else {
                 mouseOnBall.z = .5/length
