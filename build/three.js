@@ -8087,7 +8087,7 @@ THREE.Geometry.prototype = {
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			v = this.vertices[ i ];
-			key = [ Math.round( v.x * precision ), Math.round( v.y * precision ), Math.round( v.z * precision ) ].join( '_' );
+			key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
 
 			if ( verticesMap[ key ] === undefined ) {
 
