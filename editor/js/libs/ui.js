@@ -267,6 +267,7 @@ UI.Select.prototype.setMultiple = function ( boolean ) {
 };
 
 UI.Select.prototype.setOptions = function ( options ) {
+  var selected = this.dom.value;
 
 	while ( this.dom.children.length > 0 ) {
 
@@ -282,6 +283,8 @@ UI.Select.prototype.setOptions = function ( options ) {
 		this.dom.appendChild( option );
 
 	}
+
+  this.dom.value = selected;
 
 	return this;
 
