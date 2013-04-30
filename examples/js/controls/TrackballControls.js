@@ -24,6 +24,7 @@ THREE.TrackballControls = function(object, domElement) {
     this.noRotate = false;
     this.noZoom = false;
     this.noPan = false;
+    this.noRoll = false;
 
     this.staticMoving = false;
     this.dynamicDampingFactor = 0.2;
@@ -104,7 +105,7 @@ THREE.TrackballControls = function(object, domElement) {
         if (!_this.domElement) {
             return new THREE.Vector2(
 			(clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft) / (_this.screen.width * 0.5),
-			(_this.screen.height * 0.5 + _this.screen.offsetTop - clientY) / (_this.screen.height* 0.5));
+			(_this.screen.height * 0.5 + _this.screen.offsetTop - clientY) / (_this.screen.height * 0.5));
         }
 
         var totalOffsetX = 0;
@@ -125,7 +126,7 @@ THREE.TrackballControls = function(object, domElement) {
         containerY = clientY - totalOffsetY;
         var localRadius = (_this.domElement.offsetWidth + _this.domElement.offsetHeight) / 4;
         return new THREE.Vector2(
-			(containerX - _this.domElement.offsetWidth * 0.5) / (_this.domElement.offsetWidth*.5),
+			(containerX - _this.domElement.offsetWidth * 0.5) / (_this.domElement.offsetWidth * .5),
 			(_this.domElement.offsetHeight * 0.5 - containerY) / (_this.domElement.offsetHeight * .5));
     };
 
@@ -135,16 +136,24 @@ THREE.TrackballControls = function(object, domElement) {
 
         var length = mouseOnBall.length();
 
-        if (length > 1.0) {
-
-            mouseOnBall.normalize();
-
+        if (_this.noRoll) {
+            if (length < 0.70710678118654752440) {
+                mouseOnBall.z = Math.sqrt(1.0 - length * length)
+            } else {
+                mouseOnBall.z = .5/length
+            }
         } else {
 
-            mouseOnBall.z = Math.sqrt(1.0 - length * length);
+            if (length > 1.0) {
 
+                mouseOnBall.normalize()
+
+            } else {
+
+                mouseOnBall.z = Math.sqrt(1.0 - length * length);
+
+            }
         }
-
         _eye.copy(_this.object.position).sub(_this.target);
 
         var projection = _this.object.up.clone().setLength(mouseOnBall.y);
