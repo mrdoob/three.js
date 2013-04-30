@@ -17,22 +17,13 @@ THREE.Clock = function ( autoStart ) {
 
 THREE.Clock.now = (function() {
 
-	// is this a standard browser window with standard profiling tools?
-	if( self !== undefined && self.performance !== undefined && self.performance.now !== undefined ) {
+	if ( self.performance !== undefined && self.performance.now !== undefined ) {
 
-		return function() {
-
-			return self.performance.now();
-
-		};
+    	return self.performance.now;
 
 	}
 
-	return function() {
-
-		return Date.now();
-
-	};
+	return Date.now;
 
 })();
 
