@@ -19,8 +19,6 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	// disable default target object behavior
 
-	this.object.useQuaternion = true;
-
 	// internals
 
 	this.tmpQuaternion = new THREE.Quaternion();
