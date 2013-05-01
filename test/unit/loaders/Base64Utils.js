@@ -4,6 +4,18 @@
 
 module( "Base64Utils" );
 
+test( "base64ToIndex", function() {
+	for( var i = 0; i < THREE.Base64Utils._keyStr.length; i ++ ) {
+		var c = THREE.Base64Utils._keyStr.charCodeAt(i);
+		var a = THREE.Base64Utils.base64ToIndexSlow( THREE.Base64Utils._keyStr[i] );
+		var b = THREE.Base64Utils.base64ToIndex( c );
+		console.log( a );
+		console.log( b );
+		ok( a === b, "Passed!" );
+	}	
+});
+
+
 test( "Float32Array Base64 Encode/Decode", function() {
 	var originalArrayBuffer = new ArrayBuffer( 5 * 4 );
 	var originalFloat32Buffer = new Float32Array( originalArrayBuffer );

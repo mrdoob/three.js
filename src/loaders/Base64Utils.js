@@ -31,8 +31,79 @@ THREE.Base64Utils.arrayBufferToBase64 = function (arraybuffer) {
 };
 
 THREE.Base64Utils._keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+THREE.Base64Utils.base64ToIndexSlow = function( c ) {
+  return THREE.Base64Utils._keyStr.indexOf( c );
+};
+
+THREE.Base64Utils.base64ToIndex = function() {
+  var indexOfA = "A".charCodeAt(0);
+  var indexOfZ = "Z".charCodeAt(0);
+  var indexOfa = "a".charCodeAt(0);
+  var indexOfz = "z".charCodeAt(0);
+  var indexOf0 = "0".charCodeAt(0);
+  var indexOf9 = "9".charCodeAt(0);
+  var indexOfSlash = "/".charCodeAt(0);
+  var indexOfPlus = "+".charCodeAt(0);
+
+  //"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  return function( index ) {
+    if( index < indexOfA ) {
+      if( index >= indexOf0 ) {
+        // 0-9
+        return 52 + index - indexOf0;
+      }
+      if( index === indexOfPlus ) {
+        // +
+        return 62
+      }
+      // /
+      return 63;
+    }
+    if( index <= indexOfZ ) {
+      // A-Z
+      return index - indexOfA;      
+    }
+    // a-z
+    return 26 + index - indexOfa;
+  };
+}();
 
 THREE.Base64Utils.base64ToArrayBuffer = function(base64) {
+  var base64ToIndex = function() {
+  var indexOfA = "A".charCodeAt(0);
+  var indexOfZ = "Z".charCodeAt(0);
+  var indexOfa = "a".charCodeAt(0);
+  var indexOfz = "z".charCodeAt(0);
+  var indexOf0 = "0".charCodeAt(0);
+  var indexOf9 = "9".charCodeAt(0);
+  var indexOfSlash = "/".charCodeAt(0);
+  var indexOfPlus = "+".charCodeAt(0);
+
+  //"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  return function( index ) {
+    if( index < indexOfA ) {
+      if( index >= indexOf0 ) {
+        // 0-9
+        return 52 + index - indexOf0;
+      }
+      if( index === indexOfPlus ) {
+        // +
+        return 62
+      }
+      // /
+      return 63;
+    }
+    if( index <= indexOfZ ) {
+      // A-Z
+      return index - indexOfA;      
+    }
+    // a-z
+    return 26 + index - indexOfa;
+  };
+}();
+
   var bufferLength = base64.length * 0.75,
     len = base64.length, i, p = 0,
     encoded1, encoded2, encoded3, encoded4;
@@ -48,10 +119,10 @@ THREE.Base64Utils.base64ToArrayBuffer = function(base64) {
     bytes = new Uint8Array(arraybuffer);
 
     for (i = 0; i < len; i+=4) {
-      encoded1 = THREE.Base64Utils._keyStr.indexOf(base64[i]);
-      encoded2 = THREE.Base64Utils._keyStr.indexOf(base64[i+1]);
-      encoded3 = THREE.Base64Utils._keyStr.indexOf(base64[i+2]);
-      encoded4 = THREE.Base64Utils._keyStr.indexOf(base64[i+3]);
+      encoded1 = base64ToIndex(base64.charCodeAt(i));
+      encoded2 = base64ToIndex(base64.charCodeAt(i+1));
+      encoded3 = base64ToIndex(base64.charCodeAt(i+2));
+      encoded4 = base64ToIndex(base64.charCodeAt(i+3));
 
       bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
       bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
@@ -59,4 +130,5 @@ THREE.Base64Utils.base64ToArrayBuffer = function(base64) {
     }
 
     return arraybuffer;
+
 };
