@@ -35,6 +35,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	// internals
 
+	this.trackedListeners = [];
+	
 	this.target = new THREE.Vector3();
 
 	var lastPosition = new THREE.Vector3();
@@ -515,20 +517,42 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_state = STATE.NONE;
 
 	}
+	
+	this.dispose = function () {
+	
+		for ( var i = 0; i < this.trackedListeners.length; i++ ) {
+			var trackedListener = this.trackedListeners[i];
+			var target = trackedListener.target;
+			var evt = trackedListener.evt;
+			var fn = trackedListener.fn;
+			var useCapture = trackedListener.useCapture;
+			target.removeEventListener( evt, fn, useCapture );
+		}
+	
+	};
+	
+	function addAndTrackEventListener( scope, target, evt, fn, useCapture ) {
+	
+		// all events added this way are
+		// uninstalled when the 'dispose' method is called
+		
+		scope.trackedListeners.push( { target: target, evt: evt, fn: fn, useCapture: useCapture } );
+		target.addEventListener( evt, fn, useCapture );
+	
+	};
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	addAndTrackEventListener( this, this.domElement, 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	addAndTrackEventListener( this, this.domElement, 'mousedown', mousedown, false );
 
-	this.domElement.addEventListener( 'mousedown', mousedown, false );
+	addAndTrackEventListener( this, this.domElement, 'mousewheel', mousewheel, false );
+	addAndTrackEventListener( this, this.domElement, 'DOMMouseScroll', mousewheel, false );
 
-	this.domElement.addEventListener( 'mousewheel', mousewheel, false );
-	this.domElement.addEventListener( 'DOMMouseScroll', mousewheel, false ); // firefox
+	addAndTrackEventListener( this, this.domElement, 'touchstart', touchstart, false );
+	addAndTrackEventListener( this, this.domElement, 'touchend', touchend, false );
+	addAndTrackEventListener( this, this.domElement, 'touchmove', touchmove, false );
 
-	this.domElement.addEventListener( 'touchstart', touchstart, false );
-	this.domElement.addEventListener( 'touchend', touchend, false );
-	this.domElement.addEventListener( 'touchmove', touchmove, false );
-
-	window.addEventListener( 'keydown', keydown, false );
-	window.addEventListener( 'keyup', keyup, false );
+	addAndTrackEventListener( this, window, 'keydown', keydown, false );
+	addAndTrackEventListener( this, window, 'keyup', keyup, false );
 
 	this.handleResize();
 

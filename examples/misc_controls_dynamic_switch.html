@@ -37,9 +37,9 @@
 
 		<script src="js/controls/FlyControls.js"></script>
 		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<!--script src="js/controls/OrbitControls.js"></script>
 		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/controls/PathControls.js"></script>
+		<script src="js/controls/PathControls.js"></script-->
 
 		<script src="js/shaders/CopyShader.js"></script>
 		<script src="js/shaders/FilmShader.js"></script>
@@ -58,7 +58,7 @@
 	<body>
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - dynamic controls switch<br/><br/>
-		<b>1</b> fly, <b>2</b> trackball, <b>3</b> orbit, <b>4</b> first person, <b>5</b> path
+		<b>1</b> fly, <b>2</b> trackball<!--, <b>3</b> orbit, <b>4</b> first person, <b>5</b> path-->
 		</div>
 
 		<script>
@@ -271,32 +271,37 @@
 					case 49: /* Num 1 */
 					case 97: /* NumPad 1 */
 						
+						disposeCurrentControls();
 						installFlyControls();
 						break;
 					
 					case 50: /* Num 2 */
 					case 98: /* NumPad 2 */
 					
+						disposeCurrentControls();
 						installTrackballControls();
 						break;
 					
-					case 51: /* Num 3 */
-					case 99: /* NumPad 3 */
+					//case 51: /* Num 3 */
+					//case 99: /* NumPad 3 */
 					
-						installOrbitControls();
-						break;
+					//	disposeCurrentControls();
+					//	installOrbitControls();
+					//	break;
 					
-					case 52: /* Num 4 */
-					case 100: /* NumPad 4 */
+					//case 52: /* Num 4 */
+					//case 100: /* NumPad 4 */
 					
-						installFirstPersonControls();
-						break;
+					//	disposeCurrentControls();
+					//	installFirstPersonControls();
+					//	break;
 					
-					case 53: /* Num 5 */
-					case 101: /* NumPad 5 */
+					//case 53: /* Num 5 */
+					//case 101: /* NumPad 5 */
 					
-						installPathControls();
-						break;
+					//	disposeCurrentControls();
+					//	installPathControls();
+					//	break;
 					
 					default:
 						break;
@@ -375,6 +380,14 @@
 				composer.render( delta );
 
 			};
+			
+			function disposeCurrentControls() {
+			
+				if ( controls != null ) {
+					controls.dispose();
+				}
+			
+			}
 			
 			function installFlyControls() {
 			
