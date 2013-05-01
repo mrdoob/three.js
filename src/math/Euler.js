@@ -241,16 +241,6 @@ THREE.Euler.prototype = {
 
 	},
 
-	clamp: function() {
-
-		// clamps to the range [ -Math.PI, Math.PI )
-
-		this.x = THREE.Math.fpModulus( this.x + Math.PI, THREE.Math.PI2, true ) - Math.PI;
-		this.y = THREE.Math.fpModulus( this.y + Math.PI, THREE.Math.PI2, true ) - Math.PI;
-		this.z = THREE.Math.fpModulus( this.z + Math.PI, THREE.Math.PI2, true ) - Math.PI;
-		
-	},
-
 	reorder: function() {
 
 		// WARNING: this discards revolution information -bhouston

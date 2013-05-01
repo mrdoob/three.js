@@ -115,22 +115,6 @@ THREE.Math = {
 
 		};
 
-	}(),
-
-	fpModulus: function( value, divisor, upperBound ) {
-
-		if( value < 0 ) {
-
-			value += Math.ceil( (- value) / divisor ) * divisor;
-
-		}
-		else if( value >= divisor ) {
-
-			value -= Math.floor( value / divisor ) * divisor;
-
-		}
-
-		return value;
-	}
+	}()
 
 };

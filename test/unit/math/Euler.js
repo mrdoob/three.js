@@ -51,13 +51,6 @@ test( "set", function() {
 	ok( ! a.equals( eulerZero ), "Passed!" );
 });
 
-test( "clamp", function() {
-	var a = new THREE.Euler( Math.PI*4, -Math.PI*2, 0, 'XYZ' );
-	ok( ! a.equals( eulerZero ), "Passed!" );
-	a.clamp();
-	ok( a.equals( eulerZero ), "Passed!" );
-});
-
 test( "Quaternion.setFromEuler/Euler.fromQuaternion", function() {
 	var testValues = [ eulerZero, eulerAxyz, eulerAzyx ];
 	for( var i = 0; i < testValues.length; i ++ ) {
