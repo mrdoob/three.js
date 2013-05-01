@@ -96,3 +96,17 @@ THREE.Base64.toArrayBuffer = function() {
   };
 
 }();
+
+THREE.Base64.toArrayOfFloats = function( base64 ) {
+
+  var arrayBuffer = THREE.Base64.toArrayBuffer( base64 );
+  var floatArray = new Float32Array( arrayBuffer );
+
+  var arrayOfFloats = [];
+  for( var i = 0, il = floatArray.length; i < il; i ++ ) {
+    arrayOfFloats.push( floatArray[i] );
+  }  
+
+  return arrayOfFloats;
+
+};
