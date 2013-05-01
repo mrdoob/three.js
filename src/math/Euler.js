@@ -26,7 +26,7 @@ THREE.Euler.prototype = {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-		this.order = order;
+		this.order = order || this.order;
 
 		return this;
 
@@ -60,7 +60,9 @@ THREE.Euler.prototype = {
 		var m21 = te[1], m22 = te[5], m23 = te[9];
 		var m31 = te[2], m32 = te[6], m33 = te[10];
 
-		if ( order === undefined || order === 'XYZ' ) {
+		order = order || this.order;
+
+		if ( order === 'XYZ' ) {
 
 			this.y = Math.asin( clamp( m13 ) );
 
@@ -157,6 +159,11 @@ THREE.Euler.prototype = {
 			}
 
 		}
+		else {
+
+			console.warn( 'WARNING: Euler.setFromRotationMatrix() given unsupported order: ' + order )
+		
+		}
 
 		this.order = order;
 
@@ -183,7 +190,9 @@ THREE.Euler.prototype = {
 		var sqz = q.z * q.z;
 		var sqw = q.w * q.w;
 
-		if ( order === undefined || order === 'XYZ' ) {
+		order = order || this.order;
+
+		if ( order === 'XYZ' ) {
 
 			this.x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( sqw - sqx - sqy + sqz ) );
 			this.y = Math.asin(  clamp( 2 * ( q.x * q.z + q.y * q.w ) ) );
@@ -220,6 +229,11 @@ THREE.Euler.prototype = {
 			this.z = Math.asin(  clamp( 2 * ( q.z * q.w - q.x * q.y ) ) );
 
 		}
+		else {
+
+			console.warn( 'WARNING: Euler.setFromQuaternion() given unsupported order: ' + order )
+		
+		}
 
 		this.order = order;
 
@@ -229,8 +243,11 @@ THREE.Euler.prototype = {
 
 	clamp: function() {
 
-		// todo
-		console.error( "ERROR: Euler.clamp() is not yet implemented.");
+		// clamps to the range [ -Math.PI, Math.PI )
+
+		this.x = THREE.Math.fpModulus( this.x + Math.PI, THREE.Math.PI2, true ) - Math.PI;
+		this.y = THREE.Math.fpModulus( this.y + Math.PI, THREE.Math.PI2, true ) - Math.PI;
+		this.z = THREE.Math.fpModulus( this.z + Math.PI, THREE.Math.PI2, true ) - Math.PI;
 		
 	},
 

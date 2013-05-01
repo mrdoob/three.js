@@ -4,6 +4,8 @@
 
 THREE.Math = {
 
+	PI2: Math.PI * 2,
+
 	// Clamp value to range <a, b>
 
 	clamp: function ( x, a, b ) {
@@ -113,6 +115,22 @@ THREE.Math = {
 
 		};
 
-	}()
+	}(),
+
+	fpModulus: function( value, divisor, upperBound ) {
+
+		if( value < 0 ) {
+
+			value += Math.ceil( (- value) / divisor ) * divisor;
+
+		}
+		else if( value >= divisor ) {
+
+			value -= Math.floor( value / divisor ) * divisor;
+
+		}
+
+		return value;
+	}
 
 };
