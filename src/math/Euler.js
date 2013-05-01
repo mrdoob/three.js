@@ -259,8 +259,8 @@ THREE.Euler.prototype = {
 
 		return function( newOrder ) {
 
-			q.setFromEuler( euler );
-			euler.setFromQuaternion( q, newOrder );
+			q.setFromEuler( this );
+			this.setFromQuaternion( q, newOrder );
 
 		};
 

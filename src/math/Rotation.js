@@ -67,7 +67,7 @@ THREE.Rotation.prototype = {
 
     },
 
-    fromArray: function() {
+    fromArray: function( array ) {
 
         this.euler.fromArray( array );
         this.quaternion.setFromEuler( this.euler );
