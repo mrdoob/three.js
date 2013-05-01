@@ -4,14 +4,15 @@
 
 module( "Base64" );
 
-test( "base64ToIndex", function() {
+test( "base64DecodeLookup", function() {
 	for( var i = 0; i < THREE.Base64.base64String.length; i ++ ) {
 		var a = THREE.Base64.base64String.indexOf( THREE.Base64.base64String[i] );
-		var b = THREE.Base64.base64ToIndex( THREE.Base64.base64String.charCodeAt(i) );
+		var b = THREE.Base64.base64DecodeLookup[ THREE.Base64.base64String.charCodeAt(i) ];
+		console.log( a );
+		console.log( b );
 		ok( a === b, "Passed!" );
 	}	
 });
-
 
 test( "Float32Array Base64 Encode/Decode", function() {
 	var originalArrayBuffer = new ArrayBuffer( 5 * 4 );

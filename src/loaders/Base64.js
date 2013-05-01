@@ -8,36 +8,15 @@ THREE.Base64 = function () {
 
 THREE.Base64.base64String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-THREE.Base64.base64ToIndex = function() {
-  var indexOfA = "A".charCodeAt(0);
-  var indexOfZ = "Z".charCodeAt(0);
-  var indexOfa = "a".charCodeAt(0);
-  var indexOfz = "z".charCodeAt(0);
-  var indexOf0 = "0".charCodeAt(0);
-  var indexOf9 = "9".charCodeAt(0);
-  var indexOfSlash = "/".charCodeAt(0);
-  var indexOfPlus = "+".charCodeAt(0);
+THREE.Base64.base64DecodeLookup = function() {
 
-  return function( index ) {
-    if( index < indexOfA ) {
-      if( index >= indexOf0 ) {
-        // 0-9
-        return 52 + index - indexOf0;
-      }
-      if( index === indexOfPlus ) {
-        // +
-        return 62
-      }
-      // /
-      return 63;
-    }
-    if( index <= indexOfZ ) {
-      // A-Z
-      return index - indexOfA;      
-    }
-    // a-z
-    return 26 + index - indexOfa;
-  };
+  var coreArrayBuffer = new ArrayBuffer( 256 );
+  var base64DecodeLookupTable = new Uint8Array( coreArrayBuffer );
+  for( var i = 0; i < THREE.Base64.base64String.length; i ++ ) {
+    base64DecodeLookupTable[ THREE.Base64.base64String[ i ].charCodeAt( 0 ) ] = i;
+  }
+
+  return base64DecodeLookupTable;
 
 }();
 
@@ -46,10 +25,12 @@ THREE.Base64.fromArrayBuffer = function (arraybuffer) {
     i, len = bytes.buffer.byteLength, base64 = "";
 
   for (i = 0; i < len; i+=3) {
-    base64 += THREE.Base64.base64String[bytes[i] >> 2];
-    base64 += THREE.Base64.base64String[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
-    base64 += THREE.Base64.base64String[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
-    base64 += THREE.Base64.base64String[bytes[i + 2] & 63];
+    base64 += (
+        THREE.Base64.base64String[bytes[i] >> 2] +
+        THREE.Base64.base64String[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
+        THREE.Base64.base64String[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)] +
+        THREE.Base64.base64String[bytes[i + 2] & 63]
+      );
   }
 
   if ((len % 3) === 2) {
@@ -63,7 +44,7 @@ THREE.Base64.fromArrayBuffer = function (arraybuffer) {
 
 THREE.Base64.toArrayBuffer = function() {
 
-  var base64ToIndex = THREE.Base64.base64ToIndex;
+  var base64DecodeLookup = THREE.Base64.base64DecodeLookup;
 
   return function(base64) {
 
@@ -82,10 +63,10 @@ THREE.Base64.toArrayBuffer = function() {
     bytes = new Uint8Array(arraybuffer);
 
     for (i = 0; i < len; i+=4) {
-      encoded1 = base64ToIndex(base64.charCodeAt(i));
-      encoded2 = base64ToIndex(base64.charCodeAt(i+1));
-      encoded3 = base64ToIndex(base64.charCodeAt(i+2));
-      encoded4 = base64ToIndex(base64.charCodeAt(i+3));
+      encoded1 = base64DecodeLookup[base64.charCodeAt(i)];
+      encoded2 = base64DecodeLookup[base64.charCodeAt(i+1)];
+      encoded3 = base64DecodeLookup[base64.charCodeAt(i+2)];
+      encoded4 = base64DecodeLookup[base64.charCodeAt(i+3)];
 
       bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
       bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
