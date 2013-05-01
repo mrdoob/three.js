@@ -251,19 +251,21 @@ THREE.Euler.prototype = {
 		
 	},
 
-	reorder: function( newOrder ) {
+	reorder: function() {
 
-		// todo.
-		console.error( "ERROR: Euler.reorder() is not yet implemented.");
+		// WARNING: this discards revolution information -bhouston
 
-	},
+		var q = new THREE.Quaternion();
 
-	alternativeSolution: function() {
+		return function( newOrder ) {
 
-		// todo.
-		console.error( "ERROR: Euler.alternativeSolution() is not yet implemented.");
+			q.setFromEuler( euler );
+			euler.setFromQuaternion( q, newOrder );
 
-	},
+		};
+
+
+	}(),
 
 	fromArray: function ( array ) {
 
