@@ -23124,10 +23124,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objlist.push(
 			{
+				id: null,
 				buffer: buffer,
 				object: object,
 				opaque: null,
-				transparent: null
+				transparent: null,
+				z: 0
 			}
 		);
 
@@ -23137,9 +23139,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objlist.push(
 			{
+				id: null,
 				object: object,
 				opaque: null,
-				transparent: null
+				transparent: null,
+				z: 0
 			}
 		);
 
