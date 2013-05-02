@@ -212,6 +212,23 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 			vertexShader += material.vertexShader;
 			fragmentShader += material.fragmentShader;
 
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+			vertexShader += [
+				'varying vec3 vNormal;',
+				'void main() {',
+				'	vNormal = normalize( normalMatrix * normal );',
+				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+				'}'
+			].join( '\n' );
+
+			fragmentShader += [
+				'varying vec3 vNormal;',
+				'void main() {',
+				'	gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, 1.0 );',
+				'}'
+			].join( '\n' );
+
 		} else {
 
 			vertexShader += [
@@ -222,7 +239,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			fragmentShader += [
 				'void main() {',
-				'	gl_FragColor = vec4(1,0,0,1);',
+				'	gl_FragColor = vec4( 1.0, 0, 0, 1.0 );',
 				'}'
 			].join( '\n' );
 
