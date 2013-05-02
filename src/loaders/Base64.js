@@ -23,84 +23,74 @@ THREE.Base64.base64DecodeLookup = function() {
 
 }();
 
-THREE.Base64.fromArrayBuffer = function() {
+THREE.Base64.fromArrayBuffer = function ( arrayBuffer ) {
 
+  var bytes = new Uint8Array( arrayBuffer );
+  var base64 = "";
   var base64EncodeLookup = THREE.Base64.base64EncodeLookup;
 
-  return function ( arrayBuffer ) {
+  for ( var i = 0, il = bytes.length; i < il; i += 3 ) {
+  
+    base64 += base64EncodeLookup[bytes[i] >> 2];
+    base64 += base64EncodeLookup[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)];
+    base64 += base64EncodeLookup[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)];
+    base64 += base64EncodeLookup[bytes[i + 2] & 63];
 
-    var bytes = new Uint8Array( arrayBuffer );
-    var base64 = "";
+  }
 
-    for ( var i = 0, il = bytes.length; i < il; i += 3 ) {
-    
-      base64 += (
-          base64EncodeLookup[bytes[i] >> 2] +
-          base64EncodeLookup[((bytes[i] & 3) << 4) | (bytes[i + 1] >> 4)] +
-          base64EncodeLookup[((bytes[i + 1] & 15) << 2) | (bytes[i + 2] >> 6)] +
-          base64EncodeLookup[bytes[i + 2] & 63]
-        );
+  var byteLengthMod3 = bytes.length % 3;
 
-    }
+  if ( byteLengthMod3 === 2 ) {
 
-    var byteLengthMod3 = bytes.length % 3;
+    base64 = base64.substring(0, base64.length - 1) + "=";
 
-    if ( byteLengthMod3 === 2 ) {
+  } else if ( byteLengthMod3 === 1 ) {
 
-      base64 = base64.substring(0, base64.length - 1) + "=";
+    base64 = base64.substring(0, base64.length - 2) + "==";
 
-    } else if ( byteLengthMod3 === 1 ) {
+  }
 
-      base64 = base64.substring(0, base64.length - 2) + "==";
+  return base64;
 
-    }
+};
 
-    return base64;
+THREE.Base64.toArrayBuffer = function( base64 ) {
 
-  };
+  var bufferLength = base64.length * 0.75;
 
-}();
+  if (base64[base64.length - 1] === "=") {
 
-THREE.Base64.toArrayBuffer = function() {
+    bufferLength --;
 
-  var base64DecodeLookup = THREE.Base64.base64DecodeLookup;
-
-  return function( base64 ) {
-
-    var bufferLength = base64.length * 0.75;
-
-    if (base64[base64.length - 1] === "=") {
+    if (base64[base64.length - 2] === "=") {
 
       bufferLength --;
 
-      if (base64[base64.length - 2] === "=") {
-
-        bufferLength --;
-
-      }
-
     }
 
-    var arrayBuffer = new ArrayBuffer( bufferLength );
-    var bytes = new Uint8Array( arrayBuffer );
+  }
 
-    for ( var i = 0, p = 0, il = base64.length; i < il; i += 4 ) {
+  var base64DecodeLookup = THREE.Base64.base64DecodeLookup;
 
-      var encoded1 = base64DecodeLookup[base64.charCodeAt(i)];
-      var encoded2 = base64DecodeLookup[base64.charCodeAt(i+1)];
-      var encoded3 = base64DecodeLookup[base64.charCodeAt(i+2)];
-      var encoded4 = base64DecodeLookup[base64.charCodeAt(i+3)];
+  var arrayBuffer = new ArrayBuffer( bufferLength );
+  var bytes = new Uint8Array( arrayBuffer );
 
-      bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
-      bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
-      bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
+  for ( var i = 0, p = 0, il = base64.length; i < il; i += 4 ) {
 
-    }
+    var encoded1 = base64DecodeLookup[base64.charCodeAt(i)];
+    var encoded2 = base64DecodeLookup[base64.charCodeAt(i+1)];
+    var encoded3 = base64DecodeLookup[base64.charCodeAt(i+2)];
+    var encoded4 = base64DecodeLookup[base64.charCodeAt(i+3)];
 
-    return arrayBuffer;
-  };
+    bytes[p++] = (encoded1 << 2) | (encoded2 >> 4);
+    bytes[p++] = ((encoded2 & 15) << 4) | (encoded3 >> 2);
+    bytes[p++] = ((encoded3 & 3) << 6) | (encoded4 & 63);
 
-}();
+  }
+
+  return arrayBuffer;
+
+};
 
 THREE.Base64.fromArrayOfFloats = function( arrayOfFloats ) {
 
