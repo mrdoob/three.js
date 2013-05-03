@@ -1163,6 +1163,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		    type = _gl.ARRAY_BUFFER;
 
+		    geometry.buffer = _gl.createBuffer();
+
 		    _gl.bindBuffer( type, geometry.buffer );
 		    _gl.bufferData( type, geometry.array, _gl.STATIC_DRAW );
 
