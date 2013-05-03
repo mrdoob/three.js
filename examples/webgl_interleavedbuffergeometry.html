@@ -311,9 +311,9 @@
 
 					m2.multiply( m );
 
-					pA.multiplyMatrix4( m2 );
-					pB.multiplyMatrix4( m2 );
-					pC.multiplyMatrix4( m2 );
+					pA.applyMatrix4( m2 );
+					pB.applyMatrix4( m2 );
+					pC.applyMatrix4( m2 );
 
 					var ax = pA.x;
 					var ay = pA.y;
