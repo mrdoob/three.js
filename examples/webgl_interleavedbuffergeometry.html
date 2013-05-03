@@ -311,9 +311,9 @@
 
 					m2.multiply( m );
 
-					m2.multiplyVector3( pA );
-					m2.multiplyVector3( pB );
-					m2.multiplyVector3( pC );
+					pA.multiplyMatrix4( m2 );
+					pB.multiplyMatrix4( m2 );
+					pC.multiplyMatrix4( m2 );
 
 					var ax = pA.x;
 					var ay = pA.y;
@@ -347,8 +347,8 @@
 					pB.set( bx, by, bz );
 					pC.set( cx, cy, cz );
 
-					cb.sub( pC, pB );
-					ab.sub( pA, pB );
+					cb.subVectors( pC, pB );
+					ab.subVectors( pA, pB );
 					cb.cross( ab );
 
 					cb.normalize();
