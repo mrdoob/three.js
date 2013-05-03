@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - interleavedbuffergeometry</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #fff;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #050505;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #ff0000;
+			}
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #fff !important }
+			#stats #fps #fpsGraph { display: none }
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - morphtargets -
+			Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a>
+
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="../src/three.min.js"></script>
+		<script src="../src/core/InterleavedBufferGeometry.js"></script>
+		<script src="../src/core/WebGLRenderer.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script type="x-shader/x-vertex" id="vertexShader">
+
+			uniform float amplitude;
+
+			varying vec3 vViewPosition;
+			varying vec3 vNormal;
+
+			vec3 rotateVectorByQuaternion( vec3 v, vec4 q ) {
+
+				vec3 dest = vec3( 0.0 );
+
+				float x = v.x, y  = v.y, z  = v.z;
+				float qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+
+				// calculate quaternion * vector
+
+				float ix =  qw * x + qy * z - qz * y,
+					  iy =  qw * y + qz * x - qx * z,
+					  iz =  qw * z + qx * y - qy * x,
+					  iw = -qx * x - qy * y - qz * z;
+
+				// calculate result * inverse quaternion
+
+				dest.x = ix * qw + iw * -qx + iy * -qz - iz * -qy;
+				dest.y = iy * qw + iw * -qy + iz * -qx - ix * -qz;
+				dest.z = iz * qw + iw * -qz + ix * -qy - iy * -qx;
+
+				return dest;
+
+			}
+
+			vec4 axisAngleToQuaternion( vec3 axis, float angle ) {
+
+				vec4 dest = vec4( 0.0 );
+
+				float halfAngle = angle / 2.0,
+					  s = sin( halfAngle );
+
+				dest.x = axis.x * s;
+				dest.y = axis.y * s;
+				dest.z = axis.z * s;
+				dest.w = cos( halfAngle );
+
+				return dest;
+
+			}
+
+			void main() {
+
+				vec4 rotation = vec4( 0.0, 1.0, 0.0, amplitude * length( color ) * 0.001 );
+				vec4 qRotation = axisAngleToQuaternion( rotation.xyz, rotation.w );
+
+				vec3 newPosition = rotateVectorByQuaternion( position - color, qRotation ) + color;
+				vNormal = normalMatrix * rotateVectorByQuaternion( normal, qRotation );
+
+				vec4 mvPosition = modelViewMatrix * vec4( newPosition, 1.0 );
+				vViewPosition = -mvPosition.xyz;
+
+				gl_Position = projectionMatrix * mvPosition;
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+
+			varying vec3 vViewPosition;
+			varying vec3 vNormal;
+
+			void main() {
+
+				vec3 normal = normalize( vNormal );
+
+				// directional light
+
+				const vec3 lightCol1 = vec3( 0.5, 0.8, 1.0 );
+				const vec3 lightDir1 = vec3( 0.0, -1.0, 0.0 );
+				const float intensity1 = 0.5;
+
+				vec4 lDirection1 = viewMatrix * vec4( lightDir1, 0.0 );
+				vec3 lightVec1 = normalize( lDirection1.xyz );
+
+				// point light
+
+				const vec3 lightPos2 = vec3( 0.0, 0.0, 0.0 );
+				const vec3 lightCol2 = vec3( 1.0, 0.5, 0.0 );
+				const float maxDistance2 = 2000.0;
+				const float intensity2 = 1.5;
+
+				vec4 lPosition = viewMatrix * vec4( lightPos2, 1.0 );
+				vec3 lVector = lPosition.xyz + vViewPosition.xyz;
+
+				vec3 lightVec2 = normalize( lVector );
+				float lDistance2 = 1.0 - min( ( length( lVector ) / maxDistance2 ), 1.0 );
+
+				// point light
+
+				const vec3 lightPos3 = vec3( 0.0, -1000.0, 1000.0 );
+				const vec3 lightCol3 = vec3( 1.0, 0.1, 0.0 );
+				const float maxDistance3 = 3000.0;
+				const float intensity3 = 1.0;
+
+				vec4 lPosition3 = viewMatrix * vec4( lightPos3, 1.0 );
+				vec3 lVector3 = lPosition3.xyz + vViewPosition.xyz;
+
+				vec3 lightVec3 = normalize( lVector3 );
+				float lDistance3 = 1.0 - min( ( length( lVector3 ) / maxDistance3 ), 1.0 );
+
+				//
+
+				float diffuse1 = intensity1 * max( dot( normal, lightVec1 ), 0.0 );
+				float diffuse2 = intensity2 * max( dot( normal, lightVec2 ), 0.0 ) * lDistance2;
+				float diffuse3 = intensity2 * max( dot( normal, lightVec3 ), 0.0 ) * lDistance3;
+
+				gl_FragColor = vec4( diffuse1 * lightCol1 + diffuse2 * lightCol2 + diffuse3 * lightCol3, 1.0 );
+
+			}
+
+		</script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer;
+
+			var mesh;
+
+			var clock = new THREE.Clock();
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				//
+
+				camera = new THREE.PerspectiveCamera( 37, window.innerWidth / window.innerHeight, 1, 8000 );
+				camera.position.z = 2750;
+				camera.position.y = 1250;
+
+				scene = new THREE.Scene();
+
+				camera.lookAt( scene.position );
+
+				// 150,000 cubes
+				// 12 triangles per cube (6 quads)
+
+				var triangles = 12 * 150000;
+
+				// BufferGeometry with unindexed triangles
+				// use vertex colors to store centers of rotations
+
+				var geometry = new THREE.InterleavedBufferGeometry();
+
+				geometry.numVertices = triangles * 3;
+				geometry.attributes = {
+
+					position: {
+					    itemSize: 3,
+					    offset: 0,
+					    indexMultiplier: 0.0,
+                        array: null
+					},
+
+					normal: {
+					    itemSize: 3,
+					    offset: 3 * Float32Array.BYTES_PER_ELEMENT,
+					    indexMultiplier: 0.0,
+					    array: null
+					},
+
+					color: {
+					    itemSize: 3,
+					    offset: 6 * Float32Array.BYTES_PER_ELEMENT,
+					    indexMultiplier: 0.0,
+					    array: null
+					}
+
+				}
+
+				geometry.vertexByteSize
+                    = geometry.attributes.position.itemSize * Float32Array.BYTES_PER_ELEMENT
+                    + geometry.attributes.normal.itemSize * Float32Array.BYTES_PER_ELEMENT
+                    + geometry.attributes.color.itemSize * Float32Array.BYTES_PER_ELEMENT;
+
+				geometry.array = new ArrayBuffer( geometry.numVertices * geometry.vertexByteSize );
+
+				geometry.attributes.position.array = new Float32Array( geometry.array, geometry.attributes.position.offset );
+				geometry.attributes.normal.array = new Float32Array( geometry.array, geometry.attributes.normal.offset );
+				geometry.attributes.color.array = new Float32Array( geometry.array, geometry.attributes.color.offset );
+
+				geometry.attributes.position.indexMultiplier = geometry.vertexByteSize / Float32Array.BYTES_PER_ELEMENT;
+				geometry.attributes.normal.indexMultiplier = geometry.vertexByteSize / Float32Array.BYTES_PER_ELEMENT;
+				geometry.attributes.color.indexMultiplier = geometry.vertexByteSize / Float32Array.BYTES_PER_ELEMENT;
+
+				var positions = geometry.attributes.position.array;
+				var positionsOffset = geometry.attributes.position.indexMultiplier;
+				var normals = geometry.attributes.normal.array;
+				var normalsOffset = geometry.attributes.normal.indexMultiplier;
+				var colors = geometry.attributes.color.array;
+				var colorsOffset = geometry.attributes.color.indexMultiplier;
+
+				// Generate a single buffer with all the cubes
+
+				var n = 8000, n2 = n/2;	// triangles spread in the cube
+				var d = 10, d2 = d/2;	// individual triangle size
+
+				//
+
+				var color = new THREE.Color();
+
+				var pA = new THREE.Vector3();
+				var pB = new THREE.Vector3();
+				var pC = new THREE.Vector3();
+
+				var cb = new THREE.Vector3();
+				var ab = new THREE.Vector3();
+
+				var m = new THREE.Matrix4();
+				var m2 = new THREE.Matrix4();
+
+				var e = new THREE.Vector3( 0, 0, 0 );
+				var t = new THREE.Vector3();
+				var tt = new THREE.Vector3();
+				var u = new THREE.Vector3( 0, 1, 0 );
+
+				var v1 = new THREE.Vector3( 0, 0, 0 );
+				var v2 = new THREE.Vector3( d, 0, 0 );
+				var v3 = new THREE.Vector3( d, d, 0 );
+				var v4 = new THREE.Vector3( 0, d, 0 );
+
+				var v1b = new THREE.Vector3( 0, 0, d );
+				var v2b = new THREE.Vector3( d, 0, d );
+				var v3b = new THREE.Vector3( d, d, d );
+				var v4b = new THREE.Vector3( 0, d, d );
+
+				//
+
+				function addTriangle( k, x, y, z, vc, vb, va ) {
+
+					// positions
+
+					pA.copy( va );
+					pB.copy( vb );
+					pC.copy( vc );
+
+					t.set( x, y, z );
+					t.multiplyScalar( 0.5 );
+
+					m.lookAt( e, tt, u );
+
+					m2.makeTranslation( t );
+
+					m2.multiplySelf( m );
+
+					m2.multiplyVector3( pA );
+					m2.multiplyVector3( pB );
+					m2.multiplyVector3( pC );
+
+					var ax = pA.x;
+					var ay = pA.y;
+					var az = pA.z;
+
+					var bx = pB.x;
+					var by = pB.y;
+					var bz = pB.z;
+
+					var cx = pC.x;
+					var cy = pC.y;
+					var cz = pC.z;
+
+					var j = k * 9;
+
+					positions[j * positionsOffset] = ax;
+					positions[j * positionsOffset + 1] = ay;
+					positions[j * positionsOffset + 2] = az;
+
+					positions[(j + 1) * positionsOffset] = bx;
+					positions[(j + 1) * positionsOffset + 1] = by;
+					positions[(j + 1) * positionsOffset + 2] = bz;
+
+					positions[(j + 2) * positionsOffset] = cx;
+					positions[(j + 2) * positionsOffset + 1] = cy;
+					positions[(j + 2) * positionsOffset + 2] = cz;
+
+					// flat face normals
+
+					pA.set( ax, ay, az );
+					pB.set( bx, by, bz );
+					pC.set( cx, cy, cz );
+
+					cb.sub( pC, pB );
+					ab.sub( pA, pB );
+					cb.crossSelf( ab );
+
+					cb.normalize();
+
+					var nx = cb.x;
+					var ny = cb.y;
+					var nz = cb.z;
+
+					normals[j * normalsOffset] = nx;
+					normals[j * normalsOffset + 1] = ny;
+					normals[j * normalsOffset + 2] = nz;
+
+					normals[(j + 1) * normalsOffset] = nx;
+					normals[(j + 1) * normalsOffset + 1] = ny;
+					normals[(j + 1) * normalsOffset + 2] = nz;
+
+					normals[(j + 2) * normalsOffset] = nx;
+					normals[(j + 2) * normalsOffset + 1] = ny;
+					normals[(j + 2) * normalsOffset + 2] = nz;
+
+					// colors
+
+					color.setRGB( t.x, t.y, t.z );
+
+					colors[j * colorsOffset] = color.r;
+					colors[j * colorsOffset + 1] = color.g;
+					colors[j * colorsOffset + 2] = color.b;
+
+					colors[(j + 1) * colorsOffset] = color.r;
+					colors[(j + 1) * colorsOffset + 1] = color.g;
+					colors[(j + 1) * colorsOffset + 2] = color.b;
+
+					colors[(j + 2) * colorsOffset] = color.r;
+					colors[(j + 2) * colorsOffset + 1] = color.g;
+					colors[(j + 2) * colorsOffset + 2] = color.b;
+
+				}
+
+				//
+
+				for ( var i = 0; i < triangles; i += 12 ) {
+
+					var x = THREE.Math.randFloat( 0.1 * n, 0.2 * n ) * ( Math.random() > 0.5 ? 1 : -1 ) * THREE.Math.randInt( 0.5, 2 );
+					var y = THREE.Math.randFloat( 0.1 * n, 0.2 * n ) * ( Math.random() > 0.5 ? 1 : -1 ) * THREE.Math.randInt( 0.5, 2 );
+					var z = THREE.Math.randFloat( 0.1 * n, 0.2 * n ) * ( Math.random() > 0.5 ? 1 : -1 ) * THREE.Math.randInt( 0.5, 2 );
+
+					tt.set( Math.random(), Math.random(), Math.random() );
+
+					//
+
+					addTriangle( i, 	x, y, z, v1, v2, v4 );
+					addTriangle( i + 1, x, y, z, v2, v3, v4 );
+
+					addTriangle( i + 2, x, y, z, v4b, v2b, v1b );
+					addTriangle( i + 3, x, y, z, v4b, v3b, v2b );
+
+					//
+
+					addTriangle( i + 4, x, y, z, v1b, v2, v1 );
+					addTriangle( i + 5, x, y, z, v1b, v2b, v2 );
+
+
+					addTriangle( i + 6, x, y, z, v2b, v3, v2 );
+					addTriangle( i + 7, x, y, z, v2b, v3b, v3 );
+
+					//
+
+					addTriangle( i + 8, x, y, z, v3b, v4, v3 );
+					addTriangle( i + 9, x, y, z, v3b, v4b, v4 );
+
+					addTriangle( i + 10, x, y, z, v1, v4, v1b );
+					addTriangle( i + 11, x, y, z, v4, v4b, v1b );
+
+
+				}
+
+				geometry.computeBoundingSphere();
+
+				// Set up custom shader material
+
+				uniforms = {
+
+					amplitude: { type: "f", value: 0.0 }
+
+				};
+
+				var material = new THREE.ShaderMaterial( {
+
+					uniforms: 		uniforms,
+					vertexShader:   document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					vertexColors:   THREE.VertexColors
+
+				});
+
+				//
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x050505, clearAlpha: 1, alpha: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = Date.now() * 0.001;
+				var delta = clock.getDelta();
+
+				mesh.rotation.x = time * 0.025;
+				mesh.rotation.y = time * 0.05;
+
+				uniforms.amplitude.value += 2 * delta;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

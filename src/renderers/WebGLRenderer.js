@@ -1136,24 +1136,48 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var a, attribute, type;
 
-		for ( a in geometry.attributes ) {
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			if ( a === "index" ) {
+		    for ( a in geometry.attributes ) {
 
-				type = _gl.ELEMENT_ARRAY_BUFFER;
+		        if ( a === "index" ) {
 
-			} else {
+		            type = _gl.ELEMENT_ARRAY_BUFFER;
 
-				type = _gl.ARRAY_BUFFER;
+		        } else {
 
-			}
+		            type = _gl.ARRAY_BUFFER;
 
-			attribute = geometry.attributes[ a ];
+		        }
 
-			attribute.buffer = _gl.createBuffer();
+		        attribute = geometry.attributes[a];
 
-			_gl.bindBuffer( type, attribute.buffer );
-			_gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
+		        attribute.buffer = _gl.createBuffer();
+
+		        _gl.bindBuffer( type, attribute.buffer );
+		        _gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
+
+		    }
+
+		} else if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
+
+		    type = _gl.ARRAY_BUFFER;
+
+		    _gl.bindBuffer( type, geometry.buffer );
+		    _gl.bufferData( type, geometry.array, _gl.STATIC_DRAW );
+
+		    if ( geometry.attributes["index"] ) {
+
+		        attribute = geometry.attributes["index"];
+
+		        type = _gl.ELEMENT_ARRAY_BUFFER;
+
+		        attribute.buffer = _gl.createBuffer();
+
+		        _gl.bindBuffer( type, attribute.buffer );
+		        _gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
+                
+		    } 
 
 		}
 
@@ -3259,34 +3283,52 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributeName, attributeItem;
 
-		for ( attributeName in attributes ) {
+		if (geometry instanceof THREE.BufferGeometry) {
 
-			attributeItem = attributes[ attributeName ];
+		    for ( attributeName in attributes ) {
 
-			if ( attributeItem.needsUpdate ) {
+			    attributeItem = attributes[ attributeName ];
 
-				if ( attributeName === 'index' ) {
+			    if ( attributeItem.needsUpdate ) {
 
-					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
-					_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
+				    if ( attributeName === 'index' ) {
 
-				} else {
+					    _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
+					    _gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
 
-					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-					_gl.bufferData( _gl.ARRAY_BUFFER, attributeItem.array, hint );
+				    } else {
 
-				}
+					    _gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+					    _gl.bufferData( _gl.ARRAY_BUFFER, attributeItem.array, hint );
 
-				attributeItem.needsUpdate = false;
+				    }
 
-			}
+				    attributeItem.needsUpdate = false;
 
-			if ( dispose && ! attributeItem.dynamic ) {
+			    }
 
-				delete attributeItem.array;
+			    if ( dispose && ! attributeItem.dynamic ) {
 
-			}
+				    delete attributeItem.array;
 
+			    }
+
+		    }
+
+		} else if (geometry instanceof THREE.InterleavedBufferGeometry) {
+
+		    _gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.buffer );
+		    _gl.bufferData( _gl.ARRAY_BUFFER, geometry.array, hint );
+
+		    attributeItem = attributes["index"];
+
+		    if ( attributeItem ) {
+
+
+		        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer);
+		        _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint);
+
+		    }
 		}
 
 	};
@@ -3439,6 +3481,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
+					    if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
+
+					        _gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.buffer );
+
+					    }
+
 						for ( attributeName in geometryAttributes ) {
 
 							if ( attributeName === 'index' ) continue;
@@ -3449,9 +3497,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( attributePointer >= 0 ) {
 
-								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-								enableAttribute( attributePointer );
-								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+							    if ( geometry instanceof THREE.BufferGeometry ) {
+
+							        _gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+								    enableAttribute( attributePointer );
+								    _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+
+							    } else if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
+
+							        enableAttribute( attributePointer );
+							        _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, geometry.vertexByteSize, startIndex * geometry.vertexByteSize + attributeItem.offset ); 
+
+							    }
 
 							}
 
@@ -3479,6 +3536,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( updateBuffers ) {
 
+				    if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
+
+				        _gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.buffer );
+
+				    }
+
 					for ( attributeName in geometryAttributes ) {
 
 						if ( attributeName === 'index') continue;
@@ -3488,11 +3551,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 						attributeSize = attributeItem.itemSize;
 
 						if ( attributePointer >= 0 ) {
+                            
+						    if ( geometry instanceof THREE.BufferGeometry ) {
 
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-							enableAttribute( attributePointer );
-							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+							    _gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+							    enableAttribute( attributePointer );
+							    _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
 
+						    } else if (geometry instanceof THREE.InterleavedBufferGeometry) {
+
+						        enableAttribute( attributePointer );
+						        _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, geometry.vertexByteSize, attributeItem.offset ); 
+
+						    }
 						}
 
 					}
@@ -3515,7 +3586,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.ParticleSystem ) {
 
-			if ( updateBuffers ) {
+		    if ( updateBuffers ) {
+
+		        if (geometry instanceof THREE.InterleavedBufferGeometry) {
+
+		            _gl.bindBuffer(_gl.ARRAY_BUFFER, geometry.buffer);
+
+		        }
 
 				for ( attributeName in geometryAttributes ) {
 
@@ -3524,11 +3601,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 					attributeSize = attributeItem.itemSize;
 
 					if ( attributePointer >= 0 ) {
+                        
+					    if ( geometry instanceof THREE.BufferGeometry ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-						enableAttribute( attributePointer );
-						_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+					        _gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+					        enableAttribute( attributePointer );
+					        _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
 
+					    } else if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
+
+					        enableAttribute( attributePointer );
+					        _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, geometry.vertexByteSize, attributeItem.offset );
+
+					    }
 					}
 
 				}
@@ -3548,6 +3633,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
+			    if (geometry instanceof THREE.InterleavedBufferGeometry) {
+
+			        _gl.bindBuffer(_gl.ARRAY_BUFFER, geometry.buffer);
+
+			    }
+
 				for ( attributeName in geometryAttributes ) {
 
 					attributePointer = programAttributes[ attributeName ];
@@ -3556,10 +3647,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( attributePointer >= 0 ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-						enableAttribute( attributePointer );
-						_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+					    if ( geometry instanceof THREE.BufferGeometry ) {
 
+						    _gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+						    enableAttribute( attributePointer );
+						    _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+                        
+					    } else if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
+
+					        enableAttribute( attributePointer );
+					        _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, geometry.vertexByteSize, attributeItem.offset );
+
+					    }
 					}
 
 				}
@@ -4252,7 +4351,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				_this.setMaterialFaces( material );
 
-				if ( buffer instanceof THREE.BufferGeometry ) {
+				if ( buffer instanceof THREE.BufferGeometry || buffer instanceof THREE.InterleavedBufferGeometry ) {
 
 					_this.renderBufferDirect( camera, lights, fog, material, buffer, object );
 
@@ -4547,7 +4646,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// fail silently for now
 
-			} else if ( geometry instanceof THREE.BufferGeometry ) {
+			} else if ( geometry instanceof THREE.BufferGeometry || geometry instanceof THREE.InterleavedBufferGeometry ) {
 
 				initDirectBuffers( geometry );
 
@@ -4634,9 +4733,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				geometry = object.geometry;
 
-				if ( geometry instanceof THREE.BufferGeometry ) {
+				if ( geometry instanceof THREE.BufferGeometry || geometry instanceof THREE.InterleavedBufferGeometry ) {
 
-					addBuffer( scene.__webglObjects, geometry, object );
+				    addBuffer( scene.__webglObjects, geometry, object );
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
@@ -4713,7 +4812,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var geometry = object.geometry,
 			geometryGroup, customAttributesDirty, material;
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		if ( geometry instanceof THREE.BufferGeometry || geometry instanceof THREE.InterleavedBufferGeometry ) {
 
 			setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
