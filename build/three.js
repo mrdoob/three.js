@@ -246,6 +246,7 @@ THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
 */
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -636,6 +637,7 @@ THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua":
 "sienna": 0xA0522D, "silver": 0xC0C0C0, "skyblue": 0x87CEEB, "slateblue": 0x6A5ACD, "slategray": 0x708090, "slategrey": 0x708090, "snow": 0xFFFAFA,
 "springgreen": 0x00FF7F, "steelblue": 0x4682B4, "tan": 0xD2B48C, "teal": 0x008080, "thistle": 0xD8BFD8, "tomato": 0xFF6347, "turquoise": 0x40E0D0,
 "violet": 0xEE82EE, "wheat": 0xF5DEB3, "white": 0xFFFFFF, "whitesmoke": 0xF5F5F5, "yellow": 0xFFFF00, "yellowgreen": 0x9ACD32 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -1001,6 +1003,7 @@ THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 	return qm.copy( qa ).slerp( qb, t );
 
 }
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
@@ -1320,6 +1323,7 @@ THREE.Vector2.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author *kile / http://kile.stravaganza.org/
@@ -2162,6 +2166,7 @@ THREE.extend( THREE.Vector3.prototype, {
 	}()
 
 } );
+
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
@@ -2735,6 +2740,7 @@ THREE.Vector4.prototype = {
 	}
 
 };
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -2861,6 +2867,7 @@ THREE.Line3.prototype = {
 	}
 
 };
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -3123,6 +3130,7 @@ THREE.Box2.prototype = {
 	}
 
 };
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -3454,6 +3462,7 @@ THREE.Box3.prototype = {
 	}
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -3679,6 +3688,7 @@ THREE.Matrix3.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -4657,6 +4667,7 @@ THREE.extend( THREE.Matrix4.prototype, {
 	}()
 
 } );
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -4823,6 +4834,7 @@ THREE.Ray.prototype = {
 	}
 
 };
+
 /**
  * @author bhouston / http://exocortex.com
  * @author mrdoob / http://mrdoob.com/
@@ -4959,6 +4971,7 @@ THREE.Sphere.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -5112,6 +5125,7 @@ THREE.Frustum.prototype = {
 	}
 
 };
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -5334,6 +5348,7 @@ THREE.Plane.prototype = {
 	}
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -5452,6 +5467,7 @@ THREE.Math = {
 	}()
 
 };
+
 /**
  * Spline from Tween.js, slightly optimized (and trashed)
  * http://sole.github.com/tween.js/examples/05_spline.html
@@ -5628,6 +5644,7 @@ THREE.Spline = function ( points ) {
 	};
 
 };
+
 /**
  * @author bhouston / http://exocortex.com
  * @author mrdoob / http://mrdoob.com/
@@ -5818,6 +5835,7 @@ THREE.Triangle.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -5828,6 +5846,7 @@ THREE.Vertex = function ( v ) {
 	return v;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -5838,6 +5857,7 @@ THREE.UV = function ( u, v ) {
 	return new THREE.Vector2( u, v );
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -5910,6 +5930,7 @@ THREE.Clock.prototype = {
 	}
 
 };
+
 /**
  * https://github.com/mrdoob/eventdispatcher.js/
  */
@@ -5993,6 +6014,7 @@ THREE.EventDispatcher.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
@@ -6335,6 +6357,7 @@ THREE.EventDispatcher.prototype = {
 	};
 
 }( THREE ) );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -6830,6 +6853,7 @@ THREE.Object3D.prototype = {
 THREE.Object3D.defaultEulerOrder = 'XYZ',
 
 THREE.Object3DIdCount = 0;
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -7468,6 +7492,7 @@ THREE.Projector = function () {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -7517,6 +7542,7 @@ THREE.Face3.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -7567,6 +7593,7 @@ THREE.Face4.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author kile / http://kile.stravaganza.org/
@@ -8373,6 +8400,7 @@ THREE.Geometry.prototype = {
 };
 
 THREE.GeometryIdCount = 0;
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -8927,6 +8955,7 @@ THREE.BufferGeometry.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -8969,6 +8998,7 @@ THREE.Camera.prototype.lookAt = function () {
 	};
 
 }();
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -8996,6 +9026,7 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 	this.projectionMatrix.makeOrthographic( this.left, this.right, this.top, this.bottom, this.near, this.far );
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
@@ -9112,6 +9143,7 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -9138,6 +9170,7 @@ THREE.Light.prototype.clone = function ( light ) {
 	return light;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -9159,6 +9192,7 @@ THREE.AmbientLight.prototype.clone = function () {
 	return light;
 
 };
+
 /**
  * @author MPanknin / http://www.redplant.de/
  * @author alteredq / http://alteredqualia.com/
@@ -9183,6 +9217,7 @@ THREE.AreaLight = function ( hex, intensity ) {
 };
 
 THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
+
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -9262,6 +9297,7 @@ THREE.DirectionalLight.prototype.clone = function () {
 	return light;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9291,6 +9327,7 @@ THREE.HemisphereLight.prototype.clone = function () {
 	return light;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -9318,6 +9355,7 @@ THREE.PointLight.prototype.clone = function () {
 	return light;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9381,6 +9419,7 @@ THREE.SpotLight.prototype.clone = function () {
 	return light;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9822,6 +9861,7 @@ THREE.Loader.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -9866,6 +9906,7 @@ THREE.ImageLoader.prototype = {
 	}
 
 }
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -10310,6 +10351,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -10355,6 +10397,7 @@ THREE.LoadingMonitor.prototype = {
 	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -10406,6 +10449,7 @@ THREE.GeometryLoader.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -10533,6 +10577,7 @@ THREE.MaterialLoader.prototype = {
 	}
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -11769,6 +11814,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 	async_callback_gate();
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -11816,6 +11862,7 @@ THREE.TextureLoader.prototype = {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -11951,6 +11998,7 @@ THREE.Material.prototype = {
 };
 
 THREE.MaterialIdCount = 0;
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12012,6 +12060,7 @@ THREE.LineBasicMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -12078,6 +12127,7 @@ THREE.LineDashedMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12186,6 +12236,7 @@ THREE.MeshBasicMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12310,6 +12361,7 @@ THREE.MeshLambertMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12464,6 +12516,7 @@ THREE.MeshPhongMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12505,6 +12558,7 @@ THREE.MeshDepthMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  *
@@ -12552,6 +12606,7 @@ THREE.MeshNormalMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -12567,6 +12622,7 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
 	return new THREE.MeshFaceMaterial( this.materials.slice( 0 ) );
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12629,6 +12685,7 @@ THREE.ParticleBasicMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  *
@@ -12665,6 +12722,7 @@ THREE.ParticleCanvasMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -12763,6 +12821,7 @@ THREE.ShaderMaterial.prototype.clone = function () {
 	return material;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -12858,6 +12917,7 @@ THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
 THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
 THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
 THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -12949,6 +13009,7 @@ THREE.Texture.prototype = {
 };
 
 THREE.TextureIdCount = 0;
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -12975,6 +13036,7 @@ THREE.CompressedTexture.prototype.clone = function () {
 	return texture;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -12998,6 +13060,7 @@ THREE.DataTexture.prototype.clone = function () {
 	return texture;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -13021,6 +13084,7 @@ THREE.Particle.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -13062,6 +13126,7 @@ THREE.ParticleSystem.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -13100,6 +13165,7 @@ THREE.Line.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -13196,6 +13262,7 @@ THREE.Mesh.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -13252,6 +13319,7 @@ THREE.Bone.prototype.update = function ( parentSkinMatrix, forceUpdate ) {
 	}
 
 };
+
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -13504,6 +13572,7 @@ THREE.SkinnedMesh.prototype.clone = function ( object ) {
 };
 
 THREE.SkinnedMesh.offsetMatrix = new THREE.Matrix4();
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -13700,6 +13769,7 @@ THREE.MorphAnimMesh.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -13724,6 +13794,7 @@ THREE.Ribbon.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -13826,6 +13897,7 @@ THREE.LOD.prototype.clone = function () {
 	// TODO
 
 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -13867,6 +13939,7 @@ THREE.Sprite.prototype.clone = function ( object ) {
 	return object;
 
 };
+
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -13979,6 +14052,7 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 	}
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -14000,6 +14074,7 @@ THREE.Fog.prototype.clone = function () {
 	return new THREE.Fog( this.color.getHex(), this.near, this.far );
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -14018,6 +14093,7 @@ THREE.FogExp2.prototype.clone = function () {
 	return new THREE.FogExp2( this.color.getHex(), this.density );
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -15341,6 +15417,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 	}
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -18543,6 +18620,7 @@ THREE.ShaderLib = {
 	}
 
 };
+
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author mrdoob / http://mrdoob.com/
@@ -25906,6 +25984,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.addPostPlugin( new THREE.LensFlarePlugin() );
 
 };
+
 /**
  * @author szimek / https://github.com/szimek/
  * @author alteredq / http://alteredqualia.com/
@@ -25986,6 +26065,7 @@ THREE.WebGLRenderTarget.prototype = {
 	}
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com
  */
@@ -25999,6 +26079,7 @@ THREE.WebGLRenderTargetCube = function ( width, height, options ) {
 };
 
 THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -26018,6 +26099,7 @@ THREE.RenderableVertex.prototype.copy = function ( vertex ) {
 	this.positionScreen.copy( vertex.positionScreen );
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -26044,6 +26126,7 @@ THREE.RenderableFace3 = function () {
 	this.z = null;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -26071,6 +26154,7 @@ THREE.RenderableFace4 = function () {
 	this.z = null;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -26081,6 +26165,7 @@ THREE.RenderableObject = function () {
 	this.z = null;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -26099,6 +26184,7 @@ THREE.RenderableParticle = function () {
 	this.material = null;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -26114,6 +26200,7 @@ THREE.RenderableLine = function () {
 	this.material = null;
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -26691,6 +26778,7 @@ THREE.GeometryUtils.random = THREE.Math.random16;
 
 THREE.GeometryUtils.__v1 = new THREE.Vector3();
 THREE.GeometryUtils.__v2 = new THREE.Vector3();
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -27244,6 +27332,7 @@ THREE.ImageUtils = {
 	}
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -27284,6 +27373,7 @@ THREE.SceneUtils = {
 	}
 
 };
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author alteredq / http://alteredqualia.com/
@@ -27744,6 +27834,7 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 // To use the typeface.js face files, hook up the API
 self._typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
 THREE.typeface_js = self._typeface_js;
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Extensible curve object
@@ -28079,6 +28170,7 @@ THREE.Curve.create = function ( constructor, getPointFunc ) {
 	return constructor;
 
 };
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -28404,6 +28496,7 @@ THREE.CurvePath.prototype.getWrapPoints = function ( oldPts, path ) {
 
 };
 
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -28463,6 +28556,7 @@ THREE.Gyroscope.prototype.rotationWorld = new THREE.Quaternion();
 THREE.Gyroscope.prototype.rotationObject = new THREE.Quaternion();
 THREE.Gyroscope.prototype.scaleWorld = new THREE.Vector3();
 THREE.Gyroscope.prototype.scaleObject = new THREE.Vector3();
+
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -29018,6 +29112,7 @@ THREE.Path.prototype.toShapes = function() {
 	return shapes;
 
 };
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * Defines a 2d shape plane using paths.
@@ -29550,6 +29645,7 @@ THREE.Shape.Utils = {
 
 };
 
+
 /**************************************************************
  *	Line
  **************************************************************/
@@ -29586,7 +29682,8 @@ THREE.LineCurve.prototype.getTangent = function( t ) {
 
 	return tangent.normalize();
 
-};/**************************************************************
+};
+/**************************************************************
  *	Quadratic Bezier curve
  **************************************************************/
 
@@ -29628,7 +29725,8 @@ THREE.QuadraticBezierCurve.prototype.getTangent = function( t ) {
 
 	return tangent;
 
-};/**************************************************************
+};
+/**************************************************************
  *	Cubic Bezier curve
  **************************************************************/
 
@@ -29666,7 +29764,8 @@ THREE.CubicBezierCurve.prototype.getTangent = function( t ) {
 
 	return tangent;
 
-};/**************************************************************
+};
+/**************************************************************
  *	Spline curve
  **************************************************************/
 
@@ -29698,7 +29797,8 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
 
 	return v;
 
-};/**************************************************************
+};
+/**************************************************************
  *	Ellipse curve
  **************************************************************/
 
@@ -29738,7 +29838,8 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 
 	return new THREE.Vector2( tx, ty );
 
-};/**************************************************************
+};
+/**************************************************************
  *	Arc curve
  **************************************************************/
 
@@ -29747,7 +29848,8 @@ THREE.ArcCurve = function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise 
 	THREE.EllipseCurve.call( this, aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
 };
 
-THREE.ArcCurve.prototype = Object.create( THREE.EllipseCurve.prototype );/**************************************************************
+THREE.ArcCurve.prototype = Object.create( THREE.EllipseCurve.prototype );
+/**************************************************************
  *	Line3D
  **************************************************************/
 
@@ -29774,6 +29876,7 @@ THREE.LineCurve3 = THREE.Curve.create(
 	}
 
 );
+
 /**************************************************************
  *	Quadratic Bezier 3D curve
  **************************************************************/
@@ -29800,7 +29903,8 @@ THREE.QuadraticBezierCurve3 = THREE.Curve.create(
 
 	}
 
-);/**************************************************************
+);
+/**************************************************************
  *	Cubic Bezier 3D curve
  **************************************************************/
 
@@ -29827,7 +29931,8 @@ THREE.CubicBezierCurve3 = THREE.Curve.create(
 
 	}
 
-);/**************************************************************
+);
+/**************************************************************
  *	Spline 3D curve
  **************************************************************/
 
@@ -29897,7 +30002,8 @@ THREE.SplineCurve3 = THREE.Curve.create(
 
 // 	return v;
 
-// }/**************************************************************
+// }
+/**************************************************************
  *	Closed Spline 3D curve
  **************************************************************/
 
@@ -29935,7 +30041,8 @@ THREE.ClosedSplineCurve3 = THREE.Curve.create(
 
     }
 
-);/**
+);
+/**
  * @author mikael emtinger / http://gomo.se/
  */
 
@@ -30193,6 +30300,7 @@ THREE.AnimationHandler = (function() {
 	return that;
 
 }());
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author mrdoob / http://mrdoob.com/
@@ -30579,6 +30687,7 @@ THREE.Animation.prototype.getPrevKeyWith = function ( type, h, key ) {
 	return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
 
 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author mrdoob / http://mrdoob.com/
@@ -31002,6 +31111,7 @@ THREE.KeyFrameAnimation.prototype.getPrevKeyWith = function( sid, h, key ) {
 	return keys[ keys.length - 1 ];
 
 };
+
 /**
  * Camera for rendering cube maps
  *	- renders scene into axis-aligned cube
@@ -31079,6 +31189,7 @@ THREE.CubeCamera = function ( near, far, cubeResolution ) {
 };
 
 THREE.CubeCamera.prototype = Object.create( THREE.Object3D.prototype );
+
 /*
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *
@@ -31316,6 +31427,7 @@ THREE.CombinedCamera.prototype.toBottomView = function() {
 
 };
 
+
 /**
  * @author hughes
  */
@@ -31370,6 +31482,7 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 };
 
 THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
@@ -31482,6 +31595,7 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 };
 
 THREE.CubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -31636,6 +31750,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 }
 
 THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  *
@@ -32369,6 +32484,7 @@ THREE.ExtrudeGeometry.__v3 = new THREE.Vector2();
 THREE.ExtrudeGeometry.__v4 = new THREE.Vector2();
 THREE.ExtrudeGeometry.__v5 = new THREE.Vector2();
 THREE.ExtrudeGeometry.__v6 = new THREE.Vector2();
+
 /**
  * @author jonobr1 / http://jonobr1.com
  *
@@ -32505,6 +32621,7 @@ THREE.ShapeGeometry.prototype.addShape = function ( shape, options ) {
 	}
 
 };
+
 /**
  * @author astrodud / http://astrodud.isgreat.org/
  * @author zz85 / https://github.com/zz85
@@ -32591,6 +32708,7 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 };
 
 THREE.LatheGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
@@ -32664,6 +32782,7 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 };
 
 THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author Kaleb Murphy
  */
@@ -32736,6 +32855,7 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 };
 
 THREE.RingGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -32832,6 +32952,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 };
 
 THREE.SphereGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
  * @author alteredq / http://alteredqualia.com/
@@ -32891,6 +33012,7 @@ THREE.TextGeometry = function ( text, parameters ) {
 };
 
 THREE.TextGeometry.prototype = Object.create( THREE.ExtrudeGeometry.prototype );
+
 /**
  * @author oosmoxiecode
  * @author mrdoob / http://mrdoob.com/
@@ -32963,6 +33085,7 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 };
 
 THREE.TorusGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author oosmoxiecode
  * based on http://code.google.com/p/away3d/source/browse/trunk/fp10/Away3D/src/away3d/primitives/TorusKnot.as?spec=svn2473&r=2473
@@ -33072,6 +33195,7 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 };
 
 THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author WestLangley / https://github.com/WestLangley
  * @author zz85 / https://github.com/zz85
@@ -33352,6 +33476,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 	}
 };
+
 /**
  * @author clockworkgeek / https://github.com/clockworkgeek
  * @author timothypratley / https://github.com/timothypratley
@@ -33576,6 +33701,7 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 };
 
 THREE.PolyhedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author timothypratley / https://github.com/timothypratley
  */
@@ -33605,6 +33731,7 @@ THREE.IcosahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.IcosahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author timothypratley / https://github.com/timothypratley
  */
@@ -33623,6 +33750,7 @@ THREE.OctahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.OctahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author timothypratley / https://github.com/timothypratley
  */
@@ -33642,6 +33770,7 @@ THREE.TetrahedronGeometry = function ( radius, detail ) {
 };
 
 THREE.TetrahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author zz85 / https://github.com/zz85
  * Parametric Surfaces Geometry
@@ -33730,6 +33859,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 };
 
 THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author qiao / https://github.com/qiao
  * @fileoverview This is a convex hull generator using the incremental method. 
@@ -33953,6 +34083,7 @@ THREE.ConvexGeometry = function( vertices ) {
 };
 
 THREE.ConvexGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
 /**
  * @author sroucheray / http://sroucheray.org/
  * @author mrdoob / http://mrdoob.com/
@@ -33983,6 +34114,7 @@ THREE.AxisHelper = function ( size ) {
 };
 
 THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
+
 /**
  * @author WestLangley / http://github.com/WestLangley
  * @author zz85 / http://github.com/zz85
@@ -34075,6 +34207,7 @@ THREE.ArrowHelper.prototype.setColor = function ( hex ) {
 	this.cone.material.color.setHex( hex );
 
 };
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -34159,6 +34292,7 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 	this.matrixWorld = object.matrixWorld;
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -34346,6 +34480,7 @@ THREE.CameraHelper.prototype.update = function () {
 	};
 
 }();
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -34399,6 +34534,7 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 
 };
 
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -34426,6 +34562,7 @@ THREE.FaceNormalsHelper = function ( object, size ) {
 };
 
 THREE.FaceNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -34454,6 +34591,7 @@ THREE.GridHelper = function ( size, step ) {
 };
 
 THREE.GridHelper.prototype = Object.create( THREE.Line.prototype );
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -34497,6 +34635,7 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 	this.lightSphere.material.materials[ 1 ].color.copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
 
 };
+
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -34569,6 +34708,7 @@ THREE.PointLightHelper.prototype.update = function () {
 
 };
 
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
@@ -34626,6 +34766,7 @@ THREE.SpotLightHelper.prototype.update = function () {
 	this.lightCone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -34639,6 +34780,7 @@ THREE.ImmediateRenderObject = function () {
 };
 
 THREE.ImmediateRenderObject.prototype = Object.create( THREE.Object3D.prototype );
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -34716,6 +34858,7 @@ THREE.LensFlare.prototype.updateLensFlares = function () {
 	}
 
 };
+
 
 
 
@@ -35035,6 +35178,7 @@ THREE.MorphBlendMesh.prototype.update = function ( delta ) {
 	}
 
 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -35338,6 +35482,7 @@ THREE.LensFlarePlugin = function () {
 	};
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -35834,6 +35979,7 @@ THREE.ShadowMapPlugin = function () {
 };
 
 THREE.ShadowMapPlugin.__projector = new THREE.Projector();
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -36139,6 +36285,7 @@ THREE.SpritePlugin = function () {
 	};
 
 };
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -36339,6 +36486,7 @@ THREE.DepthPassPlugin = function () {
 
 };
 
+
 /**
  * @author mikael emtinger / http://gomo.se/
  *
@@ -36526,6 +36674,7 @@ THREE.ShaderFlares = {
 	}
 
 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -36634,3 +36783,4 @@ THREE.ShaderSprite = {
 	}
 
 };
+
