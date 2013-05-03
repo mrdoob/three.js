@@ -10,11 +10,10 @@ THREE.GridHelper = function ( size, step ) {
 
 	for ( var i = - size; i <= size; i += step ) {
 
-		geometry.vertices.push( new THREE.Vector3( -size, 0, i ) );
-		geometry.vertices.push( new THREE.Vector3(  size, 0, i ) );
-
-		geometry.vertices.push( new THREE.Vector3( i, 0, -size ) );
-		geometry.vertices.push( new THREE.Vector3( i, 0,  size ) );
+		geometry.vertices.push(
+			new THREE.Vector3( - size, 0, i ), new THREE.Vector3( size, 0, i ),
+			new THREE.Vector3( i, 0, - size ), new THREE.Vector3( i, 0, size )
+		);
 
 		var color = i === 0 ? color1 : color2;
 

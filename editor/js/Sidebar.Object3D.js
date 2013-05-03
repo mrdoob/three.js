@@ -56,7 +56,7 @@ Sidebar.Object3D = function ( signals ) {
 	// scale
 
 	var objectScaleRow = new UI.Panel();
-	var objectScaleLock = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '75px' ).onChange( updateScaleLock );
+	var objectScaleLock = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '75px' );
 	var objectScaleX = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleX );
 	var objectScaleY = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleY );
 	var objectScaleZ = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleZ );
@@ -200,45 +200,47 @@ Sidebar.Object3D = function ( signals ) {
 
 	var scene = null;
 
-	var uniformScale = 1;
+	function updateScaleX() {
 
-	var scaleRatioX = 1;
-	var scaleRatioY = 1;
-	var scaleRatioZ = 1;
+		if ( objectScaleLock.getValue() === true ) {
 
-	var scaleLock = false;
+			var scale = objectScaleX.getValue() / selected.scale.x;
 
-	function updateScaleLock() {
-
-		scaleLock = objectScaleLock.getValue();
-
-		if ( scaleLock ) {
-
-			scaleRatioX = objectScaleX.getValue() / uniformScale;
-			scaleRatioY = objectScaleY.getValue() / uniformScale;
-			scaleRatioZ = objectScaleZ.getValue() / uniformScale;
+			objectScaleY.setValue( objectScaleY.getValue() * scale );
+			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
 
 		}
 
-	}
-
-	function updateScaleX() {
-
-		uniformScale = objectScaleX.getValue();
 		update();
 
 	}
 
 	function updateScaleY() {
 
-		uniformScale = objectScaleY.getValue();
+		if ( objectScaleLock.getValue() === true ) {
+
+			var scale = objectScaleY.getValue() / selected.scale.y;
+
+			objectScaleX.setValue( objectScaleX.getValue() * scale );
+			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
+
+		}
+
 		update();
 
 	}
 
 	function updateScaleZ() {
 
-		uniformScale = objectScaleZ.getValue();
+		if ( objectScaleLock.getValue() === true ) {
+
+			var scale = objectScaleZ.getValue() / selected.scale.z;
+
+			objectScaleX.setValue( objectScaleX.getValue() * scale );
+			objectScaleY.setValue( objectScaleY.getValue() * scale );
+
+		}
+
 		update();
 
 	}
@@ -278,14 +280,6 @@ Sidebar.Object3D = function ( signals ) {
 			selected.rotation.x = objectRotationX.getValue();
 			selected.rotation.y = objectRotationY.getValue();
 			selected.rotation.z = objectRotationZ.getValue();
-
-			if ( scaleLock ) {
-
-				objectScaleX.setValue( uniformScale * scaleRatioX );
-				objectScaleY.setValue( uniformScale * scaleRatioY );
-				objectScaleZ.setValue( uniformScale * scaleRatioZ );
-
-			}
 
 			selected.scale.x = objectScaleX.getValue();
 			selected.scale.y = objectScaleY.getValue();

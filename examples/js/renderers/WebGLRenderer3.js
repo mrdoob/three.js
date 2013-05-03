@@ -78,7 +78,10 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	//
 
+	var frustum = new THREE.Frustum();
+	var normalMatrix = new THREE.Matrix3();
 	var modelViewMatrix = new THREE.Matrix4();
+	var modelViewProjectionMatrix = new THREE.Matrix4();
 
 	// buffers
 
@@ -104,24 +107,35 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		}
 
-		var colors = [];
-		var addColor = function ( color ) {
+		var normals = [];
+		var addNormal = function ( normal ) {
 
-			colors.push( color.r, color.g, color.b );
+			normals.push( normal.x, normal.y, normal.z );
 
 		}
 
 		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 			var face = faces[ i ];
+			var vertexNormals = face.vertexNormals.length > 0;
 
 			addPosition( vertices[ face.a ] );
 			addPosition( vertices[ face.b ] );
 			addPosition( vertices[ face.c ] );
 
-			addColor( new THREE.Color( 0xffffff * Math.random() ) );
-			addColor( new THREE.Color( 0xffffff * Math.random() ) );
-			addColor( new THREE.Color( 0xffffff * Math.random() ) );
+			if ( vertexNormals === true ) {
+
+				addNormal( face.vertexNormals[ 0 ] );
+				addNormal( face.vertexNormals[ 1 ] );
+				addNormal( face.vertexNormals[ 2 ] );
+
+			} else {
+
+				addNormal( face.normal );
+				addNormal( face.normal );
+				addNormal( face.normal );
+
+			}
 
 			if ( face instanceof THREE.Face4 ) {
 
@@ -129,9 +143,19 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 				addPosition( vertices[ face.c ] );
 				addPosition( vertices[ face.d ] );
 
-				addColor( new THREE.Color( 0xffffff * Math.random() ) );
-				addColor( new THREE.Color( 0xffffff * Math.random() ) );
-				addColor( new THREE.Color( 0xffffff * Math.random() ) );
+				if ( vertexNormals === true ) {
+
+					addNormal( face.vertexNormals[ 0 ] );
+					addNormal( face.vertexNormals[ 2 ] );
+					addNormal( face.vertexNormals[ 3 ] );
+
+				} else {
+
+					addNormal( face.normal );
+					addNormal( face.normal );
+					addNormal( face.normal );
+
+				}
 
 			}
 
@@ -139,15 +163,15 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		var buffer = {
 			positions: gl.createBuffer(),
-			colors: gl.createBuffer(),
+			normals: gl.createBuffer(),
 			count: positions.length / 3
 		};
 
 		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
 		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( positions ), gl.STATIC_DRAW );
 
-		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.colors );
-		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( colors ), gl.STATIC_DRAW );
+		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.normals );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( normals ), gl.STATIC_DRAW );
 
 		buffers[ geometry.id ] = buffer;
 
@@ -158,6 +182,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 	// programs
 
 	var programs = {};
+	var programsCache = {};
 
 	var getProgram = function ( material ) {
 
@@ -167,41 +192,91 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		}
 
-		var program = gl.createProgram();
-
 		var vertexShader = [
 			'precision ' + precision + ' float;',
 			'attribute vec3 position;',
-			'attribute vec3 color;',
+			'attribute vec3 normal;',
 			'uniform mat4 modelViewMatrix;',
+			'uniform mat3 normalMatrix;',
 			'uniform mat4 projectionMatrix;',
-			'varying vec3 vColor;',
-			'void main() {',
-			'	vColor = color;',
-			'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
-			'}'
+			''
 		].join( '\n' );
+
 		var fragmentShader = [
 			'precision ' + precision + ' float;',
-			'varying vec3 vColor;',
-			'void main() {',
-			'	gl_FragColor = vec4(vColor,1);',
-			'}'
+			''
 		].join( '\n' );
 
-		gl.attachShader( program, createShader( gl.VERTEX_SHADER, vertexShader ) );
-		gl.attachShader( program, createShader( gl.FRAGMENT_SHADER, fragmentShader ) );
-		gl.linkProgram( program );
+		if ( material instanceof THREE.ShaderMaterial ) {
 
-		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === true ) {
+			vertexShader += material.vertexShader;
+			fragmentShader += material.fragmentShader;
 
+		} else if ( material instanceof THREE.MeshNormalMaterial ) {
+
+			vertexShader += [
+				'varying vec3 vNormal;',
+				'void main() {',
+				'	vNormal = normalize( normalMatrix * normal );',
+				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+				'}'
+			].join( '\n' );
+
+			fragmentShader += [
+				'varying vec3 vNormal;',
+				'void main() {',
+				'	gl_FragColor = vec4( 0.5 * normalize( vNormal ) + 0.5, 1.0 );',
+				'}'
+			].join( '\n' );
+
+		} else {
+
+			vertexShader += [
+				'void main() {',
+				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+				'}'
+			].join( '\n' );
+
+			fragmentShader += [
+				'void main() {',
+				'	gl_FragColor = vec4( 1.0, 0, 0, 1.0 );',
+				'}'
+			].join( '\n' );
+
+		}
+
+		var program;
+		var code = vertexShader + fragmentShader;
+
+		if ( programsCache[ code ] !== undefined ) {
+
+			program = programsCache[ code ];
 			programs[ material.id ] = program;
 
 		} else {
 
-			programs[ material.id ] = null;
-			console.error( 'VALIDATE_STATUS: ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) );
-			console.error( 'GL_ERROR: ' + gl.getError() );
+			program = gl.createProgram();
+
+			gl.attachShader( program, createShader( gl.VERTEX_SHADER, vertexShader ) );
+			gl.attachShader( program, createShader( gl.FRAGMENT_SHADER, fragmentShader ) );
+			gl.linkProgram( program );
+
+			if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === true ) {
+
+				programsCache[ code ] = program;
+				programs[ material.id ] = program;
+
+			} else {
+
+				console.error( 'VALIDATE_STATUS: ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) );
+				console.error( 'GL_ERROR: ' + gl.getError() );
+
+				// fallback
+
+				program = getProgram( new THREE.MeshBasicMaterial() );
+				programs[ material.id ] = program;
+
+			}
 
 		}
 
@@ -271,6 +346,121 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	};
 
+	var currentBuffer, currentMaterial, currentProgram;
+	var locations = {};
+
+	var renderObject = function ( object, camera ) {
+
+		if ( object.visible === false ) return;
+
+		if ( object instanceof THREE.Mesh && frustum.intersectsObject( object ) === true ) {
+
+			var buffer = getBuffer( object.geometry );
+
+			var material = object.material;
+
+			if ( material !== currentMaterial ) {
+
+				var program = getProgram( object.material );
+
+				if ( program !== currentProgram ) {
+
+					gl.useProgram( program );
+
+					locations.modelViewMatrix = gl.getUniformLocation( program, 'modelViewMatrix' );
+					locations.normalMatrix = gl.getUniformLocation( program, 'normalMatrix' );
+					locations.projectionMatrix = gl.getUniformLocation( program, 'projectionMatrix' );
+
+					locations.position = gl.getAttribLocation( program, 'position' );
+					locations.normal = gl.getAttribLocation( program, 'normal' );
+
+					gl.uniformMatrix4fv( locations.projectionMatrix, false, camera.projectionMatrix.elements );
+
+					currentProgram = program;
+
+				}
+
+				if ( material instanceof THREE.ShaderMaterial ) {
+
+					var uniforms = material.uniforms;
+
+					for ( var uniform in uniforms ) {
+
+						var location = gl.getUniformLocation( program, uniform );
+
+						var type = uniforms[ uniform ].type;
+						var value = uniforms[ uniform ].value;
+
+						if ( type === "i" ) { // single integer
+
+							gl.uniform1i( location, value );
+
+						} else if ( type === "f" ) { // single float
+
+							gl.uniform1f( location, value );
+
+						} else if ( type === "v2" ) { // single THREE.Vector2
+
+							gl.uniform2f( location, value.x, value.y );
+
+						} else if ( type === "v3" ) { // single THREE.Vector3
+
+							gl.uniform3f( location, value.x, value.y, value.z );
+
+						} else if ( type === "v4" ) { // single THREE.Vector4
+
+							gl.uniform4f( location, value.x, value.y, value.z, value.w );
+
+						} else if ( type === "c" ) { // single THREE.Color
+
+							gl.uniform3f( location, value.r, value.g, value.b );
+
+						}
+
+					}
+
+				}
+
+				currentMaterial = material;
+
+			}
+
+			if ( buffer !== currentBuffer ) {
+
+				gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
+				gl.enableVertexAttribArray( locations.position );
+				gl.vertexAttribPointer( locations.position, 3, gl.FLOAT, false, 0, 0 );
+
+				if ( locations.normal >= 0 ) {
+
+					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.normals );
+					gl.enableVertexAttribArray( locations.normal );
+					gl.vertexAttribPointer( locations.normal, 3, gl.FLOAT, false, 0, 0 );
+
+				}
+
+				currentBuffer = buffer;
+
+			}
+
+			modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
+			normalMatrix.getNormalMatrix( modelViewMatrix );
+
+			gl.uniformMatrix4fv( locations.modelViewMatrix, false, modelViewMatrix.elements );
+			gl.uniformMatrix3fv( locations.normalMatrix, false, normalMatrix.elements );
+
+			gl.drawArrays( gl.TRIANGLES, 0, buffer.count );
+
+		}
+
+		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
+
+			renderObject( object.children[ i ], camera );
+
+		}
+
+	};
+
 	this.render = function ( scene, camera ) {
 
 		if ( this.autoClear === true ) this.clear();
@@ -281,60 +471,14 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
-		var currentBuffer, currentProgram;
-		var locations = {};
+		modelViewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
+		frustum.setFromMatrix( modelViewProjectionMatrix );
 
-		for ( var i = 0, l = scene.children.length; i < l; i ++ ) {
+		currentBuffer = undefined;
+		currentMaterial = undefined;
+		currentProgram = undefined;
 
-			var object = scene.children[ i ];
-
-			if ( object.visible === false ) continue;
-
-			if ( object instanceof THREE.Mesh ) {
-
-				var program = getProgram( object.material );
-
-				if ( program !== currentProgram ) {
-
-					gl.useProgram( program );
-
-					locations.modelViewMatrix = gl.getUniformLocation( program, 'modelViewMatrix' );
-					locations.projectionMatrix = gl.getUniformLocation( program, 'projectionMatrix' );
-
-					locations.position = gl.getAttribLocation( program, 'position' );
-					locations.color = gl.getAttribLocation( program, 'color' );
-
-					gl.uniformMatrix4fv( locations.projectionMatrix, false, camera.projectionMatrix.elements );
-
-					currentProgram = program;
-
-				}
-
-				var buffer = getBuffer( object.geometry );
-
-				if ( buffer !== currentBuffer ) {
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.positions );
-					gl.enableVertexAttribArray( locations.position );
-					gl.vertexAttribPointer( locations.position, 3, gl.FLOAT, false, 0, 0 );
-
-					gl.bindBuffer( gl.ARRAY_BUFFER, buffer.colors );
-					gl.enableVertexAttribArray( locations.color );
-					gl.vertexAttribPointer( locations.color, 3, gl.FLOAT, false, 0, 0 );
-
-					currentBuffer = buffer;
-
-				}
-
-				modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
-				gl.uniformMatrix4fv( locations.modelViewMatrix, false, modelViewMatrix.elements );
-
-				gl.drawArrays( gl.TRIANGLES, 0, buffer.count );
-
-			}
-
-		}
+		renderObject( scene, camera );
 
 	};
 

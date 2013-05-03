@@ -18,10 +18,11 @@
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/renderers/WebGLRenderer3.js"></script>
+		<script src="js/libs/stats.min.js"></script>
 
 		<script>
 
-			var container;
+			var container, stats;
 
 			var camera, scene, renderer;
 
@@ -57,7 +58,7 @@
 
 					geometry.computeVertexNormals();
 
-					for ( var i = 0; i < 500; i ++ ) {
+					for ( var i = 0; i < 5000; i ++ ) {
 
 						var mesh = new THREE.Mesh( geometry, material );
 
@@ -79,6 +80,12 @@
 				renderer = new THREE.WebGLRenderer3( { contextAttributes: { antialias: false } } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				stats.domElement.style.zIndex = 100;
+				container.appendChild( stats.domElement );
 
 				//
 
@@ -111,6 +118,7 @@
 
 				requestAnimationFrame( animate );
 				render();
+				stats.update();
 
 			}
 

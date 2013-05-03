@@ -515,11 +515,4 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function pad( str ) {
-
-		while ( str.length < 6 ) str = '0' + str;
-		return str;
-
-	}
-
 };
