@@ -309,7 +309,7 @@
 
 					m2.makeTranslation( t );
 
-					m2.multiplySelf( m );
+					m2.multiply( m );
 
 					m2.multiplyVector3( pA );
 					m2.multiplyVector3( pB );
@@ -349,7 +349,7 @@
 
 					cb.sub( pC, pB );
 					ab.sub( pA, pB );
-					cb.crossSelf( ab );
+					cb.cross( ab );
 
 					cb.normalize();
 
