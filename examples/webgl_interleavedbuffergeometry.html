@@ -203,7 +203,8 @@
 				// 150,000 cubes
 				// 12 triangles per cube (6 quads)
 
-				var triangles = 12 * 15000; // 150,000 cubes with non-indexed triangles throws out of memory error in chrome and crashes firefox
+				var cubes = 15000;
+				var triangles = 12 * cubes; // 150,000 cubes with non-indexed triangles throws out of memory error in chrome and crashes firefox
 
 				// BufferGeometry with unindexed triangles
 				// use vertex colors to store centers of rotations
@@ -212,6 +213,12 @@
 
 				geometry.numVertices = triangles * 3;
 				geometry.attributes = {
+
+				    index: {
+				        itemSize: 1,
+				        array: new Uint16Array(triangles * 3),
+				        numItems: triangles * 3
+				    },
 
 					position: {
 					    itemSize: 3,
@@ -257,6 +264,8 @@
 				var positions = geometry.attributes.position.array;
 				var normals = geometry.attributes.normal.array;
 				var colors = geometry.attributes.color.array;
+
+			    var indices = geometry.attributes.index.array;
 
 				// Generate a single buffer with all the cubes
 
@@ -423,6 +432,11 @@
 					addTriangle( i + 11, x, y, z, v4, v4b, v1b );
 
 
+					for (var i = 0; i < indices.length; i++) {
+
+					    indices[i] = i % (3 * chunkSize);
+
+					}
 				}
 
 				geometry.computeBoundingSphere();
