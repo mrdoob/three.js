@@ -4394,80 +4394,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	// Geometry splitting
-
-	function sortFacesByMaterial ( geometry, material ) {
-
-		var f, fl, face, materialIndex, vertices,
-			groupHash, hash_map = {};
-
-		var numMorphTargets = geometry.morphTargets.length;
-		var numMorphNormals = geometry.morphNormals.length;
-
-		var usesFaceMaterial = material instanceof THREE.MeshFaceMaterial;
-
-		geometry.geometryGroups = {};
-
-		for ( f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
-
-			face = geometry.faces[ f ];
-			materialIndex = usesFaceMaterial ? face.materialIndex : 0;
-
-			if ( hash_map[ materialIndex ] === undefined ) {
-
-				hash_map[ materialIndex ] = { 'hash': materialIndex, 'counter': 0 };
-
-			}
-
-			groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
-
-			if ( geometry.geometryGroups[ groupHash ] === undefined ) {
-
-				geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
-
-			}
-
-			vertices = face instanceof THREE.Face3 ? 3 : 4;
-
-			if ( geometry.geometryGroups[ groupHash ].vertices + vertices > 65535 ) {
-
-				hash_map[ materialIndex ].counter += 1;
-				groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
-
-				if ( geometry.geometryGroups[ groupHash ] === undefined ) {
-
-					geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
-
-				}
-
-			}
-
-			if ( face instanceof THREE.Face3 ) {
-
-				geometry.geometryGroups[ groupHash ].faces3.push( f );
-
-			} else {
-
-				geometry.geometryGroups[ groupHash ].faces4.push( f );
-
-			}
-
-			geometry.geometryGroups[ groupHash ].vertices += vertices;
-
-		}
-
-		geometry.geometryGroupsList = [];
-
-		for ( var g in geometry.geometryGroups ) {
-
-			geometry.geometryGroups[ g ].id = _geometryGroupCounter ++;
-
-			geometry.geometryGroupsList.push( geometry.geometryGroups[ g ] );
-
-		}
-
-	};
-
 	// Objects refresh
 
 	this.initWebGLObjects = function ( scene ) {
@@ -4557,7 +4483,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups === undefined ) {
 
-					sortFacesByMaterial( geometry, material );
+					geometry.makeGroups( material instanceof THREE.MeshFaceMaterial );
 
 				}
 

@@ -7,11 +7,10 @@ THREE.GeometryUtils = {
 
 	// Merge two geometries or geometry and geometry from object (using object's transform)
 
-	merge: function ( geometry1, object2 /* mesh | geometry */, materialIndexOffset ) {
+	merge: function ( geometry1, object2 /* mesh | geometry */, materialIndexOffset, useWorldSpace ) {
 
 		var matrix, normalMatrix,
 		vertexOffset = geometry1.vertices.length,
-		uvPosition = geometry1.faceVertexUvs[ 0 ].length,
 		geometry2 = object2 instanceof THREE.Mesh ? object2.geometry : object2,
 		vertices1 = geometry1.vertices,
 		vertices2 = geometry2.vertices,
@@ -23,10 +22,21 @@ THREE.GeometryUtils = {
 		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
 
 		if ( object2 instanceof THREE.Mesh ) {
+			
+			if ( useWorldSpace ) {
 
-			object2.matrixAutoUpdate && object2.updateMatrix();
+				object2.updateMatrixWorld();
 
-			matrix = object2.matrix;
+				matrix = object2.matrixWorld;
+				
+			}
+			else {
+
+				object2.matrixAutoUpdate && object2.updateMatrix();
+
+				matrix = object2.matrix;
+				
+			}
 
 			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
@@ -567,7 +577,316 @@ THREE.GeometryUtils = {
 
 		}
 
-    }
+    },
+	
+	/** Automagically convert a geometry into an array of BufferGeometries, split per face's materialIndex. */
+	makeBufferGeometries: function ( geometryIn ) {
+
+		var useNormals = null,
+			useFaceNormals = null,
+			useUvs = null,
+			useColors = null, 
+			useFaceColors = null;
+
+		THREE.GeometryUtils.triangulateQuads( geometryIn );
+
+		var verticesIn = geometryIn.vertices,
+			facesIn = geometryIn.faces;
+
+		var verticesOut, normalsOut, uvsOut, vertexColorsOut;
+
+		if ( useUvs === null ) {
+
+			//Detect if any UV coordinates specified
+			useUvs = geometryIn.faceVertexUvs.length > 0 && geometryIn.faceVertexUvs[ 0 ].length > 0;
+
+		}
+
+		geometryIn.makeGroups( true );
+
+		var bufferGeometriesOut = [ ];
+
+		for ( var i = 0, l = geometryIn.geometryGroupsList.length ; i < l ; i++ ) {
+
+			var geometryGroup = geometryIn.geometryGroupsList[ i ];
+
+			var groupFaceIndices = geometryGroup.faces3;
+
+			var numFaces = groupFaceIndices.length,
+				numVertices = numFaces * 3;
+
+			useNormals = null;
+
+			if ( useNormals === null ) {
+
+				//Detect any normals in use
+				for ( var f = 0; f < numFaces ; f++ ) {
+
+					var faceIndex = groupFaceIndices[ f ];
+					var face = facesIn[ faceIndex ];
+
+					if ( face.vertexNormals && face.vertexNormals.length > 0 ) {
+
+						useNormals = true;
+						useFaceNormals = false;
+						break;
+
+					}
+
+					if ( face.normal.x !== 0 || face.normal.y !== 0 || face.normal.z !== 0 ) {
+
+						useNormals = true;
+						break;
+
+					}
+
+				}
+
+			}
+
+			if ( useNormals && useFaceNormals === null ) {
+
+				//Assume using face normals
+				useFaceNormals = true;
+
+				//Look for vertex normals to prove we're not using face normals
+				for ( var f = 0; f < numFaces ; f++ ) {
+
+					var faceIndex = groupFaceIndices[ f ];
+					var face = facesIn[ faceIndex ];
+
+					if ( face.vertexNormals && face.vertexNormals.length > 0 ) {
+
+						useFaceNormals = false;
+						break;
+
+					}
+
+				}
+
+			}
+
+
+			if ( useColors === null ) {
+
+				//Detect any colors in use
+				for ( var f = 0; f < numFaces ; f++ ) {
+
+					var faceIndex = groupFaceIndices[ f ];
+					var face = facesIn[ faceIndex ];
+
+					if ( face.vertexColors.length > 0 ) {
+
+						useColors = true;
+						useFaceColors = false;
+						break;
+
+					}
+
+					if ( face.color.r !== 0 || face.color.g !== 0 || face.color.b !== 0 ) {
+
+						useColors = true;
+						break;
+
+					}
+
+				}
+
+			}
+
+			if ( useColors && useFaceColors === null ) {
+
+				//Assume using face colors
+				useFaceColors = true;
+
+				//Look for vertex colors to prove we're not using face colors
+				for ( var f = 0; f < numFaces ; f++ ) {
+
+					var faceIndex = groupFaceIndices[ f ];
+					var face = facesIn[ faceIndex ];
+
+					if ( face.vertexColors.length > 0 ) {
+
+						useFaceColors = false;
+						break;
+
+					}
+
+				}
+
+			}
+
+			var bufferGeometryOut = new THREE.BufferGeometry();
+
+			verticesOut = new Float32Array( numVertices * 3 );
+
+			var uvsIn = geometryIn.faceVertexUvs[ 0 ];
+
+			bufferGeometryOut.attributes.position = {
+				itemSize: 3,
+				array: verticesOut,
+				numItems: verticesOut.length
+			};
+
+			if ( useNormals ) {
+
+				normalsOut = new Float32Array( numVertices * 3 );
+
+				bufferGeometryOut.attributes.normal = {
+					itemSize: 3,
+					array: normalsOut,
+					numItems: normalsOut.length
+				};
+
+			}
+
+			if ( useUvs ) {
+
+				uvsOut = new Float32Array( numVertices * 2 );
+
+				bufferGeometryOut.attributes.uv = {
+					itemSize: 2,
+					array: uvsOut,
+					numItems: uvsOut.length
+				};
+
+			}
+
+			if ( useColors ) {
+
+				vertexColorsOut = new Float32Array( numVertices * 3 );
+
+				bufferGeometryOut.attributes.color = {
+					itemSize: 3,
+					array: vertexColorsOut,
+					numItems: vertexColorsOut.length
+				};
+
+			}
+
+	//		console.log("Making geometry group with " + numFaces + " faces");
+
+			for ( var f = 0, vi = 0, uvi = 0, ni = 0, ci = 0; f < numFaces; f++ ) {
+
+				var faceIndex = groupFaceIndices[ f ];
+				var face = facesIn[ faceIndex ];
+
+				var va = verticesIn[ face.a ];
+				var vb = verticesIn[ face.b ];
+				var vc = verticesIn[ face.c ];
+
+				verticesOut[ vi++ ] = va.x;
+				verticesOut[ vi++ ] = va.y;
+				verticesOut[ vi++ ] = va.z;
+				verticesOut[ vi++ ] = vb.x;
+				verticesOut[ vi++ ] = vb.y;
+				verticesOut[ vi++ ] = vb.z;
+				verticesOut[ vi++ ] = vc.x;
+				verticesOut[ vi++ ] = vc.y;
+				verticesOut[ vi++ ] = vc.z;
+
+				if ( useNormals ) {
+
+					var na,nb,nc;
+
+					if ( useFaceNormals ) {
+
+						na = nb = nc = face.normal;
+
+					}
+					else {
+
+						na = face.vertexNormals[ 0 ];
+						nb = face.vertexNormals[ 1 ];
+						nc = face.vertexNormals[ 2 ];
+
+					}
+
+					normalsOut[ ni++ ] = na.x;
+					normalsOut[ ni++ ] = na.y;
+					normalsOut[ ni++ ] = na.z;
+					normalsOut[ ni++ ] = nb.x;
+					normalsOut[ ni++ ] = nb.y;
+					normalsOut[ ni++ ] = nb.z;
+					normalsOut[ ni++ ] = nc.x;
+					normalsOut[ ni++ ] = nc.y;
+					normalsOut[ ni++ ] = nc.z;
+
+				}
+
+				if ( useColors ) {
+
+					var ca, cb, cc;
+
+					if ( useFaceColors ) {
+
+						ca = cb = cc = face.color;
+
+					}
+					else {
+
+						ca = face.vertexColors[ 0 ];
+						cb = face.vertexColors[ 1 ];
+						cc = face.vertexColors[ 2 ];
+
+					}
+
+					vertexColorsOut[ ci++ ] = ca.r;
+					vertexColorsOut[ ci++ ] = ca.g;
+					vertexColorsOut[ ci++ ] = ca.b;
+					vertexColorsOut[ ci++ ] = cb.r;
+					vertexColorsOut[ ci++ ] = cb.g;
+					vertexColorsOut[ ci++ ] = cb.b;
+					vertexColorsOut[ ci++ ] = cc.r;
+					vertexColorsOut[ ci++ ] = cc.g;
+					vertexColorsOut[ ci++ ] = cc.b;
+
+				}
+
+				if ( useUvs ) {
+
+					var faceVertexUvs = uvsIn[ faceIndex ];
+
+					var uva = faceVertexUvs[ 0 ];
+					var uvb = faceVertexUvs[ 1 ];
+					var uvc = faceVertexUvs[ 2 ];
+
+					uvsOut[ uvi++ ] = uva.x;
+					uvsOut[ uvi++ ] = uva.y;
+					uvsOut[ uvi++ ] = uvb.x;
+					uvsOut[ uvi++ ] = uvb.y;
+					uvsOut[ uvi++ ] = uvc.x;
+					uvsOut[ uvi++ ] = uvc.y;
+
+				}
+
+			}
+
+			bufferGeometryOut.verticesNeedUpdate = true;
+
+			if ( useUvs ) {
+
+				bufferGeometryOut.uvsNeedUpdate = true;
+
+			}
+
+			if ( useNormals ) {
+
+				bufferGeometryOut.normalsNeedUpdate = true;
+
+			}
+
+			if ( useColors ) {
+
+				bufferGeometryOut.colorsNeedUpdate = true;
+
+			}
+
+			bufferGeometriesOut.push( bufferGeometryOut );
+		}
+
+		return bufferGeometriesOut;
+	}
 
 };
 

@@ -755,6 +755,85 @@ THREE.Geometry.prototype = {
 
 	},
 
+	// Geometry splitting
+
+	makeGroups: ( function () {
+
+		var geometryGroupCounter = 0;
+		
+		return function ( usesFaceMaterial ) {
+
+			var f, fl, face, materialIndex, vertices,
+				groupHash, hash_map = {};
+
+			var numMorphTargets = this.morphTargets.length;
+			var numMorphNormals = this.morphNormals.length;
+
+			this.geometryGroups = {};
+
+			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+				face = this.faces[ f ];
+				materialIndex = usesFaceMaterial ? face.materialIndex : 0;
+
+				if ( ! ( materialIndex in hash_map ) ) {
+
+					hash_map[ materialIndex ] = { 'hash': materialIndex, 'counter': 0 };
+
+				}
+
+				groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
+
+				if ( ! ( groupHash in this.geometryGroups ) ) {
+
+					this.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+
+				}
+
+				vertices = face instanceof THREE.Face3 ? 3 : 4;
+
+				if ( this.geometryGroups[ groupHash ].vertices + vertices > 65535 ) {
+
+					hash_map[ materialIndex ].counter += 1;
+					groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
+
+					if ( ! ( groupHash in this.geometryGroups ) ) {
+
+						this.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+
+					}
+
+				}
+
+				if ( face instanceof THREE.Face3 ) {
+
+					this.geometryGroups[ groupHash ].faces3.push( f );
+
+				} else {
+
+					this.geometryGroups[ groupHash ].faces4.push( f );
+
+				}
+
+				this.geometryGroups[ groupHash ].vertices += vertices;
+
+			}
+
+			this.geometryGroupsList = [];
+
+			for ( var g in this.geometryGroups ) {
+
+				this.geometryGroups[ g ].id = geometryGroupCounter ++;
+
+				this.geometryGroupsList.push( this.geometryGroups[ g ] );
+
+			}
+
+		};
+		
+	} )(),
+			
+
 	clone: function () {
 
 		var geometry = new THREE.Geometry();
