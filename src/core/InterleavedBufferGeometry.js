@@ -16,6 +16,7 @@ THREE.InterleavedBufferGeometry = function () {
 	// attributes typed arrays are kept only if dynamic flag is set
 
 	this.dynamic = false;
+	this.needsUpdate = false;
 
 	// offsets for chunks when using indexed elements
 
@@ -80,7 +81,8 @@ THREE.InterleavedBufferGeometry.prototype = {
 
 		}
 
-		var positions = this.attributes[ "position" ].array;
+		var positions = this.attributes["position"].array;
+		var positionsOffset = this.attributes["position"].indexMultiplier;
 
 		if ( positions ) {
 
@@ -93,11 +95,11 @@ THREE.InterleavedBufferGeometry.prototype = {
 				bb.min.z = bb.max.z = positions[ 2 ];
 			}
 
-			for ( var i = 3, il = positions.length; i < il; i += 3 ) {
+			for ( var i = 3, il = positions.length; i < il; i += positionsOffset ) {
 
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
+			    x = positions[ i ];
+			    y = positions[ i + 1 ];
+			    z = positions[ i + 2 ];
 
 				// bounding box
 
@@ -152,18 +154,19 @@ THREE.InterleavedBufferGeometry.prototype = {
 
 		}
 
-		var positions = this.attributes[ "position" ].array;
+		var positions = this.attributes["position"].array;
+		var positionsOffset = this.attributes["position"].indexMultiplier;
 
 		if ( positions ) {
 
 			var radiusSq, maxRadiusSq = 0;
 			var x, y, z;
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+			for ( var i = 0, il = positions.length; i < il; i += positionsOffset ) {
 
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
+			    x = positions[ i ];
+			    y = positions[ i + 1 ];
+			    z = positions[ i + 2 ];
 
 				radiusSq =  x * x + y * y + z * z;
 				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;

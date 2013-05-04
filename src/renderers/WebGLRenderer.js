@@ -3285,7 +3285,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributeName, attributeItem;
 
-		if (geometry instanceof THREE.BufferGeometry) {
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
 		    for ( attributeName in attributes ) {
 
@@ -3317,19 +3317,43 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		    }
 
-		} else if (geometry instanceof THREE.InterleavedBufferGeometry) {
+		} else if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
+            
+		    if ( geometry.needsUpdate ) {
 
-		    _gl.bindBuffer( _gl.ARRAY_BUFFER, geometry.buffer );
-		    _gl.bufferData( _gl.ARRAY_BUFFER, geometry.array, hint );
+		        _gl.bindBuffer(_gl.ARRAY_BUFFER, geometry.buffer);
+		        _gl.bufferData(_gl.ARRAY_BUFFER, geometry.array, hint);
 
-		    attributeItem = attributes["index"];
+		        attributeItem = attributes["index"];
 
-		    if ( attributeItem ) {
+		        if (attributeItem) {
 
+		            _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer);
+		            _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint);
 
-		        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer);
-		        _gl.bufferData(_gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint);
+		        }
 
+		        geometry.needsUpdate = false;
+
+		    }
+
+		    if ( dispose && geometry.array ) {
+
+		        delete geometry.array;
+                
+		        for ( attributeName in attributes ) {
+
+		            attributeItem = attributes[attributeName];
+
+		            delete attributeItem.array;
+
+		            if (attributeItem.dynamic) {
+
+		                console.warn("WebGLRenderer: to set a InterleavedBufferGeometry dynamic, set the property on the geometry");
+
+		            }
+
+		        }
 		    }
 		}
 
