@@ -475,6 +475,9 @@ THREE.GeometryUtils = {
 
 				triA.color.copy( face.color );
 				triB.color.copy( face.color );
+				
+				triA.normal.copy( face.normal );
+				triB.normal.copy( face.normal );
 
 				triA.materialIndex = face.materialIndex;
 				triB.materialIndex = face.materialIndex;
@@ -497,6 +500,18 @@ THREE.GeometryUtils = {
 					triB.vertexColors[ 1 ] = face.vertexColors[ 2 ].clone();
 					triB.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
 
+				}
+				
+				if ( face.vertexNormals.length === 4 ) {
+					
+					triA.vertexNormals[ 0 ] = face.vertexNormals[ 0 ].clone();
+					triA.vertexNormals[ 1 ] = face.vertexNormals[ 1 ].clone();
+					triA.vertexNormals[ 2 ] = face.vertexNormals[ 3 ].clone();
+
+					triB.vertexNormals[ 0 ] = face.vertexNormals[ 1 ].clone();
+					triB.vertexNormals[ 1 ] = face.vertexNormals[ 2 ].clone();
+					triB.vertexNormals[ 2 ] = face.vertexNormals[ 3 ].clone();
+					
 				}
 
 				faces.push( triA, triB );
@@ -558,8 +573,6 @@ THREE.GeometryUtils = {
 		geometry.faceVertexUvs = faceVertexUvs;
 
 		geometry.computeCentroids();
-		geometry.computeFaceNormals();
-		geometry.computeVertexNormals();
 
 		if ( geometry.hasTangents ) geometry.computeTangents();
 
