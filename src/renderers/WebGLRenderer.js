@@ -3532,7 +3532,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 							    } else if ( geometry instanceof THREE.InterleavedBufferGeometry ) {
 
 							        enableAttribute( attributePointer );
-							        _gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, geometry.vertexByteSize, startIndex * geometry.vertexByteSize + attributeItem.offset ); 
+							        _gl.vertexAttribPointer(attributePointer, attributeSize, _gl.FLOAT, false, geometry.vertexByteSize,
+                                                                                        startIndex * geometry.vertexByteSize + attributeItem.offset);
 
 							    }
 
