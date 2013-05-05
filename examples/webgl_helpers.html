@@ -45,7 +45,7 @@
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function ( geometry, materials ) {
 
-					var material = new THREE.MeshBasicMaterial( { opacity: 0.25, wireframe: true, depthTest: false, transparent: true } );
+					var material = new THREE.MeshLambertMaterial();
 
 					mesh = new THREE.Mesh( geometry, material );
 					mesh.scale.multiplyScalar( 50 );
@@ -55,13 +55,11 @@
 
 					scene.add( new THREE.VertexNormalsHelper( mesh, 0.2 ) );
 
-					/*
 					var helper = new THREE.WireframeHelper( mesh );
 					helper.material.depthTest = false;
-					helper.material.opacity = 0.5;
+					helper.material.opacity = 0.25;
 					helper.material.transparent = true;
 					scene.add( helper );
-					*/
 
 					scene.add( new THREE.BoxHelper( mesh ) );
 
