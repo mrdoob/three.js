@@ -8,12 +8,17 @@ THREE.FaceNormalsHelper = function ( object, size ) {
 
 	var geometry = new THREE.Geometry();
 
-	for( var i = 0, l = object.geometry.faces.length; i < l; i ++ ) {
+	var faces = object.geometry.faces;
 
-		var face = object.geometry.faces[ i ];
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-		geometry.vertices.push( face.centroid );
-		geometry.vertices.push( face.normal.clone().multiplyScalar( size ).add( face.centroid ) );
+		var face = faces[ i ];
+
+		var centroid = face.centroid;
+		var normal = face.normal.clone();
+
+		geometry.vertices.push( centroid );
+		geometry.vertices.push( normal.multiplyScalar( size ).add( centroid ) );
 
 	}
 

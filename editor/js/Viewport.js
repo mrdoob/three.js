@@ -36,7 +36,6 @@ var Viewport = function ( signals ) {
 	//
 
 	var selectionBox = new THREE.BoxHelper();
-	selectionBox.material.color.setHex( 0xffff00 );
 	selectionBox.material.depthTest = false;
 	selectionBox.material.transparent = true;
 	selectionBox.visible = false;
