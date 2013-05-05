@@ -39,7 +39,7 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Interveaved Non-indexed Buffered Geometry<br />
-            (300,000 cubes - 3.6M triangles)<br />
+            <span id="counts">(150,000 cubes - 1.8M triangles)</span><br />
             Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a>
 
 		</div>
@@ -51,6 +51,7 @@
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
+        <script src="js/libs/dat.gui.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -178,14 +179,286 @@
 
 			var camera, scene, renderer;
 
-			var mesh;
+			var mesh, text;
 
 			var clock = new THREE.Clock();
 
-			init();
-			animate();
-
 			function init() {
+
+			    function GenerateGeometry() {
+
+			        var cubes = text['Cube Count'];
+			        var triangles = 12 * cubes; // 12 triangles per cube (6 quads)
+
+			        // BufferGeometry with indexed triangles
+			        // use vertex colors to store centers of rotations
+
+			        var geometry = new THREE.InterleavedBufferGeometry();
+
+			        geometry.numVertices = cubes * 8; //  Only 8 vertexes need to be defined per cube
+			        geometry.attributes = {
+
+			            index: {
+			                itemSize: 1,
+			                array: new Uint16Array(triangles * 3),
+			                numItems: triangles * 3
+			            },
+
+			            position: {
+			                itemSize: 3,
+			                numItems: geometry.numVertices * 3,
+			                offset: 0,
+			                array: null
+			            },
+
+			            color: {
+			                itemSize: 3,
+			                numItems: geometry.numVertices * 3,
+			                offset: 3 * Float32Array.BYTES_PER_ELEMENT,
+			                array: null
+			            }
+
+			        }
+
+			        geometry.vertexByteSize
+                        = geometry.attributes.position.itemSize * Float32Array.BYTES_PER_ELEMENT
+                        + geometry.attributes.color.itemSize * Float32Array.BYTES_PER_ELEMENT;
+
+			        geometry.array = new ArrayBuffer(geometry.numVertices * geometry.vertexByteSize);
+
+			        geometry.attributes.position.array = new Float32Array(geometry.array, geometry.attributes.position.offset);
+			        geometry.attributes.color.array = new Float32Array(geometry.array, geometry.attributes.color.offset);
+
+			        var positions = geometry.attributes.position.array;
+			        var colors = geometry.attributes.color.array;
+
+			        var indices = geometry.attributes.index.array;
+
+			        // Generate a single buffer with all the cubes
+
+			        var n = 8000, n2 = n / 2;	// triangles spread in the cube
+			        var d = 10, d2 = d / 2;	// individual triangle size
+
+			        //
+
+			        var color = new THREE.Color();
+
+			        var pA = new THREE.Vector3();
+
+			        var cb = new THREE.Vector3();
+			        var ab = new THREE.Vector3();
+
+			        var m = new THREE.Matrix4();
+			        var m2 = new THREE.Matrix4();
+
+			        var e = new THREE.Vector3(0, 0, 0);
+			        var t = new THREE.Vector3();
+			        var tt = new THREE.Vector3();
+			        var u = new THREE.Vector3(0, 1, 0);
+
+			        var v1 = new THREE.Vector3(0, 0, 0);
+			        var v2 = new THREE.Vector3(d, 0, 0);
+			        var v3 = new THREE.Vector3(d, d, 0);
+			        var v4 = new THREE.Vector3(0, d, 0);
+
+			        var v1b = new THREE.Vector3(0, 0, d);
+			        var v2b = new THREE.Vector3(d, 0, d);
+			        var v3b = new THREE.Vector3(d, d, d);
+			        var v4b = new THREE.Vector3(0, d, d);
+
+			        //
+
+			        function addVertex(k, x, y, z, va) {
+
+			            // positions
+
+			            pA.copy(va);
+
+			            t.set(x, y, z);
+			            t.multiplyScalar(0.5);
+
+			            m.lookAt(e, tt, u);
+
+			            m2.makeTranslation(t.x, t.y, t.z);
+
+			            m2.multiply(m);
+
+			            pA.applyMatrix4(m2);
+
+			            var j = k * 6;
+
+			            positions[j] = pA.x;
+			            positions[j + 1] = pA.y;
+			            positions[j + 2] = pA.z;
+
+			            // colors
+
+			            color.setRGB(t.x, t.y, t.z);
+
+			            colors[j] = color.r;
+			            colors[j + 1] = color.g;
+			            colors[j + 2] = color.b;
+
+			        }
+
+			        var chunkSize = 65536;
+
+			        //
+			        var v = -1; // easier to number vertices from previous example
+			        for (var i = 0; i < indices.length; i += 36) {
+
+			            //
+
+			            indices[i] = v + 1 % chunkSize;
+			            indices[i + 1] = v + 2 % chunkSize;
+			            indices[i + 2] = v + 4 % chunkSize;
+
+			            indices[i + 3] = v + 2 % chunkSize;
+			            indices[i + 4] = v + 3 % chunkSize;
+			            indices[i + 5] = v + 4 % chunkSize;
+
+
+			            indices[i + 6] = v + 8 % chunkSize;
+			            indices[i + 7] = v + 6 % chunkSize;
+			            indices[i + 8] = v + 5 % chunkSize;
+
+			            indices[i + 9] = v + 8 % chunkSize;
+			            indices[i + 10] = v + 7 % chunkSize;
+			            indices[i + 11] = v + 6 % chunkSize;
+
+			            //
+
+			            indices[i + 12] = v + 5 % chunkSize;
+			            indices[i + 13] = v + 2 % chunkSize;
+			            indices[i + 14] = v + 1 % chunkSize;
+
+			            indices[i + 15] = v + 5 % chunkSize;
+			            indices[i + 16] = v + 6 % chunkSize;
+			            indices[i + 17] = v + 2 % chunkSize;
+
+
+			            indices[i + 18] = v + 6 % chunkSize;
+			            indices[i + 19] = v + 3 % chunkSize;
+			            indices[i + 20] = v + 2 % chunkSize;
+
+			            indices[i + 21] = v + 6 % chunkSize;
+			            indices[i + 22] = v + 7 % chunkSize;
+			            indices[i + 23] = v + 3 % chunkSize;
+
+			            //
+
+			            indices[i + 24] = v + 7 % chunkSize;
+			            indices[i + 25] = v + 4 % chunkSize;
+			            indices[i + 26] = v + 3 % chunkSize;
+
+			            indices[i + 27] = v + 7 % chunkSize;
+			            indices[i + 28] = v + 8 % chunkSize;
+			            indices[i + 29] = v + 4 % chunkSize;
+
+
+			            indices[i + 30] = v + 1 % chunkSize;
+			            indices[i + 31] = v + 4 % chunkSize;
+			            indices[i + 32] = v + 5 % chunkSize;
+
+			            indices[i + 33] = v + 4 % chunkSize;
+			            indices[i + 34] = v + 8 % chunkSize;
+			            indices[i + 35] = v + 5 % chunkSize;
+
+			            v += 8;
+			        }
+
+			        for (var i = 0; i < geometry.numVertices; i += 8) {
+
+			            var x = THREE.Math.randFloat(0.1 * n, 0.2 * n) * (Math.random() > 0.5 ? 1 : -1) * THREE.Math.randInt(0.5, 2);
+			            var y = THREE.Math.randFloat(0.1 * n, 0.2 * n) * (Math.random() > 0.5 ? 1 : -1) * THREE.Math.randInt(0.5, 2);
+			            var z = THREE.Math.randFloat(0.1 * n, 0.2 * n) * (Math.random() > 0.5 ? 1 : -1) * THREE.Math.randInt(0.5, 2);
+
+			            tt.set(Math.random(), Math.random(), Math.random());
+
+			            //
+			            addVertex(i, x, y, z, v1);
+			            addVertex(i + 1, x, y, z, v2);
+			            addVertex(i + 2, x, y, z, v3);
+			            addVertex(i + 3, x, y, z, v4);
+
+
+			            addVertex(i + 4, x, y, z, v1b);
+			            addVertex(i + 5, x, y, z, v2b);
+			            addVertex(i + 6, x, y, z, v3b);
+			            addVertex(i + 7, x, y, z, v4b);
+
+			        }
+
+			        geometry.offsets = [];
+
+			        // break geometry into
+			        // chunks
+			        // for indices to fit into 16 bit integer number
+			        // floor(2^16 / 3) = 21845
+
+			        var offsets = geometry.numVertices / chunkSize;
+
+			        for (var i = 0; i < offsets; i++) {
+
+			            var offset = {
+			                start: i * chunkSize * (12 / 8) * 3,
+			                index: i * chunkSize,
+			                count: Math.min(triangles - (i * chunkSize * (12 / 8)), chunkSize * (12 / 8)) * 3
+			            };
+
+			            geometry.offsets.push(offset);
+
+			        }
+
+			        geometry.computeBoundingSphere();
+
+			        mesh = new THREE.Mesh(geometry, material);
+			        scene.add(mesh);
+
+			    }
+
+			    //
+			    var UIText = function () {
+			        this['Cube Count'] = 150000;
+			        // Define render logic ...
+			    };
+
+			    var text = new UIText();
+
+			    var gui = new dat.GUI();
+			    var controller = gui.add(text, 'Cube Count', { '600k Cubes (7.2M tri)': 600000, '300k Cubes (3.6M tri)': 300000, '150k Cubes (1.8M tri)': 150000, '75k Cubes (900k tri)': 75000, '30k Cubes (360k tri)': 30000, '15k Cubes (180k tri)': 15000 });
+			    controller.onChange(function (value) {
+
+			        scene.remove(mesh);
+
+			        mesh.geometry.dispose();
+
+			        switch (value) {
+			            case 600000:
+			                document.getElementById("counts").innerHTML = '(600,000 cubes - 7.2M triangles)';
+			                break;
+			            case 300000:
+                            document.getElementById("counts").innerHTML = '(300,000 cubes - 3.6M triangles)';
+                            break;
+			            case 150000:
+                            document.getElementById("counts").innerHTML = '(150,000 cubes - 1.8M triangles)';
+                            break;
+			            case 75000:
+                            document.getElementById("counts").innerHTML = '(75,000 cubes - 900k triangles)';
+                            break;
+			            case 30000:
+                            document.getElementById("counts").innerHTML = '(30,000 cubes - 360k triangles)';
+                            break;
+			            case 15000:
+                            document.getElementById("counts").innerHTML = '(15,000 cubes - 180k triangles)';
+                            break;
+
+			        }
+                    
+			        GenerateGeometry();
+
+			    });
+
 
 				container = document.getElementById( 'container' );
 
@@ -199,265 +472,27 @@
 
 				camera.lookAt( scene.position );
 
-				var cubes = 300000; // 300,000 cubes
-				var triangles = 12 * cubes; // 12 triangles per cube (6 quads)
+			    // Set up custom shader material
 
-				// BufferGeometry with indexed triangles
-				// use vertex colors to store centers of rotations
+			    uniforms = {
 
-				var geometry = new THREE.InterleavedBufferGeometry();
+			        amplitude: { type: "f", value: 0.0 }
 
-				geometry.numVertices = cubes * 8; //  Only 8 vertexes need to be defined per cube
-				geometry.attributes = {
+			    };
 
-				    index: {
-				        itemSize: 1,
-				        array: new Uint16Array(triangles * 3),
-				        numItems: triangles * 3
-				    },
+			    var material = new THREE.ShaderMaterial({
 
-					position: {
-					    itemSize: 3,
-					    numItems: geometry.numVertices * 3,
-					    offset: 0,
-                        array: null
-					},
+			        uniforms: uniforms,
+			        vertexShader: document.getElementById('vertexShader').textContent,
+			        fragmentShader: document.getElementById('fragmentShader').textContent,
+			        vertexColors: THREE.VertexColors
 
-					color: {
-					    itemSize: 3,
-					    numItems: geometry.numVertices * 3,
-					    offset: 3 * Float32Array.BYTES_PER_ELEMENT,
-					    array: null
-					}
-
-				}
-
-				geometry.vertexByteSize
-                    = geometry.attributes.position.itemSize * Float32Array.BYTES_PER_ELEMENT
-                    + geometry.attributes.color.itemSize * Float32Array.BYTES_PER_ELEMENT;
-
-				geometry.array = new ArrayBuffer( geometry.numVertices * geometry.vertexByteSize );
-
-				geometry.attributes.position.array = new Float32Array( geometry.array, geometry.attributes.position.offset );
-				geometry.attributes.color.array = new Float32Array( geometry.array, geometry.attributes.color.offset );
-
-				var positions = geometry.attributes.position.array;
-				var colors = geometry.attributes.color.array;
-
-			    var indices = geometry.attributes.index.array;
-
-				// Generate a single buffer with all the cubes
-
-				var n = 8000, n2 = n/2;	// triangles spread in the cube
-				var d = 10, d2 = d/2;	// individual triangle size
-
-				//
-
-				var color = new THREE.Color();
-
-				var pA = new THREE.Vector3();
-
-				var cb = new THREE.Vector3();
-				var ab = new THREE.Vector3();
-
-				var m = new THREE.Matrix4();
-				var m2 = new THREE.Matrix4();
-
-				var e = new THREE.Vector3( 0, 0, 0 );
-				var t = new THREE.Vector3();
-				var tt = new THREE.Vector3();
-				var u = new THREE.Vector3( 0, 1, 0 );
-
-				var v1 = new THREE.Vector3( 0, 0, 0 );
-				var v2 = new THREE.Vector3( d, 0, 0 );
-				var v3 = new THREE.Vector3( d, d, 0 );
-				var v4 = new THREE.Vector3( 0, d, 0 );
-
-				var v1b = new THREE.Vector3( 0, 0, d );
-				var v2b = new THREE.Vector3( d, 0, d );
-				var v3b = new THREE.Vector3( d, d, d );
-				var v4b = new THREE.Vector3( 0, d, d );
+			    });
 
 			    //
 
-				function addVertex(k, x, y, z, va) {
+			    GenerateGeometry();
 
-				    // positions
-
-				    pA.copy(va);
-
-				    t.set(x, y, z);
-				    t.multiplyScalar(0.5);
-
-				    m.lookAt(e, tt, u);
-
-				    m2.makeTranslation(t.x, t.y, t.z);
-
-				    m2.multiply(m);
-
-				    pA.applyMatrix4(m2);
-
-				    var j = k * 6;
-
-				    positions[j] = pA.x;
-				    positions[j + 1] = pA.y;
-				    positions[j + 2] = pA.z;
-
-				    // colors
-
-				    color.setRGB(t.x, t.y, t.z);
-
-				    colors[j] = color.r;
-				    colors[j + 1] = color.g;
-				    colors[j + 2] = color.b;
-
-				}
-
-				var chunkSize = 65536;
-
-				//
-				var v = -1; // easier to number vertices from previous example
-				for (var i = 0; i < indices.length; i += 36) {
-
-				    //
-
-				    indices[i] = v + 1 % chunkSize;
-				    indices[i + 1] = v + 2 % chunkSize;
-				    indices[i + 2] = v + 4 % chunkSize;
-
-				    indices[i + 3] = v + 2 % chunkSize;
-				    indices[i + 4] = v + 3 % chunkSize;
-				    indices[i + 5] = v + 4 % chunkSize;
-
-
-				    indices[i + 6] = v + 8 % chunkSize;
-				    indices[i + 7] = v + 6 % chunkSize;
-				    indices[i + 8] = v + 5 % chunkSize;
-
-				    indices[i + 9] = v + 8 % chunkSize;
-				    indices[i + 10] = v + 7 % chunkSize;
-				    indices[i + 11] = v + 6 % chunkSize;
-
-				    //
-
-				    indices[i + 12] = v + 5 % chunkSize;
-				    indices[i + 13] = v + 2 % chunkSize;
-				    indices[i + 14] = v + 1 % chunkSize;
-
-				    indices[i + 15] = v + 5 % chunkSize;
-				    indices[i + 16] = v + 6 % chunkSize;
-				    indices[i + 17] = v + 2 % chunkSize;
-
-
-				    indices[i + 18] = v + 6 % chunkSize;
-				    indices[i + 19] = v + 3 % chunkSize;
-				    indices[i + 20] = v + 2 % chunkSize;
-
-				    indices[i + 21] = v + 6 % chunkSize;
-				    indices[i + 22] = v + 7 % chunkSize;
-				    indices[i + 23] = v + 3 % chunkSize;
-
-				    //
-
-				    indices[i + 24] = v + 7 % chunkSize;
-				    indices[i + 25] = v + 4 % chunkSize;
-				    indices[i + 26] = v + 3 % chunkSize;
-
-				    indices[i + 27] = v + 7 % chunkSize;
-				    indices[i + 28] = v + 8 % chunkSize;
-				    indices[i + 29] = v + 4 % chunkSize;
-
-
-				    indices[i + 30] = v + 1 % chunkSize;
-				    indices[i + 31] = v + 4 % chunkSize;
-				    indices[i + 32] = v + 5 % chunkSize;
-
-				    indices[i + 33] = v + 4 % chunkSize;
-				    indices[i + 34] = v + 8 % chunkSize;
-				    indices[i + 35] = v + 5 % chunkSize;
-
-				    v += 8;
-				}
-
-				for (var i = 0; i < geometry.numVertices; i += 8) {
-
-					var x = THREE.Math.randFloat( 0.1 * n, 0.2 * n ) * ( Math.random() > 0.5 ? 1 : -1 ) * THREE.Math.randInt( 0.5, 2 );
-					var y = THREE.Math.randFloat( 0.1 * n, 0.2 * n ) * ( Math.random() > 0.5 ? 1 : -1 ) * THREE.Math.randInt( 0.5, 2 );
-					var z = THREE.Math.randFloat( 0.1 * n, 0.2 * n ) * ( Math.random() > 0.5 ? 1 : -1 ) * THREE.Math.randInt( 0.5, 2 );
-
-					tt.set( Math.random(), Math.random(), Math.random() );
-
-				    //
-					addVertex(i    , x, y, z, v1);
-					addVertex(i + 1, x, y, z, v2);
-					addVertex(i + 2, x, y, z, v3);
-					addVertex(i + 3, x, y, z, v4);
-
-
-					addVertex(i + 4, x, y, z, v1b);
-					addVertex(i + 5, x, y, z, v2b);
-					addVertex(i + 6, x, y, z, v3b);
-					addVertex(i + 7, x, y, z, v4b);
-                    
-				}
-
-				geometry.offsets = [];
-
-			    // break geometry into
-			    // chunks
-			    // for indices to fit into 16 bit integer number
-			    // floor(2^16 / 3) = 21845
-
-				var offsets = geometry.numVertices / chunkSize;
-
-				for (var i = 0; i < offsets; i++) {
-
-				    var offset = {
-				        start: i * chunkSize * (12 / 8) * 3,
-				        index: i * chunkSize,
-				        count: Math.min(triangles - (i * chunkSize * (12 / 8)), chunkSize * (12 / 8)) * 3
-				    };
-
-				    geometry.offsets.push(offset);
-
-				}
-
-
-				geometry.computeBoundingSphere();
-
-				// Set up custom shader material
-
-				uniforms = {
-
-					amplitude: { type: "f", value: 0.0 }
-
-				};
-
-				var material = new THREE.ShaderMaterial( {
-
-					uniforms: 		uniforms,
-					vertexShader:   document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
-					vertexColors:   THREE.VertexColors
-
-				});
-
-				//
-
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
-
-                /*
-				var boundingGeometry = new THREE.SphereGeometry(geometry.boundingSphere.radius, 64, 32);
-                
-				var boundingMaterial = new THREE.MeshBasicMaterial({ wireframe: true, side: THREE.DoubleSide })
-
-				var boundingMesh = new THREE.Mesh(boundingGeometry, boundingMaterial);
-
-				boundingMesh.position = geometry.boundingSphere.center;
-
-				scene.add(boundingMesh);
-                */
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false, stencil: false } );
@@ -473,7 +508,6 @@
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
 
-			    //
 
 			    // Remove unneeded plugins
 
@@ -519,6 +553,9 @@
 				renderer.render( scene, camera );
 
 			}
+
+			init();
+			animate();
 
 		</script>
 

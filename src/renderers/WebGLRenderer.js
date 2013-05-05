@@ -610,6 +610,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		if ( geometry instanceof THREE.BufferGeometry || geometry instanceof THREE.InterleavedBufferGeometry ) {
+
+		    if ( geometry.buffer !== undefined ) _gl.deleteBuffer( geometry.buffer );
+
+		    for ( attributeName in geometry.attributes ) {
+
+		        attributeItem = geometry.attributes[ attributeName ];
+
+		        if ( attributeItem.buffer !== undefined ) _gl.deleteBuffer( attributeItem.buffer );
+
+		    }
+
+		}
+
 		deleteCustomAttributesBuffers( geometry );
 
 	};
