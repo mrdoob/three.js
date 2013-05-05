@@ -21,6 +21,11 @@
 				top: 0px; width: 100%;
 				padding: 5px;
 			}
+			#insructions {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
 
 			a {
 
@@ -38,10 +43,12 @@
 
 		<div id="container"></div>
 		<div id="info">
+            <div id="insructions">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Interleaved Indexed Buffered Geometry<br />
             <span id="counts">(150,000 cubes - 1.8M triangles)</span><br />
-            Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a>
-
+            Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a><br />
+            MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
+            </div>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -470,24 +477,8 @@
 				camera.position.z = 2750;
 				camera.position.y = 1250;
 
-				controls = new THREE.TrackballControls(camera);
-
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
-				controls.keys = [65, 83, 68];
-
-
 				scene = new THREE.Scene();
 
-				camera.lookAt( scene.position );
 
 			    // Set up custom shader material
 
@@ -531,7 +522,25 @@
 				renderer.renderPluginsPre = [];
 				renderer.renderPluginsPost = [];
 
-                //
+			    //
+
+
+				controls = new THREE.TrackballControls(camera, renderer.domElement);
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.keys = [65, 83, 68];
+
+				camera.lookAt(scene.position);
+
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -562,11 +571,8 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
 				var delta = clock.getDelta();
 
-				mesh.rotation.x = time * 0.025;
-				mesh.rotation.y = time * 0.05;
 
 				uniforms.amplitude.value += 2 * delta;
 
