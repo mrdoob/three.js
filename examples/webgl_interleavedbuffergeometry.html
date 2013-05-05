@@ -39,8 +39,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Interveaved Non-indexed Buffered Geometry<br />
-            (100,000 cubes - 1.2M triangles)<br />
-            - Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a>
+            (300,000 cubes - 3.6M triangles)<br />
+            Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a>
 
 		</div>
 
@@ -199,7 +199,7 @@
 
 				camera.lookAt( scene.position );
 
-				var cubes = 10000; //000; // 150,000 cubes with non-indexed triangles throws periodic out of memory errors in chrome and crashes firefox
+				var cubes = 300000; // 300,000 cubes
 				var triangles = 12 * cubes; // 12 triangles per cube (6 quads)
 
 				// BufferGeometry with indexed triangles
@@ -256,8 +256,6 @@
 				var color = new THREE.Color();
 
 				var pA = new THREE.Vector3();
-				var pB = new THREE.Vector3();
-				var pC = new THREE.Vector3();
 
 				var cb = new THREE.Vector3();
 				var ab = new THREE.Vector3();
@@ -400,9 +398,7 @@
 					addVertex(i + 5, x, y, z, v2b);
 					addVertex(i + 6, x, y, z, v3b);
 					addVertex(i + 7, x, y, z, v4b);
-
-
-
+                    
 				}
 
 				geometry.offsets = [];
@@ -417,9 +413,9 @@
 				for (var i = 0; i < offsets; i++) {
 
 				    var offset = {
-				        start: i * chunkSize * (12 / 8),
+				        start: i * chunkSize * (12 / 8) * 3,
 				        index: i * chunkSize,
-				        count: Math.min(triangles - (i * chunkSize * (12 / 8)), chunkSize * (12 / 8))
+				        count: Math.min(triangles - (i * chunkSize * (12 / 8)), chunkSize * (12 / 8)) * 3
 				    };
 
 				    geometry.offsets.push(offset);
@@ -451,6 +447,7 @@
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
+                /*
 				var boundingGeometry = new THREE.SphereGeometry(geometry.boundingSphere.radius, 64, 32);
                 
 				var boundingMaterial = new THREE.MeshBasicMaterial({ wireframe: true, side: THREE.DoubleSide })
@@ -460,7 +457,7 @@
 				boundingMesh.position = geometry.boundingSphere.center;
 
 				scene.add(boundingMesh);
-
+                */
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false, stencil: false } );
