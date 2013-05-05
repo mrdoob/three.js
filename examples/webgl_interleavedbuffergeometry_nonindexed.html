@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - interleavedbuffergeometry</title>
+		<title>three.js webgl - non-indexed interleavedbuffergeometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -39,8 +39,8 @@
 		<div id="container"></div>
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - Interveaved Non-indexed Buffered Geometry<br />
-            (100,000 cubes - 1.2M triangles)<br />
-            - Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a>
+            (150,000 cubes - 1.8M triangles)<br />
+            Based on <a href="http://alteredqualia.com/three/examples/webgl_cubes.html">AlteredQualia's 1.8M triangle Animated Cube demo</a>
 
 		</div>
 
@@ -57,7 +57,6 @@
 			uniform float amplitude;
 
 			varying vec3 vViewPosition;
-			varying vec3 vNormal;
 
 			vec3 rotateVectorByQuaternion( vec3 v, vec4 q ) {
 
@@ -105,7 +104,6 @@
 				vec4 qRotation = axisAngleToQuaternion( rotation.xyz, rotation.w );
 
 				vec3 newPosition = rotateVectorByQuaternion( position - color, qRotation ) + color;
-				vNormal = normalMatrix * rotateVectorByQuaternion( normal, qRotation );
 
 				vec4 mvPosition = modelViewMatrix * vec4( newPosition, 1.0 );
 				vViewPosition = -mvPosition.xyz;
@@ -117,13 +115,13 @@
 		</script>
 
 		<script type="x-shader/x-fragment" id="fragmentShader">
+            #extension GL_OES_standard_derivatives : enable
 
 			varying vec3 vViewPosition;
-			varying vec3 vNormal;
 
 			void main() {
-
-				vec3 normal = normalize( vNormal );
+            
+				vec3 normal  = normalize(cross(dFdx(vViewPosition), dFdy(vViewPosition)));
 
 				// directional light
 
@@ -201,7 +199,7 @@
 
 				camera.lookAt( scene.position );
 
-				var cubes = 100000; // 150,000 cubes with non-indexed triangles throws periodic out of memory errors in chrome and crashes firefox
+				var cubes = 150000; // 150,000 cubes 
 				var triangles = 12 * cubes; // 12 triangles per cube (6 quads)
 
 				// BufferGeometry with unindexed triangles
@@ -212,49 +210,32 @@
 				geometry.numVertices = triangles * 3; // 3 vertices per triangle
 				geometry.attributes = {
 
-					position: {
-					    itemSize: 3,
-					    numItems: geometry.numVertices,
-					    offset: 0,
-					    indexMultiplier: 0.0,
-                        array: null
-					},
-
-					normal: {
-					    itemSize: 3,
-					    numItems: geometry.numVertices,
-					    offset: 3 * Float32Array.BYTES_PER_ELEMENT,
-					    indexMultiplier: 0.0,
-					    array: null
-					},
-
 					color: {
 					    itemSize: 3,
-					    numItems: geometry.numVertices,
-					    offset: 6 * Float32Array.BYTES_PER_ELEMENT,
-					    indexMultiplier: 0.0,
+					    numItems: geometry.numVertices * 3,
+					    offset: 3 * Float32Array.BYTES_PER_ELEMENT,
 					    array: null
+					},
+
+					position: {
+					    itemSize: 3,
+					    numItems: geometry.numVertices * 3,
+					    offset: 0,
+                        array: null
 					}
 
 				}
 
 				geometry.vertexByteSize
                     = geometry.attributes.position.itemSize * Float32Array.BYTES_PER_ELEMENT
-                    + geometry.attributes.normal.itemSize * Float32Array.BYTES_PER_ELEMENT
                     + geometry.attributes.color.itemSize * Float32Array.BYTES_PER_ELEMENT;
 
 				geometry.array = new ArrayBuffer( geometry.numVertices * geometry.vertexByteSize );
 
 				geometry.attributes.position.array = new Float32Array( geometry.array, geometry.attributes.position.offset );
-				geometry.attributes.normal.array = new Float32Array( geometry.array, geometry.attributes.normal.offset );
 				geometry.attributes.color.array = new Float32Array( geometry.array, geometry.attributes.color.offset );
 
-				geometry.attributes.position.indexMultiplier = geometry.vertexByteSize / Float32Array.BYTES_PER_ELEMENT;
-				geometry.attributes.normal.indexMultiplier = geometry.vertexByteSize / Float32Array.BYTES_PER_ELEMENT;
-				geometry.attributes.color.indexMultiplier = geometry.vertexByteSize / Float32Array.BYTES_PER_ELEMENT;
-
 				var positions = geometry.attributes.position.array;
-				var normals = geometry.attributes.normal.array;
 				var colors = geometry.attributes.color.array;
 
 				// Generate a single buffer with all the cubes
@@ -326,48 +307,20 @@
 					var cy = pC.y;
 					var cz = pC.z;
 
-					var j = k * 9 * 3;
+					var j = k * 9 * 2;
 
 					positions[j] = ax;
 					positions[j + 1] = ay;
 					positions[j + 2] = az;
                     
-					positions[j + 9] = bx;
-					positions[j + 9 + 1] = by;
-					positions[j + 9 + 2] = bz;
+					positions[j + 6] = bx;
+					positions[j + 6 + 1] = by;
+					positions[j + 6 + 2] = bz;
 
-					positions[j + 18] = cx;
-					positions[j + 18 + 1] = cy;
-					positions[j + 18 + 2] = cz;
+					positions[j + 12] = cx;
+					positions[j + 12 + 1] = cy;
+					positions[j + 12 + 2] = cz;
                     
-					// flat face normals
-
-					pA.set( ax, ay, az );
-					pB.set( bx, by, bz );
-					pC.set( cx, cy, cz );
-
-					cb.subVectors( pC, pB );
-					ab.subVectors( pA, pB );
-					cb.cross( ab );
-
-					cb.normalize();
-
-					var nx = cb.x;
-					var ny = cb.y;
-					var nz = cb.z;
-
-					normals[j] = nx;
-					normals[j + 1] = ny;
-					normals[j + 2] = nz;
-
-					normals[j + 9] = nx;
-					normals[j + 9 + 1] = ny;
-					normals[j + 9 + 2] = nz;
-
-					normals[j + 18] = nx;
-					normals[j + 18 + 1] = ny;
-					normals[j + 18 + 2] = nz;
-
 					// colors
 
 					color.setRGB( t.x, t.y, t.z );
@@ -376,13 +329,13 @@
 					colors[j + 1] = color.g;
 					colors[j + 2] = color.b;
 
-					colors[j + 9] = color.r;
-					colors[j + 9 + 1] = color.g;
-					colors[j + 9 + 2] = color.b;
+					colors[j + 6] = color.r;
+					colors[j + 6 + 1] = color.g;
+					colors[j + 6 + 2] = color.b;
 
-					colors[j + 18] = color.r;
-					colors[j + 18 + 1] = color.g;
-					colors[j + 18 + 2] = color.b;
+					colors[j + 12] = color.r;
+					colors[j + 12 + 1] = color.g;
+					colors[j + 12 + 2] = color.b;
 
 				}
 
