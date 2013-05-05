@@ -34212,11 +34212,7 @@ THREE.ArrowHelper.prototype.setColor = function ( hex ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( size ) {
-
-	size = size || 1;
-
-	var geometry = new THREE.Geometry();
+THREE.BoxHelper = function ( object ) {
 
 	//   5____4
 	// 1/___0/|
@@ -34224,19 +34220,22 @@ THREE.BoxHelper = function ( size ) {
 	// 2/___3/
 
 	var vertices = [
-		new THREE.Vector3(   size,   size,   size ),
-		new THREE.Vector3( - size,   size,   size ),
-		new THREE.Vector3( - size, - size,   size ),
-		new THREE.Vector3(   size, - size,   size ),
+		new THREE.Vector3(   1,   1,   1 ),
+		new THREE.Vector3( - 1,   1,   1 ),
+		new THREE.Vector3( - 1, - 1,   1 ),
+		new THREE.Vector3(   1, - 1,   1 ),
 
-		new THREE.Vector3(   size,   size, - size ),
-		new THREE.Vector3( - size,   size, - size ),
-		new THREE.Vector3( - size, - size, - size ),
-		new THREE.Vector3(   size, - size, - size )
+		new THREE.Vector3(   1,   1, - 1 ),
+		new THREE.Vector3( - 1,   1, - 1 ),
+		new THREE.Vector3( - 1, - 1, - 1 ),
+		new THREE.Vector3(   1, - 1, - 1 )
 	];
+
+	this.vertices = vertices;
 
 	// TODO: Wouldn't be nice if Line had .segments?
 
+	var geometry = new THREE.Geometry();
 	geometry.vertices.push(
 		vertices[ 0 ], vertices[ 1 ],
 		vertices[ 1 ], vertices[ 2 ],
@@ -34254,9 +34253,13 @@ THREE.BoxHelper = function ( size ) {
 		vertices[ 3 ], vertices[ 7 ]
 	);
 
-	this.vertices = vertices;
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ), THREE.LinePieces );
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial(), THREE.LinePieces );
+	if ( object !== undefined ) {
+
+		this.update( object );
+
+	}
 
 };
 
@@ -34545,12 +34548,17 @@ THREE.FaceNormalsHelper = function ( object, size ) {
 
 	var geometry = new THREE.Geometry();
 
-	for( var i = 0, l = object.geometry.faces.length; i < l; i ++ ) {
+	var faces = object.geometry.faces;
 
-		var face = object.geometry.faces[ i ];
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-		geometry.vertices.push( face.centroid );
-		geometry.vertices.push( face.normal.clone().multiplyScalar( size ).add( face.centroid ) );
+		var face = faces[ i ];
+
+		var centroid = face.centroid;
+		var normal = face.normal.clone();
+
+		geometry.vertices.push( centroid );
+		geometry.vertices.push( normal.multiplyScalar( size ).add( centroid ) );
 
 	}
 
@@ -34766,6 +34774,96 @@ THREE.SpotLightHelper.prototype.update = function () {
 	this.lightCone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 };
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.VertexNormalsHelper = function ( object, size ) {
+
+	size = size || 20;
+
+	var keys = [ 'a', 'b', 'c', 'd' ];
+	var geometry = new THREE.Geometry();
+
+	var vertices = object.geometry.vertices;
+	var faces = object.geometry.faces;
+
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+		var face = faces[ i ];
+
+		for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+
+			var vertexId = face[ keys[ j ] ];
+			var vertex = vertices[ vertexId ];
+			var normal = face.vertexNormals[ j ].clone();
+
+			geometry.vertices.push( vertex );
+			geometry.vertices.push( normal.multiplyScalar( size ).add( vertex ) );
+
+		}
+
+	}
+
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xff0000 } ), THREE.LinePieces );
+
+	this.matrixAutoUpdate = false;
+	this.matrixWorld = object.matrixWorld;
+
+};
+
+THREE.VertexNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.WireframeHelper = function ( object ) {
+
+	var edge = [ 0, 0 ], hash = {};
+	var sortFunction = function ( a, b ) { return a - b };
+
+	var keys = [ 'a', 'b', 'c', 'd' ];
+	var geometry = new THREE.Geometry();
+
+	var vertices = object.geometry.vertices;
+	var faces = object.geometry.faces;
+
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+		var face = faces[ i ];
+		var length = face instanceof THREE.Face4 ? 4 : 3;
+
+		for ( var j = 0; j < length; j ++ ) {
+
+			edge[ 0 ] = face[ keys[ j ] ];
+			edge[ 1 ] = face[ keys[ ( j + 1 ) % length ] ];
+			edge.sort( sortFunction );
+
+			var key = edge.toString();
+
+			if ( hash[ key ] === undefined ) {
+
+				geometry.vertices.push( vertices[ edge[ 0 ] ] );
+				geometry.vertices.push( vertices[ edge[ 1 ] ] );
+
+				hash[ key ] = true;
+
+			}
+
+		}
+
+	}
+
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffffff } ), THREE.LinePieces );
+
+	this.matrixAutoUpdate = false;
+	this.matrixWorld = object.matrixWorld;
+
+};
+
+THREE.WireframeHelper.prototype = Object.create( THREE.Line.prototype );
 
 /**
  * @author alteredq / http://alteredqualia.com/
