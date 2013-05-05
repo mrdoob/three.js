@@ -52,6 +52,8 @@
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
         <script src="js/libs/dat.gui.min.js"></script>
+        
+		<script src="js/controls/TrackballControls.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -177,7 +179,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, controls, scene, renderer;
 
 			var mesh, text;
 
@@ -468,6 +470,21 @@
 				camera.position.z = 2750;
 				camera.position.y = 1250;
 
+				controls = new THREE.TrackballControls(camera);
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.noZoom = false;
+				controls.noPan = false;
+
+				controls.staticMoving = true;
+				controls.dynamicDampingFactor = 0.3;
+
+				controls.keys = [65, 83, 68];
+
+
 				scene = new THREE.Scene();
 
 				camera.lookAt( scene.position );
@@ -525,6 +542,8 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
+				controls.handleResize();
+
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 			}
@@ -535,6 +554,7 @@
 
 				requestAnimationFrame( animate );
 
+				controls.update();
 				render();
 				stats.update();
 
