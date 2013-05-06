@@ -108,7 +108,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		}
 		var currentElement = _this.domElement;
 		var totalOffsetX = currentElement.offsetLeft - currentElement.scrollLeft;
-		var totalOffsetY = totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+		var totalOffsetY = currentElement.offsetTop - currentElement.scrollTop;
 		var containerY   = 0;
 		var canvasY      = 0;
 
