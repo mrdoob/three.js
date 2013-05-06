@@ -18,7 +18,7 @@
 		<script>
 
 			var camera, scene, renderer;
-			var mesh;
+			var mesh, faceNormalsHelper, vertexNormalsHelper;
 
 			init();
 			animate();
@@ -51,9 +51,11 @@
 					mesh.scale.multiplyScalar( 50 );
 					scene.add( mesh );
 
-					scene.add( new THREE.FaceNormalsHelper( mesh, 0.2 ) );
+					faceNormalsHelper = new THREE.FaceNormalsHelper( mesh, 10 );
+					scene.add( faceNormalsHelper );
 
-					scene.add( new THREE.VertexNormalsHelper( mesh, 0.2 ) );
+					vertexNormalsHelper = new THREE.VertexNormalsHelper( mesh, 10 );
+					scene.add( vertexNormalsHelper );
 
 					var helper = new THREE.WireframeHelper( mesh );
 					helper.material.depthTest = false;
@@ -87,6 +89,9 @@
 				if ( mesh !== undefined ) {
 
 					mesh.rotation.y += 0.01;
+
+					faceNormalsHelper.update();
+					vertexNormalsHelper.update();
 
 				}
 
