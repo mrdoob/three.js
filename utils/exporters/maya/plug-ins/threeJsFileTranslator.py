@@ -24,7 +24,9 @@ class DecimalEncoder(json.JSONEncoder):
             if '.' in s and len(s[s.index('.'):]) > FLOAT_PRECISION - 1:
                 s = '%.{0}f'.format(FLOAT_PRECISION) % o
                 while '.' in s and s[-1] == '0':
-                    s = s[-2]
+                    s = s[:-1] # this actually removes the last "0" from the string
+                if s[-1] == '.': # added this test to avoid leaving "0." instead of "0.0",
+                    s += '0'    # which would throw an error while loading the file
             return (s for s in [s])
         return super(DecimalEncoder, self)._iterencode(o, markers)
 
