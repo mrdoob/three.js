@@ -1,32 +1,72 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- */
+ * @author WestLangley / http://github.com/WestLangley
+*/
 
-THREE.FaceNormalsHelper = function ( object, size ) {
+THREE.FaceNormalsHelper = function ( object, size, hex ) {
 
-	size = size || 20;
+	this.object = object;
+
+	this.size = size || 1;
+
+	var color = hex || 0x0000ff;
 
 	var geometry = new THREE.Geometry();
 
-	var faces = object.geometry.faces;
+	var faces = this.object.geometry.faces;
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
-		var face = faces[ i ];
-
-		var centroid = face.centroid;
-		var normal = face.normal.clone();
-
-		geometry.vertices.push( centroid );
-		geometry.vertices.push( normal.multiplyScalar( size ).add( centroid ) );
+		geometry.vertices.push( new THREE.Vector3() );
+		geometry.vertices.push( new THREE.Vector3() );
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0x0000ff } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
 
 	this.matrixAutoUpdate = false;
-	this.matrixWorld = object.matrixWorld;
+
+	this.normalMatrix = new THREE.Matrix3();
+
+	this.update();
 
 };
 
 THREE.FaceNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+
+THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
+
+	var v1 = new THREE.Vector3();
+
+	return function( object ) {
+
+		this.object.updateMatrixWorld( true );
+
+		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
+
+		var vertices = this.geometry.vertices;
+
+		var faces = this.object.geometry.faces;
+
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+			var face = faces[ i ];
+
+			v1.copy( face.normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size );
+
+			var idx = 2 * i;
+
+			vertices[ idx ].copy( face.centroid ).applyMatrix4( this.object.matrixWorld );
+
+			vertices[ idx + 1 ].addVectors( vertices[ idx ], v1 );
+
+		}
+
+		this.geometry.verticesNeedUpdate = true;
+
+		return this;
+
+	}
+
+}());
+
