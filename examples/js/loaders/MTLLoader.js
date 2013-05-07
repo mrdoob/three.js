@@ -4,10 +4,11 @@
  * @author angelxuanchang
  */
 
-THREE.MTLLoader = function( baseUrl, options ) {
+THREE.MTLLoader = function( baseUrl, options, imageLoader ) {
 
 	this.baseUrl = baseUrl;
 	this.options = options;
+	this.imageLoader = imageLoader || new THREE.DefaultImageLoader();
 
 };
 
@@ -153,7 +154,7 @@ THREE.MTLLoader.prototype = {
  * @constructor
  */
 
-THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
+THREE.MTLLoader.MaterialCreator = function( baseUrl, options, imageLoader ) {
 
 	this.baseUrl = baseUrl;
 	this.options = options;
@@ -161,6 +162,7 @@ THREE.MTLLoader.MaterialCreator = function( baseUrl, options ) {
 	this.materials = {};
 	this.materialsArray = [];
 	this.nameLookup = {};
+	this.imageLoader = imageLoader || new THREE.DefaultImageLoader();
 
 	this.side = ( this.options && this.options.side )? this.options.side: THREE.FrontSide;
 	this.wrap = ( this.options && this.options.wrap )? this.options.wrap: THREE.RepeatWrapping;
@@ -353,7 +355,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					params[ 'map' ] = THREE.MTLLoader.loadTexture( this.baseUrl + value );
+					params[ 'map' ] = this.loadTexture( this.baseUrl + value );
 					params[ 'map' ].wrapS = this.wrap;
 					params[ 'map' ].wrapT = this.wrap;
 
@@ -400,83 +402,28 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
 		return this.materials[ materialName ];
 
-	}
+	},
 
-};
+	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-THREE.MTLLoader.loadTexture = function ( url, mapping, onLoad, onError ) {
+		var isCompressed = /\.dds$/i.test( url );
 
-	var isCompressed = /\.dds$/i.test( url );
+		var texture;
 
-	if ( isCompressed ) {
+		if ( isCompressed ) {
 
-		var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
+			texture = this.imageLoader.loadCompressedTexture( url, mapping, onLoad, onError );
 
-	} else {
+		} else {
 
-		var image = new Image();
-		var texture = new THREE.Texture( image, mapping );
+			// no longer check for power of 2.
+			texture = this.imageLoader.loadTexture( url, mapping, onLoad, onError );
+		}
 
-		var loader = new THREE.ImageLoader();
-
-		loader.addEventListener( 'load', function ( event ) {
-
-			texture.image = THREE.MTLLoader.ensurePowerOfTwo_( event.content );
-			texture.needsUpdate = true;
-			if ( onLoad ) onLoad( texture );
-
-		} );
-
-		loader.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event.message );
-
-		} );
-
-		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, image );
+		return texture;
 
 	}
 
-	return texture;
-
 };
 
-THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
-
-	if ( ! THREE.MTLLoader.isPowerOfTwo_( image.width ) || ! THREE.MTLLoader.isPowerOfTwo_( image.height ) ) {
-
-		var canvas = document.createElement( "canvas" );
-		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );
-		canvas.height = THREE.MTLLoader.nextHighestPowerOfTwo_( image.height );
-
-		var ctx = canvas.getContext("2d");
-		ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
-		return canvas;
-
-	}
-
-	return image;
-
-};
-
-THREE.MTLLoader.isPowerOfTwo_ = function ( x ) {
-
-	return ( x & ( x - 1 ) ) === 0;
-
-};
-
-THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
-
-	--x;
-
-	for ( var i = 1; i < 32; i <<= 1 ) {
-
-		x = x | x >> i;
-
-	}
-
-	return x + 1;
-
-};
 

@@ -548,6 +548,24 @@ THREE.ImageUtils = {
 
 		return texture;
 
+	},
+
+	ensurePowerOfTwoImage: function ( image ) {
+
+		if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
+
+			var canvas = document.createElement( "canvas" );
+			canvas.width = THREE.Math.nextHighestPowerOfTwo( image.width );
+			canvas.height = THREE.Math.nextHighestPowerOfTwo( image.height );
+
+			var ctx = canvas.getContext("2d");
+			ctx.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
+			return canvas;
+
+		}
+
+		return image;
+
 	}
 
 };

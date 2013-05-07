@@ -14,6 +14,8 @@ THREE.SceneLoader = function () {
 	this.geometryHandlerMap = {};
 	this.hierarchyHandlerMap = {};
 
+	this.imageLoader = new THREE.DefaultImageLoader();
+	
 	this.addGeometryHandler( "ascii", THREE.JSONLoader );
 
 };
@@ -959,11 +961,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			if ( isCompressed ) {
 
-				texture = THREE.ImageUtils.loadCompressedTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
+				texture = this.imageLoader.loadCompressedTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
 
 			} else {
 
-				texture = THREE.ImageUtils.loadTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
+				texture = this.imageLoader.loadTextureCube( url_array, textureJSON.mapping, generateTextureCallback( count ) );
 
 			}
 
@@ -975,11 +977,11 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 			if ( isCompressed ) {
 
-				texture = THREE.ImageUtils.loadCompressedTexture( fullUrl, textureJSON.mapping, textureCallback );
+				texture = this.imageLoader.loadCompressedTexture( fullUrl, textureJSON.mapping, textureCallback );
 
 			} else {
 
-				texture = THREE.ImageUtils.loadTexture( fullUrl, textureJSON.mapping, textureCallback );
+				texture = this.imageLoader.loadTexture( fullUrl, textureJSON.mapping, textureCallback );
 
 			}
 
