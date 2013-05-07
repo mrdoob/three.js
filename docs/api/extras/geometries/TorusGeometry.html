@@ -7,55 +7,31 @@
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
 	</head>
 	<body>
+		[page:Geometry] &rarr;
+	
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Creates a torus.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo radius], [page:todo tube], [page:todo radialSegments], [page:todo tubularSegments], [page:todo arc])</h3>
+		<h3>[name]([page:Float radius], [page:Float tube], [page:Integer radialSegments], [page:Integer tubularSegments], [page:Float arc])</h3>
 		<div>
-		radius -- todo <br />
-		tube -- todo <br />
-		radialSegments -- todo <br />
-		tubularSegments -- todo <br />
-		arc -- todo
-		</div>
-		<div>
-		todo
+		radius — Default is 100. <br />
+		tube — Diameter of the tube.  Default is 40. <br />
+		radialSegments — Default is 8 <br />
+		tubularSegments — Default is 6. <br />
+		arc — Central angle.  Default is Math.PI * 2.
 		</div>
 
 
 		<h2>Properties</h2>
 
-
-		<h3>.[page:number radialSegments]</h3>
 		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number tube]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number arc]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number radius]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number tubularSegments]</h3>
-		<div>
-		todo
-		</div> 
-
+		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
+		</div>
 
 		<h2>Source</h2>
 
