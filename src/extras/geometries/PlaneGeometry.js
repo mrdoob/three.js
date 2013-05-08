@@ -50,22 +50,23 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
 			var d = ( ix + 1 ) + gridX1 * iz;
 
-			var face = new THREE.Face4( a, b, c, d );
-			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
+			var aUV = new THREE.Vector2( ix / gridX, 1 - iz / gridZ );
+			var bUV = new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ );
+			var cUV = new THREE.Vector2( (ix + 1) / gridX, 1 - ( iz + 1 ) / gridZ );
+			var dUV = new THREE.Vector2( (ix + 1) / gridX, 1 - iz / gridZ );
 
-			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [
-				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
-				new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ )
-			] );
+			var face1 = new THREE.Face3( a, b, c);
+			var face2 = new THREE.Face3( a, c, d );
 
+			this.faces.push( face1 );
+			this.faces.push( face2 );
+
+			this.faceVertexUvs[0].push( [aUV, bUV, cUV], [aUV, cUV, dUV] );
 		}
 
 	}
 
+	this.computeFaceNormals();
 	this.computeCentroids();
 
 };
