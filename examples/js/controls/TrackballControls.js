@@ -129,12 +129,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 		var pos = _this.getMouseInContainer(clientX, clientY);
 		var mouseOnBall = new THREE.Vector3(pos.x, pos.y, 0.0);
 
-		var mouseOnBall = new THREE.Vector3(
-			( clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft ) / _this.radius,
-			( _this.screen.height * 0.5 + _this.screen.offsetTop - clientY ) / _this.radius,
-			0.0
-		);
-
 		var length = mouseOnBall.length();
 		if ( _this.noRoll ) {
 			if ( length < Math.SQRT1_2 ) {
