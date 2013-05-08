@@ -10,7 +10,7 @@ var onDocumentLoad = function ( event ) {
 		name = name.replace(/\-/g, ' ');
 
 		path = pathname.replace( /\ /g, '-' );
-		path = /\/manual\/[-a-z0-9\/]+/.exec( path ).toString().substr( 8 );
+		path = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
 
 	} else {
 
