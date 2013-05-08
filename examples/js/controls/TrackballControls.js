@@ -24,6 +24,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
+	this.noRoll = false;
 
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
@@ -99,18 +100,43 @@ THREE.TrackballControls = function ( object, domElement ) {
 		);
 
 	};
+	this.getMouseInContainer = function(clientX, clientY) {
+		if (!_this.domElement) {
+			return new THREE.Vector2(
+				(clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft) / (_this.screen.width * 0.5),
+				(_this.screen.height * 0.5 + _this.screen.offsetTop - clientY) / (_this.screen.height * 0.5));
+		}
+		var currentElement = _this.domElement;
+		var totalOffsetX = currentElement.offsetLeft - currentElement.scrollLeft;
+		var totalOffsetY = currentElement.offsetTop - currentElement.scrollTop;
+		var containerY   = 0;
+		var canvasY      = 0;
+
+
+		while (currentElement = currentElement.offsetParent) {
+			totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+			totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+		}
+		containerX = clientX - totalOffsetX;
+		containerY = clientY - totalOffsetY;
+
+		return new THREE.Vector2(
+			(containerX - _this.domElement.offsetWidth * 0.5) / (_this.domElement.offsetWidth * .5),
+			(_this.domElement.offsetHeight * 0.5 - containerY) / (_this.domElement.offsetHeight * .5));
+	};
 
 	this.getMouseProjectionOnBall = function ( clientX, clientY ) {
-
-		var mouseOnBall = new THREE.Vector3(
-			( clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft ) / _this.radius,
-			( _this.screen.height * 0.5 + _this.screen.offsetTop - clientY ) / _this.radius,
-			0.0
-		);
+		var pos = _this.getMouseInContainer(clientX, clientY);
+		var mouseOnBall = new THREE.Vector3(pos.x, pos.y, 0.0);
 
 		var length = mouseOnBall.length();
-
-		if ( length > 1.0 ) {
+		if ( _this.noRoll ) {
+			if ( length < Math.SQRT1_2 ) {
+				mouseOnBall.z = Math.sqrt( 1.0 - length * length );
+			} else {
+				mouseOnBall.z = .5 / length
+			}
+		} else if ( length > 1.0 ) {
 
 			mouseOnBall.normalize();
 
