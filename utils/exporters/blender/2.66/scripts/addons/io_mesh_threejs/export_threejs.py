@@ -1629,10 +1629,10 @@ def generate_objects(data):
         if obj.type == "MESH" and obj.THREE_exportGeometry:
             object_id = obj.name
 
-            if len(obj.modifiers) > 0:
-                geo_name = obj.name
-            else:
-                geo_name = obj.data.name
+            #if len(obj.modifiers) > 0:
+            #    geo_name = obj.name
+            #else:
+            geo_name = obj.data.name
 
             geometry_id = "geo_%s" % geo_name
 
@@ -1726,10 +1726,10 @@ def generate_geometries(data):
     for obj in data["objects"]:
         if obj.type == "MESH" and obj.THREE_exportGeometry:
 
-            if len(obj.modifiers) > 0:
-                name = obj.name
-            else:
-                name = obj.data.name
+            #if len(obj.modifiers) > 0:
+            #    name = obj.name
+            #else:
+            name = obj.data.name
 
             if name not in geo_set:
 
@@ -2327,13 +2327,13 @@ def save(operator, context, filepath = "",
                 # create extra copy of geometry with applied modifiers
                 # (if they exist)
 
-                if len(object.modifiers) > 0:
-                    name = object.name
+                #if len(object.modifiers) > 0:
+                #    name = object.name
 
                 # otherwise can share geometry
 
-                else:
-                    name = object.data.name
+                #else:
+                name = object.data.name
 
                 if name not in geo_set:
 
