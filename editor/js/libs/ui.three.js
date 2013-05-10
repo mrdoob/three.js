@@ -30,34 +30,34 @@ UI.Texture = function ( position ) {
 					scope.texture = new THREE.Texture( this );
 					scope.texture.needsUpdate = true;
 
+					// remember the original filename (including extension)
+					// this is used for url field in the scene export
+
+					scope.texture.sourceFile = file.name;
+
+					// generate unique name per texture
+					// based on source file name
+
+					var chunks = file.name.split( '.' );
+					var extension = chunks.pop().toLowerCase();
+					var filename = chunks.join( '.' );
+
+					if ( ! ( filename in scope.textureNameMap ) ) {
+
+						scope.textureNameMap[ filename ] = true;
+						scope.texture.name = filename;
+
+					} else {
+
+						scope.texture.name = filename + "_" + scope.texture.id;
+
+					}
+
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
 
 				}, false );
 
 				image.src = event.target.result;
-
-				// remember the original filename (including extension)
-				// this is used for url field in the scene export
-
-				scope.texture.sourceFile = file.name;
-
-				// generate unique name per texture
-				// based on source file name
-
-				var chunks = file.name.split( '.' );
-				var extension = chunks.pop().toLowerCase();
-				var filename = chunks.join( '.' );
-
-				if ( ! ( filename in scope.textureNameMap ) ) {
-
-					scope.textureNameMap[ filename ] = true;
-					scope.texture.name = filename;
-
-				} else {
-
-					scope.texture.name = filename + "_" + scope.texture.id;
-
-				}
 
 			}, false );
 

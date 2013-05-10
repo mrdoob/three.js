@@ -67,7 +67,7 @@ var Loader = function ( signals ) {
 
 	}
 
-	this.handleJSON = function ( data ) {
+	this.handleJSON = function ( data, file, filename ) {
 
 		if ( data.metadata === undefined ) { // 2.0
 
@@ -220,7 +220,7 @@ var Loader = function ( signals ) {
 						worker.onmessage = function ( event ) {
 
 							event.data.metadata = { version: 2 };
-							scope.handleJSON( event.data );
+							scope.handleJSON( event.data, file, filename );
 
 						};
 
@@ -245,7 +245,7 @@ var Loader = function ( signals ) {
 
 					}
 
-					scope.handleJSON( data );
+					scope.handleJSON( data, file, filename );
 
 				}, false );
 				reader.readAsText( file );
