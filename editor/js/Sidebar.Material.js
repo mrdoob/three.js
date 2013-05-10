@@ -1,5 +1,5 @@
-Sidebar.Material = function ( signals ) {
-
+Sidebar.Material = function ( signals ,options) {
+	
     var materialClasses = {
 
 		'LineBasicMaterial': THREE.LineBasicMaterial,
@@ -28,7 +28,7 @@ Sidebar.Material = function ( signals ) {
 	// name
 
 	var materialNameRow = new UI.Panel();
-	var materialName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var materialName = new UI.Input().setWidth( '130px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialNameRow.add( materialName );
@@ -49,7 +49,7 @@ Sidebar.Material = function ( signals ) {
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial'
 
-	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	} ).setWidth( '130px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialClassRow.add( materialClass );
@@ -214,16 +214,29 @@ Sidebar.Material = function ( signals ) {
 	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
+	
+	var isSubMaterial = false;
+	var subMaterial = [];
+	if(options && options.isSubMaterial === true){
+		
+		isSubMaterial = true;
+		
+	} else {
+		
+		isSubMaterial = false;
+		
+	}
 
 
 	//
 
 	var selected = null;
+	var selectedMaterial = null;
 	var selectedHasUvs = false;
 
 	function update() {
 
-		var material = selected.material;
+		var material = selectedMaterial;
 		var textureWarning = false;
 
 		if ( material ) {
@@ -233,7 +246,22 @@ Sidebar.Material = function ( signals ) {
 			if ( material instanceof materialClasses[ materialClass.getValue() ] == false ) {
 
 				material = new materialClasses[ materialClass.getValue() ]();
-				selected.material = material;
+				if (!isSubMaterial){
+					selectedMaterial = material;
+					selected.material = selectedMaterial;
+				} else {
+					var materials =selected.material.materials;
+					for (var i=0;i<materials.length;i++){
+						if (selectedMaterial === materials[i]){
+							break;
+						}
+					}
+					
+					selectedMaterial = material;
+					materials[i] = selectedMaterial;
+					
+				}
+
 
 			}
 
@@ -445,9 +473,20 @@ Sidebar.Material = function ( signals ) {
 
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( selected.material[ property ] !== undefined ? '' : 'none' );
+			properties[ property ].setDisplay( selectedMaterial[ property ] !== undefined ? '' : 'none' );
 
 		}
+		
+		if (selectedMaterial instanceof THREE.MeshFaceMaterial){
+			for (var i = selectedMaterial.materials.length ; i < subMaterial.length ; i++ ) {
+				subMaterial[i].setDisplay( 'none' );
+			}
+		} else {
+			for (var i = 0 ; i < subMaterial.length ; i++ ) {
+				subMaterial[i].setDisplay( 'none' );
+			}
+		}
+		
 
 	};
 
@@ -460,185 +499,209 @@ Sidebar.Material = function ( signals ) {
 		}
 
 	}
+	
+	function setMaterial(object,material){
+		
+		selected = object;
+		selectedHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
+		selectedMaterial = material;
+		
+		container.setDisplay( '' );
+
+
+		materialName.setValue( material.name );
+		materialClass.setValue( getMaterialInstanceName( material ) );
+
+		if ( material.color !== undefined ) {
+
+			materialColor.setValue( '#' + material.color.getHexString() );
+
+		}
+
+		if ( material.ambient !== undefined ) {
+
+			materialAmbient.setValue( '#' + material.ambient.getHexString() );
+
+		}
+
+		if ( material.emissive !== undefined ) {
+
+			materialEmissive.setValue( '#' + material.emissive.getHexString() );
+
+		}
+
+		if ( material.specular !== undefined ) {
+
+			materialSpecular.setValue( '#' + material.specular.getHexString() );
+
+		}
+
+		if ( material.shininess !== undefined ) {
+
+			materialShininess.setValue( material.shininess );
+
+		}
+
+		if ( material.map !== undefined ) {
+
+			if ( selectedHasUvs ) {
+
+				if ( material.map !== null ) {
+
+					materialMapEnabled.setValue( true );
+					materialMap.setValue( material.map );
+
+				} else {
+
+					materialMapEnabled.setValue( false );
+
+				}
+
+			} else {
+
+				console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+			}
+
+		}
+
+		/*
+		if ( material.lightMap !== undefined ) {
+
+			if ( material.lightMap !== null ) {
+
+				materialLightMapEnabled.setValue( true );
+				materialLightMap.setValue( material.lightMap );
+
+			} else {
+
+				materialLightMapEnabled.setValue( false );
+
+			}
+
+		}
+		*/
+
+		if ( material.bumpMap !== undefined ) {
+
+			if ( material.bumpMap !== null ) {
+
+				materialBumpMapEnabled.setValue( true );
+				materialBumpMap.setValue( material.bumpMap );
+				materialBumpScale.setValue( material.bumpScale );
+
+			} else {
+
+				materialBumpMapEnabled.setValue( false );
+				materialBumpScale.setValue( 1 );
+
+			}
+
+		}
+
+		if ( material.normalMap !== undefined ) {
+
+			if ( material.normalMap !== null ) {
+
+				materialNormalMapEnabled.setValue( true );
+				materialNormalMap.setValue( material.normalMap );
+
+			} else {
+
+				materialNormalMapEnabled.setValue( false );
+
+			}
+
+		}
+
+		if ( material.specularMap !== undefined ) {
+
+			if ( material.specularMap !== null ) {
+
+				materialSpecularMapEnabled.setValue( true );
+				materialSpecularMap.setValue( material.specularMap );
+
+			} else {
+
+				materialSpecularMapEnabled.setValue( false );
+
+			}
+
+		}
+
+		if ( material.envMap !== undefined ) {
+
+			if ( material.envMap !== null ) {
+
+				materialEnvMapEnabled.setValue( true );
+				materialEnvMap.setValue( material.envMap );
+				materialReflectivity.setValue( material.reflectivity );
+
+			} else {
+
+				materialEnvMapEnabled.setValue( false );
+
+			}
+
+		}
+
+		if ( material.opacity !== undefined ) {
+
+			materialOpacity.setValue( material.opacity );
+
+		}
+
+		if ( material.transparent !== undefined ) {
+
+			materialTransparent.setValue( material.transparent );
+
+		}
+
+		if ( material.wireframe !== undefined ) {
+
+			materialWireframe.setValue( material.wireframe );
+
+		}
+
+		if ( material.wireframeLinewidth !== undefined ) {
+
+			materialWireframeLinewidth.setValue( material.wireframeLinewidth );
+
+		}
+		
+		if (material instanceof THREE.MeshFaceMaterial){
+			for (var i = subMaterial.length ; i < material.materials.length ; i++ ) {
+				subMaterial.push(new Sidebar.Material(signals,{isSubMaterial:true}))
+				container.add(subMaterial[i]);
+			}
+			
+			for (var i = 0 ; i < material.materials.length ; i++ ) {
+				
+				subMaterial[i].setMaterial(object,material.materials[i]);
+				
+			}
+		}
+
+		updateRows();
+	}
 
 	// events
 
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object && object.material ) {
-
-			selected = object;
-			selectedHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
-
-			container.setDisplay( '' );
-
-			var material = object.material;
-
-			materialName.setValue( material.name );
-			materialClass.setValue( getMaterialInstanceName( material ) );
-
-			if ( material.color !== undefined ) {
-
-				materialColor.setValue( '#' + material.color.getHexString() );
-
+			
+			if(!isSubMaterial){
+				
+				var material = object.material;
+				setMaterial(object,material);
+				
 			}
-
-			if ( material.ambient !== undefined ) {
-
-				materialAmbient.setValue( '#' + material.ambient.getHexString() );
-
-			}
-
-			if ( material.emissive !== undefined ) {
-
-				materialEmissive.setValue( '#' + material.emissive.getHexString() );
-
-			}
-
-			if ( material.specular !== undefined ) {
-
-				materialSpecular.setValue( '#' + material.specular.getHexString() );
-
-			}
-
-			if ( material.shininess !== undefined ) {
-
-				materialShininess.setValue( material.shininess );
-
-			}
-
-			if ( material.map !== undefined ) {
-
-				if ( selectedHasUvs ) {
-
-					if ( material.map !== null ) {
-
-						materialMapEnabled.setValue( true );
-						materialMap.setValue( material.map );
-
-					} else {
-
-						materialMapEnabled.setValue( false );
-
-					}
-
-				} else {
-
-					console.warn( "Can't set texture, model doesn't have texture coordinates" );
-
-				}
-
-			}
-
-			/*
-			if ( material.lightMap !== undefined ) {
-
-				if ( material.lightMap !== null ) {
-
-					materialLightMapEnabled.setValue( true );
-					materialLightMap.setValue( material.lightMap );
-
-				} else {
-
-					materialLightMapEnabled.setValue( false );
-
-				}
-
-			}
-			*/
-
-			if ( material.bumpMap !== undefined ) {
-
-				if ( material.bumpMap !== null ) {
-
-					materialBumpMapEnabled.setValue( true );
-					materialBumpMap.setValue( material.bumpMap );
-					materialBumpScale.setValue( material.bumpScale );
-
-				} else {
-
-					materialBumpMapEnabled.setValue( false );
-					materialBumpScale.setValue( 1 );
-
-				}
-
-			}
-
-			if ( material.normalMap !== undefined ) {
-
-				if ( material.normalMap !== null ) {
-
-					materialNormalMapEnabled.setValue( true );
-					materialNormalMap.setValue( material.normalMap );
-
-				} else {
-
-					materialNormalMapEnabled.setValue( false );
-
-				}
-
-			}
-
-			if ( material.specularMap !== undefined ) {
-
-				if ( material.specularMap !== null ) {
-
-					materialSpecularMapEnabled.setValue( true );
-					materialSpecularMap.setValue( material.specularMap );
-
-				} else {
-
-					materialSpecularMapEnabled.setValue( false );
-
-				}
-
-			}
-
-			if ( material.envMap !== undefined ) {
-
-				if ( material.envMap !== null ) {
-
-					materialEnvMapEnabled.setValue( true );
-					materialEnvMap.setValue( material.envMap );
-					materialReflectivity.setValue( material.reflectivity );
-
-				} else {
-
-					materialEnvMapEnabled.setValue( false );
-
-				}
-
-			}
-
-			if ( material.opacity !== undefined ) {
-
-				materialOpacity.setValue( material.opacity );
-
-			}
-
-			if ( material.transparent !== undefined ) {
-
-				materialTransparent.setValue( material.transparent );
-
-			}
-
-			if ( material.wireframe !== undefined ) {
-
-				materialWireframe.setValue( material.wireframe );
-
-			}
-
-			if ( material.wireframeLinewidth !== undefined ) {
-
-				materialWireframeLinewidth.setValue( material.wireframeLinewidth );
-
-			}
-
-			updateRows();
 
 		} else {
 
 			selected = null;
+			selectedMaterial = null;
 			selectedHasUvs = false;
 
 			container.setDisplay( 'none' );
@@ -646,6 +709,8 @@ Sidebar.Material = function ( signals ) {
 		}
 
 	} );
+	
+	container.setMaterial = setMaterial;
 
 	return container;
 
