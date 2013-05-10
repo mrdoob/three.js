@@ -794,7 +794,8 @@ def generate_indices_and_weights(meshes, option_skinning):
 
                 if i < len(bone_array):
                     bone_proxy = bone_array[i]
-
+                    
+                    found = 0
                     index = bone_proxy[0]
                     weight = bone_proxy[1]
 
@@ -802,7 +803,12 @@ def generate_indices_and_weights(meshes, option_skinning):
                         if object.vertex_groups[index].name == bone.name:
                             indices.append('%d' % j)
                             weights.append('%g' % weight)
+                            found = 1
                             break
+
+                    if found != 1:
+                        indices.append('0')
+                        weights.append('0')
 
                 else:
                     indices.append('0')
