@@ -28,7 +28,7 @@ Sidebar.Material = function ( signals ,options) {
 	// name
 
 	var materialNameRow = new UI.Panel();
-	var materialName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var materialName = new UI.Input().setWidth( '130px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialNameRow.add( materialName );
@@ -49,7 +49,7 @@ Sidebar.Material = function ( signals ,options) {
 		'MeshNormalMaterial': 'MeshNormalMaterial',
 		'MeshPhongMaterial': 'MeshPhongMaterial'
 
-	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	} ).setWidth( '130px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
 	materialClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialClassRow.add( materialClass );
@@ -217,13 +217,14 @@ Sidebar.Material = function ( signals ,options) {
 	
 	var isSubMaterial = false;
 	var subMaterial = [];
-	if (!options || options.isSubMaterial !== true){
-		for (var i=0;i<25;i++){
-			subMaterial.push(new Sidebar.Material(signals,{isSubMaterial:true}))
-			container.add(subMaterial[i]);
-		}
-	} else if(options && options.isSubMaterial === true){
-		isSubMaterial = true
+	if(options && options.isSubMaterial === true){
+		
+		isSubMaterial = true;
+		
+	} else {
+		
+		isSubMaterial = false;
+		
 	}
 
 
@@ -245,8 +246,21 @@ Sidebar.Material = function ( signals ,options) {
 			if ( material instanceof materialClasses[ materialClass.getValue() ] == false ) {
 
 				material = new materialClasses[ materialClass.getValue() ]();
-				selectedMaterial = material;
-				selected.material = selectedMaterial;
+				if (!isSubMaterial){
+					selectedMaterial = material;
+					selected.material = selectedMaterial;
+				} else {
+					var materials =selected.material.materials;
+					for (var i=0;i<materials.length;i++){
+						if (selectedMaterial === materials[i]){
+							break;
+						}
+					}
+					
+					selectedMaterial = material;
+					materials[i] = selectedMaterial;
+					
+				}
 
 
 			}
@@ -462,6 +476,17 @@ Sidebar.Material = function ( signals ,options) {
 			properties[ property ].setDisplay( selectedMaterial[ property ] !== undefined ? '' : 'none' );
 
 		}
+		
+		if (selectedMaterial instanceof THREE.MeshFaceMaterial){
+			for (var i = selectedMaterial.materials.length ; i < subMaterial.length ; i++ ) {
+				subMaterial[i].setDisplay( 'none' );
+			}
+		} else {
+			for (var i = 0 ; i < subMaterial.length ; i++ ) {
+				subMaterial[i].setDisplay( 'none' );
+			}
+		}
+		
 
 	};
 
@@ -645,8 +670,15 @@ Sidebar.Material = function ( signals ,options) {
 		}
 		
 		if (material instanceof THREE.MeshFaceMaterial){
+			for (var i = subMaterial.length ; i < material.materials.length ; i++ ) {
+				subMaterial.push(new Sidebar.Material(signals,{isSubMaterial:true}))
+				container.add(subMaterial[i]);
+			}
+			
 			for (var i = 0 ; i < material.materials.length ; i++ ) {
+				
 				subMaterial[i].setMaterial(object,material.materials[i]);
+				
 			}
 		}
 
