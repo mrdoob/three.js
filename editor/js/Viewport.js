@@ -491,6 +491,23 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.playAnimations.add( function (animations) {
+		
+		function animate() {
+			requestAnimationFrame( animate );
+			
+			for (var i = 0; i < animations.length ; i++ ){
+				animations[i].update(0.016);
+			} 
+
+
+			render();
+		}
+
+		animate();
+
+	} );
+
 	//
 
 	var renderer;

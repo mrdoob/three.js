@@ -9,6 +9,7 @@ var Sidebar = function ( signals ) {
 	container.add( new Sidebar.Object3D( signals ) );
 	container.add( new Sidebar.Geometry( signals ) );
 	container.add( new Sidebar.Material( signals ) );
+	container.add( new Sidebar.Animation( signals ) );
 
 	return container;
 
