@@ -511,16 +511,8 @@ Sidebar.Material = function ( signals ) {
 
 				if ( selectedHasUvs ) {
 
-					if ( material.map !== null ) {
-
-						materialMapEnabled.setValue( true );
-						materialMap.setValue( material.map );
-
-					} else {
-
-						materialMapEnabled.setValue( false );
-
-					}
+					materialMapEnabled.setValue( material.map !== null );
+					materialMap.setValue( material.map );
 
 				} else {
 
@@ -533,80 +525,39 @@ Sidebar.Material = function ( signals ) {
 			/*
 			if ( material.lightMap !== undefined ) {
 
-				if ( material.lightMap !== null ) {
-
-					materialLightMapEnabled.setValue( true );
-					materialLightMap.setValue( material.lightMap );
-
-				} else {
-
-					materialLightMapEnabled.setValue( false );
-
-				}
+				materialLightMapEnabled.setValue( material.lightMap !== null );
+				materialLightMap.setValue( material.lightMap );
 
 			}
 			*/
 
 			if ( material.bumpMap !== undefined ) {
 
-				if ( material.bumpMap !== null ) {
-
-					materialBumpMapEnabled.setValue( true );
-					materialBumpMap.setValue( material.bumpMap );
-					materialBumpScale.setValue( material.bumpScale );
-
-				} else {
-
-					materialBumpMapEnabled.setValue( false );
-					materialBumpScale.setValue( 1 );
-
-				}
+				materialBumpMapEnabled.setValue( material.bumpMap !== null );
+				materialBumpMap.setValue( material.bumpMap );
+				materialBumpScale.setValue( material.bumpScale );
 
 			}
 
 			if ( material.normalMap !== undefined ) {
 
-				if ( material.normalMap !== null ) {
-
-					materialNormalMapEnabled.setValue( true );
-					materialNormalMap.setValue( material.normalMap );
-
-				} else {
-
-					materialNormalMapEnabled.setValue( false );
-
-				}
+				materialNormalMapEnabled.setValue( material.normalMap !== null );
+				materialNormalMap.setValue( material.normalMap );
 
 			}
 
 			if ( material.specularMap !== undefined ) {
 
-				if ( material.specularMap !== null ) {
-
-					materialSpecularMapEnabled.setValue( true );
-					materialSpecularMap.setValue( material.specularMap );
-
-				} else {
-
-					materialSpecularMapEnabled.setValue( false );
-
-				}
+				materialSpecularMapEnabled.setValue( material.specularMap !== null );
+				materialSpecularMap.setValue( material.specularMap );
 
 			}
 
 			if ( material.envMap !== undefined ) {
 
-				if ( material.envMap !== null ) {
-
-					materialEnvMapEnabled.setValue( true );
-					materialEnvMap.setValue( material.envMap );
-					materialReflectivity.setValue( material.reflectivity );
-
-				} else {
-
-					materialEnvMapEnabled.setValue( false );
-
-				}
+				materialEnvMapEnabled.setValue( material.envMap !== null );
+				materialEnvMap.setValue( material.envMap );
+				materialReflectivity.setValue( material.reflectivity );
 
 			}
 

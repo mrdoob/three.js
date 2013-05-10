@@ -7,7 +7,7 @@ UI.Texture = function ( position ) {
 	var scope = this;
 
 	var image = new Image();
-	this.texture = new THREE.Texture( image );
+	this.texture = null;
 
 	this.dom = document.createElement( 'input' );
 	this.dom.type = 'file';
@@ -25,10 +25,9 @@ UI.Texture = function ( position ) {
 			reader.addEventListener( 'load', function ( event ) {
 
 				var image = document.createElement( 'img' );
-
 				image.addEventListener( 'load', function( event ) {
 
-					scope.texture.image = this;
+					scope.texture = new THREE.Texture( this );
 					scope.texture.needsUpdate = true;
 
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
