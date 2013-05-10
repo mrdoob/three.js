@@ -1422,6 +1422,9 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
 
                 else:
                     mesh.transform(object.matrix_world)
+                    
+                    
+            mesh.update(calc_tessface=True)
 
             mesh.calc_normals()
             mesh.calc_tessface()
