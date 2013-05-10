@@ -7,26 +7,24 @@
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
 	</head>
 	<body>
+		[page:Geometry] &rarr;
+		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A class for generating a two-dimensional ring geometry.</div>
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]()</h3>
 
-
-		<h2>Properties</h2>
-
-		<h3>.[page:Vector3 todo]</h3>
-
-
-		<h2>Methods</h2>
-
-		<h3>.todo( [page:Vector3 todo] )</h3>
+		<h3>[name]([page:Float innerRadius], [page:Float outerRadius], [page:Integer thetaSegments], [page:Integer phiSegments], [page:Float thetaStart], [page:Float thetaLength])</h3>
 		<div>
-		todo — todo<br />
+		innerRadius — Default is 0, but it doesn't work right when innerRadius is set to 0.<br />
+		outerRadius — Default is 50. <br />
+		thetaSegments — Number of segments.  A higher number means the ring will be more round.  Minimum is 3.  Default is 8. <br />
+		phiSegments — Minimum is 3.  Default is 8.<br />
+		thetaStart — Starting angle. Default is 0. <br />
+		thetaLength — Central angle.  Default is Math.PI * 2.
 		</div>
 
 

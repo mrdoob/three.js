@@ -41,7 +41,7 @@
 
 				scene = new THREE.Scene();
 
-				var light, object, object2, materials;
+				var light, object, object2;
 
 				scene.add( new THREE.AmbientLight( 0x404040 ) );
 
@@ -53,54 +53,47 @@
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 
-				materials = [
-					new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true, transparent: true, opacity: 0.1, side: THREE.DoubleSide } )
-				];
-
+				var material = new THREE.MeshLambertMaterial( { ambient: 0xbbbbbb, map: map, side: THREE.DoubleSide } );
 
 				//
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.SphereGeometry( 75, 20, 10 ), materials );
+				object = new THREE.Mesh( new THREE.SphereGeometry( 75, 20, 10 ), material );
 				object.position.set( -400, 0, 200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.IcosahedronGeometry( 75, 1 ), materials );
+				object = new THREE.Mesh( new THREE.IcosahedronGeometry( 75, 1 ), material );
 				object.position.set( -200, 0, 200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.OctahedronGeometry( 75, 2 ), materials );
+				object = new THREE.Mesh( new THREE.OctahedronGeometry( 75, 2 ), material );
 				object.position.set( 0, 0, 200 );
 				scene.add( object );
 
-
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TetrahedronGeometry( 75, 0 ), materials );
+				object = new THREE.Mesh( new THREE.TetrahedronGeometry( 75, 0 ), material );
 				object.position.set( 200, 0, 200 );
 				scene.add( object );
 
-
 				//
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry( 100, 100, 4, 4 ), materials );
+				object = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), material );
 				object.position.set( -400, 0, 0 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), materials );
+				object = new THREE.Mesh( new THREE.CubeGeometry( 100, 100, 100, 4, 4, 4 ), material );
 				object.position.set( -200, 0, 0 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), materials );
+				object = new THREE.Mesh( new THREE.CircleGeometry( 50, 20, 0, Math.PI * 2 ), material );
 				object.position.set( 0, 0, 0 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), materials );
+				object = new THREE.Mesh( new THREE.RingGeometry( 10, 50, 20, 5, 0, Math.PI * 2 ), material );
 				object.position.set( 200, 0, 0 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), materials );
+				object = new THREE.Mesh( new THREE.CylinderGeometry( 25, 75, 100, 40, 5 ), material );
 				object.position.set( 400, 0, 0 );
 				scene.add( object );
-
 
 				//
 
@@ -108,19 +101,19 @@
 
 				for ( var i = 0; i < 50; i ++ ) {
 
-					points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
+					points.push( new THREE.Vector3( Math.sin( i * 0.2 ) * Math.sin( i * 0.1 ) * 15 + 50, 0, ( i - 5 ) * 2 ) );
 
 				}
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.LatheGeometry( points, 20 ), materials );
+				object = new THREE.Mesh( new THREE.LatheGeometry( points, 20 ), material );
 				object.position.set( -400, 0, -200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TorusGeometry( 50, 20, 20, 20 ), materials );
+				object = new THREE.Mesh( new THREE.TorusGeometry( 50, 20, 20, 20 ), material );
 				object.position.set( -200, 0, -200 );
 				scene.add( object );
 
-				object = THREE.SceneUtils.createMultiMaterialObject( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), materials );
+				object = new THREE.Mesh( new THREE.TorusKnotGeometry( 50, 10, 50, 20 ), material );
 				object.position.set( 0, 0, -200 );
 				scene.add( object );
 
@@ -132,6 +125,7 @@
 				object.position.set( 400, 0, -200 );
 				scene.add( object );
 
+				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

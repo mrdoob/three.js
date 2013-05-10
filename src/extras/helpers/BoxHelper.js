@@ -2,11 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.BoxHelper = function ( size ) {
-
-	size = size || 1;
-
-	var geometry = new THREE.Geometry();
+THREE.BoxHelper = function ( object ) {
 
 	//   5____4
 	// 1/___0/|
@@ -14,19 +10,22 @@ THREE.BoxHelper = function ( size ) {
 	// 2/___3/
 
 	var vertices = [
-		new THREE.Vector3(   size,   size,   size ),
-		new THREE.Vector3( - size,   size,   size ),
-		new THREE.Vector3( - size, - size,   size ),
-		new THREE.Vector3(   size, - size,   size ),
+		new THREE.Vector3(   1,   1,   1 ),
+		new THREE.Vector3( - 1,   1,   1 ),
+		new THREE.Vector3( - 1, - 1,   1 ),
+		new THREE.Vector3(   1, - 1,   1 ),
 
-		new THREE.Vector3(   size,   size, - size ),
-		new THREE.Vector3( - size,   size, - size ),
-		new THREE.Vector3( - size, - size, - size ),
-		new THREE.Vector3(   size, - size, - size )
+		new THREE.Vector3(   1,   1, - 1 ),
+		new THREE.Vector3( - 1,   1, - 1 ),
+		new THREE.Vector3( - 1, - 1, - 1 ),
+		new THREE.Vector3(   1, - 1, - 1 )
 	];
+
+	this.vertices = vertices;
 
 	// TODO: Wouldn't be nice if Line had .segments?
 
+	var geometry = new THREE.Geometry();
 	geometry.vertices.push(
 		vertices[ 0 ], vertices[ 1 ],
 		vertices[ 1 ], vertices[ 2 ],
@@ -44,9 +43,13 @@ THREE.BoxHelper = function ( size ) {
 		vertices[ 3 ], vertices[ 7 ]
 	);
 
-	this.vertices = vertices;
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffff00 } ), THREE.LinePieces );
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial(), THREE.LinePieces );
+	if ( object !== undefined ) {
+
+		this.update( object );
+
+	}
 
 };
 
