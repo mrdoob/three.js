@@ -39,6 +39,9 @@ THREE.BinaryLoader.prototype.loadAjaxJSON = function ( context, url, callback, t
 
 	var xhr = new XMLHttpRequest();
 
+	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
+	binaryPath = binaryPath && ( typeof binaryPath === "string" ) ? binaryPath : this.extractUrlBase( url );
+
 	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState == 4 ) {
@@ -68,8 +71,6 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 	var xhr = new XMLHttpRequest(),
 		url = binaryPath + "/" + json.buffers;
 
-	var length = 0;
-
 	xhr.onreadystatechange = function () {
 
 		if ( xhr.readyState == 4 ) {
@@ -78,6 +79,14 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 				var buffer = xhr.response;
 				if ( buffer === undefined ) buffer = ( new Uint8Array( xhr.responseBody ) ).buffer; // IEWEBGL needs this
+				if ( buffer.byteLength == 0 ) {  // iOS and other XMLHttpRequest level 1
+					var buffer = new ArrayBuffer( xhr.responseText.length );
+					var bufView = new Uint8Array( buffer );
+					for ( var i=0, strLen=xhr.responseText.length; i<strLen; i++ ) {
+						bufView[i] = xhr.responseText.charCodeAt(i) & 0xff;
+					}
+				}
+
 				THREE.BinaryLoader.prototype.createBinModel( buffer, callback, texturePath, json.materials );
 
 			} else {
@@ -86,30 +95,19 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 
 			}
 
-		} else if ( xhr.readyState == 3 ) {
-
-			if ( callbackProgress ) {
-
-				if ( length == 0 ) {
-
-					length = xhr.getResponseHeader( "Content-Length" );
-
-				}
-
-				callbackProgress( { total: length, loaded: xhr.responseText.length } );
-
-			}
-
-		} else if ( xhr.readyState == 2 ) {
-
-			length = xhr.getResponseHeader( "Content-Length" );
-
 		}
 
 	};
+	xhr.addEventListener( "progress", function(event) {
+		if ( event.lengthComputable )
+			callbackProgress( event );
+	}, false);
+
 
 	xhr.open( "GET", url, true );
 	xhr.responseType = "arraybuffer";
+	if ( 'overrideMimeType' in xhr )
+		xhr.overrideMimeType('text\/plain; charset=x-user-defined');
 	xhr.send( null );
 
 };
