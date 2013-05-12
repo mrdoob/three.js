@@ -28,10 +28,10 @@
 	</head>
 	<body>
 
-	    <div id="info">
-	        <a href="http://threejs.org" target="_blank">three.js</a> - headtracking demo for oculus rift. requires <a href="https://github.com/possan/oculus-rest/" target="_blank">oculus-rest</a> to get headtracking coordinates working.<br />
-	        (left click: forward, a/s/w/d/r/f: move, h: hide text)
-	    </div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - headtracking demo for oculus rift. requires <a href="https://github.com/possan/oculus-rest/" target="_blank">oculus-rest</a> to get headtracking coordinates working.<br />
+			(left click: forward, a/s/w/d/r/f: move, h: hide text)
+		</div>
 
 		<script src="../build/three.min.js"></script>
 		<script src="js/ImprovedNoise.js"></script>
@@ -116,9 +116,9 @@
 
 				}
 				window.addEventListener( 'resize', onWindowResize, false );
-	            document.addEventListener('keydown', keyPressed, false);
+				document.addEventListener('keydown', keyPressed, false);
 
-	            oculuscontrol.connect();
+				oculuscontrol.connect();
 			}
 
 			function onWindowResize() {
@@ -130,12 +130,12 @@
 				controls.handleResize();
 			}
 
-	        function keyPressed(event) {
-	            if (event.keyCode === 72) { // H
-	                guiVisible = !guiVisible;
-	                document.getElementById('info').style.display = guiVisible ? "block" : "none";
-	            }
-	        }
+			function keyPressed(event) {
+				if (event.keyCode === 72) { // H
+					guiVisible = !guiVisible;
+					document.getElementById('info').style.display = guiVisible ? "block" : "none";
+				}
+			}
 
 			function animate() {
 				requestAnimationFrame( animate );

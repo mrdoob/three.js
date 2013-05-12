@@ -32,16 +32,16 @@ THREE.OculusControls = function ( object ) {
 		xhr.send( null );
 	};
 
-    this.gotCoordinates = function( r ) {
-        this.headquat.set(r.quat.x, r.quat.y, r.quat.z, r.quat.w);
-        this.queuePoll();
-    }
+	this.gotCoordinates = function( r ) {
+		this.headquat.set(r.quat.x, r.quat.y, r.quat.z, r.quat.w);
+		this.queuePoll();
+	}
 
-    this.pollOnce = function() {
-       	this.loadAjaxJSON('http://localhost:50000', bind(this, this.gotCoordinates));
-    }
+	this.pollOnce = function() {
+		this.loadAjaxJSON('http://localhost:50000', bind(this, this.gotCoordinates));
+	}
 
-    this.queuePoll = function() {
+	this.queuePoll = function() {
 		setTimeout(bind(this, this.pollOnce), 10);
 	}
 
