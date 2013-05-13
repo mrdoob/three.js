@@ -107,6 +107,12 @@
 					fl = geometry.attributes.position.numItems / 9;
 				}
 
+				var vA = new THREE.Vector3();
+				var vB = new THREE.Vector3();
+				var vC = new THREE.Vector3();
+				var vCB = new THREE.Vector3();
+				var vAB = new THREE.Vector3();
+
 				for ( var oi = 0; oi < geometry.offsets.length; ++oi ) {
 
 					var start = geometry.offsets[ oi ].start;
@@ -125,27 +131,22 @@
 							c = index + 2;
 						}
 
-						var v1 = [geometry.attributes.position.array[a * 3],
-									geometry.attributes.position.array[a * 3 + 1],
-									geometry.attributes.position.array[a * 3 + 2]];
-						var v2 = [geometry.attributes.position.array[b * 3],
-									geometry.attributes.position.array[b * 3 + 1],
-									geometry.attributes.position.array[b * 3 + 2]];
-						var v3 = [geometry.attributes.position.array[c * 3],
-									geometry.attributes.position.array[c * 3 + 1],
-									geometry.attributes.position.array[c * 3 + 2]];
+						vA.set( geometry.attributes.position.array[a * 3],
+								geometry.attributes.position.array[a * 3 + 1],
+								geometry.attributes.position.array[a * 3 + 2] );
+						vB.set( geometry.attributes.position.array[b * 3],
+								geometry.attributes.position.array[b * 3 + 1],
+								geometry.attributes.position.array[b * 3 + 2] );
+						vC.set( geometry.attributes.position.array[c * 3],
+								geometry.attributes.position.array[c * 3 + 1],
+								geometry.attributes.position.array[c * 3 + 2] );
 
-						var cb = new THREE.Vector3(), ab = new THREE.Vector3();
-						var vA = new THREE.Vector3(v1[0], v1[1], v1[2]);
-						var vB = new THREE.Vector3(v2[0], v2[1], v2[2]);
-						var vC = new THREE.Vector3(v3[0], v3[1], v3[2]);
+						vCB.subVectors(vC, vB);
+						vAB.subVectors(vA, vB);
+						vCB.cross(vAB);
+						vCB.normalize();
 
-						cb.subVectors(vC, vB);
-						ab.subVectors(vA, vB);
-						cb.cross(ab);
-						cb.normalize();
-
-						facePlane.setFromNormalAndCoplanarPoint(cb, vA);
+						facePlane.setFromNormalAndCoplanarPoint(vCB, vA);
 
 						var planeDistance = localRay.distanceToPlane(facePlane);
 
