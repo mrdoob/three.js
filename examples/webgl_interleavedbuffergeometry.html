@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - interleavedbuffergeometry</title>
+		<title>three.js webgl - LayoutBufferGeometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -56,7 +56,7 @@ opacity: .6;
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="../src/core/InterleavedBufferGeometry.js"></script>
+		<script src="../src/core/LayoutBufferGeometry.js"></script>
 		<script src="../src/renderers/WebGLRenderer.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -112,11 +112,12 @@ opacity: .6;
 			}
 
 			void main() {
+                vec3 origin = position - color /* 3276.8 */ ;
 
-				vec4 rotation = vec4( 0.0, 1.0, 0.0, amplitude * length( color ) * 0.001 );
+				vec4 rotation = vec4( 0.0, 1.0, 0.0, amplitude * length( origin ) * 0.001 );
 				vec4 qRotation = axisAngleToQuaternion( rotation.xyz, rotation.w );
 
-				vec3 newPosition = rotateVectorByQuaternion( position - color, qRotation ) + color;
+				vec3 newPosition = rotateVectorByQuaternion( position - origin, qRotation ) + origin;
 
 				vec4 mvPosition = modelViewMatrix * vec4( newPosition, 1.0 );
 				vViewPosition = -mvPosition.xyz;
@@ -197,6 +198,16 @@ opacity: .6;
 
 			function init() {
 
+				container = document.getElementById( 'container' );
+
+				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false, stencil: false } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+                
+				renderer.setClearColor(0x050505);
+				container.appendChild( renderer.domElement );
+
+			    //
+
 			    function GenerateGeometry() {
 
 			        var cubes = text['Cube Count'];
@@ -205,7 +216,7 @@ opacity: .6;
 			        // BufferGeometry with indexed triangles
 			        // use vertex colors to store centers of rotations
 
-			        var geometry = new THREE.InterleavedBufferGeometry();
+			        var geometry = new THREE.LayoutBufferGeometry();
 
 			        geometry.numVertices = cubes * 8; //  Only 8 vertexes need to be defined per cube
 			        geometry.attributes = {
@@ -219,14 +230,18 @@ opacity: .6;
 			            position: {
 			                itemSize: 3,
 			                numItems: geometry.numVertices * 3,
-			                offset: 0,
+			                type: renderer.context.FLOAT,
+                            strideInType: 6,
+			                offsetBytes: 0,
 			                array: null
 			            },
 
 			            color: {
 			                itemSize: 3,
 			                numItems: geometry.numVertices * 3,
-			                offset: 3 * Float32Array.BYTES_PER_ELEMENT,
+			                type: renderer.context.FLOAT,
+			                strideInType: 6,
+			                offsetBytes: 3 * Float32Array.BYTES_PER_ELEMENT,
 			                array: null
 			            }
 
@@ -238,8 +253,8 @@ opacity: .6;
 
 			        geometry.array = new ArrayBuffer(geometry.numVertices * geometry.vertexByteSize);
 
-			        geometry.attributes.position.array = new Float32Array(geometry.array, geometry.attributes.position.offset);
-			        geometry.attributes.color.array = new Float32Array(geometry.array, geometry.attributes.color.offset);
+			        geometry.attributes.position.array = new Float32Array(geometry.array, geometry.attributes.position.offsetBytes);
+			        geometry.attributes.color.array = new Float32Array(geometry.array, geometry.attributes.color.offsetBytes);
 
 			        var positions = geometry.attributes.position.array;
 			        var colors = geometry.attributes.color.array;
@@ -297,7 +312,7 @@ opacity: .6;
 
 			            pA.applyMatrix4(m2);
 
-			            var j = k * 6;
+			            var j = k * geometry.attributes.position.strideInType;
 
 			            positions[j] = pA.x;
 			            positions[j + 1] = pA.y;
@@ -305,11 +320,14 @@ opacity: .6;
 
 			            // colors
 
-			            color.setRGB(t.x, t.y, t.z);
+			            pA.sub(t);
 
-			            colors[j] = color.r;
-			            colors[j + 1] = color.g;
-			            colors[j + 2] = color.b;
+
+			            var i = k * geometry.attributes.color.strideInType;
+
+			            colors[i] = pA.x;
+			            colors[i + 1] = pA.y;
+			            colors[i + 2] = pA.z;
 
 			        }
 
@@ -472,8 +490,6 @@ opacity: .6;
 			    });
 
 
-				container = document.getElementById( 'container' );
-
 				//
 
 				camera = new THREE.PerspectiveCamera( 37, window.innerWidth / window.innerHeight, 1, 8000 );
@@ -506,13 +522,6 @@ opacity: .6;
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false, stencil: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-                
-				renderer.setClearColor(0x050505);
-				container.appendChild( renderer.domElement );
-
-				//
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';

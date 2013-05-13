@@ -2,7 +2,7 @@
  * @author benaadams / @ben_a_adams / http://www.illyriad.co.uk/blog/
  */
 
-THREE.InterleavedBufferGeometry = function () {
+THREE.LayoutBufferGeometry = function () {
 
 	this.id = THREE.GeometryIdCount ++;
 
@@ -35,9 +35,9 @@ THREE.InterleavedBufferGeometry = function () {
 
 };
 
-THREE.InterleavedBufferGeometry.prototype = {
+THREE.LayoutBufferGeometry.prototype = {
 
-    constructor: THREE.InterleavedBufferGeometry,
+    constructor: THREE.LayoutBufferGeometry,
 
 	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
 	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
