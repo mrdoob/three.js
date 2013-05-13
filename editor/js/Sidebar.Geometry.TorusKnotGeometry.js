@@ -1,10 +1,8 @@
-Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
+Sidebar.Geometry.TorusKnotGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// radius
 
@@ -81,11 +79,11 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+		var uuid = geometry.uuid;
+		var name = geometry.name;
+		var object;
 
-		object.geometry.dispose();
-
-		object.geometry = new THREE.TorusKnotGeometry(
+		editor.geometries[uuid] = new THREE.TorusKnotGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),
@@ -95,9 +93,26 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 			heightScale.getValue()
 		);
 
-		object.geometry.computeBoundingSphere();
+		editor.geometries[uuid].computeBoundingSphere();
+		editor.geometries[uuid].uuid = uuid;
+		editor.geometries[uuid].name = name;
 
-		signals.objectChanged.dispatch( object );
+		for ( var i in editor.objects ) {
+
+			object = editor.objects[i];
+
+			if ( object.geometry && object.geometry.uuid == uuid ) {
+
+				delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+				object.geometry.dispose();
+
+				object.geometry = editor.geometries[uuid];
+
+				signals.objectChanged.dispatch( object );
+
+			}
+
+		}
 
 	}
 

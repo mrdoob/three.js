@@ -9,16 +9,6 @@ Sidebar.Object3D = function ( signals ) {
 	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
 
-	// parent
-
-	var objectParentRow = new UI.Panel();
-	var objectParent = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
-
-	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ).setColor( '#666' ) );
-	objectParentRow.add( objectParent );
-
-	container.add( objectParentRow );
-
 	// name
 
 	var objectNameRow = new UI.Panel();
@@ -28,6 +18,40 @@ Sidebar.Object3D = function ( signals ) {
 	objectNameRow.add( objectName );
 
 	container.add( objectNameRow );
+
+	// parent
+
+	var objectParentRow = new UI.Panel();
+	var objectParent = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var parentLabel = new UI.Text( 'Parent' ).setWidth( '90px' ).setColor( '#0080f0' );
+	parentLabel.onClick( function(){  signals.selectObject.dispatch( editor.objects[ objectParent.getValue() ] ) } );
+	objectParentRow.add( parentLabel );
+	objectParentRow.add( objectParent );
+
+	container.add( objectParentRow );
+
+	// geometry
+
+	var objectGeometryRow = new UI.Panel();
+	var objectGeometry = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var geometryLabel = new UI.Text( 'Geometry' ).setWidth( '90px' ).setColor( '#0080f0' );
+	geometryLabel.onClick( function(){  signals.selectGeometry.dispatch( editor.geometries[ objectGeometry.getValue() ] ) } );
+	objectGeometryRow.add( geometryLabel );
+	objectGeometryRow.add( objectGeometry );
+
+	container.add( objectGeometryRow );
+
+	// material
+
+	var objectMaterialRow = new UI.Panel();
+	var objectMaterial = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var materialLabel = new UI.Text( 'Material' ).setWidth( '90px' ).setColor( '#0080f0' );
+	materialLabel.onClick( function(){  signals.selectMaterial.dispatch( editor.materials[ objectMaterial.getValue() ] ) } );
+	objectMaterialRow.add( materialLabel );
+
+	objectMaterialRow.add( objectMaterial );
+
+	container.add( objectMaterialRow );
 
 	// position
 
@@ -193,18 +217,19 @@ Sidebar.Object3D = function ( signals ) {
 
 	container.add( objectUserDataRow );
 
-
 	//
 
-	var selected = null;
+	var object = null;
 
-	var scene = null;
+	var scene = editor.scene;
+
+	//
 
 	function updateScaleX() {
 
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleX.getValue() / selected.scale.x;
+			var scale = objectScaleX.getValue() / object.scale.x;
 
 			objectScaleY.setValue( objectScaleY.getValue() * scale );
 			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
@@ -219,7 +244,7 @@ Sidebar.Object3D = function ( signals ) {
 
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleY.getValue() / selected.scale.y;
+			var scale = objectScaleY.getValue() / object.scale.y;
 
 			objectScaleX.setValue( objectScaleX.getValue() * scale );
 			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
@@ -234,7 +259,7 @@ Sidebar.Object3D = function ( signals ) {
 
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleZ.getValue() / selected.scale.z;
+			var scale = objectScaleZ.getValue() / object.scale.z;
 
 			objectScaleX.setValue( objectScaleX.getValue() * scale );
 			objectScaleY.setValue( objectScaleY.getValue() * scale );
@@ -247,17 +272,17 @@ Sidebar.Object3D = function ( signals ) {
 
 	function update() {
 
-		if ( selected ) {
+		if ( object ) {
 
-			selected.name = objectName.getValue();
+			object.name = objectName.getValue();
 
-			if ( selected.parent !== undefined ) {
+			if ( object.parent !== undefined ) {
 
-				var newParentId = parseInt( objectParent.getValue() );
+				var newParentUuid = objectParent.getValue();
 
-				if ( selected.parent.id !== newParentId && selected.id !== newParentId ) {
+				if ( object.parent.uuid !== newParentUuid && object.uuid !== newParentUuid ) {
 
-					var parent = scene.getObjectById( newParentId, true );
+					var parent = editor.objects[newParentUuid];
 
 					if ( parent === undefined ) {
 
@@ -265,7 +290,7 @@ Sidebar.Object3D = function ( signals ) {
 
 					}
 
-					parent.add( selected );
+					parent.add( object );
 
 					signals.sceneChanged.dispatch( scene );
 
@@ -273,78 +298,109 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
-			selected.position.x = objectPositionX.getValue();
-			selected.position.y = objectPositionY.getValue();
-			selected.position.z = objectPositionZ.getValue();
 
-			selected.rotation.x = objectRotationX.getValue();
-			selected.rotation.y = objectRotationY.getValue();
-			selected.rotation.z = objectRotationZ.getValue();
+			if ( object.geometry !== undefined ) {
 
-			selected.scale.x = objectScaleX.getValue();
-			selected.scale.y = objectScaleY.getValue();
-			selected.scale.z = objectScaleZ.getValue();
+				var newGeometryUUid = objectGeometry.getValue();
 
-			if ( selected.fov !== undefined ) {
+				if ( object.geometry.uuid !== newGeometryUUid && object.uuid !== newGeometryUUid ) {
 
-				selected.fov = objectFov.getValue();
-				selected.updateProjectionMatrix();
+					object.geometry = editor.geometries[newGeometryUUid];
+
+					// TODO: Update Geometry;
+
+					signals.objectChanged.dispatch( object );
+
+				}
 
 			}
 
-			if ( selected.near !== undefined ) {
+			if ( object.material !== undefined ) {
 
-				selected.near = objectNear.getValue();
+				var newMaterialUUid = objectMaterial.getValue();
 
-			}
+				if ( object.material.uuid !== newMaterialUUid && object.uuid !== newMaterialUUid ) {
 
-			if ( selected.far !== undefined ) {
+					object.material = editor.materials[newMaterialUUid];
 
-				selected.far = objectFar.getValue();
+					signals.objectChanged.dispatch( object );
 
-			}
-
-			if ( selected.intensity !== undefined ) {
-
-				selected.intensity = objectIntensity.getValue();
+				}
 
 			}
 
-			if ( selected.color !== undefined ) {
+			object.position.x = objectPositionX.getValue();
+			object.position.y = objectPositionY.getValue();
+			object.position.z = objectPositionZ.getValue();
 
-				selected.color.setHex( objectColor.getHexValue() );
+			object.rotation.x = objectRotationX.getValue();
+			object.rotation.y = objectRotationY.getValue();
+			object.rotation.z = objectRotationZ.getValue();
 
-			}
+			object.scale.x = objectScaleX.getValue();
+			object.scale.y = objectScaleY.getValue();
+			object.scale.z = objectScaleZ.getValue();
 
-			if ( selected.groundColor !== undefined ) {
+			if ( object.fov !== undefined ) {
 
-				selected.groundColor.setHex( objectGroundColor.getHexValue() );
-
-			}
-
-			if ( selected.distance !== undefined ) {
-
-				selected.distance = objectDistance.getValue();
-
-			}
-
-			if ( selected.angle !== undefined ) {
-
-				selected.angle = objectAngle.getValue();
+				object.fov = objectFov.getValue();
+				object.updateProjectionMatrix();
 
 			}
 
-			if ( selected.exponent !== undefined ) {
+			if ( object.near !== undefined ) {
 
-				selected.exponent = objectExponent.getValue();
+				object.near = objectNear.getValue();
 
 			}
 
-			selected.visible = objectVisible.getValue();
+			if ( object.far !== undefined ) {
+
+				object.far = objectFar.getValue();
+
+			}
+
+			if ( object.intensity !== undefined ) {
+
+				object.intensity = objectIntensity.getValue();
+
+			}
+
+			if ( object.color !== undefined ) {
+
+				object.color.setHex( objectColor.getHexValue() );
+
+			}
+
+			if ( object.groundColor !== undefined ) {
+
+				object.groundColor.setHex( objectGroundColor.getHexValue() );
+
+			}
+
+			if ( object.distance !== undefined ) {
+
+				object.distance = objectDistance.getValue();
+
+			}
+
+			if ( object.angle !== undefined ) {
+
+				object.angle = objectAngle.getValue();
+
+			}
+
+			if ( object.exponent !== undefined ) {
+
+				object.exponent = objectExponent.getValue();
+
+			}
+
+			object.visible = objectVisible.getValue();
 
 			try {
 
-				selected.userData = JSON.parse( objectUserData.getValue() );
+				object.userData = JSON.parse( objectUserData.getValue() );
 
 			} catch ( error ) {
 
@@ -352,7 +408,7 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
-			signals.objectChanged.dispatch( selected );
+			signals.objectChanged.dispatch( object );
 
 		}
 
@@ -362,6 +418,8 @@ Sidebar.Object3D = function ( signals ) {
 
 		var properties = {
 			'parent': objectParentRow,
+			'geometry': objectGeometryRow,
+			'material': objectMaterialRow,
 			'fov': objectFovRow,
 			'near': objectNearRow,
 			'far': objectFarRow,
@@ -375,7 +433,7 @@ Sidebar.Object3D = function ( signals ) {
 
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( selected[ property ] !== undefined ? '' : 'none' );
+			properties[ property ].setDisplay( object[ property ] !== undefined ? '' : 'none' );
 
 		}
 
@@ -383,7 +441,7 @@ Sidebar.Object3D = function ( signals ) {
 
 	function updateTransformRows() {
 
-		if ( selected instanceof THREE.Light || ( selected instanceof THREE.Object3D && selected.userData.targetInverse ) ) {
+		if ( object instanceof THREE.Light || ( object instanceof THREE.Object3D && object.userData.targetInverse ) ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );
@@ -423,55 +481,81 @@ Sidebar.Object3D = function ( signals ) {
 
 	// events
 
-	signals.sceneChanged.add( function ( object ) {
+	signals.sceneChanged.add( function () {
 
-		scene = object;
 
-		var options = {};
-
-		options[ scene.id ] = 'Scene';
-
-		( function addObjects( objects ) {
-
-			for ( var i = 0, l = objects.length; i < l; i ++ ) {
-
-				var object = objects[ i ];
-
-				options[ object.id ] = object.name;
-
-				addObjects( object.children );
-
-			}
-
-		} )( object.children );
-
-		objectParent.setOptions( options );
 
 	} );
 
-	signals.objectSelected.add( function ( object ) {
+	signals.selected.add( function ( selected ) {
+			
+		var selected = editor.listSelected( 'object' );
+		object = ( selected.length ) ? selected[0] : null;
 
-		selected = object;
 		updateUI();
 
 	} );
-	signals.objectChanged.add( function ( object ) {
 
-		if ( selected === object ) updateUI();
+	signals.objectChanged.add( function ( changedObject ) {
+
+		if ( object === changedObject ) updateUI();
 
 	} );
 
 	function updateUI() {
 
-		container.setDisplay( 'block' );
+		if ( !object ) {
 
-		var object = selected;
+			container.setDisplay( 'none' );
+			return;
+
+		}
+
+		container.setDisplay( 'block' );
 
 		objectType.setValue( getObjectInstanceName( object ) );
 
+		var allObjects = {};
+		var allGeometries = {};
+		var allMaterials = {};
+
+		for ( var uuid in editor.objects ) {
+
+			if ( object.uuid != uuid ) allObjects[ uuid ] = editor.objects[ uuid ].name;
+
+		}
+
+		for ( var uuid in editor.geometries ) {
+
+			allGeometries[ uuid ] = editor.geometries[ uuid ].name;
+
+		}
+
+		for ( var uuid in editor.materials ) {
+
+			allMaterials[ uuid ] = editor.materials[ uuid ].name;
+
+		}
+
+		objectParent.setOptions( allObjects );
+		objectGeometry.setOptions( allGeometries );
+		objectMaterial.setOptions( allMaterials );
+
 		if ( object.parent !== undefined ) {
 
-			objectParent.setValue( object.parent.id );
+			objectParent.setValue( object.parent.uuid );
+
+		}
+
+		if ( object.geometry !== undefined ) {
+
+			objectGeometry.setValue( object.geometry.uuid );
+
+		}
+
+		if ( object.material !== undefined ) {
+
+			objectMaterial.setValue( object.material.uuid );
 
 		}
 

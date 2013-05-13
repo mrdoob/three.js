@@ -1,7 +1,7 @@
 
-var Loader = function ( signals ) {
+var Loader = function ( editor, signals ) {
 
-	scope = this;
+	var scope = this;
 
 	var sceneExporter = new THREE.ObjectExporter();
 
@@ -28,17 +28,19 @@ var Loader = function ( signals ) {
 
 	var timeout;
 
-	signals.sceneChanged.add( function ( scene ) {
+	signals.objectChanged.add( function () {
 
 		clearTimeout( timeout );
 
 		timeout = setTimeout( function () {
 
-			scope.saveLocalStorage( scene );
+			console.log( "Saving to localStorage." );
+			scope.saveLocalStorage( editor.scene );
 
 		}, 3000 );
 
 	} );
+
 
 	this.loadLocalStorage = function () {
 
@@ -49,7 +51,7 @@ var Loader = function ( signals ) {
 				var loader = new THREE.ObjectLoader();
 				var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
 
-				signals.sceneAdded.dispatch( scene );
+				editor.setScene( scene );
 
 			} catch ( e ) {
 
@@ -103,7 +105,7 @@ var Loader = function ( signals ) {
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.name = filename;
 
-			signals.objectAdded.dispatch( mesh );
+			editor.addObject( mesh );
 
 		} else if ( data.metadata.type === 'object' ) {
 
@@ -112,11 +114,11 @@ var Loader = function ( signals ) {
 
 			if ( result instanceof THREE.Scene ) {
 
-				signals.sceneAdded.dispatch( result );
+				editor.addObject( result );
 
 			} else {
 
-				signals.objectAdded.dispatch( result );
+				editor.addObject( result );
 
 			}
 
@@ -127,13 +129,7 @@ var Loader = function ( signals ) {
 			var loader = new THREE.SceneLoader();
 			loader.parse( data, function ( result ) {
 
-				var scene = result.scene;
-
-				while ( scene.children.length > 0 ) {
-
-					signals.objectAdded.dispatch( scene.children[ 0 ] );
-
-				}
+				editor.addObject( result.scene );
 
 			}, '' );
 
@@ -166,7 +162,7 @@ var Loader = function ( signals ) {
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.name = filename;
 
-						signals.objectAdded.dispatch( mesh );
+						editor.addObject( mesh );
 
 					} );
 
@@ -190,7 +186,7 @@ var Loader = function ( signals ) {
 
 						collada.scene.name = filename;
 
-						signals.objectAdded.dispatch( collada.scene );
+						editor.addObject( collada.scene );
 
 					} );
 
@@ -262,7 +258,7 @@ var Loader = function ( signals ) {
 					var object = new THREE.OBJLoader().parse( contents );
 					object.name = filename;
 
-					signals.objectAdded.dispatch( object );
+					editor.addObject( object );
 
 				}, false );
 				reader.readAsText( file );
@@ -287,7 +283,7 @@ var Loader = function ( signals ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					signals.objectAdded.dispatch( mesh );
+					editor.addObject( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -310,7 +306,7 @@ var Loader = function ( signals ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					signals.objectAdded.dispatch( mesh );
+					editor.addObject( mesh );
 
 				}, false );
 
@@ -339,7 +335,7 @@ var Loader = function ( signals ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 
-					signals.objectAdded.dispatch( mesh );
+					editor.addObject( mesh );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -363,7 +359,7 @@ var Loader = function ( signals ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					signals.objectAdded.dispatch( mesh );
+					editor.addObject( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -379,7 +375,7 @@ var Loader = function ( signals ) {
 
 					var result = new THREE.VRMLLoader().parse( contents );
 
-					signals.sceneAdded.dispatch( result );
+					editor.addObject( result );
 
 				}, false );
 				reader.readAsText( file );

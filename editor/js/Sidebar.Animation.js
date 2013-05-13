@@ -35,12 +35,12 @@ Sidebar.Animation = function ( signals ) {
 		};
 	}
 	
-	
 	signals.objectAdded.add( function ( object ) {
 
-		console.log(object)
 		if (object instanceof THREE.Mesh){
+
 			if (object.geometry && object.geometry.animation){
+
 				var name = object.geometry.animation.name;
 				options[name] = name
 				Animations.setOptions(options);
@@ -57,11 +57,11 @@ Sidebar.Animation = function ( signals ) {
 				}
 				
 			}
+			
 		}
 
 	} );
 	
-
 	return container;
 
 }

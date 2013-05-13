@@ -40,6 +40,7 @@ THREE.ObjectExporter.prototype = {
 				var data = {};
 
 				if ( geometry.name !== "" ) data.name = geometry.name;
+        if ( geometry.uuid !== "" ) data.uuid = geometry.uuid;
 
 				if ( geometry instanceof THREE.PlaneGeometry ) {
 
@@ -159,6 +160,7 @@ THREE.ObjectExporter.prototype = {
 			var data = {};
 
 			if ( object.name !== '' ) data.name = object.name;
+			if ( object.uuid !== '' ) data.uuid = object.uuid;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
 			if ( object.visible !== true ) data.visible = object.visible;
 
