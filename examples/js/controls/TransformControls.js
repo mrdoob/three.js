@@ -19,7 +19,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 	this.hovered = false;
 
 	this.mode = 'translate';
-	this.space = 'local';
+	this.space = 'world';
 	this.scale = 1;
 
 	this.snapDist = null;
