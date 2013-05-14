@@ -83,8 +83,8 @@
 
 				var material = object.material;
 
-				if (material === undefined) return intersects;
-				if (!geometry.dynamic) return intersects;
+				if ( material === undefined ) return intersects;
+				if ( ! geometry.dynamic ) return intersects;
 
 				var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
@@ -94,16 +94,19 @@
 				var a, b, c;
 				var precision = raycaster.precision;
 
-				inverseMatrix.getInverse(object.matrixWorld);
+				inverseMatrix.getInverse( object.matrixWorld );
 
-				localRay.copy(raycaster.ray).applyMatrix4(inverseMatrix);
+				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 				var fl;
 				var indexed = false;
-				if (geometry.attributes.index) {
+				if ( geometry.attributes.index ) {
+
 					indexed = true;
 					fl = geometry.attributes.index.numItems / 3;
+
 				} else {
+
 					fl = geometry.attributes.position.numItems / 9;
 				}
 
@@ -131,56 +134,54 @@
 							c = index + 2;
 						}
 
-						vA.set( geometry.attributes.position.array[a * 3],
-								geometry.attributes.position.array[a * 3 + 1],
-								geometry.attributes.position.array[a * 3 + 2] );
-						vB.set( geometry.attributes.position.array[b * 3],
-								geometry.attributes.position.array[b * 3 + 1],
-								geometry.attributes.position.array[b * 3 + 2] );
-						vC.set( geometry.attributes.position.array[c * 3],
-								geometry.attributes.position.array[c * 3 + 1],
-								geometry.attributes.position.array[c * 3 + 2] );
+						vA.set( geometry.attributes.position.array[ a * 3 ],
+								geometry.attributes.position.array[ a * 3 + 1 ],
+								geometry.attributes.position.array[ a * 3 + 2] );
+						vB.set( geometry.attributes.position.array[ b * 3 ],
+								geometry.attributes.position.array[ b * 3 + 1 ],
+								geometry.attributes.position.array[ b * 3 + 2] );
+						vC.set( geometry.attributes.position.array[ c * 3 ],
+								geometry.attributes.position.array[ c * 3 + 1 ],
+								geometry.attributes.position.array[ c * 3 + 2 ] );
 
-						vCB.subVectors(vC, vB);
-						vAB.subVectors(vA, vB);
-						vCB.cross(vAB).normalize();
+						facePlane.setFromCoplanarPoints( vA, vB, vC );
 
-						facePlane.setFromNormalAndCoplanarPoint(vCB, vA);
-
-						var planeDistance = localRay.distanceToPlane(facePlane);
+						var planeDistance = localRay.distanceToPlane( facePlane );
 
 						// bail if raycaster and plane are parallel
-						if (Math.abs(planeDistance) < precision) continue;
+						if ( Math.abs( planeDistance ) < precision ) continue;
 
 						// if negative distance, then plane is behind raycaster
-						if (planeDistance < 0) continue;
+						if ( planeDistance < 0 ) continue;
 
 						// check if we hit the wrong side of a single sided face
 						side = material.side;
-						if (side !== THREE.DoubleSide) {
+						if ( side !== THREE.DoubleSide ) {
 
-							var planeSign = localRay.direction.dot(facePlane.normal);
+							var planeSign = localRay.direction.dot( facePlane.normal );
 
-							if (!(side === THREE.FrontSide ? planeSign < 0 : planeSign > 0)) continue;
+							if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) continue;
 
 						}
 
 						// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
-						if (planeDistance < raycaster.near || planeDistance > raycaster.far) continue;
+						if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
 
-						intersectPoint = localRay.at(planeDistance, intersectPoint); // passing in intersectPoint avoids a copy
+						intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
 
-						if (!THREE.Triangle.containsPoint(intersectPoint, vA, vB, vC)) continue;
+						if ( ! THREE.Triangle.containsPoint( intersectPoint, vA, vB, vC ) ) continue;
 
-						var face = new THREE.Face3(a, b, c);
+						var face = new THREE.Face3( vA, vB, vC );
 
-						intersects.push({
+						intersects.push( {
+
 							distance: planeDistance, // this works because the original ray was normalized, and the transformed localRay wasn't
 							point: raycaster.ray.at(planeDistance),
 							face: face,
-							faceIndex: f,
+							faceIndex: null,
 							object: object
-						});
+
+						} );
 
 					}
 				}
