@@ -143,8 +143,7 @@
 
 						vCB.subVectors(vC, vB);
 						vAB.subVectors(vA, vB);
-						vCB.cross(vAB);
-						vCB.normalize();
+						vCB.cross(vAB).normalize();
 
 						facePlane.setFromNormalAndCoplanarPoint(vCB, vA);
 
@@ -174,13 +173,6 @@
 						if (!THREE.Triangle.containsPoint(intersectPoint, vA, vB, vC)) continue;
 
 						var face = new THREE.Face3(a, b, c);
-
-						if ( geometry.attributes.color != null ) {
-							var colors = geometry.attributes.color.array;
-							face.vertexColors[0] = new THREE.Color(colors[a * 3], colors[a * 3 + 1], colors[a * 3 + 2]);
-							face.vertexColors[1] = new THREE.Color(colors[b * 3], colors[b * 3 + 1], colors[b * 3 + 2]);
-							face.vertexColors[2] = new THREE.Color(colors[c * 3], colors[c * 3 + 1], colors[c * 3 + 2]);
-						}
 
 						intersects.push({
 							distance: planeDistance, // this works because the original ray was normalized, and the transformed localRay wasn't
