@@ -171,13 +171,11 @@
 
 						if ( ! THREE.Triangle.containsPoint( intersectPoint, vA, vB, vC ) ) continue;
 
-						var face = new THREE.Face3( vA, vB, vC );
-
 						intersects.push( {
 
 							distance: planeDistance, // this works because the original ray was normalized, and the transformed localRay wasn't
 							point: raycaster.ray.at(planeDistance),
-							face: face,
+							face: null,
 							faceIndex: null,
 							object: object
 
