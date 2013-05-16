@@ -17,9 +17,11 @@ THREE.Object3D = function () {
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
-	this.rotation = new THREE.Vector3();
-	this.eulerOrder = THREE.Object3D.defaultEulerOrder;
+	this.quaternion = new THREE.Quaternion();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
+
+	// for backwards compatibility (maps changes to this.rotation onto this.quaternion)
+	this.rotation = new THREE.Rotation( this.quaternion );
 
 	this.renderDepth = null;
 
@@ -30,9 +32,6 @@ THREE.Object3D = function () {
 
 	this.matrixAutoUpdate = true;
 	this.matrixWorldNeedsUpdate = true;
-
-	this.quaternion = new THREE.Quaternion();
-	this.useQuaternion = false;
 
 	this.visible = true;
 
@@ -69,15 +68,7 @@ THREE.Object3D.prototype = {
 
 			m1.extractRotation( this.matrix );
 
-			if ( this.useQuaternion === true )  {
-
-				this.quaternion.setFromRotationMatrix( m1 );
-
-			} else {
-
-				this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
-
-			}
+			this.quaternion.setFromRotationMatrix( m1 );
 
 		}
 
@@ -95,18 +86,7 @@ THREE.Object3D.prototype = {
 
 			q1.setFromAxisAngle( axis, angle );
 
-			if ( this.useQuaternion === true ) {
-
-				this.quaternion.multiply( q1 );
-
-			} else {
-
-				q2.setFromEuler( this.rotation, this.eulerOrder );
-				q2.multiply( q1 );
-
-				this.rotation.setEulerFromQuaternion( q2, this.eulerOrder );
-
-			}
+			this.quaternion.multiply( q1 );
 
 			return this;
 
@@ -125,15 +105,7 @@ THREE.Object3D.prototype = {
 
 			v1.copy( axis );
 
-			if ( this.useQuaternion === true ) {
-
-				v1.applyQuaternion( this.quaternion );
-
-			} else {
-
-				v1.applyEuler( this.rotation, this.eulerOrder );
-
-			}
+			v1.applyQuaternion( this.quaternion );
 
 			this.position.add( v1.multiplyScalar( distance ) );
 
@@ -214,15 +186,7 @@ THREE.Object3D.prototype = {
 
 			m1.lookAt( vector, this.position, this.up );
 
-			if ( this.useQuaternion === true )  {
-
-				this.quaternion.setFromRotationMatrix( m1 );
-
-			} else {
-
-				this.rotation.setEulerFromRotationMatrix( m1, this.eulerOrder );
-
-			}
+			this.quaternion.setFromRotationMatrix( m1 );
 
 		};
 
@@ -394,17 +358,7 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		// if we are not using a quaternion directly, convert Euler rotation to this.quaternion.
-
-		if ( this.useQuaternion === false )  {
-
-			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.eulerOrder, this.scale );
-
-		} else {
-
-			this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
-
-		}
+		this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
 
 		this.matrixWorldNeedsUpdate = true;
 
@@ -451,8 +405,8 @@ THREE.Object3D.prototype = {
 		object.up.copy( this.up );
 
 		object.position.copy( this.position );
-		if ( object.rotation instanceof THREE.Vector3 ) object.rotation.copy( this.rotation ); // because of Sprite madness
-		object.eulerOrder = this.eulerOrder;
+		object.quaternion.copy( this.quaternion );
+		object.rotation = new THREE.Rotation( object.quaternion );		
 		object.scale.copy( this.scale );
 
 		object.renderDepth = this.renderDepth;
@@ -464,9 +418,6 @@ THREE.Object3D.prototype = {
 
 		object.matrixAutoUpdate = this.matrixAutoUpdate;
 		object.matrixWorldNeedsUpdate = this.matrixWorldNeedsUpdate;
-
-		object.quaternion.copy( this.quaternion );
-		object.useQuaternion = this.useQuaternion;
 
 		object.visible = this.visible;
 

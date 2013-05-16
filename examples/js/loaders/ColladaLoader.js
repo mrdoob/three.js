@@ -888,7 +888,6 @@ THREE.ColladaLoader = function () {
 		var props = node.matrix.decompose();
 		obj.position = props[ 0 ];
 		obj.quaternion = props[ 1 ];
-		obj.useQuaternion = true;
 		obj.scale = props[ 2 ];
 
 		if ( options.centerGeometry && obj.geometry ) {

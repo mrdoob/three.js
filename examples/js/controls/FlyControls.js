@@ -19,8 +19,6 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	// disable default target object behavior
 
-	this.object.useQuaternion = true;
-
 	// internals
 
 	this.tmpQuaternion = new THREE.Quaternion();
@@ -199,7 +197,7 @@ THREE.FlyControls = function ( object, domElement ) {
 		this.object.quaternion.multiply( this.tmpQuaternion );
 
 		// expose the rotation vector for convenience
-		this.object.rotation.setEulerFromQuaternion( this.object.quaternion, this.object.eulerOrder );
+		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
 
 
 	};

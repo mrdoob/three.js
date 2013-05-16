@@ -4,6 +4,8 @@
 
 THREE.Math = {
 
+	PI2: Math.PI * 2,
+
 	// Clamp value to range <a, b>
 
 	clamp: function ( x, a, b ) {

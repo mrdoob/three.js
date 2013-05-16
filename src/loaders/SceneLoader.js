@@ -346,7 +346,6 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 							if ( quat ) {
 
 								object.quaternion.fromArray( quat );
-								object.useQuaternion = true;
 
 							} else {
 
@@ -437,8 +436,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					if ( quat !== undefined ) {
 
 						camera.quaternion.fromArray( quat );
-						camera.useQuaternion = true;
-
+				
 					} else if ( rot !== undefined ) {
 
 						camera.rotation.fromArray( rot );
@@ -466,8 +464,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					if ( quat ) {
 
 						object.quaternion.fromArray( quat );
-						object.useQuaternion = true;
-
+				
 					} else {
 
 						object.rotation.fromArray( rot );
@@ -549,8 +546,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		if ( q ) {
 
 			node.quaternion.fromArray( q );
-			node.useQuaternion = true;
-
+	
 		} else {
 
 			node.rotation.fromArray( r );
