@@ -324,8 +324,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		canvas.width = width;
-		canvas.height = height;
+		canvas.width = width * devicePixelRatio;
+		canvas.height = height * devicePixelRatio;
 
 		if ( devicePixelRatio !== 1 && updateStyle !== false ) {
 
