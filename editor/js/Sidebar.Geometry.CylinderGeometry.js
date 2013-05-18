@@ -1,10 +1,8 @@
-Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
+Sidebar.Geometry.CylinderGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// radiusTop
 
@@ -36,15 +34,15 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	container.add( heightRow );
 
-	// radiusSegments
+	// radialSegments
 
-	var radiusSegmentsRow = new UI.Panel();
-	var radiusSegments = new UI.Integer( geometry.radiusSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegmentsRow = new UI.Panel();
+	var radialSegments = new UI.Integer( geometry.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
-	radiusSegmentsRow.add( new UI.Text( 'Radius segments' ).setWidth( '90px' ).setColor( '#666' ) );
-	radiusSegmentsRow.add( radiusSegments );
+	radialSegmentsRow.add( new UI.Text( 'Radius segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	radialSegmentsRow.add( radialSegments );
 
-	container.add( radiusSegmentsRow );
+	container.add( radialSegmentsRow );
 
 	// heightSegments
 
@@ -70,22 +68,16 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.CylinderGeometry(
-			radiusTop.getValue(),
-			radiusBottom.getValue(),
-			height.getValue(),
-			radiusSegments.getValue(),
-			heightSegments.getValue(),
-			openEnded.getValue()
+		editor.remakeGeometry( geometry,
+			{
+				radiusTop: radiusTop.getValue(),
+				radiusBottom: radiusBottom.getValue(),
+				height: height.getValue(),
+				radialSegments: radialSegments.getValue(),
+				heightSegments: heightSegments.getValue(),
+				openEnded: openEnded.getValue()
+			}
 		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
 
 	}
 

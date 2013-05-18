@@ -1,4 +1,4 @@
-var Menubar = function ( signals ) {
+var Menubar = function ( editor, signals ) {
 
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );

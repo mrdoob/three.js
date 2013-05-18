@@ -1,10 +1,8 @@
-Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
+Sidebar.Geometry.PlaneGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// width
 
@@ -51,20 +49,14 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.PlaneGeometry(
-			width.getValue(),
-			height.getValue(),
-			widthSegments.getValue(),
-			heightSegments.getValue()
+		editor.remakeGeometry( geometry,
+			{
+				width: width.getValue(),
+				height: height.getValue(),
+				widthSegments: widthSegments.getValue(),
+				heightSegments: heightSegments.getValue()
+			}
 		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
 
 	}
 

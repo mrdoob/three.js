@@ -4,7 +4,7 @@ Menubar.File = function ( signals ) {
 	container.setClass( 'menu' );
 	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
 	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'block' ) } );
+	container.onClick( function () { options.setDisplay( 'none' ) } );
 
 	var title = new UI.Panel();
 	title.setTextContent( 'File' ).setColor( '#666' );
@@ -13,9 +13,6 @@ Menubar.File = function ( signals ) {
 	container.add( title );
 
 	//
-
-	var selectedObject;
-	var scene;
 
 	var options = new UI.Panel();
 	options.setClass( 'options' );
@@ -47,7 +44,7 @@ Menubar.File = function ( signals ) {
 
 			}
 
-			location.reload();
+			location.replace( location.origin + location.pathname );
 
 		}
 
@@ -120,7 +117,14 @@ Menubar.File = function ( signals ) {
 
 	var exportGeometry = function ( exporterClass ) {
 
-		if ( selectedObject.geometry === undefined ) {
+		var selected;
+		// TODO: handle multiple selection
+		for ( var i in editor.selected ) {
+			if ( editor.objects[ editor.selected[ i ].uuid ] ) selected = editor.selected[ i ];
+		}
+		if ( !selected ) return;
+
+		if ( selected.geometry === undefined ) {
 
 			alert( "Selected object doesn't have any geometry" );
 			return;
@@ -133,12 +137,12 @@ Menubar.File = function ( signals ) {
 
 		if ( exporter instanceof THREE.GeometryExporter ) {
 
-			output = JSON.stringify( exporter.parse( selectedObject.geometry ), null, '\t' );
+			output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} else {
 
-			output = exporter.parse( selectedObject.geometry );
+			output = exporter.parse( selected.geometry );
 
 		}
 
@@ -152,9 +156,16 @@ Menubar.File = function ( signals ) {
 
 	var exportObject = function ( exporterClass ) {
 
+		var selected;
+		// TODO: handle multiple selection
+		for ( var i in editor.selected ) {
+			if ( editor.objects[ editor.selected[ i ].uuid ] ) selected = editor.selected[ i ];
+		}
+		if ( !selected ) return;
+
 		var exporter = new exporterClass();
 
-		var output = JSON.stringify( exporter.parse( selectedObject ), null, '\t' );
+		var output = JSON.stringify( exporter.parse( selected ), null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
@@ -169,7 +180,7 @@ Menubar.File = function ( signals ) {
 
 		var exporter = new exporterClass();
 
-		var output = JSON.stringify( exporter.parse( scene ), null, '\t' );
+		var output = JSON.stringify( exporter.parse( editor.scene ), null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
@@ -180,19 +191,6 @@ Menubar.File = function ( signals ) {
 
 	};
 
-	// signals
-
-	signals.objectSelected.add( function ( object ) {
-
-		selectedObject = object;
-
-	} );
-
-	signals.sceneChanged.add( function ( object ) {
-
-		scene = object;
-
-	} );
 
 	return container;
 

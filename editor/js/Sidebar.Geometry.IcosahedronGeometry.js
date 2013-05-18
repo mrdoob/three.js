@@ -1,10 +1,8 @@
-Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
+Sidebar.Geometry.IcosahedronGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// radius
 
@@ -31,18 +29,12 @@ Sidebar.Geometry.IcosahedronGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.IcosahedronGeometry(
-			radius.getValue(),
-			detail.getValue()
+		editor.remakeGeometry( geometry,
+			{
+				radius: radius.getValue(),
+				detail: detail.getValue()
+			}
 		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
 
 	}
 

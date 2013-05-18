@@ -1,10 +1,8 @@
-Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
+Sidebar.Geometry.TorusKnotGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// radius
 
@@ -81,23 +79,17 @@ Sidebar.Geometry.TorusKnotGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.TorusKnotGeometry(
-			radius.getValue(),
-			tube.getValue(),
-			radialSegments.getValue(),
-			tubularSegments.getValue(),
-			p.getValue(),
-			q.getValue(),
-			heightScale.getValue()
+		editor.remakeGeometry( geometry,
+			{
+				radius: radius.getValue(),
+				tube: tube.getValue(),
+				radialSegments: radialSegments.getValue(),
+				tubularSegments: tubularSegments.getValue(),
+				p: p.getValue(),
+				q: q.getValue(),
+				heightScale: heightScale.getValue()
+			}
 		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
 
 	}
 
