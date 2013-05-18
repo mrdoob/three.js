@@ -9,7 +9,7 @@
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryIdCount ++;
+	this.id = THREE.Math.uuid();
 
 	this.name = '';
 	this.uuid = '';
@@ -803,5 +803,3 @@ THREE.Geometry.prototype = {
 	}
 
 };
-
-THREE.GeometryIdCount = 0;

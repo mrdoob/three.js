@@ -5,7 +5,7 @@
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialIdCount ++;
+	this.id = THREE.Math.uuid();
 
 	this.name = '';
 	this.uuid = '';
@@ -132,5 +132,3 @@ THREE.Material.prototype = {
 	}
 
 };
-
-THREE.MaterialIdCount = 0;
