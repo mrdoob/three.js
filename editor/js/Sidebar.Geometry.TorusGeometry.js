@@ -1,10 +1,8 @@
-Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
+Sidebar.Geometry.TorusGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// radius
 
@@ -56,26 +54,19 @@ Sidebar.Geometry.TorusGeometry = function ( signals, object ) {
 
 	container.add( arcRow );
 
-
 	//
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.TorusGeometry(
-			radius.getValue(),
-			tube.getValue(),
-			radialSegments.getValue(),
-			tubularSegments.getValue(),
-			arc.getValue()
+		editor.remakeGeometry( geometry,
+			{
+				radius: radius.getValue(),
+				tube: tube.getValue(),
+				radialSegments: radialSegments.getValue(),
+				tubularSegments: tubularSegments.getValue(),
+				arc: arc.getValue()
+			}
 		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
 
 	}
 

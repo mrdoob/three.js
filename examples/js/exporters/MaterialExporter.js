@@ -19,6 +19,7 @@ THREE.MaterialExporter.prototype = {
 		};
 
 		if ( material.name !== "" ) output.name = material.name;
+        if ( material.uuid !== "" ) output.uuid = material.uuid;
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 

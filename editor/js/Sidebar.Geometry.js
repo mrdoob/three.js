@@ -67,32 +67,32 @@ Sidebar.Geometry = function ( signals ) {
 
 	var parameters;
 
-
 	//
 
-	var selected = null;
+	var geometry = null;
 
 	function update() {
 
-		if ( selected ) {
+		if ( geometry ) {
 
-			selected.name = geometryName.getValue();
+			geometry.name = geometryName.getValue();
 
 		}
 
 	}
 
-	signals.objectSelected.add( function ( object ) {
+	signals.selected.add( function ( selected ) {
 
-		if ( object && object.geometry ) {
+		var selected = editor.listSelected( 'geometry' );
+		geometry = ( selected.length ) ? selected[0] : null;
 
-			selected = object.geometry;
+		if ( geometry ) {
 
 			container.setDisplay( 'block' );
 
-			objectType.setValue( getGeometryInstanceName( object.geometry ) );
+			objectType.setValue( getGeometryInstanceName( geometry ) );
 
-			updateFields( selected );
+			updateFields( geometry );
 
 			//
 
@@ -103,46 +103,48 @@ Sidebar.Geometry = function ( signals ) {
 
 			}
 
-			if ( selected instanceof THREE.PlaneGeometry ) {
+			if ( geometry instanceof THREE.PlaneGeometry ) {
 
-				parameters = new Sidebar.Geometry.PlaneGeometry( signals, object );
+				parameters = new Sidebar.Geometry.PlaneGeometry( signals, geometry );
 				container.add( parameters );
 
-			} else if ( selected instanceof THREE.CubeGeometry ) {
+			} else if ( geometry instanceof THREE.CubeGeometry ) {
 
-				parameters = new Sidebar.Geometry.CubeGeometry( signals, object );
+				parameters = new Sidebar.Geometry.CubeGeometry( signals, geometry );
 				container.add( parameters );
 
-			} else if ( selected instanceof THREE.CylinderGeometry ) {
+			} else if ( geometry instanceof THREE.CylinderGeometry ) {
 
-				parameters = new Sidebar.Geometry.CylinderGeometry( signals, object );
+				parameters = new Sidebar.Geometry.CylinderGeometry( signals, geometry );
 				container.add( parameters );
 
-			} else if ( selected instanceof THREE.SphereGeometry ) {
+			} else if ( geometry instanceof THREE.SphereGeometry ) {
 
-				parameters = new Sidebar.Geometry.SphereGeometry( signals, object );
+				parameters = new Sidebar.Geometry.SphereGeometry( signals, geometry );
 				container.add( parameters );
 
-			} else if ( selected instanceof THREE.IcosahedronGeometry ) {
+			} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
 
-				parameters = new Sidebar.Geometry.IcosahedronGeometry( signals, object );
+				parameters = new Sidebar.Geometry.IcosahedronGeometry( signals, geometry );
 				container.add( parameters );
 
-			} else if ( selected instanceof THREE.TorusGeometry ) {
+			} else if ( geometry instanceof THREE.TorusGeometry ) {
 
-				parameters = new Sidebar.Geometry.TorusGeometry( signals, object );
+				parameters = new Sidebar.Geometry.TorusGeometry( signals, geometry );
 				container.add( parameters );
 
-			} else if ( selected instanceof THREE.TorusKnotGeometry ) {
+			} else if ( geometry instanceof THREE.TorusKnotGeometry ) {
 
-				parameters = new Sidebar.Geometry.TorusKnotGeometry( signals, object );
+				parameters = new Sidebar.Geometry.TorusKnotGeometry( signals, geometry );
 				container.add( parameters );
 
 			}
 
+			update();
+
 		} else {
 
-			selected = null;
+			geometry = null;
 
 			container.setDisplay( 'none' );
 

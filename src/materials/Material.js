@@ -8,6 +8,7 @@ THREE.Material = function () {
 	this.id = THREE.MaterialIdCount ++;
 
 	this.name = '';
+	this.uuid = '';
 
 	this.side = THREE.FrontSide;
 

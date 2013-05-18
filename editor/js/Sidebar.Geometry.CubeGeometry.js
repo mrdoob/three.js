@@ -1,10 +1,8 @@
-Sidebar.Geometry.CubeGeometry = function ( signals, object ) {
+Sidebar.Geometry.CubeGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// width
 
@@ -70,22 +68,16 @@ Sidebar.Geometry.CubeGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.CubeGeometry(
-			width.getValue(),
-			height.getValue(),
-			depth.getValue(),
-			widthSegments.getValue(),
-			heightSegments.getValue(),
-			depthSegments.getValue()
+		editor.remakeGeometry( geometry,
+			{
+				width: width.getValue(),
+				height: height.getValue(),
+				depth: depth.getValue(),
+				widthSegments: widthSegments.getValue(),
+				heightSegments: heightSegments.getValue(),
+				depthSegments: depthSegments.getValue()
+			}
 		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
 
 	}
 

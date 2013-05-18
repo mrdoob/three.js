@@ -1,10 +1,8 @@
-Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
+Sidebar.Geometry.SphereGeometry = function ( signals, geometry ) {
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPaddingTop( '10px' );
-
-	var geometry = object.geometry;
 
 	// radius
 
@@ -81,23 +79,17 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 
 	function update() {
 
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		object.geometry.dispose();
-
-		object.geometry = new THREE.SphereGeometry(
-			radius.getValue(),
-			widthSegments.getValue(),
-			heightSegments.getValue(),
-			phiStart.getValue(),
-			phiLength.getValue(),
-			thetaStart.getValue(),
-			thetaLength.getValue()
+		editor.remakeGeometry( geometry,
+			{
+				radius: radius.getValue(),
+				widthSegments: widthSegments.getValue(),
+				heightSegments: heightSegments.getValue(),
+				phiStart: phiStart.getValue(),
+				phiLength: phiLength.getValue(),
+				thetaStart: thetaStart.getValue(),
+				thetaLength: thetaLength.getValue()
+			}
 		);
-
-		object.geometry.computeBoundingSphere();
-
-		signals.objectChanged.dispatch( object );
 
 	}
 

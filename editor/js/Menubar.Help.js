@@ -4,7 +4,7 @@ Menubar.Help = function ( signals ) {
 	container.setClass( 'menu' );
 	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
 	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'block' ) } );
+	container.onClick( function () { options.setDisplay( 'none' ) } );
 
 	var title = new UI.Panel();
 	title.setTextContent( 'Help' ).setColor( '#666' );
