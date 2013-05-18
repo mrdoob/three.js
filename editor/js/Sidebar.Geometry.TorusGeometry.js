@@ -58,38 +58,15 @@ Sidebar.Geometry.TorusGeometry = function ( signals, geometry ) {
 
 	function update() {
 
-		var uuid = geometry.uuid;
-		var name = geometry.name;
-		var object;
-
-		editor.geometries[uuid] = new THREE.TorusGeometry(
-			radius.getValue(),
-			tube.getValue(),
-			radialSegments.getValue(),
-			tubularSegments.getValue(),
-			arc.getValue()
-		);
-
-		editor.geometries[uuid].computeBoundingSphere();
-		editor.geometries[uuid].uuid = uuid;
-		editor.geometries[uuid].name = name;
-
-		for ( var i in editor.objects ) {
-
-			object = editor.objects[i];
-
-			if ( object.geometry && object.geometry.uuid == uuid ) {
-
-				delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-				object.geometry.dispose();
-
-				object.geometry = editor.geometries[uuid];
-
-				signals.objectChanged.dispatch( object );
-
+		editor.remakeGeometry( geometry,
+			{
+				radius: radius.getValue(),
+				tube: tube.getValue(),
+				radialSegments: radialSegments.getValue(),
+				tubularSegments: tubularSegments.getValue(),
+				arc: arc.getValue()
 			}
-
-		}
+		);
 
 	}
 

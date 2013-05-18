@@ -65,9 +65,16 @@ Editor.prototype = {
     var radius = parameters.radius ? parameters.radius : null;
     var radiusTop = parameters.radiusTop ? parameters.radiusTop : null;
     var radiusBottom = parameters.radiusBottom ? parameters.radiusBottom : null;
+    var phiStart = parameters.phiStart ? parameters.phiStart : null;
+    var phiLength = parameters.phiLength ? parameters.phiLength : null;
+    var thetaStart = parameters.thetaStart ? parameters.thetaStart : null;
+    var thetaLength = parameters.thetaLength ? parameters.thetaLength : null;
     var tube = parameters.tube ? parameters.tube : null;
     var arc = parameters.arc ? parameters.arc : null;
     var detail = parameters.detail ? parameters.detail : null;
+    var p = parameters.p ? parameters.p : null;
+    var q = parameters.q ? parameters.q : null;
+    var heightScale = parameters.heightScale ? parameters.heightScale : null;
     var openEnded = parameters.openEnded ? parameters.openEnded : false;
     var color = parameters.color ? parameters.color : null;
     var intensity = parameters.intensity ? parameters.intensity : null;
@@ -133,8 +140,12 @@ Editor.prototype = {
       heightSegments = heightSegments ? heightSegments : 16;
       widthSegments = widthSegments ? widthSegments : 32;
       heightSegments = heightSegments ? heightSegments : 16;
+      phiStart = phiStart ? phiStart : null;
+      phiLength = phiLength ? phiLength : null;
+      thetaStart = thetaStart ? thetaStart : null;
+      thetaLength = thetaLength ? thetaLength : null;
 
-      geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
+      geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
       object.name = name ? name : 'Sphere ' + object.id;
       geometry.name = object.name + ' geometry';
@@ -168,9 +179,9 @@ Editor.prototype = {
       tube = tube ? tube : 40;
       radialSegments = radialSegments ? radialSegments : 64;
       tubularSegments = tubularSegments ? tubularSegments : 8;
-      var p = 2;
-      var q = 3;
-      var heightScale = 1;
+      p = p ? p : 2;
+      q = q ? q : 3;
+      heightScale = heightScale ? heightScale : 1;
 
       geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
@@ -900,6 +911,82 @@ Editor.prototype = {
           list[ i ].materials[ j ].needsUpdate = true;
 
         }
+
+      }
+
+    }
+
+  },
+
+  remakeGeometry: function( geometry, parameters ) {
+
+    // TODO: document
+
+    parameters = parameters ? parameters : {};
+
+    var uuid = geometry.uuid;
+    var name = parameters.name ? parameters.name : geometry.name;
+
+    var width = parameters.width ? parameters.width : null;
+    var height = parameters.height ? parameters.height : null;
+    var depth = parameters.depth ? parameters.depth : null;
+    var widthSegments = parameters.widthSegments ? parameters.widthSegments : null;
+    var heightSegments = parameters.heightSegments ? parameters.heightSegments : null;
+    var depthSegments = parameters.depthSegments ? parameters.depthSegments : null;
+    var radialSegments = parameters.radialSegments ? parameters.radialSegments : null;
+    var tubularSegments = parameters.tubularSegments ? parameters.tubularSegments : null;
+    var radius = parameters.radius ? parameters.radius : null;
+    var radiusTop = parameters.radiusTop ? parameters.radiusTop : null;
+    var radiusBottom = parameters.radiusBottom ? parameters.radiusBottom : null;
+    var phiStart = parameters.phiStart ? parameters.phiStart : null;
+    var phiLength = parameters.phiLength ? parameters.phiLength : null;
+    var thetaStart = parameters.thetaStart ? parameters.thetaStart : null;
+    var thetaLength = parameters.thetaLength ? parameters.thetaLength : null;
+    var tube = parameters.tube ? parameters.tube : null;
+    var arc = parameters.arc ? parameters.arc : null;
+    var detail = parameters.detail ? parameters.detail : null;
+    var p = parameters.p ? parameters.p : null;
+    var q = parameters.q ? parameters.q : null;
+    var heightScale = parameters.heightScale ? parameters.heightScale : null;
+    var openEnded = parameters.openEnded ? parameters.openEnded : false;
+
+    if ( geometry instanceof THREE.CubeGeometry )
+      editor.geometries[uuid] = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+
+    if ( geometry instanceof THREE.CylinderGeometry )
+      editor.geometries[uuid] = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded );
+
+    if ( geometry instanceof THREE.IcosahedronGeometry )
+      editor.geometries[uuid] = new THREE.IcosahedronGeometry( radius, detail );
+
+    if ( geometry instanceof THREE.PlaneGeometry )
+      editor.geometries[uuid] = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+
+    if ( geometry instanceof THREE.SphereGeometry )
+      editor.geometries[uuid] = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
+
+    if ( geometry instanceof THREE.TorusGeometry )
+      editor.geometries[uuid] = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
+
+    if ( geometry instanceof THREE.TorusKnotGeometry )
+      editor.geometries[uuid] = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
+
+    editor.geometries[uuid].computeBoundingSphere();
+    editor.geometries[uuid].uuid = uuid;
+    editor.geometries[uuid].name = name;
+
+    for ( var i in editor.objects ) {
+
+      var object = editor.objects[i];
+
+      if ( object.geometry && object.geometry.uuid == uuid ) {
+
+        delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+        object.geometry.dispose();
+
+        object.geometry = editor.geometries[uuid];
+
+        signals.objectChanged.dispatch( object );
 
       }
 

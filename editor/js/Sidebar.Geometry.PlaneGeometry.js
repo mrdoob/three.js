@@ -49,37 +49,14 @@ Sidebar.Geometry.PlaneGeometry = function ( signals, geometry ) {
 
 	function update() {
 
-		var uuid = geometry.uuid;
-		var name = geometry.name;
-		var object;
-
-		editor.geometries[uuid] = new THREE.PlaneGeometry(
-			width.getValue(),
-			height.getValue(),
-			widthSegments.getValue(),
-			heightSegments.getValue()
-		);
-
-		editor.geometries[uuid].computeBoundingSphere();
-		editor.geometries[uuid].uuid = uuid;
-		editor.geometries[uuid].name = name;
-
-		for ( var i in editor.objects ) {
-
-			object = editor.objects[i];
-
-			if ( object.geometry && object.geometry.uuid == uuid ) {
-
-				delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-				object.geometry.dispose();
-
-				object.geometry = editor.geometries[uuid];
-
-				signals.objectChanged.dispatch( object );
-
+		editor.remakeGeometry( geometry,
+			{
+				width: width.getValue(),
+				height: height.getValue(),
+				widthSegments: widthSegments.getValue(),
+				heightSegments: heightSegments.getValue()
 			}
-
-		}
+		);
 
 	}
 

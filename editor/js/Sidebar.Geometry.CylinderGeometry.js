@@ -34,15 +34,15 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, geometry ) {
 
 	container.add( heightRow );
 
-	// radiusSegments
+	// radialSegments
 
-	var radiusSegmentsRow = new UI.Panel();
-	var radiusSegments = new UI.Integer( geometry.radiusSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegmentsRow = new UI.Panel();
+	var radialSegments = new UI.Integer( geometry.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
-	radiusSegmentsRow.add( new UI.Text( 'Radius segments' ).setWidth( '90px' ).setColor( '#666' ) );
-	radiusSegmentsRow.add( radiusSegments );
+	radialSegmentsRow.add( new UI.Text( 'Radius segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	radialSegmentsRow.add( radialSegments );
 
-	container.add( radiusSegmentsRow );
+	container.add( radialSegmentsRow );
 
 	// heightSegments
 
@@ -68,39 +68,16 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, geometry ) {
 
 	function update() {
 
-		var uuid = geometry.uuid;
-		var name = geometry.name;
-		var object;
-
-		editor.geometries[uuid] = new THREE.CylinderGeometry(
-			radiusTop.getValue(),
-			radiusBottom.getValue(),
-			height.getValue(),
-			radiusSegments.getValue(),
-			heightSegments.getValue(),
-			openEnded.getValue()
-		);
-
-		editor.geometries[uuid].computeBoundingSphere();
-		editor.geometries[uuid].uuid = uuid;
-		editor.geometries[uuid].name = name;
-
-		for ( var i in editor.objects ) {
-
-			object = editor.objects[i];
-
-			if ( object.geometry && object.geometry.uuid == uuid ) {
-
-				delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-				object.geometry.dispose();
-
-				object.geometry = editor.geometries[uuid];
-
-				signals.objectChanged.dispatch( object );
-
+		editor.remakeGeometry( geometry,
+			{
+				radiusTop: radiusTop.getValue(),
+				radiusBottom: radiusBottom.getValue(),
+				height: height.getValue(),
+				radialSegments: radialSegments.getValue(),
+				heightSegments: heightSegments.getValue(),
+				openEnded: openEnded.getValue()
 			}
-
-		}
+		);
 
 	}
 
