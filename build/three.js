@@ -5355,6 +5355,42 @@ THREE.Plane.prototype = {
 
 THREE.Math = {
 
+	uuid: function () {
+
+		// http://www.broofa.com/Tools/Math.uuid.htm
+		
+		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+		var uuid = new Array(36);
+		var rnd = 0, r;
+
+		return function () {
+
+			for ( var i = 0; i < 36; i ++ ) {
+
+				if ( i == 8 || i == 13 || i == 18 || i == 23 ) {
+			
+					uuid[ i ] = '-';
+			
+				} else if ( i == 14 ) {
+			
+					uuid[ i ] = '4';
+			
+				} else {
+			
+					if (rnd <= 0x02) rnd = 0x2000000 + (Math.random()*0x1000000)|0;
+					r = rnd & 0xf;
+					rnd = rnd >> 4;
+					uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+
+				}
+			}
+			
+			return uuid.join('');
+
+		};
+
+	}(),
+
 	// Clamp value to range <a, b>
 
 	clamp: function ( x, a, b ) {
@@ -6098,6 +6134,11 @@ THREE.EventDispatcher.prototype = {
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
+				var material = object.material;
+
+				if ( material === undefined ) return intersects;
+				if ( ! geometry.dynamic ) return intersects;
+
 				var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
 
@@ -6106,96 +6147,94 @@ THREE.EventDispatcher.prototype = {
 				var a, b, c;
 				var precision = raycaster.precision;
 
-				inverseMatrix.getInverse(object.matrixWorld);
+				inverseMatrix.getInverse( object.matrixWorld );
 
-				localRay.copy(raycaster.ray).applyMatrix4(inverseMatrix);
-
-				if (!geometry.dynamic) return intersects;
+				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 				var fl;
 				var indexed = false;
-				if (geometry.attributes.index) {
+				if ( geometry.attributes.index ) {
+
 					indexed = true;
 					fl = geometry.attributes.index.numItems / 3;
+
 				} else {
+
 					fl = geometry.attributes.position.numItems / 9;
 				}
 
-				for (var f = 0; f < fl; f++) {
+				var vA = new THREE.Vector3();
+				var vB = new THREE.Vector3();
+				var vC = new THREE.Vector3();
+				var vCB = new THREE.Vector3();
+				var vAB = new THREE.Vector3();
 
-					if (indexed) {
-						a = geometry.attributes.index.array[f * 3];
-						b = geometry.attributes.index.array[f * 3 + 1];
-						c = geometry.attributes.index.array[f * 3 + 2];
-					} else {
-						a = f * 3;
-						b = f * 3 + 1;
-						c = f * 3 + 2;
+				for ( var oi = 0; oi < geometry.offsets.length; ++oi ) {
+
+					var start = geometry.offsets[ oi ].start;
+					var count = geometry.offsets[ oi ].count;
+					var index = geometry.offsets[ oi ].index;
+
+					for ( var i = start, il = start + count; i < il; i += 3 ) {
+
+						if ( indexed ) {
+							a = index + geometry.attributes.index.array[ i ];
+							b = index + geometry.attributes.index.array[ i + 1 ];
+							c = index + geometry.attributes.index.array[ i + 2 ];
+						} else {
+							a = index;
+							b = index + 1;
+							c = index + 2;
+						}
+
+						vA.set( geometry.attributes.position.array[ a * 3 ],
+								geometry.attributes.position.array[ a * 3 + 1 ],
+								geometry.attributes.position.array[ a * 3 + 2] );
+						vB.set( geometry.attributes.position.array[ b * 3 ],
+								geometry.attributes.position.array[ b * 3 + 1 ],
+								geometry.attributes.position.array[ b * 3 + 2] );
+						vC.set( geometry.attributes.position.array[ c * 3 ],
+								geometry.attributes.position.array[ c * 3 + 1 ],
+								geometry.attributes.position.array[ c * 3 + 2 ] );
+
+						facePlane.setFromCoplanarPoints( vA, vB, vC );
+
+						var planeDistance = localRay.distanceToPlane( facePlane );
+
+						// bail if raycaster and plane are parallel
+						if ( Math.abs( planeDistance ) < precision ) continue;
+
+						// if negative distance, then plane is behind raycaster
+						if ( planeDistance < 0 ) continue;
+
+						// check if we hit the wrong side of a single sided face
+						side = material.side;
+						if ( side !== THREE.DoubleSide ) {
+
+							var planeSign = localRay.direction.dot( facePlane.normal );
+
+							if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) continue;
+
+						}
+
+						// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
+						if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
+
+						intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
+
+						if ( ! THREE.Triangle.containsPoint( intersectPoint, vA, vB, vC ) ) continue;
+
+						intersects.push( {
+
+							distance: planeDistance, // this works because the original ray was normalized, and the transformed localRay wasn't
+							point: raycaster.ray.at(planeDistance),
+							face: null,
+							faceIndex: null,
+							object: object
+
+						} );
+
 					}
-
-					var v1 = [geometry.attributes.position.array[a * 3],
-								geometry.attributes.position.array[a * 3 + 1],
-								geometry.attributes.position.array[a * 3 + 2]];
-					var v2 = [geometry.attributes.position.array[b * 3],
-								geometry.attributes.position.array[b * 3 + 1],
-								geometry.attributes.position.array[b * 3 + 2]];
-					var v3 = [geometry.attributes.position.array[c * 3],
-								geometry.attributes.position.array[c * 3 + 1],
-								geometry.attributes.position.array[c * 3 + 2]];
-
-					var material = object.material;
-					if (material === undefined) continue;
-
-					var cb = new THREE.Vector3(), ab = new THREE.Vector3();
-					var vA = new THREE.Vector3(v1[0], v1[1], v1[2]);
-					var vB = new THREE.Vector3(v2[0], v2[1], v2[2]);
-					var vC = new THREE.Vector3(v3[0], v3[1], v3[2]);
-
-					cb.subVectors(vC, vB);
-					ab.subVectors(vA, vB);
-					cb.cross(ab);
-					cb.normalize();
-
-					facePlane.setFromNormalAndCoplanarPoint(cb, vA);
-
-					var planeDistance = localRay.distanceToPlane(facePlane);
-
-					// bail if raycaster and plane are parallel
-					if (Math.abs(planeDistance) < precision) continue;
-
-					// if negative distance, then plane is behind raycaster
-					if (planeDistance < 0) continue;
-
-					// check if we hit the wrong side of a single sided face
-					side = material.side;
-					if (side !== THREE.DoubleSide) {
-
-						var planeSign = localRay.direction.dot(facePlane.normal);
-
-						if (!(side === THREE.FrontSide ? planeSign < 0 : planeSign > 0)) continue;
-
-					}
-
-					// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
-					if (planeDistance < raycaster.near || planeDistance > raycaster.far) continue;
-
-					intersectPoint = localRay.at(planeDistance, intersectPoint); // passing in intersectPoint avoids a copy
-
-					if (!THREE.Triangle.containsPoint(intersectPoint, vA, vB, vC)) continue;
-
-					var face = new THREE.Face3(a, b, c);
-					var colors = geometry.attributes.color.array;
-					face.vertexColors[0] = new THREE.Color(colors[a * 3], colors[a * 3 + 1], colors[a * 3 + 2]);
-					face.vertexColors[1] = new THREE.Color(colors[b * 3], colors[b * 3 + 1], colors[b * 3 + 2]);
-					face.vertexColors[2] = new THREE.Color(colors[c * 3], colors[c * 3 + 1], colors[c * 3 + 2]);
-					intersects.push({
-						distance: planeDistance, // this works because the original ray was normalized, and the transformed localRay wasn't
-						point: raycaster.ray.at(planeDistance),
-						face: face,
-						faceIndex: f,
-						object: object
-					});
-
 				}
 
 			} else if ( geometry instanceof THREE.Geometry ) {
@@ -6273,7 +6312,7 @@ THREE.EventDispatcher.prototype = {
 
 					intersects.push( {
 
-						distance: planeDistance,	// this works because the original ray was normalized, and the transformed localRay wasn't
+						distance: planeDistance,    // this works because the original ray was normalized, and the transformed localRay wasn't
 						point: raycaster.ray.at( planeDistance ),
 						face: face,
 						faceIndex: f,
@@ -6367,9 +6406,10 @@ THREE.EventDispatcher.prototype = {
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DIdCount ++;
+	this.id = THREE.Math.uuid();
 
 	this.name = '';
+	this.uuid = '';
 
 	this.parent = undefined;
 	this.children = [];
@@ -6802,9 +6842,10 @@ THREE.Object3D.prototype = {
 
 	},
 
-	clone: function ( object ) {
+	clone: function ( object, recursive ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
+		if ( recursive === undefined ) recursive = true;
 
 		object.name = this.name;
 
@@ -6837,10 +6878,14 @@ THREE.Object3D.prototype = {
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
-		for ( var i = 0; i < this.children.length; i ++ ) {
+		if ( recursive ) {
+		
+			for ( var i = 0; i < this.children.length; i ++ ) {
 
-			var child = this.children[ i ];
-			object.add( child.clone() );
+				var child = this.children[ i ];
+				object.add( child.clone() );
+
+			}
 
 		}
 
@@ -6850,9 +6895,7 @@ THREE.Object3D.prototype = {
 
 };
 
-THREE.Object3D.defaultEulerOrder = 'XYZ',
-
-THREE.Object3DIdCount = 0;
+THREE.Object3D.defaultEulerOrder = 'XYZ';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -7605,9 +7648,10 @@ THREE.Face4.prototype = {
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryIdCount ++;
+	this.id = THREE.Math.uuid();
 
 	this.name = '';
+	this.uuid = '';
 
 	this.vertices = [];
 	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
@@ -8399,15 +8443,13 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.GeometryIdCount = 0;
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.GeometryIdCount ++;
+	this.id = THREE.Math.uuid();
 
 	// attributes
 
@@ -11870,9 +11912,10 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
-	this.id = THREE.MaterialIdCount ++;
+	this.id = THREE.Math.uuid();
 
 	this.name = '';
+	this.uuid = '';
 
 	this.side = THREE.FrontSide;
 
@@ -11996,8 +12039,6 @@ THREE.Material.prototype = {
 	}
 
 };
-
-THREE.MaterialIdCount = 0;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -12926,9 +12967,10 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureIdCount ++;
+	this.id = THREE.Math.uuid();
 
 	this.name = '';
+	this.uuid = '';
 
 	this.image = image;
 	this.mipmaps = [];
@@ -13007,8 +13049,6 @@ THREE.Texture.prototype = {
 	}
 
 };
-
-THREE.TextureIdCount = 0;
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -14061,7 +14101,8 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 THREE.Fog = function ( hex, near, far ) {
 
 	this.name = '';
-
+  this.uuid = '';
+  
 	this.color = new THREE.Color( hex );
 
 	this.near = ( near !== undefined ) ? near : 1;
@@ -14083,6 +14124,8 @@ THREE.Fog.prototype.clone = function () {
 THREE.FogExp2 = function ( hex, density ) {
 
 	this.name = '';
+  this.uuid = '';
+  
 	this.color = new THREE.Color( hex );
 	this.density = ( density !== undefined ) ? density : 0.00025;
 
@@ -34683,57 +34726,55 @@ THREE.PointLightHelper.prototype.update = function () {
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.SpotLightHelper = function ( light, sphereSize ) {
+THREE.SpotLightHelper = function ( light ) {
 
-	THREE.Object3D.call( this );
-
-	this.matrixAutoUpdate = false;
+	// spotlight helper must be a child of the scene
 
 	this.light = light;
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
-	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	var geometry = new THREE.CylinderGeometry( 0, 1, 1, 8, 1, true );
 
-	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.matrixWorld = this.light.matrixWorld;
-	this.lightSphere.matrixAutoUpdate = false;
-	this.add( this.lightSphere );
-
-	geometry = new THREE.CylinderGeometry( 0.0001, 1, 1, 8, 1, true );
 	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -0.5, 0 ) );
+
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-	material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true, opacity: 0.3, transparent: true } );
-	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	var material = new THREE.MeshBasicMaterial( { wireframe: true, opacity: 0.3, transparent: true } );
 
-	this.lightCone = new THREE.Mesh( geometry, material );
-	this.lightCone.position = this.light.position;
+	THREE.Mesh.call( this, geometry, material );
 
-	var coneLength = light.distance ? light.distance : 10000;
-	var coneWidth = coneLength * Math.tan( light.angle );
-
-	this.lightCone.scale.set( coneWidth, coneWidth, coneLength );
-	this.lightCone.lookAt( this.light.target.position );
-
-	this.add( this.lightCone );
+	this.update();
 
 };
 
-THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.SpotLightHelper.prototype = Object.create( THREE.Mesh.prototype );
 
-THREE.SpotLightHelper.prototype.update = function () {
+THREE.SpotLightHelper.prototype.update = ( function () {
 
-	var coneLength = this.light.distance ? this.light.distance : 10000;
-	var coneWidth = coneLength * Math.tan( this.light.angle );
+	var targetPosition = new THREE.Vector3();
 
-	this.lightCone.scale.set( coneWidth, coneWidth, coneLength );
-	this.lightCone.lookAt( this.light.target.position );
+	return function() {
 
-	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-	this.lightCone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		var coneLength = this.light.distance ? this.light.distance : 10000;
 
-};
+		var coneWidth = coneLength * Math.tan( this.light.angle );
+
+		this.scale.set( coneWidth, coneWidth, coneLength );
+
+		this.light.updateMatrixWorld( true );
+
+		this.position.getPositionFromMatrix( this.light.matrixWorld );
+
+		this.light.target.updateMatrixWorld( true );
+
+		targetPosition.getPositionFromMatrix( this.light.target.matrixWorld );
+
+		this.lookAt( targetPosition );
+
+		this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+	}
+
+}());
 
 /**
  * @author mrdoob / http://mrdoob.com/
