@@ -5,7 +5,7 @@
 
 THREE.Material = function () {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
 	this.uuid = '';

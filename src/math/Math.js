@@ -1,10 +1,11 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Math = {
 
-	uuid: function () {
+	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
 		

@@ -6,7 +6,7 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
 	this.uuid = '';

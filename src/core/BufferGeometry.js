@@ -4,7 +4,7 @@
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	// attributes
 
