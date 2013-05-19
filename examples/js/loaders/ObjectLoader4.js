@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ObjectLoader = function () {};
+THREE.ObjectLoader4 = function () {};
 
-THREE.ObjectLoader.prototype = {
+THREE.ObjectLoader4.prototype = {
 
 	constructor: THREE.ObjectLoader,
 
@@ -46,7 +46,9 @@ THREE.ObjectLoader.prototype = {
 	parse: function ( json ) {
 
 		var geometries = this.parseGeometries( json.geometries );
+
 		var materials = this.parseMaterials( json.materials );
+
 		var object = this.parseObject( json.object, geometries, materials );
 
 		return object;
@@ -55,16 +57,16 @@ THREE.ObjectLoader.prototype = {
 
 	parseGeometries: function ( json ) {
 
-		var geometries = {};
+		var geometries = [];
 
 		if ( json !== undefined ) {
 
 			var loader = new THREE.JSONLoader();
 
-			for ( var id in json ) {
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
 				var geometry;
-				var data = json[ id ];
+				var data = json[ i ];
 
 				switch ( data.type ) {
 
@@ -164,7 +166,7 @@ THREE.ObjectLoader.prototype = {
 
 				if ( data.name !== undefined ) geometry.name = data.name;
 
-				geometries[ id ] = geometry;
+				geometries.push( geometry );
 
 			}
 
@@ -176,20 +178,20 @@ THREE.ObjectLoader.prototype = {
 
 	parseMaterials: function ( json ) {
 
-		var materials = {};
+		var materials = [];
 
 		if ( json !== undefined ) {
 
 			var loader = new THREE.MaterialLoader();
 
-			for ( var id in json ) {
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json[ id ];
+				var data = json[ i ];
 				var material = loader.parse( data );
 
 				if ( data.name !== undefined ) material.name = data.name;
 
-				materials[ id ] = material;
+				materials.push( material );
 
 			}
 
@@ -285,9 +287,9 @@ THREE.ObjectLoader.prototype = {
 
 		if ( data.children !== undefined ) {
 
-			for ( var child in data.children ) {
+			for ( var i = 0, l = data.children.length; i < l; i ++ ) {
 
-				object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+				object.add( this.parseObject( data.children[ i ], geometries, materials ) );
 
 			}
 

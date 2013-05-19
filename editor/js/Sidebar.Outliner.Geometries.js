@@ -16,10 +16,7 @@ Sidebar.Outliner.Geometries = function ( signals ) {
 		for ( var i in editor.geometries ) {
 
 			var geometry = editor.geometries[ i ];
-
-			if ( geometry.name == '') geometry.name = 'Geometry' + geometry.id;
-
-			options[ i ] = geometry.name;
+			options[ i ] = '- ' + geometry.name;
 
 		}
 

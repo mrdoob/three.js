@@ -16,10 +16,7 @@ Sidebar.Outliner.Materials = function ( signals ) {
 		for ( var i in editor.materials ) {
 
 			var material = editor.materials[ i ];
-
-			if ( material.name == '') material.name = 'Material' + material.id;
-
-			options[ i ] = material.name;
+			options[ i ] = '- ' + material.name;
 
 		}
 

@@ -16,10 +16,7 @@ Sidebar.Outliner.Textures = function ( signals ) {
 		for ( var i in editor.textures ) {
 
 			var texture = editor.textures[ i ];
-
-			if ( texture.name == '') texture.name = 'Texture' + texture.id;
-
-			options[ i ] = texture.name;
+			options[ i ] = '- ' + texture.name;
 
 		}
 

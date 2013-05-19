@@ -1,4 +1,3 @@
-
 var Loader = function ( editor, signals ) {
 
 	var scope = this;
@@ -109,12 +108,15 @@ var Loader = function ( editor, signals ) {
 
 		} else if ( data.metadata.type === 'object' ) {
 
-			var loader = new THREE.ObjectLoader();
+			var loader = data.metadata.version === 4
+				? new THREE.ObjectLoader4()
+				: new THREE.ObjectLoader();
+
 			var result = loader.parse( data );
 
 			if ( result instanceof THREE.Scene ) {
 
-				editor.addObject( result );
+				editor.addObject( result.children );
 
 			} else {
 

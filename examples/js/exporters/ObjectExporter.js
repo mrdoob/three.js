@@ -14,7 +14,7 @@ THREE.ObjectExporter.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.0,
+				version: 4.1,
 				type: 'object',
 				generator: 'ObjectExporter'
 			}
@@ -22,20 +22,17 @@ THREE.ObjectExporter.prototype = {
 
 		//
 
-		var geometries = {};
 		var geometryExporter = new THREE.GeometryExporter();
 
 		var parseGeometry = function ( geometry ) {
 
-			if ( geometries[ geometry.id ] === undefined ) {
+			if ( output.geometries === undefined ) {
 
-				if ( output.geometries === undefined ) {
+				output.geometries = {};
 
-					output.geometries = [];
+			}
 
-				}
-
-				geometries[ geometry.id ] = output.geometries.length;
+			if ( output.geometries[ geometry.id ] === undefined ) {
 
 				var data = {};
 
@@ -115,40 +112,37 @@ THREE.ObjectExporter.prototype = {
 
 				}
 
-				output.geometries.push( data );
+				output.geometries[ geometry.id ] = data;
 
 			}
 
-			return geometries[ geometry.id ];
+			return geometry.id;
 
 		};
 
 		//
 
-		var materials = {};
 		var materialExporter = new THREE.MaterialExporter();
 
 		var parseMaterial = function ( material ) {
 
-			if ( materials[ material.id ] === undefined ) {
+			if ( output.materials === undefined ) {
 
-				if ( output.materials === undefined ) {
+				output.materials = {};
 
-					output.materials = [];
+			}
 
-				}
-
-				materials[ material.id ] = output.materials.length;
+			if ( output.materials[ material.id ] === undefined ) {
 
 				var data = materialExporter.parse( material );
 
 				delete data.metadata;
 
-				output.materials.push( data );
+				output.materials[ material.id ] = data;
 
 			}
 
-			return materials[ material.id ];
+			return material.id;
 
 		};
 
@@ -159,7 +153,6 @@ THREE.ObjectExporter.prototype = {
 			var data = {};
 
 			if ( object.name !== '' ) data.name = object.name;
-			if ( object.uuid !== '' ) data.uuid = object.uuid;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
 			if ( object.visible !== true ) data.visible = object.visible;
 
@@ -246,11 +239,12 @@ THREE.ObjectExporter.prototype = {
 
 			if ( object.children.length > 0 ) {
 
-				data.children = [];
+				data.children = {};
 
 				for ( var i = 0; i < object.children.length; i ++ ) {
 
-					data.children.push( parseObject( object.children[ i ] ) );
+					var child = object.children[ i ];
+					data.children[ child.id ] = parseObject( child );
 
 				}
 
