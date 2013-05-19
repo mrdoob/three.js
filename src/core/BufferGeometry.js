@@ -187,8 +187,7 @@ THREE.BufferGeometry.prototype = {
 				this.attributes[ "normal" ] = {
 
 					itemSize: 3,
-					array: new Float32Array( nVertexElements ),
-					numItems: nVertexElements
+					array: new Float32Array( nVertexElements )
 
 				};
 
@@ -371,8 +370,7 @@ THREE.BufferGeometry.prototype = {
 			this.attributes[ "tangent" ] = {
 
 				itemSize: 4,
-				array: new Float32Array( nTangentElements ),
-				numItems: nTangentElements
+				array: new Float32Array( nTangentElements )
 
 			};
 
