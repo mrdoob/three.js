@@ -8631,8 +8631,7 @@ THREE.BufferGeometry.prototype = {
 				this.attributes[ "normal" ] = {
 
 					itemSize: 3,
-					array: new Float32Array( nVertexElements ),
-					numItems: nVertexElements
+					array: new Float32Array( nVertexElements )
 
 				};
 
@@ -8815,8 +8814,7 @@ THREE.BufferGeometry.prototype = {
 			this.attributes[ "tangent" ] = {
 
 				itemSize: 4,
-				array: new Float32Array( nTangentElements ),
-				numItems: nTangentElements
+				array: new Float32Array( nTangentElements )
 
 			};
 
@@ -19730,6 +19728,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			attribute = geometry.attributes[ a ];
+
+			if ( attribute.numItems === undefined ) {
+
+				attribute.numItems = attribute.array.length;
+
+			}
 
 			attribute.buffer = _gl.createBuffer();
 
