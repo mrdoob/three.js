@@ -171,6 +171,7 @@ var Viewport = function ( editor, signals ) {
 
 		if ( object.geometry !== undefined ) {
 
+			selectionBox.visible = true;
 			selectionBox.update( object );
 			transformControls.update();
 
@@ -221,9 +222,7 @@ var Viewport = function ( editor, signals ) {
 
 		if ( object && object !== scene ) {
 
-			selectionBox.visible = true;
 			transformControls.attach( object );
-
 			updateHelpers( object );
 
 		}
@@ -249,6 +248,7 @@ var Viewport = function ( editor, signals ) {
 	signals.objectChanged.add( function ( object ) {
 
 		updateHelpers( object );
+		transformControls.update();
 		updateInfo();
 		render();
 

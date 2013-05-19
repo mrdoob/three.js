@@ -53,36 +53,12 @@ Editor.prototype = {
 
     parameters = parameters ? parameters : {};
 
-    var name = parameters.name ? parameters.name : null;
-    var width = parameters.width ? parameters.width : null;
-    var height = parameters.height ? parameters.height : null;
-    var depth = parameters.depth ? parameters.depth : null;
-    var widthSegments = parameters.widthSegments ? parameters.widthSegments : null;
-    var heightSegments = parameters.heightSegments ? parameters.heightSegments : null;
-    var depthSegments = parameters.depthSegments ? parameters.depthSegments : null;
-    var radialSegments = parameters.radialSegments ? parameters.radialSegments : null;
-    var tubularSegments = parameters.tubularSegments ? parameters.tubularSegments : null;
-    var radius = parameters.radius ? parameters.radius : null;
-    var radiusTop = parameters.radiusTop ? parameters.radiusTop : null;
-    var radiusBottom = parameters.radiusBottom ? parameters.radiusBottom : null;
-    var phiStart = parameters.phiStart ? parameters.phiStart : null;
-    var phiLength = parameters.phiLength ? parameters.phiLength : null;
-    var thetaStart = parameters.thetaStart ? parameters.thetaStart : null;
-    var thetaLength = parameters.thetaLength ? parameters.thetaLength : null;
-    var tube = parameters.tube ? parameters.tube : null;
-    var arc = parameters.arc ? parameters.arc : null;
-    var detail = parameters.detail ? parameters.detail : null;
-    var p = parameters.p ? parameters.p : null;
-    var q = parameters.q ? parameters.q : null;
-    var heightScale = parameters.heightScale ? parameters.heightScale : null;
-    var openEnded = parameters.openEnded ? parameters.openEnded : false;
     var color = parameters.color ? parameters.color : null;
+    var groundColor = parameters.groundColor ? parameters.groundColor : null;
     var intensity = parameters.intensity ? parameters.intensity : null;
     var distance = parameters.distance ? parameters.distance : null;
     var angle = parameters.angle ? parameters.angle : null;
     var exponent = parameters.exponent ? parameters.exponent : null;
-    var skyColor = parameters.skyColor ? parameters.skyColor : null;
-    var groundColor = parameters.groundColor ? parameters.groundColor : null;
 
     if ( !type ) {
 
@@ -91,102 +67,54 @@ Editor.prototype = {
 
     } else if ( type == 'plane' ) {
 
-      width = width ? width : 200;
-      height = height ? height : 200;
+      geometry = this.createGeometry( type, parameters );
 
-      widthSegments = widthSegments ? widthSegments : 1;
-      heightSegments = heightSegments ? heightSegments : 1;
-
-      geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : 'Plane ' + object.id;
-      geometry.name = object.name + ' geometry';
+      object.name = name ? name : type + object.id;
 
       object.rotation.x = - Math.PI/2;
 
     } else if ( type == 'cube' ) {
 
-      width = width ? width : 100;
-      height = height ? height : 100;
-      depth = depth ? depth : 100;
+      geometry = this.createGeometry( type, parameters );
 
-      widthSegments = widthSegments ? widthSegments : 1;
-      heightSegments = heightSegments ? heightSegments : 1;
-      depthSegments = depthSegments ? depthSegments : 1;
-
-      geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : 'Cube ' + object.id;
-      geometry.name = object.name + ' geometry';
+      object.name = name ? name : type + object.id;
 
     } else if ( type == 'cylinder' ) {
 
-      radiusTop = radiusTop ? radiusTop : 20;
-      radiusBottom = radiusBottom ? radiusBottom : 20;
-      height = height ? height : 100;
-      radialSegments = radialSegments ? radialSegments : 8;
-      heightSegments = heightSegments ? heightSegments : 1;
-      openEnded = openEnded ? openEnded : false;
+      geometry = this.createGeometry( type, parameters );
 
-      geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : 'Cylinder ' + object.id;
-      geometry.name = object.name + ' geometry';
+      object.name = name ? name : type + object.id;
 
     } else if ( type == 'sphere' ) {
 
-      radius = radius ? radius : 75;
-      widthSegments = widthSegments ? widthSegments : 32;
-      heightSegments = heightSegments ? heightSegments : 16;
-      widthSegments = widthSegments ? widthSegments : 32;
-      heightSegments = heightSegments ? heightSegments : 16;
-      phiStart = phiStart ? phiStart : null;
-      phiLength = phiLength ? phiLength : null;
-      thetaStart = thetaStart ? thetaStart : null;
-      thetaLength = thetaLength ? thetaLength : null;
+      geometry = this.createGeometry( type, parameters );
 
-      geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : 'Sphere ' + object.id;
-      geometry.name = object.name + ' geometry';
+      object.name = name ? name : type + object.id;
 
     } else if ( type == 'icosahedron' ) {
 
-      radius = radius ? radius : 75;
-      detail = detail ? detail : 2;
+      geometry = this.createGeometry( type, parameters );
 
-      geometry = new THREE.IcosahedronGeometry ( radius, detail );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : 'Icosahedron ' + object.id;
-      geometry.name = object.name + ' geometry';
+      object.name = name ? name : type + object.id;
 
     } else if ( type == 'torus' ) {
 
-      radius = radius ? radius : 100;
-      tube = tube ? tube : 40;
-      radialSegments = radialSegments ? radialSegments : 8;
-      tubularSegments = tubularSegments ? tubularSegments : 6;
-      arc = arc ? arc : Math.PI * 2;
+      geometry = this.createGeometry( type, parameters );
 
-      geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : 'Torus ' + object.id;
-      geometry.name = object.name + ' geometry';
+      object.name = name ? name : type + object.id;
 
     } else if ( type == 'torusknot' ) {
 
-      radius = radius ? radius : 100;
-      tube = tube ? tube : 40;
-      radialSegments = radialSegments ? radialSegments : 64;
-      tubularSegments = tubularSegments ? tubularSegments : 8;
-      p = p ? p : 2;
-      q = q ? q : 3;
-      heightScale = heightScale ? heightScale : 1;
+      geometry = this.createGeometry( type, parameters );
 
-      geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : 'TorusKnot ' + object.id;
-      geometry.name = object.name + ' geometry';
+      object.name = name ? name : type + object.id;
 
     } else if ( type == 'pointlight' ) {
 
@@ -224,11 +152,11 @@ Editor.prototype = {
 
     } else if ( type == 'hemispherelight' ) {
 
-      skyColor = skyColor ? skyColor : 0x00aaff;
+      color = color ? color : 0x00aaff;
       groundColor = groundColor ? groundColor : 0xffaa00;
       intensity = intensity ? intensity : 1;
 
-      var object = new THREE.HemisphereLight( skyColor, groundColor, intensity );
+      var object = new THREE.HemisphereLight( color, groundColor, intensity );
       object.name = name ? name : 'HemisphereLight ' + object.id;
 
       object.position.set( 1, 1, 1 ).multiplyScalar( 200 );
@@ -248,6 +176,124 @@ Editor.prototype = {
 
   },
 
+  createGeometry: function( type, parameters ) {
+
+    type = type ? type : null;
+    parameters = parameters ? parameters : {};
+
+    var name = parameters.name ? parameters.name : type + 'Geometry';
+    var width = parameters.width ? parameters.width : null;
+    var height = parameters.height ? parameters.height : null;
+    var depth = parameters.depth ? parameters.depth : null;
+    var widthSegments = parameters.widthSegments ? parameters.widthSegments : null;
+    var heightSegments = parameters.heightSegments ? parameters.heightSegments : null;
+    var depthSegments = parameters.depthSegments ? parameters.depthSegments : null;
+    var radialSegments = parameters.radialSegments ? parameters.radialSegments : null;
+    var tubularSegments = parameters.tubularSegments ? parameters.tubularSegments : null;
+    var radius = parameters.radius ? parameters.radius : null;
+    var radiusTop = parameters.radiusTop ? parameters.radiusTop : null;
+    var radiusBottom = parameters.radiusBottom ? parameters.radiusBottom : null;
+    var phiStart = parameters.phiStart ? parameters.phiStart : null;
+    var phiLength = parameters.phiLength ? parameters.phiLength : null;
+    var thetaStart = parameters.thetaStart ? parameters.thetaStart : null;
+    var thetaLength = parameters.thetaLength ? parameters.thetaLength : null;
+    var tube = parameters.tube ? parameters.tube : null;
+    var arc = parameters.arc ? parameters.arc : null;
+    var detail = parameters.detail ? parameters.detail : null;
+    var p = parameters.p ? parameters.p : null;
+    var q = parameters.q ? parameters.q : null;
+    var heightScale = parameters.heightScale ? parameters.heightScale : null;
+    var openEnded = parameters.openEnded ? parameters.openEnded : false;
+
+    var geometry;
+
+    if ( !type ) {
+
+      geometry = new THREE.Geometry();
+
+    } else if ( type == 'plane' ) {
+
+      width = width ? width : 200;
+      height = height ? height : 200;
+      widthSegments = widthSegments ? widthSegments : 1;
+      heightSegments = heightSegments ? heightSegments : 1;
+
+      geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+
+    } else if ( type == 'cube' ) {
+
+      width = width ? width : 100;
+      height = height ? height : 100;
+      depth = depth ? depth : 100;
+      widthSegments = widthSegments ? widthSegments : 1;
+      heightSegments = heightSegments ? heightSegments : 1;
+      depthSegments = depthSegments ? depthSegments : 1;
+
+      geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+
+    } else if ( type == 'cylinder' ) {
+
+      radiusTop = radiusTop ? radiusTop : 20;
+      radiusBottom = radiusBottom ? radiusBottom : 20;
+      height = height ? height : 100;
+      radialSegments = radialSegments ? radialSegments : 8;
+      heightSegments = heightSegments ? heightSegments : 1;
+      openEnded = openEnded ? openEnded : false;
+
+      geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded );
+
+    } else if ( type == 'sphere' ) {
+
+      radius = radius ? radius : 75;
+      widthSegments = widthSegments ? widthSegments : 32;
+      heightSegments = heightSegments ? heightSegments : 16;
+      widthSegments = widthSegments ? widthSegments : 32;
+      heightSegments = heightSegments ? heightSegments : 16;
+      phiStart = phiStart ? phiStart : 0;
+      phiLength = phiLength ? phiLength : Math.PI * 2;
+      thetaStart = thetaStart ? thetaStart : 0;
+      thetaLength = thetaLength ? thetaLength : Math.PI;
+
+      geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
+
+    } else if ( type == 'icosahedron' ) {
+
+      radius = radius ? radius : 75;
+      detail = detail ? detail : 2;
+
+      geometry = new THREE.IcosahedronGeometry ( radius, detail );
+
+    } else if ( type == 'torus' ) {
+
+      radius = radius ? radius : 100;
+      tube = tube ? tube : 40;
+      radialSegments = radialSegments ? radialSegments : 8;
+      tubularSegments = tubularSegments ? tubularSegments : 6;
+      arc = arc ? arc : Math.PI * 2;
+
+      geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
+
+    } else if ( type == 'torusknot' ) {
+
+      radius = radius ? radius : 100;
+      tube = tube ? tube : 40;
+      radialSegments = radialSegments ? radialSegments : 64;
+      tubularSegments = tubularSegments ? tubularSegments : 8;
+      p = p ? p : 2;
+      q = q ? q : 3;
+      heightScale = heightScale ? heightScale : 1;
+
+      geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
+
+    }
+
+    geometry.name = name;
+    geometry.computeBoundingSphere();
+
+    return geometry;
+
+  },
+
   createMaterial: function( type, parameters ) {
 
     var material;
@@ -257,8 +303,6 @@ Editor.prototype = {
     parameters = parameters ? parameters : {};
 
     var name = parameters.name ? parameters.name : null;
-
-    // TODO: implement types
 
     if ( type == 'phong' ) {
 
@@ -675,8 +719,6 @@ Editor.prototype = {
     var deletedObjects = {};
 
     for ( var i in list ) {
-
-      // TODO: handle helpers
       
       if ( this.objects[ list[ i ].uuid ] && list[ i ] != this.scene ) {
 
@@ -894,6 +936,62 @@ Editor.prototype = {
 
   },
 
+  // Utils
+
+  updateObject: function( object, parameters ) {
+
+    parameters = parameters ? parameters : {};
+
+    if ( parameters.parent && object.parent && object.parent != parameters.parent)
+      editor.parent( object, parameters.parent );
+
+    if ( parameters.geometry && object.geometry && object.geometry != parameters.geometry) {
+      object.geometry = parameters.geometry;
+      this.updateGeometry( object.geometry );
+    }
+
+    if ( parameters.material && object.material && object.material != parameters.material)
+      object.material = parameters.material;
+
+    if ( parameters.name !== undefined ) object.name = parameters.name;
+
+    if ( parameters.position !== undefined ) object.position = parameters.position;
+    if ( parameters.rotation !== undefined ) object.rotation = parameters.rotation;
+    if ( parameters.scale !== undefined ) object.scale = parameters.scale;
+
+    if ( object.fov !== undefined && parameters.fov !== undefined ) object.fov = parameters.fov;
+    if ( object.near !== undefined && parameters.near !== undefined ) object.near = parameters.near;
+    if ( object.far !== undefined && parameters.far !== undefined ) object.far = parameters.far;
+    if ( object.intensity !== undefined && parameters.intensity !== undefined ) object.intensity = parameters.intensity;
+
+    if ( object.color && parameters.color !== undefined ) object.color.setHex( parameters.color );
+    if ( object.groundColor && parameters.groundColor !== undefined ) object.groundColor.setHex( parameters.groundColor );
+
+    if ( object.distance !== undefined && parameters.distance !== undefined ) object.distance = parameters.distance;
+    if ( object.angle !== undefined && parameters.angle !== undefined ) object.angle = parameters.angle;
+    if ( object.exponent !== undefined && parameters.exponent !== undefined ) object.exponent = parameters.exponent;
+    if ( object.visible !== undefined && parameters.visible !== undefined ) object.visible = parameters.visible;
+    
+    if ( parameters.userData !== undefined ) {
+
+      try {
+
+        object.userData = JSON.parse( parameters.userData );
+
+      } catch ( error ) {
+
+       console.log( error );
+
+      }
+
+    };
+
+    if ( object.updateProjectionMatrix ) object.updateProjectionMatrix();
+
+    signals.objectChanged.dispatch( object );
+
+  },
+
   updateMaterials: function( list ) {
 
     list = list ? list : this.list( 'material' );
@@ -918,62 +1016,37 @@ Editor.prototype = {
 
   },
 
-  remakeGeometry: function( geometry, parameters ) {
-
-    // TODO: document
+  updateGeometry: function( geometry, parameters ) {
 
     parameters = parameters ? parameters : {};
 
     var uuid = geometry.uuid;
-    var name = parameters.name ? parameters.name : geometry.name;
-
-    var width = parameters.width ? parameters.width : null;
-    var height = parameters.height ? parameters.height : null;
-    var depth = parameters.depth ? parameters.depth : null;
-    var widthSegments = parameters.widthSegments ? parameters.widthSegments : null;
-    var heightSegments = parameters.heightSegments ? parameters.heightSegments : null;
-    var depthSegments = parameters.depthSegments ? parameters.depthSegments : null;
-    var radialSegments = parameters.radialSegments ? parameters.radialSegments : null;
-    var tubularSegments = parameters.tubularSegments ? parameters.tubularSegments : null;
-    var radius = parameters.radius ? parameters.radius : null;
-    var radiusTop = parameters.radiusTop ? parameters.radiusTop : null;
-    var radiusBottom = parameters.radiusBottom ? parameters.radiusBottom : null;
-    var phiStart = parameters.phiStart ? parameters.phiStart : null;
-    var phiLength = parameters.phiLength ? parameters.phiLength : null;
-    var thetaStart = parameters.thetaStart ? parameters.thetaStart : null;
-    var thetaLength = parameters.thetaLength ? parameters.thetaLength : null;
-    var tube = parameters.tube ? parameters.tube : null;
-    var arc = parameters.arc ? parameters.arc : null;
-    var detail = parameters.detail ? parameters.detail : null;
-    var p = parameters.p ? parameters.p : null;
-    var q = parameters.q ? parameters.q : null;
-    var heightScale = parameters.heightScale ? parameters.heightScale : null;
-    var openEnded = parameters.openEnded ? parameters.openEnded : false;
-
-    if ( geometry instanceof THREE.CubeGeometry )
-      editor.geometries[uuid] = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
-
-    if ( geometry instanceof THREE.CylinderGeometry )
-      editor.geometries[uuid] = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded );
-
-    if ( geometry instanceof THREE.IcosahedronGeometry )
-      editor.geometries[uuid] = new THREE.IcosahedronGeometry( radius, detail );
+    var name = geometry.name;
 
     if ( geometry instanceof THREE.PlaneGeometry )
-      editor.geometries[uuid] = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+      geometry = this.createGeometry( 'plane', parameters );
+
+    if ( geometry instanceof THREE.CubeGeometry )
+      geometry = this.createGeometry( 'cube', parameters );
+
+    if ( geometry instanceof THREE.CylinderGeometry )
+      geometry = this.createGeometry( 'cylinder', parameters );
 
     if ( geometry instanceof THREE.SphereGeometry )
-      editor.geometries[uuid] = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
+      geometry = this.createGeometry( 'sphere', parameters );
+
+    if ( geometry instanceof THREE.IcosahedronGeometry )
+      geometry = this.createGeometry( 'icosahedron', parameters );
 
     if ( geometry instanceof THREE.TorusGeometry )
-      editor.geometries[uuid] = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
+      geometry = this.createGeometry( 'torus', parameters );
 
     if ( geometry instanceof THREE.TorusKnotGeometry )
-      editor.geometries[uuid] = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
+      geometry = this.createGeometry( 'torusknot', parameters );
 
-    editor.geometries[uuid].computeBoundingSphere();
-    editor.geometries[uuid].uuid = uuid;
-    editor.geometries[uuid].name = name;
+    geometry.computeBoundingSphere();
+    geometry.uuid = uuid;
+    geometry.name = name;
 
     for ( var i in editor.objects ) {
 
@@ -984,7 +1057,7 @@ Editor.prototype = {
         delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
         object.geometry.dispose();
 
-        object.geometry = editor.geometries[uuid];
+        object.geometry = geometry;
 
         signals.objectChanged.dispatch( object );
 
