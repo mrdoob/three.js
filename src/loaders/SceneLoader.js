@@ -122,14 +122,23 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			rotation = data.transform.rotation,
 			scale = data.transform.scale;
 
-		if ( position )
-			result.scene.position.set( position[ 0 ], position[ 1 ], position [ 2 ] );
+		if ( position ) {
 
-		if ( rotation )
-			result.scene.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation [ 2 ] );
+			result.scene.position.fromArray( position );
 
-		if ( scale )
-			result.scene.scale.set( scale[ 0 ], scale[ 1 ], scale [ 2 ] );
+		}
+
+		if ( rotation ) {
+
+			result.scene.rotation.fromArray( rotation );
+
+		}
+
+		if ( scale ) {
+
+			result.scene.scale.fromArray( scale );
+
+		}
 
 		if ( position || rotation || scale ) {
 
@@ -173,11 +182,10 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			// check by id if child has already been handled,
 			// if not, create new object
 
-			if ( result.objects[ objID ] === undefined ) {
+			var object = result.objects[ objID ];
+			var objJSON = children[ objID ];
 
-				var objJSON = children[ objID ];
-
-				var object = null;
+			if ( object === undefined ) {
 
 				// meshes
 
@@ -185,10 +193,12 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					if ( objJSON.loading === undefined ) {
 
-						var reservedTypes = { "type": 1, "url": 1, "material": 1,
-											  "position": 1, "rotation": 1, "scale" : 1,
-											  "visible": 1, "children": 1, "userData": 1,
-											  "skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1 };
+						var reservedTypes = {
+							"type": 1, "url": 1, "material": 1,
+							"position": 1, "rotation": 1, "scale" : 1,
+							"visible": 1, "children": 1, "userData": 1,
+							"skin": 1, "morph": 1, "mirroredLoop": 1, "duration": 1
+						};
 
 						var loaderParameters = {};
 
@@ -331,20 +341,20 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 						} else {
 
-							object.position.set( pos[0], pos[1], pos[2] );
+							object.position.fromArray( pos );
 
 							if ( quat ) {
 
-								object.quaternion.set( quat[0], quat[1], quat[2], quat[3] );
+								object.quaternion.fromArray( quat );
 								object.useQuaternion = true;
 
 							} else {
 
-								object.rotation.set( rot[0], rot[1], rot[2] );
+								object.rotation.fromArray( rot );
 
 							}
 
-							object.scale.set( scl[0], scl[1], scl[2] );
+							object.scale.fromArray( scl );
 
 						}
 
@@ -370,7 +380,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 						pos = objJSON.direction;
 
 						light = new THREE.DirectionalLight( hex, intensity );
-						light.position.set( pos[0], pos[1], pos[2] );
+						light.position.fromArray( pos );
 
 						if ( objJSON.target ) {
 
@@ -389,7 +399,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 						dst = objJSON.distance;
 
 						light = new THREE.PointLight( hex, intensity, dst );
-						light.position.set( pos[0], pos[1], pos[2] );
+						light.position.fromArray( pos );
 
 					} else if ( objJSON.type === "AmbientLight" ) {
 
@@ -422,16 +432,16 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 					}
 
 					camera.name = objID;
-					camera.position.set( pos[0], pos[1], pos[2] );
+					camera.position.fromArray( pos );
 
 					if ( quat !== undefined ) {
 
-						camera.quaternion.set( quat[0], quat[1], quat[2], quat[3] );
+						camera.quaternion.fromArray( quat );
 						camera.useQuaternion = true;
 
 					} else if ( rot !== undefined ) {
 
-						camera.rotation.set( rot[0], rot[1], rot[2] );
+						camera.rotation.fromArray( rot );
 
 					}
 
@@ -451,20 +461,20 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					object = new THREE.Object3D();
 					object.name = objID;
-					object.position.set( pos[0], pos[1], pos[2] );
+					object.position.fromArray( pos );
 
 					if ( quat ) {
 
-						object.quaternion.set( quat[0], quat[1], quat[2], quat[3] );
+						object.quaternion.fromArray( quat );
 						object.useQuaternion = true;
 
 					} else {
 
-						object.rotation.set( rot[0], rot[1], rot[2] );
+						object.rotation.fromArray( rot );
 
 					}
 
-					object.scale.set( scl[0], scl[1], scl[2] );
+					object.scale.fromArray( scl );
 					object.visible = ( objJSON.visible !== undefined ) ? objJSON.visible : false;
 
 					parent.add( object );
@@ -476,7 +486,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				if ( object ) {
 
-					if ( objJSON.userData !== undefined )  {
+					if ( objJSON.userData !== undefined ) {
 
 						for ( var key in objJSON.userData ) {
 
@@ -505,13 +515,13 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 					}
 
-					if ( objJSON.children !== undefined ) {
-
-						handle_children( object, objJSON.children );
-
-					}
-
 				}
+
+			}
+
+			if ( object !== undefined && objJSON.children !== undefined ) {
+
+				handle_children( object, objJSON.children );
 
 			}
 
@@ -534,27 +544,27 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 		var q = obj.quaternion;
 		var s = obj.scale;
 
-		node.position.set( p[0], p[1], p[2] );
+		node.position.fromArray( p );
 
 		if ( q ) {
 
-			node.quaternion.set( q[0], q[1], q[2], q[3] );
+			node.quaternion.fromArray( q );
 			node.useQuaternion = true;
 
 		} else {
 
-			node.rotation.set( r[0], r[1], r[2] );
+			node.rotation.fromArray( r );
 
 		}
 
-		node.scale.set( s[0], s[1], s[2] );
+		node.scale.fromArray( s );
 
 		// override children materials
 		// if object material was specified in JSON explicitly
 
 		if ( material ) {
 
-			node.traverse( function ( child )  {
+			node.traverse( function ( child ) {
 
 				child.material = material;
 
@@ -567,7 +577,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		var visible = ( obj.visible !== undefined ) ? obj.visible : true;
 
-		node.traverse( function ( child )  {
+		node.traverse( function ( child ) {
 
 			child.visible = visible;
 
@@ -729,6 +739,22 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	};
 
+	function traverse_json_hierarchy( objJSON, callback ) {
+
+		callback( objJSON );
+
+		if ( objJSON.children !== undefined ) {
+
+			for ( var objChildID in objJSON.children ) {
+
+				traverse_json_hierarchy( objJSON.children[ objChildID ], callback );
+
+			}
+
+		}
+
+	};
+
 	// first go synchronous elements
 
 	// fogs
@@ -780,19 +806,19 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 	// count how many hierarchies will be loaded asynchronously
 
-	var objID, objJSON;
+	for ( var objID in data.objects ) {
 
-	for ( objID in data.objects ) {
+		traverse_json_hierarchy( data.objects[ objID ], function ( objJSON ) {
 
-		objJSON = data.objects[ objID ];
+			if ( objJSON.type && ( objJSON.type in scope.hierarchyHandlerMap ) ) {
 
-		if ( objJSON.type && ( objJSON.type in this.hierarchyHandlerMap ) ) {
+				counter_models += 1;
 
-			counter_models += 1;
+				scope.onLoadStart();
 
-			scope.onLoadStart();
+			}
 
-		}
+		});
 
 	}
 
@@ -912,7 +938,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 		textureJSON = data.textures[ textureID ];
 
-		if ( textureJSON.mapping !== undefined && THREE[ textureJSON.mapping ] !== undefined  ) {
+		if ( textureJSON.mapping !== undefined && THREE[ textureJSON.mapping ] !== undefined ) {
 
 			textureJSON.mapping = new THREE[ textureJSON.mapping ]();
 
@@ -985,8 +1011,8 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 			if ( textureJSON.wrap ) {
 
 				var wrapMap = {
-				"repeat" 	: THREE.RepeatWrapping,
-				"mirror"	: THREE.MirroredRepeatWrapping
+					"repeat": THREE.RepeatWrapping,
+					"mirror": THREE.MirroredRepeatWrapping
 				}
 
 				if ( wrapMap[ textureJSON.wrap[ 0 ] ] !== undefined ) texture.wrapS = wrapMap[ textureJSON.wrap[ 0 ] ];
@@ -1051,7 +1077,7 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				// default to vertex colors if "vertexColors" is anything else face colors or 0 / null / false
 
-				} else if ( matJSON.parameters[ parID ] )   {
+				} else if ( matJSON.parameters[ parID ] ) {
 
 					matJSON.parameters[ parID ] = THREE.VertexColors;
 

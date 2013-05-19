@@ -193,9 +193,15 @@ test( "getInverse", function() {
 		var m = testMatrices[i];
 
 		var mInverse = new THREE.Matrix4().getInverse( m );
+		var mSelfInverse = m.clone();
+		mSelfInverse.getInverse( mSelfInverse );
+
+
+		// self-inverse should the same as inverse
+		ok( matrixEquals4( mSelfInverse, mInverse ), "Passed!" );
 
 		// the determinant of the inverse should be the reciprocal
-		ok( Math.abs( m.determinant() * mInverse.determinant() - 1  ) < 0.0001, "Passed!" );
+		ok( Math.abs( m.determinant() * mInverse.determinant() - 1 ) < 0.0001, "Passed!" );
 
 		var mProduct = new THREE.Matrix4().multiplyMatrices( m, mInverse );
 
