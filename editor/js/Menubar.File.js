@@ -120,7 +120,7 @@ Menubar.File = function ( signals ) {
 		var selected;
 		// TODO: handle multiple selection
 		for ( var i in editor.selected ) {
-			if ( editor.objects[ editor.selected[ i ].uuid ] ) selected = editor.selected[ i ];
+			if ( editor.objects[ editor.selected[ i ].id ] ) selected = editor.selected[ i ];
 		}
 		if ( !selected ) return;
 
@@ -159,7 +159,7 @@ Menubar.File = function ( signals ) {
 		var selected;
 		// TODO: handle multiple selection
 		for ( var i in editor.selected ) {
-			if ( editor.objects[ editor.selected[ i ].uuid ] ) selected = editor.selected[ i ];
+			if ( editor.objects[ editor.selected[ i ].id ] ) selected = editor.selected[ i ];
 		}
 		if ( !selected ) return;
 

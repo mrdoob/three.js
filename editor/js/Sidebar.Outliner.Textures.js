@@ -30,24 +30,24 @@ Sidebar.Outliner.Textures = function ( signals ) {
 
 	function selectFromOutliner() {
 
-    var uuid = outliner.getValue();
-
-		editor.select( editor.textures[uuid] );
+    var id = outliner.getValue();
+    
+		editor.select( editor.textures[ id ] );
 
 	}
 
   function getSelected() {
 
-    var selectedUuids = [];
+    var selectedIds = [];
 
-    for ( var uuid in editor.selected ) {
+    for ( var id in editor.selected ) {
 
-      if ( editor.textures[uuid] ) selectedUuids.push(uuid);
+      if ( editor.textures[ id ] ) selectedIds.push( id );
 
     }
 
     // TODO: implement multiple selection
-    outliner.setValue( selectedUuids.length ? selectedUuids[0] : null );
+    outliner.setValue( selectedIds.length ? selectedIds[0] : null );
 
   }
 

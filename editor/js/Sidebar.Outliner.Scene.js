@@ -90,9 +90,9 @@ Sidebar.Outliner.Scene = function ( signals ) {
 
 	function selectFromOutliner() {
 
-		var uuid = outliner.getValue();
+		var id = outliner.getValue();
 
-		editor.select( editor.objects[ uuid ] );
+		editor.select( editor.objects[ id ] );
 
 	}
 
@@ -102,7 +102,7 @@ Sidebar.Outliner.Scene = function ( signals ) {
 
 		var scene = editor.scene;
 
-		options[ scene.uuid ] = scene.name + ' <span style="color: #aaa">- ' + getObjectType( scene ) + '</span>';
+		options[ scene.id ] = scene.name + ' <span style="color: #aaa">- ' + getObjectType( scene ) + '</span>';
 
 		( function addObjects( objects, pad ) {
 
@@ -110,7 +110,7 @@ Sidebar.Outliner.Scene = function ( signals ) {
 
 				var object = objects[ i ];
 
-				options[ object.uuid ] = pad + object.name + ' <span style="color: #aaa">- ' + getObjectType( object ) + '</span>';
+				options[ object.id ] = pad + object.name + ' <span style="color: #aaa">- ' + getObjectType( object ) + '</span>';
 
 				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
 
@@ -126,15 +126,15 @@ Sidebar.Outliner.Scene = function ( signals ) {
 
   function getSelected() {
 
-    var selectedUuids = [];
+    var selectedIds = [];
 
-    for ( var uuid in editor.selected ) {
+    for ( var id in editor.selected ) {
 
-      if ( editor.objects[uuid] ) selectedUuids.push(uuid);
+      if ( editor.objects[ id ] ) selectedIds.push( id );
 
     }
 
-    outliner.setValue( selectedUuids.length ? selectedUuids : null );
+    outliner.setValue( selectedIds.length ? selectedIds : null );
 
   }
 

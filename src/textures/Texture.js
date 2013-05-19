@@ -9,7 +9,6 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.uuid = '';
 
 	this.image = image;
 	this.mipmaps = [];

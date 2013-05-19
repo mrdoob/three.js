@@ -196,23 +196,23 @@ Sidebar.Attributes = function ( signals ) {
         else if ( object[ key ] && key === 'parent' ) {
 
           var options = {};
-          for ( var uuid in editor.objects ) if ( object.uuid != uuid ) options[ uuid ] = editor.objects[ uuid ].name;
+          for ( var id in editor.objects ) if ( object.id != id ) options[ id ] = editor.objects[ id ].name;
           param[ key ].setOptions( options );
-          if ( object.parent !== undefined ) param[ key ].setValue( object.parent.uuid );
+          if ( object.parent !== undefined ) param[ key ].setValue( object.parent.id );
 
         } else if ( object[ key ] && key === 'geometry' ) {
 
           var options = {};
-          for ( var uuid in editor.geometries ) if ( object.uuid != uuid ) options[ uuid ] = editor.geometries[ uuid ].name;
+          for ( var id in editor.geometries ) if ( object.id != id ) options[ id ] = editor.geometries[ id ].name;
           param[ key ].setOptions( options );
-          if ( object.geometry !== undefined ) param[ key ].setValue( object.geometry.uuid );
+          if ( object.geometry !== undefined ) param[ key ].setValue( object.geometry.id );
 
         } else if ( object[ key ] && key === 'material' ) {
 
           var options = {};
-          for ( var uuid in editor.materials ) if ( object.uuid != uuid ) options[ uuid ] = editor.materials[ uuid ].name;
+          for ( var id in editor.materials ) if ( object.id != id ) options[ id ] = editor.materials[ id ].name;
           param[ key ].setOptions( options );
-          if ( object.material !== undefined ) param[ key ].setValue( object.material.uuid );
+          if ( object.material !== undefined ) param[ key ].setValue( object.material.id );
 
         } else if ( key == 'userData' ) {
 
@@ -250,17 +250,17 @@ Sidebar.Attributes = function ( signals ) {
 
     else if ( key === 'parent' ) {
 
-      if ( param[ key ].getValue() != object.uuid )
+      if ( param[ key ].getValue() != object.id )
         editor.parent( object, editor.objects[ param[ key ].getValue() ] );
 
     } else if ( key === 'geometry' ) {
 
-      if ( param[ key ].getValue() != object.geometry.uuid )
+      if ( param[ key ].getValue() != object.geometry.id )
         object.geometry = editor.geometries[ param[ key ].getValue() ];
 
     } else if ( key === 'material' ) {
 
-      if ( param[ key ].getValue() != object.material.uuid )
+      if ( param[ key ].getValue() != object.material.id )
         object.material = editor.materials[ param[ key ].getValue() ];
 
     } else if ( key === 'userData' ) {

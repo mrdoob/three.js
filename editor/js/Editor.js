@@ -368,14 +368,12 @@ Editor.prototype = {
 
     for ( var i in list ) {
 
-      if ( !list[ i ].uuid ) list[ i ].uuid = this.uuid();
-      this.objects[ list[ i ].uuid ] = list[ i ];
+      this.objects[ list[ i ].id ] = list[ i ];
       this.addHelper( list[ i ] );
 
       if ( list[ i ].target ) {
 
-        if ( !list[ i ].target.uuid ) list[ i ].target.uuid = this.uuid();
-        this.objects[ list[ i ].target.uuid ] = list[ i ].target;
+        this.objects[ list[ i ].target.id ] = list[ i ].target;
 
       }
 
@@ -412,27 +410,27 @@ Editor.prototype = {
 
     if ( object instanceof THREE.PointLight ) {
 
-      this.helpers[ object.uuid ] = new THREE.PointLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.uuid ] );
-      this.helpers[ object.uuid ].lightSphere.uuid = object.uuid;
+      this.helpers[ object.id ] = new THREE.PointLightHelper( object, 10 );
+      this.sceneHelpers.add( this.helpers[ object.id ] );
+      this.helpers[ object.id ].lightSphere.id = object.id;
 
     } else if ( object instanceof THREE.DirectionalLight ) {
 
-      this.helpers[ object.uuid ] = new THREE.DirectionalLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.uuid ] );
-      this.helpers[ object.uuid ].lightSphere.uuid = object.uuid;
+      this.helpers[ object.id ] = new THREE.DirectionalLightHelper( object, 10 );
+      this.sceneHelpers.add( this.helpers[ object.id ] );
+      this.helpers[ object.id ].lightSphere.id = object.id;
 
     } else if ( object instanceof THREE.SpotLight ) {
 
-      this.helpers[ object.uuid ] = new THREE.SpotLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.uuid ] );
-      this.helpers[ object.uuid ].lightSphere.uuid = object.uuid;
+      this.helpers[ object.id ] = new THREE.SpotLightHelper( object, 10 );
+      this.sceneHelpers.add( this.helpers[ object.id ] );
+      this.helpers[ object.id ].lightSphere.id = object.id;
 
     } else if ( object instanceof THREE.HemisphereLight ) {
 
-      this.helpers[ object.uuid ] = new THREE.HemisphereLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.uuid ] );
-      this.helpers[ object.uuid ].lightSphere.uuid = object.uuid;
+      this.helpers[ object.id ] = new THREE.HemisphereLightHelper( object, 10 );
+      this.sceneHelpers.add( this.helpers[ object.id ] );
+      this.helpers[ object.id ].lightSphere.id = object.id;
 
     }
 
@@ -440,10 +438,10 @@ Editor.prototype = {
 
   deleteHelper: function( object ) {
 
-    if ( this.helpers[ object.uuid ] ) {
+    if ( this.helpers[ object.id ] ) {
 
-      this.helpers[ object.uuid ].parent.remove( this.helpers[ object.uuid ] );
-      delete this.helpers[ object.uuid ];
+      this.helpers[ object.id ].parent.remove( this.helpers[ object.id ] );
+      delete this.helpers[ object.id ];
 
     }
 
@@ -451,9 +449,7 @@ Editor.prototype = {
 
   addGeometry: function( geometry ) {
 
-    if (!geometry.uuid) geometry.uuid = this.uuid();
-    this.geometries[ geometry.uuid ] = geometry;
-
+    this.geometries[ geometry.id ] = geometry;
     signals.geometryAdded.dispatch( geometry );
 
   },
@@ -465,18 +461,14 @@ Editor.prototype = {
       this.defaultMaterial = material;
     }
 
-    if (!material.uuid) material.uuid = this.uuid();
-    this.materials[ material.uuid ] = material;
-
+    this.materials[ material.id ] = material;
     signals.materialAdded.dispatch( material );
 
   },
 
   addTexture: function( texture ) {
 
-    if (!texture.uuid) texture.uuid = this.uuid();
-    this.textures[ texture.uuid ] = texture;
-
+    this.textures[ texture.id ] = texture;
     signals.textureAdded.dispatch( texture );
 
   },
@@ -493,7 +485,7 @@ Editor.prototype = {
 
     for ( var i in list ) {
 
-      this.selected[ list[ i ].uuid ] = list[ i ];
+      this.selected[ list[ i ].id ] = list[ i ];
 
     }
 
@@ -501,7 +493,7 @@ Editor.prototype = {
 
   },
 
-  selectByUuid: function( uuid, additive ) {
+  selectById: function( id, additive ) {
 
     var list = this.list();
 
@@ -509,7 +501,7 @@ Editor.prototype = {
 
     for ( var i in list ) {
 
-      if ( list[ i ].uuid == uuid ) this.select( list[ i ], true );
+      if ( list[ i ].id == id ) this.select( list[ i ], true );
 
     }
 
@@ -537,7 +529,7 @@ Editor.prototype = {
 
     for ( var i in list ) {
 
-      if ( this.selected[ list[ i ].uuid ] ) delete this.selected[ list[ i ].uuid ];
+      if ( this.selected[ list[ i ].id ] ) delete this.selected[ list[ i ].id ];
 
     }
 
@@ -545,9 +537,9 @@ Editor.prototype = {
 
   },
 
-  deselectByUuid: function( uuid ) {
+  deselectById: function( id ) {
 
-    if ( this.selected[ uuid ] ) delete this.selected[ uuid ];
+    if ( this.selected[ id ] ) delete this.selected[ id ];
 
   },
 
@@ -672,11 +664,11 @@ Editor.prototype = {
 
     function listFromMap( map, name ) {
 
-      for ( var uuid in map ) {
+      for ( var id in map ) {
 
-        if ( scope.regexMatch( map[ uuid ].name, name ) ) {
+        if ( scope.regexMatch( map[ id ].name, name ) ) {
 
-          list.push( map[ uuid ] );
+          list.push( map[ id ] );
 
         }
 
@@ -733,12 +725,12 @@ Editor.prototype = {
 
     for ( var i in list ) {
       
-      if ( this.objects[ list[ i ].uuid ] && list[ i ] != this.scene ) {
+      if ( this.objects[ list[ i ].id ] && list[ i ] != this.scene ) {
 
-        delete this.objects[ list[ i ].uuid ];
+        delete this.objects[ list[ i ].id ];
         this.deleteHelper( list[ i ] );
 
-        deletedObjects[ list[ i ].uuid ] = list[ i ];
+        deletedObjects[ list[ i ].id ] = list[ i ];
 
         if ( list[ i ] instanceof THREE.Light ) this.updateMaterials();
 
@@ -748,23 +740,23 @@ Editor.prototype = {
       
       }
 
-      if ( this.geometries[ list[ i ].uuid ] ) {
+      if ( this.geometries[ list[ i ].id ] ) {
 
-        delete this.geometries[ list[ i ].uuid ];
+        delete this.geometries[ list[ i ].id ];
         signals.objectDeleted.dispatch();
 
       } 
 
-      if ( this.materials[ list[ i ].uuid ] ) {
+      if ( this.materials[ list[ i ].id ] ) {
       
-        delete this.materials[ list[ i ].uuid ];
+        delete this.materials[ list[ i ].id ];
         signals.materialDeleted.dispatch();
       
       }
 
-      if ( this.textures[ list[ i ].uuid ] ) {
+      if ( this.textures[ list[ i ].id ] ) {
 
-        delete this.textures[ list[ i ].uuid ];
+        delete this.textures[ list[ i ].id ];
         signals.textureDeleted.dispatch();
 
       }
@@ -813,19 +805,19 @@ Editor.prototype = {
 
     this.scene.traverse( function( object ) {
 
-      used[ object.uuid ] = object; 
+      used[ object.id ] = object; 
 
-      if ( object.geometry ) used[ object.geometry.uuid ] = object.geometry; 
+      if ( object.geometry ) used[ object.geometry.id ] = object.geometry; 
 
       if ( object.material ) {
 
-        used[ object.material.uuid ] = object.material;
+        used[ object.material.id ] = object.material;
 
         for ( var i in object.material ){
 
           if ( object.material[ i ] instanceof THREE.Texture ) {
 
-            used[ object.material[ i ].uuid ] = object.material[ i ];
+            used[ object.material[ i ].id ] = object.material[ i ];
 
           }
 
@@ -836,26 +828,26 @@ Editor.prototype = {
     } );
 
     if ( !type || type == 'object' ) {
-      for ( var uuid in this.objects ) {
-        if ( !used[ uuid ] ) this.delete( this.objects[ uuid ] );
+      for ( var id in this.objects ) {
+        if ( !used[ id ] ) this.delete( this.objects[ id ] );
       }
     }
 
     if ( !type || type == 'geometry' ) {
-      for ( var uuid in this.geometries ) {
-        if ( !used[ uuid ] ) this.delete( this.geometries[ uuid ] );
+      for ( var id in this.geometries ) {
+        if ( !used[ id ] ) this.delete( this.geometries[ id ] );
       }
     }
 
     if ( !type || type == 'material' ) {
-      for ( var uuid in this.materials ) {
-        if ( !used[ uuid ] ) this.delete( this.materials[ uuid ] );
+      for ( var id in this.materials ) {
+        if ( !used[ id ] ) this.delete( this.materials[ id ] );
       }
     }
 
     if ( !type || type == 'texture' ) {
-      for ( var uuid in this.textures ) {
-        if ( !used[ uuid ] ) this.delete( this.textures[ uuid ] );
+      for ( var id in this.textures ) {
+        if ( !used[ id ] ) this.delete( this.textures[ id ] );
       }
     }
 
@@ -881,7 +873,7 @@ Editor.prototype = {
 
       if ( this.objects[ i ] ) {
 
-        var clonedObject = this.objects[assets[ i ].uuid ].clone();
+        var clonedObject = this.objects[assets[ i ].id ].clone();
 
         clonedObject.traverse( function( child ) {
 
@@ -890,7 +882,7 @@ Editor.prototype = {
         } );
 
         this.addObject( clonedObject, assets[ i ].parent );
-        clones[ clonedObject.uuid ] = clonedObject;
+        clones[ clonedObject.id ] = clonedObject;
 
       }
 
@@ -1033,7 +1025,7 @@ Editor.prototype = {
 
     parameters = parameters ? parameters : {};
 
-    var uuid = geometry.uuid;
+    var id = geometry.id;
     var name = geometry.name;
 
     if ( geometry instanceof THREE.PlaneGeometry )
@@ -1058,14 +1050,14 @@ Editor.prototype = {
       geometry = this.createGeometry( 'torusknot', parameters );
 
     geometry.computeBoundingSphere();
-    geometry.uuid = uuid;
+    geometry.id = id;
     geometry.name = name;
 
     for ( var i in editor.objects ) {
 
       var object = editor.objects[i];
 
-      if ( object.geometry && object.geometry.uuid == uuid ) {
+      if ( object.geometry && object.geometry.id == id ) {
 
         delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
         object.geometry.dispose();
@@ -1120,18 +1112,6 @@ Editor.prototype = {
 
     var regex = new RegExp(filter);
     return regex.test( name );
-
-  },
-
-  uuid: function() {
-
-    // http://note19.com/2007/05/27/javascript-guid-generator/
-
-    function s4() {
-      return Math.floor( ( 1 + Math.random() ) * 0x10000 ).toString( 16 ).substring( 1 );
-    };
-
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 
   }
 

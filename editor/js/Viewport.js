@@ -25,7 +25,6 @@ var Viewport = function ( editor, signals ) {
 	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
 	camera.position.set( 500, 250, 500 );
 	camera.lookAt( scene.position );
-	camera.uuid = "persp";
 
 	editor.select( camera );
 
@@ -111,9 +110,9 @@ var Viewport = function ( editor, signals ) {
 
 			for ( var i in intersect ) {
 
-				if ( editor.objects[ intersect[i].object.uuid ] ) {
+				if ( editor.objects[ intersect[i].object.id ] ) {
 
-					editor.selectByUuid( intersect[i].object.uuid );
+					editor.selectById( intersect[i].object.id );
 					hit = true;
 					break;
 
@@ -137,11 +136,11 @@ var Viewport = function ( editor, signals ) {
 
 			for ( var i in intersect ) {
 
-				if ( editor.objects[ intersect[i].object.uuid ] ) {
+				if ( editor.objects[ intersect[i].object.id ] ) {
 
-					editor.selectByUuid( intersect[i].object.uuid );
+					editor.selectById( intersect[i].object.id );
 
-					controls.focus( editor.objects[ intersect[i].object.uuid ] );
+					controls.focus( editor.objects[ intersect[i].object.id ] );
 
 					break;
 
@@ -177,7 +176,7 @@ var Viewport = function ( editor, signals ) {
 
 		}
 
-		if ( editor.helpers[ object.uuid ] ) editor.helpers[ object.uuid ].update();
+		if ( editor.helpers[ object.id ] ) editor.helpers[ object.id ].update();
 
 	} 
 

@@ -6,7 +6,6 @@
 THREE.Fog = function ( hex, near, far ) {
 
 	this.name = '';
-  this.uuid = '';
   
 	this.color = new THREE.Color( hex );
 

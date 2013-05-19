@@ -8,7 +8,6 @@ THREE.Material = function () {
 	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.uuid = '';
 
 	this.side = THREE.FrontSide;
 
