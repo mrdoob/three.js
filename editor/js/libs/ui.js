@@ -675,10 +675,14 @@ UI.Number = function ( number ) {
 
 	var onChange = function ( event ) {
 
+
+
 		var number = parseFloat( dom.value );
 
 		if ( isNaN( number ) === false ) {
 
+		  dom.oldValue = dom.newValue;
+		  dom.newValue = number;
 			dom.value = number;
 
 		}
