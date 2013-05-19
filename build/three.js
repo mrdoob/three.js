@@ -5351,11 +5351,12 @@ THREE.Plane.prototype = {
 
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Math = {
 
-	uuid: function () {
+	generateUUID: function () {
 
 		// http://www.broofa.com/Tools/Math.uuid.htm
 		
@@ -6406,10 +6407,9 @@ THREE.EventDispatcher.prototype = {
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.uuid = '';
 
 	this.parent = undefined;
 	this.children = [];
@@ -7648,10 +7648,9 @@ THREE.Face4.prototype = {
 
 THREE.Geometry = function () {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.uuid = '';
 
 	this.vertices = [];
 	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
@@ -8449,7 +8448,7 @@ THREE.Geometry.prototype = {
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	// attributes
 
@@ -11912,10 +11911,9 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.uuid = '';
 
 	this.side = THREE.FrontSide;
 
@@ -12967,10 +12965,9 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.Math.uuid();
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
-	this.uuid = '';
 
 	this.image = image;
 	this.mipmaps = [];
@@ -14101,7 +14098,6 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 THREE.Fog = function ( hex, near, far ) {
 
 	this.name = '';
-  this.uuid = '';
   
 	this.color = new THREE.Color( hex );
 
@@ -14124,7 +14120,6 @@ THREE.Fog.prototype.clone = function () {
 THREE.FogExp2 = function ( hex, density ) {
 
 	this.name = '';
-  this.uuid = '';
   
 	this.color = new THREE.Color( hex );
 	this.density = ( density !== undefined ) ? density : 0.00025;
@@ -31563,7 +31558,7 @@ THREE.CubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded ) {
+THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded ) {
 
 	THREE.Geometry.call( this );
 
@@ -31571,7 +31566,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 	this.radiusBottom = radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
 	this.height = height = height !== undefined ? height : 100;
 
-	this.radiusSegments = radiusSegments = radiusSegments || 8;
+	this.radialSegments = radialSegments = radialSegments || 8;
 	this.heightSegments = heightSegments = heightSegments || 1;
 
 	this.openEnded = openEnded = openEnded !== undefined ? openEnded : false;
@@ -31588,9 +31583,9 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 		var v = y / heightSegments;
 		var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
-		for ( x = 0; x <= radiusSegments; x ++ ) {
+		for ( x = 0; x <= radialSegments; x ++ ) {
 
-			var u = x / radiusSegments;
+			var u = x / radialSegments;
 
 			var vertex = new THREE.Vector3();
 			vertex.x = radius * Math.sin( u * Math.PI * 2 );
@@ -31612,7 +31607,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 	var tanTheta = ( radiusBottom - radiusTop ) / height;
 	var na, nb;
 
-	for ( x = 0; x < radiusSegments; x ++ ) {
+	for ( x = 0; x < radialSegments; x ++ ) {
 
 		if ( radiusTop !== 0 ) {
 
@@ -31659,7 +31654,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 		this.vertices.push( new THREE.Vector3( 0, heightHalf, 0 ) );
 
-		for ( x = 0; x < radiusSegments; x ++ ) {
+		for ( x = 0; x < radialSegments; x ++ ) {
 
 			var v1 = vertices[ 0 ][ x ];
 			var v2 = vertices[ 0 ][ x + 1 ];
@@ -31686,7 +31681,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 		this.vertices.push( new THREE.Vector3( 0, - heightHalf, 0 ) );
 
-		for ( x = 0; x < radiusSegments; x ++ ) {
+		for ( x = 0; x < radialSegments; x ++ ) {
 
 			var v1 = vertices[ y ][ x + 1 ];
 			var v2 = vertices[ y ][ x ];
@@ -33172,14 +33167,14 @@ THREE.TorusKnotGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, debug ) {
+THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed, debug ) {
 
 	THREE.Geometry.call( this );
 
 	this.path = path;
 	this.segments = segments || 64;
 	this.radius = radius || 1;
-	this.radiusSegments = radiusSegments || 8;
+	this.radialSegments = radialSegments || 8;
 	this.closed = closed || false;
 
 	if ( debug ) this.debug = new THREE.Object3D();
@@ -33244,9 +33239,9 @@ THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, d
 
 		}
 
-		for ( j = 0; j < this.radiusSegments; j++ ) {
+		for ( j = 0; j < this.radialSegments; j++ ) {
 
-			v = j / this.radiusSegments * 2 * Math.PI;
+			v = j / this.radialSegments * 2 * Math.PI;
 
 			cx = -this.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			cy = this.radius * Math.sin( v );
@@ -33266,20 +33261,20 @@ THREE.TubeGeometry = function( path, segments, radius, radiusSegments, closed, d
 
 	for ( i = 0; i < this.segments; i++ ) {
 
-		for ( j = 0; j < this.radiusSegments; j++ ) {
+		for ( j = 0; j < this.radialSegments; j++ ) {
 
 			ip = ( this.closed ) ? (i + 1) % this.segments : i + 1;
-			jp = (j + 1) % this.radiusSegments;
+			jp = (j + 1) % this.radialSegments;
 
 			a = this.grid[ i ][ j ];		// *** NOT NECESSARILY PLANAR ! ***
 			b = this.grid[ ip ][ j ];
 			c = this.grid[ ip ][ jp ];
 			d = this.grid[ i ][ jp ];
 
-			uva = new THREE.Vector2( i / this.segments, j / this.radiusSegments );
-			uvb = new THREE.Vector2( ( i + 1 ) / this.segments, j / this.radiusSegments );
-			uvc = new THREE.Vector2( ( i + 1 ) / this.segments, ( j + 1 ) / this.radiusSegments );
-			uvd = new THREE.Vector2( i / this.segments, ( j + 1 ) / this.radiusSegments );
+			uva = new THREE.Vector2( i / this.segments, j / this.radialSegments );
+			uvb = new THREE.Vector2( ( i + 1 ) / this.segments, j / this.radialSegments );
+			uvc = new THREE.Vector2( ( i + 1 ) / this.segments, ( j + 1 ) / this.radialSegments );
+			uvd = new THREE.Vector2( i / this.segments, ( j + 1 ) / this.radialSegments );
 
 			this.faces.push( new THREE.Face4( a, b, c, d ) );
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
