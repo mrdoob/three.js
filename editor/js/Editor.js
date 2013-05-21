@@ -997,25 +997,25 @@ Editor.prototype = {
     var name = geometry.name;
 
     if ( geometry instanceof THREE.PlaneGeometry )
-      geometry = this.createGeometry( 'plane', parameters );
+      geometry = this.createGeometry( 'Plane', parameters );
 
     if ( geometry instanceof THREE.CubeGeometry )
-      geometry = this.createGeometry( 'cube', parameters );
+      geometry = this.createGeometry( 'Cube', parameters );
 
     if ( geometry instanceof THREE.CylinderGeometry )
-      geometry = this.createGeometry( 'cylinder', parameters );
+      geometry = this.createGeometry( 'Cylinder', parameters );
 
     if ( geometry instanceof THREE.SphereGeometry )
-      geometry = this.createGeometry( 'sphere', parameters );
+      geometry = this.createGeometry( 'Sphere', parameters );
 
     if ( geometry instanceof THREE.IcosahedronGeometry )
-      geometry = this.createGeometry( 'icosahedron', parameters );
+      geometry = this.createGeometry( 'Icosahedron', parameters );
 
     if ( geometry instanceof THREE.TorusGeometry )
-      geometry = this.createGeometry( 'torus', parameters );
+      geometry = this.createGeometry( 'Torus', parameters );
 
     if ( geometry instanceof THREE.TorusKnotGeometry )
-      geometry = this.createGeometry( 'torusknot', parameters );
+      geometry = this.createGeometry( 'Torusknot', parameters );
 
     geometry.computeBoundingSphere();
     geometry.id = id;

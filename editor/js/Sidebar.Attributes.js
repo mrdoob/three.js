@@ -1,98 +1,145 @@
 Sidebar.Attributes = function ( signals ) {
 
   var scope = this;
-  var object;
+  var model;
   var param = {};
 
-  var primaryParams = [
-    'name',
-    'parent',
-    'geometry',
-    'material',
-    'position',
-    'rotation',
-    'scale',
-    'width',
-    'height',
-    'depth',
-    'widthSegments',
-    'heightSegments',
-    'depthSegments',
-    'radialSegments',
-    'tubularSegments',
-    'radius',
-    'radiusTop',
-    'radiusBottom',
-    'phiStart',
-    'phiLength',
-    'thetaStart',
-    'thetaLength',
-    'tube',
-    'arc',
-    'detail',
-    'p',
-    'q',
-    'heightScale',
-    'openEnded',
-    'color',
-    'groundColor',
-    'ambient',
-    'emissive',
-    'specular',
-    'reflectivity',
-    'shininess',
-    'intensity',
-    'opacity',
-    'transparent',
-    'metal',
-    'wireframe',
-    'visible',
-    'userData'
-  ];
+  var primaryParams = [ 'name', 'parent', 'geometry', 'material', 'position', 'rotation', 'scale', 'width', 'height', 'depth',
+  'widthSegments', 'heightSegments', 'depthSegments', 'radialSegments', 'tubularSegments', 'radius', 'radiusTop', 'radiusBottom',
+  'phiStart', 'phiLength', 'thetaStart', 'thetaLength', 'tube', 'arc', 'detail', 'p', 'q', 'heightScale', 'openEnded',
+  'image', 'sourceFile', 'wrapS', 'wrapT', 'minFilter', 'magFilter', 'format', 'repeat', 'offset', 'flipY', 'type', 'color',
+  'groundColor', 'ambient', 'emissive', 'specular', 'reflectivity', 'shininess', 'intensity', 'opacity', 'transparent', 'metal',
+  'wireframe', 'wireframeLinewidth', 'linewidth', 'visible', 'fog', 'near', 'far', 'exponent', 'map', 'lightMap', 'bumpMap',
+  'normalMap', 'specularMap', 'envMap', 'normalScale', 'bumpScale', 'userData' ];
   
-  var secondaryParams = [
-    'castShadow',
-    'receiveShadow',
-    'useQuaternion',
-    'fog',
-    'depthTest',
-    'depthWrite',
-    'dynamic'
-  ];
+  var secondaryParams = [ 'quaternion', 'up', 'distance', 'castShadow', 'receiveShadow', 'useQuaternion', 'depthTest', 'depthWrite',
+  'dynamic', 'children', 'elements', 'vertices', 'normals', 'colors', 'faces', 'faceUvs', 'faceVertexUvs', 'boundingBox',
+  'boundingSphere', 'verticesNeedUpdate', 'elementsNeedUpdate', 'uvsNeedUpdate', 'normalsNeedUpdate', 'tangentsNeedUpdate',
+  'colorsNeedUpdate', 'lineDistancesNeedUpdate', 'buffersNeedUpdate', 'matrix', 'matrixWorld', 'blending', 'side', 'blendSrc',
+  'blendDst', 'blendEquation', 'generateMipmaps', 'premultiplyAlpha', 'needsUpdate', 'anisothropy' ];
 
-  var integerParams = [
-    'widthSegments',
-    'heightSegments',
-    'depthSegments',
-    'radialSegments',
-    'tubularSegments'
-  ];
+  var integerParams = [ 'widthSegments', 'heightSegments', 'depthSegments', 'radialSegments', 'tubularSegments' ];
+
+  var textureParams = [ 'map', 'lightMap', 'bumpMap', 'normalMap', 'specularMap', 'envMap' ];
+
+  var multiOptions = {
+    'blending': {
+      'NoBlending': THREE.NoBlending,
+      'NormalBlending': THREE.NormalBlending,
+      'AdditiveBlending': THREE.AdditiveBlending,
+      'SubtractiveBlending': THREE.SubtractiveBlending,
+      'MultiplyBlending': THREE.MultiplyBlending,
+      'CustomBlending': THREE.CustomBlending
+    }
+    ,
+    'side': {
+      'FrontSide': THREE.FrontSide,
+      'BackSide': THREE.BackSide,
+      'DoubleSide': THREE.DoubleSide
+    },
+    'blendSrc': {
+      'ZeroFactor': THREE.ZeroFactor,
+      'OneFactor': THREE.OneFactor,
+      'SrcAlphaFactor': THREE.SrcAlphaFactor,
+      'OneMinusSrcAlphaFactor': THREE.OneMinusSrcAlphaFactor,
+      'DstAlphaFactor': THREE.DstAlphaFactor,
+      'OneMinusDstAlphaFactor': THREE.OneMinusDstAlphaFactor,      
+      'DstColorFactor': THREE.DstColorFactor,
+      'OneMinusDstColorFactor': THREE.OneMinusDstColorFactor,
+      'SrcAlphaSaturateFactor': THREE.SrcAlphaSaturateFactor
+    },
+    'blendDst': {
+      'ZeroFactor': THREE.ZeroFactor,
+      'OneFactor': THREE.OneFactor,
+      'SrcColorFactor': THREE.SrcColorFactor,
+      'OneMinusSrcColorFactor': THREE.OneMinusSrcColorFactor,
+      'SrcAlphaFactor': THREE.SrcAlphaFactor,
+      'OneMinusSrcAlphaFactor': THREE.OneMinusSrcAlphaFactor,
+      'DstAlphaFactor': THREE.DstAlphaFactor,
+      'OneMinusDstAlphaFactor': THREE.OneMinusDstAlphaFactor
+    },
+    'blendEquation': {
+      'AddEquation': THREE.AddEquation,
+      'SubtractEquation': THREE.SubtractEquation,
+      'ReverseSubtractEquation': THREE.ReverseSubtractEquation
+    },
+    'wrapS': {
+      'RepeatWrapping': THREE.RepeatWrapping,
+      'ClampToEdgeWrapping': THREE.ClampToEdgeWrapping,
+      'MirroredRepeatWrapping': THREE.MirroredRepeatWrapping,
+    },
+    'wrapT': {
+      'RepeatWrapping': THREE.RepeatWrapping,
+      'ClampToEdgeWrapping': THREE.ClampToEdgeWrapping,
+      'MirroredRepeatWrapping': THREE.MirroredRepeatWrapping,
+    },
+    'magFilter': {
+      'NearestFilter': THREE.NearestFilter,
+      'NearestMipMapNearestFilter': THREE.NearestMipMapNearestFilter,
+      'NearestMipMapLinearFilter': THREE.NearestMipMapLinearFilter,
+      'LinearFilter': THREE.LinearFilter,
+      'LinearMipMapNearestFilter': THREE.LinearMipMapNearestFilter,
+      'LinearMipMapLinearFilter': THREE.LinearMipMapLinearFilter,
+    },
+    'minFilter': {
+      'NearestFilter': THREE.NearestFilter,
+      'NearestMipMapNearestFilter': THREE.NearestMipMapNearestFilter,
+      'NearestMipMapLinearFilter': THREE.NearestMipMapLinearFilter,
+      'LinearFilter': THREE.LinearFilter,
+      'LinearMipMapNearestFilter': THREE.LinearMipMapNearestFilter,
+      'LinearMipMapLinearFilter': THREE.LinearMipMapLinearFilter,
+    },
+    'type': {
+      'UnsignedByteType': THREE.UnsignedByteType,
+      'ByteType': THREE.ByteType,
+      'ShortType': THREE.ShortType,
+      'UnsignedShortType': THREE.UnsignedShortType,
+      'IntType': THREE.IntType,
+      'UnsignedIntType': THREE.UnsignedIntType,
+      'FloatType': THREE.FloatType
+    },
+    'format': {
+      'AlphaFormat': THREE.AlphaFormat,
+      'RGBFormat': THREE.RGBFormat,
+      'RGBAFormat': THREE.RGBAFormat,
+      'LuminanceFormat': THREE.LuminanceFormat,
+      'LuminanceAlphaFormat': THREE.LuminanceAlphaFormat,
+      'RGB_S3TC_DXT1_Format': THREE.RGB_S3TC_DXT1_Format,
+      'RGBA_S3TC_DXT1_Format': THREE.RGBA_S3TC_DXT1_Format,
+      'RGBA_S3TC_DXT3_Format': THREE.RGBA_S3TC_DXT3_Format,
+      'RGBA_S3TC_DXT5_Format': THREE.RGBA_S3TC_DXT5_Format,
+      'RGB_PVRTC_4BPPV1_Format': THREE.RGB_PVRTC_4BPPV1_Format,
+      'RGB_PVRTC_2BPPV1_Format': THREE.RGB_PVRTC_2BPPV1_Format,
+      'RGBA_PVRTC_4BPPV1_Format': THREE.RGBA_PVRTC_4BPPV1_Format,
+      'RGBA_PVRTC_2BPPV1_Format': THREE.RGBA_PVRTC_2BPPV1_Format,
+    }
+  }
 
   var container = new UI.Panel();
 
-  var group1 = new UI.Panel().setBorderTop( '1px solid #ccc' ).setPadding( '10px' );
-  var group2 = new UI.Panel().setBorderTop( '1px solid #ccc' ).setPadding( '10px' ).setOpacity( 0.5 );
-  var group3 = new UI.Panel().setBorderTop( '1px solid #ccc' ).setPadding( '10px' ).setOpacity( 0.25 );//.setDisplay( 'none' ); 
+  var group1 = new UI.Panel().setBorderTop( '1px solid #ccc' ).setPadding( '10px' ).setBackgroundColor( '#ddd' ); // Primary parameters
+  var group2 = new UI.Panel().setBorderTop( '1px solid #ccc' ).setPadding( '10px' ); // Secondary params 
+  var group3 = new UI.Panel().setBorderTop( '1px solid #ccc' ).setPadding( '10px' ).setBackgroundColor( '#ddd' ).setOpacity( 0.25 );//.setDisplay( 'none' ); // everything else
 
   container.add( group1, group2, group3 );
 
   signals.objectChanged.add( function ( changed ) {
       
-    if ( object === changed ) updateUI();
+    if ( model === changed ) updateUI();
 
   } );
 
   signals.selected.add( function ( selected ) {
       
     var selected = editor.listSelected();
-    object = ( selected.length ) ? selected[0] : null;
-
-    createUI();
-    updateUI();
+    var firstSelected = ( selected.length ) ? selected[0] : null;
+    createUI( firstSelected );
 
   } );
 
-  function createUI() {
+  function createUI( newModel ) {
+
+    model = newModel;
 
     param = {};
 
@@ -100,34 +147,106 @@ Sidebar.Attributes = function ( signals ) {
     while ( group2.dom.hasChildNodes() ) group2.dom.removeChild( group2.dom.lastChild );
     while ( group3.dom.hasChildNodes() ) group3.dom.removeChild( group3.dom.lastChild );
 
-    if ( object ) {
-
+    if ( model ) {
       for ( var i in primaryParams ) addElement( primaryParams[i], group1 );
-
       for ( var i in secondaryParams ) addElement( secondaryParams[i], group2 );
-
-      for ( var key in object ) addElement( key, group3 );
-
+      for ( var key in model ) addElement( key, group3 );
     }
 
+    updateUI();
 
   }
 
   function addElement( key, parent ) {
 
-    if ( object[ key ] !== undefined && param[ key ] === undefined ) {
+    if ( model[ key ] !== undefined && param[ key ] === undefined ) {
 
-      if ( typeof object[ key ] === 'string' ) {
+      // Params from multiOptions
+
+      for ( var i in multiOptions ) {
+        if ( i == key ) {
+          param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
+          parent.add( param[ key ] );
+          return;
+        }
+      }
+
+      // Special params
+
+      if ( key === 'parent' ) {
+
+        param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
+        param[ key ].name.setColor( '#0080f0' ).onClick( function(){ createUI( editor.objects[ param[ key ].getValue() ] ) } );
+        parent.add( param[ key ] );
+        return;
+
+      }
+
+      if ( key === 'geometry' ) {
+
+        param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
+        param[ key ].name.setColor( '#0080f0' ).onClick( function(){  createUI( editor.geometries[ param[ key ].getValue() ] ) } );
+        parent.add( param[ key ] );
+        return;
+
+      }
+
+      if ( key == 'material' ) {
+
+        param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
+        param[ key ].name.setColor( '#0080f0' ).onClick( function(){  createUI( editor.materials[ param[ key ].getValue() ] ) } );
+        parent.add( param[ key ] );
+        return;
+
+      }
+
+      if ( key == 'userData' ) {
+
+        param[ key ] = new UI.ParamJson( key ).onChange( updateParam );
+        parent.add( param[ key ] );
+        return;
+
+      }
+
+      // Texture params
+
+      for ( var i in textureParams ) {
+
+        if ( key == textureParams[ i ] ) {
+
+          param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
+          param[ key ].name.setColor( '#0080f0' ).onClick( function(){
+
+            var value = param[ key ].getValue();
+            if ( value == 'new' ) {
+
+              var texture = editor.createTexture();
+              model[ key ] = texture;
+              createUI( texture );
+
+            } else createUI( editor.textures[ value ] )
+
+          } );
+          parent.add( param[ key ] );
+          return;
+
+        }
+        
+      }
+
+      // Params by type
+
+      if ( typeof model[ key ] === 'string' ) {
 
         param[ key ] = new UI.ParamString( key ).onChange( updateParam );
         parent.add( param[ key ] );
 
-      } else if ( typeof object[ key ] === 'boolean' ) {
+      } else if ( typeof model[ key ] === 'boolean' ) {
 
         param[ key ] = new UI.ParamBool( key ).onChange( updateParam );
         parent.add( param[ key ] );
 
-      } else if ( typeof object[ key ] === 'number' ) {
+      } else if ( typeof model[ key ] === 'number' ) {
 
         if ( integerParams.indexOf( key ) != -1 )
           param[ key ] = new UI.ParamInteger( key ).onChange( updateParam );
@@ -137,39 +256,39 @@ Sidebar.Attributes = function ( signals ) {
         
         parent.add( param[ key ] );
 
-      } else if ( object[ key ] instanceof THREE.Vector3 ) {
+      } else if ( model[ key ] instanceof THREE.Vector2 ) {
 
-        var hasLock = ( key === 'scale' ) ? true : false;
-        param[ key ] = new UI.ParamVector3( key, hasLock ).onChange( updateParam );
+        param[ key ] = new UI.ParamVector2( key ).onChange( updateParam );
         parent.add( param[ key ] );
 
-      } else if ( object[ key ] instanceof THREE.Color ) {
+      } else if ( model[ key ] instanceof THREE.Vector3 ) {
+
+        param[ key ] = new UI.ParamVector3( key ).onChange( updateParam );
+        parent.add( param[ key ] );
+
+      } else if ( model[ key ] instanceof THREE.Vector4 || model[ key ] instanceof THREE.Quaternion ) {
+
+        param[ key ] = new UI.ParamVector4( key ).onChange( updateParam );
+        parent.add( param[ key ] );
+
+      } else if ( model[ key ] instanceof THREE.Color ) {
 
         param[ key ] = new UI.ParamColor( key ).onChange( updateParam );
         parent.add( param[ key ] );
 
-      } else if ( key === 'parent' ) {
+      } else if ( model[ key ] instanceof Array ) {
 
-        param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
-        param[ key ].name.setColor( '#0080f0' ).onClick( function(){  editor.select( editor.objects[ param[ key ].getValue() ] ) } );
-        parent.add( param[ key ] );
+        if ( model[ key ].length ) {
 
-      } else if ( key === 'geometry' ) {
+          param[ key ] = new UI.Text( key ).setColor( '#0080f0' ).onClick( function(){  createUI( model[ key ] ) } );
+          parent.add( param[ key ], new UI.Break() );
+          
+        }
 
-        param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
-        param[ key ].name.setColor( '#0080f0' ).onClick( function(){  editor.select( editor.geometries[ param[ key ].getValue() ] ) } );
-        parent.add( param[ key ] );
+      } else if ( typeof model[ key ] !== 'function' ) {
 
-      } else if ( key == 'material' ) {
-
-        param[ key ] = new UI.ParamSelect( key ).onChange( updateParam );
-        param[ key ].name.setColor( '#0080f0' ).onClick( function(){  editor.select( editor.materials[ param[ key ].getValue() ] ) } );
-        parent.add( param[ key ] );
-
-      } else if ( key == 'userData' ) {
-
-        param[ key ] = new UI.ParamJson( key ).onChange( updateParam );
-        parent.add( param[ key ] );
+        param[ key ] = new UI.Text( key ).setColor( '#0080f0' ).onClick( function(){  createUI( model[ key ] ) } );
+        parent.add( param[ key ], new UI.Break() );
 
       }
 
@@ -179,46 +298,56 @@ Sidebar.Attributes = function ( signals ) {
 
   function updateUI() {
 
-    if ( object ) {
+    if ( model ) {
 
-      for ( var key in object ) {
+      for ( var key in model ) {
 
-        if ( typeof object[ key ] === 'string' ) param[ key ].setValue( object[ key ] );
+        // Params from multiOptions
 
-        else if ( typeof object[ key ] === 'boolean' ) param[ key ].setValue( object[ key ] );
+        for ( var i in multiOptions ) {
+          if ( i == key ) {
+            for ( var j in multiOptions[ i ] ) {
 
-        else if ( typeof object[ key ] === 'number' ) param[ key ].setValue( object[ key ] );
+              var options = {};
 
-        else if ( object[ key ] instanceof THREE.Vector3 ) param[ key ].setValue( object[ key ] );
+              for ( var j in multiOptions[ i ] ) options[ multiOptions[ i ][ j ] ] = j;
+              
+              param[ key ].setOptions( options );
+              param[ key ].setValue( model[ key ] );
+              break;
 
-        else if ( object[ key ] instanceof THREE.Color ) param[ key ].setValue( object[ key ] );
+            }
+          }
+        }
 
-        else if ( object[ key ] && key === 'parent' ) {
+        // Special params
 
-          var options = {};
-          for ( var id in editor.objects ) if ( object.id != id ) options[ id ] = editor.objects[ id ].name;
-          param[ key ].setOptions( options );
-          if ( object.parent !== undefined ) param[ key ].setValue( object.parent.id );
-
-        } else if ( object[ key ] && key === 'geometry' ) {
-
-          var options = {};
-          for ( var id in editor.geometries ) if ( object.id != id ) options[ id ] = editor.geometries[ id ].name;
-          param[ key ].setOptions( options );
-          if ( object.geometry !== undefined ) param[ key ].setValue( object.geometry.id );
-
-        } else if ( object[ key ] && key === 'material' ) {
+        if ( key === 'parent' ) {
 
           var options = {};
-          for ( var id in editor.materials ) if ( object.id != id ) options[ id ] = editor.materials[ id ].name;
+          for ( var id in editor.objects ) if ( model.id != id ) options[ id ] = editor.objects[ id ].name;
           param[ key ].setOptions( options );
-          if ( object.material !== undefined ) param[ key ].setValue( object.material.id );
+          if ( model[ key ] !== undefined ) param[ key ].setValue( model[ key ].id );
+
+        } else if ( key === 'geometry' ) {
+
+          var options = {};
+          for ( var id in editor.geometries ) options[ id ] = editor.geometries[ id ].name;
+          param[ key ].setOptions( options );
+          if ( model[ key ] !== undefined ) param[ key ].setValue( model[ key ].id );
+
+        } else if ( key === 'material' ) {
+
+          var options = {};
+          for ( var id in editor.materials ) options[ id ] = editor.materials[ id ].name;
+          param[ key ].setOptions( options );
+          if ( model[ key ] !== undefined ) param[ key ].setValue( model[ key ].id );
 
         } else if ( key == 'userData' ) {
 
           try {
 
-            param[ key ].setValue( JSON.stringify( object.userData, null, '  ' ) );
+            param[ key ].setValue( JSON.stringify( model.userData, null, '  ' ) );
 
           } catch ( error ) {
 
@@ -226,7 +355,31 @@ Sidebar.Attributes = function ( signals ) {
 
           }
 
-        }
+        // Texture params
+
+        } else if ( textureParams.indexOf( key ) != -1 ) {
+
+          var options = {};
+          options[ 'new' ] = 'New texture';
+          for ( var id in editor.textures ) options[ id ] = editor.textures[ id ].name;
+          param[ key ].setOptions( options );
+
+          param[ key ].setValue( 'new' );
+          if ( model[ key ] ) param[ key ].setValue( model[ key ].id );
+
+        } 
+
+        // Params by type
+
+        else if ( typeof model[ key ] === 'string' ) param[ key ].setValue( model[ key ] );
+
+        else if ( typeof model[ key ] === 'boolean' ) param[ key ].setValue( model[ key ] );
+
+        else if ( typeof model[ key ] === 'number' ) param[ key ].setValue( model[ key ] );
+
+        else if ( model[ key ] instanceof THREE.Vector3 ) param[ key ].setValue( model[ key ] );
+
+        else if ( model[ key ] instanceof THREE.Color ) param[ key ].setValue( model[ key ] );
 
       }
 
@@ -237,59 +390,64 @@ Sidebar.Attributes = function ( signals ) {
   function updateParam( event ) {
 
     var key = event.srcElement.name;
+    var value = ( param[ key ].getValue ) ? param[ key ].getValue() : null;
 
-    if ( typeof object[ key ] === 'string' ) object[ key ] = param[ key ].getValue();
+    // Special params
 
-    else if ( typeof object[ key ] === 'boolean' ) object[ key ] = param[ key ].getValue();
+    if ( key === 'parent' ) editor.parent( object, editor.objects[ value ] );
 
-    else if ( typeof object[ key ] === 'number' ) object[ key ] = param[ key ].getValue();
+    else if ( key === 'geometry' ) model[ key ] = editor.geometries[ value ];
 
-    else if ( object[ key ] instanceof THREE.Color ) object[ key ].setHex( param[ key ].getValue() );
+    else if ( key === 'material' ) model[ key ] = editor.materials[ value ];
 
-    else if ( object[ key ] instanceof THREE.Vector3 ) object[ key ].copy( param[ key ].getValue() );
-
-    else if ( key === 'parent' ) {
-
-      if ( param[ key ].getValue() != object.id )
-        editor.parent( object, editor.objects[ param[ key ].getValue() ] );
-
-    } else if ( key === 'geometry' ) {
-
-      if ( param[ key ].getValue() != object.geometry.id )
-        object.geometry = editor.geometries[ param[ key ].getValue() ];
-
-    } else if ( key === 'material' ) {
-
-      if ( param[ key ].getValue() != object.material.id )
-        object.material = editor.materials[ param[ key ].getValue() ];
-
-    } else if ( key === 'userData' ) {
-
+    else if ( key === 'userData' ) {
+    
       try {
-
-        object.userData = JSON.parse( param[ key ].getValue() );
-
+         model[ key ] = JSON.parse( value );
       } catch ( error ) {
-
         console.log( error );
-
       }
+    
+    } else if ( textureParams.indexOf( key ) != -1 ) {
+      
+      if ( value == 'new' ) {
+
+        var texture = editor.createTexture();
+        model[ key ] = texture;
+        createUI( texture );
+
+      } else model[ key ] = editor.textures[ value ];
 
     }
 
-    if ( object instanceof THREE.Object3D ) {
+    // Params by type
 
-      signals.objectChanged.dispatch( object );
+    else if ( typeof model[ key ] === 'string' ) model[ key ] = value;
 
-    } else if ( object instanceof THREE.Geometry ) {
+    else if ( typeof model[ key ] === 'boolean' ) model[ key ] = value;
+
+    else if ( typeof model[ key ] === 'number' ) model[ key ] = parseFloat( value );
+
+    else if ( model[ key ] instanceof THREE.Color ) model[ key ].setHex( value );
+
+    else if ( model[ key ] instanceof THREE.Vector3 ) model[ key ].copy( value );
+
+    // Post actions
+
+    if ( model instanceof THREE.Object3D ) {
+
+      signals.objectChanged.dispatch( model );
+
+    } else if ( model instanceof THREE.Geometry ) {
 
       var geoParams = {};
-      for ( var i in param ) geoParams[ i ] = param[ i ].getValue();
-      editor.updateGeometry( object, geoParams );
+      for ( var i in param )
+        if ( param[ i ].getValue ) geoParams[ i ] = param[ i ].getValue();
+      editor.updateGeometry( model, geoParams );
 
-    } else if ( object instanceof THREE.Material ) {
+    } else if ( model instanceof THREE.Material ) {
 
-      signals.materialChanged.dispatch( object );
+      signals.materialChanged.dispatch( model );
 
     }
 
