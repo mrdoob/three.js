@@ -108,9 +108,26 @@ var Loader = function ( editor, signals ) {
 
 		} else if ( data.metadata.type === 'object' ) {
 
-			var loader = data.metadata.version === 4
-				? new THREE.ObjectLoader4()
-				: new THREE.ObjectLoader();
+			var loader;
+
+			switch ( data.metadata.version ) {
+
+				case 4:
+					console.log( 'Loading Object format 4.0');
+					loader = new THREE.ObjectLoader4(); // DEPRECATED
+					break;
+
+				case 4.1:
+					console.log( 'Loading Object format 4.1');
+					loader = new THREE.ObjectLoader41(); // DEPRECATED
+					break;
+
+				default:
+					console.log( 'Loading Object format 4.2');				
+					loader = new THREE.ObjectLoader();
+					break;
+
+			}
 
 			var result = loader.parse( data );
 

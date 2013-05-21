@@ -14,7 +14,7 @@ THREE.ObjectExporter.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.1,
+				version: 4.2,
 				type: 'object',
 				generator: 'ObjectExporter'
 			}
@@ -22,19 +22,22 @@ THREE.ObjectExporter.prototype = {
 
 		//
 
+		var geometries = {};
 		var geometryExporter = new THREE.GeometryExporter();
 
 		var parseGeometry = function ( geometry ) {
 
 			if ( output.geometries === undefined ) {
 
-				output.geometries = {};
+				output.geometries = [];
 
 			}
 
-			if ( output.geometries[ geometry.id ] === undefined ) {
+			if ( geometries[ geometry.id ] === undefined ) {
 
 				var data = {};
+
+				data.id = geometry.id;
 
 				if ( geometry.name !== "" ) data.name = geometry.name;
 
@@ -112,7 +115,9 @@ THREE.ObjectExporter.prototype = {
 
 				}
 
-				output.geometries[ geometry.id ] = data;
+				geometries[ geometry.id ] = data;
+
+				output.geometries.push( data );
 
 			}
 
@@ -122,23 +127,26 @@ THREE.ObjectExporter.prototype = {
 
 		//
 
+		var materials = {};
 		var materialExporter = new THREE.MaterialExporter();
 
 		var parseMaterial = function ( material ) {
 
 			if ( output.materials === undefined ) {
 
-				output.materials = {};
+				output.materials = [];
 
 			}
 
-			if ( output.materials[ material.id ] === undefined ) {
+			if ( materials[ material.id ] === undefined ) {
 
 				var data = materialExporter.parse( material );
 
 				delete data.metadata;
 
-				output.materials[ material.id ] = data;
+				materials[ material.id ] = data;
+
+				output.materials.push( data );
 
 			}
 
@@ -151,6 +159,8 @@ THREE.ObjectExporter.prototype = {
 		var parseObject = function ( object ) {
 
 			var data = {};
+
+			data.id = object.id;
 
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
@@ -239,12 +249,11 @@ THREE.ObjectExporter.prototype = {
 
 			if ( object.children.length > 0 ) {
 
-				data.children = {};
+				data.children = [];
 
 				for ( var i = 0; i < object.children.length; i ++ ) {
 
-					var child = object.children[ i ];
-					data.children[ child.id ] = parseObject( child );
+					data.children.push( parseObject( object.children[ i ] ) );
 
 				}
 

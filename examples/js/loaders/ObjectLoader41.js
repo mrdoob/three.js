@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ObjectLoader = function () {};
+THREE.ObjectLoader41 = function () {};
 
-THREE.ObjectLoader.prototype = {
+THREE.ObjectLoader41.prototype = {
 
 	constructor: THREE.ObjectLoader,
 
@@ -61,10 +61,10 @@ THREE.ObjectLoader.prototype = {
 
 			var loader = new THREE.JSONLoader();
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var id in json ) {
 
 				var geometry;
-				var data = json[ i ];
+				var data = json[ id ];
 
 				switch ( data.type ) {
 
@@ -162,10 +162,9 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
-				if ( data.id !== undefined ) geometry.id = data.id;
 				if ( data.name !== undefined ) geometry.name = data.name;
 
-				geometries[ data.id ] = geometry;
+				geometries[ id ] = geometry;
 
 			}
 
@@ -183,15 +182,14 @@ THREE.ObjectLoader.prototype = {
 
 			var loader = new THREE.MaterialLoader();
 
-			for ( var i = 0, l = json.length; i < l; i ++ ) {
+			for ( var id in json ) {
 
-				var data = json[ i ];
+				var data = json[ id ];
 				var material = loader.parse( data );
 
-				if ( data.id !== undefined ) material.id = data.id;
 				if ( data.name !== undefined ) material.name = data.name;
 
-				materials[ data.id ] = material;
+				materials[ id ] = material;
 
 			}
 
@@ -281,7 +279,6 @@ THREE.ObjectLoader.prototype = {
 
 		}
 
-		if ( data.id !== undefined ) object.id = data.id;
 		if ( data.name !== undefined ) object.name = data.name;
 		if ( data.visible !== undefined ) object.visible = data.visible;
 		if ( data.userData !== undefined ) object.userData = data.userData;
