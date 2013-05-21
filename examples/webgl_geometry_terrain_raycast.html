@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"><br /><br /><br /><br /><br />Generating world...</div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain raycasting demo<br />(left click: forward, right click: backward)</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl terrain raycasting demo</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -63,7 +63,7 @@
 			var clock = new THREE.Clock();
 
 			var shouldSphereFollowMouse = true;
-			var checkeredSphere;
+			var helper;
 
 			init();
 			animate();
@@ -106,11 +106,11 @@
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
 
-				var sphereGeometry = new THREE.SphereGeometry(100, 20, 20);
-				checkeredSphere = new THREE.Mesh(sphereGeometry, new THREE.MeshBasicMaterial( { map: generateCheckerTexture() } ) );
-				checkeredSphere.position.y = 1000;
-
-				scene.add( checkeredSphere );
+				var geometry = new THREE.CylinderGeometry( 0, 20, 100, 3 );
+				geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 50, 0 ) );
+				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( Math.PI / 2 ) );
+				helper = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial() );
+				scene.add( helper );
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -237,38 +237,6 @@
 
 			}
 
-			function generateCheckerTexture() {
-
-				var width = 128;
-				var height = 128;
-
-				var size = width * height;
-				var checkerSize = 16;
-				var checkerHalfSize = checkerSize / 2;
-				var data = new Uint8Array( 3 * size );
-
-				for ( var i = 0; i < height; ++i ) {
-
-					var index = i * width * 3;
-					var verticalShade = Math.floor((i / checkerSize) % 2);
-
-					for ( var j = 0; j < width; ++j ) {
-
-						var shade = Math.floor( (j / checkerSize + verticalShade) % 2);
-						shade *= 255.0;
-
-						data[ index + j * 3 ] 	  = shade;
-						data[ index + j * 3 + 1 ] = shade;
-						data[ index + j * 3 + 2 ] = shade;
-					}
-				}
-
-				var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
-				texture.needsUpdate = true;
-
-				return texture;
-			}
-
 			//
 
 			function animate() {
@@ -308,7 +276,11 @@
 
 					// Toggle rotation bool for meshes that we clicked
 					if ( intersects.length > 0 ) {
-						checkeredSphere.position = intersects[ 0 ].point;
+
+						helper.position.set( 0, 0, 0 );
+						helper.lookAt( intersects[ 0 ].face.normal );
+
+						helper.position.copy( intersects[ 0 ].point );
 
 					}
 				}
