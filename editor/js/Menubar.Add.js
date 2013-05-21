@@ -131,29 +131,29 @@ Menubar.Add = function ( signals ) {
 	} );
 	options.add( option );
 
-	// add spot light
+	// // add spot light
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Spot light' );
-	option.onClick( function () {
+	// var option = new UI.Panel();
+	// option.setClass( 'option' );
+	// option.setTextContent( 'Spot light' );
+	// option.onClick( function () {
 
-		editor.select( editor.createObject( 'SpotLight' ) );
+	// 	editor.select( editor.createObject( 'SpotLight' ) );
 
-	} );
-	options.add( option );
+	// } );
+	// options.add( option );
 
-	// add directional light
+	// // add directional light
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Directional light' );
-	option.onClick( function () {
+	// var option = new UI.Panel();
+	// option.setClass( 'option' );
+	// option.setTextContent( 'Directional light' );
+	// option.onClick( function () {
 
-		editor.select( editor.createObject( 'DirectionaLight' ) );
+	// 	editor.select( editor.createObject( 'DirectionalLight' ) );
 
-	} );
-	options.add( option );
+	// } );
+	// options.add( option );
 
 	// add hemisphere light
 
@@ -190,7 +190,7 @@ Menubar.Add = function ( signals ) {
 	option.setTextContent( 'Phong material' );
 	option.onClick( function () {
 
-		editor.select( editor.createMaterial( 'Phong' ) );
+		editor.select( editor.createMaterial( 'MeshPhongMaterial' ) );
 
 	} );
 	options.add( option );
@@ -200,7 +200,7 @@ Menubar.Add = function ( signals ) {
 	option.setTextContent( 'Lambert material' );
 	option.onClick( function () {
 
-		editor.select( editor.createMaterial( 'Lambert' ) );
+		editor.select( editor.createMaterial( 'MeshLambertMaterial' ) );
 
 	} );
 	options.add( option );
@@ -210,7 +210,7 @@ Menubar.Add = function ( signals ) {
 	option.setTextContent( 'Normal material' );
 	option.onClick( function () {
 
-		editor.select( editor.createMaterial( 'Normal' ) );
+		editor.select( editor.createMaterial( 'MeshNormalMaterial' ) );
 
 	} );
 	options.add( option );
@@ -220,7 +220,7 @@ Menubar.Add = function ( signals ) {
 	option.setTextContent( 'Basic material' );
 	option.onClick( function () {
 
-		editor.select( editor.createMaterial( 'Basic' ) );
+		editor.select( editor.createMaterial( 'MeshBasicMaterial' ) );
 
 	} );
 	options.add( option );

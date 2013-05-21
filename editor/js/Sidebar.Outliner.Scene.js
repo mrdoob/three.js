@@ -24,42 +24,6 @@ Sidebar.Outliner.Scene = function ( signals ) {
 	fogTypeRow.add( fogType );
 	container.add( fogTypeRow );
 
-	var fogColorRow = new UI.Panel();
-	fogColorRow.setDisplay( 'none' );
-	var fogColor = new UI.Color().setValue( '#aaaaaa' ).onChange(
-		function() { editor.setFog( { color: fogColor.getHexValue() } ) }
-	);
-	fogColorRow.add( new UI.Text( 'Fog color' ).setWidth( '90px' ).setColor( '#666' ) );
-	fogColorRow.add( fogColor );
-	container.add( fogColorRow );
-
-	var fogNearRow = new UI.Panel();
-	fogNearRow.setDisplay( 'none' );
-	var fogNear = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange(
-		function() { editor.setFog( { near: fogNear.getValue() } ) }
-	);
-	fogNearRow.add( new UI.Text( 'Fog near' ).setWidth( '90px' ).setColor( '#666' ) );
-	fogNearRow.add( fogNear );
-	container.add( fogNearRow );
-
-	var fogFarRow = new UI.Panel();
-	fogFarRow.setDisplay( 'none' );
-	var fogFar = new UI.Number( 5000 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange(
-		function() { editor.setFog( { far: fogFar.getValue() } ) }
-	);
-	fogFarRow.add( new UI.Text( 'Fog far' ).setWidth( '90px' ).setColor( '#666' ) );
-	fogFarRow.add( fogFar );
-	container.add( fogFarRow );
-
-	var fogDensityRow = new UI.Panel();
-	fogDensityRow.setDisplay( 'none' );
-	var fogDensity = new UI.Number( 0.00025 ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).onChange(
-		function() { editor.setFog( { density: fogDensity.getValue() } ) }
-	);
-	fogDensityRow.add( new UI.Text( 'Fog density' ).setWidth( '90px' ).setColor( '#666' ) );
-	fogDensityRow.add( fogDensity );
-	container.add( fogDensityRow );
-
 	//
 
 	var scene = null;
@@ -144,18 +108,13 @@ Sidebar.Outliner.Scene = function ( signals ) {
 
 		if ( scene.fog ) {
 
-			fogColor.setHexValue( scene.fog.color.getHex() );
-
 			if ( scene.fog instanceof THREE.Fog ) {
 
 				fogType.setValue( "Fog" );
-				fogNear.setValue( scene.fog.near );
-				fogFar.setValue( scene.fog.far );
 
 			} else if ( scene.fog instanceof THREE.FogExp2 ) {
 
 				fogType.setValue( "FogExp2" );
-				fogDensity.setValue( scene.fog.density );
 
 			}
 
@@ -166,11 +125,6 @@ Sidebar.Outliner.Scene = function ( signals ) {
 		}
 
 		var type = fogType.getValue();
-
-		fogColorRow.setDisplay( type === 'None' ? 'none' : '' );
-		fogNearRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
 
 	}
 
