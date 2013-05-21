@@ -794,7 +794,8 @@ def generate_indices_and_weights(meshes, option_skinning):
 
                 if i < len(bone_array):
                     bone_proxy = bone_array[i]
-
+                    
+                    found = 0
                     index = bone_proxy[0]
                     weight = bone_proxy[1]
 
@@ -802,7 +803,12 @@ def generate_indices_and_weights(meshes, option_skinning):
                         if object.vertex_groups[index].name == bone.name:
                             indices.append('%d' % j)
                             weights.append('%g' % weight)
+                            found = 1
                             break
+
+                    if found != 1:
+                        indices.append('0')
+                        weights.append('0')
 
                 else:
                     indices.append('0')
@@ -1416,6 +1422,9 @@ def extract_meshes(objects, scene, export_single_model, option_scale, flipyz):
 
                 else:
                     mesh.transform(object.matrix_world)
+                    
+                    
+            mesh.update(calc_tessface=True)
 
             mesh.calc_normals()
             mesh.calc_tessface()
@@ -1629,10 +1638,10 @@ def generate_objects(data):
         if obj.type == "MESH" and obj.THREE_exportGeometry:
             object_id = obj.name
 
-            if len(obj.modifiers) > 0:
-                geo_name = obj.name
-            else:
-                geo_name = obj.data.name
+            #if len(obj.modifiers) > 0:
+            #    geo_name = obj.name
+            #else:
+            geo_name = obj.data.name
 
             geometry_id = "geo_%s" % geo_name
 
@@ -1726,10 +1735,10 @@ def generate_geometries(data):
     for obj in data["objects"]:
         if obj.type == "MESH" and obj.THREE_exportGeometry:
 
-            if len(obj.modifiers) > 0:
-                name = obj.name
-            else:
-                name = obj.data.name
+            #if len(obj.modifiers) > 0:
+            #    name = obj.name
+            #else:
+            name = obj.data.name
 
             if name not in geo_set:
 
@@ -2327,13 +2336,13 @@ def save(operator, context, filepath = "",
                 # create extra copy of geometry with applied modifiers
                 # (if they exist)
 
-                if len(object.modifiers) > 0:
-                    name = object.name
+                #if len(object.modifiers) > 0:
+                #    name = object.name
 
                 # otherwise can share geometry
 
-                else:
-                    name = object.data.name
+                #else:
+                name = object.data.name
 
                 if name not in geo_set:
 
