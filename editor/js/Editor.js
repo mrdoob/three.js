@@ -5,11 +5,6 @@ var Editor = function ( scene ) {
   this.textures = {};
   this.objects = {};
 
-  this.geometriesCount = 0;
-  this.materialsCount = 0;
-  this.texturesCount = 0;
-  this.objectsCount = 0;
-
   this.selected = {};
   this.helpers = {};
 
@@ -50,9 +45,7 @@ Editor.prototype = {
 
   createObject: function( type, parameters, material ) {
 
-    this.objectsCount ++;
-
-    type = type ? type.toLowerCase() : null;
+    type = type ? type : 'Group';
 
     var object;
     var geometry;
@@ -61,6 +54,7 @@ Editor.prototype = {
 
     parameters = parameters ? parameters : {};
 
+    var name = parameters.name ? parameters.name : this.incrementName( type, 'object' );
     var color = parameters.color ? parameters.color : null;
     var groundColor = parameters.groundColor ? parameters.groundColor : null;
     var intensity = parameters.intensity ? parameters.intensity : null;
@@ -68,72 +62,56 @@ Editor.prototype = {
     var angle = parameters.angle ? parameters.angle : null;
     var exponent = parameters.exponent ? parameters.exponent : null;
 
-    if ( !type ) {
+    if ( type == 'Group' ) {
 
       object = new THREE.Object3D();
-      object.name = parameters.name ? parameters.name : 'Group ' + this.objectsCount;
 
-    } else if ( type == 'plane' ) {
+    } else if ( type == 'Plane' ) {
 
       geometry = this.createGeometry( type, parameters );
-
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : type + this.objectsCount;
 
       object.rotation.x = - Math.PI/2;
 
-    } else if ( type == 'cube' ) {
+    } else if ( type == 'Cube' ) {
 
       geometry = this.createGeometry( type, parameters );
-
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : type + this.objectsCount;
 
-    } else if ( type == 'cylinder' ) {
+    } else if ( type == 'Cylinder' ) {
 
       geometry = this.createGeometry( type, parameters );
-
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : type + this.objectsCount;
 
-    } else if ( type == 'sphere' ) {
+    } else if ( type == 'Sphere' ) {
 
       geometry = this.createGeometry( type, parameters );
-
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : type + this.objectsCount;
 
-    } else if ( type == 'icosahedron' ) {
+    } else if ( type == 'Icosahedron' ) {
 
       geometry = this.createGeometry( type, parameters );
-
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : type + this.objectsCount;
 
-    } else if ( type == 'torus' ) {
+    } else if ( type == 'Torus' ) {
 
       geometry = this.createGeometry( type, parameters );
-
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : type + this.objectsCount;
-
-    } else if ( type == 'torusknot' ) {
+      
+    } else if ( type == 'TorusKnot' ) {
 
       geometry = this.createGeometry( type, parameters );
-
       object = new THREE.Mesh( geometry, this.defaultMaterial );
-      object.name = name ? name : type + this.objectsCount;
 
-    } else if ( type == 'pointlight' ) {
+    } else if ( type == 'PointLight' ) {
 
       color = color ? color : 0xffffff;
       intensity = intensity ? intensity : 1;
       distance = distance ? distance : 0;
 
-      var object = new THREE.PointLight( color, intensity, distance );
-      object.name = name ? name : 'PointLight ' + this.objectsCount;
+      object = new THREE.PointLight( color, intensity, distance );
 
-    } else if ( type == 'spotlight' ) {
+    } else if ( type == 'SpotLight' ) {
 
       color = color ? color : 0xffffff;
       intensity = intensity ? intensity : 1;
@@ -141,44 +119,41 @@ Editor.prototype = {
       angle = angle ? angle : Math.PI * 0.1;
       exponent = exponent ? exponent : 10;
 
-      var object = new THREE.SpotLight( color, intensity, distance, angle, exponent );
-      object.name =  name ? name : 'SpotLight ' + this.objectsCount;
+      object = new THREE.SpotLight( color, intensity, distance, angle, exponent );
       object.target.name = object.name + ' Target';
 
       object.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
-    } else if ( type == 'directionallight' ) {
+    } else if ( type == 'DirectionalLight' ) {
 
       color = color ? color : 0xffffff;
       intensity = intensity ? intensity : 1;
 
-      var object = new THREE.DirectionalLight( color, intensity );
-      object.name = name ? name : 'DirectionalLight ' + this.objectsCount;
+      object = new THREE.DirectionalLight( color, intensity );
       object.target.name = object.name + ' Target';
 
       object.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-    } else if ( type == 'hemispherelight' ) {
+    } else if ( type == 'HemisphereLight' ) {
 
       color = color ? color : 0x00aaff;
       groundColor = groundColor ? groundColor : 0xffaa00;
       intensity = intensity ? intensity : 1;
 
-      var object = new THREE.HemisphereLight( color, groundColor, intensity );
-      object.name = name ? name : 'HemisphereLight ' + this.objectsCount;
+      object = new THREE.HemisphereLight( color, groundColor, intensity );
 
       object.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-    } else if ( type == 'ambientlight' ) {
+    } else if ( type == 'AmbientLight' ) {
 
       color = color ? color : 0x222222;
 
-      var object = new THREE.AmbientLight( color );
-      object.name = name ? name : 'AmbientLight ' + this.objectsCount;
+      object = new THREE.AmbientLight( color );
 
     }
 
-    if ( object ) this.addObject( object );
+    object.name = name;
+    this.addObject( object );
 
     return object;
 
@@ -186,12 +161,10 @@ Editor.prototype = {
 
   createGeometry: function( type, parameters ) {
 
-    this.geometriesCount ++;
-
-    type = type ? type : null;
+    type = type ? type : 'Geometry';
     parameters = parameters ? parameters : {};
 
-    var name = parameters.name ? parameters.name : type + 'Geometry ' + this.geometriesCount;
+    var name = parameters.name ? parameters.name : this.incrementName( type + 'Geometry', 'geometry' );
     var width = parameters.width ? parameters.width : null;
     var height = parameters.height ? parameters.height : null;
     var depth = parameters.depth ? parameters.depth : null;
@@ -217,11 +190,11 @@ Editor.prototype = {
 
     var geometry;
 
-    if ( !type ) {
+    if ( type == 'Geometry' ) {
 
       geometry = new THREE.Geometry();
 
-    } else if ( type == 'plane' ) {
+    } else if ( type == 'Plane' ) {
 
       width = width ? width : 200;
       height = height ? height : 200;
@@ -230,7 +203,7 @@ Editor.prototype = {
 
       geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
 
-    } else if ( type == 'cube' ) {
+    } else if ( type == 'Cube' ) {
 
       width = width ? width : 100;
       height = height ? height : 100;
@@ -241,7 +214,7 @@ Editor.prototype = {
 
       geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
 
-    } else if ( type == 'cylinder' ) {
+    } else if ( type == 'Cylinder' ) {
 
       radiusTop = radiusTop ? radiusTop : 20;
       radiusBottom = radiusBottom ? radiusBottom : 20;
@@ -252,7 +225,7 @@ Editor.prototype = {
 
       geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded );
 
-    } else if ( type == 'sphere' ) {
+    } else if ( type == 'Sphere' ) {
 
       radius = radius ? radius : 75;
       widthSegments = widthSegments ? widthSegments : 32;
@@ -266,14 +239,14 @@ Editor.prototype = {
 
       geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
 
-    } else if ( type == 'icosahedron' ) {
+    } else if ( type == 'Icosahedron' ) {
 
       radius = radius ? radius : 75;
       detail = detail ? detail : 2;
 
       geometry = new THREE.IcosahedronGeometry ( radius, detail );
 
-    } else if ( type == 'torus' ) {
+    } else if ( type == 'Torus' ) {
 
       radius = radius ? radius : 100;
       tube = tube ? tube : 40;
@@ -283,7 +256,7 @@ Editor.prototype = {
 
       geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
 
-    } else if ( type == 'torusknot' ) {
+    } else if ( type == 'TorusKnot' ) {
 
       radius = radius ? radius : 100;
       tube = tube ? tube : 40;
@@ -306,45 +279,38 @@ Editor.prototype = {
 
   createMaterial: function( type, parameters ) {
     
-    this.materialsCount ++;
-
-    type = type ? type.toLowerCase() : 'phong';
+    type = type ? type : 'MeshPhongMaterial';
 
     parameters = parameters ? parameters : {};
 
     var material;
-    var name = parameters.name ? parameters.name : null;
+    var name = parameters.name ? parameters.name : this.incrementName( type, 'material' );
 
-    if ( type == 'phong' ) {
+    if ( type == 'MeshPhongMaterial' ) {
 
       material = new THREE.MeshPhongMaterial( parameters );
-      material.name = name ? name : 'Phong Material ' + this.materialsCount;
 
-    } else if ( type == 'lambert' ) {
+    } else if ( type == 'MeshLambertMaterial' ) {
 
       material = new THREE.MeshLambertMaterial( parameters );
-      material.name = name ? name : 'Lambert Material ' + this.materialsCount;
 
-    } else if ( type == 'normal' ) {
+    } else if ( type == 'MeshNormalMaterial' ) {
 
       material = new THREE.MeshNormalMaterial( parameters );
-      material.name = name ? name : 'Normal Material ' + this.materialsCount;
 
-    } else if ( type == 'basic' ) {
+    } else if ( type == 'MeshBasicMaterial' ) {
 
       material = new THREE.MeshBasicMaterial( parameters );
-      material.name = name ? name : 'Basic Material ' + this.materialsCount;
 
     }
 
-    if ( material ) this.addMaterial( material );
+    material.name = name;
+    this.addMaterial( material );
     return material;
 
   },
 
   createTexture: function( image, parameters ) {
-
-    this.texturesCount ++;
 
     image = image ? image : '../examples/textures/ash_uvgrid01.jpg';
 
@@ -353,7 +319,7 @@ Editor.prototype = {
     // TODO: implement parameters
 
     var texture = THREE.ImageUtils.loadTexture( image );
-    texture.name = parameters.name ? parameters.name : 'Texture ' + this.texturesCount;
+    texture.name = parameters.name ? parameters.name : this.incrementName( 'Texture', 'texture' );
 
     this.addTexture( texture );
     return texture;
@@ -424,7 +390,7 @@ Editor.prototype = {
 
       this.helpers[ object.id ] = new THREE.SpotLightHelper( object, 10 );
       this.sceneHelpers.add( this.helpers[ object.id ] );
-      this.helpers[ object.id ].lightSphere.id = object.id;
+      // this.helpers[ object.id ].lightSphere.id = object.id;
 
     } else if ( object instanceof THREE.HemisphereLight ) {
 
@@ -433,6 +399,8 @@ Editor.prototype = {
       this.helpers[ object.id ].lightSphere.id = object.id;
 
     }
+
+    signals.sceneChanged.dispatch( this.scene );
 
   },
 
@@ -463,6 +431,7 @@ Editor.prototype = {
 
     this.materials[ material.id ] = material;
     signals.materialAdded.dispatch( material );
+    signals.sceneChanged.dispatch( this.scene );
 
   },
 
@@ -470,6 +439,7 @@ Editor.prototype = {
 
     this.textures[ texture.id ] = texture;
     signals.textureAdded.dispatch( texture );
+    signals.sceneChanged.dispatch( this.scene );
 
   },
 
@@ -935,8 +905,6 @@ Editor.prototype = {
 
     this.parent( group, parent );
 
-    console.log(group);
-
     this.parent( list, group );
 
   },
@@ -1029,25 +997,25 @@ Editor.prototype = {
     var name = geometry.name;
 
     if ( geometry instanceof THREE.PlaneGeometry )
-      geometry = this.createGeometry( 'plane', parameters );
+      geometry = this.createGeometry( 'Plane', parameters );
 
     if ( geometry instanceof THREE.CubeGeometry )
-      geometry = this.createGeometry( 'cube', parameters );
+      geometry = this.createGeometry( 'Cube', parameters );
 
     if ( geometry instanceof THREE.CylinderGeometry )
-      geometry = this.createGeometry( 'cylinder', parameters );
+      geometry = this.createGeometry( 'Cylinder', parameters );
 
     if ( geometry instanceof THREE.SphereGeometry )
-      geometry = this.createGeometry( 'sphere', parameters );
+      geometry = this.createGeometry( 'Sphere', parameters );
 
     if ( geometry instanceof THREE.IcosahedronGeometry )
-      geometry = this.createGeometry( 'icosahedron', parameters );
+      geometry = this.createGeometry( 'Icosahedron', parameters );
 
     if ( geometry instanceof THREE.TorusGeometry )
-      geometry = this.createGeometry( 'torus', parameters );
+      geometry = this.createGeometry( 'Torus', parameters );
 
     if ( geometry instanceof THREE.TorusKnotGeometry )
-      geometry = this.createGeometry( 'torusknot', parameters );
+      geometry = this.createGeometry( 'Torusknot', parameters );
 
     geometry.computeBoundingSphere();
     geometry.id = id;
@@ -1112,6 +1080,20 @@ Editor.prototype = {
 
     var regex = new RegExp(filter);
     return regex.test( name );
+
+  },
+
+  incrementName: function( name, type ) {
+
+    var list = this.listByName( name+'\\d+', type );
+    var lastIncrement = 0;
+
+    for ( var i in list ) {
+      var Increment = parseFloat( list[i].name.replace( name, '' ) );
+      if ( Increment > lastIncrement ) lastIncrement = Increment;
+    }
+    
+    return name + ( lastIncrement + 1 );
 
   }
 

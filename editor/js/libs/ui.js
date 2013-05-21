@@ -43,7 +43,7 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'boxSizing', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
@@ -199,6 +199,7 @@ UI.Text = function ( text ) {
 	dom.style.cursor = 'default';
 	dom.style.display = 'inline-block';
 	dom.style.verticalAlign = 'top';
+	dom.style.overflow = 'hidden';
 
 	this.dom = dom;
 	this.setValue( text );
@@ -233,6 +234,7 @@ UI.Input = function () {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Input';
 	dom.style.padding = '2px';
+	// dom.style.boxSizing = 'border-box';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLeft = '-2px';
 	dom.style.border = '1px solid #ccc';

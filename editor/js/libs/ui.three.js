@@ -22,9 +22,9 @@ UI.ParamString = function ( name ) {
 UI.ParamString.prototype = Object.create( UI.Panel.prototype );
 
 
-UI.ParamString.prototype.setValue = function ( value ) {
+UI.ParamString.prototype.setValue = function ( model ) {
 
-	this.string.setValue( value );
+	this.string.setValue( model );
 
 };
 
@@ -58,9 +58,9 @@ UI.ParamInteger = function ( name ) {
 
 UI.ParamInteger.prototype = Object.create( UI.Panel.prototype );
 
-UI.ParamInteger.prototype.setValue = function ( value ) {
+UI.ParamInteger.prototype.setValue = function ( model ) {
 
-	this.integer.setValue( value );
+	this.integer.setValue( model );
 
 };
 
@@ -93,9 +93,9 @@ UI.ParamFloat = function ( name ) {
 
 UI.ParamFloat.prototype = Object.create( UI.Panel.prototype );
 
-UI.ParamFloat.prototype.setValue = function ( value ) {
+UI.ParamFloat.prototype.setValue = function ( model ) {
 
-	this.float.setValue( value );
+	this.float.setValue( model );
 
 };
 
@@ -115,7 +115,7 @@ UI.ParamBool = function ( name ) {
 
 	var row = new UI.Panel();
 
-	this.name = new UI.Text( name ).setWidth( '90px' ).setColor( '#666' ).setPosition( 'relative' ).setLeft( '25px' );
+	this.name = new UI.Text( name ).setWidth( 'auto' ).setColor( '#666' ).setPosition( 'relative' ).setLeft( '25px' );
 	this.bool = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '10px' );
 	this.bool.dom.name = name;
 
@@ -128,9 +128,9 @@ UI.ParamBool = function ( name ) {
 
 UI.ParamBool.prototype = Object.create( UI.Panel.prototype );
 
-UI.ParamBool.prototype.setValue = function ( value ) {
+UI.ParamBool.prototype.setValue = function ( model ) {
 
-	this.bool.setValue( value );
+	this.bool.setValue( model );
 
 };
 
@@ -141,13 +141,11 @@ UI.ParamBool.prototype.getValue = function () {
 
 };
 
-// Vector3
+// Vector2
 
-UI.ParamVector3 = function ( name, scaleLock ) {
+UI.ParamVector2 = function ( name ) {
 
   UI.Panel.call( this );
-
-  scaleLock = scaleLock ? scaleLock : false;
 
 	var scope = this;
 
@@ -155,55 +153,91 @@ UI.ParamVector3 = function ( name, scaleLock ) {
 
 	this.name = new UI.Text( name ).setWidth( '90px' ).setColor( '#666' );
 
-	this.x = new UI.Number().setWidth( '50px' ).onChange( setYZ );
-	this.y = new UI.Number().setWidth( '50px' ).onChange( setXZ );
-	this.z = new UI.Number().setWidth( '50px' ).onChange( setXY );
+	this.x = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.y ] ) } );
+	this.y = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.x ] ) } );
+
+	this.x.dom.name = name;
+	this.y.dom.name = name;
+	
+	row.add( this.name, this.x, this.y );
+	
+	this.scaleLock = new UI.Checkbox().setPosition( 'absolute' ).setRight( '10px' );
+	row.add( this.scaleLock );
+
+	this.add( row );
+
+	function scaleProportionately( event, targets ) {
+
+		if ( scope.scaleLock && scope.scaleLock.getValue() && event.srcElement.oldValue ) {
+
+			var scale = event.srcElement.value / event.srcElement.oldValue;
+			for ( var i in targets ) {
+
+				targets[ i ].setValue( parseFloat(targets[ i ].getValue()) * scale );
+			
+			}
+
+		}
+
+	}
+
+	return this;
+
+};
+
+UI.ParamVector2.prototype = Object.create( UI.Panel.prototype );
+
+UI.ParamVector2.prototype.setValue = function ( model ) {
+
+	this.x.setValue( model.x );
+	this.y.setValue( model.y );
+
+};
+
+UI.ParamVector2.prototype.getValue = function () {
+
+	return new THREE.Vector2( this.x.getValue(), this.y.getValue() );
+
+};
+
+// Vector3
+
+UI.ParamVector3 = function ( name ) {
+
+  UI.Panel.call( this );
+
+	var scope = this;
+
+	var row = new UI.Panel();
+
+	this.name = new UI.Text( name ).setWidth( '90px' ).setColor( '#666' );
+
+	this.x = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.y, scope.z ] ) } );
+	this.y = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.x, scope.z ] ) } );
+	this.z = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.x, scope.y ] ) } );
+
 	this.x.dom.name = name;
 	this.y.dom.name = name;
 	this.z.dom.name = name;
 	
 	row.add( this.name, this.x, this.y, this.z );
-
-	if ( scaleLock ) {
 	
-		this.scaleLock = new UI.Checkbox().setPosition( 'absolute' ).setLeft( '75px' );
-		row.add( this.scaleLock );
+	this.scaleLock = new UI.Checkbox().setPosition( 'absolute' ).setRight( '10px' );
+	row.add( this.scaleLock );
 
-	}
 
 	this.add( row );
 
-	function setYZ( event ) {
+	function scaleProportionately( event, targets ) {
 
 		if ( scope.scaleLock && scope.scaleLock.getValue() && event.srcElement.oldValue ) {
 
 			var scale = event.srcElement.value / event.srcElement.oldValue;
-			scope.y.setValue( parseFloat(scope.y.getValue()) * scale );
-			scope.z.setValue( parseFloat(scope.z.getValue()) * scale );
+			for ( var i in targets ) {
 
-		}
-
-	}
-
-	function setXZ( event ) {
-
-		if ( scope.scaleLock && scope.scaleLock.getValue() && event.srcElement.oldValue ) {
-
-			var scale = event.srcElement.value / event.srcElement.oldValue;
-			scope.x.setValue( parseFloat(scope.x.getValue()) * scale );
-			scope.z.setValue( parseFloat(scope.z.getValue()) * scale );
-
-		}
-
-	}
-
-	function setXY( event ) {
-
-		if ( scope.scaleLock && scope.scaleLock.getValue() && event.srcElement.oldValue ) {
-
-			var scale = event.srcElement.value / event.srcElement.oldValue;
-			scope.x.setValue( parseFloat(scope.x.getValue()) * scale );
-			scope.y.setValue( parseFloat(scope.y.getValue()) * scale );
+				targets[ i ].setValue( parseFloat(targets[ i ].getValue()) * scale );
+			
+			}
 
 		}
 
@@ -215,18 +249,82 @@ UI.ParamVector3 = function ( name, scaleLock ) {
 
 UI.ParamVector3.prototype = Object.create( UI.Panel.prototype );
 
-UI.ParamVector3.prototype.setValue = function ( value ) {
+UI.ParamVector3.prototype.setValue = function ( model ) {
 
-	this.x.setValue( value.x );
-	this.y.setValue( value.y );
-	this.z.setValue( value.z );
+	this.x.setValue( model.x );
+	this.y.setValue( model.y );
+	this.z.setValue( model.z );
 
 };
-
 
 UI.ParamVector3.prototype.getValue = function () {
 
 	return new THREE.Vector3( this.x.getValue(), this.y.getValue(), this.z.getValue() );
+
+};
+
+// Vector4
+
+UI.ParamVector4 = function ( name ) {
+
+  UI.Panel.call( this );
+
+	var scope = this;
+
+	var row = new UI.Panel();
+
+	this.name = new UI.Text( name ).setWidth( '90px' ).setColor( '#666' );
+
+	this.x = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.y, scope.z, scope.w ] ) } );
+	this.y = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.x, scope.z, scope.w ] ) } );
+	this.z = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.x, scope.y, scope.w ] ) } );
+	this.w = new UI.Number().setWidth( '35px' ).onChange( function( event ) { scaleProportionately( event, [ scope.x, scope.y, scope.z ] ) } );
+
+	this.x.dom.name = name;
+	this.y.dom.name = name;
+	this.z.dom.name = name;
+	this.w.dom.name = name;
+	
+	row.add( this.name, this.x, this.y, this.z, this.w );
+
+	this.scaleLock = new UI.Checkbox().setPosition( 'absolute' ).setRight( '10px' );
+	row.add( this.scaleLock );
+
+	this.add( row );
+
+	function scaleProportionately( event, targets ) {
+
+		if ( scope.scaleLock && scope.scaleLock.getValue() && event.srcElement.oldValue ) {
+
+			var scale = event.srcElement.value / event.srcElement.oldValue;
+			for ( var i in targets ) {
+
+				targets[ i ].setValue( parseFloat(targets[ i ].getValue()) * scale );
+			
+			}
+
+		}
+
+	}
+
+	return this;
+
+};
+
+UI.ParamVector4.prototype = Object.create( UI.Panel.prototype );
+
+UI.ParamVector4.prototype.setValue = function ( model ) {
+
+	this.x.setValue( model.x );
+	this.y.setValue( model.y );
+	this.z.setValue( model.z );
+	this.w.setValue( model.w );
+
+};
+
+UI.ParamVector4.prototype.getValue = function () {
+
+	return new THREE.Vector4( this.x.getValue(), this.y.getValue(), this.z.getValue(), this.w.getValue() );
 
 };
 
@@ -259,7 +357,6 @@ UI.ParamColor.prototype.setValue = function ( color ) {
 
 };
 
-
 UI.ParamColor.prototype.getValue = function () {
 
 	return this.color.getHexValue();
@@ -291,12 +388,11 @@ UI.ParamSelect = function ( name ) {
 
 UI.ParamSelect.prototype = Object.create( UI.Panel.prototype );
 
-UI.ParamSelect.prototype.setValue = function ( value ) {
+UI.ParamSelect.prototype.setValue = function ( model ) {
 
-	this.select.setValue( value );
+	this.select.setValue( model );
 
 };
-
 
 UI.ParamSelect.prototype.getValue = function ( value ) {
 
@@ -394,7 +490,7 @@ UI.Texture.prototype.getValue = function () {
 
 };
 
-UI.Texture.prototype.setValue = function ( value ) {
+UI.Texture.prototype.setValue = function ( model ) {
 
 	this.texture = value;
 
@@ -463,7 +559,7 @@ UI.CubeTexture.prototype.getValue = function () {
 
 };
 
-UI.CubeTexture.prototype.setValue = function ( value ) {
+UI.CubeTexture.prototype.setValue = function ( model ) {
 
 	this.texture = value;
 
@@ -510,12 +606,11 @@ UI.ParamJson = function ( name ) {
 
 UI.ParamJson.prototype = Object.create( UI.Panel.prototype );
 
-UI.ParamJson.prototype.setValue = function ( value ) {
+UI.ParamJson.prototype.setValue = function ( model ) {
 
-	this.json.setValue( value );
+	this.json.setValue( model );
 
 };
-
 
 UI.ParamJson.prototype.getValue = function () {
 
