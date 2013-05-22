@@ -58,7 +58,10 @@
 			} );
 
 		} else if (object instanceof THREE.ParticleSystem) {
-			//See: https://github.com/mrdoob/three.js/issues/3492
+			/* 	See: https://github.com/mrdoob/three.js/issues/3492
+				Original Source code: 
+					https://github.com/jpweeks/three.js/blob/particle-ray/src/core/Ray.js#L186-L216
+			*/
             
 			var vertices = object.geometry.vertices;
 			var point, distance, intersect, threshold = 5;
