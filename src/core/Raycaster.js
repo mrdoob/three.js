@@ -68,18 +68,15 @@
 			var localDirection = localtempRay.direction;
 			
 			localMatrix.getInverse(object.matrixWorld);
-			//localMatrix.multiplyVector3(localOrigin);
 			localOrigin.applyMatrix4(localMatrix);
-			//localMatrix.rotateAxis(localDirection).normalize();
 			localDirection.transformDirection(localMatrix);
 			
 			for ( var i = 0; i < vertices.length; i ++ ) {
 				point = vertices[ i ];
-				//distance = this.distanceFromIntersection( localOrigin, localDirection, point );
 				distance = localtempRay.distanceToPoint(point);
-				//if ( distance > threshold ) {
-				//    continue;
-				//}
+				if ( distance > threshold ) {
+				    continue;
+				}
 				intersect = {
 				    distance: distance,
 				    point: point.clone(),
