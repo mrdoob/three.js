@@ -62,7 +62,7 @@ Sidebar.Animation = function ( signals ) {
 		}
 
 	} );
-s
+
 	return container;
 
 }
