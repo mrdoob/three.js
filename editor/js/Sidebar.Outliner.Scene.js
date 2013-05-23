@@ -88,19 +88,19 @@ Sidebar.Outliner.Scene = function ( signals ) {
 
 	}
 
-  function getSelected() {
+	function getSelected() {
 
-    var selectedIds = [];
+		var selectedIds = [];
 
-    for ( var id in editor.selected ) {
+		for ( var id in editor.selected ) {
 
-      if ( editor.objects[ id ] ) selectedIds.push( id );
+			if ( editor.objects[ id ] ) selectedIds.push( id );
 
-    }
+		}
 
-    outliner.setValue( selectedIds.length ? selectedIds : null );
+		outliner.setValue( selectedIds.length ? selectedIds : null );
 
-  }
+	}
 
 	function getFog() {
 
@@ -134,13 +134,13 @@ Sidebar.Outliner.Scene = function ( signals ) {
 
 	signals.sceneChanged.add( function ( object ) {
 
-    clearTimeout( timeout );
+		clearTimeout( timeout );
 
-    timeout = setTimeout( function () {
+		timeout = setTimeout( function () {
 
-      getScene();
+			getScene();
 
-    }, 100 );
+		}, 100 );
 
 	} );
 

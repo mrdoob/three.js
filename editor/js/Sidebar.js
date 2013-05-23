@@ -5,9 +5,9 @@ var Sidebar = function ( editor, signals ) {
 	container.setClass( 'sidebar' );
 
 	container.add( new Sidebar.Renderer( signals ) );
-  container.add( new Sidebar.Outliner( signals ) );
-  container.add( new Sidebar.Attributes( signals ) );
-  container.add( new Sidebar.Animation( signals ) );
+	container.add( new Sidebar.Outliner( signals ) );
+	container.add( new Sidebar.Attributes( signals ) );
+	container.add( new Sidebar.Animation( signals ) );
 
 	return container;
 

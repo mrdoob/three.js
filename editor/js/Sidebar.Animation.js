@@ -16,15 +16,15 @@ Sidebar.Animation = function ( signals ) {
 	AnimationsRow.add( Animations );
 	container.add( AnimationsRow );
 	container.add( new UI.Break() );
-		
+
 	var PlayRow = new UI.Panel();
 	var playButton = new UI.Button().setLabel("Play").onClick(play);
 	PlayRow.add( playButton );
 	container.add( PlayRow );
 	container.add( new UI.Break() );
-	
+
 	function play(){
-		
+
 		var value = Animations.getValue();
 		if (possibleAnimations[value]){
 			var anims = possibleAnimations[value]
@@ -33,8 +33,9 @@ Sidebar.Animation = function ( signals ) {
 			}
 			signals.playAnimations.dispatch( anims );
 		};
+
 	}
-	
+
 	signals.objectAdded.add( function ( object ) {
 
 		if (object instanceof THREE.Mesh){
@@ -44,24 +45,24 @@ Sidebar.Animation = function ( signals ) {
 				var name = object.geometry.animation.name;
 				options[name] = name
 				Animations.setOptions(options);
-				
+
 				THREE.AnimationHandler.add(object.geometry.animation);
 				var animation = new THREE.Animation(object, 
      				name, 
      				THREE.AnimationHandler.CATMULLROM)
-				
+
 				if (possibleAnimations[name]){
 					possibleAnimations[name].push(animation);
 				} else {
 					possibleAnimations[name] = [animation];
 				}
-				
+
 			}
-			
+
 		}
 
 	} );
-	
+s
 	return container;
 
 }

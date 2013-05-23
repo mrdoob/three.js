@@ -314,7 +314,7 @@ var Viewport = function ( editor, signals ) {
 		animate();
 
 	} );
-	
+
 	//
 
 	var renderer;

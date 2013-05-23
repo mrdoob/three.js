@@ -9,7 +9,7 @@ Sidebar.Outliner.Materials = function ( signals ) {
 
 	var materials = null;
 
-  function getMaterials() {
+	function getMaterials() {
 
 		var options = {};
 
@@ -21,24 +21,24 @@ Sidebar.Outliner.Materials = function ( signals ) {
 		}
 
 		outliner.setOptions( options );
-    getSelected();
+		getSelected();
 
-  }
+	}
 
-  function getSelected() {
+	function getSelected() {
 
-    var selectedIds = [];
+		var selectedIds = [];
 
-    for ( var id in editor.selected ) {
+		for ( var id in editor.selected ) {
 
-      if ( editor.materials[ id ] ) selectedIds.push( id );
+			if ( editor.materials[ id ] ) selectedIds.push( id );
 
-    }
+		}
 
-    // TODO: implement multiple selection
-    outliner.setValue( selectedIds.length ? selectedIds[0] : null );
+		// TODO: implement multiple selection
+		outliner.setValue( selectedIds.length ? selectedIds[0] : null );
 
-  }
+	}
 
 	function selectFromOutliner() {
 
@@ -50,21 +50,21 @@ Sidebar.Outliner.Materials = function ( signals ) {
 
 	// events
 
-  var timeout;
+	var timeout;
 
 	signals.sceneChanged.add( function () {
 
-    clearTimeout( timeout );
+		clearTimeout( timeout );
 
-    timeout = setTimeout( function () {
+		timeout = setTimeout( function () {
 
-      getMaterials();
+			getMaterials();
 
-    }, 100 );
+		}, 100 );
 
 	} );
 
-  signals.selected.add( getSelected );
+	signals.selected.add( getSelected );
 
 	return container;
 

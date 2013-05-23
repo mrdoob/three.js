@@ -1,1100 +1,1100 @@
 var Editor = function ( scene ) {
 
-  this.geometries = {};
-  this.materials = {};
-  this.textures = {};
-  this.objects = {};
+	this.geometries = {};
+	this.materials = {};
+	this.textures = {};
+	this.objects = {};
 
-  this.selected = {};
-  this.helpers = {};
+	this.selected = {};
+	this.helpers = {};
 
-  this.scene = new THREE.Scene();
-  this.scene.name = ( scene && scene.name ) ? scene.name : 'Scene';
-  this.addObject( this.scene );
-  
-  this.sceneHelpers = new THREE.Scene();
+	this.scene = new THREE.Scene();
+	this.scene.name = ( scene && scene.name ) ? scene.name : 'Scene';
+	this.addObject( this.scene );
 
-  this.defaultMaterial = new THREE.MeshPhongMaterial();
-  this.defaultMaterial.name = 'Default Material';
-  this.addMaterial( this.defaultMaterial );
+	this.sceneHelpers = new THREE.Scene();
+
+	this.defaultMaterial = new THREE.MeshPhongMaterial();
+	this.defaultMaterial.name = 'Default Material';
+	this.addMaterial( this.defaultMaterial );
 
 }
 
 Editor.prototype = {
 
-  // Assets
+	// Assets
 
-  setScene: function( scene ) {
+	setScene: function( scene ) {
 
-    this.deleteAll(); // WARNING! deletes everything 
+		this.deleteAll(); // WARNING! deletes everything 
 
-    if ( scene ) {
+		if ( scene ) {
 
-      this.scene.name = scene.name;
-      this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
+			this.scene.name = scene.name;
+			this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
-      if ( scene.children.length ) this.addObject( scene.children );
+			if ( scene.children.length ) this.addObject( scene.children );
 
-    }
+		}
 
-    signals.sceneChanged.dispatch( this.scene );
+		signals.sceneChanged.dispatch( this.scene );
 
-    return this.scene 
+		return this.scene 
 
-  },
+	},
 
-  createObject: function( type, parameters, material ) {
+	createObject: function( type, parameters, material ) {
 
-    type = type ? type : 'Group';
+		type = type ? type : 'Group';
 
-    var object;
-    var geometry;
+		var object;
+		var geometry;
 
-    material = material ? material : this.defaultMaterial;
+		material = material ? material : this.defaultMaterial;
 
-    parameters = parameters ? parameters : {};
+		parameters = parameters ? parameters : {};
 
-    var name = parameters.name ? parameters.name : this.incrementName( type, 'object' );
-    var color = parameters.color ? parameters.color : null;
-    var groundColor = parameters.groundColor ? parameters.groundColor : null;
-    var intensity = parameters.intensity ? parameters.intensity : null;
-    var distance = parameters.distance ? parameters.distance : null;
-    var angle = parameters.angle ? parameters.angle : null;
-    var exponent = parameters.exponent ? parameters.exponent : null;
+		var name = parameters.name ? parameters.name : this.incrementName( type, 'object' );
+		var color = parameters.color ? parameters.color : null;
+		var groundColor = parameters.groundColor ? parameters.groundColor : null;
+		var intensity = parameters.intensity ? parameters.intensity : null;
+		var distance = parameters.distance ? parameters.distance : null;
+		var angle = parameters.angle ? parameters.angle : null;
+		var exponent = parameters.exponent ? parameters.exponent : null;
 
-    if ( type == 'Group' ) {
+		if ( type == 'Group' ) {
 
-      object = new THREE.Object3D();
+			object = new THREE.Object3D();
 
-    } else if ( type == 'Plane' ) {
+		} else if ( type == 'Plane' ) {
 
-      geometry = this.createGeometry( type, parameters );
-      object = new THREE.Mesh( geometry, this.defaultMaterial );
+			geometry = this.createGeometry( type, parameters );
+			object = new THREE.Mesh( geometry, this.defaultMaterial );
 
-      object.rotation.x = - Math.PI/2;
+			object.rotation.x = - Math.PI/2;
 
-    } else if ( type == 'Cube' ) {
+		} else if ( type == 'Cube' ) {
 
-      geometry = this.createGeometry( type, parameters );
-      object = new THREE.Mesh( geometry, this.defaultMaterial );
+			geometry = this.createGeometry( type, parameters );
+			object = new THREE.Mesh( geometry, this.defaultMaterial );
 
-    } else if ( type == 'Cylinder' ) {
+		} else if ( type == 'Cylinder' ) {
 
-      geometry = this.createGeometry( type, parameters );
-      object = new THREE.Mesh( geometry, this.defaultMaterial );
+			geometry = this.createGeometry( type, parameters );
+			object = new THREE.Mesh( geometry, this.defaultMaterial );
 
-    } else if ( type == 'Sphere' ) {
+		} else if ( type == 'Sphere' ) {
 
-      geometry = this.createGeometry( type, parameters );
-      object = new THREE.Mesh( geometry, this.defaultMaterial );
+			geometry = this.createGeometry( type, parameters );
+			object = new THREE.Mesh( geometry, this.defaultMaterial );
 
-    } else if ( type == 'Icosahedron' ) {
+		} else if ( type == 'Icosahedron' ) {
 
-      geometry = this.createGeometry( type, parameters );
-      object = new THREE.Mesh( geometry, this.defaultMaterial );
+			geometry = this.createGeometry( type, parameters );
+			object = new THREE.Mesh( geometry, this.defaultMaterial );
 
-    } else if ( type == 'Torus' ) {
+		} else if ( type == 'Torus' ) {
 
-      geometry = this.createGeometry( type, parameters );
-      object = new THREE.Mesh( geometry, this.defaultMaterial );
-      
-    } else if ( type == 'TorusKnot' ) {
+			geometry = this.createGeometry( type, parameters );
+			object = new THREE.Mesh( geometry, this.defaultMaterial );
 
-      geometry = this.createGeometry( type, parameters );
-      object = new THREE.Mesh( geometry, this.defaultMaterial );
+		} else if ( type == 'TorusKnot' ) {
 
-    } else if ( type == 'PointLight' ) {
+			geometry = this.createGeometry( type, parameters );
+			object = new THREE.Mesh( geometry, this.defaultMaterial );
 
-      color = color ? color : 0xffffff;
-      intensity = intensity ? intensity : 1;
-      distance = distance ? distance : 0;
+		} else if ( type == 'PointLight' ) {
 
-      object = new THREE.PointLight( color, intensity, distance );
+			color = color ? color : 0xffffff;
+			intensity = intensity ? intensity : 1;
+			distance = distance ? distance : 0;
 
-    } else if ( type == 'SpotLight' ) {
+			object = new THREE.PointLight( color, intensity, distance );
 
-      color = color ? color : 0xffffff;
-      intensity = intensity ? intensity : 1;
-      distance = distance ? distance : 0;
-      angle = angle ? angle : Math.PI * 0.1;
-      exponent = exponent ? exponent : 10;
+		} else if ( type == 'SpotLight' ) {
 
-      object = new THREE.SpotLight( color, intensity, distance, angle, exponent );
-      object.target.name = object.name + ' Target';
+			color = color ? color : 0xffffff;
+			intensity = intensity ? intensity : 1;
+			distance = distance ? distance : 0;
+			angle = angle ? angle : Math.PI * 0.1;
+			exponent = exponent ? exponent : 10;
 
-      object.position.set( 0, 1, 0 ).multiplyScalar( 200 );
+			object = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+			object.target.name = object.name + ' Target';
 
-    } else if ( type == 'DirectionalLight' ) {
+			object.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
-      color = color ? color : 0xffffff;
-      intensity = intensity ? intensity : 1;
+		} else if ( type == 'DirectionalLight' ) {
 
-      object = new THREE.DirectionalLight( color, intensity );
-      object.target.name = object.name + ' Target';
+			color = color ? color : 0xffffff;
+			intensity = intensity ? intensity : 1;
 
-      object.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+			object = new THREE.DirectionalLight( color, intensity );
+			object.target.name = object.name + ' Target';
 
-    } else if ( type == 'HemisphereLight' ) {
+			object.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-      color = color ? color : 0x00aaff;
-      groundColor = groundColor ? groundColor : 0xffaa00;
-      intensity = intensity ? intensity : 1;
+		} else if ( type == 'HemisphereLight' ) {
 
-      object = new THREE.HemisphereLight( color, groundColor, intensity );
+			color = color ? color : 0x00aaff;
+			groundColor = groundColor ? groundColor : 0xffaa00;
+			intensity = intensity ? intensity : 1;
 
-      object.position.set( 1, 1, 1 ).multiplyScalar( 200 );
+			object = new THREE.HemisphereLight( color, groundColor, intensity );
 
-    } else if ( type == 'AmbientLight' ) {
+			object.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-      color = color ? color : 0x222222;
+		} else if ( type == 'AmbientLight' ) {
 
-      object = new THREE.AmbientLight( color );
+			color = color ? color : 0x222222;
 
-    }
+			object = new THREE.AmbientLight( color );
 
-    object.name = name;
-    this.addObject( object );
+		}
 
-    return object;
+		object.name = name;
+		this.addObject( object );
 
-  },
+		return object;
 
-  createGeometry: function( type, parameters ) {
+	},
 
-    type = type ? type : 'Geometry';
-    parameters = parameters ? parameters : {};
+	createGeometry: function( type, parameters ) {
 
-    var name = parameters.name ? parameters.name : this.incrementName( type + 'Geometry', 'geometry' );
-    var width = parameters.width ? parameters.width : null;
-    var height = parameters.height ? parameters.height : null;
-    var depth = parameters.depth ? parameters.depth : null;
-    var widthSegments = parameters.widthSegments ? parameters.widthSegments : null;
-    var heightSegments = parameters.heightSegments ? parameters.heightSegments : null;
-    var depthSegments = parameters.depthSegments ? parameters.depthSegments : null;
-    var radialSegments = parameters.radialSegments ? parameters.radialSegments : null;
-    var tubularSegments = parameters.tubularSegments ? parameters.tubularSegments : null;
-    var radius = parameters.radius ? parameters.radius : null;
-    var radiusTop = parameters.radiusTop ? parameters.radiusTop : null;
-    var radiusBottom = parameters.radiusBottom ? parameters.radiusBottom : null;
-    var phiStart = parameters.phiStart ? parameters.phiStart : null;
-    var phiLength = parameters.phiLength ? parameters.phiLength : null;
-    var thetaStart = parameters.thetaStart ? parameters.thetaStart : null;
-    var thetaLength = parameters.thetaLength ? parameters.thetaLength : null;
-    var tube = parameters.tube ? parameters.tube : null;
-    var arc = parameters.arc ? parameters.arc : null;
-    var detail = parameters.detail ? parameters.detail : null;
-    var p = parameters.p ? parameters.p : null;
-    var q = parameters.q ? parameters.q : null;
-    var heightScale = parameters.heightScale ? parameters.heightScale : null;
-    var openEnded = parameters.openEnded ? parameters.openEnded : false;
+		type = type ? type : 'Geometry';
+		parameters = parameters ? parameters : {};
 
-    var geometry;
+		var name = parameters.name ? parameters.name : this.incrementName( type + 'Geometry', 'geometry' );
+		var width = parameters.width ? parameters.width : null;
+		var height = parameters.height ? parameters.height : null;
+		var depth = parameters.depth ? parameters.depth : null;
+		var widthSegments = parameters.widthSegments ? parameters.widthSegments : null;
+		var heightSegments = parameters.heightSegments ? parameters.heightSegments : null;
+		var depthSegments = parameters.depthSegments ? parameters.depthSegments : null;
+		var radialSegments = parameters.radialSegments ? parameters.radialSegments : null;
+		var tubularSegments = parameters.tubularSegments ? parameters.tubularSegments : null;
+		var radius = parameters.radius ? parameters.radius : null;
+		var radiusTop = parameters.radiusTop ? parameters.radiusTop : null;
+		var radiusBottom = parameters.radiusBottom ? parameters.radiusBottom : null;
+		var phiStart = parameters.phiStart ? parameters.phiStart : null;
+		var phiLength = parameters.phiLength ? parameters.phiLength : null;
+		var thetaStart = parameters.thetaStart ? parameters.thetaStart : null;
+		var thetaLength = parameters.thetaLength ? parameters.thetaLength : null;
+		var tube = parameters.tube ? parameters.tube : null;
+		var arc = parameters.arc ? parameters.arc : null;
+		var detail = parameters.detail ? parameters.detail : null;
+		var p = parameters.p ? parameters.p : null;
+		var q = parameters.q ? parameters.q : null;
+		var heightScale = parameters.heightScale ? parameters.heightScale : null;
+		var openEnded = parameters.openEnded ? parameters.openEnded : false;
 
-    if ( type == 'Geometry' ) {
+		var geometry;
 
-      geometry = new THREE.Geometry();
+		if ( type == 'Geometry' ) {
 
-    } else if ( type == 'Plane' ) {
+			geometry = new THREE.Geometry();
 
-      width = width ? width : 200;
-      height = height ? height : 200;
-      widthSegments = widthSegments ? widthSegments : 1;
-      heightSegments = heightSegments ? heightSegments : 1;
+		} else if ( type == 'Plane' ) {
 
-      geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
+			width = width ? width : 200;
+			height = height ? height : 200;
+			widthSegments = widthSegments ? widthSegments : 1;
+			heightSegments = heightSegments ? heightSegments : 1;
 
-    } else if ( type == 'Cube' ) {
+			geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
 
-      width = width ? width : 100;
-      height = height ? height : 100;
-      depth = depth ? depth : 100;
-      widthSegments = widthSegments ? widthSegments : 1;
-      heightSegments = heightSegments ? heightSegments : 1;
-      depthSegments = depthSegments ? depthSegments : 1;
+		} else if ( type == 'Cube' ) {
 
-      geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+			width = width ? width : 100;
+			height = height ? height : 100;
+			depth = depth ? depth : 100;
+			widthSegments = widthSegments ? widthSegments : 1;
+			heightSegments = heightSegments ? heightSegments : 1;
+			depthSegments = depthSegments ? depthSegments : 1;
 
-    } else if ( type == 'Cylinder' ) {
+			geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
 
-      radiusTop = radiusTop ? radiusTop : 20;
-      radiusBottom = radiusBottom ? radiusBottom : 20;
-      height = height ? height : 100;
-      radialSegments = radialSegments ? radialSegments : 8;
-      heightSegments = heightSegments ? heightSegments : 1;
-      openEnded = openEnded ? openEnded : false;
+		} else if ( type == 'Cylinder' ) {
 
-      geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded );
+			radiusTop = radiusTop ? radiusTop : 20;
+			radiusBottom = radiusBottom ? radiusBottom : 20;
+			height = height ? height : 100;
+			radialSegments = radialSegments ? radialSegments : 8;
+			heightSegments = heightSegments ? heightSegments : 1;
+			openEnded = openEnded ? openEnded : false;
 
-    } else if ( type == 'Sphere' ) {
+			geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded );
 
-      radius = radius ? radius : 75;
-      widthSegments = widthSegments ? widthSegments : 32;
-      heightSegments = heightSegments ? heightSegments : 16;
-      widthSegments = widthSegments ? widthSegments : 32;
-      heightSegments = heightSegments ? heightSegments : 16;
-      phiStart = phiStart ? phiStart : 0;
-      phiLength = phiLength ? phiLength : Math.PI * 2;
-      thetaStart = thetaStart ? thetaStart : 0;
-      thetaLength = thetaLength ? thetaLength : Math.PI;
+		} else if ( type == 'Sphere' ) {
 
-      geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
+			radius = radius ? radius : 75;
+			widthSegments = widthSegments ? widthSegments : 32;
+			heightSegments = heightSegments ? heightSegments : 16;
+			widthSegments = widthSegments ? widthSegments : 32;
+			heightSegments = heightSegments ? heightSegments : 16;
+			phiStart = phiStart ? phiStart : 0;
+			phiLength = phiLength ? phiLength : Math.PI * 2;
+			thetaStart = thetaStart ? thetaStart : 0;
+			thetaLength = thetaLength ? thetaLength : Math.PI;
 
-    } else if ( type == 'Icosahedron' ) {
+			geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength );
 
-      radius = radius ? radius : 75;
-      detail = detail ? detail : 2;
+		} else if ( type == 'Icosahedron' ) {
 
-      geometry = new THREE.IcosahedronGeometry ( radius, detail );
+			radius = radius ? radius : 75;
+			detail = detail ? detail : 2;
 
-    } else if ( type == 'Torus' ) {
+			geometry = new THREE.IcosahedronGeometry ( radius, detail );
 
-      radius = radius ? radius : 100;
-      tube = tube ? tube : 40;
-      radialSegments = radialSegments ? radialSegments : 8;
-      tubularSegments = tubularSegments ? tubularSegments : 6;
-      arc = arc ? arc : Math.PI * 2;
+		} else if ( type == 'Torus' ) {
 
-      geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
+			radius = radius ? radius : 100;
+			tube = tube ? tube : 40;
+			radialSegments = radialSegments ? radialSegments : 8;
+			tubularSegments = tubularSegments ? tubularSegments : 6;
+			arc = arc ? arc : Math.PI * 2;
 
-    } else if ( type == 'TorusKnot' ) {
+			geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
 
-      radius = radius ? radius : 100;
-      tube = tube ? tube : 40;
-      radialSegments = radialSegments ? radialSegments : 64;
-      tubularSegments = tubularSegments ? tubularSegments : 8;
-      p = p ? p : 2;
-      q = q ? q : 3;
-      heightScale = heightScale ? heightScale : 1;
+		} else if ( type == 'TorusKnot' ) {
 
-      geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
+			radius = radius ? radius : 100;
+			tube = tube ? tube : 40;
+			radialSegments = radialSegments ? radialSegments : 64;
+			tubularSegments = tubularSegments ? tubularSegments : 8;
+			p = p ? p : 2;
+			q = q ? q : 3;
+			heightScale = heightScale ? heightScale : 1;
 
-    }
+			geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
 
-    geometry.name = name;
-    geometry.computeBoundingSphere();
+		}
 
-    return geometry;
+		geometry.name = name;
+		geometry.computeBoundingSphere();
 
-  },
+		return geometry;
 
-  createMaterial: function( type, parameters ) {
-    
-    type = type ? type : 'MeshPhongMaterial';
+	},
 
-    parameters = parameters ? parameters : {};
+	createMaterial: function( type, parameters ) {
 
-    var material;
-    var name = parameters.name ? parameters.name : this.incrementName( type, 'material' );
+		type = type ? type : 'MeshPhongMaterial';
 
-    if ( type == 'MeshPhongMaterial' ) {
+		parameters = parameters ? parameters : {};
 
-      material = new THREE.MeshPhongMaterial( parameters );
+		var material;
+		var name = parameters.name ? parameters.name : this.incrementName( type, 'material' );
 
-    } else if ( type == 'MeshLambertMaterial' ) {
+		if ( type == 'MeshPhongMaterial' ) {
 
-      material = new THREE.MeshLambertMaterial( parameters );
+			material = new THREE.MeshPhongMaterial( parameters );
 
-    } else if ( type == 'MeshNormalMaterial' ) {
+		} else if ( type == 'MeshLambertMaterial' ) {
 
-      material = new THREE.MeshNormalMaterial( parameters );
+			material = new THREE.MeshLambertMaterial( parameters );
 
-    } else if ( type == 'MeshBasicMaterial' ) {
+		} else if ( type == 'MeshNormalMaterial' ) {
 
-      material = new THREE.MeshBasicMaterial( parameters );
+			material = new THREE.MeshNormalMaterial( parameters );
 
-    }
+		} else if ( type == 'MeshBasicMaterial' ) {
 
-    material.name = name;
-    this.addMaterial( material );
-    return material;
+			material = new THREE.MeshBasicMaterial( parameters );
 
-  },
+		}
 
-  createTexture: function( image, parameters ) {
+		material.name = name;
+		this.addMaterial( material );
+		return material;
 
-    image = image ? image : '../examples/textures/ash_uvgrid01.jpg';
+	},
 
-    parameters = parameters ? parameters : {};
+	createTexture: function( image, parameters ) {
 
-    // TODO: implement parameters
+		image = image ? image : '../examples/textures/ash_uvgrid01.jpg';
 
-    var texture = THREE.ImageUtils.loadTexture( image );
-    texture.name = parameters.name ? parameters.name : this.incrementName( 'Texture', 'texture' );
+		parameters = parameters ? parameters : {};
 
-    this.addTexture( texture );
-    return texture;
+		// TODO: implement parameters
 
-  },
+		var texture = THREE.ImageUtils.loadTexture( image );
+		texture.name = parameters.name ? parameters.name : this.incrementName( 'Texture', 'texture' );
 
-  addObject: function( list, parent ) {
+		this.addTexture( texture );
+		return texture;
 
-    list = ( list instanceof Array ) ? [].concat( list ) : [ list ];
+	},
 
-    parent = parent ? parent : this.scene;
+	addObject: function( list, parent ) {
 
-    for ( var i in list ) {
+		list = ( list instanceof Array ) ? [].concat( list ) : [ list ];
 
-      this.objects[ list[ i ].id ] = list[ i ];
-      this.addHelper( list[ i ] );
+		parent = parent ? parent : this.scene;
 
-      if ( list[ i ].target ) {
+		for ( var i in list ) {
 
-        this.objects[ list[ i ].target.id ] = list[ i ].target;
+			this.objects[ list[ i ].id ] = list[ i ];
+			this.addHelper( list[ i ] );
 
-      }
+			if ( list[ i ].target ) {
 
-      if ( list[ i ].material ) this.addMaterial( list[ i ].material );
-      if ( list[ i ].geometry ) this.addGeometry( list[ i ].geometry );
+				this.objects[ list[ i ].target.id ] = list[ i ].target;
 
-      if ( parent != list[ i ] ) {
+			}
 
-        // Add object to the scene
+			if ( list[ i ].material ) this.addMaterial( list[ i ].material );
+			if ( list[ i ].geometry ) this.addGeometry( list[ i ].geometry );
 
-        parent.add( list[ i ] );
+			if ( parent != list[ i ] ) {
 
-        if ( list[ i ] instanceof THREE.Light ) this.updateMaterials();
+				// Add object to the scene
 
-        signals.objectAdded.dispatch( list[ i ] );
+				parent.add( list[ i ] );
 
-        // Continue adding children
+				if ( list[ i ] instanceof THREE.Light ) this.updateMaterials();
 
-        if ( list[ i ].children && list[ i ].children.length ) {
+				signals.objectAdded.dispatch( list[ i ] );
 
-          this.addObject( list[ i ].children, list[ i ] );
+				// Continue adding children
 
-        }
+				if ( list[ i ].children && list[ i ].children.length ) {
 
-      }
+					this.addObject( list[ i ].children, list[ i ] );
 
-    }
+				}
 
-    signals.sceneChanged.dispatch( this.scene );
+			}
 
-  },
+		}
 
-  addHelper: function( object ) {
+		signals.sceneChanged.dispatch( this.scene );
 
-    if ( object instanceof THREE.PointLight ) {
+	},
 
-      this.helpers[ object.id ] = new THREE.PointLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.id ] );
-      this.helpers[ object.id ].lightSphere.id = object.id;
+	addHelper: function( object ) {
 
-    } else if ( object instanceof THREE.DirectionalLight ) {
+		if ( object instanceof THREE.PointLight ) {
 
-      this.helpers[ object.id ] = new THREE.DirectionalLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.id ] );
-      this.helpers[ object.id ].lightSphere.id = object.id;
+			this.helpers[ object.id ] = new THREE.PointLightHelper( object, 10 );
+			this.sceneHelpers.add( this.helpers[ object.id ] );
+			this.helpers[ object.id ].lightSphere.id = object.id;
 
-    } else if ( object instanceof THREE.SpotLight ) {
+		} else if ( object instanceof THREE.DirectionalLight ) {
 
-      this.helpers[ object.id ] = new THREE.SpotLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.id ] );
-      // this.helpers[ object.id ].lightSphere.id = object.id;
+			this.helpers[ object.id ] = new THREE.DirectionalLightHelper( object, 10 );
+			this.sceneHelpers.add( this.helpers[ object.id ] );
+			this.helpers[ object.id ].lightSphere.id = object.id;
 
-    } else if ( object instanceof THREE.HemisphereLight ) {
+		} else if ( object instanceof THREE.SpotLight ) {
 
-      this.helpers[ object.id ] = new THREE.HemisphereLightHelper( object, 10 );
-      this.sceneHelpers.add( this.helpers[ object.id ] );
-      this.helpers[ object.id ].lightSphere.id = object.id;
+			this.helpers[ object.id ] = new THREE.SpotLightHelper( object, 10 );
+			this.sceneHelpers.add( this.helpers[ object.id ] );
+			// this.helpers[ object.id ].lightSphere.id = object.id;
 
-    }
+		} else if ( object instanceof THREE.HemisphereLight ) {
 
-    signals.sceneChanged.dispatch( this.scene );
+			this.helpers[ object.id ] = new THREE.HemisphereLightHelper( object, 10 );
+			this.sceneHelpers.add( this.helpers[ object.id ] );
+			this.helpers[ object.id ].lightSphere.id = object.id;
 
-  },
+		}
 
-  deleteHelper: function( object ) {
+		signals.sceneChanged.dispatch( this.scene );
 
-    if ( this.helpers[ object.id ] ) {
+	},
 
-      this.helpers[ object.id ].parent.remove( this.helpers[ object.id ] );
-      delete this.helpers[ object.id ];
+	deleteHelper: function( object ) {
 
-    }
+		if ( this.helpers[ object.id ] ) {
 
-  },
+			this.helpers[ object.id ].parent.remove( this.helpers[ object.id ] );
+			delete this.helpers[ object.id ];
 
-  addGeometry: function( geometry ) {
+		}
 
-    this.geometries[ geometry.id ] = geometry;
-    signals.geometryAdded.dispatch( geometry );
+	},
 
-  },
+	addGeometry: function( geometry ) {
 
-  addMaterial: function( material ) {
+		this.geometries[ geometry.id ] = geometry;
+		signals.geometryAdded.dispatch( geometry );
 
-    if ( material.name == 'Default Material' ) {
-      this.delete( this.defaultMaterial );
-      this.defaultMaterial = material;
-    }
+	},
 
-    this.materials[ material.id ] = material;
-    signals.materialAdded.dispatch( material );
-    signals.sceneChanged.dispatch( this.scene );
+	addMaterial: function( material ) {
 
-  },
+		if ( material.name == 'Default Material' ) {
+			this.delete( this.defaultMaterial );
+			this.defaultMaterial = material;
+		}
 
-  addTexture: function( texture ) {
+		this.materials[ material.id ] = material;
+		signals.materialAdded.dispatch( material );
+		signals.sceneChanged.dispatch( this.scene );
 
-    this.textures[ texture.id ] = texture;
-    signals.textureAdded.dispatch( texture );
-    signals.sceneChanged.dispatch( this.scene );
+	},
 
-  },
+	addTexture: function( texture ) {
 
-  // Selection
+		this.textures[ texture.id ] = texture;
+		signals.textureAdded.dispatch( texture );
+		signals.sceneChanged.dispatch( this.scene );
 
-  select: function( list, additive ) {
+	},
 
-    //TODO toggle
+	// Selection
 
-    list = ( list instanceof Array ) ? list : [ list ];
+	select: function( list, additive ) {
 
-    if ( !additive ) this.selected = {};
+		//TODO toggle
 
-    for ( var i in list ) {
+		list = ( list instanceof Array ) ? list : [ list ];
 
-      this.selected[ list[ i ].id ] = list[ i ];
+		if ( !additive ) this.selected = {};
 
-    }
+		for ( var i in list ) {
 
-    signals.selected.dispatch( this.selected );
+			this.selected[ list[ i ].id ] = list[ i ];
 
-  },
+		}
 
-  selectById: function( id, additive ) {
+		signals.selected.dispatch( this.selected );
 
-    var list = this.list();
+	},
 
-    if ( !additive ) this.selected = {};
+	selectById: function( id, additive ) {
 
-    for ( var i in list ) {
+		var list = this.list();
 
-      if ( list[ i ].id == id ) this.select( list[ i ], true );
+		if ( !additive ) this.selected = {};
 
-    }
+		for ( var i in list ) {
 
-  },
+			if ( list[ i ].id == id ) this.select( list[ i ], true );
 
-  selectByName: function( name, type, additive ) {
+		}
 
-    type = type ? type : "all";
+	},
 
-    this.select( this.listByName( name, type ), additive );
+	selectByName: function( name, type, additive ) {
 
-  },
+		type = type ? type : "all";
 
-  selectAll: function( type, additive ) {
+		this.select( this.listByName( name, type ), additive );
 
-    type = type ? type : "all";
+	},
 
-    this.select( this.listByName( '*', type ), additive );
+	selectAll: function( type, additive ) {
 
-  },
+		type = type ? type : "all";
 
-  deselect: function( list ) {
+		this.select( this.listByName( '*', type ), additive );
 
-    list = ( list instanceof Array ) ? list : [ list ];
+	},
 
-    for ( var i in list ) {
+	deselect: function( list ) {
 
-      if ( this.selected[ list[ i ].id ] ) delete this.selected[ list[ i ].id ];
+		list = ( list instanceof Array ) ? list : [ list ];
 
-    }
+		for ( var i in list ) {
 
-    signals.selected.dispatch( this.selected );
+			if ( this.selected[ list[ i ].id ] ) delete this.selected[ list[ i ].id ];
 
-  },
+		}
 
-  deselectById: function( id ) {
+		signals.selected.dispatch( this.selected );
 
-    if ( this.selected[ id ] ) delete this.selected[ id ];
+	},
 
-  },
+	deselectById: function( id ) {
 
-  deselectByName: function( name, type ) {
+		if ( this.selected[ id ] ) delete this.selected[ id ];
 
-    type = type ? type : "all";
+	},
 
-    this.deselect( this.listByName( name, type ) );
+	deselectByName: function( name, type ) {
 
-  },
+		type = type ? type : "all";
 
-  deselectAll: function( type ) {
+		this.deselect( this.listByName( name, type ) );
 
-    type = type ? type : "all";
+	},
 
-    this.deselect( this.list( "all" ) );
+	deselectAll: function( type ) {
 
-  },
+		type = type ? type : "all";
 
-  pickWalk: function( direction ) {
+		this.deselect( this.list( "all" ) );
 
-    direction = direction.toLowerCase();
+	},
 
-    var selection = this.listSelected();
-    var newSelection = [];
+	pickWalk: function( direction ) {
 
-    if ( direction === 'up' ) {
+		direction = direction.toLowerCase();
 
-      for ( var i in selection ) {
+		var selection = this.listSelected();
+		var newSelection = [];
 
-        if ( selection[ i ].parent )
-          newSelection.push( selection[ i ].parent );
-        
-        else newSelection.push( selection[ i ] );
+		if ( direction === 'up' ) {
 
-      }
+			for ( var i in selection ) {
 
-    } else if ( direction === 'down' ) {
+				if ( selection[ i ].parent )
+					newSelection.push( selection[ i ].parent );
 
-      for ( var i in selection ) {
+				else newSelection.push( selection[ i ] );
 
-        if ( selection[ i ].children && selection[ i ].children.length )
-          newSelection.push( selection[ i ].children[0] );
-        
-        else newSelection.push( selection[ i ] );
+			}
 
-      }
+		} else if ( direction === 'down' ) {
 
-    } else if ( direction === 'left' || direction === 'right' ) {
+			for ( var i in selection ) {
 
-      for ( var i in selection ) {
+				if ( selection[ i ].children && selection[ i ].children.length )
+					newSelection.push( selection[ i ].children[0] );
 
-        var siblings = null;
-        var index = null;
-        var newIndex = null;
+				else newSelection.push( selection[ i ] );
 
-        if ( selection[ i ].parent ) {
+			}
 
-          siblings = selection[ i ].parent.children;
-          index = selection[ i ].parent.children.indexOf( selection[ i ] );
-          newIndex = index;
+		} else if ( direction === 'left' || direction === 'right' ) {
 
-          if ( siblings.length > 1 && direction === 'left' )
-            newIndex = ( index + siblings.length + 1 ) % siblings.length;
+			for ( var i in selection ) {
 
-          else if ( siblings.length > 1 && direction === 'right' )
-            newIndex = ( index + siblings.length - 1 ) % siblings.length;
-          
-          newSelection.push( siblings[ newIndex ] );
+				var siblings = null;
+				var index = null;
+				var newIndex = null;
 
-        } else {
+				if ( selection[ i ].parent ) {
 
-          newSelection.push( selection[ i ] );
+					siblings = selection[ i ].parent.children;
+					index = selection[ i ].parent.children.indexOf( selection[ i ] );
+					newIndex = index;
 
-        }
+					if ( siblings.length > 1 && direction === 'left' )
+						newIndex = ( index + siblings.length + 1 ) % siblings.length;
 
-      }
+					else if ( siblings.length > 1 && direction === 'right' )
+						newIndex = ( index + siblings.length - 1 ) % siblings.length;
 
-    }
+					newSelection.push( siblings[ newIndex ] );
 
-    if ( newSelection.length ) this.select( newSelection );
+				} else {
 
-  },
+					newSelection.push( selection[ i ] );
 
-  // List
+				}
 
-  list: function( type ) {
+			}
 
-    type = type ? type : "all";
+		}
 
-    var list = this.listByName( '*', type );
+		if ( newSelection.length ) this.select( newSelection );
 
-    return list;
+	},
 
-  },
+	// List
 
-  listSelected: function( type ) {
+	list: function( type ) {
 
-    var list = this.listByName( '*', 'selected' );
+		type = type ? type : "all";
 
-    if ( type ) {
+		var list = this.listByName( '*', type );
 
-      var typeList = this.listByName( '*', type );
+		return list;
 
-      var list = list.filter(function(n) {
-        if(typeList.indexOf(n) == -1) return false;
-        return true;
-      });
+	},
 
-    } 
+	listSelected: function( type ) {
 
-    return list;
+		var list = this.listByName( '*', 'selected' );
 
-  },
+		if ( type ) {
 
-  listByName: function( name, type ) {
+			var typeList = this.listByName( '*', type );
 
-    type = type ? type.toLowerCase() : "all";
+			var list = list.filter(function(n) {
+				if(typeList.indexOf(n) == -1) return false;
+				return true;
+			});
 
-    var scope = this;
-    var list = [];
+		} 
 
-    function listFromMap( map, name ) {
+		return list;
 
-      for ( var id in map ) {
+	},
 
-        if ( scope.regexMatch( map[ id ].name, name ) ) {
+	listByName: function( name, type ) {
 
-          list.push( map[ id ] );
+		type = type ? type.toLowerCase() : "all";
 
-        }
+		var scope = this;
+		var list = [];
 
+		function listFromMap( map, name ) {
 
-      }
+			for ( var id in map ) {
 
-    }
-    
-    if ( type == 'all' || type == 'object' ) {
+				if ( scope.regexMatch( map[ id ].name, name ) ) {
 
-      listFromMap( this.objects, name );
+					list.push( map[ id ] );
 
-    }
+				}
 
-    if ( type == 'all' || type == 'geometry' ) {
 
-      listFromMap( this.geometries, name );
+			}
 
-    }
+		}
 
-    if ( type == 'all' || type == 'material' ) {
+		if ( type == 'all' || type == 'object' ) {
 
-      listFromMap( this.materials, name );
+			listFromMap( this.objects, name );
 
-    }
+		}
 
-    if ( type == 'all' || type == 'texture' ) {
+		if ( type == 'all' || type == 'geometry' ) {
 
-      listFromMap( this.textures, name );
+			listFromMap( this.geometries, name );
 
-    }
+		}
 
-    if ( type == 'all' || type == 'selected' ) {
+		if ( type == 'all' || type == 'material' ) {
 
-      listFromMap( this.selected, name );
+			listFromMap( this.materials, name );
 
-    }
+		}
 
-    return list;
+		if ( type == 'all' || type == 'texture' ) {
 
-  },
+			listFromMap( this.textures, name );
 
-  // Delete
+		}
 
-  delete: function( list ) {
+		if ( type == 'all' || type == 'selected' ) {
 
-    list = list ? list : this.list( 'selected' );
+			listFromMap( this.selected, name );
 
-    list = ( list instanceof Array ) ? list : [ list ];
+		}
 
-    this.deselect( list );
+		return list;
 
-    var deletedObjects = {};
+	},
 
-    for ( var i in list ) {
-      
-      if ( this.objects[ list[ i ].id ] && list[ i ] != this.scene ) {
+	// Delete
 
-        delete this.objects[ list[ i ].id ];
-        this.deleteHelper( list[ i ] );
+	delete: function( list ) {
 
-        deletedObjects[ list[ i ].id ] = list[ i ];
+		list = list ? list : this.list( 'selected' );
 
-        if ( list[ i ] instanceof THREE.Light ) this.updateMaterials();
+		list = ( list instanceof Array ) ? list : [ list ];
 
-        signals.objectDeleted.dispatch();
+		this.deselect( list );
 
-        if ( list[ i ].children.length ) this.delete( list[ i ].children );
-      
-      }
+		var deletedObjects = {};
 
-      if ( this.geometries[ list[ i ].id ] ) {
+		for ( var i in list ) {
 
-        delete this.geometries[ list[ i ].id ];
-        signals.objectDeleted.dispatch();
+			if ( this.objects[ list[ i ].id ] && list[ i ] != this.scene ) {
 
-      } 
+				delete this.objects[ list[ i ].id ];
+				this.deleteHelper( list[ i ] );
 
-      if ( this.materials[ list[ i ].id ] ) {
-      
-        delete this.materials[ list[ i ].id ];
-        signals.materialDeleted.dispatch();
-      
-      }
+				deletedObjects[ list[ i ].id ] = list[ i ];
 
-      if ( this.textures[ list[ i ].id ] ) {
+				if ( list[ i ] instanceof THREE.Light ) this.updateMaterials();
 
-        delete this.textures[ list[ i ].id ];
-        signals.textureDeleted.dispatch();
+				signals.objectDeleted.dispatch();
 
-      }
+				if ( list[ i ].children.length ) this.delete( list[ i ].children );
 
-    } 
+			}
 
-    for ( var i in deletedObjects ) {
+			if ( this.geometries[ list[ i ].id ] ) {
 
-        if ( deletedObjects[ i ].parent ) {
-        
-          deletedObjects[ i ].parent.remove( deletedObjects[ i ] );
-        
-        }
+				delete this.geometries[ list[ i ].id ];
+				signals.objectDeleted.dispatch();
 
-    }
+			}
 
-    delete deletedObjects;
+			if ( this.materials[ list[ i ].id ] ) {
 
-    signals.sceneChanged.dispatch( this.scene );
+				delete this.materials[ list[ i ].id ];
+				signals.materialDeleted.dispatch();
 
-  },
+			}
 
-  deleteByName: function( name, type ) {
+			if ( this.textures[ list[ i ].id ] ) {
 
-    type = type ? type : "all";
+				delete this.textures[ list[ i ].id ];
+				signals.textureDeleted.dispatch();
 
-    this.delete( this.listByName( name, type ) );
+			}
 
-  },
+		} 
 
-  deleteAll: function( type ) {
+		for ( var i in deletedObjects ) {
 
-    type = type ? type : 'all';
+			if ( deletedObjects[ i ].parent ) {
 
-    this.delete( this.listByName( '*', type ) );
+				deletedObjects[ i ].parent.remove( deletedObjects[ i ] );
 
-  },
+			}
 
-  deleteUnused: function( type ) {
+		}
 
-    // TODO: test with textures
+		delete deletedObjects;
 
-    type = type ? type.toLowerCase() : 'all';
+		signals.sceneChanged.dispatch( this.scene );
 
-    var used = {};
+	},
 
-    this.scene.traverse( function( object ) {
+	deleteByName: function( name, type ) {
 
-      used[ object.id ] = object; 
+		type = type ? type : "all";
 
-      if ( object.geometry ) used[ object.geometry.id ] = object.geometry; 
+		this.delete( this.listByName( name, type ) );
 
-      if ( object.material ) {
+	},
 
-        used[ object.material.id ] = object.material;
+	deleteAll: function( type ) {
 
-        for ( var i in object.material ){
+		type = type ? type : 'all';
 
-          if ( object.material[ i ] instanceof THREE.Texture ) {
+		this.delete( this.listByName( '*', type ) );
 
-            used[ object.material[ i ].id ] = object.material[ i ];
+	},
 
-          }
+	deleteUnused: function( type ) {
 
-        }
+		// TODO: test with textures
 
-      }
+		type = type ? type.toLowerCase() : 'all';
 
-    } );
+		var used = {};
 
-    if ( !type || type == 'object' ) {
-      for ( var id in this.objects ) {
-        if ( !used[ id ] ) this.delete( this.objects[ id ] );
-      }
-    }
+		this.scene.traverse( function( object ) {
 
-    if ( !type || type == 'geometry' ) {
-      for ( var id in this.geometries ) {
-        if ( !used[ id ] ) this.delete( this.geometries[ id ] );
-      }
-    }
+			used[ object.id ] = object; 
 
-    if ( !type || type == 'material' ) {
-      for ( var id in this.materials ) {
-        if ( !used[ id ] ) this.delete( this.materials[ id ] );
-      }
-    }
+			if ( object.geometry ) used[ object.geometry.id ] = object.geometry; 
 
-    if ( !type || type == 'texture' ) {
-      for ( var id in this.textures ) {
-        if ( !used[ id ] ) this.delete( this.textures[ id ] );
-      }
-    }
+			if ( object.material ) {
 
-    delete used;
+				used[ object.material.id ] = object.material;
 
-  },
+				for ( var i in object.material ){
 
-  // Hierarchy
+					if ( object.material[ i ] instanceof THREE.Texture ) {
 
-  clone: function( assets, recursive, deep ) {
+						used[ object.material[ i ].id ] = object.material[ i ];
 
-    // TODO: consider using list
+					}
 
-    // TODO: Implement non-recursive and deep
+				}
 
-    var assets = assets ? assets : this.selected;
-    // recursive = recursive ? recursive : true;
-    // deep = deep ? deep : false;
+			}
 
-    var clones = {};
+		} );
 
-    for ( var i in assets ){
+		if ( !type || type == 'object' ) {
+			for ( var id in this.objects ) {
+				if ( !used[ id ] ) this.delete( this.objects[ id ] );
+			}
+		}
 
-      if ( this.objects[ i ] ) {
+		if ( !type || type == 'geometry' ) {
+			for ( var id in this.geometries ) {
+				if ( !used[ id ] ) this.delete( this.geometries[ id ] );
+			}
+		}
 
-        var clonedObject = this.objects[assets[ i ].id ].clone();
+		if ( !type || type == 'material' ) {
+			for ( var id in this.materials ) {
+				if ( !used[ id ] ) this.delete( this.materials[ id ] );
+			}
+		}
 
-        clonedObject.traverse( function( child ) {
+		if ( !type || type == 'texture' ) {
+			for ( var id in this.textures ) {
+				if ( !used[ id ] ) this.delete( this.textures[ id ] );
+			}
+		}
 
-          child.name += ' Clone';
+		delete used;
 
-        } );
+	},
 
-        this.addObject( clonedObject, assets[ i ].parent );
-        clones[ clonedObject.id ] = clonedObject;
+	// Hierarchy
 
-      }
+	clone: function( assets, recursive, deep ) {
 
-    }
-      
-    return clones;
+		// TODO: consider using list
 
-  },
+		// TODO: Implement non-recursive and deep
 
-  parent: function( list, parent, locked ) {
+		var assets = assets ? assets : this.selected;
+		// recursive = recursive ? recursive : true;
+		// deep = deep ? deep : false;
 
-    //TODO: implement locked
+		var clones = {};
 
-    list = list ? list : this.list( 'selected' );
+		for ( var i in assets ){
 
-    list = ( list instanceof Array ) ? list : [ list ];
+			if ( this.objects[ i ] ) {
 
-    parent = parent ? parent : this.scene;
+				var clonedObject = this.objects[assets[ i ].id ].clone();
 
-    for ( var i in list ) {
+				clonedObject.traverse( function( child ) {
 
-      if ( list[ i ] !== parent && list[ i ] !== this.scene ) {
+					child.name += ' Clone';
 
-        parent.add( list[ i ] );
-        signals.objectChanged.dispatch( list[ i ] );
+				} );
 
-      }
+				this.addObject( clonedObject, assets[ i ].parent );
+				clones[ clonedObject.id ] = clonedObject;
 
-    }
+			}
 
-    signals.sceneChanged.dispatch( this.scene );
+		}
 
-  },
-  
-  unparent: function( list ) {
+		return clones;
 
-    this.parent( list, this.scene );
+	},
 
-  },
+	parent: function( list, parent, locked ) {
 
-  group: function( list ) {
+		//TODO: implement locked
 
-    list = list ? list : this.listSelected( 'objects' );
+		list = list ? list : this.list( 'selected' );
 
-    list = ( list instanceof Array ) ? list : [ list ];
+		list = ( list instanceof Array ) ? list : [ list ];
 
-    var parent = ( list.length && list[0].parent ) ? list[0].parent : this.scene;
+		parent = parent ? parent : this.scene;
 
-    var group = this.createObject();
+		for ( var i in list ) {
 
-    this.parent( group, parent );
+			if ( list[ i ] !== parent && list[ i ] !== this.scene ) {
 
-    this.parent( list, group );
+				parent.add( list[ i ] );
+				signals.objectChanged.dispatch( list[ i ] );
 
-  },
+			}
 
-  // Utils
+		}
 
-  updateObject: function( object, parameters ) {
+		signals.sceneChanged.dispatch( this.scene );
 
-    parameters = parameters ? parameters : {};
+	},
 
-    if ( parameters.parent && object.parent && object.parent != parameters.parent)
-      editor.parent( object, parameters.parent );
+	unparent: function( list ) {
 
-    if ( parameters.geometry && object.geometry && object.geometry != parameters.geometry) {
-      object.geometry = parameters.geometry;
-      this.updateGeometry( object.geometry );
-    }
+		this.parent( list, this.scene );
 
-    if ( parameters.material && object.material && object.material != parameters.material)
-      object.material = parameters.material;
+	},
 
-    if ( parameters.name !== undefined ) object.name = parameters.name;
+	group: function( list ) {
 
-    if ( parameters.position !== undefined ) object.position = parameters.position;
-    if ( parameters.rotation !== undefined ) object.rotation = parameters.rotation;
-    if ( parameters.scale !== undefined ) object.scale = parameters.scale;
+		list = list ? list : this.listSelected( 'objects' );
 
-    if ( object.fov !== undefined && parameters.fov !== undefined ) object.fov = parameters.fov;
-    if ( object.near !== undefined && parameters.near !== undefined ) object.near = parameters.near;
-    if ( object.far !== undefined && parameters.far !== undefined ) object.far = parameters.far;
-    if ( object.intensity !== undefined && parameters.intensity !== undefined ) object.intensity = parameters.intensity;
+		list = ( list instanceof Array ) ? list : [ list ];
 
-    if ( object.color && parameters.color !== undefined ) object.color.setHex( parameters.color );
-    if ( object.groundColor && parameters.groundColor !== undefined ) object.groundColor.setHex( parameters.groundColor );
+		var parent = ( list.length && list[0].parent ) ? list[0].parent : this.scene;
 
-    if ( object.distance !== undefined && parameters.distance !== undefined ) object.distance = parameters.distance;
-    if ( object.angle !== undefined && parameters.angle !== undefined ) object.angle = parameters.angle;
-    if ( object.exponent !== undefined && parameters.exponent !== undefined ) object.exponent = parameters.exponent;
-    if ( object.visible !== undefined && parameters.visible !== undefined ) object.visible = parameters.visible;
-    
-    if ( parameters.userData !== undefined ) {
+		var group = this.createObject();
 
-      try {
+		this.parent( group, parent );
 
-        object.userData = JSON.parse( parameters.userData );
+		this.parent( list, group );
 
-      } catch ( error ) {
+	},
 
-       console.log( error );
+	// Utils
 
-      }
+	updateObject: function( object, parameters ) {
 
-    };
+		parameters = parameters ? parameters : {};
 
-    if ( object.updateProjectionMatrix ) object.updateProjectionMatrix();
+		if ( parameters.parent && object.parent && object.parent != parameters.parent)
+			editor.parent( object, parameters.parent );
 
-    signals.objectChanged.dispatch( object );
+		if ( parameters.geometry && object.geometry && object.geometry != parameters.geometry) {
+			object.geometry = parameters.geometry;
+			this.updateGeometry( object.geometry );
+		}
 
-  },
+		if ( parameters.material && object.material && object.material != parameters.material)
+			object.material = parameters.material;
 
-  updateMaterials: function( list ) {
+		if ( parameters.name !== undefined ) object.name = parameters.name;
 
-    list = list ? list : this.list( 'material' );
+		if ( parameters.position !== undefined ) object.position = parameters.position;
+		if ( parameters.rotation !== undefined ) object.rotation = parameters.rotation;
+		if ( parameters.scale !== undefined ) object.scale = parameters.scale;
 
-    list = ( list instanceof Array ) ? list : [ list ];
+		if ( object.fov !== undefined && parameters.fov !== undefined ) object.fov = parameters.fov;
+		if ( object.near !== undefined && parameters.near !== undefined ) object.near = parameters.near;
+		if ( object.far !== undefined && parameters.far !== undefined ) object.far = parameters.far;
+		if ( object.intensity !== undefined && parameters.intensity !== undefined ) object.intensity = parameters.intensity;
 
-    for ( var i in list ) {
+		if ( object.color && parameters.color !== undefined ) object.color.setHex( parameters.color );
+		if ( object.groundColor && parameters.groundColor !== undefined ) object.groundColor.setHex( parameters.groundColor );
 
-      list[ i ].needsUpdate = true;
+		if ( object.distance !== undefined && parameters.distance !== undefined ) object.distance = parameters.distance;
+		if ( object.angle !== undefined && parameters.angle !== undefined ) object.angle = parameters.angle;
+		if ( object.exponent !== undefined && parameters.exponent !== undefined ) object.exponent = parameters.exponent;
+		if ( object.visible !== undefined && parameters.visible !== undefined ) object.visible = parameters.visible;
 
-      if ( list[ i ] instanceof THREE.MeshFaceMaterial ) {
+		if ( parameters.userData !== undefined ) {
 
-        for ( var j in list[ i ].materials ) {
+			try {
 
-          list[ i ].materials[ j ].needsUpdate = true;
+				object.userData = JSON.parse( parameters.userData );
 
-        }
+			} catch ( error ) {
 
-      }
+			 console.log( error );
 
-    }
+			}
 
-  },
+		};
 
-  updateGeometry: function( geometry, parameters ) {
+		if ( object.updateProjectionMatrix ) object.updateProjectionMatrix();
 
-    parameters = parameters ? parameters : {};
+		signals.objectChanged.dispatch( object );
 
-    var id = geometry.id;
-    var name = geometry.name;
+	},
 
-    if ( geometry instanceof THREE.PlaneGeometry )
-      geometry = this.createGeometry( 'Plane', parameters );
+	updateMaterials: function( list ) {
 
-    if ( geometry instanceof THREE.CubeGeometry )
-      geometry = this.createGeometry( 'Cube', parameters );
+		list = list ? list : this.list( 'material' );
 
-    if ( geometry instanceof THREE.CylinderGeometry )
-      geometry = this.createGeometry( 'Cylinder', parameters );
+		list = ( list instanceof Array ) ? list : [ list ];
 
-    if ( geometry instanceof THREE.SphereGeometry )
-      geometry = this.createGeometry( 'Sphere', parameters );
+		for ( var i in list ) {
 
-    if ( geometry instanceof THREE.IcosahedronGeometry )
-      geometry = this.createGeometry( 'Icosahedron', parameters );
+			list[ i ].needsUpdate = true;
 
-    if ( geometry instanceof THREE.TorusGeometry )
-      geometry = this.createGeometry( 'Torus', parameters );
+			if ( list[ i ] instanceof THREE.MeshFaceMaterial ) {
 
-    if ( geometry instanceof THREE.TorusKnotGeometry )
-      geometry = this.createGeometry( 'Torusknot', parameters );
+				for ( var j in list[ i ].materials ) {
 
-    geometry.computeBoundingSphere();
-    geometry.id = id;
-    geometry.name = name;
+					list[ i ].materials[ j ].needsUpdate = true;
 
-    for ( var i in editor.objects ) {
+				}
 
-      var object = editor.objects[i];
+			}
 
-      if ( object.geometry && object.geometry.id == id ) {
+		}
 
-        delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-        object.geometry.dispose();
+	},
 
-        object.geometry = geometry;
+	updateGeometry: function( geometry, parameters ) {
 
-        signals.objectChanged.dispatch( object );
+		parameters = parameters ? parameters : {};
 
-      }
+		var id = geometry.id;
+		var name = geometry.name;
 
-    }
+		if ( geometry instanceof THREE.PlaneGeometry )
+			geometry = this.createGeometry( 'Plane', parameters );
 
-  },
+		if ( geometry instanceof THREE.CubeGeometry )
+			geometry = this.createGeometry( 'Cube', parameters );
 
-  setFog: function( parameters ) {
+		if ( geometry instanceof THREE.CylinderGeometry )
+			geometry = this.createGeometry( 'Cylinder', parameters );
 
-    var fogType = parameters.fogType ? parameters.fogType : null;
-    var near = parameters.near ? parameters.near : null;
-    var far = parameters.far ? parameters.far : null;
-    var density = parameters.density ? parameters.density : null;
-    var color = parameters.color ? parameters.color : null;
+		if ( geometry instanceof THREE.SphereGeometry )
+			geometry = this.createGeometry( 'Sphere', parameters );
 
-    if ( fogType ) {
+		if ( geometry instanceof THREE.IcosahedronGeometry )
+			geometry = this.createGeometry( 'Icosahedron', parameters );
 
-      if ( fogType === "None" ) this.scene.fog = null;
+		if ( geometry instanceof THREE.TorusGeometry )
+			geometry = this.createGeometry( 'Torus', parameters );
 
-      else if ( fogType === "Fog" ) this.scene.fog = new THREE.Fog();
+		if ( geometry instanceof THREE.TorusKnotGeometry )
+			geometry = this.createGeometry( 'Torusknot', parameters );
 
-      else if ( fogType === "FogExp2" ) this.scene.fog = new THREE.FogExp2();
+		geometry.computeBoundingSphere();
+		geometry.id = id;
+		geometry.name = name;
 
-    }
+		for ( var i in editor.objects ) {
 
-    if ( this.scene.fog ) {
+			var object = editor.objects[i];
 
-      if ( fogType ) this.scene.fog.fogType = fogType;
-      if ( near ) this.scene.fog.near = near;
-      if ( far ) this.scene.fog.far = far;
-      if ( density ) this.scene.fog.density = density;
-      if ( color ) this.scene.fog.color.setHex( color );
+			if ( object.geometry && object.geometry.id == id ) {
 
-    }
+				delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+				object.geometry.dispose();
 
-    this.updateMaterials();
-    signals.fogChanged.dispatch( this.scene.fog );
+				object.geometry = geometry;
 
-  },
+				signals.objectChanged.dispatch( object );
 
-  regexMatch: function( name, filter ) {
+			}
 
-    name = name.toLowerCase();
-    filter = '^' + filter.toLowerCase().replace(/\*/g, '.*').replace(/\?/g, '.') + '$';
+		}
 
-    var regex = new RegExp(filter);
-    return regex.test( name );
+	},
 
-  },
+	setFog: function( parameters ) {
 
-  incrementName: function( name, type ) {
+		var fogType = parameters.fogType ? parameters.fogType : null;
+		var near = parameters.near ? parameters.near : null;
+		var far = parameters.far ? parameters.far : null;
+		var density = parameters.density ? parameters.density : null;
+		var color = parameters.color ? parameters.color : null;
 
-    var list = this.listByName( name+'\\d+', type );
-    var lastIncrement = 0;
+		if ( fogType ) {
 
-    for ( var i in list ) {
-      var Increment = parseFloat( list[i].name.replace( name, '' ) );
-      if ( Increment > lastIncrement ) lastIncrement = Increment;
-    }
-    
-    return name + ( lastIncrement + 1 );
+			if ( fogType === "None" ) this.scene.fog = null;
 
-  }
+			else if ( fogType === "Fog" ) this.scene.fog = new THREE.Fog();
+
+			else if ( fogType === "FogExp2" ) this.scene.fog = new THREE.FogExp2();
+
+		}
+
+		if ( this.scene.fog ) {
+
+			if ( fogType ) this.scene.fog.fogType = fogType;
+			if ( near ) this.scene.fog.near = near;
+			if ( far ) this.scene.fog.far = far;
+			if ( density ) this.scene.fog.density = density;
+			if ( color ) this.scene.fog.color.setHex( color );
+
+		}
+
+		this.updateMaterials();
+		signals.fogChanged.dispatch( this.scene.fog );
+
+	},
+
+	regexMatch: function( name, filter ) {
+
+		name = name.toLowerCase();
+		filter = '^' + filter.toLowerCase().replace(/\*/g, '.*').replace(/\?/g, '.') + '$';
+
+		var regex = new RegExp(filter);
+		return regex.test( name );
+
+	},
+
+	incrementName: function( name, type ) {
+
+		var list = this.listByName( name+'\\d+', type );
+		var lastIncrement = 0;
+
+		for ( var i in list ) {
+			var Increment = parseFloat( list[i].name.replace( name, '' ) );
+			if ( Increment > lastIncrement ) lastIncrement = Increment;
+		}
+
+		return name + ( lastIncrement + 1 );
+
+	}
 
 }
