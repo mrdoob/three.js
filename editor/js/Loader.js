@@ -123,7 +123,7 @@ var Loader = function ( editor, signals ) {
 					break;
 
 				default:
-					console.log( 'Loading Object format 4.2');				
+					console.log( 'Loading Object format 4.2');
 					loader = new THREE.ObjectLoader();
 					break;
 
@@ -133,7 +133,7 @@ var Loader = function ( editor, signals ) {
 
 			if ( result instanceof THREE.Scene ) {
 
-				editor.addObject( result.children );
+				editor.setScene( result );
 
 			} else {
 

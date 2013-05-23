@@ -302,6 +302,8 @@ Sidebar.Attributes = function ( signals ) {
 
       for ( var key in model ) {
 
+        if ( param[ key ] === undefined ) continue;
+
         // Params from multiOptions
 
         for ( var i in multiOptions ) {

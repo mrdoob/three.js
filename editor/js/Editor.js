@@ -30,7 +30,7 @@ Editor.prototype = {
 
     if ( scene ) {
 
-      this.scene.name = scene.name ? scene.name : 'Scene';
+      this.scene.name = scene.name;
       this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
       if ( scene.children.length ) this.addObject( scene.children );
