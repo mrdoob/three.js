@@ -3,13 +3,13 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
+THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
 
 	this.object = object;
 
 	this.size = size || 1;
 
-	var color = hex || 0xff0000;
+	var color = hex || 0x0000ff;
 
 	var width = linewidth || 1;
 
@@ -23,7 +23,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 		var face = faces[ i ];
 
-		for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+		for ( var j = 0, jl = face.vertexTangents.length; j < jl; j ++ ) {
 
 			geometry.vertices.push( new THREE.Vector3() );
 			geometry.vertices.push( new THREE.Vector3() );
@@ -36,15 +36,13 @@ THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.matrixAutoUpdate = false;
 
-	this.normalMatrix = new THREE.Matrix3();
-
 	this.update();
 
 };
 
-THREE.VertexNormalsHelper.prototype = Object.create( THREE.Line.prototype );
+THREE.VertexTangentsHelper.prototype = Object.create( THREE.Line.prototype );
 
-THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
+THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
 
 	var v1 = new THREE.Vector3();
 
@@ -53,8 +51,6 @@ THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
 		var keys = [ 'a', 'b', 'c', 'd' ];
 
 		this.object.updateMatrixWorld( true );
-
-		this.normalMatrix.getNormalMatrix( this.object.matrixWorld );
 
 		var vertices = this.geometry.vertices;
 
@@ -70,16 +66,16 @@ THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
 
 			var face = faces[ i ];
 
-			for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
+			for ( var j = 0, jl = face.vertexTangents.length; j < jl; j ++ ) {
 
 				var vertexId = face[ keys[ j ] ];
 				var vertex = verts[ vertexId ];
 
-				var normal = face.vertexNormals[ j ];
+				var tangent = face.vertexTangents[ j ];
 
 				vertices[ idx ].copy( vertex ).applyMatrix4( worldMatrix );
 
-				v1.copy( normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size );
+				v1.copy( tangent ).transformDirection( worldMatrix ).multiplyScalar( this.size );
 
 				v1.add( vertices[ idx ] );
 				idx = idx + 1;
