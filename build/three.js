@@ -6441,6 +6441,8 @@ THREE.Object3D = function () {
 
 	this.frustumCulled = true;
 
+	this.boundingBox = null;
+
 	this.userData = {};
 
 };
@@ -6842,6 +6844,53 @@ THREE.Object3D.prototype = {
 
 	},
 
+	computeBoundingBox: function() {
+
+		// computes the world-axis-aligned bounding box of object (including its children),
+		// accounting for both the object's and childrens' world transforms
+
+		var v1 = new THREE.Vector3();
+
+		return function() {
+
+			if ( this.boundingBox === null ) {
+
+				this.boundingBox = new THREE.Box3();
+
+			}
+
+			this.boundingBox.makeEmpty();
+
+			var scope = this.boundingBox;
+
+			this.updateMatrixWorld( true );
+
+			this.traverse( function ( node ) {
+
+				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+
+					var vertices = node.geometry.vertices;
+
+					for ( var i = 0, il = vertices.length; i < il; i++ ) {
+
+						v1.copy( vertices[ i ] );
+
+						v1.applyMatrix4( node.matrixWorld );
+
+						scope.expandByPoint( v1 );
+
+					}
+
+				}
+
+			} );
+
+			return this.boundingBox;
+
+		};
+
+	}(),
+
 	clone: function ( object, recursive ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
@@ -6876,10 +6925,16 @@ THREE.Object3D.prototype = {
 
 		object.frustumCulled = this.frustumCulled;
 
+		if ( this.boundingBox instanceof THREE.Box3 ) {
+
+			object.boundingBox = this.boundingBox.clone();
+
+		}
+
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
-		if ( recursive ) {
-		
+		if ( recursive === true ) {
+
 			for ( var i = 0; i < this.children.length; i ++ ) {
 
 				var child = this.children[ i ];
@@ -34259,6 +34314,36 @@ THREE.BoxHelper.prototype.update = function ( object ) {
 };
 
 /**
+ * @author WestLangley / http://github.com/WestLangley
+ */
+
+// a helper to show the world-axis-aligned bounding box for an object
+
+THREE.BoundingBoxHelper = function ( object, hex ) {
+
+	var color = hex || 0x888888;
+
+	this.object = object;
+
+	this.box = new THREE.Box3();
+
+	THREE.Mesh.call( this, new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: color, wireframe: true } ) );
+
+};
+
+THREE.BoundingBoxHelper.prototype = Object.create( THREE.Mesh.prototype );
+
+THREE.BoundingBoxHelper.prototype.update = function () {
+
+	this.object.computeBoundingBox();
+
+	this.object.boundingBox.size( this.scale );
+
+	this.object.boundingBox.center( this.position );
+
+};
+
+/**
  * @author alteredq / http://alteredqualia.com/
  *
  *	- shows frustum, line of sight and up of the camera
@@ -34505,13 +34590,15 @@ THREE.DirectionalLightHelper.prototype.update = function () {
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.FaceNormalsHelper = function ( object, size, hex ) {
+THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.object = object;
 
 	this.size = size || 1;
 
-	var color = hex || 0x0000ff;
+	var color = hex || 0xffff00;
+
+	var width = linewidth || 1;
 
 	var geometry = new THREE.Geometry();
 
@@ -34524,7 +34611,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
 
 	this.matrixAutoUpdate = false;
 
@@ -34550,6 +34637,8 @@ THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
 
 		var faces = this.object.geometry.faces;
 
+		var worldMatrix = this.object.matrixWorld;
+
 		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 			var face = faces[ i ];
@@ -34558,7 +34647,7 @@ THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
 
 			var idx = 2 * i;
 
-			vertices[ idx ].copy( face.centroid ).applyMatrix4( this.object.matrixWorld );
+			vertices[ idx ].copy( face.centroid ).applyMatrix4( worldMatrix );
 
 			vertices[ idx + 1 ].addVectors( vertices[ idx ], v1 );
 
@@ -34780,7 +34869,7 @@ THREE.SpotLightHelper.prototype.update = ( function () {
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.VertexNormalsHelper = function ( object, size, hex ) {
+THREE.VertexNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.object = object;
 
@@ -34788,9 +34877,12 @@ THREE.VertexNormalsHelper = function ( object, size, hex ) {
 
 	var color = hex || 0xff0000;
 
+	var width = linewidth || 1;
+
 	var geometry = new THREE.Geometry();
 
 	var vertices = object.geometry.vertices;
+
 	var faces = object.geometry.faces;
 
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
@@ -34806,7 +34898,7 @@ THREE.VertexNormalsHelper = function ( object, size, hex ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
 
 	this.matrixAutoUpdate = false;
 
@@ -34833,7 +34925,10 @@ THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
 		var vertices = this.geometry.vertices;
 
 		var verts = this.object.geometry.vertices;
+
 		var faces = this.object.geometry.faces;
+
+		var worldMatrix = this.object.matrixWorld;
 
 		var idx = 0;
 
@@ -34848,9 +34943,106 @@ THREE.VertexNormalsHelper.prototype.update = ( function ( object ) {
 
 				var normal = face.vertexNormals[ j ];
 
-				vertices[ idx ].copy( vertex ).applyMatrix4( this.object.matrixWorld );
+				vertices[ idx ].copy( vertex ).applyMatrix4( worldMatrix );
 
 				v1.copy( normal ).applyMatrix3( this.normalMatrix ).normalize().multiplyScalar( this.size );
+
+				v1.add( vertices[ idx ] );
+				idx = idx + 1;
+
+				vertices[ idx ].copy( v1 );
+				idx = idx + 1;
+
+			}
+
+		}
+
+		this.geometry.verticesNeedUpdate = true;
+
+		return this;
+
+	}
+
+}());
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author WestLangley / http://github.com/WestLangley
+*/
+
+THREE.VertexTangentsHelper = function ( object, size, hex, linewidth ) {
+
+	this.object = object;
+
+	this.size = size || 1;
+
+	var color = hex || 0x0000ff;
+
+	var width = linewidth || 1;
+
+	var geometry = new THREE.Geometry();
+
+	var vertices = object.geometry.vertices;
+
+	var faces = object.geometry.faces;
+
+	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+		var face = faces[ i ];
+
+		for ( var j = 0, jl = face.vertexTangents.length; j < jl; j ++ ) {
+
+			geometry.vertices.push( new THREE.Vector3() );
+			geometry.vertices.push( new THREE.Vector3() );
+
+		}
+
+	}
+
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
+
+	this.matrixAutoUpdate = false;
+
+	this.update();
+
+};
+
+THREE.VertexTangentsHelper.prototype = Object.create( THREE.Line.prototype );
+
+THREE.VertexTangentsHelper.prototype.update = ( function ( object ) {
+
+	var v1 = new THREE.Vector3();
+
+	return function( object ) {
+
+		var keys = [ 'a', 'b', 'c', 'd' ];
+
+		this.object.updateMatrixWorld( true );
+
+		var vertices = this.geometry.vertices;
+
+		var verts = this.object.geometry.vertices;
+
+		var faces = this.object.geometry.faces;
+
+		var worldMatrix = this.object.matrixWorld;
+
+		var idx = 0;
+
+		for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+			var face = faces[ i ];
+
+			for ( var j = 0, jl = face.vertexTangents.length; j < jl; j ++ ) {
+
+				var vertexId = face[ keys[ j ] ];
+				var vertex = verts[ vertexId ];
+
+				var tangent = face.vertexTangents[ j ];
+
+				vertices[ idx ].copy( vertex ).applyMatrix4( worldMatrix );
+
+				v1.copy( tangent ).transformDirection( worldMatrix ).multiplyScalar( this.size );
 
 				v1.add( vertices[ idx ] );
 				idx = idx + 1;
