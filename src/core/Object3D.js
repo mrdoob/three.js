@@ -7,7 +7,7 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DIdCount ++;
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -491,9 +491,10 @@ THREE.Object3D.prototype = {
 
 	}(),
 
-	clone: function ( object ) {
+	clone: function ( object, recursive ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
+		if ( recursive === undefined ) recursive = true;
 
 		object.name = this.name;
 
@@ -532,10 +533,14 @@ THREE.Object3D.prototype = {
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
-		for ( var i = 0; i < this.children.length; i ++ ) {
+		if ( recursive === true ) {
 
-			var child = this.children[ i ];
-			object.add( child.clone() );
+			for ( var i = 0; i < this.children.length; i ++ ) {
+
+				var child = this.children[ i ];
+				object.add( child.clone() );
+
+			}
 
 		}
 
@@ -545,6 +550,4 @@ THREE.Object3D.prototype = {
 
 };
 
-THREE.Object3D.defaultEulerOrder = 'XYZ',
-
-THREE.Object3DIdCount = 0;
+THREE.Object3D.defaultEulerOrder = 'XYZ';
