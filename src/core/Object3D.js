@@ -7,7 +7,7 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.Object3DIdCount ++;
 
 	this.name = '';
 
@@ -40,6 +40,8 @@ THREE.Object3D = function () {
 	this.receiveShadow = false;
 
 	this.frustumCulled = true;
+
+	this.boundingBox = null;
 
 	this.userData = {};
 
@@ -442,10 +444,56 @@ THREE.Object3D.prototype = {
 
 	},
 
-	clone: function ( object, recursive ) {
+	computeBoundingBox: function() {
+
+		// computes the world-axis-aligned bounding box of object (including its children),
+		// accounting for both the object's and childrens' world transforms
+
+		var v1 = new THREE.Vector3();
+
+		return function() {
+
+			if ( this.boundingBox === null ) {
+
+				this.boundingBox = new THREE.Box3();
+
+			}
+
+			this.boundingBox.makeEmpty();
+
+			var scope = this.boundingBox;
+
+			this.updateMatrixWorld( true );
+
+			this.traverse( function ( node ) {
+
+				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+
+					var vertices = node.geometry.vertices;
+
+					for ( var i = 0, il = vertices.length; i < il; i++ ) {
+
+						v1.copy( vertices[ i ] );
+
+						v1.applyMatrix4( node.matrixWorld );
+
+						scope.expandByPoint( v1 );
+
+					}
+
+				}
+
+			} );
+
+			return this.boundingBox;
+
+		};
+
+	}(),
+
+	clone: function ( object ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
-		if ( recursive === undefined ) recursive = true;
 
 		object.name = this.name;
 
@@ -476,16 +524,18 @@ THREE.Object3D.prototype = {
 
 		object.frustumCulled = this.frustumCulled;
 
+		if ( this.boundingBox instanceof THREE.Box3 ) {
+
+			object.boundingBox = this.boundingBox.clone();
+
+		}
+
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
-		if ( recursive ) {
-		
-			for ( var i = 0; i < this.children.length; i ++ ) {
+		for ( var i = 0; i < this.children.length; i ++ ) {
 
-				var child = this.children[ i ];
-				object.add( child.clone() );
-
-			}
+			var child = this.children[ i ];
+			object.add( child.clone() );
 
 		}
 
@@ -495,4 +545,6 @@ THREE.Object3D.prototype = {
 
 };
 
-THREE.Object3D.defaultEulerOrder = 'XYZ';
+THREE.Object3D.defaultEulerOrder = 'XYZ',
+
+THREE.Object3DIdCount = 0;
