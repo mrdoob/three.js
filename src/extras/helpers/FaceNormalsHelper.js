@@ -3,13 +3,15 @@
  * @author WestLangley / http://github.com/WestLangley
 */
 
-THREE.FaceNormalsHelper = function ( object, size, hex ) {
+THREE.FaceNormalsHelper = function ( object, size, hex, linewidth ) {
 
 	this.object = object;
 
 	this.size = size || 1;
 
-	var color = hex || 0x0000ff;
+	var color = hex || 0xffff00;
+
+	var width = linewidth || 1;
 
 	var geometry = new THREE.Geometry();
 
@@ -22,7 +24,7 @@ THREE.FaceNormalsHelper = function ( object, size, hex ) {
 
 	}
 
-	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color } ), THREE.LinePieces );
+	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: color, linewidth: width } ), THREE.LinePieces );
 
 	this.matrixAutoUpdate = false;
 
@@ -48,6 +50,8 @@ THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
 
 		var faces = this.object.geometry.faces;
 
+		var worldMatrix = this.object.matrixWorld;
+
 		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 			var face = faces[ i ];
@@ -56,7 +60,7 @@ THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
 
 			var idx = 2 * i;
 
-			vertices[ idx ].copy( face.centroid ).applyMatrix4( this.object.matrixWorld );
+			vertices[ idx ].copy( face.centroid ).applyMatrix4( worldMatrix );
 
 			vertices[ idx + 1 ].addVectors( vertices[ idx ], v1 );
 
