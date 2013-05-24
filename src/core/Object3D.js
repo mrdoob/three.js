@@ -41,6 +41,8 @@ THREE.Object3D = function () {
 
 	this.frustumCulled = true;
 
+	this.boundingBox = null;
+
 	this.userData = {};
 
 };
@@ -442,6 +444,53 @@ THREE.Object3D.prototype = {
 
 	},
 
+	computeBoundingBox: function() {
+
+		// computes the world-axis-aligned bounding box of object (including its children),
+		// accounting for both the object's and childrens' world transforms
+
+		var v1 = new THREE.Vector3();
+
+		return function() {
+
+			if ( this.boundingBox === null ) {
+
+				this.boundingBox = new THREE.Box3();
+
+			}
+
+			this.boundingBox.makeEmpty();
+
+			var scope = this.boundingBox;
+
+			this.updateMatrixWorld( true );
+
+			this.traverse( function ( node ) {
+
+				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+
+					var vertices = node.geometry.vertices;
+
+					for ( var i = 0, il = vertices.length; i < il; i++ ) {
+
+						v1.copy( vertices[ i ] );
+
+						v1.applyMatrix4( node.matrixWorld );
+
+						scope.expandByPoint( v1 );
+
+					}
+
+				}
+
+			} );
+
+			return this.boundingBox;
+
+		};
+
+	}(),
+
 	clone: function ( object ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
@@ -474,6 +523,12 @@ THREE.Object3D.prototype = {
 		object.receiveShadow = this.receiveShadow;
 
 		object.frustumCulled = this.frustumCulled;
+
+		if ( this.boundingBox instanceof THREE.Box3 ) {
+
+			object.boundingBox = this.boundingBox.clone();
+
+		}
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
