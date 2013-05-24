@@ -4684,7 +4684,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 				buffer: buffer,
 				object: object,
 				opaque: null,
-				transparent: null
+				transparent: null,
+				// z must be initialize, otherwise sorting is invalid.
+				z: 0
 			}
 		);
 
