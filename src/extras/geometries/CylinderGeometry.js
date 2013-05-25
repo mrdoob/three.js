@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded ) {
+THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegments, heightSegments, openEnded ) {
 
 	THREE.Geometry.call( this );
 
@@ -10,7 +10,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 	this.radiusBottom = radiusBottom = radiusBottom !== undefined ? radiusBottom : 20;
 	this.height = height = height !== undefined ? height : 100;
 
-	this.radiusSegments = radiusSegments = radiusSegments || 8;
+	this.radialSegments = radialSegments = radialSegments || 8;
 	this.heightSegments = heightSegments = heightSegments || 1;
 
 	this.openEnded = openEnded = openEnded !== undefined ? openEnded : false;
@@ -27,9 +27,9 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 		var v = y / heightSegments;
 		var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
-		for ( x = 0; x <= radiusSegments; x ++ ) {
+		for ( x = 0; x <= radialSegments; x ++ ) {
 
-			var u = x / radiusSegments;
+			var u = x / radialSegments;
 
 			var vertex = new THREE.Vector3();
 			vertex.x = radius * Math.sin( u * Math.PI * 2 );
@@ -51,7 +51,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 	var tanTheta = ( radiusBottom - radiusTop ) / height;
 	var na, nb;
 
-	for ( x = 0; x < radiusSegments; x ++ ) {
+	for ( x = 0; x < radialSegments; x ++ ) {
 
 		if ( radiusTop !== 0 ) {
 
@@ -98,7 +98,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 		this.vertices.push( new THREE.Vector3( 0, heightHalf, 0 ) );
 
-		for ( x = 0; x < radiusSegments; x ++ ) {
+		for ( x = 0; x < radialSegments; x ++ ) {
 
 			var v1 = vertices[ 0 ][ x ];
 			var v2 = vertices[ 0 ][ x + 1 ];
@@ -125,7 +125,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radiusSegme
 
 		this.vertices.push( new THREE.Vector3( 0, - heightHalf, 0 ) );
 
-		for ( x = 0; x < radiusSegments; x ++ ) {
+		for ( x = 0; x < radialSegments; x ++ ) {
 
 			var v1 = vertices[ y ][ x + 1 ];
 			var v2 = vertices[ y ][ x ];

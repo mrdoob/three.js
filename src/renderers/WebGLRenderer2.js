@@ -462,6 +462,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			attribute = geometry.attributes[ a ];
 
+			if ( attribute.numItems === undefined ) {
+
+				attribute.numItems = attribute.array.length;
+
+			}
+
 			attribute.buffer = renderer.createBuffer();
 
 			if ( a === "index" ) {

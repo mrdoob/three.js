@@ -14,7 +14,7 @@ THREE.ObjectExporter.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.0,
+				version: 4.2,
 				type: 'object',
 				generator: 'ObjectExporter'
 			}
@@ -27,17 +27,17 @@ THREE.ObjectExporter.prototype = {
 
 		var parseGeometry = function ( geometry ) {
 
+			if ( output.geometries === undefined ) {
+
+				output.geometries = [];
+
+			}
+
 			if ( geometries[ geometry.id ] === undefined ) {
 
-				if ( output.geometries === undefined ) {
-
-					output.geometries = [];
-
-				}
-
-				geometries[ geometry.id ] = output.geometries.length;
-
 				var data = {};
+
+				data.id = geometry.id;
 
 				if ( geometry.name !== "" ) data.name = geometry.name;
 
@@ -115,11 +115,13 @@ THREE.ObjectExporter.prototype = {
 
 				}
 
+				geometries[ geometry.id ] = data;
+
 				output.geometries.push( data );
 
 			}
 
-			return geometries[ geometry.id ];
+			return geometry.id;
 
 		};
 
@@ -130,25 +132,25 @@ THREE.ObjectExporter.prototype = {
 
 		var parseMaterial = function ( material ) {
 
+			if ( output.materials === undefined ) {
+
+				output.materials = [];
+
+			}
+
 			if ( materials[ material.id ] === undefined ) {
-
-				if ( output.materials === undefined ) {
-
-					output.materials = [];
-
-				}
-
-				materials[ material.id ] = output.materials.length;
 
 				var data = materialExporter.parse( material );
 
 				delete data.metadata;
 
+				materials[ material.id ] = data;
+
 				output.materials.push( data );
 
 			}
 
-			return materials[ material.id ];
+			return material.id;
 
 		};
 
@@ -157,6 +159,8 @@ THREE.ObjectExporter.prototype = {
 		var parseObject = function ( object ) {
 
 			var data = {};
+
+			data.id = object.id;
 
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;

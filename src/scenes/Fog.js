@@ -6,7 +6,7 @@
 THREE.Fog = function ( hex, near, far ) {
 
 	this.name = '';
-
+  
 	this.color = new THREE.Color( hex );
 
 	this.near = ( near !== undefined ) ? near : 1;

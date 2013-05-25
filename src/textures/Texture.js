@@ -6,7 +6,7 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.TextureIdCount ++;
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -87,5 +87,3 @@ THREE.Texture.prototype = {
 	}
 
 };
-
-THREE.TextureIdCount = 0;

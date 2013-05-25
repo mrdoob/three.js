@@ -7,66 +7,33 @@
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
 	</head>
 	<body>
+		[page:Geometry] &rarr;
+	
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Creates a torus knot, the particular shape of which is defined by a pair of coprime integers, p and q.  If p and q are not coprime, the result will be a torus link.</div>
 
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( radius, tube, radialSegments, tubularSegments, arc )</h3>
+
+		<h3>[name]([page:Float radius], [page:Float tube], [page:Integer radialSegments], [page:Integer tubularSegments], [page:Integer p], [page:Integer q], [page:Float heightScale])</h3>
+		<div>
+		radius — Default is 100. <br />
+		tube — Default is 40. <br />
+		radialSegments — Default is 64. <br />
+		tubularSegments — Default is 8. <br />
+		p — Default is 2. <br />
+		q — Default is 3. <br />
+		heightScale — Default is 1.
+		</div>
 
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Vector3 todo]</h3>
-
-
-		<h3>.[page:number radialSegments]</h3>
+		
 		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number tube]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number q]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number p]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number radius]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number tubularSegments]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:array grid]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:number heightScale]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h2>Methods</h2>
-
-		<h3>.todo( [page:Vector3 todo] )</h3>
-		<div>
-		todo — todo<br />
+		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
 		</div>
 
 

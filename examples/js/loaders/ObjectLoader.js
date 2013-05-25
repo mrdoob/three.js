@@ -45,17 +45,26 @@ THREE.ObjectLoader.prototype = {
 
 	parse: function ( json ) {
 
-		// geometries
+		var geometries = this.parseGeometries( json.geometries );
+		var materials = this.parseMaterials( json.materials );
+		var object = this.parseObject( json.object, geometries, materials );
 
-		if ( json.geometries !== undefined ) {
+		return object;
 
-			var geometries = [];
+	},
+
+	parseGeometries: function ( json ) {
+
+		var geometries = {};
+
+		if ( json !== undefined ) {
+
 			var loader = new THREE.JSONLoader();
 
-			for ( var i = 0, l = json.geometries.length; i < l; i ++ ) {
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
 				var geometry;
-				var data = json.geometries[ i ];
+				var data = json[ i ];
 
 				switch ( data.type ) {
 
@@ -153,134 +162,141 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
+				if ( data.id !== undefined ) geometry.id = data.id;
 				if ( data.name !== undefined ) geometry.name = data.name;
-				geometries.push( geometry );
+
+				geometries[ data.id ] = geometry;
 
 			}
 
 		}
 
-		// materials
+		return geometries;
 
-		if ( json.materials !== undefined ) {
+	},
 
-			var materials = [];
+	parseMaterials: function ( json ) {
+
+		var materials = {};
+
+		if ( json !== undefined ) {
+
 			var loader = new THREE.MaterialLoader();
 
-			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
+			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-				var data = json.materials[ i ];
+				var data = json[ i ];
 				var material = loader.parse( data );
 
+				if ( data.id !== undefined ) material.id = data.id;
 				if ( data.name !== undefined ) material.name = data.name;
 
-				materials.push( material );
+				materials[ data.id ] = material;
 
 			}
 
 		}
 
-		// objects
+		return materials;
 
-		var parseObject = function ( data ) {
+	},
 
-			var object;
+	parseObject: function ( data, geometries, materials ) {
 
-			switch ( data.type ) {
+		var object;
 
-				case 'Scene':
+		switch ( data.type ) {
 
-					object = new THREE.Scene();
+			case 'Scene':
 
-					break;
+				object = new THREE.Scene();
 
-				case 'PerspectiveCamera':
+				break;
 
-					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-					object.position.fromArray( data.position );
-					object.rotation.fromArray( data.rotation );
+			case 'PerspectiveCamera':
 
-					break;
+				object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
+				object.position.fromArray( data.position );
+				object.rotation.fromArray( data.rotation );
 
-				case 'OrthographicCamera':
+				break;
 
-					object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-					object.position.fromArray( data.position );
-					object.rotation.fromArray( data.rotation );
+			case 'OrthographicCamera':
 
-					break;
+				object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
+				object.position.fromArray( data.position );
+				object.rotation.fromArray( data.rotation );
 
-				case 'AmbientLight':
+				break;
 
-					object = new THREE.AmbientLight( data.color );
+			case 'AmbientLight':
 
-					break;
+				object = new THREE.AmbientLight( data.color );
 
-				case 'DirectionalLight':
+				break;
 
-					object = new THREE.DirectionalLight( data.color, data.intensity );
-					object.position.fromArray( data.position );
+			case 'DirectionalLight':
 
-					break;
+				object = new THREE.DirectionalLight( data.color, data.intensity );
+				object.position.fromArray( data.position );
 
-				case 'PointLight':
+				break;
 
-					object = new THREE.PointLight( data.color, data.intensity, data.distance );
-					object.position.fromArray( data.position );
+			case 'PointLight':
 
-					break;
+				object = new THREE.PointLight( data.color, data.intensity, data.distance );
+				object.position.fromArray( data.position );
 
-				case 'SpotLight':
+				break;
 
-					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
-					object.position.fromArray( data.position );
+			case 'SpotLight':
 
-					break;
+				object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
+				object.position.fromArray( data.position );
 
-				case 'HemisphereLight':
+				break;
 
-					object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
-					object.position.fromArray( data.position );
+			case 'HemisphereLight':
 
-					break;
+				object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
+				object.position.fromArray( data.position );
 
-				case 'Mesh':
+				break;
 
-					object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
-					object.position.fromArray( data.position );
-					object.rotation.fromArray( data.rotation );
-					object.scale.fromArray( data.scale );
+			case 'Mesh':
 
-					break;
+				object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
+				object.position.fromArray( data.position );
+				object.rotation.fromArray( data.rotation );
+				object.scale.fromArray( data.scale );
 
-				default:
+				break;
 
-					object = new THREE.Object3D();
-					object.position.fromArray( data.position );
-					object.rotation.fromArray( data.rotation );
-					object.scale.fromArray( data.scale );
+			default:
 
-			}
-
-			if ( data.name !== undefined ) object.name = data.name;
-			if ( data.visible !== undefined ) object.visible = data.visible;
-			if ( data.userData !== undefined ) object.userData = data.userData;
-
-			if ( data.children !== undefined ) {
-
-				for ( var i = 0, l = data.children.length; i < l; i ++ ) {
-
-					object.add( parseObject( data.children[ i ] ) );
-
-				}
-
-			}
-
-			return object;
+				object = new THREE.Object3D();
+				object.position.fromArray( data.position );
+				object.rotation.fromArray( data.rotation );
+				object.scale.fromArray( data.scale );
 
 		}
 
-		return parseObject( json.object );
+		if ( data.id !== undefined ) object.id = data.id;
+		if ( data.name !== undefined ) object.name = data.name;
+		if ( data.visible !== undefined ) object.visible = data.visible;
+		if ( data.userData !== undefined ) object.userData = data.userData;
+
+		if ( data.children !== undefined ) {
+
+			for ( var child in data.children ) {
+
+				object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+
+			}
+
+		}
+
+		return object;
 
 	}
 

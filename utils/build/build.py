@@ -45,11 +45,14 @@ def main(argv=None):
 	sources = []
 
 	for include in args.include:
-		with open('includes/' + include + '.json','r') as f: files = json.load(f)
+		with open('includes/' + include + '.json','r') as f:
+			files = json.load(f)
 		for filename in files:
 			filename = '../../' + filename;
 			sources.append(filename)
-			with open(filename, 'r') as f: tmp.write(f.read())
+			with open(filename, 'r') as f:
+				tmp.write(f.read())
+				tmp.write('\n')
 
 	tmp.close()
 
