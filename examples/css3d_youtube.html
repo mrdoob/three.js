@@ -248,24 +248,24 @@
 					var delay = Math.random() * 1000;
 
 					new TWEEN.Tween( object.position )
-							.to( { y: - 3000 }, 1000 )
-							.delay( delay )
-							.easing( TWEEN.Easing.Exponential.In )
-							.start();
+						.to( { y: - 3000 }, 1000 )
+						.delay( delay )
+						.easing( TWEEN.Easing.Exponential.In )
+						.start();
 
 					new TWEEN.Tween( object )
-							.to( {}, 2000 )
-							.delay( delay )
-							.onComplete( function () {
+						.to( {}, 2000 )
+						.delay( delay )
+						.onComplete( function () {
 
-								scene.remove( this );
-								renderer.cameraElement.removeChild( this.element );
+							scene.remove( this );
+							renderer.cameraElement.removeChild( this.element );
 
-								var index = objects.indexOf( this );
-								objects.splice( index, 1 );
+							var index = objects.indexOf( this );
+							objects.splice( index, 1 );
 
-							} )
-							.start();
+						} )
+						.start();
 
 				}
 
