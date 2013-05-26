@@ -128,89 +128,94 @@ THREE.SkinnedMesh.prototype.addBone = function( bone ) {
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function ( force ) {
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 
-	this.matrixAutoUpdate && this.updateMatrix();
+	var offsetMatrix = new THREE.Matrix4();
 
-	// update matrixWorld
+	return function ( force ) {
 
-	if ( this.matrixWorldNeedsUpdate || force ) {
+		this.matrixAutoUpdate && this.updateMatrix();
 
-		if ( this.parent ) {
+		// update matrixWorld
 
-			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
+		if ( this.matrixWorldNeedsUpdate || force ) {
 
-		} else {
+			if ( this.parent ) {
 
-			this.matrixWorld.copy( this.matrix );
+				this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
-		}
+			} else {
 
-		this.matrixWorldNeedsUpdate = false;
+				this.matrixWorld.copy( this.matrix );
 
-		force = true;
+			}
 
-	}
+			this.matrixWorldNeedsUpdate = false;
 
-	// update children
-
-	for ( var i = 0, l = this.children.length; i < l; i ++ ) {
-
-		var child = this.children[ i ];
-
-		if ( child instanceof THREE.Bone ) {
-
-			child.update( this.identityMatrix, false );
-
-		} else {
-
-			child.updateMatrixWorld( true );
+			force = true;
 
 		}
 
-	}
+		// update children
 
-	// make a snapshot of the bones' rest position
+		for ( var i = 0, l = this.children.length; i < l; i ++ ) {
 
-	if ( this.boneInverses == undefined ) {
+			var child = this.children[ i ];
 
-		this.boneInverses = [];
+			if ( child instanceof THREE.Bone ) {
+
+				child.update( this.identityMatrix, false );
+
+			} else {
+
+				child.updateMatrixWorld( true );
+
+			}
+
+		}
+
+		// make a snapshot of the bones' rest position
+
+		if ( this.boneInverses == undefined ) {
+
+			this.boneInverses = [];
+
+			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
+				var inverse = new THREE.Matrix4();
+
+				inverse.getInverse( this.bones[ b ].skinMatrix );
+
+				this.boneInverses.push( inverse );
+
+			}
+
+		}
+
+		// flatten bone matrices to array
 
 		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
 
-			var inverse = new THREE.Matrix4();
+			// compute the offset between the current and the original transform;
 
-			inverse.getInverse( this.bones[ b ].skinMatrix );
+			// TODO: we could get rid of this multiplication step if the skinMatrix
+			// was already representing the offset; however, this requires some
+			// major changes to the animation system
 
-			this.boneInverses.push( inverse );
+			offsetMatrix.multiplyMatrices( this.bones[ b ].skinMatrix, this.boneInverses[ b ] );
+			offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
 
 		}
 
-	}
+		if ( this.useVertexTexture ) {
 
-	// flatten bone matrices to array
+			this.boneTexture.needsUpdate = true;
 
-	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+		}
 
-		// compute the offset between the current and the original transform;
+	};
 
-		//TODO: we could get rid of this multiplication step if the skinMatrix
-		// was already representing the offset; however, this requires some
-		// major changes to the animation system
-
-		THREE.SkinnedMesh.offsetMatrix.multiplyMatrices( this.bones[ b ].skinMatrix, this.boneInverses[ b ] );
-
-		THREE.SkinnedMesh.offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
-
-	}
-
-	if ( this.useVertexTexture ) {
-
-		this.boneTexture.needsUpdate = true;
-
-	}
-
-};
+}();
 
 THREE.SkinnedMesh.prototype.pose = function () {
 
@@ -222,7 +227,7 @@ THREE.SkinnedMesh.prototype.pose = function () {
 
 THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
-	if (this.geometry instanceof THREE.Geometry) {
+	if ( this.geometry instanceof THREE.Geometry ) {
 
 		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
@@ -252,12 +257,14 @@ THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
 THREE.SkinnedMesh.prototype.clone = function ( object ) {
 
-	if ( object === undefined ) object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
+	if ( object === undefined ) {
+
+		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
+
+	}
 
 	THREE.Mesh.prototype.clone.call( this, object );
 
 	return object;
 
 };
-
-THREE.SkinnedMesh.offsetMatrix = new THREE.Matrix4();
