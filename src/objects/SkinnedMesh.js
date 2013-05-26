@@ -216,23 +216,35 @@ THREE.SkinnedMesh.prototype.pose = function () {
 
 	this.updateMatrixWorld( true );
 
-	for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
+	this.normalizeSkinWeights();
 
-		// normalize weights
+};
 
-		var sw = this.geometry.skinWeights[ i ];
+THREE.SkinnedMesh.prototype.normalizeSkinWeights = function () {
 
-		var scale = 1.0 / sw.lengthManhattan();
+	if (this.geometry instanceof THREE.Geometry) {
 
-		if ( scale !== Infinity ) {
+		for ( var i = 0; i < this.geometry.skinIndices.length; i ++ ) {
 
-			sw.multiplyScalar( scale );
+			var sw = this.geometry.skinWeights[ i ];
 
-		} else {
+			var scale = 1.0 / sw.lengthManhattan();
 
-			sw.set( 1 ); // this will be normalized by the shader anyway
+			if ( scale !== Infinity ) {
+
+				sw.multiplyScalar( scale );
+
+			} else {
+
+				sw.set( 1 ); // this will be normalized by the shader anyway
+
+			}
 
 		}
+
+	} else {
+
+		// skinning weights assumed to be normalized for THREE.BufferGeometry
 
 	}
 
