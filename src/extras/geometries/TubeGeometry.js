@@ -11,7 +11,7 @@
  * http://www.cs.indiana.edu/pub/techreports/TR425.pdf
  */
 
-THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed, debug ) {
+THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) {
 
 	THREE.Geometry.call( this );
 
@@ -20,8 +20,6 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed, d
 	this.radius = radius || 1;
 	this.radialSegments = radialSegments || 8;
 	this.closed = closed || false;
-
-	if ( debug ) this.debug = new THREE.Object3D();
 
 	this.grid = [];
 
@@ -74,14 +72,6 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed, d
 		tangent = tangents[ i ];
 		normal = normals[ i ];
 		binormal = binormals[ i ];
-
-		if ( this.debug ) {
-
-			this.debug.add( new THREE.ArrowHelper(tangent, pos, radius, 0x0000ff ) );
-			this.debug.add( new THREE.ArrowHelper(normal, pos, radius, 0xff0000 ) );
-			this.debug.add( new THREE.ArrowHelper(binormal, pos, radius, 0x00ff00 ) );
-
-		}
 
 		for ( j = 0; j < this.radialSegments; j++ ) {
 
@@ -244,7 +234,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 			vec.normalize();
 
-			theta = Math.acos( tangents[ i-1 ].dot( tangents[ i ] ) );
+			theta = Math.acos( THREE.Math.clamp( tangents[ i-1 ].dot( tangents[ i ] ), -1, 1 ) ); // clamp for floating pt errors
 
 			normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -259,7 +249,7 @@ THREE.TubeGeometry.FrenetFrames = function(path, segments, closed) {
 
 	if ( closed ) {
 
-		theta = Math.acos( normals[ 0 ].dot( normals[ numpoints-1 ] ) );
+		theta = Math.acos( THREE.Math.clamp( normals[ 0 ].dot( normals[ numpoints-1 ] ), -1, 1 ) );
 		theta /= ( numpoints - 1 );
 
 		if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ numpoints-1 ] ) ) > 0 ) {
