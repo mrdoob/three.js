@@ -87,6 +87,18 @@ THREE.Geometry.prototype = {
 
 		}
 
+		if ( this.boundingBox instanceof THREE.Box3 ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere instanceof THREE.Sphere ) {
+
+			this.computeBoundingSphere();
+
+		}
+
 	},
 
 	computeCentroids: function () {
@@ -593,7 +605,7 @@ THREE.Geometry.prototype = {
 
 		}
 
-		this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
+		this.boundingSphere.setFromPoints( this.vertices );
 
 	},
 
