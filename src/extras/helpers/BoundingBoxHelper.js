@@ -20,10 +20,10 @@ THREE.BoundingBoxHelper.prototype = Object.create( THREE.Mesh.prototype );
 
 THREE.BoundingBoxHelper.prototype.update = function () {
 
-	this.object.computeBoundingBox();
+	this.box.setFromObject( this.object );
 
-	this.object.boundingBox.size( this.scale );
+	this.box.size( this.scale );
 
-	this.object.boundingBox.center( this.position );
+	this.box.center( this.position );
 
 };
