@@ -20,8 +20,7 @@ THREE.MaterialLoader.prototype = {
 
 			if ( callback !== undefined ) {
 
-				var material = scope.parse( JSON.parse( event.target.responseText ) );
-				callback( material );
+				callback( scope.parse( JSON.parse( event.target.responseText ) ) );
 
 			}
 

@@ -20,8 +20,7 @@ THREE.GeometryLoader.prototype = {
 
 			if ( callback !== undefined ) {
 
-				var geometry = scope.parse( JSON.parse( event.target.responseText ) );
-				callback( geometry );
+				callback( scope.parse( JSON.parse( event.target.responseText ) ) );
 
 			}
 
