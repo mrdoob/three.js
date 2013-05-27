@@ -3133,6 +3133,7 @@ THREE.Box2.prototype = {
 
 /**
  * @author bhouston / http://exocortex.com
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.Box3 = function ( min, max ) {
@@ -3220,6 +3221,47 @@ THREE.Box3.prototype = {
 
 			this.min.copy( center ).sub( halfSize );
 			this.max.copy( center ).add( halfSize );
+
+			return this;
+
+		};
+
+	}(),
+
+	setFromObject: function() {
+
+		// Computes the world-axis-aligned bounding box of an object (including its children),
+		// accounting for both the object's, and childrens', world transforms
+
+		var v1 = new THREE.Vector3();
+
+		return function( object ) {
+
+			var scope = this;
+
+			object.updateMatrixWorld( true );
+
+			this.makeEmpty();
+
+			object.traverse( function ( node ) {
+
+				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+
+					var vertices = node.geometry.vertices;
+
+					for ( var i = 0, il = vertices.length; i < il; i++ ) {
+
+						v1.copy( vertices[ i ] );
+
+						v1.applyMatrix4( node.matrixWorld );
+
+						scope.expandByPoint( v1 );
+
+					}
+
+				}
+
+			} );
 
 			return this;
 
@@ -6441,8 +6483,6 @@ THREE.Object3D = function () {
 
 	this.frustumCulled = true;
 
-	this.boundingBox = null;
-
 	this.userData = {};
 
 };
@@ -6844,53 +6884,6 @@ THREE.Object3D.prototype = {
 
 	},
 
-	computeBoundingBox: function() {
-
-		// computes the world-axis-aligned bounding box of object (including its children),
-		// accounting for both the object's and childrens' world transforms
-
-		var v1 = new THREE.Vector3();
-
-		return function() {
-
-			if ( this.boundingBox === null ) {
-
-				this.boundingBox = new THREE.Box3();
-
-			}
-
-			this.boundingBox.makeEmpty();
-
-			var scope = this.boundingBox;
-
-			this.updateMatrixWorld( true );
-
-			this.traverse( function ( node ) {
-
-				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
-
-					var vertices = node.geometry.vertices;
-
-					for ( var i = 0, il = vertices.length; i < il; i++ ) {
-
-						v1.copy( vertices[ i ] );
-
-						v1.applyMatrix4( node.matrixWorld );
-
-						scope.expandByPoint( v1 );
-
-					}
-
-				}
-
-			} );
-
-			return this.boundingBox;
-
-		};
-
-	}(),
-
 	clone: function ( object, recursive ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
@@ -6924,12 +6917,6 @@ THREE.Object3D.prototype = {
 		object.receiveShadow = this.receiveShadow;
 
 		object.frustumCulled = this.frustumCulled;
-
-		if ( this.boundingBox instanceof THREE.Box3 ) {
-
-			object.boundingBox = this.boundingBox.clone();
-
-		}
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
@@ -9972,9 +9959,9 @@ THREE.Loader.prototype = {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function () {
+THREE.ImageLoader = function ( manager ) {
 
-	this.crossOrigin = null;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -9982,32 +9969,19 @@ THREE.ImageLoader.prototype = {
 
 	constructor: THREE.ImageLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
-	load: function ( url, image ) {
+	load: function ( url, callback ) {
 
 		var scope = this;
 
-		if ( image === undefined ) image = new Image();
+		this.manager.add( url, 'image', function ( image ) {
 
-		image.addEventListener( 'load', function () {
+			if ( callback !== undefined ) {
 
-			scope.dispatchEvent( { type: 'load', content: image } );
+				callback( image );
 
-		}, false );
+			}
 
-		image.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
-
-		image.src = url;
+		} );
 
 	}
 
@@ -10462,40 +10436,141 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingMonitor = function () {
+THREE.LoadingManager = function () {
 
 	var scope = this;
 
-	var loaded = 0;
-	var total = 0;
+	var list = [], cache = {};
 
-	var onLoad = function ( event ) {
+	var isLoading = false;
+	var loaded = 0, total = 0;
+
+	var crossOrigin = null;
+
+	var load = function () {
+
+		var item = list[ 0 ];
+
+		if ( cache[ item.url ] === undefined ) {
+
+			switch ( item.type ) {
+
+				case 'image':
+
+					var image = document.createElement( 'img' );
+
+					image.addEventListener( 'load', function ( event ) {
+
+						if ( item.onLoad !== undefined ) {
+
+							item.onLoad( this );
+
+						}
+
+						cache[ item.url ] = this;
+
+						onLoad( item );
+
+					}, false );
+
+					if ( crossOrigin !== null ) image.crossOrigin = crossOrigin;
+
+					image.src = item.url;
+
+					break;
+
+				default:
+
+					var request = new XMLHttpRequest();
+
+					request.addEventListener( 'load', function ( event ) {
+
+						if ( item.onLoad !== undefined ) {
+
+							item.onLoad( event );
+
+						}
+
+						cache[ item.url ] = event;
+
+						onLoad( item );
+
+					}, false );
+
+					request.open( 'GET', item.url, true );
+					request.send( null );
+
+					break;
+
+			}
+
+		} else {
+
+			if ( item.onLoad !== undefined ) {
+
+				item.onLoad( cache[ item.url ] );
+
+			}
+
+			onLoad( item );
+
+		}
+
+		list.shift();
+
+	};
+
+	var onLoad = function ( item ) {
 
 		loaded ++;
 
-		scope.dispatchEvent( { type: 'progress', loaded: loaded, total: total } );
+		scope.dispatchEvent( { type: 'load', item: item, loaded: loaded, total: total } );
 
 		if ( loaded === total ) {
 
-			scope.dispatchEvent( { type: 'load' } );
+			isLoading = false;
+			scope.dispatchEvent( { type: 'complete' } );
+
+		} else {
+
+			load();
 
 		}
 
 	};
 
-	this.add = function ( loader ) {
+	this.add = function ( url, type, onLoad, onProgress, onError ) {
 
 		total ++;
 
-		loader.addEventListener( 'load', onLoad, false );
+		list.push( {
+			url: url,
+			type: type,
+			onLoad: onLoad,
+			onProgress: onProgress,
+			onError: onError
+		} );
+
+		if ( isLoading === false ) {
+
+			isLoading = true;
+			load();
+
+		}
+
+	};
+
+	this.setCrossOrigin = function ( value ) {
+
+		crossOrigin = value;
 
 	};
 
 };
 
-THREE.LoadingMonitor.prototype = {
+THREE.LoadingManager.prototype = {
 
-	constructor: THREE.LoadingMonitor,
+	constructor: THREE.LoadingManager,
 
 	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
 	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
@@ -10504,47 +10579,36 @@ THREE.LoadingMonitor.prototype = {
 
 };
 
+THREE.DefaultLoadingManager = new THREE.LoadingManager();
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function () {};
+THREE.GeometryLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
 THREE.GeometryLoader.prototype = {
 
 	constructor: THREE.GeometryLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
-	load: function ( url ) {
+	load: function ( url, callback ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		this.manager.add( url, 'text', function ( event ) {
 
-			var response = scope.parse( JSON.parse( event.target.responseText ) );
+			if ( callback !== undefined ) {
 
-			scope.dispatchEvent( { type: 'load', content: response } );
+				var geometry = scope.parse( JSON.parse( event.target.responseText ) );
+				callback( geometry );
 
-		}, false );
+			}
 
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		} );
 
 	},
 
@@ -10560,44 +10624,30 @@ THREE.GeometryLoader.prototype = {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.MaterialLoader = function () {};
+THREE.MaterialLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
 
 THREE.MaterialLoader.prototype = {
 
 	constructor: THREE.MaterialLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
-	load: function ( url ) {
+	load: function ( url, callback ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		this.manager.add( url, 'text', function ( event ) {
 
-			var response = scope.parse( JSON.parse( event.target.responseText ) );
+			if ( callback !== undefined ) {
 
-			scope.dispatchEvent( { type: 'load', content: response } );
+				var material = scope.parse( JSON.parse( event.target.responseText ) );
+				callback( material );
 
-		}, false );
+			}
 
-		request.addEventListener( 'progress', function ( event ) {
-
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		} );
 
 	},
 
@@ -34358,11 +34408,11 @@ THREE.BoundingBoxHelper.prototype = Object.create( THREE.Mesh.prototype );
 
 THREE.BoundingBoxHelper.prototype.update = function () {
 
-	this.object.computeBoundingBox();
+	this.box.setFromObject( this.object );
 
-	this.object.boundingBox.size( this.scale );
+	this.box.size( this.scale );
 
-	this.object.boundingBox.center( this.position );
+	this.box.center( this.position );
 
 };
 
