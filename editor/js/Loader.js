@@ -216,7 +216,9 @@ var Loader = function ( editor, signals ) {
 
 			case 'js':
 			case 'json':
-			case '3js':
+			case '3geo':
+			case '3mat':
+			case '3obj':
 
 				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
