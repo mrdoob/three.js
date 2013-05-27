@@ -44,6 +44,7 @@
 	"src/loaders/LoadingManager.js",
 	"src/loaders/GeometryLoader.js",
 	"src/loaders/MaterialLoader.js",
+	"src/loaders/ObjectLoader.js",
 	"src/loaders/SceneLoader.js",
 	"src/loaders/TextureLoader.js",
 	"src/materials/Material.js",
