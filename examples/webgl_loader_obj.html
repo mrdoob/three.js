@@ -73,23 +73,32 @@
 
 				// texture
 
+				var manager = new THREE.LoadingManager();
+				manager.addEventListener( 'load', function ( event ) {
+
+					console.log( 'loading', event.loaded / event.total );
+
+				} );
+				manager.addEventListener( 'complete', function ( event ) {
+
+					console.log( 'loading complete' );
+
+				} );
+
 				var texture = new THREE.Texture();
 
-				var loader = new THREE.ImageLoader();
-				loader.addEventListener( 'load', function ( event ) {
+				var loader = new THREE.ImageLoader( manager );
+				loader.load( 'textures/ash_uvgrid01.jpg', function ( image ) {
 
-					texture.image = event.content;
+					texture.image = image;
 					texture.needsUpdate = true;
 
 				} );
-				loader.load( 'textures/ash_uvgrid01.jpg' );
 
 				// model
 
-				var loader = new THREE.OBJLoader();
-				loader.addEventListener( 'load', function ( event ) {
-
-					var object = event.content;
+				var loader = new THREE.OBJLoader( manager );
+				loader.load( 'obj/male02/male02.obj', function ( object ) {
 
 					object.traverse( function ( child ) {
 
@@ -104,8 +113,7 @@
 					object.position.y = - 80;
 					scene.add( object );
 
-				});
-				loader.load( 'obj/male02/male02.obj' );
+				} );
 
 				//
 

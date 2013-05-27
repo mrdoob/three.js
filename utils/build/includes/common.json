@@ -41,7 +41,7 @@
 	"src/loaders/Loader.js",
 	"src/loaders/ImageLoader.js",
 	"src/loaders/JSONLoader.js",
-	"src/loaders/LoadingMonitor.js",
+	"src/loaders/LoadingManager.js",
 	"src/loaders/GeometryLoader.js",
 	"src/loaders/MaterialLoader.js",
 	"src/loaders/SceneLoader.js",
