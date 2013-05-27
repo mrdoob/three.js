@@ -256,7 +256,7 @@ function onMouseUp(event) {
 		if (tmp_intersected.length > 0) {
 			
 			var SIgeometry = new THREE.Geometry();
-			var SIsprite = THREE.ImageUtils.loadTexture("../textures/sprites/disc.png");
+			var SIsprite = THREE.ImageUtils.loadTexture("../textures/sprite1.png");
 			var SImaterial = new THREE.ParticleBasicMaterial( { size: particleSize, depthTest: false, transparent: true, map: SIsprite });
 			
 			SELECTEDITEMS = SELECTEDITEMS.concat(tmp_intersected);
