@@ -50,6 +50,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		extensions.element_index_uint = gl.getExtension( 'OES_element_index_uint' );
 		extensions.texture_float = gl.getExtension( 'OES_texture_float' );
+		extensions.texture_float_linear = gl.getExtension( 'OES_texture_float_linear' );
 		extensions.standard_derivatives = gl.getExtension( 'OES_standard_derivatives' );
 		extensions.texture_filter_anisotropic = gl.getExtension( 'EXT_texture_filter_anisotropic' ) || gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
 		extensions.compressed_texture_s3tc = gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
