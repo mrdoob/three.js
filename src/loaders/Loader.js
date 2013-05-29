@@ -11,6 +11,7 @@ THREE.Loader = function ( showStatus ) {
 	this.onLoadProgress = function () {};
 	this.onLoadComplete = function () {};
 
+	this.imageLoader = new THREE.DefaultImageLoader();
 };
 
 THREE.Loader.prototype = {

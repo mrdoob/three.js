@@ -5,7 +5,11 @@
  * @author angelxuanchang
  */
 
-THREE.OBJMTLLoader = function () {};
+THREE.OBJMTLLoader = function () {
+
+	this.imageLoader = new THREE.DefaultImageLoader();
+
+};
 
 THREE.OBJMTLLoader.prototype = {
 
@@ -41,7 +45,7 @@ THREE.OBJMTLLoader.prototype = {
 
 		// Loader for MTL
 
-		var mtlLoader = new THREE.MTLLoader( url.substr( 0, url.lastIndexOf( "/" ) + 1 ), options );
+		var mtlLoader = new THREE.MTLLoader( url.substr( 0, url.lastIndexOf( "/" ) + 1 ), options, this.imageLoader );
 		mtlLoader.addEventListener( 'load', waitReady );
 		mtlLoader.addEventListener( 'error', waitReady );
 

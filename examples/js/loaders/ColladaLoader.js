@@ -2,7 +2,7 @@
  * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
  */
 
-THREE.ColladaLoader = function () {
+THREE.ColladaLoader = function ( ) {
 
 	var COLLADA = null;
 	var scene = null;
@@ -25,7 +25,7 @@ THREE.ColladaLoader = function () {
 	var baseUrl;
 	var morphs;
 	var skins;
-
+	
 	var flip_uv = true;
 	var preferredShading = THREE.SmoothShading;
 
@@ -44,7 +44,11 @@ THREE.ColladaLoader = function () {
 		upAxis: 'Y',
 
 		// For reflective or refractive materials we'll use this cubemap
-		defaultEnvMap: null
+		defaultEnvMap: null,
+
+		// for overriding default image loading behavior
+		imageLoader: new THREE.DefaultImageLoader()
+
 
 	};
 
@@ -3193,7 +3197,7 @@ THREE.ColladaLoader = function () {
 
 								if (image) {
 
-									var texture = THREE.ImageUtils.loadTexture(baseUrl + image.init_from);
+									var texture = options.imageLoader.loadTexture(baseUrl + image.init_from);
 									texture.wrapS = cot.texOpts.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.wrapT = cot.texOpts.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
 									texture.offset.x = cot.texOpts.offsetU;
