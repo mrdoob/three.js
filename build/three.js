@@ -10442,7 +10442,6 @@ THREE.LoadingManager = function () {
 
 	var list = [], cache = {};
 
-	var isLoading = false;
 	var loaded = 0, total = 0;
 
 	var crossOrigin = null;
@@ -10526,14 +10525,15 @@ THREE.LoadingManager = function () {
 
 		scope.dispatchEvent( { type: 'load', item: item, loaded: loaded, total: total } );
 
-		if ( loaded === total ) {
-
-			isLoading = false;
-			scope.dispatchEvent( { type: 'complete' } );
-
-		} else {
+		if ( list.length > 0 ) {
 
 			load();
+
+		}
+
+		if ( loaded === total ) {
+
+			scope.dispatchEvent( { type: 'complete' } );
 
 		}
 
@@ -10551,12 +10551,7 @@ THREE.LoadingManager = function () {
 			onError: onError
 		} );
 
-		if ( isLoading === false ) {
-
-			isLoading = true;
-			load();
-
-		}
+		load();
 
 	};
 
@@ -27181,24 +27176,15 @@ THREE.ImageUtils = {
 		var texture = new THREE.Texture( image, mapping );
 
 		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
+		loader.load( url, function ( image ) {
 
-		loader.addEventListener( 'load', function ( event ) {
-
-			texture.image = event.content;
+			texture.image = image;
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture );
 
 		} );
-
-		loader.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event.message );
-
-		} );
-
-		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, image );
 
 		texture.sourceFile = url;
 
@@ -34550,11 +34536,11 @@ THREE.ArrowHelper.prototype.setDirection = function () {
 
 		// dir is assumed to be normalized
 
-		if ( dir.y > 0.999 ) {
+		if ( dir.y > 0.99999 ) {
 
 			this.quaternion.set( 0, 0, 0, 1 );
 
-		} else if ( dir.y < - 0.999 ) {
+		} else if ( dir.y < - 0.99999 ) {
 
 			this.quaternion.set( 1, 0, 0, 0 );
 
