@@ -56,11 +56,11 @@ THREE.ArrowHelper.prototype.setDirection = function () {
 
 		// dir is assumed to be normalized
 
-		if ( dir.y > 0.999 ) {
+		if ( dir.y > 0.99999 ) {
 
 			this.quaternion.set( 0, 0, 0, 1 );
 
-		} else if ( dir.y < - 0.999 ) {
+		} else if ( dir.y < - 0.99999 ) {
 
 			this.quaternion.set( 1, 0, 0, 0 );
 
