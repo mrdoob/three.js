@@ -8,7 +8,6 @@ THREE.LoadingManager = function () {
 
 	var list = [], cache = {};
 
-	var isLoading = false;
 	var loaded = 0, total = 0;
 
 	var crossOrigin = null;
@@ -92,14 +91,15 @@ THREE.LoadingManager = function () {
 
 		scope.dispatchEvent( { type: 'load', item: item, loaded: loaded, total: total } );
 
-		if ( loaded === total ) {
-
-			isLoading = false;
-			scope.dispatchEvent( { type: 'complete' } );
-
-		} else {
+		if ( list.length > 0 ) {
 
 			load();
+
+		}
+
+		if ( loaded === total ) {
+
+			scope.dispatchEvent( { type: 'complete' } );
 
 		}
 
@@ -117,12 +117,7 @@ THREE.LoadingManager = function () {
 			onError: onError
 		} );
 
-		if ( isLoading === false ) {
-
-			isLoading = true;
-			load();
-
-		}
+		load();
 
 	};
 

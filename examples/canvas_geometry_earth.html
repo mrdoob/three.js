@@ -66,15 +66,12 @@
 
 				var earthTexture = new THREE.Texture();
 				var loader = new THREE.ImageLoader();
+				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg', function ( image ) {
 
-				loader.addEventListener( 'load', function ( event ) {
-
-					earthTexture.image = event.content;
+					earthTexture.image = image;
 					earthTexture.needsUpdate = true;
 
 				} );
-
-				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 				var geometry = new THREE.SphereGeometry( 200, 20, 20 );
 				var material = new THREE.MeshBasicMaterial( { map: earthTexture, overdraw: true } );
