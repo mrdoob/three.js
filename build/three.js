@@ -14506,23 +14506,20 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 };
 
-THREE.Scene.prototype.clone = function (object) {
-    if ( object === undefined ) object = new THREE.Scene();
+THREE.Scene.prototype.clone = function ( object ) {
 
-    THREE.Object3D.prototype.clone.call(this, object);
-    
-    if(this.fog !== null) {
-        object.fog = this.fog.clone();
-    }
+	if ( object === undefined ) object = new THREE.Scene();
 
-    if(this.overrideMaterial !== null) {
-        object.overrideMaterial = this.overrideMaterial.clone();
-    }
-    
-    object.autoUpdate = this.autoUpdate;
-    object.matrixAutoUpdate = this.matrixAutoUpdate;
+	THREE.Object3D.prototype.clone.call(this, object);
 
-    return object;
+	if ( this.fog !== null ) object.fog = this.fog.clone();
+	if ( this.overrideMaterial !== null ) object.overrideMaterial = this.overrideMaterial.clone();
+
+	object.autoUpdate = this.autoUpdate;
+	object.matrixAutoUpdate = this.matrixAutoUpdate;
+
+	return object;
+
 };
 
 /**
@@ -14533,7 +14530,7 @@ THREE.Scene.prototype.clone = function (object) {
 THREE.Fog = function ( hex, near, far ) {
 
 	this.name = '';
-  
+
 	this.color = new THREE.Color( hex );
 
 	this.near = ( near !== undefined ) ? near : 1;
@@ -14555,7 +14552,7 @@ THREE.Fog.prototype.clone = function () {
 THREE.FogExp2 = function ( hex, density ) {
 
 	this.name = '';
-  
+
 	this.color = new THREE.Color( hex );
 	this.density = ( density !== undefined ) ? density : 0.00025;
 
