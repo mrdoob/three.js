@@ -161,7 +161,7 @@ function init() {
         geometry.vertices.push( vertex );
     }
 
-    var sprite = THREE.ImageUtils.loadTexture("../textures/sprites/ball.png");
+    var sprite = THREE.ImageUtils.loadTexture("textures/sprites/ball.png");
     var material = new THREE.ParticleBasicMaterial( { size: particleSize, depthTest: false, transparent : true, map: sprite });
     particleSystem = new THREE.ParticleSystem( geometry, material );
     plot.add( particleSystem );
@@ -256,7 +256,7 @@ function onMouseUp(event) {
 		if (tmp_intersected.length > 0) {
 			
 			var SIgeometry = new THREE.Geometry();
-			var SIsprite = THREE.ImageUtils.loadTexture("../textures/sprite1.png");
+			var SIsprite = THREE.ImageUtils.loadTexture("textures/sprite1.png");
 			var SImaterial = new THREE.ParticleBasicMaterial( { size: particleSize, depthTest: false, transparent: true, map: SIsprite });
 			
 			SELECTEDITEMS = SELECTEDITEMS.concat(tmp_intersected);
