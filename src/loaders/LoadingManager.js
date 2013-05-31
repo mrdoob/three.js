@@ -2,70 +2,39 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function () {
+THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	var scope = this;
 
-	var list = [], cache = {};
+	var loaders = {};
+	var queue = [];
+	var cache = {};
 
 	var loaded = 0, total = 0;
 
-	var crossOrigin = null;
+	var loadNext = function () {
 
-	var load = function () {
-
-		var item = list[ 0 ];
+		var item = queue[ 0 ];
 
 		if ( cache[ item.url ] === undefined ) {
 
-			switch ( item.type ) {
+			var loader = loaders[ item.type ];
 
-				case 'image':
+			if ( loader !== undefined ) {
 
-					var image = document.createElement( 'img' );
+				loader.load( item.url, function ( event ) {
 
-					image.addEventListener( 'load', function ( event ) {
+					if ( item.onLoad !== undefined ) {
 
-						if ( item.onLoad !== undefined ) {
+						item.onLoad( event );
 
-							item.onLoad( this );
+					}
 
-						}
+					cache[ item.url ] = event;
 
-						cache[ item.url ] = this;
+					onItemLoaded( item );
 
-						onLoad( item );
-
-					}, false );
-
-					if ( crossOrigin !== null ) image.crossOrigin = crossOrigin;
-
-					image.src = item.url;
-
-					break;
-
-				default:
-
-					var request = new XMLHttpRequest();
-
-					request.addEventListener( 'load', function ( event ) {
-
-						if ( item.onLoad !== undefined ) {
-
-							item.onLoad( event );
-
-						}
-
-						cache[ item.url ] = event;
-
-						onLoad( item );
-
-					}, false );
-
-					request.open( 'GET', item.url, true );
-					request.send( null );
-
-					break;
+				} );
 
 			}
 
@@ -81,25 +50,25 @@ THREE.LoadingManager = function () {
 
 		}
 
-		list.shift();
+		queue.shift();
 
 	};
 
-	var onLoad = function ( item ) {
+	var onItemLoaded = function ( item ) {
 
 		loaded ++;
 
-		scope.dispatchEvent( { type: 'load', item: item, loaded: loaded, total: total } );
+		onProgress( item, loaded, total );
 
-		if ( list.length > 0 ) {
+		if ( queue.length > 0 ) {
 
-			load();
+			loadNext();
 
 		}
 
 		if ( loaded === total ) {
 
-			scope.dispatchEvent( { type: 'complete' } );
+			onLoad();
 
 		}
 
@@ -109,7 +78,7 @@ THREE.LoadingManager = function () {
 
 		total ++;
 
-		list.push( {
+		queue.push( {
 			url: url,
 			type: type,
 			onLoad: onLoad,
@@ -117,27 +86,14 @@ THREE.LoadingManager = function () {
 			onError: onError
 		} );
 
-		load();
+		loadNext();
 
 	};
 
-	this.setCrossOrigin = function ( value ) {
+	this.addLoader = function ( type, loader ) {
 
-		crossOrigin = value;
+		loaders[ type ] = loader;
 
 	};
 
 };
-
-THREE.LoadingManager.prototype = {
-
-	constructor: THREE.LoadingManager,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
-
-};
-
-THREE.DefaultLoadingManager = new THREE.LoadingManager();

@@ -64,17 +64,10 @@
 
 				// earth
 
-				var earthTexture = new THREE.Texture();
-				var loader = new THREE.ImageLoader();
-				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg', function ( image ) {
-
-					earthTexture.image = image;
-					earthTexture.needsUpdate = true;
-
-				} );
+				var texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
 
 				var geometry = new THREE.SphereGeometry( 200, 20, 20 );
-				var material = new THREE.MeshBasicMaterial( { map: earthTexture, overdraw: true } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				group.add( mesh );
@@ -86,7 +79,14 @@
 				canvas.height = 128;
 
 				var context = canvas.getContext( '2d' );
-				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				var gradient = context.createRadialGradient(
+					canvas.width / 2,
+					canvas.height / 2,
+					0,
+					canvas.width / 2,
+					canvas.height / 2,
+					canvas.width / 2
+				);
 				gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
 				gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
 

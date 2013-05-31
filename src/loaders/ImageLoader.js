@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+THREE.ImageLoader = function ( crossOrigin ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.crossOrigin = crossOrigin;
 
 };
 
@@ -12,19 +12,45 @@ THREE.ImageLoader.prototype = {
 
 	constructor: THREE.ImageLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		var image = document.createElement( 'img' );
 
-		this.manager.add( url, 'image', function ( image ) {
+		if ( onLoad !== undefined ) {
 
-			if ( callback !== undefined ) {
+			image.addEventListener( 'load', function ( event ) {
 
-				callback( image );
+				onLoad( this );
 
-			}
+			}, false );
 
-		} );
+		}
+
+		if ( onProgress !== undefined ) {
+
+			image.addEventListener( 'progress', function ( event ) {
+
+				onProgress( event );
+
+			}, false );
+
+		}
+
+		if ( onError !== undefined ) {
+
+			image.addEventListener( 'error', function ( event ) {
+
+				onError( event );
+
+			}, false );
+
+		}
+
+		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
+		image.src = url;
+
+		return image;
 
 	}
 
