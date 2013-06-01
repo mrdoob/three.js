@@ -9959,9 +9959,9 @@ THREE.Loader.prototype = {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( manager ) {
+THREE.ImageLoader = function ( crossOrigin ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.crossOrigin = crossOrigin;
 
 };
 
@@ -9969,19 +9969,45 @@ THREE.ImageLoader.prototype = {
 
 	constructor: THREE.ImageLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		var image = document.createElement( 'img' );
 
-		this.manager.add( url, 'image', function ( image ) {
+		if ( onLoad !== undefined ) {
 
-			if ( callback !== undefined ) {
+			image.addEventListener( 'load', function ( event ) {
 
-				callback( image );
+				onLoad( this );
 
-			}
+			}, false );
 
-		} );
+		}
+
+		if ( onProgress !== undefined ) {
+
+			image.addEventListener( 'progress', function ( event ) {
+
+				onProgress( event );
+
+			}, false );
+
+		}
+
+		if ( onError !== undefined ) {
+
+			image.addEventListener( 'error', function ( event ) {
+
+				onError( event );
+
+			}, false );
+
+		}
+
+		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
+
+		image.src = url;
+
+		return image;
 
 	}
 
@@ -10436,70 +10462,39 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function () {
+THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	var scope = this;
 
-	var list = [], cache = {};
+	var loaders = {};
+	var queue = [];
+	var cache = {};
 
 	var loaded = 0, total = 0;
 
-	var crossOrigin = null;
+	var loadNext = function () {
 
-	var load = function () {
-
-		var item = list[ 0 ];
+		var item = queue[ 0 ];
 
 		if ( cache[ item.url ] === undefined ) {
 
-			switch ( item.type ) {
+			var loader = loaders[ item.type ];
 
-				case 'image':
+			if ( loader !== undefined ) {
 
-					var image = document.createElement( 'img' );
+				loader.load( item.url, function ( event ) {
 
-					image.addEventListener( 'load', function ( event ) {
+					if ( item.onLoad !== undefined ) {
 
-						if ( item.onLoad !== undefined ) {
+						item.onLoad( event );
 
-							item.onLoad( this );
+					}
 
-						}
+					cache[ item.url ] = event;
 
-						cache[ item.url ] = this;
+					onItemLoaded( item );
 
-						onLoad( item );
-
-					}, false );
-
-					if ( crossOrigin !== null ) image.crossOrigin = crossOrigin;
-
-					image.src = item.url;
-
-					break;
-
-				default:
-
-					var request = new XMLHttpRequest();
-
-					request.addEventListener( 'load', function ( event ) {
-
-						if ( item.onLoad !== undefined ) {
-
-							item.onLoad( event );
-
-						}
-
-						cache[ item.url ] = event;
-
-						onLoad( item );
-
-					}, false );
-
-					request.open( 'GET', item.url, true );
-					request.send( null );
-
-					break;
+				} );
 
 			}
 
@@ -10515,25 +10510,25 @@ THREE.LoadingManager = function () {
 
 		}
 
-		list.shift();
+		queue.shift();
 
 	};
 
-	var onLoad = function ( item ) {
+	var onItemLoaded = function ( item ) {
 
 		loaded ++;
 
-		scope.dispatchEvent( { type: 'load', item: item, loaded: loaded, total: total } );
+		onProgress( item, loaded, total );
 
-		if ( list.length > 0 ) {
+		if ( queue.length > 0 ) {
 
-			load();
+			loadNext();
 
 		}
 
 		if ( loaded === total ) {
 
-			scope.dispatchEvent( { type: 'complete' } );
+			onLoad();
 
 		}
 
@@ -10543,7 +10538,7 @@ THREE.LoadingManager = function () {
 
 		total ++;
 
-		list.push( {
+		queue.push( {
 			url: url,
 			type: type,
 			onLoad: onLoad,
@@ -10551,38 +10546,25 @@ THREE.LoadingManager = function () {
 			onError: onError
 		} );
 
-		load();
+		loadNext();
 
 	};
 
-	this.setCrossOrigin = function ( value ) {
+	this.addLoader = function ( type, loader ) {
 
-		crossOrigin = value;
+		loaders[ type ] = loader;
 
 	};
 
 };
-
-THREE.LoadingManager.prototype = {
-
-	constructor: THREE.LoadingManager,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
-
-};
-
-THREE.DefaultLoadingManager = new THREE.LoadingManager();
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function ( manager ) {
+THREE.GeometryLoader = function ( crossOrigin ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.crossOrigin = crossOrigin;
 
 };
 
@@ -10590,19 +10572,46 @@ THREE.GeometryLoader.prototype = {
 
 	constructor: THREE.GeometryLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		this.manager.add( url, 'text', function ( event ) {
+		var request = new XMLHttpRequest();
 
-			if ( callback !== undefined ) {
+		if ( onLoad !== undefined ) {
 
-				callback( scope.parse( JSON.parse( event.target.responseText ) ) );
+			request.addEventListener( 'load', function ( event ) {
 
-			}
+				onLoad( scope.parse( JSON.parse( event.target.responseText ) ) );
 
-		} );
+			}, false );
+
+		}
+
+		if ( onProgress !== undefined ) {
+
+			request.addEventListener( 'progress', function ( event ) {
+
+				onProgress( event );
+
+			}, false );
+
+		}
+
+		if ( onError !== undefined ) {
+
+			request.addEventListener( 'error', function ( event ) {
+
+				onError( event );
+
+			}, false );
+
+		}
+
+		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
+
+		request.open( 'GET', url, true );
+		request.send( null );
 
 	},
 
@@ -12257,9 +12266,9 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.TextureLoader = function () {
+THREE.TextureLoader = function ( crossOrigin ) {
 
-	this.crossOrigin = null;
+	this.crossOrigin = crossOrigin;
 
 };
 
@@ -12267,35 +12276,26 @@ THREE.TextureLoader.prototype = {
 
 	constructor: THREE.TextureLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
+	load: function ( url, onLoad ) {
 
-	load: function ( url ) {
+		var texture = new THREE.Texture();
 
-		var scope = this;
+		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
+		loader.load( url, function ( image ) {
 
-		var image = new Image();
-
-		image.addEventListener( 'load', function () {
-
-			var texture = new THREE.Texture( image );
+			texture.image = image;
 			texture.needsUpdate = true;
 
-			scope.dispatchEvent( { type: 'load', content: texture } );
+			if ( onLoad !== undefined ) {
 
-		}, false );
+				onLoad( texture );
 
-		image.addEventListener( 'error', function () {
+			}
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
+		} );
 
-		}, false );
-
-		if ( scope.crossOrigin ) image.crossOrigin = scope.crossOrigin;
-
-		image.src = url;
+		return texture;
 
 	}
 
@@ -22303,7 +22303,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( dispose && ! attributeItem.dynamic ) {
 
-				delete attributeItem.array;
+				attributeItem.array = null;
 
 			}
 
@@ -22410,13 +22410,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var program, programAttributes, linewidth, primitives, a, attribute, geometryAttributes;
+		var linewidth, a, attribute;
 		var attributeItem, attributeName, attributePointer, attributeSize;
 
-		program = setProgram( camera, lights, fog, material, object );
+		var program = setProgram( camera, lights, fog, material, object );
 
-		programAttributes = program.attributes;
-		geometryAttributes = geometry.attributes;
+		var programAttributes = program.attributes;
+		var geometryAttributes = geometry.attributes;
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -22586,11 +22586,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render lines
 
+				var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+
 				setLineWidth( material.linewidth );
 
 				var position = geometryAttributes[ "position" ];
 
-				_gl.drawArrays( _gl.LINE_STRIP, 0, position.numItems / 3 );
+				_gl.drawArrays( primitives, 0, position.numItems / 3 );
 
 				_this.info.render.calls ++;
 				_this.info.render.points += position.numItems;
@@ -22605,11 +22607,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute, i, il;
+		var linewidth, a, attribute, i, il;
 
-		program = setProgram( camera, lights, fog, material, object );
+		var program = setProgram( camera, lights, fog, material, object );
 
-		attributes = program.attributes;
+		var attributes = program.attributes;
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -22779,7 +22781,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
 			setLineWidth( material.linewidth );
 
