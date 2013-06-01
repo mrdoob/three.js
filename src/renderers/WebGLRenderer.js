@@ -7149,15 +7149,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function allocateLights ( lights ) {
+	function allocateLights( lights ) {
 
-		var l, ll, light, dirLights, pointLights, spotLights, hemiLights;
+		var dirLights = 0;
+		var pointLights = 0;
+		var spotLights = 0;
+		var hemiLights = 0;
 
-		dirLights = pointLights = spotLights = hemiLights = 0;
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
 
-		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			light = lights[ l ];
+			var light = lights[ l ];
 
 			if ( light.onlyShadow ) continue;
 
@@ -7172,13 +7173,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function allocateShadows ( lights ) {
+	function allocateShadows( lights ) {
 
-		var l, ll, light, maxShadows = 0;
+		var maxShadows = 0;
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( var l = 0, ll = lights.length; l < ll; l++ ) {
 
-			light = lights[ l ];
+			var light = lights[ l ];
 
 			if ( ! light.castShadow ) continue;
 
@@ -7193,7 +7194,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Initialization
 
-	function initGL () {
+	function initGL() {
 
 		try {
 
@@ -7213,14 +7214,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_glExtensionTextureFloatLinear = _gl.getExtension( 'OES_texture_float_linear' );
 		_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
 
-		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) ||
-											   _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) ||
-											   _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
 
-
-		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) ||
-											_gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) ||
-											_gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
+		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
 
 		if ( ! _glExtensionTextureFloat ) {
 
