@@ -2,11 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function ( onItemLoad ) {
+THREE.LoadingManager = function () {
 
 	var scope = this;
 
 	var loaded = 0, total = 0;
+
+	this.onItemLoad = function () {};
 
 	this.itemStart = function ( url ) {
 
@@ -18,11 +20,7 @@ THREE.LoadingManager = function ( onItemLoad ) {
 
 		loaded ++;
 
-		if ( onItemLoad !== undefined ) {
-
-			onItemLoad( url, loaded, total );
-
-		}
+		scope.onItemLoad( url, loaded, total );
 
 	};
 

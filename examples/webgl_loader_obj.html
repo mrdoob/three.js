@@ -73,11 +73,12 @@
 
 				// texture
 
-				var manager = new THREE.LoadingManager( function ( item, loaded, total ) {
+				var manager = new THREE.LoadingManager();
+				manager.onItemLoad = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
 
-				} );
+				};
 
 				var texture = new THREE.Texture();
 
