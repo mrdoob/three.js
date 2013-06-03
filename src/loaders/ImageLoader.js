@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( crossOrigin ) {
+THREE.ImageLoader = function ( manager ) {
 
-	this.crossOrigin = crossOrigin;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -50,7 +50,11 @@ THREE.ImageLoader.prototype = {
 
 		image.src = url;
 
-		return image;
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
 
 	}
 

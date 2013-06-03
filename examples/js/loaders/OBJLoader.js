@@ -12,18 +12,15 @@ THREE.OBJLoader.prototype = {
 
 	constructor: THREE.OBJLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		this.manager.add( url, 'text', function ( event ) {
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			if ( callback !== undefined ) {
-
-				var geometry = scope.parse( event.target.responseText );
-				callback( geometry );
-
-			}
+			onLoad( scope.parse( text ) );
 
 		} );
 

@@ -54,7 +54,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -64,13 +64,16 @@
 
 				// earth
 
-				var texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
+				var loader = new THREE.TextureLoader();
+				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
 
-				var geometry = new THREE.SphereGeometry( 200, 20, 20 );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+					var geometry = new THREE.SphereGeometry( 200, 20, 20 );
 
-				var mesh = new THREE.Mesh( geometry, material );
-				group.add( mesh );
+					var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+					var mesh = new THREE.Mesh( geometry, material );
+					group.add( mesh );
+
+				} );
 
 				// shadow
 

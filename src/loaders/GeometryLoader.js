@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function ( crossOrigin ) {
+THREE.GeometryLoader = function ( manager ) {
 
-	this.crossOrigin = crossOrigin;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -16,42 +16,19 @@ THREE.GeometryLoader.prototype = {
 
 		var scope = this;
 
-		var request = new XMLHttpRequest();
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-		if ( onLoad !== undefined ) {
+			onLoad( scope.parse( JSON.parse( text ) ) );
 
-			request.addEventListener( 'load', function ( event ) {
+		} );
 
-				onLoad( scope.parse( JSON.parse( event.target.responseText ) ) );
+	},
 
-			}, false );
+	setCrossOrigin: function ( value ) {
 
-		}
-
-		if ( onProgress !== undefined ) {
-
-			request.addEventListener( 'progress', function ( event ) {
-
-				onProgress( event );
-
-			}, false );
-
-		}
-
-		if ( onError !== undefined ) {
-
-			request.addEventListener( 'error', function ( event ) {
-
-				onError( event );
-
-			}, false );
-
-		}
-
-		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		this.crossOrigin = value;
 
 	},
 

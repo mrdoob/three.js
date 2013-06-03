@@ -74,16 +74,18 @@
 				// texture
 
 				var manager = new THREE.LoadingManager();
-				manager.addEventListener( 'load', function ( event ) {
-
-					console.log( 'loading', event.loaded / event.total );
-
-				} );
-				manager.addEventListener( 'complete', function ( event ) {
+				/*
+				manager.onLoad( function () {
 
 					console.log( 'loading complete' );
 
 				} );
+				manager.onProgress( function ( event ) {
+
+					console.log( 'loading', event.loaded / event.total );
+
+				} );
+				*/
 
 				var texture = new THREE.Texture();
 

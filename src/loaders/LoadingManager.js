@@ -74,13 +74,12 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	};
 
-	this.add = function ( url, type, onLoad, onProgress, onError ) {
+	this.add = function ( url, onLoad, onProgress, onError ) {
 
 		total ++;
 
 		queue.push( {
 			url: url,
-			type: type,
 			onLoad: onLoad,
 			onProgress: onProgress,
 			onError: onError
@@ -90,10 +89,6 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	};
 
-	this.addLoader = function ( type, loader ) {
-
-		loaders[ type ] = loader;
-
-	};
-
 };
+
+THREE.DefaultLoadingManager = new THREE.LoadingManager();
