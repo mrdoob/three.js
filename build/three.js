@@ -9959,9 +9959,72 @@ THREE.Loader.prototype = {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.ImageLoader = function ( crossOrigin ) {
+THREE.XHRLoader = function ( manager ) {
 
-	this.crossOrigin = crossOrigin;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
+THREE.XHRLoader.prototype = {
+
+	constructor: THREE.XHRLoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var request = new XMLHttpRequest();
+
+		if ( onLoad !== undefined ) {
+
+			request.addEventListener( 'load', function ( event ) {
+
+				onLoad( event.target.responseText );
+
+			}, false );
+
+		}
+
+		if ( onProgress !== undefined ) {
+
+			request.addEventListener( 'progress', function ( event ) {
+
+				onProgress( event );
+
+			}, false );
+
+		}
+
+		if ( onError !== undefined ) {
+
+			request.addEventListener( 'error', function ( event ) {
+
+				onError( event );
+
+			}, false );
+
+		}
+
+		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
+
+		request.open( 'GET', url, true );
+		request.send( null );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	}
+
+};
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+THREE.ImageLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -10007,7 +10070,11 @@ THREE.ImageLoader.prototype = {
 
 		image.src = url;
 
-		return image;
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
 
 	}
 
@@ -10534,13 +10601,12 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	};
 
-	this.add = function ( url, type, onLoad, onProgress, onError ) {
+	this.add = function ( url, onLoad, onProgress, onError ) {
 
 		total ++;
 
 		queue.push( {
 			url: url,
-			type: type,
 			onLoad: onLoad,
 			onProgress: onProgress,
 			onError: onError
@@ -10550,21 +10616,17 @@ THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	};
 
-	this.addLoader = function ( type, loader ) {
-
-		loaders[ type ] = loader;
-
-	};
-
 };
+
+THREE.DefaultLoadingManager = new THREE.LoadingManager();
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function ( crossOrigin ) {
+THREE.GeometryLoader = function ( manager ) {
 
-	this.crossOrigin = crossOrigin;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -10576,42 +10638,19 @@ THREE.GeometryLoader.prototype = {
 
 		var scope = this;
 
-		var request = new XMLHttpRequest();
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-		if ( onLoad !== undefined ) {
+			onLoad( scope.parse( JSON.parse( text ) ) );
 
-			request.addEventListener( 'load', function ( event ) {
+		} );
 
-				onLoad( scope.parse( JSON.parse( event.target.responseText ) ) );
+	},
 
-			}, false );
+	setCrossOrigin: function ( value ) {
 
-		}
-
-		if ( onProgress !== undefined ) {
-
-			request.addEventListener( 'progress', function ( event ) {
-
-				onProgress( event );
-
-			}, false );
-
-		}
-
-		if ( onError !== undefined ) {
-
-			request.addEventListener( 'error', function ( event ) {
-
-				onError( event );
-
-			}, false );
-
-		}
-
-		if ( this.crossOrigin !== undefined ) request.crossOrigin = this.crossOrigin;
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		this.crossOrigin = value;
 
 	},
 
@@ -10637,19 +10676,23 @@ THREE.MaterialLoader.prototype = {
 
 	constructor: THREE.MaterialLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		this.manager.add( url, 'text', function ( event ) {
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			if ( callback !== undefined ) {
-
-				callback( scope.parse( JSON.parse( event.target.responseText ) ) );
-
-			}
+			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		} );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
 
 	},
 
@@ -12266,9 +12309,9 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.TextureLoader = function ( crossOrigin ) {
+THREE.TextureLoader = function ( manager ) {
 
-	this.crossOrigin = crossOrigin;
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
@@ -12276,15 +12319,13 @@ THREE.TextureLoader.prototype = {
 
 	constructor: THREE.TextureLoader,
 
-	load: function ( url, onLoad ) {
-
-		var texture = new THREE.Texture();
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var loader = new THREE.ImageLoader();
-		loader.crossOrigin = this.crossOrigin;
+		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( image ) {
 
-			texture.image = image;
+			var texture = new THREE.Texture( image );
 			texture.needsUpdate = true;
 
 			if ( onLoad !== undefined ) {
@@ -12295,7 +12336,11 @@ THREE.TextureLoader.prototype = {
 
 		} );
 
-		return texture;
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
 
 	}
 
@@ -26242,15 +26287,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function allocateLights ( lights ) {
+	function allocateLights( lights ) {
 
-		var l, ll, light, dirLights, pointLights, spotLights, hemiLights;
+		var dirLights = 0;
+		var pointLights = 0;
+		var spotLights = 0;
+		var hemiLights = 0;
 
-		dirLights = pointLights = spotLights = hemiLights = 0;
+		for ( var l = 0, ll = lights.length; l < ll; l ++ ) {
 
-		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
-
-			light = lights[ l ];
+			var light = lights[ l ];
 
 			if ( light.onlyShadow ) continue;
 
@@ -26265,13 +26311,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function allocateShadows ( lights ) {
+	function allocateShadows( lights ) {
 
-		var l, ll, light, maxShadows = 0;
+		var maxShadows = 0;
 
-		for ( l = 0, ll = lights.length; l < ll; l++ ) {
+		for ( var l = 0, ll = lights.length; l < ll; l++ ) {
 
-			light = lights[ l ];
+			var light = lights[ l ];
 
 			if ( ! light.castShadow ) continue;
 
@@ -26286,7 +26332,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Initialization
 
-	function initGL () {
+	function initGL() {
 
 		try {
 
@@ -26306,14 +26352,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_glExtensionTextureFloatLinear = _gl.getExtension( 'OES_texture_float_linear' );
 		_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
 
-		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) ||
-											   _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) ||
-											   _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
+		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
 
-
-		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) ||
-											_gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) ||
-											_gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
+		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
 
 		if ( ! _glExtensionTextureFloat ) {
 
