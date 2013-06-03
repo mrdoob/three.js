@@ -10793,19 +10793,23 @@ THREE.ObjectLoader.prototype = {
 
 	constructor: THREE.ObjectLoader,
 
-	load: function ( url, callback ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		this.manager.add( url, 'text', function ( event ) {
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			if ( callback !== undefined ) {
-
-				callback( scope.parse( JSON.parse( event.target.responseText ) ) );
-
-			}
+			onLoad( scope.parse( JSON.parse( text ) ) );
 
 		} );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
 
 	},
 
