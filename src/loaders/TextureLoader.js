@@ -14,7 +14,9 @@ THREE.TextureLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var loader = new THREE.ImageLoader();
+		var scope = this;
+
+		var loader = new THREE.ImageLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( image ) {
 

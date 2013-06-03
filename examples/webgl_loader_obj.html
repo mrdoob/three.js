@@ -68,24 +68,16 @@
 				scene.add( ambient );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
-				directionalLight.position.set( 0, 0, 1 ).normalize();
+				directionalLight.position.set( 0, 0, 1 );
 				scene.add( directionalLight );
 
 				// texture
 
-				var manager = new THREE.LoadingManager();
-				/*
-				manager.onLoad( function () {
+				var manager = new THREE.LoadingManager( function ( item, loaded, total ) {
 
-					console.log( 'loading complete' );
+					console.log( item, loaded, total );
 
 				} );
-				manager.onProgress( function ( event ) {
-
-					console.log( 'loading', event.loaded / event.total );
-
-				} );
-				*/
 
 				var texture = new THREE.Texture();
 

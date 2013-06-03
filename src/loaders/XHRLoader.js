@@ -14,12 +14,14 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var scope = this;
 		var request = new XMLHttpRequest();
 
 		if ( onLoad !== undefined ) {
 
 			request.addEventListener( 'load', function ( event ) {
 
+				scope.manager.itemEnd( url );
 				onLoad( event.target.responseText );
 
 			}, false );
@@ -50,6 +52,8 @@ THREE.XHRLoader.prototype = {
 
 		request.open( 'GET', url, true );
 		request.send( null );
+
+		scope.manager.itemStart( url );
 
 	},
 
