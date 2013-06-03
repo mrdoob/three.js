@@ -9971,12 +9971,14 @@ THREE.XHRLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var scope = this;
 		var request = new XMLHttpRequest();
 
 		if ( onLoad !== undefined ) {
 
 			request.addEventListener( 'load', function ( event ) {
 
+				scope.manager.itemEnd( url );
 				onLoad( event.target.responseText );
 
 			}, false );
@@ -10008,6 +10010,8 @@ THREE.XHRLoader.prototype = {
 		request.open( 'GET', url, true );
 		request.send( null );
 
+		scope.manager.itemStart( url );
+
 	},
 
 	setCrossOrigin: function ( value ) {
@@ -10034,12 +10038,14 @@ THREE.ImageLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
+		var scope = this;
 		var image = document.createElement( 'img' );
 
 		if ( onLoad !== undefined ) {
 
 			image.addEventListener( 'load', function ( event ) {
 
+				scope.manager.itemEnd( url );
 				onLoad( this );
 
 			}, false );
@@ -10069,6 +10075,8 @@ THREE.ImageLoader.prototype = {
 		if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
 		image.src = url;
+
+		scope.manager.itemStart( url );
 
 	},
 
@@ -10529,90 +10537,27 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
+THREE.LoadingManager = function ( onItemLoad ) {
 
 	var scope = this;
 
-	var loaders = {};
-	var queue = [];
-	var cache = {};
-
 	var loaded = 0, total = 0;
 
-	var loadNext = function () {
-
-		var item = queue[ 0 ];
-
-		if ( cache[ item.url ] === undefined ) {
-
-			var loader = loaders[ item.type ];
-
-			if ( loader !== undefined ) {
-
-				loader.load( item.url, function ( event ) {
-
-					if ( item.onLoad !== undefined ) {
-
-						item.onLoad( event );
-
-					}
-
-					cache[ item.url ] = event;
-
-					onItemLoaded( item );
-
-				} );
-
-			}
-
-		} else {
-
-			if ( item.onLoad !== undefined ) {
-
-				item.onLoad( cache[ item.url ] );
-
-			}
-
-			onLoad( item );
-
-		}
-
-		queue.shift();
-
-	};
-
-	var onItemLoaded = function ( item ) {
-
-		loaded ++;
-
-		onProgress( item, loaded, total );
-
-		if ( queue.length > 0 ) {
-
-			loadNext();
-
-		}
-
-		if ( loaded === total ) {
-
-			onLoad();
-
-		}
-
-	};
-
-	this.add = function ( url, onLoad, onProgress, onError ) {
+	this.itemStart = function ( url ) {
 
 		total ++;
 
-		queue.push( {
-			url: url,
-			onLoad: onLoad,
-			onProgress: onProgress,
-			onError: onError
-		} );
+	};
 
-		loadNext();
+	this.itemEnd = function ( url ) {
+
+		loaded ++;
+
+		if ( onItemLoad !== undefined ) {
+
+			onItemLoad( url, loaded, total );
+
+		}
 
 	};
 
@@ -12325,7 +12270,9 @@ THREE.TextureLoader.prototype = {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var loader = new THREE.ImageLoader();
+		var scope = this;
+
+		var loader = new THREE.ImageLoader( scope.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( image ) {
 
