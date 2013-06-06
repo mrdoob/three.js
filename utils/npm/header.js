@@ -11,11 +11,26 @@ if( window.performance === undefined ) {
 
 if( window.performance.now === undefined ) {
 
-	window.performance.now = function () {
+	// check if we are in a Node.js environment
+	if( ( process !== undefined ) && ( process.hrtime !== undefined ) ) {
 
-		var time = process.hrtime();
-		return ( time[0] + time[1] / 1e9 ) * 1000;
+		window.performance.now = function () {
 
-	};
+			var time = process.hrtime();
+			return ( time[0] + time[1] / 1e9 ) * 1000;
+
+		};
+
+	}
+	// if not Node.js revert to using the Date class
+	else {
+
+		window.performance.now = function() {
+
+			return new Date().getTime();
+
+		};
+
+	}
 
 }

@@ -162,9 +162,9 @@
 				values_color[ v ] = new THREE.Color( 0xffaa00 );
 
 				if ( vertices[ v ].x < 0 )
-					values_color[ v ].setHSV( 0.5 + 0.1 * ( v / vertices.length ), 0.7, 0.9 );
+					values_color[ v ].setHSL( 0.5 + 0.1 * ( v / vertices.length ), 0.7, 0.5 );
 				else
-					values_color[ v ].setHSV( 0.0 + 0.1 * ( v / vertices.length ), 0.9, 0.9 );
+					values_color[ v ].setHSL( 0.0 + 0.1 * ( v / vertices.length ), 0.9, 0.5 );
 
 			}
 

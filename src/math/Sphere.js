@@ -10,7 +10,9 @@ THREE.Sphere = function ( center, radius ) {
 
 };
 
-THREE.extend( THREE.Sphere.prototype, {
+THREE.Sphere.prototype = {
+
+	constructor: THREE.Sphere,
 
 	set: function ( center, radius ) {
 
@@ -131,4 +133,4 @@ THREE.extend( THREE.Sphere.prototype, {
 
 	}
 
-} );
+};

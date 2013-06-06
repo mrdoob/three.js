@@ -9,7 +9,9 @@ THREE.Box3 = function ( min, max ) {
 
 };
 
-THREE.extend( THREE.Box3.prototype, {
+THREE.Box3.prototype = {
+
+	constructor: THREE.Box3,
 
 	set: function ( min, max ) {
 
@@ -282,7 +284,7 @@ THREE.extend( THREE.Box3.prototype, {
 			new THREE.Vector3(),
 			new THREE.Vector3(),
 			new THREE.Vector3()
-			];
+		];
 
 		return function ( matrix ) {
 
@@ -326,4 +328,4 @@ THREE.extend( THREE.Box3.prototype, {
 
 	}
 
-} );
+};

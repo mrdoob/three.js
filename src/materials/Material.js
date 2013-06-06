@@ -5,8 +5,6 @@
 
 THREE.Material = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.id = THREE.MaterialIdCount ++;
 
 	this.name = '';
@@ -39,86 +37,93 @@ THREE.Material = function () {
 
 };
 
-THREE.Material.prototype.setValues = function ( values ) {
+THREE.Material.prototype = {
 
-	if ( values === undefined ) return;
+	constructor: THREE.Material,
 
-	for ( var key in values ) {
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
-		var newValue = values[ key ];
+	setValues: function ( values ) {
 
-		if ( newValue === undefined ) {
+		if ( values === undefined ) return;
 
-			console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
-			continue;
+		for ( var key in values ) {
 
-		}
+			var newValue = values[ key ];
 
-		if ( key in this ) {
+			if ( newValue === undefined ) {
 
-			var currentValue = this[ key ];
+				console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
+				continue;
 
-			if ( currentValue instanceof THREE.Color && newValue instanceof THREE.Color ) {
+			}
 
-				currentValue.copy( newValue );
+			if ( key in this ) {
 
-			} else if ( currentValue instanceof THREE.Color ) {
+				var currentValue = this[ key ];
 
-				currentValue.set( newValue );
+				if ( currentValue instanceof THREE.Color ) {
 
-			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+					currentValue.set( newValue );
 
-				currentValue.copy( newValue );
+				} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 
-			} else {
+					currentValue.copy( newValue );
 
-				this[ key ] = newValue;
+				} else {
+
+					this[ key ] = newValue;
+
+				}
 
 			}
 
 		}
 
+	},
+
+	clone: function ( material ) {
+
+		if ( material === undefined ) material = new THREE.Material();
+
+		material.name = this.name;
+
+		material.side = this.side;
+
+		material.opacity = this.opacity;
+		material.transparent = this.transparent;
+
+		material.blending = this.blending;
+
+		material.blendSrc = this.blendSrc;
+		material.blendDst = this.blendDst;
+		material.blendEquation = this.blendEquation;
+
+		material.depthTest = this.depthTest;
+		material.depthWrite = this.depthWrite;
+
+		material.polygonOffset = this.polygonOffset;
+		material.polygonOffsetFactor = this.polygonOffsetFactor;
+		material.polygonOffsetUnits = this.polygonOffsetUnits;
+
+		material.alphaTest = this.alphaTest;
+
+		material.overdraw = this.overdraw;
+
+		material.visible = this.visible;
+
+		return material;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
-
-};
-
-THREE.Material.prototype.clone = function ( material ) {
-
-	if ( material === undefined ) material = new THREE.Material();
-
-	material.name = this.name;
-
-	material.side = this.side;
-
-	material.opacity = this.opacity;
-	material.transparent = this.transparent;
-
-	material.blending = this.blending;
-
-	material.blendSrc = this.blendSrc;
-	material.blendDst = this.blendDst;
-	material.blendEquation = this.blendEquation;
-
-	material.depthTest = this.depthTest;
-	material.depthWrite = this.depthWrite;
-
-	material.polygonOffset = this.polygonOffset;
-	material.polygonOffsetFactor = this.polygonOffsetFactor;
-	material.polygonOffsetUnits = this.polygonOffsetUnits;
-
-	material.alphaTest = this.alphaTest;
-
-	material.overdraw = this.overdraw;
-
-	material.visible = this.visible;
-
-	return material;
-
-};
-
-THREE.Material.prototype.dispose = function () {
-
-	this.dispatchEvent( { type: 'dispose' } );
 
 };
 

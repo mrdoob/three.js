@@ -28,14 +28,9 @@
 				}
 
 					.menubar .menu .options {
-						display: none;
 						padding: 5px 0px;
 						background-color: #fff;
 						width: 140px;
-					}
-
-					.menubar .menu:hover .options {
-						display: block;
 					}
 
 						.menubar .menu .options hr {
@@ -54,6 +49,11 @@
 								background-color: #08f;
 							}
 
+			.toolbar {
+				background-color: #999;
+				color: #333;
+			}
+
 			.sidebar {
 				width: 300px;
 				background-color: #eee;
@@ -68,21 +68,32 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
-		<script src="../examples/js/controls/TrackballControls.js"></script>
+		<script src="../build/three.js"></script>
+		<script src="../examples/js/libs/system.min.js"></script>
+
+		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/loaders/BinaryLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
+		<script src="../examples/js/loaders/PLYLoader.js"></script>
 		<script src="../examples/js/loaders/STLLoader.js"></script>
 		<script src="../examples/js/loaders/UTF8Loader.js"></script>
 		<script src="../examples/js/loaders/VTKLoader.js"></script>
 		<script src="../examples/js/loaders/ctm/lzma.js"></script>
 		<script src="../examples/js/loaders/ctm/ctm.js"></script>
 		<script src="../examples/js/loaders/ctm/CTMLoader.js"></script>
-		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/SceneExporter.js"></script>
-		<script src="../examples/js/exporters/SceneExporter2.js"></script>
 		<script src="../examples/js/exporters/OBJExporter.js"></script>
+		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
+		<script src="../examples/js/renderers/SVGRenderer.js"></script>
+
+		<!-- WIP -->
+
+		<script src="../examples/js/loaders/ObjectLoader.js"></script>
+		<script src="../examples/js/exporters/GeometryExporter.js"></script>
+		<script src="../examples/js/exporters/MaterialExporter.js"></script>
+		<script src="../examples/js/exporters/ObjectExporter.js"></script>
+		<script src="../examples/js/renderers/WebGLRenderer3.js"></script>
 
 		<script src="js/libs/signals.min.js"></script>
 
@@ -94,10 +105,19 @@
 		<script src="js/ui/Menubar.Add.js"></script>
 		<script src="js/ui/Menubar.Help.js"></script>
 		<script src="js/ui/Sidebar.js"></script>
+		<script src="js/ui/Sidebar.Renderer.js"></script>
 		<script src="js/ui/Sidebar.Scene.js"></script>
 		<script src="js/ui/Sidebar.Object3D.js"></script>
 		<script src="js/ui/Sidebar.Geometry.js"></script>
+		<script src="js/ui/Sidebar.Geometry.PlaneGeometry.js"></script>
+		<script src="js/ui/Sidebar.Geometry.CubeGeometry.js"></script>
+		<script src="js/ui/Sidebar.Geometry.CylinderGeometry.js"></script>
+		<script src="js/ui/Sidebar.Geometry.SphereGeometry.js"></script>
+		<script src="js/ui/Sidebar.Geometry.IcosahedronGeometry.js"></script>
+		<script src="js/ui/Sidebar.Geometry.TorusGeometry.js"></script>
+		<script src="js/ui/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/ui/Sidebar.Material.js"></script>
+		<script src="js/ui/Toolbar.js"></script>
 		<script src="js/ui/Viewport.js"></script>
 
 		<script>
@@ -113,13 +133,12 @@
 
 				cloneSelectedObject: new SIGNALS.Signal(),
 				removeSelectedObject: new SIGNALS.Signal(),
-				exportGeometry: new SIGNALS.Signal(),
-				exportScene: new SIGNALS.Signal(),
-				toggleHelpers: new SIGNALS.Signal(),
-				resetScene: new SIGNALS.Signal(),
 
 				// notifications
 
+				modifierAxisChanged: new SIGNALS.Signal(),
+				snapChanged: new SIGNALS.Signal(),
+				rendererChanged: new SIGNALS.Signal(),
 				sceneAdded: new SIGNALS.Signal(),
 				sceneChanged: new SIGNALS.Signal(),
 				objectAdded: new SIGNALS.Signal(),
@@ -127,7 +146,6 @@
 				objectChanged: new SIGNALS.Signal(),
 				materialChanged: new SIGNALS.Signal(),
 				clearColorChanged: new SIGNALS.Signal(),
-				cameraChanged: new SIGNALS.Signal(),
 				fogTypeChanged: new SIGNALS.Signal(),
 				fogColorChanged: new SIGNALS.Signal(),
 				fogParametersChanged: new SIGNALS.Signal(),
@@ -141,8 +159,15 @@
 			viewport.setTop( '32px' );
 			viewport.setLeft( '0px' );
 			viewport.setRight( '300px' );
-			viewport.setBottom( '0px' );
+			viewport.setBottom( '32px' );
 			document.body.appendChild( viewport.dom );
+
+			var toolbar = new Toolbar( signals );
+			toolbar.setBottom( '0px' );
+			toolbar.setLeft( '0px' );
+			toolbar.setRight( '300px' );
+			toolbar.setHeight( '32px' );
+			document.body.appendChild( toolbar.dom );
 
 			var menubar = new Menubar( signals );
 			menubar.setWidth( '100%' );
@@ -196,7 +221,9 @@
 								geometry.sourceType = "ctm";
 								geometry.sourceFile = file.name;
 
-								var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+								var material = new THREE.MeshPhongMaterial();
+
+								var mesh = new THREE.Mesh( geometry, material );
 								mesh.name = filename;
 
 								signals.objectAdded.dispatch( mesh );
@@ -251,39 +278,58 @@
 
 							}
 
+							if ( data.metadata.version === undefined ) {
+
+								data.metadata.version = data.metadata.formatVersion;
+
+							}
+
 							if ( data.metadata.type === 'geometry' ) {
 
 								var loader = new THREE.JSONLoader();
+								var result = loader.parse( data );
 
-								loader.createModel( data, function ( geometry, materials ) {
+								var geometry = result.geometry;
+								var material = result.materials !== undefined
+											? new THREE.MeshFaceMaterial( result.materials )
+											: new THREE.MeshPhongMaterial();
 
-									geometry.sourceType = "ascii";
-									geometry.sourceFile = file.name;
+								geometry.sourceType = "ascii";
+								geometry.sourceFile = file.name;
 
-									var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-									mesh.name = filename;
+								var mesh = new THREE.Mesh( geometry, material );
+								mesh.name = filename;
 
-									signals.objectAdded.dispatch( mesh );
-									signals.objectSelected.dispatch( mesh );
+								signals.objectAdded.dispatch( mesh );
+								signals.objectSelected.dispatch( mesh );
 
-								} );
+							} else if ( data.metadata.type === 'object' ) {
+
+								var loader = new THREE.ObjectLoader();
+								var result = loader.parse( data );
+
+								if ( result instanceof THREE.Scene ) {
+
+									signals.sceneAdded.dispatch( result );
+
+								} else {
+
+									signals.objectAdded.dispatch( result );
+
+								}
 
 							} else if ( data.metadata.type === 'scene' ) {
 
-								new THREE.SceneLoader().parse( data, function ( result ) {
+								// DEPRECATED
 
-									result.scene.name = filename;
+								var loader = new THREE.SceneLoader();
+								loader.parse( data, function ( result ) {
 
-									var resetScene = true;
+									var scene = result.scene;
 
-									if ( resetScene ) {
+									while ( scene.children.length > 0 ) {
 
-										signals.sceneAdded.dispatch( result.scene, result.currentCamera );
-
-									} else {
-
-										signals.objectAdded.dispatch( result.scene );
-										signals.objectSelected.dispatch( result.scene );
+										signals.objectAdded.dispatch( scene.children[ 0 ] );
 
 									}
 
@@ -309,7 +355,7 @@
 
 								worker.onmessage = function ( event ) {
 
-									event.data.metadata = { format: 2 };
+									event.data.metadata = { version: 2 };
 									handleJSON( event.data );
 
 								};
@@ -320,7 +366,7 @@
 
 							}
 
-							// 3.0
+							// >= 3.0
 
 							var data;
 
@@ -360,6 +406,32 @@
 
 						break;
 
+					case 'ply':
+
+						var reader = new FileReader();
+						reader.addEventListener( 'load', function ( event ) {
+
+							var contents = event.target.result;
+
+							console.log( contents );
+
+							var geometry = new THREE.PLYLoader().parse( contents );
+							geometry.sourceType = "ply";
+							geometry.sourceFile = file.name;
+
+							var material = new THREE.MeshPhongMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
+							mesh.name = filename;
+
+							signals.objectAdded.dispatch( mesh );
+							signals.objectSelected.dispatch( mesh );
+
+						}, false );
+						reader.readAsText( file );
+
+						break;
+
 					case 'stl':
 
 						var reader = new FileReader();
@@ -371,14 +443,16 @@
 							geometry.sourceType = "stl";
 							geometry.sourceFile = file.name;
 
-							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+							var material = new THREE.MeshPhongMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
 							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
 							signals.objectSelected.dispatch( mesh );
 
 						}, false );
-						reader.readAsText( file );
+						reader.readAsBinaryString(file);
 
 						break;
 
@@ -415,7 +489,9 @@
 							geometry.sourceType = "vtk";
 							geometry.sourceFile = file.name;
 
-							var mesh = new THREE.Mesh( geometry, createDummyMaterial() );
+							var material = new THREE.MeshPhongMaterial();
+
+							var mesh = new THREE.Mesh( geometry, material );
 							mesh.name = filename;
 
 							signals.objectAdded.dispatch( mesh );
@@ -430,11 +506,47 @@
 
 			}
 
-			// create default scene
+			// localStorage
 
-			signals.resetScene.dispatch();
+			if ( localStorage.threejsEditor !== undefined ) {
+
+				var loader = new THREE.ObjectLoader();
+				var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
+
+				signals.sceneAdded.dispatch( scene );
+
+			}
+
+			var timeout;
+			var sceneExporter = new THREE.ObjectExporter();
+
+			signals.sceneChanged.add( function ( scene ) {
+
+				clearTimeout( timeout );
+
+				timeout = setTimeout( function () {
+
+					localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
+
+				}, 3000 );
+
+			} );
 
 			//
+
+			document.addEventListener( 'keydown', function ( event ) {
+
+				switch ( event.keyCode ) {
+
+					case 46: // delete
+
+						signals.removeSelectedObject.dispatch();
+
+						break;
+
+				}
+
+			}, false );
 
 			var onWindowResize = function ( event ) {
 
@@ -442,17 +554,9 @@
 
 			};
 
-			var createDummyMaterial = function () {
-
-				return new THREE.MeshPhongMaterial();
-
-			};
-
-			//
+			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
-
-			window.addEventListener( 'resize', onWindowResize, false );
 
 		</script>
 	</body>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../../list.js"></script>
 		<script src="../../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">An extensible curve object which contains methods for interpolation</div>
+		<div class="desc">An extensible curve object which contains methods for interpolation.</div>
 
 
 		<h2>Constructor</h2>
@@ -46,13 +46,13 @@
 		<div>Update the cumlative segment distance cache</div>
 
 		<h3>.getUtoTmapping ( u, distance )</h3>
-		<div>Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equi distance</div>
+		<div>Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant</div>
 
 		<h3>.getTangent ( t )</h3>
 		<div>Returns a unit vector tangent at t. If the subclassed curve do not implement its tangent derivation, 2 points a small delta apart will be used to find its gradient which seems to give a reasonable approximation</div>
 
 		<h3>.getTangentAt ( u )</h3>
-		<div>Returns tangent at equidistance point u on the curve</div>
+		<div>Returns tangent at equidistant point u on the curve</div>
 
 
 		<h2>Source</h2>

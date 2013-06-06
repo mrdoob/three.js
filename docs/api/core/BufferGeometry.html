@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -11,7 +11,7 @@
 
 		<div class="desc">
 		This is a superefficent class for geometries because it saves all data in buffers. <br />
-		It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the nessecary buffer calculations.<br />
+		It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the necessary buffer calculations.<br />
 		It is mainly interesting when working with static objects.
 		</div>
 
@@ -31,7 +31,7 @@
 		Unique number of this buffergeometry instance
 		</div>
 		
-		<h3>.[page:Hashmap Attributes]</h3>
+		<h3>.[page:Hashmap attributes]</h3>
 		<div>
 		This hashmap has as id the name of the attribute to be set and as value the buffer to set it to.
 		</div>
@@ -65,6 +65,11 @@
 		Morph vertices match number and order of primary vertices.
 		</div>
 
+		<h3>.[page:boolean hasTangents]</h3>
+		<div>
+		todo
+		</div> 
+
 		<h2>Methods</h2>
 
 		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
@@ -93,7 +98,7 @@
 		<h3>.computeBoundingSphere()</h3>
 		<div>
 		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.<br />
-		Bounding spheres aren't' computed by default. They need to be explicitly computed, otherwise they are *null*.
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
 		</div>
 		
 		<h3>.dispose()</h3>
@@ -102,6 +107,46 @@
 		You need to call this when you want the bufferGeometry removed while the application is running.
 		</div>
 
+
+		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.normalizeNormals() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
+		<div>
+		event -- todo
+		</div>
+		<div>
+		todo
+		</div>
 
 		<h2>Source</h2>
 

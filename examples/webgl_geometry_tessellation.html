@@ -179,10 +179,9 @@
 			var colors = attributes.customColor.value;
 			var displacement = attributes.displacement.value;
 
-			var h, d, x, y, z;
 			var nv, v = 0;
 
-			for( var f = 0; f < geometry.faces.length; f ++ ) {
+			for ( var f = 0; f < geometry.faces.length; f ++ ) {
 
 				var face = geometry.faces[ f ];
 
@@ -196,21 +195,22 @@
 
 				}
 
-				h = 0.15 * Math.random();
-				s = 0.7 * Math.random();
+				var h = 0.15 * Math.random();
+				var s = 0.5 + 0.5 * Math.random();
+				var l = 0.5 + 0.5 * Math.random();
 
-				d = 10 * ( 0.5 - Math.random() );
+				var d = 10 * ( 0.5 - Math.random() );
 
-				x = 2 * ( 0.5 - Math.random() );
-				y = 2 * ( 0.5 - Math.random() );
-				z = 2 * ( 0.5 - Math.random() );
+				var x = 2 * ( 0.5 - Math.random() );
+				var y = 2 * ( 0.5 - Math.random() );
+				var z = 2 * ( 0.5 - Math.random() );
 
 				for ( var i = 0; i < nv; i ++ ) {
 
 					colors[ v ] = new THREE.Color();
 					displacement[ v ] = new THREE.Vector3();
 
-					colors[ v ].setHSV( h, s, 1 );
+					colors[ v ].setHSL( h, s, l );
 					colors[ v ].convertGammaToLinear();
 
 					displacement[ v ].set( x, y, z );

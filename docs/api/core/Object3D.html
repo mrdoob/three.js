@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -9,7 +9,7 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">Base class for scene graph objects</div>
+		<div class="desc">Base class for scene graph objects.</div>
 
 
 		<h2>Constructor</h2>
@@ -69,11 +69,6 @@
 		Local transform.
 		</div>
 
-		<h3>.[page:Matrix4 matrixRotationWorld]</h3>
-		<div>
-		Global rotation.
-		</div>
-
 		<h3>.[page:Quaternion quaternion]</h3>
 		<div>
 		Object's local rotation as [page:Quaternion Quaternion]. Only used when useQuaternion is set to true.
@@ -124,6 +119,16 @@
 		When this is set, then the rotationMatrix gets calculated every frame.
 		</div>
 
+		<h3>.[page:object userData]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:Matrix4 matrixWorld]</h3>
+		<div>
+		todo
+		</div> 
+
 		<h2>Methods</h2>
 		
 		<h3>.applyMatrix( [page:Matrix4 matrix])</h3>
@@ -134,15 +139,6 @@
 		This updates the position, rotation and scale with the matrix.
 		</div>
 		
-		<h3>.translate( [page:Float distance], [page:Vector3 axis] )</h3>
-		<div>
-		distance - Distance.<br />
-		axis - Translation direction.
-		</div>
-		<div>
-		Translates object along arbitrary *axis* by *distance*.
-		</div>
-
 		<h3>.translateX( [page:Float distance] )</h3>
 		<div>
 		distance - Distance.<br />
@@ -215,15 +211,6 @@
 		Executes the callback on this object and all descendants. 
 		</div>
 
-		<h3>.getChildByName( [page:String name], [page:Boolean recursive] )</h3>
-		<div>
-		name - Object name.<br />
-		recursive - Whether check in the objects's children.
-		</div>
-		<div>
-		Gets first child with name matching the argument. Searches whole subgraph recursively if *recursive* is true.
-		</div>
-		
 		<h3>.getDescendants( [page:Array array] )</h3>
 		<div>
 		array - optional argument that returns the the array with descendants.<br />
@@ -247,6 +234,42 @@
 		Creates a new clone of this object and all descendants.
 		</div>
 
+
+		<h3>.getObjectByName([page:todo name], [page:todo recursive]) [page:todo]</h3>
+		<div>
+		name -- todo <br />
+		recursive -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.translateOnAxis([page:todo axis], [page:todo distance]) [page:todo]</h3>
+		<div>
+		axis -- todo <br />
+		distance -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.getObjectById([page:todo id], [page:todo recursive]) [page:todo]</h3>
+		<div>
+		id -- todo <br />
+		recursive -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.rotateOnAxis([page:todo axis], [page:todo angle]) [page:todo]</h3>
+		<div>
+		axis -- todo <br />
+		angle -- todo
+		</div>
+		<div>
+		todo
+		</div>
 
 		<h2>Source</h2>
 

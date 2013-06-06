@@ -103,31 +103,36 @@
 				var matrix = new THREE.Matrix4();
 
 				var pxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pxGeometry.faces[ 0 ].materialIndex = 1;
 				pxGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
+				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
 				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
 
 				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nxGeometry.faces[ 0 ].materialIndex = 1;
 				nxGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
+				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
 				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pyGeometry.faces[ 0 ].materialIndex = 0;
 				pyGeometry.faces[ 0 ].vertexColors = [ light, light, light, light ];
+				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
+				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
 				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
 				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
 
 				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				pzGeometry.faces[ 0 ].materialIndex = 1;
 				pzGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
+				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
 
 				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
-				nzGeometry.faces[ 0 ].materialIndex = 1;
 				nzGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
+				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
+				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
 				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
 				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
 
@@ -218,18 +223,11 @@
 
 				}
 
-				var textureGrass = THREE.ImageUtils.loadTexture( 'textures/minecraft/grass.png' );
-				textureGrass.magFilter = THREE.NearestFilter;
-				textureGrass.minFilter = THREE.LinearMipMapLinearFilter;
+				var texture = THREE.ImageUtils.loadTexture( 'textures/minecraft/atlas.png' );
+				texture.magFilter = THREE.NearestFilter;
+				texture.minFilter = THREE.LinearMipMapLinearFilter;
 
-				var textureGrassDirt = THREE.ImageUtils.loadTexture( 'textures/minecraft/grass_dirt.png' );
-				textureGrassDirt.magFilter = THREE.NearestFilter;
-				textureGrassDirt.minFilter = THREE.LinearMipMapLinearFilter;
-
-				var material1 = new THREE.MeshLambertMaterial( { map: textureGrass, ambient: 0xbbbbbb, vertexColors: THREE.VertexColors } );
-				var material2 = new THREE.MeshLambertMaterial( { map: textureGrassDirt, ambient: 0xbbbbbb, vertexColors: THREE.VertexColors } );
-
-				var mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( [ material1, material2 ] ) );
+				var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { map: texture, ambient: 0xbbbbbb, vertexColors: THREE.VertexColors } ) );
 				scene.add( mesh );
 
 				var ambientLight = new THREE.AmbientLight( 0xcccccc );

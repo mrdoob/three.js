@@ -52,9 +52,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	// scene graph
 
 	this.sortObjects = true;
-
 	this.autoUpdateObjects = true;
-	this.autoUpdateScene = true;
 
 	// physically based shading
 
@@ -105,7 +103,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_usedTextureUnits = 0,
 
-	// GL state 
+	// GL state
 
 	_viewportX = 0,
 	_viewportY = 0,
@@ -486,54 +484,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var attributes = geometry.attributes;
 
-		var index = attributes[ "index" ];
-		var position = attributes[ "position" ];
-		var normal = attributes[ "normal" ];
-		var uv = attributes[ "uv" ];
-		var color = attributes[ "color" ];
-		var tangent = attributes[ "tangent" ];
+		var attributeName, attributeItem;
 
-		if ( geometry.elementsNeedUpdate && index !== undefined ) {
+		for ( attributeName in attributes ) {
 
-			renderer.setDynamicIndexBuffer(	index.buffer, index.array);
+			attributeItem = attributes[ attributeName ];
 
-		}
+			if ( attributeItem.needsUpdate ) {
 
-		if ( geometry.verticesNeedUpdate && position !== undefined ) {
+				if ( attributeName === 'index' ) {
 
-			renderer.setDynamicArrayBuffer( position.buffer,  position.array);
+					renderer.setDynamicIndexBuffer(	attributeItem.buffer, attributeItem.array );
 
-		}
+				} else {
 
-		if ( geometry.normalsNeedUpdate && normal !== undefined ) {
+					renderer.setDynamicArrayBuffer( attributeItem.buffer,  attributeItem.array );
 
-			renderer.setDynamicArrayBuffer( normal.buffer,  normal.array);
+				}
 
-		}
+				attributeItem.needsUpdate = false;
 
-		if ( geometry.uvsNeedUpdate && uv !== undefined ) {
+			}
 
-			renderer.setDynamicArrayBuffer( uv.buffer,  uv.array);
+			if ( dispose && ! attributeItem.dynamic ) {
 
-		}
-
-		if ( geometry.colorsNeedUpdate && color !== undefined ) {
-
-			renderer.setDynamicArrayBuffer( color.buffer,  color.array);
-
-		}
-
-		if ( geometry.tangentsNeedUpdate && tangent !== undefined ) {
-
-			renderer.setDynamicArrayBuffer( tangent.buffer, tangent.array);
-
-		}
-
-		if ( dispose ) {
-
-			for ( var i in geometry.attributes ) {
-
-				delete geometry.attributes[ i ].array;
+				delete attributeItem.array;
 
 			}
 
@@ -601,7 +576,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
-			
+
 			renderer.setDynamicArrayBuffer( object.__webglNormalBuffer, object.normalArray);
 			renderer.setFloatAttribute(program.attributes.normal, object.__webglNormalBuffer, 3, 0);
 
@@ -630,11 +605,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( material.visible === false ) return;
 
-		var program, attributes, linewidth, primitives, a, attribute;
+		var program, programAttributes, linewidth, primitives, a, attribute, geometryAttributes;
+		var attributeItem, attributeName, attributePointer, attributeSize;
 
 		program = setProgram( camera, lights, fog, material, object );
 
-		attributes = program.attributes;
+		programAttributes = program.attributes;
+		geometryAttributes = geometry.attributes;
 
 		var updateBuffers = false,
 			wireframeBit = material.wireframe ? 1 : 0,
@@ -657,7 +634,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var index = geometry.attributes[ "index" ];
+			var index = geometryAttributes[ "index" ];
 
 			// indexed triangles
 
@@ -677,60 +654,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
-						// vertices
+						for ( attributeName in geometryAttributes ) {
 
-						var position = geometry.attributes[ "position" ];
-						var positionSize = position.itemSize;
-						renderer.setFloatAttribute(attributes.position , position.buffer, positionSize, startIndex * positionSize * 4);
+							if ( attributeName === 'index' ) continue;
 
-						// normals
+							attributePointer = programAttributes[ attributeName ];
+							attributeItem = geometryAttributes[ attributeName ];
+							attributeSize = attributeItem.itemSize;
 
-						var normal = geometry.attributes[ "normal" ];
+							if ( attributePointer >= 0 ) {
 
-						if ( attributes.normal >= 0 && normal ) {
+								renderer.setFloatAttribute( attributePointer , attributeItem.buffer, attributeSize, startIndex * attributeSize * 4 );
 
-							var normalSize = normal.itemSize;
-							renderer.setFloatAttribute(attributes.normal , normal.buffer, normalSize, startIndex * normalSize * 4);
-
-						}
-
-						// uvs
-
-						var uv = geometry.attributes[ "uv" ];
-
-						if ( attributes.uv >= 0 && uv ) {
-
-							var uvSize = uv.itemSize;
-							renderer.setFloatAttribute(attributes.uv , uv.buffer, uvSize, startIndex * uvSize * 4);
+							}
 
 						}
-
-						// colors
-
-						var color = geometry.attributes[ "color" ];
-
-						if ( attributes.color >= 0 && color ) {
-
-							var colorSize = color.itemSize;
-							renderer.setFloatAttribute(attributes.color , color.buffer, colorSize, startIndex * colorSize * 4);
-
-						}
-
-						// tangents
-
-						var tangent = geometry.attributes[ "tangent" ];
-
-						if ( attributes.tangent >= 0 && tangent ) {
-
-							var tangentSize = tangent.itemSize;
-							renderer.setFloatAttribute(attributes.tangent , tangent.buffer, tangentSize, startIndex * tangentSize * 4);
-
-						}
-
 					}
 
 					// render indexed triangles
-					
+
 					renderer.drawTriangleElements(index.buffer, offsets[ i ].count, offsets[ i ].start * 2);
 
 					_this.info.render.calls ++;
@@ -745,59 +687,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( updateBuffers ) {
 
-					// vertices
+					for ( attributeName in geometryAttributes ) {
 
-					var position = geometry.attributes[ "position" ];
-					var positionSize = position.itemSize;
-					renderer.setFloatAttribute(attributes.position , position.buffer, positionSize, 0);
+						attributePointer = programAttributes[ attributeName ];
+						attributeItem = geometryAttributes[ attributeName ];
+						attributeSize = attributeItem.itemSize;
 
-					// normals
+						if ( attributePointer >= 0 ) {
 
-					var normal = geometry.attributes[ "normal" ];
+							renderer.setFloatAttribute( attributePointer , attributeItem.buffer, attributeSize, 0 );
 
-					if ( attributes.normal >= 0 && normal ) {
-
-						var normalSize = normal.itemSize;
-						renderer.setFloatAttribute(attributes.normal , normal.buffer, normalSize, 0);
-
-					}
-
-					// uvs
-
-					var uv = geometry.attributes[ "uv" ];
-
-					if ( attributes.uv >= 0 && uv ) {
-
-						var uvSize = uv.itemSize;
-						renderer.setFloatAttribute(attributes.uv , uv.buffer, uvSize, 0);
-
-					}
-
-					// colors
-
-					var color = geometry.attributes[ "color" ];
-
-					if ( attributes.color >= 0 && color ) {
-
-						var colorSize = color.itemSize;
-						renderer.setFloatAttribute(attributes.color , color.buffer, colorSize, 0);
-
-					}
-
-					// tangents
-
-					var tangent = geometry.attributes[ "tangent" ];
-
-					if ( attributes.tangent >= 0 && tangent ) {
-
-						var tangentSize = tangent.itemSize;
-						renderer.setFloatAttribute(attributes.tangent , tangent.buffer, tangentSize, 0);
+						}
 
 					}
 
 				}
 
+				var position = geometry.attributes[ "position" ];
+
 				// render non-indexed triangles
+
 				renderer.drawTriangles( position.numItems / 3)
 
 				_this.info.render.calls ++;
@@ -812,22 +721,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
-				// vertices
+				for ( attributeName in geometryAttributes ) {
 
-				var position = geometry.attributes[ "position" ];
-				var positionSize = position.itemSize;
-				renderer.setFloatAttribute(attributes.position , position.buffer, positionSize, 0);
+					attributePointer = programAttributes[ attributeName ];
+					attributeItem = geometryAttributes[ attributeName ];
+					attributeSize = attributeItem.itemSize;
 
-				// colors
+					if ( attributePointer >= 0 ) {
 
-				var color = geometry.attributes[ "color" ];
+						renderer.setFloatAttribute( attributePointer , attributeItem.buffer, attributeSize, 0 );
 
-				if ( attributes.color >= 0 && color ) {
-
-					var colorSize = color.itemSize;
-					renderer.setFloatAttribute(attributes.color , color.buffer, colorSize, 0);
+					}
 
 				}
+
+				var position = geometryAttributes[ "position" ];
 
 				// render particles
 				renderer.drawPoints(position.numItems / 3);
@@ -841,22 +749,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
-				// vertices
+				for ( attributeName in geometryAttributes ) {
 
-				var position = geometry.attributes[ "position" ];
-				var positionSize = position.itemSize;
-				renderer.setFloatAttribute(attributes.position , position.buffer, positionSize, 0);
+					attributePointer = programAttributes[ attributeName ];
+					attributeItem = geometryAttributes[ attributeName ];
+					attributeSize = attributeItem.itemSize;
 
-				// colors
+					if ( attributePointer >= 0 ) {
 
-				var color = geometry.attributes[ "color" ];
+						renderer.setFloatAttribute( attributePointer , attributeItem.buffer, attributeSize, 0 );
 
-				if ( attributes.color >= 0 && color ) {
-
-					var colorSize = color.itemSize;
-					renderer.setFloatAttribute(attributes.color , color.buffer, colorSize, 0);
+					}
 
 				}
+
+				var position = geometryAttributes[ "position" ];
 
 				// render lines
 				renderer.setLineWidth( material.linewidth );
@@ -1202,7 +1109,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else {
 
-			return b.id - a.id;
+			return a.id - b.id;
 
 		}
 
@@ -1241,7 +1148,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		// update scene graph
 
-		if ( this.autoUpdateScene ) scene.updateMatrixWorld();
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 
 		// update camera matrices and frustum
 
@@ -1284,6 +1191,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			webglObject = renderList[ i ];
 			object = webglObject.object;
 
+			webglObject.id = i;
 			webglObject.render = false;
 
 			if ( object.visible ) {
@@ -1310,8 +1218,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							webglObject.z = _vector3.z;
 
 						}
-
-						webglObject.id = object.id;
 
 					}
 
@@ -1413,7 +1319,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_lightsNeedUpdate = true;
 			renderer.resetState();
 
-			plugins[ i ].render( scene, camera, renderer.getCurrentWidth(), renderer.getCurrentWidth() );
+			plugins[ i ].render( scene, camera, renderer.getCurrentWidth(), renderer.getCurrentHeight() );
 
 			// reset state after plugin (anything could have changed)
 
@@ -1729,7 +1635,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Objects adding
 
-	function addObject ( object, scene ) {
+	function addObject( object, scene ) {
 
 		var g, geometry, material, geometryGroup;
 
@@ -1909,10 +1815,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		objlist.push(
 			{
+				id: null,
 				buffer: buffer,
 				object: object,
 				opaque: null,
-				transparent: null
+				transparent: null,
+				render: false,
+				z: 0
 			}
 		);
 
@@ -3006,9 +2915,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function setupMatrices ( object, camera ) {
 
 		object._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, object.matrixWorld );
-
-		object._normalMatrix.getInverse( object._modelViewMatrix );
-		object._normalMatrix.transpose();
+		object._normalMatrix.getNormalMatrix( object._modelViewMatrix );
 
 	};
 
@@ -3109,7 +3016,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( ! light.visible ) continue;
 
 				_direction.getPositionFromMatrix( light.matrixWorld );
-				_vector3.getPositionFromMatrix( light.target.matrixWorld );					
+				_vector3.getPositionFromMatrix( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.normalize();
 

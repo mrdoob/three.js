@@ -151,12 +151,12 @@
 
 				if ( v < vc1 ) {
 
-					values_color[ v ].setHSV( 0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].y + radius ) / ( 2 *radius ) );
+					values_color[ v ].setHSL( 0.01 + 0.1 * ( v / vc1 ), 0.99, ( vertices[ v ].y + radius ) / ( 4 * radius ) );
 
 				} else {
 
 					values_size[ v ] = 40;
-					values_color[ v ].setHSV( 0.6, 0.75, 0.5 + vertices[ v ].y / ( 0.8 * radius ) );
+					values_color[ v ].setHSL( 0.6, 0.75, 0.25 + vertices[ v ].y / ( 2 * radius ) );
 
 				}
 

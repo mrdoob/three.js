@@ -151,15 +151,15 @@ test( "intersectPlane", function() {
 
 test( "applyMatrix4", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
-	var m = new THREE.Matrix4().identity();
+	var m = new THREE.Matrix4();
 
 	ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
 
 	a = new THREE.Ray( zero3.clone(), new THREE.Vector3( 0, 0, 1 ) );
-	m.rotateByAxis( new THREE.Vector3( 0, 0, 1 ), Math.PI );
+	m.makeRotationZ( Math.PI );
 	ok( a.clone().applyMatrix4( m ).equals( a ), "Passed!" );
 
-	m.identity().rotateX( Math.PI );
+	m.makeRotationX( Math.PI );
 	var b = a.clone();
 	b.direction.negate();
 	var a2 = a.clone().applyMatrix4( m );

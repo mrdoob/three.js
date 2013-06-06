@@ -16,7 +16,7 @@
 			"rotation" : [ 0, -0.3, 0 ],
 			"scale"	   : [ 1, 1, 1 ],
 			"visible"  : true,
-			"properties" : {
+			"userData" : {
 				"rotating" : true,
 				"rotateX"  : true,
 				"rotateY"  : true
@@ -246,7 +246,7 @@
 			"rotation" : [ 0, 0.5, 0 ],
 			"scale"	   : [ 12, 12, 12 ],
 			"visible"  : true,
-			"properties" : {
+			"userData" : {
 				"rotating" : true,
 				"rotateY"  : true
 			}

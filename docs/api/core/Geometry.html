@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -11,7 +11,7 @@
 
 		<div class="desc">
 		Base class for geometries.<br />
-		A geometry holds all data nessecary to describe a 3D model.
+		A geometry holds all data necessary to describe a 3D model.
 		</div>
 
 
@@ -102,9 +102,9 @@
 		Morph colors can match either number and order of faces (face colors) or number of vertices (vertex colors).
 		</div>
 
-		<h3>.[page:Array morphColors]</h3>
+		<h3>.[page:Array morphNormals]</h3>
 		<div>
-		Array of morph normals. Morph Normals have similar structure as morph targets, each normal set is a Javascript object:
+		Array of morph normals. Morph normals have similar structure as morph targets, each normal set is a Javascript object:
 		<code>morphNormal = { name: "NormalName", normals: [ new THREE.Vector3(), ... ] }</code>
 		</div>
 
@@ -142,45 +142,55 @@
 		Defaults to true.
 		</div>
 		
-		<h3>.verticesNeedUpdate</h3>
+		<h3>.[page:Boolean verticesNeedUpdate]</h3>
 		<div>
 		Set to *true* if the vertices array has been updated.
 		</div>
 		
-		<h3>.elementsNeedUpdate</h3>
+		<h3>.[page:Boolean elementsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the faces array has been updated.
 		</div>
 		
-		<h3>.uvsNeedUpdate</h3>
+		<h3>.[page:Boolean uvsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the uvs array has been updated.
 		</div>
 		
-		<h3>.normalsNeedUpdate</h3>
+		<h3>.[page:Boolean normalsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the normals array has been updated.
 		</div>
 		
-		<h3>.tangentsNeedUpdate</h3>
+		<h3>.[page:Boolean tangentsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the tangents in the faces has been updated.
 		</div>
 		
-		<h3>.colorsNeedUpdate</h3>
+		<h3>.[page:Boolean colorsNeedUpdate]</h3>
 		<div>
 		Set to *true* if the colors array has been updated.
 		</div>
 		
-		<h3>.lineDistancesNeedUpdate</h3>
+		<h3>.[page:Boolean lineDistancesNeedUpdate]</h3>
 		<div>
 		Set to *true* if the linedistances array has been updated.
 		</div>
 		
-		<h3>.buffersNeedUpdate</h3>
+		<h3>.[page:Boolean buffersNeedUpdate]</h3>
 		<div>
 		Set to *true* if an array has changed in length.
 		</div>
+
+		<h3>.[page:array morphNormals]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:array lineDistances]</h3>
+		<div>
+		todo
+		</div> 
 
 		<h2>Methods</h2>
 
@@ -246,6 +256,46 @@
 		Don't forget to call this method when you remove an geometry because it can cuase meomory leaks. 
 		</div>
 
+
+		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
+		<div>
+		event -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.computeLineDistances() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
 
 		<h2>Source</h2>
 

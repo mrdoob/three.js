@@ -1,6 +1,7 @@
 var Menubar = function ( signals ) {
 
-	var container = new UI.Panel( 'absolute' );
+	var container = new UI.Panel();
+	container.setPosition( 'absolute' );
 	container.setClass( 'menubar' );
 
 	container.add( new Menubar.File( signals ) );

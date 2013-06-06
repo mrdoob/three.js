@@ -99,7 +99,7 @@
 				//
 
 				pointLight = new THREE.PointLight( 0xffffff, 1.5, 1000 );
-				pointLight.color.setHSV( 0.05, 0.05, 1 );
+				pointLight.color.setHSL( 0.05, 1, 0.95 );
 				pointLight.position.set( 0, 0, 600 );
 
 				scene.add( pointLight );
@@ -108,14 +108,14 @@
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1.5 );
 				spotLight.position.set( 0.05, 0.05, 1 );
-				spotLight.color.setHSV( 0.6, 0.05, 1 );
+				spotLight.color.setHSL( 0.6, 1, 0.95 );
 				scene.add( spotLight );
 
 				spotLight.position.multiplyScalar( 700 );
 
 				spotLight.castShadow = true;
 				spotLight.onlyShadow = true;
-				//spotLight.shadowCameraVisible = true;
+				// spotLight.shadowCameraVisible = true;
 
 				spotLight.shadowMapWidth = 2048;
 				spotLight.shadowMapHeight = 2048;
@@ -132,13 +132,13 @@
 
 				directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				directionalLight.position.set( 1, -0.5, 1 );
-				directionalLight.color.setHSV( 0.6, 0.05, 1 );
+				directionalLight.color.setHSL( 0.6, 1, 0.95 );
 				scene.add( directionalLight );
 
 				directionalLight.position.multiplyScalar( 500 );
 
 				directionalLight.castShadow = true;
-				//directionalLight.shadowCameraVisible = true;
+				// directionalLight.shadowCameraVisible = true;
 
 				directionalLight.shadowMapWidth = 2048;
 				directionalLight.shadowMapHeight = 2048;
@@ -158,7 +158,7 @@
 
 				directionalLight2 = new THREE.DirectionalLight( 0xffffff, 1.2 );
 				directionalLight2.position.set( 1, -0.5, -1 );
-				directionalLight2.color.setHSV( 0.08, 0.35, 1 );
+				directionalLight2.color.setHSL( 0.08, 1, 0.825 );
 				scene.add( directionalLight2 );
 
 				var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );

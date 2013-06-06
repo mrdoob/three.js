@@ -5,13 +5,13 @@ three.js
 
 The aim of the project is to create a lightweight 3D library with a very low level of complexity — in other words, for dummies. The library provides &lt;canvas&gt;, &lt;svg&gt;, CSS3D and WebGL renderers.
 
-[Examples](http://mrdoob.github.com/three.js/) — [Documentation](http://mrdoob.github.com/three.js/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
+[Examples](http://threejs.org/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
 
 
 ### Usage ###
 
-Download the [minified library](http://mrdoob.github.com/three.js/build/three.min.js) and include it in your html.
-Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file). 
+Download the [minified library](http://threejs.org/build/three.min.js) and include it in your html.
+Alternatively see [how to build the library yourself](https://github.com/mrdoob/three.js/wiki/build.py,-or-how-to-generate-a-compressed-Three.js-file).
 
 ```html
 <script src="js/three.min.js"></script>
@@ -65,6 +65,73 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 ### Change log ###
 
+
+2013 04 17 - **r58** (411,339 KB, gzip: 97,298 KB)
+
+* Removed `Matrix4`'s ` translate()`, `rotateX()`, `rotateY()`, `rotateZ()` and `rotateByAxis()`. ([mrdoob](http://github.com/mrdoob))
+* Documentation improvements. ([yurifury](http://github.com/yurifury), [tmcw](http://github.com/tmcw), [deepan2k5](http://github.com/deepan2k5), [cjshannon](http://github.com/cjshannon) and [sh0ot1e](http://github.com/sh0ot1e))
+* Improvements to `WebGLRenderer` stable z sorting.([wereHamster](http://github.com/wereHamster) and [mrdoob](http://github.com/mrdoob))
+* Lots of progress in `SceneLoader2` and `SceneExporter2`, now known as `ObjectLoader` and `ObjectExporter`. ([mrdoob](http://github.com/mrdoob))
+* Added morphTargets support to `MeshNormalMaterial`. ([mrdoob](http://github.com/mrdoob))
+* Renamed `Matrix4`'s `extractPosition()` to `copyPosition()`. ([mrdoob](http://github.com/mrdoob))
+* Editor now using localStorage for keeping state. ([mrdoob](http://github.com/mrdoob) and [sole](http://github.com/sole))
+* Added `MaterialLoader` and `MaterialExporter`. ([mrdoob](http://github.com/mrdoob))
+* Renamed `Matrix4`'s `setRotationFrom*()` to `makeRotationFrom*()`. ([bhouston](http://github.com/bhouston))
+* Added `setGeometry()` and `setMaterial()` to `Mesh`. ([mrdoob](http://github.com/mrdoob))
+* Editor primitives can now have the parameters updated at any point. ([mrdoob](http://github.com/mrdoob))
+* Renamed `Matrix4`'s `compose()` to `makeFromPositionQuaternionScale()` and added `makeFromPositionEulerScale()`. ([bhouston](http://github.com/bhouston))
+* Added `rotateOnAxis()` and `translateOnAxis()` to `Object3D`. ([WestLangley](http://github.com/WestLangley))
+* Removed `Matrix4`'s `crossVector()`. ([WestLangley](http://github.com/WestLangley))
+* Added `PLYLoader` (ASCII files). ([menway](http://github.com/menway))
+* Added new `BokehShader2`. ([zz85](http://github.com/zz85))
+* Replaced recursive calls in `PolyhedronGeometry` with an analytical construction of the geometry. ([bhickey](http://github.com/bhickey))
+* Renamed `Object3D`'s `getChildByName()` to `getObjectByName()` and added `getObjectById()`. ([mrdoob](http://github.com/mrdoob))
+* Add `materialOffset` parameter to `GeometryUtils`'s `merge()`. ([tapio](http://github.com/tapio))
+* Now using prototype based `EventDispatcher`. ([mrdoob](http://github.com/mrdoob))
+* Added `linewidth` to `ShaderMaterial`. ([mrdoob](http://github.com/mrdoob))
+* `LOD` support in `Raycaster`. ([mrdoob](http://github.com/mrdoob))
+* Added lights support to `ColladaLoader`. ([mrdoob](http://github.com/mrdoob))
+* Started `WebGLRenderer3`. Aiming to find better solutions for the WebGL layer. ([mrdoob](http://github.com/mrdoob))
+* Optimized the PCF shadow map filtering to use vector comparisons. ([MiiBond](http://github.com/MiiBond))
+* `SoftwareRenderer` now handles color changes at runtime. ([mrdoob](http://github.com/mrdoob))
+* Added `BoxHelper`. ([mrdoob](http://github.com/mrdoob))
+* Removed `setClearColorHex()`, `parameters.clearColor` and `parameters.clearAlpha`. ([mrdoob](http://github.com/mrdoob))
+* Refactored `CameraHelper`. ([mrdoob](http://github.com/mrdoob))
+* Fixed bug in `DirectionalLightHelper` and `SpotLightHelper`. ([mrdoob](http://github.com/mrdoob))
+* Fixed bug in Phong shader when using normal maps with derivative tangents. ([WestLangley](http://github.com/WestLangley))
+* Added support for `FaceColors` to `SoftwareRenderer`.
+* Updated `convert_obj_three.py` docstring with current loader interface. ([wilsaj](http://github.com/wilsaj))
+* Updated `OculusRiftEffect`. Now it should work with the original OculusRift. ([troffmo5](http://github.com/troffmo5))
+* Fixed vertex normals and UVs for `CircleGeometry`. ([WestLangley](http://github.com/WestLangley))
+* Added snapping to the editor. ([arodic](http://github.com/arodic))
+* Fixed `SpotLight`'s `angle` and `SpotlightHelper`'s cone size bug. ([WestLangley](http://github.com/WestLangley))
+* Using `CanvasRenderer` in the editor when there is no WebGL support. ([mrdoob](http://github.com/mrdoob))
+* Update `STLLoader` with [github improvements](https://github.com/blog/1465-stl-file-viewing). ([gero3](http://github.com/gero3))
+* Fixed UVs for faces that straddle the seam in `PolyhedronGeometry`. ([WestLangley](http://github.com/WestLangley))
+* Cleaned up `ArrowHelper`. ([WestLangley](http://github.com/WestLangley))
+* Added `VertexColors` support for `Line` in `CanvasRenderer`. ([gero3](http://github.com/gero3))
+* Fixed `TrackballControls` zoom increment to normalize responsiveness across various inputs. ([protometa](http://github.com/protometa))
+
+
+2013 03 15 - **r57** (403,818 KB, gzip: 96,416 KB)
+
+* Added Renderer panel to the editor. ([mrdoob](http://github.com/mrdoob))
+* Added support for custom attributes to `BufferGeometry`. ([zz85](http://github.com/zz85))
+* `CanvasRenderer` and `SVGRenderer` behave like `WebGLRenderer` with `MeshLambertMaterial` and no lights. ([mrdoob](http://github.com/mrdoob))
+* Added `ColorConverter` in examples folder. ([bhouston](http://github.com/bhouston) and [zz85](http://github.com/zz85))
+* Fixed `SVGRenderer` when autoClear false. ([mrdoob](http://github.com/mrdoob))
+* Made `WebGLRenderer` sorting truly stable. ([wereHamster](http://github.com/wereHamster) and [mrdoob](http://github.com/mrdoob))
+* Improved `Object3D` and `Camera` `lookAt()`. ([WestLangley](http://github.com/WestLangley))
+* Added `RingGeometry`. ([merpnderp](http://github.com/merpnderp))
+* Made `OBJLoader` and `OBJMTLLoader` more robust. ([mrdoob](http://github.com/mrdoob))
+* Added pan to `OrbitControls`. ([WestLangley](http://github.com/WestLangley) and [mrdoob](http://github.com/mrdoob))
+* Added `.getColumnFromMatrix()` to `Vector3`. ([WestLangley](http://github.com/WestLangley))
+* Renamed `Object3D` `properties` to `userData`. ([mrdoob](http://github.com/mrdoob))
+* Simplified `PointLightHelper`, `DirectionalLightHelper`, `SpotLightHelper` and `HemisphereLightHelper`. ([mrdoob](http://github.com/mrdoob))
+* Added `GridHelper`. ([mrdoob](http://github.com/mrdoob))
+* Added `.clone()` method to `AmbientLight`, `PointLight`, `DirectionalLight`, `SpotLight` and `HemisphereLight`. ([mrdoob](http://github.com/mrdoob))
+
+
 2013 02 15 - **r56** (408,927 KB, gzip: 97,095 KB)
 
 * Added `LineDashedMaterial` support to `CanvasRenderer`. ([sole](http://github.com/sole))
@@ -85,7 +152,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Removed `setHSV()`, `getHSV()` from `Color`. ([mrdoob](http://github.com/mrdoob))
 * Replaced `ColorUtils.adjustHSV()` with `Color`'s `.offsetHSL()`. ([mrdoob](http://github.com/mrdoob))
 * Added `Line3`. ([bhouston](http://github.com/bhouston))
-* Addded `linewidth` support to `BufferGeometry` lines. ([arodic](http://github.com/arodic))
+* Added `linewidth` support to `BufferGeometry` lines. ([arodic](http://github.com/arodic))
 * Renamed `Box3`/`Line3`/`Plane`/`Ray`/`Sphere`'s `.transform()` to `applyMatrix4()`. ([bhouston](http://github.com/bhouston))
 * Added `smoothstep` and `smootherstep` to `Math`. ([bhouston](http://github.com/bhouston))
 * Improvements to the editor. ([drewnoakes](http://github.com/drewnoakes))
@@ -160,7 +227,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 2012 11 15 - **r53** (392,799 KB, gzip: 96,044 KB)
 
-* Lots of improvements to [editor](http://mrdoob.github.com/three.js/editor/). Including possibility to export geometry and scene. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
+* Lots of improvements to [editor](http://threejs.org/editor/). Including possibility to export geometry and scene. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
 * `Sprite` no longer gets its size from the texture. ([alteredq](http://github.com/alteredq) and [mrdoob](http://github.com/mrdoob))
 * Improved `CSS3DRenderer`. ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 * Added support for vertex normals in `Ribbon`. ([alteredq](http://github.com/alteredq))
@@ -193,7 +260,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added `Object3D.defaultEulerOrder`. ([mrdoob](http://github.com/mrdoob))
 * Replaced `SceneUtils.traverseHierarchy` and `SceneUtils.showHierarchy` with `object.traverse`. ([mrdoob](http://github.com/mrdoob))
 * Added `PointerLockControls`. ([mrdoob](http://github.com/mrdoob))
-* Completed more [documentation](http://mrdoob.github.com/three.js/docs/) pages. ([sole](http://github.com/sole))
+* Completed more [documentation](http://threejs.org/docs/) pages. ([sole](http://github.com/sole))
 * Split `SceneUtils.cloneObject` into `*.clone()`. ([mrdoob](http://github.com/mrdoob))
 * Simplified `AxisHelper`. ([mrdoob](http://github.com/mrdoob))
 * Added `GeometryExporter`. ([mrdoob](http://github.com/mrdoob))
@@ -201,9 +268,9 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added `GeometryLibrary`, `MaterialLibrary`, `TextureLibrary` and `ObjectLibrary` (bear in mind that you can't rely on the GC now. Call `*.deallocate()` for removing). ([mrdoob](http://github.com/mrdoob))
 * Moved `*Controls` out of the lib. ([mrdoob](http://github.com/mrdoob))
 * Fixed shadows getting animated when skinning / morphing was disabled. ([alteredq](http://github.com/alteredq))
-* Added `Manual` section to the [documentation](http://mrdoob.github.com/three.js/docs/) pages. ([oal](http://github.com/oal))
+* Added `Manual` section to the [documentation](http://threejs.org/docs/) pages. ([oal](http://github.com/oal))
 * Added `.angleTo()` to `Vector3`. ([Wilt](http://github.com/Wilt))
-* Many improvements to the [editor](http://mrdoob.github.com/three.js/editor/). ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
+* Many improvements to the [editor](http://threejs.org/editor/). ([mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 
 
 2012 09 15 - **r51** (405,491 KB, gzip: 99,389 KB)
@@ -219,7 +286,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added support to normals maps in `MeshPhongMaterial`. ([crobi](http://github.com/crobi) and [alteredq](http://github.com/alteredq))
 * Added handling of `BufferGeometry` for `ParticleSystems`. ([alteredq](http://github.com/alteredq))
 * Added support for compressed textures and cube maps to `WebGLRenderer`. ([alteredq](http://github.com/alteredq))
-* Outliner and Material panel improvements to the [editor](http://mrdoob.github.com/three.js/editor/). ([mrdoob](http://github.com/mrdoob))
+* Outliner and Material panel improvements to the [editor](http://threejs.org/editor/). ([mrdoob](http://github.com/mrdoob))
 * Added material.emissive support to `CanvasRenderer` and `SVGRenderer`. ([mrdoob](http://github.com/mrdoob))
 * Added handling of multiple UV layers and anisotropy to Blender exporter. ([alteredq](http://github.com/alteredq))
 * Handling bump and anisotropy in `Loader` and `SceneLoader`. ([alteredq](http://github.com/alteredq))
@@ -253,7 +320,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 * Added `OrbitControls`. ([qiao](http://github.com/qiao), [mrdoob](http://github.com/mrdoob) and [alteredq](http://github.com/alteredq))
 * Completed some more documentation pages. ([mrdoob](http://github.com/mrdoob), [phenomnomnominal](http://github.com/phenomnomnominal), [FuzzYspo0N](http://github.com/FuzzYspo0N), [poeschko](http://github.com/poeschko), [wwwtyro](http://github.com/wwwtyro), [maximeq](http://github.com/maximeq) and [alteredq](http://github.com/alteredq))
 * Completed lots more documentation pages. ([sole](http://github.com/sole))
-* Started reworking [GUI](http://mrdoob.github.com/three.js/gui/). ([mrdoob](http://github.com/mrdoob))
+* Started reworking [GUI](http://threejs.org/gui/). ([mrdoob](http://github.com/mrdoob))
 * Improved python build system. ([gero3](http://github.com/gero3))
 * Made `VTKLoader` parsing more robust. ([mrdoob](http://github.com/mrdoob))
 * Added `recursive` flag to `Ray`. ([mrdoob](http://github.com/mrdoob))

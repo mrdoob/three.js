@@ -143,11 +143,10 @@
 					y2 = y1 + Math.cos( 4 * Math.PI * i/n ) * 100;
 					z2 = z1;
 
-					h = i2 % 2 ? 1 : 0.15;
+					h = i2 % 2 ? 1 : 0.25;
 					if ( i2 % 4 <= 2 ) h -= 0.15;
 
-					color = new THREE.Color( 0xffffff );
-					color.setHSV( 0.1 * Math.random(), 0.15, h );
+					color = new THREE.Color().setHSL( 0.1, 0.15, h );
 
 					position2[ geometry.vertices.length ] = new THREE.Vector3( x2, y2, z2 );
 					colors[ geometry.vertices.length ] = color;
@@ -166,7 +165,7 @@
 				ribbon.position.x = 250;
 				scene.add( ribbon );
 
-				ribbon.material.uniforms.color.value.setHSV( 0, 0.75, 1 );
+				ribbon.material.uniforms.color.value.setHSL( 0, 1, 0.5 );
 				materials.push( ribbon.material );
 
 				var ribbon = new THREE.Ribbon( geometry, material.clone() );
@@ -174,7 +173,7 @@
 				ribbon.position.x = 250;
 				scene.add( ribbon );
 
-				ribbon.material.uniforms.color.value.setHSV( 0.1, 0.75, 1 );
+				ribbon.material.uniforms.color.value.setHSL( 0.1, 1, 0.5 );
 				materials.push( ribbon.material );
 
 				//

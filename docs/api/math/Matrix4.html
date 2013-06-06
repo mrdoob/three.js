@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -63,6 +63,16 @@
 		Copies a matrix *m* into this matrix.
 		</div>
 
+		<h3>.copyPosition( [page:Matrix4 m] ) [page:Matrix4]</h3>
+		<div>
+		Copies the translation component of the supplied matrix *m* into this matrix translation component.
+		</div>
+
+		<h3>.extractRotation( [page:Matrix4 m] ) [page:Matrix4]</h3>
+		<div>
+		Extracts the rotation of the supplied matrix *m* into this matrix rotation component.
+		</div>
+
 		<h3>.lookAt( [page:Vector3 eye], [page:Vector3 center], [page:Vector3 up], ) [page:Matrix4]</h3>
 		<div>
 		Constructs a rotation matrix, looking from *eye* towards *center* with defined *up* vector.
@@ -89,26 +99,6 @@
 		Multiplies this matrix by *s*.
 		</div>
 
-		<h3>.multiplyVector3( [page:Vector3 v] ) [page:Vector3]</h3>
-		<div>
-		Applies this matrix to *v*.
-		</div>
-
-		<h3>.multiplyVector4( [page:Vector4 v] ) [page:Vector4]</h3>
-		<div>
-		Applies this matrix to *v*.
-		</div>
-
-		<h3>.rotateAxis( [page:Vector3 v] ) [page:Vector3]</h3>
-		<div>
-		Applies rotation submatrix of this matrix to vector *v* and then normalizes it.
-		</div>
-
-		<h3>.crossVector( [page:Vector4 a] ) [page:Vector4]</h3>
-		<div>
-		Computes the cross product between this matrix and the [page:Vector4] parameter *a*.
-		</div>
-
 		<h3>.determinant() [page:Float]</h3>
 		<div>
 		Computes determinant of this matrix.<br />
@@ -118,11 +108,6 @@
 		<h3>.transpose() [page:Matrix4]</h3>
 		<div>
 		Transposes this matrix.
-		</div>
-
-		<h3>.flatten() [page:Array]</h3>
-		<div>
-		Flattens this matrix into internal [page:Matrix4 Matrix4.flat] array.
 		</div>
 
 		<h3>.flattenToArray( [page:Array flat] ) [page:Array]</h3>
@@ -140,49 +125,25 @@
 		Sets the position component for this matrix from vector *v*.
 		</div>
 
-		<h3>.getPosition() [page:Vector3]</h3>
-		<div>
-		Returns position component from this matrix.<br />
-		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
-		</div>
-
-		<h3>.getColumnX() [page:Vector3]</h3>
-		<div>
-		Returns x column component from this matrix.<br />
-		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
-		</div>
-
-		<h3>.getColumnY() [page:Vector3]</h3>
-		<div>
-		Returns y column component from this matrix.<br />
-		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
-		</div>
-
-		<h3>.getColumnZ() [page:Vector3]</h3>
-		<div>
-		Returns z column component from this matrix.<br />
-		Note: this method returns a reference to the internal class vector, make a copy or clone it if you don't use it right away.
-		</div>
-
 		<h3>.getInverse( [page:Matrix4 m] ) [page:Matrix4]</h3>
 		<div>
 		Sets this matrix to the inverse of matrix *m*.<br />
 		Based on [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm].
 		</div>
 
-		<h3>.setRotationFromEuler( [page:Vector3 v], [page:String order] ) [page:Matrix4]</h3>
+		<h3>.makeRotationFromEuler( [page:Vector3 v], [page:String order] ) [page:Matrix4]</h3>
 		<div>
 		v — Rotation vector.
 		order — The order of rotations. Eg. "XYZ".
 		</div>
 		<div>
-		Sets the rotation submatrix of this matrix to the rotation specified by Euler angles.<br />
+		Sets the rotation submatrix of this matrix to the rotation specified by Euler angles, the rest of the matrix is identity.<br />
 		Default order is *"XYZ"*.
 		</div>
 
-		<h3>.setRotationFromQuaternion( [page:Quaternion q] ) [page:Matrix4]</h3>
+		<h3>.makeRotationFromQuaternion( [page:Quaternion q] ) [page:Matrix4]</h3>
 		<div>
-		Sets the rotation submatrix of this matrix to the rotation specified by *q*.
+		Sets the rotation submatrix of this matrix to the rotation specified by *q*. The rest of the matrix is identity.
 		</div>
 
 		<h3>.scale( [page:Vector3 v] ) [page:Matrix4]</h3>
@@ -190,50 +151,20 @@
 		Multiplies the columns of this matrix by vector *v*.
 		</div>
 
-		<h3>.compose( [page:Vector3 translation], [page:Quaternion rotation], [page:Vector3 scale] ) [page:Matrix4]</h3>
+		<h3>.makeFromPositionQuaternionScale( [page:Vector3 translation], [page:Quaternion rotation], [page:Vector3 scale] ) [page:Matrix4]</h3>
 		<div>
 		Sets this matrix to the transformation composed of *translation*, *rotation* and *scale*.
+		</div>
+
+		<h3>.makeFromPositionEulerScale( [page:Vector3 translation], [page:Vector3 rotation], eulerOrder, [page:Vector3 scale] ) [page:Matrix4]</h3>
+		<div>
+		Sets this matrix to the transformation composed of *translation*, *rotation* (as euler angle triple and order) and *scale*.
 		</div>
 
 		<h3>.decompose( [page:Vector3 translation], [page:Quaternion rotation], [page:Vector3 scale] ) [page:Array]</h3>
 		<div>
 		Decomposes this matrix into the *translation*, *rotation* and *scale* components.<br />
 		If parameters are not passed, new instances will be created.
-		</div>
-
-		<h3>.extractPosition( [page:Matrix4 m] ) [page:Matrix4]</h3>
-		<div>
-		Copies the translation component of the supplied matrix *m* into this matrix translation component.
-		</div>
-
-		<h3>.extractRotation( [page:Matrix4 m] ) [page:Matrix4]</h3>
-		<div>
-		Copies the rotation component of the supplied matrix *m* into this matrix rotation component.
-		</div>
-
-		<h3>.rotateByAxis( [page:Vector3 axis], [page:Float angle] ) [page:Matrix4]</h3>
-		<div>
-		Rotates this matrix around the supplied *axis* by *angle*.
-		</div>
-
-		<h3>.rotateX( [page:Float angle] ) [page:Matrix4]</h3>
-		<div>
-		Rotates this matrix around the *x* axis by *angle*.
-		</div>
-
-		<h3>.rotateY( [page:Float angle] ) [page:Matrix4]</h3>
-		<div>
-		Rotates this matrix around the *y* axis by *angle*.
-		</div>
-
-		<h3>.rotateZ( [page:Float angle] ) [page:Matrix4]</h3>
-		<div>
-		Rotates this matrix around the *z* axis by *angle*.
-		</div>
-
-		<h3>.translate( [page:Vector3 v] ) [page:Matrix4]</h3>
-		<div>
-		Translates this matrix by vector *v*.
 		</div>
 
 		<h3>.makeTranslation( [page:Float x], [page:Float y], [page:Float z] ) [page:Matrix4]</h3>
@@ -298,6 +229,19 @@
 		<h3>.clone() [page:Matrix4]</h3>
 		<div>
 		Clones this matrix.
+		</div>
+
+		<h3>.multiplyVector3Array([page:todo a]) [page:todo]</h3>
+		<div>
+		a -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.getMaxScaleOnAxis() [page:todo]</h3>
+		<div>
+		todo
 		</div>
 
 		<h2>Source</h2>

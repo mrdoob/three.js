@@ -126,16 +126,16 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 			}
 
-			object.properties.colorMaterial = new THREE.MeshFaceMaterial( colorMaterials );
-			object.properties.normalDepthMaterial = new THREE.MeshFaceMaterial( normalDepthMaterials );
+			object.userData.colorMaterial = new THREE.MeshFaceMaterial( colorMaterials );
+			object.userData.normalDepthMaterial = new THREE.MeshFaceMaterial( normalDepthMaterials );
 
 		} else {
 
 			var deferredMaterials = createDeferredMaterials( object.material );
 
-			object.properties.colorMaterial = deferredMaterials.colorMaterial;
-			object.properties.normalDepthMaterial = deferredMaterials.normalDepthMaterial;
-			object.properties.transparent = deferredMaterials.transparent;
+			object.userData.colorMaterial = deferredMaterials.colorMaterial;
+			object.userData.normalDepthMaterial = deferredMaterials.normalDepthMaterial;
+			object.userData.transparent = deferredMaterials.transparent;
 
 		}
 
@@ -317,7 +317,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var updatePointLightProxy = function ( lightProxy ) {
 
-		var light = lightProxy.properties.originalLight;
+		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
 		// skip infinite pointlights
@@ -401,7 +401,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for color and intensity updates
 
-		meshLight.properties.originalLight = light;
+		meshLight.userData.originalLight = light;
 
 		// keep reference for size reset
 
@@ -417,7 +417,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var updateSpotLightProxy = function ( lightProxy ) {
 
-		var light = lightProxy.properties.originalLight;
+		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
 		var viewMatrix = camera.matrixWorldInverse;
@@ -430,7 +430,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		tempVS.getPositionFromMatrix( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
-		viewMatrix.rotateAxis( directionVS );
+		directionVS.transformDirection( viewMatrix );
 
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
@@ -478,7 +478,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for color and intensity updates
 
-		meshLight.properties.originalLight = light;
+		meshLight.userData.originalLight = light;
 
 		// keep reference for size reset
 
@@ -494,14 +494,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var updateDirectionalLightProxy = function ( lightProxy ) {
 
-		var light = lightProxy.properties.originalLight;
+		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
 		directionVS.getPositionFromMatrix( light.matrixWorld );
 		tempVS.getPositionFromMatrix( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
-		camera.matrixWorldInverse.rotateAxis( directionVS );
+		directionVS.transformDirection( camera.matrixWorldInverse );
 
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 
@@ -545,7 +545,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for color and intensity updates
 
-		meshLight.properties.originalLight = light;
+		meshLight.userData.originalLight = light;
 
 		// keep reference for size reset
 
@@ -561,12 +561,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var updateHemisphereLightProxy = function ( lightProxy ) {
 
-		var light = lightProxy.properties.originalLight;
+		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
 		directionVS.getPositionFromMatrix( light.matrixWorld );
 		directionVS.normalize();
-		camera.matrixWorldInverse.rotateAxis( directionVS );
+		directionVS.transformDirection( camera.matrixWorldInverse );
 
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 
@@ -611,7 +611,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for color and intensity updates
 
-		meshLight.properties.originalLight = light;
+		meshLight.userData.originalLight = light;
 
 		// keep reference for size reset
 
@@ -627,7 +627,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var updateAreaLightProxy = function ( lightProxy ) {
 
-		var light = lightProxy.properties.originalLight;
+		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
 		var modelMatrix = light.matrixWorld;
@@ -639,12 +639,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
 		rightVS.copy( light.right );
-		normalVS.copy( light.normal );
-		modelMatrix.rotateAxis( rightVS );
-		modelMatrix.rotateAxis( normalVS );
+		rightVS.transformDirection( modelMatrix );
+		rightVS.transformDirection( viewMatrix );
 
-		viewMatrix.rotateAxis( rightVS );
-		viewMatrix.rotateAxis( normalVS );
+		normalVS.copy( light.normal );
+		normalVS.transformDirection( modelMatrix );
+		normalVS.transformDirection( viewMatrix );
 
 		upVS.crossVectors( rightVS, normalVS );
 		upVS.normalize();
@@ -700,7 +700,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// keep reference for color and intensity updates
 
-		meshLight.properties.originalLight = light;
+		meshLight.userData.originalLight = light;
 
 		// keep reference for size reset
 
@@ -748,7 +748,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	var initDeferredProperties = function ( object ) {
 
-		if ( object.properties.deferredInitialized ) return;
+		if ( object.userData.deferredInitialized ) return;
 
 		if ( object.material ) initDeferredMaterials( object );
 
@@ -788,7 +788,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
-		object.properties.deferredInitialized = true;
+		object.userData.deferredInitialized = true;
 
 	};
 
@@ -798,13 +798,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( object.material ) {
 
-			if ( object.properties.transparent ) {
+			if ( object.userData.transparent ) {
 
 				object.material = invisibleMaterial;
 
 			} else {
 
-				object.material = object.properties.colorMaterial;
+				object.material = object.userData.colorMaterial;
 
 			}
 
@@ -816,13 +816,13 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		if ( object.material ) {
 
-			if ( object.properties.transparent ) {
+			if ( object.userData.transparent ) {
 
 				object.material = invisibleMaterial;
 
 			} else {
 
-				object.material = object.properties.normalDepthMaterial;
+				object.material = object.userData.normalDepthMaterial;
 
 			}
 
@@ -933,7 +933,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
 		if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = camera.matrixWorldInverse;
 
-		var originalLight = proxy.properties.originalLight;
+		var originalLight = proxy.userData.originalLight;
 
 		if ( originalLight ) {
 
@@ -969,18 +969,18 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		// setup deferred properties
 
-		if ( ! scene.properties.lightSceneProxy ) {
+		if ( ! scene.userData.lightSceneProxy ) {
 
-			scene.properties.lightSceneProxy = new THREE.Scene();
-			scene.properties.lightSceneFullscreen = new THREE.Scene();
+			scene.userData.lightSceneProxy = new THREE.Scene();
+			scene.userData.lightSceneFullscreen = new THREE.Scene();
 
 			var meshLight = createDeferredEmissiveLight();
-			scene.properties.lightSceneFullscreen.add( meshLight );
+			scene.userData.lightSceneFullscreen.add( meshLight );
 
 		}
 
-		lightSceneProxy = scene.properties.lightSceneProxy;
-		lightSceneFullscreen = scene.properties.lightSceneFullscreen;
+		lightSceneProxy = scene.userData.lightSceneProxy;
+		lightSceneFullscreen = scene.userData.lightSceneFullscreen;
 
 		passColor.camera = camera;
 		passNormalDepth.camera = camera;
@@ -997,7 +997,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// update scene graph only once per frame
 		// (both color and normalDepth passes use exactly the same scene state)
 
-		this.renderer.autoUpdateScene = false;
+		scene.autoUpdate = false;
 		scene.updateMatrixWorld();
 
 		// 1) g-buffer normals + depth pass
@@ -1046,7 +1046,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// (write light proxy color pixel if behind scene pixel)
 
 		this.renderer.autoClearDepth = false;
-		this.renderer.autoUpdateScene = true;
+
+		scene.autoUpdate = true;
 
 		gl.depthFunc( gl.GEQUAL );
 
