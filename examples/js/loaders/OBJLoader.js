@@ -51,6 +51,8 @@ THREE.OBJLoader.prototype = {
 
 		data = data.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
 
+		data = data.replace( /f( +[\d]+)( [\d]+)?/g, "l $1 $2" ); // fix blender's "faces" with two vertices, which are actually lines
+
 		//
 
 		function vector( x, y, z ) {
@@ -74,6 +76,17 @@ THREE.OBJLoader.prototype = {
 		function face4( a, b, c, d, normals ) {
 
 			return new THREE.Face4( a, b, c, d, normals );
+
+		}
+
+		function linegeom( vtcs ) {
+
+			var geometry = new THREE.Geometry();
+			for (var v = 0; v < vtcs.length; v++) {
+				geometry.vertices.push( vtcs[ v ] );
+			}
+
+			return new THREE.Line( geometry );
 
 		}
 
@@ -130,6 +143,10 @@ THREE.OBJLoader.prototype = {
 		// vt float float
 
 		var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/
+
+		// l vertex vertex vertex vertex vertex ...
+
+		var line_pattern = /l(( +\d+)+)/;
 
 		// f vertex vertex vertex ...
 
@@ -190,6 +207,25 @@ THREE.OBJLoader.prototype = {
 					parseFloat( result[ 1 ] ),
 					parseFloat( result[ 2 ] )
 				) );
+
+			} else if ( ( result = line_pattern.exec( line ) ) !== null ) {
+
+				// can't find a good way to get a match with all numbers in the result using regex
+
+				var line_vertices = [];
+				var line_parts = line.split(/ +/);
+
+				for (var l = 1; l < line_parts.length; l++) {
+
+					if (line_parts[ l ]) {
+
+						line_vertices.push( vertices[ parseInt( line_parts[ l ] ) - 1 ] );
+
+					}
+
+				}
+
+				group.add( linegeom( line_vertices ) );
 
 			} else if ( ( result = face_pattern1.exec( line ) ) !== null ) {
 
