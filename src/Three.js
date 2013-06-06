@@ -234,10 +234,13 @@ THREE.RGBA_S3TC_DXT1_Format = 2002;
 THREE.RGBA_S3TC_DXT3_Format = 2003;
 THREE.RGBA_S3TC_DXT5_Format = 2004;
 
-/*
-// Potential future PVRTC compressed texture formats
+// PVRTC compressed texture formats
 THREE.RGB_PVRTC_4BPPV1_Format = 2100;
 THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
-*/
+
+// ATC compressed texture formats
+THREE.RGB_ATC_Format = 2200;
+THREE.RGBA_ATC_EXPLICIT_ALPHA_Format = 2201;
+THREE.RGBA_ATC_INTERP_ALPHA_Format = 2202;
