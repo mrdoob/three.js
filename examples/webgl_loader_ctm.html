@@ -99,7 +99,7 @@
 				var ambient = new THREE.AmbientLight( 0x080808 );
 				//scene.add( ambient );
 
-				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, 2.5, 3 );
+				var light = new THREE.SpotLight( 0xffeedd, 1.2, 650, Math.PI/2, 3 );
 				light.position.set( 0, -100, 500 );
 
 				light.castShadow = true;

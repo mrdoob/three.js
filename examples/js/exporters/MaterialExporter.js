@@ -12,11 +12,15 @@ THREE.MaterialExporter.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.0,
+				version: 4.2,
 				type: 'material',
 				generator: 'MaterialExporter'
 			}
 		};
+
+		output.id = material.id;
+
+		if ( material.name !== "" ) output.name = material.name;
 
 		if ( material instanceof THREE.MeshBasicMaterial ) {
 

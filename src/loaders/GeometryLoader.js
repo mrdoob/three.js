@@ -2,14 +2,40 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function () {};
+THREE.GeometryLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
 THREE.GeometryLoader.prototype = {
 
 	constructor: THREE.GeometryLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var scope = this;
+
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
+
+			onLoad( scope.parse( JSON.parse( text ) ) );
+
+		} );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
+	parse: function ( json ) {
+
+		
+
+	}
 
 };

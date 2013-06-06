@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../../list.js"></script>
 		<script src="../../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
@@ -16,13 +16,13 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Number radius], [page:Number segmentsWidth], [page:Number segmentsHeight], [page:Number phiStart], [page:Number phiLength], [page:Number thetaStart], [page:Number thetaLength] )</h3>
 
+		<h3>[name]([page:Float radius], [page:Integer widthSegments], [page:Integer heightSegments], [page:Float phiStart], [page:Float phiLength], [page:Float thetaStart], [page:Float thetaLength])</h3>
 
 		<div>
 		radius — sphere radius. Default is 50.<br />
-		segmentsWidth — number of horizontal segments. Minimum value is 3, and the default is 8.<br />
-		segmentsHeight — number of vertical segments. Minimum value is 2, and the default is 6.<br />
+		widthSegments — number of horizontal segments. Minimum value is 3, and the default is 8.<br />
+		heightSegments — number of vertical segments. Minimum value is 2, and the default is 6.<br />
 		phiStart — specify horizontal starting angle. Default is 0.<br />
 		phiLength — specify horizontal sweep angle size. Default is Math.PI * 2.<br />
 		thetaStart — specify vertical starting angle. Default is 0.<br />
@@ -34,6 +34,12 @@
 		</div>
 
 
+		<h2>Properties</h2>
+		
+		<div>
+		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
+		</div>
+		
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

@@ -1,7 +1,8 @@
 /**
  * @author clockworkgeek / https://github.com/clockworkgeek
  * @author timothypratley / https://github.com/timothypratley
- */
+ * @author WestLangley / http://github.com/WestLangley
+*/
 
 THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
@@ -37,7 +38,30 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 	}
 
-	this.mergeVertices();
+
+	// Handle case when face straddles the seam
+
+	for ( var i = 0, l = this.faceVertexUvs[ 0 ].length; i < l; i ++ ) {
+
+		var uvs = this.faceVertexUvs[ 0 ][ i ];
+
+		var x0 = uvs[ 0 ].x;
+		var x1 = uvs[ 1 ].x;
+		var x2 = uvs[ 2 ].x;
+
+		var max = Math.max( x0, Math.max( x1, x2 ) );
+		var min = Math.min( x0, Math.min( x1, x2 ) );
+
+		if ( max > 0.9 && min < 0.1 ) { // 0.9 is somewhat arbitrary
+
+			if ( x0 < 0.2 ) uvs[ 0 ].x += 1;
+			if ( x1 < 0.2 ) uvs[ 1 ].x += 1;
+			if ( x2 < 0.2 ) uvs[ 2 ].x += 1;
+
+		}
+
+	}
+
 
 	// Apply radius
 
@@ -46,6 +70,17 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 		this.vertices[ i ].multiplyScalar( radius );
 
 	}
+
+
+	// Merge vertices
+
+	this.mergeVertices();
+
+	this.computeCentroids();
+
+	this.computeFaceNormals();
+
+	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 
 	// Project vector onto sphere's surface
@@ -72,7 +107,6 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		var face = new THREE.Face3( v1.index, v2.index, v3.index, [ v1.clone(), v2.clone(), v3.clone() ] );
 		face.centroid.add( v1 ).add( v2 ).add( v3 ).divideScalar( 3 );
-		face.normal.copy( face.centroid ).normalize();
 		that.faces.push( face );
 
 		var azi = azimuth( face.centroid );
@@ -180,13 +214,10 @@ THREE.PolyhedronGeometry = function ( vertices, faces, radius, detail ) {
 
 		if ( ( azimuth < 0 ) && ( uv.x === 1 ) ) uv = new THREE.Vector2( uv.x - 1, uv.y );
 		if ( ( vector.x === 0 ) && ( vector.z === 0 ) ) uv = new THREE.Vector2( azimuth / 2 / Math.PI + 0.5, uv.y );
-		return uv;
+		return uv.clone();
 
 	}
 
-	this.computeCentroids();
-
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
 
 };
 

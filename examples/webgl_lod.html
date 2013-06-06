@@ -72,6 +72,7 @@
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1, 15000 );
+				scene.autoUpdate = false;
 
 				var light = new THREE.PointLight( 0xff2200 );
 				light.position.set( 0, 0, 0 );
@@ -121,10 +122,7 @@
 
 				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				renderer.sortObjects = false;
-				renderer.autoUpdateScene = false;
-
 				container.appendChild( renderer.domElement );
 
 				//

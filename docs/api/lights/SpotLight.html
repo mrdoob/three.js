@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -37,15 +37,21 @@ scene.add( spotLight );</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Float color], [page:Float intensity], [page:Float distance], [page:Boolean castShadow] )</h3>
+
+		<h3>[name]([page:todo hex], [page:todo intensity], [page:todo distance], [page:todo angle], [page:todo exponent])</h3>
+		<div>
+		hex -- todo <br />
+		intensity -- todo <br />
+		distance -- todo <br />
+		angle -- todo <br />
+		exponent -- todo
+		</div>
+		<div>
+		todo
+		</div>
+		
 
 		<h2>Properties</h2>
-
-		<h3>.[page:Vector3 position]</h3>
-		<div>
-			Light's position.<br />
-			Default — *new THREE.Vector3()*.
-		</div>
 
 		<h3>.[page:Object3D target]</h3>
 		<div>
@@ -67,8 +73,8 @@ scene.add( spotLight );</code>
 	
 		<h3>.[page:Float angle]</h3>
 		<div>
-			Maximum extent of the spotlight, in radians, from its direction.<br />
-			Default — *Math.PI/2*.
+			Maximum extent of the spotlight, in radians, from its direction. Should be no more than *Math.PI/2*.<br />
+			Default — *Math.PI/3*.
 		</div>
 	
 		<h3>.[page:Float exponent]</h3>
@@ -161,6 +167,29 @@ scene.add( spotLight );</code>
 			Default — *512*.
 		</div>
 
+
+		<h3>.[page:object shadowMatrix]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:object shadowMapSize]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:object shadowCamera]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:object shadowMap]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h2>Methods</h2>		
+		
 		<h2>Source</h2>
 
 		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]

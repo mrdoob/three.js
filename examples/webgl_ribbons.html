@@ -126,7 +126,6 @@
 				var rotationMatrix = new THREE.Matrix4();
 
 				for ( i = 0; i < xgrid; i ++ ) {
-
 					for ( j = 0; j < ygrid; j ++ ) {
 
 						var material = new THREE.MeshBasicMaterial( { color: 0xffffff, vertexColors: true, side: THREE.DoubleSide } );
@@ -148,7 +147,7 @@
 
 						ribbon.matrix.setPosition( ribbon.position );
 
-						rotationMatrix.setRotationFromEuler( ribbon.rotation );
+						rotationMatrix.makeRotationFromEuler( ribbon.rotation );
 
 						ribbon.matrix.elements[ 0 ] = rotationMatrix.elements[ 0 ];
 						ribbon.matrix.elements[ 4 ] = rotationMatrix.elements[ 4 ];

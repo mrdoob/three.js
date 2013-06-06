@@ -9,7 +9,7 @@
 
 THREE.Geometry = function () {
 
-	this.id = THREE.GeometryIdCount ++;
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -84,6 +84,18 @@ THREE.Geometry.prototype = {
 			}
 
 			face.centroid.applyMatrix4( matrix );
+
+		}
+
+		if ( this.boundingBox instanceof THREE.Box3 ) {
+
+			this.computeBoundingBox();
+
+		}
+
+		if ( this.boundingSphere instanceof THREE.Sphere ) {
+
+			this.computeBoundingSphere();
 
 		}
 
@@ -299,6 +311,244 @@ THREE.Geometry.prototype = {
 
 		}
 
+	},
+
+	computeVertexNormalsAsync: function ( areaWeighted, finish_Callback, progress_Callback, numFacesToBatch ) {
+
+		var v, vl, f, fl, face, vertices, tmpVec;
+
+		tmpVec = new THREE.Vector3();
+
+		// create internal buffers for reuse when calling this method repeatedly
+		// (otherwise memory allocation / deallocation every frame is big resource hog)
+		var that = this;
+
+		var vA, vB, vC, vD;
+				var cb = new THREE.Vector3(), ab = new THREE.Vector3(),
+				db = new THREE.Vector3(), dc = new THREE.Vector3(), bc = new THREE.Vector3();
+
+		function addVector( bufferView, index, vector ) {
+			bufferView[ index * 3 ] += vector.x;
+			bufferView[ index * 3 + 1 ] += vector.y;
+			bufferView[ index * 3 + 2 ] += vector.z;
+		}
+
+		function forEachFace( callback, progressStart, progressFinish, finishedCallback, batchSize ) {
+			var f = 0;
+			var batchCounter = 0;
+			var progress = progressStart;
+			var progressStep = (progressFinish - progressStart) / that.faces.length;
+
+			function batch( f ) {
+				var batchCounter = 0;
+				do {
+					var face = that.faces[ f ];
+					callback( face, f );
+					f++;
+					batchCounter++;
+					
+				} while ( batchCounter < batchSize && f < that.faces.length );
+
+				if ( f < that.faces.length ) {
+					progress += progressStep * batchSize;
+					if ( progress_Callback ) {
+						progress_Callback( progress );
+					}
+				}
+				else {
+					progress_Callback( progressFinish );
+					finishedCallback();
+				}
+			}
+
+			while ( f < that.faces.length ) {
+				function face( f ) {
+					setTimeout( function() {
+						batch( f );
+					}, 0 );
+				};
+				face( f );
+				f += batchSize;
+			}
+		}
+
+		function accumulateNormals( face, index ) {
+		//for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			//face = this.faces[ f ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				addVector( vertices, face.a, face.normal );
+				addVector( vertices, face.b, face.normal );
+				addVector( vertices, face.c, face.normal );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				addVector( vertices, face.a, face.normal );
+				addVector( vertices, face.b, face.normal );
+				addVector( vertices, face.c, face.normal );
+				addVector( vertices, face.d, face.normal );
+
+			}
+
+		}
+
+		//
+		function normalizeVerts( ) {
+			for ( v = 0, vl = that.vertices.length; v < vl; v ++ ) {
+				tmpVec.x = vertices[ v * 3 ];
+				tmpVec.y = vertices[ v * 3 + 1];
+				tmpVec.z = vertices[ v * 3 + 2];
+				tmpVec.normalize();
+				vertices[ v * 3 ] = tmpVec.x;
+				vertices[ v * 3 + 1 ] = tmpVec.y;
+				vertices[ v * 3 + 2 ] = tmpVec.z;
+			}
+		}
+
+		function setVertexNormals( face, index ) {
+		//for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+			//face = this.faces[ f ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				face.vertexNormals[ 0 ].set( vertices[ face.a * 3 ], vertices[ face.a * 3 + 1 ], vertices[ face.a * 3 + 2 ] );
+				face.vertexNormals[ 1 ].set( vertices[ face.b * 3 ], vertices[ face.b * 3 + 1 ], vertices[ face.b * 3 + 2 ] );
+				face.vertexNormals[ 2 ].set( vertices[ face.c * 3 ], vertices[ face.c * 3 + 1 ], vertices[ face.c * 3 + 2 ] );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				face.vertexNormals[ 0 ].set( vertices[ face.a * 3 ], vertices[ face.a * 3 + 1 ], vertices[ face.a * 3 + 2 ] );
+				face.vertexNormals[ 1 ].set( vertices[ face.b * 3 ], vertices[ face.b * 3 + 1 ], vertices[ face.b * 3 + 2 ] );
+				face.vertexNormals[ 2 ].set( vertices[ face.c * 3 ], vertices[ face.c * 3 + 1 ], vertices[ face.c * 3 + 2 ] );
+				face.vertexNormals[ 3 ].set( vertices[ face.d * 3 ], vertices[ face.d * 3 + 1 ], vertices[ face.d * 3 + 2 ] );
+
+			}
+
+		}
+
+		function weightByTriArea( face, index ) {
+			// vertex normals weighted by triangle areas
+			// http://www.iquilezles.org/www/articles/normals/normals.htm
+
+			
+
+			//for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+
+				//face = this.faces[ f ];
+
+			if ( face instanceof THREE.Face3 ) {
+
+				cb.set( that.vertices[ face.c * 3 ] - that.vertices[ face.b * 3 ],
+					that.vertices[ face.c * 3 + 1 ] - that.vertices[ face.b * 3 + 1],
+					that.vertices[ face.c * 3 + 2 ] - that.vertices[ face.b * 3 + 2 ] );
+
+				ab.set( that.vertices[ face.a * 3 ] - that.vertices[ face.b * 3 ],
+					that.vertices[ face.a * 3 + 1 ] - that.vertices[ face.b * 3 + 1],
+					that.vertices[ face.a * 3 + 2 ] - that.vertices[ face.b * 3 + 2 ] );
+				
+				cb.cross( ab );
+
+				addVector( vertices, face.a, cb );
+				addVector( vertices, face.b, cb );
+				addVector( vertices, face.c, cb );
+
+			} else if ( face instanceof THREE.Face4 ) {
+
+				vA = that.vertices[ face.a ];
+				vB = that.vertices[ face.b ];
+				vC = that.vertices[ face.c ];
+				vD = that.vertices[ face.d ];
+
+				// abd
+
+				db.set( that.vertices[ face.d * 3 ] - that.vertices[ face.b * 3 ],
+					that.vertices[ face.d * 3 + 1 ] - that.vertices[ face.b * 3 + 1],
+					that.vertices[ face.d * 3 + 2 ] - that.vertices[ face.b * 3 + 2 ] );
+				
+				ab.set( that.vertices[ face.a * 3 ] - that.vertices[ face.b * 3 ],
+					that.vertices[ face.a * 3 + 1 ] - that.vertices[ face.b * 3 + 1],
+					that.vertices[ face.a * 3 + 2 ] - that.vertices[ face.b * 3 + 2 ] );
+				db.cross( ab );
+
+				addVector( vertices, face.a, db );
+				addVector( vertices, face.b, db );
+				addVector( vertices, face.d, db );
+
+				// bcd
+
+				dc.set( that.vertices[ face.d * 3 ] - that.vertices[ face.c * 3 ],
+					that.vertices[ face.d * 3 + 1 ] - that.vertices[ face.c * 3 + 1],
+					that.vertices[ face.d * 3 + 2 ] - that.vertices[ face.c * 3 + 2 ] );
+				bc.set( that.vertices[ face.b * 3 ] - that.vertices[ face.c * 3 ],
+					that.vertices[ face.b * 3 + 1 ] - that.vertices[ face.c * 3 + 1],
+					that.vertices[ face.b * 3 + 2 ] - that.vertices[ face.c * 3 + 2 ] );
+				dc.cross( bc );
+
+				addVector( vertices, face.b, dc );
+				addVector( vertices, face.c, dc );
+				addVector( vertices, face.d, dc );
+
+			}
+
+			//}
+		}
+
+		if ( numFacesToBatch === undefined ) numFacesToBatch = 100000;
+
+		if ( this.__tmpVertices === undefined ) {
+
+			var arraySize = this.vertices.length * 3 * 4;
+			var vertexBuffer = new ArrayBuffer( arraySize );
+
+			var vertexBufferView = new Float32Array( vertexBuffer );
+			this.__tmpVertices = vertexBufferView;//new Array( this.vertices.length );
+			vertices = this.__tmpVertices;
+
+			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+				face = this.faces[ f ];
+				if ( face instanceof THREE.Face3 ) {
+					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+				} else if ( face instanceof THREE.Face4 ) {
+					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+				}
+			}
+		} else {
+			vertices = this.__tmpVertices;
+			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+				vertices[ v * 3 ] = 0.0;
+				vertices[ v * 3 + 1] = 0.0;
+				vertices[ v * 3 + 2] = 0.0;
+			}
+		}
+
+		setTimeout( function() {
+			if ( areaWeighted ) {
+								
+				forEachFace( weightByTriArea, 0, 0.5, function() { 
+					normalizeVerts();
+					forEachFace( setVertexNormals, 0.5, 1.0, function() {
+						if ( finish_Callback ) {
+							finish_Callback();
+						}
+					}, numFacesToBatch );
+				}, numFacesToBatch );
+
+			} else {
+
+				forEachFace( accumulateNormals, 0, 0.5, function() { 
+					normalizeVerts();
+					forEachFace( setVertexNormals, 0.5, 1.0, function() {
+						if ( finish_Callback ) {
+							finish_Callback();
+						}
+					}, numFacesToBatch );
+				}, numFacesToBatch );
+
+			}
+		}, 0);
 	},
 
 	computeMorphNormals: function () {
@@ -554,6 +804,386 @@ THREE.Geometry.prototype = {
 
 	},
 
+	/**
+	 * Computes tangents for the geometry asynchronously and calls
+	 * the provided callback when done. This method can also be setup to 
+	 * yeild execution periodically during computation.
+	 * @method
+	 * @param  {[type]} finish_Callback  Called when the computation is complete.
+	 * @param  {[type]} numFacesToBatch The number of faces to process before yielding to
+	 * allow the cpu to run waiting code.
+	 * @return {[type]}                 [description]
+	 */
+	computeTangentsAsync: function ( finish_Callback, progress_Callback, numFacesToBatch ) {
+
+		// based on http://www.terathon.com/code/tangent.html
+		// tangents go to vertices
+
+		var f, fl, v, vl, i, il, vertexIndex,
+			face, uv, vA, vB, vC, uvA, uvB, uvC,
+			x1, x2, y1, y2, z1, z2,
+			s1, s2, t1, t2, r, t, test,
+			tan1 = [], tan2 = [],
+			sdir = new THREE.Vector3(), tdir = new THREE.Vector3(),
+			tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(),
+			n = new THREE.Vector3(), w;
+
+		for ( f = 0; f < this.faces.length; f++ ) {
+			face = this.faces[ f ];
+			for ( i = 0; i < face.vertexNormals.length; i++ ) {
+				face.vertexTangents[ i ] = new THREE.Vector4();
+			}
+		}
+
+		if ( numFacesToBatch === undefined ) numFacesToBatch = 100000;
+
+		var arraySize = this.vertices.length * 3 * 4;
+		var tan1Buffer = new ArrayBuffer( arraySize );
+		var tan2Buffer = new ArrayBuffer( arraySize );
+
+		var tan1View = new Float32Array( tan1Buffer );
+		var tan2View = new Float32Array( tan2Buffer );
+
+		var tanTmp = new THREE.Vector3()
+
+		function getVector( bufferView, index ) {
+			tanTmp.set( bufferView[ index * 3 ], bufferView[ index * 3 + 1 ], bufferView[ index * 3 + 2 ] );
+			return tanTmp;
+		}
+
+		function addVector( bufferView, index, vector ) {
+			bufferView[ index * 3 ] += vector.x;
+			bufferView[ index * 3 + 1 ] += vector.y;
+			bufferView[ index * 3 + 2 ] += vector.z;
+		}
+
+		function handleTriangle( context, a, b, c, ua, ub, uc ) {
+
+			vA = context.vertices[ a ];
+			vB = context.vertices[ b ];
+			vC = context.vertices[ c ];
+
+			uvA = uv[ ua ];
+			uvB = uv[ ub ];
+			uvC = uv[ uc ];
+
+			x1 = vB.x - vA.x;
+			x2 = vC.x - vA.x;
+			y1 = vB.y - vA.y;
+			y2 = vC.y - vA.y;
+			z1 = vB.z - vA.z;
+			z2 = vC.z - vA.z;
+
+			s1 = uvB.x - uvA.x;
+			s2 = uvC.x - uvA.x;
+			t1 = uvB.y - uvA.y;
+			t2 = uvC.y - uvA.y;
+
+			r = 1.0 / ( s1 * t2 - s2 * t1 );
+			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
+					  ( t2 * y1 - t1 * y2 ) * r,
+					  ( t2 * z1 - t1 * z2 ) * r );
+			tdir.set( ( s1 * x2 - s2 * x1 ) * r,
+					  ( s1 * y2 - s2 * y1 ) * r,
+					  ( s1 * z2 - s2 * z1 ) * r );
+
+			function checkAndFix( vector, component ) {
+				if ( !vector[component] && vector[component] != 0 ) {
+					vector[component] = 0;
+				}
+				else if ( vector[component] === Infinity ) {
+					vector[component] = 1.0;
+				}
+				else if ( vector[component] === -Infinity ) {
+					vector[component] = -1.0;
+				}
+			}
+
+			checkAndFix( sdir, "x" );
+			checkAndFix( sdir, "y" );
+			checkAndFix( sdir, "z" );
+			checkAndFix( tdir, "x" );
+			checkAndFix( tdir, "y" );
+			checkAndFix( tdir, "z" );
+
+			addVector( tan1View, a, sdir );
+			addVector( tan1View, b, sdir );
+			addVector( tan1View, c, sdir );
+
+			addVector( tan2View, a, tdir );
+			addVector( tan2View, b, tdir );
+			addVector( tan2View, c, tdir );
+
+		}
+
+		function forEachFace( callback, progressStart, progressFinish, finishedCallback, batchSize ) {
+			var f = 0;
+			var batchCounter = 0;
+			var progress = progressStart;
+			var progressStep = (progressFinish - progressStart) / that.faces.length;
+
+			function batch( f ) {
+				var batchCounter = 0;
+				do {
+					var face = that.faces[ f ];
+					callback( face, f );
+					f++;
+					batchCounter++;
+					
+				} while ( batchCounter < batchSize && f < that.faces.length );
+
+				if ( f < that.faces.length ) {
+					progress += progressStep * batchSize;
+					if ( progress_Callback ) {
+						progress_Callback( progress );
+					}
+				}
+				else {
+					progress_Callback( progressFinish );
+					finishedCallback();
+				}
+			}
+
+			while ( f < that.faces.length ) {
+				function face( f ) {
+					setTimeout( function() {
+						batch( f );
+					}, 0 );
+				};
+				face( f );
+				f += batchSize;
+			}
+
+			
+		}
+
+		function handleAllTriangles( face, index ) {
+			uv = that.faceVertexUvs[ 0 ][ index ]; // use UV layer 0 for tangents
+			if ( face instanceof THREE.Face3 ) {
+				handleTriangle( that, face.a, face.b, face.c, 0, 1, 2 );
+			} 
+			else if ( face instanceof THREE.Face4 ) {
+				handleTriangle( that, face.a, face.b, face.d, 0, 1, 3 );
+				handleTriangle( that, face.b, face.c, face.d, 1, 2, 3 );
+			}
+		}
+
+		function computeTangentsForFace( face, index ) {
+			
+			for ( i = 0; i < face.vertexNormals.length; i++ ) {
+
+				n.copy( face.vertexNormals[ i ] );
+
+				vertexIndex = face[ faceIndex[ i ] ];
+
+				//t = tan1[ vertexIndex ];
+				t = getVector( tan1View, vertexIndex );
+
+				// Gram-Schmidt orthogonalize
+
+				tmp.copy( t );
+				tmp.sub( n.multiplyScalar( n.dot( t ) ) ).normalize();
+
+				// Calculate handedness
+
+				tmp2.crossVectors( face.vertexNormals[ i ], t );
+				//test = tmp2.dot( tan2[ vertexIndex ] );
+				test = tmp2.dot( getVector( tan2View, vertexIndex ) );
+				w = (test < 0.0) ? -1.0 : 1.0;
+
+				face.vertexTangents[ i ].set( tmp.x, tmp.y, tmp.z, w );
+
+			}
+		}
+
+		var faceIndex = [ 'a', 'b', 'c', 'd' ];
+		var that = this;
+
+		forEachFace( handleAllTriangles, 0, 0.3, function() {
+			
+			forEachFace( computeTangentsForFace, 0.3, 1.0, function() {
+				that.hasTangents = true;
+
+				if ( finish_Callback ) {
+					tanTmp = undefined;
+					tan1View = undefined;
+					tan2View = undefined;
+					tan1Buffer = undefined;
+					tan2Buffer = undefined;
+
+					finish_Callback();
+				}
+		 	}, numFacesToBatch );
+			
+		}, numFacesToBatch );
+
+	},
+
+	computeTangentsAsync_Partial: function ( finish_Callback, progress_Callback, numFacesToBatch ) {
+
+		// based on http://www.terathon.com/code/tangent.html
+		// tangents go to vertices
+
+		var f, fl, v, vl, i, il, vertexIndex,
+			face, uv, vA, vB, vC, uvA, uvB, uvC,
+			x1, x2, y1, y2, z1, z2,
+			s1, s2, t1, t2, r, t, test,
+			//tan1 = [], tan2 = [],
+			sdir = new THREE.Vector3(), tdir = new THREE.Vector3(),
+			tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(),
+			n = new THREE.Vector3(), w;
+
+		var tangentPartials = [];
+		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+
+			tangentPartials[ v ] = new THREE.Vector4();
+		}
+
+
+		if ( numFacesToBatch === undefined ) numFacesToBatch = 100000;
+
+		function handleTriangle( context, a, b, c, ua, ub, uc ) {
+
+			vA = context.vertices[ a ];
+			vB = context.vertices[ b ];
+			vC = context.vertices[ c ];
+
+			uvA = uv[ ua ];
+			uvB = uv[ ub ];
+			uvC = uv[ uc ];
+
+			x1 = vB.x - vA.x;
+			x2 = vC.x - vA.x;
+			y1 = vB.y - vA.y;
+			y2 = vC.y - vA.y;
+			z1 = vB.z - vA.z;
+			z2 = vC.z - vA.z;
+
+			s1 = uvB.x - uvA.x;
+			s2 = uvC.x - uvA.x;
+			t1 = uvB.y - uvA.y;
+			t2 = uvC.y - uvA.y;
+
+			r = 1.0 / ( s1 * t2 - s2 * t1 );
+			sdir.set( ( t2 * x1 - t1 * x2 ) * r,
+					  ( t2 * y1 - t1 * y2 ) * r,
+					  ( t2 * z1 - t1 * z2 ) * r );
+			tdir.set( ( s1 * x2 - s2 * x1 ) * r,
+					  ( s1 * y2 - s2 * y1 ) * r,
+					  ( s1 * z2 - s2 * z1 ) * r );
+
+			function checkAndFix( vector, component ) {
+				if ( !vector[component] && vector[component] != 0 ) {
+					vector[component] = 0;
+				}
+				else if ( vector[component] === Infinity ) {
+					vector[component] = 1.0;
+				}
+				else if ( vector[component] === -Infinity ) {
+					vector[component] = -1.0;
+				}
+			}
+
+			checkAndFix( sdir, "x" );
+			checkAndFix( sdir, "y" );
+			checkAndFix( tdir, "x" );
+			checkAndFix( tdir, "y" );
+
+			tangentPartials[a].x += sdir.x;
+			tangentPartials[a].y += sdir.y;
+			tangentPartials[b].x += sdir.x;
+			tangentPartials[b].y += sdir.y;
+			tangentPartials[c].x += sdir.x;
+			tangentPartials[c].y += sdir.y;
+
+			tangentPartials[a].z += tdir.x;
+			tangentPartials[a].w += tdir.y;
+			tangentPartials[b].z += tdir.x;
+			tangentPartials[b].w += tdir.y;
+			tangentPartials[c].z += tdir.x;
+			tangentPartials[c].w += tdir.y;
+
+		}
+
+		function forEachFace( callback, progressStart, progressFinish, finishedCallback, batchSize ) {
+			var f = 0;
+			var batchCounter = 0;
+			var progress = progressStart;
+			var progressStep = (progressFinish - progressStart) / that.faces.length;
+
+			function batch( f ) {
+				var batchCounter = 0;
+				do {
+					var face = that.faces[ f ];
+					callback( face, f );
+					f++;
+					batchCounter++;
+					
+				} while ( batchCounter < batchSize && f < that.faces.length );
+
+				if ( f < that.faces.length ) {
+					progress += progressStep * batchSize;
+					if ( progress_Callback ) {
+						progress_Callback( progress );
+					}
+				}
+				else {
+					progress_Callback( progressFinish );
+					finishedCallback();
+				}
+			}
+
+			while ( f < that.faces.length ) {
+				function face( f ) {
+					setTimeout( function() {
+						batch( f );
+					}, 0 );
+				};
+				face( f );
+				f += batchSize;
+			}
+
+			
+		}
+
+		function handleAllTriangles( face, index ) {
+			uv = that.faceVertexUvs[ 0 ][ index ]; // use UV layer 0 for tangents
+			if ( face instanceof THREE.Face3 ) {
+				handleTriangle( that, face.a, face.b, face.c, 0, 1, 2 );
+			} 
+			else if ( face instanceof THREE.Face4 ) {
+				handleTriangle( that, face.a, face.b, face.d, 0, 1, 3 );
+				handleTriangle( that, face.b, face.c, face.d, 1, 2, 3 );
+			}
+		}
+
+		function computeTangentsForFace( face, index ) {
+			
+			for ( i = 0; i < face.vertexNormals.length; i++ ) {
+
+				vertexIndex = face[ faceIndex[ i ] ];
+				face.vertexTangents[ i ] = tangentPartials[ vertexIndex ];
+
+			}
+		}
+
+		var faceIndex = [ 'a', 'b', 'c', 'd' ];
+		var that = this;
+
+		forEachFace( handleAllTriangles, 0, 0.3, function() {
+			
+		 	forEachFace( computeTangentsForFace, 0.3, 1.0, function() {
+				that.hasTangents = true;
+
+				if ( finish_Callback ) {
+					finish_Callback();
+				}
+		 	}, numFacesToBatch );
+
+		}, numFacesToBatch );
+
+	},
+
 	computeLineDistances: function ( ) {
 
 		var d = 0;
@@ -593,7 +1223,7 @@ THREE.Geometry.prototype = {
 
 		}
 
-		this.boundingSphere.setFromCenterAndPoints( this.boundingSphere.center, this.vertices );
+		this.boundingSphere.setFromPoints( this.vertices );
 
 	},
 
@@ -620,7 +1250,7 @@ THREE.Geometry.prototype = {
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			v = this.vertices[ i ];
-			key = [ Math.round( v.x * precision ), Math.round( v.y * precision ), Math.round( v.z * precision ) ].join( '_' );
+			key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
 
 			if ( verticesMap[ key ] === undefined ) {
 
@@ -802,5 +1432,3 @@ THREE.Geometry.prototype = {
 	}
 
 };
-
-THREE.GeometryIdCount = 0;

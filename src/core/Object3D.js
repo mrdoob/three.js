@@ -7,7 +7,7 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Object3DIdCount ++;
+	this.id = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -49,6 +49,11 @@ THREE.Object3D = function () {
 THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
+
+	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
+	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
+	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
+	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	applyMatrix: function () {
 
@@ -389,21 +394,15 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.setPosition( this.position );
+		// if we are not using a quaternion directly, convert Euler rotation to this.quaternion.
 
 		if ( this.useQuaternion === false )  {
 
-			this.matrix.setRotationFromEuler( this.rotation, this.eulerOrder );
+			this.matrix.makeFromPositionEulerScale( this.position, this.rotation, this.eulerOrder, this.scale );
 
 		} else {
 
-			this.matrix.setRotationFromQuaternion( this.quaternion );
-
-		}
-
-		if ( this.scale.x !== 1 || this.scale.y !== 1 || this.scale.z !== 1 ) {
-
-			this.matrix.scale( this.scale );
+			this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
 
 		}
 
@@ -443,9 +442,10 @@ THREE.Object3D.prototype = {
 
 	},
 
-	clone: function ( object ) {
+	clone: function ( object, recursive ) {
 
 		if ( object === undefined ) object = new THREE.Object3D();
+		if ( recursive === undefined ) recursive = true;
 
 		object.name = this.name;
 
@@ -478,10 +478,14 @@ THREE.Object3D.prototype = {
 
 		object.userData = JSON.parse( JSON.stringify( this.userData ) );
 
-		for ( var i = 0; i < this.children.length; i ++ ) {
+		if ( recursive === true ) {
 
-			var child = this.children[ i ];
-			object.add( child.clone() );
+			for ( var i = 0; i < this.children.length; i ++ ) {
+
+				var child = this.children[ i ];
+				object.add( child.clone() );
+
+			}
 
 		}
 
@@ -491,6 +495,4 @@ THREE.Object3D.prototype = {
 
 };
 
-THREE.Object3D.defaultEulerOrder = 'XYZ',
-
-THREE.Object3DIdCount = 0;
+THREE.Object3D.defaultEulerOrder = 'XYZ';

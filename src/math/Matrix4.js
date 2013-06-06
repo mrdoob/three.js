@@ -128,6 +128,14 @@ THREE.Matrix4.prototype = {
 
 	setRotationFromEuler: function ( v, order ) {
 
+		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromEuler() has been deprecated in favor of makeRotationFromEuler.  Please update your code.' );
+
+		return this.makeRotationFromEuler( v, order );
+
+	},
+
+	makeRotationFromEuler: function ( v, order ) {
+
 		var te = this.elements;
 
 		var x = v.x, y = v.y, z = v.z;
@@ -233,11 +241,30 @@ THREE.Matrix4.prototype = {
 
 		}
 
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
+
 		return this;
 
 	},
 
 	setRotationFromQuaternion: function ( q ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromQuaternion() has been deprecated in favor of makeRotationFromQuaternion.  Please update your code.' );
+
+		return this.makeRotationFromQuaternion( q );
+
+	},
+
+	makeRotationFromQuaternion: function ( q ) {
 
 		var te = this.elements;
 
@@ -258,6 +285,17 @@ THREE.Matrix4.prototype = {
 		te[2] = xz - wy;
 		te[6] = yz + wx;
 		te[10] = 1 - ( xx + yy );
+
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
 
 		return this;
 
@@ -600,8 +638,8 @@ THREE.Matrix4.prototype = {
 		te[11] = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
 		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
 
-		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 4 ] + me[ 2 ] * te[ 8 ] + me[ 3 ] * te[ 12 ];
-
+		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
+	
 		if ( det == 0 ) {
 
 			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
@@ -787,6 +825,34 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	compose: function ( position, quaternion, scale ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .compose() has been deprecated in favor of makeFromPositionQuaternionScale. Please update your code.' );
+
+		return this.makeFromPositionQuaternionScale( position, quaternion, scale );
+
+	},
+
+	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
+
+		this.makeRotationFromQuaternion( quaternion );
+		this.scale( scale );
+		this.setPosition( position );
+
+		return this;
+
+	},
+
+	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
+
+		this.makeRotationFromEuler( rotation, eulerOrder );
+		this.scale( scale );
+		this.setPosition( position );
+
+		return this;
+
+	},
+
 	makeFrustum: function ( left, right, bottom, top, near, far ) {
 
 		var te = this.elements;
@@ -856,32 +922,6 @@ THREE.Matrix4.prototype = {
 };
 
 THREE.extend( THREE.Matrix4.prototype, {
-
-	compose: function() {
-
-		var mRotation = new THREE.Matrix4();
-		var mScale = new THREE.Matrix4();
-
-		return function ( position, quaternion, scale ) {
-
-			var te = this.elements;
-
-			mRotation.identity();
-			mRotation.setRotationFromQuaternion( quaternion );
-
-			mScale.makeScale( scale.x, scale.y, scale.z );
-
-			this.multiplyMatrices( mRotation, mScale );
-
-			te[12] = position.x;
-			te[13] = position.y;
-			te[14] = position.z;
-
-			return this;
-
-		};
-
-	}(),
 
 	decompose: function() {
 
