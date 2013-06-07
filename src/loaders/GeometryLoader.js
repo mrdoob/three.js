@@ -2,43 +2,33 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function () {};
+THREE.GeometryLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
 THREE.GeometryLoader.prototype = {
 
 	constructor: THREE.GeometryLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
-	load: function ( url ) {
+	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
-		var request = new XMLHttpRequest();
 
-		request.addEventListener( 'load', function ( event ) {
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
 
-			var response = scope.parse( JSON.parse( event.target.responseText ) );
+			onLoad( scope.parse( JSON.parse( text ) ) );
 
-			scope.dispatchEvent( { type: 'load', content: response } );
+		} );
 
-		}, false );
+	},
 
-		request.addEventListener( 'progress', function ( event ) {
+	setCrossOrigin: function ( value ) {
 
-			scope.dispatchEvent( { type: 'progress', loaded: event.loaded, total: event.total } );
-
-		}, false );
-
-		request.addEventListener( 'error', function () {
-
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']' } );
-
-		}, false );
-
-		request.open( 'GET', url, true );
-		request.send( null );
+		this.crossOrigin = value;
 
 	},
 
