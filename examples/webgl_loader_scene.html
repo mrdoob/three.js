@@ -188,7 +188,7 @@
 
 			document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
-			THREE.DefaultLoadingManager.onItemLoad = function ( item, loaded, total ) {
+			THREE.DefaultLoadingManager.onProgress = function ( item, loaded, total ) {
 
 				console.log( item, loaded, total );
 

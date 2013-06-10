@@ -2,13 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.LoadingManager = function () {
+THREE.LoadingManager = function ( onLoad, onProgress, onError ) {
 
 	var scope = this;
 
 	var loaded = 0, total = 0;
 
-	this.onItemLoad = function () {};
+	this.onLoad = onLoad;
+	this.onProgress = onProgress;
+	this.onError = onError;
 
 	this.itemStart = function ( url ) {
 
@@ -20,7 +22,17 @@ THREE.LoadingManager = function () {
 
 		loaded ++;
 
-		scope.onItemLoad( url, loaded, total );
+		if ( scope.onProgress !== undefined ) {
+
+			scope.onProgress( url, loaded, total );
+
+		}
+
+		if ( loaded === total && scope.onLoad !== undefined ) {
+
+			scope.onLoad();
+
+		}
 
 	};
 
