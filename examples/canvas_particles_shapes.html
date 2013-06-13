@@ -173,7 +173,7 @@
 					//hearts circleLines
 					var material = new THREE.ParticleCanvasMaterial( {  program: hearts, blending:THREE.AdditiveBlending } );
 
-					material.color.setHSV(hue, 0.5, 1);
+					material.color.setHSL(hue, 1, 0.75);
 					hue += 0.001;
 					if (hue>1) hue-=1;
 

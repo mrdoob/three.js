@@ -45,7 +45,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://github.com/mrdoob/three.js/" target="_blank">three.js<a/> - software renderer<br/>drag to change the point of view';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js<a/> - software renderer<br/>drag to change the point of view';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -55,12 +55,28 @@
 
 				scene = new THREE.Scene();
 
-				torus = new THREE.Mesh( new THREE.TorusKnotGeometry( 150 ), new THREE.MeshBasicMaterial( { color: 0x0000ff } ) );
+				var geometry = new THREE.TorusKnotGeometry( 150 );
+
+				for ( var i = 0, j = geometry.faces.length; i < j; i ++ ) {
+
+					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
+
+				}
+
+				torus = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, vertexColors: THREE.FaceColors } ) );
 				scene.add( torus );
 
 				// Plane
 
-				cube = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200 ), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
+				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
+
+				for ( var i = 0, j = geometry.faces.length; i < j; i ++ ) {
+
+					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
+
+				}
+
+				cube = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x00ff00, vertexColors: THREE.FaceColors } ) );
 				scene.add( cube );
 
 				renderer = new THREE.SoftwareRenderer();

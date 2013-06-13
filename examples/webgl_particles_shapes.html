@@ -201,7 +201,7 @@
 				parent.add( text );
 				scene.add( parent );
 
-				///// Create particle objects for Three.js
+				// Create particle objects for Three.js
 
 				var particlesLength = 70000;
 
@@ -348,7 +348,7 @@
 				particleCloud = new THREE.ParticleSystem( particles, shaderMaterial );
 
 				particleCloud.dynamic = true;
-				//particleCloud.sortParticles = true;
+				// particleCloud.sortParticles = true;
 
 				var vertices = particleCloud.geometry.vertices;
 				var values_size = attributes.size.value;
@@ -358,8 +358,7 @@
 
 					values_size[ v ] = 50;
 
-					values_color[ v ] = new THREE.Color( 0xffffff );
-					values_color[ v ].setHSV( 0, 0, 0 );
+					values_color[ v ] = new THREE.Color( 0x000000 );
 
 					particles.vertices[ v ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
@@ -408,9 +407,9 @@
 
 					if ( target ) {
 
-						//console.log(target,particles.vertices[target]);
-						//values_size[target]
-						//values_color[target]
+						// console.log(target,particles.vertices[target]);
+						// values_size[target]
+						// values_color[target]
 
 						hue += 0.0003 * delta;
 						if ( hue > 1 ) hue -= 1;
@@ -425,16 +424,16 @@
 						emitterpos.x = pointOnShape.x * 5 - 100;
 						emitterpos.y = -pointOnShape.y * 5 + 400;
 
-						//pointLight.position.copy( emitterpos );
+						// pointLight.position.copy( emitterpos );
 						pointLight.position.x = emitterpos.x;
 						pointLight.position.y = emitterpos.y;
 						pointLight.position.z = 100;
 
 						particles.vertices[ target ] = p.position;
 
-						values_color[ target ].setHSV( hue, 0.8, 0.15 );
+						values_color[ target ].setHSL( hue, 0.6, 0.1 );
 
-						pointLight.color.setHSV( hue, 0.8, 0.95 );
+						pointLight.color.setHSL( hue, 0.8, 0.5 );
 
 
 					};
@@ -449,7 +448,7 @@
 
 						// Hide the particle
 
-						values_color[ target ].setHSV( 0, 0, 0 );
+						values_color[ target ].setRGB( 0, 0, 0 );
 						particles.vertices[ target ].set( Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY );
 
 						// Mark particle system as available by returning to pool
@@ -487,22 +486,11 @@
 				sparksEmitter.addCallback( "dead", onParticleDead );
 				sparksEmitter.start();
 
-				//sparksEmitter.addCallback("loopUpdated", engineLoopUpdate);
-
-				//sparksEmitter.addCallback("updated", function(p) {
-					// var target = particle.target;
-					// 					if (target) {
-					// 						// update energy properties
-					// 						//values_size[target] = Math.random()*100;
-					// 					}
-				//});
-				//
 				// End Particles
-
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColorHex( 0x000000, 1 );
+				renderer.setClearColor( 0x000000, 1 );
 
 				container.appendChild( renderer.domElement );
 
@@ -544,11 +532,11 @@
 				composer.addPass( renderScene );
 				composer.addPass( hblur );
 				composer.addPass( vblur );
-				//composer.addPass( effectBlurX );
-				//composer.addPass( effectBlurY );
-				//composer.addPass( effectCopy );
-				//composer.addPass( effectFocus );
-				//composer.addPass( effectFilm );
+				// composer.addPass( effectBlurX );
+				// composer.addPass( effectBlurY );
+				// composer.addPass( effectCopy );
+				// composer.addPass( effectFocus );
+				// composer.addPass( effectFilm );
 
 				vblur.renderToScreen = true;
 				effectBlurY.renderToScreen = true;
@@ -673,13 +661,13 @@
 				attributes.pcolor.needsUpdate = true;
 
 				// Pretty cool effect if you enable this
-				//particleCloud.rotation.y += 0.05;
+				// particleCloud.rotation.y += 0.05;
 
 				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
 
 				renderer.clear();
 
-				//renderer.render( scene, camera );
+				// renderer.render( scene, camera );
 				composer.render( 0.1 );
 
 

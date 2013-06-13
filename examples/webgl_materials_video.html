@@ -146,7 +146,7 @@
 					material.hue = i/xgrid;
 					material.saturation = 1 - j/ygrid;
 
-					material.color.setHSV( material.hue, material.saturation, 1 );
+					material.color.setHSL( material.hue, material.saturation, 0.5 );
 
 					mesh = new THREE.Mesh( geometry, material );
 
@@ -263,7 +263,7 @@
 					material = materials[ i ];
 
 					h = ( 360 * ( material.hue + time ) % 360 ) / 360;
-					material.color.setHSV( h, material.saturation, 1 );
+					material.color.setHSL( h, material.saturation, 0.5 );
 
 				}
 

@@ -157,7 +157,7 @@
 					for ( var i = 0; i < colorMap.colors.length; i ++ ) {
 
 						geometry.faces[ i ].color = colorMap.colors[ i ];
-						THREE.ColorUtils.adjustHSV( geometry.faces[ i ].color, 0, 0.125, 0 );
+						geometry.faces[ i ].color.offsetHSL( 0, 0.3, 0 );
 
 					}
 

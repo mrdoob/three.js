@@ -80,14 +80,14 @@
 					geometry.vertices.push( vertex );
 
 					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSV( ( vertex.x + 1000 ) / 2000, 1, 1 );
+					colors[ i ].setHSL( ( vertex.x + 1000 ) / 2000, 1, 0.5 );
 
 				}
 
 				geometry.colors = colors;
 
 				material = new THREE.ParticleBasicMaterial( { size: 85, map: sprite, vertexColors: true, transparent: true } );
-				material.color.setHSV( 1.0, 0.2, 0.8 );
+				material.color.setHSL( 1.0, 0.2, 0.7 );
 
 				particles = new THREE.ParticleSystem( geometry, material );
 				particles.sortParticles = true;
@@ -184,7 +184,7 @@
 				camera.lookAt( scene.position );
 
 				h = ( 360 * ( 1.0 + time ) % 360 ) / 360;
-				material.color.setHSV( h, 0.8, 1.0 );
+				material.color.setHSL( h, 1.0, 0.6 );
 
 				renderer.render( scene, camera );
 

@@ -13,24 +13,15 @@ THREE.ImageUtils = {
 		var texture = new THREE.Texture( image, mapping );
 
 		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
+		loader.load( url, function ( image ) {
 
-		loader.addEventListener( 'load', function ( event ) {
-
-			texture.image = event.content;
+			texture.image = image;
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture );
 
 		} );
-
-		loader.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event.message );
-
-		} );
-
-		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, image );
 
 		texture.sourceFile = url;
 

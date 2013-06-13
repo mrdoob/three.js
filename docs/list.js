@@ -38,7 +38,6 @@ var list = {
 
 		"Loaders": [
 			[ "Loader", "api/loaders/Loader" ],
-			[ "BinaryLoader", "api/loaders/BinaryLoader" ],
 			[ "GeometryLoader", "api/loaders/GeometryLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
@@ -128,7 +127,6 @@ var list = {
 		],
 
 		"Extras": [
-			[ "ColorUtils", "api/extras/ColorUtils" ],
 			[ "FontUtils", "api/extras/FontUtils" ],
 			[ "GeometryUtils", "api/extras/GeometryUtils" ],
 			[ "ImageUtils", "api/extras/ImageUtils" ],
@@ -156,7 +154,6 @@ var list = {
 		],
 
 		"Extras / Geometries": [
-			[ "AsteriskGeometry", "api/extras/geometries/AsteriskGeometry" ],
 			[ "CircleGeometry", "api/extras/geometries/CircleGeometry" ],
 			[ "ConvexGeometry", "api/extras/geometries/ConvexGeometry" ],
 			[ "CubeGeometry", "api/extras/geometries/CubeGeometry" ],

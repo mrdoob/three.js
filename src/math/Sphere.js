@@ -10,7 +10,9 @@ THREE.Sphere = function ( center, radius ) {
 
 };
 
-THREE.extend( THREE.Sphere.prototype, {
+THREE.Sphere.prototype = {
+
+	constructor: THREE.Sphere,
 
 	set: function ( center, radius ) {
 
@@ -20,18 +22,18 @@ THREE.extend( THREE.Sphere.prototype, {
 		return this;
 	},
 
-	setFromCenterAndPoints: function ( center, points ) {
+	setFromPoints: function ( points ) {
 
-		var maxRadiusSq = 0;
+		var radiusSq, maxRadiusSq = 0;
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			var radiusSq = center.distanceToSquared( points[ i ] );
+			radiusSq = points[ i ].lengthSq();
 			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
 
 		}
 
-		this.center = center;
+		this.center.set( 0, 0, 0 );
 		this.radius = Math.sqrt( maxRadiusSq );
 
 		return this;
@@ -102,7 +104,7 @@ THREE.extend( THREE.Sphere.prototype, {
 
 	},
 
-	transform: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		this.center.applyMatrix4( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
@@ -131,4 +133,4 @@ THREE.extend( THREE.Sphere.prototype, {
 
 	}
 
-} );
+};

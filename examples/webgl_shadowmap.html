@@ -96,8 +96,7 @@
 				// SCENE
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0xffaa55, 1000, FAR );
-				THREE.ColorUtils.adjustHSV( scene.fog.color, 0.02, -0.15, -0.65 );
+				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
 				// LIGHTS
 
@@ -200,7 +199,6 @@
 
 				var geometry = new THREE.PlaneGeometry( 100, 100 );
 				var planeMaterial = new THREE.MeshPhongMaterial( { color: 0xffdd99 } );
-				THREE.ColorUtils.adjustHSV( planeMaterial.color, 0, 0, 0.9 );
 				planeMaterial.ambient = planeMaterial.color;
 
 				var ground = new THREE.Mesh( geometry, planeMaterial );
@@ -276,7 +274,7 @@
 
 					if ( fudgeColor ) {
 
-						THREE.ColorUtils.adjustHSV( material.color, 0, 0.5 - Math.random(), 0.5 - Math.random() );
+						material.color.offsetHSL( 0, Math.random() * 0.5 - 0.25, Math.random() * 0.5 - 0.25 );
 						material.ambient = material.color;
 
 					}

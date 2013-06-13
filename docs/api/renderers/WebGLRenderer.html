@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -14,6 +14,7 @@
 
 
 		<h2>Constructor</h2>
+
 
 		<h3>[name]( [page:Object parameters] )</h3>
 
@@ -39,7 +40,7 @@
 		<div>A [page:Canvas] where the renderer draws its output.<br />
 		This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.</div>
 
-		<h3>.context</h3>
+		<h3>.[page:todo context]</h3>
 
 		<div>The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.</div>
 
@@ -76,13 +77,6 @@
 
 		<div>TODO</div>
 
-
-		<h3>.[page:Boolean autoUpdateScene]</h3>
-
-		<div>Defines whether the renderer should auto update the scene. Default is true.</div>
-
-		<div>TODO</div>
-
 		<!-- Physically based shading -->
 
 		<h3>.[page:Boolean gammaInput]</h3>
@@ -116,7 +110,7 @@
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
 
-		<h3>.[page:Boolean shadowMapCullFrontFaces]</h3>
+		<h3>.[page:Boolean shadowMapCullFace]</h3>
 
 		<div>Default is true. TODO</div>
 
@@ -181,6 +175,21 @@
 		</ul>
 		</div>
 
+		<h3>.[page:ShadowMapPlugin shadowMapPlugin]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:number shadowMapCullFace]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:number devicePixelRatio]</h3>
+		<div>
+		todo
+		</div> 
+
 		<h2>Methods</h2>
 
 		<h3>.getContext()</h3>
@@ -207,22 +216,17 @@
 		<h3>.enableScissorTest( [page:Boolean enable] )</h3>
 		<div>Enable the scissor test. When this is enabled, only the pixels within the defined scissor area will be affected by further renderer actions.</div>
 
+		<h3>.setClearColor( [page:Color color], [page:Float alpha] )</h3>
+		<div>Sets the clear color and opacity.</div>
 
-		<h3>.setClearColorHex( [page:Integer hex], [page:Float alpha] )</h3>
-		<div>Sets the clear color, using hex for the color and alpha for the opacity.</div>
-
-		<code>// Creates a renderer with black background
+		<code>// Creates a renderer with red background
 		var renderer = new THREE.WebGLRenderer();
 		renderer.setSize(200, 100);
-		renderer.setClearColorHex(0x000000, 1);
+		renderer.setClearColor(0xff0000, 1);
 		</code>
-
-		<h3>.setClearColor( [page:Color color], [page:Float alpha] )</h3>
-		<div>Sets the clear color, using color for the color and alpha for the opacity.</div>
 
 		<h3>.getClearColor() [page:Color]</h3>
 		<div>Returns a [page:Color THREE.Color] instance with the current clear color.</div>
-
 
 		<h3>.getClearAlpha() [page:Float]</h3>
 		<div>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</div>
@@ -230,7 +234,6 @@
 		<h3>.clear( [page:Boolean color], [page:Boolean depth], [page:Boolean stencil] )</h3>
 		<div>Tells the renderer to clear its color, depth or stencil drawing buffer(s).</div>
 		<div>If no parameters are passed, no buffer will be cleared.</div>
-
 
 		<h3>.addPostPlugin( plugin )</h3>
 		<div>Initialises the postprocessing plugin, and adds it to the renderPluginsPost array.</div>
@@ -287,10 +290,6 @@
 		<div>If cullFace is false, culling will be disabled.</div>
 
 
-		<h3>.setObjectFaces( object )</h3>
-		<div>TODO.</div>
-
-
 		<h3>.setDepthTest( depthTest )</h3>
 		<div>TODO.</div>
 
@@ -311,6 +310,59 @@
 		<div>TODO.</div>
 
 
+
+		<h3>.supportsCompressedTextureS3TC() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.getMaxAnisotropy() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.getPrecision() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.setMaterialFaces([page:todo material]) [page:todo]</h3>
+		<div>
+		material -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.supportsStandardDerivatives() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.supportsFloatTextures() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.clearTarget([page:todo renderTarget], [page:todo color], [page:todo depth], [page:todo stencil]) [page:todo]</h3>
+		<div>
+		renderTarget -- todo <br />
+		color -- todo <br />
+		depth -- todo <br />
+		stencil -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setClearColorHex([page:todo hex], [page:todo alpha]) [page:todo]</h3>
+		<div>
+		hex -- todo <br />
+		alpha -- todo
+		</div>
+		<div>
+		todo
+		</div>
 
 		<h2>Source</h2>
 

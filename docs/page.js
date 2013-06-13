@@ -1,19 +1,20 @@
 var onDocumentLoad = function ( event ) {
 
 	var path;
-	var section = /\/(manual|api)\//.exec( window.location.pathname )[ 1 ].toString().split( '.html' )[ 0 ];
-	var name = /[\-A-z0-9]+\.html/.exec( window.location.pathname ).toString().split( '.html' )[ 0 ];
+	var pathname = window.location.pathname;
+	var section = /\/(manual|api)\//.exec( pathname )[ 1 ].toString().split( '.html' )[ 0 ];
+	var name = /[\-A-z0-9]+\.html/.exec( pathname ).toString().split( '.html' )[ 0 ];
 
 	if ( section == 'manual' ) {
 
 		name = name.replace(/\-/g, ' ');
 
-		path = window.location.pathname.replace( /\ /g, '-' );
-		path = /\/manual\/[-a-z0-9\/]+/.exec( path ).toString().substr( 8 );
+		path = pathname.replace( /\ /g, '-' );
+		path = /\/manual\/[-A-z0-9\/]+/.exec( path ).toString().substr( 8 );
 
 	} else {
 
-		path = /\/api\/[A-z0-9\/]+/.exec( window.location.pathname ).toString().substr( 5 );
+		path = /\/api\/[A-z0-9\/]+/.exec( pathname ).toString().substr( 5 );
 
 	}
 
@@ -24,10 +25,25 @@ var onDocumentLoad = function ( event ) {
 	text = text.replace(/\[page:(\w+)\]/gi, "[page:$1 $1]" ); // [page:name] to [page:name title]
 	text = text.replace(/\[page:(\w+) ([\w|\.]+)\]/gi, "<a href=\"javascript:window.parent.goTo('$1')\" title=\"$1\">$2</a>" ); // [page:name title]
 	text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
-	text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_]+) ([\w|\:|\/|\.|\-|\_]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
+	text = text.replace(/\[link:([\w|\:|\/|\.|\-|\_|\(|\)]+) ([\w|\:|\/|\.|\-|\_ ]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
 	text = text.replace(/\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, "<strong>$1</strong>" ); // *
 
 	document.body.innerHTML = text;
+
+	// handle code snippets formatting
+
+	var elements = document.getElementsByTagName( 'code' );
+
+	for ( var i = 0; i < elements.length; i ++ ) {
+
+		var element = elements[ i ];
+
+		text = element.textContent.trim();
+		text = text.replace( /^\t\t/gm, '' );
+
+		element.textContent = text;
+
+	}
 
 	// Edit button
 
