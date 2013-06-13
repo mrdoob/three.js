@@ -4106,6 +4106,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			
 			renderObjects( scene.__webglObjects, false, "picking", camera, [], undefined, true );
 			renderObjectsImmediate( scene.__webglObjectsImmediate, "picking", camera, [], undefined, false );	
+		} else if ( scene.enableDepth ) {
+
+			this.setBlending( THREE.NormalBlending );
+			
+			renderObjects( scene.__webglObjects, false, "depth", camera, [], undefined, true );
+			renderObjectsImmediate( scene.__webglObjectsImmediate, "depth", camera, [], undefined, false );
 		//END_VEROLD_MOD
 		} else {
 
@@ -4399,6 +4405,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( !globject.picking ) {
 			globject.picking = object.pickingMaterial;
 		}
+		if ( !globject.depth ) {
+			globject.depth = object.customDepthMaterial;
+		}
 		//END_VEROLD_MOD
 	};
 
@@ -4453,6 +4462,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 		//Set up a special material to use for object picking
 		if ( !globject.picking ) {
 			globject.picking = object.pickingMaterial;
+		}
+		if ( !globject.depth ) {
+			globject.depth = object.customDepthMaterial;
 		}
 		//END_VEROLD_MOD
 
@@ -6873,6 +6885,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( texture.needsUpdate ) {
 
 				if ( ! texture.image.__webglTextureCube ) {
+
+					texture.addEventListener( 'dispose', onTextureDispose );
 
 					texture.image.__webglTextureCube = _gl.createTexture();
 
