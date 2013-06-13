@@ -74,7 +74,7 @@
 				// texture
 
 				var manager = new THREE.LoadingManager();
-				manager.onItemLoad = function ( item, loaded, total ) {
+				manager.onProgress = function ( item, loaded, total ) {
 
 					console.log( item, loaded, total );
 
