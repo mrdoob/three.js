@@ -1,9 +1,10 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Larry Battle / http://bateru.com/news
+ * @author bhouston / http://exocortex.com
  */
 
-var THREE = THREE || { REVISION: '56dev' };
+var THREE = THREE || { REVISION: '59dev' };
 
 self.console = self.console || {
 
@@ -18,53 +19,44 @@ self.console = self.console || {
 self.Int32Array = self.Int32Array || Array;
 self.Float32Array = self.Float32Array || Array;
 
-// Shims for "startsWith", "endsWith", and "trim" for browsers where this is not yet implemented
-// not sure we should have this, or at least not have it here
-
-// http://stackoverflow.com/questions/646628/javascript-startswith
-// http://stackoverflow.com/questions/498970/how-do-i-trim-a-string-in-javascript
-// http://wiki.ecmascript.org/doku.php?id=harmony%3astring_extras
-
-String.prototype.startsWith = String.prototype.startsWith || function ( str ) {
-
-	return this.slice( 0, str.length ) === str;
-
-};
-
-String.prototype.endsWith = String.prototype.endsWith || function ( str ) {
-
-	var t = String( str );
-	var index = this.lastIndexOf( t );
-	return ( -1 < index && index ) === (this.length - t.length);
-
-};
-
 String.prototype.trim = String.prototype.trim || function () {
 
 	return this.replace( /^\s+|\s+$/g, '' );
 
 };
 
-// based on http://stackoverflow.com/a/12317051
-THREE.extend = function ( target, other ) {
+// based on https://github.com/documentcloud/underscore/blob/bf657be243a075b5e72acc8a83e6f12a564d8f55/underscore.js#L767
+THREE.extend = function ( obj, source ) {
 
-	target = target || {};
+	// ECMAScript5 compatibility based on: http://www.nczonline.net/blog/2012/12/11/are-your-mixins-ecmascript-5-compatible/
+	if ( Object.keys ) {
 
-	for (var prop in other) {
+		var keys = Object.keys( source );
 
-		if ( typeof other[prop] === 'object' ) {
+		for (var i = 0, il = keys.length; i < il; i++) {
 
-			target[prop] = THREE.extend( target[prop], other[prop] );
+			var prop = keys[i];
+			Object.defineProperty( obj, prop, Object.getOwnPropertyDescriptor( source, prop ) );
 
-		} else {
+		}
 
-			target[prop] = other[prop];
+	} else {
+
+		var safeHasOwnProperty = {}.hasOwnProperty;
+
+		for ( var prop in source ) {
+
+			if ( safeHasOwnProperty.call( source, prop ) ) {
+
+				obj[prop] = source[prop];
+
+			}
 
 		}
 
 	}
 
-	return target;
+	return obj;
 
 };
 
@@ -73,25 +65,25 @@ THREE.extend = function ( target, other ) {
 
 // requestAnimationFrame polyfill by Erik Möller
 // fixes from Paul Irish and Tino Zijdel
-
+// using 'self' instead of 'window' for compatibility with both NodeJS and IE10.
 ( function () {
 
 	var lastTime = 0;
 	var vendors = [ 'ms', 'moz', 'webkit', 'o' ];
 
-	for ( var x = 0; x < vendors.length && !window.requestAnimationFrame; ++ x ) {
+	for ( var x = 0; x < vendors.length && !self.requestAnimationFrame; ++ x ) {
 
-		window.requestAnimationFrame = window[ vendors[ x ] + 'RequestAnimationFrame' ];
-		window.cancelAnimationFrame = window[ vendors[ x ] + 'CancelAnimationFrame' ] || window[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
+		self.requestAnimationFrame = self[ vendors[ x ] + 'RequestAnimationFrame' ];
+		self.cancelAnimationFrame = self[ vendors[ x ] + 'CancelAnimationFrame' ] || self[ vendors[ x ] + 'CancelRequestAnimationFrame' ];
 
 	}
 
-	if ( window.requestAnimationFrame === undefined ) {
+	if ( self.requestAnimationFrame === undefined && self['setTimeout'] !== undefined ) {
 
-		window.requestAnimationFrame = function ( callback, element ) {
+		self.requestAnimationFrame = function ( callback ) {
 
 			var currTime = Date.now(), timeToCall = Math.max( 0, 16 - ( currTime - lastTime ) );
-			var id = window.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
+			var id = self.setTimeout( function() { callback( currTime + timeToCall ); }, timeToCall );
 			lastTime = currTime + timeToCall;
 			return id;
 
@@ -99,7 +91,11 @@ THREE.extend = function ( target, other ) {
 
 	}
 
-	window.cancelAnimationFrame = window.cancelAnimationFrame || function ( id ) { window.clearTimeout( id ) };
+	if( self.cancelAnimationFrame === undefined && self['clearTimeout'] !== undefined ) {
+
+		self.cancelAnimationFrame = function ( id ) { self.clearTimeout( id ) };
+
+	}
 
 }() );
 
@@ -243,13 +239,17 @@ THREE.RGBA_S3TC_DXT1_Format = 2002;
 THREE.RGBA_S3TC_DXT3_Format = 2003;
 THREE.RGBA_S3TC_DXT5_Format = 2004;
 
-/*
-// Potential future PVRTC compressed texture formats
+// PVRTC compressed texture formats
 THREE.RGB_PVRTC_4BPPV1_Format = 2100;
 THREE.RGB_PVRTC_2BPPV1_Format = 2101;
 THREE.RGBA_PVRTC_4BPPV1_Format = 2102;
 THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
-*/
+
+// ATC compressed texture formats
+THREE.RGB_ATC_Format = 2200;
+THREE.RGBA_ATC_EXPLICIT_ALPHA_Format = 2201;
+THREE.RGBA_ATC_INTERP_ALPHA_Format = 2202;
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -262,23 +262,29 @@ THREE.Color = function ( value ) {
 
 };
 
-THREE.extend( THREE.Color.prototype, {
+THREE.Color.prototype = {
+
+	constructor: THREE.Color,
 
 	r: 1, g: 1, b: 1,
 
 	set: function ( value ) {
 
-		switch ( typeof value ) {
+		if ( value instanceof THREE.Color ) {
 
-			case "number":
-				this.setHex( value );
-				break;
+			this.copy( value );
 
-			case "string":
-				this.setStyle( value );
-				break;
+		} else if ( typeof value === 'number' ) {
+
+			this.setHex( value );
+
+		} else if ( typeof value === 'string' ) {
+
+			this.setStyle( value );
 
 		}
+
+		return this;
 
 	},
 
@@ -304,62 +310,33 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
-	setHSV: function ( h, s, v ) {
+	setHSL: function ( h, s, l ) {
 
-		// based on MochiKit implementation by Bob Ippolito
-		// h,s,v ranges are < 0.0 - 1.0 >
+		// h,s,l ranges are in 0.0 - 1.0
 
-		var i, f, p, q, t;
+		if ( s === 0 ) {
 
-		if ( v === 0 ) {
-
-			this.r = this.g = this.b = 0;
+			this.r = this.g = this.b = l;
 
 		} else {
 
-			i = Math.floor( h * 6 );
-			f = ( h * 6 ) - i;
-			p = v * ( 1 - s );
-			q = v * ( 1 - ( s * f ) );
-			t = v * ( 1 - ( s * ( 1 - f ) ) );
+			var hue2rgb = function ( p, q, t ) {
 
-			if ( i === 0 ) {
+				if ( t < 0 ) t += 1;
+				if ( t > 1 ) t -= 1;
+				if ( t < 1 / 6 ) return p + ( q - p ) * 6 * t;
+				if ( t < 1 / 2 ) return q;
+				if ( t < 2 / 3 ) return p + ( q - p ) * 6 * ( 2 / 3 - t );
+				return p;
 
-				this.r = v;
-				this.g = t;
-				this.b = p;
+			};
 
-			} else if ( i === 1 ) {
+			var p = l <= 0.5 ? l * ( 1 + s ) : l + s - ( l * s );
+			var q = ( 2 * l ) - p;
 
-				this.r = q;
-				this.g = v;
-				this.b = p;
-
-			} else if ( i === 2 ) {
-
-				this.r = p;
-				this.g = v;
-				this.b = t;
-
-			} else if ( i === 3 ) {
-
-				this.r = p;
-				this.g = q;
-				this.b = v;
-
-			} else if ( i === 4 ) {
-
-				this.r = t;
-				this.g = p;
-				this.b = v;
-
-			} else if ( i === 5 ) {
-
-				this.r = v;
-				this.g = p;
-				this.b = q;
-
-			}
+			this.r = hue2rgb( q, p, h + 1 / 3 );
+			this.g = hue2rgb( q, p, h );
+			this.b = hue2rgb( q, p, h - 1 / 3 );
 
 		}
 
@@ -498,78 +475,70 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
+	getHSL: function () {
+
+		var hsl = { h: 0, s: 0, l: 0 };
+
+		return function () {
+
+			// h,s,l ranges are in 0.0 - 1.0
+
+			var r = this.r, g = this.g, b = this.b;
+
+			var max = Math.max( r, g, b );
+			var min = Math.min( r, g, b );
+
+			var hue, saturation;
+			var lightness = ( min + max ) / 2.0;
+
+			if ( min === max ) {
+
+				hue = 0;
+				saturation = 0;
+
+			} else {
+
+				var delta = max - min;
+
+				saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
+
+				switch ( max ) {
+
+					case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
+					case g: hue = ( b - r ) / delta + 2; break;
+					case b: hue = ( r - g ) / delta + 4; break;
+
+				}
+
+				hue /= 6;
+
+			}
+
+			hsl.h = hue;
+			hsl.s = saturation;
+			hsl.l = lightness;
+
+			return hsl;
+
+		};
+
+	}(),
+
 	getStyle: function () {
 
-		return 'rgb(' + ( ( this.r * 255 ) | 0 )  + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
+		return 'rgb(' + ( ( this.r * 255 ) | 0 ) + ',' + ( ( this.g * 255 ) | 0 ) + ',' + ( ( this.b * 255 ) | 0 ) + ')';
 
 	},
 
-	getHSV: function ( hsv ) {
+	offsetHSL: function ( h, s, l ) {
 
-		// based on MochiKit implementation by Bob Ippolito
-		// h,s,v ranges are < 0.0 - 1.0 >
+		var hsl = this.getHSL();
 
-		var r = this.r;
-		var g = this.g;
-		var b = this.b;
+		hsl.h += h; hsl.s += s; hsl.l += l;
 
-		var max = Math.max( Math.max( r, g ), b );
-		var min = Math.min( Math.min( r, g ), b );
+		this.setHSL( hsl.h, hsl.s, hsl.l );
 
-		var hue;
-		var saturation;
-		var value = max;
-
-		if ( min === max )	{
-
-			hue = 0;
-			saturation = 0;
-
-		} else {
-
-			var delta = ( max - min );
-			saturation = delta / max;
-
-			if ( r === max ) {
-
-				hue = ( g - b ) / delta;
-
-			} else if ( g === max ) {
-
-				hue = 2 + ( ( b - r ) / delta );
-
-			} else	{
-
-				hue = 4 + ( ( r - g ) / delta );
-			}
-
-			hue /= 6;
-
-			if ( hue < 0 ) {
-
-				hue += 1;
-
-			}
-
-			if ( hue > 1 ) {
-
-				hue -= 1;
-
-			}
-
-		}
-
-		if ( hsv === undefined ) {
-
-			hsv = { h: 0, s: 0, v: 0 };
-
-		}
-
-		hsv.h = hue;
-		hsv.s = saturation;
-		hsv.v = value;
-
-		return hsv;
+		return this;
 
 	},
 
@@ -633,13 +602,19 @@ THREE.extend( THREE.Color.prototype, {
 
 	},
 
+	equals: function ( c ) {
+
+		return ( c.r === this.r ) && ( c.g === this.g ) && ( c.b === this.b );
+
+	},
+
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );
 
 	}
 
-} );
+};
 
 THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua": 0x00FFFF, "aquamarine": 0x7FFFD4, "azure": 0xF0FFFF,
 "beige": 0xF5F5DC, "bisque": 0xFFE4C4, "black": 0x000000, "blanchedalmond": 0xFFEBCD, "blue": 0x0000FF, "blueviolet": 0x8A2BE2,
@@ -665,6 +640,7 @@ THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua":
 "sienna": 0xA0522D, "silver": 0xC0C0C0, "skyblue": 0x87CEEB, "slateblue": 0x6A5ACD, "slategray": 0x708090, "slategrey": 0x708090, "snow": 0xFFFAFA,
 "springgreen": 0x00FF7F, "steelblue": 0x4682B4, "tan": 0xD2B48C, "teal": 0x008080, "thistle": 0xD8BFD8, "tomato": 0xFF6347, "turquoise": 0x40E0D0,
 "violet": 0xEE82EE, "wheat": 0xF5DEB3, "white": 0xFFFFFF, "whitesmoke": 0xF5F5F5, "yellow": 0xFFFF00, "yellowgreen": 0x9ACD32 };
+
 /**
  * @author mikael emtinger / http://gomo.se/
  * @author alteredq / http://alteredqualia.com/
@@ -681,7 +657,9 @@ THREE.Quaternion = function( x, y, z, w ) {
 
 };
 
-THREE.extend( THREE.Quaternion.prototype, {
+THREE.Quaternion.prototype = {
+
+	constructor: THREE.Quaternion,
 
 	set: function ( x, y, z, w ) {
 
@@ -998,19 +976,37 @@ THREE.extend( THREE.Quaternion.prototype, {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+		this.w = array[ 3 ];
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		return [ this.x, this.y, this.z, this.w ];
+
+	},
+
 	clone: function () {
 
 		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
 
 	}
 
-} );
+};
 
 THREE.Quaternion.slerp = function ( qa, qb, qm, t ) {
 
 	return qm.copy( qa ).slerp( qb, t );
 
 }
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author philogb / http://blog.thejit.org/
@@ -1025,7 +1021,9 @@ THREE.Vector2 = function ( x, y ) {
 
 };
 
-THREE.extend( THREE.Vector2.prototype, {
+THREE.Vector2.prototype = {
+
+	constructor: THREE.Vector2,
 
 	set: function ( x, y ) {
 
@@ -1314,10 +1312,19 @@ THREE.extend( THREE.Vector2.prototype, {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+
+		return this;
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y ];
-		
+
 	},
 
 	clone: function () {
@@ -1326,7 +1333,8 @@ THREE.extend( THREE.Vector2.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author *kile / http://kile.stravaganza.org/
@@ -1344,7 +1352,9 @@ THREE.Vector3 = function ( x, y, z ) {
 
 };
 
-THREE.extend( THREE.Vector3.prototype, {
+THREE.Vector3.prototype = {
+
+	constructor: THREE.Vector3,
 
 	set: function ( x, y, z ) {
 
@@ -1594,38 +1604,6 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
-	applyEuler: function () {
-
-		var q1 = new THREE.Quaternion();
-
-		return function ( v, eulerOrder ) {
-
-			var quaternion = q1.setFromEuler( v, eulerOrder );
-
-			this.applyQuaternion( quaternion );
-
-			return this;
-
-		};
-
-	}(),
-
-	applyAxisAngle: function () {
-
-		var q1 = new THREE.Quaternion();
-
-		return function ( axis, angle ) {
-
-			var quaternion = q1.setFromAxisAngle( axis, angle );
-
-			this.applyQuaternion( quaternion );
-
-			return this;
-
-		};
-
-	}(),
-
 	transformDirection: function ( m ) {
 
 		// input: THREE.Matrix4 affine matrix
@@ -1851,7 +1829,11 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	angleTo: function ( v ) {
 
-		return Math.acos( this.dot( v ) / this.length() / v.length() );
+		var theta = this.dot( v ) / ( this.length() * v.length() );
+
+		// clamp, to handle numerical problems
+
+		return Math.acos( THREE.Math.clamp( theta, -1, 1 ) );
 
 	},
 
@@ -1868,16 +1850,6 @@ THREE.extend( THREE.Vector3.prototype, {
 		var dz = this.z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
-
-	},
-
-	getPositionFromMatrix: function ( m ) {
-
-		this.x = m.elements[12];
-		this.y = m.elements[13];
-		this.z = m.elements[14];
-
-		return this;
 
 	},
 
@@ -2061,6 +2033,16 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	},
 
+	getPositionFromMatrix: function ( m ) {
+
+		this.x = m.elements[12];
+		this.y = m.elements[13];
+		this.z = m.elements[14];
+
+		return this;
+
+	},
+
 	getScaleFromMatrix: function ( m ) {
 
 		var sx = this.set( m.elements[0], m.elements[1], m.elements[2] ).length();
@@ -2074,16 +2056,40 @@ THREE.extend( THREE.Vector3.prototype, {
 		return this;
 	},
 
+	getColumnFromMatrix: function ( index, matrix ) {
+
+		var offset = index * 4;
+
+		var me = matrix.elements;
+
+		this.x = me[ offset ];
+		this.y = me[ offset + 1 ];
+		this.z = me[ offset + 2 ];
+
+		return this;
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+
+		return this;
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y, this.z ];
-		
+
 	},
 
 	clone: function () {
@@ -2092,7 +2098,86 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	}
 
+};
+
+THREE.extend( THREE.Vector3.prototype, {
+
+	applyEuler: function () {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( v, eulerOrder ) {
+
+			var quaternion = q1.setFromEuler( v, eulerOrder );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	applyAxisAngle: function () {
+
+		var q1 = new THREE.Quaternion();
+
+		return function ( axis, angle ) {
+
+			var quaternion = q1.setFromAxisAngle( axis, angle );
+
+			this.applyQuaternion( quaternion );
+
+			return this;
+
+		};
+
+	}(),
+
+	projectOnVector: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( vector ) {
+
+			v1.copy( vector ).normalize();
+			var d = this.dot( v1 );
+			return this.copy( v1 ).multiplyScalar( d );
+
+		};
+
+	}(),
+
+	projectOnPlane: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( planeNormal ) {
+
+			v1.copy( this ).projectOnVector( planeNormal );
+
+			return this.sub( v1 );
+
+		}
+
+	}(),
+
+	reflect: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( vector ) {
+
+		    v1.copy( this ).projectOnVector( vector ).multiplyScalar( 2 );
+
+		    return this.subVectors( v1, this );
+
+		}
+
+	}()
+
 } );
+
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
@@ -2110,7 +2195,9 @@ THREE.Vector4 = function ( x, y, z, w ) {
 
 };
 
-THREE.extend( THREE.Vector4.prototype, {
+THREE.Vector4.prototype = {
+
+	constructor: THREE.Vector4,
 
 	set: function ( x, y, z, w ) {
 
@@ -2640,10 +2727,21 @@ THREE.extend( THREE.Vector4.prototype, {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.x = array[ 0 ];
+		this.y = array[ 1 ];
+		this.z = array[ 2 ];
+		this.w = array[ 3 ];
+
+		return this;
+
+	},
+
 	toArray: function () {
 
 		return [ this.x, this.y, this.z, this.w ];
-		
+
 	},
 
 	clone: function () {
@@ -2652,7 +2750,135 @@ THREE.extend( THREE.Vector4.prototype, {
 
 	}
 
-} );
+};
+
+/**
+ * @author bhouston / http://exocortex.com
+ */
+
+THREE.Line3 = function ( start, end ) {
+
+	this.start = ( start !== undefined ) ? start : new THREE.Vector3();
+	this.end = ( end !== undefined ) ? end : new THREE.Vector3();
+
+};
+
+THREE.Line3.prototype = {
+
+	constructor: THREE.Line3,
+
+	set: function ( start, end ) {
+
+		this.start.copy( start );
+		this.end.copy( end );
+
+		return this;
+
+	},
+
+	copy: function ( line ) {
+
+		this.start.copy( line.start );
+		this.end.copy( line.end );
+
+		return this;
+
+	},
+
+	center: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.addVectors( this.start, this.end ).multiplyScalar( 0.5 );
+
+	},
+
+	delta: function ( optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+		return result.subVectors( this.end, this.start );
+
+	},
+
+	distanceSq: function () {
+
+		return this.start.distanceToSquared( this.end );
+
+	},
+
+	distance: function () {
+
+		return this.start.distanceTo( this.end );
+
+	},
+
+	at: function ( t, optionalTarget ) {
+
+		var result = optionalTarget || new THREE.Vector3();
+
+		return this.delta( result ).multiplyScalar( t ).add( this.start );
+
+	},
+
+	closestPointToPointParameter: function() {
+
+		var startP = new THREE.Vector3();
+		var startEnd = new THREE.Vector3();
+
+		return function ( point, clampToLine ) {
+
+			startP.subVectors( point, this.start );
+			startEnd.subVectors( this.end, this.start );
+
+			var startEnd2 = startEnd.dot( startEnd );
+			var startEnd_startP = startEnd.dot( startP );
+
+			var t = startEnd_startP / startEnd2;
+
+			if ( clampToLine ) {
+
+				t = THREE.Math.clamp( t, 0, 1 );
+
+			}
+
+			return t;
+
+		};
+
+	}(),
+
+	closestPointToPoint: function ( point, clampToLine, optionalTarget ) {
+
+		var t = this.closestPointToPointParameter( point, clampToLine );
+
+		var result = optionalTarget || new THREE.Vector3();
+
+		return this.delta( result ).multiplyScalar( t ).add( this.start );
+
+	},
+
+	applyMatrix4: function ( matrix ) {
+
+		this.start.applyMatrix4( matrix );
+		this.end.applyMatrix4( matrix );
+
+		return this;
+
+	},
+
+	equals: function ( line ) {
+
+		return line.start.equals( this.start ) && line.end.equals( this.end );
+
+	},
+
+	clone: function () {
+
+		return new THREE.Line3().copy( this );
+
+	}
+
+};
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -2664,7 +2890,9 @@ THREE.Box2 = function ( min, max ) {
 
 };
 
-THREE.extend( THREE.Box2.prototype, {
+THREE.Box2.prototype = {
+
+	constructor: THREE.Box2,
 
 	set: function ( min, max ) {
 
@@ -2720,7 +2948,7 @@ THREE.extend( THREE.Box2.prototype, {
 
 	},
 
-	setFromCenterAndSize: function() {
+	setFromCenterAndSize: function () {
 
 		var v1 = new THREE.Vector2();
 
@@ -2860,7 +3088,7 @@ THREE.extend( THREE.Box2.prototype, {
 
 	},
 
-	distanceToPoint: function() {
+	distanceToPoint: function () {
 
 		var v1 = new THREE.Vector2();
 
@@ -2912,9 +3140,11 @@ THREE.extend( THREE.Box2.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author bhouston / http://exocortex.com
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 THREE.Box3 = function ( min, max ) {
@@ -2924,7 +3154,9 @@ THREE.Box3 = function ( min, max ) {
 
 };
 
-THREE.extend( THREE.Box3.prototype, {
+THREE.Box3.prototype = {
+
+	constructor: THREE.Box3,
 
 	set: function ( min, max ) {
 
@@ -3000,6 +3232,47 @@ THREE.extend( THREE.Box3.prototype, {
 
 			this.min.copy( center ).sub( halfSize );
 			this.max.copy( center ).add( halfSize );
+
+			return this;
+
+		};
+
+	}(),
+
+	setFromObject: function() {
+
+		// Computes the world-axis-aligned bounding box of an object (including its children),
+		// accounting for both the object's, and childrens', world transforms
+
+		var v1 = new THREE.Vector3();
+
+		return function( object ) {
+
+			var scope = this;
+
+			object.updateMatrixWorld( true );
+
+			this.makeEmpty();
+
+			object.traverse( function ( node ) {
+
+				if ( node.geometry !== undefined && node.geometry.vertices !== undefined ) {
+
+					var vertices = node.geometry.vertices;
+
+					for ( var i = 0, il = vertices.length; i < il; i++ ) {
+
+						v1.copy( vertices[ i ] );
+
+						v1.applyMatrix4( node.matrixWorld );
+
+						scope.expandByPoint( v1 );
+
+					}
+
+				}
+
+			} );
 
 			return this;
 
@@ -3186,7 +3459,7 @@ THREE.extend( THREE.Box3.prototype, {
 
 	},
 
-	transform: function() {
+	applyMatrix4: function() {
 
 		var points = [
 			new THREE.Vector3(),
@@ -3197,7 +3470,7 @@ THREE.extend( THREE.Box3.prototype, {
 			new THREE.Vector3(),
 			new THREE.Vector3(),
 			new THREE.Vector3()
-			];
+		];
 
 		return function ( matrix ) {
 
@@ -3241,7 +3514,8 @@ THREE.extend( THREE.Box3.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
@@ -3261,7 +3535,9 @@ THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 	);
 };
 
-THREE.extend( THREE.Matrix3.prototype, {
+THREE.Matrix3.prototype = {
+
+	constructor: THREE.Matrix3,
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
@@ -3464,7 +3740,8 @@ THREE.extend( THREE.Matrix3.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -3475,6 +3752,7 @@ THREE.extend( THREE.Matrix3.prototype, {
  * @author mikael emtinger / http://gomo.se/
  * @author timknip / http://www.floorplanner.com/
  * @author bhouston / http://exocortex.com
+ * @author WestLangley / http://github.com/WestLangley
  */
 
 
@@ -3492,7 +3770,9 @@ THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33
 
 };
 
-THREE.extend( THREE.Matrix4.prototype, {
+THREE.Matrix4.prototype = {
+
+	constructor: THREE.Matrix4,
 
 	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
@@ -3539,7 +3819,66 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	},
 
+	extractPosition: function ( m ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
+		return this.copyPosition( m );
+
+	},
+
+	copyPosition: function ( m ) {
+
+		var te = this.elements;
+		var me = m.elements;
+
+		te[12] = me[12];
+		te[13] = me[13];
+		te[14] = me[14];
+
+		return this;
+
+	},
+
+	extractRotation: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( m ) {
+
+			var te = this.elements;
+			var me = m.elements;
+
+			var scaleX = 1 / v1.set( me[0], me[1], me[2] ).length();
+			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
+			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
+
+			te[0] = me[0] * scaleX;
+			te[1] = me[1] * scaleX;
+			te[2] = me[2] * scaleX;
+
+			te[4] = me[4] * scaleY;
+			te[5] = me[5] * scaleY;
+			te[6] = me[6] * scaleY;
+
+			te[8] = me[8] * scaleZ;
+			te[9] = me[9] * scaleZ;
+			te[10] = me[10] * scaleZ;
+
+			return this;
+
+		};
+
+	}(),
+
 	setRotationFromEuler: function ( v, order ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromEuler() has been deprecated in favor of makeRotationFromEuler.  Please update your code.' );
+
+		return this.makeRotationFromEuler( v, order );
+
+	},
+
+	makeRotationFromEuler: function ( v, order ) {
 
 		var te = this.elements;
 
@@ -3646,11 +3985,30 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 		}
 
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
+
 		return this;
 
 	},
 
 	setRotationFromQuaternion: function ( q ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromQuaternion() has been deprecated in favor of makeRotationFromQuaternion.  Please update your code.' );
+
+		return this.makeRotationFromQuaternion( q );
+
+	},
+
+	makeRotationFromQuaternion: function ( q ) {
 
 		var te = this.elements;
 
@@ -3671,6 +4029,17 @@ THREE.extend( THREE.Matrix4.prototype, {
 		te[2] = xz - wy;
 		te[6] = yz + wx;
 		te[10] = 1 - ( xx + yy );
+
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
 
 		return this;
 
@@ -3839,31 +4208,16 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	rotateAxis: function ( v ) {
 
-		var te = this.elements;
-		var vx = v.x, vy = v.y, vz = v.z;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateAxis() has been removed. Use Vector3.transformDirection( matrix ) instead.' );
 
-		v.x = vx * te[0] + vy * te[4] + vz * te[8];
-		v.y = vx * te[1] + vy * te[5] + vz * te[9];
-		v.z = vx * te[2] + vy * te[6] + vz * te[10];
-
-		v.normalize();
-
-		return v;
+		v.transformDirection( this );
 
 	},
 
-	crossVector: function ( a ) {
+	crossVector: function ( vector ) {
 
-		var te = this.elements;
-		var v = new THREE.Vector4();
-
-		v.x = te[0] * a.x + te[4] * a.y + te[8] * a.z + te[12] * a.w;
-		v.y = te[1] * a.x + te[5] * a.y + te[9] * a.z + te[13] * a.w;
-		v.z = te[2] * a.x + te[6] * a.y + te[10] * a.z + te[14] * a.w;
-
-		v.w = ( a.w ) ? te[3] * a.x + te[7] * a.y + te[11] * a.z + te[15] * a.w : 1;
-
-		return v;
+		console.warn( 'DEPRECATED: Matrix4\'s .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
 
 	},
 
@@ -3979,6 +4333,8 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 		return function () {
 
+			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.getPositionFromMatrix( matrix ) instead.' );
+
 			var te = this.elements;
 			return v1.set( te[12], te[13], te[14] );
 
@@ -4026,8 +4382,8 @@ THREE.extend( THREE.Matrix4.prototype, {
 		te[11] = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
 		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
 
-		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 4 ] + me[ 2 ] * te[ 8 ] + me[ 3 ] * te[ 12 ];
-
+		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
+	
 		if ( det == 0 ) {
 
 			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
@@ -4053,295 +4409,33 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	},
 
-	compose: function() {
-
-		var mRotation = new THREE.Matrix4(),
-			mScale = new THREE.Matrix4();
-		
-		return function ( translation, rotation, scale ) {
-
-			var te = this.elements;
-
-			mRotation.identity();
-			mRotation.setRotationFromQuaternion( rotation );
-
-			mScale.makeScale( scale.x, scale.y, scale.z );
-
-			this.multiplyMatrices( mRotation, mScale );
-
-			te[12] = translation.x;
-			te[13] = translation.y;
-			te[14] = translation.z;
-
-			return this;
-
-		};
-
-	}(),
-
-	decompose: function() {
-
-		var x = new THREE.Vector3(),
-			y = new THREE.Vector3(),
-			z = new THREE.Vector3(),
-			matrix = new THREE.Matrix4();
-
-		return function ( translation, rotation, scale ) {
-
-			var te = this.elements;
-
-			// grab the axis vectors
-			x.set( te[0], te[1], te[2] );
-			y.set( te[4], te[5], te[6] );
-			z.set( te[8], te[9], te[10] );
-
-			translation = ( translation instanceof THREE.Vector3 ) ? translation : new THREE.Vector3();
-			rotation = ( rotation instanceof THREE.Quaternion ) ? rotation : new THREE.Quaternion();
-			scale = ( scale instanceof THREE.Vector3 ) ? scale : new THREE.Vector3();
-
-			scale.x = x.length();
-			scale.y = y.length();
-			scale.z = z.length();
-
-			translation.x = te[12];
-			translation.y = te[13];
-			translation.z = te[14];
-
-			// scale the rotation part
-
-			matrix.copy( this );
-
-			matrix.elements[0] /= scale.x;
-			matrix.elements[1] /= scale.x;
-			matrix.elements[2] /= scale.x;
-
-			matrix.elements[4] /= scale.y;
-			matrix.elements[5] /= scale.y;
-			matrix.elements[6] /= scale.y;
-
-			matrix.elements[8] /= scale.z;
-			matrix.elements[9] /= scale.z;
-			matrix.elements[10] /= scale.z;
-
-			rotation.setFromRotationMatrix( matrix );
-
-			return [ translation, rotation, scale ];
-
-		};
-
-	}(),
-
-	extractPosition: function ( m ) {
-
-		var te = this.elements;
-		var me = m.elements;
-
-		te[12] = me[12];
-		te[13] = me[13];
-		te[14] = me[14];
-
-		return this;
-
-	},
-
-	extractRotation: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function ( m ) {
-
-			var te = this.elements;
-			var me = m.elements;
-
-			var scaleX = 1 / v1.set( me[0], me[1], me[2] ).length();
-			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
-			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
-
-			te[0] = me[0] * scaleX;
-			te[1] = me[1] * scaleX;
-			te[2] = me[2] * scaleX;
-
-			te[4] = me[4] * scaleY;
-			te[5] = me[5] * scaleY;
-			te[6] = me[6] * scaleY;
-
-			te[8] = me[8] * scaleZ;
-			te[9] = me[9] * scaleZ;
-			te[10] = me[10] * scaleZ;
-
-			return this;
-
-		};
-
-	}(),
-
 	translate: function ( v ) {
 
-		var te = this.elements;
-		var x = v.x, y = v.y, z = v.z;
-
-		te[12] = te[0] * x + te[4] * y + te[8] * z + te[12];
-		te[13] = te[1] * x + te[5] * y + te[9] * z + te[13];
-		te[14] = te[2] * x + te[6] * y + te[10] * z + te[14];
-		te[15] = te[3] * x + te[7] * y + te[11] * z + te[15];
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .translate() has been removed.');
 
 	},
 
 	rotateX: function ( angle ) {
 
-		var te = this.elements;
-		var m12 = te[4];
-		var m22 = te[5];
-		var m32 = te[6];
-		var m42 = te[7];
-		var m13 = te[8];
-		var m23 = te[9];
-		var m33 = te[10];
-		var m43 = te[11];
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-
-		te[4] = c * m12 + s * m13;
-		te[5] = c * m22 + s * m23;
-		te[6] = c * m32 + s * m33;
-		te[7] = c * m42 + s * m43;
-
-		te[8] = c * m13 - s * m12;
-		te[9] = c * m23 - s * m22;
-		te[10] = c * m33 - s * m32;
-		te[11] = c * m43 - s * m42;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateX() has been removed.');
 
 	},
 
 	rotateY: function ( angle ) {
 
-		var te = this.elements;
-		var m11 = te[0];
-		var m21 = te[1];
-		var m31 = te[2];
-		var m41 = te[3];
-		var m13 = te[8];
-		var m23 = te[9];
-		var m33 = te[10];
-		var m43 = te[11];
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-
-		te[0] = c * m11 - s * m13;
-		te[1] = c * m21 - s * m23;
-		te[2] = c * m31 - s * m33;
-		te[3] = c * m41 - s * m43;
-
-		te[8] = c * m13 + s * m11;
-		te[9] = c * m23 + s * m21;
-		te[10] = c * m33 + s * m31;
-		te[11] = c * m43 + s * m41;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateY() has been removed.');
 
 	},
 
 	rotateZ: function ( angle ) {
 
-		var te = this.elements;
-		var m11 = te[0];
-		var m21 = te[1];
-		var m31 = te[2];
-		var m41 = te[3];
-		var m12 = te[4];
-		var m22 = te[5];
-		var m32 = te[6];
-		var m42 = te[7];
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-
-		te[0] = c * m11 + s * m12;
-		te[1] = c * m21 + s * m22;
-		te[2] = c * m31 + s * m32;
-		te[3] = c * m41 + s * m42;
-
-		te[4] = c * m12 - s * m11;
-		te[5] = c * m22 - s * m21;
-		te[6] = c * m32 - s * m31;
-		te[7] = c * m42 - s * m41;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateZ() has been removed.');
 
 	},
 
 	rotateByAxis: function ( axis, angle ) {
 
-		var te = this.elements;
-
-		// optimize by checking axis
-
-		if ( axis.x === 1 && axis.y === 0 && axis.z === 0 ) {
-
-			return this.rotateX( angle );
-
-		} else if ( axis.x === 0 && axis.y === 1 && axis.z === 0 ) {
-
-			return this.rotateY( angle );
-
-		} else if ( axis.x === 0 && axis.y === 0 && axis.z === 1 ) {
-
-			return this.rotateZ( angle );
-
-		}
-
-		var x = axis.x, y = axis.y, z = axis.z;
-		var n = Math.sqrt(x * x + y * y + z * z);
-
-		x /= n;
-		y /= n;
-		z /= n;
-
-		var xx = x * x, yy = y * y, zz = z * z;
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-		var oneMinusCosine = 1 - c;
-		var xy = x * y * oneMinusCosine;
-		var xz = x * z * oneMinusCosine;
-		var yz = y * z * oneMinusCosine;
-		var xs = x * s;
-		var ys = y * s;
-		var zs = z * s;
-
-		var r11 = xx + (1 - xx) * c;
-		var r21 = xy + zs;
-		var r31 = xz - ys;
-		var r12 = xy - zs;
-		var r22 = yy + (1 - yy) * c;
-		var r32 = yz + xs;
-		var r13 = xz + ys;
-		var r23 = yz - xs;
-		var r33 = zz + (1 - zz) * c;
-
-		var m11 = te[0], m21 = te[1], m31 = te[2], m41 = te[3];
-		var m12 = te[4], m22 = te[5], m32 = te[6], m42 = te[7];
-		var m13 = te[8], m23 = te[9], m33 = te[10], m43 = te[11];
-		var m14 = te[12], m24 = te[13], m34 = te[14], m44 = te[15];
-
-		te[0] = r11 * m11 + r21 * m12 + r31 * m13;
-		te[1] = r11 * m21 + r21 * m22 + r31 * m23;
-		te[2] = r11 * m31 + r21 * m32 + r31 * m33;
-		te[3] = r11 * m41 + r21 * m42 + r31 * m43;
-
-		te[4] = r12 * m11 + r22 * m12 + r32 * m13;
-		te[5] = r12 * m21 + r22 * m22 + r32 * m23;
-		te[6] = r12 * m31 + r22 * m32 + r32 * m33;
-		te[7] = r12 * m41 + r22 * m42 + r32 * m43;
-
-		te[8] = r13 * m11 + r23 * m12 + r33 * m13;
-		te[9] = r13 * m21 + r23 * m22 + r33 * m23;
-		te[10] = r13 * m31 + r23 * m32 + r33 * m33;
-		te[11] = r13 * m41 + r23 * m42 + r33 * m43;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateByAxis() has been removed.');
 
 	},
 
@@ -4475,6 +4569,34 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	},
 
+	compose: function ( position, quaternion, scale ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .compose() has been deprecated in favor of makeFromPositionQuaternionScale. Please update your code.' );
+
+		return this.makeFromPositionQuaternionScale( position, quaternion, scale );
+
+	},
+
+	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
+
+		this.makeRotationFromQuaternion( quaternion );
+		this.scale( scale );
+		this.setPosition( position );
+
+		return this;
+
+	},
+
+	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
+
+		this.makeRotationFromEuler( rotation, eulerOrder );
+		this.scale( scale );
+		this.setPosition( position );
+
+		return this;
+
+	},
+
 	makeFrustum: function ( left, right, bottom, top, near, far ) {
 
 		var te = this.elements;
@@ -4541,7 +4663,64 @@ THREE.extend( THREE.Matrix4.prototype, {
 
 	}
 
+};
+
+THREE.extend( THREE.Matrix4.prototype, {
+
+	decompose: function() {
+
+		var x = new THREE.Vector3();
+		var y = new THREE.Vector3();
+		var z = new THREE.Vector3();
+		var matrix = new THREE.Matrix4();
+
+		return function ( position, quaternion, scale ) {
+
+			var te = this.elements;
+
+			// grab the axis vectors
+			x.set( te[0], te[1], te[2] );
+			y.set( te[4], te[5], te[6] );
+			z.set( te[8], te[9], te[10] );
+
+			position = ( position instanceof THREE.Vector3 ) ? position : new THREE.Vector3();
+			quaternion = ( quaternion instanceof THREE.Quaternion ) ? quaternion : new THREE.Quaternion();
+			scale = ( scale instanceof THREE.Vector3 ) ? scale : new THREE.Vector3();
+
+			scale.x = x.length();
+			scale.y = y.length();
+			scale.z = z.length();
+
+			position.x = te[12];
+			position.y = te[13];
+			position.z = te[14];
+
+			// scale the rotation part
+
+			matrix.copy( this );
+
+			matrix.elements[0] /= scale.x;
+			matrix.elements[1] /= scale.x;
+			matrix.elements[2] /= scale.x;
+
+			matrix.elements[4] /= scale.y;
+			matrix.elements[5] /= scale.y;
+			matrix.elements[6] /= scale.y;
+
+			matrix.elements[8] /= scale.z;
+			matrix.elements[9] /= scale.z;
+			matrix.elements[10] /= scale.z;
+
+			quaternion.setFromRotationMatrix( matrix );
+
+			return [ position, quaternion, scale ];
+
+		};
+
+	}()
+
 } );
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -4553,7 +4732,9 @@ THREE.Ray = function ( origin, direction ) {
 
 };
 
-THREE.extend( THREE.Ray.prototype, {
+THREE.Ray.prototype = {
+
+	constructor: THREE.Ray,
 
 	set: function ( origin, direction ) {
 
@@ -4684,7 +4865,7 @@ THREE.extend( THREE.Ray.prototype, {
 
 	},
 
-	transform: function ( matrix4 ) {
+	applyMatrix4: function ( matrix4 ) {
 
 		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
@@ -4705,7 +4886,8 @@ THREE.extend( THREE.Ray.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -4727,7 +4909,9 @@ THREE.Frustum = function ( p0, p1, p2, p3, p4, p5 ) {
 
 };
 
-THREE.extend( THREE.Frustum.prototype, {
+THREE.Frustum.prototype = {
+
+	constructor: THREE.Frustum,
 
 	set: function ( p0, p1, p2, p3, p4, p5 ) {
 
@@ -4856,7 +5040,8 @@ THREE.extend( THREE.Frustum.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author bhouston / http://exocortex.com
  */
@@ -4868,7 +5053,9 @@ THREE.Plane = function ( normal, constant ) {
 
 };
 
-THREE.extend( THREE.Plane.prototype, {
+THREE.Plane.prototype = {
+
+	constructor: THREE.Plane,
 
 	set: function ( normal, constant ) {
 
@@ -4974,12 +5161,12 @@ THREE.extend( THREE.Plane.prototype, {
 
 	},
 
-	isIntersectionLine: function ( startPoint, endPoint ) {
+	isIntersectionLine: function ( line ) {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
-		var startSign = this.distanceToPoint( startPoint );
-		var endSign = this.distanceToPoint( endPoint );
+		var startSign = this.distanceToPoint( line.start );
+		var endSign = this.distanceToPoint( line.end );
 
 		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
 
@@ -4989,20 +5176,20 @@ THREE.extend( THREE.Plane.prototype, {
 
 		var v1 = new THREE.Vector3();
 
-		return function ( startPoint, endPoint, optionalTarget ) {
+		return function ( line, optionalTarget ) {
 
 			var result = optionalTarget || new THREE.Vector3();
 
-			var direction = v1.subVectors( endPoint, startPoint );
+			var direction = line.delta( v1 );
 
 			var denominator = this.normal.dot( direction );
 
 			if ( denominator == 0 ) {
 
 				// line is coplanar, return origin
-				if( this.distanceToPoint( startPoint ) == 0 ) {
+				if( this.distanceToPoint( line.start ) == 0 ) {
 
-					return result.copy( startPoint );
+					return result.copy( line.start );
 
 				}
 
@@ -5011,7 +5198,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			}
 
-			var t = - ( startPoint.dot( this.normal ) + this.constant ) / denominator;
+			var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
 			if( t < 0 || t > 1 ) {
 
@@ -5019,7 +5206,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			}
 
-			return result.copy( direction ).multiplyScalar( t ).add( startPoint );
+			return result.copy( direction ).multiplyScalar( t ).add( line.start );
 
 		};
 
@@ -5033,7 +5220,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 	},
 
-	transform: function() {
+	applyMatrix4: function() {
 
 		var v1 = new THREE.Vector3();
 		var v2 = new THREE.Vector3();
@@ -5042,7 +5229,7 @@ THREE.extend( THREE.Plane.prototype, {
 
 			// compute new normal based on theory here:
 			// http://www.songho.ca/opengl/gl_normaltransform.html
-			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getInverse( matrix ).transpose();
+			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getNormalMatrix( matrix );
 			var newNormal = v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 			var newCoplanarPoint = this.coplanarPoint( v2 );
@@ -5076,7 +5263,8 @@ THREE.extend( THREE.Plane.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author bhouston / http://exocortex.com
  * @author mrdoob / http://mrdoob.com/
@@ -5089,7 +5277,9 @@ THREE.Sphere = function ( center, radius ) {
 
 };
 
-THREE.extend( THREE.Sphere.prototype, {
+THREE.Sphere.prototype = {
+
+	constructor: THREE.Sphere,
 
 	set: function ( center, radius ) {
 
@@ -5099,18 +5289,18 @@ THREE.extend( THREE.Sphere.prototype, {
 		return this;
 	},
 
-	setFromCenterAndPoints: function ( center, points ) {
+	setFromPoints: function ( points ) {
 
-		var maxRadiusSq = 0;
+		var radiusSq, maxRadiusSq = 0;
 
 		for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-			var radiusSq = center.distanceToSquared( points[ i ] );
+			radiusSq = points[ i ].lengthSq();
 			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
 
 		}
 
-		this.center = center;
+		this.center.set( 0, 0, 0 );
 		this.radius = Math.sqrt( maxRadiusSq );
 
 		return this;
@@ -5181,7 +5371,7 @@ THREE.extend( THREE.Sphere.prototype, {
 
 	},
 
-	transform: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		this.center.applyMatrix4( matrix );
 		this.radius = this.radius * matrix.getMaxScaleOnAxis();
@@ -5210,12 +5400,50 @@ THREE.extend( THREE.Sphere.prototype, {
 
 	}
 
-} );
+};
+
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
  */
 
 THREE.Math = {
+
+	generateUUID: function () {
+
+		// http://www.broofa.com/Tools/Math.uuid.htm
+		
+		var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+		var uuid = new Array(36);
+		var rnd = 0, r;
+
+		return function () {
+
+			for ( var i = 0; i < 36; i ++ ) {
+
+				if ( i == 8 || i == 13 || i == 18 || i == 23 ) {
+			
+					uuid[ i ] = '-';
+			
+				} else if ( i == 14 ) {
+			
+					uuid[ i ] = '4';
+			
+				} else {
+			
+					if (rnd <= 0x02) rnd = 0x2000000 + (Math.random()*0x1000000)|0;
+					r = rnd & 0xf;
+					rnd = rnd >> 4;
+					uuid[i] = chars[(i == 19) ? (r & 0x3) | 0x8 : r];
+
+				}
+			}
+			
+			return uuid.join('');
+
+		};
+
+	}(),
 
 	// Clamp value to range <a, b>
 
@@ -5238,6 +5466,30 @@ THREE.Math = {
 	mapLinear: function ( x, a1, a2, b1, b2 ) {
 
 		return b1 + ( x - a1 ) * ( b2 - b1 ) / ( a2 - a1 );
+
+	},
+
+	// http://en.wikipedia.org/wiki/Smoothstep
+
+	smoothstep: function ( x, min, max ) {
+
+		if ( x <= min ) return 0;
+		if ( x >= max ) return 1;
+
+		x = ( x - min )/( max - min );
+
+		return x*x*(3 - 2*x);
+
+	},
+
+	smootherstep: function ( x, min, max ) {
+
+		if ( x <= min ) return 0;
+		if ( x >= max ) return 1;
+
+		x = ( x - min )/( max - min );
+
+		return x*x*x*(x*(x*6 - 15) + 10);
 
 	},
 
@@ -5305,6 +5557,7 @@ THREE.Math = {
 	}()
 
 };
+
 /**
  * Spline from Tween.js, slightly optimized (and trashed)
  * http://sole.github.com/tween.js/examples/05_spline.html
@@ -5481,6 +5734,7 @@ THREE.Spline = function ( points ) {
 	};
 
 };
+
 /**
  * @author bhouston / http://exocortex.com
  * @author mrdoob / http://mrdoob.com/
@@ -5498,7 +5752,7 @@ THREE.Triangle.normal = function() {
 
 	var v0 = new THREE.Vector3();
 
-	return function( a, b, c, optionalTarget ) {
+	return function ( a, b, c, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -5523,9 +5777,9 @@ THREE.Triangle.normal = function() {
 // based on: http://www.blackpawn.com/texts/pointinpoly/default.html
 THREE.Triangle.barycoordFromPoint = function() {
 
-	var v0 = new THREE.Vector3(),
-		v1 = new THREE.Vector3(),
-		v2 = new THREE.Vector3();
+	var v0 = new THREE.Vector3();
+	var v1 = new THREE.Vector3();
+	var v2 = new THREE.Vector3();
 
 	return function ( point, a, b, c, optionalTarget ) {
 
@@ -5575,7 +5829,7 @@ THREE.Triangle.containsPoint = function() {
 
 }();
 
-THREE.extend( THREE.Triangle.prototype, {
+THREE.Triangle.prototype = {
 
 	constructor: THREE.Triangle,
 
@@ -5670,4 +5924,5 @@ THREE.extend( THREE.Triangle.prototype, {
 
 	}
 
-} );
+};
+
