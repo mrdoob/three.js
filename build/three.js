@@ -25834,6 +25834,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! texture.image.__webglTextureCube ) {
 
+					texture.addEventListener( 'dispose', onTextureDispose );
+
 					texture.image.__webglTextureCube = _gl.createTexture();
 
 					_this.info.memory.textures ++;
