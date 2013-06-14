@@ -1,34 +1,34 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>three.js webgl - planetary system animation</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            background-color: #000;
-            overflow: hidden;
-        }
-        #info {
-            position: absolute;
-            top: 10px; width: 100%;
-            color: white;
-            padding: 5px;
-            font-family: Monospace;
-            font-size: 13px;
-            text-align: center;
-            z-index:100;
-        }
-        a {
-            color: white;
-            text-decoration: underline;
-        }
-    </style>
+	<title>three.js webgl - planetary system animation</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			margin: 0;
+			background-color: #000;
+			overflow: hidden;
+		}
+		#info {
+			position: absolute;
+			top: 10px; width: 100%;
+			color: white;
+			padding: 5px;
+			font-family: Monospace;
+			font-size: 13px;
+			text-align: center;
+			z-index:100;
+		}
+		a {
+			color: white;
+			text-decoration: underline;
+		}
+	</style>
 </head>
 <body>
 <div id="info">
-    <a href="http://threejs.org" target="_blank">three.js</a> - planetary system animation using pivots
+	<a href="http://threejs.org" target="_blank">three.js</a> - planetary system animation using pivots
 </div>
 <div id="container"></div>
 
@@ -39,12 +39,12 @@
  * global variables
  */
 var renderer, scene, camera,
-    sun, light, planet, planetPivot, planetGroup,
-    satellite, satellitePivot, stars;
+	sun, light, planet, planetPivot, planetGroup,
+	satellite, satellitePivot, stars;
 
 // viewport
 var width   = window.innerWidth,
-    height  = window.innerHeight;
+	height  = window.innerHeight;
 
 // canvas container
 var container = document.getElementById('container');
@@ -53,17 +53,17 @@ var container = document.getElementById('container');
 var controls;
 
 // astronomical objects parameters
-var sunRadius       = 257,
-    planetRadius    = 67,
-    distanceFromSun = 907,
-    satelliteRadius = 17;
+var sunRadius	   = 257,
+	planetRadius	= 67,
+	distanceFromSun = 907,
+	satelliteRadius = 17;
 
 // camera parameters
-var fov      = 70, // vertical field of view
-    aspect   = width / height, // aspect ratio
-    near     = 0.1, // near plane distance
-    far      = 10000, // far plane distance
-    pullback = new THREE.Vector3(-planetRadius*2, 7, distanceFromSun); // initial position of the camera
+var fov	  = 70, // vertical field of view
+	aspect   = width / height, // aspect ratio
+	near	 = 0.1, // near plane distance
+	far	  = 10000, // far plane distance
+	pullback = new THREE.Vector3(-planetRadius*2, 7, distanceFromSun); // initial position of the camera
 
 // number of stars for the particle system
 var nbStars = 2000;
@@ -78,156 +78,156 @@ animate();
  * |-- sun
  * |   `-- light
  * |   `-- planetPivot
- * |       `-- planetGroup
- * |           `-- planet
- * |           `-- satellitePivot
- * |               `-- satellite
- * |           `-- camera
+ * |	   `-- planetGroup
+ * |		   `-- planet
+ * |		   `-- satellitePivot
+ * |			   `-- satellite
+ * |		   `-- camera
  * |-- stars
  * |-- planetTrajectory
  */
 function init() {
-    // renderer
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(width, height);
+	// renderer
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(width, height);
 
-    // append renderer canvas to the container
-    container.appendChild(renderer.domElement);
+	// append renderer canvas to the container
+	container.appendChild(renderer.domElement);
 
-    // scene
-    scene = new THREE.Scene();
+	// scene
+	scene = new THREE.Scene();
 
-        // sun
-        var sunGeometry = new THREE.SphereGeometry(sunRadius, 64, 64);
-        var sunMaterial = new THREE.MeshLambertMaterial({
-            color: Math.random() * 0xffff00, // random color
-            emissive: Math.random() * 0xffff00 // random color
-        });
-        sun = new THREE.Mesh(sunGeometry, sunMaterial);
+		// sun
+		var sunGeometry = new THREE.SphereGeometry(sunRadius, 64, 64);
+		var sunMaterial = new THREE.MeshLambertMaterial({
+			color: Math.random() * 0xffff00, // random color
+			emissive: Math.random() * 0xffff00 // random color
+		});
+		sun = new THREE.Mesh(sunGeometry, sunMaterial);
 
-            // light
-            light = new THREE.PointLight(0xFFFFFF);
+			// light
+			light = new THREE.PointLight(0xFFFFFF);
 
-            // planetPivot, make all descendants rotate around the sun
-            // we don't have to deal with this rotation on the planet itself
-            planetPivot = new THREE.Object3D();
+			// planetPivot, make all descendants rotate around the sun
+			// we don't have to deal with this rotation on the planet itself
+			planetPivot = new THREE.Object3D();
 
-                // planetGroup
-                planetGroup = new THREE.Object3D();
-                planetGroup.position.x = distanceFromSun; // distance from the sun
+				// planetGroup
+				planetGroup = new THREE.Object3D();
+				planetGroup.position.x = distanceFromSun; // distance from the sun
 
-                    // planet
-                    var planetGeometry = new THREE.SphereGeometry(planetRadius, 32, 32);
-                    var planetMaterial = new THREE.MeshLambertMaterial({
-                        color: Math.random() * 0xffffff // random color
-                    });
-                    planet = new THREE.Mesh(planetGeometry, planetMaterial);
+					// planet
+					var planetGeometry = new THREE.SphereGeometry(planetRadius, 32, 32);
+					var planetMaterial = new THREE.MeshLambertMaterial({
+						color: Math.random() * 0xffffff // random color
+					});
+					planet = new THREE.Mesh(planetGeometry, planetMaterial);
 
-                    // satellitePivot
-                    satellitePivot = new THREE.Object3D();
-                    satellitePivot.rotation.x = Math.PI/4;
+					// satellitePivot
+					satellitePivot = new THREE.Object3D();
+					satellitePivot.rotation.x = Math.PI/4;
 
-                        // satellite
-                        var satelliteGeometry = new THREE.SphereGeometry(satelliteRadius, 16, 16);
-                        var satelliteMaterial = new THREE.MeshLambertMaterial({
-                            color: Math.random() * 0xffffff // random color
-                        });
-                        satellite = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
-                        satellite.position.x = planetRadius+planetRadius/2;
+						// satellite
+						var satelliteGeometry = new THREE.SphereGeometry(satelliteRadius, 16, 16);
+						var satelliteMaterial = new THREE.MeshLambertMaterial({
+							color: Math.random() * 0xffffff // random color
+						});
+						satellite = new THREE.Mesh(satelliteGeometry, satelliteMaterial);
+						satellite.position.x = planetRadius+planetRadius/2;
 
-                    satellitePivot.add(satellite);
+					satellitePivot.add(satellite);
 
-                    // camera
-                    camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-                    camera.position = pullback; // pulling back the camera
-                    camera.lookAt(planet);
+					// camera
+					camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+					camera.position = pullback; // pulling back the camera
+					camera.lookAt(planet);
 
-                    // camera controls
-                    controls = new THREE.TrackballControls(camera, renderer.domElement);
+					// camera controls
+					controls = new THREE.TrackballControls(camera, renderer.domElement);
 
-                planetGroup.add(planet);
-                planetGroup.add(satellitePivot);
-                planetGroup.add(camera); // camera is centered on the planet and part of the planetary group
+				planetGroup.add(planet);
+				planetGroup.add(satellitePivot);
+				planetGroup.add(camera); // camera is centered on the planet and part of the planetary group
 
-            planetPivot.add(planetGroup);
+			planetPivot.add(planetGroup);
 
-        sun.add(light);
-        sun.add(planetPivot);
+		sun.add(light);
+		sun.add(planetPivot);
 
-        // stars
-        var starsGeometry = new THREE.Geometry(); // an empty geometry
-        for (var i = 0; i < nbStars; i++) {
-            // create a new vertex with random coordinates between -1 and 1
-            var vertex = new THREE.Vector3();
-                vertex.x = Math.random() * 2 - 1;
-                vertex.y = Math.random() * 2 - 1;
-                vertex.z = Math.random() * 2 - 1;
-                vertex.multiplyScalar(planetRadius);
+		// stars
+		var starsGeometry = new THREE.Geometry(); // an empty geometry
+		for (var i = 0; i < nbStars; i++) {
+			// create a new vertex with random coordinates between -1 and 1
+			var vertex = new THREE.Vector3();
+				vertex.x = Math.random() * 2 - 1;
+				vertex.y = Math.random() * 2 - 1;
+				vertex.z = Math.random() * 2 - 1;
+				vertex.multiplyScalar(planetRadius);
 
-            starsGeometry.vertices.push(vertex);
-        }
+			starsGeometry.vertices.push(vertex);
+		}
 
-        var starsMaterial = new THREE.ParticleBasicMaterial({
-            color: Math.random() * 0xffffff,
-            size: 2,
-            sizeAttenuation: false
-        });
-        stars = new THREE.ParticleSystem(starsGeometry, starsMaterial);
-        stars.scale.set(200, 200, 200);
+		var starsMaterial = new THREE.ParticleBasicMaterial({
+			color: Math.random() * 0xffffff,
+			size: 2,
+			sizeAttenuation: false
+		});
+		stars = new THREE.ParticleSystem(starsGeometry, starsMaterial);
+		stars.scale.set(200, 200, 200);
 
-        // planetTrajectory
-        var circleShape = new THREE.Shape();
-            circleShape.moveTo(0, 0);
-            circleShape.arc(0, 0, distanceFromSun, 0, Math.PI*2, false);
+		// planetTrajectory
+		var circleShape = new THREE.Shape();
+			circleShape.moveTo(0, 0);
+			circleShape.arc(0, 0, distanceFromSun, 0, Math.PI*2, false);
 
-        var geometry = circleShape.createPointsGeometry(23);
-            geometry.vertices.shift();
-            geometry.vertices.pop();
-            geometry.vertices.push(geometry.vertices[0]);
+		var geometry = circleShape.createPointsGeometry(23);
+			geometry.vertices.shift();
+			geometry.vertices.pop();
+			geometry.vertices.push(geometry.vertices[0]);
 
-        var material = new THREE.LineBasicMaterial({color: 0xFFFFFF});
+		var material = new THREE.LineBasicMaterial({color: 0xFFFFFF});
 
-        var planetTrajectory = new THREE.Line(geometry, material, THREE.LineStrip);
-            planetTrajectory.rotation.set(Math.PI/2, 0, 0);
+		var planetTrajectory = new THREE.Line(geometry, material, THREE.LineStrip);
+			planetTrajectory.rotation.set(Math.PI/2, 0, 0);
 
-    scene.add(sun);
-    scene.add(stars);
-    scene.add(planetTrajectory);
+	scene.add(sun);
+	scene.add(stars);
+	scene.add(planetTrajectory);
 
-    // events
-    window.addEventListener( 'resize', onWindowResize, false );
+	// events
+	window.addEventListener( 'resize', onWindowResize, false );
 }
 
 /**
  * Resize listener
  */
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 /**
  * Animate loop
  */
 function animate() {
-    // request animation frame scheme
-    requestAnimationFrame(animate);
-    render();
+	// request animation frame scheme
+	requestAnimationFrame(animate);
+	render();
 }
 
 /**
  * Render a frame
  */
 function render() {
-    planetPivot.rotation.y += 0.0005;
-    planet.rotation.y += 0.006;
-    satellitePivot.rotation.y += 0.009;
+	planetPivot.rotation.y += 0.0005;
+	planet.rotation.y += 0.006;
+	satellitePivot.rotation.y += 0.009;
 
-    controls.update();
-    renderer.clear();
-    renderer.render(scene, camera);
+	controls.update();
+	renderer.clear();
+	renderer.render(scene, camera);
 }
 </script>
 </body>
