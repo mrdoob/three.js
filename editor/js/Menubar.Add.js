@@ -19,6 +19,9 @@ Menubar.Add = function ( signals ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
+	var meshCount = 0;
+	var lightCount = 0;
+
 	// add plane
 
 	var option = new UI.Panel();
@@ -34,7 +37,7 @@ Menubar.Add = function ( signals ) {
 
 		var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Plane ' + mesh.id;
+		mesh.name = 'Plane ' + ( ++ meshCount );
 
 		mesh.rotation.x = - Math.PI/2;
 
@@ -60,7 +63,7 @@ Menubar.Add = function ( signals ) {
 
 		var geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Cube ' + mesh.id;
+		mesh.name = 'Cube ' + ( ++ meshCount );
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -84,7 +87,7 @@ Menubar.Add = function ( signals ) {
 
 		var geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Cylinder ' + mesh.id;
+		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -104,7 +107,7 @@ Menubar.Add = function ( signals ) {
 
 		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Sphere ' + mesh.id;
+		mesh.name = 'Sphere ' + ( ++ meshCount );
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -123,7 +126,7 @@ Menubar.Add = function ( signals ) {
 
 		var geometry = new THREE.IcosahedronGeometry ( radius, detail );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Icosahedron ' + mesh.id;
+		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -145,7 +148,7 @@ Menubar.Add = function ( signals ) {
 
 		var geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'Torus ' + mesh.id;
+		mesh.name = 'Torus ' + ( ++ meshCount );
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -169,7 +172,7 @@ Menubar.Add = function ( signals ) {
 
 		var geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
-		mesh.name = 'TorusKnot ' + mesh.id;
+		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
 		signals.objectAdded.dispatch( mesh );
 
@@ -192,7 +195,7 @@ Menubar.Add = function ( signals ) {
 		var distance = 0;
 
 		var light = new THREE.PointLight( color, intensity, distance );
-		light.name = 'PointLight ' + light.id;
+		light.name = 'PointLight ' + ( ++ lightCount );
 
 		signals.objectAdded.dispatch( light );
 
@@ -213,8 +216,8 @@ Menubar.Add = function ( signals ) {
 		var exponent = 10;
 
 		var light = new THREE.SpotLight( color, intensity, distance, angle, exponent );
-		light.name = 'SpotLight ' + light.id;
-		light.target.name = 'SpotLight ' + light.id + ' Target';
+		light.name = 'SpotLight ' + ( ++ lightCount );
+		light.target.name = 'SpotLight ' + ( lightCount ) + ' Target';
 
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
@@ -234,8 +237,8 @@ Menubar.Add = function ( signals ) {
 		var intensity = 1;
 
 		var light = new THREE.DirectionalLight( color, intensity );
-		light.name = 'DirectionalLight ' + light.id;
-		light.target.name = 'DirectionalLight ' + light.id + ' Target';
+		light.name = 'DirectionalLight ' + ( ++ lightCount );
+		light.target.name = 'DirectionalLight ' + ( lightCount ) + ' Target';
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
@@ -256,7 +259,7 @@ Menubar.Add = function ( signals ) {
 		var intensity = 1;
 
 		var light = new THREE.HemisphereLight( skyColor, groundColor, intensity );
-		light.name = 'HemisphereLight ' + light.id;
+		light.name = 'HemisphereLight ' + ( ++ lightCount );
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
@@ -275,7 +278,7 @@ Menubar.Add = function ( signals ) {
 		var color = 0x222222;
 
 		var light = new THREE.AmbientLight( color );
-		light.name = 'AmbientLight ' + light.id;
+		light.name = 'AmbientLight ' + ( ++ lightCount );
 
 		signals.objectAdded.dispatch( light );
 

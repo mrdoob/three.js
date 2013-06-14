@@ -22,6 +22,14 @@ UI.Element.prototype = {
 
 	},
 
+	setDisabled: function ( value ) {
+
+		this.dom.disabled = value;
+
+		return this;
+
+	},
+
 	setTextContent: function ( value ) {
 
 		this.dom.textContent = value;

@@ -9,15 +9,15 @@ Sidebar.Object3D = function ( signals ) {
 	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
 
-	// parent
+	// id
 
-	var objectParentRow = new UI.Panel();
-	var objectParent = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectIdRow = new UI.Panel();
+	var objectId = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
 
-	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ).setColor( '#666' ) );
-	objectParentRow.add( objectParent );
+	objectIdRow.add( new UI.Text( 'Id' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectIdRow.add( objectId );
 
-	container.add( objectParentRow );
+	container.add( objectIdRow );
 
 	// name
 
@@ -28,6 +28,16 @@ Sidebar.Object3D = function ( signals ) {
 	objectNameRow.add( objectName );
 
 	container.add( objectNameRow );
+
+	// parent
+
+	var objectParentRow = new UI.Panel();
+	var objectParent = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+
+	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectParentRow.add( objectParent );
+
+	container.add( objectParentRow );
 
 	// position
 
@@ -455,6 +465,7 @@ Sidebar.Object3D = function ( signals ) {
 		updateUI();
 
 	} );
+
 	signals.objectChanged.add( function ( object ) {
 
 		if ( selected === object ) updateUI();
@@ -469,13 +480,14 @@ Sidebar.Object3D = function ( signals ) {
 
 		objectType.setValue( getObjectInstanceName( object ) );
 
+		objectId.setValue( object.id );
+		objectName.setValue( object.name );
+
 		if ( object.parent !== undefined ) {
 
 			objectParent.setValue( object.parent.id );
 
 		}
-
-		objectName.setValue( object.name );
 
 		objectPositionX.setValue( object.position.x );
 		objectPositionY.setValue( object.position.y );
