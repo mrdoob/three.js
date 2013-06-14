@@ -1,4 +1,4 @@
-var Toolbar = function ( editor, signals ) {
+var Toolbar = function ( signals ) {
 
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
@@ -12,21 +12,21 @@ var Toolbar = function ( editor, signals ) {
 
 	var translate = new UI.Button( 'translate' ).onClick( function () {
 
-		signals.setTransformMode.dispatch( 'translate' );
+		signals.transformModeChanged.dispatch( 'translate' );
 
 	} );
 	buttons.add( translate );
 
 	var rotate = new UI.Button( 'rotate' ).onClick( function () {
 
-		signals.setTransformMode.dispatch( 'rotate' );
+		signals.transformModeChanged.dispatch( 'rotate' );
 
 	} );
 	buttons.add( rotate );
 
 	var scale = new UI.Button( 'scale' ).onClick( function () {
 
-		signals.setTransformMode.dispatch( 'scale' );
+		signals.transformModeChanged.dispatch( 'scale' );
 
 	} );
 	buttons.add( scale );

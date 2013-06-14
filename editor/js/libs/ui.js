@@ -12,14 +12,6 @@ UI.Element.prototype = {
 
 	},
 
-	setId: function ( name ) {
-
-		this.dom.id = name;
-
-		return this;
-
-	},
-
 	setStyle: function ( style, array ) {
 
 		for ( var i = 0; i < array.length; i ++ ) {
@@ -43,7 +35,7 @@ UI.Element.prototype = {
 // properties
 
 var properties = [ 'position', 'left', 'top', 'right', 'bottom', 'width', 'height', 'border', 'borderLeft',
-'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'boxSizing', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
+'borderTop', 'borderRight', 'borderBottom', 'borderColor', 'display', 'overflow', 'margin', 'marginLeft', 'marginTop', 'marginRight', 'marginBottom', 'padding', 'paddingLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'color',
 'backgroundColor', 'opacity', 'fontSize', 'fontWeight', 'textTransform', 'cursor' ];
 
 properties.forEach( function ( property ) {
@@ -92,7 +84,6 @@ UI.Panel = function () {
 	this.dom = dom;
 
 	return this;
-
 };
 
 UI.Panel.prototype = Object.create( UI.Element.prototype );
@@ -109,6 +100,7 @@ UI.Panel.prototype.add = function () {
 
 };
 
+
 UI.Panel.prototype.remove = function () {
 
 	for ( var i = 0; i < arguments.length; i ++ ) {
@@ -116,73 +108,6 @@ UI.Panel.prototype.remove = function () {
 		this.dom.removeChild( arguments[ i ].dom );
 
 	}
-
-	return this;
-
-};
-
-// Tabbed Panel
-
-UI.TabbedPanel = function () {
-
-	UI.Panel.call( this );
-
-	var header = new UI.Panel();
-	header.setBorderBottom( '1px solid #ccc' );
-
-	this.dom.appendChild( header.dom );
-	
-	this.header = header.dom;
-
-	this.tabs = [];
-	this.contents = [];
-
-	return this;
-
-};
-
-UI.TabbedPanel.prototype = Object.create( UI.Panel.prototype );
-
-UI.TabbedPanel.prototype.add = function () {
-
-	for ( var i = 0; i < arguments.length; i ++ ) {
-
-		var tab = new UI.Text( arguments[ i ].name ).setColor( '#666' );
-		tab.setPadding( '5px 10px' );
-		tab.setBorder( '1px solid #ccc' );
-		tab.setMargin( '0 0 -1px 5px' );
-		this.header.appendChild( tab.dom );
-
-		var content = arguments[ i ];
-		this.dom.appendChild( content.dom );
-		content.setDisplay( 'none' );
-
-		this.tabs.push(tab);
-		this.contents.push(content);
-
-		var scope = this;
-
-		tab.onClick( function() {
-
-			for (var j in scope.contents ){
-				scope.contents[j].setDisplay( 'none' );
-				scope.tabs[j].setBorderBottom( '1px solid #ccc' );
-			}
-			content.setDisplay( ' block ');
-			tab.setBorderBottom( '1px solid #eee' );
-
-		} );
-
-	}
-
-	this.contents[0].setDisplay( 'block' );
-	this.tabs[0].setBorderBottom( '1px solid #eee' );
-
-	return this;
-
-};
-
-UI.TabbedPanel.prototype.remove = function () {
 
 	return this;
 
@@ -199,7 +124,6 @@ UI.Text = function ( text ) {
 	dom.style.cursor = 'default';
 	dom.style.display = 'inline-block';
 	dom.style.verticalAlign = 'top';
-	dom.style.overflow = 'hidden';
 
 	this.dom = dom;
 	this.setValue( text );
@@ -234,7 +158,6 @@ UI.Input = function () {
 	var dom = document.createElement( 'input' );
 	dom.className = 'Input';
 	dom.style.padding = '2px';
-	// dom.style.boxSizing = 'border-box';
 	dom.style.marginTop = '-2px';
 	dom.style.marginLeft = '-2px';
 	dom.style.border = '1px solid #ccc';
@@ -401,7 +324,7 @@ UI.FancySelect = function () {
 	this.dom = dom;
 
 	this.options = [];
-	this.selectedKeys = null;
+	this.selectedValue = null;
 
 	return this;
 
@@ -424,11 +347,19 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	scope.options = [];
 
-	var generateOptionCallback = function ( element, key ) {
+	var generateOptionCallback = function ( element, value ) {
 
 		return function ( event ) {
 
-			scope.selectedKeys = [key];
+			for ( var i = 0; i < scope.options.length; i ++ ) {
+
+				scope.options[ i ].style.backgroundColor = '#f0f0f0';
+
+			}
+
+			element.style.backgroundColor = '#f0f0f0';
+
+			scope.selectedValue = value;
 
 			scope.dom.dispatchEvent( changeEvent );
 
@@ -456,40 +387,34 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 UI.FancySelect.prototype.getValue = function () {
 
-	return this.selectedKeys;
+	return this.selectedValue;
 
 };
 
-UI.FancySelect.prototype.setValue = function ( keys ) {
+UI.FancySelect.prototype.setValue = function ( value ) {
 
-	// must convert raw keys into string for compatibility with UI.Select
-	// which uses string keys (initialized from options keys)
+	// must convert raw value into string for compatibility with UI.Select
+	// which uses string values (initialized from options keys)
 
-	keys = ( keys instanceof Array ) ? keys : [keys];
+	var key = value ? value.toString() : value;
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
-		this.options[ i ].style.backgroundColor = '';
+		var element = this.options[ i ];
 
-	}
+		if ( element.value === key ) {
 
-	for ( var i in keys ) {
+			element.style.backgroundColor = '#f0f0f0';
 
-		var key = keys[ i ] ? keys[ i ].toString() : keys[ i ];
+		} else {
 
-		for ( var j = 0; j < this.options.length; j ++ ) {
-
-			if ( this.options[ j ].value === key ) {
-
-				this.options[ j ].style.backgroundColor = '#f0f0f0';
-
-			}
+			element.style.backgroundColor = '';
 
 		}
 
 	}
 
-	this.selectedKeys = keys;
+	this.selectedValue = value;
 
 	return this;
 
@@ -677,14 +602,10 @@ UI.Number = function ( number ) {
 
 	var onChange = function ( event ) {
 
-
-
 		var number = parseFloat( dom.value );
 
 		if ( isNaN( number ) === false ) {
 
-		  dom.oldValue = dom.newValue;
-		  dom.newValue = number;
 			dom.value = number;
 
 		}

@@ -57,7 +57,7 @@ Sidebar.Renderer = function ( signals ) {
 			clearColor: clearColor.getHexValue(),
 			clearAlpha: 1
 		} );
-		signals.setRenderer.dispatch( renderer );
+		signals.rendererChanged.dispatch( renderer );
 
 	}
 

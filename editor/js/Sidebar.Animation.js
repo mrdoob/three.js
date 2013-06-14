@@ -23,41 +23,64 @@ Sidebar.Animation = function ( signals ) {
 	container.add( PlayRow );
 	container.add( new UI.Break() );
 
-	function play(){
+	function play() {
 
 		var value = Animations.getValue();
-		if (possibleAnimations[value]){
+
+		if ( possibleAnimations[ value ] ) {
+
 			var anims = possibleAnimations[value]
-			for ( var i = 0;i < anims.length;i++){
-				anims[i].play();
+
+			for ( var i = 0; i < anims.length; i ++ ) {
+
+				anims[ i ].play();
+
 			}
+
 			signals.playAnimations.dispatch( anims );
+
 		};
 
 	}
 
 	signals.objectAdded.add( function ( object ) {
 
-		if (object instanceof THREE.Mesh){
+		if ( object instanceof THREE.Mesh ) {
 
-			if (object.geometry && object.geometry.animation){
+			if ( object.geometry && object.geometry.animation ) {
 
 				var name = object.geometry.animation.name;
 				options[name] = name
-				Animations.setOptions(options);
 
-				THREE.AnimationHandler.add(object.geometry.animation);
-				var animation = new THREE.Animation(object, 
-     				name, 
-     				THREE.AnimationHandler.CATMULLROM)
+				Animations.setOptions( options );
 
-				if (possibleAnimations[name]){
-					possibleAnimations[name].push(animation);
+				THREE.AnimationHandler.add( object.geometry.animation );
+
+				var animation = new THREE.Animation( object, name, THREE.AnimationHandler.CATMULLROM );
+
+				if ( possibleAnimations[ name ] ){
+
+					possibleAnimations[ name ].push( animation );
+
 				} else {
-					possibleAnimations[name] = [animation];
+
+					possibleAnimations[ name ] = [ animation ];
+
 				}
 
 			}
+
+		}
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
+		if ( object.geometry && object.geometry.animation ) {
+
+		} else {
+
+			container.setDisplay( 'none' );
 
 		}
 

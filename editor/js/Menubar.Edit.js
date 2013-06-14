@@ -4,7 +4,7 @@ Menubar.Edit = function ( signals ) {
 	container.setClass( 'menu' );
 	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
 	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'none' ) } );
+	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
 	title.setTextContent( 'Edit' ).setColor( '#666' );
@@ -24,11 +24,7 @@ Menubar.Edit = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Clone' );
-	option.onClick( function () {
-
-		editor.clone();
-
-	} );
+	option.onClick( function () { signals.cloneSelectedObject.dispatch(); } );
 	options.add( option );
 
 	// delete
@@ -36,11 +32,7 @@ Menubar.Edit = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Delete' );
-	option.onClick( function () { 
-
-		editor.delete();
-
-	} );
+	option.onClick( function () { signals.removeSelectedObject.dispatch(); } );
 	options.add( option );
 
 	//

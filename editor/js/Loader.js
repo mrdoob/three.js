@@ -1,6 +1,7 @@
-var Loader = function ( editor, signals ) {
 
-	var scope = this;
+var Loader = function ( signals ) {
+
+	scope = this;
 
 	var sceneExporter = new THREE.ObjectExporter();
 
@@ -27,19 +28,17 @@ var Loader = function ( editor, signals ) {
 
 	var timeout;
 
-	signals.objectChanged.add( function () {
+	signals.sceneChanged.add( function ( scene ) {
 
 		clearTimeout( timeout );
 
 		timeout = setTimeout( function () {
 
-			console.log( "Saving to localStorage." );
-			scope.saveLocalStorage( editor.scene );
+			scope.saveLocalStorage( scene );
 
 		}, 3000 );
 
 	} );
-
 
 	this.loadLocalStorage = function () {
 
@@ -50,7 +49,7 @@ var Loader = function ( editor, signals ) {
 				var loader = new THREE.ObjectLoader();
 				var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
 
-				editor.setScene( scene );
+				signals.sceneAdded.dispatch( scene );
 
 			} catch ( e ) {
 
@@ -104,40 +103,20 @@ var Loader = function ( editor, signals ) {
 			var mesh = new THREE.Mesh( geometry, material );
 			mesh.name = filename;
 
-			editor.addObject( mesh );
+			signals.objectAdded.dispatch( mesh );
 
 		} else if ( data.metadata.type === 'object' ) {
 
-			var loader;
-
-			switch ( data.metadata.version ) {
-
-				case 4:
-					console.log( 'Loading Object format 4.0');
-					loader = new THREE.ObjectLoader4(); // DEPRECATED
-					break;
-
-				case 4.1:
-					console.log( 'Loading Object format 4.1');
-					loader = new THREE.ObjectLoader41(); // DEPRECATED
-					break;
-
-				default:
-					console.log( 'Loading Object format 4.2');
-					loader = new THREE.ObjectLoader();
-					break;
-
-			}
-
+			var loader = new THREE.ObjectLoader();
 			var result = loader.parse( data );
 
 			if ( result instanceof THREE.Scene ) {
 
-				editor.setScene( result );
+				signals.sceneAdded.dispatch( result );
 
 			} else {
 
-				editor.addObject( result );
+				signals.objectAdded.dispatch( result );
 
 			}
 
@@ -148,7 +127,13 @@ var Loader = function ( editor, signals ) {
 			var loader = new THREE.SceneLoader();
 			loader.parse( data, function ( result ) {
 
-				editor.addObject( result.scene );
+				var scene = result.scene;
+
+				while ( scene.children.length > 0 ) {
+
+					signals.objectAdded.dispatch( scene.children[ 0 ] );
+
+				}
 
 			}, '' );
 
@@ -181,7 +166,7 @@ var Loader = function ( editor, signals ) {
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.name = filename;
 
-						editor.addObject( mesh );
+						signals.objectAdded.dispatch( mesh );
 
 					} );
 
@@ -205,7 +190,7 @@ var Loader = function ( editor, signals ) {
 
 						collada.scene.name = filename;
 
-						editor.addObject( collada.scene );
+						signals.objectAdded.dispatch( collada.scene );
 
 					} );
 
@@ -279,7 +264,7 @@ var Loader = function ( editor, signals ) {
 					var object = new THREE.OBJLoader().parse( contents );
 					object.name = filename;
 
-					editor.addObject( object );
+					signals.objectAdded.dispatch( object );
 
 				}, false );
 				reader.readAsText( file );
@@ -304,7 +289,7 @@ var Loader = function ( editor, signals ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
+					signals.objectAdded.dispatch( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -327,7 +312,7 @@ var Loader = function ( editor, signals ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
+					signals.objectAdded.dispatch( mesh );
 
 				}, false );
 
@@ -356,7 +341,7 @@ var Loader = function ( editor, signals ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
 
-					editor.addObject( mesh );
+					signals.objectAdded.dispatch( mesh );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -380,7 +365,7 @@ var Loader = function ( editor, signals ) {
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
-					editor.addObject( mesh );
+					signals.objectAdded.dispatch( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -396,7 +381,7 @@ var Loader = function ( editor, signals ) {
 
 					var result = new THREE.VRMLLoader().parse( contents );
 
-					editor.addObject( result );
+					signals.sceneAdded.dispatch( result );
 
 				}, false );
 				reader.readAsText( file );
