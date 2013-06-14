@@ -263,7 +263,7 @@ Sidebar.Object3D = function ( signals ) {
 
 			if ( selected.parent !== undefined ) {
 
-				var newParentId = parseInt( objectParent.getValue() );
+				var newParentId = objectParent.getValue();
 
 				if ( selected.parent.id !== newParentId && selected.id !== newParentId ) {
 
