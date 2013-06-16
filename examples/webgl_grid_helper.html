@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - grid helper</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			html, body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+			}
+
+			#container {
+				text-align: center;
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="container">
+		</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - grid helper</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			init();
+			animate();
+
+			var controls, camera, scene, renderer;
+			var gh;
+
+			function init() {
+
+				container = document.getElementById( "container" );
+
+				camera = new THREE.PerspectiveCamera( 60, 640 / 480.0, 1, 10000 );
+				camera.position.set( 150, 150, 150 );
+
+				scene = new THREE.Scene();
+
+				gh = new THREE.GridHelper( 100, 10 );
+				scene.add( gh );
+
+				controls = new THREE.TrackballControls( camera );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( 640, 480 );
+
+				container.appendChild( renderer.domElement );
+
+			}
+
+			function time() {
+
+				return Date.now() * 0.001;
+			}
+
+			function randomColor() {
+
+				return Math.floor(Math.random() * 0xFFFFFF) + 1;
+			}
+
+			var lastChangeTime = time()
+			function animate() {
+
+				var t = time();
+				if (t - lastChangeTime > 5.0) {
+					gh.setColors( randomColor(), randomColor() );
+					lastChangeTime = t;
+				}
+
+				render();
+				requestAnimationFrame( animate );
+			}
+
+			function render() {
+
+				controls.update();
+				renderer.render( scene, camera );
+			}
+		</script>
+
+	</body>
+</html>
