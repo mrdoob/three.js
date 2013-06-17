@@ -1,8 +1,9 @@
 /**
  * @author Eberhard Graether / http://egraether.com/
+ * @author Patrick Fuller / http://patrick-fuller.com
  */
 
-THREE.TrackballControls = function ( object, domElement ) {
+THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	var _this = this;
 	var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM: 4, TOUCH_PAN: 5 };
@@ -14,7 +15,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.enabled = true;
 
-	this.screen = { left: 0, top: 0, width: 0, height: 0 };
+	this.screen = { width: 0, height: 0, offsetLeft: 0, offsetTop: 0 };
+	this.radius = ( this.screen.width + this.screen.height ) / 4;
 
 	this.rotateSpeed = 1.0;
 	this.zoomSpeed = 1.2;
@@ -23,7 +25,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
-	this.noRoll = false;
 
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
@@ -49,6 +50,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	_zoomStart = new THREE.Vector2(),
 	_zoomEnd = new THREE.Vector2(),
+	_zoomFactor = 1,
 
 	_touchZoomDistanceStart = 0,
 	_touchZoomDistanceEnd = 0,
@@ -62,6 +64,12 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.position0 = this.object.position.clone();
 	this.up0 = this.object.up.clone();
 
+	this.left0 = this.object.left;
+	this.right0 = this.object.right;
+	this.top0 = this.object.top;
+	this.bottom0 = this.object.bottom;
+	this.center0 = new THREE.Vector2((this.left0 + this.right0) / 2.0, (this.top0 + this.bottom0) / 2.0);
+
 	// events
 
 	var changeEvent = { type: 'change' };
@@ -71,18 +79,13 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		if ( this.domElement === document ) {
+		this.screen.width = window.innerWidth;
+		this.screen.height = window.innerHeight;
 
-			this.screen.left = 0;
-			this.screen.top = 0;
-			this.screen.width = window.innerWidth;
-			this.screen.height = window.innerHeight;
+		this.screen.offsetLeft = 0;
+		this.screen.offsetTop = 0;
 
-		} else {
-
-			this.screen = this.domElement.getBoundingClientRect();
-
-		}
+		this.radius = ( this.screen.width + this.screen.height ) / 4;
 
 	};
 
@@ -99,8 +102,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.getMouseOnScreen = function ( clientX, clientY ) {
 
 		return new THREE.Vector2(
-			( clientX - _this.screen.left ) / _this.screen.width,
-			( clientY - _this.screen.top ) / _this.screen.height
+			( clientX - _this.screen.offsetLeft ) / _this.radius * 0.5,
+			( clientY - _this.screen.offsetTop ) / _this.radius * 0.5
 		);
 
 	};
@@ -108,26 +111,14 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.getMouseProjectionOnBall = function ( clientX, clientY ) {
 
 		var mouseOnBall = new THREE.Vector3(
-			( clientX - _this.screen.width * 0.5 - _this.screen.left ) / (_this.screen.width*.5),
-			( _this.screen.height * 0.5 + _this.screen.top - clientY ) / (_this.screen.height*.5),
+			( clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft ) / _this.radius,
+			( _this.screen.height * 0.5 + _this.screen.offsetTop - clientY ) / _this.radius,
 			0.0
 		);
 
 		var length = mouseOnBall.length();
 
-		if ( _this.noRoll ) {
-
-			if ( length < Math.SQRT1_2 ) {
-
-				mouseOnBall.z = Math.sqrt( 1.0 - length*length );
-
-			} else {
-
-				mouseOnBall.z = .5 / length;
-				
-			}
-
-		} else if ( length > 1.0 ) {
+		if ( length > 1.0 ) {
 
 			mouseOnBall.normalize();
 
@@ -186,15 +177,24 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			var factor = _touchZoomDistanceStart / _touchZoomDistanceEnd;
 			_touchZoomDistanceStart = _touchZoomDistanceEnd;
-			_eye.multiplyScalar( factor );
+			_zoomFactor *= factor;
+
+			_this.object.left = _zoomFactor * _this.left0 + ( 1 - _zoomFactor ) *  _this.center0.x;
+			_this.object.right = _zoomFactor * _this.right0 + ( 1 - _zoomFactor ) *  _this.center0.x;
+			_this.object.top = _zoomFactor * _this.top0 + ( 1 - _zoomFactor ) *  _this.center0.y;
+			_this.object.bottom = _zoomFactor * _this.bottom0 + ( 1 - _zoomFactor ) *  _this.center0.y;
 
 		} else {
 
 			var factor = 1.0 + ( _zoomEnd.y - _zoomStart.y ) * _this.zoomSpeed;
 
 			if ( factor !== 1.0 && factor > 0.0 ) {
+				_zoomFactor *= factor;
 
-				_eye.multiplyScalar( factor );
+				_this.object.left = _zoomFactor * _this.left0 + ( 1 - _zoomFactor ) *  _this.center0.x;
+				_this.object.right = _zoomFactor * _this.right0 + ( 1 - _zoomFactor ) *  _this.center0.x;
+				_this.object.top = _zoomFactor * _this.top0 + ( 1 - _zoomFactor ) *  _this.center0.y;
+				_this.object.bottom = _zoomFactor * _this.bottom0 + ( 1 - _zoomFactor ) *  _this.center0.y;
 
 				if ( _this.staticMoving ) {
 
@@ -273,6 +273,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 		if ( !_this.noZoom ) {
 
 			_this.zoomCamera();
+			_this.object.updateProjectionMatrix();
 
 		}
 
@@ -308,6 +309,11 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_this.object.up.copy( _this.up0 );
 
 		_eye.subVectors( _this.object.position, _this.target );
+
+		_this.object.left = _this.left0;
+		_this.object.right = _this.right0;
+		_this.object.top = _this.top0;
+		_this.object.bottom = _this.bottom0;
 
 		_this.object.lookAt( _this.target );
 
@@ -551,4 +557,4 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 };
 
-THREE.TrackballControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.OrthographicTrackballControls.prototype = Object.create( THREE.EventDispatcher.prototype );
