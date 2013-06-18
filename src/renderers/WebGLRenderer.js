@@ -5230,30 +5230,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 		}
 
 		// uv repeat and offset setting priorities
-		//	1. color map
-		//	2. specular map
-		//	3. normal map
-		//	4. bump map
+		//  1. material override
+		//	2. color map
+		//	3. specular map
+		//	4. normal map
+		//	5. bump map
 
-		var uvScaleMap;
-
-		if ( material.map ) {
-
-			uvScaleMap = material.map;
-
-		} else if ( material.specularMap ) {
-
-			uvScaleMap = material.specularMap;
-
-		} else if ( material.normalMap ) {
-
-			uvScaleMap = material.normalMap;
-
-		} else if ( material.bumpMap ) {
-
-			uvScaleMap = material.bumpMap;
-
-		}
+		var uvScaleMap =
+				material.uvScaleMap ||
+				material.map ||
+				material.specularMap ||
+				material.normalMap ||
+				material.bumpMap;
 
 		if ( uvScaleMap !== undefined ) {
 
