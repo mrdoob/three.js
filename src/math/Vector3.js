@@ -299,10 +299,12 @@ THREE.Vector3.prototype = {
 	divideScalar: function ( s ) {
 
 		if ( s !== 0 ) {
+			
+			s = 1.0 / s;
 
-			this.x /= s;
-			this.y /= s;
-			this.z /= s;
+			this.x *= s;
+			this.y *= s;
+			this.z *= s;
 
 		} else {
 
