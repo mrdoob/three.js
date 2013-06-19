@@ -29,9 +29,6 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
 
-	this.minDistance = 0;
-	this.maxDistance = Infinity;
-
 	this.keys = [ 65 /*A*/, 83 /*S*/, 68 /*D*/ ];
 
 	// internals
@@ -240,26 +237,6 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 
 	};
 
-	this.checkDistances = function () {
-
-		if ( !_this.noZoom || !_this.noPan ) {
-
-			if ( _this.object.position.lengthSq() > _this.maxDistance * _this.maxDistance ) {
-
-				_this.object.position.setLength( _this.maxDistance );
-
-			}
-
-			if ( _eye.lengthSq() < _this.minDistance * _this.minDistance ) {
-
-				_this.object.position.addVectors( _this.target, _eye.setLength( _this.minDistance ) );
-
-			}
-
-		}
-
-	};
-
 	this.update = function () {
 
 		_eye.subVectors( _this.object.position, _this.target );
@@ -284,8 +261,6 @@ THREE.OrthographicTrackballControls = function ( object, domElement ) {
 		}
 
 		_this.object.position.addVectors( _this.target, _eye );
-
-		_this.checkDistances();
 
 		_this.object.lookAt( _this.target );
 
