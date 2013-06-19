@@ -92,8 +92,8 @@ THREE.Path.prototype.quadraticCurveTo = function( aCPx, aCPy, aX, aY ) {
 };
 
 THREE.Path.prototype.bezierCurveTo = function( aCP1x, aCP1y,
-                                               aCP2x, aCP2y,
-                                               aX, aY ) {
+											   aCP2x, aCP2y,
+											   aX, aY ) {
 
 	var args = Array.prototype.slice.call( arguments );
 
@@ -141,14 +141,14 @@ THREE.Path.prototype.arc = function ( aX, aY, aRadius,
 
 	this.absarc(aX + x0, aY + y0, aRadius,
 		aStartAngle, aEndAngle, aClockwise );
-	
+
  };
 
  THREE.Path.prototype.absarc = function ( aX, aY, aRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 	this.absellipse(aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise);
  };
- 
+
 THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
 
@@ -160,7 +160,7 @@ THREE.Path.prototype.ellipse = function ( aX, aY, xRadius, yRadius,
 		aStartAngle, aEndAngle, aClockwise );
 
  };
- 
+
 
 THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 									  aStartAngle, aEndAngle, aClockwise ) {
@@ -274,7 +274,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 				points.push( new THREE.Vector2( tx, ty ) );
 
-		  	}
+			}
 
 			break;
 
@@ -424,7 +424,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 	var lastPoint = points[ points.length - 1];
 	var EPSILON = 0.0000000001;
 	if ( Math.abs(lastPoint.x - points[ 0 ].x) < EPSILON &&
-             Math.abs(lastPoint.y - points[ 0 ].y) < EPSILON)
+			 Math.abs(lastPoint.y - points[ 0 ].y) < EPSILON)
 		points.splice( points.length - 1, 1);
 	if ( closedPath ) {
 
@@ -466,95 +466,97 @@ THREE.Path.prototype.toShapes = function( isCCW ) {
 
 	}
 
-    if ( lastPath.actions.length != 0 ) {
+	if ( lastPath.actions.length != 0 ) {
 
-        subPaths.push( lastPath );
+		subPaths.push( lastPath );
 
-    }
+	}
 
-    // console.log(subPaths);
+	// console.log(subPaths);
 
-    if ( subPaths.length == 0 ) return [];
+	if ( subPaths.length == 0 ) return [];
 
-    var solid, tmpPath, tmpShape, shapes = [];
+	var solid, tmpPath, tmpShape, shapes = [];
 
-    if ( subPaths.length == 1) {
-        tmpPath = subPaths[0];
-        tmpShape = new THREE.Shape();
-        tmpShape.actions = tmpPath.actions;
-        tmpShape.curves = tmpPath.curves;
-        shapes.push( tmpShape );
-        return shapes;
-    };
+	if ( subPaths.length == 1) {
 
-    var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
-    holesFirst = isCCW ? !holesFirst : holesFirst;
+		tmpPath = subPaths[0];
+		tmpShape = new THREE.Shape();
+		tmpShape.actions = tmpPath.actions;
+		tmpShape.curves = tmpPath.curves;
+		shapes.push( tmpShape );
+		return shapes;
 
-    // console.log("Holes first", holesFirst);
+	}
 
-    if ( holesFirst ) {
+	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+	holesFirst = isCCW ? !holesFirst : holesFirst;
 
-        tmpShape = new THREE.Shape();
+	// console.log("Holes first", holesFirst);
 
-        for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+	if ( holesFirst ) {
 
-            tmpPath = subPaths[ i ];
-            solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
-            solid = isCCW ? !solid : solid;
+		tmpShape = new THREE.Shape();
 
-            if ( solid ) {
+		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
 
-                tmpShape.actions = tmpPath.actions;
-                tmpShape.curves = tmpPath.curves;
+			tmpPath = subPaths[ i ];
+			solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
+			solid = isCCW ? !solid : solid;
 
-                shapes.push( tmpShape );
-                tmpShape = new THREE.Shape();
+			if ( solid ) {
 
-                //console.log('cw', i);
+				tmpShape.actions = tmpPath.actions;
+				tmpShape.curves = tmpPath.curves;
 
-            } else {
+				shapes.push( tmpShape );
+				tmpShape = new THREE.Shape();
 
-                tmpShape.holes.push( tmpPath );
+				//console.log('cw', i);
 
-                //console.log('ccw', i);
+			} else {
 
-            }
+				tmpShape.holes.push( tmpPath );
 
-        }
+				//console.log('ccw', i);
 
-    } else {
+			}
 
-        // Shapes first
-        tmpShape = undefined;
+		}
 
-        for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+	} else {
 
-            tmpPath = subPaths[ i ];
-            solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
-            solid = isCCW ? !solid : solid;
+		// Shapes first
+		tmpShape = undefined;
 
-            if ( solid ) {
+		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
 
-                if ( tmpShape ) shapes.push( tmpShape );
+			tmpPath = subPaths[ i ];
+			solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
+			solid = isCCW ? !solid : solid;
 
-                tmpShape = new THREE.Shape();
-                tmpShape.actions = tmpPath.actions;
-                tmpShape.curves = tmpPath.curves;
+			if ( solid ) {
 
-            } else {
+				if ( tmpShape ) shapes.push( tmpShape );
 
-                tmpShape.holes.push( tmpPath );
+				tmpShape = new THREE.Shape();
+				tmpShape.actions = tmpPath.actions;
+				tmpShape.curves = tmpPath.curves;
 
-            }
+			} else {
 
-        }
+				tmpShape.holes.push( tmpPath );
 
-        shapes.push( tmpShape );
+			}
 
-    }
+		}
 
-    //console.log("shape", shapes);
+		shapes.push( tmpShape );
 
-    return shapes;
+	}
+
+	//console.log("shape", shapes);
+
+	return shapes;
 
 };
