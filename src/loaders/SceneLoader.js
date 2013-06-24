@@ -360,52 +360,60 @@ THREE.SceneLoader.prototype.parse = function ( json, callbackFinished, url ) {
 
 				// lights
 
-				} else if ( objJSON.type === "DirectionalLight" || objJSON.type === "PointLight" || objJSON.type === "AmbientLight" ) {
+	        } else if (objJSON.type === "POINT" || objJSON.type === "SUN" || objJSON.type === "SPOT" || objJSON.type === "HEMI" || objJSON.type === "AREA") {
+	          function rotate(x, y, z, vector3) {
+	            var target = new THREE.Matrix4(
+	              vector3[0], 0, 0, 0
+	              , vector3[1], 0, 0, 0
+	              , vector3[2], 0, 0, 0
+	              , 0         , 0, 0, 0
+	            );
+	            var rotateX = new THREE.Matrix4(),
+	                rotateY = new THREE.Matrix4(),
+	                rotateZ = new THREE.Matrix4();
+	            rotateX.makeRotationX(x);
+	            rotateY.makeRotationY(y);
+	            rotateZ.makeRotationZ(z);
+	            var rotateM = new THREE.Matrix4();
+	            rotateM.multiplyMatrices(rotateX, rotateY, rotateZ);
+	            target.multiplyMatrices(rotateM, target);
+	            return target;
+	          }
 
-					hex = ( objJSON.color !== undefined ) ? objJSON.color : 0xffffff;
-					intensity = ( objJSON.intensity !== undefined ) ? objJSON.intensity : 1;
+	          var energy = objJSON.energy;
+	          var color = objJSON.color;
+	          var distance = objJSON.distance;
+	          var location = objJSON.location;
+	          var rotation = objJSON.rotation;
 
-					if ( objJSON.type === "DirectionalLight" ) {
+	          if (objJSON.type === "POINT") {
+	            light = new THREE.PointLight(color, energy, distance);
+	          } else if (objJSON.type === "SUN") {
+	            light = new THREE.AmbientLight(color*energy);
+	            light.position.set(location[0], location[1], location[2]);
+	          } else if (objJSON.type === "SPOT") {
+	            light = new THREE.SpotLight(color, energy, distance, 1);
+	            var target = rotate(rotation[0], rotation[1], rotation[2],
+	                                [location[0], location[1] - distance, location[2]]);
+	            light.target.position = new THREE.Vector3(target.elements[0], target.elements[1], target.elements[2]);
+	          } else if (objJSON.type === "HEMI") {
+	            light = new THREE.DirectionalLight(color, energy, distance);
+	            var target = rotate(rotation[0], rotation[1], rotation[2],
+	                                [location[0], location[1] - distance, location[2]]);
+	            light.target.position = new THREE.Vector3(target.elements[0], target.elements[1], target.elements[2]);
+	          } else if (objJSON.type === "AREA") {
+	            light = new THREE.AreaLight(color, energy);
+	            light.position.set(location[0], location[1], location[2]);
+	            light.width = objJSON.size;
+	            light.height = objJSON.size_y;
+	          }
+	          parent.add( light );
+	          light.name = objID;
+	          result.lights[ objID ] = light;
+	          result.objects[ objID ] = light;
 
-						pos = objJSON.direction;
-
-						light = new THREE.DirectionalLight( hex, intensity );
-						light.position.set( pos[0], pos[1], pos[2] );
-
-						if ( objJSON.target ) {
-
-							target_array.push( { "object": light, "targetName" : objJSON.target } );
-
-							// kill existing default target
-							// otherwise it gets added to scene when parent gets added
-
-							light.target = null;
-
-						}
-
-					} else if ( objJSON.type === "PointLight" ) {
-
-						pos = objJSON.position;
-						dst = objJSON.distance;
-
-						light = new THREE.PointLight( hex, intensity, dst );
-						light.position.set( pos[0], pos[1], pos[2] );
-
-					} else if ( objJSON.type === "AmbientLight" ) {
-
-						light = new THREE.AmbientLight( hex );
-
-					}
-
-					parent.add( light );
-
-					light.name = objID;
-					result.lights[ objID ] = light;
-					result.objects[ objID ] = light;
-
-				// cameras
-
-				} else if ( objJSON.type === "PerspectiveCamera" || objJSON.type === "OrthographicCamera" ) {
+			  // cameras
+	        } else if ( objJSON.type === "PerspectiveCamera" || objJSON.type === "OrthographicCamera" ) {
 
 					pos = objJSON.position;
 					rot = objJSON.rotation;
