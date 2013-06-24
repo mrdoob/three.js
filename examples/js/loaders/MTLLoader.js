@@ -4,10 +4,11 @@
  * @author angelxuanchang
  */
 
-THREE.MTLLoader = function( baseUrl, options ) {
+THREE.MTLLoader = function( baseUrl, options, crossOrigin ) {
 
 	this.baseUrl = baseUrl;
 	this.options = options;
+	this.crossOrigin = crossOrigin;
 
 };
 
@@ -353,7 +354,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					params[ 'map' ] = THREE.MTLLoader.loadTexture( this.baseUrl + value );
+					params[ 'map' ] = this.loadTexture( this.baseUrl + value );
 					params[ 'map' ].wrapS = this.wrap;
 					params[ 'map' ].wrapT = this.wrap;
 
@@ -404,7 +405,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 };
 
-THREE.MTLLoader.loadTexture = function ( url, mapping, onLoad, onError ) {
+THREE.MTLLoader.prototype.loadTexture = function ( url, mapping, onLoad, onError ) {
 
 	var isCompressed = /\.dds$/i.test( url );
 
