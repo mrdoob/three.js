@@ -62,6 +62,7 @@ This code creates a scene, then creates a camera, adds the camera and cube to th
 
 </script>
 ```
+If everything went well you should see [this](http://jsfiddle.net/ksRyQ/).
 
 ### Change log ###
 
