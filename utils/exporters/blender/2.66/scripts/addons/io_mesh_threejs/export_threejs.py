@@ -1243,7 +1243,7 @@ def generate_materials_string(mesh, scene, option_colors, draw_type, option_copy
 
 def handle_texture(id, textures, material, filepath, option_copy_textures):
 
-    if textures[id]:
+    if textures[id] and textures[id]['texture'].users > 0 and len(textures[id]['texture'].users_material) > 0:
         texName     = 'map%s'       % id.capitalize()
         repeatName  = 'map%sRepeat' % id.capitalize()
         wrapName    = 'map%sWrap'   % id.capitalize()
@@ -1811,7 +1811,7 @@ def generate_textures_scene(data):
 
     for texture in bpy.data.textures:
 
-        if texture.type == 'IMAGE' and texture.image:
+        if texture.type == 'IMAGE' and texture.image and texture.users > 0 and len(texture.users_material) > 0:
 
             img = texture.image
 
