@@ -438,7 +438,7 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 // Breaks path into shapes
 
-THREE.Path.prototype.toShapes = function() {
+THREE.Path.prototype.toShapes = function( isCCW ) {
 
 	var i, il, item, action, args;
 
@@ -477,8 +477,10 @@ THREE.Path.prototype.toShapes = function() {
 	if ( subPaths.length == 0 ) return [];
 
 	var tmpPath, tmpShape, shapes = [];
+    var solid;
 
 	var holesFirst = !THREE.Shape.Utils.isClockWise( subPaths[ 0 ].getPoints() );
+    holesFirst = isCCW ? !holesFirst : holesFirst;
 	// console.log("Holes first", holesFirst);
 
 	if ( subPaths.length == 1) {
@@ -497,9 +499,10 @@ THREE.Path.prototype.toShapes = function() {
 		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
 
 			tmpPath = subPaths[ i ];
+            solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
+            solid = isCCW ? !solid : solid;
 
-			if ( THREE.Shape.Utils.isClockWise( tmpPath.getPoints() ) ) {
-
+            if ( solid ) {
 				tmpShape.actions = tmpPath.actions;
 				tmpShape.curves = tmpPath.curves;
 
@@ -521,13 +524,15 @@ THREE.Path.prototype.toShapes = function() {
 	} else {
 
 		// Shapes first
+        tmpShape = undefined;
 
 		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
 
 			tmpPath = subPaths[ i ];
+            solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
+            solid = isCCW ? !solid : solid;
 
-			if ( THREE.Shape.Utils.isClockWise( tmpPath.getPoints() ) ) {
-
+			if ( solid ) {
 
 				if ( tmpShape ) shapes.push( tmpShape );
 
