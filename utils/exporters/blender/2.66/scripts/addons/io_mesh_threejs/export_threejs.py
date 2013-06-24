@@ -196,20 +196,59 @@ TEMPLATE_CAMERA_ORTHO = """\
 		"target"  : %(target)s
 	}"""
 
-TEMPLATE_LIGHT_DIRECTIONAL = """\
-	%(light_id)s : {
-		"type"       : "DirectionalLight",
-		"direction"  : %(direction)s,
-		"color"      : %(color)d,
-		"intensity"  : %(intensity).2f
-	}"""
-
 TEMPLATE_LIGHT_POINT = """\
 	%(light_id)s : {
-		"type"       : "PointLight",
-		"position"   : %(position)s,
+		"type"       : "POINT",
+		"location"   : %(location)s,
+                "rotation"   : %(rotation)s,
 		"color"      : %(color)d,
-		"intensity"  : %(intensity).3f
+                "distance"   : %(distance).3f,
+		"energy"     : %(energy).3f
+	}"""
+
+TEMPLATE_LIGHT_SUN = """\
+	%(light_id)s : {
+		"type"       : "SUN",
+		"location"   : %(location)s,
+                "rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+                "distance"   : %(distance).3f,
+		"energy"     : %(energy).3f
+	}"""
+
+TEMPLATE_LIGHT_SPOT = """\
+	%(light_id)s : {
+		"type"       : "SPOT",
+		"location"   : %(location)s,
+                "rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+                "distance"   : %(distance).3f,
+		"energy"     : %(energy).3f,
+                "use_shadow" : %(use_shadow)d
+	}"""
+
+TEMPLATE_LIGHT_HEMI = """\
+	%(light_id)s : {
+		"type"       : "HEMI",
+		"location "  : %(location)s,
+                "rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+                "distance"   : %(distance).3f,
+		"energy"     : %(energy).3f
+	}"""
+
+TEMPLATE_LIGHT_AREA = """\
+	%(light_id)s : {
+		"type"       : "AREA",
+		"location"   : %(location)s,
+                "rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+                "distance"   : %(distance).3f,
+		"energy"     : %(energy).3f,
+                "gamma"      : %(gamma).3f,
+                "shape"      : %(shape)s,
+                "size"       : %(size).3f,
+                "size_y"     : %(size_y).3f
 	}"""
 
 TEMPLATE_VEC4 = '[ %g, %g, %g, %g ]'
@@ -1573,7 +1612,9 @@ def generate_quat(quat):
 def generate_vec4(vec):
     return TEMPLATE_VEC4 % (vec[0], vec[1], vec[2], vec[3])
 
-def generate_vec3(vec):
+def generate_vec3(vec, flipyz = False):
+    if flipyz:
+        return TEMPLATE_VEC3 % (vec[0], vec[2], vec[1])
     return TEMPLATE_VEC3 % (vec[0], vec[1], vec[2])
 
 def generate_vec2(vec):
@@ -1958,6 +1999,7 @@ def generate_material_string(material):
     material_type = type_map.get(shading, "MeshBasicMaterial")
 
     parameters = '"color": %d' % rgb2int(material["colorDiffuse"])
+    parameters += ', "ambient": %d' % rgb2int(material["colorDiffuse"])
     parameters += ', "opacity": %.2g' % material["transparency"]
 
     if shading == "Phong":
@@ -2107,30 +2149,69 @@ def generate_lights(data):
     chunks = []
 
     if data["use_lights"]:
+        lamps = data["objects"]
+        lamps = [ob for ob in lamps if (ob.type == 'LAMP')]
 
-        lights = data.get("lights", [])
-        if not lights:
-            lights.append(DEFAULTS["light"])
+        for lamp in lamps:
+            light_string = ""
+            concrete_lamp = lamp.data
 
-        for light in lights:
-
-            if light["type"] == "DirectionalLight":
-                light_string = TEMPLATE_LIGHT_DIRECTIONAL % {
-                "light_id"      : generate_string(light["name"]),
-                "direction"     : generate_vec3(light["direction"]),
-                "color"         : rgb2int(light["color"]),
-                "intensity"     : light["intensity"]
-                }
-
-            elif light["type"] == "PointLight":
+            if concrete_lamp.type == "POINT":
                 light_string = TEMPLATE_LIGHT_POINT % {
-                "light_id"      : generate_string(light["name"]),
-                "position"      : generate_vec3(light["position"]),
-                "color"         : rgb2int(light["color"]),
-                "intensity"     : light["intensity"]
+                    "light_id"      : generate_string(concrete_lamp.name),
+                    "location"      : generate_vec3(lamp.location, data["flipyz"]),
+                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    "color"         : rgb2int(concrete_lamp.color),
+                    "distance"      : concrete_lamp.distance,
+                    "energy"        : concrete_lamp.energy
+                }
+            elif concrete_lamp.type == "SUN":
+                light_string = TEMPLATE_LIGHT_SUN % {
+                    "light_id"      : generate_string(concrete_lamp.name),
+                    "location"      : generate_vec3(lamp.location, data["flipyz"]),
+                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    "color"         : rgb2int(concrete_lamp.color),
+                    "distance"      : concrete_lamp.distance,
+                    "energy"        : concrete_lamp.energy
+                }
+            elif concrete_lamp.type == "SPOT":
+                light_string = TEMPLATE_LIGHT_SPOT % {
+                    "light_id"      : generate_string(concrete_lamp.name),
+                    "location"      : generate_vec3(lamp.location, data["flipyz"]),
+                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    "color"         : rgb2int(concrete_lamp.color),
+                    "distance"      : concrete_lamp.distance,
+                    "energy"        : concrete_lamp.energy,
+                    "use_shadow"    : concrete_lamp.use_shadow
+                }
+            elif concrete_lamp.type == "HEMI":
+                light_string = TEMPLATE_LIGHT_HEMI % {
+                    "light_id"      : generate_string(concrete_lamp.name),
+                    "location"      : generate_vec3(lamp.location, data["flipyz"]),
+                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    "color"         : rgb2int(concrete_lamp.color),
+                    "distance"      : concrete_lamp.distance,
+                    "energy"        : concrete_lamp.energy
+                }
+            elif concrete_lamp.type == "AREA":
+                light_string = TEMPLATE_LIGHT_AREA % {
+                    "light_id"      : generate_string(concrete_lamp.name),
+                    "location"      : generate_vec3(lamp.location, data["flipyz"]),
+                    "rotation"      : generate_vec3(lamp.rotation_euler, data["flipyz"]),
+                    "color"         : rgb2int(concrete_lamp.color),
+                    "distance"      : concrete_lamp.distance,
+                    "energy"        : concrete_lamp.energy,
+                    "gamma"         : concrete_lamp.gamma,
+                    "shape"         : concrete_lamp.shape,
+                    "size"          : concrete_lamp.size,
+                    "size_y"        : concrete_lamp.size_y
                 }
 
             chunks.append(light_string)
+
+        if not lamps:
+            lamps.append(DEFAULTS["light"])
+
 
     return ",\n\n".join(chunks), len(chunks)
 
