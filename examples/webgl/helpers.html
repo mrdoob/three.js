@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - helpers</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				margin: 0px;
+				background-color: #000000;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../../build/three.js"></script>
+		<script src="../shared/s3age/s3age.js"></script>
+
+		<script>
+			var stage = new S3age();
+			var mesh, faceNormalsHelper, vertexNormalsHelper;
+
+			init();
+
+			function init() {
+				stage.camera.position.z = 400;
+
+				scene = stage.scene;
+
+				var light = new THREE.PointLight();
+				light.position.set( 200, 100, 150 );
+				scene.add( light );
+				scene.add( new THREE.PointLightHelper( light, 5 ) );
+
+
+				var loader = new THREE.JSONLoader();
+				loader.load( '../shared/obj/leeperrysmith/LeePerrySmith.js', function ( geometry, materials ) {
+
+					var material = new THREE.MeshLambertMaterial();
+
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.scale.multiplyScalar( 50 );
+					mesh.update = function(){
+						mesh.rotation.y += 0.01;
+					}
+					scene.add( mesh );
+
+					var faceNormalsHelper = new THREE.FaceNormalsHelper( mesh, 10 );
+					scene.add( faceNormalsHelper );
+
+					var vertexNormalsHelper = new THREE.VertexNormalsHelper( mesh, 10 );
+					scene.add( vertexNormalsHelper );
+
+					var helper = new THREE.WireframeHelper( mesh );
+					helper.material.depthTest = false;
+					helper.material.opacity = 0.25;
+					helper.material.transparent = true;
+					scene.add( helper );
+
+					scene.add( new THREE.BoxHelper( mesh ) );
+
+				} );
+			}
+
+		</script>
+
+	</body>
+</html>

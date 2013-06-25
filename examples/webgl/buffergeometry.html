@@ -34,50 +34,18 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry</div>
 
-		<script src="../build/three.min.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="../../build/three.min.js"></script>
+		<script src="../shared/s3age/s3age.js"></script>
+		<script src="../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			var stage = new S3age('#container');
 
-			var container, stats;
+			init(stage);
+			geometry(stage);
 
-			var camera, scene, renderer;
-
-			var mesh;
-
-			init();
-			animate();
-
-			function init() {
-
-				container = document.getElementById( 'container' );
-
-				//
-
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
-				camera.position.z = 2750;
-
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
-
-				//
-
-				scene.add( new THREE.AmbientLight( 0x444444 ) );
-
-				var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
-				light1.position.set( 1, 1, 1 );
-				scene.add( light1 );
-
-				var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
-				light2.position.set( 0, -1, 0 );
-				scene.add( light2 );
-
-				//
-
+			function geometry(stage){
 				var triangles = 160000;
 
 				var geometry = new THREE.BufferGeometry();
@@ -232,70 +200,68 @@
 				geometry.computeBoundingSphere();
 
 				var material = new THREE.MeshPhongMaterial( {
-						color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-						side: THREE.DoubleSide, vertexColors: THREE.VertexColors
-				} );
+					color: 0xaaaaaa, ambient: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+				});
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				var mesh = new THREE.Mesh( geometry, material );
 
-				//
+				mesh.update = function(clock){
+					var time = clock.elapsedTime * 0.001;
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x333333, clearAlpha: 1, alpha: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( scene.fog.color, 1 );
+					mesh.rotation.x = time * 0.25;
+					mesh.rotation.y = time * 0.5;
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
-
-				container.appendChild( renderer.domElement );
-
-				//
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
+				};
+				stage.scene.add( mesh );
 			}
 
-			function onWindowResize() {
+			function init(stage) {
+				setStats(stage);
+				aimCamera(stage);
+				blowFog(stage);
+				lights(stage);
+				configureRenderer(stage);
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				function configureRenderer(stage){
+					renderer = stage.renderer;
+					//new THREE.WebGLRenderer( { antialias: false, clearColor: 0x333333, clearAlpha: 1, alpha: false } );
+					renderer.setClearColor( stage.scene.fog.color, 1 );
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+					renderer.gammaInput = true;
+					renderer.gammaOutput = true;
+					renderer.physicallyBasedShading = true;
+				}
 
+				function setStats(stage){
+					stage.stats = new Stats();
+					stage.stats.domElement.style.position = 'absolute';
+					stage.stats.domElement.style.top = '0px';
+					document.body.appendChild( stage.stats.domElement );
+				}
+
+				function aimCamera(stage){			
+					// camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+					stage.camera.fov = 27;
+					stage.camera.position.z = 2750;
+				}
+
+				function blowFog(stage){
+					stage.scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+				}
+
+				function lights(stage){
+					stage.scene.add( new THREE.AmbientLight( 0x444444 ) );
+
+					var light1 = new THREE.DirectionalLight( 0xffffff, 0.5 );
+					light1.position.set( 1, 1, 1 );
+					stage.scene.add( light1 );
+
+					var light2 = new THREE.DirectionalLight( 0xffffff, 1.5 );
+					light2.position.set( 0, -1, 0 );
+					stage.scene.add( light2 );
+				}
 			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				var time = Date.now() * 0.001;
-
-				mesh.rotation.x = time * 0.25;
-				mesh.rotation.y = time * 0.5;
-
-				renderer.render( scene, camera );
-
-			}
-
 		</script>
-
 	</body>
 </html>
