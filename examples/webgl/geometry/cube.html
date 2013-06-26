@@ -3,21 +3,13 @@
 	<head>
 		<title>three.js webgl - geometry - cube</title>
 		<meta charset="utf-8">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="../shared/styles/default.css" />
 	</head>
 	<body>
-
 		<script src="../../../build/three.min.js"></script>
 		<script src="../../shared/s3age/s3age.js"></script>
 
 		<script>
-
 			var stage = new S3age();
 
 			init();
@@ -39,7 +31,6 @@
 					mesh.rotation.y += 0.01;
 				};
 				stage.scene.add( mesh );
-
 			}
 		</script>
 
