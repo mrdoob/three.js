@@ -4,62 +4,134 @@
 		<title>three.js webgl - interactive cubes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="/examples/shared/styles/default.css" />
 	</head>
 	<body>
-
 		<script src="/build/three.min.js"></script>
+		<script src="/examples/shared/s3age/s3age.js"></script>
 
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<div id="container" style="height:100%; background-color: #f0f0f0;">
+			<div id="info">
+				<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes
+			</div>
+		</div>
 
 		<script>
+			var stage = new S3age("#container", {
+				camera: {fov: 70},
+				scene: { lights: illuminate() },
+				controls: controls()
+			});
 
-			var container, stats;
-			var camera, scene, projector, raycaster, renderer;
+			// Attach the cubes later, to save from creating a large array which
+			// just forces the stage to make a second iteration.
+			scatterCubes();
 
-			var mouse = new THREE.Vector2(), INTERSECTED;
-			var radius = 100, theta = 0;
+			/**
+			 * Two control setups in one - spin the camera around the scene, and make
+			 * the cube under the mouse extra shiny.
+			 */
+			function controls() {
+				/**
+				 * Spin the camera around a sphere, always looking at the origin.
+				 */
+				var camera = (function(){
+					var radius = 100, theta = 0;
+					return function () {
+						theta += 0.1;
+						var rs = radius * Math.sin( THREE.Math.degToRad( theta ) );
+						var rc = radius * Math.cos( THREE.Math.degToRad( theta ) );
 
-			init();
-			animate();
+						stage.camera.position.set(rs, rs, rc);
+						stage.camera.lookAt( stage.scene.position );
+					}
+				}());
 
-			function init() {
+				/**
+				 * Return a list of objects currently under the cursor, sorted nearest to furthest.
+				 */
+				var intersections = (function(){
+					// Update the mouse position whenever the mouse moves
+					var mouse = new THREE.Vector2();
+					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+					function onDocumentMouseMove( event ) {
+						event.preventDefault();
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+						// <0, 0> is middle of screen, not top-left.
+						mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+						mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+					}
 
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes';
-				container.appendChild( info );
+					// These are reset every update, so only initialize once.
+					var projector = new THREE.Projector(),
+						raycaster = new THREE.Raycaster();
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
+					return function(){
+						// Send the vector in <u, v> screen space to world space, given the camera
+						var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+						projector.unprojectVector( vector, stage.camera );
 
-				scene = new THREE.Scene();
+						// Cast a ray from the camera's position through the world-space point
+						// the mouse is currently at on the screen.
+						raycaster.set( stage.camera.position, vector.sub( stage.camera.position ).normalize() );
 
-				var light = new THREE.DirectionalLight( 0xffffff, 2 );
-				light.position.set( 1, 1, 1 ).normalize();
-				scene.add( light );
+						// Get a list of objects the raycaster goes through. It is sorted closest to furthers.
+						var intersects = raycaster.intersectObjects( stage.scene.children );
+						return intersects;
+					}
+				}());
 
-				var light = new THREE.DirectionalLight( 0xffffff );
-				light.position.set( -1, -1, -1 ).normalize();
-				scene.add( light );
+				/**
+				 * Given a list of nearest to furthers intersected objects, highlight one.
+				 * Or unhighlight if the cursor is no longer over it.
+				 */
+				var highlight = (function(){
+					var target = null; // Current object under cursor
+
+					return function(intersects){
+						if ( intersects.length > 0 ) { // Something is under the cursor
+							if ( target != intersects[ 0 ].object ) {
+								// The current object is different than the new object
+	
+								// If the current object was actually something, reset its emmisivity
+								if ( target ) target.material.emissive.setHex( target.currentHex );
+
+								// Update the current object, save its emmisivity, and 
+								target = intersects[ 0 ].object;
+								target.currentHex = target.material.emissive.getHex();
+								target.material.emissive.setHex( 0xff0000 );
+
+							}
+						// Nothing under the cursor
+						} else {
+							// There was something last frame, so reset it.
+							if ( target ){
+								target.material.emissive.setHex( target.currentHex );
+								target = null;
+							}
+						}
+					}
+				}());
+
+				return {
+					update: function(){
+						if(stage && stage.running) {
+							camera();
+							highlight(intersections());
+						}
+					}
+				};
+			}
+
+			function scatterCubes() {
 
 				var geometry = new THREE.CubeGeometry( 20, 20, 20 );
 
 				for ( var i = 0; i < 2000; i ++ ) {
 
-					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(
+						{ color: Math.random() * 0xffffff }
+					) );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -73,101 +145,23 @@
 					object.scale.y = Math.random() + 0.5;
 					object.scale.z = Math.random() + 0.5;
 
-					scene.add( object );
+					stage.scene.add( object );
 
 				}
 
-				projector = new THREE.Projector();
-				raycaster = new THREE.Raycaster();
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.sortObjects = false;
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.appendChild(renderer.domElement);
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
 			}
 
-			function onWindowResize() {
+			function illuminate(){
+				var light, lights = [];
+				light = new THREE.DirectionalLight( 0xffffff, 2 );
+				light.position.set( 1, 1, 1 ).normalize();
+				lights.push(light);
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( -1, -1, -1 ).normalize();
+				lights.push(light);
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				theta += 0.1;
-
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
-				camera.lookAt( scene.position );
-
-				// find intersections
-
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
-
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
-
-				var intersects = raycaster.intersectObjects( scene.children );
-
-				if ( intersects.length > 0 ) {
-
-					if ( INTERSECTED != intersects[ 0 ].object ) {
-
-						if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-						INTERSECTED = intersects[ 0 ].object;
-						INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-						INTERSECTED.material.emissive.setHex( 0xff0000 );
-
-					}
-
-				} else {
-
-					if ( INTERSECTED ) INTERSECTED.material.emissive.setHex( INTERSECTED.currentHex );
-
-					INTERSECTED = null;
-
-				}
-
-				renderer.render( scene, camera );
-
+				return lights;
 			}
 
 		</script>
