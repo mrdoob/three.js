@@ -3,9 +3,16 @@ html {
 }
 
 body {
-	margin: 0px;
+	color: #ffffff;
+	font-family:Monospace;
+	font-size:13px;
+	text-align:center;
+	font-weight: bold;
+
 	background-color: #000000;
+	margin: 0px;
 	overflow: hidden;
+
 	height: 100%;
 }
 

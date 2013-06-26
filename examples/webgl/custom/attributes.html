@@ -4,26 +4,9 @@
 		<title>three.js webgl - custom attributes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="/examples/shared/styles/default.css">
 		<style>
-			body {
-				color: #ffffff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-
+		#container {height: 100%;}
 		</style>
 	</head>
 
@@ -33,21 +16,24 @@
 
 		<script src="/build/three.min.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="/examples/shared/s3age/s3age.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
+			// How much amplitidue to actually wiggle by.
 			uniform float amplitude;
 
+			// A value that changes per vertex, per frame.
 			attribute float displacement;
 
+			// Passed to the fragment shader
 			varying vec3 vNormal;
 			varying vec2 vUv;
 
 			void main() {
 
 				vNormal = normal;
+
 				vUv = ( 0.5 + amplitude ) * uv + vec2( amplitude );
 
 				vec3 newPosition = position + amplitude * normal * vec3( displacement );
@@ -58,7 +44,7 @@
 		</script>
 
 		<script type="x-shader/x-fragment" id="fragmentshader">
-
+			// Passed from the vertex shader.
 			varying vec3 vNormal;
 			varying vec2 vUv;
 
@@ -66,152 +52,108 @@
 			uniform sampler2D texture;
 
 			void main() {
+				// Static light for the scene.
+				vec3 light = normalize( vec3( 0.5, 0.2, 1.0 ) );
 
-				vec3 light = vec3( 0.5, 0.2, 1.0 );
-				light = normalize( light );
-
+				// Calculate a bit of light, between 0 and 1.
 				float dProd = dot( vNormal, light ) * 0.5 + 0.5;
 
+				// Get a bit of color from the texture.
 				vec4 tcolor = texture2D( texture, vUv );
+				// Use pieces of the texture to get a muted base color.
 				vec4 gray = vec4( vec3( tcolor.r * 0.3 + tcolor.g * 0.59 + tcolor.b * 0.11 ), 1.0 );
 
-				gl_FragColor = gray * vec4( vec3( dProd ) * vec3( color ), 1.0 );
-
+				// Scale the uniform color by the light, then apply the texture.
+				gl_FragColor = gray * vec4( vec3( dProd ) * color, 1.0 );
 			}
 
 		</script>
 
-
 		<script>
+		/**
+		 * A wibbly-wobbly sphere, using custom shaders.
+		 *
+		 * The sphere extends from Object3D, and can be moved, rotated, etc.
+		 */
+		var Sphere = function() {
+			THREE.Object3D.apply(this, arguments);
 
-		if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-		var renderer, scene, camera, stats;
-
-		var sphere, uniforms, attributes;
-
-		var noise = [];
-
-		var WIDTH = window.innerWidth,
-			HEIGHT = window.innerHeight;
-
-		init();
-		animate();
-
-		function init() {
-
-			camera = new THREE.PerspectiveCamera( 30, WIDTH / HEIGHT, 1, 10000 );
-			camera.position.z = 300;
-
-			scene = new THREE.Scene();
-
-			attributes = {
-
+			// Attributes, one for each vertex. Used in the vertex shader.
+			this.attributes = {
 				displacement: {	type: 'f', value: [] }
-
 			};
 
-			uniforms = {
-
+			// Several uniforms for the shaders
+			this.uniforms = {
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xff2200 ) },
 				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "/examples/shared/textures/water.jpg" ) },
-
 			};
 
-			uniforms.texture.value.wrapS = uniforms.texture.value.wrapT = THREE.RepeatWrapping;
+			this.uniforms.texture.value.wrapS = this.uniforms.texture.value.wrapT = THREE.RepeatWrapping;
 
+			// ShaderMaterial lets developers use custom shaders.
 			var shaderMaterial = new THREE.ShaderMaterial( {
-
-				uniforms: 		uniforms,
-				attributes:     attributes,
+				uniforms: 		this.uniforms,
+				attributes:     this.attributes,
 				vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 				fragmentShader: document.getElementById( 'fragmentshader' ).textContent
-
 			});
 
-
+			// Geometry for a sphere, with 128x128 = 16,384 vertices 
 			var radius = 50, segments = 128, rings = 64;
 			var geometry = new THREE.SphereGeometry( radius, segments, rings );
-			geometry.dynamic = true;
+			geometry.dynamic = true; // Avoid setting needsUpdate every render frame.
 
-			sphere = new THREE.Mesh( geometry, shaderMaterial );
+			// Attach the mesh
+			this.mesh = new THREE.Mesh( geometry, shaderMaterial );
+			this.add(this.mesh);
 
-			var vertices = sphere.geometry.vertices;
-			var values = attributes.displacement.value;
-
+			// Create some noise for each vertex.
+			this.noise = [];
+			var vertices = this.mesh.geometry.vertices;
+			var values = this.attributes.displacement.value;
 			for ( var v = 0; v < vertices.length; v++ ) {
-
 				values[ v ] = 0;
-				noise[ v ] = Math.random() * 5;
+				this.noise[ v ] = Math.random() * 5;
+			}
+		}
+
+		Sphere.prototype = Object.create(THREE.Object3D.prototype);
+
+		Sphere.prototype.update = function(clock) {
+			var time = clock.now * 0.01;
+
+			this.rotation.y = this.rotation.z = 0.01 * time;
+
+			this.uniforms.amplitude.value = 2.5 * Math.sin( this.rotation.y * 0.125 );
+
+			// Run the color of the sphere through the spectrum
+			this.uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
+
+			// Fiddle with the noisy bits
+			for ( var i = 0; i < this.attributes.displacement.value.length; i ++ ) {
+
+				this.attributes.displacement.value[ i ] = Math.sin( 0.1 * i + time );
+
+				this.noise[ i ] += 0.5 * ( 0.5 - Math.random() );
+				this.noise[ i ] = THREE.Math.clamp( this.noise[ i ], -5, 5 );
+
+				this.attributes.displacement.value[ i ] += this.noise[ i ];
 
 			}
 
-			scene.add( sphere );
-
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1 } );
-			renderer.setSize( WIDTH, HEIGHT );
-
-			var container = document.getElementById( 'container' );
-			container.appendChild( renderer.domElement );
-
-			stats = new Stats();
-			stats.domElement.style.position = 'absolute';
-			stats.domElement.style.top = '0px';
-			container.appendChild( stats.domElement );
-
-			//
-
-			window.addEventListener( 'resize', onWindowResize, false );
-
+			this.attributes.displacement.needsUpdate = true;
 		}
+		</script>
 
-		function onWindowResize() {
-
-			camera.aspect = window.innerWidth / window.innerHeight;
-			camera.updateProjectionMatrix();
-
-			renderer.setSize( window.innerWidth, window.innerHeight );
-
-		}
-
-		function animate() {
-
-			requestAnimationFrame( animate );
-
-			render();
-			stats.update();
-
-		}
-
-		function render() {
-
-			var time = Date.now() * 0.01;
-
-			sphere.rotation.y = sphere.rotation.z = 0.01 * time;
-
-			uniforms.amplitude.value = 2.5 * Math.sin( sphere.rotation.y * 0.125 );
-			uniforms.color.value.offsetHSL( 0.0005, 0, 0 );
-
-			for ( var i = 0; i < attributes.displacement.value.length; i ++ ) {
-
-				attributes.displacement.value[ i ] = Math.sin( 0.1 * i + time );
-
-				noise[ i ] += 0.5 * ( 0.5 - Math.random() );
-				noise[ i ] = THREE.Math.clamp( noise[ i ], -5, 5 );
-
-				attributes.displacement.value[ i ] += noise[ i ];
-
-			}
-
-			attributes.displacement.needsUpdate = true;
-
-			renderer.render( scene, camera );
-
-		}
-
-
-	</script>
+		<script>
+			var stage = new S3age("#container", {
+				renderer: { setClearColor: [0x050505, 1] },
+				camera: {fov: 30, position: [0, 0, 300]},
+				scene: { children: [ new Sphere() ] }
+			});
+		</script>
 
 </body>
 
