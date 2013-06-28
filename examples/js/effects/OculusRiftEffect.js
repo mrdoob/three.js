@@ -136,6 +136,7 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		RTMaterial.uniforms['scale'].value = new THREE.Vector2(1.0/distScale, 1.0*aspect/distScale);
 
 		// Create render target
+		if ( renderTarget ) renderTarget.dispose();
 		renderTarget = new THREE.WebGLRenderTarget( HMD.hResolution*distScale/2, HMD.vResolution*distScale, RTParams );
 		RTMaterial.uniforms[ "texid" ].value = renderTarget;
 
@@ -192,6 +193,15 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		renderer.render( scene, pCamera, renderTarget, true );
 		renderer.render( finalScene, oCamera );
 
+	};
+
+	this.dispose = function() {
+		if ( RTMaterial ) {
+			RTMaterial.dispose();
+		}
+		if ( renderTarget ) {
+			renderTarget.dispose();
+		}
 	};
 
 };
