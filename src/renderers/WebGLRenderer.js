@@ -3664,19 +3664,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.uv >= 0 ) {
 
-				if ( geometryGroup.__uvArray ) {
+				if ( object.geometry.faceVertexUvs[0] ) {
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBuffer );
 					enableAttribute( attributes.uv );
 					_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
 				}
 				else {
-					_gl.vertexAttrib2f( attributes.uv2, 0, 0 );
+					_gl.vertexAttrib2f( attributes.uv, 0, 0 );
 				}
 			}
 
 			if ( attributes.uv2 >= 0 ) {
 
-				if ( geometryGroup.__uv2Array ) {
+				if ( object.geometry.faceVertexUvs[1] ) {
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUV2Buffer );
 					enableAttribute( attributes.uv2 );
 					_gl.vertexAttribPointer( attributes.uv2, 2, _gl.FLOAT, false, 0, 0 );
