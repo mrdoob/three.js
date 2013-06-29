@@ -131,6 +131,7 @@ THREE.Rotation.prototype = {
 	fromArray: function ( array ) {
 
 		this.euler.fromArray( array );
+		this.updateQuaternion();
 
 		return this;
 

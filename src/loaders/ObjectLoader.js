@@ -260,10 +260,20 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
-			matrix.fromArray( data.matrix );
-			matrix.decompose( object.position, object.quaternion, object.scale );
+			if ( data.matrix !== undefined ) {
 
-			object.rotation.updateEuler();
+				matrix.fromArray( data.matrix );
+				matrix.decompose( object.position, object.quaternion, object.scale );
+
+				object.rotation.updateEuler();
+
+			} else {
+
+				if ( data.position !== undefined ) object.position.fromArray( data.position );
+				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
+
+			}
 
 			if ( data.id !== undefined ) object.id = data.id;
 			if ( data.name !== undefined ) object.name = data.name;
