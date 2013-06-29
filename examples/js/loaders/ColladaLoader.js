@@ -848,38 +848,40 @@ THREE.ColladaLoader = function () {
 			var instance_light = node.lights[i];
 			var lparams = lights[instance_light.url];
 
-			if (lparams && lparams.technique)
-			{
+			if ( lparams && lparams.technique ) {
+
 				var color = lparams.color.getHex();
 				var intensity = lparams.intensity;
 				var distance = 0;
 				var angle = lparams.falloff_angle;
 				var exponent; // Intentionally undefined, don't know what this is yet
-				
-				switch (lparams.technique)
-				{
-					case 'directional' :
-						
-						obj = new THREE.DirectionalLight(color, intensity, distance);
-						break;
-				
-					case 'point' :
-						
-						obj = new THREE.PointLight(color, intensity, distance);
+
+				switch ( lparams.technique ) {
+
+					case 'directional':
+
+						obj = new THREE.DirectionalLight( color, intensity, distance );
 						break;
 
-					case 'spot' :
-						
-						obj = new THREE.SpotLight(color, intensity, distance, angle, exponent);
+					case 'point':
+
+						obj = new THREE.PointLight( color, intensity, distance );
 						break;
 
-					case 'ambient' :
-						
-						obj = new THREE.AmbientLight(color);
+					case 'spot':
+
+						obj = new THREE.SpotLight( color, intensity, distance, angle, exponent );
 						break;
+
+					case 'ambient':
+
+						obj = new THREE.AmbientLight( color );
+						break;
+
 				}
+
 			}
-			
+
 		}
 
 		obj.name = node.name || node.id || "";
@@ -4140,7 +4142,7 @@ THREE.ColladaLoader = function () {
 
 					this.parseTechnique( child );
 					break;
-					
+
 				default:
 					break;
 
@@ -4156,35 +4158,37 @@ THREE.ColladaLoader = function () {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-			switch ( element.childNodes[ i ].nodeName ) 
-			{
-				case 'directional' :
-				case 'point' :
-				case 'spot' :
-				case 'ambient' :
-					
+			switch ( element.childNodes[ i ].nodeName ) {
+
+				case 'directional':
+				case 'point':
+				case 'spot':
+				case 'ambient':
+
 					this.technique = element.childNodes[ i ].nodeName;
+
 					var light = element.childNodes[ i ];
-	
+
 					for ( var j = 0; j < light.childNodes.length; j ++ ) {
-	
+
 						var child = light.childNodes[j];
-						switch (child.nodeName)
-						{
-							case 'color' :
-								
+
+						switch ( child.nodeName ) {
+
+							case 'color':
+
 								var rgba = _floats( child.textContent );
 								this.color = new THREE.Color(0);
 								this.color.setRGB( rgba[0], rgba[1], rgba[2] );
 								this.color.a = rgba[3];
 								break;
-								
-							case 'falloff_angle' :
-								
+
+							case 'falloff_angle':
+
 								this.falloff_angle = parseFloat( child.textContent );
-		
 								break;
-						}		
+						}
+
 					}
 
 			}
@@ -4197,15 +4201,16 @@ THREE.ColladaLoader = function () {
 
 	Light.prototype.parseTechnique = function ( element ) {
 
-		this.profile = element.getAttribute('profile');
-		
+		this.profile = element.getAttribute( 'profile' );
+
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[ i ];
-			switch ( child.nodeName ) 
-			{
-				case 'intensity' :
-					
+
+			switch ( child.nodeName ) {
+
+				case 'intensity':
+
 					this.intensity = parseFloat(child.textContent);
 					break;
 
@@ -4216,7 +4221,7 @@ THREE.ColladaLoader = function () {
 		return this;
 
 	};
-	
+
 	function InstanceLight() {
 
 		this.url = "";
@@ -4230,7 +4235,7 @@ THREE.ColladaLoader = function () {
 		return this;
 
 	};
-	
+
 	function _source( element ) {
 
 		var id = element.getAttribute( 'id' );
