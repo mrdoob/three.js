@@ -67,10 +67,10 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 	var parentScale = new THREE.Vector3();
 
 	var worldPosition = new THREE.Vector3();
-	var worldRotation = new THREE.Vector3();
+	var worldRotation = new THREE.Euler();
 	var worldRotationMatrix  = new THREE.Matrix4();
 	var camPosition = new THREE.Vector3();
-	var camRotation = new THREE.Vector3();
+	var camRotation = new THREE.Euler();
 
 	var displayAxes = {};
 	var pickerAxes = {};
@@ -379,11 +379,11 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		this.object.updateMatrixWorld();
 		worldPosition.getPositionFromMatrix( this.object.matrixWorld );
-		worldRotation.setFromRotationMatrix( tempMatrix.extractRotation(this.object.matrixWorld ));
+		worldRotation.setFromRotationMatrix( tempMatrix.extractRotation( this.object.matrixWorld ) );
 
 		this.camera.updateMatrixWorld();
 		camPosition.getPositionFromMatrix( this.camera.matrixWorld );
-		camRotation.setFromRotationMatrix( tempMatrix.extractRotation( this.camera.matrixWorld ));
+		camRotation.setFromRotationMatrix( tempMatrix.extractRotation( this.camera.matrixWorld ) );
 
 		scale = worldPosition.distanceTo( camPosition ) / 6 * this.scale;
 		this.gizmo.position.copy( worldPosition )
@@ -437,17 +437,9 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						object.rotation.set( 0, 0, 0 );
 
-						if ( name == 'RX' ) {
-							object.rotation.setX( Math.atan2( -eye.y, eye.z ) );
-						}
-
-						if ( name == 'RY' ) {
-							object.rotation.setY( Math.atan2( eye.x, eye.z ) );
-						}
-
-						if ( name == 'RZ' ) {
-							object.rotation.setZ( Math.atan2( eye.y, eye.x ) );
-						}
+						if ( name == 'RX' ) object.rotation.setX( Math.atan2( -eye.y, eye.z ) );
+						if ( name == 'RY' ) object.rotation.setY( Math.atan2( eye.x, eye.z ) );
+						if ( name == 'RZ' ) object.rotation.setZ( Math.atan2( eye.y, eye.x ) );
 
 					}
 
