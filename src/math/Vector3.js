@@ -525,7 +525,7 @@ THREE.Vector3.prototype = {
 	setEulerFromQuaternion: function ( q, order ) {
 
 		console.error( "REMOVED: Vector3\'s setEulerFromQuaternion: has been removed in favor of Euler.setFromQuaternion(), please update your code.");
-		
+
 	},
 
 	getPositionFromMatrix: function ( m ) {

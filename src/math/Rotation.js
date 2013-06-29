@@ -5,8 +5,10 @@
 
 THREE.Rotation = function ( quaternion ) {
 
-	this.euler = new THREE.Euler().setFromQuaternion( quaternion );
+	this.euler = new THREE.Euler();
 	this.quaternion = quaternion;
+
+	this.updateEuler();
 
 };
 
@@ -21,7 +23,7 @@ THREE.Rotation.prototype = {
 	set x ( value ) {
 
 		this.euler.x = value;
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 	},
 
@@ -34,7 +36,7 @@ THREE.Rotation.prototype = {
 	set y ( value ) {
 
 		this.euler.y = value;
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 	},
 
@@ -47,7 +49,7 @@ THREE.Rotation.prototype = {
 	set z ( value ) {
 
 		this.euler.z = value;
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 	},
 
@@ -59,7 +61,7 @@ THREE.Rotation.prototype = {
 		this.euler.y = y;
 		this.euler.z = z;
 
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 		return this;
 
@@ -67,7 +69,8 @@ THREE.Rotation.prototype = {
 
 	setX: function ( x ) {
 
-		this.x = x;
+		this.euler.x = x;
+		this.updateQuaternion();
 
 		return this;
 
@@ -75,7 +78,8 @@ THREE.Rotation.prototype = {
 
 	setY: function ( y ) {
 
-		this.y = y;
+		this.euler.y = y;
+		this.updateQuaternion();
 
 		return this;
 
@@ -83,25 +87,33 @@ THREE.Rotation.prototype = {
 
 	setZ: function ( z ) {
 
-		this.z = z;
+		this.euler.z = z;
+		this.updateQuaternion();
 
 		return this;
 
 	},
 
-	setFromRotationMatrix: function ( m, order ) {
+	setEulerFromRotationMatrix: function ( matrix, order ) {
 
-		this.euler.setFromRotationMatrix( m, order );
-		this.quaternion.setFromEuler( this.euler );
+		console.warn( 'DEPRECATED: Rotation\'s .setEulerFromRotationMatrix() has been renamed to .setFromRotationMatrix().' );
+		return this.setFromRotationMatrix( matrix, order );
+
+	},
+
+	setFromRotationMatrix: function ( matrix, order ) {
+
+		this.euler.setFromRotationMatrix( matrix, order );
+		this.updateQuaternion();
 
 		return this;
 
 	},
 
-	setFromQuaternion: function ( q, order ) {
+	setFromQuaternion: function ( quaternion, order ) {
 
-		this.euler.setFromQuaternion( q, order );
-		this.quaternion.copy( q );
+		this.euler.setFromQuaternion( quaternion, order );
+		this.quaternion.copy( quaternion );
 
 		return this;
 
@@ -110,7 +122,7 @@ THREE.Rotation.prototype = {
 	copy: function ( rotation ) {
 
 		this.euler.copy( rotation.euler );
-		this.quaternion.setFromEuler( this.euler );
+		this.quaternion.copy( rotation.quaternion );
 
 		return this;
 
@@ -119,7 +131,6 @@ THREE.Rotation.prototype = {
 	fromArray: function ( array ) {
 
 		this.euler.fromArray( array );
-		this.quaternion.setFromEuler( this.euler );
 
 		return this;
 
@@ -128,6 +139,22 @@ THREE.Rotation.prototype = {
 	toArray: function () {
 
 		return this.euler.toArray();
+
+	},
+
+	updateEuler: function () {
+
+		this.euler.setFromQuaternion( this.quaternion );
+
+		return this;
+
+	},
+
+	updateQuaternion: function () {
+
+		this.quaternion.setFromEuler( this.euler );
+
+		return this;
 
 	}
 
