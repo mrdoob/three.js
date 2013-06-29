@@ -14,10 +14,12 @@
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
-	var te = this.elements = new Float32Array( 16 );
+	this.elements = new Float32Array( 16 );
 
 	// TODO: if n11 is undefined, then just set to identity, otherwise copy all other values into matrix
 	//   we should not support semi specification of Matrix4, it is just weird.
+
+	var te = this.elements;
 
 	te[0] = ( n11 !== undefined ) ? n11 : 1; te[4] = n12 || 0; te[8] = n13 || 0; te[12] = n14 || 0;
 	te[1] = n21 || 0; te[5] = ( n22 !== undefined ) ? n22 : 1; te[9] = n23 || 0; te[13] = n24 || 0;
@@ -60,16 +62,7 @@ THREE.Matrix4.prototype = {
 
 	copy: function ( m ) {
 
-		var me = m.elements;
-
-		this.set(
-
-			me[0], me[4], me[8], me[12],
-			me[1], me[5], me[9], me[13],
-			me[2], me[6], me[10], me[14],
-			me[3], me[7], me[11], me[15]
-
-		);
+		this.elements.set( m.elements );
 
 		return this;
 
@@ -637,7 +630,7 @@ THREE.Matrix4.prototype = {
 		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
 
 		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
-	
+
 		if ( det == 0 ) {
 
 			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
@@ -906,6 +899,27 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.elements.set( array );
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		var te = this.elements;
+
+		return [
+			te[ 0 ], te[ 1 ], te[ 2 ], te[ 3 ],
+			te[ 4 ], te[ 5 ], te[ 6 ], te[ 7 ],
+			te[ 8 ], te[ 9 ], te[ 10 ], te[ 11 ],
+			te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
+		];
+
+	},
+
 	clone: function () {
 
 		var te = this.elements;
@@ -925,7 +939,7 @@ THREE.Matrix4.prototype = {
 
 THREE.extend( THREE.Matrix4.prototype, {
 
-	decompose: function() {
+	decompose: function () {
 
 		var x = new THREE.Vector3();
 		var y = new THREE.Vector3();
