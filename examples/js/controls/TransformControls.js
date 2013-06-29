@@ -431,7 +431,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						}
 
-						object.rotation.setFromQuaternion( tempQuaternion );
+						object.quaternion.copy( tempQuaternion );
 
 					} else if ( this.space == 'world' ) {
 
@@ -781,7 +781,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionE );
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setFromQuaternion( tempQuaternion );
+						scope.object.quaternion.copy( tempQuaternion );
 
 					} else if ( scope.active == "RXYZE" ) {
 
@@ -794,7 +794,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setFromQuaternion( tempQuaternion );
+						scope.object.quaternion.copy( tempQuaternion );
 
 					} else if ( scope.space == 'local' ) {
 
@@ -814,7 +814,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						if ( scope.active == "RY" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionY );
 						if ( scope.active == "RZ" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionZ );
 
-						scope.object.rotation.setFromQuaternion( quaternionXYZ );
+						scope.object.quaternion.copy( quaternionXYZ );
 
 					} else if ( scope.space == 'world' ) {
 
@@ -834,7 +834,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setFromQuaternion( tempQuaternion );
+						scope.object.quaternion.copy( tempQuaternion );
 
 					}
 
