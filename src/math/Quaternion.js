@@ -40,9 +40,10 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	setFromEuler: function ( rotation ) {
+	setFromEuler: function ( euler ) {
 
-		if( typeof rotation['order'] === undefined ) {
+		if ( typeof euler['order'] === undefined ) {
+
 			console.error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
 		}
 
@@ -50,49 +51,49 @@ THREE.Quaternion.prototype = {
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( rotation.x / 2 );
-		var c2 = Math.cos( rotation.y / 2 );
-		var c3 = Math.cos( rotation.z / 2 );
-		var s1 = Math.sin( rotation.x / 2 );
-		var s2 = Math.sin( rotation.y / 2 );
-		var s3 = Math.sin( rotation.z / 2 );
+		var c1 = Math.cos( euler.x / 2 );
+		var c2 = Math.cos( euler.y / 2 );
+		var c3 = Math.cos( euler.z / 2 );
+		var s1 = Math.sin( euler.x / 2 );
+		var s2 = Math.sin( euler.y / 2 );
+		var s3 = Math.sin( euler.z / 2 );
 
-		if ( rotation.order === undefined || rotation.order === 'XYZ' ) {
+		if ( euler.order === undefined || euler.order === 'XYZ' ) {
 
 			this.x = s1 * c2 * c3 + c1 * s2 * s3;
 			this.y = c1 * s2 * c3 - s1 * c2 * s3;
 			this.z = c1 * c2 * s3 + s1 * s2 * c3;
 			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( rotation.order === 'YXZ' ) {
+		} else if ( euler.order === 'YXZ' ) {
 
 			this.x = s1 * c2 * c3 + c1 * s2 * s3;
 			this.y = c1 * s2 * c3 - s1 * c2 * s3;
 			this.z = c1 * c2 * s3 - s1 * s2 * c3;
 			this.w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( rotation.order === 'ZXY' ) {
+		} else if ( euler.order === 'ZXY' ) {
 
 			this.x = s1 * c2 * c3 - c1 * s2 * s3;
 			this.y = c1 * s2 * c3 + s1 * c2 * s3;
 			this.z = c1 * c2 * s3 + s1 * s2 * c3;
 			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( rotation.order === 'ZYX' ) {
+		} else if ( euler.order === 'ZYX' ) {
 
 			this.x = s1 * c2 * c3 - c1 * s2 * s3;
 			this.y = c1 * s2 * c3 + s1 * c2 * s3;
 			this.z = c1 * c2 * s3 - s1 * s2 * c3;
 			this.w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( rotation.order === 'YZX' ) {
+		} else if ( euler.order === 'YZX' ) {
 
 			this.x = s1 * c2 * c3 + c1 * s2 * s3;
 			this.y = c1 * s2 * c3 + s1 * c2 * s3;
 			this.z = c1 * c2 * s3 - s1 * s2 * c3;
 			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( rotation.order === 'XZY' ) {
+		} else if ( euler.order === 'XZY' ) {
 
 			this.x = s1 * c2 * c3 - c1 * s2 * s3;
 			this.y = c1 * s2 * c3 - s1 * c2 * s3;
