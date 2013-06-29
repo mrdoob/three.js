@@ -2923,6 +2923,8 @@ THREE.Rotation.prototype = {
 
 	},
 
+	//
+
 	set: function ( x, y, z ) {
 
 		this.euler.x = x;
@@ -2931,6 +2933,50 @@ THREE.Rotation.prototype = {
 
 		this.quaternion.setFromEuler( this.euler );
 
+		return this;
+
+	},
+
+	setX: function ( x ) {
+
+		this.x = x;
+
+		return this;
+
+	},
+
+	setY: function ( y ) {
+
+		this.y = y;
+
+		return this;
+
+	},
+
+	setZ: function ( z ) {
+
+		this.z = z;
+
+		return this;
+
+	},
+
+	setFromRotationMatrix: function ( m, order ) {
+
+		this.euler.setFromRotationMatrix( m, order );
+		this.quaternion.setFromEuler( this.euler );
+
+		return this;
+
+	},
+
+	setFromQuaternion: function ( q, order ) {
+
+		this.euler.setFromQuaternion( q, order );
+		this.quaternion.copy( q );
+
+		return this;
+
 	},
 
 	copy: function ( rotation ) {
@@ -2938,12 +2984,16 @@ THREE.Rotation.prototype = {
 		this.euler.copy( rotation.euler );
 		this.quaternion.setFromEuler( this.euler );
 
+		return this;
+
 	},
 
-	fromArray: function( array ) {
+	fromArray: function ( array ) {
 
 		this.euler.fromArray( array );
 		this.quaternion.setFromEuler( this.euler );
+
+		return this;
 
 	},
 
