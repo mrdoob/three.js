@@ -75,7 +75,6 @@ THREE.KeyFrameAnimation.prototype.play = function( loop, startTimeMS ) {
 
 			object = this.hierarchy[ h ];
 			node = this.data.hierarchy[ h ];
-			object.useQuaternion = true;
 
 			if ( node.animationCache === undefined ) {
 

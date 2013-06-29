@@ -40,55 +40,59 @@ THREE.Quaternion.prototype = {
 
 	},
 
-	setFromEuler: function ( v, order ) {
+	setFromEuler: function ( rotation ) {
+
+		if( typeof rotation['order'] === undefined ) {
+			console.error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( v.x / 2 );
-		var c2 = Math.cos( v.y / 2 );
-		var c3 = Math.cos( v.z / 2 );
-		var s1 = Math.sin( v.x / 2 );
-		var s2 = Math.sin( v.y / 2 );
-		var s3 = Math.sin( v.z / 2 );
+		var c1 = Math.cos( rotation.x / 2 );
+		var c2 = Math.cos( rotation.y / 2 );
+		var c3 = Math.cos( rotation.z / 2 );
+		var s1 = Math.sin( rotation.x / 2 );
+		var s2 = Math.sin( rotation.y / 2 );
+		var s3 = Math.sin( rotation.z / 2 );
 
-		if ( order === undefined || order === 'XYZ' ) {
+		if ( rotation.order === undefined || rotation.order === 'XYZ' ) {
 
 			this.x = s1 * c2 * c3 + c1 * s2 * s3;
 			this.y = c1 * s2 * c3 - s1 * c2 * s3;
 			this.z = c1 * c2 * s3 + s1 * s2 * c3;
 			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( order === 'YXZ' ) {
+		} else if ( rotation.order === 'YXZ' ) {
 
 			this.x = s1 * c2 * c3 + c1 * s2 * s3;
 			this.y = c1 * s2 * c3 - s1 * c2 * s3;
 			this.z = c1 * c2 * s3 - s1 * s2 * c3;
 			this.w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( order === 'ZXY' ) {
+		} else if ( rotation.order === 'ZXY' ) {
 
 			this.x = s1 * c2 * c3 - c1 * s2 * s3;
 			this.y = c1 * s2 * c3 + s1 * c2 * s3;
 			this.z = c1 * c2 * s3 + s1 * s2 * c3;
 			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( order === 'ZYX' ) {
+		} else if ( rotation.order === 'ZYX' ) {
 
 			this.x = s1 * c2 * c3 - c1 * s2 * s3;
 			this.y = c1 * s2 * c3 + s1 * c2 * s3;
 			this.z = c1 * c2 * s3 - s1 * s2 * c3;
 			this.w = c1 * c2 * c3 + s1 * s2 * s3;
 
-		} else if ( order === 'YZX' ) {
+		} else if ( rotation.order === 'YZX' ) {
 
 			this.x = s1 * c2 * c3 + c1 * s2 * s3;
 			this.y = c1 * s2 * c3 + s1 * c2 * s3;
 			this.z = c1 * c2 * s3 - s1 * s2 * c3;
 			this.w = c1 * c2 * c3 - s1 * s2 * s3;
 
-		} else if ( order === 'XZY' ) {
+		} else if ( rotation.order === 'XZY' ) {
 
 			this.x = s1 * c2 * c3 - c1 * s2 * s3;
 			this.y = c1 * s2 * c3 - s1 * c2 * s3;

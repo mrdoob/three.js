@@ -23,8 +23,6 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 	this.position = origin;
 
-	this.useQuaternion = true;
-
 	var lineGeometry = new THREE.Geometry();
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
 	lineGeometry.vertices.push( new THREE.Vector3( 0, 1, 0 ) );

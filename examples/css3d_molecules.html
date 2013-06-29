@@ -433,7 +433,7 @@
 
 						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
 						object.matrix = objMatrix;
-						object.rotation.setEulerFromRotationMatrix( object.matrix, object.eulerOrder );
+						object.rotation.setFromRotationMatrix( object.matrix, object.rotation.order );
 
 						object.matrixAutoUpdate = false;
 						object.updateMatrix();
@@ -453,7 +453,7 @@
 						joint.position.lerp( end, 0.5 );
 
 						joint.matrix.copy( objMatrix );
-						joint.rotation.setEulerFromRotationMatrix( joint.matrix, joint.eulerOrder );
+						joint.rotation.setFromRotationMatrix( joint.matrix, joint.rotation.order );
 
 						joint.matrixAutoUpdate = false;
 						joint.updateMatrix();

@@ -126,24 +126,20 @@ THREE.Matrix4.prototype = {
 
 	}(),
 
-	setRotationFromEuler: function ( v, order ) {
+	makeRotationFromEuler: function ( rotation ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromEuler() has been deprecated in favor of makeRotationFromEuler.  Please update your code.' );
-
-		return this.makeRotationFromEuler( v, order );
-
-	},
-
-	makeRotationFromEuler: function ( v, order ) {
+		if( typeof rotation['order'] === undefined ) {
+			console.error( 'ERROR: Matrix\'s .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+		}
 
 		var te = this.elements;
 
-		var x = v.x, y = v.y, z = v.z;
+		var x = rotation.x, y = rotation.y, z = rotation.z;
 		var a = Math.cos( x ), b = Math.sin( x );
 		var c = Math.cos( y ), d = Math.sin( y );
 		var e = Math.cos( z ), f = Math.sin( z );
 
-		if ( order === undefined || order === 'XYZ' ) {
+		if ( rotation.order === undefined || rotation.order === 'XYZ' ) {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
@@ -159,7 +155,7 @@ THREE.Matrix4.prototype = {
 			te[6] = be + af * d;
 			te[10] = a * c;
 
-		} else if ( order === 'YXZ' ) {
+		} else if ( rotation.order === 'YXZ' ) {
 
 			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
@@ -175,7 +171,7 @@ THREE.Matrix4.prototype = {
 			te[6] = df + ce * b;
 			te[10] = a * c;
 
-		} else if ( order === 'ZXY' ) {
+		} else if ( rotation.order === 'ZXY' ) {
 
 			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
@@ -191,7 +187,7 @@ THREE.Matrix4.prototype = {
 			te[6] = b;
 			te[10] = a * c;
 
-		} else if ( order === 'ZYX' ) {
+		} else if ( rotation.order === 'ZYX' ) {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
@@ -207,7 +203,7 @@ THREE.Matrix4.prototype = {
 			te[6] = b * c;
 			te[10] = a * c;
 
-		} else if ( order === 'YZX' ) {
+		} else if ( rotation.order === 'YZX' ) {
 
 			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
@@ -223,7 +219,7 @@ THREE.Matrix4.prototype = {
 			te[6] = ad * f + bc;
 			te[10] = ac - bd * f;
 
-		} else if ( order === 'XZY' ) {
+		} else if ( rotation.order === 'XZY' ) {
 
 			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
@@ -843,9 +839,13 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	makeFromPositionEulerScale: function ( position, rotation, eulerOrder, scale ) {
+	makeFromPositionEulerScale: function ( position, rotation, scale ) {
 
-		this.makeRotationFromEuler( rotation, eulerOrder );
+		if( typeof rotation['order'] === undefined ) {
+			console.error( 'ERROR: Matrix4\'s .makeFromPositionEulerScale() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+		}
+
+		this.makeRotationFromEuler( rotation );
 		this.scale( scale );
 		this.setPosition( position );
 
