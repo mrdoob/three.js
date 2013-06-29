@@ -1856,7 +1856,7 @@ THREE.Vector3.prototype = {
 	setEulerFromQuaternion: function ( q, order ) {
 
 		console.error( "REMOVED: Vector3\'s setEulerFromQuaternion: has been removed in favor of Euler.setFromQuaternion(), please update your code.");
-		
+
 	},
 
 	getPositionFromMatrix: function ( m ) {
@@ -2877,8 +2877,10 @@ THREE.Euler.prototype = {
 
 THREE.Rotation = function ( quaternion ) {
 
-	this.euler = new THREE.Euler().setFromQuaternion( quaternion );
+	this.euler = new THREE.Euler();
 	this.quaternion = quaternion;
+
+	this.updateEuler();
 
 };
 
@@ -2893,7 +2895,7 @@ THREE.Rotation.prototype = {
 	set x ( value ) {
 
 		this.euler.x = value;
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 	},
 
@@ -2906,7 +2908,7 @@ THREE.Rotation.prototype = {
 	set y ( value ) {
 
 		this.euler.y = value;
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 	},
 
@@ -2919,7 +2921,7 @@ THREE.Rotation.prototype = {
 	set z ( value ) {
 
 		this.euler.z = value;
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 	},
 
@@ -2931,7 +2933,7 @@ THREE.Rotation.prototype = {
 		this.euler.y = y;
 		this.euler.z = z;
 
-		this.quaternion.setFromEuler( this.euler );
+		this.updateQuaternion();
 
 		return this;
 
@@ -2939,7 +2941,8 @@ THREE.Rotation.prototype = {
 
 	setX: function ( x ) {
 
-		this.x = x;
+		this.euler.x = x;
+		this.updateQuaternion();
 
 		return this;
 
@@ -2947,7 +2950,8 @@ THREE.Rotation.prototype = {
 
 	setY: function ( y ) {
 
-		this.y = y;
+		this.euler.y = y;
+		this.updateQuaternion();
 
 		return this;
 
@@ -2955,25 +2959,26 @@ THREE.Rotation.prototype = {
 
 	setZ: function ( z ) {
 
-		this.z = z;
+		this.euler.z = z;
+		this.updateQuaternion();
 
 		return this;
 
 	},
 
-	setFromRotationMatrix: function ( m, order ) {
+	setFromRotationMatrix: function ( matrix, order ) {
 
-		this.euler.setFromRotationMatrix( m, order );
-		this.quaternion.setFromEuler( this.euler );
+		this.euler.setFromRotationMatrix( matrix, order );
+		this.updateQuaternion();
 
 		return this;
 
 	},
 
-	setFromQuaternion: function ( q, order ) {
+	setFromQuaternion: function ( quaternion, order ) {
 
-		this.euler.setFromQuaternion( q, order );
-		this.quaternion.copy( q );
+		this.euler.setFromQuaternion( quaternion, order );
+		this.quaternion.copy( quaternion );
 
 		return this;
 
@@ -2982,7 +2987,7 @@ THREE.Rotation.prototype = {
 	copy: function ( rotation ) {
 
 		this.euler.copy( rotation.euler );
-		this.quaternion.setFromEuler( this.euler );
+		this.quaternion.copy( rotation.quaternion );
 
 		return this;
 
@@ -2991,7 +2996,6 @@ THREE.Rotation.prototype = {
 	fromArray: function ( array ) {
 
 		this.euler.fromArray( array );
-		this.quaternion.setFromEuler( this.euler );
 
 		return this;
 
@@ -3000,6 +3004,22 @@ THREE.Rotation.prototype = {
 	toArray: function () {
 
 		return this.euler.toArray();
+
+	},
+
+	updateEuler: function () {
+
+		this.euler.setFromQuaternion( this.quaternion );
+
+		return this;
+
+	},
+
+	updateQuaternion: function () {
+
+		this.quaternion.setFromEuler( this.euler );
+
+		return this;
 
 	}
 
@@ -4011,10 +4031,12 @@ THREE.Matrix3.prototype = {
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
-	var te = this.elements = new Float32Array( 16 );
+	this.elements = new Float32Array( 16 );
 
 	// TODO: if n11 is undefined, then just set to identity, otherwise copy all other values into matrix
 	//   we should not support semi specification of Matrix4, it is just weird.
+
+	var te = this.elements;
 
 	te[0] = ( n11 !== undefined ) ? n11 : 1; te[4] = n12 || 0; te[8] = n13 || 0; te[12] = n14 || 0;
 	te[1] = n21 || 0; te[5] = ( n22 !== undefined ) ? n22 : 1; te[9] = n23 || 0; te[13] = n24 || 0;
@@ -4057,16 +4079,7 @@ THREE.Matrix4.prototype = {
 
 	copy: function ( m ) {
 
-		var me = m.elements;
-
-		this.set(
-
-			me[0], me[4], me[8], me[12],
-			me[1], me[5], me[9], me[13],
-			me[2], me[6], me[10], me[14],
-			me[3], me[7], me[11], me[15]
-
-		);
+		this.elements.set( m.elements );
 
 		return this;
 
@@ -4634,7 +4647,7 @@ THREE.Matrix4.prototype = {
 		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
 
 		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
-	
+
 		if ( det == 0 ) {
 
 			var msg = "Matrix4.getInverse(): can't invert matrix, determinant is 0";
@@ -4903,6 +4916,27 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.elements.set( array );
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		var te = this.elements;
+
+		return [
+			te[ 0 ], te[ 1 ], te[ 2 ], te[ 3 ],
+			te[ 4 ], te[ 5 ], te[ 6 ], te[ 7 ],
+			te[ 8 ], te[ 9 ], te[ 10 ], te[ 11 ],
+			te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
+		];
+
+	},
+
 	clone: function () {
 
 		var te = this.elements;
@@ -4922,7 +4956,7 @@ THREE.Matrix4.prototype = {
 
 THREE.extend( THREE.Matrix4.prototype, {
 
-	decompose: function() {
+	decompose: function () {
 
 		var x = new THREE.Vector3();
 		var y = new THREE.Vector3();
@@ -11135,104 +11169,101 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
-	parseObject: function ( data, geometries, materials ) {
+	parseObject: function () {
 
-		var object;
+		var matrix = new THREE.Matrix4();
 
-		switch ( data.type ) {
+		return function ( data, geometries, materials ) {
 
-			case 'Scene':
+			var object;
 
-				object = new THREE.Scene();
+			switch ( data.type ) {
 
-				break;
+				case 'Scene':
 
-			case 'PerspectiveCamera':
+					object = new THREE.Scene();
 
-				object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
+					break;
 
-				break;
+				case 'PerspectiveCamera':
 
-			case 'OrthographicCamera':
+					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
 
-				object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
+					break;
 
-				break;
+				case 'OrthographicCamera':
 
-			case 'AmbientLight':
+					object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
 
-				object = new THREE.AmbientLight( data.color );
+					break;
 
-				break;
+				case 'AmbientLight':
 
-			case 'DirectionalLight':
+					object = new THREE.AmbientLight( data.color );
 
-				object = new THREE.DirectionalLight( data.color, data.intensity );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'DirectionalLight':
 
-			case 'PointLight':
+					object = new THREE.DirectionalLight( data.color, data.intensity );
 
-				object = new THREE.PointLight( data.color, data.intensity, data.distance );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'PointLight':
 
-			case 'SpotLight':
+					object = new THREE.PointLight( data.color, data.intensity, data.distance );
 
-				object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'SpotLight':
 
-			case 'HemisphereLight':
+					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
 
-				object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'HemisphereLight':
 
-			case 'Mesh':
+					object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
 
-				object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
-				object.scale.fromArray( data.scale );
+					break;
 
-				break;
+				case 'Mesh':
 
-			default:
+					object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
 
-				object = new THREE.Object3D();
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
-				object.scale.fromArray( data.scale );
+					break;
 
-		}
+				default:
 
-		if ( data.id !== undefined ) object.id = data.id;
-		if ( data.name !== undefined ) object.name = data.name;
-		if ( data.visible !== undefined ) object.visible = data.visible;
-		if ( data.userData !== undefined ) object.userData = data.userData;
-
-		if ( data.children !== undefined ) {
-
-			for ( var child in data.children ) {
-
-				object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					object = new THREE.Object3D();
 
 			}
 
+			matrix.fromArray( data.matrix );
+			matrix.decompose( object.position, object.quaternion, object.scale );
+
+			object.rotation.updateEuler();
+
+			if ( data.id !== undefined ) object.id = data.id;
+			if ( data.name !== undefined ) object.name = data.name;
+			if ( data.visible !== undefined ) object.visible = data.visible;
+			if ( data.userData !== undefined ) object.userData = data.userData;
+
+			if ( data.children !== undefined ) {
+
+				for ( var child in data.children ) {
+
+					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+
+				}
+
+			}
+
+			return object;
+
 		}
 
-		return object;
-
-	}
+	}()
 
 };
 
