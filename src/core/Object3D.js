@@ -407,7 +407,6 @@ THREE.Object3D.prototype = {
 
 		object.position.copy( this.position );
 		object.quaternion.copy( this.quaternion );
-		object.rotation = new THREE.Rotation( object.quaternion );		
 		object.scale.copy( this.scale );
 
 		object.renderDepth = this.renderDepth;

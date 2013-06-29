@@ -5,79 +5,80 @@
 
 THREE.Rotation = function ( quaternion ) {
 
-    this.euler = new THREE.Euler();
-    this.quaternion = quaternion;
+	this.euler = new THREE.Euler().setFromQuaternion( quaternion );
+	this.quaternion = quaternion;
 
 };
 
 THREE.Rotation.prototype = {
 
-    get x () {
+	get x () {
 
-        return this.euler.x;
+		return this.euler.x;
 
-    },
+	},
 
-    set x ( value ) {
+	set x ( value ) {
 
-        this.euler.x = value;
-        this.quaternion.setFromEuler( this.euler );
+		this.euler.x = value;
+		this.quaternion.setFromEuler( this.euler );
 
-    },
+	},
 
-    get y () {
+	get y () {
 
-        return this.euler.y;
+		return this.euler.y;
 
-    },
+	},
 
-    set y ( value ) {
+	set y ( value ) {
 
-        this.euler.y = value;
-        this.quaternion.setFromEuler( this.euler );
+		this.euler.y = value;
+		this.quaternion.setFromEuler( this.euler );
 
-    },
+	},
 
-    get z () {
+	get z () {
 
-        return this.euler.z;
+		return this.euler.z;
 
-    },
+	},
 
-    set z ( value ) {
+	set z ( value ) {
 
-        this.euler.z = value;
-        this.quaternion.setFromEuler( this.euler );
+		this.euler.z = value;
+		this.quaternion.setFromEuler( this.euler );
 
-    },
+	},
 
-    set: function ( x, y, z ) {
+	set: function ( x, y, z ) {
 
-        this.euler.x = x;
-        this.euler.y = y;
-        this.euler.z = z;
+		this.euler.x = x;
+		this.euler.y = y;
+		this.euler.z = z;
 
-        this.quaternion.setFromEuler( this.euler );
+		this.quaternion.setFromEuler( this.euler );
 
-    },
-  
-    copy: function ( rotation ) {
+	},
 
-        this.quaternion.copy( rotation.quaternion );
+	copy: function ( rotation ) {
 
-    },
+		this.euler.copy( rotation.euler );
+		this.quaternion.setFromEuler( this.euler );
 
-    fromArray: function( array ) {
+	},
 
-        this.euler.fromArray( array );
-        this.quaternion.setFromEuler( this.euler );
+	fromArray: function( array ) {
 
-    },
+		this.euler.fromArray( array );
+		this.quaternion.setFromEuler( this.euler );
 
-    toArray: function () {
+	},
 
-        return this.euler.toArray();
+	toArray: function () {
 
-    }
+		return this.euler.toArray();
+
+	}
 
 };

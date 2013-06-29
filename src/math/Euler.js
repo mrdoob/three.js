@@ -158,11 +158,10 @@ THREE.Euler.prototype = {
 
 			}
 
-		}
-		else {
+		} else {
 
 			console.warn( 'WARNING: Euler.setFromRotationMatrix() given unsupported order: ' + order )
-		
+
 		}
 
 		this.order = order;
@@ -228,11 +227,10 @@ THREE.Euler.prototype = {
 			this.y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw + sqx - sqy - sqz ) );
 			this.z = Math.asin(  clamp( 2 * ( q.z * q.w - q.x * q.y ) ) );
 
-		}
-		else {
+		} else {
 
 			console.warn( 'WARNING: Euler.setFromQuaternion() given unsupported order: ' + order )
-		
+
 		}
 
 		this.order = order;
