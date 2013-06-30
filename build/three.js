@@ -1055,7 +1055,7 @@ THREE.Quaternion.prototype = {
 
 	equals: function ( quaternion ) {
 
-		return ( quaternion._x === this._x ) && ( quaternion._y === this.y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
+		return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
 
 	},
 
@@ -6745,6 +6745,8 @@ THREE.Object3D = function () {
 	this.rotation = new THREE.Euler();
 	this.quaternion = new THREE.Quaternion();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
+
+	// keep rotation and quaternion in sync
 
 	this.rotation._quaternion = this.quaternion;
 	this.quaternion._euler = this.rotation;
