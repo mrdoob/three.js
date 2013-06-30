@@ -17,11 +17,14 @@ THREE.Object3D = function () {
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
+	this.rotation = new THREE.Euler();
 	this.quaternion = new THREE.Quaternion();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
-	// for backwards compatibility (maps changes to this.rotation onto this.quaternion)
-	this.rotation = new THREE.Rotation( this.quaternion );
+	// keep rotation and quaternion in sync
+
+	this.rotation._quaternion = this.quaternion;
+	this.quaternion._euler = this.rotation;
 
 	this.renderDepth = null;
 

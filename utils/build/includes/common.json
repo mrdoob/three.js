@@ -6,7 +6,6 @@
 	"src/math/Vector3.js",
 	"src/math/Vector4.js",
 	"src/math/Euler.js",
-	"src/math/Rotation.js",
 	"src/math/Line3.js",
 	"src/math/Box2.js",
 	"src/math/Box3.js",

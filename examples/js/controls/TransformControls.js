@@ -437,9 +437,9 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						object.rotation.set( 0, 0, 0 );
 
-						if ( name == 'RX' ) object.rotation.setX( Math.atan2( -eye.y, eye.z ) );
-						if ( name == 'RY' ) object.rotation.setY( Math.atan2( eye.x, eye.z ) );
-						if ( name == 'RZ' ) object.rotation.setZ( Math.atan2( eye.y, eye.x ) );
+						if ( name == 'RX' ) object.rotation.x = Math.atan2( -eye.y, eye.z );
+						if ( name == 'RY' ) object.rotation.y = Math.atan2(  eye.x, eye.z );
+						if ( name == 'RZ' ) object.rotation.z = Math.atan2(  eye.y, eye.x );
 
 					}
 

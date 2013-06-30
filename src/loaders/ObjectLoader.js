@@ -265,8 +265,6 @@ THREE.ObjectLoader.prototype = {
 				matrix.fromArray( data.matrix );
 				matrix.decompose( object.position, object.quaternion, object.scale );
 
-				object.rotation.updateEuler();
-
 			} else {
 
 				if ( data.position !== undefined ) object.position.fromArray( data.position );
