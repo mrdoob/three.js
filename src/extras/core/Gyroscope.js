@@ -22,10 +22,10 @@ THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
 
 			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
-			this.matrixWorld.decompose( this.translationWorld, this.rotationWorld, this.scaleWorld );
-			this.matrix.decompose( this.translationObject, this.rotationObject, this.scaleObject );
+			this.matrixWorld.decompose( this.translationWorld, this.quaternionWorld, this.scaleWorld );
+			this.matrix.decompose( this.translationObject, this.quaternionObject, this.scaleObject );
 
-			this.matrixWorld.makeFromPositionQuaternionScale( this.translationWorld, this.rotationObject, this.scaleWorld );
+			this.matrixWorld.compose( this.translationWorld, this.quaternionObject, this.scaleWorld );
 
 
 		} else {
@@ -53,8 +53,8 @@ THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
 
 THREE.Gyroscope.prototype.translationWorld = new THREE.Vector3();
 THREE.Gyroscope.prototype.translationObject = new THREE.Vector3();
-THREE.Gyroscope.prototype.rotationWorld = new THREE.Quaternion();
-THREE.Gyroscope.prototype.rotationObject = new THREE.Quaternion();
+THREE.Gyroscope.prototype.quaternionWorld = new THREE.Quaternion();
+THREE.Gyroscope.prototype.quaternionObject = new THREE.Quaternion();
 THREE.Gyroscope.prototype.scaleWorld = new THREE.Vector3();
 THREE.Gyroscope.prototype.scaleObject = new THREE.Vector3();
 

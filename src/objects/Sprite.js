@@ -24,7 +24,7 @@ THREE.Sprite.prototype.updateMatrix = function () {
 
 	this.rotation3d.set( 0, 0, this.rotation, this.rotation3d.order );
 	this.quaternion.setFromEuler( this.rotation3d );
-	this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
+	this.matrix.compose( this.position, this.quaternion, this.scale );
 
 	this.matrixWorldNeedsUpdate = true;
 

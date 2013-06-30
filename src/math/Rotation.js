@@ -1,12 +1,12 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
-  */
+ */
 
 THREE.Rotation = function ( quaternion ) {
 
 	this.euler = new THREE.Euler();
-	this.quaternion = quaternion;
+	this.__quaternion = quaternion;
 
 	this.updateEuler();
 
@@ -113,7 +113,7 @@ THREE.Rotation.prototype = {
 	setFromQuaternion: function ( quaternion, order ) {
 
 		this.euler.setFromQuaternion( quaternion, order );
-		this.quaternion.copy( quaternion );
+		this.__quaternion.copy( quaternion );
 
 		return this;
 
@@ -122,7 +122,7 @@ THREE.Rotation.prototype = {
 	copy: function ( rotation ) {
 
 		this.euler.copy( rotation.euler );
-		this.quaternion.copy( rotation.quaternion );
+		this.__quaternion.copy( rotation.quaternion );
 
 		return this;
 
@@ -145,7 +145,7 @@ THREE.Rotation.prototype = {
 
 	updateEuler: function () {
 
-		this.euler.setFromQuaternion( this.quaternion );
+		this.euler.setFromQuaternion( this.__quaternion );
 
 		return this;
 
@@ -153,7 +153,7 @@ THREE.Rotation.prototype = {
 
 	updateQuaternion: function () {
 
-		this.quaternion.setFromEuler( this.euler );
+		this.__quaternion.setFromEuler( this.euler );
 
 		return this;
 
