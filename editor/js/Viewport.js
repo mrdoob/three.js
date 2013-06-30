@@ -346,6 +346,27 @@ var Viewport = function ( signals ) {
 
 	} );
 
+	signals.flattenSelectedObject.add( function () {
+
+		var name = selected.name ?  '"' + selected.name + '"': "selected object";
+
+		if ( confirm( 'Flatten ' + name + '?' ) === false ) return;
+
+		delete selected.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+
+		var geometry = selected.geometry.clone();
+		geometry.applyMatrix( selected.matrix );
+
+		selected.setGeometry( geometry );
+
+		selected.position.set( 0, 0, 0 );
+		selected.rotation.set( 0, 0, 0 );
+		selected.scale.set( 1, 1, 1 );
+
+		signals.objectChanged.dispatch( selected );
+
+	} );
+
 	signals.cloneSelectedObject.add( function () {
 
 		if ( selected === camera ) return;

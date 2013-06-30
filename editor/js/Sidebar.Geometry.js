@@ -82,7 +82,7 @@ Sidebar.Geometry = function ( signals ) {
 
 	}
 
-	signals.objectSelected.add( function ( object ) {
+	function build( object ) {
 
 		if ( object && object.geometry ) {
 
@@ -148,17 +148,10 @@ Sidebar.Geometry = function ( signals ) {
 
 		}
 
-	} );
+	}
 
-	signals.objectChanged.add( function ( object ) {
-
-		if ( object && object.geometry ) {
-
-			updateFields( object.geometry );
-
-		}
-
-	} );
+	signals.objectSelected.add( build );
+	signals.objectChanged.add( build );
 
 	//
 
