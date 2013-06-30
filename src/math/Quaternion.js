@@ -415,7 +415,7 @@ THREE.Quaternion.prototype = {
 
 	equals: function ( quaternion ) {
 
-		return ( quaternion._x === this._x ) && ( quaternion._y === this.y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
+		return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
 
 	},
 
