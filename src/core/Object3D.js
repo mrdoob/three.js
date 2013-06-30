@@ -57,6 +57,34 @@ THREE.Object3D.prototype = {
 	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
 	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
+	get eulerOrder () {
+
+		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+
+		return this.rotation.order;
+
+	},
+
+	set eulerOrder ( value ) {
+
+		console.warn( 'DEPRECATED: Object3D\'s .eulerOrder has been moved to Object3D\'s .rotation.order.' );
+
+		this.rotation.order = value;
+
+	},
+
+	get useQuaternion () {
+
+		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+
+	},
+
+	set useQuaternion ( value ) {
+
+		console.warn( 'DEPRECATED: Object3D\'s .useQuaternion has been removed. The library now uses quaternions by default.' );
+
+	},
+
 	applyMatrix: function () {
 
 		var m1 = new THREE.Matrix4();
