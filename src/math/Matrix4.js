@@ -818,29 +818,7 @@ THREE.Matrix4.prototype = {
 
 	compose: function ( position, quaternion, scale ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .compose() has been deprecated in favor of makeFromPositionQuaternionScale. Please update your code.' );
-
-		return this.makeFromPositionQuaternionScale( position, quaternion, scale );
-
-	},
-
-	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
-
 		this.makeRotationFromQuaternion( quaternion );
-		this.scale( scale );
-		this.setPosition( position );
-
-		return this;
-
-	},
-
-	makeFromPositionEulerScale: function ( position, rotation, scale ) {
-
-		if( typeof rotation['order'] === undefined ) {
-			console.error( 'ERROR: Matrix4\'s .makeFromPositionEulerScale() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
-		}
-
-		this.makeRotationFromEuler( rotation );
 		this.scale( scale );
 		this.setPosition( position );
 

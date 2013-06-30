@@ -358,7 +358,7 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
+		this.matrix.compose( this.position, this.quaternion, this.scale );
 
 		this.matrixWorldNeedsUpdate = true;
 
