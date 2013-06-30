@@ -7,13 +7,12 @@
  */
 
 THREE.OculusControls = function ( object ) {
+
 	this.object = object;
 	this.target = new THREE.Vector3( 0, 0, 0 );
 
 	this.headquat = new THREE.Quaternion();
 	this.freeze = false;
-
-	this.object.useQuaternion = true;
 
 	this.loadAjaxJSON = function ( url, callback ) {
 		var xhr = new XMLHttpRequest();

@@ -68,14 +68,13 @@
 				perlin = new ImprovedNoise();
 
 				camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.useQuaternion = true;
 				camera.position.x = 200;
 				camera.position.y = 250;
 				camera.position.z = -200;
 
 				scene = new THREE.Scene();
 
-				effect = new THREE.OculusRiftEffect( renderer, {worldScale: 1} );
+				effect = new THREE.OculusRiftEffect( renderer, { worldScale: 1 } );
 				effect.setSize( window.innerWidth, window.innerHeight );
 
 				controls = new THREE.FirstPersonControls( camera );
