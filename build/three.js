@@ -645,12 +645,12 @@ THREE.ColorKeywords = { "aliceblue": 0xF0F8FF, "antiquewhite": 0xFAEBD7, "aqua":
  * @author bhouston / http://exocortex.com
  */
 
-THREE.Quaternion = function( x, y, z, w ) {
+THREE.Quaternion = function ( x, y, z, w ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	this.w = ( w !== undefined ) ? w : 1;
+	this._x = x || 0;
+	this._y = y || 0;
+	this._z = z || 0;
+	this._w = ( w !== undefined ) ? w : 1;
 
 };
 
@@ -658,29 +658,99 @@ THREE.Quaternion.prototype = {
 
 	constructor: THREE.Quaternion,
 
+	_x: 0,_y: 0, _z: 0, _w: 0,
+
+	_euler: undefined,
+
+	_updateEuler: function ( callback ) {
+
+		if ( this._euler !== undefined ) {
+
+			this._euler.setFromQuaternion( this, undefined, false );
+
+		}
+
+	},
+
+	get x () {
+
+		return this._x;
+
+	},
+
+	set x ( value ) {
+
+		this._x = value;
+		this._updateEuler();
+
+	},
+
+	get y () {
+
+		return this._y;
+
+	},
+
+	set y ( value ) {
+
+		this._y = value;
+		this._updateEuler();
+
+	},
+
+	get z () {
+
+		return this._z;
+
+	},
+
+	set z ( value ) {
+
+		this._z = value;
+		this._updateEuler();
+
+	},
+
+	get w () {
+
+		return this._w;
+
+	},
+
+	set w ( value ) {
+
+		this._w = value;
+		this._updateEuler();
+
+	},
+
 	set: function ( x, y, z, w ) {
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.w = w;
+		this._x = x;
+		this._y = y;
+		this._z = z;
+		this._w = w;
+
+		this._updateEuler();
 
 		return this;
 
 	},
 
-	copy: function ( q ) {
+	copy: function ( quaternion ) {
 
-		this.x = q.x;
-		this.y = q.y;
-		this.z = q.z;
-		this.w = q.w;
+		this._x = quaternion._x;
+		this._y = quaternion._y;
+		this._z = quaternion._z;
+		this._w = quaternion._w;
+
+		this._updateEuler();
 
 		return this;
 
 	},
 
-	setFromEuler: function ( euler ) {
+	setFromEuler: function ( euler, update ) {
 
 		if ( typeof euler['order'] === undefined ) {
 
@@ -691,56 +761,58 @@ THREE.Quaternion.prototype = {
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
 		//	content/SpinCalc.m
 
-		var c1 = Math.cos( euler.x / 2 );
-		var c2 = Math.cos( euler.y / 2 );
-		var c3 = Math.cos( euler.z / 2 );
-		var s1 = Math.sin( euler.x / 2 );
-		var s2 = Math.sin( euler.y / 2 );
-		var s3 = Math.sin( euler.z / 2 );
+		var c1 = Math.cos( euler._x / 2 );
+		var c2 = Math.cos( euler._y / 2 );
+		var c3 = Math.cos( euler._z / 2 );
+		var s1 = Math.sin( euler._x / 2 );
+		var s2 = Math.sin( euler._y / 2 );
+		var s3 = Math.sin( euler._z / 2 );
 
 		if ( euler.order === undefined || euler.order === 'XYZ' ) {
 
-			this.x = s1 * c2 * c3 + c1 * s2 * s3;
-			this.y = c1 * s2 * c3 - s1 * c2 * s3;
-			this.z = c1 * c2 * s3 + s1 * s2 * c3;
-			this.w = c1 * c2 * c3 - s1 * s2 * s3;
+			this._x = s1 * c2 * c3 + c1 * s2 * s3;
+			this._y = c1 * s2 * c3 - s1 * c2 * s3;
+			this._z = c1 * c2 * s3 + s1 * s2 * c3;
+			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
 		} else if ( euler.order === 'YXZ' ) {
 
-			this.x = s1 * c2 * c3 + c1 * s2 * s3;
-			this.y = c1 * s2 * c3 - s1 * c2 * s3;
-			this.z = c1 * c2 * s3 - s1 * s2 * c3;
-			this.w = c1 * c2 * c3 + s1 * s2 * s3;
+			this._x = s1 * c2 * c3 + c1 * s2 * s3;
+			this._y = c1 * s2 * c3 - s1 * c2 * s3;
+			this._z = c1 * c2 * s3 - s1 * s2 * c3;
+			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
 		} else if ( euler.order === 'ZXY' ) {
 
-			this.x = s1 * c2 * c3 - c1 * s2 * s3;
-			this.y = c1 * s2 * c3 + s1 * c2 * s3;
-			this.z = c1 * c2 * s3 + s1 * s2 * c3;
-			this.w = c1 * c2 * c3 - s1 * s2 * s3;
+			this._x = s1 * c2 * c3 - c1 * s2 * s3;
+			this._y = c1 * s2 * c3 + s1 * c2 * s3;
+			this._z = c1 * c2 * s3 + s1 * s2 * c3;
+			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
 		} else if ( euler.order === 'ZYX' ) {
 
-			this.x = s1 * c2 * c3 - c1 * s2 * s3;
-			this.y = c1 * s2 * c3 + s1 * c2 * s3;
-			this.z = c1 * c2 * s3 - s1 * s2 * c3;
-			this.w = c1 * c2 * c3 + s1 * s2 * s3;
+			this._x = s1 * c2 * c3 - c1 * s2 * s3;
+			this._y = c1 * s2 * c3 + s1 * c2 * s3;
+			this._z = c1 * c2 * s3 - s1 * s2 * c3;
+			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
 		} else if ( euler.order === 'YZX' ) {
 
-			this.x = s1 * c2 * c3 + c1 * s2 * s3;
-			this.y = c1 * s2 * c3 + s1 * c2 * s3;
-			this.z = c1 * c2 * s3 - s1 * s2 * c3;
-			this.w = c1 * c2 * c3 - s1 * s2 * s3;
+			this._x = s1 * c2 * c3 + c1 * s2 * s3;
+			this._y = c1 * s2 * c3 + s1 * c2 * s3;
+			this._z = c1 * c2 * s3 - s1 * s2 * c3;
+			this._w = c1 * c2 * c3 - s1 * s2 * s3;
 
 		} else if ( euler.order === 'XZY' ) {
 
-			this.x = s1 * c2 * c3 - c1 * s2 * s3;
-			this.y = c1 * s2 * c3 - s1 * c2 * s3;
-			this.z = c1 * c2 * s3 + s1 * s2 * c3;
-			this.w = c1 * c2 * c3 + s1 * s2 * s3;
+			this._x = s1 * c2 * c3 - c1 * s2 * s3;
+			this._y = c1 * s2 * c3 - s1 * c2 * s3;
+			this._z = c1 * c2 * s3 + s1 * s2 * c3;
+			this._w = c1 * c2 * c3 + s1 * s2 * s3;
 
 		}
+
+		if ( update !== false ) this._updateEuler();
 
 		return this;
 
@@ -751,13 +823,14 @@ THREE.Quaternion.prototype = {
 		// from http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
 		// axis have to be normalized
 
-		var halfAngle = angle / 2,
-			s = Math.sin( halfAngle );
+		var halfAngle = angle / 2, s = Math.sin( halfAngle );
 
-		this.x = axis.x * s;
-		this.y = axis.y * s;
-		this.z = axis.z * s;
-		this.w = Math.cos( halfAngle );
+		this._x = axis.x * s;
+		this._y = axis.y * s;
+		this._z = axis.z * s;
+		this._w = Math.cos( halfAngle );
+
+		this._updateEuler();
 
 		return this;
 
@@ -782,39 +855,41 @@ THREE.Quaternion.prototype = {
 
 			s = 0.5 / Math.sqrt( trace + 1.0 );
 
-			this.w = 0.25 / s;
-			this.x = ( m32 - m23 ) * s;
-			this.y = ( m13 - m31 ) * s;
-			this.z = ( m21 - m12 ) * s;
+			this._w = 0.25 / s;
+			this._x = ( m32 - m23 ) * s;
+			this._y = ( m13 - m31 ) * s;
+			this._z = ( m21 - m12 ) * s;
 
 		} else if ( m11 > m22 && m11 > m33 ) {
 
 			s = 2.0 * Math.sqrt( 1.0 + m11 - m22 - m33 );
 
-			this.w = (m32 - m23 ) / s;
-			this.x = 0.25 * s;
-			this.y = (m12 + m21 ) / s;
-			this.z = (m13 + m31 ) / s;
+			this._w = (m32 - m23 ) / s;
+			this._x = 0.25 * s;
+			this._y = (m12 + m21 ) / s;
+			this._z = (m13 + m31 ) / s;
 
 		} else if ( m22 > m33 ) {
 
 			s = 2.0 * Math.sqrt( 1.0 + m22 - m11 - m33 );
 
-			this.w = (m13 - m31 ) / s;
-			this.x = (m12 + m21 ) / s;
-			this.y = 0.25 * s;
-			this.z = (m23 + m32 ) / s;
+			this._w = (m13 - m31 ) / s;
+			this._x = (m12 + m21 ) / s;
+			this._y = 0.25 * s;
+			this._z = (m23 + m32 ) / s;
 
 		} else {
 
 			s = 2.0 * Math.sqrt( 1.0 + m33 - m11 - m22 );
 
-			this.w = ( m21 - m12 ) / s;
-			this.x = ( m13 + m31 ) / s;
-			this.y = ( m23 + m32 ) / s;
-			this.z = 0.25 * s;
+			this._w = ( m21 - m12 ) / s;
+			this._x = ( m13 + m31 ) / s;
+			this._y = ( m23 + m32 ) / s;
+			this._z = 0.25 * s;
 
 		}
+
+		this._updateEuler();
 
 		return this;
 
@@ -830,9 +905,11 @@ THREE.Quaternion.prototype = {
 
 	conjugate: function () {
 
-		this.x *= -1;
-		this.y *= -1;
-		this.z *= -1;
+		this._x *= -1;
+		this._y *= -1;
+		this._z *= -1;
+
+		this._updateEuler();
 
 		return this;
 
@@ -840,13 +917,13 @@ THREE.Quaternion.prototype = {
 
 	lengthSq: function () {
 
-		return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
+		return this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w;
 
 	},
 
 	length: function () {
 
-		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
+		return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w );
 
 	},
 
@@ -856,19 +933,19 @@ THREE.Quaternion.prototype = {
 
 		if ( l === 0 ) {
 
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-			this.w = 1;
+			this._x = 0;
+			this._y = 0;
+			this._z = 0;
+			this._w = 1;
 
 		} else {
 
 			l = 1 / l;
 
-			this.x = this.x * l;
-			this.y = this.y * l;
-			this.z = this.z * l;
-			this.w = this.w * l;
+			this._x = this._x * l;
+			this._y = this._y * l;
+			this._z = this._z * l;
+			this._w = this._w * l;
 
 		}
 
@@ -893,13 +970,15 @@ THREE.Quaternion.prototype = {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 
-		var qax = a.x, qay = a.y, qaz = a.z, qaw = a.w;
-		var qbx = b.x, qby = b.y, qbz = b.z, qbw = b.w;
+		var qax = a._x, qay = a._y, qaz = a._z, qaw = a._w;
+		var qbx = b._x, qby = b._y, qbz = b._z, qbw = b._w;
 
-		this.x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
-		this.y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
-		this.z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
-		this.w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
+		this._x = qax * qbw + qaw * qbx + qay * qbz - qaz * qby;
+		this._y = qay * qbw + qaw * qby + qaz * qbx - qax * qbz;
+		this._z = qaz * qbw + qaw * qbz + qax * qby - qay * qbx;
+		this._w = qaw * qbw - qax * qbx - qay * qby - qaz * qbz;
+
+		this._updateEuler();
 
 		return this;
 
@@ -914,18 +993,18 @@ THREE.Quaternion.prototype = {
 
 	slerp: function ( qb, t ) {
 
-		var x = this.x, y = this.y, z = this.z, w = this.w;
+		var x = this._x, y = this._y, z = this._z, w = this._w;
 
 		// http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/slerp/
 
-		var cosHalfTheta = w * qb.w + x * qb.x + y * qb.y + z * qb.z;
+		var cosHalfTheta = w * qb._w + x * qb._x + y * qb._y + z * qb._z;
 
 		if ( cosHalfTheta < 0 ) {
 
-			this.w = -qb.w;
-			this.x = -qb.x;
-			this.y = -qb.y;
-			this.z = -qb.z;
+			this._w = -qb._w;
+			this._x = -qb._x;
+			this._y = -qb._y;
+			this._z = -qb._z;
 
 			cosHalfTheta = -cosHalfTheta;
 
@@ -937,10 +1016,10 @@ THREE.Quaternion.prototype = {
 
 		if ( cosHalfTheta >= 1.0 ) {
 
-			this.w = w;
-			this.x = x;
-			this.y = y;
-			this.z = z;
+			this._w = w;
+			this._x = x;
+			this._y = y;
+			this._z = z;
 
 			return this;
 
@@ -951,10 +1030,10 @@ THREE.Quaternion.prototype = {
 
 		if ( Math.abs( sinHalfTheta ) < 0.001 ) {
 
-			this.w = 0.5 * ( w + this.w );
-			this.x = 0.5 * ( x + this.x );
-			this.y = 0.5 * ( y + this.y );
-			this.z = 0.5 * ( z + this.z );
+			this._w = 0.5 * ( w + this._w );
+			this._x = 0.5 * ( x + this._x );
+			this._y = 0.5 * ( y + this._y );
+			this._z = 0.5 * ( z + this._z );
 
 			return this;
 
@@ -963,27 +1042,31 @@ THREE.Quaternion.prototype = {
 		var ratioA = Math.sin( ( 1 - t ) * halfTheta ) / sinHalfTheta,
 		ratioB = Math.sin( t * halfTheta ) / sinHalfTheta;
 
-		this.w = ( w * ratioA + this.w * ratioB );
-		this.x = ( x * ratioA + this.x * ratioB );
-		this.y = ( y * ratioA + this.y * ratioB );
-		this.z = ( z * ratioA + this.z * ratioB );
+		this._w = ( w * ratioA + this._w * ratioB );
+		this._x = ( x * ratioA + this._x * ratioB );
+		this._y = ( y * ratioA + this._y * ratioB );
+		this._z = ( z * ratioA + this._z * ratioB );
+
+		this._updateEuler();
 
 		return this;
 
 	},
 
-	equals: function ( v ) {
+	equals: function ( quaternion ) {
 
-		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
+		return ( quaternion._x === this._x ) && ( quaternion._y === this.y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
 
 	},
 
 	fromArray: function ( array ) {
 
-		this.x = array[ 0 ];
-		this.y = array[ 1 ];
-		this.z = array[ 2 ];
-		this.w = array[ 3 ];
+		this._x = array[ 0 ];
+		this._y = array[ 1 ];
+		this._z = array[ 2 ];
+		this._w = array[ 3 ];
+
+		this._updateEuler();
 
 		return this;
 
@@ -991,13 +1074,13 @@ THREE.Quaternion.prototype = {
 
 	toArray: function () {
 
-		return [ this.x, this.y, this.z, this.w ];
+		return [ this._x, this._y, this._z, this._w ];
 
 	},
 
 	clone: function () {
 
-		return new THREE.Quaternion( this.x, this.y, this.z, this.w );
+		return new THREE.Quaternion( this._x, this._y, this._z, this._w );
 
 	}
 
@@ -2590,10 +2673,10 @@ THREE.Vector4.prototype = {
 
 THREE.Euler = function ( x, y, z, order ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	this.order = order || THREE.Euler.DefaultOrder;
+	this._x = x || 0;
+	this._y = y || 0;
+	this._z = z || 0;
+	this._order = order || THREE.Euler.DefaultOrder;
 
 };
 
@@ -2605,23 +2688,93 @@ THREE.Euler.prototype = {
 
 	constructor: THREE.Euler,
 
+	_x: 0, _y: 0, _z: 0, _order: THREE.Euler.DefaultOrder,
+
+	_quaternion: undefined,
+
+	_updateQuaternion: function () {
+
+		if ( this._quaternion !== undefined ) {
+
+			this._quaternion.setFromEuler( this, false );
+
+		}
+
+	},
+
+	get x () {
+
+		return this._x;
+
+	},
+
+	set x ( value ) {
+
+		this._x = value;
+		this._updateQuaternion();
+
+	},
+
+	get y () {
+
+		return this._y;
+
+	},
+
+	set y ( value ) {
+
+		this._y = value;
+		this._updateQuaternion();
+
+	},
+
+	get z () {
+
+		return this._z;
+
+	},
+
+	set z ( value ) {
+
+		this._z = value;
+		this._updateQuaternion();
+
+	},
+
+	get order () {
+
+		return this._order;
+
+	},
+
+	set order ( value ) {
+
+		this._order = value;
+		this._updateQuaternion();
+
+	},
+
 	set: function ( x, y, z, order ) {
 
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.order = order || this.order;
+		this._x = x;
+		this._y = y;
+		this._z = z;
+		this._order = order || this._order;
+
+		this._updateQuaternion();
 
 		return this;
 
 	},
 
-	copy: function ( e ) {
+	copy: function ( euler ) {
 
-		this.x = e.x;
-		this.y = e.y;
-		this.z = e.z;
-		this.order = e.order;
+		this._x = euler._x;
+		this._y = euler._y;
+		this._z = euler._z;
+		this._order = euler._order;
+
+		this._updateQuaternion();
 
 		return this;
 
@@ -2644,101 +2797,101 @@ THREE.Euler.prototype = {
 		var m21 = te[1], m22 = te[5], m23 = te[9];
 		var m31 = te[2], m32 = te[6], m33 = te[10];
 
-		order = order || this.order;
+		order = order || this._order;
 
 		if ( order === 'XYZ' ) {
 
-			this.y = Math.asin( clamp( m13 ) );
+			this._y = Math.asin( clamp( m13 ) );
 
 			if ( Math.abs( m13 ) < 0.99999 ) {
 
-				this.x = Math.atan2( - m23, m33 );
-				this.z = Math.atan2( - m12, m11 );
+				this._x = Math.atan2( - m23, m33 );
+				this._z = Math.atan2( - m12, m11 );
 
 			} else {
 
-				this.x = Math.atan2( m32, m22 );
-				this.z = 0;
+				this._x = Math.atan2( m32, m22 );
+				this._z = 0;
 
 			}
 
 		} else if ( order === 'YXZ' ) {
 
-			this.x = Math.asin( - clamp( m23 ) );
+			this._x = Math.asin( - clamp( m23 ) );
 
 			if ( Math.abs( m23 ) < 0.99999 ) {
 
-				this.y = Math.atan2( m13, m33 );
-				this.z = Math.atan2( m21, m22 );
+				this._y = Math.atan2( m13, m33 );
+				this._z = Math.atan2( m21, m22 );
 
 			} else {
 
-				this.y = Math.atan2( - m31, m11 );
-				this.z = 0;
+				this._y = Math.atan2( - m31, m11 );
+				this._z = 0;
 
 			}
 
 		} else if ( order === 'ZXY' ) {
 
-			this.x = Math.asin( clamp( m32 ) );
+			this._x = Math.asin( clamp( m32 ) );
 
 			if ( Math.abs( m32 ) < 0.99999 ) {
 
-				this.y = Math.atan2( - m31, m33 );
-				this.z = Math.atan2( - m12, m22 );
+				this._y = Math.atan2( - m31, m33 );
+				this._z = Math.atan2( - m12, m22 );
 
 			} else {
 
-				this.y = 0;
-				this.z = Math.atan2( m21, m11 );
+				this._y = 0;
+				this._z = Math.atan2( m21, m11 );
 
 			}
 
 		} else if ( order === 'ZYX' ) {
 
-			this.y = Math.asin( - clamp( m31 ) );
+			this._y = Math.asin( - clamp( m31 ) );
 
 			if ( Math.abs( m31 ) < 0.99999 ) {
 
-				this.x = Math.atan2( m32, m33 );
-				this.z = Math.atan2( m21, m11 );
+				this._x = Math.atan2( m32, m33 );
+				this._z = Math.atan2( m21, m11 );
 
 			} else {
 
-				this.x = 0;
-				this.z = Math.atan2( - m12, m22 );
+				this._x = 0;
+				this._z = Math.atan2( - m12, m22 );
 
 			}
 
 		} else if ( order === 'YZX' ) {
 
-			this.z = Math.asin( clamp( m21 ) );
+			this._z = Math.asin( clamp( m21 ) );
 
 			if ( Math.abs( m21 ) < 0.99999 ) {
 
-				this.x = Math.atan2( - m23, m22 );
-				this.y = Math.atan2( - m31, m11 );
+				this._x = Math.atan2( - m23, m22 );
+				this._y = Math.atan2( - m31, m11 );
 
 			} else {
 
-				this.x = 0;
-				this.y = Math.atan2( m13, m33 );
+				this._x = 0;
+				this._y = Math.atan2( m13, m33 );
 
 			}
 
 		} else if ( order === 'XZY' ) {
 
-			this.z = Math.asin( - clamp( m12 ) );
+			this._z = Math.asin( - clamp( m12 ) );
 
 			if ( Math.abs( m12 ) < 0.99999 ) {
 
-				this.x = Math.atan2( m32, m22 );
-				this.y = Math.atan2( m13, m11 );
+				this._x = Math.atan2( m32, m22 );
+				this._y = Math.atan2( m13, m11 );
 
 			} else {
 
-				this.x = Math.atan2( - m23, m33 );
-				this.y = 0;
+				this._x = Math.atan2( - m23, m33 );
+				this._y = 0;
 
 			}
 
@@ -2748,13 +2901,15 @@ THREE.Euler.prototype = {
 
 		}
 
-		this.order = order;
+		this._order = order;
+
+		this._updateQuaternion();
 
 		return this;
 
 	},
 
-	setFromQuaternion: function ( q, order ) {
+	setFromQuaternion: function ( q, order, update ) {
 
 		// q is assumed to be normalized
 
@@ -2773,43 +2928,43 @@ THREE.Euler.prototype = {
 		var sqz = q.z * q.z;
 		var sqw = q.w * q.w;
 
-		order = order || this.order;
+		order = order || this._order;
 
 		if ( order === 'XYZ' ) {
 
-			this.x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( sqw - sqx - sqy + sqz ) );
-			this.y = Math.asin(  clamp( 2 * ( q.x * q.z + q.y * q.w ) ) );
-			this.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw + sqx - sqy - sqz ) );
+			this._x = Math.atan2( 2 * ( q.x * q.w - q.y * q.z ), ( sqw - sqx - sqy + sqz ) );
+			this._y = Math.asin(  clamp( 2 * ( q.x * q.z + q.y * q.w ) ) );
+			this._z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw + sqx - sqy - sqz ) );
 
 		} else if ( order ===  'YXZ' ) {
 
-			this.x = Math.asin(  clamp( 2 * ( q.x * q.w - q.y * q.z ) ) );
-			this.y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw - sqx - sqy + sqz ) );
-			this.z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw - sqx + sqy - sqz ) );
+			this._x = Math.asin(  clamp( 2 * ( q.x * q.w - q.y * q.z ) ) );
+			this._y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw - sqx - sqy + sqz ) );
+			this._z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw - sqx + sqy - sqz ) );
 
 		} else if ( order === 'ZXY' ) {
 
-			this.x = Math.asin(  clamp( 2 * ( q.x * q.w + q.y * q.z ) ) );
-			this.y = Math.atan2( 2 * ( q.y * q.w - q.z * q.x ), ( sqw - sqx - sqy + sqz ) );
-			this.z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw - sqx + sqy - sqz ) );
+			this._x = Math.asin(  clamp( 2 * ( q.x * q.w + q.y * q.z ) ) );
+			this._y = Math.atan2( 2 * ( q.y * q.w - q.z * q.x ), ( sqw - sqx - sqy + sqz ) );
+			this._z = Math.atan2( 2 * ( q.z * q.w - q.x * q.y ), ( sqw - sqx + sqy - sqz ) );
 
 		} else if ( order === 'ZYX' ) {
 
-			this.x = Math.atan2( 2 * ( q.x * q.w + q.z * q.y ), ( sqw - sqx - sqy + sqz ) );
-			this.y = Math.asin(  clamp( 2 * ( q.y * q.w - q.x * q.z ) ) );
-			this.z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw + sqx - sqy - sqz ) );
+			this._x = Math.atan2( 2 * ( q.x * q.w + q.z * q.y ), ( sqw - sqx - sqy + sqz ) );
+			this._y = Math.asin(  clamp( 2 * ( q.y * q.w - q.x * q.z ) ) );
+			this._z = Math.atan2( 2 * ( q.x * q.y + q.z * q.w ), ( sqw + sqx - sqy - sqz ) );
 
 		} else if ( order === 'YZX' ) {
 
-			this.x = Math.atan2( 2 * ( q.x * q.w - q.z * q.y ), ( sqw - sqx + sqy - sqz ) );
-			this.y = Math.atan2( 2 * ( q.y * q.w - q.x * q.z ), ( sqw + sqx - sqy - sqz ) );
-			this.z = Math.asin(  clamp( 2 * ( q.x * q.y + q.z * q.w ) ) );
+			this._x = Math.atan2( 2 * ( q.x * q.w - q.z * q.y ), ( sqw - sqx + sqy - sqz ) );
+			this._y = Math.atan2( 2 * ( q.y * q.w - q.x * q.z ), ( sqw + sqx - sqy - sqz ) );
+			this._z = Math.asin(  clamp( 2 * ( q.x * q.y + q.z * q.w ) ) );
 
 		} else if ( order === 'XZY' ) {
 
-			this.x = Math.atan2( 2 * ( q.x * q.w + q.y * q.z ), ( sqw - sqx + sqy - sqz ) );
-			this.y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw + sqx - sqy - sqz ) );
-			this.z = Math.asin(  clamp( 2 * ( q.z * q.w - q.x * q.y ) ) );
+			this._x = Math.atan2( 2 * ( q.x * q.w + q.y * q.z ), ( sqw - sqx + sqy - sqz ) );
+			this._y = Math.atan2( 2 * ( q.x * q.z + q.y * q.w ), ( sqw + sqx - sqy - sqz ) );
+			this._z = Math.asin(  clamp( 2 * ( q.z * q.w - q.x * q.y ) ) );
 
 		} else {
 
@@ -2817,19 +2972,21 @@ THREE.Euler.prototype = {
 
 		}
 
-		this.order = order;
+		this._order = order;
+
+		if ( update !== false ) this._updateQuaternion();
 
 		return this;
 
 	},
 
-	reorder: function() {
+	reorder: function () {
 
 		// WARNING: this discards revolution information -bhouston
 
 		var q = new THREE.Quaternion();
 
-		return function( newOrder ) {
+		return function ( newOrder ) {
 
 			q.setFromEuler( this );
 			this.setFromQuaternion( q, newOrder );
@@ -2841,10 +2998,12 @@ THREE.Euler.prototype = {
 
 	fromArray: function ( array ) {
 
-		this.x = array[ 0 ];
-		this.y = array[ 1 ];
-		this.z = array[ 2 ];
-		this.order = array[ 3 ];
+		this._x = array[ 0 ];
+		this._y = array[ 1 ];
+		this._z = array[ 2 ];
+		this._order = array[ 3 ];
+
+		this._updateQuaternion();
 
 		return this;
 
@@ -2852,182 +3011,19 @@ THREE.Euler.prototype = {
 
 	toArray: function () {
 
-		return [ this.x, this.y, this.z, this.order ];
+		return [ this._x, this._y, this._z, this._order ];
 
 	},
 
-	equals: function ( rotation ) {
+	equals: function ( euler ) {
 
-		return ( ( rotation.x === this.x ) && ( rotation.y === this.y ) && ( rotation.z === this.z ) && ( rotation.order === this.order ) );
+		return ( euler._x === this._x ) && ( euler._y === this._y ) && ( euler._z === this._z ) && ( euler._order === this._order );
 
 	},
 
 	clone: function () {
 
-		return new THREE.Euler( this.x, this.y, this.z, this.order );
-
-	}
-
-};
-
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author bhouston / http://exocortex.com/
-  */
-
-THREE.Rotation = function ( quaternion ) {
-
-	this.euler = new THREE.Euler();
-	this.quaternion = quaternion;
-
-	this.updateEuler();
-
-};
-
-THREE.Rotation.prototype = {
-
-	get x () {
-
-		return this.euler.x;
-
-	},
-
-	set x ( value ) {
-
-		this.euler.x = value;
-		this.updateQuaternion();
-
-	},
-
-	get y () {
-
-		return this.euler.y;
-
-	},
-
-	set y ( value ) {
-
-		this.euler.y = value;
-		this.updateQuaternion();
-
-	},
-
-	get z () {
-
-		return this.euler.z;
-
-	},
-
-	set z ( value ) {
-
-		this.euler.z = value;
-		this.updateQuaternion();
-
-	},
-
-	//
-
-	set: function ( x, y, z ) {
-
-		this.euler.x = x;
-		this.euler.y = y;
-		this.euler.z = z;
-
-		this.updateQuaternion();
-
-		return this;
-
-	},
-
-	setX: function ( x ) {
-
-		this.euler.x = x;
-		this.updateQuaternion();
-
-		return this;
-
-	},
-
-	setY: function ( y ) {
-
-		this.euler.y = y;
-		this.updateQuaternion();
-
-		return this;
-
-	},
-
-	setZ: function ( z ) {
-
-		this.euler.z = z;
-		this.updateQuaternion();
-
-		return this;
-
-	},
-
-	setEulerFromRotationMatrix: function ( matrix, order ) {
-
-		console.warn( 'DEPRECATED: Rotation\'s .setEulerFromRotationMatrix() has been renamed to .setFromRotationMatrix().' );
-		return this.setFromRotationMatrix( matrix, order );
-
-	},
-
-	setFromRotationMatrix: function ( matrix, order ) {
-
-		this.euler.setFromRotationMatrix( matrix, order );
-		this.updateQuaternion();
-
-		return this;
-
-	},
-
-	setFromQuaternion: function ( quaternion, order ) {
-
-		this.euler.setFromQuaternion( quaternion, order );
-		this.quaternion.copy( quaternion );
-
-		return this;
-
-	},
-
-	copy: function ( rotation ) {
-
-		this.euler.copy( rotation.euler );
-		this.quaternion.copy( rotation.quaternion );
-
-		return this;
-
-	},
-
-	fromArray: function ( array ) {
-
-		this.euler.fromArray( array );
-		this.updateQuaternion();
-
-		return this;
-
-	},
-
-	toArray: function () {
-
-		return this.euler.toArray();
-
-	},
-
-	updateEuler: function () {
-
-		this.euler.setFromQuaternion( this.quaternion );
-
-		return this;
-
-	},
-
-	updateQuaternion: function () {
-
-		this.quaternion.setFromEuler( this.euler );
-
-		return this;
+		return new THREE.Euler( this._x, this._y, this._z, this._order );
 
 	}
 
@@ -4843,29 +4839,7 @@ THREE.Matrix4.prototype = {
 
 	compose: function ( position, quaternion, scale ) {
 
-		console.warn( 'DEPRECATED: Matrix4\'s .compose() has been deprecated in favor of makeFromPositionQuaternionScale. Please update your code.' );
-
-		return this.makeFromPositionQuaternionScale( position, quaternion, scale );
-
-	},
-
-	makeFromPositionQuaternionScale: function ( position, quaternion, scale ) {
-
 		this.makeRotationFromQuaternion( quaternion );
-		this.scale( scale );
-		this.setPosition( position );
-
-		return this;
-
-	},
-
-	makeFromPositionEulerScale: function ( position, rotation, scale ) {
-
-		if( typeof rotation['order'] === undefined ) {
-			console.error( 'ERROR: Matrix4\'s .makeFromPositionEulerScale() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
-		}
-
-		this.makeRotationFromEuler( rotation );
 		this.scale( scale );
 		this.setPosition( position );
 
@@ -6768,11 +6742,12 @@ THREE.Object3D = function () {
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
+	this.rotation = new THREE.Euler();
 	this.quaternion = new THREE.Quaternion();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
-	// for backwards compatibility (maps changes to this.rotation onto this.quaternion)
-	this.rotation = new THREE.Rotation( this.quaternion );
+	this.rotation._quaternion = this.quaternion;
+	this.quaternion._euler = this.rotation;
 
 	this.renderDepth = null;
 
@@ -7109,7 +7084,7 @@ THREE.Object3D.prototype = {
 
 	updateMatrix: function () {
 
-		this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
+		this.matrix.compose( this.position, this.quaternion, this.scale );
 
 		this.matrixWorldNeedsUpdate = true;
 
@@ -11252,8 +11227,6 @@ THREE.ObjectLoader.prototype = {
 				matrix.fromArray( data.matrix );
 				matrix.decompose( object.position, object.quaternion, object.scale );
 
-				object.rotation.updateEuler();
-
 			} else {
 
 				if ( data.position !== undefined ) object.position.fromArray( data.position );
@@ -14630,7 +14603,7 @@ THREE.Sprite.prototype.updateMatrix = function () {
 
 	this.rotation3d.set( 0, 0, this.rotation, this.rotation3d.order );
 	this.quaternion.setFromEuler( this.rotation3d );
-	this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
+	this.matrix.compose( this.position, this.quaternion, this.scale );
 
 	this.matrixWorldNeedsUpdate = true;
 
@@ -29163,10 +29136,10 @@ THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
 
 			this.matrixWorld.multiplyMatrices( this.parent.matrixWorld, this.matrix );
 
-			this.matrixWorld.decompose( this.translationWorld, this.rotationWorld, this.scaleWorld );
-			this.matrix.decompose( this.translationObject, this.rotationObject, this.scaleObject );
+			this.matrixWorld.decompose( this.translationWorld, this.quaternionWorld, this.scaleWorld );
+			this.matrix.decompose( this.translationObject, this.quaternionObject, this.scaleObject );
 
-			this.matrixWorld.makeFromPositionQuaternionScale( this.translationWorld, this.rotationObject, this.scaleWorld );
+			this.matrixWorld.compose( this.translationWorld, this.quaternionObject, this.scaleWorld );
 
 
 		} else {
@@ -29194,8 +29167,8 @@ THREE.Gyroscope.prototype.updateMatrixWorld = function ( force ) {
 
 THREE.Gyroscope.prototype.translationWorld = new THREE.Vector3();
 THREE.Gyroscope.prototype.translationObject = new THREE.Vector3();
-THREE.Gyroscope.prototype.rotationWorld = new THREE.Quaternion();
-THREE.Gyroscope.prototype.rotationObject = new THREE.Quaternion();
+THREE.Gyroscope.prototype.quaternionWorld = new THREE.Quaternion();
+THREE.Gyroscope.prototype.quaternionObject = new THREE.Quaternion();
 THREE.Gyroscope.prototype.scaleWorld = new THREE.Vector3();
 THREE.Gyroscope.prototype.scaleObject = new THREE.Vector3();
 
