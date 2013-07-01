@@ -19,20 +19,20 @@ Menubar.Edit = function ( signals ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
-	// flatten
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Flatten' );
-	option.onClick( function () { signals.flattenSelectedObject.dispatch(); } );
-	options.add( option );
-
 	// clone
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Clone' );
 	option.onClick( function () { signals.cloneSelectedObject.dispatch(); } );
+	options.add( option );
+
+	// flatten
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Flatten' );
+	option.onClick( function () { signals.flattenSelectedObject.dispatch(); } );
 	options.add( option );
 
 	// delete
