@@ -16,9 +16,6 @@ self.console = self.console || {
 
 };
 
-self.Int32Array = self.Int32Array || Array;
-self.Float32Array = self.Float32Array || Array;
-
 String.prototype.trim = String.prototype.trim || function () {
 
 	return this.replace( /^\s+|\s+$/g, '' );
