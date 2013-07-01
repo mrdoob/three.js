@@ -334,7 +334,7 @@ THREE.Euler.prototype = {
 		this._x = array[ 0 ];
 		this._y = array[ 1 ];
 		this._z = array[ 2 ];
-		this._order = array[ 3 ];
+		if ( array[ 3 ] !== undefined ) this._order = array[ 3 ];
 
 		this._updateQuaternion();
 
