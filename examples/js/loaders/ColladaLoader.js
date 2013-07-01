@@ -886,11 +886,7 @@ THREE.ColladaLoader = function () {
 
 		obj.name = node.name || node.id || "";
 		obj.matrix = node.matrix;
-
-		var props = node.matrix.decompose();
-		obj.position = props[ 0 ];
-		obj.quaternion = props[ 1 ];
-		obj.scale = props[ 2 ];
+		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 
 		if ( options.centerGeometry && obj.geometry ) {
 
