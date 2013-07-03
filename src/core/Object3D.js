@@ -125,6 +125,42 @@ THREE.Object3D.prototype = {
 
 	}(),
 
+	rotateX: function () {
+
+		var v1 = new THREE.Vector3( 1, 0, 0 );
+
+		return function ( angle ) {
+
+			return this.rotateOnAxis( v1, angle );
+
+		};
+
+	}(),
+
+	rotateY: function () {
+
+		var v1 = new THREE.Vector3( 0, 1, 0 );
+
+		return function ( angle ) {
+
+			return this.rotateOnAxis( v1, angle );
+
+		};
+
+	}(),
+
+	rotateZ: function () {
+
+		var v1 = new THREE.Vector3( 0, 0, 1 );
+
+		return function ( angle ) {
+
+			return this.rotateOnAxis( v1, angle );
+
+		};
+
+	}(),
+
 	translateOnAxis: function () {
 
 		// translate object by distance along axis in object space
