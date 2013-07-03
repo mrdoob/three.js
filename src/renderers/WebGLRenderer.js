@@ -607,53 +607,69 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglInit = undefined;
 
-		if ( geometry.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglVertexBuffer );
-		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
-		if ( geometry.__webglTangentBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglTangentBuffer );
-		if ( geometry.__webglColorBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglColorBuffer );
-		if ( geometry.__webglUVBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglUVBuffer );
-		if ( geometry.__webglUV2Buffer !== undefined ) _gl.deleteBuffer( geometry.__webglUV2Buffer );
+		function cleanBuffers( buffers ) {
+			if ( buffers.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglVertexBuffer );
+			if ( buffers.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglNormalBuffer );
+			if ( buffers.__webglTangentBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglTangentBuffer );
+			if ( buffers.__webglColorBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglColorBuffer );
+			if ( buffers.__webglUVBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglUVBuffer );
+			if ( buffers.__webglUV2Buffer !== undefined ) _gl.deleteBuffer( buffers.__webglUV2Buffer );
 
-		if ( geometry.__webglSkinIndicesBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglSkinIndicesBuffer );
-		if ( geometry.__webglSkinWeightsBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglSkinWeightsBuffer );
+			if ( buffers.__webglSkinIndicesBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglSkinIndicesBuffer );
+			if ( buffers.__webglSkinWeightsBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglSkinWeightsBuffer );
 
-		if ( geometry.__webglFaceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglFaceBuffer );
-		if ( geometry.__webglLineBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineBuffer );
+			if ( buffers.__webglFaceBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglFaceBuffer );
+			if ( buffers.__webglLineBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglLineBuffer );
 
-		if ( geometry.__webglLineDistanceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineDistanceBuffer );
+			if ( buffers.__webglLineDistanceBuffer !== undefined ) _gl.deleteBuffer( buffers.__webglLineDistanceBuffer );
+		}
 
-		// geometry groups
+		if ( geometry instanceof THREE.BufferGeometry ) {
+			for ( var x in geometry.attributes ) {
+				if ( geometry.attributes[x].buffer ) {
+					_gl.deleteBuffer( geometry.attributes[x].buffer );
+				}
+			}
+		}
+		else {
 
-		if ( geometry.geometryGroups !== undefined ) {
+			cleanBuffers( geometry );
 
-			for ( var g in geometry.geometryGroups ) {
+			// geometry groups
 
-				var geometryGroup = geometry.geometryGroups[ g ];
+			if ( geometry.geometryGroups !== undefined ) {
 
-				if ( geometryGroup.numMorphTargets !== undefined ) {
+				for ( var g in geometry.geometryGroups ) {
 
-					for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
+					var geometryGroup = geometry.geometryGroups[ g ];
 
-						_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
+					cleanBuffers( geometryGroup );
+
+					if ( geometryGroup.numMorphTargets !== undefined ) {
+
+						for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
+
+							_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
+
+						}
 
 					}
 
-				}
+					if ( geometryGroup.numMorphNormals !== undefined ) {
 
-				if ( geometryGroup.numMorphNormals !== undefined ) {
+						for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
 
-					for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
+							_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
 
-						_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
+						}
 
 					}
 
-				}
+					deleteCustomAttributesBuffers( geometryGroup );
 
-				deleteCustomAttributesBuffers( geometryGroup );
+				}
 
 			}
-
 		}
 
 		deleteCustomAttributesBuffers( geometry );
@@ -3411,9 +3427,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
-						for ( attributeName in geometryAttributes ) {
+						//START_VEROLD_MOD - go through the program attributes instead of the geometry attributes so wee can set
+						//default attribute values to be used by the shader if the geometry doesn't include them.
+						for ( attributeName in programAttributes ) {
 
-							if ( attributeName === 'index' ) continue;
+							//if ( attributeName === 'index' ) continue;
 
 							attributePointer = programAttributes[ attributeName ];
 							attributeItem = geometryAttributes[ attributeName ];
@@ -3421,13 +3439,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( attributePointer >= 0 ) {
 
-								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-								enableAttribute( attributePointer );
-								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+								if ( attributeItem ) {
+									_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+									enableAttribute( attributePointer );
+									_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+								}
+								else {
+									if ( attributeSize === 3 ) {
+										_gl.vertexAttrib3f( attributePointer, 1.0, 1.0, 1.0 );
+									}
+									else if ( attributeSize === 2 ) {
+										_gl.vertexAttrib2f( attributePointer, 1.0, 1.0 );
+									}
+								}
 
 							}
 
 						}
+						//END_VEROLD_MOD
 
 						// indices
 
@@ -3634,10 +3663,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.color >= 0 ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
-				enableAttribute( attributes.color );
-				_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
-
+				if ( object.geometry.faces[0].vertexColors.length > 0 ) {
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
+					enableAttribute( attributes.color );
+					_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+				}
+				else {
+					_gl.vertexAttrib3f( attributes.color, 1, 1, 1 );
+				}
 			}
 
 			// normals
@@ -4618,16 +4651,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
-			if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
-
-				object.geometry.__webglInit = true;
-				object.geometry.addEventListener( 'dispose', onGeometryDispose );
-
-			}
-
 			geometry = object.geometry;
 
-			if ( geometry === undefined ) {
+			//START_VEROLD_MOD
+			//If the geometry isn't defined or the webgl data has already been initialized, don't do anything.
+			if ( geometry === undefined || geometry && geometry.__webglInit ) {
+			//END_VEROLD_MOD
 
 				// fail silently for now
 
@@ -4711,6 +4740,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
+
+		//START_VEROLD_MOD - moved this code from earlier in function so that __webglInit can
+		//be checked above without it always being true.
+		if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
+
+			object.geometry.__webglInit = true;
+			object.geometry.addEventListener( 'dispose', onGeometryDispose );
+
+		}
+		//END_VEROLD_MOD
 
 		if ( object.__webglActive === undefined ) {
 
