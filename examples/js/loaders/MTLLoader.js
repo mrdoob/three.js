@@ -405,7 +405,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 };
 
-THREE.MTLLoader.prototype.loadTexture = function ( url, mapping, onLoad, onError ) {
+THREE.MTLLoader.MaterialCreator.prototype.loadTexture = function ( url, mapping, onLoad, onError ) {
 
 	var isCompressed = /\.dds$/i.test( url );
 
