@@ -111,7 +111,6 @@ THREE.Object3D.prototype = {
 		// axis is assumed to be normalized
 
 		var q1 = new THREE.Quaternion();
-		var q2 = new THREE.Quaternion();
 
 		return function ( axis, angle ) {
 
