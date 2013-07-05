@@ -409,6 +409,18 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 			element.style.backgroundColor = '#f0f0f0';
 
+			// scroll into view
+
+			var y = i * element.clientHeight;
+			var scrollTop = this.dom.scrollTop;
+			var domHeight = this.dom.clientHeight;
+
+			if ( y < scrollTop || y > scrollTop + domHeight ) {
+
+				this.dom.scrollTop = y;
+
+			}
+
 		} else {
 
 			element.style.backgroundColor = '';
