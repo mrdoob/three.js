@@ -106,6 +106,22 @@ Sidebar.Material = function ( signals ) {
 
 	container.add( materialShininessRow );
 
+	// vertex colors
+
+	var materialVertexColorsRow = new UI.Panel();
+	var materialVertexColors = new UI.Select().setOptions( {
+
+		0: 'No',
+		1: 'Face',
+		2: 'Vertex'
+
+	} ).onChange( update );
+
+	materialVertexColorsRow.add( new UI.Text( 'Vertex Colors' ).setWidth( '90px' ).setColor( '#666' ) );
+	materialVertexColorsRow.add( materialVertexColors );
+
+	container.add( materialVertexColorsRow );
+
 	// map
 
 	var materialMapRow = new UI.Panel();
@@ -267,6 +283,13 @@ Sidebar.Material = function ( signals ) {
 
 			}
 
+			if ( material.vertexColors !== undefined ) {
+
+				material.vertexColors = parseInt( materialVertexColors.getValue() );
+				material.needsUpdate = true;
+
+			}
+
 			if ( material.map !== undefined ) {
 
 				var mapEnabled = materialMapEnabled.getValue() === true;
@@ -275,6 +298,7 @@ Sidebar.Material = function ( signals ) {
 
 					material.map = mapEnabled ? materialMap.getValue() : null;
 					material.needsUpdate = true;
+
 					selected.geometry.buffersNeedUpdate = true;
 					selected.geometry.uvsNeedUpdate = true;
 
@@ -431,6 +455,7 @@ Sidebar.Material = function ( signals ) {
 			'emissive': materialEmissiveRow,
 			'specular': materialSpecularRow,
 			'shininess': materialShininessRow,
+			'vertexColors': materialVertexColorsRow,
 			'map': materialMapRow,
 			'lightMap': materialLightMapRow,
 			'bumpMap': materialBumpMapRow,
@@ -504,6 +529,12 @@ Sidebar.Material = function ( signals ) {
 			if ( material.shininess !== undefined ) {
 
 				materialShininess.setValue( material.shininess );
+
+			}
+
+			if ( material.vertexColors !== undefined ) {
+
+				materialVertexColors.setValue( material.vertexColors );
 
 			}
 
