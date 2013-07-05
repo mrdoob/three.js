@@ -401,16 +401,11 @@ UI.FancySelect.prototype.getValue = function () {
 
 UI.FancySelect.prototype.setValue = function ( value ) {
 
-	// must convert raw value into string for compatibility with UI.Select
-	// which uses string values (initialized from options keys)
-
-	var key = value ? value.toString() : value;
-
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
 		var element = this.options[ i ];
 
-		if ( element.value === key ) {
+		if ( element.value === value ) {
 
 			element.style.backgroundColor = '#f0f0f0';
 

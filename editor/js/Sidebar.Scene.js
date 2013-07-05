@@ -156,6 +156,8 @@ Sidebar.Scene = function ( signals ) {
 
 	// events
 
+	var selected;
+
 	signals.sceneChanged.add( function ( object ) {
 
 		scene = object;
@@ -179,6 +181,7 @@ Sidebar.Scene = function ( signals ) {
 		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
 
 		outliner.setOptions( options );
+		outliner.setValue( selected );
 
 		if ( scene.fog ) {
 
@@ -209,7 +212,9 @@ Sidebar.Scene = function ( signals ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		outliner.setValue( object !== null ? object.id : null );
+		selected = object !== null ? object.id : null;
+
+		outliner.setValue( selected );
 
 	} );
 
