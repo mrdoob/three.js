@@ -32,6 +32,7 @@ THREE.GeometryExporter.prototype = {
 		var normalsHash = {};
 		var colors = [];
 		var colorsHash = {};
+		var uvs = [];
 
 		for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -217,8 +218,8 @@ THREE.GeometryExporter.prototype = {
 
 		output.vertices = vertices;
 		output.normals = normals;
-		output.colors = colors;
-		// output.uvs = uvs;
+		if ( colors.length > 0 ) output.colors = colors;
+		if ( uvs.length > 0 ) output.uvs = uvs;
 		output.faces = faces;
 
 		//
