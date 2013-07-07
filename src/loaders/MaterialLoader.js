@@ -43,6 +43,7 @@ THREE.MaterialLoader.prototype = {
 				material = new THREE.MeshBasicMaterial( {
 
 					color: json.color,
+					vertexColors: json.vertexColors,
 					opacity: json.opacity,
 					transparent: json.transparent,
 					wireframe: json.wireframe
@@ -58,6 +59,7 @@ THREE.MaterialLoader.prototype = {
 					color: json.color,
 					ambient: json.ambient,
 					emissive: json.emissive,
+					vertexColors: json.vertexColors,
 					opacity: json.opacity,
 					transparent: json.transparent,
 					wireframe: json.wireframe
@@ -75,6 +77,7 @@ THREE.MaterialLoader.prototype = {
 					emissive: json.emissive,
 					specular: json.specular,
 					shininess: json.shininess,
+					vertexColors: json.vertexColors,
 					opacity: json.opacity,
 					transparent: json.transparent,
 					wireframe: json.wireframe

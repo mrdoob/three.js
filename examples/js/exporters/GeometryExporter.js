@@ -28,9 +28,10 @@ THREE.GeometryExporter.prototype = {
 		}
 
 		var faces = [];
-		var uvs = [[]];
 		var normals = [];
 		var normalsHash = {};
+		var colors = [];
+		var colorsHash = {};
 
 		for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -41,9 +42,9 @@ THREE.GeometryExporter.prototype = {
 			var hasFaceUv = false; // geometry.faceUvs[ 0 ][ i ] !== undefined;
 			var hasFaceVertexUv = false; // geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
 			var hasFaceNormal = face.normal.length() > 0;
-			var hasFaceVertexNormal = face.vertexNormals[ 0 ] !== undefined;
-			var hasFaceColor = false; // face.color;
-			var hasFaceVertexColor = false; // face.vertexColors[ 0 ] !== undefined;
+			var hasFaceVertexNormal = face.vertexNormals.length > 0;
+			var hasFaceColor = face.color.r !== 1 && face.color.g !== 1 && face.color.b !== 1;
+			var hasFaceVertexColor = face.vertexColors.length > 0;
 
 			var faceType = 0;
 
@@ -112,8 +113,7 @@ THREE.GeometryExporter.prototype = {
 
 			if ( hasFaceNormal ) {
 
-				var faceNormal = face.normal;
-				faces.push( getNormalIndex( faceNormal.x, faceNormal.y, faceNormal.z ) );
+				faces.push( getNormalIndex( face.normal ) );
 
 			}
 
@@ -124,18 +124,49 @@ THREE.GeometryExporter.prototype = {
 				if ( isTriangle ) {
 
 					faces.push(
-						getNormalIndex( vertexNormals[ 0 ].x, vertexNormals[ 0 ].y, vertexNormals[ 0 ].z ),
-						getNormalIndex( vertexNormals[ 1 ].x, vertexNormals[ 1 ].y, vertexNormals[ 1 ].z ),
-						getNormalIndex( vertexNormals[ 2 ].x, vertexNormals[ 2 ].y, vertexNormals[ 2 ].z )
+						getNormalIndex( vertexNormals[ 0 ] ),
+						getNormalIndex( vertexNormals[ 1 ] ),
+						getNormalIndex( vertexNormals[ 2 ] )
 					);
 
 				} else {
 
 					faces.push(
-						getNormalIndex( vertexNormals[ 0 ].x, vertexNormals[ 0 ].y, vertexNormals[ 0 ].z ),
-						getNormalIndex( vertexNormals[ 1 ].x, vertexNormals[ 1 ].y, vertexNormals[ 1 ].z ),
-						getNormalIndex( vertexNormals[ 2 ].x, vertexNormals[ 2 ].y, vertexNormals[ 2 ].z ),
-						getNormalIndex( vertexNormals[ 3 ].x, vertexNormals[ 3 ].y, vertexNormals[ 3 ].z )
+						getNormalIndex( vertexNormals[ 0 ] ),
+						getNormalIndex( vertexNormals[ 1 ] ),
+						getNormalIndex( vertexNormals[ 2 ] ),
+						getNormalIndex( vertexNormals[ 3 ] )
+					);
+
+				}
+
+			}
+
+			if ( hasFaceColor ) {
+
+				faces.push( getColorIndex( face.color ) );
+
+			}
+
+			if ( hasFaceVertexColor ) {
+
+				var vertexColors = face.vertexColors;
+
+				if ( isTriangle ) {
+
+					faces.push(
+						getColorIndex( vertexColors[ 0 ] ),
+						getColorIndex( vertexColors[ 1 ] ),
+						getColorIndex( vertexColors[ 2 ] )
+					);
+
+				} else {
+
+					faces.push(
+						getColorIndex( vertexColors[ 0 ] ),
+						getColorIndex( vertexColors[ 1 ] ),
+						getColorIndex( vertexColors[ 2 ] ),
+						getColorIndex( vertexColors[ 3 ] )
 					);
 
 				}
@@ -150,9 +181,9 @@ THREE.GeometryExporter.prototype = {
 
 		}
 
-		function getNormalIndex( x, y, z ) {
+		function getNormalIndex( normal ) {
 
-			var hash = x.toString() + y.toString() + z.toString();
+			var hash = normal.x.toString() + normal.y.toString() + normal.z.toString();
 
 			if ( normalsHash[ hash ] !== undefined ) {
 
@@ -161,15 +192,33 @@ THREE.GeometryExporter.prototype = {
 			}
 
 			normalsHash[ hash ] = normals.length / 3;
-			normals.push( x, y, z );
+			normals.push( normal.x, normal.y, normal.z );
 
 			return normalsHash[ hash ];
 
 		}
 
+		function getColorIndex( color ) {
+
+			var hash = color.r.toString() + color.g.toString() + color.b.toString();
+
+			if ( colorsHash[ hash ] !== undefined ) {
+
+				return colorsHash[ hash ];
+
+			}
+
+			colorsHash[ hash ] = colors.length;
+			colors.push( color.getHex() );
+
+			return colorsHash[ hash ];
+
+		}
+
 		output.vertices = vertices;
 		output.normals = normals;
-		output.uvs = uvs;
+		output.colors = colors;
+		// output.uvs = uvs;
 		output.faces = faces;
 
 		//

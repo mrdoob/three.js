@@ -244,7 +244,11 @@ Sidebar.Material = function ( signals ) {
 
 		if ( material ) {
 
-			material.name = materialName.getValue();
+			if ( material.name !== undefined ) {
+
+				material.name = materialName.getValue();
+
+			}
 
 			if ( material instanceof materialClasses[ materialClass.getValue() ] == false ) {
 
@@ -450,6 +454,7 @@ Sidebar.Material = function ( signals ) {
 	function updateRows() {
 
 		var properties = {
+			'name': materialNameRow,
 			'color': materialColorRow,
 			'ambient': materialAmbientRow,
 			'emissive': materialEmissiveRow,
@@ -499,7 +504,12 @@ Sidebar.Material = function ( signals ) {
 
 			var material = object.material;
 
-			materialName.setValue( material.name );
+			if ( material.name !== undefined ) {
+
+				materialName.setValue( material.name );
+
+			}
+
 			materialClass.setValue( getMaterialInstanceName( material ) );
 
 			if ( material.color !== undefined ) {
