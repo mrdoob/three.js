@@ -5,6 +5,7 @@
 	"src/math/Vector2.js",
 	"src/math/Vector3.js",
 	"src/math/Vector4.js",
+	"src/math/Euler.js",
 	"src/math/Matrix3.js",
 	"src/math/Matrix4.js",
 	"src/math/Frustum.js",
