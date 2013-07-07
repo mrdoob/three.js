@@ -4,8 +4,9 @@ Sidebar.Animation = function ( signals ) {
 	var possibleAnimations = {};
 
 	var container = new UI.Panel();
-	container.setPadding( '10px' );
 	container.setBorderTop( '1px solid #ccc' );
+	container.setPadding( '10px' );
+	container.setDisplay( 'none' );
 
 	container.add( new UI.Text( 'Animation' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
@@ -77,6 +78,8 @@ Sidebar.Animation = function ( signals ) {
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object.geometry && object.geometry.animation ) {
+
+			container.setDisplay( 'block' );
 
 		} else {
 
