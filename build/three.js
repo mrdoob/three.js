@@ -10507,18 +10507,22 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		nUvLayers = 0;
 
-		// disregard empty arrays
+		if ( json.uvs !== undefined ) {
 
-		for ( i = 0; i < json.uvs.length; i++ ) {
+			// disregard empty arrays
 
-			if ( json.uvs[ i ].length ) nUvLayers ++;
+			for ( i = 0; i < json.uvs.length; i++ ) {
 
-		}
+				if ( json.uvs[ i ].length ) nUvLayers ++;
 
-		for ( i = 0; i < nUvLayers; i++ ) {
+			}
 
-			geometry.faceUvs[ i ] = [];
-			geometry.faceVertexUvs[ i ] = [];
+			for ( i = 0; i < nUvLayers; i++ ) {
+
+				geometry.faceUvs[ i ] = [];
+				geometry.faceVertexUvs[ i ] = [];
+
+			}
 
 		}
 
@@ -10939,6 +10943,7 @@ THREE.MaterialLoader.prototype = {
 				material = new THREE.MeshBasicMaterial( {
 
 					color: json.color,
+					vertexColors: json.vertexColors,
 					opacity: json.opacity,
 					transparent: json.transparent,
 					wireframe: json.wireframe
@@ -10954,6 +10959,7 @@ THREE.MaterialLoader.prototype = {
 					color: json.color,
 					ambient: json.ambient,
 					emissive: json.emissive,
+					vertexColors: json.vertexColors,
 					opacity: json.opacity,
 					transparent: json.transparent,
 					wireframe: json.wireframe
@@ -10971,6 +10977,7 @@ THREE.MaterialLoader.prototype = {
 					emissive: json.emissive,
 					specular: json.specular,
 					shininess: json.shininess,
+					vertexColors: json.vertexColors,
 					opacity: json.opacity,
 					transparent: json.transparent,
 					wireframe: json.wireframe
@@ -25021,6 +25028,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 					_this.setTexture( texture, textureUnit );
 
 				}
+
+			} else {
+
+				console.warn( 'THREE.WebGLRenderer: Unknown uniform type: ' + type );
 
 			}
 
