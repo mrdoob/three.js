@@ -26,7 +26,7 @@ THREE.MaterialExporter.prototype = {
 
 			output.type = 'MeshBasicMaterial';
 			output.color = material.color.getHex();
-			output.vertexColors = material.vertexColors;
+			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -37,7 +37,7 @@ THREE.MaterialExporter.prototype = {
 			output.color = material.color.getHex();
 			output.ambient = material.ambient.getHex();
 			output.emissive = material.emissive.getHex();
-			output.vertexColors = material.vertexColors;
+			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -50,7 +50,7 @@ THREE.MaterialExporter.prototype = {
 			output.emissive = material.emissive.getHex();
 			output.specular = material.specular.getHex();
 			output.shininess = material.shininess;
-			output.vertexColors = material.vertexColors;
+			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
