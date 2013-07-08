@@ -1120,7 +1120,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( a in geometry.attributes ) {
 
-			if ( a === "index" ) {
+			if ( a === "index" || a === "index_wireframe" ) {
 
 				type = _gl.ELEMENT_ARRAY_BUFFER;
 
@@ -3253,7 +3253,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributeItem.needsUpdate ) {
 
-				if ( attributeName === 'index' ) {
+				if ( attributeName === 'index' || attributeName === 'index_wireframe' ) {
 
 					_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.buffer );
 					_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, attributeItem.array, hint );
@@ -3408,6 +3408,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( object instanceof THREE.Mesh ) {
 
 			var index = geometryAttributes[ "index" ];
+			var index_wireframe = geometryAttributes[ "index_wireframe" ];
 
 			// indexed triangles
 
@@ -3427,11 +3428,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
-						//START_VEROLD_MOD - go through the program attributes instead of the geometry attributes so wee can set
-						//default attribute values to be used by the shader if the geometry doesn't include them.
-						for ( attributeName in programAttributes ) {
+						for ( attributeName in geometryAttributes ) {
 
-							//if ( attributeName === 'index' ) continue;
+							if ( attributeName === 'index' || attributeName === 'index_wireframe' ) continue;
 
 							attributePointer = programAttributes[ attributeName ];
 							attributeItem = geometryAttributes[ attributeName ];
@@ -3439,34 +3438,31 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 							if ( attributePointer >= 0 ) {
 
-								if ( attributeItem ) {
-									_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-									enableAttribute( attributePointer );
-									_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
-								}
-								else {
-									if ( attributeSize === 3 ) {
-										_gl.vertexAttrib3f( attributePointer, 1.0, 1.0, 1.0 );
-									}
-									else if ( attributeSize === 2 ) {
-										_gl.vertexAttrib2f( attributePointer, 1.0, 1.0 );
-									}
-								}
+								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+								enableAttribute( attributePointer );
+								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
 
 							}
 
 						}
-						//END_VEROLD_MOD
 
 						// indices
-
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+						if ( material.wireframe && index_wireframe ) {
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index_wireframe.buffer );
+						}
+						else {
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+						}
 
 					}
 
 					// render indexed triangles
-
-					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
+					if ( material.wireframe && index_wireframe ) {
+						_gl.drawElements( _gl.LINES, offsets[ i ].count * 2, _gl.UNSIGNED_SHORT, offsets[ i ].start * 4 ); // 2 bytes per Uint16
+					}
+					else {
+						_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
+					}
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -3482,7 +3478,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					for ( attributeName in geometryAttributes ) {
 
-						if ( attributeName === 'index') continue;
+						if ( attributeName === 'index' || attributeName === 'index_wireframe') continue;
 
 						attributePointer = programAttributes[ attributeName ];
 						attributeItem = geometryAttributes[ attributeName ];
