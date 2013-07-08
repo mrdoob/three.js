@@ -3358,7 +3358,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object ) {
+	// START_VEROLD_MOD - materialIndex in offsets
+	this.renderBufferDirect = function ( camera, lights, fog, material, geometry, object, offsetIndices ) {
+	// END_VEROLD_MOD - materialIndex in offsets
 
 		if ( material.visible === false ) return;
 
@@ -3403,11 +3405,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// must set attribute pointers to use new offsets for each chunk
 				// even if geometry and materials didn't change
 
-				if ( offsets.length > 1 ) updateBuffers = true;
+				// START_VEROLD_MOD - materialIndex in offsets
+				if ( offsetIndices.length > 1 ) updateBuffers = true;
 
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+				for ( var i = 0, il = offsetIndices.length; i < il; i ++ ) {
 
-					var startIndex = offsets[ i ].index;
+					var offset = offsets[ offsetIndices[ i ] ];
+
+					var startIndex = offset.index;
+				// END_VEROLD_MOD - materialIndex in offsets
 
 					if ( updateBuffers ) {
 
@@ -3437,12 +3443,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render indexed triangles
 
-					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
+					// START_VEROLD_MOD - materialIndex in offsets
+					_gl.drawElements( _gl.TRIANGLES, offset.count, _gl.UNSIGNED_SHORT, offset.start * 2 ); // 2 bytes per Uint16
 
 					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-					_this.info.render.faces += offsets[ i ].count / 3;
-
+					_this.info.render.vertices += offset.count; // not really true, here vertices can be shared
+					_this.info.render.faces += offset.count / 3;
+					// END_VEROLD_MODE - materialIndex in offsets
 				}
 
 			// non-indexed triangles
@@ -4306,7 +4313,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( buffer instanceof THREE.BufferGeometry ) {
 
-					_this.renderBufferDirect( camera, lights, fog, material, buffer, object );
+					// START_VEROLD_MOD - materialIndex in offsets
+					_this.renderBufferDirect( camera, lights, fog, material, buffer, object, webglObject.offsetIndices );
+					// END_VEROLD_MOD - materialIndex in offsets
 
 				} else {
 
@@ -4422,16 +4431,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 	function unrollBufferMaterial ( globject ) {
 
 		var object = globject.object,
-			buffer = globject.buffer,
-			material, materialIndex, meshMaterial;
+			buffer = globject.buffer;
+
+		// START_VEROLD_MOD - materialIndex in offsets
+		var material, materialIndex, meshMaterial, offset;
+		// END_VEROLD_MOD - materialIndex in offsets
 
 		meshMaterial = object.material;
 
 		if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
 
-			materialIndex = buffer.materialIndex;
+			// START_VEROLD_MOD - materialIndex in offsets
+			materialIndex = -1;
 
-			material = meshMaterial.materials[ materialIndex ];
+			if ( buffer instanceof THREE.BufferGeometry ) {
+
+				if ( globject.offsetIndices ) {
+
+					offset = buffer.offsets[ globject.offsetIndices[ 0 ] ];
+
+					if ( offset.hasOwnProperty( 'materialIndex' ) ) {
+
+						materialIndex = offset.materialIndex;
+
+					}
+
+				}
+
+			} else {
+
+				materialIndex = buffer.materialIndex;
+
+			}
+
+			if ( materialIndex >= 0 ) {
+
+				material = meshMaterial.materials[ materialIndex ];
+
+			} else {
+
+				material = meshMaterial;
+
+			}
+			// END_VEROLD_MOD - materialIndex in offsets
 
 			if ( material.transparent ) {
 
@@ -4609,7 +4651,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function addObject( object, scene ) {
 
-		var g, geometry, material, geometryGroup;
+		var g, geometry, material, geometryGroup,
+
+		// START_VEROLD_MOD - materialIndex in offsets
+		var materialIndex, offsetIndices, offset;
+		// END_VEROLD_MOD - materialIndex in offsets
 
 		if ( object.__webglInit === undefined ) {
 
@@ -4720,7 +4766,40 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
-					addBuffer( scene.__webglObjects, geometry, object );
+					// START_VEROLD_MOD - materialIndex in offsets
+					if ( geometry.offsets ) {
+
+						offsetIndices = {};
+
+						for ( var i = 0; i < geometry.offsets.length; ++i ) {
+
+							offset = geometry.offsets[ i ];
+
+							materialIndex = offset.hasOwnProperty( 'materialIndex' ) ?
+								offset.materialIndex : 0;
+
+							if ( ! ( materialIndex in offsetIndices ) ) {
+
+								offsetIndices[ materialIndex ] = new Array();
+
+							}
+
+							offsetIndices[ materialIndex ].push( i );
+
+						}
+
+						for ( materialIndex in offsetIndices ) {
+
+							addBuffer( scene.__webglObjects, geometry, object, offsetIndices[ materialIndex ] );
+
+						}
+
+					} else {
+
+						addBuffer(scene.__webglObjects, geometry, object );
+
+					}
+					// END_VEROLD_MOD - materialIndex in offsets
 
 				} else if ( geometry instanceof THREE.Geometry ) {
 
@@ -4761,7 +4840,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function addBuffer( objlist, buffer, object ) {
+	// START_VEROLD_MOD - materialIndex in offsets
+	function addBuffer( objlist, buffer, object, offsetIndices ) {
+	// END_VEROLD_MOD - materialIndex in offsets
 
 		objlist.push(
 			{
@@ -4770,7 +4851,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				object: object,
 				opaque: null,
 				transparent: null,
-				z: 0
+				z: 0,
+				// START_VEROLD_MOD - materialIndex in offsets
+				offsetIndices: offsetIndices
+				// END_VEROLD_MOD - materialIndex in offsets
 			}
 		);
 
