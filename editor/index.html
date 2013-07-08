@@ -110,6 +110,7 @@
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
+		<script src="js/Editor.js"></script>
 		<script src="js/Loader.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
@@ -138,60 +139,30 @@
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
-			var SIGNALS = signals;
+			var editor = new Editor();
 
-			var signals = {
+			var loader = new Loader( editor );
 
-				// actions
-
-				flattenSelectedObject: new SIGNALS.Signal(),
-				cloneSelectedObject: new SIGNALS.Signal(),
-				removeSelectedObject: new SIGNALS.Signal(),
-				playAnimations: new SIGNALS.Signal(),
-
-				// notifications
-
-				transformModeChanged: new SIGNALS.Signal(),
-				snapChanged: new SIGNALS.Signal(),
-				rendererChanged: new SIGNALS.Signal(),
-				sceneAdded: new SIGNALS.Signal(),
-				sceneChanged: new SIGNALS.Signal(),
-				objectAdded: new SIGNALS.Signal(),
-				objectSelected: new SIGNALS.Signal(),
-				objectChanged: new SIGNALS.Signal(),
-				materialChanged: new SIGNALS.Signal(),
-				clearColorChanged: new SIGNALS.Signal(),
-				fogTypeChanged: new SIGNALS.Signal(),
-				fogColorChanged: new SIGNALS.Signal(),
-				fogParametersChanged: new SIGNALS.Signal(),
-				windowResize: new SIGNALS.Signal()
-
-			};
-
-			//
-
-			var loader = new Loader( signals );
-
-			var viewport = new Viewport( signals );
+			var viewport = new Viewport( editor );
 			viewport.setTop( '32px' );
 			viewport.setLeft( '0px' );
 			viewport.setRight( '300px' );
 			viewport.setBottom( '32px' );
 			document.body.appendChild( viewport.dom );
 
-			var toolbar = new Toolbar( signals );
+			var toolbar = new Toolbar( editor );
 			toolbar.setBottom( '0px' );
 			toolbar.setLeft( '0px' );
 			toolbar.setRight( '300px' );
 			toolbar.setHeight( '32px' );
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( signals );
+			var menubar = new Menubar( editor );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
 			document.body.appendChild( menubar.dom );
 
-			var sidebar = new Sidebar( signals );
+			var sidebar = new Sidebar( editor );
 			sidebar.setRight( '0px' );
 			sidebar.setTop( '32px' );
 			sidebar.setBottom( '0px' );
@@ -205,7 +176,7 @@
 
 					case 46: // delete
 
-						signals.removeSelectedObject.dispatch();
+						editor.signals.removeSelectedObject.dispatch();
 
 						break;
 
@@ -215,7 +186,7 @@
 
 			var onWindowResize = function ( event ) {
 
-				signals.windowResize.dispatch();
+				editor.signals.windowResize.dispatch();
 
 			};
 

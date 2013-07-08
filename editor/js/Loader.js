@@ -1,7 +1,7 @@
+var Loader = function ( editor ) {
 
-var Loader = function ( signals ) {
-
-	scope = this;
+	var scope = this;
+	var signals = editor.signals;
 
 	var sceneExporter = new THREE.ObjectExporter();
 

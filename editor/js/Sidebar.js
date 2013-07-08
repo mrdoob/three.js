@@ -1,4 +1,6 @@
-var Sidebar = function ( signals ) {
+var Sidebar = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
