@@ -250,7 +250,22 @@ THREE.ObjectLoader.prototype = {
 
 				case 'Mesh':
 
-					object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
+					var geometry = geometries[ data.geometry ];
+					var material = materials[ data.material ];
+
+					if ( geometry === undefined ) {
+
+						console.error( 'THREE.ObjectLoader: Undefined geometry ' + data.geometry );
+
+					}
+
+					if ( material === undefined ) {
+
+						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+
+					}
+
+					object = new THREE.Mesh( geometry, material );
 
 					break;
 
