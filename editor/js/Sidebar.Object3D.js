@@ -12,10 +12,17 @@ Sidebar.Object3D = function ( signals ) {
 	// id
 
 	var objectIdRow = new UI.Panel();
-	var objectId = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
+	var objectId = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
+	var objectIdRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+
+		objectId.setValue( THREE.Math.generateUUID() );
+		update();
+
+	} );
 
 	objectIdRow.add( new UI.Text( 'Id' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectIdRow.add( objectId );
+	objectIdRow.add( objectIdRenew );
 
 	container.add( objectIdRow );
 
@@ -259,6 +266,7 @@ Sidebar.Object3D = function ( signals ) {
 
 		if ( selected ) {
 
+			selected.id = objectId.getValue();
 			selected.name = objectName.getValue();
 
 			if ( selected.parent !== undefined ) {
