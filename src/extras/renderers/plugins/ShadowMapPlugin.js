@@ -300,7 +300,9 @@ THREE.ShadowMapPlugin = function () {
 
 					if ( buffer instanceof THREE.BufferGeometry ) {
 
-						_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object );
+						// START_VEROLD_MOD - materialIndex in offsets
+						_renderer.renderBufferDirect( shadowCamera, scene.__lights, fog, material, buffer, object, webglObject.offsetIndices );
+						// END_VEROLD_MOD - materialIndex in offsets
 
 					} else {
 
