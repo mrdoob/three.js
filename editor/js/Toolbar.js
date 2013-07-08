@@ -7,7 +7,6 @@ var Toolbar = function ( editor ) {
 	container.setClass( 'toolbar' );
 
 	var buttons = new UI.Panel();
-	buttons.setPadding( '7px' );
 	container.add( buttons );
 
 	// translate / rotate / scale
