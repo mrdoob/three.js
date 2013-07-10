@@ -271,6 +271,37 @@
 
 			}
 
+		} else if (object instanceof THREE.Line) {
+
+			var precision = raycaster.linePrecision;
+			if(precision < 0)
+				return intersects;
+
+			var precisionSq = precision * precision;
+
+			// Checking boundingSphere distance to ray
+			matrixPosition.getPositionFromMatrix(object.matrixWorld);
+			sphere.set(matrixPosition, object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis());
+			
+			if(!raycaster.ray.isIntersectionSphere(sphere))
+				return intersects;
+			
+			inverseMatrix.getInverse(object.matrixWorld);
+			localRay.copy(raycaster.ray).applyMatrix4(inverseMatrix);
+			var vertices = object.geometry.vertices;
+			var nbVertices = vertices.length;
+			var interPoint = new THREE.Vector3();
+
+			for(var i = 0; i < nbVertices - 1; ++i) {
+
+				var distTestSq = localRay.distanceSqAndPointToSegment(vertices[i], vertices[i + 1], null, interPoint);
+				if(distTestSq <= precisionSq) {
+					var worldPoint = interPoint.applyMatrix4(object.matrix);
+					var distance = raycaster.ray.origin.distanceTo(worldPoint)
+					if(raycaster.near <= distance && distance <= raycaster.far)
+						intersects.push({distance: distance, point: worldPoint, object: object});
+				}
+			}
 		}
 
 	};
@@ -289,6 +320,7 @@
 	//
 
 	THREE.Raycaster.prototype.precision = 0.0001;
+	THREE.Raycaster.prototype.linePrecision = -1; // if negative, we don't pick lines 
 
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
