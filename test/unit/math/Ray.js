@@ -174,4 +174,19 @@ test( "applyMatrix4", function() {
 });
 
 
+test( "distanceSqAndPointToSegment4", function() {
+	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
+	var v0 = new THREE.Vector3( 3, 5, 50 );
+	var v1 = new THREE.Vector3( 50, 50, 50 ); // just a far away point
+	var ptOnLine = new THREE.Vector3();
+	var ptOnSegment = new THREE.Vector3();
+	var distSqr = a.distanceSqAndPointToSegment( v0, v1, ptOnLine, ptOnSegment );
+	var m = new THREE.Matrix4();
+
+	ok( ptOnSegment.distanceTo( v0 ) < 0.0001, "Passed!" );
+	ok( ptOnLine.distanceTo( new THREE.Vector3(1, 1, 50) ) < 0.0001, "Passed!" );
+	// ((3-1) * (3-1) + (5-1) * (5-1) = 4 + 16 = 20
+	ok( distSqr === 20, "Passed!" );
+});
+
 
