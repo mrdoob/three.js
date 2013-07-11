@@ -5058,6 +5058,66 @@ THREE.Ray.prototype = {
 
 	}(),
 
+	distanceSqAndPointToSegment: function( v0, v1, optionalPointOnLine, optionalPointOnSegment ) {
+		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistLine3Segment3.cpp
+		// It returns the min distance between the ray (actually... the line) and the segment
+		// defined by v0 and v1
+		// It can also set two optional targets :
+		// - The closest point on the ray (...line)
+		// - The closest point on the segment
+		var segCenter = v0.clone().add( v1 ).multiplyScalar( 0.5 );
+		var segDir = v1.clone().sub( v0 ).normalize();
+		var segExtent = v0.distanceTo( v1 ) *0.5;
+		var diff = this.origin.clone().sub( segCenter );
+		var a01 = -this.direction.dot( segDir );
+		var b0 = diff.dot( this.direction );
+		var c = diff.lengthSq();
+		var det = Math.abs( 1 - a01 * a01 );
+		var b1, s0, s1, sqrDist, extDet;
+		if( det >= 0 ) {
+			// The line and segment are not parallel.
+			b1 = -diff.dot( segDir );
+			s1 = a01 * b0 - b1;
+			extDet = segExtent * det;
+			if( s1 >= -extDet ) {
+				if( s1 <= extDet ) {
+					// Two interior points are closest, one on the line and one
+					// on the segment.
+					var invDet = 1 / det;
+					s0 = ( a01 * b1 - b0 ) * invDet;
+					s1 *= invDet;
+					sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
+				}
+				else {
+					// The endpoint e1 of the segment and an interior point of
+					// the line are closest.
+					s1 = segExtent;
+					s0 = - ( a01 * s1 + b0 );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+				}
+			}
+			else {
+				// The end point e0 of the segment and an interior point of the
+				// line are closest.
+				s1 = - segExtent;
+				s0 = - ( a01 * s1 + b0 );
+				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+			}
+		}
+		else {
+			// The line and segment are parallel.  Choose the closest pair so that
+			// one point is at segment center.
+			s1 = 0;
+			s0 = - b0;
+			sqrDist = b0 * s0 + c;
+		}
+		if(optionalPointOnLine)
+			optionalPointOnLine.copy( this.direction.clone().multiplyScalar( s0 ).add( this.origin ) );
+		if(optionalPointOnSegment)
+			optionalPointOnSegment.copy( segDir.clone().multiplyScalar( s1 ).add( segCenter ) );
+		return sqrDist;
+	},
+
 	isIntersectionSphere: function( sphere ) {
 
 		return ( this.distanceToPoint( sphere.center ) <= sphere.radius );
@@ -5364,11 +5424,16 @@ THREE.Frustum.prototype = {
 
 			// this method is expanded inlined for performance reasons.
 
+			var geometry = object.geometry;
 			var matrix = object.matrixWorld;
-			var planes = this.planes;
-			var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			var negRadius = - geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
 
 			center.getPositionFromMatrix( matrix );
+
+			var planes = this.planes;
 
 			for ( var i = 0; i < 6; i ++ ) {
 
@@ -6432,9 +6497,14 @@ THREE.EventDispatcher.prototype = {
 
 		} else if (object instanceof THREE.Mesh ) {
 
+			var geometry = object.geometry;
+
 			// Checking boundingSphere distance to ray
 			matrixPosition.getPositionFromMatrix( object.matrixWorld );
-			sphere.set( matrixPosition, object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
 
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
@@ -6442,7 +6512,6 @@ THREE.EventDispatcher.prototype = {
 
 			}
 
-			var geometry = object.geometry;
 			var vertices = geometry.vertices;
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
@@ -6637,6 +6706,58 @@ THREE.EventDispatcher.prototype = {
 
 			}
 
+		} else if (object instanceof THREE.Line) {
+
+			var precision = raycaster.linePrecision;
+			if(precision < 0)
+				return intersects;
+
+			var precisionSq = precision * precision;
+
+			var geometry = object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			// Checking boundingSphere distance to ray
+			matrixPosition.getPositionFromMatrix(object.matrixWorld);
+			sphere.set(matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis());
+			
+			if(!raycaster.ray.isIntersectionSphere(sphere))
+				return intersects;
+			
+			inverseMatrix.getInverse(object.matrixWorld);
+			localRay.copy(raycaster.ray).applyMatrix4(inverseMatrix);
+			localRay.direction.normalize(); // for scale matrix
+
+			var vertices = geometry.vertices;
+			var nbVertices = vertices.length;
+			var interSegment = new THREE.Vector3();
+			var interLine = new THREE.Vector3();
+			var step = object.type === THREE.LineStrip ? 1 : 2;
+
+			for(var i = 0; i < nbVertices - 1; i=i+step) {
+
+				localRay.distanceSqAndPointToSegment(vertices[i], vertices[i + 1], interLine, interSegment);
+				interSegment.applyMatrix4(object.matrixWorld);
+				interLine.applyMatrix4(object.matrixWorld);
+				if(interLine.distanceToSquared(interSegment) <= precisionSq) {
+
+					var distance = raycaster.ray.origin.distanceTo(interLine);
+
+					if(raycaster.near <= distance && distance <= raycaster.far) {
+
+						intersects.push( {
+
+							distance: distance,
+							point: interSegment.clone(),
+							face: null,
+							faceIndex: null,
+							object: object
+
+						} );
+					}
+				}
+			}
 		}
 
 	};
@@ -6655,6 +6776,7 @@ THREE.EventDispatcher.prototype = {
 	//
 
 	THREE.Raycaster.prototype.precision = 0.0001;
+	THREE.Raycaster.prototype.linePrecision = -1; // if negative, we don't pick lines 
 
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
@@ -6719,7 +6841,8 @@ THREE.EventDispatcher.prototype = {
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.Object3DIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -7253,7 +7376,7 @@ THREE.Object3D.prototype = {
 
 };
 
-THREE.Object3D.defaultEulerOrder = 'XYZ';
+THREE.Object3DIdCount = 0;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -8006,7 +8129,8 @@ THREE.Face4.prototype = {
 
 THREE.Geometry = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.GeometryIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -8812,13 +8936,16 @@ THREE.Geometry.prototype = {
 
 };
 
+THREE.GeometryIdCount = 0;
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.GeometryIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	// attributes
 
@@ -10505,6 +10632,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
+	geometry.computeBoundingSphere();
 
 	function parseModel( scale ) {
 
@@ -11201,10 +11329,11 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
-				if ( data.id !== undefined ) geometry.id = data.id;
+				geometry.uuid = data.uuid;
+
 				if ( data.name !== undefined ) geometry.name = data.name;
 
-				geometries[ data.id ] = geometry;
+				geometries[ data.uuid ] = geometry;
 
 			}
 
@@ -11227,10 +11356,11 @@ THREE.ObjectLoader.prototype = {
 				var data = json[ i ];
 				var material = loader.parse( data );
 
-				if ( data.id !== undefined ) material.id = data.id;
+				material.uuid = data.uuid;
+
 				if ( data.name !== undefined ) material.name = data.name;
 
-				materials[ data.id ] = material;
+				materials[ data.uuid ] = material;
 
 			}
 
@@ -11325,6 +11455,9 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
+			object.uuid = data.uuid;
+
+			if ( data.name !== undefined ) object.name = data.name;
 			if ( data.matrix !== undefined ) {
 
 				matrix.fromArray( data.matrix );
@@ -11338,8 +11471,6 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
-			if ( data.id !== undefined ) object.id = data.id;
-			if ( data.name !== undefined ) object.name = data.name;
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
 
@@ -12638,7 +12769,8 @@ THREE.TextureLoader.prototype = {
 
 THREE.Material = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.MaterialIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -12764,6 +12896,8 @@ THREE.Material.prototype = {
 	}
 
 };
+
+THREE.MaterialIdCount = 0;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -13692,7 +13826,8 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.TextureIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -13773,6 +13908,8 @@ THREE.Texture.prototype = {
 	}
 
 };
+
+THREE.TextureIdCount = 0;
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -13857,23 +13994,10 @@ THREE.ParticleSystem = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
-	this.geometry = geometry;
-	this.material = ( material !== undefined ) ? material : new THREE.ParticleBasicMaterial( { color: Math.random() * 0xffffff } );
+	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.material = material !== undefined ? material : new THREE.ParticleBasicMaterial( { color: Math.random() * 0xffffff } );
 
 	this.sortParticles = false;
-
-	if ( this.geometry ) {
-
-		// calc bound radius
-
-		if( this.geometry.boundingSphere === null ) {
-
-			this.geometry.computeBoundingSphere();
-
-		}
-
-	}
-
 	this.frustumCulled = false;
 
 };
@@ -13883,6 +14007,7 @@ THREE.ParticleSystem.prototype = Object.create( THREE.Object3D.prototype );
 THREE.ParticleSystem.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) object = new THREE.ParticleSystem( this.geometry, this.material );
+
 	object.sortParticles = this.sortParticles;
 
 	THREE.Object3D.prototype.clone.call( this, object );
@@ -13899,19 +14024,10 @@ THREE.Line = function ( geometry, material, type ) {
 
 	THREE.Object3D.call( this );
 
-	this.geometry = geometry;
-	this.material = ( material !== undefined ) ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
+	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.material = material !== undefined ? material : new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
+
 	this.type = ( type !== undefined ) ? type : THREE.LineStrip;
-
-	if ( this.geometry ) {
-
-		if ( ! this.geometry.boundingSphere ) {
-
-			this.geometry.computeBoundingSphere();
-
-		}
-
-	}
 
 };
 
@@ -13941,47 +14057,14 @@ THREE.Mesh = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
-	this.geometry = null;
-	this.material = null;
+	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	this.setGeometry( geometry );
-	this.setMaterial( material );
+	this.updateMorphTargets();
 
 };
 
 THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
-
-THREE.Mesh.prototype.setGeometry = function ( geometry ) {
-
-	if ( geometry !== undefined ) {
-
-		this.geometry = geometry;
-
-		if ( this.geometry.boundingSphere === null ) {
-
-			this.geometry.computeBoundingSphere();
-
-		}
-
-		this.updateMorphTargets();
-
-	}
-
-};
-
-THREE.Mesh.prototype.setMaterial = function ( material ) {
-
-	if ( material !== undefined ) {
-
-		this.material = material;
-
-	} else {
-
-		this.material = new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
-
-	}
-
-};
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
