@@ -291,15 +291,16 @@
 			var vertices = object.geometry.vertices;
 			var nbVertices = vertices.length;
 			var interPoint = new THREE.Vector3();
+			var step = object.type === THREE.LineStrip ? 1 : 2;
 
-			for(var i = 0; i < nbVertices - 1; ++i) {
+			for(var i = 0; i < nbVertices - 1; i=i+step) {
 
 				var distTestSq = localRay.distanceSqAndPointToSegment(vertices[i], vertices[i + 1], null, interPoint);
 				if(distTestSq <= precisionSq) {
-					var worldPoint = interPoint.applyMatrix4(object.matrix);
-					var distance = raycaster.ray.origin.distanceTo(worldPoint)
+					interPoint.applyMatrix4(object.matrixWorld);
+					var distance = raycaster.ray.origin.distanceTo(interPoint);
 					if(raycaster.near <= distance && distance <= raycaster.far)
-						intersects.push({distance: distance, point: worldPoint, object: object});
+						intersects.push({distance: distance, point: interPoint.clone(), object: object});
 				}
 			}
 		}

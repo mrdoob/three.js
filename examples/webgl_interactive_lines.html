@@ -63,11 +63,13 @@
 				var geometry = new THREE.Geometry();
 				geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
 				geometry.vertices.push( new THREE.Vector3( 15, 15, 15 ) );
+				geometry.vertices.push( new THREE.Vector3( 0, 30, -40 ) );
+				geometry.vertices.push( new THREE.Vector3( -15, -15, -30 ) );
 
 				parentTransform = new THREE.Mesh();
-				parentTransform.position.x = Math.random() * 800 - 400;
-				parentTransform.position.y = Math.random() * 800 - 400;
-				parentTransform.position.z = Math.random() * 800 - 400;
+				parentTransform.position.x = Math.random() * 200 - 400;
+				parentTransform.position.y = Math.random() * 200 - 400;
+				parentTransform.position.z = Math.random() * 200 - 400;
 
 				parentTransform.rotation.x = Math.random() * 2 * Math.PI;
 				parentTransform.rotation.y = Math.random() * 2 * Math.PI;
@@ -77,9 +79,10 @@
 				// parentTransform.scale.y = Math.random() + 0.5;
 				// parentTransform.scale.z = Math.random() + 0.5;
 
-				for ( var i = 0; i < 1000; i ++ ) {
+				for ( var i = 0; i < 100; i ++ ) {
 
-					var object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff, linewidth: 2 } ) );
+					var type = Math.random() > 0.5 ? THREE.LineStrip : THREE.LinePieces;
+					var object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff, linewidth: 5 } ), type );
 
 					object.position.x = Math.random() * 800 - 400;
 					object.position.y = Math.random() * 800 - 400;
@@ -172,7 +175,7 @@
 				if ( intersects.length > 0 ) {
 
 					sphereInter.visible = true;
-					sphereInter.position = (intersects[0].point).clone();
+					sphereInter.position = intersects[0].point.clone();
 
 				} else {
 
