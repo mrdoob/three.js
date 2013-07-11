@@ -203,7 +203,7 @@
 					container = document.getElementById( containerId );
 
 					camera = new THREE.PerspectiveCamera( 20, container.clientWidth / container.clientHeight, 1, 20000 );
-					camera.rotation.setY( rotateY );
+					camera.rotation.y = rotateY;
 
 					// Think of the virtual camera as a post with 5 cameras on it (even though those cameras happen to live in difference scenes)
 					// You need to move the post (ie, the virtualCamera) to move all 5 cameras together.
