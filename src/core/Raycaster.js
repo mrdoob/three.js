@@ -271,6 +271,53 @@
 
 			}
 
+		} else if (object instanceof THREE.Line) {
+
+			var precision = raycaster.linePrecision;
+			if(precision < 0)
+				return intersects;
+
+			var precisionSq = precision * precision;
+
+			// Checking boundingSphere distance to ray
+			matrixPosition.getPositionFromMatrix(object.matrixWorld);
+			sphere.set(matrixPosition, object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis());
+			
+			if(!raycaster.ray.isIntersectionSphere(sphere))
+				return intersects;
+			
+			inverseMatrix.getInverse(object.matrixWorld);
+			localRay.copy(raycaster.ray).applyMatrix4(inverseMatrix);
+			localRay.direction.normalize(); // for scale matrix
+			var vertices = object.geometry.vertices;
+			var nbVertices = vertices.length;
+			var interSegment = new THREE.Vector3();
+			var interLine = new THREE.Vector3();
+			var step = object.type === THREE.LineStrip ? 1 : 2;
+
+			for(var i = 0; i < nbVertices - 1; i=i+step) {
+
+				localRay.distanceSqAndPointToSegment(vertices[i], vertices[i + 1], interLine, interSegment);
+				interSegment.applyMatrix4(object.matrixWorld);
+				interLine.applyMatrix4(object.matrixWorld);
+				if(interLine.distanceToSquared(interSegment) <= precisionSq) {
+
+					var distance = raycaster.ray.origin.distanceTo(interLine);
+
+					if(raycaster.near <= distance && distance <= raycaster.far) {
+
+						intersects.push( {
+
+							distance: distance,
+							point: interSegment.clone(),
+							face: null,
+							faceIndex: null,
+							object: object
+
+						} );
+					}
+				}
+			}
 		}
 
 	};
@@ -289,6 +336,7 @@
 	//
 
 	THREE.Raycaster.prototype.precision = 0.0001;
+	THREE.Raycaster.prototype.linePrecision = -1; // if negative, we don't pick lines 
 
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
