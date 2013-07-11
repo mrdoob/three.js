@@ -6668,6 +6668,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
 
+		//START_VEROLD_MOD - force position to attribute index 0 because we don't want color or uv2 assigned to attribute 0 automatically.
+		//We often disable color and uv2 so that we can use default values (via vertexAttrib2f, etc.) and browsers complain is attribute 0 is disabled.
+		_gl.bindAttribLocation( program, 0, "position" );
+		//END_VEROLD_MOD
+
 		_gl.linkProgram( program );
 
 		if ( !_gl.getProgramParameter( program, _gl.LINK_STATUS ) ) {
