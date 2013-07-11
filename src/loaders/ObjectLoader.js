@@ -151,10 +151,11 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
-				if ( data.id !== undefined ) geometry.id = data.id;
+				geometry.uuid = data.uuid;
+
 				if ( data.name !== undefined ) geometry.name = data.name;
 
-				geometries[ data.id ] = geometry;
+				geometries[ data.uuid ] = geometry;
 
 			}
 
@@ -177,10 +178,11 @@ THREE.ObjectLoader.prototype = {
 				var data = json[ i ];
 				var material = loader.parse( data );
 
-				if ( data.id !== undefined ) material.id = data.id;
+				material.uuid = data.uuid;
+
 				if ( data.name !== undefined ) material.name = data.name;
 
-				materials[ data.id ] = material;
+				materials[ data.uuid ] = material;
 
 			}
 
@@ -275,6 +277,9 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
+			object.uuid = data.uuid;
+
+			if ( data.name !== undefined ) object.name = data.name;
 			if ( data.matrix !== undefined ) {
 
 				matrix.fromArray( data.matrix );
@@ -288,8 +293,6 @@ THREE.ObjectLoader.prototype = {
 
 			}
 
-			if ( data.id !== undefined ) object.id = data.id;
-			if ( data.name !== undefined ) object.name = data.name;
 			if ( data.visible !== undefined ) object.visible = data.visible;
 			if ( data.userData !== undefined ) object.userData = data.userData;
 

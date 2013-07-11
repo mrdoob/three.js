@@ -355,26 +355,6 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	scope.options = [];
 
-	var generateOptionCallback = function ( element, value ) {
-
-		return function ( event ) {
-
-			for ( var i = 0; i < scope.options.length; i ++ ) {
-
-				scope.options[ i ].style.backgroundColor = '#f0f0f0';
-
-			}
-
-			element.style.backgroundColor = '#f0f0f0';
-
-			scope.selectedValue = value;
-
-			scope.dom.dispatchEvent( changeEvent );
-
-		}
-
-	};
-
 	for ( var key in options ) {
 
 		var option = document.createElement( 'div' );
@@ -385,7 +365,13 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 		scope.dom.appendChild( option );
 
 		scope.options.push( option );
-		option.addEventListener( 'click', generateOptionCallback( option, key ), false );
+
+		option.addEventListener( 'click', function ( event ) {
+
+			scope.setValue( this.value );
+			scope.dom.dispatchEvent( changeEvent );
+
+		}, false );
 
 	}
 
@@ -400,6 +386,8 @@ UI.FancySelect.prototype.getValue = function () {
 };
 
 UI.FancySelect.prototype.setValue = function ( value ) {
+
+	if ( typeof value === 'number' ) value = value.toString();
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 

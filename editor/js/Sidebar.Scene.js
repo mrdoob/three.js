@@ -107,7 +107,7 @@ Sidebar.Scene = function ( signals ) {
 
 	function updateOutliner() {
 
-		var id = outliner.getValue();
+		var id = parseInt( outliner.getValue() );
 
 		scene.traverse( function ( node ) {
 

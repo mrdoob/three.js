@@ -7,7 +7,8 @@
 
 THREE.Object3D = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.Object3DIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -542,3 +543,4 @@ THREE.Object3D.prototype = {
 };
 
 THREE.Object3D.defaultEulerOrder = 'XYZ';
+THREE.Object3DIdCount = 0;

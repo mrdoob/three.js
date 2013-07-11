@@ -18,7 +18,7 @@ THREE.MaterialExporter.prototype = {
 			}
 		};
 
-		output.id = material.id;
+		output.uuid = material.uuid;
 
 		if ( material.name !== "" ) output.name = material.name;
 

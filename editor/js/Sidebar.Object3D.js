@@ -11,20 +11,20 @@ Sidebar.Object3D = function ( signals ) {
 
 	// id
 
-	var objectIdRow = new UI.Panel();
-	var objectId = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
-	var objectIdRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+	var objectUUIDRow = new UI.Panel();
+	var objectUUID = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
+	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
-		objectId.setValue( THREE.Math.generateUUID() );
+		objectUUID.setValue( THREE.Math.generateUUID() );
 		update();
 
 	} );
 
-	objectIdRow.add( new UI.Text( 'Id' ).setWidth( '90px' ).setColor( '#666' ) );
-	objectIdRow.add( objectId );
-	objectIdRow.add( objectIdRenew );
+	objectUUIDRow.add( new UI.Text( 'Id' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectUUIDRow.add( objectUUID );
+	objectUUIDRow.add( objectUUIDRenew );
 
-	container.add( objectIdRow );
+	container.add( objectUUIDRow );
 
 	// name
 
@@ -266,12 +266,12 @@ Sidebar.Object3D = function ( signals ) {
 
 		if ( selected ) {
 
-			selected.id = objectId.getValue();
+			selected.uuid = objectUUID.getValue();
 			selected.name = objectName.getValue();
 
 			if ( selected.parent !== undefined ) {
 
-				var newParentId = objectParent.getValue();
+				var newParentId = parseInt( objectParent.getValue() );
 
 				if ( selected.parent.id !== newParentId && selected.id !== newParentId ) {
 
@@ -488,7 +488,7 @@ Sidebar.Object3D = function ( signals ) {
 
 		objectType.setValue( getObjectInstanceName( object ) );
 
-		objectId.setValue( object.id );
+		objectUUID.setValue( object.uuid );
 		objectName.setValue( object.name );
 
 		if ( object.parent !== undefined ) {

@@ -33,11 +33,11 @@ THREE.ObjectExporter.prototype = {
 
 			}
 
-			if ( geometries[ geometry.id ] === undefined ) {
+			if ( geometries[ geometry.uuid ] === undefined ) {
 
 				var data = {};
 
-				data.id = geometry.id;
+				data.uuid = geometry.uuid;
 
 				if ( geometry.name !== "" ) data.name = geometry.name;
 
@@ -115,13 +115,13 @@ THREE.ObjectExporter.prototype = {
 
 				}
 
-				geometries[ geometry.id ] = data;
+				geometries[ geometry.uuid ] = data;
 
 				output.geometries.push( data );
 
 			}
 
-			return geometry.id;
+			return geometry.uuid;
 
 		};
 
@@ -138,19 +138,19 @@ THREE.ObjectExporter.prototype = {
 
 			}
 
-			if ( materials[ material.id ] === undefined ) {
+			if ( materials[ material.uuid ] === undefined ) {
 
 				var data = materialExporter.parse( material );
 
 				delete data.metadata;
 
-				materials[ material.id ] = data;
+				materials[ material.uuid ] = data;
 
 				output.materials.push( data );
 
 			}
 
-			return material.id;
+			return material.uuid;
 
 		};
 
@@ -160,7 +160,7 @@ THREE.ObjectExporter.prototype = {
 
 			var data = {};
 
-			data.id = object.id;
+			data.uuid = object.uuid;
 
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
