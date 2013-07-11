@@ -934,7 +934,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		var tempGeometry = new THREE.Geometry();
 		THREE.GeometryUtils.merge( tempGeometry, object );
-		object.setGeometry( tempGeometry );
+		object.geometry = tempGeometry;
 		object.position.set( 0, 0, 0 );
 		object.rotation.set( 0, 0, 0 );
 		object.scale.set( 1, 1, 1 );

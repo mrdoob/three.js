@@ -80,11 +80,16 @@ THREE.Frustum.prototype = {
 
 			// this method is expanded inlined for performance reasons.
 
+			var geometry = object.geometry;
 			var matrix = object.matrixWorld;
-			var planes = this.planes;
-			var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			var negRadius = - geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
 
 			center.getPositionFromMatrix( matrix );
+
+			var planes = this.planes;
 
 			for ( var i = 0; i < 6; i ++ ) {
 

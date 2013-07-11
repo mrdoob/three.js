@@ -107,6 +107,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	geometry.computeCentroids();
 	geometry.computeFaceNormals();
+	geometry.computeBoundingSphere();
 
 	function parseModel( scale ) {
 

@@ -66,9 +66,14 @@
 
 		} else if (object instanceof THREE.Mesh ) {
 
+			var geometry = object.geometry;
+
 			// Checking boundingSphere distance to ray
 			matrixPosition.getPositionFromMatrix( object.matrixWorld );
-			sphere.set( matrixPosition, object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
+			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
 
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
@@ -76,7 +81,6 @@
 
 			}
 
-			var geometry = object.geometry;
 			var vertices = geometry.vertices;
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
@@ -279,9 +283,13 @@
 
 			var precisionSq = precision * precision;
 
+			var geometry = object.geometry;
+
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
+
 			// Checking boundingSphere distance to ray
 			matrixPosition.getPositionFromMatrix(object.matrixWorld);
-			sphere.set(matrixPosition, object.geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis());
+			sphere.set(matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis());
 			
 			if(!raycaster.ray.isIntersectionSphere(sphere))
 				return intersects;
@@ -289,7 +297,8 @@
 			inverseMatrix.getInverse(object.matrixWorld);
 			localRay.copy(raycaster.ray).applyMatrix4(inverseMatrix);
 			localRay.direction.normalize(); // for scale matrix
-			var vertices = object.geometry.vertices;
+
+			var vertices = geometry.vertices;
 			var nbVertices = vertices.length;
 			var interSegment = new THREE.Vector3();
 			var interLine = new THREE.Vector3();
