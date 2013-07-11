@@ -542,5 +542,4 @@ THREE.Object3D.prototype = {
 
 };
 
-THREE.Object3D.defaultEulerOrder = 'XYZ';
 THREE.Object3DIdCount = 0;
