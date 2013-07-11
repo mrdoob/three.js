@@ -91,11 +91,13 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	var buffers = {};
 
-	var getBuffer = function ( geometry ) {
+	var getBuffer = function ( geometry, material ) {
 
-		if ( buffers[ geometry.id ] !== undefined ) {
+		var hash = geometry.id.toString() + material.id.toString();
 
-			return buffers[ geometry.id ];
+		if ( buffers[ hash ] !== undefined ) {
+
+			return buffers[ hash ];
 
 		}
 
@@ -177,7 +179,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.normals );
 		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( normals ), gl.STATIC_DRAW );
 
-		buffers[ geometry.id ] = buffer;
+		buffers[ hash ] = buffer;
 
 		scope.info.memory.geometries ++;
 
@@ -493,7 +495,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	var renderObject = function ( object, camera ) {
 
-		var buffer = getBuffer( object.geometry );
+		var buffer = getBuffer( object.geometry, object.material );
 
 		var material = object.material;
 
