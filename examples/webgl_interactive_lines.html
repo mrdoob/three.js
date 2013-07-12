@@ -27,6 +27,8 @@
 			var mouse = new THREE.Vector2();
 			var radius = 100, theta = 0;
 
+			var currentIntersected;
+
 			init();
 			animate();
 
@@ -61,10 +63,22 @@
 				scene.add( sphereInter );
 
 				var geometry = new THREE.Geometry();
-				geometry.vertices.push( new THREE.Vector3( 0, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 15, 0, 0 ) );
-				geometry.vertices.push( new THREE.Vector3( 0, 30, -40 ) );
-				geometry.vertices.push( new THREE.Vector3( -15, -15, -30 ) );
+
+				var point = new THREE.Vector3();
+				var direction = new THREE.Vector3();
+
+				for ( var i = 0; i < 200; i ++ ) {
+
+					direction.x += Math.random() - 0.5;
+					direction.y += Math.random() - 0.5;
+					direction.z += Math.random() - 0.5;
+					direction.normalize().multiplyScalar( 5 );
+
+					point.add( direction );
+
+					geometry.vertices.push( point.clone() );
+
+				}
 
 				parentTransform = new THREE.Mesh();
 				parentTransform.position.x = Math.random() * 40 - 20;
@@ -79,7 +93,7 @@
 				parentTransform.scale.y = Math.random() + 0.5;
 				parentTransform.scale.z = Math.random() + 0.5;
 
-				for ( var i = 0; i < 500; i ++ ) {
+				for ( var i = 0; i < 100; i ++ ) {
 
 					var type = Math.random() > 0.5 ? THREE.LineStrip : THREE.LinePieces;
 					var object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } ), type );
@@ -174,8 +188,17 @@
 
 				if ( intersects.length > 0 ) {
 
+					if ( currentIntersected !== undefined ) {
+
+						currentIntersected.material.linewidth = 1;
+
+					}
+
+					currentIntersected = intersects[ 0 ].object;
+					currentIntersected.material.linewidth = 5;
+
 					sphereInter.visible = true;
-					sphereInter.position = intersects[0].point.clone();
+					sphereInter.position.copy( intersects[ 0 ].point );
 
 				} else {
 
