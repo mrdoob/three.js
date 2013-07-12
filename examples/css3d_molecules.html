@@ -19,7 +19,6 @@
 				background: -o-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Opera 12+ */
 				background: -ms-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
 				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* W3C */
-				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2b2d30', endColorstr='#000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
 				margin: 0;
 				font-family: Arial;
@@ -339,20 +338,7 @@
 				for ( var i = 0; i < objects.length; i ++ ) {
 
 					var object = objects[ i ];
-
 					object.parent.remove( object );
-
-					if ( object.element.parentNode === renderer.cameraElement ) {
-
-						renderer.cameraElement.removeChild( object.element );
-
-					}
-
-					if ( object.userData.joint ) {
-
-						object.userData.joint.parent.remove( object.userData.joint );
-
-					}
 
 				}
 
