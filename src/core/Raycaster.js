@@ -292,17 +292,17 @@
 			var vertices = object.geometry.vertices;
 			var nbVertices = vertices.length;
 			var interSegment = new THREE.Vector3();
-			var interLine = new THREE.Vector3();
+			var interRay = new THREE.Vector3();
 			var step = object.type === THREE.LineStrip ? 1 : 2;
 
 			for(var i = 0; i < nbVertices - 1; i=i+step) {
 
-				localRay.distanceSqAndPointToSegment(vertices[i], vertices[i + 1], interLine, interSegment);
+				localRay.distanceToSegment(vertices[i], vertices[i + 1], interRay, interSegment);
 				interSegment.applyMatrix4(object.matrixWorld);
-				interLine.applyMatrix4(object.matrixWorld);
-				if(interLine.distanceToSquared(interSegment) <= precisionSq) {
+				interRay.applyMatrix4(object.matrixWorld);
+				if(interRay.distanceToSquared(interSegment) <= precisionSq) {
 
-					var distance = raycaster.ray.origin.distanceTo(interLine);
+					var distance = raycaster.ray.origin.distanceTo(interRay);
 
 					if(raycaster.near <= distance && distance <= raycaster.far) {
 
