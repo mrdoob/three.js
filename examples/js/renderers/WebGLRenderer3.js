@@ -93,7 +93,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	var getBuffer = function ( geometry, material ) {
 
-		var hash = geometry.id.toString() + material.id.toString();
+		var hash = geometry.id.toString() + '+' + material.id.toString();
 
 		if ( buffers[ hash ] !== undefined ) {
 
