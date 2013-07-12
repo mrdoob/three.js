@@ -154,9 +154,9 @@ THREE.Frustum.prototype = {
 				var d1 = plane.distanceToPoint( p1 );
 				var d2 = plane.distanceToPoint( p2 );
 				
-				//if both outside plane, no intersection
+				// if both outside plane, no intersection
 
-				if ( d1 < 0 && d2 < 0) {		
+				if ( d1 < 0 && d2 < 0 ) {
 					
 					return false;
 		

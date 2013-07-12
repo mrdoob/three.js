@@ -31,7 +31,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	at: function( t, optionalTarget ) {
+	at: function ( t, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -39,7 +39,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	recast: function() {
+	recast: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -63,7 +63,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	distanceToPoint: function() {
+	distanceToPoint: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -78,13 +78,15 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	distanceSqAndPointToSegment: function( v0, v1, optionalPointOnLine, optionalPointOnSegment ) {
+	distanceSqAndPointToSegment: function ( v0, v1, optionalPointOnLine, optionalPointOnSegment ) {
+
 		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistLine3Segment3.cpp
 		// It returns the min distance between the ray (actually... the line) and the segment
 		// defined by v0 and v1
 		// It can also set two optional targets :
 		// - The closest point on the ray (...line)
 		// - The closest point on the segment
+
 		var segCenter = v0.clone().add( v1 ).multiplyScalar( 0.5 );
 		var segDir = v1.clone().sub( v0 ).normalize();
 		var segExtent = v0.distanceTo( v1 ) *0.5;
@@ -94,53 +96,79 @@ THREE.Ray.prototype = {
 		var c = diff.lengthSq();
 		var det = Math.abs( 1 - a01 * a01 );
 		var b1, s0, s1, sqrDist, extDet;
-		if( det >= 0 ) {
+
+		if ( det >= 0 ) {
+
 			// The line and segment are not parallel.
+
 			b1 = -diff.dot( segDir );
 			s1 = a01 * b0 - b1;
 			extDet = segExtent * det;
-			if( s1 >= -extDet ) {
-				if( s1 <= extDet ) {
+
+			if ( s1 >= -extDet ) {
+
+				if ( s1 <= extDet ) {
+
 					// Two interior points are closest, one on the line and one
 					// on the segment.
+
 					var invDet = 1 / det;
 					s0 = ( a01 * b1 - b0 ) * invDet;
 					s1 *= invDet;
 					sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
-				}
-				else {
+
+				} else {
+
 					// The endpoint e1 of the segment and an interior point of
 					// the line are closest.
+
 					s1 = segExtent;
 					s0 = - ( a01 * s1 + b0 );
 					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
 				}
-			}
-			else {
+
+			} else {
+
 				// The end point e0 of the segment and an interior point of the
 				// line are closest.
+
 				s1 = - segExtent;
 				s0 = - ( a01 * s1 + b0 );
 				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
 			}
-		}
-		else {
+
+		} else {
+
 			// The line and segment are parallel.  Choose the closest pair so that
 			// one point is at segment center.
+
 			s1 = 0;
 			s0 = - b0;
 			sqrDist = b0 * s0 + c;
+
 		}
-		if(optionalPointOnLine)
+
+		if ( optionalPointOnLine ) {
+
 			optionalPointOnLine.copy( this.direction.clone().multiplyScalar( s0 ).add( this.origin ) );
-		if(optionalPointOnSegment)
+
+		}
+
+		if ( optionalPointOnSegment ) {
+
 			optionalPointOnSegment.copy( segDir.clone().multiplyScalar( s1 ).add( segCenter ) );
+
+		}
+
 		return sqrDist;
+
 	},
 
-	isIntersectionSphere: function( sphere ) {
+	isIntersectionSphere: function ( sphere ) {
 
-		return ( this.distanceToPoint( sphere.center ) <= sphere.radius );
+		return this.distanceToPoint( sphere.center ) <= sphere.radius;
 
 	},
 
@@ -148,7 +176,9 @@ THREE.Ray.prototype = {
 
 		// check if the line and plane are non-perpendicular, if they
 		// eventually they will intersect.
+
 		var denominator = plane.normal.dot( this.direction );
+
 		if ( denominator != 0 ) {
 
 			return true;
