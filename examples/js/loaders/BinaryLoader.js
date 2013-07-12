@@ -18,14 +18,14 @@ THREE.BinaryLoader.prototype = Object.create( THREE.Loader.prototype );
 //		- texturePath (optional: if not specified, textures will be assumed to be in the same folder as JS model file)
 //		- binaryPath (optional: if not specified, binary file will be assumed to be in the same folder as JS model file)
 
-THREE.BinaryLoader.prototype.load = function( url, callback, texturePath, binaryPath ) {
+THREE.BinaryLoader.prototype.load = function ( url, callback, texturePath, binaryPath ) {
 
 	// todo: unify load API to for easier SceneLoader use
 
-	texturePath = texturePath && ( typeof texturePath === "string" ) ? texturePath : this.extractUrlBase( url );
-	binaryPath = binaryPath && ( typeof binaryPath === "string" ) ? binaryPath : this.extractUrlBase( url );
+	texturePath = texturePath || this.extractUrlBase( url );
+	binaryPath = binaryPath || this.extractUrlBase( url );
 
-	var callbackProgress = this.showProgress ? THREE.Loader.prototype.updateProgress : null;
+	var callbackProgress = this.showProgress ? THREE.Loader.prototype.updateProgress : undefined;
 
 	this.onLoadStart();
 
@@ -71,43 +71,59 @@ THREE.BinaryLoader.prototype.loadAjaxBuffers = function ( json, callback, binary
 	var xhr = new XMLHttpRequest(),
 		url = binaryPath + "/" + json.buffers;
 
-	xhr.onreadystatechange = function () {
+	xhr.addEventListener( 'load', function ( event ) {
 
-		if ( xhr.readyState == 4 ) {
+		var buffer = xhr.response;
 
-			if ( xhr.status == 200 || xhr.status == 0 ) {
+		if ( buffer === undefined ) {
 
-				var buffer = xhr.response;
-				if ( buffer === undefined ) buffer = ( new Uint8Array( xhr.responseBody ) ).buffer; // IEWEBGL needs this
-				if ( buffer.byteLength == 0 ) {  // iOS and other XMLHttpRequest level 1
-					var buffer = new ArrayBuffer( xhr.responseText.length );
-					var bufView = new Uint8Array( buffer );
-					for ( var i=0, strLen=xhr.responseText.length; i<strLen; i++ ) {
-						bufView[i] = xhr.responseText.charCodeAt(i) & 0xff;
-					}
-				}
+			// IEWEBGL needs this
+			buffer = ( new Uint8Array( xhr.responseBody ) ).buffer;
 
-				THREE.BinaryLoader.prototype.createBinModel( buffer, callback, texturePath, json.materials );
+		}
 
-			} else {
+		if ( buffer.byteLength == 0 ) {  // iOS and other XMLHttpRequest level 1
 
-				console.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
+			var buffer = new ArrayBuffer( xhr.responseText.length );
+
+			var bufView = new Uint8Array( buffer );
+
+			for ( var i = 0, l = xhr.responseText.length; i < l; i ++ ) {
+
+				bufView[ i ] = xhr.responseText.charCodeAt( i ) & 0xff;
 
 			}
 
 		}
 
-	};
-	xhr.addEventListener( "progress", function(event) {
-		if ( event.lengthComputable )
-			callbackProgress( event );
-	}, false);
+		THREE.BinaryLoader.prototype.createBinModel( buffer, callback, texturePath, json.materials );
+
+	}, false );
+
+	if ( callbackProgress !== undefined ) {
+
+		xhr.addEventListener( 'progress', function ( event ) {
+
+			if ( event.lengthComputable ) {
+
+				callbackProgress( event );
+
+			}
+
+		}, false );
+
+	}
+
+	xhr.addEventListener( 'error', function ( event ) {
+
+		console.error( "THREE.BinaryLoader: Couldn't load [" + url + "] [" + xhr.status + "]" );
+
+	}, false );
 
 
 	xhr.open( "GET", url, true );
 	xhr.responseType = "arraybuffer";
-	if ( 'overrideMimeType' in xhr )
-		xhr.overrideMimeType('text\/plain; charset=x-user-defined');
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.send( null );
 
 };
