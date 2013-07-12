@@ -5011,7 +5011,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	at: function( t, optionalTarget ) {
+	at: function ( t, optionalTarget ) {
 
 		var result = optionalTarget || new THREE.Vector3();
 
@@ -5019,7 +5019,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	recast: function() {
+	recast: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -5043,7 +5043,7 @@ THREE.Ray.prototype = {
 
 	},
 
-	distanceToPoint: function() {
+	distanceToPoint: function () {
 
 		var v1 = new THREE.Vector3();
 
@@ -5058,13 +5058,15 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	distanceSqAndPointToSegment: function( v0, v1, optionalPointOnLine, optionalPointOnSegment ) {
+	distanceSqAndPointToSegment: function ( v0, v1, optionalPointOnLine, optionalPointOnSegment ) {
+
 		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistLine3Segment3.cpp
 		// It returns the min distance between the ray (actually... the line) and the segment
 		// defined by v0 and v1
 		// It can also set two optional targets :
 		// - The closest point on the ray (...line)
 		// - The closest point on the segment
+
 		var segCenter = v0.clone().add( v1 ).multiplyScalar( 0.5 );
 		var segDir = v1.clone().sub( v0 ).normalize();
 		var segExtent = v0.distanceTo( v1 ) *0.5;
@@ -5074,53 +5076,79 @@ THREE.Ray.prototype = {
 		var c = diff.lengthSq();
 		var det = Math.abs( 1 - a01 * a01 );
 		var b1, s0, s1, sqrDist, extDet;
-		if( det >= 0 ) {
+
+		if ( det >= 0 ) {
+
 			// The line and segment are not parallel.
+
 			b1 = -diff.dot( segDir );
 			s1 = a01 * b0 - b1;
 			extDet = segExtent * det;
-			if( s1 >= -extDet ) {
-				if( s1 <= extDet ) {
+
+			if ( s1 >= -extDet ) {
+
+				if ( s1 <= extDet ) {
+
 					// Two interior points are closest, one on the line and one
 					// on the segment.
+
 					var invDet = 1 / det;
 					s0 = ( a01 * b1 - b0 ) * invDet;
 					s1 *= invDet;
 					sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
-				}
-				else {
+
+				} else {
+
 					// The endpoint e1 of the segment and an interior point of
 					// the line are closest.
+
 					s1 = segExtent;
 					s0 = - ( a01 * s1 + b0 );
 					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
 				}
-			}
-			else {
+
+			} else {
+
 				// The end point e0 of the segment and an interior point of the
 				// line are closest.
+
 				s1 = - segExtent;
 				s0 = - ( a01 * s1 + b0 );
 				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
 			}
-		}
-		else {
+
+		} else {
+
 			// The line and segment are parallel.  Choose the closest pair so that
 			// one point is at segment center.
+
 			s1 = 0;
 			s0 = - b0;
 			sqrDist = b0 * s0 + c;
+
 		}
-		if(optionalPointOnLine)
+
+		if ( optionalPointOnLine ) {
+
 			optionalPointOnLine.copy( this.direction.clone().multiplyScalar( s0 ).add( this.origin ) );
-		if(optionalPointOnSegment)
+
+		}
+
+		if ( optionalPointOnSegment ) {
+
 			optionalPointOnSegment.copy( segDir.clone().multiplyScalar( s1 ).add( segCenter ) );
+
+		}
+
 		return sqrDist;
+
 	},
 
-	isIntersectionSphere: function( sphere ) {
+	isIntersectionSphere: function ( sphere ) {
 
-		return ( this.distanceToPoint( sphere.center ) <= sphere.radius );
+		return this.distanceToPoint( sphere.center ) <= sphere.radius;
 
 	},
 
@@ -5128,7 +5156,9 @@ THREE.Ray.prototype = {
 
 		// check if the line and plane are non-perpendicular, if they
 		// eventually they will intersect.
+
 		var denominator = plane.normal.dot( this.direction );
+
 		if ( denominator != 0 ) {
 
 			return true;
@@ -5474,6 +5504,44 @@ THREE.Frustum.prototype = {
 		return true;
 
 	},
+
+	intersectsBox : function() {
+
+		var p1 = new THREE.Vector3(),
+			p2 = new THREE.Vector3();
+
+		return function( box ) {
+
+			var planes = this.planes;
+			
+			for ( var i = 0; i < 6 ; i ++ ) {
+			
+				var plane = planes[i];
+				
+				p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+				p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+				p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+				p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+				p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+				p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+
+				var d1 = plane.distanceToPoint( p1 );
+				var d2 = plane.distanceToPoint( p2 );
+				
+				// if both outside plane, no intersection
+
+				if ( d1 < 0 && d2 < 0 ) {
+					
+					return false;
+		
+				}
+			}
+
+			return true;
+		};
+
+	}(),
+
 
 	containsPoint: function ( point ) {
 
@@ -6495,7 +6563,7 @@ THREE.EventDispatcher.prototype = {
 
 			intersectObject( object.getObjectForDistance( distance ), raycaster, intersects );
 
-		} else if (object instanceof THREE.Mesh ) {
+		} else if ( object instanceof THREE.Mesh ) {
 
 			var geometry = object.geometry;
 
@@ -6519,7 +6587,7 @@ THREE.EventDispatcher.prototype = {
 				var material = object.material;
 
 				if ( material === undefined ) return intersects;
-				if ( ! geometry.dynamic ) return intersects;
+				if ( geometry.dynamic === false ) return intersects;
 
 				var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
@@ -6535,6 +6603,7 @@ THREE.EventDispatcher.prototype = {
 
 				var fl;
 				var indexed = false;
+
 				if ( geometry.attributes.index ) {
 
 					indexed = true;
@@ -6543,6 +6612,7 @@ THREE.EventDispatcher.prototype = {
 				} else {
 
 					fl = geometry.attributes.position.numItems / 9;
+
 				}
 
 				var vA = new THREE.Vector3();
@@ -6560,24 +6630,34 @@ THREE.EventDispatcher.prototype = {
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
 						if ( indexed ) {
+
 							a = index + geometry.attributes.index.array[ i ];
 							b = index + geometry.attributes.index.array[ i + 1 ];
 							c = index + geometry.attributes.index.array[ i + 2 ];
+
 						} else {
+
 							a = index;
 							b = index + 1;
 							c = index + 2;
+
 						}
 
-						vA.set( geometry.attributes.position.array[ a * 3 ],
-								geometry.attributes.position.array[ a * 3 + 1 ],
-								geometry.attributes.position.array[ a * 3 + 2] );
-						vB.set( geometry.attributes.position.array[ b * 3 ],
-								geometry.attributes.position.array[ b * 3 + 1 ],
-								geometry.attributes.position.array[ b * 3 + 2] );
-						vC.set( geometry.attributes.position.array[ c * 3 ],
-								geometry.attributes.position.array[ c * 3 + 1 ],
-								geometry.attributes.position.array[ c * 3 + 2 ] );
+						vA.set(
+							geometry.attributes.position.array[ a * 3 ],
+							geometry.attributes.position.array[ a * 3 + 1 ],
+							geometry.attributes.position.array[ a * 3 + 2 ]
+						);
+						vB.set(
+							geometry.attributes.position.array[ b * 3 ],
+							geometry.attributes.position.array[ b * 3 + 1 ],
+							geometry.attributes.position.array[ b * 3 + 2 ]
+						);
+						vC.set(
+							geometry.attributes.position.array[ c * 3 ],
+							geometry.attributes.position.array[ c * 3 + 1 ],
+							geometry.attributes.position.array[ c * 3 + 2 ]
+						);
 
 						facePlane.setFromCoplanarPoints( vA, vB, vC );
 
@@ -6591,25 +6671,43 @@ THREE.EventDispatcher.prototype = {
 
 						// check if we hit the wrong side of a single sided face
 						side = material.side;
+
 						if ( side !== THREE.DoubleSide ) {
 
 							var planeSign = localRay.direction.dot( facePlane.normal );
+							
 
-							if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) continue;
+							if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
+
+								continue;
+
+							}
 
 						}
 
-						// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
-						if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
+						// this can be done using the planeDistance from localRay because
+						// localRay wasn't normalized, but ray was
+						if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) {
 
-						intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
+							continue;
 
-						if ( ! THREE.Triangle.containsPoint( intersectPoint, vA, vB, vC ) ) continue;
+						}
+
+						// passing in intersectPoint avoids a copy
+						intersectPoint = localRay.at( planeDistance, intersectPoint );
+
+						if ( THREE.Triangle.containsPoint( intersectPoint, vA, vB, vC ) === false ) {
+
+							continue;
+
+						}
 
 						intersects.push( {
 
-							distance: planeDistance, // this works because the original ray was normalized, and the transformed localRay wasn't
-							point: raycaster.ray.at(planeDistance),
+							// this works because the original ray was normalized,
+							// and the transformed localRay wasn't
+							distance: planeDistance,
+							point: raycaster.ray.at( planeDistance ),
 							face: null,
 							faceIndex: null,
 							object: object
@@ -6657,14 +6755,20 @@ THREE.EventDispatcher.prototype = {
 
 						var planeSign = localRay.direction.dot( facePlane.normal );
 
-						if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) continue;
+						if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
+
+							continue;
+
+						}
 
 					}
 
-					// this can be done using the planeDistance from localRay because localRay wasn't normalized, but ray was
+					// this can be done using the planeDistance from localRay because localRay
+					// wasn't normalized, but ray was
 					if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
 
-					intersectPoint = localRay.at( planeDistance, intersectPoint ); // passing in intersectPoint avoids a copy
+					// passing in intersectPoint avoids a copy
+					intersectPoint = localRay.at( planeDistance, intersectPoint );
 
 					if ( face instanceof THREE.Face3 ) {
 
@@ -6672,7 +6776,11 @@ THREE.EventDispatcher.prototype = {
 						b = vertices[ face.b ];
 						c = vertices[ face.c ];
 
-						if ( ! THREE.Triangle.containsPoint( intersectPoint, a, b, c ) ) continue;
+						if ( THREE.Triangle.containsPoint( intersectPoint, a, b, c ) === false ) {
+
+							continue;
+
+						}
 
 					} else if ( face instanceof THREE.Face4 ) {
 
@@ -6681,20 +6789,27 @@ THREE.EventDispatcher.prototype = {
 						c = vertices[ face.c ];
 						d = vertices[ face.d ];
 
-						if ( ( ! THREE.Triangle.containsPoint( intersectPoint, a, b, d ) ) &&
-							 ( ! THREE.Triangle.containsPoint( intersectPoint, b, c, d ) ) ) continue;
+						if ( THREE.Triangle.containsPoint( intersectPoint, a, b, d ) === false &&
+						     THREE.Triangle.containsPoint( intersectPoint, b, c, d ) === false ) {
+
+							continue;
+
+						}
 
 					} else {
 
-						// This is added because if we call out of this if/else group when none of the cases
-						//    match it will add a point to the intersection list erroneously.
+						// This is added because if we call out of this if/else group when
+						// none of the cases match it will add a point to the intersection
+						// list erroneously.
 						throw Error( "face type not supported" );
 
 					}
 
 					intersects.push( {
 
-						distance: planeDistance,    // this works because the original ray was normalized, and the transformed localRay wasn't
+						// this works because the original ray was normalized,
+						// and the transformed localRay wasn't
+						distance: planeDistance,
 						point: raycaster.ray.at( planeDistance ),
 						face: face,
 						faceIndex: f,
@@ -6706,12 +6821,9 @@ THREE.EventDispatcher.prototype = {
 
 			}
 
-		} else if (object instanceof THREE.Line) {
+		} else if ( object instanceof THREE.Line ) {
 
 			var precision = raycaster.linePrecision;
-			if(precision < 0)
-				return intersects;
-
 			var precisionSq = precision * precision;
 
 			var geometry = object.geometry;
@@ -6720,13 +6832,16 @@ THREE.EventDispatcher.prototype = {
 
 			// Checking boundingSphere distance to ray
 			matrixPosition.getPositionFromMatrix(object.matrixWorld);
-			sphere.set(matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis());
+			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
 			
-			if(!raycaster.ray.isIntersectionSphere(sphere))
+			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
+
 				return intersects;
+
+			}
 			
-			inverseMatrix.getInverse(object.matrixWorld);
-			localRay.copy(raycaster.ray).applyMatrix4(inverseMatrix);
+			inverseMatrix.getInverse( object.matrixWorld );
+			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 			localRay.direction.normalize(); // for scale matrix
 
 			var vertices = geometry.vertices;
@@ -6735,16 +6850,17 @@ THREE.EventDispatcher.prototype = {
 			var interLine = new THREE.Vector3();
 			var step = object.type === THREE.LineStrip ? 1 : 2;
 
-			for(var i = 0; i < nbVertices - 1; i=i+step) {
+			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
-				localRay.distanceSqAndPointToSegment(vertices[i], vertices[i + 1], interLine, interSegment);
-				interSegment.applyMatrix4(object.matrixWorld);
-				interLine.applyMatrix4(object.matrixWorld);
-				if(interLine.distanceToSquared(interSegment) <= precisionSq) {
+				localRay.distanceSqAndPointToSegment( vertices[ i ], vertices[ i + 1 ], interLine, interSegment );
+				interSegment.applyMatrix4( object.matrixWorld );
+				interLine.applyMatrix4( object.matrixWorld );
 
-					var distance = raycaster.ray.origin.distanceTo(interLine);
+				if ( interLine.distanceToSquared( interSegment ) <= precisionSq ) {
 
-					if(raycaster.near <= distance && distance <= raycaster.far) {
+					var distance = raycaster.ray.origin.distanceTo( interLine );
+
+					if ( raycaster.near <= distance && distance <= raycaster.far ) {
 
 						intersects.push( {
 
@@ -6755,9 +6871,13 @@ THREE.EventDispatcher.prototype = {
 							object: object
 
 						} );
+
 					}
+
 				}
+
 			}
+
 		}
 
 	};
@@ -6776,7 +6896,7 @@ THREE.EventDispatcher.prototype = {
 	//
 
 	THREE.Raycaster.prototype.precision = 0.0001;
-	THREE.Raycaster.prototype.linePrecision = -1; // if negative, we don't pick lines 
+	THREE.Raycaster.prototype.linePrecision = 1;
 
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
@@ -6822,6 +6942,7 @@ THREE.EventDispatcher.prototype = {
 				intersectDescendants( objects[ i ], this, intersects );
 
 			}
+
 		}
 
 		intersects.sort( descSort );
