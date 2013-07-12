@@ -131,7 +131,7 @@ THREE.Frustum.prototype = {
 
 	},
 
-	intersectsBox = function() {
+	intersectsBox : function() {
 
 		var p1 = new THREE.Vector3(),
 			p2 = new THREE.Vector3();
@@ -166,7 +166,7 @@ THREE.Frustum.prototype = {
 			return true;
 		};
 
-	}();
+	}(),
 
 
 	containsPoint: function ( point ) {
