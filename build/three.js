@@ -7262,6 +7262,8 @@ THREE.Object3D.prototype = {
 			}
 
 			object.parent = this;
+			object.dispatchEvent( { type: 'added' } );
+
 			this.children.push( object );
 
 			// add to scene
@@ -7291,6 +7293,8 @@ THREE.Object3D.prototype = {
 		if ( index !== - 1 ) {
 
 			object.parent = undefined;
+			object.dispatchEvent( { type: 'removed' } );
+
 			this.children.splice( index, 1 );
 
 			// remove from scene
