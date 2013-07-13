@@ -79,7 +79,7 @@ Sidebar.Animation = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		if ( object.geometry && object.geometry.animation ) {
+		if ( object && object.geometry && object.geometry.animation ) {
 
 			container.setDisplay( 'block' );
 

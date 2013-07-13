@@ -22,7 +22,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	} );
 
-	objectUUIDRow.add( new UI.Text( 'Id' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectUUIDRow.add( objectUUID );
 	objectUUIDRow.add( objectUUIDRenew );
 
@@ -215,13 +215,13 @@ Sidebar.Object3D = function ( editor ) {
 
 	//
 
-	var selected = null;
-
 	function updateScaleX() {
+
+		var object = editor.selected;
 
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleX.getValue() / selected.scale.x;
+			var scale = objectScaleX.getValue() / object.scale.x;
 
 			objectScaleY.setValue( objectScaleY.getValue() * scale );
 			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
@@ -234,9 +234,11 @@ Sidebar.Object3D = function ( editor ) {
 
 	function updateScaleY() {
 
+		var object = editor.selected;
+
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleY.getValue() / selected.scale.y;
+			var scale = objectScaleY.getValue() / object.scale.y;
 
 			objectScaleX.setValue( objectScaleX.getValue() * scale );
 			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
@@ -249,9 +251,11 @@ Sidebar.Object3D = function ( editor ) {
 
 	function updateScaleZ() {
 
+		var object = editor.selected;
+
 		if ( objectScaleLock.getValue() === true ) {
 
-			var scale = objectScaleZ.getValue() / selected.scale.z;
+			var scale = objectScaleZ.getValue() / object.scale.z;
 
 			objectScaleX.setValue( objectScaleX.getValue() * scale );
 			objectScaleY.setValue( objectScaleY.getValue() * scale );
@@ -264,16 +268,18 @@ Sidebar.Object3D = function ( editor ) {
 
 	function update() {
 
-		if ( selected ) {
+		var object = editor.selected;
 
-			selected.uuid = objectUUID.getValue();
-			selected.name = objectName.getValue();
+		if ( object !== null ) {
 
-			if ( selected.parent !== undefined ) {
+			object.uuid = objectUUID.getValue();
+			object.name = objectName.getValue();
+
+			if ( object.parent !== undefined ) {
 
 				var newParentId = parseInt( objectParent.getValue() );
 
-				if ( selected.parent.id !== newParentId && selected.id !== newParentId ) {
+				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
 					var parent = scene.getObjectById( newParentId, true );
 
@@ -283,7 +289,7 @@ Sidebar.Object3D = function ( editor ) {
 
 					}
 
-					parent.add( selected );
+					parent.add( object );
 
 					signals.sceneChanged.dispatch();
 
@@ -291,92 +297,94 @@ Sidebar.Object3D = function ( editor ) {
 
 			}
 
-			selected.position.x = objectPositionX.getValue();
-			selected.position.y = objectPositionY.getValue();
-			selected.position.z = objectPositionZ.getValue();
+			object.position.x = objectPositionX.getValue();
+			object.position.y = objectPositionY.getValue();
+			object.position.z = objectPositionZ.getValue();
 
-			selected.rotation.x = objectRotationX.getValue();
-			selected.rotation.y = objectRotationY.getValue();
-			selected.rotation.z = objectRotationZ.getValue();
+			object.rotation.x = objectRotationX.getValue();
+			object.rotation.y = objectRotationY.getValue();
+			object.rotation.z = objectRotationZ.getValue();
 
-			selected.scale.x = objectScaleX.getValue();
-			selected.scale.y = objectScaleY.getValue();
-			selected.scale.z = objectScaleZ.getValue();
+			object.scale.x = objectScaleX.getValue();
+			object.scale.y = objectScaleY.getValue();
+			object.scale.z = objectScaleZ.getValue();
 
-			if ( selected.fov !== undefined ) {
+			if ( object.fov !== undefined ) {
 
-				selected.fov = objectFov.getValue();
-				selected.updateProjectionMatrix();
-
-			}
-
-			if ( selected.near !== undefined ) {
-
-				selected.near = objectNear.getValue();
+				object.fov = objectFov.getValue();
+				object.updateProjectionMatrix();
 
 			}
 
-			if ( selected.far !== undefined ) {
+			if ( object.near !== undefined ) {
 
-				selected.far = objectFar.getValue();
-
-			}
-
-			if ( selected.intensity !== undefined ) {
-
-				selected.intensity = objectIntensity.getValue();
+				object.near = objectNear.getValue();
 
 			}
 
-			if ( selected.color !== undefined ) {
+			if ( object.far !== undefined ) {
 
-				selected.color.setHex( objectColor.getHexValue() );
-
-			}
-
-			if ( selected.groundColor !== undefined ) {
-
-				selected.groundColor.setHex( objectGroundColor.getHexValue() );
+				object.far = objectFar.getValue();
 
 			}
 
-			if ( selected.distance !== undefined ) {
+			if ( object.intensity !== undefined ) {
 
-				selected.distance = objectDistance.getValue();
-
-			}
-
-			if ( selected.angle !== undefined ) {
-
-				selected.angle = objectAngle.getValue();
+				object.intensity = objectIntensity.getValue();
 
 			}
 
-			if ( selected.exponent !== undefined ) {
+			if ( object.color !== undefined ) {
 
-				selected.exponent = objectExponent.getValue();
+				object.color.setHex( objectColor.getHexValue() );
 
 			}
 
-			selected.visible = objectVisible.getValue();
+			if ( object.groundColor !== undefined ) {
+
+				object.groundColor.setHex( objectGroundColor.getHexValue() );
+
+			}
+
+			if ( object.distance !== undefined ) {
+
+				object.distance = objectDistance.getValue();
+
+			}
+
+			if ( object.angle !== undefined ) {
+
+				object.angle = objectAngle.getValue();
+
+			}
+
+			if ( object.exponent !== undefined ) {
+
+				object.exponent = objectExponent.getValue();
+
+			}
+
+			object.visible = objectVisible.getValue();
 
 			try {
 
-				selected.userData = JSON.parse( objectUserData.getValue() );
+				object.userData = JSON.parse( objectUserData.getValue() );
 
-			} catch ( error ) {
+			} catch ( exception ) {
 
-				console.log( error );
+				console.warn( exception );
 
 			}
 
-			signals.objectChanged.dispatch( selected );
+			signals.objectChanged.dispatch( object );
 
 		}
 
 	}
 
 	function updateRows() {
+
+		var object = editor.selected;
 
 		var properties = {
 			'parent': objectParentRow,
@@ -393,7 +401,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( selected[ property ] !== undefined ? '' : 'none' );
+			properties[ property ].setDisplay( object[ property ] !== undefined ? '' : 'none' );
 
 		}
 
@@ -401,7 +409,10 @@ Sidebar.Object3D = function ( editor ) {
 
 	function updateTransformRows() {
 
-		if ( selected instanceof THREE.Light || ( selected instanceof THREE.Object3D && selected.userData.targetInverse ) ) {
+		var object = editor.selected;
+
+		if ( object instanceof THREE.Light ||
+		   ( object instanceof THREE.Object3D && object.userData.targetInverse ) ) {
 
 			objectRotationRow.setDisplay( 'none' );
 			objectScaleRow.setDisplay( 'none' );
@@ -439,9 +450,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	}
 
-	// events
-
-	signals.sceneChanged.add( function () {
+	var updateObjectParent = function () {
 
 		var scene = editor.scene;
 
@@ -465,121 +474,133 @@ Sidebar.Object3D = function ( editor ) {
 
 		objectParent.setOptions( options );
 
-	} );
+	};
+
+	// events
 
 	signals.objectSelected.add( function ( object ) {
 
-		selected = object;
 		updateUI();
 
 	} );
 
+	signals.objectAdded.add( updateObjectParent );
+	signals.objectRemoved.add( updateObjectParent );
+
 	signals.objectChanged.add( function ( object ) {
 
-		if ( selected === object ) updateUI();
+		if ( object !== editor.selected ) return;
+
+		updateUI();
 
 	} );
 
 	function updateUI() {
 
-		container.setDisplay( 'block' );
+		container.setDisplay( 'none' );
 
-		var object = selected;
+		var object = editor.selected;
 
-		objectType.setValue( getObjectInstanceName( object ) );
+		if ( object !== null ) {
 
-		objectUUID.setValue( object.uuid );
-		objectName.setValue( object.name );
+			container.setDisplay( 'block' );
 
-		if ( object.parent !== undefined ) {
+			objectType.setValue( getObjectInstanceName( object ) );
 
-			objectParent.setValue( object.parent.id );
+			objectUUID.setValue( object.uuid );
+			objectName.setValue( object.name );
+
+			if ( object.parent !== undefined ) {
+
+				objectParent.setValue( object.parent.id );
+
+			}
+
+			objectPositionX.setValue( object.position.x );
+			objectPositionY.setValue( object.position.y );
+			objectPositionZ.setValue( object.position.z );
+
+			objectRotationX.setValue( object.rotation.x );
+			objectRotationY.setValue( object.rotation.y );
+			objectRotationZ.setValue( object.rotation.z );
+
+			objectScaleX.setValue( object.scale.x );
+			objectScaleY.setValue( object.scale.y );
+			objectScaleZ.setValue( object.scale.z );
+
+			if ( object.fov !== undefined ) {
+
+				objectFov.setValue( object.fov );
+
+			}
+
+			if ( object.near !== undefined ) {
+
+				objectNear.setValue( object.near );
+
+			}
+
+			if ( object.far !== undefined ) {
+
+				objectFar.setValue( object.far );
+
+			}
+
+			if ( object.intensity !== undefined ) {
+
+				objectIntensity.setValue( object.intensity );
+
+			}
+
+			if ( object.color !== undefined ) {
+
+				objectColor.setValue( '#' + object.color.getHexString() );
+
+			}
+
+			if ( object.groundColor !== undefined ) {
+
+				objectGroundColor.setValue( '#' + object.groundColor.getHexString() );
+
+			}
+
+			if ( object.distance !== undefined ) {
+
+				objectDistance.setValue( object.distance );
+
+			}
+
+			if ( object.angle !== undefined ) {
+
+				objectAngle.setValue( object.angle );
+
+			}
+
+			if ( object.exponent !== undefined ) {
+
+				objectExponent.setValue( object.exponent );
+
+			}
+
+			objectVisible.setValue( object.visible );
+
+			try {
+
+				objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
+
+			} catch ( error ) {
+
+				console.log( error );
+
+			}
+
+			objectUserData.setBorderColor( '#ccc' );
+			objectUserData.setBackgroundColor( '' );
+
+			updateRows();
+			updateTransformRows();
 
 		}
-
-		objectPositionX.setValue( object.position.x );
-		objectPositionY.setValue( object.position.y );
-		objectPositionZ.setValue( object.position.z );
-
-		objectRotationX.setValue( object.rotation.x );
-		objectRotationY.setValue( object.rotation.y );
-		objectRotationZ.setValue( object.rotation.z );
-
-		objectScaleX.setValue( object.scale.x );
-		objectScaleY.setValue( object.scale.y );
-		objectScaleZ.setValue( object.scale.z );
-
-		if ( object.fov !== undefined ) {
-
-			objectFov.setValue( object.fov );
-
-		}
-
-		if ( object.near !== undefined ) {
-
-			objectNear.setValue( object.near );
-
-		}
-
-		if ( object.far !== undefined ) {
-
-			objectFar.setValue( object.far );
-
-		}
-
-		if ( object.intensity !== undefined ) {
-
-			objectIntensity.setValue( object.intensity );
-
-		}
-
-		if ( object.color !== undefined ) {
-
-			objectColor.setValue( '#' + object.color.getHexString() );
-
-		}
-
-		if ( object.groundColor !== undefined ) {
-
-			objectGroundColor.setValue( '#' + object.groundColor.getHexString() );
-
-		}
-
-		if ( object.distance !== undefined ) {
-
-			objectDistance.setValue( object.distance );
-
-		}
-
-		if ( object.angle !== undefined ) {
-
-			objectAngle.setValue( object.angle );
-
-		}
-
-		if ( object.exponent !== undefined ) {
-
-			objectExponent.setValue( object.exponent );
-
-		}
-
-		objectVisible.setValue( object.visible );
-
-		try {
-
-			objectUserData.setValue( JSON.stringify( object.userData, null, '  ' ) );
-
-		} catch ( error ) {
-
-			console.log( error );
-
-		}
-
-		objectUserData.setBorderColor( '#ccc' );
-		objectUserData.setBackgroundColor( '' );
-
-		updateRows();
-		updateTransformRows();
 
 	}
 

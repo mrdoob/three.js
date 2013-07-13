@@ -42,6 +42,7 @@ Menubar.Add = function ( editor ) {
 		mesh.rotation.x = - Math.PI/2;
 
 		editor.addObject( mesh );
+		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -66,6 +67,7 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Cube ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
+		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -89,6 +91,7 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
+		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -109,6 +112,7 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
+		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -128,6 +132,7 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
+		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -150,6 +155,7 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
+		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -174,6 +180,7 @@ Menubar.Add = function ( editor ) {
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
+		editor.select( mesh );
 
 	} );
 	options.add( option );
@@ -197,6 +204,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'PointLight ' + ( ++ lightCount );
 
 		editor.addObject( light );
+		editor.select( light );
 
 	} );
 	options.add( option );
@@ -221,6 +229,7 @@ Menubar.Add = function ( editor ) {
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
+		editor.select( light );
 
 	} );
 	options.add( option );
@@ -242,6 +251,7 @@ Menubar.Add = function ( editor ) {
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
+		editor.select( light );
 
 	} );
 	options.add( option );
@@ -263,6 +273,7 @@ Menubar.Add = function ( editor ) {
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
 		editor.addObject( light );
+		editor.select( light );
 
 	} );
 	options.add( option );
@@ -280,6 +291,7 @@ Menubar.Add = function ( editor ) {
 		light.name = 'AmbientLight ' + ( ++ lightCount );
 
 		editor.addObject( light );
+		editor.select( light );
 
 	} );
 	options.add( option );

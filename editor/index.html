@@ -184,7 +184,8 @@
 
 					case 46: // delete
 
-						editor.signals.removeSelectedObject.dispatch();
+						editor.removeObject( editor.selected );
+						editor.deselect();
 
 						break;
 

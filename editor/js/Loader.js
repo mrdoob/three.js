@@ -3,8 +3,6 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
-	var sceneExporter = new THREE.ObjectExporter();
-
 	document.addEventListener( 'dragover', function ( event ) {
 
 		event.preventDefault();
@@ -47,7 +45,9 @@ var Loader = function ( editor ) {
 
 		timeout = setTimeout( function () {
 
-			localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
+			var exporter = new THREE.ObjectExporter();
+			localStorage.threejsEditor = JSON.stringify( exporter.parse( editor.scene ) );
+
 			console.log( 'Saved state to Local Storage' );
 
 		}, 3000 );

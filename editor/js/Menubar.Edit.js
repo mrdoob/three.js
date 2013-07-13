@@ -26,7 +26,14 @@ Menubar.Edit = function ( editor ) {
 	option.setTextContent( 'Clone' );
 	option.onClick( function () {
 
-		editor.cloneObject( editor.selected );
+		var object = editor.selected;
+
+		if ( object.parent === undefined ) return; // avoid cloning the camera or scene
+
+		object = object.clone();
+
+		editor.addObject( object );
+		editor.select( object );
 
 	} );
 	options.add( option );
@@ -38,7 +45,24 @@ Menubar.Edit = function ( editor ) {
 	option.setTextContent( 'Flatten' );
 	option.onClick( function () {
 
-		editor.flattenObject( editor.selected );
+		var object = editor.selected;
+
+		if ( object.parent === undefined ) return; // avoid flattening the camera or scene
+
+		if ( confirm( 'Flatten ' + object.name + '?' ) === false ) return;
+
+		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
+
+		var geometry = object.geometry.clone();
+		geometry.applyMatrix( object.matrix );
+
+		object.geometry = geometry;
+
+		object.position.set( 0, 0, 0 );
+		object.rotation.set( 0, 0, 0 );
+		object.scale.set( 1, 1, 1 );
+
+		editor.signals.objectChanged.dispatch( object );
 
 	} );
 	options.add( option );
@@ -51,6 +75,7 @@ Menubar.Edit = function ( editor ) {
 	option.onClick( function () {
 
 		editor.removeObject( editor.selected );
+		editor.deselect();
 
 	} );
 	options.add( option );

@@ -45,6 +45,8 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
+		// TODO: Differentiate from transform hovers change and object transform change
+
 		signals.objectChanged.dispatch( editor.selected );
 
 	} );
@@ -63,8 +65,6 @@ var Viewport = function ( editor ) {
 
 	var ray = new THREE.Raycaster();
 	var projector = new THREE.Projector();
-
-	var selected = camera;
 
 	// events
 
@@ -118,11 +118,13 @@ var Viewport = function ( editor ) {
 
 			if ( intersects.length > 0 ) {
 
-				editor.select( intersects[ 0 ].object );
+				var object = intersects[ 0 ].object;
 
-				if ( helpersToObjects[ selected.id ] !== undefined ) {
+				editor.select( object );
 
-					editor.select( helpersToObjects[ selected.id ] );
+				if ( helpersToObjects[ object.id ] !== undefined ) {
+
+					editor.select( helpersToObjects[ object.id ] );
 
 				}
 
@@ -171,13 +173,6 @@ var Viewport = function ( editor ) {
 
 	// signals
 
-	signals.sceneChanged.add( function () {
-
-		updateInfo();
-		render();
-
-	} );
-
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );
@@ -213,12 +208,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.objectAdded.add( function ( object ) {
-
-		objects.push( object );
-
-	} );
-
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
@@ -245,6 +234,21 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.objectAdded.add( function ( object ) {
+
+		objects.push( object );
+
+		if ( object instanceof THREE.Light ) {
+
+			updateMaterials();
+
+		}
+
+		render();
+		updateInfo();
+
+	} );
+
 	signals.objectChanged.add( function ( object ) {
 
 		if ( object.geometry !== undefined ) {
@@ -261,8 +265,20 @@ var Viewport = function ( editor ) {
 		}
 
 		render();
+		updateInfo();
 
-		signals.sceneChanged.dispatch( scene );
+	} );
+
+	signals.objectRemoved.add( function ( object ) {
+
+		if ( object instanceof THREE.Light ) {
+
+			updateMaterials();
+
+		}
+
+		render();
+		updateInfo();
 
 	} );
 
@@ -299,7 +315,7 @@ var Viewport = function ( editor ) {
 
 			}
 
-			updateMaterials( scene );
+			updateMaterials();
 
 			oldFogType = fogType;
 
@@ -404,9 +420,9 @@ var Viewport = function ( editor ) {
 
 	}
 
-	function updateMaterials( root ) {
+	function updateMaterials() {
 
-		root.traverse( function ( node ) {
+		editor.scene.traverse( function ( node ) {
 
 			if ( node.material ) {
 

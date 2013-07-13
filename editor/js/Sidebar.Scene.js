@@ -11,11 +11,26 @@ Sidebar.Scene = function ( editor ) {
 	container.add( new UI.Text( 'SCENE' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	var outliner = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' ).onChange( updateOutliner );
+	var outliner = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' )
+	outliner.onChange( function () {
+
+		editor.selectById( parseInt( outliner.getValue() ) );
+
+	} );
 	container.add( outliner );
 	container.add( new UI.Break() );
 
 	// fog
+
+	var updateFogParameters = function () {
+
+		var near = fogNear.getValue();
+		var far = fogFar.getValue();
+		var density = fogDensity.getValue();
+
+		signals.fogParametersChanged.dispatch( near, far, density );
+
+	};
 
 	var fogTypeRow = new UI.Panel();
 	var fogType = new UI.Select().setOptions( {
@@ -24,7 +39,15 @@ Sidebar.Scene = function ( editor ) {
 		'Fog': 'Linear',
 		'FogExp2': 'Exponential'
 
-	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateFogType );
+	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' )
+	fogType.onChange( function () {
+
+		var type = fogType.getValue();
+		signals.fogTypeChanged.dispatch( type );
+
+		refreshFogUI();
+
+	} );
 
 	fogTypeRow.add( new UI.Text( 'Fog' ).setWidth( '90px' ).setColor( '#666' ) );
 	fogTypeRow.add( fogType );
@@ -36,7 +59,12 @@ Sidebar.Scene = function ( editor ) {
 	var fogColorRow = new UI.Panel();
 	fogColorRow.setDisplay( 'none' );
 
-	var fogColor = new UI.Color().setValue( '#aaaaaa' ).onChange( updateFogColor );
+	var fogColor = new UI.Color().setValue( '#aaaaaa' )
+	fogColor.onChange( function () {
+
+		signals.fogColorChanged.dispatch( fogColor.getHexValue() );
+
+	} );
 
 	fogColorRow.add( new UI.Text( 'Fog color' ).setWidth( '90px' ).setColor( '#666' ) );
 	fogColorRow.add( fogColor );
@@ -81,7 +109,7 @@ Sidebar.Scene = function ( editor ) {
 
 	//
 
-	function getObjectType( object ) {
+	var getObjectType = function ( object ) {
 
 		var objects = {
 
@@ -105,23 +133,7 @@ Sidebar.Scene = function ( editor ) {
 
 	}
 
-	function updateOutliner() {
-
-		var id = parseInt( outliner.getValue() );
-		editor.selectById( id );
-
-	}
-
-	function updateFogType() {
-
-		var type = fogType.getValue();
-		signals.fogTypeChanged.dispatch( type );
-
-		refreshFogUI();
-
-	}
-
-	function refreshFogUI() {
+	var refreshFogUI = function () {
 
 		var type = fogType.getValue();
 
@@ -130,25 +142,11 @@ Sidebar.Scene = function ( editor ) {
 		fogFarRow.setDisplay( type === 'Fog' ? '' : 'none' );
 		fogDensityRow.setDisplay( type === 'FogExp2' ? '' : 'none' );
 
-	}
-
-	function updateFogColor() {
-
-		signals.fogColorChanged.dispatch( fogColor.getHexValue() );
-
-	}
-
-	function updateFogParameters() {
-
-		signals.fogParametersChanged.dispatch( fogNear.getValue(), fogFar.getValue(), fogDensity.getValue() );
-
-	}
+	};
 
 	// events
 
-	var selected;
-
-	signals.sceneChanged.add( function () {
+	var updateUI = function () {
 
 		var scene = editor.scene;
 
@@ -198,7 +196,10 @@ Sidebar.Scene = function ( editor ) {
 
 		refreshFogUI();
 
-	} );
+	};
+
+	signals.objectAdded.add( updateUI );
+	signals.objectRemoved.add( updateUI );
 
 	signals.objectSelected.add( function ( object ) {
 

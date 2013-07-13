@@ -13,12 +13,13 @@ var Editor = function () {
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
 		rendererChanged: new SIGNALS.Signal(),
-		sceneChanged: new SIGNALS.Signal(),
 
+		objectSelected: new SIGNALS.Signal(),
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
 		objectRemoved: new SIGNALS.Signal(),
-		objectSelected: new SIGNALS.Signal(),
+
+		helperAdded: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
 		clearColorChanged: new SIGNALS.Signal(),
@@ -55,8 +56,6 @@ Editor.prototype = {
 
 		}
 
-		this.signals.sceneChanged.dispatch( this.scene );
-
 	},
 
 	//
@@ -67,23 +66,19 @@ Editor.prototype = {
 		this.addHelper( object );
 
 		this.signals.objectAdded.dispatch( object );
-		this.signals.sceneChanged.dispatch();
 
 	},
 
 	removeObject: function ( object ) {
 
-		if ( object === this.scene ) return;
+		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
 
-		var name = object.name ?  '"' + object.name + '"': "selected object";
-
-		if ( confirm( 'Delete ' + name + '?' ) === false ) return;
+		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 		this.scene.remove( object );
 		this.removeHelper( object );
 
 		this.signals.objectRemoved.dispatch( object );
-		this.signals.sceneChanged.dispatch();
 
 	},
 
@@ -117,31 +112,41 @@ Editor.prototype = {
 
 		if ( object instanceof THREE.PointLight ) {
 
-			this.helpers[ object.id ] = new THREE.PointLightHelper( object, 10 );
-			this.sceneHelpers.add( this.helpers[ object.id ] );
-			this.helpers[ object.id ].lightSphere.id = object.id;
+			var helper = new THREE.PointLightHelper( object, 10 );
+			helper.lightSphere.id = object.id;
+			this.sceneHelpers.add( helper );
+
+			this.helpers[ object.id ] = helper;
+			this.signals.helperAdded.dispatch( helper );
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
-			this.helpers[ object.id ] = new THREE.DirectionalLightHelper( object, 10 );
-			this.sceneHelpers.add( this.helpers[ object.id ] );
-			this.helpers[ object.id ].lightSphere.id = object.id;
+			var helper = new THREE.DirectionalLightHelper( object, 10 );
+			helper.lightSphere.id = object.id;
+			this.sceneHelpers.add( helper );
+
+			this.helpers[ object.id ] = helper;
+			this.signals.helperAdded.dispatch( helper );
 
 		} else if ( object instanceof THREE.SpotLight ) {
 
-			this.helpers[ object.id ] = new THREE.SpotLightHelper( object, 10 );
-			this.sceneHelpers.add( this.helpers[ object.id ] );
-			// this.helpers[ object.id ].lightSphere.id = object.id;
+			var helper = new THREE.SpotLightHelper( object, 10 );
+			helper.lightSphere.id = object.id;
+			this.sceneHelpers.add( helper );
+
+			this.helpers[ object.id ] = helper;
+			this.signals.helperAdded.dispatch( helper );
 
 		} else if ( object instanceof THREE.HemisphereLight ) {
 
-			this.helpers[ object.id ] = new THREE.HemisphereLightHelper( object, 10 );
-			this.sceneHelpers.add( this.helpers[ object.id ] );
-			this.helpers[ object.id ].lightSphere.id = object.id;
+			var helper = new THREE.HemisphereLightHelper( object, 10 );
+			helper.lightSphere.id = object.id;
+			this.sceneHelpers.add( helper );
+
+			this.helpers[ object.id ] = helper;
+			this.signals.helperAdded.dispatch( helper );
 
 		}
-
-		this.signals.sceneChanged.dispatch();
 
 	},
 
@@ -183,36 +188,7 @@ Editor.prototype = {
 
 	deselect: function () {
 
-		this.selected = null;
-
-	},
-
-	//
-
-	cloneObject: function ( object ) {
-
-		this.addObject( object.clone() );
-
-	},
-
-	flattenObject: function ( object ) {
-
-		var name = object.name ?  '"' + object.name + '"': "selected object";
-
-		if ( confirm( 'Flatten ' + name + '?' ) === false ) return;
-
-		delete object.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		var geometry = object.geometry.clone();
-		geometry.applyMatrix( object.matrix );
-
-		object.geometry = geometry;
-
-		object.position.set( 0, 0, 0 );
-		object.rotation.set( 0, 0, 0 );
-		object.scale.set( 1, 1, 1 );
-
-		this.signals.objectChanged.dispatch( object );
+		this.select( null );
 
 	}
 
