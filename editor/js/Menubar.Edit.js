@@ -1,4 +1,4 @@
-Menubar.Edit = function ( signals ) {
+Menubar.Edit = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
@@ -24,7 +24,7 @@ Menubar.Edit = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Clone' );
-	option.onClick( function () { signals.cloneSelectedObject.dispatch(); } );
+	option.onClick( function () { editor.cloneObject( editor.selected ); } );
 	options.add( option );
 
 	// flatten
@@ -32,7 +32,7 @@ Menubar.Edit = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Flatten' );
-	option.onClick( function () { signals.flattenSelectedObject.dispatch(); } );
+	option.onClick( function () { editor.flattenObject( editor.selected ); } );
 	options.add( option );
 
 	// delete
@@ -40,7 +40,7 @@ Menubar.Edit = function ( signals ) {
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Delete' );
-	option.onClick( function () { signals.removeSelectedObject.dispatch(); } );
+	option.onClick( function () { editor.removeObject( editor.selected ); } );
 	options.add( option );
 
 	//

@@ -1,4 +1,6 @@
-Sidebar.Geometry = function ( signals ) {
+Sidebar.Geometry = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var geometryClasses = {
 

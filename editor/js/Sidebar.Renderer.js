@@ -1,4 +1,6 @@
-Sidebar.Renderer = function ( signals ) {
+Sidebar.Renderer = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var rendererClasses = {
 

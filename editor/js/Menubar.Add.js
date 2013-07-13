@@ -1,4 +1,4 @@
-Menubar.Add = function ( signals ) {
+Menubar.Add = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
@@ -41,7 +41,7 @@ Menubar.Add = function ( signals ) {
 
 		mesh.rotation.x = - Math.PI/2;
 
-		signals.objectAdded.dispatch( mesh );
+		editor.addObject( mesh );
 
 	} );
 	options.add( option );
@@ -65,8 +65,7 @@ Menubar.Add = function ( signals ) {
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Cube ' + ( ++ meshCount );
 
-		signals.objectAdded.dispatch( mesh );
-
+		editor.addObject( mesh );
 
 	} );
 	options.add( option );
@@ -89,7 +88,7 @@ Menubar.Add = function ( signals ) {
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
-		signals.objectAdded.dispatch( mesh );
+		editor.addObject( mesh );
 
 	} );
 	options.add( option );
@@ -109,7 +108,7 @@ Menubar.Add = function ( signals ) {
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
-		signals.objectAdded.dispatch( mesh );
+		editor.addObject( mesh );
 
 	} );
 	options.add( option );
@@ -128,7 +127,7 @@ Menubar.Add = function ( signals ) {
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
-		signals.objectAdded.dispatch( mesh );
+		editor.addObject( mesh );
 
 	} );
 	options.add( option );
@@ -150,7 +149,7 @@ Menubar.Add = function ( signals ) {
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
-		signals.objectAdded.dispatch( mesh );
+		editor.addObject( mesh );
 
 	} );
 	options.add( option );
@@ -174,7 +173,7 @@ Menubar.Add = function ( signals ) {
 		var mesh = new THREE.Mesh( geometry, createDummyMaterial( geometry ) );
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
-		signals.objectAdded.dispatch( mesh );
+		editor.addObject( mesh );
 
 	} );
 	options.add( option );
@@ -197,7 +196,7 @@ Menubar.Add = function ( signals ) {
 		var light = new THREE.PointLight( color, intensity, distance );
 		light.name = 'PointLight ' + ( ++ lightCount );
 
-		signals.objectAdded.dispatch( light );
+		editor.addObject( light );
 
 	} );
 	options.add( option );
@@ -221,7 +220,7 @@ Menubar.Add = function ( signals ) {
 
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
-		signals.objectAdded.dispatch( light );
+		editor.addObject( light );
 
 	} );
 	options.add( option );
@@ -242,7 +241,7 @@ Menubar.Add = function ( signals ) {
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-		signals.objectAdded.dispatch( light );
+		editor.addObject( light );
 
 	} );
 	options.add( option );
@@ -263,7 +262,7 @@ Menubar.Add = function ( signals ) {
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-		signals.objectAdded.dispatch( light );
+		editor.addObject( light );
 
 	} );
 	options.add( option );
@@ -280,7 +279,7 @@ Menubar.Add = function ( signals ) {
 		var light = new THREE.AmbientLight( color );
 		light.name = 'AmbientLight ' + ( ++ lightCount );
 
-		signals.objectAdded.dispatch( light );
+		editor.addObject( light );
 
 	} );
 	options.add( option );
@@ -291,7 +290,7 @@ Menubar.Add = function ( signals ) {
 
 		return new THREE.MeshPhongMaterial();
 
-	};
+	}
 
 	return container;
 

@@ -1,4 +1,6 @@
-Sidebar.Object3D = function ( signals ) {
+Sidebar.Object3D = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
@@ -215,8 +217,6 @@ Sidebar.Object3D = function ( signals ) {
 
 	var selected = null;
 
-	var scene = null;
-
 	function updateScaleX() {
 
 		if ( objectScaleLock.getValue() === true ) {
@@ -285,7 +285,7 @@ Sidebar.Object3D = function ( signals ) {
 
 					parent.add( selected );
 
-					signals.sceneChanged.dispatch( scene );
+					signals.sceneChanged.dispatch();
 
 				}
 
@@ -441,9 +441,9 @@ Sidebar.Object3D = function ( signals ) {
 
 	// events
 
-	signals.sceneChanged.add( function ( object ) {
+	signals.sceneChanged.add( function () {
 
-		scene = object;
+		var scene = editor.scene;
 
 		var options = {};
 
@@ -461,7 +461,7 @@ Sidebar.Object3D = function ( signals ) {
 
 			}
 
-		} )( object.children );
+		} )( scene.children );
 
 		objectParent.setOptions( options );
 

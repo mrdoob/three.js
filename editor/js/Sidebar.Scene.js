@@ -1,4 +1,6 @@
-Sidebar.Scene = function ( signals ) {
+Sidebar.Scene = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var selected = null;
 
@@ -79,8 +81,6 @@ Sidebar.Scene = function ( signals ) {
 
 	//
 
-	var scene = null;
-
 	function getObjectType( object ) {
 
 		var objects = {
@@ -108,17 +108,7 @@ Sidebar.Scene = function ( signals ) {
 	function updateOutliner() {
 
 		var id = parseInt( outliner.getValue() );
-
-		scene.traverse( function ( node ) {
-
-			if ( node.id === id ) {
-
-				signals.objectSelected.dispatch( node );
-				return;
-
-			}
-
-		} );
+		editor.selectById( id );
 
 	}
 
@@ -158,9 +148,9 @@ Sidebar.Scene = function ( signals ) {
 
 	var selected;
 
-	signals.sceneChanged.add( function ( object ) {
+	signals.sceneChanged.add( function () {
 
-		scene = object;
+		var scene = editor.scene;
 
 		var options = {};
 

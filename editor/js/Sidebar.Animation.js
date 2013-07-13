@@ -1,4 +1,6 @@
-Sidebar.Animation = function ( signals ) {
+Sidebar.Animation = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var options = {};
 	var possibleAnimations = {};

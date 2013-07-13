@@ -1,4 +1,4 @@
-Menubar.File = function ( signals ) {
+Menubar.File = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
@@ -179,20 +179,6 @@ Menubar.File = function ( signals ) {
 		window.focus();
 
 	};
-
-	// signals
-
-	signals.objectSelected.add( function ( object ) {
-
-		selectedObject = object;
-
-	} );
-
-	signals.sceneChanged.add( function ( object ) {
-
-		scene = object;
-
-	} );
 
 	return container;
 

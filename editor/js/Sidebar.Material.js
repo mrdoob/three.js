@@ -1,4 +1,6 @@
-Sidebar.Material = function ( signals ) {
+Sidebar.Material = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var materialClasses = {
 

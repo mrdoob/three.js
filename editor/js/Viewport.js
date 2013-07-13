@@ -14,6 +14,9 @@ var Viewport = function ( editor ) {
 	info.setColor( '#ffffff' );
 	container.add( info );
 
+	var scene = editor.scene;
+	var sceneHelpers = editor.sceneHelpers;
+
 	var clearColor = 0xAAAAAA;
 	var objects = [];
 
@@ -22,14 +25,10 @@ var Viewport = function ( editor ) {
 	var helpersToObjects = {};
 	var objectsToHelpers = {};
 
-	var sceneHelpers = new THREE.Scene();
-
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
 
 	//
-
-	var scene = new THREE.Scene();
 
 	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
 	camera.position.set( 500, 250, 500 );
@@ -176,6 +175,13 @@ var Viewport = function ( editor ) {
 
 	// signals
 
+	signals.sceneChanged.add( function () {
+
+		updateInfo();
+		render();
+
+	} );
+
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );
@@ -211,90 +217,9 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.sceneAdded.add( function ( object ) {
-
-		scene.userData = JSON.parse( JSON.stringify( object.userData ) );
-
-		while ( object.children.length > 0 ) {
-
-			signals.objectAdded.dispatch( object.children[ 0 ] );
-
-		}
-
-	} );
-
 	signals.objectAdded.add( function ( object ) {
 
-		// handle children
-
-		object.traverse( function ( object ) {
-
-			// create helpers for invisible object types (lights, cameras, targets)
-
-			if ( object instanceof THREE.PointLight ) {
-
-				var helper = new THREE.PointLightHelper( object, 10 );
-				sceneHelpers.add( helper );
-
-				objectsToHelpers[ object.id ] = helper;
-				helpersToObjects[ helper.lightSphere.id ] = object;
-
-				objects.push( helper.lightSphere );
-
-			} else if ( object instanceof THREE.DirectionalLight ) {
-
-				var helper = new THREE.DirectionalLightHelper( object, 10 );
-				sceneHelpers.add( helper );
-
-				objectsToHelpers[ object.id ] = helper;
-				helpersToObjects[ helper.lightSphere.id ] = object;
-
-				objects.push( helper.lightSphere );
-
-			} else if ( object instanceof THREE.SpotLight ) {
-
-				var helper = new THREE.SpotLightHelper( object, 10 );
-				sceneHelpers.add( helper );
-
-				objectsToHelpers[ object.id ] = helper;
-				helpersToObjects[ helper.lightSphere.id ] = object;
-
-				objects.push( helper.lightSphere );
-
-			} else if ( object instanceof THREE.HemisphereLight ) {
-
-				var helper = new THREE.HemisphereLightHelper( object, 10 );
-				sceneHelpers.add( helper );
-
-				objectsToHelpers[ object.id ] = helper;
-				helpersToObjects[ helper.lightSphere.id ] = object;
-
-				objects.push( helper.lightSphere );
-
-			} else {
-
-				// add to picking list
-
-				objects.push( object );
-
-			}
-
-		} );
-
-		scene.add( object );
-
-		// TODO: Add support for hierarchies with lights
-
-		if ( object instanceof THREE.Light )  {
-
-			updateMaterials( scene );
-
-		}
-
-		updateInfo();
-
-		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( object );
+		objects.push( object );
 
 	} );
 
@@ -332,7 +257,6 @@ var Viewport = function ( editor ) {
 
 			selectionBox.update( object );
 			transformControls.update();
-			updateInfo();
 
 		}
 
@@ -345,96 +269,6 @@ var Viewport = function ( editor ) {
 		render();
 
 		signals.sceneChanged.dispatch( scene );
-
-	} );
-
-	signals.flattenSelectedObject.add( function () {
-
-		var name = selected.name ?  '"' + selected.name + '"': "selected object";
-
-		if ( confirm( 'Flatten ' + name + '?' ) === false ) return;
-
-		delete selected.__webglInit; // TODO: Remove hack (WebGLRenderer refactoring)
-
-		var geometry = selected.geometry.clone();
-		geometry.applyMatrix( selected.matrix );
-
-		selected.setGeometry( geometry );
-
-		selected.position.set( 0, 0, 0 );
-		selected.rotation.set( 0, 0, 0 );
-		selected.scale.set( 1, 1, 1 );
-
-		signals.objectChanged.dispatch( selected );
-
-	} );
-
-	signals.cloneSelectedObject.add( function () {
-
-		if ( selected === camera ) return;
-
-		var object = selected.clone();
-
-		signals.objectAdded.dispatch( object );
-
-	} );
-
-	signals.removeSelectedObject.add( function () {
-
-		if ( selected.parent === undefined ) return;
-
-		var name = selected.name ?  '"' + selected.name + '"': "selected object";
-
-		if ( confirm( 'Delete ' + name + '?' ) === false ) return;
-
-		var parent = selected.parent;
-
-		if ( selected instanceof THREE.PointLight ||
-		     selected instanceof THREE.DirectionalLight ||
-		     selected instanceof THREE.SpotLight ||
-		     selected instanceof THREE.HemisphereLight ) {
-
-			var helper = objectsToHelpers[ selected.id ];
-
-			objects.splice( objects.indexOf( helper.lightSphere ), 1 );
-
-			helper.parent.remove( helper );
-			selected.parent.remove( selected );
-
-			delete objectsToHelpers[ selected.id ];
-			delete helpersToObjects[ helper.id ];
-
-			if ( selected instanceof THREE.DirectionalLight ||
-			     selected instanceof THREE.SpotLight ) {
-
-				selected.target.parent.remove( selected.target );
-
-			}
-
-			updateMaterials( scene );
-
-		} else {
-
-			selected.traverse( function ( object ) {
-
-				var index = objects.indexOf( object );
-
-				if ( index !== -1 ) {
-
-					objects.splice( index, 1 )
-
-				}
-
-			} );
-
-			selected.parent.remove( selected );
-
-			updateInfo();
-
-		}
-
-		signals.sceneChanged.dispatch( scene );
-		signals.objectSelected.dispatch( parent );
 
 	} );
 
