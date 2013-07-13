@@ -174,19 +174,39 @@ test( "applyMatrix4", function() {
 });
 
 
-test( "distanceSqAndPointToSegment4", function() {
+test( "distanceToSegment", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
-	var v0 = new THREE.Vector3( 3, 5, 50 );
-	var v1 = new THREE.Vector3( 50, 50, 50 ); // just a far away point
 	var ptOnLine = new THREE.Vector3();
 	var ptOnSegment = new THREE.Vector3();
-	var distSqr = a.distanceSqAndPointToSegment( v0, v1, ptOnLine, ptOnSegment );
-	var m = new THREE.Matrix4();
+
+	//segment in front of the ray
+	var v0 = new THREE.Vector3( 3, 5, 50 );
+	var v1 = new THREE.Vector3( 50, 50, 50 ); // just a far away point
+	var distSqr = a.distanceToSegment( v0, v1, ptOnLine, ptOnSegment );
 
 	ok( ptOnSegment.distanceTo( v0 ) < 0.0001, "Passed!" );
 	ok( ptOnLine.distanceTo( new THREE.Vector3(1, 1, 50) ) < 0.0001, "Passed!" );
 	// ((3-1) * (3-1) + (5-1) * (5-1) = 4 + 16 = 20
-	ok( distSqr === 20, "Passed!" );
+	ok( Math.abs( distSqr - 20 ) < 0.0001, "Passed!" );
+
+	//segment behind the ray
+	v0 = new THREE.Vector3( -50, -50, -50 ); // just a far away point
+	v1 = new THREE.Vector3( -3, -5, -4 );
+	distSqr = a.distanceToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+	ok( ptOnSegment.distanceTo( v1 ) < 0.0001, "Passed!" );
+	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
+	// ((-3-1) * (-3-1) + (-5-1) * (-5-1) + (-4-1) + (-4-1) = 16 + 36 + 25 = 77
+	ok( Math.abs( distSqr - 77 ) < 0.0001, "Passed!" );
+
+	//exact intersection between the ray and the segment
+	v0 = new THREE.Vector3( -50, -50, -50 );
+	v1 = new THREE.Vector3( 50, 50, 50 );
+	distSqr = a.distanceToSegment( v0, v1, ptOnLine, ptOnSegment );
+
+	ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
+	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
+	ok( distSqr < 0.0001, "Passed!" );
 });
 
 
