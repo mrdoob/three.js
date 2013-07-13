@@ -14,9 +14,6 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	var selectedObject;
-	var scene;
-
 	var options = new UI.Panel();
 	options.setClass( 'options' );
 	options.setDisplay( 'none' );
@@ -120,7 +117,9 @@ Menubar.File = function ( editor ) {
 
 	var exportGeometry = function ( exporterClass ) {
 
-		if ( selectedObject.geometry === undefined ) {
+		var object = editor.selected;
+
+		if ( object.geometry === undefined ) {
 
 			alert( "Selected object doesn't have any geometry" );
 			return;
@@ -133,12 +132,12 @@ Menubar.File = function ( editor ) {
 
 		if ( exporter instanceof THREE.GeometryExporter ) {
 
-			output = JSON.stringify( exporter.parse( selectedObject.geometry ), null, '\t' );
+			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} else {
 
-			output = exporter.parse( selectedObject.geometry );
+			output = exporter.parse( object.geometry );
 
 		}
 
@@ -154,7 +153,9 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new exporterClass();
 
-		var output = JSON.stringify( exporter.parse( selectedObject ), null, '\t' );
+		var object = editor.selected;
+
+		var output = JSON.stringify( exporter.parse( object ), null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
@@ -169,7 +170,7 @@ Menubar.File = function ( editor ) {
 
 		var exporter = new exporterClass();
 
-		var output = JSON.stringify( exporter.parse( scene ), null, '\t' );
+		var output = JSON.stringify( exporter.parse( editor.scene ), null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
