@@ -26,20 +26,6 @@ var Loader = function ( editor ) {
 
 	}, false );
 
-	var timeout;
-
-	signals.sceneChanged.add( function () {
-
-		clearTimeout( timeout );
-
-		timeout = setTimeout( function () {
-
-			scope.saveLocalStorage( editor.scene );
-
-		}, 3000 );
-
-	} );
-
 	this.loadLocalStorage = function () {
 
 		if ( localStorage.threejsEditor !== undefined ) {
@@ -53,80 +39,24 @@ var Loader = function ( editor ) {
 
 	};
 
+	var timeout;
+
 	this.saveLocalStorage = function ( scene ) {
 
-		localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
-		console.log( 'Saved state to Local Storage' );
+		clearTimeout( timeout );
 
-	}
+		timeout = setTimeout( function () {
 
-	this.handleJSON = function ( data, file, filename ) {
+			localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
+			console.log( 'Saved state to Local Storage' );
 
-		if ( data.metadata === undefined ) { // 2.0
-
-			data.metadata = { type: 'geometry' };
-
-		}
-
-		if ( data.metadata.type === undefined ) { // 3.0
-
-			data.metadata.type = 'geometry';
-
-		}
-
-		if ( data.metadata.version === undefined ) {
-
-			data.metadata.version = data.metadata.formatVersion;
-
-		}
-
-		if ( data.metadata.type === 'geometry' ) {
-
-			var loader = new THREE.JSONLoader();
-			var result = loader.parse( data );
-
-			var geometry = result.geometry;
-			var material = result.materials !== undefined
-						? new THREE.MeshFaceMaterial( result.materials )
-						: new THREE.MeshPhongMaterial();
-
-			geometry.sourceType = "ascii";
-			geometry.sourceFile = file.name;
-
-			var mesh = new THREE.Mesh( geometry, material );
-			mesh.name = filename;
-
-			editor.addObject( mesh );
-
-		} else if ( data.metadata.type === 'object' ) {
-
-			var loader = new THREE.ObjectLoader();
-			var result = loader.parse( data );
-
-			if ( result instanceof THREE.Scene ) {
-
-				editor.setScene( result );
-
-			} else {
-
-				editor.addObject( result );
-
-			}
-
-		} else if ( data.metadata.type === 'scene' ) {
-
-			// DEPRECATED
-
-			var loader = new THREE.SceneLoader();
-			loader.parse( data, function ( result ) {
-
-				editor.setScene( result.scene );
-
-			}, '' );
-
-		}
+		}, 3000 );
 
 	};
+
+	signals.objectAdded.add( this.saveLocalStorage );
+	signals.objectChanged.add( this.saveLocalStorage );
+	signals.objectRemoved.add( this.saveLocalStorage );
 
 	this.parseFile = function ( file, filename, extension ) {
 
@@ -211,7 +141,7 @@ var Loader = function ( editor ) {
 						worker.onmessage = function ( event ) {
 
 							event.data.metadata = { version: 2 };
-							scope.handleJSON( event.data, file, filename );
+							handleJSON( event.data, file, filename );
 
 						};
 
@@ -236,7 +166,7 @@ var Loader = function ( editor ) {
 
 					}
 
-					scope.handleJSON( data, file, filename );
+					handleJSON( data, file, filename );
 
 				}, false );
 				reader.readAsText( file );
@@ -380,5 +310,73 @@ var Loader = function ( editor ) {
 		}
 
 	}
+
+	var handleJSON = function ( data, file, filename ) {
+
+		if ( data.metadata === undefined ) { // 2.0
+
+			data.metadata = { type: 'geometry' };
+
+		}
+
+		if ( data.metadata.type === undefined ) { // 3.0
+
+			data.metadata.type = 'geometry';
+
+		}
+
+		if ( data.metadata.version === undefined ) {
+
+			data.metadata.version = data.metadata.formatVersion;
+
+		}
+
+		if ( data.metadata.type === 'geometry' ) {
+
+			var loader = new THREE.JSONLoader();
+			var result = loader.parse( data );
+
+			var geometry = result.geometry;
+			var material = result.materials !== undefined
+						? new THREE.MeshFaceMaterial( result.materials )
+						: new THREE.MeshPhongMaterial();
+
+			geometry.sourceType = "ascii";
+			geometry.sourceFile = file.name;
+
+			var mesh = new THREE.Mesh( geometry, material );
+			mesh.name = filename;
+
+			editor.addObject( mesh );
+
+		} else if ( data.metadata.type === 'object' ) {
+
+			var loader = new THREE.ObjectLoader();
+			var result = loader.parse( data );
+
+			if ( result instanceof THREE.Scene ) {
+
+				editor.setScene( result );
+
+			} else {
+
+				editor.addObject( result );
+
+			}
+
+		} else if ( data.metadata.type === 'scene' ) {
+
+			// DEPRECATED
+
+			var loader = new THREE.SceneLoader();
+			loader.parse( data, function ( result ) {
+
+				editor.setScene( result.scene );
+
+			}, '' );
+
+		}
+
+	};
 
 }

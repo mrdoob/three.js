@@ -45,7 +45,7 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-		signals.objectChanged.dispatch( selected );
+		signals.objectChanged.dispatch( editor.selected );
 
 	} );
 	sceneHelpers.add( transformControls.gizmo );
@@ -118,21 +118,17 @@ var Viewport = function ( editor ) {
 
 			if ( intersects.length > 0 ) {
 
-				selected = intersects[ 0 ].object;
+				editor.select( intersects[ 0 ].object );
 
 				if ( helpersToObjects[ selected.id ] !== undefined ) {
 
-					selected = helpersToObjects[ selected.id ];
+					editor.select( helpersToObjects[ selected.id ] );
 
 				}
 
-				signals.objectSelected.dispatch( selected );
-
 			} else {
 
-				selected = camera;
-
-				signals.objectSelected.dispatch( selected );
+				editor.select( camera );
 
 			}
 
@@ -150,9 +146,9 @@ var Viewport = function ( editor ) {
 
 		var intersects = getIntersects( event, objects );
 
-		if ( intersects.length > 0 && intersects[ 0 ].object === selected ) {
+		if ( intersects.length > 0 && intersects[ 0 ].object === editor.selected ) {
 
-			controls.focus( selected );
+			controls.focus( editor.selected );
 
 		}
 
@@ -237,11 +233,9 @@ var Viewport = function ( editor ) {
 
 			}
 
-			selected = object;
+			if ( object instanceof THREE.PerspectiveCamera === false ) {
 
-			if ( selected instanceof THREE.PerspectiveCamera === false ) {
-
-				transformControls.attach(object);
+				transformControls.attach( object );
 
 			}
 

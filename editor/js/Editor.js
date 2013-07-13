@@ -6,9 +6,6 @@ var Editor = function () {
 
 		// actions
 
-		flattenSelectedObject: new SIGNALS.Signal(),
-		cloneSelectedObject: new SIGNALS.Signal(),
-		removeSelectedObject: new SIGNALS.Signal(),
 		playAnimations: new SIGNALS.Signal(),
 
 		// notifications
@@ -17,9 +14,12 @@ var Editor = function () {
 		snapChanged: new SIGNALS.Signal(),
 		rendererChanged: new SIGNALS.Signal(),
 		sceneChanged: new SIGNALS.Signal(),
+
 		objectAdded: new SIGNALS.Signal(),
-		objectSelected: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
+		objectRemoved: new SIGNALS.Signal(),
+		objectSelected: new SIGNALS.Signal(),
+
 		materialChanged: new SIGNALS.Signal(),
 		clearColorChanged: new SIGNALS.Signal(),
 		fogTypeChanged: new SIGNALS.Signal(),
@@ -81,6 +81,8 @@ Editor.prototype = {
 
 		this.scene.remove( object );
 		this.removeHelper( object );
+
+		this.signals.objectRemoved.dispatch( object );
 		this.signals.sceneChanged.dispatch();
 
 	},
@@ -204,13 +206,13 @@ Editor.prototype = {
 		var geometry = object.geometry.clone();
 		geometry.applyMatrix( object.matrix );
 
-		object.setGeometry( geometry );
+		object.geometry = geometry;
 
 		object.position.set( 0, 0, 0 );
 		object.rotation.set( 0, 0, 0 );
 		object.scale.set( 1, 1, 1 );
 
-		signals.objectChanged.dispatch( object );
+		this.signals.objectChanged.dispatch( object );
 
 	}
 
