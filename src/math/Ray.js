@@ -59,6 +59,12 @@ THREE.Ray.prototype = {
 		result.subVectors( point, this.origin );
 		var directionDistance = result.dot( this.direction );
 
+		if ( directionDistance < 0 ) {
+
+			return this.origin.clone();
+
+		}
+
 		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 	},
@@ -70,6 +76,14 @@ THREE.Ray.prototype = {
 		return function ( point ) {
 
 			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
+
+			// point behind the ray
+			if ( directionDistance < 0 ) {
+
+				return this.origin.distanceTo( point);
+
+			}
+
 			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 			return v1.distanceTo( point );
@@ -160,22 +174,22 @@ THREE.Ray.prototype = {
 
 	isIntersectionPlane: function ( plane ) {
 
-		// check if the line and plane are non-perpendicular, if they
-		// eventually they will intersect.
+		// check if the ray lies on the plane first
+		var distToPoint = plane.distanceToPoint( this.origin );
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
+
 		var denominator = plane.normal.dot( this.direction );
-		if ( denominator != 0 ) {
+		if ( denominator * distToPoint < 0 ) {
 
-			return true;
-
-		}
-
-		// line is coplanar, return origin
-		if( plane.distanceToPoint( this.origin ) == 0 ) {
-
-			return true;
+			return true
 
 		}
 
+		// ray origin is behind the plane (and is pointing behind it)
 		return false;
 
 	},
