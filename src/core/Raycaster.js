@@ -148,11 +148,11 @@
 
 						var planeDistance = localRay.distanceToPlane( facePlane );
 
-						// bail if raycaster and plane are parallel
-						if ( Math.abs( planeDistance ) < precision ) continue;
+						// bail if raycaster is too close to the plane
+						if ( planeDistance < precision ) continue;
 
-						// if negative distance, then plane is behind raycaster
-						if ( planeDistance < 0 ) continue;
+						// bail if raycaster is behind raycaster
+						if ( planeDistance === null ) continue;
 
 						// check if we hit the wrong side of a single sided face
 						side = material.side;
@@ -210,11 +210,11 @@
 
 					var planeDistance = localRay.distanceToPlane( facePlane );
 
-					// bail if raycaster and plane are parallel
-					if ( Math.abs( planeDistance ) < precision ) continue;
+					// bail if raycaster is too close to the plane
+					if ( planeDistance < precision ) continue;
 
-					// if negative distance, then plane is behind raycaster
-					if ( planeDistance < 0 ) continue;
+					// bail if raycaster is behind raycaster
+					if ( planeDistance === null ) continue;
 
 					// check if we hit the wrong side of a single sided face
 					side = material.side;
