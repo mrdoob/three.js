@@ -9,7 +9,20 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">The Canvas renderer displays your beautifully crafted scenes <em>not</em> using WebGL,
+                  but draws it using the (slower) <a href="http://www.w3.org/html/wg/drafts/2dcontext/html5_canvas/">Canvas 2D Context</a> API.</div>
+		<div class="desc">This renderer can be a nice fallback from [page:WebGLRenderer] for simple scenes:</div>
+		<code>
+		if (window.WebGLRenderingContext)
+			renderer = new THREE.WebGLRenderer();
+		else
+			renderer = new THREE.CanvasRenderer();
+		</code>
+		<div class="desc">
+			Note: both WebGLRenderer and CanvasRenderer are embedded in the web page using an HTML5 &lt;canvas&gt; tag.
+			The "Canvas" in CanvasRenderer means it uses Canvas 2D instead of WebGL.<br />
+			Don't confuse either CanvasRenderer with the SoftwareRenderer example, which simulates a screen buffer in a Javascript array.
+		</div>
 
 
 		<h2>Constructor</h2>
