@@ -104,7 +104,7 @@ UI.CubeTexture = function ( position ) {
 
 	var scope = this;
 
-	this.texture = new THREE.Texture( [], new THREE.CubeReflectionMapping() );
+	this.texture = null;
 
 	this.dom = document.createElement( 'input' );
 	this.dom.type = 'file';
@@ -124,7 +124,7 @@ UI.CubeTexture = function ( position ) {
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function( event ) {
 
-					scope.texture.image = [ this, this, this, this, this, this ];
+					scope.texture = new THREE.Texture( [ this, this, this, this, this, this ], new THREE.CubeReflectionMapping() )
 					scope.texture.needsUpdate = true;
 
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
