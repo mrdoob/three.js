@@ -170,11 +170,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar: function ( scalar ) {
 
-		this.x *= s;
-		this.y *= s;
-		this.z *= s;
+		this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
 
 		return this;
 
@@ -296,13 +296,15 @@ THREE.Vector3.prototype = {
 
 	},
 
-	divideScalar: function ( s ) {
+	divideScalar: function ( scalar ) {
 
-		if ( s !== 0 ) {
+		if ( scalar !== 0 ) {
 
-			this.x /= s;
-			this.y /= s;
-			this.z /= s;
+			var invScalar = 1 / scalar;
+
+			this.x *= invScalar;
+			this.y *= invScalar;
+			this.z *= invScalar;
 
 		} else {
 

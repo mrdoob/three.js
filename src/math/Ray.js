@@ -112,7 +112,8 @@ THREE.Ray.prototype = {
 		var c = diff.lengthSq();
 		var det = Math.abs( 1 - a01 * a01 );
 		var s0, s1, sqrDist, extDet;
-		if (det >= 0) {
+
+		if ( det >= 0 ) {
 
 			// The ray and segment are not parallel.
 
@@ -120,11 +121,11 @@ THREE.Ray.prototype = {
 			s1 = a01 * b0 - b1;
 			extDet = segExtent * det;
 
-			if (s0 >= 0) {
+			if ( s0 >= 0 ) {
 
-				if (s1 >= -extDet) {
+				if ( s1 >= - extDet ) {
 
-					if (s1 <= extDet) {
+					if ( s1 <= extDet ) {
 
 						// region 0
 						// Minimum at interior points of ray and segment.
@@ -144,9 +145,7 @@ THREE.Ray.prototype = {
 
 					}
 
-				}
-
-				else {
+				} else {
 
 					// region 5
 
@@ -166,7 +165,7 @@ THREE.Ray.prototype = {
 					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
 					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
-				} else if (s1 <= extDet) {
+				} else if ( s1 <= extDet ) {
 
 					// region 3
 
@@ -174,7 +173,7 @@ THREE.Ray.prototype = {
 					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
 					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
 
-				}	else {
+				} else {
 
 					// region 2
 
@@ -186,7 +185,7 @@ THREE.Ray.prototype = {
 
 			}
 
-		}	else {
+		} else {
 
 			// Ray and segment are parallel.
 

@@ -143,16 +143,19 @@ THREE.Vector2.prototype = {
 
 	},
 
-	divideScalar: function ( s ) {
+	divideScalar: function ( scalar ) {
 
-		if ( s !== 0 ) {
+		if ( scalar !== 0 ) {
 
-			this.x /= s;
-			this.y /= s;
+			var invScalar = 1 / scalar;
+
+			this.x *= invScalar;
+			this.y *= invScalar;
 
 		} else {
 
-			this.set( 0, 0 );
+			this.x = 0;
+			this.y = 0;
 
 		}
 

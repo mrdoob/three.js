@@ -847,17 +847,21 @@ THREE.Matrix4.prototype = {
 
 			matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
 
-			matrix.elements[0] /= sx;
-			matrix.elements[1] /= sx;
-			matrix.elements[2] /= sx;
+			var invSX = 1 / sx;
+			var invSY = 1 / sy;
+			var invSZ = 1 / sz;
 
-			matrix.elements[4] /= sy;
-			matrix.elements[5] /= sy;
-			matrix.elements[6] /= sy;
+			matrix.elements[0] *= invSX;
+			matrix.elements[1] *= invSX;
+			matrix.elements[2] *= invSX;
 
-			matrix.elements[8] /= sz;
-			matrix.elements[9] /= sz;
-			matrix.elements[10] /= sz;
+			matrix.elements[4] *= invSY;
+			matrix.elements[5] *= invSY;
+			matrix.elements[6] *= invSY;
+
+			matrix.elements[8] *= invSZ;
+			matrix.elements[9] *= invSZ;
+			matrix.elements[10] *= invSZ;
 
 			quaternion.setFromRotationMatrix( matrix );
 
