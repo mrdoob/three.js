@@ -33,6 +33,7 @@ THREE.GeometryExporter.prototype = {
 		var colors = [];
 		var colorsHash = {};
 		var uvs = [];
+		var uvsHash = {};
 
 		for ( var i = 0; i < geometry.faces.length; i ++ ) {
 
@@ -40,8 +41,8 @@ THREE.GeometryExporter.prototype = {
 
 			var isTriangle = face instanceof THREE.Face3;
 			var hasMaterial = false; // face.materialIndex !== undefined;
-			var hasFaceUv = false; // geometry.faceUvs[ 0 ][ i ] !== undefined;
-			var hasFaceVertexUv = false; // geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
+			var hasFaceUv = false; // geometry.faceUvs[ 0 ].length > 0;
+			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ].length > 0;
 			var hasFaceNormal = face.normal.length() > 0;
 			var hasFaceVertexNormal = face.vertexNormals.length > 0;
 			var hasFaceColor = face.color.r !== 1 || face.color.g !== 1 || face.color.b !== 1;
@@ -70,13 +71,13 @@ THREE.GeometryExporter.prototype = {
 
 			}
 
+			/*
 			if ( hasMaterial ) {
 
 				faces.push( face.materialIndex );
 
 			}
 
-			/*
 			if ( hasFaceUv ) {
 
 				var uv = geometry.faceUvs[ 0 ][ i ];
@@ -85,32 +86,30 @@ THREE.GeometryExporter.prototype = {
 			}
 			*/
 
-			/*
 			if ( hasFaceVertexUv ) {
 
-				var uvs = geometry.faceVertexUvs[ 0 ][ i ];
+				var faceVertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
 
 				if ( isTriangle ) {
 
 					faces.push(
-						uvs[ 0 ].u, uvs[ 0 ].v,
-						uvs[ 1 ].u, uvs[ 1 ].v,
-						uvs[ 2 ].u, uvs[ 2 ].v
+						getUvIndex( faceVertexUvs[ 0 ] ),
+						getUvIndex( faceVertexUvs[ 1 ] ),
+						getUvIndex( faceVertexUvs[ 2 ] )
 					);
 
 				} else {
 
 					faces.push(
-						uvs[ 0 ].u, uvs[ 0 ].v,
-						uvs[ 1 ].u, uvs[ 1 ].v,
-						uvs[ 2 ].u, uvs[ 2 ].v,
-						uvs[ 3 ].u, uvs[ 3 ].v
+						getUvIndex( faceVertexUvs[ 0 ] ),
+						getUvIndex( faceVertexUvs[ 1 ] ),
+						getUvIndex( faceVertexUvs[ 2 ] ),
+						getUvIndex( faceVertexUvs[ 3 ] )
 					);
 
 				}
 
 			}
-			*/
 
 			if ( hasFaceNormal ) {
 
@@ -216,10 +215,27 @@ THREE.GeometryExporter.prototype = {
 
 		}
 
+		function getUvIndex( uv ) {
+
+			var hash = uv.x.toString() + uv.y.toString();
+
+			if ( uvsHash[ hash ] !== undefined ) {
+
+				return uvsHash[ hash ];
+
+			}
+
+			uvsHash[ hash ] = uvs.length / 2;
+			uvs.push( uv.x, uv.y );
+
+			return uvsHash[ hash ];
+
+		}
+
 		output.vertices = vertices;
 		output.normals = normals;
 		if ( colors.length > 0 ) output.colors = colors;
-		if ( uvs.length > 0 ) output.uvs = uvs;
+		if ( uvs.length > 0 ) output.uvs = [ uvs ]; // temporal backward compatibility
 		output.faces = faces;
 
 		//
