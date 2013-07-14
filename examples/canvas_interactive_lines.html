@@ -64,7 +64,7 @@
 						program: program }
 					)
 				);
-				sphereInter.scale.x = sphereInter.scale.y = 2;
+				sphereInter.scale.x = sphereInter.scale.y = 5;
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
@@ -99,14 +99,14 @@
 				parentTransform.scale.y = Math.random() + 0.5;
 				parentTransform.scale.z = Math.random() + 0.5;
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( var i = 0; i < 50; i ++ ) {
 
 					var type = Math.random() > 0.5 ? THREE.LineStrip : THREE.LinePieces;
 					var object = new THREE.Line( geometry, new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } ), type );
 					
-					object.position.x = Math.random() * 800 - 400;
-					object.position.y = Math.random() * 800 - 400;
-					object.position.z = Math.random() * 800 - 400;
+					object.position.x = Math.random() * 400 - 200;
+					object.position.y = Math.random() * 400 - 200;
+					object.position.z = Math.random() * 400 - 200;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
 					object.rotation.y = Math.random() * 2 * Math.PI;

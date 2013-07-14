@@ -4,6 +4,8 @@
 
 THREE.RenderableFace3 = function () {
 
+	this.id = 0;
+
 	this.v1 = new THREE.RenderableVertex();
 	this.v2 = new THREE.RenderableVertex();
 	this.v3 = new THREE.RenderableVertex();
@@ -21,6 +23,6 @@ THREE.RenderableFace3 = function () {
 	this.material = null;
 	this.uvs = [[]];
 
-	this.z = null;
+	this.z = 0;
 
 };
