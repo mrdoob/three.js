@@ -22,9 +22,6 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var helpersToObjects = {};
-	var objectsToHelpers = {};
-
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
 
@@ -258,9 +255,9 @@ var Viewport = function ( editor ) {
 
 		}
 
-		if ( objectsToHelpers[ object.id ] !== undefined ) {
+		if ( editor.helpers[ object.id ] !== undefined ) {
 
-			objectsToHelpers[ object.id ].update();
+			editor.helpers[ object.id ].update();
 
 		}
 

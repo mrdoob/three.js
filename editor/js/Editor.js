@@ -20,6 +20,7 @@ var Editor = function () {
 		objectRemoved: new SIGNALS.Signal(),
 
 		helperAdded: new SIGNALS.Signal(),
+		helperRemoved: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
 		clearColorChanged: new SIGNALS.Signal(),
@@ -115,8 +116,8 @@ Editor.prototype = {
 			var helper = new THREE.PointLightHelper( object, 10 );
 			helper.lightSphere.id = object.id;
 			this.sceneHelpers.add( helper );
-
 			this.helpers[ object.id ] = helper;
+
 			this.signals.helperAdded.dispatch( helper );
 
 		} else if ( object instanceof THREE.DirectionalLight ) {
@@ -124,8 +125,8 @@ Editor.prototype = {
 			var helper = new THREE.DirectionalLightHelper( object, 10 );
 			helper.lightSphere.id = object.id;
 			this.sceneHelpers.add( helper );
-
 			this.helpers[ object.id ] = helper;
+
 			this.signals.helperAdded.dispatch( helper );
 
 		} else if ( object instanceof THREE.SpotLight ) {
@@ -133,8 +134,8 @@ Editor.prototype = {
 			var helper = new THREE.SpotLightHelper( object, 10 );
 			helper.lightSphere.id = object.id;
 			this.sceneHelpers.add( helper );
-
 			this.helpers[ object.id ] = helper;
+
 			this.signals.helperAdded.dispatch( helper );
 
 		} else if ( object instanceof THREE.HemisphereLight ) {
@@ -142,8 +143,8 @@ Editor.prototype = {
 			var helper = new THREE.HemisphereLightHelper( object, 10 );
 			helper.lightSphere.id = object.id;
 			this.sceneHelpers.add( helper );
-
 			this.helpers[ object.id ] = helper;
+
 			this.signals.helperAdded.dispatch( helper );
 
 		}
@@ -156,6 +157,8 @@ Editor.prototype = {
 
 			this.helpers[ object.id ].parent.remove( this.helpers[ object.id ] );
 			delete this.helpers[ object.id ];
+
+			this.signals.helperRemoved.dispatch( helper );
 
 		}
 
