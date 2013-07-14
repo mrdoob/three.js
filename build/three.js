@@ -5039,6 +5039,12 @@ THREE.Ray.prototype = {
 		result.subVectors( point, this.origin );
 		var directionDistance = result.dot( this.direction );
 
+		if ( directionDistance < 0 ) {
+
+			return this.origin.clone();
+
+		}
+
 		return result.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 	},
@@ -5050,6 +5056,15 @@ THREE.Ray.prototype = {
 		return function ( point ) {
 
 			var directionDistance = v1.subVectors( point, this.origin ).dot( this.direction );
+
+			// point behind the ray
+
+			if ( directionDistance < 0 ) {
+
+				return this.origin.distanceTo( point );
+
+			}
+
 			v1.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
 			return v1.distanceTo( point );
@@ -5058,81 +5073,112 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	distanceSqAndPointToSegment: function ( v0, v1, optionalPointOnLine, optionalPointOnSegment ) {
+	distanceToSegment: function( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistLine3Segment3.cpp
-		// It returns the min distance between the ray (actually... the line) and the segment
+		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistRay3Segment3.cpp
+		// It returns the min distance between the ray and the segment
 		// defined by v0 and v1
 		// It can also set two optional targets :
-		// - The closest point on the ray (...line)
+		// - The closest point on the ray
 		// - The closest point on the segment
 
 		var segCenter = v0.clone().add( v1 ).multiplyScalar( 0.5 );
 		var segDir = v1.clone().sub( v0 ).normalize();
-		var segExtent = v0.distanceTo( v1 ) *0.5;
+		var segExtent = v0.distanceTo( v1 ) * 0.5;
 		var diff = this.origin.clone().sub( segCenter );
-		var a01 = -this.direction.dot( segDir );
+		var a01 = - this.direction.dot( segDir );
 		var b0 = diff.dot( this.direction );
+		var b1 = - diff.dot( segDir );
 		var c = diff.lengthSq();
 		var det = Math.abs( 1 - a01 * a01 );
-		var b1, s0, s1, sqrDist, extDet;
+		var s0, s1, sqrDist, extDet;
+		if (det >= 0) {
 
-		if ( det >= 0 ) {
+			// The ray and segment are not parallel.
 
-			// The line and segment are not parallel.
-
-			b1 = -diff.dot( segDir );
+			s0 = a01 * b1 - b0;
 			s1 = a01 * b0 - b1;
 			extDet = segExtent * det;
 
-			if ( s1 >= -extDet ) {
+			if (s0 >= 0) {
 
-				if ( s1 <= extDet ) {
+				if (s1 >= -extDet) {
 
-					// Two interior points are closest, one on the line and one
-					// on the segment.
+					if (s1 <= extDet) {
 
-					var invDet = 1 / det;
-					s0 = ( a01 * b1 - b0 ) * invDet;
-					s1 *= invDet;
-					sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
+						// region 0
+						// Minimum at interior points of ray and segment.
 
-				} else {
+						var invDet = 1 / det;
+						s0 *= invDet;
+						s1 *= invDet;
+						sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
 
-					// The endpoint e1 of the segment and an interior point of
-					// the line are closest.
+					} else {
 
-					s1 = segExtent;
-					s0 = - ( a01 * s1 + b0 );
+						// region 1
+
+						s1 = segExtent;
+						s0 = Math.max( 0, - ( a01 * s1 + b0) );
+						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+					}
+
+				}
+
+				else {
+
+					// region 5
+
+					s1 = - segExtent;
+					s0 = Math.max( 0, - ( a01 * s1 + b0) );
 					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 				}
 
 			} else {
 
-				// The end point e0 of the segment and an interior point of the
-				// line are closest.
+				if ( s1 <= - extDet) {
 
-				s1 = - segExtent;
-				s0 = - ( a01 * s1 + b0 );
-				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+					// region 4
+
+					s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				} else if (s1 <= extDet) {
+
+					// region 3
+
+					s0 = 0;
+					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
+
+				}	else {
+
+					// region 2
+
+					s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+
+				}
 
 			}
 
-		} else {
+		}	else {
 
-			// The line and segment are parallel.  Choose the closest pair so that
-			// one point is at segment center.
+			// Ray and segment are parallel.
 
-			s1 = 0;
-			s0 = - b0;
-			sqrDist = b0 * s0 + c;
+			s1 = ( a01 > 0 ) ? - segExtent : segExtent;
+			s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+			sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 		}
 
-		if ( optionalPointOnLine ) {
+		if ( optionalPointOnRay ) {
 
-			optionalPointOnLine.copy( this.direction.clone().multiplyScalar( s0 ).add( this.origin ) );
+			optionalPointOnRay.copy( this.direction.clone().multiplyScalar( s0 ).add( this.origin ) );
 
 		}
 
@@ -5154,23 +5200,25 @@ THREE.Ray.prototype = {
 
 	isIntersectionPlane: function ( plane ) {
 
-		// check if the line and plane are non-perpendicular, if they
-		// eventually they will intersect.
+		// check if the ray lies on the plane first
+
+		var distToPoint = plane.distanceToPoint( this.origin );
+
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
 
 		var denominator = plane.normal.dot( this.direction );
 
-		if ( denominator != 0 ) {
+		if ( denominator * distToPoint < 0 ) {
 
-			return true;
-
-		}
-
-		// line is coplanar, return origin
-		if( plane.distanceToPoint( this.origin ) == 0 ) {
-
-			return true;
+			return true
 
 		}
+
+		// ray origin is behind the plane (and is pointing behind it)
 
 		return false;
 
@@ -5188,14 +5236,17 @@ THREE.Ray.prototype = {
 
 			}
 
-			// Unsure if this is the correct method to handle this case.
-			return undefined;
+			// Null is preferable to undefined since undefined means.... it is undefined
+
+			return null;
 
 		}
 
 		var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
 
-		return t;
+		// Return if the ray never intersects the plane
+
+		return t >= 0 ? t :  null;
 
 	},
 
@@ -5203,9 +5254,9 @@ THREE.Ray.prototype = {
 
 		var t = this.distanceToPlane( plane );
 
-		if ( t === undefined ) {
+		if ( t === null ) {
 
-			return undefined;
+			return null;
 		}
 
 		return this.at( t, optionalTarget );
@@ -6663,11 +6714,11 @@ THREE.EventDispatcher.prototype = {
 
 						var planeDistance = localRay.distanceToPlane( facePlane );
 
-						// bail if raycaster and plane are parallel
-						if ( Math.abs( planeDistance ) < precision ) continue;
+						// bail if the ray is too close to the plane
+						if ( planeDistance < precision ) continue;
 
-						// if negative distance, then plane is behind raycaster
-						if ( planeDistance < 0 ) continue;
+						// bail if the ray is behind the plane
+						if ( planeDistance === null ) continue;
 
 						// check if we hit the wrong side of a single sided face
 						side = material.side;
@@ -6743,11 +6794,11 @@ THREE.EventDispatcher.prototype = {
 
 					var planeDistance = localRay.distanceToPlane( facePlane );
 
-					// bail if raycaster and plane are parallel
-					if ( Math.abs( planeDistance ) < precision ) continue;
+					// bail if the ray is too close to the plane
+					if ( planeDistance < precision ) continue;
 
-					// if negative distance, then plane is behind raycaster
-					if ( planeDistance < 0 ) continue;
+					// bail if the ray is behind the plane
+					if ( planeDistance === null ) continue;
 
 					// check if we hit the wrong side of a single sided face
 					side = material.side;
@@ -6847,18 +6898,18 @@ THREE.EventDispatcher.prototype = {
 			var vertices = geometry.vertices;
 			var nbVertices = vertices.length;
 			var interSegment = new THREE.Vector3();
-			var interLine = new THREE.Vector3();
+			var interRay = new THREE.Vector3();
 			var step = object.type === THREE.LineStrip ? 1 : 2;
 
 			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
-				localRay.distanceSqAndPointToSegment( vertices[ i ], vertices[ i + 1 ], interLine, interSegment );
+				localRay.distanceToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 				interSegment.applyMatrix4( object.matrixWorld );
-				interLine.applyMatrix4( object.matrixWorld );
+				interRay.applyMatrix4( object.matrixWorld );
 
-				if ( interLine.distanceToSquared( interSegment ) <= precisionSq ) {
+				if ( interRay.distanceToSquared( interSegment ) <= precisionSq ) {
 
-					var distance = raycaster.ray.origin.distanceTo( interLine );
+					var distance = raycaster.ray.origin.distanceTo( interRay );
 
 					if ( raycaster.near <= distance && distance <= raycaster.far ) {
 
@@ -7583,6 +7634,7 @@ THREE.Projector = function () {
 	var getObject = function ( object ) {
 
 		_object = getNextObjectInPool();
+		_object.id = object.id;
 		_object.object = object;
 
 		if ( object.renderDepth !== null ) {
@@ -7745,6 +7797,7 @@ THREE.Projector = function () {
 
 								_face = getNextFace3InPool();
 
+								_face.id = object.id;
 								_face.v1.copy( v1 );
 								_face.v2.copy( v2 );
 								_face.v3.copy( v3 );
@@ -7786,6 +7839,7 @@ THREE.Projector = function () {
 
 								_face = getNextFace4InPool();
 
+								_face.id = object.id;
 								_face.v1.copy( v1 );
 								_face.v2.copy( v2 );
 								_face.v3.copy( v3 );
@@ -7897,6 +7951,8 @@ THREE.Projector = function () {
 						_clippedVertex2PositionScreen.multiplyScalar( 1 / _clippedVertex2PositionScreen.w );
 
 						_line = getNextLineInPool();
+
+						_line.id = object.id;
 						_line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
 						_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
 
@@ -7937,10 +7993,11 @@ THREE.Projector = function () {
 				if ( _vector4.z > 0 && _vector4.z < 1 ) {
 
 					_particle = getNextParticleInPool();
-					_particle.object = object;
+					_particle.id = object.id;
 					_particle.x = _vector4.x / _vector4.w;
 					_particle.y = _vector4.y / _vector4.w;
 					_particle.z = _vector4.z;
+					_particle.object = object;
 
 					_particle.rotation = object.rotation.z;
 
@@ -8066,7 +8123,19 @@ THREE.Projector = function () {
 
 	function painterSort( a, b ) {
 
-		return b.z - a.z;
+		if ( a.z !== b.z ) {
+
+			return b.z - a.z;
+
+		} else if ( a.id !== b.id ) {
+
+			return a.id - b.id;
+
+		} else {
+
+			return 0;
+
+		}
 
 	}
 
@@ -27045,6 +27114,8 @@ THREE.RenderableVertex.prototype.copy = function ( vertex ) {
 
 THREE.RenderableFace3 = function () {
 
+	this.id = 0;
+
 	this.v1 = new THREE.RenderableVertex();
 	this.v2 = new THREE.RenderableVertex();
 	this.v3 = new THREE.RenderableVertex();
@@ -27062,7 +27133,7 @@ THREE.RenderableFace3 = function () {
 	this.material = null;
 	this.uvs = [[]];
 
-	this.z = null;
+	this.z = 0;
 
 };
 
@@ -27071,6 +27142,8 @@ THREE.RenderableFace3 = function () {
  */
 
 THREE.RenderableFace4 = function () {
+
+	this.id = 0;
 
 	this.v1 = new THREE.RenderableVertex();
 	this.v2 = new THREE.RenderableVertex();
@@ -27090,7 +27163,7 @@ THREE.RenderableFace4 = function () {
 	this.material = null;
 	this.uvs = [[]];
 
-	this.z = null;
+	this.z = 0;
 
 };
 
@@ -27100,8 +27173,10 @@ THREE.RenderableFace4 = function () {
 
 THREE.RenderableObject = function () {
 
+	this.id = 0;
+
 	this.object = null;
-	this.z = null;
+	this.z = 0;
 
 };
 
@@ -27111,11 +27186,13 @@ THREE.RenderableObject = function () {
 
 THREE.RenderableParticle = function () {
 
+	this.id = 0;
+
 	this.object = null;
 
-	this.x = null;
-	this.y = null;
-	this.z = null;
+	this.x = 0;
+	this.y = 0;
+	this.z = 0;
 
 	this.rotation = null;
 	this.scale = new THREE.Vector2();
@@ -27130,13 +27207,15 @@ THREE.RenderableParticle = function () {
 
 THREE.RenderableLine = function () {
 
-	this.z = null;
+	this.id = 0;
 
 	this.v1 = new THREE.RenderableVertex();
 	this.v2 = new THREE.RenderableVertex();
 
 	this.vertexColors = [ new THREE.Color(), new THREE.Color() ];
 	this.material = null;
+
+	this.z = 0;
 
 };
 
