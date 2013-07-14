@@ -49,8 +49,22 @@
 
 				scene = new THREE.Scene();
 
-				var sphereGeometry = new THREE.SphereGeometry(3);
-				sphereInter = new THREE.Mesh( sphereGeometry, new THREE.MeshBasicMaterial( { color: 0xff0000 } ) );
+				var PI2 = Math.PI * 2;
+				var program = function ( context ) {
+
+					context.beginPath();
+					context.arc( 0, 0, 1, 0, PI2, true );
+					context.fill();
+
+				}
+
+				sphereInter = new THREE.Particle(
+					new THREE.ParticleCanvasMaterial( {
+						color: 0xff0000,
+						program: program }
+					)
+				);
+				sphereInter.scale.x = sphereInter.scale.y = 2;
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
@@ -59,7 +73,7 @@
 				var point = new THREE.Vector3();
 				var direction = new THREE.Vector3();
 
-				for ( var i = 0; i < 200; i ++ ) {
+				for ( var i = 0; i < 100; i ++ ) {
 
 					direction.x += Math.random() - 0.5;
 					direction.y += Math.random() - 0.5;
@@ -193,6 +207,14 @@
 					sphereInter.position.copy( intersects[ 0 ].point );
 
 				} else {
+
+					if ( currentIntersected !== undefined ) {
+
+						currentIntersected.material.linewidth = 1;
+
+					}
+
+					currentIntersected = undefined;
 
 					sphereInter.visible = false;
 
