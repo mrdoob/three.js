@@ -5,7 +5,6 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryClasses = {
 
 		"CircleGeometry": THREE.CircleGeometry,
-		"ConvexGeometry": THREE.ConvexGeometry,
 		"CubeGeometry": THREE.CubeGeometry,
 		"CylinderGeometry": THREE.CylinderGeometry,
 		"ExtrudeGeometry": THREE.ExtrudeGeometry,
