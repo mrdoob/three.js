@@ -1234,16 +1234,19 @@ THREE.Vector2.prototype = {
 
 	},
 
-	divideScalar: function ( s ) {
+	divideScalar: function ( scalar ) {
 
-		if ( s !== 0 ) {
+		if ( scalar !== 0 ) {
 
-			this.x /= s;
-			this.y /= s;
+			var invScalar = 1 / scalar;
+
+			this.x *= invScalar;
+			this.y *= invScalar;
 
 		} else {
 
-			this.set( 0, 0 );
+			this.x = 0;
+			this.y = 0;
 
 		}
 
@@ -1581,11 +1584,11 @@ THREE.Vector3.prototype = {
 
 	},
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar: function ( scalar ) {
 
-		this.x *= s;
-		this.y *= s;
-		this.z *= s;
+		this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
 
 		return this;
 
@@ -1707,13 +1710,15 @@ THREE.Vector3.prototype = {
 
 	},
 
-	divideScalar: function ( s ) {
+	divideScalar: function ( scalar ) {
 
-		if ( s !== 0 ) {
+		if ( scalar !== 0 ) {
 
-			this.x /= s;
-			this.y /= s;
-			this.z /= s;
+			var invScalar = 1 / scalar;
+
+			this.x *= invScalar;
+			this.y *= invScalar;
+			this.z *= invScalar;
 
 		} else {
 
@@ -2260,12 +2265,12 @@ THREE.Vector4.prototype = {
 
 	},
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar: function ( scalar ) {
 
-		this.x *= s;
-		this.y *= s;
-		this.z *= s;
-		this.w *= s;
+		this.x *= scalar;
+		this.y *= scalar;
+		this.z *= scalar;
+		this.w *= scalar;
 
 		return this;
 
@@ -2289,14 +2294,16 @@ THREE.Vector4.prototype = {
 
 	},
 
-	divideScalar: function ( s ) {
+	divideScalar: function ( scalar ) {
 
-		if ( s !== 0 ) {
+		if ( scalar !== 0 ) {
 
-			this.x /= s;
-			this.y /= s;
-			this.z /= s;
-			this.w /= s;
+			var invScalar = 1 / scalar;
+
+			this.x *= invScalar;
+			this.y *= invScalar;
+			this.z *= invScalar;
+			this.w *= invScalar;
 
 		} else {
 
@@ -2614,6 +2621,7 @@ THREE.Vector4.prototype = {
 		if ( oldLength !== 0 && l !== oldLength ) {
 
 			this.multiplyScalar( l / oldLength );
+
 		}
 
 		return this;
@@ -4865,17 +4873,21 @@ THREE.Matrix4.prototype = {
 
 			matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
 
-			matrix.elements[0] /= sx;
-			matrix.elements[1] /= sx;
-			matrix.elements[2] /= sx;
+			var invSX = 1 / sx;
+			var invSY = 1 / sy;
+			var invSZ = 1 / sz;
 
-			matrix.elements[4] /= sy;
-			matrix.elements[5] /= sy;
-			matrix.elements[6] /= sy;
+			matrix.elements[0] *= invSX;
+			matrix.elements[1] *= invSX;
+			matrix.elements[2] *= invSX;
 
-			matrix.elements[8] /= sz;
-			matrix.elements[9] /= sz;
-			matrix.elements[10] /= sz;
+			matrix.elements[4] *= invSY;
+			matrix.elements[5] *= invSY;
+			matrix.elements[6] *= invSY;
+
+			matrix.elements[8] *= invSZ;
+			matrix.elements[9] *= invSZ;
+			matrix.elements[10] *= invSZ;
 
 			quaternion.setFromRotationMatrix( matrix );
 
@@ -5092,7 +5104,8 @@ THREE.Ray.prototype = {
 		var c = diff.lengthSq();
 		var det = Math.abs( 1 - a01 * a01 );
 		var s0, s1, sqrDist, extDet;
-		if (det >= 0) {
+
+		if ( det >= 0 ) {
 
 			// The ray and segment are not parallel.
 
@@ -5100,11 +5113,11 @@ THREE.Ray.prototype = {
 			s1 = a01 * b0 - b1;
 			extDet = segExtent * det;
 
-			if (s0 >= 0) {
+			if ( s0 >= 0 ) {
 
-				if (s1 >= -extDet) {
+				if ( s1 >= - extDet ) {
 
-					if (s1 <= extDet) {
+					if ( s1 <= extDet ) {
 
 						// region 0
 						// Minimum at interior points of ray and segment.
@@ -5124,9 +5137,7 @@ THREE.Ray.prototype = {
 
 					}
 
-				}
-
-				else {
+				} else {
 
 					// region 5
 
@@ -5146,7 +5157,7 @@ THREE.Ray.prototype = {
 					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
 					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
-				} else if (s1 <= extDet) {
+				} else if ( s1 <= extDet ) {
 
 					// region 3
 
@@ -5154,7 +5165,7 @@ THREE.Ray.prototype = {
 					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
 					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
 
-				}	else {
+				} else {
 
 					// region 2
 
@@ -5166,7 +5177,7 @@ THREE.Ray.prototype = {
 
 			}
 
-		}	else {
+		} else {
 
 			// Ray and segment are parallel.
 
@@ -7755,9 +7766,11 @@ THREE.Projector = function () {
 					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
 					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
-					_vertex.positionScreen.x /= _vertex.positionScreen.w;
-					_vertex.positionScreen.y /= _vertex.positionScreen.w;
-					_vertex.positionScreen.z /= _vertex.positionScreen.w;
+					var invW = 1 / _vertex.positionScreen.w;
+
+					_vertex.positionScreen.x *= invW;
+					_vertex.positionScreen.y *= invW;
+					_vertex.positionScreen.z *= invW;
 
 					_vertex.visible = ! ( _vertex.positionScreen.x < -1 || _vertex.positionScreen.x > 1 ||
 							      _vertex.positionScreen.y < -1 || _vertex.positionScreen.y > 1 ||
@@ -7988,14 +8001,16 @@ THREE.Projector = function () {
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
 				_vector4.applyMatrix4( _viewProjectionMatrix );
 
-				_vector4.z /= _vector4.w;
+				var invW = 1 / _vector4.w;
+
+				_vector4.z *= invW;
 
 				if ( _vector4.z > 0 && _vector4.z < 1 ) {
 
 					_particle = getNextParticleInPool();
 					_particle.id = object.id;
-					_particle.x = _vector4.x / _vector4.w;
-					_particle.y = _vector4.y / _vector4.w;
+					_particle.x = _vector4.x * invW;
+					_particle.y = _vector4.y * invW;
 					_particle.z = _vector4.z;
 					_particle.object = object;
 
