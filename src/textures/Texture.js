@@ -44,11 +44,6 @@ THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
 	clone: function ( texture ) {
 
 		if ( texture === undefined ) texture = new THREE.Texture();
@@ -88,5 +83,7 @@ THREE.Texture.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.Texture.prototype );
 
 THREE.TextureIdCount = 0;

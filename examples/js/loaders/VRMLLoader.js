@@ -8,11 +8,6 @@ THREE.VRMLLoader.prototype = {
 
 	constructor: THREE.VTKLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
 	load: function ( url, callback ) {
 
 		var scope = this;
@@ -377,3 +372,5 @@ THREE.VRMLLoader.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.VRMLLoader.prototype );

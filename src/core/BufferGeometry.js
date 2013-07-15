@@ -36,11 +36,6 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
 	applyMatrix: function ( matrix ) {
 
 		var positionArray;
@@ -551,3 +546,5 @@ THREE.BufferGeometry.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );

@@ -16,11 +16,6 @@ THREE.MTLLoader.prototype = {
 
 	constructor: THREE.MTLLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
 	/**
 	 * Loads a MTL file
 	 *
@@ -474,3 +469,4 @@ THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
 
 };
 
+THREE.EventDispatcher.prototype.apply( THREE.MTLLoader.prototype );

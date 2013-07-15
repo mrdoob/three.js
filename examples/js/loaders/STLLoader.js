@@ -28,12 +28,7 @@ THREE.STLLoader = function () {};
 
 THREE.STLLoader.prototype = {
 
-	constructor: THREE.STLLoader,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent
+	constructor: THREE.STLLoader
 
 };
 
@@ -215,6 +210,8 @@ THREE.STLLoader.prototype.ensureBinary = function (buf) {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.STLLoader.prototype );
 
 if ( typeof DataView === 'undefined'){
 
