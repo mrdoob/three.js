@@ -353,7 +353,7 @@
 
 			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
-				localRay.distanceToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
+				localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 				interSegment.applyMatrix4( object.matrixWorld );
 				interRay.applyMatrix4( object.matrixWorld );
 
