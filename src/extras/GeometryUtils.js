@@ -154,40 +154,44 @@ THREE.GeometryUtils = {
 	// 	(uniform distribution)
 	// 	http://www.cgafaq.info/wiki/Random_Point_In_Triangle
 
-	randomPointInTriangle: function ( vectorA, vectorB, vectorC ) {
+	randomPointInTriangle: function () {
 
-		var a, b, c,
-			point = new THREE.Vector3(),
-			tmp = THREE.GeometryUtils.__v1;
+		var vector = new THREE.Vector3();
 
-		a = THREE.GeometryUtils.random();
-		b = THREE.GeometryUtils.random();
+		return function ( vectorA, vectorB, vectorC ) {
 
-		if ( ( a + b ) > 1 ) {
+			var point = new THREE.Vector3();
 
-			a = 1 - a;
-			b = 1 - b;
+			var a = THREE.Math.random16();
+			var b = THREE.Math.random16();
 
-		}
+			if ( ( a + b ) > 1 ) {
 
-		c = 1 - a - b;
+				a = 1 - a;
+				b = 1 - b;
 
-		point.copy( vectorA );
-		point.multiplyScalar( a );
+			}
 
-		tmp.copy( vectorB );
-		tmp.multiplyScalar( b );
+			var c = 1 - a - b;
 
-		point.add( tmp );
+			point.copy( vectorA );
+			point.multiplyScalar( a );
 
-		tmp.copy( vectorC );
-		tmp.multiplyScalar( c );
+			vector.copy( vectorB );
+			vector.multiplyScalar( b );
 
-		point.add( tmp );
+			point.add( vector );
 
-		return point;
+			vector.copy( vectorC );
+			vector.multiplyScalar( c );
 
-	},
+			point.add( vector );
+
+			return point;
+
+		};
+
+	}(),
 
 	// Get random point in face (triangle / quad)
 	// (uniform distribution)
@@ -237,7 +241,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			var r = THREE.GeometryUtils.random() * ( area1 + area2 );
+			var r = THREE.Math.random16() * ( area1 + area2 );
 
 			if ( r < area1 ) {
 
@@ -347,7 +351,7 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < n; i ++ ) {
 
-			r = THREE.GeometryUtils.random() * totalArea;
+			r = THREE.Math.random16() * totalArea;
 
 			index = binarySearchIndices( r );
 
@@ -372,18 +376,22 @@ THREE.GeometryUtils = {
 	// Get triangle area (half of parallelogram)
 	//	http://mathworld.wolfram.com/TriangleArea.html
 
-	triangleArea: function ( vectorA, vectorB, vectorC ) {
+	triangleArea: function () {
 
-		var tmp1 = THREE.GeometryUtils.__v1,
-			tmp2 = THREE.GeometryUtils.__v2;
+		var vector1 = new THREE.Vector3();
+		var vector2 = new THREE.Vector3();
 
-		tmp1.subVectors( vectorB, vectorA );
-		tmp2.subVectors( vectorC, vectorA );
-		tmp1.cross( tmp2 );
+		return function ( vectorA, vectorB, vectorC ) {
 
-		return 0.5 * tmp1.length();
+			vector1.subVectors( vectorB, vectorA );
+			vector2.subVectors( vectorC, vectorA );
+			vector1.cross( vector2 );
 
-	},
+			return 0.5 * vector1.length();
+
+		};
+
+	}(),
 
 	// Center geometry so that 0,0,0 is in center of bounding box
 
@@ -402,30 +410,6 @@ THREE.GeometryUtils = {
 		geometry.computeBoundingBox();
 
 		return offset;
-
-	},
-
-	// Normalize UVs to be from <0,1>
-	// (for now just the first set of UVs)
-
-	normalizeUVs: function ( geometry ) {
-
-		var uvSet = geometry.faceVertexUvs[ 0 ];
-
-		for ( var i = 0, il = uvSet.length; i < il; i ++ ) {
-
-			var uvs = uvSet[ i ];
-
-			for ( var j = 0, jl = uvs.length; j < jl; j ++ ) {
-
-				// texture repeat
-
-				if( uvs[ j ].x !== 1.0 ) uvs[ j ].x = uvs[ j ].x - Math.floor( uvs[ j ].x );
-				if( uvs[ j ].y !== 1.0 ) uvs[ j ].y = uvs[ j ].y - Math.floor( uvs[ j ].y );
-
-			}
-
-		}
 
 	},
 
@@ -570,8 +554,3 @@ THREE.GeometryUtils = {
     }
 
 };
-
-THREE.GeometryUtils.random = THREE.Math.random16;
-
-THREE.GeometryUtils.__v1 = new THREE.Vector3();
-THREE.GeometryUtils.__v2 = new THREE.Vector3();
