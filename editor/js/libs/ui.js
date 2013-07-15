@@ -542,6 +542,8 @@ UI.Number = function ( number ) {
 
 		event.stopPropagation();
 
+		if ( event.keyCode === 13 ) dom.blur();
+
 	}, false );
 
 	this.min = - Infinity;
