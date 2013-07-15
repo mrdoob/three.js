@@ -353,20 +353,20 @@
 
 			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
-				localRay.distanceToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
-				interSegment.applyMatrix4( object.matrixWorld );
-				interRay.applyMatrix4( object.matrixWorld );
+				var distSq = localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-				if ( interRay.distanceToSquared( interSegment ) <= precisionSq ) {
+				if ( distSq <= precisionSq ) {
 
-					var distance = raycaster.ray.origin.distanceTo( interRay );
+					var distance = localRay.origin.distanceTo( interRay );
 
 					if ( raycaster.near <= distance && distance <= raycaster.far ) {
 
 						intersects.push( {
 
 							distance: distance,
-							point: interSegment.clone(),
+							// What do we want? intersection point on the ray or on the segment??
+							// point: raycaster.ray.at( distance ),
+							point: interSegment.clone().applyMatrix4( object.matrixWorld ),
 							face: null,
 							faceIndex: null,
 							object: object

@@ -182,7 +182,7 @@ test( "applyMatrix4", function() {
 });
 
 
-test( "distanceToSegment", function() {
+test( "distanceSqToSegment", function() {
 	var a = new THREE.Ray( one3.clone(), new THREE.Vector3( 0, 0, 1 ) );
 	var ptOnLine = new THREE.Vector3();
 	var ptOnSegment = new THREE.Vector3();
@@ -190,7 +190,7 @@ test( "distanceToSegment", function() {
 	//segment in front of the ray
 	var v0 = new THREE.Vector3( 3, 5, 50 );
 	var v1 = new THREE.Vector3( 50, 50, 50 ); // just a far away point
-	var distSqr = a.distanceToSegment( v0, v1, ptOnLine, ptOnSegment );
+	var distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
 	ok( ptOnSegment.distanceTo( v0 ) < 0.0001, "Passed!" );
 	ok( ptOnLine.distanceTo( new THREE.Vector3(1, 1, 50) ) < 0.0001, "Passed!" );
@@ -200,7 +200,7 @@ test( "distanceToSegment", function() {
 	//segment behind the ray
 	v0 = new THREE.Vector3( -50, -50, -50 ); // just a far away point
 	v1 = new THREE.Vector3( -3, -5, -4 );
-	distSqr = a.distanceToSegment( v0, v1, ptOnLine, ptOnSegment );
+	distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
 	ok( ptOnSegment.distanceTo( v1 ) < 0.0001, "Passed!" );
 	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
@@ -210,7 +210,7 @@ test( "distanceToSegment", function() {
 	//exact intersection between the ray and the segment
 	v0 = new THREE.Vector3( -50, -50, -50 );
 	v1 = new THREE.Vector3( 50, 50, 50 );
-	distSqr = a.distanceToSegment( v0, v1, ptOnLine, ptOnSegment );
+	distSqr = a.distanceSqToSegment( v0, v1, ptOnLine, ptOnSegment );
 
 	ok( ptOnSegment.distanceTo( one3 ) < 0.0001, "Passed!" );
 	ok( ptOnLine.distanceTo( one3 ) < 0.0001, "Passed!" );
