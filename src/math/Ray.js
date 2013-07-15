@@ -61,7 +61,7 @@ THREE.Ray.prototype = {
 
 		if ( directionDistance < 0 ) {
 
-			return this.origin.clone();
+			return result.copy( this.origin );
 
 		}
 
