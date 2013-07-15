@@ -236,12 +236,11 @@ Sidebar.Material = function ( editor ) {
 
 	//
 
-	var selected = null;
-	var selectedHasUvs = false;
-
 	function update() {
 
-		var material = selected.material;
+		var object = editor.selected;
+		var objectHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
+		var material = object.material;
 		var textureWarning = false;
 
 		if ( material ) {
@@ -255,7 +254,7 @@ Sidebar.Material = function ( editor ) {
 			if ( material instanceof materialClasses[ materialClass.getValue() ] == false ) {
 
 				material = new materialClasses[ materialClass.getValue() ]();
-				selected.material = material;
+				object.material = material;
 
 			}
 
@@ -300,13 +299,13 @@ Sidebar.Material = function ( editor ) {
 
 				var mapEnabled = materialMapEnabled.getValue() === true;
 
-				if ( selectedHasUvs )  {
+				if ( objectHasUvs )  {
 
 					material.map = mapEnabled ? materialMap.getValue() : null;
 					material.needsUpdate = true;
 
-					selected.geometry.buffersNeedUpdate = true;
-					selected.geometry.uvsNeedUpdate = true;
+					object.geometry.buffersNeedUpdate = true;
+					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -321,12 +320,12 @@ Sidebar.Material = function ( editor ) {
 
 				var lightMapEnabled = materialLightMapEnabled.getValue() === true;
 
-				if ( selectedHasUvs )  {
+				if ( objectHasUvs )  {
 
 					material.lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
 					material.needsUpdate = true;
-					selected.geometry.buffersNeedUpdate = true;
-					selected.geometry.uvsNeedUpdate = true;
+					object.geometry.buffersNeedUpdate = true;
+					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -341,13 +340,13 @@ Sidebar.Material = function ( editor ) {
 
 				var bumpMapEnabled = materialBumpMapEnabled.getValue() === true;
 
-				if ( selectedHasUvs )  {
+				if ( objectHasUvs )  {
 
 					material.bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
 					material.bumpScale = materialBumpScale.getValue();
 					material.needsUpdate = true;
-					selected.geometry.buffersNeedUpdate = true;
-					selected.geometry.uvsNeedUpdate = true;
+					object.geometry.buffersNeedUpdate = true;
+					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -361,12 +360,12 @@ Sidebar.Material = function ( editor ) {
 
 				var normalMapEnabled = materialNormalMapEnabled.getValue() === true;
 
-				if ( selectedHasUvs )  {
+				if ( objectHasUvs )  {
 
 					material.normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
 					material.needsUpdate = true;
-					selected.geometry.buffersNeedUpdate = true;
-					selected.geometry.uvsNeedUpdate = true;
+					object.geometry.buffersNeedUpdate = true;
+					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -380,12 +379,12 @@ Sidebar.Material = function ( editor ) {
 
 				var specularMapEnabled = materialSpecularMapEnabled.getValue() === true;
 
-				if ( selectedHasUvs )  {
+				if ( objectHasUvs )  {
 
 					material.specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
 					material.needsUpdate = true;
-					selected.geometry.buffersNeedUpdate = true;
-					selected.geometry.uvsNeedUpdate = true;
+					object.geometry.buffersNeedUpdate = true;
+					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -399,13 +398,13 @@ Sidebar.Material = function ( editor ) {
 
 				var envMapEnabled = materialEnvMapEnabled.getValue() === true;
 
-				if ( selectedHasUvs )  {
+				if ( objectHasUvs )  {
 
 					material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
 					material.reflectivity = materialReflectivity.getValue();
 					material.needsUpdate = true;
-					selected.geometry.buffersNeedUpdate = true;
-					selected.geometry.uvsNeedUpdate = true;
+					object.geometry.buffersNeedUpdate = true;
+					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -475,9 +474,11 @@ Sidebar.Material = function ( editor ) {
 
 		};
 
+		var object = editor.selected;
+
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( selected.material[ property ] !== undefined ? '' : 'none' );
+			properties[ property ].setDisplay( object.material[ property ] !== undefined ? '' : 'none' );
 
 		}
 
@@ -498,9 +499,6 @@ Sidebar.Material = function ( editor ) {
 	signals.objectSelected.add( function ( object ) {
 
 		if ( object && object.material ) {
-
-			selected = object;
-			selectedHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
 
 			container.setDisplay( '' );
 
@@ -552,14 +550,19 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.map !== undefined ) {
 
-				if ( selectedHasUvs ) {
+				materialMapEnabled.setValue( material.map !== null );
 
-					materialMapEnabled.setValue( material.map !== null );
-					materialMap.setValue( material.map );
+				if ( material.map !== null ) {
 
-				} else {
+					if ( object.geometry.faceVertexUvs[ 0 ].length > 0 ) {
 
-					console.warn( "Can't set texture, model doesn't have texture coordinates" );
+						materialMap.setValue( material.map );
+
+					} else {
+
+						console.warn( "Can't set texture, model doesn't have texture coordinates" );
+
+					}
 
 				}
 
@@ -631,9 +634,6 @@ Sidebar.Material = function ( editor ) {
 			updateRows();
 
 		} else {
-
-			selected = null;
-			selectedHasUvs = false;
 
 			container.setDisplay( 'none' );
 
