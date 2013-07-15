@@ -12,11 +12,13 @@ THREE.MaterialExporter.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.0,
+				version: 4.2,
 				type: 'material',
 				generator: 'MaterialExporter'
 			}
 		};
+
+		output.uuid = material.uuid;
 
 		if ( material.name !== "" ) output.name = material.name;
 
@@ -24,6 +26,7 @@ THREE.MaterialExporter.prototype = {
 
 			output.type = 'MeshBasicMaterial';
 			output.color = material.color.getHex();
+			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -34,6 +37,7 @@ THREE.MaterialExporter.prototype = {
 			output.color = material.color.getHex();
 			output.ambient = material.ambient.getHex();
 			output.emissive = material.emissive.getHex();
+			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -46,6 +50,7 @@ THREE.MaterialExporter.prototype = {
 			output.emissive = material.emissive.getHex();
 			output.specular = material.specular.getHex();
 			output.shininess = material.shininess;
+			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;

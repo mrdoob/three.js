@@ -14,7 +14,7 @@ THREE.ObjectExporter.prototype = {
 
 		var output = {
 			metadata: {
-				version: 4.0,
+				version: 4.3,
 				type: 'object',
 				generator: 'ObjectExporter'
 			}
@@ -27,17 +27,17 @@ THREE.ObjectExporter.prototype = {
 
 		var parseGeometry = function ( geometry ) {
 
-			if ( geometries[ geometry.id ] === undefined ) {
+			if ( output.geometries === undefined ) {
 
-				if ( output.geometries === undefined ) {
+				output.geometries = [];
 
-					output.geometries = [];
+			}
 
-				}
-
-				geometries[ geometry.id ] = output.geometries.length;
+			if ( geometries[ geometry.uuid ] === undefined ) {
 
 				var data = {};
+
+				data.uuid = geometry.uuid;
 
 				if ( geometry.name !== "" ) data.name = geometry.name;
 
@@ -115,11 +115,13 @@ THREE.ObjectExporter.prototype = {
 
 				}
 
+				geometries[ geometry.uuid ] = data;
+
 				output.geometries.push( data );
 
 			}
 
-			return geometries[ geometry.id ];
+			return geometry.uuid;
 
 		};
 
@@ -130,25 +132,25 @@ THREE.ObjectExporter.prototype = {
 
 		var parseMaterial = function ( material ) {
 
-			if ( materials[ material.id ] === undefined ) {
+			if ( output.materials === undefined ) {
 
-				if ( output.materials === undefined ) {
+				output.materials = [];
 
-					output.materials = [];
+			}
 
-				}
-
-				materials[ material.id ] = output.materials.length;
+			if ( materials[ material.uuid ] === undefined ) {
 
 				var data = materialExporter.parse( material );
 
 				delete data.metadata;
 
+				materials[ material.uuid ] = data;
+
 				output.materials.push( data );
 
 			}
 
-			return materials[ material.id ];
+			return material.uuid;
 
 		};
 
@@ -157,6 +159,8 @@ THREE.ObjectExporter.prototype = {
 		var parseObject = function ( object ) {
 
 			var data = {};
+
+			data.uuid = object.uuid;
 
 			if ( object.name !== '' ) data.name = object.name;
 			if ( JSON.stringify( object.userData ) !== '{}' ) data.userData = object.userData;
@@ -173,8 +177,6 @@ THREE.ObjectExporter.prototype = {
 				data.aspect = object.aspect;
 				data.near = object.near;
 				data.far = object.far;
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
 
 			} else if ( object instanceof THREE.OrthographicCamera ) {
 
@@ -185,8 +187,6 @@ THREE.ObjectExporter.prototype = {
 				data.bottom = object.bottom;
 				data.near = object.near;
 				data.far = object.far;
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
 
 			} else if ( object instanceof THREE.AmbientLight ) {
 
@@ -198,7 +198,6 @@ THREE.ObjectExporter.prototype = {
 				data.type = 'DirectionalLight';
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
-				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.PointLight ) {
 
@@ -206,7 +205,6 @@ THREE.ObjectExporter.prototype = {
 				data.color = object.color.getHex();
 				data.intensity = object.intensity;
 				data.distance = object.distance;
-				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.SpotLight ) {
 
@@ -216,32 +214,26 @@ THREE.ObjectExporter.prototype = {
 				data.distance = object.distance;
 				data.angle = object.angle;
 				data.exponent = object.exponent;
-				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.HemisphereLight ) {
 
 				data.type = 'HemisphereLight';
 				data.color = object.color.getHex();
 				data.groundColor = object.groundColor.getHex();
-				data.position = object.position.toArray();
 
 			} else if ( object instanceof THREE.Mesh ) {
 
 				data.type = 'Mesh';
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
-				data.scale = object.scale.toArray();
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
 
 			} else {
 
 				data.type = 'Object3D';
-				data.position = object.position.toArray();
-				data.rotation = object.rotation.toArray();
-				data.scale = object.scale.toArray();
 
 			}
+
+			data.matrix = object.matrix.toArray();
 
 			if ( object.children.length > 0 ) {
 

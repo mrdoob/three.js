@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - multiple windows</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body, html {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				width: 100%;
+				height: 100%;
+
+				background-color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#container {
+				width: 100%;
+				height: 100%;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+				color: #0080ff;
+			}
+
+			#newview {
+				position: absolute;
+				top: 10px;
+				left: 10px;
+				background-color: rgba(0,0,0,0.5);
+				color: white;
+				font-weight: bold;
+				padding: 1em;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - multiple windows - webgl</div>
+		<div id="newview">Click for new Window</div>
+		<script src="../build/three.js"></script>
+		<script src="js/controls/TransformControls.js"></script>
+		<script src="js/Detector.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, windowManager, viewCount = 0;
+
+			var views, scene, renderer;
+
+			var mesh, group1, group2, group3, light;
+
+			var mouseX = 0, mouseY = 0;
+
+			var windowWidth = 1, windowHeight = 1;
+
+			/**
+			 * Makes one class inherit from another.
+			 * @param {!Object} subClass Class that wants to inherit.
+			 * @param {!Object} superClass Class to inherit from.
+			 */
+
+			var inherit = function( subClass, superClass ) {
+
+				var TmpClass = function() { };
+				TmpClass.prototype = superClass.prototype;
+				subClass.prototype = new TmpClass();
+
+			};
+
+			/**
+			 * Represents a popup window.
+			 */
+
+			var ViewWindow = function( manager, id, window, container ) {
+				var self = this;
+				this.manager = manager;
+				this.id = id;
+				this.window = window;
+				this.renderQueued = false;
+				this.width = 300;
+				this.height = 150;
+				this.container = container;
+				this.closed = false;
+				this.devicePixelRatio = 1;//window.devicePixelRatio || 1;
+				var document = window.document
+				this.document = document;
+				this.canvas = this.document.createElement( 'canvas' );
+				var style = this.canvas.style;
+				style.width = "100%";
+				style.height = "100%";
+				this.container.appendChild( this.canvas );
+				this.ctx = this.canvas.getContext( '2d' );
+
+				// TODO: should probably make the polyfill take a window?
+				this.window.requestAnimFrame = (function() {
+
+					return this.window.requestAnimationFrame ||
+							this.window.webkitRequestAnimationFrame ||
+							this.window.mozRequestAnimationFrame ||
+							function( callback ){
+
+								this.window.setTimeout( callback, 1000 / 60 );
+
+							};
+
+				})();
+
+				this.window.addEventListener( 'resize', this.constructor.prototype.updateSize.bind( this ) );
+				this.window.addEventListener( 'unload', this.constructor.prototype.close.bind( this ) );
+				this.window.addEventListener( 'focus', this.constructor.prototype.focus.bind( this ) );
+
+				var rand = function() {
+
+					return Math.random() * 0.2 + 0.5;
+
+				};
+
+				var view = {
+
+					background: new THREE.Color().setRGB( rand(), rand(), rand() ),
+					fov: 30,
+
+				};
+
+				this.view = view;
+
+				var camera = new THREE.PerspectiveCamera( 30, 1, 1, 10000 );
+				var angle = 0.2;
+				var distance = 1500;
+				camera.position.z = Math.cos(Math.PI * angle) * distance;
+				camera.position.x = Math.sin(Math.PI * angle) * distance;
+				camera.position.y = distance * 0.1;
+				camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+				view.camera = camera;
+
+				camera.updateFromCanvas = (function( camera ) {
+
+					return function( canvas ) {
+
+						camera.aspect = canvas.width / canvas.height;
+						camera.updateProjectionMatrix();
+
+
+					};
+
+				}( camera ));
+
+				this.perspectiveCamera = camera;
+
+				var camera = new THREE.OrthographicCamera( -1, 1, 1, -1, 1, 10000 );
+				camera.position.z = 1500;
+
+				camera.updateFromCanvas = (function( camera ) {
+
+					return function ( canvas ) {
+
+						var width  = canvas.width;
+						var height = canvas.height;
+						camera.left    = -width;
+						camera.right   =  width;
+						camera.top     =  height;
+						camera.bottom  = -height;
+						camera.updateProjectionMatrix();
+
+					};
+
+				}( camera ));
+
+				this.orthographicCamera = camera;
+
+				this.currentCamera = this.perspectiveCamera;
+
+				// Is this in three.js?
+				var copyOrientation = function( src, dst ) {
+
+					dst.up.copy( src.up );
+					dst.position.copy( src.position );
+					dst.scale.copy( src.scale );
+					dst.rotation.copy( src.rotation );
+					dst.quaternion.copy( src.quaternion );
+
+				};
+
+				var setCamera = function( camera ) {
+
+					self.currentCamera = camera;
+
+				};
+
+				var buttonsElem = document.createElement( 'div' );
+				var style = buttonsElem.style;
+				style.position = 'absolute';
+				style.top = '10px';
+				style.padding = '1em';
+				style.right = '10px';
+				style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+
+				var views = [
+					{
+						name: 'perspective 1',
+						func: function() {
+
+							setCamera( self.perspectiveCamera );
+
+							var angle = 0.2;
+							var distance = 1500;
+							var x = Math.sin(Math.PI * angle) * distance;
+							var y = distance * 0.1;
+							var z = Math.cos(Math.PI * angle) * distance;
+							self.currentCamera.position.set( x, y, z );
+							self.currentCamera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+						},
+					},
+
+					{
+						name: 'perspective 2',
+						func: function() {
+
+							setCamera( self.perspectiveCamera );
+
+							var angle = -0.4;
+							var distance = 2500;
+							var x = Math.sin(Math.PI * angle) * distance;
+							var y = distance * 0.2;
+							var z = Math.cos(Math.PI * angle) * distance;
+							self.currentCamera.position.set( x, y, z );
+							self.currentCamera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+						},
+					},
+
+					{
+						name: 'perspective 3',
+						func: function() {
+
+							setCamera( self.perspectiveCamera );
+
+							var angle = 0.25;
+							var distance = 1500;
+							var x = Math.sin(Math.PI * angle) * distance;
+							var y = distance * 0.6;
+							var z = Math.cos(Math.PI * angle) * distance;
+							self.currentCamera.position.set( x, y, z );
+							self.currentCamera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+						},
+					},
+/*
+					{
+						name: 'left',
+						func: function() {
+
+							setCamera( self.orthographicCamera );
+
+							self.currentCamera.position.set( -1500, 0, 0 );
+							self.currentCamera.up.set( 0, 1, 0 );
+							self.currentCamera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+						},
+					},
+
+					{
+						name: 'top',
+						func: function() {
+
+							setCamera( self.orthographicCamera );
+
+							self.currentCamera.position.set( 0, 1500, 0 );
+							self.currentCamera.up.set( 0, 0, -1 );
+							self.currentCamera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+						},
+					},
+
+					{
+						name: 'front',
+						func: function() {
+
+							setCamera( self.orthographicCamera );
+
+							self.currentCamera.position.set( 0, 0, 1500 );
+							self.currentCamera.up.set( 0, 1, 0 );
+							self.currentCamera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+						},
+					},
+*/
+				];
+				var updateViewHandler = function( button, view ) {
+
+					if ( self.oldButton ) {
+
+						self.oldButton.style.color = 'black';
+
+					}
+
+					view.func();
+					self.manager.updateControlCamera( self.currentCamera );
+					self.queueRender();
+
+					self.oldButton = button,
+					button.style.color = 'white';
+
+				};
+
+				var buttons = [];
+				views.forEach(function( view ) {
+
+					var button = document.createElement( 'div' );
+					button.appendChild( document.createTextNode( view.name ) );
+					button.addEventListener( 'click', function( button, view ) {
+
+					  return function() {
+
+						  updateViewHandler( button, view );
+
+					  };
+
+					}( button, view ) );
+					buttonsElem.appendChild( button );
+					buttons.push( button );
+
+				});
+
+				this.container.appendChild( buttonsElem );
+				this.updateSize();
+				var viewNdx = (viewCount++) % buttons.length;
+				updateViewHandler( buttons[viewNdx], views[viewNdx] );
+			};
+
+			ViewWindow.prototype.focus = function() {
+
+				this.manager.makeWindowCurrent( this );
+
+			};
+
+			ViewWindow.prototype.updateSize = function() {
+
+				var desiredWidth  = this.canvas.clientWidth  * this.devicePixelRatio;
+				var desiredHeight = this.canvas.clientHeight * this.devicePixelRatio;
+
+				if ( this.canvas.width != desiredWidth || this.canvas.height != desiredHeight ) {
+
+					this.canvas.width  = desiredWidth;
+					this.canvas.height = desiredHeight;
+					this.width = desiredWidth;
+					this.height = desiredHeight;
+					this.manager.updateMaxSize();
+
+					this.queueRender();
+
+				}
+			};
+
+			ViewWindow.prototype.close = function() {
+				if ( !this.closed ) {
+					this.manager.removeWindow( this, this.id );
+				}
+			};
+
+			ViewWindow.prototype.closeImmediately = function() {
+
+				this.closed = true;
+				this.window.close();
+
+			};
+
+			ViewWindow.prototype.queueRender = function() {
+
+				if ( ! this.renderQueued ) {
+
+				  this.renderQueued = true;
+				  this.window.requestAnimFrame( this.constructor.prototype.render.bind( this ) );
+
+				}
+
+			};
+
+			ViewWindow.prototype.render = function() {
+
+				this.renderQueued = false;
+				var view = this.view;
+				camera = this.currentCamera;
+
+				camera.updateFromCanvas( this.canvas );
+
+				this.manager.renderSceneToCanvas( this, camera, view, this.ctx );
+
+			};
+
+			/**
+			 * Represents the main window.
+			 */
+
+			MainViewWindow = function() {
+
+				ViewWindow.apply( this, arguments );
+
+			};
+
+			inherit( MainViewWindow, ViewWindow );
+
+			MainViewWindow.prototype.close = function() {
+
+			};
+
+			MainViewWindow.prototype.closeImmediately = function() {
+
+			};
+
+			/**
+			 * Manages the windows.
+			 */
+			var WindowManager = function( container, scene ) {
+
+				this.windows = [];
+				this.controls = [];
+				this.maxWidth = 0;
+				this.maxHeight = 0;
+				this.newWindowId = 0;
+				this.scene = scene;
+
+				this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, devicePixelRatio: 1 } );
+
+				window.addEventListener( 'unload', this.constructor.prototype.closeAllWindows.bind( this ) );
+
+				// Main window has to be created last.
+				this.windows.push( new MainViewWindow( this, 0, window, container ) );
+				this.currentWindow = this.windows[0];
+			};
+
+
+			WindowManager.prototype.createWindow = function() {
+
+				var id = ++this.newWindowId;
+				var subWindow = window.open( '', 'view#' + id, 'width=400,height=400,location=no,resizable=yes' );
+				var document = subWindow.document;
+				var body = document.body;
+				var style = body.style;
+				style.width = '100%';
+				style.height = '100%';
+				style.padding = '0px';
+				style.margin = '0px';
+				style.overflow = 'hidden';
+				style.fontFamily = 'Monospace';
+				style.fontSize = '13px';
+				this.windows.push( new ViewWindow( this, id, subWindow, body ) );
+
+			};
+
+			WindowManager.prototype.removeWindow = function( window, id ) {
+
+				for ( var ii = 0; ii < this.windows.length; ++ii ) {
+
+					if ( this.windows[ ii ].id == id ) {
+
+						this.windows.splice( ii, 1 );
+						break;
+
+					}
+
+				}
+
+			};
+
+			WindowManager.prototype.closeAllWindows = function() {
+
+				this.windows.forEach( function( window ) {
+
+					window.closeImmediately();
+
+				} );
+
+				this.windows = [];
+
+			};
+
+			WindowManager.prototype.updateMaxSize = function() {
+
+				var maxWidth = 0;
+				var maxHeight = 0;
+				this.windows.forEach( function( window ) {
+
+					maxWidth  = Math.max( window.width,  maxWidth );
+					maxHeight = Math.max( window.height, maxHeight );
+
+				} );
+
+				if ( this.maxWidth != maxWidth || this.maxHeight != maxHeight ) {
+
+					this.renderer.setSize( maxWidth, maxHeight, false );
+					this.maxWidth = maxWidth;
+					this.maxHeight = maxHeight;
+
+				}
+
+			};
+
+			WindowManager.prototype.updateAllWindows = function() {
+
+				this.updateMaxSize();
+
+				this.controls.forEach( function( control ) {
+
+					control.update();
+
+				} );
+
+				var renderer = this.renderer;
+				var self = this;
+				this.windows.forEach( function( window ) {
+
+					window.render();
+
+				} );
+
+			};
+
+			WindowManager.prototype.renderSceneToCanvas = function( window, camera, parameters, ctx ) {
+
+				var renderer = this.renderer;
+				var canvas = ctx.canvas;
+				var scene = this.scene;
+
+				var hide = window !== this.currentWindow;
+				this.controls.forEach( function( control ) {
+
+					if ( hide ) {
+
+						control.hide();
+
+					} else {
+
+						control.setMode( control.mode );
+
+					}
+
+				} );
+
+				renderer.setViewport( 0, 0, canvas.width, canvas.height );
+				renderer.setClearColor( parameters.background );
+				renderer.render( scene, camera );
+
+				var srcX = 0;
+				var srcY = this.maxHeight - canvas.height;
+				var dstX = 0;
+				var dstY = 0;
+				var width = canvas.width;
+				var height = canvas.height;
+
+				if ( srcX >= 0 && srcY >= 0 && width >= 1 && height >= 1 ) {
+
+					ctx.drawImage( renderer.context.canvas,
+								   srcX, srcY, width, height,
+								   dstX, dstY, width, height );
+
+				}
+
+			};
+
+			WindowManager.prototype.makeWindowCurrent = function( window ) {
+
+				if ( window !== this.currentWindow ) {
+
+					this.currentWindow = window;
+					this.attachControlsToWindow( window );
+					this.updateAllWindows();
+
+				}
+
+			};
+
+			WindowManager.prototype.updateControlCamera = function( camera ) {
+
+				this.controls.forEach( function( control ) {
+
+					control.camera = camera;
+					control.update();
+
+				} );
+
+			};
+
+			WindowManager.prototype.attachControlsToWindow = function( window ) {
+
+				this.controls.forEach( function( control ) {
+
+					var object = control.object;
+					if ( object ) {
+
+						control.detach( object );
+
+					}
+
+					// switch to this window
+					control.domElement = window.container;
+					control.document = window.document;
+					control.camera = window.currentCamera;
+
+					control.attach( object );
+					control.update();
+
+				} );
+
+			};
+
+			WindowManager.prototype.addTransformControl = function( object ) {
+
+				var window = this.currentWindow;
+				var camera = window.currentCamera;
+				var container = window.container;
+				var control = new THREE.TransformControls( camera, container, window.document );
+				control.addEventListener( 'change', windowManager.__proto__.updateAllWindows.bind( windowManager ));
+				control.attach( object );
+				control.scale = 0.65;
+				this.scene.add( control.gizmo );
+
+				this.controls.push( control );
+
+			};
+
+			init();
+
+			function init() {
+
+				scene = new THREE.Scene();
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 0, 0, 1 );
+				scene.add( light );
+
+				var faceIndices = [ 'a', 'b', 'c', 'd' ];
+
+				var color, f, f2, f3, p, n, vertexIndex,
+
+					radius = 200,
+
+					geometry  = new THREE.IcosahedronGeometry( radius, 1 ),
+					geometry2 = new THREE.IcosahedronGeometry( radius, 1 ),
+					geometry3 = new THREE.IcosahedronGeometry( radius, 1 );
+
+				for ( var i = 0; i < geometry.faces.length; i ++ ) {
+
+					f  = geometry.faces[ i ];
+					f2 = geometry2.faces[ i ];
+					f3 = geometry3.faces[ i ];
+
+					n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+
+					for( var j = 0; j < n; j++ ) {
+
+						vertexIndex = f[ faceIndices[ j ] ];
+
+						p = geometry.vertices[ vertexIndex ];
+
+						color = new THREE.Color( 0xffffff );
+						color.setHSL( ( p.y / radius + 1 ) / 2, 1.0, 0.5 );
+
+						f.vertexColors[ j ] = color;
+
+						color = new THREE.Color( 0xffffff );
+						color.setHSL( 0.0, ( p.y / radius + 1 ) / 2, 0.5 );
+
+						f2.vertexColors[ j ] = color;
+
+						color = new THREE.Color( 0xffffff );
+						color.setHSL( 0.125 * vertexIndex/geometry.vertices.length, 1.0, 0.5 );
+
+						f3.vertexColors[ j ] = color;
+
+					}
+
+				}
+
+
+				var materials = [
+
+					new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, vertexColors: THREE.VertexColors } ),
+					new THREE.MeshBasicMaterial( { color: 0x000000, shading: THREE.FlatShading, wireframe: true, transparent: true } )
+
+				];
+
+				group1 = THREE.SceneUtils.createMultiMaterialObject( geometry, materials );
+				group1.position.x = -400;
+				group1.rotation.x = -0;
+				scene.add( group1 );
+
+				group2 = THREE.SceneUtils.createMultiMaterialObject( geometry2, materials );
+				group2.position.x = 400;
+				group2.rotation.x = 0;
+				scene.add( group2 );
+
+				group3 = THREE.SceneUtils.createMultiMaterialObject( geometry3, materials );
+				group3.position.x = 0;
+				group3.rotation.x = 0;
+				scene.add( group3 );
+
+				container = document.getElementById( 'container' );
+
+				windowManager = new WindowManager( container, scene );
+				var newViewButton = document.getElementById( 'newview' );
+				newViewButton.addEventListener( 'click', windowManager.__proto__.createWindow.bind( windowManager ) );
+
+				windowManager.addTransformControl( group1 );
+				windowManager.addTransformControl( group2 );
+				windowManager.addTransformControl( group3 );
+
+				windowManager.updateAllWindows();
+
+			}
+
+		</script>
+
+	</body>
+</html>

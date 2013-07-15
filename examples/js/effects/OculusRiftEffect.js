@@ -20,7 +20,8 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		interpupillaryDistance: 0.064,
 		lensSeparationDistance: 0.064,
 		eyeToScreenDistance: 0.041,
-		distortionK : [1.0, 0.22, 0.24, 0.0]
+		distortionK : [1.0, 0.22, 0.24, 0.0],
+		chromaAbParameter: [ 0.996, -0.004, 1.014, 0.0]
 	};
 
 	// Perspective camera
@@ -48,7 +49,8 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 			"scale": { type: "v2", value: new THREE.Vector2(1.0,1.0) },
 			"scaleIn": { type: "v2", value: new THREE.Vector2(1.0,1.0) },
 			"lensCenter": { type: "v2", value: new THREE.Vector2(0.0,0.0) },
-			"hmdWarpParam": { type: "v4", value: new THREE.Vector4(1.0,0.0,0.0,0.0) }
+			"hmdWarpParam": { type: "v4", value: new THREE.Vector4(1.0,0.0,0.0,0.0) },
+			"chromAbParam": { type: "v4", value: new THREE.Vector4(1.0,0.0,0.0,0.0) }
 		},
 		vertexShader: [
 			"varying vec2 vUv;",
@@ -59,10 +61,11 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		].join("\n"),
 
 		fragmentShader: [
-		    "uniform vec2 scale;",
-		    "uniform vec2 scaleIn;",
-		    "uniform vec2 lensCenter;",
-		    "uniform vec4 hmdWarpParam;",
+			"uniform vec2 scale;",
+			"uniform vec2 scaleIn;",
+			"uniform vec2 lensCenter;",
+			"uniform vec4 hmdWarpParam;",
+			'uniform vec4 chromAbParam;',
 			"uniform sampler2D texid;",
 			"varying vec2 vUv;",
 			"void main()",
@@ -71,12 +74,18 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 			"  vec2 theta = (uv-lensCenter)*scaleIn;",
 			"  float rSq = theta.x*theta.x + theta.y*theta.y;",
 			"  vec2 rvector = theta*(hmdWarpParam.x + hmdWarpParam.y*rSq + hmdWarpParam.z*rSq*rSq + hmdWarpParam.w*rSq*rSq*rSq);",
-			"  vec2 tc = (lensCenter + scale * rvector);",
-			"  tc = (tc+1.0)/2.0;", // range from [-1,1] to [0,1]
-			"  if (any(bvec2(clamp(tc, vec2(0.0,0.0), vec2(1.0,1.0))-tc)))",
+			'  vec2 rBlue = rvector * (chromAbParam.z + chromAbParam.w * rSq);',
+			"  vec2 tcBlue = (lensCenter + scale * rBlue);",
+			"  tcBlue = (tcBlue+1.0)/2.0;", // range from [-1,1] to [0,1]
+			"  if (any(bvec2(clamp(tcBlue, vec2(0.0,0.0), vec2(1.0,1.0))-tcBlue))) {",
 			"    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);",
-			"  else",
-			"    gl_FragColor = texture2D(texid, tc);",
+			"    return;}",
+			"  vec2 tcGreen = lensCenter + scale * rvector;",
+			"  tcGreen = (tcGreen+1.0)/2.0;", // range from [-1,1] to [0,1]
+			"  vec2 rRed = rvector * (chromAbParam.x + chromAbParam.y * rSq);",
+			"  vec2 tcRed = lensCenter + scale * rRed;",
+			"  tcRed = (tcRed+1.0)/2.0;", // range from [-1,1] to [0,1]
+			"  gl_FragColor = vec4(texture2D(texid, tcRed).r, texture2D(texid, tcGreen).g, texture2D(texid, tcBlue).b, 1);",
 			"}"
 		].join("\n")
 	} );
@@ -119,13 +128,15 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		// Distortion shader parameters
 		var lensShift = 4 * (HMD.hScreenSize/4 - HMD.lensSeparationDistance/2) / HMD.hScreenSize;
 		left.lensCenter = new THREE.Vector2(lensShift, 0.0);
-		right.lensCenter = new THREE.Vector2(-lensShift, 0.0);    
+		right.lensCenter = new THREE.Vector2(-lensShift, 0.0);
 
 		RTMaterial.uniforms['hmdWarpParam'].value = new THREE.Vector4(HMD.distortionK[0], HMD.distortionK[1], HMD.distortionK[2], HMD.distortionK[3]);
+		RTMaterial.uniforms['chromAbParam'].value = new THREE.Vector4(HMD.chromaAbParameter[0], HMD.chromaAbParameter[1], HMD.chromaAbParameter[2], HMD.chromaAbParameter[3]);
 		RTMaterial.uniforms['scaleIn'].value = new THREE.Vector2(1.0,1.0/aspect);
 		RTMaterial.uniforms['scale'].value = new THREE.Vector2(1.0/distScale, 1.0*aspect/distScale);
 
 		// Create render target
+		if ( renderTarget ) renderTarget.dispose();
 		renderTarget = new THREE.WebGLRenderTarget( HMD.hResolution*distScale/2, HMD.vResolution*distScale, RTParams );
 		RTMaterial.uniforms[ "texid" ].value = renderTarget;
 
@@ -182,6 +193,15 @@ THREE.OculusRiftEffect = function ( renderer, options ) {
 		renderer.render( scene, pCamera, renderTarget, true );
 		renderer.render( finalScene, oCamera );
 
+	};
+
+	this.dispose = function() {
+		if ( RTMaterial ) {
+			RTMaterial.dispose();
+		}
+		if ( renderTarget ) {
+			renderTarget.dispose();
+		}
 	};
 
 };

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			This light's color gets applied to all the objects in the scene globally.
+		</div>
+
+
+		<h2>Example</h2>
+
+<code>var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( light );</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Float hex] )</h3>
+		<div>
+		[page:Integer hex] — Numeric value of the RGB component of the color.
+		</div>
+		<div>
+		This creates a Ambientlight with a color.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

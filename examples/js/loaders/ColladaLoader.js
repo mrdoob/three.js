@@ -716,7 +716,6 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		// FIXME: multi-material mesh?
 		// geometries
 
 		var double_sided_materials = {};
@@ -756,15 +755,15 @@ THREE.ColladaLoader = function () {
 
 						if ( geometry.doubleSided ) {
 
-							if ( !( material3js in double_sided_materials ) ) {
+							if ( !( instance_material.symbol in double_sided_materials ) ) {
 
 								var _copied_material = material3js.clone();
 								_copied_material.side = THREE.DoubleSide;
-								double_sided_materials[ material3js ] = _copied_material;
+								double_sided_materials[ instance_material.symbol ] = _copied_material;
 
 							}
 
-							material3js = double_sided_materials[ material3js ];
+							material3js = double_sided_materials[ instance_material.symbol ];
 
 						}
 
@@ -836,28 +835,50 @@ THREE.ColladaLoader = function () {
 
 		for ( i = 0; i < node.cameras.length; i ++ ) {
 
-			var params = cameras[node.cameras[i].url];
-			obj = new THREE.PerspectiveCamera(params.fov, params.aspect_ratio, params.znear, params.zfar);
+			var instance_camera = node.cameras[i];
+			var cparams = cameras[instance_camera.url];
+
+			obj = new THREE.PerspectiveCamera(cparams.fov, parseFloat(cparams.aspect_ratio), 
+					parseFloat(cparams.znear), parseFloat(cparams.zfar));
 
 		}
 
 		for ( i = 0; i < node.lights.length; i ++ ) {
 
-			var params = lights[node.lights[i].url];
+			var instance_light = node.lights[i];
+			var lparams = lights[instance_light.url];
 
-			switch ( params.technique ) {
+			if ( lparams && lparams.technique ) {
 
-				case 'ambient':
-					obj = new THREE.AmbientLight(params.color);
-					break;
+				var color = lparams.color.getHex();
+				var intensity = lparams.intensity;
+				var distance = 0;
+				var angle = lparams.falloff_angle;
+				var exponent; // Intentionally undefined, don't know what this is yet
 
-				case 'point':
-					obj = new THREE.PointLight(params.color);
-					break;
+				switch ( lparams.technique ) {
 
-				case 'directional':
-					obj = new THREE.DirectionalLight(params.color);
-					break;
+					case 'directional':
+
+						obj = new THREE.DirectionalLight( color, intensity, distance );
+						break;
+
+					case 'point':
+
+						obj = new THREE.PointLight( color, intensity, distance );
+						break;
+
+					case 'spot':
+
+						obj = new THREE.SpotLight( color, intensity, distance, angle, exponent );
+						break;
+
+					case 'ambient':
+
+						obj = new THREE.AmbientLight( color );
+						break;
+
+				}
 
 			}
 
@@ -865,12 +886,7 @@ THREE.ColladaLoader = function () {
 
 		obj.name = node.name || node.id || "";
 		obj.matrix = node.matrix;
-
-		var props = node.matrix.decompose();
-		obj.position = props[ 0 ];
-		obj.quaternion = props[ 1 ];
-		obj.useQuaternion = true;
-		obj.scale = props[ 2 ];
+		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 
 		if ( options.centerGeometry && obj.geometry ) {
 
@@ -1846,11 +1862,6 @@ THREE.ColladaLoader = function () {
 					this.cameras.push( ( new InstanceCamera() ).parse( child ) );
 					break;
 
-				case 'instance_light':
-
-					this.lights.push( ( new InstanceLight() ).parse( child ) );
-					break;
-
 				case 'instance_controller':
 
 					this.controllers.push( ( new InstanceController() ).parse( child ) );
@@ -1859,6 +1870,11 @@ THREE.ColladaLoader = function () {
 				case 'instance_geometry':
 
 					this.geometries.push( ( new InstanceGeometry() ).parse( child ) );
+					break;
+
+				case 'instance_light':
+
+					this.lights.push( ( new InstanceLight() ).parse( child ) );
 					break;
 
 				case 'instance_node':
@@ -2979,6 +2995,11 @@ THREE.ColladaLoader = function () {
 
 	ColorOrTexture.prototype.parse = function ( element ) {
 
+		if (element.nodeName == 'transparent')
+		{
+			this.opaque = element.getAttribute('opaque');
+		}
+		
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[ i ];
@@ -3125,8 +3146,25 @@ THREE.ColladaLoader = function () {
 	Shader.prototype.create = function() {
 
 		var props = {};
-		var transparent = ( this['transparency'] !== undefined && this['transparency'] < 1.0 );
 
+		var transparent = false;
+		if (this['transparency'] !== undefined && this['transparent'] !== undefined)
+		{
+			// convert transparent color RBG to average value
+			var transparentColor = this['transparent'];
+			var transparencyLevel = (this.transparent.color.r +
+										this.transparent.color.g + 
+										this.transparent.color.b)
+										/ 3 * this.transparency;
+			
+			if (transparencyLevel > 0)
+			{
+				transparent = true;
+				props[ 'transparent' ] = true;
+				props[ 'opacity' ] = 1 - transparencyLevel;
+			}
+		}
+		
 		for ( var prop in this ) {
 
 			switch ( prop ) {
@@ -3143,11 +3181,11 @@ THREE.ColladaLoader = function () {
 						if ( cot.isTexture() ) {
 
 							var samplerId = cot.texture;
-							var surfaceId = this.effect.sampler[samplerId].source;
+							var surfaceId = this.effect.sampler[samplerId];
 
-							if ( surfaceId ) {
+							if ( surfaceId !== undefined && surfaceId.source !== undefined ) {
 
-								var surface = this.effect.surface[surfaceId];
+								var surface = this.effect.surface[surfaceId.source];
 								var image = images[surface.init_from];
 
 								if (image) {
@@ -3205,15 +3243,7 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'transparency':
-
-					if ( transparent ) {
-
-						props[ 'transparent' ] = true;
-						props[ 'opacity' ] = this[ prop ];
-						transparent = true;
-
-					}
-
+					// gets figured out up top
 					break;
 
 				default:
@@ -3942,7 +3972,6 @@ THREE.ColladaLoader = function () {
 	};
 
 	// Camera
-
 	function Camera() {
 
 		this.id = "";
@@ -3964,7 +3993,11 @@ THREE.ColladaLoader = function () {
 			switch ( child.nodeName ) {
 
 				case 'optics':
+
 					this.parseOptics( child );
+					break;
+
+				default:
 					break;
 
 			}
@@ -4096,8 +4129,62 @@ THREE.ColladaLoader = function () {
 			switch ( child.nodeName ) {
 
 				case 'technique_common':
+
+					this.parseCommon( child );
+					break;
+
+				case 'technique':
+
 					this.parseTechnique( child );
 					break;
+
+				default:
+					break;
+
+			}
+
+		}
+
+		return this;
+
+	};
+
+	Light.prototype.parseCommon = function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			switch ( element.childNodes[ i ].nodeName ) {
+
+				case 'directional':
+				case 'point':
+				case 'spot':
+				case 'ambient':
+
+					this.technique = element.childNodes[ i ].nodeName;
+
+					var light = element.childNodes[ i ];
+
+					for ( var j = 0; j < light.childNodes.length; j ++ ) {
+
+						var child = light.childNodes[j];
+
+						switch ( child.nodeName ) {
+
+							case 'color':
+
+								var rgba = _floats( child.textContent );
+								this.color = new THREE.Color(0);
+								this.color.setRGB( rgba[0], rgba[1], rgba[2] );
+								this.color.a = rgba[3];
+								break;
+
+							case 'falloff_angle':
+
+								this.falloff_angle = parseFloat( child.textContent );
+								break;
+						}
+
+					}
 
 			}
 
@@ -4109,38 +4196,24 @@ THREE.ColladaLoader = function () {
 
 	Light.prototype.parseTechnique = function ( element ) {
 
+		this.profile = element.getAttribute( 'profile' );
+
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
 			var child = element.childNodes[ i ];
 
 			switch ( child.nodeName ) {
 
-				case 'ambient':
-				case 'point':
-				case 'directional':
+				case 'intensity':
 
-					this.technique = child.nodeName;
-
-					for ( var k = 0; k < child.childNodes.length; k ++ ) {
-
-						var param = child.childNodes[ k ];
-
-						switch ( param.nodeName ) {
-
-							case 'color':
-								var vector = new THREE.Vector3().fromArray( _floats( param.textContent ) );
-								this.color = new THREE.Color().setRGB( vector.x, vector.y, vector.z );
-								break;
-
-						}
-
-					}
-
-				break;
+					this.intensity = parseFloat(child.textContent);
+					break;
 
 			}
 
 		}
+
+		return this;
 
 	};
 

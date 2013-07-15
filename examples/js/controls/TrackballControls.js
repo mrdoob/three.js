@@ -14,8 +14,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.enabled = true;
 
-	this.screen = { width: 0, height: 0, offsetLeft: 0, offsetTop: 0 };
-	this.radius = ( this.screen.width + this.screen.height ) / 4;
+	this.screen = { left: 0, top: 0, width: 0, height: 0 };
 
 	this.rotateSpeed = 1.0;
 	this.zoomSpeed = 1.2;
@@ -24,6 +23,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.noRotate = false;
 	this.noZoom = false;
 	this.noPan = false;
+	this.noRoll = false;
 
 	this.staticMoving = false;
 	this.dynamicDampingFactor = 0.2;
@@ -71,13 +71,18 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	this.handleResize = function () {
 
-		this.screen.width = window.innerWidth;
-		this.screen.height = window.innerHeight;
+		if ( this.domElement === document ) {
 
-		this.screen.offsetLeft = 0;
-		this.screen.offsetTop = 0;
+			this.screen.left = 0;
+			this.screen.top = 0;
+			this.screen.width = window.innerWidth;
+			this.screen.height = window.innerHeight;
 
-		this.radius = ( this.screen.width + this.screen.height ) / 4;
+		} else {
+
+			this.screen = this.domElement.getBoundingClientRect();
+
+		}
 
 	};
 
@@ -94,8 +99,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.getMouseOnScreen = function ( clientX, clientY ) {
 
 		return new THREE.Vector2(
-			( clientX - _this.screen.offsetLeft ) / _this.radius * 0.5,
-			( clientY - _this.screen.offsetTop ) / _this.radius * 0.5
+			( clientX - _this.screen.left ) / _this.screen.width,
+			( clientY - _this.screen.top ) / _this.screen.height
 		);
 
 	};
@@ -103,14 +108,26 @@ THREE.TrackballControls = function ( object, domElement ) {
 	this.getMouseProjectionOnBall = function ( clientX, clientY ) {
 
 		var mouseOnBall = new THREE.Vector3(
-			( clientX - _this.screen.width * 0.5 - _this.screen.offsetLeft ) / _this.radius,
-			( _this.screen.height * 0.5 + _this.screen.offsetTop - clientY ) / _this.radius,
+			( clientX - _this.screen.width * 0.5 - _this.screen.left ) / (_this.screen.width*.5),
+			( _this.screen.height * 0.5 + _this.screen.top - clientY ) / (_this.screen.height*.5),
 			0.0
 		);
 
 		var length = mouseOnBall.length();
 
-		if ( length > 1.0 ) {
+		if ( _this.noRoll ) {
+
+			if ( length < Math.SQRT1_2 ) {
+
+				mouseOnBall.z = Math.sqrt( 1.0 - length*length );
+
+			} else {
+
+				mouseOnBall.z = .5 / length;
+				
+			}
+
+		} else if ( length > 1.0 ) {
 
 			mouseOnBall.normalize();
 
@@ -227,9 +244,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( !_this.noZoom || !_this.noPan ) {
 
-			if ( _this.object.position.lengthSq() > _this.maxDistance * _this.maxDistance ) {
+			if ( _eye.lengthSq() > _this.maxDistance * _this.maxDistance ) {
 
-				_this.object.position.setLength( _this.maxDistance );
+				_this.object.position.addVectors( _this.target, _eye.setLength( _this.maxDistance ) );
 
 			}
 
@@ -355,15 +372,18 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_rotateStart = _rotateEnd = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
+			_rotateStart = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
+			_rotateEnd.copy(_rotateStart)
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
-			_zoomStart = _zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_zoomStart = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_zoomEnd.copy(_zoomStart);
 
 		} else if ( _state === STATE.PAN && !_this.noPan ) {
 
-			_panStart = _panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_panStart = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_panEnd.copy(_panStart)
 
 		}
 

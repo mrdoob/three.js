@@ -42,7 +42,6 @@
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
-			uniform float amplitude;
 			attribute float size;
 			attribute vec3 customColor;
 
@@ -115,7 +114,6 @@
 
 			uniforms = {
 
-				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
 				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/spark1.png" ) },
 
@@ -143,18 +141,15 @@
 
 				position: {
 					itemSize: 3,
-					array: new Float32Array( particles * 3 ),
-					numItems: particles * 3
+					array: new Float32Array( particles * 3 )
 				},
 				customColor: {
 					itemSize: 3,
-					array: new Float32Array( particles * 3 ),
-					numItems: particles * 3
+					array: new Float32Array( particles * 3 )
 				},
 				size: {
 					itemSize: 1,
 					array: new Float32Array( particles ),
-					numItems: particles * 1,
 					dynamic: true
 				},
 

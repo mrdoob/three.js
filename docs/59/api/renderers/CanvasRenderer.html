@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">The Canvas renderer displays your beautifully crafted scenes <em>not</em> using WebGL,
+                  but draws it using the (slower) <a href="http://www.w3.org/html/wg/drafts/2dcontext/html5_canvas/">Canvas 2D Context</a> API.</div>
+		<div class="desc">This renderer can be a nice fallback from [page:WebGLRenderer] for simple scenes:</div>
+		<code>
+		if (window.WebGLRenderingContext)
+			renderer = new THREE.WebGLRenderer();
+		else
+			renderer = new THREE.CanvasRenderer();
+		</code>
+		<div class="desc">
+			Note: both WebGLRenderer and CanvasRenderer are embedded in the web page using an HTML5 &lt;canvas&gt; tag.
+			The "Canvas" in CanvasRenderer means it uses Canvas 2D instead of WebGL.<br />
+			Don't confuse either CanvasRenderer with the SoftwareRenderer example, which simulates a screen buffer in a Javascript array.
+		</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:todo parameters])</h3>
+		<div>
+		parameters -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+
+		<h2>Properties</h2>
+
+
+		<h3>.[page:object info]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:object domElement]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:number devicePixelRatio]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:boolean autoClear]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:boolean sortObjects]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:boolean sortElements]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h2>Methods</h2>
+
+
+		<h3>.getMaxAnisotropy() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.render([page:todo scene], [page:todo camera]) [page:todo]</h3>
+		<div>
+		scene -- todo <br />
+		camera -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.clear() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.setClearColor([page:todo color], [page:todo alpha]) [page:todo]</h3>
+		<div>
+		color -- todo <br />
+		alpha -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setFaceCulling() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.supportsVertexTextures() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.setSize([page:todo width], [page:todo height], [page:todo updateStyle]) [page:todo]</h3>
+		<div>
+		width -- todo <br />
+		height -- todo <br />
+		updateStyle -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setClearColorHex([page:todo hex], [page:todo alpha]) [page:todo]</h3>
+		<div>
+		hex -- todo <br />
+		alpha -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

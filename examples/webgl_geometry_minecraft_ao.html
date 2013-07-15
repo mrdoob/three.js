@@ -123,6 +123,14 @@
 				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
 				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
 
+				var py2Geometry = new THREE.PlaneGeometry( 100, 100 );
+				py2Geometry.faces[ 0 ].vertexColors = [ light, light, light, light ];
+				py2Geometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
+				py2Geometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				py2Geometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
+				py2Geometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
+				py2Geometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
+
 				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.faces[ 0 ].vertexColors = [ light, shadow, shadow, light ];
 				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
@@ -161,13 +169,32 @@
 						var pxnz = getY( x + 1, z - 1 );
 						var nxnz = getY( x - 1, z - 1 );
 
-						dummy.geometry = pyGeometry;
+						var a = nx > h || nz > h || nxnz > h ? 0 : 1;
+						var b = nx > h || pz > h || nxpz > h ? 0 : 1;
+						var c = px > h || pz > h || pxpz > h ? 0 : 1;
+						var d = px > h || nz > h || pxnz > h ? 0 : 1;
 
-						var colors = dummy.geometry.faces[ 0 ].vertexColors;
-						colors[ 0 ] = nx > h || nz > h || nxnz > h ? shadow : light;
-						colors[ 1 ] = nx > h || pz > h || nxpz > h ? shadow : light;
-						colors[ 2 ] = px > h || pz > h || pxpz > h ? shadow : light;
-						colors[ 3 ] = px > h || nz > h || pxnz > h ? shadow : light;
+						if ( a + c > b + d ) {
+
+							dummy.geometry = py2Geometry;
+
+							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							colors[ 3 ] = a === 0 ? shadow : light;
+							colors[ 0 ] = b === 0 ? shadow : light;
+							colors[ 1 ] = c === 0 ? shadow : light;
+							colors[ 2 ] = d === 0 ? shadow : light;
+
+						} else {
+
+							dummy.geometry = pyGeometry;
+
+							var colors = dummy.geometry.faces[ 0 ].vertexColors;
+							colors[ 0 ] = a === 0 ? shadow : light;
+							colors[ 1 ] = b === 0 ? shadow : light;
+							colors[ 2 ] = c === 0 ? shadow : light;
+							colors[ 3 ] = d === 0 ? shadow : light;
+
+						}
 
 						THREE.GeometryUtils.merge( geometry, dummy );
 

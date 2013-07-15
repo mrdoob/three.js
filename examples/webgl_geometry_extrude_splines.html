@@ -16,9 +16,11 @@
 	<body>
 
 		<script src="../build/three.min.js"></script>
+		<!--
 		<script src="../src/extras/core/Curve.js"></script>
 		<script src="../src/extras/geometries/TubeGeometry.js"></script>
 		<script src="../src/extras/helpers/CameraHelper.js"></script>
+		-->
 
 		<!-- where curves formulas are defined -->
 		<script src="js/CurveExtras.js"></script>
@@ -380,7 +382,7 @@
 			if (!lookAhead)
 			lookAt.copy( pos ).add( dir );
 			splineCamera.matrix.lookAt(splineCamera.position, lookAt, normal);
-			splineCamera.rotation.setEulerFromRotationMatrix( splineCamera.matrix, splineCamera.eulerOrder );
+			splineCamera.rotation.setFromRotationMatrix( splineCamera.matrix, splineCamera.rotation.order );
 
 			cameraHelper.update();
 

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Create a texture to apply to a surface or as a reflection or refraction map.</div>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy )</h3>
+
+		<h2>Example</h2>
+
+		<code>
+		// load a texture, set wrap mode to repeat
+		var texture = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+		texture.repeat.set( 4, 4 );
+		</code>
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Image image]</h3>
+		<div>
+		An Image object, typically created using the ImageUtils or [page:ImageLoader ImageLoader] classes. The Image object can include an image (e.g., PNG, JPG, GIF, DDS), video (e.g., MP4, OGG/OGV), or set of six images for a cube map.
+		</div>
+
+		<h3>.[page:object mapping]</h3>
+		<div>
+		How the image is applied to the object. An object type of THREE.UVMapping() is the default, where the U,V coordinates are used to apply the map, and a single texture is expected. The other types are THREE.CubeReflectionMapping, for cube maps used as a reflection map; THREE.CubeRefractionMapping, refraction mapping; THREE.SphericalReflectionMapping, a spherical reflection map projection; and THREE.SphericalRefractionMapping.
+		</div>
+
+		<h3>.[page:number wrapS]</h3>
+		<div>
+		The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.
+		</div>
+
+		<h3>.[page:number wrapT]</h3>
+		<div>
+		The default is THREE.ClampToEdgeWrapping, where the edge is clamped to the outer edge texels. The other two choices are THREE.RepeatWrapping and THREE.MirroredRepeatWrapping.
+		</div>
+
+		<h3>.[page:number magFilter]</h3>
+		<div>
+		How the texture is sampled when a texel covers more than one pixel. The default is THREE.LinearFilter, which takes the four closest texels and bilinearly interpolates among them. The other option is THREE.NearestFilter, which uses the value of the closest texel.
+		</div>
+
+		<h3>.[page:number minFilter]</h3>
+		<div>
+		How the texture is sampled when a texel covers less than one pixel. The default is THREE.LinearMipMapLinearFilter, which uses mipmapping and a trilinear filter. Other choices are THREE.NearestFilter, THREE.NearestMipMapNearestFilter, THREE.NearestMipMapLinearFilter, THREE.LinearFilter, and THREE.LinearMipMapNearestFilter. These vary whether the nearest texel or nearest four texels are retrieved on the nearest mipmap or nearest two mipmaps. Interpolation occurs among the samples retrieved.
+		</div>
+
+		<h3>.[page:number format]</h3>
+		<div>
+		The default is THREE.RGBAFormat for the texture. Other formats are: THREE.AlphaFormat, THREE.RGBFormat, THREE.LuminanceFormat, and THREE.LuminanceAlphaFormat. There are also compressed texture formats, if the S3TC extension is supported: THREE.RGB_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT1_Format, THREE.RGBA_S3TC_DXT3_Format, and THREE.RGBA_S3TC_DXT5_Format.
+		</div>
+
+		<h3>.[page:number type]</h3>
+		<div>
+		The default is THREE.UnsignedByteType. Other valid types (as WebGL allows) are THREE.ByteType, THREE.ShortType, THREE.UnsignedShortType, THREE.IntType, THREE.UnsignedIntType, THREE.FloatType, THREE.UnsignedShort4444Type, THREE.UnsignedShort5551Type, and THREE.UnsignedShort565Type.
+		</div>
+
+		<h3>.[page:number anisotropy]</h3>
+		<div>
+		The number of samples taken along the axis through the pixel that has the highest density of texels. By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used. Use renderer.getMaxAnisotropy() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.
+		</div>
+
+		<h3>.[page:boolean needsUpdate]</h3>
+		<div>
+		If a texture is changed after creation, set this flag to true so that the texture is properly set up. Particularly important for setting the wrap mode.
+		</div>
+
+		<h3>.[page:Vector2 repeat]</h3>
+		<div>
+		How many times the texture is repeated across the surface, in each direction U and V.
+		</div>
+
+		<h3>.[page:Vector2 offset]</h3>
+		<div>
+		How much a single repetition of the texture is offset from the beginning, in each direction U and V. Typical range is 0.0 to 1.0.
+		</div>
+
+		<h3>.[page:string name]</h3>
+		<div>
+		Given name of the texture, empty string by default.
+		</div>
+
+		<h3>.[page:boolean generateMipmaps]</h3>
+		<div>
+		Whether to generate mipmaps (if possible) for a texture. True by default.
+		</div>
+
+		<h3>.[page:boolean flipY]</h3>
+		<div>
+		False by default, set this to true if the texture needs to be flipped vertically.
+		</div>
+
+		<h3>.[page:array mipmaps]</h3>
+		<div>
+		Array of mipmaps generated.
+		</div>
+
+		<h3>.[page:number unpackAlignment]</h3>
+		<div>
+		4 by default. Specifies the alignment requirements for the start of each pixel row in memory. The allowable values are 1 (byte-alignment), 2 (rows aligned to even-numbered bytes), 4 (word-alignment), and 8 (rows start on double-word boundaries). See <a href="http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml">glPixelStorei</a> for more information.
+		</div>
+
+		<h3>.[page:boolean premultiplyAlpha]</h3>
+		<div>
+		False by default, which is the norm for PNG images. Set to true if the RGB values have been stored premultiplied by alpha.
+		</div>
+
+		<h3>.[page:object onUpdate]</h3>
+		<div>
+		A callback function, called when the texture is updated (e.g., when needsUpdate has been set to true and then the texture is used).
+		</div>
+
+		<h3>.[page:number id]</h3>
+		<div>
+		An internal ID number, starting from 0; should not be modified. THREE.TextureIdCount is the number of textures created so far.
+		</div>
+
+		<h2>Methods</h2>
+
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
+
+		<h3>.clone([page:todo texture]) [page:todo]</h3>
+		<div>
+		Make copy of texture. Note this is not a "deep copy", the image is shared.
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.dispose() [page:todo]</h3>
+		<div>
+		Call [page:EventDispatcher EventDispatcher].dispatchEvent with a 'dispose' event type.
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">4D vector.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Float x], [page:Float y], [page:Float z], [page:Float w] )</h3>
+		<div>
+		x -- todo <br />
+		y -- todo <br />
+		z -- todo <br />
+		w -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Float x]</h3>
+
+		<h3>.[page:Float y]</h3>
+
+		<h3>.[page:Float z]</h3>
+
+		<h3>.[page:Float w]</h3>
+
+
+		<h2>Methods</h2>
+
+		<h3>.set( [page:Float x], [page:Float y], [page:Float z], [page:Float w] ) [page:Vector4]</h3>
+		<div>
+		Sets value of this vector.
+		</div>
+
+		<h3>.copy( [page:Vector4 v] ) [page:Vector4]</h3>
+		<div>
+		Copies value of *v* to this vector.
+		</div>
+
+		<h3>.add( [page:Vector4 v] ) [page:Vector4]</h3>
+		<div>
+		Adds *v* to this vector.
+		</div>
+
+		<h3>.addVectors( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
+		<div>
+		Sets this vector to *a + b*.
+		</div>
+
+		<h3>.sub( [page:Vector4 v] ) [page:Vector4]</h3>
+		<div>
+		Subtracts *v* from this vector.
+		</div>
+
+		<h3>.subVectors( [page:Vector4 a], [page:Vector4 b] ) [page:Vector4]</h3>
+		<div>
+		Sets this vector to *a - b*.
+		</div>
+
+		<h3>.multiplyScalar( [page:Float s] ) [page:Vector4]</h3>
+		<div>
+		Multiplies this vector by scalar *s*.
+		</div>
+
+		<h3>.divideScalar( [page:Float s] ) [page:Vector4]</h3>
+		<div>
+		Divides this vector by scalar *s*.<br />
+		Set vector to *( 0, 0, 0 )* if *s == 0*.
+		</div>
+
+		<h3>.negate() [page:Vector4]</h3>
+		<div>
+		Inverts this vector.
+		</div>
+
+		<h3>.dot( [page:Vector4 v] ) [page:Float]</h3>
+		<div>
+		Computes dot product of this vector and *v*.
+		</div>
+
+		<h3>.lengthSq() [page:Float]</h3>
+		<div>
+		Computes squared length of this vector.
+		</div>
+
+		<h3>.length() [page:Float]</h3>
+		<div>
+		Computes length of this vector.
+		</div>
+
+		<h3>.normalize() [page:Vector4]</h3>
+		<div>
+		Normalizes this vector.
+		</div>
+
+		<h3>.setLength( [page:Float l] ) [page:Vector4]</h3>
+		<div>
+		Normalizes this vector and multiplies it by *l*.
+		</div>
+
+		<h3>.lerp( [page:Vector4 v], [page:Float alpha] ) [page:Vector4]</h3>
+		<div>
+		Linearly interpolate between this vector and *v* with *alpha* factor.
+		</div>
+
+		<h3>.clone() [page:Vector4]</h3>
+		<div>
+		Clones this vector.
+		</div>
+
+
+		<h3>.clamp([page:todo min], [page:todo max]) [page:todo]</h3>
+		<div>
+		min -- todo <br />
+		max -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.toArray() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.applyMatrix4([page:todo m]) [page:todo]</h3>
+		<div>
+		m -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.min([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.max([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setAxisAngleFromRotationMatrix([page:todo m]) [page:todo]</h3>
+		<div>
+		m -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.addScalar([page:todo s]) [page:todo]</h3>
+		<div>
+		s -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.equals([page:todo v]) [page:todo]</h3>
+		<div>
+		v -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setAxisAngleFromQuaternion([page:todo q]) [page:todo]</h3>
+		<div>
+		q -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setW([page:todo w]) [page:todo]</h3>
+		<div>
+		w -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.getComponent([page:todo index]) [page:todo]</h3>
+		<div>
+		index -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.fromArray([page:todo array]) [page:todo]</h3>
+		<div>
+		array -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.lengthManhattan() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.setComponent([page:todo index], [page:todo value]) [page:todo]</h3>
+		<div>
+		index -- todo <br />
+		value -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setX([page:todo x]) [page:todo]</h3>
+		<div>
+		x -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setY([page:todo y]) [page:todo]</h3>
+		<div>
+		y -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.setZ([page:todo z]) [page:todo]</h3>
+		<div>
+		z -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
