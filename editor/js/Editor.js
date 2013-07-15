@@ -134,7 +134,22 @@ Editor.prototype = {
 
 		return function ( object ) {
 
-			if ( object instanceof THREE.PointLight ) {
+			if ( object instanceof THREE.Camera ) {
+
+				var picker = new THREE.Mesh( geometry, material );
+				picker.name = 'picker';
+				picker.userData.object = object;
+				picker.visible = false;
+
+				var helper = new THREE.CameraHelper( object, 10 );
+				helper.add( picker );
+			
+				this.sceneHelpers.add( helper );
+				this.helpers[ object.id ] = helper;
+
+				this.signals.helperAdded.dispatch( helper );
+
+			} else if ( object instanceof THREE.PointLight ) {
 
 				var picker = new THREE.Mesh( geometry, material );
 				picker.name = 'picker';
@@ -242,7 +257,7 @@ Editor.prototype = {
 
 	selectById: function ( id ) {
 
-		this.select( this.scene.getObjectById( id ) );
+		this.select( this.scene.getObjectById( id, true ) );
 
 	},
 
