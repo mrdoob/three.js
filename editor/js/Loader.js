@@ -37,6 +37,7 @@ var Loader = function ( editor ) {
 
 	};
 
+	var exporter = new THREE.ObjectExporter();
 	var timeout;
 
 	this.saveLocalStorage = function ( scene ) {
@@ -45,10 +46,8 @@ var Loader = function ( editor ) {
 
 		timeout = setTimeout( function () {
 
-			var exporter = new THREE.ObjectExporter();
 			localStorage.threejsEditor = JSON.stringify( exporter.parse( editor.scene ) );
-
-			console.log( 'Saved state to Local Storage' );
+			console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to LocalStorage.' );
 
 		}, 3000 );
 

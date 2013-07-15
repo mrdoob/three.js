@@ -146,7 +146,7 @@ Sidebar.Scene = function ( editor ) {
 
 	// events
 
-	var updateUI = function () {
+	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
 
@@ -196,10 +196,7 @@ Sidebar.Scene = function ( editor ) {
 
 		refreshFogUI();
 
-	};
-
-	signals.objectAdded.add( updateUI );
-	signals.objectRemoved.add( updateUI );
+	} );
 
 	signals.objectSelected.add( function ( object ) {
 

@@ -281,17 +281,7 @@ Sidebar.Object3D = function ( editor ) {
 
 				if ( object.parent.id !== newParentId && object.id !== newParentId ) {
 
-					var parent = scene.getObjectById( newParentId, true );
-
-					if ( parent === undefined ) {
-
-						parent = scene;
-
-					}
-
-					parent.add( object );
-
-					signals.sceneChanged.dispatch();
+					editor.parent( object, editor.scene.getObjectById( newParentId, true ) );
 
 				}
 
@@ -450,7 +440,15 @@ Sidebar.Object3D = function ( editor ) {
 
 	}
 
-	var updateObjectParent = function () {
+	// events
+
+	signals.objectSelected.add( function ( object ) {
+
+		updateUI();
+
+	} );
+
+	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
 
@@ -474,18 +472,7 @@ Sidebar.Object3D = function ( editor ) {
 
 		objectParent.setOptions( options );
 
-	};
-
-	// events
-
-	signals.objectSelected.add( function ( object ) {
-
-		updateUI();
-
 	} );
-
-	signals.objectAdded.add( updateObjectParent );
-	signals.objectRemoved.add( updateObjectParent );
 
 	signals.objectChanged.add( function ( object ) {
 

@@ -119,11 +119,13 @@ var Viewport = function ( editor ) {
 
 				editor.select( object );
 
+				/*
 				if ( helpersToObjects[ object.id ] !== undefined ) {
 
 					editor.select( helpersToObjects[ object.id ] );
 
 				}
+				*/
 
 			} else {
 
@@ -205,6 +207,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.sceneGraphChanged.add( function () {
+
+		render();
+		updateInfo();
+
+	} );
+
 	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
@@ -241,9 +250,6 @@ var Viewport = function ( editor ) {
 
 		}
 
-		render();
-		updateInfo();
-
 	} );
 
 	signals.objectChanged.add( function ( object ) {
@@ -273,9 +279,6 @@ var Viewport = function ( editor ) {
 			updateMaterials();
 
 		}
-
-		render();
-		updateInfo();
 
 	} );
 

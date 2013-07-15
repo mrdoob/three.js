@@ -14,6 +14,8 @@ var Editor = function () {
 		snapChanged: new SIGNALS.Signal(),
 		rendererChanged: new SIGNALS.Signal(),
 
+		sceneGraphChanged: new SIGNALS.Signal(),
+
 		objectSelected: new SIGNALS.Signal(),
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
@@ -67,6 +69,7 @@ Editor.prototype = {
 		this.addHelper( object );
 
 		this.signals.objectAdded.dispatch( object );
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -76,10 +79,11 @@ Editor.prototype = {
 
 		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
-		this.scene.remove( object );
+		object.parent.remove( object );
 		this.removeHelper( object );
 
 		this.signals.objectRemoved.dispatch( object );
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -161,6 +165,22 @@ Editor.prototype = {
 			this.signals.helperRemoved.dispatch( helper );
 
 		}
+
+	},
+
+	//
+
+	parent: function ( object, parent ) {
+
+		if ( parent === undefined ) {
+
+			parent = this.scene;
+
+		}
+
+		parent.add( object );
+
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
