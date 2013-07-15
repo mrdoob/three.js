@@ -5053,7 +5053,7 @@ THREE.Ray.prototype = {
 
 		if ( directionDistance < 0 ) {
 
-			return this.origin.clone();
+			return result.copy( this.origin );
 
 		}
 
@@ -5085,7 +5085,7 @@ THREE.Ray.prototype = {
 
 	}(),
 
-	distanceToSegment: function( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+	distanceSqToSegment: function( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
 		// from http://www.geometrictools.com/LibMathematics/Distance/Wm5DistRay3Segment3.cpp
 		// It returns the min distance between the ray and the segment
@@ -6914,20 +6914,20 @@ THREE.EventDispatcher.prototype = {
 
 			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
-				localRay.distanceToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
-				interSegment.applyMatrix4( object.matrixWorld );
-				interRay.applyMatrix4( object.matrixWorld );
+				var distSq = localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-				if ( interRay.distanceToSquared( interSegment ) <= precisionSq ) {
+				if ( distSq <= precisionSq ) {
 
-					var distance = raycaster.ray.origin.distanceTo( interRay );
+					var distance = localRay.origin.distanceTo( interRay );
 
 					if ( raycaster.near <= distance && distance <= raycaster.far ) {
 
 						intersects.push( {
 
 							distance: distance,
-							point: interSegment.clone(),
+							// What do we want? intersection point on the ray or on the segment??
+							// point: raycaster.ray.at( distance ),
+							point: interSegment.clone().applyMatrix4( object.matrixWorld ),
 							face: null,
 							faceIndex: null,
 							object: object
@@ -35299,53 +35299,58 @@ THREE.CameraHelper.prototype.update = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DirectionalLightHelper = function ( light, sphereSize ) {
+THREE.DirectionalLightHelper = function ( light, size ) {
 
 	THREE.Object3D.call( this );
 
+	this.light = light;
+	this.light.updateMatrixWorld();
+
+	this.matrixWorld = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.light = light;
-
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
+	var geometry = new THREE.PlaneGeometry( size, size );
+	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.matrixWorld = this.light.matrixWorld;
-	this.lightSphere.matrixAutoUpdate = false;
-	this.add( this.lightSphere );
-
-	/*
-	this.targetSphere = new THREE.Mesh( geometry, material );
-	this.targetSphere.position = this.light.target.position;
-	this.add( this.targetSphere );
-	*/
+	this.lightPlane = new THREE.Mesh( geometry, material );
+	this.add( this.lightPlane );
 
 	geometry = new THREE.Geometry();
-	geometry.vertices.push( this.light.position );
-	geometry.vertices.push( this.light.target.position );
+	geometry.vertices.push( new THREE.Vector3() );
+	geometry.vertices.push( new THREE.Vector3() );
 	geometry.computeLineDistances();
 
-	material = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
+	material = new THREE.LineBasicMaterial( { fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.targetLine = new THREE.Line( geometry, material );
 	this.add( this.targetLine );
 
-}
+	this.update();
+
+};
 
 THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.DirectionalLightHelper.prototype.update = function () {
 
-	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	var vector = new THREE.Vector3();
 
-	this.targetLine.geometry.computeLineDistances();
-	this.targetLine.geometry.verticesNeedUpdate = true;
-	this.targetLine.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	return function () {
 
-};
+		vector.getPositionFromMatrix( this.light.matrixWorld ).negate();
+
+		this.lightPlane.lookAt( vector );
+		this.lightPlane.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+		this.targetLine.geometry.vertices[ 1 ].copy( vector );
+		this.targetLine.geometry.verticesNeedUpdate = true;
+		this.targetLine.material.color.copy( this.lightPlane.material.color );
+
+	}
+
+}();
 
 
 /**
@@ -35475,26 +35480,28 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 	THREE.Object3D.call( this );
 
 	this.light = light;
+	this.light.updateMatrixWorld();
+
+	this.matrixWorld = light.matrixWorld;
+	this.matrixAutoUpdate = false;
+
+	this.colors = [ new THREE.Color(), new THREE.Color() ];
 
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
 	for ( var i = 0, il = 8; i < il; i ++ ) {
 
-		geometry.faces[ i ].materialIndex = i < 4 ? 0 : 1;
+		geometry.faces[ i ].color = this.colors[ i < 4 ? 0 : 1 ];
 
 	}
 
-	var materialSky = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
-	materialSky.color.copy( light.color ).multiplyScalar( light.intensity );
+	var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, wireframe: true } );
 
-	var materialGround = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
-	materialGround.color.copy( light.groundColor ).multiplyScalar( light.intensity );
-
-	this.lightSphere = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( [ materialSky, materialGround ] ) );
-	this.lightSphere.position = light.position;
-	this.lightSphere.lookAt( new THREE.Vector3() );
+	this.lightSphere = new THREE.Mesh( geometry, material );
 	this.add( this.lightSphere );
+
+	this.update();
 
 };
 
@@ -35502,12 +35509,19 @@ THREE.HemisphereLightHelper.prototype = Object.create( THREE.Object3D.prototype 
 
 THREE.HemisphereLightHelper.prototype.update = function () {
 
-	this.lightSphere.lookAt( new THREE.Vector3() );
+	var vector = new THREE.Vector3();
 
-	this.lightSphere.material.materials[ 0 ].color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-	this.lightSphere.material.materials[ 1 ].color.copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
+	return function () {
 
-};
+		this.colors[ 0 ].copy( this.light.color ).multiplyScalar( this.light.intensity );
+		this.colors[ 1 ].copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
+
+		this.lightSphere.lookAt( vector.getPositionFromMatrix( this.light.matrixWorld ).negate() );
+		this.lightSphere.geometry.colorsNeedUpdate = true;
+
+	}
+
+}();
 
 
 /**
@@ -35518,9 +35532,10 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 THREE.PointLightHelper = function ( light, sphereSize ) {
 
 	this.light = light;
+	this.light.updateMatrixWorld();
 
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
+	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	THREE.Mesh.call( this, geometry, material );
@@ -35584,53 +35599,48 @@ THREE.PointLightHelper.prototype.update = function () {
 
 THREE.SpotLightHelper = function ( light ) {
 
-	// spotlight helper must be a child of the scene
+	THREE.Object3D.call( this );
 
 	this.light = light;
+	this.light.updateMatrixWorld();
+
+	this.matrixWorld = light.matrixWorld;
+	this.matrixAutoUpdate = false;
 
 	var geometry = new THREE.CylinderGeometry( 0, 1, 1, 8, 1, true );
 
 	geometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, -0.5, 0 ) );
-
 	geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-	var material = new THREE.MeshBasicMaterial( { wireframe: true, opacity: 0.3, transparent: true } );
-
-	THREE.Mesh.call( this, geometry, material );
+	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
+	
+	this.cone = new THREE.Mesh( geometry, material );
+	this.add( this.cone );
 
 	this.update();
 
 };
 
-THREE.SpotLightHelper.prototype = Object.create( THREE.Mesh.prototype );
+THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.SpotLightHelper.prototype.update = ( function () {
+THREE.SpotLightHelper.prototype.update = function () {
 
-	var targetPosition = new THREE.Vector3();
+	var vector = new THREE.Vector3();
 
-	return function() {
+	return function () {
 
 		var coneLength = this.light.distance ? this.light.distance : 10000;
-
 		var coneWidth = coneLength * Math.tan( this.light.angle );
 
-		this.scale.set( coneWidth, coneWidth, coneLength );
+		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		this.light.updateMatrixWorld( true );
+		this.cone.lookAt( vector.getPositionFromMatrix( this.light.matrixWorld ).negate() );
 
-		this.position.getPositionFromMatrix( this.light.matrixWorld );
-
-		this.light.target.updateMatrixWorld( true );
-
-		targetPosition.getPositionFromMatrix( this.light.target.matrixWorld );
-
-		this.lookAt( targetPosition );
-
-		this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+		this.cone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	}
 
-}());
+}();
 
 /**
  * @author mrdoob / http://mrdoob.com/
