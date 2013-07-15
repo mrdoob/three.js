@@ -65,8 +65,15 @@ Editor.prototype = {
 
 	addObject: function ( object ) {
 
+		var scope = this;
+
+		object.traverse( function ( child ) {
+
+			scope.addHelper( child );
+
+		} );
+
 		this.scene.add( object );
-		this.addHelper( object );
 
 		this.signals.objectAdded.dispatch( object );
 		this.signals.sceneGraphChanged.dispatch();
@@ -79,8 +86,15 @@ Editor.prototype = {
 
 		if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
+		var scope = this;
+
+		object.traverse( function ( child ) {
+
+			scope.removeHelper( child );
+
+		} );
+
 		object.parent.remove( object );
-		this.removeHelper( object );
 
 		this.signals.objectRemoved.dispatch( object );
 		this.signals.sceneGraphChanged.dispatch();
@@ -118,7 +132,7 @@ Editor.prototype = {
 		if ( object instanceof THREE.PointLight ) {
 
 			var helper = new THREE.PointLightHelper( object, 10 );
-			helper.lightSphere.id = object.id;
+			helper.userData.object = object;
 			this.sceneHelpers.add( helper );
 			this.helpers[ object.id ] = helper;
 
@@ -127,7 +141,7 @@ Editor.prototype = {
 		} else if ( object instanceof THREE.DirectionalLight ) {
 
 			var helper = new THREE.DirectionalLightHelper( object, 10 );
-			helper.lightSphere.id = object.id;
+			helper.userData.object = object;
 			this.sceneHelpers.add( helper );
 			this.helpers[ object.id ] = helper;
 
@@ -136,7 +150,7 @@ Editor.prototype = {
 		} else if ( object instanceof THREE.SpotLight ) {
 
 			var helper = new THREE.SpotLightHelper( object, 10 );
-			helper.lightSphere.id = object.id;
+			helper.userData.object = object;
 			this.sceneHelpers.add( helper );
 			this.helpers[ object.id ] = helper;
 
@@ -145,7 +159,7 @@ Editor.prototype = {
 		} else if ( object instanceof THREE.HemisphereLight ) {
 
 			var helper = new THREE.HemisphereLightHelper( object, 10 );
-			helper.lightSphere.id = object.id;
+			helper.userData.object = object;
 			this.sceneHelpers.add( helper );
 			this.helpers[ object.id ] = helper;
 
@@ -159,7 +173,9 @@ Editor.prototype = {
 
 		if ( this.helpers[ object.id ] !== undefined ) {
 
-			this.helpers[ object.id ].parent.remove( this.helpers[ object.id ] );
+			var helper = this.helpers[ object.id ];
+			helper.parent.remove( helper );
+
 			delete this.helpers[ object.id ];
 
 			this.signals.helperRemoved.dispatch( helper );

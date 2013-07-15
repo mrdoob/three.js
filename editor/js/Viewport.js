@@ -117,15 +117,16 @@ var Viewport = function ( editor ) {
 
 				var object = intersects[ 0 ].object;
 
-				editor.select( object );
+				if ( object.userData.object !== undefined ) {
 
-				/*
-				if ( helpersToObjects[ object.id ] !== undefined ) {
+				
+					editor.select( object.userData.object );
 
-					editor.select( helpersToObjects[ object.id ] );
+				} else {
+
+					editor.select( object );
 
 				}
-				*/
 
 			} else {
 
@@ -242,13 +243,13 @@ var Viewport = function ( editor ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		objects.push( object );
-
 		if ( object instanceof THREE.Light ) {
 
 			updateMaterials();
 
 		}
+
+		objects.push( object );
 
 	} );
 
@@ -257,7 +258,6 @@ var Viewport = function ( editor ) {
 		if ( object.geometry !== undefined ) {
 
 			selectionBox.update( object );
-			transformControls.update();
 
 		}
 
@@ -266,6 +266,8 @@ var Viewport = function ( editor ) {
 			editor.helpers[ object.id ].update();
 
 		}
+
+		transformControls.update();
 
 		render();
 		updateInfo();
@@ -279,6 +281,20 @@ var Viewport = function ( editor ) {
 			updateMaterials();
 
 		}
+
+		objects.splice( objects.indexOf( object ), 1 );
+
+	} );
+
+	signals.helperAdded.add( function ( object ) {
+
+		objects.push( object );
+
+	} );
+
+	signals.helperRemoved.add( function ( object ) {
+
+		objects.splice( objects.indexOf( object ), 1 );
 
 	} );
 
