@@ -288,13 +288,13 @@ var Viewport = function ( editor ) {
 
 	signals.helperAdded.add( function ( object ) {
 
-		objects.push( object );
+		objects.push( object.getObjectByName( 'picker' ) );
 
 	} );
 
 	signals.helperRemoved.add( function ( object ) {
 
-		objects.splice( objects.indexOf( object ), 1 );
+		objects.splice( objects.indexOf( object.getObjectByName( 'picker' ) ), 1 );
 
 	} );
 

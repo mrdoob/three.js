@@ -36,7 +36,7 @@ Menubar.Add = function ( editor ) {
 		var heightSegments = 1;
 
 		var geometry = new THREE.PlaneGeometry( width, height, widthSegments, heightSegments );
-		var material = new THREE.MeshLambertMaterial();
+		var material = new THREE.MeshPhongMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane ' + ( ++ meshCount );
 
@@ -64,7 +64,7 @@ Menubar.Add = function ( editor ) {
 		var depthSegments = 1;
 
 		var geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Cube ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
@@ -88,7 +88,7 @@ Menubar.Add = function ( editor ) {
 		var openEnded = false;
 
 		var geometry = new THREE.CylinderGeometry( radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
@@ -109,7 +109,7 @@ Menubar.Add = function ( editor ) {
 		var heightSegments = 16;
 
 		var geometry = new THREE.SphereGeometry( radius, widthSegments, heightSegments );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
@@ -129,7 +129,7 @@ Menubar.Add = function ( editor ) {
 		var detail = 2;
 
 		var geometry = new THREE.IcosahedronGeometry ( radius, detail );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
@@ -152,7 +152,7 @@ Menubar.Add = function ( editor ) {
 		var arc = Math.PI * 2;
 
 		var geometry = new THREE.TorusGeometry( radius, tube, radialSegments, tubularSegments, arc );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
@@ -177,7 +177,7 @@ Menubar.Add = function ( editor ) {
 		var heightScale = 1;
 
 		var geometry = new THREE.TorusKnotGeometry( radius, tube, radialSegments, tubularSegments, p, q, heightScale );
-		var mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial() );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
 		editor.addObject( mesh );

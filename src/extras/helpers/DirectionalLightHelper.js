@@ -3,51 +3,56 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DirectionalLightHelper = function ( light, sphereSize ) {
+THREE.DirectionalLightHelper = function ( light, size ) {
 
 	THREE.Object3D.call( this );
 
+	this.light = light;
+	this.light.updateMatrixWorld();
+
+	this.matrixWorld = light.matrixWorld;
 	this.matrixAutoUpdate = false;
 
-	this.light = light;
-
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
+	var geometry = new THREE.PlaneGeometry( size, size );
+	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.matrixWorld = this.light.matrixWorld;
-	this.lightSphere.matrixAutoUpdate = false;
-	this.add( this.lightSphere );
-
-	/*
-	this.targetSphere = new THREE.Mesh( geometry, material );
-	this.targetSphere.position = this.light.target.position;
-	this.add( this.targetSphere );
-	*/
+	this.lightPlane = new THREE.Mesh( geometry, material );
+	this.add( this.lightPlane );
 
 	geometry = new THREE.Geometry();
-	geometry.vertices.push( this.light.position );
-	geometry.vertices.push( this.light.target.position );
+	geometry.vertices.push( new THREE.Vector3() );
+	geometry.vertices.push( new THREE.Vector3() );
 	geometry.computeLineDistances();
 
-	material = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
+	material = new THREE.LineBasicMaterial( { fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.targetLine = new THREE.Line( geometry, material );
 	this.add( this.targetLine );
 
-}
+	this.update();
+
+};
 
 THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.DirectionalLightHelper.prototype.update = function () {
 
-	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	var vector = new THREE.Vector3();
 
-	this.targetLine.geometry.computeLineDistances();
-	this.targetLine.geometry.verticesNeedUpdate = true;
-	this.targetLine.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	return function () {
 
-};
+		vector.getPositionFromMatrix( this.light.matrixWorld ).negate();
+
+		this.lightPlane.lookAt( vector );
+		this.lightPlane.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+		this.targetLine.geometry.vertices[ 1 ].copy( vector );
+		this.targetLine.geometry.verticesNeedUpdate = true;
+		this.targetLine.material.color.copy( this.lightPlane.material.color );
+
+	}
+
+}();
 
