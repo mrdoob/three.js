@@ -57,16 +57,9 @@ THREE.CSS3DRenderer = function () {
 	domElement.style.overflow = 'hidden';
 
 	domElement.style.WebkitTransformStyle = 'preserve-3d';
-	domElement.style.WebkitPerspectiveOrigin = '50% 50%';
-
 	domElement.style.MozTransformStyle = 'preserve-3d';
-	domElement.style.MozPerspectiveOrigin = '50% 50%';
-
 	domElement.style.oTransformStyle = 'preserve-3d';
-	domElement.style.oPerspectiveOrigin = '50% 50%';
-
 	domElement.style.transformStyle = 'preserve-3d';
-	domElement.style.perspectiveOrigin = '50% 50%';
 
 	this.domElement = domElement;
 
