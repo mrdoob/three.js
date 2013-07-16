@@ -1,4 +1,6 @@
-Sidebar.Renderer = function ( signals ) {
+Sidebar.Renderer = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var rendererClasses = {
 
@@ -57,7 +59,7 @@ Sidebar.Renderer = function ( signals ) {
 			clearColor: clearColor.getHexValue(),
 			clearAlpha: 1
 		} );
-		signals.setRenderer.dispatch( renderer );
+		signals.rendererChanged.dispatch( renderer );
 
 	}
 

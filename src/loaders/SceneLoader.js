@@ -338,7 +338,6 @@ THREE.SceneLoader.prototype = {
 								if ( quat ) {
 
 									object.quaternion.fromArray( quat );
-									object.useQuaternion = true;
 
 								} else {
 
@@ -429,7 +428,6 @@ THREE.SceneLoader.prototype = {
 						if ( quat !== undefined ) {
 
 							camera.quaternion.fromArray( quat );
-							camera.useQuaternion = true;
 
 						} else if ( rot !== undefined ) {
 
@@ -458,7 +456,6 @@ THREE.SceneLoader.prototype = {
 						if ( quat ) {
 
 							object.quaternion.fromArray( quat );
-							object.useQuaternion = true;
 
 						} else {
 
@@ -541,7 +538,6 @@ THREE.SceneLoader.prototype = {
 			if ( q ) {
 
 				node.quaternion.fromArray( q );
-				node.useQuaternion = true;
 
 			} else {
 

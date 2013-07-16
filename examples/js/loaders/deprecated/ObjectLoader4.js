@@ -8,11 +8,6 @@ THREE.ObjectLoader4.prototype = {
 
 	constructor: THREE.ObjectLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
 	load: function ( url ) {
 
 		var scope = this;
@@ -300,3 +295,5 @@ THREE.ObjectLoader4.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.ObjectLoader4.prototype );

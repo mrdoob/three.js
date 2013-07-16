@@ -1,13 +1,15 @@
-var Sidebar = function ( editor, signals ) {
+var Sidebar = function ( editor ) {
 
-	var container = new UI.Panel().setWidth('300px');
+	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
 	container.setClass( 'sidebar' );
 
-	container.add( new Sidebar.Renderer( signals ) );
-	container.add( new Sidebar.Outliner( signals ) );
-	container.add( new Sidebar.Attributes( signals ) );
-	container.add( new Sidebar.Animation( signals ) );
+	container.add( new Sidebar.Renderer( editor ) );
+	container.add( new Sidebar.Scene( editor ) );
+	container.add( new Sidebar.Object3D( editor ) );
+	container.add( new Sidebar.Geometry( editor ) );
+	container.add( new Sidebar.Material( editor ) );
+	container.add( new Sidebar.Animation( editor ) );
 
 	return container;
 

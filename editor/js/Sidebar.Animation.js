@@ -1,11 +1,14 @@
-Sidebar.Animation = function ( signals ) {
+Sidebar.Animation = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var options = {};
 	var possibleAnimations = {};
 
 	var container = new UI.Panel();
-	container.setPadding( '10px' );
 	container.setBorderTop( '1px solid #ccc' );
+	container.setPadding( '10px' );
+	container.setDisplay( 'none' );
 
 	container.add( new UI.Text( 'Animation' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
@@ -23,41 +26,66 @@ Sidebar.Animation = function ( signals ) {
 	container.add( PlayRow );
 	container.add( new UI.Break() );
 
-	function play(){
+	function play() {
 
 		var value = Animations.getValue();
-		if (possibleAnimations[value]){
+
+		if ( possibleAnimations[ value ] ) {
+
 			var anims = possibleAnimations[value]
-			for ( var i = 0;i < anims.length;i++){
-				anims[i].play();
+
+			for ( var i = 0; i < anims.length; i ++ ) {
+
+				anims[ i ].play();
+
 			}
+
 			signals.playAnimations.dispatch( anims );
+
 		};
 
 	}
 
 	signals.objectAdded.add( function ( object ) {
 
-		if (object instanceof THREE.Mesh){
+		if ( object instanceof THREE.Mesh ) {
 
-			if (object.geometry && object.geometry.animation){
+			if ( object.geometry && object.geometry.animation ) {
 
 				var name = object.geometry.animation.name;
 				options[name] = name
-				Animations.setOptions(options);
 
-				THREE.AnimationHandler.add(object.geometry.animation);
-				var animation = new THREE.Animation(object, 
-     				name, 
-     				THREE.AnimationHandler.CATMULLROM)
+				Animations.setOptions( options );
 
-				if (possibleAnimations[name]){
-					possibleAnimations[name].push(animation);
+				THREE.AnimationHandler.add( object.geometry.animation );
+
+				var animation = new THREE.Animation( object, name, THREE.AnimationHandler.CATMULLROM );
+
+				if ( possibleAnimations[ name ] ){
+
+					possibleAnimations[ name ].push( animation );
+
 				} else {
-					possibleAnimations[name] = [animation];
+
+					possibleAnimations[ name ] = [ animation ];
+
 				}
 
 			}
+
+		}
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
+
+		if ( object && object.geometry && object.geometry.animation ) {
+
+			container.setDisplay( 'block' );
+
+		} else {
+
+			container.setDisplay( 'none' );
 
 		}
 

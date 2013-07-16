@@ -9,8 +9,6 @@
 
 THREE.CameraHelper = function ( camera ) {
 
-	THREE.Line.call( this );
-
 	var geometry = new THREE.Geometry();
 	var material = new THREE.LineBasicMaterial( { color: 0xffffff, vertexColors: THREE.FaceColors } );
 

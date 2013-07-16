@@ -78,6 +78,7 @@ THREE.Projector = function () {
 	var getObject = function ( object ) {
 
 		_object = getNextObjectInPool();
+		_object.id = object.id;
 		_object.object = object;
 
 		if ( object.renderDepth !== null ) {
@@ -198,9 +199,11 @@ THREE.Projector = function () {
 					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
 					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
 
-					_vertex.positionScreen.x /= _vertex.positionScreen.w;
-					_vertex.positionScreen.y /= _vertex.positionScreen.w;
-					_vertex.positionScreen.z /= _vertex.positionScreen.w;
+					var invW = 1 / _vertex.positionScreen.w;
+
+					_vertex.positionScreen.x *= invW;
+					_vertex.positionScreen.y *= invW;
+					_vertex.positionScreen.z *= invW;
 
 					_vertex.visible = ! ( _vertex.positionScreen.x < -1 || _vertex.positionScreen.x > 1 ||
 							      _vertex.positionScreen.y < -1 || _vertex.positionScreen.y > 1 ||
@@ -240,6 +243,7 @@ THREE.Projector = function () {
 
 								_face = getNextFace3InPool();
 
+								_face.id = object.id;
 								_face.v1.copy( v1 );
 								_face.v2.copy( v2 );
 								_face.v3.copy( v3 );
@@ -281,6 +285,7 @@ THREE.Projector = function () {
 
 								_face = getNextFace4InPool();
 
+								_face.id = object.id;
 								_face.v1.copy( v1 );
 								_face.v2.copy( v2 );
 								_face.v3.copy( v3 );
@@ -392,6 +397,8 @@ THREE.Projector = function () {
 						_clippedVertex2PositionScreen.multiplyScalar( 1 / _clippedVertex2PositionScreen.w );
 
 						_line = getNextLineInPool();
+
+						_line.id = object.id;
 						_line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
 						_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
 
@@ -427,15 +434,18 @@ THREE.Projector = function () {
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
 				_vector4.applyMatrix4( _viewProjectionMatrix );
 
-				_vector4.z /= _vector4.w;
+				var invW = 1 / _vector4.w;
+
+				_vector4.z *= invW;
 
 				if ( _vector4.z > 0 && _vector4.z < 1 ) {
 
 					_particle = getNextParticleInPool();
-					_particle.object = object;
-					_particle.x = _vector4.x / _vector4.w;
-					_particle.y = _vector4.y / _vector4.w;
+					_particle.id = object.id;
+					_particle.x = _vector4.x * invW;
+					_particle.y = _vector4.y * invW;
 					_particle.z = _vector4.z;
+					_particle.object = object;
 
 					_particle.rotation = object.rotation.z;
 
@@ -561,7 +571,19 @@ THREE.Projector = function () {
 
 	function painterSort( a, b ) {
 
-		return b.z - a.z;
+		if ( a.z !== b.z ) {
+
+			return b.z - a.z;
+
+		} else if ( a.id !== b.id ) {
+
+			return a.id - b.id;
+
+		} else {
+
+			return 0;
+
+		}
 
 	}
 

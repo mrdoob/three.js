@@ -151,10 +151,11 @@ THREE.ObjectLoader.prototype = {
 
 				}
 
-				if ( data.id !== undefined ) geometry.id = data.id;
+				geometry.uuid = data.uuid;
+
 				if ( data.name !== undefined ) geometry.name = data.name;
 
-				geometries[ data.id ] = geometry;
+				geometries[ data.uuid ] = geometry;
 
 			}
 
@@ -177,10 +178,11 @@ THREE.ObjectLoader.prototype = {
 				var data = json[ i ];
 				var material = loader.parse( data );
 
-				if ( data.id !== undefined ) material.id = data.id;
+				material.uuid = data.uuid;
+
 				if ( data.name !== undefined ) material.name = data.name;
 
-				materials[ data.id ] = material;
+				materials[ data.uuid ] = material;
 
 			}
 
@@ -190,103 +192,124 @@ THREE.ObjectLoader.prototype = {
 
 	},
 
-	parseObject: function ( data, geometries, materials ) {
+	parseObject: function () {
 
-		var object;
+		var matrix = new THREE.Matrix4();
 
-		switch ( data.type ) {
+		return function ( data, geometries, materials ) {
 
-			case 'Scene':
+			var object;
 
-				object = new THREE.Scene();
+			switch ( data.type ) {
 
-				break;
+				case 'Scene':
 
-			case 'PerspectiveCamera':
+					object = new THREE.Scene();
 
-				object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
+					break;
 
-				break;
+				case 'PerspectiveCamera':
 
-			case 'OrthographicCamera':
+					object = new THREE.PerspectiveCamera( data.fov, data.aspect, data.near, data.far );
 
-				object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
+					break;
 
-				break;
+				case 'OrthographicCamera':
 
-			case 'AmbientLight':
+					object = new THREE.OrthographicCamera( data.left, data.right, data.top, data.bottom, data.near, data.far );
 
-				object = new THREE.AmbientLight( data.color );
+					break;
 
-				break;
+				case 'AmbientLight':
 
-			case 'DirectionalLight':
+					object = new THREE.AmbientLight( data.color );
 
-				object = new THREE.DirectionalLight( data.color, data.intensity );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'DirectionalLight':
 
-			case 'PointLight':
+					object = new THREE.DirectionalLight( data.color, data.intensity );
 
-				object = new THREE.PointLight( data.color, data.intensity, data.distance );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'PointLight':
 
-			case 'SpotLight':
+					object = new THREE.PointLight( data.color, data.intensity, data.distance );
 
-				object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'SpotLight':
 
-			case 'HemisphereLight':
+					object = new THREE.SpotLight( data.color, data.intensity, data.distance, data.angle, data.exponent );
 
-				object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
-				object.position.fromArray( data.position );
+					break;
 
-				break;
+				case 'HemisphereLight':
 
-			case 'Mesh':
+					object = new THREE.HemisphereLight( data.color, data.groundColor, data.intensity );
 
-				object = new THREE.Mesh( geometries[ data.geometry ], materials[ data.material ] );
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
-				object.scale.fromArray( data.scale );
+					break;
 
-				break;
+				case 'Mesh':
 
-			default:
+					var geometry = geometries[ data.geometry ];
+					var material = materials[ data.material ];
 
-				object = new THREE.Object3D();
-				object.position.fromArray( data.position );
-				object.rotation.fromArray( data.rotation );
-				object.scale.fromArray( data.scale );
+					if ( geometry === undefined ) {
 
-		}
+						console.error( 'THREE.ObjectLoader: Undefined geometry ' + data.geometry );
 
-		if ( data.id !== undefined ) object.id = data.id;
-		if ( data.name !== undefined ) object.name = data.name;
-		if ( data.visible !== undefined ) object.visible = data.visible;
-		if ( data.userData !== undefined ) object.userData = data.userData;
+					}
 
-		if ( data.children !== undefined ) {
+					if ( material === undefined ) {
 
-			for ( var child in data.children ) {
+						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
 
-				object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+					}
+
+					object = new THREE.Mesh( geometry, material );
+
+					break;
+
+				default:
+
+					object = new THREE.Object3D();
 
 			}
 
+			object.uuid = data.uuid;
+
+			if ( data.name !== undefined ) object.name = data.name;
+			if ( data.matrix !== undefined ) {
+
+				matrix.fromArray( data.matrix );
+				matrix.decompose( object.position, object.quaternion, object.scale );
+
+			} else {
+
+				if ( data.position !== undefined ) object.position.fromArray( data.position );
+				if ( data.rotation !== undefined ) object.rotation.fromArray( data.rotation );
+				if ( data.scale !== undefined ) object.scale.fromArray( data.scale );
+
+			}
+
+			if ( data.visible !== undefined ) object.visible = data.visible;
+			if ( data.userData !== undefined ) object.userData = data.userData;
+
+			if ( data.children !== undefined ) {
+
+				for ( var child in data.children ) {
+
+					object.add( this.parseObject( data.children[ child ], geometries, materials ) );
+
+				}
+
+			}
+
+			return object;
+
 		}
 
-		return object;
-
-	}
+	}()
 
 };

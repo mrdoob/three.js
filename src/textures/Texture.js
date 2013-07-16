@@ -6,7 +6,8 @@
 
 THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.TextureIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -42,11 +43,6 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	clone: function ( texture ) {
 
@@ -87,3 +83,7 @@ THREE.Texture.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.Texture.prototype );
+
+THREE.TextureIdCount = 0;

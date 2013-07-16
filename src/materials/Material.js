@@ -5,7 +5,8 @@
 
 THREE.Material = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.MaterialIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -40,11 +41,6 @@ THREE.Material = function () {
 THREE.Material.prototype = {
 
 	constructor: THREE.Material,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	setValues: function ( values ) {
 
@@ -131,3 +127,7 @@ THREE.Material.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.Material.prototype );
+
+THREE.MaterialIdCount = 0;

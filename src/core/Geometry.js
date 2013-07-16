@@ -9,7 +9,8 @@
 
 THREE.Geometry = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.GeometryIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -55,11 +56,6 @@ THREE.Geometry = function () {
 THREE.Geometry.prototype = {
 
 	constructor: THREE.Geometry,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	applyMatrix: function ( matrix ) {
 
@@ -1432,3 +1428,7 @@ THREE.Geometry.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
+
+THREE.GeometryIdCount = 0;

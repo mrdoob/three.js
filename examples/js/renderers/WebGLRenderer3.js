@@ -21,6 +21,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	parameters = parameters || {};
 
+	var scope = this;
+
 	var canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' );
 
 	var devicePixelRatio = parameters.devicePixelRatio !== undefined
@@ -89,11 +91,13 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	var buffers = {};
 
-	var getBuffer = function ( geometry ) {
+	var getBuffer = function ( geometry, material ) {
 
-		if ( buffers[ geometry.id ] !== undefined ) {
+		var hash = geometry.id.toString() + '+' + material.id.toString();
 
-			return buffers[ geometry.id ];
+		if ( buffers[ hash ] !== undefined ) {
+
+			return buffers[ hash ];
 
 		}
 
@@ -175,7 +179,9 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		gl.bindBuffer( gl.ARRAY_BUFFER, buffer.normals );
 		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( normals ), gl.STATIC_DRAW );
 
-		buffers[ geometry.id ] = buffer;
+		buffers[ hash ] = buffer;
+
+		scope.info.memory.geometries ++;
 
 		return buffer;
 
@@ -269,6 +275,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 				programsCache[ code ] = program;
 				programs[ material.id ] = program;
 
+				scope.info.memory.programs ++;
+
 			} else {
 
 				console.error( 'VALIDATE_STATUS: ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) );
@@ -306,6 +314,27 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 		}
 
 		return shader;
+
+	};
+
+	this.info = {
+
+		memory: {
+
+			programs: 0,
+			geometries: 0,
+			textures: 0
+
+		},
+
+		render: {
+
+			calls: 0,
+			vertices: 0,
+			faces: 0,
+			points: 0
+
+		}
 
 	};
 
@@ -466,7 +495,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	var renderObject = function ( object, camera ) {
 
-		var buffer = getBuffer( object.geometry );
+		var buffer = getBuffer( object.geometry, object.material );
 
 		var material = object.material;
 
@@ -566,6 +595,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		gl.drawArrays( gl.TRIANGLES, 0, buffer.count );
 
+		scope.info.render.calls ++;
+
 	};
 
 	this.render = function ( scene, camera ) {
@@ -583,6 +614,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		objectsOpaque.length = 0;
 		objectsTransparent.length = 0;
+
+		scope.info.render.calls = 0;
 
 		currentBuffer = undefined;
 		currentMaterial = undefined;

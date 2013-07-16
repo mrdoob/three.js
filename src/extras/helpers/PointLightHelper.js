@@ -5,20 +5,17 @@
 
 THREE.PointLightHelper = function ( light, sphereSize ) {
 
-	THREE.Object3D.call( this );
-
-	this.matrixAutoUpdate = false;
-
 	this.light = light;
+	this.light.updateMatrixWorld();
 
 	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
+	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.matrixWorld = this.light.matrixWorld;
-	this.lightSphere.matrixAutoUpdate = false;
-	this.add( this.lightSphere );
+	THREE.Mesh.call( this, geometry, material );
+
+	this.matrixWorld = this.light.matrixWorld;
+	this.matrixAutoUpdate = false;
 
 	/*
 	var distanceGeometry = new THREE.IcosahedronGeometry( 1, 2 );
@@ -44,15 +41,13 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 };
 
-THREE.PointLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
 
 THREE.PointLightHelper.prototype.update = function () {
 
-	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	/*
-	this.lightDistance.material.color.copy( this.color );
-
 	var d = this.light.distance;
 
 	if ( d === 0.0 ) {

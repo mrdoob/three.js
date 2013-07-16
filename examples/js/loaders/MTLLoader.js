@@ -4,21 +4,17 @@
  * @author angelxuanchang
  */
 
-THREE.MTLLoader = function( baseUrl, options ) {
+THREE.MTLLoader = function( baseUrl, options, crossOrigin ) {
 
 	this.baseUrl = baseUrl;
 	this.options = options;
+	this.crossOrigin = crossOrigin;
 
 };
 
 THREE.MTLLoader.prototype = {
 
 	constructor: THREE.MTLLoader,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	/**
 	 * Loads a MTL file
@@ -353,7 +349,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 					// Diffuse texture map
 
-					params[ 'map' ] = THREE.MTLLoader.loadTexture( this.baseUrl + value );
+					params[ 'map' ] = this.loadTexture( this.baseUrl + value );
 					params[ 'map' ].wrapS = this.wrap;
 					params[ 'map' ].wrapT = this.wrap;
 
@@ -400,37 +396,38 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 		this.materials[ materialName ] = new THREE.MeshPhongMaterial( params );
 		return this.materials[ materialName ];
 
+	},
+
+
+	loadTexture: function ( url, mapping, onLoad, onError ) {
+
+		var isCompressed = /\.dds$/i.test( url );
+
+		if ( isCompressed ) {
+
+			var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
+
+		} else {
+
+			var image = new Image();
+			var texture = new THREE.Texture( image, mapping );
+
+			var loader = new THREE.ImageLoader();
+			loader.crossOrigin = this.crossOrigin;
+			loader.load( url, function ( image ) {
+
+				texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
+				texture.needsUpdate = true;
+
+				if ( onLoad ) onLoad( texture );
+
+			} );
+
+		}
+
+		return texture;
+
 	}
-
-};
-
-THREE.MTLLoader.loadTexture = function ( url, mapping, onLoad, onError ) {
-
-	var isCompressed = /\.dds$/i.test( url );
-
-	if ( isCompressed ) {
-
-		var texture = THREE.ImageUtils.loadCompressedTexture( url, mapping, onLoad, onError );
-
-	} else {
-
-		var image = new Image();
-		var texture = new THREE.Texture( image, mapping );
-
-		var loader = new THREE.ImageLoader();
-		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, function ( image ) {
-
-			texture.image = THREE.MTLLoader.ensurePowerOfTwo_( image );
-			texture.needsUpdate = true;
-
-			if ( onLoad ) onLoad( texture );
-
-		} );
-
-	}
-
-	return texture;
 
 };
 
@@ -472,3 +469,4 @@ THREE.MTLLoader.nextHighestPowerOfTwo_ = function( x ) {
 
 };
 
+THREE.EventDispatcher.prototype.apply( THREE.MTLLoader.prototype );

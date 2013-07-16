@@ -244,9 +244,9 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( !_this.noZoom || !_this.noPan ) {
 
-			if ( _this.object.position.lengthSq() > _this.maxDistance * _this.maxDistance ) {
+			if ( _eye.lengthSq() > _this.maxDistance * _this.maxDistance ) {
 
-				_this.object.position.setLength( _this.maxDistance );
+				_this.object.position.addVectors( _this.target, _eye.setLength( _this.maxDistance ) );
 
 			}
 
@@ -372,15 +372,18 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_rotateStart = _rotateEnd = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
+			_rotateStart = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
+			_rotateEnd.copy(_rotateStart)
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
-			_zoomStart = _zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_zoomStart = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_zoomEnd.copy(_zoomStart);
 
 		} else if ( _state === STATE.PAN && !_this.noPan ) {
 
-			_panStart = _panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_panStart = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_panEnd.copy(_panStart)
 
 		}
 

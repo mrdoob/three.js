@@ -22,9 +22,9 @@ THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Sprite.prototype.updateMatrix = function () {
 
-	this.rotation3d.set( 0, 0, this.rotation );
-	this.quaternion.setFromEuler( this.rotation3d, this.eulerOrder );
-	this.matrix.makeFromPositionQuaternionScale( this.position, this.quaternion, this.scale );
+	this.rotation3d.set( 0, 0, this.rotation, this.rotation3d.order );
+	this.quaternion.setFromEuler( this.rotation3d );
+	this.matrix.compose( this.position, this.quaternion, this.scale );
 
 	this.matrixWorldNeedsUpdate = true;
 

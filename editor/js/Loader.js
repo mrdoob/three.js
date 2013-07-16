@@ -1,8 +1,7 @@
-var Loader = function ( editor, signals ) {
+var Loader = function ( editor ) {
 
 	var scope = this;
-
-	var sceneExporter = new THREE.ObjectExporter();
+	var signals = editor.signals;
 
 	document.addEventListener( 'dragover', function ( event ) {
 
@@ -25,136 +24,38 @@ var Loader = function ( editor, signals ) {
 
 	}, false );
 
+	this.loadLocalStorage = function () {
+
+		if ( localStorage.threejsEditor !== undefined ) {
+
+			var loader = new THREE.ObjectLoader();
+			var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
+
+			editor.setScene( scene );
+
+		}
+
+	};
+
+	var exporter = new THREE.ObjectExporter();
 	var timeout;
 
-	signals.objectChanged.add( function () {
+	this.saveLocalStorage = function ( scene ) {
 
 		clearTimeout( timeout );
 
 		timeout = setTimeout( function () {
 
-			console.log( "Saving to localStorage." );
-			scope.saveLocalStorage( editor.scene );
+			localStorage.threejsEditor = JSON.stringify( exporter.parse( editor.scene ) );
+			console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to LocalStorage.' );
 
 		}, 3000 );
 
-	} );
-
-
-	this.loadLocalStorage = function () {
-
-		if ( localStorage.threejsEditor !== undefined ) {
-
-			try {
-
-				var loader = new THREE.ObjectLoader();
-				var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
-
-				editor.setScene( scene );
-
-			} catch ( e ) {
-
-				console.warn( "Unable to load object from localStorage." );
-
-			}
-
-		}
-
 	};
 
-	this.saveLocalStorage = function ( scene ) {
-
-		localStorage.threejsEditor = JSON.stringify( sceneExporter.parse( scene ) );
-
-	}
-
-	this.handleJSON = function ( data, file, filename ) {
-
-		if ( data.metadata === undefined ) { // 2.0
-
-			data.metadata = { type: 'geometry' };
-
-		}
-
-		if ( data.metadata.type === undefined ) { // 3.0
-
-			data.metadata.type = 'geometry';
-
-		}
-
-		if ( data.metadata.version === undefined ) {
-
-			data.metadata.version = data.metadata.formatVersion;
-
-		}
-
-		if ( data.metadata.type === 'geometry' ) {
-
-			var loader = new THREE.JSONLoader();
-			var result = loader.parse( data );
-
-			var geometry = result.geometry;
-			var material = result.materials !== undefined
-						? new THREE.MeshFaceMaterial( result.materials )
-						: new THREE.MeshPhongMaterial();
-
-			geometry.sourceType = "ascii";
-			geometry.sourceFile = file.name;
-
-			var mesh = new THREE.Mesh( geometry, material );
-			mesh.name = filename;
-
-			editor.addObject( mesh );
-
-		} else if ( data.metadata.type === 'object' ) {
-
-			var loader;
-
-			switch ( data.metadata.version ) {
-
-				case 4:
-					console.log( 'Loading Object format 4.0');
-					loader = new THREE.ObjectLoader4(); // DEPRECATED
-					break;
-
-				case 4.1:
-					console.log( 'Loading Object format 4.1');
-					loader = new THREE.ObjectLoader41(); // DEPRECATED
-					break;
-
-				default:
-					console.log( 'Loading Object format 4.2');
-					loader = new THREE.ObjectLoader();
-					break;
-
-			}
-
-			var result = loader.parse( data );
-
-			if ( result instanceof THREE.Scene ) {
-
-				editor.setScene( result );
-
-			} else {
-
-				editor.addObject( result );
-
-			}
-
-		} else if ( data.metadata.type === 'scene' ) {
-
-			// DEPRECATED
-
-			var loader = new THREE.SceneLoader();
-			loader.parse( data, function ( result ) {
-
-				editor.addObject( result.scene );
-
-			}, '' );
-
-		}
-
-	};
+	signals.objectAdded.add( this.saveLocalStorage );
+	signals.objectChanged.add( this.saveLocalStorage );
+	signals.objectRemoved.add( this.saveLocalStorage );
 
 	this.parseFile = function ( file, filename, extension ) {
 
@@ -216,9 +117,11 @@ var Loader = function ( editor, signals ) {
 
 			case 'js':
 			case 'json':
+
 			case '3geo':
 			case '3mat':
 			case '3obj':
+			case '3scn':
 
 				var reader = new FileReader();
 				reader.addEventListener( 'load', function ( event ) {
@@ -237,7 +140,7 @@ var Loader = function ( editor, signals ) {
 						worker.onmessage = function ( event ) {
 
 							event.data.metadata = { version: 2 };
-							scope.handleJSON( event.data, file, filename );
+							handleJSON( event.data, file, filename );
 
 						};
 
@@ -262,7 +165,7 @@ var Loader = function ( editor, signals ) {
 
 					}
 
-					scope.handleJSON( data, file, filename );
+					handleJSON( data, file, filename );
 
 				}, false );
 				reader.readAsText( file );
@@ -396,7 +299,7 @@ var Loader = function ( editor, signals ) {
 
 					var result = new THREE.VRMLLoader().parse( contents );
 
-					editor.addObject( result );
+					editor.setScene( result );
 
 				}, false );
 				reader.readAsText( file );
@@ -406,5 +309,73 @@ var Loader = function ( editor, signals ) {
 		}
 
 	}
+
+	var handleJSON = function ( data, file, filename ) {
+
+		if ( data.metadata === undefined ) { // 2.0
+
+			data.metadata = { type: 'geometry' };
+
+		}
+
+		if ( data.metadata.type === undefined ) { // 3.0
+
+			data.metadata.type = 'geometry';
+
+		}
+
+		if ( data.metadata.version === undefined ) {
+
+			data.metadata.version = data.metadata.formatVersion;
+
+		}
+
+		if ( data.metadata.type === 'geometry' ) {
+
+			var loader = new THREE.JSONLoader();
+			var result = loader.parse( data );
+
+			var geometry = result.geometry;
+			var material = result.materials !== undefined
+						? new THREE.MeshFaceMaterial( result.materials )
+						: new THREE.MeshPhongMaterial();
+
+			geometry.sourceType = "ascii";
+			geometry.sourceFile = file.name;
+
+			var mesh = new THREE.Mesh( geometry, material );
+			mesh.name = filename;
+
+			editor.addObject( mesh );
+
+		} else if ( data.metadata.type === 'object' ) {
+
+			var loader = new THREE.ObjectLoader();
+			var result = loader.parse( data );
+
+			if ( result instanceof THREE.Scene ) {
+
+				editor.setScene( result );
+
+			} else {
+
+				editor.addObject( result );
+
+			}
+
+		} else if ( data.metadata.type === 'scene' ) {
+
+			// DEPRECATED
+
+			var loader = new THREE.SceneLoader();
+			loader.parse( data, function ( result ) {
+
+				editor.setScene( result.scene );
+
+			}, '' );
+
+		}
+
+	};
 
 }

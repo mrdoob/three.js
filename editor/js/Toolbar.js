@@ -1,32 +1,33 @@
-var Toolbar = function ( editor, signals ) {
+var Toolbar = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
 	container.setClass( 'toolbar' );
 
 	var buttons = new UI.Panel();
-	buttons.setPadding( '7px' );
 	container.add( buttons );
 
 	// translate / rotate / scale
 
 	var translate = new UI.Button( 'translate' ).onClick( function () {
 
-		signals.setTransformMode.dispatch( 'translate' );
+		signals.transformModeChanged.dispatch( 'translate' );
 
 	} );
 	buttons.add( translate );
 
 	var rotate = new UI.Button( 'rotate' ).onClick( function () {
 
-		signals.setTransformMode.dispatch( 'rotate' );
+		signals.transformModeChanged.dispatch( 'rotate' );
 
 	} );
 	buttons.add( rotate );
 
 	var scale = new UI.Button( 'scale' ).onClick( function () {
 
-		signals.setTransformMode.dispatch( 'scale' );
+		signals.transformModeChanged.dispatch( 'scale' );
 
 	} );
 	buttons.add( scale );

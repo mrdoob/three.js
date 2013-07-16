@@ -152,19 +152,14 @@
 		Multiplies the columns of this matrix by vector *v*.
 		</div>
 
-		<h3>.makeFromPositionQuaternionScale( [page:Vector3 translation], [page:Quaternion rotation], [page:Vector3 scale] ) [page:Matrix4]</h3>
+		<h3>.compose( [page:Vector3 translation], [page:Quaternion quaternion], [page:Vector3 scale] ) [page:Matrix4]</h3>
 		<div>
-		Sets this matrix to the transformation composed of *translation*, *rotation* and *scale*.
+		Sets this matrix to the transformation composed of *translation*, *quaternion* and *scale*.
 		</div>
 
-		<h3>.makeFromPositionEulerScale( [page:Vector3 translation], [page:Vector3 rotation], eulerOrder, [page:Vector3 scale] ) [page:Matrix4]</h3>
+		<h3>.decompose( [page:Vector3 translation], [page:Quaternion quaternion], [page:Vector3 scale] ) [page:Array]</h3>
 		<div>
-		Sets this matrix to the transformation composed of *translation*, *rotation* (as euler angle triple and order) and *scale*.
-		</div>
-
-		<h3>.decompose( [page:Vector3 translation], [page:Quaternion rotation], [page:Vector3 scale] ) [page:Array]</h3>
-		<div>
-		Decomposes this matrix into the *translation*, *rotation* and *scale* components.<br />
+		Decomposes this matrix into the *translation*, *quaternion* and *scale* components.<br />
 		If parameters are not passed, new instances will be created.
 		</div>
 

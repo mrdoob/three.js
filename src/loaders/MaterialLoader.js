@@ -109,6 +109,8 @@ THREE.MaterialLoader.prototype = {
 
 		}
 
+		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
+
 		return material;
 
 	}

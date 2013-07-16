@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = THREE || { REVISION: '59dev' };
+var THREE = THREE || { REVISION: '59' };
 
 self.console = self.console || {
 
@@ -15,9 +15,6 @@ self.console = self.console || {
 	error: function () {}
 
 };
-
-self.Int32Array = self.Int32Array || Array;
-self.Float32Array = self.Float32Array || Array;
 
 String.prototype.trim = String.prototype.trim || function () {
 

@@ -4,7 +4,8 @@
 
 THREE.BufferGeometry = function () {
 
-	this.id = THREE.Math.generateUUID();
+	this.id = THREE.GeometryIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	// attributes
 
@@ -34,11 +35,6 @@ THREE.BufferGeometry = function () {
 THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
-
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
 
 	applyMatrix: function ( matrix ) {
 
@@ -550,3 +546,5 @@ THREE.BufferGeometry.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.BufferGeometry.prototype );

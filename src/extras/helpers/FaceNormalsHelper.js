@@ -40,7 +40,7 @@ THREE.FaceNormalsHelper.prototype.update = ( function ( object ) {
 
 	var v1 = new THREE.Vector3();
 
-	return function( object ) {
+	return function ( object ) {
 
 		this.object.updateMatrixWorld( true );
 

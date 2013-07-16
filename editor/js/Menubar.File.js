@@ -1,10 +1,10 @@
-Menubar.File = function ( signals ) {
+Menubar.File = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
 	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
 	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'none' ) } );
+	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
 	title.setTextContent( 'File' ).setColor( '#666' );
@@ -44,7 +44,7 @@ Menubar.File = function ( signals ) {
 
 			}
 
-			location.replace( location.origin + location.pathname );
+			location.reload();
 
 		}
 
@@ -117,14 +117,9 @@ Menubar.File = function ( signals ) {
 
 	var exportGeometry = function ( exporterClass ) {
 
-		var selected;
-		// TODO: handle multiple selection
-		for ( var i in editor.selected ) {
-			if ( editor.objects[ editor.selected[ i ].id ] ) selected = editor.selected[ i ];
-		}
-		if ( !selected ) return;
+		var object = editor.selected;
 
-		if ( selected.geometry === undefined ) {
+		if ( object.geometry === undefined ) {
 
 			alert( "Selected object doesn't have any geometry" );
 			return;
@@ -137,12 +132,12 @@ Menubar.File = function ( signals ) {
 
 		if ( exporter instanceof THREE.GeometryExporter ) {
 
-			output = JSON.stringify( exporter.parse( selected.geometry ), null, '\t' );
+			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		} else {
 
-			output = exporter.parse( selected.geometry );
+			output = exporter.parse( object.geometry );
 
 		}
 
@@ -156,16 +151,11 @@ Menubar.File = function ( signals ) {
 
 	var exportObject = function ( exporterClass ) {
 
-		var selected;
-		// TODO: handle multiple selection
-		for ( var i in editor.selected ) {
-			if ( editor.objects[ editor.selected[ i ].id ] ) selected = editor.selected[ i ];
-		}
-		if ( !selected ) return;
-
 		var exporter = new exporterClass();
 
-		var output = JSON.stringify( exporter.parse( selected ), null, '\t' );
+		var object = editor.selected;
+
+		var output = JSON.stringify( exporter.parse( object ), null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
 		var blob = new Blob( [ output ], { type: 'text/plain' } );
@@ -190,7 +180,6 @@ Menubar.File = function ( signals ) {
 		window.focus();
 
 	};
-
 
 	return container;
 

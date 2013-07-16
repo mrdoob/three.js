@@ -17,8 +17,8 @@
 
 		<script>
 
-			var camera, scene, renderer;
-			var mesh, faceNormalsHelper, vertexNormalsHelper;
+			var scene, renderer;
+			var camera, light;
 
 			init();
 			animate();
@@ -36,26 +36,28 @@
 
 				scene = new THREE.Scene();
 
-				var light = new THREE.PointLight();
+				light = new THREE.PointLight();
 				light.position.set( 200, 100, 150 );
 				scene.add( light );
 
 				scene.add( new THREE.PointLightHelper( light, 5 ) );
+
+				var helper = new THREE.GridHelper( 200, 10 );
+				helper.setColors( 0x0000ff, 0x808080 );
+				helper.position.y = - 150;
+				scene.add( helper );
 
 				var loader = new THREE.JSONLoader();
 				loader.load( 'obj/leeperrysmith/LeePerrySmith.js', function ( geometry, materials ) {
 
 					var material = new THREE.MeshLambertMaterial();
 
-					mesh = new THREE.Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.scale.multiplyScalar( 50 );
 					scene.add( mesh );
 
-					faceNormalsHelper = new THREE.FaceNormalsHelper( mesh, 10 );
-					scene.add( faceNormalsHelper );
-
-					vertexNormalsHelper = new THREE.VertexNormalsHelper( mesh, 10 );
-					scene.add( vertexNormalsHelper );
+					scene.add( new THREE.FaceNormalsHelper( mesh, 10 ) );
+					scene.add( new THREE.VertexNormalsHelper( mesh, 10 ) );
 
 					var helper = new THREE.WireframeHelper( mesh );
 					helper.material.depthTest = false;
@@ -86,14 +88,15 @@
 
 				requestAnimationFrame( animate );
 
-				if ( mesh !== undefined ) {
+				var time = - performance.now() * 0.0003;
 
-					mesh.rotation.y += 0.01;
+				camera.position.x = 400 * Math.cos( time );
+				camera.position.z = 400 * Math.sin( time );
+				camera.lookAt( scene.position );
 
-					faceNormalsHelper.update();
-					vertexNormalsHelper.update();
-
-				}
+				light.position.x = Math.sin( time * 1.7 ) * 300;
+				light.position.y = Math.cos( time * 1.5 ) * 400;
+				light.position.z = Math.cos( time * 1.3 ) * 300;
 
 				renderer.render( scene, camera );
 

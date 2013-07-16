@@ -8,11 +8,6 @@ THREE.VRMLLoader.prototype = {
 
 	constructor: THREE.VTKLoader,
 
-	addEventListener: THREE.EventDispatcher.prototype.addEventListener,
-	hasEventListener: THREE.EventDispatcher.prototype.hasEventListener,
-	removeEventListener: THREE.EventDispatcher.prototype.removeEventListener,
-	dispatchEvent: THREE.EventDispatcher.prototype.dispatchEvent,
-
 	load: function ( url, callback ) {
 
 		var scope = this;
@@ -112,8 +107,7 @@ THREE.VRMLLoader.prototype = {
 
 						if ( /appearance/.exec( data ) ) {
 
-							var material = defines[ /USE (\w+)/.exec( data )[ 1 ] ].clone();
-							parent.setMaterial( material );
+							parent.material = defines[ /USE (\w+)/.exec( data )[ 1 ] ].clone();
 
 						} else {
 
@@ -216,7 +210,7 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						parent.setGeometry( new THREE.CubeGeometry( width, height, depth ) );
+						parent.geometry = new THREE.CubeGeometry( width, height, depth );
 
 					} else if ( /Cylinder/.exec( data.string ) ) {
 
@@ -238,7 +232,7 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						parent.setGeometry( new THREE.CylinderGeometry( radius, radius, height ) );
+						parent.geometry = new THREE.CylinderGeometry( radius, radius, height );
 
 					} else if ( /Cone/.exec( data.string ) ) {
 
@@ -260,15 +254,13 @@ THREE.VRMLLoader.prototype = {
 
 						}
 
-						parent.setGeometry( new THREE.CylinderGeometry( topRadius, bottomRadius, height ) );
+						parent.geometry = new THREE.CylinderGeometry( topRadius, bottomRadius, height );
 
 					} else if ( /Sphere/.exec( data.string ) ) {
 
 						var result = /radius( +[\d|\.|\+|\-|e]+)/.exec( data.children[ 0 ] );
 
-						parent.setGeometry( new THREE.SphereGeometry(
-							parseFloat( result[ 1 ] )
-						) );
+						parent.geometry = new THREE.SphereGeometry( parseFloat( result[ 1 ] ) );
 
 					}
 
@@ -336,7 +328,7 @@ THREE.VRMLLoader.prototype = {
 
 							}
 
-							parent.setMaterial( material );
+							parent.material = material;
 
 						}
 
@@ -380,3 +372,5 @@ THREE.VRMLLoader.prototype = {
 	}
 
 };
+
+THREE.EventDispatcher.prototype.apply( THREE.VRMLLoader.prototype );

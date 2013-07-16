@@ -1,4 +1,6 @@
-var Viewport = function ( editor, signals ) {
+var Viewport = function ( editor ) {
+
+	var signals = editor.signals;
 
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
@@ -16,6 +18,9 @@ var Viewport = function ( editor, signals ) {
 	var sceneHelpers = editor.sceneHelpers;
 
 	var clearColor = 0xAAAAAA;
+	var objects = [];
+
+	// helpers
 
 	var grid = new THREE.GridHelper( 500, 25 );
 	sceneHelpers.add( grid );
@@ -26,8 +31,6 @@ var Viewport = function ( editor, signals ) {
 	camera.position.set( 500, 250, 500 );
 	camera.lookAt( scene.position );
 
-	editor.select( camera );
-
 	//
 
 	var selectionBox = new THREE.BoxHelper();
@@ -36,20 +39,24 @@ var Viewport = function ( editor, signals ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	//
-
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-		signals.objectChanged.dispatch( this.object );
+		// TODO: Differentiate from transform hovers change and object transform change
+
+		signals.objectChanged.dispatch( editor.selected );
 
 	} );
 	sceneHelpers.add( transformControls.gizmo );
 	transformControls.hide();
 
-	//
+	// fog
 
-	var selected;
+	var oldFogType = "None";
+	var oldFogColor = 0xaaaaaa;
+	var oldFogNear = 1;
+	var oldFogFar = 5000;
+	var oldFogDensity = 0.00025;
 
 	// object picking
 
@@ -104,27 +111,34 @@ var Viewport = function ( editor, signals ) {
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 1 ) {
 
-			var hit;
+			var intersects = getIntersects( event, objects );
 
-			var intersect = getIntersects( event, [ scene, sceneHelpers ] );
+			if ( intersects.length > 0 ) {
 
-			for ( var i in intersect ) {
+				var object = intersects[ 0 ].object;
 
-				if ( editor.objects[ intersect[i].object.id ] ) {
+				if ( object.userData.object !== undefined ) {
 
-					editor.selectById( intersect[i].object.id );
-					hit = true;
-					break;
+				
+					editor.select( object.userData.object );
+
+				} else {
+
+					editor.select( object );
 
 				}
 
+			} else {
+
+				editor.select( camera );
+
 			}
 
-			if ( !hit ) editor.deselectAll();
+			render();
 
 		}
 
-		controls.enabled = false; // ?
+		controls.enabled = false;
 
 		document.removeEventListener( 'mouseup', onMouseUp );
 
@@ -132,21 +146,13 @@ var Viewport = function ( editor, signals ) {
 
 	var onDoubleClick = function ( event ) {
 
-		var intersect = getIntersects( event, [ scene, sceneHelpers ] );
+		var intersects = getIntersects( event, objects );
 
-			for ( var i in intersect ) {
+		if ( intersects.length > 0 && intersects[ 0 ].object === editor.selected ) {
 
-				if ( editor.objects[ intersect[i].object.id ] ) {
+			controls.focus( editor.selected );
 
-					editor.selectById( intersect[i].object.id );
-
-					controls.focus( editor.objects[ intersect[i].object.id ] );
-
-					break;
-
-				}
-
-			}
+		}
 
 	};
 
@@ -165,24 +171,9 @@ var Viewport = function ( editor, signals ) {
 	} );
 	controls.enabled = false;
 
-
-	function updateHelpers( object ) {
-
-		if ( object.geometry !== undefined ) {
-
-			selectionBox.visible = true;
-			selectionBox.update( object );
-			transformControls.update();
-
-		}
-
-		if ( editor.helpers[ object.id ] ) editor.helpers[ object.id ].update();
-
-	} 
-
 	// signals
 
-	signals.setTransformMode.add( function ( mode ) {
+	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );
 		render();
@@ -195,7 +186,13 @@ var Viewport = function ( editor, signals ) {
 
 	} );
 
-	signals.setRenderer.add( function ( object ) {
+	signals.snapChanged.add( function ( dist ) {
+
+		snapDist = dist;
+
+	} );
+
+	signals.rendererChanged.add( function ( object ) {
 
 		container.dom.removeChild( renderer.domElement );
 
@@ -211,18 +208,32 @@ var Viewport = function ( editor, signals ) {
 
 	} );
 
-	signals.selected.add( function () {
+	signals.sceneGraphChanged.add( function () {
+
+		render();
+		updateInfo();
+
+	} );
+
+	signals.objectSelected.add( function ( object ) {
 
 		selectionBox.visible = false;
 		transformControls.detach();
 
-		selected = editor.listSelected( 'object' );
-		object = ( selected.length ) ? selected[0] : null;
+		if ( object !== null ) {
 
-		if ( object && object !== scene ) {
+			if ( object.geometry !== undefined ) {
 
-			transformControls.attach( object );
-			updateHelpers( object );
+				selectionBox.update( object );
+				selectionBox.visible = true;
+
+			}
+
+			if ( object instanceof THREE.PerspectiveCamera === false ) {
+
+				transformControls.attach( object );
+
+			}
 
 		}
 
@@ -230,45 +241,65 @@ var Viewport = function ( editor, signals ) {
 
 	} );
 
-	signals.sceneChanged.add( function () {
-
-		render();
-
-	} );
-
 	signals.objectAdded.add( function ( object ) {
 
-		updateHelpers( object );
-		updateInfo();
-		render();
+		if ( object instanceof THREE.Light ) {
+
+			updateMaterials();
+
+		}
+
+		objects.push( object );
 
 	} );
 
 	signals.objectChanged.add( function ( object ) {
 
-		updateHelpers( object );
+		if ( object.geometry !== undefined ) {
+
+			selectionBox.update( object );
+
+		}
+
+		if ( editor.helpers[ object.id ] !== undefined ) {
+
+			editor.helpers[ object.id ].update();
+
+		}
+
 		transformControls.update();
-		updateInfo();
+
 		render();
+		updateInfo();
 
 	} );
 
-	signals.objectDeleted.add( function () {
+	signals.objectRemoved.add( function ( object ) {
 
-		updateInfo();
-		render();
+		if ( object instanceof THREE.Light ) {
+
+			updateMaterials();
+
+		}
+
+		objects.splice( objects.indexOf( object ), 1 );
+
+	} );
+
+	signals.helperAdded.add( function ( object ) {
+
+		objects.push( object.getObjectByName( 'picker' ) );
+
+	} );
+
+	signals.helperRemoved.add( function ( object ) {
+
+		objects.splice( objects.indexOf( object.getObjectByName( 'picker' ) ), 1 );
 
 	} );
 
 	signals.materialChanged.add( function ( material ) {
 
-		render();
-
-	} );
-
-	signals.geometryChanged.add( function ( material ) {
-
-		updateInfo();
 		render();
 
 	} );
@@ -282,7 +313,51 @@ var Viewport = function ( editor, signals ) {
 
 	} );
 
-	signals.fogChanged.add( function () {
+	signals.fogTypeChanged.add( function ( fogType ) {
+
+		if ( fogType !== oldFogType ) {
+
+			if ( fogType === "None" ) {
+
+				scene.fog = null;
+
+			} else if ( fogType === "Fog" ) {
+
+				scene.fog = new THREE.Fog( oldFogColor, oldFogNear, oldFogFar );
+
+			} else if ( fogType === "FogExp2" ) {
+
+				scene.fog = new THREE.FogExp2( oldFogColor, oldFogDensity );
+
+			}
+
+			updateMaterials();
+
+			oldFogType = fogType;
+
+		}
+
+		render();
+
+	} );
+
+	signals.fogColorChanged.add( function ( fogColor ) {
+
+		oldFogColor = fogColor;
+
+		updateFog( scene );
+
+		render();
+
+	} );
+
+	signals.fogParametersChanged.add( function ( near, far, density ) {
+
+		oldFogNear = near;
+		oldFogFar = far;
+		oldFogDensity = density;
+
+		updateFog( scene );
 
 		render();
 
@@ -300,13 +375,14 @@ var Viewport = function ( editor, signals ) {
 	} );
 
 	signals.playAnimations.add( function (animations) {
-
+		
 		function animate() {
 			requestAnimationFrame( animate );
-
+			
 			for (var i = 0; i < animations.length ; i++ ){
 				animations[i].update(0.016);
 			} 
+
 
 			render();
 		}
@@ -357,6 +433,44 @@ var Viewport = function ( editor, signals ) {
 		} );
 
 		info.setValue( 'objects: ' + objects + ', vertices: ' + vertices + ', faces: ' + faces );
+
+	}
+
+	function updateMaterials() {
+
+		editor.scene.traverse( function ( node ) {
+
+			if ( node.material ) {
+
+				node.material.needsUpdate = true;
+
+				if ( node.material instanceof THREE.MeshFaceMaterial ) {
+
+					for ( var i = 0; i < node.material.materials.length; i ++ ) {
+
+						node.material.materials[ i ].needsUpdate = true;
+
+					}
+
+				}
+
+			}
+
+		} );
+
+	}
+
+	function updateFog( root ) {
+
+		if ( root.fog ) {
+
+			root.fog.color.setHex( oldFogColor );
+
+			if ( root.fog.near !== undefined ) root.fog.near = oldFogNear;
+			if ( root.fog.far !== undefined ) root.fog.far = oldFogFar;
+			if ( root.fog.density !== undefined ) root.fog.density = oldFogDensity;
+
+		}
 
 	}
 

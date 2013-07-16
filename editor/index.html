@@ -20,8 +20,7 @@
 			button {
 
 				position: relative;
-				left: -3px;
-				top: -3px;
+				margin-top: -2px;
 
 			}
 
@@ -59,25 +58,35 @@
 								background-color: #08f;
 							}
 
-			.toolbar {
-				background-color: #999;
-				color: #333;
-			}
 
 			.sidebar {
+				width: 300px;
 				background-color: #eee;
 				overflow: auto;
 			}
 
-				.sidebar .Text {
+				.sidebar .Panel {
 					margin-bottom: 10px;
+				}
+
+			.toolbar {
+				background-color: #999;
+				color: #333;
+			}
+			
+				.toolbar .Panel {
+					padding: 4px;
+				}
+
+				.toolbar button {
+					margin-right: 6px;
 				}
 
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
@@ -98,8 +107,7 @@
 		<script src="../examples/js/renderers/SoftwareRenderer.js"></script>
 		<script src="../examples/js/renderers/SVGRenderer.js"></script>
 
-		<script src="../examples/js/loaders/deprecated/ObjectLoader4.js"></script>
-		<script src="../examples/js/loaders/deprecated/ObjectLoader41.js"></script>
+		<!-- WIP -->
 
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/MaterialExporter.js"></script>
@@ -111,26 +119,26 @@
 		<script src="js/libs/ui.three.js"></script>
 
 		<script src="js/Editor.js"></script>
-
 		<script src="js/Loader.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Help.js"></script>
-
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Renderer.js"></script>
-
-		<script src="js/Sidebar.Outliner.js"></script>
-		<script src="js/Sidebar.Outliner.Scene.js"></script>
-		<script src="js/Sidebar.Outliner.Geometries.js"></script>
-		<script src="js/Sidebar.Outliner.Materials.js"></script>
-		<script src="js/Sidebar.Outliner.Textures.js"></script>
-
-		<script src="js/Sidebar.Attributes.js"></script>
+		<script src="js/Sidebar.Scene.js"></script>
+		<script src="js/Sidebar.Object3D.js"></script>
+		<script src="js/Sidebar.Geometry.js"></script>
 		<script src="js/Sidebar.Animation.js"></script>
-
+		<script src="js/Sidebar.Geometry.PlaneGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.CubeGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.CylinderGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.SphereGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.IcosahedronGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.TorusGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
+		<script src="js/Sidebar.Material.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 
@@ -139,72 +147,30 @@
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
 
-			var SIGNALS = signals;
-
-			var signals = {
-
-				// actions
-
-				setRenderer: new SIGNALS.Signal(),
-				undo: new SIGNALS.Signal(),
-				redo: new SIGNALS.Signal(),
-				playAnimations: new SIGNALS.Signal(),
-				setTransformMode: new SIGNALS.Signal(),
-
-				// editor events
-
-				objectAdded: new SIGNALS.Signal(),
-				geometryAdded: new SIGNALS.Signal(),
-				materialAdded: new SIGNALS.Signal(),
-				textureAdded: new SIGNALS.Signal(),
-
-				objectChanged: new SIGNALS.Signal(),
-				geometryChanged: new SIGNALS.Signal(),
-				materialChanged: new SIGNALS.Signal(),
-				textureChanged: new SIGNALS.Signal(),
-				sceneChanged: new SIGNALS.Signal(),
-				fogChanged: new SIGNALS.Signal(),
-				
-				objectDeleted: new SIGNALS.Signal(),
-				geometryDeleted: new SIGNALS.Signal(),
-				materialDeleted: new SIGNALS.Signal(),
-				textureDeleted: new SIGNALS.Signal(),
-				selected: new SIGNALS.Signal(),
-
-				/// viewport events
-								
-				snapChanged: new SIGNALS.Signal(),
-				clearColorChanged: new SIGNALS.Signal(),
-				windowResize: new SIGNALS.Signal()
-
-			};
-
-			//
-
 			var editor = new Editor();
 
-			var loader = new Loader( editor, signals );
+			var loader = new Loader( editor );
 
-			var viewport = new Viewport( editor, signals );
+			var viewport = new Viewport( editor );
 			viewport.setTop( '32px' );
 			viewport.setLeft( '0px' );
 			viewport.setRight( '300px' );
 			viewport.setBottom( '32px' );
 			document.body.appendChild( viewport.dom );
 
-			var toolbar = new Toolbar( editor, signals );
+			var toolbar = new Toolbar( editor );
 			toolbar.setBottom( '0px' );
 			toolbar.setLeft( '0px' );
 			toolbar.setRight( '300px' );
 			toolbar.setHeight( '32px' );
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor, signals );
+			var menubar = new Menubar( editor );
 			menubar.setWidth( '100%' );
 			menubar.setHeight( '32px' );
 			document.body.appendChild( menubar.dom );
 
-			var sidebar = new Sidebar( editor, signals );
+			var sidebar = new Sidebar( editor );
 			sidebar.setRight( '0px' );
 			sidebar.setTop( '32px' );
 			sidebar.setBottom( '0px' );
@@ -217,34 +183,10 @@
 				switch ( event.keyCode ) {
 
 					case 46: // delete
-					case 8: // backspace
 
-						event.preventDefault();
-						editor.delete();
-						break;
+						editor.removeObject( editor.selected );
+						editor.deselect();
 
-					case 37: // left arrow
-
-						event.preventDefault();
-						editor.pickWalk( 'left' );
-						break;
-
-					case 38: // up arrow
-
-						event.preventDefault();
-						editor.pickWalk( 'up' );
-						break;
-
-					case 39: // right arrow
-
-						event.preventDefault();
-						editor.pickWalk( 'right' );
-						break;
-
-					case 40: // down arrow
- 
-						event.preventDefault();
-						editor.pickWalk( 'down' );
 						break;
 
 					}
@@ -253,22 +195,15 @@
 
 			var onWindowResize = function ( event ) {
 
-				signals.windowResize.dispatch();
+				editor.signals.windowResize.dispatch();
 
 			};
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
-			document.addEventListener( "DOMContentLoaded", function(){
-    		
-    		onWindowResize();
+			onWindowResize();
 
-				loader.loadLocalStorage();
-
-    	}, false );
-
-
-			
+			loader.loadLocalStorage();
 
 		</script>
 	</body>

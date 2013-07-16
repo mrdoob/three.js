@@ -67,10 +67,10 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 	var parentScale = new THREE.Vector3();
 
 	var worldPosition = new THREE.Vector3();
-	var worldRotation = new THREE.Vector3();
+	var worldRotation = new THREE.Euler();
 	var worldRotationMatrix  = new THREE.Matrix4();
 	var camPosition = new THREE.Vector3();
-	var camRotation = new THREE.Vector3();
+	var camRotation = new THREE.Euler();
 
 	var displayAxes = {};
 	var pickerAxes = {};
@@ -379,11 +379,11 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		this.object.updateMatrixWorld();
 		worldPosition.getPositionFromMatrix( this.object.matrixWorld );
-		worldRotation.setEulerFromRotationMatrix( tempMatrix.extractRotation(this.object.matrixWorld ));
+		worldRotation.setFromRotationMatrix( tempMatrix.extractRotation( this.object.matrixWorld ) );
 
 		this.camera.updateMatrixWorld();
 		camPosition.getPositionFromMatrix( this.camera.matrixWorld );
-		camRotation.setEulerFromRotationMatrix( tempMatrix.extractRotation( this.camera.matrixWorld ));
+		camRotation.setFromRotationMatrix( tempMatrix.extractRotation( this.camera.matrixWorld ) );
 
 		scale = worldPosition.distanceTo( camPosition ) / 6 * this.scale;
 		this.gizmo.position.copy( worldPosition )
@@ -399,7 +399,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 				if ( name.search('E') != -1 ){
 
 					lookAtMatrix.lookAt( camPosition, worldPosition, tempVector.set( 0, 1, 0 ));
-					object.rotation.setEulerFromRotationMatrix( lookAtMatrix );
+					object.rotation.setFromRotationMatrix( lookAtMatrix );
 
 				} else {
 
@@ -431,23 +431,15 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						}
 
-						object.rotation.setEulerFromQuaternion( tempQuaternion );
+						object.quaternion.copy( tempQuaternion );
 
 					} else if ( this.space == 'world' ) {
 
 						object.rotation.set( 0, 0, 0 );
 
-						if ( name == 'RX' ) {
-							object.rotation.setX( Math.atan2( -eye.y, eye.z ) );
-						}
-
-						if ( name == 'RY' ) {
-							object.rotation.setY( Math.atan2( eye.x, eye.z ) );
-						}
-
-						if ( name == 'RZ' ) {
-							object.rotation.setZ( Math.atan2( eye.y, eye.x ) );
-						}
+						if ( name == 'RX' ) object.rotation.x = Math.atan2( -eye.y, eye.z );
+						if ( name == 'RY' ) object.rotation.y = Math.atan2(  eye.x, eye.z );
+						if ( name == 'RZ' ) object.rotation.z = Math.atan2(  eye.y, eye.x );
 
 					}
 
@@ -789,7 +781,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionE );
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
+						scope.object.quaternion.copy( tempQuaternion );
 
 					} else if ( scope.active == "RXYZE" ) {
 
@@ -802,7 +794,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
+						scope.object.quaternion.copy( tempQuaternion );
 
 					} else if ( scope.space == 'local' ) {
 
@@ -822,7 +814,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						if ( scope.active == "RY" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionY );
 						if ( scope.active == "RZ" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionZ );
 
-						scope.object.rotation.setEulerFromQuaternion( quaternionXYZ );
+						scope.object.quaternion.copy( quaternionXYZ );
 
 					} else if ( scope.space == 'world' ) {
 
@@ -842,7 +834,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 						tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
 
-						scope.object.rotation.setEulerFromQuaternion( tempQuaternion );
+						scope.object.quaternion.copy( tempQuaternion );
 
 					}
 
@@ -942,7 +934,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		var tempGeometry = new THREE.Geometry();
 		THREE.GeometryUtils.merge( tempGeometry, object );
-		object.setGeometry( tempGeometry );
+		object.geometry = tempGeometry;
 		object.position.set( 0, 0, 0 );
 		object.rotation.set( 0, 0, 0 );
 		object.scale.set( 1, 1, 1 );
