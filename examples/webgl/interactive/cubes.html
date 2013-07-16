@@ -55,7 +55,9 @@
 				 */
 				var intersections = (function(){
 					// Update the mouse position whenever the mouse moves
-					var mouse = new THREE.Vector2();
+					//Start the mouse off-screen, so there's no "default" ray through the origin.
+					// eg nothing lit by default.
+					var mouse = new THREE.Vector2(window.innerWidth, window.innerHeight);
 					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 					function onDocumentMouseMove( event ) {
 						event.preventDefault();

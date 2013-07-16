@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - animation - skinning</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="../../shared/styles/default.css" />
+		<style>
+			#container {
+				height: 100%;
+			}
+
+			a {
+				color: #f00;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a>
+			webgl - animation - skinning -
+			buffalo model from <a href="http://ro.me">ro.me</a>
+			<br/>
+			click to start animation
+		</div>
+
+		<script src="../../../build/three.js"></script>
+		<script src="../../shared/s3age/s3age.js"></script>
+		<script>
+		var Stampede = function(stage){
+			THREE.Object3D.apply(this, [].slice.call(arguments, 1));
+			this.stage = stage;
+
+			this.add(this._sky = new THREE.Object3D());
+			this.add(this._plains = new THREE.Object3D());
+			this.add(this._herd = new THREE.Object3D());
+			this._buffalos = [];
+
+			this.sun();
+			this.plains();
+			this.buffalo();
+			return this;
+		};
+		Stampede.prototype = Object.create(THREE.Object3D.prototype);
+
+		Stampede.prototype.sun = function(){
+			this.stage.scene.fog = new THREE.FogExp2( 0xfff4e5, 0.0003 );
+
+			var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+			light.position.set( 0, 1, 1 ).normalize();
+			this._sky.add( light );
+		};
+
+		Stampede.prototype.plains = function(){
+			var dirt;
+			var planeSimple = new THREE.PlaneGeometry( 200, 300 );
+			var planeTesselated = new THREE.PlaneGeometry( 100, 300, 25, 40 );
+			var matWire = new THREE.MeshBasicMaterial( { color: 0x110000, wireframe: true, wireframeLinewidth: 2 } );
+			var matSolid = new THREE.MeshBasicMaterial( { color: 0xffb23f } );
+
+			dirt = new THREE.Mesh( planeSimple, matSolid );
+			dirt.position.y = -10;
+			dirt.rotation.x = - Math.PI / 2;
+			dirt.scale.set( 25, 25, 25 );
+			this._plains.add( dirt );
+
+			dirt = new THREE.Mesh( planeTesselated, matWire );
+			dirt.rotation.x = - Math.PI / 2;
+			dirt.scale.set( 25, 25, 25 );
+			this._plains.add( dirt );
+		};
+
+		Stampede.prototype.buffalo = function() {
+			this.placeBuffalo();
+		};
+
+		Stampede.prototype.placeBuffalo = function() {
+			// Can't just add the buffalo, have to wait for them to be loaded, first.
+			this.add(new Buffalo());
+		};
+
+		var Buffalo = (function(){
+			var geometry = new THREE.CubeGeometry(1, 1),
+				material = new THREE.MeshBasicMaterial();
+
+			var loader = new THREE.JSONLoader();
+			loader.load( "../../shared/obj/buffalo/buffalo.js", set3D );
+
+			function set3D(geom, mats){
+				geometry = geom;
+				material = new THREE.MeshFaceMaterial( mats );
+
+				var originalMaterial = mats[ 0 ];
+
+				originalMaterial.skinning = true;
+				originalMaterial.transparent = true;
+				originalMaterial.alphaTest = 0.75;
+
+				// THREE.AnimationHandler.add( geometry.animation );
+			}
+
+			var buffalos = [];
+			var Buffalo = function(){
+				THREE.Object3D.apply(this, arguments);
+				buffalos.push(this);
+
+				this.add(this.mesh = new THREE.SkinnedMesh(geometry, material));
+				this.mesh.position.y = this.mesh.geometry.boundingSphere.radius * 0.5;
+			}
+			Buffalo.prototype = Object.create(THREE.Object3D.prototype);
+
+			Buffalo.prototype.update3D = function() {
+				if(this.mesh.geometry !== geometry){
+					this.mesh.geometry = geometry;
+				}
+				if(this.mesh.material !== material){
+					this.mesh.material = material;
+				}
+			};
+			return Buffalo;
+		}());
+		</script>
+
+		<script>
+			var stage = new S3age("#container", {
+				camera: {fov: 25, far: 10000}
+			});
+
+			stage.scene.add(new Stampede(stage));
+
+			// var animations = [];
+
+			// var dirt, dz = 0, dstep = -10, playback = false;
+
+			// var clock = new THREE.Clock();
+
+			// (function(){
+			// 	stage.camera.position.set( 0, 185, 2500 );
+
+			// 	stage.renderer.setClearColor( scene.fog.color, 1 );
+			// 	stage.renderer.antialias = true;
+			// 	stage.renderer.sortObjects = false;
+			// }());
+
+
+			// function createScene( geometry, materials ) {
+			// 	buffalos = [];
+			// 	animations = [];
+
+			// 	var x, y,
+			// 		buffalo, animation,
+			// 		gridx = 25, gridz = 15,
+			// 		sepx  = 150, sepz = 300;
+
+
+
+			// 	for( x = 0; x < gridx; x ++ ) {
+
+			// 		for( z = 0; z < gridz; z ++ ) {
+
+			// 			buffalo = new Buffalo();
+
+			// 			buffalo.position.x = - ( gridx - 1 ) * sepx * 0.5 + x * sepx + Math.random() * 0.5 * sepx;
+			// 			buffalo.position.z = - ( gridz - 1 ) * sepz * 0.5 + z * sepz + Math.random() * 0.5 * sepz - 500;
+
+			// 			buffalo.rotation.y = 0.2 - Math.random() * 0.4;
+
+			// 			scene.add( buffalo );
+
+			// 			buffalos.push( buffalo );
+
+			// 			animation = new THREE.Animation( buffalo, "take_001" );
+			// 			animations.push( animation );
+
+			// 		}
+
+			// 	}
+
+			// }
+
+			// document.addEventListener( 'click', startAnimation, false );
+			// function startAnimation() {
+
+			// 	for( var i = 0; i < animations.length; i ++ ) {
+
+			// 		animations[ i ].offset = 0.05 * Math.random();
+			// 		animations[ i ].play();
+
+			// 	}
+
+			// 	dz = dstep;
+			// 	playback = true;
+
+			// }
+
+
+			// var bindControls = function(){
+			// 	var mouseX = windowHalfX = window.innerWidth / 2;
+			// 	document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+			// 	function onDocumentMouseMove( event ) {
+			// 		mouseX = ( event.clientX - windowHalfX );
+
+			// 	}
+			// 	stage.controls = {
+			// 		update: function(){
+			// 			stage.camera.position.x += ( mouseX - stage.camera.position.x ) * 0.05;
+			// 			stage.camera.lookAt( stage.scene.position );
+			// 			camera.position.z += 2 * Math.sin( elapsed );
+			// 		}
+			// 	}
+			// }
+
+			// function loop() {
+			// 	THREE.AnimationHandler.update( delta );
+
+			// 	if ( buffalos && playback ) {
+			// 		var elapsed = clock.getElapsedTime();
+
+			// 		for( i = 0; i < buffalos.length; i++ ) {
+
+			// 			buffalos[ i ].position.z += 2 * Math.sin( elapsed + offset[ i ] );
+
+			// 		}
+
+			// 	}
+
+			// 	dirt.position.z += dz;
+			// 	if( dirt.position.z < -500 ) dirt.position.z = 0;
+			// }
+
+		</script>
+
+	</body>
+</html>
+

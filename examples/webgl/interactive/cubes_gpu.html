@@ -35,11 +35,9 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
-
-		<script src="js/controls/TrackballControls.js"></script>
-
-		<script src="js/libs/stats.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/js/controls/TrackballControls.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -104,21 +102,21 @@
 
 				}
 
+				var position = new THREE.Vector3();
+				var rotation = new THREE.Vector3();
+				var scale = new THREE.Vector3();
 				for ( var i = 0; i < 5000; i ++ ) {
 
-					var position = new THREE.Vector3();
 
 					position.x = Math.random() * 10000 - 5000;
 					position.y = Math.random() * 6000 - 3000;
 					position.z = Math.random() * 8000 - 4000;
 
-					var rotation = new THREE.Vector3();
 
 					rotation.x = Math.random() * 2 * Math.PI;
 					rotation.y = Math.random() * 2 * Math.PI;
 					rotation.z = Math.random() * 2 * Math.PI;
 
-					var scale = new THREE.Vector3();
 
 					scale.x = Math.random() * 200 + 100;
 					scale.y = Math.random() * 200 + 100;

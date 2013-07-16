@@ -4,24 +4,8 @@
 		<title>three.js webgl - buffergeometry</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="../../shared/styles/default.css" />
 		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
 			a {
 
 				color: #0080ff;
@@ -34,40 +18,21 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry</div>
 
-		<script src="../build/three.min.js"></script>
-
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
+		<script src="../../../build/three.js"></script>
+		<script src="../../shared/s3age/s3age.js"></script>
 		<script>
+			var segments = 10000;
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var container, stats;
-
-			var camera, scene, renderer;
-
-			var mesh;
+			stage = new S3age("#container",{
+				camera: {fov: 27, far: 4000}
+			});
+			stage.camera.position.z = 2750;
 
 			init();
-			animate();
 
 			function init() {
 
-				container = document.getElementById( 'container' );
-
-				//
-
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 4000 );
-				camera.position.z = 2750;
-
-				scene = new THREE.Scene();
-
-
-				var segments = 10000;
-
 				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial({ vertexColors: true });
 
 				geometry.attributes = {
 					position: {
@@ -83,6 +48,21 @@
 				var positions = geometry.attributes.position.array;
 				var colors = geometry.attributes.color.array;
 
+				trace(positions, colors);
+
+				geometry.computeBoundingSphere();
+
+				var material = new THREE.LineBasicMaterial({ vertexColors: true });
+				mesh = new THREE.Line( geometry, material );
+				mesh.update = function(clock){
+					var time = clock.getElapsedTime() * 0.1;
+					mesh.rotation.x = time * 0.25;
+					mesh.rotation.y = time * 0.5;
+				};
+				stage.scene.add( mesh );
+			}
+
+			function trace(positions, colors){
 				var r = 800;
 
 				for ( var i = 0; i < segments; i ++ ) {
@@ -102,69 +82,8 @@
 					colors[ i * 3 ] = ( x / r ) + 0.5;
 					colors[ i * 3 + 1 ] = ( y / r ) + 0.5;
 					colors[ i * 3 + 2 ] = ( z / r ) + 0.5;
-
 				}
-
-				geometry.computeBoundingSphere();
-
-				mesh = new THREE.Line( geometry, material );
-				scene.add( mesh );
-
-				//
-
-				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x000000, clearAlpha: 0, alpha: true } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
-
-				container.appendChild( renderer.domElement );
-
-				//
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
-
-				//
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
 			}
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				render();
-				stats.update();
-
-			}
-
-			function render() {
-
-				var time = Date.now() * 0.001;
-
-				mesh.rotation.x = time * 0.25;
-				mesh.rotation.y = time * 0.5;
-
-				renderer.render( scene, camera );
-
-			}
-
 		</script>
 
 	</body>

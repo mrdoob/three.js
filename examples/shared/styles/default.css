@@ -16,10 +16,20 @@ body {
 	height: 100%;
 }
 
+#container {
+	height: 100%;
+}
+
 #info {
 	color: #fff;
 	position: absolute;
 	top: 0px; width: 100%;
 	padding: 5px;
 	z-index:100;
+}
+
+#stats {
+	position: absolute;
+	top: 0;
+	left: 0;
 }

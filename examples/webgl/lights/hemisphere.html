@@ -50,12 +50,12 @@
 			press <strong>h</strong> to toggle hemisphere light, <strong>d</strong> to toggle directional light
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="../../shared/js/controls/TrackballControls.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -199,7 +199,7 @@
 
 				var loader = new THREE.JSONLoader();
 
-				loader.load( "models/animated/flamingo.js", function( geometry ) {
+				loader.load( "../../shared/models/animated/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					geometry.computeMorphNormals();
