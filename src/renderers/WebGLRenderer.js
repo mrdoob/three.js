@@ -3664,8 +3664,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// colors
 
 			if ( attributes.color >= 0 ) {
-
-				if ( object.geometry.faces[0].vertexColors.length > 0 ) {
+				//START_VEROLD_MOD - setting default colour of white if the shader program needs color but we don't have it.
+				//Not sure if this check is entirely sufficient.
+				if ( object.geometry.faces.length && object.geometry.faces[0].vertexColors.length > 0 ||
+					object.geometry.__webglColorBuffer ) {
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
 					enableAttribute( attributes.color );
 					_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
@@ -3673,6 +3675,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				else {
 					_gl.vertexAttrib3f( attributes.color, 1, 1, 1 );
 				}
+				//END_VEROLD_MOD
 			}
 
 			// normals
@@ -3698,7 +3701,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			// uvs
 
 			if ( attributes.uv >= 0 ) {
-
+				//START_VEROLD_MOD - setting default uvs if the shader program needs them but we don't have them.
 				if ( object.geometry.faceVertexUvs[0] ) {
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBuffer );
 					enableAttribute( attributes.uv );
@@ -3707,10 +3710,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				else {
 					_gl.vertexAttrib2f( attributes.uv, 0, 0 );
 				}
+				//END_VEROLD_MOD
 			}
 
 			if ( attributes.uv2 >= 0 ) {
-
+				//START_VEROLD_MOD - setting default uvs if the shader program needs them but we don't have them.
 				if ( object.geometry.faceVertexUvs[1] ) {
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUV2Buffer );
 					enableAttribute( attributes.uv2 );
@@ -3719,6 +3723,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				else {
 					_gl.vertexAttrib2f( attributes.uv2, 0, 0 );
 				}
+				//END_VEROLD_MOD
 			}
 
 			if ( material.skinning &&
