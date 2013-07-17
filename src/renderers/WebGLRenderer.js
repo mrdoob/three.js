@@ -2761,19 +2761,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
-						for ( attributeName in geometryAttributes ) {
-
-							if ( attributeName === 'index' ) continue;
+						for ( attributeName in programAttributes ) {
 
 							attributePointer = programAttributes[ attributeName ];
 							attributeItem = geometryAttributes[ attributeName ];
-							attributeSize = attributeItem.itemSize;
 
 							if ( attributePointer >= 0 ) {
 
-								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-								enableAttribute( attributePointer );
-								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+								if ( attributeItem ) {
+									attributeSize = attributeItem.itemSize;
+									_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+									enableAttribute( attributePointer );
+									_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+								}
+								else if ( material.defaultAttributeValues ) {
+									if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+										_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+									}
+									else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+										_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+									}
+								}
 
 							}
 
@@ -2801,19 +2809,29 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( updateBuffers ) {
 
-					for ( attributeName in geometryAttributes ) {
+					for ( attributeName in programAttributes ) {
 
 						if ( attributeName === 'index') continue;
 
 						attributePointer = programAttributes[ attributeName ];
 						attributeItem = geometryAttributes[ attributeName ];
-						attributeSize = attributeItem.itemSize;
-
+						
 						if ( attributePointer >= 0 ) {
 
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-							enableAttribute( attributePointer );
-							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+							if ( attributeItem ) {
+								attributeSize = attributeItem.itemSize;
+								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+								enableAttribute( attributePointer );
+								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+							}
+							else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+								if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+									_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+								}
+								else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+									_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+								}
+							}
 
 						}
 
@@ -2839,18 +2857,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
-				for ( attributeName in geometryAttributes ) {
+				for ( attributeName in programAttributes ) {
 
 					attributePointer = programAttributes[ attributeName ];
 					attributeItem = geometryAttributes[ attributeName ];
-					attributeSize = attributeItem.itemSize;
-
+					
 					if ( attributePointer >= 0 ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-						enableAttribute( attributePointer );
-						_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
-
+						if ( attributeItem ) {
+							attributeSize = attributeItem.itemSize;
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+							enableAttribute( attributePointer );
+							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+						}
+						else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+							if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+								_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+							}
+							else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+								_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+							}
+						}
 					}
 
 				}
@@ -2870,17 +2897,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
-				for ( attributeName in geometryAttributes ) {
+				for ( attributeName in programAttributes ) {
 
 					attributePointer = programAttributes[ attributeName ];
 					attributeItem = geometryAttributes[ attributeName ];
-					attributeSize = attributeItem.itemSize;
-
+					
 					if ( attributePointer >= 0 ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-						enableAttribute( attributePointer );
-						_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+						if ( attributeItem ) {
+							attributeSize = attributeItem.itemSize;
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+							enableAttribute( attributePointer );
+							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+						}
+						else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+							if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+								_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+							}
+							else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+								_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+							}
+						}
 
 					}
 
@@ -2984,10 +3021,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.color >= 0 ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
-				enableAttribute( attributes.color );
-				_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
-
+				if ( object.geometry.faces.length && object.geometry.faces[0].vertexColors.length > 0 ||
+					object.geometry.__webglColorBuffer ) {
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
+					enableAttribute( attributes.color );
+					_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+				}
+				else if ( material.defaultAttributeValues ) {
+					_gl.vertexAttrib3fv( attributes.color, material.defaultAttributeValues.color );
+				}
 			}
 
 			// normals
@@ -3014,17 +3056,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.uv >= 0 ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBuffer );
-				enableAttribute( attributes.uv );
-				_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+				if ( object.geometry.faceVertexUvs[0] ) {
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBuffer );
+					enableAttribute( attributes.uv );
+					_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+				}
+				else if ( material.defaultAttributeValues ) {
+					_gl.vertexAttrib2fv( attributes.uv, material.defaultAttributeValues.uv );
+				}
 
 			}
 
 			if ( attributes.uv2 >= 0 ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUV2Buffer );
-				enableAttribute( attributes.uv2 );
-				_gl.vertexAttribPointer( attributes.uv2, 2, _gl.FLOAT, false, 0, 0 );
+				if ( object.geometry.faceVertexUvs[1] ) {
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUV2Buffer );
+					enableAttribute( attributes.uv2 );
+					_gl.vertexAttribPointer( attributes.uv2, 2, _gl.FLOAT, false, 0, 0 );
+				}
+				else if ( material.defaultAttributeValues ) {
+					_gl.vertexAttrib2fv( attributes.uv2, material.defaultAttributeValues.uv2 );
+				}
 
 			}
 
@@ -4316,7 +4368,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		};
 
-		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters );
+		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters, material.index0AttributeName );
 
 		var attributes = material.program.attributes;
 
@@ -5556,7 +5608,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Shaders
 
-	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
+	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters, index0AttributeName ) {
 
 		var p, pl, d, program, code;
 		var chunks = [];
@@ -5788,6 +5840,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
+
+		//Force a particular attribute to index 0.
+		// because potentially expensive emulation is done by browser if attribute 0 is disabled.
+		//And, color, for example is often automatically bound to index 0 so disabling it
+		if ( index0AttributeName ) {
+			_gl.bindAttribLocation( program, 0, index0AttributeName );
+		}
 
 		_gl.linkProgram( program );
 
