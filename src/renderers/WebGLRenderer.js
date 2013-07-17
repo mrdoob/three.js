@@ -3423,7 +3423,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				// even if geometry and materials didn't change
 
 				// START_VEROLD_MOD - materialIndex in offsets
-				if ( offsetIndices.length > 1 ) updateBuffers = true;
+				if ( offsets.length > 1 ) updateBuffers = true;
 
 				for ( var i = 0, il = offsetIndices.length; i < il; i ++ ) {
 
