@@ -11,7 +11,7 @@ Sidebar.Object3D = function ( editor ) {
 	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
 
-	// id
+	// uuid
 
 	var objectUUIDRow = new UI.Panel();
 	var objectUUID = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
