@@ -27,6 +27,23 @@ Sidebar.Material = function ( editor ) {
 	container.add( new UI.Text().setValue( 'MATERIAL' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
+	// uuid
+
+	var materialUUIDRow = new UI.Panel();
+	var materialUUID = new UI.Input().setWidth( '115px' ).setColor( '#444' ).setFontSize( '12px' ).setDisabled( true );
+	var materialUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
+
+		materialUUID.setValue( THREE.Math.generateUUID() );
+		update();
+
+	} );
+
+	materialUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ).setColor( '#666' ) );
+	materialUUIDRow.add( materialUUID );
+	materialUUIDRow.add( materialUUIDRenew );
+
+	container.add( materialUUIDRow );
+
 	// name
 
 	var materialNameRow = new UI.Panel();
@@ -244,6 +261,12 @@ Sidebar.Material = function ( editor ) {
 		var textureWarning = false;
 
 		if ( material ) {
+
+			if ( material.uuid !== undefined ) {
+
+				object.uuid = objectUUID.getValue();
+
+			}
 
 			if ( material.name !== undefined ) {
 
@@ -503,6 +526,12 @@ Sidebar.Material = function ( editor ) {
 			container.setDisplay( '' );
 
 			var material = object.material;
+
+			if ( material.uuid !== undefined ) {
+
+				materialUUID.setValue( material.uuid );
+
+			}
 
 			if ( material.name !== undefined ) {
 
