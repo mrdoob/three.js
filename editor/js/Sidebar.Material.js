@@ -264,7 +264,7 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.uuid !== undefined ) {
 
-				object.uuid = objectUUID.getValue();
+				material.uuid = materialUUID.getValue();
 
 			}
 
