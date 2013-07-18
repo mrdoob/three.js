@@ -44,12 +44,32 @@ Menubar.File = function ( editor ) {
 
 			}
 
-			location.reload();
+			location.href = location.pathname;
 
 		}
 
 	} );
 	options.add( option );
+
+	options.add( new UI.HorizontalRule() );
+
+
+	// share
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Share' );
+	option.onClick( function () {
+
+		var exporter = new THREE.ObjectExporter();
+		var string = JSON.stringify( exporter.parse( editor.scene ) );
+		window.location.hash = 'A/' + window.btoa( RawDeflate.deflate( string ) );
+
+	} );
+	options.add( option );
+
+	options.add( new UI.HorizontalRule() );
+
 
 	// export geometry
 
