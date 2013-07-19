@@ -19,15 +19,25 @@ Menubar.File = function ( editor ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
-	/*
 	// open
+
+	var input = document.createElement( 'input' );
+	input.type = 'file';
+	input.addEventListener( 'change', function ( event ) {
+
+		editor.loader.loadFile( input.files[ 0 ] );
+
+	} );
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Open' );
-	option.onClick( function () { alert( 'Open' ) } );
+	option.onClick( function () {
+
+		input.click();
+
+	} );
 	options.add( option );
-	*/
 
 	// reset
 
