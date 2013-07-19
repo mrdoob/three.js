@@ -243,6 +243,77 @@ THREE.Ray.prototype = {
 
 	},
 
+	isIntersectionBox: function () {
+		
+		var v = new THREE.Vector3();
+
+		return function ( box ) {
+
+			return this.intersectBox( box, v ) !== null;
+
+		}
+
+	}(),
+
+	intersectBox: function ( box , optionalTarget ) {
+
+		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
+
+		var tmin,tmax,tymin,tymax,tzmin,tzmax;
+
+		var invdirx = 1/this.direction.x,
+			invdiry = 1/this.direction.y,
+			invdirz = 1/this.direction.z;
+
+		var origin = this.origin;
+
+		if (invdirx >= 0) {
+				
+			tmin = (box.min.x - origin.x) * invdirx;
+			tmax = (box.max.x - origin.x) * invdirx;
+
+		} else { 
+
+			tmin = (box.max.x - origin.x) * invdirx;
+			tmax = (box.min.x - origin.x) * invdirx;
+		}			
+
+		if (invdiry >= 0) {
+		
+			tymin = (box.min.y - origin.y) * invdiry;
+			tymax = (box.max.y - origin.y) * invdiry;
+
+		} else {
+
+			tymin = (box.max.y - origin.y) * invdiry;
+			tymax = (box.min.y - origin.y) * invdiry;
+		}
+
+		if ((tmin > tymax) || (tymin > tmax)) return null;
+
+		if (tymin > tmin) tmin = tymin;
+
+		if (tymax < tmax) tmax = tymax;
+
+		if (invdirz >= 0) {
+		
+			tzmin = (box.min.z - origin.z) * invdirz;
+			tzmax = (box.max.z - origin.z) * invdirz;
+
+		} else {
+
+			tzmin = (box.max.z - origin.z) * invdirz;
+			tzmax = (box.min.z - origin.z) * invdirz;
+		}
+
+		if ((tmin > tzmax) || (tzmin > tmax)) return null;
+
+		if (tzmin > tmin) tmin = tzmin; 
+
+		return this.at( tmin, optionalTarget );;
+
+	},
+
 	distanceToPlane: function ( plane ) {
 
 		var denominator = plane.normal.dot( this.direction );
