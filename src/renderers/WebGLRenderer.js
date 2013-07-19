@@ -6687,7 +6687,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( !_gl.getProgramParameter( program, _gl.LINK_STATUS ) ) {
 
 			console.error( "Could not initialise shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
-
+			console.error( "Program Info Log: " + _gl.getProgramInfoLog( program ) );
 		}
 
 		// clean up
