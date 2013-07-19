@@ -202,6 +202,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		var vertexShader = [
 			'precision ' + precision + ' float;',
+			"precision " + precision + " int;",
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
 			'uniform mat4 modelViewMatrix;',
@@ -212,6 +213,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		var fragmentShader = [
 			'precision ' + precision + ' float;',
+			"precision " + precision + " int;",
 			''
 		].join( '\n' );
 
@@ -279,6 +281,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			} else {
 
+				console.error( 'Program Info Log: ' + gl.getProgramInfoLog( program ) );
 				console.error( 'VALIDATE_STATUS: ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) );
 				console.error( 'GL_ERROR: ' + gl.getError() );
 
