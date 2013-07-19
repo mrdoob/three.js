@@ -13,14 +13,7 @@ var Loader = function ( editor ) {
 	document.addEventListener( 'drop', function ( event ) {
 
 		event.preventDefault();
-
-		var file = event.dataTransfer.files[ 0 ];
-
-		var chunks = file.name.split( '.' );
-		var extension = chunks.pop().toLowerCase();
-		var filename = chunks.join( '.' );
-
-		scope.parseFile( file, filename, extension );
+		scope.loadFile( event.dataTransfer.files[ 0 ] );
 
 	}, false );
 
@@ -57,7 +50,10 @@ var Loader = function ( editor ) {
 	signals.objectChanged.add( this.saveLocalStorage );
 	signals.objectRemoved.add( this.saveLocalStorage );
 
-	this.parseFile = function ( file, filename, extension ) {
+	this.loadFile = function ( file ) {
+
+		var filename = file.name;
+		var extension = filename.split( '.' ).pop().toLowerCase();
 
 		switch ( extension ) {
 
@@ -303,6 +299,12 @@ var Loader = function ( editor ) {
 
 				}, false );
 				reader.readAsText( file );
+
+				break;
+
+			default:
+
+				alert( 'Unsupported file format.' );
 
 				break;
 
