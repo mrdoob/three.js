@@ -356,6 +356,22 @@ THREE.Color.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.r = array[ 0 ];
+		this.g = array[ 1 ];
+		this.b = array[ 2 ];
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		return [ this.r, this.g, this.b ];
+
+	},
+
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );
