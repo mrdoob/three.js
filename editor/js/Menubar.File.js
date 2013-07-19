@@ -19,21 +19,11 @@ Menubar.File = function ( editor ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
-	/*
-	// open
+	// new
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Open' );
-	option.onClick( function () { alert( 'Open' ) } );
-	options.add( option );
-	*/
-
-	// reset
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Reset' );
+	option.setTextContent( 'New' );
 	option.onClick( function () {
 
 		if ( confirm( 'Are you sure?' ) ) {
@@ -54,16 +44,22 @@ Menubar.File = function ( editor ) {
 	options.add( new UI.HorizontalRule() );
 
 
-	// share
+	// import
+
+	var input = document.createElement( 'input' );
+	input.type = 'file';
+	input.addEventListener( 'change', function ( event ) {
+
+		editor.loader.loadFile( input.files[ 0 ] );
+
+	} );
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Share' );
+	option.setTextContent( 'Import' );
 	option.onClick( function () {
 
-		var exporter = new THREE.ObjectExporter();
-		var string = JSON.stringify( exporter.parse( editor.scene ) );
-		window.location.hash = 'A/' + window.btoa( RawDeflate.deflate( string ) );
+		input.click();
 
 	} );
 	options.add( option );
@@ -200,6 +196,24 @@ Menubar.File = function ( editor ) {
 		window.focus();
 
 	};
+
+	options.add( new UI.HorizontalRule() );
+
+
+	// share
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Share' );
+	option.onClick( function () {
+
+		var exporter = new THREE.ObjectExporter();
+		var string = JSON.stringify( exporter.parse( editor.scene ) );
+		window.location.hash = 'A/' + window.btoa( RawDeflate.deflate( string ) );
+
+	} );
+	options.add( option );
+
 
 	return container;
 

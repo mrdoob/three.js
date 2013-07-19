@@ -151,8 +151,6 @@
 
 			var editor = new Editor();
 
-			var loader = new Loader( editor );
-
 			var viewport = new Viewport( editor );
 			viewport.setTop( '32px' );
 			viewport.setLeft( '0px' );
@@ -216,7 +214,7 @@
 				
 			} else {
 
-				loader.loadLocalStorage();
+				editor.loader.loadLocalStorage();
 
 			}
 

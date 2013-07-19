@@ -33,6 +33,8 @@ var Editor = function () {
 
 	};
 
+	this.loader = new Loader( this );
+
 	this.scene = new THREE.Scene();
 	this.sceneHelpers = new THREE.Scene();
 
