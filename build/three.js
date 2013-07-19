@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = THREE || { REVISION: '59' };
+var THREE = THREE || { REVISION: '60dev' };
 
 self.console = self.console || {
 
@@ -20266,9 +20266,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer deallocation
 
-	var deallocateGeometry = function ( geometry ) {
-
-		geometry.__webglInit = undefined;
+	var deleteBuffers = function ( geometry ) {
 
 		if ( geometry.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglVertexBuffer );
 		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
@@ -20284,8 +20282,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry.__webglLineBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineBuffer );
 
 		if ( geometry.__webglLineDistanceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineDistanceBuffer );
+		// custom attributes
 
-		// geometry groups
+		if ( geometry.__webglCustomAttributesList !== undefined ) {
+
+			for ( var id in geometry.__webglCustomAttributesList ) {
+
+				_gl.deleteBuffer( geometry.__webglCustomAttributesList[ id ].buffer );
+
+			}
+
+		}
+
+	};
+
+	var deallocateGeometry = function ( geometry ) {
+
+		geometry.__webglInit = undefined;
 
 		if ( geometry.geometryGroups !== undefined ) {
 
@@ -20313,13 +20326,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				deleteCustomAttributesBuffers( geometryGroup );
+				deleteBuffers( geometryGroup );
 
 			}
 
 		}
 
-		deleteCustomAttributesBuffers( geometry );
+		deleteBuffers( geometry );
 
 	};
 
@@ -20426,22 +20439,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.deleteProgram( program );
 
 			_this.info.memory.programs --;
-
-		}
-
-	};
-
-	//
-
-	function deleteCustomAttributesBuffers( geometry ) {
-
-		if ( geometry.__webglCustomAttributesList ) {
-
-			for ( var id in geometry.__webglCustomAttributesList ) {
-
-				_gl.deleteBuffer( geometry.__webglCustomAttributesList[ id ].buffer );
-
-			}
 
 		}
 
@@ -25955,6 +25952,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var prefix_vertex = [
 
 			"precision " + _precision + " float;",
+			"precision " + _precision + " int;",
 
 			customDefines,
 
@@ -26057,6 +26055,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var prefix_fragment = [
 
 			"precision " + _precision + " float;",
+			"precision " + _precision + " int;",
 
 			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
@@ -26114,7 +26113,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( !_gl.getProgramParameter( program, _gl.LINK_STATUS ) ) {
 
 			console.error( "Could not initialise shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
-
+			console.error( "Program Info Log: " + _gl.getProgramInfoLog( program ) );
 		}
 
 		// clean up
