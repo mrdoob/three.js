@@ -57,6 +57,24 @@ var Loader = function ( editor ) {
 
 		switch ( extension ) {
 
+			case 'babylon':
+
+				var reader = new FileReader();
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+					var json = JSON.parse( contents );
+
+					var loader = new THREE.BabylonLoader();
+					var scene = loader.parse( json );
+
+					editor.setScene( scene );
+
+				}, false );
+				reader.readAsText( file );
+
+				break;
+
 			case 'ctm':
 
 				var reader = new FileReader();
