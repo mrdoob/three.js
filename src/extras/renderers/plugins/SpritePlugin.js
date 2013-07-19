@@ -271,7 +271,7 @@ THREE.SpritePlugin = function () {
 		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
 		var vertexShader = _gl.createShader( _gl.VERTEX_SHADER );
 
-		var prefix = "precision " + precision + " float;\n";
+		var prefix = "precision " + precision + " float;\n" + "precision " + precision + " int;\n";
 
 		_gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
 		_gl.shaderSource( vertexShader, prefix + shader.vertexShader );
