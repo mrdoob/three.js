@@ -308,9 +308,15 @@ THREE.Ray.prototype = {
 
 		if ((tmin > tzmax) || (tzmin > tmax)) return null;
 
-		if (tzmin > tmin) tmin = tzmin; 
+		if (tzmin > tmin) tmin = tzmin;
 
-		return this.at( tmin, optionalTarget );;
+		if (tzmax < tmax) tmax = tzmax;
+
+		//return point closest to the ray (positive side)
+
+		if ( tmax < 0 ) return null;
+
+		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
 
 	},
 
