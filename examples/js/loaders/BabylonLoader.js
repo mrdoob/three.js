@@ -99,7 +99,7 @@ THREE.BabylonLoader.prototype = {
 			}
 
 			light.name = data.name;
-			light.position.fromArray( data.data );
+			light.position.set( data.data[ 0 ], data.data[ 1 ], - data.data[ 2 ] );
 			light.color.fromArray( data.diffuse );
 			if ( data.intensity ) light.intensity = data.intensity;
 
