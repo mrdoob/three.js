@@ -291,9 +291,9 @@ THREE.Ray.prototype = {
 
 		if ((tmin > tymax) || (tymin > tmax)) return null;
 
-		if (tymin > tmin) tmin = tymin;
+		if (tymin > tmin || isNaN(tmin) ) tmin = tymin;
 
-		if (tymax < tmax) tmax = tymax;
+		if (tymax < tmax || isNaN(tmax) ) tmax = tymax;
 
 		if (invdirz >= 0) {
 		
@@ -308,9 +308,9 @@ THREE.Ray.prototype = {
 
 		if ((tmin > tzmax) || (tzmin > tmax)) return null;
 
-		if (tzmin > tmin) tmin = tzmin;
+		if (tzmin > tmin || isNaN(tmin) ) tmin = tzmin;
 
-		if (tzmax < tmax) tmax = tzmax;
+		if (tzmax < tmax || isNaN(tmax) ) tmax = tzmax;
 
 		//return point closest to the ray (positive side)
 

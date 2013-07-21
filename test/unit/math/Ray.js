@@ -242,6 +242,16 @@ test( "intersectBox", function() {
 	//tilted ray should intersect box at 0,1,0
 	ok( d.isIntersectionBox(box) === true, "Passed!" );
 	ok( d.intersectBox(box).distanceTo( new THREE.Vector3( 0, 1, 0 ) ) < TOL, "Passed!" );	
+
+	var e = new THREE.Ray( new THREE.Vector3( 1, -2, 1 ), new THREE.Vector3( 0, 1, 0).normalize() );
+	//handle case where ray is coplar with one of the boxes side - box in front of ray
+	ok( e.isIntersectionBox(box) === true, "Passed!" );
+	ok( e.intersectBox(box).distanceTo( new THREE.Vector3( 1, -1, 1 ) ) < TOL, "Passed!" );	
+	
+	var f = new THREE.Ray( new THREE.Vector3( 1, -2, 0 ), new THREE.Vector3( 0, -1, 0).normalize() );
+	//handle case where ray is coplar with one of the boxes side - box behind ray
+	ok( f.isIntersectionBox(box) === false, "Passed!" );
+	ok( f.intersectBox(box) == null, "Passed!" );		
 	
 });
 
