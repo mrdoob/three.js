@@ -76,6 +76,21 @@
 
 			}
 
+			//Check boundingBox before continuing
+			
+			inverseMatrix.getInverse( object.matrixWorld );  
+			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			if ( geometry.boundingBox !== null) {
+
+				if ( localRay.isIntersectionBox(geometry.boundingBox) === false )  {
+
+					return intersects;
+
+				}
+
+			} 
+
 			var vertices = geometry.vertices;
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
@@ -87,10 +102,6 @@
 
 				var a, b, c;
 				var precision = raycaster.precision;
-
-				inverseMatrix.getInverse( object.matrixWorld );
-
-				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 				var fl;
 				var indexed = false;
@@ -185,10 +196,6 @@
 
 				var a, b, c, d;
 				var precision = raycaster.precision;
-
-				inverseMatrix.getInverse( object.matrixWorld );
-
-				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 				for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
