@@ -20320,39 +20320,57 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		geometry.__webglInit = undefined;
 
-		if ( geometry.geometryGroups !== undefined ) {
+		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			for ( var g in geometry.geometryGroups ) {
+			var attributes = geometry.attributes;
 
-				var geometryGroup = geometry.geometryGroups[ g ];
+			for ( var key in attributes ) {
 
-				if ( geometryGroup.numMorphTargets !== undefined ) {
+				if ( attributes[ key ].buffer !== undefined ) {
 
-					for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
-
-						_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
-
-					}
-
+					_gl.deleteBuffer( attributes[ key ].buffer );
+		
 				}
-
-				if ( geometryGroup.numMorphNormals !== undefined ) {
-
-					for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
-
-						_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
-
-					}
-
-				}
-
-				deleteBuffers( geometryGroup );
 
 			}
 
-		}
+		} else {
 
-		deleteBuffers( geometry );
+			if ( geometry.geometryGroups !== undefined ) {
+
+				for ( var g in geometry.geometryGroups ) {
+
+					var geometryGroup = geometry.geometryGroups[ g ];
+
+					if ( geometryGroup.numMorphTargets !== undefined ) {
+
+						for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
+
+							_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
+
+						}
+
+					}
+
+					if ( geometryGroup.numMorphNormals !== undefined ) {
+
+						for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
+
+							_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
+
+						}
+
+					}
+
+					deleteBuffers( geometryGroup );
+
+				}
+
+			}
+
+			deleteBuffers( geometry );
+
+		}
 
 	};
 
