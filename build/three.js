@@ -1914,9 +1914,12 @@ THREE.Vector3.prototype = {
 
 	crossVectors: function ( a, b ) {
 
-		this.x = a.y * b.z - a.z * b.y;
-		this.y = a.z * b.x - a.x * b.z;
-		this.z = a.x * b.y - a.y * b.x;
+		var ax = a.x, ay = a.y, az = a.z;
+		var bx = b.x, by = b.y, bz = b.z;
+
+		this.x = ay * bz - az * by;
+		this.y = az * bx - ax * bz;
+		this.z = ax * by - ay * bx;
 
 		return this;
 
@@ -5295,6 +5298,7 @@ THREE.Ray.prototype = {
 		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
 		this.direction.sub( this.origin );
+		this.direction.normalize();
 
 		return this;
 	},
@@ -6299,6 +6303,69 @@ THREE.Triangle.containsPoint = function() {
 
 }();
 
+THREE.Triangle.intersectionRay = function ()	{
+
+	// Compute the offset origin, edges, and normal.
+	var diff = new THREE.Vector3();
+	var edge1 = new THREE.Vector3();
+	var edge2 = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+
+	return function ( ray, a, b, c, backfaceCulling ) {
+
+		//from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+
+		edge1.subVectors( b, a );
+		edge2.subVectors( c, a );
+		normal.crossVectors( edge1, edge2 );
+
+		// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+		// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+		//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+		//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+		//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+		var DdN = ray.direction.dot(normal);
+		var sign;
+		if ( DdN > 0 ) {
+
+				if ( backfaceCulling ) return null;
+				sign = 1;
+
+		} else if ( DdN < 0 ) {
+
+				sign = - 1;
+				DdN = - DdN;
+
+		} else return null;
+
+		diff.subVectors( ray.origin, a );
+		var DdQxE2 = sign * ray.direction.dot( edge2.crossVectors( diff, edge2 ) );
+
+		// b1 < 0, no intersection
+		if ( DdQxE2 < 0 )
+			return null;
+
+		var DdE1xQ = sign * ray.direction.dot( edge1.cross( diff ) );
+		// b2 < 0, no intersection
+		if ( DdE1xQ < 0 )
+			return null;
+
+		// b1+b2 > 1, no intersection
+		if ( DdQxE2 + DdE1xQ > DdN )
+			return null
+
+		// Line intersects triangle, check if ray does.
+		var QdN = - sign * diff.dot( normal );
+		// t < 0, no intersection
+		if ( QdN < 0 )
+			return null
+
+		// Ray intersects triangle.
+		return ray.at( QdN / DdN );
+	}
+
+}();
+
 THREE.Triangle.prototype = {
 
 	constructor: THREE.Triangle,
@@ -6379,6 +6446,12 @@ THREE.Triangle.prototype = {
 	containsPoint: function ( point ) {
 
 		return THREE.Triangle.containsPoint( point, this.a, this.b, this.c );
+
+	},
+
+	intersectionRay: function ( ray, backfaceCulling ) {
+
+		return THREE.Triangle.intersectionRay( ray, this.a, this.b, this.c, backfaceCulling );
 
 	},
 
@@ -6587,6 +6660,7 @@ THREE.EventDispatcher.prototype = {
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
+ * @author stephomi / http://stephaneginier.com/
  */
 
 ( function ( THREE ) {
@@ -6594,13 +6668,7 @@ THREE.EventDispatcher.prototype = {
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
-
-		// normalized ray.direction required for accurate distance calculations
-		if ( this.ray.direction.lengthSq() > 0 ) {
-
-			this.ray.direction.normalize();
-
-		}
+		// direction is assumed to be normalized (for accurate distance calculations)
 
 		this.near = near || 0;
 		this.far = far || Infinity;
@@ -6676,11 +6744,6 @@ THREE.EventDispatcher.prototype = {
 				if ( material === undefined ) return intersects;
 				if ( geometry.dynamic === false ) return intersects;
 
-				var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-				var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
-
-				var side = object.material.side;
-
 				var a, b, c;
 				var precision = raycaster.precision;
 
@@ -6705,22 +6768,25 @@ THREE.EventDispatcher.prototype = {
 				var vA = new THREE.Vector3();
 				var vB = new THREE.Vector3();
 				var vC = new THREE.Vector3();
-				var vCB = new THREE.Vector3();
-				var vAB = new THREE.Vector3();
 
-				for ( var oi = 0; oi < geometry.offsets.length; ++oi ) {
+				var offsets = geometry.offsets;
+				var indices = geometry.attributes.index.array;
+				var positions = geometry.attributes.position.array;
+				var offLength = geometry.offsets.length;
 
-					var start = geometry.offsets[ oi ].start;
-					var count = geometry.offsets[ oi ].count;
-					var index = geometry.offsets[ oi ].index;
+				for ( var oi = 0; oi < offLength; ++oi ) {
+
+					var start = offsets[ oi ].start;
+					var count = offsets[ oi ].count;
+					var index = offsets[ oi ].index;
 
 					for ( var i = start, il = start + count; i < il; i += 3 ) {
 
 						if ( indexed ) {
 
-							a = index + geometry.attributes.index.array[ i ];
-							b = index + geometry.attributes.index.array[ i + 1 ];
-							c = index + geometry.attributes.index.array[ i + 2 ];
+							a = index + indices[ i ];
+							b = index + indices[ i + 1 ];
+							c = index + indices[ i + 2 ];
 
 						} else {
 
@@ -6731,70 +6797,37 @@ THREE.EventDispatcher.prototype = {
 						}
 
 						vA.set(
-							geometry.attributes.position.array[ a * 3 ],
-							geometry.attributes.position.array[ a * 3 + 1 ],
-							geometry.attributes.position.array[ a * 3 + 2 ]
+							positions[ a * 3 ],
+							positions[ a * 3 + 1 ],
+							positions[ a * 3 + 2 ]
 						);
 						vB.set(
-							geometry.attributes.position.array[ b * 3 ],
-							geometry.attributes.position.array[ b * 3 + 1 ],
-							geometry.attributes.position.array[ b * 3 + 2 ]
+							positions[ b * 3 ],
+							positions[ b * 3 + 1 ],
+							positions[ b * 3 + 2 ]
 						);
 						vC.set(
-							geometry.attributes.position.array[ c * 3 ],
-							geometry.attributes.position.array[ c * 3 + 1 ],
-							geometry.attributes.position.array[ c * 3 + 2 ]
+							positions[ c * 3 ],
+							positions[ c * 3 + 1 ],
+							positions[ c * 3 + 2 ]
 						);
 
-						facePlane.setFromCoplanarPoints( vA, vB, vC );
+						var interPoint = THREE.Triangle.intersectionRay( localRay, vA, vB, vC, material.side !== THREE.DoubleSide );
 
-						var planeDistance = localRay.distanceToPlane( facePlane );
+						if ( !interPoint ) continue;
+
+						interPoint.applyMatrix4( object.matrixWorld );
+						var distance = raycaster.ray.origin.distanceTo( interPoint );
 
 						// bail if the ray is too close to the plane
-						if ( planeDistance < precision ) continue;
+						if ( distance < precision ) continue;
 
-						// bail if the ray is behind the plane
-						if ( planeDistance === null ) continue;
-
-						// check if we hit the wrong side of a single sided face
-						side = material.side;
-
-						if ( side !== THREE.DoubleSide ) {
-
-							var planeSign = localRay.direction.dot( facePlane.normal );
-							
-
-							if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
-
-								continue;
-
-							}
-
-						}
-
-						// this can be done using the planeDistance from localRay because
-						// localRay wasn't normalized, but ray was
-						if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) {
-
-							continue;
-
-						}
-
-						// passing in intersectPoint avoids a copy
-						intersectPoint = localRay.at( planeDistance, intersectPoint );
-
-						if ( THREE.Triangle.containsPoint( intersectPoint, vA, vB, vC ) === false ) {
-
-							continue;
-
-						}
+						if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
 						intersects.push( {
 
-							// this works because the original ray was normalized,
-							// and the transformed localRay wasn't
-							distance: planeDistance,
-							point: raycaster.ray.at( planeDistance ),
+							distance: distance,
+							point: interPoint,
 							face: null,
 							faceIndex: null,
 							object: object
@@ -6808,8 +6841,6 @@ THREE.EventDispatcher.prototype = {
 
 				var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
-
-				var side = object.material.side;
 
 				var a, b, c, d;
 				var precision = raycaster.precision;
@@ -6826,44 +6857,16 @@ THREE.EventDispatcher.prototype = {
 
 					if ( material === undefined ) continue;
 
-					facePlane.setFromNormalAndCoplanarPoint( face.normal, vertices[face.a] );
-
-					var planeDistance = localRay.distanceToPlane( facePlane );
-
-					// bail if the ray is too close to the plane
-					if ( planeDistance < precision ) continue;
-
-					// bail if the ray is behind the plane
-					if ( planeDistance === null ) continue;
-
-					// check if we hit the wrong side of a single sided face
-					side = material.side;
-					if ( side !== THREE.DoubleSide ) {
-
-						var planeSign = localRay.direction.dot( facePlane.normal );
-
-						if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
-
-							continue;
-
-						}
-
-					}
-
-					// this can be done using the planeDistance from localRay because localRay
-					// wasn't normalized, but ray was
-					if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
-
-					// passing in intersectPoint avoids a copy
-					intersectPoint = localRay.at( planeDistance, intersectPoint );
+					var interPoint;
 
 					if ( face instanceof THREE.Face3 ) {
 
 						a = vertices[ face.a ];
 						b = vertices[ face.b ];
 						c = vertices[ face.c ];
+						interPoint = THREE.Triangle.intersectionRay( localRay, a, b, c, material.side !== THREE.DoubleSide );
 
-						if ( THREE.Triangle.containsPoint( intersectPoint, a, b, c ) === false ) {
+						if ( !interPoint ) {
 
 							continue;
 
@@ -6875,11 +6878,13 @@ THREE.EventDispatcher.prototype = {
 						b = vertices[ face.b ];
 						c = vertices[ face.c ];
 						d = vertices[ face.d ];
+						interPoint = THREE.Triangle.intersectionRay( localRay, a, b, d, material.side !== THREE.DoubleSide );
 
-						if ( THREE.Triangle.containsPoint( intersectPoint, a, b, d ) === false &&
-						     THREE.Triangle.containsPoint( intersectPoint, b, c, d ) === false ) {
+						if( !interPoint ) {
 
-							continue;
+						 interPoint = THREE.Triangle.intersectionRay( localRay, b, c, d, material.side !== THREE.DoubleSide  );
+
+						 if( !interPoint ) continue;
 
 						}
 
@@ -6892,12 +6897,18 @@ THREE.EventDispatcher.prototype = {
 
 					}
 
+					interPoint.applyMatrix4( object.matrixWorld );
+					var distance = raycaster.ray.origin.distanceTo( interPoint );
+
+					// bail if the ray is too close to the plane
+					if ( distance < precision ) continue;
+
+					if ( distance < raycaster.near || distance > raycaster.far ) continue;
+
 					intersects.push( {
 
-						// this works because the original ray was normalized,
-						// and the transformed localRay wasn't
-						distance: planeDistance,
-						point: raycaster.ray.at( planeDistance ),
+						distance: distance,
+						point: interPoint,
 						face: face,
 						faceIndex: f,
 						object: object
@@ -6929,7 +6940,6 @@ THREE.EventDispatcher.prototype = {
 			
 			inverseMatrix.getInverse( object.matrixWorld );
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
-			localRay.direction.normalize(); // for scale matrix
 
 			var vertices = geometry.vertices;
 			var nbVertices = vertices.length;
@@ -6988,13 +6998,7 @@ THREE.EventDispatcher.prototype = {
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
 		this.ray.set( origin, direction );
-
-		// normalized ray.direction required for accurate distance calculations
-		if ( this.ray.direction.length() > 0 ) {
-
-			this.ray.direction.normalize();
-
-		}
+		// direction is assumed to be normalized (for accurate distance calculations)
 
 	};
 
