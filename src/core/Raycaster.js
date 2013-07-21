@@ -1,6 +1,7 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
+ * @author stephomi / http://stephaneginier.com/
  */
 
 ( function ( THREE ) {
@@ -8,13 +9,7 @@
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
-
-		// normalized ray.direction required for accurate distance calculations
-		if ( this.ray.direction.lengthSq() > 0 ) {
-
-			this.ray.direction.normalize();
-
-		}
+		// direction is assumed to be normalized (for accurate distance calculations)
 
 		this.near = near || 0;
 		this.far = far || Infinity;
@@ -172,8 +167,6 @@
 
 						intersects.push( {
 
-							// this works because the original ray was normalized,
-							// and the transformed localRay wasn't
 							distance: distance,
 							point: interPoint,
 							face: null,
@@ -288,7 +281,6 @@
 			
 			inverseMatrix.getInverse( object.matrixWorld );
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
-			localRay.direction.normalize(); // for scale matrix
 
 			var vertices = geometry.vertices;
 			var nbVertices = vertices.length;
@@ -347,13 +339,7 @@
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
 		this.ray.set( origin, direction );
-
-		// normalized ray.direction required for accurate distance calculations
-		if ( this.ray.direction.length() > 0 ) {
-
-			this.ray.direction.normalize();
-
-		}
+		// direction is assumed to be normalized (for accurate distance calculations)
 
 	};
 
