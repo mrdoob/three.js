@@ -92,7 +92,7 @@ THREE.Triangle.containsPoint = function() {
 
 }();
 
-THREE.Triangle.intersectionRayTriangle = function ()	{
+THREE.Triangle.intersectionRay = function ()	{
 
 	// Compute the offset origin, edges, and normal.
 	var diff = new THREE.Vector3();
@@ -235,6 +235,12 @@ THREE.Triangle.prototype = {
 	containsPoint: function ( point ) {
 
 		return THREE.Triangle.containsPoint( point, this.a, this.b, this.c );
+
+	},
+
+	intersectionRay: function ( ray, backfaceCulling ) {
+
+		return THREE.Triangle.intersectionRay( ray, this.a, this.b, this.c, backfaceCulling );
 
 	},
 

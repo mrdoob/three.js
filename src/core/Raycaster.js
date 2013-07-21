@@ -158,7 +158,7 @@
 							positions[ c * 3 + 2 ]
 						);
 
-						var interPoint = THREE.Triangle.intersectionRayTriangle( localRay, vA, vB, vC, material.side !== THREE.DoubleSide );
+						var interPoint = THREE.Triangle.intersectionRay( localRay, vA, vB, vC, material.side !== THREE.DoubleSide );
 
 						if ( !interPoint ) continue;
 
@@ -212,7 +212,7 @@
 						a = vertices[ face.a ];
 						b = vertices[ face.b ];
 						c = vertices[ face.c ];
-						interPoint = THREE.Triangle.intersectionRayTriangle( localRay, a, b, c, material.side !== THREE.DoubleSide );
+						interPoint = THREE.Triangle.intersectionRay( localRay, a, b, c, material.side !== THREE.DoubleSide );
 
 						if ( !interPoint ) {
 
@@ -226,11 +226,11 @@
 						b = vertices[ face.b ];
 						c = vertices[ face.c ];
 						d = vertices[ face.d ];
-						interPoint = THREE.Triangle.intersectionRayTriangle( localRay, a, b, d, material.side !== THREE.DoubleSide );
+						interPoint = THREE.Triangle.intersectionRay( localRay, a, b, d, material.side !== THREE.DoubleSide );
 
 						if( !interPoint ) {
 
-						 interPoint = THREE.Triangle.intersectionRayTriangle( localRay, b, c, d, material.side !== THREE.DoubleSide  );
+						 interPoint = THREE.Triangle.intersectionRay( localRay, b, c, d, material.side !== THREE.DoubleSide  );
 
 						 if( !interPoint ) continue;
 
