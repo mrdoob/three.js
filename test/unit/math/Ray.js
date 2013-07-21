@@ -238,11 +238,10 @@ test( "intersectBox", function() {
 	ok( c.isIntersectionBox(box) === true, "Passed!" );
 	ok( c.intersectBox(box).distanceTo( new THREE.Vector3( 1, 0, 0 ) ) < TOL, "Passed!" );
 
-	//even if we attempt to use unnormalized direction vector, it should work
-	var a = new THREE.Ray( new THREE.Vector3( 0, -2, -1 ), new THREE.Vector3( 0, 100, 100) );
-	//ray should intersect box at -1,0,0
-	ok( a.isIntersectionBox(box) === true, "Passed!" );
-	ok( a.intersectBox(box).distanceTo( new THREE.Vector3( 0, -1, 0 ) ) < TOL, "Passed!" );	
+	var d = new THREE.Ray( new THREE.Vector3( 0, 2, 1 ), new THREE.Vector3( 0, -1, -1).normalize() );
+	//tilted ray should intersect box at 0,1,0
+	ok( d.isIntersectionBox(box) === true, "Passed!" );
+	ok( d.intersectBox(box).distanceTo( new THREE.Vector3( 0, 1, 0 ) ) < TOL, "Passed!" );	
 	
 });
 
