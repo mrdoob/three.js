@@ -38,7 +38,7 @@ THREE.CSS2DRenderer = function () {
 	var _width, _height;
 	var _widthHalf, _heightHalf;
 
-	var vector4 = new THREE.Vector4();
+	var vector = new THREE.Vector3();
 	var viewMatrix = new THREE.Matrix4();
 	var viewProjectionMatrix = new THREE.Matrix4();
 
@@ -64,16 +64,11 @@ THREE.CSS2DRenderer = function () {
 
 		if ( object instanceof THREE.CSS2DObject ) {
 
+			vector.getPositionFromMatrix( object.matrixWorld );
+			vector.applyProjection( viewProjectionMatrix );
+
 			var element = object.element;
-			var matrix = object.matrixWorld;
-
-			vector4.set( matrix.elements[ 12 ], matrix.elements[ 13 ], matrix.elements[ 14 ], 1 );
-			vector4.applyMatrix4( viewProjectionMatrix );
-
-			vector4.x = ( vector4.x / vector4.w ) * _widthHalf + _widthHalf;
-			vector4.y = - ( vector4.y / vector4.w ) * _heightHalf + _heightHalf;
-
-			var style = 'translate(-50%,-50%) translate(' + vector4.x + 'px,' + vector4.y + 'px)';
+			var style = 'translate(-50%,-50%) translate(' + ( vector.x * _widthHalf + _widthHalf ) + 'px,' + ( - vector.y * _heightHalf + _heightHalf ) + 'px)';
 
 			element.style.WebkitTransform = style;
 			element.style.MozTransform = style;
