@@ -34,82 +34,18 @@ THREE.MaterialLoader.prototype = {
 
 	parse: function ( json ) {
 
-		var material;
+		var material = new THREE[ json.type ];
 
-		switch ( json.type ) {
-
-			case 'MeshBasicMaterial':
-
-				material = new THREE.MeshBasicMaterial( {
-
-					color: json.color,
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-			case 'MeshLambertMaterial':
-
-				material = new THREE.MeshLambertMaterial( {
-
-					color: json.color,
-					ambient: json.ambient,
-					emissive: json.emissive,
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-			case 'MeshPhongMaterial':
-
-				material = new THREE.MeshPhongMaterial( {
-
-					color: json.color,
-					ambient: json.ambient,
-					emissive: json.emissive,
-					specular: json.specular,
-					shininess: json.shininess,
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-			case 'MeshNormalMaterial':
-
-				material = new THREE.MeshNormalMaterial( {
-
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-			case 'MeshDepthMaterial':
-
-				material = new THREE.MeshDepthMaterial( {
-
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-		}
-
+		if ( json.color !== undefined ) material.color.setHex( json.color );
+		if ( json.ambient !== undefined ) material.ambient.setHex( json.ambient );
+		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
+		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
+		if ( json.shininess !== undefined ) material.shininess = json.shininess;
 		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
+		if ( json.blending !== undefined ) material.blending = json.blending;
+		if ( json.opacity !== undefined ) material.opacity = json.opacity;
+		if ( json.transparent !== undefined ) material.transparent = json.transparent;
+		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 
 		return material;
 
