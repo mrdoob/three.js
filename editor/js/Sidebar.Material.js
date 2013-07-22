@@ -229,12 +229,12 @@ Sidebar.Material = function ( editor ) {
 	var materialBlendingRow = new UI.Panel();
 	var materialBlending = new UI.Select().setOptions( {
 
-		0: 'NoBlending',
-		1: 'NormalBlending',
-		2: 'AdditiveBlending',
-		3: 'SubtractiveBlending',
-		4: 'MultiplyBlending',
-		5: 'CustomBlending'
+		0: 'No',
+		1: 'Normal',
+		2: 'Additive',
+		3: 'Subtractive',
+		4: 'Multiply',
+		5: 'Custom'
 
 	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
