@@ -67,6 +67,19 @@ Menubar.File = function ( editor ) {
 	options.add( new UI.HorizontalRule() );
 
 
+	// export buffergeometry
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Export BufferGeometry' );
+	option.onClick( function () {
+
+		exportGeometry( THREE.BufferGeometryExporter );
+
+	} );
+	options.add( option );
+
+
 	// export geometry
 
 	var option = new UI.Panel();
@@ -146,7 +159,7 @@ Menubar.File = function ( editor ) {
 
 		var output;
 
-		if ( exporter instanceof THREE.GeometryExporter ) {
+		if ( exporter instanceof THREE.BufferGeometryExporter || exporter instanceof THREE.GeometryExporter ) {
 
 			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );

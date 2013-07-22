@@ -48,7 +48,8 @@ THREE.ObjectLoader.prototype = {
 
 		if ( json !== undefined ) {
 
-			var loader = new THREE.JSONLoader();
+			var geometryLoader = new THREE.JSONLoader();
+			var bufferGeometryLoader = new THREE.BufferGeometryLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
@@ -143,9 +144,15 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'BufferGeometry':
+
+						geometry = bufferGeometryLoader.parse( data.data );
+
+						break;
+
 					case 'Geometry':
 
-						geometry = loader.parse( data.data ).geometry;
+						geometry = geometryLoader.parse( data.data ).geometry;
 
 						break;
 

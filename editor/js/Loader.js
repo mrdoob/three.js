@@ -334,13 +334,13 @@ var Loader = function ( editor ) {
 
 		if ( data.metadata === undefined ) { // 2.0
 
-			data.metadata = { type: 'geometry' };
+			data.metadata = { type: 'Geometry' };
 
 		}
 
 		if ( data.metadata.type === undefined ) { // 3.0
 
-			data.metadata.type = 'geometry';
+			data.metadata.type = 'Geometry';
 
 		}
 
@@ -350,7 +350,7 @@ var Loader = function ( editor ) {
 
 		}
 
-		if ( data.metadata.type === 'geometry' ) {
+		if ( data.metadata.type.toLowerCase() === 'geometry' ) {
 
 			var loader = new THREE.JSONLoader();
 			var result = loader.parse( data );
@@ -368,7 +368,7 @@ var Loader = function ( editor ) {
 
 			editor.addObject( mesh );
 
-		} else if ( data.metadata.type === 'object' ) {
+		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
 			var loader = new THREE.ObjectLoader();
 			var result = loader.parse( data );
@@ -383,7 +383,7 @@ var Loader = function ( editor ) {
 
 			}
 
-		} else if ( data.metadata.type === 'scene' ) {
+		} else if ( data.metadata.type.toLowerCase() === 'scene' ) {
 
 			// DEPRECATED
 
