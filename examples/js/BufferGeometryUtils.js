@@ -5,11 +5,14 @@
 
 THREE.BufferGeometryUtils = {
 
-	fromGeometry: function geometryToBufferGeometry( geometry ) {
+	fromGeometry: function geometryToBufferGeometry( geometry, settings ) {
+
+		settings = settings || { 'vertexColors': THREE.NoColors };
 
 		var vertices = geometry.vertices;
 		var faces = geometry.faces;
 		var faceVertexUvs = geometry.faceVertexUvs;
+		var vertexColors = settings.vertexColors;
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
 
 		var triangles = 0;
@@ -19,8 +22,6 @@ THREE.BufferGeometryUtils = {
 			triangles += faces[ i ] instanceof THREE.Face3 ? 1 : 2;
 
 		}
-
-		console.log( faces.length, triangles );
 
 		var bufferGeometry = new THREE.BufferGeometry();
 
@@ -34,11 +35,20 @@ THREE.BufferGeometryUtils = {
 				itemSize: 3,
 				array: new Float32Array( triangles * 3 * 3 )
 			}
-			/*
-			color: {
+
+		}
+
+		var positions = bufferGeometry.attributes.position.array;
+		var normals = bufferGeometry.attributes.normal.array;
+
+		if ( vertexColors !== THREE.NoColors ) {
+
+			bufferGeometry.attributes.color = {
 				itemSize: 3,
 				array: new Float32Array( triangles * 3 * 3 )
-			}*/
+			};
+
+			var colors = bufferGeometry.attributes.color.array;
 
 		}
 
@@ -52,10 +62,6 @@ THREE.BufferGeometryUtils = {
 			var uvs = bufferGeometry.attributes.uv.array;
 
 		}
-
-		var positions = bufferGeometry.attributes.position.array;
-		var normals = bufferGeometry.attributes.normal.array;
-		// var colors = bufferGeometry.attributes.color.array;
 
 		var i2 = 0, i3 = 0;
 
@@ -95,6 +101,42 @@ THREE.BufferGeometryUtils = {
 			normals[ i3 + 7 ] = nc.y;
 			normals[ i3 + 8 ] = nc.z;
 
+			if ( vertexColors === THREE.FaceColors ) {
+
+				var fc = face.color;
+
+				colors[ i3     ] = fc.r;
+				colors[ i3 + 1 ] = fc.g;
+				colors[ i3 + 2 ] = fc.b;
+
+				colors[ i3 + 3 ] = fc.r;
+				colors[ i3 + 4 ] = fc.g;
+				colors[ i3 + 5 ] = fc.b;
+
+				colors[ i3 + 6 ] = fc.r;
+				colors[ i3 + 7 ] = fc.g;
+				colors[ i3 + 8 ] = fc.b;
+
+			} else if ( vertexColors === THREE.VertexColors ) {
+
+				var vca = face.vertexColors[ 0 ];
+				var vcb = face.vertexColors[ 1 ];
+				var vcc = face.vertexColors[ 2 ];
+
+				colors[ i3     ] = vca.r;
+				colors[ i3 + 1 ] = vca.g;
+				colors[ i3 + 2 ] = vca.b;
+
+				colors[ i3 + 3 ] = vcb.r;
+				colors[ i3 + 4 ] = vcb.g;
+				colors[ i3 + 5 ] = vcb.b;
+
+				colors[ i3 + 6 ] = vcc.r;
+				colors[ i3 + 7 ] = vcc.g;
+				colors[ i3 + 8 ] = vcc.b;
+
+			}
+
 			if ( hasFaceVertexUv === true ) {
 
 				var uva = faceVertexUvs[ 0 ][ i ][ 0 ];
@@ -118,7 +160,6 @@ THREE.BufferGeometryUtils = {
 			if ( face instanceof THREE.Face4 ) {
 
 				var d = vertices[ face.d ];
-				var nd = face.vertexNormals[ 3 ];
 
 				positions[ i3     ] = a.x;
 				positions[ i3 + 1 ] = a.y;
@@ -132,6 +173,8 @@ THREE.BufferGeometryUtils = {
 				positions[ i3 + 7 ] = d.y;
 				positions[ i3 + 8 ] = d.z;
 
+				var nd = face.vertexNormals[ 3 ];
+
 				normals[ i3     ] = na.x;
 				normals[ i3 + 1 ] = na.y;
 				normals[ i3 + 2 ] = na.z;
@@ -143,6 +186,38 @@ THREE.BufferGeometryUtils = {
 				normals[ i3 + 6 ] = nd.x;
 				normals[ i3 + 7 ] = nd.y;
 				normals[ i3 + 8 ] = nd.z;
+
+				if ( vertexColors === THREE.FaceColors ) {
+
+					colors[ i3     ] = fc.r;
+					colors[ i3 + 1 ] = fc.g;
+					colors[ i3 + 2 ] = fc.b;
+
+					colors[ i3 + 3 ] = fc.r;
+					colors[ i3 + 4 ] = fc.g;
+					colors[ i3 + 5 ] = fc.b;
+
+					colors[ i3 + 6 ] = fc.r;
+					colors[ i3 + 7 ] = fc.g;
+					colors[ i3 + 8 ] = fc.b;
+
+				} else if ( vertexColors === THREE.VertexColors ) {
+
+					var vcd = face.vertexColors[ 3 ];
+
+					colors[ i3     ] = vca.r;
+					colors[ i3 + 1 ] = vca.g;
+					colors[ i3 + 2 ] = vca.b;
+
+					colors[ i3 + 3 ] = vcc.r;
+					colors[ i3 + 4 ] = vcc.g;
+					colors[ i3 + 5 ] = vcc.b;
+
+					colors[ i3 + 6 ] = vcd.r;
+					colors[ i3 + 7 ] = vcd.g;
+					colors[ i3 + 8 ] = vcd.b;
+
+				}
 
 				if ( hasFaceVertexUv === true ) {
 
