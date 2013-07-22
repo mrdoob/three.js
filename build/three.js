@@ -9179,6 +9179,8 @@ THREE.BufferGeometry = function () {
 	this.id = THREE.GeometryIdCount ++;
 	this.uuid = THREE.Math.generateUUID();
 
+	this.name = '';
+
 	// attributes
 
 	this.attributes = {};
