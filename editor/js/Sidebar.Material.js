@@ -218,6 +218,27 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialEnvMapRow );
 
+
+	// blending
+
+	var materialBlendingRow = new UI.Panel();
+	var materialBlending = new UI.Select().setOptions( {
+
+		0: 'NoBlending',
+		1: 'NormalBlending',
+		2: 'AdditiveBlending',
+		3: 'SubtractiveBlending',
+		4: 'MultiplyBlending',
+		5: 'CustomBlending'
+
+	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+
+	materialBlendingRow.add( new UI.Text( 'Blending' ).setWidth( '90px' ).setColor( '#666' ) );
+	materialBlendingRow.add( materialBlending );
+
+	container.add( materialBlendingRow );
+
+
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
@@ -437,6 +458,12 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.blending !== undefined ) {
+
+				material.blending = parseInt( materialBlending.getValue() );
+
+			}
+
 			if ( material.opacity !== undefined ) {
 
 				material.opacity = materialOpacity.getValue();
@@ -491,6 +518,7 @@ Sidebar.Material = function ( editor ) {
 			'normalMap': materialNormalMapRow,
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
+			'blending': materialBlendingRow,
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
 			'wireframe': materialWireframeRow
@@ -633,6 +661,12 @@ Sidebar.Material = function ( editor ) {
 				materialEnvMapEnabled.setValue( material.envMap !== null );
 				materialEnvMap.setValue( material.envMap );
 				materialReflectivity.setValue( material.reflectivity );
+
+			}
+
+			if ( material.blending !== undefined ) {
+
+				materialBlending.setValue( material.blending );
 
 			}
 
