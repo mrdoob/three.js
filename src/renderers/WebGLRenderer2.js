@@ -4,6 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  * @author gero3 / https://github.com/gero3/
+ * @author aluarosi / https://github.com/aluarosi/
  */
 
 THREE.WebGLRenderer = function ( parameters ) {
@@ -135,7 +136,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: [], positions: [] },
-		point: { length: 0, colors: [], positions: [], distances: [] },
+		point: { length: 0, colors: [], positions: [], distances: [], quadratics: []},
 		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [] },
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
 
@@ -2639,6 +2640,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.pointLightColor.value = lights.point.colors;
 		uniforms.pointLightPosition.value = lights.point.positions;
 		uniforms.pointLightDistance.value = lights.point.distances;
+		uniforms.pointLightQuadratic.value = lights.point.quadratics;
 
 		uniforms.spotLightColor.value = lights.spot.colors;
 		uniforms.spotLightPosition.value = lights.spot.positions;
@@ -2945,6 +2947,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		intensity,  intensitySq,
 		position,
 		distance,
+		quadratic,
+        
 
 		zlights = _lights,
 
@@ -2954,6 +2958,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		pointColors = zlights.point.colors,
 		pointPositions = zlights.point.positions,
 		pointDistances = zlights.point.distances,
+		pointQuadratics = zlights.point.quadratics,
 
 		spotColors = zlights.spot.colors,
 		spotPositions = zlights.spot.positions,
@@ -2990,6 +2995,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			color = light.color;
 			intensity = light.intensity;
 			distance = light.distance;
+			quadratic = light.quadratic;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
@@ -3068,6 +3074,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				pointPositions[ pointOffset + 2 ] = _vector3.z;
 
 				pointDistances[ pointLength ] = distance;
+
+				pointQuadratics[ pointLength ] = quadratic;
 
 				pointLength += 1;
 
