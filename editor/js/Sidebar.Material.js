@@ -286,8 +286,11 @@ Sidebar.Material = function ( editor ) {
 		var object = editor.selected;
 		var geometry = object.geometry;
 		var material = object.material;
-		var objectHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
 		var textureWarning = false;
+		var objectHasUvs = false;
+
+		if ( geometry.faceVertexUvs !== undefined && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
+		if ( geometry.attributes !== undefined && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
 		if ( material ) {
 
