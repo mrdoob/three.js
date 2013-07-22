@@ -141,6 +141,7 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
+
 	// map
 
 	var materialMapRow = new UI.Panel();
@@ -153,6 +154,7 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialMapRow );
 
+
 	// light map
 
 	var materialLightMapRow = new UI.Panel();
@@ -164,6 +166,7 @@ Sidebar.Material = function ( editor ) {
 	materialLightMapRow.add( materialLightMap );
 
 	container.add( materialLightMapRow );
+
 
 	// bump map
 
@@ -179,6 +182,7 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialBumpMapRow );
 
+
 	// normal map
 
 	var materialNormalMapRow = new UI.Panel();
@@ -190,6 +194,7 @@ Sidebar.Material = function ( editor ) {
 	materialNormalMapRow.add( materialNormalMap );
 
 	container.add( materialNormalMapRow );
+
 
 	// specular map
 
@@ -203,13 +208,13 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialSpecularMapRow );
 
+
 	// env map
 
 	var materialEnvMapRow = new UI.Panel();
 	var materialEnvMapEnabled = new UI.Checkbox( false ).onChange( update );
 	var materialEnvMap = new UI.CubeTexture().setColor( '#444' ).setWidth( '100px' ).onChange( update );
 	var materialReflectivity = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
-
 
 	materialEnvMapRow.add( new UI.Text( 'Env Map' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialEnvMapRow.add( materialEnvMapEnabled );
@@ -249,6 +254,7 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialOpacityRow );
 
+
 	// transparent
 
 	var materialTransparentRow = new UI.Panel();
@@ -258,6 +264,7 @@ Sidebar.Material = function ( editor ) {
 	materialTransparentRow.add( materialTransparent );
 
 	container.add( materialTransparentRow );
+
 
 	// wireframe
 
