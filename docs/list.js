@@ -18,7 +18,6 @@ var list = {
 			[ "Clock", "api/core/Clock" ],
 			[ "EventDispatcher", "api/core/EventDispatcher" ],
 			[ "Face3", "api/core/Face3" ],
-			[ "Face4", "api/core/Face4" ],
 			[ "Geometry", "api/core/Geometry" ],
 			[ "Object3D", "api/core/Object3D" ],
 			[ "Projector", "api/core/Projector" ],
@@ -107,7 +106,6 @@ var list = {
 
 		"Renderers / Renderables": [
 			[ "RenderableFace3", "api/renderers/renderables/RenderableFace3" ],
-			[ "RenderableFace4", "api/renderers/renderables/RenderableFace4" ],
 			[ "RenderableLine", "api/renderers/renderables/RenderableLine" ],
 			[ "RenderableObject", "api/renderers/renderables/RenderableObject" ],
 			[ "RenderableParticle", "api/renderers/renderables/RenderableParticle" ],
