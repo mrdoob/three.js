@@ -221,42 +221,40 @@ THREE.Projector = function () {
 
 					var side = material.side;
 
-					if ( face instanceof THREE.Face3 ) {
+					v1 = _vertexPool[ face.a ];
+					v2 = _vertexPool[ face.b ];
+					v3 = _vertexPool[ face.c ];
 
-						v1 = _vertexPool[ face.a ];
-						v2 = _vertexPool[ face.b ];
-						v3 = _vertexPool[ face.c ];
+					_points3[ 0 ] = v1.positionScreen;
+					_points3[ 1 ] = v2.positionScreen;
+					_points3[ 2 ] = v3.positionScreen;
 
-						_points3[ 0 ] = v1.positionScreen;
-						_points3[ 1 ] = v2.positionScreen;
-						_points3[ 2 ] = v3.positionScreen;
+					if ( v1.visible === true || v2.visible === true || v3.visible === true ||
+						_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
 
-						if ( v1.visible === true || v2.visible === true || v3.visible === true ||
-							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
+						visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) *
+							    ( v2.positionScreen.y - v1.positionScreen.y ) -
+							    ( v3.positionScreen.y - v1.positionScreen.y ) *
+							    ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
 
-							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
-								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
+						if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
 
-							if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
+							_face = getNextFace3InPool();
 
-								_face = getNextFace3InPool();
-
-								_face.id = object.id;
-								_face.v1.copy( v1 );
-								_face.v2.copy( v2 );
-								_face.v3.copy( v3 );
-
-							} else {
-
-								continue;
-
-							}
+							_face.id = object.id;
+							_face.v1.copy( v1 );
+							_face.v2.copy( v2 );
+							_face.v3.copy( v3 );
 
 						} else {
 
 							continue;
 
 						}
+
+					} else {
+
+						continue;
 
 					}
 

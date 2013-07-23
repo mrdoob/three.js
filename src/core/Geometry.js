@@ -300,16 +300,7 @@ THREE.Geometry.prototype = {
 					face = this.faces[ f ];
 
 					faceNormal = new THREE.Vector3();
-
-					if ( face instanceof THREE.Face3 ) {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
-
-					} else {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3() };
-
-					}
+					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
 
 					dstNormalsFace.push( faceNormal );
 					dstNormalsVertex.push( vertexNormals );
@@ -342,20 +333,9 @@ THREE.Geometry.prototype = {
 
 				faceNormal.copy( face.normal );
 
-				if ( face instanceof THREE.Face3 ) {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-
-				} else {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-					vertexNormals.d.copy( face.vertexNormals[ 3 ] );
-
-				}
+				vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+				vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+				vertexNormals.c.copy( face.vertexNormals[ 2 ] );
 
 			}
 
