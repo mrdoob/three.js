@@ -203,7 +203,7 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		outliner.setValue( object.id );
+		outliner.setValue( object !== null ? object.id : null );
 
 	} );
 

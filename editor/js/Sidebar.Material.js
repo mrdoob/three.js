@@ -289,8 +289,8 @@ Sidebar.Material = function ( editor ) {
 		var textureWarning = false;
 		var objectHasUvs = false;
 
-		if ( geometry.faceVertexUvs !== undefined && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
-		if ( geometry.attributes !== undefined && geometry.attributes.uv !== undefined ) objectHasUvs = true;
+		if ( geometry instanceof THREE.Geometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
+		if ( geometry instanceof THREE.BufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
 		if ( material ) {
 
@@ -627,20 +627,7 @@ Sidebar.Material = function ( editor ) {
 			if ( material.map !== undefined ) {
 
 				materialMapEnabled.setValue( material.map !== null );
-
-				if ( material.map !== null ) {
-
-					if ( object.geometry.faceVertexUvs[ 0 ].length > 0 ) {
-
-						materialMap.setValue( material.map );
-
-					} else {
-
-						console.warn( "Can't set texture, model doesn't have texture coordinates" );
-
-					}
-
-				}
+				materialMap.setValue( material.map );
 
 			}
 
