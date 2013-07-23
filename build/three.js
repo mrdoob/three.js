@@ -8243,7 +8243,6 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
-	this.faceUvs = [[]];
 	this.faceVertexUvs = [[]];
 
 	this.morphTargets = [];
@@ -10580,7 +10579,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		type,
 		isQuad,
 		hasMaterial,
-		hasFaceUv, hasFaceVertexUv,
+		hasFaceVertexUv,
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
 
@@ -10607,7 +10606,6 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			for ( i = 0; i < nUvLayers; i++ ) {
 
-				geometry.faceUvs[ i ] = [];
 				geometry.faceVertexUvs[ i ] = [];
 
 			}
@@ -10639,14 +10637,13 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			isQuad              = isBitSet( type, 0 );
 			hasMaterial         = isBitSet( type, 1 );
-			hasFaceUv           = isBitSet( type, 2 );
 			hasFaceVertexUv     = isBitSet( type, 3 );
 			hasFaceNormal       = isBitSet( type, 4 );
 			hasFaceVertexNormal = isBitSet( type, 5 );
 			hasFaceColor	    = isBitSet( type, 6 );
 			hasFaceVertexColor  = isBitSet( type, 7 );
 
-			//console.log("type", type, "bits", isQuad, hasMaterial, hasFaceUv, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
+			// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
 			if ( isQuad ) {
 
@@ -10682,23 +10679,6 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			fi = geometry.faces.length;
 
-			if ( hasFaceUv ) {
-
-				for ( i = 0; i < nUvLayers; i++ ) {
-
-					uvLayer = json.uvs[ i ];
-
-					uvIndex = faces[ offset ++ ];
-
-					u = uvLayer[ uvIndex * 2 ];
-					v = uvLayer[ uvIndex * 2 + 1 ];
-
-					geometry.faceUvs[ i ][ fi ] = new THREE.Vector2( u, v );
-
-				}
-
-			}
-
 			if ( hasFaceVertexUv ) {
 
 				for ( i = 0; i < nUvLayers; i++ ) {
@@ -10728,13 +10708,11 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				normalIndex = faces[ offset ++ ] * 3;
 
-				normal = new THREE.Vector3();
-
-				normal.x = normals[ normalIndex ++ ];
-				normal.y = normals[ normalIndex ++ ];
-				normal.z = normals[ normalIndex ];
-
-				face.normal = normal;
+				face.normal.set(
+					normals[ normalIndex ++ ],
+					normals[ normalIndex ++ ],
+					normals[ normalIndex ]
+				);
 
 			}
 
@@ -10744,11 +10722,11 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 					normalIndex = faces[ offset ++ ] * 3;
 
-					normal = new THREE.Vector3();
-
-					normal.x = normals[ normalIndex ++ ];
-					normal.y = normals[ normalIndex ++ ];
-					normal.z = normals[ normalIndex ];
+					normal = new THREE.Vector3(
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ]
+					);
 
 					face.vertexNormals.push( normal );
 
@@ -10760,9 +10738,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 			if ( hasFaceColor ) {
 
 				colorIndex = faces[ offset ++ ];
-
-				color = new THREE.Color( colors[ colorIndex ] );
-				face.color = color;
+				face.color.setHex( colors[ colorIndex ] );
 
 			}
 
@@ -10772,9 +10748,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 				for ( i = 0; i < nVertices; i++ ) {
 
 					colorIndex = faces[ offset ++ ];
-
-					color = new THREE.Color( colors[ colorIndex ] );
-					face.vertexColors.push( color );
+					face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
 
 				}
 
@@ -20117,13 +20091,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uvType ) {
 
-			if ( geometry.faceUvs.length > 0 || geometry.faceVertexUvs.length > 0 ) {
+			if ( geometry.faceVertexUvs.length > 0 ) {
 
 				geometryGroup.__uvArray = new Float32Array( nvertices * 2 );
 
 			}
 
-			if ( geometry.faceUvs.length > 1 || geometry.faceVertexUvs.length > 1 ) {
+			if ( geometry.faceVertexUvs.length > 1 ) {
 
 				geometryGroup.__uv2Array = new Float32Array( nvertices * 2 );
 
@@ -26452,14 +26426,7 @@ THREE.GeometryUtils = {
 		var i, il, j, jl;
 
 		var faces = [];
-		var faceUvs = [];
 		var faceVertexUvs = [];
-
-		for ( i = 0, il = geometry.faceUvs.length; i < il; i ++ ) {
-
-			faceUvs[ i ] = [];
-
-		}
 
 		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
@@ -26473,12 +26440,6 @@ THREE.GeometryUtils = {
 
 			faces.push( face );
 
-			for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-				faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
-
-			}
-
 			for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
 				faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
@@ -26488,7 +26449,6 @@ THREE.GeometryUtils = {
 		}
 
 		geometry.faces = faces;
-		geometry.faceUvs = faceUvs;
 		geometry.faceVertexUvs = faceVertexUvs;
 
 		geometry.computeCentroids();
