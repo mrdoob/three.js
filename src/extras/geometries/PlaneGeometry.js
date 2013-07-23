@@ -50,14 +50,25 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
 			var d = ( ix + 1 ) + gridX1 * iz;
 
-			var face = new THREE.Face4( a, b, c, d );
+			var face = new THREE.Face3( a, b, c );
 			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
 			this.faces.push( face );
 			this.faceVertexUvs[ 0 ].push( [
 				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
 				new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
+				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ )
+			] );
+
+
+			face = new THREE.Face3( a, c, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [
+				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
 				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
 				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ )
 			] );
