@@ -61,21 +61,21 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 			var u1 = u0 + inverseSegments;
 			var v1 = v0 + inversePointLength;
 
-			this.faces.push( new THREE.Face3( a, b, c ) );
+			this.faces.push( new THREE.Face3( a, b, d ) );
 
 			this.faceVertexUvs[ 0 ].push( [
 
 				new THREE.Vector2( u0, v0 ),
 				new THREE.Vector2( u1, v0 ),
-				new THREE.Vector2( u1, v1 )
+				new THREE.Vector2( u0, v1 )
 
 			] );
 
-			this.faces.push( new THREE.Face3( a, c, d ) );
+			this.faces.push( new THREE.Face3( b, c, d ) );
 
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.Vector2( u0, v0 ),
+				new THREE.Vector2( u1, v0 ),
 				new THREE.Vector2( u1, v1 ),
 				new THREE.Vector2( u0, v1 )
 

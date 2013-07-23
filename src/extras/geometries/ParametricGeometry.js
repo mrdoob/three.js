@@ -44,19 +44,19 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 			a = i * sliceCount + j;
 			b = i * sliceCount + j + 1;
-			c = (i + 1) * sliceCount + j;
-			d = (i + 1) * sliceCount + j + 1;
+			c = (i + 1) * sliceCount + j + 1;
+			d = (i + 1) * sliceCount + j;
 
 			uva = new THREE.Vector2( j / slices, i / stacks );
 			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvc = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvd = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
 
-			faces.push( new THREE.Face3( a, b, c ) );
-			uvs.push( [ uva, uvb, uvc ] );
+			faces.push( new THREE.Face3( a, b, d ) );
+			uvs.push( [ uva, uvb, uvd ] );
 
-			faces.push( new THREE.Face3( a, c, d ) );
-			uvs.push( [ uva, uvc, uvd ] );
+			faces.push( new THREE.Face3( b, c, d ) );
+			uvs.push( [ uvb, uvc, uvd ] );
 
 		}
 

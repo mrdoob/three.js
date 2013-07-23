@@ -50,28 +50,24 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
 			var d = ( ix + 1 ) + gridX1 * iz;
 
-			var face = new THREE.Face3( a, b, c );
+			var uva = new THREE.Vector2( ix / gridX, 1 - iz / gridZ );
+			var uvb = new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ );
+
+			var face = new THREE.Face3( a, b, d );
 			face.normal.copy( normal );
 			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
 			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [
-				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
-				new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ )
-			] );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
-
-			face = new THREE.Face3( a, c, d );
+			face = new THREE.Face3( b, c, d );
 			face.normal.copy( normal );
 			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
 			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [
-				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ )
-			] );
+			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
 
 		}
 

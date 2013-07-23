@@ -51,25 +51,25 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 			var c = ( this.tubularSegments + 1 ) * ( j - 1 ) + i;
 			var d = ( this.tubularSegments + 1 ) * j + i;
 
-			var face = new THREE.Face3( a, b, c, [ normals[ a ], normals[ b ], normals[ c ] ] );
+			var face = new THREE.Face3( a, b, d, [ normals[ a ], normals[ b ], normals[ d ] ] );
 			face.normal.add( normals[ a ] );
 			face.normal.add( normals[ b ] );
-			face.normal.add( normals[ c ] );
+			face.normal.add( normals[ d ] );
 			face.normal.normalize();
 
 			this.faces.push( face );
 
-			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ c ].clone() ] );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ d ].clone() ] );
 
-			face = new THREE.Face3( a, c, d, [ normals[ a ], normals[ c ], normals[ d ] ] );
-			face.normal.add( normals[ a ] );
+			face = new THREE.Face3( b, c, d, [ normals[ b ], normals[ c ], normals[ d ] ] );
+			face.normal.add( normals[ b ] );
 			face.normal.add( normals[ c ] );
 			face.normal.add( normals[ d ] );
 			face.normal.normalize();
 
 			this.faces.push( face );
 
-			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
 		}
 
 	}
