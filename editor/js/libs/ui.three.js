@@ -1,21 +1,28 @@
 // Texture
 
-UI.Texture = function ( position ) {
+UI.Texture = function () {
 
     UI.Element.call( this );
 
 	var scope = this;
 
-	var image = new Image();
-	this.texture = null;
+	var canvas = document.createElement( 'canvas' );
+	canvas.width = 64;
+	canvas.height = 16;
+	canvas.style.cursor = 'pointer';
+	canvas.addEventListener( 'click', function ( event ) {
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'file';
-	this.dom.style.position = position || 'relative';
+		input.click();
 
-	this.onChangeCallback = null;
+	}, false );
 
-	this.dom.addEventListener( 'change', function ( event ) {
+	var context = canvas.getContext( '2d' );
+	context.fillStyle = 'black';
+	context.fillRect( 0, 0, canvas.width, canvas.height );
+
+	var input = document.createElement( 'input' );
+	input.type = 'file';
+	input.addEventListener( 'change', function ( event ) {
 
 		var file = event.target.files[ 0 ];
 
@@ -27,31 +34,12 @@ UI.Texture = function ( position ) {
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function( event ) {
 
+					var scale = 64 / this.width;
+
+					context.drawImage( this, 0, 0, this.width * scale, this.height * scale );
+
 					scope.texture = new THREE.Texture( this );
 					scope.texture.needsUpdate = true;
-
-					// remember the original filename (including extension)
-					// this is used for url field in the scene export
-
-					scope.texture.sourceFile = file.name;
-
-					// generate unique name per texture
-					// based on source file name
-
-					var chunks = file.name.split( '.' );
-					var extension = chunks.pop().toLowerCase();
-					var filename = chunks.join( '.' );
-
-					if ( ! ( filename in scope.textureNameMap ) ) {
-
-						scope.textureNameMap[ filename ] = true;
-						scope.texture.name = filename;
-
-					} else {
-
-						scope.texture.name = filename + "_" + scope.texture.id;
-
-					}
 
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -65,7 +53,11 @@ UI.Texture = function ( position ) {
 
 		}
 
-	}, false );
+	} );
+
+	this.dom = canvas;
+	this.texture = null;
+	this.onChangeCallback = null;
 
 	return this;
 
@@ -98,21 +90,29 @@ UI.Texture.prototype.onChange = function ( callback ) {
 
 // CubeTexture
 
-UI.CubeTexture = function ( position ) {
+UI.CubeTexture = function () {
 
 	UI.Element.call( this );
 
 	var scope = this;
 
-	this.texture = null;
+	var canvas = document.createElement( 'canvas' );
+	canvas.width = 64;
+	canvas.height = 16;
+	canvas.style.cursor = 'pointer';
+	canvas.addEventListener( 'click', function ( event ) {
 
-	this.dom = document.createElement( 'input' );
-	this.dom.type = 'file';
-	this.dom.style.position = position || 'relative';
+		input.click();
 
-	this.onChangeCallback = null;
+	}, false );
 
-	this.dom.addEventListener( 'change', function ( event ) {
+	var context = canvas.getContext( '2d' );
+	context.fillStyle = 'black';
+	context.fillRect( 0, 0, canvas.width, canvas.height );
+
+	var input = document.createElement( 'input' );
+	input.type = 'file';
+	input.addEventListener( 'change', function ( event ) {
 
 		var file = event.target.files[ 0 ];
 
@@ -123,6 +123,10 @@ UI.CubeTexture = function ( position ) {
 
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function( event ) {
+
+					var scale = 64 / this.width;
+
+					context.drawImage( this, 0, 0, this.width * scale, this.height * scale );
 
 					scope.texture = new THREE.Texture( [ this, this, this, this, this, this ], new THREE.CubeReflectionMapping() )
 					scope.texture.needsUpdate = true;
@@ -138,6 +142,10 @@ UI.CubeTexture = function ( position ) {
 		}
 
 	}, false );
+
+	this.dom = canvas;
+	this.texture = null;
+	this.onChangeCallback = null;
 
 	return this;
 
