@@ -443,7 +443,16 @@ var Viewport = function ( editor ) {
 				} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 					vertices += geometry.attributes.position.numItems / 3;
-					faces += geometry.attributes.index.numItems / 3;
+
+					if ( geometry.attributes.index !== undefined ) {
+
+						faces += geometry.attributes.index.numItems / 3;
+
+					} else {
+
+						faces += vertices / 3;
+
+					}
 
 				}
 

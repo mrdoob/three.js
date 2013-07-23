@@ -184,7 +184,17 @@ Sidebar.Geometry = function ( editor ) {
 		} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 			geometryVertices.setValue( geometry.attributes.position.numItems / 3 );
-			geometryFaces.setValue( geometry.attributes.index.numItems / 3 );
+
+			if ( geometry.attributes.index !== undefined ) {
+
+				geometryFaces.setValue( geometry.attributes.index.numItems / 3 );
+
+			} else {
+
+				geometryFaces.setValue( geometry.attributes.position.numItems / 3 / 3 );
+
+			}
+
 
 		}
 
