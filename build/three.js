@@ -11284,9 +11284,14 @@ THREE.BufferGeometryLoader.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
-		for ( var key in json.attributes ) {
+		var attributes = json.attributes;
+		var offsets = json.offsets;
+		var boundingSphere = json.boundingSphere;
 
-			var attribute = json.attributes[ key ];
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
+
 			geometry.attributes[ key ] = {
 				itemSize: attribute.itemSize,
 				array: new self[ attribute.type ]( attribute.array )
@@ -11294,9 +11299,15 @@ THREE.BufferGeometryLoader.prototype = {
 
 		}
 
-		if ( json.offsets !== undefined ) {
+		if ( offsets !== undefined ) {
 
-			geometry.offsets = JSON.parse( JSON.stringify( json.offsets ) );
+			geometry.offsets = JSON.parse( JSON.stringify( offsets ) );
+
+		}
+
+		if ( boundingSphere !== undefined ) {
+
+			geometry.boundingSphere = new THREE.Sphere( undefined, boundingSphere.radius );
 
 		}
 
