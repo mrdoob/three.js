@@ -16,12 +16,17 @@ THREE.BufferGeometryExporter.prototype = {
 				type: 'BufferGeometry',
 				generator: 'BufferGeometryExporter'
 			},
-			attributes: {}
+			attributes: {
+			}
 		};
 
-		for ( var key in geometry.attributes ) {
+		var attributes = geometry.attributes;
+		var offsets = geometry.offsets;
+		var boundingSphere = geometry.boundingSphere;
 
-			var attribute = geometry.attributes[ key ];
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
 
 			output.attributes[ key ] = {
 				itemSize: attribute.itemSize,
@@ -31,9 +36,17 @@ THREE.BufferGeometryExporter.prototype = {
 
 		}
 
-		if ( geometry.offsets.length > 0 ) {
+		if ( offsets.length > 0 ) {
 
-			output.offsets = JSON.parse( JSON.stringify( geometry.offsets ) );
+			output.offsets = JSON.parse( JSON.stringify( offsets ) );
+
+		}
+
+		if ( boundingSphere !== null ) {
+
+			output.boundingSphere = {
+				radius: boundingSphere.radius
+			}
 
 		}
 
