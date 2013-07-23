@@ -109,16 +109,10 @@
 
 				materials[ 0 ].shading = THREE.FlatShading;
 
-				mesh = new THREE.Object3D();
+				mesh = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
 				mesh.position.x = 400;
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = 250;
 				scene.add( mesh );
-
-				var part1 = new THREE.Mesh( geometry, new THREE.MeshFaceMaterial( materials ) );
-				mesh.add( part1 );
-
-				var part2 = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0xffffff, opacity: 0.9, shading: THREE.FlatShading, wireframe: true, wireframeLinewidth: 2, transparent: true } ) );
-				mesh.add( part2 );
 
 			}
 
