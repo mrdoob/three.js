@@ -274,13 +274,11 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 				normalIndex = faces[ offset ++ ] * 3;
 
-				normal = new THREE.Vector3();
-
-				normal.x = normals[ normalIndex ++ ];
-				normal.y = normals[ normalIndex ++ ];
-				normal.z = normals[ normalIndex ];
-
-				face.normal = normal;
+				face.normal.set(
+					normals[ normalIndex ++ ],
+					normals[ normalIndex ++ ],
+					normals[ normalIndex ]
+				);
 
 			}
 
@@ -290,11 +288,11 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 					normalIndex = faces[ offset ++ ] * 3;
 
-					normal = new THREE.Vector3();
-
-					normal.x = normals[ normalIndex ++ ];
-					normal.y = normals[ normalIndex ++ ];
-					normal.z = normals[ normalIndex ];
+					normal = new THREE.Vector3(
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ]
+					);
 
 					face.vertexNormals.push( normal );
 
@@ -306,9 +304,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 			if ( hasFaceColor ) {
 
 				colorIndex = faces[ offset ++ ];
-
-				color = new THREE.Color( colors[ colorIndex ] );
-				face.color = color;
+				face.color.setHex( colors[ colorIndex ] );
 
 			}
 
@@ -318,9 +314,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 				for ( i = 0; i < nVertices; i++ ) {
 
 					colorIndex = faces[ offset ++ ];
-
-					color = new THREE.Color( colors[ colorIndex ] );
-					face.vertexColors.push( color );
+					face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
 
 				}
 
