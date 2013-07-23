@@ -134,22 +134,6 @@ THREE.SoftwareRenderer = function () {
 					shader, element, material
 				)
 
-			} else if ( element instanceof THREE.RenderableFace4 ) {
-
-				drawTriangle(
-					element.v1.positionScreen,
-					element.v2.positionScreen,
-					element.v4.positionScreen,
-					shader, element, material
-				);
-
-				drawTriangle(
-					element.v2.positionScreen,
-					element.v3.positionScreen,
-					element.v4.positionScreen,
-					shader, element, material
-				);
-
 			}
 
 		}
