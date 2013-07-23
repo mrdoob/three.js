@@ -126,7 +126,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		type,
 		isQuad,
 		hasMaterial,
-		hasFaceUv, hasFaceVertexUv,
+		hasFaceVertexUv,
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
 
@@ -153,7 +153,6 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			for ( i = 0; i < nUvLayers; i++ ) {
 
-				geometry.faceUvs[ i ] = [];
 				geometry.faceVertexUvs[ i ] = [];
 
 			}
@@ -185,14 +184,13 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			isQuad              = isBitSet( type, 0 );
 			hasMaterial         = isBitSet( type, 1 );
-			hasFaceUv           = isBitSet( type, 2 );
 			hasFaceVertexUv     = isBitSet( type, 3 );
 			hasFaceNormal       = isBitSet( type, 4 );
 			hasFaceVertexNormal = isBitSet( type, 5 );
 			hasFaceColor	    = isBitSet( type, 6 );
 			hasFaceVertexColor  = isBitSet( type, 7 );
 
-			//console.log("type", type, "bits", isQuad, hasMaterial, hasFaceUv, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
+			// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
 			if ( isQuad ) {
 
@@ -227,23 +225,6 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 			// to get face <=> uv index correspondence
 
 			fi = geometry.faces.length;
-
-			if ( hasFaceUv ) {
-
-				for ( i = 0; i < nUvLayers; i++ ) {
-
-					uvLayer = json.uvs[ i ];
-
-					uvIndex = faces[ offset ++ ];
-
-					u = uvLayer[ uvIndex * 2 ];
-					v = uvLayer[ uvIndex * 2 + 1 ];
-
-					geometry.faceUvs[ i ][ fi ] = new THREE.Vector2( u, v );
-
-				}
-
-			}
 
 			if ( hasFaceVertexUv ) {
 

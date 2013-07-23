@@ -344,14 +344,7 @@ THREE.GeometryUtils = {
 		var i, il, j, jl;
 
 		var faces = [];
-		var faceUvs = [];
 		var faceVertexUvs = [];
-
-		for ( i = 0, il = geometry.faceUvs.length; i < il; i ++ ) {
-
-			faceUvs[ i ] = [];
-
-		}
 
 		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
@@ -365,12 +358,6 @@ THREE.GeometryUtils = {
 
 			faces.push( face );
 
-			for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-				faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
-
-			}
-
 			for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
 				faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
@@ -380,7 +367,6 @@ THREE.GeometryUtils = {
 		}
 
 		geometry.faces = faces;
-		geometry.faceUvs = faceUvs;
 		geometry.faceVertexUvs = faceVertexUvs;
 
 		geometry.computeCentroids();

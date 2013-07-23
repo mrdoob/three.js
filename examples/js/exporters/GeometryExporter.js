@@ -41,7 +41,7 @@ THREE.GeometryExporter.prototype = {
 
 			var isTriangle = face instanceof THREE.Face3;
 			var hasMaterial = false; // face.materialIndex !== undefined;
-			var hasFaceUv = false; // geometry.faceUvs[ 0 ].length > 0;
+			var hasFaceUv = false; // deprecated
 			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ].length > 0;
 			var hasFaceNormal = face.normal.length() > 0;
 			var hasFaceVertexNormal = face.vertexNormals.length > 0;
@@ -75,13 +75,6 @@ THREE.GeometryExporter.prototype = {
 			if ( hasMaterial ) {
 
 				faces.push( face.materialIndex );
-
-			}
-
-			if ( hasFaceUv ) {
-
-				var uv = geometry.faceUvs[ 0 ][ i ];
-				uvs[ 0 ].push( uv.u, uv.v );
 
 			}
 			*/
