@@ -198,43 +198,15 @@
 
 					if ( material === undefined ) continue;
 
-					var interPoint;
+					a = vertices[ face.a ];
+					b = vertices[ face.b ];
+					c = vertices[ face.c ];
+					
+					var interPoint = THREE.Triangle.intersectionRay( localRay, a, b, c, material.side !== THREE.DoubleSide );
 
-					if ( face instanceof THREE.Face3 ) {
+					if ( !interPoint ) {
 
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
-						interPoint = THREE.Triangle.intersectionRay( localRay, a, b, c, material.side !== THREE.DoubleSide );
-
-						if ( !interPoint ) {
-
-							continue;
-
-						}
-
-					} else if ( face instanceof THREE.Face4 ) {
-
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
-						d = vertices[ face.d ];
-						interPoint = THREE.Triangle.intersectionRay( localRay, a, b, d, material.side !== THREE.DoubleSide );
-
-						if( !interPoint ) {
-
-						 interPoint = THREE.Triangle.intersectionRay( localRay, b, c, d, material.side !== THREE.DoubleSide  );
-
-						 if( !interPoint ) continue;
-
-						}
-
-					} else {
-
-						// This is added because if we call out of this if/else group when
-						// none of the cases match it will add a point to the intersection
-						// list erroneously.
-						throw Error( "face type not supported" );
+						continue;
 
 					}
 
