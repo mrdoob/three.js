@@ -74,6 +74,17 @@ THREE.MaterialExporter.prototype = {
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
 
+		} else if ( material instanceof THREE.MeshFaceMaterial ) {
+
+			output.type = 'MeshFaceMaterial';
+			output.materials = [];
+
+			for ( var i = 0, l = material.materials.length; i < l; i ++ ) {
+
+				output.materials.push( this.parse( material.materials[ i ] ) );
+
+			}
+
 		}
 
 		return output;
