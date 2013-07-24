@@ -11080,6 +11080,16 @@ THREE.MaterialLoader.prototype = {
 		if ( json.transparent !== undefined ) material.transparent = json.transparent;
 		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 
+		if ( json.materials !== undefined ) {
+
+			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
+
+				material.materials.push( this.parse( json.materials[ i ] ) );
+
+			}
+
+		}
+
 		return material;
 
 	}
