@@ -8,7 +8,6 @@
 	</head>
 	<body>
 		<script src="../../build/three.js"></script>
-		<script src="../shared/js/libs/stats.min.js"></script>
 		<script src="../shared/s3age/s3age.js"></script>
 
 		<script>
@@ -18,30 +17,33 @@
 				 * particle system will be drawn over the last draw, leaving the old pixels in place.
 				 */
 				renderer: {
-					preserveDrawingBuffer: true
+					// The secret to the trails - by not clearing the drawing buffer, each particle gets drawn every frame
+					preserveDrawingBuffer: true,
+					// The other property to enable overdraw.
+					autoClearColor: false,
+
+					// A performance optimization
+					// Since there are a lot of points, and every point gets drawn,
+					// it's not important to sort them into depth order.
+					sortObjects: false
 				},
-				camera: {
-					fov:  60,
-					near: 1,
-					far:  10000
+				camera: { fov:  60, near: 1, far:  10000,
+					// The mouse starts at <0, 0>, so the large X value will
+					// cause the camera to start by spinning to the rest position
+					position: [100000, 0, 3200]
+				},
+				controls: Controls(),
+				scene: {
+					children: [
+						Particles()
+					]
 				}
 			});
-
-			// The other property to enable overdraw.
-			stage.renderer.autoClearColor = false;
-			// A performance optimization
-			// Since there are a lot of points, and every point gets drawn,
-			// it's not important to sort them into depth order.
-			stage.renderer.sortObjects = false;
-
-			particleSystem();
-			controls();
-			stats();
 
 			/**
 			 * Create a couple thousand points of a half-dozen colors.
 			 */
-			function particleSystem() {
+			function Particles() {
 				var colors = [ 0x000000, 0xff0080, 0x8000ff, 0xffffff ];
 				var geometry = new THREE.Geometry();
 
@@ -68,44 +70,36 @@
 				});
 
 				var mesh = new THREE.ParticleSystem( geometry, material );
-				stage.scene.add( mesh );
+				return mesh;
 			}
 
-			function stats() {
-				var stats = stage.stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				document.body.appendChild( stats.domElement );
-			}
-
-			function controls() {
+			function Controls() {
 				var mouseX = 0, mouseY = 0;
-				var windowHalfX = window.innerWidth / 2;
-				var windowHalfY = window.innerHeight / 2;
-
-				var camera = stage.camera;
-				// The mouse starts at <0, 0>, so the large X value will
-				// cause the camera to start by spinning to the rest position
-				camera.position.set( 100000, 0, 3200 );
-				// Minimum for controls is an update function. Called every render frame.
-				stage.controls = {
-					update: function(){
-						// Move the camera towards the mouse, with some damping.
-						camera.position.x += ( mouseX - camera.position.x ) * .05;
-						camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-						// Keep the camera pointed at the center of the scene
-						camera.lookAt( stage.scene.position );
-					}
-				};
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				function onDocumentMouseMove(event) {
+					var windowHalfX = window.innerWidth / 2;
+					var windowHalfY = window.innerHeight / 2;
+
 					// Use the center of the screen, instead of top-left, then scale by 10.
 					mouseX = ( event.clientX - windowHalfX ) * 10;
 					mouseY = ( event.clientY - windowHalfY ) * 10;
 				}
+
+				// Minimum for controls is an update function. Called every render frame.
+				return {
+					update: function(){
+						if(stage){ // Make sure the stage's finished loading.
+							var camera = stage.camera;
+							// Move the camera towards the mouse, with some damping.
+							camera.position.x += ( mouseX - camera.position.x ) * .05;
+							camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+							// Keep the camera pointed at the center of the scene
+							camera.lookAt( stage.scene.position );
+						}
+					}
+				};
 			}
 
 		</script>
