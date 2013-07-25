@@ -15,25 +15,17 @@ THREE.BufferGeometryUtils = {
 		var vertexColors = settings.vertexColors;
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
 
-		var triangles = 0;
-
-		for ( var i = 0; i < faces.length; i ++ ) {
-
-			triangles += faces[ i ] instanceof THREE.Face3 ? 1 : 2;
-
-		}
-
 		var bufferGeometry = new THREE.BufferGeometry();
 
 		bufferGeometry.attributes = {
 
 			position: {
 				itemSize: 3,
-				array: new Float32Array( triangles * 3 * 3 )
+				array: new Float32Array( faces.length * 3 * 3 )
 			},
 			normal: {
 				itemSize: 3,
-				array: new Float32Array( triangles * 3 * 3 )
+				array: new Float32Array( faces.length * 3 * 3 )
 			}
 
 		}
@@ -45,7 +37,7 @@ THREE.BufferGeometryUtils = {
 
 			bufferGeometry.attributes.color = {
 				itemSize: 3,
-				array: new Float32Array( triangles * 3 * 3 )
+				array: new Float32Array( faces.length * 3 * 3 )
 			};
 
 			var colors = bufferGeometry.attributes.color.array;
@@ -56,7 +48,7 @@ THREE.BufferGeometryUtils = {
 
 			bufferGeometry.attributes.uv = {
 				itemSize: 2,
-				array: new Float32Array( triangles * 3 * 2 )
+				array: new Float32Array( faces.length * 3 * 2 )
 			};
 
 			var uvs = bufferGeometry.attributes.uv.array;
