@@ -39,106 +39,6 @@
 		<script src="../../shared/s3age/s3age.js"></script>
 
 		<script>
-			var stage = new S3age("#container", {
-				autostart: false, // Not starting until the Knight has loaded.
-				exposed: true,
-				camera: { fov: 20, near: 1, far: 10000 },
-				render: {
-					setClearColor: 0xcce0ff,
-					gammaInput: true,
-					gammaOutput: true,
-					physicallyBasedShading: true,
-					shadowMapEnabled: true
-				},
-				scene: {
-					fog: new THREE.Fog( 0xcce0ff, 500, 10000 ),
-					lights: [
-						new THREE.AmbientLight( 0x222222 ),
-						shadowlight(),
-						spotlight()
-					],
-					children: [
-						Ground()
-					]
-				},
-				controls: {
-					// TODO Abstract this control type into the S3age controls classes.
-					// Half-orbit controls. Revolve the camera between the "sides" of the
-					// screen at "eye-level"
-					center: new THREE.Vector3(0, 350, 0),
-					update: (function(){
-						var mouseX = 0, mouseY = 0;
-						document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-						function onDocumentMouseMove( event ) {
-							mouseX = ( event.clientX - (document.width  / 2) );
-							mouseY = ( event.clientY - (document.height / 2) );
-						}
-						var base = new THREE.Vector3(0, 350, 3500);
-						return function(){
-							var camera = stage.camera;
-							var position = camera.position;
-							base.x += ( mouseX - base.x ) * .05;
-							base.y = THREE.Math.clamp( base.y + ( - mouseY - base.y ) * .05, 0, 1000 );
-							position.set(base.x, base.y + stage.controls.center.y, base.z);
-							camera.lookAt( stage.controls.center );
-						};
-					}())
-				}
-			});
-
-			//TODO figure out why shadows aren't falling.
-			function shadowlight(){
-				var light;
-
-				light = new THREE.DirectionalLight( 0xdfebff, 1.75 );
-				light.position.set( 50, 200, 100 );
-				light.position.multiplyScalar( 1.3 );
-
-				light.castShadow = true;
-
-				light.shadowMapHeight = light.shadowMapWidth = 2048;
-
-				var d = 300;
-				light.shadowCameraLeft = light.shadowCameraBottom = -d;
-				light.shadowCameraRight = light.shadowCameraTop = d;
-
-				light.shadowCameraFar = 1000;
-				light.shadowDarkness = 0.5;
-
-				return light;
-			}
-
-			/**
-			 * Soft green light from the bottom, provides "reflection" of the grass
-			 */
-			function spotlight(){
-				var light = new THREE.DirectionalLight( 0x497f13, 1 );
-				light.position.set( 0, -1, 0 );
-				return light;
-			}
-
-			/**
-			 * Grassy knoll
-			 */
-			function Ground() {
-				var initColor = new THREE.Color( 0x497f13 );
-				var initTexture = THREE.ImageUtils.generateDataTexture( 1, 1, initColor );
-
-				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: initTexture } );
-
-				var groundTexture = THREE.ImageUtils.loadTexture( "../../shared/textures/terrain/grasslight-big.jpg", undefined, function() { groundMaterial.map = groundTexture } );
-				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-				groundTexture.repeat.set( 25, 25 );
-				groundTexture.anisotropy = 16;
-
-				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000 ), groundMaterial );
-				//TODO make terrain "fall off" around the center.
-				mesh.rotation.x = - Math.PI / 2;
-				mesh.receiveShadow = true;
-				return mesh;
-			}
-
-
 			/**
 			 * A knight in shiny armor.
 			 *
@@ -154,13 +54,12 @@
 					self.initialize( geometry, materials);
 					stage.start(); // Let the stage know when the knight's been loaded.
 				} );
-				this.scale.set(60, 60, 60);
+				this.scale.set(50, 50, 50);
 			}
 			Knight.prototype = Object.create(THREE.Object3D.prototype);
 
 			Knight.prototype.initialize = function( geometry, materials) {
 				ensureLoop( geometry.animation );
-
 
 				THREE.AnimationHandler.add( geometry.animation );
 
@@ -202,7 +101,8 @@
 
 				// update morphs
 				if ( this.mesh ) {
-					var time = clock.elapsed;
+					// TODO Figure out morphs...
+					var time = clock.elapsed * 0.001;
 
 					// mouth
 					mesh.morphTargetInfluences[ 1 ] = ( 1 + Math.sin( 4 * time ) ) / 2;
@@ -215,6 +115,9 @@
 				}
 			};
 
+			/**
+			 * Utility to connect ends of an animation, so it lines up correctly.
+			 */
 			function ensureLoop( animation ) {
 				for ( var i = 0; i < animation.hierarchy.length; i ++ ) {
 
@@ -229,8 +132,108 @@
 
 				}
 			}
+		</script>
 
-			stage.scene.add(new Knight());
+		<script type="text/javascript">
+			var stage = new S3age("#container", {
+				autostart: false, // Not starting until the Knight has loaded.
+				exposed: true,
+				camera: { fov: 20, near: 1, far: 10000 },
+				renderer: {
+					setClearColor: 0xcce0ff,
+					gammaInput: true,
+					gammaOutput: true,
+					physicallyBasedShading: true,
+					shadowMapEnabled: true
+				},
+				scene: {
+					fog: new THREE.Fog( 0xcce0ff, 500, 10000 ),
+					lights: [
+						new THREE.AmbientLight( 0x222222 ),
+						shadowlight(),
+						spotlight()
+					],
+					children: [
+						Ground(),
+						new Knight()
+					]
+				},
+				controls: {
+					// TODO Abstract this control type into the S3age controls classes.
+					// Half-orbit controls. Revolve the camera between the "sides" of the
+					// screen at "eye-level"
+					center: new THREE.Vector3(0, 350, 0),
+					update: (function(){
+						var mouseX = 0, mouseY = 0;
+						document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+						function onDocumentMouseMove( event ) {
+							mouseX = ( event.clientX - (document.width  / 2) );
+							mouseY = ( event.clientY - (document.height / 2) );
+						}
+						var base = new THREE.Vector3(0, 350, 3500);
+						return function(){
+							var camera = stage.camera;
+							var position = camera.position;
+							base.x += ( mouseX - base.x ) * .05;
+							base.y = THREE.Math.clamp( base.y + ( - mouseY - base.y ) * .05, 0, 1000 );
+							position.set(base.x, base.y + stage.controls.center.y, base.z);
+							camera.lookAt( stage.controls.center );
+						};
+					}())
+				}
+			});
+
+			/**
+			 * "Lightbulb" at about chest-level on the knight.
+			 */
+			function shadowlight(){
+				var light = new THREE.DirectionalLight( 0xebf3ff, 1.6 );
+				light.position.set( 0, 350, 500 ).multiplyScalar( 1.1 );
+
+				light.castShadow = true;
+
+				light.shadowMapHeight = light.shadowMapWidth = 2048;
+
+				var d = 400;
+				light.shadowCameraLeft = -d * 1.5;
+				light.shadowCameraRight = d * 1.5;
+				light.shadowCameraTop = d * 2.5;
+				light.shadowCameraBottom = -d;
+
+				light.shadowCameraFar = 2000;
+
+				return light;
+			}
+
+			/**
+			 * Soft green light from the bottom, provides "reflection" of the grass
+			 */
+			function spotlight(){
+				var light = new THREE.DirectionalLight( 0x497f13, 1 );
+				light.position.set( 0, 1, 0 );
+				return light;
+			}
+
+			/**
+			 * Grassy knoll
+			 */
+			function Ground() {
+				var initColor = new THREE.Color( 0x497f13 );
+				var initTexture = THREE.ImageUtils.generateDataTexture( 1, 1, initColor );
+
+				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: initTexture } );
+
+				var groundTexture = THREE.ImageUtils.loadTexture( "../../shared/textures/terrain/grasslight-big.jpg", undefined, function() { groundMaterial.map = groundTexture } );
+				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+				groundTexture.repeat.set( 25, 25 );
+				groundTexture.anisotropy = 16;
+
+				var mesh = new THREE.Mesh( new THREE.PlaneGeometry( 20000, 20000 ), groundMaterial );
+				//TODO make terrain "fall off" around the center.
+				mesh.rotation.x = - Math.PI / 2;
+				mesh.receiveShadow = true;
+				return mesh;
+			}
 		</script>
 	</body>
 </html>
