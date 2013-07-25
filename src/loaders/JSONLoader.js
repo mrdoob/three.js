@@ -119,7 +119,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		var i, j, fi,
 
-		offset, zLength, nVertices,
+		offset, zLength,
 
 		colorIndex, normalIndex, uvIndex, materialIndex,
 
@@ -130,9 +130,9 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
 
-		vertex, face, color, normal,
+		vertex, face, faceA, faceB, color, hex, normal,
 
-		uvLayer, uvs, u, v,
+		uvLayer, uv, u, v,
 
 		faces = json.faces,
 		vertices = json.vertices,
@@ -194,114 +194,216 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			if ( isQuad ) {
 
-				face = new THREE.Face4();
+				faceA = new THREE.Face3();
+				faceA.a = faces[ offset ];
+				faceA.b = faces[ offset + 1 ];
+				faceA.c = faces[ offset + 3 ];
 
-				face.a = faces[ offset ++ ];
-				face.b = faces[ offset ++ ];
-				face.c = faces[ offset ++ ];
-				face.d = faces[ offset ++ ];
+				faceB = new THREE.Face3();
+				faceB.a = faces[ offset + 1 ];
+				faceB.b = faces[ offset + 2 ];
+				faceB.c = faces[ offset + 3 ];
 
-				nVertices = 4;
+				offset += 4;
 
-			} else {
+				if ( hasMaterial ) {
 
-				face = new THREE.Face3();
-
-				face.a = faces[ offset ++ ];
-				face.b = faces[ offset ++ ];
-				face.c = faces[ offset ++ ];
-
-				nVertices = 3;
-
-			}
-
-			if ( hasMaterial ) {
-
-				materialIndex = faces[ offset ++ ];
-				face.materialIndex = materialIndex;
-
-			}
-
-			// to get face <=> uv index correspondence
-
-			fi = geometry.faces.length;
-
-			if ( hasFaceVertexUv ) {
-
-				for ( i = 0; i < nUvLayers; i++ ) {
-
-					uvLayer = json.uvs[ i ];
-
-					uvs = [];
-
-					for ( j = 0; j < nVertices; j ++ ) {
-
-						uvIndex = faces[ offset ++ ];
-
-						u = uvLayer[ uvIndex * 2 ];
-						v = uvLayer[ uvIndex * 2 + 1 ];
-
-						uvs[ j ] = new THREE.Vector2( u, v );
-
-					}
-
-					geometry.faceVertexUvs[ i ][ fi ] = uvs;
+					materialIndex = faces[ offset ++ ];
+					faceA.materialIndex = materialIndex;
+					faceB.materialIndex = materialIndex;
 
 				}
 
-			}
+				// to get face <=> uv index correspondence
 
-			if ( hasFaceNormal ) {
+				fi = geometry.faces.length;
 
-				normalIndex = faces[ offset ++ ] * 3;
+				if ( hasFaceVertexUv ) {
 
-				face.normal.set(
-					normals[ normalIndex ++ ],
-					normals[ normalIndex ++ ],
-					normals[ normalIndex ]
-				);
+					for ( i = 0; i < nUvLayers; i++ ) {
 
-			}
+						uvLayer = json.uvs[ i ];
 
-			if ( hasFaceVertexNormal ) {
+						geometry.faceVertexUvs[ i ][ fi ] = [];
+						geometry.faceVertexUvs[ i ][ fi + 1 ] = []
 
-				for ( i = 0; i < nVertices; i++ ) {
+						for ( j = 0; j < 4; j ++ ) {
+
+							uvIndex = faces[ offset ++ ];
+
+							u = uvLayer[ uvIndex * 2 ];
+							v = uvLayer[ uvIndex * 2 + 1 ];
+
+							uv = new THREE.Vector2( u, v );
+
+							if ( j !== 2 ) geometry.faceVertexUvs[ i ][ fi ].push( uv );
+							if ( j !== 0 ) geometry.faceVertexUvs[ i ][ fi + 1 ].push( uv );
+
+						}
+
+					}
+
+				}
+
+				if ( hasFaceNormal ) {
 
 					normalIndex = faces[ offset ++ ] * 3;
 
-					normal = new THREE.Vector3(
+					faceA.normal.set(
 						normals[ normalIndex ++ ],
 						normals[ normalIndex ++ ],
 						normals[ normalIndex ]
 					);
 
-					face.vertexNormals.push( normal );
+					faceB.normal.copy( faceA.normal );
 
 				}
 
-			}
+				if ( hasFaceVertexNormal ) {
+
+					for ( i = 0; i < 4; i++ ) {
+
+						normalIndex = faces[ offset ++ ] * 3;
+
+						normal = new THREE.Vector3(
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ]
+						);
 
 
-			if ( hasFaceColor ) {
+						if ( i !== 2 ) faceA.vertexNormals.push( normal );
+						if ( i !== 0 ) faceB.vertexNormals.push( normal );
 
-				colorIndex = faces[ offset ++ ];
-				face.color.setHex( colors[ colorIndex ] );
+					}
 
-			}
+				}
 
 
-			if ( hasFaceVertexColor ) {
-
-				for ( i = 0; i < nVertices; i++ ) {
+				if ( hasFaceColor ) {
 
 					colorIndex = faces[ offset ++ ];
-					face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
+					hex = colors[ colorIndex ];
+
+					faceA.color.setHex( hex );
+					faceB.color.setHex( hex );
 
 				}
 
-			}
 
-			geometry.faces.push( face );
+				if ( hasFaceVertexColor ) {
+
+					for ( i = 0; i < 4; i++ ) {
+
+						colorIndex = faces[ offset ++ ];
+						hex = colors[ colorIndex ];
+
+						if ( i !== 2 ) faceA.vertexColors.push( new THREE.Color( hex ) );
+						if ( i !== 0 ) faceB.vertexColors.push( new THREE.Color( hex ) );
+
+					}
+
+				}
+
+				geometry.faces.push( faceA );
+				geometry.faces.push( faceB );
+
+			} else {
+
+				face = new THREE.Face3();
+				face.a = faces[ offset ++ ];
+				face.b = faces[ offset ++ ];
+				face.c = faces[ offset ++ ];
+
+				if ( hasMaterial ) {
+
+					materialIndex = faces[ offset ++ ];
+					face.materialIndex = materialIndex;
+
+				}
+
+				// to get face <=> uv index correspondence
+
+				fi = geometry.faces.length;
+
+				if ( hasFaceVertexUv ) {
+
+					for ( i = 0; i < nUvLayers; i++ ) {
+
+						uvLayer = json.uvs[ i ];
+
+						geometry.faceVertexUvs[ i ][ fi ] = [];
+
+						for ( j = 0; j < 3; j ++ ) {
+
+							uvIndex = faces[ offset ++ ];
+
+							u = uvLayer[ uvIndex * 2 ];
+							v = uvLayer[ uvIndex * 2 + 1 ];
+
+							uv = new THREE.Vector2( u, v );
+
+							geometry.faceVertexUvs[ i ][ fi ].push( uv );
+
+						}
+
+					}
+
+				}
+
+				if ( hasFaceNormal ) {
+
+					normalIndex = faces[ offset ++ ] * 3;
+
+					face.normal.set(
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ]
+					);
+
+				}
+
+				if ( hasFaceVertexNormal ) {
+
+					for ( i = 0; i < 3; i++ ) {
+
+						normalIndex = faces[ offset ++ ] * 3;
+
+						normal = new THREE.Vector3(
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ]
+						);
+
+						face.vertexNormals.push( normal );
+
+					}
+
+				}
+
+
+				if ( hasFaceColor ) {
+
+					colorIndex = faces[ offset ++ ];
+					face.color.setHex( colors[ colorIndex ] );
+
+				}
+
+
+				if ( hasFaceVertexColor ) {
+
+					for ( i = 0; i < 3; i++ ) {
+
+						colorIndex = faces[ offset ++ ];
+						face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
+
+					}
+
+				}
+
+				geometry.faces.push( face );
+
+			}
 
 		}
 
