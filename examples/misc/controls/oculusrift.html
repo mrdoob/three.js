@@ -33,11 +33,11 @@
 			(left click: forward, a/s/w/d/r/f: move, h: hide text)
 		</div>
 
-		<script src="../build/three.min.js"></script>
-		<script src="js/ImprovedNoise.js"></script>
-		<script src="js/effects/OculusRiftEffect.js"></script>
-		<script src="js/controls/FirstPersonControls.js"></script>
-		<script src="js/controls/OculusControls.js"></script>
+		<script src="/build/three.min.js"></script>
+		<script src="/examples/shared/js/ImprovedNoise.js"></script>
+		<script src="/examples/shared/js/effects/OculusRiftEffect.js"></script>
+		<script src="/examples/shared/js/controls/FirstPersonControls.js"></script>
+		<script src="/examples/shared/js/controls/OculusControls.js"></script>
 
 		<script>
 
@@ -94,7 +94,7 @@
 
 				var geometry = new THREE.CubeGeometry( 100, 100, 200 );
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif' );
+				var texture = THREE.ImageUtils.loadTexture( '/examples/shared/textures/crate.gif' );
 				texture.anisotropy = renderer.getMaxAnisotropy();
 
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 20, shading: THREE.FlatShading, map: texture } );

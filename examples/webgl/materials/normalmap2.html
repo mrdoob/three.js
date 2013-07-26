@@ -52,20 +52,20 @@
 			</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
-		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/ColorCorrectionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="/examples/shared/js/shaders/BleachBypassShader.js"></script>
+		<script src="/examples/shared/js/shaders/ColorCorrectionShader.js"></script>
+		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
+		<script src="/examples/shared/js/shaders/FXAAShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
 
 
 		<script>
@@ -125,11 +125,11 @@
 				var shader = THREE.ShaderLib[ "normalmap" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniforms[ "uNormalScale" ].value.set( 0.8, 0.8 );
 
-				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-				uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-SPEC.jpg" );
+				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Map-COL.jpg" );
+				uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Map-SPEC.jpg" );
 
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;
@@ -151,7 +151,7 @@
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
+				loader.load( "/examples/shared/obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createScene( geometry, 100, material ) } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x111111, clearAlpha: 1 } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

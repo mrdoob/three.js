@@ -6,16 +6,16 @@
 	"type"          : "scene",
 	"sourceFile"    : "scene.blend",
 	"generatedBy"   : "Blender 2.65 Exporter",
-	"objects"       : 29,
+	"/examples/shared/objects"       : 29,
 	"geometries"    : 3,
 	"materials"     : 3,
-	"textures"      : 0
+	"/examples/shared/textures"      : 0
 },
 
 "urlBaseType" : "relativeToScene",
 
 
-"objects" :
+"/examples/shared/objects" :
 {
 	"Cube.006" : {
 		"geometry"  : "geo_Cube",

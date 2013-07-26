@@ -37,10 +37,10 @@
 			based on <a href="http://spidergl.org/example.php?id=13" target="_blank">SpiderGL</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<!-- HDR fragment shader -->
 
@@ -126,7 +126,7 @@
 
 				scene = new THREE.Scene();
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/memorial.png" );
+				var texture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/memorial.png" );
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.NearestFilter;
 

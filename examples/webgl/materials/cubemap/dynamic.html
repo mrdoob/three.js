@@ -57,30 +57,30 @@
 			</div>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="/examples/shared/js/loaders/BinaryLoader.js"></script>
 
-		<script src="js/shaders/BleachBypassShader.js"></script>
-		<script src="js/shaders/BlendShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
-		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
-		<script src="js/shaders/TriangleBlurShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
+		<script src="/examples/shared/js/shaders/BleachBypassShader.js"></script>
+		<script src="/examples/shared/js/shaders/BlendShader.js"></script>
+		<script src="/examples/shared/js/shaders/ConvolutionShader.js"></script>
+		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
+		<script src="/examples/shared/js/shaders/FXAAShader.js"></script>
+		<script src="/examples/shared/js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="/examples/shared/js/shaders/VerticalTiltShiftShader.js"></script>
+		<script src="/examples/shared/js/shaders/TriangleBlurShader.js"></script>
+		<script src="/examples/shared/js/shaders/VignetteShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/SavePass.js"></script>
+		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/BloomPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/SavePass.js"></script>
 
-		<script src="js/Car.js"></script>
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Car.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -255,8 +255,8 @@
 
 				// FLARES
 
-				flareA = THREE.ImageUtils.loadTexture( "textures/lensflare2.jpg" );
-				flareB = THREE.ImageUtils.loadTexture( "textures/lensflare0.png" );
+				flareA = THREE.ImageUtils.loadTexture( "/examples/shared/textures/lensflare2.jpg" );
+				flareB = THREE.ImageUtils.loadTexture( "/examples/shared/textures/lensflare0.png" );
 
 				// CARS - VEYRON
 
@@ -324,7 +324,7 @@
 
 				};
 
-				veyron.loadPartsBinary( "obj/veyron/parts/veyron_body_bin.js", "obj/veyron/parts/veyron_wheel_bin.js" );
+				veyron.loadPartsBinary( "/examples/shared/obj/veyron/parts/veyron_body_bin.js", "/examples/shared/obj/veyron/parts/veyron_wheel_bin.js" );
 
 				// CARS - GALLARDO
 
@@ -393,7 +393,7 @@
 
 				};
 
-				gallardo.loadPartsBinary( "obj/gallardo/parts/gallardo_body_bin.js", "obj/gallardo/parts/gallardo_wheel_bin.js" );
+				gallardo.loadPartsBinary( "/examples/shared/obj/gallardo/parts/gallardo_body_bin.js", "/examples/shared/obj/gallardo/parts/gallardo_wheel_bin.js" );
 
 				//
 
@@ -517,7 +517,7 @@
 
 				// GROUND
 
-				var texture = THREE.ImageUtils.loadTexture( "textures/cube/Park3Med/ny.jpg" );
+				var texture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/cube/Park3Med/ny.jpg" );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.repeat.set( 50, 50 );
 

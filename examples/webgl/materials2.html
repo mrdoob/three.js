@@ -15,10 +15,10 @@
 	</head>
 	<body>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -44,11 +44,11 @@
 
 				// Materials
 
-				var imgTexture2 = THREE.ImageUtils.loadTexture( "textures/planets/moon_1024.jpg" );
+				var imgTexture2 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/planets/moon_1024.jpg" );
 				imgTexture2.wrapS = imgTexture2.wrapT = THREE.RepeatWrapping;
 				imgTexture2.anisotropy = 16;
 
-				var imgTexture = THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" );
+				var imgTexture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/lava/lavatile.jpg" );
 				imgTexture.repeat.set( 4, 2 );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 				imgTexture.anisotropy = 16;

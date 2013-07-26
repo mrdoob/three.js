@@ -31,10 +31,10 @@
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - custom attributes example - particles - billboards</div>
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -109,7 +109,7 @@
 
 				amplitude: { type: "f", value: 1.0 },
 				color:     { type: "c", value: new THREE.Color( 0xffffff ) },
-				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "textures/sprites/disc.png" ) },
+				texture:   { type: "t", value: THREE.ImageUtils.loadTexture( "/examples/shared/textures/sprites/disc.png" ) },
 
 			};
 

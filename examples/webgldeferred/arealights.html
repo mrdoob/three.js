@@ -44,25 +44,25 @@
 		</div>
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="/examples/shared/js/loaders/BinaryLoader.js"></script>
 
-		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
-		<script src="js/ShaderDeferred.js"></script>
+		<script src="/examples/shared/js/renderers/WebGLDeferredRenderer.js"></script>
+		<script src="/examples/shared/js/ShaderDeferred.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/ConvolutionShader.js"></script>
+		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
+		<script src="/examples/shared/js/shaders/FXAAShader.js"></script>
+		<script src="/examples/shared/js/shaders/ConvolutionShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/BloomPass.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -242,7 +242,7 @@
 			function initObjects() {
 
 				var loader = new THREE.BinaryLoader();
-				loader.load( "obj/box/box.js", function ( geometry, materials ) {
+				loader.load( "/examples/shared/obj/box/box.js", function ( geometry, materials ) {
 
 					var material = new THREE.MeshPhongMaterial( { color: 0xffaa55, specular: 0x888888, shininess: 200 } );
 					var object = new THREE.Mesh( geometry, material );
@@ -253,9 +253,9 @@
 
 				/*
 				var loader = new THREE.BinaryLoader();
-				loader.load( "obj/veyron/VeyronNoUv_bin.js", function ( geometry ) {
+				loader.load( "/examples/shared/obj/veyron/VeyronNoUv_bin.js", function ( geometry ) {
 
-					var r = "textures/cube/Bridge2/";
+					var r = "/examples/shared/textures/cube/Bridge2/";
 					var urls = [
 						r + "posx.jpg", r + "negx.jpg",
 						r + "posy.jpg", r + "negy.jpg",

@@ -34,10 +34,10 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - io blender - vertex colors</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -72,8 +72,8 @@
 
 				var loader = new THREE.JSONLoader();
 
-				loader.load( "obj/cubecolors/cubecolors.js", createScene1 );
-				loader.load( "obj/cubecolors/cube_fvc.js", createScene2 );
+				loader.load( "/examples/shared/obj/cubecolors/cubecolors.js", createScene1 );
+				loader.load( "/examples/shared/obj/cubecolors/cube_fvc.js", createScene2 );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );

@@ -39,29 +39,29 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - webgl physically based shading testbed
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
-		<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
-		<script src="js/shaders/VerticalTiltShiftShader.js"></script>
-		<script src="js/shaders/VignetteShader.js"></script>
+		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
+		<script src="/examples/shared/js/shaders/FXAAShader.js"></script>
+		<script src="/examples/shared/js/shaders/HorizontalTiltShiftShader.js"></script>
+		<script src="/examples/shared/js/shaders/VerticalTiltShiftShader.js"></script>
+		<script src="/examples/shared/js/shaders/VignetteShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/BloomPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/SavePass.js"></script>
+		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/BloomPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/SavePass.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
 
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/tween.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/libs/tween.min.js"></script>
 
-		<script src='js/libs/dat.gui.min.js'></script>
+		<script src='/examples/shared/js/libs/dat.gui.min.js'></script>
 
 
 		<script>
@@ -151,25 +151,25 @@
 				texturePattern.repeat.set( 1000, 1000 );
 				texturePattern.format = THREE.RGBFormat;
 
-				var textureSquares = THREE.ImageUtils.loadTexture( "textures/patterns/bright_squares256.png" );
+				var textureSquares = THREE.ImageUtils.loadTexture( "/examples/shared/textures/patterns/bright_squares256.png" );
 				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
 				textureSquares.format = THREE.RGBFormat;
 
-				var textureNoiseColor = THREE.ImageUtils.loadTexture( "textures/disturb.jpg" );
+				var textureNoiseColor = THREE.ImageUtils.loadTexture( "/examples/shared/textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
 				textureNoiseColor.format = THREE.RGBFormat;
 
-				var textureLava = THREE.ImageUtils.loadTexture( "textures/lava/lavatile.jpg" );
+				var textureLava = THREE.ImageUtils.loadTexture( "/examples/shared/textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.format = THREE.RGBFormat;
 
 				//
 
-				var path = "textures/cube/SwedishRoyalCastle/";
+				var path = "/examples/shared/textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
 						path + 'px' + format, path + 'nx' + format,
@@ -274,7 +274,7 @@
 
 				var loader = new THREE.JSONLoader();
 
-				loader.load( "models/animated/sittingBox.js", function( geometry ) {
+				loader.load( "/examples/shared/models/animated/sittingBox.js", function( geometry ) {
 
 					var morphMaterial = new THREE.MeshPhongMaterial( { ambient: 0x000000, color: 0x000000, specular: 0xff9900, shininess: 50, morphTargets: true, morphNormals: true, side: THREE.DoubleSide } );
 					morphMaterial.shading = THREE.FlatShading;

@@ -44,16 +44,16 @@
 		skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
 
-		<script src="js/loaders/ctm/lzma.js"></script>
-		<script src="js/loaders/ctm/ctm.js"></script>
-		<script src="js/loaders/ctm/CTMLoader.js"></script>
+		<script src="/examples/shared/js/loaders/ctm/lzma.js"></script>
+		<script src="/examples/shared/js/loaders/ctm/ctm.js"></script>
+		<script src="/examples/shared/js/loaders/ctm/CTMLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -106,7 +106,7 @@
 				cameraCube = new THREE.PerspectiveCamera( 25, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 10000 );
 				sceneCube.add( cameraCube );
 
-				var r = "textures/cube/pisa/";
+				var r = "/examples/shared/textures/cube/pisa/";
 				var urls = [ r + "px.png", r + "nx.png",
 							 r + "py.png", r + "ny.png",
 							 r + "pz.png", r + "nz.png" ];
@@ -182,7 +182,7 @@
 				var position = new THREE.Vector3( -105, -78, -40 );
 				var scale = new THREE.Vector3( 30, 30, 30 );
 
-				loaderCTM.loadParts( "models/ctm/camaro/camaro.js", function( geometries, materials ) {
+				loaderCTM.loadParts( "/examples/shared/models/ctm/camaro/camaro.js", function( geometries, materials ) {
 
 					hackMaterials( materials );
 

@@ -45,24 +45,24 @@
 		</div>
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
-		<!-- <script src="js/loaders/UTF8Loader.js"></script> -->
+		<script src="/examples/shared/js/loaders/BinaryLoader.js"></script>
+		<!-- <script src="/examples/shared/js/loaders/UTF8Loader.js"></script> -->
 
-		<script src="js/renderers/WebGLDeferredRenderer.js"></script>
-		<script src="js/ShaderDeferred.js"></script>
+		<script src="/examples/shared/js/renderers/WebGLDeferredRenderer.js"></script>
+		<script src="/examples/shared/js/ShaderDeferred.js"></script>
 
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/FXAAShader.js"></script>
+		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
+		<script src="/examples/shared/js/shaders/FXAAShader.js"></script>
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -209,7 +209,7 @@
 
 				var loader = new THREE.UTF8Loader();
 
-				loader.load( "models/utf8/ben_dds.js", function ( object ) {
+				loader.load( "/examples/shared/models/utf8/ben_dds.js", function ( object ) {
 
 					object.scale.multiplyScalar( 150 );
 					object.position.y = -75;
@@ -217,7 +217,7 @@
 
 				}, { normalizeRGB: true } );
 
-				loader.load( "models/utf8/WaltHi.js", function ( object ) {
+				loader.load( "/examples/shared/models/utf8/WaltHi.js", function ( object ) {
 
 					object.position.y = -35;
 					scene.add( object );
@@ -228,10 +228,10 @@
 
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
+				loader.load( "/examples/shared/obj/leeperrysmith/LeePerrySmith.js", function( geometry, materials ) {
 
-					var mapColor = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Map-COL.jpg" );
-					var mapHeight = THREE.ImageUtils.loadTexture( "obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
+					var mapColor = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Map-COL.jpg" );
+					var mapHeight = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Infinite-Level_02_Disp_NoSmoothUV-4096.jpg" );
 					mapHeight.repeat.set( 0.998, 0.998 );
 					mapHeight.offset.set( 0.001, 0.001 )
 					mapHeight.wrapS = mapHeight.wrapT = THREE.RepeatWrapping;
@@ -248,7 +248,7 @@
 
 
 				var loader = new THREE.BinaryLoader();
-				loader.load( "obj/female02/Female02_bin.js", function( geometry, materials ) {
+				loader.load( "/examples/shared/obj/female02/Female02_bin.js", function( geometry, materials ) {
 
 					for ( var i = 0; i < materials.length; i ++ ) materials[ i ].wrapAround = true;
 
@@ -260,7 +260,7 @@
 
 				} );
 
-				loader.load( "obj/male02/Male02_bin.js", function( geometry, materials ) {
+				loader.load( "/examples/shared/obj/male02/Male02_bin.js", function( geometry, materials ) {
 
 					for ( var i = 0; i < materials.length; i ++ ) materials[ i ].wrapAround = true;
 
@@ -286,13 +286,13 @@
 
 				var object = new THREE.Object3D();
 
-				var mapHeight2 = THREE.ImageUtils.loadTexture( "obj/lightmap/rocks.jpg" );
+				var mapHeight2 = THREE.ImageUtils.loadTexture( "/examples/shared/obj/lightmap/rocks.jpg" );
 				mapHeight2.repeat.set( 3, 1.5 );
 				mapHeight2.wrapS = mapHeight2.wrapT = THREE.RepeatWrapping;
 				mapHeight2.anisotropy = 4;
 				mapHeight2.format = THREE.RGBFormat;
 
-				var mapHeight3 = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+				var mapHeight3 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/water.jpg" );
 				mapHeight3.repeat.set( 16, 8 );
 				mapHeight3.wrapS = mapHeight3.wrapT = THREE.RepeatWrapping;
 				mapHeight3.anisotropy = 4;

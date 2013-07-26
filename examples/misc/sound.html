@@ -42,11 +42,11 @@
 
 		<div id="container"></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+		<script src="/examples/shared/js/controls/FirstPersonControls.js"></script>
 
-		<script src="js/Detector.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
 
 		<script>
 
@@ -140,7 +140,7 @@
 				mesh1.scale.set( s, s, s );
 				scene.add( mesh1 );
 
-				sound1 = new Sound( [ 'sounds/358232_j_s_song.mp3', 'sounds/358232_j_s_song.ogg' ], 275, 1 );
+				sound1 = new Sound( [ '/examples/shared/sounds/358232_j_s_song.mp3', '/examples/shared/sounds/358232_j_s_song.ogg' ], 275, 1 );
 				sound1.position.copy( mesh1.position );
 				sound1.play();
 
@@ -151,7 +151,7 @@
 				mesh2.scale.set( s, s, s );
 				scene.add( mesh2 );
 
-				sound2 = new Sound( [ 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3', 'sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' ], 275, 1 );
+				sound2 = new Sound( [ '/examples/shared/sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3', '/examples/shared/sounds/376737_Skullbeatz___Bad_Cat_Maste.ogg' ], 275, 1 );
 				sound2.position.copy( mesh2.position );
 				sound2.play();
 

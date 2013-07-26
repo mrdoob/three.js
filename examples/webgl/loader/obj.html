@@ -30,11 +30,11 @@
 		<a href="http://threejs.org" target="_blank">three.js</a> - OBJLoader test
 		</div>
 
-		<script src="../build/three.min.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="/build/three.min.js"></script>
+		<script src="/examples/shared/js/loaders/OBJLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -83,7 +83,7 @@
 				var texture = new THREE.Texture();
 
 				var loader = new THREE.ImageLoader( manager );
-				loader.load( 'textures/ash_uvgrid01.jpg', function ( image ) {
+				loader.load( '/examples/shared/textures/ash_uvgrid01.jpg', function ( image ) {
 
 					texture.image = image;
 					texture.needsUpdate = true;
@@ -93,7 +93,7 @@
 				// model
 
 				var loader = new THREE.OBJLoader( manager );
-				loader.load( 'obj/male02/male02.obj', function ( object ) {
+				loader.load( '/examples/shared/obj/male02/male02.obj', function ( object ) {
 
 					object.traverse( function ( child ) {
 

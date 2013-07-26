@@ -15,7 +15,7 @@ THREE.ObjectExporter.prototype = {
 		var output = {
 			metadata: {
 				version: 4.3,
-				type: 'object',
+				type: '/examples/shared/object',
 				generator: 'ObjectExporter'
 			}
 		};

@@ -31,16 +31,16 @@
 		move camera with WASD / RF + mouse
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/controls/FirstPersonControls.js"></script>
+		<script src="/examples/shared/js/controls/FirstPersonControls.js"></script>
 
-		<script src="js/shaders/UnpackDepthRGBAShader.js"></script>
+		<script src="/examples/shared/js/shaders/UnpackDepthRGBAShader.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
-		<script src="fonts/helvetiker_bold.typeface.js"></script>
+		<script src="/examples/shared/fonts/helvetiker_bold.typeface.js"></script>
 
 		<script>
 
@@ -315,7 +315,7 @@
 
 				var loader = new THREE.JSONLoader();
 
-				loader.load( "models/animated/horse.js", function( geometry ) {
+				loader.load( "/examples/shared/models/animated/horse.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 
@@ -329,49 +329,49 @@
 				} );
 
 				/*
-				loader.load( "obj/morphs/fox.js", function( geometry ) {
+				loader.load( "/examples/shared/obj/morphs/fox.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 200, 1000, 100 - Math.random() * 500, FLOOR - 5, 600 );
 
 				} );
 
-				loader.load( "obj/morphs/shdw3walk.js", function( geometry ) {
+				loader.load( "/examples/shared/obj/morphs/shdw3walk.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 40, 2000, -500, FLOOR + 60, 245 );
 
 				} );
 
-				loader.load( "obj/morphs/flamingo.js", function( geometry ) {
+				loader.load( "/examples/shared/obj/morphs/flamingo.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 500, 1000, 500 - Math.random() * 500, FLOOR + 350, 40 );
 
 				} );
 
-				loader.load( "obj/morphs/stork.js", function( geometry ) {
+				loader.load( "/examples/shared/obj/morphs/stork.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 350, 1000, 500 - Math.random() * 500, FLOOR + 350, 340 );
 
 				} );
 
-				loader.load( "obj/morphs/mountainlion.js", function( geometry ) {
+				loader.load( "/examples/shared/obj/morphs/mountainlion.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 400, 1000, 500 - Math.random() * 500, FLOOR - 5, 700 );
 
 				} );
 
-				loader.load( "obj/morphs/bearBrown.js", function( geometry ) {
+				loader.load( "/examples/shared/obj/morphs/bearBrown.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 300, 2500, -500, FLOOR - 5, -750 );
 
 				} );
 
-				loader.load( "obj/morphs/parrot.js", function( geometry ) {
+				loader.load( "/examples/shared/obj/morphs/parrot.js", function( geometry ) {
 
 					morphColorsToFaceColors( geometry );
 					addMorph( geometry, 450, 500, 500 - Math.random() * 500, FLOOR + 300, 700 );

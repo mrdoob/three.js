@@ -7,7 +7,7 @@
 
 	"urlBaseType" : "relativeToHTML",
 
-	"objects": {
+	"/examples/shared/objects": {
 
 		"group" : {
 			"position" : [ 0, 0, 0 ],
@@ -209,8 +209,8 @@
 				},
 
 				"man" : {
-					"type": "obj",
-					"url" : "obj/male02/male02.obj",
+					"type": "/examples/shared/obj",
+					"url" : "/examples/shared/obj/male02/male02.obj",
 					"material" : "phong_man",
 					"position" : [ -10, -10, -25 ],
 					"rotation" : [ 0, 0, 0 ],
@@ -238,7 +238,7 @@
 
 				"monster" : {
 					"type": "dae",
-					"url" : "models/collada/monster/monster.dae",
+					"url" : "/examples/shared/models/collada/monster/monster.dae",
 					"position" : [ -43, -10, 27 ],
 					"rotation" : [ -1.57, 0, 0 ],
 					"scale"	   : [ 0.01, 0.01, 0.01 ],
@@ -247,7 +247,7 @@
 
 				"hand" : {
 					"type" : "utf8",
-					"url"  : "models/utf8/hand.js",
+					"url"  : "/examples/shared/models/utf8/hand.js",
 					"material" : "phong_hand",
 					"position" : [ -28, -1, 29 ],
 					"rotation" : [ 0, 0.5, 0 ],
@@ -449,49 +449,49 @@
 
 		"WaltHead": {
 			"type": "binary",
-			"url" : "obj/walt/WaltHead_bin.js"
+			"url" : "/examples/shared/obj/walt/WaltHead_bin.js"
 		},
 
 		"NinjaLo": {
 			"type": "binary",
-			"url" : "obj/ninja/NinjaLo_bin.js"
+			"url" : "/examples/shared/obj/ninja/NinjaLo_bin.js"
 		},
 
 		"veyron": {
 			"type": "binary",
-			"url" : "obj/veyron/VeyronNoUv_bin.js"
+			"url" : "/examples/shared/obj/veyron/VeyronNoUv_bin.js"
 		},
 
 		"sittingBox": {
 			"type": "ascii",
-			"url" : "models/animated/sittingBox.js"
+			"url" : "/examples/shared/models/animated/sittingBox.js"
 		},
 
 		"knight": {
 			"type": "ascii",
-			"url" : "models/skinned/knight.js"
+			"url" : "/examples/shared/models/skinned/knight.js"
 		},
 
 		"man": {
 			"type": "binary",
-			"url" : "obj/male02/Male02_bin.js"
+			"url" : "/examples/shared/obj/male02/Male02_bin.js"
 		},
 
 		"ben": {
 			"type": "ctm",
-			"url" : "models/ctm/ben.ctm",
+			"url" : "/examples/shared/models/ctm/ben.ctm",
 			"useWorkers" : true,
 			"useBuffers" : true
 		},
 
 		"bunny": {
 			"type": "vtk",
-			"url" : "models/vtk/bunny.vtk"
+			"url" : "/examples/shared/models/vtk/bunny.vtk"
 		},
 
 		"disk": {
 			"type": "stl",
-			"url" : "models/stl/ascii/slotted_disk.stl"
+			"url" : "/examples/shared/models/stl/ascii/slotted_disk.stl"
 		},
 
 		"colorcube": {
@@ -708,91 +708,91 @@
 
 	},
 
-	"textures": {
+	"/examples/shared/textures": {
 
 		"cube_reflection": {
 			"url": [
-				"textures/cube/SwedishRoyalCastle/px.jpg",
-				"textures/cube/SwedishRoyalCastle/nx.jpg",
-				"textures/cube/SwedishRoyalCastle/py.jpg",
-				"textures/cube/SwedishRoyalCastle/ny.jpg",
-				"textures/cube/SwedishRoyalCastle/pz.jpg",
-				"textures/cube/SwedishRoyalCastle/nz.jpg"
+				"/examples/shared/textures/cube/SwedishRoyalCastle/px.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/nx.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/py.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/ny.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/pz.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/nz.jpg"
 			]
 		},
 
 		"cube_refraction": {
 			"url": [
-				"textures/cube/SwedishRoyalCastle/px.jpg",
-				"textures/cube/SwedishRoyalCastle/nx.jpg",
-				"textures/cube/SwedishRoyalCastle/py.jpg",
-				"textures/cube/SwedishRoyalCastle/ny.jpg",
-				"textures/cube/SwedishRoyalCastle/nz.jpg",
-				"textures/cube/SwedishRoyalCastle/pz.jpg"
+				"/examples/shared/textures/cube/SwedishRoyalCastle/px.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/nx.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/py.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/ny.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/nz.jpg",
+				"/examples/shared/textures/cube/SwedishRoyalCastle/pz.jpg"
 			],
 			"mapping": "CubeRefractionMapping"
 		},
 
 		"cube_compressed": {
 			"url": [
-				"textures/cube/Escher/dds/px.dds",
-				 "textures/cube/Escher/dds/nx.dds",
-				 "textures/cube/Escher/dds/py.dds",
-				 "textures/cube/Escher/dds/ny.dds",
-				 "textures/cube/Escher/dds/pz.dds",
-				 "textures/cube/Escher/dds/nz.dds"
+				"/examples/shared/textures/cube/Escher/dds/px.dds",
+				 "/examples/shared/textures/cube/Escher/dds/nx.dds",
+				 "/examples/shared/textures/cube/Escher/dds/py.dds",
+				 "/examples/shared/textures/cube/Escher/dds/ny.dds",
+				 "/examples/shared/textures/cube/Escher/dds/pz.dds",
+				 "/examples/shared/textures/cube/Escher/dds/nz.dds"
 			]
 		},
 
 		"texture_bg": {
-			"url": "textures/cube/SwedishRoyalCastle/pz.jpg",
+			"url": "/examples/shared/textures/cube/SwedishRoyalCastle/pz.jpg",
 			"anisotropy": 4
 		},
 
 		"texture_compressed_dxt3": {
-			"url": "textures/compressed/hepatica_dxt3_mip.dds",
+			"url": "/examples/shared/textures/compressed/hepatica_dxt3_mip.dds",
 			"anisotropy": 4
 		},
 
 		"texture_compressed_dxt5": {
-			"url": "textures/compressed/explosion_dxt5_mip.dds",
+			"url": "/examples/shared/textures/compressed/explosion_dxt5_mip.dds",
 			"anisotropy": 4
 		},
 
 		"texture_bump": {
-			"url": "textures/water.jpg",
+			"url": "/examples/shared/textures/water.jpg",
 			"anisotropy": 4
 		},
 
 		"texture_bump_repeat": {
-			"url": "textures/water.jpg",
+			"url": "/examples/shared/textures/water.jpg",
 			"repeat" : [ 20, 20 ],
 			"anisotropy": 4
 		},
 
 		"texture_bump_repeat_2": {
-			"url": "textures/water.jpg",
+			"url": "/examples/shared/textures/water.jpg",
 			"repeat" : [ 4, 2 ],
 			"anisotropy": 4
 		},
 
 		"texture_normal": {
-			"url": "textures/normal/ninja/normal.jpg",
+			"url": "/examples/shared/textures/normal/ninja/normal.jpg",
 			"anisotropy": 4
 		},
 
 		"texture_ao": {
-			"url": "textures/normal/ninja/ao.jpg",
+			"url": "/examples/shared/textures/normal/ninja/ao.jpg",
 			"anisotropy": 4
 		},
 
 		"texture_displacement": {
-			"url": "textures/normal/ninja/displacement.jpg",
+			"url": "/examples/shared/textures/normal/ninja/displacement.jpg",
 			"anisotropy": 4
 		},
 
 		"texture_minecraft": {
-			"url": "textures/minecraft/grass.png",
+			"url": "/examples/shared/textures/minecraft/grass.png",
 			"magFilter": "NearestFilter",
 			"minFilter": "LinearMipMapLinearFilter"
 		}

@@ -58,28 +58,28 @@
 		[based on greggman's <a href="http://webglsamples.googlecode.com/hg/blob/blob.html">blob</a>, original code by Henrik Rydgård]
 	</div>
 
-	<script src="../build/three.min.js"></script>
+	<script src="/build/three.min.js"></script>
 
-	<script src="js/controls/TrackballControls.js"></script>
+	<script src="/examples/shared/js/controls/TrackballControls.js"></script>
 
-	<script src="js/shaders/CopyShader.js"></script>
-	<script src="js/shaders/FXAAShader.js"></script>
-	<script src="js/shaders/HorizontalTiltShiftShader.js"></script>
-	<script src="js/shaders/VerticalTiltShiftShader.js"></script>
+	<script src="/examples/shared/js/shaders/CopyShader.js"></script>
+	<script src="/examples/shared/js/shaders/FXAAShader.js"></script>
+	<script src="/examples/shared/js/shaders/HorizontalTiltShiftShader.js"></script>
+	<script src="/examples/shared/js/shaders/VerticalTiltShiftShader.js"></script>
 
-	<script src="js/postprocessing/EffectComposer.js"></script>
-	<script src="js/postprocessing/RenderPass.js"></script>
-	<script src="js/postprocessing/BloomPass.js"></script>
-	<script src="js/postprocessing/ShaderPass.js"></script>
-	<script src="js/postprocessing/MaskPass.js"></script>
-	<script src="js/postprocessing/SavePass.js"></script>
+	<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
+	<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
+	<script src="/examples/shared/js/postprocessing/BloomPass.js"></script>
+	<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
+	<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
+	<script src="/examples/shared/js/postprocessing/SavePass.js"></script>
 
-	<script src="js/MarchingCubes.js"></script>
-	<script src="js/ShaderToon.js"></script>
+	<script src="/examples/shared/js/MarchingCubes.js"></script>
+	<script src="/examples/shared/js/ShaderToon.js"></script>
 
-	<script src="js/Detector.js"></script>
-	<script src="js/libs/stats.min.js"></script>
-	<script src="js/libs/dat.gui.min.js"></script>
+	<script src="/examples/shared/js/Detector.js"></script>
+	<script src="/examples/shared/js/libs/stats.min.js"></script>
+	<script src="/examples/shared/js/libs/dat.gui.min.js"></script>
 
 
 	<script>
@@ -252,7 +252,7 @@
 
 			// environment map
 
-			var path = "textures/cube/SwedishRoyalCastle/";
+			var path = "/examples/shared/textures/cube/SwedishRoyalCastle/";
 			var format = '.jpg';
 			var urls = [
 				path + 'px' + format, path + 'nx' + format,
@@ -284,7 +284,7 @@
 			dottedMaterial2.uniforms.uBaseColor.value.setRGB( 0, 0, 0 );
 			dottedMaterial2.uniforms.uLineColor1.value.setHSL( 0.05, 1.0, 0.5 );
 
-			var texture = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
+			var texture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/ash_uvgrid01.jpg" );
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
 			var materials = {

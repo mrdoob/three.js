@@ -290,7 +290,7 @@ THREE.UTF8Loader.GeometryCreator.prototype = {
 //       { material: 'material_name',
 //         attribRange: [#, #],
 //         indexRange: [#, #],
-//         names: [ 'object names' ... ],
+//         names: [ '/examples/shared/object names' ... ],
 //         lengths: [#, #, # ... ]
 //       }
 //     ],

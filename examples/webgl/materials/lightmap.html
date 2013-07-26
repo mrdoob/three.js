@@ -24,12 +24,12 @@
 	</head>
 
 	<body>
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script type="x-shader/x-vertex" id="vertexShader">
 
@@ -155,7 +155,7 @@
 				var loader = new THREE.JSONLoader();
 				var callback = function ( geometry, materials ) { createScene( geometry, materials, 0, 0, 0, 0, 100 ) };
 
-				loader.load( "obj/lightmap/lightmap.js", callback );
+				loader.load( "/examples/shared/obj/lightmap/lightmap.js", callback );
 
 				//
 

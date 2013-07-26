@@ -42,10 +42,10 @@
 		- knight by <a href="http://vimeo.com/36113323">apendua</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -154,7 +154,7 @@
 				//
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "models/skinned/knight.js", function ( geometry, materials ) { createScene( geometry, materials, 0, FLOOR, -300, 60 ) } );
+				loader.load( "/examples/shared/models/skinned/knight.js", function ( geometry, materials ) { createScene( geometry, materials, 0, FLOOR, -300, 60 ) } );
 
 				//
 
@@ -200,7 +200,7 @@
 
 				THREE.AnimationHandler.add( geometry.animation );
 
-				var path = "textures/cube/Park2/";
+				var path = "/examples/shared/textures/cube/Park2/";
 				var format = '.jpg';
 				var urls = [
 						path + 'posx' + format, path + 'negx' + format,
@@ -211,10 +211,10 @@
 
 				//var envMap = THREE.ImageUtils.loadTextureCube( urls );
 
-				//var map = THREE.ImageUtils.loadTexture( "textures/ash_uvgrid01.jpg" );
+				//var map = THREE.ImageUtils.loadTexture( "/examples/shared/textures/ash_uvgrid01.jpg" );
 
 				//var bumpMap = THREE.ImageUtils.generateDataTexture( 1, 1, new THREE.Color() );
-				//var bumpMap = THREE.ImageUtils.loadTexture( "textures/water.jpg" );
+				//var bumpMap = THREE.ImageUtils.loadTexture( "/examples/shared/textures/water.jpg" );
 
 				for ( var i = 0; i < materials.length; i ++ ) {
 

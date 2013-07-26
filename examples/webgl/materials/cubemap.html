@@ -35,12 +35,12 @@
 			<p>Texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/loaders/BinaryLoader.js"></script>
+		<script src="/examples/shared/js/loaders/BinaryLoader.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -97,7 +97,7 @@
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				scene.add( lightMesh );
 
-				var path = "textures/cube/SwedishRoyalCastle/";
+				var path = "/examples/shared/textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
 						path + 'px' + format, path + 'nx' + format,
@@ -154,7 +154,7 @@
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.load( "obj/walt/WaltHead_bin.js", function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
+				loader.load( "/examples/shared/obj/walt/WaltHead_bin.js", function( geometry ) { createScene( geometry, cubeMaterial1, cubeMaterial2, cubeMaterial3 ) } );
 
 				//
 

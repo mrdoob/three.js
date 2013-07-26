@@ -29,8 +29,8 @@
 		Press "W/E/R" twice to toggle world/local space
 		</div>
 
-		<script src="../build/three.min.js"></script>
-		<script src="js/controls/TransformControls.js"></script>
+		<script src="/build/three.min.js"></script>
+		<script src="/examples/shared/js/controls/TransformControls.js"></script>
 
 		<script>
 
@@ -56,7 +56,7 @@
 				scene = new THREE.Scene();
 				scene.add( new THREE.GridHelper( 500, 100 ) );
 
-				var texture = THREE.ImageUtils.loadTexture( 'textures/crate.gif', new THREE.UVMapping(), render );
+				var texture = THREE.ImageUtils.loadTexture( '/examples/shared/textures/crate.gif', new THREE.UVMapping(), render );
 				texture.anisotropy = renderer.getMaxAnisotropy();
 
 				var geometry = new THREE.CubeGeometry( 200, 200, 200 );

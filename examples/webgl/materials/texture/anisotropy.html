@@ -53,10 +53,10 @@
 		anisotropy: <span class="c" id="val_right"></span><br/>
 		</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="/build/three.min.js"></script>
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="/examples/shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -111,14 +111,14 @@
 
 				var maxAnisotropy = renderer.getMaxAnisotropy();
 
-				var texture1 = THREE.ImageUtils.loadTexture( "textures/crate.gif" );
+				var texture1 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/crate.gif" );
 				var material1 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture1 } );
 
 				texture1.anisotropy = maxAnisotropy;
 				texture1.wrapS = texture1.wrapT = THREE.RepeatWrapping;
 				texture1.repeat.set( 512, 512 );
 
-				var texture2 = THREE.ImageUtils.loadTexture( "textures/crate.gif" );
+				var texture2 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/crate.gif" );
 				var material2 = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture2 } );
 
 				texture2.anisotropy = 1;
