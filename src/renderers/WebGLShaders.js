@@ -712,6 +712,7 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+			"uniform bool pointLightQuadratic[ MAX_POINT_LIGHTS ];",
 
 			"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
@@ -749,8 +750,14 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-				"if ( pointLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+				"if ( pointLightDistance[ i ] > 0.0 ) {",
+					"if ( pointLightQuadratic[ i ] ){",
+						"lDistance = min( pow( pointLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+					"} else {",
+					    "lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+					"}",
+				"}",
 
 				"vPointLight[ i ] = vec4( lVector, lDistance );",
 
@@ -812,6 +819,7 @@ THREE.ShaderChunk = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform bool pointLightQuadratic[ MAX_POINT_LIGHTS ];",
 
 			"#else",
 
@@ -892,8 +900,14 @@ THREE.ShaderChunk = {
 					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
 					"float lDistance = 1.0;",
-					"if ( pointLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+					"if ( pointLightDistance[ i ] > 0.0 ) {",
+						"if ( pointLightQuadratic[ i ] ){",
+							"lDistance = min( pow( pointLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+						"} else {",
+					    	"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"}",
+					"}",
 
 					"lVector = normalize( lVector );",
 

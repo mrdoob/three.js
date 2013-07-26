@@ -9118,7 +9118,7 @@ THREE.PointLight.prototype.clone = function () {
 //THREE.SmartPointLight = function ( hex, near , far, quadratic ) {
 THREE.SmartPointLight = function ( params ) {
 /**
- * Wrapper for PointLight. 
+ * Wrapper for PointLight.
  * parameters 	-->	object with specifications (parameters)
  * 	color			:	light color, instanceof Color
  * 						default = white
@@ -9128,7 +9128,7 @@ THREE.SmartPointLight = function ( params ) {
  * 						default = 1.0
  * 	fade_type		:	'constant', for constant intensity (no decay)
  * 						'linear', 	linear decay until, intensity becomes 0.0 by fade_distance
- * 						'quadratic', quadratic decay, intensity remains constant 
+ * 						'quadratic', quadratic decay, intensity remains constant
  *							for distances < near_distance
  * 						default = 'constant'
  * For LINEAR PointLight:
@@ -9137,19 +9137,19 @@ THREE.SmartPointLight = function ( params ) {
  * For QUADRATIC PointLight
  * 	near_distance	:	For shorter distances than this, light intensity remains constant.
  * 						Think about it like the "light bulb radius", you do not put objects
- * 						within this distance. The default value tries to be a useful one 
- *							in most situations: change only if needed. 
- * 						default = 0.01 
+ * 						within this distance. The default value tries to be a useful one
+ *							in most situations: change only if needed.
+ * 						default = 0.01
  */
-	var color 		= 	params.color instanceof THREE.Color ? 
-						params.color : new THREE.Color(0xffffff); 
-	var main_intensity 	= 	typeof params.main_intensity === 'number' && 
-						! (params.main_intensity < 0.0) ? 
+	var color 		= 	params.color instanceof THREE.Color ?
+						params.color : new THREE.Color(0xffffff);
+	var main_intensity 	= 	typeof params.main_intensity === 'number' &&
+						! (params.main_intensity < 0.0) ?
 						params.main_intensity : 1.0;
 	var main_distance	= 	typeof params.main_distance === 'number' &&
 						! (params.main_distance < 0.0) ?
 						params.main_distance : 1.0;
-	var fade_type		= 	params.fade_type === 'constant' || 
+	var fade_type		= 	params.fade_type === 'constant' ||
 						params.fade_type === 'linear' ||
 						params.fade_type === 'quadratic' ?
 						params.fade_type : 'constant';
@@ -9160,11 +9160,11 @@ THREE.SmartPointLight = function ( params ) {
 						! (params.near_distance < 0.0) ?
 						params.near_distance : 1.0;
 	var	hex,
-		intensity, 
+		intensity,
 		distance,
-		quadratic;			
+		quadratic;
 	hex = color.getHex();
-	if ( fade_type === 'quadratic'){ 
+	if ( fade_type === 'quadratic'){
 		distance = near_distance;
 		intensity = Math.pow( main_distance/near_distance, 2 ) * main_intensity;
 		quadratic = true;
@@ -9175,13 +9175,11 @@ THREE.SmartPointLight = function ( params ) {
 		// fade_type should be 'constant' if we got here
 		distance = 0;
 		intensity = main_intensity;
-	}	
+	}
 	THREE.PointLight.call( this, hex, intensity, distance, quadratic );
-
 }
 
 THREE.SmartPointLight.prototype = Object.create( THREE.PointLight.prototype );
-
 /**
  * @author alteredq / http://alteredqualia.com/
  */
