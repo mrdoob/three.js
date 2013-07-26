@@ -83,7 +83,18 @@
 			octree = new THREE.Octree( {
 				// uncomment below to see the octree (may kill the fps)
 				//scene: scene,
-				renderer: renderer
+				// when undeferred = true, objects are inserted immediately
+				// instead of being deferred until next octree.update() call
+				// this may decrease performance as it forces a matrix update
+				undeferred: false,
+				// set the max depth of tree
+				// where -1 is infinite
+				depthMax: -1,
+				// max number of objects before nodes split or merge
+				objectsThreshold: 8,
+				// percent between 0 and 1 that nodes will overlap each other
+				// helps insert objects that lie over more than one node
+				overlapPct: 0.15
 			} );
 			
 			// create object to show search radius and add to scene
@@ -250,6 +261,12 @@
 			controls.update();
 
 			renderer.render( scene, camera );
+			
+			// update octree post render
+			// this ensures any objects being added
+			// have already had their matrices updated
+			
+			octree.update();
 
 		}
 		

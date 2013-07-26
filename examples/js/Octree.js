@@ -1,6 +1,6 @@
-/**!
+/*!
  *
- * threeoctree.js (r56) / https://github.com/collinhover/threeoctree
+ * threeoctree.js (r59) / https://github.com/collinhover/threeoctree
  * (sparse) dynamic 3D spatial representation structure for fast searches.
  *
  * @author Collin Hover / http://collinhover.com/
@@ -105,16 +105,6 @@
 		this.utilVec31Search = new THREE.Vector3();
 		this.utilVec32Search = new THREE.Vector3();
 		
-		// hook into renderer as a post plugin
-		
-		this.renderer = parameters.renderer;
-		
-		if ( this.renderer instanceof THREE.WebGLRenderer || this.renderer instanceof THREE.CanvasRenderer ) {
-			
-			this.renderer.addPostPlugin( this );
-			
-		}
-		
 		// pass scene to see octree structure
 		
 		this.scene = parameters.scene;
@@ -136,6 +126,7 @@
 		this.depthMax = isNumber( parameters.depthMax ) ? parameters.depthMax : -1;
 		this.objectsThreshold = isNumber( parameters.objectsThreshold ) ? parameters.objectsThreshold : 8;
 		this.overlapPct = isNumber( parameters.overlapPct ) ? parameters.overlapPct : 0.15;
+		this.undeferred = parameters.undeferred || false;
 		
 		this.root = parameters.root instanceof THREE.OctreeNode ? parameters.root : new THREE.OctreeNode( parameters );
 		
@@ -143,25 +134,7 @@
 
 	THREE.Octree.prototype = {
 		
-		setRoot: function ( root ) { 
-			
-			if ( root instanceof THREE.OctreeNode ) {
-				
-				// store new root
-				
-				this.root = root;
-				
-				// update properties
-				
-				this.root.updateProperties();
-				
-			}
-			
-		},
-		
-		init: function () {},
-		
-		render: function () {
+		update: function () {
 			
 			// add any deferred objects that were waiting for render cycle
 			
@@ -183,7 +156,21 @@
 		
 		add: function ( object, options ) {
 			
-			this.objectsDeferred.push( { object: object, options: options } );
+			// add immediately
+			
+			if ( this.undeferred ) {
+				
+				this.updateObject( object );
+				
+				this.addDeferred( object, options );
+				
+			}
+			// defer add until update called
+			else {
+				
+				this.objectsDeferred.push( { object: object, options: options } );
+				
+			}
 			
 		},
 		
@@ -372,7 +359,7 @@
 			
 		},
 		
-		update: function () {
+		rebuild: function () {
 			
 			var i, l,
 				node,
@@ -581,6 +568,22 @@
 			}
 			
 			return results;
+			
+		},
+		
+		setRoot: function ( root ) { 
+			
+			if ( root instanceof THREE.OctreeNode ) {
+				
+				// store new root
+				
+				this.root = root;
+				
+				// update properties
+				
+				this.root.updateProperties();
+				
+			}
 			
 		},
 		
