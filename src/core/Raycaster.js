@@ -368,7 +368,7 @@
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4( object.matrixWorld ),
 							face: null,
-							faceIndex: null,
+							faceIndex: i,
 							object: object
 
 						} );
