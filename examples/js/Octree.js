@@ -686,7 +686,23 @@
 			}
 			else {
 				
-				this.radius = this.object.geometry ? this.object.geometry.boundingSphere.radius : this.object.boundRadius;
+				if ( this.object.geometry ) {
+					
+					if ( this.object.geometry.boundingSphere === null ) {
+						
+						this.object.geometry.computeBoundingSphere();
+						
+					}
+					
+					this.radius = this.object.geometry.boundingSphere.radius;
+					
+				}
+				else {
+					
+					this.radius = this.object.boundRadius;
+					
+				}
+				
 				this.position.getPositionFromMatrix( this.object.matrixWorld );
 				
 			}
