@@ -6,7 +6,8 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background-color: #ffffff;
+				font-family: Monospace;
+				background-color: #f0f0f0;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -67,6 +68,18 @@
 					new THREE.MeshBasicMaterial( { color: 0x00FF00, transparent: true, opacity: 0.4 } )
 				);
 				scene.add( searchMesh );
+				
+				// info
+				
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '0';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.style.padding = '10px';
+				info.style.background = '#FFFFFF';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - octree (sparse & dynamic) - by <a href="http://github.com/collinhover/threeoctree" target="_blank">collinhover</a>';
+				document.body.appendChild( info );
 
 			}
 
@@ -86,6 +99,10 @@
 				// render results
 			
 				render();
+				
+				// update octree to add deferred objects
+				
+				octree.update();
 
 			}
 		
