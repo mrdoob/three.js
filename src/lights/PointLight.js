@@ -56,23 +56,24 @@ THREE.SmartPointLight = function ( params ) {
  *							in most situations: change only if needed.
  * 						default = 0.01
  */
+	if (typeof params === 'undefined') params = {};
 	var color 		= 	params.color instanceof THREE.Color ?
 						params.color : new THREE.Color(0xffffff);
 	var main_intensity 	= 	typeof params.main_intensity === 'number' &&
 						! (params.main_intensity < 0.0) ?
 						params.main_intensity : 1.0;
 	var main_distance	= 	typeof params.main_distance === 'number' &&
-						! (params.main_distance < 0.0) ?
+						! (params.main_distance <= 0.0) ?
 						params.main_distance : 1.0;
 	var fade_type		= 	params.fade_type === 'constant' ||
 						params.fade_type === 'linear' ||
 						params.fade_type === 'quadratic' ?
 						params.fade_type : 'constant';
 	var fade_distance	= 	typeof params.fade_distance === 'number' &&
-						! (params.fade_distance < 0.0) ?
+						! (params.fade_distance <= 0.0) ?
 						params.fade_distance : 1.0;
 	var near_distance	= 	typeof params.near_distance === 'number' &&
-						! (params.near_distance < 0.0) ?
+						! (params.near_distance <= 0.0) ?
 						params.near_distance : 1.0;
 	var	hex,
 		intensity,
