@@ -19846,8 +19846,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateGeometry( geometry );
 
-		_this.info.memory.geometries --;
-
 	};
 
 	var onTextureDispose = function ( event ) {
@@ -19915,6 +19913,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		_this.info.memory.geometries --;
+
 	};
 
 	var deallocateGeometry = function ( geometry ) {
@@ -19934,6 +19934,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 			}
+
+			_this.info.memory.geometries --;
 
 		} else {
 
@@ -19967,9 +19969,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			}
+			} else {
 
-			deleteBuffers( geometry );
+				deleteBuffers( geometry );
+
+			}
 
 		}
 
