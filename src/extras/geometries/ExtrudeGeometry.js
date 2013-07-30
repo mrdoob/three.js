@@ -651,11 +651,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
+ 		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+ 		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
  		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
  		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+
+ 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+ 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
 
 	}
 

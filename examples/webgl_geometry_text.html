@@ -81,7 +81,7 @@
 			var composer;
 			var effectFXAA;
 
-			var textMesh1, textMesh2, textGeo, material, parent;
+			var group, textMesh1, textMesh2, textGeo, material;
 
 			var firstLetter = true;
 
@@ -227,10 +227,10 @@
 					new THREE.MeshPhongMaterial( { color: 0xffffff, shading: THREE.SmoothShading } ) // side
 				] );
 
-				parent = new THREE.Object3D();
-				parent.position.y = 100;
+				group = new THREE.Object3D();
+				group.position.y = 100;
 
-				scene.add( parent );
+				scene.add( group );
 
 				createText();
 
@@ -519,7 +519,7 @@
 				textMesh1.rotation.x = 0;
 				textMesh1.rotation.y = Math.PI * 2;
 
-				parent.add( textMesh1 );
+				group.add( textMesh1 );
 
 				if ( mirror ) {
 
@@ -532,7 +532,7 @@
 					textMesh2.rotation.x = Math.PI;
 					textMesh2.rotation.y = Math.PI * 2;
 
-					parent.add( textMesh2 );
+					group.add( textMesh2 );
 
 				}
 
@@ -542,8 +542,8 @@
 
 				updatePermalink();
 
-				parent.remove( textMesh1 );
-				if ( mirror ) parent.remove( textMesh2 );
+				group.remove( textMesh1 );
+				if ( mirror ) group.remove( textMesh2 );
 
 				if ( !text ) return;
 
@@ -627,7 +627,7 @@
 
 			function render() {
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 
 				camera.lookAt( cameraTarget );
 

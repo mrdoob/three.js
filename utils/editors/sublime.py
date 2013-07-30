@@ -19,7 +19,7 @@ def main(argv=None):
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--include', action='append', required=True)
-	parser.add_argument('--output', default='editors/sublimetext2/threejs.sublime-completions')
+	parser.add_argument('--output', default='sublimetext2/threejs.sublime-completions')
 
 	args = parser.parse_args()
 
@@ -34,8 +34,9 @@ def main(argv=None):
 	tmp.write('{\n\t"scope": "source.js,source.js.embedded.html,source.coffee",\n\t"version": "r55",\n\t"completions":\n\t[\n')
 
 	for include in args.include:
-		with open('includes/' + include + '.json','r') as f: files = json.load(f)
+		with open('../build/includes/' + include + '.json','r') as f: files = json.load(f)
 		for filename in files:
+			filename = '../../' + filename;
 			with open(filename, 'r') as f:
 				string = f.read()
 				match = re.search('THREE.(\w+)[\ ]+?=[\ ]+?function[\ ]+\(([\w\,\ ]+)?\)', string)

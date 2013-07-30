@@ -364,6 +364,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 	this.detach = function ( object ) {
 
 		this.object = undefined;
+		this.hovered = false;
 
 	 	this.hide();
 

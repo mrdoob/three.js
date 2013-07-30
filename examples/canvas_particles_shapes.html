@@ -33,7 +33,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group, text, plane;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -68,6 +68,9 @@
 				camera.position.set( 0, 150, 700 );
 
 				scene = new THREE.Scene();
+
+				group = new THREE.Object3D();
+				scene.add( group );
 
 				// Get text from hash
 
@@ -106,16 +109,12 @@
 				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
 
-				parent = new THREE.Object3D();
-				parent.add( text );
+				group.add( text );
 
 
 				particleCloud = new THREE.Object3D(); // Just a group
 				particleCloud.y = 800;
-				parent.add( particleCloud );
-
-				scene.add( parent );
-
+				group.add( particleCloud );
 
 				// Create Particle Systems
 
@@ -335,7 +334,7 @@
 				// Pretty cool effect if you enable this
 				//particleCloud.rotation.y += 0.05;
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

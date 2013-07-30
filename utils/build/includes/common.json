@@ -44,6 +44,7 @@
 	"src/loaders/ImageLoader.js",
 	"src/loaders/JSONLoader.js",
 	"src/loaders/LoadingManager.js",
+	"src/loaders/BufferGeometryLoader.js",
 	"src/loaders/GeometryLoader.js",
 	"src/loaders/MaterialLoader.js",
 	"src/loaders/ObjectLoader.js",
@@ -85,7 +86,6 @@
 	"src/renderers/WebGLRenderTargetCube.js",
 	"src/renderers/renderables/RenderableVertex.js",
 	"src/renderers/renderables/RenderableFace3.js",
-	"src/renderers/renderables/RenderableFace4.js",
 	"src/renderers/renderables/RenderableObject.js",
 	"src/renderers/renderables/RenderableParticle.js",
 	"src/renderers/renderables/RenderableLine.js"

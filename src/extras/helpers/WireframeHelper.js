@@ -16,12 +16,11 @@ THREE.WireframeHelper = function ( object ) {
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 		var face = faces[ i ];
-		var length = face instanceof THREE.Face4 ? 4 : 3;
 
-		for ( var j = 0; j < length; j ++ ) {
+		for ( var j = 0; j < 3; j ++ ) {
 
 			edge[ 0 ] = face[ keys[ j ] ];
-			edge[ 1 ] = face[ keys[ ( j + 1 ) % length ] ];
+			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
 			edge.sort( sortFunction );
 
 			var key = edge.toString();

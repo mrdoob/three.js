@@ -27,7 +27,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group, text, plane;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -63,9 +63,9 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				parent = new THREE.Object3D();
-				parent.position.y = 50;
-				scene.add( parent );
+				group = new THREE.Object3D();
+				group.position.y = 50;
+				scene.add( group );
 
 				function addShape( shape, extrudeSettings, color, x, y, z, rx, ry, rz, s ) {
 
@@ -80,7 +80,7 @@
 					mesh.position.set( x, y, z - 125 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
-					parent.add( mesh );
+					group.add( mesh );
 
 					// 3d shape
 
@@ -90,7 +90,7 @@
 					mesh.position.set( x, y, z - 75 );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
-					parent.add( mesh );
+					group.add( mesh );
 
 					// solid line
 
@@ -98,7 +98,7 @@
 					line.position.set( x, y, z + 25 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.add( line );
+					group.add( line );
 
 					// transparent line from real points
 
@@ -106,7 +106,7 @@
 					line.position.set( x, y, z + 75 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.add( line );
+					group.add( line );
 
 					// vertices from real points
 
@@ -115,7 +115,7 @@
 					particles.position.set( x, y, z + 75 );
 					particles.rotation.set( rx, ry, rz );
 					particles.scale.set( s, s, s );
-					parent.add( particles );
+					group.add( particles );
 
 					// transparent line from equidistance sampled points
 
@@ -123,7 +123,7 @@
 					line.position.set( x, y, z + 125 );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.add( line );
+					group.add( line );
 
 					// equidistance sampled points
 
@@ -132,7 +132,7 @@
 					particles2.position.set( x, y, z + 125 );
 					particles2.rotation.set( rx, ry, rz );
 					particles2.scale.set( s, s, s );
-					parent.add( particles2 );
+					group.add( particles2 );
 
 				}
 
@@ -466,7 +466,7 @@
 
 			function render() {
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

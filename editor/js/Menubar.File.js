@@ -19,21 +19,11 @@ Menubar.File = function ( editor ) {
 	options.setDisplay( 'none' );
 	container.add( options );
 
-	/*
-	// open
+	// new
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Open' );
-	option.onClick( function () { alert( 'Open' ) } );
-	options.add( option );
-	*/
-
-	// reset
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Reset' );
+	option.setTextContent( 'New' );
 	option.onClick( function () {
 
 		if ( confirm( 'Are you sure?' ) ) {
@@ -44,12 +34,38 @@ Menubar.File = function ( editor ) {
 
 			}
 
-			location.reload();
+			location.href = location.pathname;
 
 		}
 
 	} );
 	options.add( option );
+
+	options.add( new UI.HorizontalRule() );
+
+
+	// import
+
+	var input = document.createElement( 'input' );
+	input.type = 'file';
+	input.addEventListener( 'change', function ( event ) {
+
+		editor.loader.loadFile( input.files[ 0 ] );
+
+	} );
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Import' );
+	option.onClick( function () {
+
+		input.click();
+
+	} );
+	options.add( option );
+
+	options.add( new UI.HorizontalRule() );
+
 
 	// export geometry
 
@@ -58,7 +74,17 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export Geometry' );
 	option.onClick( function () {
 
-		exportGeometry( THREE.GeometryExporter );
+		var geometry = editor.selected.geometry;
+
+		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			exportGeometry( THREE.BufferGeometryExporter );
+
+		} else if ( geometry instanceof THREE.Geometry ) {
+
+			exportGeometry( THREE.GeometryExporter );
+
+		}
 
 	} );
 	options.add( option );
@@ -130,7 +156,7 @@ Menubar.File = function ( editor ) {
 
 		var output;
 
-		if ( exporter instanceof THREE.GeometryExporter ) {
+		if ( exporter instanceof THREE.BufferGeometryExporter || exporter instanceof THREE.GeometryExporter ) {
 
 			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
@@ -180,6 +206,24 @@ Menubar.File = function ( editor ) {
 		window.focus();
 
 	};
+
+	options.add( new UI.HorizontalRule() );
+
+
+	// share
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Share' );
+	option.onClick( function () {
+
+		var exporter = new THREE.ObjectExporter();
+		var string = JSON.stringify( exporter.parse( editor.scene ) );
+		window.location.hash = 'A/' + window.btoa( RawDeflate.deflate( string ) );
+
+	} );
+	options.add( option );
+
 
 	return container;
 

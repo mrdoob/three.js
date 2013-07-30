@@ -58,33 +58,33 @@
 				var sides = [
 					{
 						url: 'textures/cube/Bridge2/posx.jpg',
-						position: new THREE.Vector3( -512, 0, 0 ),
-						rotation: new THREE.Vector3( 0, Math.PI / 2, 0 )
+						position: [ -512, 0, 0 ],
+						rotation: [ 0, Math.PI / 2, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negx.jpg',
-						position: new THREE.Vector3( 512, 0, 0 ),
-						rotation: new THREE.Vector3( 0, -Math.PI / 2, 0 )
+						position: [ 512, 0, 0 ],
+						rotation: [ 0, -Math.PI / 2, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/posy.jpg',
-						position: new THREE.Vector3( 0,  512, 0 ),
-						rotation: new THREE.Vector3( Math.PI / 2, 0, Math.PI )
+						position: [ 0,  512, 0 ],
+						rotation: [ Math.PI / 2, 0, Math.PI ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negy.jpg',
-						position: new THREE.Vector3( 0, -512, 0 ),
-						rotation: new THREE.Vector3( - Math.PI / 2, 0, Math.PI )
+						position: [ 0, -512, 0 ],
+						rotation: [ - Math.PI / 2, 0, Math.PI ]
 					},
 					{
 						url: 'textures/cube/Bridge2/posz.jpg',
-						position: new THREE.Vector3( 0, 0,  512 ),
-						rotation: new THREE.Vector3( 0, Math.PI, 0 )
+						position: [ 0, 0,  512 ],
+						rotation: [ 0, Math.PI, 0 ]
 					},
 					{
 						url: 'textures/cube/Bridge2/negz.jpg',
-						position: new THREE.Vector3( 0, 0, -512 ),
-						rotation: new THREE.Vector3( 0, 0, 0 )
+						position: [ 0, 0, -512 ],
+						rotation: [ 0, 0, 0 ]
 					}
 				];
 
@@ -97,8 +97,8 @@
 					element.src = side.url;
 
 					var object = new THREE.CSS3DObject( element );
-					object.position = side.position;
-					object.rotation = side.rotation;
+					object.position.fromArray( side.position );
+					object.rotation.fromArray( side.rotation );
 					scene.add( object );
 
 				}

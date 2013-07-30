@@ -1451,7 +1451,8 @@ var Qrcode = function () {
 
 	function f4( a, b, c, d, color ) {
 
-		scope.faces.push( new THREE.Face4( a, b, c, d, undefined, color ) );
+		scope.faces.push( new THREE.Face3( a, b, d, undefined, color ) );
+		scope.faces.push( new THREE.Face3( b, c, d, undefined, color ) );
 
 	}
 

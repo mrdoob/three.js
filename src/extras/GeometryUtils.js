@@ -54,16 +54,7 @@ THREE.GeometryUtils = {
 			faceVertexNormals = face.vertexNormals,
 			faceVertexColors = face.vertexColors;
 
-			if ( face instanceof THREE.Face3 ) {
-
-				faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				faceCopy = new THREE.Face4( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset, face.d + vertexOffset );
-
-			}
-
+			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
 
 			if ( normalMatrix ) {
@@ -200,60 +191,11 @@ THREE.GeometryUtils = {
 
 		var vA, vB, vC, vD;
 
-		if ( face instanceof THREE.Face3 ) {
+		vA = geometry.vertices[ face.a ];
+		vB = geometry.vertices[ face.b ];
+		vC = geometry.vertices[ face.c ];
 
-			vA = geometry.vertices[ face.a ];
-			vB = geometry.vertices[ face.b ];
-			vC = geometry.vertices[ face.c ];
-
-			return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
-
-		} else if ( face instanceof THREE.Face4 ) {
-
-			vA = geometry.vertices[ face.a ];
-			vB = geometry.vertices[ face.b ];
-			vC = geometry.vertices[ face.c ];
-			vD = geometry.vertices[ face.d ];
-
-			var area1, area2;
-
-			if ( useCachedAreas ) {
-
-				if ( face._area1 && face._area2 ) {
-
-					area1 = face._area1;
-					area2 = face._area2;
-
-				} else {
-
-					area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
-					area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-					face._area1 = area1;
-					face._area2 = area2;
-
-				}
-
-			} else {
-
-				area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD ),
-				area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-			}
-
-			var r = THREE.Math.random16() * ( area1 + area2 );
-
-			if ( r < area1 ) {
-
-				return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vD );
-
-			} else {
-
-				return THREE.GeometryUtils.randomPointInTriangle( vB, vC, vD );
-
-			}
-
-		}
+		return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 	},
 
@@ -279,27 +221,11 @@ THREE.GeometryUtils = {
 
 			face = faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+			vA = vertices[ face.a ];
+			vB = vertices[ face.b ];
+			vC = vertices[ face.c ];
 
-				vA = vertices[ face.a ];
-				vB = vertices[ face.b ];
-				vC = vertices[ face.c ];
-
-				face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				vA = vertices[ face.a ];
-				vB = vertices[ face.b ];
-				vC = vertices[ face.c ];
-				vD = vertices[ face.d ];
-
-				face._area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
-				face._area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-				face._area = face._area1 + face._area2;
-
-			}
+			face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
 
 			totalArea += face._area;
 
@@ -418,14 +344,7 @@ THREE.GeometryUtils = {
 		var i, il, j, jl;
 
 		var faces = [];
-		var faceUvs = [];
 		var faceVertexUvs = [];
-
-		for ( i = 0, il = geometry.faceUvs.length; i < il; i ++ ) {
-
-			faceUvs[ i ] = [];
-
-		}
 
 		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
@@ -437,98 +356,17 @@ THREE.GeometryUtils = {
 
 			var face = geometry.faces[ i ];
 
-			if ( face instanceof THREE.Face4 ) {
+			faces.push( face );
 
-				var a = face.a;
-				var b = face.b;
-				var c = face.c;
-				var d = face.d;
+			for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
-				var triA = new THREE.Face3();
-				var triB = new THREE.Face3();
-
-				triA.color.copy( face.color );
-				triB.color.copy( face.color );
-
-				triA.materialIndex = face.materialIndex;
-				triB.materialIndex = face.materialIndex;
-
-				triA.a = a;
-				triA.b = b;
-				triA.c = d;
-
-				triB.a = b;
-				triB.b = c;
-				triB.c = d;
-
-				if ( face.vertexColors.length === 4 ) {
-
-					triA.vertexColors[ 0 ] = face.vertexColors[ 0 ].clone();
-					triA.vertexColors[ 1 ] = face.vertexColors[ 1 ].clone();
-					triA.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
-
-					triB.vertexColors[ 0 ] = face.vertexColors[ 1 ].clone();
-					triB.vertexColors[ 1 ] = face.vertexColors[ 2 ].clone();
-					triB.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
-
-				}
-
-				faces.push( triA, triB );
-
-				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-					if ( geometry.faceVertexUvs[ j ].length ) {
-
-						var uvs = geometry.faceVertexUvs[ j ][ i ];
-
-						var uvA = uvs[ 0 ];
-						var uvB = uvs[ 1 ];
-						var uvC = uvs[ 2 ];
-						var uvD = uvs[ 3 ];
-
-						var uvsTriA = [ uvA.clone(), uvB.clone(), uvD.clone() ];
-						var uvsTriB = [ uvB.clone(), uvC.clone(), uvD.clone() ];
-
-						faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
-
-					}
-
-				}
-
-				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-					if ( geometry.faceUvs[ j ].length ) {
-
-						var faceUv = geometry.faceUvs[ j ][ i ];
-
-						faceUvs[ j ].push( faceUv, faceUv );
-
-					}
-
-				}
-
-			} else {
-
-				faces.push( face );
-
-				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-					faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
-
-				}
-
-				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
-
-				}
+				faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
 
 			}
 
 		}
 
 		geometry.faces = faces;
-		geometry.faceUvs = faceUvs;
 		geometry.faceVertexUvs = faceVertexUvs;
 
 		geometry.computeCentroids();

@@ -40,15 +40,16 @@
 			}
 
 			.element {
-				width: 140px;
-				height: 180px;
-				box-shadow: 0px 0px 20px rgba(0,255,255,0.5);
+				width: 120px;
+				height: 160px;
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
 				border: 1px solid rgba(127,255,255,0.25);
+				text-align: center;
 				cursor: default;
 			}
 
 			.element:hover {
-				box-shadow: 0px 0px 20px rgba(0,255,255,0.75);
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
 				border: 1px solid rgba(127,255,255,0.75);
 			}
 
@@ -56,18 +57,18 @@
 					position: absolute;
 					top: 20px;
 					right: 20px;
-					font-size: 20px;
+					font-size: 12px;
 					color: rgba(127,255,255,0.75);
 				}
 
 				.element .symbol {
 					position: absolute;
 					top: 40px;
-					width: 100%;
-					font-size: 70px;
-					text-align: center;
-					color: rgba(255,255,255,0.75);
+					left: 0px;
+					right: 0px;
+					font-size: 60px;
 					font-weight: bold;
+					color: rgba(255,255,255,0.75);
 
 					-webkit-filter: drop-shadow(0px 0px 20px rgba(0,255,255,0.95));
 					-moz-filter: drop-shadow(0px 0px 20px rgba(0,255,255,0.95));
@@ -78,10 +79,10 @@
 
 				.element .details {
 					position: absolute;
-					top: 125px;
-					width: 100%;
-					font-size: 18px;
-					text-align: center;
+					bottom: 15px;
+					left: 0px;
+					right: 0px;
+					font-size: 12px;
 					color: rgba(127,255,255,0.75);
 				}
 
@@ -252,7 +253,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 1800;
+				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
 
@@ -290,8 +291,8 @@
 					//
 
 					var object = new THREE.Object3D();
-					object.position.x = ( table[ i + 3 ] * 160 ) - 1540;
-					object.position.y = - ( table[ i + 4 ] * 200 ) + 1100;
+					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
+					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
 
 					targets.table.push( object );
 
@@ -308,9 +309,9 @@
 
 					var object = new THREE.Object3D();
 
-					object.position.x = 1000 * Math.cos( theta ) * Math.sin( phi );
-					object.position.y = 1000 * Math.sin( theta ) * Math.sin( phi );
-					object.position.z = 1000 * Math.cos( phi );
+					object.position.x = 800 * Math.cos( theta ) * Math.sin( phi );
+					object.position.y = 800 * Math.sin( theta ) * Math.sin( phi );
+					object.position.z = 800 * Math.cos( phi );
 
 					vector.copy( object.position ).multiplyScalar( 2 );
 
@@ -330,9 +331,9 @@
 
 					var object = new THREE.Object3D();
 
-					object.position.x = 1100 * Math.sin( phi );
+					object.position.x = 900 * Math.sin( phi );
 					object.position.y = - ( i * 8 ) + 450;
-					object.position.z = 1100 * Math.cos( phi );
+					object.position.z = 900 * Math.cos( phi );
 
 					vector.x = object.position.x * 2;
 					vector.y = object.position.y;
@@ -441,6 +442,8 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
 
 			}
 

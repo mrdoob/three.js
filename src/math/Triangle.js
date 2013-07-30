@@ -92,6 +92,69 @@ THREE.Triangle.containsPoint = function() {
 
 }();
 
+THREE.Triangle.intersectionRay = function ()	{
+
+	// Compute the offset origin, edges, and normal.
+	var diff = new THREE.Vector3();
+	var edge1 = new THREE.Vector3();
+	var edge2 = new THREE.Vector3();
+	var normal = new THREE.Vector3();
+
+	return function ( ray, a, b, c, backfaceCulling ) {
+
+		//from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+
+		edge1.subVectors( b, a );
+		edge2.subVectors( c, a );
+		normal.crossVectors( edge1, edge2 );
+
+		// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+		// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+		//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+		//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+		//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+		var DdN = ray.direction.dot(normal);
+		var sign;
+		if ( DdN > 0 ) {
+
+				if ( backfaceCulling ) return null;
+				sign = 1;
+
+		} else if ( DdN < 0 ) {
+
+				sign = - 1;
+				DdN = - DdN;
+
+		} else return null;
+
+		diff.subVectors( ray.origin, a );
+		var DdQxE2 = sign * ray.direction.dot( edge2.crossVectors( diff, edge2 ) );
+
+		// b1 < 0, no intersection
+		if ( DdQxE2 < 0 )
+			return null;
+
+		var DdE1xQ = sign * ray.direction.dot( edge1.cross( diff ) );
+		// b2 < 0, no intersection
+		if ( DdE1xQ < 0 )
+			return null;
+
+		// b1+b2 > 1, no intersection
+		if ( DdQxE2 + DdE1xQ > DdN )
+			return null
+
+		// Line intersects triangle, check if ray does.
+		var QdN = - sign * diff.dot( normal );
+		// t < 0, no intersection
+		if ( QdN < 0 )
+			return null
+
+		// Ray intersects triangle.
+		return ray.at( QdN / DdN );
+	}
+
+}();
+
 THREE.Triangle.prototype = {
 
 	constructor: THREE.Triangle,
@@ -172,6 +235,12 @@ THREE.Triangle.prototype = {
 	containsPoint: function ( point ) {
 
 		return THREE.Triangle.containsPoint( point, this.a, this.b, this.c );
+
+	},
+
+	intersectionRay: function ( ray, backfaceCulling ) {
+
+		return THREE.Triangle.intersectionRay( ray, this.a, this.b, this.c, backfaceCulling );
 
 	},
 

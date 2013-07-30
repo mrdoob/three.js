@@ -56,19 +56,26 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments, u
 			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
 			var d = ( ix + 1 ) + gridX1 * iz;
 
-			var face = new THREE.Face4( a, b, c, d );
-			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
-			this.faces.push( face );
-
 			//START_VEROLD_MOD
-			this.faceVertexUvs[ 0 ].push( [
-				new THREE.Vector2( ix / gridX * uvMult, 1 - iz  * uvMult / gridZ ),
-				new THREE.Vector2( ix / gridX * uvMult, 1 - ( iz + 1 )  * uvMult / gridZ ),
-				new THREE.Vector2( ( ix + 1 )  * uvMult / gridX, 1 - ( iz + 1 ) * uvMult/ gridZ ),
-				new THREE.Vector2( ( ix + 1 )  * uvMult / gridX, 1 - iz  * uvMult / gridZ )
-			] );
+			var uva = new THREE.Vector2( ix / gridX * uvMult, 1 - iz * uvMult / gridZ );
+			var uvb = new THREE.Vector2( ix / gridX * uvMult, 1 - ( iz + 1 ) * uvMult / gridZ );
+			var uvc = new THREE.Vector2( ( ix + 1 ) * uvMult / gridX, 1 - ( iz + 1 ) * uvMult / gridZ );
+			var uvd = new THREE.Vector2( ( ix + 1 ) * uvMult / gridX, 1 - iz * uvMult / gridZ );
 			//END_VEROLD_MOD
+
+			var face = new THREE.Face3( a, b, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+			face = new THREE.Face3( b, c, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
 
 		}
 

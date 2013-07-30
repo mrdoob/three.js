@@ -7,13 +7,15 @@ THREE.BufferGeometry = function () {
 	this.id = THREE.GeometryIdCount ++;
 	this.uuid = THREE.Math.generateUUID();
 
+	this.name = '';
+
 	// attributes
 
 	this.attributes = {};
 
 	// attributes typed arrays are kept only if dynamic flag is set
 
-	this.dynamic = false;
+	this.dynamic = true;
 
 	// offsets for chunks when using indexed elements
 

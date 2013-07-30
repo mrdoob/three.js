@@ -287,6 +287,7 @@ THREE.Ray.prototype = {
 		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
 		this.direction.sub( this.origin );
+		this.direction.normalize();
 
 		return this;
 	},

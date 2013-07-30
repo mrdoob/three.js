@@ -31,7 +31,7 @@
 
 			var camera, scene, renderer;
 
-			var text, parent;
+			var group, text;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -55,7 +55,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = 'Simple Dynamic 3D Text Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br/>Drag to spin the text';
+				info.innerHTML = 'Simple Dynamic 3D Text Example by <a href="http://www.lab4games.net/zz85/blog">zz85</a><br>Drag to spin the text';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
@@ -97,10 +97,10 @@
 				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
 
-				parent = new THREE.Object3D();
-				parent.add( text );
+				group = new THREE.Object3D();
+				group.add( text );
 
-				scene.add( parent );
+				scene.add( group );
 
 				renderer = new THREE.CanvasRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -212,7 +212,7 @@
 
 			function render() {
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

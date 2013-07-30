@@ -110,8 +110,11 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 			uvc = new THREE.Vector2( ( i + 1 ) / this.segments, ( j + 1 ) / this.radialSegments );
 			uvd = new THREE.Vector2( i / this.segments, ( j + 1 ) / this.radialSegments );
 
-			this.faces.push( new THREE.Face4( a, b, c, d ) );
-			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
+			this.faces.push( new THREE.Face3( a, b, d ) );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+			this.faces.push( new THREE.Face3( b, c, d ) );
+			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
 
 		}
 	}

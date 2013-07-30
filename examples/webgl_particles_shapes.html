@@ -85,7 +85,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group, text, plane;
 
 			var speed = 50;
 
@@ -197,9 +197,9 @@
 				text.rotation.x = 0;
 				text.rotation.y = Math.PI * 2;
 
-				parent = new THREE.Object3D();
-				parent.add( text );
-				scene.add( parent );
+				group = new THREE.Object3D();
+				group.add( text );
+				scene.add( group );
 
 				// Create particle objects for Three.js
 
@@ -331,15 +331,15 @@
 
 				var shaderMaterial = new THREE.ShaderMaterial( {
 
-					uniforms: 		uniforms,
-					attributes:     attributes,
+					uniforms: uniforms,
+					attributes: attributes,
 
-					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
+					vertexShader: document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 
-					blending: 		THREE.AdditiveBlending,
-					depthWrite:		false,
-					transparent:	true
+					blending: THREE.AdditiveBlending,
+					depthWrite: false,
+					transparent: true
 
 				});
 
@@ -362,7 +362,7 @@
 
 				}
 
-				parent.add( particleCloud );
+				group.add( particleCloud );
 				particleCloud.y = 800;
 
 
@@ -661,13 +661,12 @@
 				// Pretty cool effect if you enable this
 				// particleCloud.rotation.y += 0.05;
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 
 				renderer.clear();
 
 				// renderer.render( scene, camera );
 				composer.render( 0.1 );
-
 
 			}
 
