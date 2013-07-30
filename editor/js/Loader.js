@@ -3,20 +3,6 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
-	document.addEventListener( 'dragover', function ( event ) {
-
-		event.preventDefault();
-		event.dataTransfer.dropEffect = 'copy';
-
-	}, false );
-
-	document.addEventListener( 'drop', function ( event ) {
-
-		event.preventDefault();
-		scope.loadFile( event.dataTransfer.files[ 0 ] );
-
-	}, false );
-
 	this.loadLocalStorage = function () {
 
 		if ( localStorage.threejsEditor !== undefined ) {

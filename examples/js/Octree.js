@@ -555,35 +555,17 @@
 				vertices = geometry.vertices,
 				centroid = face.centroid,
 				va = vertices[ face.a ], vb = vertices[ face.b ], vc = vertices[ face.c ], vd,
-				centroidToVert = this.utilVec31FaceBounds,
-				radius;
+				centroidToVert = this.utilVec31FaceBounds;
 			
-			// handle face type
-			
-			if ( face instanceof THREE.Face4 ) {
+			centroid.addVectors( va, vb ).add( vc ).divideScalar( 3 );
 				
-				vd = vertices[ face.d ];
-				
-				centroid.addVectors( va, vb ).add( vc ).add( vd ).divideScalar( 4 );
-				
-				radius = Math.max( centroidToVert.subVectors( centroid, va ).length(), centroidToVert.subVectors( centroid, vb ).length(), centroidToVert.subVectors( centroid, vc ).length(), centroidToVert.subVectors( centroid, vd ).length() );
-				
-			}
-			else {
-				
-				centroid.addVectors( va, vb ).add( vc ).divideScalar( 3 );
-				
-				radius = Math.max( centroidToVert.subVectors( centroid, va ).length(), centroidToVert.subVectors( centroid, vb ).length(), centroidToVert.subVectors( centroid, vc ).length() );
-				
-			}
-			
-			return radius;
+			return Math.max( centroidToVert.subVectors( centroid, va ).length(), centroidToVert.subVectors( centroid, vb ).length(), centroidToVert.subVectors( centroid, vc ).length() );
 			
 		},
 		
 		usesFaces: function () {
 			
-			return this.faces instanceof THREE.Face3 || this.faces instanceof THREE.Face4;
+			return this.faces instanceof THREE.Face3;
 			
 		}
 		
@@ -650,7 +632,7 @@
 		
 		if ( this.tree.scene ) {
 			
-			this.visual = new THREE.Mesh( new THREE.CubeGeometry( this.radiusOverlap * 2, this.radiusOverlap * 2, this.radiusOverlap * 2 ), new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe: true, wireframeLinewidth: 1 } ) );
+			this.visual = new THREE.Mesh( new THREE.CubeGeometry( this.radiusOverlap * 2, this.radiusOverlap * 2, this.radiusOverlap * 2 ), new THREE.MeshBasicMaterial( { color: 0xFF0000, wireframe: true, wireframeLinewidth: 1, opacity: 0.05, transparent: true } ) );
 			this.visual.position.copy( this.position );
 			this.tree.scene.add( this.visual );
 			

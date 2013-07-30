@@ -57,6 +57,18 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
+	// When rendered geometry doesn't include these attributes but the material does,
+	// use these default values in WebGL. This avoids errors when buffer data is missing.
+	this.defaultAttributeValues = {
+		"color" : [ 1, 1, 1],
+		"uv" : [ 0, 0 ],
+		"uv2" : [ 0, 0 ]
+	};
+
+	// By default, bind position to attribute index 0. In WebGL, attribute 0
+	// should always be used to avoid potentially expensive emulation.
+	this.index0AttributeName = "position";
+
 	this.setValues( parameters );
 
 };

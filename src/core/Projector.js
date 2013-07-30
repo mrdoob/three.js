@@ -9,7 +9,6 @@ THREE.Projector = function () {
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
 	_face, _face3Count, _face3Pool = [], _face3PoolLength = 0,
-	_face4Count, _face4Pool = [], _face4PoolLength = 0,
 	_line, _lineCount, _linePool = [], _linePoolLength = 0,
 	_particle, _particleCount, _particlePool = [], _particlePoolLength = 0,
 
@@ -153,7 +152,6 @@ THREE.Projector = function () {
 		v1, v2, v3, v4, isFaceMaterial, objectMaterials;
 
 		_face3Count = 0;
-		_face4Count = 0;
 		_lineCount = 0;
 		_particleCount = 0;
 
@@ -223,36 +221,30 @@ THREE.Projector = function () {
 
 					var side = material.side;
 
-					if ( face instanceof THREE.Face3 ) {
+					v1 = _vertexPool[ face.a ];
+					v2 = _vertexPool[ face.b ];
+					v3 = _vertexPool[ face.c ];
 
-						v1 = _vertexPool[ face.a ];
-						v2 = _vertexPool[ face.b ];
-						v3 = _vertexPool[ face.c ];
+					_points3[ 0 ] = v1.positionScreen;
+					_points3[ 1 ] = v2.positionScreen;
+					_points3[ 2 ] = v3.positionScreen;
 
-						_points3[ 0 ] = v1.positionScreen;
-						_points3[ 1 ] = v2.positionScreen;
-						_points3[ 2 ] = v3.positionScreen;
+					if ( v1.visible === true || v2.visible === true || v3.visible === true ||
+						_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
 
-						if ( v1.visible === true || v2.visible === true || v3.visible === true ||
-							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
+						visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) *
+							    ( v2.positionScreen.y - v1.positionScreen.y ) -
+							    ( v3.positionScreen.y - v1.positionScreen.y ) *
+							    ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
 
-							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
-								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
+						if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
 
-							if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
+							_face = getNextFace3InPool();
 
-								_face = getNextFace3InPool();
-
-								_face.id = object.id;
-								_face.v1.copy( v1 );
-								_face.v2.copy( v2 );
-								_face.v3.copy( v3 );
-
-							} else {
-
-								continue;
-
-							}
+							_face.id = object.id;
+							_face.v1.copy( v1 );
+							_face.v2.copy( v2 );
+							_face.v3.copy( v3 );
 
 						} else {
 
@@ -260,48 +252,9 @@ THREE.Projector = function () {
 
 						}
 
-					} else if ( face instanceof THREE.Face4 ) {
+					} else {
 
-						v1 = _vertexPool[ face.a ];
-						v2 = _vertexPool[ face.b ];
-						v3 = _vertexPool[ face.c ];
-						v4 = _vertexPool[ face.d ];
-
-						_points4[ 0 ] = v1.positionScreen;
-						_points4[ 1 ] = v2.positionScreen;
-						_points4[ 2 ] = v3.positionScreen;
-						_points4[ 3 ] = v4.positionScreen;
-
-						if ( v1.visible === true || v2.visible === true || v3.visible === true || v4.visible === true ||
-							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points4 ) ) ) {
-
-							visible = ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
-								( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||
-								( v2.positionScreen.x - v3.positionScreen.x ) * ( v4.positionScreen.y - v3.positionScreen.y ) -
-								( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0;
-
-
-							if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
-
-								_face = getNextFace4InPool();
-
-								_face.id = object.id;
-								_face.v1.copy( v1 );
-								_face.v2.copy( v2 );
-								_face.v3.copy( v3 );
-								_face.v4.copy( v4 );
-
-							} else {
-
-								continue;
-
-							}
-
-						} else {
-
-							continue;
-
-						}
+						continue;
 
 					}
 
@@ -321,7 +274,7 @@ THREE.Projector = function () {
 
 					faceVertexNormals = face.vertexNormals;
 
-					for ( n = 0, nl = faceVertexNormals.length; n < nl; n ++ ) {
+					for ( n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
 
 						var normalModel = _face.vertexNormalsModel[ n ];
 						normalModel.copy( faceVertexNormals[ n ] );
@@ -341,7 +294,7 @@ THREE.Projector = function () {
 
 					_face.vertexNormalsLength = faceVertexNormals.length;
 
-					for ( c = 0, cl = faceVertexUvs.length; c < cl; c ++ ) {
+					for ( c = 0, cl = Math.min( faceVertexUvs.length, 3 ); c < cl; c ++ ) {
 
 						uvs = faceVertexUvs[ c ][ f ];
 
@@ -516,22 +469,6 @@ THREE.Projector = function () {
 
 		return _face3Pool[ _face3Count ++ ];
 
-
-	}
-
-	function getNextFace4InPool() {
-
-		if ( _face4Count === _face4PoolLength ) {
-
-			var face = new THREE.RenderableFace4();
-			_face4Pool.push( face );
-			_face4PoolLength ++;
-			_face4Count ++;
-			return face;
-
-		}
-
-		return _face4Pool[ _face4Count ++ ];
 
 	}
 

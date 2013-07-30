@@ -143,28 +143,6 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			}
 
-			if ( face instanceof THREE.Face4 ) {
-
-				addPosition( vertices[ face.a ] );
-				addPosition( vertices[ face.c ] );
-				addPosition( vertices[ face.d ] );
-
-				if ( vertexNormals === true ) {
-
-					addNormal( face.vertexNormals[ 0 ] );
-					addNormal( face.vertexNormals[ 2 ] );
-					addNormal( face.vertexNormals[ 3 ] );
-
-				} else {
-
-					addNormal( face.normal );
-					addNormal( face.normal );
-					addNormal( face.normal );
-
-				}
-
-			}
-
 		}
 
 		var buffer = {

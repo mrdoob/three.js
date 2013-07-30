@@ -2,29 +2,47 @@
 
 UI.Texture = function () {
 
-    UI.Element.call( this );
+	UI.Element.call( this );
 
 	var scope = this;
 
-	var canvas = document.createElement( 'canvas' );
-	canvas.width = 64;
-	canvas.height = 16;
-	canvas.style.cursor = 'pointer';
-	canvas.addEventListener( 'click', function ( event ) {
-
-		input.click();
-
-	}, false );
-
-	var context = canvas.getContext( '2d' );
-	context.fillStyle = 'black';
-	context.fillRect( 0, 0, canvas.width, canvas.height );
+	var dom = document.createElement( 'span' );
 
 	var input = document.createElement( 'input' );
 	input.type = 'file';
 	input.addEventListener( 'change', function ( event ) {
 
-		var file = event.target.files[ 0 ];
+		loadFile( event.target.files[ 0 ] );
+
+	} );
+
+	var canvas = document.createElement( 'canvas' );
+	canvas.width = 32;
+	canvas.height = 16;
+	canvas.style.cursor = 'pointer';
+	canvas.style.marginRight = '5px';
+	canvas.style.border = '1px solid #888';
+	canvas.addEventListener( 'click', function ( event ) {
+
+		input.click();
+
+	}, false );
+	canvas.addEventListener( 'drop', function ( event ) {
+
+		event.preventDefault();
+		event.stopPropagation();
+		loadFile( event.dataTransfer.files[ 0 ] );
+
+	}, false );
+	dom.appendChild( canvas );
+
+	var name = document.createElement( 'input' );
+	name.disabled = true;
+	name.style.width = '64px';
+	name.style.border = '1px solid #ccc';
+	dom.appendChild( name );
+
+	var loadFile = function ( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
 
@@ -34,12 +52,11 @@ UI.Texture = function () {
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function( event ) {
 
-					var scale = 64 / this.width;
+					var texture = new THREE.Texture( this );
+					texture.sourceFile = file.name;
+					texture.needsUpdate = true;
 
-					context.drawImage( this, 0, 0, this.width * scale, this.height * scale );
-
-					scope.texture = new THREE.Texture( this );
-					scope.texture.needsUpdate = true;
+					scope.setValue( texture );
 
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -53,9 +70,9 @@ UI.Texture = function () {
 
 		}
 
-	} );
+	}
 
-	this.dom = canvas;
+	this.dom = dom;
 	this.texture = null;
 	this.onChangeCallback = null;
 
@@ -65,17 +82,44 @@ UI.Texture = function () {
 
 UI.Texture.prototype = Object.create( UI.Element.prototype );
 
-UI.Texture.prototype.textureNameMap = {};
-
 UI.Texture.prototype.getValue = function () {
 
 	return this.texture;
 
 };
 
-UI.Texture.prototype.setValue = function ( value ) {
+UI.Texture.prototype.setValue = function ( texture ) {
 
-	this.texture = value;
+	var canvas = this.dom.children[ 0 ];
+	var name = this.dom.children[ 1 ];
+	var context = canvas.getContext( '2d' );
+
+	if ( texture !== null ) {
+
+		var image = texture.image;
+
+		if ( image.width > 0 ) {
+
+			name.value = texture.sourceFile;
+
+			var scale = canvas.width / image.width;
+			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+		} else {
+
+			name.value = texture.sourceFile + ' (error)';
+			context.clearRect( 0, 0, canvas.width, canvas.height );
+
+		}
+
+	} else {
+
+		name.value = '';
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+
+	}
+
+	this.texture = texture;
 
 };
 
@@ -96,25 +140,43 @@ UI.CubeTexture = function () {
 
 	var scope = this;
 
-	var canvas = document.createElement( 'canvas' );
-	canvas.width = 64;
-	canvas.height = 16;
-	canvas.style.cursor = 'pointer';
-	canvas.addEventListener( 'click', function ( event ) {
-
-		input.click();
-
-	}, false );
-
-	var context = canvas.getContext( '2d' );
-	context.fillStyle = 'black';
-	context.fillRect( 0, 0, canvas.width, canvas.height );
+	var dom = document.createElement( 'span' );
 
 	var input = document.createElement( 'input' );
 	input.type = 'file';
 	input.addEventListener( 'change', function ( event ) {
 
-		var file = event.target.files[ 0 ];
+		loadFile( event.target.files[ 0 ] );
+
+	}, false );
+
+	var canvas = document.createElement( 'canvas' );
+	canvas.width = 32;
+	canvas.height = 16;
+	canvas.style.cursor = 'pointer';
+	canvas.style.marginRight = '5px';
+	canvas.style.border = '1px solid #888';
+	canvas.addEventListener( 'click', function ( event ) {
+
+		input.click();
+
+	}, false );
+	canvas.addEventListener( 'drop', function ( event ) {
+
+		event.preventDefault();
+		event.stopPropagation();
+		loadFile( event.dataTransfer.files[ 0 ] );
+
+	}, false );
+	dom.appendChild( canvas );
+
+	var name = document.createElement( 'input' );
+	name.disabled = true;
+	name.style.width = '64px';
+	name.style.border = '1px solid #ccc';
+	dom.appendChild( name );
+
+	var loadFile = function ( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
 
@@ -124,12 +186,13 @@ UI.CubeTexture = function () {
 				var image = document.createElement( 'img' );
 				image.addEventListener( 'load', function( event ) {
 
-					var scale = 64 / this.width;
+					var array = [ this, this, this, this, this, this ];
 
-					context.drawImage( this, 0, 0, this.width * scale, this.height * scale );
+					var texture = new THREE.Texture( array, new THREE.CubeReflectionMapping() );
+					texture.sourceFile = file.name;
+					texture.needsUpdate = true;
 
-					scope.texture = new THREE.Texture( [ this, this, this, this, this, this ], new THREE.CubeReflectionMapping() )
-					scope.texture.needsUpdate = true;
+					scope.setValue( texture );
 
 					if ( scope.onChangeCallback ) scope.onChangeCallback();
 
@@ -141,9 +204,9 @@ UI.CubeTexture = function () {
 
 		}
 
-	}, false );
+	};
 
-	this.dom = canvas;
+	this.dom = dom;
 	this.texture = null;
 	this.onChangeCallback = null;
 
@@ -159,9 +222,38 @@ UI.CubeTexture.prototype.getValue = function () {
 
 };
 
-UI.CubeTexture.prototype.setValue = function ( value ) {
+UI.CubeTexture.prototype.setValue = function ( texture ) {
 
-	this.texture = value;
+	var canvas = this.dom.children[ 0 ];
+	var name = this.dom.children[ 1 ];
+	var context = canvas.getContext( '2d' );
+
+	if ( texture !== null ) {
+
+		var image = texture.image[ 0 ];
+
+		if ( image.width > 0 ) {
+
+			name.value = texture.sourceFile;
+
+			var scale = canvas.width / image.width;
+			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+		} else {
+
+			name.value = texture.sourceFile + ' (error)';
+			context.clearRect( 0, 0, canvas.width, canvas.height );
+
+		}
+
+	} else {
+
+		name.value = '';
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+
+	}
+
+	this.texture = texture;
 
 };
 

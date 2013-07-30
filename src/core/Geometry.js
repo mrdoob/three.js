@@ -20,7 +20,6 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
-	this.faceUvs = [[]];
 	this.faceVertexUvs = [[]];
 
 	this.morphTargets = [];
@@ -106,22 +105,10 @@ THREE.Geometry.prototype = {
 			face = this.faces[ f ];
 			face.centroid.set( 0, 0, 0 );
 
-			if ( face instanceof THREE.Face3 ) {
-
-				face.centroid.add( this.vertices[ face.a ] );
-				face.centroid.add( this.vertices[ face.b ] );
-				face.centroid.add( this.vertices[ face.c ] );
-				face.centroid.divideScalar( 3 );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				face.centroid.add( this.vertices[ face.a ] );
-				face.centroid.add( this.vertices[ face.b ] );
-				face.centroid.add( this.vertices[ face.c ] );
-				face.centroid.add( this.vertices[ face.d ] );
-				face.centroid.divideScalar( 4 );
-
-			}
+			face.centroid.add( this.vertices[ face.a ] );
+			face.centroid.add( this.vertices[ face.b ] );
+			face.centroid.add( this.vertices[ face.c ] );
+			face.centroid.divideScalar( 3 );
 
 		}
 
@@ -172,16 +159,7 @@ THREE.Geometry.prototype = {
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 				face = this.faces[ f ];
-
-				if ( face instanceof THREE.Face3 ) {
-
-					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-				}
+				face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
 			}
 
@@ -210,48 +188,17 @@ THREE.Geometry.prototype = {
 
 				face = this.faces[ f ];
 
-				if ( face instanceof THREE.Face3 ) {
+				vA = this.vertices[ face.a ];
+				vB = this.vertices[ face.b ];
+				vC = this.vertices[ face.c ];
 
-					vA = this.vertices[ face.a ];
-					vB = this.vertices[ face.b ];
-					vC = this.vertices[ face.c ];
+				cb.subVectors( vC, vB );
+				ab.subVectors( vA, vB );
+				cb.cross( ab );
 
-					cb.subVectors( vC, vB );
-					ab.subVectors( vA, vB );
-					cb.cross( ab );
-
-					vertices[ face.a ].add( cb );
-					vertices[ face.b ].add( cb );
-					vertices[ face.c ].add( cb );
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					vA = this.vertices[ face.a ];
-					vB = this.vertices[ face.b ];
-					vC = this.vertices[ face.c ];
-					vD = this.vertices[ face.d ];
-
-					// abd
-
-					db.subVectors( vD, vB );
-					ab.subVectors( vA, vB );
-					db.cross( ab );
-
-					vertices[ face.a ].add( db );
-					vertices[ face.b ].add( db );
-					vertices[ face.d ].add( db );
-
-					// bcd
-
-					dc.subVectors( vD, vC );
-					bc.subVectors( vB, vC );
-					dc.cross( bc );
-
-					vertices[ face.b ].add( dc );
-					vertices[ face.c ].add( dc );
-					vertices[ face.d ].add( dc );
-
-				}
+				vertices[ face.a ].add( cb );
+				vertices[ face.b ].add( cb );
+				vertices[ face.c ].add( cb );
 
 			}
 
@@ -261,20 +208,9 @@ THREE.Geometry.prototype = {
 
 				face = this.faces[ f ];
 
-				if ( face instanceof THREE.Face3 ) {
-
-					vertices[ face.a ].add( face.normal );
-					vertices[ face.b ].add( face.normal );
-					vertices[ face.c ].add( face.normal );
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					vertices[ face.a ].add( face.normal );
-					vertices[ face.b ].add( face.normal );
-					vertices[ face.c ].add( face.normal );
-					vertices[ face.d ].add( face.normal );
-
-				}
+				vertices[ face.a ].add( face.normal );
+				vertices[ face.b ].add( face.normal );
+				vertices[ face.c ].add( face.normal );
 
 			}
 
@@ -290,20 +226,9 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			if ( face instanceof THREE.Face3 ) {
-
-				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
-				face.vertexNormals[ 3 ].copy( vertices[ face.d ] );
-
-			}
+			face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
+			face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
+			face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
 
 		}
 
@@ -374,16 +299,7 @@ THREE.Geometry.prototype = {
 					face = this.faces[ f ];
 
 					faceNormal = new THREE.Vector3();
-
-					if ( face instanceof THREE.Face3 ) {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
-
-					} else {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3() };
-
-					}
+					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
 
 					dstNormalsFace.push( faceNormal );
 					dstNormalsVertex.push( vertexNormals );
@@ -416,20 +332,9 @@ THREE.Geometry.prototype = {
 
 				faceNormal.copy( face.normal );
 
-				if ( face instanceof THREE.Face3 ) {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-
-				} else {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-					vertexNormals.d.copy( face.vertexNormals[ 3 ] );
-
-				}
+				vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+				vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+				vertexNormals.c.copy( face.vertexNormals[ 2 ] );
 
 			}
 
@@ -514,16 +419,7 @@ THREE.Geometry.prototype = {
 			face = this.faces[ f ];
 			uv = this.faceVertexUvs[ 0 ][ f ]; // use UV layer 0 for tangents
 
-			if ( face instanceof THREE.Face3 ) {
-
-				handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				handleTriangle( this, face.a, face.b, face.d, 0, 1, 3 );
-				handleTriangle( this, face.b, face.c, face.d, 1, 2, 3 );
-
-			}
+			handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
 
 		}
 
@@ -533,7 +429,7 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			for ( i = 0; i < face.vertexNormals.length; i++ ) {
+			for ( i = 0; i < Math.min( face.vertexNormals.length, 3 ); i++ ) {
 
 				n.copy( face.vertexNormals[ i ] );
 
@@ -654,91 +550,24 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+			face.a = changes[ face.a ];
+			face.b = changes[ face.b ];
+			face.c = changes[ face.c ];
 
-				face.a = changes[ face.a ];
-				face.b = changes[ face.b ];
-				face.c = changes[ face.c ];
+			indices = [ face.a, face.b, face.c ];
 
-				indices = [ face.a, face.b, face.c ];
+			var dupIndex = -1;
 
-				var dupIndex = -1;
+			// if any duplicate vertices are found in a Face3
+			// we have to remove the face as nothing can be saved
+			for ( var n = 0; n < 3; n ++ ) {
+				if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
 
-				// if any duplicate vertices are found in a Face3
-				// we have to remove the face as nothing can be saved
-				for ( var n = 0; n < 3; n ++ ) {
-					if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+					dupIndex = n;
+					faceIndicesToRemove.push( i );
+					break;
 
-						dupIndex = n;
-						faceIndicesToRemove.push( i );
-						break;
-
-					}
 				}
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				face.a = changes[ face.a ];
-				face.b = changes[ face.b ];
-				face.c = changes[ face.c ];
-				face.d = changes[ face.d ];
-
-				// check dups in (a, b, c, d) and convert to -> face3
-
-				indices = [ face.a, face.b, face.c, face.d ];
-
-				var dupIndex = -1;
-
-				for ( var n = 0; n < 4; n ++ ) {
-
-					if ( indices[ n ] == indices[ ( n + 1 ) % 4 ] ) {
-
-						// if more than one duplicated vertex is found
-						// we can't generate any valid Face3's, thus
-						// we need to remove this face complete.
-						if ( dupIndex >= 0 ) {
-
-							faceIndicesToRemove.push( i );
-
-						}
-
-						dupIndex = n;
-
-					}
-				}
-
-				if ( dupIndex >= 0 ) {
-
-					indices.splice( dupIndex, 1 );
-
-					var newFace = new THREE.Face3( indices[0], indices[1], indices[2], face.normal, face.color, face.materialIndex );
-
-					for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
-
-						u = this.faceVertexUvs[ j ][ i ];
-
-						if ( u ) {
-							u.splice( dupIndex, 1 );
-						}
-
-					}
-
-					if( face.vertexNormals && face.vertexNormals.length > 0) {
-
-						newFace.vertexNormals = face.vertexNormals;
-						newFace.vertexNormals.splice( dupIndex, 1 );
-
-					}
-
-					if( face.vertexColors && face.vertexColors.length > 0 ) {
-
-						newFace.vertexColors = face.vertexColors;
-						newFace.vertexColors.splice( dupIndex, 1 );
-					}
-
-					this.faces[ i ] = newFace;
-				}
-
 			}
 
 		}
