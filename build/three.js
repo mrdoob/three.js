@@ -9182,9 +9182,10 @@ THREE.SmartPointLight = function ( params ) {
 THREE.SmartPointLight.prototype = Object.create( THREE.PointLight.prototype );
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author aluarosi / https://github.com/aluarosi
  */
 
-THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
+THREE.SpotLight = function ( hex, intensity, distance, angle, exponent, quadratic ) {
 
 	THREE.Light.call( this, hex );
 
@@ -9195,6 +9196,7 @@ THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
+	this.quadratic = ( quadratic !== undefined ) ? quadratic : false;
 
 	this.castShadow = false;
 	this.onlyShadow = false;
@@ -9236,6 +9238,7 @@ THREE.SpotLight.prototype.clone = function () {
 	light.distance = this.distance;
 	light.angle = this.angle;
 	light.exponent = this.exponent;
+	light.quadratic = this.quadratic;
 
 	light.castShadow = this.castShadow;
 	light.onlyShadow = this.onlyShadow;
@@ -9317,8 +9320,6 @@ THREE.SmartSpotLight = function ( params ) {
 		distance = 0;
 		intensity = main_intensity;
 	}
-	console.log( main_intensity, main_distance, fade_type, fade_distance, near_distance, angle, exponent);
-	console.log( hex,intensity, distance, angle, exponent, quadratic);
 	THREE.SpotLight.call( this, hex, intensity, distance, angle, exponent, quadratic );
 }
 
@@ -15728,6 +15729,7 @@ THREE.ShaderChunk = {
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 		"#endif",
 
@@ -15972,6 +15974,7 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 			"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
 
@@ -16000,7 +16003,6 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-
 				"if ( pointLightDistance[ i ] > 0.0 ) {",
 					"if ( pointLightQuadratic[ i ] ){",
 						"lDistance = min( pow( pointLightDistance[i]/length(lVector), 2.0 ),1.0 );",
@@ -16023,8 +16025,13 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-				"if ( spotLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+				"if ( spotLightDistance[ i ] > 0.0 ) {",
+					"if ( spotLightQuadratic[ i ] ){",
+						"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+					"} else {",
+					    "lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"}",
+				"}",
 
 				"vSpotLight[ i ] = vec4( lVector, lDistance );",
 
@@ -16086,6 +16093,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 			"#ifdef PHONG_PER_PIXEL",
 
@@ -16225,8 +16233,13 @@ THREE.ShaderChunk = {
 					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
 					"float lDistance = 1.0;",
-					"if ( spotLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"if ( spotLightDistance[ i ] > 0.0 ) {",
+						"if ( spotLightQuadratic[ i ] ){",
+							"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+						"} else {",
+					    	"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+						"}",
+					"}",
 
 					"lVector = normalize( lVector );",
 
@@ -17173,7 +17186,8 @@ THREE.UniformsLib = {
 		"spotLightDirection" : { type: "fv", value: [] },
 		"spotLightDistance" : { type: "fv1", value: [] },
 		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] }
+		"spotLightExponent" : { type: "fv1", value: [] },
+		"spotLightQuadratic" : { type: "iv1", value: [] }
 
 	},
 
@@ -18612,7 +18626,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: [], positions: [] },
 		point: { length: 0, colors: [], positions: [], distances: [], quadratics: []},
-		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [] },
+		spot: { length: 0, colors: [], positions: [], distances: [], directions: [], anglesCos: [], exponents: [], quadratics: [] },
 		hemi: { length: 0, skyColors: [], groundColors: [], positions: [] }
 
 	};
@@ -21123,6 +21137,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.spotLightDirection.value = lights.spot.directions;
 		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
 		uniforms.spotLightExponent.value = lights.spot.exponents;
+		uniforms.spotLightQuadratic.value = lights.spot.quadratics;
 
 		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
 		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
@@ -21441,6 +21456,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotDirections = zlights.spot.directions,
 		spotAnglesCos = zlights.spot.anglesCos,
 		spotExponents = zlights.spot.exponents,
+		spotQuadratics = zlights.spot.quadratics,
 
 		hemiSkyColors = zlights.hemi.skyColors,
 		hemiGroundColors = zlights.hemi.groundColors,
@@ -21591,6 +21607,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
 				spotExponents[ spotLength ] = light.exponent;
+
+				spotQuadratics[ spotLength ] = quadratic;
 
 				spotLength += 1;
 

@@ -1,8 +1,9 @@
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author aluarosi / https://github.com/aluarosi
  */
 
-THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
+THREE.SpotLight = function ( hex, intensity, distance, angle, exponent, quadratic ) {
 
 	THREE.Light.call( this, hex );
 
@@ -13,6 +14,7 @@ THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
+	this.quadratic = ( quadratic !== undefined ) ? quadratic : false;
 
 	this.castShadow = false;
 	this.onlyShadow = false;
@@ -54,6 +56,7 @@ THREE.SpotLight.prototype.clone = function () {
 	light.distance = this.distance;
 	light.angle = this.angle;
 	light.exponent = this.exponent;
+	light.quadratic = this.quadratic;
 
 	light.castShadow = this.castShadow;
 	light.onlyShadow = this.onlyShadow;

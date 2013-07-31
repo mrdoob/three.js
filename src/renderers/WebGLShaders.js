@@ -478,6 +478,7 @@ THREE.ShaderChunk = {
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 		"#endif",
 
@@ -722,6 +723,7 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 			"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
 
@@ -750,7 +752,6 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-
 				"if ( pointLightDistance[ i ] > 0.0 ) {",
 					"if ( pointLightQuadratic[ i ] ){",
 						"lDistance = min( pow( pointLightDistance[i]/length(lVector), 2.0 ),1.0 );",
@@ -773,8 +774,13 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-				"if ( spotLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+				"if ( spotLightDistance[ i ] > 0.0 ) {",
+					"if ( spotLightQuadratic[ i ] ){",
+						"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+					"} else {",
+					    "lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"}",
+				"}",
 
 				"vSpotLight[ i ] = vec4( lVector, lDistance );",
 
@@ -836,6 +842,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 			"#ifdef PHONG_PER_PIXEL",
 
@@ -975,8 +982,13 @@ THREE.ShaderChunk = {
 					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
 					"float lDistance = 1.0;",
-					"if ( spotLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"if ( spotLightDistance[ i ] > 0.0 ) {",
+						"if ( spotLightQuadratic[ i ] ){",
+							"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+						"} else {",
+					    	"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+						"}",
+					"}",
 
 					"lVector = normalize( lVector );",
 
@@ -1923,7 +1935,8 @@ THREE.UniformsLib = {
 		"spotLightDirection" : { type: "fv", value: [] },
 		"spotLightDistance" : { type: "fv1", value: [] },
 		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] }
+		"spotLightExponent" : { type: "fv1", value: [] },
+		"spotLightQuadratic" : { type: "iv1", value: [] }
 
 	},
 
