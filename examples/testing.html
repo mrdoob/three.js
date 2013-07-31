@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>three.js - examples test runner</title>
+	<link rel="stylesheet" href="shared/styles/bootstrap.min.css">
+	<script src="shared/js/libs/jquery.min.js"></script>
+	<script src="shared/js/libs/q.min.js"></script>
+	<script src="shared/js/libs/coffee-script.js"></script>
+	<style>
+		#menu-well {
+			position: absolute;
+			overflow: auto;
+			top: 2%;
+			bottom: 2%;
+			left: 2%;
+			right: 82%;
+		}
+
+		.nav > li > a {
+			padding: 2px;
+			margin-bottom: 2px;
+		}
+
+		#viewer-well {
+			overflow: auto;
+
+			position: absolute;
+			top: 2%;
+			bottom: 2%;
+			left: 20%;
+			right: 2%;
+
+			margin: 0;
+			padding: 0.5em;
+		}
+
+		#viewer {
+			width: 100%;
+			height: 100%;
+			border: 1px solid #bbb;
+		}
+	</style>
+</head>
+<body>
+	<div id="menu-well" class="well">
+		<ul class="nav nav-list" id="menu"></ul>
+	</div>
+
+	<div id="viewer-well" class="well">
+		<iframe id="viewer"></iframe>
+	</div>
+
+	<script type="text/coffeescript">
+		$ ->
+			Q($.get('tests.json'))
+			.then (tests)->
+				tests = JSON.parse(tests)
+				buildMenu tests, $("#menu"), '.'
+				$(".tree-toggle").click ->
+					$(this).parent().children("ul.tree").toggle(200)
+				$(".tree:first a:first").addClass("current")
+				$(".example").click ->
+					$(".current").removeClass ".current"
+					$(this).addClass ".current"
+
+		buildMenu = (tests, root, path)->
+			for name, part of tests
+				if part is true
+					$li = $ "<li><a href='#{path}/#{name}' target='viewer' class='example btn btn-warning'>#{name}</a></li>"
+					root.append $li
+				else
+					prefix = ""
+					depth = path.match("/")?.length
+					(prefix += "&gt;") for i in [1..depth]
+					$li = $ "<li>
+							<label class='tree-toggle nav-header untested'>#{path}/#{name}</label>
+							<ul class='nav nav-list tree'></ul>
+						</li>"
+					root.append $li
+					buildMenu part, $li.find("ul"), "#{path}/#{name}"
+	</script>
+</body>
+</html>
+

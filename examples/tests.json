@@ -1,0 +1,347 @@
+{
+	"webgldeferred": {
+		"animation.html": true,
+		"arealights.html": true,
+		"pointlights.html": true
+	},
+	"webgl3": {
+		"performance.html": true
+	},
+	"webgl": {
+		"buffergeometry.html": true,
+		"camera.html": true,
+		"geometries.html": true,
+		"geometries2.html": true,
+		"hdr.html": true,
+		"helpers.html": true,
+		"kinect.html": true,
+		"lensflares.html": true,
+		"lod.html": true,
+		"materials.html": true,
+		"materials2.html": true,
+		"morphnormals.html": true,
+		"morphtargets.html": true,
+		"octree.html": true,
+		"performance.html": true,
+		"postprocessing.html": true,
+		"postprocessing2.html": true,
+		"ribbons.html": true,
+		"rtt.html": true,
+		"sandbox.html": true,
+		"shader.html": true,
+		"shader2.html": true,
+		"shadowmap.html": true,
+		"sprites.html": true,
+		"trails.html": true,
+		"test": {
+			"memory.html": true,
+			"memory2.html": true
+		},
+		"terrain": {
+			"dynamic.html": true
+		},
+		"shadowmap": {
+			"performance.html": true
+		},
+		"shading": {
+			"physical.html": true
+		},
+		"shader": {
+			"lava.html": true
+		},
+		"postprocessing": {
+			"advanced.html": true,
+			"dof.html": true,
+			"dof2.html": true,
+			"godrays.html": true
+		},
+		"performance": {
+			"doublesided.html": true,
+			"static.html": true
+		},
+		"particles": {
+			"billboards.html": true,
+			"dynamic.html": true,
+			"random.html": true,
+			"shapes.html": true,
+			"sprites.html": true,
+			"billboards": {
+				"colors.html": true
+			}
+		},
+		"panorama": {
+			"equirectangular.html": true
+		},
+		"multiple": {
+			"views.html": true,
+			"windows.html": true,
+			"canvases": {
+				"circle.html": true,
+				"complex.html": true,
+				"grid.html": true
+			}
+		},
+		"morphtargets": {
+			"horse.html": true,
+			"md2.html": true,
+			"md2": {
+				"control.html": true
+			}
+		},
+		"materials": {
+			"blending.html": true,
+			"bumpmap.html": true,
+			"cars.html": true,
+			"cubemap.html": true,
+			"grass.html": true,
+			"lightmap.html": true,
+			"normalmap.html": true,
+			"normalmap2.html": true,
+			"shaders.html": true,
+			"skin.html": true,
+			"video.html": true,
+			"wireframe.html": true,
+			"texture": {
+				"anisotropy.html": true,
+				"compressed.html": true,
+				"filters.html": true,
+				"manualmipmap.html": true
+			},
+			"shaders": {
+				"fresnel.html": true
+			},
+			"cubemap": {
+				"dynamic.html": true,
+				"dynamic2.html": true,
+				"escher.html": true,
+				"refraction.html": true,
+				"balls": {
+					"reflection.html": true,
+					"refraction.html": true,
+					"refraction": {
+						"crosseyed.html": true
+					},
+					"reflection": {
+						"anaglyph.html": true
+					}
+				}
+			},
+			"cars": {
+				"anaglyph.html": true,
+				"camaro.html": true,
+				"parallaxbarrier.html": true,
+				"camaro": {
+					"crosseyed.html": true
+				}
+			},
+			"bumpmap": {
+				"skin.html": true
+			},
+			"blending": {
+				"custom.html": true
+			}
+		},
+		"marching": {
+			"cubes.html": true
+		},
+		"loader": {
+			"collada.html": true,
+			"ctm.html": true,
+			"obj.html": true,
+			"ply.html": true,
+			"scene.html": true,
+			"stl.html": true,
+			"utf8.html": true,
+			"vtk.html": true,
+			"scene": {
+				"blender.html": true
+			},
+			"obj": {
+				"mtl.html": true
+			},
+			"json": {
+				"blender.html": true,
+				"objconverter.html": true
+			},
+			"ctm": {
+				"materials.html": true
+			},
+			"collada": {
+				"keyframe.html": true
+			}
+		},
+		"lines": {
+			"colors.html": true,
+			"cubes.html": true,
+			"dashed.html": true,
+			"sphere.html": true,
+			"splines.html": true
+		},
+		"lights": {
+			"hemisphere.html": true,
+			"pointlights.html": true,
+			"pointlights2.html": true
+		},
+		"interactive": {
+			"cubes.html": true,
+			"draggablecubes.html": true,
+			"voxelpainter.html": true,
+			"cubes": {
+				"gpu.html": true
+			}
+		},
+		"geometry": {
+			"colors.html": true,
+			"convex.html": true,
+			"cube.html": true,
+			"dynamic.html": true,
+			"hierarchy.html": true,
+			"hierarchy2.html": true,
+			"minecraft.html": true,
+			"normals.html": true,
+			"nurbs.html": true,
+			"shapes.html": true,
+			"subdivision.html": true,
+			"terrain.html": true,
+			"tessellation.html": true,
+			"text.html": true,
+			"terrain": {
+				"fog.html": true,
+				"raycast.html": true
+			},
+			"minecraft": {
+				"ao.html": true,
+				"oculusrift.html": true
+			},
+			"large": {
+				"mesh.html": true
+			},
+			"extrude": {
+				"shapes.html": true,
+				"splines.html": true,
+				"uvs2.html": true
+			},
+			"colors": {
+				"blender.html": true
+			}
+		},
+		"custom": {
+			"attributes.html": true,
+			"attributes": {
+				"lines.html": true,
+				"particles.html": true,
+				"particles2.html": true,
+				"particles3.html": true,
+				"ribbons.html": true
+			}
+		},
+		"buffergeometry": {
+			"lines.html": true,
+			"particles.html": true,
+			"custom": {
+				"attributes": {
+					"particles.html": true
+				}
+			}
+		},
+		"animation": {
+			"cloth.html": true,
+			"skinning.html": true,
+			"skinning": {
+				"morph.html": true
+			}
+		}
+	},
+	"software": {
+		"sandbox.html": true
+	},
+	"misc": {
+		"lookat.html": true,
+		"sound.html": true,
+		"uv": {
+			"tests.html": true
+		},
+		"ubiquity": {
+			"test.html": true
+		},
+		"lights": {
+			"test.html": true
+		},
+		"controls": {
+			"fly.html": true,
+			"oculusrift.html": true,
+			"orbit.html": true,
+			"path.html": true,
+			"pointerlock.html": true,
+			"trackball.html": true,
+			"transform.html": true
+		}
+	},
+	"css3d": {
+		"molecules.html": true,
+		"panorama.html": true,
+		"periodictable.html": true,
+		"sandbox.html": true,
+		"sprites.html": true,
+		"youtube.html": true
+	},
+	"canvas": {
+		"lines.html": true,
+		"materials.html": true,
+		"performance.html": true,
+		"sandbox.html": true,
+		"particles": {
+			"floor.html": true,
+			"random.html": true,
+			"shapes.html": true,
+			"sprites.html": true,
+			"waves.html": true
+		},
+		"materials": {
+			"depth.html": true,
+			"normal.html": true,
+			"reflection.html": true,
+			"video.html": true
+		},
+		"lines": {
+			"colors.html": true,
+			"sphere.html": true
+		},
+		"lights": {
+			"pointlights.html": true,
+			"pointlights": {
+				"smooth.html": true
+			}
+		},
+		"interactive": {
+			"cubes.html": true,
+			"lines.html": true,
+			"particles.html": true,
+			"voxelpainter.html": true,
+			"cubes": {
+				"tween.html": true
+			}
+		},
+		"geometry": {
+			"birds.html": true,
+			"cube.html": true,
+			"earth.html": true,
+			"hierarchy.html": true,
+			"nurbs.html": true,
+			"panorama.html": true,
+			"shapes.html": true,
+			"terrain.html": true,
+			"text.html": true,
+			"panorama": {
+				"fisheye.html": true
+			}
+		},
+		"camera": {
+			"orthographic.html": true,
+			"orthographic2.html": true
+		},
+		"ascii": {
+			"effect.html": true
+		}
+	}
+}
