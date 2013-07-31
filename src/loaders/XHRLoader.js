@@ -21,8 +21,8 @@ THREE.XHRLoader.prototype = {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				scope.manager.itemEnd( url );
 				onLoad( event.target.responseText );
+				scope.manager.itemEnd( url );
 
 			}, false );
 
