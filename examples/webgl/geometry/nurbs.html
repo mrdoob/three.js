@@ -26,11 +26,11 @@
 
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - NURBS curve and surface example</div>
 
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/js/curves/NURBSCurve.js"></script>
-		<script src="/examples/shared/js/curves/NURBSSurface.js"></script>
-		<script src="/examples/shared/js/curves/NURBSUtils.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/js/curves/NURBSCurve.js"></script>
+		<script src="../../shared/js/curves/NURBSSurface.js"></script>
+		<script src="../../shared/js/curves/NURBSUtils.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 
 		<script>
@@ -152,7 +152,7 @@
 				var knots2 = [0, 0, 0, 0, 1, 1, 1, 1];
 				var nurbsSurface = new THREE.NURBSSurface(degree1, degree2, knots1, knots2, nsControlPoints);
 
-				var map = THREE.ImageUtils.loadTexture( '/examples/shared/textures/ash_uvgrid01.jpg' );
+				var map = THREE.ImageUtils.loadTexture( '../../shared/textures/ash_uvgrid01.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 

@@ -43,12 +43,12 @@
 			<a href="http://threejs.org" target="_blank">three.js</a> - point lights WebGL demo
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
+		<script src="../../shared/js/controls/TrackballControls.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -116,12 +116,12 @@
 
 				// TEXTURES
 
-				var texture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/disturb.jpg" );
+				var texture = THREE.ImageUtils.loadTexture( "../../shared/textures/disturb.jpg" );
 				texture.repeat.set( 20, 10 );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.format = THREE.RGBFormat;
 
-				var texture2 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/planets/moon_1024.jpg" );
+				var texture2 = THREE.ImageUtils.loadTexture( "../../shared/textures/planets/moon_1024.jpg" );
 				texture2.repeat.set( 2, 1 );
 				texture2.wrapS = texture2.wrapT = THREE.RepeatWrapping;
 				texture2.format = THREE.RGBFormat;

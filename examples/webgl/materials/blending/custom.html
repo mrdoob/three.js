@@ -36,24 +36,24 @@
 
 		<div id="images" class="menu">
 			Foreground
-			<a id="img_0" href="#"><img src="/examples/shared/textures/disturb.jpg" /></a>
-			<a id="img_1" href="#"><img src="/examples/shared/textures/sprite0.jpg" /></a>
-			<a id="img_2" href="#"><img src="/examples/shared/textures/sprite0.png" /></a>
-			<a id="img_3" href="#"><img src="/examples/shared/textures/lensflare/lensflare0.png" /></a>
-			<a id="img_4" href="#"><img src="/examples/shared/textures/lensflare/lensflare0_alpha.png" /></a>
-			<a id="img_5" href="#"><img src="/examples/shared/textures/sprites/ball.png" /></a>
-			<a id="img_6" href="#"><img src="/examples/shared/textures/sprites/snowflake7_alpha.png" /></a>
+			<a id="img_0" href="#"><img src="../../../shared/textures/disturb.jpg" /></a>
+			<a id="img_1" href="#"><img src="../../../shared/textures/sprite0.jpg" /></a>
+			<a id="img_2" href="#"><img src="../../../shared/textures/sprite0.png" /></a>
+			<a id="img_3" href="#"><img src="../../../shared/textures/lensflare/lensflare0.png" /></a>
+			<a id="img_4" href="#"><img src="../../../shared/textures/lensflare/lensflare0_alpha.png" /></a>
+			<a id="img_5" href="#"><img src="../../../shared/textures/sprites/ball.png" /></a>
+			<a id="img_6" href="#"><img src="../../../shared/textures/sprites/snowflake7_alpha.png" /></a>
 		</div>
 
 		<div id="backgrounds" class="menu">
 			Background
-			<a id="bg_0" href="#"><img src="/examples/shared/textures/disturb.jpg" /></a>
+			<a id="bg_0" href="#"><img src="../../../shared/textures/disturb.jpg" /></a>
 			<a id="bg_1" href="#"></a>
 			<a id="bg_2" href="#"></a>
-			<a id="bg_3" href="#"><img src="/examples/shared/textures/crate.gif" /></a>
-			<a id="bg_4" href="#"><img src="/examples/shared/textures/lava/lavatile.jpg" /></a>
-			<a id="bg_5" href="#"><img src="/examples/shared/textures/water.jpg" /></a>
-			<a id="bg_6" href="#"><img src="/examples/shared/textures/lava/cloud.png" /></a>
+			<a id="bg_3" href="#"><img src="../../../shared/textures/crate.gif" /></a>
+			<a id="bg_4" href="#"><img src="../../../shared/textures/lava/lavatile.jpg" /></a>
+			<a id="bg_5" href="#"><img src="../../../shared/textures/water.jpg" /></a>
+			<a id="bg_6" href="#"><img src="../../../shared/textures/lava/cloud.png" /></a>
 		</div>
 
 		<div id="labels" class="menu">
@@ -71,8 +71,8 @@
 			<div class="lbl" id="lbl_dst">Destination</div>
 		</div>
 
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="../../../../build/three.min.js"></script>
+		<script src="../../../shared/js/Detector.js"></script>
 
 		<script>
 
@@ -151,23 +151,23 @@
 				mapBg1.repeat.set( 128, 64 );
 				mapBg1.needsUpdate = true;
 
-				var mapBg2 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/disturb.jpg" );
+				var mapBg2 = THREE.ImageUtils.loadTexture( "../../../shared/textures/disturb.jpg" );
 				mapBg2.wrapS = mapBg2.wrapT = THREE.RepeatWrapping;
 				mapBg2.repeat.set( 8, 4 );
 
-				var mapBg3 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/crate.gif" );
+				var mapBg3 = THREE.ImageUtils.loadTexture( "../../../shared/textures/crate.gif" );
 				mapBg3.wrapS = mapBg3.wrapT = THREE.RepeatWrapping;
 				mapBg3.repeat.set( 32, 16 );
 
-				var mapBg4 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/lava/lavatile.jpg" );
+				var mapBg4 = THREE.ImageUtils.loadTexture( "../../../shared/textures/lava/lavatile.jpg" );
 				mapBg4.wrapS = mapBg4.wrapT = THREE.RepeatWrapping;
 				mapBg4.repeat.set( 8, 4 );
 
-				var mapBg5 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/water.jpg" );
+				var mapBg5 = THREE.ImageUtils.loadTexture( "../../../shared/textures/water.jpg" );
 				mapBg5.wrapS = mapBg5.wrapT = THREE.RepeatWrapping;
 				mapBg5.repeat.set( 8, 4 );
 
-				var mapBg6 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/lava/cloud.png" );
+				var mapBg6 = THREE.ImageUtils.loadTexture( "../../../shared/textures/lava/cloud.png" );
 				mapBg6.wrapS = mapBg6.wrapT = THREE.RepeatWrapping;
 				mapBg6.repeat.set( 2, 1 );
 
@@ -181,13 +181,13 @@
 
 				// FOREGROUND IMAGES
 
-				var images = [ '/examples/shared/textures/disturb.jpg',
-							   '/examples/shared/textures/sprite0.jpg',
-							   '/examples/shared/textures/sprite0.png',
-							   '/examples/shared/textures/lensflare/lensflare0.png',
-							   '/examples/shared/textures/lensflare/lensflare0_alpha.png',
-							   '/examples/shared/textures/sprites/ball.png',
-							   '/examples/shared/textures/sprites/snowflake7_alpha.png' ];
+				var images = [ '../../../shared/textures/disturb.jpg',
+							   '../../../shared/textures/sprite0.jpg',
+							   '../../../shared/textures/sprite0.png',
+							   '../../../shared/textures/lensflare/lensflare0.png',
+							   '../../../shared/textures/lensflare/lensflare0_alpha.png',
+							   '../../../shared/textures/sprites/ball.png',
+							   '../../../shared/textures/sprites/snowflake7_alpha.png' ];
 
 				for ( var i = 0; i < images.length; i ++ ) {
 

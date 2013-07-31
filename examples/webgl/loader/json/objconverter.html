@@ -35,10 +35,10 @@
 			<a href="http://sketchup.google.com/3dwarehouse/details?mid=f526cc4abf7cb68d76cab47c765b7255">iClone</a>.
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../../shared/js/Detector.js"></script>
+		<script src="../../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -185,8 +185,8 @@
 				var callbackMale = function ( geometry, materials ) { createScene( geometry, materials, 90, FLOOR, 50, 105 ) };
 				var callbackFemale = function ( geometry, materials ) { createScene( geometry, materials, -80, FLOOR, 50, 0 ) };
 
-				loader.load( "/examples/shared/obj/male02/Male02_dds.js", callbackMale );
-				loader.load( "/examples/shared/obj/female02/Female02_slim.js", callbackFemale );
+				loader.load( "../../../shared/obj/male02/Male02_dds.js", callbackMale );
+				loader.load( "../../../shared/obj/female02/Female02_slim.js", callbackFemale );
 
 				//
 

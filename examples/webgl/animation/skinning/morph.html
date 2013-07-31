@@ -4,7 +4,7 @@
 		<title>three.js webgl - skinning + morphing [knight]</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" href="/examples/shared/styles/default.css" />
+		<link rel="stylesheet" href="../../../shared/styles/default.css" />
 		<style>
 			body {
 				color: #000;
@@ -34,8 +34,8 @@
 		- knight by <a href="http://vimeo.com/36113323">apendua</a>
 		</div>
 
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/s3age/s3age.js"></script>
+		<script src="../../../../build/three.min.js"></script>
+		<script src="../../../shared/s3age/s3age.js"></script>
 
 		<script>
 			/**
@@ -49,7 +49,7 @@
 
 				var loader = new THREE.JSONLoader();
 				// Load the knight
-				loader.load( "/examples/shared/models/skinned/knight.js", function ( geometry, materials ) {
+				loader.load( "../../../shared/models/skinned/knight.js", function ( geometry, materials ) {
 					self.initialize( geometry, materials);
 					stage.start(); // Let the stage know when the knight's been loaded.
 				} );
@@ -222,7 +222,7 @@
 
 				var groundMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0x111111, map: initTexture } );
 
-				var groundTexture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/terrain/grasslight-big.jpg", undefined, function() { groundMaterial.map = groundTexture } );
+				var groundTexture = THREE.ImageUtils.loadTexture( "../../../shared/textures/terrain/grasslight-big.jpg", undefined, function() { groundMaterial.map = groundTexture } );
 				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 				groundTexture.repeat.set( 25, 25 );
 				groundTexture.anisotropy = 16;

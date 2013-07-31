@@ -4,16 +4,16 @@
 		<title>three.js webgl - materials - lightmap</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" type="text/css" href="/examples/shared/styles/default.css" />
+		<link rel="stylesheet" type="text/css" href="../../shared/styles/default.css" />
 		<style>
 			#stats #fps { background: transparent !important }
 			#stats #fps #fpsText { color: #abc !important }
 			#stats #fps #fpsGraph { display: none }
 		</style>
 
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/s3age/s3age.js"></script>
-		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/s3age/s3age.js"></script>
+		<script src="../../shared/js/controls/TrackballControls.js"></script>
 	</head>
 
 	<body>
@@ -98,7 +98,7 @@
 					children: [
 						new SkyDome(),
 						(function LightMap(){
-							var lit = new S3age.Loader(THREE.JSONLoader, "/examples/shared/obj/lightmap/lightmap.js");
+							var lit = new S3age.Loader(THREE.JSONLoader, "../../shared/obj/lightmap/lightmap.js");
 							lit.scale.multiplyScalar(100);
 							return lit;
 						}())

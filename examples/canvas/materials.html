@@ -15,9 +15,9 @@
 	</head>
 	<body>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -74,8 +74,8 @@
 					new THREE.MeshDepthMaterial( { overdraw: true } ),
 					new THREE.MeshNormalMaterial( { overdraw: true } ),
 					new THREE.MeshNormalMaterial( { shading: THREE.SmoothShading, overdraw: true } ),
-					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( '/examples/shared/textures/land_ocean_ice_cloud_2048.jpg' ) } ),
-					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( '/examples/shared/textures/envmap.png', new THREE.SphericalReflectionMapping() ) } )
+					new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( '../shared/textures/land_ocean_ice_cloud_2048.jpg' ) } ),
+					new THREE.MeshBasicMaterial( { envMap: THREE.ImageUtils.loadTexture( '../shared/textures/envmap.png', new THREE.SphericalReflectionMapping() ) } )
 
 				];
 

@@ -36,12 +36,12 @@
 	</head>
 	<body>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../build/three.min.js"></script>
 
-		<script src='/examples/shared/js/libs/dat.gui.min.js'></script>
+		<script src='../shared/js/libs/dat.gui.min.js'></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../shared/js/Detector.js"></script>
+		<script src="../shared/js/libs/stats.min.js"></script>
 
 		<script id="vs" type="x-shader/x-vertex">
 
@@ -209,7 +209,7 @@
 
 				}, false );
 				video.loop = true;
-				video.src = '/examples/shared/textures/kinect.webm';
+				video.src = '../shared/textures/kinect.webm';
 				video.play();
 
 				renderer = new THREE.WebGLRenderer();

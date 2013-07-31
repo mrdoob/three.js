@@ -39,7 +39,7 @@
 			Walt Disney head by <a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
 		<script>
 
@@ -59,7 +59,7 @@
 				scene = new THREE.Scene();
 
 				loader = new THREE.JSONLoader();
-				loader.load( '/examples/shared/obj/WaltHeadLo.js', function ( geometry ) {
+				loader.load( '../../shared/obj/WaltHeadLo.js', function ( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshNormalMaterial( { overdraw: true } ) );
 					scene.add( mesh );

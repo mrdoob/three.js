@@ -44,14 +44,14 @@
 			use arrows to control characters, mouse for camera
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
+		<script src="../../../shared/js/controls/TrackballControls.js"></script>
 
-		<script src='/examples/shared/js/MD2CharacterComplex.js'></script>
+		<script src='../../../shared/js/MD2CharacterComplex.js'></script>
 
-		<script src='/examples/shared/js/Detector.js'></script>
-		<script src='/examples/shared/js/libs/stats.min.js'></script>
+		<script src='../../../shared/js/Detector.js'></script>
+		<script src='../../../shared/js/libs/stats.min.js'></script>
 
 		<script>
 
@@ -123,7 +123,7 @@
 
 				//  GROUND
 
-				var gt = THREE.ImageUtils.loadTexture( "/examples/shared/textures/terrain/grasslight-big.jpg" );
+				var gt = THREE.ImageUtils.loadTexture( "../../../shared/textures/terrain/grasslight-big.jpg" );
 				var gg = new THREE.PlaneGeometry( 16000, 16000 );
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
@@ -173,7 +173,7 @@
 
 				var configOgro = {
 
-					baseUrl: "/examples/shared/models/animated/ogro/",
+					baseUrl: "../../../shared/models/animated/ogro/",
 
 					body: "ogro-light.js",
 					skins: [ "grok.jpg", "ogrobase.png", "arboshak.png", "ctf_r.png", "ctf_b.png", "darkam.png", "freedom.png",

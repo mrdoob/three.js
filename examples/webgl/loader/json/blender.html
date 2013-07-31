@@ -38,12 +38,12 @@
 			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/loaders/ColladaLoader.js"></script>
+		<script src="../../../shared/js/loaders/ColladaLoader.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../../shared/js/Detector.js"></script>
+		<script src="../../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -62,7 +62,7 @@
 
 			var loader = new THREE.ColladaLoader();
 			loader.options.convertUpAxis = true;
-			loader.load( '/examples/shared/models/collada/monster/monster.dae', function ( collada ) {
+			loader.load( '../../../shared/models/collada/monster/monster.dae', function ( collada ) {
 
 				dae = collada.scene;
 				skin = collada.skins[ 0 ];
@@ -90,7 +90,7 @@
 				// Add Blender exported Collada model
 
 				var loader = new THREE.JSONLoader();
-				loader.load( '/examples/shared/models/animated/monster/monster.js', function ( geometry, materials ) {
+				loader.load( '../../../shared/models/animated/monster/monster.js', function ( geometry, materials ) {
 
 					// adjust color a bit
 

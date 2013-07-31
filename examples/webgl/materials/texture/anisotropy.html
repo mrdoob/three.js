@@ -4,7 +4,7 @@
 		<title>three.js webgl - materials - anisotropic texture filtering</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link rel="stylesheet" type="text/css" href="/examples/shared/styles/default.css" />
+		<link rel="stylesheet" type="text/css" href="../../../shared/styles/default.css" />
 		<style>
 			.lbl { color:#fff; font-size:16px; font-weight:bold; position: absolute; bottom:0px; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
 			#lbl_left { text-align:left; left:0px }
@@ -35,9 +35,9 @@
 			anisotropy: <span class="c" id="val_right"></span><br/>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/s3age/s3age.js"></script>
+		<script src="../../../shared/s3age/s3age.js"></script>
 
 		<script type="text/javascript">
 			var FOG_COLOR = 0xf2f7ff;
@@ -101,7 +101,7 @@
 					var constructor = function(anisotropy){
 						THREE.Object3D.apply(this, [].slice.call(arguments, 1));
 
-						var texture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/crate.gif" );
+						var texture = THREE.ImageUtils.loadTexture( "../../../shared/textures/crate.gif" );
 						material = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
 						texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 						texture.repeat.set( 512, 512 );

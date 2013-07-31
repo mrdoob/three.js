@@ -37,10 +37,10 @@
 			leaf texture by <a href="http://opengameart.org/node/10505">lauris71</a>, explosion texture by <a href="http://opengameart.org/node/7728">bart</a>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../../shared/js/Detector.js"></script>
+		<script src="../../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -69,20 +69,20 @@
 				DXT5 - RGBA - transparent textures with full alpha range
 				*/
 
-				var map1 = THREE.ImageUtils.loadCompressedTexture( '/examples/shared/textures/compressed/disturb_dxt1_nomip.dds' );
+				var map1 = THREE.ImageUtils.loadCompressedTexture( '../../../shared/textures/compressed/disturb_dxt1_nomip.dds' );
 				map1.minFilter = map1.magFilter = THREE.LinearFilter;
 				map1.anisotropy = 4;
 
-				var map2 = THREE.ImageUtils.loadCompressedTexture( '/examples/shared/textures/compressed/disturb_dxt1_mip.dds' );
+				var map2 = THREE.ImageUtils.loadCompressedTexture( '../../../shared/textures/compressed/disturb_dxt1_mip.dds' );
 				map2.anisotropy = 4;
 
-				var map3 = THREE.ImageUtils.loadCompressedTexture( '/examples/shared/textures/compressed/hepatica_dxt3_mip.dds' );
+				var map3 = THREE.ImageUtils.loadCompressedTexture( '../../../shared/textures/compressed/hepatica_dxt3_mip.dds' );
 				map3.anisotropy = 4;
 
-				var map4 = THREE.ImageUtils.loadCompressedTexture( '/examples/shared/textures/compressed/explosion_dxt5_mip.dds' );
+				var map4 = THREE.ImageUtils.loadCompressedTexture( '../../../shared/textures/compressed/explosion_dxt5_mip.dds' );
 				map4.anisotropy = 4;
 
-				var cubemap = THREE.ImageUtils.loadCompressedTextureCube( '/examples/shared/textures/compressed/Mountains.dds', new THREE.CubeReflectionMapping, function( cubemap ) {
+				var cubemap = THREE.ImageUtils.loadCompressedTextureCube( '../../../shared/textures/compressed/Mountains.dds', new THREE.CubeReflectionMapping, function( cubemap ) {
 
 					cubemap.magFilter = cubemap.minFilter = THREE.LinearFilter;
 					material1.needsUpdate = true;

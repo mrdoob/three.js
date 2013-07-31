@@ -7,7 +7,7 @@
 	</head>
 	<body>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../build/three.min.js"></script>
 
 		<script>
 
@@ -42,7 +42,7 @@
 				scene.add( helper );
 
 				var loader = new THREE.JSONLoader();
-				loader.load( '/examples/shared/obj/leeperrysmith/LeePerrySmith.js', function ( geometry, materials ) {
+				loader.load( '../shared/obj/leeperrysmith/LeePerrySmith.js', function ( geometry, materials ) {
 
 					var material = new THREE.MeshLambertMaterial();
 

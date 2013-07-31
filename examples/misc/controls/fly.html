@@ -33,21 +33,21 @@
 			b { color:orange }
 		</style>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/controls/FlyControls.js"></script>
+		<script src="../../shared/js/controls/FlyControls.js"></script>
 
-		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
-		<script src="/examples/shared/js/shaders/FilmShader.js"></script>
+		<script src="../../shared/js/shaders/CopyShader.js"></script>
+		<script src="../../shared/js/shaders/FilmShader.js"></script>
 
-		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
-		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/FilmPass.js"></script>
+		<script src="../../shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="../../shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="../../shared/js/postprocessing/MaskPass.js"></script>
+		<script src="../../shared/js/postprocessing/RenderPass.js"></script>
+		<script src="../../shared/js/postprocessing/FilmPass.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 	</head>
 
@@ -110,12 +110,12 @@
 				ambientLight = new THREE.AmbientLight( 0x000000 );
 				scene.add( ambientLight );
 
-				var planetTexture   = THREE.ImageUtils.loadTexture( "/examples/shared/textures/planets/earth_atmos_2048.jpg" );
-				var cloudsTexture   = THREE.ImageUtils.loadTexture( "/examples/shared/textures/planets/earth_clouds_1024.png" );
-				var normalTexture   = THREE.ImageUtils.loadTexture( "/examples/shared/textures/planets/earth_normal_2048.jpg" );
-				var specularTexture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/planets/earth_specular_2048.jpg" );
+				var planetTexture   = THREE.ImageUtils.loadTexture( "../../shared/textures/planets/earth_atmos_2048.jpg" );
+				var cloudsTexture   = THREE.ImageUtils.loadTexture( "../../shared/textures/planets/earth_clouds_1024.png" );
+				var normalTexture   = THREE.ImageUtils.loadTexture( "../../shared/textures/planets/earth_normal_2048.jpg" );
+				var specularTexture = THREE.ImageUtils.loadTexture( "../../shared/textures/planets/earth_specular_2048.jpg" );
 
-				var moonTexture = THREE.ImageUtils.loadTexture( "/examples/shared/textures/planets/moon_1024.jpg" );
+				var moonTexture = THREE.ImageUtils.loadTexture( "../../shared/textures/planets/moon_1024.jpg" );
 
 				var shader = THREE.ShaderLib[ "normalmap" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );

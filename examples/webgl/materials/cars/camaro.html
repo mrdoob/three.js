@@ -32,12 +32,12 @@
 			<div id="buttons"></div>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/loaders/BinaryLoader.js"></script>
+		<script src="../../../shared/js/loaders/BinaryLoader.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../../shared/js/Detector.js"></script>
+		<script src="../../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -108,7 +108,7 @@
 
 				document.addEventListener('mousemove', onDocumentMouseMove, false);
 
-				var r = "/examples/shared/textures/cube/SwedishRoyalCastle/";
+				var r = "../../../shared/textures/cube/SwedishRoyalCastle/";
 				var urls = [ r + "px.jpg", r + "nx.jpg",
 							 r + "py.jpg", r + "ny.jpg",
 							 r + "pz.jpg", r + "nz.jpg" ];
@@ -222,7 +222,7 @@
 				};
 
 				var loader = new THREE.BinaryLoader();
-				loader.load( "/examples/shared/obj/camaro/CamaroNoUv_bin.js", function( geometry ) { createScene( geometry, camaroMaterials ) } );
+				loader.load( "../../../shared/obj/camaro/CamaroNoUv_bin.js", function( geometry ) { createScene( geometry, camaroMaterials ) } );
 
 				//
 

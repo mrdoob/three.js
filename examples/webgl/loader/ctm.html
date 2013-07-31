@@ -42,14 +42,14 @@
 		<a href="http://davidoreilly.com/post/18087489343/disneyhead" target="_blank">David OReilly</a>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/loaders/ctm/lzma.js"></script>
-		<script src="/examples/shared/js/loaders/ctm/ctm.js"></script>
-		<script src="/examples/shared/js/loaders/ctm/CTMLoader.js"></script>
+		<script src="../../shared/js/loaders/ctm/lzma.js"></script>
+		<script src="../../shared/js/loaders/ctm/ctm.js"></script>
+		<script src="../../shared/js/loaders/ctm/CTMLoader.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -84,7 +84,7 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x050505, 800, 2000 );
 
-				var path = "/examples/shared/textures/cube/SwedishRoyalCastle/";
+				var path = "../../shared/textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
 					path + 'px' + format, path + 'nx' + format,
@@ -157,15 +157,15 @@
 
 				var loader = new THREE.CTMLoader();
 
-				loader.load( "/examples/shared/models/ctm/ben.ctm",   function( geometry ) {
+				loader.load( "../../shared/models/ctm/ben.ctm",   function( geometry ) {
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "/examples/shared/textures/ash_uvgrid01.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xffaa00, map: THREE.ImageUtils.loadTexture( "../../shared/textures/ash_uvgrid01.jpg" ), envMap: reflectionCube, combine: THREE.MixOperation, reflectivity: 0.3 } );
 					callbackModel( geometry, 450, material, 0, -200, 0, 0, 0 );
 					checkTime();
 
 				}, { useWorker: true } );
 
-				loader.load( "/examples/shared/models/ctm/WaltHead.ctm",  function( geometry ) {
+				loader.load( "../../shared/models/ctm/WaltHead.ctm",  function( geometry ) {
 
 					var material1 = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 					var material2 = new THREE.MeshPhongMaterial( { color: 0xff4400, specular: 0x333333, shininess: 100 } );
@@ -179,10 +179,10 @@
 
 				}, { useWorker: true } );
 
-				loader.load( "/examples/shared/models/ctm/LeePerry.ctm",  function( geometry ) {
+				loader.load( "../../shared/models/ctm/LeePerry.ctm",  function( geometry ) {
 
 					/*
-					var material = new THREE.MeshPhongMaterial( { wrapAround: true, color: 0xffffff, specular: 0x232323, shininess: 50, map: THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Map-COL.jpg" ) } );
+					var material = new THREE.MeshPhongMaterial( { wrapAround: true, color: 0xffffff, specular: 0x232323, shininess: 50, map: THREE.ImageUtils.loadTexture( "../../shared/obj/leeperrysmith/Map-COL.jpg" ) } );
 					material.wrapRGB.set( 0.65, 0.5, 0.5 );
 					*/
 
@@ -191,11 +191,11 @@
 					var shader = THREE.ShaderLib[ "normalmap" ];
 					var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-					uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+					uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "../../shared/obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 					uniforms[ "uNormalScale" ].value.set( 0.8, 0.8 );
 
-					uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Map-COL.jpg" );
-					uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Map-SPEC.jpg" );
+					uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "../../shared/obj/leeperrysmith/Map-COL.jpg" );
+					uniforms[ "tSpecular" ].value = THREE.ImageUtils.loadTexture( "../../shared/obj/leeperrysmith/Map-SPEC.jpg" );
 
 					uniforms[ "enableAO" ].value = false;
 					uniforms[ "enableDiffuse" ].value = true;

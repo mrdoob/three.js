@@ -44,15 +44,15 @@
 			converted by <a href="https://twitter.com/#!/oosmoxiecode">@oosmoxiecode</a>'s <a href="http://oos.moxiecode.com/blog/2012/01/md2-to-json-converter/">MD2 converter<a>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
+		<script src="../../shared/js/controls/TrackballControls.js"></script>
 
-		<script src='/examples/shared/js/MD2Character.js'></script>
+		<script src='../../shared/js/MD2Character.js'></script>
 
-		<script src='/examples/shared/js/Detector.js'></script>
-		<script src='/examples/shared/js/libs/stats.min.js'></script>
-		<script src='/examples/shared/js/libs/dat.gui.min.js'></script>
+		<script src='../../shared/js/Detector.js'></script>
+		<script src='../../shared/js/libs/stats.min.js'></script>
+		<script src='../../shared/js/libs/dat.gui.min.js'></script>
 
 		<script>
 
@@ -122,7 +122,7 @@
 
 				//  GROUND
 
-				var gt = THREE.ImageUtils.loadTexture( "/examples/shared/textures/terrain/grasslight-big.jpg" );
+				var gt = THREE.ImageUtils.loadTexture( "../../shared/textures/terrain/grasslight-big.jpg" );
 				var gg = new THREE.PlaneGeometry( 2000, 2000 );
 				var gm = new THREE.MeshPhongMaterial( { color: 0xffffff, map: gt } );
 
@@ -182,7 +182,7 @@
 
 				var config = {
 
-					baseUrl: "/examples/shared/models/animated/ratamahatta/",
+					baseUrl: "../../shared/models/animated/ratamahatta/",
 
 					body: "ratamahatta.js",
 					skins: [ "ratamahatta.png", "ctf_b.png", "ctf_r.png", "dead.png", "gearwhore.png" ],

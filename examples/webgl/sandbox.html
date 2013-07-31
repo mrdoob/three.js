@@ -34,11 +34,11 @@
 	<body>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - webgl sandbox.</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/shaders/BasicShader.js"></script>
+		<script src="../shared/js/shaders/BasicShader.js"></script>
 
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -79,7 +79,7 @@
 
 				var texture1 = new THREE.Texture( generateTexture( 0, 0.5, 1 ), new THREE.UVMapping() );
 				var texture2 = new THREE.Texture( generateTexture( 0, 1, 0 ), new THREE.SphericalReflectionMapping() );
-				var texture3 = THREE.ImageUtils.loadTexture( '/examples/shared/textures/land_ocean_ice_cloud_2048.jpg' )
+				var texture3 = THREE.ImageUtils.loadTexture( '../shared/textures/land_ocean_ice_cloud_2048.jpg' )
 
 				texture1.needsUpdate = true;
 				texture2.needsUpdate = true;

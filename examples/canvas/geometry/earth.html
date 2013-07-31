@@ -34,8 +34,8 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - earth demo</div>
 
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -65,7 +65,7 @@
 				// earth
 
 				var loader = new THREE.TextureLoader();
-				loader.load( '/examples/shared/textures/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
+				loader.load( '../../shared/textures/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
 
 					var geometry = new THREE.SphereGeometry( 200, 20, 20 );
 

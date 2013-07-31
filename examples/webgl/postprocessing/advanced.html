@@ -40,30 +40,30 @@
 
 		<div id="container"></div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/shaders/BleachBypassShader.js"></script>
-		<script src="/examples/shared/js/shaders/ColorifyShader.js"></script>
-		<script src="/examples/shared/js/shaders/ConvolutionShader.js"></script>
-		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
-		<script src="/examples/shared/js/shaders/DotScreenShader.js"></script>
-		<script src="/examples/shared/js/shaders/FilmShader.js"></script>
-		<script src="/examples/shared/js/shaders/HorizontalBlurShader.js"></script>
-		<script src="/examples/shared/js/shaders/SepiaShader.js"></script>
-		<script src="/examples/shared/js/shaders/VerticalBlurShader.js"></script>
-		<script src="/examples/shared/js/shaders/VignetteShader.js"></script>
+		<script src="../../shared/js/shaders/BleachBypassShader.js"></script>
+		<script src="../../shared/js/shaders/ColorifyShader.js"></script>
+		<script src="../../shared/js/shaders/ConvolutionShader.js"></script>
+		<script src="../../shared/js/shaders/CopyShader.js"></script>
+		<script src="../../shared/js/shaders/DotScreenShader.js"></script>
+		<script src="../../shared/js/shaders/FilmShader.js"></script>
+		<script src="../../shared/js/shaders/HorizontalBlurShader.js"></script>
+		<script src="../../shared/js/shaders/SepiaShader.js"></script>
+		<script src="../../shared/js/shaders/VerticalBlurShader.js"></script>
+		<script src="../../shared/js/shaders/VignetteShader.js"></script>
 
-		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
-		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/BloomPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/FilmPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/DotScreenPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/TexturePass.js"></script>
-		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
+		<script src="../../shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="../../shared/js/postprocessing/RenderPass.js"></script>
+		<script src="../../shared/js/postprocessing/BloomPass.js"></script>
+		<script src="../../shared/js/postprocessing/FilmPass.js"></script>
+		<script src="../../shared/js/postprocessing/DotScreenPass.js"></script>
+		<script src="../../shared/js/postprocessing/TexturePass.js"></script>
+		<script src="../../shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="../../shared/js/postprocessing/MaskPass.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -113,11 +113,11 @@
 
 				loader = new THREE.JSONLoader( true );
 				document.body.appendChild( loader.statusDomElement );
-				loader.load( "/examples/shared/obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
+				loader.load( "../../shared/obj/leeperrysmith/LeePerrySmith.js", function( geometry ) { createMesh( geometry, sceneModel, 100 ) } );
 
 				//
 
-				var materialColor = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( "/examples/shared/textures/cube/SwedishRoyalCastle/pz.jpg" ), depthTest: false } );
+				var materialColor = new THREE.MeshBasicMaterial( { map: THREE.ImageUtils.loadTexture( "../../shared/textures/cube/SwedishRoyalCastle/pz.jpg" ), depthTest: false } );
 
 				quadBG = new THREE.Mesh( new THREE.PlaneGeometry( 1, 1 ), materialColor );
 				quadBG.position.z = -500;
@@ -333,10 +333,10 @@
 				var shader = THREE.ShaderLib[ "normalmap" ];
 				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
-				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "../../shared/obj/leeperrysmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
 				uniforms[ "uNormalScale" ].value.set( 0.75, 0.75 );
 
-				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/obj/leeperrysmith/Map-COL.jpg" );
+				uniforms[ "tDiffuse" ].value = THREE.ImageUtils.loadTexture( "../../shared/obj/leeperrysmith/Map-COL.jpg" );
 
 				uniforms[ "enableAO" ].value = false;
 				uniforms[ "enableDiffuse" ].value = true;

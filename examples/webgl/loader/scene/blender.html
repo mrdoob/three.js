@@ -147,10 +147,10 @@
 			</center>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../../shared/js/Detector.js"></script>
+		<script src="../../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -275,7 +275,7 @@
 				var loader = new THREE.SceneLoader();
 				loader.callbackProgress = callbackProgress;
 
-				loader.load( "/examples/shared/obj/blenderscene/scene.js", callbackFinished );
+				loader.load( "../../../shared/obj/blenderscene/scene.js", callbackFinished );
 
 				$( "plus_exp" ).addEventListener( 'click', createToggle( "exp" ), false );
 
@@ -420,7 +420,7 @@
 
 				$( "section_exp" ).innerHTML = generateSceneView( result );
 
-				var config = [ "/examples/shared/obj", "geo", "mat", "tex", "lit", "cam" ];
+				var config = [ "../../../shared/obj", "geo", "mat", "tex", "lit", "cam" ];
 
 				for ( var i = 0; i < config.length; i++ )
 					$( "plus_" + config[i] ).addEventListener( 'click', createToggle( config[i] ), false );
@@ -448,7 +448,7 @@
 			function generateSceneView( result ) {
 
 				var config = [
-				[ "Objects",    "/examples/shared/obj", result.objects ],
+				[ "Objects",    "../../../shared/obj", result.objects ],
 				[ "Geometries", "geo", result.geometries ],
 				[ "Materials",  "mat", result.materials ],
 				[ "Textures",   "tex", result.textures ],

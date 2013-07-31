@@ -45,22 +45,22 @@
 		<div id="container"></div>
 
 
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../shared/js/libs/stats.min.js"></script>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="../shared/js/Detector.js"></script>
 
-		<script src="/examples/shared/js/renderers/WebGLDeferredRenderer.js"></script>
-		<script src="/examples/shared/js/ShaderDeferred.js"></script>
+		<script src="../shared/js/renderers/WebGLDeferredRenderer.js"></script>
+		<script src="../shared/js/ShaderDeferred.js"></script>
 
-		<script src="/examples/shared/js/shaders/CopyShader.js"></script>
-		<script src="/examples/shared/js/shaders/FXAAShader.js"></script>
+		<script src="../shared/js/shaders/CopyShader.js"></script>
+		<script src="../shared/js/shaders/FXAAShader.js"></script>
 
-		<script src="/examples/shared/js/postprocessing/EffectComposer.js"></script>
-		<script src="/examples/shared/js/postprocessing/RenderPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/ShaderPass.js"></script>
-		<script src="/examples/shared/js/postprocessing/MaskPass.js"></script>
+		<script src="../shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="../shared/js/postprocessing/RenderPass.js"></script>
+		<script src="../shared/js/postprocessing/ShaderPass.js"></script>
+		<script src="../shared/js/postprocessing/MaskPass.js"></script>
 
 		<script>
 
@@ -230,7 +230,7 @@
 				// add animated model
 
 				var loader = new THREE.JSONLoader();
-				loader.load( "/examples/shared/models/animated/elderlyWalk.js", function( geometry ) {
+				loader.load( "../shared/models/animated/elderlyWalk.js", function( geometry ) {
 
 					geometry.computeMorphNormals();
 
@@ -249,7 +249,7 @@
 
 				} );
 
-				loader.load( "/examples/shared/models/skinned/human_walk_0_female.js", function ( geometry, materials ) {
+				loader.load( "../shared/models/skinned/human_walk_0_female.js", function ( geometry, materials ) {
 
 					geometry.computeVertexNormals();
 					geometry.computeBoundingBox();
@@ -315,13 +315,13 @@
 
 				var object = new THREE.Object3D();
 
-				var mapHeight2 = THREE.ImageUtils.loadTexture( "/examples/shared/obj/lightmap/rocks.jpg" );
+				var mapHeight2 = THREE.ImageUtils.loadTexture( "../shared/obj/lightmap/rocks.jpg" );
 				mapHeight2.repeat.set( 3, 1.5 );
 				mapHeight2.wrapS = mapHeight2.wrapT = THREE.RepeatWrapping;
 				mapHeight2.anisotropy = 4;
 				mapHeight2.format = THREE.RGBFormat;
 
-				var mapHeight3 = THREE.ImageUtils.loadTexture( "/examples/shared/textures/water.jpg" );
+				var mapHeight3 = THREE.ImageUtils.loadTexture( "../shared/textures/water.jpg" );
 				mapHeight3.repeat.set( 16, 8 );
 				mapHeight3.wrapS = mapHeight3.wrapT = THREE.RepeatWrapping;
 				mapHeight3.anisotropy = 4;

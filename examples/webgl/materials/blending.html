@@ -13,8 +13,8 @@
 	</head>
 	<body>
 
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/js/Detector.js"></script>
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
 
 		<script>
 
@@ -59,7 +59,7 @@
 				mapBg.needsUpdate = true;
 
 				/*
-				var mapBg = THREE.ImageUtils.loadTexture( "/examples/shared/textures/disturb.jpg" );
+				var mapBg = THREE.ImageUtils.loadTexture( "../../shared/textures/disturb.jpg" );
 				mapBg.wrapS = mapBg.wrapT = THREE.RepeatWrapping;
 				mapBg.repeat.set( 8, 4 );
 				*/
@@ -74,11 +74,11 @@
 
 				var blendings = [ "NoBlending", "NormalBlending", "AdditiveBlending", "SubtractiveBlending", "MultiplyBlending", "AdditiveAlphaBlending" ];
 
-				var map0 = THREE.ImageUtils.loadTexture( '/examples/shared/textures/ash_uvgrid01.jpg' );
-				var map1 = THREE.ImageUtils.loadTexture( '/examples/shared/textures/sprite0.jpg' );
-				var map2 = THREE.ImageUtils.loadTexture( '/examples/shared/textures/sprite0.png' );
-				var map3 = THREE.ImageUtils.loadTexture( '/examples/shared/textures/lensflare/lensflare0.png' );
-				var map4 = THREE.ImageUtils.loadTexture( '/examples/shared/textures/lensflare/lensflare0_alpha.png' );
+				var map0 = THREE.ImageUtils.loadTexture( '../../shared/textures/ash_uvgrid01.jpg' );
+				var map1 = THREE.ImageUtils.loadTexture( '../../shared/textures/sprite0.jpg' );
+				var map2 = THREE.ImageUtils.loadTexture( '../../shared/textures/sprite0.png' );
+				var map3 = THREE.ImageUtils.loadTexture( '../../shared/textures/lensflare/lensflare0.png' );
+				var map4 = THREE.ImageUtils.loadTexture( '../../shared/textures/lensflare/lensflare0_alpha.png' );
 
 				var geo1 = new THREE.PlaneGeometry( 100, 100 );
 				var geo2 = new THREE.PlaneGeometry( 100, 25 );

@@ -15,10 +15,10 @@
 	</head>
 	<body>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../shared/js/Detector.js"></script>
+		<script src="../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -49,7 +49,7 @@
 				light.position.set( 0, 1, 0 );
 				scene.add( light );
 
-				var map = THREE.ImageUtils.loadTexture( '/examples/shared/textures/ash_uvgrid01.jpg' );
+				var map = THREE.ImageUtils.loadTexture( '../shared/textures/ash_uvgrid01.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 

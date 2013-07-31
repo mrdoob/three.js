@@ -3,15 +3,16 @@
 	<head>
 		<title>three.js webgl - geometry - cube</title>
 		<meta charset="utf-8">
-		<link type="text/css" rel="stylesheet" href="/examples/shared/styles/default.css" />
+		<link type="text/css" rel="stylesheet" href="../../shared/styles/default.css" />
 	</head>
 	<body>
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/s3age/s3age.js"></script>
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/s3age/s3age.js"></script>
 
 		<script>
 			var stage = new S3age("body", {
-				camera: {fov: 70, position: [0, 0, 400]}
+				camera: {fov: 70, position: [0, 0, 400]},
+				debug: true, expose: true
 			});
 
 			stage.scene.add(cube());
@@ -19,7 +20,7 @@
 			function cube() {
 				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
 
-				var texture = THREE.ImageUtils.loadTexture('/examples/shared/textures/crate.gif');
+				var texture = THREE.ImageUtils.loadTexture('../../shared/textures/crate.gif');
 				// Ensure the texture looks good when the cube is at oblique angles
 				//   http://en.wikipedia.org/wiki/Anisotropic_filtering
 				texture.anisotropy = stage.renderer.getMaxAnisotropy();

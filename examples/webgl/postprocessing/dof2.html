@@ -40,14 +40,14 @@ Setup Number Focus Test Plates
 Use WEBGL Depth buffer support?
 -->
 	<body>
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
-		<script src='/examples/shared/js/libs/dat.gui.min.js'></script>
-		<script src="/examples/shared/js/modifiers/SubdivisionModifier.js"></script>
+		<script src='../../shared/js/libs/dat.gui.min.js'></script>
+		<script src="../../shared/js/modifiers/SubdivisionModifier.js"></script>
 
 		<div id="info">
 
@@ -58,7 +58,7 @@ Use WEBGL Depth buffer support?
 		</div>
 
 
-		<script src="/examples/shared/js/shaders/BokehShader2.js"></script>
+		<script src="../../shared/js/shaders/BokehShader2.js"></script>
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -121,7 +121,7 @@ Use WEBGL Depth buffer support?
 				object = new THREE.Object3D();
 				scene.add( object );
 
-				var r = "/examples/shared/textures/cube/Bridge2/";
+				var r = "../../shared/textures/cube/Bridge2/";
 				var urls = [ r + "posx.jpg", r + "negx.jpg",
 							 r + "posy.jpg", r + "negy.jpg",
 							 r + "posz.jpg", r + "negz.jpg" ];
@@ -193,7 +193,7 @@ Use WEBGL Depth buffer support?
 
 				var modifier = new THREE.SubdivisionModifier( 1 );
 
-				loader2.load( '/examples/shared/obj/Suzanne.js', function ( geometry ) {
+				loader2.load( '../../shared/obj/Suzanne.js', function ( geometry ) {
 
 					var smooth = geometry;
 					smooth.mergeVertices();
@@ -340,7 +340,7 @@ Use WEBGL Depth buffer support?
 				var gui = new dat.GUI();
 
 				gui.add( effectController, "enabled" ).onChange( matChanger );
-				gui.add( effectController, "/examples/shared/jsDepthCalculation" ).onChange( matChanger );
+				gui.add( effectController, "../../shared/jsDepthCalculation" ).onChange( matChanger );
 				gui.add( effectController, "shaderFocus" ).onChange( matChanger );
 				gui.add( effectController, "focalDepth", 0.0, 200.0 ).listen().onChange( matChanger );
 

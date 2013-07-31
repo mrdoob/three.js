@@ -46,12 +46,12 @@
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)</div>
 		</div>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/loaders/BinaryLoader.js"></script>
+		<script src="../../shared/js/loaders/BinaryLoader.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../../shared/js/Detector.js"></script>
+		<script src="../../shared/js/libs/stats.min.js"></script>
 
 		<script>
 
@@ -139,7 +139,7 @@
 				lightMesh.scale.x = lightMesh.scale.y = lightMesh.scale.z = 0.05;
 				//scene.add( lightMesh );
 
-				var path = "/examples/shared/textures/cube/SwedishRoyalCastle/";
+				var path = "../../shared/textures/cube/SwedishRoyalCastle/";
 				var format = '.jpg';
 				var urls = [
 						path + 'px' + format, path + 'nx' + format,
@@ -164,10 +164,10 @@
 				uniforms[ "enableReflection" ].value = true;
 				uniforms[ "enableDisplacement" ].value = true;
 
-				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/textures/normal/ninja/normal.jpg" );
-				uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/textures/normal/ninja/ao.jpg" );
+				uniforms[ "tNormal" ].value = THREE.ImageUtils.loadTexture( "../../shared/textures/normal/ninja/normal.jpg" );
+				uniforms[ "tAO" ].value = THREE.ImageUtils.loadTexture( "../../shared/textures/normal/ninja/ao.jpg" );
 
-				uniforms[ "tDisplacement" ].value = THREE.ImageUtils.loadTexture( "/examples/shared/textures/normal/ninja/displacement.jpg" );
+				uniforms[ "tDisplacement" ].value = THREE.ImageUtils.loadTexture( "../../shared/textures/normal/ninja/displacement.jpg" );
 				uniforms[ "uDisplacementBias" ].value = - 0.428408;
 				uniforms[ "uDisplacementScale" ].value = 2.436143;
 
@@ -207,7 +207,7 @@
 				loader = new THREE.BinaryLoader( true );
 				document.body.appendChild( loader.statusDomElement );
 
-				loader.load( "/examples/shared/obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) } );
+				loader.load( "../../shared/obj/ninja/NinjaLo_bin.js", function( geometry ) { createScene( geometry, scale, material1, material2 ) } );
 
 				//
 

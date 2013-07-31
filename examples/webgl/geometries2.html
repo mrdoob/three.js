@@ -15,19 +15,19 @@
 	</head>
 	<body>
 
-		<script src="/build/three.min.js"></script>
+		<script src="../../build/three.min.js"></script>
 
-		<script src="/examples/shared/js/Detector.js"></script>
-		<script src="/examples/shared/js/libs/stats.min.js"></script>
+		<script src="../shared/js/Detector.js"></script>
+		<script src="../shared/js/libs/stats.min.js"></script>
 
 		<!--
 		<script src="../src/core/Geometry.js"></script>
 		<script src="../src/extras/geometries/ParametricGeometry.js"></script>
 		-->
 
-		<script src="/examples/shared/js/CurveExtras.js"></script>
-		<script src="/examples/shared/js/UVsUtils.js"></script>
-		<script src="/examples/shared/js/ParametricGeometries.js"></script>
+		<script src="../shared/js/CurveExtras.js"></script>
+		<script src="../shared/js/UVsUtils.js"></script>
+		<script src="../shared/js/ParametricGeometries.js"></script>
 		<script>
 
 			/* Testing the new Parametric Surfaces Geometries*/
@@ -60,7 +60,7 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				var map = THREE.ImageUtils.loadTexture( '/examples/shared/textures/ash_uvgrid01.jpg' );
+				var map = THREE.ImageUtils.loadTexture( '../shared/textures/ash_uvgrid01.jpg' );
 				map.wrapS = map.wrapT = THREE.RepeatWrapping;
 				map.anisotropy = 16;
 

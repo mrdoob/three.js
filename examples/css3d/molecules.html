@@ -86,10 +86,10 @@
 		</style>
 	</head>
 	<body>
-		<script src="/build/three.min.js"></script>
-		<script src="/examples/shared/js/controls/TrackballControls.js"></script>
-		<script src="/examples/shared/js/renderers/CSS3DRenderer.js"></script>
-		<script src="/examples/shared/js/loaders/PDBLoader.js"></script>
+		<script src="../../build/three.min.js"></script>
+		<script src="../shared/js/controls/TrackballControls.js"></script>
+		<script src="../shared/js/renderers/CSS3DRenderer.js"></script>
+		<script src="../shared/js/loaders/PDBLoader.js"></script>
 
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js css3d</a> - molecules</div>
@@ -169,12 +169,12 @@
 
 				baseSprite.onload = function () {
 
-					loadMolecule( "/examples/shared/models/molecules/caffeine.pdb" );
+					loadMolecule( "../shared/models/molecules/caffeine.pdb" );
 					createMenu();
 
 				};
 
-				baseSprite.src = '/examples/shared/textures/sprites/ball.png';
+				baseSprite.src = '../shared/textures/sprites/ball.png';
 
 				//
 
@@ -202,7 +202,7 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = "/examples/shared/models/molecules/" +  MOLECULES[ m ];
+					var url = "../shared/models/molecules/" +  MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
