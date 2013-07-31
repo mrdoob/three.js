@@ -30,7 +30,6 @@ THREE.PointLight.prototype.clone = function () {
 };
 
 
-//THREE.SmartPointLight = function ( hex, near , far, quadratic ) {
 THREE.SmartPointLight = function ( params ) {
 /**
  * Wrapper for PointLight.
