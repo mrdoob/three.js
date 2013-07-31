@@ -15873,8 +15873,13 @@ THREE.ShaderChunk = {
 					"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
 					"float lDistance = 1.0;",
-					"if ( spotLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"if ( spotLightDistance[ i ] > 0.0 ) {",
+						"if ( spotLightQuadratic[ i ] ){",
+							"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+						"} else {",
+					    	"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+						"}",
+					"}",
 
 					"lVector = normalize( lVector );",
 
