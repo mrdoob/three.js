@@ -6938,7 +6938,7 @@ THREE.EventDispatcher.prototype = {
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4( object.matrixWorld ),
 							face: null,
-							faceIndex: i,
+							faceIndex: null,
 							object: object
 
 						} );
