@@ -170,7 +170,7 @@
 							distance: distance,
 							point: interPoint,
 							face: null,
-							faceIndex: null,
+							elementIndex: null,
 							object: object
 
 						} );
@@ -223,7 +223,7 @@
 						distance: distance,
 						point: interPoint,
 						face: face,
-						faceIndex: f,
+						elementIndex: f,
 						object: object
 
 					} );
@@ -277,7 +277,7 @@
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4( object.matrixWorld ),
 							face: null,
-							faceIndex: null,
+							elementIndex: i,
 							object: object
 
 						} );
