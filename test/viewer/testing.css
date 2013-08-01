@@ -42,8 +42,7 @@ label.title.welled {
 
 	position: absolute;
 	top: 60px;
-	/*bottom: 48.5%;*/
-	bottom: 2%;
+	bottom: 48.5%;
 	left: 16%;
 	right: 25%;
 
@@ -58,8 +57,6 @@ label.title.welled {
 }
 
 #snapshot-well {
-	display: none;
-
 	overflow: auto;
 
 	position: absolute;

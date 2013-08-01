@@ -62,5 +62,7 @@ testing.controller "testing", ($scope, $http, $timeout)->
 testing.controller "menu", ($scope, $http)->
 
 testing.controller "controls", ($scope, snapshot)->
+	$scope.Snapshot = snapshot
 
 testing.controller "viewports", ($scope, snapshot)->
+	$scope.Snapshot = snapshot
