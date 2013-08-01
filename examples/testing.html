@@ -3,20 +3,45 @@
 <head>
 	<title>three.js - examples test runner</title>
 	<link rel="stylesheet" href="shared/styles/bootstrap.min.css">
-	<script src="shared/js/libs/jquery.min.js"></script>
-	<script src="shared/js/libs/q.min.js"></script>
+	<script src="shared/js/libs/angular.js"></script>
+	<script src="shared/js/libs/underscore-min.js"></script>
 	<script src="shared/js/libs/coffee-script.js"></script>
 	<style>
+		.well {
+			margin-bottom: 0;
+		}
+
+		.center-502 {
+			width: 502px;
+			margin: 0 auto;
+		}
+
+		label.title {
+			padding: 0.25em 0.5em;
+			border-bottom: 1px solid #e3e3e3;
+			border-right: 1px solid #e3e3e3;
+			border-bottom-right-radius: 4px;
+		}
+
+		label.title.welled {
+			margin-top: -19px;
+			margin-left: -19px;
+		}
+
 		#menu-well {
 			position: absolute;
 			overflow: auto;
-			top: 2%;
+			top: 60px;
 			bottom: 2%;
-			left: 2%;
-			right: 82%;
+			left: 1%;
+			right: 85%;
 		}
 
-		.nav > li > a {
+		#menu-well > ul {
+			padding-top: 15px;
+		}
+
+		.nav > li > button {
 			padding: 2px;
 			margin-bottom: 2px;
 		}
@@ -25,60 +50,151 @@
 			overflow: auto;
 
 			position: absolute;
-			top: 2%;
-			bottom: 2%;
-			left: 20%;
-			right: 2%;
+			top: 60px;
+			bottom: 48.5%;
+			left: 16%;
+			right: 25%;
 
 			margin: 0;
-			padding: 0.5em;
+			padding: 0em;
 		}
 
 		#viewer {
-			width: 100%;
-			height: 100%;
+			width: 502px;
+			height: 502px;
 			border: 1px solid #bbb;
 		}
-	</style>
-</head>
-<body>
-	<div id="menu-well" class="well">
-		<ul class="nav nav-list" id="menu"></ul>
-	</div>
 
-	<div id="viewer-well" class="well">
-		<iframe id="viewer"></iframe>
-	</div>
+		#snapshot-well {
+			overflow: auto;
+
+			position: absolute;
+			top: 52.5%;
+			bottom: 2%;
+			left: 16%;
+			right: 25%;
+
+			margin: 0;
+			padding: 0em;
+		}
+
+		#snapshot {
+			width: 502px;
+			height: 502px;
+		}
+
+		#scripting-well {
+			overflow: auto;
+
+			position: absolute;
+			top: 60px;
+			bottom: 2%;
+			right: 1%;
+			left: 76%;
+		}
+
+		.controls {
+			padding-top: 15px;
+		}
+	</style>
 
 	<script type="text/coffeescript">
-		$ ->
-			Q($.get('tests.json'))
-			.then (tests)->
-				tests = JSON.parse(tests)
-				buildMenu tests, $("#menu"), '.'
-				$(".tree-toggle").click ->
-					$(this).parent().children("ul.tree").toggle(200)
-				$(".tree:first a:first").addClass("current")
-				$(".example").click ->
-					$(".current").removeClass ".current"
-					$(this).addClass ".current"
-
-		buildMenu = (tests, root, path)->
-			for name, part of tests
-				if part is true
-					$li = $ "<li><a href='#{path}/#{name}' target='viewer' class='example btn btn-warning'>#{name}</a></li>"
-					root.append $li
-				else
-					prefix = ""
-					depth = path.match("/")?.length
-					(prefix += "&gt;") for i in [1..depth]
-					$li = $ "<li>
-							<label class='tree-toggle nav-header untested'>#{path}/#{name}</label>
-							<ul class='nav nav-list tree'></ul>
-						</li>"
-					root.append $li
-					buildMenu part, $li.find("ul"), "#{path}/#{name}"
+		window.testing = angular.module("three.testing", [])
 	</script>
+
+	<script type="text/coffeescript">
+		file = (name)-> name?.match(/\.html$/) isnt null
+		testing.filter "files", ->
+			(input) ->
+				ret = []
+				for name, t of input
+					if file(name)
+						ret.push(name) 
+				ret
+
+		directory = (name)-> not file(name) and name?.match(/^\$/) is null
+		testing.filter "directories", ->
+			(input, path)->
+				ret = {}
+				for name, children of input
+					ret["#{path}/#{name}"] = children if directory(name)
+				ret
+	</script>
+
+	<script type="text/coffeescript">
+		testing.controller "testing", ($scope)->
+			Test = $scope.Test =
+				url: ""
+				load: (path, name)->
+					Test.url = "#{path}/#{name}"
+				previous: ->
+				next: ->
+				pass: ->
+				fail: ->
+				snapshot: ->
+
+		testing.controller "menu", ($scope, $http)->
+			$http.get("tests.json")
+			.success (data, status)->
+				$scope.tests = data
+
+		testing.controller "controls", ($scope)->
+			$scope.snapshot = ->
+				console.log "Taking snapshot"
+	</script>
+
+	<script type="text/coffeescript">
+		angular.bootstrap document.body, ["three.testing"]
+	</script>
+</head>
+<body>
+	<div ng-controller="testing">
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<a class="navbar-brand" href="#">Three.js Test Suite</a>
+			</div>
+		</div>
+
+		<div id="menu-well" class="well" ng-controller="menu">
+			<label class="clearfix pull-left title welled">Menu</label>
+			<ul class="nav nav-list">
+				<li ng-repeat="(path, tests) in tests" ng-include="'menu_item'"><li>
+			</ul>
+		</div>
+
+		<div id="renderers">
+			<div id="viewer-well" class="well">
+				<label class="clearfix pull-left title">Viewport</label>
+				<div class="center-502">
+					<iframe id="viewer" ng-src="{{Test.url}}"></iframe>
+				</div>
+			</div>
+
+			<div id="snapshot-well" class="well">
+				<label class="clearfix pull-left title">Snapshot</label>
+				<div class="center-502">
+					<img id="snapshot" />
+				</div>
+			</div>
+		</div>
+
+		<div id="scripting-well" class="well" ng-controller="controls">
+			<label class="clearfix pull-left title welled">Controls</label>
+			<div class="controls">
+				<div class="nav navbar">
+					<button ng-click="Test.previous()" class="btn btn-primary navbar-btn pull-left">Previous</button>
+					<button ng-click="Test.next()" class="btn btn-primary navbar-btn pull-right">Next</button>
+				</div>
+				<div class="nav navbar">
+					<button ng-click="Test.pass()" class="btn btn-success navbar-btn pull-left">Pass</button>
+					<button ng-click="Test.fail()" class="btn btn-danger navbar-btn pull-right">Fail</button>
+				</div>
+				<div class="nav navbar">
+					<button ng-click="Test.snapshot()" class="btn btn-default navbar-btn btn-block">Snapshot</button>
+				<div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>
 
