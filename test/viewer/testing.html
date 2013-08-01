@@ -125,8 +125,10 @@
 		testing.controller "testing", ($scope)->
 			Test = $scope.Test =
 				url: ""
-				load: (path, name)->
-					Test.url = "#{path}/#{name}"
+				Url: (path, name)->
+					"#{path}/#{name}"
+				load: (path)->
+					Test.url = path
 				previous: ->
 				next: ->
 				pass: ->

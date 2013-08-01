@@ -1,7 +1,7 @@
 <label class='tree-toggle nav-header untested'>{{path}}</label>
 <ul class='nav nav-list tree'>
 	<li ng-repeat="name in $parent.tests | files">
-		<button ng-click='Test.load(path, name)' class='example btn btn-warning btn-block'>{{name}}</button>
+		<button ng-click='Test.load(Test.Url(path, name))' class='example btn btn-warning btn-block'>{{name}}</button>
 	</li>
 	<li ng-repeat="(path, tests) in $parent.tests | directories:path"  ng-include="'menu_item'"></li>
 </ul>
