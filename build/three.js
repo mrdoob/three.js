@@ -22542,11 +22542,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Initialization
 
+	function tryCreateGL(contextName) {
+		return _canvas.getContext(
+			contextName, {
+				alpha: _alpha,
+				premultipliedAlpha: _premultipliedAlpha,
+				antialias: _antialias,
+				stencil: _stencil,
+				preserveDrawingBuffer: _preserveDrawingBuffer
+			});
+	};
+
 	function initGL () {
 
 		try {
 
-			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { alpha: _alpha, premultipliedAlpha: _premultipliedAlpha, antialias: _antialias, stencil: _stencil, preserveDrawingBuffer: _preserveDrawingBuffer } ) ) ) {
+			if ( ! ( _gl = tryCreateGL('experimental-webgl') || ! ( _gl = tryCreateGL('webgl') ) ) ) {
 
 				throw 'Error creating WebGL context.';
 
