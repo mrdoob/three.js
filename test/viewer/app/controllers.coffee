@@ -32,7 +32,8 @@ testing.controller "testing", ($scope, $http, $timeout)->
 				base.tests[test]
 
 		move: (i = 1)->
-			index = ordered.indexOf Test.url
+			index = ordered.indexOf(Test.url)
+			if index + i < 0 then index += ordered.length
 			next = ordered[(index + i) % ordered.length]
 			Test.url = next
 		previous: ->
