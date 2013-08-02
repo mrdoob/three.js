@@ -1,0 +1,36 @@
+html {
+	height: 100%;
+}
+
+body {
+	color: #ffffff;
+	font-family:Monospace;
+	font-size:13px;
+	text-align:center;
+	font-weight: bold;
+
+	background-color: #000000;
+	margin: 0px;
+	overflow: hidden;
+
+	height: 100%;
+}
+
+#container {
+	height: 100%;
+}
+
+#info {
+	color: #fff;
+	position: absolute;
+	top: 0px; width: 100%;
+	padding: 5px;
+	z-index:100;
+}
+
+#stats {
+       position: absolute;
+       top: 0;
+       left: 0;
+}
+

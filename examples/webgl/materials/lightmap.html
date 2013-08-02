@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - lightmap</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="../../shared/styles/default.css" />
+		<style>
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #abc !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/s3age/s3age.js"></script>
+		<script src="../../shared/js/controls/TrackballControls.js"></script>
+	</head>
+
+	<body>
+		<div id="container"></div>
+
+		<script type="x-shader/x-vertex" id="vertexShader">
+
+			varying vec3 vWorldPosition;
+
+			void main() {
+
+				vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+				vWorldPosition = worldPosition.xyz;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+
+		</script>
+
+		<script type="x-shader/x-fragment" id="fragmentShader">
+
+			uniform vec3 topColor;
+			uniform vec3 bottomColor;
+			uniform float offset;
+			uniform float exponent;
+
+			varying vec3 vWorldPosition;
+
+			void main() {
+
+				float h = normalize( vWorldPosition + offset ).y;
+				gl_FragColor = vec4( mix( bottomColor, topColor, pow( h, exponent )), 1.0 );
+
+			}
+
+		</script>
+
+		<script type="text/javascript">
+			function SkyDome(){
+				THREE.Object3D.apply(this, [].slice.call(arguments, 0));
+
+				var vertexShader = document.getElementById( 'vertexShader' ).textContent;
+				var fragmentShader = document.getElementById( 'fragmentShader' ).textContent;
+				var uniforms = {
+					topColor: 	 { type: "c", value: new THREE.Color( 0x0077ff ) },
+					bottomColor: { type: "c", value: new THREE.Color( 0xfafafa ) },
+					offset:		 { type: "f", value: 600 },
+					exponent:	 { type: "f", value: 0.9 }
+				}
+
+				var skyGeo = new THREE.SphereGeometry( 4000, 32, 15 );
+				var skyMat = new THREE.ShaderMaterial( { vertexShader: vertexShader, fragmentShader: fragmentShader, uniforms: uniforms, side: THREE.BackSide } );
+
+				var sky = new THREE.Mesh( skyGeo, skyMat );
+				this.add(sky);
+			}
+			SkyDome.prototype = Object.create(THREE.Object3D.prototype);
+		</script>
+
+		<script>
+			// Going to use this guy in the controls
+			var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.475 );
+			directionalLight.position.set( 1, 1, -1 );
+
+			var stage = new S3age("#container", {
+				camera: { fov: 40, far: 10000, position: [700, 180, -500]},
+				renderer: { 
+					alpha: false,
+					setClearColor: [0xfafafa, 1],
+					gammaInput: true,
+					gammaOutput: true,
+					physicallyBasedShading: true
+				},
+				scene: {
+					fog: new THREE.Fog( 0xfafafa, 1000, 10000 ),
+					lights: [
+						// HSL(0.6, 1, 0.75), HSL(0.1, 0.8, 0.7)
+						new THREE.HemisphereLight( 0x7fb2ff, 0xefbe75, 1.25 ),
+						directionalLight
+					],
+					children: [
+						new SkyDome(),
+						(function LightMap(){
+							var lit = new S3age.Loader(THREE.JSONLoader, "../../shared/obj/lightmap/lightmap.js");
+							lit.scale.multiplyScalar(100);
+							return lit;
+						}())
+					]
+				}
+			});
+
+			(function Controls(){
+				controls = new THREE.TrackballControls( stage.camera );
+				controls.target.z = 150;
+				stage.controls = {
+					update: function(clock){
+						controls.update( clock.delta );
+						// var elapsed = clock.elapsed * 0.001;
+						// directionalLight.position.x = Math.cos(elapsed);
+						// directionalLight.position.z = Math.sin(elapsed);
+					}
+				};
+			}());
+		</script>
+	</body>
+</html>

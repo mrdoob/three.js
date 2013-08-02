@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - trails</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="../shared/styles/default.css" />
+	</head>
+	<body>
+		<script src="../../build/three.min.js"></script>
+		<script src="../shared/s3age/s3age.js"></script>
+
+		<script>
+			var stage = new S3age("body", {
+				/**
+				 * Enable Trails turns on overdrawing on the renderer. Each render loop, the
+				 * particle system will be drawn over the last draw, leaving the old pixels in place.
+				 */
+				renderer: {
+					// The secret to the trails - by not clearing the drawing buffer, each particle gets drawn every frame
+					preserveDrawingBuffer: true,
+					// The other property to enable overdraw.
+					autoClearColor: false,
+
+					// A performance optimization
+					// Since there are a lot of points, and every point gets drawn,
+					// it's not important to sort them into depth order.
+					sortObjects: false
+				},
+				camera: { fov:  60, near: 1, far:  10000,
+					// The mouse starts at <0, 0>, so the large X value will
+					// cause the camera to start by spinning to the rest position
+					position: [100000, 0, 3200]
+				},
+				controls: Controls(),
+				scene: {
+					children: [
+						Particles()
+					]
+				}
+			});
+
+			/**
+			 * Create a couple thousand points of a half-dozen colors.
+			 */
+			function Particles() {
+				var colors = [ 0x000000, 0xff0080, 0x8000ff, 0xffffff ];
+				var geometry = new THREE.Geometry();
+
+				for ( var i = 0; i < 2000; i ++ ) {
+
+					var vertex = new THREE.Vector3();
+					vertex.x = Math.random() * 4000 - 2000;
+					vertex.y = Math.random() * 4000 - 2000;
+					vertex.z = Math.random() * 4000 - 2000;
+					geometry.vertices.push( vertex );
+
+					geometry.colors.push(
+						new THREE.Color( colors[ Math.floor( Math.random() * colors.length ) ] )
+					);
+				}
+
+				var material = new THREE.ParticleBasicMaterial({
+					size: 1,
+					vertexColors: THREE.VertexColors,
+					depthTest: false,
+					opacity: 0.5,
+					sizeAttenuation: false,
+					transparent: true
+				});
+
+				var mesh = new THREE.ParticleSystem( geometry, material );
+				return mesh;
+			}
+
+			function Controls() {
+				var mouseX = 0, mouseY = 0;
+
+				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				function onDocumentMouseMove(event) {
+					var windowHalfX = window.innerWidth / 2;
+					var windowHalfY = window.innerHeight / 2;
+
+					// Use the center of the screen, instead of top-left, then scale by 10.
+					mouseX = ( event.clientX - windowHalfX ) * 10;
+					mouseY = ( event.clientY - windowHalfY ) * 10;
+				}
+
+				// Minimum for controls is an update function. Called every render frame.
+				return {
+					update: function(){
+						if(stage){ // Make sure the stage's finished loading.
+							var camera = stage.camera;
+							// Move the camera towards the mouse, with some damping.
+							camera.position.x += ( mouseX - camera.position.x ) * .05;
+							camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+							// Keep the camera pointed at the center of the scene
+							camera.lookAt( stage.scene.position );
+						}
+					}
+				};
+			}
+
+		</script>
+	</body>
+</html>

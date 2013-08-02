@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="fragment" content="!" />
+	<title>three.js - examples test runner</title>
+	<link rel="stylesheet" href="libs/bootstrap.min.css">
+	<script src="libs/angular.js"></script>
+	<script src="libs/underscore-min.js"></script>
+	<script src="libs/coffee-script.js"></script>
+	<link rel="stylesheet" href="testing.css"></script>
+
+	<script type="text/coffeescript" src="app/app.coffee"></script>
+	<script type="text/coffeescript" src="app/filters.coffee"></script>
+	<script type="text/coffeescript" src="app/services.coffee"></script>
+	<script type="text/coffeescript" src="app/directives.coffee"></script>
+	<script type="text/coffeescript" src="app/controllers.coffee"></script>
+	<script type="text/coffeescript">
+		angular.bootstrap document.body, ["three.testing"]
+	</script>
+</head>
+<body>
+	<div ng-controller="testing">
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<a class="navbar-brand" href="#">Three.js Test Suite</a>
+			</div>
+		</div>
+
+		<div id="menu-well" class="well" ng-controller="menu">
+			<label class="clearfix pull-left title welled">Menu</label>
+			<ng-include src="'menu_item.html'"></ng-include>
+		</div>
+
+		<div id="renderers" ng-controller="viewports">
+			<div id="viewer-well" class="well">
+				<label class="clearfix pull-left title">Viewport</label>
+				<div class="center-502">
+					<iframe id="viewer" ng-src="../../examples/{{Test.current.path}}"></iframe>
+				</div>
+			</div>
+
+			<div id="snapshot-well" class="well">
+				<label class="clearfix pull-left title">Snapshot</label>
+				<div class="center-502">
+					<img id="snapshot" ng-src="{{Snapshot.URL}}" />
+				</div>
+			</div>
+		</div>
+
+		<div id="scripting-well" class="well" ng-controller="controls">
+			<label class="clearfix pull-left title welled">Controls</label>
+			<div class="controls">
+				<div class="nav navbar">
+					<button ng-click="Test.previous()" class="btn btn-primary navbar-btn pull-left">Previous</button>
+					<button ng-click="Test.next()" class="btn btn-primary navbar-btn pull-right">Next</button>
+				</div>
+				<div class="nav navbar">
+					<button ng-click="Test.pass()" class="btn btn-success navbar-btn pull-left">Pass</button>
+					<button ng-click="Test.fail()" class="btn btn-danger navbar-btn pull-right">Fail</button>
+				</div>
+				<div class="nav navbar">
+					<button ng-click="Snapshot.snap()" class="btn btn-default navbar-btn btn-block">Snapshot</button>
+				<div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
+

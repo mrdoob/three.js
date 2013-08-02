@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - level-of-details</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="../shared/styles/default.css">
+		<style>
+			a { color:red }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - level-of-details WebGL example
+		</div>
+
+
+		<script src="../../build/three.min.js"></script>
+		<script src="../shared/s3age/s3age.js"></script>
+		<script src="../shared/js/controls/FlyControls.js"></script>
+
+		<script type="text/javascript">
+			var LODSphere = (function(){
+				var geometry = [
+					// [ Geometry, LOD Distance]
+					[ new THREE.IcosahedronGeometry( 10, 4 ), 5 ],
+					[ new THREE.IcosahedronGeometry( 10, 3 ), 30 ],
+					[ new THREE.IcosahedronGeometry( 10, 2 ), 100 ],
+					[ new THREE.IcosahedronGeometry( 10, 1 ), 200 ],
+					[ new THREE.IcosahedronGeometry( 10, 0 ), 800 ]
+
+				];
+				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, wireframe: true } );
+
+				var constructor = function(){
+					THREE.Object3D.call(this, [].slice.call(arguments, 0));
+					var mesh, level, lod = new THREE.LOD();
+
+					// An LOD takes a mesh for each defined distance.
+					// Each of the meshes can have different geometries and textures,
+					// allowing tight control over both faces and on-card texture size.
+					for ( i = 0; i < geometry.length; i ++ ) {
+						var level = geometry[ i ];
+						mesh = new THREE.Mesh( level[ 0 ], material );
+						mesh.scale.set( 1.5, 1.5, 1.5 );
+						mesh.updateMatrix();
+						mesh.matrixAutoUpdate = false;
+						// The level has the mesh, and some distance to switch at.
+						lod.addLevel( mesh, level[ 1 ] );
+					}
+					lod.updateMatrix();
+					lod.matrixAutoUpdate = false;
+
+					this.add( lod );
+				}
+				constructor.prototype = Object.create(THREE.Object3D.prototype);
+
+				// Move the LODSphere somewhere in the area.
+				constructor.prototype.scatter = function(){
+					this.position.fromArray([
+						1000 * ( 0.5 - Math.random() ),
+						750 * ( 0.5 - Math.random() ),
+						1000 * ( 0.5 - Math.random() )
+					]);
+					return this;
+				}
+
+				// The THREE.LOD() updates itself against a camera, to determine distance, etc.
+				constructor.prototype.lod = function(camera){
+					this.children[0].update(camera);
+				}
+
+				return constructor;
+			}());
+		</script>
+
+		<script>
+			var stage = new S3age("body", {
+				scene: {
+					lights: [
+						new THREE.PointLight( 0xff2200 ),
+						new THREE.DirectionalLight( 0xffffff, 1, [0, 0, 1] )
+					],
+					children: (function(){
+						var sphere, object = new THREE.Object3D();
+						for ( var j = 0; j < 1000; j ++ ) {
+							// Initialize a thousand or so LODspheres scattered about the stage.
+							object.add((new LODSphere()).scatter());
+						}
+						object.update = function(){
+							// On every frame, have each sphere check its distance to the camera.
+							object.children.forEach(function(lodsphere){
+								lodsphere.lod( stage.camera );
+							});
+						}
+						return [object];
+					}())
+				},
+			});
+			stage.controls = (function(){
+				controls = new THREE.FlyControls( stage.camera );
+				controls.movementSpeed = 100;
+				controls.rollSpeed = Math.PI / 10;
+				return {
+					update: function(clock) {
+						controls.update( clock.delta * 0.001 );
+					}
+				}
+			}());
+		</script>
+	</body>
+</html>

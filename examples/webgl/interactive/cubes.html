@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - interactive cubes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="../../shared/styles/default.css" />
+	</head>
+	<body>
+		<script src="../../../build/three.min.js"></script>
+		<script src="../../shared/s3age/s3age.js"></script>
+
+		<div id="container" style="height:100%; background-color: #f0f0f0;">
+			<div id="info">
+				<a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive cubes
+			</div>
+		</div>
+
+		<script>
+			var stage = new S3age("#container", {
+				camera: {fov: 70},
+				scene: { lights: illuminate() },
+				controls: controls()
+			});
+
+			// Attach the cubes later, to save from creating a large array which
+			// just forces the stage to make a second iteration.
+			scatterCubes();
+
+			/**
+			 * Two control setups in one - spin the camera around the scene, and make
+			 * the cube under the mouse extra shiny.
+			 */
+			function controls() {
+				/**
+				 * Spin the camera around a sphere, always looking at the origin.
+				 */
+				var camera = (function(){
+					var radius = 100, theta = 0;
+					return function () {
+						theta += 0.1;
+						var rs = radius * Math.sin( THREE.Math.degToRad( theta ) );
+						var rc = radius * Math.cos( THREE.Math.degToRad( theta ) );
+
+						stage.camera.position.set(rs, rs, rc);
+						stage.camera.lookAt( stage.scene.position );
+					}
+				}());
+
+				/**
+				 * Return a list of objects currently under the cursor, sorted nearest to furthest.
+				 */
+				var intersections = (function(){
+					// Update the mouse position whenever the mouse moves
+					var mouse = new THREE.Vector2();
+					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+					function onDocumentMouseMove( event ) {
+						event.preventDefault();
+
+						// <0, 0> is middle of screen, not top-left.
+						mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+						mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+					}
+
+					// These are reset every update, so only initialize once.
+					var projector = new THREE.Projector(),
+						raycaster = new THREE.Raycaster();
+
+					return function(){
+						// Send the vector in <u, v> screen space to world space, given the camera
+						var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
+						projector.unprojectVector( vector, stage.camera );
+
+						// Cast a ray from the camera's position through the world-space point
+						// the mouse is currently at on the screen.
+						raycaster.set( stage.camera.position, vector.sub( stage.camera.position ).normalize() );
+
+						// Get a list of objects the raycaster goes through. It is sorted closest to furthers.
+						var intersects = raycaster.intersectObjects( stage.scene.children );
+						return intersects;
+					}
+				}());
+
+				/**
+				 * Given a list of nearest to furthers intersected objects, highlight one.
+				 * Or unhighlight if the cursor is no longer over it.
+				 */
+				var highlight = (function(){
+					var target = null; // Current object under cursor
+
+					return function(intersects){
+						if ( intersects.length > 0 ) { // Something is under the cursor
+							if ( target != intersects[ 0 ].object ) {
+								// The current object is different than the new object
+	
+								// If the current object was actually something, reset its emmisivity
+								if ( target ) target.material.emissive.setHex( target.currentHex );
+
+								// Update the current object, save its emmisivity, and 
+								target = intersects[ 0 ].object;
+								target.currentHex = target.material.emissive.getHex();
+								target.material.emissive.setHex( 0xff0000 );
+
+							}
+						// Nothing under the cursor
+						} else {
+							// There was something last frame, so reset it.
+							if ( target ){
+								target.material.emissive.setHex( target.currentHex );
+								target = null;
+							}
+						}
+					}
+				}());
+
+				return {
+					update: function(){
+						if(stage && stage.running) {
+							camera();
+							highlight(intersections());
+						}
+					}
+				};
+			}
+
+			function scatterCubes() {
+
+				var geometry = new THREE.CubeGeometry( 20, 20, 20 );
+
+				for ( var i = 0; i < 2000; i ++ ) {
+
+					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial(
+						{ color: Math.random() * 0xffffff }
+					) );
+
+					object.position.x = Math.random() * 800 - 400;
+					object.position.y = Math.random() * 800 - 400;
+					object.position.z = Math.random() * 800 - 400;
+
+					object.rotation.x = Math.random() * 2 * Math.PI;
+					object.rotation.y = Math.random() * 2 * Math.PI;
+					object.rotation.z = Math.random() * 2 * Math.PI;
+
+					object.scale.x = Math.random() + 0.5;
+					object.scale.y = Math.random() + 0.5;
+					object.scale.z = Math.random() + 0.5;
+
+					stage.scene.add( object );
+
+				}
+
+			}
+
+			function illuminate(){
+				var light, lights = [];
+				light = new THREE.DirectionalLight( 0xffffff, 2 );
+				light.position.set( 1, 1, 1 ).normalize();
+				lights.push(light);
+
+				light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( -1, -1, -1 ).normalize();
+				lights.push(light);
+
+				return lights;
+			}
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,12 @@
+<label class='tree-toggle nav-header untested'>{{path}}</label>
+<ul class='nav nav-list tree'>
+	<li ng-repeat="(name, test) in tests.tests">
+		<button ng-click='Test.load(test.path)' class='example btn btn-block' ng-class="{
+			'btn-warning': test.warn,
+			'btn-success': test.pass,
+			'btn-danger': test.fail,
+			'btn-info': test.path == Test.current.path
+		}">{{name}}</button>
+	</li>
+	<li ng-repeat="(path, tests) in tests.children"  ng-include="'menu_item.html'"></li>
+</ul>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - anisotropic texture filtering</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="../../../shared/styles/default.css" />
+		<style>
+			.lbl { color:#fff; font-size:16px; font-weight:bold; position: absolute; bottom:0px; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
+			#lbl_left { text-align:left; left:0px }
+			#lbl_right { text-align:left; right:0px }
+
+			.g { color:#aaa }
+			.c { color:#fa0 }
+
+			*, #info { color: black;}
+			#info a { color:red }
+
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #777 !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - anisotropic texture filtering example
+		</div>
+
+		<div id="lbl_left" class="lbl">
+			anisotropy: <span class="c" id="val_left"></span><br/>
+		</div>
+
+		<div id="lbl_right" class="lbl">
+			anisotropy: <span class="c" id="val_right"></span><br/>
+		</div>
+
+		<script src="../../../../build/three.min.js"></script>
+
+		<script src="../../../shared/s3age/s3age.js"></script>
+
+		<script type="text/javascript">
+			var FOG_COLOR = 0xf2f7ff;
+			var AMBIENT_COLOR = 0xeef0ff;
+		</script>
+
+		<script type="text/javascript">
+			var sceneLeft, sceneRight;
+
+			var stage = new S3age("body", {
+				camera: {fov: 35, far: 25000, position: [0, 0, 1500]},
+				renderer: {
+					setClearColor: [FOG_COLOR, 1],
+					autoClear: false
+				},
+				scene: {
+					fog: new THREE.Fog( FOG_COLOR, 1, 25000 )
+				},
+				controls: (function(){
+					var mouseX = 0, mouseY = 0;
+					document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+					function onDocumentMouseMove(event) {
+						if(stage && stage.running) {
+							mouseX = ( event.clientX - stage.width/2 );
+							mouseY = ( event.clientY - stage.height/2 );
+						}
+					}
+					return {
+						update: function() {
+							if(stage && stage.running){
+								stage.camera.position.x += ( mouseX - stage.camera.position.x ) * .05;
+								stage.camera.position.y = THREE.Math.clamp( stage.camera.position.y + ( - ( mouseY - 200 ) - stage.camera.position.y ) * .05, 50, 1000 );
+
+								stage.camera.lookAt( sceneLeft.position );
+							}
+						}
+					};
+				}())
+			});
+
+			init();
+
+			function init() {
+				sceneLeft = stage.scene;
+				sceneRight = new THREE.Scene();
+
+				sceneRight.fog = sceneLeft.fog;
+
+				[sceneLeft, sceneRight].forEach(function(scene){
+					scene.add(  new THREE.AmbientLight( AMBIENT_COLOR ) );
+
+					var light = new THREE.DirectionalLight( 0xffffff, 2 );
+					light.position.set( 1, 1, 1 ).normalize();
+					scene.add( light );
+				});
+
+				// GROUND
+				var Ground = (function(){
+					var geometry = new THREE.PlaneGeometry( 100, 100 );
+
+					var constructor = function(anisotropy){
+						THREE.Object3D.apply(this, [].slice.call(arguments, 1));
+
+						var texture = THREE.ImageUtils.loadTexture( "../../../shared/textures/crate.gif" );
+						material = new THREE.MeshPhongMaterial( { color: 0xffffff, map: texture } );
+						texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+						texture.repeat.set( 512, 512 );
+						texture.anisotropy = anisotropy;
+
+						mesh = new THREE.Mesh( geometry, material );
+						mesh.rotation.x = - Math.PI / 2;
+						mesh.scale.set( 1000, 1000, 1000 );
+						this.add(mesh);
+					};
+					constructor.prototype = Object.create(THREE.Object3D.prototype);
+
+					return constructor;
+				}());
+
+				var maxAnisotropy = stage.renderer.getMaxAnisotropy();
+
+				if ( maxAnisotropy > 0 ) {
+					sceneLeft.add( new Ground(1) );
+					document.getElementById( "val_left" ).innerHTML = 1;
+
+					sceneRight.add( new Ground(maxAnisotropy) );
+					document.getElementById( "val_right" ).innerHTML = maxAnisotropy;
+				} else {
+					document.getElementById( "val_left" ).innerHTML = "not supported";
+					document.getElementById( "val_right" ).innerHTML =  "not supported";
+					return;
+				}
+			}
+
+			stage.render = function(){
+				stage.renderer.enableScissorTest( false );
+				stage.renderer.clear();
+				stage.renderer.enableScissorTest( true );
+
+				stage.renderer.setScissor( 0, 0, stage.width/2 - 2, stage.height );
+				stage.renderer.render( sceneLeft, stage.camera );
+
+				stage.renderer.setScissor( stage.width/2, 0, stage.width/2 - 2, stage.height  );
+				stage.renderer.render( sceneRight, stage.camera );
+			}
+
+		</script>
+
+	</body>
+</html>

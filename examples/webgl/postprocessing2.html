@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - postprocessing</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="../shared/styles/default.css" />
+		<style type="text/css">
+			div#filters {
+				position: absolute;
+				z-index: 10;
+				color: #fff;
+				font-family: monospace;
+				text-align: center;
+				margin: 10px;
+				width: 100%;
+			}
+
+			label, input {
+				cursor: pointer;
+			}
+		</style>
+		<script src="../../build/three.min.js"></script>
+		<script src="../shared/s3age/s3age.js"></script>
+
+		<script src="../shared/js/shaders/CopyShader.js"></script>
+		<script src="../shared/js/shaders/DotScreenShader.js"></script>
+		<script src="../shared/js/shaders/RGBShiftShader.js"></script>
+		<script src="../shared/js/shaders/EdgeShader.js"></script>
+		<script src="../shared/js/shaders/EdgeShader2.js"></script>
+
+		<script src="../shared/js/postprocessing/EffectComposer.js"></script>
+		<script src="../shared/js/postprocessing/RenderPass.js"></script>
+		<script src="../shared/js/postprocessing/MaskPass.js"></script>
+		<script src="../shared/js/postprocessing/ShaderPass.js"></script>
+
+		<script src="../shared/js/Asteroids.js"></script>
+
+	</head>
+	<body>
+		<div id="filters">
+			<label for="dotScreen">Dot Screen:</label><input id="dotScreen" type="checkbox" onchange="updateOptions()"/><br />
+			<label for="rgbShift">RGB Shift:</label><input id="rgbShift" type="checkbox" onchange="updateOptions()" /><br />
+			<label for="edge">Edge Detection (Frei-Chen Filter):</label><input id="edge" type="checkbox" checked onchange="updateOptions()" /><br />
+			<label for="edge2">Edge Detection (Sobel Filter):</label><input id="edge2" type="checkbox" onchange="updateOptions()" /><br />
+		</div>
+
+		<div id="container"></div>
+		<script type="text/javascript">
+			(function(){
+				var dotScreenEffect, rgbShiftEffect, edgeEffect, edgeEffect2;
+				window.effects = function(){
+					dotScreenEffect = new THREE.ShaderPass( THREE.DotScreenShader );
+					dotScreenEffect.uniforms[ 'scale' ].value = 4;
+					dotScreenEffect.enabled = false;
+
+					rgbShiftEffect = new THREE.ShaderPass( THREE.RGBShiftShader );
+					rgbShiftEffect.uniforms[ 'amount' ].value = 0.0015;
+					rgbShiftEffect.enabled = false;
+
+					edgeEffect = new THREE.ShaderPass( THREE.EdgeShader );
+					edgeEffect.enabled = false;
+					edgeEffect.resize = function(w, h){
+						edgeEffect.uniforms[ 'aspect' ].value.x = w;
+						edgeEffect.uniforms[ 'aspect' ].value.y = h;
+					};
+
+					edgeEffect2 = new THREE.ShaderPass( THREE.EdgeShader2 );
+					edgeEffect2.enabled = true;
+					edgeEffect2.resize = function(w, h){
+						edgeEffect2.uniforms[ 'aspect' ].value.x = w;
+						edgeEffect2.uniforms[ 'aspect' ].value.y = h;
+					};
+
+					return [
+						dotScreenEffect,
+						rgbShiftEffect,
+						edgeEffect,
+						edgeEffect2
+					]
+				};
+
+				window.updateOptions = function() {
+					var dotScreen = document.getElementById('dotScreen');
+					var rgbShift = document.getElementById('rgbShift');
+					var edge = document.getElementById('edge');
+					var edge2 = document.getElementById('edge2');
+
+					dotScreenEffect.enabled = dotScreen.checked;
+					rgbShiftEffect.enabled = rgbShift.checked;
+					edgeEffect.enabled = edge.checked;
+					edgeEffect2.enabled = edge2.checked;
+				};
+			}())
+		</script>				
+
+		<script>
+			new S3age("#container", {
+				camera: { fov: 70, position: [0, 0, 300]},
+				scene: Asteroids(),
+				effects: window.effects()
+			});
+		</script>
+	</body>
+</html>
