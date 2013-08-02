@@ -2,18 +2,11 @@ testing.controller "testing", ($scope, $http, $timeout)->
 	ordered = []
 	order = (tests)->
 		recur = (tests)->
-			ordered.push test.path for name, test of tests.tests
-			recur tests for name, tests of tests.children
+			paths = (test.path for name, test of tests.tests)
+			ordered = ordered.concat _(paths).sort()
+			groups = _(tests.children).chain().keys().sort().value()
+			recur tests.children[group] for group in groups
 		recur tests
-		_(ordered).sort (a, b)->
-			# TODO FIX
-			as = a.match(/\//g).length
-			bs = b.match(/\//g).length
-			return  1 if as > bs
-			return -1 if bs > as
-			return  1 if a > b
-			return -1 if b > a
-			return  0
 
 	$http.get("tests.json")
 	.success (data, status)->
