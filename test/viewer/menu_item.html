@@ -5,7 +5,7 @@
 			'btn-warning': test.warn,
 			'btn-success': test.pass,
 			'btn-danger': test.fail,
-			'btn-info': test.path == Test.url
+			'btn-info': test.path == Test.current.path
 		}">{{name}}</button>
 	</li>
 	<li ng-repeat="(path, tests) in tests.children"  ng-include="'menu_item.html'"></li>

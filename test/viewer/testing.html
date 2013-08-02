@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta name="fragment" content="!" />
 	<title>three.js - examples test runner</title>
 	<link rel="stylesheet" href="libs/bootstrap.min.css">
 	<script src="libs/angular.js"></script>
@@ -8,9 +9,7 @@
 	<script src="libs/coffee-script.js"></script>
 	<link rel="stylesheet" href="testing.css"></script>
 
-	<script type="text/coffeescript">
-		window.testing = angular.module("three.testing", [])
-	</script>
+	<script type="text/coffeescript" src="app/app.coffee"></script>
 	<script type="text/coffeescript" src="app/filters.coffee"></script>
 	<script type="text/coffeescript" src="app/services.coffee"></script>
 	<script type="text/coffeescript" src="app/directives.coffee"></script>
@@ -29,16 +28,14 @@
 
 		<div id="menu-well" class="well" ng-controller="menu">
 			<label class="clearfix pull-left title welled">Menu</label>
-			<ul class="nav nav-list">
-				<li ng-repeat="(path, tests) in tests.children" ng-include="'menu_item.html'"><li>
-			</ul>
+			<ng-include src="'menu_item.html'"></ng-include>
 		</div>
 
 		<div id="renderers" ng-controller="viewports">
 			<div id="viewer-well" class="well">
 				<label class="clearfix pull-left title">Viewport</label>
 				<div class="center-502">
-					<iframe id="viewer" ng-src="../../examples/{{Test.url}}"></iframe>
+					<iframe id="viewer" ng-src="../../examples/{{Test.current.path}}"></iframe>
 				</div>
 			</div>
 

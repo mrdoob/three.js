@@ -1,4 +1,4 @@
-testing.controller "testing", ($scope, $http, $timeout)->
+testing.controller "testing", ($scope, testloader, $timeout, $location)->
 	ordered = []
 	order = (tests)->
 		recur = (tests)->
@@ -8,20 +8,14 @@ testing.controller "testing", ($scope, $http, $timeout)->
 			recur tests.children[group] for group in groups
 		recur tests
 
-	$http.get("tests.json")
-	.success (data, status)->
-		$scope.tests = data
-		order $scope.tests
-		# This is working funky
-		$timeout Test.next
-
 	Test = $scope.Test =
-		url: ""
-		Url: (path, name)->
-			"#{path}/#{name}"
+		current:
+			name: ''
+			path: ''
 		load: (url)->
-			Test.url = url
-		find: 
+			$location.path url
+			Test.current = Test.find.test url
+		find:
 			test: (path)->
 				path = path.split "/"
 				path.shift()
@@ -30,28 +24,36 @@ testing.controller "testing", ($scope, $http, $timeout)->
 				while part = path.shift()
 					base = base.children[part]
 				base.tests[test]
-
 		move: (i = 1)->
-			index = ordered.indexOf(Test.url)
+			index = ordered.indexOf(Test.current.path)
 			if index + i < 0 then index += ordered.length
 			next = ordered[(index + i) % ordered.length]
-			Test.url = next
+			Test.current = Test.find.test next
 		previous: ->
 			Test.move -1
 		next: ->
-			return Test.first() if Test.url is ''
+			return Test.first() if Test.current.path is ''
 			Test.move()
 		first: ->
-			Test.url = ordered[0]
+			Test.current = Test.find.test ordered[0]
 		set: (p, f)->
-			test = Test.find.test(Test.url)
-			test.pass = p
-			test.fail = f
+			Test.current.pass = p
+			Test.current.fail = f
 			Test.next()
 		pass: ->
 			Test.set true, false
 		fail: ->
 			Test.set false, true
+
+	testloader.get()
+	.success (data)->
+		$scope.tests = data
+		order $scope.tests if $scope.tests
+		if url = $location.path()
+			if url[0] = '/' then url = url.substring(1)
+			Test.load url
+		else
+			Test.next()
 
 testing.controller "menu", ($scope, $http)->
 
