@@ -22557,7 +22557,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		try {
 
-			if ( ! ( _gl = tryCreateGL('experimental-webgl') || ! ( _gl = tryCreateGL('webgl') ) ) ) {
+			if ( ! ( _gl = ( tryCreateGL('experimental-webgl') || tryCreateGL('webgl') ) ) ) {
 
 				throw 'Error creating WebGL context.';
 
