@@ -6,7 +6,8 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
 			body {
-				background-color: #ffffff;
+				font-family: Monospace;
+				background-color: #f0f0f0;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -55,8 +56,20 @@
 				document.body.appendChild( renderer.domElement );
 			
 				// create octree
-			
+				
 				octree = new THREE.Octree( {
+					// when undeferred = true, objects are inserted immediately
+					// instead of being deferred until next octree.update() call
+					// this may decrease performance as it forces a matrix update
+					undeferred: false,
+					// set the max depth of tree
+					depthMax: Infinity,
+					// max number of objects before nodes split or merge
+					objectsThreshold: 8,
+					// percent between 0 and 1 that nodes will overlap each other
+					// helps insert objects that lie over more than one node
+					overlapPct: 0.15,
+					// pass the scene to visualize the octree
 					scene: scene
 				} );
 			
@@ -67,6 +80,18 @@
 					new THREE.MeshBasicMaterial( { color: 0x00FF00, transparent: true, opacity: 0.4 } )
 				);
 				scene.add( searchMesh );
+				
+				// info
+				
+				var info = document.createElement( 'div' );
+				info.style.position = 'absolute';
+				info.style.top = '0';
+				info.style.width = '100%';
+				info.style.textAlign = 'center';
+				info.style.padding = '10px';
+				info.style.background = '#FFFFFF';
+				info.innerHTML = '<a href="http://threejs.org" target="_blank">three.js</a> webgl - octree (sparse & dynamic) - by <a href="http://github.com/collinhover/threeoctree" target="_blank">collinhover</a>';
+				document.body.appendChild( info );
 
 			}
 
@@ -86,6 +111,10 @@
 				// render results
 			
 				render();
+				
+				// update octree to add deferred objects
+				
+				octree.update();
 
 			}
 		
