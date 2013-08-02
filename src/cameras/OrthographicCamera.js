@@ -39,8 +39,6 @@ THREE.OrthographicCamera.prototype.clone = function () {
 	
 	camera.near = this.near;
 	camera.far = this.far;
-	
-	camera.updateProjectionMatrix();
 
 	return camera;
 };
