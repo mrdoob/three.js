@@ -9455,6 +9455,19 @@ THREE.Camera.prototype.lookAt = function () {
 
 }();
 
+THREE.Camera.prototype.clone = function (camera) {
+
+	if ( camera === undefined ) camera = new THREE.Camera();
+
+	THREE.Object3D.prototype.clone.call( this, camera );
+
+	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
+	camera.projectionMatrix.copy( this.projectionMatrix );
+	camera.projectionMatrixInverse.copy( this.projectionMatrixInverse );
+
+	return camera;
+};
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9481,6 +9494,23 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 	this.projectionMatrix.makeOrthographic( this.left, this.right, this.top, this.bottom, this.near, this.far );
 
+};
+
+THREE.OrthographicCamera.prototype.clone = function () {
+
+	var camera = new THREE.OrthographicCamera();
+
+	THREE.Camera.prototype.clone.call( this, camera );
+
+	camera.left = this.left;
+	camera.right = this.right;
+	camera.top = this.top;
+	camera.bottom = this.bottom;
+	
+	camera.near = this.near;
+	camera.far = this.far;
+
+	return camera;
 };
 
 /**
@@ -9598,6 +9628,20 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 	}
 
+};
+
+THREE.PerspectiveCamera.prototype.clone = function () {
+
+	var camera = new THREE.PerspectiveCamera();
+
+	THREE.Camera.prototype.clone.call( this, camera );
+
+	camera.fov = this.fov;
+	camera.aspect = this.aspect;
+	camera.near = this.near;
+	camera.far = this.far;
+
+	return camera;
 };
 
 /**

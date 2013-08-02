@@ -39,9 +39,9 @@ THREE.Camera.prototype.clone = function (camera) {
 
 	THREE.Object3D.prototype.clone.call( this, camera );
 
-	camera.matrixWorldInverse.copy(this.matrixWorldInverse);
-	camera.projectionMatrix.copy(this.projectionMatrix);
-	camera.projectionMatrixInverse.copy(this.projectionMatrixInverse);
+	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
+	camera.projectionMatrix.copy( this.projectionMatrix );
+	camera.projectionMatrixInverse.copy( this.projectionMatrixInverse );
 
 	return camera;
 };
