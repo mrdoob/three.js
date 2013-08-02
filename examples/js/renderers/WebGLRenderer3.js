@@ -39,6 +39,12 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		gl = canvas.getContext( 'webgl', attributes ) || canvas.getContext( 'experimental-webgl', attributes );
 
+		if ( gl === null ) {
+
+			throw 'Error creating WebGL context.';
+
+		}
+
 	} catch ( exception ) {
 
 		console.error( exception );
