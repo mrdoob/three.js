@@ -128,16 +128,33 @@ THREE.GeometryUtils = {
 
 		}
 
-		var face, newFaces = [];
+		var face, faceVertexUv, newFaces = [], newFaceVertexUvs = [];
+
+		for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+
+			newFaceVertexUvs.push( [] );
+
+		}
 
 		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
 
 			face = geometry.faces[ i ];
-			if ( ! ( face.materialIndex in materialIndexMap ) ) newFaces.push( face );
+			if ( ! ( face.materialIndex in materialIndexMap ) ) {
+
+				newFaces.push( face );
+				for ( var j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
+
+					faceVertexUv = geometry.faceVertexUvs[ j ][ i ];
+					newFaceVertexUvs[ j ].push( faceVertexUv );
+
+				}
+
+			}
 
 		}
 
 		geometry.faces = newFaces;
+		geometry.faceVertexUvs = newFaceVertexUvs;
 
 	},
 
