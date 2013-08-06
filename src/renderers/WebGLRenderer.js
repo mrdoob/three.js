@@ -2861,7 +2861,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					// render indexed triangles
 					if ( material.wireframe && index_wireframe ) {
-						_gl.drawElements( _gl.LINES, offset.count * 2, _gl.UNSIGNED_SHORT, offset.start * 4 ); // 2 bytes per Uint16
+						_gl.drawElements( _gl.LINES, offset.wireframe.count, _gl.UNSIGNED_SHORT, offset.wireframe.start * 2 ); // 2 bytes per Uint16
 					}
 					else {
 						_gl.drawElements( _gl.TRIANGLES, offset.count, _gl.UNSIGNED_SHORT, offset.start * 2 ); // 2 bytes per Uint16
