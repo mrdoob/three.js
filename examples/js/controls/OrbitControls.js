@@ -33,6 +33,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	this.minDistance = 0;
 	this.maxDistance = Infinity;
+	this.minY=null; // disallow camera y position to get under some level [if not null]
 
 	this.keys = { LEFT: 37, UP: 38, RIGHT: 39, BOTTOM: 40 };
 
@@ -183,7 +184,10 @@ THREE.OrbitControls = function ( object, domElement ) {
 		offset.x = radius * Math.sin( phi ) * Math.sin( theta );
 		offset.y = radius * Math.cos( phi );
 		offset.z = radius * Math.sin( phi ) * Math.cos( theta );
-
+		if (offset.y < this.minY)
+		{
+			offset.y = this.minY;
+		}
 		position.copy( this.center ).add( offset );
 
 		this.object.lookAt( this.center );
