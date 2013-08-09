@@ -277,8 +277,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'mouseup', onMouseUp, false );
+		// Greggman fix: https://github.com/greggman/three.js/commit/fde9f9917d6d8381f06bf22cdff766029d1761be
+		scope.domElement.addEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.addEventListener( 'mouseup', onMouseUp, false );
 
 	}
 
@@ -331,14 +332,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
+		// Greggman fix: https://github.com/greggman/three.js/commit/fde9f9917d6d8381f06bf22cdff766029d1761be
+		scope.update();
 	}
 
 	function onMouseUp( /* event */ ) {
 
 		if ( scope.enabled === false ) { return; }
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		// Greggman fix: https://github.com/greggman/three.js/commit/fde9f9917d6d8381f06bf22cdff766029d1761be
+		scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
 
 		state = STATE.NONE;
 
@@ -380,20 +384,33 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( scope.noPan === true ) { return; }
 
 		// pan a pixel - I guess for precise positioning?
+		// Greggman fix: https://github.com/greggman/three.js/commit/fde9f9917d6d8381f06bf22cdff766029d1761be
+		var needUpdate = false;
 		switch ( event.keyCode ) {
 
 			case scope.keys.UP:
 				scope.pan( new THREE.Vector2( 0, 1 ) );
+				needUpdate = true;
 				break;
 			case scope.keys.BOTTOM:
 				scope.pan( new THREE.Vector2( 0, -1 ) );
+				needUpdate = true;
 				break;
 			case scope.keys.LEFT:
 				scope.pan( new THREE.Vector2( 1, 0 ) );
+				needUpdate = true;
 				break;
 			case scope.keys.RIGHT:
 				scope.pan( new THREE.Vector2( -1, 0 ) );
+				needUpdate = true;
 				break;
+		}
+
+		// Greggman fix: https://github.com/greggman/three.js/commit/fde9f9917d6d8381f06bf22cdff766029d1761be
+		if ( needUpdate ) {
+
+			scope.update();
+
 		}
 
 	}
