@@ -46,7 +46,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
 
 		<script src='js/MD2Character.js'></script>
 
@@ -159,7 +159,7 @@
 
 				// CONTROLS
 
-				controls = new THREE.TrackballControls( camera, renderer.domElement );
+				controls = new THREE.OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 50, 0 );
 
 				// GUI
