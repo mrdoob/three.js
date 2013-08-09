@@ -80,11 +80,11 @@ var Viewport = function ( editor ) {
 
 		if ( object instanceof Array ) {
 
-			return ray.intersectObjects( object, true );
+			return ray.intersectObjects( object );
 
 		}
 
-		return ray.intersectObject( object, true );
+		return ray.intersectObject( object );
 
 	};
 
@@ -252,6 +252,12 @@ var Viewport = function ( editor ) {
 		}
 
 		objects.push( object );
+
+		object.traverse( function ( child ) {
+
+			objects.push( child );
+
+		} );
 
 	} );
 
