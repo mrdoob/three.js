@@ -30,6 +30,10 @@
 
 	};
 
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
+
 	var intersectObject = function ( object, raycaster, intersects ) {
 
 		if ( object instanceof THREE.Particle ) {
@@ -105,10 +109,6 @@
 					fl = geometry.attributes.position.numItems / 9;
 
 				}
-
-				var vA = new THREE.Vector3();
-				var vB = new THREE.Vector3();
-				var vC = new THREE.Vector3();
 
 				var offsets = geometry.offsets;
 				var indices = geometry.attributes.index.array;
