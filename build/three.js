@@ -765,7 +765,7 @@ THREE.Quaternion.prototype = {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( typeof euler['order'] === undefined ) {
+		if ( euler instanceof THREE.Euler === false ) {
 
 			console.error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
 		}
@@ -781,7 +781,7 @@ THREE.Quaternion.prototype = {
 		var s2 = Math.sin( euler._y / 2 );
 		var s3 = Math.sin( euler._z / 2 );
 
-		if ( euler.order === undefined || euler.order === 'XYZ' ) {
+		if ( euler.order === 'XYZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
@@ -2034,17 +2034,17 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	applyEuler: function () {
 
-		var q1 = new THREE.Quaternion();
+		var quaternion = new THREE.Quaternion();
 
-		return function ( rotation ) {
+		return function ( euler ) {
 
-			if( typeof rotation['order'] === undefined ) {
+			if ( euler instanceof THREE.Euler === false ) {
+
 				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+
 			}
 
-			var quaternion = q1.setFromEuler( rotation );
-
-			this.applyQuaternion( quaternion );
+			this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
 			return this;
 
@@ -4166,7 +4166,7 @@ THREE.Matrix4.prototype = {
 
 	makeRotationFromEuler: function ( euler ) {
 
-		if ( typeof euler['order'] === undefined ) {
+		if ( euler instanceof THREE.Euler === false ) {
 
 			console.error( 'ERROR: Matrix\'s .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
 
@@ -4179,7 +4179,7 @@ THREE.Matrix4.prototype = {
 		var c = Math.cos( y ), d = Math.sin( y );
 		var e = Math.cos( z ), f = Math.sin( z );
 
-		if ( euler.order === undefined || euler.order === 'XYZ' ) {
+		if ( euler.order === 'XYZ' ) {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
@@ -6689,6 +6689,10 @@ THREE.EventDispatcher.prototype = {
 
 	};
 
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
+
 	var intersectObject = function ( object, raycaster, intersects ) {
 
 		if ( object instanceof THREE.Particle ) {
@@ -6764,10 +6768,6 @@ THREE.EventDispatcher.prototype = {
 					fl = geometry.attributes.position.numItems / 9;
 
 				}
-
-				var vA = new THREE.Vector3();
-				var vB = new THREE.Vector3();
-				var vC = new THREE.Vector3();
 
 				var offsets = geometry.offsets;
 				var indices = geometry.attributes.index.array;
