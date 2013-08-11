@@ -80,6 +80,21 @@
 
 			}
 
+			//Check boundingBox before continuing
+			
+			inverseMatrix.getInverse( object.matrixWorld );  
+			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			if ( geometry.boundingBox !== null) {
+
+				if ( localRay.isIntersectionBox(geometry.boundingBox) === false )  {
+
+					return intersects;
+
+				}
+
+			} 
+
 			var vertices = geometry.vertices;
 
 			if ( geometry instanceof THREE.BufferGeometry ) {
@@ -91,10 +106,6 @@
 
 				var a, b, c;
 				var precision = raycaster.precision;
-
-				inverseMatrix.getInverse( object.matrixWorld );
-
-				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 				var fl;
 				var indexed = false;
@@ -153,7 +164,7 @@
 							positions[ c * 3 + 2 ]
 						);
 
-						var interPoint = THREE.Triangle.intersectionRay( localRay, vA, vB, vC, material.side !== THREE.DoubleSide );
+						var interPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
 
 						if ( !interPoint ) continue;
 
@@ -186,10 +197,6 @@
 				var a, b, c, d;
 				var precision = raycaster.precision;
 
-				inverseMatrix.getInverse( object.matrixWorld );
-
-				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
-
 				for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 					var face = geometry.faces[ f ];
@@ -202,7 +209,7 @@
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 					
-					var interPoint = THREE.Triangle.intersectionRay( localRay, a, b, c, material.side !== THREE.DoubleSide );
+					var interPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
 
 					if ( !interPoint ) {
 
