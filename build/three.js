@@ -2054,13 +2054,11 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	applyAxisAngle: function () {
 
-		var q1 = new THREE.Quaternion();
+		var quaternion = new THREE.Quaternion();
 
 		return function ( axis, angle ) {
 
-			var quaternion = q1.setFromAxisAngle( axis, angle );
-
-			this.applyQuaternion( quaternion );
+			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
 			return this;
 
