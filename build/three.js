@@ -5381,7 +5381,7 @@ THREE.Ray.prototype = {
 
 		return function ( a, b, c, backfaceCulling, optionalTarget ) {
 
-			//from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+			// from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
 
 			edge1.subVectors( b, a );
 			edge2.subVectors( c, a );
@@ -5392,41 +5392,60 @@ THREE.Ray.prototype = {
 			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
 			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
 			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = this.direction.dot(normal);
+			var DdN = this.direction.dot( normal );
 			var sign;
+
 			if ( DdN > 0 ) {
 
-					if ( backfaceCulling ) return null;
-					sign = 1;
+				if ( backfaceCulling ) return null;
+				sign = 1;
 
 			} else if ( DdN < 0 ) {
 
-					sign = - 1;
-					DdN = - DdN;
+				sign = - 1;
+				DdN = - DdN;
 
-			} else return null;
+			} else {
+
+				return null;
+
+			}
 
 			diff.subVectors( this.origin, a );
 			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
 
 			// b1 < 0, no intersection
-			if ( DdQxE2 < 0 )
+			if ( DdQxE2 < 0 ) {
+
 				return null;
+
+			}
 
 			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+
 			// b2 < 0, no intersection
-			if ( DdE1xQ < 0 )
+			if ( DdE1xQ < 0 ) {
+
 				return null;
 
+			}
+
 			// b1+b2 > 1, no intersection
-			if ( DdQxE2 + DdE1xQ > DdN )
-				return null
+			if ( DdQxE2 + DdE1xQ > DdN ) {
+
+				return null;
+
+			}
 
 			// Line intersects triangle, check if ray does.
 			var QdN = - sign * diff.dot( normal );
+
 			// t < 0, no intersection
-			if ( QdN < 0 )
-				return null
+			if ( QdN < 0 ) {
+
+				return null;
+
+			}
 
 			// Ray intersects triangle.
 			return this.at( QdN / DdN, optionalTarget );
@@ -6812,14 +6831,14 @@ THREE.EventDispatcher.prototype = {
 
 			}
 
-			//Check boundingBox before continuing
+			// Check boundingBox before continuing
 			
 			inverseMatrix.getInverse( object.matrixWorld );  
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			if ( geometry.boundingBox !== null) {
+			if ( geometry.boundingBox !== null ) {
 
-				if ( localRay.isIntersectionBox(geometry.boundingBox) === false )  {
+				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
 
 					return intersects;
 
@@ -6896,12 +6915,16 @@ THREE.EventDispatcher.prototype = {
 							positions[ c * 3 + 2 ]
 						);
 
-						var interPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+						var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
 
-						if ( !interPoint ) continue;
+						if ( intersectionPoint === null ) {
 
-						interPoint.applyMatrix4( object.matrixWorld );
-						var distance = raycaster.ray.origin.distanceTo( interPoint );
+							continue;
+
+						}
+
+						intersectionPoint.applyMatrix4( object.matrixWorld );
+						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 						// bail if the ray is too close to the plane
 						if ( distance < precision ) continue;
@@ -6911,7 +6934,7 @@ THREE.EventDispatcher.prototype = {
 						intersects.push( {
 
 							distance: distance,
-							point: interPoint,
+							point: intersectionPoint,
 							face: null,
 							faceIndex: null,
 							object: object
@@ -6941,16 +6964,16 @@ THREE.EventDispatcher.prototype = {
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 					
-					var interPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+					var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
 
-					if ( !interPoint ) {
+					if ( intersectionPoint === null ) {
 
 						continue;
 
 					}
 
-					interPoint.applyMatrix4( object.matrixWorld );
-					var distance = raycaster.ray.origin.distanceTo( interPoint );
+					intersectionPoint.applyMatrix4( object.matrixWorld );
+					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 					// bail if the ray is too close to the plane
 					if ( distance < precision ) continue;
@@ -6960,7 +6983,7 @@ THREE.EventDispatcher.prototype = {
 					intersects.push( {
 
 						distance: distance,
-						point: interPoint,
+						point: intersectionPoint,
 						face: face,
 						faceIndex: f,
 						object: object
