@@ -372,7 +372,7 @@ THREE.Ray.prototype = {
 
 		return function ( a, b, c, backfaceCulling, optionalTarget ) {
 
-			//from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+			// from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
 
 			edge1.subVectors( b, a );
 			edge2.subVectors( c, a );
@@ -383,41 +383,60 @@ THREE.Ray.prototype = {
 			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
 			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
 			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = this.direction.dot(normal);
+			var DdN = this.direction.dot( normal );
 			var sign;
+
 			if ( DdN > 0 ) {
 
-					if ( backfaceCulling ) return null;
-					sign = 1;
+				if ( backfaceCulling ) return null;
+				sign = 1;
 
 			} else if ( DdN < 0 ) {
 
-					sign = - 1;
-					DdN = - DdN;
+				sign = - 1;
+				DdN = - DdN;
 
-			} else return null;
+			} else {
+
+				return null;
+
+			}
 
 			diff.subVectors( this.origin, a );
 			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
 
 			// b1 < 0, no intersection
-			if ( DdQxE2 < 0 )
+			if ( DdQxE2 < 0 ) {
+
 				return null;
+
+			}
 
 			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+
 			// b2 < 0, no intersection
-			if ( DdE1xQ < 0 )
+			if ( DdE1xQ < 0 ) {
+
 				return null;
 
+			}
+
 			// b1+b2 > 1, no intersection
-			if ( DdQxE2 + DdE1xQ > DdN )
-				return null
+			if ( DdQxE2 + DdE1xQ > DdN ) {
+
+				return null;
+
+			}
 
 			// Line intersects triangle, check if ray does.
 			var QdN = - sign * diff.dot( normal );
+
 			// t < 0, no intersection
-			if ( QdN < 0 )
-				return null
+			if ( QdN < 0 ) {
+
+				return null;
+
+			}
 
 			// Ray intersects triangle.
 			return this.at( QdN / DdN, optionalTarget );

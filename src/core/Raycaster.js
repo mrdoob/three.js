@@ -80,14 +80,14 @@
 
 			}
 
-			//Check boundingBox before continuing
+			// Check boundingBox before continuing
 			
 			inverseMatrix.getInverse( object.matrixWorld );  
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			if ( geometry.boundingBox !== null) {
+			if ( geometry.boundingBox !== null ) {
 
-				if ( localRay.isIntersectionBox(geometry.boundingBox) === false )  {
+				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
 
 					return intersects;
 
@@ -164,12 +164,16 @@
 							positions[ c * 3 + 2 ]
 						);
 
-						var interPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+						var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
 
-						if ( !interPoint ) continue;
+						if ( intersectionPoint === null ) {
 
-						interPoint.applyMatrix4( object.matrixWorld );
-						var distance = raycaster.ray.origin.distanceTo( interPoint );
+							continue;
+
+						}
+
+						intersectionPoint.applyMatrix4( object.matrixWorld );
+						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 						// bail if the ray is too close to the plane
 						if ( distance < precision ) continue;
@@ -179,7 +183,7 @@
 						intersects.push( {
 
 							distance: distance,
-							point: interPoint,
+							point: intersectionPoint,
 							face: null,
 							faceIndex: null,
 							object: object
@@ -209,16 +213,16 @@
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 					
-					var interPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+					var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
 
-					if ( !interPoint ) {
+					if ( intersectionPoint === null ) {
 
 						continue;
 
 					}
 
-					interPoint.applyMatrix4( object.matrixWorld );
-					var distance = raycaster.ray.origin.distanceTo( interPoint );
+					intersectionPoint.applyMatrix4( object.matrixWorld );
+					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 					// bail if the ray is too close to the plane
 					if ( distance < precision ) continue;
@@ -228,7 +232,7 @@
 					intersects.push( {
 
 						distance: distance,
-						point: interPoint,
+						point: intersectionPoint,
 						face: face,
 						faceIndex: f,
 						object: object
