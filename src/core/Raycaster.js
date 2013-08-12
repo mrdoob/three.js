@@ -68,11 +68,11 @@
 			var geometry = object.geometry;
 
 			// Checking boundingSphere distance to ray
-			matrixPosition.getPositionFromMatrix( object.matrixWorld );
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
@@ -253,8 +253,9 @@
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			// Checking boundingSphere distance to ray
-			matrixPosition.getPositionFromMatrix(object.matrixWorld);
-			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 			
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
