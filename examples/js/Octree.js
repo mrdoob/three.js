@@ -1,6 +1,6 @@
 /*!
  *
- * threeoctree.js (r59) / https://github.com/collinhover/threeoctree
+ * threeoctree.js (r60) / https://github.com/collinhover/threeoctree
  * (sparse) dynamic 3D spatial representation structure for fast searches.
  *
  * @author Collin Hover / http://collinhover.com/
@@ -681,14 +681,14 @@
 					}
 					
 					this.radius = this.object.geometry.boundingSphere.radius;
+					this.position.copy( this.object.geometry.boundingSphere.center ).applyMatrix4( this.object.matrixWorld );
 					
 				} else {
 					
 					this.radius = this.object.boundRadius;
+					this.position.getPositionFromMatrix( this.object.matrixWorld );
 					
 				}
-				
-				this.position.getPositionFromMatrix( this.object.matrixWorld );
 				
 			}
 			
