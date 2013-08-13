@@ -5502,23 +5502,35 @@ THREE.Sphere.prototype = {
 		return this;
 	},
 
-	setFromPoints: function ( points ) {
 
-		var radiusSq, maxRadiusSq = 0;
+	setFromPoints: function () {
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+		var _box = new THREE.Box3();
+		var _center = new THREE.Vector3();
 
-			radiusSq = points[ i ].lengthSq();
-			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+		return function ( points, optionalCenter )  {
 
-		}
+			// use boundingBox center as sphere center
 
-		this.center.set( 0, 0, 0 );
-		this.radius = Math.sqrt( maxRadiusSq );
+			var center = optionalCenter || _box.setFromPoints( points ).center( _center );
 
-		return this;
+			var maxRadiusSq = 0;
 
-	},
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				var radiusSq = center.distanceToSquared( points[ i ] );
+				maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+
+			}
+
+			this.center.copy( center );
+			this.radius = Math.sqrt( maxRadiusSq );
+
+			return this;			
+ 		
+ 		};
+
+	}(),
 
 	copy: function ( sphere ) {
 
@@ -5691,36 +5703,18 @@ THREE.Frustum.prototype = {
 
 	intersectsObject: function () {
 
-		var center = new THREE.Vector3();
+		var sphere = new THREE.Sphere();
 
 		return function ( object ) {
 
-			// this method is expanded inlined for performance reasons.
-
 			var geometry = object.geometry;
-			var matrix = object.matrixWorld;
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			var negRadius = - geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 
-			center.getPositionFromMatrix( matrix );
-
-			var planes = this.planes;
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				var distance = planes[ i ].distanceToPoint( center );
-
-				if ( distance < negRadius ) {
-
-					return false;
-
-				}
-
-			}
-
-			return true;
+			return this.intersectsSphere( sphere );
 
 		};
 
@@ -6819,11 +6813,11 @@ THREE.EventDispatcher.prototype = {
 			var geometry = object.geometry;
 
 			// Checking boundingSphere distance to ray
-			matrixPosition.getPositionFromMatrix( object.matrixWorld );
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
@@ -7004,8 +6998,9 @@ THREE.EventDispatcher.prototype = {
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			// Checking boundingSphere distance to ray
-			matrixPosition.getPositionFromMatrix(object.matrixWorld);
-			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 			
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
