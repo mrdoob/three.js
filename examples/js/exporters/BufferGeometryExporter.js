@@ -45,6 +45,7 @@ THREE.BufferGeometryExporter.prototype = {
 		if ( boundingSphere !== null ) {
 
 			output.boundingSphere = {
+				center: boundingSphere.center.toArray(),
 				radius: boundingSphere.radius
 			}
 
