@@ -909,6 +909,25 @@ THREE.WebGLRenderer = function ( parameters ) {
 			normalType = bufferGuessNormalType( material ),
 			vertexColorType = bufferGuessVertexColorType( material );
 
+		// START_VEROLD_MOD - quad wireframes
+		if ( geometry.faceEdgeMasks !== undefined ) {
+
+			nlines = 0;
+
+			for ( var f = 0, fl = faces3.length; f < fl; f ++ ) {
+
+				var fi = faces3[ f ],
+					edgeMask = geometry.faceEdgeMasks[ fi ];
+
+				nlines += ( edgeMask & 1 ) ? 1 : 0;
+				nlines += ( edgeMask & 2 ) ? 1 : 0;
+				nlines += ( edgeMask & 4 ) ? 1 : 0;
+
+			}
+
+		}
+		// END_VEROLD_MOD - quad wireframes
+
 		// console.log( "uvType", uvType, "normalType", normalType, "vertexColorType", vertexColorType, object, geometryGroup, material );
 
 		geometryGroup.__vertexArray = new Float32Array( nvertices * 3 );
@@ -2288,22 +2307,32 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
 
+				fi = chunk_faces3[ f ];
+
 				faceArray[ offset_face ] 	 = vertexIndex;
 				faceArray[ offset_face + 1 ] = vertexIndex + 1;
 				faceArray[ offset_face + 2 ] = vertexIndex + 2;
 
 				offset_face += 3;
 
-				lineArray[ offset_line ]     = vertexIndex;
-				lineArray[ offset_line + 1 ] = vertexIndex + 1;
+				// START_VEROLD_MOD - quad wireframes
+				var edgeMask = geometry.faceEdgeMasks !== undefined ? geometry.faceEdgeMasks[ fi ] : ~0;
 
-				lineArray[ offset_line + 2 ] = vertexIndex;
-				lineArray[ offset_line + 3 ] = vertexIndex + 2;
+				if ( edgeMask & 1 ) {
+					lineArray[ offset_line++ ] = vertexIndex;
+					lineArray[ offset_line++ ] = vertexIndex + 1;
+				}
 
-				lineArray[ offset_line + 4 ] = vertexIndex + 1;
-				lineArray[ offset_line + 5 ] = vertexIndex + 2;
+				if ( edgeMask & 2 ) {
+					lineArray[ offset_line++ ] = vertexIndex + 1;
+					lineArray[ offset_line++ ] = vertexIndex + 2;
+				}
 
-				offset_line += 6;
+				if ( edgeMask & 4 ) {
+					lineArray[ offset_line++ ] = vertexIndex;
+					lineArray[ offset_line++ ] = vertexIndex + 2;
+				}
+				// END_VEROLD_MOD - quad wireframes
 
 				vertexIndex += 3;
 
