@@ -19,7 +19,7 @@ THREE.VRMLLoader.prototype = {
 
 			scope.dispatchEvent( { type: 'load', content: object } );
 
-			//if ( callback ) callback( geometry ); //WP what is that line for ?? and hyw only one geometry and no material ?
+			if ( callback ) callback( geometry );
 
 		}, false );
 
