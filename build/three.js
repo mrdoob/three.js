@@ -3466,6 +3466,40 @@ THREE.Box3.prototype = {
 
 	},
 
+	addPoint: function ( point ) {
+
+		if ( point.x < this.min.x ) {
+
+			this.min.x = point.x;
+
+		} else if ( point.x > this.max.x ) {
+
+			this.max.x = point.x;
+
+		}
+
+		if ( point.y < this.min.y ) {
+
+			this.min.y = point.y;
+
+		} else if ( point.y > this.max.y ) {
+
+			this.max.y = point.y;
+
+		}
+
+		if ( point.z < this.min.z ) {
+
+			this.min.z = point.z;
+
+		} else if ( point.z > this.max.z ) {
+
+			this.max.z = point.z;
+
+		}
+
+	},
+
 	setFromPoints: function ( points ) {
 
 		if ( points.length > 0 ) {
@@ -3477,37 +3511,7 @@ THREE.Box3.prototype = {
 
 			for ( var i = 1, il = points.length; i < il; i ++ ) {
 
-				point = points[ i ];
-
-				if ( point.x < this.min.x ) {
-
-					this.min.x = point.x;
-
-				} else if ( point.x > this.max.x ) {
-
-					this.max.x = point.x;
-
-				}
-
-				if ( point.y < this.min.y ) {
-
-					this.min.y = point.y;
-
-				} else if ( point.y > this.max.y ) {
-
-					this.max.y = point.y;
-
-				}
-
-				if ( point.z < this.min.z ) {
-
-					this.min.z = point.z;
-
-				} else if ( point.z > this.max.z ) {
-
-					this.max.z = point.z;
-
-				}
+				this.addPoint( points[ i ] )
 
 			}
 
@@ -5505,25 +5509,30 @@ THREE.Sphere.prototype = {
 
 	setFromPoints: function () {
 
-		var _box = new THREE.Box3();
-		var _center = new THREE.Vector3();
+		var box = new THREE.Box3();
 
 		return function ( points, optionalCenter )  {
 
-			// use boundingBox center as sphere center
+			var center = this.center;
 
-			var center = optionalCenter || _box.setFromPoints( points ).center( _center );
+			if ( optionalCenter !== undefined ) {
+
+				center.copy( optionalCenter );
+
+			} else {
+
+				box.setFromPoints( points ).center( center );
+
+			}
 
 			var maxRadiusSq = 0;
 
 			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-				var radiusSq = center.distanceToSquared( points[ i ] );
-				maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
 			}
 
-			this.center.copy( center );
 			this.radius = Math.sqrt( maxRadiusSq );
 
 			return this;			
@@ -9108,35 +9117,48 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( this.boundingSphere === null ) {
+		var box = new THREE.Box3();
+		var vector = new THREE.Vector3();
 
-			this.boundingSphere = new THREE.Sphere();
+		return function () {
 
-		}
+			if ( this.boundingSphere === null ) {
 
-		var positions = this.attributes[ "position" ].array;
-
-		if ( positions ) {
-
-			var radiusSq, maxRadiusSq = 0;
-			var x, y, z;
-
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
-
-				radiusSq =  x * x + y * y + z * z;
-				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
+				this.boundingSphere = new THREE.Sphere();
 
 			}
 
-			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+			var positions = this.attributes[ "position" ].array;
+
+			if ( positions ) {
+
+				var center = this.boundingSphere.center;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					box.addPoint( vector );
+
+				}
+
+				box.center( center );
+
+				var maxRadiusSq = 0;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+				}
+
+				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+			}
 
 		}
 
-	},
+	}(),
 
 	computeVertexNormals: function () {
 
@@ -11223,7 +11245,7 @@ THREE.BufferGeometryLoader.prototype = {
 
 		if ( boundingSphere !== undefined ) {
 
-			geometry.boundingSphere = new THREE.Sphere( undefined, boundingSphere.radius );
+			geometry.boundingSphere = new THREE.Sphere( boundingSphere.center, boundingSphere.radius );
 
 		}
 
