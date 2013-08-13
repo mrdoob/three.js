@@ -25,25 +25,30 @@ THREE.Sphere.prototype = {
 
 	setFromPoints: function () {
 
-		var _box = new THREE.Box3();
-		var _center = new THREE.Vector3();
+		var box = new THREE.Box3();
 
 		return function ( points, optionalCenter )  {
 
-			// use boundingBox center as sphere center
+			var center = this.center;
 
-			var center = optionalCenter || _box.setFromPoints( points ).center( _center );
+			if ( optionalCenter !== undefined ) {
+
+				center.copy( optionalCenter );
+
+			} else {
+
+				box.setFromPoints( points ).center( center );
+
+			}
 
 			var maxRadiusSq = 0;
 
 			for ( var i = 0, il = points.length; i < il; i ++ ) {
 
-				var radiusSq = center.distanceToSquared( points[ i ] );
-				maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
 			}
 
-			this.center.copy( center );
 			this.radius = Math.sqrt( maxRadiusSq );
 
 			return this;			

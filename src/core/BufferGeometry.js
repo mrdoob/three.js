@@ -141,35 +141,48 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( this.boundingSphere === null ) {
+		var box = new THREE.Box3();
+		var vector = new THREE.Vector3();
 
-			this.boundingSphere = new THREE.Sphere();
+		return function () {
 
-		}
+			if ( this.boundingSphere === null ) {
 
-		var positions = this.attributes[ "position" ].array;
-
-		if ( positions ) {
-
-			var radiusSq, maxRadiusSq = 0;
-			var x, y, z;
-
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
-
-				radiusSq =  x * x + y * y + z * z;
-				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
+				this.boundingSphere = new THREE.Sphere();
 
 			}
 
-			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+			var positions = this.attributes[ "position" ].array;
+
+			if ( positions ) {
+
+				var center = this.boundingSphere.center;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					box.addPoint( vector );
+
+				}
+
+				box.center( center );
+
+				var maxRadiusSq = 0;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+				}
+
+				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+			}
 
 		}
 
-	},
+	}(),
 
 	computeVertexNormals: function () {
 
