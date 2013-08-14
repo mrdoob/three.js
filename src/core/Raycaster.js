@@ -114,7 +114,7 @@
 					var positions = geometry.attributes.position.array;
 					var offLength = geometry.offsets.length;
 
-					var fl = geometry.attributes.index.numItems / 3;
+					var fl = geometry.attributes.index.array.length / 3;
 
 					for ( var oi = 0; oi < offLength; ++oi ) {
 
@@ -174,7 +174,7 @@
 					var positions = geometry.attributes.position.array;
 					var offLength = geometry.offsets.length;
 
-					var fl = geometry.attributes.position.numItems / 9;
+					var fl = geometry.attributes.position.array.length;
 
 					for ( var i = 0; i < fl; i += 3 ) {
 
