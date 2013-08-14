@@ -59,7 +59,10 @@ THREE.BufferGeometryLoader.prototype = {
 
 		if ( boundingSphere !== undefined ) {
 
-			geometry.boundingSphere = new THREE.Sphere( boundingSphere.center, boundingSphere.radius );
+			geometry.boundingSphere = new THREE.Sphere(
+				new THREE.Vector3().fromArray( boundingSphere.center ),
+				boundingSphere.radius
+			);
 
 		}
 
