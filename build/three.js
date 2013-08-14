@@ -767,7 +767,7 @@ THREE.Quaternion.prototype = {
 
 		if ( euler instanceof THREE.Euler === false ) {
 
-			console.error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+			throw new Error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
