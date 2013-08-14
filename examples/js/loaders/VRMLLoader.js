@@ -153,11 +153,12 @@ THREE.VRMLLoader.prototype = {
 
 							var result = float4_pattern.exec( child );
 
-							object.rotation.set(
+							object.quaternion.set(
 								parseFloat( result[ 1 ] ),
 								parseFloat( result[ 2 ] ),
-								parseFloat( result[ 3 ] )
-							).multiplyScalar( result[ 4 ] );
+								parseFloat( result[ 3 ] ),
+								parseFloat( result[ 4 ] )
+							);
 
 						} else if ( /scale/.exec( child ) ) {
 
