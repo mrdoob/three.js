@@ -75,8 +75,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			this.screen.left = 0;
 			this.screen.top = 0;
-			this.screen.width = _this.domElement.offsetWidth;
-			this.screen.height = _this.domElement.offsetHeight;
+			this.screen.width = this.domElement.offsetWidth;
+			this.screen.height = this.domElement.offsetHeight;
 
 		} else {
 
