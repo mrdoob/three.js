@@ -5,7 +5,7 @@
 module( "Quaternion" );
 
 var orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
-var eulerAngles = new THREE.Vector3( 0.1, -0.3, 0.25 );
+var eulerAngles = new THREE.Euler( 0.1, -0.3, 0.25 );
 
 
 
@@ -153,7 +153,7 @@ test( "inverse/conjugate", function() {
 
 test( "multiplyQuaternions/multiply", function() {
 
-	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+	var angles = [ new THREE.Euler( 1, 0, 0 ), new THREE.Euler( 0, 1, 0 ), new THREE.Euler( 0, 0, 1 ) ];
 
 	var q1 = new THREE.Quaternion().setFromEuler( angles[0], "XYZ" );
 	var q2 = new THREE.Quaternion().setFromEuler( angles[1], "XYZ" );
@@ -174,7 +174,7 @@ test( "multiplyQuaternions/multiply", function() {
 
 test( "multiplyVector3", function() {
 	
-	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+	var angles = [ new THREE.Euler( 1, 0, 0 ), new THREE.Euler( 0, 1, 0 ), new THREE.Euler( 0, 0, 1 ) ];
 
 	// ensure euler conversion for Quaternion matches that of Matrix4
 	for( var i = 0; i < orders.length; i ++ ) {
