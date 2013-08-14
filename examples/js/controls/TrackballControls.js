@@ -66,24 +66,21 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	var changeEvent = { type: 'change' };
 
-
 	// methods
-
-	this.handleResize = function () {
-
+	this.updateScreen = function()	{
 		if ( this.domElement === document ) {
-
 			this.screen.left = 0;
-			this.screen.top = 0;
+			this.screen.top = 0;							
 			this.screen.width = window.innerWidth;
 			this.screen.height = window.innerHeight;
 
 		} else {
-
 			this.screen = this.domElement.getBoundingClientRect();
-
 		}
-
+	}
+		
+	this.handleResize = function () {
+		this.updateScreen();
 	};
 
 	this.handleEvent = function ( event ) {
@@ -95,7 +92,14 @@ THREE.TrackballControls = function ( object, domElement ) {
 		}
 
 	};
+	this.checkPageXY = function ( event ) {
+		if ( event.pageX == null && event.clientX != null ) {
+			var doc = document.documentElement, body = document.body;
+			event.pageX = event.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
+			event.pageY = event.clientY + (doc && doc.scrollTop	|| body && body.scrollTop	|| 0) - (doc	 && doc.clientTop	|| body && body.clientTop	|| 0);
+		}
 
+	}
 	this.getMouseOnScreen = function ( clientX, clientY ) {
 
 		return new THREE.Vector2(
@@ -369,20 +373,23 @@ THREE.TrackballControls = function ( object, domElement ) {
 			_state = event.button;
 
 		}
-
+			
+		_this.updateScreen();
+		_this.checkPageXY(event);
+			
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_rotateStart = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
+			_rotateStart = _this.getMouseProjectionOnBall( event.pageX, event.pageY );
 			_rotateEnd.copy(_rotateStart)
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
-			_zoomStart = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_zoomStart = _this.getMouseOnScreen( event.pageX, event.pageY );
 			_zoomEnd.copy(_zoomStart);
 
 		} else if ( _state === STATE.PAN && !_this.noPan ) {
 
-			_panStart = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_panStart = _this.getMouseOnScreen( event.pageX, event.pageY );
 			_panEnd.copy(_panStart)
 
 		}
@@ -399,17 +406,20 @@ THREE.TrackballControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
+		_this.updateScreen();
+		_this.checkPageXY(event);
+
 		if ( _state === STATE.ROTATE && !_this.noRotate ) {
 
-			_rotateEnd = _this.getMouseProjectionOnBall( event.clientX, event.clientY );
+			_rotateEnd = _this.getMouseProjectionOnBall( event.pageX, event.pageY );
 
 		} else if ( _state === STATE.ZOOM && !_this.noZoom ) {
 
-			_zoomEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_zoomEnd = _this.getMouseOnScreen( event.pageX, event.pageY );
 
 		} else if ( _state === STATE.PAN && !_this.noPan ) {
 
-			_panEnd = _this.getMouseOnScreen( event.clientX, event.clientY );
+			_panEnd = _this.getMouseOnScreen( event.pageX, event.pageY );
 
 		}
 
