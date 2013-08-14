@@ -107,46 +107,80 @@
 				var a, b, c;
 				var precision = raycaster.precision;
 
-				var fl;
-				var indexed = false;
+				if ( geometry.attributes.index !== undefined ) {
 
-				if ( geometry.attributes.index ) {
+					var offsets = geometry.offsets;
+					var indices = geometry.attributes.index.array;
+					var positions = geometry.attributes.position.array;
+					var offLength = geometry.offsets.length;
 
-					indexed = true;
-					fl = geometry.attributes.index.numItems / 3;
+					var fl = geometry.attributes.index.numItems / 3;
+
+					for ( var oi = 0; oi < offLength; ++oi ) {
+
+						var start = offsets[ oi ].start;
+						var count = offsets[ oi ].count;
+						var index = offsets[ oi ].index;
+
+						for ( var i = start, il = start + count; i < il; i += 3 ) {
+
+							a = index + indices[ i ];
+							b = index + indices[ i + 1 ]; 
+							c = index + indices[ i + 2 ];
+
+							vA.set(
+								positions[ a * 3 ],
+								positions[ a * 3 + 1 ],
+								positions[ a * 3 + 2 ]
+							);
+							vB.set(
+								positions[ b * 3 ],
+								positions[ b * 3 + 1 ],
+								positions[ b * 3 + 2 ]
+							);
+							vC.set(
+								positions[ c * 3 ],
+								positions[ c * 3 + 1 ],
+								positions[ c * 3 + 2 ]
+							);
+
+							var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+
+							if ( intersectionPoint === null ) continue;
+
+							intersectionPoint.applyMatrix4( object.matrixWorld );
+
+							var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
+
+							if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+
+							intersects.push( {
+
+								distance: distance,
+								point: intersectionPoint,
+								face: null,
+								faceIndex: null,
+								object: object
+
+							} );
+
+						}
+
+					}
 
 				} else {
 
-					fl = geometry.attributes.position.numItems / 9;
+					var offsets = geometry.offsets;
+					var positions = geometry.attributes.position.array;
+					var offLength = geometry.offsets.length;
 
-				}
+					var fl = geometry.attributes.position.numItems / 9;
 
-				var offsets = geometry.offsets;
-				var indices = geometry.attributes.index.array;
-				var positions = geometry.attributes.position.array;
-				var offLength = geometry.offsets.length;
+					for ( var i = 0; i < fl; i += 3 ) {
 
-				for ( var oi = 0; oi < offLength; ++oi ) {
-
-					var start = offsets[ oi ].start;
-					var count = offsets[ oi ].count;
-					var index = offsets[ oi ].index;
-
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-						if ( indexed ) {
-
-							a = index + indices[ i ];
-							b = index + indices[ i + 1 ];
-							c = index + indices[ i + 2 ];
-
-						} else {
-
-							a = index;
-							b = index + 1;
-							c = index + 2;
-
-						}
+						a = i;
+						b = i + 1;
+						c = i + 2;
 
 						vA.set(
 							positions[ a * 3 ],
@@ -166,19 +200,13 @@
 
 						var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
 
-						if ( intersectionPoint === null ) {
-
-							continue;
-
-						}
+						if ( intersectionPoint === null ) continue;
 
 						intersectionPoint.applyMatrix4( object.matrixWorld );
+
 						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-						// bail if the ray is too close to the plane
-						if ( distance < precision ) continue;
-
-						if ( distance < raycaster.near || distance > raycaster.far ) continue;
+						if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
 
 						intersects.push( {
 
@@ -191,6 +219,7 @@
 						} );
 
 					}
+
 				}
 
 			} else if ( geometry instanceof THREE.Geometry ) {
@@ -215,19 +244,13 @@
 					
 					var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
 
-					if ( intersectionPoint === null ) {
-
-						continue;
-
-					}
+					if ( intersectionPoint === null ) continue;
 
 					intersectionPoint.applyMatrix4( object.matrixWorld );
+
 					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-					// bail if the ray is too close to the plane
-					if ( distance < precision ) continue;
-
-					if ( distance < raycaster.near || distance > raycaster.far ) continue;
+					if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
 
 					intersects.push( {
 
@@ -276,27 +299,23 @@
 
 				var distSq = localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-				if ( distSq <= precisionSq ) {
+				if ( distSq > precisionSq ) continue;
 
-					var distance = localRay.origin.distanceTo( interRay );
+				var distance = localRay.origin.distanceTo( interRay );
 
-					if ( raycaster.near <= distance && distance <= raycaster.far ) {
+				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
-						intersects.push( {
+				intersects.push( {
 
-							distance: distance,
-							// What do we want? intersection point on the ray or on the segment??
-							// point: raycaster.ray.at( distance ),
-							point: interSegment.clone().applyMatrix4( object.matrixWorld ),
-							face: null,
-							faceIndex: null,
-							object: object
+					distance: distance,
+					// What do we want? intersection point on the ray or on the segment??
+					// point: raycaster.ray.at( distance ),
+					point: interSegment.clone().applyMatrix4( object.matrixWorld ),
+					face: null,
+					faceIndex: null,
+					object: object
 
-						} );
-
-					}
-
-				}
+				} );
 
 			}
 
