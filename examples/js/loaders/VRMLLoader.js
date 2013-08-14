@@ -19,8 +19,6 @@ THREE.VRMLLoader.prototype = {
 
 			scope.dispatchEvent( { type: 'load', content: object } );
 
-			if ( callback ) callback( geometry );
-
 		}, false );
 
 		request.addEventListener( 'progress', function ( event ) {

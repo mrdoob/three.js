@@ -57,7 +57,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
-				camera.position.z = 0.2;
+				camera.position.z = 6;
 
 				controls = new THREE.TrackballControls( camera );
 
@@ -88,11 +88,7 @@
 				var loader = new THREE.VRMLLoader();
 				loader.addEventListener( 'load', function ( event ) {
 
-					var geometry = event.content;
-
-					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.setY( - 0.09 );
-					scene.add( mesh );
+					scene = event.content;
 
 				} );
 				loader.load( "models/vrml/simple.wrl" );
