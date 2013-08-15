@@ -33,6 +33,7 @@ THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 THREE.SpotLightHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
+	var vector2 = new THREE.Vector3();
 
 	return function () {
 
@@ -41,10 +42,13 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		this.cone.lookAt( vector.getPositionFromMatrix( this.light.matrixWorld ).negate() );
+		vector.getPositionFromMatrix( this.light.matrixWorld );
+		vector2.getPositionFromMatrix( this.light.target.matrixWorld );
+
+		this.cone.lookAt( vector2.sub( vector ) );
 
 		this.cone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	}
+	};
 
 }();
