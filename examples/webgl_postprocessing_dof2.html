@@ -47,7 +47,6 @@ Use WEBGL Depth buffer support?
 		<script src="js/libs/stats.min.js"></script>
 
 		<script src='js/libs/dat.gui.min.js'></script>
-		<script src="js/modifiers/SubdivisionModifier.js"></script>
 
 		<div id="info">
 
@@ -190,18 +189,7 @@ Use WEBGL Depth buffer support?
 				// Adding Monkeys
 
 				var loader2 = new THREE.JSONLoader();
-
-				var modifier = new THREE.SubdivisionModifier( 1 );
-
 				loader2.load( 'obj/Suzanne.js', function ( geometry ) {
-
-					var smooth = geometry;
-					smooth.mergeVertices();
-					modifier.modify( smooth );
-
-					smooth.computeCentroids();
-					smooth.computeFaceNormals();
-					smooth.computeVertexNormals();
 
 					var material = new THREE.MeshPhongMaterial( {
 						color: 0xffffff,
@@ -212,10 +200,10 @@ Use WEBGL Depth buffer support?
 						reflectivity: 1.0
 					});
 
-					var mesh;
-
 					var monkeys = 20;
+
 					for ( var i = 0; i < monkeys; i ++ ) {
+
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.scale.multiplyScalar(30);
 
