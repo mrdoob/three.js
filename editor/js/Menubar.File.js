@@ -74,7 +74,17 @@ Menubar.File = function ( editor ) {
 	option.setTextContent( 'Export Geometry' );
 	option.onClick( function () {
 
-		exportGeometry( THREE.GeometryExporter );
+		var geometry = editor.selected.geometry;
+
+		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			exportGeometry( THREE.BufferGeometryExporter );
+
+		} else if ( geometry instanceof THREE.Geometry ) {
+
+			exportGeometry( THREE.GeometryExporter );
+
+		}
 
 	} );
 	options.add( option );
@@ -146,7 +156,7 @@ Menubar.File = function ( editor ) {
 
 		var output;
 
-		if ( exporter instanceof THREE.GeometryExporter ) {
+		if ( exporter instanceof THREE.BufferGeometryExporter || exporter instanceof THREE.GeometryExporter ) {
 
 			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
 			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );

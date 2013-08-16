@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">
+		This is a superefficent class for geometries because it saves all data in buffers. <br />
+		It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the necessary buffer calculations.<br />
+		It is mainly interesting when working with static objects.
+		</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<div>
+			This creates a new [name]. It also sets several properties to an default value.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Integer id]</h3>
+		<div>
+		Unique number of this buffergeometry instance
+		</div>
+		
+		<h3>.[page:Hashmap attributes]</h3>
+		<div>
+		This hashmap has as id the name of the attribute to be set and as value the buffer to set it to.
+		</div>
+		
+		<h3>.[page:Boolean dynamic]</h3>
+		<div>
+		When set, it holds certain buffers in memory to have faster updates for this object. When unset, it deletes those buffers and saves memory.
+		</div>
+		
+		<h3>.[page:Array offsets]</h3>
+		<div>
+		This Array should contain every offset at which the buffers should be rendered. This is important for indexed buffers.
+		</div>
+
+		<h3>.[page:Object boundingBox]</h3>
+		<div>
+		Bounding box.
+		<code>{ min: new THREE.Vector3(), max: new THREE.Vector3() }</code>
+		</div>
+
+		<h3>.[page:Object boundingSphere]</h3>
+		<div>
+		Bounding sphere.
+		<code>{ radius: float }</code>
+		</div>
+		
+		<h3>.[page:Array morphTargets]</h3>
+		<div>
+		Array of morph targets. Each morph target is a Javascript object:
+		<code>{ name: "targetName", vertices: [ new THREE.Vertex(), ... ] }</code>
+		Morph vertices match number and order of primary vertices.
+		</div>
+
+		<h3>.[page:boolean hasTangents]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h2>Methods</h2>
+
+		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
+		<div>
+		Bakes matrix transform directly into vertex coordinates.
+		</div>
+
+		<h3>.computeVertexNormals()</h3>
+		<div>
+		Computes vertex normals by averaging face normals.<br />
+		</div>
+
+		<h3>.computeTangents()</h3>
+		<div>
+		Computes vertex tangents.<br />
+		Based on [link:http://www.terathon.com/code/tangent.html]<br />
+		Geometry must have vertex [page:UV UVs] (layer 0 will be used).
+		</div>
+
+		<h3>.computeBoundingBox()</h3>
+		<div>
+		Computes bounding box of the geometry, updating [page:Geometry Geometry.boundingBox] attribute.<br />
+		Bounding boxes aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
+		</div>
+
+		<h3>.computeBoundingSphere()</h3>
+		<div>
+		Computes bounding sphere of the geometry, updating [page:Geometry Geometry.boundingSphere] attribute.<br />
+		Bounding spheres aren't computed by default. They need to be explicitly computed, otherwise they are *null*.
+		</div>
+		
+		<h3>.dispose()</h3>
+		<div>
+		Disposes the object from memory. <br />
+		You need to call this when you want the bufferGeometry removed while the application is running.
+		</div>
+
+
+		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
+		<div>
+		type -- todo <br />
+		listener -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.normalizeNormals() [page:todo]</h3>
+		<div>
+		todo
+		</div>
+
+		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
+		<div>
+		event -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

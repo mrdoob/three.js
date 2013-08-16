@@ -12,6 +12,7 @@ var Viewport = function ( editor ) {
 	info.setBottom( '5px' );
 	info.setFontSize( '12px' );
 	info.setColor( '#ffffff' );
+	info.setValue( 'objects: 0, vertices: 0, faces: 0' );
 	container.add( info );
 
 	var scene = editor.scene;
@@ -79,11 +80,11 @@ var Viewport = function ( editor ) {
 
 		if ( object instanceof Array ) {
 
-			return ray.intersectObjects( object, true );
+			return ray.intersectObjects( object );
 
 		}
 
-		return ray.intersectObject( object, true );
+		return ray.intersectObject( object );
 
 	};
 
@@ -252,26 +253,37 @@ var Viewport = function ( editor ) {
 
 		objects.push( object );
 
+		object.traverse( function ( child ) {
+
+			objects.push( child );
+
+		} );
+
 	} );
 
 	signals.objectChanged.add( function ( object ) {
 
-		if ( object.geometry !== undefined ) {
-
-			selectionBox.update( object );
-
-		}
-
-		if ( editor.helpers[ object.id ] !== undefined ) {
-
-			editor.helpers[ object.id ].update();
-
-		}
-
 		transformControls.update();
 
+		if ( object !== camera ) {
+
+			if ( object.geometry !== undefined ) {
+
+				selectionBox.update( object );
+
+			}
+
+			if ( editor.helpers[ object.id ] !== undefined ) {
+
+				editor.helpers[ object.id ].update();
+
+			}
+
+			updateInfo();
+
+		}
+
 		render();
-		updateInfo();
 
 	} );
 
@@ -426,8 +438,29 @@ var Viewport = function ( editor ) {
 			if ( object instanceof THREE.Mesh ) {
 
 				objects ++;
-				vertices += object.geometry.vertices.length;
-				faces += object.geometry.faces.length;
+
+				var geometry = object.geometry;
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					vertices += geometry.vertices.length;
+					faces += geometry.faces.length;
+
+				} else if ( geometry instanceof THREE.BufferGeometry ) {
+
+					vertices += geometry.attributes.position.array.length / 3;
+
+					if ( geometry.attributes.index !== undefined ) {
+
+						faces += geometry.attributes.index.array.length / 3;
+
+					} else {
+
+						faces += vertices / 3;
+
+					}
+
+				}
 
 			}
 

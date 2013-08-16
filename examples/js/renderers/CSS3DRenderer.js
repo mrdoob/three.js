@@ -72,8 +72,6 @@ THREE.CSS3DRenderer = function () {
 
 	domElement.appendChild( cameraElement );
 
-	this.cameraElement = cameraElement;
-
 	this.setSize = function ( width, height ) {
 
 		_width = width;

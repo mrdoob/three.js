@@ -51,51 +51,16 @@ THREE.OBJExporter.prototype = {
 
 		}
 
-		// map
-
-		var count = 1; // OBJ values start by 1
-		var map = [ count ];
-
-		for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-			var face = geometry.faces[ i ];
-
-			if ( face instanceof THREE.Face3 ) {
-
-				count += 3;
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				count += 4;
-
-			}
-
-			map.push( count );
-
-		}
-
 		// faces
 
-		for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
+		for ( var i = 0, j = 1, l = geometry.faces.length; i < l; i ++, j += 3 ) {
 
 			var face = geometry.faces[ i ];
 
 			output += 'f ';
-
-			if ( face instanceof THREE.Face3 ) {
-
-				output += ( face.a + 1 ) + '/' + ( map[ i ] ) + '/' + ( map[ i ] ) + ' ';
-				output += ( face.b + 1 ) + '/' + ( map[ i ] + 1 ) + '/' + ( map[ i ] + 1 ) + ' ';
-				output += ( face.c + 1 ) + '/' + ( map[ i ] + 2 ) + '/' + ( map[ i ] + 2 ) + '\n';
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				output += ( face.a + 1 ) + '/' + ( map[ i ] ) + '/' + ( map[ i ] ) + ' ';
-				output += ( face.b + 1 ) + '/' + ( map[ i ] + 1 ) + '/' + ( map[ i ] + 1 ) + ' ';
-				output += ( face.c + 1 ) + '/' + ( map[ i ] + 2 ) + '/' + ( map[ i ] + 2 ) + ' ';
-				output += ( face.d + 1 ) + '/' + ( map[ i ] + 3 ) + '/' + ( map[ i ] + 3 ) + '\n';
-
-			}
+			output += ( face.a + 1 ) + '/' + ( j ) + '/' + ( j ) + ' ';
+			output += ( face.b + 1 ) + '/' + ( j + 1 ) + '/' + ( j + 1 ) + ' ';
+			output += ( face.c + 1 ) + '/' + ( j + 2 ) + '/' + ( j + 2 ) + '\n';
 
 		}
 

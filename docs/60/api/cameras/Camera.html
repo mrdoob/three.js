@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Abstract base class for cameras. This class should always be inherited when you build a new camera.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<div>
+			This constructor sets following properties to the correct type: matrixWorldInverse, projectionMatrix and projectionMatrixInverse.
+			
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Matrix4 matrixWorldInverse]</h3>
+		<div>This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.</div>
+
+		<h3>.[page:Matrix4 projectionMatrix]</h3>
+		<div>This is the matrix which contains the projection.</div>		
+
+		<h3>.[page:Matrix4 projectionMatrixInverse]</h3>
+		<div>This is the inverse of projectionMatrix.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>.lookAt( [page:Vector3 vector] )</h3>
+		<div>
+		vector — point to look at<br />
+		<br />
+		This makes the camera look at the vector position in the global space as long as the parent of this camera is the scene or at position (0,0,0).
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

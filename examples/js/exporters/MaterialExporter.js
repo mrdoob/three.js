@@ -27,6 +27,7 @@ THREE.MaterialExporter.prototype = {
 			output.type = 'MeshBasicMaterial';
 			output.color = material.color.getHex();
 			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
+			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -38,6 +39,7 @@ THREE.MaterialExporter.prototype = {
 			output.ambient = material.ambient.getHex();
 			output.emissive = material.emissive.getHex();
 			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
+			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -51,6 +53,7 @@ THREE.MaterialExporter.prototype = {
 			output.specular = material.specular.getHex();
 			output.shininess = material.shininess;
 			if ( material.vertexColors !== THREE.NoColors ) output.vertexColors = material.vertexColors;
+			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -58,6 +61,7 @@ THREE.MaterialExporter.prototype = {
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
 			output.type = 'MeshNormalMaterial';
+			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
@@ -65,9 +69,21 @@ THREE.MaterialExporter.prototype = {
 		} else if ( material instanceof THREE.MeshDepthMaterial ) {
 
 			output.type = 'MeshDepthMaterial';
+			if ( material.blending !== THREE.NormalBlending ) output.blending = material.blending;
 			output.opacity = material.opacity;
 			output.transparent = material.transparent;
 			output.wireframe = material.wireframe;
+
+		} else if ( material instanceof THREE.MeshFaceMaterial ) {
+
+			output.type = 'MeshFaceMaterial';
+			output.materials = [];
+
+			for ( var i = 0, l = material.materials.length; i < l; i ++ ) {
+
+				output.materials.push( this.parse( material.materials[ i ] ) );
+
+			}
 
 		}
 

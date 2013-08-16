@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">
+			Affects objects using [page:MeshLambertMaterial] or [page:MeshPhongMaterial].
+		</div>
+
+
+		<h2>Example</h2>
+
+		<code>// White directional light at half intensity shining from the top.
+
+var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+directionalLight.position.set( 0, 1, 0 );
+scene.add( directionalLight );</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:todo hex], [page:todo intensity])</h3>
+		<div>
+		hex -- todo <br />
+		intensity -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Object3D target]</h3>
+		<div>
+			Target used for shadow camera orientation.
+		</div>
+
+		<h3>.[page:Float intensity]</h3>
+		<div>
+			Light's intensity.<br />
+			Default — *1.0*.
+		</div>
+
+		<h3>.[page:Boolean onlyShadow]</h3>
+		<div>
+			If set to *true* light will only cast shadow but not contribute any lighting (as if *intensity* was 0 but cheaper to compute).<br />
+			Default — *false*.
+		</div>
+
+		<h3>.[page:Float shadowCameraNear]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *50*.
+		</div>
+
+		<h3>.[page:Float shadowCameraFar]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *5000*.
+		</div>
+
+		<h3>.[page:Float shadowCameraLeft]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *-500*.
+		</div>
+
+		<h3>.[page:Float shadowCameraRight]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *500*.
+		</div>
+
+		<h3>.[page:Float shadowCameraTop]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *500*.
+		</div>
+
+		<h3>.[page:Float shadowCameraBottom]</h3>
+		<div>
+			Orthographic shadow camera frustum parameter.<br />
+			Default — *-500*.
+		</div>
+
+		<h3>.[page:Boolean shadowCameraVisible]</h3>
+		<div>
+			Show debug shadow camera frustum.<br />
+			Default — *false*.
+		</div>
+
+		<h3>.[page:Float shadowBias]</h3>
+		<div>
+			Shadow map bias.<br />
+			Default — *0*.
+		</div>
+
+		<h3>.[page:Float shadowDarkness]</h3>
+		<div>
+			Darkness of shadow casted by this light (from *0* to *1*).<br />
+			Default — *0.5*.
+		</div>
+
+		<h3>.[page:Integer shadowMapWidth]</h3>
+		<div>
+			Shadow map texture width in pixels.<br />
+			Default — *512*.
+		</div>
+
+		<h3>.[page:Integer shadowMapHeight]</h3>
+		<div>
+			Shadow map texture height in pixels.<br />
+			Default — *512*.
+		</div>
+
+		<h3>.[page:Boolean shadowCascade]</h3>
+		<div>
+			??? <br />
+			Default — *false*.
+		</div>
+
+		<h3>.[page:Vector3 shadowCascadeOffset]</h3>
+		<div>
+			??? <br />
+			Default — *Three.Vector3( 0, 0, -1000 )*.
+		</div>
+
+		<h3>.[page:Integer shadowCascadeCount]</h3>
+		<div>
+			??? <br />
+			Default — *2*.
+		</div>
+
+		<h3>.[page:Array shadowCascadeBias]</h3>
+		<div>
+			??? <br />
+			Default — <strong>[ 0, 0, 0 ]</strong>.
+		</div>
+
+		<h3>.[page:Array shadowCascadeWidth]</h3>
+		<div>
+			??? <br />
+			Default — <strong>[ 512, 512, 512 ]</strong>.
+		</div>
+
+		<h3>.[page:Array shadowCascadeHeight]</h3>
+		<div>
+			??? <br />
+			Default — <strong>[ 512, 512, 512 ]</strong>.
+		</div>
+
+		<h3>.[page:Array shadowCascadeNearZ]</h3>
+		<div>
+			??? <br />
+			Default — <strong>[ -1.000, 0.990, 0.998 ]</strong>.
+		</div>
+
+		<h3>.[page:Array shadowCascadeFarZ]</h3>
+		<div>
+			??? <br />
+			Default — <strong>[ 0.990, 0.998, 1.000 ]</strong>.
+		</div>
+
+		<h3>.[page:Array shadowCascadeArray]</h3>
+		<div>
+			??? <br />
+			Default — <strong>[ ]</strong>.
+		</div>
+
+		<h3>.[page:RenderTarget shadowMap]</h3>
+		<div>
+			??? <br />
+			Default — *null*.
+		</div>
+
+		<h3>.[page:Integer shadowMapSize]</h3>
+		<div>
+			??? <br />
+			Default — *null*.
+		</div>
+
+		<h3>.[page:Camera shadowCamera]</h3>
+		<div>
+			??? <br />
+			Default — *null*.
+		</div>
+
+		<h3>.[page:Matrix shadowMatrix]</h3>
+		<div>
+			??? <br />
+			Default — *null*.
+		</div>
+		
+		<h2>Methods</h2>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

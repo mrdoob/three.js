@@ -259,7 +259,19 @@ Editor.prototype = {
 
 	selectById: function ( id ) {
 
-		this.select( this.scene.getObjectById( id, true ) );
+		var object = null;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.id === id ) {
+
+				object = child;
+
+			}
+
+		} );
+
+		this.select( object );
 
 	},
 

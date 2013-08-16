@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../../list.js"></script>
+		<script src="../../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../../page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+	
+		<h1>[name]</h1>
+
+		<div class="desc">Creates a torus knot, the particular shape of which is defined by a pair of coprime integers, p and q.  If p and q are not coprime, the result will be a torus link.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([page:Float radius], [page:Float tube], [page:Integer radialSegments], [page:Integer tubularSegments], [page:Integer p], [page:Integer q], [page:Float heightScale])</h3>
+		<div>
+		radius — Default is 100. <br />
+		tube — Default is 40. <br />
+		radialSegments — Default is 64. <br />
+		tubularSegments — Default is 8. <br />
+		p — Default is 2. <br />
+		q — Default is 3. <br />
+		heightScale — Default is 1.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		
+		<div>
+		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

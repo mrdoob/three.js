@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr;
+
+		<h1>[name]</h1>
+
+		<div class="desc">Camera with perspective projection.</div>
+
+
+		<h2>Example</h2>
+
+		<code>var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+scene.add( camera );</code>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [page:Float fov], [page:Float aspect], [page:Float near], [page:Float far] )</h3>
+		<div>
+		fov — Camera frustum vertical field of view.<br />
+		aspect — Camera frustum aspect ratio.<br />
+		near — Camera frustum near plane.<br />
+		far — Camera frustum far plane.
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Float fov]</h3>
+		<div>Camera frustum vertical field of view, from bottom to top of view, in degrees.</div>
+
+		<h3>.[page:Float aspect]</h3>
+		<div>Camera frustum aspect ratio, window width divided by window height.</div>
+
+		<h3>.[page:Float near]</h3>
+		<div>Camera frustum near plane.</div>
+
+		<h3>.[page:Float far]</h3>
+		<div>Camera frustum far plane.</div>
+
+
+		<h2>Methods</h2>
+
+		<h3>.setLens( [page:Float focalLength], [page:Float frameSize] )</h3>
+		<div>
+		focalLength — focal length<br />
+		frameSize — frame size
+		</div>
+
+		<div>
+		Uses focal length (in mm) to estimate and set FOV 35mm (fullframe) camera is used if frame size is not specified.<br />
+		Formula based on [link:http://www.bobatkins.com/photography/technical/field_of_view.html]
+		</div>
+
+		<h3>.setViewOffset( [page:Float fullWidth], [page:Float fullHeight], [page:Float x], [page:Float y], [page:Float width], [page:Float height] )</h3>
+		<div>
+		fullWidth — full width of multiview setup<br />
+		fullHeight — full height of multiview setup<br />
+		x — horizontal offset of subcamera<br />
+		y — vertical offset of subcamera<br />
+		width — width of subcamera<br />
+		height — height of subcamera
+		</div>
+
+		<div>
+		Sets an offset in a larger frustum. This is useful for multi-window or multi-monitor/multi-machine setups.
+		</div>
+
+		<div>
+		For example, if you have 3x2 monitors and each monitor is 1920x1080 and the monitors are in grid like this:<br />
+
+		<pre>+---+---+---+
+| A | B | C |
++---+---+---+
+| D | E | F |
++---+---+---+</pre>
+
+		then for each monitor you would call it like this:<br />
+
+		<code>var w = 1920;
+var h = 1080;
+var fullWidth = w * 3;
+var fullHeight = h * 2;
+
+// A
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
+// B
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 0, w, h );
+// C
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 0, w, h );
+// D
+camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 1, w, h );
+// E
+camera.setViewOffset( fullWidth, fullHeight, w * 1, h * 1, w, h );
+// F
+camera.setViewOffset( fullWidth, fullHeight, w * 2, h * 1, w, h );
+</code>
+
+		Note there is no reason monitors have to be the same size or in a grid.
+		</div>
+
+		<h3>.updateProjectionMatrix()</h3>
+		<div>
+		Updates the camera projection matrix. Must be called after change of parameters.
+		</div>
+
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

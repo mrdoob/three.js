@@ -2409,7 +2409,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		this.geometry3js.computeBoundingBox();
+		// this.geometry3js.computeBoundingBox();
 
 		return this;
 
@@ -2588,7 +2588,10 @@ THREE.ColladaLoader = function () {
 					faces.push( new THREE.Face3( vs[0], vs[1], vs[2], ns, cs.length ? cs : new THREE.Color() ) );
 
 				} else if ( vcount === 4 ) {
-					faces.push( new THREE.Face4( vs[0], vs[1], vs[2], vs[3], ns, cs.length ? cs : new THREE.Color() ) );
+
+					faces.push( new THREE.Face3( vs[0], vs[1], vs[3], [ns[0], ns[1], ns[3]], cs.length ? [cs[0], cs[1], cs[3]] : new THREE.Color() ) );
+					
+					faces.push( new THREE.Face3( vs[1], vs[2], vs[3], [ns[1], ns[2], ns[3]], cs.length ? [cs[1], cs[2], cs[3]] : new THREE.Color() ) );
 
 				} else if ( vcount > 4 && options.subdivideFaces ) {
 
@@ -2626,7 +2629,15 @@ THREE.ColladaLoader = function () {
 
 							} else if ( vcount === 4 ) {
 
-								uvArr = [ uv[0], uv[1], uv[2], uv[3] ];
+								if ( ndx === 0 ) {
+
+									uvArr = [ uv[0], uv[1], uv[3] ];
+
+								} else {
+
+									uvArr = [ uv[1], uv[2], uv[3] ];
+
+								}
 
 							} else {
 
@@ -2634,7 +2645,7 @@ THREE.ColladaLoader = function () {
 
 							}
 
-							if ( !geom.faceVertexUvs[k] ) {
+							if ( geom.faceVertexUvs[k] === undefined ) {
 
 								geom.faceVertexUvs[k] = [];
 

@@ -39,6 +39,12 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		gl = canvas.getContext( 'webgl', attributes ) || canvas.getContext( 'experimental-webgl', attributes );
 
+		if ( gl === null ) {
+
+			throw 'Error creating WebGL context.';
+
+		}
+
 	} catch ( exception ) {
 
 		console.error( exception );
@@ -143,28 +149,6 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			}
 
-			if ( face instanceof THREE.Face4 ) {
-
-				addPosition( vertices[ face.a ] );
-				addPosition( vertices[ face.c ] );
-				addPosition( vertices[ face.d ] );
-
-				if ( vertexNormals === true ) {
-
-					addNormal( face.vertexNormals[ 0 ] );
-					addNormal( face.vertexNormals[ 2 ] );
-					addNormal( face.vertexNormals[ 3 ] );
-
-				} else {
-
-					addNormal( face.normal );
-					addNormal( face.normal );
-					addNormal( face.normal );
-
-				}
-
-			}
-
 		}
 
 		var buffer = {
@@ -202,6 +186,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		var vertexShader = [
 			'precision ' + precision + ' float;',
+			"precision " + precision + " int;",
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
 			'uniform mat4 modelViewMatrix;',
@@ -212,6 +197,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 		var fragmentShader = [
 			'precision ' + precision + ' float;',
+			"precision " + precision + " int;",
 			''
 		].join( '\n' );
 
@@ -279,6 +265,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			} else {
 
+				console.error( 'Program Info Log: ' + gl.getProgramInfoLog( program ) );
 				console.error( 'VALIDATE_STATUS: ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) );
 				console.error( 'GL_ERROR: ' + gl.getError() );
 

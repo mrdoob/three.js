@@ -34,7 +34,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group, text, plane;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -58,9 +58,9 @@
 
 				scene = new THREE.Scene();
 
-				parent = new THREE.Object3D();
-				parent.position.y = 50;
-				scene.add( parent );
+				group = new THREE.Object3D();
+				group.position.y = 50;
+				scene.add( group );
 
 				function addShape( shape, color, x, y, z, rx, ry, rz, s ) {
 
@@ -73,7 +73,7 @@
 					mesh.position.set( x, y, z );
 					mesh.rotation.set( rx, ry, rz );
 					mesh.scale.set( s, s, s );
-					parent.add( mesh );
+					group.add( mesh );
 
 					// line
 
@@ -84,7 +84,7 @@
 					line.position.set( x, y, z );
 					line.rotation.set( rx, ry, rz );
 					line.scale.set( s, s, s );
-					parent.add( line );
+					group.add( line );
 
 				}
 
@@ -397,7 +397,7 @@
 
 			function render() {
 
-				parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );
 
 			}

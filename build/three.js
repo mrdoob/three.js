@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = THREE || { REVISION: '59' };
+var THREE = THREE || { REVISION: '60' };
 
 self.console = self.console || {
 
@@ -602,6 +602,22 @@ THREE.Color.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.r = array[ 0 ];
+		this.g = array[ 1 ];
+		this.b = array[ 2 ];
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		return [ this.r, this.g, this.b ];
+
+	},
+
 	clone: function () {
 
 		return new THREE.Color().setRGB( this.r, this.g, this.b );
@@ -749,9 +765,9 @@ THREE.Quaternion.prototype = {
 
 	setFromEuler: function ( euler, update ) {
 
-		if ( typeof euler['order'] === undefined ) {
+		if ( euler instanceof THREE.Euler === false ) {
 
-			console.error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+			throw new Error( 'ERROR: Quaternion\'s .setFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
 		}
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
@@ -765,7 +781,7 @@ THREE.Quaternion.prototype = {
 		var s2 = Math.sin( euler._y / 2 );
 		var s3 = Math.sin( euler._z / 2 );
 
-		if ( euler.order === undefined || euler.order === 'XYZ' ) {
+		if ( euler.order === 'XYZ' ) {
 
 			this._x = s1 * c2 * c3 + c1 * s2 * s3;
 			this._y = c1 * s2 * c3 - s1 * c2 * s3;
@@ -1898,9 +1914,12 @@ THREE.Vector3.prototype = {
 
 	crossVectors: function ( a, b ) {
 
-		this.x = a.y * b.z - a.z * b.y;
-		this.y = a.z * b.x - a.x * b.z;
-		this.z = a.x * b.y - a.y * b.x;
+		var ax = a.x, ay = a.y, az = a.z;
+		var bx = b.x, by = b.y, bz = b.z;
+
+		this.x = ay * bz - az * by;
+		this.y = az * bx - ax * bz;
+		this.z = ax * by - ay * bx;
 
 		return this;
 
@@ -2015,17 +2034,17 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	applyEuler: function () {
 
-		var q1 = new THREE.Quaternion();
+		var quaternion = new THREE.Quaternion();
 
-		return function ( rotation ) {
+		return function ( euler ) {
 
-			if( typeof rotation['order'] === undefined ) {
+			if ( euler instanceof THREE.Euler === false ) {
+
 				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+
 			}
 
-			var quaternion = q1.setFromEuler( rotation );
-
-			this.applyQuaternion( quaternion );
+			this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
 			return this;
 
@@ -2035,13 +2054,11 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	applyAxisAngle: function () {
 
-		var q1 = new THREE.Quaternion();
+		var quaternion = new THREE.Quaternion();
 
 		return function ( axis, angle ) {
 
-			var quaternion = q1.setFromAxisAngle( axis, angle );
-
-			this.applyQuaternion( quaternion );
+			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
 			return this;
 
@@ -3449,6 +3466,40 @@ THREE.Box3.prototype = {
 
 	},
 
+	addPoint: function ( point ) {
+
+		if ( point.x < this.min.x ) {
+
+			this.min.x = point.x;
+
+		} else if ( point.x > this.max.x ) {
+
+			this.max.x = point.x;
+
+		}
+
+		if ( point.y < this.min.y ) {
+
+			this.min.y = point.y;
+
+		} else if ( point.y > this.max.y ) {
+
+			this.max.y = point.y;
+
+		}
+
+		if ( point.z < this.min.z ) {
+
+			this.min.z = point.z;
+
+		} else if ( point.z > this.max.z ) {
+
+			this.max.z = point.z;
+
+		}
+
+	},
+
 	setFromPoints: function ( points ) {
 
 		if ( points.length > 0 ) {
@@ -3460,37 +3511,7 @@ THREE.Box3.prototype = {
 
 			for ( var i = 1, il = points.length; i < il; i ++ ) {
 
-				point = points[ i ];
-
-				if ( point.x < this.min.x ) {
-
-					this.min.x = point.x;
-
-				} else if ( point.x > this.max.x ) {
-
-					this.max.x = point.x;
-
-				}
-
-				if ( point.y < this.min.y ) {
-
-					this.min.y = point.y;
-
-				} else if ( point.y > this.max.y ) {
-
-					this.max.y = point.y;
-
-				}
-
-				if ( point.z < this.min.z ) {
-
-					this.min.z = point.z;
-
-				} else if ( point.z > this.max.z ) {
-
-					this.max.z = point.z;
-
-				}
+				this.addPoint( points[ i ] )
 
 			}
 
@@ -4147,7 +4168,7 @@ THREE.Matrix4.prototype = {
 
 	makeRotationFromEuler: function ( euler ) {
 
-		if ( typeof euler['order'] === undefined ) {
+		if ( euler instanceof THREE.Euler === false ) {
 
 			console.error( 'ERROR: Matrix\'s .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
 
@@ -4160,7 +4181,7 @@ THREE.Matrix4.prototype = {
 		var c = Math.cos( y ), d = Math.sin( y );
 		var e = Math.cos( z ), f = Math.sin( z );
 
-		if ( euler.order === undefined || euler.order === 'XYZ' ) {
+		if ( euler.order === 'XYZ' ) {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
@@ -5274,11 +5295,175 @@ THREE.Ray.prototype = {
 
 	},
 
+	isIntersectionBox: function () {
+		
+		var v = new THREE.Vector3();
+
+		return function ( box ) {
+
+			return this.intersectBox( box, v ) !== null;
+
+		}
+
+	}(),
+
+	intersectBox: function ( box , optionalTarget ) {
+
+		// http://www.scratchapixel.com/lessons/3d-basic-lessons/lesson-7-intersecting-simple-shapes/ray-box-intersection/
+
+		var tmin,tmax,tymin,tymax,tzmin,tzmax;
+
+		var invdirx = 1/this.direction.x,
+			invdiry = 1/this.direction.y,
+			invdirz = 1/this.direction.z;
+
+		var origin = this.origin;
+
+		if (invdirx >= 0) {
+				
+			tmin = (box.min.x - origin.x) * invdirx;
+			tmax = (box.max.x - origin.x) * invdirx;
+
+		} else { 
+
+			tmin = (box.max.x - origin.x) * invdirx;
+			tmax = (box.min.x - origin.x) * invdirx;
+		}			
+
+		if (invdiry >= 0) {
+		
+			tymin = (box.min.y - origin.y) * invdiry;
+			tymax = (box.max.y - origin.y) * invdiry;
+
+		} else {
+
+			tymin = (box.max.y - origin.y) * invdiry;
+			tymax = (box.min.y - origin.y) * invdiry;
+		}
+
+		if ((tmin > tymax) || (tymin > tmax)) return null;
+
+		// These lines also handle the case where tmin or tmax is NaN
+		// (result of 0 * Infinity). x !== x returns true if x is NaN
+		
+		if (tymin > tmin || tmin !== tmin ) tmin = tymin;
+
+		if (tymax < tmax || tmax !== tmax ) tmax = tymax;
+
+		if (invdirz >= 0) {
+		
+			tzmin = (box.min.z - origin.z) * invdirz;
+			tzmax = (box.max.z - origin.z) * invdirz;
+
+		} else {
+
+			tzmin = (box.max.z - origin.z) * invdirz;
+			tzmax = (box.min.z - origin.z) * invdirz;
+		}
+
+		if ((tmin > tzmax) || (tzmin > tmax)) return null;
+
+		if (tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+
+		if (tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+
+		//return point closest to the ray (positive side)
+
+		if ( tmax < 0 ) return null;
+
+		return this.at( tmin >= 0 ? tmin : tmax, optionalTarget );
+
+	},
+
+	intersectTriangle: function() {
+
+		// Compute the offset origin, edges, and normal.
+		var diff = new THREE.Vector3();
+		var edge1 = new THREE.Vector3();
+		var edge2 = new THREE.Vector3();
+		var normal = new THREE.Vector3();
+
+		return function ( a, b, c, backfaceCulling, optionalTarget ) {
+
+			// from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+
+			edge1.subVectors( b, a );
+			edge2.subVectors( c, a );
+			normal.crossVectors( edge1, edge2 );
+
+			// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+			// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+			var DdN = this.direction.dot( normal );
+			var sign;
+
+			if ( DdN > 0 ) {
+
+				if ( backfaceCulling ) return null;
+				sign = 1;
+
+			} else if ( DdN < 0 ) {
+
+				sign = - 1;
+				DdN = - DdN;
+
+			} else {
+
+				return null;
+
+			}
+
+			diff.subVectors( this.origin, a );
+			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
+
+			// b1 < 0, no intersection
+			if ( DdQxE2 < 0 ) {
+
+				return null;
+
+			}
+
+			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+
+			// b2 < 0, no intersection
+			if ( DdE1xQ < 0 ) {
+
+				return null;
+
+			}
+
+			// b1+b2 > 1, no intersection
+			if ( DdQxE2 + DdE1xQ > DdN ) {
+
+				return null;
+
+			}
+
+			// Line intersects triangle, check if ray does.
+			var QdN = - sign * diff.dot( normal );
+
+			// t < 0, no intersection
+			if ( QdN < 0 ) {
+
+				return null;
+
+			}
+
+			// Ray intersects triangle.
+			return this.at( QdN / DdN, optionalTarget );
+	
+		}
+	
+	}(),
+
 	applyMatrix4: function ( matrix4 ) {
 
 		this.direction.add( this.origin ).applyMatrix4( matrix4 );
 		this.origin.applyMatrix4( matrix4 );
 		this.direction.sub( this.origin );
+		this.direction.normalize();
 
 		return this;
 	},
@@ -5321,23 +5506,40 @@ THREE.Sphere.prototype = {
 		return this;
 	},
 
-	setFromPoints: function ( points ) {
 
-		var radiusSq, maxRadiusSq = 0;
+	setFromPoints: function () {
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+		var box = new THREE.Box3();
 
-			radiusSq = points[ i ].lengthSq();
-			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+		return function ( points, optionalCenter )  {
 
-		}
+			var center = this.center;
 
-		this.center.set( 0, 0, 0 );
-		this.radius = Math.sqrt( maxRadiusSq );
+			if ( optionalCenter !== undefined ) {
 
-		return this;
+				center.copy( optionalCenter );
 
-	},
+			} else {
+
+				box.setFromPoints( points ).center( center );
+
+			}
+
+			var maxRadiusSq = 0;
+
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+
+			}
+
+			this.radius = Math.sqrt( maxRadiusSq );
+
+			return this;			
+ 		
+ 		};
+
+	}(),
 
 	copy: function ( sphere ) {
 
@@ -5510,36 +5712,18 @@ THREE.Frustum.prototype = {
 
 	intersectsObject: function () {
 
-		var center = new THREE.Vector3();
+		var sphere = new THREE.Sphere();
 
 		return function ( object ) {
 
-			// this method is expanded inlined for performance reasons.
-
 			var geometry = object.geometry;
-			var matrix = object.matrixWorld;
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			var negRadius = - geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 
-			center.getPositionFromMatrix( matrix );
-
-			var planes = this.planes;
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				var distance = planes[ i ].distanceToPoint( center );
-
-				if ( distance < negRadius ) {
-
-					return false;
-
-				}
-
-			}
-
-			return true;
+			return this.intersectsSphere( sphere );
 
 		};
 
@@ -6571,6 +6755,7 @@ THREE.EventDispatcher.prototype = {
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author bhouston / http://exocortex.com/
+ * @author stephomi / http://stephaneginier.com/
  */
 
 ( function ( THREE ) {
@@ -6578,13 +6763,7 @@ THREE.EventDispatcher.prototype = {
 	THREE.Raycaster = function ( origin, direction, near, far ) {
 
 		this.ray = new THREE.Ray( origin, direction );
-
-		// normalized ray.direction required for accurate distance calculations
-		if ( this.ray.direction.lengthSq() > 0 ) {
-
-			this.ray.direction.normalize();
-
-		}
+		// direction is assumed to be normalized (for accurate distance calculations)
 
 		this.near = near || 0;
 		this.far = far || Infinity;
@@ -6604,6 +6783,10 @@ THREE.EventDispatcher.prototype = {
 		return a.distance - b.distance;
 
 	};
+
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
 
 	var intersectObject = function ( object, raycaster, intersects ) {
 
@@ -6639,17 +6822,32 @@ THREE.EventDispatcher.prototype = {
 			var geometry = object.geometry;
 
 			// Checking boundingSphere distance to ray
-			matrixPosition.getPositionFromMatrix( object.matrixWorld );
 
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
 				return intersects;
 
 			}
+
+			// Check boundingBox before continuing
+			
+			inverseMatrix.getInverse( object.matrixWorld );  
+			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+
+			if ( geometry.boundingBox !== null ) {
+
+				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
+
+					return intersects;
+
+				}
+
+			} 
 
 			var vertices = geometry.vertices;
 
@@ -6660,125 +6858,114 @@ THREE.EventDispatcher.prototype = {
 				if ( material === undefined ) return intersects;
 				if ( geometry.dynamic === false ) return intersects;
 
-				var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
-				var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
-
-				var side = object.material.side;
-
 				var a, b, c;
 				var precision = raycaster.precision;
 
-				inverseMatrix.getInverse( object.matrixWorld );
+				if ( geometry.attributes.index !== undefined ) {
 
-				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
+					var offsets = geometry.offsets;
+					var indices = geometry.attributes.index.array;
+					var positions = geometry.attributes.position.array;
+					var offLength = geometry.offsets.length;
 
-				var fl;
-				var indexed = false;
+					var fl = geometry.attributes.index.array.length / 3;
 
-				if ( geometry.attributes.index ) {
+					for ( var oi = 0; oi < offLength; ++oi ) {
 
-					indexed = true;
-					fl = geometry.attributes.index.numItems / 3;
+						var start = offsets[ oi ].start;
+						var count = offsets[ oi ].count;
+						var index = offsets[ oi ].index;
+
+						for ( var i = start, il = start + count; i < il; i += 3 ) {
+
+							a = index + indices[ i ];
+							b = index + indices[ i + 1 ]; 
+							c = index + indices[ i + 2 ];
+
+							vA.set(
+								positions[ a * 3 ],
+								positions[ a * 3 + 1 ],
+								positions[ a * 3 + 2 ]
+							);
+							vB.set(
+								positions[ b * 3 ],
+								positions[ b * 3 + 1 ],
+								positions[ b * 3 + 2 ]
+							);
+							vC.set(
+								positions[ c * 3 ],
+								positions[ c * 3 + 1 ],
+								positions[ c * 3 + 2 ]
+							);
+
+							var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+
+							if ( intersectionPoint === null ) continue;
+
+							intersectionPoint.applyMatrix4( object.matrixWorld );
+
+							var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
+
+							if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
+
+							intersects.push( {
+
+								distance: distance,
+								point: intersectionPoint,
+								face: null,
+								faceIndex: null,
+								object: object
+
+							} );
+
+						}
+
+					}
 
 				} else {
 
-					fl = geometry.attributes.position.numItems / 9;
+					var offsets = geometry.offsets;
+					var positions = geometry.attributes.position.array;
+					var offLength = geometry.offsets.length;
 
-				}
+					var fl = geometry.attributes.position.array.length;
 
-				var vA = new THREE.Vector3();
-				var vB = new THREE.Vector3();
-				var vC = new THREE.Vector3();
-				var vCB = new THREE.Vector3();
-				var vAB = new THREE.Vector3();
+					for ( var i = 0; i < fl; i += 3 ) {
 
-				for ( var oi = 0; oi < geometry.offsets.length; ++oi ) {
-
-					var start = geometry.offsets[ oi ].start;
-					var count = geometry.offsets[ oi ].count;
-					var index = geometry.offsets[ oi ].index;
-
-					for ( var i = start, il = start + count; i < il; i += 3 ) {
-
-						if ( indexed ) {
-
-							a = index + geometry.attributes.index.array[ i ];
-							b = index + geometry.attributes.index.array[ i + 1 ];
-							c = index + geometry.attributes.index.array[ i + 2 ];
-
-						} else {
-
-							a = index;
-							b = index + 1;
-							c = index + 2;
-
-						}
+						a = i;
+						b = i + 1;
+						c = i + 2;
 
 						vA.set(
-							geometry.attributes.position.array[ a * 3 ],
-							geometry.attributes.position.array[ a * 3 + 1 ],
-							geometry.attributes.position.array[ a * 3 + 2 ]
+							positions[ a * 3 ],
+							positions[ a * 3 + 1 ],
+							positions[ a * 3 + 2 ]
 						);
 						vB.set(
-							geometry.attributes.position.array[ b * 3 ],
-							geometry.attributes.position.array[ b * 3 + 1 ],
-							geometry.attributes.position.array[ b * 3 + 2 ]
+							positions[ b * 3 ],
+							positions[ b * 3 + 1 ],
+							positions[ b * 3 + 2 ]
 						);
 						vC.set(
-							geometry.attributes.position.array[ c * 3 ],
-							geometry.attributes.position.array[ c * 3 + 1 ],
-							geometry.attributes.position.array[ c * 3 + 2 ]
+							positions[ c * 3 ],
+							positions[ c * 3 + 1 ],
+							positions[ c * 3 + 2 ]
 						);
 
-						facePlane.setFromCoplanarPoints( vA, vB, vC );
+						var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
 
-						var planeDistance = localRay.distanceToPlane( facePlane );
+						if ( intersectionPoint === null ) continue;
 
-						// bail if the ray is too close to the plane
-						if ( planeDistance < precision ) continue;
+						intersectionPoint.applyMatrix4( object.matrixWorld );
 
-						// bail if the ray is behind the plane
-						if ( planeDistance === null ) continue;
+						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-						// check if we hit the wrong side of a single sided face
-						side = material.side;
-
-						if ( side !== THREE.DoubleSide ) {
-
-							var planeSign = localRay.direction.dot( facePlane.normal );
-							
-
-							if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
-
-								continue;
-
-							}
-
-						}
-
-						// this can be done using the planeDistance from localRay because
-						// localRay wasn't normalized, but ray was
-						if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) {
-
-							continue;
-
-						}
-
-						// passing in intersectPoint avoids a copy
-						intersectPoint = localRay.at( planeDistance, intersectPoint );
-
-						if ( THREE.Triangle.containsPoint( intersectPoint, vA, vB, vC ) === false ) {
-
-							continue;
-
-						}
+						if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
 
 						intersects.push( {
 
-							// this works because the original ray was normalized,
-							// and the transformed localRay wasn't
-							distance: planeDistance,
-							point: raycaster.ray.at( planeDistance ),
+							distance: distance,
+							point: intersectionPoint,
 							face: null,
 							faceIndex: null,
 							object: object
@@ -6786,6 +6973,7 @@ THREE.EventDispatcher.prototype = {
 						} );
 
 					}
+
 				}
 
 			} else if ( geometry instanceof THREE.Geometry ) {
@@ -6793,14 +6981,8 @@ THREE.EventDispatcher.prototype = {
 				var isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				var objectMaterials = isFaceMaterial === true ? object.material.materials : null;
 
-				var side = object.material.side;
-
 				var a, b, c, d;
 				var precision = raycaster.precision;
-
-				inverseMatrix.getInverse( object.matrixWorld );
-
-				localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
 				for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -6810,78 +6992,24 @@ THREE.EventDispatcher.prototype = {
 
 					if ( material === undefined ) continue;
 
-					facePlane.setFromNormalAndCoplanarPoint( face.normal, vertices[face.a] );
+					a = vertices[ face.a ];
+					b = vertices[ face.b ];
+					c = vertices[ face.c ];
+					
+					var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
 
-					var planeDistance = localRay.distanceToPlane( facePlane );
+					if ( intersectionPoint === null ) continue;
 
-					// bail if the ray is too close to the plane
-					if ( planeDistance < precision ) continue;
+					intersectionPoint.applyMatrix4( object.matrixWorld );
 
-					// bail if the ray is behind the plane
-					if ( planeDistance === null ) continue;
+					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
-					// check if we hit the wrong side of a single sided face
-					side = material.side;
-					if ( side !== THREE.DoubleSide ) {
-
-						var planeSign = localRay.direction.dot( facePlane.normal );
-
-						if ( ! ( side === THREE.FrontSide ? planeSign < 0 : planeSign > 0 ) ) {
-
-							continue;
-
-						}
-
-					}
-
-					// this can be done using the planeDistance from localRay because localRay
-					// wasn't normalized, but ray was
-					if ( planeDistance < raycaster.near || planeDistance > raycaster.far ) continue;
-
-					// passing in intersectPoint avoids a copy
-					intersectPoint = localRay.at( planeDistance, intersectPoint );
-
-					if ( face instanceof THREE.Face3 ) {
-
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
-
-						if ( THREE.Triangle.containsPoint( intersectPoint, a, b, c ) === false ) {
-
-							continue;
-
-						}
-
-					} else if ( face instanceof THREE.Face4 ) {
-
-						a = vertices[ face.a ];
-						b = vertices[ face.b ];
-						c = vertices[ face.c ];
-						d = vertices[ face.d ];
-
-						if ( THREE.Triangle.containsPoint( intersectPoint, a, b, d ) === false &&
-						     THREE.Triangle.containsPoint( intersectPoint, b, c, d ) === false ) {
-
-							continue;
-
-						}
-
-					} else {
-
-						// This is added because if we call out of this if/else group when
-						// none of the cases match it will add a point to the intersection
-						// list erroneously.
-						throw Error( "face type not supported" );
-
-					}
+					if ( distance < precision || distance < raycaster.near || distance > raycaster.far ) continue;
 
 					intersects.push( {
 
-						// this works because the original ray was normalized,
-						// and the transformed localRay wasn't
-						distance: planeDistance,
-						point: raycaster.ray.at( planeDistance ),
+						distance: distance,
+						point: intersectionPoint,
 						face: face,
 						faceIndex: f,
 						object: object
@@ -6902,8 +7030,9 @@ THREE.EventDispatcher.prototype = {
 			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
 			// Checking boundingSphere distance to ray
-			matrixPosition.getPositionFromMatrix(object.matrixWorld);
-			sphere.set( matrixPosition, geometry.boundingSphere.radius * object.matrixWorld.getMaxScaleOnAxis() );
+
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 			
 			if ( raycaster.ray.isIntersectionSphere( sphere ) === false ) {
 
@@ -6913,7 +7042,6 @@ THREE.EventDispatcher.prototype = {
 			
 			inverseMatrix.getInverse( object.matrixWorld );
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
-			localRay.direction.normalize(); // for scale matrix
 
 			var vertices = geometry.vertices;
 			var nbVertices = vertices.length;
@@ -6925,27 +7053,23 @@ THREE.EventDispatcher.prototype = {
 
 				var distSq = localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-				if ( distSq <= precisionSq ) {
+				if ( distSq > precisionSq ) continue;
 
-					var distance = localRay.origin.distanceTo( interRay );
+				var distance = localRay.origin.distanceTo( interRay );
 
-					if ( raycaster.near <= distance && distance <= raycaster.far ) {
+				if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
-						intersects.push( {
+				intersects.push( {
 
-							distance: distance,
-							// What do we want? intersection point on the ray or on the segment??
-							// point: raycaster.ray.at( distance ),
-							point: interSegment.clone().applyMatrix4( object.matrixWorld ),
-							face: null,
-							faceIndex: null,
-							object: object
+					distance: distance,
+					// What do we want? intersection point on the ray or on the segment??
+					// point: raycaster.ray.at( distance ),
+					point: interSegment.clone().applyMatrix4( object.matrixWorld ),
+					face: null,
+					faceIndex: null,
+					object: object
 
-						} );
-
-					}
-
-				}
+				} );
 
 			}
 
@@ -6972,13 +7096,7 @@ THREE.EventDispatcher.prototype = {
 	THREE.Raycaster.prototype.set = function ( origin, direction ) {
 
 		this.ray.set( origin, direction );
-
-		// normalized ray.direction required for accurate distance calculations
-		if ( this.ray.direction.length() > 0 ) {
-
-			this.ray.direction.normalize();
-
-		}
+		// direction is assumed to be normalized (for accurate distance calculations)
 
 	};
 
@@ -7582,7 +7700,6 @@ THREE.Projector = function () {
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
 	_face, _face3Count, _face3Pool = [], _face3PoolLength = 0,
-	_face4Count, _face4Pool = [], _face4PoolLength = 0,
 	_line, _lineCount, _linePool = [], _linePoolLength = 0,
 	_particle, _particleCount, _particlePool = [], _particlePoolLength = 0,
 
@@ -7726,7 +7843,6 @@ THREE.Projector = function () {
 		v1, v2, v3, v4, isFaceMaterial, objectMaterials;
 
 		_face3Count = 0;
-		_face4Count = 0;
 		_lineCount = 0;
 		_particleCount = 0;
 
@@ -7796,36 +7912,30 @@ THREE.Projector = function () {
 
 					var side = material.side;
 
-					if ( face instanceof THREE.Face3 ) {
+					v1 = _vertexPool[ face.a ];
+					v2 = _vertexPool[ face.b ];
+					v3 = _vertexPool[ face.c ];
 
-						v1 = _vertexPool[ face.a ];
-						v2 = _vertexPool[ face.b ];
-						v3 = _vertexPool[ face.c ];
+					_points3[ 0 ] = v1.positionScreen;
+					_points3[ 1 ] = v2.positionScreen;
+					_points3[ 2 ] = v3.positionScreen;
 
-						_points3[ 0 ] = v1.positionScreen;
-						_points3[ 1 ] = v2.positionScreen;
-						_points3[ 2 ] = v3.positionScreen;
+					if ( v1.visible === true || v2.visible === true || v3.visible === true ||
+						_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
 
-						if ( v1.visible === true || v2.visible === true || v3.visible === true ||
-							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
+						visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) *
+							    ( v2.positionScreen.y - v1.positionScreen.y ) -
+							    ( v3.positionScreen.y - v1.positionScreen.y ) *
+							    ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
 
-							visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
-								( v3.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
+						if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
 
-							if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
+							_face = getNextFace3InPool();
 
-								_face = getNextFace3InPool();
-
-								_face.id = object.id;
-								_face.v1.copy( v1 );
-								_face.v2.copy( v2 );
-								_face.v3.copy( v3 );
-
-							} else {
-
-								continue;
-
-							}
+							_face.id = object.id;
+							_face.v1.copy( v1 );
+							_face.v2.copy( v2 );
+							_face.v3.copy( v3 );
 
 						} else {
 
@@ -7833,48 +7943,9 @@ THREE.Projector = function () {
 
 						}
 
-					} else if ( face instanceof THREE.Face4 ) {
+					} else {
 
-						v1 = _vertexPool[ face.a ];
-						v2 = _vertexPool[ face.b ];
-						v3 = _vertexPool[ face.c ];
-						v4 = _vertexPool[ face.d ];
-
-						_points4[ 0 ] = v1.positionScreen;
-						_points4[ 1 ] = v2.positionScreen;
-						_points4[ 2 ] = v3.positionScreen;
-						_points4[ 3 ] = v4.positionScreen;
-
-						if ( v1.visible === true || v2.visible === true || v3.visible === true || v4.visible === true ||
-							_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points4 ) ) ) {
-
-							visible = ( v4.positionScreen.x - v1.positionScreen.x ) * ( v2.positionScreen.y - v1.positionScreen.y ) -
-								( v4.positionScreen.y - v1.positionScreen.y ) * ( v2.positionScreen.x - v1.positionScreen.x ) < 0 ||
-								( v2.positionScreen.x - v3.positionScreen.x ) * ( v4.positionScreen.y - v3.positionScreen.y ) -
-								( v2.positionScreen.y - v3.positionScreen.y ) * ( v4.positionScreen.x - v3.positionScreen.x ) < 0;
-
-
-							if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
-
-								_face = getNextFace4InPool();
-
-								_face.id = object.id;
-								_face.v1.copy( v1 );
-								_face.v2.copy( v2 );
-								_face.v3.copy( v3 );
-								_face.v4.copy( v4 );
-
-							} else {
-
-								continue;
-
-							}
-
-						} else {
-
-							continue;
-
-						}
+						continue;
 
 					}
 
@@ -7894,7 +7965,7 @@ THREE.Projector = function () {
 
 					faceVertexNormals = face.vertexNormals;
 
-					for ( n = 0, nl = faceVertexNormals.length; n < nl; n ++ ) {
+					for ( n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
 
 						var normalModel = _face.vertexNormalsModel[ n ];
 						normalModel.copy( faceVertexNormals[ n ] );
@@ -7914,7 +7985,7 @@ THREE.Projector = function () {
 
 					_face.vertexNormalsLength = faceVertexNormals.length;
 
-					for ( c = 0, cl = faceVertexUvs.length; c < cl; c ++ ) {
+					for ( c = 0, cl = Math.min( faceVertexUvs.length, 3 ); c < cl; c ++ ) {
 
 						uvs = faceVertexUvs[ c ][ f ];
 
@@ -8089,22 +8160,6 @@ THREE.Projector = function () {
 
 		return _face3Pool[ _face3Count ++ ];
 
-
-	}
-
-	function getNextFace4InPool() {
-
-		if ( _face4Count === _face4PoolLength ) {
-
-			var face = new THREE.RenderableFace4();
-			_face4Pool.push( face );
-			_face4PoolLength ++;
-			_face4Count ++;
-			return face;
-
-		}
-
-		return _face4Pool[ _face4Count ++ ];
 
 	}
 
@@ -8284,52 +8339,11 @@ THREE.Face3.prototype = {
 
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.Face4 = function ( a, b, c, d, normal, color, materialIndex ) {
 
-	this.a = a;
-	this.b = b;
-	this.c = c;
-	this.d = d;
-
-	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
-	this.vertexNormals = normal instanceof Array ? normal : [ ];
-
-	this.color = color instanceof THREE.Color ? color : new THREE.Color();
-	this.vertexColors = color instanceof Array ? color : [];
-
-	this.vertexTangents = [];
-
-	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
-
-	this.centroid = new THREE.Vector3();
-
-};
-
-THREE.Face4.prototype = {
-
-	constructor: THREE.Face4,
-
-	clone: function () {
-
-		var face = new THREE.Face4( this.a, this.b, this.c, this.d );
-
-		face.normal.copy( this.normal );
-		face.color.copy( this.color );
-		face.centroid.copy( this.centroid );
-
-		face.materialIndex = this.materialIndex;
-
-		var i, il;
-		for ( i = 0, il = this.vertexNormals.length; i < il; i ++ ) face.vertexNormals[ i ] = this.vertexNormals[ i ].clone();
-		for ( i = 0, il = this.vertexColors.length; i < il; i ++ ) face.vertexColors[ i ] = this.vertexColors[ i ].clone();
-		for ( i = 0, il = this.vertexTangents.length; i < il; i ++ ) face.vertexTangents[ i ] = this.vertexTangents[ i ].clone();
-
-		return face;
-
-	}
+	return new THREE.Face3( a, b, c, normal, color, materialIndex );
 
 };
 
@@ -8355,7 +8369,6 @@ THREE.Geometry = function () {
 
 	this.faces = [];
 
-	this.faceUvs = [[]];
 	this.faceVertexUvs = [[]];
 
 	this.morphTargets = [];
@@ -8441,22 +8454,10 @@ THREE.Geometry.prototype = {
 			face = this.faces[ f ];
 			face.centroid.set( 0, 0, 0 );
 
-			if ( face instanceof THREE.Face3 ) {
-
-				face.centroid.add( this.vertices[ face.a ] );
-				face.centroid.add( this.vertices[ face.b ] );
-				face.centroid.add( this.vertices[ face.c ] );
-				face.centroid.divideScalar( 3 );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				face.centroid.add( this.vertices[ face.a ] );
-				face.centroid.add( this.vertices[ face.b ] );
-				face.centroid.add( this.vertices[ face.c ] );
-				face.centroid.add( this.vertices[ face.d ] );
-				face.centroid.divideScalar( 4 );
-
-			}
+			face.centroid.add( this.vertices[ face.a ] );
+			face.centroid.add( this.vertices[ face.b ] );
+			face.centroid.add( this.vertices[ face.c ] );
+			face.centroid.divideScalar( 3 );
 
 		}
 
@@ -8507,16 +8508,7 @@ THREE.Geometry.prototype = {
 			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 				face = this.faces[ f ];
-
-				if ( face instanceof THREE.Face3 ) {
-
-					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-				}
+				face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
 			}
 
@@ -8545,48 +8537,17 @@ THREE.Geometry.prototype = {
 
 				face = this.faces[ f ];
 
-				if ( face instanceof THREE.Face3 ) {
+				vA = this.vertices[ face.a ];
+				vB = this.vertices[ face.b ];
+				vC = this.vertices[ face.c ];
 
-					vA = this.vertices[ face.a ];
-					vB = this.vertices[ face.b ];
-					vC = this.vertices[ face.c ];
+				cb.subVectors( vC, vB );
+				ab.subVectors( vA, vB );
+				cb.cross( ab );
 
-					cb.subVectors( vC, vB );
-					ab.subVectors( vA, vB );
-					cb.cross( ab );
-
-					vertices[ face.a ].add( cb );
-					vertices[ face.b ].add( cb );
-					vertices[ face.c ].add( cb );
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					vA = this.vertices[ face.a ];
-					vB = this.vertices[ face.b ];
-					vC = this.vertices[ face.c ];
-					vD = this.vertices[ face.d ];
-
-					// abd
-
-					db.subVectors( vD, vB );
-					ab.subVectors( vA, vB );
-					db.cross( ab );
-
-					vertices[ face.a ].add( db );
-					vertices[ face.b ].add( db );
-					vertices[ face.d ].add( db );
-
-					// bcd
-
-					dc.subVectors( vD, vC );
-					bc.subVectors( vB, vC );
-					dc.cross( bc );
-
-					vertices[ face.b ].add( dc );
-					vertices[ face.c ].add( dc );
-					vertices[ face.d ].add( dc );
-
-				}
+				vertices[ face.a ].add( cb );
+				vertices[ face.b ].add( cb );
+				vertices[ face.c ].add( cb );
 
 			}
 
@@ -8596,20 +8557,9 @@ THREE.Geometry.prototype = {
 
 				face = this.faces[ f ];
 
-				if ( face instanceof THREE.Face3 ) {
-
-					vertices[ face.a ].add( face.normal );
-					vertices[ face.b ].add( face.normal );
-					vertices[ face.c ].add( face.normal );
-
-				} else if ( face instanceof THREE.Face4 ) {
-
-					vertices[ face.a ].add( face.normal );
-					vertices[ face.b ].add( face.normal );
-					vertices[ face.c ].add( face.normal );
-					vertices[ face.d ].add( face.normal );
-
-				}
+				vertices[ face.a ].add( face.normal );
+				vertices[ face.b ].add( face.normal );
+				vertices[ face.c ].add( face.normal );
 
 			}
 
@@ -8625,20 +8575,9 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			if ( face instanceof THREE.Face3 ) {
-
-				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-				face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-				face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
-				face.vertexNormals[ 3 ].copy( vertices[ face.d ] );
-
-			}
+			face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
+			face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
+			face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
 
 		}
 
@@ -8709,16 +8648,7 @@ THREE.Geometry.prototype = {
 					face = this.faces[ f ];
 
 					faceNormal = new THREE.Vector3();
-
-					if ( face instanceof THREE.Face3 ) {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
-
-					} else {
-
-						vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3(), d: new THREE.Vector3() };
-
-					}
+					vertexNormals = { a: new THREE.Vector3(), b: new THREE.Vector3(), c: new THREE.Vector3() };
 
 					dstNormalsFace.push( faceNormal );
 					dstNormalsVertex.push( vertexNormals );
@@ -8751,20 +8681,9 @@ THREE.Geometry.prototype = {
 
 				faceNormal.copy( face.normal );
 
-				if ( face instanceof THREE.Face3 ) {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-
-				} else {
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
-					vertexNormals.d.copy( face.vertexNormals[ 3 ] );
-
-				}
+				vertexNormals.a.copy( face.vertexNormals[ 0 ] );
+				vertexNormals.b.copy( face.vertexNormals[ 1 ] );
+				vertexNormals.c.copy( face.vertexNormals[ 2 ] );
 
 			}
 
@@ -8849,16 +8768,7 @@ THREE.Geometry.prototype = {
 			face = this.faces[ f ];
 			uv = this.faceVertexUvs[ 0 ][ f ]; // use UV layer 0 for tangents
 
-			if ( face instanceof THREE.Face3 ) {
-
-				handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				handleTriangle( this, face.a, face.b, face.d, 0, 1, 3 );
-				handleTriangle( this, face.b, face.c, face.d, 1, 2, 3 );
-
-			}
+			handleTriangle( this, face.a, face.b, face.c, 0, 1, 2 );
 
 		}
 
@@ -8868,7 +8778,7 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			for ( i = 0; i < face.vertexNormals.length; i++ ) {
+			for ( i = 0; i < Math.min( face.vertexNormals.length, 3 ); i++ ) {
 
 				n.copy( face.vertexNormals[ i ] );
 
@@ -8989,91 +8899,24 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+			face.a = changes[ face.a ];
+			face.b = changes[ face.b ];
+			face.c = changes[ face.c ];
 
-				face.a = changes[ face.a ];
-				face.b = changes[ face.b ];
-				face.c = changes[ face.c ];
+			indices = [ face.a, face.b, face.c ];
 
-				indices = [ face.a, face.b, face.c ];
+			var dupIndex = -1;
 
-				var dupIndex = -1;
+			// if any duplicate vertices are found in a Face3
+			// we have to remove the face as nothing can be saved
+			for ( var n = 0; n < 3; n ++ ) {
+				if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
 
-				// if any duplicate vertices are found in a Face3
-				// we have to remove the face as nothing can be saved
-				for ( var n = 0; n < 3; n ++ ) {
-					if ( indices[ n ] == indices[ ( n + 1 ) % 3 ] ) {
+					dupIndex = n;
+					faceIndicesToRemove.push( i );
+					break;
 
-						dupIndex = n;
-						faceIndicesToRemove.push( i );
-						break;
-
-					}
 				}
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				face.a = changes[ face.a ];
-				face.b = changes[ face.b ];
-				face.c = changes[ face.c ];
-				face.d = changes[ face.d ];
-
-				// check dups in (a, b, c, d) and convert to -> face3
-
-				indices = [ face.a, face.b, face.c, face.d ];
-
-				var dupIndex = -1;
-
-				for ( var n = 0; n < 4; n ++ ) {
-
-					if ( indices[ n ] == indices[ ( n + 1 ) % 4 ] ) {
-
-						// if more than one duplicated vertex is found
-						// we can't generate any valid Face3's, thus
-						// we need to remove this face complete.
-						if ( dupIndex >= 0 ) {
-
-							faceIndicesToRemove.push( i );
-
-						}
-
-						dupIndex = n;
-
-					}
-				}
-
-				if ( dupIndex >= 0 ) {
-
-					indices.splice( dupIndex, 1 );
-
-					var newFace = new THREE.Face3( indices[0], indices[1], indices[2], face.normal, face.color, face.materialIndex );
-
-					for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
-
-						u = this.faceVertexUvs[ j ][ i ];
-
-						if ( u ) {
-							u.splice( dupIndex, 1 );
-						}
-
-					}
-
-					if( face.vertexNormals && face.vertexNormals.length > 0) {
-
-						newFace.vertexNormals = face.vertexNormals;
-						newFace.vertexNormals.splice( dupIndex, 1 );
-
-					}
-
-					if( face.vertexColors && face.vertexColors.length > 0 ) {
-
-						newFace.vertexColors = face.vertexColors;
-						newFace.vertexColors.splice( dupIndex, 1 );
-					}
-
-					this.faces[ i ] = newFace;
-				}
-
 			}
 
 		}
@@ -9159,13 +9002,15 @@ THREE.BufferGeometry = function () {
 	this.id = THREE.GeometryIdCount ++;
 	this.uuid = THREE.Math.generateUUID();
 
+	this.name = '';
+
 	// attributes
 
 	this.attributes = {};
 
 	// attributes typed arrays are kept only if dynamic flag is set
 
-	this.dynamic = false;
+	this.dynamic = true;
 
 	// offsets for chunks when using indexed elements
 
@@ -9291,35 +9136,48 @@ THREE.BufferGeometry.prototype = {
 
 	computeBoundingSphere: function () {
 
-		if ( this.boundingSphere === null ) {
+		var box = new THREE.Box3();
+		var vector = new THREE.Vector3();
 
-			this.boundingSphere = new THREE.Sphere();
+		return function () {
 
-		}
+			if ( this.boundingSphere === null ) {
 
-		var positions = this.attributes[ "position" ].array;
-
-		if ( positions ) {
-
-			var radiusSq, maxRadiusSq = 0;
-			var x, y, z;
-
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
-
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
-
-				radiusSq =  x * x + y * y + z * z;
-				if ( radiusSq > maxRadiusSq ) maxRadiusSq = radiusSq;
+				this.boundingSphere = new THREE.Sphere();
 
 			}
 
-			this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+			var positions = this.attributes[ "position" ].array;
+
+			if ( positions ) {
+
+				var center = this.boundingSphere.center;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					box.addPoint( vector );
+
+				}
+
+				box.center( center );
+
+				var maxRadiusSq = 0;
+
+				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+
+					vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
+
+				}
+
+				this.boundingSphere.radius = Math.sqrt( maxRadiusSq );
+
+			}
 
 		}
 
-	},
+	}(),
 
 	computeVertexNormals: function () {
 
@@ -9736,6 +9594,19 @@ THREE.Camera.prototype.lookAt = function () {
 
 }();
 
+THREE.Camera.prototype.clone = function (camera) {
+
+	if ( camera === undefined ) camera = new THREE.Camera();
+
+	THREE.Object3D.prototype.clone.call( this, camera );
+
+	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
+	camera.projectionMatrix.copy( this.projectionMatrix );
+	camera.projectionMatrixInverse.copy( this.projectionMatrixInverse );
+
+	return camera;
+};
+
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -9762,6 +9633,23 @@ THREE.OrthographicCamera.prototype.updateProjectionMatrix = function () {
 
 	this.projectionMatrix.makeOrthographic( this.left, this.right, this.top, this.bottom, this.near, this.far );
 
+};
+
+THREE.OrthographicCamera.prototype.clone = function () {
+
+	var camera = new THREE.OrthographicCamera();
+
+	THREE.Camera.prototype.clone.call( this, camera );
+
+	camera.left = this.left;
+	camera.right = this.right;
+	camera.top = this.top;
+	camera.bottom = this.bottom;
+	
+	camera.near = this.near;
+	camera.far = this.far;
+
+	return camera;
 };
 
 /**
@@ -9879,6 +9767,20 @@ THREE.PerspectiveCamera.prototype.updateProjectionMatrix = function () {
 
 	}
 
+};
+
+THREE.PerspectiveCamera.prototype.clone = function () {
+
+	var camera = new THREE.PerspectiveCamera();
+
+	THREE.Camera.prototype.clone.call( this, camera );
+
+	camera.fov = this.fov;
+	camera.aspect = this.aspect;
+	camera.near = this.near;
+	camera.far = this.far;
+
+	return camera;
 };
 
 /**
@@ -10622,8 +10524,8 @@ THREE.XHRLoader.prototype = {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				scope.manager.itemEnd( url );
 				onLoad( event.target.responseText );
+				scope.manager.itemEnd( url );
 
 			}, false );
 
@@ -10853,20 +10755,20 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		var i, j, fi,
 
-		offset, zLength, nVertices,
+		offset, zLength,
 
 		colorIndex, normalIndex, uvIndex, materialIndex,
 
 		type,
 		isQuad,
 		hasMaterial,
-		hasFaceUv, hasFaceVertexUv,
+		hasFaceVertexUv,
 		hasFaceNormal, hasFaceVertexNormal,
 		hasFaceColor, hasFaceVertexColor,
 
-		vertex, face, color, normal,
+		vertex, face, faceA, faceB, color, hex, normal,
 
-		uvLayer, uvs, u, v,
+		uvLayer, uv, u, v,
 
 		faces = json.faces,
 		vertices = json.vertices,
@@ -10887,7 +10789,6 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			for ( i = 0; i < nUvLayers; i++ ) {
 
-				geometry.faceUvs[ i ] = [];
 				geometry.faceVertexUvs[ i ] = [];
 
 			}
@@ -10919,148 +10820,226 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 			isQuad              = isBitSet( type, 0 );
 			hasMaterial         = isBitSet( type, 1 );
-			hasFaceUv           = isBitSet( type, 2 );
 			hasFaceVertexUv     = isBitSet( type, 3 );
 			hasFaceNormal       = isBitSet( type, 4 );
 			hasFaceVertexNormal = isBitSet( type, 5 );
 			hasFaceColor	    = isBitSet( type, 6 );
 			hasFaceVertexColor  = isBitSet( type, 7 );
 
-			//console.log("type", type, "bits", isQuad, hasMaterial, hasFaceUv, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
+			// console.log("type", type, "bits", isQuad, hasMaterial, hasFaceVertexUv, hasFaceNormal, hasFaceVertexNormal, hasFaceColor, hasFaceVertexColor);
 
 			if ( isQuad ) {
 
-				face = new THREE.Face4();
+				faceA = new THREE.Face3();
+				faceA.a = faces[ offset ];
+				faceA.b = faces[ offset + 1 ];
+				faceA.c = faces[ offset + 3 ];
 
-				face.a = faces[ offset ++ ];
-				face.b = faces[ offset ++ ];
-				face.c = faces[ offset ++ ];
-				face.d = faces[ offset ++ ];
+				faceB = new THREE.Face3();
+				faceB.a = faces[ offset + 1 ];
+				faceB.b = faces[ offset + 2 ];
+				faceB.c = faces[ offset + 3 ];
 
-				nVertices = 4;
+				offset += 4;
+
+				if ( hasMaterial ) {
+
+					materialIndex = faces[ offset ++ ];
+					faceA.materialIndex = materialIndex;
+					faceB.materialIndex = materialIndex;
+
+				}
+
+				// to get face <=> uv index correspondence
+
+				fi = geometry.faces.length;
+
+				if ( hasFaceVertexUv ) {
+
+					for ( i = 0; i < nUvLayers; i++ ) {
+
+						uvLayer = json.uvs[ i ];
+
+						geometry.faceVertexUvs[ i ][ fi ] = [];
+						geometry.faceVertexUvs[ i ][ fi + 1 ] = []
+
+						for ( j = 0; j < 4; j ++ ) {
+
+							uvIndex = faces[ offset ++ ];
+
+							u = uvLayer[ uvIndex * 2 ];
+							v = uvLayer[ uvIndex * 2 + 1 ];
+
+							uv = new THREE.Vector2( u, v );
+
+							if ( j !== 2 ) geometry.faceVertexUvs[ i ][ fi ].push( uv );
+							if ( j !== 0 ) geometry.faceVertexUvs[ i ][ fi + 1 ].push( uv );
+
+						}
+
+					}
+
+				}
+
+				if ( hasFaceNormal ) {
+
+					normalIndex = faces[ offset ++ ] * 3;
+
+					faceA.normal.set(
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ]
+					);
+
+					faceB.normal.copy( faceA.normal );
+
+				}
+
+				if ( hasFaceVertexNormal ) {
+
+					for ( i = 0; i < 4; i++ ) {
+
+						normalIndex = faces[ offset ++ ] * 3;
+
+						normal = new THREE.Vector3(
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ]
+						);
+
+
+						if ( i !== 2 ) faceA.vertexNormals.push( normal );
+						if ( i !== 0 ) faceB.vertexNormals.push( normal );
+
+					}
+
+				}
+
+
+				if ( hasFaceColor ) {
+
+					colorIndex = faces[ offset ++ ];
+					hex = colors[ colorIndex ];
+
+					faceA.color.setHex( hex );
+					faceB.color.setHex( hex );
+
+				}
+
+
+				if ( hasFaceVertexColor ) {
+
+					for ( i = 0; i < 4; i++ ) {
+
+						colorIndex = faces[ offset ++ ];
+						hex = colors[ colorIndex ];
+
+						if ( i !== 2 ) faceA.vertexColors.push( new THREE.Color( hex ) );
+						if ( i !== 0 ) faceB.vertexColors.push( new THREE.Color( hex ) );
+
+					}
+
+				}
+
+				geometry.faces.push( faceA );
+				geometry.faces.push( faceB );
 
 			} else {
 
 				face = new THREE.Face3();
-
 				face.a = faces[ offset ++ ];
 				face.b = faces[ offset ++ ];
 				face.c = faces[ offset ++ ];
 
-				nVertices = 3;
+				if ( hasMaterial ) {
 
-			}
-
-			if ( hasMaterial ) {
-
-				materialIndex = faces[ offset ++ ];
-				face.materialIndex = materialIndex;
-
-			}
-
-			// to get face <=> uv index correspondence
-
-			fi = geometry.faces.length;
-
-			if ( hasFaceUv ) {
-
-				for ( i = 0; i < nUvLayers; i++ ) {
-
-					uvLayer = json.uvs[ i ];
-
-					uvIndex = faces[ offset ++ ];
-
-					u = uvLayer[ uvIndex * 2 ];
-					v = uvLayer[ uvIndex * 2 + 1 ];
-
-					geometry.faceUvs[ i ][ fi ] = new THREE.Vector2( u, v );
+					materialIndex = faces[ offset ++ ];
+					face.materialIndex = materialIndex;
 
 				}
 
-			}
+				// to get face <=> uv index correspondence
 
-			if ( hasFaceVertexUv ) {
+				fi = geometry.faces.length;
 
-				for ( i = 0; i < nUvLayers; i++ ) {
+				if ( hasFaceVertexUv ) {
 
-					uvLayer = json.uvs[ i ];
+					for ( i = 0; i < nUvLayers; i++ ) {
 
-					uvs = [];
+						uvLayer = json.uvs[ i ];
 
-					for ( j = 0; j < nVertices; j ++ ) {
+						geometry.faceVertexUvs[ i ][ fi ] = [];
 
-						uvIndex = faces[ offset ++ ];
+						for ( j = 0; j < 3; j ++ ) {
 
-						u = uvLayer[ uvIndex * 2 ];
-						v = uvLayer[ uvIndex * 2 + 1 ];
+							uvIndex = faces[ offset ++ ];
 
-						uvs[ j ] = new THREE.Vector2( u, v );
+							u = uvLayer[ uvIndex * 2 ];
+							v = uvLayer[ uvIndex * 2 + 1 ];
+
+							uv = new THREE.Vector2( u, v );
+
+							geometry.faceVertexUvs[ i ][ fi ].push( uv );
+
+						}
 
 					}
 
-					geometry.faceVertexUvs[ i ][ fi ] = uvs;
-
 				}
 
-			}
-
-			if ( hasFaceNormal ) {
-
-				normalIndex = faces[ offset ++ ] * 3;
-
-				normal = new THREE.Vector3();
-
-				normal.x = normals[ normalIndex ++ ];
-				normal.y = normals[ normalIndex ++ ];
-				normal.z = normals[ normalIndex ];
-
-				face.normal = normal;
-
-			}
-
-			if ( hasFaceVertexNormal ) {
-
-				for ( i = 0; i < nVertices; i++ ) {
+				if ( hasFaceNormal ) {
 
 					normalIndex = faces[ offset ++ ] * 3;
 
-					normal = new THREE.Vector3();
-
-					normal.x = normals[ normalIndex ++ ];
-					normal.y = normals[ normalIndex ++ ];
-					normal.z = normals[ normalIndex ];
-
-					face.vertexNormals.push( normal );
+					face.normal.set(
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ++ ],
+						normals[ normalIndex ]
+					);
 
 				}
 
-			}
+				if ( hasFaceVertexNormal ) {
+
+					for ( i = 0; i < 3; i++ ) {
+
+						normalIndex = faces[ offset ++ ] * 3;
+
+						normal = new THREE.Vector3(
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ++ ],
+							normals[ normalIndex ]
+						);
+
+						face.vertexNormals.push( normal );
+
+					}
+
+				}
 
 
-			if ( hasFaceColor ) {
-
-				colorIndex = faces[ offset ++ ];
-
-				color = new THREE.Color( colors[ colorIndex ] );
-				face.color = color;
-
-			}
-
-
-			if ( hasFaceVertexColor ) {
-
-				for ( i = 0; i < nVertices; i++ ) {
+				if ( hasFaceColor ) {
 
 					colorIndex = faces[ offset ++ ];
-
-					color = new THREE.Color( colors[ colorIndex ] );
-					face.vertexColors.push( color );
+					face.color.setHex( colors[ colorIndex ] );
 
 				}
 
-			}
 
-			geometry.faces.push( face );
+				if ( hasFaceVertexColor ) {
+
+					for ( i = 0; i < 3; i++ ) {
+
+						colorIndex = faces[ offset ++ ];
+						face.vertexColors.push( new THREE.Color( colors[ colorIndex ] ) );
+
+					}
+
+				}
+
+				geometry.faces.push( face );
+
+			}
 
 		}
 
@@ -11228,6 +11207,80 @@ THREE.DefaultLoadingManager = new THREE.LoadingManager();
  * @author mrdoob / http://mrdoob.com/
  */
 
+THREE.BufferGeometryLoader = function ( manager ) {
+
+	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+
+};
+
+THREE.BufferGeometryLoader.prototype = {
+
+	constructor: THREE.BufferGeometryLoader,
+
+	load: function ( url, onLoad, onProgress, onError ) {
+
+		var scope = this;
+
+		var loader = new THREE.XHRLoader();
+		loader.setCrossOrigin( this.crossOrigin );
+		loader.load( url, function ( text ) {
+
+			onLoad( scope.parse( JSON.parse( text ) ) );
+
+		} );
+
+	},
+
+	setCrossOrigin: function ( value ) {
+
+		this.crossOrigin = value;
+
+	},
+
+	parse: function ( json ) {
+
+		var geometry = new THREE.BufferGeometry();
+
+		var attributes = json.attributes;
+		var offsets = json.offsets;
+		var boundingSphere = json.boundingSphere;
+
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
+
+			geometry.attributes[ key ] = {
+				itemSize: attribute.itemSize,
+				array: new self[ attribute.type ]( attribute.array )
+			}
+
+		}
+
+		if ( offsets !== undefined ) {
+
+			geometry.offsets = JSON.parse( JSON.stringify( offsets ) );
+
+		}
+
+		if ( boundingSphere !== undefined ) {
+
+			geometry.boundingSphere = new THREE.Sphere(
+				new THREE.Vector3().fromArray( boundingSphere.center !== undefined ? boundingSphere.center : [ 0, 0, 0 ] ),
+				boundingSphere.radius
+			);
+
+		}
+
+		return geometry;
+
+	}
+
+};
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 THREE.GeometryLoader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
@@ -11302,82 +11355,28 @@ THREE.MaterialLoader.prototype = {
 
 	parse: function ( json ) {
 
-		var material;
+		var material = new THREE[ json.type ];
 
-		switch ( json.type ) {
+		if ( json.color !== undefined ) material.color.setHex( json.color );
+		if ( json.ambient !== undefined ) material.ambient.setHex( json.ambient );
+		if ( json.emissive !== undefined ) material.emissive.setHex( json.emissive );
+		if ( json.specular !== undefined ) material.specular.setHex( json.specular );
+		if ( json.shininess !== undefined ) material.shininess = json.shininess;
+		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
+		if ( json.blending !== undefined ) material.blending = json.blending;
+		if ( json.opacity !== undefined ) material.opacity = json.opacity;
+		if ( json.transparent !== undefined ) material.transparent = json.transparent;
+		if ( json.wireframe !== undefined ) material.wireframe = json.wireframe;
 
-			case 'MeshBasicMaterial':
+		if ( json.materials !== undefined ) {
 
-				material = new THREE.MeshBasicMaterial( {
+			for ( var i = 0, l = json.materials.length; i < l; i ++ ) {
 
-					color: json.color,
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
+				material.materials.push( this.parse( json.materials[ i ] ) );
 
-				} );
-
-				break;
-
-			case 'MeshLambertMaterial':
-
-				material = new THREE.MeshLambertMaterial( {
-
-					color: json.color,
-					ambient: json.ambient,
-					emissive: json.emissive,
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-			case 'MeshPhongMaterial':
-
-				material = new THREE.MeshPhongMaterial( {
-
-					color: json.color,
-					ambient: json.ambient,
-					emissive: json.emissive,
-					specular: json.specular,
-					shininess: json.shininess,
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-			case 'MeshNormalMaterial':
-
-				material = new THREE.MeshNormalMaterial( {
-
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
-
-			case 'MeshDepthMaterial':
-
-				material = new THREE.MeshDepthMaterial( {
-
-					opacity: json.opacity,
-					transparent: json.transparent,
-					wireframe: json.wireframe
-
-				} );
-
-				break;
+			}
 
 		}
-
-		if ( json.vertexColors !== undefined ) material.vertexColors = json.vertexColors;
 
 		return material;
 
@@ -11435,7 +11434,8 @@ THREE.ObjectLoader.prototype = {
 
 		if ( json !== undefined ) {
 
-			var loader = new THREE.JSONLoader();
+			var geometryLoader = new THREE.JSONLoader();
+			var bufferGeometryLoader = new THREE.BufferGeometryLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
 
@@ -11530,9 +11530,15 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'BufferGeometry':
+
+						geometry = bufferGeometryLoader.parse( data.data );
+
+						break;
+
 					case 'Geometry':
 
-						geometry = loader.parse( data.data ).geometry;
+						geometry = geometryLoader.parse( data.data ).geometry;
 
 						break;
 
@@ -13888,6 +13894,18 @@ THREE.ShaderMaterial = function ( parameters ) {
 	this.morphTargets = false; // set to use morph targets
 	this.morphNormals = false; // set to use morph normals
 
+	// When rendered geometry doesn't include these attributes but the material does,
+	// use these default values in WebGL. This avoids errors when buffer data is missing.
+	this.defaultAttributeValues = {
+		"color" : [ 1, 1, 1],
+		"uv" : [ 0, 0 ],
+		"uv2" : [ 0, 0 ]
+	};
+
+	// By default, bind position to attribute index 0. In WebGL, attribute 0
+	// should always be used to avoid potentially expensive emulation.
+	this.index0AttributeName = "position";
+
 	this.setValues( parameters );
 
 };
@@ -15523,47 +15541,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableFace4 ) {
-
-				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3; _v4 = element.v4;
-
-				if ( _v1.positionScreen.z < -1 || _v1.positionScreen.z > 1 ) continue;
-				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
-				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
-				if ( _v4.positionScreen.z < -1 || _v4.positionScreen.z > 1 ) continue;
-
-				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
-				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
-				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
-				_v4.positionScreen.x *= _canvasWidthHalf; _v4.positionScreen.y *= _canvasHeightHalf;
-
-				_v5.positionScreen.copy( _v2.positionScreen );
-				_v6.positionScreen.copy( _v4.positionScreen );
-
-				if ( material.overdraw > 0 ) {
-
-					expand( _v1.positionScreen, _v2.positionScreen, material.overdraw );
-					expand( _v2.positionScreen, _v4.positionScreen, material.overdraw );
-					expand( _v4.positionScreen, _v1.positionScreen, material.overdraw );
-
-					expand( _v3.positionScreen, _v5.positionScreen, material.overdraw );
-					expand( _v3.positionScreen, _v6.positionScreen, material.overdraw );
-
-				}
-
-				_elemBox.setFromPoints( [
-					_v1.positionScreen,
-					_v2.positionScreen,
-					_v3.positionScreen,
-					_v4.positionScreen
-				] );
-
-				if ( _clipBox.isIntersectionBox( _elemBox ) === true ) {
-
-					renderFace4( _v1, _v2, _v3, _v4, _v5, _v6, element, material );
-
-				}
-
 			}
 
 			/* DEBUG
@@ -16014,165 +15991,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
-	function renderFace4( v1, v2, v3, v4, v5, v6, element, material ) {
-
-		_this.info.render.vertices += 4;
-		_this.info.render.faces ++;
-
-		setOpacity( material.opacity );
-		setBlending( material.blending );
-
-		if ( ( material.map !== undefined && material.map !== null ) || ( material.envMap !== undefined && material.envMap !== null ) ) {
-
-			// Let renderFace3() handle this
-
-			renderFace3( v1, v2, v4, 0, 1, 3, element, material );
-			renderFace3( v5, v3, v6, 1, 2, 3, element, material );
-
-			return;
-
-		}
-
-		_v1x = v1.positionScreen.x; _v1y = v1.positionScreen.y;
-		_v2x = v2.positionScreen.x; _v2y = v2.positionScreen.y;
-		_v3x = v3.positionScreen.x; _v3y = v3.positionScreen.y;
-		_v4x = v4.positionScreen.x; _v4y = v4.positionScreen.y;
-		_v5x = v5.positionScreen.x; _v5y = v5.positionScreen.y;
-		_v6x = v6.positionScreen.x; _v6y = v6.positionScreen.y;
-
-		if ( material instanceof THREE.MeshLambertMaterial || material instanceof THREE.MeshPhongMaterial ) {
-
-			_diffuseColor.copy( material.color );
-			_emissiveColor.copy( material.emissive );
-
-			if ( material.vertexColors === THREE.FaceColors ) {
-
-				_diffuseColor.multiply( element.color );
-
-			}
-
-			if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 4 ) {
-
-				_color1.copy( _ambientLight );
-				_color2.copy( _ambientLight );
-				_color3.copy( _ambientLight );
-				_color4.copy( _ambientLight );
-
-				calculateLight( element.v1.positionWorld, element.vertexNormalsModel[ 0 ], _color1 );
-				calculateLight( element.v2.positionWorld, element.vertexNormalsModel[ 1 ], _color2 );
-				calculateLight( element.v4.positionWorld, element.vertexNormalsModel[ 3 ], _color3 );
-				calculateLight( element.v3.positionWorld, element.vertexNormalsModel[ 2 ], _color4 );
-
-				_color1.multiply( _diffuseColor ).add( _emissiveColor );
-				_color2.multiply( _diffuseColor ).add( _emissiveColor );
-				_color3.multiply( _diffuseColor ).add( _emissiveColor );
-				_color4.multiply( _diffuseColor ).add( _emissiveColor );
-
-				_image = getGradientTexture( _color1, _color2, _color3, _color4 );
-
-				// TODO: UVs are incorrect, v4->v3?
-
-				drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
-				clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
-
-				drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
-				clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
-
-			} else {
-
-				_color.copy( _ambientLight );
-
-				calculateLight( element.centroidModel, element.normalModel, _color );
-
-				_color.multiply( _diffuseColor ).add( _emissiveColor );
-
-				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
-
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
-
-			}
-
-		} else if ( material instanceof THREE.MeshBasicMaterial ) {
-
-			_color.copy( material.color );
-
-			if ( material.vertexColors === THREE.FaceColors ) {
-
-				_color.multiply( element.color );
-
-			}
-
-			drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
-
-			material.wireframe === true
-				? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-				: fillPath( _color );
-
-		} else if ( material instanceof THREE.MeshNormalMaterial ) {
-
-			var normal;
-
-			if ( material.shading == THREE.FlatShading ) {
-
-				normal = element.normalModelView;
-				_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
-
-				drawQuad( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _v4x, _v4y );
-
-				material.wireframe === true
-					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
-					: fillPath( _color );
-
-			} else if ( material.shading == THREE.SmoothShading ) {
-
-				normal = element.vertexNormalsModelView[ 0 ];
-				_color1.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
-
-				normal = element.vertexNormalsModelView[ 1 ];
-				_color2.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
-
-				normal = element.vertexNormalsModelView[ 3 ];
-				_color3.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
-
-				normal = element.vertexNormalsModelView[ 2 ];
-				_color4.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
-
-				_image = getGradientTexture( _color1, _color2, _color3, _color4 );
-
-				drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
-				clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
-
-				drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
-				clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
-
-			}
-
-		} else if ( material instanceof THREE.MeshDepthMaterial ) {
-
-			_near = _camera.near;
-			_far = _camera.far;
-
-			_color1.r = _color1.g = _color1.b = 1 - smoothstep( v1.positionScreen.z * v1.positionScreen.w, _near, _far );
-			_color2.r = _color2.g = _color2.b = 1 - smoothstep( v2.positionScreen.z * v2.positionScreen.w, _near, _far );
-			_color3.r = _color3.g = _color3.b = 1 - smoothstep( v4.positionScreen.z * v4.positionScreen.w, _near, _far );
-			_color4.r = _color4.g = _color4.b = 1 - smoothstep( v3.positionScreen.z * v3.positionScreen.w, _near, _far );
-
-			_image = getGradientTexture( _color1, _color2, _color3, _color4 );
-
-			// TODO: UVs are incorrect, v4->v3?
-
-			drawTriangle( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y );
-			clipImage( _v1x, _v1y, _v2x, _v2y, _v4x, _v4y, 0, 0, 1, 0, 0, 1, _image );
-
-			drawTriangle( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y );
-			clipImage( _v5x, _v5y, _v3x, _v3y, _v6x, _v6y, 1, 0, 1, 1, 0, 1, _image );
-
-		}
-
-	}
-
 	//
 
 	function drawTriangle( x0, y0, x1, y1, x2, y2 ) {
@@ -16181,17 +15999,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_context.moveTo( x0, y0 );
 		_context.lineTo( x1, y1 );
 		_context.lineTo( x2, y2 );
-		_context.closePath();
-
-	}
-
-	function drawQuad( x0, y0, x1, y1, x2, y2, x3, y3 ) {
-
-		_context.beginPath();
-		_context.moveTo( x0, y0 );
-		_context.lineTo( x1, y1 );
-		_context.lineTo( x2, y2 );
-		_context.lineTo( x3, y3 );
 		_context.closePath();
 
 	}
@@ -20225,8 +20032,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		deallocateGeometry( geometry );
 
-		_this.info.memory.geometries --;
-
 	};
 
 	var onTextureDispose = function ( event ) {
@@ -20266,9 +20071,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Buffer deallocation
 
-	var deallocateGeometry = function ( geometry ) {
-
-		geometry.__webglInit = undefined;
+	var deleteBuffers = function ( geometry ) {
 
 		if ( geometry.__webglVertexBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglVertexBuffer );
 		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
@@ -20284,42 +20087,81 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry.__webglLineBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineBuffer );
 
 		if ( geometry.__webglLineDistanceBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglLineDistanceBuffer );
+		// custom attributes
 
-		// geometry groups
+		if ( geometry.__webglCustomAttributesList !== undefined ) {
 
-		if ( geometry.geometryGroups !== undefined ) {
+			for ( var id in geometry.__webglCustomAttributesList ) {
 
-			for ( var g in geometry.geometryGroups ) {
-
-				var geometryGroup = geometry.geometryGroups[ g ];
-
-				if ( geometryGroup.numMorphTargets !== undefined ) {
-
-					for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
-
-						_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
-
-					}
-
-				}
-
-				if ( geometryGroup.numMorphNormals !== undefined ) {
-
-					for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
-
-						_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
-
-					}
-
-				}
-
-				deleteCustomAttributesBuffers( geometryGroup );
+				_gl.deleteBuffer( geometry.__webglCustomAttributesList[ id ].buffer );
 
 			}
 
 		}
 
-		deleteCustomAttributesBuffers( geometry );
+		_this.info.memory.geometries --;
+
+	};
+
+	var deallocateGeometry = function ( geometry ) {
+
+		geometry.__webglInit = undefined;
+
+		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			var attributes = geometry.attributes;
+
+			for ( var key in attributes ) {
+
+				if ( attributes[ key ].buffer !== undefined ) {
+
+					_gl.deleteBuffer( attributes[ key ].buffer );
+		
+				}
+
+			}
+
+			_this.info.memory.geometries --;
+
+		} else {
+
+			if ( geometry.geometryGroups !== undefined ) {
+
+				for ( var g in geometry.geometryGroups ) {
+
+					var geometryGroup = geometry.geometryGroups[ g ];
+
+					if ( geometryGroup.numMorphTargets !== undefined ) {
+
+						for ( var m = 0, ml = geometryGroup.numMorphTargets; m < ml; m ++ ) {
+
+							_gl.deleteBuffer( geometryGroup.__webglMorphTargetsBuffers[ m ] );
+
+						}
+
+					}
+
+					if ( geometryGroup.numMorphNormals !== undefined ) {
+
+						for ( var m = 0, ml = geometryGroup.numMorphNormals; m < ml; m ++ ) {
+
+							_gl.deleteBuffer( geometryGroup.__webglMorphNormalsBuffers[ m ] );
+
+						}
+
+					}
+
+					deleteBuffers( geometryGroup );
+
+				}
+
+			} else {
+
+				deleteBuffers( geometry );
+
+			}
+
+		}
 
 	};
 
@@ -20431,22 +20273,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	//
-
-	function deleteCustomAttributesBuffers( geometry ) {
-
-		if ( geometry.__webglCustomAttributesList ) {
-
-			for ( var id in geometry.__webglCustomAttributesList ) {
-
-				_gl.deleteBuffer( geometry.__webglCustomAttributesList[ id ].buffer );
-
-			}
-
-		}
-
-	};
-
 	// Buffer initialization
 
 	function initCustomAttributes ( geometry, object ) {
@@ -20544,11 +20370,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		var geometry = object.geometry,
 			faces3 = geometryGroup.faces3,
-			faces4 = geometryGroup.faces4,
 
-			nvertices = faces3.length * 3 + faces4.length * 4,
-			ntris     = faces3.length * 1 + faces4.length * 2,
-			nlines    = faces3.length * 3 + faces4.length * 4,
+			nvertices = faces3.length * 3,
+			ntris     = faces3.length * 1,
+			nlines    = faces3.length * 3,
 
 			material = getBufferMaterial( object, geometryGroup ),
 
@@ -20580,13 +20405,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uvType ) {
 
-			if ( geometry.faceUvs.length > 0 || geometry.faceVertexUvs.length > 0 ) {
+			if ( geometry.faceVertexUvs.length > 0 ) {
 
 				geometryGroup.__uvArray = new Float32Array( nvertices * 2 );
 
 			}
 
-			if ( geometry.faceUvs.length > 1 || geometry.faceVertexUvs.length > 1 ) {
+			if ( geometry.faceVertexUvs.length > 1 ) {
 
 				geometryGroup.__uv2Array = new Float32Array( nvertices * 2 );
 
@@ -21544,7 +21369,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		vertices = geometry.vertices,
 		chunk_faces3 = geometryGroup.faces3,
-		chunk_faces4 = geometryGroup.faces4,
 		obj_faces = geometry.faces,
 
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
@@ -21581,35 +21405,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				vertexArray[ offset + 8 ] = v3.z;
 
 				offset += 9;
-
-			}
-
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
-
-				v1 = vertices[ face.a ];
-				v2 = vertices[ face.b ];
-				v3 = vertices[ face.c ];
-				v4 = vertices[ face.d ];
-
-				vertexArray[ offset ]     = v1.x;
-				vertexArray[ offset + 1 ] = v1.y;
-				vertexArray[ offset + 2 ] = v1.z;
-
-				vertexArray[ offset + 3 ] = v2.x;
-				vertexArray[ offset + 4 ] = v2.y;
-				vertexArray[ offset + 5 ] = v2.z;
-
-				vertexArray[ offset + 6 ] = v3.x;
-				vertexArray[ offset + 7 ] = v3.y;
-				vertexArray[ offset + 8 ] = v3.z;
-
-				vertexArray[ offset + 9 ]  = v4.x;
-				vertexArray[ offset + 10 ] = v4.y;
-				vertexArray[ offset + 11 ] = v4.z;
-
-				offset += 12;
 
 			}
 
@@ -21691,84 +21486,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-					chf = chunk_faces4[ f ];
-					face = obj_faces[ chf ];
-
-					// morph positions
-
-					v1 = morphTargets[ vk ].vertices[ face.a ];
-					v2 = morphTargets[ vk ].vertices[ face.b ];
-					v3 = morphTargets[ vk ].vertices[ face.c ];
-					v4 = morphTargets[ vk ].vertices[ face.d ];
-
-					vka = morphTargetsArrays[ vk ];
-
-					vka[ offset_morphTarget ] 	  = v1.x;
-					vka[ offset_morphTarget + 1 ] = v1.y;
-					vka[ offset_morphTarget + 2 ] = v1.z;
-
-					vka[ offset_morphTarget + 3 ] = v2.x;
-					vka[ offset_morphTarget + 4 ] = v2.y;
-					vka[ offset_morphTarget + 5 ] = v2.z;
-
-					vka[ offset_morphTarget + 6 ] = v3.x;
-					vka[ offset_morphTarget + 7 ] = v3.y;
-					vka[ offset_morphTarget + 8 ] = v3.z;
-
-					vka[ offset_morphTarget + 9 ]  = v4.x;
-					vka[ offset_morphTarget + 10 ] = v4.y;
-					vka[ offset_morphTarget + 11 ] = v4.z;
-
-					// morph normals
-
-					if ( material.morphNormals ) {
-
-						if ( needsSmoothNormals ) {
-
-							faceVertexNormals = morphNormals[ vk ].vertexNormals[ chf ];
-
-							n1 = faceVertexNormals.a;
-							n2 = faceVertexNormals.b;
-							n3 = faceVertexNormals.c;
-							n4 = faceVertexNormals.d;
-
-						} else {
-
-							n1 = morphNormals[ vk ].faceNormals[ chf ];
-							n2 = n1;
-							n3 = n1;
-							n4 = n1;
-
-						}
-
-						nka = morphNormalsArrays[ vk ];
-
-						nka[ offset_morphTarget ] 	  = n1.x;
-						nka[ offset_morphTarget + 1 ] = n1.y;
-						nka[ offset_morphTarget + 2 ] = n1.z;
-
-						nka[ offset_morphTarget + 3 ] = n2.x;
-						nka[ offset_morphTarget + 4 ] = n2.y;
-						nka[ offset_morphTarget + 5 ] = n2.z;
-
-						nka[ offset_morphTarget + 6 ] = n3.x;
-						nka[ offset_morphTarget + 7 ] = n3.y;
-						nka[ offset_morphTarget + 8 ] = n3.z;
-
-						nka[ offset_morphTarget + 9 ]  = n4.x;
-						nka[ offset_morphTarget + 10 ] = n4.y;
-						nka[ offset_morphTarget + 11 ] = n4.z;
-
-					}
-
-					//
-
-					offset_morphTarget += 12;
-
-				}
-
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglMorphTargetsBuffers[ vk ] );
 				_gl.bufferData( _gl.ARRAY_BUFFER, morphTargetsArrays[ vk ], hint );
 
@@ -21835,68 +21552,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
-
-				// weights
-
-				sw1 = obj_skinWeights[ face.a ];
-				sw2 = obj_skinWeights[ face.b ];
-				sw3 = obj_skinWeights[ face.c ];
-				sw4 = obj_skinWeights[ face.d ];
-
-				skinWeightArray[ offset_skin ]     = sw1.x;
-				skinWeightArray[ offset_skin + 1 ] = sw1.y;
-				skinWeightArray[ offset_skin + 2 ] = sw1.z;
-				skinWeightArray[ offset_skin + 3 ] = sw1.w;
-
-				skinWeightArray[ offset_skin + 4 ] = sw2.x;
-				skinWeightArray[ offset_skin + 5 ] = sw2.y;
-				skinWeightArray[ offset_skin + 6 ] = sw2.z;
-				skinWeightArray[ offset_skin + 7 ] = sw2.w;
-
-				skinWeightArray[ offset_skin + 8 ]  = sw3.x;
-				skinWeightArray[ offset_skin + 9 ]  = sw3.y;
-				skinWeightArray[ offset_skin + 10 ] = sw3.z;
-				skinWeightArray[ offset_skin + 11 ] = sw3.w;
-
-				skinWeightArray[ offset_skin + 12 ] = sw4.x;
-				skinWeightArray[ offset_skin + 13 ] = sw4.y;
-				skinWeightArray[ offset_skin + 14 ] = sw4.z;
-				skinWeightArray[ offset_skin + 15 ] = sw4.w;
-
-				// indices
-
-				si1 = obj_skinIndices[ face.a ];
-				si2 = obj_skinIndices[ face.b ];
-				si3 = obj_skinIndices[ face.c ];
-				si4 = obj_skinIndices[ face.d ];
-
-				skinIndexArray[ offset_skin ]     = si1.x;
-				skinIndexArray[ offset_skin + 1 ] = si1.y;
-				skinIndexArray[ offset_skin + 2 ] = si1.z;
-				skinIndexArray[ offset_skin + 3 ] = si1.w;
-
-				skinIndexArray[ offset_skin + 4 ] = si2.x;
-				skinIndexArray[ offset_skin + 5 ] = si2.y;
-				skinIndexArray[ offset_skin + 6 ] = si2.z;
-				skinIndexArray[ offset_skin + 7 ] = si2.w;
-
-				skinIndexArray[ offset_skin + 8 ]  = si3.x;
-				skinIndexArray[ offset_skin + 9 ]  = si3.y;
-				skinIndexArray[ offset_skin + 10 ] = si3.z;
-				skinIndexArray[ offset_skin + 11 ] = si3.w;
-
-				skinIndexArray[ offset_skin + 12 ] = si4.x;
-				skinIndexArray[ offset_skin + 13 ] = si4.y;
-				skinIndexArray[ offset_skin + 14 ] = si4.z;
-				skinIndexArray[ offset_skin + 15 ] = si4.w;
-
-				offset_skin += 16;
-
-			}
-
 			if ( offset_skin > 0 ) {
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglSkinIndicesBuffer );
@@ -21948,49 +21603,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
-
-				vertexColors = face.vertexColors;
-				faceColor = face.color;
-
-				if ( vertexColors.length === 4 && vertexColorType === THREE.VertexColors ) {
-
-					c1 = vertexColors[ 0 ];
-					c2 = vertexColors[ 1 ];
-					c3 = vertexColors[ 2 ];
-					c4 = vertexColors[ 3 ];
-
-				} else {
-
-					c1 = faceColor;
-					c2 = faceColor;
-					c3 = faceColor;
-					c4 = faceColor;
-
-				}
-
-				colorArray[ offset_color ]     = c1.r;
-				colorArray[ offset_color + 1 ] = c1.g;
-				colorArray[ offset_color + 2 ] = c1.b;
-
-				colorArray[ offset_color + 3 ] = c2.r;
-				colorArray[ offset_color + 4 ] = c2.g;
-				colorArray[ offset_color + 5 ] = c2.b;
-
-				colorArray[ offset_color + 6 ] = c3.r;
-				colorArray[ offset_color + 7 ] = c3.g;
-				colorArray[ offset_color + 8 ] = c3.b;
-
-				colorArray[ offset_color + 9 ]  = c4.r;
-				colorArray[ offset_color + 10 ] = c4.g;
-				colorArray[ offset_color + 11 ] = c4.b;
-
-				offset_color += 12;
-
-			}
-
 			if ( offset_color > 0 ) {
 
 				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
@@ -22028,41 +21640,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				tangentArray[ offset_tangent + 11 ] = t3.w;
 
 				offset_tangent += 12;
-
-			}
-
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
-
-				vertexTangents = face.vertexTangents;
-
-				t1 = vertexTangents[ 0 ];
-				t2 = vertexTangents[ 1 ];
-				t3 = vertexTangents[ 2 ];
-				t4 = vertexTangents[ 3 ];
-
-				tangentArray[ offset_tangent ]     = t1.x;
-				tangentArray[ offset_tangent + 1 ] = t1.y;
-				tangentArray[ offset_tangent + 2 ] = t1.z;
-				tangentArray[ offset_tangent + 3 ] = t1.w;
-
-				tangentArray[ offset_tangent + 4 ] = t2.x;
-				tangentArray[ offset_tangent + 5 ] = t2.y;
-				tangentArray[ offset_tangent + 6 ] = t2.z;
-				tangentArray[ offset_tangent + 7 ] = t2.w;
-
-				tangentArray[ offset_tangent + 8 ]  = t3.x;
-				tangentArray[ offset_tangent + 9 ]  = t3.y;
-				tangentArray[ offset_tangent + 10 ] = t3.z;
-				tangentArray[ offset_tangent + 11 ] = t3.w;
-
-				tangentArray[ offset_tangent + 12 ] = t4.x;
-				tangentArray[ offset_tangent + 13 ] = t4.y;
-				tangentArray[ offset_tangent + 14 ] = t4.z;
-				tangentArray[ offset_tangent + 15 ] = t4.w;
-
-				offset_tangent += 16;
 
 			}
 
@@ -22110,43 +21687,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				face = obj_faces[ chunk_faces4[ f ] ];
-
-				vertexNormals = face.vertexNormals;
-				faceNormal = face.normal;
-
-				if ( vertexNormals.length === 4 && needsSmoothNormals ) {
-
-					for ( i = 0; i < 4; i ++ ) {
-
-						vn = vertexNormals[ i ];
-
-						normalArray[ offset_normal ]     = vn.x;
-						normalArray[ offset_normal + 1 ] = vn.y;
-						normalArray[ offset_normal + 2 ] = vn.z;
-
-						offset_normal += 3;
-
-					}
-
-				} else {
-
-					for ( i = 0; i < 4; i ++ ) {
-
-						normalArray[ offset_normal ]     = faceNormal.x;
-						normalArray[ offset_normal + 1 ] = faceNormal.y;
-						normalArray[ offset_normal + 2 ] = faceNormal.z;
-
-						offset_normal += 3;
-
-					}
-
-				}
-
-			}
-
 			_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglNormalBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, normalArray, hint );
 
@@ -22163,27 +21703,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( uv === undefined ) continue;
 
 				for ( i = 0; i < 3; i ++ ) {
-
-					uvi = uv[ i ];
-
-					uvArray[ offset_uv ]     = uvi.x;
-					uvArray[ offset_uv + 1 ] = uvi.y;
-
-					offset_uv += 2;
-
-				}
-
-			}
-
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				fi = chunk_faces4[ f ];
-
-				uv = obj_uvs[ fi ];
-
-				if ( uv === undefined ) continue;
-
-				for ( i = 0; i < 4; i ++ ) {
 
 					uvi = uv[ i ];
 
@@ -22216,27 +21735,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				if ( uv2 === undefined ) continue;
 
 				for ( i = 0; i < 3; i ++ ) {
-
-					uv2i = uv2[ i ];
-
-					uv2Array[ offset_uv2 ]     = uv2i.x;
-					uv2Array[ offset_uv2 + 1 ] = uv2i.y;
-
-					offset_uv2 += 2;
-
-				}
-
-			}
-
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				fi = chunk_faces4[ f ];
-
-				uv2 = obj_uvs2[ fi ];
-
-				if ( uv2 === undefined ) continue;
-
-				for ( i = 0; i < 4; i ++ ) {
 
 					uv2i = uv2[ i ];
 
@@ -22283,36 +21781,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-				faceArray[ offset_face ]     = vertexIndex;
-				faceArray[ offset_face + 1 ] = vertexIndex + 1;
-				faceArray[ offset_face + 2 ] = vertexIndex + 3;
-
-				faceArray[ offset_face + 3 ] = vertexIndex + 1;
-				faceArray[ offset_face + 4 ] = vertexIndex + 2;
-				faceArray[ offset_face + 5 ] = vertexIndex + 3;
-
-				offset_face += 6;
-
-				lineArray[ offset_line ]     = vertexIndex;
-				lineArray[ offset_line + 1 ] = vertexIndex + 1;
-
-				lineArray[ offset_line + 2 ] = vertexIndex;
-				lineArray[ offset_line + 3 ] = vertexIndex + 3;
-
-				lineArray[ offset_line + 4 ] = vertexIndex + 1;
-				lineArray[ offset_line + 5 ] = vertexIndex + 2;
-
-				lineArray[ offset_line + 6 ] = vertexIndex + 2;
-				lineArray[ offset_line + 7 ] = vertexIndex + 3;
-
-				offset_line += 8;
-
-				vertexIndex += 4;
-
-			}
-
 			_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
 			_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, faceArray, hint );
 
@@ -22348,19 +21816,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							face = obj_faces[ chunk_faces4[ f ] ];
-
-							customAttribute.array[ offset_custom ] 	   = customAttribute.value[ face.a ];
-							customAttribute.array[ offset_custom + 1 ] = customAttribute.value[ face.b ];
-							customAttribute.array[ offset_custom + 2 ] = customAttribute.value[ face.c ];
-							customAttribute.array[ offset_custom + 3 ] = customAttribute.value[ face.d ];
-
-							offset_custom += 4;
-
-						}
-
 					} else if ( customAttribute.boundTo === "faces" ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
@@ -22372,19 +21827,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 2 ] = value;
 
 							offset_custom += 3;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							value = customAttribute.value[ chunk_faces4[ f ] ];
-
-							customAttribute.array[ offset_custom ] 	   = value;
-							customAttribute.array[ offset_custom + 1 ] = value;
-							customAttribute.array[ offset_custom + 2 ] = value;
-							customAttribute.array[ offset_custom + 3 ] = value;
-
-							offset_custom += 4;
 
 						}
 
@@ -22415,31 +21857,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							face = obj_faces[ chunk_faces4[ f ] ];
-
-							v1 = customAttribute.value[ face.a ];
-							v2 = customAttribute.value[ face.b ];
-							v3 = customAttribute.value[ face.c ];
-							v4 = customAttribute.value[ face.d ];
-
-							customAttribute.array[ offset_custom ] 	   = v1.x;
-							customAttribute.array[ offset_custom + 1 ] = v1.y;
-
-							customAttribute.array[ offset_custom + 2 ] = v2.x;
-							customAttribute.array[ offset_custom + 3 ] = v2.y;
-
-							customAttribute.array[ offset_custom + 4 ] = v3.x;
-							customAttribute.array[ offset_custom + 5 ] = v3.y;
-
-							customAttribute.array[ offset_custom + 6 ] = v4.x;
-							customAttribute.array[ offset_custom + 7 ] = v4.y;
-
-							offset_custom += 8;
-
-						}
-
 					} else if ( customAttribute.boundTo === "faces" ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
@@ -22460,31 +21877,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 5 ] = v3.y;
 
 							offset_custom += 6;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							value = customAttribute.value[ chunk_faces4[ f ] ];
-
-							v1 = value;
-							v2 = value;
-							v3 = value;
-							v4 = value;
-
-							customAttribute.array[ offset_custom ] 	   = v1.x;
-							customAttribute.array[ offset_custom + 1 ] = v1.y;
-
-							customAttribute.array[ offset_custom + 2 ] = v2.x;
-							customAttribute.array[ offset_custom + 3 ] = v2.y;
-
-							customAttribute.array[ offset_custom + 4 ] = v3.x;
-							customAttribute.array[ offset_custom + 5 ] = v3.y;
-
-							customAttribute.array[ offset_custom + 6 ] = v4.x;
-							customAttribute.array[ offset_custom + 7 ] = v4.y;
-
-							offset_custom += 8;
 
 						}
 
@@ -22530,35 +21922,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							face = obj_faces[ chunk_faces4[ f ] ];
-
-							v1 = customAttribute.value[ face.a ];
-							v2 = customAttribute.value[ face.b ];
-							v3 = customAttribute.value[ face.c ];
-							v4 = customAttribute.value[ face.d ];
-
-							customAttribute.array[ offset_custom  ] 	= v1[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 1  ] = v1[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 2  ] = v1[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 3  ] = v2[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 4  ] = v2[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 5  ] = v2[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 6  ] = v3[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 7  ] = v3[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 8  ] = v3[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 9  ] = v4[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 10 ] = v4[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
-
-							offset_custom += 12;
-
-						}
-
 					} else if ( customAttribute.boundTo === "faces" ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
@@ -22585,35 +21948,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							value = customAttribute.value[ chunk_faces4[ f ] ];
-
-							v1 = value;
-							v2 = value;
-							v3 = value;
-							v4 = value;
-
-							customAttribute.array[ offset_custom  ] 	= v1[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 1  ] = v1[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 2  ] = v1[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 3  ] = v2[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 4  ] = v2[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 5  ] = v2[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 6  ] = v3[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 7  ] = v3[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 8  ] = v3[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 9  ] = v4[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 10 ] = v4[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
-
-							offset_custom += 12;
-
-						}
-
 					} else if ( customAttribute.boundTo === "faceVertices" ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
@@ -22637,35 +21971,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 8 ] = v3[ pp[ 2 ] ];
 
 							offset_custom += 9;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							value = customAttribute.value[ chunk_faces4[ f ] ];
-
-							v1 = value[ 0 ];
-							v2 = value[ 1 ];
-							v3 = value[ 2 ];
-							v4 = value[ 3 ];
-
-							customAttribute.array[ offset_custom  ] 	= v1[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 1  ] = v1[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 2  ] = v1[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 3  ] = v2[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 4  ] = v2[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 5  ] = v2[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 6  ] = v3[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 7  ] = v3[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 8  ] = v3[ pp[ 2 ] ];
-
-							customAttribute.array[ offset_custom + 9  ] = v4[ pp[ 0 ] ];
-							customAttribute.array[ offset_custom + 10 ] = v4[ pp[ 1 ] ];
-							customAttribute.array[ offset_custom + 11 ] = v4[ pp[ 2 ] ];
-
-							offset_custom += 12;
 
 						}
 
@@ -22702,39 +22007,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							face = obj_faces[ chunk_faces4[ f ] ];
-
-							v1 = customAttribute.value[ face.a ];
-							v2 = customAttribute.value[ face.b ];
-							v3 = customAttribute.value[ face.c ];
-							v4 = customAttribute.value[ face.d ];
-
-							customAttribute.array[ offset_custom  ] 	= v1.x;
-							customAttribute.array[ offset_custom + 1  ] = v1.y;
-							customAttribute.array[ offset_custom + 2  ] = v1.z;
-							customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-							customAttribute.array[ offset_custom + 4  ] = v2.x;
-							customAttribute.array[ offset_custom + 5  ] = v2.y;
-							customAttribute.array[ offset_custom + 6  ] = v2.z;
-							customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-							customAttribute.array[ offset_custom + 8  ] = v3.x;
-							customAttribute.array[ offset_custom + 9  ] = v3.y;
-							customAttribute.array[ offset_custom + 10 ] = v3.z;
-							customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-							customAttribute.array[ offset_custom + 12 ] = v4.x;
-							customAttribute.array[ offset_custom + 13 ] = v4.y;
-							customAttribute.array[ offset_custom + 14 ] = v4.z;
-							customAttribute.array[ offset_custom + 15 ] = v4.w;
-
-							offset_custom += 16;
-
-						}
-
 					} else if ( customAttribute.boundTo === "faces" ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
@@ -22764,39 +22036,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							value = customAttribute.value[ chunk_faces4[ f ] ];
-
-							v1 = value;
-							v2 = value;
-							v3 = value;
-							v4 = value;
-
-							customAttribute.array[ offset_custom  ] 	= v1.x;
-							customAttribute.array[ offset_custom + 1  ] = v1.y;
-							customAttribute.array[ offset_custom + 2  ] = v1.z;
-							customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-							customAttribute.array[ offset_custom + 4  ] = v2.x;
-							customAttribute.array[ offset_custom + 5  ] = v2.y;
-							customAttribute.array[ offset_custom + 6  ] = v2.z;
-							customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-							customAttribute.array[ offset_custom + 8  ] = v3.x;
-							customAttribute.array[ offset_custom + 9  ] = v3.y;
-							customAttribute.array[ offset_custom + 10 ] = v3.z;
-							customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-							customAttribute.array[ offset_custom + 12 ] = v4.x;
-							customAttribute.array[ offset_custom + 13 ] = v4.y;
-							customAttribute.array[ offset_custom + 14 ] = v4.z;
-							customAttribute.array[ offset_custom + 15 ] = v4.w;
-
-							offset_custom += 16;
-
-						}
-
 					} else if ( customAttribute.boundTo === "faceVertices" ) {
 
 						for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
@@ -22823,39 +22062,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 							customAttribute.array[ offset_custom + 11 ] = v3.w;
 
 							offset_custom += 12;
-
-						}
-
-						for ( f = 0, fl = chunk_faces4.length; f < fl; f ++ ) {
-
-							value = customAttribute.value[ chunk_faces4[ f ] ];
-
-							v1 = value[ 0 ];
-							v2 = value[ 1 ];
-							v3 = value[ 2 ];
-							v4 = value[ 3 ];
-
-							customAttribute.array[ offset_custom  ] 	= v1.x;
-							customAttribute.array[ offset_custom + 1  ] = v1.y;
-							customAttribute.array[ offset_custom + 2  ] = v1.z;
-							customAttribute.array[ offset_custom + 3  ] = v1.w;
-
-							customAttribute.array[ offset_custom + 4  ] = v2.x;
-							customAttribute.array[ offset_custom + 5  ] = v2.y;
-							customAttribute.array[ offset_custom + 6  ] = v2.z;
-							customAttribute.array[ offset_custom + 7  ] = v2.w;
-
-							customAttribute.array[ offset_custom + 8  ] = v3.x;
-							customAttribute.array[ offset_custom + 9  ] = v3.y;
-							customAttribute.array[ offset_custom + 10 ] = v3.z;
-							customAttribute.array[ offset_custom + 11 ] = v3.w;
-
-							customAttribute.array[ offset_custom + 12 ] = v4.x;
-							customAttribute.array[ offset_custom + 13 ] = v4.y;
-							customAttribute.array[ offset_custom + 14 ] = v4.z;
-							customAttribute.array[ offset_custom + 15 ] = v4.w;
-
-							offset_custom += 16;
 
 						}
 
@@ -23074,19 +22280,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					if ( updateBuffers ) {
 
-						for ( attributeName in geometryAttributes ) {
-
-							if ( attributeName === 'index' ) continue;
+						for ( attributeName in programAttributes ) {
 
 							attributePointer = programAttributes[ attributeName ];
 							attributeItem = geometryAttributes[ attributeName ];
-							attributeSize = attributeItem.itemSize;
 
 							if ( attributePointer >= 0 ) {
 
-								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-								enableAttribute( attributePointer );
-								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+								if ( attributeItem ) {
+
+									attributeSize = attributeItem.itemSize;
+									_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+									enableAttribute( attributePointer );
+									_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+
+								} else if ( material.defaultAttributeValues ) {
+
+									if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+
+										_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+									} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+
+										_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+									}
+
+								}
 
 							}
 
@@ -23114,19 +22334,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( updateBuffers ) {
 
-					for ( attributeName in geometryAttributes ) {
+					for ( attributeName in programAttributes ) {
 
 						if ( attributeName === 'index') continue;
 
 						attributePointer = programAttributes[ attributeName ];
 						attributeItem = geometryAttributes[ attributeName ];
-						attributeSize = attributeItem.itemSize;
-
+						
 						if ( attributePointer >= 0 ) {
 
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-							enableAttribute( attributePointer );
-							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+							if ( attributeItem ) {
+
+								attributeSize = attributeItem.itemSize;
+								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+								enableAttribute( attributePointer );
+								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+
+							} else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+
+								if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+
+									_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+								} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+
+									_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+								}
+
+							}
 
 						}
 
@@ -23152,17 +22388,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
-				for ( attributeName in geometryAttributes ) {
+				for ( attributeName in programAttributes ) {
 
 					attributePointer = programAttributes[ attributeName ];
 					attributeItem = geometryAttributes[ attributeName ];
-					attributeSize = attributeItem.itemSize;
-
+					
 					if ( attributePointer >= 0 ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-						enableAttribute( attributePointer );
-						_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+						if ( attributeItem ) {
+
+							attributeSize = attributeItem.itemSize;
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+							enableAttribute( attributePointer );
+							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+
+						} else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+
+							if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+
+								_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+							} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+
+								_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+							}
+
+						}
 
 					}
 
@@ -23183,17 +22435,33 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( updateBuffers ) {
 
-				for ( attributeName in geometryAttributes ) {
+				for ( attributeName in programAttributes ) {
 
 					attributePointer = programAttributes[ attributeName ];
 					attributeItem = geometryAttributes[ attributeName ];
-					attributeSize = attributeItem.itemSize;
-
+					
 					if ( attributePointer >= 0 ) {
 
-						_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-						enableAttribute( attributePointer );
-						_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+						if ( attributeItem ) {
+
+							attributeSize = attributeItem.itemSize;
+							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+							enableAttribute( attributePointer );
+							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+
+						} else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+
+							if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+
+								_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+							} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+
+								_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+							}
+
+						}
 
 					}
 
@@ -23297,9 +22565,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.color >= 0 ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
-				enableAttribute( attributes.color );
-				_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+				if ( object.geometry.colors.length > 0 || object.geometry.faces.length > 0 ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
+					enableAttribute( attributes.color );
+					_gl.vertexAttribPointer( attributes.color, 3, _gl.FLOAT, false, 0, 0 );
+
+				} else if ( material.defaultAttributeValues ) {
+
+
+					_gl.vertexAttrib3fv( attributes.color, material.defaultAttributeValues.color );
+
+				}
 
 			}
 
@@ -23327,17 +22604,35 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.uv >= 0 ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBuffer );
-				enableAttribute( attributes.uv );
-				_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+				if ( object.geometry.faceVertexUvs[0] ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBuffer );
+					enableAttribute( attributes.uv );
+					_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
+
+				} else if ( material.defaultAttributeValues ) {
+
+
+					_gl.vertexAttrib2fv( attributes.uv, material.defaultAttributeValues.uv );
+
+				}
 
 			}
 
 			if ( attributes.uv2 >= 0 ) {
 
-				_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUV2Buffer );
-				enableAttribute( attributes.uv2 );
-				_gl.vertexAttribPointer( attributes.uv2, 2, _gl.FLOAT, false, 0, 0 );
+				if ( object.geometry.faceVertexUvs[1] ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUV2Buffer );
+					enableAttribute( attributes.uv2 );
+					_gl.vertexAttribPointer( attributes.uv2, 2, _gl.FLOAT, false, 0, 0 );
+
+				} else if ( material.defaultAttributeValues ) {
+
+
+					_gl.vertexAttrib2fv( attributes.uv2, material.defaultAttributeValues.uv2 );
+
+				}
 
 			}
 
@@ -24060,11 +23355,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
-				geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+				geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
 
 			}
 
-			vertices = face instanceof THREE.Face3 ? 3 : 4;
+			vertices = 3;
 
 			if ( geometry.geometryGroups[ groupHash ].vertices + vertices > 65535 ) {
 
@@ -24073,22 +23368,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups[ groupHash ] === undefined ) {
 
-					geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'faces4': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
+					geometry.geometryGroups[ groupHash ] = { 'faces3': [], 'materialIndex': materialIndex, 'vertices': 0, 'numMorphTargets': numMorphTargets, 'numMorphNormals': numMorphNormals };
 
 				}
 
 			}
 
-			if ( face instanceof THREE.Face3 ) {
-
-				geometry.geometryGroups[ groupHash ].faces3.push( f );
-
-			} else {
-
-				geometry.geometryGroups[ groupHash ].faces4.push( f );
-
-			}
-
+			geometry.geometryGroups[ groupHash ].faces3.push( f );
 			geometry.geometryGroups[ groupHash ].vertices += vertices;
 
 		}
@@ -24638,7 +23924,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		};
 
-		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters );
+		material.program = buildProgram( shaderID, material.fragmentShader, material.vertexShader, material.uniforms, material.attributes, material.defines, parameters, material.index0AttributeName );
 
 		var attributes = material.program.attributes;
 
@@ -25878,7 +25164,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Shaders
 
-	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters ) {
+	function buildProgram ( shaderID, fragmentShader, vertexShader, uniforms, attributes, defines, parameters, index0AttributeName ) {
 
 		var p, pl, d, program, code;
 		var chunks = [];
@@ -25955,6 +25241,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var prefix_vertex = [
 
 			"precision " + _precision + " float;",
+			"precision " + _precision + " int;",
 
 			customDefines,
 
@@ -26057,6 +25344,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		var prefix_fragment = [
 
 			"precision " + _precision + " float;",
+			"precision " + _precision + " int;",
 
 			( parameters.bumpMap || parameters.normalMap ) ? "#extension GL_OES_standard_derivatives : enable" : "",
 
@@ -26109,12 +25397,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
 
+		//Force a particular attribute to index 0.
+		// because potentially expensive emulation is done by browser if attribute 0 is disabled.
+		//And, color, for example is often automatically bound to index 0 so disabling it
+		if ( index0AttributeName ) {
+			_gl.bindAttribLocation( program, 0, index0AttributeName );
+		}
+
 		_gl.linkProgram( program );
 
 		if ( !_gl.getProgramParameter( program, _gl.LINK_STATUS ) ) {
 
 			console.error( "Could not initialise shader\n" + "VALIDATE_STATUS: " + _gl.getProgramParameter( program, _gl.VALIDATE_STATUS ) + ", gl error [" + _gl.getError() + "]" );
-
+			console.error( "Program Info Log: " + _gl.getProgramInfoLog( program ) );
 		}
 
 		// clean up
@@ -26912,7 +26207,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		try {
 
-			if ( ! ( _gl = _canvas.getContext( 'experimental-webgl', { alpha: _alpha, premultipliedAlpha: _premultipliedAlpha, antialias: _antialias, stencil: _stencil, preserveDrawingBuffer: _preserveDrawingBuffer } ) ) ) {
+			var attributes = {
+				alpha: _alpha,
+				premultipliedAlpha: _premultipliedAlpha,
+				antialias: _antialias,
+				stencil: _stencil,
+				preserveDrawingBuffer: _preserveDrawingBuffer
+			};
+
+			_gl = _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+
+			if ( _gl === null ) {
 
 				throw 'Error creating WebGL context.';
 
@@ -27147,36 +26452,6 @@ THREE.RenderableFace3 = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.RenderableFace4 = function () {
-
-	this.id = 0;
-
-	this.v1 = new THREE.RenderableVertex();
-	this.v2 = new THREE.RenderableVertex();
-	this.v3 = new THREE.RenderableVertex();
-	this.v4 = new THREE.RenderableVertex();
-
-	this.centroidModel = new THREE.Vector3();
-
-	this.normalModel = new THREE.Vector3();
-	this.normalModelView = new THREE.Vector3();
-
-	this.vertexNormalsLength = 0;
-	this.vertexNormalsModel = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-	this.vertexNormalsModelView = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-	this.color = null;
-	this.material = null;
-	this.uvs = [[]];
-
-	this.z = 0;
-
-};
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 THREE.RenderableObject = function () {
 
 	this.id = 0;
@@ -27281,16 +26556,7 @@ THREE.GeometryUtils = {
 			faceVertexNormals = face.vertexNormals,
 			faceVertexColors = face.vertexColors;
 
-			if ( face instanceof THREE.Face3 ) {
-
-				faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				faceCopy = new THREE.Face4( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset, face.d + vertexOffset );
-
-			}
-
+			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
 
 			if ( normalMatrix ) {
@@ -27354,29 +26620,6 @@ THREE.GeometryUtils = {
 
 	},
 
-	removeMaterials: function ( geometry, materialIndexArray ) {
-
-		var materialIndexMap = {};
-
-		for ( var i = 0, il = materialIndexArray.length; i < il; i ++ ) {
-
-			materialIndexMap[ materialIndexArray[i] ] = true;
-
-		}
-
-		var face, newFaces = [];
-
-		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
-
-			face = geometry.faces[ i ];
-			if ( ! ( face.materialIndex in materialIndexMap ) ) newFaces.push( face );
-
-		}
-
-		geometry.faces = newFaces;
-
-	},
-
 	// Get random point in triangle (via barycentric coordinates)
 	// 	(uniform distribution)
 	// 	http://www.cgafaq.info/wiki/Random_Point_In_Triangle
@@ -27427,60 +26670,11 @@ THREE.GeometryUtils = {
 
 		var vA, vB, vC, vD;
 
-		if ( face instanceof THREE.Face3 ) {
+		vA = geometry.vertices[ face.a ];
+		vB = geometry.vertices[ face.b ];
+		vC = geometry.vertices[ face.c ];
 
-			vA = geometry.vertices[ face.a ];
-			vB = geometry.vertices[ face.b ];
-			vC = geometry.vertices[ face.c ];
-
-			return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
-
-		} else if ( face instanceof THREE.Face4 ) {
-
-			vA = geometry.vertices[ face.a ];
-			vB = geometry.vertices[ face.b ];
-			vC = geometry.vertices[ face.c ];
-			vD = geometry.vertices[ face.d ];
-
-			var area1, area2;
-
-			if ( useCachedAreas ) {
-
-				if ( face._area1 && face._area2 ) {
-
-					area1 = face._area1;
-					area2 = face._area2;
-
-				} else {
-
-					area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
-					area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-					face._area1 = area1;
-					face._area2 = area2;
-
-				}
-
-			} else {
-
-				area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD ),
-				area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-			}
-
-			var r = THREE.Math.random16() * ( area1 + area2 );
-
-			if ( r < area1 ) {
-
-				return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vD );
-
-			} else {
-
-				return THREE.GeometryUtils.randomPointInTriangle( vB, vC, vD );
-
-			}
-
-		}
+		return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 	},
 
@@ -27506,27 +26700,11 @@ THREE.GeometryUtils = {
 
 			face = faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+			vA = vertices[ face.a ];
+			vB = vertices[ face.b ];
+			vC = vertices[ face.c ];
 
-				vA = vertices[ face.a ];
-				vB = vertices[ face.b ];
-				vC = vertices[ face.c ];
-
-				face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				vA = vertices[ face.a ];
-				vB = vertices[ face.b ];
-				vC = vertices[ face.c ];
-				vD = vertices[ face.d ];
-
-				face._area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
-				face._area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-				face._area = face._area1 + face._area2;
-
-			}
+			face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
 
 			totalArea += face._area;
 
@@ -27645,14 +26823,7 @@ THREE.GeometryUtils = {
 		var i, il, j, jl;
 
 		var faces = [];
-		var faceUvs = [];
 		var faceVertexUvs = [];
-
-		for ( i = 0, il = geometry.faceUvs.length; i < il; i ++ ) {
-
-			faceUvs[ i ] = [];
-
-		}
 
 		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
@@ -27664,98 +26835,17 @@ THREE.GeometryUtils = {
 
 			var face = geometry.faces[ i ];
 
-			if ( face instanceof THREE.Face4 ) {
+			faces.push( face );
 
-				var a = face.a;
-				var b = face.b;
-				var c = face.c;
-				var d = face.d;
+			for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
-				var triA = new THREE.Face3();
-				var triB = new THREE.Face3();
-
-				triA.color.copy( face.color );
-				triB.color.copy( face.color );
-
-				triA.materialIndex = face.materialIndex;
-				triB.materialIndex = face.materialIndex;
-
-				triA.a = a;
-				triA.b = b;
-				triA.c = d;
-
-				triB.a = b;
-				triB.b = c;
-				triB.c = d;
-
-				if ( face.vertexColors.length === 4 ) {
-
-					triA.vertexColors[ 0 ] = face.vertexColors[ 0 ].clone();
-					triA.vertexColors[ 1 ] = face.vertexColors[ 1 ].clone();
-					triA.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
-
-					triB.vertexColors[ 0 ] = face.vertexColors[ 1 ].clone();
-					triB.vertexColors[ 1 ] = face.vertexColors[ 2 ].clone();
-					triB.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
-
-				}
-
-				faces.push( triA, triB );
-
-				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-					if ( geometry.faceVertexUvs[ j ].length ) {
-
-						var uvs = geometry.faceVertexUvs[ j ][ i ];
-
-						var uvA = uvs[ 0 ];
-						var uvB = uvs[ 1 ];
-						var uvC = uvs[ 2 ];
-						var uvD = uvs[ 3 ];
-
-						var uvsTriA = [ uvA.clone(), uvB.clone(), uvD.clone() ];
-						var uvsTriB = [ uvB.clone(), uvC.clone(), uvD.clone() ];
-
-						faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
-
-					}
-
-				}
-
-				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-					if ( geometry.faceUvs[ j ].length ) {
-
-						var faceUv = geometry.faceUvs[ j ][ i ];
-
-						faceUvs[ j ].push( faceUv, faceUv );
-
-					}
-
-				}
-
-			} else {
-
-				faces.push( face );
-
-				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-					faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
-
-				}
-
-				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
-
-				}
+				faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
 
 			}
 
 		}
 
 		geometry.faces = faces;
-		geometry.faceUvs = faceUvs;
 		geometry.faceVertexUvs = faceVertexUvs;
 
 		geometry.computeCentroids();
@@ -27764,21 +26854,7 @@ THREE.GeometryUtils = {
 
 		if ( geometry.hasTangents ) geometry.computeTangents();
 
-	},
-
-	setMaterialIndex: function ( geometry, index, startFace, endFace ){
-
-		var faces = geometry.faces;
-		var start = startFace || 0;
-		var end = endFace || faces.length - 1;
-
-		for ( var i = start; i <= end; i ++ ) {
-
-			faces[i].materialIndex = index;
-
-		}
-
-    }
+	}
 
 };
 
@@ -28809,7 +27885,7 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 			cCROSSap = cX*apy - cY*apx;
 			bCROSScp = bX*cpy - bY*cpx;
 
-			if ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) ) return false;
+			if ( (aCROSSbp >= -EPSILON) && (bCROSScp >= -EPSILON) && (cCROSSap >= -EPSILON) ) return false;
 
 		}
 
@@ -32565,18 +31641,26 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				var d = ( ix + 1 ) + gridX1 * iy;
 
-				var face = new THREE.Face4( a + offset, b + offset, c + offset, d + offset );
+				var uva = new THREE.Vector2( ix / gridX, 1 - iy / gridY );
+				var uvb = new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY );
+				var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iy + 1 ) / gridY );
+				var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY );
+
+				var face = new THREE.Face3( a + offset, b + offset, d + offset );
 				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
+				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [
-							new THREE.Vector2( ix / gridX, 1 - iy / gridY ),
-							new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY ),
-							new THREE.Vector2( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
-							new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY )
-						] );
+				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+				face = new THREE.Face3( b + offset, c + offset, d + offset );
+				face.normal.copy( normal );
+				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+				face.materialIndex = materialIndex;
+
+				scope.faces.push( face );
+				scope.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
 
 			}
 
@@ -32678,8 +31762,11 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 			var uv3 = uvs[ y + 1 ][ x + 1 ].clone();
 			var uv4 = uvs[ y ][ x + 1 ].clone();
 
-			this.faces.push( new THREE.Face4( v1, v2, v3, v4, [ n1, n2, n3, n4 ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3, uv4 ] );
+			this.faces.push( new THREE.Face3( v1, v2, v4, [ n1, n2, n4 ] ) );
+			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
+
+			this.faces.push( new THREE.Face3( v2, v3, v4, [ n2, n3, n4 ] ) );
+			this.faceVertexUvs[ 0 ].push( [ uv2, uv3, uv4 ] );
 
 		}
 
@@ -33399,11 +32486,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
+ 		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+ 		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
  		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
  		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+
+ 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+ 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
 
 	}
 
@@ -33675,21 +32765,31 @@ THREE.LatheGeometry = function ( points, segments, phiStart, phiLength ) {
 			var c = base + 1 + np;
 			var d = base + 1;
 
-			this.faces.push( new THREE.Face4( a, b, c, d ) );
-
 			var u0 = i * inverseSegments;
 			var v0 = j * inversePointLength;
 			var u1 = u0 + inverseSegments;
 			var v1 = v0 + inversePointLength;
 
+			this.faces.push( new THREE.Face3( a, b, d ) );
+
 			this.faceVertexUvs[ 0 ].push( [
 
-				new THREE.Vector2( u0, v0 ), 
+				new THREE.Vector2( u0, v0 ),
+				new THREE.Vector2( u1, v0 ),
+				new THREE.Vector2( u0, v1 )
+
+			] );
+
+			this.faces.push( new THREE.Face3( b, c, d ) );
+
+			this.faceVertexUvs[ 0 ].push( [
+
 				new THREE.Vector2( u1, v0 ),
 				new THREE.Vector2( u1, v1 ),
 				new THREE.Vector2( u0, v1 )
 
 			] );
+
 
 		}
 
@@ -33756,17 +32856,24 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 			var c = ( ix + 1 ) + gridX1 * ( iz + 1 );
 			var d = ( ix + 1 ) + gridX1 * iz;
 
-			var face = new THREE.Face4( a, b, c, d );
+			var uva = new THREE.Vector2( ix / gridX, 1 - iz / gridZ );
+			var uvb = new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ );
+			var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ );
+
+			var face = new THREE.Face3( a, b, d );
 			face.normal.copy( normal );
-			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
 			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [
-				new THREE.Vector2( ix / gridX, 1 - iz / gridZ ),
-				new THREE.Vector2( ix / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iz + 1 ) / gridZ ),
-				new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iz / gridZ )
-			] );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+			face = new THREE.Face3( b, c, d );
+			face.normal.copy( normal );
+			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+
+			this.faces.push( face );
+			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
 
 		}
 
@@ -33930,8 +33037,11 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 
 			} else {
 
-				this.faces.push( new THREE.Face4( v1, v2, v3, v4, [ n1, n2, n3, n4 ] ) );
-				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3, uv4 ] );
+				this.faces.push( new THREE.Face3( v1, v2, v4, [ n1, n2, n4 ] ) );
+				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
+
+				this.faces.push( new THREE.Face3( v2, v3, v4, [ n2, n3, n4 ] ) );
+				this.faceVertexUvs[ 0 ].push( [ uv2, uv3, uv4 ] );
 
 			}
 
@@ -34061,8 +33171,17 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 			var c = ( this.tubularSegments + 1 ) * ( j - 1 ) + i;
 			var d = ( this.tubularSegments + 1 ) * j + i;
 
-			var face = new THREE.Face4( a, b, c, d, [ normals[ a ], normals[ b ], normals[ c ], normals[ d ] ] );
+			var face = new THREE.Face3( a, b, d, [ normals[ a ], normals[ b ], normals[ d ] ] );
 			face.normal.add( normals[ a ] );
+			face.normal.add( normals[ b ] );
+			face.normal.add( normals[ d ] );
+			face.normal.normalize();
+
+			this.faces.push( face );
+
+			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ d ].clone() ] );
+
+			face = new THREE.Face3( b, c, d, [ normals[ b ], normals[ c ], normals[ d ] ] );
 			face.normal.add( normals[ b ] );
 			face.normal.add( normals[ c ] );
 			face.normal.add( normals[ d ] );
@@ -34070,7 +33189,7 @@ THREE.TorusGeometry = function ( radius, tube, radialSegments, tubularSegments, 
 
 			this.faces.push( face );
 
-			this.faceVertexUvs[ 0 ].push( [ uvs[ a ].clone(), uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ b ].clone(), uvs[ c ].clone(), uvs[ d ].clone() ] );
 		}
 
 	}
@@ -34153,8 +33272,11 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 			var uvc = new THREE.Vector2( ( i + 1 ) / this.radialSegments, ( j + 1 ) / this.tubularSegments );
 			var uvd = new THREE.Vector2( i / this.radialSegments, ( j + 1 ) / this.tubularSegments );
 
-			this.faces.push( new THREE.Face4( a, b, c, d ) );
-			this.faceVertexUvs[ 0 ].push( [ uva,uvb,uvc, uvd ] );
+			this.faces.push( new THREE.Face3( a, b, d ) );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+			this.faces.push( new THREE.Face3( b, c, d ) );
+			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
 
 		}
 	}
@@ -34294,8 +33416,11 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 			uvc = new THREE.Vector2( ( i + 1 ) / this.segments, ( j + 1 ) / this.radialSegments );
 			uvd = new THREE.Vector2( i / this.segments, ( j + 1 ) / this.radialSegments );
 
-			this.faces.push( new THREE.Face4( a, b, c, d ) );
-			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvc, uvd ] );
+			this.faces.push( new THREE.Face3( a, b, d ) );
+			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+			this.faces.push( new THREE.Face3( b, c, d ) );
+			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
 
 		}
 	}
@@ -34752,19 +33877,17 @@ THREE.TetrahedronGeometry.prototype = Object.create( THREE.Geometry.prototype );
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  *
- * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements, useTris );
+ * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements );
  *
  */
 
-THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
+THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 	THREE.Geometry.call( this );
 
 	var verts = this.vertices;
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
-
-	useTris = (useTris === undefined) ? false : useTris;
 
 	var i, il, j, p;
 	var u, v;
@@ -34795,28 +33918,19 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 
 			a = i * sliceCount + j;
 			b = i * sliceCount + j + 1;
-			c = (i + 1) * sliceCount + j;
-			d = (i + 1) * sliceCount + j + 1;
+			c = (i + 1) * sliceCount + j + 1;
+			d = (i + 1) * sliceCount + j;
 
 			uva = new THREE.Vector2( j / slices, i / stacks );
 			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvc = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvd = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
 
-			if ( useTris ) {
+			faces.push( new THREE.Face3( a, b, d ) );
+			uvs.push( [ uva, uvb, uvd ] );
 
-				faces.push( new THREE.Face3( a, b, c ) );
-				faces.push( new THREE.Face3( b, d, c ) );
-
-				uvs.push( [ uva, uvb, uvc ] );
-				uvs.push( [ uvb, uvd, uvc ] );
-
-			} else {
-
-				faces.push( new THREE.Face4( a, b, d, c ) );
-				uvs.push( [ uva, uvb, uvd, uvc ] );
-
-			}
+			faces.push( new THREE.Face3( b, c, d ) );
+			uvs.push( [ uvb, uvc, uvd ] );
 
 		}
 
@@ -35594,6 +34708,7 @@ THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 THREE.SpotLightHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
+	var vector2 = new THREE.Vector3();
 
 	return function () {
 
@@ -35602,11 +34717,14 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		this.cone.lookAt( vector.getPositionFromMatrix( this.light.matrixWorld ).negate() );
+		vector.getPositionFromMatrix( this.light.matrixWorld );
+		vector2.getPositionFromMatrix( this.light.target.matrixWorld );
+
+		this.cone.lookAt( vector2.sub( vector ) );
 
 		this.cone.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	}
+	};
 
 }();
 
@@ -35826,12 +34944,11 @@ THREE.WireframeHelper = function ( object ) {
 	for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
 		var face = faces[ i ];
-		var length = face instanceof THREE.Face4 ? 4 : 3;
 
-		for ( var j = 0; j < length; j ++ ) {
+		for ( var j = 0; j < 3; j ++ ) {
 
 			edge[ 0 ] = face[ keys[ j ] ];
-			edge[ 1 ] = face[ keys[ ( j + 1 ) % length ] ];
+			edge[ 1 ] = face[ keys[ ( j + 1 ) % 3 ] ];
 			edge.sort( sortFunction );
 
 			var key = edge.toString();

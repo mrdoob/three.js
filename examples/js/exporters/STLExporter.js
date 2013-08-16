@@ -41,22 +41,10 @@ THREE.STLExporter.prototype = {
 			for (j = 0; j < geometry.faces.length; j++) {
 				face = geometry.faces[j];
 				normal = face.normal;
-				if (face instanceof THREE.Face3) {
-					vertex1 = this.getTransformedPosition (geometry.vertices[face.a], matrix, position);
-					vertex2 = this.getTransformedPosition (geometry.vertices[face.b], matrix, position);
-					vertex3 = this.getTransformedPosition (geometry.vertices[face.c], matrix, position);
-					this.addTriangleToContent (normal, vertex1, vertex2, vertex3);
-				} else if (face instanceof THREE.Face4) {
-					vertex1 = this.getTransformedPosition (geometry.vertices[face.a], matrix, position);
-					vertex2 = this.getTransformedPosition (geometry.vertices[face.b], matrix, position);
-					vertex3 = this.getTransformedPosition (geometry.vertices[face.c], matrix, position);
-					this.addTriangleToContent (normal, vertex1, vertex2, vertex3);
-
-					vertex1 = this.getTransformedPosition (geometry.vertices[face.a], matrix, position);
-					vertex2 = this.getTransformedPosition (geometry.vertices[face.c], matrix, position);
-					vertex3 = this.getTransformedPosition (geometry.vertices[face.d], matrix, position);
-					this.addTriangleToContent (normal, vertex1, vertex2, vertex3);
-				}
+				vertex1 = this.getTransformedPosition (geometry.vertices[face.a], matrix, position);
+				vertex2 = this.getTransformedPosition (geometry.vertices[face.b], matrix, position);
+				vertex3 = this.getTransformedPosition (geometry.vertices[face.c], matrix, position);
+				this.addTriangleToContent (normal, vertex1, vertex2, vertex3);
 			}
 		};
 		

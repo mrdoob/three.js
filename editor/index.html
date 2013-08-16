@@ -5,6 +5,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
+			* {
+				vertical-align: middle;
+			}
+
 			body {
 				font-family: Arial, sans-serif;
 				font-size: 14px;
@@ -20,10 +24,9 @@
 			button {
 
 				position: relative;
-				margin-top: -2px;
 
 			}
-
+			
 			.menubar {
 				background-color: #eee;
 				padding: 0px;
@@ -91,7 +94,7 @@
 
 		<script src="../examples/js/controls/EditorControls.js"></script>
 		<script src="../examples/js/controls/TransformControls.js"></script>
-		<script src="../examples/js/loaders/BinaryLoader.js"></script>
+		<script src="../examples/js/loaders/BabylonLoader.js"></script>
 		<script src="../examples/js/loaders/ColladaLoader.js"></script>
 		<script src="../examples/js/loaders/OBJLoader.js"></script>
 		<script src="../examples/js/loaders/PLYLoader.js"></script>
@@ -109,6 +112,9 @@
 
 		<!-- WIP -->
 
+		<script src="../examples/js/BufferGeometryUtils.js"></script>
+
+		<script src="../examples/js/exporters/BufferGeometryExporter.js"></script>
 		<script src="../examples/js/exporters/GeometryExporter.js"></script>
 		<script src="../examples/js/exporters/MaterialExporter.js"></script>
 		<script src="../examples/js/exporters/ObjectExporter.js"></script>
@@ -177,6 +183,20 @@
 			document.body.appendChild( sidebar.dom );
 
 			//
+
+			document.addEventListener( 'dragover', function ( event ) {
+
+				event.preventDefault();
+				event.dataTransfer.dropEffect = 'copy';
+
+			}, false );
+
+			document.addEventListener( 'drop', function ( event ) {
+
+				event.preventDefault();
+				editor.loader.loadFile( event.dataTransfer.files[ 0 ] );
+
+			}, false );
 
 			document.addEventListener( 'keydown', function ( event ) {
 

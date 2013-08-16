@@ -95,13 +95,13 @@ THREE.extend( THREE.WebGLRenderer.MeshRenderer.prototype, {
 
 		if ( uvType ) {
 
-			if ( geometry.faceUvs.length > 0 || geometry.faceVertexUvs.length > 0 ) {
+			if ( geometry.faceVertexUvs.length > 0 ) {
 
 				geometryGroup.__uvArray = new Float32Array( nvertices * 2 );
 
 			}
 
-			if ( geometry.faceUvs.length > 1 || geometry.faceVertexUvs.length > 1 ) {
+			if ( geometry.faceVertexUvs.length > 1 ) {
 
 				geometryGroup.__uv2Array = new Float32Array( nvertices * 2 );
 

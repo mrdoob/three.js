@@ -21,7 +21,8 @@ Sidebar.Geometry = function ( editor ) {
 		"TorusGeometry": THREE.TorusGeometry,
 		"TorusKnotGeometry": THREE.TorusKnotGeometry,
 		"TubeGeometry": THREE.TubeGeometry,
-		"Geometry": THREE.Geometry
+		"Geometry": THREE.Geometry,
+		"BufferGeometry": THREE.BufferGeometry
 
 	};
 
@@ -174,8 +175,28 @@ Sidebar.Geometry = function ( editor ) {
 
 		geometryUUID.setValue( geometry.uuid );
 		geometryName.setValue( geometry.name );
-		geometryVertices.setValue( geometry.vertices.length );
-		geometryFaces.setValue( geometry.faces.length );
+
+		if ( geometry instanceof THREE.Geometry ) {
+
+			geometryVertices.setValue( geometry.vertices.length );
+			geometryFaces.setValue( geometry.faces.length );
+
+		} else if ( geometry instanceof THREE.BufferGeometry ) {
+
+			geometryVertices.setValue( geometry.attributes.position.numItems / 3 );
+
+			if ( geometry.attributes.index !== undefined ) {
+
+				geometryFaces.setValue( geometry.attributes.index.numItems / 3 );
+
+			} else {
+
+				geometryFaces.setValue( geometry.attributes.position.numItems / 3 / 3 );
+
+			}
+
+
+		}
 
 	}
 

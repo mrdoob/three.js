@@ -141,11 +141,12 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialVertexColorsRow );
 
+
 	// map
 
 	var materialMapRow = new UI.Panel();
 	var materialMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialMap = new UI.Texture().setColor( '#444' ).setWidth( '100px' ).onChange( update );
+	var materialMap = new UI.Texture().setColor( '#444' ).onChange( update );
 
 	materialMapRow.add( new UI.Text( 'Map' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialMapRow.add( materialMapEnabled );
@@ -153,11 +154,12 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialMapRow );
 
+
 	// light map
 
 	var materialLightMapRow = new UI.Panel();
 	var materialLightMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialLightMap = new UI.Texture().setColor( '#444' ).setWidth( '100px' ).onChange( update );
+	var materialLightMap = new UI.Texture().setColor( '#444' ).onChange( update );
 
 	materialLightMapRow.add( new UI.Text( 'Light Map' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialLightMapRow.add( materialLightMapEnabled );
@@ -165,25 +167,27 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialLightMapRow );
 
+
 	// bump map
 
 	var materialBumpMapRow = new UI.Panel();
 	var materialBumpMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialBumpMap = new UI.Texture().setColor( '#444' ).setWidth( '100px' ).onChange( update );
+	var materialBumpMap = new UI.Texture().setColor( '#444' ).onChange( update );
 	var materialBumpScale = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
 
 	materialBumpMapRow.add( new UI.Text( 'Bump Map' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialBumpMapRow.add( materialBumpMapEnabled );
-	materialBumpMapRow.add( materialBumpScale );
 	materialBumpMapRow.add( materialBumpMap );
+	materialBumpMapRow.add( materialBumpScale );
 
 	container.add( materialBumpMapRow );
+
 
 	// normal map
 
 	var materialNormalMapRow = new UI.Panel();
 	var materialNormalMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialNormalMap = new UI.Texture().setColor( '#444' ).setWidth( '100px' ).onChange( update );
+	var materialNormalMap = new UI.Texture().setColor( '#444' ).onChange( update );
 
 	materialNormalMapRow.add( new UI.Text( 'Normal Map' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialNormalMapRow.add( materialNormalMapEnabled );
@@ -191,11 +195,12 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialNormalMapRow );
 
+
 	// specular map
 
 	var materialSpecularMapRow = new UI.Panel();
 	var materialSpecularMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialSpecularMap = new UI.Texture().setColor( '#444' ).setWidth( '100px' ).onChange( update );
+	var materialSpecularMap = new UI.Texture().setColor( '#444' ).onChange( update );
 
 	materialSpecularMapRow.add( new UI.Text( 'Specular Map' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialSpecularMapRow.add( materialSpecularMapEnabled );
@@ -203,20 +208,41 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialSpecularMapRow );
 
+
 	// env map
 
 	var materialEnvMapRow = new UI.Panel();
 	var materialEnvMapEnabled = new UI.Checkbox( false ).onChange( update );
-	var materialEnvMap = new UI.CubeTexture().setColor( '#444' ).setWidth( '100px' ).onChange( update );
+	var materialEnvMap = new UI.CubeTexture().setColor( '#444' ).onChange( update );
 	var materialReflectivity = new UI.Number( 1 ).setWidth( '30px' ).onChange( update );
-
 
 	materialEnvMapRow.add( new UI.Text( 'Env Map' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialEnvMapRow.add( materialEnvMapEnabled );
-	materialEnvMapRow.add( materialReflectivity );
 	materialEnvMapRow.add( materialEnvMap );
+	materialEnvMapRow.add( materialReflectivity );
 
 	container.add( materialEnvMapRow );
+
+
+	// blending
+
+	var materialBlendingRow = new UI.Panel();
+	var materialBlending = new UI.Select().setOptions( {
+
+		0: 'No',
+		1: 'Normal',
+		2: 'Additive',
+		3: 'Subtractive',
+		4: 'Multiply',
+		5: 'Custom'
+
+	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+
+	materialBlendingRow.add( new UI.Text( 'Blending' ).setWidth( '90px' ).setColor( '#666' ) );
+	materialBlendingRow.add( materialBlending );
+
+	container.add( materialBlendingRow );
+
 
 	// opacity
 
@@ -228,6 +254,7 @@ Sidebar.Material = function ( editor ) {
 
 	container.add( materialOpacityRow );
 
+
 	// transparent
 
 	var materialTransparentRow = new UI.Panel();
@@ -237,6 +264,7 @@ Sidebar.Material = function ( editor ) {
 	materialTransparentRow.add( materialTransparent );
 
 	container.add( materialTransparentRow );
+
 
 	// wireframe
 
@@ -256,9 +284,13 @@ Sidebar.Material = function ( editor ) {
 	function update() {
 
 		var object = editor.selected;
-		var objectHasUvs = object.geometry.faceVertexUvs[ 0 ].length > 0;
+		var geometry = object.geometry;
 		var material = object.material;
 		var textureWarning = false;
+		var objectHasUvs = false;
+
+		if ( geometry instanceof THREE.Geometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
+		if ( geometry instanceof THREE.BufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
 		if ( material ) {
 
@@ -313,6 +345,9 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.vertexColors !== undefined ) {
 
+				geometry.buffersNeedUpdate = true;
+				geometry.colorsNeedUpdate = true;
+
 				material.vertexColors = parseInt( materialVertexColors.getValue() );
 				material.needsUpdate = true;
 
@@ -324,11 +359,11 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs )  {
 
+					geometry.buffersNeedUpdate = true;
+					geometry.uvsNeedUpdate = true;
+
 					material.map = mapEnabled ? materialMap.getValue() : null;
 					material.needsUpdate = true;
-
-					object.geometry.buffersNeedUpdate = true;
-					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -345,10 +380,11 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs )  {
 
+					geometry.buffersNeedUpdate = true;
+					geometry.uvsNeedUpdate = true;
+
 					material.lightMap = lightMapEnabled ? materialLightMap.getValue() : null;
 					material.needsUpdate = true;
-					object.geometry.buffersNeedUpdate = true;
-					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -365,11 +401,12 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs )  {
 
+					geometry.buffersNeedUpdate = true;
+					geometry.uvsNeedUpdate = true;
+
 					material.bumpMap = bumpMapEnabled ? materialBumpMap.getValue() : null;
 					material.bumpScale = materialBumpScale.getValue();
 					material.needsUpdate = true;
-					object.geometry.buffersNeedUpdate = true;
-					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -385,10 +422,11 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs )  {
 
+					geometry.buffersNeedUpdate = true;
+					geometry.uvsNeedUpdate = true;
+
 					material.normalMap = normalMapEnabled ? materialNormalMap.getValue() : null;
 					material.needsUpdate = true;
-					object.geometry.buffersNeedUpdate = true;
-					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -404,10 +442,11 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs )  {
 
+					geometry.buffersNeedUpdate = true;
+					geometry.uvsNeedUpdate = true;
+
 					material.specularMap = specularMapEnabled ? materialSpecularMap.getValue() : null;
 					material.needsUpdate = true;
-					object.geometry.buffersNeedUpdate = true;
-					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
@@ -423,17 +462,24 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs )  {
 
+					geometry.buffersNeedUpdate = true;
+					geometry.uvsNeedUpdate = true;
+
 					material.envMap = envMapEnabled ? materialEnvMap.getValue() : null;
 					material.reflectivity = materialReflectivity.getValue();
 					material.needsUpdate = true;
-					object.geometry.buffersNeedUpdate = true;
-					object.geometry.uvsNeedUpdate = true;
 
 				} else {
 
 					if ( envMapEnabled ) textureWarning = true;
 
 				}
+
+			}
+
+			if ( material.blending !== undefined ) {
+
+				material.blending = parseInt( materialBlending.getValue() );
 
 			}
 
@@ -491,6 +537,7 @@ Sidebar.Material = function ( editor ) {
 			'normalMap': materialNormalMapRow,
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
+			'blending': materialBlendingRow,
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
 			'wireframe': materialWireframeRow
@@ -580,20 +627,7 @@ Sidebar.Material = function ( editor ) {
 			if ( material.map !== undefined ) {
 
 				materialMapEnabled.setValue( material.map !== null );
-
-				if ( material.map !== null ) {
-
-					if ( object.geometry.faceVertexUvs[ 0 ].length > 0 ) {
-
-						materialMap.setValue( material.map );
-
-					} else {
-
-						console.warn( "Can't set texture, model doesn't have texture coordinates" );
-
-					}
-
-				}
+				materialMap.setValue( material.map );
 
 			}
 
@@ -633,6 +667,12 @@ Sidebar.Material = function ( editor ) {
 				materialEnvMapEnabled.setValue( material.envMap !== null );
 				materialEnvMap.setValue( material.envMap );
 				materialReflectivity.setValue( material.reflectivity );
+
+			}
+
+			if ( material.blending !== undefined ) {
+
+				materialBlending.setValue( material.blending );
 
 			}
 

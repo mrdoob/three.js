@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Base class for scene graph objects.</div>
+
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<div>
+		todo
+		</div>
+
+
+		<h2>Properties</h2>
+
+		<h3>.[page:Integer id]</h3>
+		<div>
+		Unique number of this object instance.
+		</div>
+
+		<h3>.[page:String name]</h3>
+		<div>
+		Optional name of the object (doesn't need to be unique).
+		</div>
+
+		<h3>.[page:Object3D parent]</h3>
+		<div>
+		Object's parent in the scene graph.
+		</div>
+
+		<h3>.[page:Object3D children]</h3>
+		<div>
+		Array with object's children.
+		</div>
+
+		<h3>.[page:Vector3 position]</h3>
+		<div>
+		Object's local position.
+		</div>
+
+		<h3>.[page:Vector3 rotation]</h3>
+		<div>
+		Object's local rotation (<a href="https://en.wikipedia.org/wiki/Euler_angles">Euler angles</a>), in radians.
+		</div>
+
+		<h3>.[page:String eulerOrder]</h3>
+		<div>
+		Order of axis for Euler angles.
+		</div>
+
+		<h3>.[page:Vector3 scale]</h3>
+		<div>
+		Object's local scale.
+		</div>
+
+		<h3>.[page:Vector3 up]</h3>
+		<div>
+		Up direction.
+		</div>
+
+		<h3>.[page:Matrix4 matrix]</h3>
+		<div>
+		Local transform.
+		</div>
+
+		<h3>.[page:Quaternion quaternion]</h3>
+		<div>
+		Object's local rotation as [page:Quaternion Quaternion]. Only used when useQuaternion is set to true.
+		</div>
+
+		<h3>.[page:Boolean useQuaternion]</h3>
+		<div>
+		Use quaternion instead of Euler angles for specifying local rotation.
+		</div>
+
+		<h3>.[page:Float renderDepth]</h3>
+		<div>
+		Override depth-sorting order if non *null*.
+		</div>
+
+		<h3>.[page:Boolean visible]</h3>
+		<div>
+		Object gets rendered if *true*.
+		</div>
+
+		<h3>.[page:Boolean castShadow]</h3>
+		<div>
+		Gets rendered into shadow map.
+		</div>
+
+		<h3>.[page:Boolean receiveShadow]</h3>
+		<div>
+		Material gets baked in shadow receiving.
+		</div>
+
+		<h3>.[page:Boolean frustumCulled]</h3>
+		<div>
+		When this is set, it checks every frame if the object is in the frustum of the camera. Otherwise the object gets drawn every frame even if it isn't visible.
+		</div>
+
+		<h3>.[page:Boolean matrixAutoUpdate]</h3>
+		<div>
+		When this is set, it calculates the matrix of position, (rotation or quaternion) and scale every frame and also recalculates the matrixWorld property.
+		</div>
+
+		<h3>.[page:Boolean matrixWorldNeedsUpdate]</h3>
+		<div>
+		When this is set, it calculates the matrixWorld in that frame and resets this property to false.
+		</div>
+
+		<h3>.[page:Boolean rotationAutoUpdate]</h3>
+		<div>
+		When this is set, then the rotationMatrix gets calculated every frame.
+		</div>
+
+		<h3>.[page:object userData]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h3>.[page:Matrix4 matrixWorld]</h3>
+		<div>
+		todo
+		</div> 
+
+		<h2>Methods</h2>
+		
+		<h3>.applyMatrix( [page:Matrix4 matrix])</h3>
+		<div>
+		matrix - matrix
+		</div>
+		<div>
+		This updates the position, rotation and scale with the matrix.
+		</div>
+		
+		<h3>.translateX( [page:Float distance] )</h3>
+		<div>
+		distance - Distance.<br />
+		</div>
+		<div>
+		Translates object along x axis by distance.
+		</div>
+
+		<h3>.translateY( [page:Float distance] )</h3>
+		<div>
+		distance - Distance.<br />
+		</div>
+		<div>
+		Translates object along y axis by distance.
+		</div>
+
+		<h3>.translateZ( [page:Float distance] )</h3>
+		<div>
+		distance - Distance.<br />
+		</div>
+		<div>
+		Translates object along z axis by distance.
+		</div>
+		
+		<h3>.localToWorld( [page:Vector3 vector] )</h3>
+		<div>
+		vector - A local vector.<br />
+		</div>
+		<div>
+		Updates the vector from local space to world space.
+		</div>
+
+		<h3>.worldToLocal( [page:Vector3 vector] )</h3>
+		<div>
+		vector - A world vector.<br />
+		</div>
+		<div>
+		Updates the vector from world space to local space.
+		</div>
+
+		<h3>.lookAt( [page:Vector3 vector] )</h3>
+		<div>
+		vector - A world vector to look at.<br />
+		</div>
+		<div>
+		Rotates object to face point in space.
+		</div>
+
+		<h3>.add( [page:Object3D object] )</h3>
+		<div>
+		object - An object.<br />
+		</div>
+		<div>
+		Adds *object* as child of this object.
+		</div>
+
+		<h3>.remove( [page:Object3D object] )</h3>
+		<div>
+		object - An object.<br />
+		</div>
+		<div>
+		Removes *object* as child of this object.
+		</div>
+
+		<h3>.traverse( [page:Function callback] )</h3>
+		<div>
+		callback - An Function with as first argument an object3D object.<br />
+		</div>
+		<div>
+		Executes the callback on this object and all descendants. 
+		</div>
+
+		<h3>.getDescendants( [page:Array array] )</h3>
+		<div>
+		array - optional argument that returns the the array with descendants.<br />
+		</div>
+		<div>
+		Searches whole subgraph recursively to add all objects in the array.
+		</div>
+
+		<h3>.updateMatrix()</h3>
+		<div>
+		Updates local transform.
+		</div>
+
+		<h3>.updateMatrixWorld( [page:Boolean force] )</h3>
+		<div>
+		Updates global transform of the object and its children.
+		</div>
+
+		<h3>.clone()</h3>
+		<div>
+		Creates a new clone of this object and all descendants.
+		</div>
+
+
+		<h3>.getObjectByName([page:todo name], [page:todo recursive]) [page:todo]</h3>
+		<div>
+		name -- todo <br />
+		recursive -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.translateOnAxis([page:todo axis], [page:todo distance]) [page:todo]</h3>
+		<div>
+		axis -- todo <br />
+		distance -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.getObjectById([page:todo id], [page:todo recursive]) [page:todo]</h3>
+		<div>
+		id -- todo <br />
+		recursive -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h3>.rotateOnAxis([page:todo axis], [page:todo angle]) [page:todo]</h3>
+		<div>
+		axis -- todo <br />
+		angle -- todo
+		</div>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>

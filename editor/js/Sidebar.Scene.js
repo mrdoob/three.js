@@ -2,8 +2,6 @@ Sidebar.Scene = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var selected = null;
-
 	var container = new UI.Panel();
 	container.setPadding( '10px' );
 	container.setBorderTop( '1px solid #ccc' );
@@ -169,7 +167,12 @@ Sidebar.Scene = function ( editor ) {
 		} )( scene.children, '&nbsp;&nbsp;&nbsp;' );
 
 		outliner.setOptions( options );
-		outliner.setValue( selected );
+
+		if ( editor.selected !== null ) {
+
+			outliner.setValue( editor.selected.id );
+
+		}
 
 		if ( scene.fog ) {
 
@@ -200,9 +203,7 @@ Sidebar.Scene = function ( editor ) {
 
 	signals.objectSelected.add( function ( object ) {
 
-		selected = object !== null ? object.id : null;
-
-		outliner.setValue( selected );
+		outliner.setValue( object !== null ? object.id : null );
 
 	} );
 
