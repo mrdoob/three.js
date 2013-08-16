@@ -24,28 +24,11 @@
 
 			}
 
-			a {
-
-				color: #2194CE;
-				text-decoration: none;
-
-			}
-
-				a:hover {
-
-					text-decoration: underline;
-
-				}
-
-				a:active {
-
-					color: #ff8888;
-
-				}
-
 			h1 {
+
 				font-size: 25px;
 				font-weight: normal;
+
 			}
 
 			#panel {
@@ -64,6 +47,26 @@
 
 				}
 
+				#panel #list .link {
+
+					color: #2194CE;
+					text-decoration: none;
+					cursor: pointer;
+
+				}
+
+				#panel #list .selected {
+
+					color: #ff0000;
+
+				}
+
+					#panel #list .link:hover {
+
+						text-decoration: underline;
+
+					}
+
 			#viewer {
 
 				position: absolute;
@@ -81,6 +84,7 @@
 		<div id="panel">
 			<div id="list">
 				<h1>three.js examples</h1>
+				<br />
 			</div>
 		</div>
 		<iframe id="viewer"></iframe>
@@ -297,22 +301,52 @@
 
 		];
 
+		//
+
 		var list = document.getElementById( 'list' );
+		var viewer = document.getElementById( 'viewer' );
 
 		var container = document.createElement( 'div' );
 		list.appendChild( container );
 
+		var divs = {};
+		var SELECTED = null;
+
 		for ( var i = 0; i < files.length; i ++ ) {
 
-			var file = files[ i ];
+			( function ( file ) {
 
-			var link = document.createElement( 'a' );
-			link.href = file + '.html';
-			link.textContent = file;
-			link.target = 'viewer';
-			container.appendChild( link );
+				var div = document.createElement( 'div' );
+				div.className = 'link';
+				div.textContent = file;
+				div.addEventListener( 'click', function () {
 
-			container.appendChild( document.createElement( 'br' ) );
+					load( file );
+
+				} );
+				container.appendChild( div );
+
+				divs[ file ] = div;
+
+			} )( files[ i ] );
+
+		}
+
+		var load = function ( file ) {
+
+			if ( SELECTED !== null ) SELECTED.className = 'link';
+
+			SELECTED = divs[ file ];
+			SELECTED.className = 'link selected';
+
+			window.location.hash = file;
+			viewer.src = file + '.html';
+
+		};
+
+		if ( window.location.hash !== '' ) {
+
+			load( window.location.hash.substring( 1 ) );
 
 		}
 
