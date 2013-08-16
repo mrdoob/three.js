@@ -17,7 +17,7 @@ THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
 
 THREE.HemisphereLight.prototype.clone = function () {
 
-	var light = new THREE.PointLight();
+	var light = new THREE.HemisphereLight();
 
 	THREE.Light.prototype.clone.call( this, light );
 
