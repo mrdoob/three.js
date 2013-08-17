@@ -554,6 +554,58 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
+	clone: function() {
+
+		var geometry = new THREE.BufferGeometry();
+
+		geometry.numVertices = this.numVertices;
+
+		for ( var attr in this.attributes ) {
+
+			var attribute = {
+				itemSize: this.attributes[ attr ].itemSize,
+				numItems: this.attributes[ attr ].numItems,
+				array: null
+			};
+
+			var sourceAttr = this.attributes[ attr ];
+
+			if ( attr === 'index' ) {
+
+				attribute.array = new Uint16Array( sourceAttr.numItems );
+
+			} else {
+
+				attribute.array = new Float32Array( sourceAttr.numItems );
+
+			}
+
+			for (var i = 0, il = sourceAttr.numItems; i < il; i++) {
+
+				attribute.array[ i ] = sourceAttr.array[ i ];
+
+			}
+
+			geometry.attributes[ attr ] = attribute;
+
+		}
+
+		for (var i = 0, il = this.offsets.length; i < il; i++) {
+
+			var offset = this.offsets[ i ];
+
+			geometry.offsets.push({
+				start: offset.start,
+				index: offset.index,
+				count: offset.count
+			});
+
+		  }
+
+		return geometry;
+
+	},
+
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );
