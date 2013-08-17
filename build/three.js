@@ -32873,7 +32873,7 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) 
 			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
 			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
+			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 
@@ -33041,7 +33041,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
 
 				this.faces.push( new THREE.Face3( v2, v3, v4, [ n2, n3, n4 ] ) );
-				this.faceVertexUvs[ 0 ].push( [ uv2, uv3, uv4 ] );
+				this.faceVertexUvs[ 0 ].push( [ uv2.clone(), uv3, uv4.clone() ] );
 
 			}
 
@@ -33276,7 +33276,7 @@ THREE.TorusKnotGeometry = function ( radius, tube, radialSegments, tubularSegmen
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
 			this.faces.push( new THREE.Face3( b, c, d ) );
-			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
+			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 	}
@@ -33420,7 +33420,7 @@ THREE.TubeGeometry = function( path, segments, radius, radialSegments, closed ) 
 			this.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
 
 			this.faces.push( new THREE.Face3( b, c, d ) );
-			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
+			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 	}
@@ -33930,7 +33930,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 			uvs.push( [ uva, uvb, uvd ] );
 
 			faces.push( new THREE.Face3( b, c, d ) );
-			uvs.push( [ uvb, uvc, uvd ] );
+			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 
