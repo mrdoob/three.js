@@ -9956,7 +9956,7 @@ THREE.HemisphereLight.prototype = Object.create( THREE.Light.prototype );
 
 THREE.HemisphereLight.prototype.clone = function () {
 
-	var light = new THREE.PointLight();
+	var light = new THREE.HemisphereLight();
 
 	THREE.Light.prototype.clone.call( this, light );
 
@@ -31660,7 +31660,7 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
+				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 			}
 

@@ -26,6 +26,68 @@
  *		selective subdivision
  */
 
+THREE.Face4Stub = function ( a, b, c, d, normal, color, materialIndex ) {
+
+	this.a = a;
+	this.b = b;
+	this.c = c;
+	this.d = d;
+
+	this.normal = normal instanceof THREE.Vector3 ? normal : new THREE.Vector3();
+	this.vertexNormals = normal instanceof Array ? normal : [ ];
+
+	this.color = color instanceof THREE.Color ? color : new THREE.Color();
+	this.vertexColors = color instanceof Array ? color : [];
+
+	this.vertexTangents = [];
+
+	this.materialIndex = materialIndex !== undefined ? materialIndex : 0;
+
+	this.centroid = new THREE.Vector3();
+
+};
+
+
+THREE.GeometryUtils.convertFace4s = function(geometry) {
+
+	// return geometry;
+
+	var faces = geometry.faces;
+	var faceVertexUvs = geometry.faceVertexUvs[0];
+
+	var newfaces = [];
+	var newfaceVertexUvs = [];
+
+	var f, fl, face, uv;
+
+	for (f=0, fl=faces.length; f < fl; f++) {
+
+		face = faces[f];
+		uv = faceVertexUvs[f];
+
+		if ( face instanceof THREE.Face3 ) {
+			
+			newfaces.push(face);
+			if (uv) newfaceVertexUvs.push(uv);
+
+		} else {
+
+			newfaces.push( new THREE.Face3( face.a, face.b, face.c, null, face.color, face.materialIndex) );
+			newfaces.push( new THREE.Face3( face.d, face.a, face.c, null, face.color, face.materialIndex) );
+
+
+			if (uv) newfaceVertexUvs.push([uv[0], uv[1], uv[2]]);
+			if (uv) newfaceVertexUvs.push([uv[3], uv[0], uv[2]]);
+
+		}
+
+	}
+
+	geometry.faces = newfaces;
+	geometry.faceVertexUvs = [newfaceVertexUvs];
+
+}
+
 
 THREE.SubdivisionModifier = function ( subdivisions ) {
 
@@ -46,6 +108,13 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 	while ( repeats-- > 0 ) {
 		this.smooth( geometry );
 	}
+
+	THREE.GeometryUtils.convertFace4s( geometry );
+	delete geometry.__tmpVertices;
+	geometry.computeCentroids();
+	geometry.computeFaceNormals();
+	geometry.computeVertexNormals();
+
 
 };
 
@@ -98,7 +167,7 @@ THREE.GeometryUtils.computeEdgeFaces = function ( geometry ) {
 			hash = orderedKey( face.c, face.a );
 			mapEdgeHash( hash, i );
 
-		} else if ( face instanceof THREE.Face4 ) {
+		} else if ( face instanceof THREE.Face4Stub ) {
 
 			hash = orderedKey( face.a, face.b );
 			mapEdgeHash( hash, i );
@@ -176,7 +245,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 
 		// TODO move vertex selection over here!
 
-		var newFace = new THREE.Face4( a, b, c, d, null, oldFace.color, oldFace.materialIndex );
+		var newFace = new THREE.Face4Stub( a, b, c, d, null, oldFace.color, oldFace.materialIndex );
 
 		if (scope.useOldVertexColors) {
 
@@ -345,7 +414,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			avgUv.x /= 3;
 			avgUv.y /= 3;
 
-		} else if ( face instanceof THREE.Face4 ) {
+		} else if ( face instanceof THREE.Face4Stub ) {
 
 			avgUv.x = getUV( face.a, i ).x + getUV( face.b, i ).x + getUV( face.c, i ).x + getUV( face.d, i ).x;
 			avgUv.y = getUV( face.a, i ).y + getUV( face.b, i ).y + getUV( face.c, i ).y + getUV( face.d, i ).y;
@@ -540,7 +609,7 @@ THREE.SubdivisionModifier.prototype.smooth = function ( oldGeometry ) {
 			f4( currentVerticeIndex, edgePoints[hashBC], face.c, edgePoints[hashCA], face, bca123, i );
 			f4( currentVerticeIndex, edgePoints[hashCA], face.a, edgePoints[hashAB], face, cab123, i );
 
-		} else if ( face instanceof THREE.Face4 ) {
+		} else if ( face instanceof THREE.Face4Stub ) {
 
 			// create 4 face4s
 
