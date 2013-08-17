@@ -2635,7 +2635,7 @@ THREE.ColladaLoader = function () {
 
 								} else {
 
-									uvArr = [ uv[1], uv[2], uv[3] ];
+									uvArr = [ uv[1].clone(), uv[2], uv[3].clone() ];
 
 								}
 
