@@ -344,21 +344,20 @@
 		Assigns this vectors z value to array[2]. <br />
 		</div>
 
-		<h3>.multiply([page:todo v], [page:todo w]) [page:todo]</h3>
+		<h3>.multiply([page:todo v]) [page:todo this]</h3>
 		<div>
-		v -- todo <br />
-		w -- todo
+		v -- [page:todo Vector3] <br />
 		</div>
 		<div>
-		todo
+		Multipies this vector by vector v.
 		</div>
 
-		<h3>.applyProjection([page:todo m]) [page:todo]</h3>
+		<h3>.applyProjection([page:todo m]) [page:todo ths]</h3>
 		<div>
-		m -- todo
+		m -- [page:todo Matrix4] projection matrix.
 		</div>
 		<div>
-		todo
+		Multiplies this vector and m, and divides by perspective.
 		</div>
 
 		<h3>.setEulerFromRotationMatrix([page:todo m], [page:todo order]) [page:todo]</h3>
