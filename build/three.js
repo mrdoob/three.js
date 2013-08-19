@@ -5381,7 +5381,7 @@ THREE.Ray.prototype = {
 
 		return function ( a, b, c, backfaceCulling, optionalTarget ) {
 
-			//from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
+			// from http://www.geometrictools.com/LibMathematics/Intersection/Wm5IntrRay3Triangle3.cpp
 
 			edge1.subVectors( b, a );
 			edge2.subVectors( c, a );
@@ -5392,41 +5392,60 @@ THREE.Ray.prototype = {
 			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
 			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
 			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = this.direction.dot(normal);
+			var DdN = this.direction.dot( normal );
 			var sign;
+
 			if ( DdN > 0 ) {
 
-					if ( backfaceCulling ) return null;
-					sign = 1;
+				if ( backfaceCulling ) return null;
+				sign = 1;
 
 			} else if ( DdN < 0 ) {
 
-					sign = - 1;
-					DdN = - DdN;
+				sign = - 1;
+				DdN = - DdN;
 
-			} else return null;
+			} else {
+
+				return null;
+
+			}
 
 			diff.subVectors( this.origin, a );
 			var DdQxE2 = sign * this.direction.dot( edge2.crossVectors( diff, edge2 ) );
 
 			// b1 < 0, no intersection
-			if ( DdQxE2 < 0 )
+			if ( DdQxE2 < 0 ) {
+
 				return null;
+
+			}
 
 			var DdE1xQ = sign * this.direction.dot( edge1.cross( diff ) );
+
 			// b2 < 0, no intersection
-			if ( DdE1xQ < 0 )
+			if ( DdE1xQ < 0 ) {
+
 				return null;
 
+			}
+
 			// b1+b2 > 1, no intersection
-			if ( DdQxE2 + DdE1xQ > DdN )
-				return null
+			if ( DdQxE2 + DdE1xQ > DdN ) {
+
+				return null;
+
+			}
 
 			// Line intersects triangle, check if ray does.
 			var QdN = - sign * diff.dot( normal );
+
 			// t < 0, no intersection
-			if ( QdN < 0 )
-				return null
+			if ( QdN < 0 ) {
+
+				return null;
+
+			}
 
 			// Ray intersects triangle.
 			return this.at( QdN / DdN, optionalTarget );
@@ -6812,14 +6831,14 @@ THREE.EventDispatcher.prototype = {
 
 			}
 
-			//Check boundingBox before continuing
+			// Check boundingBox before continuing
 			
 			inverseMatrix.getInverse( object.matrixWorld );  
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			if ( geometry.boundingBox !== null) {
+			if ( geometry.boundingBox !== null ) {
 
-				if ( localRay.isIntersectionBox(geometry.boundingBox) === false )  {
+				if ( localRay.isIntersectionBox( geometry.boundingBox ) === false )  {
 
 					return intersects;
 
@@ -6896,12 +6915,16 @@ THREE.EventDispatcher.prototype = {
 							positions[ c * 3 + 2 ]
 						);
 
-						var interPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+						var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
 
-						if ( !interPoint ) continue;
+						if ( intersectionPoint === null ) {
 
-						interPoint.applyMatrix4( object.matrixWorld );
-						var distance = raycaster.ray.origin.distanceTo( interPoint );
+							continue;
+
+						}
+
+						intersectionPoint.applyMatrix4( object.matrixWorld );
+						var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 						// bail if the ray is too close to the plane
 						if ( distance < precision ) continue;
@@ -6911,7 +6934,7 @@ THREE.EventDispatcher.prototype = {
 						intersects.push( {
 
 							distance: distance,
-							point: interPoint,
+							point: intersectionPoint,
 							face: null,
 							faceIndex: null,
 							object: object
@@ -6941,16 +6964,16 @@ THREE.EventDispatcher.prototype = {
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 					
-					var interPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+					var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
 
-					if ( !interPoint ) {
+					if ( intersectionPoint === null ) {
 
 						continue;
 
 					}
 
-					interPoint.applyMatrix4( object.matrixWorld );
-					var distance = raycaster.ray.origin.distanceTo( interPoint );
+					intersectionPoint.applyMatrix4( object.matrixWorld );
+					var distance = raycaster.ray.origin.distanceTo( intersectionPoint );
 
 					// bail if the ray is too close to the plane
 					if ( distance < precision ) continue;
@@ -6960,7 +6983,7 @@ THREE.EventDispatcher.prototype = {
 					intersects.push( {
 
 						distance: distance,
-						point: interPoint,
+						point: intersectionPoint,
 						face: face,
 						faceIndex: f,
 						object: object
@@ -25608,7 +25631,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				for( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+					if ( texture.format!==THREE.RGBAFormat ) {
+						_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+					} else {
+						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					}
 
 				}
 
@@ -25726,21 +25753,26 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					if ( isCompressed ) {
+					if( !isCompressed ) {
 
+						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
+
+					} else {
+						
 						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
 
 						for( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
 							mipmap = mipmaps[ j ];
-							_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+							if ( texture.format!==THREE.RGBAFormat ) {
+
+								_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+							} else {
+								_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+							}
 
 						}
-
-					} else {
-
-						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
-
 					}
 
 				}
@@ -27028,6 +27060,77 @@ THREE.ImageUtils = {
 
 	},
 
+	loadDDSTexture: function ( url, mapping, onLoad, onError ) {
+
+		var images = [];
+		images.loadCount = 0;
+
+		var texture = new THREE.CompressedTexture();
+		texture.image = images;
+		if ( mapping !== undefined ) texture.mapping = mapping;
+
+		// no flipping for cube textures
+		// (also flipping doesn't work for compressed textures )
+
+		texture.flipY = false;
+
+		// can't generate mipmaps for compressed textures
+		// mips must be embedded in DDS files
+
+		texture.generateMipmaps = false;
+
+		{
+			var request = new XMLHttpRequest();
+
+			request.onload = function( ) {
+
+				var buffer = request.response;
+				var dds = THREE.ImageUtils.parseDDS( buffer, true );
+
+				if ( dds.isCubemap ) {
+
+					var faces = dds.mipmaps.length / dds.mipmapCount;
+
+					for ( var f = 0; f < faces; f ++ ) {
+
+						images[ f ] = { mipmaps : [] };
+
+						for ( var i = 0; i < dds.mipmapCount; i ++ ) {
+
+							images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
+							images[ f ].format = dds.format;
+							images[ f ].width = dds.width;
+							images[ f ].height = dds.height;
+
+						}
+
+					}
+
+
+				} else {
+					texture.image.width = dds.width;
+					texture.image.height = dds.height;
+					texture.mipmaps = dds.mipmaps;
+				}
+
+				texture.format = dds.format;
+				texture.needsUpdate = true;
+				if ( onLoad ) onLoad( texture );
+
+			}
+
+			request.onerror = onError;
+
+			request.open( 'GET', url, true );
+			request.responseType = "arraybuffer";
+			request.send( null );
+
+		}
+
+		return texture;
+
+	},
+
 	parseDDS: function ( buffer, loadMipmaps ) {
 
 		var dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
@@ -27088,6 +27191,27 @@ THREE.ImageUtils = {
 			);
 		}
 
+		function loadARGBMip( buffer, dataOffset, width, height ) {
+			var dataLength = width*height*4;
+			var srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
+			var byteArray = new Uint8Array( dataLength );
+			var dst = 0;
+			var src = 0;
+			for ( var y = 0; y < height; y++ ) {
+				for ( var x = 0; x < width; x++ ) {
+					var b = srcBuffer[src]; src++;
+					var g = srcBuffer[src]; src++;
+					var r = srcBuffer[src]; src++;
+					var a = srcBuffer[src]; src++;
+					byteArray[dst] = r; dst++;	//r
+					byteArray[dst] = g; dst++;	//g
+					byteArray[dst] = b; dst++;	//b
+					byteArray[dst] = a; dst++;	//a
+				}
+			}
+			return byteArray;
+		}
+
 		var FOURCC_DXT1 = fourCCToInt32("DXT1");
 		var FOURCC_DXT3 = fourCCToInt32("DXT3");
 		var FOURCC_DXT5 = fourCCToInt32("DXT5");
@@ -27107,6 +27231,11 @@ THREE.ImageUtils = {
 
 		var off_pfFlags = 20;
 		var off_pfFourCC = 21;
+		var off_RGBBitCount = 22;
+		var off_RBitMask = 23;
+		var off_GBitMask = 24;
+		var off_BBitMask = 25;
+		var off_ABitMask = 26;
 
 		var off_caps = 27;
 		var off_caps2 = 28;
@@ -27135,6 +27264,8 @@ THREE.ImageUtils = {
 
 		var fourCC = header[ off_pfFourCC ];
 
+		var isRGBAUncompressed = false;
+
 		switch ( fourCC ) {
 
 			case FOURCC_DXT1:
@@ -27157,9 +27288,18 @@ THREE.ImageUtils = {
 
 			default:
 
-				console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
-				return dds;
-
+				if( header[off_RGBBitCount] ==32 
+					&& header[off_RBitMask]&0xff0000
+					&& header[off_GBitMask]&0xff00 
+					&& header[off_BBitMask]&0xff
+					&& header[off_ABitMask]&0xff000000  ) {
+					isRGBAUncompressed = true;
+					blockBytes = 64;
+					dds.format = THREE.RGBAFormat;
+				} else {
+					console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+					return dds;
+				}
 		}
 
 		dds.mipmapCount = 1;
@@ -27190,9 +27330,14 @@ THREE.ImageUtils = {
 
 			for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
-				var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
-				var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
-
+				if( isRGBAUncompressed ) {
+					var byteArray = loadARGBMip( buffer, dataOffset, width, height );
+					var dataLength = byteArray.length;
+				} else {
+					var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
+					var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
+				}
+				
 				var mipmap = { "data": byteArray, "width": width, "height": height };
 				dds.mipmaps.push( mipmap );
 
