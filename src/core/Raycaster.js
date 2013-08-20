@@ -95,8 +95,6 @@
 
 			} 
 
-			var vertices = geometry.vertices;
-
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
 				var material = object.material;
@@ -229,6 +227,8 @@
 
 				var a, b, c, d;
 				var precision = raycaster.precision;
+
+				var vertices = geometry.vertices;
 
 				for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
