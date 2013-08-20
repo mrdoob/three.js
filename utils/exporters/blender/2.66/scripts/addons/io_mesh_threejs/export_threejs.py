@@ -856,6 +856,9 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
     armature, armatureObject = get_armature()
     if armature is None or armatureObject is None:
         return "", 0
+    armatureMat = armatureObject.matrix_world
+    l,r,s = armatureMat.decompose()
+    armatureRotMat = r.to_matrix()
 
     parents = []
     parent_index = -1
@@ -878,8 +881,8 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
         for frame in range(int(start_frame), int(end_frame / option_frame_step) + 1):
 
-            pos, pchange = position(hierarchy, frame * option_frame_step, action, armatureObject.matrix_world)
-            rot, rchange = rotation(hierarchy, frame * option_frame_step, action, armatureObject.matrix_world)
+            pos, pchange = position(hierarchy, frame * option_frame_step, action, armatureMat)
+            rot, rchange = rotation(hierarchy, frame * option_frame_step, action, armatureRotMat)
 
             if flipyz:
                 px, py, pz = pos.x, pos.z, -pos.y
@@ -1067,7 +1070,8 @@ def rotation(bone, frame, action, armatureMatrix):
                 change = change or hasChanged
 
     rot3 = rotation.to_3d()
-    rotation.xyz = armatureMatrix * bone.matrix_local.inverted() * rot3
+    rotation.xyz = rot3 * bone.matrix_local.inverted()
+    rotation.xyz = armatureMatrix * rotation.xyz
 
     return rotation, change
 
