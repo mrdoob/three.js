@@ -6,7 +6,13 @@
 
 THREE.Matrix3 = function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
-	this.elements = new Float32Array(9);
+	try {
+        this.elements = new Float32Array(9);
+    }
+    catch(x)
+    {
+        this.elements = new Array();
+    }
 
 	this.set(
 
