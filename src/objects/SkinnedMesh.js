@@ -3,13 +3,22 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
+// START_VEROLD_MOD - bind matrix
+THREE.SkinnedMesh = function ( geometry, material, useVertexTexture, bindMatrix ) {
+// END_VEROLD_MOD - bind matrix
 
 	THREE.Mesh.call( this, geometry, material );
 
 	//
 
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
+
+	// START_VEROLD_MOD - bind matrix
+	this.bindMatrix = bindMatrix !== undefined ? bindMatrix.clone() : new THREE.Matrix4();
+
+	this.invBindMatrix = new THREE.Matrix4();
+	this.invBindMatrix.getInverse( this.bindMatrix );
+	// END_VEROLD_MOD - bind matrix
 
 	// init bones
 
@@ -201,7 +210,12 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 			// was already representing the offset; however, this requires some
 			// major changes to the animation system
 
-			offsetMatrix.multiplyMatrices( this.bones[ b ].skinMatrix, this.boneInverses[ b ] );
+			// START_VEROLD_MOD - bind matrix
+			offsetMatrix.multiplyMatrices( this.invBindMatrix, this.bones[ b ].skinMatrix );
+			offsetMatrix.multiply( this.boneInverses[ b ] );
+			offsetMatrix.multiply( this.bindMatrix );
+			// END_VEROLD_MOD - bind matrix
+
 			offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
 
 		}
@@ -258,7 +272,9 @@ THREE.SkinnedMesh.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) {
 
-		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
+		// START_VEROLD_MOD - bind matrix
+		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture, this.bindMatrix );
+		// END_VEROLD_MOD - bind matrix
 
 	}
 
