@@ -4654,9 +4654,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			skinning: material.skinning,
 			maxBones: maxBones,
 			useVertexTexture: _supportsBoneTextures && object && object.useVertexTexture,
-			boneTextureWidth: object && object.boneTextureWidth,
-			boneTextureHeight: object && object.boneTextureHeight,
-
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
 			maxMorphTargets: this.maxMorphTargets,
@@ -4811,6 +4808,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
 					_this.setTexture( object.boneTexture, textureUnit );
+
+				}
+
+				if ( p_uniforms.boneTextureWidth !== null ) {
+
+					_gl.uniform1i( p_uniforms.boneTextureWidth, object.boneTextureWidth );
+
+				}
+
+				if ( p_uniforms.boneTextureHeight !== null ) {
+
+					_gl.uniform1i( p_uniforms.boneTextureHeight, object.boneTextureHeight );
 
 				}
 
@@ -6026,8 +6035,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
-			parameters.boneTextureWidth ? "#define N_BONE_PIXEL_X " + parameters.boneTextureWidth.toFixed( 1 ) : "",
-			parameters.boneTextureHeight ? "#define N_BONE_PIXEL_Y " + parameters.boneTextureHeight.toFixed( 1 ) : "",
 
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
 			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
@@ -6193,6 +6200,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( parameters.useVertexTexture ) {
 
 			identifiers.push( 'boneTexture' );
+			identifiers.push( 'boneTextureWidth' );
+			identifiers.push( 'boneTextureHeight' );
 
 		} else {
 
