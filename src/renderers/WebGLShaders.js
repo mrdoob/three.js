@@ -1260,8 +1260,8 @@ THREE.ShaderChunk = {
 					"float x = mod( j, float( boneTextureWidth ) );",
 					"float y = floor( j / float( boneTextureWidth ) );",
 
-					"const float dx = 1.0 / float( boneTextureWidth );",
-					"const float dy = 1.0 / float( boneTextureHeight );",
+					"float dx = 1.0 / float( boneTextureWidth );",
+					"float dy = 1.0 / float( boneTextureHeight );",
 
 					"y = dy * ( y + 0.5 );",
 
