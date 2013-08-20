@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = THREE || { REVISION: '60' };
+var THREE = THREE || { REVISION: '61dev' };
 
 self.console = self.console || {
 
@@ -6849,8 +6849,6 @@ THREE.EventDispatcher.prototype = {
 
 			} 
 
-			var vertices = geometry.vertices;
-
 			if ( geometry instanceof THREE.BufferGeometry ) {
 
 				var material = object.material;
@@ -6984,6 +6982,8 @@ THREE.EventDispatcher.prototype = {
 				var a, b, c, d;
 				var precision = raycaster.precision;
 
+				var vertices = geometry.vertices;
+
 				for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
 					var face = geometry.faces[ f ];
@@ -7043,33 +7043,39 @@ THREE.EventDispatcher.prototype = {
 			inverseMatrix.getInverse( object.matrixWorld );
 			localRay.copy( raycaster.ray ).applyMatrix4( inverseMatrix );
 
-			var vertices = geometry.vertices;
-			var nbVertices = vertices.length;
-			var interSegment = new THREE.Vector3();
-			var interRay = new THREE.Vector3();
-			var step = object.type === THREE.LineStrip ? 1 : 2;
+			/* if ( geometry instanceof THREE.BufferGeometry ) {
 
-			for ( var i = 0; i < nbVertices - 1; i = i + step ) {
+			} else */ if ( geometry instanceof THREE.Geometry ) {
 
-				var distSq = localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
+				var vertices = geometry.vertices;
+				var nbVertices = vertices.length;
+				var interSegment = new THREE.Vector3();
+				var interRay = new THREE.Vector3();
+				var step = object.type === THREE.LineStrip ? 1 : 2;
 
-				if ( distSq > precisionSq ) continue;
+				for ( var i = 0; i < nbVertices - 1; i = i + step ) {
 
-				var distance = localRay.origin.distanceTo( interRay );
+					var distSq = localRay.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-				if ( distance < raycaster.near || distance > raycaster.far ) continue;
+					if ( distSq > precisionSq ) continue;
 
-				intersects.push( {
+					var distance = localRay.origin.distanceTo( interRay );
 
-					distance: distance,
-					// What do we want? intersection point on the ray or on the segment??
-					// point: raycaster.ray.at( distance ),
-					point: interSegment.clone().applyMatrix4( object.matrixWorld ),
-					face: null,
-					faceIndex: null,
-					object: object
+					if ( distance < raycaster.near || distance > raycaster.far ) continue;
 
-				} );
+					intersects.push( {
+
+						distance: distance,
+						// What do we want? intersection point on the ray or on the segment??
+						// point: raycaster.ray.at( distance ),
+						point: interSegment.clone().applyMatrix4( object.matrixWorld ),
+						face: null,
+						faceIndex: null,
+						object: object
+
+					} );
+
+				}
 
 			}
 
