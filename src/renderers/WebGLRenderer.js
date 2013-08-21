@@ -6159,13 +6159,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else if ( texture instanceof THREE.CompressedTexture ) {
 
-				// compressed textures can only use manually created mipmaps
-				// WebGL can't generate mipmaps for DDS textures
-
 				for( var i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 					mipmap = mipmaps[ i ];
-					_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+					if ( texture.format!==THREE.RGBAFormat ) {
+						_gl.compressedTexImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+					} else {
+						_gl.texImage2D( _gl.TEXTURE_2D, i, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+					}
 
 				}
 
@@ -6283,23 +6284,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					if ( isCompressed ) {
+					if( !isCompressed ) {
 
+						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
+
+					} else {
+						
 						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
 
 						for( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
 
 							mipmap = mipmaps[ j ];
-							_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+							if ( texture.format!==THREE.RGBAFormat ) {
+
+								_gl.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+							} else {
+								_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+							}
 
 						}
-
-					} else {
-
-						_gl.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
-
 					}
-
 				}
 
 				if ( texture.generateMipmaps && isImagePowerOfTwo ) {
