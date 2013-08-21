@@ -13737,7 +13737,15 @@ THREE.MeshFaceMaterial = function ( materials ) {
 
 THREE.MeshFaceMaterial.prototype.clone = function () {
 
-	return new THREE.MeshFaceMaterial( this.materials.slice( 0 ) );
+	var material = new THREE.MeshFaceMaterial();
+
+	for ( var i = 0; i < this.materials.length; i ++ ) {
+
+		material.materials.push( this.materials[ i ].clone() );
+
+	}
+
+	return material;
 
 };
 
@@ -17569,15 +17577,17 @@ THREE.ShaderChunk = {
 			"#ifdef BONE_TEXTURE",
 
 				"uniform sampler2D boneTexture;",
+				"uniform int boneTextureWidth;",
+				"uniform int boneTextureHeight;",
 
 				"mat4 getBoneMatrix( const in float i ) {",
 
 					"float j = i * 4.0;",
-					"float x = mod( j, N_BONE_PIXEL_X );",
-					"float y = floor( j / N_BONE_PIXEL_X );",
+					"float x = mod( j, float( boneTextureWidth ) );",
+					"float y = floor( j / float( boneTextureWidth ) );",
 
-					"const float dx = 1.0 / N_BONE_PIXEL_X;",
-					"const float dy = 1.0 / N_BONE_PIXEL_Y;",
+					"float dx = 1.0 / float( boneTextureWidth );",
+					"float dy = 1.0 / float( boneTextureHeight );",
 
 					"y = dy * ( y + 0.5 );",
 
@@ -23902,8 +23912,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			skinning: material.skinning,
 			maxBones: maxBones,
 			useVertexTexture: _supportsBoneTextures && object && object.useVertexTexture,
-			boneTextureWidth: object && object.boneTextureWidth,
-			boneTextureHeight: object && object.boneTextureHeight,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -24059,6 +24067,18 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_gl.uniform1i( p_uniforms.boneTexture, textureUnit );
 					_this.setTexture( object.boneTexture, textureUnit );
+
+				}
+
+				if ( p_uniforms.boneTextureWidth !== null ) {
+
+					_gl.uniform1i( p_uniforms.boneTextureWidth, object.boneTextureWidth );
+
+				}
+
+				if ( p_uniforms.boneTextureHeight !== null ) {
+
+					_gl.uniform1i( p_uniforms.boneTextureHeight, object.boneTextureHeight );
 
 				}
 
@@ -25276,8 +25296,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.skinning ? "#define USE_SKINNING" : "",
 			parameters.useVertexTexture ? "#define BONE_TEXTURE" : "",
-			parameters.boneTextureWidth ? "#define N_BONE_PIXEL_X " + parameters.boneTextureWidth.toFixed( 1 ) : "",
-			parameters.boneTextureHeight ? "#define N_BONE_PIXEL_Y " + parameters.boneTextureHeight.toFixed( 1 ) : "",
 
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
 			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
@@ -25443,6 +25461,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( parameters.useVertexTexture ) {
 
 			identifiers.push( 'boneTexture' );
+			identifiers.push( 'boneTextureWidth' );
+			identifiers.push( 'boneTextureHeight' );
 
 		} else {
 
