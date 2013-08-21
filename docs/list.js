@@ -40,7 +40,7 @@ var list = {
 			[ "GeometryLoader", "api/loaders/GeometryLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
-			[ "LoadingMonitor", "api/loaders/LoadingMonitor" ],
+			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "SceneLoader", "api/loaders/SceneLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
 		],

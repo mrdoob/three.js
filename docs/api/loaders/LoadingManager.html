@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script src="../../list.js"></script>
+		<script src="../../page.js"></script>
+		<link type="text/css" rel="stylesheet" href="../../page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<div class="desc">Handles and keeps track of loaded and pending data.</div>
+		<code>
+var manager = new THREE.LoadingManager();
+manager.onProgress = function ( item, loaded, total ) {
+
+	console.log( item, loaded, total );
+
+};
+
+var loader = new THREE.OBJLoader( manager );
+loader.load( 'file.obj', function ( object ) {
+
+	//
+
+} );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<div>
+		todo
+		</div>
+
+		<h2>Source</h2>
+
+		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	</body>
+</html>
