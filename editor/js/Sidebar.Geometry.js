@@ -121,9 +121,9 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-			if ( geometry instanceof THREE.PlaneGeometry ) {
+			if ( geometry instanceof THREE.CircleGeometry ) {
 
-				parameters = new Sidebar.Geometry.PlaneGeometry( signals, object );
+				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
 				container.add( parameters );
 
 			} else if ( geometry instanceof THREE.CubeGeometry ) {
@@ -144,6 +144,11 @@ Sidebar.Geometry = function ( editor ) {
 			} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
 
 				parameters = new Sidebar.Geometry.IcosahedronGeometry( signals, object );
+				container.add( parameters );
+
+			} else if ( geometry instanceof THREE.PlaneGeometry ) {
+
+				parameters = new Sidebar.Geometry.PlaneGeometry( signals, object );
 				container.add( parameters );
 
 			} else if ( geometry instanceof THREE.TorusGeometry ) {
