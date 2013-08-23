@@ -164,14 +164,14 @@ THREE.OrbitControls = function ( object, domElement ) {
 			// half of the fov is center to top of screen
 			targetDistance *= Math.tan( (scope.object.fov/2) * Math.PI / 180.0 );
 			// we actually don't use screenWidth, since perspective camera is fixed to screen height
-			scope.panLeft( 2 * delta.x * targetDistance / scope.domElement.height );
-			scope.panUp( 2 * delta.y * targetDistance / scope.domElement.height );
+			scope.panLeft( 2 * delta.x * targetDistance / scope.domElement.body.clientHeight );
+			scope.panUp( 2 * delta.y * targetDistance / scope.domElement.body.clientHeight );
 		}
 		else if ( scope.object.top !== undefined )
 		{
 			// orthographic
-			scope.panLeft( delta.x * (scope.object.right - scope.object.left) / scope.domElement.width );
-			scope.panUp( delta.y * (scope.object.top - scope.object.bottom) / scope.domElement.height );
+			scope.panLeft( delta.x * (scope.object.right - scope.object.left) / scope.domElement.body.clientWidth );
+			scope.panUp( delta.y * (scope.object.top - scope.object.bottom) / scope.domElement.body.clientHeight );
 		}
 		else
 		{
@@ -323,9 +323,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 			rotateDelta.subVectors( rotateEnd, rotateStart );
 
 			// rotating across whole screen goes 360 degrees around
-			scope.rotateLeft( 2 * Math.PI * rotateDelta.x / scope.domElement.width * scope.rotateSpeed );
+			scope.rotateLeft( 2 * Math.PI * rotateDelta.x / scope.domElement.body.clientWidth * scope.rotateSpeed );
 			// rotating up and down along whole screen attempts to go 360, but limited to 180
-			scope.rotateUp( 2 * Math.PI * rotateDelta.y / scope.domElement.height * scope.rotateSpeed );
+			scope.rotateUp( 2 * Math.PI * rotateDelta.y / scope.domElement.body.clientHeight * scope.rotateSpeed );
 
 			rotateStart.copy( rotateEnd );
 
@@ -498,9 +498,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 				rotateDelta.subVectors( rotateEnd, rotateStart );
 
 				// rotating across whole screen goes 360 degrees around
-				scope.rotateLeft( 2 * Math.PI * rotateDelta.x / scope.domElement.width * scope.rotateSpeed );
+				scope.rotateLeft( 2 * Math.PI * rotateDelta.x / scope.domElement.body.clientWidth * scope.rotateSpeed );
 				// rotating up and down along whole screen attempts to go 360, but limited to 180
-				scope.rotateUp( 2 * Math.PI * rotateDelta.y / scope.domElement.height * scope.rotateSpeed );
+				scope.rotateUp( 2 * Math.PI * rotateDelta.y / scope.domElement.body.clientHeight * scope.rotateSpeed );
 
 				rotateStart.copy( rotateEnd );
 				break;
