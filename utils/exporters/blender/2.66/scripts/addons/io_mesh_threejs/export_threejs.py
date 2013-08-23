@@ -698,45 +698,64 @@ def generate_uvs(uv_layers, option_uv_coords):
     return ",".join("[%s]" % n for n in layers)
 
 # ##############################################################################
+# Model exporter - armature
+# (only the first armature will exported)
+# ##############################################################################
+def get_armature():
+    if len(bpy.data.armatures) == 0:
+        print("Warning: no armatures in the scene")
+        return None, None
+
+    armature = bpy.data.armatures[0]
+
+    # Someone please figure out a proper way to get the armature node
+    for object in bpy.data.objects:
+        if object.type == 'ARMATURE':
+            return armature, object
+
+    print("Warning: no node of type 'ARMATURE' in the scene")
+    return None, None
+
+# ##############################################################################
 # Model exporter - bones
 # (only the first armature will exported)
 # ##############################################################################
 
 def generate_bones(option_bones, flipyz):
 
-    if not option_bones or len(bpy.data.armatures) == 0:
+    if not option_bones:
+        return "", 0
+
+    armature, armatureObject = get_armature()
+    if armature is None or armatureObject is None:
         return "", 0
 
     hierarchy = []
 
-    armature = bpy.data.armatures[0]
-
     TEMPLATE_BONE = '{"parent":%d,"name":"%s","pos":[%g,%g,%g],"rotq":[0,0,0,1]}'
 
     for bone in armature.bones:
+        bonePos = None
+        boneIndex = None
         if bone.parent == None:
-            if flipyz:
-                joint = TEMPLATE_BONE % (-1, bone.name, bone.head.x, bone.head.z, -bone.head.y)
-                hierarchy.append(joint)
-            else:
-                joint = TEMPLATE_BONE % (-1, bone.name, bone.head.x, bone.head.y, bone.head.z)
-                hierarchy.append(joint)
+            bonePos = bone.head_local
+            boneIndex = -1
         else:
-            index = i = 0
+            bonePos = bone.head_local - bone.parent.head_local
+            boneIndex = i = 0
             for parent in armature.bones:
                 if parent.name == bone.parent.name:
-                    index = i
+                    boneIndex = i
                 i += 1
 
-            position = bone.head_local - bone.parent.head_local
-
-            if flipyz:
-                joint = TEMPLATE_BONE % (index, bone.name, position.x, position.z, -position.y)
-                hierarchy.append(joint)
-            else:
-                joint = TEMPLATE_BONE % (index, bone.name, position.x, position.y, position.z)
-                hierarchy.append(joint)
-
+        bonePosWorld = armatureObject.matrix_world * bonePos
+        if flipyz:
+            joint = TEMPLATE_BONE % (boneIndex, bone.name, bonePosWorld.x, bonePosWorld.z, -bonePosWorld.y)
+            hierarchy.append(joint)
+        else:
+            joint = TEMPLATE_BONE % (boneIndex, bone.name, bonePosWorld.x, bonePosWorld.y, bonePosWorld.z)
+            hierarchy.append(joint)
+                
     bones_string = ",".join(hierarchy)
 
     return bones_string, len(armature.bones)
@@ -754,7 +773,7 @@ def generate_indices_and_weights(meshes, option_skinning):
     indices = []
     weights = []
 
-    armature = bpy.data.armatures[0]
+    armature, armatureObject = get_armature()
 
     for mesh, object in meshes:
 
@@ -828,13 +847,18 @@ def generate_indices_and_weights(meshes, option_skinning):
 
 def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
-    if not option_animation_skeletal or len(bpy.data.actions) == 0 or len(bpy.data.armatures) == 0:
+    if not option_animation_skeletal or len(bpy.data.actions) == 0:
         return ""
 
     # TODO: Add scaling influences
 
     action = bpy.data.actions[0]
-    armature = bpy.data.armatures[0]
+    armature, armatureObject = get_armature()
+    if armature is None or armatureObject is None:
+        return "", 0
+    armatureMat = armatureObject.matrix_world
+    l,r,s = armatureMat.decompose()
+    armatureRotMat = r.to_matrix()
 
     parents = []
     parent_index = -1
@@ -857,8 +881,8 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
 
         for frame in range(int(start_frame), int(end_frame / option_frame_step) + 1):
 
-            pos, pchange = position(hierarchy, frame * option_frame_step)
-            rot, rchange = rotation(hierarchy, frame * option_frame_step)
+            pos, pchange = position(hierarchy, frame * option_frame_step, action, armatureMat)
+            rot, rchange = rotation(hierarchy, frame * option_frame_step, action, armatureRotMat)
 
             if flipyz:
                 px, py, pz = pos.x, pos.z, -pos.y
@@ -930,15 +954,12 @@ def handle_position_channel(channel, frame, position):
 
     return change
 
-def position(bone, frame):
+def position(bone, frame, action, armatureMatrix):
 
     position = mathutils.Vector((0,0,0))
     change = False
 
-    action = bpy.data.actions[0]
     ngroups = len(action.groups)
-
-
 
     if ngroups > 0:
 
@@ -982,7 +1003,7 @@ def position(bone, frame):
         position.y += (bone.head * parentInvertedLocalMatrix).y + parentHeadTailDiff.y
         position.z += (bone.head * parentInvertedLocalMatrix).z + parentHeadTailDiff.z
 
-    return position, change
+    return armatureMatrix*position, change
 
 def handle_rotation_channel(channel, frame, rotation):
 
@@ -1010,7 +1031,7 @@ def handle_rotation_channel(channel, frame, rotation):
 
     return change
 
-def rotation(bone, frame):
+def rotation(bone, frame, action, armatureMatrix):
 
     # TODO: calculate rotation also from rotation_euler channels
 
@@ -1018,23 +1039,23 @@ def rotation(bone, frame):
 
     change = False
 
-    action = bpy.data.actions[0]
     ngroups = len(action.groups)
 
     # animation grouped by bones
 
     if ngroups > 0:
 
-        index = 0
+        index = -1
 
         for i in range(ngroups):
             if action.groups[i].name == bone.name:
                 index = i
 
-        for channel in action.groups[index].channels:
-            if "quaternion" in channel.data_path:
-                hasChanged = handle_rotation_channel(channel, frame, rotation)
-                change = change or hasChanged
+        if index > -1:
+            for channel in action.groups[index].channels:
+                if "quaternion" in channel.data_path:
+                    hasChanged = handle_rotation_channel(channel, frame, rotation)
+                    change = change or hasChanged
 
     # animation in raw fcurves
 
@@ -1050,6 +1071,7 @@ def rotation(bone, frame):
 
     rot3 = rotation.to_3d()
     rotation.xyz = rot3 * bone.matrix_local.inverted()
+    rotation.xyz = armatureMatrix * rotation.xyz
 
     return rotation, change
 
