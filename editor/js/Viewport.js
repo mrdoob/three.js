@@ -245,19 +245,17 @@ var Viewport = function ( editor ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		if ( object instanceof THREE.Light ) {
-
-			updateMaterials();
-
-		}
-
-		objects.push( object );
+		var materialsNeedUpdate = false;
 
 		object.traverse( function ( child ) {
+
+			if ( child instanceof THREE.Light ) materialsNeedUpdate = true;
 
 			objects.push( child );
 
 		} );
+
+		if ( materialsNeedUpdate === true ) updateMaterials();
 
 	} );
 
@@ -289,13 +287,17 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
-		if ( object instanceof THREE.Light ) {
+		var materialsNeedUpdate = false;
 
-			updateMaterials();
+		object.traverse( function ( child ) {
 
-		}
+			if ( child instanceof THREE.Light ) materialsNeedUpdate = true;
 
-		objects.splice( objects.indexOf( object ), 1 );
+			objects.splice( objects.indexOf( child ), 1 );
+
+		} );
+
+		if ( materialsNeedUpdate === true ) updateMaterials();
 
 	} );
 
@@ -390,12 +392,14 @@ var Viewport = function ( editor ) {
 	signals.playAnimations.add( function (animations) {
 		
 		function animate() {
+
 			requestAnimationFrame( animate );
 			
-			for (var i = 0; i < animations.length ; i++ ){
-				animations[i].update(0.016);
-			} 
+			for ( var i = 0; i < animations.length ; i ++ ) {
 
+				animations[i].update(0.016);
+
+			} 
 
 			render();
 		}
@@ -522,6 +526,8 @@ var Viewport = function ( editor ) {
 		renderer.clear();
 		renderer.render( scene, camera );
 		renderer.render( sceneHelpers, camera );
+
+		console.trace();
 
 	}
 
