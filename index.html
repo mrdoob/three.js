@@ -18,7 +18,7 @@
 				margin: 0px;
 				padding: 19px 0px 30px 180px;
 
-				font-family: 'inconsolata';
+				font-family: Tahoma, Geneva, sans-serif;
 				font-size: 15px;
 
 			}
@@ -33,8 +33,9 @@
 			}
 
 			h2 {
-				color: #999;
-				font-size: 18px;
+                
+				color: #FF961E;
+				font-size: 20px;
 				font-weight: normal;
 
 				margin-top: 12px;
@@ -49,7 +50,7 @@
 
 			a {
 				color: #2194CE;
-				font-size: 15px;
+				font-size: 16px;
 				text-decoration: none;
 			}
 
@@ -58,7 +59,9 @@
 			}
 
 			#panel	{
-				position: fixed;
+
+				position: absolute;
+font-family: 'inconsolata';
 
 				left: 0px;
 				top: 0px;
@@ -70,10 +73,119 @@
 			}
 
 			.images {
-				line-height: 0px;
+			//	line-height: 0px;
 				margin-bottom: 40px;
 			}
-
+           
+            .title{
+             display: block;   
+            }
+            .featuredLink{
+               
+             display: inline-block;  
+                margin-bottom: -5px;
+                margin-left: 5px;
+                -webkit-transition: all .4s;
+                width: 200px;
+                padding: 20px;
+                
+            }
+            .featuredLink:hover{
+                color: white;
+             background-color: #2194CE;  
+                text-decoration: none;
+            }
+            
+            
+            /* Navigation*/
+#nav a{
+           display: block;
+                position: relative;
+height: 20px;
+padding: 7px;
+background-color: #2194CE;
+color: #FFF;
+margin-bottom: 3px;
+padding-top: 10px;
+-webkit-transition: all .4s;
+                
+            }
+            #nav a:hover{
+                background-color: #186d98;
+                text-decoration: none;
+            }
+            .group{
+             //   border-bottom: 1px solid grey;
+                padding-bottom: 3px;
+             margin-bottom: 7px;   
+            }
+            #nav img{
+             display: block;
+position: absolute;
+float: right;
+right: 0;
+top: 0;
+padding: 5px;
+height: 30px;
+width: auto;
+margin-left: 0px;
+                height: 100%;
+                margin-top: 0px;
+box-sizing: border-box;
+border-left: 1px rgb(255, 255, 255) solid;
+z-index: 2;
+                
+                
+                
+            }
+            
+            #startingLinks a:hover{
+             text-decoration: none;
+                background-color: #186d98;
+            }
+            #startingLinks a{
+                -webkit-transition: all .4s;
+             font-size: 18px;
+display: inline-block;
+height: 38px;
+background-color: #2194CE;
+color: #FFF;
+padding-left: 45px;
+padding-right: 45px;
+padding-top: 16px;
+              border-bottom: 1px solid white;  
+                width: 226px;
+                text-align: center;
+            }
+            #startingLinks a img{
+             position: relative;   
+            }
+            #startingLinks a span{
+             position: relative;
+top: -8px;
+   
+            }
+            
+            /* 
+            About
+             */
+            #about span{
+             color: #FF961E;   
+            }
+            #about{
+             margin-top:47px;   
+            }
+            #footer{
+                display: absolute;
+                bottom: 0px;
+                left: 0px;
+                width: 100%;
+                background-color: #2194CE;
+                color: white;
+                padding-top: 20px;
+                padding-bottom: 20px;
+            text-indent: 30px;
+            }
 		</style>
 	</head>
 	<body>
@@ -94,24 +206,30 @@
 
 		<div id="panel">
 			<h1>three.js<span style="font-size: 50%; vertical-align: super;"> <a href="http://github.com/mrdoob/three.js/releases">r60</a></span></h1>
-
-			<a href="examples/">examples</a><br /><br />
-
-			<a href="http://github.com/mrdoob/three.js/zipball/master">download</a><br /><br />
-
-			<a href="http://www.aerotwist.com/lab/getting-started-with-three-js/">getting started</a><br />
-			<a href="docs/">documentation</a><br />
-			<a href="https://plus.google.com/104300307601542851567" rel="publisher">google+</a><br />
-			<a href="http://webchat.freenode.net/?channels=three.js">chat</a><br />
-			<a href="http://stackoverflow.com/questions/tagged/three.js">help</a><br /><br />
-
-			<a href="http://github.com/mrdoob/three.js/">github</a><br />
-			<a href="http://github.com/mrdoob/three.js/contributors">contributors</a><br />
-			<a href="http://github.com/mrdoob/three.js/wiki">wiki</a><br />
-			<a href="http://github.com/mrdoob/three.js/issues">issues</a><br /><br />
-
-			<a href="editor/">editor</a> (beta)
-
+<div id="nav">
+    <div class="group">
+			<a href="examples/">examples</a>
+</div>
+    <div class="group">
+        <a href="http://github.com/mrdoob/three.js/zipball/master">download <img width='26' height='26' title='' alt='' src='downloadWhite.png'></a>
+</div>
+     <div class="group">
+			<a href="http://www.aerotwist.com/lab/getting-started-with-three-js/">getting started</a>
+			<a href="docs/">documentation</a>
+			<a href="https://plus.google.com/104300307601542851567" rel="publisher">google+</a>
+			<a href="http://webchat.freenode.net/?channels=three.js">chat</a>
+			<a href="http://stackoverflow.com/questions/tagged/three.js">help</a>
+</div>
+     <div class="group">
+			<a href="http://github.com/mrdoob/three.js/">github</a>
+			<a href="http://github.com/mrdoob/three.js/contributors">contributors</a>
+			<a href="http://github.com/mrdoob/three.js/wiki">wiki</a>
+			<a href="http://github.com/mrdoob/three.js/issues">issues</a>
+</div>
+     <div class="group">
+			<a href="editor/">editor <span>(beta)</span></a> 
+         </div>
+</div>
 			<hr />
 
 			<center>
@@ -121,50 +239,68 @@
 			</center>
 
 		</div>
-
-		<h2>featured projects</h2>
-		<div id="featured" class="images"></div>
+<div id="about">
+    <h2>About</h2>
+    <p style="padding-right: 75px;">Three.js is a
+        <span>lightwight</span>,
+        <span>cross-browser</span>Javascript libary for creating and displaying animated 3D computer graphics. It has
+        <span>&lt;canvas&gt;</span>,
+        <span>&lt;svg &gt;</span>,
+        <span>CSS3D</span>and
+        <span>WebGL</span>renderers. Three.js is designed to have a very
+        <span>low level of complexity</span>, in other words, for dummies.</p>
+</div>
+		<div id="gettingStarted"><h2>Getting Started</h2>
+        <div id="startingLinks"><div>
+            <a href="https://github.com/mrdoob/three.js/wiki/Features"><span>Major Features </span> <img src="features.png"></a>
+            <a href="http://www.aerotwist.com/tutorials/getting-started-with-three-js/"><span>Beginner's Tutorial </span><img src="rightArrow.png"></a>
+             <a href="http://github.com/mrdoob/three.js/zipball/master"><span>Download </span><img src="downloadWhite.png"></a>
+            </div>
+            </div>
+        </div>
+       
+		<div id="featured" class="images"><h2>Featured Projects</h2></div>
 		<script>
 
 		var files = [
 
-			[ "cubeslam", "http://cubeslam.com/" ],
-			[ "hyperlapse", "http://hyperlapse.tllabs.io/" ],
-			[ "wwmaze", "http://chrome.com/maze/" ],
-			[ "paleodictyon", "http://antivj.com/paleodictyon_app/" ],
-			[ "findyourwaytooz", "http://www.findyourwaytooz.com/" ],
-			[ "voxeljs", "http://voxeljs.com/" ],
-			[ "neverseenthesky", "http://christmasexperiments.com/23/" ],
-			[ "zeitgeist2012", "http://www.google.com/zeitgeist/2012/#explore" ],
-			[ "zoetrope", "http://lab.sehsucht.de/" ],
-			[ "mvsw", "http://www.pillandpillow.com/mvsw/site/" ],
-			[ "thecarpandtheseagull", "http://thecarpandtheseagull.thecreatorsproject.com/" ],
-			[ "100000stars", "http://workshop.chromeexperiments.com/stars/" ],
-			[ "theywilleatyou", "http://theywilleatyou.com/" ],
-			[ "blast", "http://blast.hellohikimori.com/" ],
-			[ "hexgl", "http://hexgl.bkcore.com/" ],
-			[ "armsglobe", "http://workshop.chromeexperiments.com/projects/armsglobe/" ],
-			[ "carvisualizer", "http://carvisualizer.plus360degrees.com/threejs/" ],
-			[ "chromeweblab", "http://www.chromeweblab.com/" ],
-			[ "lightgraffiti", "http://lightgraffiti.littlesun.com/" ],
-			[ "tntfortwo", "http://www.pajamaclubmusic.com/3d/" ],
-			[ "chaostoperfection", "http://www.chaostoperfection.com/" ],
-			[ "livecodelab", "http://www.sketchpatch.net/labs/livecodelabIntro.html" ],
-			[ "kaiopua", "http://collinhover.github.com/kaiopua/" ],
-			[ "physijs", "http://chandlerprall.github.com/Physijs/" ],
-			[ "googlecube", "http://www.playmapscube.com/" ],
-			[ "triggerrally", "http://triggerrally.com/" ],
-			[ "zombiesvscow", "http://yagiz.me/zombiesvscow/" ],
-			[ "threefab", "http://blackjk3.github.com/threefab/" ],
-			[ "nyancat", "http://dl.dropbox.com/u/6213850/WebGL/nyanCat/nyan.html" ],
-			[ "threenodes", "http://idflood.github.com/ThreeNodes.js/public/index.html" ],
-			[ "f50", "http://www.adidas.com/football/uk/pages/f50/" ],
-			[ "lights", "http://lights.elliegoulding.com/" ],
-			[ "beanstalk", "http://inear.se/beanstalk/" ],
-			[ "missioncontrol", "http://superfad.com/missioncontrol/" ],
-			[ "rome", "http://ro.me/" ],
-			[ "globe", "http://data-arts.appspot.com/globe" ],
-			[ "helloracer", "http://helloracer.com/webgl/" ]
+			[ "cubeslam", "http://cubeslam.com/", "cube slam" ],
+			[ "hyperlapse", "http://hyperlapse.tllabs.io/", "Hyperlapse" ],
+			[ "wwmaze", "http://chrome.com/maze/", "World Wide Maze" ],
+			[ "paleodictyon", "http://antivj.com/paleodictyon_app/", "Paleodictyon" ],
+			[ "findyourwaytooz", "http://www.findyourwaytooz.com/", "Find Your Way to Oz" ],
+			[ "voxeljs", "http://voxeljs.com/", "voxel.js" ],
+			[ "neverseenthesky", "http://christmasexperiments.com/23/", "Never Seen The Sky" ],
+			[ "zeitgeist2012", "http://www.google.com/zeitgeist/2012/#explore", "Zeitgeist 2012" ],
+			[ "zoetrope", "http://lab.sehsucht.de/", "Zoetrope" ],
+			[ "mvsw", "http://www.pillandpillow.com/mvsw/site/","MvsW" ],
+			[ "thecarpandtheseagull", "http://thecarpandtheseagull.thecreatorsproject.com/", "The Carp and The Seagull" ],
+			[ "100000stars", "http://workshop.chromeexperiments.com/stars/", "100,000 Stars" ],
+			[ "theywilleatyou", "http://theywilleatyou.com/", "They Will Eat You" ],
+			[ "blast", "http://blast.hellohikimori.com/", "Blast" ],
+			[ "hexgl", "http://hexgl.bkcore.com/", "HexGL" ],
+			[ "armsglobe", "http://workshop.chromeexperiments.com/projects/armsglobe/", "Arms Globe" ],
+			[ "carvisualizer", "http://carvisualizer.plus360degrees.com/threejs/", "Car Visualizer" ],
+			[ "chromeweblab", "http://www.chromeweblab.com/", "Chrome Web Lab" ],
+			[ "lightgraffiti", "http://lightgraffiti.littlesun.com/", "Sunlight Graffiti" ],
+			[ "tntfortwo", "http://www.pajamaclubmusic.com/3d/", "TNT For Two" ],
+			[ "chaostoperfection", "http://www.chaostoperfection.com/", "Chaos To Perfection" ],
+			[ "livecodelab", "http://www.sketchpatch.net/labs/livecodelabIntro.html", "Livecodelab" ],
+			[ "kaiopua", "http://collinhover.github.com/kaiopua/", "kaiopua" ],
+			[ "physijs", "http://chandlerprall.github.com/Physijs/", "Physijs" ],
+			[ "googlecube", "http://www.playmapscube.com/", "Maps Cube" ],
+			[ "triggerrally", "http://triggerrally.com/", "Trigger Rally" ],
+			[ "zombiesvscow", "http://yagiz.me/zombiesvscow/", "Zombie vs. Cow" ],
+			[ "threefab", "http://blackjk3.github.com/threefab/", "THREE Fab" ],
+			[ "nyancat", "http://dl.dropbox.com/u/6213850/WebGL/nyanCat/nyan.html", "3D Nyon Cat" ],
+			[ "threenodes", "http://idflood.github.com/ThreeNodes.js/public/index.html", "ThreeNodes.js" ],
+			[ "f50", "http://www.adidas.com/football/uk/pages/f50/", "f50" ],
+			[ "lights", "http://lights.elliegoulding.com/", "Lights" ],
+			[ "beanstalk", "http://inear.se/beanstalk/", "Beanstalk" ],
+			[ "missioncontrol", "http://superfad.com/missioncontrol/", "Mission Control" ],
+			[ "rome", "http://ro.me/", "Rome" ],
+			[ "globe", "http://data-arts.appspot.com/globe", "Globe" ],
+			[ "helloracer", "http://helloracer.com/webgl/", "Hello Racer" ]
 
 		];
 
@@ -173,11 +309,11 @@
 		for ( var i = 0; i < files.length; i ++ ) {
 
 			var file = files[ i ];
-			element.innerHTML += '<a href="' + file[ 1 ] + '" target="_blank"><img src="files/projects/' + file[ 0 ] + '.jpg" width="200" height="150"></a>';
+			element.innerHTML += '<a class="featuredLink" href="' + file[ 1 ] + '" target="_blank"><img src="files/projects/' + file[ 0 ] + '.jpg" width="200" height="150"><div class="title">' + file[2] + '</div></a>';
 
 		}
 
 		</script>
-
+<div id="footer"> Copyright 2013 three.js |  <a href="https://github.com/mrdoob/three.js/" style="color: white;"> Github</a></div>
 	</body>
 </html>
