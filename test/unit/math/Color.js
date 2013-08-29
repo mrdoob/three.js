@@ -129,7 +129,7 @@ test( "setStyleRGBPercent", function(){
 
 test( "setStyleRGBPercentWithSpaces", function(){
     var c = new THREE.Color();
-    c.setStyle('rgb(100%,50%,10%)');
+    c.setStyle('rgb(100%, 50%, 10%)');
     ok( c.r == 1, "Red: " + c.r );
     ok( c.g == 0.5, "Green: " + c.g );
     ok( c.b == 0.1, "Blue: " + c.b );
