@@ -188,7 +188,7 @@ THREE.ShadowMapPlugin = function () {
 
 			}
 
-			if ( light.isVirtual && virtualLight.originalCamera == camera ) {
+			if ( light.isVirtual && light.originalCamera == camera ) {
 
 				updateShadowCamera( camera, light );
 
