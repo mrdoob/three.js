@@ -414,7 +414,7 @@ THREE.ShadowMapPlugin = function () {
 
 		virtualLight.position.copy( light.position );
 		virtualLight.target.position.copy( light.target.position );
-		virtualLight.lookAt( virtualLight.target );
+		virtualLight.lookAt( virtualLight.target.position );
 
 		virtualLight.shadowCameraVisible = light.shadowCameraVisible;
 		virtualLight.shadowDarkness = light.shadowDarkness;
