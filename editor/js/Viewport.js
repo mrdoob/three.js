@@ -68,11 +68,10 @@ var Viewport = function ( editor ) {
 
 	var getIntersects = function ( event, object ) {
 
-		var vector = new THREE.Vector3(
-			( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-			- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
+	    var rect = container.dom.getBoundingClientRect();
+	    x = (event.clientX - rect.left) / rect.width;
+	    y = (event.clientY - rect.top) / rect.height;
+		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
 
@@ -95,7 +94,10 @@ var Viewport = function ( editor ) {
 
 		event.preventDefault();
 
-		onMouseDownPosition.set( event.layerX, event.layerY );
+	    var rect = container.dom.getBoundingClientRect();
+	    x = (event.clientX - rect.left) / rect.width;
+	    y = (event.clientY - rect.top) / rect.height;
+		onMouseDownPosition.set( x, y );
 
 		if ( transformControls.hovered === false ) {
 
@@ -108,7 +110,10 @@ var Viewport = function ( editor ) {
 
 	var onMouseUp = function ( event ) {
 
-		onMouseUpPosition.set( event.layerX, event.layerY );
+	    var rect = container.dom.getBoundingClientRect();
+	    x = (event.clientX - rect.left) / rect.width;
+	    y = (event.clientY - rect.top) / rect.height;
+		onMouseUpPosition.set( x, y );
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 1 ) {
 
@@ -527,7 +532,7 @@ var Viewport = function ( editor ) {
 		renderer.render( scene, camera );
 		renderer.render( sceneHelpers, camera );
 
-		console.trace();
+		//console.trace();
 
 	}
 

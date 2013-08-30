@@ -89,6 +89,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 			intersectionPlanes[intersectionPlaneList[i]] = new THREE.Mesh( new THREE.PlaneGeometry( 500, 500 ) );
 			intersectionPlanes[intersectionPlaneList[i]].material.side = THREE.DoubleSide;
 			intersectionPlanes[intersectionPlaneList[i]].visible = false;
+			intersectionPlanes[intersectionPlaneList[i]].name = intersectionPlaneList[i]; 
 			planes.add(intersectionPlanes[intersectionPlaneList[i]]);
 
 		}
@@ -335,7 +336,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		pickerAxes['rotate'].add( mesh );
 
 		mesh = new THREE.Mesh( new THREE.SphereGeometry( 0.95, 12, 12 ), HandleMaterial( white, 0.25 ) );
-		mesh.name = 'RXYZE';
+		mesh.name = 'RXYZ';
 		pickerAxes['rotate'].add( mesh );
 
 		intersectionPlanes['SPHERE'] = new THREE.Mesh( new THREE.SphereGeometry( 0.95, 12, 12 ) );
@@ -390,6 +391,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 		this.gizmo.position.copy( worldPosition )
 		this.gizmo.scale.set( scale, scale, scale );
 
+		lookAtMatrix.lookAt( camPosition, worldPosition, tempVector.set( 0, 1, 0 ));
+
 		for ( var i in this.gizmo.children ) {
 
 			for ( var j in this.gizmo.children[i].children ) {
@@ -400,7 +403,7 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 				if ( name.search('E') != -1 ){
 
 					lookAtMatrix.lookAt( camPosition, worldPosition, tempVector.set( 0, 1, 0 ));
-					object.rotation.setFromRotationMatrix( lookAtMatrix );
+					object.quaternion.setFromRotationMatrix( lookAtMatrix );
 
 				} else {
 
@@ -579,6 +582,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		}
 
+		// console.log(currentPlane);
+
 	}
 
 	var hovered = null;
@@ -632,8 +637,8 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		}
 
-		scope.document.addEventListener( 'mousemove', onMouseMove, false );
-		scope.document.addEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.addEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.addEventListener( 'mouseup', onMouseUp, false );
 
 	};
 
@@ -673,8 +678,9 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		}
 
-		scope.document.addEventListener( 'mousemove', onMouseMove, false );
-		scope.document.addEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.addEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.addEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.addEventListener( 'mouseout', onMouseUp, false );
 
 	};
 
@@ -700,7 +706,6 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 						if ( !(isActive("X")) || scope.modifierAxis.x != 1 ) point.x = 0;
 						if ( !(isActive("Y")) || scope.modifierAxis.y != 1 ) point.y = 0;
 						if ( !(isActive("Z")) || scope.modifierAxis.z != 1 ) point.z = 0;
-						if ( isActive("XYZ") ) point.set( 0, 0, 0 );
 
 						point.applyMatrix4( oldRotationMatrix );
 
@@ -854,8 +859,9 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 		scope.active = false;
 
-		scope.document.removeEventListener( 'mousemove', onMouseMove, false );
-		scope.document.removeEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.removeEventListener( 'mouseout', onMouseUp, false );
 
 	}
 
@@ -910,11 +916,10 @@ THREE.TransformControls = function ( camera, domElement, doc ) {
 
 	function intersectObjects( event, objects ) {
 
-		pointerVector.set(
-			( event.layerX / scope.domElement.offsetWidth ) * 2 - 1,
-			- ( event.layerY / scope.domElement.offsetHeight ) * 2 + 1,
-			0.5
-		);
+	    var rect = scope.domElement.getBoundingClientRect();
+	    x = (event.clientX - rect.left) / rect.width;
+	    y = (event.clientY - rect.top) / rect.height;
+		pointerVector.set( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( pointerVector, scope.camera );
 		ray.set( camPosition, pointerVector.sub( camPosition ).normalize() );
