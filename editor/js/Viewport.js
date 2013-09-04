@@ -45,11 +45,10 @@ var Viewport = function ( editor ) {
 
 		// TODO: Differentiate from transform hovers change and object transform change
 
-		signals.objectChanged.dispatch( editor.selected );
+		if (editor.selected) signals.objectChanged.dispatch( editor.selected );
 
 	} );
-	sceneHelpers.add( transformControls.gizmo );
-	transformControls.hide();
+	sceneHelpers.add( transformControls );
 
 	// fog
 
@@ -115,7 +114,7 @@ var Viewport = function ( editor ) {
 	    y = (event.clientY - rect.top) / rect.height;
 		onMouseUpPosition.set( x, y );
 
-		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 1 ) {
+		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
 
 			var intersects = getIntersects( event, objects );
 
@@ -183,19 +182,18 @@ var Viewport = function ( editor ) {
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );
-		render();
 
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.snapDist = dist;
+		transformControls.setSnap( dist );
 
 	} );
 
-	signals.snapChanged.add( function ( dist ) {
+	signals.spaceChanged.add( function ( space ) {
 
-		snapDist = dist;
+		transformControls.setSpace( space );
 
 	} );
 

@@ -23,6 +23,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var center = new THREE.Vector3();
 	var normalMatrix = new THREE.Matrix3();
+	var pointer = new THREE.Vector2();
+	var pointerOld = new THREE.Vector2();
 
 	// events
 
@@ -114,6 +116,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
+		pointerOld.set( event.clientX, event.clientY );
+
 		domElement.addEventListener( 'mousemove', onMouseMove, false );
 		domElement.addEventListener( 'mouseup', onMouseUp, false );
 		domElement.addEventListener( 'mouseout', onMouseUp, false );
@@ -126,8 +130,10 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || event.oMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || event.oMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
+
+		var movementX = pointer.x - pointerOld.x;
+		var movementY = pointer.y - pointerOld.y;
 
 		if ( state === STATE.ROTATE ) {
 
@@ -142,6 +148,8 @@ THREE.EditorControls = function ( object, domElement ) {
 			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
 
 		}
+
+		pointerOld.set( event.clientX, event.clientY );
 
 	}
 
