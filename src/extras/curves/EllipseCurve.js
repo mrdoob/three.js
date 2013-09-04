@@ -23,19 +23,20 @@ THREE.EllipseCurve.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 
-	var deltaAngle = this.aEndAngle - this.aStartAngle;
+  var deltaAngle = this.aEndAngle - this.aStartAngle;
 
-	if ( !this.aClockwise ) {
-
-		t = 1 - t;
-
+	if ( this.aClockwise ) {
+    t = 1 - t;
+    deltaAngle = Math.PI*2 - deltaAngle;
+    var angle = this.aEndAngle + t * deltaAngle;
 	}
-
-	var angle = this.aStartAngle + t * deltaAngle;
+  else {
+    var angle = this.aStartAngle + t * deltaAngle;
+  }
 
 	var tx = this.aX + this.xRadius * Math.cos( angle );
 	var ty = this.aY + this.yRadius * Math.sin( angle );
 
 	return new THREE.Vector2( tx, ty );
-
 };
+
