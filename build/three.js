@@ -15134,11 +15134,21 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 		}
 
+		if ( object.shadowCascadeArray ) {
+
+			for ( var x = 0; x < object.shadowCascadeArray.length; x ++ ) {
+
+				this.__removeObject( object.shadowCascadeArray[ x ] );
+
+			}
+
+		}
+
 	} else if ( !( object instanceof THREE.Camera ) ) {
 
 		var i = this.__objects.indexOf( object );
 
-		if( i !== -1 ) {
+		if ( i !== -1 ) {
 
 			this.__objects.splice( i, 1 );
 			this.__objectsRemoved.push( object );
@@ -34572,6 +34582,14 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 
 THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
+THREE.DirectionalLightHelper.prototype.dispose = function () {
+	
+	this.lightPlane.geometry.dispose();
+	this.lightPlane.material.dispose();
+	this.targetLine.geometry.dispose();
+	this.targetLine.material.dispose();
+};
+
 THREE.DirectionalLightHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
@@ -34746,6 +34764,11 @@ THREE.HemisphereLightHelper = function ( light, sphereSize, arrowLength, domeSiz
 
 THREE.HemisphereLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
+THREE.HemisphereLightHelper.prototype.dispose = function () {
+	this.lightSphere.geometry.dispose();
+	this.lightSphere.material.dispose();
+};
+
 THREE.HemisphereLightHelper.prototype.update = function () {
 
 	var vector = new THREE.Vector3();
@@ -34808,6 +34831,12 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
 
+THREE.PointLightHelper.prototype.dispose = function () {
+	
+	this.geometry.dispose();
+	this.material.dispose();
+};
+
 THREE.PointLightHelper.prototype.update = function () {
 
 	this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
@@ -34861,6 +34890,11 @@ THREE.SpotLightHelper = function ( light ) {
 };
 
 THREE.SpotLightHelper.prototype = Object.create( THREE.Object3D.prototype );
+
+THREE.SpotLightHelper.prototype.dispose = function () {
+	this.cone.geometry.dispose();
+	this.cone.material.dispose();
+};
 
 THREE.SpotLightHelper.prototype.update = function () {
 
