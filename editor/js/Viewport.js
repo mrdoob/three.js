@@ -43,8 +43,9 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-		// TODO: Differentiate from transform hovers change and object transform change
-
+        controls.enabled = true;
+        if ( transformControls.axis ) controls.enabled = false;
+        
 		if (editor.selected) signals.objectChanged.dispatch( editor.selected );
 
 	} );
@@ -98,12 +99,7 @@ var Viewport = function ( editor ) {
 	    y = (event.clientY - rect.top) / rect.height;
 		onMouseDownPosition.set( x, y );
 
-		if ( transformControls.hovered === false ) {
-
-			controls.enabled = true;
-			document.addEventListener( 'mouseup', onMouseUp, false );
-
-		}
+		document.addEventListener( 'mouseup', onMouseUp, false );
 
 	};
 
@@ -144,8 +140,6 @@ var Viewport = function ( editor ) {
 
 		}
 
-		controls.enabled = false;
-
 		document.removeEventListener( 'mouseup', onMouseUp );
 
 	};
@@ -175,7 +169,6 @@ var Viewport = function ( editor ) {
 		signals.objectChanged.dispatch( camera );
 
 	} );
-	controls.enabled = false;
 
 	// signals
 
