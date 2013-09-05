@@ -79,6 +79,12 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 
 		}
 
+		if ( object.shadowCascadeArray ) {
+			for ( var x = 0; x < object.shadowCascadeArray.length; x++ ) {
+				this.__removeObject( object.shadowCascadeArray[ x ] );
+			}
+		}
+
 	} else if ( !( object instanceof THREE.Camera ) ) {
 
 		var i = this.__objects.indexOf( object );

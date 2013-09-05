@@ -43,6 +43,12 @@ THREE.PointLightHelper = function ( light, sphereSize ) {
 
 THREE.PointLightHelper.prototype = Object.create( THREE.Mesh.prototype );
 
+THREE.PointLightHelper.prototype.dispose = function () {
+	
+	this.geometry.dispose();
+	this.material.dispose();
+};
+
 THREE.PointLightHelper.prototype.update = function () {
 
 	this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
