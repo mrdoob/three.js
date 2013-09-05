@@ -43,9 +43,14 @@ var Toolbar = function ( editor ) {
 	buttons.add( snap );
 	buttons.add( new UI.Text( 'snap' ) );
 
+	var local = new UI.Checkbox( false ).onChange( update );
+	buttons.add( local );
+	buttons.add( new UI.Text( 'local' ) );
+
 	function update() {
 
 		signals.snapChanged.dispatch( snap.getValue() === true ? grid.getValue() : null );
+		signals.spaceChanged.dispatch( local.getValue() === true ? "local" : "world" );
 
 	}
 
