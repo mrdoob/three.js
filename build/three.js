@@ -28956,7 +28956,7 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
 
-	var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
+	var lastPoint = curve.getPoint(1);
 	args.push(lastPoint.x);
 	args.push(lastPoint.y);
 
@@ -30036,9 +30036,7 @@ THREE.SplineCurve.prototype.getPoint = function ( t ) {
  *	Ellipse curve
  **************************************************************/
 
-THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius,
-							aStartAngle, aEndAngle,
-							aClockwise ) {
+THREE.EllipseCurve = function ( aX, aY, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 	this.aX = aX;
 	this.aY = aY;
@@ -30057,15 +30055,18 @@ THREE.EllipseCurve.prototype = Object.create( THREE.Curve.prototype );
 
 THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 
+	var angle;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
 
-	if ( !this.aClockwise ) {
+	if ( this.aClockwise === true ) {
 
-		t = 1 - t;
+		angle = this.aEndAngle + ( 1 - t ) * ( Math.PI * 2 - deltaAngle );
+
+	} else {
+
+		angle = this.aStartAngle + t * deltaAngle;
 
 	}
-
-	var angle = this.aStartAngle + t * deltaAngle;
 
 	var tx = this.aX + this.xRadius * Math.cos( angle );
 	var ty = this.aY + this.yRadius * Math.sin( angle );
