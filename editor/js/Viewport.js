@@ -45,11 +45,10 @@ var Viewport = function ( editor ) {
 
 		// TODO: Differentiate from transform hovers change and object transform change
 
-		signals.objectChanged.dispatch( editor.selected );
+		if (editor.selected) signals.objectChanged.dispatch( editor.selected );
 
 	} );
-	sceneHelpers.add( transformControls.gizmo );
-	transformControls.hide();
+	sceneHelpers.add( transformControls );
 
 	// fog
 
@@ -68,11 +67,10 @@ var Viewport = function ( editor ) {
 
 	var getIntersects = function ( event, object ) {
 
-		var vector = new THREE.Vector3(
-			( event.layerX / container.dom.offsetWidth ) * 2 - 1,
-			- ( event.layerY / container.dom.offsetHeight ) * 2 + 1,
-			0.5
-		);
+	    var rect = container.dom.getBoundingClientRect();
+	    x = (event.clientX - rect.left) / rect.width;
+	    y = (event.clientY - rect.top) / rect.height;
+		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
 
@@ -95,7 +93,10 @@ var Viewport = function ( editor ) {
 
 		event.preventDefault();
 
-		onMouseDownPosition.set( event.layerX, event.layerY );
+	    var rect = container.dom.getBoundingClientRect();
+	    x = (event.clientX - rect.left) / rect.width;
+	    y = (event.clientY - rect.top) / rect.height;
+		onMouseDownPosition.set( x, y );
 
 		if ( transformControls.hovered === false ) {
 
@@ -108,9 +109,12 @@ var Viewport = function ( editor ) {
 
 	var onMouseUp = function ( event ) {
 
-		onMouseUpPosition.set( event.layerX, event.layerY );
+	    var rect = container.dom.getBoundingClientRect();
+	    x = (event.clientX - rect.left) / rect.width;
+	    y = (event.clientY - rect.top) / rect.height;
+		onMouseUpPosition.set( x, y );
 
-		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) < 1 ) {
+		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
 
 			var intersects = getIntersects( event, objects );
 
@@ -178,19 +182,18 @@ var Viewport = function ( editor ) {
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );
-		render();
 
 	} );
 
 	signals.snapChanged.add( function ( dist ) {
 
-		transformControls.snapDist = dist;
+		transformControls.setSnap( dist );
 
 	} );
 
-	signals.snapChanged.add( function ( dist ) {
+	signals.spaceChanged.add( function ( space ) {
 
-		snapDist = dist;
+		transformControls.setSpace( space );
 
 	} );
 
@@ -527,7 +530,7 @@ var Viewport = function ( editor ) {
 		renderer.render( scene, camera );
 		renderer.render( sceneHelpers, camera );
 
-		console.trace();
+		//console.trace();
 
 	}
 
