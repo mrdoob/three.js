@@ -24,6 +24,14 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 	var angle;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
 
+  if(deltaAngle < 0) {
+    deltaAngle += Math.PI*2;
+  }
+
+  if(deltaAngle > Math.PI*2) {
+    deltaAngle -= Math.PI*2;
+  }
+
 	if ( this.aClockwise === true ) {
 
 		angle = this.aEndAngle + ( 1 - t ) * ( Math.PI * 2 - deltaAngle );
