@@ -5492,6 +5492,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotOffset = 0,
 		hemiOffset = 0;
 
+		//First, push all shadow-casting lights to the beginning of the light array
+		var numShadowCasters = 0;
+		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
+			light = lights[ l ];
+			if ( light.onlyShadow ) continue;
+			if ( light.castShadow ) {
+				if ( l !== numShadowCasters ) {
+					var tmpLight = lights[ numShadowCasters ];
+					lights[ numShadowCasters ] = light;
+					lights[ l ] = tmpLight;
+				}
+				numShadowCasters++;
+			}
+		}
+
 		for ( l = 0, ll = lights.length; l < ll; l ++ ) {
 
 			light = lights[ l ];
