@@ -23,16 +23,16 @@ THREE.TransformGizmo = function () {
 
 	this.handleGizmos = {
 		X: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "red" } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0xff0000 } ) ),
 			new THREE.Vector3( 0.5, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "green" } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x00ff00 } ) ),
 			new THREE.Vector3( 0, 0.5, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "blue" } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x0000ff } ) ),
 			new THREE.Vector3( 0, 0, 0.5 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		]
@@ -225,33 +225,33 @@ THREE.TransformGizmoTranslate = function () {
 	this.handleGizmos = {
 
 		X: [
-			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: "red" } ) ),
+			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0xff0000 } ) ),
 			new THREE.Vector3( 0.5, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: "green" } ) ),
+			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0x00ff00 } ) ),
 			new THREE.Vector3( 0, 0.5, 0 )
 		],
 		Z: [
-			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: "blue" } ) ),
+			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0x0000ff } ) ),
 			new THREE.Vector3( 0, 0, 0.5 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		XYZ: [
-			new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), new THREE.TransformGizmoMaterial( { color: "white", opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		],
 		XY: [
-			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: "yellow", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0.15, 0.15, 0 )
 		],
 		YZ: [
-			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: "cyan", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0.15, 0.15 ),
 			new THREE.Vector3( 0, Math.PI/2, 0 )
 		],
 		XZ: [
-			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: "magenta", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0.15, 0, 0.15 ),
 			new THREE.Vector3( -Math.PI/2, 0, 0 )
 		]
@@ -261,16 +261,16 @@ THREE.TransformGizmoTranslate = function () {
 	this.pickerGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "red", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0.6, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "green", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0.6, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "blue", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0.6 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		]
@@ -323,25 +323,25 @@ THREE.TransformGizmoRotate = function () {
 	this.handleGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: "red" } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0xff0000 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( 0, -Math.PI/2, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: "green" } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x00ff00 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: "blue" } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x0000ff } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		E: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.005, 4, 64 ), new THREE.TransformGizmoMaterial( { color: "yellow", opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.005, 4, 64 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) )
 		],
 		XYZE: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 64 ), new THREE.TransformGizmoMaterial( { color: "gray" } ) )
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 64 ), new THREE.TransformGizmoMaterial( { color: 0x787878 } ) )
 		]
 
 	}
@@ -349,22 +349,22 @@ THREE.TransformGizmoRotate = function () {
 	this.pickerGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: "red", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( 0, -Math.PI/2, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: "green", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: "blue", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		E: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.05, 2, 24 ), new THREE.TransformGizmoMaterial( { color: "yellow", opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.05, 2, 24 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) )
 		],
 		XYZE: [
 			new THREE.Mesh( new THREE.Geometry() ) // TODO
@@ -462,19 +462,19 @@ THREE.TransformGizmoScale = function () {
 	this.handleGizmos = {
 
 		XYZ: [
-			new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: "white", opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		],
 		X: [
-			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: "red" } ) ),
+			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0xff0000 } ) ),
 			new THREE.Vector3( 0.5, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: "green" } ) ),
+			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0x00ff00 } ) ),
 			new THREE.Vector3( 0, 0.5, 0 )
 		],
 		Z: [
-			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: "blue" } ) ),
+			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0x0000ff } ) ),
 			new THREE.Vector3( 0, 0, 0.5 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		]
@@ -484,17 +484,17 @@ THREE.TransformGizmoScale = function () {
 	this.pickerGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "red", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0.6, 0, 0 ),
 			new THREE.Vector3( Math.PI/4, 0, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "green", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0.6, 0 ),
 			new THREE.Vector3( 0, Math.PI/4, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: "blue", opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0.6 ),
 			new THREE.Vector3( Math.PI/2, Math.PI/4, 0 )
 		]
