@@ -10633,6 +10633,8 @@ THREE.ImageLoader.prototype = {
 
 		scope.manager.itemStart( url );
 
+		return image;
+
 	},
 
 	setCrossOrigin: function ( value ) {
@@ -26922,20 +26924,20 @@ THREE.ImageUtils = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		var image = new Image();
-		var texture = new THREE.Texture( image, mapping );
-
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, function ( image ) {
 
-			texture.image = image;
+		var texture = new THREE.Texture( undefined, mapping );
+
+		var image = loader.load( url, function () {
+
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture );
 
 		} );
 
+		texture.image = image;
 		texture.sourceFile = url;
 
 		return texture;
@@ -30068,6 +30070,9 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 	var angle;
 	var deltaAngle = this.aEndAngle - this.aStartAngle;
 
+	if ( deltaAngle < 0 ) deltaAngle += Math.PI * 2;
+	if ( deltaAngle > Math.PI * 2 ) deltaAngle -= Math.PI * 2;
+
 	if ( this.aClockwise === true ) {
 
 		angle = this.aEndAngle + ( 1 - t ) * ( Math.PI * 2 - deltaAngle );
@@ -30084,6 +30089,7 @@ THREE.EllipseCurve.prototype.getPoint = function ( t ) {
 	return new THREE.Vector2( tx, ty );
 
 };
+
 /**************************************************************
  *	Arc curve
  **************************************************************/
