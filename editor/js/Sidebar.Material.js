@@ -244,6 +244,23 @@ Sidebar.Material = function ( editor ) {
 	container.add( materialBlendingRow );
 
 
+	// side
+
+	var materialSideRow = new UI.Panel();
+	var materialSide = new UI.Select().setOptions( {
+
+		0: 'Front',
+		1: 'Back',
+		2: 'Double'
+
+	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+
+	materialSideRow.add( new UI.Text( 'Side' ).setWidth( '90px' ).setColor( '#666' ) );
+	materialSideRow.add( materialSide );
+
+	container.add( materialSideRow );
+
+
 	// opacity
 
 	var materialOpacityRow = new UI.Panel();
@@ -483,6 +500,12 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
+			if ( material.side !== undefined ) {
+
+				material.side = parseInt( materialSide.getValue() );
+
+			}
+
 			if ( material.opacity !== undefined ) {
 
 				material.opacity = materialOpacity.getValue();
@@ -538,6 +561,7 @@ Sidebar.Material = function ( editor ) {
 			'specularMap': materialSpecularMapRow,
 			'envMap': materialEnvMapRow,
 			'blending': materialBlendingRow,
+			'side': materialSideRow,
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
 			'wireframe': materialWireframeRow
@@ -673,6 +697,12 @@ Sidebar.Material = function ( editor ) {
 			if ( material.blending !== undefined ) {
 
 				materialBlending.setValue( material.blending );
+
+			}
+
+			if ( material.side !== undefined ) {
+
+				materialSide.setValue( material.side );
 
 			}
 
