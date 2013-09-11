@@ -91,7 +91,6 @@ var list = {
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
 			[ "Particle", "api/objects/Particle" ],
 			[ "ParticleSystem", "api/objects/ParticleSystem" ],
-			[ "Ribbon", "api/objects/Ribbon" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Sprite", "api/objects/Sprite" ]
 
