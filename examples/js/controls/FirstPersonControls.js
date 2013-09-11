@@ -14,6 +14,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 	this.movementSpeed = 1.0;
 	this.lookSpeed = 0.005;
 
+	this.mouseInactiveWindow = 0;
+
 	this.lookVertical = true;
 	this.autoForward = false;
 	// this.invertVertical = false;
@@ -133,6 +135,9 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 			this.mouseY = event.pageY - this.domElement.offsetTop - this.viewHalfY;
 
 		}
+
+		this.mouseX = applyInactiveWindow( this.mouseX, this.viewHalfX, this.mouseInactiveWindow );
+		this.mouseY = applyInactiveWindow( this.mouseY, this.viewHalfY, this.mouseInactiveWindow );
 
 	};
 
@@ -277,6 +282,17 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		};
 
 	};
+
+	function applyInactiveWindow( position, size, ratio ) {
+
+		var newPosition = ( Math.abs( position ) - size * ratio ) / ( 1 - ratio );
+
+		if ( newPosition < 0 ) return 0;
+
+		if ( position < 0 ) return -newPosition;
+
+		return newPosition;
+	}
 
 	this.handleResize();
 
