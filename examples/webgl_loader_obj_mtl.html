@@ -76,15 +76,12 @@
 				// model
 
 				var loader = new THREE.OBJMTLLoader();
-				loader.addEventListener( 'load', function ( event ) {
-
-					var object = event.content;
+				loader.load( 'obj/male02/male02.obj', 'obj/male02/male02_dds.mtl', function ( object ) {
 
 					object.position.y = - 80;
 					scene.add( object );
 
-				});
-				loader.load( 'obj/male02/male02.obj', 'obj/male02/male02_dds.mtl' );
+				} );
 
 				//
 

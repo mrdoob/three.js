@@ -26,17 +26,17 @@ THREE.OBJLoader.prototype = {
 
 	},
 
-	parse: function ( data ) {
+	parse: function ( text ) {
 
 		// fixes
 
-		data = data.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
+		text = text.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
 
 		var replacement = '/f$1$2$4\n/f$2$3$4'; // quads to tris
-		data = data.replace( /f( +\d+)( +\d+)( +\d+)( +\d+)/g, replacement );
-		data = data.replace( /f( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)/g, replacement );
-		data = data.replace( /f( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)/g, replacement );
-		data = data.replace( /f( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)/g, replacement );
+		text = text.replace( /f( +\d+)( +\d+)( +\d+)( +\d+)/g, replacement );
+		text = text.replace( /f( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)/g, replacement );
+		text = text.replace( /f( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)/g, replacement );
+		text = text.replace( /f( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)/g, replacement );
 
 		//
 
@@ -61,9 +61,9 @@ THREE.OBJLoader.prototype = {
 		var object = new THREE.Object3D();
 		var geometry, material, mesh;
 
-		// create mesh if no objects in data
+		// create mesh if no objects in text
 
-		if ( /^o /gm.test( data ) === false ) {
+		if ( /^o /gm.test( text ) === false ) {
 
 			geometry = new THREE.Geometry();
 			material = new THREE.MeshLambertMaterial();
@@ -107,7 +107,7 @@ THREE.OBJLoader.prototype = {
 
 		//
 
-		var lines = data.split( '\n' );
+		var lines = text.split( '\n' );
 
 		for ( var i = 0; i < lines.length; i ++ ) {
 
