@@ -72,6 +72,9 @@ Editor.prototype = {
 
 		object.traverse( function ( child ) {
 
+			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
+			if ( child.material !== undefined ) scope.addMaterial( child.material );
+
 			scope.addHelper( child );
 
 		} );
@@ -104,27 +107,21 @@ Editor.prototype = {
 
 	},
 
-	addGeometry: function ( geometry  ) {
+	addGeometry: function ( geometry ) {
 
-	},
-
-	removeGeometry: function ( geometry  ) {
+		this.geometries[ geometry.uuid ] = geometry;
 
 	},
 
 	addMaterial: function ( material ) {
 
-	},
-
-	removeMaterial: function ( material ) {
+		this.materials[ material.uuid ] = material;
 
 	},
 
 	addTexture: function ( texture ) {
 
-	},
-
-	removeTexture: function ( texture ) {
+		this.textures[ texture.uuid ] = texture;
 
 	},
 
