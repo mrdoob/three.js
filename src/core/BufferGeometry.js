@@ -558,8 +558,6 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
-		geometry.numVertices = this.numVertices;
-
 		for ( var attr in this.attributes ) {
 
 			var attribute = {
