@@ -85,6 +85,21 @@
 
 			}
 
+			#button {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				padding: 8px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.7;
+			}
+
+				#button:hover {
+					cursor: pointer;
+					opacity: 1;
+				}
+
 		</style>
 	</head>
 	<body>
@@ -326,8 +341,22 @@
 		var container = document.createElement( 'div' );
 		list.appendChild( container );
 
+		var button = document.createElement( 'div' );
+		button.id = 'button';
+		button.textContent = 'View source';
+		button.addEventListener( 'click', function ( event ) {
+
+			var array = location.href.split( '/' );
+			array.pop();
+
+			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
+
+		}, false );
+		button.style.display = 'none';
+		document.body.appendChild( button );
+
 		var divs = {};
-		var SELECTED = null;
+		var selected = null;
 
 		for ( var key in files ) {
 
@@ -365,14 +394,16 @@
 
 		var load = function ( file ) {
 
-			if ( SELECTED !== null ) SELECTED.className = 'link';
+			if ( selected !== null ) divs[ selected ].className = 'link';
 
-			SELECTED = divs[ file ];
-			SELECTED.className = 'link selected';
+			selected = file;
+			divs[ selected ].className = 'link selected';
 
 			window.location.hash = file;
 			viewer.src = file + '.html';
 			viewer.focus();
+
+			button.style.display = '';
 
 		};
 
