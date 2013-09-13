@@ -558,29 +558,39 @@ THREE.BufferGeometry.prototype = {
 
 		var geometry = new THREE.BufferGeometry();
 
+		var types = [ Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array, Int32Array, Uint32Array, Float32Array, Float64Array ];
+
 		for ( var attr in this.attributes ) {
 
-			var attribute = {
-				itemSize: this.attributes[ attr ].itemSize,
-				numItems: this.attributes[ attr ].numItems,
+			var attribute, sourceAttr, sourceArray;
+
+			sourceAttr = this.attributes[ attr ];
+			sourceArray = sourceAttr.array;
+
+			attribute = {
+
+				itemSize: sourceAttr.itemSize,
+				numItems: sourceAttr.numItems,
 				array: null
+
 			};
 
-			var sourceAttr = this.attributes[ attr ];
+			for ( var i = 0, il = types.length; i < il; i ++ ) {
 
-			if ( attr === 'index' ) {
+				var type = types[ i ];
 
-				attribute.array = new Uint16Array( sourceAttr.numItems );
+				if ( sourceArray instanceof type ) {
 
-			} else {
+					attributes.array = new type( sourceArray.length );
+					break;
 
-				attribute.array = new Float32Array( sourceAttr.numItems );
+				}
 
 			}
 
-			for (var i = 0, il = sourceAttr.numItems; i < il; i++) {
+			for ( var i = 0, il = sourceAttr.numItems; i < il; i ++ ) {
 
-				attribute.array[ i ] = sourceAttr.array[ i ];
+				attribute.array[ i ] = sourceArray[ i ];
 
 			}
 
@@ -588,17 +598,19 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
-		for (var i = 0, il = this.offsets.length; i < il; i++) {
+		for ( var i = 0, il = this.offsets.length; i < il; i ++ ) {
 
 			var offset = this.offsets[ i ];
 
 			geometry.offsets.push({
+
 				start: offset.start,
 				index: offset.index,
 				count: offset.count
+
 			});
 
-		  }
+		}
 
 		return geometry;
 
