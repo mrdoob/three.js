@@ -323,7 +323,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			if ( material instanceof materialClasses[ materialClass.getValue() ] == false ) {
+			if ( material instanceof materialClasses[ materialClass.getValue() ] === false ) {
 
 				material = new materialClasses[ materialClass.getValue() ]();
 				object.material = material;

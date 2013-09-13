@@ -277,6 +277,93 @@ Editor.prototype = {
 
 		this.select( null );
 
+	},
+
+	// utils
+
+	getObjectType: function ( object ) {
+
+		var types = {
+
+			'Scene': THREE.Scene,
+			'PerspectiveCamera': THREE.PerspectiveCamera,
+			'AmbientLight': THREE.AmbientLight,
+			'DirectionalLight': THREE.DirectionalLight,
+			'HemisphereLight': THREE.HemisphereLight,
+			'PointLight': THREE.PointLight,
+			'SpotLight': THREE.SpotLight,
+			'Mesh': THREE.Mesh,
+			'Object3D': THREE.Object3D
+
+		};
+
+		for ( var type in types ) {
+
+			if ( object instanceof types[ type ] ) return type;
+
+		}
+
+	},
+
+	getGeometryType: function ( geometry ) {
+
+		var types = {
+
+			'CircleGeometry': THREE.CircleGeometry,
+			'CubeGeometry': THREE.CubeGeometry,
+			'CylinderGeometry': THREE.CylinderGeometry,
+			'ExtrudeGeometry': THREE.ExtrudeGeometry,
+			'IcosahedronGeometry': THREE.IcosahedronGeometry,
+			'LatheGeometry': THREE.LatheGeometry,
+			'OctahedronGeometry': THREE.OctahedronGeometry,
+			'ParametricGeometry': THREE.ParametricGeometry,
+			'PlaneGeometry': THREE.PlaneGeometry,
+			'PolyhedronGeometry': THREE.PolyhedronGeometry,
+			'ShapeGeometry': THREE.ShapeGeometry,
+			'SphereGeometry': THREE.SphereGeometry,
+			'TetrahedronGeometry': THREE.TetrahedronGeometry,
+			'TextGeometry': THREE.TextGeometry,
+			'TorusGeometry': THREE.TorusGeometry,
+			'TorusKnotGeometry': THREE.TorusKnotGeometry,
+			'TubeGeometry': THREE.TubeGeometry,
+			'Geometry': THREE.Geometry,
+			'BufferGeometry': THREE.BufferGeometry
+
+		};
+
+		for ( var type in types ) {
+
+			if ( geometry instanceof types[ type ] ) return type;
+
+		}
+
+	},
+
+	getMaterialType: function ( material ) {
+
+		var types = {
+
+			'LineBasicMaterial': THREE.LineBasicMaterial,
+			'LineDashedMaterial': THREE.LineDashedMaterial,
+			'MeshBasicMaterial': THREE.MeshBasicMaterial,
+			'MeshDepthMaterial': THREE.MeshDepthMaterial,
+			'MeshFaceMaterial': THREE.MeshFaceMaterial,
+			'MeshLambertMaterial': THREE.MeshLambertMaterial,
+			'MeshNormalMaterial': THREE.MeshNormalMaterial,
+			'MeshPhongMaterial': THREE.MeshPhongMaterial,
+			'ParticleBasicMaterial': THREE.ParticleBasicMaterial,
+			'ParticleCanvasMaterial': THREE.ParticleCanvasMaterial,
+			'ShaderMaterial': THREE.ShaderMaterial,
+			'Material': THREE.Material
+
+		};
+
+		for ( var type in types ) {
+
+			if ( material instanceof types[ type ] ) return type;
+
+		}
+
 	}
 
 }

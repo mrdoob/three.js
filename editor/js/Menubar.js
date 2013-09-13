@@ -1,8 +1,6 @@
 var Menubar = function ( editor ) {
 
-	var container = new UI.Panel();
-	container.setPosition( 'absolute' );
-	container.setClass( 'menubar' );
+	var container = new UI.Panel().setId( 'menubar' );
 
 	container.add( new Menubar.File( editor ) );
 	container.add( new Menubar.Edit( editor ) );
