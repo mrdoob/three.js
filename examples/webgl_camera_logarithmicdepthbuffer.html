@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - cameras</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #808080;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+				z-index: 100;
+			}
+
+			a {
+
+				color: #0080ff;
+			}
+
+			b { color: lightgreen }
+
+			#stats { position: absolute; top:0; left: 0 }
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - cameras - logarithmic depth buffer<br/>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="fonts/helvetiker_regular.typeface.js"></script>
+
+		<script>
+
+			var SCREEN_WIDTH = window.innerWidth;
+			var SCREEN_HEIGHT = window.innerHeight;
+
+			var container, stats;
+			var camera, scene, renderer, controls;
+			var cameraLogZBuf, sceneLogZBuf, rendererLogZBuf;
+
+			var labels = [
+				{ size: .000001, label: "microscopic (1µm)" },
+				{ size: .001, label: "minuscule (1mm)" },
+				{ size: .01, label: "tiny (1cm)" },
+				{ size: 1, label: "petite (1m)" },
+				{ size: 10, label: "small (10m)" },
+				{ size: 100, label: "average (100m)" },
+				{ size: 1000, label: "medium (1km)" },
+				{ size: 10000, label: "good-sized (10km)" },
+				{ size: 100000, label: "large (100km)" },
+				{ size: 1000000, label: "extra-large (1Mm)" },
+				{ size: 10000000, label: "mammoth (10Mm)" },
+				{ size: 100000000, label: "enormous (100Mm)" },
+				{ size: 1000000000, label: "stupendous (1Gm)" }
+			];
+
+			init();
+			animate();
+
+			function init() {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				scene = new THREE.Scene();
+				sceneLogZBuf = new THREE.Scene();
+
+				// 1 micrometer to 1 parsec in one scene?   preposterous!  and yet...
+        var NEAR = 1e-6, FAR = 1e24;
+				camera = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				camera.position.z = 100;
+				scene.add(camera);
+
+				cameraLogZBuf = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				cameraLogZBuf.position = camera.position;
+				cameraLogZBuf.quaternion = camera.quaternion;
+				cameraLogZBuf.matrix = camera.matrix;
+
+				camera.setViewOffset( SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				cameraLogZBuf.setViewOffset( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+
+				var labelmat = new THREE.MeshNormalMaterial();
+				var labelmatLogZBuf = new THREE.MeshNormalMaterial();
+				for (var i = 0; i < labels.length; i++) {
+					var labelgeo = new THREE.TextGeometry(labels[i].label, {
+						size: labels[i].size,
+						height: labels[i].size / 2,
+						font: 'helvetiker',
+					});
+					labelgeo.computeBoundingSphere();
+					var mesh = new THREE.Mesh(labelgeo, labelmat);
+					mesh.position.x = -labelgeo.boundingSphere.radius;
+					mesh.position.y = labels[i].size;
+					mesh.position.z = -labels[i].size * 10;
+					scene.add(mesh);
+
+					var meshLogZBuf = new THREE.Mesh(labelgeo.clone(), labelmatLogZBuf);
+					meshLogZBuf.position = mesh.position;
+					sceneLogZBuf.add(meshLogZBuf);
+				}
+
+				renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: false});
+				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
+				renderer.domElement.style.position = "relative";
+				container.appendChild(renderer.domElement);
+
+				rendererLogZBuf = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
+				rendererLogZBuf.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
+				rendererLogZBuf.domElement.style.position = "relative";
+				container.appendChild(rendererLogZBuf.domElement);
+
+				controls = new THREE.OrbitControls(camera, document);
+				controls.dollyOut(.0000001);
+				controls.rotateUp(Math.PI/16);
+				//controls.addEventListener( 'change', render );
+
+				stats = new Stats();
+				container.appendChild(stats.domElement);
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				render();
+			}
+
+			function onWindowResize( event ) {
+
+				SCREEN_WIDTH = window.innerWidth;
+				SCREEN_HEIGHT = window.innerHeight;
+
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+				camera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+        render();
+			}
+
+			function render() {
+				controls.update();
+
+				renderer.render( scene, camera );
+				rendererLogZBuf.render( sceneLogZBuf, cameraLogZBuf );
+				stats.update();
+console.log('up it');
+			}
+
+		</script>
+	</body>
+</html>
