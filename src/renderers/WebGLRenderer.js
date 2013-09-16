@@ -24,20 +24,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
 
-	if ( parameters.clearColor !== undefined ) {
-
-		console.warn( 'DEPRECATED: clearColor in WebGLRenderer constructor parameters is being removed. Use .setClearColor() instead.' );
-		_clearColor.setHex( parameters.clearColor );
-
-	}
-
-	if ( parameters.clearAlpha !== undefined ) {
-
-		console.warn( 'DEPRECATED: clearAlpha in WebGLRenderer constructor parameters is being removed. Use .setClearColor() instead.' );
-		_clearAlpha = parameters.clearAlpha;
-
-	}
-
 	// public properties
 
 	this.domElement = _canvas;
