@@ -117,7 +117,7 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

@@ -220,9 +220,9 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x030303, clearAlpha: 1 } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
 				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 
