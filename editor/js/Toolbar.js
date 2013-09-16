@@ -2,9 +2,7 @@ var Toolbar = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
-	container.setPosition( 'absolute' );
-	container.setClass( 'toolbar' );
+	var container = new UI.Panel().setId( 'toolbar' );
 
 	var buttons = new UI.Panel();
 	container.add( buttons );
@@ -43,9 +41,14 @@ var Toolbar = function ( editor ) {
 	buttons.add( snap );
 	buttons.add( new UI.Text( 'snap' ) );
 
+	var local = new UI.Checkbox( false ).onChange( update );
+	buttons.add( local );
+	buttons.add( new UI.Text( 'local' ) );
+
 	function update() {
 
 		signals.snapChanged.dispatch( snap.getValue() === true ? grid.getValue() : null );
+		signals.spaceChanged.dispatch( local.getValue() === true ? "local" : "world" );
 
 	}
 

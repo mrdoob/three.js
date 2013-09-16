@@ -112,7 +112,8 @@
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0xaaccff, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer.setClearColor( 0xaaccff, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";

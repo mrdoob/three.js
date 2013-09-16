@@ -73,6 +73,26 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
+	// add circle
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Circle' );
+	option.onClick( function () {
+
+		var radius = 20;
+		var segments = 8;
+
+		var geometry = new THREE.CircleGeometry( radius, segments );
+		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
+		mesh.name = 'Circle ' + ( ++ meshCount );
+
+		editor.addObject( mesh );
+		editor.select( mesh );
+
+	} );
+	options.add( option );
+
 	// add cylinder
 
 	var option = new UI.Panel();

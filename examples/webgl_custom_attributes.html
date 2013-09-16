@@ -149,7 +149,8 @@
 
 			scene.add( sphere );
 
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1 } );
+			renderer = new THREE.WebGLRenderer( { alpha: false } );
+			renderer.setClearColor( 0x050505, 1 );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );

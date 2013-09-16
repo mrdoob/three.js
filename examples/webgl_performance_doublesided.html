@@ -116,7 +116,8 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, antialias: FANCY } );
+				renderer = new THREE.WebGLRenderer( { antialias: FANCY, alpha: false } );
+				renderer.setClearColor( 0x050505, 1 );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.gammaInput = true;

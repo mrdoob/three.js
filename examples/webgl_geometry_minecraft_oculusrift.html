@@ -196,9 +196,9 @@
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer.setClearColor( 0xbfd1e5, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor(new THREE.Color(0xbfd1e5));
 
 				// Here is the effect for the Oculus Rift
 				// worldScale 100 means that 100 Units == 1m

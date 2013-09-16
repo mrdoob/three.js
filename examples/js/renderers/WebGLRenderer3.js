@@ -27,8 +27,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 	var devicePixelRatio = parameters.devicePixelRatio !== undefined
 				? parameters.devicePixelRatio
-				: window.devicePixelRatio !== undefined
-					? window.devicePixelRatio
+				: self.devicePixelRatio !== undefined
+					? self.devicePixelRatio
 					: 1;
 
 	var gl;
