@@ -54,6 +54,7 @@ THREE.ShaderLib['mirror'] = {
 THREE.Mirror = function ( renderer, camera, options ) {
 
 	THREE.Object3D.call( this );
+
 	this.name = 'mirror_' + this.id;
 
 	function isPowerOfTwo ( value ) {
@@ -82,7 +83,9 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	
 	// For debug only, show the normal and plane of the mirror
 	var debugMode = options.debugMode !== undefined ? options.debugMode : false;
-	if (debugMode){
+
+	if ( debugMode ) {
+
 		var arrow = new THREE.ArrowHelper(new THREE.Vector3( 0, 0, 1 ), new THREE.Vector3( 0, 0, 0 ), 10, 0xffff80 );
 		var planeGeometry = new THREE.Geometry();
 		planeGeometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
@@ -94,13 +97,18 @@ THREE.Mirror = function ( renderer, camera, options ) {
 
 		this.add(arrow);
 		this.add(plane);
+
 	}
 
-	if ( camera instanceof THREE.PerspectiveCamera )
+	if ( camera instanceof THREE.PerspectiveCamera ) {
+
 		this.camera = camera;
-	else {
+
+	} else {
+
 		this.camera = new THREE.PerspectiveCamera();
-		console.log(this.name + ': camera is not a Perspective Camera!')
+		console.log( this.name + ': camera is not a Perspective Camera!' );
+
 	}
 
 	this.textureMatrix = new THREE.Matrix4();
@@ -114,16 +122,18 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	var mirrorUniforms = THREE.UniformsUtils.clone( mirrorShader.uniforms );
 
 	this.material = new THREE.ShaderMaterial( {
+
 		fragmentShader: mirrorShader.fragmentShader,
 		vertexShader: mirrorShader.vertexShader,
 		uniforms: mirrorUniforms
+
 	} );
 
 	this.material.uniforms.mirrorSampler.value = this.texture;
 	this.material.uniforms.mirrorColor.value = mirrorColor;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
 
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo(height) ) {
+	if ( !isPowerOfTwo(width) || !isPowerOfTwo( height ) ) {
 
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
@@ -137,7 +147,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 
 THREE.Mirror.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.Mirror.prototype.renderWithMirror = function (otherMirror) {
+THREE.Mirror.prototype.renderWithMirror = function ( otherMirror ) {
 
 	// update the mirror matrix to mirror the current view
 	this.updateTextureMatrix();
@@ -165,7 +175,7 @@ THREE.Mirror.prototype.renderWithMirror = function (otherMirror) {
 
 THREE.Mirror.prototype.updateTextureMatrix = function () {
 
-	function sign(x) { return x ? x < 0 ? -1 : 1 : 0; }
+	var sign = THREE.Math.sign;
 
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
@@ -222,10 +232,10 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	var q = new THREE.Vector4();
 	var projectionMatrix = this.mirrorCamera.projectionMatrix;
 
-	q.x = (sign(this.clipPlane.x) + projectionMatrix.elements[8]) / projectionMatrix.elements[0];
-	q.y = (sign(this.clipPlane.y) + projectionMatrix.elements[9]) / projectionMatrix.elements[5];
-	q.z = -1.0;
-	q.w = (1.0 + projectionMatrix.elements[10]) / projectionMatrix.elements[14];
+	q.x = ( sign(this.clipPlane.x) + projectionMatrix.elements[8] ) / projectionMatrix.elements[0];
+	q.y = ( sign(this.clipPlane.y) + projectionMatrix.elements[9] ) / projectionMatrix.elements[5];
+	q.z = - 1.0;
+	q.w = ( 1.0 + projectionMatrix.elements[10] ) / projectionMatrix.elements[14];
 
 	// Calculate the scaled plane vector
 	var c = new THREE.Vector4();

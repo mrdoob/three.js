@@ -554,7 +554,7 @@ THREE.BufferGeometry.prototype = {
 
 	},
 
-	clone: function() {
+	clone: function () {
 
 		var geometry = new THREE.BufferGeometry();
 
@@ -562,12 +562,10 @@ THREE.BufferGeometry.prototype = {
 
 		for ( var attr in this.attributes ) {
 
-			var attribute, sourceAttr, sourceArray;
+			var sourceAttr = this.attributes[ attr ];
+			var sourceArray = sourceAttr.array;
 
-			sourceAttr = this.attributes[ attr ];
-			sourceArray = sourceAttr.array;
-
-			attribute = {
+			var attribute = {
 
 				itemSize: sourceAttr.itemSize,
 				numItems: sourceAttr.numItems,
@@ -581,16 +579,10 @@ THREE.BufferGeometry.prototype = {
 
 				if ( sourceArray instanceof type ) {
 
-					attributes.array = new type( sourceArray.length );
+					attribute.array = new type( sourceArray );
 					break;
 
 				}
-
-			}
-
-			for ( var i = 0, il = sourceAttr.numItems; i < il; i ++ ) {
-
-				attribute.array[ i ] = sourceArray[ i ];
 
 			}
 
@@ -602,13 +594,13 @@ THREE.BufferGeometry.prototype = {
 
 			var offset = this.offsets[ i ];
 
-			geometry.offsets.push({
+			geometry.offsets.push( {
 
 				start: offset.start,
 				index: offset.index,
 				count: offset.count
 
-			});
+			} );
 
 		}
 
