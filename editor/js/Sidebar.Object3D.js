@@ -18,7 +18,8 @@ Sidebar.Object3D = function ( editor ) {
 	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
-		update();
+
+		editor.selected.uuid = objectUUID.getValue();
 
 	} );
 
@@ -31,7 +32,11 @@ Sidebar.Object3D = function ( editor ) {
 	// name
 
 	var objectNameRow = new UI.Panel();
-	var objectName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
+
+			editor.setObjectName( editor.selected, objectName.getValue() );
+
+	} );
 
 	objectNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
 	objectNameRow.add( objectName );
@@ -271,9 +276,6 @@ Sidebar.Object3D = function ( editor ) {
 		var object = editor.selected;
 
 		if ( object !== null ) {
-
-			object.uuid = objectUUID.getValue();
-			object.name = objectName.getValue();
 
 			if ( object.parent !== undefined ) {
 

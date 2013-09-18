@@ -86,6 +86,13 @@ Editor.prototype = {
 
 	},
 
+	setObjectName: function ( object, name ) {
+
+		object.name = name;
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
 	removeObject: function ( object ) {
 
 		if ( object.parent === undefined ) return; // avoid deleting the camera or scene
@@ -113,9 +120,23 @@ Editor.prototype = {
 
 	},
 
+	setGeometryName: function ( geometry, name ) {
+
+		geometry.name = name;
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
 	addMaterial: function ( material ) {
 
 		this.materials[ material.uuid ] = material;
+
+	},
+
+	setMaterialName: function ( material, name ) {
+
+		material.name = name;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
