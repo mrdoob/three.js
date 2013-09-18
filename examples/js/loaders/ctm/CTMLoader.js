@@ -117,8 +117,8 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 							var ctmFile = files[ i ];
 
-                            var e1 = Date.now();
-                            // console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
+                            				var e1 = Date.now();
+                            				// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
 
 							if ( useBuffers ) {
 
@@ -130,8 +130,8 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 							}
 
-                            var e = Date.now();
-                            console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
+                            				var e = Date.now();
+                            				console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
 
 						}
 
@@ -234,57 +234,57 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		// (needed for buffer splitting, to keep together face vertices)
 		if ( reorderVertices ) {
 
-            function copyVertexInfo(v, vt) {
+		    	function copyVertexInfo(v, vt) {
 
-                var sx = v * 3,
-                    sy = v * 3 + 1,
-                    sz = v * 3 + 2,
+				var sx = v * 3,
+			    	    sy = v * 3 + 1,
+			    	    sz = v * 3 + 2,
 
-                    dx = vt * 3,
-                    dy = vt * 3 + 1,
-                    dz = vt * 3 + 2;
+			    	dx = vt * 3,
+			    	dy = vt * 3 + 1,
+			    	dz = vt * 3 + 2;
 
-                newVertices[ dx ] = vertexPositionArray[ sx ];
-                newVertices[ dy ] = vertexPositionArray[ sy ];
-                newVertices[ dz ] = vertexPositionArray[ sz ];
+				newVertices[ dx ] = vertexPositionArray[ sx ];
+				newVertices[ dy ] = vertexPositionArray[ sy ];
+				newVertices[ dz ] = vertexPositionArray[ sz ];
 
-                if ( vertexNormalArray ) {
-                    newNormals[ dx ] = vertexNormalArray[ sx ];
-                    newNormals[ dy ] = vertexNormalArray[ sy ];
-                    newNormals[ dz ] = vertexNormalArray[ sz ];
-                }
+				if ( vertexNormalArray ) {
+				    newNormals[ dx ] = vertexNormalArray[ sx ];
+				    newNormals[ dy ] = vertexNormalArray[ sy ];
+				    newNormals[ dz ] = vertexNormalArray[ sz ];
+				}
 
-                if ( vertexUvArray ) {
-                    newUvs[ vt * 2 ] 	 = vertexUvArray[ v * 2 ];
-                    newUvs[ vt * 2 + 1 ] = vertexUvArray[ v * 2 + 1 ];
-                }
+				if ( vertexUvArray ) {
+				    newUvs[ vt * 2 ] 	 = vertexUvArray[ v * 2 ];
+				    newUvs[ vt * 2 + 1 ] = vertexUvArray[ v * 2 + 1 ];
+				}
 
-                if ( vertexColorArray ) {
-                    newColors[ vt * 4 ] 	= vertexColorArray[ v * 4 ];
-                    newColors[ vt * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
-                    newColors[ vt * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
-                    newColors[ vt * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
-                }
-            }
+				if ( vertexColorArray ) {
+				    newColors[ vt * 4 ] 	= vertexColorArray[ v * 4 ];
+				    newColors[ vt * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
+				    newColors[ vt * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
+				    newColors[ vt * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
+				}
+		    	}
 
-			function handleVertex( v, iMap ) {
+		    	function handleVertex( v, iMap ) {
 
 				if ( iMap[ v ] === undefined ) {
 
 					iMap[ v ] = vertexCounter;
-                    reverseIndexMap[vertexCounter] = v;
+                    			reverseIndexMap[vertexCounter] = v;
 					vertexCounter += 1;
 				}
-                return iMap[ v ];
-			}
+                		return iMap[ v ];
+		    	}
 
 			var newFaces = new Uint32Array( vertexIndexArray.length );
 			var indexMap = {}, reverseIndexMap = {}, vertexCounter = 0;
 
-            // in most Reality Capture models < 1% of faces**2 are sprawled, for complex CAD/CAM > 2%
-            var spawledFaceCount = 0,
-                spawledFaceLimit = Math.ceil(vertexIndexArray.length/3000);
-            var sprawledFaces = new Uint32Array( spawledFaceLimit );  // to store sprawled triangle indices
+            		// in most Reality Capture models < 1% of faces**2 are sprawled, for complex CAD/CAM > 2%
+            		var spawledFaceCount = 0,
+                	    spawledFaceLimit = Math.ceil(vertexIndexArray.length/3000);
+            		var sprawledFaces = new Uint32Array( spawledFaceLimit );  // to store sprawled triangle indices
 
 			for ( var i = 0; i < vertexIndexArray.length; i += 3 ) {
 
@@ -298,56 +298,57 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 				// check for sprawled triangles and put them aside to recreate later
 				if ( Math.abs( indexMap[a] - indexMap[b] ) > 65535 ||
-                     Math.abs( indexMap[b] - indexMap[c] ) > 65535 ||
-                     Math.abs( indexMap[c] - indexMap[a] ) > 65535 ){
+                     		     Math.abs( indexMap[b] - indexMap[c] ) > 65535 ||
+                     		     Math.abs( indexMap[c] - indexMap[a] ) > 65535 ){
 
-                    // expand storage when neccessary
-                    if (spawledFaceCount >= spawledFaceLimit) {
-                        console.warn("reached sprawled faces limit: " + spawledFaceCount);
-                        spawledFaceLimit *= 2;
-                        var tArr = new Uint32Array( spawledFaceLimit );
-                        tArr.set(sprawledFaces);
-                        sprawledFaces = tArr;
-                    }
+			    		// expand storage when neccessary
+			    		if (spawledFaceCount >= spawledFaceLimit) {
+						console.warn("reached sprawled faces limit: " + spawledFaceCount);
+						spawledFaceLimit *= 2;
+						var tArr = new Uint32Array( spawledFaceLimit );
+						tArr.set(sprawledFaces);
+						sprawledFaces = tArr;
+			    		}
 
-                    sprawledFaces[ spawledFaceCount ] = i;  // starting index in newFaces
-                    spawledFaceCount += 1;
-                }
-                else {
+                    			sprawledFaces[ spawledFaceCount ] = i;  // starting index in newFaces
+                    			spawledFaceCount += 1;
+                		}
+                		else {
 
 				    newFaces[ i ] 	  = indexMap[ a ];
 				    newFaces[ i + 1 ] = indexMap[ b ];
 				    newFaces[ i + 2 ] = indexMap[ c ];
-                }
+                		}
 			}
-            console.log("Number of sprawled faces: " + spawledFaceCount + " current limit: " + spawledFaceLimit +
-                        " total: " + vertexIndexArray.length/3 + " vertices: " + vertexCounter);
+            		// console.log("Number of sprawled faces: " + spawledFaceCount + " current limit: " + spawledFaceLimit +
+                        //	" total: " + vertexIndexArray.length/3 + " vertices: " + vertexCounter);
 
-            // create dublicate vertices and update sprawled faces
-            var indexMap2 = {},
-                noov = vertexCounter;   // # of original vertices
+			// create dublicate vertices and update sprawled faces
+			var indexMap2 = {},
+			    noov = vertexCounter;   // # of original vertices
 
-            for (var isf = 0; isf < spawledFaceCount; isf++ ) {
-                var i = sprawledFaces[isf];
+			for (var isf = 0; isf < spawledFaceCount; isf++ ) {
+				var i = sprawledFaces[isf];
 
-                for (var j = 0; j < 3; j++) {
-                    var v = vertexIndexArray[ i + j ];
-                    newFaces[ i + j] = handleVertex(v, indexMap2);   // new vertex
-                }
-            }
-            // console.log("Created duplicated vertices: " + (vertexCounter - noov));
+				for (var j = 0; j < 3; j++) {
+				    var v = vertexIndexArray[ i + j ];
+				    newFaces[ i + j] = handleVertex(v, indexMap2);   // new vertex
+				}
+			}
 
-            // copy xyz, uv, normals and colors into new arrays
-            var newVertices = new Float32Array( 3*vertexCounter );
+			// console.log("Created duplicated vertices: " + (vertexCounter - noov));
+
+			// copy xyz, uv, normals and colors into new arrays
+			var newVertices = new Float32Array( 3*vertexCounter );
 			var newNormals, newUvs, newColors;
 
 			if ( vertexNormalArray ) newNormals = new Float32Array( 3*vertexCounter );
 			if ( vertexUvArray ) newUvs = new Float32Array( 2*vertexCounter );
 			if ( vertexColorArray ) newColors = new Float32Array( 4*vertexCounter );
 
-            for (var iv = 0; iv < vertexCounter; iv++) {
-                copyVertexInfo(reverseIndexMap[iv], iv);
-            }
+			for (var iv = 0; iv < vertexCounter; iv++) {
+				copyVertexInfo(reverseIndexMap[iv], iv);
+			}
 
 			vertexIndexArray = newFaces;
 			vertexPositionArray = newVertices;
@@ -383,7 +384,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 				i -= 3;
 
-                if ( minPrev > 0 ) {
+                		if ( minPrev > 0 ) {
 
 				    for ( var k = start; k < i; ++ k )
 					    indices[ k ] -= minPrev;
@@ -401,15 +402,15 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		}
 
-        if ( minPrev > 0 ) {
+        	if ( minPrev > 0 ) {
 
 		    for ( var k = start; k < i; ++ k )
 			    indices[ k ] -= minPrev;
 		}
 		scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
-        var e = Date.now();
-		console.log( "Vetex reordering time: " + (e-s) + " ms" );
+        	// var e = Date.now();
+		// console.log( "Vetex reordering time: " + (e-s) + " ms" );
 
 		// recast CTM 32-bit indices as 16-bit WebGL indices
 		var vertexIndexArray16 = new Uint16Array( vertexIndexArray );
