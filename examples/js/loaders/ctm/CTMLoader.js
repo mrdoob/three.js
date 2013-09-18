@@ -281,7 +281,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 			var newFaces = new Uint32Array( vertexIndexArray.length );
 			var indexMap = {}, reverseIndexMap = {}, vertexCounter = 0;
 
-            		// in most Reality Capture models < 1% of faces**2 are sprawled, for complex CAD/CAM > 2%
             		var spawledFaceCount = 0,
                 	    spawledFaceLimit = Math.ceil(vertexIndexArray.length/3000);
             		var sprawledFaces = new Uint32Array( spawledFaceLimit );  // to store sprawled triangle indices
