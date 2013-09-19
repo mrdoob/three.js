@@ -1,7 +1,9 @@
 /*
  * @author zz85 / http://github.com/zz85
  * 
- * 	Usage: slimerjs generate_screenshots.js
+ * 	Usage: slimerjs generate_screenshots.js <path to examples> <viewport>
+ *
+ *	Example: slimerjs generate_screenshots.js http://localhost:8000/three.js/examples/ 640x480
  * 
  */
 
@@ -9,15 +11,38 @@
 // ------- Configurations ------------
 //
 
-var EXAMPLES_PATH = 'http://localhost:8000/gits/three.js/examples/';
+var EXAMPLES_PATH = 'http://localhost:8000/examples/';
 var SCREENSHOTS_PATH = '../../examples/screenshots/';
 var WIDTH = 800;
 var HEIGHT = 600;
 var SCREENSHOT_DELAY = 1000;
 
+var args = require('system').args;
+
+if (args.length > 1) {
+
+	if (args[1]) {
+		EXAMPLES_PATH = args[1];
+		console.log('EXAMPLES_PATH set to: ' + EXAMPLES_PATH)
+	}
+
+	if (args[2]) {
+		var arg = args[2];
+		if (arg.match(/^[0-9]+x[0-9]+$/)) {
+			var viewportParts = arg.split('x');
+			WIDTH = viewportParts[0]
+			HEIGHT = viewportParts[1];
+			console.log('WIDTH set to: ' + WIDTH);
+			console.log('HEIGHT set to: ' + HEIGHT);
+		}
+	}
+
+}
+
 //
 // ------ End Configurations ---------
 //
+
 
 var queue = [];
 var webpage = require("webpage");
@@ -58,7 +83,7 @@ function open(file, delay, cb) {
 			page.render(SCREENSHOTS_PATH + file + '.jpg', {
 				format: "jpg",
 				quality: 100, 
-				onlyViewport:true
+				onlyViewport: true
 			});
 			
 			page.close();
