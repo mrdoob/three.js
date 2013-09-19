@@ -107,6 +107,8 @@
 		<div id="panel">
 			<div id="list">
 				<h1>three.js examples</h1><br />
+
+				<a href="#">Contents</a><br />
 			</div>
 		</div>
 		<iframe id="viewer"></iframe>
@@ -190,15 +192,87 @@
 
 		};
 
-		if ( window.location.hash !== '' ) {
+		function curryLoad ( file ) {
 
-			load( window.location.hash.substring( 1 ) );
+			return function () {
 
-		} else {
+				load( file );
+				return false;
 
-			viewer.src = 'contents.html';
-			viewer.focus();
+			} 
+
 		}
+
+
+		window.addEventListener( "hashchange", handleHash, false);
+
+		function handleHash () {
+
+			var hash = window.location.hash;
+
+			if (hash.length) hash = hash.substring(1);
+
+			if ( hash ) {
+
+				load( hash );
+
+			} else {
+
+				// we should remove contents.html if it isn't useful in future.
+				// viewer.src = 'contents.html';
+				// viewer.focus();
+
+				var iFrameWindow = viewer.contentWindow || viewer.documentWindow;
+				var iFrameDoc = iFrameWindow.document;
+
+				var container = document.createElement( 'div' );
+
+				// ugly but quick way to style this
+
+				container.innerHTML = '<style>@font-face{font-family:inconsolata;src:url(files/inconsolata.woff) format(woff);font-weight:400;font-style:normal}body{background-color:#fff;font-family:inconsolata;font-size:15px}h1{font-size:22px;font-weight:400}h2{font-size:20px;font-weight:400}img{width:200px}</style>';
+
+
+				container.innerHTML += '<h1>Contents</h1>';
+
+				iFrameDoc.open();
+				iFrameDoc.appendChild(container);
+				iFrameDoc.close();
+
+				var example, section, div, html, a;
+
+				for ( var key in files ) {
+
+					section = files[ key ];
+
+					div = document.createElement( 'h2' );
+					div.textContent = key;
+					container.appendChild( div );
+					
+					div = document.createElement( 'div' );
+					div.className = 'images';
+					container.appendChild( div );
+
+					for ( var i = 0; i < section.length; i ++ ) {
+
+						example = section[ i ];
+
+						a = document.createElement('a');
+						a.href = example + '.html';
+						a.innerHTML = '<img src="screenshots/' +  example + '.jpg">';
+						a.addEventListener( 'click', curryLoad( example ) );
+
+						div.appendChild( a );
+
+					}
+
+				}
+
+
+			}
+
+		}
+
+		handleHash();
 
 		</script>
 
