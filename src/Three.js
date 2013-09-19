@@ -6,13 +6,13 @@
 
 var THREE = THREE || { REVISION: '61' };
 
-self.console = self.console || {
+var console = {
 
-	info: function () {},
-	log: function () {},
-	debug: function () {},
-	warn: function () {},
-	error: function () {}
+	info: self.console.info || function () {},
+	log: self.console.log || function () {},
+	debug: self.console.debug || function () {},
+	warn: self.console.warn || function () {},
+	error: self.console.error || function () {}
 
 };
 
