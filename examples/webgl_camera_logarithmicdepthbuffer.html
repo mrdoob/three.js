@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - cameras</title>
+		<title>three.js webgl - cameras - logarithmic depth buffer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -31,43 +31,100 @@
 			b { color: lightgreen }
 
 			#stats { position: absolute; top:0; left: 0 }
+
+			.renderer_label {
+				position: absolute;
+				bottom: 1em;
+				width: 100%;
+				color: white;
+				z-index: 10;
+				display: block;
+				text-align: center;
+			}
+			.renderer_label.renderer_label_normal {
+			}
+			.renderer_label.renderer_label_logzbuf {
+			}
+			#container {
+				white-space: nowrap;
+			}
+			#container_normal {
+				width: 50%;
+				display: inline-block;
+				position: relative;
+				overflow: hidden;
+			}
+			#container_logzbuf {
+				width: 50%;
+				display: inline-block;
+				position: relative;
+				overflow: hidden;
+			}
+			#renderer_border {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				width: 2px;
+				z-index: 10;
+				opacity: .8;
+				background: #ccc;
+				border: 1px inset #ccc;
+				cursor: col-resize;
+			}
 		</style>
 	</head>
 	<body>
 
-		<div id="container"></div>
+		<div id="container">
+			<div id="container_normal"><h2 class="renderer_label renderer_label_normal">normal z-buffer</h2></div><div id="container_logzbuf"><h2 class="renderer_label renderer_label_logzbuf">logarithmic z-buffer</h2></div>
+			<div id="renderer_border"></div>
+		</div>
+
 		<div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - cameras - logarithmic depth buffer<br/>
+			Zoom through scene with objects ranging in size from 1µm to 1000 light years using the mousewheel<br/>
+			Linear z-buffer handles close-up objects well, but fails spectacularly at distant objects<br/>
+			Logarithmic handles all but the smallest objects with ease
 		</div>
 
 		<script src="../build/three.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 		<script src="fonts/helvetiker_regular.typeface.js"></script>
 
 		<script>
 
+			// 1 micrometer to 100 million light years in one scene?	 preposterous!	and yet...
+			var NEAR = 1e-6, FAR = 1e24;
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
+			var screensplit = .25, screensplit_right = 0;
+			var mouse = [.5, .5];
+			var zoompos = -100, minzoomspeed = .015;
+			var zoomspeed = minzoomspeed;
 
 			var container, stats;
-			var camera, scene, renderer, controls;
-			var cameraLogZBuf, sceneLogZBuf, rendererLogZBuf;
+			var objects = {};
 
-			var labels = [
-				{ size: .000001, label: "microscopic (1µm)" },
-				{ size: .001, label: "minuscule (1mm)" },
-				{ size: .01, label: "tiny (1cm)" },
-				{ size: 1, label: "petite (1m)" },
-				{ size: 10, label: "small (10m)" },
-				{ size: 100, label: "average (100m)" },
-				{ size: 1000, label: "medium (1km)" },
-				{ size: 10000, label: "good-sized (10km)" },
-				{ size: 100000, label: "large (100km)" },
-				{ size: 1000000, label: "extra-large (1Mm)" },
-				{ size: 10000000, label: "mammoth (10Mm)" },
-				{ size: 100000000, label: "enormous (100Mm)" },
-				{ size: 1000000000, label: "stupendous (1Gm)" }
+			// Generate a number of text labels, from 1µm in size up to 1000 light years
+			// Try to use some descriptive real-world examples of objects at each scale
+
+			var labeldata = [
+				{ size: .01,           scale: .001, label: "microscopic (1µm)", scale: .0001 }, // FIXME - triangulating text fails at this size, so we scale instead
+				{ size: .01,           scale: 0.1,  label: "minuscule (1mm)", scale: .1},
+				{ size: .01,           scale: 1.0,  label: "tiny (1cm)", scale: 1 },
+				{ size: 1,             scale: 1.0,  label: "child-sized (1m)", scale: 1 },
+				{ size: 10,            scale: 1.0,  label: "tree-sized (10m)", scale: 1 },
+				{ size: 100,           scale: 1.0,  label: "building-sized (100m)", scale: 1 },
+				{ size: 1000,          scale: 1.0,  label: "medium (1km)", scale: 1 },
+				{ size: 10000,         scale: 1.0,  label: "city-sized (10km)", scale: 1 },
+				{ size: 3400000,       scale: 1.0,  label: "moon-sized (3,400 Km)", scale: 1 },
+				{ size: 12000000,      scale: 1.0,  label: "planet-sized (12,000 km)", scale: 1 },
+				{ size: 1400000000,    scale: 1.0,  label: "sun-sized (1,400,000 km)", scale: 1 },
+ 				{ size: 7.47e12,       scale: 1.0,  label: "solar system-sized (50Au)", scale: 1 },
+   				{ size: 9.4605284e15,  scale: 1.0,  label: "gargantuan (1 light year)", scale: 1 },
+   				{ size: 3.08567758e16, scale: 1.0,  label: "ludicrous (1 parsec)", scale: 1 },
+				{ size: 1e19,          scale: 1.0,  label: "mind boggling (1000 light years)", scale: 1 },
+				{ size: 1.135e21,      scale: 1.0,  label: "galaxy-sized (120,000 light years)", scale: 1 }
 			];
 
 			init();
@@ -75,97 +132,191 @@
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				container = document.getElementById( 'container' );
 
-				scene = new THREE.Scene();
-				sceneLogZBuf = new THREE.Scene();
-
-				// 1 micrometer to 1 parsec in one scene?   preposterous!  and yet...
-        var NEAR = 1e-6, FAR = 1e24;
-				camera = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
-				camera.position.z = 100;
-				scene.add(camera);
-
-				cameraLogZBuf = new THREE.PerspectiveCamera( 50, 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
-				cameraLogZBuf.position = camera.position;
-				cameraLogZBuf.quaternion = camera.quaternion;
-				cameraLogZBuf.matrix = camera.matrix;
-
-				camera.setViewOffset( SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
-				cameraLogZBuf.setViewOffset( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
-
-				var labelmat = new THREE.MeshNormalMaterial();
-				var labelmatLogZBuf = new THREE.MeshNormalMaterial();
-				for (var i = 0; i < labels.length; i++) {
-					var labelgeo = new THREE.TextGeometry(labels[i].label, {
-						size: labels[i].size,
-						height: labels[i].size / 2,
-						font: 'helvetiker',
-					});
-					labelgeo.computeBoundingSphere();
-					var mesh = new THREE.Mesh(labelgeo, labelmat);
-					mesh.position.x = -labelgeo.boundingSphere.radius;
-					mesh.position.y = labels[i].size;
-					mesh.position.z = -labels[i].size * 10;
-					scene.add(mesh);
-
-					var meshLogZBuf = new THREE.Mesh(labelgeo.clone(), labelmatLogZBuf);
-					meshLogZBuf.position = mesh.position;
-					sceneLogZBuf.add(meshLogZBuf);
-				}
-
-				renderer = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: false});
-				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
-				renderer.domElement.style.position = "relative";
-				container.appendChild(renderer.domElement);
-
-				rendererLogZBuf = new THREE.WebGLRenderer({antialias: true, logarithmicDepthBuffer: true});
-				rendererLogZBuf.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
-				rendererLogZBuf.domElement.style.position = "relative";
-				container.appendChild(rendererLogZBuf.domElement);
-
-				controls = new THREE.OrbitControls(camera, document);
-				controls.dollyOut(.0000001);
-				controls.rotateUp(Math.PI/16);
-				//controls.addEventListener( 'change', render );
+				// Initialize two copies of the same scene, one with normal z-buffer and one with logarithmic z-buffer
+				objects.normal = initScene('normal', false);
+				objects.logzbuf = initScene('logzbuf', true);
 
 				stats = new Stats();
 				container.appendChild(stats.domElement);
 
+				// Resize border allows the user to easily compare effects of logarithmic depth buffer over the whole scene
+				border = document.getElementById( 'renderer_border' );
+				border.addEventListener("mousedown", onBorderMouseDown);
+
 				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'mousewheel', onMouseWheel, false );
+				window.addEventListener( 'DOMMouseScroll', onMouseWheel, false );
+				window.addEventListener( 'mousemove', onMouseMove, false );
 
 				render();
 			}
 
-			function onWindowResize( event ) {
+			function initScene(name, logDepthBuf) {
+
+				var scene = new THREE.Scene();
+				var framecontainer = document.getElementById('container_' + name);
+
+				var camera = new THREE.PerspectiveCamera( 50, screensplit * SCREEN_WIDTH / SCREEN_HEIGHT, NEAR, FAR );
+				scene.add(camera);
+
+				var light = new THREE.DirectionalLight(0xffffff, 1);
+				light.position.set(100,100,100);
+				scene.add(light);
+
+				var pointlight = new THREE.PointLight(0xffccaa, .1);
+				pointlight.position = camera.position;
+				scene.add(pointlight);
+
+				var materialargs = {
+					color: 0xffffff,
+					specular: 0xffaa00,
+					shininess: 50,
+					metal: true,
+					shading: THREE.SmoothShading,
+					emissive: 0x333333
+				};
+
+				var geomtransform = new THREE.Matrix4();
+				var tmpvec = new THREE.Vector3();
+				var meshes = [];
+
+				for (var i = 0; i < labeldata.length; i++) {
+					var scale = labeldata[i].scale || 1;
+					var labelgeo = new THREE.TextGeometry(labeldata[i].label, {
+						size: labeldata[i].size,
+						height: labeldata[i].size / 2,
+						font: 'helvetiker',
+					});
+					labelgeo.computeBoundingSphere();
+
+					// center text
+					geomtransform.setPosition(tmpvec.set(-labelgeo.boundingSphere.radius, 0, 0));
+					labelgeo.applyMatrix(geomtransform);
+
+					// Pick a color at "random"
+					materialargs.color = THREE.ColorKeywords[Object.keys(THREE.ColorKeywords)[i]];
+
+					var mesh = new THREE.Mesh( labelgeo, new THREE.MeshPhongMaterial( materialargs ) );
+					mesh.position.z = -labeldata[i].size * 1 * scale;
+					mesh.scale.set(scale, scale, scale);
+
+					scene.add(mesh);
+				}
+
+				var renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: logDepthBuf });
+				renderer.setSize(SCREEN_WIDTH/2, SCREEN_HEIGHT);
+				renderer.domElement.style.position = "relative";
+				renderer.domElement.id = 'renderer_' + name;
+				framecontainer.appendChild(renderer.domElement);
+
+				return { container: framecontainer, renderer: renderer, scene: scene, camera: camera }
+			}
+
+			function updateRendererSizes() {
+
+				// Recalculate size for both renderers when screen size or split location changes
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
 
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				screensplit_right = 1 - screensplit;
 
-				camera.aspect = 0.5 * SCREEN_WIDTH / SCREEN_HEIGHT;
-				camera.updateProjectionMatrix();
+				objects.normal.renderer.setSize( screensplit * SCREEN_WIDTH, SCREEN_HEIGHT );
+				objects.normal.camera.aspect = screensplit * SCREEN_WIDTH / SCREEN_HEIGHT;
+				objects.normal.camera.updateProjectionMatrix();
+				objects.normal.camera.setViewOffset( SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, SCREEN_WIDTH * screensplit, SCREEN_HEIGHT );
+				objects.normal.container.style.width = (screensplit * 100) + '%';
+
+				objects.logzbuf.renderer.setSize( screensplit_right * SCREEN_WIDTH, SCREEN_HEIGHT );
+				objects.logzbuf.camera.aspect = screensplit_right * SCREEN_WIDTH / SCREEN_HEIGHT;
+				objects.logzbuf.camera.updateProjectionMatrix();
+				objects.logzbuf.camera.setViewOffset( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH * screensplit, 0, SCREEN_WIDTH * screensplit_right, SCREEN_HEIGHT );
+				objects.logzbuf.container.style.width = (screensplit_right * 100) + '%';
+
+				border.style.left = (screensplit * 100) + "%";
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
+				render();
 
-        render();
 			}
 
 			function render() {
-				controls.update();
 
-				renderer.render( scene, camera );
-				rendererLogZBuf.render( sceneLogZBuf, cameraLogZBuf );
+				// Put some limits on zooming
+				var minzoom = labeldata[0].size * labeldata[0].scale*1;
+				var maxzoom = labeldata[labeldata.length-1].size * labeldata[labeldata.length-1].scale * 100;
+				var damping = (Math.abs(zoomspeed) > minzoomspeed ? .95 : 1.0);
+
+				// Zoom out faster the further out you go
+				var zoom = THREE.Math.clamp(Math.pow(Math.E, zoompos), minzoom, maxzoom);
+				zoompos = Math.log(zoom);
+
+				// Slow down quickly at the zoom limits
+				if ((zoom == minzoom && zoomspeed < 0) || (zoom == maxzoom && zoomspeed > 0)) {
+					damping = .85;
+				}
+
+				zoompos += zoomspeed;
+				zoomspeed *= damping;
+
+				objects.normal.camera.position.x = Math.sin(.5 * Math.PI * (mouse[0] - .5)) * zoom;
+				objects.normal.camera.position.y = Math.sin(.25 * Math.PI * (mouse[1] - .5)) * zoom;
+				objects.normal.camera.position.z = Math.cos(.5 * Math.PI * (mouse[0] - .5)) * zoom;
+				objects.normal.camera.lookAt(objects.normal.scene.position);
+
+				// Clone camera settings across both scenes
+				objects.logzbuf.camera.position.copy(objects.normal.camera.position);
+				objects.logzbuf.camera.quaternion.copy(objects.normal.camera.quaternion);
+
+				// Update renderer sizes if the split has changed
+				if (screensplit_right != 1 - screensplit) {
+					updateRendererSizes();
+				}
+
+				objects.normal.renderer.render(objects.normal.scene, objects.normal.camera);
+				objects.logzbuf.renderer.render(objects.logzbuf.scene, objects.logzbuf.camera);
+
 				stats.update();
-console.log('up it');
+
 			}
 
+			function onWindowResize(event) {
+				updateRendererSizes();
+			}
+
+			function onBorderMouseDown(ev) {
+				// activate draggable window resizing bar
+				window.addEventListener("mousemove", onBorderMouseMove);
+				window.addEventListener("mouseup", onBorderMouseUp);
+				ev.stopPropagation();
+				ev.preventDefault();
+			}
+			function onBorderMouseMove(ev) {
+				screensplit = Math.max(0, Math.min(1, ev.clientX / window.innerWidth));
+				ev.stopPropagation();
+			}
+			function onBorderMouseUp(ev) {
+				window.removeEventListener("mousemove", onBorderMouseMove);
+				window.removeEventListener("mouseup", onBorderMouseUp);
+			}
+			function onMouseMove(ev) {
+				mouse[0] = ev.clientX / window.innerWidth;
+				mouse[1] = ev.clientY / window.innerHeight;
+			}
+			function onMouseWheel(ev) {
+				var amount = -ev.wheelDeltaY || ev.detail;
+				var dir = amount / Math.abs(amount);
+				zoomspeed = dir/10;
+
+				// Slow down default zoom speed after user starts zooming, to give them more control
+				minzoomspeed = 0.001;
+			}
 		</script>
 	</body>
 </html>
