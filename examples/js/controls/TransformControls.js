@@ -680,6 +680,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 	 	this.gizmo[_mode].show();
 
 		this.update();
+		scope.dispatchEvent( changeEvent );
 
 	}
 
@@ -693,14 +694,15 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		scope.size = size;
 		this.update();
+		scope.dispatchEvent( changeEvent );
 	 	
 	}
 
 	this.setSpace = function ( space ) {
 
 		scope.space = space;
-
 		this.update();
+		scope.dispatchEvent( changeEvent );
 
 	}
 
@@ -737,7 +739,6 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( scope.object === undefined || _dragging == true ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		var pointer = event.touches? event.touches[0] : event;
 
