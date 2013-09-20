@@ -3,6 +3,7 @@
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
+ * @author aluarosi / https://github.com/aluarosi/
  */
 
 THREE.WebGLRenderer = function ( parameters ) {
@@ -166,8 +167,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() },
-		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), anglesCos: new Array(), exponents: new Array() },
+		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), quadratics: new Array() },
+		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), anglesCos: new Array(), exponents: new Array(), quadratics: new Array() },
 		hemi: { length: 0, skyColors: new Array(), groundColors: new Array(), positions: new Array() }
 
 	};
@@ -4619,6 +4620,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.pointLightColor.value = lights.point.colors;
 		uniforms.pointLightPosition.value = lights.point.positions;
 		uniforms.pointLightDistance.value = lights.point.distances;
+		uniforms.pointLightQuadratic.value = lights.point.quadratics;
 
 		uniforms.spotLightColor.value = lights.spot.colors;
 		uniforms.spotLightPosition.value = lights.spot.positions;
@@ -4626,6 +4628,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.spotLightDirection.value = lights.spot.directions;
 		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
 		uniforms.spotLightExponent.value = lights.spot.exponents;
+		uniforms.spotLightQuadratic.value = lights.spot.quadratics;
 
 		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
 		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
@@ -4929,6 +4932,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		intensity,  intensitySq,
 		position,
 		distance,
+		quadratic,
 
 		zlights = _lights,
 
@@ -4938,6 +4942,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		pointColors = zlights.point.colors,
 		pointPositions = zlights.point.positions,
 		pointDistances = zlights.point.distances,
+		pointQuadratics = zlights.point.quadratics,
 
 		spotColors = zlights.spot.colors,
 		spotPositions = zlights.spot.positions,
@@ -4945,6 +4950,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotDirections = zlights.spot.directions,
 		spotAnglesCos = zlights.spot.anglesCos,
 		spotExponents = zlights.spot.exponents,
+		spotQuadratics = zlights.spot.quadratics,
 
 		hemiSkyColors = zlights.hemi.skyColors,
 		hemiGroundColors = zlights.hemi.groundColors,
@@ -4974,6 +4980,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			color = light.color;
 			intensity = light.intensity;
 			distance = light.distance;
+			quadratic = light.quadratic;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
@@ -5053,6 +5060,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				pointDistances[ pointLength ] = distance;
 
+				pointQuadratics[ pointLength ] = quadratic;
+
 				pointLength += 1;
 
 			} else if ( light instanceof THREE.SpotLight ) {
@@ -5092,6 +5101,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
 				spotExponents[ spotLength ] = light.exponent;
+
+				spotQuadratics[ spotLength ] = quadratic;
 
 				spotLength += 1;
 

@@ -10031,14 +10031,16 @@ THREE.HemisphereLight.prototype.clone = function () {
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ * @author aluarosi / https://github.com/aluarosi
  */
 
-THREE.PointLight = function ( hex, intensity, distance ) {
+THREE.PointLight = function ( hex, intensity, distance, quadratic ) {
 
 	THREE.Light.call( this, hex );
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
+	this.quadratic = ( quadratic !== undefined ) ? quadratic : false;
 
 };
 
@@ -10052,16 +10054,85 @@ THREE.PointLight.prototype.clone = function () {
 
 	light.intensity = this.intensity;
 	light.distance = this.distance;
+	light.quadratic = this.quadratic;
 
 	return light;
 
 };
 
+
+THREE.SmartPointLight = function ( params ) {
+/**
+ * Wrapper for PointLight.
+ * parameters 	-->	object with specifications (parameters)
+ * 	color			:	light color, instanceof Color
+ * 						default = white
+ * 	main_intensity	:	intensity at main_distance (should be between 0.0 and 1.0)
+ * 						default = 1.0
+ * 	main_distance	:	distance at which intensity is as specified by the parameter 'intensity'
+ * 						default = 1.0
+ * 	fade_type		:	'constant', for constant intensity (no decay)
+ * 						'linear', 	linear decay until, intensity becomes 0.0 by fade_distance
+ * 						'quadratic', quadratic decay, intensity remains constant
+ *							for distances < near_distance
+ * 						default = 'constant'
+ * For LINEAR PointLight:
+ * 	fade_distance	: 	distance from main_distance where light intensity becomes 0.0
+ * 						default = 1.0
+ * For QUADRATIC PointLight
+ * 	near_distance	:	For shorter distances than this, light intensity remains constant.
+ * 						Think about it like the "light bulb radius", you do not put objects
+ * 						within this distance. The default value tries to be a useful one
+ *							in most situations: change only if needed.
+ * 						default = 0.01
+ */
+	if (typeof params === 'undefined') params = {};
+	var color 		= 	params.color instanceof THREE.Color ?
+						params.color : new THREE.Color(0xffffff);
+	var main_intensity 	= 	typeof params.main_intensity === 'number' &&
+						! (params.main_intensity < 0.0) ?
+						params.main_intensity : 1.0;
+	var main_distance	= 	typeof params.main_distance === 'number' &&
+						! (params.main_distance <= 0.0) ?
+						params.main_distance : 1.0;
+	var fade_type		= 	params.fade_type === 'constant' ||
+						params.fade_type === 'linear' ||
+						params.fade_type === 'quadratic' ?
+						params.fade_type : 'constant';
+	var fade_distance	= 	typeof params.fade_distance === 'number' &&
+						! (params.fade_distance <= 0.0) ?
+						params.fade_distance : 1.0;
+	var near_distance	= 	typeof params.near_distance === 'number' &&
+						! (params.near_distance <= 0.0) ?
+						params.near_distance : 1.0;
+	var	hex,
+		intensity,
+		distance,
+		quadratic;
+	hex = color.getHex();
+	if ( fade_type === 'quadratic'){
+		distance = near_distance;
+		intensity = Math.pow( main_distance/near_distance, 2 ) * main_intensity;
+		quadratic = true;
+	} else if ( fade_type === 'linear' ) {
+		distance = main_distance + fade_distance;
+		intensity = (1 + main_distance / fade_distance ) * main_intensity;
+	} else {
+		// fade_type should be 'constant' if we got here
+		distance = 0;
+		intensity = main_intensity;
+	}
+	THREE.PointLight.call( this, hex, intensity, distance, quadratic );
+}
+
+THREE.SmartPointLight.prototype = Object.create( THREE.PointLight.prototype );
+
 /**
  * @author alteredq / http://alteredqualia.com/
+ * @author aluarosi / https://github.com/aluarosi
  */
 
-THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
+THREE.SpotLight = function ( hex, intensity, distance, angle, exponent, quadratic ) {
 
 	THREE.Light.call( this, hex );
 
@@ -10072,6 +10143,7 @@ THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
 	this.distance = ( distance !== undefined ) ? distance : 0;
 	this.angle = ( angle !== undefined ) ? angle : Math.PI / 3;
 	this.exponent = ( exponent !== undefined ) ? exponent : 10;
+	this.quadratic = ( quadratic !== undefined ) ? quadratic : false;
 
 	this.castShadow = false;
 	this.onlyShadow = false;
@@ -10113,6 +10185,7 @@ THREE.SpotLight.prototype.clone = function () {
 	light.distance = this.distance;
 	light.angle = this.angle;
 	light.exponent = this.exponent;
+	light.quadratic = this.quadratic;
 
 	light.castShadow = this.castShadow;
 	light.onlyShadow = this.onlyShadow;
@@ -10120,6 +10193,84 @@ THREE.SpotLight.prototype.clone = function () {
 	return light;
 
 };
+
+
+
+THREE.SmartSpotLight = function ( params ) {
+/**
+ * Wrapper for SpotLight.
+ * parameters 	-->	object with specifications (parameters)
+ * 	color			:	light color, instanceof Color
+ * 						default = white
+ * 	main_intensity	:	intensity at main_distance (should be between 0.0 and 1.0)
+ * 						default = 1.0
+ * 	main_distance	:	distance at which intensity is as specified by the parameter 'intensity'
+ * 						default = 1.0
+ * 	fade_type		:	'constant', for constant intensity (no decay)
+ * 						'linear', 	linear decay until, intensity becomes 0.0 by fade_distance
+ * 						'quadratic', quadratic decay, intensity remains constant
+ *							for distances < near_distance
+ * 						default = 'constant'
+ * angle			:	same as for SpotLight
+ * exponent			:	same as for SpotLight 
+ *
+ * For LINEAR SpotLight:
+ * 	fade_distance	: 	distance from main_distance where light intensity becomes 0.0
+ * 						default = 1.0
+ * For QUADRATIC SpotLight
+ * 	near_distance	:	For shorter distances than this, light intensity remains constant.
+ * 						Think about it like the "light bulb radius", you do not put objects
+ * 						within this distance. The default value tries to be a useful one
+ *							in most situations: change only if needed.
+ * 						default = 0.01
+ */
+	if (typeof params === 'undefined') params = {};
+	var color 		= 	params.color instanceof THREE.Color ?
+						params.color : new THREE.Color(0xffffff);
+	var main_intensity 	= 	typeof params.main_intensity === 'number' &&
+						! (params.main_intensity < 0.0) ?
+						params.main_intensity : 1.0;
+	var main_distance	= 	typeof params.main_distance === 'number' &&
+						! (params.main_distance <= 0.0) ?
+						params.main_distance : 1.0;
+	var fade_type		= 	params.fade_type === 'constant' ||
+						params.fade_type === 'linear' ||
+						params.fade_type === 'quadratic' ?
+						params.fade_type : 'constant';
+	var fade_distance	= 	typeof params.fade_distance === 'number' &&
+						! (params.fade_distance <= 0.0) ?
+						params.fade_distance : 1.0;
+	var near_distance	= 	typeof params.near_distance === 'number' &&
+						! (params.near_distance <= 0.0) ?
+						params.near_distance : 1.0;
+	var angle			= 	typeof params.angle === 'number' &&
+						params.angle > 0 && params.angle <= Math.PI/2 ?
+						params.angle : Math.PI/3;
+	var exponent		= 	typeof params.exponent === 'number' &&
+						params.exponent >= 0 ?
+						params.exponent : 10;	
+
+	var	hex,
+		intensity,
+		distance,
+		quadratic;
+	hex = color.getHex();
+	if ( fade_type === 'quadratic'){
+		distance = near_distance;
+		intensity = Math.pow( main_distance/near_distance, 2 ) * main_intensity;
+		quadratic = true;
+	} else if ( fade_type === 'linear' ) {
+		distance = main_distance + fade_distance;
+		intensity = (1 + main_distance / fade_distance ) * main_intensity;
+	} else {
+		// fade_type should be 'constant' if we got here
+		distance = 0;
+		intensity = main_intensity;
+	}
+	THREE.SpotLight.call( this, hex, intensity, distance, angle, exponent, quadratic );
+}
+
+THREE.SmartSpotLight.prototype = Object.create( THREE.SpotLight.prototype );
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -16367,6 +16518,7 @@ THREE.CanvasRenderer = function ( parameters ) {
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
+ * @author aluarosi / https://github.com/aluarosi
  */
 
 THREE.ShaderChunk = {
@@ -16830,6 +16982,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+			"uniform bool pointLightQuadratic[ MAX_POINT_LIGHTS ];",
 
 		"#endif",
 
@@ -16841,6 +16994,7 @@ THREE.ShaderChunk = {
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 		"#endif",
 
@@ -16919,8 +17073,14 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-				"if ( pointLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+				"if ( pointLightDistance[ i ] > 0.0 ) {",
+					"if ( pointLightQuadratic[ i ] ){",
+						"lDistance = min( pow( pointLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+					"} else {",
+					    "lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+					"}",
+				"}",
 
 				"lVector = normalize( lVector );",
 				"float dotProduct = dot( transformedNormal, lVector );",
@@ -16978,8 +17138,13 @@ THREE.ShaderChunk = {
 					"spotEffect = max( pow( spotEffect, spotLightExponent[ i ] ), 0.0 );",
 
 					"float lDistance = 1.0;",
-					"if ( spotLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"if ( spotLightDistance[ i ] > 0.0 ) {",
+						"if ( spotLightQuadratic[ i ] ){",
+							"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+						"} else {",
+					    	"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+						"}",
+					"}",
 
 					"lVector = normalize( lVector );",
 
@@ -17069,6 +17234,7 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+			"uniform bool pointLightQuadratic[ MAX_POINT_LIGHTS ];",
 
 			"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
 
@@ -17078,6 +17244,7 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 			"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
 
@@ -17106,8 +17273,13 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-				"if ( pointLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+				"if ( pointLightDistance[ i ] > 0.0 ) {",
+					"if ( pointLightQuadratic[ i ] ){",
+						"lDistance = min( pow( pointLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+					"} else {",
+					    "lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+					"}",
+				"}",
 
 				"vPointLight[ i ] = vec4( lVector, lDistance );",
 
@@ -17123,8 +17295,13 @@ THREE.ShaderChunk = {
 				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
 
 				"float lDistance = 1.0;",
-				"if ( spotLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+				"if ( spotLightDistance[ i ] > 0.0 ) {",
+					"if ( spotLightQuadratic[ i ] ){",
+						"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+					"} else {",
+					    "lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"}",
+				"}",
 
 				"vSpotLight[ i ] = vec4( lVector, lDistance );",
 
@@ -17169,6 +17346,7 @@ THREE.ShaderChunk = {
 
 				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
 				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
+				"uniform bool pointLightQuadratic[ MAX_POINT_LIGHTS ];",
 
 			"#else",
 
@@ -17185,6 +17363,7 @@ THREE.ShaderChunk = {
 			"uniform vec3 spotLightDirection[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
+			"uniform bool spotLightQuadratic[ MAX_SPOT_LIGHTS ];",
 
 			"#ifdef PHONG_PER_PIXEL",
 
@@ -17249,8 +17428,14 @@ THREE.ShaderChunk = {
 					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
 					"float lDistance = 1.0;",
-					"if ( pointLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+
+					"if ( pointLightDistance[ i ] > 0.0 ) {",
+						"if ( pointLightQuadratic[ i ] ){",
+							"lDistance = min( pow( pointLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+						"} else {",
+					    	"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
+						"}",
+					"}",
 
 					"lVector = normalize( lVector );",
 
@@ -17318,8 +17503,13 @@ THREE.ShaderChunk = {
 					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
 					"float lDistance = 1.0;",
-					"if ( spotLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+					"if ( spotLightDistance[ i ] > 0.0 ) {",
+						"if ( spotLightQuadratic[ i ] ){",
+							"lDistance = min( pow( spotLightDistance[i]/length(lVector), 2.0 ),1.0 );",
+						"} else {",
+					    	"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
+						"}",
+					"}",
 
 					"lVector = normalize( lVector );",
 
@@ -18261,13 +18451,15 @@ THREE.UniformsLib = {
 		"pointLightColor" : { type: "fv", value: [] },
 		"pointLightPosition" : { type: "fv", value: [] },
 		"pointLightDistance" : { type: "fv1", value: [] },
+		"pointLightQuadratic" : { type: "iv1", value: [] },
 
 		"spotLightColor" : { type: "fv", value: [] },
 		"spotLightPosition" : { type: "fv", value: [] },
 		"spotLightDirection" : { type: "fv", value: [] },
 		"spotLightDistance" : { type: "fv1", value: [] },
 		"spotLightAngleCos" : { type: "fv1", value: [] },
-		"spotLightExponent" : { type: "fv1", value: [] }
+		"spotLightExponent" : { type: "fv1", value: [] },
+		"spotLightQuadratic" : { type: "iv1", value: [] }
 
 	},
 
@@ -19573,6 +19765,7 @@ THREE.ShaderLib = {
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
+ * @author aluarosi / https://github.com/aluarosi/
  */
 
 THREE.WebGLRenderer = function ( parameters ) {
@@ -19736,8 +19929,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		ambient: [ 0, 0, 0 ],
 		directional: { length: 0, colors: new Array(), positions: new Array() },
-		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array() },
-		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), anglesCos: new Array(), exponents: new Array() },
+		point: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), quadratics: new Array() },
+		spot: { length: 0, colors: new Array(), positions: new Array(), distances: new Array(), directions: new Array(), anglesCos: new Array(), exponents: new Array(), quadratics: new Array() },
 		hemi: { length: 0, skyColors: new Array(), groundColors: new Array(), positions: new Array() }
 
 	};
@@ -24189,6 +24382,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.pointLightColor.value = lights.point.colors;
 		uniforms.pointLightPosition.value = lights.point.positions;
 		uniforms.pointLightDistance.value = lights.point.distances;
+		uniforms.pointLightQuadratic.value = lights.point.quadratics;
 
 		uniforms.spotLightColor.value = lights.spot.colors;
 		uniforms.spotLightPosition.value = lights.spot.positions;
@@ -24196,6 +24390,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		uniforms.spotLightDirection.value = lights.spot.directions;
 		uniforms.spotLightAngleCos.value = lights.spot.anglesCos;
 		uniforms.spotLightExponent.value = lights.spot.exponents;
+		uniforms.spotLightQuadratic.value = lights.spot.quadratics;
 
 		uniforms.hemisphereLightSkyColor.value = lights.hemi.skyColors;
 		uniforms.hemisphereLightGroundColor.value = lights.hemi.groundColors;
@@ -24499,6 +24694,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		intensity,  intensitySq,
 		position,
 		distance,
+		quadratic,
 
 		zlights = _lights,
 
@@ -24508,6 +24704,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		pointColors = zlights.point.colors,
 		pointPositions = zlights.point.positions,
 		pointDistances = zlights.point.distances,
+		pointQuadratics = zlights.point.quadratics,
 
 		spotColors = zlights.spot.colors,
 		spotPositions = zlights.spot.positions,
@@ -24515,6 +24712,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		spotDirections = zlights.spot.directions,
 		spotAnglesCos = zlights.spot.anglesCos,
 		spotExponents = zlights.spot.exponents,
+		spotQuadratics = zlights.spot.quadratics,
 
 		hemiSkyColors = zlights.hemi.skyColors,
 		hemiGroundColors = zlights.hemi.groundColors,
@@ -24544,6 +24742,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			color = light.color;
 			intensity = light.intensity;
 			distance = light.distance;
+			quadratic = light.quadratic;
 
 			if ( light instanceof THREE.AmbientLight ) {
 
@@ -24623,6 +24822,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				pointDistances[ pointLength ] = distance;
 
+				pointQuadratics[ pointLength ] = quadratic;
+
 				pointLength += 1;
 
 			} else if ( light instanceof THREE.SpotLight ) {
@@ -24662,6 +24863,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				spotAnglesCos[ spotLength ] = Math.cos( light.angle );
 				spotExponents[ spotLength ] = light.exponent;
+
+				spotQuadratics[ spotLength ] = quadratic;
 
 				spotLength += 1;
 
@@ -31773,15 +31976,13 @@ THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
  *
  * parameters = {
  *
- *  size: <float>, // size of the text
- *  height: <float>, // thickness to extrude text
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segements of extrude spline too
- *  amount: <int>, // Amount
+ *  amount: <int>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
- *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float>, // how far from text outline is bevel
+ *  bevelThickness: <float>, // how deep into the original shape bevel goes
+ *  bevelSize: <float>, // how far from shape outline is bevel
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
