@@ -17,6 +17,8 @@ var Editor = function () {
 
 		sceneGraphChanged: new SIGNALS.Signal(),
 
+		cameraChanged: new SIGNALS.Signal(),
+
 		objectSelected: new SIGNALS.Signal(),
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
