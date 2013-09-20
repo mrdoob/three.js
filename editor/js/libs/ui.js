@@ -332,6 +332,34 @@ UI.FancySelect = function () {
 	dom.style.padding = '0';
 	dom.style.cursor = 'default';
 	dom.style.overflow = 'auto';
+	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
+
+	// Broadcast for object selection after arrow navigation
+	var changeEvent = document.createEvent('HTMLEvents');
+	changeEvent.initEvent( 'change', true, true );
+
+	// Keybindings to support arrow navigation
+	dom.addEventListener( 'keyup', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				var index = scope.indexOf( scope.selectedValue );
+				index += ( event.keyCode == 38 ) ? -1 : 1;
+
+				if ( index >= 0 && index < scope.options.length ) {
+
+					// Select dom element
+					scope.setValue( scope.options[index].value );
+
+					// Invoke object selection logic
+					scope.dom.dispatchEvent( changeEvent );
+
+				}
+
+				break;
+		}
+	}, false);
 
 	this.dom = dom;
 
@@ -426,6 +454,27 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 	return this;
 
 };
+
+UI.FancySelect.prototype.indexOf = function ( key ) {
+
+	if ( typeof key === 'number' ) key = key.toString();
+
+	// Iterate options and return the index of the first occurrence of the key
+	for ( var i = 0; i < this.options.length; i++ ) {
+
+		var element = this.options[i];
+
+		if ( element.value === key ) {
+
+			test = element;
+			return i;
+
+		}
+	}
+
+	return -1
+};
+
 
 // Checkbox
 
