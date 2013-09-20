@@ -58,11 +58,18 @@ Editor.prototype = {
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
+		// avoid render per object
+
+		this.signals.sceneGraphChanged.active = false;
+
 		while ( scene.children.length > 0 ) {
 
 			this.addObject( scene.children[ 0 ] );
 
 		}
+
+		this.signals.sceneGraphChanged.active = true;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
