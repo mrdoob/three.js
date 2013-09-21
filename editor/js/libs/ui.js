@@ -338,6 +338,19 @@ UI.FancySelect = function () {
 	var changeEvent = document.createEvent('HTMLEvents');
 	changeEvent.initEvent( 'change', true, true );
 
+	// Prevent native scroll behavior
+	dom.addEventListener( 'keydown', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				event.preventDefault();
+				event.stopPropagation();
+				break;
+		}
+
+	}, false);
+
 	// Keybindings to support arrow navigation
 	dom.addEventListener( 'keyup', function (event) {
 
@@ -349,10 +362,10 @@ UI.FancySelect = function () {
 
 				if ( index >= 0 && index < scope.options.length ) {
 
-					// Select dom element
+					// Highlight selected dom elem and scroll parent if needed
 					scope.setValue( scope.options[index].value );
 
-					// Invoke object selection logic
+					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
 
 				}
@@ -431,13 +444,17 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 			// scroll into view
 
-			var y = i * element.clientHeight;
-			var scrollTop = this.dom.scrollTop;
-			var domHeight = this.dom.clientHeight;
+			var y = element.offsetTop - this.dom.offsetTop,
+				bottomY = y + element.offsetHeight,
+				minScroll = bottomY - this.dom.offsetHeight;
 
-			if ( y < scrollTop || y > scrollTop + domHeight ) {
+			if ( this.dom.scrollTop > y ) {
 
-				this.dom.scrollTop = y;
+				this.dom.scrollTop = y
+
+			} else if ( this.dom.scrollTop < minScroll ) {
+
+				this.dom.scrollTop = minScroll;
 
 			}
 
