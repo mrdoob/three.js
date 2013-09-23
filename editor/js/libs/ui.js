@@ -332,6 +332,47 @@ UI.FancySelect = function () {
 	dom.style.padding = '0';
 	dom.style.cursor = 'default';
 	dom.style.overflow = 'auto';
+	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
+
+	// Broadcast for object selection after arrow navigation
+	var changeEvent = document.createEvent('HTMLEvents');
+	changeEvent.initEvent( 'change', true, true );
+
+	// Prevent native scroll behavior
+	dom.addEventListener( 'keydown', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				event.preventDefault();
+				event.stopPropagation();
+				break;
+		}
+
+	}, false);
+
+	// Keybindings to support arrow navigation
+	dom.addEventListener( 'keyup', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				var index = scope.indexOf( scope.selectedValue );
+				index += ( event.keyCode == 38 ) ? -1 : 1;
+
+				if ( index >= 0 && index < scope.options.length ) {
+
+					// Highlight selected dom elem and scroll parent if needed
+					scope.setValue( scope.options[index].value );
+
+					// Invoke object/helper/mesh selection logic
+					scope.dom.dispatchEvent( changeEvent );
+
+				}
+
+				break;
+		}
+	}, false);
 
 	this.dom = dom;
 
@@ -403,13 +444,17 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 			// scroll into view
 
-			var y = i * element.clientHeight;
-			var scrollTop = this.dom.scrollTop;
-			var domHeight = this.dom.clientHeight;
+			var y = element.offsetTop - this.dom.offsetTop,
+				bottomY = y + element.offsetHeight,
+				minScroll = bottomY - this.dom.offsetHeight;
 
-			if ( y < scrollTop || y > scrollTop + domHeight ) {
+			if ( this.dom.scrollTop > y ) {
 
-				this.dom.scrollTop = y;
+				this.dom.scrollTop = y
+
+			} else if ( this.dom.scrollTop < minScroll ) {
+
+				this.dom.scrollTop = minScroll;
 
 			}
 
@@ -426,6 +471,27 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 	return this;
 
 };
+
+UI.FancySelect.prototype.indexOf = function ( key ) {
+
+	if ( typeof key === 'number' ) key = key.toString();
+
+	// Iterate options and return the index of the first occurrence of the key
+	for ( var i = 0; i < this.options.length; i++ ) {
+
+		var element = this.options[i];
+
+		if ( element.value === key ) {
+
+			test = element;
+			return i;
+
+		}
+	}
+
+	return -1
+};
+
 
 // Checkbox
 
