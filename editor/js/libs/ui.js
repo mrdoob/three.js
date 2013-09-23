@@ -357,13 +357,12 @@ UI.FancySelect = function () {
 		switch ( event.keyCode ) {
 			case 38: // up
 			case 40: // down
-				var index = scope.indexOf( scope.selectedValue );
-				index += ( event.keyCode == 38 ) ? -1 : 1;
+				scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
 
-				if ( index >= 0 && index < scope.options.length ) {
+				if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
 
 					// Highlight selected dom elem and scroll parent if needed
-					scope.setValue( scope.options[index].value );
+					scope.setValue( scope.options[ scope.selectedIndex ].value );
 
 					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
@@ -377,6 +376,7 @@ UI.FancySelect = function () {
 	this.dom = dom;
 
 	this.options = [];
+	this.selectedIndex = -1;
 	this.selectedValue = null;
 
 	return this;
@@ -444,9 +444,9 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 			// scroll into view
 
-			var y = element.offsetTop - this.dom.offsetTop,
-				bottomY = y + element.offsetHeight,
-				minScroll = bottomY - this.dom.offsetHeight;
+			var y = element.offsetTop - this.dom.offsetTop;
+			var bottomY = y + element.offsetHeight;
+			var minScroll = bottomY - this.dom.offsetHeight;
 
 			if ( this.dom.scrollTop > y ) {
 
@@ -457,6 +457,8 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 				this.dom.scrollTop = minScroll;
 
 			}
+
+			this.selectedIndex = i;
 
 		} else {
 
@@ -470,26 +472,6 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 	return this;
 
-};
-
-UI.FancySelect.prototype.indexOf = function ( key ) {
-
-	if ( typeof key === 'number' ) key = key.toString();
-
-	// Iterate options and return the index of the first occurrence of the key
-	for ( var i = 0; i < this.options.length; i++ ) {
-
-		var element = this.options[i];
-
-		if ( element.value === key ) {
-
-			test = element;
-			return i;
-
-		}
-	}
-
-	return -1
 };
 
 
