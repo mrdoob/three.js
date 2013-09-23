@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = THREE || { REVISION: '61' };
+var THREE = THREE || { REVISION: '62dev' };
 
 self.console = self.console || {
 
@@ -14041,7 +14041,6 @@ THREE.ShaderMaterial.prototype.clone = function () {
  *
  *  useScreenCoordinates: <bool>,
  *  sizeAttenuation: <bool>,
- *  scaleByViewport: <bool>,
  *  alignment: THREE.SpriteAlignment.center,
  *
  *	uvOffset: new THREE.Vector2(),
@@ -14063,7 +14062,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.useScreenCoordinates = true;
 	this.depthTest = !this.useScreenCoordinates;
 	this.sizeAttenuation = !this.useScreenCoordinates;
-	this.scaleByViewport = !this.sizeAttenuation;
 	this.alignment = THREE.SpriteAlignment.center.clone();
 
 	this.fog = false;
@@ -14081,7 +14079,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	if ( parameters.depthTest === undefined ) this.depthTest = !this.useScreenCoordinates;
 	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = !this.useScreenCoordinates;
-	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.sizeAttenuation;
 
 };
 
@@ -14098,7 +14095,6 @@ THREE.SpriteMaterial.prototype.clone = function () {
 
 	material.useScreenCoordinates = this.useScreenCoordinates;
 	material.sizeAttenuation = this.sizeAttenuation;
-	material.scaleByViewport = this.scaleByViewport;
 	material.alignment.copy( this.alignment );
 
 	material.uvOffset.copy( this.uvOffset );
@@ -14113,15 +14109,15 @@ THREE.SpriteMaterial.prototype.clone = function () {
 // Alignment enums
 
 THREE.SpriteAlignment = {};
-THREE.SpriteAlignment.topLeft = new THREE.Vector2( 1, -1 );
-THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -1 );
-THREE.SpriteAlignment.topRight = new THREE.Vector2( -1, -1 );
-THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 1, 0 );
+THREE.SpriteAlignment.topLeft = new THREE.Vector2( 0.5, -0.5 );
+THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -0.5 );
+THREE.SpriteAlignment.topRight = new THREE.Vector2( -0.5, -0.5 );
+THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 0.5, 0 );
 THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
-THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
-THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
-THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
-THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
+THREE.SpriteAlignment.centerRight = new THREE.Vector2( -0.5, 0 );
+THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 0.5, 0.5 );
+THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 0.5 );
+THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -0.5, 0.5 );
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -15051,7 +15047,6 @@ THREE.Sprite = function ( material ) {
 
 	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
-	this.rotation3d = this.rotation;
 	this.rotation = 0;
 
 };
@@ -15064,8 +15059,6 @@ THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Sprite.prototype.updateMatrix = function () {
 
-	this.rotation3d.set( 0, 0, this.rotation, this.rotation3d.order );
-	this.quaternion.setFromEuler( this.rotation3d );
 	this.matrix.compose( this.position, this.quaternion, this.scale );
 
 	this.matrixWorldNeedsUpdate = true;
@@ -31773,15 +31766,13 @@ THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
  *
  * parameters = {
  *
- *  size: <float>, // size of the text
- *  height: <float>, // thickness to extrude text
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segements of extrude spline too
- *  amount: <int>, // Amount
+ *  amount: <int>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
- *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float>, // how far from text outline is bevel
+ *  bevelThickness: <float>, // how deep into the original shape bevel goes
+ *  bevelSize: <float>, // how far from shape outline is bevel
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
@@ -36166,16 +36157,16 @@ THREE.SpritePlugin = function () {
 
 		var i = 0;
 
-		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = -1;	// vertex 0
+		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = -0.5;	// vertex 0
 		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv 0
 
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = -1;	// vertex 1
+		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = -0.5;	// vertex 1
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 0;	// uv 1
 
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// vertex 2
+		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = 0.5;	// vertex 2
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// uv 2
 
-		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = 1;	// vertex 3
+		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = 0.5;	// vertex 3
 		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;	// uv 3
 
 		i = 0;
@@ -36206,6 +36197,7 @@ THREE.SpritePlugin = function () {
 		_sprite.uniforms.rotation             = _gl.getUniformLocation( _sprite.program, "rotation" );
 		_sprite.uniforms.scale                = _gl.getUniformLocation( _sprite.program, "scale" );
 		_sprite.uniforms.alignment            = _gl.getUniformLocation( _sprite.program, "alignment" );
+		_sprite.uniforms.halfViewport         = _gl.getUniformLocation( _sprite.program, "halfViewport" );
 
 		_sprite.uniforms.color                = _gl.getUniformLocation( _sprite.program, "color" );
 		_sprite.uniforms.map                  = _gl.getUniformLocation( _sprite.program, "map" );
@@ -36236,8 +36228,6 @@ THREE.SpritePlugin = function () {
 
 		var attributes = _sprite.attributes,
 			uniforms = _sprite.uniforms;
-
-		var invAspect = viewportHeight / viewportWidth;
 
 		var halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
@@ -36301,7 +36291,7 @@ THREE.SpritePlugin = function () {
 
 		// update positions and sort
 
-		var i, sprite, material, screenPosition, size, fogType, scale = [];
+		var i, sprite, material, screenPosition, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
@@ -36348,8 +36338,8 @@ THREE.SpritePlugin = function () {
 						Math.max( 0, Math.min( 1, sprite.position.z ) )
 					);
 
-					scale[ 0 ] = _renderer.devicePixelRatio;
-					scale[ 1 ] = _renderer.devicePixelRatio;
+					scale[ 0 ] = _renderer.devicePixelRatio * sprite.scale.x;
+					scale[ 1 ] = _renderer.devicePixelRatio * sprite.scale.y;
 
 				} else {
 
@@ -36357,8 +36347,8 @@ THREE.SpritePlugin = function () {
 					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
-					scale[ 0 ] = 1;
-					scale[ 1 ] = 1;
+					scale[ 0 ] = sprite.scale.x;
+					scale[ 1 ] = sprite.scale.y;
 
 				}
 
@@ -36379,11 +36369,6 @@ THREE.SpritePlugin = function () {
 
 				}
 
-				size = 1 / ( material.scaleByViewport ? viewportHeight : 1 );
-
-				scale[ 0 ] *= size * invAspect * sprite.scale.x
-				scale[ 1 ] *= size * sprite.scale.y;
-
 				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
 				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
 				_gl.uniform2f( uniforms.alignment, material.alignment.x, material.alignment.y );
@@ -36393,6 +36378,7 @@ THREE.SpritePlugin = function () {
 
 				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
+				_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
 
 				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 				_renderer.setDepthTest( material.depthTest );
@@ -36860,6 +36846,7 @@ THREE.ShaderSprite = {
 			"uniform vec2 alignment;",
 			"uniform vec2 uvOffset;",
 			"uniform vec2 uvScale;",
+			"uniform vec2 halfViewport;",
 
 			"attribute vec2 position;",
 			"attribute vec2 uv;",
@@ -36870,22 +36857,23 @@ THREE.ShaderSprite = {
 
 				"vUV = uvOffset + uv * uvScale;",
 
-				"vec2 alignedPosition = position + alignment;",
+				"vec2 alignedPosition = ( position + alignment ) * scale;",
 
 				"vec2 rotatedPosition;",
-				"rotatedPosition.x = ( cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y ) * scale.x;",
-				"rotatedPosition.y = ( sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y ) * scale.y;",
+				"rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;",
+				"rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;",
 
 				"vec4 finalPosition;",
 
 				"if( useScreenCoordinates != 0 ) {",
 
-					"finalPosition = vec4( screenPosition.xy + rotatedPosition, screenPosition.z, 1.0 );",
+					"finalPosition = vec4( screenPosition.xy + ( rotatedPosition / halfViewport ), screenPosition.z, 1.0 );",
 
 				"} else {",
 
-					"finalPosition = projectionMatrix * modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
+					"finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
 					"finalPosition.xy += rotatedPosition * ( sizeAttenuation == 1 ? 1.0 : finalPosition.z );",
+					"finalPosition = projectionMatrix * finalPosition;",
 
 				"}",
 
