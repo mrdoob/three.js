@@ -9,7 +9,6 @@ THREE.Sprite = function ( material ) {
 
 	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
-	this.rotation3d = this.rotation;
 	this.rotation = 0;
 
 };
@@ -21,9 +20,6 @@ THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
  */
 
 THREE.Sprite.prototype.updateMatrix = function () {
-
-//	this.rotation3d.set( 0, 0, this.rotation, this.rotation3d.order );	// not needed. sprite is rotated in the vertex shader.
-//	this.quaternion.setFromEuler( this.rotation3d );					// ...sprite.rotation3d remains zero.
 
 	this.matrix.compose( this.position, this.quaternion, this.scale );
 
