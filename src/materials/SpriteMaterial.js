@@ -12,7 +12,6 @@
  *
  *  useScreenCoordinates: <bool>,
  *  sizeAttenuation: <bool>,
- *  scaleByViewport: <bool>,
  *  alignment: THREE.SpriteAlignment.center,
  *
  *	uvOffset: new THREE.Vector2(),
@@ -34,7 +33,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.useScreenCoordinates = true;
 	this.depthTest = !this.useScreenCoordinates;
 	this.sizeAttenuation = !this.useScreenCoordinates;
-	this.scaleByViewport = !this.sizeAttenuation;
 	this.alignment = THREE.SpriteAlignment.center.clone();
 
 	this.fog = false;
@@ -52,7 +50,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	if ( parameters.depthTest === undefined ) this.depthTest = !this.useScreenCoordinates;
 	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = !this.useScreenCoordinates;
-	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.sizeAttenuation;
 
 };
 
@@ -69,7 +66,6 @@ THREE.SpriteMaterial.prototype.clone = function () {
 
 	material.useScreenCoordinates = this.useScreenCoordinates;
 	material.sizeAttenuation = this.sizeAttenuation;
-	material.scaleByViewport = this.scaleByViewport;
 	material.alignment.copy( this.alignment );
 
 	material.uvOffset.copy( this.uvOffset );
@@ -84,12 +80,12 @@ THREE.SpriteMaterial.prototype.clone = function () {
 // Alignment enums
 
 THREE.SpriteAlignment = {};
-THREE.SpriteAlignment.topLeft = new THREE.Vector2( 1, -1 );
-THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -1 );
-THREE.SpriteAlignment.topRight = new THREE.Vector2( -1, -1 );
-THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 1, 0 );
+THREE.SpriteAlignment.topLeft = new THREE.Vector2( 0.5, -0.5 );
+THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -0.5 );
+THREE.SpriteAlignment.topRight = new THREE.Vector2( -0.5, -0.5 );
+THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 0.5, 0 );
 THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
-THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
-THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
-THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
-THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
+THREE.SpriteAlignment.centerRight = new THREE.Vector2( -0.5, 0 );
+THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 0.5, 0.5 );
+THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 0.5 );
+THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -0.5, 0.5 );
