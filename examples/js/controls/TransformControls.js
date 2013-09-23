@@ -40,6 +40,7 @@ THREE.TransformGizmo = function () {
 
 	var showPickers = false; //debug
 	var showActivePlane = false; //debug
+	this.activePlane = undefined;
 
 	this.init = function () {
 
@@ -144,7 +145,7 @@ THREE.TransformGizmo = function () {
 
 		}
 
-		if (this.activePlane) this.activePlane.visible = showActivePlane;
+		if ( this.activePlane !== undefined ) this.activePlane.visible = showActivePlane;
 
 	}
 
@@ -156,7 +157,7 @@ THREE.TransformGizmo = function () {
 
 			handle = this.handleGizmos[ i ][0];
 
-			if ( handle.material.oldColor ) {
+			if ( handle.material.oldColor !== undefined ) {
 
 				handle.material.color.copy( handle.material.oldColor );
 				handle.material.opacity = handle.material.oldOpacity;
@@ -165,7 +166,7 @@ THREE.TransformGizmo = function () {
 
 		}
 
-		if ( this.handleGizmos[ axis ] ) {
+		if ( this.handleGizmos[ axis ] !== undefined ) {
 		
 			handle = this.handleGizmos[ axis ][0];
 
@@ -261,18 +262,35 @@ THREE.TransformGizmoTranslate = function () {
 	this.pickerGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0.6, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0.6, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.075, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0.6 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
+		],
+		XYZ: [
+			new THREE.Mesh( new THREE.OctahedronGeometry( 0.2, 0 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
+		],
+		XY: [
+			new THREE.Mesh( new THREE.PlaneGeometry( 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ),
+			new THREE.Vector3( 0.2, 0.2, 0 )
+		],
+		YZ: [
+			new THREE.Mesh( new THREE.PlaneGeometry( 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0x00ffff, opacity: 0.25 } ) ),
+			new THREE.Vector3( 0, 0.2, 0.2 ),
+			new THREE.Vector3( 0, Math.PI/2, 0 )
+		],
+		XZ: [
+			new THREE.Mesh( new THREE.PlaneGeometry( 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ),
+			new THREE.Vector3( 0.2, 0, 0.2 ),
+			new THREE.Vector3( -Math.PI/2, 0, 0 )
 		]
 
 	}
@@ -349,22 +367,22 @@ THREE.TransformGizmoRotate = function () {
 	this.pickerGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( 0, -Math.PI/2, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.05, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.12, 4, 12, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0 ),
 			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		E: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.05, 2, 24 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.12, 2, 24 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) )
 		],
 		XYZE: [
 			new THREE.Mesh( new THREE.Geometry() ) // TODO
@@ -461,9 +479,6 @@ THREE.TransformGizmoScale = function () {
 
 	this.handleGizmos = {
 
-		XYZ: [
-			new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
-		],
 		X: [
 			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0xff0000 } ) ),
 			new THREE.Vector3( 0.5, 0, 0 ),
@@ -477,6 +492,9 @@ THREE.TransformGizmoScale = function () {
 			new THREE.Mesh( arrowGeometry, new THREE.TransformGizmoMaterial( { color: 0x0000ff } ) ),
 			new THREE.Vector3( 0, 0, 0.5 ),
 			new THREE.Vector3( Math.PI/2, 0, 0 )
+		],
+		XYZ: [
+			new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		]
 
 	}
@@ -484,21 +502,22 @@ THREE.TransformGizmoScale = function () {
 	this.pickerGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0xff0000, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0.6, 0, 0 ),
-			new THREE.Vector3( Math.PI/4, 0, -Math.PI/2 )
+			new THREE.Vector3( 0, 0, -Math.PI/2 )
 		],
 		Y: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
-			new THREE.Vector3( 0, 0.6, 0 ),
-			new THREE.Vector3( 0, Math.PI/4, 0 )
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x00ff00, opacity: 0.25 } ) ),
+			new THREE.Vector3( 0, 0.6, 0 )
 		],
 		Z: [
-			new THREE.Mesh( new THREE.CylinderGeometry( 0.125, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
+			new THREE.Mesh( new THREE.CylinderGeometry( 0.2, 0, 1, 4, 1, false ), new THREE.TransformGizmoMaterial( { color: 0x0000ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0, 0, 0.6 ),
-			new THREE.Vector3( Math.PI/2, Math.PI/4, 0 )
+			new THREE.Vector3( Math.PI/2, 0, 0 )
+		],
+		XYZ: [
+			new THREE.Mesh( new THREE.CubeGeometry( 0.4, 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		]
-
 	}
 
 	this.setActivePlane = function ( axis, eye ) {
@@ -556,11 +575,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 	this.gizmo["rotate"].hide();
 	this.gizmo["scale"].hide();
 
-	this.object = false;
+	this.object = undefined;
 	this.snap = false;
 	this.space = "world";
 	this.size = 1;
-	this.axis = false;
+	this.axis = undefined;
 
 	var scope = this;
 	
@@ -634,15 +653,14 @@ THREE.TransformControls = function ( camera, domElement ) {
 	 	this.gizmo["scale"].hide();
 	 	this.gizmo[_mode].show();
 
-	 	scope.dispatchEvent( changeEvent );
 	 	scope.update();
 
 	}
 
 	this.detach = function ( object ) {
 
-		scope.object = false;
-		this.axis = false;
+		scope.object = undefined;
+		this.axis = undefined;
 
 	 	this.gizmo["translate"].hide();
 	 	this.gizmo["rotate"].hide();
@@ -661,8 +679,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 	 	this.gizmo["scale"].hide();	
 	 	this.gizmo[_mode].show();
 
-	 	scope.dispatchEvent( changeEvent );
 		this.update();
+		scope.dispatchEvent( changeEvent );
 
 	}
 
@@ -675,23 +693,22 @@ THREE.TransformControls = function ( camera, domElement ) {
 	this.setSize = function ( size ) {
 
 		scope.size = size;
-	 	scope.dispatchEvent( changeEvent );
 		this.update();
+		scope.dispatchEvent( changeEvent );
 	 	
 	}
 
 	this.setSpace = function ( space ) {
 
 		scope.space = space;
-
-	 	scope.dispatchEvent( changeEvent );
 		this.update();
+		scope.dispatchEvent( changeEvent );
 
 	}
 
 	this.update = function () {
 
-		if ( !scope.object ) return;
+		if ( scope.object === undefined ) return;
 
 		scope.object.updateMatrixWorld();
 		worldPosition.getPositionFromMatrix( scope.object.matrixWorld );
@@ -719,10 +736,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerHover( event ) {
 
-		if ( !scope.object || _dragging ) return;
+		if ( scope.object === undefined || _dragging == true ) return;
 
 		event.preventDefault();
-		event.stopPropagation();
 
 		var pointer = event.touches? event.touches[0] : event;
 
@@ -731,14 +747,14 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( intersect ) {
 
 			scope.axis = intersect.object.name;
-			scope.dispatchEvent( changeEvent );
 			scope.update();
-
-		} else {
-
-			scope.axis = false;
 			scope.dispatchEvent( changeEvent );
+
+		} else if ( scope.axis !== undefined ) {
+
+			scope.axis = undefined;
 			scope.update();
+			scope.dispatchEvent( changeEvent );
 
 		}
 
@@ -746,14 +762,14 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerDown( event ) {
 
-		if ( !scope.object || _dragging ) return;
+		if ( scope.object === undefined || _dragging == true ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
 
 		var pointer = event.touches? event.touches[0] : event;
 
-		if ( pointer.button === 0 || pointer.button == undefined ) {
+		if ( pointer.button === 0 || pointer.button === undefined ) {
 
 			var intersect = intersectObjects( pointer, scope.gizmo[_mode].pickers.children );
 
@@ -769,20 +785,16 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 				var planeIntersect = intersectObjects( pointer, [scope.gizmo[_mode].activePlane] );
 
-				if ( planeIntersect ) {
+				oldPosition.copy( scope.object.position );
+				oldScale.copy( scope.object.scale );
 
-					oldPosition.copy( scope.object.position );
-					oldScale.copy( scope.object.scale );
+				oldRotationMatrix.extractRotation( scope.object.matrix );
+				worldRotationMatrix.extractRotation( scope.object.matrixWorld );
 
-					oldRotationMatrix.extractRotation( scope.object.matrix );
-					worldRotationMatrix.extractRotation( scope.object.matrixWorld );
+				parentRotationMatrix.extractRotation( scope.object.parent.matrixWorld );
+				parentScale.getScaleFromMatrix( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
 
-					parentRotationMatrix.extractRotation( scope.object.parent.matrixWorld );
-					parentScale.getScaleFromMatrix( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
-
-					offset.copy( planeIntersect.point );
-
-				}
+				offset.copy( planeIntersect.point );
 
 			}
 
@@ -794,7 +806,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerMove( event ) {
 
-		if ( !scope.object || !scope.axis || !_dragging ) return;
+		if ( scope.object === undefined || scope.axis === undefined || _dragging == false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -803,172 +815,167 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		var planeIntersect = intersectObjects( pointer, [scope.gizmo[_mode].activePlane] );
 
-		if ( planeIntersect ) {
+		point.copy( planeIntersect.point );
 
-			point.copy( planeIntersect.point );
+		if ( _mode == "translate" ) {
 
-			if ( _mode == "translate" ) {
+			point.sub( offset );
+			point.multiply(parentScale);
 
-				point.sub( offset );
-				point.multiply(parentScale);
+			if ( scope.space == "local" ) {
 
-				if ( scope.space == "local" ) {
+				point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
+
+				if ( scope.axis.search("X") == -1 ) point.x = 0;
+				if ( scope.axis.search("Y") == -1 ) point.y = 0;
+				if ( scope.axis.search("Z") == -1 ) point.z = 0;
+
+				point.applyMatrix4( oldRotationMatrix );
+
+				scope.object.position.copy( oldPosition );
+				scope.object.position.add( point );
+
+			} 
+
+			if ( scope.space == "world" || scope.axis.search("XYZ") != -1 ) {
+
+				if ( scope.axis.search("X") == -1 ) point.x = 0;
+				if ( scope.axis.search("Y") == -1 ) point.y = 0;
+				if ( scope.axis.search("Z") == -1 ) point.z = 0;
+
+				point.applyMatrix4( tempMatrix.getInverse( parentRotationMatrix ) );
+
+				scope.object.position.copy( oldPosition );
+				scope.object.position.add( point );
+
+				if ( scope.snap == true ) {
+
+					if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
+					if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
+					if ( scope.axis.search("Z") != -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
+				
+				}
+
+			}
+
+		} else if ( _mode == "scale" ) {
+
+			point.sub( offset );
+			point.multiply(parentScale);
+
+			if ( scope.space == "local" ) {
+
+				if ( scope.axis == "XYZ") {
+
+					scale = 1 + ( ( point.y ) / 50 );
+
+					scope.object.scale.x = oldScale.x * scale;
+					scope.object.scale.y = oldScale.y * scale;
+					scope.object.scale.z = oldScale.z * scale;
+
+				} else {
 
 					point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
 
-					if ( scope.axis.search("X") == -1 ) point.x = 0;
-					if ( scope.axis.search("Y") == -1 ) point.y = 0;
-					if ( scope.axis.search("Z") == -1 ) point.z = 0;
-
-					point.applyMatrix4( oldRotationMatrix );
-
-					scope.object.position.copy( oldPosition );
-					scope.object.position.add( point );
-
-				} 
-
-				if ( scope.space == "world" || scope.axis.search("XYZ") != -1 ) {
-
-					if ( scope.axis.search("X") == -1 ) point.x = 0;
-					if ( scope.axis.search("Y") == -1 ) point.y = 0;
-					if ( scope.axis.search("Z") == -1 ) point.z = 0;
-
-					point.applyMatrix4( tempMatrix.getInverse( parentRotationMatrix ) );
-
-					scope.object.position.copy( oldPosition );
-					scope.object.position.add( point );
-
-					if ( scope.snap ) {
-
-						if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
-						if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
-						if ( scope.axis.search("Z") != -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
-					
-					}
-
-				}
-
-			} else if ( _mode == "scale" ) {
-
-				point.sub( offset );
-				point.multiply(parentScale);
-
-				if ( scope.space == "local" ) {
-
-					if ( scope.axis == "XYZ") {
-
-						scale = 1 + ( ( point.y ) / 50 );
-
-						scope.object.scale.x = oldScale.x * scale;
-						scope.object.scale.y = oldScale.y * scale;
-						scope.object.scale.z = oldScale.z * scale;
-
-					} else {
-
-						point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
-
-						if ( scope.axis == "X" ) scope.object.scale.x = oldScale.x * ( 1 + point.x / 50 );
-						if ( scope.axis == "Y" ) scope.object.scale.y = oldScale.y * ( 1 + point.y / 50 );
-						if ( scope.axis == "Z" ) scope.object.scale.z = oldScale.z * ( 1 + point.z / 50 );
-
-					}
-
-				}
-
-			} else if ( _mode == "rotate" ) {
-
-				point.sub( worldPosition );
-				point.multiply(parentScale);
-				tempVector.copy(offset).sub( worldPosition );
-				tempVector.multiply(parentScale);
-
-				if ( scope.axis == "E" ) {
-
-					point.applyMatrix4( tempMatrix.getInverse( lookAtMatrix ) );
-					tempVector.applyMatrix4( tempMatrix.getInverse( lookAtMatrix ) );
-
-					rotation.set( Math.atan2( point.z, point.y ), Math.atan2( point.x, point.z ), Math.atan2( point.y, point.x ) );
-					offsetRotation.set( Math.atan2( tempVector.z, tempVector.y ), Math.atan2( tempVector.x, tempVector.z ), Math.atan2( tempVector.y, tempVector.x ) );
-
-					tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
-
-					quaternionE.setFromAxisAngle( eye, rotation.z - offsetRotation.z );
-					quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
-
-					tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionE );
-					tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
-
-					scope.object.quaternion.copy( tempQuaternion );
-
-				} else if ( scope.axis == "XYZE" ) {
-
-					quaternionE.setFromEuler( point.clone().cross(tempVector).normalize() ); // rotation axis
-
-					tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
-					quaternionX.setFromAxisAngle( quaternionE, - point.clone().angleTo(tempVector) );
-					quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
-
-					tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
-					tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
-
-					scope.object.quaternion.copy( tempQuaternion );
-
-				} else if ( scope.space == "local" ) {
-
-					point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
-
-					tempVector.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
-
-					rotation.set( Math.atan2( point.z, point.y ), Math.atan2( point.x, point.z ), Math.atan2( point.y, point.x ) );
-					offsetRotation.set( Math.atan2( tempVector.z, tempVector.y ), Math.atan2( tempVector.x, tempVector.z ), Math.atan2( tempVector.y, tempVector.x ) );
-
-					quaternionXYZ.setFromRotationMatrix( oldRotationMatrix );
-					quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
-					quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
-					quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
-
-					if ( scope.axis == "X" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionX );
-					if ( scope.axis == "Y" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionY );
-					if ( scope.axis == "Z" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionZ );
-
-					scope.object.quaternion.copy( quaternionXYZ );
-
-				} else if ( scope.space == "world" ) {
-
-					rotation.set( Math.atan2( point.z, point.y ), Math.atan2( point.x, point.z ), Math.atan2( point.y, point.x ) );
-					offsetRotation.set( Math.atan2( tempVector.z, tempVector.y ), Math.atan2( tempVector.x, tempVector.z ), Math.atan2( tempVector.y, tempVector.x ) );
-
-					tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
-
-					quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
-					quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
-					quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
-					quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
-
-					if ( scope.axis == "X" ) tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
-					if ( scope.axis == "Y" ) tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionY );
-					if ( scope.axis == "Z" ) tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionZ );
-
-					tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
-
-					scope.object.quaternion.copy( tempQuaternion );
+					if ( scope.axis == "X" ) scope.object.scale.x = oldScale.x * ( 1 + point.x / 50 );
+					if ( scope.axis == "Y" ) scope.object.scale.y = oldScale.y * ( 1 + point.y / 50 );
+					if ( scope.axis == "Z" ) scope.object.scale.z = oldScale.z * ( 1 + point.z / 50 );
 
 				}
 
 			}
 
+		} else if ( _mode == "rotate" ) {
+
+			point.sub( worldPosition );
+			point.multiply(parentScale);
+			tempVector.copy(offset).sub( worldPosition );
+			tempVector.multiply(parentScale);
+
+			if ( scope.axis == "E" ) {
+
+				point.applyMatrix4( tempMatrix.getInverse( lookAtMatrix ) );
+				tempVector.applyMatrix4( tempMatrix.getInverse( lookAtMatrix ) );
+
+				rotation.set( Math.atan2( point.z, point.y ), Math.atan2( point.x, point.z ), Math.atan2( point.y, point.x ) );
+				offsetRotation.set( Math.atan2( tempVector.z, tempVector.y ), Math.atan2( tempVector.x, tempVector.z ), Math.atan2( tempVector.y, tempVector.x ) );
+
+				tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
+
+				quaternionE.setFromAxisAngle( eye, rotation.z - offsetRotation.z );
+				quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
+
+				tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionE );
+				tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
+
+				scope.object.quaternion.copy( tempQuaternion );
+
+			} else if ( scope.axis == "XYZE" ) {
+
+				quaternionE.setFromEuler( point.clone().cross(tempVector).normalize() ); // rotation axis
+
+				tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
+				quaternionX.setFromAxisAngle( quaternionE, - point.clone().angleTo(tempVector) );
+				quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
+
+				tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
+				tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
+
+				scope.object.quaternion.copy( tempQuaternion );
+
+			} else if ( scope.space == "local" ) {
+
+				point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
+
+				tempVector.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
+
+				rotation.set( Math.atan2( point.z, point.y ), Math.atan2( point.x, point.z ), Math.atan2( point.y, point.x ) );
+				offsetRotation.set( Math.atan2( tempVector.z, tempVector.y ), Math.atan2( tempVector.x, tempVector.z ), Math.atan2( tempVector.y, tempVector.x ) );
+
+				quaternionXYZ.setFromRotationMatrix( oldRotationMatrix );
+				quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
+				quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
+				quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
+
+				if ( scope.axis == "X" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionX );
+				if ( scope.axis == "Y" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionY );
+				if ( scope.axis == "Z" ) quaternionXYZ.multiplyQuaternions( quaternionXYZ, quaternionZ );
+
+				scope.object.quaternion.copy( quaternionXYZ );
+
+			} else if ( scope.space == "world" ) {
+
+				rotation.set( Math.atan2( point.z, point.y ), Math.atan2( point.x, point.z ), Math.atan2( point.y, point.x ) );
+				offsetRotation.set( Math.atan2( tempVector.z, tempVector.y ), Math.atan2( tempVector.x, tempVector.z ), Math.atan2( tempVector.y, tempVector.x ) );
+
+				tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );
+
+				quaternionX.setFromAxisAngle( unitX, rotation.x - offsetRotation.x );
+				quaternionY.setFromAxisAngle( unitY, rotation.y - offsetRotation.y );
+				quaternionZ.setFromAxisAngle( unitZ, rotation.z - offsetRotation.z );
+				quaternionXYZ.setFromRotationMatrix( worldRotationMatrix );
+
+				if ( scope.axis == "X" ) tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionX );
+				if ( scope.axis == "Y" ) tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionY );
+				if ( scope.axis == "Z" ) tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionZ );
+
+				tempQuaternion.multiplyQuaternions( tempQuaternion, quaternionXYZ );
+
+				scope.object.quaternion.copy( tempQuaternion );
+
+			}
+
 		}
 
-		scope.dispatchEvent( changeEvent );
 		scope.update();
+		scope.dispatchEvent( changeEvent );
 
 	}
 
 	function onPointerUp( event ) {
 
-		scope.axis = false;
+		scope.axis = undefined;
 		_dragging = false;
-		scope.dispatchEvent( changeEvent );
 		scope.update();
 
 	}

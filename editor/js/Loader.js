@@ -35,6 +35,7 @@ var Loader = function ( editor ) {
 	signals.objectAdded.add( this.saveLocalStorage );
 	signals.objectChanged.add( this.saveLocalStorage );
 	signals.objectRemoved.add( this.saveLocalStorage );
+	signals.sceneGraphChanged.add( this.saveLocalStorage );
 
 	this.loadFile = function ( file ) {
 

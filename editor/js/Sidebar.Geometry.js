@@ -17,7 +17,8 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
-		update();
+
+		editor.selected.geometry.uuid = geometryUUID.getValue();
 
 	} );
 
@@ -30,7 +31,11 @@ Sidebar.Geometry = function ( editor ) {
 	// name
 
 	var geometryNameRow = new UI.Panel();
-	var geometryName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var geometryName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
+
+		editor.setGeometryName( editor.selected.geometry, geometryName.getValue() );
+
+	} );
 
 	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
 	geometryNameRow.add( geometryName );
@@ -73,15 +78,6 @@ Sidebar.Geometry = function ( editor ) {
 
 
 	//
-
-	function update() {
-
-		var geometry = editor.selected.geometry;
-
-		geometry.uuid = geometryUUID.getValue();
-		geometry.name = geometryName.getValue();
-
-	}
 
 	function build() {
 

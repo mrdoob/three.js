@@ -47,7 +47,11 @@ Sidebar.Material = function ( editor ) {
 	// name
 
 	var materialNameRow = new UI.Panel();
-	var materialName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var materialName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
+
+		editor.setMaterialName( editor.selected.material, materialName.getValue() );
+
+	} );
 
 	materialNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
 	materialNameRow.add( materialName );
@@ -314,12 +318,6 @@ Sidebar.Material = function ( editor ) {
 			if ( material.uuid !== undefined ) {
 
 				material.uuid = materialUUID.getValue();
-
-			}
-
-			if ( material.name !== undefined ) {
-
-				material.name = materialName.getValue();
 
 			}
 

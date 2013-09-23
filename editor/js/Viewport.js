@@ -44,9 +44,10 @@ var Viewport = function ( editor ) {
 	transformControls.addEventListener( 'change', function () {
 
         controls.enabled = true;
+
         if ( transformControls.axis ) controls.enabled = false;
         
-		if (editor.selected) signals.objectChanged.dispatch( editor.selected );
+		if ( editor.selected ) signals.objectChanged.dispatch( editor.selected );
 
 	} );
 	sceneHelpers.add( transformControls );
@@ -166,7 +167,7 @@ var Viewport = function ( editor ) {
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
-		signals.objectChanged.dispatch( camera );
+		signals.cameraChanged.dispatch( camera );
 
 	} );
 
@@ -210,6 +211,12 @@ var Viewport = function ( editor ) {
 
 		render();
 		updateInfo();
+
+	} );
+
+	signals.cameraChanged.add( function () {
+
+		render();
 
 	} );
 
