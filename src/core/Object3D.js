@@ -142,7 +142,7 @@ THREE.Object3D.prototype = {
 
 			q1.setFromAxisAngle( axis, angle );
 
-			this.quaternion.multiply( q1 );
+			this.quaternion.multiplyQuaternions( q1, this.quaternion );
 
 			return this;
 
