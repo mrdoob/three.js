@@ -361,11 +361,15 @@ UI.FancySelect = function () {
 
 				if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
 
+					scope.signalingChange = true;
+
 					// Highlight selected dom elem and scroll parent if needed
 					scope.setValue( scope.options[ scope.selectedIndex ].value );
 
 					// Invoke object/helper/mesh selection logic
 					scope.dom.dispatchEvent( changeEvent );
+
+					scope.signalingChange = false;
 
 				}
 
@@ -413,8 +417,12 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 		option.addEventListener( 'click', function ( event ) {
 
+			scope.signalingChange = true;
+
 			scope.setValue( this.value );
 			scope.dom.dispatchEvent( changeEvent );
+
+			scope.signalingChange = false;
 
 		}, false );
 
