@@ -21,6 +21,7 @@ Sidebar.Material = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setDisplay( 'none' );
+	container.addClass( 'Material' );
 
 	container.add( new UI.Text().setValue( 'MATERIAL' ) );
 	container.add( new UI.Break(), new UI.Break() );

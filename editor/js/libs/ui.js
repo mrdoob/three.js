@@ -25,12 +25,13 @@ UI.Element.prototype = {
 
 		debugger;
 
-		var classes = this.dom.className.split(/\S+/g);
+		var classes = this.dom.className.split(/\s+/g);
 
-		for ( var i = 0; i < classes.length; i++ ) {
+		// Exit early and avoid dom update if already set
+		var index = classes.indexOf(value);
+		if ( index >= 0 ) {
 
-			// Exit early and prevent reassignment if already exists
-			if ( classes[i] === value ) return;
+			return;
 
 		}
 
