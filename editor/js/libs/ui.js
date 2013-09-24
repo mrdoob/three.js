@@ -354,11 +354,6 @@ UI.FancySelect = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'FancySelect';
-	dom.style.background = '#fff';
-	dom.style.border = '1px solid #ccc';
-	dom.style.padding = '0';
-	dom.style.cursor = 'default';
-	dom.style.overflow = 'auto';
 	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
 
 	// Broadcast for object selection after arrow navigation
@@ -429,9 +424,8 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	for ( var key in options ) {
 
-		var option = document.createElement( 'div' );
-		option.style.padding = '4px';
-		option.style.whiteSpace = 'nowrap';
+		var option = document.createElement('div');
+		option.className = 'option';
 		option.innerHTML = options[ key ];
 		option.value = key;
 		scope.dom.appendChild( option );

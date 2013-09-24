@@ -7,7 +7,7 @@ Sidebar.Scene = function ( editor ) {
 	container.add( new UI.Text( 'SCENE' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	var outliner = new UI.FancySelect().setId( 'outliner' ).setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' );
+	var outliner = new UI.FancySelect().setId( 'outliner' );
 	outliner.onChange( function () {
 
 		editor.selectById( parseInt( outliner.getValue() ) );
