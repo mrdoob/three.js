@@ -18,6 +18,8 @@ THREE.EventDispatcher.prototype = {
 	},
 
 	addEventListener: function ( type, listener ) {
+		
+		if ( listener === undefined ) return;
 
 		if ( this._listeners === undefined ) this._listeners = {};
 
@@ -77,13 +79,12 @@ THREE.EventDispatcher.prototype = {
 
 		if ( listenerArray !== undefined ) {
 
+			listenerArray = listenerArray.slice();
 			event.target = this;
 
-			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
-
-				listenerArray[ i ].call( this, event );
-
-			}
+			var listener;
+			while ( ( listener = listenerArray.shift() ) !== undefined )
+				listener.call( this, event );
 
 		}
 
