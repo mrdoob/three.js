@@ -123,9 +123,6 @@ UI.Panel = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Panel';
-	dom.style.userSelect = 'none';
-	dom.style.WebkitUserSelect = 'none';
-	dom.style.MozUserSelect = 'none';
 
 	this.dom = dom;
 
