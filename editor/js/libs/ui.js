@@ -23,8 +23,6 @@ UI.Element.prototype = {
 
 	addClass: function ( value ) {
 
-		debugger;
-
 		var classes = this.dom.className.split(/\s+/g);
 
 		// Exit early and avoid dom update if already set

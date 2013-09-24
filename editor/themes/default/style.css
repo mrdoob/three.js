@@ -1,0 +1,132 @@
+﻿* {
+	vertical-align: middle;
+}
+
+body {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	margin: 0;
+	overflow: hidden;
+}
+
+hr {
+	border: 0px;
+	border-top: 1px solid #ccc;
+}
+
+button {
+	position: relative;
+}
+
+.Panel {
+
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+
+		/* No support for these yet */
+	-o-user-select: none;
+	user-select: none;
+}
+
+.FancySelect {
+	background: #fff;
+	border: 1px solid #ccc;
+	padding: 0;
+	cursor: default;
+	overflow: auto;
+}
+
+	.FancySelect .option {
+		padding: 4px;
+		white-space: nowrap;
+	}
+
+
+#menubar {
+	position: absolute;
+	background: url(trans.png);
+	padding: 0px;
+	margin: 0px;
+}
+
+	#menubar .menu {
+		float: left;
+		width: 50px;
+		cursor: pointer;
+	}
+
+	#menubar .Panel {
+		color: #888;
+	}
+
+		#menubar .menu .options {
+			padding: 5px 0px;
+			background: url(trans.png);
+			width: 140px;
+		}
+
+			#menubar .menu .options hr {
+				border-color: #444;
+			}
+
+			#menubar .menu .options .option {
+				color: #666;
+				background-color: transparent;
+				padding: 5px 10px;
+				margin: 0px !important;
+			}
+
+				#menubar .menu .options .option:hover {
+					color: #fff;
+					background-color: #08f;
+				}
+
+
+#sidebar {
+	position: absolute;
+	width: 300px;
+	background: url(trans.png);
+	overflow: auto;
+}
+
+	#sidebar .Panel {
+		margin-bottom: 10px;
+	}
+
+	#sidebar > .Panel {
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #333;
+	}
+
+	#sidebar #outliner {
+		width: 100%;
+		height: 140px;
+		color: #444;
+		font-size: 12px;
+	}
+
+	#sidebar #outliner .type {
+		padding: 2px 4px;
+		font-size: 10px;
+		background: #eee;
+		color: #aaa;
+	}
+
+#toolbar {
+	position: absolute;
+	background: url(trans.png);
+	color: #333;
+}
+			
+	#toolbar .Panel {
+		padding: 4px;
+		color: #888;
+	}
+
+	#toolbar button {
+		margin-right: 6px;
+	}
+
+
