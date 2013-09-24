@@ -604,17 +604,17 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	applyEuler: function () {
 
-		var q1 = new THREE.Quaternion();
+		var quaternion = new THREE.Quaternion();
 
-		return function ( rotation ) {
+		return function ( euler ) {
 
-			if( typeof rotation['order'] === undefined ) {
+			if ( euler instanceof THREE.Euler === false ) {
+
 				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+
 			}
 
-			var quaternion = q1.setFromEuler( rotation );
-
-			this.applyQuaternion( quaternion );
+			this.applyQuaternion( quaternion.setFromEuler( euler ) );
 
 			return this;
 
@@ -624,13 +624,11 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	applyAxisAngle: function () {
 
-		var q1 = new THREE.Quaternion();
+		var quaternion = new THREE.Quaternion();
 
 		return function ( axis, angle ) {
 
-			var quaternion = q1.setFromAxisAngle( axis, angle );
-
-			this.applyQuaternion( quaternion );
+			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
 
 			return this;
 

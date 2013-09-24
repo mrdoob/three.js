@@ -136,7 +136,7 @@
 				//
 
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0x000000, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );

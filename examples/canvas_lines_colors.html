@@ -76,7 +76,8 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.CanvasRenderer( { clearColor: 0x000000, clearAlpha: 1, antialias: false } );
+				renderer = new THREE.CanvasRenderer( { antialias: false } );
+				renderer.setClearColor( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );

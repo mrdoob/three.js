@@ -75,7 +75,6 @@
 		{ "trigger": "THREE.Mesh", "contents": "THREE.Mesh( ${1:geometry}, ${2:material} )$0" },
 		{ "trigger": "THREE.SkinnedMesh", "contents": "THREE.SkinnedMesh( ${1:geometry}, ${2:material}, ${3:useVertexTexture} )$0" },
 		{ "trigger": "THREE.MorphAnimMesh", "contents": "THREE.MorphAnimMesh( ${1:geometry}, ${2:material} )$0" },
-		{ "trigger": "THREE.Ribbon", "contents": "THREE.Ribbon( ${1:geometry}, ${2:material} )$0" },
 		{ "trigger": "THREE.LOD", "contents": "THREE.LOD()$0" },
 		{ "trigger": "THREE.Sprite", "contents": "THREE.Sprite( ${1:material} )$0" },
 		{ "trigger": "THREE.Scene", "contents": "THREE.Scene()$0" },

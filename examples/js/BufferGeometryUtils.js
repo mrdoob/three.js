@@ -7,6 +7,12 @@ THREE.BufferGeometryUtils = {
 
 	fromGeometry: function geometryToBufferGeometry( geometry, settings ) {
 
+		if ( geometry instanceof THREE.BufferGeometry ) {
+
+			return geometry;
+
+		}
+
 		settings = settings || { 'vertexColors': THREE.NoColors };
 
 		var vertices = geometry.vertices;

@@ -37,7 +37,7 @@ THREE.DirectionalLightHelper = function ( light, size ) {
 
 THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
-THREE.DirectionalLightHelper.prototype.destroy = function () {
+THREE.DirectionalLightHelper.prototype.dispose = function () {
 	
 	this.lightPlane.geometry.dispose();
 	this.lightPlane.material.dispose();

@@ -60,6 +60,12 @@ THREE.ObjectExporter.prototype = {
 					data.heightSegments = geometry.heightSegments;
 					data.depthSegments = geometry.depthSegments;
 
+				} else if ( geometry instanceof THREE.CircleGeometry ) {
+
+					data.type = 'CircleGeometry';
+					data.radius = geometry.radius;
+					data.segments = geometry.segments;
+
 				} else if ( geometry instanceof THREE.CylinderGeometry ) {
 
 					data.type = 'CylinderGeometry';

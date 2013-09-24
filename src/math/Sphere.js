@@ -22,23 +22,40 @@ THREE.Sphere.prototype = {
 		return this;
 	},
 
-	setFromPoints: function ( points ) {
 
-		var radiusSq, maxRadiusSq = 0;
+	setFromPoints: function () {
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+		var box = new THREE.Box3();
 
-			radiusSq = points[ i ].lengthSq();
-			maxRadiusSq = Math.max( maxRadiusSq, radiusSq );
+		return function ( points, optionalCenter )  {
 
-		}
+			var center = this.center;
 
-		this.center.set( 0, 0, 0 );
-		this.radius = Math.sqrt( maxRadiusSq );
+			if ( optionalCenter !== undefined ) {
 
-		return this;
+				center.copy( optionalCenter );
 
-	},
+			} else {
+
+				box.setFromPoints( points ).center( center );
+
+			}
+
+			var maxRadiusSq = 0;
+
+			for ( var i = 0, il = points.length; i < il; i ++ ) {
+
+				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+
+			}
+
+			this.radius = Math.sqrt( maxRadiusSq );
+
+			return this;			
+ 		
+ 		};
+
+	}(),
 
 	copy: function ( sphere ) {
 

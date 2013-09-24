@@ -2,37 +2,12 @@ Sidebar.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var geometryClasses = {
-
-		"CircleGeometry": THREE.CircleGeometry,
-		"CubeGeometry": THREE.CubeGeometry,
-		"CylinderGeometry": THREE.CylinderGeometry,
-		"ExtrudeGeometry": THREE.ExtrudeGeometry,
-		"IcosahedronGeometry": THREE.IcosahedronGeometry,
-		"LatheGeometry": THREE.LatheGeometry,
-		"OctahedronGeometry": THREE.OctahedronGeometry,
-		"ParametricGeometry": THREE.ParametricGeometry,
-		"PlaneGeometry": THREE.PlaneGeometry,
-		"PolyhedronGeometry": THREE.PolyhedronGeometry,
-		"ShapeGeometry": THREE.ShapeGeometry,
-		"SphereGeometry": THREE.SphereGeometry,
-		"TetrahedronGeometry": THREE.TetrahedronGeometry,
-		"TextGeometry": THREE.TextGeometry,
-		"TorusGeometry": THREE.TorusGeometry,
-		"TorusKnotGeometry": THREE.TorusKnotGeometry,
-		"TubeGeometry": THREE.TubeGeometry,
-		"Geometry": THREE.Geometry,
-		"BufferGeometry": THREE.BufferGeometry
-
-	};
-
 	var container = new UI.Panel();
 	container.setBorderTop( '1px solid #ccc' );
 	container.setPadding( '10px' );
 	container.setDisplay( 'none' );
 
-	var objectType = new UI.Text().setColor( '#666' ).setTextTransform( 'uppercase' );
-	container.add( objectType );
+	container.add( new UI.Text().setValue( 'GEOMETRY' ).setColor( '#666' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// uuid
@@ -61,6 +36,16 @@ Sidebar.Geometry = function ( editor ) {
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
+
+	// class
+
+	var geometryTypeRow = new UI.Panel();
+	var geometryType = new UI.Text().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	geometryTypeRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryTypeRow.add( geometryType );
+
+	container.add( geometryTypeRow );
 
 	// vertices
 
@@ -108,7 +93,7 @@ Sidebar.Geometry = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			objectType.setValue( getGeometryInstanceName( object.geometry ) );
+			geometryType.setValue( editor.getGeometryType( object.geometry ) );
 
 			updateFields( geometry );
 
@@ -121,9 +106,9 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-			if ( geometry instanceof THREE.PlaneGeometry ) {
+			if ( geometry instanceof THREE.CircleGeometry ) {
 
-				parameters = new Sidebar.Geometry.PlaneGeometry( signals, object );
+				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
 				container.add( parameters );
 
 			} else if ( geometry instanceof THREE.CubeGeometry ) {
@@ -144,6 +129,11 @@ Sidebar.Geometry = function ( editor ) {
 			} else if ( geometry instanceof THREE.IcosahedronGeometry ) {
 
 				parameters = new Sidebar.Geometry.IcosahedronGeometry( signals, object );
+				container.add( parameters );
+
+			} else if ( geometry instanceof THREE.PlaneGeometry ) {
+
+				parameters = new Sidebar.Geometry.PlaneGeometry( signals, object );
 				container.add( parameters );
 
 			} else if ( geometry instanceof THREE.TorusGeometry ) {
@@ -195,16 +185,6 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-
-		}
-
-	}
-
-	function getGeometryInstanceName( geometry ) {
-
-		for ( var key in geometryClasses ) {
-
-			if ( geometry instanceof geometryClasses[ key ] ) return key;
 
 		}
 

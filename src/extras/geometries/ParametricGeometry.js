@@ -56,7 +56,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 			uvs.push( [ uva, uvb, uvd ] );
 
 			faces.push( new THREE.Face3( b, c, d ) );
-			uvs.push( [ uvb, uvc, uvd ] );
+			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 

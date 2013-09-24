@@ -112,7 +112,7 @@
 					position.y = Math.random() * 6000 - 3000;
 					position.z = Math.random() * 8000 - 4000;
 
-					var rotation = new THREE.Vector3();
+					var rotation = new THREE.Euler();
 
 					rotation.x = Math.random() * 2 * Math.PI;
 					rotation.y = Math.random() * 2 * Math.PI;
@@ -170,9 +170,10 @@
 
 				projector = new THREE.Projector();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xffffff } );
-				renderer.sortObjects = false;
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setClearColor( 0xffffff, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 

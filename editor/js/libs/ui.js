@@ -4,6 +4,14 @@ UI.Element = function () {};
 
 UI.Element.prototype = {
 
+	setId: function ( id ) {
+
+		this.dom.id = id;
+		
+		return this;
+
+	},
+
 	setClass: function ( name ) {
 
 		this.dom.className = name;

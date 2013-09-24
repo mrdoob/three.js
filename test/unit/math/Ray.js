@@ -217,3 +217,42 @@ test( "distanceSqToSegment", function() {
 	ok( distSqr < 0.0001, "Passed!" );
 });
 
+test( "intersectBox", function() {
+
+	var TOL = 0.0001;
+	
+	var box = new THREE.Box3( new THREE.Vector3(  -1, -1, -1 ), new THREE.Vector3( 1, 1, 1 ) );
+
+	var a = new THREE.Ray( new THREE.Vector3( -2, 0, 0 ), new THREE.Vector3( 1, 0, 0) );
+	//ray should intersect box at -1,0,0
+	ok( a.isIntersectionBox(box) === true, "Passed!" );
+	ok( a.intersectBox(box).distanceTo( new THREE.Vector3( -1, 0, 0 ) ) < TOL, "Passed!" );
+
+	var b = new THREE.Ray( new THREE.Vector3( -2, 0, 0 ), new THREE.Vector3( -1, 0, 0) );
+	//ray is point away from box, it should not intersect
+	ok( b.isIntersectionBox(box) === false, "Passed!" );
+	ok( b.intersectBox(box) === null, "Passed!" );
+
+	var c = new THREE.Ray( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0) );
+	// ray is inside box, should return exit point
+	ok( c.isIntersectionBox(box) === true, "Passed!" );
+	ok( c.intersectBox(box).distanceTo( new THREE.Vector3( 1, 0, 0 ) ) < TOL, "Passed!" );
+
+	var d = new THREE.Ray( new THREE.Vector3( 0, 2, 1 ), new THREE.Vector3( 0, -1, -1).normalize() );
+	//tilted ray should intersect box at 0,1,0
+	ok( d.isIntersectionBox(box) === true, "Passed!" );
+	ok( d.intersectBox(box).distanceTo( new THREE.Vector3( 0, 1, 0 ) ) < TOL, "Passed!" );	
+
+	var e = new THREE.Ray( new THREE.Vector3( 1, -2, 1 ), new THREE.Vector3( 0, 1, 0).normalize() );
+	//handle case where ray is coplanar with one of the boxes side - box in front of ray
+	ok( e.isIntersectionBox(box) === true, "Passed!" );
+	ok( e.intersectBox(box).distanceTo( new THREE.Vector3( 1, -1, 1 ) ) < TOL, "Passed!" );	
+	
+	var f = new THREE.Ray( new THREE.Vector3( 1, -2, 0 ), new THREE.Vector3( 0, -1, 0).normalize() );
+	//handle case where ray is coplanar with one of the boxes side - box behind ray
+	ok( f.isIntersectionBox(box) === false, "Passed!" );
+	ok( f.intersectBox(box) == null, "Passed!" );		
+	
+});
+
+

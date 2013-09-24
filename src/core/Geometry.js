@@ -15,8 +15,7 @@ THREE.Geometry = function () {
 	this.name = '';
 
 	this.vertices = [];
-	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem, Line and Ribbon
-	this.normals = []; // one-to-one vertex normals, used in Ribbon
+	this.colors = [];  // one-to-one vertex colors, used in ParticleSystem and Line
 
 	this.faces = [];
 
@@ -1191,12 +1190,13 @@ THREE.Geometry.prototype = {
 		}
 
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
-
-			this.faces.splice( i, 1 );
+			var idx = faceIndicesToRemove[ i ];
+			
+			this.faces.splice( idx, 1 );
 
 			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
 
-				this.faceVertexUvs[ j ].splice( i, 1 );
+				this.faceVertexUvs[ j ].splice( idx, 1 );
 
 			}
 

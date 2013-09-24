@@ -75,7 +75,7 @@ THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments, u
 			face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
 			this.faces.push( face );
-			this.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
+			this.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 

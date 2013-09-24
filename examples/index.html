@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js - examples</title>
+		<style>
+
+			@font-face {
+
+				font-family: 'inconsolata';
+				src: url('files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+
+			}
+
+			body {
+
+				background-color: #ffffff;
+				margin: 0px;
+				font-family: 'inconsolata';
+				font-size: 15px;
+				overflow: hidden;
+
+			}
+
+			h1 {
+
+				font-size: 25px;
+				font-weight: normal;
+
+			}
+
+			h2 {
+
+				font-size: 20px;
+				font-weight: normal;
+
+			}
+
+			#panel {
+
+				position: absolute;
+				width: 300px;
+				height: 100%;
+				overflow: scroll;
+
+			}
+
+				#panel #list {
+
+					padding: 10px 20px;
+					line-height: 18px;
+
+				}
+
+				#panel #list .link {
+
+					color: #2194CE;
+					text-decoration: none;
+					cursor: pointer;
+
+				}
+
+				#panel #list .selected {
+
+					color: #ff0000;
+
+				}
+
+					#panel #list .link:hover {
+
+						text-decoration: underline;
+
+					}
+
+			#viewer {
+
+				position: absolute;
+				left: 300px;
+				width: -webkit-calc(100% - 300px); /* Safari */
+				width: calc(100% - 300px);
+				height: 100%;
+				border: 0px;
+
+			}
+
+			#button {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				padding: 8px;
+				color: #fff;
+				background-color: #555;
+				opacity: 0.7;
+			}
+
+				#button:hover {
+					cursor: pointer;
+					opacity: 1;
+				}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="panel">
+			<div id="list">
+				<h1>three.js examples</h1><br />
+			</div>
+		</div>
+		<iframe id="viewer"></iframe>
+
+		<script>
+
+		var files = {
+			"webgl": [
+				"webgl_animation_cloth",
+				"webgl_animation_skinning",
+				"webgl_animation_skinning_morph",
+				"webgl_buffergeometry",
+				"webgl_buffergeometry_custom_attributes_particles",
+				"webgl_buffergeometry_lines",
+				"webgl_buffergeometry_particles",
+				"webgl_camera",
+				"webgl_custom_attributes",
+				"webgl_custom_attributes_lines",
+				"webgl_custom_attributes_particles",
+				"webgl_custom_attributes_particles2",
+				"webgl_custom_attributes_particles3",
+				"webgl_geometries",
+				"webgl_geometries2",
+				"webgl_geometry_colors",
+				"webgl_geometry_colors_blender",
+				"webgl_geometry_convex",
+				"webgl_geometry_cube",
+				"webgl_geometry_dynamic",
+				"webgl_geometry_extrude_shapes",
+				"webgl_geometry_extrude_splines",
+				"webgl_geometry_extrude_uvs2",
+				"webgl_geometry_hierarchy",
+				"webgl_geometry_hierarchy2",
+				"webgl_geometry_large_mesh",
+				"webgl_geometry_minecraft",
+				"webgl_geometry_minecraft_ao",
+				"webgl_geometry_minecraft_oculusrift",
+				"webgl_geometry_normals",
+				"webgl_geometry_nurbs",
+				"webgl_geometry_shapes",
+				"webgl_geometry_subdivision",
+				"webgl_geometry_terrain",
+				"webgl_geometry_terrain_fog",
+				"webgl_geometry_terrain_raycast",
+				"webgl_geometry_tessellation",
+				"webgl_geometry_text",
+				"webgl_hdr",
+				"webgl_helpers",
+				"webgl_interactive_cubes",
+				"webgl_interactive_cubes_gpu",
+				"webgl_interactive_draggablecubes",
+				"webgl_interactive_voxelpainter",
+				"webgl_kinect",
+				"webgl_lensflares",
+				"webgl_lights_hemisphere",
+				"webgl_lights_pointlights",
+				"webgl_lights_pointlights2",
+				"webgl_lines_colors",
+				"webgl_lines_cubes",
+				"webgl_lines_dashed",
+				"webgl_lines_sphere",
+				"webgl_lines_splines",
+				"webgl_loader_collada",
+				"webgl_loader_collada_keyframe",
+				"webgl_loader_ctm",
+				"webgl_loader_ctm_materials",
+				"webgl_loader_json_blender",
+				"webgl_loader_json_objconverter",
+				"webgl_loader_obj",
+				"webgl_loader_obj_mtl",
+				"webgl_loader_ply",
+				"webgl_loader_scene",
+				"webgl_loader_scene_blender",
+				"webgl_loader_stl",
+				"webgl_loader_utf8",
+				"webgl_loader_vrml",
+				"webgl_loader_vtk",
+				"webgl_lod",
+				"webgl_marching_cubes",
+				"webgl_materials",
+				"webgl_materials2",
+				"webgl_materials_blending",
+				"webgl_materials_blending_custom",
+				"webgl_materials_bumpmap",
+				"webgl_materials_bumpmap_skin",
+				"webgl_materials_cars",
+				"webgl_materials_cars_anaglyph",
+				"webgl_materials_cars_camaro",
+				"webgl_materials_cars_camaro_crosseyed",
+				"webgl_materials_cars_parallaxbarrier",
+				"webgl_materials_cubemap",
+				"webgl_materials_cubemap_balls_reflection",
+				"webgl_materials_cubemap_balls_reflection_anaglyph",
+				"webgl_materials_cubemap_balls_refraction",
+				"webgl_materials_cubemap_balls_refraction_crosseyed",
+				"webgl_materials_cubemap_dynamic",
+				"webgl_materials_cubemap_dynamic2",
+				"webgl_materials_cubemap_escher",
+				"webgl_materials_cubemap_refraction",
+				"webgl_materials_grass",
+				"webgl_materials_lightmap",
+				"webgl_materials_normalmap",
+				"webgl_materials_normalmap2",
+				"webgl_materials_shaders",
+				"webgl_materials_shaders_fresnel",
+				"webgl_materials_skin",
+				"webgl_materials_texture_anisotropy",
+				"webgl_materials_texture_compressed",
+				"webgl_materials_texture_filters",
+				"webgl_materials_texture_manualmipmap",
+				"webgl_materials_video",
+				"webgl_materials_wireframe",
+				"webgl_mirror",
+				"webgl_morphnormals",
+				"webgl_morphtargets",
+				"webgl_morphtargets_horse",
+				"webgl_morphtargets_md2",
+				"webgl_morphtargets_md2_control",
+				"webgl_multiple_canvases_circle",
+				"webgl_multiple_canvases_complex",
+				"webgl_multiple_canvases_grid",
+				"webgl_multiple_views",
+				"webgl_multiple_windows",
+				"webgl_octree",
+				"webgl_octree_raycasting",
+				"webgl_panorama_equirectangular",
+				"webgl_particles_billboards",
+				"webgl_particles_billboards_colors",
+				"webgl_particles_dynamic",
+				"webgl_particles_random",
+				"webgl_particles_shapes",
+				"webgl_particles_sprites",
+				"webgl_performance",
+				"webgl_performance_doublesided",
+				"webgl_performance_static",
+				"webgl_postprocessing",
+				"webgl_postprocessing2",
+				"webgl_postprocessing_advanced",
+				"webgl_postprocessing_dof",
+				"webgl_postprocessing_dof2",
+				"webgl_postprocessing_godrays",
+				"webgl_rtt",
+				"webgl_sandbox",
+				"webgl_shader",
+				"webgl_shader2",
+				"webgl_shader_lava",
+				"webgl_shading_physical",
+				"webgl_shadowmap",
+				"webgl_shadowmap_performance",
+				"webgl_sprites",
+				"webgl_terrain_dynamic",
+				"webgl_test_memory",
+				"webgl_test_memory2",
+				"webgl_trails"
+			],
+			"webgl3": [
+				"webgl3_performance"
+			],
+			"webgldeferred": [
+				"webgldeferred_animation",
+				"webgldeferred_arealights",
+				"webgldeferred_pointlights"
+			],
+			"css3d": [
+				"css3d_molecules",
+				"css3d_panorama",
+				"css3d_periodictable",
+				"css3d_sandbox",
+				"css3d_sprites",
+				"css3d_youtube"
+			],
+			"misc": [
+				"misc_controls_fly",
+				"misc_controls_oculusrift",
+				"misc_controls_orbit",
+				"misc_controls_path",
+				"misc_controls_pointerlock",
+				"misc_controls_trackball",
+				"misc_controls_transform",
+				"misc_lights_test",
+				"misc_lookat",
+				"misc_sound",
+				"misc_ubiquity_test",
+				"misc_uv_tests"
+			],
+			"canvas": [
+				"canvas_ascii_effect",
+				"canvas_camera_orthographic",
+				"canvas_camera_orthographic2",
+				"canvas_geometry_birds",
+				"canvas_geometry_cube",
+				"canvas_geometry_earth",
+				"canvas_geometry_hierarchy",
+				"canvas_geometry_nurbs",
+				"canvas_geometry_panorama",
+				"canvas_geometry_panorama_fisheye",
+				"canvas_geometry_shapes",
+				"canvas_geometry_terrain",
+				"canvas_geometry_text",
+				"canvas_interactive_cubes",
+				"canvas_interactive_cubes_tween",
+				"canvas_interactive_lines",
+				"canvas_interactive_particles",
+				"canvas_interactive_voxelpainter",
+				"canvas_lights_pointlights",
+				"canvas_lights_pointlights_smooth",
+				"canvas_lines",
+				"canvas_lines_colors",
+				"canvas_lines_sphere",
+				"canvas_materials",
+				"canvas_materials_depth",
+				"canvas_materials_normal",
+				"canvas_materials_reflection",
+				"canvas_materials_video",
+				"canvas_particles_floor",
+				"canvas_particles_random",
+				"canvas_particles_shapes",
+				"canvas_particles_sprites",
+				"canvas_particles_waves",
+				"canvas_performance",
+				"canvas_sandbox"
+			],
+			"software": [
+				"software_sandbox"
+			]
+		};
+
+		//
+
+		var list = document.getElementById( 'list' );
+		var viewer = document.getElementById( 'viewer' );
+
+		var container = document.createElement( 'div' );
+		list.appendChild( container );
+
+		var button = document.createElement( 'div' );
+		button.id = 'button';
+		button.textContent = 'View source';
+		button.addEventListener( 'click', function ( event ) {
+
+			var array = location.href.split( '/' );
+			array.pop();
+
+			window.open( 'view-source:' + array.join( '/' ) + '/' + selected + '.html' );
+
+		}, false );
+		button.style.display = 'none';
+		document.body.appendChild( button );
+
+		var divs = {};
+		var selected = null;
+
+		for ( var key in files ) {
+
+			var section = files[ key ];
+
+			var div = document.createElement( 'h2' );
+			div.textContent = key;
+			container.appendChild( div );
+
+			for ( var i = 0; i < section.length; i ++ ) {
+
+				( function ( file ) {
+
+					var name = file.split( '_' );
+					name.shift();
+					name = name.join( ' / ' );
+
+					var div = document.createElement( 'div' );
+					div.className = 'link';
+					div.textContent = name;
+					div.addEventListener( 'click', function () {
+
+						load( file );
+
+					} );
+					container.appendChild( div );
+
+					divs[ file ] = div;
+
+				} )( section[ i ] );
+
+			}
+
+		}
+
+		var load = function ( file ) {
+
+			if ( selected !== null ) divs[ selected ].className = 'link';
+
+			divs[ file ].className = 'link selected';
+
+			window.location.hash = file;
+			viewer.src = file + '.html';
+			viewer.focus();
+
+			button.style.display = '';
+
+			selected = file;
+
+		};
+
+		if ( window.location.hash !== '' ) {
+
+			load( window.location.hash.substring( 1 ) );
+
+		}
+
+		</script>
+
+	</body>
+</html>

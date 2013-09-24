@@ -70,7 +70,7 @@
 
 				}
 
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
 
 				cube = new THREE.Mesh( geometry, material );
 				cube.position.y = 150;
@@ -81,7 +81,7 @@
 				var geometry = new THREE.PlaneGeometry( 200, 200 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0, overdraw: 0.5 } );
 
 				plane = new THREE.Mesh( geometry, material );
 				scene.add( plane );

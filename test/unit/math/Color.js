@@ -111,7 +111,23 @@ test( "setStyleRGBRed", function(){
     ok( c.b == 0, "Blue: " + c.b );
 });
 
+test( "setStyleRGBRedWithSpaces", function(){
+    var c = new THREE.Color();
+    c.setStyle('rgb(255, 0, 0)');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g == 0, "Green: " + c.g );
+    ok( c.b == 0, "Blue: " + c.b );
+});
+
 test( "setStyleRGBPercent", function(){
+    var c = new THREE.Color();
+    c.setStyle('rgb(100%,50%,10%)');
+    ok( c.r == 1, "Red: " + c.r );
+    ok( c.g == 0.5, "Green: " + c.g );
+    ok( c.b == 0.1, "Blue: " + c.b );
+});
+
+test( "setStyleRGBPercentWithSpaces", function(){
     var c = new THREE.Color();
     c.setStyle('rgb(100%,50%,10%)');
     ok( c.r == 1, "Red: " + c.r );

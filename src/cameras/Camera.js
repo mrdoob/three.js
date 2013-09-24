@@ -32,3 +32,16 @@ THREE.Camera.prototype.lookAt = function () {
 	};
 
 }();
+
+THREE.Camera.prototype.clone = function (camera) {
+
+	if ( camera === undefined ) camera = new THREE.Camera();
+
+	THREE.Object3D.prototype.clone.call( this, camera );
+
+	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
+	camera.projectionMatrix.copy( this.projectionMatrix );
+	camera.projectionMatrixInverse.copy( this.projectionMatrixInverse );
+
+	return camera;
+};

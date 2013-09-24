@@ -23,6 +23,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var center = new THREE.Vector3();
 	var normalMatrix = new THREE.Matrix3();
+	var pointer = new THREE.Vector2();
+	var pointerOld = new THREE.Vector2();
 
 	// events
 
@@ -114,6 +116,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		}
 
+		pointerOld.set( event.clientX, event.clientY );
+
 		domElement.addEventListener( 'mousemove', onMouseMove, false );
 		domElement.addEventListener( 'mouseup', onMouseUp, false );
 		domElement.addEventListener( 'mouseout', onMouseUp, false );
@@ -126,8 +130,10 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		event.preventDefault();
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || event.oMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || event.oMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
+
+		var movementX = pointer.x - pointerOld.x;
+		var movementY = pointer.y - pointerOld.y;
 
 		if ( state === STATE.ROTATE ) {
 
@@ -142,6 +148,8 @@ THREE.EditorControls = function ( object, domElement ) {
 			scope.pan( new THREE.Vector3( - movementX, movementY, 0 ) );
 
 		}
+
+		pointerOld.set( event.clientX, event.clientY );
 
 	}
 
@@ -185,28 +193,36 @@ THREE.EditorControls = function ( object, domElement ) {
 	// touch
 
 	var touch = new THREE.Vector3();
-	var prevTouch = new THREE.Vector3();
+
+	var touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	var prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+
 	var prevDistance = null;
 
 	function touchStart( event ) {
 
 		if ( scope.enabled === false ) return;
 
-		var touches = event.touches;
+		switch ( event.touches.length ) {
 
-		switch ( touches.length ) {
+			case 1:
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
+				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
+				break;
 
 			case 2:
-				var dx = touches[ 0 ].pageX - touches[ 1 ].pageX;
-				var dy = touches[ 0 ].pageY - touches[ 1 ].pageY;
-				prevDistance = Math.sqrt( dx * dx + dy * dy );
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
+				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 );
+				prevDistance = touches[ 0 ].distanceTo( touches[ 1 ] );
 				break;
 
 		}
 
-		prevTouch.set( touches[ 0 ].pageX, touches[ 0 ].pageY, 0 );
+		prevTouches[ 0 ].copy( touches[ 0 ] );
+		prevTouches[ 1 ].copy( touches[ 1 ] );
 
 	}
+
 
 	function touchMove( event ) {
 
@@ -215,31 +231,47 @@ THREE.EditorControls = function ( object, domElement ) {
 		event.preventDefault();
 		event.stopPropagation();
 
-		var touches = event.touches;
+		var getClosest = function( touch, touches ) {
 
-		touch.set( touches[ 0 ].pageX, touches[ 0 ].pageY, 0 );
+			var closest = touches[ 0 ];
 
-		switch ( touches.length ) {
+			for ( var i in touches ) {
+				if ( closest.distanceTo(touch) > touches[ i ].distanceTo(touch) ) closest = touches[ i ];
+			}
+
+			return closest;
+
+		}
+
+		switch ( event.touches.length ) {
 
 			case 1:
-				scope.rotate( touch.sub( prevTouch ).multiplyScalar( - 0.005 ) );
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
+				touches[ 1 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
+				scope.rotate( touches[ 0 ].sub( getClosest( touches[ 0 ] ,prevTouches ) ).multiplyScalar( - 0.005 ) );
 				break;
 
 			case 2:
-				var dx = touches[ 0 ].pageX - touches[ 1 ].pageX;
-				var dy = touches[ 0 ].pageY - touches[ 1 ].pageY;
-				var distance = Math.sqrt( dx * dx + dy * dy );
+				touches[ 0 ].set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY, 0 );
+				touches[ 1 ].set( event.touches[ 1 ].pageX, event.touches[ 1 ].pageY, 0 );
+				distance = touches[ 0 ].distanceTo( touches[ 1 ] );
 				scope.zoom( new THREE.Vector3( 0, 0, prevDistance - distance ) );
 				prevDistance = distance;
-				break;
 
-			case 3:
-				scope.pan( touch.sub( prevTouch ).setX( - touch.x ) );
+
+				var offset0 = touches[ 0 ].clone().sub( getClosest( touches[ 0 ] ,prevTouches ) );
+				var offset1 = touches[ 1 ].clone().sub( getClosest( touches[ 1 ] ,prevTouches ) );
+				offset0.x = -offset0.x;
+				offset1.x = -offset1.x;
+
+				scope.pan( offset0.add( offset1 ).multiplyScalar( 0.5 ) );
+
 				break;
 
 		}
 
-		prevTouch.set( touches[ 0 ].pageX, touches[ 0 ].pageY, 0 );
+		prevTouches[ 0 ].copy( touches[ 0 ] );
+		prevTouches[ 1 ].copy( touches[ 1 ] );
 
 	}
 

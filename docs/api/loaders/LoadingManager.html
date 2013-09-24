@@ -7,43 +7,31 @@
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
 	</head>
 	<body>
-		[page:Object3D] &rarr;
-
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Handles and keeps track of loaded and pending data.</div>
+		<code>
+var manager = new THREE.LoadingManager();
+manager.onProgress = function ( item, loaded, total ) {
 
+	console.log( item, loaded, total );
+
+};
+
+var loader = new THREE.OBJLoader( manager );
+loader.load( 'file.obj', function ( object ) {
+
+	//
+
+} );
+		</code>
 
 		<h2>Constructor</h2>
 
-
-		<h3>[name]([page:todo geometry], [page:todo material])</h3>
-		<div>
-		geometry -- todo <br />
-		material -- todo
-		</div>
+		<h3>[name]()</h3>
 		<div>
 		todo
 		</div>
-
-
-		<h2>Properties</h2>
-
-
-
-		<h3>.[page:todo geometry]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h3>.[page:todo material]</h3>
-		<div>
-		todo
-		</div> 
-
-		<h2>Methods</h2>
-
-
 
 		<h2>Source</h2>
 

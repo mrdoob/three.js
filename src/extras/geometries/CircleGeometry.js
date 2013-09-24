@@ -6,12 +6,11 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength, inn
 
     THREE.Geometry.call( this );
 
-    radius = radius || 50;
+	this.radius = radius = radius || 50;
+	this.segments = segments = segments !== undefined ? Math.max( 3, segments ) : 8;
 
-    thetaStart = thetaStart !== undefined ? thetaStart : 0;
-    thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-    segments = segments !== undefined ? Math.max( 3, segments ) : 8;
-    innerRadius = innerRadius !== undefined ? innerRadius : 0;
+	this.thetaStart = thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	this.thetaLength = thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
 
     if ( innerRadius >= radius ) {
     	console.warn( "CircleGeometry: Can't set the innerRadius to be greater than the radius.");

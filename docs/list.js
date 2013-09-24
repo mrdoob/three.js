@@ -40,7 +40,7 @@ var list = {
 			[ "GeometryLoader", "api/loaders/GeometryLoader" ],
 			[ "ImageLoader", "api/loaders/ImageLoader" ],
 			[ "JSONLoader", "api/loaders/JSONLoader" ],
-			[ "LoadingMonitor", "api/loaders/LoadingMonitor" ],
+			[ "LoadingManager", "api/loaders/LoadingManager" ],
 			[ "SceneLoader", "api/loaders/SceneLoader" ],
 			[ "TextureLoader", "api/loaders/TextureLoader" ],
 		],
@@ -67,6 +67,7 @@ var list = {
 			[ "Box2", "api/math/Box2" ],
 			[ "Box3", "api/math/Box3" ],
 			[ "Color", "api/math/Color" ],
+			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
 			[ "Math", "api/math/Math" ],
 			[ "Matrix3", "api/math/Matrix3" ],
@@ -90,7 +91,6 @@ var list = {
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
 			[ "Particle", "api/objects/Particle" ],
 			[ "ParticleSystem", "api/objects/ParticleSystem" ],
-			[ "Ribbon", "api/objects/Ribbon" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Sprite", "api/objects/Sprite" ]
 
@@ -177,6 +177,7 @@ var list = {
 			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
 			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
+			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ]

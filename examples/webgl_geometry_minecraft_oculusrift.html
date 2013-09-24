@@ -95,32 +95,38 @@
 
 				var pxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
+				pxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				pxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				pxGeometry.applyMatrix( matrix.makeRotationY( Math.PI / 2 ) );
 				pxGeometry.applyMatrix( matrix.makeTranslation( 50, 0, 0 ) );
 
 				var nxGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
+				nxGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				nxGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				nxGeometry.applyMatrix( matrix.makeRotationY( - Math.PI / 2 ) );
 				nxGeometry.applyMatrix( matrix.makeTranslation( - 50, 0, 0 ) );
 
 				var pyGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 1 ].y = 0.5;
-				pyGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 0 ].y = 0.5;
+				pyGeometry.faceVertexUvs[ 0 ][ 1 ][ 1 ].y = 0.5;
 				pyGeometry.applyMatrix( matrix.makeRotationX( - Math.PI / 2 ) );
 				pyGeometry.applyMatrix( matrix.makeTranslation( 0, 50, 0 ) );
 
 				var pzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
+				pzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				pzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				pzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, 50 ) );
 
 				var nzGeometry = new THREE.PlaneGeometry( 100, 100 );
 				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 0 ].y = 0.5;
-				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 3 ].y = 0.5;
+				nzGeometry.faceVertexUvs[ 0 ][ 0 ][ 2 ].y = 0.5;
+				nzGeometry.faceVertexUvs[ 0 ][ 1 ][ 2 ].y = 0.5;
 				nzGeometry.applyMatrix( matrix.makeRotationY( Math.PI ) );
 				nzGeometry.applyMatrix( matrix.makeTranslation( 0, 0, -50 ) );
+
 				//
 
 				var geometry = new THREE.Geometry();
@@ -190,9 +196,9 @@
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer.setClearColor( 0xbfd1e5, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor(new THREE.Color(0xbfd1e5));
 
 				// Here is the effect for the Oculus Rift
 				// worldScale 100 means that 100 Units == 1m

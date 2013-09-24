@@ -17,7 +17,7 @@
 
 		<h2>Example</h2>
 
-		<code>var geometry = new THREE.Geometry()
+		<code>var geometry = new THREE.Geometry();
 
 		geometry.vertices.push( new THREE.Vector3( -10,  10, 0 ) );
 		geometry.vertices.push( new THREE.Vector3( -10, -10, 0 ) );
@@ -59,16 +59,9 @@
 		<h3>.[page:Array colors]</h3>
 		<div>
 		Array of vertex [page:Color colors], matching number and order of vertices.<br />
-		Used in [page:ParticleSystem], [page:Line] and [page:Ribbon].<br />
+		Used in [page:ParticleSystem] and [page:Line].<br />
 		[page:Mesh Meshes] use per-face-use-of-vertex colors embedded directly in faces.<br />
 		To signal an update in this array, [page:Geometry Geometry.colorsNeedUpdate] needs to be set to true.
-		</div>
-
-		<h3>.[page:Array normals]</h3>
-		<div>
-		Array of vertex [page:Vector3 normals], matching number and order of vertices.<br />
-		[link:http://en.wikipedia.org/wiki/Normal_(geometry) Normal vectors] are  nessecary for lighting <br />
-		To signal an update in this array, [page:Geometry Geometry.normalsNeedUpdate] needs to be set to true.
 		</div>
 
 		<h3>.[page:Array faces]</h3>

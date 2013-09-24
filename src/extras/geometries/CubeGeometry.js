@@ -104,7 +104,7 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [ uvb, uvc, uvd ] );
+				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 			}
 

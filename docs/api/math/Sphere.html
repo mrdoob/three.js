@@ -90,13 +90,13 @@
 		todo
 		</div>
 
-		<h3>.setFromCenterAndPoints([page:todo center], [page:todo points]) [page:todo]</h3>
+		<h3>.setFromPoints([page:todo points], [page:Vector3 optionalCenter]) [page:todo]</h3>
 		<div>
-		center -- todo <br />
-		points -- todo
+		points -- list of [page:Vector3 vector] positions.<br />  
+		optionalCenter -- optional position for the sphere's center.<br />
 		</div>
 		<div>
-		todo
+		Computes the minimum bounding sphere for *points*. If *optionalCenter* is given, it is used as the sphere's center. Otherwise, the center of the axis-aligned bounding box encompassing *points* is calculated.
 		</div>
 
 		<h3>.distanceToPoint([page:todo point]) [page:todo]</h3>

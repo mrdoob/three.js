@@ -69,6 +69,15 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
+					case 'CircleGeometry':
+
+						geometry = new THREE.CircleGeometry(
+							data.radius,
+							data.segments
+						);
+
+						break;
+
 					case 'CubeGeometry':
 
 						geometry = new THREE.CubeGeometry(
