@@ -12,6 +12,36 @@ UI.Element.prototype = {
 
 	},
 
+	trim: function ( value ) {
+
+		if ( value.trim ) 
+			return value.trim();
+		else 
+			return value.replace(/^\s+|\s+$/g,'');  ;
+
+	},
+
+	addClass: function ( value ) {
+
+		debugger;
+
+		var classes = this.dom.className.split(/\S+/g);
+
+		for ( var i = 0; i < classes.length; i++ ) {
+
+			// Exit early and prevent reassignment if already exists
+			if ( classes[i] === value ) return;
+
+		}
+
+		classes.push( value );
+
+		this.dom.className = classes.join(' ');
+
+		return this;
+		
+	},
+
 	setClass: function ( name ) {
 
 		this.dom.className = name;

@@ -16,7 +16,7 @@ Sidebar.Renderer = function ( editor ) {
 	container.setPadding( '10px' );
 	container.setBorderTop( '1px solid #ccc' );
 
-	container.add( new UI.Text( 'RENDERER' ).setColor( '#666' ) );
+	container.add( new UI.Text( 'RENDERER' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// class
@@ -34,7 +34,7 @@ Sidebar.Renderer = function ( editor ) {
 	var rendererClassRow = new UI.Panel();
 	var rendererClass = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateRenderer );
 
-	rendererClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
+	rendererClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ) );
 	rendererClassRow.add( rendererClass );
 
 	container.add( rendererClassRow );
@@ -44,7 +44,7 @@ Sidebar.Renderer = function ( editor ) {
 	var clearColorRow = new UI.Panel();
 	var clearColor = new UI.Color().setValue( '#aaaaaa' ).onChange( updateClearColor );
 
-	clearColorRow.add( new UI.Text( 'Clear color' ).setWidth( '90px' ).setColor( '#666' ) );
+	clearColorRow.add( new UI.Text( 'Clear color' ).setWidth( '90px' ) );
 	clearColorRow.add( clearColor );
 
 	container.add( clearColorRow );

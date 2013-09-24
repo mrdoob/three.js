@@ -7,7 +7,7 @@ Sidebar.Geometry = function ( editor ) {
 	container.setPadding( '10px' );
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text().setValue( 'GEOMETRY' ).setColor( '#666' ) );
+	container.add( new UI.Text().setValue( 'GEOMETRY' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// uuid
@@ -22,7 +22,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	} );
 
-	geometryUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ) );
 	geometryUUIDRow.add( geometryUUID );
 	geometryUUIDRow.add( geometryUUIDRenew );
 
@@ -37,7 +37,7 @@ Sidebar.Geometry = function ( editor ) {
 
 	} );
 
-	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ) );
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
@@ -47,7 +47,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryTypeRow = new UI.Panel();
 	var geometryType = new UI.Text().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
 
-	geometryTypeRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryTypeRow.add( new UI.Text( 'Class' ).setWidth( '90px' ) );
 	geometryTypeRow.add( geometryType );
 
 	container.add( geometryTypeRow );
@@ -57,7 +57,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryVerticesRow = new UI.Panel();
 	var geometryVertices = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
 
-	geometryVerticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryVerticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
 	geometryVerticesRow.add( geometryVertices );
 
 	container.add( geometryVerticesRow );
@@ -67,7 +67,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryFacesRow = new UI.Panel();
 	var geometryFaces = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
 
-	geometryFacesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryFacesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
 	geometryFacesRow.add( geometryFaces );
 
 	container.add( geometryFacesRow );

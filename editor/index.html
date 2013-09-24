@@ -27,7 +27,7 @@
 			
 			#menubar {
 				position: absolute;
-				background-color: #eee;
+				background: url(trans.png);
 				padding: 0px;
 				margin: 0px;
 			}
@@ -38,9 +38,13 @@
 					cursor: pointer;
 				}
 
+				#menubar .Panel {
+					color: #888;
+				}
+
 					#menubar .menu .options {
 						padding: 5px 0px;
-						background-color: #fff;
+						background: url(trans.png);
 						width: 140px;
 					}
 
@@ -64,29 +68,31 @@
 			#sidebar {
 				position: absolute;
 				width: 300px;
-				background-color: #eee;
+				background: url(trans.png);
 				overflow: auto;
 			}
 
 				#sidebar .Panel {
 					margin-bottom: 10px;
+					color: #888;
 				}
 
 				#sidebar #outliner .type {
 					padding: 2px 4px;
 					font-size: 10px;
-					background-color: #eee;
+					background: #eee;
 					color: #aaa;
 				}
 
 			#toolbar {
 				position: absolute;
-				background-color: #999;
+				background: url(trans.png);
 				color: #333;
 			}
 			
 				#toolbar .Panel {
 					padding: 4px;
+					color: #888;
 				}
 
 				#toolbar button {
@@ -167,10 +173,10 @@
 			var editor = new Editor();
 
 			var viewport = new Viewport( editor );
-			viewport.setTop( '32px' );
-			viewport.setLeft( '0px' );
-			viewport.setRight( '300px' );
-			viewport.setBottom( '32px' );
+			viewport.setTop( '0' );
+			viewport.setLeft( '0' );
+			viewport.setRight( '0' );
+			viewport.setBottom( '0' );
 			document.body.appendChild( viewport.dom );
 
 			var toolbar = new Toolbar( editor );
