@@ -42,6 +42,15 @@ button {
 		white-space: nowrap;
 	}
 
+input.Number {
+	/* '#0080f0' */
+	color: red;
+	font-size: 12px;
+	background-color: transparent;
+	border: 1px solid transparent;
+	padding: 2px;
+	cursor: col-resize;
+}
 
 #menubar {
 	position: absolute;
@@ -119,7 +128,7 @@ button {
 	background: url(trans.png);
 	color: #333;
 }
-			
+
 	#toolbar .Panel {
 		padding: 4px;
 		color: #888;

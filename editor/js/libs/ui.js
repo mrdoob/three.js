@@ -600,12 +600,6 @@ UI.Number = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -760,12 +754,6 @@ UI.Integer = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
