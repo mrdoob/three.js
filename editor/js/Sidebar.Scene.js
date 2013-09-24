@@ -3,9 +3,6 @@ Sidebar.Scene = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
-	container.setPadding( '10px' );
-	container.setBorderTop( '1px solid #ccc' );
-
 
 	container.add( new UI.Text( 'SCENE' ) );
 	container.add( new UI.Break(), new UI.Break() );

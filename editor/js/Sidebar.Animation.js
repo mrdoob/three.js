@@ -6,8 +6,6 @@ Sidebar.Animation = function ( editor ) {
 	var possibleAnimations = {};
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPadding( '10px' );
 	container.setDisplay( 'none' );
 
 	container.add( new UI.Text( 'Animation' ) );

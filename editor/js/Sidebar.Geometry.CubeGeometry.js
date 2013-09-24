@@ -1,8 +1,6 @@
 Sidebar.Geometry.CubeGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPaddingTop( '10px' );
 
 	var geometry = object.geometry;
 

@@ -13,8 +13,6 @@ Sidebar.Renderer = function ( editor ) {
 	};
 
 	var container = new UI.Panel();
-	container.setPadding( '10px' );
-	container.setBorderTop( '1px solid #ccc' );
 
 	container.add( new UI.Text( 'RENDERER' ) );
 	container.add( new UI.Break(), new UI.Break() );

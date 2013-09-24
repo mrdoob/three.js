@@ -3,8 +3,6 @@ Sidebar.Object3D = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPadding( '10px' );
 	container.setDisplay( 'none' );
 
 	var objectType = new UI.Text().setTextTransform( 'uppercase' );
