@@ -126,7 +126,7 @@ Sidebar.Scene = function ( editor ) {
 
 		var options = {};
 
-		options[ scene.id ] = '<span class="type">' + editor.getObjectType( scene ) + '</span> ' + scene.name;
+		options[ scene.id ] = '<span class="type">' + editor.getObjectType( scene ).replace( /[a-z]/g, '' ) + '</span> ' + scene.name;
 
 		( function addObjects( objects, pad ) {
 
@@ -134,11 +134,15 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 
-				var option = pad + '<span class="type">' + editor.getObjectType( object ) + '</span> ' + object.name;
+				var option = pad + '<span class="type">' + editor.getObjectType( object ).replace( /[a-z]/g, '' ) + '</span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
-					option += ' ( ' + object.geometry.name + ', ' + object.material.name + ' ) ';
+					var geometry = object.geometry;
+					var material = object.material;
+
+					option += ' — <span class="type">' + editor.getGeometryType( geometry ).replace( /[a-z]/g, '' ) + '</span> ' + geometry.name + ', ';
+					option += ' <span class="type">' + editor.getMaterialType( material ).replace( /[a-z]/g, '' ) + '</span> ' + material.name;
 
 				}
 
