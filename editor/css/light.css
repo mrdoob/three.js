@@ -2,32 +2,6 @@
 	vertical-align: middle;
 }
 
-	/* Webkit micro scrollbars */
-
-	::-webkit-scrollbar {
-		width:9px;
-	}
-
-	::-webkit-scrollbar-track {
-		-webkit-border-radius:5px;
-		border-radius:5px;
-		background:rgba(140,140,140,0.1);
-	}
-
-	::-webkit-scrollbar-thumb {
-		-webkit-border-radius:5px;
-		border-radius:5px;
-		background:rgba(140,140,140,0.2);
-	}
-
-	::-webkit-scrollbar-thumb:hover {
-		background:rgba(140,140,140,0.4);
-	}
-
-	::-webkit-scrollbar-thumb:window-inactive {
-		background:rgba(140,140,140,0.5);
-	}
-
 body {
 	font-family: Arial, sans-serif;
 	font-size: 14px;
@@ -56,8 +30,8 @@ button {
 }
 
 .FancySelect {
-	background: #222;
-	border: 1px solid #3C3C3C;
+	background: #fff;
+	border: 1px solid #ccc;
 	padding: 0;
 	cursor: default;
 	overflow: auto;
@@ -70,11 +44,11 @@ button {
 	}
 
 	.FancySelect .option.active {
-		background-color: #153C5E;
+		background-color: #F0F0F0;
 	}
 
 input.Number {
-	color: #2A75B7;
+	color: #0080f0;
 	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
 	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
 	border: 1px solid transparent;
@@ -93,7 +67,7 @@ input.Number {
 	position: absolute;
 	width: 100%;
 	height: 32px;
-	background: url(trans.png);
+	background: #eee;
 	padding: 0px;
 	margin: 0px;
 }
@@ -110,13 +84,12 @@ input.Number {
 
 		#menubar .menu .options {
 			padding: 5px 0px;
-			background: url(trans.png);
+			background: #eee;
 			width: 140px;
-			border-top: solid 1px #1D1D1D;
 		}
 
 			#menubar .menu .options hr {
-				border-color: #444;
+				border-color: #ddd;
 			}
 
 			#menubar .menu .options .option {
@@ -138,14 +111,14 @@ input.Number {
 	top: 32px;
 	bottom: 0px;
 	width: 300px;
-	background: url(trans.png);
+	background: #eee;
 	overflow: auto;
 }
 
 	#sidebar input,
 	#sidebar textarea,
 	#sidebar select {
-		background: #ccc;
+		/* background: #ccc; */
 	}
 
 	#sidebar .Panel {
@@ -155,28 +128,20 @@ input.Number {
 	#sidebar > .Panel {
 		color: #888;
 		padding: 10px;
-		border-top: 1px solid #333;
+		border-top: 1px solid #ccc;
 	}
 
 	#sidebar #outliner {
 		width: 100%;
 		height: 140px;
-		color: #868686;
+		color: #444;
 		font-size: 12px;
-	}
-
-	#sidebar .Panel.Material canvas {
-
-		background: url(../common/grid.png);
-		border: solid 1px #5A5A5A;
-
 	}
 
 	#sidebar #outliner .type {
 		padding: 2px 4px;
 		font-size: 10px;
-		background: #474747;
-		border-radius: 2px 2px;
+		background: #eee;
 		color: #aaa;
 	}
 
@@ -186,7 +151,7 @@ input.Number {
 	right: 300px;
 	bottom: 0px;
 	height: 32px;
-	background: url(trans.png);
+	background: #eee;
 	color: #333;
 }
 

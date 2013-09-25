@@ -43,13 +43,13 @@ Sidebar.Renderer = function ( editor ) {
 	var themeRow = new UI.Panel();
 	var originalColor;
 
-	var themeClass = new UI.Select().setOptions( ['Original', 'Dark', 'Dark+'] ).setWidth( '150px ').setColor( '#444' ).setFontSize( '12px ').onChange( function () {
+	var themeClass = new UI.Select().setOptions( ['Light', 'Dark', 'Dark+'] ).setWidth( '150px ').setColor( '#444' ).setFontSize( '12px ').onChange( function () {
 
 		var colorVal = clearColor.getValue();
 		switch ( this.value ) {
 
 			case '1':
-				themeLink.href = 'themes/darkgray/style.css';
+				themeLink.href = 'css/dark.css';
 
 				if ( originalColor && originalColor != colorVal ) {
 
@@ -60,7 +60,7 @@ Sidebar.Renderer = function ( editor ) {
 				break;
 
 			case '2':
-				themeLink.href =  'themes/darkgray/style.css'
+				themeLink.href =  'css/dark.css'
 
 				if ( colorVal != '#333333' ) {
 
@@ -72,7 +72,7 @@ Sidebar.Renderer = function ( editor ) {
 				break;
 
 			default:
-				themeLink.href = 'themes/default/style.css';
+				themeLink.href = 'css/light.css';
 
 				if ( originalColor && originalColor != colorVal ) {
 
