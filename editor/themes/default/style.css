@@ -35,6 +35,7 @@ button {
 	padding: 0;
 	cursor: default;
 	overflow: auto;
+	outline: none;
 }
 
 	.FancySelect .option {
@@ -42,11 +43,14 @@ button {
 		white-space: nowrap;
 	}
 
+	.FancySelect .option.active {
+		background-color: #F0F0F0;
+	}
+
 input.Number {
-	/* '#0080f0' */
-	color: red;
-	font-size: 12px;
-	background-color: transparent;
+	color: #0080f0;
+	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
+	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
 	border: 1px solid transparent;
 	padding: 2px;
 	cursor: col-resize;
@@ -54,7 +58,7 @@ input.Number {
 
 #menubar {
 	position: absolute;
-	background: url(trans.png);
+	background: #eee;
 	padding: 0px;
 	margin: 0px;
 }
@@ -71,12 +75,12 @@ input.Number {
 
 		#menubar .menu .options {
 			padding: 5px 0px;
-			background: url(trans.png);
+			background: #eee;
 			width: 140px;
 		}
 
 			#menubar .menu .options hr {
-				border-color: #444;
+				border-color: #ddd;
 			}
 
 			#menubar .menu .options .option {
@@ -95,9 +99,15 @@ input.Number {
 #sidebar {
 	position: absolute;
 	width: 300px;
-	background: url(trans.png);
+	background: #eee;
 	overflow: auto;
 }
+
+	#sidebar input,
+	#sidebar textarea,
+	#sidebar select {
+		/* background: #ccc; */
+	}
 
 	#sidebar .Panel {
 		margin-bottom: 10px;
@@ -106,7 +116,7 @@ input.Number {
 	#sidebar > .Panel {
 		color: #888;
 		padding: 10px;
-		border-top: 1px solid #333;
+		border-top: 1px solid #ccc;
 	}
 
 	#sidebar #outliner {
@@ -114,6 +124,13 @@ input.Number {
 		height: 140px;
 		color: #444;
 		font-size: 12px;
+	}
+
+	#sidebar .Panel.Material canvas {
+
+		/* background: url(../common/grid.png);
+		border: solid 1px #5A5A5A; */
+
 	}
 
 	#sidebar #outliner .type {
@@ -125,7 +142,7 @@ input.Number {
 
 #toolbar {
 	position: absolute;
-	background: url(trans.png);
+	background: #eee;
 	color: #333;
 }
 

@@ -12,35 +12,6 @@ UI.Element.prototype = {
 
 	},
 
-	trim: function ( value ) {
-
-		if ( value.trim ) 
-			return value.trim();
-		else 
-			return value.replace(/^\s+|\s+$/g,'');  ;
-
-	},
-
-	addClass: function ( value ) {
-
-		var classes = this.dom.className.split(/\s+/g);
-
-		// Exit early and avoid dom update if already set
-		var index = classes.indexOf(value);
-		if ( index >= 0 ) {
-
-			return;
-
-		}
-
-		classes.push( value );
-
-		this.dom.className = classes.join(' ');
-
-		return this;
-		
-	},
-
 	setClass: function ( name ) {
 
 		this.dom.className = name;
@@ -460,7 +431,7 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 		if ( element.value === value ) {
 
-			element.style.backgroundColor = '#f0f0f0';
+			element.classList.add( 'active' );
 
 			// scroll into view
 
@@ -482,7 +453,7 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 		} else {
 
-			element.style.backgroundColor = '';
+			element.classList.remove( 'active' );
 
 		}
 
