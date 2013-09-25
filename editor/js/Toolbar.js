@@ -2,7 +2,7 @@ var Toolbar = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel().setId( 'toolbar' );
+	var container = new UI.Panel();
 
 	var buttons = new UI.Panel();
 	container.add( buttons );

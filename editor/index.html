@@ -77,29 +77,16 @@
 
 			var editor = new Editor();
 
-			var viewport = new Viewport( editor );
-			viewport.setTop( '0' );
-			viewport.setLeft( '0' );
-			viewport.setRight( '0' );
-			viewport.setBottom( '0' );
+			var viewport = new Viewport( editor ).setId( 'viewport' );
 			document.body.appendChild( viewport.dom );
 
-			var toolbar = new Toolbar( editor );
-			toolbar.setBottom( '0px' );
-			toolbar.setLeft( '0px' );
-			toolbar.setRight( '300px' );
-			toolbar.setHeight( '32px' );
+			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor );
-			menubar.setWidth( '100%' );
-			menubar.setHeight( '32px' );
+			var menubar = new Menubar( editor ).setId( 'menubar' );
 			document.body.appendChild( menubar.dom );
 
-			var sidebar = new Sidebar( editor );
-			sidebar.setRight( '0px' );
-			sidebar.setTop( '32px' );
-			sidebar.setBottom( '0px' );
+			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
 			document.body.appendChild( sidebar.dom );
 
 			//

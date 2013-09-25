@@ -56,8 +56,17 @@ input.Number {
 	cursor: col-resize;
 }
 
+#viewport {
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+}
+
 #menubar {
 	position: absolute;
+	width: 100%;
+	height: 32px;
 	background: #eee;
 	padding: 0px;
 	margin: 0px;
@@ -98,6 +107,9 @@ input.Number {
 
 #sidebar {
 	position: absolute;
+	right: 0px;
+	top: 32px;
+	bottom: 0px;
 	width: 300px;
 	background: #eee;
 	overflow: auto;
@@ -142,6 +154,10 @@ input.Number {
 
 #toolbar {
 	position: absolute;
+	left: 0px;
+	right: 300px;
+	bottom: 0px;
+	height: 32px;
 	background: #eee;
 	color: #333;
 }
