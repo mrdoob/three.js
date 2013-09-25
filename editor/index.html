@@ -4,98 +4,9 @@
 		<title>three.js editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			* {
-				vertical-align: middle;
-			}
-
-			body {
-				font-family: Arial, sans-serif;
-				font-size: 14px;
-				margin: 0;
-				overflow: hidden;
-			}
-
-			hr {
-				border: 0px;
-				border-top: 1px solid #ccc;
-			}
-
-			button {
-				position: relative;
-			}
-			
-			#menubar {
-				position: absolute;
-				background-color: #eee;
-				padding: 0px;
-				margin: 0px;
-			}
-
-				#menubar .menu {
-					float: left;
-					width: 50px;
-					cursor: pointer;
-				}
-
-					#menubar .menu .options {
-						padding: 5px 0px;
-						background-color: #fff;
-						width: 140px;
-					}
-
-						#menubar .menu .options hr {
-							border-color: #ddd;
-						}
-
-						#menubar .menu .options .option {
-							color: #666;
-							background-color: transparent;
-							padding: 5px 10px;
-							margin: 0px !important;
-						}
-
-							#menubar .menu .options .option:hover {
-								color: #fff;
-								background-color: #08f;
-							}
-
-
-			#sidebar {
-				position: absolute;
-				width: 300px;
-				background-color: #eee;
-				overflow: auto;
-			}
-
-				#sidebar .Panel {
-					margin-bottom: 10px;
-				}
-
-				#sidebar #outliner .type {
-					padding: 2px 4px;
-					font-size: 10px;
-					background-color: #eee;
-					color: #aaa;
-				}
-
-			#toolbar {
-				position: absolute;
-				background-color: #999;
-				color: #333;
-			}
-			
-				#toolbar .Panel {
-					padding: 4px;
-				}
-
-				#toolbar button {
-					margin-right: 6px;
-				}
-
-		</style>
 	</head>
 	<body>
+		<link id="theme" href="themes/default/style.css" rel="stylesheet" />
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
@@ -167,10 +78,10 @@
 			var editor = new Editor();
 
 			var viewport = new Viewport( editor );
-			viewport.setTop( '32px' );
-			viewport.setLeft( '0px' );
-			viewport.setRight( '300px' );
-			viewport.setBottom( '32px' );
+			viewport.setTop( '0' );
+			viewport.setLeft( '0' );
+			viewport.setRight( '0' );
+			viewport.setBottom( '0' );
 			document.body.appendChild( viewport.dom );
 
 			var toolbar = new Toolbar( editor );

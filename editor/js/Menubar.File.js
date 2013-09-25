@@ -7,7 +7,7 @@ Menubar.File = function ( editor ) {
 	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
-	title.setTextContent( 'File' ).setColor( '#666' );
+	title.setTextContent( 'File' );
 	title.setMargin( '0px' );
 	title.setPadding( '8px' );
 	container.add( title );

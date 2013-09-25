@@ -1,8 +1,6 @@
 Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPaddingTop( '10px' );
 
 	var geometry = object.geometry;
 
@@ -11,7 +9,7 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 	var radiusRow = new UI.Panel();
 	var radius = new UI.Number( geometry.radius ).onChange( update );
 
-	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ).setColor( '#666' ) );
+	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -21,7 +19,7 @@ Sidebar.Geometry.CircleGeometry = function ( signals, object ) {
 	var segmentsRow = new UI.Panel();
 	var segments = new UI.Integer( geometry.segments ).onChange( update );
 
-	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	segmentsRow.add( new UI.Text( 'Segments' ).setWidth( '90px' ) );
 	segmentsRow.add( segments );
 
 	container.add( segmentsRow );

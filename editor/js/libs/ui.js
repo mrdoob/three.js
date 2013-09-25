@@ -93,9 +93,6 @@ UI.Panel = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Panel';
-	dom.style.userSelect = 'none';
-	dom.style.WebkitUserSelect = 'none';
-	dom.style.MozUserSelect = 'none';
 
 	this.dom = dom;
 
@@ -327,11 +324,6 @@ UI.FancySelect = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'FancySelect';
-	dom.style.background = '#fff';
-	dom.style.border = '1px solid #ccc';
-	dom.style.padding = '0';
-	dom.style.cursor = 'default';
-	dom.style.overflow = 'auto';
 	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
 
 	// Broadcast for object selection after arrow navigation
@@ -402,9 +394,8 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	for ( var key in options ) {
 
-		var option = document.createElement( 'div' );
-		option.style.padding = '4px';
-		option.style.whiteSpace = 'nowrap';
+		var option = document.createElement('div');
+		option.className = 'option';
 		option.innerHTML = options[ key ];
 		option.value = key;
 		scope.dom.appendChild( option );
@@ -440,7 +431,7 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 		if ( element.value === value ) {
 
-			element.style.backgroundColor = '#f0f0f0';
+			element.classList.add( 'active' );
 
 			// scroll into view
 
@@ -462,7 +453,7 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 		} else {
 
-			element.style.backgroundColor = '';
+			element.classList.remove( 'active' );
 
 		}
 
@@ -580,12 +571,6 @@ UI.Number = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -740,12 +725,6 @@ UI.Integer = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
