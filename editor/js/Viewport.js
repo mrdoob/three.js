@@ -41,11 +41,19 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-        controls.enabled = true;
+		controls.enabled = true;
 
-        if ( transformControls.axis ) controls.enabled = false;
-        
-		if ( editor.selected ) signals.objectChanged.dispatch( editor.selected );
+		if ( transformControls.axis !== undefined ) {
+
+			controls.enabled = false;
+
+		}
+
+		if ( editor.selected !== null ) {
+
+			signals.objectChanged.dispatch( editor.selected );
+
+		}
 
 	} );
 	sceneHelpers.add( transformControls );
@@ -67,9 +75,9 @@ var Viewport = function ( editor ) {
 
 	var getIntersects = function ( event, object ) {
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
@@ -93,9 +101,9 @@ var Viewport = function ( editor ) {
 
 		event.preventDefault();
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		onMouseDownPosition.set( x, y );
 
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -104,9 +112,9 @@ var Viewport = function ( editor ) {
 
 	var onMouseUp = function ( event ) {
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		onMouseUpPosition.set( x, y );
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
