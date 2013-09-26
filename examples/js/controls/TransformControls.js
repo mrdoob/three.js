@@ -974,9 +974,8 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function onPointerUp( event ) {
 
-		scope.axis = undefined;
 		_dragging = false;
-		scope.update();
+		onPointerHover( event );
 
 	}
 
