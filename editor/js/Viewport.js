@@ -407,6 +407,20 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.themeChanged.add( function ( theme ) {
+
+		switch ( theme.selectedIndex ) {
+
+			case '0': grid.setColors( new THREE.Color( 0x444444 ), new THREE.Color( 0x888888 ) ); break;
+			case '1': grid.setColors( new THREE.Color( 0xbbbbbb ), new THREE.Color( 0x888888 )); break;
+
+		}
+
+		// Force refresh
+		render();
+
+	});
+
 	//
 
 	var renderer;
