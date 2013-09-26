@@ -73,7 +73,7 @@ Sidebar.Material = function ( editor ) {
 
 	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
-	materialClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ) );
+	materialClassRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
 	materialClassRow.add( materialClass );
 
 	container.add( materialClassRow );

@@ -45,7 +45,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryTypeRow = new UI.Panel();
 	var geometryType = new UI.Text().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
 
-	geometryTypeRow.add( new UI.Text( 'Class' ).setWidth( '90px' ) );
+	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
 	geometryTypeRow.add( geometryType );
 
 	container.add( geometryTypeRow );
