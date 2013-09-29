@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js - examples</title>
+		<style>
+
+			@font-face {
+
+				font-family: 'inconsolata';
+				src: url('files/inconsolata.woff') format('woff');
+				font-weight: normal;
+				font-style: normal;
+
+			}
+
+			body {
+
+				background-color: #ffffff;;
+				font-family: 'inconsolata';
+				font-size: 15px;
+
+			}
+
+			h2 {
+
+				font-size: 20px;
+				font-weight: normal;
+
+			}
+
+			img {
+				width: 200px;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<!-- includes examples files -->
+		<script src="files.js"></script>
+		
+		<script>
+
+		//
+
+		var container = document.getElementById( 'container' );
+		var example, section, div, html;
+
+		for ( var key in files ) {
+
+			section = files[ key ];
+
+			div = document.createElement( 'h2' );
+			div.textContent = key;
+			container.appendChild( div );
+
+			
+			html = '';
+
+			for ( var i = 0; i < section.length; i ++ ) {
+
+				example = section[ i ];
+
+				html += '<a href="' + example + '.html"><img src="screenshots/' +  example + '.jpg"></a>'
+
+			}
+
+			div = document.createElement( 'div' );
+			div.className = 'images';
+			div.innerHTML = html;
+			container.appendChild( div );
+
+		}
+
+		</script>
+
+	</body>
+</html>
