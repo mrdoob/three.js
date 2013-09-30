@@ -18,7 +18,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 			? parameters.canvas
 			: document.createElement( 'canvas' ),
 
-	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
+	_canvasWidth = _canvas.width,
+	_canvasHeight = _canvas.height,
+	_canvasWidthHalf = Math.floor( _canvasWidth / 2 ),
+	_canvasHeightHalf = Math.floor( _canvasHeight / 2 ),
+	
 	_context = _canvas.getContext( '2d' ),
 
 	_clearColor = new THREE.Color( 0x000000 ),
