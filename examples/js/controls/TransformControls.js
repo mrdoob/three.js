@@ -19,6 +19,21 @@ THREE.TransformGizmoMaterial = function ( parameters ) {
 
 THREE.TransformGizmoMaterial.prototype = Object.create( THREE.MeshBasicMaterial.prototype );
 
+THREE.TransformGizmoLineMaterial = function ( parameters ) {
+
+	THREE.MeshBasicMaterial.call( this );
+
+	this.depthTest = false;
+	this.depthWrite = false;
+	this.transparent = true;
+	this.linewidth = 1;
+
+	this.setValues( parameters );
+
+}
+
+THREE.TransformGizmoLineMaterial.prototype = Object.create( THREE.LineBasicMaterial.prototype );
+
 THREE.TransformGizmo = function () {
 
 	this.handleGizmos = {
@@ -47,10 +62,12 @@ THREE.TransformGizmo = function () {
 		THREE.Object3D.call( this );
 
 		this.handles = new THREE.Object3D();
+		this.lines = new THREE.Object3D();
 		this.pickers = new THREE.Object3D();
 		this.planes = new THREE.Object3D();
 
 		this.add(this.handles);
+		this.add(this.lines);
 		this.add(this.pickers);
 		this.add(this.planes);
 
@@ -105,6 +122,18 @@ THREE.TransformGizmo = function () {
 
 		}
 
+		if ( this.lineGizmos ) {
+
+			for ( var i in this.lineGizmos ) {
+
+				var line = this.lineGizmos[i][0];
+				line.name = i;
+				this.lines.add( line );
+
+			}
+
+		}
+
 		// reset Transformations
 
 		this.traverse(function (child) {
@@ -125,6 +154,8 @@ THREE.TransformGizmo = function () {
 
 		for ( var j in this.handles.children ) this.handles.children[j].visible = false;
 
+		for ( var j in this.lines.children ) this.lines.children[j].visible = false;
+
 		for ( var j in this.pickers.children ) this.pickers.children[j].visible = false;
 
 		for ( var j in this.planes.children ) this.planes.children[j].visible = false;
@@ -133,17 +164,11 @@ THREE.TransformGizmo = function () {
 
 	this.show = function () {
 
-		for ( var i in this.handles.children ) {
+		for ( var i in this.handles.children ) this.handles.children[i].visible = true;
 
-			this.handles.children[i].visible = true;
+		for ( var i in this.lines.children ) this.lines.children[i].visible = true;
 
-		}
-
-		for ( var i in this.pickers.children ) {
-
-			this.pickers.children[i].visible = showPickers;
-
-		}
+		for ( var i in this.pickers.children ) this.pickers.children[i].visible = showPickers;
 
 		if ( this.activePlane !== undefined ) this.activePlane.visible = showActivePlane;
 
@@ -152,6 +177,7 @@ THREE.TransformGizmo = function () {
 	this.highlight = function ( axis ) {
 
 		var handle;
+		var line;
 
 		for ( var i in this.handleGizmos ) {
 
@@ -175,6 +201,31 @@ THREE.TransformGizmo = function () {
 	 
 			handle.material.color.setRGB( 1, 1, 0 );
 			handle.material.opacity = 1;
+
+		}
+
+		for ( var i in this.lineGizmos ) {
+
+			line = this.lineGizmos[ i ][0];
+
+			if ( line.material.oldColor !== undefined ) {
+
+				line.material.color.copy( line.material.oldColor );
+				line.material.opacity = line.material.oldOpacity;
+
+			}
+
+		}
+
+		if ( this.lineGizmos[ axis ] !== undefined ) {
+		
+			line = this.lineGizmos[ axis ][0];
+
+			line.material.oldColor = line.material.color.clone();
+			line.material.oldOpacity = line.material.opacity;
+	 
+			line.material.color.setRGB( 1, 1, 0 );
+			line.material.opacity = 1;
 
 		}
 
@@ -218,11 +269,20 @@ THREE.TransformGizmoTranslate = function () {
 
 	THREE.TransformGizmo.call( this );
 
-	var arrowGeometry = new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false );
+	var arrowGeometry = new THREE.Geometry();
 	var mesh = new THREE.Mesh( new THREE.CylinderGeometry( 0, 0.05, 0.2, 12, 1, false ) );
 	mesh.position.y = 0.5;
 	THREE.GeometryUtils.merge( arrowGeometry, mesh );
-				
+	
+	var lineXGeometry = new THREE.Geometry();
+	lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
+
+	var lineYGeometry = new THREE.Geometry();
+	lineYGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+
+	var lineZGeometry = new THREE.Geometry();
+	lineZGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) );
+
 	this.handleGizmos = {
 
 		X: [
@@ -255,6 +315,20 @@ THREE.TransformGizmoTranslate = function () {
 			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: 0xff00ff, opacity: 0.25 } ) ),
 			new THREE.Vector3( 0.15, 0, 0.15 ),
 			new THREE.Vector3( -Math.PI/2, 0, 0 )
+		]
+
+	}
+
+	this.lineGizmos = {
+
+		X: [
+			new THREE.Line( lineXGeometry, new THREE.TransformGizmoLineMaterial( { color: 0xff0000 } ) ),
+		],
+		Y: [
+			new THREE.Line( lineYGeometry, new THREE.TransformGizmoLineMaterial( { color: 0x00ff00 } ) ),
+		],
+		Z: [
+			new THREE.Line( lineZGeometry, new THREE.TransformGizmoLineMaterial( { color: 0x0000ff } ) ),
 		]
 
 	}
@@ -338,31 +412,40 @@ THREE.TransformGizmoRotate = function () {
 
 	THREE.TransformGizmo.call( this );
 
+	var CircleGeometry = function ( radius, facing, arc ) {
+
+			var geometry = new THREE.Geometry();
+			arc = arc ? arc : 1;
+			for ( var i = 0; i <= 64 * arc; ++i ) {
+				if ( facing == 'x' ) geometry.vertices.push( new THREE.Vector3( 0, Math.cos( i / 32 * Math.PI ), Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
+				if ( facing == 'y' ) geometry.vertices.push( new THREE.Vector3( Math.cos( i / 32 * Math.PI ), 0, Math.sin( i / 32 * Math.PI ) ).multiplyScalar(radius) );
+				if ( facing == 'z' ) geometry.vertices.push( new THREE.Vector3( Math.sin( i / 32 * Math.PI ), Math.cos( i / 32 * Math.PI ), 0 ).multiplyScalar(radius) );
+			}
+
+			return geometry;
+	}
+
 	this.handleGizmos = {
 
 		X: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0xff0000 } ) ),
-			new THREE.Vector3( 0, 0, 0 ),
-			new THREE.Vector3( 0, -Math.PI/2, -Math.PI/2 )
+			new THREE.Line( CircleGeometry(1,'x',0.5), new THREE.TransformGizmoLineMaterial( { color: 0xff0000 } ) ),
 		],
 		Y: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x00ff00 } ) ),
-			new THREE.Vector3( 0, 0, 0 ),
-			new THREE.Vector3( Math.PI/2, 0, 0 )
+			new THREE.Line( CircleGeometry(1,'y',0.5), new THREE.TransformGizmoLineMaterial( { color: 0x00ff00 } ) ),
 		],
 		Z: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 32, Math.PI ), new THREE.TransformGizmoMaterial( { color: 0x0000ff } ) ),
-			new THREE.Vector3( 0, 0, 0 ),
-			new THREE.Vector3( 0, 0, -Math.PI/2 )
+			new THREE.Line( CircleGeometry(1,'z',0.5), new THREE.TransformGizmoLineMaterial( { color: 0x0000ff } ) ),
 		],
 		E: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1.25, 0.005, 4, 64 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) )
+			new THREE.Line( CircleGeometry(1.25,'z',1), new THREE.TransformGizmoLineMaterial( { color: 0xcccc00 } ) ),
 		],
 		XYZE: [
-			new THREE.Mesh( new THREE.TorusGeometry( 1, 0.005, 4, 64 ), new THREE.TransformGizmoMaterial( { color: 0x787878 } ) )
+			new THREE.Line( CircleGeometry(1,'z',1), new THREE.TransformGizmoLineMaterial( { color: 0x787878 } ) ),
 		]
 
 	}
+
+	this.lineGizmos = {}
 
 	this.pickerGizmos = {
 
@@ -472,10 +555,19 @@ THREE.TransformGizmoScale = function () {
 
 	THREE.TransformGizmo.call( this );
 
-	var arrowGeometry = new THREE.CylinderGeometry( 0.005, 0.005, 1, 4, 1, false );
+	var arrowGeometry = new THREE.Geometry();
 	var mesh = new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ) );
 	mesh.position.y = 0.5;
 	THREE.GeometryUtils.merge( arrowGeometry, mesh );
+
+	var lineXGeometry = new THREE.Geometry();
+	lineXGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 1, 0, 0 ) );
+
+	var lineYGeometry = new THREE.Geometry();
+	lineYGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 1, 0 ) );
+
+	var lineZGeometry = new THREE.Geometry();
+	lineZGeometry.vertices.push( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, 1 ) );
 
 	this.handleGizmos = {
 
@@ -495,6 +587,20 @@ THREE.TransformGizmoScale = function () {
 		],
 		XYZ: [
 			new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
+		]
+
+	}
+
+	this.lineGizmos = {
+
+		X: [
+			new THREE.Line( lineXGeometry, new THREE.TransformGizmoLineMaterial( { color: 0xff0000 } ) ),
+		],
+		Y: [
+			new THREE.Line( lineYGeometry, new THREE.TransformGizmoLineMaterial( { color: 0x00ff00 } ) ),
+		],
+		Z: [
+			new THREE.Line( lineZGeometry, new THREE.TransformGizmoLineMaterial( { color: 0x0000ff } ) ),
 		]
 
 	}
