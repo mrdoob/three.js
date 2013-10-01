@@ -72,7 +72,7 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 	}
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+	if ( xhr.overrideMimeType && !( 'FormData' in window ) ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
 	xhr.send( null );
 
@@ -101,7 +101,13 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 			if ( xhr.status === 200 || xhr.status === 0 ) {
 
-				var binaryData = xhr.responseText;
+				var binaryData;
+
+				if( xhr.responseType === 'arraybuffer' )  {
+					binaryData = new Uint8Array(xhr.response);
+				} else {
+					binaryData  = xhr.responseText;
+				}
 
 				var s = Date.now();
 
@@ -194,8 +200,19 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 	}
 
-	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.open( "GET", url, true );
+
+	// check if xhr2 is available
+	if ( 'FormData' in window ) {
+
+		xhr.responseType = "arraybuffer";
+
+	} else if ( xhr.overrideMimeType )  {
+
+		xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+
+	}
+
 	xhr.send( null );
 
 };
