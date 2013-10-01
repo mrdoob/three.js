@@ -977,6 +977,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		scope.axis = undefined;
 		_dragging = false;
 		scope.update();
+		scope.dispatchEvent( changeEvent );
 
 	}
 
