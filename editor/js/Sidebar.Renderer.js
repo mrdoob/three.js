@@ -2,7 +2,7 @@ Sidebar.Renderer = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var rendererClasses = {
+	var rendererTypes = {
 
 		'WebGLRenderer': THREE.WebGLRenderer,
 		'WebGLRenderer3': THREE.WebGLRenderer3,
@@ -13,17 +13,15 @@ Sidebar.Renderer = function ( editor ) {
 	};
 
 	var container = new UI.Panel();
-	container.setPadding( '10px' );
-	container.setBorderTop( '1px solid #ccc' );
 
-	container.add( new UI.Text( 'RENDERER' ).setColor( '#666' ) );
+	container.add( new UI.Text( 'RENDERER' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// class
 
 	var options = {};
 
-	for ( var key in rendererClasses ) {
+	for ( var key in rendererTypes ) {
 
 		if ( key.indexOf( 'WebGL' ) >= 0 && System.support.webgl === false ) continue;
 
@@ -31,51 +29,47 @@ Sidebar.Renderer = function ( editor ) {
 
 	}
 
-	var rendererClassRow = new UI.Panel();
-	var rendererClass = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateRenderer );
+	var rendererTypeRow = new UI.Panel();
+	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( updateRenderer );
 
-	rendererClassRow.add( new UI.Text( 'Class' ).setWidth( '90px' ).setColor( '#666' ) );
-	rendererClassRow.add( rendererClass );
+	rendererTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	rendererTypeRow.add( rendererType );
 
-	container.add( rendererClassRow );
+	container.add( rendererTypeRow );
 
-	// clear color
+	// Quick hack to expose a user control to switch themes - for easy review purposes only
 
-	var clearColorRow = new UI.Panel();
-	var clearColor = new UI.Color().setValue( '#aaaaaa' ).onChange( updateClearColor );
+	var themeLink = document.getElementById( 'theme' );
+	var themeRow = new UI.Panel();
+	var originalColor;
 
-	clearColorRow.add( new UI.Text( 'Clear color' ).setWidth( '90px' ).setColor( '#666' ) );
-	clearColorRow.add( clearColor );
+	var theme = new UI.Select().setOptions( [ 'Light', 'Dark' ] ).setWidth( '150px ').setColor( '#444' ).setFontSize( '12px ');
+	theme.onChange( function () {
 
-	container.add( clearColorRow );
+		switch ( this.value ) {
+
+			case '0': themeLink.href = 'css/light.css'; break;
+			case '1': themeLink.href = 'css/dark.css'; break;
+
+		}
+
+	} );
+
+	themeRow.add( new UI.Text('Theme').setWidth('90px') );
+	themeRow.add( theme );
+
+	container.add( themeRow );
 
 	//
 
 	function updateRenderer() {
 
-		var renderer = new rendererClasses[ rendererClass.getValue() ]( {
-			antialias: true,
-			alpha: false,
-			clearColor: clearColor.getHexValue(),
-			clearAlpha: 1
+		var renderer = new rendererTypes[ rendererType.getValue() ]( {
+			antialias: true
 		} );
 		signals.rendererChanged.dispatch( renderer );
 
 	}
-
-	function updateClearColor() {
-
-		signals.clearColorChanged.dispatch( clearColor.getHexValue() );
-
-	}
-
-	// events
-
-	signals.clearColorChanged.add( function ( color ) {
-
-		clearColor.setHexValue( color );
-
-	} );
 
 	return container;
 

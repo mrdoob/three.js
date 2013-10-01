@@ -170,7 +170,7 @@ THREE.Path.prototype.absellipse = function ( aX, aY, xRadius, yRadius,
 									aStartAngle, aEndAngle, aClockwise );
 	this.curves.push( curve );
 
-	var lastPoint = curve.getPoint(aClockwise ? 1 : 0);
+	var lastPoint = curve.getPoint(1);
 	args.push(lastPoint.x);
 	args.push(lastPoint.y);
 

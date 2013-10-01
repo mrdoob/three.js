@@ -26,17 +26,17 @@ THREE.OBJLoader.prototype = {
 
 	},
 
-	parse: function ( data ) {
+	parse: function ( text ) {
 
 		// fixes
 
-		data = data.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
+		text = text.replace( /\ \\\r\n/g, '' ); // rhino adds ' \\r\n' some times.
 
 		var replacement = '/f$1$2$4\n/f$2$3$4'; // quads to tris
-		data = data.replace( /f( +\d+)( +\d+)( +\d+)( +\d+)/g, replacement );
-		data = data.replace( /f( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)/g, replacement );
-		data = data.replace( /f( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)/g, replacement );
-		data = data.replace( /f( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)/g, replacement );
+		text = text.replace( /f( +\d+)( +\d+)( +\d+)( +\d+)/g, replacement );
+		text = text.replace( /f( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)( +\d+\/\d+)/g, replacement );
+		text = text.replace( /f( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)( +\d+\/\d+\/\d+)/g, replacement );
+		text = text.replace( /f( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)( +\d+\/\/\d+)/g, replacement );
 
 		//
 
@@ -58,42 +58,19 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		function meshN( meshName, materialName ) {
+		var object = new THREE.Object3D();
+		var geometry, material, mesh;
 
-			if ( geometry.vertices.length > 0 ) {
+		// create mesh if no objects in text
 
-				geometry.mergeVertices();
-				geometry.computeCentroids();
-				geometry.computeFaceNormals();
-				geometry.computeBoundingSphere();
+		if ( /^o /gm.test( text ) === false ) {
 
-				object.add( mesh );
-
-				geometry = new THREE.Geometry();
-				mesh = new THREE.Mesh( geometry, material );
-
-				verticesCount = 0;
-
-			}
-
-			if ( meshName !== undefined ) mesh.name = meshName;
-			if ( materialName !== undefined ) {
-
-				material = new THREE.MeshLambertMaterial();
-				material.name = materialName;
-
-				mesh.material = material;
-
-			}
+			geometry = new THREE.Geometry();
+			material = new THREE.MeshLambertMaterial();
+			mesh = new THREE.Mesh( geometry, material );
+			object.add( mesh );
 
 		}
-
-		var group = new THREE.Object3D();
-		var object = group;
-
-		var geometry = new THREE.Geometry();
-		var material = new THREE.MeshLambertMaterial();
-		var mesh = new THREE.Mesh( geometry, material );
 
 		var vertices = [];
 		var verticesCount = 0;
@@ -110,11 +87,11 @@ THREE.OBJLoader.prototype = {
 
 		// vt float float
 
-		var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/
+		var uv_pattern = /vt( +[\d|\.|\+|\-|e]+)( +[\d|\.|\+|\-|e]+)/;
 
 		// f vertex vertex vertex
 
-		var face_pattern1 = /f( +\d+)( +\d+)( +\d+)/
+		var face_pattern1 = /f( +\d+)( +\d+)( +\d+)/;
 
 		// f vertex/uv vertex/uv vertex/uv
 
@@ -130,7 +107,7 @@ THREE.OBJLoader.prototype = {
 
 		//
 
-		var lines = data.split( "\n" );
+		var lines = text.split( '\n' );
 
 		for ( var i = 0; i < lines.length; i ++ ) {
 
@@ -262,21 +239,24 @@ THREE.OBJLoader.prototype = {
 
 				// object
 
-				object = new THREE.Object3D();
-				object.name = line.substring( 2 ).trim();
-				group.add( object );
+				geometry = new THREE.Geometry();
+				material = new THREE.MeshLambertMaterial();
+
+				mesh = new THREE.Mesh( geometry, material );
+				mesh.name = line.substring( 2 ).trim();
+				object.add( mesh );
+
+				verticesCount = 0;
 
 			} else if ( /^g /.test( line ) ) {
 
 				// group
 
-				meshN( line.substring( 2 ).trim(), undefined );
-
 			} else if ( /^usemtl /.test( line ) ) {
 
 				// material
 
-				meshN( undefined, line.substring( 7 ).trim() );
+				material.name = line.substring( 7 ).trim();
 
 			} else if ( /^mtllib /.test( line ) ) {
 
@@ -294,10 +274,17 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		// add the last group
-		meshN( undefined, undefined );
+		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-		return group;
+			var geometry = object.children[ i ].geometry;
+
+			geometry.computeCentroids();
+			geometry.computeFaceNormals();
+			geometry.computeBoundingSphere();
+
+		}
+
+		return object;
 
 	}
 

@@ -9,20 +9,20 @@ THREE.ImageUtils = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		var image = new Image();
-		var texture = new THREE.Texture( image, mapping );
-
 		var loader = new THREE.ImageLoader();
 		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, function ( image ) {
 
-			texture.image = image;
+		var texture = new THREE.Texture( undefined, mapping );
+
+		var image = loader.load( url, function () {
+
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture );
 
 		} );
 
+		texture.image = image;
 		texture.sourceFile = url;
 
 		return texture;

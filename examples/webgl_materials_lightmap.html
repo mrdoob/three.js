@@ -134,12 +134,11 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, clearColor: 0xfafafa, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
-
-				renderer.setClearColor( scene.fog.color, 1 );
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;

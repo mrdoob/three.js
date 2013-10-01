@@ -91,7 +91,6 @@ var list = {
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
 			[ "Particle", "api/objects/Particle" ],
 			[ "ParticleSystem", "api/objects/ParticleSystem" ],
-			[ "Ribbon", "api/objects/Ribbon" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Sprite", "api/objects/Sprite" ]
 
@@ -178,6 +177,7 @@ var list = {
 			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
 			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
+			[ "GridHelper", "api/extras/helpers/GridHelper" ],
 			[ "HemisphereLightHelper", "api/extras/helpers/HemisphereLightHelper" ],
 			[ "PointLightHelper", "api/extras/helpers/PointLightHelper" ],
 			[ "SpotLightHelper", "api/extras/helpers/SpotLightHelper" ]

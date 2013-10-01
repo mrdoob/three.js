@@ -19,16 +19,16 @@ THREE.SpritePlugin = function () {
 
 		var i = 0;
 
-		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = -1;	// vertex 0
+		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = -0.5;	// vertex 0
 		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv 0
 
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = -1;	// vertex 1
+		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = -0.5;	// vertex 1
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 0;	// uv 1
 
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// vertex 2
+		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = 0.5;	// vertex 2
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// uv 2
 
-		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = 1;	// vertex 3
+		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = 0.5;	// vertex 3
 		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;	// uv 3
 
 		i = 0;
@@ -59,6 +59,7 @@ THREE.SpritePlugin = function () {
 		_sprite.uniforms.rotation             = _gl.getUniformLocation( _sprite.program, "rotation" );
 		_sprite.uniforms.scale                = _gl.getUniformLocation( _sprite.program, "scale" );
 		_sprite.uniforms.alignment            = _gl.getUniformLocation( _sprite.program, "alignment" );
+		_sprite.uniforms.halfViewport         = _gl.getUniformLocation( _sprite.program, "halfViewport" );
 
 		_sprite.uniforms.color                = _gl.getUniformLocation( _sprite.program, "color" );
 		_sprite.uniforms.map                  = _gl.getUniformLocation( _sprite.program, "map" );
@@ -89,8 +90,6 @@ THREE.SpritePlugin = function () {
 
 		var attributes = _sprite.attributes,
 			uniforms = _sprite.uniforms;
-
-		var invAspect = viewportHeight / viewportWidth;
 
 		var halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
@@ -154,7 +153,7 @@ THREE.SpritePlugin = function () {
 
 		// update positions and sort
 
-		var i, sprite, material, screenPosition, size, fogType, scale = [];
+		var i, sprite, material, screenPosition, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
@@ -201,8 +200,8 @@ THREE.SpritePlugin = function () {
 						Math.max( 0, Math.min( 1, sprite.position.z ) )
 					);
 
-					scale[ 0 ] = _renderer.devicePixelRatio;
-					scale[ 1 ] = _renderer.devicePixelRatio;
+					scale[ 0 ] = _renderer.devicePixelRatio * sprite.scale.x;
+					scale[ 1 ] = _renderer.devicePixelRatio * sprite.scale.y;
 
 				} else {
 
@@ -210,8 +209,8 @@ THREE.SpritePlugin = function () {
 					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
-					scale[ 0 ] = 1;
-					scale[ 1 ] = 1;
+					scale[ 0 ] = sprite.scale.x;
+					scale[ 1 ] = sprite.scale.y;
 
 				}
 
@@ -232,11 +231,6 @@ THREE.SpritePlugin = function () {
 
 				}
 
-				size = 1 / ( material.scaleByViewport ? viewportHeight : 1 );
-
-				scale[ 0 ] *= size * invAspect * sprite.scale.x
-				scale[ 1 ] *= size * sprite.scale.y;
-
 				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
 				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
 				_gl.uniform2f( uniforms.alignment, material.alignment.x, material.alignment.y );
@@ -246,6 +240,7 @@ THREE.SpritePlugin = function () {
 
 				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
+				_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
 
 				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 				_renderer.setDepthTest( material.depthTest );

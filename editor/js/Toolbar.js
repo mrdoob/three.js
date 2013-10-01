@@ -3,8 +3,6 @@ var Toolbar = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
-	container.setPosition( 'absolute' );
-	container.setClass( 'toolbar' );
 
 	var buttons = new UI.Panel();
 	container.add( buttons );

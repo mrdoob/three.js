@@ -1,8 +1,6 @@
 Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPaddingTop( '10px' );
 
 	var geometry = object.geometry;
 
@@ -11,7 +9,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 	var radiusRow = new UI.Panel();
 	var radius = new UI.Number( geometry.radius ).onChange( update );
 
-	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ).setColor( '#666' ) );
+	radiusRow.add( new UI.Text( 'Radius' ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
@@ -21,7 +19,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 	var widthSegmentsRow = new UI.Panel();
 	var widthSegments = new UI.Integer( geometry.widthSegments ).setRange( 1, Infinity ).onChange( update );
 
-	widthSegmentsRow.add( new UI.Text( 'Width segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	widthSegmentsRow.add( new UI.Text( 'Width segments' ).setWidth( '90px' ) );
 	widthSegmentsRow.add( widthSegments );
 
 	container.add( widthSegmentsRow );
@@ -31,7 +29,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 	var heightSegmentsRow = new UI.Panel();
 	var heightSegments = new UI.Integer( geometry.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
-	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
 
 	container.add( heightSegmentsRow );
@@ -41,7 +39,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 	var phiStartRow = new UI.Panel();
 	var phiStart = new UI.Number( geometry.phiStart ).onChange( update );
 
-	phiStartRow.add( new UI.Text( 'Phi start' ).setWidth( '90px' ).setColor( '#666' ) );
+	phiStartRow.add( new UI.Text( 'Phi start' ).setWidth( '90px' ) );
 	phiStartRow.add( phiStart );
 
 	container.add( phiStartRow );
@@ -51,7 +49,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 	var phiLengthRow = new UI.Panel();
 	var phiLength = new UI.Number( geometry.phiLength ).onChange( update );
 
-	phiLengthRow.add( new UI.Text( 'Phi length' ).setWidth( '90px' ).setColor( '#666' ) );
+	phiLengthRow.add( new UI.Text( 'Phi length' ).setWidth( '90px' ) );
 	phiLengthRow.add( phiLength );
 
 	container.add( phiLengthRow );
@@ -61,7 +59,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 	var thetaStartRow = new UI.Panel();
 	var thetaStart = new UI.Number( geometry.thetaStart ).onChange( update );
 
-	thetaStartRow.add( new UI.Text( 'Theta start' ).setWidth( '90px' ).setColor( '#666' ) );
+	thetaStartRow.add( new UI.Text( 'Theta start' ).setWidth( '90px' ) );
 	thetaStartRow.add( thetaStart );
 
 	container.add( thetaStartRow );
@@ -71,7 +69,7 @@ Sidebar.Geometry.SphereGeometry = function ( signals, object ) {
 	var thetaLengthRow = new UI.Panel();
 	var thetaLength = new UI.Number( geometry.thetaLength ).onChange( update );
 
-	thetaLengthRow.add( new UI.Text( 'Theta length' ).setWidth( '90px' ).setColor( '#666' ) );
+	thetaLengthRow.add( new UI.Text( 'Theta length' ).setWidth( '90px' ) );
 	thetaLengthRow.add( thetaLength );
 
 	container.add( thetaLengthRow );

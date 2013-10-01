@@ -334,9 +334,9 @@
 
 				// RENDERER
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x00aaff, clearAlpha: 1, antialias: false } );
-				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
 				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 
 				renderer.domElement.style.position = "absolute";
 				renderer.domElement.style.top = MARGIN + "px";

@@ -2,37 +2,10 @@ Sidebar.Geometry = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var geometryClasses = {
-
-		"CircleGeometry": THREE.CircleGeometry,
-		"CubeGeometry": THREE.CubeGeometry,
-		"CylinderGeometry": THREE.CylinderGeometry,
-		"ExtrudeGeometry": THREE.ExtrudeGeometry,
-		"IcosahedronGeometry": THREE.IcosahedronGeometry,
-		"LatheGeometry": THREE.LatheGeometry,
-		"OctahedronGeometry": THREE.OctahedronGeometry,
-		"ParametricGeometry": THREE.ParametricGeometry,
-		"PlaneGeometry": THREE.PlaneGeometry,
-		"PolyhedronGeometry": THREE.PolyhedronGeometry,
-		"ShapeGeometry": THREE.ShapeGeometry,
-		"SphereGeometry": THREE.SphereGeometry,
-		"TetrahedronGeometry": THREE.TetrahedronGeometry,
-		"TextGeometry": THREE.TextGeometry,
-		"TorusGeometry": THREE.TorusGeometry,
-		"TorusKnotGeometry": THREE.TorusKnotGeometry,
-		"TubeGeometry": THREE.TubeGeometry,
-		"Geometry": THREE.Geometry,
-		"BufferGeometry": THREE.BufferGeometry
-
-	};
-
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPadding( '10px' );
 	container.setDisplay( 'none' );
 
-	var objectType = new UI.Text().setColor( '#666' ).setTextTransform( 'uppercase' );
-	container.add( objectType );
+	container.add( new UI.Text().setValue( 'GEOMETRY' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	// uuid
@@ -42,11 +15,12 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
 		geometryUUID.setValue( THREE.Math.generateUUID() );
-		update();
+
+		editor.selected.geometry.uuid = geometryUUID.getValue();
 
 	} );
 
-	geometryUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ) );
 	geometryUUIDRow.add( geometryUUID );
 	geometryUUIDRow.add( geometryUUIDRenew );
 
@@ -55,19 +29,33 @@ Sidebar.Geometry = function ( editor ) {
 	// name
 
 	var geometryNameRow = new UI.Panel();
-	var geometryName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var geometryName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
 
-	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
+		editor.setGeometryName( editor.selected.geometry, geometryName.getValue() );
+
+	} );
+
+	geometryNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ) );
 	geometryNameRow.add( geometryName );
 
 	container.add( geometryNameRow );
+
+	// class
+
+	var geometryTypeRow = new UI.Panel();
+	var geometryType = new UI.Text().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' );
+
+	geometryTypeRow.add( new UI.Text( 'Type' ).setWidth( '90px' ) );
+	geometryTypeRow.add( geometryType );
+
+	container.add( geometryTypeRow );
 
 	// vertices
 
 	var geometryVerticesRow = new UI.Panel();
 	var geometryVertices = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
 
-	geometryVerticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryVerticesRow.add( new UI.Text( 'Vertices' ).setWidth( '90px' ) );
 	geometryVerticesRow.add( geometryVertices );
 
 	container.add( geometryVerticesRow );
@@ -77,7 +65,7 @@ Sidebar.Geometry = function ( editor ) {
 	var geometryFacesRow = new UI.Panel();
 	var geometryFaces = new UI.Text().setColor( '#444' ).setFontSize( '12px' );
 
-	geometryFacesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ).setColor( '#666' ) );
+	geometryFacesRow.add( new UI.Text( 'Faces' ).setWidth( '90px' ) );
 	geometryFacesRow.add( geometryFaces );
 
 	container.add( geometryFacesRow );
@@ -89,15 +77,6 @@ Sidebar.Geometry = function ( editor ) {
 
 	//
 
-	function update() {
-
-		var geometry = editor.selected.geometry;
-
-		geometry.uuid = geometryUUID.getValue();
-		geometry.name = geometryName.getValue();
-
-	}
-
 	function build() {
 
 		var object = editor.selected;
@@ -108,7 +87,7 @@ Sidebar.Geometry = function ( editor ) {
 
 			container.setDisplay( 'block' );
 
-			objectType.setValue( getGeometryInstanceName( object.geometry ) );
+			geometryType.setValue( editor.getGeometryType( object.geometry ) );
 
 			updateFields( geometry );
 
@@ -200,16 +179,6 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-
-		}
-
-	}
-
-	function getGeometryInstanceName( geometry ) {
-
-		for ( var key in geometryClasses ) {
-
-			if ( geometry instanceof geometryClasses[ key ] ) return key;
 
 		}
 

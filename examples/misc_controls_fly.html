@@ -232,7 +232,7 @@
 
 				}
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x000000, clearAlpha: 1 } );
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				renderer.sortObjects = false;
 

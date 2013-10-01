@@ -7,7 +7,7 @@ Menubar.Help = function ( editor ) {
 	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
-	title.setTextContent( 'Help' ).setColor( '#666' );
+	title.setTextContent( 'Help' );
 	title.setMargin( '0px' );
 	title.setPadding( '8px' );
 	container.add( title );

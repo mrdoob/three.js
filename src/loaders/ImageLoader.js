@@ -54,6 +54,8 @@ THREE.ImageLoader.prototype = {
 
 		scope.manager.itemStart( url );
 
+		return image;
+
 	},
 
 	setCrossOrigin: function ( value ) {

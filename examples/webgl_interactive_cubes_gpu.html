@@ -170,9 +170,10 @@
 
 				projector = new THREE.Projector();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, clearColor: 0xffffff } );
-				renderer.sortObjects = false;
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setClearColor( 0xffffff, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
 

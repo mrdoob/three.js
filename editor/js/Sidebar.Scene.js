@@ -3,13 +3,11 @@ Sidebar.Scene = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
-	container.setPadding( '10px' );
-	container.setBorderTop( '1px solid #ccc' );
 
-	container.add( new UI.Text( 'SCENE' ).setColor( '#666' ) );
+	container.add( new UI.Text( 'SCENE' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
-	var outliner = new UI.FancySelect().setWidth( '100%' ).setHeight('140px').setColor( '#444' ).setFontSize( '12px' )
+	var outliner = new UI.FancySelect().setId( 'outliner' );
 	outliner.onChange( function () {
 
 		editor.selectById( parseInt( outliner.getValue() ) );
@@ -47,7 +45,7 @@ Sidebar.Scene = function ( editor ) {
 
 	} );
 
-	fogTypeRow.add( new UI.Text( 'Fog' ).setWidth( '90px' ).setColor( '#666' ) );
+	fogTypeRow.add( new UI.Text( 'Fog' ).setWidth( '90px' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );
@@ -64,7 +62,7 @@ Sidebar.Scene = function ( editor ) {
 
 	} );
 
-	fogColorRow.add( new UI.Text( 'Fog color' ).setWidth( '90px' ).setColor( '#666' ) );
+	fogColorRow.add( new UI.Text( 'Fog color' ).setWidth( '90px' ) );
 	fogColorRow.add( fogColor );
 
 	container.add( fogColorRow );
@@ -76,7 +74,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var fogNear = new UI.Number( 1 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( updateFogParameters );
 
-	fogNearRow.add( new UI.Text( 'Fog near' ).setWidth( '90px' ).setColor( '#666' ) );
+	fogNearRow.add( new UI.Text( 'Fog near' ).setWidth( '90px' ) );
 	fogNearRow.add( fogNear );
 
 	container.add( fogNearRow );
@@ -88,7 +86,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var fogFar = new UI.Number( 5000 ).setWidth( '60px' ).setRange( 0, Infinity ).onChange( updateFogParameters );
 
-	fogFarRow.add( new UI.Text( 'Fog far' ).setWidth( '90px' ).setColor( '#666' ) );
+	fogFarRow.add( new UI.Text( 'Fog far' ).setWidth( '90px' ) );
 	fogFarRow.add( fogFar );
 
 	container.add( fogFarRow );
@@ -100,36 +98,12 @@ Sidebar.Scene = function ( editor ) {
 
 	var fogDensity = new UI.Number( 0.00025 ).setWidth( '60px' ).setRange( 0, 0.1 ).setPrecision( 5 ).onChange( updateFogParameters );
 
-	fogDensityRow.add( new UI.Text( 'Fog density' ).setWidth( '90px' ).setColor( '#666' ) );
+	fogDensityRow.add( new UI.Text( 'Fog density' ).setWidth( '90px' ) );
 	fogDensityRow.add( fogDensity );
 
 	container.add( fogDensityRow );
 
 	//
-
-	var getObjectType = function ( object ) {
-
-		var objects = {
-
-			'Scene': THREE.Scene,
-			'PerspectiveCamera': THREE.PerspectiveCamera,
-			'AmbientLight': THREE.AmbientLight,
-			'DirectionalLight': THREE.DirectionalLight,
-			'HemisphereLight': THREE.HemisphereLight,
-			'PointLight': THREE.PointLight,
-			'SpotLight': THREE.SpotLight,
-			'Mesh': THREE.Mesh,
-			'Object3D': THREE.Object3D
-
-		};
-
-		for ( var type in objects ) {
-
-			if ( object instanceof objects[ type ] ) return type;
-
-		}
-
-	}
 
 	var refreshFogUI = function () {
 
@@ -150,7 +124,7 @@ Sidebar.Scene = function ( editor ) {
 
 		var options = {};
 
-		options[ scene.id ] = scene.name + ' <span style="color: #aaa">- ' + getObjectType( scene ) + '</span>';
+		options[ scene.id ] = '<span class="type">' + editor.getObjectType( scene ).replace( /[a-z]/g, '' ) + '</span> ' + scene.name;
 
 		( function addObjects( objects, pad ) {
 
@@ -158,7 +132,19 @@ Sidebar.Scene = function ( editor ) {
 
 				var object = objects[ i ];
 
-				options[ object.id ] = pad + object.name + ' <span style="color: #aaa">- ' + getObjectType( object ) + '</span>';
+				var option = pad + '<span class="type">' + editor.getObjectType( object ).replace( /[a-z]/g, '' ) + '</span> ' + object.name;
+
+				if ( object instanceof THREE.Mesh ) {
+
+					var geometry = object.geometry;
+					var material = object.material;
+
+					option += ' — <span class="type">' + editor.getGeometryType( geometry ).replace( /[a-z]/g, '' ) + '</span> ' + geometry.name + ', ';
+					option += ' <span class="type">' + editor.getMaterialType( material ).replace( /[a-z]/g, '' ) + '</span> ' + material.name;
+
+				}
+
+				options[ object.id ] = option;
 
 				addObjects( object.children, pad + '&nbsp;&nbsp;&nbsp;' );
 

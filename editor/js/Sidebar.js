@@ -1,8 +1,6 @@
 var Sidebar = function ( editor ) {
 
 	var container = new UI.Panel();
-	container.setPosition( 'absolute' );
-	container.setClass( 'sidebar' );
 
 	container.add( new Sidebar.Renderer( editor ) );
 	container.add( new Sidebar.Scene( editor ) );

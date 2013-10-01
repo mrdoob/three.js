@@ -4,7 +4,6 @@ var Viewport = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
-	container.setBackgroundColor( '#aaa' );
 
 	var info = new UI.Text();
 	info.setPosition( 'absolute' );
@@ -18,7 +17,6 @@ var Viewport = function ( editor ) {
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
 
-	var clearColor = 0xAAAAAA;
 	var objects = [];
 
 	// helpers
@@ -43,10 +41,19 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-        controls.enabled = true;
-        if ( transformControls.axis ) controls.enabled = false;
-        
-		if (editor.selected) signals.objectChanged.dispatch( editor.selected );
+		controls.enabled = true;
+
+		if ( transformControls.axis !== undefined ) {
+
+			controls.enabled = false;
+
+		}
+
+		if ( editor.selected !== null ) {
+
+			signals.objectChanged.dispatch( editor.selected );
+
+		}
 
 	} );
 	sceneHelpers.add( transformControls );
@@ -68,9 +75,9 @@ var Viewport = function ( editor ) {
 
 	var getIntersects = function ( event, object ) {
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
@@ -94,9 +101,9 @@ var Viewport = function ( editor ) {
 
 		event.preventDefault();
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		onMouseDownPosition.set( x, y );
 
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -105,9 +112,9 @@ var Viewport = function ( editor ) {
 
 	var onMouseUp = function ( event ) {
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		onMouseUpPosition.set( x, y );
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
@@ -166,7 +173,7 @@ var Viewport = function ( editor ) {
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
-		signals.objectChanged.dispatch( camera );
+		signals.cameraChanged.dispatch( camera );
 
 	} );
 
@@ -195,7 +202,6 @@ var Viewport = function ( editor ) {
 		container.dom.removeChild( renderer.domElement );
 
 		renderer = object;
-		renderer.setClearColor( clearColor );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
@@ -210,6 +216,12 @@ var Viewport = function ( editor ) {
 
 		render();
 		updateInfo();
+
+	} );
+
+	signals.cameraChanged.add( function () {
+
+		render();
 
 	} );
 
@@ -315,15 +327,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.clearColorChanged.add( function ( color ) {
-
-		renderer.setClearColor( color );
-		render();
-
-		clearColor = color;
-
-	} );
-
 	signals.fogTypeChanged.add( function ( fogType ) {
 
 		if ( fogType !== oldFogType ) {
@@ -410,7 +413,7 @@ var Viewport = function ( editor ) {
 
 	if ( System.support.webgl === true ) {
 
-		renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
 
 	} else {
 
@@ -418,7 +421,6 @@ var Viewport = function ( editor ) {
 
 	}
 
-	renderer.setClearColor( clearColor );
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );

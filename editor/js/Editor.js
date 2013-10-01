@@ -17,6 +17,8 @@ var Editor = function () {
 
 		sceneGraphChanged: new SIGNALS.Signal(),
 
+		cameraChanged: new SIGNALS.Signal(),
+
 		objectSelected: new SIGNALS.Signal(),
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
@@ -26,7 +28,6 @@ var Editor = function () {
 		helperRemoved: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
-		clearColorChanged: new SIGNALS.Signal(),
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
@@ -56,11 +57,18 @@ Editor.prototype = {
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
+		// avoid render per object
+
+		this.signals.sceneGraphChanged.active = false;
+
 		while ( scene.children.length > 0 ) {
 
 			this.addObject( scene.children[ 0 ] );
 
 		}
+
+		this.signals.sceneGraphChanged.active = true;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -72,6 +80,9 @@ Editor.prototype = {
 
 		object.traverse( function ( child ) {
 
+			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
+			if ( child.material !== undefined ) scope.addMaterial( child.material );
+
 			scope.addHelper( child );
 
 		} );
@@ -79,6 +90,13 @@ Editor.prototype = {
 		this.scene.add( object );
 
 		this.signals.objectAdded.dispatch( object );
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	setObjectName: function ( object, name ) {
+
+		object.name = name;
 		this.signals.sceneGraphChanged.dispatch();
 
 	},
@@ -104,27 +122,35 @@ Editor.prototype = {
 
 	},
 
-	addGeometry: function ( geometry  ) {
+	addGeometry: function ( geometry ) {
+
+		this.geometries[ geometry.uuid ] = geometry;
 
 	},
 
-	removeGeometry: function ( geometry  ) {
+	setGeometryName: function ( geometry, name ) {
+
+		geometry.name = name;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
 	addMaterial: function ( material ) {
 
+		this.materials[ material.uuid ] = material;
+
 	},
 
-	removeMaterial: function ( material ) {
+	setMaterialName: function ( material, name ) {
+
+		material.name = name;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
 	addTexture: function ( texture ) {
 
-	},
-
-	removeTexture: function ( texture ) {
+		this.textures[ texture.uuid ] = texture;
 
 	},
 
@@ -279,6 +305,93 @@ Editor.prototype = {
 	deselect: function () {
 
 		this.select( null );
+
+	},
+
+	// utils
+
+	getObjectType: function ( object ) {
+
+		var types = {
+
+			'Scene': THREE.Scene,
+			'PerspectiveCamera': THREE.PerspectiveCamera,
+			'AmbientLight': THREE.AmbientLight,
+			'DirectionalLight': THREE.DirectionalLight,
+			'HemisphereLight': THREE.HemisphereLight,
+			'PointLight': THREE.PointLight,
+			'SpotLight': THREE.SpotLight,
+			'Mesh': THREE.Mesh,
+			'Object3D': THREE.Object3D
+
+		};
+
+		for ( var type in types ) {
+
+			if ( object instanceof types[ type ] ) return type;
+
+		}
+
+	},
+
+	getGeometryType: function ( geometry ) {
+
+		var types = {
+
+			'CircleGeometry': THREE.CircleGeometry,
+			'CubeGeometry': THREE.CubeGeometry,
+			'CylinderGeometry': THREE.CylinderGeometry,
+			'ExtrudeGeometry': THREE.ExtrudeGeometry,
+			'IcosahedronGeometry': THREE.IcosahedronGeometry,
+			'LatheGeometry': THREE.LatheGeometry,
+			'OctahedronGeometry': THREE.OctahedronGeometry,
+			'ParametricGeometry': THREE.ParametricGeometry,
+			'PlaneGeometry': THREE.PlaneGeometry,
+			'PolyhedronGeometry': THREE.PolyhedronGeometry,
+			'ShapeGeometry': THREE.ShapeGeometry,
+			'SphereGeometry': THREE.SphereGeometry,
+			'TetrahedronGeometry': THREE.TetrahedronGeometry,
+			'TextGeometry': THREE.TextGeometry,
+			'TorusGeometry': THREE.TorusGeometry,
+			'TorusKnotGeometry': THREE.TorusKnotGeometry,
+			'TubeGeometry': THREE.TubeGeometry,
+			'Geometry': THREE.Geometry,
+			'BufferGeometry': THREE.BufferGeometry
+
+		};
+
+		for ( var type in types ) {
+
+			if ( geometry instanceof types[ type ] ) return type;
+
+		}
+
+	},
+
+	getMaterialType: function ( material ) {
+
+		var types = {
+
+			'LineBasicMaterial': THREE.LineBasicMaterial,
+			'LineDashedMaterial': THREE.LineDashedMaterial,
+			'MeshBasicMaterial': THREE.MeshBasicMaterial,
+			'MeshDepthMaterial': THREE.MeshDepthMaterial,
+			'MeshFaceMaterial': THREE.MeshFaceMaterial,
+			'MeshLambertMaterial': THREE.MeshLambertMaterial,
+			'MeshNormalMaterial': THREE.MeshNormalMaterial,
+			'MeshPhongMaterial': THREE.MeshPhongMaterial,
+			'ParticleBasicMaterial': THREE.ParticleBasicMaterial,
+			'ParticleCanvasMaterial': THREE.ParticleCanvasMaterial,
+			'ShaderMaterial': THREE.ShaderMaterial,
+			'Material': THREE.Material
+
+		};
+
+		for ( var type in types ) {
+
+			if ( material instanceof types[ type ] ) return type;
+
+		}
 
 	}
 

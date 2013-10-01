@@ -296,7 +296,8 @@
 				directionalLight.position.set( 1, 1, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff } );
+				renderer = new THREE.WebGLRenderer( { alpha: false } );
+				renderer.setClearColor( 0xffffff );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.innerHTML = "";

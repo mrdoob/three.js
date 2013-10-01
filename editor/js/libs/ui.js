@@ -4,6 +4,14 @@ UI.Element = function () {};
 
 UI.Element.prototype = {
 
+	setId: function ( id ) {
+
+		this.dom.id = id;
+		
+		return this;
+
+	},
+
 	setClass: function ( name ) {
 
 		this.dom.className = name;
@@ -85,9 +93,6 @@ UI.Panel = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Panel';
-	dom.style.userSelect = 'none';
-	dom.style.WebkitUserSelect = 'none';
-	dom.style.MozUserSelect = 'none';
 
 	this.dom = dom;
 
@@ -319,15 +324,51 @@ UI.FancySelect = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'FancySelect';
-	dom.style.background = '#fff';
-	dom.style.border = '1px solid #ccc';
-	dom.style.padding = '0';
-	dom.style.cursor = 'default';
-	dom.style.overflow = 'auto';
+	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
+
+	// Broadcast for object selection after arrow navigation
+	var changeEvent = document.createEvent('HTMLEvents');
+	changeEvent.initEvent( 'change', true, true );
+
+	// Prevent native scroll behavior
+	dom.addEventListener( 'keydown', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				event.preventDefault();
+				event.stopPropagation();
+				break;
+		}
+
+	}, false);
+
+	// Keybindings to support arrow navigation
+	dom.addEventListener( 'keyup', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
+
+				if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
+
+					// Highlight selected dom elem and scroll parent if needed
+					scope.setValue( scope.options[ scope.selectedIndex ].value );
+
+					// Invoke object/helper/mesh selection logic
+					scope.dom.dispatchEvent( changeEvent );
+
+				}
+
+				break;
+		}
+	}, false);
 
 	this.dom = dom;
 
 	this.options = [];
+	this.selectedIndex = -1;
 	this.selectedValue = null;
 
 	return this;
@@ -353,9 +394,8 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	for ( var key in options ) {
 
-		var option = document.createElement( 'div' );
-		option.style.padding = '4px';
-		option.style.whiteSpace = 'nowrap';
+		var option = document.createElement('div');
+		option.className = 'option';
 		option.innerHTML = options[ key ];
 		option.value = key;
 		scope.dom.appendChild( option );
@@ -391,23 +431,29 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 		if ( element.value === value ) {
 
-			element.style.backgroundColor = '#f0f0f0';
+			element.classList.add( 'active' );
 
 			// scroll into view
 
-			var y = i * element.clientHeight;
-			var scrollTop = this.dom.scrollTop;
-			var domHeight = this.dom.clientHeight;
+			var y = element.offsetTop - this.dom.offsetTop;
+			var bottomY = y + element.offsetHeight;
+			var minScroll = bottomY - this.dom.offsetHeight;
 
-			if ( y < scrollTop || y > scrollTop + domHeight ) {
+			if ( this.dom.scrollTop > y ) {
 
-				this.dom.scrollTop = y;
+				this.dom.scrollTop = y
+
+			} else if ( this.dom.scrollTop < minScroll ) {
+
+				this.dom.scrollTop = minScroll;
 
 			}
 
+			this.selectedIndex = i;
+
 		} else {
 
-			element.style.backgroundColor = '';
+			element.classList.remove( 'active' );
 
 		}
 
@@ -418,6 +464,7 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 	return this;
 
 };
+
 
 // Checkbox
 
@@ -524,12 +571,6 @@ UI.Number = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -684,12 +725,6 @@ UI.Integer = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
