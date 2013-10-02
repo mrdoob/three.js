@@ -585,25 +585,14 @@ CTM.InterleavedStream.prototype.writeByte = function(value){
 CTM.Stream = function(data){
   this.data = data;
   this.offset = 0;
-  if (typeof data === 'string'){
-	this.readByte = this.readByteFromString;
-	this.readString = this.readStringFromString;
-  } else {
-	this.readByte = this.readByteFromArray;
-	this.readString = this.readStringFromArray;
-  }
 };
 
 CTM.Stream.prototype.TWO_POW_MINUS23 = Math.pow(2, -23);
 
 CTM.Stream.prototype.TWO_POW_MINUS126 = Math.pow(2, -126);
 
-CTM.Stream.prototype.readByteFromArray = function(){
+CTM.Stream.prototype.readByte = function(){
   return this.data[this.offset ++] & 0xff;
-};
-
-CTM.Stream.prototype.readByteFromString = function(){
-  return this.data.charCodeAt(this.offset ++) & 0xff;
 };
 
 CTM.Stream.prototype.readInt32 = function(){
@@ -636,21 +625,12 @@ CTM.Stream.prototype.readFloat32 = function(){
   return s * 0;
 };
 
-CTM.Stream.prototype.readStringFromArray = function(){
+CTM.Stream.prototype.readString = function(){
   var len = this.readInt32();
 
   this.offset += len;
 
   return this.data.subarray(this.offset - len, len);
-};
-
-
-CTM.Stream.prototype.readStringFromString = function(){
-  var len = this.readInt32();
-
-  this.offset += len;
-
-  return this.data.substr(this.offset - len, len);
 };
 
 CTM.Stream.prototype.readArrayInt32 = function(array){
