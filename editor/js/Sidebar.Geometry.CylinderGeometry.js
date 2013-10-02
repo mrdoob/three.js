@@ -39,7 +39,7 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 	// radiusSegments
 
 	var radiusSegmentsRow = new UI.Panel();
-	var radiusSegments = new UI.Integer( geometry.radiusSegments ).setRange( 1, Infinity ).onChange( update );
+	var radiusSegments = new UI.Integer( geometry.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
 	radiusSegmentsRow.add( new UI.Text( 'Radius segments' ).setWidth( '90px' ).setColor( '#666' ) );
 	radiusSegmentsRow.add( radiusSegments );
