@@ -682,7 +682,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 	this.gizmo["scale"].hide();
 
 	this.object = undefined;
-	this.snap = false;
+	this.snap = undefined;
 	this.space = "world";
 	this.size = 1;
 	this.axis = undefined;
@@ -954,7 +954,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 				scope.object.position.copy( oldPosition );
 				scope.object.position.add( point );
 
-				if ( scope.snap == true ) {
+				if ( scope.snap != undefined ) {
 
 					if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
 					if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;

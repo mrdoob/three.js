@@ -30,9 +30,21 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	var changeEvent = { type: 'change' };
 
-	this.focus = function ( target ) {
+	this.focus = function ( target, frame ) {
 
-		center.getPositionFromMatrix( target.matrixWorld );
+		var scale = new THREE.Vector3();
+		target.matrixWorld.decompose( center, new THREE.Quaternion(), scale );
+
+		if ( frame && target.geometry ) {
+
+			scale = ( scale.x + scale.y + scale.z ) / 3;
+			center.add(target.geometry.boundingSphere.center.clone().multiplyScalar( scale ));
+			var radius = target.geometry.boundingSphere.radius * ( scale );
+			var pos = object.position.clone().sub( center ).normalize().multiplyScalar( radius * 2 );
+			object.position.copy( center ).add( pos );
+
+		}
+
 		object.lookAt( center );
 
 		scope.dispatchEvent( changeEvent );
@@ -121,6 +133,7 @@ THREE.EditorControls = function ( object, domElement ) {
 		domElement.addEventListener( 'mousemove', onMouseMove, false );
 		domElement.addEventListener( 'mouseup', onMouseUp, false );
 		domElement.addEventListener( 'mouseout', onMouseUp, false );
+		domElement.addEventListener( 'dblclick', onMouseUp, false );
 
 	}
 
@@ -155,11 +168,10 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		if ( scope.enabled === false ) return;
-
 		domElement.removeEventListener( 'mousemove', onMouseMove, false );
 		domElement.removeEventListener( 'mouseup', onMouseUp, false );
 		domElement.removeEventListener( 'mouseout', onMouseUp, false );
+		domElement.removeEventListener( 'dblclick', onMouseUp, false );
 
 		state = STATE.NONE;
 
