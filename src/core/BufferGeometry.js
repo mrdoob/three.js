@@ -38,6 +38,17 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
+	addAtribute: function( name, type, amount, itemSize ) {
+
+		this.attributes[ name ] = {
+
+			itemSize: 	 itemSize,
+			array: 		 new type( amount * itemSize )
+
+		};
+
+	},
+
 	applyMatrix: function ( matrix ) {
 
 		var positionArray;
