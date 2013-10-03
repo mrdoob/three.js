@@ -12,6 +12,7 @@ THREE.BufferGeometry = function () {
 	// attributes
 
 	this.attributes = {};
+	this.numVertices = 0;
 
 	// attributes typed arrays are kept only if dynamic flag is set
 
@@ -37,6 +38,34 @@ THREE.BufferGeometry = function () {
 THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
+
+	addAtribute: function( name, itemSize ) {
+
+		itemSize = itemSize || 1;
+
+		var arrSize = this.numVertices * itemSize;
+
+		if ( name === 'index' ) {
+
+			this.attributes[ name ] = {
+
+				itemSize: 	 1,
+				array: 		 new Uint16Array( itemSize )
+
+			};
+
+		} else {
+
+			this.attributes[ name ] = {
+
+				itemSize: 	 itemSize,
+				array: 		 new Float32Array( arrSize )
+
+			};
+
+		}
+
+	},
 
 	applyMatrix: function ( matrix ) {
 
