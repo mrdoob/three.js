@@ -34,7 +34,7 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry</div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
@@ -81,24 +81,13 @@
 				var triangles = 160000;
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.attributes = {
-					index: {
-						itemSize: 1,
-						array: new Uint16Array( triangles * 3 )
-					},
-					position: {
-						itemSize: 3,
-						array: new Float32Array( triangles * 3 * 3 )
-					},
-					normal: {
-						itemSize: 3,
-						array: new Float32Array( triangles * 3 * 3 )
-					},
-					color: {
-						itemSize: 3,
-						array: new Float32Array( triangles * 3 * 3 )
-					}
-				}
+				geometry.numVertices = 3 * triangles;
+
+				geometry.addAtribute( 'index', 3 * triangles );
+				geometry.addAtribute( 'position', 3 );
+				geometry.addAtribute( 'position', 3 );
+				geometry.addAtribute( 'normal', 3 );
+				geometry.addAtribute( 'color', 3 );
 
 				// break geometry into
 				// chunks of 21,845 triangles (3 unique vertices per triangle)
