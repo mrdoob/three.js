@@ -138,9 +138,9 @@
 			geometry = new THREE.BufferGeometry();
 			// geometry.dynamic = true;
 
-			geometry.addAtribute( 'position', Float32Array, particles, 3 );
-			geometry.addAtribute( 'customColor', Float32Array, particles, 3 );
-			geometry.addAtribute( 'size', Float32Array, particles, 1 );
+			geometry.addAttribute( 'position', Float32Array, particles, 3 );
+			geometry.addAttribute( 'customColor', Float32Array, particles, 3 );
+			geometry.addAttribute( 'size', Float32Array, particles, 1 );
 			geometry.attributes.size.dynamic = true;
 
 			values_size = geometry.attributes.size.array;

@@ -82,10 +82,10 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAtribute( 'index', Uint16Array, 3 * triangles, 1 );
-				geometry.addAtribute( 'position', Float32Array, 3 * triangles, 3 );
-				geometry.addAtribute( 'normal', Float32Array, 3 * triangles, 3 );
-				geometry.addAtribute( 'color', Float32Array, 3 * triangles, 3 );
+				geometry.addAttribute( 'index', Uint16Array, 3 * triangles, 1 );
+				geometry.addAttribute( 'position', Float32Array, 3 * triangles, 3 );
+				geometry.addAttribute( 'normal', Float32Array, 3 * triangles, 3 );
+				geometry.addAttribute( 'color', Float32Array, 3 * triangles, 3 );
 
 				// break geometry into
 				// chunks of 21,845 triangles (3 unique vertices per triangle)
