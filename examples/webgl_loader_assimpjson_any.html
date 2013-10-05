@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collada - blender</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: red }
+
+			#stats { position: absolute; top:0; left: 0 }
+			#stats #fps { background: transparent !important }
+			#stats #fps #fpsText { color: #aaa !important }
+			#stats #fps #fpsGraph { display: none }
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> -
+			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
+		</div>
+
+		<script src="../build/three.min.js"></script>
+
+		<script src="js/loaders/AssimpJSONLoader.js"></script>
+
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			var container, stats;
+
+			var camera, scene, renderer, objects;
+			var particleLight, pointLight;
+			var dae, skin;
+
+			var clock = new THREE.Clock();
+			var morphs = [];
+
+			// Collada model
+			var loader = new THREE.AssimpJSONLoader();
+			loader.load( 'models/assimp/jeep/jeep1.ms3d.json', function ( assimpjson ) {
+				assimpjson.scale.x = assimpjson.scale.y = assimpjson.scale.z = 0.2;
+				assimpjson.updateMatrix();
+
+				init(assimpjson);
+				animate();
+			} );
+
+			function init(assimpjson) {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 2, 4, 5 );
+
+				scene = new THREE.Scene();
+				scene.fog = new THREE.FogExp2( 0x000000, 0.035 );
+
+				// Grid
+
+				var size = 14, step = 1;
+
+				var geometry = new THREE.Geometry();
+				var material = new THREE.LineBasicMaterial( { color: 0x303030 } );
+
+				for ( var i = - size; i <= size; i += step ) {
+
+					geometry.vertices.push( new THREE.Vector3( - size, - 0.04, i ) );
+					geometry.vertices.push( new THREE.Vector3(   size, - 0.04, i ) );
+
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04, - size ) );
+					geometry.vertices.push( new THREE.Vector3( i, - 0.04,   size ) );
+
+				}
+
+				var line = new THREE.Line( geometry, material, THREE.LinePieces );
+				scene.add( line );
+
+
+				// Add the ASSIMPJSON scene
+
+				scene.add( assimpjson );
+
+				// Lights
+
+				scene.add( new THREE.AmbientLight( 0xcccccc ) );
+
+				var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
+				directionalLight.position.x = Math.random() - 0.5;
+				directionalLight.position.y = Math.random() - 0.5;
+				directionalLight.position.z = Math.random() - 0.5;
+				directionalLight.position.normalize();
+				scene.add( directionalLight );
+
+				//pointLight = new THREE.PointLight( 0xffffff, 4 );
+				//pointLight.position = particleLight.position;
+				//scene.add( pointLight );
+
+				// Renderer
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				container.appendChild( renderer.domElement );
+
+				// Stats
+
+				stats = new Stats();
+				container.appendChild( stats.domElement );
+
+				// Events
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize( event ) {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			//
+
+			var t = 0;
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				// animate Collada model
+
+				if ( t > 30 ) t = 0;
+
+			
+
+				// animate morphs
+
+				var delta = clock.getDelta();
+
+
+				render();
+				stats.update();
+			}
+
+			function render() {
+
+				var timer = Date.now() * 0.0005;
+
+				camera.position.x = Math.cos( timer ) * 10;
+				camera.position.y = 4;
+				camera.position.z = Math.sin( timer ) * 10;
+
+				camera.lookAt( scene.position );
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
