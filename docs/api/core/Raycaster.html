@@ -22,8 +22,8 @@
 		<div>
 		[page:Vector3 origin] — The origin vector where the ray casts from.<br />
 		[page:Vector3 direction] — The direction vector that  gives direction to the ray.<br />
-		[page:Float near] — All results returned are further away then near. Near can't be negative. Default value is 0.<br />
-		[page:Float far] — All results returned are closer then far. Far can't be lower then near . Default value is Infinity.
+		[page:Float near] — Optional. All results returned are further away then near. Near can't be negative.<br />
+		[page:Float far] — Optional. All results returned are closer then far. Far can't be lower then near.
 		</div>
 		<div>
 		This creates a new raycaster object.<br />
@@ -40,13 +40,15 @@
 		<h3>.[page:float near]</h3>
 		<div>
 		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
-		This value shouldn't be negative and should be smaller than the far property. 
+		This value shouldn't be negative and should be smaller than the far property. <br />
+		Default — *0.0*
 		</div>
 
 		<h3>.[page:float far]</h3>
 		<div>
 		The far factor of the raycaster. This value indicates which objects can be discarded based on the distance.<br />
-		This value shouldn't be negative and should be larger than the near property. 
+		This value shouldn't be negative and should be larger than the near property. <br />
+		Default — *Infinity*
 		</div>
 
 		<h3>.[page:float precision]</h3>

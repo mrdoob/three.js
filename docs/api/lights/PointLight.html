@@ -26,15 +26,16 @@ scene.add( light );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo hex], [page:todo intensity], [page:todo distance])</h3>
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:Float distance])</h3>
 		<div>
-		hex -- todo <br />
-		intensity -- todo <br />
-		distance -- todo
+		[page:Integer hex] — Numeric value of the RGB component of the color.<br />
+		[page:Float intensity] — Optional. The intensity of the light.<br />
+		[page:Float distance] — Optional. The distance at which light stops from this source.
 		</div>
 		<div>
-		todo
+		This creates a colored PointLight.
 		</div>
+
 
 
 		<h2>Properties</h2>
@@ -42,7 +43,7 @@ scene.add( light );</code>
 		<h3>.[page:Float intensity]</h3>
 		<div>
 			Light's intensity.<br />
-			Default - *1.0*.
+			Default — *1.0*.
 		</div>
 
 		<h3>.[page:Float distance]</h3>

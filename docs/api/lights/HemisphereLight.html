@@ -16,16 +16,20 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo skyColorHex], [page:todo groundColorHex], [page:todo intensity])</h3>
+		<h3>[name]([page:Integer skyColorHex], [page:Integer groundColorHex], [page:Float intensity])</h3>
         <div>
 		[page:Integer skyColorHex] — Numeric value of the RGB sky color.<br />
 		[page:Integer groundColorHex] — Numeric value of the RGB ground color.<br />
-		[page:Integer intensity] — The intensity of the light.
+		[page:Float intensity] — Optional. The intensity of the light.
 		</div>
+		<div>
+		This creates a HemisphereLight with a sky color and a ground color. 
+		</div>
+
 
 		<h2>Properties</h2>
 
-		<h3>.[page:Float groundColor]</h3>
+		<h3>.[page:Integer groundColor]</h3>
 
 		<div>
 			Light's ground color.<br />
@@ -35,7 +39,7 @@
 
 		<div>
 			Light's intensity.<br />
-			Default — *1*.
+			Default — *1.0*.
 		</div>
 
 		<h2>Methods</h2>

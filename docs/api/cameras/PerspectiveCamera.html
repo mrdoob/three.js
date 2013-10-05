@@ -25,26 +25,34 @@ scene.add( camera );</code>
 
 		<h3>[name]( [page:Float fov], [page:Float aspect], [page:Float near], [page:Float far] )</h3>
 		<div>
-		fov — Camera frustum vertical field of view.<br />
-		aspect — Camera frustum aspect ratio.<br />
-		near — Camera frustum near plane.<br />
-		far — Camera frustum far plane.
+		fov — Optional. Camera frustum vertical field of view.<br />
+		aspect — Optional. Camera frustum aspect ratio.<br />
+		near — Optional. Camera frustum near plane.<br />
+		far — Optional. Camera frustum far plane.
 		</div>
 
 
 		<h2>Properties</h2>
 
 		<h3>.[page:Float fov]</h3>
-		<div>Camera frustum vertical field of view, from bottom to top of view, in degrees.</div>
+		<div>Camera frustum vertical field of view, from bottom to top of view, in degrees.<br />
+			Default - *50*
+		</div>
 
 		<h3>.[page:Float aspect]</h3>
-		<div>Camera frustum aspect ratio, window width divided by window height.</div>
+		<div>Camera frustum aspect ratio, window width divided by window height.<br />
+			Default - *1*
+		</div>
 
 		<h3>.[page:Float near]</h3>
-		<div>Camera frustum near plane.</div>
+		<div>Camera frustum near plane.<br />
+			Default - *0.1*
+		</div>
 
 		<h3>.[page:Float far]</h3>
-		<div>Camera frustum far plane.</div>
+		<div>Camera frustum far plane.<br />
+			Default - *2000*
+		</div>
 
 
 		<h2>Methods</h2>
