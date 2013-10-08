@@ -16,7 +16,6 @@
 				background-color: #ffffff;
 
 				margin: 0px;
-				padding: 19px 0px 30px 180px;
 
 				font-family: 'inconsolata';
 				font-size: 15px;
@@ -38,6 +37,7 @@
 				font-weight: normal;
 
 				margin-top: 12px;
+				margin-bottom: 28px;
 			}
 
 			hr {
@@ -62,16 +62,18 @@
 
 				left: 0px;
 				top: 0px;
+				bottom: 0px;
 
 				width: 140px;
-				height: 100%;
 
 				padding: 20px 20px 0px 20px;
 			}
 
-			.images {
+			#content {
+				position: absolute;
+				left: 180px;
+				top: 30px;
 				line-height: 0px;
-				margin-bottom: 40px;
 			}
 
 		</style>
@@ -122,64 +124,68 @@
 
 		</div>
 
-		<h2>featured projects</h2>
-		<div id="featured" class="images"></div>
-		<script>
+		<div id="content">
 
-		var files = [
+			<h2>featured projects</h2>
+			<div id="featured"></div>
+			<script>
 
-			[ "reflektor", "https://www.justareflektor.com/" ],
-			[ "hellorun", "http://hellorun.helloenjoy.com" ],
-			[ "cubeslam", "http://cubeslam.com/" ],
-			[ "hyperlapse", "http://hyperlapse.tllabs.io/" ],
-			[ "wwmaze", "http://chrome.com/maze/" ],
-			[ "paleodictyon", "http://antivj.com/paleodictyon_app/" ],
-			[ "findyourwaytooz", "http://www.findyourwaytooz.com/" ],
-			[ "voxeljs", "http://voxeljs.com/" ],
-			[ "neverseenthesky", "http://christmasexperiments.com/23/" ],
-			[ "zeitgeist2012", "http://www.google.com/zeitgeist/2012/#explore" ],
-			[ "zoetrope", "http://lab.sehsucht.de/" ],
-			[ "mvsw", "http://www.pillandpillow.com/mvsw/site/" ],
-			[ "thecarpandtheseagull", "http://thecarpandtheseagull.thecreatorsproject.com/" ],
-			[ "100000stars", "http://workshop.chromeexperiments.com/stars/" ],
-			[ "theywilleatyou", "http://theywilleatyou.com/" ],
-			[ "blast", "http://blast.hellohikimori.com/" ],
-			[ "hexgl", "http://hexgl.bkcore.com/" ],
-			[ "armsglobe", "http://workshop.chromeexperiments.com/projects/armsglobe/" ],
-			[ "carvisualizer", "http://carvisualizer.plus360degrees.com/threejs/" ],
-			[ "chromeweblab", "http://www.chromeweblab.com/" ],
-			[ "lightgraffiti", "http://lightgraffiti.littlesun.com/" ],
-			[ "tntfortwo", "http://www.pajamaclubmusic.com/3d/" ],
-			[ "chaostoperfection", "http://www.chaostoperfection.com/" ],
-			[ "livecodelab", "http://www.sketchpatch.net/labs/livecodelabIntro.html" ],
-			[ "kaiopua", "http://collinhover.github.com/kaiopua/" ],
-			[ "physijs", "http://chandlerprall.github.com/Physijs/" ],
-			[ "googlecube", "http://www.playmapscube.com/" ],
-			[ "triggerrally", "http://triggerrally.com/" ],
-			[ "zombiesvscow", "http://yagiz.me/zombiesvscow/" ],
-			[ "threefab", "http://blackjk3.github.com/threefab/" ],
-			[ "nyancat", "http://dl.dropbox.com/u/6213850/WebGL/nyanCat/nyan.html" ],
-			[ "threenodes", "http://idflood.github.com/ThreeNodes.js/public/index.html" ],
-			[ "f50", "http://www.adidas.com/football/uk/pages/f50/" ],
-			[ "lights", "http://lights.elliegoulding.com/" ],
-			[ "beanstalk", "http://inear.se/beanstalk/" ],
-			[ "missioncontrol", "http://superfad.com/missioncontrol/" ],
-			[ "rome", "http://ro.me/" ],
-			[ "globe", "http://data-arts.appspot.com/globe" ],
-			[ "helloracer", "http://helloracer.com/webgl/" ]
+			var files = [
 
-		];
+				[ "reflektor", "https://www.justareflektor.com/" ],
+				[ "hellorun", "http://hellorun.helloenjoy.com" ],
+				[ "cubeslam", "http://cubeslam.com/" ],
+				[ "hyperlapse", "http://hyperlapse.tllabs.io/" ],
+				[ "wwmaze", "http://chrome.com/maze/" ],
+				[ "paleodictyon", "http://antivj.com/paleodictyon_app/" ],
+				[ "findyourwaytooz", "http://www.findyourwaytooz.com/" ],
+				[ "voxeljs", "http://voxeljs.com/" ],
+				[ "neverseenthesky", "http://christmasexperiments.com/23/" ],
+				[ "zeitgeist2012", "http://www.google.com/zeitgeist/2012/#explore" ],
+				[ "zoetrope", "http://lab.sehsucht.de/" ],
+				[ "mvsw", "http://www.pillandpillow.com/mvsw/site/" ],
+				[ "thecarpandtheseagull", "http://thecarpandtheseagull.thecreatorsproject.com/" ],
+				[ "100000stars", "http://workshop.chromeexperiments.com/stars/" ],
+				[ "theywilleatyou", "http://theywilleatyou.com/" ],
+				[ "blast", "http://blast.hellohikimori.com/" ],
+				[ "hexgl", "http://hexgl.bkcore.com/" ],
+				[ "armsglobe", "http://workshop.chromeexperiments.com/projects/armsglobe/" ],
+				[ "carvisualizer", "http://carvisualizer.plus360degrees.com/threejs/" ],
+				[ "chromeweblab", "http://www.chromeweblab.com/" ],
+				[ "lightgraffiti", "http://lightgraffiti.littlesun.com/" ],
+				[ "tntfortwo", "http://www.pajamaclubmusic.com/3d/" ],
+				[ "chaostoperfection", "http://www.chaostoperfection.com/" ],
+				[ "livecodelab", "http://www.sketchpatch.net/labs/livecodelabIntro.html" ],
+				[ "kaiopua", "http://collinhover.github.com/kaiopua/" ],
+				[ "physijs", "http://chandlerprall.github.com/Physijs/" ],
+				[ "googlecube", "http://www.playmapscube.com/" ],
+				[ "triggerrally", "http://triggerrally.com/" ],
+				[ "zombiesvscow", "http://yagiz.me/zombiesvscow/" ],
+				[ "threefab", "http://blackjk3.github.com/threefab/" ],
+				[ "nyancat", "http://dl.dropbox.com/u/6213850/WebGL/nyanCat/nyan.html" ],
+				[ "threenodes", "http://idflood.github.com/ThreeNodes.js/public/index.html" ],
+				[ "f50", "http://www.adidas.com/football/uk/pages/f50/" ],
+				[ "lights", "http://lights.elliegoulding.com/" ],
+				[ "beanstalk", "http://inear.se/beanstalk/" ],
+				[ "missioncontrol", "http://superfad.com/missioncontrol/" ],
+				[ "rome", "http://ro.me/" ],
+				[ "globe", "http://data-arts.appspot.com/globe" ],
+				[ "helloracer", "http://helloracer.com/webgl/" ]
 
-		var element = document.getElementById( 'featured' );
+			];
 
-		for ( var i = 0; i < files.length; i ++ ) {
+			var element = document.getElementById( 'featured' );
 
-			var file = files[ i ];
-			element.innerHTML += '<a href="' + file[ 1 ] + '" target="_blank"><img src="files/projects/' + file[ 0 ] + '.jpg" width="200" height="150"></a>';
+			for ( var i = 0; i < files.length; i ++ ) {
 
-		}
+				var file = files[ i ];
+				element.innerHTML += '<a href="' + file[ 1 ] + '" target="_blank"><img src="files/projects/' + file[ 0 ] + '.jpg" width="200" height="150"></a>';
 
-		</script>
+			}
+
+			</script>
+
+		</div>
 
 	</body>
 </html>
