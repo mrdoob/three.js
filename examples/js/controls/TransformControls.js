@@ -21,7 +21,7 @@ THREE.TransformGizmoMaterial.prototype = Object.create( THREE.MeshBasicMaterial.
 
 THREE.TransformGizmoLineMaterial = function ( parameters ) {
 
-	THREE.MeshBasicMaterial.call( this );
+	THREE.LineBasicMaterial.call( this );
 
 	this.depthTest = false;
 	this.depthWrite = false;
