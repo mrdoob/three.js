@@ -53,6 +53,8 @@ Sidebar.Renderer = function ( editor ) {
 
 		}
 
+		signals.themeChanged.dispatch( { selectedIndex: this.value } );
+
 	} );
 
 	themeRow.add( new UI.Text('Theme').setWidth('90px') );

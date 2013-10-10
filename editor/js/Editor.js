@@ -14,6 +14,7 @@ var Editor = function () {
 		snapChanged: new SIGNALS.Signal(),
 		spaceChanged: new SIGNALS.Signal(),
 		rendererChanged: new SIGNALS.Signal(),
+		themeChanged: new SIGNALS.Signal(),
 
 		sceneGraphChanged: new SIGNALS.Signal(),
 
