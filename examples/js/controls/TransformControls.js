@@ -10,7 +10,7 @@ THREE.TransformGizmoMaterial = function ( parameters ) {
 
 	this.depthTest = false;
 	this.depthWrite = false;
-	this.side = THREE.DoubleSide;
+	this.side = THREE.FrontSide;
 	this.transparent = true;
 
 	this.setValues( parameters );
@@ -300,7 +300,9 @@ THREE.TransformGizmoTranslate = function () {
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		XYZ: [
-			new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.OctahedronGeometry( 0.1, 0 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) ),
+			new THREE.Vector3( 0, 0, 0 ),
+			new THREE.Vector3( 0, 0, 0 )
 		],
 		XY: [
 			new THREE.Mesh( new THREE.PlaneGeometry( 0.29, 0.29 ), new THREE.TransformGizmoMaterial( { color: 0xffff00, opacity: 0.25 } ) ),
