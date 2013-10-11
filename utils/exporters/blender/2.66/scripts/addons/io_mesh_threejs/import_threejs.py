@@ -146,6 +146,7 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
                 #  - to preserve vertex normals from the original data
                 #    call me.update() before setting them
 
+                calc_edges(calc_tessface = True)
                 me.tessfaces[fi].use_smooth = True
 
                 if not recalculate_normals:
@@ -272,7 +273,7 @@ def create_mesh_object(name, vertices, materials, face_data, flipYZ, recalculate
         for fi in range(len(faces)):
 
             if faceMaterials[fi] >= 0:
-
+                calc_edges(calc_tessface = True)
                 me.tessfaces[fi].material_index = faceMaterials[fi]
 
     # Create a new object
