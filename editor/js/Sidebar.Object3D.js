@@ -3,11 +3,9 @@ Sidebar.Object3D = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPadding( '10px' );
 	container.setDisplay( 'none' );
 
-	var objectType = new UI.Text().setColor( '#666' ).setTextTransform( 'uppercase' );
+	var objectType = new UI.Text().setTextTransform( 'uppercase' );
 	container.add( objectType );
 	container.add( new UI.Break(), new UI.Break() );
 
@@ -18,11 +16,12 @@ Sidebar.Object3D = function ( editor ) {
 	var objectUUIDRenew = new UI.Button( '⟳' ).setMarginLeft( '7px' ).onClick( function () {
 
 		objectUUID.setValue( THREE.Math.generateUUID() );
-		update();
+
+		editor.selected.uuid = objectUUID.getValue();
 
 	} );
 
-	objectUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectUUIDRow.add( new UI.Text( 'UUID' ).setWidth( '90px' ) );
 	objectUUIDRow.add( objectUUID );
 	objectUUIDRow.add( objectUUIDRenew );
 
@@ -31,9 +30,13 @@ Sidebar.Object3D = function ( editor ) {
 	// name
 
 	var objectNameRow = new UI.Panel();
-	var objectName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
+	var objectName = new UI.Input().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
 
-	objectNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ).setColor( '#666' ) );
+			editor.setObjectName( editor.selected, objectName.getValue() );
+
+	} );
+
+	objectNameRow.add( new UI.Text( 'Name' ).setWidth( '90px' ) );
 	objectNameRow.add( objectName );
 
 	container.add( objectNameRow );
@@ -43,7 +46,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectParentRow = new UI.Panel();
 	var objectParent = new UI.Select().setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
-	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectParentRow.add( new UI.Text( 'Parent' ).setWidth( '90px' ) );
 	objectParentRow.add( objectParent );
 
 	container.add( objectParentRow );
@@ -55,7 +58,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectPositionY = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectPositionZ = new UI.Number().setWidth( '50px' ).onChange( update );
 
-	objectPositionRow.add( new UI.Text( 'Position' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectPositionRow.add( new UI.Text( 'Position' ).setWidth( '90px' ) );
 	objectPositionRow.add( objectPositionX, objectPositionY, objectPositionZ );
 
 	container.add( objectPositionRow );
@@ -67,7 +70,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectRotationY = new UI.Number().setWidth( '50px' ).onChange( update );
 	var objectRotationZ = new UI.Number().setWidth( '50px' ).onChange( update );
 
-	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectRotationRow.add( new UI.Text( 'Rotation' ).setWidth( '90px' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
 
 	container.add( objectRotationRow );
@@ -80,7 +83,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectScaleY = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleY );
 	var objectScaleZ = new UI.Number( 1 ).setWidth( '50px' ).onChange( updateScaleZ );
 
-	objectScaleRow.add( new UI.Text( 'Scale' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectScaleRow.add( new UI.Text( 'Scale' ).setWidth( '90px' ) );
 	objectScaleRow.add( objectScaleLock );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
 
@@ -91,7 +94,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectFovRow = new UI.Panel();
 	var objectFov = new UI.Number().onChange( update );
 
-	objectFovRow.add( new UI.Text( 'Fov' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectFovRow.add( new UI.Text( 'Fov' ).setWidth( '90px' ) );
 	objectFovRow.add( objectFov );
 
 	container.add( objectFovRow );
@@ -101,7 +104,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectNearRow = new UI.Panel();
 	var objectNear = new UI.Number().onChange( update );
 
-	objectNearRow.add( new UI.Text( 'Near' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectNearRow.add( new UI.Text( 'Near' ).setWidth( '90px' ) );
 	objectNearRow.add( objectNear );
 
 	container.add( objectNearRow );
@@ -111,7 +114,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectFarRow = new UI.Panel();
 	var objectFar = new UI.Number().onChange( update );
 
-	objectFarRow.add( new UI.Text( 'Far' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectFarRow.add( new UI.Text( 'Far' ).setWidth( '90px' ) );
 	objectFarRow.add( objectFar );
 
 	container.add( objectFarRow );
@@ -121,7 +124,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectIntensityRow = new UI.Panel();
 	var objectIntensity = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
-	objectIntensityRow.add( new UI.Text( 'Intensity' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectIntensityRow.add( new UI.Text( 'Intensity' ).setWidth( '90px' ) );
 	objectIntensityRow.add( objectIntensity );
 
 	container.add( objectIntensityRow );
@@ -131,7 +134,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectColorRow = new UI.Panel();
 	var objectColor = new UI.Color().onChange( update );
 
-	objectColorRow.add( new UI.Text( 'Color' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectColorRow.add( new UI.Text( 'Color' ).setWidth( '90px' ) );
 	objectColorRow.add( objectColor );
 
 	container.add( objectColorRow );
@@ -141,7 +144,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectGroundColorRow = new UI.Panel();
 	var objectGroundColor = new UI.Color().onChange( update );
 
-	objectGroundColorRow.add( new UI.Text( 'Ground color' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectGroundColorRow.add( new UI.Text( 'Ground color' ).setWidth( '90px' ) );
 	objectGroundColorRow.add( objectGroundColor );
 
 	container.add( objectGroundColorRow );
@@ -151,7 +154,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectDistanceRow = new UI.Panel();
 	var objectDistance = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
-	objectDistanceRow.add( new UI.Text( 'Distance' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectDistanceRow.add( new UI.Text( 'Distance' ).setWidth( '90px' ) );
 	objectDistanceRow.add( objectDistance );
 
 	container.add( objectDistanceRow );
@@ -161,7 +164,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectAngleRow = new UI.Panel();
 	var objectAngle = new UI.Number().setPrecision( 3 ).setRange( 0, Math.PI / 2 ).onChange( update );
 
-	objectAngleRow.add( new UI.Text( 'Angle' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectAngleRow.add( new UI.Text( 'Angle' ).setWidth( '90px' ) );
 	objectAngleRow.add( objectAngle );
 
 	container.add( objectAngleRow );
@@ -171,7 +174,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectExponentRow = new UI.Panel();
 	var objectExponent = new UI.Number().setRange( 0, Infinity ).onChange( update );
 
-	objectExponentRow.add( new UI.Text( 'Exponent' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectExponentRow.add( new UI.Text( 'Exponent' ).setWidth( '90px' ) );
 	objectExponentRow.add( objectExponent );
 
 	container.add( objectExponentRow );
@@ -181,7 +184,7 @@ Sidebar.Object3D = function ( editor ) {
 	var objectVisibleRow = new UI.Panel();
 	var objectVisible = new UI.Checkbox().onChange( update );
 
-	objectVisibleRow.add( new UI.Text( 'Visible' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectVisibleRow.add( new UI.Text( 'Visible' ).setWidth( '90px' ) );
 	objectVisibleRow.add( objectVisible );
 
 	container.add( objectVisibleRow );
@@ -207,7 +210,7 @@ Sidebar.Object3D = function ( editor ) {
 
 	} );
 
-	objectUserDataRow.add( new UI.Text( 'User data' ).setWidth( '90px' ).setColor( '#666' ) );
+	objectUserDataRow.add( new UI.Text( 'User data' ).setWidth( '90px' ) );
 	objectUserDataRow.add( objectUserData );
 
 	container.add( objectUserDataRow );
@@ -271,9 +274,6 @@ Sidebar.Object3D = function ( editor ) {
 		var object = editor.selected;
 
 		if ( object !== null ) {
-
-			object.uuid = objectUUID.getValue();
-			object.name = objectName.getValue();
 
 			if ( object.parent !== undefined ) {
 

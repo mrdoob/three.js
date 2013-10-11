@@ -17,6 +17,8 @@ var Editor = function () {
 
 		sceneGraphChanged: new SIGNALS.Signal(),
 
+		cameraChanged: new SIGNALS.Signal(),
+
 		objectSelected: new SIGNALS.Signal(),
 		objectAdded: new SIGNALS.Signal(),
 		objectChanged: new SIGNALS.Signal(),
@@ -26,7 +28,6 @@ var Editor = function () {
 		helperRemoved: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
-		clearColorChanged: new SIGNALS.Signal(),
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
@@ -56,11 +57,18 @@ Editor.prototype = {
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
+		// avoid render per object
+
+		this.signals.sceneGraphChanged.active = false;
+
 		while ( scene.children.length > 0 ) {
 
 			this.addObject( scene.children[ 0 ] );
 
 		}
+
+		this.signals.sceneGraphChanged.active = true;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -82,6 +90,13 @@ Editor.prototype = {
 		this.scene.add( object );
 
 		this.signals.objectAdded.dispatch( object );
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	setObjectName: function ( object, name ) {
+
+		object.name = name;
 		this.signals.sceneGraphChanged.dispatch();
 
 	},
@@ -113,9 +128,23 @@ Editor.prototype = {
 
 	},
 
+	setGeometryName: function ( geometry, name ) {
+
+		geometry.name = name;
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
 	addMaterial: function ( material ) {
 
 		this.materials[ material.uuid ] = material;
+
+	},
+
+	setMaterialName: function ( material, name ) {
+
+		material.name = name;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 

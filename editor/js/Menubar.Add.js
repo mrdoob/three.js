@@ -7,7 +7,7 @@ Menubar.Add = function ( editor ) {
 	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
-	title.setTextContent( 'Add' ).setColor( '#666' );
+	title.setTextContent( 'Add' );
 	title.setMargin( '0px' );
 	title.setPadding( '8px' );
 	container.add( title );

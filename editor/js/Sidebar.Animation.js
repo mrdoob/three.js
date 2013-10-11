@@ -6,16 +6,14 @@ Sidebar.Animation = function ( editor ) {
 	var possibleAnimations = {};
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPadding( '10px' );
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text( 'Animation' ).setColor( '#666' ) );
+	container.add( new UI.Text( 'Animation' ) );
 	container.add( new UI.Break(), new UI.Break() );
 
 	var AnimationsRow = new UI.Panel();
 	var Animations = new UI.Select().setOptions( options ).setWidth( '130px' ).setColor( '#444' ).setFontSize( '12px' );
-	AnimationsRow.add( new UI.Text( 'animations' ).setWidth( '90px' ).setColor( '#666' ) );
+	AnimationsRow.add( new UI.Text( 'animations' ).setWidth( '90px' ) );
 	AnimationsRow.add( Animations );
 	container.add( AnimationsRow );
 	container.add( new UI.Break() );
