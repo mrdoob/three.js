@@ -41,7 +41,7 @@ THREE.AssimpJSONLoader.prototype = {
 	parse: function ( json ) {
 		var meshes = this.parseList ( json.meshes, this.parseMesh );
 		var materials = this.parseList ( json.materials, this.parseMaterial );
-		return this.parseObject( json.rootnode, meshes, materials );
+		return this.parseObject( json, json.rootnode, meshes, materials );
 	},
 
 	parseList : function(json, handler) {
@@ -264,8 +264,26 @@ THREE.AssimpJSONLoader.prototype = {
 		return mat;
 	},
 
-	parseObject : function(json, meshes, materials) {
-		return new THREE.Mesh( meshes[0], materials[0] );
+	parseObject : function(json, node, meshes, materials) {
+		var obj = new THREE.Object3D()
+		,	i
+		,	idx
+		;
+
+		obj.name = node.name || "";
+		obj.matrix = new THREE.Matrix4().fromArray(node.transformation).transpose();
+		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
+
+		for(i = 0; node.meshes && i < node.meshes.length; ++i) {
+			idx = node.meshes[i];
+			obj.add(new THREE.Mesh( meshes[idx], materials[json.meshes[idx].materialindex] ));
+		}
+
+		for(i = 0; node.children && i < node.children.length; ++i) {
+			obj.add(this.parseObject(json, node.children[i], meshes, materials));
+		}
+
+		return obj;
 	},
 };
 
