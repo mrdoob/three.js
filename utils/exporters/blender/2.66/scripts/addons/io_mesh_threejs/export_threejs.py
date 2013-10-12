@@ -1299,7 +1299,6 @@ def generate_ascii_model(meshes, morphs,
                          filepath,
                          option_animation_morph,
                          option_animation_skeletal,
-                         #option_all_animations,
                          option_frame_step):
 
     vertices = []
@@ -1483,7 +1482,6 @@ def generate_mesh_string(objects, scene,
                 filepath,
                 option_animation_morph,
                 option_animation_skeletal,
-                #option_all_animations,
                 option_frame_step):
 
     meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
@@ -1548,7 +1546,6 @@ def generate_mesh_string(objects, scene,
                                 filepath,
                                 option_animation_morph,
                                 option_animation_skeletal,
-                                #option_all_animations,
                                 option_frame_step)
 
     # remove temp meshes
@@ -1576,7 +1573,6 @@ def export_mesh(objects,
                 option_copy_textures,
                 option_animation_morph,
                 option_animation_skeletal,
-                #option_all_animations,
                 option_frame_step):
 
     """Export single mesh"""
@@ -1600,7 +1596,6 @@ def export_mesh(objects,
                 filepath,
                 option_animation_morph,
                 option_animation_skeletal,
-                #option_all_animations,
                 option_frame_step)
 
     write_file(filepath, text)
@@ -2337,7 +2332,6 @@ def save(operator, context, filepath = "",
          option_copy_textures = False,
          option_animation_morph = False,
          option_animation_skeletal = False,
-         #option_all_animations = False,
          option_frame_step = 1,
          option_all_meshes = True):
 
@@ -2461,7 +2455,6 @@ def save(operator, context, filepath = "",
                     option_copy_textures,
                     option_animation_morph,
                     option_animation_skeletal,
-                    #option_all_animations,
                     option_frame_step)
 
     return {'FINISHED'}
