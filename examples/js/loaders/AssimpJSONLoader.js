@@ -214,6 +214,10 @@ THREE.AssimpJSONLoader.prototype = {
 						loader.setCrossOrigin(this.crossOrigin);
 						loader.load(scope.texturePath + '/' + prop.value, function(tex) {
 							if(tex) {
+								// TODO: read texture settings from assimp.
+								// Wrapping is the default, though.
+								tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+
 								mat[keyname] = tex;
 								mat.needsUpdate = true;
 							}
