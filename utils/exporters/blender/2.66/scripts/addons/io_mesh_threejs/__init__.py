@@ -222,7 +222,7 @@ def save_settings_export(properties):
     "option_scale"        : properties.option_scale,
 
     "align_model"         : properties.align_model,
-    "option_all_animation" : properties.option_all_animations
+    #"option_all_animation" : properties.option_all_animations
     }
 
     fname = get_settings_fullpath()
@@ -268,7 +268,7 @@ def restore_settings_export(properties):
 
     properties.option_frame_step = settings.get("option_frame_step", 1)
     properties.option_all_meshes = settings.get("option_all_meshes", True)
-    properties.option_all_animations = settings.get("option_all_animations", True)
+    #properties.option_all_animations = settings.get("option_all_animations", True)
 
 # ################################################################
 # Exporter
@@ -317,7 +317,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     option_frame_step = IntProperty(name = "Frame step", description = "Animation frame step", min = 1, max = 1000, soft_min = 1, soft_max = 1000, default = 1)
     option_all_meshes = BoolProperty(name = "All meshes", description = "All meshes (merged)", default = True)
-    option_all_animations = BoolProperty(name = "All animations", description = "All animations", default = True)
+    #option_all_animations = BoolProperty(name = "All animations", description = "All animations", default = False)
 
     def invoke(self, context, event):
         restore_settings_export(self.properties)
@@ -414,8 +414,8 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
         row = layout.row()
         row.prop(self.properties, "option_animation_skeletal")
         row = layout.row()
-        row.prop(self.properties, "option_all_animations")
-        row = layout.row()
+        #row.prop(self.properties, "option_all_animations")
+        #row = layout.row()
         row.prop(self.properties, "option_frame_step")
         layout.separator()
 

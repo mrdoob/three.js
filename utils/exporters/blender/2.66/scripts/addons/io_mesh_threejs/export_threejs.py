@@ -267,7 +267,6 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"skinWeights" : [%(weights)s],
 
-	"animation"  : {%(animation)s},
         "animations" : [%(animations)s]
 """
 
@@ -933,9 +932,9 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz, act
 
     return animation_string
 
-def generate_all_animations(option_animation_skeletal, option_frame_step, flipyz, option_all_animations):
+def generate_all_animations(option_animation_skeletal, option_frame_step, flipyz):
     all_animations_string = ""
-    if option_all_animations:
+    if option_animation_skeletal:
         for index in range(0, len(bpy.data.actions)):
             if index != 0 :
                 all_animations_string += ", \n"
@@ -1300,7 +1299,7 @@ def generate_ascii_model(meshes, morphs,
                          filepath,
                          option_animation_morph,
                          option_animation_skeletal,
-                         option_all_animations,
+                         #option_all_animations,
                          option_frame_step):
 
     vertices = []
@@ -1401,8 +1400,7 @@ def generate_ascii_model(meshes, morphs,
     "bones"     : bones_string,
     "indices"   : indices_string,
     "weights"   : weights_string,
-    "animation" : generate_animation(option_animation_skeletal, option_frame_step, flipyz, 0),
-    "animations" : generate_all_animations(option_animation_skeletal, option_frame_step, flipyz, option_all_animations)
+    "animations" : generate_all_animations(option_animation_skeletal, option_frame_step, flipyz)
     }
 
     text = TEMPLATE_FILE_ASCII % {
@@ -1485,7 +1483,7 @@ def generate_mesh_string(objects, scene,
                 filepath,
                 option_animation_morph,
                 option_animation_skeletal,
-                option_all_animations,
+                #option_all_animations,
                 option_frame_step):
 
     meshes = extract_meshes(objects, scene, export_single_model, option_scale, flipyz)
@@ -1550,7 +1548,7 @@ def generate_mesh_string(objects, scene,
                                 filepath,
                                 option_animation_morph,
                                 option_animation_skeletal,
-                                option_all_animations,
+                                #option_all_animations,
                                 option_frame_step)
 
     # remove temp meshes
@@ -1578,7 +1576,7 @@ def export_mesh(objects,
                 option_copy_textures,
                 option_animation_morph,
                 option_animation_skeletal,
-                option_all_animations,
+                #option_all_animations,
                 option_frame_step):
 
     """Export single mesh"""
@@ -1602,7 +1600,7 @@ def export_mesh(objects,
                 filepath,
                 option_animation_morph,
                 option_animation_skeletal,
-                option_all_animations,
+                #option_all_animations,
                 option_frame_step)
 
     write_file(filepath, text)
@@ -2339,7 +2337,7 @@ def save(operator, context, filepath = "",
          option_copy_textures = False,
          option_animation_morph = False,
          option_animation_skeletal = False,
-         option_all_animations = False,
+         #option_all_animations = False,
          option_frame_step = 1,
          option_all_meshes = True):
 
@@ -2463,7 +2461,7 @@ def save(operator, context, filepath = "",
                     option_copy_textures,
                     option_animation_morph,
                     option_animation_skeletal,
-                    option_all_animations,
+                    #option_all_animations,
                     option_frame_step)
 
     return {'FINISHED'}
