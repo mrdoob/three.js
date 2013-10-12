@@ -81,24 +81,11 @@
 				var triangles = 160000;
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.attributes = {
-					index: {
-						itemSize: 1,
-						array: new Uint16Array( triangles * 3 )
-					},
-					position: {
-						itemSize: 3,
-						array: new Float32Array( triangles * 3 * 3 )
-					},
-					normal: {
-						itemSize: 3,
-						array: new Float32Array( triangles * 3 * 3 )
-					},
-					color: {
-						itemSize: 3,
-						array: new Float32Array( triangles * 3 * 3 )
-					}
-				}
+
+				geometry.addAttribute( 'index', Uint16Array, triangles * 3, 1 );
+				geometry.addAttribute( 'position', Float32Array, triangles * 3, 3 );
+				geometry.addAttribute( 'normal', Float32Array, triangles * 3, 3 );
+				geometry.addAttribute( 'color', Float32Array, triangles * 3, 3 );
 
 				// break geometry into
 				// chunks of 21,845 triangles (3 unique vertices per triangle)
