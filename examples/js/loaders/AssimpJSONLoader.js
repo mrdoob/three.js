@@ -1,6 +1,14 @@
 /**
  * @author Alexander Gessler / http://www.greentoken.de/
  * https://github.com/acgessler
+ *
+ * Loader for models imported with Open Asset Import Library (http://assimp.sf.net)
+ * through assimp2json (https://github.com/acgessler/assimp2json).
+ *
+ * Supports any input format that assimp supports, including 3ds, obj, dae, blend,
+ * fbx, x, ms3d, lwo (and many more).
+ *
+ * See webgl_loader_assimp2json example.
  */
 
 THREE.AssimpJSONLoader = function ( manager ) {
