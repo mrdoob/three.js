@@ -8114,7 +8114,7 @@ THREE.Projector = function () {
 
 				_vector4.z *= invW;
 
-				if ( _vector4.z > 0 && _vector4.z < 1 ) {
+				if ( _vector4.z > -1 && _vector4.z < 1 ) {
 
 					_particle = getNextParticleInPool();
 					_particle.id = object.id;
