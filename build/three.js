@@ -6896,7 +6896,16 @@ THREE.EventDispatcher.prototype = {
 								positions[ c * 3 + 2 ]
 							);
 
-							var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+							
+							if ( material.side === THREE.BackSide ) {
+							
+								var intersectionPoint = localRay.intersectTriangle( vC, vB, vA, true ); 
+
+							} else {
+
+								var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+
+							}
 
 							if ( intersectionPoint === null ) continue;
 
@@ -6950,7 +6959,16 @@ THREE.EventDispatcher.prototype = {
 							positions[ c * 3 + 2 ]
 						);
 
-						var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+						
+						if ( material.side === THREE.BackSide ) {
+							
+							var intersectionPoint = localRay.intersectTriangle( vC, vB, vA, true ); 
+
+						} else {
+
+							var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+
+						}
 
 						if ( intersectionPoint === null ) continue;
 
@@ -6996,7 +7014,15 @@ THREE.EventDispatcher.prototype = {
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 					
-					var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+					if ( material.side === THREE.BackSide ) {
+							
+						var intersectionPoint = localRay.intersectTriangle( c, b, a, true ); 
+
+					} else {
+								
+						var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+
+					}
 
 					if ( intersectionPoint === null ) continue;
 
