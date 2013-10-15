@@ -7,6 +7,10 @@ The aim of the project is to create a lightweight 3D library with a very low lev
 
 [Examples](http://threejs.org/) — [Documentation](http://threejs.org/docs/) — [Migrating](https://github.com/mrdoob/three.js/wiki/Migration) — [Help](http://stackoverflow.com/questions/tagged/three.js)
 
+Or browse the code and run the example in a Web IDE, Just click on the button below.
+
+[![IDE](https://codio-public.s3.amazonaws.com/sharing/demo-in-ide.png)](https://codio.com/codio/threejs/master/tree/README.md)
+
 
 ### Usage ###
 
