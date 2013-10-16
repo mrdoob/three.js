@@ -648,6 +648,10 @@ UI.Number = function ( number ) {
 
 			dom.value = number;
 
+		} else {
+
+			dom.value = '0.00';
+
 		}
 
 	};
