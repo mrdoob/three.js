@@ -88,7 +88,7 @@
 				var loader = new THREE.VRMLLoader();
 				loader.addEventListener( 'load', function ( event ) {
 
-					scene = event.content;
+					scene.add(event.content);
 
 				} );
 				loader.load( "models/vrml/simple.wrl" );

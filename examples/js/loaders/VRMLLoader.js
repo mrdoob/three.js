@@ -91,9 +91,9 @@ THREE.VRMLLoader.prototype = {
 			}
 
 			var defines = {};
-			var float_pattern = /( +[\d|\.|\+|\-|e]+)/;
-			var float3_pattern = /( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+)/;
-			var float4_pattern = /( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+)/;
+			var float_pattern = /\s+([\d|\.|\+|\-|e]+)/;
+			var float3_pattern = /\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+)/;
+			var float4_pattern = /\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+)/;
 
 			var parseNode = function ( data, parent ) {
 
@@ -257,7 +257,7 @@ THREE.VRMLLoader.prototype = {
 
 					} else if ( /Sphere/.exec( data.string ) ) {
 
-						var result = /radius( +[\d|\.|\+|\-|e]+)/.exec( data.children[ 0 ] );
+						var result = /radius\s+([\d|\.|\+|\-|e]+)/.exec( data.children[ 0 ] );
 
 						parent.geometry = new THREE.SphereGeometry( parseFloat( result[ 1 ] ) );
 
@@ -311,7 +311,7 @@ THREE.VRMLLoader.prototype = {
 
 								} else if ( /transparency/.exec( parameter ) ) {
 
-									var result = /( +[\d|\.|\+|\-|e]+)/.exec( parameter );
+									var result = /\s+([\d|\.|\+|\-|e]+)/.exec( parameter );
 
 									material.opacity = parseFloat( result[ 1 ] );
 									material.transparent = true;
