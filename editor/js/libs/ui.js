@@ -644,15 +644,7 @@ UI.Number = function ( number ) {
 
 		var number = parseFloat( dom.value );
 
-		if ( isNaN( number ) === false ) {
-
-			dom.value = number;
-
-		} else {
-
-			dom.value = '0.00';
-
-		}
+		dom.value = isNaN( number ) === false ? number : 0;
 
 	};
 
