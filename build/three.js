@@ -15720,7 +15720,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var width, height, scaleX, scaleY,
 		bitmap, bitmapWidth, bitmapHeight;
 
-		if ( material instanceof THREE.Sprite ||
+		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
 			if ( material.map === null ) {
