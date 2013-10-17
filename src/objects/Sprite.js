@@ -37,3 +37,6 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
+// Backwards compatibility
+
+THREE.Particle = THREE.Sprite;
