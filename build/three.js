@@ -6790,7 +6790,7 @@ THREE.EventDispatcher.prototype = {
 
 	var intersectObject = function ( object, raycaster, intersects ) {
 
-		if ( object instanceof THREE.Particle ) {
+		if ( object instanceof THREE.Sprite ) {
 
 			matrixPosition.getPositionFromMatrix( object.matrixWorld );
 			var distance = raycaster.ray.distanceToPoint( matrixPosition );
@@ -7733,7 +7733,7 @@ THREE.Projector = function () {
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
 	_face, _face3Count, _face3Pool = [], _face3PoolLength = 0,
 	_line, _lineCount, _linePool = [], _linePoolLength = 0,
-	_particle, _particleCount, _particlePool = [], _particlePoolLength = 0,
+	_sprite, _spriteCount, _spritePool = [], _spritePoolLength = 0,
 
 	_renderData = { objects: [], sprites: [], lights: [], elements: [] },
 
@@ -7835,7 +7835,7 @@ THREE.Projector = function () {
 
 			}
 
-		} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
+		} else if ( object instanceof THREE.Sprite ) {
 
 			_renderData.sprites.push( getObject( object ) );
 
@@ -7876,7 +7876,7 @@ THREE.Projector = function () {
 
 		_face3Count = 0;
 		_lineCount = 0;
-		_particleCount = 0;
+		_spriteCount = 0;
 
 		_renderData.elements.length = 0;
 
@@ -8105,7 +8105,7 @@ THREE.Projector = function () {
 
 			_modelMatrix = object.matrixWorld;
 
-			if ( object instanceof THREE.Particle ) {
+			if ( object instanceof THREE.Sprite ) {
 
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
 				_vector4.applyMatrix4( _viewProjectionMatrix );
@@ -8116,21 +8116,21 @@ THREE.Projector = function () {
 
 				if ( _vector4.z > -1 && _vector4.z < 1 ) {
 
-					_particle = getNextParticleInPool();
-					_particle.id = object.id;
-					_particle.x = _vector4.x * invW;
-					_particle.y = _vector4.y * invW;
-					_particle.z = _vector4.z;
-					_particle.object = object;
+					_sprite = getNextSpriteInPool();
+					_sprite.id = object.id;
+					_sprite.x = _vector4.x * invW;
+					_sprite.y = _vector4.y * invW;
+					_sprite.z = _vector4.z;
+					_sprite.object = object;
 
-					_particle.rotation = object.rotation.z;
+					_sprite.rotation = object.rotation;
 
-					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
-					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
+					_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
+					_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
 
-					_particle.material = object.material;
+					_sprite.material = object.material;
 
-					_renderData.elements.push( _particle );
+					_renderData.elements.push( _sprite );
 
 				}
 
@@ -8211,19 +8211,19 @@ THREE.Projector = function () {
 
 	}
 
-	function getNextParticleInPool() {
+	function getNextSpriteInPool() {
 
-		if ( _particleCount === _particlePoolLength ) {
+		if ( _spriteCount === _spritePoolLength ) {
 
-			var particle = new THREE.RenderableParticle();
-			_particlePool.push( particle );
-			_particlePoolLength ++;
-			_particleCount ++
-			return particle;
+			var sprite = new THREE.RenderableSprite();
+			_spritePool.push( sprite );
+			_spritePoolLength ++;
+			_spriteCount ++
+			return sprite;
 
 		}
 
-		return _particlePool[ _particleCount ++ ];
+		return _spritePool[ _spriteCount ++ ];
 
 	}
 
@@ -13874,7 +13874,7 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
  * }
  */
 
-THREE.ParticleBasicMaterial = function ( parameters ) {
+THREE.ParticleSystemMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -13893,11 +13893,11 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.ParticleSystemMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleBasicMaterial.prototype.clone = function () {
+THREE.ParticleSystemMaterial.prototype.clone = function () {
 
-	var material = new THREE.ParticleBasicMaterial();
+	var material = new THREE.ParticleSystemMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -13916,42 +13916,9 @@ THREE.ParticleBasicMaterial.prototype.clone = function () {
 
 };
 
-/**
- * @author mrdoob / http://mrdoob.com/
- *
- * parameters = {
- *  color: <hex>,
- *  program: <function>,
- *  opacity: <float>,
- *  blending: THREE.NormalBlending
- * }
- */
+// backwards compatibility
 
-THREE.ParticleCanvasMaterial = function ( parameters ) {
-
-	THREE.Material.call( this );
-
-	this.color = new THREE.Color( 0xffffff );
-	this.program = function ( context, color ) {};
-
-	this.setValues( parameters );
-
-};
-
-THREE.ParticleCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
-
-THREE.ParticleCanvasMaterial.prototype.clone = function () {
-
-	var material = new THREE.ParticleCanvasMaterial();
-
-	THREE.Material.prototype.clone.call( this, material );
-
-	material.color.copy( this.color );
-	material.program = this.program;
-
-	return material;
-
-};
+THREE.ParticleBasicMaterial = THREE.ParticleSystemMaterial;
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -14158,6 +14125,46 @@ THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -0.5, 0.5 );
 
 /**
  * @author mrdoob / http://mrdoob.com/
+ *
+ * parameters = {
+ *  color: <hex>,
+ *  program: <function>,
+ *  opacity: <float>,
+ *  blending: THREE.NormalBlending
+ * }
+ */
+
+THREE.SpriteCanvasMaterial = function ( parameters ) {
+
+	THREE.Material.call( this );
+
+	this.color = new THREE.Color( 0xffffff );
+	this.program = function ( context, color ) {};
+
+	this.setValues( parameters );
+
+};
+
+THREE.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.SpriteCanvasMaterial.prototype.clone = function () {
+
+	var material = new THREE.SpriteCanvasMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+	material.program = this.program;
+
+	return material;
+
+};
+
+// backwards compatibility
+
+THREE.ParticleCanvasMaterial = THREE.SpriteCanvasMaterial;
+/**
+ * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
  * @author szimek / https://github.com/szimek/
  */
@@ -14298,30 +14305,6 @@ THREE.DataTexture.prototype.clone = function () {
 };
 
 /**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Particle = function ( material ) {
-
-	THREE.Object3D.call( this );
-
-	this.material = material;
-
-};
-
-THREE.Particle.prototype = Object.create( THREE.Object3D.prototype );
-
-THREE.Particle.prototype.clone = function ( object ) {
-
-	if ( object === undefined ) object = new THREE.Particle( this.material );
-
-	THREE.Object3D.prototype.clone.call( this, object );
-
-	return object;
-
-};
-
-/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -14330,7 +14313,7 @@ THREE.ParticleSystem = function ( geometry, material ) {
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
-	this.material = material !== undefined ? material : new THREE.ParticleBasicMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new THREE.ParticleSystemMaterial( { color: Math.random() * 0xffffff } );
 
 	this.sortParticles = false;
 	this.frustumCulled = false;
@@ -15112,7 +15095,9 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
+// Backwards compatibility
 
+THREE.Particle = THREE.Sprite;
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -15571,12 +15556,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_elemBox.makeEmpty();
 
-			if ( element instanceof THREE.RenderableParticle ) {
+			if ( element instanceof THREE.RenderableSprite ) {
 
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
-				renderParticle( _v1, element, material );
+				renderSprite( _v1, element, material );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -15669,13 +15654,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				// for particles
+				// for sprites
 
 				_directionalLights.add( lightColor );
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				// for particles
+				// for sprites
 
 				_pointLights.add( lightColor );
 
@@ -15727,7 +15712,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
-	function renderParticle( v1, element, material ) {
+	function renderSprite( v1, element, material ) {
 
 		setOpacity( material.opacity );
 		setBlending( material.blending );
@@ -15735,7 +15720,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var width, height, scaleX, scaleY,
 		bitmap, bitmapWidth, bitmapHeight;
 
-		if ( material instanceof THREE.ParticleBasicMaterial ) {
+		if ( material instanceof THREE.Sprite ||
+			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
 			if ( material.map === null ) {
 
@@ -15811,7 +15797,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.stroke();
 			*/
 
-		} else if ( material instanceof THREE.ParticleCanvasMaterial ) {
+		} else if ( material instanceof THREE.SpriteCanvasMaterial ) {
 
 			width = element.scale.x * _canvasWidthHalf;
 			height = element.scale.y * _canvasHeightHalf;
@@ -23689,7 +23675,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			shaderID = 'dashed';
 
-		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+		} else if ( material instanceof THREE.ParticleSystemMaterial ) {
 
 			shaderID = 'particle_basic';
 
@@ -23956,7 +23942,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				refreshUniformsLine( m_uniforms, material );
 				refreshUniformsDash( m_uniforms, material );
 
-			} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+			} else if ( material instanceof THREE.ParticleSystemMaterial ) {
 
 				refreshUniformsParticle( m_uniforms, material );
 
@@ -26316,7 +26302,7 @@ THREE.RenderableObject = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.RenderableParticle = function () {
+THREE.RenderableSprite = function () {
 
 	this.id = 0;
 
@@ -26326,7 +26312,7 @@ THREE.RenderableParticle = function () {
 	this.y = 0;
 	this.z = 0;
 
-	this.rotation = null;
+	this.rotation = 0;
 	this.scale = new THREE.Vector2();
 
 	this.material = null;
