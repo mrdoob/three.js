@@ -123,7 +123,6 @@ THREE.VRMLLoader.prototype = {
 				var object = parent;
 
 				if ( /Transform/.exec( data.string ) || /Group/.exec( data.string ) ) {
-
 					object = new THREE.Object3D();
 
 					if ( /DEF/.exec( data.string ) ) {
@@ -264,6 +263,8 @@ THREE.VRMLLoader.prototype = {
 					} else if ( /IndexedFaceSet/.exec( data.string ) ) {
 
                         var geometry = new THREE.Geometry();
+                       // var geometry = parent.geometry;
+                        var isRecordingCoordinates = false;
 
                         for (var i = 0, j = data.children.length; i < j; i++) {
 
@@ -271,7 +272,7 @@ THREE.VRMLLoader.prototype = {
 
                             var result;
                             var vec;
-                           // todo: try if you can use parseNode here, to parse the Coordinate node
+
                             if ( /Coordinate/.exec (child.string)) {
 
                                 for (var k = 0, l = child.children.length; k < l; k++) {
@@ -291,28 +292,73 @@ THREE.VRMLLoader.prototype = {
                                 }
                             }
 
-                            // parse coordIndex lines
-                            if ( null != ( result = /\s?(\d+)\s?,\s?(\d+)\s?,\s?(\d+)\s?,\s?(-?\d+)\s?,/.exec(child) ) ) {
-                                debugger;
-                                // todo: vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+                            if (/coordIndex/.exec(child)) {
+                                isRecordingCoordinates = true;
+                            }
 
-                                geometry.faces.push( new THREE.Face3(
-                                        parseInt(result[1]),
-                                        parseInt(result[2]),
-                                        parseInt(result[3])
-                                    // todo: pass in the color here, if any, or set it (better)
-                                    // todo: pass in the normal
-                                    )
-                                );
+                            var coordIndex = false;
+                            var face3 =  [];
+                            var skip = 0;
+                            var regex = /(-?\d+)/g;
+
+                            while ( isRecordingCoordinates && null != (coordIndex = regex.exec(child) ) ) {
+                                // parse coordIndex lines
+                                coordIndex = parseInt(coordIndex, 10);
+
+                                face3.push(coordIndex);
+
+                                // -1 indicates end of face points
+                                if (coordIndex === -1) {
+                                    // reset the collection
+                                    face3 = [];
+                                }
+
+                                // vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+
+                                skip = face3.length -3;
+                                skip = skip < 0 ? 0 : skip;
+
+                                // Face3 only works with triangles, but IndexedFaceSet allows others shapes, build them of triangles
+                                if (face3.length >= 3) {
+                                    var face = new THREE.Face3(
+                                        face3[0],
+                                        face3[skip + 1],
+                                        face3[skip + 2]
+                                        // todo: pass in the normal here, if any, or set it (better)
+                                        // todo: pass in the color
+                                    );
+
+                                    // calculate normal
+                                    var v1 = new THREE.Vector3();
+                                    var v2 = new THREE.Vector3();
+                                    v1.subVectors(geometry.vertices[face3[1]], geometry.vertices[face3[0]]);
+                                    v2.subVectors(geometry.vertices[face3[2]], geometry.vertices[face3[0]]);
+
+                                    var normal = new THREE.Vector3();
+                                    normal = normal.crossVectors(v1, v2);
+                                    debugger;
+
+                                    face.normal.copy( normal );
+                                    face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+
+
+                                    //face.normalize();
+
+                                    geometry.faces.push(face);
+
+                                }
 
                             }
+
+                            // stop recording if a ] is encountered after recording was turned on
+                            isRecordingCoordinates = (isRecordingCoordinates && null === (/]/.exec(child) ) );
+
                         }
 
                         geometry.computeBoundingSphere();
-
-                        var mesh = new THREE.Mesh(geometry);
-
-						parent.add(mesh);
+                        //var mesh = new THREE.Mesh(geometry);
+                        //parent.add(mesh);
+                        parent.geometry = geometry;
 					}
 
 					return;
@@ -364,8 +410,8 @@ THREE.VRMLLoader.prototype = {
 								} else if ( /transparency/.exec( parameter ) ) {
 
 									var result = /\s+([\d|\.|\+|\-|e]+)/.exec( parameter );
-
-									material.opacity = parseFloat( result[ 1 ] );
+                                    // transparency is opposite of opacity
+									material.opacity = Math.abs( 1 - parseFloat( result[ 1 ] ) );
 									material.transparent = true;
 
 								}
