@@ -55,12 +55,10 @@ var list = {
 			[ "MeshLambertMaterial", "api/materials/MeshLambertMaterial" ],
 			[ "MeshNormalMaterial", "api/materials/MeshNormalMaterial" ],
 			[ "MeshPhongMaterial", "api/materials/MeshPhongMaterial" ],
-			[ "ParticleBasicMaterial", "api/materials/ParticleBasicMaterial" ],
-			[ "ParticleCanvasMaterial", "api/materials/ParticleCanvasMaterial" ],
-			[ "ParticleDOMMaterial", "api/materials/ParticleDOMMaterial" ],
+			[ "ParticleSystemMaterial", "api/materials/ParticleSystemMaterial" ],
 			[ "ShaderMaterial", "api/materials/ShaderMaterial" ],
-			[ "SpriteMaterial", "api/materials/SpriteMaterial" ]
-
+			[ "SpriteMaterial", "api/materials/SpriteMaterial" ],
+			[ "SpriteCanvasMaterial", "api/materials/SpriteCanvasMaterial" ]
 		],
 
 		"Math": [
@@ -89,7 +87,6 @@ var list = {
 			[ "LOD", "api/objects/LOD" ],
 			[ "Mesh", "api/objects/Mesh" ],
 			[ "MorphAnimMesh", "api/objects/MorphAnimMesh" ],
-			[ "Particle", "api/objects/Particle" ],
 			[ "ParticleSystem", "api/objects/ParticleSystem" ],
 			[ "SkinnedMesh", "api/objects/SkinnedMesh" ],
 			[ "Sprite", "api/objects/Sprite" ]
