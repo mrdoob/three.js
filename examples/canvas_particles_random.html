@@ -58,7 +58,12 @@
 
 				for ( var i = 0; i < 1000; i++ ) {
 
-					particle = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: Math.random() * 0x808008 + 0x808080, program: program } ) );
+					var material = new THREE.SpriteCanvasMaterial( {
+						color: Math.random() * 0x808008 + 0x808080,
+						program: program
+					} );
+
+					particle = new THREE.Sprite( material );
 					particle.position.x = Math.random() * 2000 - 1000;
 					particle.position.y = Math.random() * 2000 - 1000;
 					particle.position.z = Math.random() * 2000 - 1000;
