@@ -261,6 +261,58 @@ THREE.VRMLLoader.prototype = {
 
 						parent.geometry = new THREE.SphereGeometry( parseFloat( result[ 1 ] ) );
 
+					} else if ( /IndexedFaceSet/.exec( data.string ) ) {
+
+                        var geometry = new THREE.Geometry();
+
+                        for (var i = 0, j = data.children.length; i < j; i++) {
+
+                            var child = data.children[i];
+
+                            var result;
+                            var vec;
+                           // todo: try if you can use parseNode here, to parse the Coordinate node
+                            if ( /Coordinate/.exec (child.string)) {
+
+                                for (var k = 0, l = child.children.length; k < l; k++) {
+
+                                    var point = child.children[k];
+
+                                    if (null != (result = float3_pattern.exec(point))) {
+
+                                        vec = new THREE.Vector3(
+                                            parseFloat(result[1]),
+                                            parseFloat(result[2]),
+                                            parseFloat(result[3])
+                                        );
+
+                                        geometry.vertices.push( vec );
+                                    }
+                                }
+                            }
+
+                            // parse coordIndex lines
+                            if ( null != ( result = /\s?(\d+)\s?,\s?(\d+)\s?,\s?(\d+)\s?,\s?(-?\d+)\s?,/.exec(child) ) ) {
+                                debugger;
+                                // todo: vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+
+                                geometry.faces.push( new THREE.Face3(
+                                        parseInt(result[1]),
+                                        parseInt(result[2]),
+                                        parseInt(result[3])
+                                    // todo: pass in the color here, if any, or set it (better)
+                                    // todo: pass in the normal
+                                    )
+                                );
+
+                            }
+                        }
+
+                        geometry.computeBoundingSphere();
+
+                        var mesh = new THREE.Mesh(geometry);
+
+						parent.add(mesh);
 					}
 
 					return;
