@@ -6740,6 +6740,8 @@ THREE.EventDispatcher.prototype = {
 
 			event.target = this;
 
+			listenerArray = listenerArray.slice();
+
 			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
 
 				listenerArray[ i ].call( this, event );
@@ -15723,36 +15725,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
-			if ( material.map === null ) {
-
-				scaleX = element.object.scale.x;
-				scaleY = element.object.scale.y;
-
-				// TODO: Be able to disable this
-
-				scaleX *= element.scale.x * _canvasWidthHalf;
-				scaleY *= element.scale.y * _canvasHeightHalf;
-
-				_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
-				_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
-
-				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-					_elemBox.makeEmpty();
-					return;
-
-				}
-
-				setFillStyle( material.color.getStyle() );
-
-				_context.save();
-				_context.translate( v1.x, v1.y );
-				_context.rotate( - element.rotation );
-				_context.scale( scaleX, scaleY );
-				_context.fillRect( -1, -1, 2, 2 );
-				_context.restore();
-
-			} else {
+			if ( material.map.image !== undefined ) {
 
 				bitmap = material.map.image;
 				bitmapWidth = bitmap.width >> 1;
@@ -15783,6 +15756,35 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.translate( - bitmapWidth, - bitmapHeight );
 				_context.drawImage( bitmap, 0, 0 );
+				_context.restore();
+
+			} else {
+
+				scaleX = element.object.scale.x;
+				scaleY = element.object.scale.y;
+
+				// TODO: Be able to disable this
+
+				scaleX *= element.scale.x * _canvasWidthHalf;
+				scaleY *= element.scale.y * _canvasHeightHalf;
+
+				_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
+				_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
+
+				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
+
+					_elemBox.makeEmpty();
+					return;
+
+				}
+
+				setFillStyle( material.color.getStyle() );
+
+				_context.save();
+				_context.translate( v1.x, v1.y );
+				_context.rotate( - element.rotation );
+				_context.scale( scaleX, scaleY );
+				_context.fillRect( -1, -1, 2, 2 );
 				_context.restore();
 
 			}
