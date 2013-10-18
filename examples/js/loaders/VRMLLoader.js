@@ -103,16 +103,25 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /USE/.exec( data ) ) {
 
-						if ( /appearance/.exec( data ) ) {
+                        var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
 
-							parent.material = defines[ /USE (\w+)/.exec( data )[ 1 ] ].clone();
+                        if (undefined == defines[defineKey]) {
 
-						} else {
+                            console.warn(defineKey + ' is not defined.');
 
-							var object = defines[ /USE (\w+)/.exec( data )[ 1 ] ].clone();
-							parent.add( object );
+                        } else {
 
-						}
+                            if ( /appearance/.exec( data ) && defineKey ) {
+
+                                parent.material = defines[ defineKey].clone();
+
+                            } else if (defineKey){
+                                var object = defines[ defineKey ].clone();
+                                parent.add( object );
+
+                            }
+
+                        }
 
 					}
 
@@ -331,20 +340,26 @@ THREE.VRMLLoader.prototype = {
                                     // calculate normal
                                     var v1 = new THREE.Vector3();
                                     var v2 = new THREE.Vector3();
-                                    v1.subVectors(geometry.vertices[face3[1]], geometry.vertices[face3[0]]);
-                                    v2.subVectors(geometry.vertices[face3[2]], geometry.vertices[face3[0]]);
 
-                                    var normal = new THREE.Vector3();
-                                    normal = normal.crossVectors(v1, v2);
-                                    debugger;
+                                    var vertex0 = geometry.vertices[face3[0]];
+                                    var vertex1 = geometry.vertices[face3[1]];
+                                    var vertex2 = geometry.vertices[face3[2]];
 
-                                    face.normal.copy( normal );
-                                    face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+                                    if (undefined == vertex0 || undefined == vertex1 || undefined == vertex2) {
+                                        // skip this face
+                                    } else {
+                                        // add this face
+                                        v1.subVectors(vertex1, vertex0);
+                                        v2.subVectors(vertex2, vertex0);
 
+                                        var normal = new THREE.Vector3();
+                                        normal = normal.crossVectors(v1, v2);
 
-                                    //face.normalize();
+                                        face.normal.copy( normal );
+                                        face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 
-                                    geometry.faces.push(face);
+                                        geometry.faces.push(face);
+                                    }
 
                                 }
 
