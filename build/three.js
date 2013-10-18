@@ -6729,28 +6729,40 @@ THREE.EventDispatcher.prototype = {
 
 	},
 
-	dispatchEvent: function ( event ) {
+	dispatchEvent: function () {
 
-		if ( this._listeners === undefined ) return;
+		var array = [];
 
-		var listeners = this._listeners;
-		var listenerArray = listeners[ event.type ];
+		return function ( event ) {
 
-		if ( listenerArray !== undefined ) {
+			if ( this._listeners === undefined ) return;
 
-			event.target = this;
+			var listeners = this._listeners;
+			var listenerArray = listeners[ event.type ];
 
-			listenerArray = listenerArray.slice();
+			if ( listenerArray !== undefined ) {
 
-			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
+				event.target = this;
 
-				listenerArray[ i ].call( this, event );
+				var length = listenerArray.length;
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					array[ i ] = listenerArray[ i ];
+
+				}
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					array[ i ].call( this, event );
+
+				}
 
 			}
 
-		}
+		};
 
-	}
+	}()
 
 };
 
