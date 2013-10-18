@@ -77,8 +77,9 @@ THREE.EventDispatcher.prototype = {
 
 		if ( listenerArray !== undefined ) {
 
-			listenerArray = listenerArray.slice();
 			event.target = this;
+
+			listenerArray = listenerArray.slice();
 
 			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
 
