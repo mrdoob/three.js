@@ -55,12 +55,12 @@
 		todo
 		</div>
 
-		<h3>.loadTexture([page:todo url], [page:todo mapping], [page:todo onLoad], [page:todo onError]) [page:todo]</h3>
+		<h3>.loadTexture([page:String url], [page:UVMapping mapping], [page:Function onLoad], [page:Function onError]) [page:todo]</h3>
 		<div>
-		url -- todo <br />
-		mapping -- todo <br />
-		onLoad -- todo <br />
-		onError -- todo
+		url -- the url of the texture<br />
+		mapping -- Can be an instance of [page:UVMapping Three.UVMapping], [page:CubeReflectionMapping THREE.CubeReflectionMapping], [page:SphericalReflectionMapping THREE.SphericalReflectionMapping] or [page:SphericalRefractionMapping THREE.SphericalRefractionMapping]. Describes how the image is applied to the object.<br />Use undefined instead of null as a default value. See mapping property of [page:Texture texture] for more details.
+		onLoad -- callback function<br />
+		onError -- callback function
 		</div>
 		<div>
 		todo
