@@ -119,6 +119,14 @@ THREE.ColladaLoader = function () {
 	function parse( doc, callBack, url ) {
 
 		COLLADA = doc;
+		// If missing, add xpath support to XML document
+		if( !COLLADA.evaluate ) {
+			var temp = {document: COLLADA};
+			wgxpath.install(temp);
+			if( !this.XPathResult ) {
+				this.XPathResult = temp.XPathResult;
+			}
+		}
 		callBack = callBack || readyCallbackFunc;
 
 		if ( url !== undefined ) {
