@@ -221,7 +221,7 @@ def save_settings_export(properties):
     "option_vertices_truncate" : properties.option_vertices_truncate,
     "option_scale"        : properties.option_scale,
 
-    "align_model"         : properties.align_model,
+    "align_model"         : properties.align_model
     }
 
     fname = get_settings_fullpath()
