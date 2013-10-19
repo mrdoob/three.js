@@ -267,7 +267,7 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"skinWeights" : [%(weights)s],
 
-	"animation" : {%(animation)s}
+        "animations" : [%(animations)s]
 """
 
 TEMPLATE_VERTEX = "%g,%g,%g"
@@ -845,14 +845,14 @@ def generate_indices_and_weights(meshes, option_skinning):
 # (only the first action will exported)
 # ##############################################################################
 
-def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
+def generate_animation(option_animation_skeletal, option_frame_step, flipyz, action_index):
 
-    if not option_animation_skeletal or len(bpy.data.actions) == 0:
+    if not option_animation_skeletal or len(bpy.data.actions) == 0 or len(bpy.data.actions) == 0:
         return ""
 
     # TODO: Add scaling influences
 
-    action = bpy.data.actions[0]
+    action = bpy.data.actions[action_index]
     armature, armatureObject = get_armature()
     if armature is None or armatureObject is None:
         return "", 0
@@ -931,6 +931,15 @@ def generate_animation(option_animation_skeletal, option_frame_step, flipyz):
     animation_string = '"name":"%s","fps":%d,"length":%g,"hierarchy":[%s]' % (action.name, fps, (frame_length / fps), hierarchy_string)
 
     return animation_string
+
+def generate_all_animations(option_animation_skeletal, option_frame_step, flipyz):
+    all_animations_string = ""
+    if option_animation_skeletal:
+        for index in range(0, len(bpy.data.actions)):
+            if index != 0 :
+                all_animations_string += ", \n"
+            all_animations_string += "{" + generate_animation(option_animation_skeletal, option_frame_step, flipyz, index) + "}"
+    return all_animations_string
 
 def handle_position_channel(channel, frame, position):
 
@@ -1390,7 +1399,7 @@ def generate_ascii_model(meshes, morphs,
     "bones"     : bones_string,
     "indices"   : indices_string,
     "weights"   : weights_string,
-    "animation" : generate_animation(option_animation_skeletal, option_frame_step, flipyz)
+    "animations" : generate_all_animations(option_animation_skeletal, option_frame_step, flipyz)
     }
 
     text = TEMPLATE_FILE_ASCII % {
