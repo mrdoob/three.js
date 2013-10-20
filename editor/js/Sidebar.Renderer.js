@@ -37,29 +37,6 @@ Sidebar.Renderer = function ( editor ) {
 
 	container.add( rendererTypeRow );
 
-	// Quick hack to expose a user control to switch themes - for easy review purposes only
-
-	var themeLink = document.getElementById( 'theme' );
-	var themeRow = new UI.Panel();
-	var originalColor;
-
-	var theme = new UI.Select().setOptions( [ 'Light', 'Dark' ] ).setWidth( '150px ').setColor( '#444' ).setFontSize( '12px ');
-	theme.onChange( function () {
-
-		switch ( this.value ) {
-
-			case '0': themeLink.href = 'css/light.css'; break;
-			case '1': themeLink.href = 'css/dark.css'; break;
-
-		}
-
-	} );
-
-	themeRow.add( new UI.Text('Theme').setWidth('90px') );
-	themeRow.add( theme );
-
-	container.add( themeRow );
-
 	//
 
 	function updateRenderer() {
