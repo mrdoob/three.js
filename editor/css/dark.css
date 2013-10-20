@@ -172,14 +172,6 @@ input.Number {
 
 	}
 
-	#sidebar #outliner .type {
-		padding: 2px 4px;
-		font-size: 10px;
-		background: #474747;
-		border-radius: 2px 2px;
-		color: #aaa;
-	}
-
 #toolbar {
 	position: absolute;
 	left: 0px;
