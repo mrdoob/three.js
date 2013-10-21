@@ -6,7 +6,7 @@ THREE.VRMLLoader = function () {};
 
 THREE.VRMLLoader.prototype = {
 
-	constructor: THREE.VTKLoader,
+	constructor: THREE.VRMLLoader,
 
 	load: function ( url, callback ) {
 
@@ -52,18 +52,33 @@ THREE.VRMLLoader.prototype = {
 
 				var tree = { 'string': 'Scene', children: [] };
 				var current = tree;
+                var matches;
 
 				for ( var i = 0; i < lines.length; i ++ ) {
 
+                    var comment = '';
+
 					var line = lines[ i ];
 
-					if ( /^#/.exec( line ) ) {
+                    // omit whitespace only lines
+                    if ( null !== ( result = /^\s+?$/g.exec( line ) ) ) {
+                        continue;
+                    }
 
-						continue;
+					if ( /#/.exec( line ) ) {
 
-					} else if ( /{/.exec( line ) ) {
+                        var parts = line.split('#');
 
-						var block = { 'string': line, 'parent': current, 'children': [] };
+                        // discard everything after the #, it is a comment
+                        line = parts[0];
+
+                        // well, let's also keep the comment
+                        comment = parts[1];
+					}
+                    // todo: add collection like coordIndex and colorIndex who are delimited by [ ]
+                    if ( matches = /([^\s]*){1}\s?{/.exec( line ) ) { // first subpattern should match the Node name
+
+						var block = { 'nodeType' : matches[1], 'string': line, 'parent': current, 'children': [],'comment' : comment };
 						current.children.push( block );
 						current = block;
 
@@ -80,13 +95,13 @@ THREE.VRMLLoader.prototype = {
 
 					} else if ( line !== '' ) {
 
-						current.children.push( line );
+                        current.children.push( line );
 
 					}
 
 				}
 
-				return tree;
+                return tree;
 
 			}
 
@@ -106,7 +121,7 @@ THREE.VRMLLoader.prototype = {
                         var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
 
                         if (undefined == defines[defineKey]) {
-
+                            debugger;
                             console.warn(defineKey + ' is not defined.');
 
                         } else {
@@ -114,6 +129,10 @@ THREE.VRMLLoader.prototype = {
                             if ( /appearance/.exec( data ) && defineKey ) {
 
                                 parent.material = defines[ defineKey].clone();
+
+                            } else if ( /geometry/.exec( data ) && defineKey ) {
+
+                                parent.geometry = defines[ defineKey].clone();
 
                             } else if (defineKey){
                                 var object = defines[ defineKey ].clone();
@@ -136,7 +155,7 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
 						defines[ object.name ] = object;
 
 					}
@@ -159,13 +178,14 @@ THREE.VRMLLoader.prototype = {
 
 							var result = float4_pattern.exec( child );
 
-							object.quaternion.set(
-								parseFloat( result[ 1 ] ),
-								parseFloat( result[ 2 ] ),
-								parseFloat( result[ 3 ] ),
-								parseFloat( result[ 4 ] )
-							);
+                            var quaternion = new THREE.Quaternion();
 
+                            var x =  parseFloat( result[ 1 ] );
+                            var y = parseFloat(result[ 2 ]);
+                            var z = parseFloat(result[ 3 ]);
+                            var w = parseFloat(result[ 4 ]);
+
+                            object.quaternion.setFromAxisAngle( new THREE.Vector3( x, y, z), w );
 						} else if ( /scale/.exec( child ) ) {
 
 							var result = float3_pattern.exec( child );
@@ -187,10 +207,8 @@ THREE.VRMLLoader.prototype = {
 					object = new THREE.Mesh();
 
 					if ( /DEF/.exec( data.string ) ) {
-
 						object.name = /DEF (\w+)/.exec( data.string )[ 1 ];
 						defines[ object.name ] = object;
-
 					}
 
 					parent.add( object );
@@ -272,7 +290,7 @@ THREE.VRMLLoader.prototype = {
 					} else if ( /IndexedFaceSet/.exec( data.string ) ) {
 
                         var geometry = new THREE.Geometry();
-                       // var geometry = parent.geometry;
+
                         var isRecordingCoordinates = false;
 
                         for (var i = 0, j = data.children.length; i < j; i++) {
@@ -371,8 +389,13 @@ THREE.VRMLLoader.prototype = {
                         }
 
                         geometry.computeBoundingSphere();
-                        //var mesh = new THREE.Mesh(geometry);
-                        //parent.add(mesh);
+
+                        // see if it's a define
+                        if ( /DEF/.exec( data.string ) ) {
+                            geometry.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+                            defines[ geometry.name ] = geometry;
+                        }
+
                         parent.geometry = geometry;
 					}
 
@@ -436,6 +459,7 @@ THREE.VRMLLoader.prototype = {
 							if ( /DEF/.exec( data.string ) ) {
 
 								material.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+
 								defines[ material.name ] = material;
 
 							}
