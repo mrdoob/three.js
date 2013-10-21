@@ -27,8 +27,8 @@ var Viewport = function ( editor ) {
 	//
 
 	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
-	camera.position.set( 500, 250, 500 );
-	camera.lookAt( scene.position );
+	camera.position.fromArray( editor.config.getKey( 'camera' ).position );
+	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
 
 	//
 
@@ -170,6 +170,7 @@ var Viewport = function ( editor ) {
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
+	controls.center.fromArray( editor.config.getKey( 'camera' ).target )
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
@@ -233,6 +234,11 @@ var Viewport = function ( editor ) {
 	} );
 
 	signals.cameraChanged.add( function () {
+
+		editor.config.setKey( 'camera', {
+			position: camera.position.toArray(),
+			target: controls.center.toArray()
+		} );
 
 		render();
 

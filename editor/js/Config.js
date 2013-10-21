@@ -3,12 +3,22 @@ var Config = function () {
 	var name = 'threejs-editor';
 
 	var storage = {
-		theme: 'css/light.css'
+		theme: 'css/light.css',
+		camera: {
+			position: [ 500, 250, 500 ],
+			target: [ 0, 0, 0 ] 
+		}
 	};
 
 	if ( window.localStorage[ name ] !== undefined ) {
 
-		storage = JSON.parse( window.localStorage[ name ] );
+		var data = JSON.parse( window.localStorage[ name ] );
+
+		for ( var key in data ) {
+
+			storage[ key ] = data[ key ];
+
+		}
 
 	}
 
