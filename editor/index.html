@@ -90,7 +90,52 @@
 			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
 			document.body.appendChild( sidebar.dom );
 
+			//
+
 			editor.setTheme( editor.config.getKey( 'theme' ) );
+
+			var state = editor.config.getKey( 'state' );
+
+			if ( state !== undefined ) {
+
+				var loader = new THREE.ObjectLoader();
+				var scene = loader.parse( state );
+
+				editor.setScene( scene );
+
+			}
+
+			var selected = editor.config.getKey( 'selected' );
+
+			if ( selected !== undefined ) {
+
+				editor.selectByUuid( selected );
+
+			}
+
+			//
+
+			var timeout;
+			var exporter = new THREE.ObjectExporter();
+
+			var saveLocalStorage = function ( scene ) {
+
+				clearTimeout( timeout );
+
+				timeout = setTimeout( function () {
+
+					editor.config.setKey( 'state', exporter.parse( editor.scene ) );
+
+				}, 3000 );
+
+			};
+
+			var signals = editor.signals;
+
+			signals.objectAdded.add( saveLocalStorage );
+			signals.objectChanged.add( saveLocalStorage );
+			signals.objectRemoved.add( saveLocalStorage );
+			signals.sceneGraphChanged.add( saveLocalStorage );
 
 			//
 
