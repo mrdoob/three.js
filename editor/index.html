@@ -44,6 +44,8 @@
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
+		<script src="js/Storage.js"></script>
+
 		<script src="js/Editor.js"></script>
 		<script src="js/Config.js"></script>
 		<script src="js/Loader.js"></script>
@@ -94,48 +96,54 @@
 
 			editor.setTheme( editor.config.getKey( 'theme' ) );
 
-			var state = editor.config.getKey( 'state' );
+			editor.storage.init( function () {
 
-			if ( state !== undefined ) {
+				editor.storage.get( function ( state ) {
 
-				var loader = new THREE.ObjectLoader();
-				var scene = loader.parse( state );
+					if ( state !== undefined ) {
 
-				editor.setScene( scene );
+						var loader = new THREE.ObjectLoader();
+						var scene = loader.parse( state );
 
-			}
+						editor.setScene( scene );
 
-			var selected = editor.config.getKey( 'selected' );
+					}
 
-			if ( selected !== undefined ) {
+					var selected = editor.config.getKey( 'selected' );
 
-				editor.selectByUuid( selected );
+					if ( selected !== undefined ) {
 
-			}
+						editor.selectByUuid( selected );
 
-			//
+					}
 
-			var timeout;
-			var exporter = new THREE.ObjectExporter();
+				} );
 
-			var saveLocalStorage = function ( scene ) {
+				//
 
-				clearTimeout( timeout );
+				var timeout;
+				var exporter = new THREE.ObjectExporter();
 
-				timeout = setTimeout( function () {
+				var saveState = function ( scene ) {
 
-					editor.config.setKey( 'state', exporter.parse( editor.scene ) );
+					clearTimeout( timeout );
 
-				}, 3000 );
+					timeout = setTimeout( function () {
 
-			};
+						editor.storage.set( exporter.parse( editor.scene ) );
 
-			var signals = editor.signals;
+					}, 2000 );
 
-			signals.objectAdded.add( saveLocalStorage );
-			signals.objectChanged.add( saveLocalStorage );
-			signals.objectRemoved.add( saveLocalStorage );
-			signals.sceneGraphChanged.add( saveLocalStorage );
+				};
+
+				var signals = editor.signals;
+
+				signals.objectAdded.add( saveState );
+				signals.objectChanged.add( saveState );
+				signals.objectRemoved.add( saveState );
+				signals.sceneGraphChanged.add( saveState );
+
+			} );
 
 			//
 

@@ -29,8 +29,11 @@ Menubar.File = function ( editor ) {
 		if ( confirm( 'Are you sure?' ) ) {
 
 			editor.config.clear();
+			editor.storage.clear( function () {
 
-			location.href = location.pathname;
+				location.href = location.pathname;
+
+			} );
 
 		}
 

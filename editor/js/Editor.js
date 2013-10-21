@@ -38,6 +38,7 @@ var Editor = function () {
 	};
 	
 	this.config = new Config();
+	this.storage = new Storage();
 	this.loader = new Loader( this );
 
 	this.scene = new THREE.Scene();
