@@ -179,6 +179,19 @@ var Viewport = function ( editor ) {
 
 	// signals
 
+	signals.themeChanged.add( function ( value ) {
+
+		switch ( value ) {
+
+			case 'css/light.css': grid.setColors( 0x444444, 0x888888 ); break;
+			case 'css/dark.css': grid.setColors( 0xbbbbbb, 0x888888 ); break;
+
+		}
+
+		render();
+
+	} );
+
 	signals.transformModeChanged.add( function ( mode ) {
 
 		transformControls.setMode( mode );

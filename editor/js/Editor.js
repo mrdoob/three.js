@@ -10,6 +10,8 @@ var Editor = function () {
 
 		// notifications
 
+		themeChanged: new SIGNALS.Signal(),
+
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
 		spaceChanged: new SIGNALS.Signal(),
@@ -51,6 +53,14 @@ var Editor = function () {
 };
 
 Editor.prototype = {
+
+	setTheme: function ( value ) {
+
+		document.getElementById( 'theme' ).href = value;
+
+		this.signals.themeChanged.dispatch( value );
+
+	},
 
 	setScene: function ( scene ) {
 

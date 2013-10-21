@@ -21,14 +21,12 @@ Menubar.View = function ( editor ) {
 
 	// themes
 
-	var themeLink = document.getElementById( 'theme' );
-
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Light theme' );
 	option.onClick( function () {
 
-		themeLink.href = 'css/light.css';
+		editor.setTheme( 'css/light.css' );
 
 	} );
 	options.add( option );
@@ -40,7 +38,7 @@ Menubar.View = function ( editor ) {
 	option.setTextContent( 'Dark theme' );
 	option.onClick( function () {
 
-		themeLink.href = 'css/dark.css';
+		editor.setTheme( 'css/dark.css' );
 
 	} );
 	options.add( option );
