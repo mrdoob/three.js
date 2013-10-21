@@ -40,8 +40,6 @@
 		<script src="../examples/js/exporters/ObjectExporter.js"></script>
 		<script src="../examples/js/renderers/WebGLRenderer3.js"></script>
 
-		<script src="js/libs/rawdeflate.js"></script>
-		<script src="js/libs/rawinflate.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
@@ -134,21 +132,6 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
-
-			var hash = window.location.hash.substr( 1 );
-
-			if ( hash !== '' && hash.substr( 0, 2 ) === 'A/' ) {
-
-				var string = RawDeflate.inflate( window.atob( hash.substr( 2 ) ) );
-				var json = JSON.parse( string );
-				var scene = new THREE.ObjectLoader().parse( json );
-				editor.setScene( scene );
-				
-			} else {
-
-				editor.loader.loadLocalStorage();
-
-			}
 
 		</script>
 	</body>
