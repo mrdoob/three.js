@@ -36,9 +36,9 @@ var Editor = function () {
 		windowResize: new SIGNALS.Signal()
 
 	};
-
+	
+	this.config = new Config();
 	this.loader = new Loader( this );
-	this.localStorage = new LocalStorage();
 
 	this.scene = new THREE.Scene();
 	this.sceneHelpers = new THREE.Scene();

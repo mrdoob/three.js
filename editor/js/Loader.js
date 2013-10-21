@@ -5,7 +5,7 @@ var Loader = function ( editor ) {
 
 	this.loadLocalStorage = function () {
 
-		var state = editor.localStorage.getKey( 'state' );
+		var state = editor.config.getKey( 'state' );
 
 		if ( state !== undefined ) {
 
@@ -27,7 +27,7 @@ var Loader = function ( editor ) {
 
 		timeout = setTimeout( function () {
 
-			editor.localStorage.setKey( 'state', exporter.parse( editor.scene ) );
+			editor.config.setKey( 'state', exporter.parse( editor.scene ) );
 
 		}, 3000 );
 

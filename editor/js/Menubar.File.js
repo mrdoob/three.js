@@ -28,7 +28,7 @@ Menubar.File = function ( editor ) {
 
 		if ( confirm( 'Are you sure?' ) ) {
 
-			editor.localStorage.clear();
+			editor.config.clear();
 
 			location.href = location.pathname;
 

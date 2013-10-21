@@ -1,4 +1,4 @@
-var LocalStorage = function () {
+var Config = function () {
 
 	var name = 'threejs-editor';
 
@@ -6,9 +6,9 @@ var LocalStorage = function () {
 		theme: 'css/light.css'
 	};
 
-	if ( localStorage[ name ] !== undefined ) {
+	if ( window.localStorage[ name ] !== undefined ) {
 
-		storage = JSON.parse( localStorage[ name ] );
+		storage = JSON.parse( window.localStorage[ name ] );
 
 	}
 
@@ -24,7 +24,7 @@ var LocalStorage = function () {
 
 			storage[ key ] = value;
 
-			localStorage[ name ] = JSON.stringify( storage );
+			window.localStorage[ name ] = JSON.stringify( storage );
 
 			console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to LocalStorage.' );
 
@@ -32,7 +32,7 @@ var LocalStorage = function () {
 
 		clear: function () {
 
-			delete localStorage[ name ];
+			delete window.localStorage[ name ];
 
 		}
 
