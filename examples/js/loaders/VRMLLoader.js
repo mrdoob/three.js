@@ -324,62 +324,40 @@ THREE.VRMLLoader.prototype = {
                             }
 
                             var coordIndex = false;
-                            var face3 =  [];
+                            var points =  [];
                             var skip = 0;
                             var regex = /(-?\d+)/g;
-
+                            // read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
                             while ( isRecordingCoordinates && null != (coordIndex = regex.exec(child) ) ) {
                                 // parse coordIndex lines
                                 coordIndex = parseInt(coordIndex, 10);
 
-                                face3.push(coordIndex);
+                                points.push(coordIndex);
 
                                 // -1 indicates end of face points
                                 if (coordIndex === -1) {
                                     // reset the collection
-                                    face3 = [];
+                                    points = [];
                                 }
 
                                 // vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
 
-                                skip = face3.length -3;
+                                skip = points.length -3;
                                 skip = skip < 0 ? 0 : skip;
 
-                                // Face3 only works with triangles, but IndexedFaceSet allows others shapes, build them of triangles
-                                if (face3.length >= 3) {
+                                // Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
+                                if (points.length >= 3) {
                                     var face = new THREE.Face3(
-                                        face3[0],
-                                        face3[skip + 1],
-                                        face3[skip + 2]
-                                        // todo: pass in the normal here, if any, or set it (better)
+                                        points[0],
+                                        points[skip + 1],
+                                        points[skip + 2],
+                                        null // normal, will be added later
                                         // todo: pass in the color
                                     );
 
-                                    // calculate normal
-                                    var v1 = new THREE.Vector3();
-                                    var v2 = new THREE.Vector3();
+                                    geometry.faces.push(face);
 
-                                    var vertex0 = geometry.vertices[face3[0]];
-                                    var vertex1 = geometry.vertices[face3[1]];
-                                    var vertex2 = geometry.vertices[face3[2]];
-
-                                    if (undefined == vertex0 || undefined == vertex1 || undefined == vertex2) {
-                                        // skip this face
-                                    } else {
-                                        // add this face
-                                        v1.subVectors(vertex1, vertex0);
-                                        v2.subVectors(vertex2, vertex0);
-
-                                        var normal = new THREE.Vector3();
-                                        normal = normal.crossVectors(v1, v2);
-
-                                        face.normal.copy( normal );
-                                        face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
-
-                                        geometry.faces.push(face);
                                     }
-
-                                }
 
                             }
 
@@ -388,6 +366,8 @@ THREE.VRMLLoader.prototype = {
 
                         }
 
+                        geometry.computeFaceNormals();
+                       // geometry.computeVertexNormals();
                         geometry.computeBoundingSphere();
 
                         // see if it's a define
@@ -410,6 +390,7 @@ THREE.VRMLLoader.prototype = {
 						if ( /Material/.exec( child.string ) ) {
 
 							var material = new THREE.MeshPhongMaterial();
+                            material.doubleSided = THREE.DoubleSide;
 
 							for ( var j = 0; j < child.children.length; j ++ ) {
 
