@@ -27,6 +27,7 @@ Menubar.View = function ( editor ) {
 	option.onClick( function () {
 
 		editor.setTheme( 'css/light.css' );
+		editor.localStorage.setKey( 'theme', 'css/light.css' );
 
 	} );
 	options.add( option );
@@ -39,6 +40,7 @@ Menubar.View = function ( editor ) {
 	option.onClick( function () {
 
 		editor.setTheme( 'css/dark.css' );
+		editor.localStorage.setKey( 'theme', 'css/dark.css' );
 
 	} );
 	options.add( option );
