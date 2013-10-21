@@ -211,11 +211,11 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( object ) {
+	signals.rendererChanged.add( function ( type ) {
 
 		container.dom.removeChild( renderer.domElement );
 
-		renderer = object;
+		renderer = new THREE[ type ]( { antialias: true } );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
@@ -430,13 +430,21 @@ var Viewport = function ( editor ) {
 
 	var renderer;
 
-	if ( System.support.webgl === true ) {
+	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer = new THREE[ editor.config.getKey( 'renderer' ) ]( { antialias: true } );
 
 	} else {
 
-		renderer = new THREE.CanvasRenderer();
+		if ( System.support.webgl === true ) {
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+		} else {
+
+			renderer = new THREE.CanvasRenderer();
+
+		}
 
 	}
 

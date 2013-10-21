@@ -37,14 +37,18 @@ Sidebar.Renderer = function ( editor ) {
 
 	container.add( rendererTypeRow );
 
+	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
+
+		rendererType.setValue( editor.config.getKey( 'renderer' ) );
+
+	}
+
 	//
 
 	function updateRenderer() {
 
-		var renderer = new rendererTypes[ rendererType.getValue() ]( {
-			antialias: true
-		} );
-		signals.rendererChanged.dispatch( renderer );
+		signals.rendererChanged.dispatch( rendererType.getValue() );
+		editor.config.setKey( 'renderer', rendererType.getValue() );
 
 	}
 
