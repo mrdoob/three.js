@@ -367,7 +367,7 @@ THREE.VRMLLoader.prototype = {
                         }
 
                         geometry.computeFaceNormals();
-                       // geometry.computeVertexNormals();
+                        //geometry.computeVertexNormals(); // does not show
                         geometry.computeBoundingSphere();
 
                         // see if it's a define
@@ -390,7 +390,7 @@ THREE.VRMLLoader.prototype = {
 						if ( /Material/.exec( child.string ) ) {
 
 							var material = new THREE.MeshPhongMaterial();
-                            material.doubleSided = THREE.DoubleSide;
+                            material.side = THREE.DoubleSide;
 
 							for ( var j = 0; j < child.children.length; j ++ ) {
 
