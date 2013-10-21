@@ -291,25 +291,40 @@ Editor.prototype = {
 	select: function ( object ) {
 
 		this.selected = object;
+		this.config.setKey( 'selected', object.uuid );
 		this.signals.objectSelected.dispatch( object );
 
 	},
 
 	selectById: function ( id ) {
 
-		var object = null;
+		var scope = this;
 
 		this.scene.traverse( function ( child ) {
 
 			if ( child.id === id ) {
 
-				object = child;
+				scope.select( child );
 
 			}
 
 		} );
 
-		this.select( object );
+	},
+
+	selectByUuid: function ( uuid ) {
+
+		var scope = this;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.uuid === uuid ) {
+
+				scope.select( child );
+
+			}
+
+		} );
 
 	},
 

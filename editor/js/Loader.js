@@ -16,6 +16,14 @@ var Loader = function ( editor ) {
 
 		}
 
+		var selected = editor.config.getKey( 'selected' );
+
+		if ( selected !== undefined ) {
+
+			editor.selectByUuid( selected );
+
+		}
+
 	};
 
 	var exporter = new THREE.ObjectExporter();
