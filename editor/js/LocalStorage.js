@@ -13,6 +13,7 @@ var LocalStorage = function () {
 	}
 
 	return {
+
 		getKey: function ( key ) {
 
 			return storage[ key ];
@@ -26,6 +27,12 @@ var LocalStorage = function () {
 			localStorage[ name ] = JSON.stringify( storage );
 
 			console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to LocalStorage.' );
+
+		},
+
+		clear: function () {
+
+			delete localStorage[ name ];
 
 		}
 

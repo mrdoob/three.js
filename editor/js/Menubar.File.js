@@ -28,11 +28,7 @@ Menubar.File = function ( editor ) {
 
 		if ( confirm( 'Are you sure?' ) ) {
 
-			if ( localStorage.threejsEditor !== undefined ) {
-
-				delete localStorage.threejsEditor;
-
-			}
+			editor.localStorage.clear();
 
 			location.href = location.pathname;
 
