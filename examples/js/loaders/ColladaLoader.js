@@ -3088,9 +3088,13 @@ THREE.ColladaLoader = function () {
 
 				case 'wrapU':
 				case 'wrapV':
-
-					this.texOpts[ child.nodeName ] = parseInt( child.textContent );
-					break;
+					
+					// some dae have a value of true which becomes NaN via parseInt			
+			                if (child.textContent.toUpperCase() == 'TRUE'){
+			                     this.texOpts[ child.nodeName ] = 1;
+			                } else {
+			                     this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+			                }
 
 				default:
 					this.texOpts[ child.nodeName ] = child.textContent;
