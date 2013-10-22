@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '62dev' };
+var THREE = { REVISION: '62' };
 
 self.console = self.console || {
 
@@ -11195,8 +11195,9 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		}
 
 		geometry.bones = json.bones;
+		// could change this to json.animations[0] or remove completely
 		geometry.animation = json.animation;
-
+		geometry.animations = json.animations;
 	};
 
 	function parseMorphing( scale ) {
