@@ -116,10 +116,41 @@ THREE.ColladaLoader = function () {
 
 	};
 
+        // new selectNodes
+	function newSelectNodes(xml, path, att, val) {
+	    var parts = path.split('/');
+	    var c = 0;
+	    var i = 0;
+	    for (i = 0; i < parts.length; i++) {
+	        if (parts[i] === "" || parts[i] === "." || parts[i] === "..") {
+	        }
+	        else {
+	            parts[i] = parts[i].replace("dae:", "");
+	            if (c !== 0) xml = xml[0];
+	            if (xml == undefined) return false;
+	            xml = xml.getElementsByTagName(parts[i]);	            
+	            c++;
+	        }
+	    }
+
+	    if (att && val) {
+	        var attObj;
+	        for (i = 0; i < xml.length; i++) {
+	            attObj = xml[i].attributes.getNamedItem(att);
+	            if (attObj && attObj.value === val) {
+	                return xml[i];
+	            }
+	        }
+	        return false;
+	    }
+
+	    return xml;
+	}
+
 	function parse( doc, callBack, url ) {
 
-		COLLADA = doc;
-		callBack = callBack || readyCallbackFunc;
+	    COLLADA = doc;
+	    callBack = callBack || readyCallbackFunc;
 
 		if ( url !== undefined ) {
 
@@ -131,10 +162,10 @@ THREE.ColladaLoader = function () {
 
 		parseAsset();
 		setUpConversion();
-		images = parseLib( "//dae:library_images/dae:image", _Image, "image" );
-		materials = parseLib( "//dae:library_materials/dae:material", Material, "material" );
-		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
-		geometries = parseLib( "//dae:library_geometries/dae:geometry", Geometry, "geometry" );
+		images = parseLib("//dae:library_images/dae:image", _Image, "image");
+		materials = parseLib("//dae:library_materials/dae:material", Material, "material");
+		effects = parseLib("//dae:library_effects/dae:effect", Effect, "effect");
+		geometries = parseLib("//dae:library_geometries/dae:geometry", Geometry, "geometry");
 		cameras = parseLib( ".//dae:library_cameras/dae:camera", Camera, "camera" );
 		lights = parseLib( ".//dae:library_lights/dae:light", Light, "light" );
 		controllers = parseLib( "//dae:library_controllers/dae:controller", Controller, "controller" );
@@ -197,9 +228,11 @@ THREE.ColladaLoader = function () {
 
 	function parseAsset () {
 
-		var elements = COLLADA.evaluate( '//dae:asset', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+	    //var elements = COLLADA.evaluate( '//dae:asset', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+	    var elements = newSelectNodes(COLLADA, '//dae:asset', false, false);
 
-		var element = elements.iterateNext();
+	    //var element = elements.iterateNext();
+	    var element = elements[0];
 
 		if ( element && element.childNodes ) {
 
@@ -211,7 +244,7 @@ THREE.ColladaLoader = function () {
 
 					case 'unit':
 
-						var meter = child.getAttribute( 'meter' );
+					    var meter = child.getAttribute('meter');
 
 						if ( meter ) {
 
@@ -236,12 +269,13 @@ THREE.ColladaLoader = function () {
 
 	function parseLib ( q, classSpec, prefix ) {
 
-		var elements = COLLADA.evaluate(q, COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null) ;
+	    //var elements = COLLADA.evaluate(q, COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+	    var elements = newSelectNodes(COLLADA, q, false, false);
 
 		var lib = {};
-		var element = elements.iterateNext();
-		var i = 0;
+		//var element = elements.iterateNext();
 
+        /*
 		while ( element ) {
 
 			var daeElement = ( new classSpec() ).parse( element );
@@ -251,6 +285,13 @@ THREE.ColladaLoader = function () {
 			element = elements.iterateNext();
 
 		}
+        */
+
+		for (var i = 0; i < elements.length; i++) {
+		    var daeElement = (new classSpec()).parse(elements[i]);
+		    if (!daeElement.id || daeElement.id.length == 0) daeElement.id = prefix + (i++);
+		    lib[daeElement.id] = daeElement;
+		}
 
 		return lib;
 
@@ -258,7 +299,8 @@ THREE.ColladaLoader = function () {
 
 	function parseScene() {
 
-		var sceneElement = COLLADA.evaluate( './/dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
+	    //var sceneElement = COLLADA.evaluate('.//dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
+	    var sceneElement = newSelectNodes(COLLADA, './/dae:scene/dae:instance_visual_scene', false, false)[0];
 
 		if ( sceneElement ) {
 
@@ -924,7 +966,8 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-		return COLLADA.evaluate( './/dae:library_nodes//dae:node[@id=\'' + id + '\']', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
+	    //return COLLADA.evaluate('.//dae:library_nodes//dae:node[@id=\'' + id + '\']', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null).iterateNext();
+	    return newSelectNodes(COLLADA, './/dae:library_nodes//dae:node', "id", id);
 
 	};
 
@@ -2201,18 +2244,26 @@ THREE.ColladaLoader = function () {
 
 				case 'bind_material':
 
-					var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+				    //var instances = COLLADA.evaluate('.//dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+				    var instances = newSelectNodes(child, './/dae:instance_material', false, false);
 
 					if ( instances ) {
 
-						var instance = instances.iterateNext();
+					    //var instance = instances.iterateNext();
 
+                        /*
 						while ( instance ) {
 
 							this.instance_material.push( (new InstanceMaterial()).parse(instance) );
 							instance = instances.iterateNext();
 
 						}
+                        */
+
+					    for (var j = 0; j < instances.length; j++) {
+					        this.instance_material.push((new InstanceMaterial()).parse(instances[j]));
+					    }
+
 
 					}
 
@@ -2265,18 +2316,25 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'bind_material' ) {
 
-				var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+			    //var instances = COLLADA.evaluate('.//dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+			    var instances = newSelectNodes(child, './/dae:instance_material', false, false);
 
 				if ( instances ) {
 
-					var instance = instances.iterateNext();
+				    //var instance = instances.iterateNext();
 
+                    /*
 					while ( instance ) {
 
 						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
 						instance = instances.iterateNext();
 
 					}
+                    */
+
+				    for (var j = 0; j < instances.length; j++) {
+				        this.instance_material.push((new InstanceMaterial()).parse(instances[j]));
+				    }
 
 				}
 
@@ -4401,17 +4459,26 @@ THREE.ColladaLoader = function () {
 
 	function evaluateXPath( node, query ) {
 
-		var instances = COLLADA.evaluate( query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+	    //var instances = COLLADA.evaluate(query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+	    var instances = newSelectNodes(node, query, false, false);
 
-		var inst = instances.iterateNext();
+	    //var inst = instances.iterateNext();
+
 		var result = [];
 
+        /*
 		while ( inst ) {
 
 			result.push( inst );
 			inst = instances.iterateNext();
 
 		}
+        */
+
+		for (var i = 0; i < instances.length; i++) {
+		    result.push(instances[i]);
+		}
+
 
 		return result;
 
@@ -4421,8 +4488,10 @@ THREE.ColladaLoader = function () {
 
 		obj.doubleSided = false;
 
-		var node = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+		//var node = COLLADA.evaluate('.//dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+		var node = newSelectNodes(element, './/dae:extra//dae:double_sided', false, false);
 
+        /*
 		if ( node ) {
 
 			node = node.iterateNext();
@@ -4434,6 +4503,16 @@ THREE.ColladaLoader = function () {
 			}
 
 		}
+        */
+
+		for (var i = 0; i < node.length; i++) {
+		    if (node[i] && parseInt(node[i].textContent, 10) === 1) {
+
+		        obj.doubleSided = true;
+
+		    }
+		}
+
 
 	};
 
