@@ -7,7 +7,7 @@ Menubar.File = function ( editor ) {
 	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
-	title.setTextContent( 'File' ).setColor( '#666' );
+	title.setTextContent( 'File' );
 	title.setMargin( '0px' );
 	title.setPadding( '8px' );
 	container.add( title );
@@ -28,13 +28,12 @@ Menubar.File = function ( editor ) {
 
 		if ( confirm( 'Are you sure?' ) ) {
 
-			if ( localStorage.threejsEditor !== undefined ) {
+			editor.config.clear();
+			editor.storage.clear( function () {
 
-				delete localStorage.threejsEditor;
+				location.href = location.pathname;
 
-			}
-
-			location.href = location.pathname;
+			} );
 
 		}
 
@@ -206,24 +205,6 @@ Menubar.File = function ( editor ) {
 		window.focus();
 
 	};
-
-	options.add( new UI.HorizontalRule() );
-
-
-	// share
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Share' );
-	option.onClick( function () {
-
-		var exporter = new THREE.ObjectExporter();
-		var string = JSON.stringify( exporter.parse( editor.scene ) );
-		window.location.hash = 'A/' + window.btoa( RawDeflate.deflate( string ) );
-
-	} );
-	options.add( option );
-
 
 	return container;
 

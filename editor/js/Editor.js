@@ -10,12 +10,16 @@ var Editor = function () {
 
 		// notifications
 
+		themeChanged: new SIGNALS.Signal(),
+
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
 		spaceChanged: new SIGNALS.Signal(),
 		rendererChanged: new SIGNALS.Signal(),
 
 		sceneGraphChanged: new SIGNALS.Signal(),
+
+		cameraChanged: new SIGNALS.Signal(),
 
 		objectSelected: new SIGNALS.Signal(),
 		objectAdded: new SIGNALS.Signal(),
@@ -26,14 +30,15 @@ var Editor = function () {
 		helperRemoved: new SIGNALS.Signal(),
 
 		materialChanged: new SIGNALS.Signal(),
-		clearColorChanged: new SIGNALS.Signal(),
 		fogTypeChanged: new SIGNALS.Signal(),
 		fogColorChanged: new SIGNALS.Signal(),
 		fogParametersChanged: new SIGNALS.Signal(),
 		windowResize: new SIGNALS.Signal()
 
 	};
-
+	
+	this.config = new Config();
+	this.storage = new Storage();
 	this.loader = new Loader( this );
 
 	this.scene = new THREE.Scene();
@@ -51,16 +56,31 @@ var Editor = function () {
 
 Editor.prototype = {
 
+	setTheme: function ( value ) {
+
+		document.getElementById( 'theme' ).href = value;
+
+		this.signals.themeChanged.dispatch( value );
+
+	},
+
 	setScene: function ( scene ) {
 
 		this.scene.name = scene.name;
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
+
+		// avoid render per object
+
+		this.signals.sceneGraphChanged.active = false;
 
 		while ( scene.children.length > 0 ) {
 
 			this.addObject( scene.children[ 0 ] );
 
 		}
+
+		this.signals.sceneGraphChanged.active = true;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -82,6 +102,13 @@ Editor.prototype = {
 		this.scene.add( object );
 
 		this.signals.objectAdded.dispatch( object );
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
+	setObjectName: function ( object, name ) {
+
+		object.name = name;
 		this.signals.sceneGraphChanged.dispatch();
 
 	},
@@ -113,9 +140,23 @@ Editor.prototype = {
 
 	},
 
+	setGeometryName: function ( geometry, name ) {
+
+		geometry.name = name;
+		this.signals.sceneGraphChanged.dispatch();
+
+	},
+
 	addMaterial: function ( material ) {
 
 		this.materials[ material.uuid ] = material;
+
+	},
+
+	setMaterialName: function ( material, name ) {
+
+		material.name = name;
+		this.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -251,25 +292,40 @@ Editor.prototype = {
 	select: function ( object ) {
 
 		this.selected = object;
+		this.config.setKey( 'selected', object.uuid );
 		this.signals.objectSelected.dispatch( object );
 
 	},
 
 	selectById: function ( id ) {
 
-		var object = null;
+		var scope = this;
 
 		this.scene.traverse( function ( child ) {
 
 			if ( child.id === id ) {
 
-				object = child;
+				scope.select( child );
 
 			}
 
 		} );
 
-		this.select( object );
+	},
+
+	selectByUuid: function ( uuid ) {
+
+		var scope = this;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.uuid === uuid ) {
+
+				scope.select( child );
+
+			}
+
+		} );
 
 	},
 
@@ -351,9 +407,9 @@ Editor.prototype = {
 			'MeshLambertMaterial': THREE.MeshLambertMaterial,
 			'MeshNormalMaterial': THREE.MeshNormalMaterial,
 			'MeshPhongMaterial': THREE.MeshPhongMaterial,
-			'ParticleBasicMaterial': THREE.ParticleBasicMaterial,
-			'ParticleCanvasMaterial': THREE.ParticleCanvasMaterial,
+			'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
 			'ShaderMaterial': THREE.ShaderMaterial,
+			'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
 			'Material': THREE.Material
 
 		};

@@ -168,13 +168,16 @@
 				var setTargetParticle = function() {
 
 					//hearts circleLines
-					var material = new THREE.ParticleCanvasMaterial( {  program: hearts, blending:THREE.AdditiveBlending } );
+					var material = new THREE.SpriteCanvasMaterial( {
+						program: hearts,
+						blending:THREE.AdditiveBlending
+					} );
 
 					material.color.setHSL(hue, 1, 0.75);
 					hue += 0.001;
 					if (hue>1) hue-=1;
 
-					particle = new THREE.Particle( material );
+					particle = new THREE.Sprite( material );
 
 					particle.scale.x = particle.scale.y = Math.random() * 20 +20;
 					particleCloud.add( particle );
@@ -190,9 +193,11 @@
 
 				};
 
-				var onParticleDead = function(particle) {
+				var onParticleDead = function( particle ) {
+
 					particle.target.visible = false;
-					particleCloud.remove(particle.target);
+					particleCloud.remove( particle.target );
+
 				};
 
 				sparksEmitter = new SPARKS.Emitter(new SPARKS.SteadyCounter(160));
@@ -332,7 +337,7 @@
 				emitterpos.y = -pointOnShape.y * 5 + 400;
 
 				// Pretty cool effect if you enable this
-				//particleCloud.rotation.y += 0.05;
+				// particleCloud.rotation.y += 0.05;
 
 				group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 				renderer.render( scene, camera );

@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = THREE || { REVISION: '61' };
+var THREE = { REVISION: '62' };
 
 self.console = self.console || {
 
@@ -6729,26 +6729,40 @@ THREE.EventDispatcher.prototype = {
 
 	},
 
-	dispatchEvent: function ( event ) {
+	dispatchEvent: function () {
 
-		if ( this._listeners === undefined ) return;
+		var array = [];
 
-		var listeners = this._listeners;
-		var listenerArray = listeners[ event.type ];
+		return function ( event ) {
 
-		if ( listenerArray !== undefined ) {
+			if ( this._listeners === undefined ) return;
 
-			event.target = this;
+			var listeners = this._listeners;
+			var listenerArray = listeners[ event.type ];
 
-			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
+			if ( listenerArray !== undefined ) {
 
-				listenerArray[ i ].call( this, event );
+				event.target = this;
+
+				var length = listenerArray.length;
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					array[ i ] = listenerArray[ i ];
+
+				}
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					array[ i ].call( this, event );
+
+				}
 
 			}
 
-		}
+		};
 
-	}
+	}()
 
 };
 
@@ -6790,7 +6804,7 @@ THREE.EventDispatcher.prototype = {
 
 	var intersectObject = function ( object, raycaster, intersects ) {
 
-		if ( object instanceof THREE.Particle ) {
+		if ( object instanceof THREE.Sprite ) {
 
 			matrixPosition.getPositionFromMatrix( object.matrixWorld );
 			var distance = raycaster.ray.distanceToPoint( matrixPosition );
@@ -6896,7 +6910,16 @@ THREE.EventDispatcher.prototype = {
 								positions[ c * 3 + 2 ]
 							);
 
-							var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+							
+							if ( material.side === THREE.BackSide ) {
+							
+								var intersectionPoint = localRay.intersectTriangle( vC, vB, vA, true ); 
+
+							} else {
+
+								var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+
+							}
 
 							if ( intersectionPoint === null ) continue;
 
@@ -6950,7 +6973,16 @@ THREE.EventDispatcher.prototype = {
 							positions[ c * 3 + 2 ]
 						);
 
-						var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+						
+						if ( material.side === THREE.BackSide ) {
+							
+							var intersectionPoint = localRay.intersectTriangle( vC, vB, vA, true ); 
+
+						} else {
+
+							var intersectionPoint = localRay.intersectTriangle( vA, vB, vC, material.side !== THREE.DoubleSide );
+
+						}
 
 						if ( intersectionPoint === null ) continue;
 
@@ -6996,7 +7028,15 @@ THREE.EventDispatcher.prototype = {
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 					
-					var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+					if ( material.side === THREE.BackSide ) {
+							
+						var intersectionPoint = localRay.intersectTriangle( c, b, a, true ); 
+
+					} else {
+								
+						var intersectionPoint = localRay.intersectTriangle( a, b, c, material.side !== THREE.DoubleSide );
+
+					}
 
 					if ( intersectionPoint === null ) continue;
 
@@ -7707,7 +7747,7 @@ THREE.Projector = function () {
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
 	_face, _face3Count, _face3Pool = [], _face3PoolLength = 0,
 	_line, _lineCount, _linePool = [], _linePoolLength = 0,
-	_particle, _particleCount, _particlePool = [], _particlePoolLength = 0,
+	_sprite, _spriteCount, _spritePool = [], _spritePoolLength = 0,
 
 	_renderData = { objects: [], sprites: [], lights: [], elements: [] },
 
@@ -7809,7 +7849,7 @@ THREE.Projector = function () {
 
 			}
 
-		} else if ( object instanceof THREE.Sprite || object instanceof THREE.Particle ) {
+		} else if ( object instanceof THREE.Sprite ) {
 
 			_renderData.sprites.push( getObject( object ) );
 
@@ -7850,7 +7890,7 @@ THREE.Projector = function () {
 
 		_face3Count = 0;
 		_lineCount = 0;
-		_particleCount = 0;
+		_spriteCount = 0;
 
 		_renderData.elements.length = 0;
 
@@ -8079,7 +8119,7 @@ THREE.Projector = function () {
 
 			_modelMatrix = object.matrixWorld;
 
-			if ( object instanceof THREE.Particle ) {
+			if ( object instanceof THREE.Sprite ) {
 
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
 				_vector4.applyMatrix4( _viewProjectionMatrix );
@@ -8088,23 +8128,23 @@ THREE.Projector = function () {
 
 				_vector4.z *= invW;
 
-				if ( _vector4.z > 0 && _vector4.z < 1 ) {
+				if ( _vector4.z > -1 && _vector4.z < 1 ) {
 
-					_particle = getNextParticleInPool();
-					_particle.id = object.id;
-					_particle.x = _vector4.x * invW;
-					_particle.y = _vector4.y * invW;
-					_particle.z = _vector4.z;
-					_particle.object = object;
+					_sprite = getNextSpriteInPool();
+					_sprite.id = object.id;
+					_sprite.x = _vector4.x * invW;
+					_sprite.y = _vector4.y * invW;
+					_sprite.z = _vector4.z;
+					_sprite.object = object;
 
-					_particle.rotation = object.rotation.z;
+					_sprite.rotation = object.rotation;
 
-					_particle.scale.x = object.scale.x * Math.abs( _particle.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
-					_particle.scale.y = object.scale.y * Math.abs( _particle.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
+					_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
+					_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
 
-					_particle.material = object.material;
+					_sprite.material = object.material;
 
-					_renderData.elements.push( _particle );
+					_renderData.elements.push( _sprite );
 
 				}
 
@@ -8185,19 +8225,19 @@ THREE.Projector = function () {
 
 	}
 
-	function getNextParticleInPool() {
+	function getNextSpriteInPool() {
 
-		if ( _particleCount === _particlePoolLength ) {
+		if ( _spriteCount === _spritePoolLength ) {
 
-			var particle = new THREE.RenderableParticle();
-			_particlePool.push( particle );
-			_particlePoolLength ++;
-			_particleCount ++
-			return particle;
+			var sprite = new THREE.RenderableSprite();
+			_spritePool.push( sprite );
+			_spritePoolLength ++;
+			_spriteCount ++
+			return sprite;
 
 		}
 
-		return _particlePool[ _particleCount ++ ];
+		return _spritePool[ _spriteCount ++ ];
 
 	}
 
@@ -9040,6 +9080,17 @@ THREE.BufferGeometry = function () {
 THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
+
+	addAttribute: function( name, type, numItems, itemSize ) {
+
+		this.attributes[ name ] = {
+
+			itemSize: itemSize,
+			array: new type( numItems * itemSize )
+
+		};
+
+	},
 
 	applyMatrix: function ( matrix ) {
 
@@ -11144,8 +11195,9 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		}
 
 		geometry.bones = json.bones;
+		// could change this to json.animations[0] or remove completely
 		geometry.animation = json.animation;
-
+		geometry.animations = json.animations;
 	};
 
 	function parseMorphing( scale ) {
@@ -13837,7 +13889,7 @@ THREE.MeshFaceMaterial.prototype.clone = function () {
  * }
  */
 
-THREE.ParticleBasicMaterial = function ( parameters ) {
+THREE.ParticleSystemMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -13856,11 +13908,11 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.ParticleSystemMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleBasicMaterial.prototype.clone = function () {
+THREE.ParticleSystemMaterial.prototype.clone = function () {
 
-	var material = new THREE.ParticleBasicMaterial();
+	var material = new THREE.ParticleSystemMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -13879,42 +13931,9 @@ THREE.ParticleBasicMaterial.prototype.clone = function () {
 
 };
 
-/**
- * @author mrdoob / http://mrdoob.com/
- *
- * parameters = {
- *  color: <hex>,
- *  program: <function>,
- *  opacity: <float>,
- *  blending: THREE.NormalBlending
- * }
- */
+// backwards compatibility
 
-THREE.ParticleCanvasMaterial = function ( parameters ) {
-
-	THREE.Material.call( this );
-
-	this.color = new THREE.Color( 0xffffff );
-	this.program = function ( context, color ) {};
-
-	this.setValues( parameters );
-
-};
-
-THREE.ParticleCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
-
-THREE.ParticleCanvasMaterial.prototype.clone = function () {
-
-	var material = new THREE.ParticleCanvasMaterial();
-
-	THREE.Material.prototype.clone.call( this, material );
-
-	material.color.copy( this.color );
-	material.program = this.program;
-
-	return material;
-
-};
+THREE.ParticleBasicMaterial = THREE.ParticleSystemMaterial;
 
 /**
  * @author alteredq / http://alteredqualia.com/
@@ -14041,7 +14060,6 @@ THREE.ShaderMaterial.prototype.clone = function () {
  *
  *  useScreenCoordinates: <bool>,
  *  sizeAttenuation: <bool>,
- *  scaleByViewport: <bool>,
  *  alignment: THREE.SpriteAlignment.center,
  *
  *	uvOffset: new THREE.Vector2(),
@@ -14063,7 +14081,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.useScreenCoordinates = true;
 	this.depthTest = !this.useScreenCoordinates;
 	this.sizeAttenuation = !this.useScreenCoordinates;
-	this.scaleByViewport = !this.sizeAttenuation;
 	this.alignment = THREE.SpriteAlignment.center.clone();
 
 	this.fog = false;
@@ -14081,7 +14098,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	if ( parameters.depthTest === undefined ) this.depthTest = !this.useScreenCoordinates;
 	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = !this.useScreenCoordinates;
-	if ( parameters.scaleByViewport === undefined ) this.scaleByViewport = !this.sizeAttenuation;
 
 };
 
@@ -14098,7 +14114,6 @@ THREE.SpriteMaterial.prototype.clone = function () {
 
 	material.useScreenCoordinates = this.useScreenCoordinates;
 	material.sizeAttenuation = this.sizeAttenuation;
-	material.scaleByViewport = this.scaleByViewport;
 	material.alignment.copy( this.alignment );
 
 	material.uvOffset.copy( this.uvOffset );
@@ -14113,16 +14128,56 @@ THREE.SpriteMaterial.prototype.clone = function () {
 // Alignment enums
 
 THREE.SpriteAlignment = {};
-THREE.SpriteAlignment.topLeft = new THREE.Vector2( 1, -1 );
-THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -1 );
-THREE.SpriteAlignment.topRight = new THREE.Vector2( -1, -1 );
-THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 1, 0 );
+THREE.SpriteAlignment.topLeft = new THREE.Vector2( 0.5, -0.5 );
+THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -0.5 );
+THREE.SpriteAlignment.topRight = new THREE.Vector2( -0.5, -0.5 );
+THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 0.5, 0 );
 THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
-THREE.SpriteAlignment.centerRight = new THREE.Vector2( -1, 0 );
-THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 1, 1 );
-THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 1 );
-THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -1, 1 );
+THREE.SpriteAlignment.centerRight = new THREE.Vector2( -0.5, 0 );
+THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 0.5, 0.5 );
+THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 0.5 );
+THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -0.5, 0.5 );
 
+/**
+ * @author mrdoob / http://mrdoob.com/
+ *
+ * parameters = {
+ *  color: <hex>,
+ *  program: <function>,
+ *  opacity: <float>,
+ *  blending: THREE.NormalBlending
+ * }
+ */
+
+THREE.SpriteCanvasMaterial = function ( parameters ) {
+
+	THREE.Material.call( this );
+
+	this.color = new THREE.Color( 0xffffff );
+	this.program = function ( context, color ) {};
+
+	this.setValues( parameters );
+
+};
+
+THREE.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+
+THREE.SpriteCanvasMaterial.prototype.clone = function () {
+
+	var material = new THREE.SpriteCanvasMaterial();
+
+	THREE.Material.prototype.clone.call( this, material );
+
+	material.color.copy( this.color );
+	material.program = this.program;
+
+	return material;
+
+};
+
+// backwards compatibility
+
+THREE.ParticleCanvasMaterial = THREE.SpriteCanvasMaterial;
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author alteredq / http://alteredqualia.com/
@@ -14265,30 +14320,6 @@ THREE.DataTexture.prototype.clone = function () {
 };
 
 /**
- * @author mrdoob / http://mrdoob.com/
- */
-
-THREE.Particle = function ( material ) {
-
-	THREE.Object3D.call( this );
-
-	this.material = material;
-
-};
-
-THREE.Particle.prototype = Object.create( THREE.Object3D.prototype );
-
-THREE.Particle.prototype.clone = function ( object ) {
-
-	if ( object === undefined ) object = new THREE.Particle( this.material );
-
-	THREE.Object3D.prototype.clone.call( this, object );
-
-	return object;
-
-};
-
-/**
  * @author alteredq / http://alteredqualia.com/
  */
 
@@ -14297,7 +14328,7 @@ THREE.ParticleSystem = function ( geometry, material ) {
 	THREE.Object3D.call( this );
 
 	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
-	this.material = material !== undefined ? material : new THREE.ParticleBasicMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new THREE.ParticleSystemMaterial( { color: Math.random() * 0xffffff } );
 
 	this.sortParticles = false;
 	this.frustumCulled = false;
@@ -15051,7 +15082,6 @@ THREE.Sprite = function ( material ) {
 
 	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
-	this.rotation3d = this.rotation;
 	this.rotation = 0;
 
 };
@@ -15064,8 +15094,6 @@ THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Sprite.prototype.updateMatrix = function () {
 
-	this.rotation3d.set( 0, 0, this.rotation, this.rotation3d.order );
-	this.quaternion.setFromEuler( this.rotation3d );
 	this.matrix.compose( this.position, this.quaternion, this.scale );
 
 	this.matrixWorldNeedsUpdate = true;
@@ -15082,7 +15110,9 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
+// Backwards compatibility
 
+THREE.Particle = THREE.Sprite;
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -15270,7 +15300,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 			? parameters.canvas
 			: document.createElement( 'canvas' ),
 
-	_canvasWidth, _canvasHeight, _canvasWidthHalf, _canvasHeightHalf,
+	_canvasWidth = _canvas.width,
+	_canvasHeight = _canvas.height,
+	_canvasWidthHalf = Math.floor( _canvasWidth / 2 ),
+	_canvasHeightHalf = Math.floor( _canvasHeight / 2 ),
+	
 	_context = _canvas.getContext( '2d' ),
 
 	_clearColor = new THREE.Color( 0x000000 ),
@@ -15537,12 +15571,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_elemBox.makeEmpty();
 
-			if ( element instanceof THREE.RenderableParticle ) {
+			if ( element instanceof THREE.RenderableSprite ) {
 
 				_v1 = element;
 				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
 
-				renderParticle( _v1, element, material );
+				renderSprite( _v1, element, material );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -15635,13 +15669,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.DirectionalLight ) {
 
-				// for particles
+				// for sprites
 
 				_directionalLights.add( lightColor );
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				// for particles
+				// for sprites
 
 				_pointLights.add( lightColor );
 
@@ -15693,7 +15727,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
-	function renderParticle( v1, element, material ) {
+	function renderSprite( v1, element, material ) {
 
 		setOpacity( material.opacity );
 		setBlending( material.blending );
@@ -15701,38 +15735,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var width, height, scaleX, scaleY,
 		bitmap, bitmapWidth, bitmapHeight;
 
-		if ( material instanceof THREE.ParticleBasicMaterial ) {
+		if ( material instanceof THREE.SpriteMaterial ||
+			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
-			if ( material.map === null ) {
-
-				scaleX = element.object.scale.x;
-				scaleY = element.object.scale.y;
-
-				// TODO: Be able to disable this
-
-				scaleX *= element.scale.x * _canvasWidthHalf;
-				scaleY *= element.scale.y * _canvasHeightHalf;
-
-				_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
-				_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
-
-				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-					_elemBox.makeEmpty();
-					return;
-
-				}
-
-				setFillStyle( material.color.getStyle() );
-
-				_context.save();
-				_context.translate( v1.x, v1.y );
-				_context.rotate( - element.rotation );
-				_context.scale( scaleX, scaleY );
-				_context.fillRect( -1, -1, 2, 2 );
-				_context.restore();
-
-			} else {
+			if ( material.map.image !== undefined ) {
 
 				bitmap = material.map.image;
 				bitmapWidth = bitmap.width >> 1;
@@ -15765,6 +15771,35 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_context.drawImage( bitmap, 0, 0 );
 				_context.restore();
 
+			} else {
+
+				scaleX = element.object.scale.x;
+				scaleY = element.object.scale.y;
+
+				// TODO: Be able to disable this
+
+				scaleX *= element.scale.x * _canvasWidthHalf;
+				scaleY *= element.scale.y * _canvasHeightHalf;
+
+				_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
+				_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
+
+				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
+
+					_elemBox.makeEmpty();
+					return;
+
+				}
+
+				setFillStyle( material.color.getStyle() );
+
+				_context.save();
+				_context.translate( v1.x, v1.y );
+				_context.rotate( - element.rotation );
+				_context.scale( scaleX, scaleY );
+				_context.fillRect( -1, -1, 2, 2 );
+				_context.restore();
+
 			}
 
 			/* DEBUG
@@ -15777,7 +15812,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.stroke();
 			*/
 
-		} else if ( material instanceof THREE.ParticleCanvasMaterial ) {
+		} else if ( material instanceof THREE.SpriteCanvasMaterial ) {
 
 			width = element.scale.x * _canvasWidthHalf;
 			height = element.scale.y * _canvasHeightHalf;
@@ -17572,7 +17607,7 @@ THREE.ShaderChunk = {
 
 		"#ifdef USE_COLOR",
 
-			"gl_FragColor = gl_FragColor * vec4( vColor, opacity );",
+			"gl_FragColor = gl_FragColor * vec4( vColor, 1.0 );",
 
 		"#endif"
 
@@ -19708,8 +19743,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_viewportX = 0,
 	_viewportY = 0,
-	_viewportWidth = 0,
-	_viewportHeight = 0,
+	_viewportWidth = _canvas.width,
+	_viewportHeight = _canvas.height,
 	_currentWidth = 0,
 	_currentHeight = 0,
 
@@ -23655,7 +23690,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			shaderID = 'dashed';
 
-		} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+		} else if ( material instanceof THREE.ParticleSystemMaterial ) {
 
 			shaderID = 'particle_basic';
 
@@ -23922,7 +23957,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				refreshUniformsLine( m_uniforms, material );
 				refreshUniformsDash( m_uniforms, material );
 
-			} else if ( material instanceof THREE.ParticleBasicMaterial ) {
+			} else if ( material instanceof THREE.ParticleSystemMaterial ) {
 
 				refreshUniformsParticle( m_uniforms, material );
 
@@ -26108,6 +26143,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.blendEquation( _gl.FUNC_ADD );
 		_gl.blendFunc( _gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA );
 
+		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
+		
 		_gl.clearColor( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha );
 
 	};
@@ -26280,7 +26317,7 @@ THREE.RenderableObject = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.RenderableParticle = function () {
+THREE.RenderableSprite = function () {
 
 	this.id = 0;
 
@@ -26290,7 +26327,7 @@ THREE.RenderableParticle = function () {
 	this.y = 0;
 	this.z = 0;
 
-	this.rotation = null;
+	this.rotation = 0;
 	this.scale = new THREE.Vector2();
 
 	this.material = null;
@@ -31773,15 +31810,13 @@ THREE.CylinderGeometry.prototype = Object.create( THREE.Geometry.prototype );
  *
  * parameters = {
  *
- *  size: <float>, // size of the text
- *  height: <float>, // thickness to extrude text
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segements of extrude spline too
- *  amount: <int>, // Amount
+ *  amount: <int>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
- *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float>, // how far from text outline is bevel
+ *  bevelThickness: <float>, // how deep into the original shape bevel goes
+ *  bevelSize: <float>, // how far from shape outline is bevel
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
@@ -36166,16 +36201,16 @@ THREE.SpritePlugin = function () {
 
 		var i = 0;
 
-		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = -1;	// vertex 0
+		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = -0.5;	// vertex 0
 		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv 0
 
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = -1;	// vertex 1
+		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = -0.5;	// vertex 1
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 0;	// uv 1
 
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// vertex 2
+		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = 0.5;	// vertex 2
 		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// uv 2
 
-		_sprite.vertices[ i++ ] = -1; _sprite.vertices[ i++ ] = 1;	// vertex 3
+		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = 0.5;	// vertex 3
 		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;	// uv 3
 
 		i = 0;
@@ -36206,6 +36241,7 @@ THREE.SpritePlugin = function () {
 		_sprite.uniforms.rotation             = _gl.getUniformLocation( _sprite.program, "rotation" );
 		_sprite.uniforms.scale                = _gl.getUniformLocation( _sprite.program, "scale" );
 		_sprite.uniforms.alignment            = _gl.getUniformLocation( _sprite.program, "alignment" );
+		_sprite.uniforms.halfViewport         = _gl.getUniformLocation( _sprite.program, "halfViewport" );
 
 		_sprite.uniforms.color                = _gl.getUniformLocation( _sprite.program, "color" );
 		_sprite.uniforms.map                  = _gl.getUniformLocation( _sprite.program, "map" );
@@ -36236,8 +36272,6 @@ THREE.SpritePlugin = function () {
 
 		var attributes = _sprite.attributes,
 			uniforms = _sprite.uniforms;
-
-		var invAspect = viewportHeight / viewportWidth;
 
 		var halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
@@ -36301,7 +36335,7 @@ THREE.SpritePlugin = function () {
 
 		// update positions and sort
 
-		var i, sprite, material, screenPosition, size, fogType, scale = [];
+		var i, sprite, material, screenPosition, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
@@ -36348,8 +36382,8 @@ THREE.SpritePlugin = function () {
 						Math.max( 0, Math.min( 1, sprite.position.z ) )
 					);
 
-					scale[ 0 ] = _renderer.devicePixelRatio;
-					scale[ 1 ] = _renderer.devicePixelRatio;
+					scale[ 0 ] = _renderer.devicePixelRatio * sprite.scale.x;
+					scale[ 1 ] = _renderer.devicePixelRatio * sprite.scale.y;
 
 				} else {
 
@@ -36357,8 +36391,8 @@ THREE.SpritePlugin = function () {
 					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
 					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
-					scale[ 0 ] = 1;
-					scale[ 1 ] = 1;
+					scale[ 0 ] = sprite.scale.x;
+					scale[ 1 ] = sprite.scale.y;
 
 				}
 
@@ -36379,11 +36413,6 @@ THREE.SpritePlugin = function () {
 
 				}
 
-				size = 1 / ( material.scaleByViewport ? viewportHeight : 1 );
-
-				scale[ 0 ] *= size * invAspect * sprite.scale.x
-				scale[ 1 ] *= size * sprite.scale.y;
-
 				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
 				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
 				_gl.uniform2f( uniforms.alignment, material.alignment.x, material.alignment.y );
@@ -36393,6 +36422,7 @@ THREE.SpritePlugin = function () {
 
 				_gl.uniform1f( uniforms.rotation, sprite.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
+				_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
 
 				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 				_renderer.setDepthTest( material.depthTest );
@@ -36860,6 +36890,7 @@ THREE.ShaderSprite = {
 			"uniform vec2 alignment;",
 			"uniform vec2 uvOffset;",
 			"uniform vec2 uvScale;",
+			"uniform vec2 halfViewport;",
 
 			"attribute vec2 position;",
 			"attribute vec2 uv;",
@@ -36870,22 +36901,23 @@ THREE.ShaderSprite = {
 
 				"vUV = uvOffset + uv * uvScale;",
 
-				"vec2 alignedPosition = position + alignment;",
+				"vec2 alignedPosition = ( position + alignment ) * scale;",
 
 				"vec2 rotatedPosition;",
-				"rotatedPosition.x = ( cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y ) * scale.x;",
-				"rotatedPosition.y = ( sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y ) * scale.y;",
+				"rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;",
+				"rotatedPosition.y = sin( rotation ) * alignedPosition.x + cos( rotation ) * alignedPosition.y;",
 
 				"vec4 finalPosition;",
 
 				"if( useScreenCoordinates != 0 ) {",
 
-					"finalPosition = vec4( screenPosition.xy + rotatedPosition, screenPosition.z, 1.0 );",
+					"finalPosition = vec4( screenPosition.xy + ( rotatedPosition / halfViewport ), screenPosition.z, 1.0 );",
 
 				"} else {",
 
-					"finalPosition = projectionMatrix * modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
+					"finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
 					"finalPosition.xy += rotatedPosition * ( sizeAttenuation == 1 ? 1.0 : finalPosition.z );",
+					"finalPosition = projectionMatrix * finalPosition;",
 
 				"}",
 

@@ -4,7 +4,6 @@ var Viewport = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setPosition( 'absolute' );
-	container.setBackgroundColor( '#aaa' );
 
 	var info = new UI.Text();
 	info.setPosition( 'absolute' );
@@ -18,7 +17,6 @@ var Viewport = function ( editor ) {
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
 
-	var clearColor = 0xAAAAAA;
 	var objects = [];
 
 	// helpers
@@ -29,8 +27,8 @@ var Viewport = function ( editor ) {
 	//
 
 	var camera = new THREE.PerspectiveCamera( 50, container.dom.offsetWidth / container.dom.offsetHeight, 1, 5000 );
-	camera.position.set( 500, 250, 500 );
-	camera.lookAt( scene.position );
+	camera.position.fromArray( editor.config.getKey( 'camera' ).position );
+	camera.lookAt( new THREE.Vector3().fromArray( editor.config.getKey( 'camera' ).target ) );
 
 	//
 
@@ -43,10 +41,19 @@ var Viewport = function ( editor ) {
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
-        controls.enabled = true;
-        if ( transformControls.axis ) controls.enabled = false;
-        
-		if (editor.selected) signals.objectChanged.dispatch( editor.selected );
+		controls.enabled = true;
+
+		if ( transformControls.axis !== undefined ) {
+
+			controls.enabled = false;
+
+		}
+
+		if ( editor.selected !== null ) {
+
+			signals.objectChanged.dispatch( editor.selected );
+
+		}
 
 	} );
 	sceneHelpers.add( transformControls );
@@ -68,9 +75,9 @@ var Viewport = function ( editor ) {
 
 	var getIntersects = function ( event, object ) {
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
@@ -94,9 +101,9 @@ var Viewport = function ( editor ) {
 
 		event.preventDefault();
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		onMouseDownPosition.set( x, y );
 
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -105,9 +112,9 @@ var Viewport = function ( editor ) {
 
 	var onMouseUp = function ( event ) {
 
-	    var rect = container.dom.getBoundingClientRect();
-	    x = (event.clientX - rect.left) / rect.width;
-	    y = (event.clientY - rect.top) / rect.height;
+		var rect = container.dom.getBoundingClientRect();
+		x = (event.clientX - rect.left) / rect.width;
+		y = (event.clientY - rect.top) / rect.height;
 		onMouseUpPosition.set( x, y );
 
 		if ( onMouseDownPosition.distanceTo( onMouseUpPosition ) == 0 ) {
@@ -163,14 +170,28 @@ var Viewport = function ( editor ) {
 	// otherwise controls.enabled doesn't work.
 
 	var controls = new THREE.EditorControls( camera, container.dom );
+	controls.center.fromArray( editor.config.getKey( 'camera' ).target )
 	controls.addEventListener( 'change', function () {
 
 		transformControls.update();
-		signals.objectChanged.dispatch( camera );
+		signals.cameraChanged.dispatch( camera );
 
 	} );
 
 	// signals
+
+	signals.themeChanged.add( function ( value ) {
+
+		switch ( value ) {
+
+			case 'css/light.css': grid.setColors( 0x444444, 0x888888 ); break;
+			case 'css/dark.css': grid.setColors( 0xbbbbbb, 0x888888 ); break;
+
+		}
+
+		render();
+
+	} );
 
 	signals.transformModeChanged.add( function ( mode ) {
 
@@ -190,12 +211,11 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( object ) {
+	signals.rendererChanged.add( function ( type ) {
 
 		container.dom.removeChild( renderer.domElement );
 
-		renderer = object;
-		renderer.setClearColor( clearColor );
+		renderer = new THREE[ type ]( { antialias: true } );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
@@ -210,6 +230,17 @@ var Viewport = function ( editor ) {
 
 		render();
 		updateInfo();
+
+	} );
+
+	signals.cameraChanged.add( function () {
+
+		editor.config.setKey( 'camera', {
+			position: camera.position.toArray(),
+			target: controls.center.toArray()
+		} );
+
+		render();
 
 	} );
 
@@ -315,15 +346,6 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.clearColorChanged.add( function ( color ) {
-
-		renderer.setClearColor( color );
-		render();
-
-		clearColor = color;
-
-	} );
-
 	signals.fogTypeChanged.add( function ( fogType ) {
 
 		if ( fogType !== oldFogType ) {
@@ -408,17 +430,24 @@ var Viewport = function ( editor ) {
 
 	var renderer;
 
-	if ( System.support.webgl === true ) {
+	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
 
-		renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+		renderer = new THREE[ editor.config.getKey( 'renderer' ) ]( { antialias: true } );
 
 	} else {
 
-		renderer = new THREE.CanvasRenderer();
+		if ( System.support.webgl === true ) {
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+		} else {
+
+			renderer = new THREE.CanvasRenderer();
+
+		}
 
 	}
 
-	renderer.setClearColor( clearColor );
 	renderer.autoClear = false;
 	renderer.autoUpdateScene = false;
 	container.dom.appendChild( renderer.domElement );

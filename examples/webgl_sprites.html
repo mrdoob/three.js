@@ -22,7 +22,7 @@
 
 		<script>
 
-			var container, stats;
+			var stats;
 
 			var camera, scene, renderer;
 
@@ -40,9 +40,6 @@
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2100 );
 				camera.position.z = 1500;
@@ -129,8 +126,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				// stats
 
@@ -138,7 +134,7 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
+				document.body.appendChild( stats.domElement );
 
 				//
 

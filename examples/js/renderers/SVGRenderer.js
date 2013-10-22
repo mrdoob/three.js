@@ -126,12 +126,12 @@ THREE.SVGRenderer = function () {
 
 			_elemBox.makeEmpty();
 
-			if ( element instanceof THREE.RenderableParticle ) {
+			if ( element instanceof THREE.RenderableSprite ) {
 
 				_v1 = element;
 				_v1.x *= _svgWidthHalf; _v1.y *= -_svgHeightHalf;
 
-				renderParticle( _v1, element, material );
+				renderSprite( _v1, element, material );
 
 			} else if ( element instanceof THREE.RenderableLine ) {
 
@@ -258,7 +258,7 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function renderParticle( v1, element, material ) {
+	function renderSprite( v1, element, material ) {
 
 		/*
 		_svgNode = getCircleNode( _circleCount++ );
@@ -266,7 +266,7 @@ THREE.SVGRenderer = function () {
 		_svgNode.setAttribute( 'cy', v1.y );
 		_svgNode.setAttribute( 'r', element.scale.x * _svgWidthHalf );
 
-		if ( material instanceof THREE.ParticleCircleMaterial ) {
+		if ( material instanceof THREE.SpriteSVGMaterial ) {
 
 			_color.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
 			_color.g = _ambientLight.g + _directionalLights.g + _pointLights.g;

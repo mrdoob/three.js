@@ -122,7 +122,7 @@
 				var amounty = 10;
 
 				var PI2 = Math.PI * 2;
-				var material = new THREE.ParticleCanvasMaterial( {
+				var material = new THREE.SpriteCanvasMaterial( {
 
 					color: 0x0808080,
 					program: function ( context ) {
@@ -139,7 +139,7 @@
 
 					for ( var iy = 0; iy < amounty; iy++ ) {
 
-						particle = new THREE.Particle( material );
+						particle = new THREE.Sprite( material );
 						particle.position.x = ix * separation - ( ( amountx * separation ) / 2 );
 						particle.position.y = -153
 						particle.position.z = iy * separation - ( ( amounty * separation ) / 2 );

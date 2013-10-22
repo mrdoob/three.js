@@ -136,25 +136,11 @@
 			var radius = 200;
 
 			geometry = new THREE.BufferGeometry();
-			// geometry.dynamic = true;
-			geometry.attributes = {
 
-				position: {
-					itemSize: 3,
-					array: new Float32Array( particles * 3 )
-				},
-				customColor: {
-					itemSize: 3,
-					array: new Float32Array( particles * 3 )
-				},
-				size: {
-					itemSize: 1,
-					array: new Float32Array( particles ),
-					dynamic: true
-				},
-
-			}
-
+			geometry.addAttribute( 'position', Float32Array, particles, 3 );
+			geometry.addAttribute( 'customColor', Float32Array, particles, 3 );
+			geometry.addAttribute( 'size', Float32Array, particles, 1 );
+			geometry.attributes.size.dynamic = true;
 
 			values_size = geometry.attributes.size.array;
 			var positions = geometry.attributes.position.array;
@@ -162,7 +148,7 @@
 
 			sphere = new THREE.ParticleSystem( geometry, shaderMaterial );
 
-			//sphere.sortParticles = true;
+			// sphere.sortParticles = true;
 
 			var color = new THREE.Color( 0xffaa00 );;
 

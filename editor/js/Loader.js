@@ -3,39 +3,6 @@ var Loader = function ( editor ) {
 	var scope = this;
 	var signals = editor.signals;
 
-	this.loadLocalStorage = function () {
-
-		if ( localStorage.threejsEditor !== undefined ) {
-
-			var loader = new THREE.ObjectLoader();
-			var scene = loader.parse( JSON.parse( localStorage.threejsEditor ) );
-
-			editor.setScene( scene );
-
-		}
-
-	};
-
-	var exporter = new THREE.ObjectExporter();
-	var timeout;
-
-	this.saveLocalStorage = function ( scene ) {
-
-		clearTimeout( timeout );
-
-		timeout = setTimeout( function () {
-
-			localStorage.threejsEditor = JSON.stringify( exporter.parse( editor.scene ) );
-			console.log( '[' + /\d\d\:\d\d\:\d\d/.exec( new Date() )[ 0 ] + ']', 'Saved state to LocalStorage.' );
-
-		}, 3000 );
-
-	};
-
-	signals.objectAdded.add( this.saveLocalStorage );
-	signals.objectChanged.add( this.saveLocalStorage );
-	signals.objectRemoved.add( this.saveLocalStorage );
-
 	this.loadFile = function ( file ) {
 
 		var filename = file.name;

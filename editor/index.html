@@ -4,98 +4,10 @@
 		<title>three.js editor</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			* {
-				vertical-align: middle;
-			}
-
-			body {
-				font-family: Arial, sans-serif;
-				font-size: 14px;
-				margin: 0;
-				overflow: hidden;
-			}
-
-			hr {
-				border: 0px;
-				border-top: 1px solid #ccc;
-			}
-
-			button {
-				position: relative;
-			}
-			
-			#menubar {
-				position: absolute;
-				background-color: #eee;
-				padding: 0px;
-				margin: 0px;
-			}
-
-				#menubar .menu {
-					float: left;
-					width: 50px;
-					cursor: pointer;
-				}
-
-					#menubar .menu .options {
-						padding: 5px 0px;
-						background-color: #fff;
-						width: 140px;
-					}
-
-						#menubar .menu .options hr {
-							border-color: #ddd;
-						}
-
-						#menubar .menu .options .option {
-							color: #666;
-							background-color: transparent;
-							padding: 5px 10px;
-							margin: 0px !important;
-						}
-
-							#menubar .menu .options .option:hover {
-								color: #fff;
-								background-color: #08f;
-							}
-
-
-			#sidebar {
-				position: absolute;
-				width: 300px;
-				background-color: #eee;
-				overflow: auto;
-			}
-
-				#sidebar .Panel {
-					margin-bottom: 10px;
-				}
-
-				#sidebar #outliner .type {
-					padding: 2px 4px;
-					font-size: 10px;
-					background-color: #eee;
-					color: #aaa;
-				}
-
-			#toolbar {
-				position: absolute;
-				background-color: #999;
-				color: #333;
-			}
-			
-				#toolbar .Panel {
-					padding: 4px;
-				}
-
-				#toolbar button {
-					margin-right: 6px;
-				}
-
-		</style>
 	</head>
 	<body>
+		<link href="css/types.css" rel="stylesheet" />
+		<link id="theme" href="css/light.css" rel="stylesheet" />
 
 		<script src="../build/three.min.js"></script>
 		<script src="../examples/js/libs/system.min.js"></script>
@@ -128,18 +40,20 @@
 		<script src="../examples/js/exporters/ObjectExporter.js"></script>
 		<script src="../examples/js/renderers/WebGLRenderer3.js"></script>
 
-		<script src="js/libs/rawdeflate.js"></script>
-		<script src="js/libs/rawinflate.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
+		<script src="js/Storage.js"></script>
+
 		<script src="js/Editor.js"></script>
+		<script src="js/Config.js"></script>
 		<script src="js/Loader.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
+		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Renderer.js"></script>
@@ -166,30 +80,70 @@
 
 			var editor = new Editor();
 
-			var viewport = new Viewport( editor );
-			viewport.setTop( '32px' );
-			viewport.setLeft( '0px' );
-			viewport.setRight( '300px' );
-			viewport.setBottom( '32px' );
+			var viewport = new Viewport( editor ).setId( 'viewport' );
 			document.body.appendChild( viewport.dom );
 
-			var toolbar = new Toolbar( editor );
-			toolbar.setBottom( '0px' );
-			toolbar.setLeft( '0px' );
-			toolbar.setRight( '300px' );
-			toolbar.setHeight( '32px' );
+			var toolbar = new Toolbar( editor ).setId( 'toolbar' )
 			document.body.appendChild( toolbar.dom );
 
-			var menubar = new Menubar( editor );
-			menubar.setWidth( '100%' );
-			menubar.setHeight( '32px' );
+			var menubar = new Menubar( editor ).setId( 'menubar' );
 			document.body.appendChild( menubar.dom );
 
-			var sidebar = new Sidebar( editor );
-			sidebar.setRight( '0px' );
-			sidebar.setTop( '32px' );
-			sidebar.setBottom( '0px' );
+			var sidebar = new Sidebar( editor ).setId( 'sidebar' );
 			document.body.appendChild( sidebar.dom );
+
+			//
+
+			editor.setTheme( editor.config.getKey( 'theme' ) );
+
+			editor.storage.init( function () {
+
+				editor.storage.get( function ( state ) {
+
+					if ( state !== undefined ) {
+
+						var loader = new THREE.ObjectLoader();
+						var scene = loader.parse( state );
+
+						editor.setScene( scene );
+
+					}
+
+					var selected = editor.config.getKey( 'selected' );
+
+					if ( selected !== undefined ) {
+
+						editor.selectByUuid( selected );
+
+					}
+
+				} );
+
+				//
+
+				var timeout;
+				var exporter = new THREE.ObjectExporter();
+
+				var saveState = function ( scene ) {
+
+					clearTimeout( timeout );
+
+					timeout = setTimeout( function () {
+
+						editor.storage.set( exporter.parse( editor.scene ) );
+
+					}, 2000 );
+
+				};
+
+				var signals = editor.signals;
+
+				signals.objectAdded.add( saveState );
+				signals.objectChanged.add( saveState );
+				signals.objectRemoved.add( saveState );
+				signals.sceneGraphChanged.add( saveState );
+
+			} );
 
 			//
 
@@ -231,21 +185,6 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
-
-			var hash = window.location.hash.substr( 1 );
-
-			if ( hash !== '' && hash.substr( 0, 2 ) === 'A/' ) {
-
-				var string = RawDeflate.inflate( window.atob( hash.substr( 2 ) ) );
-				var json = JSON.parse( string );
-				var scene = new THREE.ObjectLoader().parse( json );
-				editor.setScene( scene );
-				
-			} else {
-
-				editor.loader.loadLocalStorage();
-
-			}
 
 		</script>
 	</body>

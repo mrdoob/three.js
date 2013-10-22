@@ -51,7 +51,7 @@
 				particles = new Array();
 
 				var PI2 = Math.PI * 2;
-				var material = new THREE.ParticleCanvasMaterial( {
+				var material = new THREE.SpriteCanvasMaterial( {
 
 					color: 0xffffff,
 					program: function ( context ) {
@@ -70,7 +70,7 @@
 
 					for ( var iy = 0; iy < AMOUNTY; iy ++ ) {
 
-						particle = particles[ i ++ ] = new THREE.Particle( material );
+						particle = particles[ i ++ ] = new THREE.Sprite( material );
 						particle.position.x = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 );
 						particle.position.z = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 );
 						scene.add( particle );

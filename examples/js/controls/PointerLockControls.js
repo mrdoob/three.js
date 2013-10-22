@@ -88,7 +88,7 @@ THREE.PointerLockControls = function ( camera ) {
 				break;
 
 			case 40: // down
-			case 83: // a
+			case 83: // s
 				moveBackward = false;
 				break;
 

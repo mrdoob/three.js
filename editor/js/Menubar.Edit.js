@@ -7,7 +7,7 @@ Menubar.Edit = function ( editor ) {
 	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
-	title.setTextContent( 'Edit' ).setColor( '#666' );
+	title.setTextContent( 'Edit' );
 	title.setMargin( '0px' );
 	title.setPadding( '8px' );
 	container.add( title );

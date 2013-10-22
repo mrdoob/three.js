@@ -6,7 +6,7 @@ THREE.VRMLLoader = function () {};
 
 THREE.VRMLLoader.prototype = {
 
-	constructor: THREE.VTKLoader,
+	constructor: THREE.VRMLLoader,
 
 	load: function ( url, callback ) {
 
@@ -52,18 +52,33 @@ THREE.VRMLLoader.prototype = {
 
 				var tree = { 'string': 'Scene', children: [] };
 				var current = tree;
+                var matches;
 
 				for ( var i = 0; i < lines.length; i ++ ) {
 
+                    var comment = '';
+
 					var line = lines[ i ];
 
-					if ( /^#/.exec( line ) ) {
+                    // omit whitespace only lines
+                    if ( null !== ( result = /^\s+?$/g.exec( line ) ) ) {
+                        continue;
+                    }
 
-						continue;
+					if ( /#/.exec( line ) ) {
 
-					} else if ( /{/.exec( line ) ) {
+                        var parts = line.split('#');
 
-						var block = { 'string': line, 'parent': current, 'children': [] };
+                        // discard everything after the #, it is a comment
+                        line = parts[0];
+
+                        // well, let's also keep the comment
+                        comment = parts[1];
+					}
+                    // todo: add collection like coordIndex and colorIndex who are delimited by [ ]
+                    if ( matches = /([^\s]*){1}\s?{/.exec( line ) ) { // first subpattern should match the Node name
+
+						var block = { 'nodeType' : matches[1], 'string': line, 'parent': current, 'children': [],'comment' : comment };
 						current.children.push( block );
 						current = block;
 
@@ -80,20 +95,20 @@ THREE.VRMLLoader.prototype = {
 
 					} else if ( line !== '' ) {
 
-						current.children.push( line );
+                        current.children.push( line );
 
 					}
 
 				}
 
-				return tree;
+                return tree;
 
 			}
 
 			var defines = {};
-			var float_pattern = /( +[\d|\.|\+|\-|e]+)/;
-			var float3_pattern = /( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+)/;
-			var float4_pattern = /( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+),?( +[\d|\.|\+|\-|e]+)/;
+			var float_pattern = /\s+([\d|\.|\+|\-|e]+)/;
+			var float3_pattern = /\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+)/;
+			var float4_pattern = /\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+),?\s+([\d|\.|\+|\-|e]+)/;
 
 			var parseNode = function ( data, parent ) {
 
@@ -103,16 +118,29 @@ THREE.VRMLLoader.prototype = {
 
 					if ( /USE/.exec( data ) ) {
 
-						if ( /appearance/.exec( data ) ) {
+                        var defineKey = /USE\s+?(\w+)/.exec( data )[ 1 ];
 
-							parent.material = defines[ /USE (\w+)/.exec( data )[ 1 ] ].clone();
+                        if (undefined == defines[defineKey]) {
+                            debugger;
+                            console.warn(defineKey + ' is not defined.');
 
-						} else {
+                        } else {
 
-							var object = defines[ /USE (\w+)/.exec( data )[ 1 ] ].clone();
-							parent.add( object );
+                            if ( /appearance/.exec( data ) && defineKey ) {
 
-						}
+                                parent.material = defines[ defineKey].clone();
+
+                            } else if ( /geometry/.exec( data ) && defineKey ) {
+
+                                parent.geometry = defines[ defineKey].clone();
+
+                            } else if (defineKey){
+                                var object = defines[ defineKey ].clone();
+                                parent.add( object );
+
+                            }
+
+                        }
 
 					}
 
@@ -123,12 +151,11 @@ THREE.VRMLLoader.prototype = {
 				var object = parent;
 
 				if ( /Transform/.exec( data.string ) || /Group/.exec( data.string ) ) {
-
 					object = new THREE.Object3D();
 
 					if ( /DEF/.exec( data.string ) ) {
 
-						object.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+						object.name = /DEF\s+(\w+)/.exec( data.string )[ 1 ];
 						defines[ object.name ] = object;
 
 					}
@@ -151,13 +178,14 @@ THREE.VRMLLoader.prototype = {
 
 							var result = float4_pattern.exec( child );
 
-							object.quaternion.set(
-								parseFloat( result[ 1 ] ),
-								parseFloat( result[ 2 ] ),
-								parseFloat( result[ 3 ] ),
-								parseFloat( result[ 4 ] )
-							);
+                            var quaternion = new THREE.Quaternion();
 
+                            var x =  parseFloat( result[ 1 ] );
+                            var y = parseFloat(result[ 2 ]);
+                            var z = parseFloat(result[ 3 ]);
+                            var w = parseFloat(result[ 4 ]);
+
+                            object.quaternion.setFromAxisAngle( new THREE.Vector3( x, y, z), w );
 						} else if ( /scale/.exec( child ) ) {
 
 							var result = float3_pattern.exec( child );
@@ -179,10 +207,8 @@ THREE.VRMLLoader.prototype = {
 					object = new THREE.Mesh();
 
 					if ( /DEF/.exec( data.string ) ) {
-
 						object.name = /DEF (\w+)/.exec( data.string )[ 1 ];
 						defines[ object.name ] = object;
-
 					}
 
 					parent.add( object );
@@ -257,10 +283,100 @@ THREE.VRMLLoader.prototype = {
 
 					} else if ( /Sphere/.exec( data.string ) ) {
 
-						var result = /radius( +[\d|\.|\+|\-|e]+)/.exec( data.children[ 0 ] );
+						var result = /radius\s+([\d|\.|\+|\-|e]+)/.exec( data.children[ 0 ] );
 
 						parent.geometry = new THREE.SphereGeometry( parseFloat( result[ 1 ] ) );
 
+					} else if ( /IndexedFaceSet/.exec( data.string ) ) {
+
+                        var geometry = new THREE.Geometry();
+
+                        var isRecordingCoordinates = false;
+
+                        for (var i = 0, j = data.children.length; i < j; i++) {
+
+                            var child = data.children[i];
+
+                            var result;
+                            var vec;
+
+                            if ( /Coordinate/.exec (child.string)) {
+
+                                for (var k = 0, l = child.children.length; k < l; k++) {
+
+                                    var point = child.children[k];
+
+                                    if (null != (result = float3_pattern.exec(point))) {
+
+                                        vec = new THREE.Vector3(
+                                            parseFloat(result[1]),
+                                            parseFloat(result[2]),
+                                            parseFloat(result[3])
+                                        );
+
+                                        geometry.vertices.push( vec );
+                                    }
+                                }
+                            }
+
+                            if (/coordIndex/.exec(child)) {
+                                isRecordingCoordinates = true;
+                            }
+
+                            var coordIndex = false;
+                            var points =  [];
+                            var skip = 0;
+                            var regex = /(-?\d+)/g;
+                            // read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
+                            while ( isRecordingCoordinates && null != (coordIndex = regex.exec(child) ) ) {
+                                // parse coordIndex lines
+                                coordIndex = parseInt(coordIndex, 10);
+
+                                points.push(coordIndex);
+
+                                // -1 indicates end of face points
+                                if (coordIndex === -1) {
+                                    // reset the collection
+                                    points = [];
+                                }
+
+                                // vrml support multipoint indexed face sets (more then 3 vertices). You must calculate the composing triangles here
+
+                                skip = points.length -3;
+                                skip = skip < 0 ? 0 : skip;
+
+                                // Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
+                                if (points.length >= 3) {
+                                    var face = new THREE.Face3(
+                                        points[0],
+                                        points[skip + 1],
+                                        points[skip + 2],
+                                        null // normal, will be added later
+                                        // todo: pass in the color
+                                    );
+
+                                    geometry.faces.push(face);
+
+                                    }
+
+                            }
+
+                            // stop recording if a ] is encountered after recording was turned on
+                            isRecordingCoordinates = (isRecordingCoordinates && null === (/]/.exec(child) ) );
+
+                        }
+
+                        geometry.computeFaceNormals();
+                        //geometry.computeVertexNormals(); // does not show
+                        geometry.computeBoundingSphere();
+
+                        // see if it's a define
+                        if ( /DEF/.exec( data.string ) ) {
+                            geometry.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+                            defines[ geometry.name ] = geometry;
+                        }
+
+                        parent.geometry = geometry;
 					}
 
 					return;
@@ -274,6 +390,7 @@ THREE.VRMLLoader.prototype = {
 						if ( /Material/.exec( child.string ) ) {
 
 							var material = new THREE.MeshPhongMaterial();
+                            material.side = THREE.DoubleSide;
 
 							for ( var j = 0; j < child.children.length; j ++ ) {
 
@@ -311,9 +428,9 @@ THREE.VRMLLoader.prototype = {
 
 								} else if ( /transparency/.exec( parameter ) ) {
 
-									var result = /( +[\d|\.|\+|\-|e]+)/.exec( parameter );
-
-									material.opacity = parseFloat( result[ 1 ] );
+									var result = /\s+([\d|\.|\+|\-|e]+)/.exec( parameter );
+                                    // transparency is opposite of opacity
+									material.opacity = Math.abs( 1 - parseFloat( result[ 1 ] ) );
 									material.transparent = true;
 
 								}
@@ -323,6 +440,7 @@ THREE.VRMLLoader.prototype = {
 							if ( /DEF/.exec( data.string ) ) {
 
 								material.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+
 								defines[ material.name ] = material;
 
 							}
