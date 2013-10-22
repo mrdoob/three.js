@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '62' };
+var THREE = { REVISION: '63dev' };
 
 self.console = self.console || {
 
@@ -31760,7 +31760,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 			var uv1 = uvs[ 0 ][ x ].clone();
 			var uv2 = uvs[ 0 ][ x + 1 ].clone();
-			var uv3 = new THREE.Vector2( uv2.u, 0 );
+			var uv3 = new THREE.Vector2( uv2.x, 0 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
@@ -31787,7 +31787,7 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 
 			var uv1 = uvs[ y ][ x + 1 ].clone();
 			var uv2 = uvs[ y ][ x ].clone();
-			var uv3 = new THREE.Vector2( uv2.u, 1 );
+			var uv3 = new THREE.Vector2( uv2.x, 1 );
 
 			this.faces.push( new THREE.Face3( v1, v2, v3, [ n1, n2, n3 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv3 ] );
