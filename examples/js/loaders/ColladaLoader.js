@@ -541,7 +541,9 @@ THREE.ColladaLoader = function () {
 
 			} else {
 
-				throw 'ColladaLoader: Could not find joint \'' + bone.sid + '\'.';
+				console.log('ColladaLoader: Could not find joint \'' + bone.sid + '\'.');
+				bone.skinningMatrix = new THREE.Matrix4();
+			    	bone.weights = [];
 
 			}
 
