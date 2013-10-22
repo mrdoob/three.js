@@ -26,12 +26,6 @@ var Storage = function () {
 			request.onsuccess = function ( event ) {
 
 				database = event.target.result;
-				database.onabort = function ( event ) {
-
-					database.close();
-					database = null;
-
-				};
 
 				callback();
 
@@ -77,7 +71,9 @@ var Storage = function () {
 			var objectStore = transaction.objectStore( 'states' );
 			var request = objectStore.clear();
 			request.onsuccess = function ( event ) {
+
 				callback();
+			
 			};
 
 		}
