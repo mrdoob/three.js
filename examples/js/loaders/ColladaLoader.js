@@ -541,9 +541,10 @@ THREE.ColladaLoader = function () {
 
 			} else {
 
-				console.log('ColladaLoader: Could not find joint \'' + bone.sid + '\'.');
+				console.warn( "ColladaLoader: Could not find joint '" + bone.sid + "'." );
+
 				bone.skinningMatrix = new THREE.Matrix4();
-			    	bone.weights = [];
+				bone.weights = [];
 
 			}
 
@@ -3086,20 +3087,28 @@ THREE.ColladaLoader = function () {
 				case 'repeatV':
 
 					this.texOpts[ child.nodeName ] = parseFloat( child.textContent );
+
 					break;
 
 				case 'wrapU':
 				case 'wrapV':
 					
-					// some dae have a value of true which becomes NaN via parseInt			
-			                if (child.textContent.toUpperCase() == 'TRUE'){
-			                     this.texOpts[ child.nodeName ] = 1;
-			                } else {
-			                     this.texOpts[ child.nodeName ] = parseInt( child.textContent );
-			                }
+					// some dae have a value of true which becomes NaN via parseInt
+
+					if ( child.textContent.toUpperCase() == 'TRUE' ) {
+					
+						this.texOpts[ child.nodeName ] = 1;
+					
+					} else {
+					
+						this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					
+					}
 
 				default:
+
 					this.texOpts[ child.nodeName ] = child.textContent;
+
 					break;
 
 			}
