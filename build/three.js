@@ -11599,7 +11599,7 @@ THREE.ObjectLoader.prototype = {
 							data.radiusTop,
 							data.radiusBottom,
 							data.height,
-							data.radiusSegments,
+							data.radialSegments,
 							data.heightSegments,
 							data.openEnded
 						);
