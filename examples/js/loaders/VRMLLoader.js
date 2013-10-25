@@ -400,7 +400,7 @@ THREE.VRMLLoader.prototype = {
 
 				} else if ( 'Background' === data.nodeType ) {
 
-                    console.warn('Implement hemisphere light here');
+                    console.warn ('Background node is not implemented.');
 
 				} else if ( /geometry/.exec( data.string ) ) {
 
