@@ -74,7 +74,7 @@ THREE.ObjectExporter.prototype = {
 					data.height = geometry.height;
 					data.radialSegments = geometry.radialSegments;
 					data.heightSegments = geometry.heightSegments;
-					data.openEnded = data.openEnded;
+					data.openEnded = geometry.openEnded;
 
 				} else if ( geometry instanceof THREE.SphereGeometry ) {
 
