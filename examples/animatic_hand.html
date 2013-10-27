@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Animation of a hand using Animatic</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+   </head>
+  <body>
+
+    <script src="../build/three.min.js"></script>
+    <script src="../src/extras/animation/Animatic.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+    <script>
+        // SCENE
+        var scene = new THREE.Scene();
+        
+        // CAMERA
+        var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+        var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+        var camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+        scene.add(camera);
+        camera.position.set(0,150,800);
+        camera.lookAt(scene.position);	
+        
+        // RENDERER
+        var renderer = new THREE.WebGLRenderer( {antialias:true} );
+        renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        var container = document.getElementById( 'ThreeJS' );
+        container.appendChild( renderer.domElement );
+        
+        // LIGHT
+        var light = new THREE.PointLight(0xffffff);
+        light.position.set(-1000,2000,1000);
+        scene.add(light);
+        
+        // FINGER
+        var skinMaterial = new THREE.MeshPhongMaterial({ambient: 0xffffff, color: 0xffdabe, specular: 0x111111, shininess: 10});
+        function phalanx(bottomRadius, topRadius, height) {
+            var phalanxBoneGeometry = new THREE.CylinderGeometry(topRadius, bottomRadius, height, 8, 8, false);
+            var knuckleGeometry = new THREE.SphereGeometry(topRadius, 8, 8);
+            knuckleGeometry.applyMatrix( new THREE.Matrix4().makeTranslation(0, height / 2, 0)) 
+            THREE.GeometryUtils.merge(phalanxBoneGeometry, knuckleGeometry);
+            var phalanxBone = new THREE.Mesh(phalanxBoneGeometry, skinMaterial);
+            phalanxBone.position.y = height / 2;
+            var phalanx = new THREE.Object3D();
+            phalanx.add(phalanxBone);
+            return phalanx;
+        }
+        function createFinger() {
+            var finger = new THREE.Object3D();
+            var phalanx3 = phalanx(12, 12, 30);
+            phalanx3.position.y = 50;
+            var phalanx2 = phalanx(14, 12, 50);
+            phalanx2.add(phalanx3);
+            phalanx2.position.y = 66;
+            var phalanx1 = phalanx(15, 14, 66);
+            phalanx1.add(phalanx2);
+            phalanx1.position.y = 100;
+            var metacarpal = phalanx(30, 20, 100);
+            metacarpal.add(phalanx1);
+            metacarpal.position.y = 0;
+            finger.add(metacarpal);
+            finger.metacarpal = metacarpal;
+            finger.phalanx1 = phalanx1;
+            finger.phalanx2 = phalanx2;
+            finger.phalanx3 = phalanx3;
+            return finger;
+        }
+        function createThumb() {
+            var thumb = new THREE.Object3D();
+            var phalanx3 = phalanx(16, 16, 40);
+            phalanx3.position.y = 50;
+            var phalanx2 = phalanx(20, 16, 50);
+            phalanx2.add(phalanx3);
+            phalanx2.position.y = 80;
+            var phalanx1 = phalanx(30, 20, 80);
+            phalanx1.add(phalanx2);
+            thumb.add(phalanx1);
+            thumb.phalanx1 = phalanx1;
+            thumb.phalanx2 = phalanx2;
+            thumb.phalanx3 = phalanx3;
+            return thumb;
+        }
+        
+        function createHand(flip) {
+            var hand = new THREE.Object3D();
+            var finger0 = createFinger(); 
+            finger0.rotation.x = flip * -0.1;
+            var finger1 = createFinger(); 
+            finger1.scale.y = 1.05;
+            finger1.position.z = flip * 20;
+            finger1.position.x = 15;
+            var finger2 = createFinger(); 
+            finger2.scale.y = 0.98;
+            finger2.rotation.x = flip * 0.1;
+            finger2.position.z = flip * 40;
+            var finger3 = createFinger(); 
+            finger3.scale.y = 0.9;
+            finger3.rotation.x = flip * 0.2;
+            finger3.position.z = flip * 60;
+            finger3.position.x = -15;
+            var thumb = createThumb(); 
+            thumb.scale.y = 0.8;
+            thumb.position.y = -20;
+            thumb.position.x = -20;
+            thumb.rotation.y = 1.1;
+            thumb.rotation.z = 0.5;
+            thumb.rotation.x = flip * -1.2;
+            thumb.rotation.y = flip;
+            thumb.position.z = flip * -20;
+            hand.add(finger0);
+            hand.finger0 = finger0;
+            hand.add(finger1);
+            hand.finger1 = finger1;
+            hand.add(finger2);
+            hand.finger2 = finger2;
+            hand.add(finger3);
+            hand.finger3 = finger3;
+            hand.add(thumb);
+            hand.thumb = thumb;
+            return hand;
+        }
+        var hands = new THREE.Object3D();
+        var leftHand = createHand(1);
+        leftHand.position.x = -200;
+        leftHand.rotation.y = 3.14159265358979;
+        hands.add(leftHand);
+        hands.left = leftHand;
+        var rightHand = createHand(-1);
+        rightHand.position.x = 200;
+        hands.add(rightHand);
+        hands.right = rightHand;
+        scene.add(hands);
+        
+        // ANIMATION -- THE IMPORTANT PART
+        // 
+        var rest = {
+            phalanx1: {rotation: {z: 0.6}},
+            phalanx2: {rotation: {z: 0.5}},
+            phalanx3: {rotation: {z: 1}}
+        };
+        var straight = {
+            phalanx1: {rotation: {z: 0}},
+            phalanx2: {rotation: {z: 0}},
+            phalanx3: {rotation: {z: 0}}
+        };
+        var grip = {
+            phalanx1: {rotation: {z: 1}},
+            phalanx2: {rotation: {z: 1.5}},
+            phalanx3: {rotation: {z: 1}}
+        };
+        var curl = {
+            phalanx1: {rotation: {z: 1.5}},
+            phalanx2: {rotation: {z: 1.6}},
+            phalanx3: {rotation: {z: 1}}
+        };
+        var handRest = {
+            thumb: rest,
+            finger0: rest,
+            finger1: rest,
+            finger2: rest,
+            finger3: rest
+        };
+        var handStraight = {
+            thumb: straight,
+            finger0: straight,
+            finger1: straight,
+            finger2: straight,
+            finger3: straight
+        };
+        var handGrip = {
+            thumb: rest,
+            finger0: grip,
+            finger1: grip,
+            finger2: grip,
+            finger3: grip
+        };
+        var handFist = {
+            thumb: grip,
+            finger0: curl,
+            finger1: curl,
+            finger2: curl,
+            finger3: curl
+        };
+        var handPoint = {
+            thumb: grip,
+            finger0: straight,
+            finger1: curl,
+            finger2: curl,
+            finger3: curl
+        };
+        var handSequence = [handRest, handStraight, handGrip, handRest, handFist, handRest, handPoint, handStraight];
+        function moveHands() {
+            THREE.Animatic.snap(hands, 
+              [ 
+                {left: handSequence, right: handSequence}
+              ],
+              4, clap); 
+        }
+        function clap() {
+            THREE.Animatic.animate(hands, 
+              [ 
+                {left: {position: {x: -50}, rotation: {y: 2, x: -0.5}}, right: {position: {x: 0}, rotation: {y: -1}}},
+                {left: {position: {x: -200}, rotation: {y: 3.14159265358979, x: 0}}, right: {position: {x: 200}, rotation: {y: 0}}}
+              ],
+              0.5, moveHands); 
+        }
+        moveHands();
+
+        function rotate(something, angSpeed) {
+            THREE.Animatic.animate(
+                something, 
+                {rotation: {y: something.rotation.y + angSpeed}}, 
+                1, 
+                function(){rotate(something, angSpeed)}
+            );
+        }
+        rotate(hands, 1.0);
+        
+        // START THE REFRESH LOOP
+        var f = function() {
+            renderer.render(scene, camera); 
+        }
+        setInterval(f, 100);
+    </script>
+
+  </body>
+</html>

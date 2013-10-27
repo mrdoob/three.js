@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Animation of the Earth and Moon using Animatic</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+   </head>
+  <body>
+
+    <script src="../build/three.min.js"></script>
+    <script src="../src/extras/animation/Animatic.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+    <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+    <script>
+      // SCENE
+
+      var scene = new THREE.Scene();
+
+      // CAMERA
+      var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+      var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+      var camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+      scene.add(camera);
+      camera.position.set(0,150,400);
+      camera.lookAt(scene.position);	
+      
+      // RENDERER
+      var renderer = new THREE.WebGLRenderer( {antialias:true} );
+      renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+      var container = document.getElementById( 'ThreeJS' );
+      container.appendChild( renderer.domElement );
+      
+      // LIGHT
+      var light = new THREE.PointLight(0xffffff);
+      light.position.set(-100,200,100);
+      scene.add(light);
+      
+      // FLOOR
+      var floorTexture = new THREE.ImageUtils.loadTexture('textures/crate.gif');
+      floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+      floorTexture.repeat.set( 10, 10 );
+      var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+      var floorGeometry = new THREE.PlaneGeometry(1000, 1000, 10, 10);
+      var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+      floor.position.y = -0.5;
+      floor.rotation.x = Math.PI / 2;
+      scene.add(floor);
+      
+      // EARTH
+      var earthTexture = new THREE.ImageUtils.loadTexture('textures/land_ocean_ice_cloud_2048.jpg');
+      var earthMaterial = new THREE.MeshBasicMaterial( { map: earthTexture} );
+      var earthGeometry = new THREE.SphereGeometry(60, 20, 20);
+      var earth = new THREE.Mesh(earthGeometry, earthMaterial);
+      earth.position.y = 60;
+      
+      // MOON
+      var moonGeometry = new THREE.SphereGeometry(30, 20, 20);
+      var moonTexture = new THREE.ImageUtils.loadTexture('textures/planets/moon_1024.jpg');
+      var moonMaterial = new THREE.MeshBasicMaterial( { map: moonTexture} );
+      var moon = new THREE.Mesh(moonGeometry, moonMaterial);
+      moon.rotation.x = 1;
+      moon.position.y = 60;
+      moon.position.x = 150;
+      
+      // EARTH/MOON SYSTEM
+      var earthWithMoon = new THREE.Object3D();
+      earthWithMoon.add(earth);
+      earthWithMoon.add(moon);
+      moon.rotation.z = 0.5;
+      
+      scene.add(earthWithMoon);
+      
+      // ANIMATION -- THE IMPORTANT PART
+      // 
+      // This function is written using an `Animatic.animate`
+      // call. The code will rotate the object by
+      // `angularSpeed` radians over 1 second.
+      // Once the 1-second animation is complete, `animate`
+      // will run the anonymous function passed as the final 
+      // parameter. This function calls the rotate function 
+      // again, and so the animation continues.
+      function rotate(world, angularSpeed) {
+          THREE.Animatic.animate(world.rotation,
+              {y: world.rotation.y + angularSpeed}, 
+              1.0, 
+              function() {rotate(world, angularSpeed)});
+      }
+      rotate(earthWithMoon, 1.2);
+      rotate(earth, 1.0);
+      rotate(moon, 0.8);
+      
+      // START THE REFRESH LOOP
+      var f = function() {
+          renderer.render(scene, camera); 
+      }
+      setInterval(f, 40);
+    </script>
+
+  </body>
+</html>
