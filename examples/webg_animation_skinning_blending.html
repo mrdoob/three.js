@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - skeletal animation blending</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #f00;
+			}
+
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - animation - skeletal - blending </a><br/>
+		asdw or cursor keys to move
+		</div>
+
+		<script src="../build/Three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			window.onload = init;
+
+			var container;
+
+			var camera, scene, boneScene, renderer, controls;
+
+			var skinnedMesh = null;
+			var boneMeshRoot = null;
+
+			var walkAnim = null;
+			var idleAnim = null;
+
+			var clock = new THREE.Clock();
+
+			var forwardMovement = 0;
+			var sideRotation = 0;
+			var walkUnitsPerSecond = 1.35;
+
+			var gui = new dat.GUI();
+			var stats = new Stats();
+
+			var options = { "Show Bones": false, "Target Character": true };
+
+
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 1, 1000 );
+
+				boneScene = new THREE.Scene();
+				scene = new THREE.Scene();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setClearColor( '#e5f4ff', 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
+
+				var loader = new THREE.JSONLoader();
+				loader.load( "models/skinned/johnson.js", start );
+
+				gui.add( options, "Show Bones" ).onChange(function(value) {
+					( value ) ? boneScene.add( boneMeshRoot ): boneScene.remove( boneMeshRoot );
+				});
+
+				gui.add( options, "Target Character" ).listen();
+
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'keydown', onKeyDown, false );
+				window.addEventListener( 'keyup', onKeyUp, false );
+
+			}
+
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+
+			function onKeyDown( e ) {
+
+				if ( e.keyCode === 87 || e.keyIdentifier === 'Up' )
+					forwardMovement = walkUnitsPerSecond;
+				else if ( e.keyCode === 83 || e.keyIdentifier === 'Down' )
+					forwardMovement = -walkUnitsPerSecond;
+				else if ( e.keyCode === 68 || e.keyIdentifier === 'Right' )
+					sideRotation = -1;
+				else if ( e.keyCode === 65 || e.keyIdentifier === 'Left' )
+					sideRotation = 1;
+				else if ( e.keyCode === 32 )
+					options['Target Character'] = !options['Target Character'];
+
+			}
+
+
+			function onKeyUp( e ) {
+
+				if ( e.keyCode === 87 || e.keyIdentifier === 'Up' )
+					forwardMovement = 0;
+				else if ( e.keyCode === 83 || e.keyIdentifier === 'Down' )
+					forwardMovement = 0;
+				else if ( e.keyCode === 68  || e.keyIdentifier === 'Right' )
+					sideRotation = 0;
+				else if ( e.keyCode === 65 || e.keyIdentifier === 'Left' )
+					sideRotation = 0;
+
+			}
+
+
+			function createScene( geometry, materials ) {
+
+				createFloorGrid();
+
+				var material = new THREE.MeshFaceMaterial( materials );
+				var originalMaterial = materials[ 0 ];
+
+				originalMaterial.skinning = true;
+				originalMaterial.transparent = true;
+				originalMaterial.alphaTest = 0.75;
+
+				skinnedMesh = new THREE.SkinnedMesh( geometry, material, false );
+				skinnedMesh.position.set(0, 0, 0);
+
+				// We require access to multiple animations in order to blend
+				if ( geometry.animations !== undefined ) {
+
+					for ( var i = 0; i < geometry.animations.length; ++i )
+						THREE.AnimationHandler.add( geometry.animations[i] );
+
+				}
+
+				idleAnim = new THREE.Animation( skinnedMesh, "idle" );
+				walkAnim = new THREE.Animation( skinnedMesh, "walk" );
+
+				boneMeshRoot = new THREE.Object3D();
+
+				// Add axis visualizations for each bone
+				for ( var i = 0; i < skinnedMesh.bones.length; ++i ) {
+
+					skinnedMesh.bones[i].test = Math.random() * 10;
+					skinnedMesh.bones[i].helper = new THREE.AxisHelper(0.025);
+
+				}
+
+				// Once all axes are created, parent them correctly
+				for ( var i = 0; i < skinnedMesh.bones.length; ++i ) {
+
+					if ( skinnedMesh.bones[i].parent instanceof THREE.Bone )
+						skinnedMesh.bones[i].parent.helper.add( skinnedMesh.bones[i].helper );
+					else
+						boneMeshRoot.add( skinnedMesh.bones[i].helper );
+
+				}
+
+				scene.add( skinnedMesh );
+
+			}
+
+
+			function createFloorGrid() {
+
+				var planeTesselated = new THREE.PlaneGeometry( 1, 1, 10, 10 );
+				var matWire = new THREE.MeshBasicMaterial( { color: 0x110000, wireframe: true } );
+
+				var floor = new THREE.Mesh( planeTesselated, matWire );
+				floor.rotation.x = - Math.PI / 2;
+				floor.scale.set( 25, 25, 25 );
+				scene.add( floor );
+
+			}
+
+
+			function start(geometry, materials) {
+
+				createScene(geometry, materials);
+
+				var cameraDistance = skinnedMesh.geometry.boundingSphere.radius * 10;
+				camera.position.set(0.0, cameraDistance * 0.25, cameraDistance);
+
+				controls = new THREE.OrbitControls(camera);
+				controls.center.set( 0.0, 1.0, 0.0 );
+				controls.noKeys = true;
+
+				update();
+			}
+
+
+			function update() {
+
+				requestAnimationFrame( update, renderer.domElement );
+
+				var delta = clock.getDelta();
+
+				THREE.AnimationHandler.update( delta );
+
+				updateCharacterMovement( delta );
+				updateCharacterAnimation();
+				updateBoneVisualization();
+
+				if ( options['Target Character'] ) {
+
+					// Aim the camera slightly above the character's origin
+					controls.target = skinnedMesh.position.clone();
+					controls.target.y += 1.0;
+					controls.update();
+
+				}
+
+				renderer.clear();
+				renderer.render( scene, camera );
+				renderer.clear( false, true, false );
+				renderer.render( boneScene, camera );
+
+				stats.update();
+
+			}
+
+
+			function updateCharacterMovement( delta ) {
+
+				skinnedMesh.rotation.y += sideRotation * delta;
+				skinnedMesh.updateMatrix();
+
+				// pull the character's forward basis vector out of the matrix
+				var forward = new THREE.Vector3(
+					skinnedMesh.matrix.elements[8],
+					skinnedMesh.matrix.elements[9],
+					skinnedMesh.matrix.elements[10]
+				);
+
+				forward.multiplyScalar( forwardMovement ).multiplyScalar( delta );
+				skinnedMesh.position.add( forward );
+
+			}
+
+
+			function updateCharacterAnimation() {
+
+				if ( forwardMovement !== 0 ) {
+
+					if ( !walkAnim.isPlaying ) {
+						walkAnim.play( true, 0, 1, 0.3 );
+
+						if ( idleAnim.isPlaying )
+							idleAnim.stop( 0.3 );
+					}
+
+
+				} else {
+
+					if ( !idleAnim.isPlaying ) {
+						idleAnim.play( true, 0, 1, 0.3 );
+
+						if ( walkAnim.isPlaying )
+							walkAnim.stop( 0.3 );
+					}
+
+				}
+			}
+
+
+			function updateBoneVisualization() {
+
+				boneMeshRoot.position.copy( skinnedMesh.position );
+				boneMeshRoot.rotation.copy( skinnedMesh.rotation );
+
+				skinnedMesh.bones[0].helper.position = skinnedMesh.bones[0].position;
+				skinnedMesh.bones[0].helper.quaternion = skinnedMesh.bones[0].quaternion;
+				skinnedMesh.bones[0].helper.scale = skinnedMesh.bones[0].scale;
+				skinnedMesh.bones[0].helper.updateMatrix();
+
+				for ( var i = 1; i < skinnedMesh.bones.length; ++i ) {
+
+					skinnedMesh.bones[i].helper.position = skinnedMesh.bones[i].position;
+					skinnedMesh.bones[i].helper.quaternion = skinnedMesh.bones[i].quaternion;
+					skinnedMesh.bones[i].helper.scale = skinnedMesh.bones[i].scale;
+					skinnedMesh.bones[i].helper.updateMatrix();
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>
+
