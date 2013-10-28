@@ -50,7 +50,7 @@ button {
 	-webkit-user-select: none;
 	-ms-user-select: none;
 
-		/* No support for these yet */
+	/* No support for these yet */
 	-o-user-select: none;
 	user-select: none;
 }
@@ -88,7 +88,6 @@ input.Number {
 	left: 0px;
 	right: 300px;
 	bottom: 32px;
-	background-color: #333333;
 }
 
 #menubar {
