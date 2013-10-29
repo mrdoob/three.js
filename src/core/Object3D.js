@@ -18,14 +18,14 @@ THREE.Object3D = function () {
 	this.up = new THREE.Vector3( 0, 1, 0 );
 
 	this.position = new THREE.Vector3();
-	this.rotation = new THREE.Euler();
-	this.quaternion = new THREE.Quaternion();
+	this._rotation = new THREE.Euler();
+	this._quaternion = new THREE.Quaternion();
 	this.scale = new THREE.Vector3( 1, 1, 1 );
 
 	// keep rotation and quaternion in sync
 
-	this.rotation._quaternion = this.quaternion;
-	this.quaternion._euler = this.rotation;
+	this._rotation._quaternion = this.quaternion;
+	this._quaternion._euler = this.rotation;
 
 	this.renderDepth = null;
 
@@ -52,6 +52,32 @@ THREE.Object3D = function () {
 THREE.Object3D.prototype = {
 
 	constructor: THREE.Object3D,
+	
+	get rotation () { 
+		return this._rotation; 
+	},
+
+	set rotation ( value ) {
+		
+		this._rotation = value;
+		this._rotation._quaternion = this._quaternion;
+		this._quaternion._euler = this._rotation;
+		this._rotation._updateQuaternion();
+		
+	},
+
+	get quaternion () { 
+		return this._quaternion; 
+	},
+	
+	set quaternion ( value ) {
+		
+		this._quaternion = value;
+		this._quaternion._euler = this._rotation;
+		this._rotation._quaternion = this._quaternion;
+		this._quaternion._updateEuler();
+		
+	},
 
 	get eulerOrder () {
 
