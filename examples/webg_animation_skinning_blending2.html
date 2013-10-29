@@ -91,8 +91,10 @@
 				var loader = new THREE.JSONLoader();
 				loader.load( "models/skinned/johnson.js", start );
 
-				gui.add( options, "Show Bones" ).onChange(function(value) {
+				gui.add( options, "Show Bones" ).onChange( function( value ) {
+
 					( value ) ? boneScene.add( boneMeshRoot ): boneScene.remove( boneMeshRoot );
+
 				});
 
 				gui.add( options, "Enable Orbit" ).listen();
@@ -129,13 +131,13 @@
 				originalMaterial.alphaTest = 0.75;
 
 				skinnedMesh = new THREE.SkinnedMesh( geometry, material, false );
-				skinnedMesh.position.set(0, 0, 0);
+				skinnedMesh.position.set( 0, 0, 0 );
 
 				// We require access to multiple animations in order to blend
 				if ( geometry.animations !== undefined ) {
 
 					for ( var i = 0; i < geometry.animations.length; ++i )
-						THREE.AnimationHandler.add( geometry.animations[i] );
+						THREE.AnimationHandler.add( geometry.animations[ i ] );
 
 				}
 
@@ -144,18 +146,18 @@
 				// Add axis visualizations for each bone
 				for ( var i = 0; i < skinnedMesh.bones.length; ++i ) {
 
-					skinnedMesh.bones[i].test = Math.random() * 10;
-					skinnedMesh.bones[i].helper = new THREE.AxisHelper(0.025);
+					skinnedMesh.bones[ i ].test = Math.random() * 10;
+					skinnedMesh.bones[ i ].helper = new THREE.AxisHelper( 0.025 );
 
 				}
 
 				// Once all axes are created, parent them correctly
 				for ( var i = 0; i < skinnedMesh.bones.length; ++i ) {
 
-					if ( skinnedMesh.bones[i].parent instanceof THREE.Bone )
-						skinnedMesh.bones[i].parent.helper.add( skinnedMesh.bones[i].helper );
+					if ( skinnedMesh.bones[ i ].parent instanceof THREE.Bone )
+						skinnedMesh.bones[ i ].parent.helper.add( skinnedMesh.bones[ i ].helper );
 					else
-						boneMeshRoot.add( skinnedMesh.bones[i].helper );
+						boneMeshRoot.add( skinnedMesh.bones[ i ].helper );
 
 				}
 
@@ -188,9 +190,9 @@
 				createScene(geometry, materials);
 
 				var cameraDistance = skinnedMesh.geometry.boundingSphere.radius * 5;
-				camera.position.set(-cameraDistance * 0.25, cameraDistance * 0.25, cameraDistance);
+				camera.position.set( -cameraDistance * 0.25, cameraDistance * 0.25, cameraDistance );
 
-				controls = new THREE.OrbitControls(camera);
+				controls = new THREE.OrbitControls( camera );
 				controls.center.set( 0.0, 1.0, 0.0 );
 				controls.noKeys = true;
 				controls.update();
@@ -205,14 +207,14 @@
 
 				var delta = clock.getDelta();
 
-				idleAnim.weight = 1 - options['Blend'];
-				walkAnim.weight = options['Blend'];
+				idleAnim.weight = 1 - options[ 'Blend' ];
+				walkAnim.weight = options[ 'Blend' ];
 
 				THREE.AnimationHandler.update( delta );
 
 				updateBoneVisualization();
 
-				controls.enabled = options['Enable Orbit'];
+				controls.enabled = options[ 'Enable Orbit' ];
 
 				renderer.clear();
 				renderer.render( scene, camera );
@@ -229,17 +231,17 @@
 				boneMeshRoot.position.copy( skinnedMesh.position );
 				boneMeshRoot.rotation.copy( skinnedMesh.rotation );
 
-				skinnedMesh.bones[0].helper.position = skinnedMesh.bones[0].position;
-				skinnedMesh.bones[0].helper.quaternion = skinnedMesh.bones[0].quaternion;
-				skinnedMesh.bones[0].helper.scale = skinnedMesh.bones[0].scale;
-				skinnedMesh.bones[0].helper.updateMatrix();
+				skinnedMesh.bones[ 0 ].helper.position = skinnedMesh.bones[ 0 ].position;
+				skinnedMesh.bones[ 0 ].helper.quaternion = skinnedMesh.bones[ 0 ].quaternion;
+				skinnedMesh.bones[ 0 ].helper.scale = skinnedMesh.bones[ 0 ].scale;
+				skinnedMesh.bones[ 0 ].helper.updateMatrix();
 
 				for ( var i = 1; i < skinnedMesh.bones.length; ++i ) {
 
-					skinnedMesh.bones[i].helper.position = skinnedMesh.bones[i].position;
-					skinnedMesh.bones[i].helper.quaternion = skinnedMesh.bones[i].quaternion;
-					skinnedMesh.bones[i].helper.scale = skinnedMesh.bones[i].scale;
-					skinnedMesh.bones[i].helper.updateMatrix();
+					skinnedMesh.bones[ i ].helper.position = skinnedMesh.bones[ i ].position;
+					skinnedMesh.bones[ i ].helper.quaternion = skinnedMesh.bones[ i ].quaternion;
+					skinnedMesh.bones[ i ].helper.scale = skinnedMesh.bones[ i ].scale;
+					skinnedMesh.bones[ i ].helper.updateMatrix();
 
 				}
 
