@@ -161,6 +161,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 	if (this.isFadingOut) {
 
 			fadedWeight = this.weight * Math.max( 1 - this.fadeTimeElapsed / this.fadeOutTime, 0 );
+
 			if ( fadedWeight === 0 ) {
 
 				this.stop(0);
@@ -277,9 +278,11 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 					// blend this pos animation with others
 					if (object instanceof THREE.Bone) {
+
 						var proportionalWeight = fadedWeight / ( fadedWeight + object.accumulatedPosWeight );
 						vector.lerp( newVector, proportionalWeight );
 						object.accumulatedPosWeight += fadedWeight;
+
 					} else
 						vector = newVector;
 
@@ -297,8 +300,10 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 					currentPoint = this.interpolateCatmullRom( this.points, scale );
 
 					if ( object instanceof THREE.Bone ) {
+
 						var proportionalWeight = fadedWeight / ( fadedWeight + object.accumulatedPosWeight );
 						object.accumulatedPosWeight += fadedWeight;
+
 					}
 					else
 						var proportionalWeight = 1;
