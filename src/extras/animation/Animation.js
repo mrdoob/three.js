@@ -162,12 +162,9 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 			fadedWeight = this.weight * Math.max( 1 - this.fadeTimeElapsed / this.fadeOutTime, 0 );
 
-			if ( fadedWeight === 0 ) {
-
-				this.stop(0);
-				return;
-
-			}
+			// Once faded out, this animation is complete
+			if ( fadedWeight === 0 )
+				return false;
 
 	} else {
 
@@ -176,8 +173,9 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 		else
 			fadedWeight = this.weight;
 
+		// If no weight yet, don't bother
 		if ( fadedWeight === 0 )
-			return;
+			return true;
 	}
 
 	unloopedCurrentTime = this.currentTime;
@@ -339,7 +337,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 				}
 				// Avoid paying the cost of slerp if we don't have to
-				else if ( object.accumulateRotWeight === 0) {
+				else if ( object.accumulatedRotWeight === 0) {
 
 					object.quaternion = newRotation;
 					object.accumulatedRotWeight = fadedWeight;
@@ -377,6 +375,8 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 		}
 
 	}
+
+	return true;
 
 };
 
