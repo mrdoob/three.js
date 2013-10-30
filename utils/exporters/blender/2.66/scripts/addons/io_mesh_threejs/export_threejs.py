@@ -267,7 +267,7 @@ TEMPLATE_MODEL_ASCII = """\
 
 	"skinWeights" : [%(weights)s],
 
-    "animations" : [%(animations)s]
+	"animations" : [%(animations)s]
 """
 
 TEMPLATE_VERTEX = "%g,%g,%g"
