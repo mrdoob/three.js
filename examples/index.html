@@ -6,83 +6,70 @@
 		<style>
 
 			@font-face {
-
 				font-family: 'inconsolata';
 				src: url('files/inconsolata.woff') format('woff');
 				font-weight: normal;
 				font-style: normal;
-
 			}
 
 			body {
-
 				background-color: #ffffff;
 				margin: 0px;
 				font-family: 'inconsolata';
 				font-size: 15px;
 				overflow: hidden;
+			}
 
+			a {
+				color: #2194CE;
+				text-decoration: none;
 			}
 
 			h1 {
-
+				margin-top: 20px;
+				margin-bottom: 40px;
 				font-size: 25px;
 				font-weight: normal;
-
 			}
 
 			h2 {
-
 				font-size: 20px;
 				font-weight: normal;
-
 			}
 
 			#panel {
-
 				position: absolute;
 				width: 300px;
 				height: 100%;
 				overflow: scroll;
-
 			}
 
 				#panel #list {
-
-					padding: 10px 20px;
+					padding: 0px 20px;
 					line-height: 18px;
-
 				}
 
 				#panel #list .link {
-
 					color: #2194CE;
 					text-decoration: none;
 					cursor: pointer;
-
 				}
 
 				#panel #list .selected {
-
 					color: #ff0000;
-
 				}
 
 					#panel #list .link:hover {
-
 						text-decoration: underline;
-
 					}
 
 			#viewer {
-
 				position: absolute;
 				left: 300px;
 				width: -webkit-calc(100% - 300px); /* Safari */
 				width: calc(100% - 300px);
 				height: 100%;
 				border: 0px;
-
 			}
 
 			#button {
@@ -106,7 +93,7 @@
 
 		<div id="panel">
 			<div id="list">
-				<h1>three.js examples</h1><br />
+				<h1><a href="http://threejs.org">three.js</a> / examples</h1>
 			</div>
 		</div>
 		<iframe id="viewer"></iframe>
