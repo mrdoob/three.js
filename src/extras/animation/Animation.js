@@ -218,12 +218,8 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 						}
 
-					} else {
-
-						this.stop();
-						return;
-
-					}
+					} else
+						return false;
 
 				} else {
 
