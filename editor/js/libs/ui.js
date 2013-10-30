@@ -522,7 +522,12 @@ UI.Color = function () {
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
 
-	try { dom.type = 'color'; } catch ( exception ) {}
+	try {
+
+		dom.type = 'color';
+		dom.value = '#ffffff';
+
+	} catch ( exception ) {}
 
 	this.dom = dom;
 
