@@ -8,13 +8,19 @@ THREE.VRMLLoader.prototype = {
 
 	constructor: THREE.VRMLLoader,
 
+    // for IndexedFaceSet support
     isRecordingPoints: false,
-
     isRecordingFaces: false,
-
     points: [],
-
     indexes : [],
+
+    // for Background support
+    isRecordingAngles: false,
+    isRecordingColors: false,
+    angles: [],
+    colors: [],
+
+    recordingFieldname: null,
 
 	load: function ( url, callback ) {
 
@@ -56,22 +62,149 @@ THREE.VRMLLoader.prototype = {
 
 		var parseV2 = function ( lines, scene ) {
             var defines = {};
+            var float_pattern = /(\b|\-|\+)([\d\.e]+)/;
             var float3_pattern = /([\d\.\+\-e]+),?\s+([\d\.\+\-e]+),?\s+([\d\.\+\-e]+)/;
+
+
+
+            /**
+            * Interpolates colors a and b following their relative distance
+            * expressed by t.
+            *
+            * @param float a
+            * @param float b
+            * @param float t
+            * @returns {Color}
+            */
+            var interpolateColors = function(a, b, t) {
+               var deltaR = a.r - b.r;
+               var deltaG = a.g - b.g;
+               var deltaB = a.b - b.b;
+
+               var c = new THREE.Color();
+
+               c.r = a.r - t * deltaR;
+               c.g = a.g - t * deltaG;
+               c.b = a.b - t * deltaB;
+
+               return c;
+            };
+
+            /**
+             * Vertically paints the faces interpolating between the
+             * specified colors at the specified angels. This is used for the Background
+             * node, but could be applied to other nodes with multiple faces as well.
+             *
+             * The first angle is never specified, it is the Zenith (0 rad). Angles are specified
+             * in radians. The geometry is thought a sphere, but could be anything.
+             *
+             * You must specify one more color than you have angles at the beginning of the colors array.
+             * This is the color of the Zenith (the top of the shape).
+             *
+             * @param geometry
+             * @param radius
+             * @param angles
+             * @param colors
+             * @param boolean directionIsDown Whether to work bottom up or top down (default)
+             */
+            var paintFaces = function (geometry, radius, angles, colors, directionIsDown) {
+
+                var f, n, p, vertexIndex, color;
+
+                var direction = directionIsDown ? 1 : -1;
+
+                var faceIndices = [ 'a', 'b', 'c', 'd' ];
+
+                var coord = [ ], aColor, bColor, t = 1, A = {}, B = {}, applyColor = false, colorIndex;
+
+                for ( var k = 0; k < angles.length; k++ ) {
+
+                    var vec = { };
+
+                    // push the vector at which the color changes
+                    vec.y = direction * ( Math.cos( angles[k] ) * radius);
+
+                    vec.x = direction * ( Math.sin( angles[k] ) * radius);
+
+                    coord.push( vec );
+
+                }
+
+                // painting the colors on the faces
+                for ( var i = 0; i < geometry.faces.length ; i++ ) {
+
+                    f  = geometry.faces[ i ];
+
+                    n = ( f instanceof THREE.Face3 ) ? 3 : 4;
+
+                    for ( var j = 0; j < n; j++ ) {
+
+                        vertexIndex = f[ faceIndices[ j ] ];
+
+                        p = geometry.vertices[ vertexIndex ];
+
+                        for ( var index = 0; index < colors.length; index++ ) {
+
+                            // linear interpolation between aColor and bColor, calculate proportion
+                            // A is previous point (angle)
+                            if ( index === 0 ) {
+
+                                A.x = 0;
+                                A.y = directionIsDown ? radius : -1 * radius;
+
+                            } else {
+
+                                A.x = coord[ index-1 ].x;
+                                A.y = coord[ index-1 ].y;
+
+                            }
+
+                            // B is current point (angle)
+                            B = coord[index];
+
+                            if ( undefined !== B ) {
+                                // p has to be between the points A and B which we interpolate
+                                applyColor = directionIsDown ? p.y <= A.y && p.y > B.y : p.y >= A.y && p.y < B.y;
+
+                                if (applyColor) {
+
+                                    bColor = colors[ index + 1 ];
+
+                                    aColor = colors[ index ];
+
+                                    // below is simple linear interpolation
+                                    t = Math.abs( p.y - A.y ) / ( A.y - B.y );
+
+                                    // to make it faster, you can only calculate this if the y coord changes, the color is the same for points with the same y
+                                    color = interpolateColors( aColor, bColor, t );
+
+                                    f.vertexColors[ j ] = color;
+                                }
+
+                            } else if ( undefined === f.vertexColors[ j ] ) {
+                                colorIndex = directionIsDown ? colors.length -1 : 0;
+                                f.vertexColors[ j ] = colors[ colorIndex ];
+
+                            }
+                        }
+
+
+                    }
+
+                }
+            };
 
             var parseProperty = function (node, line) {
 
-                var parts = [];
-                var part;
-                var property = {};
-                var fieldName;
+                var parts = [], part, property = {}, fieldName;
 
                 /**
                  * Expression for matching relevant information, such as a name or value, but not the separators
                  * @type {RegExp}
                  */
                 var regex = /[^\s,\[\]]+/g;
-                var point;
-                var index;
+
+                var point, index, angles, colors;
 
                 while (null != ( part = regex.exec(line) ) ) {
                     parts.push(part[0]);
@@ -79,16 +212,31 @@ THREE.VRMLLoader.prototype = {
 
                 fieldName = parts[0];
 
-                if (fieldName === 'point') {
-                    // start recording points
-                    this.isRecordingPoints = true;
-                    this.points = [];
-                }
 
-                if (fieldName === 'coordIndex') {
-                    // start recording faces
-                    this.isRecordingFaces = true;
-                    this.indexes = [];
+                // trigger several recorders
+                switch (fieldName) {
+                    case 'skyAngle':
+                    case 'groundAngle':
+                        this.recordingFieldname = fieldName;
+                        this.isRecordingAngles = true;
+                        this.angles = [];
+                        break;
+                    case 'skyColor':
+                    case 'groundColor':
+                        this.recordingFieldname = fieldName;
+                        this.isRecordingColors = true;
+                        this.colors = [];
+                        break;
+                    case 'point':
+                        this.recordingFieldname = fieldName;
+                        this.isRecordingPoints = true;
+                        this.points = [];
+                        break;
+                    case 'coordIndex':
+                        this.recordingFieldname = fieldName;
+                        this.isRecordingFaces = true;
+                        this.indexes = [];
+                        break;
                 }
 
                 if (this.isRecordingFaces) {
@@ -141,9 +289,54 @@ THREE.VRMLLoader.prototype = {
                     }
 
                     // end
-                    if (/]/.exec(line)) {
+                    if ( /]/.exec(line) ) {
                         this.isRecordingPoints = false;
                         node.points = this.points;
+                    }
+
+                } else if ( this.isRecordingAngles ) {
+
+                    // the parts hold the angles as strings
+                    if ( parts.length > 0 ) {
+
+                        for ( var ind = 0;ind < parts.length; ind++ ) {
+
+                            // the part should be a float
+                            if ( ! float_pattern.test( parts[ind] ) ) {
+                                continue;
+                            }
+
+                            this.angles.push( parseFloat( parts[ind] ) );
+                        }
+
+                    }
+
+                    // end
+                    if ( /]/.exec(line) ) {
+                        this.isRecordingAngles = false;
+                        node[this.recordingFieldname] = this.angles;
+                    }
+
+                } else if (this.isRecordingColors) {
+                    // this is the float3 regex with the g modifier added, you could also explode the line by comma first (faster probably)
+                    var float3_repeatable = /([\d\.\+\-e]+),?\s+([\d\.\+\-e]+),?\s+([\d\.\+\-e]+)/g;
+
+                    while( null !== (parts = float3_repeatable.exec(line) ) ) {
+
+                        color = {
+                            r: parseFloat(parts[1]),
+                            g: parseFloat(parts[2]),
+                            b: parseFloat(parts[3])
+                        };
+
+                        this.colors.push(color);
+
+                    }
+
+                    // end
+                    if (/]/.exec(line)) {
+                        this.isRecordingColors = false;
+                        node[this.recordingFieldname] = this.colors;
                     }
 
                 } else if ( parts[parts.length -1] !== 'NULL' && fieldName !== 'children') {
@@ -297,7 +490,7 @@ THREE.VRMLLoader.prototype = {
 					} else if ( line !== '' ) {
 
                         parseProperty(current, line);
-                        // todo: remove once new parsing is complete?
+                        // todo: remove once new parsing is complete? we still do not parse geometry and appearance the new way
                         current.children.push( line );
 
 					}
@@ -392,7 +585,9 @@ THREE.VRMLLoader.prototype = {
 					object = new THREE.Mesh();
 
 					if ( /DEF/.exec( data.string ) ) {
+
 						object.name = /DEF (\w+)/.exec( data.string )[ 1 ];
+
 						defines[ object.name ] = object;
 					}
 
@@ -400,7 +595,46 @@ THREE.VRMLLoader.prototype = {
 
 				} else if ( 'Background' === data.nodeType ) {
 
-                    console.warn ('Background node is not implemented.');
+                    var segments = 20;
+
+                    // sky (full sphere):
+                    var radius = 2e4;
+
+                    var skyGeometry = new THREE.SphereGeometry( radius, segments, segments );
+
+                    var skyMaterial = new THREE.MeshBasicMaterial( { color: 'white', vertexColors: THREE.VertexColors, shading: THREE.NoShading } );
+
+                    skyMaterial.side = THREE.BackSide;
+
+                    skyMaterial.fog = false;
+
+                    skyMaterial.color = new THREE.Color();
+
+                    paintFaces( skyGeometry, radius, data.skyAngle, data.skyColor, true );
+
+                    var sky = new THREE.Mesh( skyGeometry, skyMaterial );
+
+                    scene.add( sky );
+
+                    // ground (half sphere):
+
+                    radius = 1.2e4;
+
+                    var groundGeometry = new THREE.SphereGeometry( radius, segments, segments, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
+
+                    var groundMaterial = new THREE.MeshBasicMaterial( { color: 'white', vertexColors: THREE.VertexColors, shading: THREE.NoShading } );
+
+                    groundMaterial.side = THREE.BackSide;
+
+                    groundMaterial.fog = false;
+
+                    groundMaterial.color = new THREE.Color();
+
+                    paintFaces( groundGeometry, radius, data.groundAngle, data.groundColor, false );
+
+                    var ground = new THREE.Mesh( groundGeometry, groundMaterial );
+
+                    scene.add( ground );
 
 				} else if ( /geometry/.exec( data.string ) ) {
 
@@ -428,19 +662,19 @@ THREE.VRMLLoader.prototype = {
 
                         var indexes;
 
-                        for (var i = 0, j = data.children.length; i < j; i++) {
+                        for ( var i = 0, j = data.children.length; i < j; i++ ) {
 
-                            var child = data.children[i];
+                            var child = data.children[ i ];
 
                             var vec;
 
                             if ( 'Coordinate' === child.nodeType ) {
 
-                                for (var k = 0, l = child.points.length; k < l; k++) {
+                                for ( var k = 0, l = child.points.length; k < l; k++ ) {
 
-                                    var point = child.points[k];
+                                    var point = child.points[ k ];
 
-                                    vec = new THREE.Vector3(point.x, point.y, point.z);
+                                    vec = new THREE.Vector3( point.x, point.y, point.z );
 
                                     geometry.vertices.push( vec );
                                 }
@@ -450,8 +684,9 @@ THREE.VRMLLoader.prototype = {
                         }
 
                         var skip = 0;
+
                         // read this: http://math.hws.edu/eck/cs424/notes2013/16_Threejs_Advanced.html
-                        for (var i = 0, j = data.coordIndex.length; i < j; i++) {
+                        for ( var i = 0, j = data.coordIndex.length; i < j; i++ ) {
 
                             indexes = data.coordIndex[i];
 
@@ -461,7 +696,7 @@ THREE.VRMLLoader.prototype = {
                             // todo: this is the time to check if the faces are ordered ccw or not (cw)
 
                             // Face3 only works with triangles, but IndexedFaceSet allows shapes with more then three vertices, build them of triangles
-                            while ( indexes.length >= 3 && skip < (indexes.length -2) ) {
+                            while ( indexes.length >= 3 && skip < ( indexes.length -2 ) ) {
 
                                 var face = new THREE.Face3(
                                     indexes[0],
@@ -473,14 +708,14 @@ THREE.VRMLLoader.prototype = {
 
                                 skip++;
 
-                                geometry.faces.push(face);
+                                geometry.faces.push( face );
 
                             }
 
 
                         }
 
-                        if (false === data.solid) {
+                        if ( false === data.solid ) {
                             parent.material.side = THREE.DoubleSide;
                         }
 
@@ -523,7 +758,7 @@ THREE.VRMLLoader.prototype = {
 
                                 var e = child.emissiveColor;
 
-                                material.emissive.setRGB( e.r, e.g, e.b);
+                                material.emissive.setRGB( e.r, e.g, e.b );
 
                             }
 
@@ -538,12 +773,13 @@ THREE.VRMLLoader.prototype = {
                             if ( undefined !== child.transparency ) {
 
                                 var t = child.transparency;
+
                                 // transparency is opposite of opacity
                                 material.opacity = Math.abs( 1 - t );
+
                                 material.transparent = true;
 
                             }
-
 
 							if ( /DEF/.exec( data.string ) ) {
 
@@ -552,11 +788,6 @@ THREE.VRMLLoader.prototype = {
 								defines[ material.name ] = material;
 
 							}
-
-                            // todo: below does not work, but we should find a way to make it work (for USE(d) geometries (IndexedFaceSets) that are marked as solid)
-                            if (undefined !== parent.geometry.solid && false === parent.geometry.solid) {
-                                material.side = THREE.DoubleSide;
-                            }
 
 							parent.material = material;
 
@@ -587,6 +818,7 @@ THREE.VRMLLoader.prototype = {
 		var scene = new THREE.Scene();
 
 		var lines = data.split( '\n' );
+
 		var header = lines.shift();
 
 		if ( /V1.0/.exec( header ) ) {
@@ -606,3 +838,4 @@ THREE.VRMLLoader.prototype = {
 };
 
 THREE.EventDispatcher.prototype.apply( THREE.VRMLLoader.prototype );
+
