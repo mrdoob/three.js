@@ -2393,7 +2393,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			if ( dispose && ! attributeItem.dynamic ) {
+			if ( dispose && ! geometry.dynamic ) {
 
 				attributeItem.array = null;
 
