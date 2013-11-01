@@ -601,6 +601,9 @@ UI.Number = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var pointerOld = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -608,6 +611,8 @@ UI.Number = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		pointerOld.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -618,8 +623,10 @@ UI.Number = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
+
+		var movementX = pointer.x - pointerOld.x;
+		var movementY = pointer.y - pointerOld.y;
 
 		distance += movementX - movementY;
 
@@ -628,6 +635,8 @@ UI.Number = function ( number ) {
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		pointerOld.set( event.clientX, event.clientY );
 
 	};
 
@@ -748,6 +757,9 @@ UI.Integer = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var pointerOld = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -755,6 +767,8 @@ UI.Integer = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		pointerOld.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -765,8 +779,10 @@ UI.Integer = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
+
+		var movementX = pointer.x - pointerOld.x;
+		var movementY = pointer.y - pointerOld.y;
 
 		distance += movementX - movementY;
 
@@ -775,6 +791,8 @@ UI.Integer = function ( number ) {
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ) | 0;
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		pointerOld.set( event.clientX, event.clientY );
 
 	};
 
