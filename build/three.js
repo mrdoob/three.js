@@ -14108,6 +14108,7 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.depthTest = !this.useScreenCoordinates;
 	this.sizeAttenuation = !this.useScreenCoordinates;
 	this.alignment = THREE.SpriteAlignment.center.clone();
+	this.rotation = 0;
 
 	this.fog = false;
 
@@ -15107,8 +15108,6 @@ THREE.Sprite = function ( material ) {
 	THREE.Object3D.call( this );
 
 	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
-
-	this.rotation = 0;
 
 };
 
@@ -36446,7 +36445,7 @@ THREE.SpritePlugin = function () {
 				_gl.uniform1f( uniforms.opacity, material.opacity );
 				_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
-				_gl.uniform1f( uniforms.rotation, sprite.rotation );
+				_gl.uniform1f( uniforms.rotation, material.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 				_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
 
