@@ -158,19 +158,23 @@
 				scene.add( directional );
 
 				canvasRenderer = new THREE.CanvasRenderer();
+				canvasRenderer.setClearColor( 0xf0f0f0 );
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( canvasRenderer.domElement );
 
 				svgRenderer = new THREE.SVGRenderer();
+				svgRenderer.setClearColor( 0xf0f0f0 );
 				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				svgRenderer.setQuality( 'low' );
 				container.appendChild( svgRenderer.domElement );
 
 				softwareRenderer = new THREE.SoftwareRenderer();
+				softwareRenderer.setClearColor( 0xf0f0f0 );
 				softwareRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( softwareRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
+				webglRenderer.setClearColor( 0xf0f0f0 );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( webglRenderer.domElement );
 
