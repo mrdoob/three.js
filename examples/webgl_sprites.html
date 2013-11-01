@@ -59,8 +59,8 @@
 
 				group = new THREE.Object3D();
 
-				var materialC = new THREE.SpriteMaterial( { map: mapC, useScreenCoordinates: false, color: 0xffffff, fog: true } );
-				var materialB = new THREE.SpriteMaterial( { map: mapB, useScreenCoordinates: false, color: 0xffffff, fog: true } );
+				var materialC = new THREE.SpriteMaterial( { map: mapC, color: 0xffffff, fog: true } );
+				var materialB = new THREE.SpriteMaterial( { map: mapB, color: 0xffffff, fog: true } );
 
 				for ( var a = 0; a < amount; a ++ ) {
 
@@ -100,9 +100,9 @@
 					var scaleX = mapA.image.width;
 					var scaleY = mapA.image.height;
 
-					var materialA1 = new THREE.SpriteMaterial( { map: mapA, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.25 } );
-					var materialA2 = new THREE.SpriteMaterial( { map: mapA, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.5 } );
-					var materialA3 = new THREE.SpriteMaterial( { map: mapA, alignment: THREE.SpriteAlignment.topLeft, opacity: 1 } );
+					var materialA1 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.25 } );
+					var materialA2 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.5 } );
+					var materialA3 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 1 } );
 
 					sprite = new THREE.Sprite( materialA1 );
 					sprite.position.set( 100, 100, 0 );
