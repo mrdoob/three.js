@@ -14104,9 +14104,9 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff );
 	this.map = new THREE.Texture();
 
-	this.useScreenCoordinates = true;
-	this.depthTest = !this.useScreenCoordinates;
-	this.sizeAttenuation = !this.useScreenCoordinates;
+	this.useScreenCoordinates = false;
+	this.depthTest = true;
+	this.sizeAttenuation = true;
 	this.alignment = THREE.SpriteAlignment.center.clone();
 	this.rotation = 0;
 
@@ -14123,8 +14123,8 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	parameters = parameters || {};
 
-	if ( parameters.depthTest === undefined ) this.depthTest = !this.useScreenCoordinates;
-	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = !this.useScreenCoordinates;
+	if ( parameters.depthTest === undefined ) this.depthTest = this.useScreenCoordinates === false;
+	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = this.useScreenCoordinates === false;
 
 };
 
@@ -14142,6 +14142,7 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	material.useScreenCoordinates = this.useScreenCoordinates;
 	material.sizeAttenuation = this.sizeAttenuation;
 	material.alignment.copy( this.alignment );
+	material.rotation = this.rotation;
 
 	material.uvOffset.copy( this.uvOffset );
 	material.uvScale.copy( this.uvScale );
