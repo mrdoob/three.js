@@ -15758,64 +15758,35 @@ THREE.CanvasRenderer = function ( parameters ) {
 		setOpacity( material.opacity );
 		setBlending( material.blending );
 
-		var width, height, scaleX, scaleY,
-		bitmap, bitmapWidth, bitmapHeight;
+		var scaleX = element.scale.x * _canvasWidthHalf;
+		var scaleY = element.scale.y * _canvasHeightHalf;
+
+		_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
+		_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
+
+		if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
+
+			_elemBox.makeEmpty();
+			return;
+
+		}
 
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
 			if ( material.map.image !== undefined ) {
 
-				bitmap = material.map.image;
-				bitmapWidth = bitmap.width >> 1;
-				bitmapHeight = bitmap.height >> 1;
-
-				scaleX = element.scale.x * _canvasWidthHalf;
-				scaleY = element.scale.y * _canvasHeightHalf;
-
-				width = scaleX * bitmapWidth;
-				height = scaleY * bitmapHeight;
-
-				// TODO: Rotations break this...
-
-				_elemBox.min.set( v1.x - width, v1.y - height );
-				_elemBox.max.set( v1.x + width, v1.y + height );
-
-				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-					_elemBox.makeEmpty();
-					return;
-
-				}
+				var bitmap = material.map.image;
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( - element.rotation );
+				_context.rotate( - material.rotation );
 				_context.scale( scaleX, - scaleY );
 
-				_context.translate( - bitmapWidth, - bitmapHeight );
-				_context.drawImage( bitmap, 0, 0 );
+				_context.drawImage( bitmap, 0, 0, bitmap.width, bitmap.height, - 0.5, - 0.5, 1, 1 );
 				_context.restore();
 
 			} else {
-
-				scaleX = element.object.scale.x;
-				scaleY = element.object.scale.y;
-
-				// TODO: Be able to disable this
-
-				scaleX *= element.scale.x * _canvasWidthHalf;
-				scaleY *= element.scale.y * _canvasHeightHalf;
-
-				_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
-				_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
-
-				if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-					_elemBox.makeEmpty();
-					return;
-
-				}
 
 				setFillStyle( material.color.getStyle() );
 
@@ -15823,35 +15794,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 				_context.translate( v1.x, v1.y );
 				_context.rotate( - element.rotation );
 				_context.scale( scaleX, scaleY );
-				_context.fillRect( -1, -1, 2, 2 );
+				_context.fillRect( - 0.5, - 0.5, 1, 1 );
 				_context.restore();
 
 			}
 
-			/* DEBUG
-			setStrokeStyle( 'rgb(255,255,0)' );
-			_context.beginPath();
-			_context.moveTo( v1.x - 10, v1.y );
-			_context.lineTo( v1.x + 10, v1.y );
-			_context.moveTo( v1.x, v1.y - 10 );
-			_context.lineTo( v1.x, v1.y + 10 );
-			_context.stroke();
-			*/
-
 		} else if ( material instanceof THREE.SpriteCanvasMaterial ) {
-
-			width = element.scale.x * _canvasWidthHalf;
-			height = element.scale.y * _canvasHeightHalf;
-
-			_elemBox.min.set( v1.x - width, v1.y - height );
-			_elemBox.max.set( v1.x + width, v1.y + height );
-
-			if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-				_elemBox.makeEmpty();
-				return;
-
-			}
 
 			setStrokeStyle( material.color.getStyle() );
 			setFillStyle( material.color.getStyle() );
@@ -15859,13 +15807,23 @@ THREE.CanvasRenderer = function ( parameters ) {
 			_context.save();
 			_context.translate( v1.x, v1.y );
 			_context.rotate( - element.rotation );
-			_context.scale( width, height );
+			_context.scale( scaleX, scaleY );
 
 			material.program( _context );
 
 			_context.restore();
 
 		}
+
+		/* DEBUG
+		setStrokeStyle( 'rgb(255,255,0)' );
+		_context.beginPath();
+		_context.moveTo( v1.x - 10, v1.y );
+		_context.lineTo( v1.x + 10, v1.y );
+		_context.moveTo( v1.x, v1.y - 10 );
+		_context.lineTo( v1.x, v1.y + 10 );
+		_context.stroke();
+		*/
 
 	}
 
