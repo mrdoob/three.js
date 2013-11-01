@@ -7,6 +7,14 @@ var list = {
 	},
 
 	"Reference": {
+    "Constants": [
+      [ "CustomBlendingEquation", "api/constants/CustomBlendingEquations"],
+      [ "GLState", "api/constants/GLState"],
+      [ "Materials", "api/constants/Materials"],
+      [ "ShadowingTypes", "api/constants/ShadowingTypes"],
+      [ "Textures", "api/constants/Textures"]
+    ],
+
 		"Cameras": [
 			[ "Camera", "api/cameras/Camera" ],
 			[ "OrthographicCamera", "api/cameras/OrthographicCamera" ],
