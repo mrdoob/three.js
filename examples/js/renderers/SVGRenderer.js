@@ -26,7 +26,7 @@ THREE.SVGRenderer = function () {
 	_w, // z-buffer to w-buffer
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
 
-	_svgPathPool = [], _svgCirclePool = [], _svgLinePool = [],
+	_svgPathPool = [], _svgRectPool = [], _svgLinePool = [],
 	_svgNode, _pathCount, _circleCount, _lineCount,
 	_quality = 1;
 
@@ -260,30 +260,27 @@ THREE.SVGRenderer = function () {
 
 	function renderSprite( v1, element, material ) {
 
-		/*
-		_svgNode = getCircleNode( _circleCount++ );
-		_svgNode.setAttribute( 'cx', v1.x );
-		_svgNode.setAttribute( 'cy', v1.y );
-		_svgNode.setAttribute( 'r', element.scale.x * _svgWidthHalf );
+		var scaleX = element.object.scale.x;
+		var scaleY = element.object.scale.y;
 
-		if ( material instanceof THREE.SpriteSVGMaterial ) {
+		// TODO: Be able to disable this
 
-			_color.r = _ambientLight.r + _directionalLights.r + _pointLights.r;
-			_color.g = _ambientLight.g + _directionalLights.g + _pointLights.g;
-			_color.b = _ambientLight.b + _directionalLights.b + _pointLights.b;
+		scaleX *= element.scale.x * _svgWidthHalf;
+		scaleY *= element.scale.y * _svgHeightHalf;
 
-			_color.r = material.color.r * _color.r;
-			_color.g = material.color.g * _color.g;
-			_color.b = material.color.b * _color.b;
+		_svgNode = getRectNode( _circleCount++ );
+		_svgNode.setAttribute( 'x', v1.x - scaleX );
+		_svgNode.setAttribute( 'y', v1.y - scaleY );
+		_svgNode.setAttribute( 'width', 2 * scaleX );
+		_svgNode.setAttribute( 'height', 2 * scaleY );
 
-			_color.updateStyleString();
+		if ( material instanceof THREE.SpriteMaterial ) {
 
-			_svgNode.setAttribute( 'style', 'fill: ' + _color.__styleString );
+			_svgNode.setAttribute( 'style', 'fill: ' + material.color.getStyle() );
 
 		}
 
 		_svg.appendChild( _svgNode );
-		*/
 
 	}
 
@@ -407,23 +404,23 @@ THREE.SVGRenderer = function () {
 
 	}
 
-	function getCircleNode( id ) {
+	function getRectNode( id ) {
 
-		if ( _svgCirclePool[id] == null ) {
+		if ( _svgRectPool[ id ] == null ) {
 
-			_svgCirclePool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'circle' );
+			_svgRectPool[ id ] = document.createElementNS( 'http://www.w3.org/2000/svg', 'rect' );
 
 			if ( _quality == 0 ) {
 
-				_svgCirclePool[id].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
+				_svgRectPool[id].setAttribute( 'shape-rendering', 'crispEdges' ); //optimizeSpeed
 
 			}
 
-			return _svgCirclePool[ id ];
+			return _svgRectPool[ id ];
 
 		}
 
-		return _svgCirclePool[ id ];
+		return _svgRectPool[ id ];
 
 	}
 
