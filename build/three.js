@@ -31536,8 +31536,8 @@ THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
 		var v2 = i + 1 ;
 		var v3 = 0;
 
-		this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
-		this.faceVertexUvs[ 0 ].push( [ uvs[ i ], uvs[ i + 1 ], centerUV ] );
+		this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
+		this.faceVertexUvs[ 0 ].push( [ uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ] );
 
 	}
 
@@ -31761,8 +31761,8 @@ THREE.CylinderGeometry = function ( radiusTop, radiusBottom, height, radialSegme
 			this.faces.push( new THREE.Face3( v1, v2, v4, [ n1, n2, n4 ] ) );
 			this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
 
-			this.faces.push( new THREE.Face3( v2, v3, v4, [ n2, n3, n4 ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uv2, uv3, uv4 ] );
+			this.faces.push( new THREE.Face3( v2, v3, v4, [ n2.clone(), n3, n4.clone() ] ) );
+			this.faceVertexUvs[ 0 ].push( [ uv2.clone(), uv3, uv4.clone() ] );
 
 		}
 
@@ -32909,7 +32909,7 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 			vertex.y = radius * Math.sin( segment );
 
 			this.vertices.push( vertex );
-			uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, - ( vertex.y / radius + 1 ) / 2 + 1 ) );
+			uvs.push( new THREE.Vector2( ( vertex.x / outerRadius + 1 ) / 2, ( vertex.y / outerRadius + 1 ) / 2 ) );
 		}
 
 		radius += radiusStep;
@@ -32930,15 +32930,15 @@ THREE.RingGeometry = function ( innerRadius, outerRadius, thetaSegments, phiSegm
 			var v2 = segment + thetaSegments + i;
 			var v3 = segment + thetaSegments + 1 + i;
 
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
+			this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
 
 			v1 = segment + i;
 			v2 = segment + thetaSegments + 1 + i;
 			v3 = segment + 1 + i;
 
-			this.faces.push( new THREE.Face3( v1, v2, v3, [ n, n, n ] ) );
-			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ], uvs[ v2 ], uvs[ v3 ] ]);
+			this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
+			this.faceVertexUvs[ 0 ].push( [ uvs[ v1 ].clone(), uvs[ v2 ].clone(), uvs[ v3 ].clone() ]);
 
 		}
 	}
@@ -33034,7 +33034,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 				this.faces.push( new THREE.Face3( v1, v2, v4, [ n1, n2, n4 ] ) );
 				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
 
-				this.faces.push( new THREE.Face3( v2, v3, v4, [ n2, n3, n4 ] ) );
+				this.faces.push( new THREE.Face3( v2, v3, v4, [ n2.clone(), n3, n4.clone() ] ) );
 				this.faceVertexUvs[ 0 ].push( [ uv2.clone(), uv3, uv4.clone() ] );
 
 			}
