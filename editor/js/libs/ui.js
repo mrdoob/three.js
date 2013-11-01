@@ -602,7 +602,7 @@ UI.Number = function ( number ) {
 	var onMouseDownValue = 0;
 
 	var pointer = new THREE.Vector2();
-	var pointerOld = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
 
 	var onMouseDown = function ( event ) {
 
@@ -612,7 +612,7 @@ UI.Number = function ( number ) {
 
 		onMouseDownValue = parseFloat( dom.value );
 
-		pointerOld.set( event.clientX, event.clientY );
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -625,10 +625,7 @@ UI.Number = function ( number ) {
 
 		pointer.set( event.clientX, event.clientY );
 
-		var movementX = pointer.x - pointerOld.x;
-		var movementY = pointer.y - pointerOld.y;
-
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
@@ -636,7 +633,7 @@ UI.Number = function ( number ) {
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
 
-		pointerOld.set( event.clientX, event.clientY );
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 
@@ -758,7 +755,7 @@ UI.Integer = function ( number ) {
 	var onMouseDownValue = 0;
 
 	var pointer = new THREE.Vector2();
-	var pointerOld = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
 
 	var onMouseDown = function ( event ) {
 
@@ -768,7 +765,7 @@ UI.Integer = function ( number ) {
 
 		onMouseDownValue = parseFloat( dom.value );
 
-		pointerOld.set( event.clientX, event.clientY );
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -781,10 +778,7 @@ UI.Integer = function ( number ) {
 
 		pointer.set( event.clientX, event.clientY );
 
-		var movementX = pointer.x - pointerOld.x;
-		var movementY = pointer.y - pointerOld.y;
-
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
@@ -792,7 +786,7 @@ UI.Integer = function ( number ) {
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
 
-		pointerOld.set( event.clientX, event.clientY );
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 
