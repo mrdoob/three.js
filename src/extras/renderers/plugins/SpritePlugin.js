@@ -238,7 +238,7 @@ THREE.SpritePlugin = function () {
 				_gl.uniform1f( uniforms.opacity, material.opacity );
 				_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
 
-				_gl.uniform1f( uniforms.rotation, sprite.rotation );
+				_gl.uniform1f( uniforms.rotation, material.rotation );
 				_gl.uniform2fv( uniforms.scale, scale );
 				_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
 

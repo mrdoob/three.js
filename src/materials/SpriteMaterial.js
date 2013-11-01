@@ -34,6 +34,7 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.depthTest = !this.useScreenCoordinates;
 	this.sizeAttenuation = !this.useScreenCoordinates;
 	this.alignment = THREE.SpriteAlignment.center.clone();
+	this.rotation = 0;
 
 	this.fog = false;
 
