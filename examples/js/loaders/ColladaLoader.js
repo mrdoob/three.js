@@ -10,7 +10,7 @@ THREE.ColladaLoader = function () {
 
 	var readyCallbackFunc = null;
 
- 	var sources = {};
+	var sources = {};
 	var images = {};
 	var animations = {};
 	var controllers = {};
@@ -140,7 +140,7 @@ THREE.ColladaLoader = function () {
 		controllers = parseLib( "library_controllers controller", Controller, "controller" );
 		animations = parseLib( "library_animations animation", Animation, "animation" );
 		visualScenes = parseLib( "library_visual_scenes visual_scene", VisualScene, "visual_scene" );
-        
+		
 		morphs = [];
 		skins = [];
 
@@ -197,13 +197,15 @@ THREE.ColladaLoader = function () {
 
 	function parseAsset () {
 
-        var elements = COLLADA.querySelectorAll('asset');
-        
-        var elementsLength = elements.length; //cache loop length
-        for (var i = 0; i < elementsLength; i ++){
-            var element = elements[i];
-            
-            var elementChildNodesLength = element.childNodes.length;
+		var elements = COLLADA.querySelectorAll('asset');
+		
+		var elementsLength = elements.length; //cache loop length
+
+		for ( var i = 0; i < elementsLength; i ++ ) {
+
+			var element = elements[ i ];			
+			var elementChildNodesLength = element.childNodes.length;
+
 			for ( var j = 0; j < elementChildNodesLength; j ++ ) {
 
 				var child = element.childNodes[ j ];
@@ -237,17 +239,19 @@ THREE.ColladaLoader = function () {
 
 	function parseLib ( q, classSpec, prefix ) {
 
-        var elements = COLLADA.querySelectorAll(q);
+		var elements = COLLADA.querySelectorAll(q);
 
-        var lib = {};
+		var lib = {};
 
 		var i = 0;
 
-        var elementsLength = elements.length;
-		for (var j = 0; j < elementsLength; j++){
-            var element = elements[j];
+		var elementsLength = elements.length;
 
-            var daeElement = ( new classSpec() ).parse( element );
+		for ( var j = 0; j < elementsLength; j ++ ) {
+
+			var element = elements[j];
+			var daeElement = ( new classSpec() ).parse( element );
+
 			if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
 			lib[ daeElement.id ] = daeElement;
 
@@ -258,9 +262,9 @@ THREE.ColladaLoader = function () {
 	};
 
 	function parseScene() {
-    
-        var sceneElement = COLLADA.querySelectorAll('scene instance_visual_scene')[0];
-        
+	
+		var sceneElement = COLLADA.querySelectorAll('scene instance_visual_scene')[0];
+		
 		if ( sceneElement ) {
 
 			var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
@@ -495,15 +499,15 @@ THREE.ColladaLoader = function () {
 	function setupSkinningMatrices ( bones, skin ) {
 
 		// FIXME: this is dumb...
-        
-		for ( var i = 0; i < bones.length ; i ++ ) {
-        
+		
+		for ( var i = 0; i < bones.length; i ++ ) {
+		
 			var bone = bones[ i ];
 			var found = -1;
 
 			if ( bone.type != 'JOINT' ) continue;
 
-			for ( var j = 0; j < skin.joints.length ; j ++ ) {
+			for ( var j = 0; j < skin.joints.length; j ++ ) {
 
 				if ( bone.sid == skin.joints[ j ] ) {
 
@@ -524,9 +528,9 @@ THREE.ColladaLoader = function () {
 
 				bone.weights = [];
 
-                for ( var j = 0; j < skin.weights.length ; j ++ ) {
-                    
-					for (var k = 0; k < skin.weights[ j ].length; k ++) {
+				for ( var j = 0; j < skin.weights.length; j ++ ) {
+					
+					for (var k = 0; k < skin.weights[ j ].length; k ++ ) {
 
 						var w = skin.weights[ j ][ k ];
 
@@ -927,8 +931,8 @@ THREE.ColladaLoader = function () {
 	};
 
 	function getLibraryNode( id ) {
-    
-        return COLLADA.querySelectorAll('library_nodes node#'+id)[0];  //returns 'undefined' if nothing is matched
+	
+		return COLLADA.querySelectorAll('library_nodes node#'+id)[0];  //returns 'undefined' if nothing is matched
 
 	};
 
@@ -2204,16 +2208,15 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'bind_material':
-            
-                    var instances = child.querySelectorAll('instance_material');
-                    
-					for (var j = 0; j < instances.length; j ++){
+			
+					var instances = child.querySelectorAll('instance_material');
+					
+					for ( var j = 0; j < instances.length; j ++ ){
 
 						var instance = instances[j];
-
-                        this.instance_material.push( (new InstanceMaterial()).parse(instance) );
+						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
 						
-                    }
+					}
 
 
 					break;
@@ -2265,11 +2268,13 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'bind_material' ) {
 
-                var instances = child.querySelectorAll('instance_material');
-                    
-            	for (var j = 0; j < instances.length; j++){
-                    var instance = instances[j];
-             		this.instance_material.push( (new InstanceMaterial()).parse(instance) );
+				var instances = child.querySelectorAll('instance_material');
+					
+				for ( var j = 0; j < instances.length; j ++ ) {
+
+					var instance = instances[j];
+					this.instance_material.push( (new InstanceMaterial()).parse(instance) );
+
 				}
 
 				break;
@@ -2414,12 +2419,13 @@ THREE.ColladaLoader = function () {
 		var source, numParams;
 		var vcIndex = 0, vcount = 3, maxOffset = 0;
 		var texture_sets = [];
-        
-		for ( j = 0; j < inputs.length ; j ++ ) {
+		
+		for ( j = 0; j < inputs.length; j ++ ) {
 
 			input = inputs[ j ];
+
 			var offset = input.offset + 1;
-			maxOffset = (maxOffset < offset)? offset : maxOffset;
+			maxOffset = ( maxOffset < offset )? offset : maxOffset;
 
 			switch ( input.semantic ) {
 
@@ -4407,8 +4413,8 @@ THREE.ColladaLoader = function () {
 
 		obj.doubleSided = false;
 
-        var node = element.querySelectorAll('extra double_sided')[0];
-    
+		var node = element.querySelectorAll('extra double_sided')[0];
+	
 		if ( node ) {
 
 			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
