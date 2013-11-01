@@ -65,8 +65,6 @@ THREE.VRMLLoader.prototype = {
             var float_pattern = /(\b|\-|\+)([\d\.e]+)/;
             var float3_pattern = /([\d\.\+\-e]+),?\s+([\d\.\+\-e]+),?\s+([\d\.\+\-e]+)/;
 
-
-
             /**
             * Interpolates colors a and b following their relative distance
             * expressed by t.
@@ -95,8 +93,13 @@ THREE.VRMLLoader.prototype = {
              * specified colors at the specified angels. This is used for the Background
              * node, but could be applied to other nodes with multiple faces as well.
              *
+             * When used with the Background node, default is directionIsDown is true if
+             * interpolating the skyColor down from the Zenith. When interpolationg up from
+             * the Nadir i.e. interpolating the groundColor, the directionIsDown is false.
+             *
              * The first angle is never specified, it is the Zenith (0 rad). Angles are specified
-             * in radians. The geometry is thought a sphere, but could be anything.
+             * in radians. The geometry is thought a sphere, but could be anything. The color interpolation
+             * is linear along the Y axis in any case.
              *
              * You must specify one more color than you have angles at the beginning of the colors array.
              * This is the color of the Zenith (the top of the shape).
@@ -105,7 +108,7 @@ THREE.VRMLLoader.prototype = {
              * @param radius
              * @param angles
              * @param colors
-             * @param boolean directionIsDown Whether to work bottom up or top down (default)
+             * @param boolean directionIsDown Whether to work bottom up or top down.
              */
             var paintFaces = function (geometry, radius, angles, colors, directionIsDown) {
 
@@ -187,7 +190,6 @@ THREE.VRMLLoader.prototype = {
 
                             }
                         }
-
 
                     }
 
