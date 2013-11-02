@@ -512,7 +512,7 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	} else {
 
-		var materials = this.initMaterials( json.materials, texturePath );
+		var materials = this.initMaterials( json.materials, texturePath, this.textureCache );
 
 		if ( this.needsTangents( materials ) ) {
 

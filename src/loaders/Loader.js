@@ -67,13 +67,13 @@ THREE.Loader.prototype = {
 
 	},
 
-	initMaterials: function ( materials, texturePath ) {
+	initMaterials: function ( materials, texturePath, textureCache ) {
 
 		var array = [];
 
 		for ( var i = 0; i < materials.length; ++ i ) {
 
-			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath );
+			array[ i ] = THREE.Loader.prototype.createMaterial( materials[ i ], texturePath, textureCache );
 
 		}
 
@@ -95,7 +95,7 @@ THREE.Loader.prototype = {
 
 	},
 
-	createMaterial: function ( m, texturePath ) {
+	createMaterial: function ( m, texturePath, textureCache ) {
 
 		var _this = this;
 
@@ -143,10 +143,25 @@ THREE.Loader.prototype = {
 
 		}
 
-		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
+		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy, cache ) {
 
 			var isCompressed = /\.dds$/i.test( sourceFile );
 			var fullPath = texturePath + "/" + sourceFile;
+			var textureTag;
+
+			if ( cache ) {
+
+				textureTag = fullPath;
+				textureTag += "@" + (repeat     ? repeat[0] + "-" + repeat[1] : "?");
+				textureTag += "@" + (offset     ? offset[0] + "-" + offset[1] : "?");
+				textureTag += "@" + (wrap       ? wrap[0]   + "-" + wrap[1]   : "?");
+				textureTag += "@" + (anisotropy ? anisotropy                  : "?");
+
+				if ( cache[textureTag] ) {
+					return cache[textureTag];
+				}
+
+			}
 
 			if ( isCompressed ) {
 
@@ -200,6 +215,12 @@ THREE.Loader.prototype = {
 			if ( ! isCompressed ) {
 
 				load_image( where[ name ], fullPath );
+
+			}
+
+			if ( cache ) {
+
+				cache[textureTag] = where[ name ];
 
 			}
 
@@ -331,31 +352,31 @@ THREE.Loader.prototype = {
 
 		if ( m.mapDiffuse && texturePath ) {
 
-			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy );
+			create_texture( mpars, "map", m.mapDiffuse, m.mapDiffuseRepeat, m.mapDiffuseOffset, m.mapDiffuseWrap, m.mapDiffuseAnisotropy, textureCache );
 
 		}
 
 		if ( m.mapLight && texturePath ) {
 
-			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy );
+			create_texture( mpars, "lightMap", m.mapLight, m.mapLightRepeat, m.mapLightOffset, m.mapLightWrap, m.mapLightAnisotropy, textureCache );
 
 		}
 
 		if ( m.mapBump && texturePath ) {
 
-			create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy );
+			create_texture( mpars, "bumpMap", m.mapBump, m.mapBumpRepeat, m.mapBumpOffset, m.mapBumpWrap, m.mapBumpAnisotropy, textureCache );
 
 		}
 
 		if ( m.mapNormal && texturePath ) {
 
-			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy );
+			create_texture( mpars, "normalMap", m.mapNormal, m.mapNormalRepeat, m.mapNormalOffset, m.mapNormalWrap, m.mapNormalAnisotropy, textureCache );
 
 		}
 
 		if ( m.mapSpecular && texturePath ) {
 
-			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy );
+			create_texture( mpars, "specularMap", m.mapSpecular, m.mapSpecularRepeat, m.mapSpecularOffset, m.mapSpecularWrap, m.mapSpecularAnisotropy, textureCache );
 
 		}
 
