@@ -4,7 +4,8 @@ module.exports = function (grunt) {
 		canvas = grunt.file.readJSON('utils/build/includes/canvas.json'),
 		css3d = grunt.file.readJSON('utils/build/includes/css3d.json'),
 		webgl = grunt.file.readJSON('utils/build/includes/webgl.json'),
-		math = grunt.file.readJSON('utils/build/includes/math.json');
+		math = grunt.file.readJSON('utils/build/includes/math.json'),
+		banner = '// three.js - http://github.com/mrdoob/three.js \n';
 
 	grunt.initConfig({
 		concat: {
@@ -39,6 +40,9 @@ module.exports = function (grunt) {
 		},
 
 		uglify: {
+			options: {
+				banner: banner
+			},
 			common: {
 				files: {
 					'build/three.min.js': 'build/three.js'
