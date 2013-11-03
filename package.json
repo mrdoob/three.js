@@ -1,0 +1,30 @@
+{
+  "name": "three.js",
+  "description": "JavaScript 3D library",
+  "version": "0.0.62",
+  "homepage": "http://threejs.org/",
+  "author": "three.js contributors",
+  "help": {
+    "web": "http://stackoverflow.com/questions/tagged/three.js"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-uglify": "~0.1.2",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-bump": "~0.0.11",
+    "grunt-text-replace":"~0.3.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mrdoob/three.js.git"
+  },
+  "licenses": [
+    {
+      "type": "The MIT License",
+      "url": "https://raw.github.com/mrdoob/three.js/master/LICENSE"
+    }
+  ],
+  "dependencies": {
+
+  }
+}
