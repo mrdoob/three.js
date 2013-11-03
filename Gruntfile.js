@@ -40,6 +40,10 @@ module.exports = function (grunt) {
 			math: {
 				src: math,
 				dest: 'build/three-math.js'
+			},
+			max: {
+				src: ['utils/build/externs/examples.js'].concat(common, extras),
+				dest: 'build/three-max.js'
 			}
 		},
 
@@ -73,6 +77,11 @@ module.exports = function (grunt) {
 				files: {
 					'build/three-math.min.js': 'build/three-math.js'
 				}
+			},
+			max: {
+				files: {
+					'build/three-max.min.js': 'build/three-max.js'
+				}
 			}
 		}
 	});
@@ -82,11 +91,12 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('default', ['build']);
 	grunt.registerTask('build', ['build:common']);
-	grunt.registerTask('build:common', ['concat:common','uglify:common']);
-	grunt.registerTask('build:canvas', ['concat:canvas','uglify:canvas']);
-	grunt.registerTask('build:css3d', ['concat:css3d','uglify:css3d']);
-	grunt.registerTask('build:webgl', ['concat:webgl','uglify:webgl']);
-	grunt.registerTask('build:extras', ['concat:extras','uglify:extras']);
-	grunt.registerTask('build:math', ['concat:math','uglify:math']);
-	grunt.registerTask('build:all', ['build:common','build:canvas','build:css3d','build:webgl','build:extras','build:math']);
+	grunt.registerTask('build:common', ['concat:common', 'uglify:common']);
+	grunt.registerTask('build:canvas', ['concat:canvas', 'uglify:canvas']);
+	grunt.registerTask('build:css3d', ['concat:css3d', 'uglify:css3d']);
+	grunt.registerTask('build:webgl', ['concat:webgl', 'uglify:webgl']);
+	grunt.registerTask('build:extras', ['concat:extras', 'uglify:extras']);
+	grunt.registerTask('build:math', ['concat:math', 'uglify:math']);
+	grunt.registerTask('build:max', ['concat:max', 'uglify:max']);
+	grunt.registerTask('build:all', ['build:common', 'build:canvas', 'build:css3d', 'build:webgl', 'build:extras', 'build:math', 'build:max']);
 };
