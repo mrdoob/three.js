@@ -8,6 +8,8 @@ module.exports = function (grunt) {
 		banner = '// three.js - http://github.com/mrdoob/three.js \n';
 
 	grunt.initConfig({
+		pkg:grunt.file.readJSON('package.json'),
+
 		concat: {
 			common: {
 				src: common.concat(extras),
@@ -78,11 +80,40 @@ module.exports = function (grunt) {
 					'build/three-max.min.js': 'build/three-max.js'
 				}
 			}
+		},
+
+		bump: {
+			options: {
+				files: ['package.json'],
+				updateConfigs: ["pkg"],
+				commit: true,
+				commitMessage: 'Release v%VERSION%',
+				commitFiles: ['package.json', 'build/three.min.js', 'build/three.js', 'src/Three.js'],
+				createTag: true,
+				tagName: 'v%VERSION%',
+				tagMessage: 'Version %VERSION%',
+				push: true,
+				pushTo: 'origin dev',
+				gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d'
+			}
+		},
+
+		replace: {
+			version: {
+				src: ['src/Three.js'],
+				overwrite: true,
+				replacements: [{
+					from: /REVISION: '[^']+'/,
+					to: "REVISION: 'v<%= pkg.version %>'"
+				}]
+			}
 		}
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-bump');
+	grunt.loadNpmTasks('grunt-text-replace');
 
 	grunt.registerTask('default', ['build']);
 	grunt.registerTask('build', ['build:common']);
@@ -94,4 +125,9 @@ module.exports = function (grunt) {
 	grunt.registerTask('build:math', ['concat:math', 'uglify:math']);
 	grunt.registerTask('build:max', ['concat:max', 'uglify:max']);
 	grunt.registerTask('build:all', ['build:common', 'build:canvas', 'build:css3d', 'build:webgl', 'build:extras', 'build:math', 'build:max']);
+
+	grunt.registerTask('release', ['replace:version', 'default','bump-commit']);
+	grunt.registerTask('release:patch', ['bump-only:patch','release']);
+	grunt.registerTask('release:minor', ['bump-only:minor','release']);
+	grunt.registerTask('release:major', ['bump-only:major','release']);
 };
