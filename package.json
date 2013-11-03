@@ -1,7 +1,7 @@
 {
   "name": "three.js",
   "description": "JavaScript 3D library",
-  "version": "0.0.62",
+  "version": "0.0.63",
   "homepage": "http://threejs.org/",
   "author": "three.js contributors",
   "help": {
