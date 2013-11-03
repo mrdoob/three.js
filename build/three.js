@@ -36978,4 +36978,3 @@ THREE.ShaderSprite = {
 	}
 
 };
-
