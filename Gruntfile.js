@@ -88,7 +88,7 @@ module.exports = function (grunt) {
 				updateConfigs: ["pkg"],
 				commit: true,
 				commitMessage: 'Release v%VERSION%',
-				commitFiles: ['package.json', 'build/three.min.js', 'build/three.js', 'src/Three.js'],
+				commitFiles: ['package.json', 'bower.json', 'build/three.min.js', 'build/three.js', 'src/Three.js'],
 				createTag: true,
 				tagName: 'v%VERSION%',
 				tagMessage: 'Version %VERSION%',
