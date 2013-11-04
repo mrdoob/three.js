@@ -2081,7 +2081,7 @@ def generate_cameras(data):
     if data["use_cameras"]:
 
         cams = bpy.data.objects
-        cams = [ob for ob in cams if (ob.type == 'CAMERA' and ob.select)]
+        cams = [ob for ob in cams if (ob.type == 'CAMERA')]
 
         if not cams:
             camera = DEFAULTS["camera"]
