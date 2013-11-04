@@ -737,7 +737,7 @@ def generate_bones(option_bones, flipyz):
     for bone in armature.bones:
         bonePos = None
         boneIndex = None
-        if bone.parent == None:
+        if bone.parent is None:
             bonePos = bone.head_local
             boneIndex = -1
         else:
@@ -995,7 +995,7 @@ def position(bone, frame, action, armatureMatrix):
 
     position = position * bone.matrix_local.inverted()
 
-    if bone.parent == None:
+    if bone.parent is None:
 
         position.x += bone.head.x
         position.y += bone.head.y
