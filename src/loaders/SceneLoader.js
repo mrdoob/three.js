@@ -363,25 +363,6 @@ THREE.SceneLoader.prototype = {
 
 					} else if (objJSON.type === "PointLight" || objJSON.type === "AmbientLight" || objJSON.type === "SpotLight" || objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight") {
 
-						function rotate(x, y, z, vector3) {
-							var target = new THREE.Matrix4(
-							vector3[0], 0, 0, 0,
-							vector3[1], 0, 0, 0,
-							vector3[2], 0, 0, 0,
-							0		 , 0, 0, 0
-							);
-							var rotateX = new THREE.Matrix4();
-							var	rotateY = new THREE.Matrix4(),
-							var rotateZ = new THREE.Matrix4();
-							rotateX.makeRotationX(x);
-							rotateY.makeRotationY(y);
-							rotateZ.makeRotationZ(z);
-							var rotateM = new THREE.Matrix4();
-							rotateM.multiplyMatrices(rotateX, rotateY, rotateZ);
-							target.multiplyMatrices(rotateM, target);
-							return target;
-						}
-
 						var color = objJSON.color;
 						var intensity = objJSON.intensity;
 						var distance = objJSON.distance;
@@ -403,16 +384,14 @@ THREE.SceneLoader.prototype = {
 								light = new THREE.SpotLight( color, intensity, distance, 1 );
 								light.angle = objJSON.angle;
 								light.position.fromArray( position );
-								var target = rotate(rotation[0], rotation[1], rotation[2],
-													[position[0], position[1] - distance, position[2]]);
-								light.target.position.fromArray( target.elements );
+								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
+								light.target.applyEuler( new THREE.Euler( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], 'XYZ' ) );
 								break;
 
 							case 'HemisphereLight':
 								light = new THREE.DirectionalLight( color, intensity, distance );
-								var target = rotate(rotation[0], rotation[1], rotation[2],
-													[position[0], position[1] - distance, position[2]]);
-								light.target.position.fromArray( target.elements );
+								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
+								light.target.applyEuler( new THREE.Euler( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], 'XYZ' ) );
 								break;
 
 							case 'AreaLight':
