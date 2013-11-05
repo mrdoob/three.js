@@ -12221,7 +12221,9 @@ THREE.SceneLoader.prototype = {
 
 					// lights
 
-					} else if (objJSON.type === "PointLight" || objJSON.type === "AmbientLight" || objJSON.type === "SpotLight" || objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight") {
+					} else if ( objJSON.type === "AmbientLight" || objJSON.type === "PointLight" ||
+						objJSON.type === "DirectionalLight" || objJSON.type === "SpotLight" ||
+						objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight" ) {
 
 						var color = objJSON.color;
 						var intensity = objJSON.intensity;
@@ -12238,6 +12240,11 @@ THREE.SceneLoader.prototype = {
 							case 'PointLight':
 								light = new THREE.PointLight( color, intensity, distance );
 								light.position.fromArray( position );
+								break;
+
+							case 'DirectionalLight':
+								light = new THREE.DirectionalLight( color, intensity );
+								light.position.fromArray( objJSON.direction );
 								break;
 
 							case 'SpotLight':
