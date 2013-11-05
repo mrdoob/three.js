@@ -44,7 +44,8 @@ THREE.ColladaLoader = function () {
 		upAxis: 'Y',
 
 		// For reflective or refractive materials we'll use this cubemap
-		defaultEnvMap: null
+		defaultEnvMap: null,
+        useEmbeddedAmbient: true
 
 	};
 
@@ -846,7 +847,7 @@ THREE.ColladaLoader = function () {
 			var instance_camera = node.cameras[i];
 			var cparams = cameras[instance_camera.url];
 
-			obj = new THREE.PerspectiveCamera(cparams.fov, parseFloat(cparams.aspect_ratio), 
+			obj = new THREE.PerspectiveCamera(parseFloat(cparams.xfov), parseFloat(cparams.aspect_ratio),
 					parseFloat(cparams.znear), parseFloat(cparams.zfar));
 
 		}
@@ -882,10 +883,12 @@ THREE.ColladaLoader = function () {
 						break;
 
 					case 'ambient':
-
-						obj = new THREE.AmbientLight( color );
-						break;
-
+                        if (options.useEmbeddedAmbient){
+                            obj = new THREE.AmbientLight( color );
+                            break;
+                        }
+                        //leave function and do not add an Object3D to the scene graph for the ambient light!
+                        return;
 				}
 
 			}
@@ -916,6 +919,7 @@ THREE.ColladaLoader = function () {
 
 	};
 
+    //getJointID is an unused function, can be deleted?
 	function getJointId( skin, id ) {
 
 		for ( var i = 0; i < skin.joints.length; i ++ ) {
@@ -1769,7 +1773,7 @@ THREE.ColladaLoader = function () {
 
 	Node.prototype.getChildById = function ( id, recursive ) {
 
-		if ( this.id == id ) {
+		if ( this.id == id || this.id === "node-"+ id ) {
 
 			return this;
 
@@ -3036,7 +3040,7 @@ THREE.ColladaLoader = function () {
 						repeatU: 1,
 						repeatV: 1,
 						wrapU: 1,
-						wrapV: 1,
+						wrapV: 1
 					};
 					this.parseTexture( child );
 					break;
@@ -3172,17 +3176,16 @@ THREE.ColladaLoader = function () {
 		if (this['transparency'] !== undefined && this['transparent'] !== undefined)
 		{
 			// convert transparent color RBG to average value
-			var transparentColor = this['transparent'];
 			var transparencyLevel = (this.transparent.color.r +
 										this.transparent.color.g + 
 										this.transparent.color.b)
 										/ 3 * this.transparency;
 			
-			if (transparencyLevel > 0)
+			if (transparencyLevel !== 1)
 			{
 				transparent = true;
 				props[ 'transparent' ] = true;
-				props[ 'opacity' ] = 1 - transparencyLevel;
+				props[ 'opacity' ] = transparencyLevel;
 			}
 		}
 		
@@ -3227,20 +3230,11 @@ THREE.ColladaLoader = function () {
 
 							}
 
-						} else if ( prop === 'diffuse' || !transparent ) {
-
-							if ( prop === 'emission' ) {
-
-								props[ 'emissive' ] = cot.color.getHex();
-
-							} else {
-
-								props[ prop ] = cot.color.getHex();
-
-							}
-
-						}
-
+						} else if ( prop === 'emission' ) {
+                            props[ 'emissive' ] = cot.color.getHex();
+                            } else{
+                                props[ prop ] = cot.color.getHex();
+                            }
 					}
 
 					break;
@@ -3261,10 +3255,6 @@ THREE.ColladaLoader = function () {
 
 					props[ 'refractionRatio' ] = this[ prop ]; //TODO: "index_of_refraction" becomes "refractionRatio" in shader, but I'm not sure if the two are actually comparable
 					if ( this[ prop ] !== 1.0 ) props['envMap'] = options.defaultEnvMap;
-					break;
-
-				case 'transparency':
-					// gets figured out up top
 					break;
 
 				default:
