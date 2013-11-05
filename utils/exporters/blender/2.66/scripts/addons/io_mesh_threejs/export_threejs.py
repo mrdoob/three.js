@@ -197,60 +197,60 @@ TEMPLATE_CAMERA_ORTHO = """\
 	}"""
 
 TEMPLATE_LIGHT_POINT = """\
-        %(light_id)s : {
-                "type"       : "PointLight",
-                "position"   : %(position)s,
-                "rotation"   : %(rotation)s,
-                "color"      : %(color)d,
-                "distance"   : %(distance).3f,
-                "intensity"     : %(intensity).3f
-        }"""
+	%(light_id)s : {
+		"type"       : "PointLight",
+		"position"   : %(position)s,
+		"rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+		"distance"   : %(distance).3f,
+		"intensity"  : %(intensity).3f
+	}"""
 
 TEMPLATE_LIGHT_SUN = """\
-        %(light_id)s : {
-                "type"       : "AmbientLight",
-                "position"   : %(position)s,
-                "rotation"   : %(rotation)s,
-                "color"      : %(color)d,
-                "distance"   : %(distance).3f,
-                "intensity"     : %(intensity).3f
-        }"""
+	%(light_id)s : {
+		"type"       : "AmbientLight",
+		"position"   : %(position)s,
+		"rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+		"distance"   : %(distance).3f,
+		"intensity"  : %(intensity).3f
+	}"""
 
 TEMPLATE_LIGHT_SPOT = """\
-        %(light_id)s : {
-                "type"       : "SpotLight",
-                "position"   : %(position)s,
-                "rotation"   : %(rotation)s,
-                "color"      : %(color)d,
-                "distance"   : %(distance).3f,
-                "intensity"     : %(intensity).3f,
-                "use_shadow" : %(use_shadow)d,
-                "angle"      : %(angle).3f
-        }"""
+	%(light_id)s : {
+		"type"       : "SpotLight",
+		"position"   : %(position)s,
+		"rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+		"distance"   : %(distance).3f,
+		"intensity"  : %(intensity).3f,
+		"use_shadow" : %(use_shadow)d,
+		"angle"      : %(angle).3f
+	}"""
 
 TEMPLATE_LIGHT_HEMI = """\
-        %(light_id)s : {
-                "type"       : "HemisphereLight",
-                "position"  : %(position)s,
-                "rotation"   : %(rotation)s,
-                "color"      : %(color)d,
-                "distance"   : %(distance).3f,
-                "intensity"     : %(intensity).3f
-        }"""
+	%(light_id)s : {
+		"type"       : "HemisphereLight",
+		"position"   : %(position)s,
+		"rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+		"distance"   : %(distance).3f,
+		"intensity"  : %(intensity).3f
+	}"""
 
 TEMPLATE_LIGHT_AREA = """\
-        %(light_id)s : {
-                "type"       : "AreaLight",
-                "position"   : %(position)s,
-                "rotation"   : %(rotation)s,
-                "color"      : %(color)d,
-                "distance"   : %(distance).3f,
-                "intensity"     : %(intensity).3f,
-                "gamma"      : %(gamma).3f,
-                "shape"      : "%(shape)s",
-                "size"       : %(size).3f,
-                "size_y"     : %(size_y).3f
-        }"""
+	%(light_id)s : {
+		"type"       : "AreaLight",
+		"position"   : %(position)s,
+		"rotation"   : %(rotation)s,
+		"color"      : %(color)d,
+		"distance"   : %(distance).3f,
+		"intensity"  : %(intensity).3f,
+		"gamma"      : %(gamma).3f,
+		"shape"      : "%(shape)s",
+		"size"       : %(size).3f,
+		"size_y"     : %(size_y).3f
+	}"""
 
 
 TEMPLATE_VEC4 = '[ %g, %g, %g, %g ]'
