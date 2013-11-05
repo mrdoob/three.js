@@ -10,14 +10,10 @@ THREE.ShaderSprite = {
 
 		vertexShader: [
 
-			"uniform int useScreenCoordinates;",
-			"uniform int sizeAttenuation;",
-			"uniform vec3 screenPosition;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
 			"uniform float rotation;",
 			"uniform vec2 scale;",
-			"uniform vec2 alignment;",
 			"uniform vec2 uvOffset;",
 			"uniform vec2 uvScale;",
 			"uniform vec2 halfViewport;",
@@ -31,7 +27,7 @@ THREE.ShaderSprite = {
 
 				"vUV = uvOffset + uv * uvScale;",
 
-				"vec2 alignedPosition = ( position + alignment ) * scale;",
+				"vec2 alignedPosition = position * scale;",
 
 				"vec2 rotatedPosition;",
 				"rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;",
@@ -39,17 +35,9 @@ THREE.ShaderSprite = {
 
 				"vec4 finalPosition;",
 
-				"if( useScreenCoordinates != 0 ) {",
-
-					"finalPosition = vec4( screenPosition.xy + ( rotatedPosition / halfViewport ), screenPosition.z, 1.0 );",
-
-				"} else {",
-
-					"finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
-					"finalPosition.xy += rotatedPosition * ( sizeAttenuation == 1 ? 1.0 : finalPosition.z );",
-					"finalPosition = projectionMatrix * finalPosition;",
-
-				"}",
+				"finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
+				"finalPosition.xy += rotatedPosition;",
+				"finalPosition = projectionMatrix * finalPosition;",
 
 				"gl_Position = finalPosition;",
 

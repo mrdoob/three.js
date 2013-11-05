@@ -100,9 +100,11 @@
 					var scaleX = mapA.image.width;
 					var scaleY = mapA.image.height;
 
-					var materialA1 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.25 } );
-					var materialA2 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.5 } );
-					var materialA3 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 1 } );
+					var materialA1 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.25 } );
+					var materialA2 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.5 } );
+					var materialA3 = new THREE.SpriteMaterial( { map: mapA, opacity: 1 } );
+
+					/*
 
 					sprite = new THREE.Sprite( materialA1 );
 					sprite.position.set( 100, 100, 0 );
@@ -118,6 +120,8 @@
 					sprite.position.set( 200, 200, 3 );
 					sprite.scale.set( scaleX, scaleY, 1 );
 					scene.add( sprite );
+					
+					*/
 
 				}
 
