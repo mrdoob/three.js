@@ -396,7 +396,7 @@ THREE.SceneLoader.prototype = {
 
 							case 'AreaLight':
 								light = new THREE.AreaLight(color, intensity);
-								light.position.fromArray( position[ );
+								light.position.fromArray( position );
 								light.width = objJSON.size;
 								light.height = objJSON.size_y;
 								break;
