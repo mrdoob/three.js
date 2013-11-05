@@ -714,7 +714,7 @@ def generate_bones(option_bones, flipyz):
     TEMPLATE_BONE = '{"parent":%d,"name":"%s","pos":[%g,%g,%g],"rotq":[0,0,0,1]}'
 
     for bone in armature.bones:
-        if bone.parent == None:
+        if bone.parent is None:
             if flipyz:
                 joint = TEMPLATE_BONE % (-1, bone.name, bone.head.x, bone.head.z, -bone.head.y)
                 hierarchy.append(joint)
@@ -959,7 +959,7 @@ def position(bone, frame):
 
     position = position * bone.matrix_local.inverted()
 
-    if bone.parent == None:
+    if bone.parent is None:
 
         position.x += bone.head.x
         position.y += bone.head.y

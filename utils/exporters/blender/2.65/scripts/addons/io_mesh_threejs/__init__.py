@@ -25,8 +25,7 @@ bl_info = {
     "name": "three.js format",
     "author": "mrdoob, kikko, alteredq, remoe, pxf, n3tfr34k",
     "version": (1, 4, 0),
-    "blender": (2, 6, 5),
-    "api": 35622,
+    "blender": (2, 65, 0),
     "location": "File > Import-Export",
     "description": "Import-Export three.js meshes",
     "warning": "",
@@ -322,7 +321,7 @@ class ExportTHREEJS(bpy.types.Operator, ExportHelper):
 
     @classmethod
     def poll(cls, context):
-        return context.active_object != None
+        return context.active_object is not None
 
     def execute(self, context):
         print("Selected: " + context.active_object.name)
