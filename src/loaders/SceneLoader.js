@@ -361,61 +361,74 @@ THREE.SceneLoader.prototype = {
 
 					// lights
 
-		            // lights
-		          } else if (objJSON.type === "PointLight" || objJSON.type === "AmbientLight" || objJSON.type === "SpotLight" || objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight") {
-		            function rotate(x, y, z, vector3) {
-		              var target = new THREE.Matrix4(
-		                vector3[0], 0, 0, 0
-		                , vector3[1], 0, 0, 0
-		                , vector3[2], 0, 0, 0
-		                , 0         , 0, 0, 0
-		              );
-		              var rotateX = new THREE.Matrix4(),
-		                  rotateY = new THREE.Matrix4(),
-		                  rotateZ = new THREE.Matrix4();
-		              rotateX.makeRotationX(x);
-		              rotateY.makeRotationY(y);
-		              rotateZ.makeRotationZ(z);
-		              var rotateM = new THREE.Matrix4();
-		              rotateM.multiplyMatrices(rotateX, rotateY, rotateZ);
-		              target.multiplyMatrices(rotateM, target);
-		              return target;
-		            }
+					} else if (objJSON.type === "PointLight" || objJSON.type === "AmbientLight" || objJSON.type === "SpotLight" || objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight") {
 
-		            var intensity = objJSON.intensity;
-		            var color = objJSON.color;
-		            var distance = objJSON.distance;
-		            var position = objJSON.position;
-		            var rotation = objJSON.rotation;
-		            if (objJSON.type === "PointLight") {
-		              light = new THREE.PointLight(color, intensity, distance);
-		              light.position.fromArray(position);
-		            } else if (objJSON.type === "SpotLight") {
-		              light = new THREE.SpotLight(color, intensity, distance, 1);
-		              light.angle = objJSON.angle;
-		              light.position.fromArray(position);
-		              var target = rotate(rotation[0], rotation[1], rotation[2],
-		                                  [position[0], position[1] - distance, position[2]]);
-		              light.target.position = new THREE.Vector3(target.elements[0], target.elements[1], target.elements[2]);
-		            } else if (objJSON.type === "AmbientLight") {
-		              light = new THREE.AmbientLight(color);
-		            } else if (objJSON.type === "HemisphereLight") {
-		              light = new THREE.DirectionalLight(color, intensity, distance);
-		              var target = rotate(rotation[0], rotation[1], rotation[2],
-		                                  [position[0], position[1] - distance, position[2]]);
-		              light.target.position = new THREE.Vector3(target.elements[0], target.elements[1], target.elements[2]);
-		            } else if (objJSON.type === "AreaLight") {
-		              light = new THREE.AreaLight(color, intensity);
-		              light.position.set(position[0], position[1], position[2]);
-		              light.width = objJSON.size;
-		              light.height = objJSON.size_y;
-		            }
-		            parent.add( light );
-		            light.name = objID;
-		            result.lights[ objID ] = light;
-		            result.objects[ objID ] = light;
+						function rotate(x, y, z, vector3) {
+							var target = new THREE.Matrix4(
+							vector3[0], 0, 0, 0,
+							vector3[1], 0, 0, 0,
+							vector3[2], 0, 0, 0,
+							0		 , 0, 0, 0
+							);
+							var rotateX = new THREE.Matrix4();
+							var	rotateY = new THREE.Matrix4(),
+							var rotateZ = new THREE.Matrix4();
+							rotateX.makeRotationX(x);
+							rotateY.makeRotationY(y);
+							rotateZ.makeRotationZ(z);
+							var rotateM = new THREE.Matrix4();
+							rotateM.multiplyMatrices(rotateX, rotateY, rotateZ);
+							target.multiplyMatrices(rotateM, target);
+							return target;
+						}
 
-		            // cameras
+						var intensity = objJSON.intensity;
+						var color = objJSON.color;
+						var distance = objJSON.distance;
+						var position = objJSON.position;
+						var rotation = objJSON.rotation;
+
+						if (objJSON.type === "PointLight") {
+
+							light = new THREE.PointLight(color, intensity, distance);
+							light.position.fromArray(position);
+
+						} else if (objJSON.type === "SpotLight") {
+
+							light = new THREE.SpotLight(color, intensity, distance, 1);
+							light.angle = objJSON.angle;
+							light.position.fromArray(position);
+							var target = rotate(rotation[0], rotation[1], rotation[2],
+												[position[0], position[1] - distance, position[2]]);
+							light.target.position = new THREE.Vector3(target.elements[0], target.elements[1], target.elements[2]);
+
+						} else if (objJSON.type === "AmbientLight") {
+
+							light = new THREE.AmbientLight(color);
+
+						} else if (objJSON.type === "HemisphereLight") {
+
+							light = new THREE.DirectionalLight(color, intensity, distance);
+							var target = rotate(rotation[0], rotation[1], rotation[2],
+												[position[0], position[1] - distance, position[2]]);
+							light.target.position = new THREE.Vector3(target.elements[0], target.elements[1], target.elements[2]);
+
+						} else if (objJSON.type === "AreaLight") {
+
+							light = new THREE.AreaLight(color, intensity);
+							light.position.set(position[0], position[1], position[2]);
+							light.width = objJSON.size;
+							light.height = objJSON.size_y;
+
+						}
+
+						parent.add( light );
+
+						light.name = objID;
+						result.lights[ objID ] = light;
+						result.objects[ objID ] = light;
+
+					// cameras
 
 					} else if ( objJSON.type === "PerspectiveCamera" || objJSON.type === "OrthographicCamera" ) {
 
