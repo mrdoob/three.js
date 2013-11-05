@@ -60,8 +60,6 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		var vertices = [];
-		var verticesCount = 0;
 		var normals = [];
 		var uvs = [];
 
@@ -112,7 +110,7 @@ THREE.OBJLoader.prototype = {
 
 				// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-				vertices.push( vector(
+				geometry.vertices.push( vector(
 					parseFloat( result[ 1 ] ),
 					parseFloat( result[ 2 ] ),
 					parseFloat( result[ 3 ] )
@@ -143,40 +141,25 @@ THREE.OBJLoader.prototype = {
 
 				 if ( result[ 4 ] === undefined ) {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 1 ] ) - 1 ],
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 3 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++
+						parseInt( result[ 1 ] ) - 1,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 3 ] ) - 1
 					) );
 
 				} else {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 1 ] ) - 1 ],
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 3 ] ) - 1 ],
-						vertices[ parseInt( result[ 4 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3
+						parseInt( result[ 1 ] ) - 1,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 4 ] ) - 1
 					) );
 
 					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 3 ] ) - 1,
+						parseInt( result[ 4 ] ) - 1
 					) );
-
-					verticesCount += 4;
 
 				}
 
@@ -186,16 +169,10 @@ THREE.OBJLoader.prototype = {
 
 				if ( result[ 10 ] === undefined ) {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1
 					) );
 
 					geometry.faceVertexUvs[ 0 ].push( [
@@ -206,17 +183,10 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ],
-						vertices[ parseInt( result[ 11 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 11 ] ) - 1
 					) );
 
 					geometry.faceVertexUvs[ 0 ].push( [
@@ -226,9 +196,9 @@ THREE.OBJLoader.prototype = {
 					] );
 
 					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1,
+						parseInt( result[ 11 ] ) - 1
 					) );
 
 					geometry.faceVertexUvs[ 0 ].push( [
@@ -236,9 +206,6 @@ THREE.OBJLoader.prototype = {
 						uvs[ parseInt( result[ 9 ] ) - 1 ],
 						uvs[ parseInt( result[ 12 ] ) - 1 ]
 					] );
-
-					verticesCount += 4;
-
 				}
 
 			} else if ( ( result = face_pattern3.exec( line ) ) !== null ) {
@@ -247,16 +214,10 @@ THREE.OBJLoader.prototype = {
 
 				if ( result[ 13 ] === undefined ) {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 6 ] ) - 1 ],
-						vertices[ parseInt( result[ 10 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 6 ] ) - 1,
+						parseInt( result[ 10 ] ) - 1,
 						[
 							normals[ parseInt( result[ 4 ] ) - 1 ],
 							normals[ parseInt( result[ 8 ] ) - 1 ],
@@ -272,17 +233,10 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 6 ] ) - 1 ],
-						vertices[ parseInt( result[ 10 ] ) - 1 ],
-						vertices[ parseInt( result[ 14 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 6 ] ) - 1,
+						parseInt( result[ 14 ] ) - 1,
 						[
 							normals[ parseInt( result[ 4 ] ) - 1 ],
 							normals[ parseInt( result[ 8 ] ) - 1 ],
@@ -297,9 +251,9 @@ THREE.OBJLoader.prototype = {
 					] );
 
 					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3,
+						parseInt( result[ 6 ] ) - 1,
+						parseInt( result[ 10 ] ) - 1,
+						parseInt( result[ 14 ] ) - 1,
 						[
 							normals[ parseInt( result[ 8 ] ) - 1 ],
 							normals[ parseInt( result[ 12 ] ) - 1 ],
@@ -313,8 +267,6 @@ THREE.OBJLoader.prototype = {
 						uvs[ parseInt( result[ 15 ] ) - 1 ]
 					] );
 
-					verticesCount += 4;
-
 				}
 
 			} else if ( ( result = face_pattern4.exec( line ) ) !== null ) {
@@ -323,16 +275,10 @@ THREE.OBJLoader.prototype = {
 
 				if ( result[ 10 ] === undefined ) {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount ++,
-						verticesCount ++,
-						verticesCount ++,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1,
 						[
 							normals[ parseInt( result[ 3 ] ) - 1 ],
 							normals[ parseInt( result[ 6 ] ) - 1 ],
@@ -342,17 +288,10 @@ THREE.OBJLoader.prototype = {
 
 				} else {
 
-					geometry.vertices.push(
-						vertices[ parseInt( result[ 2 ] ) - 1 ],
-						vertices[ parseInt( result[ 5 ] ) - 1 ],
-						vertices[ parseInt( result[ 8 ] ) - 1 ],
-						vertices[ parseInt( result[ 11 ] ) - 1 ]
-					);
-
 					geometry.faces.push( face3(
-						verticesCount,
-						verticesCount + 1,
-						verticesCount + 3,
+						parseInt( result[ 2 ] ) - 1,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 11 ] ) - 1,
 						[
 							normals[ parseInt( result[ 3 ] ) - 1 ],
 							normals[ parseInt( result[ 6 ] ) - 1 ],
@@ -361,17 +300,15 @@ THREE.OBJLoader.prototype = {
 					) );
 
 					geometry.faces.push( face3(
-						verticesCount + 1,
-						verticesCount + 2,
-						verticesCount + 3,
+						parseInt( result[ 5 ] ) - 1,
+						parseInt( result[ 8 ] ) - 1,
+						parseInt( result[ 11 ] ) - 1,
 						[
 							normals[ parseInt( result[ 6 ] ) - 1 ],
 							normals[ parseInt( result[ 9 ] ) - 1 ],
 							normals[ parseInt( result[ 12 ] ) - 1 ]
 						]
 					) );
-
-					verticesCount += 4;
 
 				}
 
@@ -385,8 +322,6 @@ THREE.OBJLoader.prototype = {
 				mesh = new THREE.Mesh( geometry, material );
 				mesh.name = line.substring( 2 ).trim();
 				object.add( mesh );
-
-				verticesCount = 0;
 
 			} else if ( /^g /.test( line ) ) {
 
