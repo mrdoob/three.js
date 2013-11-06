@@ -77,7 +77,8 @@ events.forEach( function ( event ) {
 
 	UI.Element.prototype[ method ] = function ( callback ) {
 
-		this.dom.addEventListener( event.toLowerCase(), callback, false );
+		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
+
 		return this;
 
 	};
