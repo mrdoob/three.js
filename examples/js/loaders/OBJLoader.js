@@ -62,6 +62,7 @@ THREE.OBJLoader.prototype = {
 
 		var normals = [];
 		var uvs = [];
+		var vertices = [];
 
 		// v float float float
 
@@ -110,7 +111,7 @@ THREE.OBJLoader.prototype = {
 
 				// ["v 1.0 2.0 3.0", "1.0", "2.0", "3.0"]
 
-				geometry.vertices.push( vector(
+				vertices.push( vector(
 					parseFloat( result[ 1 ] ),
 					parseFloat( result[ 2 ] ),
 					parseFloat( result[ 3 ] )
@@ -352,6 +353,7 @@ THREE.OBJLoader.prototype = {
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
 			var geometry = object.children[ i ].geometry;
+			geometry.vertices = vertices.map(function(v) { return v.clone(); });
 
 			geometry.computeCentroids();
 			geometry.computeFaceNormals();
