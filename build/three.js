@@ -14096,10 +14096,6 @@ THREE.ShaderMaterial.prototype.clone = function () {
  *  depthTest: <bool>,
  *  depthWrite: <bool>,
  *
- *  useScreenCoordinates: <bool>,
- *  sizeAttenuation: <bool>,
- *  alignment: THREE.SpriteAlignment.center,
- *
  *	uvOffset: new THREE.Vector2(),
  *	uvScale: new THREE.Vector2(),
  *
@@ -14116,10 +14112,8 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff );
 	this.map = new THREE.Texture();
 
-	this.useScreenCoordinates = false;
 	this.depthTest = true;
 	this.sizeAttenuation = true;
-	this.alignment = THREE.SpriteAlignment.center.clone();
 	this.rotation = 0;
 
 	this.fog = false;
@@ -14130,13 +14124,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 	// set parameters
 
 	this.setValues( parameters );
-
-	// override coupled defaults if not specified explicitly by parameters
-
-	parameters = parameters || {};
-
-	if ( parameters.depthTest === undefined ) this.depthTest = this.useScreenCoordinates === false;
-	if ( parameters.sizeAttenuation === undefined ) this.sizeAttenuation = this.useScreenCoordinates === false;
 
 };
 
@@ -14151,9 +14138,6 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	material.color.copy( this.color );
 	material.map = this.map;
 
-	material.useScreenCoordinates = this.useScreenCoordinates;
-	material.sizeAttenuation = this.sizeAttenuation;
-	material.alignment.copy( this.alignment );
 	material.rotation = this.rotation;
 
 	material.uvOffset.copy( this.uvOffset );
@@ -14164,19 +14148,6 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	return material;
 
 };
-
-// Alignment enums
-
-THREE.SpriteAlignment = {};
-THREE.SpriteAlignment.topLeft = new THREE.Vector2( 0.5, -0.5 );
-THREE.SpriteAlignment.topCenter = new THREE.Vector2( 0, -0.5 );
-THREE.SpriteAlignment.topRight = new THREE.Vector2( -0.5, -0.5 );
-THREE.SpriteAlignment.centerLeft = new THREE.Vector2( 0.5, 0 );
-THREE.SpriteAlignment.center = new THREE.Vector2( 0, 0 );
-THREE.SpriteAlignment.centerRight = new THREE.Vector2( -0.5, 0 );
-THREE.SpriteAlignment.bottomLeft = new THREE.Vector2( 0.5, 0.5 );
-THREE.SpriteAlignment.bottomCenter = new THREE.Vector2( 0, 0.5 );
-THREE.SpriteAlignment.bottomRight = new THREE.Vector2( -0.5, 0.5 );
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -36236,16 +36207,12 @@ THREE.SpritePlugin = function () {
 
 		_sprite.uniforms.rotation             = _gl.getUniformLocation( _sprite.program, "rotation" );
 		_sprite.uniforms.scale                = _gl.getUniformLocation( _sprite.program, "scale" );
-		_sprite.uniforms.alignment            = _gl.getUniformLocation( _sprite.program, "alignment" );
 		_sprite.uniforms.halfViewport         = _gl.getUniformLocation( _sprite.program, "halfViewport" );
 
 		_sprite.uniforms.color                = _gl.getUniformLocation( _sprite.program, "color" );
 		_sprite.uniforms.map                  = _gl.getUniformLocation( _sprite.program, "map" );
 		_sprite.uniforms.opacity              = _gl.getUniformLocation( _sprite.program, "opacity" );
 
-		_sprite.uniforms.useScreenCoordinates = _gl.getUniformLocation( _sprite.program, "useScreenCoordinates" );
-		_sprite.uniforms.sizeAttenuation   	  = _gl.getUniformLocation( _sprite.program, "sizeAttenuation" );
-		_sprite.uniforms.screenPosition    	  = _gl.getUniformLocation( _sprite.program, "screenPosition" );
 		_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
 		_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
 
@@ -36331,7 +36298,7 @@ THREE.SpritePlugin = function () {
 
 		// update positions and sort
 
-		var i, sprite, material, screenPosition, fogType, scale = [];
+		var i, sprite, material, fogType, scale = [];
 
 		for( i = 0; i < nSprites; i ++ ) {
 
@@ -36340,16 +36307,8 @@ THREE.SpritePlugin = function () {
 
 			if ( ! sprite.visible || material.opacity === 0 ) continue;
 
-			if ( ! material.useScreenCoordinates ) {
-
-				sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
-				sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
-
-			} else {
-
-				sprite.z = - sprite.position.z;
-
-			}
+			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
+			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
 
 		}
 
@@ -36367,30 +36326,10 @@ THREE.SpritePlugin = function () {
 			if ( material.map && material.map.image && material.map.image.width ) {
 
 				_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
+				_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
 
-				if ( material.useScreenCoordinates === true ) {
-
-					_gl.uniform1i( uniforms.useScreenCoordinates, 1 );
-					_gl.uniform3f(
-						uniforms.screenPosition,
-						( ( sprite.position.x * _renderer.devicePixelRatio ) - halfViewportWidth  ) / halfViewportWidth,
-						( halfViewportHeight - ( sprite.position.y * _renderer.devicePixelRatio ) ) / halfViewportHeight,
-						Math.max( 0, Math.min( 1, sprite.position.z ) )
-					);
-
-					scale[ 0 ] = _renderer.devicePixelRatio * sprite.scale.x;
-					scale[ 1 ] = _renderer.devicePixelRatio * sprite.scale.y;
-
-				} else {
-
-					_gl.uniform1i( uniforms.useScreenCoordinates, 0 );
-					_gl.uniform1i( uniforms.sizeAttenuation, material.sizeAttenuation ? 1 : 0 );
-					_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
-
-					scale[ 0 ] = sprite.scale.x;
-					scale[ 1 ] = sprite.scale.y;
-
-				}
+				scale[ 0 ] = sprite.scale.x;
+				scale[ 1 ] = sprite.scale.y;
 
 				if ( scene.fog && material.fog ) {
 
@@ -36411,7 +36350,6 @@ THREE.SpritePlugin = function () {
 
 				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
 				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
-				_gl.uniform2f( uniforms.alignment, material.alignment.x, material.alignment.y );
 
 				_gl.uniform1f( uniforms.opacity, material.opacity );
 				_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
@@ -36876,14 +36814,10 @@ THREE.ShaderSprite = {
 
 		vertexShader: [
 
-			"uniform int useScreenCoordinates;",
-			"uniform int sizeAttenuation;",
-			"uniform vec3 screenPosition;",
 			"uniform mat4 modelViewMatrix;",
 			"uniform mat4 projectionMatrix;",
 			"uniform float rotation;",
 			"uniform vec2 scale;",
-			"uniform vec2 alignment;",
 			"uniform vec2 uvOffset;",
 			"uniform vec2 uvScale;",
 			"uniform vec2 halfViewport;",
@@ -36897,7 +36831,7 @@ THREE.ShaderSprite = {
 
 				"vUV = uvOffset + uv * uvScale;",
 
-				"vec2 alignedPosition = ( position + alignment ) * scale;",
+				"vec2 alignedPosition = position * scale;",
 
 				"vec2 rotatedPosition;",
 				"rotatedPosition.x = cos( rotation ) * alignedPosition.x - sin( rotation ) * alignedPosition.y;",
@@ -36905,17 +36839,9 @@ THREE.ShaderSprite = {
 
 				"vec4 finalPosition;",
 
-				"if( useScreenCoordinates != 0 ) {",
-
-					"finalPosition = vec4( screenPosition.xy + ( rotatedPosition / halfViewport ), screenPosition.z, 1.0 );",
-
-				"} else {",
-
-					"finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
-					"finalPosition.xy += rotatedPosition * ( sizeAttenuation == 1 ? 1.0 : finalPosition.z );",
-					"finalPosition = projectionMatrix * finalPosition;",
-
-				"}",
+				"finalPosition = modelViewMatrix * vec4( 0.0, 0.0, 0.0, 1.0 );",
+				"finalPosition.xy += rotatedPosition;",
+				"finalPosition = projectionMatrix * finalPosition;",
 
 				"gl_Position = finalPosition;",
 
