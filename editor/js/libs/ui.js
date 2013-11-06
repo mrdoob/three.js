@@ -126,6 +126,16 @@ UI.Panel.prototype.remove = function () {
 
 };
 
+UI.Panel.prototype.clear = function () {
+
+	while ( this.dom.children.length ) {
+
+		this.dom.removeChild( this.dom.lastChild );
+
+	}
+
+};
+
 // Text
 
 UI.Text = function ( text ) {
