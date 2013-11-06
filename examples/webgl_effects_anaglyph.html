@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube refraction [balls]</title>
+		<title>three.js webgl - effects - anaglyph</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -33,14 +33,11 @@
 	</head>
 
 	<body>
-		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - webgl cube refraction demo. skybox by <a href="http://www.zfight.com/" target="_blank">Jochum Skoglund</a>
-			- O, P : change eye separation
-		</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - effects - anaglyph. skybox by <a href="http://ict.debevec.org/~debevec/" target="_blank">Paul Debevec</a></div>
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/effects/CrosseyedEffect.js"></script>
+		<script src="js/effects/AnaglyphEffect.js"></script>
 
 		<script src="js/Detector.js"></script>
 
@@ -57,7 +54,8 @@
 
 			var directionalLight, pointLight;
 
-			var mouseX = 0, mouseY = 0;
+			var mouseX = 0;
+			var mouseY = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -75,30 +73,31 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
 				camera.position.z = 3200;
 
-				camera.target = new THREE.Vector3( 0, 0, 0 );
-
 				scene = new THREE.Scene();
 
 				var geometry = new THREE.SphereGeometry( 100, 32, 16 );
 
-				var path = "textures/cube/skybox/";
-				var format = '.jpg';
+				var path = "textures/cube/pisa/";
+				var format = '.png';
 				var urls = [
 					path + 'px' + format, path + 'nx' + format,
 					path + 'py' + format, path + 'ny' + format,
 					path + 'pz' + format, path + 'nz' + format
 				];
 
-				var textureCube = THREE.ImageUtils.loadTextureCube( urls, new THREE.CubeRefractionMapping() );
-				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube, refractionRatio: 0.95 } );
+				var textureCube = THREE.ImageUtils.loadTextureCube( urls );
+				var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
+
 					mesh.position.x = Math.random() * 10000 - 5000;
 					mesh.position.y = Math.random() * 10000 - 5000;
 					mesh.position.z = Math.random() * 10000 - 5000;
+
 					mesh.scale.x = mesh.scale.y = mesh.scale.z = Math.random() * 3 + 1;
+
 					scene.add( mesh );
 
 					spheres.push( mesh );
@@ -127,11 +126,11 @@
 				renderer = new THREE.WebGLRenderer();
 				container.appendChild( renderer.domElement );
 
-				effect = new THREE.CrosseyedEffect( renderer );
-				effect.setSize( window.innerWidth, window.innerHeight );
-				effect.separation = 90;
+				var width = window.innerWidth || 2;
+				var height = window.innerHeight || 2;
 
-				document.addEventListener( 'keydown', onKeyDown, false );
+				effect = new THREE.AnaglyphEffect( renderer );
+				effect.setSize( width, height );
 
 				//
 
@@ -151,28 +150,12 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onDocumentMouseMove(event) {
 
 				mouseX = ( event.clientX - windowHalfX ) * 10;
 				mouseY = ( event.clientY - windowHalfY ) * 10;
 
 			}
-
-			function onKeyDown ( event ) {
-
-				switch( event.keyCode ) {
-
-					/* O */
-					case 79: effect.separation -= 0.5; break;
-
-					/* P */
-					case 80: effect.separation += 0.5; break;
-
-				}
-
-				console.log( effect.separation );
-
-			};
 
 			//
 
@@ -190,6 +173,8 @@
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.lookAt( scene.position );
 
 				for ( var i = 0, il = spheres.length; i < il; i ++ ) {
 
