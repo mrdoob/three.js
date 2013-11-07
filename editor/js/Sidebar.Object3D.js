@@ -541,13 +541,13 @@ Sidebar.Object3D = function ( editor ) {
 
 			if ( object.color !== undefined ) {
 
-				objectColor.setValue( '#' + object.color.getHexString() );
+				objectColor.setHexValue( object.color.getHexString() );
 
 			}
 
 			if ( object.groundColor !== undefined ) {
 
-				objectGroundColor.setValue( '#' + object.groundColor.getHexString() );
+				objectGroundColor.setHexValue( object.groundColor.getHexString() );
 
 			}
 

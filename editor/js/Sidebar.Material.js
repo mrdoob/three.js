@@ -611,25 +611,25 @@ Sidebar.Material = function ( editor ) {
 
 			if ( material.color !== undefined ) {
 
-				materialColor.setValue( '#' + material.color.getHexString() );
+				materialColor.setHexValue( material.color.getHexString() );
 
 			}
 
 			if ( material.ambient !== undefined ) {
 
-				materialAmbient.setValue( '#' + material.ambient.getHexString() );
+				materialAmbient.setHexValue( material.ambient.getHexString() );
 
 			}
 
 			if ( material.emissive !== undefined ) {
 
-				materialEmissive.setValue( '#' + material.emissive.getHexString() );
+				materialEmissive.setHexValue( material.emissive.getHexString() );
 
 			}
 
 			if ( material.specular !== undefined ) {
 
-				materialSpecular.setValue( '#' + material.specular.getHexString() );
+				materialSpecular.setHexValue( material.specular.getHexString() );
 
 			}
 
