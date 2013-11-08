@@ -70,11 +70,10 @@ THREE.PLYLoader.prototype = {
 
 	},
 
-	isASCII: function(buf){
+	isASCII: function( data ){
 
-    var header = this.parseHeader( buf );
+    var header = this.parseHeader( this.bin2str( data ) );
     
-		// currently only supports ASCII encoded files.
 		return header.format === "ascii";
 
 	},
@@ -83,7 +82,7 @@ THREE.PLYLoader.prototype = {
 
 		if ( data instanceof ArrayBuffer ) {
 
-			return this.isASCII( this.bin2str( data ) )
+			return this.isASCII( data )
 				? this.parseASCII( this.bin2str( data ) )
 				: this.parseBinary( data );
 
@@ -97,7 +96,7 @@ THREE.PLYLoader.prototype = {
 
   parseHeader: function ( data ) {
 		
-    var patternHeader = /ply([\s\S]*)end_header/;
+    var patternHeader = /ply([\s\S]*)end_header\n/;
 		var headerText = "";
 		if ( ( result = patternHeader.exec( data ) ) != null ) {
 			headerText = result [ 1 ];
@@ -106,6 +105,7 @@ THREE.PLYLoader.prototype = {
     var header = new Object();
     header.comments = [];
     header.elements = [];
+    header.headerLength = result[0].length;
     
 		var lines = headerText.split( '\n' );
     var currentElement = undefined;
@@ -250,7 +250,7 @@ THREE.PLYLoader.prototype = {
 		var lines = body.split( '\n' );
     var currentElement = 0;
     var currentElementCount = 0;
-    var useColor = false;
+    geometry.useColor = false;
     
 		for ( var i = 0; i < lines.length; i ++ ) {
 
@@ -267,35 +267,19 @@ THREE.PLYLoader.prototype = {
       
       var element = this.parseASCIIElement( header.elements[currentElement].properties, line );
       
-      if ( header.elements[currentElement].name === "vertex" ) {
-
-        geometry.vertices.push(
-          new THREE.Vector3( element.x, element.y, element.z )
-        );
-        
-        if ( 'red' in element && 'green' in element && 'blue' in element ) {
-          
-          useColor = true;
-          
-          color = new THREE.Color();
-          color.setRGB( element.red / 255.0, element.green / 255.0, element.blue / 255.0 );
-          geometry.colors.push( color );
-          
-        }
-
-      } else if ( header.elements[currentElement].name === "face" ) {
-
-        geometry.faces.push(
-          new THREE.Face3( element.vertex_indices[0], element.vertex_indices[1], element.vertex_indices[2] )
-        );
-
-      }
+      this.handleElement( geometry, header.elements[currentElement].name, element );
       
       currentElementCount++;
       
     }
 
-    if ( useColor ) {
+    return this.postProcess( geometry );
+
+	},
+
+  postProcess: function ( geometry ) {
+    
+    if ( geometry.useColor ) {
       
       for ( var i = 0; i < geometry.faces.length; i ++ ) {
         
@@ -315,14 +299,120 @@ THREE.PLYLoader.prototype = {
 		geometry.computeBoundingSphere();
 
 		return geometry;
+    
+  },
 
-	},
+  handleElement: function ( geometry, elementName, element ) {
+    
+    if ( elementName === "vertex" ) {
 
-	parseBinary: function (buf) {
+      geometry.vertices.push(
+        new THREE.Vector3( element.x, element.y, element.z )
+      );
+      
+      if ( 'red' in element && 'green' in element && 'blue' in element ) {
+        
+        geometry.useColor = true;
+        
+        color = new THREE.Color();
+        color.setRGB( element.red / 255.0, element.green / 255.0, element.blue / 255.0 );
+        geometry.colors.push( color );
+        
+      }
 
-		// not supported yet
-		console.error('Not supported yet.');
+    } else if ( elementName === "face" ) {
 
+      geometry.faces.push(
+        new THREE.Face3( element.vertex_indices[0], element.vertex_indices[1], element.vertex_indices[2] )
+      );
+
+    }
+    
+  },
+
+  binaryRead: function ( dataview, at, type, little_endian ) {
+
+    switch( type ) {
+
+      // corespondences for non-specific length types here match rply:
+    case 'int8':    case 'char':   return [ dataview.getInt8( at ), 1 ];
+    case 'uint8':   case 'uchar':  return [ dataview.getUint8( at ), 1 ];
+    case 'int16':   case 'short':  return [ dataview.getInt16( at, little_endian ), 2 ];
+    case 'uint16':  case 'ushort': return [ dataview.getUint16( at, little_endian ), 2 ];
+    case 'int32':   case 'int':    return [ dataview.getInt32( at, little_endian ), 4 ];
+    case 'uint32':  case 'uint':   return [ dataview.getUint32( at, little_endian ), 4 ];
+    case 'float32': case 'float':  return [ dataview.getFloat32( at, little_endian ), 4 ];
+    case 'float64': case 'double': return [ dataview.getFloat64( at, little_endian ), 8 ];
+      
+    }
+    
+  },
+
+  binaryReadElement: function ( dataview, at, properties, little_endian ) {
+    
+    var element = Object();
+    var result, read = 0;
+    
+    for ( var i = 0; i < properties.length; i ++ ) {
+     
+      if ( properties[i].type === "list" ) {
+        
+        var list = [];
+
+        result = this.binaryRead( dataview, at+read, properties[i].countType, little_endian );
+        var n = result[0];
+        read += result[1];
+        
+        for ( j = 0; j < n; j ++ ) {
+          
+          result = this.binaryRead( dataview, at+read, properties[i].itemType, little_endian );
+          list.push( result[0] );
+          read += result[1];
+          
+        }
+        
+        element[ properties[i].name ] = list;
+        
+      } else {
+        
+        result = this.binaryRead( dataview, at+read, properties[i].type, little_endian );
+        element[ properties[i].name ] = result[0];
+        read += result[1];
+        
+      }
+      
+    }
+    
+    return [ element, read ];
+    
+  },
+
+	parseBinary: function ( data ) {
+
+		var geometry = new THREE.Geometry();
+
+    var header = this.parseHeader( this.bin2str( data ) );
+    var little_endian = (header.format === "binary_little_endian");
+    
+    var body = new DataView( data, header.headerLength );
+        
+    var result, loc = 0;
+    for ( var currentElement = 0; currentElement < header.elements.length; currentElement ++ ) {
+      
+      for ( var currentElementCount = 0; currentElementCount < header.elements[currentElement].count; currentElementCount ++ ) {
+      
+        result = this.binaryReadElement( body, loc, header.elements[currentElement].properties, little_endian );
+        loc += result[1];
+        var element = result[0];
+      
+        this.handleElement( geometry, header.elements[currentElement].name, element );
+      
+      }
+      
+    }
+    
+    return this.postProcess( geometry );
+    
 	}
 
 
