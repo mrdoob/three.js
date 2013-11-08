@@ -250,6 +250,7 @@ THREE.PLYLoader.prototype = {
 		var lines = body.split( '\n' );
     var currentElement = 0;
     var currentElementCount = 0;
+    var useColor = false;
     
 		for ( var i = 0; i < lines.length; i ++ ) {
 
@@ -271,6 +272,16 @@ THREE.PLYLoader.prototype = {
         geometry.vertices.push(
           new THREE.Vector3( element.x, element.y, element.z )
         );
+        
+        if ( 'red' in element && 'green' in element && 'blue' in element ) {
+          
+          useColor = true;
+          
+          color = new THREE.Color();
+          color.setRGB( element.red / 255.0, element.green / 255.0, element.blue / 255.0 );
+          geometry.colors.push( color );
+          
+        }
 
       } else if ( header.elements[currentElement].name === "face" ) {
 
@@ -281,6 +292,22 @@ THREE.PLYLoader.prototype = {
       }
       
       currentElementCount++;
+      
+    }
+
+    if ( useColor ) {
+      
+      for ( var i = 0; i < geometry.faces.length; i ++ ) {
+        
+        geometry.faces[i].vertexColors = [
+          geometry.colors[geometry.faces[i].a],
+          geometry.colors[geometry.faces[i].b],
+          geometry.colors[geometry.faces[i].c]
+        ];
+        
+      }
+      
+      geometry.elementsNeedUpdate = true;
       
     }
 
