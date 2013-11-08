@@ -72,8 +72,10 @@ THREE.PLYLoader.prototype = {
 
 	isASCII: function(buf){
 
+    var header = this.parseHeader( buf );
+    
 		// currently only supports ASCII encoded files.
-		return true;
+		return header.format === "ascii";
 
 	},
 
@@ -81,7 +83,7 @@ THREE.PLYLoader.prototype = {
 
 		if ( data instanceof ArrayBuffer ) {
 
-			return this.isASCII( data )
+			return this.isASCII( this.bin2str( data ) )
 				? this.parseASCII( this.bin2str( data ) )
 				: this.parseBinary( data );
 
@@ -93,6 +95,142 @@ THREE.PLYLoader.prototype = {
 
 	},
 
+  parseHeader: function ( data ) {
+		
+    var patternHeader = /ply([\s\S]*)end_header/;
+		var headerText = "";
+		if ( ( result = patternHeader.exec( data ) ) != null ) {
+			headerText = result [ 1 ];
+		}
+    
+    var header = new Object();
+    header.comments = [];
+    header.elements = [];
+    
+		var lines = headerText.split( '\n' );
+    var currentElement = undefined;
+    var lineType, lineValues;
+
+    function make_ply_element_property(propertValues) {
+      
+      var property = Object();
+
+      property.type = propertValues[0]
+      
+      if ( property.type === "list" ) {
+        
+        property.name = propertValues[3]
+        property.countType = propertValues[1]
+        property.itemType = propertValues[2]
+
+      } else {
+
+        property.name = propertValues[1]
+
+      }
+
+      return property
+      
+    }
+    
+		for ( var i = 0; i < lines.length; i ++ ) {
+
+			var line = lines[ i ];
+			line = line.trim()
+      if ( line === "" ) { continue; }
+      lineValues = line.split( /\s+/ );
+      lineType = lineValues.shift()
+      line = lineValues.join(" ")
+      
+      switch( lineType ) {
+        
+      case "format":
+        header.format = lineValues[0];
+        header.version = lineValues[1];
+        break;
+
+      case "comment":
+        header.comments.push(line);
+        break;
+
+      case "element":
+        if ( !(currentElement === undefined) ) {
+          header.elements.push(currentElement);
+        }
+        currentElement = Object();
+        currentElement.name = lineValues[0];
+        currentElement.count = parseInt( lineValues[1] );
+        currentElement.properties = [];
+        break;
+        
+      case "property":
+        currentElement.properties.push( make_ply_element_property( lineValues ) );
+        break;
+        
+
+      default:
+        console.log("unhandled", lineType, lineValues);
+
+      }
+
+    }
+    
+    if ( !(currentElement === undefined) ) {
+      header.elements.push(currentElement);
+    }
+    
+    return header;
+    
+  },
+
+  parseASCIINumber: function ( n, type ) {
+    
+    switch( type ) {
+      
+    case 'char': case 'uchar': case 'short': case 'ushort': case 'int': case 'uint':
+    case 'int8': case 'uint8': case 'int16': case 'uint16': case 'int32': case 'uint32':
+      return parseInt( n );
+
+    case 'float': case 'double': case 'float32': case 'float64':
+      return parseFloat( n );
+      
+    }
+    
+  },
+
+  parseASCIIElement: function ( properties, line ) {
+
+    values = line.split( /\s+/ );
+    
+    var element = Object();
+    
+    for ( var i = 0; i < properties.length; i ++ ) {
+      
+      if ( properties[i].type === "list" ) {
+        
+        var list = [];
+        var n = this.parseASCIINumber( values.shift(), properties[i].countType );
+
+        for ( j = 0; j < n; j ++ ) {
+          
+          list.push( this.parseASCIINumber( values.shift(), properties[i].itemType ) );
+          
+        }
+        
+        element[ properties[i].name ] = list;
+        
+      } else {
+        
+        element[ properties[i].name ] = this.parseASCIINumber( values.shift(), properties[i].type );
+        
+      }
+      
+    }
+    
+    return element;
+    
+  },
+
 	parseASCII: function ( data ) {
 
 		// PLY ascii format specification, as per http://en.wikipedia.org/wiki/PLY_(file_format)
@@ -101,58 +239,50 @@ THREE.PLYLoader.prototype = {
 
 		var result;
 
-		var patternHeader = /ply([\s\S]*)end_header/;
-		var header = "";
-		if ( ( result = patternHeader.exec( data ) ) != null ) {
-			header = result [ 1 ];
-		}
+    var header = this.parseHeader( data );
 
-		var patternBody = /end_header([\s\S]*)$/;
+		var patternBody = /end_header\n([\s\S]*)$/;
 		var body = "";
 		if ( ( result = patternBody.exec( data ) ) != null ) {
 			body = result [ 1 ];
 		}
+    
+		var lines = body.split( '\n' );
+    var currentElement = 0;
+    var currentElementCount = 0;
+    
+		for ( var i = 0; i < lines.length; i ++ ) {
 
-		var patternVertexCount = /element[\s]+vertex[\s]+(\d+)/g;
-		var vertexCount = 0;
-		if ( ( result = patternVertexCount.exec( header ) ) != null ) {
-			vertexCount = parseInt( result[ 1 ] );
-		}
+			var line = lines[ i ];
+			line = line.trim()
+      if ( line === "" ) { continue; }
+      
+      if ( currentElementCount >= header.elements[currentElement].count ) {
 
-		var patternFaceCount = /element[\s]+face[\s]+(\d+)/g;
-		var faceCount = 0;
-		if ( ( result = patternFaceCount.exec( header ) ) != null ) {
-			faceCount = parseInt( result[ 1 ] );
-		}
+        currentElement++;
+        currentElementCount = 0;
 
-		if ( vertexCount != 0 && faceCount != 0 ) {
-			// Vertex
-			// assume x y z
-			var patternVertex = /([-+]?[0-9]+\.?[0-9]*([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+[\s]+([-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+/g;
-			for ( var i = 0; i < vertexCount; i++) {
-				if ( ( result = patternVertex.exec( body ) ) != null ) {
-					geometry.vertices.push( new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) ) );
-				} else {
-					console.error('Vertex error: vertex count mismatch.');
-					return geometry;
-				}
-			}
+      }
+      
+      var element = this.parseASCIIElement( header.elements[currentElement].properties, line );
+      
+      if ( header.elements[currentElement].name === "vertex" ) {
 
-			// Face
-			// assume 3 index0 index1 index2
-			var patternFace = /3[\s]+([-+]?[0-9]+)[\s]+([-+]?[0-9]+)[\s]+([-+]?[0-9]+)/g;
-			for (var i = 0; i < faceCount; i++) {
-				if ( ( result = patternFace.exec( body ) ) != null ) {
-					geometry.faces.push( new THREE.Face3( parseInt( result[ 1 ] ), parseInt( result[ 2 ] ), parseInt( result[ 3 ] ) ) );
-				} else {
-					console.error('Face error: vertex count mismatch.');
-					return geometry;
-				}
-			}
+        geometry.vertices.push(
+          new THREE.Vector3( element.x, element.y, element.z )
+        );
 
-		} else {
-			console.error( 'Header error: vertexCount(' + vertexCount + '), faceCount(' + faceCount + ').' );
-		}
+      } else if ( header.elements[currentElement].name === "face" ) {
+
+        geometry.faces.push(
+          new THREE.Face3( element.vertex_indices[0], element.vertex_indices[1], element.vertex_indices[2] )
+        );
+
+      }
+      
+      currentElementCount++;
+      
+    }
 
 		geometry.computeCentroids();
 		geometry.computeBoundingSphere();
