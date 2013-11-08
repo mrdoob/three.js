@@ -198,17 +198,14 @@ THREE.ColladaLoader = function () {
 	function parseAsset () {
 
 		var elements = COLLADA.querySelectorAll('asset');
-		
-		var elementsLength = elements.length; //cache loop length
 
-		for ( var i = 0; i < elementsLength; i ++ ) {
+		var element = elements[0];
 
-			var element = elements[ i ];			
-			var elementChildNodesLength = element.childNodes.length;
+		if ( element && element.childNodes ) {
 
-			for ( var j = 0; j < elementChildNodesLength; j ++ ) {
+			for ( var i = 0; i < element.childNodes.length; i ++ ) {
 
-				var child = element.childNodes[ j ];
+				var child = element.childNodes[ i ];
 
 				switch ( child.nodeName ) {
 
@@ -931,8 +928,18 @@ THREE.ColladaLoader = function () {
 	};
 
 	function getLibraryNode( id ) {
-	
-		return COLLADA.querySelectorAll('library_nodes node#'+id)[0];  //returns 'undefined' if nothing is matched
+
+        var nodes = COLLADA.querySelectorAll('library_nodes node');
+
+        for ( var i = 0; i < nodes.length; i++ ) {
+
+            var attObj = nodes[i].attributes.getNamedItem('id');
+            if ( attObj && attObj.value === id ) {
+                return nodes[i];
+        }
+        }
+
+        return undefined;
 
 	};
 
@@ -2425,7 +2432,7 @@ THREE.ColladaLoader = function () {
 			input = inputs[ j ];
 
 			var offset = input.offset + 1;
-			maxOffset = ( maxOffset < offset )? offset : maxOffset;
+			maxOffset = (maxOffset < offset)? offset : maxOffset;
 
 			switch ( input.semantic ) {
 
@@ -3036,7 +3043,7 @@ THREE.ColladaLoader = function () {
 						repeatU: 1,
 						repeatV: 1,
 						wrapU: 1,
-						wrapV: 1,
+						wrapV: 1
 					};
 					this.parseTexture( child );
 					break;
@@ -3090,7 +3097,7 @@ THREE.ColladaLoader = function () {
 					
 					// some dae have a value of true which becomes NaN via parseInt
 
-					if ( child.textContent.toUpperCase() == 'TRUE' ) {
+					if ( child.textContent.toUpperCase() === 'TRUE' ) {
 					
 						this.texOpts[ child.nodeName ] = 1;
 					
@@ -3099,6 +3106,7 @@ THREE.ColladaLoader = function () {
 						this.texOpts[ child.nodeName ] = parseInt( child.textContent );
 					
 					}
+					break;
 
 				default:
 
