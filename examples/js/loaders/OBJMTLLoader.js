@@ -133,9 +133,9 @@ THREE.OBJMTLLoader.prototype = {
   				parseInt( b ) - (face_offset + 1),
   				parseInt( c ) - (face_offset + 1),
   				[
-  					normals[ parseInt( normals_inds[ 0 ] ) - 1 ],
-  					normals[ parseInt( normals_inds[ 1 ] ) - 1 ],
-  					normals[ parseInt( normals_inds[ 2 ] ) - 1 ]
+  					normals[ parseInt( normals_inds[ 0 ] ) - 1 ].clone(),
+  					normals[ parseInt( normals_inds[ 1 ] ) - 1 ].clone(),
+  					normals[ parseInt( normals_inds[ 2 ] ) - 1 ].clone()
   				]
   			) );
       }
@@ -143,9 +143,9 @@ THREE.OBJMTLLoader.prototype = {
     
     function add_uvs( a, b, c ) {
 			geometry.faceVertexUvs[ 0 ].push( [
-				uvs[ parseInt( a ) - 1 ],
-				uvs[ parseInt( b ) - 1 ],
-				uvs[ parseInt( c ) - 1 ]
+				uvs[ parseInt( a ) - 1 ].clone(),
+				uvs[ parseInt( b ) - 1 ].clone(),
+				uvs[ parseInt( c ) - 1 ].clone()
 			] );
     }
     
