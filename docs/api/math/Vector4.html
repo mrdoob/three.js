@@ -175,7 +175,9 @@
 		m -- [page:Matrix4]
 		</div>
 		<div>
-		todo
+		Sets this Vector4 to the computed <a href='http://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation' target='_blank'>axis-angle representation</a> of the rotation defined by Matrix4 m. Assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled).<br/><br/>
+
+		The axis is stored in components (x, y, z) of the vector, and the rotation in radians is stored in component w
 		</div>
 
 		<h3>.setAxisAngleFromQuaternion([page:Quaternion q]) [page:Vector4 this]</h3>
@@ -183,7 +185,9 @@
 		q -- [page:Quaternion]
 		</div>
 		<div>
-		todo
+		Sets this Vector4 to the computed <a href='http://en.wikipedia.org/wiki/Axis%E2%80%93angle_representation' target='_blank'>axis-angle representation</a> of the rotation defined by Quaternion q.<br/><br/>
+
+		The axis is stored in components (x, y, z) of the vector, and the rotation in radians is stored in component w
 		</div>
 
 		<h3>.getComponent([page:Integer index]) [page:Float]</h3>
