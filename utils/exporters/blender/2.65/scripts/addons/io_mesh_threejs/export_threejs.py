@@ -2175,7 +2175,7 @@ def generate_cameras(data):
                     "aspect"    : 1.333,
                     "near"      : camera.clip_start,
                     "far"       : camera.clip_end,
-                    "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]]),
+                    "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
                     "target"    : generate_vec3([0, 0, 0])
                     }
 
