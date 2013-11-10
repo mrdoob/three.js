@@ -453,8 +453,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var scaleX = element.scale.x * _canvasWidthHalf;
 		var scaleY = element.scale.y * _canvasHeightHalf;
 
-		_elemBox.min.set( v1.x - scaleX, v1.y - scaleY );
-		_elemBox.max.set( v1.x + scaleX, v1.y + scaleY );
+		_elemBox.min.set( v1.x - ( scaleX * 0.5 ), v1.y - ( scaleY * 0.5 ) );
+		_elemBox.max.set( v1.x + ( scaleX * 0.5 ), v1.y + ( scaleY * 0.5 ) );
 
 		if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
