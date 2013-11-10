@@ -29,12 +29,6 @@
 			var mapC;
 
 			var group;
-			var time = 0;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -100,9 +94,11 @@
 					var scaleX = mapA.image.width;
 					var scaleY = mapA.image.height;
 
-					var materialA1 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.25 } );
-					var materialA2 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 0.5 } );
-					var materialA3 = new THREE.SpriteMaterial( { map: mapA, useScreenCoordinates: true, alignment: THREE.SpriteAlignment.topLeft, opacity: 1 } );
+					var materialA1 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.25 } );
+					var materialA2 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.5 } );
+					var materialA3 = new THREE.SpriteMaterial( { map: mapA, opacity: 1 } );
+
+					/*
 
 					sprite = new THREE.Sprite( materialA1 );
 					sprite.position.set( 100, 100, 0 );
@@ -118,6 +114,8 @@
 					sprite.position.set( 200, 200, 3 );
 					sprite.scale.set( scaleX, scaleY, 1 );
 					scene.add( sprite );
+					
+					*/
 
 				}
 
@@ -162,9 +160,11 @@
 
 			function render() {
 
-				for ( var c = 0; c < group.children.length; c ++ ) {
+				var time = Date.now() / 1000;
 
-					var sprite = group.children[ c ];
+				for ( var i = 0, l = group.children.length; i < l; i ++ ) {
+
+					var sprite = group.children[ i ];
 					var material = sprite.material;
 					var scale = Math.sin( time + sprite.position.x * 0.01 ) * 0.3 + 1.0;
 
@@ -178,11 +178,14 @@
 
 					}
 
-					sprite.material.rotation += 0.1 * ( c / group.children.length );
+					sprite.material.rotation += 0.1 * ( i / l );
 					sprite.scale.set( scale * imageWidth, scale * imageHeight, 1.0 );
 
-					if ( material.map !== mapC )
+					if ( material.map !== mapC ) {
+
 						material.opacity = Math.sin( time + sprite.position.x * 0.01 ) * 0.4 + 0.6;
+
+					}
 
 				}
 
