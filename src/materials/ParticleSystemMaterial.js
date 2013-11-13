@@ -19,7 +19,7 @@
  * }
  */
 
-THREE.ParticleBasicMaterial = function ( parameters ) {
+THREE.ParticleSystemMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -38,11 +38,11 @@ THREE.ParticleBasicMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleBasicMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.ParticleSystemMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleBasicMaterial.prototype.clone = function () {
+THREE.ParticleSystemMaterial.prototype.clone = function () {
 
-	var material = new THREE.ParticleBasicMaterial();
+	var material = new THREE.ParticleSystemMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -60,3 +60,7 @@ THREE.ParticleBasicMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+// backwards compatibility
+
+THREE.ParticleBasicMaterial = THREE.ParticleSystemMaterial;

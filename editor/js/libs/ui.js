@@ -77,7 +77,8 @@ events.forEach( function ( event ) {
 
 	UI.Element.prototype[ method ] = function ( callback ) {
 
-		this.dom.addEventListener( event.toLowerCase(), callback, false );
+		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
+
 		return this;
 
 	};
@@ -93,9 +94,6 @@ UI.Panel = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Panel';
-	dom.style.userSelect = 'none';
-	dom.style.WebkitUserSelect = 'none';
-	dom.style.MozUserSelect = 'none';
 
 	this.dom = dom;
 
@@ -126,6 +124,16 @@ UI.Panel.prototype.remove = function () {
 	}
 
 	return this;
+
+};
+
+UI.Panel.prototype.clear = function () {
+
+	while ( this.dom.children.length ) {
+
+		this.dom.removeChild( this.dom.lastChild );
+
+	}
 
 };
 
@@ -327,15 +335,51 @@ UI.FancySelect = function () {
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'FancySelect';
-	dom.style.background = '#fff';
-	dom.style.border = '1px solid #ccc';
-	dom.style.padding = '0';
-	dom.style.cursor = 'default';
-	dom.style.overflow = 'auto';
+	dom.tabIndex = 0;	// keyup event is ignored without setting tabIndex
+
+	// Broadcast for object selection after arrow navigation
+	var changeEvent = document.createEvent('HTMLEvents');
+	changeEvent.initEvent( 'change', true, true );
+
+	// Prevent native scroll behavior
+	dom.addEventListener( 'keydown', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				event.preventDefault();
+				event.stopPropagation();
+				break;
+		}
+
+	}, false);
+
+	// Keybindings to support arrow navigation
+	dom.addEventListener( 'keyup', function (event) {
+
+		switch ( event.keyCode ) {
+			case 38: // up
+			case 40: // down
+				scope.selectedIndex += ( event.keyCode == 38 ) ? -1 : 1;
+
+				if ( scope.selectedIndex >= 0 && scope.selectedIndex < scope.options.length ) {
+
+					// Highlight selected dom elem and scroll parent if needed
+					scope.setValue( scope.options[ scope.selectedIndex ].value );
+
+					// Invoke object/helper/mesh selection logic
+					scope.dom.dispatchEvent( changeEvent );
+
+				}
+
+				break;
+		}
+	}, false);
 
 	this.dom = dom;
 
 	this.options = [];
+	this.selectedIndex = -1;
 	this.selectedValue = null;
 
 	return this;
@@ -361,9 +405,8 @@ UI.FancySelect.prototype.setOptions = function ( options ) {
 
 	for ( var key in options ) {
 
-		var option = document.createElement( 'div' );
-		option.style.padding = '4px';
-		option.style.whiteSpace = 'nowrap';
+		var option = document.createElement('div');
+		option.className = 'option';
 		option.innerHTML = options[ key ];
 		option.value = key;
 		scope.dom.appendChild( option );
@@ -399,23 +442,29 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 
 		if ( element.value === value ) {
 
-			element.style.backgroundColor = '#f0f0f0';
+			element.classList.add( 'active' );
 
 			// scroll into view
 
-			var y = i * element.clientHeight;
-			var scrollTop = this.dom.scrollTop;
-			var domHeight = this.dom.clientHeight;
+			var y = element.offsetTop - this.dom.offsetTop;
+			var bottomY = y + element.offsetHeight;
+			var minScroll = bottomY - this.dom.offsetHeight;
 
-			if ( y < scrollTop || y > scrollTop + domHeight ) {
+			if ( this.dom.scrollTop > y ) {
 
-				this.dom.scrollTop = y;
+				this.dom.scrollTop = y
+
+			} else if ( this.dom.scrollTop < minScroll ) {
+
+				this.dom.scrollTop = minScroll;
 
 			}
 
+			this.selectedIndex = i;
+
 		} else {
 
-			element.style.backgroundColor = '';
+			element.classList.remove( 'active' );
 
 		}
 
@@ -426,6 +475,7 @@ UI.FancySelect.prototype.setValue = function ( value ) {
 	return this;
 
 };
+
 
 // Checkbox
 
@@ -483,7 +533,12 @@ UI.Color = function () {
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
 
-	try { dom.type = 'color'; } catch ( exception ) {}
+	try {
+
+		dom.type = 'color';
+		dom.value = '#ffffff';
+
+	} catch ( exception ) {}
 
 	this.dom = dom;
 
@@ -532,12 +587,6 @@ UI.Number = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -563,6 +612,9 @@ UI.Number = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -570,6 +622,8 @@ UI.Number = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -580,16 +634,17 @@ UI.Number = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 
@@ -611,11 +666,7 @@ UI.Number = function ( number ) {
 
 		var number = parseFloat( dom.value );
 
-		if ( isNaN( number ) === false ) {
-
-			dom.value = number;
-
-		}
+		dom.value = isNaN( number ) === false ? number : 0;
 
 	};
 
@@ -692,12 +743,6 @@ UI.Integer = function ( number ) {
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Number';
-	dom.style.color = '#0080f0';
-	dom.style.fontSize = '12px';
-	dom.style.backgroundColor = 'transparent';
-	dom.style.border = '1px solid transparent';
-	dom.style.padding = '2px';
-	dom.style.cursor = 'col-resize';
 	dom.value = '0.00';
 
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -720,6 +765,9 @@ UI.Integer = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -727,6 +775,8 @@ UI.Integer = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -737,16 +787,17 @@ UI.Integer = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ) | 0;
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 

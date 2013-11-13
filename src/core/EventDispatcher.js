@@ -68,25 +68,39 @@ THREE.EventDispatcher.prototype = {
 
 	},
 
-	dispatchEvent: function ( event ) {
+	dispatchEvent: function () {
 
-		if ( this._listeners === undefined ) return;
+		var array = [];
 
-		var listeners = this._listeners;
-		var listenerArray = listeners[ event.type ];
+		return function ( event ) {
 
-		if ( listenerArray !== undefined ) {
+			if ( this._listeners === undefined ) return;
 
-			event.target = this;
+			var listeners = this._listeners;
+			var listenerArray = listeners[ event.type ];
 
-			for ( var i = 0, l = listenerArray.length; i < l; i ++ ) {
+			if ( listenerArray !== undefined ) {
 
-				listenerArray[ i ].call( this, event );
+				event.target = this;
+
+				var length = listenerArray.length;
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					array[ i ] = listenerArray[ i ];
+
+				}
+
+				for ( var i = 0; i < length; i ++ ) {
+
+					array[ i ].call( this, event );
+
+				}
 
 			}
 
-		}
+		};
 
-	}
+	}()
 
 };

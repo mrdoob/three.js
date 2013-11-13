@@ -1,8 +1,6 @@
 Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
-	container.setBorderTop( '1px solid #ccc' );
-	container.setPaddingTop( '10px' );
 
 	var geometry = object.geometry;
 
@@ -11,7 +9,7 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 	var radiusTopRow = new UI.Panel();
 	var radiusTop = new UI.Number( geometry.radiusTop ).onChange( update );
 
-	radiusTopRow.add( new UI.Text( 'Radius top' ).setWidth( '90px' ).setColor( '#666' ) );
+	radiusTopRow.add( new UI.Text( 'Radius top' ).setWidth( '90px' ) );
 	radiusTopRow.add( radiusTop );
 
 	container.add( radiusTopRow );
@@ -21,7 +19,7 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 	var radiusBottomRow = new UI.Panel();
 	var radiusBottom = new UI.Number( geometry.radiusBottom ).onChange( update );
 
-	radiusBottomRow.add( new UI.Text( 'Radius bottom' ).setWidth( '90px' ).setColor( '#666' ) );
+	radiusBottomRow.add( new UI.Text( 'Radius bottom' ).setWidth( '90px' ) );
 	radiusBottomRow.add( radiusBottom );
 
 	container.add( radiusBottomRow );
@@ -31,27 +29,27 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 	var heightRow = new UI.Panel();
 	var height = new UI.Number( geometry.height ).onChange( update );
 
-	heightRow.add( new UI.Text( 'Height' ).setWidth( '90px' ).setColor( '#666' ) );
+	heightRow.add( new UI.Text( 'Height' ).setWidth( '90px' ) );
 	heightRow.add( height );
 
 	container.add( heightRow );
 
-	// radiusSegments
+	// radialSegments
 
-	var radiusSegmentsRow = new UI.Panel();
-	var radiusSegments = new UI.Integer( geometry.radiusSegments ).setRange( 1, Infinity ).onChange( update );
+	var radialSegmentsRow = new UI.Panel();
+	var radialSegments = new UI.Integer( geometry.radialSegments ).setRange( 1, Infinity ).onChange( update );
 
-	radiusSegmentsRow.add( new UI.Text( 'Radius segments' ).setWidth( '90px' ).setColor( '#666' ) );
-	radiusSegmentsRow.add( radiusSegments );
+	radialSegmentsRow.add( new UI.Text( 'Radial segments' ).setWidth( '90px' ) );
+	radialSegmentsRow.add( radialSegments );
 
-	container.add( radiusSegmentsRow );
+	container.add( radialSegmentsRow );
 
 	// heightSegments
 
 	var heightSegmentsRow = new UI.Panel();
 	var heightSegments = new UI.Integer( geometry.heightSegments ).setRange( 1, Infinity ).onChange( update );
 
-	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ).setColor( '#666' ) );
+	heightSegmentsRow.add( new UI.Text( 'Height segments' ).setWidth( '90px' ) );
 	heightSegmentsRow.add( heightSegments );
 
 	container.add( heightSegmentsRow );
@@ -61,7 +59,7 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 	var openEndedRow = new UI.Panel();
 	var openEnded = new UI.Checkbox( geometry.openEnded ).onChange( update );
 
-	openEndedRow.add( new UI.Text( 'Open ended' ).setWidth( '90px' ).setColor( '#666' ) );
+	openEndedRow.add( new UI.Text( 'Open ended' ).setWidth( '90px' ) );
 	openEndedRow.add( openEnded );
 
 	container.add( openEndedRow );
@@ -78,7 +76,7 @@ Sidebar.Geometry.CylinderGeometry = function ( signals, object ) {
 			radiusTop.getValue(),
 			radiusBottom.getValue(),
 			height.getValue(),
-			radiusSegments.getValue(),
+			radialSegments.getValue(),
 			heightSegments.getValue(),
 			openEnded.getValue()
 		);

@@ -36,15 +36,16 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> - shader demo. featuring <a href="http://www.pouet.net/prod.php?which=52761" target="_blank">Monjori by Mic</a></div>
 
-		<script src="../build/three.min.js"></script>
+		<script src="../build/three.js"></script>
 
 		<script src="js/Detector.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
-
+			
+			varying vec2 vUv;
 			void main()	{
-
+				vUv = uv2;
 				gl_Position = vec4( position, 1.0 );
 
 			}
@@ -55,6 +56,7 @@
 
 			uniform vec2 resolution;
 			uniform float time;
+			varying vec2 vUv;
 
 			void main()	{
 
@@ -80,7 +82,7 @@
 				d=r/350.0;
 				d+=sin(d*d*8.0)*0.52;
 				f=(sin(a*g)+1.0)/2.0;
-				gl_FragColor=vec4(vec3(f*i/1.6,i/2.0+d/13.0,i)*d*p.x+vec3(i/1.3+d/8.0,i/2.0+d/18.0,i)*d*(1.0-p.x),1.0);
+				gl_FragColor=vec4( vUv, 1.0 ,1.0);
 
 			}
 

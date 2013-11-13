@@ -444,8 +444,9 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		}
 
 		geometry.bones = json.bones;
+		// could change this to json.animations[0] or remove completely
 		geometry.animation = json.animation;
-
+		geometry.animations = json.animations;
 	};
 
 	function parseMorphing( scale ) {

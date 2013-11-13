@@ -361,40 +361,52 @@ THREE.SceneLoader.prototype = {
 
 					// lights
 
-					} else if ( objJSON.type === "DirectionalLight" || objJSON.type === "PointLight" || objJSON.type === "AmbientLight" ) {
+					} else if ( objJSON.type === "AmbientLight" || objJSON.type === "PointLight" ||
+						objJSON.type === "DirectionalLight" || objJSON.type === "SpotLight" ||
+						objJSON.type === "HemisphereLight" || objJSON.type === "AreaLight" ) {
 
-						hex = ( objJSON.color !== undefined ) ? objJSON.color : 0xffffff;
-						intensity = ( objJSON.intensity !== undefined ) ? objJSON.intensity : 1;
+						var color = objJSON.color;
+						var intensity = objJSON.intensity;
+						var distance = objJSON.distance;
+						var position = objJSON.position;
+						var rotation = objJSON.rotation;
 
-						if ( objJSON.type === "DirectionalLight" ) {
+						switch ( objJSON.type ) {
 
-							pos = objJSON.direction;
+							case 'AmbientLight':
+								light = new THREE.AmbientLight( color );
+								break;
 
-							light = new THREE.DirectionalLight( hex, intensity );
-							light.position.fromArray( pos );
+							case 'PointLight':
+								light = new THREE.PointLight( color, intensity, distance );
+								light.position.fromArray( position );
+								break;
 
-							if ( objJSON.target ) {
+							case 'DirectionalLight':
+								light = new THREE.DirectionalLight( color, intensity );
+								light.position.fromArray( objJSON.direction );
+								break;
 
-								target_array.push( { "object": light, "targetName" : objJSON.target } );
+							case 'SpotLight':
+								light = new THREE.SpotLight( color, intensity, distance, 1 );
+								light.angle = objJSON.angle;
+								light.position.fromArray( position );
+								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
+								light.target.applyEuler( new THREE.Euler( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], 'XYZ' ) );
+								break;
 
-								// kill existing default target
-								// otherwise it gets added to scene when parent gets added
+							case 'HemisphereLight':
+								light = new THREE.DirectionalLight( color, intensity, distance );
+								light.target.set( position[ 0 ], position[ 1 ] - distance, position[ 2 ] );
+								light.target.applyEuler( new THREE.Euler( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ], 'XYZ' ) );
+								break;
 
-								light.target = null;
-
-							}
-
-						} else if ( objJSON.type === "PointLight" ) {
-
-							pos = objJSON.position;
-							dst = objJSON.distance;
-
-							light = new THREE.PointLight( hex, intensity, dst );
-							light.position.fromArray( pos );
-
-						} else if ( objJSON.type === "AmbientLight" ) {
-
-							light = new THREE.AmbientLight( hex );
+							case 'AreaLight':
+								light = new THREE.AreaLight(color, intensity);
+								light.position.fromArray( position );
+								light.width = objJSON.size;
+								light.height = objJSON.size_y;
+								break;
 
 						}
 

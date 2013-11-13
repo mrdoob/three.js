@@ -10,7 +10,7 @@ THREE.ColladaLoader = function () {
 
 	var readyCallbackFunc = null;
 
- 	var sources = {};
+	var sources = {};
 	var images = {};
 	var animations = {};
 	var controllers = {};
@@ -131,16 +131,16 @@ THREE.ColladaLoader = function () {
 
 		parseAsset();
 		setUpConversion();
-		images = parseLib( "//dae:library_images/dae:image", _Image, "image" );
-		materials = parseLib( "//dae:library_materials/dae:material", Material, "material" );
-		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
-		geometries = parseLib( "//dae:library_geometries/dae:geometry", Geometry, "geometry" );
-		cameras = parseLib( ".//dae:library_cameras/dae:camera", Camera, "camera" );
-		lights = parseLib( ".//dae:library_lights/dae:light", Light, "light" );
-		controllers = parseLib( "//dae:library_controllers/dae:controller", Controller, "controller" );
-		animations = parseLib( "//dae:library_animations/dae:animation", Animation, "animation" );
-		visualScenes = parseLib( ".//dae:library_visual_scenes/dae:visual_scene", VisualScene, "visual_scene" );
-
+		images = parseLib( "library_images image", _Image, "image" );
+		materials = parseLib( "library_materials material", Material, "material" );
+		effects = parseLib( "library_effects effect", Effect, "effect" );
+		geometries = parseLib( "library_geometries geometry", Geometry, "geometry" );
+		cameras = parseLib( "library_cameras camera", Camera, "camera" );
+		lights = parseLib( "library_lights light", Light, "light" );
+		controllers = parseLib( "library_controllers controller", Controller, "controller" );
+		animations = parseLib( "library_animations animation", Animation, "animation" );
+		visualScenes = parseLib( "library_visual_scenes visual_scene", VisualScene, "visual_scene" );
+		
 		morphs = [];
 		skins = [];
 
@@ -197,9 +197,9 @@ THREE.ColladaLoader = function () {
 
 	function parseAsset () {
 
-		var elements = COLLADA.evaluate( '//dae:asset', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+		var elements = COLLADA.querySelectorAll('asset');
 
-		var element = elements.iterateNext();
+		var element = elements[0];
 
 		if ( element && element.childNodes ) {
 
@@ -236,19 +236,21 @@ THREE.ColladaLoader = function () {
 
 	function parseLib ( q, classSpec, prefix ) {
 
-		var elements = COLLADA.evaluate(q, COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null) ;
+		var elements = COLLADA.querySelectorAll(q);
 
 		var lib = {};
-		var element = elements.iterateNext();
+
 		var i = 0;
 
-		while ( element ) {
+		var elementsLength = elements.length;
 
+		for ( var j = 0; j < elementsLength; j ++ ) {
+
+			var element = elements[j];
 			var daeElement = ( new classSpec() ).parse( element );
+
 			if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
 			lib[ daeElement.id ] = daeElement;
-
-			element = elements.iterateNext();
 
 		}
 
@@ -257,9 +259,9 @@ THREE.ColladaLoader = function () {
 	};
 
 	function parseScene() {
-
-		var sceneElement = COLLADA.evaluate( './/dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
-
+	
+		var sceneElement = COLLADA.querySelectorAll('scene instance_visual_scene')[0];
+		
 		if ( sceneElement ) {
 
 			var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
@@ -494,9 +496,9 @@ THREE.ColladaLoader = function () {
 	function setupSkinningMatrices ( bones, skin ) {
 
 		// FIXME: this is dumb...
-
+		
 		for ( var i = 0; i < bones.length; i ++ ) {
-
+		
 			var bone = bones[ i ];
 			var found = -1;
 
@@ -524,8 +526,8 @@ THREE.ColladaLoader = function () {
 				bone.weights = [];
 
 				for ( var j = 0; j < skin.weights.length; j ++ ) {
-
-					for (var k = 0; k < skin.weights[ j ].length; k ++) {
+					
+					for (var k = 0; k < skin.weights[ j ].length; k ++ ) {
 
 						var w = skin.weights[ j ][ k ];
 
@@ -541,7 +543,10 @@ THREE.ColladaLoader = function () {
 
 			} else {
 
-				throw 'ColladaLoader: Could not find joint \'' + bone.sid + '\'.';
+				console.warn( "ColladaLoader: Could not find joint '" + bone.sid + "'." );
+
+				bone.skinningMatrix = new THREE.Matrix4();
+				bone.weights = [];
 
 			}
 
@@ -924,7 +929,17 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-		return COLLADA.evaluate( './/dae:library_nodes//dae:node[@id=\'' + id + '\']', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
+        var nodes = COLLADA.querySelectorAll('library_nodes node');
+
+        for ( var i = 0; i < nodes.length; i++ ) {
+
+            var attObj = nodes[i].attributes.getNamedItem('id');
+            if ( attObj && attObj.value === id ) {
+                return nodes[i];
+        }
+        }
+
+        return undefined;
 
 	};
 
@@ -2200,21 +2215,16 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'bind_material':
+			
+					var instances = child.querySelectorAll('instance_material');
+					
+					for ( var j = 0; j < instances.length; j ++ ){
 
-					var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
-					if ( instances ) {
-
-						var instance = instances.iterateNext();
-
-						while ( instance ) {
-
-							this.instance_material.push( (new InstanceMaterial()).parse(instance) );
-							instance = instances.iterateNext();
-
-						}
-
+						var instance = instances[j];
+						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
+						
 					}
+
 
 					break;
 
@@ -2265,18 +2275,12 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'bind_material' ) {
 
-				var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+				var instances = child.querySelectorAll('instance_material');
+					
+				for ( var j = 0; j < instances.length; j ++ ) {
 
-				if ( instances ) {
-
-					var instance = instances.iterateNext();
-
-					while ( instance ) {
-
-						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
-						instance = instances.iterateNext();
-
-					}
+					var instance = instances[j];
+					this.instance_material.push( (new InstanceMaterial()).parse(instance) );
 
 				}
 
@@ -2422,10 +2426,11 @@ THREE.ColladaLoader = function () {
 		var source, numParams;
 		var vcIndex = 0, vcount = 3, maxOffset = 0;
 		var texture_sets = [];
-
+		
 		for ( j = 0; j < inputs.length; j ++ ) {
 
 			input = inputs[ j ];
+
 			var offset = input.offset + 1;
 			maxOffset = (maxOffset < offset)? offset : maxOffset;
 
@@ -3038,7 +3043,7 @@ THREE.ColladaLoader = function () {
 						repeatU: 1,
 						repeatV: 1,
 						wrapU: 1,
-						wrapV: 1,
+						wrapV: 1
 					};
 					this.parseTexture( child );
 					break;
@@ -3084,16 +3089,29 @@ THREE.ColladaLoader = function () {
 				case 'repeatV':
 
 					this.texOpts[ child.nodeName ] = parseFloat( child.textContent );
+
 					break;
 
 				case 'wrapU':
 				case 'wrapV':
+					
+					// some dae have a value of true which becomes NaN via parseInt
 
-					this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					if ( child.textContent.toUpperCase() === 'TRUE' ) {
+					
+						this.texOpts[ child.nodeName ] = 1;
+					
+					} else {
+					
+						this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					
+					}
 					break;
 
 				default:
+
 					this.texOpts[ child.nodeName ] = child.textContent;
+
 					break;
 
 			}
@@ -3135,7 +3153,7 @@ THREE.ColladaLoader = function () {
 				case 'index_of_refraction':
 				case 'transparency':
 
-					var f = evaluateXPath( child, './/dae:float' );
+					var f = child.querySelectorAll('float');
 
 					if ( f.length > 0 )
 						this[ child.nodeName ] = parseFloat( f[ 0 ].textContent );
@@ -4399,33 +4417,13 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function evaluateXPath( node, query ) {
-
-		var instances = COLLADA.evaluate( query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
-		var inst = instances.iterateNext();
-		var result = [];
-
-		while ( inst ) {
-
-			result.push( inst );
-			inst = instances.iterateNext();
-
-		}
-
-		return result;
-
-	};
-
 	function extractDoubleSided( obj, element ) {
 
 		obj.doubleSided = false;
 
-		var node = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
+		var node = element.querySelectorAll('extra double_sided')[0];
+	
 		if ( node ) {
-
-			node = node.iterateNext();
 
 			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
 

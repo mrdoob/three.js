@@ -1,0 +1,199 @@
+﻿* {
+	vertical-align: middle;
+}
+
+	/* Webkit micro scrollbars */
+
+	::-webkit-scrollbar {
+		width:9px;
+	}
+
+	::-webkit-scrollbar-track {
+		-webkit-border-radius:5px;
+		border-radius:5px;
+		background:rgba(140,140,140,0.1);
+	}
+
+	::-webkit-scrollbar-thumb {
+		-webkit-border-radius:5px;
+		border-radius:5px;
+		background:rgba(140,140,140,0.2);
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background:rgba(140,140,140,0.4);
+	}
+
+	::-webkit-scrollbar-thumb:window-inactive {
+		background:rgba(140,140,140,0.5);
+	}
+
+body {
+	font-family: Arial, sans-serif;
+	font-size: 14px;
+	margin: 0;
+	overflow: hidden;
+}
+
+hr {
+	border: 0px;
+	border-top: 1px solid #ccc;
+}
+
+button {
+	position: relative;
+}
+
+.Panel {
+
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+
+	/* No support for these yet */
+	-o-user-select: none;
+	user-select: none;
+}
+
+.FancySelect {
+	background: #222;
+	border: 1px solid #3C3C3C;
+	padding: 0;
+	cursor: default;
+	overflow: auto;
+	outline: none;
+}
+
+	.FancySelect .option {
+		padding: 4px;
+		white-space: nowrap;
+	}
+
+	.FancySelect .option.active {
+		background-color: #153C5E;
+	}
+
+input.Number {
+	color: #2A75B7;
+	font-size: 12px;							/** TODO: Use of !imporant is not ideal **/
+	background-color: transparent!important;	/* For now this is a quick fix a rendering issue due to inherited background */
+	border: 1px solid transparent;
+	padding: 2px;
+	cursor: col-resize;
+}
+
+#viewport {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+}
+
+#menubar {
+	position: absolute;
+	width: 100%;
+	height: 32px;
+	background-color: #111;
+	padding: 0px;
+	margin: 0px;
+}
+
+	#menubar .menu {
+		float: left;
+		width: 50px;
+		cursor: pointer;
+	}
+
+	#menubar .Panel {
+		color: #888;
+	}
+
+		#menubar .menu .options {
+			display: none;
+			padding: 5px 0px;
+			background-color: #111;
+			width: 140px;
+			border-top: solid 1px #1D1D1D;
+		}
+
+		#menubar .menu:hover .options {
+			display: block;
+		}
+
+			#menubar .menu .options hr {
+				border-color: #444;
+			}
+
+			#menubar .menu .options .option {
+				color: #666;
+				background-color: transparent;
+				padding: 5px 10px;
+				margin: 0px !important;
+			}
+
+				#menubar .menu .options .option:hover {
+					color: #fff;
+					background-color: #08f;
+				}
+
+
+#sidebar {
+	position: absolute;
+	right: 0px;
+	top: 32px;
+	bottom: 0px;
+	width: 300px;
+	background-color: #111;
+	overflow: auto;
+}
+
+	#sidebar input,
+	#sidebar textarea,
+	#sidebar select {
+		background: #ccc;
+	}
+
+	#sidebar .Panel {
+		margin-bottom: 10px;
+	}
+
+	#sidebar > .Panel {
+		color: #888;
+		padding: 10px;
+		border-top: 1px solid #333;
+	}
+
+	#sidebar #outliner {
+		width: 100%;
+		height: 140px;
+		color: #868686;
+		font-size: 12px;
+	}
+
+	#sidebar .Panel.Material canvas {
+
+		border: solid 1px #5A5A5A;
+
+	}
+
+#toolbar {
+	position: absolute;
+	left: 0px;
+	right: 300px;
+	bottom: 0px;
+	height: 32px;
+	background-color: #111;
+	color: #333;
+}
+
+	#toolbar .Panel {
+		padding: 4px;
+		color: #888;
+	}
+
+	#toolbar button {
+		margin-right: 6px;
+	}
+
+

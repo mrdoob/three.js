@@ -69,16 +69,8 @@
 				var geometry = new THREE.BufferGeometry();
 				var material = new THREE.LineBasicMaterial({ vertexColors: true });
 
-				geometry.attributes = {
-					position: {
-						itemSize: 3,
-						array: new Float32Array(segments * 3)
-					},
-					color: {
-						itemSize: 3,
-						array: new Float32Array(segments * 3)
-					}
-				};
+				geometry.addAttribute( 'position', Float32Array, segments, 3 );
+				geometry.addAttribute( 'color', Float32Array, segments, 3 );
 
 				var positions = geometry.attributes.position.array;
 				var colors = geometry.attributes.color.array;

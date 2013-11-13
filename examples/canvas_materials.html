@@ -116,7 +116,7 @@
 
 				}
 
-				particleLight = new THREE.Particle( new THREE.ParticleCanvasMaterial( { color: 0xffffff, program: program } ) );
+				particleLight = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xffffff, program: program } ) );
 				particleLight.scale.x = particleLight.scale.y = particleLight.scale.z = 4;
 				scene.add( particleLight );
 

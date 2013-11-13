@@ -59,7 +59,7 @@
 				// particles
 
 				var PI2 = Math.PI * 2;
-				var material = new THREE.ParticleCanvasMaterial( {
+				var material = new THREE.SpriteCanvasMaterial( {
 
 					color: 0xffffff,
 					program: function ( context ) {
@@ -74,7 +74,7 @@
 
 				for ( var i = 0; i < 1000; i ++ ) {
 
-					particle = new THREE.Particle( material );
+					particle = new THREE.Sprite( material );
 					particle.position.x = Math.random() * 2 - 1;
 					particle.position.y = Math.random() * 2 - 1;
 					particle.position.z = Math.random() * 2 - 1;

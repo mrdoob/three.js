@@ -80,7 +80,7 @@ THREE.SphereGeometry = function ( radius, widthSegments, heightSegments, phiStar
 				this.faces.push( new THREE.Face3( v1, v2, v4, [ n1, n2, n4 ] ) );
 				this.faceVertexUvs[ 0 ].push( [ uv1, uv2, uv4 ] );
 
-				this.faces.push( new THREE.Face3( v2, v3, v4, [ n2, n3, n4 ] ) );
+				this.faces.push( new THREE.Face3( v2, v3, v4, [ n2.clone(), n3, n4.clone() ] ) );
 				this.faceVertexUvs[ 0 ].push( [ uv2.clone(), uv3, uv4.clone() ] );
 
 			}

@@ -86,7 +86,7 @@
 
 				geometry.colors = colors;
 
-				material = new THREE.ParticleBasicMaterial( { size: 85, map: sprite, vertexColors: true, transparent: true } );
+				material = new THREE.ParticleSystemMaterial( { size: 85, map: sprite, vertexColors: true, transparent: true } );
 				material.color.setHSL( 1.0, 0.2, 0.7 );
 
 				particles = new THREE.ParticleSystem( geometry, material );

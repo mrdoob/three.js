@@ -47,11 +47,11 @@
 	"src/materials/MeshDepthMaterial.js",
 	"src/materials/MeshNormalMaterial.js",
 	"src/materials/MeshFaceMaterial.js",
-	"src/materials/ParticleBasicMaterial.js",
-	"src/materials/ParticleCanvasMaterial.js",
+	"src/materials/ParticleSystemMaterial.js",
+	"src/materials/SpriteMaterial.js",
+	"src/materials/SpriteCanvasMaterial.js",
 	"src/textures/Texture.js",
 	"src/textures/DataTexture.js",
-	"src/objects/Particle.js",
 	"src/objects/Line.js",
 	"src/objects/Mesh.js",
 	"src/objects/Bone.js",
@@ -61,6 +61,6 @@
 	"src/renderers/renderables/RenderableVertex.js",
 	"src/renderers/renderables/RenderableFace3.js",
 	"src/renderers/renderables/RenderableObject.js",
-	"src/renderers/renderables/RenderableParticle.js",
+	"src/renderers/renderables/RenderableSprite.js",
 	"src/renderers/renderables/RenderableLine.js"
 ]

@@ -9,7 +9,7 @@
  * }
  */
 
-THREE.ParticleCanvasMaterial = function ( parameters ) {
+THREE.SpriteCanvasMaterial = function ( parameters ) {
 
 	THREE.Material.call( this );
 
@@ -20,11 +20,11 @@ THREE.ParticleCanvasMaterial = function ( parameters ) {
 
 };
 
-THREE.ParticleCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
+THREE.SpriteCanvasMaterial.prototype = Object.create( THREE.Material.prototype );
 
-THREE.ParticleCanvasMaterial.prototype.clone = function () {
+THREE.SpriteCanvasMaterial.prototype.clone = function () {
 
-	var material = new THREE.ParticleCanvasMaterial();
+	var material = new THREE.SpriteCanvasMaterial();
 
 	THREE.Material.prototype.clone.call( this, material );
 
@@ -34,3 +34,7 @@ THREE.ParticleCanvasMaterial.prototype.clone = function () {
 	return material;
 
 };
+
+// backwards compatibility
+
+THREE.ParticleCanvasMaterial = THREE.SpriteCanvasMaterial;

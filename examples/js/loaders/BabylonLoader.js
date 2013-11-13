@@ -90,16 +90,16 @@ THREE.BabylonLoader.prototype = {
 					break;
 
 				case 2:
-					light = new BABYLON.SpotLight();
+					light = new THREE.SpotLight();
 					break;
 
 				case 3:
-					light = new BABYLON.HemisphericLight();
+					light = new THREE.HemisphereLight();
 					break;
 			}
 
 			light.name = data.name;
-			light.position.set( data.data[ 0 ], data.data[ 1 ], - data.data[ 2 ] );
+			light.position.set( data.position[ 0 ], data.position[ 1 ], - data.position[ 2 ] );
 			light.color.fromArray( data.diffuse );
 			if ( data.intensity ) light.intensity = data.intensity;
 
@@ -126,49 +126,35 @@ THREE.BabylonLoader.prototype = {
 					array: new Uint16Array( data.indices )
 				};
 
-				var strideSize = 0;
-				var positions = [];
-				var normals = [];
-
-				switch ( data.uvCount ) {
-
-					case 0:
-						strideSize = 6; // [3, 3]
-						break;
-					case 1:
-						strideSize = 8; // [3, 3, 2]
-						break;
-					case 2:
-						strideSize = 10; // [3, 3, 2, 2]
-						break;
-
-				}
-
-				var vertices = data.vertices;
-
-				for ( var j = 0, jl = vertices.length; j < jl; j += strideSize ) {
-
-					positions.push(
-						vertices[ j ],
-						vertices[ j + 1 ],
-						- vertices[ j + 2 ]
-					);
-
-					normals.push( 
-						vertices[ j + 3 ],
-						vertices[ j + 4 ],
-						- vertices[ j + 5 ]
-					);
-				}
-
 				geometry.attributes.position = {
 					itemSize: 3,
-					array: new Float32Array( positions )
+					array: new Float32Array( data.positions )
 				};
+
+				var positions = geometry.attributes.position.array;
+
+				for ( var j = 2, jl = positions.length; j < jl; j += 3 ) {
+
+					positions[ j ] = - positions[ j ]; 
+
+				}
 
 				geometry.attributes.normal = {
 					itemSize: 3,
-					array: new Float32Array( normals )
+					array: new Float32Array( data.normals )
+				};
+
+				var normals = geometry.attributes.normal.array;
+
+				for ( var j = 2, jl = normals.length; j < jl; j += 3 ) {
+
+					normals[ j ] = - normals[ j ]; 
+
+				}
+
+				geometry.attributes.uv = {
+					itemSize: 2,
+					array: new Float32Array( data.uvs )
 				};
 
 				var subMeshes = data.subMeshes;

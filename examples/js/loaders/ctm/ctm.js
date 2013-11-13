@@ -1,3 +1,30 @@
+/*
+Copyright (c) 2011 Juan Mellado
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+/*
+References:
+- "OpenCTM: The Open Compressed Triangle Mesh file format" by Marcus Geelnard
+  http://openctm.sourceforge.net/
+*/
 
 var CTM = CTM || {};
 
@@ -348,6 +375,7 @@ CTM.restoreIndices = function(indices, len){
   var i = 3;
   if (len > 0){
     indices[2] += indices[0];
+    indices[1] += indices[0];
   }
   for (; i < len; i += 3){
     indices[i] += indices[i - 3];
@@ -564,7 +592,7 @@ CTM.Stream.prototype.TWO_POW_MINUS23 = Math.pow(2, -23);
 CTM.Stream.prototype.TWO_POW_MINUS126 = Math.pow(2, -126);
 
 CTM.Stream.prototype.readByte = function(){
-  return this.data.charCodeAt(this.offset ++) & 0xff;
+  return this.data[this.offset ++] & 0xff;
 };
 
 CTM.Stream.prototype.readInt32 = function(){
@@ -602,7 +630,7 @@ CTM.Stream.prototype.readString = function(){
 
   this.offset += len;
 
-  return this.data.substr(this.offset - len, len);
+  return this.data.subarray(this.offset - len, len);
 };
 
 CTM.Stream.prototype.readArrayInt32 = function(array){

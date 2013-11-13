@@ -72,7 +72,7 @@
 				}
 
 				var PI2 = Math.PI * 2;
-				particleMaterial = new THREE.ParticleCanvasMaterial( {
+				particleMaterial = new THREE.SpriteCanvasMaterial( {
 
 					color: 0x000000,
 					program: function ( context ) {
@@ -129,7 +129,7 @@
 
 					intersects[ 0 ].object.material.color.setHex( Math.random() * 0xffffff );
 
-					var particle = new THREE.Particle( particleMaterial );
+					var particle = new THREE.Sprite( particleMaterial );
 					particle.position = intersects[ 0 ].point;
 					particle.scale.x = particle.scale.y = 8;
 					scene.add( particle );
