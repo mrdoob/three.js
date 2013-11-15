@@ -132,7 +132,7 @@
 
 						editor.storage.set( exporter.parse( editor.scene ) );
 
-					}, 2000 );
+					}, 1000 );
 
 				};
 
@@ -141,6 +141,7 @@
 				signals.objectAdded.add( saveState );
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );
+				signals.materialChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
 
 			} );
