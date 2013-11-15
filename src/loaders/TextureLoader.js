@@ -17,7 +17,6 @@ THREE.TextureLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.ImageLoader( scope.manager );
-		loader.setCrossOrigin( this.crossOrigin );
 		loader.load( url, function ( image ) {
 
 			var texture = new THREE.Texture( image );
@@ -29,14 +28,8 @@ THREE.TextureLoader.prototype = {
 
 			}
 
-		} );
+		}, onProgress, onError );
 
 	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-
-	}
 
 };
