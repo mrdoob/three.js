@@ -114,7 +114,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function parse( doc, callBack, url ) {
 
@@ -187,13 +187,13 @@ THREE.ColladaLoader = function () {
 
 		return result;
 
-	};
+	}
 
 	function setPreferredShading ( shading ) {
 
 		preferredShading = shading;
 
-	};
+	}
 
 	function parseAsset () {
 
@@ -232,7 +232,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function parseLib ( q, classSpec, prefix ) {
 
@@ -256,7 +256,7 @@ THREE.ColladaLoader = function () {
 
 		return lib;
 
-	};
+	}
 
 	function parseScene() {
 	
@@ -273,7 +273,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function createAnimations() {
 
@@ -282,7 +282,7 @@ THREE.ColladaLoader = function () {
 		// fill in the keys
 		recurseHierarchy( scene );
 
-	};
+	}
 
 	function recurseHierarchy( node ) {
 
@@ -339,7 +339,7 @@ THREE.ColladaLoader = function () {
 
 		return newData;
 
-	};
+	}
 
 	function calcAnimationBounds () {
 
@@ -367,7 +367,7 @@ THREE.ColladaLoader = function () {
 
 		return { start:start, end:end, frames:frames,ID:ID };
 
-	};
+	}
 
 	function createMorph ( geometry, ctrl ) {
 
@@ -458,7 +458,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function setupSkeleton ( node, bones, frame, parent ) {
 
@@ -496,7 +496,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function setupSkinningMatrices ( bones, skin ) {
 
@@ -558,14 +558,15 @@ THREE.ColladaLoader = function () {
 			}
 		}
 
-	};
+	}
+
 	//Walk the Collada tree and flatten the bones into a list, extract the position, quat and scale from the matrix
-	function flattenSkeleton(skeleton)
-	{
+	function flattenSkeleton(skeleton) {
+
 		var list = [];
-		var walk = function(parentid, node, list)
-		{
-			var bone = {}
+		var walk = function(parentid, node, list) {
+
+			var bone = {};
 			bone.name = node.sid;
 			bone.parent = parentid;
 			bone.matrix = node.matrix;
@@ -577,57 +578,69 @@ THREE.ColladaLoader = function () {
 			bone.scl = [data[2].x,data[2].y,data[2].z];
 			bone.rotq = [data[1].x,data[1].y,data[1].z,data[1].w];
 			list.push(bone);
-			for(var i in node.nodes)
-			{
+
+			for(var i in node.nodes) {
+
 				walk(node.sid,node.nodes[i],list);
+
 			}
+
 		};
+
 		walk(-1,skeleton,list);
 		return list;
-	};
-	//Move the vertices into the pose that is proper for the start of the animation
-	function skinToBindPose(geometry,skeleton,skinController)
-	{
-			var bones = [];
-			setupSkeleton( skeleton, bones, -1 );
-			setupSkinningMatrices( bones, skinController.skin );
-			v = new THREE.Vector3();
-			var skinned = [];
-			for(var i =0; i < geometry.vertices.length; i++)
-			{
-				skinned.push(new THREE.Vector3());
-			}
-			for ( i = 0; i < bones.length; i ++ ) {
-
-					if ( bones[ i ].type != 'JOINT' ) continue;
-
-					for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
-
-						w = bones[ i ].weights[ j ];
-						vidx = w.index;
-						weight = w.weight;
-
-						o = geometry.vertices[vidx];
-						s = skinned[vidx];
-						
-						v.x = o.x;
-						v.y = o.y;
-						v.z = o.z;
-
-						v.applyMatrix4( bones[i].skinningMatrix );
-
-						s.x += (v.x * weight);
-						s.y += (v.y * weight);
-						s.z += (v.z * weight);
-					}
-
-				}
-			for(var i =0; i < geometry.vertices.length; i++)
-			{
-				geometry.vertices[i] = skinned[i];
-			}	
 
 	}
+
+	//Move the vertices into the pose that is proper for the start of the animation
+	function skinToBindPose(geometry,skeleton,skinController) {
+
+		var bones = [];
+		setupSkeleton( skeleton, bones, -1 );
+		setupSkinningMatrices( bones, skinController.skin );
+		v = new THREE.Vector3();
+		var skinned = [];
+
+		for(var i =0; i < geometry.vertices.length; i++) {
+
+			skinned.push(new THREE.Vector3());
+
+		}
+
+		for ( i = 0; i < bones.length; i ++ ) {
+
+			if ( bones[ i ].type != 'JOINT' ) continue;
+
+			for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
+
+				w = bones[ i ].weights[ j ];
+				vidx = w.index;
+				weight = w.weight;
+
+				o = geometry.vertices[vidx];
+				s = skinned[vidx];
+				
+				v.x = o.x;
+				v.y = o.y;
+				v.z = o.z;
+
+				v.applyMatrix4( bones[i].skinningMatrix );
+
+				s.x += (v.x * weight);
+				s.y += (v.y * weight);
+				s.z += (v.z * weight);
+			}
+
+		}
+
+		for(var i =0; i < geometry.vertices.length; i++) {
+
+			geometry.vertices[i] = skinned[i];
+
+		}
+
+	}
+
 	function applySkin ( geometry, instanceCtrl, frame ) {
 
 		// TODO: get this from the renderer or options
@@ -661,27 +674,33 @@ THREE.ColladaLoader = function () {
 
 		//sort that list so that the order reflects the order in the joint list
 		var sortedbones = [];
-		for(var i = 0; i < joints.length; i++)
-		{
-			for(var j =0; j < bonelist.length; j++)
-			{
-				if(bonelist[j].name == joints[i])
-				{
+		for(var i = 0; i < joints.length; i++) {
+
+			for(var j =0; j < bonelist.length; j++) {
+
+				if(bonelist[j].name == joints[i]) {
+
 					sortedbones[i] = bonelist[j];
+
 				}
+
 			}
+
 		}
 
 		//hook up the parents by index instead of name
-		for(var i = 0; i < sortedbones.length; i++)
-		{
-			for(var j =0; j < sortedbones.length; j++)
-			{
-				if(sortedbones[i].parent == sortedbones[j].name)
-				{
+		for(var i = 0; i < sortedbones.length; i++) {
+
+			for(var j =0; j < sortedbones.length; j++) {
+
+				if(sortedbones[i].parent == sortedbones[j].name) {
+
 					sortedbones[i].parent = j;
+
 				}
+
 			}
+
 		}
 
 
@@ -699,14 +718,16 @@ THREE.ColladaLoader = function () {
 
 		//hook up the skin weights
 		// TODO -  this might be a good place to choose greatest 4 weights
-		for(var i =0; i < weights.length; i++)
-		{
+		for(var i =0; i < weights.length; i++) {
+
 			var indicies = new THREE.Vector4(weights[i][0]?weights[i][0].joint:0,weights[i][1]?weights[i][1].joint:0,weights[i][2]?weights[i][2].joint:0,weights[i][3]?weights[i][3].joint:0);
 			var weight = new THREE.Vector4(weights[i][0]?weights[i][0].weight:0,weights[i][1]?weights[i][1].weight:0,weights[i][2]?weights[i][2].weight:0,weights[i][3]?weights[i][3].weight:0);
 			
 			skinIndices.push(indicies);
 			skinWeights.push(weight);
+
 		}
+
 		geometry.skinIndices = skinIndices;
 		geometry.skinWeights = skinWeights;
 		geometry.bones = sortedbones;
@@ -716,15 +737,17 @@ THREE.ColladaLoader = function () {
 		//NOTE: this has no effect when using morphtargets
 		var animationdata = {"name":animationBounds.ID,"fps":30,"length":animationBounds.frames/30,"hierarchy":[]};
 
-		for(var j =0; j < sortedbones.length; j++)
-		{
+		for(var j =0; j < sortedbones.length; j++) {
+
 			animationdata.hierarchy.push({parent:sortedbones[j].parent, name:sortedbones[j].name, keys:[]});
+
 		}
 
 		//if using hardware skinning, move the vertices into the binding pose
-		if(sortedbones.length < maxbones)
-		{
+		if(sortedbones.length < maxbones) {
+
 			skinToBindPose(geometry,skeleton,skinController);
+
 		}
 
 		for ( frame = 0; frame < animationBounds.frames; frame ++ ) {
@@ -738,14 +761,13 @@ THREE.ColladaLoader = function () {
 			setupSkinningMatrices( bones, skinController.skin );
 
 			//if using hardware skinning, just hook up the animiation data
-			if(sortedbones.length < maxbones)
-			{
-				for(var i = 0; i < bones.length; i ++)
-				{
-					for(var j = 0; j < animationdata.hierarchy.length; j ++)
-					{
-						if(animationdata.hierarchy[j].name == bones[i].sid)
-						{
+			if(sortedbones.length < maxbones) {
+
+				for(var i = 0; i < bones.length; i ++) {
+
+					for(var j = 0; j < animationdata.hierarchy.length; j ++) {
+
+						if(animationdata.hierarchy[j].name == bones[i].sid) {
 
 							var key = {};
 							key.time = (frame/30);
@@ -763,14 +785,18 @@ THREE.ColladaLoader = function () {
 							key.rot = data[1];
 
 							animationdata.hierarchy[j].keys.push(key);
+
 						}
+
 					}
+
 				}
+
 				geometry.animation = animationdata;
-			}
-			// otherwise, process the animation into morphtargets
-			else
-			{
+
+			} else {
+
+				// otherwise, process the animation into morphtargets
 				
 				for ( i = 0; i < geometry.vertices.length; i++ ) {
 
@@ -806,7 +832,9 @@ THREE.ColladaLoader = function () {
 				}
 
 			geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
+
 			}
+
 		}
 
 	};
@@ -971,17 +999,17 @@ THREE.ColladaLoader = function () {
 					
 					applySkin( geom, skinController );
 
-					if(geom.morphTargets.length > 0)
-					{
+					if(geom.morphTargets.length > 0) {
+
 						material.morphTargets = true;
 						material.skinning = false;
-					}
-					else
-					{
+
+					} else {
+
 						material.morphTargets = false;
 						material.skinning = true;
-					}
-				
+
+					}				
 					
 
 					mesh = new THREE.SkinnedMesh( geom, material, false );
@@ -3194,9 +3222,10 @@ THREE.ColladaLoader = function () {
 
 	ColorOrTexture.prototype.parse = function ( element ) {
 
-		if (element.nodeName == 'transparent')
-		{
+		if (element.nodeName == 'transparent') {
+
 			this.opaque = element.getAttribute('opaque');
+
 		}
 		
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
@@ -3360,8 +3389,8 @@ THREE.ColladaLoader = function () {
 		var props = {};
 
 		var transparent = false;
-		if (this['transparency'] !== undefined && this['transparent'] !== undefined)
-		{
+
+		if (this['transparency'] !== undefined && this['transparent'] !== undefined) {
 			// convert transparent color RBG to average value
 			var transparentColor = this['transparent'];
 			var transparencyLevel = (this.transparent.color.r +
@@ -3369,12 +3398,13 @@ THREE.ColladaLoader = function () {
 										this.transparent.color.b)
 										/ 3 * this.transparency;
 			
-			if (transparencyLevel > 0)
-			{
+			if (transparencyLevel > 0) {
 				transparent = true;
 				props[ 'transparent' ] = true;
 				props[ 'opacity' ] = 1 - transparencyLevel;
+
 			}
+
 		}
 		
 		for ( var prop in this ) {
