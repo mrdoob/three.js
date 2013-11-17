@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - animation - skinning</title>
+		<title>three.js webgl - collada - skinning</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -34,9 +34,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank">three.js</a> webgl - animation - skinning -
-		buffalo model from <a href="http://ro.me">ro.me</a><br/>
-		click to start animation
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - collada - skinning
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -49,26 +47,11 @@
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			window.onload = init;
-
 			var container, stats;
-
 			var camera, scene, renderer;
-
-			var mesh, light;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
-			var animations = [];
-			var buffalos = [];
-			var offset = [];
-			var box;
-			var floor, dz = 0, dstep = -10, playback = false;
-			var skin;
 			var clock = new THREE.Clock();
+
+			init();
 
 			function init() {
 
@@ -77,17 +60,13 @@
 				camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( -5, -5, 5 );
 				camera.up.set( 0, 0, 1 );
+
 				scene = new THREE.Scene();
 				scene.fog = new THREE.FogExp2( 0xfff4e5, 0.0003 );
 
-				light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
 				light.position.set( 0, -4, -4 ).normalize();
 				scene.add( light );
-
-				var planeSimple = new THREE.PlaneGeometry( 200, 300 );
-				var planeTesselated = new THREE.PlaneGeometry( 100, 300, 25, 40 );
-				var matWire = new THREE.MeshBasicMaterial( { color: 0x110000, wireframe: true, wireframeLinewidth: 2 } );
-				var matSolid = new THREE.MeshBasicMaterial( { color: 0xffb23f } );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
 				renderer.setClearColor( scene.fog.color, 1 );
@@ -100,27 +79,39 @@
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
 				container.appendChild( stats.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				
 
 				var loader = new THREE.ColladaLoader();
-				loader.load( "./models/collada/avatar.dae", createScene );
+				loader.load( "./models/collada/avatar.dae", function ( geometry, materials ) {
+				
+					scene.add( geometry.scene );
 
-				//
+					camera.lookAt(geometry.scene.children[0].children[1].position);
+
+					var skin = geometry.scene.children[0].children[1];
+					
+					if ( skin.geometry.animation ) {
+
+						THREE.AnimationHandler.add( skin.geometry.animation );
+
+						var animation = new THREE.Animation(
+							skin,
+							skin.geometry.animation.name,
+							THREE.AnimationHandler.LINEAR
+						  );
+						 
+						animation.play();
+						
+					}
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				//
-
-				loop();
+				animate();
 
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -129,51 +120,13 @@
 
 			}
 
-			function createScene( geometry, materials ) {
-			
-				scene.add( geometry.scene );
-				camera.lookAt( geometry.scene.position );
-				camera.lookAt(geometry.scene.children[0].children[1].position)
-				skin = geometry.scene.children[0].children[1];
-				
-				if(skin.geometry.animation)
-				{
-					THREE.AnimationHandler.add(skin.geometry.animation);
-					var animation = new THREE.Animation(
-						skin,
-						skin.geometry.animation.name,
-						THREE.AnimationHandler.LINEAR
-					  );
-					 
-					animation.play();
-					
-				}
-			}
+			function animate() {
 
-			
-
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
-
-			}
-
-			function loop() {
-
-				requestAnimationFrame( loop, renderer.domElement );
+				requestAnimationFrame( animate, renderer.domElement );
 
 				var delta = clock.getDelta();
 
-				
 				THREE.AnimationHandler.update( delta );
-
-				
-				
-				
-				
-
 
 				renderer.render( scene, camera );
 
