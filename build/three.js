@@ -36176,7 +36176,10 @@ THREE.ShadowMapPlugin.__projector = new THREE.Projector();
 
 THREE.SpritePlugin = function () {
 
-	var _gl, _renderer, _precision, _sprite = {};
+	var _gl, _renderer, _precision;
+
+	var vertices, faces, vertexBuffer, elementBuffer;
+	var program, attributes, uniforms;
 
 	this.init = function ( renderer ) {
 
@@ -36185,66 +36188,57 @@ THREE.SpritePlugin = function () {
 
 		_precision = renderer.getPrecision();
 
-		_sprite.vertices = new Float32Array( 8 + 8 );
-		_sprite.faces    = new Uint16Array( 6 );
+		vertices = new Float32Array( [
+			- 0.5, - 0.5, 0, 0, 
+			  0.5, - 0.5, 1, 0,
+			  0.5,   0.5, 1, 1,
+			- 0.5,   0.5, 0, 1
+		] );
 
-		var i = 0;
+		faces = new Uint16Array( [
+			0, 1, 2,
+			0, 2, 3
+		] );
 
-		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = -0.5;	// vertex 0
-		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 0;	// uv 0
+		vertexBuffer  = _gl.createBuffer();
+		elementBuffer = _gl.createBuffer();
 
-		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = -0.5;	// vertex 1
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 0;	// uv 1
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, vertexBuffer );
+		_gl.bufferData( _gl.ARRAY_BUFFER, vertices, _gl.STATIC_DRAW );
 
-		_sprite.vertices[ i++ ] = 0.5;  _sprite.vertices[ i++ ] = 0.5;	// vertex 2
-		_sprite.vertices[ i++ ] = 1;  _sprite.vertices[ i++ ] = 1;	// uv 2
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
+		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, faces, _gl.STATIC_DRAW );
 
-		_sprite.vertices[ i++ ] = -0.5; _sprite.vertices[ i++ ] = 0.5;	// vertex 3
-		_sprite.vertices[ i++ ] = 0;  _sprite.vertices[ i++ ] = 1;	// uv 3
+		program = createProgram( THREE.ShaderSprite[ 'sprite' ], _precision );
 
-		i = 0;
+		attributes = {
+			position:			_gl.getAttribLocation ( program, 'position' ),
+			uv:					_gl.getAttribLocation ( program, 'uv' )
+		};
 
-		_sprite.faces[ i++ ] = 0; _sprite.faces[ i++ ] = 1; _sprite.faces[ i++ ] = 2;
-		_sprite.faces[ i++ ] = 0; _sprite.faces[ i++ ] = 2; _sprite.faces[ i++ ] = 3;
+		uniforms = {
+			uvOffset:			_gl.getUniformLocation( program, 'uvOffset' ),
+			uvScale:			_gl.getUniformLocation( program, 'uvScale' ),
 
-		_sprite.vertexBuffer  = _gl.createBuffer();
-		_sprite.elementBuffer = _gl.createBuffer();
+			rotation:			_gl.getUniformLocation( program, 'rotation' ),
+			scale:				_gl.getUniformLocation( program, 'scale' ),
+			halfViewport: 		_gl.getUniformLocation( program, 'halfViewport' ),
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
-		_gl.bufferData( _gl.ARRAY_BUFFER, _sprite.vertices, _gl.STATIC_DRAW );
+			color:				_gl.getUniformLocation( program, 'color' ),
+			map:				_gl.getUniformLocation( program, 'map' ),
+			opacity:			_gl.getUniformLocation( program, 'opacity' ),
 
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
-		_gl.bufferData( _gl.ELEMENT_ARRAY_BUFFER, _sprite.faces, _gl.STATIC_DRAW );
+			modelViewMatrix: 	_gl.getUniformLocation( program, 'modelViewMatrix' ),
+			projectionMatrix:	_gl.getUniformLocation( program, 'projectionMatrix' ),
 
-		_sprite.program = createProgram( THREE.ShaderSprite[ "sprite" ], _precision );
+			fogType: 			_gl.getUniformLocation( program, 'fogType' ),
+			fogDensity: 		_gl.getUniformLocation( program, 'fogDensity' ),
+			fogNear: 			_gl.getUniformLocation( program, 'fogNear' ),
+			fogFar: 			_gl.getUniformLocation( program, 'fogFar' ),
+			fogColor: 			_gl.getUniformLocation( program, 'fogColor' ),
 
-		_sprite.attributes = {};
-		_sprite.uniforms = {};
-
-		_sprite.attributes.position           = _gl.getAttribLocation ( _sprite.program, "position" );
-		_sprite.attributes.uv                 = _gl.getAttribLocation ( _sprite.program, "uv" );
-
-		_sprite.uniforms.uvOffset             = _gl.getUniformLocation( _sprite.program, "uvOffset" );
-		_sprite.uniforms.uvScale              = _gl.getUniformLocation( _sprite.program, "uvScale" );
-
-		_sprite.uniforms.rotation             = _gl.getUniformLocation( _sprite.program, "rotation" );
-		_sprite.uniforms.scale                = _gl.getUniformLocation( _sprite.program, "scale" );
-		_sprite.uniforms.halfViewport         = _gl.getUniformLocation( _sprite.program, "halfViewport" );
-
-		_sprite.uniforms.color                = _gl.getUniformLocation( _sprite.program, "color" );
-		_sprite.uniforms.map                  = _gl.getUniformLocation( _sprite.program, "map" );
-		_sprite.uniforms.opacity              = _gl.getUniformLocation( _sprite.program, "opacity" );
-
-		_sprite.uniforms.modelViewMatrix      = _gl.getUniformLocation( _sprite.program, "modelViewMatrix" );
-		_sprite.uniforms.projectionMatrix     = _gl.getUniformLocation( _sprite.program, "projectionMatrix" );
-
-		_sprite.uniforms.fogType 		  	  = _gl.getUniformLocation( _sprite.program, "fogType" );
-		_sprite.uniforms.fogDensity 		  = _gl.getUniformLocation( _sprite.program, "fogDensity" );
-		_sprite.uniforms.fogNear 		  	  = _gl.getUniformLocation( _sprite.program, "fogNear" );
-		_sprite.uniforms.fogFar 		  	  = _gl.getUniformLocation( _sprite.program, "fogFar" );
-		_sprite.uniforms.fogColor 		  	  = _gl.getUniformLocation( _sprite.program, "fogColor" );
-
-		_sprite.uniforms.alphaTest 		  	  = _gl.getUniformLocation( _sprite.program, "alphaTest" );
+			alphaTest: 			_gl.getUniformLocation( program, 'alphaTest' )
+		};
 
 	};
 
@@ -36255,15 +36249,12 @@ THREE.SpritePlugin = function () {
 
 		if ( ! nSprites ) return;
 
-		var attributes = _sprite.attributes,
-			uniforms = _sprite.uniforms;
-
 		var halfViewportWidth = viewportWidth * 0.5,
 			halfViewportHeight = viewportHeight * 0.5;
 
 		// setup gl
 
-		_gl.useProgram( _sprite.program );
+		_gl.useProgram( program );
 
 		_gl.enableVertexAttribArray( attributes.position );
 		_gl.enableVertexAttribArray( attributes.uv );
@@ -36271,11 +36262,11 @@ THREE.SpritePlugin = function () {
 		_gl.disable( _gl.CULL_FACE );
 		_gl.enable( _gl.BLEND );
 
-		_gl.bindBuffer( _gl.ARRAY_BUFFER, _sprite.vertexBuffer );
+		_gl.bindBuffer( _gl.ARRAY_BUFFER, vertexBuffer );
 		_gl.vertexAttribPointer( attributes.position, 2, _gl.FLOAT, false, 2 * 8, 0 );
 		_gl.vertexAttribPointer( attributes.uv, 2, _gl.FLOAT, false, 2 * 8, 8 );
 
-		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, _sprite.elementBuffer );
+		_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, elementBuffer );
 
 		_gl.uniformMatrix4fv( uniforms.projectionMatrix, false, camera.projectionMatrix.elements );
 
@@ -36404,7 +36395,7 @@ THREE.SpritePlugin = function () {
 		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
 		var vertexShader = _gl.createShader( _gl.VERTEX_SHADER );
 
-		var prefix = "precision " + precision + " float;\n";
+		var prefix = 'precision ' + precision + ' float;\n';
 
 		_gl.shaderSource( fragmentShader, prefix + shader.fragmentShader );
 		_gl.shaderSource( vertexShader, prefix + shader.vertexShader );
