@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - cube reflection [cars]</title>
+		<title>three.js webgl - effects - parallax barrier</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -36,7 +36,7 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank">three.js</a> webgl demo :
+				<a href="http://threejs.org" target="_blank">three.js</a> webgl - effects - parallax barrier. 
 				texture by <a href="http://www.humus.name/index.php?page=Textures" target="_blank">Humus</a> :
 				<span id="car_info">
 					<span id="car_name">Bugatti Veyron model</span>
@@ -57,7 +57,7 @@
 
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/effects/AnaglyphEffect.js"></script>
+		<script src="js/effects/ParallaxBarrierEffect.js"></script>
 		<script src="js/loaders/BinaryLoader.js"></script>
 
 		<script src="js/Detector.js"></script>
@@ -204,14 +204,13 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setFaceCulling( THREE.CullFaceNone );
+				container.appendChild( renderer.domElement );
 
 				var width = window.innerWidth || 2;
 				var height = window.innerHeight || 2;
 
-				effect = new THREE.AnaglyphEffect( renderer );
+				effect = new THREE.ParallaxBarrierEffect( renderer );
 				effect.setSize( width, height );
-
-				container.appendChild( renderer.domElement );
 
 				if ( STATS_ENABLED ) {
 
@@ -495,7 +494,7 @@
 
 					}
 
-				}, false);
+				}, false );
 
 			}
 
@@ -526,7 +525,7 @@
 
 				var buttons, i, src = "";
 
-				for( i = 0; i < materials.length; i ++ ) {
+				for( i = 0; i < materials.length; i++ ) {
 
 					src += '<button id="' + button_name( car, i ) + '">' + materials[ i ][ 0 ] + '</button> ';
 
@@ -543,7 +542,7 @@
 
 			function attachButtonMaterials( materials, faceMaterial, material_indices, car ) {
 
-				for( var i = 0; i < materials.length; i ++ ) {
+				for( var i = 0; i < materials.length; i++ ) {
 
 					$( button_name( car, i ) ).counter = i;
 					$( button_name( car, i ) ).addEventListener( 'click', function() {
@@ -578,13 +577,10 @@
 				}
 
 				var mesh = new THREE.Mesh( geometry, m );
-
 				mesh.rotation.x = r[ 0 ];
 				mesh.rotation.y = r[ 1 ];
 				mesh.rotation.z = r[ 2 ];
-
 				mesh.scale.x = mesh.scale.y = mesh.scale.z = s;
-
 				scene.add( mesh );
 
 				CARS[ car ].object = mesh;
@@ -619,8 +615,9 @@
 
 				var timer = -0.0002 * Date.now();
 
-				camera.position.x = 1000 * Math.cos( timer );
 				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+
+				camera.position.x = 1000 * Math.cos( timer );
 				camera.position.z = 1000 * Math.sin( timer );
 
 				camera.lookAt( scene.position );

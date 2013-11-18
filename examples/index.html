@@ -6,83 +6,70 @@
 		<style>
 
 			@font-face {
-
 				font-family: 'inconsolata';
 				src: url('files/inconsolata.woff') format('woff');
 				font-weight: normal;
 				font-style: normal;
-
 			}
 
 			body {
-
 				background-color: #ffffff;
 				margin: 0px;
 				font-family: 'inconsolata';
 				font-size: 15px;
 				overflow: hidden;
+			}
 
+			a {
+				color: #2194CE;
+				text-decoration: none;
 			}
 
 			h1 {
-
+				margin-top: 20px;
+				margin-bottom: 40px;
 				font-size: 25px;
 				font-weight: normal;
-
 			}
 
 			h2 {
-
 				font-size: 20px;
 				font-weight: normal;
-
 			}
 
 			#panel {
-
 				position: absolute;
-				width: 300px;
+				width: 310px;
 				height: 100%;
 				overflow: scroll;
-
 			}
 
 				#panel #list {
-
-					padding: 10px 20px;
+					padding: 0px 20px;
 					line-height: 18px;
-
 				}
 
 				#panel #list .link {
-
 					color: #2194CE;
 					text-decoration: none;
 					cursor: pointer;
-
 				}
 
 				#panel #list .selected {
-
 					color: #ff0000;
-
 				}
 
 					#panel #list .link:hover {
-
 						text-decoration: underline;
-
 					}
 
 			#viewer {
-
 				position: absolute;
-				left: 300px;
-				width: -webkit-calc(100% - 300px); /* Safari */
-				width: calc(100% - 300px);
+				left: 310px;
+				width: -webkit-calc(100% - 310px); /* Safari */
+				width: calc(100% - 310px);
 				height: 100%;
 				border: 0px;
-
 			}
 
 			#button {
@@ -106,7 +93,7 @@
 
 		<div id="panel">
 			<div id="list">
-				<h1>three.js examples</h1><br />
+				<h1><a href="http://threejs.org">three.js</a> / examples</h1>
 			</div>
 		</div>
 		<iframe id="viewer"></iframe>
@@ -128,6 +115,10 @@
 				"webgl_custom_attributes_particles",
 				"webgl_custom_attributes_particles2",
 				"webgl_custom_attributes_particles3",
+				"webgl_effects_anaglyph",
+				"webgl_effects_crosseyed",
+				"webgl_effects_oculusrift",
+				"webgl_effects_parallaxbarrier",
 				"webgl_geometries",
 				"webgl_geometries2",
 				"webgl_geometry_colors",
@@ -143,7 +134,6 @@
 				"webgl_geometry_large_mesh",
 				"webgl_geometry_minecraft",
 				"webgl_geometry_minecraft_ao",
-				"webgl_geometry_minecraft_oculusrift",
 				"webgl_geometry_normals",
 				"webgl_geometry_nurbs",
 				"webgl_geometry_shapes",
@@ -172,6 +162,7 @@
 				"webgl_loader_assimp2json",
 				"webgl_loader_collada",
 				"webgl_loader_collada_keyframe",
+				"webgl_loader_collada_skinning",
 				"webgl_loader_ctm",
 				"webgl_loader_ctm_materials",
 				"webgl_loader_json_blender",
@@ -186,7 +177,7 @@
 				"webgl_loader_vrml",
 				"webgl_loader_vtk",
 				"webgl_lod",
-				"webgl_marching_cubes",
+				"webgl_marchingcubes",
 				"webgl_materials",
 				"webgl_materials2",
 				"webgl_materials_blending",
@@ -194,15 +185,10 @@
 				"webgl_materials_bumpmap",
 				"webgl_materials_bumpmap_skin",
 				"webgl_materials_cars",
-				"webgl_materials_cars_anaglyph",
 				"webgl_materials_cars_camaro",
-				"webgl_materials_cars_camaro_crosseyed",
-				"webgl_materials_cars_parallaxbarrier",
 				"webgl_materials_cubemap",
 				"webgl_materials_cubemap_balls_reflection",
-				"webgl_materials_cubemap_balls_reflection_anaglyph",
 				"webgl_materials_cubemap_balls_refraction",
-				"webgl_materials_cubemap_balls_refraction_crosseyed",
 				"webgl_materials_cubemap_dynamic",
 				"webgl_materials_cubemap_dynamic2",
 				"webgl_materials_cubemap_escher",

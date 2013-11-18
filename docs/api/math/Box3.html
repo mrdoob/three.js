@@ -9,19 +9,19 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">Represents a boundary box in 3d space.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo min], [page:todo max])</h3>
+		<h3>[name]([page:Vector3 min], [page:Vector3 max])</h3>
 		<div>
-		min -- todo <br />
-		max -- todo
+		min -- Lower (x, y, z) boundary of the box.  <br />
+		max -- Upper (x, y, z) boundary of the box.
 		</div>
 		<div>
-		todo
+		Creates a box bounded by min and max
 		</div>
 
 		<h2>Properties</h2>
@@ -30,44 +30,41 @@
 
 		<h3>.[page:Vector3 max]</h3>
 		<div>
-		todo
+		Upper (x, y, z) boundary of this box.
 		</div> 
 
 		<h3>.[page:Vector3 min]</h3>
 		<div>
-		todo
+		Lower (x, y, z) boundary of this box.
 		</div> 
 
 		<h2>Methods</h2>
 
 
 
-		<h3>.set([page:todo min], [page:todo max]) [page:todo]</h3>
+		<h3>.set([page:Vector3 min], [page:Vector3 max]) [page:Box3 this]</h3>
 		<div>
-		min -- todo <br />
-		max -- todo
+		min -- Upper (x, y, z) boundary of this box. <br />
+		max -- Lower (x, y, z) boundary of this box.
 		</div>
 		<div>
 		todo
 		</div>
 
-		<h3>.applyMatrix4([page:todo matrix]) [page:todo]</h3>
+		<h3>.applyMatrix4([page:Matrix4 matrix]) [page:Box3 this]</h3>
 		<div>
-		matrix -- todo
+		matrix -- Transform the box with a matrix.
 		</div>
 		<div>
 		todo
 		</div>
 
-		<h3>.expandByPoint([page:todo point]) [page:todo]</h3>
+		<h3>.expandByPoint([page:Vector3 point]) [page:Box3 this]</h3>
 		<div>
-		point -- todo
-		</div>
-		<div>
-		todo
+		Expands the box outwards by the point. It takes the min and max values of the box.
 		</div>
 
-		<h3>.clampPoint([page:todo point], [page:todo optionalTarget]) [page:todo]</h3>
+		<h3>.clampPoint([page:Vector3 point], [page:todo optionalTarget]) [page:todo]</h3>
 		<div>
 		point -- todo <br />
 		optionalTarget -- todo

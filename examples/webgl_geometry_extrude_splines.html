@@ -139,13 +139,13 @@
 			tubeMesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [
 				new THREE.MeshLambertMaterial({
 					color: color,
-					opacity: geometry.debug ? 0.2 : 0.8,
 					transparent: true
 				}),
 				new THREE.MeshBasicMaterial({
 					color: 0x000000,
-					opacity: 0.5,
-					wireframe: true
+					opacity: 0.3,
+					wireframe: true,
+					transparent: true
 			})]);
 
 			if ( geometry.debug ) tubeMesh.add( geometry.debug );
@@ -232,6 +232,7 @@
 			//
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0xf0f0f0 );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			container.appendChild( renderer.domElement );

@@ -132,25 +132,13 @@
 				heartShape.bezierCurveTo( x + 80, y + 35, x + 80, y, x + 50, y );
 				heartShape.bezierCurveTo( x + 35, y, x + 25, y + 25, x + 25, y + 25 );
 
-				var circleLines = function ( context ) {
-
-					context.lineWidth = 0.05;
-					context.beginPath();
-					context.arc( 0, 0, 1, 0, Math.PI*2, true );
-					context.stroke();
-
-					context.globalAlpha = 0.2;
-					context.fill();
-
-				}
-
 				var hue = 0;
 
 				var hearts = function ( context ) {
 
 					context.globalAlpha = 0.5;
 					var x = 0, y = 0;
-					context.scale(0.1, -0.1); // Scale so canvas render can redraw within bounds
+					context.scale(0.05, -0.05); // Scale so canvas render can redraw within bounds
 					context.beginPath();
 					 // From http://blog.burlock.org/html5/130-paths
 					context.bezierCurveTo( x + 2.5, y + 2.5, x + 2.0, y, x, y );
@@ -167,7 +155,6 @@
 
 				var setTargetParticle = function() {
 
-					//hearts circleLines
 					var material = new THREE.SpriteCanvasMaterial( {
 						program: hearts,
 						blending:THREE.AdditiveBlending
@@ -179,7 +166,7 @@
 
 					particle = new THREE.Sprite( material );
 
-					particle.scale.x = particle.scale.y = Math.random() * 20 +20;
+					particle.scale.x = particle.scale.y = Math.random() * 40 + 40;
 					particleCloud.add( particle );
 
 					return particle;

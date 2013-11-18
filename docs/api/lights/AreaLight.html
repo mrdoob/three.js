@@ -24,10 +24,10 @@ scene.add( areaLight1 );</code>
 		<h2>Constructor</h2>
 
 
-		<h3>[name]( [page:Float hex], [page:Float intensity])</h3>
+		<h3>[name]( [page:Integer hex], [page:Float intensity])</h3>
 		<div>
 		[page:Integer hex] — Numeric value of the RGB component of the color.<br />
-		[page:Integer intensity] — The intensity of the light.
+		[page:Float intensity] — Numeric value of the light's strength/intensity.
 		</div>
 		<div>
 		This creates a arealight with color.
@@ -68,10 +68,11 @@ scene.add( areaLight1 );</code>
 		todo
 		</div> 
 
-		<h3>.[page:number intensity]</h3>
+		<h3>.[page:Float intensity]</h3>
 		<div>
-		todo
-		</div> 
+			Light's intensity.<br />
+			Default — *1.0*.
+		</div>
 
 		<h3>.[page:number constantAttenuation]</h3>
 		<div>

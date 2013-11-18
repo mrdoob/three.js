@@ -77,7 +77,8 @@ events.forEach( function ( event ) {
 
 	UI.Element.prototype[ method ] = function ( callback ) {
 
-		this.dom.addEventListener( event.toLowerCase(), callback, false );
+		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
+
 		return this;
 
 	};
@@ -123,6 +124,16 @@ UI.Panel.prototype.remove = function () {
 	}
 
 	return this;
+
+};
+
+UI.Panel.prototype.clear = function () {
+
+	while ( this.dom.children.length ) {
+
+		this.dom.removeChild( this.dom.lastChild );
+
+	}
 
 };
 
@@ -522,7 +533,12 @@ UI.Color = function () {
 	dom.style.padding = '0px';
 	dom.style.backgroundColor = 'transparent';
 
-	try { dom.type = 'color'; } catch ( exception ) {}
+	try {
+
+		dom.type = 'color';
+		dom.value = '#ffffff';
+
+	} catch ( exception ) {}
 
 	this.dom = dom;
 
@@ -596,6 +612,9 @@ UI.Number = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -603,6 +622,8 @@ UI.Number = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -613,16 +634,17 @@ UI.Number = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ).toFixed( scope.precision );
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 
@@ -743,6 +765,9 @@ UI.Integer = function ( number ) {
 	var distance = 0;
 	var onMouseDownValue = 0;
 
+	var pointer = new THREE.Vector2();
+	var prevPointer = new THREE.Vector2();
+
 	var onMouseDown = function ( event ) {
 
 		event.preventDefault();
@@ -750,6 +775,8 @@ UI.Integer = function ( number ) {
 		distance = 0;
 
 		onMouseDownValue = parseFloat( dom.value );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 		document.addEventListener( 'mousemove', onMouseMove, false );
 		document.addEventListener( 'mouseup', onMouseUp, false );
@@ -760,16 +787,17 @@ UI.Integer = function ( number ) {
 
 		var currentValue = dom.value;
 
-		var movementX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
-		var movementY = event.movementY || event.webkitMovementY || event.mozMovementY || 0;
+		pointer.set( event.clientX, event.clientY );
 
-		distance += movementX - movementY;
+		distance += ( pointer.x - prevPointer.x ) - ( pointer.y - prevPointer.y );
 
 		var number = onMouseDownValue + ( distance / ( event.shiftKey ? 5 : 50 ) ) * scope.step;
 
 		dom.value = Math.min( scope.max, Math.max( scope.min, number ) ) | 0;
 
 		if ( currentValue !== dom.value ) dom.dispatchEvent( changeEvent );
+
+		prevPointer.set( event.clientX, event.clientY );
 
 	};
 

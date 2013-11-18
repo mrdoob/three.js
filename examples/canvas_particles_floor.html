@@ -55,11 +55,13 @@
 					for ( var iy = 0; iy < AMOUNTY; iy++ ) {
 
 						particle = new THREE.Sprite( material );
-						particle.scale.y = 4;
+						particle.scale.y = 20;
 						particle.position.x = ix * SEPARATION - ( ( AMOUNTX * SEPARATION ) / 2 );
 						particle.position.z = iy * SEPARATION - ( ( AMOUNTY * SEPARATION ) / 2 );
 						scene.add( particle );
+
 					}
+
 				}
 
 				renderer = new THREE.CanvasRenderer();

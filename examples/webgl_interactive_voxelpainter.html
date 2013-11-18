@@ -92,7 +92,7 @@
 
 				}
 
-				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2 } );
+				var material = new THREE.LineBasicMaterial( { color: 0x000000, opacity: 0.2, transparent: true } );
 
 				var line = new THREE.Line( geometry, material );
 				line.type = THREE.LinePieces;
@@ -114,7 +114,8 @@
 				directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
 				scene.add( directionalLight );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, preserveDrawingBuffer: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setClearColor( 0xf0f0f0 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
