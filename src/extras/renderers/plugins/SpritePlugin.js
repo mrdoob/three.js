@@ -5,7 +5,7 @@
 
 THREE.SpritePlugin = function () {
 
-	var _gl, _renderer;
+	var _gl, _renderer, _texture;
 
 	var vertices, faces, vertexBuffer, elementBuffer;
 	var program, attributes, uniforms;
@@ -66,6 +66,17 @@ THREE.SpritePlugin = function () {
 
 			alphaTest:			_gl.getUniformLocation( program, 'alphaTest' )
 		};
+
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = 8;
+		canvas.height = 8;
+
+		var context = canvas.getContext( '2d' );
+		context.fillStyle = '#ffffff';
+		context.fillRect( 0, 0, canvas.width, canvas.height );
+
+		_texture = new THREE.Texture( canvas );
+		_texture.needsUpdate = true;
 
 	};
 
@@ -159,53 +170,59 @@ THREE.SpritePlugin = function () {
 		for( i = 0; i < nSprites; i ++ ) {
 
 			sprite = sprites[ i ];
+
+			if ( sprite.visible === false ) continue;
+
 			material = sprite.material;
 
-			if ( ! sprite.visible || material.opacity === 0 ) continue;
+			_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
+			_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
+
+			scale[ 0 ] = sprite.scale.x;
+			scale[ 1 ] = sprite.scale.y;
+
+			if ( scene.fog && material.fog ) {
+
+				fogType = sceneFogType;
+
+			} else {
+
+				fogType = 0;
+
+			}
+
+			if ( oldFogType !== fogType ) {
+
+				_gl.uniform1i( uniforms.fogType, fogType );
+				oldFogType = fogType;
+
+			}
+
+			_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
+			_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
+
+			_gl.uniform1f( uniforms.opacity, material.opacity );
+			_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
+
+			_gl.uniform1f( uniforms.rotation, material.rotation );
+			_gl.uniform2fv( uniforms.scale, scale );
+			_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
+
+			_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
+			_renderer.setDepthTest( material.depthTest );
+			_renderer.setDepthWrite( material.depthWrite );
 
 			if ( material.map && material.map.image && material.map.image.width ) {
 
-				_gl.uniform1f( uniforms.alphaTest, material.alphaTest );
-				_gl.uniformMatrix4fv( uniforms.modelViewMatrix, false, sprite._modelViewMatrix.elements );
-
-				scale[ 0 ] = sprite.scale.x;
-				scale[ 1 ] = sprite.scale.y;
-
-				if ( scene.fog && material.fog ) {
-
-					fogType = sceneFogType;
-
-				} else {
-
-					fogType = 0;
-
-				}
-
-				if ( oldFogType !== fogType ) {
-
-					_gl.uniform1i( uniforms.fogType, fogType );
-					oldFogType = fogType;
-
-				}
-
-				_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
-				_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
-
-				_gl.uniform1f( uniforms.opacity, material.opacity );
-				_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
-
-				_gl.uniform1f( uniforms.rotation, material.rotation );
-				_gl.uniform2fv( uniforms.scale, scale );
-				_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
-
-				_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
-				_renderer.setDepthTest( material.depthTest );
-				_renderer.setDepthWrite( material.depthWrite );
 				_renderer.setTexture( material.map, 0 );
 
-				_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
+			} else {
+
+				_renderer.setTexture( _texture, 0 );
 
 			}
+
+			_gl.drawElements( _gl.TRIANGLES, 6, _gl.UNSIGNED_SHORT, 0 );
 
 		}
 
@@ -223,7 +240,7 @@ THREE.SpritePlugin = function () {
 		var fragmentShader = _gl.createShader( _gl.FRAGMENT_SHADER );
 
 		_gl.shaderSource( vertexShader, [
-			
+
 			'precision ' + _renderer.getPrecision() + ' float;',
 
 			'uniform mat4 modelViewMatrix;',
