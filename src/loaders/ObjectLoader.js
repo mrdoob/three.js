@@ -287,6 +287,20 @@ THREE.ObjectLoader.prototype = {
 
 					break;
 
+				case 'Sprite':
+
+					var material = materials[ data.material ];
+
+					if ( material === undefined ) {
+
+						console.error( 'THREE.ObjectLoader: Undefined material ' + data.material );
+
+					}
+
+					object = new THREE.Sprite( material );
+
+					break;
+
 				default:
 
 					object = new THREE.Object3D();

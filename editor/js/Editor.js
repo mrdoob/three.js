@@ -349,6 +349,7 @@ Editor.prototype = {
 			'PointLight': THREE.PointLight,
 			'SpotLight': THREE.SpotLight,
 			'Mesh': THREE.Mesh,
+			'Sprite': THREE.Sprite,
 			'Object3D': THREE.Object3D
 
 		};
@@ -410,6 +411,7 @@ Editor.prototype = {
 			'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
 			'ShaderMaterial': THREE.ShaderMaterial,
 			'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
+			'SpriteMaterial': THREE.SpriteMaterial,
 			'Material': THREE.Material
 
 		};

@@ -466,7 +466,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
-			if ( material.map.image !== undefined ) {
+			if ( material.map !== null ) {
 
 				var bitmap = material.map.image;
 

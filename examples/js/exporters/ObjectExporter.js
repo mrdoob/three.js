@@ -241,6 +241,11 @@ THREE.ObjectExporter.prototype = {
 				data.geometry = parseGeometry( object.geometry );
 				data.material = parseMaterial( object.material );
 
+			} else if ( object instanceof THREE.Sprite ) {
+
+				data.type = 'Sprite';
+				data.material = parseMaterial( object.material );
+
 			} else {
 
 				data.type = 'Object3D';

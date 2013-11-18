@@ -90,6 +90,13 @@ THREE.MaterialExporter.prototype = {
 
 			}
 
+		} else if ( material instanceof THREE.SpriteMaterial ) {
+
+			output.type = 'SpriteMaterial';
+			output.color = material.color.getHex();
+			output.opacity = material.opacity;
+			output.transparent = material.transparent;
+
 		}
 
 		return output;
