@@ -36327,7 +36327,7 @@ THREE.SpritePlugin = function () {
 			sprite = sprites[ i ];
 			material = sprite.material;
 
-			if ( ! sprite.visible || material.opacity === 0 ) continue;
+			if ( sprite.visible === false ) continue;
 
 			sprite._modelViewMatrix.multiplyMatrices( camera.matrixWorldInverse, sprite.matrixWorld );
 			sprite.z = - sprite._modelViewMatrix.elements[ 14 ];
