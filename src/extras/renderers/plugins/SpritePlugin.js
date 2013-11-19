@@ -49,7 +49,6 @@ THREE.SpritePlugin = function () {
 
 			rotation:			_gl.getUniformLocation( program, 'rotation' ),
 			scale:				_gl.getUniformLocation( program, 'scale' ),
-			halfViewport: 		_gl.getUniformLocation( program, 'halfViewport' ),
 
 			color:				_gl.getUniformLocation( program, 'color' ),
 			map:				_gl.getUniformLocation( program, 'map' ),
@@ -86,9 +85,6 @@ THREE.SpritePlugin = function () {
 			nSprites = sprites.length;
 
 		if ( ! nSprites ) return;
-
-		var halfViewportWidth = viewportWidth * 0.5,
-			halfViewportHeight = viewportHeight * 0.5;
 
 		// setup gl
 
@@ -206,7 +202,6 @@ THREE.SpritePlugin = function () {
 
 			_gl.uniform1f( uniforms.rotation, material.rotation );
 			_gl.uniform2fv( uniforms.scale, scale );
-			_gl.uniform2f( uniforms.halfViewport, halfViewportWidth, halfViewportHeight );
 
 			_renderer.setBlending( material.blending, material.blendEquation, material.blendSrc, material.blendDst );
 			_renderer.setDepthTest( material.depthTest );
@@ -249,7 +244,6 @@ THREE.SpritePlugin = function () {
 			'uniform vec2 scale;',
 			'uniform vec2 uvOffset;',
 			'uniform vec2 uvScale;',
-			'uniform vec2 halfViewport;',
 
 			'attribute vec2 position;',
 			'attribute vec2 uv;',
