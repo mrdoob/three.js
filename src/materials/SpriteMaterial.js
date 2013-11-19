@@ -26,8 +26,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 	this.color = new THREE.Color( 0xffffff );
 	this.map = null;
 
-	this.depthTest = true;
-	this.sizeAttenuation = true;
 	this.rotation = 0;
 
 	this.fog = false;
