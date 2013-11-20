@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '63' };
+var THREE = { REVISION: '64dev' };
 
 self.console = self.console || {
 
@@ -19956,6 +19956,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( stencil === undefined || stencil ) bits |= _gl.STENCIL_BUFFER_BIT;
 
 		_gl.clear( bits );
+
+	};
+
+	this.clearColor = function () {
+
+		_gl.clear( _gl.COLOR_BUFFER_BIT );
+
+	};
+
+	this.clearDepth = function () {
+
+		_gl.clear( _gl.DEPTH_BUFFER_BIT );
+
+	};
+
+	this.clearStencil = function () {
+
+		_gl.clear( _gl.STENCIL_BUFFER_BIT );
 
 	};
 
