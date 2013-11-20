@@ -142,11 +142,11 @@
 				var widthHalf = material.map.image.width / 2;
 				var heightHalf = material.map.image.height / 2;
 
-				spriteTL.position.set( widthHalf, window.innerHeight - heightHalf, 1 ); // top left
-				spriteTR.position.set( window.innerWidth - widthHalf, window.innerHeight - heightHalf, 2 ); // top right
+				spriteTL.position.set( widthHalf, window.innerHeight - heightHalf, 0 ); // top left
+				spriteTR.position.set( window.innerWidth - widthHalf, window.innerHeight - heightHalf, 0 ); // top right
 				spriteBL.position.set( widthHalf, heightHalf, 0 ); // bottom left
-				spriteBR.position.set( window.innerWidth - widthHalf, heightHalf, 3 ); // bottom right
-				spriteC.position.set( window.innerWidth * 0.5, window.innerHeight * 0.5, 4 ); // center
+				spriteBR.position.set( window.innerWidth - widthHalf, heightHalf, 0 ); // bottom right
+				spriteC.position.set( window.innerWidth * 0.5, window.innerHeight * 0.5, 0 ); // center
 
 			};
 
@@ -209,6 +209,7 @@
 
 				renderer.clear();
 				renderer.render( scene, camera );
+				renderer.clearDepth();
 				renderer.render( sceneOrtho, cameraOrtho );
 
 			}
