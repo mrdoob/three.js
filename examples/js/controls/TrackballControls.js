@@ -559,6 +559,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	window.addEventListener( 'keydown', keydown, false );
 	window.addEventListener( 'keyup', keyup, false );
+	window.addEventListener( 'mousewheel', mousewheel, false); //Opera / IE
 
 	this.handleResize();
 
