@@ -18,13 +18,12 @@
 	<body>
 		<script src="../build/three.min.js"></script>
 
-		<script src="js/libs/stats.min.js"></script>
-
 		<script>
 
-			var stats;
+			var camera, scene, renderer;
+			var cameraOrtho, sceneOrtho;
 
-			var camera, cameraOverlays, scene, sceneOverlays, renderer;
+			var spriteTL, spriteTR, spriteBL, spriteBR, spriteC;
 
 			var mapC;
 
@@ -35,22 +34,22 @@
 
 			function init() {
 
-				cameraOverlays = new THREE.OrthographicCamera( 0,window.innerWidth, window.innerHeight, 0, -10,10);
-				
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2100 );
 				camera.position.z = 1500;
 
-				scene = new THREE.Scene();
-				sceneOverlays = new THREE.Scene();
+				cameraOrtho = new THREE.OrthographicCamera( 0, window.innerWidth, window.innerHeight, 0, - 10, 10 );
 
+				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1500, 2100 );
+
+				sceneOrtho = new THREE.Scene();
 
 				// create sprites
 
 				var amount = 200;
 				var radius = 500;
 
-				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png", undefined, function() { createHUDSprites() } );
+				var mapA = THREE.ImageUtils.loadTexture( "textures/sprite0.png", undefined, createHUDSprites );
 				var mapB = THREE.ImageUtils.loadTexture( "textures/sprite1.png" );
 				mapC = THREE.ImageUtils.loadTexture( "textures/sprite2.png" );
 
@@ -90,39 +89,6 @@
 
 				scene.add( group );
 
-				// add 2d-sprites
-				var createHUDSprites = function() {
-
-					var scaleX = mapA.image.width;
-					var scaleY = mapA.image.height;
-										
-					var materialA1 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.25 } );
-					var materialA2 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.5 } );
-					var materialA3 = new THREE.SpriteMaterial( { map: mapA, opacity: 1 } );
-
-					// Simulating deprecated option "alignment: THREE.SpriteAlignment.topLeft"
-					var x=100+scaleX/2;
-					var y=window.innerHeight-100-scaleY/2;
-					
-					sprite = new THREE.Sprite( materialA1 );
-					sprite.position.set( x, y, 1 );
-					sprite.scale.set( scaleX, scaleY, 1 );
-					sceneOverlays.add( sprite );
-
-					sprite = new THREE.Sprite( materialA2 );
-					sprite.position.set( x+50, y-50, 2 );
-					sprite.scale.set( scaleX, scaleY, 1 );
-					sceneOverlays.add( sprite );
-
-					sprite = new THREE.Sprite( materialA3 );
-					sprite.position.set( x+100, y-100, 3 );
-					sprite.scale.set( scaleX, scaleY, 1 );
-					sceneOverlays.add( sprite );
-					
-					
-
-				}
-
 				// renderer
 
 				renderer = new THREE.WebGLRenderer();
@@ -131,14 +97,6 @@
 				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
 				
 				document.body.appendChild( renderer.domElement );
-				
-				// stats
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				document.body.appendChild( stats.domElement );
 
 				//
 
@@ -146,12 +104,62 @@
 
 			}
 
+			function createHUDSprites ( texture ) {
+
+				var material = new THREE.SpriteMaterial( { map: texture } );
+
+				var width = material.map.image.width;
+				var height = material.map.image.height;
+				
+				spriteTL = new THREE.Sprite( material );
+				spriteTL.scale.set( width, height, 1 );
+				sceneOrtho.add( spriteTL );
+
+				spriteTR = new THREE.Sprite( material );
+				spriteTR.scale.set( width, height, 1 );
+				sceneOrtho.add( spriteTR );
+
+				spriteBL = new THREE.Sprite( material );
+				spriteBL.scale.set( width, height, 1 );
+				sceneOrtho.add( spriteBL );
+
+				spriteBR = new THREE.Sprite( material );
+				spriteBR.scale.set( width, height, 1 );
+				sceneOrtho.add( spriteBR );
+				
+				spriteC = new THREE.Sprite( material );
+				spriteC.scale.set( width, height, 1 );
+				sceneOrtho.add( spriteC );
+
+				updateHUDSprites();
+
+			};
+
+			function updateHUDSprites () {
+
+				var material = spriteTL.material;
+
+				var widthHalf = material.map.image.width / 2;
+				var heightHalf = material.map.image.height / 2;
+
+				spriteTL.position.set( widthHalf, window.innerHeight - heightHalf, 1 ); // top left
+				spriteTR.position.set( window.innerWidth - widthHalf, window.innerHeight - heightHalf, 2 ); // top right
+				spriteBL.position.set( widthHalf, heightHalf, 0 ); // bottom left
+				spriteBR.position.set( window.innerWidth - widthHalf, heightHalf, 3 ); // bottom right
+				spriteC.position.set( window.innerWidth * 0.5, window.innerHeight * 0.5, 4 ); // center
+
+			};
+
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				cameraOverlays = new THREE.OrthographicCamera( 0,window.innerWidth, window.innerHeight, 0, -10,10);
-				
+				camera.aspect = window.innerWidth / window.innerHeight;				
 				camera.updateProjectionMatrix();
+
+				cameraOrtho.right = window.innerWidth;
+				cameraOrtho.top = window.innerHeight;
+				cameraOrtho.updateProjectionMatrix();
+
+				updateHUDSprites();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -160,9 +168,7 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
-				stats.update();
 
 			}
 
@@ -201,10 +207,9 @@
 				group.rotation.y = time * 0.75;
 				group.rotation.z = time * 1.0;
 
-				time += 0.02;
-
+				renderer.clear();
 				renderer.render( scene, camera );
-				renderer.render( sceneOverlays, cameraOverlays );
+				renderer.render( sceneOrtho, cameraOrtho );
 
 			}
 
