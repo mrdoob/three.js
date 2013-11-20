@@ -24,7 +24,7 @@
 
 			var stats;
 
-			var camera, scene, renderer;
+			var camera, cameraOverlays, scene, sceneOverlays, renderer;
 
 			var mapC;
 
@@ -35,10 +35,13 @@
 
 			function init() {
 
+				cameraOverlays = new THREE.OrthographicCamera( 0,window.innerWidth, window.innerHeight, 0, -10,10);
+				
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2100 );
 				camera.position.z = 1500;
 
 				scene = new THREE.Scene();
+				sceneOverlays = new THREE.Scene();
 
 				scene.fog = new THREE.Fog( 0x000000, 1500, 2100 );
 
@@ -88,34 +91,35 @@
 				scene.add( group );
 
 				// add 2d-sprites
-
 				var createHUDSprites = function() {
 
 					var scaleX = mapA.image.width;
 					var scaleY = mapA.image.height;
-
+										
 					var materialA1 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.25 } );
 					var materialA2 = new THREE.SpriteMaterial( { map: mapA, opacity: 0.5 } );
 					var materialA3 = new THREE.SpriteMaterial( { map: mapA, opacity: 1 } );
 
-					/*
-
+					// Simulating deprecated option "alignment: THREE.SpriteAlignment.topLeft"
+					var x=100+scaleX/2;
+					var y=window.innerHeight-100-scaleY/2;
+					
 					sprite = new THREE.Sprite( materialA1 );
-					sprite.position.set( 100, 100, 0 );
+					sprite.position.set( x, y, 1 );
 					sprite.scale.set( scaleX, scaleY, 1 );
-					scene.add( sprite );
+					sceneOverlays.add( sprite );
 
 					sprite = new THREE.Sprite( materialA2 );
-					sprite.position.set( 150, 150, 2 );
+					sprite.position.set( x+50, y-50, 2 );
 					sprite.scale.set( scaleX, scaleY, 1 );
-					scene.add( sprite );
+					sceneOverlays.add( sprite );
 
 					sprite = new THREE.Sprite( materialA3 );
-					sprite.position.set( 200, 200, 3 );
+					sprite.position.set( x+100, y-100, 3 );
 					sprite.scale.set( scaleX, scaleY, 1 );
-					scene.add( sprite );
+					sceneOverlays.add( sprite );
 					
-					*/
+					
 
 				}
 
@@ -124,8 +128,10 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0x000000, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.autoClear = false; // To allow render overlay on top of sprited sphere
+				
 				document.body.appendChild( renderer.domElement );
-
+				
 				// stats
 
 				stats = new Stats();
@@ -143,6 +149,8 @@
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
+				cameraOverlays = new THREE.OrthographicCamera( 0,window.innerWidth, window.innerHeight, 0, -10,10);
+				
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -196,6 +204,7 @@
 				time += 0.02;
 
 				renderer.render( scene, camera );
+				renderer.render( sceneOverlays, cameraOverlays );
 
 			}
 
