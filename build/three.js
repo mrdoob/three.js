@@ -15552,8 +15552,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-
 	};
+
+	// compatibility
+
+	this.clearColor = function () {};
+	this.clearDepth = function () {};
+	this.clearStencil = function () {};
 
 	this.render = function ( scene, camera ) {
 
