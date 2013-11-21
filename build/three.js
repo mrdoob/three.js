@@ -24171,13 +24171,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
 
+			if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
+
+				object.geometry.__webglInit = true;
+				object.geometry.addEventListener( 'dispose', onGeometryDispose );
+
+			}
+
 			geometry = object.geometry;
 
-			//START_VEROLD_MOD
-			//If the geometry isn't defined or the webgl data has already been initialized, don't do anything.
-			if ( geometry === undefined || geometry && geometry.__webglInit ) {
-			//END_VEROLD_MOD
-
+			if ( geometry === undefined ) {
+			
 				// fail silently for now
 
 			} else if ( geometry instanceof THREE.BufferGeometry ) {
@@ -24247,16 +24251,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		}
-
-		//START_VEROLD_MOD - moved this code from earlier in function so that __webglInit can
-		//be checked above without it always being true.
-		if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
-
-			object.geometry.__webglInit = true;
-			object.geometry.addEventListener( 'dispose', onGeometryDispose );
-
-		}
-		//END_VEROLD_MOD
 
 		if ( object.__webglActive === undefined ) {
 
