@@ -105,8 +105,7 @@ var list = {
 			[ "CanvasRenderer", "api/renderers/CanvasRenderer" ],
 			[ "WebGLRenderer", "api/renderers/WebGLRenderer" ],
 			[ "WebGLRenderTarget", "api/renderers/WebGLRenderTarget" ],
-			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ],
-			[ "WebGLShaders", "api/renderers/WebGLShaders" ]
+			[ "WebGLRenderTargetCube", "api/renderers/WebGLRenderTargetCube" ]
 		],
 
 		"Renderers / Renderables": [
@@ -115,6 +114,13 @@ var list = {
 			[ "RenderableObject", "api/renderers/renderables/RenderableObject" ],
 			[ "RenderableParticle", "api/renderers/renderables/RenderableParticle" ],
 			[ "RenderableVertex", "api/renderers/renderables/RenderableVertex" ]
+		],
+
+		"Renderers / Shaders": [
+			[ "ShaderChunk", "api/renderers/shaders/ShaderChunk" ],
+			[ "UniformsUtils", "api/renderers/shaders/UniformsUtils" ],
+			[ "UniformsLib", "api/renderers/shaders/UniformsLib" ],
+			[ "ShaderLib", "api/renderers/shaders/ShaderLib" ]
 		],
 
 		"Scenes": [
