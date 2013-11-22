@@ -6,7 +6,7 @@
  * @author mikael emtinger / http://gomo.se/
  */
 
- THREE.ShaderChunk = {
+THREE.ShaderChunk = {
 
 	// FOG
 
