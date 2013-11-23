@@ -247,8 +247,8 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 5000 );
-				camera.position.z = 1500;
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.z = 3000;
 
 				scene = new THREE.Scene();
 
@@ -365,6 +365,8 @@
 
 				controls = new THREE.TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 0.5;
+				controls.minDistance = 500;
+				controls.maxDistance = 6000;
 				controls.addEventListener( 'change', render );
 
 				var button = document.getElementById( 'table' );
@@ -447,6 +449,7 @@
 				requestAnimationFrame( animate );
 
 				TWEEN.update();
+
 				controls.update();
 
 			}
