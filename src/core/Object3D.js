@@ -115,9 +115,9 @@ THREE.Object3D.prototype = {
 
 			this.matrix.multiplyMatrices( matrix, this.matrix );
 
-			this.position.getPositionFromMatrix( this.matrix );
+			this.position.setFromMatrixPosition( this.matrix );
 
-			this.scale.getScaleFromMatrix( this.matrix );
+			this.scale.setFromMatrixScale( this.matrix );
 
 			m1.extractRotation( this.matrix );
 
