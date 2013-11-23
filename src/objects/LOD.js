@@ -61,8 +61,8 @@ THREE.LOD.prototype.update = function () {
 
 		if ( this.objects.length > 1 ) {
 
-			v1.getPositionFromMatrix( camera.matrixWorld );
-			v2.getPositionFromMatrix( this.matrixWorld );
+			v1.setFromMatrixPosition( camera.matrixWorld );
+			v2.setFromMatrixPosition( this.matrixWorld );
 
 			var distance = v1.distanceTo( v2 );
 

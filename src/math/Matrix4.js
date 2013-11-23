@@ -580,7 +580,7 @@ THREE.Matrix4.prototype = {
 
 		return function () {
 
-			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.getPositionFromMatrix( matrix ) instead.' );
+			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
 			var te = this.elements;
 			return v1.set( te[12], te[13], te[14] );
