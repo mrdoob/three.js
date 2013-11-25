@@ -10,9 +10,11 @@
  *  origin - Vector3
  *  length - Number
  *  hex - color in hex value
+ *  headLength - Number
+ *  headWidth - Number
  */
 
-THREE.ArrowHelper = function ( dir, origin, length, hex ) {
+THREE.ArrowHelper = function ( dir, origin, length, hex, headLength, headWidth ) {
 
 	// dir is assumed to be normalized
 
@@ -20,6 +22,8 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 	if ( hex === undefined ) hex = 0xffff00;
 	if ( length === undefined ) length = 1;
+	if ( headLength === undefined ) headLength = 0.2 * length;
+	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 	this.position = origin;
 
@@ -31,15 +35,15 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.05, 0.25, 5, 1 );
-	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.875, 0 ) );
+	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
+	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
 
 	this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: hex } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
 	this.setDirection( dir );
-	this.setLength( length );
+	this.setLength( length, headLength, headWidth );
 
 };
 
@@ -76,9 +80,17 @@ THREE.ArrowHelper.prototype.setDirection = function () {
 
 }();
 
-THREE.ArrowHelper.prototype.setLength = function ( length ) {
+THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
-	this.scale.set( length, length, length );
+	if ( headLength === undefined ) headLength = 0.2 * length;
+	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+
+	this.line.scale.set( 1, length, 1 );
+	this.line.updateMatrix();
+
+	this.cone.scale.set( headWidth, headLength, headWidth );
+	this.cone.position.y = length;
+	this.cone.updateMatrix();
 
 };
 
