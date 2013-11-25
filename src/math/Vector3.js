@@ -535,19 +535,42 @@ THREE.Vector3.prototype = {
 
 	getPositionFromMatrix: function ( m ) {
 
-		this.x = m.elements[12];
-		this.y = m.elements[13];
-		this.z = m.elements[14];
+		console.warn( "DEPRECATED: Vector3\'s .getPositionFromMatrix() has been renamed to .setFromMatrixPosition(). Please update your code." );
 
-		return this;
+		return this.setFromMatrixPosition( m );
 
 	},
 
 	getScaleFromMatrix: function ( m ) {
 
-		var sx = this.set( m.elements[0], m.elements[1], m.elements[2] ).length();
-		var sy = this.set( m.elements[4], m.elements[5], m.elements[6] ).length();
-		var sz = this.set( m.elements[8], m.elements[9], m.elements[10] ).length();
+		console.warn( "DEPRECATED: Vector3\'s .getScaleFromMatrix() has been renamed to .setFromMatrixScale(). Please update your code." );
+
+		return this.setFromMatrixScale( m );
+	},
+
+	getColumnFromMatrix: function ( index, matrix ) {
+
+		console.warn( "DEPRECATED: Vector3\'s .getColumnFromMatrix() has been renamed to .setFromMatrixColumn(). Please update your code." );
+
+		return this.setFromMatrixColumn( index, matrix );
+
+	},
+
+	setFromMatrixPosition: function ( m ) {
+
+		this.x = m.elements[ 12 ];
+		this.y = m.elements[ 13 ];
+		this.z = m.elements[ 14 ];
+
+		return this;
+
+	},
+
+	setFromMatrixScale: function ( m ) {
+
+		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[  2 ] ).length();
+		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[  6 ] ).length();
+		var sz = this.set( m.elements[ 8 ], m.elements[ 9 ], m.elements[ 10 ] ).length();
 
 		this.x = sx;
 		this.y = sy;
@@ -556,7 +579,7 @@ THREE.Vector3.prototype = {
 		return this;
 	},
 
-	getColumnFromMatrix: function ( index, matrix ) {
+	setFromMatrixColumn: function ( index, matrix ) {
 
 		var offset = index * 4;
 

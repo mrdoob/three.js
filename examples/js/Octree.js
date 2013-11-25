@@ -686,7 +686,7 @@
 				} else {
 					
 					this.radius = this.object.boundRadius;
-					this.position.getPositionFromMatrix( this.object.matrixWorld );
+					this.position.setFromMatrixPosition( this.object.matrixWorld );
 					
 				}
 				

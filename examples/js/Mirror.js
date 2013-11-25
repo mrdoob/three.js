@@ -180,8 +180,8 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
 
-	this.mirrorWorldPosition.getPositionFromMatrix( this.matrixWorld );
-	this.cameraWorldPosition.getPositionFromMatrix( this.camera.matrixWorld );
+	this.mirrorWorldPosition.setFromMatrixPosition( this.matrixWorld );
+	this.cameraWorldPosition.setFromMatrixPosition( this.camera.matrixWorld );
 
 	this.rotationMatrix.extractRotation( this.matrixWorld );
 

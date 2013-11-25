@@ -86,7 +86,7 @@ THREE.Projector = function () {
 
 		} else {
 
-			_vector3.getPositionFromMatrix( object.matrixWorld );
+			_vector3.setFromMatrixPosition( object.matrixWorld );
 			_vector3.applyProjection( _viewProjectionMatrix );
 			_object.z = _vector3.z;
 

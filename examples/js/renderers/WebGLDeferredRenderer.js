@@ -333,12 +333,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			lightProxy.scale.set( 1, 1, 1 ).multiplyScalar( distance );
 			uniforms[ "lightRadius" ].value = distance;
 
-			positionVS.getPositionFromMatrix( light.matrixWorld );
+			positionVS.setFromMatrixPosition( light.matrixWorld );
 			positionVS.applyMatrix4( currentCamera.matrixWorldInverse );
 
 			uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
-			lightProxy.position.getPositionFromMatrix( light.matrixWorld );
+			lightProxy.position.setFromMatrixPosition( light.matrixWorld );
 
 		} else {
 
@@ -425,11 +425,11 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var viewMatrix = currentCamera.matrixWorldInverse;
 		var modelMatrix = light.matrixWorld;
 
-		positionVS.getPositionFromMatrix( modelMatrix );
+		positionVS.setFromMatrixPosition( modelMatrix );
 		positionVS.applyMatrix4( viewMatrix );
 
-		directionVS.getPositionFromMatrix( modelMatrix );
-		tempVS.getPositionFromMatrix( light.target.matrixWorld );
+		directionVS.setFromMatrixPosition( modelMatrix );
+		tempVS.setFromMatrixPosition( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
 		directionVS.transformDirection( viewMatrix );
@@ -499,8 +499,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		directionVS.getPositionFromMatrix( light.matrixWorld );
-		tempVS.getPositionFromMatrix( light.target.matrixWorld );
+		directionVS.setFromMatrixPosition( light.matrixWorld );
+		tempVS.setFromMatrixPosition( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
 		directionVS.transformDirection( currentCamera.matrixWorldInverse );
@@ -566,7 +566,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		directionVS.getPositionFromMatrix( light.matrixWorld );
+		directionVS.setFromMatrixPosition( light.matrixWorld );
 		directionVS.normalize();
 		directionVS.transformDirection( currentCamera.matrixWorldInverse );
 
@@ -635,7 +635,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var modelMatrix = light.matrixWorld;
 		var viewMatrix = currentCamera.matrixWorldInverse;
 
-		positionVS.getPositionFromMatrix( modelMatrix );
+		positionVS.setFromMatrixPosition( modelMatrix );
 		positionVS.applyMatrix4( viewMatrix );
 
 		uniforms[ "lightPositionVS" ].value.copy( positionVS );

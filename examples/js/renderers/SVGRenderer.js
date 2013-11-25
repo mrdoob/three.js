@@ -222,7 +222,7 @@ THREE.SVGRenderer = function () {
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld ).normalize();
+				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
 
 				var amount = normal.dot( lightPosition );
 
@@ -236,7 +236,7 @@ THREE.SVGRenderer = function () {
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld );
+				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
 
 				var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
