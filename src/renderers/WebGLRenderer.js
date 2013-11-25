@@ -2925,7 +2925,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( attributes.color >= 0 ) {
 
-				if ( object.geometry.colors.length > 0 || object.geometry.faces.length > 0 ) {
+				if ( object.geometry.colors.length > 0 || object.geometry.faces.length > 0 && geometryGroup.__webglColorBuffer.length > 0) {
 
 					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglColorBuffer );
 					enableAttribute( attributes.color );
