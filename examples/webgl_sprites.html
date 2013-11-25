@@ -40,7 +40,7 @@
 				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
 				camera.position.z = 1500;
 
-				cameraOrtho = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 0, 10 );
+				cameraOrtho = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
 				cameraOrtho.position.z = 10;
 
 				scene = new THREE.Scene();
@@ -149,11 +149,11 @@
 				var imageWidth = material.map.image.width / 2;
 				var imageHeight = material.map.image.height / 2;
 
-				spriteTL.position.set( - width + imageWidth,   height - imageHeight, 0 ); // top left
-				spriteTR.position.set(   width - imageWidth,   height - imageHeight, 0 ); // top right
-				spriteBL.position.set( - width + imageWidth, - height + imageHeight, 0 ); // bottom left
-				spriteBR.position.set(   width - imageWidth, - height + imageHeight, 0 ); // bottom right
-				spriteC.position.set( 0, 0, 0 ); // center
+				spriteTL.position.set( - width + imageWidth,   height - imageHeight, 1 ); // top left
+				spriteTR.position.set(   width - imageWidth,   height - imageHeight, 1 ); // top right
+				spriteBL.position.set( - width + imageWidth, - height + imageHeight, 1 ); // bottom left
+				spriteBR.position.set(   width - imageWidth, - height + imageHeight, 1 ); // bottom right
+				spriteC.position.set( 0, 0, 1 ); // center
 
 			};
 
