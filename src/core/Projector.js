@@ -391,7 +391,7 @@ THREE.Projector = function () {
 
 				_vector4.z *= invW;
 
-				if ( _vector4.z > -1 && _vector4.z < 1 ) {
+				if ( _vector4.z >= -1 && _vector4.z <= 1 ) {
 
 					_sprite = getNextSpriteInPool();
 					_sprite.id = object.id;
