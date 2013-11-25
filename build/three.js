@@ -1965,19 +1965,42 @@ THREE.Vector3.prototype = {
 
 	getPositionFromMatrix: function ( m ) {
 
-		this.x = m.elements[12];
-		this.y = m.elements[13];
-		this.z = m.elements[14];
+		console.warn( "DEPRECATED: Vector3\'s .getPositionFromMatrix() has been renamed to .setFromMatrixPosition(). Please update your code." );
 
-		return this;
+		return this.setFromMatrixPosition( m );
 
 	},
 
 	getScaleFromMatrix: function ( m ) {
 
-		var sx = this.set( m.elements[0], m.elements[1], m.elements[2] ).length();
-		var sy = this.set( m.elements[4], m.elements[5], m.elements[6] ).length();
-		var sz = this.set( m.elements[8], m.elements[9], m.elements[10] ).length();
+		console.warn( "DEPRECATED: Vector3\'s .getScaleFromMatrix() has been renamed to .setFromMatrixScale(). Please update your code." );
+
+		return this.setFromMatrixScale( m );
+	},
+
+	getColumnFromMatrix: function ( index, matrix ) {
+
+		console.warn( "DEPRECATED: Vector3\'s .getColumnFromMatrix() has been renamed to .setFromMatrixColumn(). Please update your code." );
+
+		return this.setFromMatrixColumn( index, matrix );
+
+	},
+
+	setFromMatrixPosition: function ( m ) {
+
+		this.x = m.elements[ 12 ];
+		this.y = m.elements[ 13 ];
+		this.z = m.elements[ 14 ];
+
+		return this;
+
+	},
+
+	setFromMatrixScale: function ( m ) {
+
+		var sx = this.set( m.elements[ 0 ], m.elements[ 1 ], m.elements[  2 ] ).length();
+		var sy = this.set( m.elements[ 4 ], m.elements[ 5 ], m.elements[  6 ] ).length();
+		var sz = this.set( m.elements[ 8 ], m.elements[ 9 ], m.elements[ 10 ] ).length();
 
 		this.x = sx;
 		this.y = sy;
@@ -1986,7 +2009,7 @@ THREE.Vector3.prototype = {
 		return this;
 	},
 
-	getColumnFromMatrix: function ( index, matrix ) {
+	setFromMatrixColumn: function ( index, matrix ) {
 
 		var offset = index * 4;
 
@@ -4627,7 +4650,7 @@ THREE.Matrix4.prototype = {
 
 		return function () {
 
-			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.getPositionFromMatrix( matrix ) instead.' );
+			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
 			var te = this.elements;
 			return v1.set( te[12], te[13], te[14] );
@@ -6806,7 +6829,7 @@ THREE.EventDispatcher.prototype = {
 
 		if ( object instanceof THREE.Sprite ) {
 
-			matrixPosition.getPositionFromMatrix( object.matrixWorld );
+			matrixPosition.setFromMatrixPosition( object.matrixWorld );
 			var distance = raycaster.ray.distanceToPoint( matrixPosition );
 
 			if ( distance > object.scale.x ) {
@@ -6826,7 +6849,7 @@ THREE.EventDispatcher.prototype = {
 
 		} else if ( object instanceof THREE.LOD ) {
 
-			matrixPosition.getPositionFromMatrix( object.matrixWorld );
+			matrixPosition.setFromMatrixPosition( object.matrixWorld );
 			var distance = raycaster.ray.origin.distanceTo( matrixPosition );
 
 			intersectObject( object.getObjectForDistance( distance ), raycaster, intersects );
@@ -7305,9 +7328,9 @@ THREE.Object3D.prototype = {
 
 			this.matrix.multiplyMatrices( matrix, this.matrix );
 
-			this.position.getPositionFromMatrix( this.matrix );
+			this.position.setFromMatrixPosition( this.matrix );
 
-			this.scale.getScaleFromMatrix( this.matrix );
+			this.scale.setFromMatrixScale( this.matrix );
 
 			m1.extractRotation( this.matrix );
 
@@ -7849,7 +7872,7 @@ THREE.Projector = function () {
 
 		} else {
 
-			_vector3.getPositionFromMatrix( object.matrixWorld );
+			_vector3.setFromMatrixPosition( object.matrixWorld );
 			_vector3.applyProjection( _viewProjectionMatrix );
 			_object.z = _vector3.z;
 
@@ -8145,34 +8168,30 @@ THREE.Projector = function () {
 
 			_modelMatrix = object.matrixWorld;
 
-			if ( object instanceof THREE.Sprite ) {
+			_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
+			_vector4.applyMatrix4( _viewProjectionMatrix );
 
-				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
-				_vector4.applyMatrix4( _viewProjectionMatrix );
+			var invW = 1 / _vector4.w;
 
-				var invW = 1 / _vector4.w;
+			_vector4.z *= invW;
 
-				_vector4.z *= invW;
+			if ( _vector4.z >= -1 && _vector4.z <= 1 ) {
 
-				if ( _vector4.z > -1 && _vector4.z < 1 ) {
+				_sprite = getNextSpriteInPool();
+				_sprite.id = object.id;
+				_sprite.x = _vector4.x * invW;
+				_sprite.y = _vector4.y * invW;
+				_sprite.z = _vector4.z;
+				_sprite.object = object;
 
-					_sprite = getNextSpriteInPool();
-					_sprite.id = object.id;
-					_sprite.x = _vector4.x * invW;
-					_sprite.y = _vector4.y * invW;
-					_sprite.z = _vector4.z;
-					_sprite.object = object;
+				_sprite.rotation = object.rotation;
 
-					_sprite.rotation = object.rotation;
+				_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
+				_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
 
-					_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
-					_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
+				_sprite.material = object.material;
 
-					_sprite.material = object.material;
-
-					_renderData.elements.push( _sprite );
-
-				}
+				_renderData.elements.push( _sprite );
 
 			}
 
@@ -15055,8 +15074,8 @@ THREE.LOD.prototype.update = function () {
 
 		if ( this.objects.length > 1 ) {
 
-			v1.getPositionFromMatrix( camera.matrixWorld );
-			v2.getPositionFromMatrix( this.matrixWorld );
+			v1.setFromMatrixPosition( camera.matrixWorld );
+			v2.setFromMatrixPosition( this.matrixWorld );
 
 			var distance = v1.distanceTo( v2 );
 
@@ -15722,7 +15741,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld ).normalize();
+				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
 
 				var amount = normal.dot( lightPosition );
 
@@ -15734,7 +15753,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld );
+				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
 
 				var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
@@ -15762,8 +15781,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var scaleX = element.scale.x * _canvasWidthHalf;
 		var scaleY = element.scale.y * _canvasHeightHalf;
 
-		_elemBox.min.set( v1.x - ( scaleX * 0.5 ), v1.y - ( scaleY * 0.5 ) );
-		_elemBox.max.set( v1.x + ( scaleX * 0.5 ), v1.y + ( scaleY * 0.5 ) );
+		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
+		_elemBox.min.set( v1.x - dist, v1.y - dist );
+		_elemBox.max.set( v1.x + dist, v1.y + dist );
 
 		if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
@@ -15781,7 +15801,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( - material.rotation );
+				_context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
 
 				_context.drawImage( bitmap, 0, 0, bitmap.width, bitmap.height, - 0.5, - 0.5, 1, 1 );
@@ -15793,8 +15813,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( - element.rotation );
-				_context.scale( scaleX, scaleY );
+				_context.rotate( material.rotation );
+				_context.scale( scaleX, - scaleY );
 				_context.fillRect( - 0.5, - 0.5, 1, 1 );
 				_context.restore();
 
@@ -16384,6 +16404,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 };
 
 /**
+ * Shader chunks for WebLG Shader library
+ * 
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
  * @author mikael emtinger / http://gomo.se/
@@ -18157,6 +18179,9 @@ THREE.ShaderChunk = {
 
 
 };
+/**
+ * Uniform Utilities
+ */
 
 THREE.UniformsUtils = {
 
@@ -18220,6 +18245,9 @@ THREE.UniformsUtils = {
 	}
 
 };
+/**
+ * Uniforms library for shared webgl shaders
+ */
 
 THREE.UniformsLib = {
 
@@ -18319,6 +18347,14 @@ THREE.UniformsLib = {
 	}
 
 };
+/**
+ * Webgl Shader Library for three.js
+ *
+ * @author alteredq / http://alteredqualia.com/
+ * @author mrdoob / http://mrdoob.com/
+ * @author mikael emtinger / http://gomo.se/
+ */
+
 
 THREE.ShaderLib = {
 
@@ -22875,7 +22911,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						} else {
 
-							_vector3.getPositionFromMatrix( object.matrixWorld );
+							_vector3.setFromMatrixPosition( object.matrixWorld );
 							_vector3.applyProjection( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
@@ -24003,7 +24039,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.cameraPosition !== null ) {
 
-					_vector3.getPositionFromMatrix( camera.matrixWorld );
+					_vector3.setFromMatrixPosition( camera.matrixWorld );
 					_gl.uniform3f( p_uniforms.cameraPosition, _vector3.x, _vector3.y, _vector3.z );
 
 				}
@@ -24607,8 +24643,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
-				_direction.getPositionFromMatrix( light.matrixWorld );
-				_vector3.getPositionFromMatrix( light.target.matrixWorld );
+				_direction.setFromMatrixPosition( light.matrixWorld );
+				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.normalize();
 
@@ -24653,7 +24689,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_vector3.getPositionFromMatrix( light.matrixWorld );
+				_vector3.setFromMatrixPosition( light.matrixWorld );
 
 				pointPositions[ pointOffset ]     = _vector3.x;
 				pointPositions[ pointOffset + 1 ] = _vector3.y;
@@ -24681,7 +24717,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_vector3.getPositionFromMatrix( light.matrixWorld );
+				_vector3.setFromMatrixPosition( light.matrixWorld );
 
 				spotPositions[ spotOffset ]     = _vector3.x;
 				spotPositions[ spotOffset + 1 ] = _vector3.y;
@@ -24690,7 +24726,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				spotDistances[ spotLength ] = distance;
 
 				_direction.copy( _vector3 );
-				_vector3.getPositionFromMatrix( light.target.matrixWorld );
+				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.normalize();
 
@@ -24709,7 +24745,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
-				_direction.getPositionFromMatrix( light.matrixWorld );
+				_direction.setFromMatrixPosition( light.matrixWorld );
 				_direction.normalize();
 
 				// skip lights with undefined direction
@@ -34405,8 +34441,8 @@ THREE.DirectionalLightHelper.prototype.update = function () {
 
 	return function () {
 
-		v1.getPositionFromMatrix( this.light.matrixWorld );
-		v2.getPositionFromMatrix( this.light.target.matrixWorld );
+		v1.setFromMatrixPosition( this.light.matrixWorld );
+		v2.setFromMatrixPosition( this.light.target.matrixWorld );
 		v3.subVectors( v2, v1 );
 
 		this.lightPlane.lookAt( v3 );
@@ -34589,7 +34625,7 @@ THREE.HemisphereLightHelper.prototype.update = function () {
 		this.colors[ 0 ].copy( this.light.color ).multiplyScalar( this.light.intensity );
 		this.colors[ 1 ].copy( this.light.groundColor ).multiplyScalar( this.light.intensity );
 
-		this.lightSphere.lookAt( vector.getPositionFromMatrix( this.light.matrixWorld ).negate() );
+		this.lightSphere.lookAt( vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 		this.lightSphere.geometry.colorsNeedUpdate = true;
 
 	}
@@ -34719,8 +34755,8 @@ THREE.SpotLightHelper.prototype.update = function () {
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		vector.getPositionFromMatrix( this.light.matrixWorld );
-		vector2.getPositionFromMatrix( this.light.target.matrixWorld );
+		vector.setFromMatrixPosition( this.light.matrixWorld );
+		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
 
 		this.cone.lookAt( vector2.sub( vector ) );
 
@@ -35893,8 +35929,8 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
-			shadowCamera.position.getPositionFromMatrix( light.matrixWorld );
-			_matrixPosition.getPositionFromMatrix( light.target.matrixWorld );
+			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
+			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
 			shadowCamera.updateMatrixWorld();
 
