@@ -374,6 +374,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.clearColor = function () {
+
+		_gl.clear( _gl.COLOR_BUFFER_BIT );
+
+	};
+
+	this.clearDepth = function () {
+
+		_gl.clear( _gl.DEPTH_BUFFER_BIT );
+
+	};
+
+	this.clearStencil = function () {
+
+		_gl.clear( _gl.STENCIL_BUFFER_BIT );
+
+	};
+
 	this.clearTarget = function ( renderTarget, color, depth, stencil ) {
 
 		this.setRenderTarget( renderTarget );
