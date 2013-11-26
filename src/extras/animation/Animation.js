@@ -155,7 +155,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 			nextKey = animationCache.nextKey[ type ];
 
 			// switch keys?
-			if(!nextKey) debugger;
+			
 			if ( nextKey.time <= unloopedCurrentTime ) {
 
 				// did we loop?
@@ -168,7 +168,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 						nextKey = this.getNextKeyWith( type, h, 1 );
 
 						//if(nextKey.index < prevKey.index ) then we have wrapped over the end, and nextKey.time < currentTime will loop forever
-						while( nextKey && nextKey.time < currentTime  && nextKey.index > prevKey.index) {
+						while( nextKey !== null && nextKey.time < currentTime  && nextKey.index > prevKey.index) {
 
 							prevKey = nextKey;
 							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
