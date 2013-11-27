@@ -159,12 +159,12 @@
 		Sets this vector to cross product of *a* and *b*.
 		</div>
 
-		<h3>.getPositionFromMatrix( [page:Matrix4 m] ) [page:Vector3 this]</h3>
+		<h3>.setFromMatrixPosition( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector extracting position from matrix transform.
 		</div>
 
-		<h3>.getScaleFromMatrix( [page:Matrix4 m] ) [page:Vector3 this]</h3>
+		<h3>.setFromMatrixScale( [page:Matrix4 m] ) [page:Vector3 this]</h3>
 		<div>
 		Sets this vector extracting scale from matrix transform.
 		</div>
@@ -321,7 +321,7 @@
 		Returns the angle between this vector and vector v in radians.
 		</div>
 
-		<h3>.getColumnFromMatrix([page:Integer index], [page:Matrix4 matrix]) [page:Vector3 this]</h3>
+		<h3>.setFromMatrixColumn([page:Integer index], [page:Matrix4 matrix]) [page:Vector3 this]</h3>
 		<div>
 		index -- 0, 1, 2, or 3 <br />
 		matrix -- [page:Matrix4]

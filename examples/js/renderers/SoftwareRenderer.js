@@ -38,6 +38,10 @@ THREE.SoftwareRenderer = function () {
 
 	var projector = new THREE.Projector();
 
+	var vector1 = new THREE.Vector3();
+	var vector2 = new THREE.Vector3();
+	var vector3 = new THREE.Vector3();
+
 	this.domElement = canvas;
 
 	this.autoClear = true;
@@ -132,7 +136,46 @@ THREE.SoftwareRenderer = function () {
 					element.v2.positionScreen,
 					element.v3.positionScreen,
 					shader, element, material
-				)
+				);
+
+			} else if ( element instanceof THREE.RenderableSprite ) {
+
+				var scaleX = element.scale.x * 0.5;
+				var scaleY = element.scale.y * 0.5;
+
+				vector1.copy( element );
+				vector1.x -= scaleX;
+				vector1.y += scaleY;
+
+				vector2.copy( element );
+				vector2.x -= scaleX;
+				vector2.y -= scaleY;
+
+				vector3.copy( element );
+				vector3.x += scaleX;
+				vector3.y += scaleY;
+
+				drawTriangle(
+					vector1, vector2, vector3,
+					shader, element, material
+				);
+
+				vector1.copy( element );
+				vector1.x += scaleX;
+				vector1.y += scaleY;
+
+				vector2.copy( element );
+				vector2.x -= scaleX;
+				vector2.y -= scaleY;
+
+				vector3.copy( element );
+				vector3.x += scaleX;
+				vector3.y -= scaleY;
+
+				drawTriangle(
+					vector1, vector2, vector3,
+					shader, element, material
+				);
 
 			}
 
@@ -179,7 +222,8 @@ THREE.SoftwareRenderer = function () {
 
 			if ( material instanceof THREE.MeshBasicMaterial ||
 			     material instanceof THREE.MeshLambertMaterial ||
-			     material instanceof THREE.MeshPhongMaterial ) {
+			     material instanceof THREE.MeshPhongMaterial ||
+			     material instanceof THREE.SpriteMaterial ) {
 
 				var string;
 

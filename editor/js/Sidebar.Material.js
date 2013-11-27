@@ -14,6 +14,7 @@ Sidebar.Material = function ( editor ) {
 		'MeshPhongMaterial': THREE.MeshPhongMaterial,
 		'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
 		'ShaderMaterial': THREE.ShaderMaterial,
+		'SpriteMaterial': THREE.SpriteMaterial,
 		'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
 		'Material': THREE.Material
 
@@ -69,7 +70,8 @@ Sidebar.Material = function ( editor ) {
 		'MeshFaceMaterial': 'MeshFaceMaterial',
 		'MeshLambertMaterial': 'MeshLambertMaterial',
 		'MeshNormalMaterial': 'MeshNormalMaterial',
-		'MeshPhongMaterial': 'MeshPhongMaterial'
+		'MeshPhongMaterial': 'MeshPhongMaterial',
+		'SpriteMaterial': 'SpriteMaterial'
 
 	} ).setWidth( '150px' ).setColor( '#444' ).setFontSize( '12px' ).onChange( update );
 
@@ -309,6 +311,7 @@ Sidebar.Material = function ( editor ) {
 		var textureWarning = false;
 		var objectHasUvs = false;
 
+		if ( object instanceof THREE.Sprite ) objectHasUvs = true;
 		if ( geometry instanceof THREE.Geometry && geometry.faceVertexUvs[ 0 ].length > 0 ) objectHasUvs = true;
 		if ( geometry instanceof THREE.BufferGeometry && geometry.attributes.uv !== undefined ) objectHasUvs = true;
 
@@ -373,8 +376,12 @@ Sidebar.Material = function ( editor ) {
 
 				if ( objectHasUvs )  {
 
-					geometry.buffersNeedUpdate = true;
-					geometry.uvsNeedUpdate = true;
+					if ( geometry !== undefined ) {
+
+						geometry.buffersNeedUpdate = true;
+						geometry.uvsNeedUpdate = true;
+
+					}
 
 					material.map = mapEnabled ? materialMap.getValue() : null;
 					material.needsUpdate = true;
@@ -562,28 +569,17 @@ Sidebar.Material = function ( editor ) {
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
 			'wireframe': materialWireframeRow
-
 		};
 
-		var object = editor.selected;
+		var material = editor.selected.material;
 
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( object.material[ property ] !== undefined ? '' : 'none' );
+			properties[ property ].setDisplay( material[ property ] !== undefined ? '' : 'none' );
 
 		}
 
 	};
-
-	function getMaterialInstanceName( material ) {
-
-		for ( var key in materialClasses ) {
-
-			if ( material instanceof materialClasses[ key ] ) return key;
-
-		}
-
-	}
 
 	// events
 
@@ -607,7 +603,7 @@ Sidebar.Material = function ( editor ) {
 
 			}
 
-			materialClass.setValue( getMaterialInstanceName( material ) );
+			materialClass.setValue( editor.getMaterialType( material ) );
 
 			if ( material.color !== undefined ) {
 

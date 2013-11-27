@@ -248,8 +248,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-
 	};
+
+	// compatibility
+
+	this.clearColor = function () {};
+	this.clearDepth = function () {};
+	this.clearStencil = function () {};
 
 	this.render = function ( scene, camera ) {
 
@@ -413,7 +418,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld ).normalize();
+				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
 
 				var amount = normal.dot( lightPosition );
 
@@ -425,7 +430,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( light instanceof THREE.PointLight ) {
 
-				var lightPosition = _vector3.getPositionFromMatrix( light.matrixWorld );
+				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld );
 
 				var amount = normal.dot( _vector3.subVectors( lightPosition, position ).normalize() );
 
@@ -453,8 +458,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var scaleX = element.scale.x * _canvasWidthHalf;
 		var scaleY = element.scale.y * _canvasHeightHalf;
 
-		_elemBox.min.set( v1.x - ( scaleX * 0.5 ), v1.y - ( scaleY * 0.5 ) );
-		_elemBox.max.set( v1.x + ( scaleX * 0.5 ), v1.y + ( scaleY * 0.5 ) );
+		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
+		_elemBox.min.set( v1.x - dist, v1.y - dist );
+		_elemBox.max.set( v1.x + dist, v1.y + dist );
 
 		if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
 
@@ -466,13 +472,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
-			if ( material.map.image !== undefined ) {
+			if ( material.map !== null ) {
 
 				var bitmap = material.map.image;
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( - material.rotation );
+				_context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
 
 				_context.drawImage( bitmap, 0, 0, bitmap.width, bitmap.height, - 0.5, - 0.5, 1, 1 );
@@ -484,8 +490,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( - element.rotation );
-				_context.scale( scaleX, scaleY );
+				_context.rotate( material.rotation );
+				_context.scale( scaleX, - scaleY );
 				_context.fillRect( - 0.5, - 0.5, 1, 1 );
 				_context.restore();
 
@@ -618,7 +624,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			}
 
-			if ( material.wireframe === false && material.shading == THREE.SmoothShading && element.vertexNormalsLength == 3 ) {
+			if ( material.wireframe === false && material.shading === THREE.SmoothShading && element.vertexNormalsLength === 3 ) {
 
 				_color1.copy( _ambientLight );
 				_color2.copy( _ambientLight );
@@ -681,7 +687,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
-				}/* else if ( material.envMap.mapping == THREE.SphericalRefractionMapping ) {
+				}/* else if ( material.envMap.mapping === THREE.SphericalRefractionMapping ) {
 
 
 
@@ -722,7 +728,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			var normal;
 
-			if ( material.shading == THREE.FlatShading ) {
+			if ( material.shading === THREE.FlatShading ) {
 
 				normal = element.normalModelView;
 
@@ -732,7 +738,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
 					: fillPath( _color );
 
-			} else if ( material.shading == THREE.SmoothShading ) {
+			} else if ( material.shading === THREE.SmoothShading ) {
 
 				normal = element.vertexNormalsModelView[ uv1 ];
 				_color1.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
@@ -789,12 +795,12 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-		if ( texture instanceof THREE.DataTexture || texture.image === undefined || texture.image.width == 0 ) return;
+		if ( texture instanceof THREE.DataTexture || texture.image === undefined || texture.image.width === 0 ) return;
 
 		if ( texture.needsUpdate === true ) {
 
-			var repeatX = texture.wrapS == THREE.RepeatWrapping;
-			var repeatY = texture.wrapT == THREE.RepeatWrapping;
+			var repeatX = texture.wrapS === THREE.RepeatWrapping;
+			var repeatY = texture.wrapT === THREE.RepeatWrapping;
 
 			_patterns[ texture.id ] = _context.createPattern(
 				texture.image, repeatX === true && repeatY === true

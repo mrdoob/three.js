@@ -38,7 +38,7 @@
 
 		if ( object instanceof THREE.Sprite ) {
 
-			matrixPosition.getPositionFromMatrix( object.matrixWorld );
+			matrixPosition.setFromMatrixPosition( object.matrixWorld );
 			var distance = raycaster.ray.distanceToPoint( matrixPosition );
 
 			if ( distance > object.scale.x ) {
@@ -58,7 +58,7 @@
 
 		} else if ( object instanceof THREE.LOD ) {
 
-			matrixPosition.getPositionFromMatrix( object.matrixWorld );
+			matrixPosition.setFromMatrixPosition( object.matrixWorld );
 			var distance = raycaster.ray.origin.distanceTo( matrixPosition );
 
 			intersectObject( object.getObjectForDistance( distance ), raycaster, intersects );

@@ -438,7 +438,7 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 
 			} else {
 
-				vector3.getPositionFromMatrix( object.matrixWorld );
+				vector3.setFromMatrixPosition( object.matrixWorld );
 				vector3.applyProjection( cameraViewProjectionMatrix );
 
 				object.z = vector3.z;

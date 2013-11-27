@@ -419,6 +419,24 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	this.clearColor = function () {
+
+		_gl.clear( _gl.COLOR_BUFFER_BIT );
+
+	};
+
+	this.clearDepth = function () {
+
+		_gl.clear( _gl.DEPTH_BUFFER_BIT );
+
+	};
+
+	this.clearStencil = function () {
+
+		_gl.clear( _gl.STENCIL_BUFFER_BIT );
+
+	};
+
 	this.clearTarget = function ( renderTarget, color, depth, stencil ) {
 
 		this.setRenderTarget( renderTarget );
@@ -3354,7 +3372,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						} else {
 
-							_vector3.getPositionFromMatrix( object.matrixWorld );
+							_vector3.setFromMatrixPosition( object.matrixWorld );
 							_vector3.applyProjection( _projScreenMatrix );
 
 							webglObject.z = _vector3.z;
@@ -4661,7 +4679,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( p_uniforms.cameraPosition !== null ) {
 
-					_vector3.getPositionFromMatrix( camera.matrixWorld );
+					_vector3.setFromMatrixPosition( camera.matrixWorld );
 					_gl.uniform3f( p_uniforms.cameraPosition, _vector3.x, _vector3.y, _vector3.z );
 
 				}
@@ -5280,8 +5298,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
-				_direction.getPositionFromMatrix( light.matrixWorld );
-				_vector3.getPositionFromMatrix( light.target.matrixWorld );
+				_direction.setFromMatrixPosition( light.matrixWorld );
+				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.normalize();
 
@@ -5326,7 +5344,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_vector3.getPositionFromMatrix( light.matrixWorld );
+				_vector3.setFromMatrixPosition( light.matrixWorld );
 
 				pointPositions[ pointOffset ]     = _vector3.x;
 				pointPositions[ pointOffset + 1 ] = _vector3.y;
@@ -5354,7 +5372,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				_vector3.getPositionFromMatrix( light.matrixWorld );
+				_vector3.setFromMatrixPosition( light.matrixWorld );
 
 				spotPositions[ spotOffset ]     = _vector3.x;
 				spotPositions[ spotOffset + 1 ] = _vector3.y;
@@ -5363,7 +5381,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				spotDistances[ spotLength ] = distance;
 
 				_direction.copy( _vector3 );
-				_vector3.getPositionFromMatrix( light.target.matrixWorld );
+				_vector3.setFromMatrixPosition( light.target.matrixWorld );
 				_direction.sub( _vector3 );
 				_direction.normalize();
 
@@ -5382,7 +5400,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( ! light.visible ) continue;
 
-				_direction.getPositionFromMatrix( light.matrixWorld );
+				_direction.setFromMatrixPosition( light.matrixWorld );
 				_direction.normalize();
 
 				// skip lights with undefined direction

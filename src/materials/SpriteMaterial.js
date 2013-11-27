@@ -24,10 +24,8 @@ THREE.SpriteMaterial = function ( parameters ) {
 	// defaults
 
 	this.color = new THREE.Color( 0xffffff );
-	this.map = new THREE.Texture();
+	this.map = null;
 
-	this.depthTest = true;
-	this.sizeAttenuation = true;
 	this.rotation = 0;
 
 	this.fog = false;

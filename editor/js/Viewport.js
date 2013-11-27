@@ -76,8 +76,8 @@ var Viewport = function ( editor ) {
 	var getIntersects = function ( event, object ) {
 
 		var rect = container.dom.getBoundingClientRect();
-		x = (event.clientX - rect.left) / rect.width;
-		y = (event.clientY - rect.top) / rect.height;
+		x = ( event.clientX - rect.left ) / rect.width;
+		y = ( event.clientY - rect.top ) / rect.height;
 		var vector = new THREE.Vector3( ( x ) * 2 - 1, - ( y ) * 2 + 1, 0.5 );
 
 		projector.unprojectVector( vector, camera );
@@ -186,14 +186,16 @@ var Viewport = function ( editor ) {
 
 			case 'css/light.css':
 				grid.setColors( 0x444444, 0x888888 );
-				renderer.setClearColor( 0xaaaaaa );
+				clearColor = 0xaaaaaa;
 				break;
 			case 'css/dark.css':
 				grid.setColors( 0xbbbbbb, 0x888888 );
-				renderer.setClearColor( 0x333333 );
+				clearColor = 0x333333;
 				break;
 
 		}
+		
+		renderer.setClearColor( clearColor );
 
 		render();
 
@@ -224,6 +226,7 @@ var Viewport = function ( editor ) {
 		renderer = new THREE[ type ]( { antialias: true } );
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
+		renderer.setClearColor( clearColor );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
@@ -434,7 +437,7 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var renderer;
+	var clearColor, renderer;
 
 	if ( editor.config.getKey( 'renderer' ) !== undefined ) {
 

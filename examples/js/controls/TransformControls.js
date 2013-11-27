@@ -819,11 +819,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( scope.object === undefined ) return;
 
 		scope.object.updateMatrixWorld();
-		worldPosition.getPositionFromMatrix( scope.object.matrixWorld );
+		worldPosition.setFromMatrixPosition( scope.object.matrixWorld );
 		worldRotation.setFromRotationMatrix( tempMatrix.extractRotation( scope.object.matrixWorld ) );
 
 		camera.updateMatrixWorld();
-		camPosition.getPositionFromMatrix( camera.matrixWorld );
+		camPosition.setFromMatrixPosition( camera.matrixWorld );
 		camRotation.setFromRotationMatrix( tempMatrix.extractRotation( camera.matrixWorld ) );
 
 		scale = worldPosition.distanceTo( camPosition ) / 6 * scope.size;
@@ -900,7 +900,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 				worldRotationMatrix.extractRotation( scope.object.matrixWorld );
 
 				parentRotationMatrix.extractRotation( scope.object.parent.matrixWorld );
-				parentScale.getScaleFromMatrix( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
+				parentScale.setFromMatrixScale( tempMatrix.getInverse( scope.object.parent.matrixWorld ) );
 
 				offset.copy( planeIntersect.point );
 

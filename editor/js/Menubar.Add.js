@@ -206,6 +206,26 @@ Menubar.Add = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
+	// add sprite
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Sprite' );
+	option.onClick( function () {
+
+		var sprite = new THREE.Sprite( new THREE.SpriteMaterial() );
+		sprite.name = 'Sprite ' + ( ++ meshCount );
+
+		editor.addObject( sprite );
+		editor.select( sprite );
+
+	} );
+	options.add( option );
+
+	// divider
+
+	options.add( new UI.HorizontalRule() );
+
 	// add point light
 
 	var option = new UI.Panel();

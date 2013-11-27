@@ -198,8 +198,8 @@ THREE.ShadowMapPlugin = function () {
 			shadowMatrix = light.shadowMatrix;
 			shadowCamera = light.shadowCamera;
 
-			shadowCamera.position.getPositionFromMatrix( light.matrixWorld );
-			_matrixPosition.getPositionFromMatrix( light.target.matrixWorld );
+			shadowCamera.position.setFromMatrixPosition( light.matrixWorld );
+			_matrixPosition.setFromMatrixPosition( light.target.matrixWorld );
 			shadowCamera.lookAt( _matrixPosition );
 			shadowCamera.updateMatrixWorld();
 
