@@ -2,9 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.OBJLoader = function ( manager ) {
+THREE.OBJLoader = function ( manager, center ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	this.center = ( center !== undefined ) ? 1 : 0;
 
 };
 
@@ -28,6 +29,8 @@ THREE.OBJLoader.prototype = {
 
 	parse: function ( text ) {
 
+		var scope = this;
+	
 		function vector( x, y, z ) {
 
 			return new THREE.Vector3( x, y, z );
@@ -299,6 +302,10 @@ THREE.OBJLoader.prototype = {
 			geometry.computeCentroids();
 			geometry.computeFaceNormals();
 			geometry.computeBoundingSphere();
+			
+			if ( scope.center === 1 ) {
+				THREE.GeometryUtils.center( geometry );
+			}
 
 		}
 		
