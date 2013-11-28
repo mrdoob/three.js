@@ -54,7 +54,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -64,23 +64,16 @@
 
 				// earth
 
-				var earthTexture = new THREE.Texture();
-				var loader = new THREE.ImageLoader();
+				var loader = new THREE.TextureLoader();
+				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg', function ( texture ) {
 
-				loader.addEventListener( 'load', function ( event ) {
+					var geometry = new THREE.SphereGeometry( 200, 20, 20 );
 
-					earthTexture.image = event.content;
-					earthTexture.needsUpdate = true;
+					var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+					var mesh = new THREE.Mesh( geometry, material );
+					group.add( mesh );
 
 				} );
-
-				loader.load( 'textures/land_ocean_ice_cloud_2048.jpg' );
-
-				var geometry = new THREE.SphereGeometry( 200, 20, 20 );
-				var material = new THREE.MeshBasicMaterial( { map: earthTexture, overdraw: true } );
-
-				var mesh = new THREE.Mesh( geometry, material );
-				group.add( mesh );
 
 				// shadow
 
@@ -89,7 +82,14 @@
 				canvas.height = 128;
 
 				var context = canvas.getContext( '2d' );
-				var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+				var gradient = context.createRadialGradient(
+					canvas.width / 2,
+					canvas.height / 2,
+					0,
+					canvas.width / 2,
+					canvas.height / 2,
+					canvas.width / 2
+				);
 				gradient.addColorStop( 0.1, 'rgba(210,210,210,1)' );
 				gradient.addColorStop( 1, 'rgba(255,255,255,1)' );
 

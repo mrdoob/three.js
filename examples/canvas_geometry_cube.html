@@ -62,13 +62,15 @@
 
 				var geometry = new THREE.CubeGeometry( 200, 200, 200 );
 
-				for ( var i = 0; i < geometry.faces.length; i ++ ) {
+				for ( var i = 0; i < geometry.faces.length; i += 2 ) {
 
-					geometry.faces[ i ].color.setHex( Math.random() * 0xffffff );
+					var hex = Math.random() * 0xffffff;
+					geometry.faces[ i ].color.setHex( hex );
+					geometry.faces[ i + 1 ].color.setHex( hex );
 
 				}
 
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.FaceColors, overdraw: 0.5 } );
 
 				cube = new THREE.Mesh( geometry, material );
 				cube.position.y = 150;
@@ -79,7 +81,7 @@
 				var geometry = new THREE.PlaneGeometry( 200, 200 );
 				geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0 } );
+				var material = new THREE.MeshBasicMaterial( { color: 0xe0e0e0, overdraw: 0.5 } );
 
 				plane = new THREE.Mesh( geometry, material );
 				scene.add( plane );

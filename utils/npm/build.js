@@ -84,9 +84,14 @@ var buildModule = function ( name, version ) {
 	copyFile( readmeFileName, outputReadmeFileName );
 }
 
-// TODO: make this non-Windows specific.
-var cmdExe = "cmd.exe";
-var args = [ "/c", "build_all.bat" ];
+var cmdExe, args;
+if (process.platform === 'win32' || process.platform === 'win64') {
+	cmdExe = "cmd.exe";
+	args = [ "/c", "build_all.bat" ];
+} else {
+	cmdExe = './build_all.sh';
+	args = [];
+}
 var opts = { "cwd": "../build" };
 var buildAll = cp.spawn( cmdExe, args, opts );
 

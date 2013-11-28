@@ -41,12 +41,6 @@ THREE.Animation.prototype.play = function ( loop, startTimeMS ) {
 
 			object = this.hierarchy[ h ];
 
-			if ( this.interpolationType !== THREE.AnimationHandler.CATMULLROM_FORWARD ) {
-
-				object.useQuaternion = true;
-
-			}
-
 			object.matrixAutoUpdate = true;
 
 			if ( object.animationCache === undefined ) {

@@ -27,8 +27,8 @@ Depends on where blender.app is. Assuming you copied it to your Applications fol
 
 By default, this should look like:
 
-    /home/USERNAME/.blender/2.6X/scripts/addons
+    /home/USERNAME/.config/blender/2.6X/scripts/addons
 
 ## Usage
 
-Use the regular Import and Export menu within Blender, select `Three.js (js)`.
+Activate the Import-Export addon under "User Preferences" > "Addons" and then use the regular Import and Export menu within Blender, select `Three.js (js)`.

@@ -7,7 +7,7 @@ THREE.GeometryUtils = {
 
 	// Merge two geometries or geometry and geometry from object (using object's transform)
 
-	merge: function ( geometry1, object2 /* mesh | geometry */ ) {
+	merge: function ( geometry1, object2 /* mesh | geometry */, materialIndexOffset ) {
 
 		var matrix, normalMatrix,
 		vertexOffset = geometry1.vertices.length,
@@ -20,15 +20,15 @@ THREE.GeometryUtils = {
 		uvs1 = geometry1.faceVertexUvs[ 0 ],
 		uvs2 = geometry2.faceVertexUvs[ 0 ];
 
+		if ( materialIndexOffset === undefined ) materialIndexOffset = 0;
+
 		if ( object2 instanceof THREE.Mesh ) {
 
 			object2.matrixAutoUpdate && object2.updateMatrix();
 
 			matrix = object2.matrix;
 
-			normalMatrix = new THREE.Matrix3();
-			normalMatrix.getInverse( matrix );
-			normalMatrix.transpose();
+			normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
 		}
 
@@ -54,16 +54,7 @@ THREE.GeometryUtils = {
 			faceVertexNormals = face.vertexNormals,
 			faceVertexColors = face.vertexColors;
 
-			if ( face instanceof THREE.Face3 ) {
-
-				faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				faceCopy = new THREE.Face4( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset, face.d + vertexOffset );
-
-			}
-
+			faceCopy = new THREE.Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
 
 			if ( normalMatrix ) {
@@ -95,7 +86,7 @@ THREE.GeometryUtils = {
 
 			}
 
-			faceCopy.materialIndex = face.materialIndex;
+			faceCopy.materialIndex = face.materialIndex + materialIndexOffset;
 
 			faceCopy.centroid.copy( face.centroid );
 
@@ -127,67 +118,48 @@ THREE.GeometryUtils = {
 
 	},
 
-	removeMaterials: function ( geometry, materialIndexArray ) {
-
-		var materialIndexMap = {};
-
-		for ( var i = 0, il = materialIndexArray.length; i < il; i ++ ) {
-
-			materialIndexMap[ materialIndexArray[i] ] = true;
-
-		}
-
-		var face, newFaces = [];
-
-		for ( var i = 0, il = geometry.faces.length; i < il; i ++ ) {
-
-			face = geometry.faces[ i ];
-			if ( ! ( face.materialIndex in materialIndexMap ) ) newFaces.push( face );
-
-		}
-
-		geometry.faces = newFaces;
-
-	},
-
 	// Get random point in triangle (via barycentric coordinates)
 	// 	(uniform distribution)
 	// 	http://www.cgafaq.info/wiki/Random_Point_In_Triangle
 
-	randomPointInTriangle: function ( vectorA, vectorB, vectorC ) {
+	randomPointInTriangle: function () {
 
-		var a, b, c,
-			point = new THREE.Vector3(),
-			tmp = THREE.GeometryUtils.__v1;
+		var vector = new THREE.Vector3();
 
-		a = THREE.GeometryUtils.random();
-		b = THREE.GeometryUtils.random();
+		return function ( vectorA, vectorB, vectorC ) {
 
-		if ( ( a + b ) > 1 ) {
+			var point = new THREE.Vector3();
 
-			a = 1 - a;
-			b = 1 - b;
+			var a = THREE.Math.random16();
+			var b = THREE.Math.random16();
 
-		}
+			if ( ( a + b ) > 1 ) {
 
-		c = 1 - a - b;
+				a = 1 - a;
+				b = 1 - b;
 
-		point.copy( vectorA );
-		point.multiplyScalar( a );
+			}
 
-		tmp.copy( vectorB );
-		tmp.multiplyScalar( b );
+			var c = 1 - a - b;
 
-		point.add( tmp );
+			point.copy( vectorA );
+			point.multiplyScalar( a );
 
-		tmp.copy( vectorC );
-		tmp.multiplyScalar( c );
+			vector.copy( vectorB );
+			vector.multiplyScalar( b );
 
-		point.add( tmp );
+			point.add( vector );
 
-		return point;
+			vector.copy( vectorC );
+			vector.multiplyScalar( c );
 
-	},
+			point.add( vector );
+
+			return point;
+
+		};
+
+	}(),
 
 	// Get random point in face (triangle / quad)
 	// (uniform distribution)
@@ -196,60 +168,11 @@ THREE.GeometryUtils = {
 
 		var vA, vB, vC, vD;
 
-		if ( face instanceof THREE.Face3 ) {
+		vA = geometry.vertices[ face.a ];
+		vB = geometry.vertices[ face.b ];
+		vC = geometry.vertices[ face.c ];
 
-			vA = geometry.vertices[ face.a ];
-			vB = geometry.vertices[ face.b ];
-			vC = geometry.vertices[ face.c ];
-
-			return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
-
-		} else if ( face instanceof THREE.Face4 ) {
-
-			vA = geometry.vertices[ face.a ];
-			vB = geometry.vertices[ face.b ];
-			vC = geometry.vertices[ face.c ];
-			vD = geometry.vertices[ face.d ];
-
-			var area1, area2;
-
-			if ( useCachedAreas ) {
-
-				if ( face._area1 && face._area2 ) {
-
-					area1 = face._area1;
-					area2 = face._area2;
-
-				} else {
-
-					area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
-					area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-					face._area1 = area1;
-					face._area2 = area2;
-
-				}
-
-			} else {
-
-				area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD ),
-				area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-			}
-
-			var r = THREE.GeometryUtils.random() * ( area1 + area2 );
-
-			if ( r < area1 ) {
-
-				return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vD );
-
-			} else {
-
-				return THREE.GeometryUtils.randomPointInTriangle( vB, vC, vD );
-
-			}
-
-		}
+		return THREE.GeometryUtils.randomPointInTriangle( vA, vB, vC );
 
 	},
 
@@ -275,27 +198,11 @@ THREE.GeometryUtils = {
 
 			face = faces[ i ];
 
-			if ( face instanceof THREE.Face3 ) {
+			vA = vertices[ face.a ];
+			vB = vertices[ face.b ];
+			vC = vertices[ face.c ];
 
-				vA = vertices[ face.a ];
-				vB = vertices[ face.b ];
-				vC = vertices[ face.c ];
-
-				face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
-
-			} else if ( face instanceof THREE.Face4 ) {
-
-				vA = vertices[ face.a ];
-				vB = vertices[ face.b ];
-				vC = vertices[ face.c ];
-				vD = vertices[ face.d ];
-
-				face._area1 = THREE.GeometryUtils.triangleArea( vA, vB, vD );
-				face._area2 = THREE.GeometryUtils.triangleArea( vB, vC, vD );
-
-				face._area = face._area1 + face._area2;
-
-			}
+			face._area = THREE.GeometryUtils.triangleArea( vA, vB, vC );
 
 			totalArea += face._area;
 
@@ -347,7 +254,7 @@ THREE.GeometryUtils = {
 
 		for ( i = 0; i < n; i ++ ) {
 
-			r = THREE.GeometryUtils.random() * totalArea;
+			r = THREE.Math.random16() * totalArea;
 
 			index = binarySearchIndices( r );
 
@@ -372,18 +279,22 @@ THREE.GeometryUtils = {
 	// Get triangle area (half of parallelogram)
 	//	http://mathworld.wolfram.com/TriangleArea.html
 
-	triangleArea: function ( vectorA, vectorB, vectorC ) {
+	triangleArea: function () {
 
-		var tmp1 = THREE.GeometryUtils.__v1,
-			tmp2 = THREE.GeometryUtils.__v2;
+		var vector1 = new THREE.Vector3();
+		var vector2 = new THREE.Vector3();
 
-		tmp1.subVectors( vectorB, vectorA );
-		tmp2.subVectors( vectorC, vectorA );
-		tmp1.cross( tmp2 );
+		return function ( vectorA, vectorB, vectorC ) {
 
-		return 0.5 * tmp1.length();
+			vector1.subVectors( vectorB, vectorA );
+			vector2.subVectors( vectorC, vectorA );
+			vector1.cross( vector2 );
 
-	},
+			return 0.5 * vector1.length();
+
+		};
+
+	}(),
 
 	// Center geometry so that 0,0,0 is in center of bounding box
 
@@ -405,43 +316,12 @@ THREE.GeometryUtils = {
 
 	},
 
-	// Normalize UVs to be from <0,1>
-	// (for now just the first set of UVs)
-
-	normalizeUVs: function ( geometry ) {
-
-		var uvSet = geometry.faceVertexUvs[ 0 ];
-
-		for ( var i = 0, il = uvSet.length; i < il; i ++ ) {
-
-			var uvs = uvSet[ i ];
-
-			for ( var j = 0, jl = uvs.length; j < jl; j ++ ) {
-
-				// texture repeat
-
-				if( uvs[ j ].x !== 1.0 ) uvs[ j ].x = uvs[ j ].x - Math.floor( uvs[ j ].x );
-				if( uvs[ j ].y !== 1.0 ) uvs[ j ].y = uvs[ j ].y - Math.floor( uvs[ j ].y );
-
-			}
-
-		}
-
-	},
-
 	triangulateQuads: function ( geometry ) {
 
 		var i, il, j, jl;
 
 		var faces = [];
-		var faceUvs = [];
 		var faceVertexUvs = [];
-
-		for ( i = 0, il = geometry.faceUvs.length; i < il; i ++ ) {
-
-			faceUvs[ i ] = [];
-
-		}
 
 		for ( i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
@@ -453,98 +333,17 @@ THREE.GeometryUtils = {
 
 			var face = geometry.faces[ i ];
 
-			if ( face instanceof THREE.Face4 ) {
+			faces.push( face );
 
-				var a = face.a;
-				var b = face.b;
-				var c = face.c;
-				var d = face.d;
+			for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
 
-				var triA = new THREE.Face3();
-				var triB = new THREE.Face3();
-
-				triA.color.copy( face.color );
-				triB.color.copy( face.color );
-
-				triA.materialIndex = face.materialIndex;
-				triB.materialIndex = face.materialIndex;
-
-				triA.a = a;
-				triA.b = b;
-				triA.c = d;
-
-				triB.a = b;
-				triB.b = c;
-				triB.c = d;
-
-				if ( face.vertexColors.length === 4 ) {
-
-					triA.vertexColors[ 0 ] = face.vertexColors[ 0 ].clone();
-					triA.vertexColors[ 1 ] = face.vertexColors[ 1 ].clone();
-					triA.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
-
-					triB.vertexColors[ 0 ] = face.vertexColors[ 1 ].clone();
-					triB.vertexColors[ 1 ] = face.vertexColors[ 2 ].clone();
-					triB.vertexColors[ 2 ] = face.vertexColors[ 3 ].clone();
-
-				}
-
-				faces.push( triA, triB );
-
-				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-					if ( geometry.faceVertexUvs[ j ].length ) {
-
-						var uvs = geometry.faceVertexUvs[ j ][ i ];
-
-						var uvA = uvs[ 0 ];
-						var uvB = uvs[ 1 ];
-						var uvC = uvs[ 2 ];
-						var uvD = uvs[ 3 ];
-
-						var uvsTriA = [ uvA.clone(), uvB.clone(), uvD.clone() ];
-						var uvsTriB = [ uvB.clone(), uvC.clone(), uvD.clone() ];
-
-						faceVertexUvs[ j ].push( uvsTriA, uvsTriB );
-
-					}
-
-				}
-
-				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-					if ( geometry.faceUvs[ j ].length ) {
-
-						var faceUv = geometry.faceUvs[ j ][ i ];
-
-						faceUvs[ j ].push( faceUv, faceUv );
-
-					}
-
-				}
-
-			} else {
-
-				faces.push( face );
-
-				for ( j = 0, jl = geometry.faceUvs.length; j < jl; j ++ ) {
-
-					faceUvs[ j ].push( geometry.faceUvs[ j ][ i ] );
-
-				}
-
-				for ( j = 0, jl = geometry.faceVertexUvs.length; j < jl; j ++ ) {
-
-					faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
-
-				}
+				faceVertexUvs[ j ].push( geometry.faceVertexUvs[ j ][ i ] );
 
 			}
 
 		}
 
 		geometry.faces = faces;
-		geometry.faceUvs = faceUvs;
 		geometry.faceVertexUvs = faceVertexUvs;
 
 		geometry.computeCentroids();
@@ -553,25 +352,6 @@ THREE.GeometryUtils = {
 
 		if ( geometry.hasTangents ) geometry.computeTangents();
 
-	},
-
-	setMaterialIndex: function ( geometry, index, startFace, endFace ){
-
-		var faces = geometry.faces;
-		var start = startFace || 0;
-		var end = endFace || faces.length - 1;
-
-		for ( var i = start; i <= end; i ++ ) {
-
-			faces[i].materialIndex = index;
-
-		}
-
-    }
+	}
 
 };
-
-THREE.GeometryUtils.random = THREE.Math.random16;
-
-THREE.GeometryUtils.__v1 = new THREE.Vector3();
-THREE.GeometryUtils.__v2 = new THREE.Vector3();

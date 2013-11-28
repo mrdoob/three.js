@@ -439,7 +439,7 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 			cCROSSap = cX*apy - cY*apx;
 			bCROSScp = bX*cpy - bY*cpx;
 
-			if ( (aCROSSbp >= 0.0) && (bCROSScp >= 0.0) && (cCROSSap >= 0.0) ) return false;
+			if ( (aCROSSbp >= -EPSILON) && (bCROSScp >= -EPSILON) && (cCROSSap >= -EPSILON) ) return false;
 
 		}
 
@@ -457,3 +457,4 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 
 // To use the typeface.js face files, hook up the API
 self._typeface_js = { faces: THREE.FontUtils.faces, loadFace: THREE.FontUtils.loadFace };
+THREE.typeface_js = self._typeface_js;

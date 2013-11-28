@@ -1,50 +1,71 @@
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author mrdoob / http://mrdoob.com/
+ * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.DirectionalLightHelper = function ( light, sphereSize ) {
+THREE.DirectionalLightHelper = function ( light, size ) {
 
 	THREE.Object3D.call( this );
 
 	this.light = light;
+	this.light.updateMatrixWorld();
 
-	var geometry = new THREE.SphereGeometry( sphereSize, 4, 2 );
-	var material = new THREE.MeshBasicMaterial( { fog: false, wireframe: true } );
+	this.matrixWorld = light.matrixWorld;
+	this.matrixAutoUpdate = false;
+
+	size = size || 1;
+	var geometry = new THREE.PlaneGeometry( size, size );
+	var material = new THREE.MeshBasicMaterial( { wireframe: true, fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
-	this.lightSphere = new THREE.Mesh( geometry, material );
-	this.lightSphere.position = this.light.position;
-	this.add( this.lightSphere );
-
-	/*
-	this.targetSphere = new THREE.Mesh( geometry, material );
-	this.targetSphere.position = this.light.target.position;
-	this.add( this.targetSphere );
-	*/
+	this.lightPlane = new THREE.Mesh( geometry, material );
+	this.add( this.lightPlane );
 
 	geometry = new THREE.Geometry();
-	geometry.vertices.push( this.light.position );
-	geometry.vertices.push( this.light.target.position );
-	geometry.computeLineDistances();
+	geometry.vertices.push( new THREE.Vector3() );
+	geometry.vertices.push( new THREE.Vector3() );
 
-	material = new THREE.LineDashedMaterial( { dashSize: 4, gapSize: 4, opacity: 0.75, transparent: true, fog: false } );
+	material = new THREE.LineBasicMaterial( { fog: false } );
 	material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
 
 	this.targetLine = new THREE.Line( geometry, material );
 	this.add( this.targetLine );
 
-}
+	this.update();
+
+};
 
 THREE.DirectionalLightHelper.prototype = Object.create( THREE.Object3D.prototype );
 
+THREE.DirectionalLightHelper.prototype.dispose = function () {
+	
+	this.lightPlane.geometry.dispose();
+	this.lightPlane.material.dispose();
+	this.targetLine.geometry.dispose();
+	this.targetLine.material.dispose();
+};
+
 THREE.DirectionalLightHelper.prototype.update = function () {
 
-	this.lightSphere.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	var v1 = new THREE.Vector3();
+	var v2 = new THREE.Vector3();
+	var v3 = new THREE.Vector3();
 
-	this.targetLine.geometry.computeLineDistances();
-	this.targetLine.geometry.verticesNeedUpdate = true;
-	this.targetLine.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+	return function () {
 
-};
+		v1.getPositionFromMatrix( this.light.matrixWorld );
+		v2.getPositionFromMatrix( this.light.target.matrixWorld );
+		v3.subVectors( v2, v1 );
+
+		this.lightPlane.lookAt( v3 );
+		this.lightPlane.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
+
+		this.targetLine.geometry.vertices[ 1 ].copy( v3 );
+		this.targetLine.geometry.verticesNeedUpdate = true;
+		this.targetLine.material.color.copy( this.lightPlane.material.color );
+
+	}
+
+}();
 

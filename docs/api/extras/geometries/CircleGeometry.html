@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../../list.js"></script>
 		<script src="../../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../../page.css" />
@@ -9,26 +9,19 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
-
+		<div class="desc">CircleGeometry is a simple shape of Euclidean geometry.  It is contructed from a number of triangular segments that are oriented around a central point and extend as far out as a given radius.  It is built counter-clockwise from a start angle and a given central angle.  It can also be used to create regular polygons, where the number of segments determines the number of sides.
+		</div>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( radius, detail )</h3>
-
-
-		<h2>Properties</h2>
-
-		<h3>.[page:Vector3 todo]</h3>
-
-
-		<h2>Methods</h2>
-
-		<h3>.todo( [page:Vector3 todo] )</h3>
+		<h3>[name]([page:Float radius], [page:Integer segments], [page:Float thetaStart], [page:Float thetaLength])</h3>
 		<div>
-		todo — todo<br />
+		radius — Radius of the circle, default = 50.<br />
+		segments — Number of segments (triangles), minimum = 3, default = 8.<br />
+		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
+		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete circle.
 		</div>
-
+		
 
 		<h2>Source</h2>
 

@@ -5,7 +5,7 @@
 module( "Quaternion" );
 
 var orders = [ 'XYZ', 'YXZ', 'ZXY', 'ZYX', 'YZX', 'XZY' ];
-var eulerAngles = new THREE.Vector3( 0.1, -0.3, 0.25 );
+var eulerAngles = new THREE.Euler( 0.1, -0.3, 0.25 );
 
 
 
@@ -91,16 +91,16 @@ test( "setFromAxisAngle", function() {
 });
 
 
-test( "setFromEuler/setEulerFromQuaternion", function() {
+test( "setFromEuler/setFromQuaternion", function() {
 
 	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
 
 	// ensure euler conversion to/from Quaternion matches.
 	for( var i = 0; i < orders.length; i ++ ) {
 		for( var j = 0; j < angles.length; j ++ ) {
-			var eulers2 = new THREE.Vector3().setEulerFromQuaternion( new THREE.Quaternion().setFromEuler( angles[j], orders[i] ), orders[i] );
-
-			ok( eulers2.distanceTo( angles[j] ) < 0.001, "Passed!" );
+			var eulers2 = new THREE.Euler().setFromQuaternion( new THREE.Quaternion().setFromEuler( new THREE.Euler( angles[j].x, angles[j].y, angles[j].z, orders[i] ) ), orders[i] );
+			var newAngle = new THREE.Vector3( eulers2.x, eulers2.y, eulers2.z );
+			ok( newAngle.distanceTo( angles[j] ) < 0.001, "Passed!" );
 		}
 	}
 
@@ -111,7 +111,7 @@ test( "setFromEuler/setFromRotationMatrix", function() {
 	// ensure euler conversion for Quaternion matches that of Matrix4
 	for( var i = 0; i < orders.length; i ++ ) {
 		var q = new THREE.Quaternion().setFromEuler( eulerAngles, orders[i] );
-		var m = new THREE.Matrix4().setRotationFromEuler( eulerAngles, orders[i] );
+		var m = new THREE.Matrix4().makeRotationFromEuler( eulerAngles, orders[i] );
 		var q2 = new THREE.Quaternion().setFromRotationMatrix( m );
 
 		ok( qSub( q, q2 ).length() < 0.001, "Passed!" );
@@ -153,7 +153,7 @@ test( "inverse/conjugate", function() {
 
 test( "multiplyQuaternions/multiply", function() {
 
-	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+	var angles = [ new THREE.Euler( 1, 0, 0 ), new THREE.Euler( 0, 1, 0 ), new THREE.Euler( 0, 0, 1 ) ];
 
 	var q1 = new THREE.Quaternion().setFromEuler( angles[0], "XYZ" );
 	var q2 = new THREE.Quaternion().setFromEuler( angles[1], "XYZ" );
@@ -161,9 +161,9 @@ test( "multiplyQuaternions/multiply", function() {
 
 	var q = new THREE.Quaternion().multiplyQuaternions( q1, q2 ).multiply( q3 );
 
-	var m1 = new THREE.Matrix4().setRotationFromEuler( angles[0], "XYZ" );
-	var m2 = new THREE.Matrix4().setRotationFromEuler( angles[1], "XYZ" );
-	var m3 = new THREE.Matrix4().setRotationFromEuler( angles[2], "XYZ" );
+	var m1 = new THREE.Matrix4().makeRotationFromEuler( angles[0], "XYZ" );
+	var m2 = new THREE.Matrix4().makeRotationFromEuler( angles[1], "XYZ" );
+	var m3 = new THREE.Matrix4().makeRotationFromEuler( angles[2], "XYZ" );
 
 	var m = new THREE.Matrix4().multiplyMatrices( m1, m2 ).multiply( m3 );
 
@@ -174,13 +174,13 @@ test( "multiplyQuaternions/multiply", function() {
 
 test( "multiplyVector3", function() {
 	
-	var angles = [ new THREE.Vector3( 1, 0, 0 ), new THREE.Vector3( 0, 1, 0 ), new THREE.Vector3( 0, 0, 1 ) ];
+	var angles = [ new THREE.Euler( 1, 0, 0 ), new THREE.Euler( 0, 1, 0 ), new THREE.Euler( 0, 0, 1 ) ];
 
 	// ensure euler conversion for Quaternion matches that of Matrix4
 	for( var i = 0; i < orders.length; i ++ ) {
 		for( var j = 0; j < angles.length; j ++ ) {
 			var q = new THREE.Quaternion().setFromEuler( angles[j], orders[i] );
-			var m = new THREE.Matrix4().setRotationFromEuler( angles[j], orders[i] );
+			var m = new THREE.Matrix4().makeRotationFromEuler( angles[j], orders[i] );
 
 			var v0 = new THREE.Vector3(1, 0, 0);
 			var qv = v0.clone().applyQuaternion( q );

@@ -74,31 +74,18 @@ THREE.Frustum.prototype = {
 
 	intersectsObject: function () {
 
-		var center = new THREE.Vector3();
+		var sphere = new THREE.Sphere();
 
 		return function ( object ) {
 
-			// this method is expanded inlined for performance reasons.
+			var geometry = object.geometry;
 
-			var matrix = object.matrixWorld;
-			var planes = this.planes;
-			var negRadius = - object.geometry.boundingSphere.radius * matrix.getMaxScaleOnAxis();
+			if ( geometry.boundingSphere === null ) geometry.computeBoundingSphere();
 
-			center.getPositionFromMatrix( matrix );
+			sphere.copy( geometry.boundingSphere );
+			sphere.applyMatrix4( object.matrixWorld );
 
-			for ( var i = 0; i < 6; i ++ ) {
-
-				var distance = planes[ i ].distanceToPoint( center );
-
-				if ( distance < negRadius ) {
-
-					return false;
-
-				}
-
-			}
-
-			return true;
+			return this.intersectsSphere( sphere );
 
 		};
 
@@ -125,6 +112,44 @@ THREE.Frustum.prototype = {
 		return true;
 
 	},
+
+	intersectsBox : function() {
+
+		var p1 = new THREE.Vector3(),
+			p2 = new THREE.Vector3();
+
+		return function( box ) {
+
+			var planes = this.planes;
+			
+			for ( var i = 0; i < 6 ; i ++ ) {
+			
+				var plane = planes[i];
+				
+				p1.x = plane.normal.x > 0 ? box.min.x : box.max.x;
+				p2.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+				p1.y = plane.normal.y > 0 ? box.min.y : box.max.y;
+				p2.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+				p1.z = plane.normal.z > 0 ? box.min.z : box.max.z;
+				p2.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+
+				var d1 = plane.distanceToPoint( p1 );
+				var d2 = plane.distanceToPoint( p2 );
+				
+				// if both outside plane, no intersection
+
+				if ( d1 < 0 && d2 < 0 ) {
+					
+					return false;
+		
+				}
+			}
+
+			return true;
+		};
+
+	}(),
+
 
 	containsPoint: function ( point ) {
 

@@ -19,7 +19,6 @@
 				background: -o-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Opera 12+ */
 				background: -ms-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
 				background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* W3C */
-				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2b2d30', endColorstr='#000000',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 
 				margin: 0;
 				font-family: Arial;
@@ -115,24 +114,24 @@
 			var visualizationType = 2;
 
 			var MOLECULES = {
-				"Ethanol"   :"ethanol.pdb",
-				"Aspirin"   :"aspirin.pdb",
-				"Caffeine"  :"caffeine.pdb",
-				"Nicotine"  :"nicotine.pdb",
-				"LSD"  		:"lsd.pdb",
-				"Cocaine"  		:"cocaine.pdb",
-				"Cholesterol"  :"cholesterol.pdb",
-				"Lycopene"  :"lycopene.pdb",
-				"Glucose"   : "glucose.pdb",
-				"Aluminium oxide":"Al2O3.pdb",
-				"Cubane"	:"cubane.pdb",
-				"Copper"    :"cu.pdb",
-				"Fluorite"  :"caf2.pdb",
-				"Salt"      :"nacl.pdb",
-				"YBCO superconductor":"ybco.pdb",
-				"Buckyball" : "buckyball.pdb",
-				//"Diamond"   :"diamond.pdb",
-				"Graphite"  :"graphite.pdb"
+				"Ethanol": "ethanol.pdb",
+				"Aspirin": "aspirin.pdb",
+				"Caffeine": "caffeine.pdb",
+				"Nicotine": "nicotine.pdb",
+				"LSD": "lsd.pdb",
+				"Cocaine": "cocaine.pdb",
+				"Cholesterol": "cholesterol.pdb",
+				"Lycopene": "lycopene.pdb",
+				"Glucose": "glucose.pdb",
+				"Aluminium oxide": "Al2O3.pdb",
+				"Cubane": "cubane.pdb",
+				"Copper": "cu.pdb",
+				"Fluorite": "caf2.pdb",
+				"Salt": "nacl.pdb",
+				"YBCO superconductor": "ybco.pdb",
+				"Buckyball": "buckyball.pdb",
+				//"Diamond": "diamond.pdb",
+				"Graphite": "graphite.pdb"
 			};
 
 			var loader = new THREE.PDBLoader();
@@ -339,20 +338,7 @@
 				for ( var i = 0; i < objects.length; i ++ ) {
 
 					var object = objects[ i ];
-
 					object.parent.remove( object );
-
-					if ( object.element.parentNode === renderer.cameraElement ) {
-
-						renderer.cameraElement.removeChild( object.element );
-
-					}
-
-					if ( object.userData.joint ) {
-
-						object.userData.joint.parent.remove( object.userData.joint );
-
-					}
 
 				}
 
@@ -390,7 +376,6 @@
 						var object = new THREE.CSS3DSprite( atom );
 						object.position.copy( position );
 						object.position.multiplyScalar( 75 );
-						object.billboard = true;
 
 						object.matrixAutoUpdate = false;
 						object.updateMatrix();
@@ -433,7 +418,7 @@
 
 						var objMatrix = new THREE.Matrix4().makeRotationAxis( axis.normalize(), radians );
 						object.matrix = objMatrix;
-						object.rotation.setEulerFromRotationMatrix( object.matrix, object.eulerOrder );
+						object.rotation.setFromRotationMatrix( object.matrix, object.rotation.order );
 
 						object.matrixAutoUpdate = false;
 						object.updateMatrix();
@@ -453,7 +438,7 @@
 						joint.position.lerp( end, 0.5 );
 
 						joint.matrix.copy( objMatrix );
-						joint.rotation.setEulerFromRotationMatrix( joint.matrix, joint.eulerOrder );
+						joint.rotation.setFromRotationMatrix( joint.matrix, joint.rotation.order );
 
 						joint.matrixAutoUpdate = false;
 						joint.updateMatrix();

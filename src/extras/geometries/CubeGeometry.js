@@ -85,18 +85,26 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				var d = ( ix + 1 ) + gridX1 * iy;
 
-				var face = new THREE.Face4( a + offset, b + offset, c + offset, d + offset );
+				var uva = new THREE.Vector2( ix / gridX, 1 - iy / gridY );
+				var uvb = new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY );
+				var uvc = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - ( iy + 1 ) / gridY );
+				var uvd = new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY );
+
+				var face = new THREE.Face3( a + offset, b + offset, d + offset );
 				face.normal.copy( normal );
-				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone(), normal.clone() );
+				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
 				face.materialIndex = materialIndex;
 
 				scope.faces.push( face );
-				scope.faceVertexUvs[ 0 ].push( [
-							new THREE.Vector2( ix / gridX, 1 - iy / gridY ),
-							new THREE.Vector2( ix / gridX, 1 - ( iy + 1 ) / gridY ),
-							new THREE.Vector2( ( ix + 1 ) / gridX, 1- ( iy + 1 ) / gridY ),
-							new THREE.Vector2( ( ix + 1 ) / gridX, 1 - iy / gridY )
-						] );
+				scope.faceVertexUvs[ 0 ].push( [ uva, uvb, uvd ] );
+
+				face = new THREE.Face3( b + offset, c + offset, d + offset );
+				face.normal.copy( normal );
+				face.vertexNormals.push( normal.clone(), normal.clone(), normal.clone() );
+				face.materialIndex = materialIndex;
+
+				scope.faces.push( face );
+				scope.faceVertexUvs[ 0 ].push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 			}
 

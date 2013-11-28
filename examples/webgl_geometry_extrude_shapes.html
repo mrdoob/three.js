@@ -19,9 +19,6 @@
 		<canvas id="debug" style="position:absolute; left:100px"></canvas>
 
 		<script src="../build/three.min.js"></script>
-		<script src="../src/extras/core/Curve.js"></script>
-		<script src="../src/extras/geometries/TubeGeometry.js"></script>
-		<script src="../src/extras/geometries/ExtrudeGeometry.js"></script>
 		<script src="js/libs/stats.min.js"></script>
 
 
@@ -31,7 +28,7 @@
 
 			var camera, scene, renderer;
 
-			var text, plane;
+			var group, text, plane;
 
 			var targetRotation = 0;
 			var targetRotationOnMouseDown = 0;
@@ -67,15 +64,15 @@
 				light.position.set( 0, 0, 1 );
 				scene.add( light );
 
-				parent = new THREE.Object3D();
-				parent.position.y = 50;
-				scene.add( parent );
+				group = new THREE.Object3D();
+				group.position.y = 50;
+				scene.add( group );
 
 				function addGeometry( geometry, color, x, y, z, rx, ry, rz, s ) {
 
 					// 3d shape
 
-					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color, opacity: 0.2, transparent: true } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  opacity: 0.3 } ) ] );
+					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.3, transparent: true } ) ] );
 
 					mesh.position.set( x, y, z - 75 );
 					// mesh.rotation.set( rx, ry, rz );
@@ -83,7 +80,7 @@
 
 					if ( geometry.debug ) mesh.add( geometry.debug );
 
-					parent.add( mesh );
+					group.add( mesh );
 
 				}
 
@@ -216,6 +213,7 @@
 			//
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0xf0f0f0 );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			container.appendChild( renderer.domElement );
@@ -325,7 +323,7 @@
 
 		function render() {
 
-			parent.rotation.y += ( targetRotation - parent.rotation.y ) * 0.05;
+			group.rotation.y += ( targetRotation - group.rotation.y ) * 0.05;
 			renderer.render( scene, camera );
 
 		}

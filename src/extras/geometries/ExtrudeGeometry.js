@@ -5,15 +5,13 @@
  *
  * parameters = {
  *
- *  size: <float>, // size of the text
- *  height: <float>, // thickness to extrude text
  *  curveSegments: <int>, // number of points on the curves
  *  steps: <int>, // number of points for z-side extrusions / used for subdividing segements of extrude spline too
- *  amount: <int>, // Amount
+ *  amount: <int>, // Depth to extrude the shape
  *
  *  bevelEnabled: <bool>, // turn on bevel
- *  bevelThickness: <float>, // how deep into text bevel goes
- *  bevelSize: <float>, // how far from text outline is bevel
+ *  bevelThickness: <float>, // how deep into the original shape bevel goes
+ *  bevelSize: <float>, // how far from shape outline is bevel
  *  bevelSegments: <int>, // number of bevel layers
  *
  *  extrudePath: <THREE.CurvePath> // 3d spline path to extrude shape along. (creates Frames if .frames aren't defined)
@@ -651,11 +649,14 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 		c += shapesOffset;
 		d += shapesOffset;
 
- 		scope.faces.push( new THREE.Face4( a, b, c, d, null, null, extrudeMaterial ) );
+ 		scope.faces.push( new THREE.Face3( a, b, d, null, null, extrudeMaterial ) );
+ 		scope.faces.push( new THREE.Face3( b, c, d, null, null, extrudeMaterial ) );
 
  		var uvs = uvgen.generateSideWallUV( scope, shape, wallContour, options, a, b, c, d,
  		                                    stepIndex, stepsLength, contourIndex1, contourIndex2 );
- 		scope.faceVertexUvs[ 0 ].push( uvs );
+
+ 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 0 ], uvs[ 1 ], uvs[ 3 ] ] );
+ 		scope.faceVertexUvs[ 0 ].push( [ uvs[ 1 ], uvs[ 2 ], uvs[ 3 ] ] );
 
 	}
 

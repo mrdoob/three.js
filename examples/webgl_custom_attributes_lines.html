@@ -185,7 +185,8 @@
 
 			scene.add( object );
 
-			renderer = new THREE.WebGLRenderer( { clearColor: 0x050505, clearAlpha: 1, antialias: true } );
+			renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+			renderer.setClearColor( 0x050505, 1 );
 			renderer.setSize( WIDTH, HEIGHT );
 
 			var container = document.getElementById( 'container' );

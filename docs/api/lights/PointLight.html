@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
+		<meta charset="utf-8" />
 		<script src="../../list.js"></script>
 		<script src="../../page.js"></script>
 		<link type="text/css" rel="stylesheet" href="../../page.css" />
@@ -25,16 +25,20 @@ scene.add( light );</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [page:Float color], [page:Float intensity], [page:Float distance] )</h3>
+
+		<h3>[name]([page:Integer hex], [page:Float intensity], [page:todo distance])</h3>
+		<div>
+		[page:Integer hex] — Numeric value of the RGB component of the color. <br />
+		[page:Float intensity] — Numeric value of the light's strength/intensity. <br />
+		distance -- todo
+		</div>
+		<div>
+		Creates a light at a specific position in the scene.  The light shines in all directions (roughly similar to a light bulb.)
+	
+		</div>
 
 
 		<h2>Properties</h2>
-
-		<h3>.[page:Vector3 position]</h3>
-		<div>
-			Light's position.<br />
-			Default — *new THREE.Vector3()*.
-		</div>
 
 		<h3>.[page:Float intensity]</h3>
 		<div>
@@ -47,6 +51,8 @@ scene.add( light );</code>
 			If non-zero, light will attenuate linearly from maximum intensity at light *position* down to zero at *distance*.<br />
 			Default — *0.0*.
 		</div>
+		
+		<h2>Methods</h2>
 
 
 		<h2>Source</h2>

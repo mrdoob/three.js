@@ -6,6 +6,8 @@ THREE.PointerLockControls = function ( camera ) {
 
 	var scope = this;
 
+	camera.rotation.set( 0, 0, 0 );
+
 	var pitchObject = new THREE.Object3D();
 	pitchObject.add( camera );
 
@@ -86,7 +88,7 @@ THREE.PointerLockControls = function ( camera ) {
 				break;
 
 			case 40: // down
-			case 83: // a
+			case 83: // s
 				moveBackward = false;
 				break;
 
@@ -117,6 +119,25 @@ THREE.PointerLockControls = function ( camera ) {
 		canJump = boolean;
 
 	};
+
+	this.getDirection = function() {
+
+		// assumes the camera itself is not rotated
+
+		var direction = new THREE.Vector3( 0, 0, -1 );
+		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
+
+		return function( v ) {
+
+			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
+
+			v.copy( direction ).applyEuler( rotation );
+
+			return v;
+
+		}
+
+	}();
 
 	this.update = function ( delta ) {
 

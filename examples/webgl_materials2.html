@@ -119,7 +119,8 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0x0a0a0a, clearAlpha: 1, antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setClearColor( 0x0a0a0a, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = true;
 

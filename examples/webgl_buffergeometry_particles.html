@@ -26,7 +26,6 @@
 
 				color: #0080ff;
 			}
-
 		</style>
 	</head>
 	<body>
@@ -69,21 +68,9 @@
 				var particles = 500000;
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.attributes = {
 
-					position: {
-						itemSize: 3,
-						array: new Float32Array( particles * 3 ),
-						numItems: particles * 3
-					},
-					color: {
-						itemSize: 3,
-						array: new Float32Array( particles * 3 ),
-						numItems: particles * 3
-					}
-
-				}
-
+				geometry.addAttribute( 'position', Float32Array, particles, 3 );
+				geometry.addAttribute( 'color', Float32Array, particles, 3 );
 
 				var positions = geometry.attributes.position.array;
 				var colors = geometry.attributes.color.array;
@@ -122,16 +109,16 @@
 
 				//
 
-				var material = new THREE.ParticleBasicMaterial( { size: 15, vertexColors: true } );
+				var material = new THREE.ParticleSystemMaterial( { size: 15, vertexColors: true } );
 
 				particleSystem = new THREE.ParticleSystem( geometry, material );
 				scene.add( particleSystem );
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, clearColor: 0x333333, clearAlpha: 1, alpha: false } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
 				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
 

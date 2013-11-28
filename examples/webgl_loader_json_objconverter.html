@@ -147,6 +147,7 @@
 					try {
 
 						webglRenderer = new THREE.WebGLRenderer();
+						webglRenderer.setClearColor( 0xffffff );
 						webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 						webglRenderer.domElement.style.position = "relative";
 
@@ -163,6 +164,7 @@
 				if ( render_canvas ) {
 
 					canvasRenderer = new THREE.CanvasRenderer();
+					canvasRenderer.setClearColor( 0xffffff );
 					canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 					container.appendChild( canvasRenderer.domElement );
 

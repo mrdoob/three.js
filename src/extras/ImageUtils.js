@@ -9,29 +9,20 @@ THREE.ImageUtils = {
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
-		var image = new Image();
-		var texture = new THREE.Texture( image, mapping );
-
 		var loader = new THREE.ImageLoader();
+		loader.crossOrigin = this.crossOrigin;
 
-		loader.addEventListener( 'load', function ( event ) {
+		var texture = new THREE.Texture( undefined, mapping );
 
-			texture.image = event.content;
+		var image = loader.load( url, function () {
+
 			texture.needsUpdate = true;
 
 			if ( onLoad ) onLoad( texture );
 
 		} );
 
-		loader.addEventListener( 'error', function ( event ) {
-
-			if ( onError ) onError( event.message );
-
-		} );
-
-		loader.crossOrigin = this.crossOrigin;
-		loader.load( url, image );
-
+		texture.image = image;
 		texture.sourceFile = url;
 
 		return texture;
@@ -239,6 +230,77 @@ THREE.ImageUtils = {
 
 	},
 
+	loadDDSTexture: function ( url, mapping, onLoad, onError ) {
+
+		var images = [];
+		images.loadCount = 0;
+
+		var texture = new THREE.CompressedTexture();
+		texture.image = images;
+		if ( mapping !== undefined ) texture.mapping = mapping;
+
+		// no flipping for cube textures
+		// (also flipping doesn't work for compressed textures )
+
+		texture.flipY = false;
+
+		// can't generate mipmaps for compressed textures
+		// mips must be embedded in DDS files
+
+		texture.generateMipmaps = false;
+
+		{
+			var request = new XMLHttpRequest();
+
+			request.onload = function( ) {
+
+				var buffer = request.response;
+				var dds = THREE.ImageUtils.parseDDS( buffer, true );
+
+				if ( dds.isCubemap ) {
+
+					var faces = dds.mipmaps.length / dds.mipmapCount;
+
+					for ( var f = 0; f < faces; f ++ ) {
+
+						images[ f ] = { mipmaps : [] };
+
+						for ( var i = 0; i < dds.mipmapCount; i ++ ) {
+
+							images[ f ].mipmaps.push( dds.mipmaps[ f * dds.mipmapCount + i ] );
+							images[ f ].format = dds.format;
+							images[ f ].width = dds.width;
+							images[ f ].height = dds.height;
+
+						}
+
+					}
+
+
+				} else {
+					texture.image.width = dds.width;
+					texture.image.height = dds.height;
+					texture.mipmaps = dds.mipmaps;
+				}
+
+				texture.format = dds.format;
+				texture.needsUpdate = true;
+				if ( onLoad ) onLoad( texture );
+
+			}
+
+			request.onerror = onError;
+
+			request.open( 'GET', url, true );
+			request.responseType = "arraybuffer";
+			request.send( null );
+
+		}
+
+		return texture;
+
+	},
+
 	parseDDS: function ( buffer, loadMipmaps ) {
 
 		var dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
@@ -299,6 +361,27 @@ THREE.ImageUtils = {
 			);
 		}
 
+		function loadARGBMip( buffer, dataOffset, width, height ) {
+			var dataLength = width*height*4;
+			var srcBuffer = new Uint8Array( buffer, dataOffset, dataLength );
+			var byteArray = new Uint8Array( dataLength );
+			var dst = 0;
+			var src = 0;
+			for ( var y = 0; y < height; y++ ) {
+				for ( var x = 0; x < width; x++ ) {
+					var b = srcBuffer[src]; src++;
+					var g = srcBuffer[src]; src++;
+					var r = srcBuffer[src]; src++;
+					var a = srcBuffer[src]; src++;
+					byteArray[dst] = r; dst++;	//r
+					byteArray[dst] = g; dst++;	//g
+					byteArray[dst] = b; dst++;	//b
+					byteArray[dst] = a; dst++;	//a
+				}
+			}
+			return byteArray;
+		}
+
 		var FOURCC_DXT1 = fourCCToInt32("DXT1");
 		var FOURCC_DXT3 = fourCCToInt32("DXT3");
 		var FOURCC_DXT5 = fourCCToInt32("DXT5");
@@ -318,6 +401,11 @@ THREE.ImageUtils = {
 
 		var off_pfFlags = 20;
 		var off_pfFourCC = 21;
+		var off_RGBBitCount = 22;
+		var off_RBitMask = 23;
+		var off_GBitMask = 24;
+		var off_BBitMask = 25;
+		var off_ABitMask = 26;
 
 		var off_caps = 27;
 		var off_caps2 = 28;
@@ -346,6 +434,8 @@ THREE.ImageUtils = {
 
 		var fourCC = header[ off_pfFourCC ];
 
+		var isRGBAUncompressed = false;
+
 		switch ( fourCC ) {
 
 			case FOURCC_DXT1:
@@ -368,9 +458,18 @@ THREE.ImageUtils = {
 
 			default:
 
-				console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
-				return dds;
-
+				if( header[off_RGBBitCount] ==32 
+					&& header[off_RBitMask]&0xff0000
+					&& header[off_GBitMask]&0xff00 
+					&& header[off_BBitMask]&0xff
+					&& header[off_ABitMask]&0xff000000  ) {
+					isRGBAUncompressed = true;
+					blockBytes = 64;
+					dds.format = THREE.RGBAFormat;
+				} else {
+					console.error( "ImageUtils.parseDDS(): Unsupported FourCC code: ", int32ToFourCC( fourCC ) );
+					return dds;
+				}
 		}
 
 		dds.mipmapCount = 1;
@@ -401,9 +500,14 @@ THREE.ImageUtils = {
 
 			for ( var i = 0; i < dds.mipmapCount; i ++ ) {
 
-				var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
-				var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
-
+				if( isRGBAUncompressed ) {
+					var byteArray = loadARGBMip( buffer, dataOffset, width, height );
+					var dataLength = byteArray.length;
+				} else {
+					var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
+					var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
+				}
+				
 				var mipmap = { "data": byteArray, "width": width, "height": height };
 				dds.mipmaps.push( mipmap );
 

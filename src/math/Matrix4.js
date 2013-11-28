@@ -14,10 +14,12 @@
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
-	var te = this.elements = new Float32Array( 16 );
+	this.elements = new Float32Array( 16 );
 
 	// TODO: if n11 is undefined, then just set to identity, otherwise copy all other values into matrix
 	//   we should not support semi specification of Matrix4, it is just weird.
+
+	var te = this.elements;
 
 	te[0] = ( n11 !== undefined ) ? n11 : 1; te[4] = n12 || 0; te[8] = n13 || 0; te[12] = n14 || 0;
 	te[1] = n21 || 0; te[5] = ( n22 !== undefined ) ? n22 : 1; te[9] = n23 || 0; te[13] = n24 || 0;
@@ -60,31 +62,79 @@ THREE.Matrix4.prototype = {
 
 	copy: function ( m ) {
 
-		var me = m.elements;
-
-		this.set(
-
-			me[0], me[4], me[8], me[12],
-			me[1], me[5], me[9], me[13],
-			me[2], me[6], me[10], me[14],
-			me[3], me[7], me[11], me[15]
-
-		);
+		this.elements.set( m.elements );
 
 		return this;
 
 	},
 
-	setRotationFromEuler: function ( v, order ) {
+	extractPosition: function ( m ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .extractPosition() has been renamed to .copyPosition().' );
+		return this.copyPosition( m );
+
+	},
+
+	copyPosition: function ( m ) {
+
+		var te = this.elements;
+		var me = m.elements;
+
+		te[12] = me[12];
+		te[13] = me[13];
+		te[14] = me[14];
+
+		return this;
+
+	},
+
+	extractRotation: function () {
+
+		var v1 = new THREE.Vector3();
+
+		return function ( m ) {
+
+			var te = this.elements;
+			var me = m.elements;
+
+			var scaleX = 1 / v1.set( me[0], me[1], me[2] ).length();
+			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
+			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
+
+			te[0] = me[0] * scaleX;
+			te[1] = me[1] * scaleX;
+			te[2] = me[2] * scaleX;
+
+			te[4] = me[4] * scaleY;
+			te[5] = me[5] * scaleY;
+			te[6] = me[6] * scaleY;
+
+			te[8] = me[8] * scaleZ;
+			te[9] = me[9] * scaleZ;
+			te[10] = me[10] * scaleZ;
+
+			return this;
+
+		};
+
+	}(),
+
+	makeRotationFromEuler: function ( euler ) {
+
+		if ( euler instanceof THREE.Euler === false ) {
+
+			console.error( 'ERROR: Matrix\'s .makeRotationFromEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+
+		}
 
 		var te = this.elements;
 
-		var x = v.x, y = v.y, z = v.z;
+		var x = euler.x, y = euler.y, z = euler.z;
 		var a = Math.cos( x ), b = Math.sin( x );
 		var c = Math.cos( y ), d = Math.sin( y );
 		var e = Math.cos( z ), f = Math.sin( z );
 
-		if ( order === undefined || order === 'XYZ' ) {
+		if ( euler.order === 'XYZ' ) {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
@@ -100,7 +150,7 @@ THREE.Matrix4.prototype = {
 			te[6] = be + af * d;
 			te[10] = a * c;
 
-		} else if ( order === 'YXZ' ) {
+		} else if ( euler.order === 'YXZ' ) {
 
 			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
@@ -116,7 +166,7 @@ THREE.Matrix4.prototype = {
 			te[6] = df + ce * b;
 			te[10] = a * c;
 
-		} else if ( order === 'ZXY' ) {
+		} else if ( euler.order === 'ZXY' ) {
 
 			var ce = c * e, cf = c * f, de = d * e, df = d * f;
 
@@ -132,7 +182,7 @@ THREE.Matrix4.prototype = {
 			te[6] = b;
 			te[10] = a * c;
 
-		} else if ( order === 'ZYX' ) {
+		} else if ( euler.order === 'ZYX' ) {
 
 			var ae = a * e, af = a * f, be = b * e, bf = b * f;
 
@@ -148,7 +198,7 @@ THREE.Matrix4.prototype = {
 			te[6] = b * c;
 			te[10] = a * c;
 
-		} else if ( order === 'YZX' ) {
+		} else if ( euler.order === 'YZX' ) {
 
 			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
@@ -164,7 +214,7 @@ THREE.Matrix4.prototype = {
 			te[6] = ad * f + bc;
 			te[10] = ac - bd * f;
 
-		} else if ( order === 'XZY' ) {
+		} else if ( euler.order === 'XZY' ) {
 
 			var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
 
@@ -182,11 +232,30 @@ THREE.Matrix4.prototype = {
 
 		}
 
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
+
 		return this;
 
 	},
 
 	setRotationFromQuaternion: function ( q ) {
+
+		console.warn( 'DEPRECATED: Matrix4\'s .setRotationFromQuaternion() has been deprecated in favor of makeRotationFromQuaternion.  Please update your code.' );
+
+		return this.makeRotationFromQuaternion( q );
+
+	},
+
+	makeRotationFromQuaternion: function ( q ) {
 
 		var te = this.elements;
 
@@ -207,6 +276,17 @@ THREE.Matrix4.prototype = {
 		te[2] = xz - wy;
 		te[6] = yz + wx;
 		te[10] = 1 - ( xx + yy );
+
+		// last column
+		te[3] = 0;
+		te[7] = 0;
+		te[11] = 0;
+
+		// bottom row
+		te[12] = 0;
+		te[13] = 0;
+		te[14] = 0;
+		te[15] = 1;
 
 		return this;
 
@@ -381,18 +461,10 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	crossVector: function ( a ) {
+	crossVector: function ( vector ) {
 
-		var te = this.elements;
-		var v = new THREE.Vector4();
-
-		v.x = te[0] * a.x + te[4] * a.y + te[8] * a.z + te[12] * a.w;
-		v.y = te[1] * a.x + te[5] * a.y + te[9] * a.z + te[13] * a.w;
-		v.z = te[2] * a.x + te[6] * a.y + te[10] * a.z + te[14] * a.w;
-
-		v.w = ( a.w ) ? te[3] * a.x + te[7] * a.y + te[11] * a.z + te[15] * a.w : 1;
-
-		return v;
+		console.warn( 'DEPRECATED: Matrix4\'s .crossVector() has been removed. Use vector.applyMatrix4( matrix ) instead.' );
+		return vector.applyMatrix4( this );
 
 	},
 
@@ -557,7 +629,7 @@ THREE.Matrix4.prototype = {
 		te[11] = n13*n22*n41 - n12*n23*n41 - n13*n21*n42 + n11*n23*n42 + n12*n21*n43 - n11*n22*n43;
 		te[15] = n12*n23*n31 - n13*n22*n31 + n13*n21*n32 - n11*n23*n32 - n12*n21*n33 + n11*n22*n33;
 
-		var det = me[ 0 ] * te[ 0 ] + me[ 1 ] * te[ 4 ] + me[ 2 ] * te[ 8 ] + me[ 3 ] * te[ 12 ];
+		var det = n11 * te[ 0 ] + n21 * te[ 4 ] + n31 * te[ 8 ] + n41 * te[ 12 ];
 
 		if ( det == 0 ) {
 
@@ -584,216 +656,33 @@ THREE.Matrix4.prototype = {
 
 	},
 
-	extractPosition: function ( m ) {
-
-		var te = this.elements;
-		var me = m.elements;
-
-		te[12] = me[12];
-		te[13] = me[13];
-		te[14] = me[14];
-
-		return this;
-
-	},
-
-	extractRotation: function() {
-
-		var v1 = new THREE.Vector3();
-
-		return function ( m ) {
-
-			var te = this.elements;
-			var me = m.elements;
-
-			var scaleX = 1 / v1.set( me[0], me[1], me[2] ).length();
-			var scaleY = 1 / v1.set( me[4], me[5], me[6] ).length();
-			var scaleZ = 1 / v1.set( me[8], me[9], me[10] ).length();
-
-			te[0] = me[0] * scaleX;
-			te[1] = me[1] * scaleX;
-			te[2] = me[2] * scaleX;
-
-			te[4] = me[4] * scaleY;
-			te[5] = me[5] * scaleY;
-			te[6] = me[6] * scaleY;
-
-			te[8] = me[8] * scaleZ;
-			te[9] = me[9] * scaleZ;
-			te[10] = me[10] * scaleZ;
-
-			return this;
-
-		};
-
-	}(),
-
 	translate: function ( v ) {
 
-		var te = this.elements;
-		var x = v.x, y = v.y, z = v.z;
-
-		te[12] = te[0] * x + te[4] * y + te[8] * z + te[12];
-		te[13] = te[1] * x + te[5] * y + te[9] * z + te[13];
-		te[14] = te[2] * x + te[6] * y + te[10] * z + te[14];
-		te[15] = te[3] * x + te[7] * y + te[11] * z + te[15];
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .translate() has been removed.');
 
 	},
 
 	rotateX: function ( angle ) {
 
-		var te = this.elements;
-		var m12 = te[4];
-		var m22 = te[5];
-		var m32 = te[6];
-		var m42 = te[7];
-		var m13 = te[8];
-		var m23 = te[9];
-		var m33 = te[10];
-		var m43 = te[11];
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-
-		te[4] = c * m12 + s * m13;
-		te[5] = c * m22 + s * m23;
-		te[6] = c * m32 + s * m33;
-		te[7] = c * m42 + s * m43;
-
-		te[8] = c * m13 - s * m12;
-		te[9] = c * m23 - s * m22;
-		te[10] = c * m33 - s * m32;
-		te[11] = c * m43 - s * m42;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateX() has been removed.');
 
 	},
 
 	rotateY: function ( angle ) {
 
-		var te = this.elements;
-		var m11 = te[0];
-		var m21 = te[1];
-		var m31 = te[2];
-		var m41 = te[3];
-		var m13 = te[8];
-		var m23 = te[9];
-		var m33 = te[10];
-		var m43 = te[11];
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-
-		te[0] = c * m11 - s * m13;
-		te[1] = c * m21 - s * m23;
-		te[2] = c * m31 - s * m33;
-		te[3] = c * m41 - s * m43;
-
-		te[8] = c * m13 + s * m11;
-		te[9] = c * m23 + s * m21;
-		te[10] = c * m33 + s * m31;
-		te[11] = c * m43 + s * m41;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateY() has been removed.');
 
 	},
 
 	rotateZ: function ( angle ) {
 
-		var te = this.elements;
-		var m11 = te[0];
-		var m21 = te[1];
-		var m31 = te[2];
-		var m41 = te[3];
-		var m12 = te[4];
-		var m22 = te[5];
-		var m32 = te[6];
-		var m42 = te[7];
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-
-		te[0] = c * m11 + s * m12;
-		te[1] = c * m21 + s * m22;
-		te[2] = c * m31 + s * m32;
-		te[3] = c * m41 + s * m42;
-
-		te[4] = c * m12 - s * m11;
-		te[5] = c * m22 - s * m21;
-		te[6] = c * m32 - s * m31;
-		te[7] = c * m42 - s * m41;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateZ() has been removed.');
 
 	},
 
 	rotateByAxis: function ( axis, angle ) {
 
-		var te = this.elements;
-
-		// optimize by checking axis
-
-		if ( axis.x === 1 && axis.y === 0 && axis.z === 0 ) {
-
-			return this.rotateX( angle );
-
-		} else if ( axis.x === 0 && axis.y === 1 && axis.z === 0 ) {
-
-			return this.rotateY( angle );
-
-		} else if ( axis.x === 0 && axis.y === 0 && axis.z === 1 ) {
-
-			return this.rotateZ( angle );
-
-		}
-
-		var x = axis.x, y = axis.y, z = axis.z;
-		var n = Math.sqrt(x * x + y * y + z * z);
-
-		x /= n;
-		y /= n;
-		z /= n;
-
-		var xx = x * x, yy = y * y, zz = z * z;
-		var c = Math.cos( angle );
-		var s = Math.sin( angle );
-		var oneMinusCosine = 1 - c;
-		var xy = x * y * oneMinusCosine;
-		var xz = x * z * oneMinusCosine;
-		var yz = y * z * oneMinusCosine;
-		var xs = x * s;
-		var ys = y * s;
-		var zs = z * s;
-
-		var r11 = xx + (1 - xx) * c;
-		var r21 = xy + zs;
-		var r31 = xz - ys;
-		var r12 = xy - zs;
-		var r22 = yy + (1 - yy) * c;
-		var r32 = yz + xs;
-		var r13 = xz + ys;
-		var r23 = yz - xs;
-		var r33 = zz + (1 - zz) * c;
-
-		var m11 = te[0], m21 = te[1], m31 = te[2], m41 = te[3];
-		var m12 = te[4], m22 = te[5], m32 = te[6], m42 = te[7];
-		var m13 = te[8], m23 = te[9], m33 = te[10], m43 = te[11];
-
-		te[0] = r11 * m11 + r21 * m12 + r31 * m13;
-		te[1] = r11 * m21 + r21 * m22 + r31 * m23;
-		te[2] = r11 * m31 + r21 * m32 + r31 * m33;
-		te[3] = r11 * m41 + r21 * m42 + r31 * m43;
-
-		te[4] = r12 * m11 + r22 * m12 + r32 * m13;
-		te[5] = r12 * m21 + r22 * m22 + r32 * m23;
-		te[6] = r12 * m31 + r22 * m32 + r32 * m33;
-		te[7] = r12 * m41 + r22 * m42 + r32 * m43;
-
-		te[8] = r13 * m11 + r23 * m12 + r33 * m13;
-		te[9] = r13 * m21 + r23 * m22 + r33 * m23;
-		te[10] = r13 * m31 + r23 * m32 + r33 * m33;
-		te[11] = r13 * m41 + r23 * m42 + r33 * m43;
-
-		return this;
+		console.warn( 'DEPRECATED: Matrix4\'s .rotateByAxis() has been removed.');
 
 	},
 
@@ -927,6 +816,65 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	compose: function ( position, quaternion, scale ) {
+
+		this.makeRotationFromQuaternion( quaternion );
+		this.scale( scale );
+		this.setPosition( position );
+
+		return this;
+
+	},
+
+	decompose: function () {
+
+		var vector = new THREE.Vector3();
+		var matrix = new THREE.Matrix4();
+
+		return function ( position, quaternion, scale ) {
+
+			var te = this.elements;
+
+			var sx = vector.set( te[0], te[1], te[2] ).length();
+			var sy = vector.set( te[4], te[5], te[6] ).length();
+			var sz = vector.set( te[8], te[9], te[10] ).length();
+
+			position.x = te[12];
+			position.y = te[13];
+			position.z = te[14];
+
+			// scale the rotation part
+
+			matrix.elements.set( this.elements ); // at this point matrix is incomplete so we can't use .copy()
+
+			var invSX = 1 / sx;
+			var invSY = 1 / sy;
+			var invSZ = 1 / sz;
+
+			matrix.elements[0] *= invSX;
+			matrix.elements[1] *= invSX;
+			matrix.elements[2] *= invSX;
+
+			matrix.elements[4] *= invSY;
+			matrix.elements[5] *= invSY;
+			matrix.elements[6] *= invSY;
+
+			matrix.elements[8] *= invSZ;
+			matrix.elements[9] *= invSZ;
+			matrix.elements[10] *= invSZ;
+
+			quaternion.setFromRotationMatrix( matrix );
+
+			scale.x = sx;
+			scale.y = sy;
+			scale.z = sz;
+
+			return this;
+
+		};
+
+	}(),
+
 	makeFrustum: function ( left, right, bottom, top, near, far ) {
 
 		var te = this.elements;
@@ -978,6 +926,27 @@ THREE.Matrix4.prototype = {
 
 	},
 
+	fromArray: function ( array ) {
+
+		this.elements.set( array );
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		var te = this.elements;
+
+		return [
+			te[ 0 ], te[ 1 ], te[ 2 ], te[ 3 ],
+			te[ 4 ], te[ 5 ], te[ 6 ], te[ 7 ],
+			te[ 8 ], te[ 9 ], te[ 10 ], te[ 11 ],
+			te[ 12 ], te[ 13 ], te[ 14 ], te[ 15 ]
+		];
+
+	},
+
 	clone: function () {
 
 		var te = this.elements;
@@ -994,85 +963,3 @@ THREE.Matrix4.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.Matrix4.prototype, {
-
-	compose: function() {
-
-		var mRotation = new THREE.Matrix4();
-		var mScale = new THREE.Matrix4();
-
-		return function ( position, quaternion, scale ) {
-
-			var te = this.elements;
-
-			mRotation.identity();
-			mRotation.setRotationFromQuaternion( quaternion );
-
-			mScale.makeScale( scale.x, scale.y, scale.z );
-
-			this.multiplyMatrices( mRotation, mScale );
-
-			te[12] = position.x;
-			te[13] = position.y;
-			te[14] = position.z;
-
-			return this;
-
-		};
-
-	}(),
-
-	decompose: function() {
-
-		var x = new THREE.Vector3();
-		var y = new THREE.Vector3();
-		var z = new THREE.Vector3();
-		var matrix = new THREE.Matrix4();
-
-		return function ( position, quaternion, scale ) {
-
-			var te = this.elements;
-
-			// grab the axis vectors
-			x.set( te[0], te[1], te[2] );
-			y.set( te[4], te[5], te[6] );
-			z.set( te[8], te[9], te[10] );
-
-			position = ( position instanceof THREE.Vector3 ) ? position : new THREE.Vector3();
-			quaternion = ( quaternion instanceof THREE.Quaternion ) ? quaternion : new THREE.Quaternion();
-			scale = ( scale instanceof THREE.Vector3 ) ? scale : new THREE.Vector3();
-
-			scale.x = x.length();
-			scale.y = y.length();
-			scale.z = z.length();
-
-			position.x = te[12];
-			position.y = te[13];
-			position.z = te[14];
-
-			// scale the rotation part
-
-			matrix.copy( this );
-
-			matrix.elements[0] /= scale.x;
-			matrix.elements[1] /= scale.x;
-			matrix.elements[2] /= scale.x;
-
-			matrix.elements[4] /= scale.y;
-			matrix.elements[5] /= scale.y;
-			matrix.elements[6] /= scale.y;
-
-			matrix.elements[8] /= scale.z;
-			matrix.elements[9] /= scale.z;
-			matrix.elements[10] /= scale.z;
-
-			quaternion.setFromRotationMatrix( matrix );
-
-			return [ position, quaternion, scale ];
-
-		};
-
-	}()
-
-} );

@@ -14,12 +14,14 @@ THREE.Clock = function ( autoStart ) {
 
 };
 
-THREE.extend( THREE.Clock.prototype, {
+THREE.Clock.prototype = {
+
+	constructor: THREE.Clock,
 
 	start: function () {
 
-		this.startTime = window.performance !== undefined && window.performance.now !== undefined
-					? window.performance.now()
+		this.startTime = self.performance !== undefined && self.performance.now !== undefined
+					? self.performance.now()
 					: Date.now();
 
 		this.oldTime = this.startTime;
@@ -52,8 +54,8 @@ THREE.extend( THREE.Clock.prototype, {
 
 		if ( this.running ) {
 
-			var newTime = window.performance !== undefined && window.performance.now !== undefined
-					? window.performance.now()
+			var newTime = self.performance !== undefined && self.performance.now !== undefined
+					? self.performance.now()
 					: Date.now();
 
 			diff = 0.001 * ( newTime - this.oldTime );
@@ -67,4 +69,4 @@ THREE.extend( THREE.Clock.prototype, {
 
 	}
 
-} );
+};

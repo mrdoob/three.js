@@ -80,6 +80,8 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	this.setSize = function ( width, height ) {
 
+		if ( _renderTargetL ) _renderTargetL.dispose();
+		if ( _renderTargetR ) _renderTargetR.dispose();
 		_renderTargetL = new THREE.WebGLRenderTarget( width, height, _params );
 		_renderTargetR = new THREE.WebGLRenderTarget( width, height, _params );
 
@@ -164,5 +166,10 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 		renderer.render( _scene, _camera );
 
 	};
+
+	this.dispose = function() {
+		if ( _renderTargetL ) _renderTargetL.dispose();
+		if ( _renderTargetR ) _renderTargetR.dispose();
+	}
 
 };

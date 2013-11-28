@@ -9,20 +9,10 @@ THREE.Mesh = function ( geometry, material ) {
 
 	THREE.Object3D.call( this );
 
-	this.geometry = geometry;
-	this.material = ( material !== undefined ) ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff, wireframe: true } );
+	this.geometry = geometry !== undefined ? geometry : new THREE.Geometry();
+	this.material = material !== undefined ? material : new THREE.MeshBasicMaterial( { color: Math.random() * 0xffffff } );
 
-	if ( this.geometry !== undefined ) {
-
-		if ( this.geometry.boundingSphere === null ) {
-
-			this.geometry.computeBoundingSphere();
-
-		}
-
-		this.updateMorphTargets();
-
-	}
+	this.updateMorphTargets();
 
 };
 

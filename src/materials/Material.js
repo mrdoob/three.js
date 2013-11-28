@@ -5,9 +5,8 @@
 
 THREE.Material = function () {
 
-	THREE.EventDispatcher.call( this );
-
 	this.id = THREE.MaterialIdCount ++;
+	this.uuid = THREE.Math.generateUUID();
 
 	this.name = '';
 
@@ -31,7 +30,7 @@ THREE.Material = function () {
 
 	this.alphaTest = 0;
 
-	this.overdraw = false; // Boolean for fixing antialiasing gaps in CanvasRenderer
+	this.overdraw = 0; // Overdrawn pixels (typically between 0 and 1) for fixing antialiasing gaps in CanvasRenderer
 
 	this.visible = true;
 
@@ -39,87 +38,96 @@ THREE.Material = function () {
 
 };
 
-THREE.Material.prototype.setValues = function ( values ) {
+THREE.Material.prototype = {
 
-	if ( values === undefined ) return;
+	constructor: THREE.Material,
 
-	for ( var key in values ) {
+	setValues: function ( values ) {
 
-		var newValue = values[ key ];
+		if ( values === undefined ) return;
 
-		if ( newValue === undefined ) {
+		for ( var key in values ) {
 
-			console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
-			continue;
+			var newValue = values[ key ];
 
-		}
+			if ( newValue === undefined ) {
 
-		if ( key in this ) {
+				console.warn( 'THREE.Material: \'' + key + '\' parameter is undefined.' );
+				continue;
 
-			var currentValue = this[ key ];
+			}
 
-			if ( currentValue instanceof THREE.Color && newValue instanceof THREE.Color ) {
+			if ( key in this ) {
 
-				currentValue.copy( newValue );
+				var currentValue = this[ key ];
 
-			} else if ( currentValue instanceof THREE.Color ) {
+				if ( currentValue instanceof THREE.Color ) {
 
-				currentValue.set( newValue );
+					currentValue.set( newValue );
 
-			} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
+				} else if ( currentValue instanceof THREE.Vector3 && newValue instanceof THREE.Vector3 ) {
 
-				currentValue.copy( newValue );
+					currentValue.copy( newValue );
 
-			} else {
+				} else if ( key == 'overdraw') {
 
-				this[ key ] = newValue;
+					// ensure overdraw is backwards-compatable with legacy boolean type
+					this[ key ] = Number(newValue);
+
+				} else {
+
+					this[ key ] = newValue;
+
+				}
 
 			}
 
 		}
 
+	},
+
+	clone: function ( material ) {
+
+		if ( material === undefined ) material = new THREE.Material();
+
+		material.name = this.name;
+
+		material.side = this.side;
+
+		material.opacity = this.opacity;
+		material.transparent = this.transparent;
+
+		material.blending = this.blending;
+
+		material.blendSrc = this.blendSrc;
+		material.blendDst = this.blendDst;
+		material.blendEquation = this.blendEquation;
+
+		material.depthTest = this.depthTest;
+		material.depthWrite = this.depthWrite;
+
+		material.polygonOffset = this.polygonOffset;
+		material.polygonOffsetFactor = this.polygonOffsetFactor;
+		material.polygonOffsetUnits = this.polygonOffsetUnits;
+
+		material.alphaTest = this.alphaTest;
+
+		material.overdraw = this.overdraw;
+
+		material.visible = this.visible;
+
+		return material;
+
+	},
+
+	dispose: function () {
+
+		this.dispatchEvent( { type: 'dispose' } );
+
 	}
 
 };
 
-THREE.Material.prototype.clone = function ( material ) {
-
-	if ( material === undefined ) material = new THREE.Material();
-
-	material.name = this.name;
-
-	material.side = this.side;
-
-	material.opacity = this.opacity;
-	material.transparent = this.transparent;
-
-	material.blending = this.blending;
-
-	material.blendSrc = this.blendSrc;
-	material.blendDst = this.blendDst;
-	material.blendEquation = this.blendEquation;
-
-	material.depthTest = this.depthTest;
-	material.depthWrite = this.depthWrite;
-
-	material.polygonOffset = this.polygonOffset;
-	material.polygonOffsetFactor = this.polygonOffsetFactor;
-	material.polygonOffsetUnits = this.polygonOffsetUnits;
-
-	material.alphaTest = this.alphaTest;
-
-	material.overdraw = this.overdraw;
-
-	material.visible = this.visible;
-
-	return material;
-
-};
-
-THREE.Material.prototype.dispose = function () {
-
-	this.dispatchEvent( { type: 'dispose' } );
-
-};
+THREE.EventDispatcher.prototype.apply( THREE.Material.prototype );
 
 THREE.MaterialIdCount = 0;

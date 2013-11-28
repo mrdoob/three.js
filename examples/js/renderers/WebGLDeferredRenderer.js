@@ -38,6 +38,8 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
+	var currentCamera = null;
+
 	var positionVS = new THREE.Vector3();
 	var directionVS = new THREE.Vector3();
 	var tempVS = new THREE.Vector3();
@@ -332,7 +334,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 			uniforms[ "lightRadius" ].value = distance;
 
 			positionVS.getPositionFromMatrix( light.matrixWorld );
-			positionVS.applyMatrix4( camera.matrixWorldInverse );
+			positionVS.applyMatrix4( currentCamera.matrixWorldInverse );
 
 			uniforms[ "lightPositionVS" ].value.copy( positionVS );
 
@@ -420,7 +422,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var light = lightProxy.userData.originalLight;
 		var uniforms = lightProxy.material.uniforms;
 
-		var viewMatrix = camera.matrixWorldInverse;
+		var viewMatrix = currentCamera.matrixWorldInverse;
 		var modelMatrix = light.matrixWorld;
 
 		positionVS.getPositionFromMatrix( modelMatrix );
@@ -501,7 +503,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		tempVS.getPositionFromMatrix( light.target.matrixWorld );
 		directionVS.sub( tempVS );
 		directionVS.normalize();
-		directionVS.transformDirection( camera.matrixWorldInverse );
+		directionVS.transformDirection( currentCamera.matrixWorldInverse );
 
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 
@@ -566,7 +568,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		directionVS.getPositionFromMatrix( light.matrixWorld );
 		directionVS.normalize();
-		directionVS.transformDirection( camera.matrixWorldInverse );
+		directionVS.transformDirection( currentCamera.matrixWorldInverse );
 
 		uniforms[ "lightDirectionVS" ].value.copy( directionVS );
 
@@ -631,7 +633,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		var uniforms = lightProxy.material.uniforms;
 
 		var modelMatrix = light.matrixWorld;
-		var viewMatrix = camera.matrixWorldInverse;
+		var viewMatrix = currentCamera.matrixWorldInverse;
 
 		positionVS.getPositionFromMatrix( modelMatrix );
 		positionVS.applyMatrix4( viewMatrix );
@@ -926,12 +928,12 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	//
 
-	function updateLightProxy ( proxy, camera ) {
+	function updateLightProxy ( proxy ) {
 
 		var uniforms = proxy.material.uniforms;
 
-		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = camera.projectionMatrixInverse;
-		if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = camera.matrixWorldInverse;
+		if ( uniforms[ "matProjInverse" ] ) uniforms[ "matProjInverse" ].value = currentCamera.projectionMatrixInverse;
+		if ( uniforms[ "matView" ] ) uniforms[ "matView" ].value = currentCamera.matrixWorldInverse;
 
 		var originalLight = proxy.userData.originalLight;
 
@@ -979,12 +981,14 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		}
 
+		currentCamera = camera;
+
 		lightSceneProxy = scene.userData.lightSceneProxy;
 		lightSceneFullscreen = scene.userData.lightSceneFullscreen;
 
-		passColor.camera = camera;
-		passNormalDepth.camera = camera;
-		passLightProxy.camera = camera;
+		passColor.camera = currentCamera;
+		passNormalDepth.camera = currentCamera;
+		passLightProxy.camera = currentCamera;
 		passLightFullscreen.camera = THREE.EffectComposer.camera;
 
 		passColor.scene = scene;
@@ -997,7 +1001,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// update scene graph only once per frame
 		// (both color and normalDepth passes use exactly the same scene state)
 
-		this.renderer.autoUpdateScene = false;
+		scene.autoUpdate = false;
 		scene.updateMatrixWorld();
 
 		// 1) g-buffer normals + depth pass
@@ -1046,23 +1050,24 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 		// (write light proxy color pixel if behind scene pixel)
 
 		this.renderer.autoClearDepth = false;
-		this.renderer.autoUpdateScene = true;
+
+		scene.autoUpdate = true;
 
 		gl.depthFunc( gl.GEQUAL );
 
-		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
+		currentCamera.projectionMatrixInverse.getInverse( currentCamera.projectionMatrix );
 
 		for ( var i = 0, il = lightSceneProxy.children.length; i < il; i ++ ) {
 
 			var proxy = lightSceneProxy.children[ i ];
-			updateLightProxy( proxy, camera );
+			updateLightProxy( proxy );
 
 		}
 
 		for ( var i = 0, il = lightSceneFullscreen.children.length; i < il; i ++ ) {
 
 			var proxy = lightSceneFullscreen.children[ i ];
-			updateLightProxy( proxy, camera );
+			updateLightProxy( proxy );
 
 		}
 

@@ -3,19 +3,17 @@
  * Parametric Surfaces Geometry
  * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
  *
- * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements, useTris );
+ * new THREE.ParametricGeometry( parametricFunction, uSegments, ySegements );
  *
  */
 
-THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
+THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 	THREE.Geometry.call( this );
 
 	var verts = this.vertices;
 	var faces = this.faces;
 	var uvs = this.faceVertexUvs[ 0 ];
-
-	useTris = (useTris === undefined) ? false : useTris;
 
 	var i, il, j, p;
 	var u, v;
@@ -46,28 +44,19 @@ THREE.ParametricGeometry = function ( func, slices, stacks, useTris ) {
 
 			a = i * sliceCount + j;
 			b = i * sliceCount + j + 1;
-			c = (i + 1) * sliceCount + j;
-			d = (i + 1) * sliceCount + j + 1;
+			c = (i + 1) * sliceCount + j + 1;
+			d = (i + 1) * sliceCount + j;
 
 			uva = new THREE.Vector2( j / slices, i / stacks );
 			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvc = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
+			uvd = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
 
-			if ( useTris ) {
+			faces.push( new THREE.Face3( a, b, d ) );
+			uvs.push( [ uva, uvb, uvd ] );
 
-				faces.push( new THREE.Face3( a, b, c ) );
-				faces.push( new THREE.Face3( b, d, c ) );
-
-				uvs.push( [ uva, uvb, uvc ] );
-				uvs.push( [ uvb, uvd, uvc ] );
-
-			} else {
-
-				faces.push( new THREE.Face4( a, b, d, c ) );
-				uvs.push( [ uva, uvb, uvd, uvc ] );
-
-			}
+			faces.push( new THREE.Face3( b, c, d ) );
+			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
 
 		}
 

@@ -72,7 +72,6 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 	}
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
 	xhr.send( null );
 
@@ -101,9 +100,9 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 			if ( xhr.status === 200 || xhr.status === 0 ) {
 
-				var binaryData = xhr.responseText;
+				var binaryData = new Uint8Array(xhr.response);
 
-				//var s = Date.now();
+				var s = Date.now();
 
 				if ( parameters.useWorker ) {
 
@@ -117,6 +116,9 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 							var ctmFile = files[ i ];
 
+                            				var e1 = Date.now();
+                            				// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
+
 							if ( useBuffers ) {
 
 								scope.createModelBuffers( ctmFile, callback );
@@ -127,10 +129,11 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 							}
 
+                            				var e = Date.now();
+                            				console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
+
 						}
 
-						//var e = Date.now();
-						//console.log( "CTM data parse time [worker]: " + (e-s) + " ms" );
 
 					};
 
@@ -190,8 +193,9 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 	}
 
-	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.open( "GET", url, true );
+	xhr.responseType = "arraybuffer";
+
 	xhr.send( null );
 
 };
@@ -209,6 +213,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		THREE.BufferGeometry.call( this );
 
+		var s = Date.now();
 		// init GL buffers
 
 		var vertexIndexArray = file.body.indices,
@@ -218,97 +223,130 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		var vertexUvArray, vertexColorArray;
 
 		if ( file.body.uvMaps !== undefined && file.body.uvMaps.length > 0 ) {
-
 			vertexUvArray = file.body.uvMaps[ 0 ].uv;
-
 		}
 
 		if ( file.body.attrMaps !== undefined && file.body.attrMaps.length > 0 && file.body.attrMaps[ 0 ].name === "Color" ) {
-
 			vertexColorArray = file.body.attrMaps[ 0 ].attr;
-
 		}
 
 		// reorder vertices
 		// (needed for buffer splitting, to keep together face vertices)
-
 		if ( reorderVertices ) {
 
-			var newFaces = new Uint32Array( vertexIndexArray.length ),
-				newVertices = new Float32Array( vertexPositionArray.length );
+		    	function copyVertexInfo(v, vt) {
 
-			var newNormals, newUvs, newColors;
+				var sx = v * 3,
+			    	    sy = v * 3 + 1,
+			    	    sz = v * 3 + 2,
 
-			if ( vertexNormalArray ) newNormals = new Float32Array( vertexNormalArray.length );
-			if ( vertexUvArray ) newUvs = new Float32Array( vertexUvArray.length );
-			if ( vertexColorArray ) newColors = new Float32Array( vertexColorArray.length );
+			    	dx = vt * 3,
+			    	dy = vt * 3 + 1,
+			    	dz = vt * 3 + 2;
 
-			var indexMap = {}, vertexCounter = 0;
+				newVertices[ dx ] = vertexPositionArray[ sx ];
+				newVertices[ dy ] = vertexPositionArray[ sy ];
+				newVertices[ dz ] = vertexPositionArray[ sz ];
 
-			function handleVertex( v ) {
-
-				if ( indexMap[ v ] === undefined ) {
-
-					indexMap[ v ] = vertexCounter;
-
-					var sx = v * 3,
-						sy = v * 3 + 1,
-						sz = v * 3 + 2,
-
-						dx = vertexCounter * 3,
-						dy = vertexCounter * 3 + 1,
-						dz = vertexCounter * 3 + 2;
-
-					newVertices[ dx ] = vertexPositionArray[ sx ];
-					newVertices[ dy ] = vertexPositionArray[ sy ];
-					newVertices[ dz ] = vertexPositionArray[ sz ];
-
-					if ( vertexNormalArray ) {
-
-						newNormals[ dx ] = vertexNormalArray[ sx ];
-						newNormals[ dy ] = vertexNormalArray[ sy ];
-						newNormals[ dz ] = vertexNormalArray[ sz ];
-
-					}
-
-					if ( vertexUvArray ) {
-
-						newUvs[ vertexCounter * 2 ] 	= vertexUvArray[ v * 2 ];
-						newUvs[ vertexCounter * 2 + 1 ] = vertexUvArray[ v * 2 + 1 ];
-
-					}
-
-					if ( vertexColorArray ) {
-
-						newColors[ vertexCounter * 4 ] 	   = vertexColorArray[ v * 4 ];
-						newColors[ vertexCounter * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
-						newColors[ vertexCounter * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
-						newColors[ vertexCounter * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
-
-					}
-
-					vertexCounter += 1;
-
+				if ( vertexNormalArray ) {
+				    newNormals[ dx ] = vertexNormalArray[ sx ];
+				    newNormals[ dy ] = vertexNormalArray[ sy ];
+				    newNormals[ dz ] = vertexNormalArray[ sz ];
 				}
 
-			}
+				if ( vertexUvArray ) {
+				    newUvs[ vt * 2 ] 	 = vertexUvArray[ v * 2 ];
+				    newUvs[ vt * 2 + 1 ] = vertexUvArray[ v * 2 + 1 ];
+				}
 
-			var a, b, c;
+				if ( vertexColorArray ) {
+				    newColors[ vt * 4 ] 	= vertexColorArray[ v * 4 ];
+				    newColors[ vt * 4 + 1 ] = vertexColorArray[ v * 4 + 1 ];
+				    newColors[ vt * 4 + 2 ] = vertexColorArray[ v * 4 + 2 ];
+				    newColors[ vt * 4 + 3 ] = vertexColorArray[ v * 4 + 3 ];
+				}
+		    	}
+
+		    	function handleVertex( v, iMap ) {
+
+				if ( iMap[ v ] === undefined ) {
+
+					iMap[ v ] = vertexCounter;
+                    			reverseIndexMap[vertexCounter] = v;
+					vertexCounter += 1;
+				}
+                		return iMap[ v ];
+		    	}
+
+			var newFaces = new Uint32Array( vertexIndexArray.length );
+			var indexMap = {}, reverseIndexMap = {}, vertexCounter = 0;
+
+            		var spawledFaceCount = 0,
+                	    spawledFaceLimit = Math.ceil(vertexIndexArray.length/3000);
+            		var sprawledFaces = new Uint32Array( spawledFaceLimit );  // to store sprawled triangle indices
 
 			for ( var i = 0; i < vertexIndexArray.length; i += 3 ) {
 
-				a = vertexIndexArray[ i ];
-				b = vertexIndexArray[ i + 1 ];
-				c = vertexIndexArray[ i + 2 ];
+				var a = vertexIndexArray[ i ];
+				var b = vertexIndexArray[ i + 1 ];
+				var c = vertexIndexArray[ i + 2 ];
 
-				handleVertex( a );
-				handleVertex( b );
-				handleVertex( c );
+				handleVertex( a, indexMap );
+				handleVertex( b, indexMap );
+				handleVertex( c, indexMap );
 
-				newFaces[ i ] 	  = indexMap[ a ];
-				newFaces[ i + 1 ] = indexMap[ b ];
-				newFaces[ i + 2 ] = indexMap[ c ];
+				// check for sprawled triangles and put them aside to recreate later
+				if ( Math.abs( indexMap[a] - indexMap[b] ) > 65535 ||
+                     		     Math.abs( indexMap[b] - indexMap[c] ) > 65535 ||
+                     		     Math.abs( indexMap[c] - indexMap[a] ) > 65535 ){
 
+			    		// expand storage when neccessary
+			    		if (spawledFaceCount >= spawledFaceLimit) {
+						console.warn("reached sprawled faces limit: " + spawledFaceCount);
+						spawledFaceLimit *= 2;
+						var tArr = new Uint32Array( spawledFaceLimit );
+						tArr.set(sprawledFaces);
+						sprawledFaces = tArr;
+			    		}
+
+                    			sprawledFaces[ spawledFaceCount ] = i;  // starting index in newFaces
+                    			spawledFaceCount += 1;
+                		}
+                		else {
+
+				    newFaces[ i ] 	  = indexMap[ a ];
+				    newFaces[ i + 1 ] = indexMap[ b ];
+				    newFaces[ i + 2 ] = indexMap[ c ];
+                		}
+			}
+            		// console.log("Number of sprawled faces: " + spawledFaceCount + " current limit: " + spawledFaceLimit +
+                        //	" total: " + vertexIndexArray.length/3 + " vertices: " + vertexCounter);
+
+			// create dublicate vertices and update sprawled faces
+			var indexMap2 = {},
+			    noov = vertexCounter;   // # of original vertices
+
+			for (var isf = 0; isf < spawledFaceCount; isf++ ) {
+				var i = sprawledFaces[isf];
+
+				for (var j = 0; j < 3; j++) {
+				    var v = vertexIndexArray[ i + j ];
+				    newFaces[ i + j] = handleVertex(v, indexMap2);   // new vertex
+				}
+			}
+
+			// console.log("Created duplicated vertices: " + (vertexCounter - noov));
+
+			// copy xyz, uv, normals and colors into new arrays
+			var newVertices = new Float32Array( 3*vertexCounter );
+			var newNormals, newUvs, newColors;
+
+			if ( vertexNormalArray ) newNormals = new Float32Array( 3*vertexCounter );
+			if ( vertexUvArray ) newUvs = new Float32Array( 2*vertexCounter );
+			if ( vertexColorArray ) newColors = new Float32Array( 4*vertexCounter );
+
+			for (var iv = 0; iv < vertexCounter; iv++) {
+				copyVertexInfo(reverseIndexMap[iv], iv);
 			}
 
 			vertexIndexArray = newFaces;
@@ -317,7 +355,6 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 			if ( vertexNormalArray ) vertexNormalArray = newNormals;
 			if ( vertexUvArray ) vertexUvArray = newUvs;
 			if ( vertexColorArray ) vertexColorArray = newColors;
-
 		}
 
 		// compute offsets
@@ -346,10 +383,10 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 				i -= 3;
 
-				for ( var k = start; k < i; ++ k ) {
+                		if ( minPrev > 0 ) {
 
-					indices[ k ] -= minPrev;
-
+				    for ( var k = start; k < i; ++ k )
+					    indices[ k ] -= minPrev;
 				}
 
 				scope.offsets.push( { start: start, count: i - start, index: minPrev } );
@@ -364,20 +401,20 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 
 		}
 
-		for ( var k = start; k < i; ++ k ) {
+        	if ( minPrev > 0 ) {
 
-			indices[ k ] -= minPrev;
-
+		    for ( var k = start; k < i; ++ k )
+			    indices[ k ] -= minPrev;
 		}
-
 		scope.offsets.push( { start: start, count: i - start, index: minPrev } );
 
-		// recast CTM 32-bit indices as 16-bit WebGL indices
+        	// var e = Date.now();
+		// console.log( "Vetex reordering time: " + (e-s) + " ms" );
 
+		// recast CTM 32-bit indices as 16-bit WebGL indices
 		var vertexIndexArray16 = new Uint16Array( vertexIndexArray );
 
 		// attributes
-
 		var attributes = scope.attributes;
 
 		attributes[ "index" ]    = { itemSize: 1, array: vertexIndexArray16, numItems: vertexIndexArray16.length };

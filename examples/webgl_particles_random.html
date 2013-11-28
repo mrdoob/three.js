@@ -92,7 +92,7 @@
 					color = parameters[i][0];
 					size  = parameters[i][1];
 
-					materials[i] = new THREE.ParticleBasicMaterial( { size: size } );
+					materials[i] = new THREE.ParticleSystemMaterial( { size: size } );
 
 					particles = new THREE.ParticleSystem( geometry, materials[i] );
 

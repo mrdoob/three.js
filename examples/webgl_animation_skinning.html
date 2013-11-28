@@ -99,9 +99,9 @@
 				floor.scale.set( 25, 25, 25 );
 				scene.add( floor );
 
-				renderer = new THREE.WebGLRenderer( { clearColor: 0xffffff, clearAlpha: 1, antialias: true } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
 				renderer.setClearColor( scene.fog.color, 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.sortObjects = false;
 
 				container.appendChild( renderer.domElement );
