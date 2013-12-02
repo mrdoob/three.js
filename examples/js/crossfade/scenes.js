@@ -34,7 +34,7 @@ function generateGeometry(objectType, numObjects) {
 
 		var scale = new THREE.Vector3();
 
-		var geom;
+		var geom, color=new THREE.Color();
 
 		scale.x = Math.random() * 200 + 100;
 
@@ -43,15 +43,16 @@ function generateGeometry(objectType, numObjects) {
 			geom = new THREE.CubeGeometry( 1, 1, 1 );
 			scale.y = Math.random() * 200 + 100;
 			scale.z = Math.random() * 200 + 100;
+			color.setRGB( 0, 0, Math.random()+0.1 );
 		}
 		else if ( objectType == "sphere" )
 		{
 			geom = new THREE.IcosahedronGeometry( 1, 1 )
 			scale.y = scale.z = scale.x;
+			color.setRGB( Math.random()+0.1, 0, 0 );
 		}
-
+		
 		// give the geom's vertices a random color, to be displayed
-		var color = new THREE.Color( Math.random() * 0xffffff );
 		applyVertexColors( geom, color );
 
 		var cube = new THREE.Mesh( geom );

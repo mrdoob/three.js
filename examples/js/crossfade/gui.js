@@ -1,7 +1,7 @@
 var transitionParams = {
 	"useTexture": true,
 	"transition": 0.5,
-	"transitionSpeed": 2.5,
+	"transitionSpeed": 2.0,
 	"texture": 5,
 	"loopTexture": true,
 	"animateTransition": true,
@@ -26,14 +26,14 @@ function initGUI() {
 		
 	}).listen();
 		
-	gui.add(transitionParams, "textureThreshold", 0, 1, 0.01 ).onChange(function(value) {
+	gui.add(transitionParams, "textureThreshold", 0, 1, 0.01).onChange(function(value) {
 		
 		transition.setTextureThreshold(value);
 		
 	});
 
 	gui.add(transitionParams, "animateTransition");
-	gui.add(transitionParams, "transition", 0, 1, 0.01 ).listen();
-	gui.add(transitionParams, "transitionSpeed", 0.5, 5, 0.01 );
-
+	gui.add(transitionParams, "transition", 0, 1, 0.01).listen();
+	gui.add(transitionParams, "transitionSpeed", 0.5, 5, 0.01);
+	
 }
