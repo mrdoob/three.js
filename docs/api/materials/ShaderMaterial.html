@@ -17,12 +17,27 @@
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo parameters])</h3>
+		<h3>[name]([page:Object parameters])</h3>
 		<div>
-		parameters -- todo
+		parameters -- An object containing various parameters setting up shaders and their uniforms.
 		</div>
 		<div>
-		todo
+		<br>
+		Example:<br>
+		<br>
+		uniforms = {
+			time: { type: "f", value: 1.0 },
+			resolution: { type: "v2", value: new THREE.Vector2() }
+		};
+
+		material = new THREE.ShaderMaterial( {
+
+			uniforms: uniforms,
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+		} );
+
 		</div>
 
 
@@ -32,17 +47,17 @@
 
 		<h3>.[page:object uniforms]</h3>
 		<div>
-		todo
+		Uniforms defined inside GLSL shader code.
 		</div> 
 
 		<h3>.[page:string fragmentShader]</h3>
 		<div>
-		todo
+		Fragment shader GLSL code.  This is the actual code for the shader.  In the example above the code is retrieved from DOM elements emnbedded directly in the page although other methods can be used including specifying a string directly.  
 		</div> 
 
 		<h3>.[page:string vertexShader]</h3>
 		<div>
-		todo
+		Vertex shader GLSL code.  This is the actual code for the shader.  In the example above the code is retrieved from DOM elements emnbedded directly in the page although other methods can be used including specifying a string directly.  
 		</div> 
 
 		<h3>.[page:boolean morphTargets]</h3>
