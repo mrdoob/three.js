@@ -89,26 +89,22 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 			j = right;
 	
 			swapF( median, i );
-			// swap = arr[ median ]; arr[ median ] = arr[ i ]; arr[ i ] = swap;
 
 			if ( arr[ left * eleSize + orderElement ] > arr[ right * eleSize + orderElement ] ) {
 		
 				swapF( left, right );
-				// swap = arr[ left ]; arr[ left ] = arr[ right ]; arr[ right ] = swap;
 				
 			}
 
 			if ( arr[ i * eleSize + orderElement ] > arr[ right * eleSize + orderElement ] ) {
 		
 				swapF( i, right );
-				// swap = arr[ i ]; arr[ i ] = arr[ right ]; arr[ right ] = swap;
 		
 			}
 
 			if ( arr[ left * eleSize + orderElement ] > arr[ i * eleSize + orderElement ] ) {
 		
 				swapF( left, i );
-				// swap = arr[ left ]; arr[ left ] = arr[ i ]; arr[ i ] = swap;
 			
 			}
 
@@ -126,7 +122,6 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 				if ( j < i ) break;
 		
 				swapF( i, j );
-				// swap = arr[ i ]; arr[ i ] = arr[ j ]; arr[ j ] = swap;
 			
 			}
 
@@ -184,7 +179,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
  * http://en.wikipedia.org/wiki/Binary_tree
  * http://en.wikipedia.org/wiki/K-d_tree
  *
- * If you want to further minimize performance, remove Node.depth and replace in search algorithm with a traversal to root node
+ * If you want to further minimize memory usage, remove Node.depth and replace in search algorithm with a traversal to root node (see comments at THREE.TypedArrayUtils.Kdtree.prototype.Node)
  */
 
  THREE.TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
@@ -219,7 +214,6 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 		
 		median = Math.floor( plength / 2 );
 		
-		// debugger;
 		node = new self.Node( getPointSet( points, median ) , depth, parent, median + pos );
 		node.left = buildTree( points.subarray( 0, median * eleSize), depth + 1, node, pos );
 		node.right = buildTree( points.subarray( ( median + 1 ) * eleSize, points.length ), depth + 1, node, pos + median + 1 );
@@ -232,12 +226,13 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 		
 	this.getMaxDepth = function () { return maxDepth; };
 	
-	 /* point: array of size eleSize 
-	    maxNodes: max amount of nodes to return 
-	    maxDistance: maximum distance to point result nodes should have
-	*/
-	
 	this.nearest = function ( point, maxNodes , maxDistance ) {
+	
+		 /* point: array of size eleSize 
+			maxNodes: max amount of nodes to return 
+			maxDistance: maximum distance to point result nodes should have
+			condition (not implemented): function to test node before it's added to the result list, e.g. test for view frustum
+		*/
 
 		var i,
 			result,
@@ -386,7 +381,22 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 	};
 	
 };
-	
+
+/**
+ * If you need to free up additional memory and agree with an additional O( log n ) traversal time you can get rid of "depth" and "pos" in Node:
+ * Depth can be easily done by adding 1 for every parent (care: root node has depth 0, not 1)
+ * Pos is a bit tricky: Assuming the tree is balanced (which is the case when after we built it up), perform the following steps:
+ *   By traversing to the root store the path e.g. in a bit pattern (01001011, 0 is left, 1 is right)
+ *   From buildTree we know that "median = Math.floor( plength / 2 );", therefore for each bit...
+ *     0: amountOfNodesRelevantForUs = Math.floor( (pamountOfNodesRelevantForUs - 1) / 2 );
+ *     1: amountOfNodesRelevantForUs = Math.ceil( (pamountOfNodesRelevantForUs - 1) / 2 );
+ *        pos += Math.floor( (pamountOfNodesRelevantForUs - 1) / 2 );
+ *     when recursion done, we still need to add all left children of target node:
+ *        pos += Math.floor( (pamountOfNodesRelevantForUs - 1) / 2 );
+ *        and I think you need to +1 for the current position, not sure.. depends, try it out ^^
+ *
+ * I experienced that for 200'000 nodes you can get rid of 4 MB memory each, leading to 8 MB memory saved.
+ */
 THREE.TypedArrayUtils.Kdtree.prototype.Node = function ( obj, depth, parent, pos ) {
 
 	this.obj = obj;
