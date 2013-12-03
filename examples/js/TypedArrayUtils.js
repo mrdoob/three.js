@@ -95,6 +95,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 		
 				swapF( left, right );
 				// swap = arr[ left ]; arr[ left ] = arr[ right ]; arr[ right ] = swap;
+				
 			}
 
 			if ( arr[ i * eleSize + orderElement ] > arr[ right * eleSize + orderElement ] ) {
