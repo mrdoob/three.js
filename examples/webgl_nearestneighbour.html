@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Kunstexploration 3D</title>
+		<title>three.js webgl - nearest neighbour</title>
 		<style>
 			html, body {
 				width: 100%;
@@ -26,7 +26,7 @@
 	</head>
 	<body>
 		
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - typed arrays - nearest neighbour for 500'000 sprites</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - typed arrays - nearest neighbour for 500,000 sprites</div>
 		
 		<script src="../build/three.min.js"></script>
 		<script src="js/TypedArrayUtils.js"></script>
@@ -111,26 +111,24 @@
 				
 				//
 
-				renderer = new THREE.WebGLRenderer(); //Detector.webgl? new THREE.WebGLRenderer(): new THREE.CanvasRenderer()
+				renderer = new THREE.WebGLRenderer(); // Detector.webgl? new THREE.WebGLRenderer(): new THREE.CanvasRenderer()
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				document.body.appendChild( renderer.domElement );
 
-				
-				
-				//create the custom shader
+				// create the custom shader
 				var imagePreviewTexture = THREE.ImageUtils.loadTexture( 'textures/crate.gif');
 				imagePreviewTexture.minFilter = THREE.LinearMipMapLinearFilter;
 				imagePreviewTexture.magFilter = THREE.LinearFilter;
 				
 				pointShaderMaterial = new THREE.ShaderMaterial( {
-					uniforms:       {
-										tex1: { type: "t", value: imagePreviewTexture },
-										zoom: { type: 'f', value: 9.0 },
-									},
-					attributes:     {
-										alpha: { type: 'f', value: null },
-									},
+					uniforms: {
+						tex1: { type: "t", value: imagePreviewTexture },
+						zoom: { type: 'f', value: 9.0 },
+					},
+					attributes: {
+						alpha: { type: 'f', value: null },
+					},
 					vertexShader:   document.getElementById( 'vertexshader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentshader' ).textContent,
 					transparent: true
@@ -161,9 +159,7 @@
 				positions = _particleGeom.attributes.position.array;
 				alphas = _particleGeom.attributes.alpha.array;
 				
-				particles = new THREE.ParticleSystem( _particleGeom, 
-					pointShaderMaterial
-				);
+				particles = new THREE.ParticleSystem( _particleGeom, pointShaderMaterial );
 				particles.dynamic = true;
 				
 				for (var x = 0; x < amountOfParticles; x++) {
@@ -176,12 +172,12 @@
 				
 				var measureStart = new Date().getTime();
 				
-				//creating the kdtree takes a lot of time to execute, in turn the nearest neighbour search will be much faster
+				// creating the kdtree takes a lot of time to execute, in turn the nearest neighbour search will be much faster
 				kdtree = new THREE.TypedArrayUtils.Kdtree( positions, distanceFunction, 3 );
 				
 				console.log('TIME building kdtree', new Date().getTime() - measureStart);
 				
-				//display particles after the kd-tree was generated and the sorting of the positions-array is done
+				// display particles after the kd-tree was generated and the sorting of the positions-array is done
 				scene.add(particles);
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -213,10 +209,10 @@
 			
 			function displayNearest(position) {
 				
-				//take the nearest 200 around him. distance^2 'cause we use the manhattan distance and no square is applied in the distance function
+				// take the nearest 200 around him. distance^2 'cause we use the manhattan distance and no square is applied in the distance function
 				var imagePositionsInRange = kdtree.nearest([position.x, position.y, position.z], 100, maxDistance);
 								
-				//We combine the nearest neighbour with a view frustum. Doesn't make sense if we change the sprites not in our view... well maybe it does. Whatever you want.
+				// We combine the nearest neighbour with a view frustum. Doesn't make sense if we change the sprites not in our view... well maybe it does. Whatever you want.
 				var _frustum = new THREE.Frustum();
 				var _projScreenMatrix = new THREE.Matrix4();
 				camera.matrixWorldInverse.getInverse( camera.matrixWorld );
@@ -235,9 +231,9 @@
 					
 						var objectIndex = object[0].pos;
 						
-						//set the alpha according to distance
+						// set the alpha according to distance
 						alphas[ objectIndex ] = 1.0 / maxDistance * object[1];
-						//update the attribute
+						// update the attribute
 						_particleGeom.attributes.alpha.needsUpdate = true;
 					}
 				}
