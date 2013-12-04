@@ -406,7 +406,7 @@
 				for (var f = 0; f<BIRDS; f++ ) {
 					verts.push(
 						new THREE.Vector3(0, -0, -20),
-						new THREE.Vector3(0, 10, -20),
+						new THREE.Vector3(0, 4, -20),
 						new THREE.Vector3(0, 0, 30)
 					);
 
@@ -422,18 +422,18 @@
 						new THREE.Vector2(1, 1)
 					]);
 
-					var wingsSpan = 30;
+					var wingsSpan = 20;
 
 					verts.push(
-						new THREE.Vector3(0, 0, -20),
+						new THREE.Vector3(0, 0, -15),
 						new THREE.Vector3(-wingsSpan, 0, 0),
-						new THREE.Vector3(0, 0, 20)
+						new THREE.Vector3(0, 0, 15)
 					);
 
 					verts.push(
-						new THREE.Vector3(0, 0, 20),
+						new THREE.Vector3(0, 0, 15),
 						new THREE.Vector3(wingsSpan, 0, 0),
-						new THREE.Vector3(0, 0, -20)
+						new THREE.Vector3(0, 0, -15)
 					);
 
 					faces.push(new THREE.Face3(
@@ -677,8 +677,8 @@
 					var y = ~~(i / WIDTH) / WIDTH;
 
 					birdColors[ v ] = new THREE.Color(
-						Math.random() * 0xffffff
-						// ~~(v / 9) / BIRDS * 0xffffff
+						0x444444 +
+						~~(v / 9) / BIRDS * 0x666666
 					);
 					references[ v ] = new THREE.Vector2( x, y );
 					birdVertex[ v ] = v % 9;
