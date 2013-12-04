@@ -3376,12 +3376,14 @@ THREE.Box2.prototype = {
 
 	},
 
-	getParameter: function ( point ) {
+	getParameter: function ( point, optionalTarget ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		return new THREE.Vector2(
+		var result = optionalTarget || new THREE.Vector2();
+
+		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y )
 		);
@@ -3701,12 +3703,14 @@ THREE.Box3.prototype = {
 
 	},
 
-	getParameter: function ( point ) {
+	getParameter: function ( point, optionalTarget ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
 
-		return new THREE.Vector3(
+		var result = optionalTarget || new THREE.Vector3();
+
+		return result.set(
 			( point.x - this.min.x ) / ( this.max.x - this.min.x ),
 			( point.y - this.min.y ) / ( this.max.y - this.min.y ),
 			( point.z - this.min.z ) / ( this.max.z - this.min.z )
@@ -28559,7 +28563,8 @@ THREE.CurvePath.prototype.getWrapPoints = function ( oldPts, path ) {
 		// check for out of bounds?
 
 		var pathPt = path.getPoint( xNorm );
-		var normal = path.getNormalVector( xNorm ).multiplyScalar( oldY );
+		var normal = path.getNormalVector( xNorm );
+		normal.set( -normal.y, normal.x ).multiplyScalar( oldY );
 
 		p.x = pathPt.x + normal.x;
 		p.y = pathPt.y + normal.y;
@@ -30518,7 +30523,18 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 	this.currentTime += deltaTimeMS * this.timeScale;
 
 	unloopedCurrentTime = this.currentTime;
+
+	// Mod operation fails on floats
+	// was this supposed to be in frames?
+	while ( this.currentTime > this.data.length ) {
+
+		this.currentTime -= this.data.length;
+
+	}
+
 	currentTime = this.currentTime = this.currentTime % this.data.length;
+
+	
 	frame = parseInt( Math.min( currentTime * this.data.fps, this.data.length * this.data.fps ), 10 );
 
 
@@ -30538,19 +30554,20 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 			nextKey = animationCache.nextKey[ type ];
 
 			// switch keys?
-
+			
 			if ( nextKey.time <= unloopedCurrentTime ) {
 
 				// did we loop?
 
-				if ( currentTime < unloopedCurrentTime ) {
+				if ( currentTime <= unloopedCurrentTime ) {
 
 					if ( this.loop ) {
 
 						prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 						nextKey = this.getNextKeyWith( type, h, 1 );
 
-						while( nextKey.time < currentTime ) {
+						// if ( nextKey.index < prevKey.index ) then we have wrapped over the end, and nextKey.time < currentTime will loop forever
+						while ( nextKey !== null && nextKey.time < currentTime && nextKey.index > prevKey.index) {
 
 							prevKey = nextKey;
 							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
@@ -30571,7 +30588,8 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 						prevKey = nextKey;
 						nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
 
-					} while( nextKey.time < currentTime )
+					} while ( nextKey !== null && nextKey.time < currentTime && nextKey.index > prevKey.index )
+					// if ( nextKey.index < prevKey.index ) then we have wrapped over the end, and nextKey.time < currentTime will loop forever
 
 				}
 
@@ -34002,9 +34020,11 @@ THREE.AxisHelper.prototype = Object.create( THREE.Line.prototype );
  *  origin - Vector3
  *  length - Number
  *  hex - color in hex value
+ *  headLength - Number
+ *  headWidth - Number
  */
 
-THREE.ArrowHelper = function ( dir, origin, length, hex ) {
+THREE.ArrowHelper = function ( dir, origin, length, hex, headLength, headWidth ) {
 
 	// dir is assumed to be normalized
 
@@ -34012,6 +34032,8 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 
 	if ( hex === undefined ) hex = 0xffff00;
 	if ( length === undefined ) length = 1;
+	if ( headLength === undefined ) headLength = 0.2 * length;
+	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
 	this.position = origin;
 
@@ -34023,15 +34045,15 @@ THREE.ArrowHelper = function ( dir, origin, length, hex ) {
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	var coneGeometry = new THREE.CylinderGeometry( 0, 0.05, 0.25, 5, 1 );
-	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, 0.875, 0 ) );
+	var coneGeometry = new THREE.CylinderGeometry( 0, 0.5, 1, 5, 1 );
+	coneGeometry.applyMatrix( new THREE.Matrix4().makeTranslation( 0, - 0.5, 0 ) );
 
 	this.cone = new THREE.Mesh( coneGeometry, new THREE.MeshBasicMaterial( { color: hex } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
 	this.setDirection( dir );
-	this.setLength( length );
+	this.setLength( length, headLength, headWidth );
 
 };
 
@@ -34068,9 +34090,17 @@ THREE.ArrowHelper.prototype.setDirection = function () {
 
 }();
 
-THREE.ArrowHelper.prototype.setLength = function ( length ) {
+THREE.ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
-	this.scale.set( length, length, length );
+	if ( headLength === undefined ) headLength = 0.2 * length;
+	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
+
+	this.line.scale.set( 1, length, 1 );
+	this.line.updateMatrix();
+
+	this.cone.scale.set( headWidth, headLength, headWidth );
+	this.cone.position.y = length;
+	this.cone.updateMatrix();
 
 };
 
