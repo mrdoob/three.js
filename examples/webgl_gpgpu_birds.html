@@ -406,7 +406,7 @@
 				for (var f = 0; f<BIRDS; f++ ) {
 					verts.push(
 						new THREE.Vector3(0, -0, -20),
-						new THREE.Vector3(0, 10, -20),
+						new THREE.Vector3(0, 4, -20),
 						new THREE.Vector3(0, 0, 30)
 					);
 
@@ -422,18 +422,18 @@
 						new THREE.Vector2(1, 1)
 					]);
 
-					var wingsSpan = 30;
+					var wingsSpan = 20;
 
 					verts.push(
-						new THREE.Vector3(0, 0, -20),
+						new THREE.Vector3(0, 0, -15),
 						new THREE.Vector3(-wingsSpan, 0, 0),
-						new THREE.Vector3(0, 0, 20)
+						new THREE.Vector3(0, 0, 15)
 					);
 
 					verts.push(
-						new THREE.Vector3(0, 0, 20),
+						new THREE.Vector3(0, 0, 15),
 						new THREE.Vector3(wingsSpan, 0, 0),
-						new THREE.Vector3(0, 0, -20)
+						new THREE.Vector3(0, 0, -15)
 					);
 
 					faces.push(new THREE.Face3(
@@ -515,9 +515,6 @@
 
 
 			var simulator;
-			var flipflop = true;
-			var rtPosition1, rtPosition2, rtVelocity1, rtVelocity2;
-
 
 			init();
 			animate();
@@ -545,21 +542,7 @@
 				////////
 				simulator = new SimulatorRenderer(WIDTH, renderer);
 
-				var dtPosition = generateDataTexture();
-				var dtVelocity = generateVelocityTexture();
-
-				rtPosition1 = simulator.getRenderTarget();
-				rtPosition2 = rtPosition1.clone();
-				rtVelocity1 = rtPosition1.clone();
-				rtVelocity2 = rtPosition1.clone();
-
-				simulator.renderTexture(dtPosition, rtPosition1);
-				simulator.renderTexture(rtPosition1, rtPosition2);
-
-				simulator.renderTexture(dtVelocity, rtVelocity1);
-				simulator.renderTexture(rtVelocity1, rtVelocity2);
-
-				simulator.velocityUniforms.testing.value = 10;
+				simulator.init();
 
 				/////////
 
@@ -694,8 +677,8 @@
 					var y = ~~(i / WIDTH) / WIDTH;
 
 					birdColors[ v ] = new THREE.Color(
-						Math.random() * 0xffffff
-						// ~~(v / 9) / BIRDS * 0xffffff
+						0x444444 +
+						~~(v / 9) / BIRDS * 0x666666
 					);
 					references[ v ] = new THREE.Vector2( x, y );
 					birdVertex[ v ] = v % 9;
@@ -789,21 +772,13 @@
 				// 	delta = 0.0001;
 				// }
 
-				if (!paused)
-				if (flipflop) {
-					simulator.renderVelocity( rtPosition1, rtVelocity1, rtVelocity2, delta );
-					simulator.renderPosition( rtPosition1, rtVelocity2, rtPosition2, delta );
-					birdUniforms.texturePosition.value = rtPosition2;
-					birdUniforms.textureVelocity.value = rtVelocity2;
+				if (!paused) {
+					simulator.simulate( delta );
 
-				} else {
-					simulator.renderVelocity( rtPosition2, rtVelocity2, rtVelocity1, delta );
-					simulator.renderPosition( rtPosition2, rtVelocity1, rtPosition1, delta );
-					birdUniforms.texturePosition.value = rtPosition1;
-					birdUniforms.textureVelocity.value = rtVelocity1;
+					birdUniforms.texturePosition.value = simulator.currentPosition;
+					birdUniforms.textureVelocity.value = simulator.currentVelocity;
 				}
 
-				flipflop = !flipflop;
 
 				simulator.velocityUniforms.predator.value.set( mouseX / windowHalfX, -mouseY / windowHalfY, 0 );
 
@@ -824,67 +799,7 @@
 			}
 
 
-			function generateDataTexture() {
 
-				var x, y, z;
-
-				var w = WIDTH, h = WIDTH;
-
-				var a = new Float32Array(PARTICLES * 4);
-
-				for (var k = 0; k < PARTICLES; k++) {
-
-					x = Math.random() * BOUNDS - BOUNDS_HALF;
-					y = Math.random() * BOUNDS - BOUNDS_HALF;
-					z = Math.random() * BOUNDS - BOUNDS_HALF;
-
-					a[ k*4 + 0 ] = x;
-					a[ k*4 + 1 ] = y;
-					a[ k*4 + 2 ] = z;
-					a[ k*4 + 3 ] = 1;
-
-				}
-
-				var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType );
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
-				texture.needsUpdate = true;
-				texture.flipY = false;
-
-				return texture;
-
-			}
-
-			function generateVelocityTexture() {
-
-				var x, y, z;
-
-				var w = WIDTH, h = WIDTH;
-
-				var a = new Float32Array(PARTICLES * 4);
-
-				for (var k = 0; k < PARTICLES; k++) {
-
-					x = Math.random() - 0.5;
-					y = Math.random() - 0.5;
-					z = Math.random() - 0.5;
-
-					a[ k*4 + 0 ] = x * 10;
-					a[ k*4 + 1 ] = y * 10;
-					a[ k*4 + 2 ] = z * 10;
-					a[ k*4 + 3 ] = 1;
-
-				}
-
-				var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType );
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
-				texture.needsUpdate = true;
-				texture.flipY = false;
-
-				return texture;
-
-			}
 
 		</script>
 	</body>
