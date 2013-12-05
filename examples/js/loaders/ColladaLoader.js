@@ -1101,6 +1101,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		obj.name = node.name || node.id || "";
+		obj.layer = node.layer || "";
 		obj.matrix = node.matrix;
 		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 
@@ -2060,6 +2061,7 @@ THREE.ColladaLoader = function () {
 		this.sid = element.getAttribute('sid');
 		this.name = element.getAttribute('name');
 		this.type = element.getAttribute('type');
+		this.layer = element.getAttribute('layer');
 
 		this.type = this.type == 'JOINT' ? this.type : 'NODE';
 
