@@ -7,9 +7,9 @@ THREE.Clock = function ( autoStart ) {
 
 	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
-    if( this.autoStart ) {
-        this.start()
-    } 
+	if( this.autoStart ) {
+		this.start()
+	} 
 
 	this.startTime = 0;
 	this.oldTime = 0;
@@ -23,9 +23,9 @@ THREE.Clock.prototype = {
 
 	constructor: THREE.Clock,
 
-    //convenience function since this gets called a couple times
-    getTimeNow: function () {
-        return self.performance !== undefined && self.performance.now !== undefined
+	//convenience function since this gets called a couple times
+	getTimeNow: function () {
+		return self.performance !== undefined && self.performance.now !== undefined
 					? self.performance.now()
 					: Date.now();
 	},
@@ -46,9 +46,9 @@ THREE.Clock.prototype = {
 	},
 
 	getElapsedTime: function () {
-	    var elapsed = 0;
-	    
-	    if ( this.autoStart && ! this.running ) {
+		var elapsed = 0;
+		
+		if ( this.autoStart && ! this.running ) {
 
 			this.start();
 
@@ -56,20 +56,20 @@ THREE.Clock.prototype = {
 
 		if ( this.running ) {
 		 
-		    elapsed = 0.001 * ( this.getTimeNow() - this.startTime );
+			elapsed = 0.001 * ( this.getTimeNow() - this.startTime );
 		
 		}
 
-	    return elapsed;
+		return elapsed;
 	
 	},
 	
 	getDelta: function () {
 	
-	    console.warn( 'DEPRECATED: Clock\'s .getDelta() has been moved to Clock\'s .getDeltaTime().' );
+		console.warn( 'DEPRECATED: Clock\'s .getDelta() has been moved to Clock\'s .getDeltaTime().' );
 
-	    return this.getDeltaTime();
-	    
+		return this.getDeltaTime();
+		
 	},
 
 	getDeltaTime: function () {
