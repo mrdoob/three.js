@@ -9,13 +9,13 @@
 	<body>
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A two dimensional surface that extends infinitely in 3d space.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:Vector3 normal], [page:number constant])</h3>
+		<h3>[name]([page:Vector3 normal], [page:Float constant])</h3>
 		<div>
 		normal -- the normal vector defining the plane <br />
 		constant -- the distance from the origin to the plane along the normal vector
@@ -24,51 +24,55 @@
 
 		<h2>Properties</h2>
 
-
-
-		<h3>.[page:number constant]</h3>
-		<div>
-		the distance from the origin to the plane along the normal vector
-		</div> 
-
 		<h3>.[page:Vector3 normal]</h3>
 		<div>
-		the normal vector defining the plane
+		[Page:Vector3] representing the normal vector that definesthe plane
 		</div> 
 
+
+		<h3>.[page:Float constant]</h3>
+		<div>
+		[Page:Float] describing the distance from the origin to the plane along the normal vector
+		</div> 
+
+		
 		<h2>Methods</h2>
 
 
 
-		<h3>.normalize() [page:todo]</h3>
+		<h3>.normalize() [page:Plane this]</h3>
 		<div>
-		todo
+		Normalizes the normal vector, and adjusts the constant value accordingly.
 		</div>
 
-		<h3>.set([page:todo normal], [page:todo constant]) [page:todo]</h3>
+		<h3>.set([page:Vector3 normal], [page:Float constant]) [page:Plane this]</h3>
 		<div>
-		normal -- todo <br />
-		constant -- todo
+		normal -- [Page:Vector3] <br />
+		constant -- [Page: Float]
 		</div>
 		<div>
-		todo
-		</div>
-
-		<h3>.copy([page:todo plane]) [page:todo]</h3>
-		<div>
-		plane -- todo
-		</div>
-		<div>
-		todo
+		Sets the plane's values.
 		</div>
 
-		<h3>.applyMatrix4([page:todo matrix], [page:todo optionalNormalMatrix]) [page:todo]</h3>
+		<h3>.copy([page:Plane plane]) [page:Plane this]</h3>
 		<div>
-		matrix -- todo <br />
-		optionalNormalMatrix -- todo
+		plane -- [page:Plane] to copy
 		</div>
 		<div>
-		todo
+		Copies the values of the passed plane to this plane.
+		</div>
+
+		<h3>.applyMatrix4([page:Matrix4 matrix], [page:Matrix3 optionalNormalMatrix]) [page:Plane this]</h3>
+		<div>
+		matrix -- [Page:Matrix4] to apply <br />
+		optionalNormalMatrix -- (optional) normal [Page:Matrix3] of the Matrix4 to apply
+		</div>
+		<div>
+		Apply a Matrix4 to the plane. The second parameter is is optional, but if not provided a new Matrix3 will be created each time this method is called.
+		
+		<code>
+		var optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix ) 
+		</code>
 		</div>
 
 		<h3>.orthoPoint([page:todo point], [page:todo optionalTarget]) [page:todo]</h3>
