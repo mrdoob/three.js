@@ -180,12 +180,13 @@ THREE.Plane.prototype = {
 
 		var v1 = new THREE.Vector3();
 		var v2 = new THREE.Vector3();
+		var m1 = new THREE.Matrix3()
 
 		return function ( matrix, optionalNormalMatrix ) {
 
 			// compute new normal based on theory here:
 			// http://www.songho.ca/opengl/gl_normaltransform.html
-			optionalNormalMatrix = optionalNormalMatrix || new THREE.Matrix3().getNormalMatrix( matrix );
+			optionalNormalMatrix = optionalNormalMatrix || m1.getNormalMatrix( matrix );
 			var newNormal = v1.copy( this.normal ).applyMatrix3( optionalNormalMatrix );
 
 			var newCoplanarPoint = this.coplanarPoint( v2 );
