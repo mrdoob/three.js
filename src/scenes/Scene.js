@@ -12,7 +12,7 @@ THREE.Scene = function ( args ) {
 	this.overrideMaterial = null;
 
 	this.autoUpdate = !!args.autoUpdate || true; // checked by the renderer
-	this.matrixAutoUpdate = !!args.autoUpdate || false;
+	this.matrixAutoUpdate = !!args.matrixAutoUpdate || false;
 
 	this.__lights = [];
 	
