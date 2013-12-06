@@ -4,7 +4,7 @@
 
 THREE.Scene = function ( args ) {
 	
-	if (typeof args === 'undefined') args = {};
+	args = args || {};
 	
 	THREE.Object3D.call( this );
 
