@@ -75,6 +75,7 @@ var list = {
 			[ "Color", "api/math/Color" ],
 			[ "Euler", "api/math/Euler" ],
 			[ "Frustum", "api/math/Frustum" ],
+			[ "Line3", "api/math/Line3" ],
 			[ "Math", "api/math/Math" ],
 			[ "Matrix3", "api/math/Matrix3" ],
 			[ "Matrix4", "api/math/Matrix4" ],
