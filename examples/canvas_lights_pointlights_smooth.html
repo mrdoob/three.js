@@ -75,21 +75,18 @@
 				var program = function ( context ) {
 
 					context.beginPath();
-					context.arc( 0, 0, 1, 0, PI2, true );
+					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
 				}
 
 				particle1 = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xff0040, program: program } ) );
-				particle1.scale.x = particle1.scale.y = particle1.scale.z = 0.5;
 				scene.add( particle1 );
 
 				particle2 = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x0040ff, program: program } ) );
-				particle2.scale.x = particle2.scale.y = particle2.scale.z = 0.5;
 				scene.add( particle2 );
 
 				particle3 = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0x80ff80, program: program } ) );
-				particle3.scale.x = particle3.scale.y = particle3.scale.z = 0.5;
 				scene.add( particle3 );
 
 				loader = new THREE.JSONLoader();

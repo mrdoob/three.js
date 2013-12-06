@@ -53,7 +53,7 @@
 				var program = function ( context ) {
 
 					context.beginPath();
-					context.arc( 0, 0, 1, 0, PI2, true );
+					context.arc( 0, 0, 0.5, 0, PI2, true );
 					context.fill();
 
 				}
@@ -64,7 +64,7 @@
 						program: program }
 					)
 				);
-				sphereInter.scale.x = sphereInter.scale.y = 5;
+				sphereInter.scale.x = sphereInter.scale.y = 10;
 				sphereInter.visible = false;
 				scene.add( sphereInter );
 
