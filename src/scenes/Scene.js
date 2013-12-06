@@ -2,18 +2,20 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Scene = function () {
-
+THREE.Scene = function ( args ) {
+	
+	if (typeof args === 'undefined') args = {};
+	
 	THREE.Object3D.call( this );
 
 	this.fog = null;
 	this.overrideMaterial = null;
 
-	this.autoUpdate = true; // checked by the renderer
-	this.matrixAutoUpdate = false;
+	this.autoUpdate = !!args.autoUpdate || true; // checked by the renderer
+	this.matrixAutoUpdate = !!args.autoUpdate || false;
 
 	this.__lights = [];
-
+	
 	this.__objectsAdded = [];
 	this.__objectsRemoved = [];
 
