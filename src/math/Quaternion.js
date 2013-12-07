@@ -200,15 +200,24 @@ THREE.Quaternion.prototype = {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
-		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
+		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled),
+		// and m is either Matrix3 or Matrix4.
+		var te = m.elements;
+		var m11, m12, m13, m21, m22, m23, m31, m32, m33;
 
-		var te = m.elements,
+		if ( m instanceof THREE.Matrix3 ) {
+			m11 = te[0]; m12 = te[3]; m13 = te[6];
+			m21 = te[1]; m22 = te[4]; m23 = te[7];
+			m31 = te[2]; m32 = te[5]; m33 = te[8];
+		} else if ( m instanceof THREE.Matrix4 ) {
+			m11 = te[0]; m12 = te[4]; m13 = te[8];
+			m21 = te[1]; m22 = te[5]; m23 = te[9];
+			m31 = te[2]; m32 = te[6]; m33 = te[10];
+		} else {
+			throw new Error( 'Invalid matrix type: ' + typeof m)
+		}
 
-			m11 = te[0], m12 = te[4], m13 = te[8],
-			m21 = te[1], m22 = te[5], m23 = te[9],
-			m31 = te[2], m32 = te[6], m33 = te[10],
-
-			trace = m11 + m22 + m33,
+		var trace = m11 + m22 + m33,
 			s;
 
 		if ( trace > 0 ) {
