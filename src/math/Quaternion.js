@@ -214,7 +214,7 @@ THREE.Quaternion.prototype = {
 			m21 = te[1]; m22 = te[5]; m23 = te[9];
 			m31 = te[2]; m32 = te[6]; m33 = te[10];
 		} else {
-			throw new Error( 'Invalid matrix type: ' + typeof m)
+			throw new Error( 'Invalid matrix type' );
 		}
 
 		var trace = m11 + m22 + m33,
