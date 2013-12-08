@@ -57,10 +57,10 @@
 		<h3>.applyMatrix4([page:Matrix4 matrix], [page:Matrix3 optionalNormalMatrix]) [page:Plane this]</h3>
 		<div>
 		matrix -- [Page:Matrix4] to apply <br />
-		optionalNormalMatrix -- (optional) normal [Page:Matrix3] of the Matrix4 to apply
+		optionalNormalMatrix -- (optional) pre-computed normal [Page:Matrix3] of the Matrix4 to apply
 		</div>
 		<div>
-		Apply a Matrix4 to the plane. The second parameter is optional, but if not provided a new Matrix3 will be created each time this method is called.
+		Apply a Matrix4 to the plane. The second parameter is optional.
 		
 		<code>
 		var optionalNormalMatrix = new THREE.Matrix3().getNormalMatrix( matrix ) 
