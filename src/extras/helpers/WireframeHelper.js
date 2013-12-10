@@ -63,8 +63,9 @@ THREE.WireframeHelper = function ( object ) {
                             vertices[ 3 * edge[ k ] + 2 ]);
     
                         geometry.vertices.push( vertex );
-                        hash[ key ] = true;
                     }
+
+					hash[ key ] = true;
 
 				}
 
