@@ -10,7 +10,7 @@ THREE.WireframeHelper = function ( object ) {
 	var keys = [ 'a', 'b', 'c', 'd' ];
 	var geometry = new THREE.Geometry();
 
-	if (object.geometry.vertices) {
+	if ( object.geometry instanceof THREE.Geometry ) {
 
 		var vertices = object.geometry.vertices;
 		var faces = object.geometry.faces;
