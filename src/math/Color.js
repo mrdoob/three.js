@@ -223,9 +223,11 @@ THREE.Color.prototype = {
 
 	},
 
-	getHSL: function () {
+	getHSL: function ( optionalTarget ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
+
+		var hsl = optionalTarget || { h: 0, s: 0, l: 0 };
 
 		var r = this.r, g = this.g, b = this.b;
 
@@ -258,11 +260,11 @@ THREE.Color.prototype = {
 
 		}
 
-		return {
-			h: hue,
-			s: saturation,
-			l: lightness
-		};
+		hsl.h = hue;
+		hsl.s = saturation;
+		hsl.l = lightness;
+
+		return hsl;
 
 	},
 
