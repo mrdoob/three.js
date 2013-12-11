@@ -225,52 +225,46 @@ THREE.Color.prototype = {
 
 	getHSL: function () {
 
-		var hsl = { h: 0, s: 0, l: 0 };
+		// h,s,l ranges are in 0.0 - 1.0
 
-		return function () {
+		var r = this.r, g = this.g, b = this.b;
 
-			// h,s,l ranges are in 0.0 - 1.0
+		var max = Math.max( r, g, b );
+		var min = Math.min( r, g, b );
 
-			var r = this.r, g = this.g, b = this.b;
+		var hue, saturation;
+		var lightness = ( min + max ) / 2.0;
 
-			var max = Math.max( r, g, b );
-			var min = Math.min( r, g, b );
+		if ( min === max ) {
 
-			var hue, saturation;
-			var lightness = ( min + max ) / 2.0;
+			hue = 0;
+			saturation = 0;
 
-			if ( min === max ) {
+		} else {
 
-				hue = 0;
-				saturation = 0;
+			var delta = max - min;
 
-			} else {
+			saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
 
-				var delta = max - min;
+			switch ( max ) {
 
-				saturation = lightness <= 0.5 ? delta / ( max + min ) : delta / ( 2 - max - min );
-
-				switch ( max ) {
-
-					case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
-					case g: hue = ( b - r ) / delta + 2; break;
-					case b: hue = ( r - g ) / delta + 4; break;
-
-				}
-
-				hue /= 6;
+				case r: hue = ( g - b ) / delta + ( g < b ? 6 : 0 ); break;
+				case g: hue = ( b - r ) / delta + 2; break;
+				case b: hue = ( r - g ) / delta + 4; break;
 
 			}
 
-			hsl.h = hue;
-			hsl.s = saturation;
-			hsl.l = lightness;
+			hue /= 6;
 
-			return hsl;
+		}
 
+		return {
+			h: hue,
+			s: saturation,
+			l: lightness
 		};
 
-	}(),
+	},
 
 	getStyle: function () {
 
