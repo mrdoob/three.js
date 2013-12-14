@@ -166,14 +166,15 @@
 
 				switch ( event.keyCode ) {
 
+					case 8: // prevent browser back 
+						event.preventDefault();
+						break;
 					case 46: // delete
-
 						editor.removeObject( editor.selected );
 						editor.deselect();
-
 						break;
 
-					}
+				}
 
 			}, false );
 
