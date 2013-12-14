@@ -34,10 +34,14 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2100 );
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera = new THREE.PerspectiveCamera( 60, width / height, 1, 2100 );
 				camera.position.z = 1500;
 
-				cameraOrtho = new THREE.OrthographicCamera( 0, window.innerWidth, window.innerHeight, 0, - 10, 10 );
+				cameraOrtho = new THREE.OrthographicCamera( - width / 2, width / 2, height / 2, - height / 2, 1, 10 );
+				cameraOrtho.position.z = 10;
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0x000000, 1500, 2100 );
@@ -137,26 +141,34 @@
 
 			function updateHUDSprites () {
 
+				var width = window.innerWidth / 2;
+				var height = window.innerHeight / 2;
+
 				var material = spriteTL.material;
 
-				var widthHalf = material.map.image.width / 2;
-				var heightHalf = material.map.image.height / 2;
+				var imageWidth = material.map.image.width / 2;
+				var imageHeight = material.map.image.height / 2;
 
-				spriteTL.position.set( widthHalf, window.innerHeight - heightHalf, 1 ); // top left
-				spriteTR.position.set( window.innerWidth - widthHalf, window.innerHeight - heightHalf, 2 ); // top right
-				spriteBL.position.set( widthHalf, heightHalf, 0 ); // bottom left
-				spriteBR.position.set( window.innerWidth - widthHalf, heightHalf, 3 ); // bottom right
-				spriteC.position.set( window.innerWidth * 0.5, window.innerHeight * 0.5, 4 ); // center
+				spriteTL.position.set( - width + imageWidth,   height - imageHeight, 1 ); // top left
+				spriteTR.position.set(   width - imageWidth,   height - imageHeight, 1 ); // top right
+				spriteBL.position.set( - width + imageWidth, - height + imageHeight, 1 ); // bottom left
+				spriteBR.position.set(   width - imageWidth, - height + imageHeight, 1 ); // bottom right
+				spriteC.position.set( 0, 0, 1 ); // center
 
 			};
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;				
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;				
 				camera.updateProjectionMatrix();
 
-				cameraOrtho.right = window.innerWidth;
-				cameraOrtho.top = window.innerHeight;
+				cameraOrtho.left = - width / 2;
+				cameraOrtho.right = width / 2;
+				cameraOrtho.top = height / 2;
+				cameraOrtho.bottom = - height / 2;
 				cameraOrtho.updateProjectionMatrix();
 
 				updateHUDSprites();
@@ -209,6 +221,7 @@
 
 				renderer.clear();
 				renderer.render( scene, camera );
+				renderer.clearDepth();
 				renderer.render( sceneOrtho, cameraOrtho );
 
 			}
