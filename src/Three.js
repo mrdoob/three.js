@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '64dev' };
+var THREE = { REVISION: '64' };
 
 self.console = self.console || {
 
