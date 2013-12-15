@@ -95,10 +95,10 @@ function SimulatorRenderer(WIDTH, renderer) {
 		var dtPosition = generatePositionTexture();
 		var dtVelocity = generateVelocityTexture();
 
-		rtPosition1 = getRenderTarget();
+		rtPosition1 = getRenderTarget( THREE.RGBAFormat );
 		rtPosition2 = rtPosition1.clone();
-		rtVelocity1 = rtPosition1.clone();
-		rtVelocity2 = rtPosition1.clone();
+		rtVelocity1 = getRenderTarget( THREE.RGBFormat );
+		rtVelocity2 = rtVelocity1.clone();
 
 		simulator.renderTexture(dtPosition, rtPosition1);
 		simulator.renderTexture(rtPosition1, rtPosition2);
@@ -111,13 +111,13 @@ function SimulatorRenderer(WIDTH, renderer) {
 
 	this.init = init;
 
-	function getRenderTarget() {
+	function getRenderTarget( type ) {
 		var renderTarget = new THREE.WebGLRenderTarget(WIDTH, WIDTH, {
 			wrapS: THREE.RepeatWrapping,
 			wrapT: THREE.RepeatWrapping,
 			minFilter: THREE.NearestFilter,
 			magFilter: THREE.NearestFilter,
-			format: THREE.RGBAFormat,
+			format: type,
 			type: THREE.FloatType,
 			stencilBuffer: false
 		});
@@ -173,9 +173,9 @@ function SimulatorRenderer(WIDTH, renderer) {
 
 	function generatePositionTexture() {
 
-		var a = new Float32Array( PARTICLES * 3 );
+		var a = new Float32Array( PARTICLES * 4 );
 
-		for ( var k = 0; k < PARTICLES; k += 3 ) {
+		for ( var k = 0; k < PARTICLES; k += 4 ) {
 
 			var x = Math.random() * BOUNDS - BOUNDS_HALF;
 			var y = Math.random() * BOUNDS - BOUNDS_HALF;
@@ -184,10 +184,11 @@ function SimulatorRenderer(WIDTH, renderer) {
 			a[ k + 0 ] = x;
 			a[ k + 1 ] = y;
 			a[ k + 2 ] = z;
+			a[ k + 3 ] = 1;
 
 		}
 
-		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBFormat, THREE.FloatType );
+		var texture = new THREE.DataTexture( a, WIDTH, WIDTH, THREE.RGBAFormat, THREE.FloatType );
 		texture.minFilter = THREE.NearestFilter;
 		texture.magFilter = THREE.NearestFilter;
 		texture.needsUpdate = true;
