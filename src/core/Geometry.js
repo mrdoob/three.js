@@ -141,29 +141,11 @@ THREE.Geometry.prototype = {
 
 		var v, vl, f, fl, face, vertices;
 
-		// create internal buffers for reuse when calling this method repeatedly
-		// (otherwise memory allocation / deallocation every frame is big resource hog)
+		vertices = new Array( this.vertices.length );
 
-		if ( this.__tmpVertices === undefined || this.__tmpVertices.length != this.vertices.length) {
+		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			this.__tmpVertices = new Array( this.vertices.length );
-			vertices = this.__tmpVertices;
-
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-				vertices[ v ] = new THREE.Vector3();
-
-			}
-
-		} else {
-
-			vertices = this.__tmpVertices;
-
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-				vertices[ v ].set( 0, 0, 0 );
-
-			}
+			vertices[ v ] = new THREE.Vector3();
 
 		}
 
@@ -218,12 +200,9 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			if (face.vertexNormals === undefined || face.vertexNormals.length !== 3)
-				face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-			face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-			face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-			face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
+			face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
+			face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
+			face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
 
 		}
 
@@ -512,9 +491,6 @@ THREE.Geometry.prototype = {
 		var precision = Math.pow( 10, precisionPoints );
 		var i,il, face;
 		var indices, k, j, jl, u;
-
-		// reset cache of vertices as it now will be changing.
-		this.__tmpVertices = undefined;
 
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
