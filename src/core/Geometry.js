@@ -144,7 +144,7 @@ THREE.Geometry.prototype = {
 		// create internal buffers for reuse when calling this method repeatedly
 		// (otherwise memory allocation / deallocation every frame is big resource hog)
 
-		if ( this.__tmpVertices === undefined ) {
+		if ( this.__tmpVertices === undefined || this.__tmpVertices.length != this.vertices.length) {
 
 			this.__tmpVertices = new Array( this.vertices.length );
 			vertices = this.__tmpVertices;
@@ -152,13 +152,6 @@ THREE.Geometry.prototype = {
 			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
 				vertices[ v ] = new THREE.Vector3();
-
-			}
-
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-				face = this.faces[ f ];
-				face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
 			}
 
@@ -224,6 +217,9 @@ THREE.Geometry.prototype = {
 		for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
 			face = this.faces[ f ];
+
+			if (face.vertexNormals === undefined || face.vertexNormals.length !== 3)
+				face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
 
 			face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
 			face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
@@ -573,7 +569,7 @@ THREE.Geometry.prototype = {
 
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
 			var idx = faceIndicesToRemove[ i ];
-			
+
 			this.faces.splice( idx, 1 );
 
 			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
