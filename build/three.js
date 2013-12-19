@@ -15188,6 +15188,9 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 	}
 
+	this.dispatchEvent( { type: 'objectAdded', object: object } );
+	object.dispatchEvent( { type: 'addedToScene', scene: this } );
+
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
 		this.__addObject( object.children[ c ] );
@@ -15233,6 +15236,9 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 		}
 
 	}
+
+	this.dispatchEvent( { type: 'objectRemoved', object: object } );
+	object.dispatchEvent( { type: 'removedFromScene', scene: this } );
 
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
