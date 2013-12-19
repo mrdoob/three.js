@@ -34980,15 +34980,15 @@ THREE.WireframeHelper = function ( object ) {
 
 	var keys = [ 'a', 'b', 'c', 'd' ];
 	var geometry = new THREE.BufferGeometry();
-	var numEdges = 0;
 
 	if ( object.geometry instanceof THREE.Geometry ) {
 
 		var vertices = object.geometry.vertices;
 		var faces = object.geometry.faces;
+		var numEdges = 0;
 
 		// allocate maximal size
-		var edges = new Uint32Array(6 * faces.length);
+		var edges = new Uint32Array( 6 * faces.length );
 
 		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -35033,21 +35033,21 @@ THREE.WireframeHelper = function ( object ) {
 
 		}
 
-	} else if ( object.geometry.offsets ) {
+	} else if ( object.geometry.offsets.length ) {
 
 		var vertices = object.geometry.attributes.position.array;
 		var indices = object.geometry.attributes.index.array;
-		var offsets = object.geometry.offsets
+		var offsets = object.geometry.offsets;
+		var numEdges = 0;
 
 		// allocate maximal size
-		var edges = new Uint32Array(2 * indices.length);
+		var edges = new Uint32Array( 2 * indices.length );
 
 		for ( var o = 0, ol = offsets.length; o < ol; ++ o ) {
 
 			var start = offsets[ o ].start;
 			var count = offsets[ o ].count;
 			var index = offsets[ o ].index;
-			var il;
 
 			for ( var i = start, il = start + count; i < il; i += 3 ) {
 
@@ -35091,6 +35091,7 @@ THREE.WireframeHelper = function ( object ) {
 			}
 
 		}
+
 	} else {
 
 		var vertices = object.geometry.attributes.position.array;
@@ -35103,12 +35104,13 @@ THREE.WireframeHelper = function ( object ) {
 		for ( var i = 0, l = numTris; i < l; i ++ ) {
 
 			var index = i * 9;
-			var index2 = 2 * index;
 
 			for ( var j = 0; j < 3; j ++ ) {
 
+				var index2 = 2 * index + 6 * j;
 				var vertex1 = j * 3;
 				var vertex2 = ( ( j + 1 ) % 3 ) * 3;
+
 				coords[ index2 + 0 ] = vertices[ index + vertex1 ];
 				coords[ index2 + 1 ] = vertices[ index + vertex1 + 1 ];
 				coords[ index2 + 2 ] = vertices[ index + vertex1 + 2 ];
