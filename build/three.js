@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '64' };
+var THREE = { REVISION: '65dev' };
 
 self.console = self.console || {
 
@@ -8590,36 +8590,11 @@ THREE.Geometry.prototype = {
 
 		var v, vl, f, fl, face, vertices;
 
-		// create internal buffers for reuse when calling this method repeatedly
-		// (otherwise memory allocation / deallocation every frame is big resource hog)
+		vertices = new Array( this.vertices.length );
 
-		if ( this.__tmpVertices === undefined ) {
+		for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
-			this.__tmpVertices = new Array( this.vertices.length );
-			vertices = this.__tmpVertices;
-
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-				vertices[ v ] = new THREE.Vector3();
-
-			}
-
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-				face = this.faces[ f ];
-				face.vertexNormals = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-
-			}
-
-		} else {
-
-			vertices = this.__tmpVertices;
-
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
-
-				vertices[ v ].set( 0, 0, 0 );
-
-			}
+			vertices[ v ] = new THREE.Vector3();
 
 		}
 
@@ -8674,9 +8649,9 @@ THREE.Geometry.prototype = {
 
 			face = this.faces[ f ];
 
-			face.vertexNormals[ 0 ].copy( vertices[ face.a ] );
-			face.vertexNormals[ 1 ].copy( vertices[ face.b ] );
-			face.vertexNormals[ 2 ].copy( vertices[ face.c ] );
+			face.vertexNormals[ 0 ] = vertices[ face.a ].clone();
+			face.vertexNormals[ 1 ] = vertices[ face.b ].clone();
+			face.vertexNormals[ 2 ] = vertices[ face.c ].clone();
 
 		}
 
@@ -8966,9 +8941,6 @@ THREE.Geometry.prototype = {
 		var i,il, face;
 		var indices, k, j, jl, u;
 
-		// reset cache of vertices as it now will be changing.
-		this.__tmpVertices = undefined;
-
 		for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
 
 			v = this.vertices[ i ];
@@ -9022,7 +8994,7 @@ THREE.Geometry.prototype = {
 
 		for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
 			var idx = faceIndicesToRemove[ i ];
-			
+
 			this.faces.splice( idx, 1 );
 
 			for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
@@ -15216,6 +15188,9 @@ THREE.Scene.prototype.__addObject = function ( object ) {
 
 	}
 
+	this.dispatchEvent( { type: 'objectAdded', object: object } );
+	object.dispatchEvent( { type: 'addedToScene', scene: this } );
+
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
 		this.__addObject( object.children[ c ] );
@@ -15261,6 +15236,9 @@ THREE.Scene.prototype.__removeObject = function ( object ) {
 		}
 
 	}
+
+	this.dispatchEvent( { type: 'objectRemoved', object: object } );
+	object.dispatchEvent( { type: 'removedFromScene', scene: this } );
 
 	for ( var c = 0; c < object.children.length; c ++ ) {
 
@@ -35008,15 +34986,15 @@ THREE.WireframeHelper = function ( object ) {
 
 	var keys = [ 'a', 'b', 'c', 'd' ];
 	var geometry = new THREE.BufferGeometry();
-	var numEdges = 0;
 
 	if ( object.geometry instanceof THREE.Geometry ) {
 
 		var vertices = object.geometry.vertices;
 		var faces = object.geometry.faces;
+		var numEdges = 0;
 
 		// allocate maximal size
-		var edges = new Uint32Array(6 * faces.length);
+		var edges = new Uint32Array( 6 * faces.length );
 
 		for ( var i = 0, l = faces.length; i < l; i ++ ) {
 
@@ -35061,32 +35039,40 @@ THREE.WireframeHelper = function ( object ) {
 
 		}
 
-	} else {
+	} else if ( object.geometry.offsets.length ) {
 
 		var vertices = object.geometry.attributes.position.array;
-		var faces = object.geometry.attributes.index.array;
+		var indices = object.geometry.attributes.index.array;
+		var offsets = object.geometry.offsets;
+		var numEdges = 0;
 
 		// allocate maximal size
-		var edges = new Uint32Array(2 * faces.length);
+		var edges = new Uint32Array( 2 * indices.length );
 
-		for ( var i = 0, l = faces.length / 3; i < l; i ++ ) {
+		for ( var o = 0, ol = offsets.length; o < ol; ++ o ) {
 
-			for ( var j = 0; j < 3; j ++ ) {
+			var start = offsets[ o ].start;
+			var count = offsets[ o ].count;
+			var index = offsets[ o ].index;
 
-				var index = i * 3;
+			for ( var i = start, il = start + count; i < il; i += 3 ) {
 
-				edge[ 0 ] = faces[ index + j ];
-				edge[ 1 ] = faces[ index + ( j + 1 ) % 3 ];
-				edge.sort( sortFunction );
+				for ( var j = 0; j < 3; j ++ ) {
 
-				var key = edge.toString();
+					edge[ 0 ] = index + indices[ i + j ];
+					edge[ 1 ] = index + indices[ i + ( j + 1 ) % 3 ];
+					edge.sort( sortFunction );
 
-				if ( hash[ key ] === undefined ) {
+					var key = edge.toString();
 
-					edges[ 2 * numEdges ] = edge[ 0 ];
-					edges[ 2 * numEdges + 1 ] = edge[ 1 ];
-					hash[ key ] = true;
-					numEdges ++;
+					if ( hash[ key ] === undefined ) {
+
+						edges[ 2 * numEdges ] = edge[ 0 ];
+						edges[ 2 * numEdges + 1 ] = edge[ 1 ];
+						hash[ key ] = true;
+						numEdges ++;
+
+					}
 
 				}
 
@@ -35111,6 +35097,38 @@ THREE.WireframeHelper = function ( object ) {
 			}
 
 		}
+
+	} else {
+
+		var vertices = object.geometry.attributes.position.array;
+		var numEdges = vertices.length / 3;
+		var numTris = numEdges / 3;
+
+		geometry.addAttribute( 'position', Float32Array, 2 * numEdges , 3 );
+		var coords = geometry.attributes.position.array;
+
+		for ( var i = 0, l = numTris; i < l; i ++ ) {
+
+			var index = i * 9;
+
+			for ( var j = 0; j < 3; j ++ ) {
+
+				var index2 = 2 * index + 6 * j;
+				var vertex1 = j * 3;
+				var vertex2 = ( ( j + 1 ) % 3 ) * 3;
+
+				coords[ index2 + 0 ] = vertices[ index + vertex1 ];
+				coords[ index2 + 1 ] = vertices[ index + vertex1 + 1 ];
+				coords[ index2 + 2 ] = vertices[ index + vertex1 + 2 ];
+
+				coords[ index2 + 3 ] = vertices[ index + vertex2 ];
+				coords[ index2 + 4 ] = vertices[ index + vertex2 + 1 ];
+				coords[ index2 + 5 ] = vertices[ index + vertex2 + 2 ];
+
+			}
+
+		}
+
 	}
 
 	THREE.Line.call( this, geometry, new THREE.LineBasicMaterial( { color: 0xffffff } ), THREE.LinePieces );
