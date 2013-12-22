@@ -148,7 +148,7 @@ THREE.Matrix3.prototype = {
 
 			if ( throwOnInvertible || false ) {
 
-				throw new Error( msg ); 
+				throw new Error( msg );
 
 			} else {
 
@@ -205,6 +205,26 @@ THREE.Matrix3.prototype = {
 		r[ 8 ] = m[ 8 ];
 
 		return this;
+
+	},
+
+	fromArray: function ( array ) {
+
+		this.elements.set( array );
+
+		return this;
+
+	},
+
+	toArray: function () {
+
+		var te = this.elements;
+
+		return [
+			te[ 0 ], te[ 1 ], te[ 2 ],
+			te[ 3 ], te[ 4 ], te[ 5 ],
+			te[ 6 ], te[ 7 ], te[ 8 ]
+		];
 
 	},
 
