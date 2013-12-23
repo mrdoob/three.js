@@ -619,7 +619,25 @@ THREE.Vector3.prototype = {
 
 		return new THREE.Vector3( this.x, this.y, this.z );
 
-	}
+	},
+
+	crossSelf: function ( v ) {
+
+	    var x = this.x, y = this.y, z = this.z;
+
+	    this.x = y * v.z - z * v.y;
+	    this.y = z * v.x - x * v.z;
+	    this.z = x * v.y - y * v.x;
+
+	    return this;
+
+    },
+
+    isZero: function () {
+
+        return ( this.lengthSq() < 0.0001 /* almostZero */ );
+
+    }
 
 };
 
