@@ -179,6 +179,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionTextureFloat;
 	var _glExtensionTextureFloatLinear;
 	var _glExtensionStandardDerivatives;
+	var _glExtensionHardwareInstancing;
 	var _glExtensionTextureFilterAnisotropic;
 	var _glExtensionCompressedTextureS3TC;
 	var _glExtensionCompressedTextureATC;
@@ -273,6 +274,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.supportsStandardDerivatives = function () {
 
 		return _glExtensionStandardDerivatives;
+
+	};
+
+	this.supportsHardwareInstancing = function () {
+
+		return _glExtensionHardwareInstancing;
 
 	};
 
@@ -1137,11 +1144,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			attribute.buffer = _gl.createBuffer();
+			//Only bind if we still have array data.
+			if ( attribute.array ) {
+				attribute.buffer = _gl.createBuffer();
 
-			_gl.bindBuffer( type, attribute.buffer );
-			_gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
-
+				_gl.bindBuffer( type, attribute.buffer );
+				_gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
+			}
 		}
 
 	};
@@ -6791,6 +6800,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_glExtensionTextureFloat = _gl.getExtension( 'OES_texture_float' );
 		_glExtensionTextureFloatLinear = _gl.getExtension( 'OES_texture_float_linear' );
 		_glExtensionStandardDerivatives = _gl.getExtension( 'OES_standard_derivatives' );
+		_glExtensionHardwareInstancing = _gl.getExtension( 'ANGLE_instanced_arrays' );
 
 		_glExtensionTextureFilterAnisotropic = _gl.getExtension( 'EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'MOZ_EXT_texture_filter_anisotropic' ) || _gl.getExtension( 'WEBKIT_EXT_texture_filter_anisotropic' );
 
@@ -6813,6 +6823,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( ! _glExtensionStandardDerivatives ) {
 
 			console.log( 'THREE.WebGLRenderer: Standard derivatives not supported.' );
+
+		}
+
+		if ( ! _glExtensionHardwareInstancing ) {
+
+			console.log( 'THREE.WebGLRenderer: Hardware instancing not supported.' );
 
 		}
 
