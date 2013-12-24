@@ -3409,7 +3409,12 @@ THREE.ColladaLoader = function () {
 
 		}
 		
-		var keys = {'diffuse':'map', 'ambient':"lightMap" ,'specular':'specularMap'}
+		var keys = {
+			'diffuse':'map', 
+			'ambient':"lightMap" ,
+			'specular':'specularMap',
+			'emission':'emissionMap'
+			};
 		
 		for ( var prop in this ) {
 
