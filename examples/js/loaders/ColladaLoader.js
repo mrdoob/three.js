@@ -3796,7 +3796,7 @@ THREE.ColladaLoader = function () {
 					this.shader = ( new Shader( child.nodeName, this ) ).parse( child );
 					break;
 				case 'extra':
-					this.parseExtraTechnique(child);	
+					this.parseExtra(child);	
 					break;
 				default:
 					break;
