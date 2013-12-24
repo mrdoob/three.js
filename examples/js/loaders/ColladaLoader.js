@@ -3817,7 +3817,7 @@ THREE.ColladaLoader = function () {
 			switch ( child.nodeName ) {
 
 				case 'technique':
-					this.parseExtraTechnique( element );
+					this.parseExtraTechnique( child );
 					break;
 				default:
 					break;
