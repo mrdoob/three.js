@@ -3807,6 +3807,27 @@ THREE.ColladaLoader = function () {
 
 	};
 	
+	Effect.prototype.parseExtra = function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[i];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'technique':
+					this.parseExtraTechnique( element );
+					break;
+				default:
+					break;
+
+			}
+
+		}
+
+	};
+	
 	Effect.prototype.parseExtraTechnique= function ( element ) {
 
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
