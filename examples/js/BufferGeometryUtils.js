@@ -20,6 +20,7 @@ THREE.BufferGeometryUtils = {
 		var faceVertexUvs = geometry.faceVertexUvs;
 		var vertexColors = settings.vertexColors;
 		var hasFaceVertexUv = faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexNormals = faces[ 0 ].vertexNormals.length == 3;
 
 		var bufferGeometry = new THREE.BufferGeometry();
 
@@ -83,21 +84,41 @@ THREE.BufferGeometryUtils = {
 			positions[ i3 + 7 ] = c.y;
 			positions[ i3 + 8 ] = c.z;
 
-			var na = face.vertexNormals[ 0 ];
-			var nb = face.vertexNormals[ 1 ];
-			var nc = face.vertexNormals[ 2 ];
+			if ( hasFaceVertexNormals === true ) {
 
-			normals[ i3     ] = na.x;
-			normals[ i3 + 1 ] = na.y;
-			normals[ i3 + 2 ] = na.z;
+				var na = face.vertexNormals[ 0 ];
+				var nb = face.vertexNormals[ 1 ];
+				var nc = face.vertexNormals[ 2 ];
 
-			normals[ i3 + 3 ] = nb.x;
-			normals[ i3 + 4 ] = nb.y;
-			normals[ i3 + 5 ] = nb.z;
+				normals[ i3     ] = na.x;
+				normals[ i3 + 1 ] = na.y;
+				normals[ i3 + 2 ] = na.z;
 
-			normals[ i3 + 6 ] = nc.x;
-			normals[ i3 + 7 ] = nc.y;
-			normals[ i3 + 8 ] = nc.z;
+				normals[ i3 + 3 ] = nb.x;
+				normals[ i3 + 4 ] = nb.y;
+				normals[ i3 + 5 ] = nb.z;
+
+				normals[ i3 + 6 ] = nc.x;
+				normals[ i3 + 7 ] = nc.y;
+				normals[ i3 + 8 ] = nc.z;
+
+			} else {
+
+				var n = face.normal;
+
+				normals[ i3     ] = n.x;
+				normals[ i3 + 1 ] = n.y;
+				normals[ i3 + 2 ] = n.z;
+
+				normals[ i3 + 3 ] = n.x;
+				normals[ i3 + 4 ] = n.y;
+				normals[ i3 + 5 ] = n.z;
+
+				normals[ i3 + 6 ] = n.x;
+				normals[ i3 + 7 ] = n.y;
+				normals[ i3 + 8 ] = n.z;
+
+			}
 
 			if ( vertexColors === THREE.FaceColors ) {
 
