@@ -3409,6 +3409,8 @@ THREE.ColladaLoader = function () {
 
 		}
 		
+		var keys = {'diffuse':'map', 'ambient':"lightMap" ,'specular':'specularMap'}
+		
 		for ( var prop in this ) {
 
 			switch ( prop ) {
@@ -3441,7 +3443,7 @@ THREE.ColladaLoader = function () {
 									texture.offset.y = cot.texOpts.offsetV;
 									texture.repeat.x = cot.texOpts.repeatU;
 									texture.repeat.y = cot.texOpts.repeatV;
-									props['map'] = texture;
+									props[keys[prop]] = texture;
 
 									// Texture with baked lighting?
 									if (prop === 'emission') props['emissive'] = 0xffffff;
