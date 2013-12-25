@@ -3358,6 +3358,7 @@ THREE.ColladaLoader = function () {
 				case 'diffuse':
 				case 'specular':
 				case 'transparent':
+				case 'bump':
 
 					this[ child.nodeName ] = ( new ColorOrTexture() ).parse( child );
 					break;
@@ -3409,6 +3410,14 @@ THREE.ColladaLoader = function () {
 
 		}
 		
+		var keys = {
+			'diffuse':'map', 
+			'ambient':"lightMap" ,
+			'specular':'specularMap',
+			'emission':'emissionMap',
+			'bump':'normalMap'
+			};
+		
 		for ( var prop in this ) {
 
 			switch ( prop ) {
@@ -3417,6 +3426,7 @@ THREE.ColladaLoader = function () {
 				case 'emission':
 				case 'diffuse':
 				case 'specular':
+				case 'bump':
 
 					var cot = this[ prop ];
 
@@ -3441,7 +3451,7 @@ THREE.ColladaLoader = function () {
 									texture.offset.y = cot.texOpts.offsetV;
 									texture.repeat.x = cot.texOpts.repeatU;
 									texture.repeat.y = cot.texOpts.repeatV;
-									props['map'] = texture;
+									props[keys[prop]] = texture;
 
 									// Texture with baked lighting?
 									if (prop === 'emission') props['emissive'] = 0xffffff;
@@ -3785,7 +3795,51 @@ THREE.ColladaLoader = function () {
 
 					this.shader = ( new Shader( child.nodeName, this ) ).parse( child );
 					break;
+				case 'extra':
+					this.parseExtra(child);	
+					break;
+				default:
+					break;
 
+			}
+
+		}
+
+	};
+	
+	Effect.prototype.parseExtra = function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[i];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'technique':
+					this.parseExtraTechnique( child );
+					break;
+				default:
+					break;
+
+			}
+
+		}
+
+	};
+	
+	Effect.prototype.parseExtraTechnique= function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[i];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'bump':
+					this.shader.parse( element );
+					break;
 				default:
 					break;
 
