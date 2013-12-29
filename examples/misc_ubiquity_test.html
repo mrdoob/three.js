@@ -28,7 +28,7 @@
 			var SCREEN_HEIGHT = window.innerHeight / 2;
 			var AMOUNT = 100;
 
-			var container, stats;
+			var stats;
 
 			var camera, scene;
 			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
@@ -44,9 +44,6 @@
 			animate();
 
 			function init() {
-
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
 				camera.position.z = 500;
@@ -188,28 +185,28 @@
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xf0f0f0 );
 				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( canvasRenderer.domElement );
+				document.body.appendChild( canvasRenderer.domElement );
 
 				svgRenderer = new THREE.SVGRenderer();
 				svgRenderer.setClearColor( 0xf0f0f0 );
 				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				svgRenderer.setQuality( 'low' );
-				container.appendChild( svgRenderer.domElement );
+				document.body.appendChild( svgRenderer.domElement );
 
 				softwareRenderer = new THREE.SoftwareRenderer();
 				softwareRenderer.setClearColor( 0xf0f0f0 );
 				softwareRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( softwareRenderer.domElement );
+				document.body.appendChild( softwareRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setClearColor( 0xf0f0f0 );
 				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( webglRenderer.domElement );
+				document.body.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
+				document.body.appendChild( stats.domElement );
 
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
