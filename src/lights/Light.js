@@ -13,6 +13,30 @@ THREE.Light = function ( hex ) {
 
 THREE.Light.prototype = Object.create( THREE.Object3D.prototype );
 
+THREE.Light.prototype.getWorldDirection = function() {
+
+	var targetPosition = new THREE.Vector3();
+
+	return function ( optionalTarget ) {
+
+		var direction = optionalTarget || new THREE.Vector3();
+
+		direction.setFromMatrixPosition( this.matrixWorld );
+		
+		if( this.target ) {
+
+			targetPosition.setFromMatrixPosition( this.target.matrixWorld );
+			direction.sub( targetPosition );
+			direction.normalize();
+
+		}
+
+		return direction;
+
+	};
+
+}();
+
 THREE.Light.prototype.clone = function ( light ) {
 
 	if ( light === undefined ) light = new THREE.Light();
