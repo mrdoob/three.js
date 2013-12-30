@@ -60,6 +60,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 	this.shadowMapCullFace = THREE.CullFaceFront;
 	this.shadowMapDebug = false;
 	this.shadowMapCascade = false;
+	this.maxShadows = -1;
+
+	// lights
+
+	this.maxDirLights = -1;
+	this.maxPointLights = -1;
+	this.maxSpotLights = -1;
+	this.maxHemiLights = -1;
 
 	// morphs
 
@@ -6739,10 +6747,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			if ( light.onlyShadow ) continue;
 
-			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
-			if ( light instanceof THREE.PointLight ) pointLights ++;
-			if ( light instanceof THREE.SpotLight ) spotLights ++;
-			if ( light instanceof THREE.HemisphereLight ) hemiLights ++;
+			if ( light instanceof THREE.DirectionalLight && ( dirLights < _this.maxDirLights || _this.maxDirLights === -1 ) ) dirLights ++;
+			if ( light instanceof THREE.PointLight && ( pointLights < _this.maxPointLights || _this.maxPointLights === -1 ) ) pointLights ++;
+			if ( light instanceof THREE.SpotLight && ( spotLights < _this.maxSpotLights || _this.maxSpotLights === -1 ) ) spotLights ++;
+			if ( light instanceof THREE.HemisphereLight && ( hemiLights < _this.maxHemiLights || _this.maxHemiLights === -1 ) ) hemiLights ++;
 
 		}
 
@@ -6765,7 +6773,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		return maxShadows;
+		return _this.maxShadows === -1 ? maxShadows : Math.min( maxShadows, _this.maxShadows );
 
 	};
 
