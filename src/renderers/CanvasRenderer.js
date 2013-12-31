@@ -472,16 +472,49 @@ THREE.CanvasRenderer = function ( parameters ) {
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
-			if ( material.map !== null ) {
+			var texture = material.map;
 
-				var bitmap = material.map.image;
+			if ( texture !== null ) {
+
+				if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
+
+					if ( texture.image !== undefined && texture.image.width > 0 ) {
+
+						textureToPattern( texture );
+
+					}
+
+					texture.addEventListener( 'update', onTextureUpdate );
+
+				}
+
+				var pattern = _patterns[ texture.id ];
+
+				if ( pattern !== undefined ) {
+
+					setFillStyle( pattern );
+
+				} else {
+
+					setFillStyle( 'rgba(0,0,0,1)' );
+
+				}
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( material.rotation );
+				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
-
-				_context.drawImage( bitmap, 0, 0, bitmap.width, bitmap.height, - 0.5, - 0.5, 1, 1 );
+				_context.beginPath();
+				_context.moveTo( - 0.5, - 0.5 );
+				_context.lineTo(   0.5, - 0.5 );
+				_context.lineTo(   0.5,   0.5 );
+				_context.lineTo( - 0.5,   0.5 );
+				_context.closePath();
+				_context.translate( - 0.5, 0.5 );
+				_context.translate( - texture.offset.x, texture.offset.y );
+				_context.scale( 1 / texture.image.width, - 1 / texture.image.height );
+				_context.scale( 1 / texture.repeat.x, 1 / texture.repeat.y );
+				_context.fill();
 				_context.restore();
 
 			} else {
@@ -490,7 +523,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( material.rotation );
+				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
 				_context.fillRect( - 0.5, - 0.5, 1, 1 );
 				_context.restore();
@@ -504,7 +537,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.save();
 			_context.translate( v1.x, v1.y );
-			_context.rotate( - element.rotation );
+			if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 			_context.scale( scaleX, scaleY );
 
 			material.program( _context );
@@ -842,16 +875,20 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		if ( _patterns[ texture.id ] === undefined ) {
+		var pattern = _patterns[ texture.id ];
 
-			setFillStyle( 'rgba(0,0,0,1)' )
+		if ( pattern !== undefined ) {
+
+			setFillStyle( pattern );
+
+		} else {
+
+			setFillStyle( 'rgba(0,0,0,1)' );
 			_context.fill();
 
 			return;
 
-		}
-	
-		setFillStyle( _patterns[ texture.id ] );
+		}	
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 

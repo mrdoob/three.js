@@ -25,6 +25,7 @@
 			var canvasRenderer, webglRenderer;
 
 			var texture, mesh;
+			var texture2;
 
 			init();
 			animate();
@@ -34,7 +35,7 @@
 				var width = window.innerWidth / 2;
 				var height = window.innerHeight;
 
-				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 2000 );
 				camera.position.z = 400;
 
 				scene = new THREE.Scene();
@@ -49,6 +50,37 @@
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
+
+				// SPRITES
+
+				texture2 = THREE.ImageUtils.loadTexture( 'textures/sprite.png' );
+				texture2.wrapS = THREE.RepeatWrapping;
+				texture2.wrapT = THREE.RepeatWrapping;
+				var material = new THREE.SpriteMaterial( { map: texture2 } );
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					var sprite = new THREE.Sprite( material );
+					sprite.position.x = Math.random() * 1000 - 500;
+					sprite.position.y = Math.random() * 1000 - 500;
+					sprite.position.z = Math.random() * 1000 - 500;
+					sprite.scale.set( 64, 64, 1 );
+					scene.add( sprite );
+
+				}
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					var material = new THREE.SpriteMaterial( { color: Math.random() * 0xffffff } );
+					var sprite = new THREE.Sprite( material );
+					sprite.position.x = Math.random() * 1000 - 500;
+					sprite.position.y = Math.random() * 1000 - 500;
+					sprite.position.z = Math.random() * 1000 - 500;
+					sprite.scale.set( 64, 64, 1 );
+					scene.add( sprite );
+
+				}
+
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xf0f0f0 );
@@ -111,6 +143,16 @@
 
 				mesh.rotation.x = time * 2;
 				mesh.rotation.y = time * 4;
+
+				//
+
+				texture2.repeat.x = Math.sin( time ) * 0.5 + 0.5;
+				texture2.repeat.y = Math.cos( time ) * 0.5 + 0.5;
+
+				texture2.offset.x = Math.sin( time );
+				texture2.offset.y = Math.cos( time );
+
+				//
 
 				scene.updateMatrixWorld();
 
