@@ -129,8 +129,8 @@
 				var image = new Image();
 				image.onload = function () {
 
+					texture.image = this;
 					texture.needsUpdate = true;
-					material.map.image = this;
 
 					render();
 
