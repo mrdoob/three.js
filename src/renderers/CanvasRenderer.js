@@ -818,19 +818,30 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-		if ( texture instanceof THREE.DataTexture || texture.image === undefined || texture.image.width === 0 ) return;
+		if ( texture instanceof THREE.DataTexture ) return;
 
 		if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
 
-			textureToPattern( texture );
+			if ( texture.image !== undefined && texture.image.width > 0 ) {
+
+				textureToPattern( texture );
+
+			}
 
 			texture.addEventListener( 'update', onTextureUpdate );
 
 		}
 
-		_patterns[ texture.id ] === undefined
-			? setFillStyle( 'rgba(0,0,0,1)' )
-			: setFillStyle( _patterns[ texture.id ] );
+		if ( _patterns[ texture.id ] === undefined ) {
+
+			setFillStyle( 'rgba(0,0,0,1)' )
+			_context.fill();
+
+			return;
+
+		}
+	
+		setFillStyle( _patterns[ texture.id ] );
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
