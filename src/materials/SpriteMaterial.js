@@ -30,9 +30,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	this.fog = false;
 
-	this.uvOffset = new THREE.Vector2( 0, 0 );
-	this.uvScale  = new THREE.Vector2( 1, 1 );
-
 	// set parameters
 
 	this.setValues( parameters );
@@ -51,9 +48,6 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.rotation = this.rotation;
-
-	material.uvOffset.copy( this.uvOffset );
-	material.uvScale.copy( this.uvScale );
 
 	material.fog = this.fog;
 
