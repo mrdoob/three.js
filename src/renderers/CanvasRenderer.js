@@ -804,8 +804,18 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var repeatX = texture.wrapS === THREE.RepeatWrapping;
 		var repeatY = texture.wrapT === THREE.RepeatWrapping;
 
+		var image = texture.image;
+
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = image.width;
+		canvas.height = image.height;
+
+		var context = canvas.getContext( '2d' );
+		context.setTransform( 1, 0, 0, - 1, 0, image.height );
+		context.drawImage( image, 0, 0 );
+
 		_patterns[ texture.id ] = _context.createPattern(
-			texture.image, repeatX === true && repeatY === true
+			canvas, repeatX === true && repeatY === true
 				? 'repeat'
 				: repeatX === true && repeatY === false
 					? 'repeat-x'
@@ -852,13 +862,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 		height = texture.image.height * texture.repeat.y;
 
 		u0 = ( u0 + offsetX ) * width;
-		v0 = ( 1.0 - v0 + offsetY ) * height;
+		v0 = ( v0 + offsetY ) * height;
 
 		u1 = ( u1 + offsetX ) * width;
-		v1 = ( 1.0 - v1 + offsetY ) * height;
+		v1 = ( v1 + offsetY ) * height;
 
 		u2 = ( u2 + offsetX ) * width;
-		v2 = ( 1.0 - v2 + offsetY ) * height;
+		v2 = ( v2 + offsetY ) * height;
 
 		x1 -= x0; y1 -= y0;
 		x2 -= x0; y2 -= y0;
