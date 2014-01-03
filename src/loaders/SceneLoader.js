@@ -1127,7 +1127,7 @@ THREE.SceneLoader.prototype = {
 
 					uniforms[ "tCube" ].value = matJSON.parameters.envMap;
 					uniforms[ "enableReflection" ].value = true;
-					uniforms[ "uReflectivity" ].value = matJSON.parameters.reflectivity;
+					uniforms[ "reflectivity" ].value = matJSON.parameters.reflectivity;
 
 				}
 
@@ -1155,15 +1155,15 @@ THREE.SceneLoader.prototype = {
 
 				}
 
-				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniforms[ "uSpecularColor" ].value.setHex( specular );
-				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+				uniforms[ "diffuse" ].value.setHex( diffuse );
+				uniforms[ "specular" ].value.setHex( specular );
+				uniforms[ "ambient" ].value.setHex( ambient );
 
-				uniforms[ "uShininess" ].value = shininess;
+				uniforms[ "shininess" ].value = shininess;
 
 				if ( matJSON.parameters.opacity ) {
 
-					uniforms[ "uOpacity" ].value = matJSON.parameters.opacity;
+					uniforms[ "opacity" ].value = matJSON.parameters.opacity;
 
 				}
 
