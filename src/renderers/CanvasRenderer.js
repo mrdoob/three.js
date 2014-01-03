@@ -418,9 +418,10 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			if ( light instanceof THREE.DirectionalLight ) {
 
-				var lightPosition = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
+				//var lightDirection = _vector3.setFromMatrixPosition( light.matrixWorld ).normalize();
+				var lightDirection = light.getWorldDirection( _vector3 );
 
-				var amount = normal.dot( lightPosition );
+				var amount = normal.dot( lightDirection );
 
 				if ( amount <= 0 ) continue;
 
