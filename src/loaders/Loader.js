@@ -147,7 +147,7 @@ THREE.Loader.prototype = {
 
 			var isCompressed = /\.dds$/i.test( sourceFile );
 			
-			var fullPath = texturePath + texturePath.slice(-1) === '/' : '' : '/' + sourceFile;
+			var fullPath = texturePath + (texturePath.slice(-1) === '/' ? '' : '/') + sourceFile;
 
 			if ( isCompressed ) {
 
