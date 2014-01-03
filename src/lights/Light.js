@@ -35,14 +35,9 @@ THREE.Light._getWorldDirectionClosure = function() {
 		var direction = optionalTarget || new THREE.Vector3();
 
 		direction.setFromMatrixPosition( this.matrixWorld );
-		
-		if( this.target ) {
-
-			targetPosition.setFromMatrixPosition( this.target.matrixWorld );
-			direction.sub( targetPosition );
-			direction.normalize();
-
-		}
+		targetPosition.setFromMatrixPosition( this.target.matrixWorld );
+		direction.sub( targetPosition );
+		direction.normalize();
 
 		return direction;
 
