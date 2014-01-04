@@ -22,7 +22,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 	if ( this.renderer === undefined ) {
 
-		this.renderer = new THREE.WebGLRenderer( { alpha: false, antialias: false } );
+		this.renderer = new THREE.WebGLRenderer( { antialias: false } );
 		this.renderer.setSize( fullWidth, fullHeight );
 		this.renderer.setClearColorHex( 0x000000, 0 );
 
