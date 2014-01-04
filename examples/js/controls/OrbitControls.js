@@ -389,6 +389,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false || scope.noZoom === true ) return;
 
+		event.preventDefault();
+		event.stopPropagation();
+
 		var delta = event.deltaY;
 
 		if ( delta > 0 ) {
