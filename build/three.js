@@ -10623,15 +10623,15 @@ THREE.Loader.prototype = {
 
 			// for the moment don't handle displacement texture
 
-			uniforms[ "uDiffuseColor" ].value.setHex( mpars.color );
-			uniforms[ "uSpecularColor" ].value.setHex( mpars.specular );
-			uniforms[ "uAmbientColor" ].value.setHex( mpars.ambient );
+			uniforms[ "diffuse" ].value.setHex( mpars.color );
+			uniforms[ "specular" ].value.setHex( mpars.specular );
+			uniforms[ "ambient" ].value.setHex( mpars.ambient );
 
-			uniforms[ "uShininess" ].value = mpars.shininess;
+			uniforms[ "shininess" ].value = mpars.shininess;
 
 			if ( mpars.opacity !== undefined ) {
 
-				uniforms[ "uOpacity" ].value = mpars.opacity;
+				uniforms[ "opacity" ].value = mpars.opacity;
 
 			}
 
@@ -13020,7 +13020,7 @@ THREE.SceneLoader.prototype = {
 
 					uniforms[ "tCube" ].value = matJSON.parameters.envMap;
 					uniforms[ "enableReflection" ].value = true;
-					uniforms[ "uReflectivity" ].value = matJSON.parameters.reflectivity;
+					uniforms[ "reflectivity" ].value = matJSON.parameters.reflectivity;
 
 				}
 
@@ -13048,15 +13048,15 @@ THREE.SceneLoader.prototype = {
 
 				}
 
-				uniforms[ "uDiffuseColor" ].value.setHex( diffuse );
-				uniforms[ "uSpecularColor" ].value.setHex( specular );
-				uniforms[ "uAmbientColor" ].value.setHex( ambient );
+				uniforms[ "diffuse" ].value.setHex( diffuse );
+				uniforms[ "specular" ].value.setHex( specular );
+				uniforms[ "ambient" ].value.setHex( ambient );
 
-				uniforms[ "uShininess" ].value = shininess;
+				uniforms[ "shininess" ].value = shininess;
 
 				if ( matJSON.parameters.opacity ) {
 
-					uniforms[ "uOpacity" ].value = matJSON.parameters.opacity;
+					uniforms[ "opacity" ].value = matJSON.parameters.opacity;
 
 				}
 
@@ -14149,9 +14149,6 @@ THREE.SpriteMaterial = function ( parameters ) {
 
 	this.fog = false;
 
-	this.uvOffset = new THREE.Vector2( 0, 0 );
-	this.uvScale  = new THREE.Vector2( 1, 1 );
-
 	// set parameters
 
 	this.setValues( parameters );
@@ -14170,9 +14167,6 @@ THREE.SpriteMaterial.prototype.clone = function () {
 	material.map = this.map;
 
 	material.rotation = this.rotation;
-
-	material.uvOffset.copy( this.uvOffset );
-	material.uvScale.copy( this.uvScale );
 
 	material.fog = this.fog;
 
@@ -14257,7 +14251,7 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 	this.flipY = true;
 	this.unpackAlignment = 4; // valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
-	this.needsUpdate = false;
+	this._needsUpdate = false;
 	this.onUpdate = null;
 
 };
@@ -14265,6 +14259,20 @@ THREE.Texture = function ( image, mapping, wrapS, wrapT, magFilter, minFilter, f
 THREE.Texture.prototype = {
 
 	constructor: THREE.Texture,
+
+	get needsUpdate () {
+
+		return this._needsUpdate;
+
+	},
+
+	set needsUpdate ( value ) {
+
+		if ( value === true ) this.update();
+
+		this._needsUpdate = value;
+
+	},
 
 	clone: function ( texture ) {
 
@@ -14295,6 +14303,12 @@ THREE.Texture.prototype = {
 		texture.unpackAlignment = this.unpackAlignment;
 
 		return texture;
+
+	},
+
+	update: function () {
+
+		this.dispatchEvent( { type: 'update' } );
 
 	},
 
@@ -15386,7 +15400,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	_lightColor = new THREE.Color(),
 
-	_patterns = {}, _imagedatas = {},
+	_patterns = {},
 
 	_near, _far,
 
@@ -15800,16 +15814,49 @@ THREE.CanvasRenderer = function ( parameters ) {
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
-			if ( material.map !== null ) {
+			var texture = material.map;
 
-				var bitmap = material.map.image;
+			if ( texture !== null ) {
+
+				if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
+
+					if ( texture.image !== undefined && texture.image.width > 0 ) {
+
+						textureToPattern( texture );
+
+					}
+
+					texture.addEventListener( 'update', onTextureUpdate );
+
+				}
+
+				var pattern = _patterns[ texture.id ];
+
+				if ( pattern !== undefined ) {
+
+					setFillStyle( pattern );
+
+				} else {
+
+					setFillStyle( 'rgba(0,0,0,1)' );
+
+				}
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( material.rotation );
+				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
-
-				_context.drawImage( bitmap, 0, 0, bitmap.width, bitmap.height, - 0.5, - 0.5, 1, 1 );
+				_context.beginPath();
+				_context.moveTo( - 0.5, - 0.5 );
+				_context.lineTo(   0.5, - 0.5 );
+				_context.lineTo(   0.5,   0.5 );
+				_context.lineTo( - 0.5,   0.5 );
+				_context.closePath();
+				_context.translate( - 0.5, 0.5 );
+				_context.translate( - texture.offset.x, texture.offset.y );
+				_context.scale( 1 / texture.image.width, - 1 / texture.image.height );
+				_context.scale( 1 / texture.repeat.x, 1 / texture.repeat.y );
+				_context.fill();
 				_context.restore();
 
 			} else {
@@ -15818,7 +15865,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( material.rotation );
+				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
 				_context.fillRect( - 0.5, - 0.5, 1, 1 );
 				_context.restore();
@@ -15832,7 +15879,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.save();
 			_context.translate( v1.x, v1.y );
-			_context.rotate( - element.rotation );
+			if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 			_context.scale( scaleX, scaleY );
 
 			material.program( _context );
@@ -16121,32 +16168,69 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
+	function onTextureUpdate ( event ) {
+
+		textureToPattern( event.target );
+
+	}
+
+	function textureToPattern( texture ) {
+
+		var repeatX = texture.wrapS === THREE.RepeatWrapping;
+		var repeatY = texture.wrapT === THREE.RepeatWrapping;
+
+		var image = texture.image;
+
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = image.width;
+		canvas.height = image.height;
+
+		var context = canvas.getContext( '2d' );
+		context.setTransform( 1, 0, 0, - 1, 0, image.height );
+		context.drawImage( image, 0, 0 );
+
+		_patterns[ texture.id ] = _context.createPattern(
+			canvas, repeatX === true && repeatY === true
+				? 'repeat'
+				: repeatX === true && repeatY === false
+					? 'repeat-x'
+					: repeatX === false && repeatY === true
+						? 'repeat-y'
+						: 'no-repeat'
+		);
+
+	}
+
 	function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-		if ( texture instanceof THREE.DataTexture || texture.image === undefined || texture.image.width === 0 ) return;
+		if ( texture instanceof THREE.DataTexture ) return;
 
-		if ( texture.needsUpdate === true ) {
+		if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
 
-			var repeatX = texture.wrapS === THREE.RepeatWrapping;
-			var repeatY = texture.wrapT === THREE.RepeatWrapping;
+			if ( texture.image !== undefined && texture.image.width > 0 ) {
 
-			_patterns[ texture.id ] = _context.createPattern(
-				texture.image, repeatX === true && repeatY === true
-					? 'repeat'
-					: repeatX === true && repeatY === false
-						? 'repeat-x'
-						: repeatX === false && repeatY === true
-							? 'repeat-y'
-							: 'no-repeat'
-			);
+				textureToPattern( texture );
 
-			texture.needsUpdate = false;
+			}
+
+			texture.addEventListener( 'update', onTextureUpdate );
 
 		}
 
-		_patterns[ texture.id ] === undefined
-			? setFillStyle( 'rgba(0,0,0,1)' )
-			: setFillStyle( _patterns[ texture.id ] );
+		var pattern = _patterns[ texture.id ];
+
+		if ( pattern !== undefined ) {
+
+			setFillStyle( pattern );
+
+		} else {
+
+			setFillStyle( 'rgba(0,0,0,1)' );
+			_context.fill();
+
+			return;
+
+		}	
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
@@ -16157,13 +16241,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 		height = texture.image.height * texture.repeat.y;
 
 		u0 = ( u0 + offsetX ) * width;
-		v0 = ( 1.0 - v0 + offsetY ) * height;
+		v0 = ( v0 + offsetY ) * height;
 
 		u1 = ( u1 + offsetX ) * width;
-		v1 = ( 1.0 - v1 + offsetY ) * height;
+		v1 = ( v1 + offsetY ) * height;
 
 		u2 = ( u2 + offsetX ) * width;
-		v2 = ( 1.0 - v2 + offsetY ) * height;
+		v2 = ( v2 + offsetY ) * height;
 
 		x1 -= x0; y1 -= y0;
 		x2 -= x0; y2 -= y0;
@@ -16173,30 +16257,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		det = u1 * v2 - u2 * v1;
 
-		if ( det === 0 ) {
-
-			if ( _imagedatas[ texture.id ] === undefined ) {
-
-				var canvas = document.createElement( 'canvas' )
-				canvas.width = texture.image.width;
-				canvas.height = texture.image.height;
-
-				var context = canvas.getContext( '2d' );
-				context.drawImage( texture.image, 0, 0 );
-
-				_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
-
-			}
-
-			var data = _imagedatas[ texture.id ];
-			var index = ( Math.floor( u0 ) + Math.floor( v0 ) * texture.image.width ) * 4;
-
-			_color.setRGB( data[ index ] / 255, data[ index + 1 ] / 255, data[ index + 2 ] / 255 );
-			fillPath( _color );
-
-			return;
-
-		}
+		if ( det === 0 ) return;
 
 		idet = 1 / det;
 
@@ -17333,20 +17394,12 @@ THREE.ShaderChunk = {
 				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 				"float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-				"#ifdef PHYSICALLY_BASED_SHADING",
+				// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-					// 2.0 => 2.0001 is hack to work around ANGLE bug
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, pointHalfVector ), 5.0 );",
-					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
-
-				"#else",
-
-					"pointSpecular += specular * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance;",
-
-				"#endif",
+				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, pointHalfVector ), 5.0 );",
+				"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
 
 			"}",
 
@@ -17408,20 +17461,12 @@ THREE.ShaderChunk = {
 					"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
 					"float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
-					"#ifdef PHYSICALLY_BASED_SHADING",
+					// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
+					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-						"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, spotHalfVector ), 5.0 );",
-						"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
-
-					"#else",
-
-						"spotSpecular += specular * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * spotEffect;",
-
-					"#endif",
+					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, spotHalfVector ), 5.0 );",
+					"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
 
 				"}",
 
@@ -17464,41 +17509,34 @@ THREE.ShaderChunk = {
 				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 				"float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
-				"#ifdef PHYSICALLY_BASED_SHADING",
-
 					/*
-					// fresnel term from skin shader
-					"const float F0 = 0.128;",
+				// fresnel term from skin shader
+				"const float F0 = 0.128;",
 
-					"float base = 1.0 - dot( viewPosition, dirHalfVector );",
-					"float exponential = pow( base, 5.0 );",
+				"float base = 1.0 - dot( viewPosition, dirHalfVector );",
+				"float exponential = pow( base, 5.0 );",
 
-					"float fresnel = exponential + F0 * ( 1.0 - exponential );",
-					*/
+				"float fresnel = exponential + F0 * ( 1.0 - exponential );",
+				*/
 
-					/*
-					// fresnel term from fresnel shader
-					"const float mFresnelBias = 0.08;",
-					"const float mFresnelScale = 0.3;",
-					"const float mFresnelPower = 5.0;",
+				/*
+				// fresnel term from fresnel shader
+				"const float mFresnelBias = 0.08;",
+				"const float mFresnelScale = 0.3;",
+				"const float mFresnelPower = 5.0;",
 
-					"float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
-					*/
+				"float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
+				*/
 
-					// 2.0 => 2.0001 is hack to work around ANGLE bug
+				// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-					//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
+				//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
 
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
-					"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
+				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+				"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
-				"#else",
-
-					"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight;",
-
-				"#endif",
 
 			"}",
 
@@ -17537,23 +17575,15 @@ THREE.ShaderChunk = {
 				"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
 				"float hemiSpecularWeightGround = specularStrength * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
 
-				"#ifdef PHYSICALLY_BASED_SHADING",
+				"float dotProductGround = dot( normal, lVectorGround );",
 
-					"float dotProductGround = dot( normal, lVectorGround );",
+				// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-					// 2.0 => 2.0001 is hack to work around ANGLE bug
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-					"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
-					"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
-					"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
-
-				"#else",
-
-					"hemiSpecular += specular * hemiColor * ( hemiSpecularWeightSky + hemiSpecularWeightGround ) * hemiDiffuseWeight;",
-
-				"#endif",
+				"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
+				"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+				"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 			"}",
 
@@ -18923,15 +18953,15 @@ THREE.ShaderLib = {
 			"uDisplacementBias": { type: "f", value: 0.0 },
 			"uDisplacementScale": { type: "f", value: 1.0 },
 
-			"uDiffuseColor": { type: "c", value: new THREE.Color( 0xffffff ) },
-			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"uAmbientColor": { type: "c", value: new THREE.Color( 0xffffff ) },
-			"uShininess": { type: "f", value: 30 },
-			"uOpacity": { type: "f", value: 1 },
+			"diffuse": { type: "c", value: new THREE.Color( 0xffffff ) },
+			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"ambient": { type: "c", value: new THREE.Color( 0xffffff ) },
+			"shininess": { type: "f", value: 30 },
+			"opacity": { type: "f", value: 1 },
 
 			"useRefract": { type: "i", value: 0 },
-			"uRefractionRatio": { type: "f", value: 0.98 },
-			"uReflectivity": { type: "f", value: 0.5 },
+			"refractionRatio": { type: "f", value: 0.98 },
+			"reflectivity": { type: "f", value: 0.5 },
 
 			"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
 			"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
@@ -18944,11 +18974,11 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
-			"uniform vec3 uAmbientColor;",
-			"uniform vec3 uDiffuseColor;",
-			"uniform vec3 uSpecularColor;",
-			"uniform float uShininess;",
-			"uniform float uOpacity;",
+			"uniform vec3 ambient;",
+			"uniform vec3 diffuse;",
+			"uniform vec3 specular;",
+			"uniform float shininess;",
+			"uniform float opacity;",
 
 			"uniform bool enableDiffuse;",
 			"uniform bool enableSpecular;",
@@ -18965,8 +18995,8 @@ THREE.ShaderLib = {
 			"uniform vec2 uNormalScale;",
 
 			"uniform bool useRefract;",
-			"uniform float uRefractionRatio;",
-			"uniform float uReflectivity;",
+			"uniform float refractionRatio;",
+			"uniform float reflectivity;",
 
 			"varying vec3 vTangent;",
 			"varying vec3 vBinormal;",
@@ -19023,7 +19053,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
+				"gl_FragColor = vec4( vec3( 1.0 ), opacity );",
 
 				"vec3 specularTex = vec3( 1.0 );",
 
@@ -19113,28 +19143,20 @@ THREE.ShaderLib = {
 
 						"#endif",
 
-						"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
+						"pointDiffuse += pointDistance * pointLightColor[ i ] * diffuse * pointDiffuseWeight;",
 
 						// specular
 
 						"vec3 pointHalfVector = normalize( pointVector + viewPosition );",
 						"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-						"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, uShininess ), 0.0 );",
+						"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-						"#ifdef PHYSICALLY_BASED_SHADING",
+						// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
+						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-							"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-							"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( pointVector, pointHalfVector ), 5.0 );",
-							"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance * specularNormalization;",
-
-						"#else",
-
-							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
-
-						"#endif",
+						"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( pointVector, pointHalfVector ), 5.0 );",
+						"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance * specularNormalization;",
 
 					"}",
 
@@ -19179,28 +19201,20 @@ THREE.ShaderLib = {
 
 							"#endif",
 
-							"spotDiffuse += spotDistance * spotLightColor[ i ] * uDiffuseColor * spotDiffuseWeight * spotEffect;",
+							"spotDiffuse += spotDistance * spotLightColor[ i ] * diffuse * spotDiffuseWeight * spotEffect;",
 
 							// specular
 
 							"vec3 spotHalfVector = normalize( spotVector + viewPosition );",
 							"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
-							"float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, uShininess ), 0.0 );",
+							"float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
-							"#ifdef PHYSICALLY_BASED_SHADING",
+							// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-								// 2.0 => 2.0001 is hack to work around ANGLE bug
+							"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-								"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-								"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
-								"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
-
-							"#else",
-
-								"spotSpecular += spotDistance * spotLightColor[ i ] * uSpecularColor * spotSpecularWeight * spotDiffuseWeight * spotEffect;",
-
-							"#endif",
+							"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
+							"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
 
 						"}",
 
@@ -19235,28 +19249,20 @@ THREE.ShaderLib = {
 
 						"#endif",
 
-						"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
+						"dirDiffuse += directionalLightColor[ i ] * diffuse * dirDiffuseWeight;",
 
 						// specular
 
 						"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 						"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-						"float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, uShininess ), 0.0 );",
+						"float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
-						"#ifdef PHYSICALLY_BASED_SHADING",
+						// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
+						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-							"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-							"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
-							"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
-
-						"#else",
-
-							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;",
-
-						"#endif",
+						"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+						"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
 					"}",
 
@@ -19281,14 +19287,14 @@ THREE.ShaderLib = {
 
 						"vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
 
-						"hemiDiffuse += uDiffuseColor * hemiColor;",
+						"hemiDiffuse += diffuse * hemiColor;",
 
 						// specular (sky light)
 
 
 						"vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
 						"float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
-						"float hemiSpecularWeightSky = specularTex.r * max( pow( hemiDotNormalHalfSky, uShininess ), 0.0 );",
+						"float hemiSpecularWeightSky = specularTex.r * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
 
 						// specular (ground light)
 
@@ -19296,25 +19302,17 @@ THREE.ShaderLib = {
 
 						"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 						"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
-						"float hemiSpecularWeightGround = specularTex.r * max( pow( hemiDotNormalHalfGround, uShininess ), 0.0 );",
+						"float hemiSpecularWeightGround = specularTex.r * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
 
-						"#ifdef PHYSICALLY_BASED_SHADING",
+						"float dotProductGround = dot( normal, lVectorGround );",
 
-							"float dotProductGround = dot( normal, lVectorGround );",
+						// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
+						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-							"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-							"vec3 schlickSky = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
-							"vec3 schlickGround = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
-							"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
-
-						"#else",
-
-							"hemiSpecular += uSpecularColor * hemiColor * ( hemiSpecularWeightSky + hemiSpecularWeightGround ) * hemiDiffuseWeight;",
-
-						"#endif",
+						"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
+						"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+						"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 					"}",
 
@@ -19355,11 +19353,11 @@ THREE.ShaderLib = {
 
 				"#ifdef METAL",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor + totalSpecular );",
+					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient + totalSpecular );",
 
 				"#else",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor ) + totalSpecular;",
+					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;",
 
 				"#endif",
 
@@ -19370,7 +19368,7 @@ THREE.ShaderLib = {
 
 					"if ( useRefract ) {",
 
-						"vReflect = refract( cameraToVertex, normal, uRefractionRatio );",
+						"vReflect = refract( cameraToVertex, normal, refractionRatio );",
 
 					"} else {",
 
@@ -19386,7 +19384,7 @@ THREE.ShaderLib = {
 
 					"#endif",
 
-					"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * uReflectivity );",
+					"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * reflectivity );",
 
 				"}",
 
@@ -19681,7 +19679,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.gammaInput = false;
 	this.gammaOutput = false;
-	this.physicallyBasedShading = false;
 
 	// shadow map
 
@@ -25138,7 +25135,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_this.gammaInput ? "#define GAMMA_INPUT" : "",
 			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-			_this.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -25248,7 +25244,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_this.gammaInput ? "#define GAMMA_INPUT" : "",
 			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-			_this.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
 
 			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 			( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",
@@ -36646,8 +36641,17 @@ THREE.SpritePlugin = function () {
 
 			}
 
-			_gl.uniform2f( uniforms.uvScale, material.uvScale.x, material.uvScale.y );
-			_gl.uniform2f( uniforms.uvOffset, material.uvOffset.x, material.uvOffset.y );
+			if ( material.map !== null ) {
+
+				_gl.uniform2f( uniforms.uvOffset, material.map.offset.x, material.map.offset.y );
+				_gl.uniform2f( uniforms.uvScale, material.map.repeat.x, material.map.repeat.y );
+
+			} else {
+
+				_gl.uniform2f( uniforms.uvOffset, 0, 0 );
+				_gl.uniform2f( uniforms.uvScale, 1, 1 );
+
+			}
 
 			_gl.uniform1f( uniforms.opacity, material.opacity );
 			_gl.uniform3f( uniforms.color, material.color.r, material.color.g, material.color.b );
