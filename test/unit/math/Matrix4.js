@@ -284,13 +284,13 @@ test( "compose/decompose", function() {
 
 				var m2 = new THREE.Matrix4().compose( t2, r2, s2 );
 			
-				// self-inverse should the same as inverse
 				var matrixIsSame = matrixEquals4( m, m2 );
+				/* debug code
 				if( ! matrixIsSame ) {
 					console.log( t, s, r );
 					console.log( t2, s2, r2 );
 					console.log( m, m2 );
-				}
+				}*/
 				ok( matrixEquals4( m, m2 ), "Passed!" );
 
 			}
