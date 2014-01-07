@@ -4929,6 +4929,12 @@ THREE.Matrix4.prototype = {
 			var sy = vector.set( te[4], te[5], te[6] ).length();
 			var sz = vector.set( te[8], te[9], te[10] ).length();
 
+			// if determine is negative, we need to invert one scale
+			var det = this.determinant();
+			if( det < 0 ) {
+				sx = -sx;
+			}
+
 			position.x = te[12];
 			position.y = te[13];
 			position.z = te[14];
@@ -7347,25 +7353,13 @@ THREE.Object3D.prototype = {
 
 	},
 
-	applyMatrix: function () {
+	applyMatrix: function ( matrix ) {
 
-		var m1 = new THREE.Matrix4();
+		this.matrix.multiplyMatrices( matrix, this.matrix );
 
-		return function ( matrix ) {
+		this.matrix.decompose( this.position, this.quaternion, this.scale );
 
-			this.matrix.multiplyMatrices( matrix, this.matrix );
-
-			this.position.setFromMatrixPosition( this.matrix );
-
-			this.scale.setFromMatrixScale( this.matrix );
-
-			m1.extractRotation( this.matrix );
-
-			this.quaternion.setFromRotationMatrix( m1 );
-
-		}
-
-	}(),
+	},
 
 	setRotationFromAxisAngle: function ( axis, angle ) {
 
