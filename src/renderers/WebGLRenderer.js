@@ -3729,7 +3729,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function addObject( object, scene ) {
 
-		var g, geometry, material, geometryGroup;
+		var g, geometry, material, geometryGroup, init = false;
 
 		if ( object.__webglInit === undefined ) {
 
@@ -3737,47 +3737,55 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			object._modelViewMatrix = new THREE.Matrix4();
 			object._normalMatrix = new THREE.Matrix3();
+			
+			init = true;
+			
+		}
 
-			if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
+		if ( object.geometry !== undefined && object.geometry.__webglInit === undefined ) {
 
-				object.geometry.__webglInit = true;
-				object.geometry.addEventListener( 'dispose', onGeometryDispose );
+			object.geometry.__webglInit = true;
+			object.geometry.addEventListener( 'dispose', onGeometryDispose );
 
-			}
-
+			init = true;
+			
+		}
+		
+		if ( init === true ) {
+		
 			geometry = object.geometry;
-
+	
 			if ( geometry === undefined ) {
-
+	
 				// fail silently for now
-
+	
 			} else if ( geometry instanceof THREE.BufferGeometry ) {
-
+	
 				initDirectBuffers( geometry );
-
+	
 			} else if ( object instanceof THREE.Mesh ) {
-
+	
 				material = object.material;
-
+	
 				if ( geometry.geometryGroups === undefined ) {
-
+	
 					sortFacesByMaterial( geometry, material );
-
+	
 				}
-
+	
 				// create separate VBOs per geometry chunk
-
+	
 				for ( g in geometry.geometryGroups ) {
-
+	
 					geometryGroup = geometry.geometryGroups[ g ];
-
+	
 					// initialise VBO on the first access
-
+	
 					if ( ! geometryGroup.__webglVertexBuffer ) {
-
+	
 						createMeshBuffers( geometryGroup );
 						initMeshBuffers( geometryGroup, object );
-
+	
 						geometry.verticesNeedUpdate = true;
 						geometry.morphTargetsNeedUpdate = true;
 						geometry.elementsNeedUpdate = true;
@@ -3785,36 +3793,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 						geometry.normalsNeedUpdate = true;
 						geometry.tangentsNeedUpdate = true;
 						geometry.colorsNeedUpdate = true;
-
+	
 					}
-
+	
 				}
-
+	
 			} else if ( object instanceof THREE.Line ) {
-
+	
 				if ( ! geometry.__webglVertexBuffer ) {
-
+	
 					createLineBuffers( geometry );
 					initLineBuffers( geometry, object );
-
+	
 					geometry.verticesNeedUpdate = true;
 					geometry.colorsNeedUpdate = true;
 					geometry.lineDistancesNeedUpdate = true;
-
+	
 				}
-
+	
 			} else if ( object instanceof THREE.ParticleSystem ) {
-
+	
 				if ( ! geometry.__webglVertexBuffer ) {
-
+	
 					createParticleBuffers( geometry );
 					initParticleBuffers( geometry, object );
-
+	
 					geometry.verticesNeedUpdate = true;
 					geometry.colorsNeedUpdate = true;
-
+	
 				}
-
+	
 			}
 
 		}
