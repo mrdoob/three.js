@@ -9,7 +9,6 @@
 				color: #000;
 				font-family:Monospace;
 				font-size:13px;
-				text-align:center;
 				margin: 0px;
 				overflow: hidden;
 			}
@@ -17,6 +16,7 @@
 			#info {
 				position: absolute;
 				top: 0px; width: 100%;
+				text-align:center;
 				padding: 5px;
 			}
 
@@ -79,9 +79,7 @@
 				scene = new THREE.Scene();
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.5, 3000000 );
 
-				// resize(innerWidth, innerHeight);
-
-				camera.position.set( 0, Math.max( parameters.width * 1.5, parameters.height ) / 8, -parameters.height );
+				camera.position.set( 0, Math.max( parameters.width * 1.5, parameters.height ) / 8, parameters.height );
 				camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
@@ -91,7 +89,7 @@
 				controls.maxPolarAngle = Math.PI * 0.495;
 
 				directionalLight = new THREE.DirectionalLight( 0xffff55, 1 );
-				directionalLight.position.set( -600, 300, 600 );
+				directionalLight.position.set( - 1, 1, - 1 );
 				scene.add( directionalLight );
 
 				
@@ -123,17 +121,37 @@
 
 				// load skybox
 
-				var path = "textures/cube/skybox/";
-
-				var cubeMap = THREE.ImageUtils.loadTextureCube( [
-					path + 'px.jpg',
-					path + 'nx.jpg',
-					path + 'py.jpg',
-					path + 'ny.jpg',
-					path + 'pz.jpg',
-					path + 'nz.jpg'
-				] );
+				var cubeMap = new THREE.Texture( [] );
 				cubeMap.format = THREE.RGBFormat;
+				cubeMap.flipY = false;
+
+				var loader = new THREE.ImageLoader();
+				loader.load( 'textures/skyboxsun25degtest.png', function ( image ) {
+
+					var getSide = function ( x, y ) {
+
+						var size = 1024;
+
+						var canvas = document.createElement( 'canvas' );
+						canvas.width = size;
+						canvas.height = size;
+
+						var context = canvas.getContext( '2d' );
+						context.drawImage( image, - x * size, - y * size );
+
+						return canvas;
+
+					};
+
+					cubeMap.image[ 0 ] = getSide( 2, 1 ); // px
+					cubeMap.image[ 1 ] = getSide( 0, 1 ); // nx
+					cubeMap.image[ 2 ] = getSide( 1, 0 ); // py
+					cubeMap.image[ 3 ] = getSide( 1, 2 ); // ny
+					cubeMap.image[ 4 ] = getSide( 1, 1 ); // pz
+					cubeMap.image[ 5 ] = getSide( 3, 1 ); // nz
+					cubeMap.needsUpdate = true;
+
+				} );
 
 				var cubeShader = THREE.ShaderLib['cube'];
 				cubeShader.uniforms['tCube'].value = cubeMap;
@@ -160,9 +178,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				
-
 				render();
 
 			}
@@ -176,16 +191,6 @@
 
 			}
 
-			function resize(width, height) {
-
-				camera.aspect =  width / height;
-				camera.updateProjectionMatrix();
-				renderer.setSize( width, height );
-			
-			}
-
-
 		</script>
-
 	</body>
 </html>
