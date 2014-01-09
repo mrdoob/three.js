@@ -247,6 +247,8 @@
 				var precision = raycaster.precision;
 
 				var vertices = geometry.vertices;
+				var morphTargets = geometry.morphTargets;
+				var morphInfluences = object.morphTargetInfluences;
 
 				for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -259,7 +261,46 @@
 					a = vertices[ face.a ];
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
-					
+
+					if ( material.morphTargets === true) {
+						vA.set(0, 0, 0);
+						vB.set(0, 0, 0);
+						vC.set(0, 0, 0);
+
+						for(var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+							vA.x += (morphTargets[t].vertices[ face.a ].x - a.x) * morphInfluences[t];
+							vA.y += (morphTargets[t].vertices[ face.a ].y - a.y) * morphInfluences[t];
+							vA.z += (morphTargets[t].vertices[ face.a ].z - a.z) * morphInfluences[t];
+
+							vB.x += (morphTargets[t].vertices[ face.b ].x - b.x) * morphInfluences[t];
+							vB.y += (morphTargets[t].vertices[ face.b ].y - b.y) * morphInfluences[t];
+							vB.z += (morphTargets[t].vertices[ face.b ].z - b.z) * morphInfluences[t];
+
+							vC.x += (morphTargets[t].vertices[ face.c ].x - c.x) * morphInfluences[t];
+							vC.y += (morphTargets[t].vertices[ face.c ].y - c.y) * morphInfluences[t];
+							vC.z += (morphTargets[t].vertices[ face.c ].z - c.z) * morphInfluences[t];
+
+						}
+
+						vA.x += a.x;
+						vA.y += a.y;
+						vA.z += a.z;
+
+						vB.x += b.x;
+						vB.y += b.y;
+						vB.z += b.z;
+
+						vC.x += c.x;
+						vC.y += c.y;
+						vC.z += c.z;
+
+						a = vA;
+						b = vB;
+						c = vC;
+
+					}
+
 					if ( material.side === THREE.BackSide ) {
 							
 						var intersectionPoint = localRay.intersectTriangle( c, b, a, true ); 
