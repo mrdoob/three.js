@@ -17,7 +17,7 @@ THREE.Loader.prototype = {
 
 	constructor: THREE.Loader,
 
-	crossOrigin: 'anonymous',
+	crossOrigin: undefined,
 
 	addStatusElement: function () {
 
@@ -138,7 +138,7 @@ THREE.Loader.prototype = {
 
 			};
 
-			image.crossOrigin = _this.crossOrigin;
+			if ( _this.crossOrigin !== undefined ) image.crossOrigin = _this.crossOrigin;
 			image.src = url;
 
 		}
