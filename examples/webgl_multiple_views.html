@@ -53,6 +53,8 @@
 
 			var windowWidth, windowHeight;
 
+                        var dpr = window.devicePixelRatio || 1;
+
 			var views = [
 				{ 
 					left: 0,
@@ -283,10 +285,11 @@
 
 					view.updateCamera( camera, scene, mouseX, mouseY );
 
-					var left   = Math.floor( windowWidth  * view.left );
-					var bottom = Math.floor( windowHeight * view.bottom );
-					var width  = Math.floor( windowWidth  * view.width );
-					var height = Math.floor( windowHeight * view.height );
+                                        // multiply by the device pixel ratio in order to properly support high DPI displays
+					var left   = Math.floor( windowWidth  * view.left ) * dpr;
+					var bottom = Math.floor( windowHeight * view.bottom ) * dpr;
+					var width  = Math.floor( windowWidth  * view.width ) * dpr;
+					var height = Math.floor( windowHeight * view.height ) * dpr;
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
 					renderer.enableScissorTest ( true );
