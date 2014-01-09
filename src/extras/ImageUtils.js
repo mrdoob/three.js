@@ -5,7 +5,7 @@
 
 THREE.ImageUtils = {
 
-	crossOrigin: 'anonymous',
+	crossOrigin: undefined,
 
 	loadTexture: function ( url, mapping, onLoad, onError ) {
 
