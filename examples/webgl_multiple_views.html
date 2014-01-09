@@ -53,10 +53,10 @@
 
 			var windowWidth, windowHeight;
 
-                        var dpr = window.devicePixelRatio || 1;
+			var dpr = window.devicePixelRatio || 1;
 
 			var views = [
-				{ 
+				{
 					left: 0,
 					bottom: 0,
 					width: 0.5,
@@ -285,7 +285,7 @@
 
 					view.updateCamera( camera, scene, mouseX, mouseY );
 
-                                        // multiply by the device pixel ratio in order to properly support high DPI displays
+					// multiply by the device pixel ratio in order to properly support high DPI displays
 					var left   = Math.floor( windowWidth  * view.left ) * dpr;
 					var bottom = Math.floor( windowHeight * view.bottom ) * dpr;
 					var width  = Math.floor( windowWidth  * view.width ) * dpr;
