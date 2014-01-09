@@ -1965,8 +1965,8 @@ def extract_material_data(m, option_colors):
 
     if textures['bump']:
         material['mapBump'] = textures['bump']['texture'].image.name
-        if textures['normal']['slot'].use_map_normal:
-            material['mapBumpScale'] = textures['normal']['slot'].normal_factor
+        if textures['bump']['slot'].use_map_normal:
+            material['mapBumpScale'] = textures['bump']['slot'].normal_factor
 
     material['shading'] = m.THREE_materialType
     material['blending'] = m.THREE_blendingType

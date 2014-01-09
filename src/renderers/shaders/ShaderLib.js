@@ -569,15 +569,15 @@ THREE.ShaderLib = {
 			"uDisplacementBias": { type: "f", value: 0.0 },
 			"uDisplacementScale": { type: "f", value: 1.0 },
 
-			"uDiffuseColor": { type: "c", value: new THREE.Color( 0xffffff ) },
-			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"uAmbientColor": { type: "c", value: new THREE.Color( 0xffffff ) },
-			"uShininess": { type: "f", value: 30 },
-			"uOpacity": { type: "f", value: 1 },
+			"diffuse": { type: "c", value: new THREE.Color( 0xffffff ) },
+			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"ambient": { type: "c", value: new THREE.Color( 0xffffff ) },
+			"shininess": { type: "f", value: 30 },
+			"opacity": { type: "f", value: 1 },
 
 			"useRefract": { type: "i", value: 0 },
-			"uRefractionRatio": { type: "f", value: 0.98 },
-			"uReflectivity": { type: "f", value: 0.5 },
+			"refractionRatio": { type: "f", value: 0.98 },
+			"reflectivity": { type: "f", value: 0.5 },
 
 			"uOffset" : { type: "v2", value: new THREE.Vector2( 0, 0 ) },
 			"uRepeat" : { type: "v2", value: new THREE.Vector2( 1, 1 ) },
@@ -590,11 +590,11 @@ THREE.ShaderLib = {
 
 		fragmentShader: [
 
-			"uniform vec3 uAmbientColor;",
-			"uniform vec3 uDiffuseColor;",
-			"uniform vec3 uSpecularColor;",
-			"uniform float uShininess;",
-			"uniform float uOpacity;",
+			"uniform vec3 ambient;",
+			"uniform vec3 diffuse;",
+			"uniform vec3 specular;",
+			"uniform float shininess;",
+			"uniform float opacity;",
 
 			"uniform bool enableDiffuse;",
 			"uniform bool enableSpecular;",
@@ -611,8 +611,8 @@ THREE.ShaderLib = {
 			"uniform vec2 uNormalScale;",
 
 			"uniform bool useRefract;",
-			"uniform float uRefractionRatio;",
-			"uniform float uReflectivity;",
+			"uniform float refractionRatio;",
+			"uniform float reflectivity;",
 
 			"varying vec3 vTangent;",
 			"varying vec3 vBinormal;",
@@ -669,7 +669,7 @@ THREE.ShaderLib = {
 
 			"void main() {",
 
-				"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
+				"gl_FragColor = vec4( vec3( 1.0 ), opacity );",
 
 				"vec3 specularTex = vec3( 1.0 );",
 
@@ -759,28 +759,20 @@ THREE.ShaderLib = {
 
 						"#endif",
 
-						"pointDiffuse += pointDistance * pointLightColor[ i ] * uDiffuseColor * pointDiffuseWeight;",
+						"pointDiffuse += pointDistance * pointLightColor[ i ] * diffuse * pointDiffuseWeight;",
 
 						// specular
 
 						"vec3 pointHalfVector = normalize( pointVector + viewPosition );",
 						"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
-						"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, uShininess ), 0.0 );",
+						"float pointSpecularWeight = specularTex.r * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-						"#ifdef PHYSICALLY_BASED_SHADING",
+						// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
+						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-							"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-							"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( pointVector, pointHalfVector ), 5.0 );",
-							"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance * specularNormalization;",
-
-						"#else",
-
-							"pointSpecular += pointDistance * pointLightColor[ i ] * uSpecularColor * pointSpecularWeight * pointDiffuseWeight;",
-
-						"#endif",
+						"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( pointVector, pointHalfVector ), 5.0 );",
+						"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * pointDistance * specularNormalization;",
 
 					"}",
 
@@ -825,28 +817,20 @@ THREE.ShaderLib = {
 
 							"#endif",
 
-							"spotDiffuse += spotDistance * spotLightColor[ i ] * uDiffuseColor * spotDiffuseWeight * spotEffect;",
+							"spotDiffuse += spotDistance * spotLightColor[ i ] * diffuse * spotDiffuseWeight * spotEffect;",
 
 							// specular
 
 							"vec3 spotHalfVector = normalize( spotVector + viewPosition );",
 							"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
-							"float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, uShininess ), 0.0 );",
+							"float spotSpecularWeight = specularTex.r * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
-							"#ifdef PHYSICALLY_BASED_SHADING",
+							// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-								// 2.0 => 2.0001 is hack to work around ANGLE bug
+							"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-								"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-								"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
-								"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
-
-							"#else",
-
-								"spotSpecular += spotDistance * spotLightColor[ i ] * uSpecularColor * spotSpecularWeight * spotDiffuseWeight * spotEffect;",
-
-							"#endif",
+							"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( spotVector, spotHalfVector ), 5.0 );",
+							"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * spotDistance * specularNormalization * spotEffect;",
 
 						"}",
 
@@ -881,28 +865,20 @@ THREE.ShaderLib = {
 
 						"#endif",
 
-						"dirDiffuse += directionalLightColor[ i ] * uDiffuseColor * dirDiffuseWeight;",
+						"dirDiffuse += directionalLightColor[ i ] * diffuse * dirDiffuseWeight;",
 
 						// specular
 
 						"vec3 dirHalfVector = normalize( dirVector + viewPosition );",
 						"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
-						"float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, uShininess ), 0.0 );",
+						"float dirSpecularWeight = specularTex.r * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
-						"#ifdef PHYSICALLY_BASED_SHADING",
+						// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
+						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-							"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-							"vec3 schlick = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
-							"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
-
-						"#else",
-
-							"dirSpecular += directionalLightColor[ i ] * uSpecularColor * dirSpecularWeight * dirDiffuseWeight;",
-
-						"#endif",
+						"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+						"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
 					"}",
 
@@ -927,14 +903,14 @@ THREE.ShaderLib = {
 
 						"vec3 hemiColor = mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
 
-						"hemiDiffuse += uDiffuseColor * hemiColor;",
+						"hemiDiffuse += diffuse * hemiColor;",
 
 						// specular (sky light)
 
 
 						"vec3 hemiHalfVectorSky = normalize( lVector + viewPosition );",
 						"float hemiDotNormalHalfSky = 0.5 * dot( normal, hemiHalfVectorSky ) + 0.5;",
-						"float hemiSpecularWeightSky = specularTex.r * max( pow( hemiDotNormalHalfSky, uShininess ), 0.0 );",
+						"float hemiSpecularWeightSky = specularTex.r * max( pow( hemiDotNormalHalfSky, shininess ), 0.0 );",
 
 						// specular (ground light)
 
@@ -942,25 +918,17 @@ THREE.ShaderLib = {
 
 						"vec3 hemiHalfVectorGround = normalize( lVectorGround + viewPosition );",
 						"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
-						"float hemiSpecularWeightGround = specularTex.r * max( pow( hemiDotNormalHalfGround, uShininess ), 0.0 );",
+						"float hemiSpecularWeightGround = specularTex.r * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
 
-						"#ifdef PHYSICALLY_BASED_SHADING",
+						"float dotProductGround = dot( normal, lVectorGround );",
 
-							"float dotProductGround = dot( normal, lVectorGround );",
+						// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-							// 2.0 => 2.0001 is hack to work around ANGLE bug
+						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-							"float specularNormalization = ( uShininess + 2.0001 ) / 8.0;",
-
-							"vec3 schlickSky = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
-							"vec3 schlickGround = uSpecularColor + vec3( 1.0 - uSpecularColor ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
-							"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
-
-						"#else",
-
-							"hemiSpecular += uSpecularColor * hemiColor * ( hemiSpecularWeightSky + hemiSpecularWeightGround ) * hemiDiffuseWeight;",
-
-						"#endif",
+						"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
+						"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+						"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 					"}",
 
@@ -1001,11 +969,11 @@ THREE.ShaderLib = {
 
 				"#ifdef METAL",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor + totalSpecular );",
+					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient + totalSpecular );",
 
 				"#else",
 
-					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * uAmbientColor ) + totalSpecular;",
+					"gl_FragColor.xyz = gl_FragColor.xyz * ( totalDiffuse + ambientLightColor * ambient ) + totalSpecular;",
 
 				"#endif",
 
@@ -1016,7 +984,7 @@ THREE.ShaderLib = {
 
 					"if ( useRefract ) {",
 
-						"vReflect = refract( cameraToVertex, normal, uRefractionRatio );",
+						"vReflect = refract( cameraToVertex, normal, refractionRatio );",
 
 					"} else {",
 
@@ -1032,7 +1000,7 @@ THREE.ShaderLib = {
 
 					"#endif",
 
-					"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * uReflectivity );",
+					"gl_FragColor.xyz = mix( gl_FragColor.xyz, cubeColor.xyz, specularTex.r * reflectivity );",
 
 				"}",
 

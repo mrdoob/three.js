@@ -58,7 +58,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	_lightColor = new THREE.Color(),
 
-	_patterns = {}, _imagedatas = {},
+	_patterns = {},
 
 	_near, _far,
 
@@ -472,16 +472,49 @@ THREE.CanvasRenderer = function ( parameters ) {
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 
-			if ( material.map !== null ) {
+			var texture = material.map;
 
-				var bitmap = material.map.image;
+			if ( texture !== null ) {
+
+				if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
+
+					if ( texture.image !== undefined && texture.image.width > 0 ) {
+
+						textureToPattern( texture );
+
+					}
+
+					texture.addEventListener( 'update', onTextureUpdate );
+
+				}
+
+				var pattern = _patterns[ texture.id ];
+
+				if ( pattern !== undefined ) {
+
+					setFillStyle( pattern );
+
+				} else {
+
+					setFillStyle( 'rgba(0,0,0,1)' );
+
+				}
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( material.rotation );
+				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
-
-				_context.drawImage( bitmap, 0, 0, bitmap.width, bitmap.height, - 0.5, - 0.5, 1, 1 );
+				_context.beginPath();
+				_context.moveTo( - 0.5, - 0.5 );
+				_context.lineTo(   0.5, - 0.5 );
+				_context.lineTo(   0.5,   0.5 );
+				_context.lineTo( - 0.5,   0.5 );
+				_context.closePath();
+				_context.translate( - 0.5, 0.5 );
+				_context.translate( - texture.offset.x, texture.offset.y );
+				_context.scale( 1 / texture.image.width, - 1 / texture.image.height );
+				_context.scale( 1 / texture.repeat.x, 1 / texture.repeat.y );
+				_context.fill();
 				_context.restore();
 
 			} else {
@@ -490,7 +523,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_context.save();
 				_context.translate( v1.x, v1.y );
-				_context.rotate( material.rotation );
+				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 				_context.scale( scaleX, - scaleY );
 				_context.fillRect( - 0.5, - 0.5, 1, 1 );
 				_context.restore();
@@ -504,7 +537,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			_context.save();
 			_context.translate( v1.x, v1.y );
-			_context.rotate( - element.rotation );
+			if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 			_context.scale( scaleX, scaleY );
 
 			material.program( _context );
@@ -793,32 +826,69 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	}
 
+	function onTextureUpdate ( event ) {
+
+		textureToPattern( event.target );
+
+	}
+
+	function textureToPattern( texture ) {
+
+		var repeatX = texture.wrapS === THREE.RepeatWrapping;
+		var repeatY = texture.wrapT === THREE.RepeatWrapping;
+
+		var image = texture.image;
+
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = image.width;
+		canvas.height = image.height;
+
+		var context = canvas.getContext( '2d' );
+		context.setTransform( 1, 0, 0, - 1, 0, image.height );
+		context.drawImage( image, 0, 0 );
+
+		_patterns[ texture.id ] = _context.createPattern(
+			canvas, repeatX === true && repeatY === true
+				? 'repeat'
+				: repeatX === true && repeatY === false
+					? 'repeat-x'
+					: repeatX === false && repeatY === true
+						? 'repeat-y'
+						: 'no-repeat'
+		);
+
+	}
+
 	function patternPath( x0, y0, x1, y1, x2, y2, u0, v0, u1, v1, u2, v2, texture ) {
 
-		if ( texture instanceof THREE.DataTexture || texture.image === undefined || texture.image.width === 0 ) return;
+		if ( texture instanceof THREE.DataTexture ) return;
 
-		if ( texture.needsUpdate === true ) {
+		if ( texture.hasEventListener( 'update', onTextureUpdate ) === false ) {
 
-			var repeatX = texture.wrapS === THREE.RepeatWrapping;
-			var repeatY = texture.wrapT === THREE.RepeatWrapping;
+			if ( texture.image !== undefined && texture.image.width > 0 ) {
 
-			_patterns[ texture.id ] = _context.createPattern(
-				texture.image, repeatX === true && repeatY === true
-					? 'repeat'
-					: repeatX === true && repeatY === false
-						? 'repeat-x'
-						: repeatX === false && repeatY === true
-							? 'repeat-y'
-							: 'no-repeat'
-			);
+				textureToPattern( texture );
 
-			texture.needsUpdate = false;
+			}
+
+			texture.addEventListener( 'update', onTextureUpdate );
 
 		}
 
-		_patterns[ texture.id ] === undefined
-			? setFillStyle( 'rgba(0,0,0,1)' )
-			: setFillStyle( _patterns[ texture.id ] );
+		var pattern = _patterns[ texture.id ];
+
+		if ( pattern !== undefined ) {
+
+			setFillStyle( pattern );
+
+		} else {
+
+			setFillStyle( 'rgba(0,0,0,1)' );
+			_context.fill();
+
+			return;
+
+		}	
 
 		// http://extremelysatisfactorytotalitarianism.com/blog/?p=2120
 
@@ -829,13 +899,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 		height = texture.image.height * texture.repeat.y;
 
 		u0 = ( u0 + offsetX ) * width;
-		v0 = ( 1.0 - v0 + offsetY ) * height;
+		v0 = ( v0 + offsetY ) * height;
 
 		u1 = ( u1 + offsetX ) * width;
-		v1 = ( 1.0 - v1 + offsetY ) * height;
+		v1 = ( v1 + offsetY ) * height;
 
 		u2 = ( u2 + offsetX ) * width;
-		v2 = ( 1.0 - v2 + offsetY ) * height;
+		v2 = ( v2 + offsetY ) * height;
 
 		x1 -= x0; y1 -= y0;
 		x2 -= x0; y2 -= y0;
@@ -845,30 +915,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		det = u1 * v2 - u2 * v1;
 
-		if ( det === 0 ) {
-
-			if ( _imagedatas[ texture.id ] === undefined ) {
-
-				var canvas = document.createElement( 'canvas' )
-				canvas.width = texture.image.width;
-				canvas.height = texture.image.height;
-
-				var context = canvas.getContext( '2d' );
-				context.drawImage( texture.image, 0, 0 );
-
-				_imagedatas[ texture.id ] = context.getImageData( 0, 0, texture.image.width, texture.image.height ).data;
-
-			}
-
-			var data = _imagedatas[ texture.id ];
-			var index = ( Math.floor( u0 ) + Math.floor( v0 ) * texture.image.width ) * 4;
-
-			_color.setRGB( data[ index ] / 255, data[ index + 1 ] / 255, data[ index + 2 ] / 255 );
-			fillPath( _color );
-
-			return;
-
-		}
+		if ( det === 0 ) return;
 
 		idet = 1 / det;
 

@@ -50,7 +50,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.gammaInput = false;
 	this.gammaOutput = false;
-	this.physicallyBasedShading = false;
 
 	// shadow map
 
@@ -2709,16 +2708,16 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				var position = geometryAttributes[ "position" ];
-
-				// render particles
-
-				_gl.drawArrays( _gl.POINTS, 0, position.numItems / 3 );
-
-				_this.info.render.calls ++;
-				_this.info.render.points += position.numItems / 3;
-
 			}
+
+			var position = geometryAttributes[ "position" ];
+
+			// render particles
+
+			_gl.drawArrays( _gl.POINTS, 0, position.numItems / 3 );
+
+			_this.info.render.calls ++;
+			_this.info.render.points += position.numItems / 3;
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -2756,22 +2755,22 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-				// render lines
-
-				var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
-
-				setLineWidth( material.linewidth );
-
-				var position = geometryAttributes[ "position" ];
-
-				_gl.drawArrays( primitives, 0, position.numItems / 3 );
-
-				_this.info.render.calls ++;
-				_this.info.render.points += position.numItems;
-
 			}
 
-    	}
+			// render lines
+
+			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+
+			setLineWidth( material.linewidth );
+
+			var position = geometryAttributes[ "position" ];
+
+			_gl.drawArrays( primitives, 0, position.numItems / 3 );
+
+			_this.info.render.calls ++;
+			_this.info.render.points += position.numItems;
+
+		}
 
 	};
 
@@ -5507,7 +5506,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_this.gammaInput ? "#define GAMMA_INPUT" : "",
 			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-			_this.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
 
 			"#define MAX_DIR_LIGHTS " + parameters.maxDirLights,
 			"#define MAX_POINT_LIGHTS " + parameters.maxPointLights,
@@ -5617,7 +5615,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_this.gammaInput ? "#define GAMMA_INPUT" : "",
 			_this.gammaOutput ? "#define GAMMA_OUTPUT" : "",
-			_this.physicallyBasedShading ? "#define PHYSICALLY_BASED_SHADING" : "",
 
 			( parameters.useFog && parameters.fog ) ? "#define USE_FOG" : "",
 			( parameters.useFog && parameters.fogExp ) ? "#define FOG_EXP2" : "",

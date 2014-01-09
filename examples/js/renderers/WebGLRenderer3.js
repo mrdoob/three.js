@@ -4,7 +4,7 @@
  * parameters = {
  *   canvas: canvas,
  *   contextAttributes: {
- *     alpha: true,
+ *     alpha: false,
  *     depth: true,
  *     stencil: false,
  *     antialias: true,
@@ -36,6 +36,8 @@ THREE.WebGLRenderer3 = function ( parameters ) {
 	try {
 
 		var attributes = parameters.contextAttributes || {};
+		
+		if ( attributes.alpha === undefined ) attributes.alpha = false;
 
 		gl = canvas.getContext( 'webgl', attributes ) || canvas.getContext( 'experimental-webgl', attributes );
 

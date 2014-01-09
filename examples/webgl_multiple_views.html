@@ -53,8 +53,10 @@
 
 			var windowWidth, windowHeight;
 
+			var dpr = window.devicePixelRatio || 1;
+
 			var views = [
-				{ 
+				{
 					left: 0,
 					bottom: 0,
 					width: 0.5,
@@ -230,7 +232,7 @@
 				group3.rotation.x = 0;
 				scene.add( group3 );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				container.appendChild( renderer.domElement );
@@ -283,10 +285,11 @@
 
 					view.updateCamera( camera, scene, mouseX, mouseY );
 
-					var left   = Math.floor( windowWidth  * view.left );
-					var bottom = Math.floor( windowHeight * view.bottom );
-					var width  = Math.floor( windowWidth  * view.width );
-					var height = Math.floor( windowHeight * view.height );
+					// multiply by the device pixel ratio in order to properly support high DPI displays
+					var left   = Math.floor( windowWidth  * view.left ) * dpr;
+					var bottom = Math.floor( windowHeight * view.bottom ) * dpr;
+					var width  = Math.floor( windowWidth  * view.width ) * dpr;
+					var height = Math.floor( windowHeight * view.height ) * dpr;
 					renderer.setViewport( left, bottom, width, height );
 					renderer.setScissor( left, bottom, width, height );
 					renderer.enableScissorTest ( true );

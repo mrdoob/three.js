@@ -923,20 +923,12 @@ THREE.ShaderChunk = {
 				"float pointDotNormalHalf = max( dot( normal, pointHalfVector ), 0.0 );",
 				"float pointSpecularWeight = specularStrength * max( pow( pointDotNormalHalf, shininess ), 0.0 );",
 
-				"#ifdef PHYSICALLY_BASED_SHADING",
+				// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-					// 2.0 => 2.0001 is hack to work around ANGLE bug
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, pointHalfVector ), 5.0 );",
-					"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
-
-				"#else",
-
-					"pointSpecular += specular * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance;",
-
-				"#endif",
+				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, pointHalfVector ), 5.0 );",
+				"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
 
 			"}",
 
@@ -998,20 +990,12 @@ THREE.ShaderChunk = {
 					"float spotDotNormalHalf = max( dot( normal, spotHalfVector ), 0.0 );",
 					"float spotSpecularWeight = specularStrength * max( pow( spotDotNormalHalf, shininess ), 0.0 );",
 
-					"#ifdef PHYSICALLY_BASED_SHADING",
+					// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-						// 2.0 => 2.0001 is hack to work around ANGLE bug
+					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-						"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-						"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, spotHalfVector ), 5.0 );",
-						"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
-
-					"#else",
-
-						"spotSpecular += specular * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * spotEffect;",
-
-					"#endif",
+					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, spotHalfVector ), 5.0 );",
+					"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
 
 				"}",
 
@@ -1054,41 +1038,34 @@ THREE.ShaderChunk = {
 				"float dirDotNormalHalf = max( dot( normal, dirHalfVector ), 0.0 );",
 				"float dirSpecularWeight = specularStrength * max( pow( dirDotNormalHalf, shininess ), 0.0 );",
 
-				"#ifdef PHYSICALLY_BASED_SHADING",
-
 					/*
-					// fresnel term from skin shader
-					"const float F0 = 0.128;",
+				// fresnel term from skin shader
+				"const float F0 = 0.128;",
 
-					"float base = 1.0 - dot( viewPosition, dirHalfVector );",
-					"float exponential = pow( base, 5.0 );",
+				"float base = 1.0 - dot( viewPosition, dirHalfVector );",
+				"float exponential = pow( base, 5.0 );",
 
-					"float fresnel = exponential + F0 * ( 1.0 - exponential );",
-					*/
+				"float fresnel = exponential + F0 * ( 1.0 - exponential );",
+				*/
 
-					/*
-					// fresnel term from fresnel shader
-					"const float mFresnelBias = 0.08;",
-					"const float mFresnelScale = 0.3;",
-					"const float mFresnelPower = 5.0;",
+				/*
+				// fresnel term from fresnel shader
+				"const float mFresnelBias = 0.08;",
+				"const float mFresnelScale = 0.3;",
+				"const float mFresnelPower = 5.0;",
 
-					"float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
-					*/
+				"float fresnel = mFresnelBias + mFresnelScale * pow( 1.0 + dot( normalize( -viewPosition ), normal ), mFresnelPower );",
+				*/
 
-					// 2.0 => 2.0001 is hack to work around ANGLE bug
+				// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-					//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
+				//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
 
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
-					"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
+				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+				"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
-				"#else",
-
-					"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight;",
-
-				"#endif",
 
 			"}",
 
@@ -1127,23 +1104,15 @@ THREE.ShaderChunk = {
 				"float hemiDotNormalHalfGround = 0.5 * dot( normal, hemiHalfVectorGround ) + 0.5;",
 				"float hemiSpecularWeightGround = specularStrength * max( pow( hemiDotNormalHalfGround, shininess ), 0.0 );",
 
-				"#ifdef PHYSICALLY_BASED_SHADING",
+				"float dotProductGround = dot( normal, lVectorGround );",
 
-					"float dotProductGround = dot( normal, lVectorGround );",
+				// 2.0 => 2.0001 is hack to work around ANGLE bug
 
-					// 2.0 => 2.0001 is hack to work around ANGLE bug
+				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
-
-					"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
-					"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
-					"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
-
-				"#else",
-
-					"hemiSpecular += specular * hemiColor * ( hemiSpecularWeightSky + hemiSpecularWeightGround ) * hemiDiffuseWeight;",
-
-				"#endif",
+				"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
+				"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+				"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 			"}",
 

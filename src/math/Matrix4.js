@@ -839,6 +839,12 @@ THREE.Matrix4.prototype = {
 			var sy = vector.set( te[4], te[5], te[6] ).length();
 			var sz = vector.set( te[8], te[9], te[10] ).length();
 
+			// if determine is negative, we need to invert one scale
+			var det = this.determinant();
+			if( det < 0 ) {
+				sx = -sx;
+			}
+
 			position.x = te[12];
 			position.y = te[13];
 			position.z = te[14];

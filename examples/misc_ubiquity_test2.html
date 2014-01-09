@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js misc - geometry - polyfield</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #ffffff;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+
+		<script src="../build/three.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+		<script>
+
+			var stats;
+
+			var camera, scene;
+			var canvasRenderer, webglRenderer;
+
+			var texture, mesh;
+			var texture2;
+
+			init();
+			animate();
+
+			function init() {
+
+				var width = window.innerWidth / 2;
+				var height = window.innerHeight;
+
+				camera = new THREE.PerspectiveCamera( 70, width / height, 1, 2000 );
+				camera.position.z = 400;
+
+				scene = new THREE.Scene();
+
+				var geometry = new THREE.CubeGeometry( 200, 200, 200, 4, 4, 4 );
+
+				texture = THREE.ImageUtils.loadTexture( 'textures/UV_Grid_Sm.jpg' );
+				texture.wrapS = THREE.RepeatWrapping;
+				texture.wrapT = THREE.RepeatWrapping;
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				// SPRITES
+
+				texture2 = THREE.ImageUtils.loadTexture( 'textures/sprite.png' );
+				texture2.wrapS = THREE.RepeatWrapping;
+				texture2.wrapT = THREE.RepeatWrapping;
+				var material = new THREE.SpriteMaterial( { map: texture2 } );
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					var sprite = new THREE.Sprite( material );
+					sprite.position.x = Math.random() * 1000 - 500;
+					sprite.position.y = Math.random() * 1000 - 500;
+					sprite.position.z = Math.random() * 1000 - 500;
+					sprite.scale.set( 64, 64, 1 );
+					scene.add( sprite );
+
+				}
+
+				for ( var i = 0; i < 50; i ++ ) {
+
+					var material = new THREE.SpriteMaterial( { color: Math.random() * 0xffffff } );
+					var sprite = new THREE.Sprite( material );
+					sprite.position.x = Math.random() * 1000 - 500;
+					sprite.position.y = Math.random() * 1000 - 500;
+					sprite.position.z = Math.random() * 1000 - 500;
+					sprite.scale.set( 64, 64, 1 );
+					scene.add( sprite );
+
+				}
+
+
+				canvasRenderer = new THREE.CanvasRenderer();
+				canvasRenderer.setClearColor( 0xf0f0f0 );
+				canvasRenderer.setSize( width, height );
+				document.body.appendChild( canvasRenderer.domElement );
+
+				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
+				webglRenderer.setClearColor( 0xf0f0f0 );
+				webglRenderer.setSize( width, height );
+				document.body.appendChild( webglRenderer.domElement );
+
+				stats = new Stats();
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				document.body.appendChild( stats.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth / 2;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				canvasRenderer.setSize( width, height );
+				webglRenderer.setSize( width, height );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				render();
+				stats.update();
+
+			}
+
+			function render() {
+
+				var time = performance.now() * 0.0001;
+
+				camera.position.x = Math.sin( time ) * 500;
+				camera.position.z = Math.cos( time ) * 500;
+				camera.lookAt( scene.position );
+
+				texture.repeat.x = Math.sin( time ) * 0.5 + 0.5;
+				texture.repeat.y = Math.cos( time ) * 0.5 + 0.5;
+
+				texture.offset.x = Math.sin( time );
+				texture.offset.y = Math.cos( time );
+
+				mesh.rotation.x = time * 2;
+				mesh.rotation.y = time * 4;
+
+				//
+
+				texture2.repeat.x = Math.sin( time ) * 0.5 + 0.5;
+				texture2.repeat.y = Math.cos( time ) * 0.5 + 0.5;
+
+				texture2.offset.x = Math.sin( time );
+				texture2.offset.y = Math.cos( time );
+
+				//
+
+				scene.updateMatrixWorld();
+
+				canvasRenderer.render( scene, camera );
+				webglRenderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
