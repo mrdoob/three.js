@@ -488,36 +488,70 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-				var pattern = _patterns[ texture.id ];
+				//
 
-				if ( pattern !== undefined ) {
+				if ( texture.repeat.x <= 1 && texture.repeat.y <= 1 ) { // rotation supported
 
-					setFillStyle( pattern );
+					var bitmap = texture.image;
 
-				} else {
+					var ox = bitmap.width * texture.offset.x;
+					var oy = bitmap.height * ( 1 - texture.offset.y - texture.repeat.y );
 
-					setFillStyle( 'rgba(0,0,0,1)' );
+					var sx = bitmap.width * texture.repeat.x;
+					var sy = bitmap.height * texture.repeat.y;
+
+					_context.save();
+
+					_context.translate( v1.x, v1.y );
+
+					if ( material.rotation ) _context.rotate( material.rotation );
+
+					_context.scale( scaleX, - scaleY );
+
+					_context.drawImage( bitmap, ox, oy, sx, sy, - 0.5, - 0.5, 1, 1 );
+
+					_context.restore();
+
+				} else { // repeat.x or repeat.y > 1 // rotation not supported
+
+					var bitmap = texture.image;
+
+					var ox = bitmap.width * texture.offset.x;
+					var oy = bitmap.height * texture.offset.y;
+
+					var sx = bitmap.width * texture.repeat.x;
+					var sy = bitmap.height * texture.repeat.y;
+
+					var cx = sx / scaleX;
+					var cy = sy / scaleY;
+
+					var pattern = _patterns[ texture.id ];
+
+					if ( pattern !== undefined ) {
+
+						setFillStyle( pattern );
+
+					} else {
+
+						setFillStyle( 'rgba( 0, 0, 0, 1 )' );
+
+					}
+
+					_context.save();
+
+					_context.scale( 1 / cx, 1 / cy );
+
+					_context.translate( v1.x * cx - 0.5 * sx - ox, v1.y * cy - 0.5 * sy - oy );
+
+					//if ( material.rotation ) _context.rotate( material.rotation ); // rotation not supported when using patterns (origin is offset)
+
+					_context.fillRect( ox, oy, sx, sy );
+
+					_context.restore();
 
 				}
 
-				_context.save();
-				_context.translate( v1.x, v1.y );
-				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
-				_context.scale( scaleX, - scaleY );
-				_context.beginPath();
-				_context.moveTo( - 0.5, - 0.5 );
-				_context.lineTo(   0.5, - 0.5 );
-				_context.lineTo(   0.5,   0.5 );
-				_context.lineTo( - 0.5,   0.5 );
-				_context.closePath();
-				_context.translate( - 0.5, 0.5 );
-				_context.translate( - texture.offset.x, texture.offset.y );
-				_context.scale( 1 / texture.image.width, - 1 / texture.image.height );
-				_context.scale( 1 / texture.repeat.x, 1 / texture.repeat.y );
-				_context.fill();
-				_context.restore();
-
-			} else {
+			} else { // no texture
 
 				setFillStyle( material.color.getStyle() );
 
