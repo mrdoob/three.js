@@ -22,6 +22,8 @@ THREE.Projector = function () {
 	_points3 = new Array( 3 ),
 	_points4 = new Array( 4 ),
 
+	_projectionMatrixInverse = new THREE.Matrix4(),
+
 	_viewMatrix = new THREE.Matrix4(),
 	_viewProjectionMatrix = new THREE.Matrix4(),
 
@@ -50,9 +52,8 @@ THREE.Projector = function () {
 
 	this.unprojectVector = function ( vector, camera ) {
 
-		camera.projectionMatrixInverse.getInverse( camera.projectionMatrix );
-
-		_viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, camera.projectionMatrixInverse );
+		_projectionMatrixInverse.getInverse( camera.projectionMatrix );
+		_viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, _projectionMatrixInverse );
 
 		return vector.applyProjection( _viewProjectionMatrix );
 
