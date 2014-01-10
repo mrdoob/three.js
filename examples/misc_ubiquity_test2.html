@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js misc - geometry - polyfield</title>
+		<title>three.js misc - ubiquity - test2</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -104,7 +104,7 @@
 					var material = new THREE.SpriteMaterial( { map: texture2, opacity: 0.7 } );
 					var sprite = new THREE.Sprite( material );
 
-					//sprite.material.rotation = Math.random(); // rotation is not supported by CanvasRenderer when repeating textures
+					sprite.material.rotation = 0.5 * Math.PI * ( Math.random() - 0.5 );
 
 					sprite.position.x = Math.random() * 1000 - 500;
 					sprite.position.y = Math.random() * 1000 - 500;
@@ -210,8 +210,8 @@
 
 				//
 
-				texture2.repeat.x = Math.sin( time ) + 2.0;
-				texture2.repeat.y = Math.sin( time ) + 2.0;
+				texture2.repeat.x = Math.sin( time ) + 1.25;
+				texture2.repeat.y = Math.sin( time ) + 1.25;
 
 				texture2.offset.x = Math.sin( time );
 				texture2.offset.y = Math.cos( time );
