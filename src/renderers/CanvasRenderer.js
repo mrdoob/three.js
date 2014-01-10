@@ -490,9 +490,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				//
 
-				if ( texture.repeat.x <= 1 && texture.repeat.y <= 1 ) { // rotation supported
+				var bitmap = texture.image;
 
-					var bitmap = texture.image;
+				if ( texture.repeat.x <= 1 && texture.repeat.y <= 1 ) { // rotation supported
 
 					var ox = bitmap.width * texture.offset.x;
 					var oy = bitmap.height * ( 1 - texture.offset.y - texture.repeat.y );
@@ -504,7 +504,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_context.translate( v1.x, v1.y );
 
-					if ( material.rotation ) _context.rotate( material.rotation );
+					if ( material.rotation !== 0 ) _context.rotate( material.rotation );
 
 					_context.scale( scaleX, - scaleY );
 
@@ -513,8 +513,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 					_context.restore();
 
 				} else { // repeat.x or repeat.y > 1 // rotation not supported
-
-					var bitmap = texture.image;
 
 					var ox = bitmap.width * texture.offset.x;
 					var oy = bitmap.height * texture.offset.y;
@@ -543,7 +541,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 					_context.translate( v1.x * cx - 0.5 * sx - ox, v1.y * cy - 0.5 * sy - oy );
 
-					//if ( material.rotation ) _context.rotate( material.rotation ); // rotation not supported when using patterns (origin is offset)
+					// if ( material.rotation !== 0 ) _context.rotate( material.rotation ); // rotation not supported when using patterns (origin is offset)
 
 					_context.fillRect( ox, oy, sx, sy );
 
