@@ -488,66 +488,39 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
+				var pattern = _patterns[ texture.id ];
+
+				if ( pattern !== undefined ) {
+
+					setFillStyle( pattern );
+
+				} else {
+
+					setFillStyle( 'rgba( 0, 0, 0, 1 )' );
+
+				}
+
 				//
 
 				var bitmap = texture.image;
 
-				if ( texture.repeat.x <= 1 && texture.repeat.y <= 1 ) { // rotation supported
+				var ox = bitmap.width * texture.offset.x;
+				var oy = bitmap.height * texture.offset.y;
 
-					var ox = bitmap.width * texture.offset.x;
-					var oy = bitmap.height * ( 1 - texture.offset.y - texture.repeat.y );
+				var sx = bitmap.width * texture.repeat.x;
+				var sy = bitmap.height * texture.repeat.y;
 
-					var sx = bitmap.width * texture.repeat.x;
-					var sy = bitmap.height * texture.repeat.y;
+				var cx = scaleX / sx;
+				var cy = scaleY / sy;
 
-					_context.save();
-
-					_context.translate( v1.x, v1.y );
-
-					if ( material.rotation !== 0 ) _context.rotate( material.rotation );
-
-					_context.scale( scaleX, - scaleY );
-
-					_context.drawImage( bitmap, ox, oy, sx, sy, - 0.5, - 0.5, 1, 1 );
-
-					_context.restore();
-
-				} else { // repeat.x or repeat.y > 1 // rotation not supported
-
-					var ox = bitmap.width * texture.offset.x;
-					var oy = bitmap.height * texture.offset.y;
-
-					var sx = bitmap.width * texture.repeat.x;
-					var sy = bitmap.height * texture.repeat.y;
-
-					var cx = sx / scaleX;
-					var cy = sy / scaleY;
-
-					var pattern = _patterns[ texture.id ];
-
-					if ( pattern !== undefined ) {
-
-						setFillStyle( pattern );
-
-					} else {
-
-						setFillStyle( 'rgba( 0, 0, 0, 1 )' );
-
-					}
-
-					_context.save();
-
-					_context.scale( 1 / cx, 1 / cy );
-
-					_context.translate( v1.x * cx - 0.5 * sx - ox, v1.y * cy - 0.5 * sy - oy );
-
-					// if ( material.rotation !== 0 ) _context.rotate( material.rotation ); // rotation not supported when using patterns (origin is offset)
-
-					_context.fillRect( ox, oy, sx, sy );
-
-					_context.restore();
-
-				}
+				_context.save();
+				_context.translate( v1.x, v1.y );
+				if ( material.rotation !== 0 ) _context.rotate( material.rotation );
+				_context.translate( - scaleX / 2, - scaleY / 2 );
+				_context.scale( cx, cy );
+				_context.translate( - ox, - oy );
+				_context.fillRect( ox, oy, sx, sy );
+				_context.restore();
 
 			} else { // no texture
 
