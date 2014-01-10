@@ -9253,6 +9253,8 @@ THREE.BufferGeometry.prototype = {
 
 			if ( positions ) {
 
+				box.makeEmpty();
+
 				var center = this.boundingSphere.center;
 
 				for ( var i = 0, il = positions.length; i < il; i += 3 ) {
