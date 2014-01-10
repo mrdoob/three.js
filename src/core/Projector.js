@@ -22,8 +22,6 @@ THREE.Projector = function () {
 	_points3 = new Array( 3 ),
 	_points4 = new Array( 4 ),
 
-	_projectionMatrixInverse = new THREE.Matrix4(),
-
 	_viewMatrix = new THREE.Matrix4(),
 	_viewProjectionMatrix = new THREE.Matrix4(),
 
@@ -50,14 +48,20 @@ THREE.Projector = function () {
 
 	};
 
-	this.unprojectVector = function ( vector, camera ) {
+	this.unprojectVector = function () {
 
-		_projectionMatrixInverse.getInverse( camera.projectionMatrix );
-		_viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, _projectionMatrixInverse );
+		var projectionMatrixInverse = new THREE.Matrix4();
 
-		return vector.applyProjection( _viewProjectionMatrix );
+		return function ( vector, camera ) {
 
-	};
+			projectionMatrixInverse.getInverse( camera.projectionMatrix );
+			_viewProjectionMatrix.multiplyMatrices( camera.matrixWorld, projectionMatrixInverse );
+
+			return vector.applyProjection( _viewProjectionMatrix );
+
+		};
+
+	}();
 
 	this.pickingRay = function ( vector, camera ) {
 
