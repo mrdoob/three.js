@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( value ) {
+THREE.Color = function () {
 
-	if ( value !== undefined ) this.set( value );
+	if ( arguments.length ) this.set( arguments.length === 1 ? arguments[0] : arguments );
 
 	return this;
 
@@ -30,7 +30,11 @@ THREE.Color.prototype = {
 
 			this.setStyle( value );
 
-		}
+		} else if ( value.length ) {
+
+            this.setRGB.apply( this, value );
+
+        }
 
 		return this;
 
