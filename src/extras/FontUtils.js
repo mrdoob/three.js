@@ -429,6 +429,10 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 			px = contour[ verts[ p ] ].x
 			py = contour[ verts[ p ] ].y
 
+			if ( ( (px === ax) && (py === ay) ) ||
+				 ( (px === bx) && (py === by) ) ||
+			 	 ( (px === cx) && (py === cy) ) )	continue;
+
 			apx = px - ax;  apy = py - ay;
 			bpx = px - bx;  bpy = py - by;
 			cpx = px - cx;  cpy = py - cy;
