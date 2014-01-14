@@ -7095,8 +7095,11 @@ THREE.EventDispatcher.prototype = {
 
 						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
 
-							var targets = morphTargets[ t ].vertices;
 							var influence = morphInfluences[ t ];
+
+							if ( influence === 0 ) continue;
+
+							var targets = morphTargets[ t ].vertices;
 
 							vA.x += ( targets[ face.a ].x - a.x ) * influence;
 							vA.y += ( targets[ face.a ].y - a.y ) * influence;
@@ -8104,8 +8107,11 @@ THREE.Projector = function () {
 
 						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
 
-							var targets = morphTargets[ t ].vertices;
 							var influence = morphInfluences[ t ];
+
+							if ( influence === 0 ) continue;
+
+							var targets = morphTargets[ t ].vertices;
 
 							_vA.x += ( targets[ face.a ].x - v1p.x ) * influence;
 							_vA.y += ( targets[ face.a ].y - v1p.y ) * influence;
