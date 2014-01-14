@@ -431,7 +431,7 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 
 			if ( ( (px === ax) && (py === ay) ) ||
 				 ( (px === bx) && (py === by) ) ||
-			 	 ( (px === cx) && (py === cy) ) )	continue;
+				 ( (px === cx) && (py === cy) ) )	continue;
 
 			apx = px - ax;  apy = py - ay;
 			bpx = px - bx;  bpy = py - by;

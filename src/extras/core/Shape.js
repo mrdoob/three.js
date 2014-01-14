@@ -426,21 +426,21 @@ THREE.Shape.Utils = {
 				}
 			}
 		}
-		
+
 		function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
 			var EPSILON = 0.0000000001;
-			
+
 			var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x,   seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
 			var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x,   seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
-			
+
 			var seg1seg2dx = inSeg1Pt1.x - inSeg2Pt1.x;
 			var seg1seg2dy = inSeg1Pt1.y - inSeg2Pt1.y;
-			
+
 			var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
 			var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
-			
+
 			if ( Math.abs(limit) > EPSILON ) {			// not parallel
-			
+
 				var perpSeg2;
 				if ( limit > 0 ) {
 					if ( ( perpSeg1 < 0 ) || ( perpSeg1 > limit ) ) 		return [];
@@ -451,7 +451,7 @@ THREE.Shape.Utils = {
 					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
 					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
 				}
-		
+
 				// intersection at endpoint ?
 				if ( perpSeg2 == 0 ) {
 					if ( ( inExcludeAdjacentSegs ) &&
@@ -463,15 +463,15 @@ THREE.Shape.Utils = {
 						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
 					return  [ inSeg1Pt2 ];
 				}
-					
+
 				// return real intersection point
 				var factorSeg1 = perpSeg2 / limit;
 				return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx,
 							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
-				
+
 			} else {		// parallel or colinear
 				if ( perpSeg1 != 0 )							 			return [];
-				
+
 				// they are collinear or degenerate
 				var seg1Pt = ( (seg1dx == 0) && (seg1dy == 0) );	// segment1 ist just a point?
 				var seg2Pt = ( (seg2dx == 0) && (seg2dy == 0) );	// segment2 ist just a point?
@@ -491,7 +491,7 @@ THREE.Shape.Utils = {
 					if (! point_in_segment_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
 					return  [ inSeg2Pt1 ];
 				}
-				
+
 				// they are collinear segments, which might overlap
 				var seg1min, seg1max, seg1minVal, seg1maxVal;
 				var seg2min, seg2max, seg2minVal, seg2maxVal;
@@ -548,23 +548,23 @@ THREE.Shape.Utils = {
 
 		function isPointInsideAngle( inVertex, inLegFromPt, inLegToPt, inOtherPt ) {
 			// The order of legs is important
-			
+
 			var EPSILON = 0.0000000001;
-			
+
 			// translation of all points, so that Vertex is at (0,0)
 			var legFromPtX	= inLegFromPt.x - inVertex.x,  legFromPtY	= inLegFromPt.y - inVertex.y;
 			var legToPtX	= inLegToPt.x	- inVertex.x,  legToPtY		= inLegToPt.y	- inVertex.y;
 			var otherPtX	= inOtherPt.x	- inVertex.x,  otherPtY		= inOtherPt.y	- inVertex.y;
-			
+
 			// main angle >0: < 180 deg.; 0: 180 deg.; <0: > 180 deg.
 			var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
 			var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
-		
+
 			if ( Math.abs(from2toAngle) > EPSILON ) {			// angle != 180 deg.
-				
+
 				var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
 				// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
-		
+
 				if ( from2toAngle > 0 ) {				// main angle < 180 deg.
 					return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
 				} else {								// main angle > 180 deg.
@@ -576,46 +576,46 @@ THREE.Shape.Utils = {
 			}
 		}
 
-		
+
 		function removeHoles( contour, holes ) {
-	
+
 			var shape = contour.concat(); // work on this shape
 			var hole;
-			
+
 			function isCutLineInsideAngles( inShapeIdx, inHoleIdx ) {
 				// Check if hole point lies within angle around shape point
 				var lastShapeIdx = shape.length - 1;
-		
+
 				var prevShapeIdx = inShapeIdx - 1;
 				if ( prevShapeIdx < 0 )			prevShapeIdx = lastShapeIdx;
-		
+
 				var nextShapeIdx = inShapeIdx + 1;
 				if ( nextShapeIdx > lastShapeIdx )	nextShapeIdx = 0;
-		
+
 				var insideAngle = isPointInsideAngle( shape[inShapeIdx], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[inHoleIdx] );
 				if (! insideAngle ) {
 					// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
 					return	false;
 				}
-				
+
 				// Check if shape point lies within angle around hole point
 				var lastHoleIdx = hole.length - 1;
-		
+
 				var prevHoleIdx = inHoleIdx - 1;
 				if ( prevHoleIdx < 0 )			prevHoleIdx = lastHoleIdx;
-		
+
 				var nextHoleIdx = inHoleIdx + 1;
 				if ( nextHoleIdx > lastHoleIdx )	nextHoleIdx = 0;
-		
+
 				insideAngle = isPointInsideAngle( hole[inHoleIdx], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[inShapeIdx] );
 				if (! insideAngle ) {
 					// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
 					return	false;
 				}
-	
+
 				return	true;
 			}
-	
+
 			function intersectsShapeEdge( inShapePt, inHolePt ) {
 				// checks for intersections with shape edges
 				var sIdx, nextIdx, intersection;
@@ -624,12 +624,12 @@ THREE.Shape.Utils = {
 					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[sIdx], shape[nextIdx], true );
 					if ( intersection.length > 0 )		return	true;
 				}
-	
+
 				return	false;
 			}
-	
+
 			var indepHoles = [];
-	
+
 			function intersectsHoleEdge( inShapePt, inHolePt ) {
 				// checks for intersections with hole edges
 				var ihIdx, chkHole,
@@ -644,15 +644,15 @@ THREE.Shape.Utils = {
 				}
 				return	false;
 			}
-	
+
 			var holeIndex, shapeIndex,
 				shapePt, h, h2, holePt,
 				holeIdx, cutKey, failedCuts = [],
 				tmpShape1, tmpShape2,
 				tmpHole1, tmpHole2;
-	
+
 			for (h in holes) { indepHoles.push( h ); }
-			
+
 			var counter = indepHoles.length * 2;
 			while ( indepHoles.length > 0 ) {
 				counter --;
@@ -660,56 +660,56 @@ THREE.Shape.Utils = {
 					console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
 					break;
 				}
-				
+
 				// search for shape-vertex and hole-vertex,
 				// which can be connected without intersections
 				for ( shapeIndex = 0; shapeIndex < shape.length; shapeIndex++ ) {
-		
+
 					shapePt = shape[ shapeIndex ];
 					holeIndex	= -1;
-	
+
 					// search for hole which can be reached without intersections
 					for ( h = 0; h < indepHoles.length; h++ ) {
 						holeIdx = indepHoles[h];
-						
+
 						// prevent multiple checks
 						cutKey = shapePt.x + ":" + shapePt.y + ":" + holeIdx;
 						if ( failedCuts[cutKey] !== undefined )			continue;
-						
+
 						hole = holes[holeIdx];
 						for ( h2 = 0; h2 < hole.length; h2 ++ ) {
 							holePt = hole[ h2 ];
 							if (! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
 							if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
 							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
-	
+
 							holeIndex = h2;
 							indepHoles.splice(h,1);
-				
+
 							tmpShape1 = shape.slice( 0, shapeIndex+1 );
 							tmpShape2 = shape.slice( shapeIndex );
 							tmpHole1 = hole.slice( holeIndex );
 							tmpHole2 = hole.slice( 0, holeIndex+1 );
-				
+
 							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
-				
+
 							// Debug only, to show the selected cuts
 							// glob_CutLines.push( [ shapePt, holePt ] );
-							
+
 							break;
 						}
 						if ( holeIndex >= 0 )	break;		// hole-vertex found
-						
+
 						failedCuts[cutKey] = true;			// remember failure
 					}
 					if ( holeIndex >= 0 )	break;		// hole-vertex found
 				}
 			}
-	
+
 			return shape; 			/* shape with no holes */
 		}
 
-		
+
 		var i, il, f, face,
 			key, index,
 			allPointsMap = {};
