@@ -247,8 +247,6 @@
 				var precision = raycaster.precision;
 
 				var vertices = geometry.vertices;
-				var morphTargets = geometry.morphTargets;
-				var morphInfluences = object.morphTargetInfluences;
 
 				for ( var f = 0, fl = geometry.faces.length; f < fl; f ++ ) {
 
@@ -262,41 +260,37 @@
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
 
-					if ( material.morphTargets === true) {
-						vA.set(0, 0, 0);
-						vB.set(0, 0, 0);
-						vC.set(0, 0, 0);
+					if ( material.morphTargets === true ) {
 
-						for(var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+						var morphTargets = geometry.morphTargets;
+						var morphInfluences = object.morphTargetInfluences;
 
-							var targets = morphTargets[t].vertices;
-							var influence = morphInfluences[t];
+						vA.set( 0, 0, 0 );
+						vB.set( 0, 0, 0 );
+						vC.set( 0, 0, 0 );
 
-							vA.x += (targets[ face.a ].x - a.x) * influence;
-							vA.y += (targets[ face.a ].y - a.y) * influence;
-							vA.z += (targets[ face.a ].z - a.z) * influence;
+						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
 
-							vB.x += (targets[ face.b ].x - b.x) * influence;
-							vB.y += (targets[ face.b ].y - b.y) * influence;
-							vB.z += (targets[ face.b ].z - b.z) * influence;
+							var targets = morphTargets[ t ].vertices;
+							var influence = morphInfluences[ t ];
 
-							vC.x += (targets[ face.c ].x - c.x) * influence;
-							vC.y += (targets[ face.c ].y - c.y) * influence;
-							vC.z += (targets[ face.c ].z - c.z) * influence;
+							vA.x += ( targets[ face.a ].x - a.x ) * influence;
+							vA.y += ( targets[ face.a ].y - a.y ) * influence;
+							vA.z += ( targets[ face.a ].z - a.z ) * influence;
+
+							vB.x += ( targets[ face.b ].x - b.x ) * influence;
+							vB.y += ( targets[ face.b ].y - b.y ) * influence;
+							vB.z += ( targets[ face.b ].z - b.z ) * influence;
+
+							vC.x += ( targets[ face.c ].x - c.x ) * influence;
+							vC.y += ( targets[ face.c ].y - c.y ) * influence;
+							vC.z += ( targets[ face.c ].z - c.z ) * influence;
 
 						}
 
-						vA.x += a.x;
-						vA.y += a.y;
-						vA.z += a.z;
-
-						vB.x += b.x;
-						vB.y += b.y;
-						vB.z += b.z;
-
-						vC.x += c.x;
-						vC.y += c.y;
-						vC.z += c.z;
+						vA.add( a );
+						vB.add( b );
+						vC.add( c );
 
 						a = vA;
 						b = vB;
@@ -306,7 +300,7 @@
 
 					if ( material.side === THREE.BackSide ) {
 							
-						var intersectionPoint = localRay.intersectTriangle( c, b, a, true ); 
+						var intersectionPoint = localRay.intersectTriangle( c, b, a, true );
 
 					} else {
 								
