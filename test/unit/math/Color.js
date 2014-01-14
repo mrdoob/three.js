@@ -4,7 +4,7 @@ test( "constructor", function(){
     var c = new THREE.Color();
     ok( c.r, "Red: " + c.r );
     ok( c.g, "Green: " + c.g );
-    ok( c.b, "Blue: " + c.g );
+    ok( c.b, "Blue: " + c.b );
 });
 
 test( "copyHex", function(){
