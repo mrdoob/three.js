@@ -152,8 +152,7 @@ THREE.Projector = function () {
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
 		var visible = false,
-		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
-		geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
+		object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
 		v1, v2, v3, v4, isFaceMaterial, objectMaterials;
 
 		_face3Count = 0;
@@ -174,7 +173,7 @@ THREE.Projector = function () {
 
 		projectGraph( scene, sortObjects );
 
-		for ( o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
+		for ( var o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
 			object = _renderData.objects[ o ].object;
 
@@ -195,7 +194,7 @@ THREE.Projector = function () {
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				objectMaterials = isFaceMaterial === true ? object.material : null;
 
-				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
+				for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					_vertex = getNextVertexInPool();
 
@@ -214,7 +213,7 @@ THREE.Projector = function () {
 
 				}
 
-				for ( f = 0, fl = faces.length; f < fl; f ++ ) {
+				for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
 					face = faces[ f ];
 
@@ -279,7 +278,7 @@ THREE.Projector = function () {
 
 					faceVertexNormals = face.vertexNormals;
 
-					for ( n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
+					for ( var n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
 
 						var normalModel = _face.vertexNormalsModel[ n ];
 						normalModel.copy( faceVertexNormals[ n ] );
@@ -299,13 +298,13 @@ THREE.Projector = function () {
 
 					_face.vertexNormalsLength = faceVertexNormals.length;
 
-					for ( c = 0, cl = Math.min( faceVertexUvs.length, 3 ); c < cl; c ++ ) {
+					for ( var c = 0, cl = Math.min( faceVertexUvs.length, 3 ); c < cl; c ++ ) {
 
 						uvs = faceVertexUvs[ c ][ f ];
 
 						if ( uvs === undefined ) continue;
 
-						for ( u = 0, ul = uvs.length; u < ul; u ++ ) {
+						for ( var u = 0, ul = uvs.length; u < ul; u ++ ) {
 
 							_face.uvs[ c ][ u ] = uvs[ u ];
 
