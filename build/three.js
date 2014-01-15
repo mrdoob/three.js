@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '65dev' };
+var THREE = { REVISION: '65' };
 
 self.console = self.console || {
 
@@ -7083,10 +7083,51 @@ THREE.EventDispatcher.prototype = {
 					a = vertices[ face.a ];
 					b = vertices[ face.b ];
 					c = vertices[ face.c ];
-					
+
+					if ( material.morphTargets === true ) {
+
+						var morphTargets = geometry.morphTargets;
+						var morphInfluences = object.morphTargetInfluences;
+
+						vA.set( 0, 0, 0 );
+						vB.set( 0, 0, 0 );
+						vC.set( 0, 0, 0 );
+
+						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+							var influence = morphInfluences[ t ];
+
+							if ( influence === 0 ) continue;
+
+							var targets = morphTargets[ t ].vertices;
+
+							vA.x += ( targets[ face.a ].x - a.x ) * influence;
+							vA.y += ( targets[ face.a ].y - a.y ) * influence;
+							vA.z += ( targets[ face.a ].z - a.z ) * influence;
+
+							vB.x += ( targets[ face.b ].x - b.x ) * influence;
+							vB.y += ( targets[ face.b ].y - b.y ) * influence;
+							vB.z += ( targets[ face.b ].z - b.z ) * influence;
+
+							vC.x += ( targets[ face.c ].x - c.x ) * influence;
+							vC.y += ( targets[ face.c ].y - c.y ) * influence;
+							vC.z += ( targets[ face.c ].z - c.z ) * influence;
+
+						}
+
+						vA.add( a );
+						vB.add( b );
+						vC.add( c );
+
+						a = vA;
+						b = vB;
+						c = vC;
+
+					}
+
 					if ( material.side === THREE.BackSide ) {
 							
-						var intersectionPoint = localRay.intersectTriangle( c, b, a, true ); 
+						var intersectionPoint = localRay.intersectTriangle( c, b, a, true );
 
 					} else {
 								
@@ -7821,6 +7862,10 @@ THREE.Projector = function () {
 
 	_renderData = { objects: [], sprites: [], lights: [], elements: [] },
 
+	_vA = new THREE.Vector3(),
+	_vB = new THREE.Vector3(),
+	_vC = new THREE.Vector3(),
+
 	_vector3 = new THREE.Vector3(),
 	_vector4 = new THREE.Vector4(),
 
@@ -7908,6 +7953,27 @@ THREE.Projector = function () {
 
 	};
 
+	var projectVertex = function ( vertex ) {
+
+		var position = vertex.position;
+		var positionWorld = vertex.positionWorld;
+		var positionScreen = vertex.positionScreen;
+
+		positionWorld.copy( position ).applyMatrix4( _modelMatrix );
+		positionScreen.copy( positionWorld ).applyMatrix4( _viewProjectionMatrix );
+
+		var invW = 1 / positionScreen.w;
+
+		positionScreen.x *= invW;
+		positionScreen.y *= invW;
+		positionScreen.z *= invW;
+
+		vertex.visible = positionScreen.x >= -1 && positionScreen.x <= 1 &&
+				 positionScreen.y >= -1 && positionScreen.y <= 1 &&
+				 positionScreen.z >= -1 && positionScreen.z <= 1;
+
+	};
+
 	var projectObject = function ( object ) {
 
 		if ( object.visible === false ) return;
@@ -7959,8 +8025,7 @@ THREE.Projector = function () {
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
 		var visible = false,
-		o, ol, v, vl, f, fl, n, nl, c, cl, u, ul, object,
-		geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
+		object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
 		v1, v2, v3, v4, isFaceMaterial, objectMaterials;
 
 		_face3Count = 0;
@@ -7981,7 +8046,7 @@ THREE.Projector = function () {
 
 		projectGraph( scene, sortObjects );
 
-		for ( o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
+		for ( var o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
 			object = _renderData.objects[ o ].object;
 
@@ -8002,26 +8067,16 @@ THREE.Projector = function () {
 				isFaceMaterial = object.material instanceof THREE.MeshFaceMaterial;
 				objectMaterials = isFaceMaterial === true ? object.material : null;
 
-				for ( v = 0, vl = vertices.length; v < vl; v ++ ) {
+				for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 					_vertex = getNextVertexInPool();
+					_vertex.position.copy( vertices[ v ] );
 
-					_vertex.positionWorld.copy( vertices[ v ] ).applyMatrix4( _modelMatrix );
-					_vertex.positionScreen.copy( _vertex.positionWorld ).applyMatrix4( _viewProjectionMatrix );
-
-					var invW = 1 / _vertex.positionScreen.w;
-
-					_vertex.positionScreen.x *= invW;
-					_vertex.positionScreen.y *= invW;
-					_vertex.positionScreen.z *= invW;
-
-					_vertex.visible = ! ( _vertex.positionScreen.x < -1 || _vertex.positionScreen.x > 1 ||
-							      _vertex.positionScreen.y < -1 || _vertex.positionScreen.y > 1 ||
-							      _vertex.positionScreen.z < -1 || _vertex.positionScreen.z > 1 );
+					projectVertex( _vertex );
 
 				}
 
-				for ( f = 0, fl = faces.length; f < fl; f ++ ) {
+				for ( var f = 0, fl = faces.length; f < fl; f ++ ) {
 
 					face = faces[ f ];
 
@@ -8036,6 +8091,51 @@ THREE.Projector = function () {
 					v1 = _vertexPool[ face.a ];
 					v2 = _vertexPool[ face.b ];
 					v3 = _vertexPool[ face.c ];
+
+					if ( material.morphTargets === true ) {
+
+						var morphTargets = geometry.morphTargets;
+						var morphInfluences = object.morphTargetInfluences;
+
+						var v1p = v1.position;
+						var v2p = v2.position;
+						var v3p = v3.position;
+
+						_vA.set( 0, 0, 0 );
+						_vB.set( 0, 0, 0 );
+						_vC.set( 0, 0, 0 );
+
+						for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
+
+							var influence = morphInfluences[ t ];
+
+							if ( influence === 0 ) continue;
+
+							var targets = morphTargets[ t ].vertices;
+
+							_vA.x += ( targets[ face.a ].x - v1p.x ) * influence;
+							_vA.y += ( targets[ face.a ].y - v1p.y ) * influence;
+							_vA.z += ( targets[ face.a ].z - v1p.z ) * influence;
+
+							_vB.x += ( targets[ face.b ].x - v2p.x ) * influence;
+							_vB.y += ( targets[ face.b ].y - v2p.y ) * influence;
+							_vB.z += ( targets[ face.b ].z - v2p.z ) * influence;
+
+							_vC.x += ( targets[ face.c ].x - v3p.x ) * influence;
+							_vC.y += ( targets[ face.c ].y - v3p.y ) * influence;
+							_vC.z += ( targets[ face.c ].z - v3p.z ) * influence;
+
+						}
+
+						v1.position.add( _vA );
+						v2.position.add( _vB );
+						v3.position.add( _vC );
+
+						projectVertex( v1 );
+						projectVertex( v2 );
+						projectVertex( v3 );
+
+					}
 
 					_points3[ 0 ] = v1.positionScreen;
 					_points3[ 1 ] = v2.positionScreen;
@@ -8086,7 +8186,7 @@ THREE.Projector = function () {
 
 					faceVertexNormals = face.vertexNormals;
 
-					for ( n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
+					for ( var n = 0, nl = Math.min( faceVertexNormals.length, 3 ); n < nl; n ++ ) {
 
 						var normalModel = _face.vertexNormalsModel[ n ];
 						normalModel.copy( faceVertexNormals[ n ] );
@@ -8106,13 +8206,13 @@ THREE.Projector = function () {
 
 					_face.vertexNormalsLength = faceVertexNormals.length;
 
-					for ( c = 0, cl = Math.min( faceVertexUvs.length, 3 ); c < cl; c ++ ) {
+					for ( var c = 0, cl = Math.min( faceVertexUvs.length, 3 ); c < cl; c ++ ) {
 
 						uvs = faceVertexUvs[ c ][ f ];
 
 						if ( uvs === undefined ) continue;
 
-						for ( u = 0, ul = uvs.length; u < ul; u ++ ) {
+						for ( var u = 0, ul = uvs.length; u < ul; u ++ ) {
 
 							_face.uvs[ c ][ u ] = uvs[ u ];
 
@@ -15119,9 +15219,19 @@ THREE.LOD.prototype.update = function () {
 
 }();
 
-THREE.LOD.prototype.clone = function () {
+THREE.LOD.prototype.clone = function ( object ) {
 
-	// TODO
+	if ( object === undefined ) object = new THREE.LOD();
+
+	THREE.Object3D.prototype.clone.call( this, object );
+
+	for ( var i = 0, l = this.objects.length; i < l; i ++ ) {
+		var x = this.objects[i].object.clone();
+		x.visible = i === 0;
+		object.addLevel( x, this.objects[i].distance );
+	}
+
+	return object;
 
 };
 
@@ -26299,6 +26409,7 @@ THREE.WebGLRenderTargetCube.prototype = Object.create( THREE.WebGLRenderTarget.p
 
 THREE.RenderableVertex = function () {
 
+	this.position = new THREE.Vector3();
 	this.positionWorld = new THREE.Vector3();
 	this.positionScreen = new THREE.Vector4();
 

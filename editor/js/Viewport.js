@@ -139,7 +139,7 @@ var Viewport = function ( editor ) {
 
 			} else {
 
-				editor.select( camera );
+				editor.select( null );
 
 			}
 

@@ -292,7 +292,17 @@ Editor.prototype = {
 	select: function ( object ) {
 
 		this.selected = object;
-		this.config.setKey( 'selected', object.uuid );
+
+		if ( object !== null ) {
+
+			this.config.setKey( 'selected', object.uuid );
+
+		} else {
+
+			this.config.setKey( 'selected', null );
+
+		}
+
 		this.signals.objectSelected.dispatch( object );
 
 	},

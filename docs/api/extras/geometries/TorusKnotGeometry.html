@@ -14,6 +14,15 @@
 		<div class="desc">Creates a torus knot, the particular shape of which is defined by a pair of coprime integers, p and q.  If p and q are not coprime, the result will be a torus link.</div>
 
 
+		<h2>Example</h2>
+		
+		<code>var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var torusKnot = new THREE.Mesh( geometry, material );
+		scene.add( torusKnot );
+		</code>
+
+
 		<h2>Constructor</h2>
 
 
