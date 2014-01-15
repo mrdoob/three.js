@@ -24,11 +24,14 @@
 			var container, stats;
 			var camera, scene, renderer;
 			var projector, plane;
+
 			var mouse2D, mouse3D, raycaster, theta = 45,
 			isShiftDown = false, isCtrlDown = false,
 			target = new THREE.Vector3( 0, 200, 0 );
 			var normalMatrix = new THREE.Matrix3();
-			var ROLLOVERED;
+
+			var cubeGeometry = new THREE.CubeGeometry( 50, 50, 50 );
+			var cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff80, overdraw: 0.5 } );
 
 			init();
 			animate();
@@ -81,6 +84,8 @@
 				plane.rotation.x = - Math.PI / 2;
 				plane.visible = false;
 				scene.add( plane );
+
+				var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true } );
 
 				mouse2D = new THREE.Vector3( 0, 10000, 0.5 );
 
@@ -144,10 +149,7 @@
 
 				if ( intersects.length > 0 ) {
 
-					if ( ROLLOVERED ) ROLLOVERED.color.setHex( 0x00ff80 );
-
-					ROLLOVERED = intersects[ 0 ].face;
-					ROLLOVERED.color.setHex( 0xff8000 )
+					// TODO
 
 				}
 
@@ -180,17 +182,7 @@
 
 						var position = new THREE.Vector3().addVectors( intersect.point, normal );
 
-						var geometry = new THREE.CubeGeometry( 50, 50, 50 );
-
-						for ( var i = 0; i < geometry.faces.length; i ++ ) {
-
-							geometry.faces[ i ].color.setHex( 0x00ff80 );
-
-						}
-
-						var material = new THREE.MeshLambertMaterial( { vertexColors: THREE.FaceColors } );
-
-						var voxel = new THREE.Mesh( geometry, material );
+						var voxel = new THREE.Mesh( cubeGeometry, cubeMaterial );
 						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
 						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
 						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;
