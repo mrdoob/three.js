@@ -38,8 +38,7 @@
 
 			var camera, scene, renderer;
 
-			var fov = 70,
-			texture_placeholder,
+			var texture_placeholder,
 			isUserInteracting = false,
 			onMouseDownMouseX = 0, onMouseDownMouseY = 0,
 			lon = 0, onMouseDownLon = 0,
@@ -55,7 +54,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, 1, 1100 );
+				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1100 );
 				camera.target = new THREE.Vector3( 0, 0, 0 );
 
 				scene = new THREE.Scene();
@@ -112,12 +111,13 @@
 
 			function onDocumentMouseMove( event ) {
 
-				if ( isUserInteracting ) {
+				if ( isUserInteracting === true ) {
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
 					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
 
 				}
+
 			}
 
 			function onDocumentMouseUp( event ) {
@@ -132,35 +132,40 @@
 
 				if ( event.wheelDeltaY ) {
 
-					fov -= event.wheelDeltaY * 0.05;
+					camera.fov -= event.wheelDeltaY * 0.05;
 
 				// Opera / Explorer 9
 
 				} else if ( event.wheelDelta ) {
 
-					fov -= event.wheelDelta * 0.05;
+					camera.fov -= event.wheelDelta * 0.05;
 
 				// Firefox
 
 				} else if ( event.detail ) {
 
-					fov += event.detail * 1.0;
+					camera.fov += event.detail * 1.0;
 
 				}
 
-				camera.projectionMatrix.makePerspective( fov, window.innerWidth / window.innerHeight, 1, 1100 );
-				render();
+				camera.updateProjectionMatrix();
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-				render();
+				update();
 
 			}
 
-			function render() {
+			function update() {
+
+				if ( isUserInteracting === false ) {
+
+					lon += 0.1;
+
+				}
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
 				phi = THREE.Math.degToRad( 90 - lat );
@@ -174,9 +179,7 @@
 
 				/*
 				// distortion
-				camera.position.x = - camera.target.x;
-				camera.position.y = - camera.target.y;
-				camera.position.z = - camera.target.z;
+				camera.position.copy( camera.target ).negate();
 				*/
 
 				renderer.render( scene, camera );

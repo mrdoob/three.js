@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js misc - geometry - polyfield</title>
+		<title>three.js misc - ubiquity - test</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -24,31 +24,24 @@
 
 		<script>
 
-			var SCREEN_WIDTH = window.innerWidth / 2;
-			var SCREEN_HEIGHT = window.innerHeight / 2;
 			var AMOUNT = 100;
 
-			var container, stats;
+			var stats;
 
 			var camera, scene;
 			var canvasRenderer, svgRenderer, softwareRenderer, webglRenderer;
 
 			var mesh, group;
 
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
-
 			init();
 			animate();
 
 			function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+				var width = window.innerWidth / 2;
+				var height = window.innerHeight / 2;
 
-				camera = new THREE.PerspectiveCamera( 75, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 100000 );
+				camera = new THREE.PerspectiveCamera( 75, width / height, 1, 10000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -187,31 +180,29 @@
 
 				canvasRenderer = new THREE.CanvasRenderer();
 				canvasRenderer.setClearColor( 0xf0f0f0 );
-				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( canvasRenderer.domElement );
+				canvasRenderer.setSize( width, height );
+				document.body.appendChild( canvasRenderer.domElement );
 
 				svgRenderer = new THREE.SVGRenderer();
 				svgRenderer.setClearColor( 0xf0f0f0 );
-				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+				svgRenderer.setSize( width, height );
 				svgRenderer.setQuality( 'low' );
-				container.appendChild( svgRenderer.domElement );
+				document.body.appendChild( svgRenderer.domElement );
 
 				softwareRenderer = new THREE.SoftwareRenderer();
 				softwareRenderer.setClearColor( 0xf0f0f0 );
-				softwareRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( softwareRenderer.domElement );
+				softwareRenderer.setSize( width, height );
+				document.body.appendChild( softwareRenderer.domElement );
 
 				webglRenderer = new THREE.WebGLRenderer( { antialias: true } );
 				webglRenderer.setClearColor( 0xf0f0f0 );
-				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				container.appendChild( webglRenderer.domElement );
+				webglRenderer.setSize( width, height );
+				document.body.appendChild( webglRenderer.domElement );
 
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
-				container.appendChild( stats.domElement );
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+				document.body.appendChild( stats.domElement );
 
 				//
 
@@ -221,26 +212,16 @@
 
 			function onWindowResize() {
 
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
+				var width = window.innerWidth / 2;
+				var height = window.innerHeight / 2;
 
-				SCREEN_WIDTH = window.innerWidth / 2;
-				SCREEN_HEIGHT = window.innerHeight / 2;
-
-				camera.aspect = SCREEN_WIDTH / window.SCREEN_HEIGHT;
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				canvasRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				svgRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				softwareRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				webglRenderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
+				canvasRenderer.setSize( width, height );
+				svgRenderer.setSize( width, height );
+				softwareRenderer.setSize( width, height );
+				webglRenderer.setSize( width, height );
 
 			}
 
@@ -257,11 +238,13 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
+				var time = Date.now() * 0.0002;
+
+				camera.position.x = Math.sin( time ) * 500;
+				camera.position.z = Math.cos( time ) * 500;
 				camera.lookAt( scene.position );
 
-				group.rotation.y += 0.01;
+				group.rotation.x += 0.01;
 
 				scene.updateMatrixWorld();
 

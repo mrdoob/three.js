@@ -437,7 +437,7 @@
 				this.newWindowId = 0;
 				this.scene = scene;
 
-				this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false, devicePixelRatio: 1 } );
+				this.renderer = new THREE.WebGLRenderer( { antialias: true, devicePixelRatio: 1 } );
 
 				window.addEventListener( 'unload', this.constructor.prototype.closeAllWindows.bind( this ) );
 

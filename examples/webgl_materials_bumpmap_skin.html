@@ -179,7 +179,7 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: false, alpha: false } );
+				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( 0x060708, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -197,7 +197,6 @@
 
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
 
 				//
 
@@ -276,9 +275,9 @@
 				uniforms[ "bumpMap" ].value = mapHeight;
 				uniforms[ "specularMap" ].value = mapSpecular;
 
-				uniforms[ "uAmbientColor" ].value.setHex( 0xa0a0a0 );
-				uniforms[ "uDiffuseColor" ].value.setHex( 0xa0a0a0 );
-				uniforms[ "uSpecularColor" ].value.setHex( 0xa0a0a0 );
+				uniforms[ "ambient" ].value.setHex( 0xa0a0a0 );
+				uniforms[ "diffuse" ].value.setHex( 0xa0a0a0 );
+				uniforms[ "specular" ].value.setHex( 0xa0a0a0 );
 
 				uniforms[ "uRoughness" ].value = 0.145;
 				uniforms[ "uSpecularBrightness" ].value = 0.75;
