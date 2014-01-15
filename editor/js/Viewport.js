@@ -494,7 +494,7 @@ var Viewport = function ( editor ) {
 
 					} else {
 
-						faces += vertices / 3;
+						faces += geometry.attributes.position.array.length / 9;
 
 					}
 
