@@ -107,9 +107,6 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	THREE.Object3D.call( this );
 	this.name = 'water_' + this.id;
 
-	function isPowerOfTwo ( value ) {
-		return ( value & ( value - 1 ) ) === 0;
-	};
 	function optionalParameter ( value, defaultValue ) {
 		return value !== undefined ? value : defaultValue;
 	};
@@ -177,7 +174,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	this.material.uniforms.eye.value = this.eye;
 	
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo(height) ) 
+	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo(height) )
 	{
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
