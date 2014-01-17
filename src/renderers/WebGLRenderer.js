@@ -456,11 +456,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 	};
 
 	function createMeshBuffers ( geometryGroup ) {
-
+	
 		geometryGroup.__webglVertexBuffer = _gl.createBuffer();
 		geometryGroup.__webglNormalBuffer = _gl.createBuffer();
 		geometryGroup.__webglTangentBuffer = _gl.createBuffer();
 		geometryGroup.__webglColorBuffer = _gl.createBuffer();
+		geometryGroup.__webglUVBufferMulti = [];
+		for( var i = 0; i < 5; i++ ){
+		
+			geometryGroup.__webglUVBufferMulti[ i ] = _gl.createBuffer();
+			
+		}
 		geometryGroup.__webglUVBuffer = _gl.createBuffer();
 		geometryGroup.__webglUV2Buffer = _gl.createBuffer();
 
@@ -555,6 +561,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry.__webglNormalBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglNormalBuffer );
 		if ( geometry.__webglTangentBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglTangentBuffer );
 		if ( geometry.__webglColorBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglColorBuffer );
+		
+		for( var i = 0; i < geometry.__webglUVBufferMulti.length; i++ ){
+		
+			if ( geometry.__webglUVBufferMulti[i] !== undefined ) _gl.deleteBuffer( geometry.__webglUVBufferMulti[i] );
+			
+		}
 		if ( geometry.__webglUVBuffer !== undefined ) _gl.deleteBuffer( geometry.__webglUVBuffer );
 		if ( geometry.__webglUV2Buffer !== undefined ) _gl.deleteBuffer( geometry.__webglUV2Buffer );
 
@@ -869,6 +881,14 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( uvType ) {
 
+			geometryGroup.__uvArrayMulti = [];
+			
+			for(var i = 0; i < geometry.faceVertexUvs.length; i++){
+			
+				geometryGroup.__uvArrayMulti[i] = new Float32Array( nvertices * 2 );
+				
+			}
+			
 			if ( geometry.faceVertexUvs.length > 0 ) {
 
 				geometryGroup.__uvArray = new Float32Array( nvertices * 2 );
@@ -1593,6 +1613,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		needsSmoothNormals = ( normalType === THREE.SmoothShading );
 
+		var uv_multi = [0, 0, 0, 0, 0];
+		var uvi_multi = [0, 0, 0, 0, 0];
+		
 		var f, fl, fi, face,
 		vertexNormals, faceNormal, normal,
 		vertexColors, faceColor,
@@ -1610,10 +1633,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 		a,
 
 		vertexIndex = 0,
-
+		
 		offset = 0,
 		offset_uv = 0,
 		offset_uv2 = 0,
+		offset_uv_multi = [0, 0, 0, 0, 0],
 		offset_face = 0,
 		offset_normal = 0,
 		offset_tangent = 0,
@@ -1627,6 +1651,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 		value,
 
 		vertexArray = geometryGroup.__vertexArray,
+		uvArrayMulti = geometryGroup.__uvArrayMulti,
 		uvArray = geometryGroup.__uvArray,
 		uv2Array = geometryGroup.__uv2Array,
 		normalArray = geometryGroup.__normalArray,
@@ -1658,7 +1683,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 		vertices = geometry.vertices,
 		chunk_faces3 = geometryGroup.faces3,
 		obj_faces = geometry.faces,
-
+		
+		obj_uvs_multi = [],
 		obj_uvs  = geometry.faceVertexUvs[ 0 ],
 		obj_uvs2 = geometry.faceVertexUvs[ 1 ],
 
@@ -1669,6 +1695,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		morphTargets = geometry.morphTargets,
 		morphNormals = geometry.morphNormals;
+		
+		for(i = 0; i < geometry.faceVertexUvs.length; i++){
+		
+			obj_uvs_multi[ i ] = geometry.faceVertexUvs[ i ];
+			
+		}
 
 		if ( dirtyVertices ) {
 
@@ -1980,6 +2012,42 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+		for( i = 0; i < obj_uvs_multi.length; i++ ){
+		
+			if ( dirtyUvs && obj_uvs_multi[ i ] && uvType ) {
+
+				for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
+
+					fi = chunk_faces3[ f ];
+
+					uv_multi[ i ] = obj_uvs_multi[ i ][ fi ];
+
+					if ( uv_multi[ i ] === undefined ) continue;
+
+					for ( var j = 0; j < 3; j ++ ) {
+
+						uvi_multi[ i ] = uv_multi[ i ][ j ];
+
+						uvArrayMulti[ i ][ offset_uv_multi[ i ] ]     = uvi_multi[ i ].x;
+						uvArrayMulti[ i ][ offset_uv_multi[ i ] + 1 ] = uvi_multi[ i ].y;
+
+						offset_uv_multi[ i ] += 2;
+						
+					}
+
+				}
+
+				if ( offset_uv_multi[ i ] > 0 ) {
+					
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBufferMulti[ i ] );
+					_gl.bufferData( _gl.ARRAY_BUFFER, uvArrayMulti[ i ], hint );
+					
+				}
+
+			}
+			
+		}
+		
 		if ( dirtyUvs && obj_uvs && uvType ) {
 
 			for ( f = 0, fl = chunk_faces3.length; f < fl; f ++ ) {
@@ -2370,6 +2438,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			delete geometryGroup.__colorArray;
 			delete geometryGroup.__normalArray;
 			delete geometryGroup.__tangentArray;
+			delete geometryGroup.__uvArrayMulti;
 			delete geometryGroup.__uvArray;
 			delete geometryGroup.__uv2Array;
 			delete geometryGroup.__faceArray;
@@ -2426,7 +2495,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasPositions && ! object.__webglVertexBuffer ) object.__webglVertexBuffer = _gl.createBuffer();
 		if ( object.hasNormals && ! object.__webglNormalBuffer ) object.__webglNormalBuffer = _gl.createBuffer();
-		if ( object.hasUvs && ! object.__webglUvBuffer ) object.__webglUvBuffer = _gl.createBuffer();
+		
+		for(var i = 0; i < object.geometry.faceVertexUvs.length; i++){
+		
+			if ( object.hasUvs && ! object.__webglUVBufferMulti[ i ] ) object.__webglUVBufferMulti[ i ] = _gl.createBuffer();
+			
+		}
+		
+		if ( object.hasUvs && ! object.__webglUVBuffer ) object.__webglUVBuffer = _gl.createBuffer();
+		if ( object.hasUvs && ! object.__webglUV2Buffer ) object.__webglUV2Buffer = _gl.createBuffer();
 		if ( object.hasColors && ! object.__webglColorBuffer ) object.__webglColorBuffer = _gl.createBuffer();
 
 		if ( object.hasPositions ) {
@@ -2493,7 +2570,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object.hasUvs && material.map ) {
 
-			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUvBuffer );
+			for(var i = 0; i < object.__webglUVBufferMulti.length; i++){
+			
+				_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUVBufferMulti[ i ] );
+				_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArrayMulti[ i ], _gl.DYNAMIC_DRAW );
+				
+				if( i == 0 ) _gl.vertexAttribPointer( program.attributes.uv_multi1, 2, _gl.FLOAT, false, 0, 0 );
+				if( i == 1 ) _gl.vertexAttribPointer( program.attributes.uv_multi2, 2, _gl.FLOAT, false, 0, 0 );
+				if( i == 2 ) _gl.vertexAttribPointer( program.attributes.uv_multi3, 2, _gl.FLOAT, false, 0, 0 );
+				if( i == 3 ) _gl.vertexAttribPointer( program.attributes.uv_multi4, 2, _gl.FLOAT, false, 0, 0 );
+				if( i == 4 ) _gl.vertexAttribPointer( program.attributes.uv_multi5, 2, _gl.FLOAT, false, 0, 0 );
+				
+			}
+			
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, object.__webglUVBuffer );
 			_gl.bufferData( _gl.ARRAY_BUFFER, object.uvArray, _gl.DYNAMIC_DRAW );
 			_gl.enableVertexAttribArray( program.attributes.uv );
 			_gl.vertexAttribPointer( program.attributes.uv, 2, _gl.FLOAT, false, 0, 0 );
@@ -2888,8 +2978,38 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-			// uvs
+			// uvs multi
+			
+			for(i = 0; i < object.geometry.faceVertexUvs.length; i++){
+				
+				var tomod = 0;
+				if( i == 0 ) tomod = attributes.uv_multi1;
+				if( i == 1 ) tomod = attributes.uv_multi2;
+				if( i == 2 ) tomod = attributes.uv_multi3;
+				if( i == 3 ) tomod = attributes.uv_multi4;
+				if( i == 4 ) tomod = attributes.uv_multi5;
+				
+				if ( tomod >= 0 ) {
 
+					if ( object.geometry.faceVertexUvs[i] ) {
+
+						_gl.bindBuffer( _gl.ARRAY_BUFFER, geometryGroup.__webglUVBufferMulti[ i ] );
+						enableAttribute( tomod );
+						_gl.vertexAttribPointer( tomod, 2, _gl.FLOAT, false, 0, 0 );
+
+					} else if ( material.defaultAttributeValues ) {
+
+
+						_gl.vertexAttrib2fv( tomod, material.defaultAttributeValues.uv );
+
+					}
+
+				}
+				
+			}
+
+			// uvs legacy
+			
 			if ( attributes.uv >= 0 ) {
 
 				if ( object.geometry.faceVertexUvs[0] ) {
@@ -5517,6 +5637,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			"#define MAX_BONES " + parameters.maxBones,
 
 			parameters.map ? "#define USE_MAP" : "",
+			parameters.multiMap ? "#define USE_MULTIMAP" : "",
 			parameters.envMap ? "#define USE_ENVMAP" : "",
 			parameters.lightMap ? "#define USE_LIGHTMAP" : "",
 			parameters.bumpMap ? "#define USE_BUMPMAP" : "",
@@ -5550,8 +5671,15 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			"attribute vec3 position;",
 			"attribute vec3 normal;",
+			
 			"attribute vec2 uv;",
 			"attribute vec2 uv2;",
+
+			"attribute vec2 uv_multi1;",
+			"attribute vec2 uv_multi2;",
+			"attribute vec2 uv_multi3;",
+			"attribute vec2 uv_multi4;",
+			"attribute vec2 uv_multi5;",
 
 			"#ifdef USE_COLOR",
 
@@ -5711,7 +5839,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		identifiers = [
 
-			"position", "normal", "uv", "uv2", "tangent", "color",
+			"position", "normal", "uv",
+			"uv2", "tangent", "color",
+			"uv_multi1", "uv_multi2", "uv_multi3", "uv_multi4", "uv_multi5",
 			"skinIndex", "skinWeight", "lineDistance"
 
 		];
@@ -5822,6 +5952,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Textures
 
+
+	function isPowerOfTwo ( value ) {
+
+		return ( value & ( value - 1 ) ) === 0;
+
+	};
+
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
 
 		if ( isImagePowerOfTwo ) {
@@ -5879,7 +6016,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = texture.image,
-			isImagePowerOfTwo = THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height ),
+			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
 			glFormat = paramThreeToGL( texture.format ),
 			glType = paramThreeToGL( texture.type );
 
@@ -6029,7 +6166,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var image = cubeImage[ 0 ],
-				isImagePowerOfTwo = THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height ),
+				isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
 				glFormat = paramThreeToGL( texture.format ),
 				glType = paramThreeToGL( texture.type );
 
@@ -6142,7 +6279,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// Setup texture, create render and frame buffers
 
-			var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height ),
+			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget.width ) && isPowerOfTwo( renderTarget.height ),
 				glFormat = paramThreeToGL( renderTarget.format ),
 				glType = paramThreeToGL( renderTarget.type );
 
