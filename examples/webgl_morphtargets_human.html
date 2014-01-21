@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - skinning + morphing [knight]</title>
+		<title>three.js webgl - morph target - human</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -33,8 +33,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - skinning + morphing
-		- knight by <a href="http://vimeo.com/36113323">apendua</a>
+		<a href="http://github.com/mrdoob/three.js" target="_blank">three.js</a> webgl - morph targets - human</a>
 		</div>
 
 		<script src="../build/three.min.js"></script>
@@ -42,12 +41,9 @@
 		<script src="js/UCSCharacter.js"></script>
 
 		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
 		
 		<script src='js/libs/dat.gui.min.js'></script>
-		
-		<script src="js/libs/jquery-1.7.1.min.js"></script>
-		
+				
 		<script src="js/controls/OrbitControls.js"></script>
 		
 		<script>
@@ -55,7 +51,7 @@
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container,stats;
+			var container;
 
 			var camera, scene;
 			var renderer;
@@ -81,78 +77,30 @@
 				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 100000 );
-				camera.position.z = 10000;
-				camera.position.x = 5000;
-				camera.position.y = 10000;
+				camera.position.set( 2000, 5000, 5000 );
 
 				scene = new THREE.Scene();
 
-				scene.fog = new THREE.Fog( 0xffffff, 20000, 100000 );
-				scene.fog.color.setHSL( 0.6, 0, 1 );
-
-				scene.add( camera );
-
 				// LIGHTS
 
-				var ambient = new THREE.AmbientLight( 0x222222 );
-				scene.add( ambient );
-
-
-				var light = new THREE.DirectionalLight( 0xffffff, 1.6 );
+				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, 140, 500 );
 				light.position.multiplyScalar( 1.1 );
 				light.color.setHSL( 0.6, 0.075, 1 );
 				scene.add( light );
 
-				light.castShadow = true;
-
-				light.shadowMapWidth = 2048;
-				light.shadowMapHeight = 2048;
-
-				var d = 390;
-
-				light.shadowCameraLeft = -d * 2;
-				light.shadowCameraRight = d * 2;
-				light.shadowCameraTop = d * 1.5;
-				light.shadowCameraBottom = -d;
-
-				light.shadowCameraFar = 3500;
-				//light.shadowCameraVisible = true;
-
 				//
 
 				var light = new THREE.DirectionalLight( 0xffffff, 1 );
 				light.position.set( 0, -1, 0 );
-				light.color.setHSL( 0.25, 0.85, 0.5 );
 				scene.add( light );
 
 				// RENDERER
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
-				renderer.domElement.style.position = "relative";
-
-				renderer.setClearColor( scene.fog.color, 1 );
-
+				renderer.setClearColor( 0xffffff );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-				renderer.physicallyBasedShading = true;
-
-				renderer.shadowMapEnabled = true;
-
-				// STATS
-
-				stats = new Stats();
-				stats.domElement.style.position = 'absolute';
-				stats.domElement.style.top = '0px';
-				stats.domElement.style.zIndex = 100;
-				container.appendChild( stats.domElement );
-
-				stats.domElement.children[ 0 ].children[ 0 ].style.color = "#777";
-				stats.domElement.children[ 0 ].style.background = "transparent";
-				stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 				// CHARACTER
 
@@ -163,20 +111,23 @@
 					gui = new dat.GUI();
 					setupSkinsGUI();
 					setupMorphsGUI();
-					gui.width = 400;
+					gui.width = 300;
 					gui.open();
 				}
 				
-				$.getJSON("models/skinned/UCS_config.json", function( config ) {
-						character.loadParts( config );
-						scene.add( character.root );
-					}
-				);
+				var loader = new THREE.XHRLoader();
+				loader.load("models/skinned/UCS_config.json", function ( text ) {
+
+					var config = JSON.parse( text );
+					character.loadParts( config );
+					scene.add( character.root );
+
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				
 				controls = new THREE.OrbitControls( camera, renderer.domElement );
-				controls.center = new THREE.Vector3(0,3000,0);
+				controls.center.set( 0, 3000, 0);
 
 				controls.addEventListener( 'change', render );
 
@@ -263,7 +214,6 @@
 				controls.update();
 
 				render();
-				stats.update();
 
 			}
 
