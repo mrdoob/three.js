@@ -121,26 +121,31 @@ Sidebar.Scene = function ( editor ) {
 	signals.sceneGraphChanged.add( function () {
 
 		var scene = editor.scene;
+		var sceneType = editor.getObjectType( scene );
 
 		var options = {};
 
-		options[ scene.id ] = '<span class="type">' + editor.getObjectType( scene ).replace( /[a-z]/g, '' ) + '</span> ' + scene.name;
+		options[ scene.id ] = '<span class="type ' + sceneType + '"></span> ' + scene.name;
 
 		( function addObjects( objects, pad ) {
 
 			for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
 				var object = objects[ i ];
+				var objectType = editor.getObjectType( object );
 
-				var option = pad + '<span class="type">' + editor.getObjectType( object ).replace( /[a-z]/g, '' ) + '</span> ' + object.name;
+				var option = pad + '<span class="type ' + objectType + '"></span> ' + object.name;
 
 				if ( object instanceof THREE.Mesh ) {
 
 					var geometry = object.geometry;
 					var material = object.material;
 
-					option += ' — <span class="type">' + editor.getGeometryType( geometry ).replace( /[a-z]/g, '' ) + '</span> ' + geometry.name + ', ';
-					option += ' <span class="type">' + editor.getMaterialType( material ).replace( /[a-z]/g, '' ) + '</span> ' + material.name;
+					var geometryType = editor.getGeometryType( geometry );
+					var materialType = editor.getMaterialType( material );
+
+					option += ' <span class="type ' + geometryType + '"></span> ' + geometry.name;
+					option += ' <span class="type ' + materialType + '"></span> ' + material.name;
 
 				}
 

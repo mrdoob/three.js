@@ -246,7 +246,7 @@ THREE.PathControls = function ( object, domElement ) {
 			particleGeo = createSplineGeometry( spline, 10 ),
 			lineMat = new THREE.LineBasicMaterial( { color: 0xff0000, linewidth: 3 } ),
 			lineObj = new THREE.Line( lineGeo, lineMat ),
-			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleBasicMaterial( { color: 0xffaa00, size: 3 } ) );
+			particleObj = new THREE.ParticleSystem( particleGeo, new THREE.ParticleSystemMaterial( { color: 0xffaa00, size: 3 } ) );
 
 		lineObj.scale.set( 1, 1, 1 );
 		parent.add( lineObj );

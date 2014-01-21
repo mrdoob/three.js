@@ -57,10 +57,6 @@ THREE.Mirror = function ( renderer, camera, options ) {
 
 	this.name = 'mirror_' + this.id;
 
-	function isPowerOfTwo ( value ) {
-		return ( value & ( value - 1 ) ) === 0;
-	};
-
 	options = options || {};
 
 	this.matrixNeedsUpdate = true;
@@ -133,7 +129,7 @@ THREE.Mirror = function ( renderer, camera, options ) {
 	this.material.uniforms.mirrorColor.value = mirrorColor;
 	this.material.uniforms.textureMatrix.value = this.textureMatrix;
 
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo( height ) ) {
+	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo( height ) ) {
 
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
@@ -180,8 +176,8 @@ THREE.Mirror.prototype.updateTextureMatrix = function () {
 	this.updateMatrixWorld();
 	this.camera.updateMatrixWorld();
 
-	this.mirrorWorldPosition.getPositionFromMatrix( this.matrixWorld );
-	this.cameraWorldPosition.getPositionFromMatrix( this.camera.matrixWorld );
+	this.mirrorWorldPosition.setFromMatrixPosition( this.matrixWorld );
+	this.cameraWorldPosition.setFromMatrixPosition( this.camera.matrixWorld );
 
 	this.rotationMatrix.extractRotation( this.matrixWorld );
 

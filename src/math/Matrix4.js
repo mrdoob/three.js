@@ -580,7 +580,7 @@ THREE.Matrix4.prototype = {
 
 		return function () {
 
-			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.getPositionFromMatrix( matrix ) instead.' );
+			console.warn( 'DEPRECATED: Matrix4\'s .getPosition() has been removed. Use Vector3.setFromMatrixPosition( matrix ) instead.' );
 
 			var te = this.elements;
 			return v1.set( te[12], te[13], te[14] );
@@ -838,6 +838,12 @@ THREE.Matrix4.prototype = {
 			var sx = vector.set( te[0], te[1], te[2] ).length();
 			var sy = vector.set( te[4], te[5], te[6] ).length();
 			var sz = vector.set( te[8], te[9], te[10] ).length();
+
+			// if determine is negative, we need to invert one scale
+			var det = this.determinant();
+			if( det < 0 ) {
+				sx = -sx;
+			}
 
 			position.x = te[12];
 			position.y = te[13];

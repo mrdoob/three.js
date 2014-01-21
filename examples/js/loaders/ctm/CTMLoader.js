@@ -72,7 +72,6 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 	}
 
 	xhr.open( "GET", url, true );
-	if ( xhr.overrideMimeType ) xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.setRequestHeader( "Content-Type", "text/plain" );
 	xhr.send( null );
 
@@ -101,7 +100,7 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 			if ( xhr.status === 200 || xhr.status === 0 ) {
 
-				var binaryData = xhr.responseText;
+				var binaryData = new Uint8Array(xhr.response);
 
 				var s = Date.now();
 
@@ -194,8 +193,9 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 	}
 
-	xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
 	xhr.open( "GET", url, true );
+	xhr.responseType = "arraybuffer";
+
 	xhr.send( null );
 
 };

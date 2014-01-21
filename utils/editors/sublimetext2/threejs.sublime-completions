@@ -1,5 +1,5 @@
 {
-	"scope": "source.js,source.js.embedded.html,source.coffee",
+	"scope": "source.js,source.js.embedded.html,source.coffee,source.ts",
 	"version": "r55",
 	"completions":
 	[

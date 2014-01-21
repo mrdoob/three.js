@@ -38,6 +38,17 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
+	addAttribute: function( name, type, numItems, itemSize ) {
+
+		this.attributes[ name ] = {
+
+			itemSize: itemSize,
+			array: new type( numItems * itemSize )
+
+		};
+
+	},
+
 	applyMatrix: function ( matrix ) {
 
 		var positionArray;
@@ -155,6 +166,8 @@ THREE.BufferGeometry.prototype = {
 			var positions = this.attributes[ "position" ].array;
 
 			if ( positions ) {
+
+				box.makeEmpty();
 
 				var center = this.boundingSphere.center;
 

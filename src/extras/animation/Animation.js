@@ -128,7 +128,18 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 	this.currentTime += deltaTimeMS * this.timeScale;
 
 	unloopedCurrentTime = this.currentTime;
+
+	// Mod operation fails on floats
+	// was this supposed to be in frames?
+	while ( this.currentTime > this.data.length ) {
+
+		this.currentTime -= this.data.length;
+
+	}
+
 	currentTime = this.currentTime = this.currentTime % this.data.length;
+
+	
 	frame = parseInt( Math.min( currentTime * this.data.fps, this.data.length * this.data.fps ), 10 );
 
 
@@ -148,19 +159,20 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 			nextKey = animationCache.nextKey[ type ];
 
 			// switch keys?
-
+			
 			if ( nextKey.time <= unloopedCurrentTime ) {
 
 				// did we loop?
 
-				if ( currentTime < unloopedCurrentTime ) {
+				if ( currentTime <= unloopedCurrentTime ) {
 
 					if ( this.loop ) {
 
 						prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 						nextKey = this.getNextKeyWith( type, h, 1 );
 
-						while( nextKey.time < currentTime ) {
+						// if ( nextKey.index < prevKey.index ) then we have wrapped over the end, and nextKey.time < currentTime will loop forever
+						while ( nextKey !== null && nextKey.time < currentTime && nextKey.index > prevKey.index) {
 
 							prevKey = nextKey;
 							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
@@ -181,7 +193,8 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 						prevKey = nextKey;
 						nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
 
-					} while( nextKey.time < currentTime )
+					} while ( nextKey !== null && nextKey.time < currentTime && nextKey.index > prevKey.index )
+					// if ( nextKey.index < prevKey.index ) then we have wrapped over the end, and nextKey.time < currentTime will loop forever
 
 				}
 

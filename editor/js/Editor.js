@@ -10,6 +10,8 @@ var Editor = function () {
 
 		// notifications
 
+		themeChanged: new SIGNALS.Signal(),
+
 		transformModeChanged: new SIGNALS.Signal(),
 		snapChanged: new SIGNALS.Signal(),
 		spaceChanged: new SIGNALS.Signal(),
@@ -34,7 +36,9 @@ var Editor = function () {
 		windowResize: new SIGNALS.Signal()
 
 	};
-
+	
+	this.config = new Config();
+	this.storage = new Storage();
 	this.loader = new Loader( this );
 
 	this.scene = new THREE.Scene();
@@ -51,6 +55,14 @@ var Editor = function () {
 };
 
 Editor.prototype = {
+
+	setTheme: function ( value ) {
+
+		document.getElementById( 'theme' ).href = value;
+
+		this.signals.themeChanged.dispatch( value );
+
+	},
 
 	setScene: function ( scene ) {
 
@@ -280,25 +292,50 @@ Editor.prototype = {
 	select: function ( object ) {
 
 		this.selected = object;
+
+		if ( object !== null ) {
+
+			this.config.setKey( 'selected', object.uuid );
+
+		} else {
+
+			this.config.setKey( 'selected', null );
+
+		}
+
 		this.signals.objectSelected.dispatch( object );
 
 	},
 
 	selectById: function ( id ) {
 
-		var object = null;
+		var scope = this;
 
 		this.scene.traverse( function ( child ) {
 
 			if ( child.id === id ) {
 
-				object = child;
+				scope.select( child );
 
 			}
 
 		} );
 
-		this.select( object );
+	},
+
+	selectByUuid: function ( uuid ) {
+
+		var scope = this;
+
+		this.scene.traverse( function ( child ) {
+
+			if ( child.uuid === uuid ) {
+
+				scope.select( child );
+
+			}
+
+		} );
 
 	},
 
@@ -322,6 +359,7 @@ Editor.prototype = {
 			'PointLight': THREE.PointLight,
 			'SpotLight': THREE.SpotLight,
 			'Mesh': THREE.Mesh,
+			'Sprite': THREE.Sprite,
 			'Object3D': THREE.Object3D
 
 		};
@@ -380,9 +418,10 @@ Editor.prototype = {
 			'MeshLambertMaterial': THREE.MeshLambertMaterial,
 			'MeshNormalMaterial': THREE.MeshNormalMaterial,
 			'MeshPhongMaterial': THREE.MeshPhongMaterial,
-			'ParticleBasicMaterial': THREE.ParticleBasicMaterial,
-			'ParticleCanvasMaterial': THREE.ParticleCanvasMaterial,
+			'ParticleSystemMaterial': THREE.ParticleSystemMaterial,
 			'ShaderMaterial': THREE.ShaderMaterial,
+			'SpriteCanvasMaterial': THREE.SpriteCanvasMaterial,
+			'SpriteMaterial': THREE.SpriteMaterial,
 			'Material': THREE.Material
 
 		};

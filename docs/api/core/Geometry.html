@@ -33,7 +33,7 @@
 
 		<h3>[name]()</h3>
 		<div>
-		todo
+		The constructor takes no arguments.
 		</div>
 
 
@@ -52,7 +52,7 @@
 		<h3>.[page:Array vertices]</h3>
 		<div>
 		Array of [page:Vector3 vertices].<br />
-		The array of vertices hold every position of points of the model.<br />
+		The array of vertices holds every position of points in the model.<br />
 		To signal an update in this array, [page:Geometry Geometry.verticesNeedUpdate] needs to be set to true.
 		</div>
 
@@ -74,7 +74,7 @@
 		<h3>.[page:Array faceVertexUvs]</h3>
 		<div>
 		Array of face [page:UV] layers.<br />
-		Each UV layer is an array of [page:UV] matching order and number of vertices in faces.<br />
+		Each UV layer is an array of [page:UV]s matching the order and number of vertices in faces.<br />
 		To signal an update in this array, [page:Geometry Geometry.uvsNeedUpdate] needs to be set to true.
 		</div>
 
@@ -89,7 +89,7 @@
 		<div>
 		Array of morph colors. Morph colors have similar structure as morph targets, each color set is a Javascript object:
 		<code>morphColor = { name: "colorName", colors: [ new THREE.Color(), ... ] }</code>
-		Morph colors can match either number and order of faces (face colors) or number of vertices (vertex colors).
+		Morph colors can match either the number and order of faces (face colors) or the number of vertices (vertex colors).
 		</div>
 
 		<h3>.[page:Array morphNormals]</h3>
@@ -172,17 +172,16 @@
 		Set to *true* if an array has changed in length.
 		</div>
 
-		<h3>.[page:array morphNormals]</h3>
-		<div>
-		todo
-		</div> 
-
 		<h3>.[page:array lineDistances]</h3>
 		<div>
-		todo
+		An array containing distances between vertices for Line geometries.
+		This is required for LinePieces/LineDashedMaterial to render correctly.
+		Line distances can also be generated with computeLineDistances.
 		</div> 
 
 		<h2>Methods</h2>
+		
+		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
 		<h3>.applyMatrix( [page:Matrix4 matrix] )</h3>
 		<div>
@@ -243,49 +242,14 @@
 		<h3>.dispose()</h3>
 		<div>
 		Removes The object from memory. <br />
-		Don't forget to call this method when you remove an geometry because it can cuase meomory leaks. 
+		Don't forget to call this method when you remove a geometry because it can cause memory leaks. 
 		</div>
 
-
-		<h3>.dispatchEvent([page:todo event]) [page:todo]</h3>
+		<h3>.computeLineDistances()</h3>
 		<div>
-		event -- todo
-		</div>
-		<div>
-		todo
+		Compute distances between vertices for Line geometries.
 		</div>
 
-		<h3>.hasEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.removeEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
-
-		<h3>.computeLineDistances() [page:todo]</h3>
-		<div>
-		todo
-		</div>
-
-		<h3>.addEventListener([page:todo type], [page:todo listener]) [page:todo]</h3>
-		<div>
-		type -- todo <br />
-		listener -- todo
-		</div>
-		<div>
-		todo
-		</div>
 
 		<h2>Source</h2>
 

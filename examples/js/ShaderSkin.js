@@ -36,10 +36,10 @@ THREE.ShaderSkin = {
 			"tDiffuse"	: { type: "t", value: null },
 			"tBeckmann"	: { type: "t", value: null },
 
-			"uDiffuseColor":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"uAmbientColor":  { type: "c", value: new THREE.Color( 0x050505 ) },
-			"uOpacity": 	  { type: "f", value: 1 },
+			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
+			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"ambient":  { type: "c", value: new THREE.Color( 0x050505 ) },
+			"opacity": 	  { type: "f", value: 1 },
 
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
 			"uSpecularBrightness": 	{ type: "f", value: 0.75 },
@@ -65,10 +65,10 @@ THREE.ShaderSkin = {
 			"uniform bool enableBump;",
 			"uniform bool enableSpecular;",
 
-			"uniform vec3 uAmbientColor;",
-			"uniform vec3 uDiffuseColor;",
-			"uniform vec3 uSpecularColor;",
-			"uniform float uOpacity;",
+			"uniform vec3 ambient;",
+			"uniform vec3 diffuse;",
+			"uniform vec3 specular;",
+			"uniform float opacity;",
 
 			"uniform float uRoughness;",
 			"uniform float uSpecularBrightness;",
@@ -159,7 +159,7 @@ THREE.ShaderSkin = {
 
 			"void main() {",
 
-				"gl_FragColor = vec4( vec3( 1.0 ), uOpacity );",
+				"gl_FragColor = vec4( vec3( 1.0 ), opacity );",
 
 				"vec4 colDiffuse = texture2D( tDiffuse, vUv );",
 				"colDiffuse.rgb *= colDiffuse.rgb;",
@@ -215,8 +215,8 @@ THREE.ShaderSkin = {
 
 						"float pointSpecularWeight = KS_Skin_Specular( normal, lVector, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"pointTotal    += lDistance * uDiffuseColor * pointLightColor[ i ] * pointDiffuseWeight;",
-						"specularTotal += lDistance * uSpecularColor * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
+						"pointTotal    += lDistance * diffuse * pointLightColor[ i ] * pointDiffuseWeight;",
+						"specularTotal += lDistance * specular * pointLightColor[ i ] * pointSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -240,8 +240,8 @@ THREE.ShaderSkin = {
 
 						"float dirSpecularWeight =  KS_Skin_Specular( normal, dirVector, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"dirTotal 	   += uDiffuseColor * directionalLightColor[ i ] * dirDiffuseWeight;",
-						"specularTotal += uSpecularColor * directionalLightColor[ i ] * dirSpecularWeight * specularStrength;",
+						"dirTotal 	   += diffuse * directionalLightColor[ i ] * dirDiffuseWeight;",
+						"specularTotal += specular * directionalLightColor[ i ] * dirSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -261,7 +261,7 @@ THREE.ShaderSkin = {
 						"float dotProduct = dot( normal, lVector );",
 						"float hemiDiffuseWeight = 0.5 * dotProduct + 0.5;",
 
-						"hemiTotal += uDiffuseColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
+						"hemiTotal += diffuse * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight );",
 
 						// specular (sky light)
 
@@ -273,7 +273,7 @@ THREE.ShaderSkin = {
 						"vec3 lVectorGround = -lVector;",
 						"hemiSpecularWeight += KS_Skin_Specular( normal, lVectorGround, viewPosition, uRoughness, uSpecularBrightness );",
 
-						"specularTotal += uSpecularColor * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",
+						"specularTotal += specular * mix( hemisphereLightGroundColor[ i ], hemisphereLightSkyColor[ i ], hemiDiffuseWeight ) * hemiSpecularWeight * specularStrength;",
 
 					"}",
 
@@ -295,7 +295,7 @@ THREE.ShaderSkin = {
 					"totalLight += hemiTotal;",
 				"#endif",
 
-				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * uAmbientColor ) + specularTotal;",
+				"gl_FragColor.xyz = gl_FragColor.xyz * ( totalLight + ambientLightColor * ambient ) + specularTotal;",
 
 				THREE.ShaderChunk[ "shadowmap_fragment" ],
 				THREE.ShaderChunk[ "linear_to_gamma_fragment" ],
@@ -375,10 +375,10 @@ THREE.ShaderSkin = {
 
 			"uNormalScale": { type: "f", value: 1.0 },
 
-			"uDiffuseColor":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
-			"uSpecularColor": { type: "c", value: new THREE.Color( 0x111111 ) },
-			"uAmbientColor":  { type: "c", value: new THREE.Color( 0x050505 ) },
-			"uOpacity": 	  { type: "f", value: 1 },
+			"diffuse":  { type: "c", value: new THREE.Color( 0xeeeeee ) },
+			"specular": { type: "c", value: new THREE.Color( 0x111111 ) },
+			"ambient":  { type: "c", value: new THREE.Color( 0x050505 ) },
+			"opacity": 	  { type: "f", value: 1 },
 
 			"uRoughness": 	  		{ type: "f", value: 0.15 },
 			"uSpecularBrightness": 	{ type: "f", value: 0.75 }
@@ -389,10 +389,10 @@ THREE.ShaderSkin = {
 
 		fragmentShader: [
 
-			"uniform vec3 uAmbientColor;",
-			"uniform vec3 uDiffuseColor;",
-			"uniform vec3 uSpecularColor;",
-			"uniform float uOpacity;",
+			"uniform vec3 ambient;",
+			"uniform vec3 diffuse;",
+			"uniform vec3 specular;",
+			"uniform float opacity;",
 
 			"uniform float uRoughness;",
 			"uniform float uSpecularBrightness;",
@@ -476,8 +476,8 @@ THREE.ShaderSkin = {
 
 				"gl_FragColor = vec4( 1.0 );",
 
-				"vec4 mColor = vec4( uDiffuseColor, uOpacity );",
-				"vec4 mSpecular = vec4( uSpecularColor, uOpacity );",
+				"vec4 mColor = vec4( diffuse, opacity );",
+				"vec4 mSpecular = vec4( specular, opacity );",
 
 				"vec3 normalTex = texture2D( tNormal, vUv ).xyz * 2.0 - 1.0;",
 				"normalTex.xy *= uNormalScale;",
@@ -543,7 +543,7 @@ THREE.ShaderSkin = {
 
 				// all lights contribution summation
 
-				"vec4 totalLight = vec4( vec3( 0.0 ), uOpacity );",
+				"vec4 totalLight = vec4( vec3( 0.0 ), opacity );",
 
 				"#if MAX_DIR_LIGHTS > 0",
 					"totalLight += dirTotal;",
@@ -595,7 +595,7 @@ THREE.ShaderSkin = {
 
 					"gl_FragColor.xyz *= pow( colDiffuse.xyz, vec3( 0.5 ) );",
 
-					"gl_FragColor.xyz += ambientLightColor * uAmbientColor * colDiffuse.xyz + specularTotal;",
+					"gl_FragColor.xyz += ambientLightColor * ambient * colDiffuse.xyz + specularTotal;",
 
 					"#ifndef VERSION1",
 

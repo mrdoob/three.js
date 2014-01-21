@@ -2,9 +2,6 @@ Menubar.Add = function ( editor ) {
 
 	var container = new UI.Panel();
 	container.setClass( 'menu' );
-	container.onMouseOver( function () { options.setDisplay( 'block' ) } );
-	container.onMouseOut( function () { options.setDisplay( 'none' ) } );
-	container.onClick( function () { options.setDisplay( 'block' ) } );
 
 	var title = new UI.Panel();
 	title.setTextContent( 'Add' );
@@ -16,7 +13,6 @@ Menubar.Add = function ( editor ) {
 
 	var options = new UI.Panel();
 	options.setClass( 'options' );
-	options.setDisplay( 'none' );
 	container.add( options );
 
 	var meshCount = 0;
@@ -202,6 +198,26 @@ Menubar.Add = function ( editor ) {
 
 		editor.addObject( mesh );
 		editor.select( mesh );
+
+	} );
+	options.add( option );
+
+	// divider
+
+	options.add( new UI.HorizontalRule() );
+
+	// add sprite
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Sprite' );
+	option.onClick( function () {
+
+		var sprite = new THREE.Sprite( new THREE.SpriteMaterial() );
+		sprite.name = 'Sprite ' + ( ++ meshCount );
+
+		editor.addObject( sprite );
+		editor.select( sprite );
 
 	} );
 	options.add( option );

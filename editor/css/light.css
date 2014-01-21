@@ -19,12 +19,11 @@ button {
 }
 
 .Panel {
-
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	-ms-user-select: none;
 
-		/* No support for these yet */
+	/* No support for these yet */
 	-o-user-select: none;
 	user-select: none;
 }
@@ -40,11 +39,12 @@ button {
 
 	.FancySelect .option {
 		padding: 4px;
+		color: #666;
 		white-space: nowrap;
 	}
 
 	.FancySelect .option.active {
-		background-color: #F0F0F0;
+		background-color: #f8f8f8;
 	}
 
 input.Number {
@@ -57,11 +57,11 @@ input.Number {
 }
 
 #viewport {
+	position: absolute;
 	top: 32px;
 	left: 0px;
 	right: 300px;
 	bottom: 32px;
-	background-color: #aaaaaa;
 }
 
 #menubar {
@@ -84,9 +84,14 @@ input.Number {
 	}
 
 		#menubar .menu .options {
+			display: none;
 			padding: 5px 0px;
 			background: #eee;
 			width: 140px;
+		}
+
+		#menubar .menu:hover .options {
+			display: block;
 		}
 
 			#menubar .menu .options hr {
@@ -137,13 +142,6 @@ input.Number {
 		height: 140px;
 		color: #444;
 		font-size: 12px;
-	}
-
-	#sidebar #outliner .type {
-		padding: 2px 4px;
-		font-size: 10px;
-		background: #eee;
-		color: #aaa;
 	}
 
 #toolbar {

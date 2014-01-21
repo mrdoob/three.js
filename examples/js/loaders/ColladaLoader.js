@@ -10,7 +10,7 @@ THREE.ColladaLoader = function () {
 
 	var readyCallbackFunc = null;
 
- 	var sources = {};
+	var sources = {};
 	var images = {};
 	var animations = {};
 	var controllers = {};
@@ -114,7 +114,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function parse( doc, callBack, url ) {
 
@@ -131,16 +131,16 @@ THREE.ColladaLoader = function () {
 
 		parseAsset();
 		setUpConversion();
-		images = parseLib( "//dae:library_images/dae:image", _Image, "image" );
-		materials = parseLib( "//dae:library_materials/dae:material", Material, "material" );
-		effects = parseLib( "//dae:library_effects/dae:effect", Effect, "effect" );
-		geometries = parseLib( "//dae:library_geometries/dae:geometry", Geometry, "geometry" );
-		cameras = parseLib( ".//dae:library_cameras/dae:camera", Camera, "camera" );
-		lights = parseLib( ".//dae:library_lights/dae:light", Light, "light" );
-		controllers = parseLib( "//dae:library_controllers/dae:controller", Controller, "controller" );
-		animations = parseLib( "//dae:library_animations/dae:animation", Animation, "animation" );
-		visualScenes = parseLib( ".//dae:library_visual_scenes/dae:visual_scene", VisualScene, "visual_scene" );
-
+		images = parseLib( "library_images image", _Image, "image" );
+		materials = parseLib( "library_materials material", Material, "material" );
+		effects = parseLib( "library_effects effect", Effect, "effect" );
+		geometries = parseLib( "library_geometries geometry", Geometry, "geometry" );
+		cameras = parseLib( "library_cameras camera", Camera, "camera" );
+		lights = parseLib( "library_lights light", Light, "light" );
+		controllers = parseLib( "library_controllers controller", Controller, "controller" );
+		animations = parseLib( "library_animations animation", Animation, "animation" );
+		visualScenes = parseLib( "library_visual_scenes visual_scene", VisualScene, "visual_scene" );
+		
 		morphs = [];
 		skins = [];
 
@@ -187,19 +187,19 @@ THREE.ColladaLoader = function () {
 
 		return result;
 
-	};
+	}
 
 	function setPreferredShading ( shading ) {
 
 		preferredShading = shading;
 
-	};
+	}
 
 	function parseAsset () {
 
-		var elements = COLLADA.evaluate( '//dae:asset', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+		var elements = COLLADA.querySelectorAll('asset');
 
-		var element = elements.iterateNext();
+		var element = elements[0];
 
 		if ( element && element.childNodes ) {
 
@@ -232,34 +232,36 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function parseLib ( q, classSpec, prefix ) {
 
-		var elements = COLLADA.evaluate(q, COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null) ;
+		var elements = COLLADA.querySelectorAll(q);
 
 		var lib = {};
-		var element = elements.iterateNext();
+
 		var i = 0;
 
-		while ( element ) {
+		var elementsLength = elements.length;
 
+		for ( var j = 0; j < elementsLength; j ++ ) {
+
+			var element = elements[j];
 			var daeElement = ( new classSpec() ).parse( element );
+
 			if ( !daeElement.id || daeElement.id.length == 0 ) daeElement.id = prefix + ( i ++ );
 			lib[ daeElement.id ] = daeElement;
-
-			element = elements.iterateNext();
 
 		}
 
 		return lib;
 
-	};
+	}
 
 	function parseScene() {
-
-		var sceneElement = COLLADA.evaluate( './/dae:scene/dae:instance_visual_scene', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
-
+	
+		var sceneElement = COLLADA.querySelectorAll('scene instance_visual_scene')[0];
+		
 		if ( sceneElement ) {
 
 			var url = sceneElement.getAttribute( 'url' ).replace( /^#/, '' );
@@ -271,7 +273,7 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function createAnimations() {
 
@@ -280,7 +282,7 @@ THREE.ColladaLoader = function () {
 		// fill in the keys
 		recurseHierarchy( scene );
 
-	};
+	}
 
 	function recurseHierarchy( node ) {
 
@@ -337,21 +339,22 @@ THREE.ColladaLoader = function () {
 
 		return newData;
 
-	};
+	}
 
 	function calcAnimationBounds () {
 
 		var start = 1000000;
 		var end = -start;
 		var frames = 0;
-
+		var ID;
 		for ( var id in animations ) {
 
 			var animation = animations[ id ];
-
+			ID = ID || animation.id; 
 			for ( var i = 0; i < animation.sampler.length; i ++ ) {
 
 				var sampler = animation.sampler[ i ];
+				
 				sampler.create();
 
 				start = Math.min( start, sampler.startTime );
@@ -362,9 +365,9 @@ THREE.ColladaLoader = function () {
 
 		}
 
-		return { start:start, end:end, frames:frames };
+		return { start:start, end:end, frames:frames,ID:ID };
 
-	};
+	}
 
 	function createMorph ( geometry, ctrl ) {
 
@@ -455,12 +458,14 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function setupSkeleton ( node, bones, frame, parent ) {
 
 		node.world = node.world || new THREE.Matrix4();
+		node.localworld = node.localworld || new THREE.Matrix4();
 		node.world.copy( node.matrix );
+		node.localworld.copy( node.matrix );
 
 		if ( node.channels && node.channels.length ) {
 
@@ -470,7 +475,9 @@ THREE.ColladaLoader = function () {
 			if ( m instanceof THREE.Matrix4 ) {
 
 				node.world.copy( m );
-
+				node.localworld.copy(m);
+				if(frame == 0)
+					node.matrix.copy(m);
 			}
 
 		}
@@ -489,14 +496,14 @@ THREE.ColladaLoader = function () {
 
 		}
 
-	};
+	}
 
 	function setupSkinningMatrices ( bones, skin ) {
 
 		// FIXME: this is dumb...
-
+		
 		for ( var i = 0; i < bones.length; i ++ ) {
-
+		
 			var bone = bones[ i ];
 			var found = -1;
 
@@ -520,12 +527,14 @@ THREE.ColladaLoader = function () {
 				bone.invBindMatrix = inv;
 				bone.skinningMatrix = new THREE.Matrix4();
 				bone.skinningMatrix.multiplyMatrices(bone.world, inv); // (IBMi * JMi)
+				bone.animatrix = new THREE.Matrix4();
 
+				bone.animatrix.copy(bone.localworld);
 				bone.weights = [];
 
 				for ( var j = 0; j < skin.weights.length; j ++ ) {
-
-					for (var k = 0; k < skin.weights[ j ].length; k ++) {
+					
+					for (var k = 0; k < skin.weights[ j ].length; k ++ ) {
 
 						var w = skin.weights[ j ][ k ];
 
@@ -541,16 +550,102 @@ THREE.ColladaLoader = function () {
 
 			} else {
 
-				throw 'ColladaLoader: Could not find joint \'' + bone.sid + '\'.';
+				console.warn( "ColladaLoader: Could not find joint '" + bone.sid + "'." );
 
+				bone.skinningMatrix = new THREE.Matrix4();
+				bone.weights = [];
+
+			}
+		}
+
+	}
+
+	//Walk the Collada tree and flatten the bones into a list, extract the position, quat and scale from the matrix
+	function flattenSkeleton(skeleton) {
+
+		var list = [];
+		var walk = function(parentid, node, list) {
+
+			var bone = {};
+			bone.name = node.sid;
+			bone.parent = parentid;
+			bone.matrix = node.matrix;
+			var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
+			bone.matrix.decompose(data[0],data[1],data[2]);
+							
+			bone.pos = [data[0].x,data[0].y,data[0].z];
+							
+			bone.scl = [data[2].x,data[2].y,data[2].z];
+			bone.rotq = [data[1].x,data[1].y,data[1].z,data[1].w];
+			list.push(bone);
+
+			for(var i in node.nodes) {
+
+				walk(node.sid,node.nodes[i],list);
+
+			}
+
+		};
+
+		walk(-1,skeleton,list);
+		return list;
+
+	}
+
+	//Move the vertices into the pose that is proper for the start of the animation
+	function skinToBindPose(geometry,skeleton,skinController) {
+
+		var bones = [];
+		setupSkeleton( skeleton, bones, -1 );
+		setupSkinningMatrices( bones, skinController.skin );
+		v = new THREE.Vector3();
+		var skinned = [];
+
+		for(var i =0; i < geometry.vertices.length; i++) {
+
+			skinned.push(new THREE.Vector3());
+
+		}
+
+		for ( i = 0; i < bones.length; i ++ ) {
+
+			if ( bones[ i ].type != 'JOINT' ) continue;
+
+			for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
+
+				w = bones[ i ].weights[ j ];
+				vidx = w.index;
+				weight = w.weight;
+
+				o = geometry.vertices[vidx];
+				s = skinned[vidx];
+				
+				v.x = o.x;
+				v.y = o.y;
+				v.z = o.z;
+
+				v.applyMatrix4( bones[i].skinningMatrix );
+
+				s.x += (v.x * weight);
+				s.y += (v.y * weight);
+				s.z += (v.z * weight);
 			}
 
 		}
 
-	};
+		for(var i =0; i < geometry.vertices.length; i++) {
+
+			geometry.vertices[i] = skinned[i];
+
+		}
+
+	}
 
 	function applySkin ( geometry, instanceCtrl, frame ) {
 
+		// TODO: get this from the renderer or options
+		var maxbones = 30;
+		
 		var skinController = controllers[ instanceCtrl.url ];
 
 		frame = frame !== undefined ? frame : 40;
@@ -572,69 +667,173 @@ THREE.ColladaLoader = function () {
 		var animationBounds = calcAnimationBounds();
 		var skeleton = daeScene.getChildById( instanceCtrl.skeleton[0], true ) ||
 					   daeScene.getChildBySid( instanceCtrl.skeleton[0], true );
+		
+		//flatten the skeleton into a list of bones
+		var bonelist = flattenSkeleton(skeleton);
+		var joints = skinController.skin.joints;
+
+		//sort that list so that the order reflects the order in the joint list
+		var sortedbones = [];
+		for(var i = 0; i < joints.length; i++) {
+
+			for(var j =0; j < bonelist.length; j++) {
+
+				if(bonelist[j].name == joints[i]) {
+
+					sortedbones[i] = bonelist[j];
+
+				}
+
+			}
+
+		}
+
+		//hook up the parents by index instead of name
+		for(var i = 0; i < sortedbones.length; i++) {
+
+			for(var j =0; j < sortedbones.length; j++) {
+
+				if(sortedbones[i].parent == sortedbones[j].name) {
+
+					sortedbones[i].parent = j;
+
+				}
+
+			}
+
+		}
+
 
 		var i, j, w, vidx, weight;
 		var v = new THREE.Vector3(), o, s;
 
 		// move vertices to bind shape
-
 		for ( i = 0; i < geometry.vertices.length; i ++ ) {
+					geometry.vertices[i].applyMatrix4( skinController.skin.bindShapeMatrix );
+		}
 
-			geometry.vertices[i].applyMatrix4( skinController.skin.bindShapeMatrix );
+		var skinIndices = [];
+		var skinWeights = [];
+		var weights = skinController.skin.weights;
+
+		//hook up the skin weights
+		// TODO -  this might be a good place to choose greatest 4 weights
+		for(var i =0; i < weights.length; i++) {
+
+			var indicies = new THREE.Vector4(weights[i][0]?weights[i][0].joint:0,weights[i][1]?weights[i][1].joint:0,weights[i][2]?weights[i][2].joint:0,weights[i][3]?weights[i][3].joint:0);
+			var weight = new THREE.Vector4(weights[i][0]?weights[i][0].weight:0,weights[i][1]?weights[i][1].weight:0,weights[i][2]?weights[i][2].weight:0,weights[i][3]?weights[i][3].weight:0);
+			
+			skinIndices.push(indicies);
+			skinWeights.push(weight);
 
 		}
 
+		geometry.skinIndices = skinIndices;
+		geometry.skinWeights = skinWeights;
+		geometry.bones = sortedbones;
 		// process animation, or simply pose the rig if no animation
+		
+		//create an animation for the animated bones
+		//NOTE: this has no effect when using morphtargets
+		var animationdata = {"name":animationBounds.ID,"fps":30,"length":animationBounds.frames/30,"hierarchy":[]};
+
+		for(var j =0; j < sortedbones.length; j++) {
+
+			animationdata.hierarchy.push({parent:sortedbones[j].parent, name:sortedbones[j].name, keys:[]});
+
+		}
+
+		//if using hardware skinning, move the vertices into the binding pose
+		if(sortedbones.length < maxbones) {
+
+			skinToBindPose(geometry,skeleton,skinController);
+
+		}
 
 		for ( frame = 0; frame < animationBounds.frames; frame ++ ) {
 
 			var bones = [];
 			var skinned = [];
-
-			// zero skinned vertices
-
-			for ( i = 0; i < geometry.vertices.length; i++ ) {
-
-				skinned.push( new THREE.Vector3() );
-
-			}
-
 			// process the frame and setup the rig with a fresh
 			// transform, possibly from the bone's animation channel(s)
 
 			setupSkeleton( skeleton, bones, frame );
 			setupSkinningMatrices( bones, skinController.skin );
 
-			// skin 'm
+			//if using hardware skinning, just hook up the animiation data
+			if(sortedbones.length < maxbones) {
 
-			for ( i = 0; i < bones.length; i ++ ) {
+				for(var i = 0; i < bones.length; i ++) {
 
-				if ( bones[ i ].type != 'JOINT' ) continue;
+					for(var j = 0; j < animationdata.hierarchy.length; j ++) {
 
-				for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
+						if(animationdata.hierarchy[j].name == bones[i].sid) {
 
-					w = bones[ i ].weights[ j ];
-					vidx = w.index;
-					weight = w.weight;
+							var key = {};
+							key.time = (frame/30);
+							key.matrix = bones[i].animatrix;
+							
+							if(frame == 0)
+								bones[i].matrix = key.matrix;
+							
+							var data = [new THREE.Vector3(),new THREE.Quaternion(),new THREE.Vector3()];
+							key.matrix.decompose(data[0],data[1],data[2]);
+							
+							key.pos = [data[0].x,data[0].y,data[0].z];
+							
+							key.scl = [data[2].x,data[2].y,data[2].z];
+							key.rot = data[1];
 
-					o = geometry.vertices[vidx];
-					s = skinned[vidx];
+							animationdata.hierarchy[j].keys.push(key);
 
-					v.x = o.x;
-					v.y = o.y;
-					v.z = o.z;
+						}
 
-					v.applyMatrix4( bones[i].skinningMatrix );
-
-					s.x += (v.x * weight);
-					s.y += (v.y * weight);
-					s.z += (v.z * weight);
+					}
 
 				}
 
-			}
+				geometry.animation = animationdata;
+
+			} else {
+
+				// otherwise, process the animation into morphtargets
+				
+				for ( i = 0; i < geometry.vertices.length; i++ ) {
+
+					skinned.push( new THREE.Vector3() );
+
+				}
+
+				for ( i = 0; i < bones.length; i ++ ) {
+
+					if ( bones[ i ].type != 'JOINT' ) continue;
+
+					for ( j = 0; j < bones[ i ].weights.length; j ++ ) {
+
+						w = bones[ i ].weights[ j ];
+						vidx = w.index;
+						weight = w.weight;
+
+						o = geometry.vertices[vidx];
+						s = skinned[vidx];
+
+						v.x = o.x;
+						v.y = o.y;
+						v.z = o.z;
+
+						v.applyMatrix4( bones[i].skinningMatrix );
+
+						s.x += (v.x * weight);
+						s.y += (v.y * weight);
+						s.z += (v.z * weight);
+
+					}
+
+				}
 
 			geometry.morphTargets.push( { name: "target_" + frame, vertices: skinned } );
+
+			}
 
 		}
 
@@ -797,16 +996,33 @@ THREE.ColladaLoader = function () {
 
 				if ( skinController !== undefined ) {
 
+					
 					applySkin( geom, skinController );
 
-					material.morphTargets = true;
+					if(geom.morphTargets.length > 0) {
+
+						material.morphTargets = true;
+						material.skinning = false;
+
+					} else {
+
+						material.morphTargets = false;
+						material.skinning = true;
+
+					}				
+					
 
 					mesh = new THREE.SkinnedMesh( geom, material, false );
-					mesh.skeleton = skinController.skeleton;
-					mesh.skinController = controllers[ skinController.url ];
-					mesh.skinInstanceController = skinController;
+
+
+					//mesh.skeleton = skinController.skeleton;
+					//mesh.skinController = controllers[ skinController.url ];
+					//mesh.skinInstanceController = skinController;
 					mesh.name = 'skin_' + skins.length;
 
+					
+					
+					//mesh.animationHandle.setKey(0);
 					skins.push( mesh );
 
 				} else if ( morphController !== undefined ) {
@@ -885,6 +1101,7 @@ THREE.ColladaLoader = function () {
 		}
 
 		obj.name = node.name || node.id || "";
+		obj.layer = node.layer || "";
 		obj.matrix = node.matrix;
 		obj.matrix.decompose( obj.position, obj.quaternion, obj.scale );
 
@@ -924,7 +1141,17 @@ THREE.ColladaLoader = function () {
 
 	function getLibraryNode( id ) {
 
-		return COLLADA.evaluate( './/dae:library_nodes//dae:node[@id=\'' + id + '\']', COLLADA, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null ).iterateNext();
+        var nodes = COLLADA.querySelectorAll('library_nodes node');
+
+        for ( var i = 0; i < nodes.length; i++ ) {
+
+            var attObj = nodes[i].attributes.getNamedItem('id');
+            if ( attObj && attObj.value === id ) {
+                return nodes[i];
+        }
+        }
+
+        return undefined;
 
 	};
 
@@ -1834,6 +2061,7 @@ THREE.ColladaLoader = function () {
 		this.sid = element.getAttribute('sid');
 		this.name = element.getAttribute('name');
 		this.type = element.getAttribute('type');
+		this.layer = element.getAttribute('layer');
 
 		this.type = this.type == 'JOINT' ? this.type : 'NODE';
 
@@ -2200,21 +2428,16 @@ THREE.ColladaLoader = function () {
 					break;
 
 				case 'bind_material':
+			
+					var instances = child.querySelectorAll('instance_material');
+					
+					for ( var j = 0; j < instances.length; j ++ ){
 
-					var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
-					if ( instances ) {
-
-						var instance = instances.iterateNext();
-
-						while ( instance ) {
-
-							this.instance_material.push( (new InstanceMaterial()).parse(instance) );
-							instance = instances.iterateNext();
-
-						}
-
+						var instance = instances[j];
+						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
+						
 					}
+
 
 					break;
 
@@ -2265,18 +2488,12 @@ THREE.ColladaLoader = function () {
 
 			if ( child.nodeName == 'bind_material' ) {
 
-				var instances = COLLADA.evaluate( './/dae:instance_material', child, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
+				var instances = child.querySelectorAll('instance_material');
+					
+				for ( var j = 0; j < instances.length; j ++ ) {
 
-				if ( instances ) {
-
-					var instance = instances.iterateNext();
-
-					while ( instance ) {
-
-						this.instance_material.push( (new InstanceMaterial()).parse(instance) );
-						instance = instances.iterateNext();
-
-					}
+					var instance = instances[j];
+					this.instance_material.push( (new InstanceMaterial()).parse(instance) );
 
 				}
 
@@ -2422,10 +2639,11 @@ THREE.ColladaLoader = function () {
 		var source, numParams;
 		var vcIndex = 0, vcount = 3, maxOffset = 0;
 		var texture_sets = [];
-
+		
 		for ( j = 0; j < inputs.length; j ++ ) {
 
 			input = inputs[ j ];
+
 			var offset = input.offset + 1;
 			maxOffset = (maxOffset < offset)? offset : maxOffset;
 
@@ -3006,9 +3224,10 @@ THREE.ColladaLoader = function () {
 
 	ColorOrTexture.prototype.parse = function ( element ) {
 
-		if (element.nodeName == 'transparent')
-		{
+		if (element.nodeName == 'transparent') {
+
 			this.opaque = element.getAttribute('opaque');
+
 		}
 		
 		for ( var i = 0; i < element.childNodes.length; i ++ ) {
@@ -3038,7 +3257,7 @@ THREE.ColladaLoader = function () {
 						repeatU: 1,
 						repeatV: 1,
 						wrapU: 1,
-						wrapV: 1,
+						wrapV: 1
 					};
 					this.parseTexture( child );
 					break;
@@ -3084,16 +3303,29 @@ THREE.ColladaLoader = function () {
 				case 'repeatV':
 
 					this.texOpts[ child.nodeName ] = parseFloat( child.textContent );
+
 					break;
 
 				case 'wrapU':
 				case 'wrapV':
+					
+					// some dae have a value of true which becomes NaN via parseInt
 
-					this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					if ( child.textContent.toUpperCase() === 'TRUE' ) {
+					
+						this.texOpts[ child.nodeName ] = 1;
+					
+					} else {
+					
+						this.texOpts[ child.nodeName ] = parseInt( child.textContent );
+					
+					}
 					break;
 
 				default:
+
 					this.texOpts[ child.nodeName ] = child.textContent;
+
 					break;
 
 			}
@@ -3126,6 +3358,7 @@ THREE.ColladaLoader = function () {
 				case 'diffuse':
 				case 'specular':
 				case 'transparent':
+				case 'bump':
 
 					this[ child.nodeName ] = ( new ColorOrTexture() ).parse( child );
 					break;
@@ -3135,7 +3368,7 @@ THREE.ColladaLoader = function () {
 				case 'index_of_refraction':
 				case 'transparency':
 
-					var f = evaluateXPath( child, './/dae:float' );
+					var f = child.querySelectorAll('float');
 
 					if ( f.length > 0 )
 						this[ child.nodeName ] = parseFloat( f[ 0 ].textContent );
@@ -3159,8 +3392,8 @@ THREE.ColladaLoader = function () {
 		var props = {};
 
 		var transparent = false;
-		if (this['transparency'] !== undefined && this['transparent'] !== undefined)
-		{
+
+		if (this['transparency'] !== undefined && this['transparent'] !== undefined) {
 			// convert transparent color RBG to average value
 			var transparentColor = this['transparent'];
 			var transparencyLevel = (this.transparent.color.r +
@@ -3168,13 +3401,22 @@ THREE.ColladaLoader = function () {
 										this.transparent.color.b)
 										/ 3 * this.transparency;
 			
-			if (transparencyLevel > 0)
-			{
+			if (transparencyLevel > 0) {
 				transparent = true;
 				props[ 'transparent' ] = true;
 				props[ 'opacity' ] = 1 - transparencyLevel;
+
 			}
+
 		}
+		
+		var keys = {
+			'diffuse':'map', 
+			'ambient':"lightMap" ,
+			'specular':'specularMap',
+			'emission':'emissionMap',
+			'bump':'normalMap'
+			};
 		
 		for ( var prop in this ) {
 
@@ -3184,6 +3426,7 @@ THREE.ColladaLoader = function () {
 				case 'emission':
 				case 'diffuse':
 				case 'specular':
+				case 'bump':
 
 					var cot = this[ prop ];
 
@@ -3208,7 +3451,7 @@ THREE.ColladaLoader = function () {
 									texture.offset.y = cot.texOpts.offsetV;
 									texture.repeat.x = cot.texOpts.repeatU;
 									texture.repeat.y = cot.texOpts.repeatV;
-									props['map'] = texture;
+									props[keys[prop]] = texture;
 
 									// Texture with baked lighting?
 									if (prop === 'emission') props['emissive'] = 0xffffff;
@@ -3552,7 +3795,51 @@ THREE.ColladaLoader = function () {
 
 					this.shader = ( new Shader( child.nodeName, this ) ).parse( child );
 					break;
+				case 'extra':
+					this.parseExtra(child);	
+					break;
+				default:
+					break;
 
+			}
+
+		}
+
+	};
+	
+	Effect.prototype.parseExtra = function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[i];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'technique':
+					this.parseExtraTechnique( child );
+					break;
+				default:
+					break;
+
+			}
+
+		}
+
+	};
+	
+	Effect.prototype.parseExtraTechnique= function ( element ) {
+
+		for ( var i = 0; i < element.childNodes.length; i ++ ) {
+
+			var child = element.childNodes[i];
+			if ( child.nodeType != 1 ) continue;
+
+			switch ( child.nodeName ) {
+
+				case 'bump':
+					this.shader.parse( element );
+					break;
 				default:
 					break;
 
@@ -4399,33 +4686,13 @@ THREE.ColladaLoader = function () {
 
 	};
 
-	function evaluateXPath( node, query ) {
-
-		var instances = COLLADA.evaluate( query, node, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
-		var inst = instances.iterateNext();
-		var result = [];
-
-		while ( inst ) {
-
-			result.push( inst );
-			inst = instances.iterateNext();
-
-		}
-
-		return result;
-
-	};
-
 	function extractDoubleSided( obj, element ) {
 
 		obj.doubleSided = false;
 
-		var node = COLLADA.evaluate( './/dae:extra//dae:double_sided', element, _nsResolver, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null );
-
+		var node = element.querySelectorAll('extra double_sided')[0];
+	
 		if ( node ) {
-
-			node = node.iterateNext();
 
 			if ( node && parseInt( node.textContent, 10 ) === 1 ) {
 

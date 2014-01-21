@@ -9,8 +9,6 @@ THREE.Sprite = function ( material ) {
 
 	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
-	this.rotation = 0;
-
 };
 
 THREE.Sprite.prototype = Object.create( THREE.Object3D.prototype );
@@ -37,3 +35,6 @@ THREE.Sprite.prototype.clone = function ( object ) {
 
 };
 
+// Backwards compatibility
+
+THREE.Particle = THREE.Sprite;

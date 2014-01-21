@@ -2,7 +2,7 @@
 <html lang="en" id="html-el">
 	<head>
 		<title>three.js webgl - UV mapped ExtrudeGeometry</title>
-		
+
 		<script type="text/javascript" src="../build/three.min.js"></script>
 		<script type="text/javascript" src="js/UVsUtils.js"></script>
 
@@ -26,7 +26,7 @@
 
 	window.launch = function() {
 
-		camera = new THREE.PerspectiveCamera(30, WIDTH / HEIGHT);
+		camera = new THREE.PerspectiveCamera(30, WIDTH / HEIGHT, 1, 10000);
 		camera.position.z = 20;
 
 		scene = new THREE.Scene();
@@ -45,8 +45,10 @@
 
 		// show canvas
 		targetCanvas = renderer.domElement;
-		targetCanvas.width  = WIDTH;
-		targetCanvas.height = HEIGHT;
+
+		/// Don't add it
+		//targetCanvas.width  = WIDTH;
+		//targetCanvas.height = HEIGHT;
 		document.getElementById('canvas-container').appendChild(targetCanvas);
 
 		setupAnimation();
@@ -177,7 +179,7 @@
 		</script>
 	</head>
 	
-	<body onload="void launch()">
+	<body onload="launch()">
 		<div>
 			<form id="repeat-setting">
 				U repeat: &nbsp;

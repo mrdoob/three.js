@@ -64,7 +64,7 @@ THREE.CSS2DRenderer = function () {
 
 		if ( object instanceof THREE.CSS2DObject ) {
 
-			vector.getPositionFromMatrix( object.matrixWorld );
+			vector.setFromMatrixPosition( object.matrixWorld );
 			vector.applyProjection( viewProjectionMatrix );
 
 			var element = object.element;

@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	</head>
 	<body>
+		<link href="css/types.css" rel="stylesheet" />
 		<link id="theme" href="css/light.css" rel="stylesheet" />
 
 		<script src="../build/three.min.js"></script>
@@ -39,18 +40,20 @@
 		<script src="../examples/js/exporters/ObjectExporter.js"></script>
 		<script src="../examples/js/renderers/WebGLRenderer3.js"></script>
 
-		<script src="js/libs/rawdeflate.js"></script>
-		<script src="js/libs/rawinflate.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
 
+		<script src="js/Storage.js"></script>
+
 		<script src="js/Editor.js"></script>
+		<script src="js/Config.js"></script>
 		<script src="js/Loader.js"></script>
 		<script src="js/Menubar.js"></script>
 		<script src="js/Menubar.File.js"></script>
 		<script src="js/Menubar.Edit.js"></script>
 		<script src="js/Menubar.Add.js"></script>
+		<script src="js/Menubar.View.js"></script>
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Sidebar.js"></script>
 		<script src="js/Sidebar.Renderer.js"></script>
@@ -91,6 +94,60 @@
 
 			//
 
+			editor.setTheme( editor.config.getKey( 'theme' ) );
+
+			editor.storage.init( function () {
+
+				editor.storage.get( function ( state ) {
+
+					if ( state !== undefined ) {
+
+						var loader = new THREE.ObjectLoader();
+						var scene = loader.parse( state );
+
+						editor.setScene( scene );
+
+					}
+
+					var selected = editor.config.getKey( 'selected' );
+
+					if ( selected !== undefined ) {
+
+						editor.selectByUuid( selected );
+
+					}
+
+				} );
+
+				//
+
+				var timeout;
+				var exporter = new THREE.ObjectExporter();
+
+				var saveState = function ( scene ) {
+
+					clearTimeout( timeout );
+
+					timeout = setTimeout( function () {
+
+						editor.storage.set( exporter.parse( editor.scene ) );
+
+					}, 1000 );
+
+				};
+
+				var signals = editor.signals;
+
+				signals.objectAdded.add( saveState );
+				signals.objectChanged.add( saveState );
+				signals.objectRemoved.add( saveState );
+				signals.materialChanged.add( saveState );
+				signals.sceneGraphChanged.add( saveState );
+
+			} );
+
+			//
+
 			document.addEventListener( 'dragover', function ( event ) {
 
 				event.preventDefault();
@@ -109,14 +166,15 @@
 
 				switch ( event.keyCode ) {
 
+					case 8: // prevent browser back 
+						event.preventDefault();
+						break;
 					case 46: // delete
-
 						editor.removeObject( editor.selected );
 						editor.deselect();
-
 						break;
 
-					}
+				}
 
 			}, false );
 
@@ -129,21 +187,6 @@
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			onWindowResize();
-
-			var hash = window.location.hash.substr( 1 );
-
-			if ( hash !== '' && hash.substr( 0, 2 ) === 'A/' ) {
-
-				var string = RawDeflate.inflate( window.atob( hash.substr( 2 ) ) );
-				var json = JSON.parse( string );
-				var scene = new THREE.ObjectLoader().parse( json );
-				editor.setScene( scene );
-				
-			} else {
-
-				editor.loader.loadLocalStorage();
-
-			}
 
 		</script>
 	</body>

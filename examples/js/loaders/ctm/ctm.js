@@ -592,7 +592,7 @@ CTM.Stream.prototype.TWO_POW_MINUS23 = Math.pow(2, -23);
 CTM.Stream.prototype.TWO_POW_MINUS126 = Math.pow(2, -126);
 
 CTM.Stream.prototype.readByte = function(){
-  return this.data.charCodeAt(this.offset ++) & 0xff;
+  return this.data[this.offset ++] & 0xff;
 };
 
 CTM.Stream.prototype.readInt32 = function(){
@@ -630,7 +630,7 @@ CTM.Stream.prototype.readString = function(){
 
   this.offset += len;
 
-  return this.data.substr(this.offset - len, len);
+  return String.fromCharCode.apply(null,this.data.subarray(this.offset - len, this.offset));
 };
 
 CTM.Stream.prototype.readArrayInt32 = function(array){

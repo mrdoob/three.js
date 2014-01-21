@@ -27,32 +27,23 @@
 			}
 
 			a {
-
 				color: #2194CE;
-
+				text-decoration: none;
 			}
 
 			#panel	{
-
 				position: fixed;
-
 				width: 260px;
 				height: 100%;
-
 				overflow: auto;
-
 			}
 
 				#panel h1 {
 					margin-top: 20px;
+					margin-bottom: 40px;
 					margin-left: 20px;
 					font-size: 25px;
 					font-weight: normal;
-				}
-
-				#panel h1 a {
-					color: #444;
-					text-decoration: none;
 				}
 
 				#panel h2 {
@@ -97,12 +88,10 @@
 
 		<script src="list.js"></script>
 		<script>
-			var REVISION = '61';
-
 			var panel = document.getElementById( 'panel' );
 			var viewer = document.getElementById( 'viewer' );
 
-			var html = '<h1><a href="http://threejs.org">three.js</a><span style="font-size: 50%; vertical-align: super;"> r' + REVISION + '</span></h1>';
+			var html = '<h1><a href="http://threejs.org">three.js</a> / docs</h1>';
 
 			var DELIMITER = '/';
 			var nameCategoryMap = {};

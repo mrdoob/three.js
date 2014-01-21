@@ -72,7 +72,7 @@
 
 					// 3d shape
 
-					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color, opacity: 0.2, transparent: true } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true,  opacity: 0.3 } ) ] );
+					var mesh = THREE.SceneUtils.createMultiMaterialObject( geometry, [ new THREE.MeshLambertMaterial( { color: color } ), new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true, opacity: 0.3, transparent: true } ) ] );
 
 					mesh.position.set( x, y, z - 75 );
 					// mesh.rotation.set( rx, ry, rz );
@@ -213,6 +213,7 @@
 			//
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0xf0f0f0 );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 
 			container.appendChild( renderer.domElement );

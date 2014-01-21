@@ -48,6 +48,7 @@
 	"src/extras/helpers/BoundingBoxHelper.js",
 	"src/extras/helpers/CameraHelper.js",
 	"src/extras/helpers/DirectionalLightHelper.js",
+	"src/extras/helpers/EdgesHelper.js",
 	"src/extras/helpers/FaceNormalsHelper.js",
 	"src/extras/helpers/GridHelper.js",
 	"src/extras/helpers/HemisphereLightHelper.js",
@@ -63,6 +64,5 @@
 	"src/extras/renderers/plugins/ShadowMapPlugin.js",
 	"src/extras/renderers/plugins/SpritePlugin.js",
 	"src/extras/renderers/plugins/DepthPassPlugin.js",
-	"src/extras/shaders/ShaderFlares.js",
-	"src/extras/shaders/ShaderSprite.js"
+	"src/extras/shaders/ShaderFlares.js"
 ]

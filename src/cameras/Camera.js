@@ -9,9 +9,7 @@ THREE.Camera = function () {
 	THREE.Object3D.call( this );
 
 	this.matrixWorldInverse = new THREE.Matrix4();
-
 	this.projectionMatrix = new THREE.Matrix4();
-	this.projectionMatrixInverse = new THREE.Matrix4();
 
 };
 
@@ -41,7 +39,6 @@ THREE.Camera.prototype.clone = function (camera) {
 
 	camera.matrixWorldInverse.copy( this.matrixWorldInverse );
 	camera.projectionMatrix.copy( this.projectionMatrix );
-	camera.projectionMatrixInverse.copy( this.projectionMatrixInverse );
 
 	return camera;
 };

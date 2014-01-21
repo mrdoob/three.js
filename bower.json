@@ -1,0 +1,27 @@
+{
+	"name": "three.js",
+	"version": "0.0.65",
+	"homepage": "http://threejs.org/",
+	"description": "JavaScript 3D library",
+	"main": "build/three.js",
+	"keywords": [
+		"three",
+		"threejs",
+		"three.js",
+		"3D",
+		"webgl"
+	],
+	"license": "MIT",
+	"ignore": [
+		"**/.*",
+		"*.md",
+		"bower.json",
+		"docs",
+		"editor",
+		"examples",
+		"src",
+		"test",
+		"utils",
+		"LICENSE"
+	]
+}

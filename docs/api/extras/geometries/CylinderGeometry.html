@@ -11,7 +11,16 @@
 		
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A class for generating cylinder geometries</div>
+
+
+		<h2>Example</h2>
+		
+		<code>var geometry = new THREE.CylinderGeometry( 5, 5, 20, 32 );
+		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		var cylinder = new THREE.Mesh( geometry, material );
+		scene.add( cylinder );
+		</code>
 
 
 		<h2>Constructor</h2>

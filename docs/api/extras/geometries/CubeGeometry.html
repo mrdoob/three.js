@@ -12,6 +12,16 @@
 		<h1>[name]</h1>
 
 		<div class="desc">CubeGeometry is the quadrilateral primitive geometry class. It is typically used for creating a cube or irregular quadrilateral of the dimensions provided with the 'width', 'height', and 'depth' constructor arguments.</div>
+		
+		
+		<h2>Example</h2>
+		
+		
+		<code>var geometry = new THREE.CubeGeometry( 1, 1, 1 );
+		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+		var cube = new THREE.Mesh( geometry, material );
+		scene.add( cube );
+		</code>
 
 
 		<h2>Constructor</h2>
@@ -30,7 +40,7 @@
 		<h2>Properties</h2>
 		
 		<div>
-		Each of the contructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
+		Each of the constructor parameters is accessible as a property of the same name. Any modification of these properties after instantiation does not change the geometry.
 		</div>
 		
 		<h2>Source</h2>
