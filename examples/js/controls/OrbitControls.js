@@ -411,6 +411,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		}
 
+		if(delta != 0) scope.update();
+
 	}
 
 	function onKeyDown( event ) {
