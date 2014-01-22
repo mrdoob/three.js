@@ -492,8 +492,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
 
-		var needUpdate = false;
-
 		switch ( event.touches.length ) {
 
 			case 1: // one-fingered touch: rotate
@@ -510,7 +508,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				rotateStart.copy( rotateEnd );
 
-				needUpdate = true;
+				scope.update();
 				break;
 
 			case 2: // two-fingered touch: dolly
@@ -536,7 +534,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				dollyStart.copy( dollyEnd );
 
-				needUpdate = true;
+				scope.update();
 				break;
 
 			case 3: // three-fingered touch: pan
@@ -550,17 +548,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 				panStart.copy( panEnd );
 
-				needUpdate = true;
+				scope.update();
 				break;
 
 			default:
 				state = STATE.NONE;
-
-		}
-
-		if ( needUpdate ) {
-
-			scope.update();
 
 		}
 
