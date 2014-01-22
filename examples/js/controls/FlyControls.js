@@ -20,6 +20,8 @@ THREE.FlyControls = function ( object, domElement ) {
 	// disable default target object behavior
 
 	// internals
+	
+	this.trackedListeners = [];
 
 	this.tmpQuaternion = new THREE.Quaternion();
 
@@ -243,6 +245,19 @@ THREE.FlyControls = function ( object, domElement ) {
 		}
 
 	};
+	
+	this.dispose = function () {
+	
+		for ( var i = 0; i < this.trackedListeners.length; i++ ) {
+			var trackedListener = this.trackedListeners[i];
+			var target = trackedListener.target;
+			var evt = trackedListener.evt;
+			var fn = trackedListener.fn;
+			var useCapture = trackedListener.useCapture;
+			target.removeEventListener( evt, fn, useCapture );
+		}
+	
+	};
 
 	function bind( scope, fn ) {
 
@@ -253,15 +268,25 @@ THREE.FlyControls = function ( object, domElement ) {
 		};
 
 	};
+	
+	function addAndTrackEventListener( scope, target, evt, fn, useCapture ) {
+	
+		// all events added this way are
+		// uninstalled when the 'dispose' method is called
+		
+		scope.trackedListeners.push( { target: target, evt: evt, fn: fn, useCapture: useCapture } );
+		target.addEventListener( evt, fn, useCapture );
+	
+	};
 
-	this.domElement.addEventListener( 'contextmenu', function ( event ) { event.preventDefault(); }, false );
+	addAndTrackEventListener( this, this.domElement, 'contextmenu', function ( event ) { event.preventDefault(); }, false );
 
-	this.domElement.addEventListener( 'mousemove', bind( this, this.mousemove ), false );
-	this.domElement.addEventListener( 'mousedown', bind( this, this.mousedown ), false );
-	this.domElement.addEventListener( 'mouseup',   bind( this, this.mouseup ), false );
+	addAndTrackEventListener( this, this.domElement, 'mousemove', bind( this, this.mousemove ), false );
+	addAndTrackEventListener( this, this.domElement, 'mousedown', bind( this, this.mousedown ), false );
+	addAndTrackEventListener( this, this.domElement, 'mouseup',   bind( this, this.mouseup ), false );
 
-	this.domElement.addEventListener( 'keydown', bind( this, this.keydown ), false );
-	this.domElement.addEventListener( 'keyup',   bind( this, this.keyup ), false );
+	addAndTrackEventListener( this, this.domElement, 'keydown', bind( this, this.keydown ), false );
+	addAndTrackEventListener( this, this.domElement, 'keyup',   bind( this, this.keyup ), false );
 
 	this.updateMovementVector();
 	this.updateRotationVector();
