@@ -242,12 +242,24 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	var saveTimeout;
+
 	signals.cameraChanged.add( function () {
 
-		editor.config.setKey( 'camera', {
-			position: camera.position.toArray(),
-			target: controls.center.toArray()
-		} );
+		if ( saveTimeout !== undefined ) {
+
+			clearTimeout( saveTimeout );
+
+		}
+
+		saveTimeout = setTimeout( function () {
+
+			editor.config.setKey( 'camera', {
+				position: camera.position.toArray(),
+				target: controls.center.toArray()
+			} );
+
+		}, 1000 );
 
 		render();
 
