@@ -18,6 +18,26 @@ Menubar.Add = function ( editor ) {
 	var meshCount = 0;
 	var lightCount = 0;
 
+	// add object
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Object3D' );
+	option.onClick( function () {
+
+		var mesh = new THREE.Object3D();
+		mesh.name = 'Object3D ' + ( ++ meshCount );
+
+		editor.addObject( mesh );
+		editor.select( mesh );
+
+	} );
+	options.add( option );
+
+	// divider
+
+	options.add( new UI.HorizontalRule() );
+
 	// add plane
 
 	var option = new UI.Panel();
@@ -35,8 +55,6 @@ Menubar.Add = function ( editor ) {
 		var material = new THREE.MeshPhongMaterial();
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane ' + ( ++ meshCount );
-
-		mesh.rotation.x = - Math.PI/2;
 
 		editor.addObject( mesh );
 		editor.select( mesh );

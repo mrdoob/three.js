@@ -52,10 +52,8 @@
 
 			var camera, controls, scene, renderer;
 
-			var cross;
-
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -129,13 +127,6 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				render();
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-				controls.update();
 
 			}
 
