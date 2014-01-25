@@ -396,6 +396,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false || scope.noZoom === true ) return;
 
+		event.preventDefault();
+
 		var delta = 0;
 
 		if ( event.wheelDelta !== undefined ) { // WebKit / Opera / Explorer 9
