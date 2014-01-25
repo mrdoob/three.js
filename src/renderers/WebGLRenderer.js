@@ -2382,6 +2382,45 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// used by renderBufferDirect for THREE.Line
+	function setupLinesVertexAttributes( material, programAttributes, geometryAttributes, startIndex ) {
+
+		var attributeItem, attributeName, attributePointer, attributeSize;
+
+		for ( attributeName in programAttributes ) {
+
+			attributePointer = programAttributes[ attributeName ];
+			attributeItem = geometryAttributes[ attributeName ];
+			
+			if ( attributePointer >= 0 ) {
+
+				if ( attributeItem ) {
+
+					attributeSize = attributeItem.itemSize;
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+					enableAttribute( attributePointer );
+					_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+
+				} else if ( material.defaultAttributeValues ) {
+
+					if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+
+						_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+					} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+
+						_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
 	function setDirectBuffers ( geometry, hint, dispose ) {
 
 		var attributes = geometry.attributes;
@@ -2721,54 +2760,65 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			if ( updateBuffers ) {
+			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-				for ( attributeName in programAttributes ) {
+			setLineWidth( material.linewidth );
 
-					attributePointer = programAttributes[ attributeName ];
-					attributeItem = geometryAttributes[ attributeName ];
-					
-					if ( attributePointer >= 0 ) {
+			var index = geometryAttributes[ "index" ];
 
-						if ( attributeItem ) {
+			// indexed lines
+			
+			if ( index ) {
 
-							attributeSize = attributeItem.itemSize;
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-							enableAttribute( attributePointer );
-							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+				var offsets = geometry.offsets;
 
-						} else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+				// if there is more than 1 chunk
+				// must set attribute pointers to use new offsets for each chunk
+				// even if geometry and materials didn't change
 
-							if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+				if ( offsets.length > 1 ) updateBuffers = true;
 
-								_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-							} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+					var startIndex = offsets[ i ].index;
 
-								_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+					if ( updateBuffers ) {
 
-							}
+						setupLinesVertexAttributes(material, programAttributes, geometryAttributes, startIndex);
 
-						}
+						// indices
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
+
+					// render indexed lines
+
+					_gl.drawElements( _gl.LINES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16Array
+
+					_this.info.render.calls ++;
+					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
 
 				}
 
 			}
 
-			// render lines
+			// non-indexed lines
 
-			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			else {
 
-			setLineWidth( material.linewidth );
+				if ( updateBuffers ) {
 
-			var position = geometryAttributes[ "position" ];
+					setupLinesVertexAttributes(material, programAttributes, geometryAttributes, 0);
+				}
 
-			_gl.drawArrays( primitives, 0, position.numItems / 3 );
+				var position = geometryAttributes[ "position" ];
 
-			_this.info.render.calls ++;
-			_this.info.render.points += position.numItems;
+				_gl.drawArrays( primitives, 0, position.numItems / 3 );
+				_this.info.render.calls ++;
+				_this.info.render.points += position.numItems;
+			}
+
+
 
 		}
 
@@ -5822,13 +5872,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Textures
 
-
-	function isPowerOfTwo ( value ) {
-
-		return ( value & ( value - 1 ) ) === 0;
-
-	};
-
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
 
 		if ( isImagePowerOfTwo ) {
@@ -5886,7 +5929,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = texture.image,
-			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
+			isImagePowerOfTwo = THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height ),
 			glFormat = paramThreeToGL( texture.format ),
 			glType = paramThreeToGL( texture.type );
 
@@ -6036,7 +6079,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var image = cubeImage[ 0 ],
-				isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
+				isImagePowerOfTwo = THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height ),
 				glFormat = paramThreeToGL( texture.format ),
 				glType = paramThreeToGL( texture.type );
 
@@ -6149,7 +6192,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// Setup texture, create render and frame buffers
 
-			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget.width ) && isPowerOfTwo( renderTarget.height ),
+			var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height ),
 				glFormat = paramThreeToGL( renderTarget.format ),
 				glType = paramThreeToGL( renderTarget.type );
 
