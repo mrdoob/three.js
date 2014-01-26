@@ -39,7 +39,6 @@ THREE.GeometryExporter.prototype = {
 
 			var face = geometry.faces[ i ];
 
-			var isTriangle = face instanceof THREE.Face3;
 			var hasMaterial = false; // face.materialIndex !== undefined;
 			var hasFaceUv = false; // deprecated
 			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ].length > 0;
@@ -50,7 +49,7 @@ THREE.GeometryExporter.prototype = {
 
 			var faceType = 0;
 
-			faceType = setBit( faceType, 0, ! isTriangle );
+			faceType = setBit( faceType, 0, 0 );
 			faceType = setBit( faceType, 1, hasMaterial );
 			faceType = setBit( faceType, 2, hasFaceUv );
 			faceType = setBit( faceType, 3, hasFaceVertexUv );
@@ -60,16 +59,8 @@ THREE.GeometryExporter.prototype = {
 			faceType = setBit( faceType, 7, hasFaceVertexColor );
 
 			faces.push( faceType );
+			faces.push( face.a, face.b, face.c );
 
-			if ( isTriangle ) {
-
-				faces.push( face.a, face.b, face.c );
-
-			} else {
-
-				faces.push( face.a, face.b, face.c, face.d );
-
-			}
 
 			/*
 			if ( hasMaterial ) {
@@ -83,24 +74,11 @@ THREE.GeometryExporter.prototype = {
 
 				var faceVertexUvs = geometry.faceVertexUvs[ 0 ][ i ];
 
-				if ( isTriangle ) {
-
-					faces.push(
-						getUvIndex( faceVertexUvs[ 0 ] ),
-						getUvIndex( faceVertexUvs[ 1 ] ),
-						getUvIndex( faceVertexUvs[ 2 ] )
-					);
-
-				} else {
-
-					faces.push(
-						getUvIndex( faceVertexUvs[ 0 ] ),
-						getUvIndex( faceVertexUvs[ 1 ] ),
-						getUvIndex( faceVertexUvs[ 2 ] ),
-						getUvIndex( faceVertexUvs[ 3 ] )
-					);
-
-				}
+				faces.push(
+					getUvIndex( faceVertexUvs[ 0 ] ),
+					getUvIndex( faceVertexUvs[ 1 ] ),
+					getUvIndex( faceVertexUvs[ 2 ] )
+				);
 
 			}
 
@@ -114,24 +92,11 @@ THREE.GeometryExporter.prototype = {
 
 				var vertexNormals = face.vertexNormals;
 
-				if ( isTriangle ) {
-
-					faces.push(
-						getNormalIndex( vertexNormals[ 0 ] ),
-						getNormalIndex( vertexNormals[ 1 ] ),
-						getNormalIndex( vertexNormals[ 2 ] )
-					);
-
-				} else {
-
-					faces.push(
-						getNormalIndex( vertexNormals[ 0 ] ),
-						getNormalIndex( vertexNormals[ 1 ] ),
-						getNormalIndex( vertexNormals[ 2 ] ),
-						getNormalIndex( vertexNormals[ 3 ] )
-					);
-
-				}
+				faces.push(
+					getNormalIndex( vertexNormals[ 0 ] ),
+					getNormalIndex( vertexNormals[ 1 ] ),
+					getNormalIndex( vertexNormals[ 2 ] )
+				);
 
 			}
 
@@ -145,24 +110,11 @@ THREE.GeometryExporter.prototype = {
 
 				var vertexColors = face.vertexColors;
 
-				if ( isTriangle ) {
-
-					faces.push(
-						getColorIndex( vertexColors[ 0 ] ),
-						getColorIndex( vertexColors[ 1 ] ),
-						getColorIndex( vertexColors[ 2 ] )
-					);
-
-				} else {
-
-					faces.push(
-						getColorIndex( vertexColors[ 0 ] ),
-						getColorIndex( vertexColors[ 1 ] ),
-						getColorIndex( vertexColors[ 2 ] ),
-						getColorIndex( vertexColors[ 3 ] )
-					);
-
-				}
+				faces.push(
+					getColorIndex( vertexColors[ 0 ] ),
+					getColorIndex( vertexColors[ 1 ] ),
+					getColorIndex( vertexColors[ 2 ] )
+				);
 
 			}
 
