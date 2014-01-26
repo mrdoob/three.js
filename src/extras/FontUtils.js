@@ -424,8 +424,6 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 
 		for ( p = 0; p < n; p++ ) {
 
-			if( (p === u) || (p === v) || (p === w) ) continue;
-
 			px = contour[ verts[ p ] ].x
 			py = contour[ verts[ p ] ].y
 
