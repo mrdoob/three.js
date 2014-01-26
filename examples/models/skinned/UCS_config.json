@@ -1,0 +1,10 @@
+{
+	"baseUrl":		"models/skinned/UCS/",
+	"character":	"umich_ucs.js",
+	"skins": 		["Asian_Male.jpg", "Black_Female.jpg", "Caucasion_Female.jpg", "Caucasion_Male.jpg", "Highlighted_Muscles.jpg", "Indian_Male.jpg"],
+	"morphs": 		["Obesity", "Femininity", "Musculature", "Age", "Skinniness"],
+	"x":	0,
+	"y":	-500,
+	"z":	-300,
+	"s":	30
+}
