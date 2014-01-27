@@ -24,7 +24,7 @@ THREE.WebGLDeferredRenderer = function ( parameters ) {
 
 		this.renderer = new THREE.WebGLRenderer( { antialias: false } );
 		this.renderer.setSize( fullWidth, fullHeight );
-		this.renderer.setClearColorHex( 0x000000, 0 );
+		this.renderer.setClearColor( 0x000000, 0 );
 
 		this.renderer.autoClear = false;
 
