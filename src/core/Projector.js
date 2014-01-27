@@ -156,17 +156,10 @@ THREE.Projector = function () {
 	var RenderState = function () {
 
 		var object = null;
-		var side = null;
 
 		var setObject = function ( value ) {
 
 			object = value;
-
-		};
-
-		var setSide = function ( value ) {
-
-			side = value;
 
 		};
 
@@ -209,16 +202,10 @@ THREE.Projector = function () {
 			if ( v1.visible === true || v2.visible === true || v3.visible === true ||
 				_clipBox.isIntersectionBox( _boundingBox.setFromPoints( _points3 ) ) ) {
 
-				visible = ( ( v3.positionScreen.x - v1.positionScreen.x ) *
+				return ( ( v3.positionScreen.x - v1.positionScreen.x ) *
 					    ( v2.positionScreen.y - v1.positionScreen.y ) -
 					    ( v3.positionScreen.y - v1.positionScreen.y ) *
 					    ( v2.positionScreen.x - v1.positionScreen.x ) ) < 0;
-
-				if ( side === THREE.DoubleSide || visible === ( side === THREE.FrontSide ) ) {
-
-					return true;
-
-				}
 
 			}
 
@@ -228,11 +215,11 @@ THREE.Projector = function () {
 
 		var handleTriangle = function ( a, b, c ) {
 
-			v1 = _vertexPool[ a ];
-			v2 = _vertexPool[ b ];
-			v3 = _vertexPool[ c ];
+			var v1 = _vertexPool[ a ];
+			var v2 = _vertexPool[ b ];
+			var v3 = _vertexPool[ c ];
 
-			if ( checkTriangleVisibility( v1, v2, v3, side ) === true ) {
+			if ( checkTriangleVisibility( v1, v2, v3 ) === true ) {
 
 				_face = getNextFace3InPool();
 
@@ -251,7 +238,6 @@ THREE.Projector = function () {
 
 		return {
 			setObject: setObject,
-			setSide: setSide,
 			projectVertex: projectVertex,
 			checkTriangleVisibility: checkTriangleVisibility,
 			handleVertex: handleVertex,
@@ -264,9 +250,8 @@ THREE.Projector = function () {
 
 	this.projectScene = function ( scene, camera, sortObjects, sortElements ) {
 
-		var visible = false,
-		object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
-		v1, v2, v3, v4, isFaceMaterial, objectMaterials;
+		var object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
+		isFaceMaterial, objectMaterials;
 
 		_face3Count = 0;
 		_lineCount = 0;
@@ -313,8 +298,6 @@ THREE.Projector = function () {
 							renderState.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
 						}
-
-						var side = object.material.side;
 
 						if ( attributes.index !== undefined ) {
 
@@ -368,9 +351,9 @@ THREE.Projector = function () {
 
 						var side = material.side;
 
-						v1 = _vertexPool[ face.a ];
-						v2 = _vertexPool[ face.b ];
-						v3 = _vertexPool[ face.c ];
+						var v1 = _vertexPool[ face.a ];
+						var v2 = _vertexPool[ face.b ];
+						var v3 = _vertexPool[ face.c ];
 
 						if ( material.morphTargets === true ) {
 
@@ -417,9 +400,9 @@ THREE.Projector = function () {
 
 						}
 
-						renderState.setSide( side );
+						var visible = renderState.checkTriangleVisibility( v1, v2, v3 );
 
-						if ( renderState.checkTriangleVisibility( v1, v2, v3, side ) === false ) continue;
+						if ( visible === ( side === THREE.BackSide ) ) continue;
 
 						_face = getNextFace3InPool();
 
