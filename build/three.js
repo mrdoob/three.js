@@ -9866,7 +9866,6 @@ THREE.BufferGeometry.prototype = {
 			var attribute = {
 
 				itemSize: sourceAttr.itemSize,
-				numItems: sourceAttr.numItems,
 				array: null
 
 			};
@@ -20912,12 +20911,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			attribute = geometry.attributes[ a ];
 
-			if ( attribute.numItems === undefined ) {
-
-				attribute.numItems = attribute.array.length;
-
-			}
-
 			attribute.buffer = _gl.createBuffer();
 
 			_gl.bindBuffer( type, attribute.buffer );
@@ -22545,11 +22538,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				// render non-indexed triangles
 
-				_gl.drawArrays( _gl.TRIANGLES, 0, position.numItems / 3 );
+				_gl.drawArrays( _gl.TRIANGLES, 0, position.array.length / 3 );
 
 				_this.info.render.calls ++;
-				_this.info.render.vertices += position.numItems / 3;
-				_this.info.render.faces += position.numItems / 3 / 3;
+				_this.info.render.vertices += position.array.length / 3;
+				_this.info.render.faces += position.array.length / 3 / 3;
 
 			}
 
@@ -22597,10 +22590,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// render particles
 
-			_gl.drawArrays( _gl.POINTS, 0, position.numItems / 3 );
+			_gl.drawArrays( _gl.POINTS, 0, position.array.length / 3 );
 
 			_this.info.render.calls ++;
-			_this.info.render.points += position.numItems / 3;
+			_this.info.render.points += position.array.length / 3;
 
 		} else if ( object instanceof THREE.Line ) {
 
@@ -22657,9 +22650,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				var position = geometryAttributes[ "position" ];
 
-				_gl.drawArrays( primitives, 0, position.numItems / 3 );
+				_gl.drawArrays( primitives, 0, position.array.length / 3 );
 				_this.info.render.calls ++;
-				_this.info.render.points += position.numItems;
+				_this.info.render.points += position.array.length;
 			}
 
 
