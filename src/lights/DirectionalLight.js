@@ -3,9 +3,9 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DirectionalLight = function ( hex, intensity ) {
+THREE.DirectionalLight = function ( color, intensity ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 	this.position.set( 0, 1, 0 );
 	this.target = new THREE.Object3D();
