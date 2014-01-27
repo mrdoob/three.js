@@ -303,17 +303,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		this.setViewport( 0, 0, _canvas.width, _canvas.height );
+		this.setViewport();
 
 	};
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x !== undefined ? x : 0;
-		_viewportY = y !== undefined ? y : 0;
+		_viewportX = x !== undefined ? x * this.devicePixelRatio : 0;
+		_viewportY = y !== undefined ? y * this.devicePixelRatio : 0;
 
-		_viewportWidth = width !== undefined ? width : _canvas.width;
-		_viewportHeight = height !== undefined ? height : _canvas.height;
+		_viewportWidth = width !== undefined ? width * this.devicePixelRatio : _canvas.width;
+		_viewportHeight = height !== undefined ? height * this.devicePixelRatio : _canvas.height;
 
 		_gl.viewport( _viewportX, _viewportY, _viewportWidth, _viewportHeight );
 
@@ -321,7 +321,13 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		_gl.scissor( x, y, width, height );
+		var sX = x !== undefined ? x * this.devicePixelRatio : 0;
+		var sY = y !== undefined ? y * this.devicePixelRatio : 0;
+
+		var sW = width !== undefined ? width * this.devicePixelRatio : _canvas.width;
+		var sH = height !== undefined ? height * this.devicePixelRatio : _canvas.height;
+
+		_gl.scissor( sX, sY, sW, sH );
 
 	};
 
