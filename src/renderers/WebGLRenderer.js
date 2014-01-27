@@ -321,13 +321,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	this.setScissor = function ( x, y, width, height ) {
 
-		var sX = x * this.devicePixelRatio;
-		var sY = y * this.devicePixelRatio;
-
-		var sW = width * this.devicePixelRatio;
-		var sH = height * this.devicePixelRatio;
-
-		_gl.scissor( sX, sY, sW, sH );
+		_gl.scissor(
+			x * this.devicePixelRatio,
+			y * this.devicePixelRatio,
+			width * this.devicePixelRatio,
+			height * this.devicePixelRatio
+		);
 
 	};
 
