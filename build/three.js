@@ -248,11 +248,15 @@ THREE.RGBA_PVRTC_2BPPV1_Format = 2103;
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( value ) {
+THREE.Color = function ( color ) {
 
-	if ( value !== undefined ) this.set( value );
+	if ( arguments.length === 3 ) {
 
-	return this;
+		return this.setRGB( arguments[ 0 ], arguments[ 1 ], arguments[ 2 ] );
+
+	}
+
+	return this.set( color )
 
 };
 
@@ -10047,11 +10051,11 @@ THREE.PerspectiveCamera.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
  
-THREE.Light = function ( hex ) {
+THREE.Light = function ( color ) {
 
 	THREE.Object3D.call( this );
 
-	this.color = new THREE.Color( hex );
+	this.color = new THREE.Color( color );
 
 };
 
@@ -10073,9 +10077,9 @@ THREE.Light.prototype.clone = function ( light ) {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.AmbientLight = function ( hex ) {
+THREE.AmbientLight = function ( color ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 };
 
@@ -10096,9 +10100,9 @@ THREE.AmbientLight.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.AreaLight = function ( hex, intensity ) {
+THREE.AreaLight = function ( color, intensity ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 	this.normal = new THREE.Vector3( 0, -1, 0 );
 	this.right = new THREE.Vector3( 1, 0, 0 );
@@ -10122,9 +10126,9 @@ THREE.AreaLight.prototype = Object.create( THREE.Light.prototype );
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.DirectionalLight = function ( hex, intensity ) {
+THREE.DirectionalLight = function ( color, intensity ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 	this.position.set( 0, 1, 0 );
 	this.target = new THREE.Object3D();
@@ -10200,13 +10204,13 @@ THREE.DirectionalLight.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.HemisphereLight = function ( skyColorHex, groundColorHex, intensity ) {
+THREE.HemisphereLight = function ( skyColor, groundColor, intensity ) {
 
-	THREE.Light.call( this, skyColorHex );
+	THREE.Light.call( this, skyColor );
 
 	this.position.set( 0, 100, 0 );
 
-	this.groundColor = new THREE.Color( groundColorHex );
+	this.groundColor = new THREE.Color( groundColor );
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 
 };
@@ -10230,9 +10234,9 @@ THREE.HemisphereLight.prototype.clone = function () {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointLight = function ( hex, intensity, distance ) {
+THREE.PointLight = function ( color, intensity, distance ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;
@@ -10258,9 +10262,9 @@ THREE.PointLight.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.SpotLight = function ( hex, intensity, distance, angle, exponent ) {
+THREE.SpotLight = function ( color, intensity, distance, angle, exponent ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 	this.position.set( 0, 1, 0 );
 	this.target = new THREE.Object3D();
@@ -15415,11 +15419,11 @@ THREE.Scene.prototype.clone = function ( object ) {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Fog = function ( hex, near, far ) {
+THREE.Fog = function ( color, near, far ) {
 
 	this.name = '';
 
-	this.color = new THREE.Color( hex );
+	this.color = new THREE.Color( color );
 
 	this.near = ( near !== undefined ) ? near : 1;
 	this.far = ( far !== undefined ) ? far : 1000;
@@ -15437,11 +15441,11 @@ THREE.Fog.prototype.clone = function () {
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.FogExp2 = function ( hex, density ) {
+THREE.FogExp2 = function ( color, density ) {
 
 	this.name = '';
 
-	this.color = new THREE.Color( hex );
+	this.color = new THREE.Color( color );
 	this.density = ( density !== undefined ) ? density : 0.00025;
 
 };
@@ -15617,15 +15621,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.set(
-			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
-			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
-		);
+		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf ),
+		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
-		_clearBox.set(
-			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
-			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
-		);
+		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
@@ -15642,10 +15642,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.set( color );
 		_clearAlpha = alpha !== undefined ? alpha : 1;
 
-		_clearBox.set(
-			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
-			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
-		);
+		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 	};
 
