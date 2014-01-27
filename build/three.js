@@ -17858,6 +17858,8 @@ THREE.ShaderChunk = {
 
 			"mat4 boneMatX = getBoneMatrix( skinIndex.x );",
 			"mat4 boneMatY = getBoneMatrix( skinIndex.y );",
+			"mat4 boneMatZ = getBoneMatrix( skinIndex.z );",
+			"mat4 boneMatW = getBoneMatrix( skinIndex.w );",
 
 		"#endif"
 
@@ -17878,7 +17880,9 @@ THREE.ShaderChunk = {
 			"#endif",
 
 			"vec4 skinned  = boneMatX * skinVertex * skinWeight.x;",
-			"skinned 	  += boneMatY * skinVertex * skinWeight.y;",
+			"skinned      += boneMatY * skinVertex * skinWeight.y;",
+			"skinned      += boneMatZ * skinVertex * skinWeight.z;",
+			"skinned      += boneMatW * skinVertex * skinWeight.w;",
 
 		"#endif"
 
