@@ -62,9 +62,7 @@ THREE.BufferGeometryUtils = {
 
 		}
 
-		var i2 = 0, i3 = 0;
-
-		for ( var i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0, i2 = 0, i3 = 0; i < faces.length; i ++, i2 += 6, i3 += 9 ) {
 
 			var face = faces[ i ];
 
@@ -172,9 +170,6 @@ THREE.BufferGeometryUtils = {
 				uvs[ i2 + 5 ] = uvc.y;
 
 			}
-
-			i3 += 9;
-			i2 += 6;
 
 		}
 
