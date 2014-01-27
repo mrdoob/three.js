@@ -79,22 +79,22 @@
 
 		<h3>.[page:Boolean gammaInput]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If set, then it expects that all textures and colors are premultiplied gamma.</div>
 
 
 		<h3>.[page:Boolean gammaOutput]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma.</div>
 
 
 		<h3>.[page:Boolean shadowMapEnabled]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If set, use shadow maps in the scene.</div>
 
 
 		<h3>.[page:Boolean shadowMapAutoUpdate]</h3>
 
-		<div>Default is true. TODO</div>
+		<div>Default is true. If set, autoupdate the shadowmaps every frame.</div>
 
 
 		<h3>.[page:Integer shadowMapType]</h3>
@@ -103,14 +103,14 @@
 		<div>Options are THREE.BasicShadowMap, THREE.PCFShadowMap, THREE.PCFSoftShadowMap. Default is THREE.PCFShadowMap.</div>
 
 
-		<h3>.[page:Boolean shadowMapCullFace]</h3>
+		<h3>.[page:Integer shadowMapCullFace]</h3>
 
-		<div>Default is true. TODO</div>
+		<div>Default is THREE.CullFaceFront. The faces that needed to be culled. Possible values: THREE.CullFaceFront and THREE.CullFaceBack</div>
 
 
-		<h3>.[page:Boolean shadowMapDebug]</h3>
+		<h3>[page:Boolean shadowMapDebug]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If set, then the shadowmaps get a specific color to identify which shadow is from which shadowmap.</div>
 
 
 		<h3>.[page:Boolean shadowMapCascade]</h3>
@@ -120,17 +120,17 @@
 
 		<h3>.[page:Integer maxMorphTargets]</h3>
 
-		<div>Default is 8. TODO</div>
+		<div>Default is 8. The maximum number of MorphTargets allowed in a shader. Keep in mind that the standard materials only allow 8 MorphTargets.</div>
 
 
 		<h3>.[page:Integer maxMorphNormals]</h3>
 
-		<div>Default is 4. TODO</div>
+		<div>Default is 4. The maximum number of MorphNormals allowed in a shader. Keep in mind that the standard materials only allow 4 MorphNormals. </div>
 
 
 		<h3>.[page:Boolean autoScaleCubemaps]</h3>
 
-		<div>Default is true. TODO</div>
+		<div>Default is true. If set, then Cubemaps are scaled, when the are bigger the the maximum size, to make sure that they aren't bigger then the maximum size.</div>
 
 
 		<h3>.[page:Boolean renderPluginsPre]</h3>
@@ -170,17 +170,13 @@
 
 		<h3>.[page:ShadowMapPlugin shadowMapPlugin]</h3>
 		<div>
-		todo
+		This contains the reference to the shadowMapPlugin.
 		</div> 
 
-		<h3>.[page:number shadowMapCullFace]</h3>
-		<div>
-		todo
-		</div> 
 
 		<h3>.[page:number devicePixelRatio]</h3>
 		<div>
-		todo
+		The pixel ration of the devices. 
 		</div> 
 
 		<h2>Methods</h2>
@@ -240,10 +236,10 @@
 		<div>Tells the shadow map plugin to update using the passed scene and camera parameters.</div>
 
 
-		<h3>.renderBufferImmediate( [page:Object3D object], [page:??? program], [page:??? shading] )</h3>
+		<h3>.renderBufferImmediate( [page:Object3D object], [page:shaderprogram program], [page:Material shading] )</h3>
 		<div>object — an instance of [page:Object3D]]<br />
-		program — an instance of ???<br />
-		shading — an instance of ???<br />
+		program — an instance of shaderProgram<br />
+		shading — an instance of Material<br />
 		</div>
 		<div>TODO.</div>
 
