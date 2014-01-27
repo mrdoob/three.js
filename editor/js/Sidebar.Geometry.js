@@ -167,15 +167,15 @@ Sidebar.Geometry = function ( editor ) {
 
 		} else if ( geometry instanceof THREE.BufferGeometry ) {
 
-			geometryVertices.setValue( geometry.attributes.position.numItems / 3 );
+			geometryVertices.setValue( geometry.attributes.position.array.length / 3 );
 
 			if ( geometry.attributes.index !== undefined ) {
 
-				geometryFaces.setValue( geometry.attributes.index.numItems / 3 );
+				geometryFaces.setValue( geometry.attributes.index.array.length / 3 );
 
 			} else {
 
-				geometryFaces.setValue( geometry.attributes.position.numItems / 3 / 3 );
+				geometryFaces.setValue( geometry.attributes.position.array.length / 3 / 3 );
 
 			}
 
