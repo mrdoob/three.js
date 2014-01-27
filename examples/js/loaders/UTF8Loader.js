@@ -98,10 +98,10 @@ THREE.UTF8Loader.BufferGeometryCreator.prototype.create = function ( attribArray
 
 	var attributes = geometry.attributes;
 
-	attributes[ "index" ]    = { itemSize: 1, array: indexArray, numItems: indexArray.length };
-	attributes[ "position" ] = { itemSize: 3, array: positionArray, numItems: positionArray.length };
-	attributes[ "normal" ]   = { itemSize: 3, array: normalArray, numItems: normalArray.length };
-	attributes[ "uv" ] 		 = { itemSize: 2, array: uvArray, numItems: uvArray.length };
+	attributes[ "index" ]    = { itemSize: 1, array: indexArray };
+	attributes[ "position" ] = { itemSize: 3, array: positionArray };
+	attributes[ "normal" ]   = { itemSize: 3, array: normalArray };
+	attributes[ "uv" ] 		 = { itemSize: 2, array: uvArray };
 
 	// create offsets
 	// (all triangles should fit in a single chunk)

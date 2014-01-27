@@ -417,24 +417,24 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		// attributes
 		var attributes = scope.attributes;
 
-		attributes[ "index" ]    = { itemSize: 1, array: vertexIndexArray16, numItems: vertexIndexArray16.length };
-		attributes[ "position" ] = { itemSize: 3, array: vertexPositionArray, numItems: vertexPositionArray.length };
+		attributes[ "index" ]    = { itemSize: 1, array: vertexIndexArray16 };
+		attributes[ "position" ] = { itemSize: 3, array: vertexPositionArray };
 
 		if ( vertexNormalArray !== undefined ) {
 
-			attributes[ "normal" ] = { itemSize: 3, array: vertexNormalArray, numItems: vertexNormalArray.length };
+			attributes[ "normal" ] = { itemSize: 3, array: vertexNormalArray };
 
 		}
 
 		if ( vertexUvArray !== undefined ) {
 
-			attributes[ "uv" ] = { itemSize: 2, array: vertexUvArray, numItems: vertexUvArray.length };
+			attributes[ "uv" ] = { itemSize: 2, array: vertexUvArray };
 
 		}
 
 		if ( vertexColorArray !== undefined ) {
 
-			attributes[ "color" ]  = { itemSize: 4, array: vertexColorArray, numItems: vertexColorArray.length };
+			attributes[ "color" ]  = { itemSize: 4, array: vertexColorArray };
 
 		}
 

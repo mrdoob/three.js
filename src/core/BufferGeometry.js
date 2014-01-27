@@ -581,7 +581,6 @@ THREE.BufferGeometry.prototype = {
 			var attribute = {
 
 				itemSize: sourceAttr.itemSize,
-				numItems: sourceAttr.numItems,
 				array: null
 
 			};
