@@ -6242,7 +6242,11 @@ THREE.Math = {
 
 		};
 
-	}()
+	}(),
+
+	isPowerOfTwo: function ( value ) {
+		return ( value & ( value - 1 ) ) === 0 && value !== 0;
+	}
 
 };
 
@@ -9224,7 +9228,7 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function( name, type, numItems, itemSize ) {
+	addAttribute: function ( name, type, numItems, itemSize ) {
 
 		this.attributes[ name ] = {
 
@@ -22124,6 +22128,45 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
+	// used by renderBufferDirect for THREE.Line
+	function setupLinesVertexAttributes( material, programAttributes, geometryAttributes, startIndex ) {
+
+		var attributeItem, attributeName, attributePointer, attributeSize;
+
+		for ( attributeName in programAttributes ) {
+
+			attributePointer = programAttributes[ attributeName ];
+			attributeItem = geometryAttributes[ attributeName ];
+			
+			if ( attributePointer >= 0 ) {
+
+				if ( attributeItem ) {
+
+					attributeSize = attributeItem.itemSize;
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+					enableAttribute( attributePointer );
+					_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+
+				} else if ( material.defaultAttributeValues ) {
+
+					if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+
+						_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+					} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+
+						_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+					}
+
+				}
+
+			}
+
+		}
+
+	}
+
 	function setDirectBuffers ( geometry, hint, dispose ) {
 
 		var attributes = geometry.attributes;
@@ -22463,54 +22506,65 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		} else if ( object instanceof THREE.Line ) {
 
-			if ( updateBuffers ) {
+			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
 
-				for ( attributeName in programAttributes ) {
+			setLineWidth( material.linewidth );
 
-					attributePointer = programAttributes[ attributeName ];
-					attributeItem = geometryAttributes[ attributeName ];
-					
-					if ( attributePointer >= 0 ) {
+			var index = geometryAttributes[ "index" ];
 
-						if ( attributeItem ) {
+			// indexed lines
+			
+			if ( index ) {
 
-							attributeSize = attributeItem.itemSize;
-							_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-							enableAttribute( attributePointer );
-							_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
+				var offsets = geometry.offsets;
 
-						} else if ( material.defaultAttributeValues && material.defaultAttributeValues[ attributeName ] ) {
+				// if there is more than 1 chunk
+				// must set attribute pointers to use new offsets for each chunk
+				// even if geometry and materials didn't change
 
-							if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+				if ( offsets.length > 1 ) updateBuffers = true;
 
-								_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
 
-							} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+					var startIndex = offsets[ i ].index;
 
-								_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+					if ( updateBuffers ) {
 
-							}
+						setupLinesVertexAttributes(material, programAttributes, geometryAttributes, startIndex);
 
-						}
+						// indices
+						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
+
+					// render indexed lines
+
+					_gl.drawElements( _gl.LINES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16Array
+
+					_this.info.render.calls ++;
+					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
 
 				}
 
 			}
 
-			// render lines
+			// non-indexed lines
 
-			var primitives = ( object.type === THREE.LineStrip ) ? _gl.LINE_STRIP : _gl.LINES;
+			else {
 
-			setLineWidth( material.linewidth );
+				if ( updateBuffers ) {
 
-			var position = geometryAttributes[ "position" ];
+					setupLinesVertexAttributes(material, programAttributes, geometryAttributes, 0);
+				}
 
-			_gl.drawArrays( primitives, 0, position.numItems / 3 );
+				var position = geometryAttributes[ "position" ];
 
-			_this.info.render.calls ++;
-			_this.info.render.points += position.numItems;
+				_gl.drawArrays( primitives, 0, position.numItems / 3 );
+				_this.info.render.calls ++;
+				_this.info.render.points += position.numItems;
+			}
+
+
 
 		}
 
@@ -25564,13 +25618,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Textures
 
-
-	function isPowerOfTwo ( value ) {
-
-		return ( value & ( value - 1 ) ) === 0;
-
-	};
-
 	function setTextureParameters ( textureType, texture, isImagePowerOfTwo ) {
 
 		if ( isImagePowerOfTwo ) {
@@ -25628,7 +25675,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 			var image = texture.image,
-			isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
+			isImagePowerOfTwo = THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height ),
 			glFormat = paramThreeToGL( texture.format ),
 			glType = paramThreeToGL( texture.type );
 
@@ -25778,7 +25825,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				var image = cubeImage[ 0 ],
-				isImagePowerOfTwo = isPowerOfTwo( image.width ) && isPowerOfTwo( image.height ),
+				isImagePowerOfTwo = THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height ),
 				glFormat = paramThreeToGL( texture.format ),
 				glType = paramThreeToGL( texture.type );
 
@@ -25891,7 +25938,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// Setup texture, create render and frame buffers
 
-			var isTargetPowerOfTwo = isPowerOfTwo( renderTarget.width ) && isPowerOfTwo( renderTarget.height ),
+			var isTargetPowerOfTwo = THREE.Math.isPowerOfTwo( renderTarget.width ) && THREE.Math.isPowerOfTwo( renderTarget.height ),
 				glFormat = paramThreeToGL( renderTarget.format ),
 				glType = paramThreeToGL( renderTarget.type );
 
@@ -27993,10 +28040,6 @@ THREE.FontUtils.generateShapes = function( text, parameters ) {
 			px = contour[ verts[ p ] ].x
 			py = contour[ verts[ p ] ].y
 
-			if ( ( (px === ax) && (py === ay) ) ||
-				 ( (px === bx) && (py === by) ) ||
-				 ( (px === cx) && (py === cy) ) )	continue;
-
 			apx = px - ax;  apy = py - ay;
 			bpx = px - bx;  bpy = py - by;
 			cpx = px - cx;  cpy = py - cy;
@@ -29632,7 +29675,7 @@ THREE.Shape.Utils = {
 
 	},
 
-	triangulateShape_OLD: function ( contour, holes ) {
+	triangulateShape: function ( contour, holes ) {
 
 		var shapeWithoutHoles = THREE.Shape.Utils.removeHoles( contour, holes );
 
@@ -29713,374 +29756,6 @@ THREE.Shape.Utils = {
 		}
 
 		return triangles.concat( isolatedPts );
-
-	}, // end triangulate shapes
-
-	/*
-	 *		Modified Triangulation.
-	 *
-	 *		basically rewritten 'removeHoles':
-	 *		- doesn't cut out an area anymore, but slices from shape to hole by adding two edges
-	 *		  - ATTENTION: this requires small change to 'THREE.FontUtils.snip' to account for duplicate coordinates
-	 *		- checks whether such a cut line lies inside the shape doesn't intersect any other edge (shape and holes)
-	 */
-	triangulateShape: function ( contour, holes ) {
-
-		function point_in_segment_2D( inSegPt1, inSegPt2, inOtherPt ) {
-			// inOtherPt needs to be colinear to the inSegment
-			if ( inSegPt1.x != inSegPt2.x ) {
-				if ( inSegPt1.x < inSegPt2.x ) {
-					return	( ( inSegPt1.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt2.x ) );
-				} else {
-					return	( ( inSegPt2.x <= inOtherPt.x ) && ( inOtherPt.x <= inSegPt1.x ) );
-				}
-			} else {
-				if ( inSegPt1.y < inSegPt2.y ) {
-					return	( ( inSegPt1.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt2.y ) );
-				} else {
-					return	( ( inSegPt2.y <= inOtherPt.y ) && ( inOtherPt.y <= inSegPt1.y ) );
-				}
-			}
-		}
-
-		function intersect_segments_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1, inSeg2Pt2, inExcludeAdjacentSegs ) {
-			var EPSILON = 0.0000000001;
-
-			var seg1dx = inSeg1Pt2.x - inSeg1Pt1.x,   seg1dy = inSeg1Pt2.y - inSeg1Pt1.y;
-			var seg2dx = inSeg2Pt2.x - inSeg2Pt1.x,   seg2dy = inSeg2Pt2.y - inSeg2Pt1.y;
-
-			var seg1seg2dx = inSeg1Pt1.x - inSeg2Pt1.x;
-			var seg1seg2dy = inSeg1Pt1.y - inSeg2Pt1.y;
-
-			var limit		= seg1dy * seg2dx - seg1dx * seg2dy;
-			var perpSeg1	= seg1dy * seg1seg2dx - seg1dx * seg1seg2dy;
-
-			if ( Math.abs(limit) > EPSILON ) {			// not parallel
-
-				var perpSeg2;
-				if ( limit > 0 ) {
-					if ( ( perpSeg1 < 0 ) || ( perpSeg1 > limit ) ) 		return [];
-					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
-					if ( ( perpSeg2 < 0 ) || ( perpSeg2 > limit ) ) 		return [];
-				} else {
-					if ( ( perpSeg1 > 0 ) || ( perpSeg1 < limit ) ) 		return [];
-					perpSeg2 = seg2dy * seg1seg2dx - seg2dx * seg1seg2dy;
-					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
-				}
-
-				// intersection at endpoint ?
-				if ( perpSeg2 == 0 ) {
-					if ( ( inExcludeAdjacentSegs ) &&
-						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
-					return  [ inSeg1Pt1 ];
-				}
-				if ( perpSeg2 == limit ) {
-					if ( ( inExcludeAdjacentSegs ) &&
-						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
-					return  [ inSeg1Pt2 ];
-				}
-
-				// return real intersection point
-				var factorSeg1 = perpSeg2 / limit;
-				return	[ { x: inSeg1Pt1.x + factorSeg1 * seg1dx,
-							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
-
-			} else {		// parallel or colinear
-				if ( perpSeg1 != 0 )							 			return [];
-
-				// they are collinear or degenerate
-				var seg1Pt = ( (seg1dx == 0) && (seg1dy == 0) );	// segment1 ist just a point?
-				var seg2Pt = ( (seg2dx == 0) && (seg2dy == 0) );	// segment2 ist just a point?
-				// both segments are points
-				if ( seg1Pt && seg2Pt ) {
-					if ( (inSeg1Pt1.x != inSeg2Pt1.x) ||
-						 (inSeg1Pt1.y != inSeg2Pt1.y) )		return [];   	// they are distinct  points
-					return  [ inSeg1Pt1 ];                 					// they are the same point
-				}
-				// segment#1  is a single point
-				if ( seg1Pt ) {
-					if (! point_in_segment_2D( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
-					return  [ inSeg1Pt1 ];
-				}
-				// segment#2  is a single point
-				if ( seg2Pt ) {
-					if (! point_in_segment_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
-					return  [ inSeg2Pt1 ];
-				}
-
-				// they are collinear segments, which might overlap
-				var seg1min, seg1max, seg1minVal, seg1maxVal;
-				var seg2min, seg2max, seg2minVal, seg2maxVal;
-				if (seg1dx != 0) {		// the segments are NOT on a vertical line
-					if ( inSeg1Pt1.x < inSeg1Pt2.x ) {
-						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.x;
-						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.x;
-					} else {
-						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.x;
-						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.x;
-					}
-					if ( inSeg2Pt1.x < inSeg2Pt2.x ) {
-						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.x;
-						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.x;
-					} else {
-						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.x;
-						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.x;
-					}
-				} else {				// the segments are on a vertical line
-					if ( inSeg1Pt1.y < inSeg1Pt2.y ) {
-						seg1min = inSeg1Pt1; seg1minVal = inSeg1Pt1.y;
-						seg1max = inSeg1Pt2; seg1maxVal = inSeg1Pt2.y;
-					} else {
-						seg1min = inSeg1Pt2; seg1minVal = inSeg1Pt2.y;
-						seg1max = inSeg1Pt1; seg1maxVal = inSeg1Pt1.y;
-					}
-					if ( inSeg2Pt1.y < inSeg2Pt2.y ) {
-						seg2min = inSeg2Pt1; seg2minVal = inSeg2Pt1.y;
-						seg2max = inSeg2Pt2; seg2maxVal = inSeg2Pt2.y;
-					} else {
-						seg2min = inSeg2Pt2; seg2minVal = inSeg2Pt2.y;
-						seg2max = inSeg2Pt1; seg2maxVal = inSeg2Pt1.y;
-					}
-				}
-				if ( seg1minVal <= seg2minVal ) {
-					if ( seg1maxVal <  seg2minVal )	return [];
-					if ( seg1maxVal == seg2minVal )	{
-						if ( inExcludeAdjacentSegs )		return [];
-						return [ seg2min ];
-					}
-					if ( seg1maxVal <= seg2maxVal )	return [ seg2min, seg1max ];
-					return	[ seg2min, seg2max ];
-				} else {
-					if ( seg1minVal >  seg2maxVal )	return [];
-					if ( seg1minVal == seg2maxVal )	{
-						if ( inExcludeAdjacentSegs )		return [];
-						return [ seg1min ];
-					}
-					if ( seg1maxVal <= seg2maxVal )	return [ seg1min, seg1max ];
-					return	[ seg1min, seg2max ];
-				}
-			}
-		}
-
-		function isPointInsideAngle( inVertex, inLegFromPt, inLegToPt, inOtherPt ) {
-			// The order of legs is important
-
-			var EPSILON = 0.0000000001;
-
-			// translation of all points, so that Vertex is at (0,0)
-			var legFromPtX	= inLegFromPt.x - inVertex.x,  legFromPtY	= inLegFromPt.y - inVertex.y;
-			var legToPtX	= inLegToPt.x	- inVertex.x,  legToPtY		= inLegToPt.y	- inVertex.y;
-			var otherPtX	= inOtherPt.x	- inVertex.x,  otherPtY		= inOtherPt.y	- inVertex.y;
-
-			// main angle >0: < 180 deg.; 0: 180 deg.; <0: > 180 deg.
-			var from2toAngle	= legFromPtX * legToPtY - legFromPtY * legToPtX;
-			var from2otherAngle	= legFromPtX * otherPtY - legFromPtY * otherPtX;
-
-			if ( Math.abs(from2toAngle) > EPSILON ) {			// angle != 180 deg.
-
-				var other2toAngle		= otherPtX * legToPtY - otherPtY * legToPtX;
-				// console.log( "from2to: " + from2toAngle + ", from2other: " + from2otherAngle + ", other2to: " + other2toAngle );
-
-				if ( from2toAngle > 0 ) {				// main angle < 180 deg.
-					return	( ( from2otherAngle >= 0 ) && ( other2toAngle >= 0 ) );
-				} else {								// main angle > 180 deg.
-					return	( ( from2otherAngle >= 0 ) || ( other2toAngle >= 0 ) );
-				}
-			} else {										// angle == 180 deg.
-				// console.log( "from2to: 180 deg., from2other: " + from2otherAngle  );
-				return	( from2otherAngle > 0 );
-			}
-		}
-
-
-		function removeHoles( contour, holes ) {
-
-			var shape = contour.concat(); // work on this shape
-			var hole;
-
-			function isCutLineInsideAngles( inShapeIdx, inHoleIdx ) {
-				// Check if hole point lies within angle around shape point
-				var lastShapeIdx = shape.length - 1;
-
-				var prevShapeIdx = inShapeIdx - 1;
-				if ( prevShapeIdx < 0 )			prevShapeIdx = lastShapeIdx;
-
-				var nextShapeIdx = inShapeIdx + 1;
-				if ( nextShapeIdx > lastShapeIdx )	nextShapeIdx = 0;
-
-				var insideAngle = isPointInsideAngle( shape[inShapeIdx], shape[ prevShapeIdx ], shape[ nextShapeIdx ], hole[inHoleIdx] );
-				if (! insideAngle ) {
-					// console.log( "Vertex (Shape): " + inShapeIdx + ", Point: " + hole[inHoleIdx].x + "/" + hole[inHoleIdx].y );
-					return	false;
-				}
-
-				// Check if shape point lies within angle around hole point
-				var lastHoleIdx = hole.length - 1;
-
-				var prevHoleIdx = inHoleIdx - 1;
-				if ( prevHoleIdx < 0 )			prevHoleIdx = lastHoleIdx;
-
-				var nextHoleIdx = inHoleIdx + 1;
-				if ( nextHoleIdx > lastHoleIdx )	nextHoleIdx = 0;
-
-				insideAngle = isPointInsideAngle( hole[inHoleIdx], hole[ prevHoleIdx ], hole[ nextHoleIdx ], shape[inShapeIdx] );
-				if (! insideAngle ) {
-					// console.log( "Vertex (Hole): " + inHoleIdx + ", Point: " + shape[inShapeIdx].x + "/" + shape[inShapeIdx].y );
-					return	false;
-				}
-
-				return	true;
-			}
-
-			function intersectsShapeEdge( inShapePt, inHolePt ) {
-				// checks for intersections with shape edges
-				var sIdx, nextIdx, intersection;
-				for ( sIdx = 0; sIdx < shape.length; sIdx++ ) {
-					nextIdx = sIdx+1; nextIdx %= shape.length;
-					intersection = intersect_segments_2D( inShapePt, inHolePt, shape[sIdx], shape[nextIdx], true );
-					if ( intersection.length > 0 )		return	true;
-				}
-
-				return	false;
-			}
-
-			var indepHoles = [];
-
-			function intersectsHoleEdge( inShapePt, inHolePt ) {
-				// checks for intersections with hole edges
-				var ihIdx, chkHole,
-					hIdx, nextIdx, intersection;
-				for ( ihIdx = 0; ihIdx < indepHoles.length; ihIdx++ ) {
-					chkHole = holes[indepHoles[ihIdx]];
-					for ( hIdx = 0; hIdx < chkHole.length; hIdx++ ) {
-						nextIdx = hIdx+1; nextIdx %= chkHole.length;
-						intersection = intersect_segments_2D( inShapePt, inHolePt, chkHole[hIdx], chkHole[nextIdx], true );
-						if ( intersection.length > 0 )		return	true;
-					}
-				}
-				return	false;
-			}
-
-			var holeIndex, shapeIndex,
-				shapePt, h, h2, holePt,
-				holeIdx, cutKey, failedCuts = [],
-				tmpShape1, tmpShape2,
-				tmpHole1, tmpHole2;
-
-			for (h in holes) { indepHoles.push( h ); }
-
-			var counter = indepHoles.length * 2;
-			while ( indepHoles.length > 0 ) {
-				counter --;
-				if ( counter < 0 ) {
-					console.log( "Infinite Loop! Holes left:" + indepHoles.length + ", Probably Hole outside Shape!" );
-					break;
-				}
-
-				// search for shape-vertex and hole-vertex,
-				// which can be connected without intersections
-				for ( shapeIndex = 0; shapeIndex < shape.length; shapeIndex++ ) {
-
-					shapePt = shape[ shapeIndex ];
-					holeIndex	= -1;
-
-					// search for hole which can be reached without intersections
-					for ( h = 0; h < indepHoles.length; h++ ) {
-						holeIdx = indepHoles[h];
-
-						// prevent multiple checks
-						cutKey = shapePt.x + ":" + shapePt.y + ":" + holeIdx;
-						if ( failedCuts[cutKey] !== undefined )			continue;
-
-						hole = holes[holeIdx];
-						for ( h2 = 0; h2 < hole.length; h2 ++ ) {
-							holePt = hole[ h2 ];
-							if (! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
-							if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
-							if ( intersectsHoleEdge( shapePt, holePt ) )		continue;
-
-							holeIndex = h2;
-							indepHoles.splice(h,1);
-
-							tmpShape1 = shape.slice( 0, shapeIndex+1 );
-							tmpShape2 = shape.slice( shapeIndex );
-							tmpHole1 = hole.slice( holeIndex );
-							tmpHole2 = hole.slice( 0, holeIndex+1 );
-
-							shape = tmpShape1.concat( tmpHole1 ).concat( tmpHole2 ).concat( tmpShape2 );
-
-							// Debug only, to show the selected cuts
-							// glob_CutLines.push( [ shapePt, holePt ] );
-
-							break;
-						}
-						if ( holeIndex >= 0 )	break;		// hole-vertex found
-
-						failedCuts[cutKey] = true;			// remember failure
-					}
-					if ( holeIndex >= 0 )	break;		// hole-vertex found
-				}
-			}
-
-			return shape; 			/* shape with no holes */
-		}
-
-
-		var i, il, f, face,
-			key, index,
-			allPointsMap = {};
-
-		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
-
-		var allpoints = contour.concat();
-		for (var h in holes) { Array.prototype.push.apply( allpoints, holes[h] ); }
-		//console.log( "allpoints",allpoints, allpoints.length );
-
-		// prepare all points map
-
-		for ( i = 0, il = allpoints.length; i < il; i ++ ) {
-
-			key = allpoints[ i ].x + ":" + allpoints[ i ].y;
-
-			if ( allPointsMap[ key ] !== undefined ) {
-
-				console.log( "Duplicate point", key );
-
-			}
-
-			allPointsMap[ key ] = i;
-
-		}
-
-		// remove holes by cutting paths to holes and adding them to the shape
-		var shapeWithoutHoles = removeHoles( contour, holes );
-
-		var triangles = THREE.FontUtils.Triangulate( shapeWithoutHoles, false ); // True returns indices for points of spooled shape
-		//console.log( "triangles",triangles, triangles.length );
-
-		// check all face vertices against all points map
-
-		for ( i = 0, il = triangles.length; i < il; i ++ ) {
-
-			face = triangles[ i ];
-
-			for ( f = 0; f < 3; f ++ ) {
-
-				key = face[ f ].x + ":" + face[ f ].y;
-
-				index = allPointsMap[ key ];
-
-				if ( index !== undefined ) {
-
-					face[ f ] = index;
-
-				}
-
-			}
-
-		}
-
-		return triangles.concat();
 
 	}, // end triangulate shapes
 
