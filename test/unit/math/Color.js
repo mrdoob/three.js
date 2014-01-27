@@ -7,6 +7,13 @@ test( "constructor", function(){
     ok( c.b, "Blue: " + c.b );
 });
 
+test( "rgb constructor", function(){
+    var c = new THREE.Color( 1, 1, 1 );
+    ok( c.r == 1, "Passed" );
+    ok( c.g == 1, "Passed" );
+    ok( c.b == 1, "Passed" );
+});
+
 test( "copyHex", function(){
     var c = new THREE.Color();
     var c2 = new THREE.Color(0xF5FFFA);
