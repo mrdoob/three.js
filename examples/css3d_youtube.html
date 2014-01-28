@@ -269,7 +269,15 @@
 				request.send( null );
 
 			}
-
+			
+			function addToView(data,time) {
+				setTimeout(function(){
+					scene.add(
+						new Element( data )
+					);
+				},time);
+			}
+			
 			function onData( event ) {
 
 				var data = JSON.parse( event.target.responseText );
@@ -279,9 +287,8 @@
 
 				for ( var i = 0; i < entries.length; i ++ ) {
 
-					var object = new Element( entries[ i ] );
-					scene.add( object );
-
+					addToView(entries[ i ], i * 100);
+				
 				}
 
 			}
