@@ -689,13 +689,14 @@ THREE.extend( THREE.Vector3.prototype, {
 
 	reflect: function () {
 
+		// reflect incident vector off plane orthogonal to normal
+		// normal is assumed to have unit length
+
 		var v1 = new THREE.Vector3();
 
-		return function ( vector ) {
+		return function ( normal ) {
 
-		    v1.copy( this ).projectOnVector( vector ).multiplyScalar( 2 );
-
-		    return this.subVectors( v1, this );
+			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
 		}
 
