@@ -5,7 +5,7 @@
  * @author szimek / https://github.com/szimek/
  */
 
-THREE.WebGLRenderer = function ( parameters ) {
+THREE.WebGLRenderer = function ( parameters , useGLContext ) {
 
 	console.log( 'THREE.WebGLRenderer', THREE.REVISION );
 
@@ -20,6 +20,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
 	_stencil = parameters.stencil !== undefined ? parameters.stencil : true,
 	_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
+
+	/* Changed to use another context */
+	_givenGLContext = useGLContext !== undefined ? useGLContext : null;
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0;
@@ -181,7 +184,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionTextureFilterAnisotropic;
 	var _glExtensionCompressedTextureS3TC;
 
-	initGL();
+	initGL(_givenGLContext);
 
 	setDefaultGLState();
 
@@ -6463,7 +6466,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	// Initialization
 
-	function initGL() {
+	function initGL( oldContext ) {
 
 		try {
 
@@ -6475,7 +6478,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				preserveDrawingBuffer: _preserveDrawingBuffer
 			};
 
-			_gl = _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+			if(oldContext === null)
+				_gl = _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+			else
+				_gl = oldContext;
 
 			if ( _gl === null ) {
 
