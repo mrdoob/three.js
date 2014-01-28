@@ -108,7 +108,7 @@
 									"time":0,
 									"pos" :[0,0,0],
 									"rot" :[0,0,0],
-                  "scl" :[1,1,1]
+                  							"scl" :[1,1,1]
 								},
 								{
 									"time":1.0,
@@ -158,8 +158,9 @@
 				render();
 			};
 			
-			var render = function () {		
+			var render = function () {
 				renderer.render( scene, camera );
+				stats.update();
 			};
 
 			try {
