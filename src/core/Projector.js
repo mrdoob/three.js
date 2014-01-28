@@ -213,6 +213,20 @@ THREE.Projector = function () {
 
 		};
 
+		var handleLine = function ( a, b ) {
+
+			_line = getNextLineInPool();
+
+			_line.id = object.id;
+			_line.v1.copy( _vertexPool[ a ] );
+			_line.v2.copy( _vertexPool[ b ] );
+
+			_line.material = object.material;
+
+			_renderData.elements.push( _line );
+
+		};
+
 		var handleTriangle = function ( a, b, c ) {
 
 			var v1 = _vertexPool[ a ];
@@ -241,6 +255,7 @@ THREE.Projector = function () {
 			projectVertex: projectVertex,
 			checkTriangleVisibility: checkTriangleVisibility,
 			handleVertex: handleVertex,
+			handleLine: handleLine,
 			handleTriangle: handleTriangle
 		}
 
@@ -274,6 +289,7 @@ THREE.Projector = function () {
 		for ( var o = 0, ol = _renderData.objects.length; o < ol; o ++ ) {
 
 			object = _renderData.objects[ o ].object;
+			geometry = object.geometry;
 
 			renderState.setObject( object );
 
@@ -282,8 +298,6 @@ THREE.Projector = function () {
 			_vertexCount = 0;
 
 			if ( object instanceof THREE.Mesh ) {
-
-				geometry = object.geometry;
 
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -476,52 +490,92 @@ THREE.Projector = function () {
 
 			} else if ( object instanceof THREE.Line ) {
 
-				_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+				if ( geometry instanceof THREE.BufferGeometry ) {
 
-				vertices = object.geometry.vertices;
+					var attributes = geometry.attributes;
 
-				v1 = getNextVertexInPool();
-				v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
+					if ( attributes.position !== undefined ) {
 
-				// Handle LineStrip and LinePieces
-				var step = object.type === THREE.LinePieces ? 2 : 1;
+						var positions = attributes.position.array;
 
-				for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
+						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
-					v1 = getNextVertexInPool();
-					v1.positionScreen.copy( vertices[ v ] ).applyMatrix4( _modelViewProjectionMatrix );
-
-					if ( ( v + 1 ) % step > 0 ) continue;
-
-					v2 = _vertexPool[ _vertexCount - 2 ];
-
-					_clippedVertex1PositionScreen.copy( v1.positionScreen );
-					_clippedVertex2PositionScreen.copy( v2.positionScreen );
-
-					if ( clipLine( _clippedVertex1PositionScreen, _clippedVertex2PositionScreen ) === true ) {
-
-						// Perform the perspective divide
-						_clippedVertex1PositionScreen.multiplyScalar( 1 / _clippedVertex1PositionScreen.w );
-						_clippedVertex2PositionScreen.multiplyScalar( 1 / _clippedVertex2PositionScreen.w );
-
-						_line = getNextLineInPool();
-
-						_line.id = object.id;
-						_line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
-						_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
-
-						_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
-
-						_line.material = object.material;
-
-						if ( object.material.vertexColors === THREE.VertexColors ) {
-
-							_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
-							_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );
+							renderState.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
 						}
 
-						_renderData.elements.push( _line );
+						if ( attributes.index !== undefined ) {
+
+							var indices = attributes.index.array;
+
+							for ( var i = 0, l = indices.length; i < l; i += 2 ) {
+
+								renderState.handleLine( indices[ i ], indices[ i + 1 ] );
+
+							}
+
+						} else {
+
+							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i ++ ) {
+
+								renderState.handleLine( i, i + 1 );
+
+							}
+
+						}
+
+					}
+
+				} else if ( geometry instanceof THREE.Geometry ) {
+
+					_modelViewProjectionMatrix.multiplyMatrices( _viewProjectionMatrix, _modelMatrix );
+
+					vertices = object.geometry.vertices;
+
+					v1 = getNextVertexInPool();
+					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
+
+					// Handle LineStrip and LinePieces
+					var step = object.type === THREE.LinePieces ? 2 : 1;
+
+					for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
+
+						v1 = getNextVertexInPool();
+						v1.positionScreen.copy( vertices[ v ] ).applyMatrix4( _modelViewProjectionMatrix );
+
+						if ( ( v + 1 ) % step > 0 ) continue;
+
+						v2 = _vertexPool[ _vertexCount - 2 ];
+
+						_clippedVertex1PositionScreen.copy( v1.positionScreen );
+						_clippedVertex2PositionScreen.copy( v2.positionScreen );
+
+						if ( clipLine( _clippedVertex1PositionScreen, _clippedVertex2PositionScreen ) === true ) {
+
+							// Perform the perspective divide
+							_clippedVertex1PositionScreen.multiplyScalar( 1 / _clippedVertex1PositionScreen.w );
+							_clippedVertex2PositionScreen.multiplyScalar( 1 / _clippedVertex2PositionScreen.w );
+
+							_line = getNextLineInPool();
+
+							_line.id = object.id;
+							_line.v1.positionScreen.copy( _clippedVertex1PositionScreen );
+							_line.v2.positionScreen.copy( _clippedVertex2PositionScreen );
+
+							_line.z = Math.max( _clippedVertex1PositionScreen.z, _clippedVertex2PositionScreen.z );
+
+							_line.material = object.material;
+
+							if ( object.material.vertexColors === THREE.VertexColors ) {
+
+								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
+								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );
+
+							}
+
+							_renderData.elements.push( _line );
+
+						}
 
 					}
 
