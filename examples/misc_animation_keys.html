@@ -58,7 +58,7 @@
 				camera.position.z = 100;
 				camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
 				
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.CanvasRenderer( { antialias: false } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.setClearColor( 0x555555, 1);				
 				container.appendChild( renderer.domElement );	
