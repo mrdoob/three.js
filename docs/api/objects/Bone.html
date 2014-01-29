@@ -11,46 +11,43 @@
 
 		<h1>[name]</h1>
 
-		<div class="desc">todo</div>
+		<div class="desc">A bone which is part of a SkinnedMesh.</div>
 
 
 		<h2>Constructor</h2>
 
 
-		<h3>[name]([page:todo belongsToSkin])</h3>
+		<h3>[name]([page:SkinnedMesh belongsToSkin])</h3>
 		<div>
-		belongsToSkin -- todo
+		belongsToSkin -- An instance of [page:SkinnedMesh].
 		</div>
 		<div>
-		todo
+		This creates a new instance of a bone from the skin.
 		</div>
-
 
 		<h2>Properties</h2>
 
-
-
 		<h3>.[page:Matrix4 skinMatrix]</h3>
 		<div>
-		todo
+		The matrix of the bone.
 		</div> 
 
-		<h3>.[page:todo skin]</h3>
+		<h3>.[page:SkinnedMesh skin]</h3>
 		<div>
-		todo
+		The skin that contains this bone. 
 		</div> 
 
 		<h2>Methods</h2>
 
 
 
-		<h3>.update([page:todo parentSkinMatrix], [page:todo forceUpdate]) [page:todo]</h3>
+		<h3>.update([page:Matrix4 parentSkinMatrix], [page:boolean  forceUpdate])</h3>
 		<div>
-		parentSkinMatrix -- todo <br />
-		forceUpdate -- todo
+		parentSkinMatrix -- the matrix of the parent bone.<br />
+		forceUpdate -- force the update of the skinmatrix.
 		</div>
 		<div>
-		todo
+		This updates the matrix of the bone and the matrices of its children.
 		</div>
 
 		<h2>Source</h2>
