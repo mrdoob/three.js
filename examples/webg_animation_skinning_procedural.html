@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>skinning - tree</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				color: #000;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+
+				background-color: #000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				position: absolute;
+				top: 0px; width: 100%;
+				padding: 5px;
+			}
+
+			a {
+
+				color: #f00;
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="container"></div>
+
+		<div id="info">
+		<a href="http://threejs.org" target="_blank">three.js</a> webgl - animation - skeletal - procedural </a><br/>
+		</div>
+
+		<script src="../build/Three.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/SimplexNoise.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+
+
+		<script>
+
+			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+			window.onload = init;
+
+			var container;
+
+			var camera, scene, renderer, controls;
+			var boneScene;
+
+			var windowHalfX = window.innerWidth / 2;
+			var windowHalfY = window.innerHeight / 2;
+
+			var animation = null;
+			var skinnedMesh = null;
+
+			var clock = new THREE.Clock();
+			var noise = new SimplexNoise();
+
+			var gui = new dat.GUI();
+			var stats = new Stats();
+
+			var options = {
+				'Show Bones': false,
+				'Enable Orbit': false,
+				'Trunk Speed':0.25,
+				'Trunk Sway':0.025,
+				'Branch Speed': 0.4,
+				'Branch Sway': 0.04
+			};
+
+			// -----------------------------------------------------------------------
+			function init() {
+
+				container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 10000 );
+
+				controls = new THREE.OrbitControls( camera );
+				controls.enabled = false;
+
+				scene = new THREE.Scene();
+
+				boneScene = new THREE.Scene();
+
+				var light = new THREE.DirectionalLight( 0xffffff, 1.5 );
+				light.position.set( 0, 1, 1 ).normalize();
+				scene.add( light );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+				renderer.setClearColor( '#e5f4ff', 1 );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.sortObjects = false;
+				renderer.autoClear = false;
+
+				container.appendChild( renderer.domElement );
+
+				var loader = new THREE.JSONLoader();
+				loader.load( "models/skinned/tree.js", start );
+
+				gui.add( options, "Enable Orbit" ).onChange( function( value ) {
+
+					controls.enabled = value;
+
+				});
+
+				gui.add( options, "Show Bones" ).listen();
+				gui.add( options, "Trunk Speed", 0, 1.5, 0.01).listen();
+				gui.add( options, "Trunk Sway", 0, 0.25, 0.01).listen();
+				gui.add( options, "Branch Speed", 0, 1.5, 0.01).listen();
+				gui.add( options, "Branch Sway", 0, 0.25, 0.01).listen();
+
+				stats.domElement.style.position = 'absolute';
+				stats.domElement.style.top = '0px';
+				container.appendChild( stats.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			// -----------------------------------------------------------------------
+			function onWindowResize() {
+
+				windowHalfX = window.innerWidth / 2;
+				windowHalfY = window.innerHeight / 2;
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			// -----------------------------------------------------------------------
+			function createScene( geometry, materials ) {
+
+				createFloorGrid();
+
+				var material = new THREE.MeshFaceMaterial( materials );
+				var originalMaterial = materials[ 0 ];
+
+				originalMaterial.skinning = true;
+				originalMaterial.transparent = true;
+				originalMaterial.alphaTest = 0.75;
+
+				// Support either single or multiple animation json formats
+				if ( geometry.animations !== undefined ) {
+
+					for (var i = 0; i < geometry.animations.length; ++i)
+						THREE.AnimationHandler.add( geometry.animations[ i ] );
+
+				} else
+					THREE.AnimationHandler.add( geometry.animation );
+
+				skinnedMesh = new THREE.SkinnedMesh( geometry, material, true );
+				skinnedMesh.position.set( 0, 0, 0 );
+
+				//skinnedMesh.rotation.y = Math.PI / 2;
+
+				for ( var i = 0; i < skinnedMesh.bones.length; ++i ) {
+
+					skinnedMesh.bones[i].noiseParam = Math.random() * 10;
+					skinnedMesh.bones[i].helper = new THREE.AxisHelper( 0.1 );
+
+				}
+
+				// Once all axes are created, parent them correctly
+				for ( var i = 0; i < skinnedMesh.bones.length; ++i ) {
+
+					if ( skinnedMesh.bones[i].parent instanceof THREE.Bone )
+						skinnedMesh.bones[i].parent.helper.add( skinnedMesh.bones[ i ].helper );
+					else
+						boneScene.add( skinnedMesh.bones[ i ].helper );
+
+				}
+
+				scene.add( skinnedMesh );
+
+			}
+
+			// -----------------------------------------------------------------------
+			function createFloorGrid() {
+
+				var planeTesselated = new THREE.PlaneGeometry( 1, 1, 10, 10 );
+				var matWire = new THREE.MeshBasicMaterial( { color: 0x110000, wireframe: true } );
+
+				var floor = new THREE.Mesh( planeTesselated, matWire );
+				floor.rotation.x = - Math.PI / 2;
+				floor.scale.set( 25, 25, 25 );
+				scene.add( floor );
+
+			}
+
+			// -----------------------------------------------------------------------
+			function start(geometry, materials) {
+
+				createScene( geometry, materials );
+
+				var radius = skinnedMesh.geometry.boundingSphere.radius;
+				var cameraDistance = radius * 5;
+
+				controls.center.set( 0.0, radius * 0.75, 0.0 );
+				camera.position.set(0.0, cameraDistance * 0.25 + 1, cameraDistance * 0.5);
+
+				controls.update();
+
+				update();
+			}
+
+			// -----------------------------------------------------------------------
+			function update() {
+
+				requestAnimationFrame( update, renderer.domElement );
+
+				updateProceduralAnimation( clock.getDelta() );
+
+				renderer.clear();
+				renderer.render( scene, camera );
+
+				if ( options[ 'Show Bones' ] ) {
+
+					renderer.clear( false, true, false );
+					renderer.render( boneScene, camera );
+
+				}
+
+				stats.update();
+
+			}
+
+			// -----------------------------------------------------------------------
+			function updateProceduralAnimation(delta) {
+
+				 // trunk sway
+				skinnedMesh.bones[ 0 ].noiseParam += delta * options[ 'Trunk Speed' ];
+				skinnedMesh.bones[ 0 ].rotation.x = noise.noise(0, skinnedMesh.bones[0].noiseParam) * options[ 'Trunk Sway' ];
+				skinnedMesh.bones[ 0 ].rotation.y = noise.noise(skinnedMesh.bones[0].noiseParam, 0) * options[ 'Trunk Sway' ];
+
+				for ( var i = 1; i < skinnedMesh.bones.length; ++i ) {
+
+					skinnedMesh.bones[ i ].noiseParam += delta * options[ 'Branch Speed' ];
+					skinnedMesh.bones[ i ].rotation.x = noise.noise( 0, skinnedMesh.bones[i].noiseParam ) * options[ 'Branch Sway' ];
+					skinnedMesh.bones[ i ].rotation.y = noise.noise( skinnedMesh.bones[i].noiseParam, 0 ) * options[ 'Branch Sway' ];
+
+				}
+
+				for ( var i = 0; i < skinnedMesh.bones.length; ++i ) {
+
+					skinnedMesh.bones[ i ].helper.position = skinnedMesh.bones[ i ].position;
+					skinnedMesh.bones[ i ].helper.quaternion = skinnedMesh.bones[ i ].quaternion;
+					skinnedMesh.bones[ i ].helper.updateMatrix();
+
+				}
+
+			}
+
+		</script>
+
+	</body>
+</html>
+

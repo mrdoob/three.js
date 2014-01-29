@@ -13,8 +13,16 @@ THREE.AnimationHandler = (function() {
 
 	that.update = function( deltaTimeMS ) {
 
-		for( var i = 0; i < playing.length; i ++ )
-			playing[ i ].update( deltaTimeMS );
+		var completedAnims = [];
+
+		for( var i = 0; i < playing.length; i ++ ) {
+
+			if ( !playing[ i ].update( deltaTimeMS ) )
+				completedAnims.push( playing[ i ] );
+		}
+
+		for ( var i = 0; i < completedAnims.length; ++i )
+			completedAnims[ i ].stop( 0 );
 
 	};
 
