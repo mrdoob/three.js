@@ -11867,24 +11867,25 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
-					case 'CircleGeometry':
+					case 'BoxGeometry':
+					case 'CubeGeometry': // DEPRECATED
 
-						geometry = new THREE.CircleGeometry(
-							data.radius,
-							data.segments
-						);
-
-						break;
-
-					case 'CubeGeometry':
-
-						geometry = new THREE.CubeGeometry(
+						geometry = new THREE.BoxGeometry(
 							data.width,
 							data.height,
 							data.depth,
 							data.widthSegments,
 							data.heightSegments,
 							data.depthSegments
+						);
+
+						break;
+
+					case 'CircleGeometry':
+
+						geometry = new THREE.CircleGeometry(
+							data.radius,
+							data.segments
 						);
 
 						break;
@@ -12974,7 +12975,7 @@ THREE.SceneLoader.prototype = {
 
 			if ( geoJSON.type === "cube" ) {
 
-				geometry = new THREE.CubeGeometry( geoJSON.width, geoJSON.height, geoJSON.depth, geoJSON.widthSegments, geoJSON.heightSegments, geoJSON.depthSegments );
+				geometry = new THREE.BoxGeometry( geoJSON.width, geoJSON.height, geoJSON.depth, geoJSON.widthSegments, geoJSON.heightSegments, geoJSON.depthSegments );
 				geometry.name = geoID;
 				result.geometries[ geoID ] = geometry;
 
@@ -31936,66 +31937,11 @@ THREE.CombinedCamera.prototype.toBottomView = function() {
 };
 
 /**
- * @author hughes
- */
-
-THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
-
-	THREE.Geometry.call( this );
-
-	this.radius = radius = radius || 50;
-	this.segments = segments = segments !== undefined ? Math.max( 3, segments ) : 8;
-
-	this.thetaStart = thetaStart = thetaStart !== undefined ? thetaStart : 0;
-	this.thetaLength = thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
-
-	var i, uvs = [],
-	center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
-
-	this.vertices.push(center);
-	uvs.push( centerUV );
-
-	for ( i = 0; i <= segments; i ++ ) {
-
-		var vertex = new THREE.Vector3();
-		var segment = thetaStart + i / segments * thetaLength;
-
-		vertex.x = radius * Math.cos( segment );
-		vertex.y = radius * Math.sin( segment );
-
-		this.vertices.push( vertex );
-		uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, ( vertex.y / radius + 1 ) / 2 ) );
-
-	}
-
-	var n = new THREE.Vector3( 0, 0, 1 );
-
-	for ( i = 1; i <= segments; i ++ ) {
-
-		var v1 = i;
-		var v2 = i + 1 ;
-		var v3 = 0;
-
-		this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
-		this.faceVertexUvs[ 0 ].push( [ uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ] );
-
-	}
-
-	this.computeCentroids();
-	this.computeFaceNormals();
-
-	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
-
-};
-
-THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
-
-/**
  * @author mrdoob / http://mrdoob.com/
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
 	THREE.Geometry.call( this );
 
@@ -32109,7 +32055,66 @@ THREE.CubeGeometry = function ( width, height, depth, widthSegments, heightSegme
 
 };
 
-THREE.CubeGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
+/**
+ * @author hughes
+ */
+
+THREE.CircleGeometry = function ( radius, segments, thetaStart, thetaLength ) {
+
+	THREE.Geometry.call( this );
+
+	this.radius = radius = radius || 50;
+	this.segments = segments = segments !== undefined ? Math.max( 3, segments ) : 8;
+
+	this.thetaStart = thetaStart = thetaStart !== undefined ? thetaStart : 0;
+	this.thetaLength = thetaLength = thetaLength !== undefined ? thetaLength : Math.PI * 2;
+
+	var i, uvs = [],
+	center = new THREE.Vector3(), centerUV = new THREE.Vector2( 0.5, 0.5 );
+
+	this.vertices.push(center);
+	uvs.push( centerUV );
+
+	for ( i = 0; i <= segments; i ++ ) {
+
+		var vertex = new THREE.Vector3();
+		var segment = thetaStart + i / segments * thetaLength;
+
+		vertex.x = radius * Math.cos( segment );
+		vertex.y = radius * Math.sin( segment );
+
+		this.vertices.push( vertex );
+		uvs.push( new THREE.Vector2( ( vertex.x / radius + 1 ) / 2, ( vertex.y / radius + 1 ) / 2 ) );
+
+	}
+
+	var n = new THREE.Vector3( 0, 0, 1 );
+
+	for ( i = 1; i <= segments; i ++ ) {
+
+		var v1 = i;
+		var v2 = i + 1 ;
+		var v3 = 0;
+
+		this.faces.push( new THREE.Face3( v1, v2, v3, [ n.clone(), n.clone(), n.clone() ] ) );
+		this.faceVertexUvs[ 0 ].push( [ uvs[ i ].clone(), uvs[ i + 1 ].clone(), centerUV.clone() ] );
+
+	}
+
+	this.computeCentroids();
+	this.computeFaceNormals();
+
+	this.boundingSphere = new THREE.Sphere( new THREE.Vector3(), radius );
+
+};
+
+THREE.CircleGeometry.prototype = Object.create( THREE.Geometry.prototype );
+
+// DEPRECATED
+
+THREE.CubeGeometry = THREE.BoxGeometry;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -34613,7 +34618,7 @@ THREE.BoundingBoxHelper = function ( object, hex ) {
 
 	this.box = new THREE.Box3();
 
-	THREE.Mesh.call( this, new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: color, wireframe: true } ) );
+	THREE.Mesh.call( this, new THREE.BoxGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: color, wireframe: true } ) );
 
 };
 
