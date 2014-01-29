@@ -339,8 +339,8 @@ Editor.prototype = {
 
 		var types = {
 
+			'BoxGeometry': THREE.BoxGeometry,
 			'CircleGeometry': THREE.CircleGeometry,
-			'CubeGeometry': THREE.CubeGeometry,
 			'CylinderGeometry': THREE.CylinderGeometry,
 			'ExtrudeGeometry': THREE.ExtrudeGeometry,
 			'IcosahedronGeometry': THREE.IcosahedronGeometry,

@@ -59,7 +59,7 @@
 
 				scene = new THREE.Scene();
 
-				geometry = new THREE.CubeGeometry( 200, 200, 200 );
+				geometry = new THREE.BoxGeometry( 200, 200, 200 );
 
 				/*
 				This is how compressed textures are supposed to be used:
@@ -140,13 +140,13 @@
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200 ), material5 );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material5 );
 				mesh.position.x = 200;
 				mesh.position.y = 200;
 				scene.add( mesh );
 				meshes.push( mesh );
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 200, 200, 200 ), material6 );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 200, 200, 200 ), material6 );
 				mesh.position.x = 200;
 				mesh.position.y = -200;
 				scene.add( mesh );

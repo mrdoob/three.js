@@ -558,7 +558,7 @@ THREE.TransformGizmoScale = function () {
 	THREE.TransformGizmo.call( this );
 
 	var arrowGeometry = new THREE.Geometry();
-	var mesh = new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ) );
+	var mesh = new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ) );
 	mesh.position.y = 0.5;
 	THREE.GeometryUtils.merge( arrowGeometry, mesh );
 
@@ -588,7 +588,7 @@ THREE.TransformGizmoScale = function () {
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		XYZ: [
-			new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		]
 
 	}
@@ -624,7 +624,7 @@ THREE.TransformGizmoScale = function () {
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		XYZ: [
-			new THREE.Mesh( new THREE.CubeGeometry( 0.4, 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.BoxGeometry( 0.4, 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		]
 	}
 

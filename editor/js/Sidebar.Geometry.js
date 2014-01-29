@@ -100,14 +100,14 @@ Sidebar.Geometry = function ( editor ) {
 
 			}
 
-			if ( geometry instanceof THREE.CircleGeometry ) {
+			if ( geometry instanceof THREE.BoxGeometry ) {
 
-				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
+				parameters = new Sidebar.Geometry.BoxGeometry( signals, object );
 				container.add( parameters );
 
-			} else if ( geometry instanceof THREE.CubeGeometry ) {
+			} else if ( geometry instanceof THREE.CircleGeometry ) {
 
-				parameters = new Sidebar.Geometry.CubeGeometry( signals, object );
+				parameters = new Sidebar.Geometry.CircleGeometry( signals, object );
 				container.add( parameters );
 
 			} else if ( geometry instanceof THREE.CylinderGeometry ) {

@@ -50,9 +50,9 @@ THREE.ObjectExporter.prototype = {
 					data.widthSegments = geometry.widthSegments;
 					data.heightSegments = geometry.heightSegments;
 
-				} else if ( geometry instanceof THREE.CubeGeometry ) {
+				} else if ( geometry instanceof THREE.BoxGeometry ) {
 
-					data.type = 'CubeGeometry';
+					data.type = 'BoxGeometry';
 					data.width = geometry.width;
 					data.height = geometry.height;
 					data.depth = geometry.depth;

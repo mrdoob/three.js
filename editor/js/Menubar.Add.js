@@ -62,11 +62,11 @@ Menubar.Add = function ( editor ) {
 	} );
 	options.add( option );
 
-	// add cube
+	// add box
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Cube' );
+	option.setTextContent( 'Box' );
 	option.onClick( function () {
 
 		var width = 100;
@@ -77,9 +77,9 @@ Menubar.Add = function ( editor ) {
 		var heightSegments = 1;
 		var depthSegments = 1;
 
-		var geometry = new THREE.CubeGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
+		var geometry = new THREE.BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments );
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
-		mesh.name = 'Cube ' + ( ++ meshCount );
+		mesh.name = 'Box ' + ( ++ meshCount );
 
 		editor.addObject( mesh );
 		editor.select( mesh );
