@@ -19905,6 +19905,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	parameters = parameters || {};
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	_context = parameters.context !== undefined ? parameters.context : null,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
@@ -26410,7 +26411,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				preserveDrawingBuffer: _preserveDrawingBuffer
 			};
 
-			_gl = _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+			_gl = _context || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
 
 			if ( _gl === null ) {
 
@@ -29384,6 +29385,51 @@ THREE.Path.prototype.getPoints = function( divisions, closedPath ) {
 
 THREE.Path.prototype.toShapes = function( isCCW ) {
 
+	function isPointInsidePolygon( inPt, inPolygon ) {
+		var EPSILON = 0.0000000001;
+
+		var polyLen = inPolygon.length;
+
+		// inPt on polygon contour => immediate success    or
+		// toggling of inside/outside at every single! intersection point of an edge
+		//  with the horizontal line through inPt, left of inPt
+		//  not counting lowerY endpoints of edges and whole edges on that line
+		var inside = false;
+		for( var p = polyLen - 1, q = 0; q < polyLen; p = q++ ) {
+			var edgeLowPt  = inPolygon[ p ];
+			var edgeHighPt = inPolygon[ q ];
+
+			var edgeDx = edgeHighPt.x - edgeLowPt.x;
+			var edgeDy = edgeHighPt.y - edgeLowPt.y;
+
+			if ( Math.abs(edgeDy) > EPSILON ) {			// not parallel
+				if ( edgeDy < 0 ) {
+					edgeLowPt  = inPolygon[ q ]; edgeDx = -edgeDx;
+					edgeHighPt = inPolygon[ p ]; edgeDy = -edgeDy;
+				}
+				if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
+
+				if ( inPt.y == edgeLowPt.y ) {
+					if ( inPt.x == edgeLowPt.x )		return	true;		// inPt is on contour ?
+					// continue;				// no intersection or edgeLowPt => doesn't count !!!
+				} else {
+					var perpEdge = edgeDy * (inPt.x - edgeLowPt.x) - edgeDx * (inPt.y - edgeLowPt.y);
+					if ( perpEdge == 0 )				return	true;		// inPt is on contour ?
+					if ( perpEdge < 0 ) 				continue;
+					inside = !inside;		// true intersection left of inPt
+				}
+			} else {		// parallel or colinear
+				if ( inPt.y != edgeLowPt.y ) 		continue;			// parallel
+				// egde lies on the same horizontal line as inPt
+				if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
+					 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
+				// continue;
+			}
+		}
+
+		return	inside;
+	}
+
 	var i, il, item, action, args;
 
 	var subPaths = [], lastPath = new THREE.Path();
@@ -29437,66 +29483,88 @@ THREE.Path.prototype.toShapes = function( isCCW ) {
 	holesFirst = isCCW ? !holesFirst : holesFirst;
 
 	// console.log("Holes first", holesFirst);
+	
+	var betterShapeHoles = [];
+	var newShapes = [];
+	var newShapeHoles = [];
+	var mainIdx = 0;
+	var tmpPoints;
 
-	if ( holesFirst ) {
+	newShapes[mainIdx] = undefined;
+	newShapeHoles[mainIdx] = [];
 
-		tmpShape = new THREE.Shape();
+	for ( i = 0, il = subPaths.length; i < il; i ++ ) {
 
-		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
+		tmpPath = subPaths[ i ];
+		tmpPoints = tmpPath.getPoints();
+		solid = THREE.Shape.Utils.isClockWise( tmpPoints );
+		solid = isCCW ? !solid : solid;
 
-			tmpPath = subPaths[ i ];
-			solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
-			solid = isCCW ? !solid : solid;
+		if ( solid ) {
 
-			if ( solid ) {
+			if ( (! holesFirst ) && ( newShapes[mainIdx] ) )	mainIdx++;
 
-				tmpShape.actions = tmpPath.actions;
-				tmpShape.curves = tmpPath.curves;
+			newShapes[mainIdx] = { s: new THREE.Shape(), p: tmpPoints };
+			newShapes[mainIdx].s.actions = tmpPath.actions;
+			newShapes[mainIdx].s.curves = tmpPath.curves;
+			
+			if ( holesFirst )	mainIdx++;
+			newShapeHoles[mainIdx] = [];
 
-				shapes.push( tmpShape );
-				tmpShape = new THREE.Shape();
+			//console.log('cw', i);
 
-				//console.log('cw', i);
+		} else {
 
-			} else {
+			newShapeHoles[mainIdx].push( { h: tmpPath, p: tmpPoints[0] } );
 
-				tmpShape.holes.push( tmpPath );
-
-				//console.log('ccw', i);
-
-			}
-
-		}
-
-	} else {
-
-		// Shapes first
-		tmpShape = undefined;
-
-		for ( i = 0, il = subPaths.length; i < il; i ++ ) {
-
-			tmpPath = subPaths[ i ];
-			solid = THREE.Shape.Utils.isClockWise( tmpPath.getPoints() );
-			solid = isCCW ? !solid : solid;
-
-			if ( solid ) {
-
-				if ( tmpShape ) shapes.push( tmpShape );
-
-				tmpShape = new THREE.Shape();
-				tmpShape.actions = tmpPath.actions;
-				tmpShape.curves = tmpPath.curves;
-
-			} else {
-
-				tmpShape.holes.push( tmpPath );
-
-			}
+			//console.log('ccw', i);
 
 		}
 
+	}
+
+	if ( newShapes.length > 1 ) {
+		var ambigious = false;
+		var toChange = [];
+
+		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++ ) {
+			betterShapeHoles[sIdx] = [];
+		}
+		for (var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx++ ) {
+			var sh = newShapes[sIdx];
+			var sho = newShapeHoles[sIdx];
+			for (var hIdx = 0; hIdx < sho.length; hIdx++ ) {
+				var ho = sho[hIdx];
+				var hole_unassigned = true;
+				for (var s2Idx = 0; s2Idx < newShapes.length; s2Idx++ ) {
+					if ( isPointInsidePolygon( ho.p, newShapes[s2Idx].p ) ) {
+						if ( sIdx != s2Idx )		toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } );
+						if ( hole_unassigned ) {
+							hole_unassigned = false;
+							betterShapeHoles[s2Idx].push( ho );
+						} else {
+							ambigious = true;
+						}
+					}
+				}
+				if ( hole_unassigned ) { betterShapeHoles[sIdx].push( ho ); }
+			}
+		}
+		// console.log("ambigious: ", ambigious);
+		if ( toChange.length > 0 ) {
+			// console.log("to change: ", toChange);
+			if (! ambigious)	newShapeHoles = betterShapeHoles;
+		}
+	}
+
+	var tmpHoles, j, jl;
+	for ( i = 0, il = newShapes.length; i < il; i ++ ) {
+		tmpShape = newShapes[i].s;
 		shapes.push( tmpShape );
-
+		tmpHoles = newShapeHoles[i];
+		for ( j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
+			tmpShape.holes.push( tmpHoles[j].h );
+		}
 	}
 
 	//console.log("shape", shapes);
@@ -29632,7 +29700,7 @@ THREE.Shape.Utils = {
 
 	triangulateShape: function ( contour, holes ) {
 
-		function point_in_segment_2D( inSegPt1, inSegPt2, inOtherPt ) {
+		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
 			// inOtherPt needs to be colinear to the inSegment
 			if ( inSegPt1.x != inSegPt2.x ) {
 				if ( inSegPt1.x < inSegPt2.x ) {
@@ -29674,7 +29742,8 @@ THREE.Shape.Utils = {
 					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
 				}
 
-				// intersection at endpoint ?
+				// i.e. to reduce rounding errors
+				// intersection at endpoint of segment#1?
 				if ( perpSeg2 == 0 ) {
 					if ( ( inExcludeAdjacentSegs ) &&
 						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
@@ -29685,6 +29754,9 @@ THREE.Shape.Utils = {
 						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
 					return  [ inSeg1Pt2 ];
 				}
+				// intersection at endpoint of segment#2?
+				if ( perpSeg1 == 0 )		return  [ inSeg2Pt1 ];
+				if ( perpSeg1 == limit )	return  [ inSeg2Pt2 ];
 
 				// return real intersection point
 				var factorSeg1 = perpSeg2 / limit;
@@ -29692,7 +29764,8 @@ THREE.Shape.Utils = {
 							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
 
 			} else {		// parallel or colinear
-				if ( perpSeg1 != 0 )							 			return [];
+				if ( ( perpSeg1 != 0 ) ||
+					 ( seg2dy * seg1seg2dx != seg2dx * seg1seg2dy ) ) 			return [];
 
 				// they are collinear or degenerate
 				var seg1Pt = ( (seg1dx == 0) && (seg1dy == 0) );	// segment1 ist just a point?
@@ -29705,12 +29778,12 @@ THREE.Shape.Utils = {
 				}
 				// segment#1  is a single point
 				if ( seg1Pt ) {
-					if (! point_in_segment_2D( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
+					if (! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
 					return  [ inSeg1Pt1 ];
 				}
 				// segment#2  is a single point
 				if ( seg2Pt ) {
-					if (! point_in_segment_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
+					if (! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
 					return  [ inSeg2Pt1 ];
 				}
 
