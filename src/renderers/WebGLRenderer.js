@@ -12,6 +12,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	parameters = parameters || {};
 
 	var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElement( 'canvas' ),
+	_givenGLContext = parameters.givenGLContext !== undefined ? parameters.givenGLContext : null,
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
@@ -6517,7 +6518,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 				preserveDrawingBuffer: _preserveDrawingBuffer
 			};
 
-			_gl = _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
+			_gl = _givenGLContext || _canvas.getContext( 'webgl', attributes ) || _canvas.getContext( 'experimental-webgl', attributes );
 
 			if ( _gl === null ) {
 
