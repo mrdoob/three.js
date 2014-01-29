@@ -98,31 +98,31 @@ THREE.UCSCharacter = function() {
 		var materials = [];
 		
 		for ( var i = 0; i < skins.length; i ++ ) {
-			materials[i] = new THREE.MeshLambertMaterial( {"colorDiffuse"  : [0.5880, 0.5880, 0.5880],
-														  "colorAmbient"  : [0.5880, 0.5880, 0.5880],
-														  "colorSpecular"  : [0.5000, 0.5000, 0.5000],
-														  "color" : 0xeeeeee,
-														  "transparency"  : 1.0,
-														  "specularCoef"  : 10.0,
-														  "wireframe" : false,
-														  "vertexColors" : false,
-														  "map" : skins[i]} );
-			materials[i].skinning = true;
-			materials[i].morphTargets = true;
 
-			materials[i].wrapAround = true;
-			materials[i].perPixel = true;
+			materials[ i ] = new THREE.MeshLambertMaterial( {
+				color: 0xeeeeee,
+				specular: 10.0,
+				map: skins[ i ],
+				skinning: true,
+				morphTargets: true,
+				wrapAround: true
+			} );
+
 		}
 		
 		return materials;
 	}
 
 	this.checkLoadComplete = function () {
+
 		scope.loadCounter -= 1;
+
 		if ( scope.loadCounter === 0 ) {
+
 			scope.onLoadComplete();
+
 		}
+
 	}
 
 }
-
