@@ -700,28 +700,6 @@ THREE.ShaderChunk = {
 
 	lights_phong_pars_vertex: [
 
-		"#ifndef PHONG_PER_PIXEL",
-
-		"#if MAX_POINT_LIGHTS > 0",
-
-			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
-			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-
-			"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0",
-
-			"uniform vec3 spotLightPosition[ MAX_SPOT_LIGHTS ];",
-			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
-
-			"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
-
-		"#endif",
-
-		"#endif",
-
 		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
 			"varying vec3 vWorldPosition;",
@@ -732,44 +710,6 @@ THREE.ShaderChunk = {
 
 
 	lights_phong_vertex: [
-
-		"#ifndef PHONG_PER_PIXEL",
-
-		"#if MAX_POINT_LIGHTS > 0",
-
-			"for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
-
-				"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-				"float lDistance = 1.0;",
-				"if ( pointLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
-
-				"vPointLight[ i ] = vec4( lVector, lDistance );",
-
-			"}",
-
-		"#endif",
-
-		"#if MAX_SPOT_LIGHTS > 0",
-
-			"for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
-
-				"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
-				"vec3 lVector = lPosition.xyz - mvPosition.xyz;",
-
-				"float lDistance = 1.0;",
-				"if ( spotLightDistance[ i ] > 0.0 )",
-					"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
-
-				"vSpotLight[ i ] = vec4( lVector, lDistance );",
-
-			"}",
-
-		"#endif",
-
-		"#endif",
 
 		"#if MAX_SPOT_LIGHTS > 0 || defined( USE_BUMPMAP )",
 
@@ -802,16 +742,8 @@ THREE.ShaderChunk = {
 
 			"uniform vec3 pointLightColor[ MAX_POINT_LIGHTS ];",
 
-			"#ifdef PHONG_PER_PIXEL",
-
-				"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
-				"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
-
-			"#else",
-
-				"varying vec4 vPointLight[ MAX_POINT_LIGHTS ];",
-
-			"#endif",
+			"uniform vec3 pointLightPosition[ MAX_POINT_LIGHTS ];",
+			"uniform float pointLightDistance[ MAX_POINT_LIGHTS ];",
 
 		"#endif",
 
@@ -823,15 +755,7 @@ THREE.ShaderChunk = {
 			"uniform float spotLightAngleCos[ MAX_SPOT_LIGHTS ];",
 			"uniform float spotLightExponent[ MAX_SPOT_LIGHTS ];",
 
-			"#ifdef PHONG_PER_PIXEL",
-
-				"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
-
-			"#else",
-
-				"varying vec4 vSpotLight[ MAX_SPOT_LIGHTS ];",
-
-			"#endif",
+			"uniform float spotLightDistance[ MAX_SPOT_LIGHTS ];",
 
 		"#endif",
 
@@ -880,23 +804,14 @@ THREE.ShaderChunk = {
 
 			"for ( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {",
 
-				"#ifdef PHONG_PER_PIXEL",
+				"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
+				"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
-					"vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );",
-					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+				"float lDistance = 1.0;",
+				"if ( pointLightDistance[ i ] > 0.0 )",
+					"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
 
-					"float lDistance = 1.0;",
-					"if ( pointLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );",
-
-					"lVector = normalize( lVector );",
-
-				"#else",
-
-					"vec3 lVector = normalize( vPointLight[ i ].xyz );",
-					"float lDistance = vPointLight[ i ].w;",
-
-				"#endif",
+				"lVector = normalize( lVector );",
 
 				// diffuse
 
@@ -941,23 +856,14 @@ THREE.ShaderChunk = {
 
 			"for ( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {",
 
-				"#ifdef PHONG_PER_PIXEL",
+				"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
+				"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
 
-					"vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );",
-					"vec3 lVector = lPosition.xyz + vViewPosition.xyz;",
+				"float lDistance = 1.0;",
+				"if ( spotLightDistance[ i ] > 0.0 )",
+					"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
 
-					"float lDistance = 1.0;",
-					"if ( spotLightDistance[ i ] > 0.0 )",
-						"lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );",
-
-					"lVector = normalize( lVector );",
-
-				"#else",
-
-					"vec3 lVector = normalize( vSpotLight[ i ].xyz );",
-					"float lDistance = vSpotLight[ i ].w;",
-
-				"#endif",
+				"lVector = normalize( lVector );",
 
 				"float spotEffect = dot( spotLightDirection[ i ], normalize( spotLightPosition[ i ] - vWorldPosition ) );",
 

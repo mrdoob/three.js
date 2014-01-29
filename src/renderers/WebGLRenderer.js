@@ -4212,7 +4212,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			alphaTest: material.alphaTest,
 			metal: material.metal,
-			perPixel: material.perPixel,
 			wrapAround: material.wrapAround,
 			doubleSided: material.side === THREE.DoubleSide,
 			flipSided: material.side === THREE.BackSide
@@ -5579,7 +5578,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			parameters.morphTargets ? "#define USE_MORPHTARGETS" : "",
 			parameters.morphNormals ? "#define USE_MORPHNORMALS" : "",
-			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
 			parameters.wrapAround ? "#define WRAP_AROUND" : "",
 			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
@@ -5678,7 +5676,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			parameters.vertexColors ? "#define USE_COLOR" : "",
 
 			parameters.metal ? "#define METAL" : "",
-			parameters.perPixel ? "#define PHONG_PER_PIXEL" : "",
 			parameters.wrapAround ? "#define WRAP_AROUND" : "",
 			parameters.doubleSided ? "#define DOUBLE_SIDED" : "",
 			parameters.flipSided ? "#define FLIP_SIDED" : "",
