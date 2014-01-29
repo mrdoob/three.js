@@ -125,7 +125,7 @@ THREE.Shape.Utils = {
 
 	triangulateShape: function ( contour, holes ) {
 
-		function point_in_segment_2D( inSegPt1, inSegPt2, inOtherPt ) {
+		function point_in_segment_2D_colin( inSegPt1, inSegPt2, inOtherPt ) {
 			// inOtherPt needs to be colinear to the inSegment
 			if ( inSegPt1.x != inSegPt2.x ) {
 				if ( inSegPt1.x < inSegPt2.x ) {
@@ -167,7 +167,8 @@ THREE.Shape.Utils = {
 					if ( ( perpSeg2 > 0 ) || ( perpSeg2 < limit ) ) 		return [];
 				}
 
-				// intersection at endpoint ?
+				// i.e. to reduce rounding errors
+				// intersection at endpoint of segment#1?
 				if ( perpSeg2 == 0 ) {
 					if ( ( inExcludeAdjacentSegs ) &&
 						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
@@ -178,6 +179,9 @@ THREE.Shape.Utils = {
 						 ( ( perpSeg1 == 0 ) || ( perpSeg1 == limit ) ) )		return [];
 					return  [ inSeg1Pt2 ];
 				}
+				// intersection at endpoint of segment#2?
+				if ( perpSeg1 == 0 )		return  [ inSeg2Pt1 ];
+				if ( perpSeg1 == limit )	return  [ inSeg2Pt2 ];
 
 				// return real intersection point
 				var factorSeg1 = perpSeg2 / limit;
@@ -185,7 +189,8 @@ THREE.Shape.Utils = {
 							y: inSeg1Pt1.y + factorSeg1 * seg1dy } ];
 
 			} else {		// parallel or colinear
-				if ( perpSeg1 != 0 )							 			return [];
+				if ( ( perpSeg1 != 0 ) ||
+					 ( seg2dy * seg1seg2dx != seg2dx * seg1seg2dy ) ) 			return [];
 
 				// they are collinear or degenerate
 				var seg1Pt = ( (seg1dx == 0) && (seg1dy == 0) );	// segment1 ist just a point?
@@ -198,12 +203,12 @@ THREE.Shape.Utils = {
 				}
 				// segment#1  is a single point
 				if ( seg1Pt ) {
-					if (! point_in_segment_2D( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
+					if (! point_in_segment_2D_colin( inSeg2Pt1, inSeg2Pt2, inSeg1Pt1 ) )		return [];		// but not in segment#2
 					return  [ inSeg1Pt1 ];
 				}
 				// segment#2  is a single point
 				if ( seg2Pt ) {
-					if (! point_in_segment_2D( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
+					if (! point_in_segment_2D_colin( inSeg1Pt1, inSeg1Pt2, inSeg2Pt1 ) )		return [];		// but not in segment#1
 					return  [ inSeg2Pt1 ];
 				}
 
