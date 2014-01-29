@@ -25593,11 +25593,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.attachShader( program, glVertexShader );
 		_gl.attachShader( program, glFragmentShader );
 
-		//Force a particular attribute to index 0.
+		// Force a particular attribute to index 0.
 		// because potentially expensive emulation is done by browser if attribute 0 is disabled.
-		//And, color, for example is often automatically bound to index 0 so disabling it
-		if ( index0AttributeName ) {
+		// And, color, for example is often automatically bound to index 0 so disabling it
+		if ( index0AttributeName !== undefined ) {
+
 			_gl.bindAttribLocation( program, 0, index0AttributeName );
+
+		} else {
+
+			_gl.bindAttribLocation( program, 0, 'position' );			
+
 		}
 
 		_gl.linkProgram( program );
