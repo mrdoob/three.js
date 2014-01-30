@@ -263,94 +263,121 @@
 
 
 		<h3>.initWebGLObjects( [page:Scene scene] )</h3>
-		<div>TODO.</div>
+		<div>
+		[page:Scene scene] -- The scene to initialize.
+		</div>
+		<div>
+		This method initializes the scene. This means adding and removing all objects from the scene and updating them to make sure we have the correct webgl buffers. 
+		</div>
 
 
-		<h3>.initMaterial( material, lights, fog, object )</h3>
-		<div>TODO.</div>
-
+		<h3>.initMaterial( [page:Material material], [page:Array lights], [page:Fog fog], [page:Object3D object])</h3>
+		<div>
+		[page:Material material] -- The material to initialize.<br />
+		[page:Array lights] -- An array of lights that influence the material.<br />
+		[page:Fog fog] -- The fog of the scene.<br />
+		[page:Object3D object] -- The object of the material that needs init.
+		</div>
+		<div>
+		This method initializes the material as a webgl program to be used.
+		</div>
 
 		<h3>.setFaceCulling( cullFace, frontFace )</h3>
 		<div>
-		[page:String cullFace] — "back", "front", "front_and_back", or false.<br />
-		[page:String frontFace] — "ccw" or "cw<br />
+		[page:String cullFace] —- "back", "front", "front_and_back", or false.<br />
+		[page:String frontFace] —- "ccw" or "cw<br />
 		</div>
 		<div>Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.</div>
 		<div>If cullFace is false, culling will be disabled.</div>
 
 
-		<h3>.setDepthTest( depthTest )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setDepthWrite( depthWrite )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setBlending( blending, blendEquation, blendSrc, blendDst )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setTexture( texture, slot )</h3>
-		<div>TODO.</div>
-
-
-		<h3>.setRenderTarget( renderTarget )</h3>
-		<div>TODO.</div>
-
-
-
-		<h3>.supportsCompressedTextureS3TC() [page:todo]</h3>
+		<h3>.setDepthTest( [page:boolean depthTest] )</h3>
 		<div>
-		todo
-		</div>
-
-		<h3>.getMaxAnisotropy() [page:todo]</h3>
-		<div>
-		todo
-		</div>
-
-		<h3>.getPrecision() [page:todo]</h3>
-		<div>
-		todo
-		</div>
-
-		<h3>.setMaterialFaces([page:todo material]) [page:todo]</h3>
-		<div>
-		material -- todo
+		depthTest -- The boolean to decide if depth of a fragment needs to be tested against the depth buffer . <br />
 		</div>
 		<div>
-		todo
+		This sets, based on depthTest, whether or not the depth data needs to be tested against the depth buffer.
 		</div>
 
-		<h3>.supportsStandardDerivatives() [page:todo]</h3>
+		<h3>.setDepthWrite( [page:boolean depthWrite] )</h3>
 		<div>
-		todo
+		depthWrite -- The boolean to decide if depth of a fragment needs to be kept. <br />
+		</div>
+		<div>
+		This sets, based on depthWrite, whether or not the depth data needs to be written in the depth buffer.
 		</div>
 
-		<h3>.supportsFloatTextures() [page:todo]</h3>
+
+		<h3>.setBlending( [page:number blending], [page:number blendEquation], [page:number blendSrc], [page:number blendDst] )</h3>
 		<div>
-		todo
+		blending -- A number indicating the blending mode. Possible value are THREE.NoBlending, THREE.NormalBlending, THREE.AdditiveBlending, THREE.SubtractiveBlending, THREE.MultiplyBlending or THREE.CustomBlending <br />
+		blendEquation -- When blending is THREE.CustomBlending, then you can set the blendEquation. Possible values are THREE.AddEquation, THREE.SubtractEquation or THREE.ReverseSubtractEquation.<br />
+		blendSrc -- When blending is THREE.CustomBlending, then you can set the blendSrc. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor<br />
+		blendDst -- When blending is THREE.CustomBlending, then you can set the blendDst. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor
+		</div>
+		<div>
+		This method sets the correct blending.
+		</div>
+		
+		<h3>.setTexture( [page:Texture texture], [page:number slot] )</h3>
+		<div>
+		texture -- The [page:Texture texture] that needs to be set.<br />
+		slot -- The number indicating which slot should be used by the texture.
+		</div>
+		<div>
+		This method sets the correct texture to the correct slot for the wegl shader. The slot number can be found as a value of the uniform of the sampler.
+		</div>
+		
+		<h3>.setRenderTarget( [page:WebGLRenderTarget renderTarget] )</h3>
+		<div>
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated.<br />
+		</div>
+		<div>
+		This method sets the active rendertarget.
 		</div>
 
-		<h3>.clearTarget([page:todo renderTarget], [page:todo color], [page:todo depth], [page:todo stencil]) [page:todo]</h3>
+		<h3>.supportsCompressedTextureS3TC() [page:boolean]</h3>
 		<div>
-		renderTarget -- todo <br />
-		color -- todo <br />
-		depth -- todo <br />
-		stencil -- todo
-		</div>
-		<div>
-		todo
+		This method returns true if the webgl implementation supports compressed textures of the format S3TC.
 		</div>
 
-		<h3>.setClearColorHex([page:todo hex], [page:todo alpha]) [page:todo]</h3>
+		<h3>.getMaxAnisotropy() [page:number]</h3>
 		<div>
-		hex -- todo <br />
-		alpha -- todo
+		This returns the anisotropy level of the textures.
+		</div>
+
+		<h3>.getPrecision() [page:string]</h3>
+		<div>
+		This gets the precision used by the shaders. It returns "highp","mediump" or "lowp".
+		</div>
+
+		<h3>.setMaterialFaces([page:Material material])</h3>
+		<div>
+		material -- The [page:Material material] with side that shouldn't be culled.  
 		</div>
 		<div>
-		todo
+		This sets which side needs to be culled in the webgl renderer.
+		</div>
+
+		<h3>.supportsStandardDerivatives() [page:boolean]</h3>
+		<div>
+		This method returns true if the webgl implementation supports standard derivatives.
+		</div>
+
+		<h3>.supportsFloatTextures() [page:boolean]</h3>
+		<div>
+		This method returns true if the webgl implementation supports float textures.
+		</div>
+
+		<h3>.clearTarget([page:WebGLRenderTarget renderTarget], [page:boolean color], [page:boolean depth], [page:boolean stencil]) </h3>
+		<div>
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be cleared.<br />
+		color -- If set, then the color gets cleared. <br />
+		depth -- If set, then the depth gets cleared. <br />
+		stencil -- If set, then the stencil gets cleared.
+		</div>
+		<div>
+		This method clears a rendertarget. To do this, it activates the rendertarget.
 		</div>
 
 		<h2>Source</h2>
