@@ -266,14 +266,21 @@
 		<div>TODO.</div>
 
 
-		<h3>.initMaterial( material, lights, fog, object )</h3>
-		<div>TODO.</div>
-
+		<h3>.initMaterial( [page:Material material], [page:Array lights], [page:Fog fog], [page:Object3D object])</h3>
+		<div>
+		[page:Material material] -- The material to initialize.<br />
+		[page:Array lights] -- An array of lights that influence the material.<br />
+		[page:Fog fog] -- The fog of the scene.<br />
+		[page:Object3D object] -- The object of the material that needs init.
+		</div>
+		<div>
+		Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.
+		</div>
 
 		<h3>.setFaceCulling( cullFace, frontFace )</h3>
 		<div>
-		[page:String cullFace] — "back", "front", "front_and_back", or false.<br />
-		[page:String frontFace] — "ccw" or "cw<br />
+		[page:String cullFace] —- "back", "front", "front_and_back", or false.<br />
+		[page:String frontFace] —- "ccw" or "cw<br />
 		</div>
 		<div>Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.</div>
 		<div>If cullFace is false, culling will be disabled.</div>
