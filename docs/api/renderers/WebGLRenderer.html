@@ -287,15 +287,15 @@
 		<div>TODO.</div>
 
 
-		<h3>.setBlending( blending, blendEquation, blendSrc, blendDst )</h3>
+		<h3>.setBlending( [page:number blending], [page:number blendEquation], [page:number blendSrc], [page:number blendDst] )</h3>
 		<div>
-		blending -- The [page:Texture texture] that needs to be set.<br />
-		blendEquation -- The number indicating which slot should be used by the texture.<br />
-		blendSrc -- The number indicating which slot should be used by the texture.<br />
-		blendDst -- The number indicating which slot should be used by the texture.
+		blending -- A number indicating the blending mode. Possible value are THREE.NoBlending, THREE.NormalBlending, THREE.AdditiveBlending, THREE.SubtractiveBlending, THREE.MultiplyBlending or THREE.CustomBlending <br />
+		blendEquation -- When blending is THREE.CustomBlending, then you can set the blendEquation. Possible values are THREE.AddEquation, THREE.SubtractEquation or THREE.ReverseSubtractEquation.<br />
+		blendSrc -- When blending is THREE.CustomBlending, then you can set the blendSrc. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor<br />
+		blendDst -- When blending is THREE.CustomBlending, then you can set the blendDst. Possible values are THREE.ZeroFactor, THREE.OneFactor,THREE.SrcColorFactor, THREE.OneMinusSrcColorFactor, THREE.SrcAlphaFactor, THREE.OneMinusSrcAlphaFactor, THREE.DstAlphaFactor, THREE.OneMinusDstAlphaFactor, THREE.DstColorFactor,THREE.OneMinusDstColorFactor or THREE.SrcAlphaSaturateFactor
 		</div>
 		<div>
-		This method sets the correct texture to the correct slot for the wegl shader. The slot number can be found as a value of the uniform of the sampler.
+		This method sets the correct blending.
 		</div>
 		
 		<h3>.setTexture( [page:Texture texture], [page:number slot] )</h3>
