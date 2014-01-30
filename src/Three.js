@@ -16,12 +16,6 @@ self.console = self.console || {
 
 };
 
-String.prototype.trim = String.prototype.trim || function () {
-
-	return this.replace( /^\s+|\s+$/g, '' );
-
-};
-
 // based on https://github.com/documentcloud/underscore/blob/bf657be243a075b5e72acc8a83e6f12a564d8f55/underscore.js#L767
 THREE.extend = function ( obj, source ) {
 
