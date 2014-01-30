@@ -71,7 +71,7 @@ THREE.STLLoader.prototype.load = function (url, callback) {
 
 	}, false );
 
-	xhr.overrideMimeType('text/plain; charset=x-user-defined');
+	if (xhr.overrideMimeType) { xhr.overrideMimeType('text/plain; charset=x-user-defined'); }
 	xhr.open( 'GET', url, true );
 	xhr.responseType = "arraybuffer";
 	xhr.send( null );
