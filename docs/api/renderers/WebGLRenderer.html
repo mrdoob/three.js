@@ -263,7 +263,12 @@
 
 
 		<h3>.initWebGLObjects( [page:Scene scene] )</h3>
-		<div>TODO.</div>
+		<div>
+		[page:Scene scene] -- The scene to initialize.
+		</div>
+		<div>
+		This method initializes the scene. This means adding and removing all objects from the scene and updating them to make sure we have the correct webgl buffers. 
+		</div>
 
 
 		<h3>.initMaterial( [page:Material material], [page:Array lights], [page:Fog fog], [page:Object3D object])</h3>
@@ -274,7 +279,7 @@
 		[page:Object3D object] -- The object of the material that needs init.
 		</div>
 		<div>
-		Used for setting the gl frontFace, cullFace states in the GPU, thus enabling/disabling face culling when rendering.
+		This method initializes the material as a webgl program to be used.
 		</div>
 
 		<h3>.setFaceCulling( cullFace, frontFace )</h3>
