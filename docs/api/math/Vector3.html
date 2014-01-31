@@ -330,12 +330,12 @@
 		Sets this vector's x, y, and z equal to the column of the matrix specified by the index.
 		</div>
 
-		<h3>.reflect([page:Vector3 vector]) [page:Vector3 this]</h3>
+		<h3>.reflect([page:Vector3 normal]) [page:Vector3 this]</h3>
 		<div>
-		vector -- [page:Vector3] the vector to reflect about
+		normal -- [page:Vector3] the normal to the reflecting plane
 		</div>
 		<div>
-		Reflects this vector about a vector.
+		Reflect incident vector off of plane orthogonal to normal. normal is assumed to have unit length.
 		</div>
 
 		<h3>.fromArray([page:Array array]) [page:Vector3 this]</h3>
