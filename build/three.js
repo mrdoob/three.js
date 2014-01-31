@@ -6215,7 +6215,7 @@ THREE.Math = {
 
 	sign: function ( x ) {
 
-		return ( x < 0 ) ? -1 : ( ( x > 0 ) ? 1 : 0 );
+		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
 
 	},
 
@@ -32368,7 +32368,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 
 	function getBevelVec( inPt, inPrev, inNext ) {
+
 		var EPSILON = 0.0000000001;
+		var sign = THREE.Math.sign;
 		
 		// computes for inPt the corresponding point inPt' on a new contour
 		//   shiftet by 1 unit (length of normalized vector) to the left
@@ -32427,8 +32429,8 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			
 		} else {		// handle special case of colinear edges
 
-			if ( ( ( v_prev_x != 0 ) && ( Math.sign(v_prev_x) != Math.sign(v_next_x) ) ) ||
-				 ( ( v_prev_x == 0 ) && ( Math.sign(v_prev_y) != Math.sign(v_next_y) ) ) ) {
+			if ( ( ( v_prev_x != 0 ) && ( sign(v_prev_x) != sign(v_next_x) ) ) ||
+				 ( ( v_prev_x == 0 ) && ( sign(v_prev_y) != sign(v_next_y) ) ) ) {
 				// console.log("Warning: lines are a straight spike");
 				v_trans_x = v_prev_x;
 				v_trans_y = v_prev_y;
