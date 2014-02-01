@@ -163,15 +163,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.set(
-			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
-			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
-		);
+		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf ),
+		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
-		_clearBox.set(
-			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
-			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
-		);
+		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
@@ -188,10 +184,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_clearColor.set( color );
 		_clearAlpha = alpha !== undefined ? alpha : 1;
 
-		_clearBox.set(
-			new THREE.Vector2( - _canvasWidthHalf, - _canvasHeightHalf ),
-			new THREE.Vector2( _canvasWidthHalf, _canvasHeightHalf )
-		);
+		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
+		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
 
 	};
 

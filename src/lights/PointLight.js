@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.PointLight = function ( hex, intensity, distance ) {
+THREE.PointLight = function ( color, intensity, distance ) {
 
-	THREE.Light.call( this, hex );
+	THREE.Light.call( this, color );
 
 	this.intensity = ( intensity !== undefined ) ? intensity : 1;
 	this.distance = ( distance !== undefined ) ? distance : 0;

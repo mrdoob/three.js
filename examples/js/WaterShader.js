@@ -107,9 +107,6 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	THREE.Object3D.call( this );
 	this.name = 'water_' + this.id;
 
-	function isPowerOfTwo ( value ) {
-		return ( value & ( value - 1 ) ) === 0;
-	};
 	function optionalParameter ( value, defaultValue ) {
 		return value !== undefined ? value : defaultValue;
 	};
@@ -177,7 +174,7 @@ THREE.Water = function ( renderer, camera, scene, options ) {
 	
 	this.material.uniforms.eye.value = this.eye;
 	
-	if ( !isPowerOfTwo(width) || !isPowerOfTwo(height) ) 
+	if ( !THREE.Math.isPowerOfTwo(width) || !THREE.Math.isPowerOfTwo(height) )
 	{
 		this.texture.generateMipmaps = false;
 		this.tempTexture.generateMipmaps = false;
@@ -206,8 +203,8 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.normal.applyMatrix4( this.rotationMatrix );
 
 	var view = this.mirrorWorldPosition.clone().sub( this.cameraWorldPosition );
-	var reflectView = view.reflect( this.normal );
-	reflectView.add( this.mirrorWorldPosition );
+	view.reflect( this.normal ).negate();
+	view.add( this.mirrorWorldPosition );
 
 	this.rotationMatrix.extractRotation( this.camera.matrixWorld );
 
@@ -216,16 +213,16 @@ THREE.Water.prototype.updateTextureMatrix = function () {
 	this.lookAtPosition.add( this.cameraWorldPosition );
 
 	var target = this.mirrorWorldPosition.clone().sub( this.lookAtPosition );
-	var reflectTarget = target.reflect( this.normal );
-	reflectTarget.add( this.mirrorWorldPosition );
+	target.reflect( this.normal ).negate();
+	target.add( this.mirrorWorldPosition );
 
 	this.up.set(0, -1, 0);
 	this.up.applyMatrix4( this.rotationMatrix );
-	var reflectUp = this.up.reflect( this.normal );
+	this.up.reflect( this.normal ).negate();
 
-	this.mirrorCamera.position.copy(reflectView);
-	this.mirrorCamera.up = reflectUp;
-	this.mirrorCamera.lookAt(reflectTarget);
+	this.mirrorCamera.position.copy( view );
+	this.mirrorCamera.up = this.up;
+	this.mirrorCamera.lookAt( target );
 	this.mirrorCamera.aspect = this.camera.aspect;
 
 	this.mirrorCamera.updateProjectionMatrix();

@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '65' };
+var THREE = { REVISION: '66dev' };
 
 self.console = self.console || {
 
@@ -13,12 +13,6 @@ self.console = self.console || {
 	debug: function () {},
 	warn: function () {},
 	error: function () {}
-
-};
-
-String.prototype.trim = String.prototype.trim || function () {
-
-	return this.replace( /^\s+|\s+$/g, '' );
 
 };
 

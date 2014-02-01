@@ -830,7 +830,7 @@ THREE.SceneLoader.prototype = {
 
 			if ( geoJSON.type === "cube" ) {
 
-				geometry = new THREE.CubeGeometry( geoJSON.width, geoJSON.height, geoJSON.depth, geoJSON.widthSegments, geoJSON.heightSegments, geoJSON.depthSegments );
+				geometry = new THREE.BoxGeometry( geoJSON.width, geoJSON.height, geoJSON.depth, geoJSON.widthSegments, geoJSON.heightSegments, geoJSON.depthSegments );
 				geometry.name = geoID;
 				result.geometries[ geoID ] = geometry;
 

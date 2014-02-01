@@ -175,6 +175,7 @@ var list = {
 			[ "ParametricGeometry", "api/extras/geometries/ParametricGeometry" ],
 			[ "PlaneGeometry", "api/extras/geometries/PlaneGeometry" ],
 			[ "PolyhedronGeometry", "api/extras/geometries/PolyhedronGeometry" ],
+			[ "RingGeometry", "api/extras/geometries/RingGeometry" ],
 			[ "ShapeGeometry", "api/extras/geometries/ShapeGeometry" ],
 			[ "SphereGeometry", "api/extras/geometries/SphereGeometry" ],
 			[ "TetrahedronGeometry", "api/extras/geometries/TetrahedronGeometry" ],

@@ -38,7 +38,7 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function( name, type, numItems, itemSize ) {
+	addAttribute: function ( name, type, numItems, itemSize ) {
 
 		this.attributes[ name ] = {
 
@@ -581,7 +581,6 @@ THREE.BufferGeometry.prototype = {
 			var attribute = {
 
 				itemSize: sourceAttr.itemSize,
-				numItems: sourceAttr.numItems,
 				array: null
 
 			};

@@ -1,4 +1,4 @@
-Sidebar.Geometry.CubeGeometry = function ( signals, object ) {
+Sidebar.Geometry.BoxGeometry = function ( signals, object ) {
 
 	var container = new UI.Panel();
 
@@ -72,7 +72,7 @@ Sidebar.Geometry.CubeGeometry = function ( signals, object ) {
 
 		object.geometry.dispose();
 
-		object.geometry = new THREE.CubeGeometry(
+		object.geometry = new THREE.BoxGeometry(
 			width.getValue(),
 			height.getValue(),
 			depth.getValue(),

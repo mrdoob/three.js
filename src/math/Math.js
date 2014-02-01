@@ -126,7 +126,7 @@ THREE.Math = {
 
 	sign: function ( x ) {
 
-		return ( x < 0 ) ? -1 : ( ( x > 0 ) ? 1 : 0 );
+		return ( x < 0 ) ? - 1 : ( x > 0 ) ? 1 : 0;
 
 	},
 
@@ -152,6 +152,10 @@ THREE.Math = {
 
 		};
 
-	}()
+	}(),
+
+	isPowerOfTwo: function ( value ) {
+		return ( value & ( value - 1 ) ) === 0 && value !== 0;
+	}
 
 };

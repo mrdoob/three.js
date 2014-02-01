@@ -12,7 +12,7 @@ THREE.BoundingBoxHelper = function ( object, hex ) {
 
 	this.box = new THREE.Box3();
 
-	THREE.Mesh.call( this, new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: color, wireframe: true } ) );
+	THREE.Mesh.call( this, new THREE.BoxGeometry( 1, 1, 1 ), new THREE.MeshBasicMaterial( { color: color, wireframe: true } ) );
 
 };
 

@@ -2,11 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Color = function ( value ) {
+THREE.Color = function ( color ) {
 
-	if ( value !== undefined ) this.set( value );
+	if ( arguments.length === 3 ) {
 
-	return this;
+		return this.setRGB( arguments[ 0 ], arguments[ 1 ], arguments[ 2 ] );
+
+	}
+
+	return this.set( color )
 
 };
 

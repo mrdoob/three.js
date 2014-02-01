@@ -644,7 +644,7 @@ THREE.VRMLLoader.prototype = {
 
                         var s = data.size;
 
-						parent.geometry = new THREE.CubeGeometry( s.x, s.y, s.z );
+						parent.geometry = new THREE.BoxGeometry( s.x, s.y, s.z );
 
 					} else if ( 'Cylinder' === data.nodeType ) {
 
