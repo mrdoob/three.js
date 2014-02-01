@@ -146,7 +146,8 @@ THREE.Loader.prototype = {
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
 			var isCompressed = /\.dds$/i.test( sourceFile );
-			var fullPath = texturePath + "/" + sourceFile;
+			
+			var fullPath = texturePath + (texturePath.slice(-1) === '/' ? '' : '/') + sourceFile;
 
 			if ( isCompressed ) {
 
