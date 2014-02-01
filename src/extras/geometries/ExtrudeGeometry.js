@@ -197,7 +197,9 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 
 
 	function getBevelVec( inPt, inPrev, inNext ) {
+
 		var EPSILON = 0.0000000001;
+		var sign = THREE.Math.sign;
 		
 		// computes for inPt the corresponding point inPt' on a new contour
 		//   shiftet by 1 unit (length of normalized vector) to the left
@@ -263,7 +265,7 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 				if ( v_prev_x < -EPSILON ) {
 					if ( v_next_x < -EPSILON ) { direction_eq = true; }
 				} else {
-					if ( Math.sign(v_prev_y) == Math.sign(v_next_y) ) { direction_eq = true; }
+					if ( sign(v_prev_y) == sign(v_next_y) ) { direction_eq = true; }
 				}
 			}
 
