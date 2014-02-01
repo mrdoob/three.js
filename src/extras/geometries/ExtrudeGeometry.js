@@ -256,17 +256,27 @@ THREE.ExtrudeGeometry.prototype.addShape = function ( shape, options ) {
 			
 		} else {		// handle special case of colinear edges
 
-			if ( ( ( v_prev_x != 0 ) && ( Math.sign(v_prev_x) != Math.sign(v_next_x) ) ) ||
-				 ( ( v_prev_x == 0 ) && ( Math.sign(v_prev_y) != Math.sign(v_next_y) ) ) ) {
-				// console.log("Warning: lines are a straight spike");
-				v_trans_x = v_prev_x;
-				v_trans_y = v_prev_y;
-				shrink_by = Math.sqrt( v_prev_lensq / 2 );
+			var direction_eq = false;		// assumes: opposite
+			if ( v_prev_x > EPSILON ) {
+				if ( v_next_x > EPSILON ) { direction_eq = true; }
 			} else {
+				if ( v_prev_x < -EPSILON ) {
+					if ( v_next_x < -EPSILON ) { direction_eq = true; }
+				} else {
+					if ( Math.sign(v_prev_y) == Math.sign(v_next_y) ) { direction_eq = true; }
+				}
+			}
+
+			if ( direction_eq ) {
 				// console.log("Warning: lines are a straight sequence");
 				v_trans_x = -v_prev_y;
 				v_trans_y =  v_prev_x;
 				shrink_by = Math.sqrt( v_prev_lensq );
+			} else {
+				// console.log("Warning: lines are a straight spike");
+				v_trans_x = v_prev_x;
+				v_trans_y = v_prev_y;
+				shrink_by = Math.sqrt( v_prev_lensq / 2 );
 			}
 
 		}
