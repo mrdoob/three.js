@@ -51,17 +51,17 @@ THREE.MorphAnimation.prototype = {
 
 			if ( frame != currentFrame ) {
 
-				mesh.morphTargetInfluences[ lastFrame ] = 0;
-				mesh.morphTargetInfluences[ currentFrame ] = 1;
-				mesh.morphTargetInfluences[ frame ] = 0;
+				this.mesh.morphTargetInfluences[ lastFrame ] = 0;
+				this.mesh.morphTargetInfluences[ currentFrame ] = 1;
+				this.mesh.morphTargetInfluences[ frame ] = 0;
 
 				lastFrame = currentFrame;
 				currentFrame = frame;
 
 			}
 
-			mesh.morphTargetInfluences[ frame ] = ( currentTime % interpolation ) / interpolation;
-			mesh.morphTargetInfluences[ lastFrame ] = 1 - mesh.morphTargetInfluences[ frame ];
+			this.mesh.morphTargetInfluences[ frame ] = ( currentTime % interpolation ) / interpolation;
+			this.mesh.morphTargetInfluences[ lastFrame ] = 1 - this.mesh.morphTargetInfluences[ frame ];
 
 		}
 
