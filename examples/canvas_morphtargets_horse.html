@@ -60,7 +60,7 @@
 				scene.add( light );
 
 				var loader = new THREE.JSONLoader( true );
-				loader.load( "models/animated/horse.js", function( geometry ) {
+				loader.load( "models/animated/horse.js", function ( geometry ) {
 
 					mesh = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: 0x606060, morphTargets: true, overdraw: 0.5 } ) );
 					mesh.scale.set( 1.5, 1.5, 1.5 );

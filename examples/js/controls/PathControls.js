@@ -217,7 +217,10 @@ THREE.PathControls = function ( object, domElement ) {
 
 		THREE.AnimationHandler.add( animationData );
 
-		return new THREE.Animation( parent, name, THREE.AnimationHandler.CATMULLROM_FORWARD, false );
+		var animation = new THREE.Animation( parent, name );
+		animation.interpolationType = THREE.AnimationHandler.CATMULLROM_FORWARD;
+
+		return animation;
 
 	};
 

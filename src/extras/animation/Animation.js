@@ -4,7 +4,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.Animation = function ( root, name, interpolationType ) {
+THREE.Animation = function ( root, name ) {
 
 	this.root = root;
 	this.data = THREE.AnimationHandler.get( name );
@@ -17,7 +17,7 @@ THREE.Animation = function ( root, name, interpolationType ) {
 	this.isPaused = true;
 	this.loop = true;
 
-	this.interpolationType = interpolationType !== undefined ? interpolationType : THREE.AnimationHandler.LINEAR;
+	this.interpolationType = THREE.AnimationHandler.LINEAR;
 
 	this.points = [];
 	this.target = new THREE.Vector3();

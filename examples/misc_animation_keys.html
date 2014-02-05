@@ -126,7 +126,7 @@
 				ensureLoop( sphereMesh.animation );
 				THREE.AnimationHandler.add( sphereMesh.animation );
 												
-				var sphereMeshAnimation = new THREE.Animation( sphereMesh, sphereMesh.animation.name, THREE.AnimationHandler.LINEAR )
+				var sphereMeshAnimation = new THREE.Animation( sphereMesh, sphereMesh.animation.name )
 				sphereMeshAnimation.play();
 				
 				scene.add( sphereMesh );
