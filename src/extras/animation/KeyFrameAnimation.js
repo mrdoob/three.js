@@ -177,15 +177,14 @@ THREE.KeyFrameAnimation.prototype.update = function ( delta ) {
 	//
 
 	var duration = this.data.length;
-	var currentTime = this.currentTime;
 
 	if ( this.loop === true ) {
 
-		currentTime %= duration;
+		this.currentTime %= duration;
 
 	}
 
-	currentTime = Math.min( currentTime, duration );
+	this.currentTime = Math.min( this.currentTime, duration );
 
 	for ( var h = 0, hl = this.hierarchy.length; h < hl; h++ ) {
 
@@ -201,9 +200,9 @@ THREE.KeyFrameAnimation.prototype.update = function ( delta ) {
 			var prevKey = animationCache.prevKey;
 			var nextKey = animationCache.nextKey;
 
-			if ( nextKey.time <= currentTime ) {
+			if ( nextKey.time <= this.currentTime ) {
 
-				while ( nextKey.time < currentTime && nextKey.index > prevKey.index ) {
+				while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
 
 					prevKey = nextKey;
 					nextKey = keys[ prevKey.index + 1 ];
@@ -215,9 +214,9 @@ THREE.KeyFrameAnimation.prototype.update = function ( delta ) {
 
 			}
 
-			if ( nextKey.time >= currentTime ) {
+			if ( nextKey.time >= this.currentTime ) {
 
-				prevKey.interpolate( nextKey, currentTime );
+				prevKey.interpolate( nextKey, this.currentTime );
 
 			} else {
 

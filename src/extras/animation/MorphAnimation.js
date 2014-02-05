@@ -38,16 +38,16 @@ THREE.MorphAnimation.prototype = {
 
 			this.currentTime += delta;
 
-			var currentTime = this.currentTime;
-
 			if ( this.loop === true ) {
 
-				currentTime %= this.duration;
+				this.currentTime %= this.duration;
 
 			}
 
+			this.currentTime = Math.min( this.currentTime, duration );
+
 			var interpolation = this.duration / this.frames;
-			var frame = Math.floor( currentTime / interpolation );
+			var frame = Math.floor( this.currentTime / interpolation );
 
 			if ( frame != currentFrame ) {
 
@@ -60,7 +60,7 @@ THREE.MorphAnimation.prototype = {
 
 			}
 
-			this.mesh.morphTargetInfluences[ frame ] = ( currentTime % interpolation ) / interpolation;
+			this.mesh.morphTargetInfluences[ frame ] = ( this.currentTime % interpolation ) / interpolation;
 			this.mesh.morphTargetInfluences[ lastFrame ] = 1 - this.mesh.morphTargetInfluences[ frame ];
 
 		}

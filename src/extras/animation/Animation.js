@@ -114,15 +114,14 @@ THREE.Animation.prototype.update = function ( delta ) {
 	var types = [ "pos", "rot", "scl" ];
 
 	var duration = this.data.length;
-	var currentTime = this.currentTime;
 
 	if ( this.loop === true ) {
 
-		currentTime %= duration;
+		this.currentTime %= duration;
 
 	}
 
-	currentTime = Math.min( currentTime, duration );
+	this.currentTime = Math.min( this.currentTime, duration );
 
 	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
@@ -139,12 +138,12 @@ THREE.Animation.prototype.update = function ( delta ) {
 			var prevKey = animationCache.prevKey[ type ];
 			var nextKey = animationCache.nextKey[ type ];
 
-			if ( nextKey.time <= currentTime ) {
+			if ( nextKey.time <= this.currentTime ) {
 
 				prevKey = this.data.hierarchy[ h ].keys[ 0 ];
 				nextKey = this.getNextKeyWith( type, h, 1 );
 
-				while ( nextKey.time < currentTime && nextKey.index > prevKey.index ) {
+				while ( nextKey.time < this.currentTime && nextKey.index > prevKey.index ) {
 
 					prevKey = nextKey;
 					nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
@@ -159,7 +158,7 @@ THREE.Animation.prototype.update = function ( delta ) {
 			object.matrixAutoUpdate = true;
 			object.matrixWorldNeedsUpdate = true;
 
-			var scale = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
+			var scale = ( this.currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
 
 			var prevXYZ = prevKey[ type ];
 			var nextXYZ = nextKey[ type ];
