@@ -331,9 +331,6 @@
 								THREE.AnimationHandler.add( object.geometry.animation );
 
 								var animation = new THREE.Animation( object, object.geometry.animation.name );
-								animation.JITCompile = false;
-								animation.interpolationType = THREE.AnimationHandler.LINEAR;
-
 								animation.play();
 
 							}

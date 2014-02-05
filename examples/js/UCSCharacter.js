@@ -54,9 +54,6 @@ THREE.UCSCharacter = function() {
 			mesh.receiveShadow = true;
 
 			animation = new THREE.Animation( mesh, geometry.animation.name );
-			animation.JITCompile = false;
-			animation.interpolationType = THREE.AnimationHandler.LINEAR;
-
 			animation.play();
 			
 			scope.setSkin(0);
