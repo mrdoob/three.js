@@ -28,10 +28,6 @@ THREE.BufferGeometry = function () {
 
 	this.hasTangents = false;
 
-	// for compatibility
-
-	this.morphTargets = [];
-
 };
 
 THREE.BufferGeometry.prototype = {
