@@ -194,8 +194,8 @@
 						}
 
 					}
-
-					animation.play( false, 0 );
+					animation.loop = false;
+					animation.play();
 					lastTimestamp = Date.now();
 
 				}

@@ -24,22 +24,19 @@ THREE.Animation = function ( root, name, interpolationType ) {
 
 };
 
-THREE.Animation.prototype.play = function ( loop, startTimeMS ) {
+THREE.Animation.prototype.play = function ( startTime ) {
+
+	this.currentTime = startTime !== undefined ? startTime : 0;
 
 	if ( this.isPlaying === false ) {
 
 		this.isPlaying = true;
-		this.loop = loop !== undefined ? loop : true;
-		this.currentTime = startTimeMS !== undefined ? startTimeMS : 0;
 
 		// reset key cache
 
-		var h, hl = this.hierarchy.length,
-			object;
+		for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
-		for ( h = 0; h < hl; h ++ ) {
-
-			object = this.hierarchy[ h ];
+			var object = this.hierarchy[ h ];
 
 			object.matrixAutoUpdate = true;
 
