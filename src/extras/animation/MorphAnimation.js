@@ -38,13 +38,13 @@ THREE.MorphAnimation.prototype = {
 
 			this.currentTime += delta;
 
-			if ( this.loop === true ) {
+			if ( this.loop === true && this.currentTime > this.duration ) {
 
 				this.currentTime %= this.duration;
 
 			}
 
-			this.currentTime = Math.min( this.currentTime, duration );
+			this.currentTime = Math.min( this.currentTime, this.duration );
 
 			var interpolation = this.duration / this.frames;
 			var frame = Math.floor( this.currentTime / interpolation );

@@ -229,13 +229,9 @@ THREE.Animation.prototype.update = function ( delta ) {
 
 	}
 
-	if ( this.currentTime > duration ) {
+	if ( this.loop === false && this.currentTime > duration ) {
 
-		if ( this.loop === false ) {
-
-			this.stop();
-
-		}
+		this.stop();
 
 	}
 
