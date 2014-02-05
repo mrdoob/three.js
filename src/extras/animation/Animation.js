@@ -115,9 +115,10 @@ THREE.Animation.prototype.update = function ( delta ) {
 
 	var duration = this.data.length;
 
-	if ( this.loop === true ) {
+	if ( this.loop === true && this.currentTime > duration ) {
 
 		this.currentTime %= duration;
+		this.reset();
 
 	}
 
@@ -229,8 +230,6 @@ THREE.Animation.prototype.update = function ( delta ) {
 	}
 
 	if ( this.currentTime > duration ) {
-
-		this.reset();
 
 		if ( this.loop === false ) {
 
