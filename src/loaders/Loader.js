@@ -62,8 +62,12 @@ THREE.Loader.prototype = {
 	extractUrlBase: function ( url ) {
 
 		var parts = url.split( '/' );
+
+		if ( parts.length === 1 ) return './';
+
 		parts.pop();
-		return ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+
+		return parts.join( '/' ) + '/';
 
 	},
 
@@ -146,8 +150,8 @@ THREE.Loader.prototype = {
 		function create_texture( where, name, sourceFile, repeat, offset, wrap, anisotropy ) {
 
 			var isCompressed = /\.dds$/i.test( sourceFile );
-			
-			var fullPath = texturePath + (texturePath.slice(-1) === '/' ? '' : '/') + sourceFile;
+
+			var fullPath = texturePath + sourceFile;
 
 			if ( isCompressed ) {
 
