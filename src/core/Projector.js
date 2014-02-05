@@ -223,6 +223,7 @@ THREE.Projector = function () {
 			_line.id = object.id;
 			_line.v1.copy( v1 );
 			_line.v2.copy( v2 );
+			_face.z = ( v1.positionScreen.z + v2.positionScreen.z ) / 2;
 
 			_line.material = object.material;
 
@@ -244,6 +245,7 @@ THREE.Projector = function () {
 				_face.v1.copy( v1 );
 				_face.v2.copy( v2 );
 				_face.v3.copy( v3 );
+				_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
 
 				_face.material = object.material;
 
