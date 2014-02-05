@@ -32,36 +32,7 @@ THREE.Animation.prototype.play = function ( startTime ) {
 
 		this.isPlaying = true;
 
-		// reset key cache
-
-		for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
-
-			var object = this.hierarchy[ h ];
-
-			object.matrixAutoUpdate = true;
-
-			if ( object.animationCache === undefined ) {
-
-				object.animationCache = {};
-				object.animationCache.prevKey = { pos: 0, rot: 0, scl: 0 };
-				object.animationCache.nextKey = { pos: 0, rot: 0, scl: 0 };
-				object.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
-
-			}
-
-			var prevKey = object.animationCache.prevKey;
-			var nextKey = object.animationCache.nextKey;
-
-			prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.rot = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.scl = this.data.hierarchy[ h ].keys[ 0 ];
-
-			nextKey.pos = this.getNextKeyWith( "pos", h, 1 );
-			nextKey.rot = this.getNextKeyWith( "rot", h, 1 );
-			nextKey.scl = this.getNextKeyWith( "scl", h, 1 );
-
-		}
-
+		this.reset();
 		this.update( 0 );
 
 	}
@@ -98,52 +69,65 @@ THREE.Animation.prototype.stop = function() {
 
 };
 
-
-THREE.Animation.prototype.update = function ( deltaTimeMS ) {
-
-	// early out
-
-	if ( this.isPlaying === false ) return;
-
-
-	// vars
-
-	var types = [ "pos", "rot", "scl" ];
-	var type;
-	var scale;
-	var vector;
-	var prevXYZ, nextXYZ;
-	var prevKey, nextKey;
-	var object;
-	var animationCache;
-	var frame;
-	var JIThierarchy = this.data.JIT.hierarchy;
-	var currentTime, unloopedCurrentTime;
-	var currentPoint, forwardPoint, angle;
-
-
-	this.currentTime += deltaTimeMS * this.timeScale;
-
-	unloopedCurrentTime = this.currentTime;
-
-	// Mod operation fails on floats
-	// was this supposed to be in frames?
-	while ( this.currentTime > this.data.length ) {
-
-		this.currentTime -= this.data.length;
-
-	}
-
-	currentTime = this.currentTime = this.currentTime % this.data.length;
-
-	
-	frame = parseInt( Math.min( currentTime * this.data.fps, this.data.length * this.data.fps ), 10 );
-
+THREE.Animation.prototype.reset = function () {
 
 	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
 
-		object = this.hierarchy[ h ];
-		animationCache = object.animationCache;
+		var object = this.hierarchy[ h ];
+
+		object.matrixAutoUpdate = true;
+
+		if ( object.animationCache === undefined ) {
+
+			object.animationCache = {};
+			object.animationCache.prevKey = { pos: 0, rot: 0, scl: 0 };
+			object.animationCache.nextKey = { pos: 0, rot: 0, scl: 0 };
+			object.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
+
+		}
+
+		var prevKey = object.animationCache.prevKey;
+		var nextKey = object.animationCache.nextKey;
+
+		prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
+		prevKey.rot = this.data.hierarchy[ h ].keys[ 0 ];
+		prevKey.scl = this.data.hierarchy[ h ].keys[ 0 ];
+
+		nextKey.pos = this.getNextKeyWith( "pos", h, 1 );
+		nextKey.rot = this.getNextKeyWith( "rot", h, 1 );
+		nextKey.scl = this.getNextKeyWith( "scl", h, 1 );
+
+	}
+
+};
+
+
+THREE.Animation.prototype.update = function ( delta ) {
+
+	if ( this.isPlaying === false ) return;
+
+	this.currentTime += delta * this.timeScale;
+
+	//
+
+	var vector;
+	var types = [ "pos", "rot", "scl" ];
+
+	var duration = this.data.length;
+	var currentTime = this.currentTime;
+
+	if ( this.loop === true ) {
+
+		currentTime %= duration;
+
+	}
+
+	currentTime = Math.min( currentTime, duration );
+
+	for ( var h = 0, hl = this.hierarchy.length; h < hl; h ++ ) {
+
+		var object = this.hierarchy[ h ];
+		var animationCache = object.animationCache;
 
 		// loop through pos/rot/scl
 
@@ -151,47 +135,19 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 			// get keys
 
-			type    = types[ t ];
-			prevKey = animationCache.prevKey[ type ];
-			nextKey = animationCache.nextKey[ type ];
+			var type    = types[ t ];
+			var prevKey = animationCache.prevKey[ type ];
+			var nextKey = animationCache.nextKey[ type ];
 
-			// switch keys?
-			
-			if ( nextKey.time <= unloopedCurrentTime ) {
+			if ( nextKey.time <= currentTime ) {
 
-				// did we loop?
+				prevKey = this.data.hierarchy[ h ].keys[ 0 ];
+				nextKey = this.getNextKeyWith( type, h, 1 );
 
-				if ( currentTime <= unloopedCurrentTime ) {
+				while ( nextKey.time < currentTime && nextKey.index > prevKey.index ) {
 
-					if ( this.loop ) {
-
-						prevKey = this.data.hierarchy[ h ].keys[ 0 ];
-						nextKey = this.getNextKeyWith( type, h, 1 );
-
-						// if ( nextKey.index < prevKey.index ) then we have wrapped over the end, and nextKey.time < currentTime will loop forever
-						while ( nextKey !== null && nextKey.time < currentTime && nextKey.index > prevKey.index) {
-
-							prevKey = nextKey;
-							nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
-
-						}
-
-					} else {
-
-						this.stop();
-						return;
-
-					}
-
-				} else {
-
-					do {
-
-						prevKey = nextKey;
-						nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
-
-					} while ( nextKey !== null && nextKey.time < currentTime && nextKey.index > prevKey.index )
-					// if ( nextKey.index < prevKey.index ) then we have wrapped over the end, and nextKey.time < currentTime will loop forever
+					prevKey = nextKey;
+					nextKey = this.getNextKeyWith( type, h, nextKey.index + 1 );
 
 				}
 
@@ -200,23 +156,16 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 			}
 
-
 			object.matrixAutoUpdate = true;
 			object.matrixWorldNeedsUpdate = true;
 
-			scale = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
-			prevXYZ = prevKey[ type ];
-			nextXYZ = nextKey[ type ];
+			var scale = ( currentTime - prevKey.time ) / ( nextKey.time - prevKey.time );
 
+			var prevXYZ = prevKey[ type ];
+			var nextXYZ = nextKey[ type ];
 
-			// check scale error
-
-			if ( scale < 0 || scale > 1 ) {
-
-				console.log( "THREE.Animation.update: Warning! Scale out of bounds:" + scale + " on bone " + h );
-				scale = scale < 0 ? 0 : 1;
-
-			}
+			if ( scale < 0 ) scale = 0;
+			if ( scale > 1 ) scale = 1;
 
 			// interpolate
 
@@ -231,7 +180,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 					vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 				} else if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-						    this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+					this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
 					this.points[ 0 ] = this.getPrevKeyWith( "pos", h, prevKey.index - 1 )[ "pos" ];
 					this.points[ 1 ] = prevXYZ;
@@ -240,7 +189,7 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 					scale = scale * 0.33 + 0.33;
 
-					currentPoint = this.interpolateCatmullRom( this.points, scale );
+					var currentPoint = this.interpolateCatmullRom( this.points, scale );
 
 					vector.x = currentPoint[ 0 ];
 					vector.y = currentPoint[ 1 ];
@@ -248,14 +197,14 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 
 					if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
-						forwardPoint = this.interpolateCatmullRom( this.points, scale * 1.01 );
+						var forwardPoint = this.interpolateCatmullRom( this.points, scale * 1.01 );
 
 						this.target.set( forwardPoint[ 0 ], forwardPoint[ 1 ], forwardPoint[ 2 ] );
 						this.target.sub( vector );
 						this.target.y = 0;
 						this.target.normalize();
 
-						angle = Math.atan2( this.target.x, this.target.z );
+						var angle = Math.atan2( this.target.x, this.target.z );
 						object.rotation.set( 0, angle, 0 );
 
 					}
@@ -275,6 +224,18 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 				vector.z = prevXYZ[ 2 ] + ( nextXYZ[ 2 ] - prevXYZ[ 2 ] ) * scale;
 
 			}
+
+		}
+
+	}
+
+	if ( this.currentTime > duration ) {
+
+		this.reset();
+
+		if ( this.loop === false ) {
+
+			this.stop();
 
 		}
 
@@ -364,7 +325,7 @@ THREE.Animation.prototype.getPrevKeyWith = function ( type, h, key ) {
 	var keys = this.data.hierarchy[ h ].keys;
 
 	if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-		 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+		this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
 		key = key > 0 ? key : 0;
 

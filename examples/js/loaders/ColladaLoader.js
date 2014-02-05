@@ -4220,7 +4220,7 @@ THREE.ColladaLoader = function () {
 	// TODO: Currently only doing linear interpolation. Should support full COLLADA spec.
 	Key.prototype.interpolate = function ( nextKey, time ) {
 
-		for ( var i = 0; i < this.targets.length; ++i ) {
+		for ( var i = 0, l = this.targets.length; i < l; i ++ ) {
 
 			var target = this.targets[ i ],
 				nextTarget = nextKey.getTarget( target.sid ),
@@ -4232,14 +4232,8 @@ THREE.ColladaLoader = function () {
 					nextData = nextTarget.data,
 					prevData = target.data;
 
-				// check scale error
-
-				if ( scale < 0 || scale > 1 ) {
-
-					console.log( "Key.interpolate: Warning! Scale out of bounds:" + scale );
-					scale = scale < 0 ? 0 : 1;
-
-				}
+				if ( scale < 0 ) scale = 0;
+				if ( scale > 1 ) scale = 1;
 
 				if ( prevData.length ) {
 

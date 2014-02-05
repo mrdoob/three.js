@@ -228,18 +228,6 @@ THREE.AnimationHandler = (function() {
 
 		}
 
-
-		// JIT
-
-		var lengthInFrames = parseInt( data.length * data.fps, 10 );
-
-		data.JIT = {};
-		data.JIT.hierarchy = [];
-
-		for( var h = 0; h < data.hierarchy.length; h ++ )
-			data.JIT.hierarchy.push( new Array( lengthInFrames ) );
-
-
 		// done
 
 		data.initialized = true;

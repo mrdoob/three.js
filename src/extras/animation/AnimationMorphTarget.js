@@ -19,14 +19,13 @@ THREE.AnimationMorphTarget = function( root, data ) {
  * Play
  */
 
-THREE.AnimationMorphTarget.prototype.play = function( loop, startTimeMS ) {
+THREE.AnimationMorphTarget.prototype.play = function ( startTime ) {
 
-	if( !this.isPlaying ) {
+	this.currentTime = startTime !== undefined ? startTime : 0;
+
+	if ( this.isPlaying === false ) {
 
 		this.isPlaying = true;
-		this.loop = loop !== undefined ? loop : true;
-		this.currentTime = startTimeMS !== undefined ? startTimeMS : 0;
-
 
 		// reset key cache
 
