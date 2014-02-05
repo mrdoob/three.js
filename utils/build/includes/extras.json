@@ -22,6 +22,7 @@
 	"src/extras/animation/AnimationHandler.js",
 	"src/extras/animation/Animation.js",
 	"src/extras/animation/KeyFrameAnimation.js",
+	"src/extras/animation/MorphAnimation.js",
 	"src/extras/cameras/CubeCamera.js",
 	"src/extras/cameras/CombinedCamera.js",
 	"src/extras/geometries/BoxGeometry.js",
