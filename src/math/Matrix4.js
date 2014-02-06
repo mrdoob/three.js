@@ -14,7 +14,13 @@
 
 THREE.Matrix4 = function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
-	this.elements = new Float32Array( 16 );
+	try {
+        this.elements = new Float32Array( 16 );
+    }
+    catch(x)
+    {
+        this.elements = new Array();
+    }
 
 	// TODO: if n11 is undefined, then just set to identity, otherwise copy all other values into matrix
 	//   we should not support semi specification of Matrix4, it is just weird.
@@ -62,7 +68,13 @@ THREE.Matrix4.prototype = {
 
 	copy: function ( m ) {
 
-		this.elements.set( m.elements );
+		try {
+            this.elements.set( m.elements );
+        }
+        catch(x)
+        {
+            this.elements = m.elements;
+        }
 
 		return this;
 
