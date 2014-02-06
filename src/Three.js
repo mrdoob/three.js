@@ -6,7 +6,7 @@
 
 var THREE = { REVISION: '65' };
 
-self.console = self.console || {
+var console = self.console || {
 
 	info: function () {},
 	log: function () {},

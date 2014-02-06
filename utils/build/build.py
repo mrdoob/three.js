@@ -44,6 +44,10 @@ def main(argv=None):
 	tmp = open(path, 'w')
 	sources = []
 
+	with open('header.js', 'r') as f:
+		tmp.write(f.read())
+		tmp.write('\n')
+
 	for include in args.include:
 		with open('includes/' + include + '.json','r') as f:
 			files = json.load(f)
@@ -53,6 +57,10 @@ def main(argv=None):
 			with open(filename, 'r') as f:
 				tmp.write(f.read())
 				tmp.write('\n')
+	
+	with open('footer.js', 'r') as f:
+		tmp.write(f.read())
+		tmp.write('\n')
 
 	tmp.close()
 
@@ -65,7 +73,7 @@ def main(argv=None):
 	else:
 
 		externs = ' --externs '.join(args.externs)
-		source = ' '.join(sources)
+		source = path
 		cmd = 'java -jar compiler/compiler.jar --warning_level=VERBOSE --jscomp_off=globalThis --externs %s --jscomp_off=checkTypes --language_in=ECMASCRIPT5_STRICT --js %s --js_output_file %s %s' % (externs, source, output, sourcemapargs)
 		os.system(cmd)
 
