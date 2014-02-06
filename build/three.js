@@ -8035,7 +8035,7 @@ THREE.Projector = function () {
 
 		};
 
-		var handleVertex = function ( x, y, z ) {
+		var pushVertex = function ( x, y, z ) {
 
 			_vertex = getNextVertexInPool();
 			_vertex.position.set( x, y, z );
@@ -8064,7 +8064,7 @@ THREE.Projector = function () {
 
 		};
 
-		var handleLine = function ( a, b ) {
+		var pushLine = function ( a, b ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
@@ -8082,7 +8082,7 @@ THREE.Projector = function () {
 
 		};
 
-		var handleTriangle = function ( a, b, c ) {
+		var pushTriangle = function ( a, b, c ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
@@ -8110,9 +8110,9 @@ THREE.Projector = function () {
 			setObject: setObject,
 			projectVertex: projectVertex,
 			checkTriangleVisibility: checkTriangleVisibility,
-			handleVertex: handleVertex,
-			handleLine: handleLine,
-			handleTriangle: handleTriangle
+			pushVertex: pushVertex,
+			pushLine: pushLine,
+			pushTriangle: pushTriangle
 		}
 
 	};
@@ -8165,7 +8165,7 @@ THREE.Projector = function () {
 
 						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
-							renderList.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+							renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
 						}
 
@@ -8175,7 +8175,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = indices.length; i < l; i += 3 ) {
 
-								renderList.handleTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+								renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 
 							}
 
@@ -8183,7 +8183,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
 
-								renderList.handleTriangle( i, i + 1, i + 2 );
+								renderList.pushTriangle( i, i + 1, i + 2 );
 
 							}
 
@@ -8193,17 +8193,17 @@ THREE.Projector = function () {
 
 				} else if ( geometry instanceof THREE.Geometry2 ) {
 
-					var positions = geometry.positions;
+					vertices = geometry.vertices;
 
-					for ( var i = 0, l = positions.length; i < l; i += 3 ) {
+					for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
 
-						renderList.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+						renderList.pushVertex( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
 
 					}
 
-					for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
+					for ( var i = 0, l = vertices.length / 3; i < l; i += 3 ) {
 
-						renderList.handleTriangle( i, i + 1, i + 2 );
+						renderList.pushTriangle( i, i + 1, i + 2 );
 
 					}
 
@@ -8221,7 +8221,7 @@ THREE.Projector = function () {
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 						var vertex = vertices[ v ];
-						renderList.handleVertex( vertex.x, vertex.y, vertex.z );
+						renderList.pushVertex( vertex.x, vertex.y, vertex.z );
 
 					}
 
@@ -8372,7 +8372,7 @@ THREE.Projector = function () {
 
 						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
-							renderList.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+							renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
 						}
 
@@ -8382,7 +8382,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = indices.length; i < l; i += 2 ) {
 
-								renderList.handleLine( indices[ i ], indices[ i + 1 ] );
+								renderList.pushLine( indices[ i ], indices[ i + 1 ] );
 
 							}
 
@@ -8390,7 +8390,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i ++ ) {
 
-								renderList.handleLine( i, i + 1 );
+								renderList.pushLine( i, i + 1 );
 
 							}
 
@@ -9364,7 +9364,7 @@ THREE.Geometry2 = function ( size ) {
 
 	this.name = '';
 
-	this.positions = size !== undefined ? new Float32Array( size * 3 ) : [];
+	this.vertices = size !== undefined ? new Float32Array( size * 3 ) : [];
 	this.normals = size !== undefined ? new Float32Array( size * 3 ) : [];
 	this.uvs = size !== undefined ? new Float32Array( size * 2 ) : [];
 
@@ -9379,7 +9379,7 @@ THREE.Geometry2.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		matrix.multiplyVector3Array( this.positions );
+		matrix.multiplyVector3Array( this.vertices );
 
 	},
 
@@ -9398,12 +9398,12 @@ THREE.Geometry2.prototype = {
 
 			box.makeEmpty();
 
-			var positions = this.positions;
+			var vertices = this.vertices;
 			var center = this.boundingSphere.center;
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
 
-				vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+				vector.set( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
 				box.addPoint( vector );
 
 			}
@@ -9412,9 +9412,9 @@ THREE.Geometry2.prototype = {
 
 			var maxRadiusSq = 0;
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
 
-				vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+				vector.set( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
 				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 			}
@@ -31946,28 +31946,14 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 
 	var vector = new THREE.Vector3();
 
-	var vertices = [];
-	var positions = [];
+	var vectors = [];
+	var vertices = this.vertices;
 
-	var addPosition = function ( a, b, c ) {
+	var addVertex = function ( a, b, c ) {
 
-		positions.push(
-			vertices[ a ],
-			vertices[ a + 1 ],
-			vertices[ a + 2 ]
-		);
-
-		positions.push(
-			vertices[ b ],
-			vertices[ b + 1 ],
-			vertices[ b + 2 ]
-		);
-
-		positions.push(
-			vertices[ c ],
-			vertices[ c + 1 ],
-			vertices[ c + 2 ]
-		);
+		vertices.push( vectors[ a ], vectors[ a + 1 ], vectors[ a + 2 ] );
+		vertices.push( vectors[ b ], vectors[ b + 1 ], vectors[ b + 2 ] );
+		vertices.push( vectors[ c ], vectors[ c + 1 ], vectors[ c + 2 ] );
 
 	};
 
@@ -31985,7 +31971,7 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 		gridY = scope.heightSegments,
 		width_half = width / 2,
 		height_half = height / 2,
-		offset = vertices.length;
+		offset = vectors.length;
 
 		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
@@ -32019,7 +32005,7 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
 				vector[ w ] = depth;
 
-				vertices.push( vector.x, vector.y, vector.z );
+				vectors.push( vector.x, vector.y, vector.z );
 
 			}
 
@@ -32034,8 +32020,8 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				var d = ( ix + 1 ) + gridX1 * iy;
 
-				addPosition( a * 3 + offset, b * 3 + offset, d * 3 + offset );
-				addPosition( b * 3 + offset, c * 3 + offset, d * 3 + offset );
+				addVertex( a * 3 + offset, b * 3 + offset, d * 3 + offset );
+				addVertex( b * 3 + offset, c * 3 + offset, d * 3 + offset );
 
 			}
 
@@ -32043,7 +32029,7 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 
 	}
 
-	this.positions = new Float32Array( positions );
+	this.vertices = new Float32Array( vertices );
 
 };
 
@@ -33299,7 +33285,7 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 
 	THREE.Geometry2.call( this, ( widthSegments * heightSegments ) * 2 * 3 );
 
-	var positions = this.positions;
+	var vertices = this.vertices;
 	var normals = this.normals;
 	var uvs = this.uvs;
 
@@ -33332,33 +33318,33 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 			var x1 = ix * segmentWidth - widthHalf;
 			var x2 = ( ix + 1 ) * segmentWidth - widthHalf;
 
-			positions[ offset ++ ] = x1;
-			positions[ offset ++ ] = y1;
+			vertices[ offset ++ ] = x1;
+			vertices[ offset ++ ] = y1;
 
 			offset ++;
 
-			positions[ offset ++ ] = x2;
-			positions[ offset ++ ] = y1;
+			vertices[ offset ++ ] = x2;
+			vertices[ offset ++ ] = y1;
 
 			offset ++;
 
-			positions[ offset ++ ] = x1;
-			positions[ offset ++ ] = y2;
+			vertices[ offset ++ ] = x1;
+			vertices[ offset ++ ] = y2;
 
 			offset ++;
 
-			positions[ offset ++ ] = x2;
-			positions[ offset ++ ] = y1;
+			vertices[ offset ++ ] = x2;
+			vertices[ offset ++ ] = y1;
 
 			offset ++;
 
-			positions[ offset ++ ] = x2;
-			positions[ offset ++ ] = y2;
+			vertices[ offset ++ ] = x2;
+			vertices[ offset ++ ] = y2;
 
 			offset ++;
 
-			positions[ offset ++ ] = x1;
-			positions[ offset ++ ] = y2;
+			vertices[ offset ++ ] = x1;
+			vertices[ offset ++ ] = y2;
 
 			offset ++;
 
