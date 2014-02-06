@@ -9,7 +9,7 @@ THREE.Geometry2 = function ( size ) {
 
 	this.name = '';
 
-	this.positions = size !== undefined ? new Float32Array( size * 3 ) : [];
+	this.vertices = size !== undefined ? new Float32Array( size * 3 ) : [];
 	this.normals = size !== undefined ? new Float32Array( size * 3 ) : [];
 	this.uvs = size !== undefined ? new Float32Array( size * 2 ) : [];
 
@@ -24,7 +24,7 @@ THREE.Geometry2.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		matrix.multiplyVector3Array( this.positions );
+		matrix.multiplyVector3Array( this.vertices );
 
 	},
 
@@ -43,12 +43,12 @@ THREE.Geometry2.prototype = {
 
 			box.makeEmpty();
 
-			var positions = this.positions;
+			var vertices = this.vertices;
 			var center = this.boundingSphere.center;
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
 
-				vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+				vector.set( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
 				box.addPoint( vector );
 
 			}
@@ -57,9 +57,9 @@ THREE.Geometry2.prototype = {
 
 			var maxRadiusSq = 0;
 
-			for ( var i = 0, il = positions.length; i < il; i += 3 ) {
+			for ( var i = 0, il = vertices.length; i < il; i += 3 ) {
 
-				vector.set( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+				vector.set( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
 				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( vector ) );
 
 			}

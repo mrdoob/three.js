@@ -23,28 +23,14 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 
 	var vector = new THREE.Vector3();
 
-	var vertices = [];
-	var positions = [];
+	var vectors = [];
+	var vertices = this.vertices;
 
-	var addPosition = function ( a, b, c ) {
+	var addVertex = function ( a, b, c ) {
 
-		positions.push(
-			vertices[ a ],
-			vertices[ a + 1 ],
-			vertices[ a + 2 ]
-		);
-
-		positions.push(
-			vertices[ b ],
-			vertices[ b + 1 ],
-			vertices[ b + 2 ]
-		);
-
-		positions.push(
-			vertices[ c ],
-			vertices[ c + 1 ],
-			vertices[ c + 2 ]
-		);
+		vertices.push( vectors[ a ], vectors[ a + 1 ], vectors[ a + 2 ] );
+		vertices.push( vectors[ b ], vectors[ b + 1 ], vectors[ b + 2 ] );
+		vertices.push( vectors[ c ], vectors[ c + 1 ], vectors[ c + 2 ] );
 
 	};
 
@@ -62,7 +48,7 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 		gridY = scope.heightSegments,
 		width_half = width / 2,
 		height_half = height / 2,
-		offset = vertices.length;
+		offset = vectors.length;
 
 		if ( ( u === 'x' && v === 'y' ) || ( u === 'y' && v === 'x' ) ) {
 
@@ -96,7 +82,7 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 				vector[ v ] = ( iy * segment_height - height_half ) * vdir;
 				vector[ w ] = depth;
 
-				vertices.push( vector.x, vector.y, vector.z );
+				vectors.push( vector.x, vector.y, vector.z );
 
 			}
 
@@ -111,8 +97,8 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 				var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
 				var d = ( ix + 1 ) + gridX1 * iy;
 
-				addPosition( a * 3 + offset, b * 3 + offset, d * 3 + offset );
-				addPosition( b * 3 + offset, c * 3 + offset, d * 3 + offset );
+				addVertex( a * 3 + offset, b * 3 + offset, d * 3 + offset );
+				addVertex( b * 3 + offset, c * 3 + offset, d * 3 + offset );
 
 			}
 
@@ -120,7 +106,7 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 
 	}
 
-	this.positions = new Float32Array( positions );
+	this.vertices = new Float32Array( vertices );
 
 };
 

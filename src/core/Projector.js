@@ -184,7 +184,7 @@ THREE.Projector = function () {
 
 		};
 
-		var handleVertex = function ( x, y, z ) {
+		var pushVertex = function ( x, y, z ) {
 
 			_vertex = getNextVertexInPool();
 			_vertex.position.set( x, y, z );
@@ -213,7 +213,7 @@ THREE.Projector = function () {
 
 		};
 
-		var handleLine = function ( a, b ) {
+		var pushLine = function ( a, b ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
@@ -231,7 +231,7 @@ THREE.Projector = function () {
 
 		};
 
-		var handleTriangle = function ( a, b, c ) {
+		var pushTriangle = function ( a, b, c ) {
 
 			var v1 = _vertexPool[ a ];
 			var v2 = _vertexPool[ b ];
@@ -259,9 +259,9 @@ THREE.Projector = function () {
 			setObject: setObject,
 			projectVertex: projectVertex,
 			checkTriangleVisibility: checkTriangleVisibility,
-			handleVertex: handleVertex,
-			handleLine: handleLine,
-			handleTriangle: handleTriangle
+			pushVertex: pushVertex,
+			pushLine: pushLine,
+			pushTriangle: pushTriangle
 		}
 
 	};
@@ -314,7 +314,7 @@ THREE.Projector = function () {
 
 						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
-							renderList.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+							renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
 						}
 
@@ -324,7 +324,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = indices.length; i < l; i += 3 ) {
 
-								renderList.handleTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+								renderList.pushTriangle( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
 
 							}
 
@@ -332,7 +332,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
 
-								renderList.handleTriangle( i, i + 1, i + 2 );
+								renderList.pushTriangle( i, i + 1, i + 2 );
 
 							}
 
@@ -342,17 +342,17 @@ THREE.Projector = function () {
 
 				} else if ( geometry instanceof THREE.Geometry2 ) {
 
-					var positions = geometry.positions;
+					vertices = geometry.vertices;
 
-					for ( var i = 0, l = positions.length; i < l; i += 3 ) {
+					for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
 
-						renderList.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+						renderList.pushVertex( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
 
 					}
 
-					for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
+					for ( var i = 0, l = vertices.length / 3; i < l; i += 3 ) {
 
-						renderList.handleTriangle( i, i + 1, i + 2 );
+						renderList.pushTriangle( i, i + 1, i + 2 );
 
 					}
 
@@ -370,7 +370,7 @@ THREE.Projector = function () {
 					for ( var v = 0, vl = vertices.length; v < vl; v ++ ) {
 
 						var vertex = vertices[ v ];
-						renderList.handleVertex( vertex.x, vertex.y, vertex.z );
+						renderList.pushVertex( vertex.x, vertex.y, vertex.z );
 
 					}
 
@@ -521,7 +521,7 @@ THREE.Projector = function () {
 
 						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
-							renderList.handleVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+							renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
 						}
 
@@ -531,7 +531,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = indices.length; i < l; i += 2 ) {
 
-								renderList.handleLine( indices[ i ], indices[ i + 1 ] );
+								renderList.pushLine( indices[ i ], indices[ i + 1 ] );
 
 							}
 
@@ -539,7 +539,7 @@ THREE.Projector = function () {
 
 							for ( var i = 0, l = ( positions.length / 3 ) - 1; i < l; i ++ ) {
 
-								renderList.handleLine( i, i + 1 );
+								renderList.pushLine( i, i + 1 );
 
 							}
 

@@ -7,7 +7,7 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 
 	THREE.Geometry2.call( this, ( widthSegments * heightSegments ) * 2 * 3 );
 
-	var positions = this.positions;
+	var vertices = this.vertices;
 	var normals = this.normals;
 	var uvs = this.uvs;
 
@@ -40,33 +40,33 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 			var x1 = ix * segmentWidth - widthHalf;
 			var x2 = ( ix + 1 ) * segmentWidth - widthHalf;
 
-			positions[ offset ++ ] = x1;
-			positions[ offset ++ ] = y1;
+			vertices[ offset ++ ] = x1;
+			vertices[ offset ++ ] = y1;
 
 			offset ++;
 
-			positions[ offset ++ ] = x2;
-			positions[ offset ++ ] = y1;
+			vertices[ offset ++ ] = x2;
+			vertices[ offset ++ ] = y1;
 
 			offset ++;
 
-			positions[ offset ++ ] = x1;
-			positions[ offset ++ ] = y2;
+			vertices[ offset ++ ] = x1;
+			vertices[ offset ++ ] = y2;
 
 			offset ++;
 
-			positions[ offset ++ ] = x2;
-			positions[ offset ++ ] = y1;
+			vertices[ offset ++ ] = x2;
+			vertices[ offset ++ ] = y1;
 
 			offset ++;
 
-			positions[ offset ++ ] = x2;
-			positions[ offset ++ ] = y2;
+			vertices[ offset ++ ] = x2;
+			vertices[ offset ++ ] = y2;
 
 			offset ++;
 
-			positions[ offset ++ ] = x1;
-			positions[ offset ++ ] = y2;
+			vertices[ offset ++ ] = x1;
+			vertices[ offset ++ ] = y2;
 
 			offset ++;
 
