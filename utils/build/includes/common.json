@@ -28,6 +28,7 @@
 	"src/core/Face3.js",
 	"src/core/Face4.js",
 	"src/core/Geometry.js",
+	"src/core/Geometry2.js",
 	"src/core/BufferGeometry.js",
 	"src/cameras/Camera.js",
 	"src/cameras/OrthographicCamera.js",
