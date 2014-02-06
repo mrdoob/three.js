@@ -103,6 +103,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	var state = STATE.NONE;
 
+	// for reset
+
+	this.target0 = this.target.clone();
+	this.position0 = this.object.position.clone();
+
 	// events
 
 	var changeEvent = { type: 'change' };
@@ -278,6 +283,17 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	};
 
+
+	this.reset = function () {
+
+		state = STATE.NONE;
+
+		this.target.copy( this.target0 );
+		this.object.position.copy( this.position0 );
+
+		this.update();
+
+	};
 
 	function getAutoRotationAngle() {
 
