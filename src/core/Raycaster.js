@@ -56,6 +56,39 @@
 
 			} );
 
+		} else if (object instanceof THREE.ParticleSystem) {
+			/* 	See: https://github.com/mrdoob/three.js/issues/3492
+				Original Source code: 
+					https://github.com/jpweeks/three.js/blob/particle-ray/src/core/Ray.js#L186-L216
+			*/
+            
+			var vertices = object.geometry.vertices;
+			var point, distance, intersect, threshold = 5;
+			var localMatrix = new THREE.Matrix4();
+			var localtempRay = raycaster.ray.clone(); 
+			var localOrigin = localtempRay.origin;
+			var localDirection = localtempRay.direction;
+			
+			localMatrix.getInverse(object.matrixWorld);
+			localOrigin.applyMatrix4(localMatrix);
+			localDirection.transformDirection(localMatrix);
+			
+			for ( var i = 0; i < vertices.length; i ++ ) {
+				point = vertices[ i ];
+				distance = localtempRay.distanceToPoint(point);
+				if ( distance > threshold ) {
+				    continue;
+				}
+				intersect = {
+				    distance: distance,
+				    point: point.clone(),
+				    face: null,
+				    object: object,
+				    vertex: i
+				};    
+				intersects.push(intersect);
+			}
+            
 		} else if ( object instanceof THREE.LOD ) {
 
 			matrixPosition.setFromMatrixPosition( object.matrixWorld );
