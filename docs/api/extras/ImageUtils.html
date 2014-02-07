@@ -25,23 +25,23 @@
 
 
 
-		<h3>.generateDataTexture([page:Number width], [page:Number height], [page:Number color]) [page:todo]</h3>
+		<h3>.generateDataTexture([page:Number width], [page:Number height], [page:Number color]) [page:DataTexture]</h3>
 		<div>
 		width -- The width of the texture. <br />
 		height -- The width of the texture. <br />
 		color -- The hexadecimal value of the color.
 		</div>
 		<div>
-		Generates a texture of a 
+		Generates a texture of a single color. It is a DataTexture with format, RGBFormat.
 		</div>
 
-		<h3>.parseDDS([page:todo buffer], [page:todo loadMipmaps]) [page:todo]</h3>
+		<h3>.parseDDS([page:String buffer], [page:boolean loadMipmaps]) [page:CompressedTexture]</h3>
 		<div>
-		buffer -- todo <br />
-		loadMipmaps -- todo
+		buffer -- A string containing the data of the dds. <br />
+		loadMipmaps -- A boolean to indicate if you need to load the mipmaps. Default is True.
 		</div>
 		<div>
-		todo
+		Parses a DDS Image from the string into a CompressedTexture. 
 		</div>
 
 		<h3>.loadCompressedTexture([page:todo url], [page:todo mapping], [page:todo onLoad], [page:todo onError]) [page:todo]</h3>
