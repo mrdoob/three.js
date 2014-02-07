@@ -956,14 +956,14 @@ THREE.TransformControls = function ( camera, domElement ) {
 				scope.object.position.copy( oldPosition );
 				scope.object.position.add( point );
 
-				if ( scope.snap != undefined ) {
-
-					if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
-					if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
-					if ( scope.axis.search("Z") != -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
-				
-				}
-
+			}
+			
+			if ( scope.snap != undefined ) {
+			
+				if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
+				if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
+				if ( scope.axis.search("Z") != -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
+			
 			}
 
 		} else if ( _mode == "scale" ) {
