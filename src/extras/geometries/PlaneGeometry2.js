@@ -3,9 +3,9 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Plane.as
  */
 
-THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments ) {
+THREE.PlaneGeometry = function ( width, height, widthSegments, heightSegments ) {
 
-	THREE.Geometry2.call( this, ( widthSegments * heightSegments ) * 2 * 3 );
+	THREE.Geometry.call( this, ( widthSegments * heightSegments ) * 2 * 3 );
 
 	var vertices = this.vertices;
 	var normals = this.normals;
@@ -76,4 +76,4 @@ THREE.PlaneGeometry2 = function ( width, height, widthSegments, heightSegments )
 
 };
 
-THREE.PlaneGeometry2.prototype = Object.create( THREE.Geometry2.prototype );
+THREE.PlaneGeometry.prototype = Object.create( THREE.Geometry.prototype );
