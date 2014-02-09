@@ -2175,7 +2175,10 @@ def generate_cameras(data):
                     "aspect"    : 1.333,
                     "near"      : camera.clip_start,
                     "far"       : camera.clip_end,
-                    "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
+                    # Before this fix the Y position of camera was explicitly negated, causing incorrect camera pos. The reason 
+                    # for negation was unknown, maybe it was needed in some situation.  The old line was:
+                    # "position"  : generate_vec3([cameraobj.location[0], -cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
+                    "position"  : generate_vec3([cameraobj.location[0], cameraobj.location[1], cameraobj.location[2]], data["flipyz"]),
                     "target"    : generate_vec3([0, 0, 0])
                     }
 
