@@ -404,6 +404,57 @@ THREE.Vector3.prototype = {
 
 	},
 
+    clampScalar: function ( minVal, maxVal ) {
+
+        if ( this.x < minVal ) {
+            this.x = minVal;
+        } else if ( this.x > maxVal ) {
+            this.x = maxVal;
+        }
+
+        if ( this.y < minVal ) {
+            this.y = minVal;
+        } else if ( this.y > maxVal ) {
+            this.y = maxVal;
+        }
+
+        if ( this.z < minVal ) {
+            this.z = minVal;
+        } else if ( this.z > maxVal ) {
+            this.z = maxVal;
+        }
+
+        return this;
+    },
+
+    floor: function() {
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
+        this.z = Math.floor(this.z);
+        return this;
+    },
+
+    ceil: function() {
+        this.x = Math.ceil(this.x);
+        this.y = Math.ceil(this.y);
+        this.z = Math.ceil(this.z);
+        return this;
+    },
+
+    round: function() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        this.z = Math.round(this.z);
+        return this;
+    },
+
+    roundToZero: function() {
+        this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
+        this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
+        this.z = (this.z < 0) ? Math.ceil(this.z) : Math.floor(this.z);
+        return this;
+    },
+
 	negate: function () {
 
 		return this.multiplyScalar( - 1 );

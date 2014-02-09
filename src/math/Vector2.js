@@ -224,8 +224,48 @@ THREE.Vector2.prototype = {
 		}
 
 		return this;
-
 	},
+
+    clampScalar: function ( minVal, maxVal ) {
+
+        if ( this.x < minVal ) {
+            this.x = minVal;
+        } else if ( this.x > maxVal ) {
+            this.x = maxVal;
+        }
+
+        if ( this.y < minVal ) {
+            this.y = minVal;
+        } else if ( this.y > maxVal ) {
+            this.y = maxVal;
+        }
+
+        return this;
+    },
+
+    floor: function() {
+        this.x = Math.floor(this.x);
+        this.y = Math.floor(this.y);
+        return this;
+    },
+
+    ceil: function() {
+        this.x = Math.ceil(this.x);
+        this.y = Math.ceil(this.y);
+        return this;
+    },
+
+    round: function() {
+        this.x = Math.round(this.x);
+        this.y = Math.round(this.y);
+        return this;
+    },
+
+    roundToZero: function() {
+        this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
+        this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
+        return this;
+    },
 
 	negate: function() {
 
