@@ -483,34 +483,21 @@ THREE.Vector4.prototype = {
 
 	},
 
-    clampScalar: function ( minVal, maxVal ) {
+	clampScalar: ( function () {
+		var min, max;
 
-        if ( this.x < minVal ) {
-            this.x = minVal;
-        } else if ( this.x > maxVal ) {
-            this.x = maxVal;
-        }
+		return function ( minVal, maxVal ) {
+			if ( !min || !max ) {
+				min = new THREE.Vector4();
+				max = new THREE.Vector4();
+			}
 
-        if ( this.y < minVal ) {
-            this.y = minVal;
-        } else if ( this.y > maxVal ) {
-            this.y = maxVal;
-        }
+			min.set(minVal, minVal, minVal, minVal);
+			max.set(maxVal, maxVal, maxVal, maxVal);
+			return this.clamp(min, max);
 
-        if ( this.z < minVal ) {
-            this.z = minVal;
-        } else if ( this.z > maxVal ) {
-            this.z = maxVal;
-        }
-
-        if ( this.w < minVal ) {
-            this.w = minVal;
-        } else if ( this.w > maxVal ) {
-            this.w = maxVal;
-        }
-
-        return this;
-    },
+		};
+	} )(),
 
     floor: function() {
         this.x = Math.floor(this.x);
