@@ -409,7 +409,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			scope.dollyIn();
 
-		}
+		}
+
+		scope.update();
 
 	}
 
