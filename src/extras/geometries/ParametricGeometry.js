@@ -11,67 +11,95 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 
 	THREE.Geometry.call( this );
 
-	var verts = this.vertices;
-	var faces = this.faces;
-	var uvs = this.faceVertexUvs[ 0 ];
+	//Save the parameters that are passed in
+	this.func = func;
+	this.slices = slices;
+	this.stacks = stacks;
 
-	var i, il, j, p;
-	var u, v;
+	this.updateGeometry = function(){
 
-	var stackCount = stacks + 1;
-	var sliceCount = slices + 1;
+		var verts = this.vertices;
+		var faces = this.faces;
+		var uvs = this.faceVertexUvs[ 0 ];
 
-	for ( i = 0; i <= stacks; i ++ ) {
+		//reset all to geometry
+		var newFaces = [];
+		var newVerts = [];
+		var newUvs   = [];
 
-		v = i / stacks;
+		var i, il, j, p;
+		var u, v;
 
-		for ( j = 0; j <= slices; j ++ ) {
+		var stackCount = this.stacks + 1;
+		var sliceCount = this.slices + 1;
 
-			u = j / slices;
+		for ( i = 0; i <= this.stacks; i ++ ) {
 
-			p = func( u, v );
-			verts.push( p );
+			v = i / this.stacks;
 
-		}
-	}
+			for ( j = 0; j <= this.slices; j ++ ) {
 
-	var a, b, c, d;
-	var uva, uvb, uvc, uvd;
+				u = j / this.slices;
 
-	for ( i = 0; i < stacks; i ++ ) {
+				p = func( u, v );
+				newVerts.push( p );
 
-		for ( j = 0; j < slices; j ++ ) {
-
-			a = i * sliceCount + j;
-			b = i * sliceCount + j + 1;
-			c = (i + 1) * sliceCount + j + 1;
-			d = (i + 1) * sliceCount + j;
-
-			uva = new THREE.Vector2( j / slices, i / stacks );
-			uvb = new THREE.Vector2( ( j + 1 ) / slices, i / stacks );
-			uvc = new THREE.Vector2( ( j + 1 ) / slices, ( i + 1 ) / stacks );
-			uvd = new THREE.Vector2( j / slices, ( i + 1 ) / stacks );
-
-			faces.push( new THREE.Face3( a, b, d ) );
-			uvs.push( [ uva, uvb, uvd ] );
-
-			faces.push( new THREE.Face3( b, c, d ) );
-			uvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
-
+			}
 		}
 
+		var a, b, c, d;
+		var uva, uvb, uvc, uvd;
+
+		for ( i = 0; i < this.stacks; i ++ ) {
+
+			for ( j = 0; j < this.slices; j ++ ) {
+
+				a = i * sliceCount + j;
+				b = i * sliceCount + j + 1;
+				c = (i + 1) * sliceCount + j + 1;
+				d = (i + 1) * sliceCount + j;
+
+				uva = new THREE.Vector2( j / this.slices, i / this.stacks );
+				uvb = new THREE.Vector2( ( j + 1 ) / this.slices, i / this.stacks );
+				uvc = new THREE.Vector2( ( j + 1 ) / this.slices, ( i + 1 ) / this.stacks );
+				uvd = new THREE.Vector2( j / this.slices, ( i + 1 ) / this.stacks );
+
+				newFaces.push( new THREE.Face3( a, b, d ) );
+				newUvs.push( [ uva, uvb, uvd ] );
+
+				newFaces.push( new THREE.Face3( b, c, d ) );
+				newUvs.push( [ uvb.clone(), uvc, uvd.clone() ] );
+
+			}
+
+		}
+
+		//Set updated (recalculated) geometry
+		this.vertices = newVerts;
+		this.faces =newFaces;
+		this.faceVertexUvs[ 0 ] = newUvs;
+
+		// console.log(this);
+
+		// magic bullet
+		// var diff = this.mergeVertices();
+		// console.log('removed ', diff, ' vertices by merging');
+
+		this.computeCentroids();
+		this.computeFaceNormals();
+		this.computeVertexNormals();
+
+		//flag all dirty geometry
+		this.verticesNeedUpdate = true;
+		this.elementsNeedUpdate = true;
+		this.morphTargetsNeedUpdate = true;
+		this.uvsNeedUpdate = true;
+		this.normalsNeedUpdate = true;
+		this.colorsNeedUpdate = true;
+		this.tangentsNeedUpdate = true;
 	}
 
-	// console.log(this);
-
-	// magic bullet
-	// var diff = this.mergeVertices();
-	// console.log('removed ', diff, ' vertices by merging');
-
-	this.computeCentroids();
-	this.computeFaceNormals();
-	this.computeVertexNormals();
-
+	this.updateGeometry();
 };
 
 THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
