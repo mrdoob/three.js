@@ -41,6 +41,14 @@ THREE.JSONLoader.prototype.loadAjaxJSON = function ( context, url, callback, tex
 				if ( xhr.responseText ) {
 
 					var json = JSON.parse( xhr.responseText );
+
+					if ( json.metadata.type === 'scene' ) {
+
+						console.error( 'THREE.JSONLoader: "' + url + '" seems to be a Scene. Use THREE.SceneLoader instead.' );
+						return;
+
+					}
+
 					var result = context.parse( json, texturePath );
 					callback( result.geometry, result.materials );
 
