@@ -3,9 +3,9 @@
  * based on http://papervision3d.googlecode.com/svn/trunk/as3/trunk/src/org/papervision3d/objects/primitives/Cube.as
  */
 
-THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
-	THREE.Geometry.call( this );
+	THREE.Geometry2.call( this );
 
 	var scope = this;
 
@@ -110,4 +110,4 @@ THREE.BoxGeometry = function ( width, height, depth, widthSegments, heightSegmen
 
 };
 
-THREE.BoxGeometry.prototype = Object.create( THREE.Geometry.prototype );
+THREE.BoxGeometry2.prototype = Object.create( THREE.Geometry2.prototype );

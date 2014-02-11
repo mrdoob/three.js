@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.Geometry = function ( size ) {
+THREE.Geometry2 = function ( size ) {
 
 	this.id = THREE.GeometryIdCount ++;
 	this.uuid = THREE.Math.generateUUID();
@@ -18,9 +18,9 @@ THREE.Geometry = function ( size ) {
 
 };
 
-THREE.Geometry.prototype = {
+THREE.Geometry2.prototype = {
 
-	constructor: THREE.Geometry,
+	constructor: THREE.Geometry2,
 
 	applyMatrix: function ( matrix ) {
 
@@ -78,4 +78,4 @@ THREE.Geometry.prototype = {
 
 };
 
-THREE.EventDispatcher.prototype.apply( THREE.Geometry.prototype );
+THREE.EventDispatcher.prototype.apply( THREE.Geometry2.prototype );
