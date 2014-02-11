@@ -16,7 +16,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 	this.slices = slices;
 	this.stacks = stacks;
 
-	this.updateGeometry = function(){
+	this.update = function(){
 
 		var verts = this.vertices;
 		var faces = this.faces;
@@ -99,7 +99,7 @@ THREE.ParametricGeometry = function ( func, slices, stacks ) {
 		this.tangentsNeedUpdate = true;
 	}
 
-	this.updateGeometry();
+	this.update();
 };
 
 THREE.ParametricGeometry.prototype = Object.create( THREE.Geometry.prototype );
