@@ -119,19 +119,23 @@ THREE.glTFInterpolator = function(param)
 	this.isRot = false;
 	
 	var node = param.target;
+	node.updateMatrix();
 	node.matrixAutoUpdate = true;
 	this.targetNode = node;
 	
 	switch (param.path) {
 		case "translation" :
 			this.target = node.position;
+			this.originalValue = node.position.clone();
 			break;
 		case "rotation" :
 			this.target = node.quaternion;
+			this.originalValue = node.quaternion.clone();
 			this.isRot = true;
 			break;
 		case "scale" :
 			this.target = node.scale;
+			this.originalValue = node.scale.clone();
 			break;
 	}
 	
@@ -161,23 +165,23 @@ THREE.glTFInterpolator.prototype.interp = function(t)
 	else if (t < this.keys[0])
 	{
 		if (this.isRot) {
-			this.quat1.set(this.values[0],
+			this.quat1.set(this.originalValue.x,
+					this.originalValue.y,
+					this.originalValue.z,
+					this.originalValue.w);
+			this.quat2.set(this.values[0],
 					this.values[1],
 					this.values[2],
 					this.values[3]);
-			this.quat2.set(this.values[4],
-					this.values[5],
-					this.values[6],
-					this.values[7]);
 			THREE.Quaternion.slerp(this.quat1, this.quat2, this.quat3, t / this.keys[0]);
 		}
 		else {
-			this.vec3.set(this.values[0],
+			this.vec3.set(this.originalValue.x,
+					this.originalValue.y,
+					this.originalValue.z);
+			this.vec2.set(this.values[0],
 					this.values[1],
 					this.values[2]);
-			this.vec2.set(this.values[3],
-					this.values[4],
-					this.values[5]);
 
 			this.vec3.lerp(this.vec2, t / this.keys[0]);
 		}

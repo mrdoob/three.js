@@ -168,7 +168,7 @@
                 var spot1 = null;
                 if (sceneInfo.addLights) {
                     
-                    var ambient = new THREE.AmbientLight( 0x222222 );
+                    var ambient = new THREE.AmbientLight( 0x888888 );
                     scene.add( ambient );
 
                 	var directionalLight = new THREE.DirectionalLight( 0xdddddd );
@@ -302,6 +302,10 @@
 	    				for (i = 0; i < len; i++) {
 	    					var animation = gltf.animations[i];
 	    					animation.loop = true;
+	    					// There's .3333 seconds junk at the tail of the Monster animation that
+	    					// keeps it from looping cleanly. Clip it at 3 seconds
+	    					if (sceneInfo.animationTime)
+		    					animation.duration = sceneInfo.animationTime;
     						animation.play();
 	    				}
     				}
@@ -369,6 +373,7 @@
 			                 objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
 			                 objectPosition: new THREE.Vector3(0, 1, 0),
 			                 objectRotation: new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 2),
+			                 animationTime: 3,
 			                 addLights:true,
 			                 shadows:true,
 			                 addGround:true },
@@ -377,7 +382,7 @@
 		                 objectScale: new THREE.Vector3(0.1, 0.1, 0.1),
 		                 addLights:true,
 		                 addGround:true,
-		                 shadows:false },
+		                 shadows:true },
      			];
 
 			function buildSceneList()
