@@ -30,20 +30,11 @@
             	z-index: -1;
             }
             
-            #rendercontainer {
-            	position: absolute;
-            	top: 0px;
-            	width:100%;
-            	height:100%;
-            	z-index: -1;
-            	background-color:Red;
-            }
-                        
             #controls {
             	position:absolute;
-            	width:25%;
-            	left:75%;
+            	width:250px;
             	bottom:0%;
+            	right:0%;
             	height:134px;
             	background-color:White;
             	opacity:.9;
@@ -69,7 +60,7 @@
                         
             .controlValue {
             	position:absolute;
-            	left:50%;
+            	left:36%;
             	top:0%;
             }
             
@@ -101,7 +92,9 @@
         <div id="info">
 			<a href="http://threejs.org" target="_blank">three.js</a> - 
 			<a href="http://gltf.gl/" target="_blank">glTF</a> loader - 
-			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a>
+			<br></br>
+			monster by <a href="http://www.3drt.com/downloads.htm" target="_blank">3drt</a> -
+			COLLADA duck by Sony
         </div>
 		<div id="container">
 		</div>
@@ -182,7 +175,7 @@
                 	directionalLight.position.set( 0, -1, 1 ).normalize();
                 	scene.add( directionalLight );
                 
-	                spot1   = new THREE.SpotLight( 0x888888, 2 );
+	                spot1   = new THREE.SpotLight( 0xffffff, 1 );
 	                spot1.position.set( -100, 200, 100 );
 	                spot1.target.position.set( 0, 0, 0 );
 
@@ -372,9 +365,9 @@
 			var sceneList = 
 				[
 		             { name : "Monster", url : "./models/gltf/monster/monster.json", 
-			                 cameraPos: new THREE.Vector3(0, 1, 100), 
+			                 cameraPos: new THREE.Vector3(30, 10, 70), 
 			                 objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
-			                 objectPosition: new THREE.Vector3(0, 0, 0),
+			                 objectPosition: new THREE.Vector3(0, 1, 0),
 			                 objectRotation: new THREE.Euler(-Math.PI / 2, 0, -Math.PI / 2),
 			                 addLights:true,
 			                 shadows:true,
@@ -382,28 +375,9 @@
 	                 { name : "Duck", url : "./models/gltf/duck/duck.json", 
 		                 cameraPos: new THREE.Vector3(0, 30, -50),
 		                 objectScale: new THREE.Vector3(0.1, 0.1, 0.1),
-		                 addLights:false,
-		                 addGround:false,
+		                 addLights:true,
+		                 addGround:true,
 		                 shadows:false },
-	                 { name : "Wine Rack", url : "./models/gltf/wine/wine.json",
-		             	 cameraPos: new THREE.Vector3(60, 30, 100), 
-		             	 objectPosition: new THREE.Vector3(-60, 0, -20),
-		             	 addLights:true },
-	                 { name : "Rambler", url : "./models/gltf/rambler/Rambler.json", 
-			      		cameraPos: new THREE.Vector3(0, 10, 50), 
-			      		objectRotation: new THREE.Euler(-Math.PI / 2, 0, 0),
-			      		objectPosition: new THREE.Vector3(0, 1, 0),
-			      		objectScale: new THREE.Vector3(0.1, 0.1, 0.1),
-			      		addLights:true,
-			      		addGround:true,
-			      		shadows:true },
-	                 { name : "Super Murdoch", url : "./models/gltf/SuperMurdoch/SuperMurdoch.json", 
-             			cameraPos: new THREE.Vector3(0, 10, 50), 
-	             		objectScale: new THREE.Vector3(0.01, 0.01, 0.01),
-             			addLights:true,
-             			addGround:true,
-             			shadows:true },
-		             
      			];
 
 			function buildSceneList()
