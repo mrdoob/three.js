@@ -8,7 +8,7 @@ THREE.Projector = function () {
 
 	var _object, _objectCount, _objectPool = [], _objectPoolLength = 0,
 	_vertex, _vertexCount, _vertexPool = [], _vertexPoolLength = 0,
-	_face, _face3Count, _face3Pool = [], _face3PoolLength = 0,
+	_face, _faceCount, _facePool = [], _facePoolLength = 0,
 	_line, _lineCount, _linePool = [], _linePoolLength = 0,
 	_sprite, _spriteCount, _spritePool = [], _spritePoolLength = 0,
 
@@ -239,7 +239,7 @@ THREE.Projector = function () {
 
 			if ( checkTriangleVisibility( v1, v2, v3 ) === true ) {
 
-				_face = getNextFace3InPool();
+				_face = getNextFaceInPool();
 
 				_face.id = object.id;
 				_face.v1.copy( v1 );
@@ -286,7 +286,7 @@ THREE.Projector = function () {
 		var object, geometry, vertices, faces, face, faceVertexNormals, faceVertexUvs, uvs,
 		isFaceMaterial, objectMaterials;
 
-		_face3Count = 0;
+		_faceCount = 0;
 		_lineCount = 0;
 		_spriteCount = 0;
 
@@ -456,7 +456,7 @@ THREE.Projector = function () {
 
 						if ( visible === ( side === THREE.BackSide ) ) continue;
 
-						_face = getNextFace3InPool();
+						_face = getNextFaceInPool();
 
 						_face.id = object.id;
 						_face.v1.copy( v1 );
@@ -689,19 +689,19 @@ THREE.Projector = function () {
 
 	}
 
-	function getNextFace3InPool() {
+	function getNextFaceInPool() {
 
-		if ( _face3Count === _face3PoolLength ) {
+		if ( _faceCount === _facePoolLength ) {
 
-			var face = new THREE.RenderableFace3();
-			_face3Pool.push( face );
-			_face3PoolLength ++;
-			_face3Count ++;
+			var face = new THREE.RenderableFace();
+			_facePool.push( face );
+			_facePoolLength ++;
+			_faceCount ++;
 			return face;
 
 		}
 
-		return _face3Pool[ _face3Count ++ ];
+		return _facePool[ _faceCount ++ ];
 
 
 	}
