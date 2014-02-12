@@ -7884,7 +7884,6 @@ THREE.Projector = function () {
 	_modelViewProjectionMatrix = new THREE.Matrix4(),
 
 	_normalMatrix = new THREE.Matrix3(),
-	_normalViewMatrix = new THREE.Matrix3(),
 
 	_centroid = new THREE.Vector3(),
 
@@ -8006,11 +8005,17 @@ THREE.Projector = function () {
 
 	var RenderList = function () {
 
+		var normals = [];
+
 		var object = null;
+		var normalMatrix = new THREE.Matrix3();
 
 		var setObject = function ( value ) {
 
 			object = value;
+			normalMatrix.getNormalMatrix( object.matrixWorld );
+
+			normals.length = 0;
 
 		};
 
@@ -8041,6 +8046,12 @@ THREE.Projector = function () {
 			_vertex.position.set( x, y, z );
 
 			projectVertex( _vertex );
+
+		};
+
+		var pushNormal = function ( x, y, z ) {
+
+			normals.push( x, y, z );
 
 		};
 
@@ -8098,6 +8109,18 @@ THREE.Projector = function () {
 				_face.v3.copy( v3 );
 				_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
 
+				for ( var i = 0; i < 3; i ++ ) {
+
+					var offset = arguments[ i ] * 3;
+					var normal = _face.vertexNormalsModel[ i ];
+
+					normal.set( normals[ offset + 0 ], normals[ offset + 1 ], normals[ offset + 2 ] );
+					normal.applyMatrix3( normalMatrix ).normalize();
+
+				}
+
+				_face.vertexNormalsLength = 3;
+
 				_face.material = object.material;
 
 				_renderData.elements.push( _face );
@@ -8111,6 +8134,7 @@ THREE.Projector = function () {
 			projectVertex: projectVertex,
 			checkTriangleVisibility: checkTriangleVisibility,
 			pushVertex: pushVertex,
+			pushNormal: pushNormal,
 			pushLine: pushLine,
 			pushTriangle: pushTriangle
 		}
@@ -8135,8 +8159,6 @@ THREE.Projector = function () {
 
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
-
-		_normalViewMatrix.getNormalMatrix( _viewMatrix );
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
@@ -8169,6 +8191,14 @@ THREE.Projector = function () {
 
 						}
 
+						var normals = attributes.normal.array;
+
+						for ( var i = 0, l = normals.length; i < l; i += 3 ) {
+
+							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+
+						}
+
 						if ( attributes.index !== undefined ) {
 
 							var indices = attributes.index.array;
@@ -8195,15 +8225,13 @@ THREE.Projector = function () {
 
 					vertices = geometry.vertices;
 
-					for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
+					for ( var i = 0, j = 0, l = vertices.length; i < l; i += 9, j += 3 ) {
 
-						renderList.pushVertex( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
+						renderList.pushVertex( vertices[ i + 0 ], vertices[ i + 1 ], vertices[ i + 2 ] );
+						renderList.pushVertex( vertices[ i + 3 ], vertices[ i + 4 ], vertices[ i + 5 ] );
+						renderList.pushVertex( vertices[ i + 6 ], vertices[ i + 7 ], vertices[ i + 8 ] );
 
-					}
-
-					for ( var i = 0, l = vertices.length / 3; i < l; i += 3 ) {
-
-						renderList.pushTriangle( i, i + 1, i + 2 );
+						renderList.pushTriangle( j + 0, j + 1, j + 2 );
 
 					}
 
@@ -8307,8 +8335,6 @@ THREE.Projector = function () {
 
 						_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-						_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
-
 						_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 						faceVertexNormals = face.vertexNormals;
@@ -8325,9 +8351,6 @@ THREE.Projector = function () {
 							}
 
 							normalModel.applyMatrix3( _normalMatrix ).normalize();
-
-							var normalModelView = _face.vertexNormalsModelView[ n ];
-							normalModelView.copy( normalModel ).applyMatrix3( _normalViewMatrix );
 
 						}
 
@@ -11563,16 +11586,14 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	function parseSkin() {
 
-		var i, l, x, y, z, w, a, b, c, d;
-
 		if ( json.skinWeights ) {
 
-			for ( i = 0, l = json.skinWeights.length; i < l; i += 2 ) {
+			for ( var i = 0, l = json.skinWeights.length; i < l; i += 2 ) {
 
-				x = json.skinWeights[ i     ];
-				y = json.skinWeights[ i + 1 ];
-				z = 0;
-				w = 0;
+				var x = json.skinWeights[ i     ];
+				var y = json.skinWeights[ i + 1 ];
+				var z = 0;
+				var w = 0;
 
 				geometry.skinWeights.push( new THREE.Vector4( x, y, z, w ) );
 
@@ -11582,12 +11603,12 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		if ( json.skinIndices ) {
 
-			for ( i = 0, l = json.skinIndices.length; i < l; i += 2 ) {
+			for ( var i = 0, l = json.skinIndices.length; i < l; i += 2 ) {
 
-				a = json.skinIndices[ i     ];
-				b = json.skinIndices[ i + 1 ];
-				c = 0;
-				d = 0;
+				var a = json.skinIndices[ i     ];
+				var b = json.skinIndices[ i + 1 ];
+				var c = 0;
+				var d = 0;
 
 				geometry.skinIndices.push( new THREE.Vector4( a, b, c, d ) );
 
@@ -11596,9 +11617,20 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		}
 
 		geometry.bones = json.bones;
+
+		if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
+
+				console.warn( 'When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
+
+		}
+
+
 		// could change this to json.animations[0] or remove completely
+		
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
+
 	};
 
 	function parseMorphing( scale ) {
@@ -15782,6 +15814,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_pointLights = new THREE.Color(),
 
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
+	_normal = new THREE.Vector3(),
+	_normalViewMatrix = new THREE.Matrix3(),
 
 	_pixelMap, _pixelMapContext, _pixelMapImage, _pixelMapData,
 	_gradientMap, _gradientMapContext, _gradientMapQuality = 16;
@@ -15979,6 +16013,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_lights = _renderData.lights;
 		_camera = camera;
 
+		_normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
+
 		/* DEBUG
 		setFillStyle( 'rgba( 0, 255, 255, 0.5 )' );
 		_context.fillRect( _clipBox.min.x, _clipBox.min.y, _clipBox.max.x - _clipBox.min.x, _clipBox.max.y - _clipBox.min.y );
@@ -15986,7 +16022,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		calculateLights();
 
-		for ( var e = 0, el = _elements.length; e < el; e++ ) {
+		for ( var e = 0, el = _elements.length; e < el; e ++ ) {
 
 			var element = _elements[ e ];
 
@@ -16413,17 +16449,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( material.envMap.mapping instanceof THREE.SphericalReflectionMapping ) {
 
-					_vector3.copy( element.vertexNormalsModelView[ uv1 ] );
-					_uv1x = 0.5 * _vector3.x + 0.5;
-					_uv1y = 0.5 * _vector3.y + 0.5;
+					_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
+					_uv1x = 0.5 * _normal.x + 0.5;
+					_uv1y = 0.5 * _normal.y + 0.5;
 
-					_vector3.copy( element.vertexNormalsModelView[ uv2 ] );
-					_uv2x = 0.5 * _vector3.x + 0.5;
-					_uv2y = 0.5 * _vector3.y + 0.5;
+					_normal.copy( element.vertexNormalsModel[ uv2 ] ).applyMatrix3( _normalViewMatrix );
+					_uv2x = 0.5 * _normal.x + 0.5;
+					_uv2y = 0.5 * _normal.y + 0.5;
 
-					_vector3.copy( element.vertexNormalsModelView[ uv3 ] );
-					_uv3x = 0.5 * _vector3.x + 0.5;
-					_uv3y = 0.5 * _vector3.y + 0.5;
+					_normal.copy( element.vertexNormalsModel[ uv3 ] ).applyMatrix3( _normalViewMatrix );
+					_uv3x = 0.5 * _normal.x + 0.5;
+					_uv3y = 0.5 * _normal.y + 0.5;
 
 					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
@@ -16466,13 +16502,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			var normal;
-
 			if ( material.shading === THREE.FlatShading ) {
 
-				normal = element.normalModelView;
+				_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
 
-				_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 				material.wireframe === true
 					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
@@ -16480,14 +16514,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material.shading === THREE.SmoothShading ) {
 
-				normal = element.vertexNormalsModelView[ uv1 ];
-				_color1.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
+				_color1.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
-				normal = element.vertexNormalsModelView[ uv2 ];
-				_color2.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_normal.copy( element.vertexNormalsModel[ uv2 ] ).applyMatrix3( _normalViewMatrix );
+				_color2.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
-				normal = element.vertexNormalsModelView[ uv3 ];
-				_color3.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_normal.copy( element.vertexNormalsModel[ uv3 ] ).applyMatrix3( _normalViewMatrix );
+				_color3.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 				_color4.addColors( _color2, _color3 ).multiplyScalar( 0.5 );
 
@@ -23512,17 +23546,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function unrollBufferMaterial ( globject ) {
 
-		var object = globject.object,
-			buffer = globject.buffer,
-			material, materialIndex, meshMaterial;
+		var object = globject.object;
+		var buffer = globject.buffer;
 
-		meshMaterial = object.material;
+		var geometry = object.geometry;
+		var material = object.material;
 
-		if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
+		if ( material instanceof THREE.MeshFaceMaterial ) {
 
-			materialIndex = buffer.materialIndex;
+			var materialIndex = geometry instanceof THREE.BufferGeometry ? 0 : buffer.materialIndex;
 
-			material = meshMaterial.materials[ materialIndex ];
+			material = material.materials[ materialIndex ];
 
 			if ( material.transparent ) {
 
@@ -23537,8 +23571,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		} else {
-
-			material = meshMaterial;
 
 			if ( material ) {
 
@@ -26647,11 +26679,9 @@ THREE.RenderableFace3 = function () {
 	this.centroidModel = new THREE.Vector3();
 
 	this.normalModel = new THREE.Vector3();
-	this.normalModelView = new THREE.Vector3();
 
-	this.vertexNormalsLength = 0;
 	this.vertexNormalsModel = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-	this.vertexNormalsModelView = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	this.vertexNormalsLength = 0;
 
 	this.color = null;
 	this.material = null;

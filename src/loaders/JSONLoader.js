@@ -419,16 +419,14 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 	function parseSkin() {
 
-		var i, l, x, y, z, w, a, b, c, d;
-
 		if ( json.skinWeights ) {
 
-			for ( i = 0, l = json.skinWeights.length; i < l; i += 2 ) {
+			for ( var i = 0, l = json.skinWeights.length; i < l; i += 2 ) {
 
-				x = json.skinWeights[ i     ];
-				y = json.skinWeights[ i + 1 ];
-				z = 0;
-				w = 0;
+				var x = json.skinWeights[ i     ];
+				var y = json.skinWeights[ i + 1 ];
+				var z = 0;
+				var w = 0;
 
 				geometry.skinWeights.push( new THREE.Vector4( x, y, z, w ) );
 
@@ -438,12 +436,12 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 
 		if ( json.skinIndices ) {
 
-			for ( i = 0, l = json.skinIndices.length; i < l; i += 2 ) {
+			for ( var i = 0, l = json.skinIndices.length; i < l; i += 2 ) {
 
-				a = json.skinIndices[ i     ];
-				b = json.skinIndices[ i + 1 ];
-				c = 0;
-				d = 0;
+				var a = json.skinIndices[ i     ];
+				var b = json.skinIndices[ i + 1 ];
+				var c = 0;
+				var d = 0;
 
 				geometry.skinIndices.push( new THREE.Vector4( a, b, c, d ) );
 
@@ -452,9 +450,20 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		}
 
 		geometry.bones = json.bones;
+
+		if ( geometry.bones && geometry.bones.length > 0 && ( geometry.skinWeights.length !== geometry.skinIndices.length || geometry.skinIndices.length !== geometry.vertices.length ) ) {
+
+				console.warn( 'When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+					geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.' );
+
+		}
+
+
 		// could change this to json.animations[0] or remove completely
+		
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
+
 	};
 
 	function parseMorphing( scale ) {

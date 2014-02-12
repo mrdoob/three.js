@@ -3608,17 +3608,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function unrollBufferMaterial ( globject ) {
 
-		var object = globject.object,
-			buffer = globject.buffer,
-			material, materialIndex, meshMaterial;
+		var object = globject.object;
+		var buffer = globject.buffer;
 
-		meshMaterial = object.material;
+		var geometry = object.geometry;
+		var material = object.material;
 
-		if ( meshMaterial instanceof THREE.MeshFaceMaterial ) {
+		if ( material instanceof THREE.MeshFaceMaterial ) {
 
-			materialIndex = buffer.materialIndex;
+			var materialIndex = geometry instanceof THREE.BufferGeometry ? 0 : buffer.materialIndex;
 
-			material = meshMaterial.materials[ materialIndex ];
+			material = material.materials[ materialIndex ];
 
 			if ( material.transparent ) {
 
@@ -3633,8 +3633,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 		} else {
-
-			material = meshMaterial;
 
 			if ( material ) {
 

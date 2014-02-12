@@ -33,7 +33,6 @@ THREE.Projector = function () {
 	_modelViewProjectionMatrix = new THREE.Matrix4(),
 
 	_normalMatrix = new THREE.Matrix3(),
-	_normalViewMatrix = new THREE.Matrix3(),
 
 	_centroid = new THREE.Vector3(),
 
@@ -155,11 +154,17 @@ THREE.Projector = function () {
 
 	var RenderList = function () {
 
+		var normals = [];
+
 		var object = null;
+		var normalMatrix = new THREE.Matrix3();
 
 		var setObject = function ( value ) {
 
 			object = value;
+			normalMatrix.getNormalMatrix( object.matrixWorld );
+
+			normals.length = 0;
 
 		};
 
@@ -190,6 +195,12 @@ THREE.Projector = function () {
 			_vertex.position.set( x, y, z );
 
 			projectVertex( _vertex );
+
+		};
+
+		var pushNormal = function ( x, y, z ) {
+
+			normals.push( x, y, z );
 
 		};
 
@@ -247,6 +258,18 @@ THREE.Projector = function () {
 				_face.v3.copy( v3 );
 				_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
 
+				for ( var i = 0; i < 3; i ++ ) {
+
+					var offset = arguments[ i ] * 3;
+					var normal = _face.vertexNormalsModel[ i ];
+
+					normal.set( normals[ offset + 0 ], normals[ offset + 1 ], normals[ offset + 2 ] );
+					normal.applyMatrix3( normalMatrix ).normalize();
+
+				}
+
+				_face.vertexNormalsLength = 3;
+
 				_face.material = object.material;
 
 				_renderData.elements.push( _face );
@@ -260,6 +283,7 @@ THREE.Projector = function () {
 			projectVertex: projectVertex,
 			checkTriangleVisibility: checkTriangleVisibility,
 			pushVertex: pushVertex,
+			pushNormal: pushNormal,
 			pushLine: pushLine,
 			pushTriangle: pushTriangle
 		}
@@ -284,8 +308,6 @@ THREE.Projector = function () {
 
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
-
-		_normalViewMatrix.getNormalMatrix( _viewMatrix );
 
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
@@ -318,6 +340,14 @@ THREE.Projector = function () {
 
 						}
 
+						var normals = attributes.normal.array;
+
+						for ( var i = 0, l = normals.length; i < l; i += 3 ) {
+
+							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+
+						}
+
 						if ( attributes.index !== undefined ) {
 
 							var indices = attributes.index.array;
@@ -344,15 +374,13 @@ THREE.Projector = function () {
 
 					vertices = geometry.vertices;
 
-					for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
+					for ( var i = 0, j = 0, l = vertices.length; i < l; i += 9, j += 3 ) {
 
-						renderList.pushVertex( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
+						renderList.pushVertex( vertices[ i + 0 ], vertices[ i + 1 ], vertices[ i + 2 ] );
+						renderList.pushVertex( vertices[ i + 3 ], vertices[ i + 4 ], vertices[ i + 5 ] );
+						renderList.pushVertex( vertices[ i + 6 ], vertices[ i + 7 ], vertices[ i + 8 ] );
 
-					}
-
-					for ( var i = 0, l = vertices.length / 3; i < l; i += 3 ) {
-
-						renderList.pushTriangle( i, i + 1, i + 2 );
+						renderList.pushTriangle( j + 0, j + 1, j + 2 );
 
 					}
 
@@ -456,8 +484,6 @@ THREE.Projector = function () {
 
 						_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-						_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
-
 						_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 						faceVertexNormals = face.vertexNormals;
@@ -474,9 +500,6 @@ THREE.Projector = function () {
 							}
 
 							normalModel.applyMatrix3( _normalMatrix ).normalize();
-
-							var normalModelView = _face.vertexNormalsModelView[ n ];
-							normalModelView.copy( normalModel ).applyMatrix3( _normalViewMatrix );
 
 						}
 
