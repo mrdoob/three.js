@@ -82,15 +82,12 @@ THREE.GLTFLoaderUtils = Object.create(Object, {
 
             //if this is not specified, 1 "big blob" scenes fails to load.
             xhr.setRequestHeader("If-Modified-Since", "Sat, 01 Jan 1970 00:00:00 GMT");
-            xhr.onload = function(e) {
-                if ((xhr.status == 200) || (xhr.status == 206)) {
-
-                    delegate.streamAvailable(path, xhr.response);
-
-                } else {
-                    delegate.handleError(THREE.GLTFLoaderUtils.XMLHTTPREQUEST_STATUS_ERROR, this.status);
-                }
-            };
+            xhr.addEventListener( 'load', function ( event ) {
+                delegate.streamAvailable(path, xhr.response);
+            }, false );
+            xhr.addEventListener( 'error', function ( event ) {
+                delegate.handleError(THREE.GLTFLoaderUtils.XMLHTTPREQUEST_STATUS_ERROR, xhr.status);
+            }, false );
             xhr.send(null);
         }
     },
