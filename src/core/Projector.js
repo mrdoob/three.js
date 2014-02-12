@@ -344,15 +344,13 @@ THREE.Projector = function () {
 
 					vertices = geometry.vertices;
 
-					for ( var i = 0, l = vertices.length; i < l; i += 3 ) {
+					for ( var i = 0, j = 0, l = vertices.length; i < l; i += 9, j += 3 ) {
 
-						renderList.pushVertex( vertices[ i ], vertices[ i + 1 ], vertices[ i + 2 ] );
+						renderList.pushVertex( vertices[ i + 0 ], vertices[ i + 1 ], vertices[ i + 2 ] );
+						renderList.pushVertex( vertices[ i + 3 ], vertices[ i + 4 ], vertices[ i + 5 ] );
+						renderList.pushVertex( vertices[ i + 6 ], vertices[ i + 7 ], vertices[ i + 8 ] );
 
-					}
-
-					for ( var i = 0, l = vertices.length / 3; i < l; i += 3 ) {
-
-						renderList.pushTriangle( i, i + 1, i + 2 );
+						renderList.pushTriangle( j + 0, j + 1, j + 2 );
 
 					}
 
