@@ -155,11 +155,17 @@ THREE.Projector = function () {
 
 	var RenderList = function () {
 
+		var normals = [];
+
 		var object = null;
+		var normalMatrix = new THREE.Matrix3();
 
 		var setObject = function ( value ) {
 
 			object = value;
+			normalMatrix.getNormalMatrix( object.matrixWorld );
+
+			normals.length = 0;
 
 		};
 
@@ -190,6 +196,12 @@ THREE.Projector = function () {
 			_vertex.position.set( x, y, z );
 
 			projectVertex( _vertex );
+
+		};
+
+		var pushNormal = function ( x, y, z ) {
+
+			normals.push( x, y, z );
 
 		};
 
@@ -247,6 +259,18 @@ THREE.Projector = function () {
 				_face.v3.copy( v3 );
 				_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
 
+				for ( var i = 0; i < 3; i ++ ) {
+
+					var offset = arguments[ i ] * 3;
+					var normal = _face.vertexNormalsModel[ i ];
+
+					normal.set( normals[ offset + 0 ], normals[ offset + 1 ], normals[ offset + 2 ] );
+					normal.applyMatrix3( normalMatrix ).normalize();
+
+				}
+
+				_face.vertexNormalsLength = 3;
+
 				_face.material = object.material;
 
 				_renderData.elements.push( _face );
@@ -260,6 +284,7 @@ THREE.Projector = function () {
 			projectVertex: projectVertex,
 			checkTriangleVisibility: checkTriangleVisibility,
 			pushVertex: pushVertex,
+			pushNormal: pushNormal,
 			pushLine: pushLine,
 			pushTriangle: pushTriangle
 		}
@@ -315,6 +340,14 @@ THREE.Projector = function () {
 						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
 							renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+
+						}
+
+						var normals = attributes.normal.array;
+
+						for ( var i = 0, l = normals.length; i < l; i += 3 ) {
+
+							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
 
 						}
 
