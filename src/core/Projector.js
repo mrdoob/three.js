@@ -34,8 +34,6 @@ THREE.Projector = function () {
 
 	_normalMatrix = new THREE.Matrix3(),
 
-	_centroid = new THREE.Vector3(),
-
 	_frustum = new THREE.Frustum(),
 
 	_clippedVertex1PositionScreen = new THREE.Vector4(),
@@ -615,8 +613,6 @@ THREE.Projector = function () {
 				}
 
 			} else if ( object instanceof THREE.Sprite ) {
-
-				_modelMatrix = object.matrixWorld;
 
 				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
 				_vector4.applyMatrix4( _viewProjectionMatrix );
