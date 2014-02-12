@@ -33,7 +33,6 @@ THREE.Projector = function () {
 	_modelViewProjectionMatrix = new THREE.Matrix4(),
 
 	_normalMatrix = new THREE.Matrix3(),
-	_normalViewMatrix = new THREE.Matrix3(),
 
 	_centroid = new THREE.Vector3(),
 
@@ -310,8 +309,6 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse.getInverse( camera.matrixWorld ) );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_normalViewMatrix.getNormalMatrix( _viewMatrix );
-
 		_frustum.setFromMatrix( _viewProjectionMatrix );
 
 		projectGraph( scene, sortObjects );
@@ -487,8 +484,6 @@ THREE.Projector = function () {
 
 						_face.normalModel.applyMatrix3( _normalMatrix ).normalize();
 
-						_face.normalModelView.copy( _face.normalModel ).applyMatrix3( _normalViewMatrix );
-
 						_face.centroidModel.copy( face.centroid ).applyMatrix4( _modelMatrix );
 
 						faceVertexNormals = face.vertexNormals;
@@ -505,9 +500,6 @@ THREE.Projector = function () {
 							}
 
 							normalModel.applyMatrix3( _normalMatrix ).normalize();
-
-							var normalModelView = _face.vertexNormalsModelView[ n ];
-							normalModelView.copy( normalModel ).applyMatrix3( _normalViewMatrix );
 
 						}
 

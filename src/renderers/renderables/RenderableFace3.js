@@ -13,11 +13,9 @@ THREE.RenderableFace3 = function () {
 	this.centroidModel = new THREE.Vector3();
 
 	this.normalModel = new THREE.Vector3();
-	this.normalModelView = new THREE.Vector3();
 
-	this.vertexNormalsLength = 0;
 	this.vertexNormalsModel = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-	this.vertexNormalsModelView = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	this.vertexNormalsLength = 0;
 
 	this.color = null;
 	this.material = null;
