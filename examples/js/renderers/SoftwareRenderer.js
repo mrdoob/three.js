@@ -129,7 +129,7 @@ THREE.SoftwareRenderer = function () {
 			var material = element.material;
 			var shader = getMaterialShader( material );
 
-			if ( element instanceof THREE.RenderableFace3 ) {
+			if ( element instanceof THREE.RenderableFace ) {
 
 				drawTriangle(
 					element.v1.positionScreen,

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.RenderableFace3 = function () {
+THREE.RenderableFace = function () {
 
 	this.id = 0;
 

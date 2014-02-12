@@ -317,7 +317,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableFace3 ) {
+			} else if ( element instanceof THREE.RenderableFace ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
