@@ -452,6 +452,14 @@ THREE.JSONLoader.prototype.parse = function ( json, texturePath ) {
 		}
 
 		geometry.bones = json.bones;
+
+    if ( (geometry.bones.length > 0) && (
+      (geometry.skinWeights.length != geometry.skinIndices.length) ||
+      (geometry.skinWeights.length != geometry.vertices.length) ) ) {
+        console.warn('When skinning, number of vertices (' + geometry.vertices.length + '), skinIndices (' +
+          geometry.skinIndices.length + '), and skinWeights (' + geometry.skinWeights.length + ') should match.');
+    }
+
 		// could change this to json.animations[0] or remove completely
 		geometry.animation = json.animation;
 		geometry.animations = json.animations;
