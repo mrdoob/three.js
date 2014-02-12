@@ -7,7 +7,7 @@ THREE.Sprite = function ( material ) {
 
 	THREE.Object3D.call( this );
 
-	this.geometry = { boundingSphere: new THREE.Sphere( new THREE.Vector3(), 0.5 ) };
+	this.geometry = { boundingSphere: new THREE.Sphere( new THREE.Vector3(), 0.5 ), addEventListener: function () {} /* WebGLRenderer dependency */ };
 	this.material = ( material !== undefined ) ? material : new THREE.SpriteMaterial();
 
 };
