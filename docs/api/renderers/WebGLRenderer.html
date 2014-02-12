@@ -38,7 +38,7 @@
 		<div>A [page:Canvas] where the renderer draws its output.<br />
 		This is automatically created by the renderer in the constructor (if not provided already); you just need to add it to your page.</div>
 
-		<h3>.[page:todo context]</h3>
+		<h3>.[page:WebGLRenderingContext context]</h3>
 
 		<div>The HTML5 Canvas's 'webgl' context obtained from the canvas where the renderer will draw.</div>
 
@@ -111,7 +111,7 @@
 
 		<h3>.[page:Boolean shadowMapCascade]</h3>
 
-		<div>Default is false. TODO</div>
+		<div>Default is false. If Set, use cascaded shadowmaps. See [link:http://developer.download.nvidia.com/SDK/10.5/opengl/src/cascaded_shadow_maps/doc/cascaded_shadow_maps.pdf cascaded shadowmaps] for more information.</div>
 
 
 		<h3>.[page:Integer maxMorphTargets]</h3>
@@ -237,7 +237,9 @@
 		program — an instance of shaderProgram<br />
 		shading — an instance of Material<br />
 		</div>
-		<div>TODO.</div>
+		<div>
+        Render an immediate buffer. Gets called by renderImmediateObject.
+        </div>
 
 
 		<h3>.renderBufferDirect( [page:Camera camera], [page:Array lights], [page:Fog fog], [page:Material material], [page:Object geometryGroup], [page:Object3D object] )</h3>
@@ -255,7 +257,7 @@
         <div>Even with forceClear set to true you can prevent certain buffers being cleared by setting either the .autoClearColor, .autoClearStencil or .autoClearDepth properties to false.</div>
 
 		<h3>.renderImmediateObject( camera, lights, fog, material, object )</h3>
-		<div>TODO.</div>
+		<div>Renders an immediate Object using a camera.</div>
 
 
 		<h3>.initWebGLObjects( [page:Scene scene] )</h3>
