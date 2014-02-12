@@ -509,9 +509,7 @@ THREE.Projector = function () {
 						_face.color = face.color;
 						_face.material = material;
 
-						_centroid.copy( _face.centroidModel ).applyProjection( _viewProjectionMatrix );
-
-						_face.z = _centroid.z;
+						_face.z = ( v1.positionScreen.z + v2.positionScreen.z + v3.positionScreen.z ) / 3;
 
 						_renderData.elements.push( _face );
 
