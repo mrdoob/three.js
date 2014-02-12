@@ -460,13 +460,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
 		_elemBox.max.set( v1.x + dist, v1.y + dist );
 
-		if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-			_elemBox.makeEmpty();
-			return;
-
-		}
-
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
 

@@ -12,7 +12,7 @@ THREE.Projector = function () {
 	_line, _lineCount, _linePool = [], _linePoolLength = 0,
 	_sprite, _spriteCount, _spritePool = [], _spritePoolLength = 0,
 
-	_renderData = { objects: [], sprites: [], lights: [], elements: [] },
+	_renderData = { objects: [], lights: [], elements: [] },
 
 	_vA = new THREE.Vector3(),
 	_vB = new THREE.Vector3(),
@@ -112,17 +112,13 @@ THREE.Projector = function () {
 
 			_renderData.lights.push( object );
 
-		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line ) {
+		} else if ( object instanceof THREE.Mesh || object instanceof THREE.Line || object instanceof THREE.Sprite ) {
 
 			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
 				_renderData.objects.push( getObject( object ) );
 
 			}
-
-		} else if ( object instanceof THREE.Sprite ) {
-
-			_renderData.sprites.push( getObject( object ) );
 
 		}
 
@@ -139,7 +135,6 @@ THREE.Projector = function () {
 		_objectCount = 0;
 
 		_renderData.objects.length = 0;
-		_renderData.sprites.length = 0;
 		_renderData.lights.length = 0;
 
 		projectObject( root );
@@ -625,40 +620,36 @@ THREE.Projector = function () {
 
 				}
 
-			}
+			} else if ( object instanceof THREE.Sprite ) {
 
-		}
+				_modelMatrix = object.matrixWorld;
 
-		for ( o = 0, ol = _renderData.sprites.length; o < ol; o++ ) {
+				_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
+				_vector4.applyMatrix4( _viewProjectionMatrix );
 
-			object = _renderData.sprites[ o ].object;
+				var invW = 1 / _vector4.w;
 
-			_modelMatrix = object.matrixWorld;
+				_vector4.z *= invW;
 
-			_vector4.set( _modelMatrix.elements[12], _modelMatrix.elements[13], _modelMatrix.elements[14], 1 );
-			_vector4.applyMatrix4( _viewProjectionMatrix );
+				if ( _vector4.z >= -1 && _vector4.z <= 1 ) {
 
-			var invW = 1 / _vector4.w;
+					_sprite = getNextSpriteInPool();
+					_sprite.id = object.id;
+					_sprite.x = _vector4.x * invW;
+					_sprite.y = _vector4.y * invW;
+					_sprite.z = _vector4.z;
+					_sprite.object = object;
 
-			_vector4.z *= invW;
+					_sprite.rotation = object.rotation;
 
-			if ( _vector4.z >= -1 && _vector4.z <= 1 ) {
+					_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
+					_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
 
-				_sprite = getNextSpriteInPool();
-				_sprite.id = object.id;
-				_sprite.x = _vector4.x * invW;
-				_sprite.y = _vector4.y * invW;
-				_sprite.z = _vector4.z;
-				_sprite.object = object;
+					_sprite.material = object.material;
 
-				_sprite.rotation = object.rotation;
+					_renderData.elements.push( _sprite );
 
-				_sprite.scale.x = object.scale.x * Math.abs( _sprite.x - ( _vector4.x + camera.projectionMatrix.elements[0] ) / ( _vector4.w + camera.projectionMatrix.elements[12] ) );
-				_sprite.scale.y = object.scale.y * Math.abs( _sprite.y - ( _vector4.y + camera.projectionMatrix.elements[5] ) / ( _vector4.w + camera.projectionMatrix.elements[13] ) );
-
-				_sprite.material = object.material;
-
-				_renderData.elements.push( _sprite );
+				}
 
 			}
 
