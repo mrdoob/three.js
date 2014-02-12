@@ -82,28 +82,6 @@ THREE.Projector = function () {
 
 	};
 
-	var getObject = function ( object ) {
-
-		_object = getNextObjectInPool();
-		_object.id = object.id;
-		_object.object = object;
-
-		if ( object.renderDepth !== null ) {
-
-			_object.z = object.renderDepth;
-
-		} else {
-
-			_vector3.setFromMatrixPosition( object.matrixWorld );
-			_vector3.applyProjection( _viewProjectionMatrix );
-			_object.z = _vector3.z;
-
-		}
-
-		return _object;
-
-	};
-
 	var projectObject = function ( object ) {
 
 		if ( object.visible === false ) return;
@@ -116,7 +94,23 @@ THREE.Projector = function () {
 
 			if ( object.frustumCulled === false || _frustum.intersectsObject( object ) === true ) {
 
-				_renderData.objects.push( getObject( object ) );
+				_object = getNextObjectInPool();
+				_object.id = object.id;
+				_object.object = object;
+
+				if ( object.renderDepth !== null ) {
+
+					_object.z = object.renderDepth;
+
+				} else {
+
+					_vector3.setFromMatrixPosition( object.matrixWorld );
+					_vector3.applyProjection( _viewProjectionMatrix );
+					_object.z = _vector3.z;
+
+				}
+
+				_renderData.objects.push( _object );
 
 			}
 
