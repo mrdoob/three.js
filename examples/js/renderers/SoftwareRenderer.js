@@ -126,7 +126,7 @@ THREE.SoftwareRenderer = function () {
 
 		if ( this.autoClear === true ) this.clear();
 
-		var renderData = projector.projectScene( scene, camera );
+		var renderData = projector.projectScene( scene, camera, false, false );
 		var elements = renderData.elements;
 
 		for ( var e = 0, el = elements.length; e < el; e ++ ) {
