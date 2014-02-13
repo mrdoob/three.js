@@ -74,6 +74,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_pointLights = new THREE.Color(),
 
 	_vector3 = new THREE.Vector3(), // Needed for PointLight
+	_normal = new THREE.Vector3(),
+	_normalViewMatrix = new THREE.Matrix3(),
 
 	_pixelMap, _pixelMapContext, _pixelMapImage, _pixelMapData,
 	_gradientMap, _gradientMapContext, _gradientMapQuality = 16;
@@ -271,6 +273,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_lights = _renderData.lights;
 		_camera = camera;
 
+		_normalViewMatrix.getNormalMatrix( camera.matrixWorldInverse );
+
 		/* DEBUG
 		setFillStyle( 'rgba( 0, 255, 255, 0.5 )' );
 		_context.fillRect( _clipBox.min.x, _clipBox.min.y, _clipBox.max.x - _clipBox.min.x, _clipBox.max.y - _clipBox.min.y );
@@ -278,7 +282,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		calculateLights();
 
-		for ( var e = 0, el = _elements.length; e < el; e++ ) {
+		for ( var e = 0, el = _elements.length; e < el; e ++ ) {
 
 			var element = _elements[ e ];
 
@@ -313,7 +317,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				}
 
-			} else if ( element instanceof THREE.RenderableFace3 ) {
+			} else if ( element instanceof THREE.RenderableFace ) {
 
 				_v1 = element.v1; _v2 = element.v2; _v3 = element.v3;
 
@@ -455,13 +459,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
 		_elemBox.max.set( v1.x + dist, v1.y + dist );
-
-		if ( _clipBox.isIntersectionBox( _elemBox ) === false ) {
-
-			_elemBox.makeEmpty();
-			return;
-
-		}
 
 		if ( material instanceof THREE.SpriteMaterial ||
 			 material instanceof THREE.ParticleSystemMaterial ) { // Backwards compatibility
@@ -705,17 +702,17 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				if ( material.envMap.mapping instanceof THREE.SphericalReflectionMapping ) {
 
-					_vector3.copy( element.vertexNormalsModelView[ uv1 ] );
-					_uv1x = 0.5 * _vector3.x + 0.5;
-					_uv1y = 0.5 * _vector3.y + 0.5;
+					_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
+					_uv1x = 0.5 * _normal.x + 0.5;
+					_uv1y = 0.5 * _normal.y + 0.5;
 
-					_vector3.copy( element.vertexNormalsModelView[ uv2 ] );
-					_uv2x = 0.5 * _vector3.x + 0.5;
-					_uv2y = 0.5 * _vector3.y + 0.5;
+					_normal.copy( element.vertexNormalsModel[ uv2 ] ).applyMatrix3( _normalViewMatrix );
+					_uv2x = 0.5 * _normal.x + 0.5;
+					_uv2y = 0.5 * _normal.y + 0.5;
 
-					_vector3.copy( element.vertexNormalsModelView[ uv3 ] );
-					_uv3x = 0.5 * _vector3.x + 0.5;
-					_uv3y = 0.5 * _vector3.y + 0.5;
+					_normal.copy( element.vertexNormalsModel[ uv3 ] ).applyMatrix3( _normalViewMatrix );
+					_uv3x = 0.5 * _normal.x + 0.5;
+					_uv3y = 0.5 * _normal.y + 0.5;
 
 					patternPath( _v1x, _v1y, _v2x, _v2y, _v3x, _v3y, _uv1x, _uv1y, _uv2x, _uv2y, _uv3x, _uv3y, material.envMap );
 
@@ -758,13 +755,11 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		} else if ( material instanceof THREE.MeshNormalMaterial ) {
 
-			var normal;
-
 			if ( material.shading === THREE.FlatShading ) {
 
-				normal = element.normalModelView;
+				_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
 
-				_color.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 				material.wireframe === true
 					? strokePath( _color, material.wireframeLinewidth, material.wireframeLinecap, material.wireframeLinejoin )
@@ -772,14 +767,14 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 			} else if ( material.shading === THREE.SmoothShading ) {
 
-				normal = element.vertexNormalsModelView[ uv1 ];
-				_color1.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_normal.copy( element.vertexNormalsModel[ uv1 ] ).applyMatrix3( _normalViewMatrix );
+				_color1.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
-				normal = element.vertexNormalsModelView[ uv2 ];
-				_color2.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_normal.copy( element.vertexNormalsModel[ uv2 ] ).applyMatrix3( _normalViewMatrix );
+				_color2.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
-				normal = element.vertexNormalsModelView[ uv3 ];
-				_color3.setRGB( normal.x, normal.y, normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
+				_normal.copy( element.vertexNormalsModel[ uv3 ] ).applyMatrix3( _normalViewMatrix );
+				_color3.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
 				_color4.addColors( _color2, _color3 ).multiplyScalar( 0.5 );
 

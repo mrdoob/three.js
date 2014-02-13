@@ -50,6 +50,7 @@ var Loader = function ( editor ) {
 						mesh.name = filename;
 
 						editor.addObject( mesh );
+						editor.select( mesh );
 
 					} );
 
@@ -74,6 +75,7 @@ var Loader = function ( editor ) {
 						collada.scene.name = filename;
 
 						editor.addObject( collada.scene );
+						editor.select( collada.scene );
 
 					} );
 
@@ -150,6 +152,7 @@ var Loader = function ( editor ) {
 					object.name = filename;
 
 					editor.addObject( object );
+					editor.select( object );
 
 				}, false );
 				reader.readAsText( file );
@@ -175,6 +178,7 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -198,6 +202,7 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 
@@ -227,6 +232,7 @@ var Loader = function ( editor ) {
 					var mesh = new THREE.Mesh( geometry, material );
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsBinaryString( file );
@@ -251,6 +257,7 @@ var Loader = function ( editor ) {
 					mesh.name = filename;
 
 					editor.addObject( mesh );
+					editor.select( mesh );
 
 				}, false );
 				reader.readAsText( file );
@@ -320,6 +327,7 @@ var Loader = function ( editor ) {
 			mesh.name = filename;
 
 			editor.addObject( mesh );
+			editor.select( mesh );
 
 		} else if ( data.metadata.type.toLowerCase() === 'object' ) {
 
@@ -333,6 +341,7 @@ var Loader = function ( editor ) {
 			} else {
 
 				editor.addObject( result );
+				editor.select( result );
 
 			}
 

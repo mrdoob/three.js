@@ -18,6 +18,8 @@ THREE.SoftwareRenderer = function () {
 	var viewportXScale, viewportYScale, viewportZScale;
 	var viewportXOffs, viewportYOffs, viewportZOffs;
 
+	var clearColor = new THREE.Color( 0x000000 );
+
 	var imagedata, data, zbuffer;
 	var numBlocks, blockMaxZ, blockFlags;
 
@@ -53,7 +55,7 @@ THREE.SoftwareRenderer = function () {
 
 	this.setClearColor = function ( color, alpha ) {
 
-		// TODO
+		clearColor.set( color );
 
 	};
 
@@ -76,8 +78,12 @@ THREE.SoftwareRenderer = function () {
 		canvas.width = canvasWidth;
 		canvas.height = canvasHeight;
 
+		context.fillStyle = clearColor.getStyle();
+		context.fillRect( 0, 0, canvasWidth, canvasHeight );
+
 		imagedata = context.getImageData( 0, 0, canvasWidth, canvasHeight );
 		data = imagedata.data;
+
 		zbuffer = new Int32Array( data.length / 4 );
 
 		numBlocks = canvasWBlocks * canvasHBlocks;
@@ -129,7 +135,7 @@ THREE.SoftwareRenderer = function () {
 			var material = element.material;
 			var shader = getMaterialShader( material );
 
-			if ( element instanceof THREE.RenderableFace3 ) {
+			if ( element instanceof THREE.RenderableFace ) {
 
 				drawTriangle(
 					element.v1.positionScreen,
@@ -569,7 +575,7 @@ THREE.SoftwareRenderer = function () {
 	function clearBlock( blockX, blockY ) {
 
 		var zoffset = blockX * blockSize + blockY * blockSize * canvasWidth;
-		var poffset = zoffset * 4 + 3;
+		var poffset = zoffset * 4;
 
 		var zlinestep = canvasWidth - blockSize;
 		var plinestep = zlinestep * 4;
@@ -578,11 +584,12 @@ THREE.SoftwareRenderer = function () {
 
 			for ( var x = 0; x < blockSize; x ++ ) {
 
-				zbuffer[ zoffset ] = maxZVal;
-				data[ poffset ] = 0;
+				zbuffer[ zoffset ++ ] = maxZVal;
 
-				zoffset ++;
-				poffset += 4;
+				data[ poffset ++ ] = clearColor.r * 255 | 0;
+				data[ poffset ++ ] = clearColor.g * 255 | 0;
+				data[ poffset ++ ] = clearColor.b * 255 | 0;
+				data[ poffset ++ ] = 255;
 
 			}
 

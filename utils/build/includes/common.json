@@ -28,6 +28,7 @@
 	"src/core/Face3.js",
 	"src/core/Face4.js",
 	"src/core/Geometry.js",
+	"src/core/Geometry2.js",
 	"src/core/BufferGeometry.js",
 	"src/cameras/Camera.js",
 	"src/cameras/OrthographicCamera.js",
@@ -86,7 +87,7 @@
 	"src/renderers/WebGLRenderTarget.js",
 	"src/renderers/WebGLRenderTargetCube.js",
 	"src/renderers/renderables/RenderableVertex.js",
-	"src/renderers/renderables/RenderableFace3.js",
+	"src/renderers/renderables/RenderableFace.js",
 	"src/renderers/renderables/RenderableObject.js",
 	"src/renderers/renderables/RenderableSprite.js",
 	"src/renderers/renderables/RenderableLine.js"
