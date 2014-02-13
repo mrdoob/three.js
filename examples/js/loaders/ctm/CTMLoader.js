@@ -116,8 +116,8 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 							var ctmFile = files[ i ];
 
-																		var e1 = Date.now();
-																		// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
+							var e1 = Date.now();
+							// console.log( "CTM data parse time [worker]: " + (e1-s) + " ms" );
 
 							if ( useBuffers ) {
 
@@ -129,8 +129,8 @@ THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
 							}
 
-																		var e = Date.now();
-																		console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
+							var e = Date.now();
+							console.log( "model load time [worker]: " + (e-e1) + " ms, total: " + (e-s));
 
 						}
 
@@ -229,7 +229,7 @@ THREE.CTMLoader.prototype.createModelBuffers = function ( file, callback ) {
 		// attributes
 		var attributes = scope.attributes;
 
-		attributes[ "index" ]		 = { itemSize: 1, array: vertexIndexArray };
+		attributes[ "index" ]    = { itemSize: 1, array: vertexIndexArray };
 		attributes[ "position" ] = { itemSize: 3, array: vertexPositionArray };
 
 		if ( vertexNormalArray !== undefined ) 
@@ -432,15 +432,15 @@ THREE.CTMLoader.prototype.createModelClassic = function ( file, callback ) {
 
 	function f3n ( scope, normals, a, b, c, mi, nai, nbi, nci ) {
 
-		var nax = normals[ nai * 3		 ],
+		var nax = normals[ nai * 3     ],
 			nay = normals[ nai * 3 + 1 ],
 			naz = normals[ nai * 3 + 2 ],
 
-			nbx = normals[ nbi * 3		 ],
+			nbx = normals[ nbi * 3     ],
 			nby = normals[ nbi * 3 + 1 ],
 			nbz = normals[ nbi * 3 + 2 ],
 
-			ncx = normals[ nci * 3		 ],
+			ncx = normals[ nci * 3     ],
 			ncy = normals[ nci * 3 + 1 ],
 			ncz = normals[ nci * 3 + 2 ];
 
