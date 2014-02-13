@@ -28,6 +28,67 @@ THREE.Geometry2.prototype = {
 
 	},
 
+	computeBoundingBox: function () {
+
+		if ( this.boundingBox === null ) {
+
+			this.boundingBox = new THREE.Box3();
+
+		}
+
+		var vertices = this.vertices;
+		var bb = this.boundingBox;
+
+		if ( vertices.length >= 3 ) {
+
+			bb.min.x = bb.max.x = vertices[ 0 ];
+			bb.min.y = bb.max.y = vertices[ 1 ];
+			bb.min.z = bb.max.z = vertices[ 2 ];
+
+		}
+
+		for ( var i = 3, il = vertices.length; i < il; i += 3 ) {
+
+			var x = vertices[ i ];
+			var y = vertices[ i + 1 ];
+			var z = vertices[ i + 2 ];
+
+			// bounding box
+
+			if ( x < bb.min.x ) {
+
+				bb.min.x = x;
+
+			} else if ( x > bb.max.x ) {
+
+				bb.max.x = x;
+
+			}
+
+			if ( y < bb.min.y ) {
+
+				bb.min.y = y;
+
+			} else if ( y > bb.max.y ) {
+
+				bb.max.y = y;
+
+			}
+
+			if ( z < bb.min.z ) {
+
+				bb.min.z = z;
+
+			} else if ( z > bb.max.z ) {
+
+				bb.max.z = z;
+
+			}
+
+		}
+
+	},
+
 	computeBoundingSphere: function () {
 
 		var box = new THREE.Box3();

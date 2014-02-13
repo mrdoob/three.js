@@ -87,7 +87,6 @@ THREE.BufferGeometry.prototype = {
 		if ( positions ) {
 
 			var bb = this.boundingBox;
-			var x, y, z;
 
 			if( positions.length >= 3 ) {
 				bb.min.x = bb.max.x = positions[ 0 ];
@@ -97,9 +96,9 @@ THREE.BufferGeometry.prototype = {
 
 			for ( var i = 3, il = positions.length; i < il; i += 3 ) {
 
-				x = positions[ i ];
-				y = positions[ i + 1 ];
-				z = positions[ i + 2 ];
+				var x = positions[ i ];
+				var y = positions[ i + 1 ];
+				var z = positions[ i + 2 ];
 
 				// bounding box
 
