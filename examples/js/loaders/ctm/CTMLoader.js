@@ -84,6 +84,8 @@ THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
 THREE.CTMLoader.prototype.load = function( url, callback, parameters ) {
 
+	parameters = parameters || {};
+
 	var scope = this;
 
 	var offsets = parameters.offsets !== undefined ? parameters.offsets : [ 0 ];
