@@ -8430,6 +8430,8 @@ THREE.Projector = function () {
 
 					vertices = object.geometry.vertices;
 
+					if ( vertices.length === 0 ) continue;
+
 					v1 = getNextVertexInPool();
 					v1.positionScreen.copy( vertices[ 0 ] ).applyMatrix4( _modelViewProjectionMatrix );
 
