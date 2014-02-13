@@ -585,7 +585,7 @@ THREE.Projector = function () {
 					// Handle LineStrip and LinePieces
 					var step = object.type === THREE.LinePieces ? 2 : 1;
 
-					for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
+					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 						v1 = getNextVertexInPool();
 						v1.positionScreen.copy( vertices[ v ] ).applyMatrix4( _modelViewProjectionMatrix );
