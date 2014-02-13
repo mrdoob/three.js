@@ -33,6 +33,8 @@ THREE.VRMLLoader.prototype = {
 
 			scope.dispatchEvent( { type: 'load', content: object } );
 
+			if ( callback ) callback( object );
+
 		}, false );
 
 		request.addEventListener( 'progress', function ( event ) {
