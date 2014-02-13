@@ -8167,28 +8167,46 @@ THREE.Projector = function () {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var attributes = geometry.attributes;
+					var offsets = geometry.offsets;
 
-					if ( attributes.position !== undefined ) {
+					if ( attributes.position === undefined ) continue;
 
-						var positions = attributes.position.array;
+					var positions = attributes.position.array;
 
-						for ( var i = 0, l = positions.length; i < l; i += 3 ) {
+					for ( var i = 0, l = positions.length; i < l; i += 3 ) {
 
-							renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
+						renderList.pushVertex( positions[ i ], positions[ i + 1 ], positions[ i + 2 ] );
 
-						}
+					}
 
-						var normals = attributes.normal.array;
+					var normals = attributes.normal.array;
 
-						for ( var i = 0, l = normals.length; i < l; i += 3 ) {
+					for ( var i = 0, l = normals.length; i < l; i += 3 ) {
 
-							renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
+						renderList.pushNormal( normals[ i ], normals[ i + 1 ], normals[ i + 2 ] );
 
-						}
+					}
 
-						if ( attributes.index !== undefined ) {
+					if ( attributes.index !== undefined ) {
 
-							var indices = attributes.index.array;
+						var indices = attributes.index.array;
+
+						if ( offsets.length > 0 ) {
+
+							for ( var o = 0; o < offsets.length; o ++ ) {
+
+								var offset = offsets[ o ];
+								var index = offset.index;
+
+								for ( var i = offset.start, l = offset.start + offset.count; i < l; i += 3 ) {
+
+									renderList.pushTriangle( indices[ i ] + index, indices[ i + 1 ] + index, indices[ i + 2 ] + index );
+
+								}
+
+							}
+
+						} else {
 
 							for ( var i = 0, l = indices.length; i < l; i += 3 ) {
 
@@ -8196,13 +8214,13 @@ THREE.Projector = function () {
 
 							}
 
-						} else {
+						}
 
-							for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
+					} else {
 
-								renderList.pushTriangle( i, i + 1, i + 2 );
+						for ( var i = 0, l = positions.length / 3; i < l; i += 3 ) {
 
-							}
+							renderList.pushTriangle( i, i + 1, i + 2 );
 
 						}
 
@@ -8418,7 +8436,7 @@ THREE.Projector = function () {
 					// Handle LineStrip and LinePieces
 					var step = object.type === THREE.LinePieces ? 2 : 1;
 
-					for ( v = 1, vl = vertices.length; v < vl; v ++ ) {
+					for ( var v = 1, vl = vertices.length; v < vl; v ++ ) {
 
 						v1 = getNextVertexInPool();
 						v1.positionScreen.copy( vertices[ v ] ).applyMatrix4( _modelViewProjectionMatrix );
