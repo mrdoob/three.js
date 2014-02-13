@@ -20,6 +20,8 @@ THREE.CTMLoader.prototype = Object.create( THREE.Loader.prototype );
 
 THREE.CTMLoader.prototype.loadParts = function( url, callback, parameters ) {
 
+	parameters = parameters || {};
+
 	var scope = this;
 
 	var xhr = new XMLHttpRequest();
