@@ -7148,6 +7148,8 @@ THREE.EventDispatcher.prototype = {
 
 								distance: distance,
 								point: intersectionPoint,
+								vertices: [vA.clone(), vB.clone(), vC.clone()],
+								indices: [a, b, c],
 								face: null,
 								faceIndex: null,
 								object: object
@@ -7211,6 +7213,8 @@ THREE.EventDispatcher.prototype = {
 
 							distance: distance,
 							point: intersectionPoint,
+							vertices: [vA.clone(), vB.clone(), vC.clone()],
+							indices: [a, b, c],
 							face: null,
 							faceIndex: null,
 							object: object
