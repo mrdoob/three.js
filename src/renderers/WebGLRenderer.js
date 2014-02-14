@@ -16,6 +16,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	_precision = parameters.precision !== undefined ? parameters.precision : 'highp',
 
+	_buffers = {},
+
 	_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 	_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 	_antialias = parameters.antialias !== undefined ? parameters.antialias : false,
@@ -1080,6 +1082,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 			_gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
 
 		}
+
+	};
+
+	function initGeometry2Buffers( geometry ) {
+
+		var buffers = {};
+		var attributes = [ 'vertices', 'normals', 'uvs' ];
+
+		for ( var key in attributes ) {
+
+			var array = geometry[ attributes[ key ] ];
+			var buffer = _gl.createBuffer();
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, array, _gl.STATIC_DRAW );
+
+			buffers[ attributes[ key ] ] = buffer;
+
+		}
+
+		_buffers[ geometry.id ] = buffers;
 
 	};
 
@@ -2457,6 +2480,27 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
+	}
+
+	function setGeometry2Buffers( geometry, hint ) {
+
+		if ( geometry.needsUpdate === false ) return;
+
+		var attributes = [ 'vertices', 'normals', 'uvs' ];
+		var buffers = _buffers[ geometry.id ];
+
+		for ( var key in attributes ) {
+
+			var array = geometry[ attributes[ key ] ];
+			var buffer = buffers[ attributes[ key ] ];
+
+			_gl.bindBuffer( _gl.ARRAY_BUFFER, buffer );
+			_gl.bufferData( _gl.ARRAY_BUFFER, array, hint );
+
+		}
+
+		geometry.needsUpdate = false;
+
 	};
 
 	// Buffer rendering
@@ -2551,6 +2595,56 @@ THREE.WebGLRenderer = function ( parameters ) {
 		_gl.drawArrays( _gl.TRIANGLES, 0, object.count );
 
 		object.count = 0;
+
+	};
+
+	this.renderBufferGeometry2 = function ( camera, lights, fog, material, geometry, object ) {
+
+		var program = setProgram( camera, lights, fog, material, object );
+
+		var programAttributes = program.attributes;
+
+		var attributes = { 'position': 'vertices', 'normal': 'normals', 'uv': 'uvs' };
+		var itemSizes = { 'position': 3, 'normal': 3, 'uv': 2 };
+
+		var buffers = _buffers[ geometry.id ];
+
+		disableAttributes();
+
+		for ( var name in programAttributes ) {
+
+			var attributePointer = programAttributes[ name ];
+			
+			if ( attributePointer >= 0 ) {
+
+				var array = geometry[ attributes[ name ] ];
+
+				if ( array !== undefined && array.length > 0 ) {
+
+					_gl.bindBuffer( _gl.ARRAY_BUFFER, buffers[ attributes[ name ] ] );
+					enableAttribute( attributePointer );
+					_gl.vertexAttribPointer( attributePointer, itemSizes[ name ], _gl.FLOAT, false, 0, 0 );
+
+				} else {
+
+					if ( itemSizes[ name ] === 3 ) {
+
+						_gl.vertexAttrib3fv( attributePointer, [ 0, 0, 0 ] );
+
+					} else if ( itemSizes[ name ] === 2 ) {
+
+						_gl.vertexAttrib2fv( attributePointer, [ 0, 0 ] );
+
+					}
+
+
+				}
+
+			}
+
+		}
+
+		_gl.drawArrays( _gl.TRIANGLES, 0, geometry.vertices.length / 3 );
 
 	};
 
@@ -3518,6 +3612,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 					_this.renderBufferDirect( camera, lights, fog, material, buffer, object );
 
+				} else if ( buffer instanceof THREE.Geometry2 ) {
+
+					_this.renderBufferGeometry2( camera, lights, fog, material, buffer, object );
+
 				} else {
 
 					_this.renderBuffer( camera, lights, fog, material, buffer, object );
@@ -3802,6 +3900,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				initDirectBuffers( geometry );
 
+			} else if ( geometry instanceof THREE.Geometry2 ) {
+
+				initGeometry2Buffers( geometry );
+
 			} else if ( object instanceof THREE.Mesh ) {
 
 				material = object.material;
@@ -3873,6 +3975,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 				geometry = object.geometry;
 
 				if ( geometry instanceof THREE.BufferGeometry ) {
+
+					addBuffer( scene.__webglObjects, geometry, object );
+
+				} else if ( geometry instanceof THREE.Geometry2 ) {
 
 					addBuffer( scene.__webglObjects, geometry, object );
 
@@ -3953,6 +4059,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
 			setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+
+		} else if ( geometry instanceof THREE.Geometry2 ) {
+
+			setGeometry2Buffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
 
 		} else if ( object instanceof THREE.Mesh ) {
 
