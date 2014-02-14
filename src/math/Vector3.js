@@ -597,7 +597,7 @@ THREE.Vector3.prototype = {
 
 	projectOnVector: function () {
 
-		var v1;
+		var v1, dot;
 
 		return function ( vector ) {
 
@@ -605,7 +605,9 @@ THREE.Vector3.prototype = {
 
 			v1.copy( vector ).normalize();
 
-			return this.copy( v1 ).multiplyScalar( this.dot( v1 ) );
+			dot = this.dot( v1 );
+
+			return this.copy( v1 ).multiplyScalar( dot );
 
 		};
 
