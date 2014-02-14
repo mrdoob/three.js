@@ -16,41 +16,6 @@ self.console = self.console || {
 
 };
 
-// based on https://github.com/documentcloud/underscore/blob/bf657be243a075b5e72acc8a83e6f12a564d8f55/underscore.js#L767
-THREE.extend = function ( obj, source ) {
-
-	// ECMAScript5 compatibility based on: http://www.nczonline.net/blog/2012/12/11/are-your-mixins-ecmascript-5-compatible/
-	if ( Object.keys ) {
-
-		var keys = Object.keys( source );
-
-		for (var i = 0, il = keys.length; i < il; i++) {
-
-			var prop = keys[i];
-			Object.defineProperty( obj, prop, Object.getOwnPropertyDescriptor( source, prop ) );
-
-		}
-
-	} else {
-
-		var safeHasOwnProperty = {}.hasOwnProperty;
-
-		for ( var prop in source ) {
-
-			if ( safeHasOwnProperty.call( source, prop ) ) {
-
-				obj[prop] = source[prop];
-
-			}
-
-		}
-
-	}
-
-	return obj;
-
-};
-
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
 // http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
 
@@ -1325,10 +1290,67 @@ THREE.Vector2.prototype = {
 		}
 
 		return this;
+	},
+
+	clampScalar: ( function () {
+
+		var min, max;
+
+		return function ( minVal, maxVal ) {
+
+			if ( min === undefined ) {
+
+				min = new THREE.Vector2();
+				max = new THREE.Vector2();
+
+			}
+
+			min.set( minVal, minVal );
+			max.set( maxVal, maxVal );
+
+			return this.clamp( min, max );
+
+		};
+		
+	} )(),
+
+	floor: function () {
+
+		this.x = Math.floor( this.x );
+		this.y = Math.floor( this.y );
+
+		return this;
 
 	},
 
-	negate: function() {
+	ceil: function () {
+
+		this.x = Math.ceil( this.x );
+		this.y = Math.ceil( this.y );
+
+		return this;
+
+	},
+
+	round: function () {
+
+		this.x = Math.round( this.x );
+		this.y = Math.round( this.y );
+
+		return this;
+
+	},
+
+	roundToZero: function () {
+
+		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
+		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+
+		return this;
+
+	},
+
+	negate: function () {
 
 		return this.multiplyScalar( - 1 );
 
@@ -1614,6 +1636,44 @@ THREE.Vector3.prototype = {
 
 	},
 
+	applyEuler: function () {
+
+		var quaternion;
+
+		return function ( euler ) {
+
+			if ( euler instanceof THREE.Euler === false ) {
+
+				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
+
+			}
+
+			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
+
+			this.applyQuaternion( quaternion.setFromEuler( euler ) );
+
+			return this;
+
+		};
+
+	}(),
+
+	applyAxisAngle: function () {
+
+		var quaternion;
+
+		return function ( axis, angle ) {
+
+			if ( quaternion === undefined ) quaternion = new THREE.Quaternion();
+
+			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
+
+			return this;
+
+		};
+
+	}(),
+
 	applyMatrix3: function ( m ) {
 
 		var x = this.x;
@@ -1828,6 +1888,68 @@ THREE.Vector3.prototype = {
 
 	},
 
+	clampScalar: ( function () {
+
+		var min, max;
+
+		return function ( minVal, maxVal ) {
+
+			if ( min === undefined ) {
+
+				min = new THREE.Vector3();
+				max = new THREE.Vector3();
+
+			}
+
+			min.set( minVal, minVal, minVal );
+			max.set( maxVal, maxVal, maxVal );
+
+			return this.clamp( min, max );
+
+		};
+
+	} )(),
+
+	floor: function () {
+
+		this.x = Math.floor( this.x );
+		this.y = Math.floor( this.y );
+		this.z = Math.floor( this.z );
+
+		return this;
+
+	},
+
+	ceil: function () {
+
+		this.x = Math.ceil( this.x );
+		this.y = Math.ceil( this.y );
+		this.z = Math.ceil( this.z );
+
+		return this;
+
+	},
+
+	round: function () {
+
+		this.x = Math.round( this.x );
+		this.y = Math.round( this.y );
+		this.z = Math.round( this.z );
+
+		return this;
+
+	},
+
+	roundToZero: function () {
+
+		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
+		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+		this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+
+		return this;
+
+	},
+
 	negate: function () {
 
 		return this.multiplyScalar( - 1 );
@@ -1918,6 +2040,57 @@ THREE.Vector3.prototype = {
 		return this;
 
 	},
+
+	projectOnVector: function () {
+
+		var v1, dot;
+
+		return function ( vector ) {
+
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
+
+			v1.copy( vector ).normalize();
+
+			dot = this.dot( v1 );
+
+			return this.copy( v1 ).multiplyScalar( dot );
+
+		};
+
+	}(),
+
+	projectOnPlane: function () {
+
+		var v1;
+
+		return function ( planeNormal ) {
+
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
+
+			v1.copy( this ).projectOnVector( planeNormal );
+
+			return this.sub( v1 );
+
+		}
+
+	}(),
+
+	reflect: function () {
+
+		// reflect incident vector off plane orthogonal to normal
+		// normal is assumed to have unit length
+
+		var v1;
+
+		return function ( normal ) {
+
+			if ( v1 === undefined ) v1 = new THREE.Vector3();
+
+			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
+
+		}
+
+	}(),
 
 	angleTo: function ( v ) {
 
@@ -2046,88 +2219,6 @@ THREE.Vector3.prototype = {
 	}
 
 };
-
-THREE.extend( THREE.Vector3.prototype, {
-
-	applyEuler: function () {
-
-		var quaternion = new THREE.Quaternion();
-
-		return function ( euler ) {
-
-			if ( euler instanceof THREE.Euler === false ) {
-
-				console.error( 'ERROR: Vector3\'s .applyEuler() now expects a Euler rotation rather than a Vector3 and order.  Please update your code.' );
-
-			}
-
-			this.applyQuaternion( quaternion.setFromEuler( euler ) );
-
-			return this;
-
-		};
-
-	}(),
-
-	applyAxisAngle: function () {
-
-		var quaternion = new THREE.Quaternion();
-
-		return function ( axis, angle ) {
-
-			this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-			return this;
-
-		};
-
-	}(),
-
-	projectOnVector: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function ( vector ) {
-
-			v1.copy( vector ).normalize();
-			var d = this.dot( v1 );
-			return this.copy( v1 ).multiplyScalar( d );
-
-		};
-
-	}(),
-
-	projectOnPlane: function () {
-
-		var v1 = new THREE.Vector3();
-
-		return function ( planeNormal ) {
-
-			v1.copy( this ).projectOnVector( planeNormal );
-
-			return this.sub( v1 );
-
-		}
-
-	}(),
-
-	reflect: function () {
-
-		// reflect incident vector off plane orthogonal to normal
-		// normal is assumed to have unit length
-
-		var v1 = new THREE.Vector3();
-
-		return function ( normal ) {
-
-			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
-
-		}
-
-	}()
-
-} );
-
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
  * @author philogb / http://blog.thejit.org/
@@ -2613,7 +2704,73 @@ THREE.Vector4.prototype = {
 
 	},
 
-	negate: function() {
+	clampScalar: ( function () {
+
+		var min, max;
+
+		return function ( minVal, maxVal ) {
+
+			if ( min === undefined ) {
+
+				min = new THREE.Vector4();
+				max = new THREE.Vector4();
+
+			}
+
+			min.set( minVal, minVal, minVal, minVal );
+			max.set( maxVal, maxVal, maxVal, maxVal );
+
+			return this.clamp( min, max );
+
+		};
+
+	} )(),
+
+    floor: function () {
+
+        this.x = Math.floor( this.x );
+        this.y = Math.floor( this.y );
+        this.z = Math.floor( this.z );
+        this.w = Math.floor( this.w );
+
+        return this;
+
+    },
+
+    ceil: function () {
+
+        this.x = Math.ceil( this.x );
+        this.y = Math.ceil( this.y );
+        this.z = Math.ceil( this.z );
+        this.w = Math.ceil( this.w );
+
+        return this;
+
+    },
+
+    round: function () {
+
+        this.x = Math.round( this.x );
+        this.y = Math.round( this.y );
+        this.z = Math.round( this.z );
+        this.w = Math.round( this.w );
+
+        return this;
+
+    },
+
+    roundToZero: function () {
+
+        this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
+        this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
+        this.z = ( this.z < 0 ) ? Math.ceil( this.z ) : Math.floor( this.z );
+        this.w = ( this.w < 0 ) ? Math.ceil( this.w ) : Math.floor( this.w );
+
+        return this;
+
+    },
+
+	negate: function () {
 
 		return this.multiplyScalar( -1 );
 
