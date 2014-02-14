@@ -100,7 +100,6 @@
 				var material = object.material;
 
 				if ( material === undefined ) return intersects;
-				if ( geometry.dynamic === false ) return intersects;
 
 				var a, b, c;
 				var precision = raycaster.precision;

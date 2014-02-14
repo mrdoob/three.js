@@ -2444,7 +2444,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	}
 
-	function setDirectBuffers ( geometry, hint, dispose ) {
+	function setDirectBuffers( geometry, hint ) {
 
 		var attributes = geometry.attributes;
 
@@ -2469,12 +2469,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				attributeItem.needsUpdate = false;
-
-			}
-
-			if ( dispose && ! attributeItem.dynamic ) {
-
-				attributeItem.array = null;
 
 			}
 
@@ -3562,7 +3556,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	};
 
-	function renderObjects ( renderList, reverse, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
+	function renderObjects( renderList, reverse, materialType, camera, lights, fog, useBlending, overrideMaterial ) {
 
 		var webglObject, object, buffer, material, start, end, delta;
 
@@ -4058,11 +4052,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( geometry instanceof THREE.BufferGeometry ) {
 
-			setDirectBuffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+			setDirectBuffers( geometry, _gl.DYNAMIC_DRAW );
 
 		} else if ( geometry instanceof THREE.Geometry2 ) {
 
-			setGeometry2Buffers( geometry, _gl.DYNAMIC_DRAW, !geometry.dynamic );
+			setGeometry2Buffers( geometry, _gl.DYNAMIC_DRAW );
 
 		} else if ( object instanceof THREE.Mesh ) {
 
