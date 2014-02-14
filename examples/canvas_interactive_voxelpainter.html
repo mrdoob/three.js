@@ -180,14 +180,9 @@
 						var normal = intersect.face.normal.clone();
 						normal.applyMatrix3( normalMatrix ).normalize();
 
-						var position = new THREE.Vector3().addVectors( intersect.point, normal );
-
 						var voxel = new THREE.Mesh( cubeGeometry, cubeMaterial );
-						voxel.position.x = Math.floor( position.x / 50 ) * 50 + 25;
-						voxel.position.y = Math.floor( position.y / 50 ) * 50 + 25;
-						voxel.position.z = Math.floor( position.z / 50 ) * 50 + 25;
-						voxel.matrixAutoUpdate = false;
-						voxel.updateMatrix();
+						voxel.position.addVectors( intersect.point, normal );
+						voxel.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
 						scene.add( voxel );
 
 					}
