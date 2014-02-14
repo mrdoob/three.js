@@ -145,7 +145,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 	_currentWidth = 0,
 	_currentHeight = 0,
 
-	_enabledAttributes = {},
+	_enabledAttributes = new Uint8Array( 16 ),
 
 	// frustum
 
@@ -3146,10 +3146,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function enableAttribute( attribute ) {
 
-		if ( ! _enabledAttributes[ attribute ] ) {
+		if ( _enabledAttributes[ attribute ] === 0 ) {
 
 			_gl.enableVertexAttribArray( attribute );
-			_enabledAttributes[ attribute ] = true;
+			_enabledAttributes[ attribute ] = 1;
 
 		}
 
@@ -3159,10 +3159,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		for ( var attribute in _enabledAttributes ) {
 
-			if ( _enabledAttributes[ attribute ] ) {
+			if ( _enabledAttributes[ attribute ] === 1 ) {
 
 				_gl.disableVertexAttribArray( attribute );
-				_enabledAttributes[ attribute ] = false;
+				_enabledAttributes[ attribute ] = 0;
 
 			}
 
