@@ -164,6 +164,7 @@
 
 								distance: distance,
 								point: intersectionPoint,
+								indices: [a, b, c],
 								face: null,
 								faceIndex: null,
 								object: object
@@ -227,6 +228,7 @@
 
 							distance: distance,
 							point: intersectionPoint,
+							indices: [a, b, c],
 							face: null,
 							faceIndex: null,
 							object: object
