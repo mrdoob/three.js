@@ -579,8 +579,6 @@ var Viewport = function ( editor ) {
 		renderer.render( scene, camera );
 		renderer.render( sceneHelpers, camera );
 
-		//console.trace();
-
 	}
 
 	return container;
