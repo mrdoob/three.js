@@ -609,6 +609,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_this.info.memory.geometries --;
 
+		} if ( geometry instanceof THREE.Geometry2 ) {
+
+			delete _buffers[ geometry.id ];
+
+			_this.info.memory.geometries --;
+
 		} else {
 
 			if ( geometry.geometryGroups !== undefined ) {
