@@ -22,8 +22,6 @@ THREE.BufferGeometry = function () {
 	this.boundingBox = null;
 	this.boundingSphere = null;
 
-	this.hasTangents = false;
-
 };
 
 THREE.BufferGeometry.prototype = {
@@ -43,28 +41,23 @@ THREE.BufferGeometry.prototype = {
 
 	applyMatrix: function ( matrix ) {
 
-		var positionArray;
-		var normalArray;
+		var position = this.attributes.position;
 
-		if ( this.attributes[ "position" ] ) positionArray = this.attributes[ "position" ].array;
-		if ( this.attributes[ "normal" ] ) normalArray = this.attributes[ "normal" ].array;
+		if ( position !== undefined ) {
 
-		if ( positionArray !== undefined ) {
-
-			matrix.multiplyVector3Array( positionArray );
-			this.verticesNeedUpdate = true;
+			matrix.multiplyVector3Array( position.array );
+			position.needsUpdate = true;
 
 		}
 
-		if ( normalArray !== undefined ) {
+		var normal = this.attributes.normal;
+
+		if ( normal !== undefined ) {
 
 			var normalMatrix = new THREE.Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.multiplyVector3Array( normalArray );
-
-			this.normalizeNormals();
-
-			this.normalsNeedUpdate = true;
+			normalMatrix.multiplyVector3Array( normal.array );
+			normal.needsUpdate = true;
 
 		}
 
@@ -552,9 +545,6 @@ THREE.BufferGeometry.prototype = {
 			}
 
 		}
-
-		this.hasTangents = true;
-		this.tangentsNeedUpdate = true;
 
 	},
 
