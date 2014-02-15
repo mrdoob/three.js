@@ -39,6 +39,7 @@
 		if ( object instanceof THREE.Sprite ) {
 
 			matrixPosition.setFromMatrixPosition( object.matrixWorld );
+			
 			var distance = raycaster.ray.distanceToPoint( matrixPosition );
 
 			if ( distance > object.scale.x ) {
@@ -101,19 +102,18 @@
 
 				if ( material === undefined ) return intersects;
 
+				var attributes = geometry.attributes;
+
 				var a, b, c;
 				var precision = raycaster.precision;
 
-				if ( geometry.attributes.index !== undefined ) {
+				if ( attributes.index !== undefined ) {
 
 					var offsets = geometry.offsets;
-					var indices = geometry.attributes.index.array;
-					var positions = geometry.attributes.position.array;
-					var offLength = geometry.offsets.length;
+					var indices = attributes.index.array;
+					var positions = attributes.position.array;
 
-					var fl = geometry.attributes.index.array.length / 3;
-
-					for ( var oi = 0; oi < offLength; ++oi ) {
+					for ( var oi = 0, ol = offsets.length; oi < ol; ++oi ) {
 
 						var start = offsets[ oi ].start;
 						var count = offsets[ oi ].count;
@@ -178,12 +178,9 @@
 				} else {
 
 					var offsets = geometry.offsets;
-					var positions = geometry.attributes.position.array;
-					var offLength = geometry.offsets.length;
+					var positions = attributes.position.array;
 
-					var fl = geometry.attributes.position.array.length;
-
-					for ( var i = 0; i < fl; i += 3 ) {
+					for ( var i = 0, il = attributes.position.array.length; i < il; i += 3 ) {
 
 						a = i;
 						b = i + 1;
