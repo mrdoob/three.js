@@ -130,9 +130,9 @@ THREE.OBJLoader.prototype = {
 
 			var ia = parseUVIndex( a );
 			var ib = parseUVIndex( b );
-      		var ic = parseUVIndex( c );
+			var ic = parseUVIndex( c );
 
-      		if ( d === undefined ) {
+			if ( d === undefined ) {
 
 				addUV( ia, ib, ic );
 
