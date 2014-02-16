@@ -46,7 +46,7 @@
 	"src/loaders/JSONLoader.js",
 	"src/loaders/LoadingManager.js",
 	"src/loaders/BufferGeometryLoader.js",
-	"src/loaders/GeometryLoader.js",
+	"src/loaders/Geometry2Loader.js",
 	"src/loaders/MaterialLoader.js",
 	"src/loaders/ObjectLoader.js",
 	"src/loaders/SceneLoader.js",

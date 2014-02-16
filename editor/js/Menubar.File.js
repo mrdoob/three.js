@@ -91,6 +91,10 @@ Menubar.File = function ( editor ) {
 
 			exportGeometry( THREE.BufferGeometryExporter );
 
+		} else if ( geometry instanceof THREE.Geometry2 ) {
+
+			exportGeometry( THREE.Geometry2Exporter );
+
 		} else if ( geometry instanceof THREE.Geometry ) {
 
 			exportGeometry( THREE.GeometryExporter );
@@ -151,6 +155,7 @@ Menubar.File = function ( editor ) {
 		var output;
 
 		if ( exporter instanceof THREE.BufferGeometryExporter ||
+			 exporter instanceof THREE.Geometry2Exporter ||
 		     exporter instanceof THREE.GeometryExporter ) {
 
 			output = JSON.stringify( exporter.parse( object.geometry ), null, '\t' );
