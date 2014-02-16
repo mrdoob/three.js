@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '66dev' };
+var THREE = { REVISION: '66' };
 
 self.console = self.console || {
 
@@ -12257,15 +12257,15 @@ THREE.BufferGeometryLoader.prototype = {
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.GeometryLoader = function ( manager ) {
+THREE.Geometry2Loader = function ( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
 };
 
-THREE.GeometryLoader.prototype = {
+THREE.Geometry2Loader.prototype = {
 
-	constructor: THREE.GeometryLoader,
+	constructor: THREE.Geometry2Loader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -12289,7 +12289,28 @@ THREE.GeometryLoader.prototype = {
 
 	parse: function ( json ) {
 
-		
+		var geometry = new THREE.Geometry2( json.vertices.length / 3 );
+
+		var attributes = [ 'vertices', 'normals', 'uvs' ];
+		var boundingSphere = json.boundingSphere;
+
+		for ( var key in attributes ) {
+
+			var attribute = attributes[ key ];
+			geometry[ attribute ].set( json[ attribute ] );
+
+		}
+
+		if ( boundingSphere !== undefined ) {
+
+			geometry.boundingSphere = new THREE.Sphere(
+				new THREE.Vector3().fromArray( boundingSphere.center !== undefined ? boundingSphere.center : [ 0, 0, 0 ] ),
+				boundingSphere.radius
+			);
+
+		}
+
+		return geometry;
 
 	}
 
@@ -12412,6 +12433,7 @@ THREE.ObjectLoader.prototype = {
 		if ( json !== undefined ) {
 
 			var geometryLoader = new THREE.JSONLoader();
+			var geometry2Loader = new THREE.Geometry2Loader();
 			var bufferGeometryLoader = new THREE.BufferGeometryLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -12520,6 +12542,12 @@ THREE.ObjectLoader.prototype = {
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data.data );
+
+						break;
+
+					case 'Geometry2':
+
+						geometry = geometry2Loader.parse( data.data );
 
 						break;
 
