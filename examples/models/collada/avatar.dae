@@ -41,132 +41,6 @@
         </technique>
       </profile_COMMON>
     </effect>
-    <effect id="bman0008_tp_Imported_OBJ_Object_AUTO_XSIPOLYCLS_material2">
-      <profile_COMMON>
-        <newparam sid="VWS_Business_Male2_jpg-surface">
-          <surface type="2D">
-            <init_from>VWS_Business_Male2_jpg</init_from>
-          </surface>
-        </newparam>
-        <newparam sid="VWS_Business_Male2_jpg-sampler">
-          <sampler2D>
-            <source>VWS_Business_Male2_jpg-surface</source>
-          </sampler2D>
-        </newparam>
-        <technique sid="common">
-          <blinn>
-            <emission>
-              <color>0 0 0 1</color>
-            </emission>
-            <ambient>
-              <color>0.3 0.3 0.3 1</color>
-            </ambient>
-            <diffuse>
-              <texture texture="VWS_Business_Male2_jpg-sampler" texcoord="CHANNEL1"/>
-            </diffuse>
-            <specular>
-              <color>0.9 0.9 0.9 1</color>
-            </specular>
-            <shininess>
-              <float>8</float>
-            </shininess>
-            <reflective>
-              <color>0 0 0 1</color>
-            </reflective>
-            <transparent opaque="A_ONE">
-              <color>1 1 1 1</color>
-            </transparent>
-            <transparency>
-              <float>1</float>
-            </transparency>
-          </blinn>
-        </technique>
-      </profile_COMMON>
-      <extra>
-        <technique profile="3dsMAX">
-          <extended_shader>
-            <apply_reflection_dimming>0</apply_reflection_dimming>
-            <dim_level>0</dim_level>
-            <falloff_type>0</falloff_type>
-            <index_of_refraction>1.5</index_of_refraction>
-            <opacity_type>0</opacity_type>
-            <reflection_level>3</reflection_level>
-            <wire_size>1</wire_size>
-            <wire_units>0</wire_units>
-          </extended_shader>
-          <shader>
-            <ambient_diffuse_lexture_lock>1</ambient_diffuse_lexture_lock>
-            <ambient_diffuse_lock>1</ambient_diffuse_lock>
-            <diffuse_specular_lock>0</diffuse_specular_lock>
-            <soften>0.1</soften>
-            <use_self_illum_color>0</use_self_illum_color>
-          </shader>
-        </technique>
-      </extra>
-    </effect>
-    <effect id="char_man_head_v2_AUTO_XSIPOLYCLS_material5">
-      <profile_COMMON>
-        <newparam sid="VWS_Business_Male2_jpg-surface">
-          <surface type="2D">
-            <init_from>VWS_Business_Male2_jpg</init_from>
-          </surface>
-        </newparam>
-        <newparam sid="VWS_Business_Male2_jpg-sampler">
-          <sampler2D>
-            <source>VWS_Business_Male2_jpg-surface</source>
-          </sampler2D>
-        </newparam>
-        <technique sid="common">
-          <blinn>
-            <emission>
-              <color>0 0 0 1</color>
-            </emission>
-            <ambient>
-              <color>0.3 0.3 0.3 1</color>
-            </ambient>
-            <diffuse>
-              <texture texture="VWS_Business_Male2_jpg-sampler" texcoord="CHANNEL1"/>
-            </diffuse>
-            <specular>
-              <color>0.9 0.9 0.9 1</color>
-            </specular>
-            <shininess>
-              <float>8</float>
-            </shininess>
-            <reflective>
-              <color>0 0 0 1</color>
-            </reflective>
-            <transparent opaque="A_ONE">
-              <color>1 1 1 1</color>
-            </transparent>
-            <transparency>
-              <float>1</float>
-            </transparency>
-          </blinn>
-        </technique>
-      </profile_COMMON>
-      <extra>
-        <technique profile="3dsMAX">
-          <extended_shader>
-            <apply_reflection_dimming>0</apply_reflection_dimming>
-            <dim_level>0</dim_level>
-            <falloff_type>0</falloff_type>
-            <index_of_refraction>1.5</index_of_refraction>
-            <opacity_type>0</opacity_type>
-            <reflection_level>3</reflection_level>
-            <wire_size>1</wire_size>
-            <wire_units>0</wire_units>
-          </extended_shader>
-          <shader>
-            <ambient_diffuse_lexture_lock>1</ambient_diffuse_lexture_lock>
-            <ambient_diffuse_lock>1</ambient_diffuse_lock>
-            <diffuse_specular_lock>0</diffuse_specular_lock>
-            <soften>0.1</soften>
-            <use_self_illum_color>0</use_self_illum_color>
-          </shader>
-        </technique>
-      </extra>
-    </effect>
     <effect id="scene_material">
       <profile_COMMON>
         <newparam sid="VWS_B_Male2-2_jpg-surface">
@@ -288,12 +162,6 @@
     <material id="ColorEffectR166G202B240-material" name="ColorEffectR166G202B240-material">
       <instance_effect url="#ColorEffectR166G202B240"/>
     </material>
-    <material id="bman0008_tp_Imported_OBJ_Object_AUTO_XSIPOLYCLS_material2-material" name="bman0008_tp_Imported_OBJ_Object_AUTO_XSIPOLYCLS_material2-material">
-      <instance_effect url="#bman0008_tp_Imported_OBJ_Object_AUTO_XSIPOLYCLS_material2"/>
-    </material>
-    <material id="char_man_head_v2_AUTO_XSIPOLYCLS_material5-material" name="char_man_head_v2_AUTO_XSIPOLYCLS_material5-material">
-      <instance_effect url="#char_man_head_v2_AUTO_XSIPOLYCLS_material5"/>
-    </material>
     <material id="scene_material-material" name="scene_material-material">
       <instance_effect url="#scene_material"/>
     </material>
@@ -387,9 +255,6 @@
   <library_images>
     <image id="VWS_B_Male2-2_jpg">
       <init_from>VWS_B_Male2-2.jpg</init_from>
-    </image>
-    <image id="VWS_Business_Male2_jpg">
-      <init_from>./avatars/VWS_Business_Male2.jpg</init_from>
     </image>
   </library_images>
   <library_visual_scenes>

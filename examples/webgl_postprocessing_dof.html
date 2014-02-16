@@ -13,7 +13,6 @@
 				font-size:13px;
 				text-align:center;
 				font-weight: bold;
-				text-align:center;
 			}
 
 			a {
@@ -72,9 +71,9 @@
 			var windowHalfY = window.innerHeight / 2;
 
 			var width = window.innerWidth;
-			var height = window.innerHeight - 300;
+			var height = window.innerHeight;
 
-			var postprocessing = { enabled  : true };
+			var postprocessing = {};
 
 			init();
 			animate();
@@ -172,10 +171,6 @@
 
 				renderer.autoClear = false;
 
-				renderer.domElement.style.position = 'absolute';
-				renderer.domElement.style.top = "150px";
-				renderer.domElement.style.left = "0px";
-
 				stats = new Stats();
 				stats.domElement.style.position = 'absolute';
 				stats.domElement.style.top = '0px';
@@ -249,7 +244,7 @@
 				windowHalfY = window.innerHeight / 2;
 
 				width = window.innerWidth;
-				height = window.innerHeight - 300;
+				height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -312,16 +307,7 @@
 
 				}
 
-				if ( postprocessing.enabled ) {
-
-					postprocessing.composer.render( 0.1 );
-
-				} else {
-
-					renderer.clear();
-					renderer.render( scene, camera );
-
-				}
+				postprocessing.composer.render( 0.1 );
 
 			}
 

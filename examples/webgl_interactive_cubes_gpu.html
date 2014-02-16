@@ -126,7 +126,7 @@
 
 					// give the geom's vertices a random color, to be displayed
 
-					var geom = new THREE.CubeGeometry( 1, 1, 1 );
+					var geom = new THREE.BoxGeometry( 1, 1, 1 );
 					var color = new THREE.Color( Math.random() * 0xffffff );
 					applyVertexColors( geom, color );
 
@@ -139,7 +139,7 @@
 
 					//give the pickingGeom's vertices a color corresponding to the "id"
 
-					var pickingGeom = new THREE.CubeGeometry( 1, 1, 1 );
+					var pickingGeom = new THREE.BoxGeometry( 1, 1, 1 );
 					var pickingColor = new THREE.Color( i );
 					applyVertexColors( pickingGeom, pickingColor );
 
@@ -165,7 +165,7 @@
 
 				pickingScene.add( new THREE.Mesh( pickingGeometry, pickingMaterial ) );
 
-				highlightBox = new THREE.Mesh( new THREE.CubeGeometry( 1, 1, 1 ), new THREE.MeshLambertMaterial( { color: 0xffff00 } ) );
+				highlightBox = new THREE.Mesh( new THREE.BoxGeometry( 1, 1, 1 ), new THREE.MeshLambertMaterial( { color: 0xffff00 } ) );
 				scene.add( highlightBox );
 
 				projector = new THREE.Projector();

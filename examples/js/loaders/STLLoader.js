@@ -32,7 +32,7 @@ THREE.STLLoader.prototype = {
 
 };
 
-THREE.STLLoader.prototype.load = function (url, callback) {
+THREE.STLLoader.prototype.load = function ( url, callback ) {
 
 	var scope = this;
 
@@ -42,16 +42,15 @@ THREE.STLLoader.prototype.load = function (url, callback) {
 
 		if ( event.target.status === 200 || event.target.status === 0 ) {
 
-				var geometry = scope.parse( event.target.response || event.target.responseText );
+			var geometry = scope.parse( event.target.response || event.target.responseText );
 
-				scope.dispatchEvent( { type: 'load', content: geometry } );
+			scope.dispatchEvent( { type: 'load', content: geometry } );
 
-				if ( callback ) callback( geometry );
+			if ( callback ) callback( geometry );
 
 		} else {
 
-			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']',
-				response: event.target.responseText } );
+			scope.dispatchEvent( { type: 'error', message: 'Couldn\'t load URL [' + url + ']', response: event.target.responseText } );
 
 		}
 
@@ -71,14 +70,14 @@ THREE.STLLoader.prototype.load = function (url, callback) {
 
 	}, false );
 
-	xhr.overrideMimeType('text/plain; charset=x-user-defined');
+	if ( xhr.overrideMimeType ) xhr.overrideMimeType( 'text/plain; charset=x-user-defined' );
 	xhr.open( 'GET', url, true );
-	xhr.responseType = "arraybuffer";
+	xhr.responseType = 'arraybuffer';
 	xhr.send( null );
 
 };
 
-THREE.STLLoader.prototype.parse = function (data) {
+THREE.STLLoader.prototype.parse = function ( data ) {
 
 
 	var isBinary = function () {
@@ -150,27 +149,28 @@ THREE.STLLoader.prototype.parseASCII = function (data) {
 	geometry = new THREE.Geometry();
 	patternFace = /facet([\s\S]*?)endfacet/g;
 
-	while (((result = patternFace.exec(data)) != null)) {
+	while ( ( result = patternFace.exec( data ) ) !== null ) {
 
 		text = result[0];
 		patternNormal = /normal[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
 
-		while (((result = patternNormal.exec(text)) != null)) {
+		while ( ( result = patternNormal.exec( text ) ) !== null ) {
 
-			normal = new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5]));
+			normal = new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) );
 
 		}
 
 		patternVertex = /vertex[\s]+([\-+]?[0-9]+\.?[0-9]*([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+[\s]+([\-+]?[0-9]*\.?[0-9]+([eE][\-+]?[0-9]+)?)+/g;
 
-		while (((result = patternVertex.exec(text)) != null)) {
+		while ( ( result = patternVertex.exec( text ) ) !== null ) {
 
-			geometry.vertices.push(new THREE.Vector3(parseFloat(result[1]), parseFloat(result[3]), parseFloat(result[5])));
+			geometry.vertices.push( new THREE.Vector3( parseFloat( result[ 1 ] ), parseFloat( result[ 3 ] ), parseFloat( result[ 5 ] ) ) );
 
 		}
 
 		length = geometry.vertices.length;
-		geometry.faces.push(new THREE.Face3(length - 3, length - 2, length - 1, normal));
+
+		geometry.faces.push( new THREE.Face3( length - 3, length - 2, length - 1, normal ) );
 
 	}
 

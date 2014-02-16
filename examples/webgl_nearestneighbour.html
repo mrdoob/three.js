@@ -105,7 +105,7 @@
 
 				];
 
-				mesh = new THREE.Mesh( new THREE.CubeGeometry( 10000, 10000, 10000, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
+				mesh = new THREE.Mesh( new THREE.BoxGeometry( 10000, 10000, 10000, 7, 7, 7 ), new THREE.MeshFaceMaterial( materials ) );
 				mesh.scale.x = - 1;
 				scene.add(mesh);
 				
@@ -141,7 +141,6 @@
 				};
 				
 				_particleGeom = new THREE.BufferGeometry();
-				_particleGeom.dynamic = false;
 				_particleGeom.attributes = {
 
 					position: {
@@ -151,8 +150,7 @@
 					
 					alpha: {
 						itemSize: 1,
-						array: new Float32Array( amountOfParticles ),
-						dynamic: true
+						array: new Float32Array( amountOfParticles )
 					}
 
 				};

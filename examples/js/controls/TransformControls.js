@@ -558,7 +558,7 @@ THREE.TransformGizmoScale = function () {
 	THREE.TransformGizmo.call( this );
 
 	var arrowGeometry = new THREE.Geometry();
-	var mesh = new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ) );
+	var mesh = new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ) );
 	mesh.position.y = 0.5;
 	THREE.GeometryUtils.merge( arrowGeometry, mesh );
 
@@ -588,7 +588,7 @@ THREE.TransformGizmoScale = function () {
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		XYZ: [
-			new THREE.Mesh( new THREE.CubeGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.BoxGeometry( 0.125, 0.125, 0.125 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		]
 
 	}
@@ -624,7 +624,7 @@ THREE.TransformGizmoScale = function () {
 			new THREE.Vector3( Math.PI/2, 0, 0 )
 		],
 		XYZ: [
-			new THREE.Mesh( new THREE.CubeGeometry( 0.4, 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
+			new THREE.Mesh( new THREE.BoxGeometry( 0.4, 0.4, 0.4 ), new THREE.TransformGizmoMaterial( { color: 0xffffff, opacity: 0.25 } ) )
 		]
 	}
 
@@ -956,14 +956,14 @@ THREE.TransformControls = function ( camera, domElement ) {
 				scope.object.position.copy( oldPosition );
 				scope.object.position.add( point );
 
-				if ( scope.snap != undefined ) {
-
-					if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
-					if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
-					if ( scope.axis.search("Z") != -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
-				
-				}
-
+			}
+			
+			if ( scope.snap != undefined ) {
+			
+				if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
+				if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
+				if ( scope.axis.search("Z") != -1 ) scope.object.position.z = Math.round( scope.object.position.z / scope.snap ) * scope.snap;
+			
 			}
 
 		} else if ( _mode == "scale" ) {

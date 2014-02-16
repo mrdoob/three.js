@@ -24,6 +24,7 @@ THREE.ObjectExporter.prototype = {
 
 		var geometries = {};
 		var geometryExporter = new THREE.GeometryExporter();
+		var geometry2Exporter = new THREE.Geometry2Exporter();
 		var bufferGeometryExporter = new THREE.BufferGeometryExporter();
 
 		var parseGeometry = function ( geometry ) {
@@ -50,9 +51,9 @@ THREE.ObjectExporter.prototype = {
 					data.widthSegments = geometry.widthSegments;
 					data.heightSegments = geometry.heightSegments;
 
-				} else if ( geometry instanceof THREE.CubeGeometry ) {
+				} else if ( geometry instanceof THREE.BoxGeometry ) {
 
-					data.type = 'CubeGeometry';
+					data.type = 'BoxGeometry';
 					data.width = geometry.width;
 					data.height = geometry.height;
 					data.depth = geometry.depth;
@@ -117,6 +118,13 @@ THREE.ObjectExporter.prototype = {
 
 					data.type = 'BufferGeometry';
 					data.data = bufferGeometryExporter.parse( geometry );
+
+					delete data.data.metadata;
+
+				} else if ( geometry instanceof THREE.Geometry2 ) {
+
+					data.type = 'Geometry2';
+					data.data = geometry2Exporter.parse( geometry );
 
 					delete data.data.metadata;
 
