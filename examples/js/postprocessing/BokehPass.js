@@ -58,15 +58,19 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.renderToScreen = false;
 	this.clear = false;
 
+	this.camera2 = new THREE.OrthographicCamera( -1, 1, 1, -1, 0, 1 );
+	this.scene2  = new THREE.Scene();
+
+	this.quad2 = new THREE.Mesh( new THREE.PlaneGeometry( 2, 2 ), null );
+	this.scene2.add( this.quad2 );
+
 };
 
 THREE.BokehPass.prototype = {
 
 	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
 
-		var composer = THREE.EffectComposer;
-
-		composer.quad.material = this.materialBokeh;
+		this.quad2.material = this.materialBokeh;
 
 		// Render depth into texture
 
@@ -80,11 +84,11 @@ THREE.BokehPass.prototype = {
 
 		if ( this.renderToScreen ) {
 
-			renderer.render( composer.scene, composer.camera );
+			renderer.render( this.scene2, this.camera2 );
 
 		} else {
 
-			renderer.render( composer.scene, composer.camera, writeBuffer, this.clear );
+			renderer.render( this.scene2, this.camera2, writeBuffer, this.clear );
 
 		}
 

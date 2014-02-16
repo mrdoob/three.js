@@ -497,6 +497,11 @@ var Viewport = function ( editor ) {
 					vertices += geometry.vertices.length;
 					faces += geometry.faces.length;
 
+				} else if ( geometry instanceof THREE.Geometry2 ) {
+
+					vertices += geometry.vertices.length / 3;
+					faces += geometry.vertices.length / 9;
+
 				} else if ( geometry instanceof THREE.BufferGeometry ) {
 
 					vertices += geometry.attributes.position.array.length / 3;
@@ -573,8 +578,6 @@ var Viewport = function ( editor ) {
 		renderer.clear();
 		renderer.render( scene, camera );
 		renderer.render( sceneHelpers, camera );
-
-		//console.trace();
 
 	}
 
