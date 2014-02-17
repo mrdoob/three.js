@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '66' };
+var THREE = { REVISION: '67dev' };
 
 self.console = self.console || {
 
@@ -24642,7 +24642,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxHemiLights: maxLightCount.hemi,
 
 			maxShadows: maxShadows,
-			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
+			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow && maxShadows > 0,
 			shadowMapType: this.shadowMapType,
 			shadowMapDebug: this.shadowMapDebug,
 			shadowMapCascade: this.shadowMapCascade,
@@ -26912,7 +26912,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var light = lights[ l ];
 
-			if ( light.onlyShadow ) continue;
+			if ( light.onlyShadow || light.visible === false ) continue;
 
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
