@@ -371,7 +371,7 @@ THREE.Shape.Utils = {
 				tmpShape1, tmpShape2,
 				tmpHole1, tmpHole2;
 
-			for (h in holes) { indepHoles.push( h ); }
+			for (h = 0, hl = holes.length; h < hl; h++) { indepHoles.push( h ); }
 
 			var counter = indepHoles.length * 2;
 			while ( indepHoles.length > 0 ) {
@@ -437,7 +437,7 @@ THREE.Shape.Utils = {
 		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
 
 		var allpoints = contour.concat();
-		for (var h in holes) { Array.prototype.push.apply( allpoints, holes[h] ); }
+		for (var h = 0, hl = holes.length; h < hl; h++) { Array.prototype.push.apply( allpoints, holes[h] ); }
 		//console.log( "allpoints",allpoints, allpoints.length );
 
 		// prepare all points map
