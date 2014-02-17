@@ -470,7 +470,8 @@ THREE.Projector = function () {
 
 						var visible = renderList.checkTriangleVisibility( v1, v2, v3 );
 
-						if ( visible === ( side === THREE.BackSide ) ) continue;
+						if ( ( visible === false && side === THREE.FrontSide ) ||
+							 ( visible === true && side === THREE.BackSide ) ) continue;
 
 						_face = getNextFaceInPool();
 
