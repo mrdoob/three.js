@@ -187,7 +187,7 @@ lib/guava.jar
 
 Guava Libraries
 URL: http://code.google.com/p/guava-libraries/
-Version:  13.0.1
+Version:  15.0
 License: Apache License 2.0
 
 Description: Google's core Java libraries.
@@ -276,6 +276,28 @@ Version: JSON version 20090211
 License: MIT license
 Description:
 JSON is a set of java files for use in transmitting data in JSON format.
+
+Local Modifications: None
+
+---
+Code in
+lib/mockito-core.jar
+URL: https://code.google.com/p/mockito
+Version: 1.9.5
+License: MIT license
+Description:
+Mockito is an open source testing framework for Java. The framework allows the creation of Test Double objects (called "Mock Objects") in automated unit tests for the purpose of Test-driven Development (TDD) or Behavior Driven Development (BDD).
+
+Local Modifications: None
+
+---
+Code in
+lib/objenesis.jar
+URL: http://objenesis.org
+Version: 1.2
+License: Apache 2.0 license
+Description:
+Depended by lib/mockito-core.jar, not used directly.
 
 Local Modifications: None
 

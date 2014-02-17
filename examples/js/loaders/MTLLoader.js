@@ -395,7 +395,7 @@ THREE.MTLLoader.MaterialCreator.prototype = {
 
 THREE.MTLLoader.ensurePowerOfTwo_ = function ( image ) {
 
-	if ( ! THREE.Math.isPowerOfTwo_( image.width ) || ! THREE.Math.isPowerOfTwo_( image.height ) ) {
+	if ( ! THREE.Math.isPowerOfTwo( image.width ) || ! THREE.Math.isPowerOfTwo( image.height ) ) {
 
 		var canvas = document.createElement( "canvas" );
 		canvas.width = THREE.MTLLoader.nextHighestPowerOfTwo_( image.width );

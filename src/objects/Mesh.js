@@ -20,7 +20,7 @@ THREE.Mesh.prototype = Object.create( THREE.Object3D.prototype );
 
 THREE.Mesh.prototype.updateMorphTargets = function () {
 
-	if ( this.geometry.morphTargets.length > 0 ) {
+	if ( this.geometry.morphTargets !== undefined && this.geometry.morphTargets.length > 0 ) {
 
 		this.morphTargetBase = -1;
 		this.morphTargetForcedOrder = [];

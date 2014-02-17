@@ -40,7 +40,7 @@ function generateGeometry(objectType, numObjects) {
 
 		if ( objectType == "cube" )
 		{
-			geom = new THREE.CubeGeometry( 1, 1, 1 );
+			geom = new THREE.BoxGeometry( 1, 1, 1 );
 			scale.y = Math.random() * 200 + 100;
 			scale.z = Math.random() * 200 + 100;
 			color.setRGB( 0, 0, Math.random()+0.1 );

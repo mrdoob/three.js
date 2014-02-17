@@ -246,7 +246,7 @@
 					( function () {
 
 						var object = scene.children[ i ];
-						var delay = Math.random() * 100;
+						var delay = i * 15;
 
 						new TWEEN.Tween( object.position )
 							.to( { y: - 2000 }, 1000 )
@@ -269,7 +269,7 @@
 				request.send( null );
 
 			}
-
+			
 			function onData( event ) {
 
 				var data = JSON.parse( event.target.responseText );
@@ -279,9 +279,16 @@
 
 				for ( var i = 0; i < entries.length; i ++ ) {
 
-					var object = new Element( entries[ i ] );
-					scene.add( object );
+					( function ( data, time ) {
 
+						setTimeout( function () {
+
+							scene.add( new Element( data ) );
+
+						}, time );
+
+					} )( entries[ i ], i * 15 );
+				
 				}
 
 			}

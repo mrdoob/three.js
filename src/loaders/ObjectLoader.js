@@ -49,6 +49,7 @@ THREE.ObjectLoader.prototype = {
 		if ( json !== undefined ) {
 
 			var geometryLoader = new THREE.JSONLoader();
+			var geometry2Loader = new THREE.Geometry2Loader();
 			var bufferGeometryLoader = new THREE.BufferGeometryLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -69,24 +70,25 @@ THREE.ObjectLoader.prototype = {
 
 						break;
 
-					case 'CircleGeometry':
+					case 'BoxGeometry':
+					case 'CubeGeometry': // DEPRECATED
 
-						geometry = new THREE.CircleGeometry(
-							data.radius,
-							data.segments
-						);
-
-						break;
-
-					case 'CubeGeometry':
-
-						geometry = new THREE.CubeGeometry(
+						geometry = new THREE.BoxGeometry(
 							data.width,
 							data.height,
 							data.depth,
 							data.widthSegments,
 							data.heightSegments,
 							data.depthSegments
+						);
+
+						break;
+
+					case 'CircleGeometry':
+
+						geometry = new THREE.CircleGeometry(
+							data.radius,
+							data.segments
 						);
 
 						break;
@@ -156,6 +158,12 @@ THREE.ObjectLoader.prototype = {
 					case 'BufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data.data );
+
+						break;
+
+					case 'Geometry2':
+
+						geometry = geometry2Loader.parse( data.data );
 
 						break;
 

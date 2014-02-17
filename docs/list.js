@@ -188,6 +188,7 @@ var list = {
 		"Extras / Helpers": [
 			[ "ArrowHelper", "api/extras/helpers/ArrowHelper" ],
 			[ "AxisHelper", "api/extras/helpers/AxisHelper" ],
+			[ "BoundingBoxHelper", "api/extras/helpers/BoundingBoxHelper" ],
 			[ "CameraHelper", "api/extras/helpers/CameraHelper" ],
 			[ "DirectionalLightHelper", "api/extras/helpers/DirectionalLightHelper" ],
 			[ "GridHelper", "api/extras/helpers/GridHelper" ],
