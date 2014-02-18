@@ -823,7 +823,7 @@
 
 				}
 				
-				if ( scope.snap !== undefined ) {
+				if ( scope.snap ) {
 				
 					if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
 					if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
