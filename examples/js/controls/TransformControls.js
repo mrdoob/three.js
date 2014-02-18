@@ -549,10 +549,10 @@
 		this.gizmo["scale"].hide();
 
 		this.object = undefined;
-		this.snap = undefined;
+		this.snap = null;
 		this.space = "world";
 		this.size = 1;
-		this.axis = undefined;
+		this.axis = null;
 
 		var scope = this;
 		
@@ -723,9 +723,9 @@
 				scope.update();
 				scope.dispatchEvent( changeEvent );
 
-			} else if ( scope.axis !== undefined ) {
+			} else if ( scope.axis !== null ) {
 
-				scope.axis = undefined;
+				scope.axis = null;
 				scope.update();
 				scope.dispatchEvent( changeEvent );
 
@@ -779,7 +779,7 @@
 
 		function onPointerMove( event ) {
 
-			if ( scope.object === undefined || scope.axis === undefined || _dragging === false ) return;
+			if ( scope.object === undefined || scope.axis === null || _dragging === false ) return;
 
 			event.preventDefault();
 			event.stopPropagation();
@@ -823,7 +823,7 @@
 
 				}
 				
-				if ( scope.snap ) {
+				if ( scope.snap !== null ) {
 				
 					if ( scope.axis.search("X") != -1 ) scope.object.position.x = Math.round( scope.object.position.x / scope.snap ) * scope.snap;
 					if ( scope.axis.search("Y") != -1 ) scope.object.position.y = Math.round( scope.object.position.y / scope.snap ) * scope.snap;
