@@ -41,7 +41,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 	// Some constants
 	var WARNINGS = !true; // Set to true for development
-	var ABC = ['a', 'b', 'c'];
+	var ABC = [ 'a', 'b', 'c' ];
 	
 
 	function getEdge( a, b, map ) {
@@ -101,12 +101,12 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		var i, il, face, edge;
 
-		for (i=0, il=vertices.length; i < il; i++) {
+		for ( i = 0, il = vertices.length; i < il; i++ ) {
 			metaVertices[ i ] = { edges: [] };
 		}
 		
-		for (i=0, il=faces.length; i < il; i++) {
-			face = faces[i];
+		for ( i = 0, il = faces.length; i < il; i++ ) {
+			face = faces[ i ];
 
 			processEdge( face.a, face.b, vertices, edges, face, metaVertices );
 			processEdge( face.b, face.c, vertices, edges, face, metaVertices );
@@ -165,8 +165,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var other, currentEdge, newEdge, face;
 		var edgeVertexWeight, adjacentVertexWeight, connectedFaces;
 
-		for (i in sourceEdges) {
-			currentEdge = sourceEdges[i];
+		for ( i in sourceEdges ) {
+
+			currentEdge = sourceEdges[ i ];
 			newEdge = new THREE.Vector3();
 
 			edgeVertexWeight = 3 / 8;
@@ -175,13 +176,13 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			connectedFaces = currentEdge.faces.length;
 
 			// check how many linked faces. 2 should be correct.
-			if (connectedFaces != 2) {
+			if ( connectedFaces != 2 ) {
 
 				// if length is not 2, handle condition
 				edgeVertexWeight = 0.5;
 				adjacentVertexWeight = 0;
 
-				if (connectedFaces != 1 ) {
+				if ( connectedFaces != 1 ) {
 					
 					if (WARNINGS) console.warn('Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge);
 			
@@ -193,11 +194,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			tmp.set( 0, 0, 0 );
 
-			for (j = 0; j < connectedFaces; j++ ) {
+			for ( j = 0; j < connectedFaces; j++ ) {
 
 				face = currentEdge.faces[ j ];
 				
-				for (k = 0; k < 3; k++) {
+				for ( k = 0; k < 3; k++ ) {
 
 					other = oldVertices[ face[ ABC[k] ] ];
 					if (other !== currentEdge.a && other !== currentEdge.b ) break;
@@ -228,20 +229,20 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var connectingEdge, connectingEdges, oldVertex, newSourceVertex;
 		newSourceVertices = [];
 
-		for ( i=0, il=oldVertices.length; i < il; i++ ) {
+		for ( i = 0, il = oldVertices.length; i < il; i++ ) {
 
-			oldVertex = oldVertices[i];
+			oldVertex = oldVertices[ i ];
 
 			// find all connecting edges (using lookupTable)
 			connectingEdges = metaVertices[ i ].edges;
 			n = connectingEdges.length;
 			beta;
 
-			if (n == 3) {
+			if ( n == 3 ) {
 
 				beta = 3 / 16;
 
-			} else if (n > 3) {
+			} else if ( n > 3 ) {
 
 				beta = 3 / ( 8 * n ); // Warren's modified formula
 
@@ -253,12 +254,12 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 			sourceVertexWeight = 1 - n * beta;
 			connectingVertexWeight = beta;
 
-			if (n <= 2) {
+			if ( n <= 2 ) {
 				
 				// crease and boundary rules
 				// console.warn('crease and boundary rules');
 
-				if (n == 2) {
+				if ( n == 2 ) {
 
 					if (WARNINGS) console.warn('2 connecting edges', connectingEdges);
 					sourceVertexWeight = 3 / 4;
@@ -267,11 +268,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 					// sourceVertexWeight = 1;
 					// connectingVertexWeight = 0;
 
-				} else if (n == 1) {
+				} else if ( n == 1 ) {
 
 					if (WARNINGS) console.warn('only 1 connecting edge');
 
-				} else if (n == 0) {
+				} else if ( n == 0 ) {
 
 					if (WARNINGS) console.warn('0 connecting edges');
 			
@@ -281,7 +282,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			newSourceVertex = oldVertex.clone().multiplyScalar( sourceVertexWeight );
 
-			tmp.set(0, 0, 0);
+			tmp.set( 0, 0, 0 );
 
 			for ( j=0; j < n; j++ ) {
 
@@ -311,9 +312,9 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		var sl = newSourceVertices.length, edge1, edge2, edge3;
 		newFaces = [];
 
-		for ( i=0, il=oldFaces.length; i < il; i++ ) {
+		for ( i = 0, il = oldFaces.length; i < il; i++ ) {
 
-			face = oldFaces[i];
+			face = oldFaces[ i ];
 
 			// find the 3 new edges vertex of each old face
 
