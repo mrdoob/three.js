@@ -32,10 +32,12 @@ THREE.BufferGeometry.prototype = {
 
 		this.attributes[ name ] = {
 
-			itemSize: itemSize,
-			array: new type( numItems * itemSize )
+			array: new type( numItems * itemSize ),
+			itemSize: itemSize
 
 		};
+
+		return this.attributes[ name ];
 
 	},
 
