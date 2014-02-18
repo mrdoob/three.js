@@ -46,7 +46,7 @@ def main(argv=None):
 	sources = []
 
 	if args.amd:
-		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( factory );\n\n\t} else {\n\n\t\troot.THREE = factory();\n\n\t}\n\n}( this, function () {\n\n')
+		tmp.write('( function ( root, factory ) {\n\n\tif ( typeof define === \'function\' && define.amd ) {\n\n\t\tdefine( [\'exports\'], factory );\n\n\t} else if (typeof exports === \'object\') {\n\n\t\tfactory(exports);\n\n\t} else {\n\n\t\tfactory(root);\n\n\t}\n\n}( this, function (exports) {\n\n')
 
 	for include in args.include:
 		with open('includes/' + include + '.json','r') as f:
@@ -59,7 +59,7 @@ def main(argv=None):
 				tmp.write('\n')
 
 	if args.amd:
-		tmp.write('return THREE;\n\n} ) );')
+		tmp.write('exports.THREE = THREE;\n\n} ) );')
 
 	tmp.close()
 
