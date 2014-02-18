@@ -43,7 +43,7 @@ var Viewport = function ( editor ) {
 
 		controls.enabled = true;
 
-		if ( transformControls.axis !== undefined ) {
+		if ( transformControls.axis !== null ) {
 
 			controls.enabled = false;
 
