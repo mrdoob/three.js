@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '66' };
+var THREE = { REVISION: '67dev' };
 
 self.console = self.console || {
 
@@ -18169,7 +18169,7 @@ THREE.ShaderChunk = {
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, pointHalfVector ), 5.0 );",
+				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, pointHalfVector ), 0.0 ), 5.0 );",
 				"pointSpecular += schlick * pointLightColor[ i ] * pointSpecularWeight * pointDiffuseWeight * lDistance * specularNormalization;",
 
 			"}",
@@ -18227,7 +18227,7 @@ THREE.ShaderChunk = {
 
 					"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, spotHalfVector ), 5.0 );",
+					"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, spotHalfVector ), 0.0 ), 5.0 );",
 					"spotSpecular += schlick * spotLightColor[ i ] * spotSpecularWeight * spotDiffuseWeight * lDistance * specularNormalization * spotEffect;",
 
 				"}",
@@ -18296,7 +18296,7 @@ THREE.ShaderChunk = {
 
 				//"dirSpecular += specular * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization * fresnel;",
 
-				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( dirVector, dirHalfVector ), 5.0 );",
+				"vec3 schlick = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( dirVector, dirHalfVector ), 0.0 ), 5.0 );",
 				"dirSpecular += schlick * directionalLightColor[ i ] * dirSpecularWeight * dirDiffuseWeight * specularNormalization;",
 
 
@@ -18343,8 +18343,8 @@ THREE.ShaderChunk = {
 
 				"float specularNormalization = ( shininess + 2.0001 ) / 8.0;",
 
-				"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVector, hemiHalfVectorSky ), 5.0 );",
-				"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 5.0 );",
+				"vec3 schlickSky = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVector, hemiHalfVectorSky ), 0.0 ), 5.0 );",
+				"vec3 schlickGround = specular + vec3( 1.0 - specular ) * pow( max( 1.0 - dot( lVectorGround, hemiHalfVectorGround ), 0.0 ), 5.0 );",
 				"hemiSpecular += hemiColor * specularNormalization * ( schlickSky * hemiSpecularWeightSky * max( dotProduct, 0.0 ) + schlickGround * hemiSpecularWeightGround * max( dotProductGround, 0.0 ) );",
 
 			"}",
@@ -24642,7 +24642,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			maxHemiLights: maxLightCount.hemi,
 
 			maxShadows: maxShadows,
-			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow,
+			shadowMapEnabled: this.shadowMapEnabled && object.receiveShadow && maxShadows > 0,
 			shadowMapType: this.shadowMapType,
 			shadowMapDebug: this.shadowMapDebug,
 			shadowMapCascade: this.shadowMapCascade,
@@ -26912,7 +26912,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var light = lights[ l ];
 
-			if ( light.onlyShadow ) continue;
+			if ( light.onlyShadow || light.visible === false ) continue;
 
 			if ( light instanceof THREE.DirectionalLight ) dirLights ++;
 			if ( light instanceof THREE.PointLight ) pointLights ++;
@@ -30486,12 +30486,16 @@ THREE.Shape.Utils = {
 			}
 
 			var holeIndex, shapeIndex,
-				shapePt, h, h2, holePt,
+				shapePt, holePt,
 				holeIdx, cutKey, failedCuts = [],
 				tmpShape1, tmpShape2,
 				tmpHole1, tmpHole2;
 
-			for (h in holes) { indepHoles.push( h ); }
+			for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+				indepHoles.push( h );
+
+			}
 
 			var counter = indepHoles.length * 2;
 			while ( indepHoles.length > 0 ) {
@@ -30509,7 +30513,7 @@ THREE.Shape.Utils = {
 					holeIndex	= -1;
 
 					// search for hole which can be reached without intersections
-					for ( h = 0; h < indepHoles.length; h++ ) {
+					for ( var h = 0; h < indepHoles.length; h ++ ) {
 						holeIdx = indepHoles[h];
 
 						// prevent multiple checks
@@ -30517,7 +30521,7 @@ THREE.Shape.Utils = {
 						if ( failedCuts[cutKey] !== undefined )			continue;
 
 						hole = holes[holeIdx];
-						for ( h2 = 0; h2 < hole.length; h2 ++ ) {
+						for ( var h2 = 0; h2 < hole.length; h2 ++ ) {
 							holePt = hole[ h2 ];
 							if (! isCutLineInsideAngles( shapeIndex, h2 ) )		continue;
 							if ( intersectsShapeEdge( shapePt, holePt ) )		continue;
@@ -30557,7 +30561,13 @@ THREE.Shape.Utils = {
 		// To maintain reference to old shape, one must match coordinates, or offset the indices from original arrays. It's probably easier to do the first.
 
 		var allpoints = contour.concat();
-		for (var h in holes) { Array.prototype.push.apply( allpoints, holes[h] ); }
+
+		for ( var h = 0, hl = holes.length; h < hl; h ++ ) {
+
+			Array.prototype.push.apply( allpoints, holes[h] );
+
+		}
+
 		//console.log( "allpoints",allpoints, allpoints.length );
 
 		// prepare all points map
