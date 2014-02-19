@@ -4,7 +4,7 @@
  * @author bhouston / http://exocortex.com
  */
 
-var THREE = { REVISION: '66' };
+var THREE = { REVISION: '67dev' };
 
 self.console = self.console || {
 
@@ -10246,7 +10246,7 @@ THREE.Geometry.prototype = {
 
 		var geometryGroupCounter = 0;
 		
-		return function ( usesFaceMaterial ) {
+		return function ( usesFaceMaterial, maxVerticesInGroup ) {
 
 			var f, fl, face, materialIndex,
 				groupHash, hash_map = {};
@@ -10275,7 +10275,7 @@ THREE.Geometry.prototype = {
 
 				}
 
-				if ( this.geometryGroups[ groupHash ].vertices + 3 > 65535 ) {
+				if ( this.geometryGroups[ groupHash ].vertices + 3 > maxVerticesInGroup ) {
 
 					hash_map[ materialIndex ].counter += 1;
 					groupHash = hash_map[ materialIndex ].hash + '_' + hash_map[ materialIndex ].counter;
@@ -20442,6 +20442,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionStandardDerivatives;
 	var _glExtensionTextureFilterAnisotropic;
 	var _glExtensionCompressedTextureS3TC;
+	var _glExtensionElementIndexUint;
+	
 
 	initGL();
 
@@ -21157,8 +21159,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		geometryGroup.__faceArray = new Uint16Array( ntris * 3 );
-		geometryGroup.__lineArray = new Uint16Array( nlines * 2 );
+		var UintArray = _glExtensionElementIndexUint ? Uint32Array : Uint16Array;
+
+		geometryGroup.__typeArray = UintArray;
+		geometryGroup.__faceArray = new UintArray( ntris * 3 );
+		geometryGroup.__lineArray = new UintArray( nlines * 2 );
 
 		var m, ml;
 
@@ -21319,30 +21324,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initDirectBuffers( geometry ) {
 
-		var a, attribute, type;
+		for ( var name in geometry.attributes ) {
 
-		for ( a in geometry.attributes ) {
+			var bufferType = ( name === "index" ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-			if ( a === "index" ) {
-
-				type = _gl.ELEMENT_ARRAY_BUFFER;
-
-			} else {
-
-				type = _gl.ARRAY_BUFFER;
-
-			}
-
-			attribute = geometry.attributes[ a ];
-
+			var attribute = geometry.attributes[ name ];
 			attribute.buffer = _gl.createBuffer();
 
-			_gl.bindBuffer( type, attribute.buffer );
-			_gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
+			_gl.bindBuffer( bufferType, attribute.buffer );
+			_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
 
 		}
 
-	};
+	}
 
 	// Buffer setting
 
@@ -21665,8 +21659,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-
-	};
+	}
 
 	function setLineBuffers ( geometry, hint ) {
 
@@ -21838,7 +21831,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-	};
+	}
 
 	function setMeshBuffers( geometryGroup, object, hint, dispose, material ) {
 
@@ -22901,8 +22894,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed triangles
-
-					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
+					var type, size;
+					
+					if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ) {
+						
+						type = _gl.UNSIGNED_INT;
+						size = 4;
+						
+					} else {
+						
+						type = _gl.UNSIGNED_SHORT;
+						size = 2;
+						
+					}
+					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -23047,8 +23052,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed lines
-
-					_gl.drawElements( _gl.LINES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16Array
+					var type, size;
+					
+					if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ){
+						
+						type = _gl.UNSIGNED_INT;
+						size = 4;
+						
+					} else {
+						
+						type = _gl.UNSIGNED_SHORT;
+						size = 2;
+						
+					}
+					
+					_gl.drawElements( _gl.LINES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -23260,19 +23278,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// wireframe
 
+			var type = _glExtensionElementIndexUint !== null && geometryGroup.__typeArray instanceof Uint32Array ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+			
 			if ( material.wireframe ) {
 
 				setLineWidth( material.wireframeLinewidth );
-
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
-				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, _gl.UNSIGNED_SHORT, 0 );
+				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, type, 0 );
 
 			// triangles
 
 			} else {
 
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
-				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
+				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0 );
 
 			}
 
@@ -23998,7 +24017,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups === undefined ) {
 
-					geometry.makeGroups( material instanceof THREE.MeshFaceMaterial );
+					geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
 
 				}
 
@@ -26735,27 +26754,36 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
 
-		if ( ! _glExtensionTextureFloat ) {
+		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' );
+		
+		
+		if ( _glExtensionTextureFloat === null ) {
 
 			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
 
 		}
 
-		if ( ! _glExtensionStandardDerivatives ) {
+		if ( _glExtensionStandardDerivatives === null ) {
 
 			console.log( 'THREE.WebGLRenderer: Standard derivatives not supported.' );
 
 		}
 
-		if ( ! _glExtensionTextureFilterAnisotropic ) {
+		if ( _glExtensionTextureFilterAnisotropic === null ) {
 
 			console.log( 'THREE.WebGLRenderer: Anisotropic texture filtering not supported.' );
 
 		}
 
-		if ( ! _glExtensionCompressedTextureS3TC ) {
+		if ( _glExtensionCompressedTextureS3TC === null ) {
 
 			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
+
+		}
+
+		if ( _glExtensionElementIndexUint === null ) {
+
+			console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
 
 		}
 
