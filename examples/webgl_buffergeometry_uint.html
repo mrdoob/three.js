@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - buffergeometry</title>
+		<title>three.js webgl - buffergeometry - uint</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry - uint</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -82,23 +82,17 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'index', Uint16Array, triangles * 3, 1 );
+				geometry.addAttribute( 'index', Uint32Array, triangles * 3, 1 );
 				geometry.addAttribute( 'position', Float32Array, triangles * 3, 3 );
 				geometry.addAttribute( 'normal', Float32Array, triangles * 3, 3 );
 				geometry.addAttribute( 'color', Float32Array, triangles * 3, 3 );
 
-				// break geometry into
-				// chunks of 21,845 triangles (3 unique vertices per triangle)
-				// for indices to fit into 16 bit integer number
-				// floor(2^16 / 3) = 21845
-
-				var chunkSize = 21845;
 
 				var indices = geometry.attributes.index.array;
 
 				for ( var i = 0; i < indices.length; i ++ ) {
 
-					indices[ i ] = i % ( 3 * chunkSize );
+					indices[ i ] = i;
 
 				}
 
@@ -197,20 +191,6 @@
 					colors[ i + 6 ] = color.r;
 					colors[ i + 7 ] = color.g;
 					colors[ i + 8 ] = color.b;
-
-				}
-
-				var offsets = triangles / chunkSize;
-
-				for ( var i = 0; i < offsets; i ++ ) {
-
-					var offset = {
-						start: i * chunkSize * 3,
-						index: i * chunkSize * 3,
-						count: Math.min( triangles - ( i * chunkSize ), chunkSize ) * 3
-					};
-
-					geometry.offsets.push( offset );
 
 				}
 
