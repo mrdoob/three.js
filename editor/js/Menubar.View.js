@@ -1,48 +1,35 @@
 Menubar.View = function ( editor ) {
+	var menuConfig,
+		optionsPanel;
 
-	var container = new UI.Panel();
-	container.setClass( 'menu' );
-
-	var title = new UI.Panel();
-	title.setTextContent( 'View' );
-	title.setMargin( '0px' );
-	title.setPadding( '8px' );
-	container.add( title );
-
-	//
-
-	var options = new UI.Panel();
-	options.setClass( 'options' );
-	container.add( options );
-
-	// themes
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Light theme' );
-	option.onClick( function () {
+	function onLightThemeOptionClick () {
 
 		editor.setTheme( 'css/light.css' );
 		editor.config.setKey( 'theme', 'css/light.css' );
 
-	} );
-	options.add( option );
+	}
 
-	// about
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Dark theme' );
-	option.onClick( function () {
+	function onDarkThemeOptionClick () {
 
 		editor.setTheme( 'css/dark.css' );
 		editor.config.setKey( 'theme', 'css/dark.css' );
 
-	} );
-	options.add( option );
+	}
+	
 
-	//
+	// configure menu contents
 
-	return container;
+	with(UI.MenubarHelper) {
+
+		menuConfig = [
+			createOption( 'Light theme', onLightThemeOptionClick ),
+			createOption( 'Dark theme', onDarkThemeOptionClick )
+		];
+
+	}
+
+	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+
+	return UI.MenubarHelper.createMenuContainer( 'Help', optionsPanel );
 
 }
