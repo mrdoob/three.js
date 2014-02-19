@@ -700,10 +700,9 @@ THREE.Geometry.prototype = {
 	 * the provided callback when done. This method can also be setup to 
 	 * yeild execution periodically during computation.
 	 * @method
-	 * @param  {[type]} finish_Callback  Called when the computation is complete.
-	 * @param  {[type]} numFacesToBatch The number of faces to process before yielding to
+	 * @param  {Function} finish_Callback  Called when the computation is complete.
+	 * @param  {Int} numFacesToBatch The number of faces to process before yielding to
 	 * allow the cpu to run waiting code.
-	 * @return {[type]}                 [description]
 	 */
 	computeTangentsAsync: function ( finish_Callback, progress_Callback, numFacesToBatch ) {
 

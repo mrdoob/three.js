@@ -3621,9 +3621,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 					if ( ! material ) continue;
 					//START_VEROLD_MOD
 					else {
-						for ( var x in overrideUniforms) {
-							if ( material.uniforms[x] ) {
-								material.uniforms[x].value = overrideUniforms[x].value;
+						if (overrideUniforms) {
+							for (var x = 0; x < overrideUniforms.length; x++) {
+								if ( material.uniforms[x] ) {
+									material.uniforms[x].value = overrideUniforms[x].value;
+								}
 							}
 						}
 					}
@@ -3652,9 +3654,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 				}
 
 				//START_VEROLD_MOD
-				for ( var x in overrideUniforms) {
-					if ( material.uniforms[x] ) {
-						material.uniforms[x].value = overrideUniforms[x].defaultValue;
+				if (overrideUniforms) {
+					for (var x = 0; x < overrideUniforms.length; x++) {
+						if ( material.uniforms[x] ) {
+							material.uniforms[x].value = overrideUniforms[x].defaultValue;
+						}
 					}
 				}
 
