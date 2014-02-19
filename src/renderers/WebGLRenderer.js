@@ -2579,47 +2579,49 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// indexed triangles
 
+			var type, size;
+			
+			if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ) {
+				
+				type = _gl.UNSIGNED_INT;
+				size = 4;
+				
+			} else {
+				
+				type = _gl.UNSIGNED_SHORT;
+				size = 2;
+				
+			}
+
 			if ( index ) {
 
 				var offsets = geometry.offsets;
 
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
-				// even if geometry and materials didn't change
+				if ( offsets.length === 0 ) {
 
-				if ( offsets.length > 1 ) updateBuffers = true;
+					for ( attributeName in programAttributes ) {
 
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+						attributePointer = programAttributes[ attributeName ];
+						attributeItem = geometryAttributes[ attributeName ];
 
-					var startIndex = offsets[ i ].index;
+						if ( attributePointer >= 0 ) {
 
-					if ( updateBuffers ) {
+							if ( attributeItem ) {
 
-						for ( attributeName in programAttributes ) {
+								attributeSize = attributeItem.itemSize;
+								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+								enableAttribute( attributePointer );
+								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
 
-							attributePointer = programAttributes[ attributeName ];
-							attributeItem = geometryAttributes[ attributeName ];
+							} else if ( material.defaultAttributeValues ) {
 
-							if ( attributePointer >= 0 ) {
+								if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
 
-								if ( attributeItem ) {
+									_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
 
-									attributeSize = attributeItem.itemSize;
-									_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
-									enableAttribute( attributePointer );
-									_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+								} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
 
-								} else if ( material.defaultAttributeValues ) {
-
-									if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
-
-										_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
-
-									} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
-
-										_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
-
-									}
+									_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
 
 								}
 
@@ -2627,31 +2629,75 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 						}
 
-						// indices
-
-						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
-
 					}
 
-					// render indexed triangles
-					var type, size;
-					
-					if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ) {
-						
-						type = _gl.UNSIGNED_INT;
-						size = 4;
-						
-					} else {
-						
-						type = _gl.UNSIGNED_SHORT;
-						size = 2;
-						
-					}
-					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16
+					_gl.drawElements( _gl.TRIANGLES, index.array.length, type, 0 );
 
 					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
-					_this.info.render.faces += offsets[ i ].count / 3;
+					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
+					_this.info.render.faces += index.array.length / 3;
+
+				} else {
+
+					// if there is more than 1 chunk
+					// must set attribute pointers to use new offsets for each chunk
+					// even if geometry and materials didn't change
+
+					updateBuffers = true;
+
+					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+						var startIndex = offsets[ i ].index;
+
+						if ( updateBuffers ) {
+
+							for ( attributeName in programAttributes ) {
+
+								attributePointer = programAttributes[ attributeName ];
+								attributeItem = geometryAttributes[ attributeName ];
+
+								if ( attributePointer >= 0 ) {
+
+									if ( attributeItem ) {
+
+										attributeSize = attributeItem.itemSize;
+										_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
+										enableAttribute( attributePointer );
+										_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+
+									} else if ( material.defaultAttributeValues ) {
+
+										if ( material.defaultAttributeValues[ attributeName ].length === 2 ) {
+
+											_gl.vertexAttrib2fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+										} else if ( material.defaultAttributeValues[ attributeName ].length === 3 ) {
+
+											_gl.vertexAttrib3fv( attributePointer, material.defaultAttributeValues[ attributeName ] );
+
+										}
+
+									}
+
+								}
+
+							}
+
+							// indices
+
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+						}
+
+						// render indexed triangles
+
+						_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, type, offsets[ i ].start * size );
+
+						_this.info.render.calls ++;
+						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+						_this.info.render.faces += offsets[ i ].count / 3;
+
+					}
 
 				}
 
