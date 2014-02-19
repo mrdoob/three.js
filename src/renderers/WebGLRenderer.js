@@ -2634,9 +2634,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed triangles
-					var type,size;
+					var type, size;
 					
-					if (_glExtensionElementIndexUint && index.array instanceof Uint32Array){
+					if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ) {
 						
 						type = _gl.UNSIGNED_INT;
 						size = 4;
@@ -2792,9 +2792,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed lines
-					var type,size;
+					var type, size;
 					
-					if (_glExtensionElementIndexUint && index.array instanceof Uint32Array){
+					if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ){
 						
 						type = _gl.UNSIGNED_INT;
 						size = 4;
