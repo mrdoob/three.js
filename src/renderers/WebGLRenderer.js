@@ -899,8 +899,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		geometryGroup.__faceArray = new Uint16Array( ntris * 3 );
-		geometryGroup.__lineArray = new Uint16Array( nlines * 2 );
+		var type = _glExtensionElementIndexUint ? Uint32Array : Uint16Array;
+
+		geometryGroup.__faceArray = new type( ntris * 3 );
+		geometryGroup.__lineArray = new type( nlines * 2 );
 
 		var m, ml;
 
@@ -3005,16 +3007,17 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material.wireframe ) {
 
 				setLineWidth( material.wireframeLinewidth );
-
+				var type = _glExtensionElementIndexUint ? gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
-				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, _gl.UNSIGNED_SHORT, 0 );
+				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, type, 0 );
 
 			// triangles
 
 			} else {
 
+				var type = _glExtensionElementIndexUint ? gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
-				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
+				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0 );
 
 			}
 
@@ -3740,7 +3743,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups === undefined ) {
 
-					geometry.makeGroups( material instanceof THREE.MeshFaceMaterial );
+					geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
 
 				}
 
