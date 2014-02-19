@@ -2577,23 +2577,23 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var index = geometryAttributes[ "index" ];
 
-			var type, size;
-			
-			if ( index.array instanceof Uint32Array ) {
-				
-				type = _gl.UNSIGNED_INT;
-				size = 4;
-				
-			} else {
-				
-				type = _gl.UNSIGNED_SHORT;
-				size = 2;
-				
-			}
-
 			if ( index ) {
 
 				// indexed triangles
+
+				var type, size;
+			
+				if ( index.array instanceof Uint32Array ) {
+					
+					type = _gl.UNSIGNED_INT;
+					size = 4;
+					
+				} else {
+					
+					type = _gl.UNSIGNED_SHORT;
+					size = 2;
+					
+				}
 
 				var offsets = geometry.offsets;
 
