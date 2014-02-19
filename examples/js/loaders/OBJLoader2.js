@@ -28,27 +28,7 @@ THREE.OBJLoader.prototype = {
 
 	parse: function ( text ) {
 
-		/*
-		function vector( x, y, z ) {
-
-			return new THREE.Vector3( parseFloat( x ), parseFloat( y ), parseFloat( z ) );
-
-		}
-
-		function uv( u, v ) {
-
-			return new THREE.Vector2( parseFloat( u ), parseFloat( v ) );
-
-		}
-
-		function face3( a, b, c, normals ) {
-
-			return new THREE.Face3( a, b, c, normals );
-
-		}
-		*/
-		
-		var object = new THREE.Object3D();
+		var object, objects = [];
 		var geometry, material, mesh;
 
 		function parseVertexIndex( value ) {
@@ -172,10 +152,23 @@ THREE.OBJLoader.prototype = {
 
 		if ( /^o /gm.test( text ) === false ) {
 
-			geometry = new THREE.Geometry2();
-			material = new THREE.MeshLambertMaterial();
-			mesh = new THREE.Mesh( geometry, material );
-			object.add( mesh );
+			geometry = {
+				vertices: [],
+				normals: [],
+				uvs: []
+			};
+
+			material = {
+				name: ''
+			};
+
+			object = {
+				name: '',
+				geometry: geometry,
+				material: material
+			};
+
+			objects.push( object );
 
 		}
 
@@ -285,12 +278,22 @@ THREE.OBJLoader.prototype = {
 
 			} else if ( /^o /.test( line ) ) {
 
-				geometry = new THREE.Geometry2();
-				material = new THREE.MeshLambertMaterial();
+				geometry = {
+					vertices: [],
+					normals: [],
+					uvs: []
+				};
 
-				mesh = new THREE.Mesh( geometry, material );
-				mesh.name = line.substring( 2 ).trim();
-				object.add( mesh );
+				material = {
+					name: ''
+				};
+
+				object = {
+					name: line.substring( 2 ).trim(),
+					geometry: geometry
+				};
+
+				objects.push( object )
 
 			} else if ( /^g /.test( line ) ) {
 
@@ -318,19 +321,28 @@ THREE.OBJLoader.prototype = {
 
 		}
 
-		var children = object.children;
+		var container = new THREE.Object3D();
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+		for ( var i = 0, l = objects.length; i < l; i ++ ) {
 
-			var geometry = children[ i ].geometry;
+			var object = objects[ i ];
 
-			geometry.vertices = new Float32Array( geometry.vertices );
-			geometry.normals = new Float32Array( geometry.normals );
-			geometry.uvs = new Float32Array( geometry.uvs );
+			var geometry = new THREE.Geometry2( object.geometry.vertices.length / 3 );
+			geometry.vertices.set( object.geometry.vertices );
+			geometry.normals.set( object.geometry.normals );
+			geometry.uvs.set( object.geometry.uvs );
+
+			var material = new THREE.MeshLambertMaterial();
+			material.name = object.material.name;
+
+			var mesh = new THREE.Mesh( geometry, material );
+			mesh.name = object.name;
+
+			container.add( mesh );
 
 		}
 
-		return object;
+		return container;
 
 	}
 

@@ -4,12 +4,16 @@
  * @author mraleph / http://mrale.ph/
  */
 
-THREE.SoftwareRenderer = function () {
+THREE.SoftwareRenderer = function ( parameters ) {
 
 	console.log( 'THREE.SoftwareRenderer', THREE.REVISION );
 
+	parameters = parameters || {};
+
 	var canvas = document.createElement( 'canvas' );
-	var context = canvas.getContext( '2d' );
+	var context = canvas.getContext( '2d', {
+		alpha: parameters.alpha === true
+	} );
 
 	var shaders = {};
 
