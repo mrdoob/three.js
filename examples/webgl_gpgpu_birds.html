@@ -43,11 +43,10 @@
 		<script src="js/libs/stats.min.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
 
-		<script src="js/SimulatorRenderer.js"></script>
+		<script src="js/SimulationRenderer.js"></script>
 
 		<!--
 		TODO: If you're reading this, you may wish to improve this example by
-			- Replacing the custom BirdGeometry with a BufferGeometry?
 			- Create a better shading for the birds?
 			- Refactoring the SimulationRenderer to a more generic TextureRenderer / making the GPGPU workflow easier?
 
@@ -388,90 +387,93 @@
 			/* TEXTURE WIDTH FOR SIMULATION */
 			var WIDTH = hash || 32; 
 
-			var BIRDS = 1024;
+			var BIRDS = WIDTH * WIDTH;
 
-			// Custom Geometry
+			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
 			THREE.BirdGeometry = function () {
 
-				THREE.Geometry.call( this );
+				THREE.BufferGeometry.call( this );
+				// THREE.Geometry2.call( this, BIRDS * 3 );
 
-				BIRDS = WIDTH * WIDTH;
+				var triangles = 3 * BIRDS;
 
-				var verts = this.vertices;
-				var faces = this.faces;
-				var uvs = this.faceVertexUvs[ 0 ];
+				// this.addAttribute( 'index', Uint16Array, triangles * 3, 1 );
+				var vertices = this.addAttribute( 'position', Float32Array, triangles * 3, 3 ).array;
+				// this.addAttribute( 'normal', Float32Array, triangles * 3, 3 );
+				// this.addAttribute( 'color', Float32Array, triangles * 3, 3 );
 
-				var fi = 0;
+				var v = 0;
+
+				function verts_push() {
+					for (var i=0; i < arguments.length; i++) {
+						vertices[v++] = arguments[i];
+					}
+				}
+
+				var wingsSpan = 20;
 
 				for (var f = 0; f<BIRDS; f++ ) {
-					verts.push(
-						new THREE.Vector3(0, -0, -20),
-						new THREE.Vector3(0, 4, -20),
-						new THREE.Vector3(0, 0, 30)
+
+					// Body
+					verts_push(
+						0, -0, -20,
+						0, 4, -20,
+						0, 0, 30
 					);
 
-					faces.push(new THREE.Face3(
-						fi++,
-						fi++,
-						fi++
-					));
-
-					uvs.push([
-						new THREE.Vector2(0, 0),
-						new THREE.Vector2(0, 1),
-						new THREE.Vector2(1, 1)
-					]);
-
-					var wingsSpan = 20;
-
-					verts.push(
-						new THREE.Vector3(0, 0, -15),
-						new THREE.Vector3(-wingsSpan, 0, 0),
-						new THREE.Vector3(0, 0, 15)
+					// Left Wing
+					verts_push(
+						0, 0, -15,
+						-wingsSpan, 0, 0,
+						0, 0, 15
 					);
 
-					verts.push(
-						new THREE.Vector3(0, 0, 15),
-						new THREE.Vector3(wingsSpan, 0, 0),
-						new THREE.Vector3(0, 0, -15)
+					// Right Wing
+					verts_push(
+						0, 0, 15,
+						wingsSpan, 0, 0,
+						0, 0, -15
 					);
 
-					faces.push(new THREE.Face3(
-						fi++,
-						fi++,
-						fi++
-					));
+				}
 
-					faces.push(new THREE.Face3(
-						fi++,
-						fi++,
-						fi++
-					));
+				var birdColors = this.addAttribute( 'birdColor', Float32Array, triangles * 3, 3 ).array;
+				var references = this.addAttribute( 'reference', Float32Array, triangles * 3, 2 ).array;
+				var birdVertex = this.addAttribute( 'birdVertex', Float32Array, triangles * 3, 1 ).array;
+				// Uint16Array
 
-					uvs.push([
-						new THREE.Vector2(0, 0),
-						new THREE.Vector2(0, 1),
-						new THREE.Vector2(1, 1)
-					]);
+				for( var v = 0; v < triangles * 3; v++ ) {
 
-					uvs.push([
-						new THREE.Vector2(0, 0),
-						new THREE.Vector2(0, 1),
-						new THREE.Vector2(1, 1)
-					]);
+					var i = ~~(v / 3);
+					var x = (i % WIDTH) / WIDTH;
+					var y = ~~(i / WIDTH) / WIDTH;
+
+					var c = new THREE.Color(
+						0x444444 +
+						~~(v / 9) / BIRDS * 0x666666
+					);
+
+					birdColors[ v * 3 + 0 ] = c.r;
+					birdColors[ v * 3 + 1 ] = c.g;
+					birdColors[ v * 3 + 2 ] = c.b;
+
+					references[ v * 2     ] = x;
+					references[ v * 2 + 1 ] = y;
+
+					birdVertex[ v         ] = v % 9;
 
 				}
 
 				this.applyMatrix( new THREE.Matrix4().makeScale( 0.2, 0.2, 0.2 ) );
 
-				this.computeCentroids();
-				this.computeFaceNormals();
-				this.computeVertexNormals();
+				// this.computeCentroids();
+				// this.computeFaceNormals();
+				// this.computeVertexNormals();
 
 			}
 
 
-			THREE.BirdGeometry.prototype = Object.create( THREE.Geometry.prototype );
+			THREE.BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype ); // Geometry2
 
 
 			var container, stats;
@@ -540,7 +542,7 @@
 				renderer.autoClear = true;
 
 				////////
-				simulator = new SimulatorRenderer(WIDTH, renderer);
+				simulator = new SimulationRenderer(WIDTH, renderer);
 
 				simulator.init();
 
@@ -634,18 +636,18 @@
 
 				// For Vertex Shaders
 				birdAttributes = {
-					index: { type: 'i', value: [] },
-					birdColor: {	type: 'c', value: [] },
-					reference: { type: 'v2', value: [] },
-					birdVertex: { type: 'f', value: [] },
+					// index: { type: 'i', value: [] },
+					birdColor: { type: 'c', value: null },
+					reference: { type: 'v2', value: null },
+					birdVertex: { type: 'f', value: null }
 				};
 
 				// For Vertex and Fragment
 				birdUniforms = {
 
-					color:     { type: "c", value: new THREE.Color( 0xff2200 ) },
-					texturePosition:     { type: "t", value: null },
-					textureVelocity:     { type: "t", value: null },
+					color: { type: "c", value: new THREE.Color( 0xff2200 ) },
+					texturePosition: { type: "t", value: null },
+					textureVelocity: { type: "t", value: null },
 					time: { type: "f", value: 1.0 },
 					delta: { type: "f", value: 0.0 },
 
@@ -658,32 +660,11 @@
 					attributes:     birdAttributes,
 					vertexShader:   document.getElementById( 'birdVS' ).textContent,
 					fragmentShader: document.getElementById( 'birdFS' ).textContent,
-					side: THREE.DoubleSide,
-					// wireframe: true
+					side: THREE.DoubleSide
 
 				});
 
 				// geometry.dynamic = false;
-
-				var vertices = geometry.vertices;
-				var birdColors = birdAttributes.birdColor.value;
-				var references = birdAttributes.reference.value;
-				var birdVertex = birdAttributes.birdVertex.value;
-
-				for( var v = 0; v < vertices.length; v++ ) {
-
-					var i = ~~(v / 3);
-					var x = (i % WIDTH) / WIDTH;
-					var y = ~~(i / WIDTH) / WIDTH;
-
-					birdColors[ v ] = new THREE.Color(
-						0x444444 +
-						~~(v / 9) / BIRDS * 0x666666
-					);
-					references[ v ] = new THREE.Vector2( x, y );
-					birdVertex[ v ] = v % 9;
-
-				}
 
 
 				// var 
