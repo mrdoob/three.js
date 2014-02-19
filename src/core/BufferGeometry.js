@@ -52,6 +52,10 @@ THREE.BufferGeometry.prototype = {
 
 		}
 
+	},
+
+	getAttribute: function ( name ) {
+
 		return this.attributes[ name ];
 
 	},
