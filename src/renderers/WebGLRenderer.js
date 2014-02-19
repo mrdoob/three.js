@@ -3007,7 +3007,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 			if ( material.wireframe ) {
 
 				setLineWidth( material.wireframeLinewidth );
-				var type = _glExtensionElementIndexUint ? gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+				var type = _glExtensionElementIndexUint ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
 				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, type, 0 );
 
@@ -3015,7 +3015,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				var type = _glExtensionElementIndexUint ? gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+				var type = _glExtensionElementIndexUint ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
 				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0 );
 
