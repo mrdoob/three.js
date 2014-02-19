@@ -2,6 +2,8 @@ Menubar.File = function ( editor ) {
 
 	var menuConfig,
 		optionsPanel,
+		createOption,
+		createDivider,
 		fileInput;
 
 
@@ -163,23 +165,22 @@ Menubar.File = function ( editor ) {
 	fileInput.addEventListener( 'change', onFileInputChange);
 
 	// configure menu contents
+
+	createOption  = UI.MenubarHelper.createOption;
+	createDivider = UI.MenubarHelper.createDivider;
 	
-	with(UI.MenubarHelper) {
+	menuConfig    = [
+		createOption( 'New', onNewOptionClick ),
+		createDivider(),
 
-		menuConfig   = [
-			createOption( 'New', onNewOptionClick ),
-			createDivider(),
+		createOption( 'Import', onImportOptionClick ),
+		createDivider(),
 
-			createOption( 'Import', onImportOptionClick ),
-			createDivider(),
-
-			createOption( 'Export Geometry', onExportGeometryOptionClick ),
-			createOption( 'Export Object', onExportObjectOptionClick ),
-			createOption( 'Export Scene', onExportSceneOptionClick ),
-			createOption( 'Export OBJ', onExportOBJOptionClick )
-		];
-	
-	}
+		createOption( 'Export Geometry', onExportGeometryOptionClick ),
+		createOption( 'Export Object', onExportObjectOptionClick ),
+		createOption( 'Export Scene', onExportSceneOptionClick ),
+		createOption( 'Export OBJ', onExportOBJOptionClick )
+	];
 
 	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 

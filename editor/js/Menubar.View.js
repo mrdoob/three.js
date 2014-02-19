@@ -1,6 +1,9 @@
 Menubar.View = function ( editor ) {
+	
 	var menuConfig,
-		optionsPanel;
+		optionsPanel,
+		createOption,
+		createDivider;
 
 	function onLightThemeOptionClick () {
 
@@ -19,14 +22,13 @@ Menubar.View = function ( editor ) {
 
 	// configure menu contents
 
-	with(UI.MenubarHelper) {
+	createOption  = UI.MenubarHelper.createOption;
+	createDivider = UI.MenubarHelper.createDivider;
 
-		menuConfig = [
-			createOption( 'Light theme', onLightThemeOptionClick ),
-			createOption( 'Dark theme', onDarkThemeOptionClick )
-		];
-
-	}
+	menuConfig    = [
+		createOption( 'Light theme', onLightThemeOptionClick ),
+		createOption( 'Dark theme', onDarkThemeOptionClick )
+	];
 
 	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 

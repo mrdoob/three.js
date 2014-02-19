@@ -1,7 +1,9 @@
 Menubar.Add = function ( editor ) {
 
 	var menuConfig,
-		optionsPanel;
+		optionsPanel,
+		createOption,
+		createDivider;
 
 	var meshCount = 0;
 	var lightCount = 0;
@@ -241,33 +243,32 @@ Menubar.Add = function ( editor ) {
 
 	// configure menu contents
 
-	with(UI.MenubarHelper) {
+	createOption  = UI.MenubarHelper.createOption;
+	createDivider = UI.MenubarHelper.createDivider;
 
-		menuConfig   = [
-			createOption( 'Object3D', onObject3DOptionClick ),
-			createDivider(),
+	menuConfig    = [
+		createOption( 'Object3D', onObject3DOptionClick ),
+		createDivider(),
 
-			createOption( 'Plane', onPlaneOptionClick ),
-			createOption( 'Box', onBoxOptionClick ),
-			createOption( 'Circle', onCircleOptionClick ),
-			createOption( 'Cylinder', onCylinderOptionClick ),
-			createOption( 'Sphere', onSphereOptionClick  ),
-			createOption( 'Icosahedron', onIcosahedronOptionClick ),
-			createOption( 'Torus', onTorusOptionClick ),
-			createOption( 'Torus Knot', onTorusKnotOptionClick ),
-			createDivider(),
+		createOption( 'Plane', onPlaneOptionClick ),
+		createOption( 'Box', onBoxOptionClick ),
+		createOption( 'Circle', onCircleOptionClick ),
+		createOption( 'Cylinder', onCylinderOptionClick ),
+		createOption( 'Sphere', onSphereOptionClick  ),
+		createOption( 'Icosahedron', onIcosahedronOptionClick ),
+		createOption( 'Torus', onTorusOptionClick ),
+		createOption( 'Torus Knot', onTorusKnotOptionClick ),
+		createDivider(),
 
-			createOption( 'Sprite', onSpriteOptionClick  ),
-			createDivider(),
+		createOption( 'Sprite', onSpriteOptionClick  ),
+		createDivider(),
 
-			createOption( 'Point light', onPointLightOptionClick ),
-			createOption( 'Spot light', onSpotLightOptionClick ),
-			createOption( 'Directional light', onDirectionalLightOptionClick ),
-			createOption( 'Hemisphere light', onHemisphereLightOptionClick ),
-			createOption( 'Ambient light', onAmbientLightOptionClick )
-		];
-
-	}
+		createOption( 'Point light', onPointLightOptionClick ),
+		createOption( 'Spot light', onSpotLightOptionClick ),
+		createOption( 'Directional light', onDirectionalLightOptionClick ),
+		createOption( 'Hemisphere light', onHemisphereLightOptionClick ),
+		createOption( 'Ambient light', onAmbientLightOptionClick )
+	];
 
 	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 

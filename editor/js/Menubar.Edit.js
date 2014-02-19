@@ -1,7 +1,9 @@
 Menubar.Edit = function ( editor ) {
 
 	var menuConfig,
-		optionsPanel;
+		optionsPanel,
+		createOption,
+		createDivider;
 
 	// event handlers
 
@@ -82,22 +84,21 @@ Menubar.Edit = function ( editor ) {
 
 	// configure menu contents
 
-	with(UI.MenubarHelper) {
+	createOption  = UI.MenubarHelper.createOption;
+	createDivider = UI.MenubarHelper.createDivider;
 
-		menuConfig   = [
-			// createOption( 'Undo', onUndoOptionClick ),
-			// createOption( 'Redo', onRedoOptionClick ),
-			// createDivider(),
+	menuConfig    = [
+		// createOption( 'Undo', onUndoOptionClick ),
+		// createOption( 'Redo', onRedoOptionClick ),
+		// createDivider(),
 
-			createOption( 'Clone', onCloneOptionClick ),
-			createOption( 'Delete', onDeleteOptionClick ),
-			createDivider(),
+		createOption( 'Clone', onCloneOptionClick ),
+		createOption( 'Delete', onDeleteOptionClick ),
+		createDivider(),
 
-			createOption( 'Convert', onConvertOptionClick ),
-			createOption( 'Flatten', onFlattenOptionClick )
-		];
-
-	}
+		createOption( 'Convert', onConvertOptionClick ),
+		createOption( 'Flatten', onFlattenOptionClick )
+	];
 
 	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
