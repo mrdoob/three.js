@@ -21159,7 +21159,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var UintArray = _glExtensionElementIndexUint ? Uint32Array : Uint16Array;
+		var UintArray = _glExtensionElementIndexUint !== null && ntris > 21845 ? Uint32Array : Uint16Array; // 65535 / 3
 
 		geometryGroup.__typeArray = UintArray;
 		geometryGroup.__faceArray = new UintArray( ntris * 3 );
@@ -22841,7 +22841,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var type, size;
 			
-			if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ) {
+			if ( index.array instanceof Uint32Array ) {
 				
 				type = _gl.UNSIGNED_INT;
 				size = 4;
@@ -22871,7 +22871,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 								attributeSize = attributeItem.itemSize;
 								_gl.bindBuffer( _gl.ARRAY_BUFFER, attributeItem.buffer );
 								enableAttribute( attributePointer );
-								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, startIndex * attributeSize * 4 ); // 4 bytes per Float32
+								_gl.vertexAttribPointer( attributePointer, attributeSize, _gl.FLOAT, false, 0, 0 );
 
 							} else if ( material.defaultAttributeValues ) {
 
@@ -23100,7 +23100,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 					// render indexed lines
 					var type, size;
 					
-					if ( _glExtensionElementIndexUint !== null && index.array instanceof Uint32Array ){
+					if ( index.array instanceof Uint32Array ){
 						
 						type = _gl.UNSIGNED_INT;
 						size = 4;
@@ -23322,9 +23322,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			// wireframe
+			var type = geometryGroup.__typeArray instanceof Uint32Array ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
-			var type = _glExtensionElementIndexUint !== null && geometryGroup.__typeArray instanceof Uint32Array ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+			// wireframe
 			
 			if ( material.wireframe ) {
 
