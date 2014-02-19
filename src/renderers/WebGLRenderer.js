@@ -182,6 +182,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionStandardDerivatives;
 	var _glExtensionTextureFilterAnisotropic;
 	var _glExtensionCompressedTextureS3TC;
+	var _glExtensionElementIndexUint;
+	
 
 	initGL();
 
@@ -897,8 +899,10 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		geometryGroup.__faceArray = new Uint16Array( ntris * 3 );
-		geometryGroup.__lineArray = new Uint16Array( nlines * 2 );
+		var type = _glExtensionElementIndexUint ? Uint32Array : Uint16Array;
+
+		geometryGroup.__faceArray = new type( ntris * 3 );
+		geometryGroup.__lineArray = new type( nlines * 2 );
 
 		var m, ml;
 
@@ -2641,8 +2645,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed triangles
-
-					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
+					var type,size;
+					
+					if (_glExtensionElementIndexUint && index.array instanceof Uint32Array){
+						
+						type = _gl.UNSIGNED_INT;
+						size = 4;
+						
+					} else {
+						
+						type = _gl.UNSIGNED_SHORT;
+						size = 2;
+						
+					}
+					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -2787,8 +2803,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed lines
-
-					_gl.drawElements( _gl.LINES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16Array
+					var type,size;
+					
+					if (_glExtensionElementIndexUint && index.array instanceof Uint32Array){
+						
+						type = _gl.UNSIGNED_INT;
+						size = 4;
+						
+					} else {
+						
+						type = _gl.UNSIGNED_SHORT;
+						size = 2;
+						
+					}
+					
+					_gl.drawElements( _gl.LINES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -3000,19 +3029,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// wireframe
 
+			var type = _glExtensionElementIndexUint ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+			
 			if ( material.wireframe ) {
 
 				setLineWidth( material.wireframeLinewidth );
-
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
-				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, _gl.UNSIGNED_SHORT, 0 );
+				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, type, 0 );
 
 			// triangles
 
 			} else {
 
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
-				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, _gl.UNSIGNED_SHORT, 0 );
+				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0 );
 
 			}
 
@@ -3738,7 +3768,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				if ( geometry.geometryGroups === undefined ) {
 
-					geometry.makeGroups( material instanceof THREE.MeshFaceMaterial );
+					geometry.makeGroups( material instanceof THREE.MeshFaceMaterial, _glExtensionElementIndexUint ? 4294967296 : 65535  );
 
 				}
 
@@ -6475,6 +6505,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
 
+		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' )
+		
+		
 		if ( ! _glExtensionTextureFloat ) {
 
 			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
@@ -6496,6 +6529,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( ! _glExtensionCompressedTextureS3TC ) {
 
 			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
+
+		}
+
+		if ( ! _glExtensionElementIndexUint ) {
+
+			console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
 
 		}
 
