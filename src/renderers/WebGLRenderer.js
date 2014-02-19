@@ -2645,8 +2645,20 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed triangles
-
-					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16
+					var type,size;
+					
+					if (_glExtensionElementIndexUint && index.array instanceof Uint32Array){
+						
+						type = _gl.UNSIGNED_INT;
+						size = 4;
+						
+					} else {
+						
+						type = _gl.UNSIGNED_SHORT;
+						size = 2;
+						
+					}
+					_gl.drawElements( _gl.TRIANGLES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -2791,8 +2803,21 @@ THREE.WebGLRenderer = function ( parameters ) {
 					}
 
 					// render indexed lines
-
-					_gl.drawElements( _gl.LINES, offsets[ i ].count, _gl.UNSIGNED_SHORT, offsets[ i ].start * 2 ); // 2 bytes per Uint16Array
+					var type,size;
+					
+					if (_glExtensionElementIndexUint && index.array instanceof Uint32Array){
+						
+						type = _gl.UNSIGNED_INT;
+						size = 4;
+						
+					} else {
+						
+						type = _gl.UNSIGNED_SHORT;
+						size = 2;
+						
+					}
+					
+					_gl.drawElements( _gl.LINES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
 
 					_this.info.render.calls ++;
 					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
@@ -3004,10 +3029,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// wireframe
 
+			var type = _glExtensionElementIndexUint ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+			
 			if ( material.wireframe ) {
 
 				setLineWidth( material.wireframeLinewidth );
-				var type = _glExtensionElementIndexUint ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglLineBuffer );
 				_gl.drawElements( _gl.LINES, geometryGroup.__webglLineCount, type, 0 );
 
@@ -3015,7 +3041,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			} else {
 
-				var type = _glExtensionElementIndexUint ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 				if ( updateBuffers ) _gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, geometryGroup.__webglFaceBuffer );
 				_gl.drawElements( _gl.TRIANGLES, geometryGroup.__webglFaceCount, type, 0 );
 
