@@ -947,14 +947,12 @@ UI.Button.prototype.setLabel = function ( value ) {
 };
 
 
-UI.MenubarHelper = (function() {
+UI.MenubarHelper = {
 
-	function createMenuContainer( name, optionsPanel ) {
-		var container,
-			title;
+	createMenuContainer: function ( name, optionsPanel ) {
 
-		container		= new UI.Panel();
-		title			= new UI.Panel();
+		var container = new UI.Panel();
+		var title = new UI.Panel();
 
 		title.setTextContent( name );
 		title.setMargin( '0px' );
@@ -965,23 +963,23 @@ UI.MenubarHelper = (function() {
 		container.add( optionsPanel );
 
 		return container;
-	}
-	
-	function createOption(name, callbackHandler) {
-		var option;
 
-		option = new UI.Panel();
+	},
+	
+	createOption: function ( name, callbackHandler ) {
+
+		var option = new UI.Panel();
 		option.setClass( 'option' );
 		option.setTextContent( name );
 		option.onClick( callbackHandler );
 
 		return option;
-	}
 
-	function createOptionsPanel(menuConfig) {
-		var options;
+	},
 
-		options = new UI.Panel();
+	createOptionsPanel: function ( menuConfig ) {
+
+		var options = new UI.Panel();
 		options.setClass( 'options' );
 
 		menuConfig.forEach(function(option) {
@@ -989,16 +987,13 @@ UI.MenubarHelper = (function() {
 		});
 
 		return options;
-	}
 
-	function createDivider() {
+	},
+
+	createDivider: function () {
+
 		return new UI.HorizontalRule();
+
 	}
 
-	return {
-		createMenuContainer:createMenuContainer,
-		createOption:createOption,
-		createOptionsPanel:createOptionsPanel,
-		createDivider:createDivider
-	};
-})();
+};
