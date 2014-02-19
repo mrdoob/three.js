@@ -2577,8 +2577,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			var index = geometryAttributes[ "index" ];
 
-			// indexed triangles
-
 			var type, size;
 			
 			if ( index.array instanceof Uint32Array ) {
@@ -2594,6 +2592,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 			}
 
 			if ( index ) {
+
+				// indexed triangles
 
 				var offsets = geometry.offsets;
 
@@ -2701,9 +2701,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 				}
 
-			// non-indexed triangles
-
 			} else {
+
+				// non-indexed triangles
 
 				if ( updateBuffers ) {
 
@@ -2755,9 +2755,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			}
 
-		// render particles
-
 		} else if ( object instanceof THREE.ParticleSystem ) {
+
+			// render particles
 
 			if ( updateBuffers ) {
 
@@ -2811,73 +2811,93 @@ THREE.WebGLRenderer = function ( parameters ) {
 			setLineWidth( material.linewidth );
 
 			var index = geometryAttributes[ "index" ];
-
-			// indexed lines
 			
 			if ( index ) {
 
+				// indexed lines
+
+				var type, size;
+				
+				if ( index.array instanceof Uint32Array ){
+					
+					type = _gl.UNSIGNED_INT;
+					size = 4;
+					
+				} else {
+					
+					type = _gl.UNSIGNED_SHORT;
+					size = 2;
+					
+				}
+
 				var offsets = geometry.offsets;
 
-				// if there is more than 1 chunk
-				// must set attribute pointers to use new offsets for each chunk
-				// even if geometry and materials didn't change
-
-				if ( offsets.length > 1 ) updateBuffers = true;
-
-				for ( var i = 0, il = offsets.length; i < il; i ++ ) {
-
-					var startIndex = offsets[ i ].index;
+				if ( offsets.length === 0 ) {
 
 					if ( updateBuffers ) {
 
-						setupLinesVertexAttributes(material, programAttributes, geometryAttributes, startIndex);
+						setupLinesVertexAttributes( material, programAttributes, geometryAttributes, 0 );
 
 						// indices
 						_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
 
 					}
-
-					// render indexed lines
-					var type, size;
 					
-					if ( index.array instanceof Uint32Array ){
-						
-						type = _gl.UNSIGNED_INT;
-						size = 4;
-						
-					} else {
-						
-						type = _gl.UNSIGNED_SHORT;
-						size = 2;
-						
-					}
-					
-					_gl.drawElements( _gl.LINES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
+					_gl.drawElements( _gl.LINES, index.array.length, type, 0 ); // 2 bytes per Uint16Array
 
 					_this.info.render.calls ++;
-					_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+					_this.info.render.vertices += index.array.length; // not really true, here vertices can be shared
+
+				} else {
+
+					// if there is more than 1 chunk
+					// must set attribute pointers to use new offsets for each chunk
+					// even if geometry and materials didn't change
+
+					if ( offsets.length > 1 ) updateBuffers = true;
+
+					for ( var i = 0, il = offsets.length; i < il; i ++ ) {
+
+						var startIndex = offsets[ i ].index;
+
+						if ( updateBuffers ) {
+
+							setupLinesVertexAttributes(material, programAttributes, geometryAttributes, startIndex);
+
+							// indices
+							_gl.bindBuffer( _gl.ELEMENT_ARRAY_BUFFER, index.buffer );
+
+						}
+
+						// render indexed lines
+						
+						_gl.drawElements( _gl.LINES, offsets[ i ].count, type, offsets[ i ].start * size ); // 2 bytes per Uint16Array
+
+						_this.info.render.calls ++;
+						_this.info.render.vertices += offsets[ i ].count; // not really true, here vertices can be shared
+
+					}
 
 				}
 
-			}
+			} else {
 
-			// non-indexed lines
-
-			else {
+				// non-indexed lines
 
 				if ( updateBuffers ) {
 
-					setupLinesVertexAttributes(material, programAttributes, geometryAttributes, 0);
+					setupLinesVertexAttributes( material, programAttributes, geometryAttributes, 0 );
+
 				}
 
 				var position = geometryAttributes[ "position" ];
 
 				_gl.drawArrays( primitives, 0, position.array.length / 3 );
+
 				_this.info.render.calls ++;
 				_this.info.render.points += position.array.length;
+
 			}
-
-
 
 		}
 
