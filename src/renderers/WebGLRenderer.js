@@ -182,6 +182,8 @@ THREE.WebGLRenderer = function ( parameters ) {
 	var _glExtensionStandardDerivatives;
 	var _glExtensionTextureFilterAnisotropic;
 	var _glExtensionCompressedTextureS3TC;
+	var _glExtensionElementIndexUint;
+	
 
 	initGL();
 
@@ -6475,6 +6477,9 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		_glExtensionCompressedTextureS3TC = _gl.getExtension( 'WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'MOZ_WEBGL_compressed_texture_s3tc' ) || _gl.getExtension( 'WEBKIT_WEBGL_compressed_texture_s3tc' );
 
+		_glExtensionElementIndexUint = _gl.getExtension( 'OES_element_index_uint' )
+		
+		
 		if ( ! _glExtensionTextureFloat ) {
 
 			console.log( 'THREE.WebGLRenderer: Float textures not supported.' );
@@ -6496,6 +6501,12 @@ THREE.WebGLRenderer = function ( parameters ) {
 		if ( ! _glExtensionCompressedTextureS3TC ) {
 
 			console.log( 'THREE.WebGLRenderer: S3TC compressed textures not supported.' );
+
+		}
+
+		if ( ! _glExtensionElementIndexUint ) {
+
+			console.log( 'THREE.WebGLRenderer: elementindex as unsigned integer not supported.' );
 
 		}
 
