@@ -5632,10 +5632,6 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			_gl.bindAttribLocation( program, 0, index0AttributeName );
 
-		} else {
-
-			_gl.bindAttribLocation( program, 0, 'position' );			
-
 		}
 
 		_gl.linkProgram( program );
