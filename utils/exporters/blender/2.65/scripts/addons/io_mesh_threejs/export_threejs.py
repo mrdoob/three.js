@@ -374,7 +374,7 @@ def rgb2int(rgb):
 # #####################################################
 
 def write_file(fname, content):
-    out = open(fname, "w")
+    out = open(fname, "w", encoding="utf-8")
     out.write(content)
     out.close()
 
