@@ -899,10 +899,11 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		}
 
-		var type = _glExtensionElementIndexUint ? Uint32Array : Uint16Array;
+		var UintArray = _glExtensionElementIndexUint ? Uint32Array : Uint16Array;
 
-		geometryGroup.__faceArray = new type( ntris * 3 );
-		geometryGroup.__lineArray = new type( nlines * 2 );
+		geometryGroup.__typeArray = UintArray;
+		geometryGroup.__faceArray = new UintArray( ntris * 3 );
+		geometryGroup.__lineArray = new UintArray( nlines * 2 );
 
 		var m, ml;
 
@@ -3017,7 +3018,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 			// wireframe
 
-			var type = _glExtensionElementIndexUint ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+			var type = _glExtensionElementIndexUint !== null && geometryGroup.__typeArray instanceof Uint32Array ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 			
 			if ( material.wireframe ) {
 
