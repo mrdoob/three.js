@@ -3062,7 +3062,7 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 		if ( object instanceof THREE.Mesh ) {
 
-			var type = geometryGroup.__typeArray instanceof Uint32Array ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+			var type = geometryGroup.__typeArray === Uint32Array ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
 			// wireframe
 			
