@@ -1063,30 +1063,19 @@ THREE.WebGLRenderer = function ( parameters ) {
 
 	function initDirectBuffers( geometry ) {
 
-		var a, attribute, type;
+		for ( var name in geometry.attributes ) {
 
-		for ( a in geometry.attributes ) {
+			var bufferType = ( name === "index" ) ? _gl.ELEMENT_ARRAY_BUFFER : _gl.ARRAY_BUFFER;
 
-			if ( a === "index" ) {
-
-				type = _gl.ELEMENT_ARRAY_BUFFER;
-
-			} else {
-
-				type = _gl.ARRAY_BUFFER;
-
-			}
-
-			attribute = geometry.attributes[ a ];
-
+			var attribute = geometry.attributes[ name ];
 			attribute.buffer = _gl.createBuffer();
 
-			_gl.bindBuffer( type, attribute.buffer );
-			_gl.bufferData( type, attribute.array, _gl.STATIC_DRAW );
+			_gl.bindBuffer( bufferType, attribute.buffer );
+			_gl.bufferData( bufferType, attribute.array, _gl.STATIC_DRAW );
 
 		}
 
-	};
+	}
 
 	// Buffer setting
 
