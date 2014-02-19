@@ -8929,14 +8929,33 @@ THREE.BufferGeometry.prototype = {
 
 	constructor: THREE.BufferGeometry,
 
-	addAttribute: function ( name, type, numItems, itemSize ) {
+	addAttribute: function ( name, array, itemSize ) {
 
-		this.attributes[ name ] = {
+		if ( arguments.length === 4 ) {
 
-			array: new type( numItems * itemSize ),
-			itemSize: itemSize
+			console.warn( 'DEPRECATED: BufferGeometry.addAttribute() now accepts only 3 arguments ( name, array, itemSize )' );
 
-		};
+			this.attributes[ arguments[ 0 ] ] = {
+
+				array: new arguments[ 1 ]( arguments[ 2 ] * arguments[ 3 ] ),
+				itemSize: arguments[ 3 ]
+
+			};
+
+		} else {
+
+			this.attributes[ name ] = {
+
+				array: array,
+				itemSize: itemSize
+
+			};
+
+		}
+
+	},
+
+	getAttribute: function ( name ) {
 
 		return this.attributes[ name ];
 
@@ -10367,9 +10386,13 @@ THREE.Geometry2 = function ( size ) {
 
 	THREE.BufferGeometry.call( this );
 
-	this.vertices = this.addAttribute( 'position', Float32Array, size, 3 ).array;
-	this.normals = this.addAttribute( 'normal', Float32Array, size, 3 ).array;
-	this.uvs = this.addAttribute( 'uv', Float32Array, size, 2 ).array;
+	this.addAttribute( 'position', new Float32Array( size * 3 ), 3 );
+	this.addAttribute( 'normal', new Float32Array( size * 3 ), 3 );
+	this.addAttribute( 'uv', new Float32Array( size * 2 ), 2 );
+
+	this.vertices = this.getAttribute( 'position' ).array;
+	this.normals = this.getAttribute( 'normal' ).array;
+	this.uvs = this.getAttribute( 'uv' ).array;
 
 	this.boundingBox = null;
 	this.boundingSphere = null;
@@ -15851,8 +15874,8 @@ THREE.LOD.prototype.clone = function ( object ) {
 
 THREE.Sprite = ( function () {
 
-	var geometry = new THREE.Geometry2( 3 );
-	geometry.vertices.set( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new Float32Array( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] ), 3 );
 
 	return function ( material ) {
 
@@ -35162,7 +35185,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	}
 
-	geometry.addAttribute( 'position', Float32Array, 2 * numEdges, 3 );
+	geometry.addAttribute( 'position', new Float32Array( numEdges * 2 * 3 ), 3 );
 
 	var coords = geometry.attributes.position.array;
 
@@ -35752,7 +35775,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', Float32Array, 2 * numEdges, 3 );
+		geometry.addAttribute( 'position', new Float32Array( numEdges * 2 * 3 ), 3 );
 
 		var coords = geometry.attributes.position.array;
 
@@ -35812,7 +35835,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 
 		}
 
-		geometry.addAttribute( 'position', Float32Array, 2 * numEdges, 3 );
+		geometry.addAttribute( 'position', new Float32Array( numEdges * 2 * 3 ), 3 );
 
 		var coords = geometry.attributes.position.array;
 
@@ -35836,7 +35859,7 @@ THREE.WireframeHelper = function ( object, hex ) {
 		var numEdges = vertices.length / 3;
 		var numTris = numEdges / 3;
 
-		geometry.addAttribute( 'position', Float32Array, 2 * numEdges, 3 );
+		geometry.addAttribute( 'position', new Float32Array( numEdges * 2 * 3 ), 3 );
 
 		var coords = geometry.attributes.position.array;
 
