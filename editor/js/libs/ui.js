@@ -945,3 +945,60 @@ UI.Button.prototype.setLabel = function ( value ) {
 	return this;
 
 };
+
+
+UI.MenubarHelper = (function() {
+
+	function createMenuContainer( name, optionsPanel ) {
+		var container,
+			title;
+
+		container		= new UI.Panel();
+		title			= new UI.Panel();
+
+		title.setTextContent( name );
+		title.setMargin( '0px' );
+		title.setPadding( '8px' );
+
+		container.setClass( 'menu' );
+		container.add( title );
+		container.add( optionsPanel );
+
+		return container;
+	}
+	
+	function createOption(name, callbackHandler) {
+		var option;
+
+		option = new UI.Panel();
+		option.setClass( 'option' );
+		option.setTextContent( name );
+		option.onClick( callbackHandler );
+
+		return option;
+	}
+
+	function createOptionsPanel(menuConfig) {
+		var options;
+
+		options = new UI.Panel();
+		options.setClass( 'options' );
+
+		menuConfig.forEach(function(option) {
+			options.add(option);
+		});
+
+		return options;
+	}
+
+	function createDivider() {
+		return new UI.HorizontalRule();
+	}
+
+	return {
+		createMenuContainer:createMenuContainer,
+		createOption:createOption,
+		createOptionsPanel:createOptionsPanel,
+		createDivider:createDivider
+	};
+})();
