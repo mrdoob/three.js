@@ -3,9 +3,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-// START_VEROLD_MOD - bind matrix
-THREE.SkinnedMesh = function ( geometry, material, useVertexTexture, bindMatrix ) {
-// END_VEROLD_MOD - bind matrix
+THREE.SkinnedMesh = function ( geometry, material, useVertexTexture ) {
 
 	THREE.Mesh.call( this, geometry, material );
 
@@ -14,10 +12,8 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture, bindMatrix 
 	this.useVertexTexture = useVertexTexture !== undefined ? useVertexTexture : true;
 
 	// START_VEROLD_MOD - bind matrix
-	this.bindMatrix = bindMatrix !== undefined ? bindMatrix.clone() : new THREE.Matrix4();
-
-	this.invBindMatrix = new THREE.Matrix4();
-	this.invBindMatrix.getInverse( this.bindMatrix );
+	this.bindMatrix = new THREE.Matrix4();
+	this.boneMatricesNeedUpdate = true;
 	// END_VEROLD_MOD - bind matrix
 
 	// init bones
@@ -74,49 +70,11 @@ THREE.SkinnedMesh = function ( geometry, material, useVertexTexture, bindMatrix 
 
 		}
 
-		//
-
-		var nBones = this.bones.length;
-
-		if ( this.useVertexTexture ) {
-
-			// layout (1 matrix = 4 pixels)
-			//	RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
-			//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
-			//  	 16x16 pixel texture max   64 bones (16 * 16 / 4)
-			//  	 32x32 pixel texture max  256 bones (32 * 32 / 4)
-			//  	 64x64 pixel texture max 1024 bones (64 * 64 / 4)
-
-			var size;
-
-			if ( nBones > 256 )
-				size = 64;
-			else if ( nBones > 64 )
-				size = 32;
-			else if ( nBones > 16 )
-				size = 16;
-			else
-				size = 8;
-
-			this.boneTextureWidth = size;
-			this.boneTextureHeight = size;
-
-			this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
-			this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
-			this.boneTexture.minFilter = THREE.NearestFilter;
-			this.boneTexture.magFilter = THREE.NearestFilter;
-			this.boneTexture.generateMipmaps = false;
-			this.boneTexture.flipY = false;
-
-		} else {
-
-			this.boneMatrices = new Float32Array( 16 * nBones );
-
-		}
-
-		this.pose();
-
 	}
+
+	// START_VEROLD_MOD - bind matrix
+	this.pose();
+	// END_VEROLD_MOD - bind matrix
 
 };
 
@@ -132,13 +90,153 @@ THREE.SkinnedMesh.prototype.addBone = function( bone ) {
 
 	this.bones.push( bone );
 
+	// START_VEROLD_MOD - bind matrix
+	this.boneMatricesNeedUpdate = true;
+
+	this.boneInverses = undefined;
+	// END_VEROLD_MOD - bind matrix
+
 	return bone;
 
 };
 
-THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
+// START_VEROLD_MOD - bind matrix
+THREE.SkinnedMesh.prototype.clearBones = function () {
+
+	this.bones = [];
+
+};
+// END_VEROLD_MOD - bind matrix
+
+// START_VEROLD_MOD - bind matrix
+THREE.SkinnedMesh.prototype.initBoneMatrices = function () {
+
+	var nBones = this.bones.length;
+
+	this.boneMatrices = undefined;
+	this.boneTextureWidth = undefined;
+	this.boneTextureHeight = undefined;
+
+	if ( this.boneTexture ) {
+
+		this.boneTexture.dispose();
+		this.boneTexture = undefined;
+
+	}
+
+	if ( this.useVertexTexture ) {
+
+		// layout (1 matrix = 4 pixels)
+		//	RGBA RGBA RGBA RGBA (=> column1, column2, column3, column4)
+		//  with  8x8  pixel texture max   16 bones  (8 * 8  / 4)
+		//  	 16x16 pixel texture max   64 bones (16 * 16 / 4)
+		//  	 32x32 pixel texture max  256 bones (32 * 32 / 4)
+		//  	 64x64 pixel texture max 1024 bones (64 * 64 / 4)
+
+		var size;
+
+		if ( nBones > 256 )
+			size = 64;
+		else if ( nBones > 64 )
+			size = 32;
+		else if ( nBones > 16 )
+			size = 16;
+		else
+			size = 8;
+
+		this.boneTextureWidth = size;
+		this.boneTextureHeight = size;
+
+		this.boneMatrices = new Float32Array( this.boneTextureWidth * this.boneTextureHeight * 4 ); // 4 floats per RGBA pixel
+		this.boneTexture = new THREE.DataTexture( this.boneMatrices, this.boneTextureWidth, this.boneTextureHeight, THREE.RGBAFormat, THREE.FloatType );
+		this.boneTexture.minFilter = THREE.NearestFilter;
+		this.boneTexture.magFilter = THREE.NearestFilter;
+		this.boneTexture.generateMipmaps = false;
+		this.boneTexture.flipY = false;
+
+	} else {
+
+		this.boneMatrices = new Float32Array( 16 * nBones );
+
+	}
+
+	this.boneMatricesNeedUpdate = false;
+
+	this.pose();
+
+};
+
+// START_VEROLD_MOD - bind matrix
+THREE.SkinnedMesh.prototype.updateBoneMatrices = function() {
 
 	var offsetMatrix = new THREE.Matrix4();
+
+	var invMatrixWorld = new THREE.Matrix4().getInverse( this.matrixWorld );
+
+	// make a snapshot of the bones' rest position
+
+	if ( this.boneInverses == undefined ) {
+
+		this.bindMatrix.copy( this.matrixWorld );
+
+		this.boneInverses = [];
+
+		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
+			var inverse = new THREE.Matrix4();
+
+			if ( this.bones[ b ] ) {
+
+				var matrix = this.bones[ b ].matrixWorld;
+
+				inverse.getInverse( matrix );
+
+			}
+
+			this.boneInverses.push( inverse );
+
+		}
+
+	}
+
+	// update the bone matrices
+
+	if ( this.boneMatricesNeedUpdate ) {
+
+		this.initBoneMatrices();
+
+	}
+
+	// flatten bone matrices to array
+
+	for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
+
+		// compute the offset between the current and the original transform;
+
+		// TODO: we could get rid of this multiplication step if the skinMatrix
+		// was already representing the offset; however, this requires some
+		// major changes to the animation system
+
+		var matrix = this.bones[ b ] ? this.bones[ b ].matrixWorld : this.identityMatrix;
+
+		offsetMatrix.multiplyMatrices( invMatrixWorld, matrix );
+		offsetMatrix.multiply( this.boneInverses[ b ] );
+		offsetMatrix.multiply( this.bindMatrix );
+
+		offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
+
+	}
+
+	if ( this.useVertexTexture ) {
+
+		this.boneTexture.needsUpdate = true;
+
+	}
+
+};
+// END_VEROLD_MOD - bind matrix
+
+THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 
 	return function ( force ) {
 
@@ -182,50 +280,6 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 
 		}
 
-		// make a snapshot of the bones' rest position
-
-		if ( this.boneInverses == undefined ) {
-
-			this.boneInverses = [];
-
-			for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
-
-				var inverse = new THREE.Matrix4();
-
-				inverse.getInverse( this.bones[ b ].skinMatrix );
-
-				this.boneInverses.push( inverse );
-
-			}
-
-		}
-
-		// flatten bone matrices to array
-
-		for ( var b = 0, bl = this.bones.length; b < bl; b ++ ) {
-
-			// compute the offset between the current and the original transform;
-
-			// TODO: we could get rid of this multiplication step if the skinMatrix
-			// was already representing the offset; however, this requires some
-			// major changes to the animation system
-
-			// START_VEROLD_MOD - bind matrix
-			offsetMatrix.multiplyMatrices( this.invBindMatrix, this.bones[ b ].skinMatrix );
-			offsetMatrix.multiply( this.boneInverses[ b ] );
-			offsetMatrix.multiply( this.bindMatrix );
-			// END_VEROLD_MOD - bind matrix
-
-			offsetMatrix.flattenToArrayOffset( this.boneMatrices, b * 16 );
-
-		}
-
-		if ( this.useVertexTexture ) {
-
-			this.boneTexture.needsUpdate = true;
-
-		}
-
 	};
 
 }();
@@ -233,6 +287,10 @@ THREE.SkinnedMesh.prototype.updateMatrixWorld = function () {
 THREE.SkinnedMesh.prototype.pose = function () {
 
 	this.updateMatrixWorld( true );
+
+	// START_VEROLD_MOD - bind matrix
+	this.updateBoneMatrices();
+	// END_VEROLD_MOD - bind matrix
 
 	this.normalizeSkinWeights();
 
@@ -272,9 +330,7 @@ THREE.SkinnedMesh.prototype.clone = function ( object ) {
 
 	if ( object === undefined ) {
 
-		// START_VEROLD_MOD - bind matrix
-		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture, this.bindMatrix );
-		// END_VEROLD_MOD - bind matrix
+		object = new THREE.SkinnedMesh( this.geometry, this.material, this.useVertexTexture );
 
 	}
 

@@ -46,8 +46,10 @@ THREE.Animation.prototype.play = function ( loop, startTimeMS ) {
 			if ( object.animationCache === undefined ) {
 
 				object.animationCache = {};
-				object.animationCache.prevKey = { pos: 0, rot: 0, scl: 0 };
-				object.animationCache.nextKey = { pos: 0, rot: 0, scl: 0 };
+				// START_VEROLD_MOD - keyframes
+				object.animationCache.prevKey = { };
+				object.animationCache.nextKey = { };
+				// END_VEROLD_MOD - keyframes
 				object.animationCache.originalMatrix = object instanceof THREE.Bone ? object.skinMatrix : object.matrix;
 
 			}
@@ -55,9 +57,17 @@ THREE.Animation.prototype.play = function ( loop, startTimeMS ) {
 			var prevKey = object.animationCache.prevKey;
 			var nextKey = object.animationCache.nextKey;
 
-			prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.rot = this.data.hierarchy[ h ].keys[ 0 ];
-			prevKey.scl = this.data.hierarchy[ h ].keys[ 0 ];
+			// START_VEROLD_MOD - keyframes
+			if ( this.data.hierarchy[ h ].keys !== undefined && this.data.hierarchy[ h ].keys.length > 0 ) {
+			// END_VEROLD_MOD - keyframes
+
+				prevKey.pos = this.data.hierarchy[ h ].keys[ 0 ];
+				prevKey.rot = this.data.hierarchy[ h ].keys[ 0 ];
+				prevKey.scl = this.data.hierarchy[ h ].keys[ 0 ];
+
+			// START_VEROLD_MOD - keyframes
+			}
+			// END_VEROLD_MOD - keyframes
 
 			nextKey.pos = this.getNextKeyWith( "pos", h, 1 );
 			nextKey.rot = this.getNextKeyWith( "rot", h, 1 );
@@ -146,6 +156,16 @@ THREE.Animation.prototype.update = function ( deltaTimeMS ) {
 			type    = types[ t ];
 			prevKey = animationCache.prevKey[ type ];
 			nextKey = animationCache.nextKey[ type ];
+
+			// START_VEROLD_MOD - keyframes
+			// is there key data?
+
+			if ( !prevKey || !nextKey ) {
+
+				continue;
+
+			}
+			// END_VEROLD_MOD - keyframes
 
 			// switch keys?
 
@@ -329,28 +349,38 @@ THREE.Animation.prototype.getNextKeyWith = function ( type, h, key ) {
 
 	var keys = this.data.hierarchy[ h ].keys;
 
-	if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-		 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+	// START_VEROLD_MOD - keyframes
+	if ( keys !== undefined && keys.length > 0 ) {
+	// END_VEROLD_MOD - keyframes
 
-		key = key < keys.length - 1 ? key : keys.length - 1;
+		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+			 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
-	} else {
+			key = key < keys.length - 1 ? key : keys.length - 1;
 
-		key = key % keys.length;
+		} else {
 
-	}
-
-	for ( ; key < keys.length; key++ ) {
-
-		if ( keys[ key ][ type ] !== undefined ) {
-
-			return keys[ key ];
+			key = key % keys.length;
 
 		}
 
+		for ( ; key < keys.length; key++ ) {
+
+			if ( keys[ key ][ type ] !== undefined ) {
+
+				return keys[ key ];
+
+			}
+
+		}
+
+		return this.data.hierarchy[ h ].keys[ 0 ];
+
+	// START_VEROLD_MOD - keyframes
 	}
 
-	return this.data.hierarchy[ h ].keys[ 0 ];
+	return null;
+	// END_VEROLD_MOD - keyframes
 
 };
 
@@ -360,28 +390,38 @@ THREE.Animation.prototype.getPrevKeyWith = function ( type, h, key ) {
 
 	var keys = this.data.hierarchy[ h ].keys;
 
-	if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
-		 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
+	// START_VEROLD_MOD - keyframes
+	if ( keys !== undefined && keys.length > 0 ) {
+	// END_VEROLD_MOD - keyframes
 
-		key = key > 0 ? key : 0;
+		if ( this.interpolationType === THREE.AnimationHandler.CATMULLROM ||
+			 this.interpolationType === THREE.AnimationHandler.CATMULLROM_FORWARD ) {
 
-	} else {
+			key = key > 0 ? key : 0;
 
-		key = key >= 0 ? key : key + keys.length;
+		} else {
 
-	}
-
-
-	for ( ; key >= 0; key -- ) {
-
-		if ( keys[ key ][ type ] !== undefined ) {
-
-			return keys[ key ];
+			key = key >= 0 ? key : key + keys.length;
 
 		}
 
+
+		for ( ; key >= 0; key -- ) {
+	
+			if ( keys[ key ][ type ] !== undefined ) {
+	
+				return keys[ key ];
+	
+			}
+
+		}
+
+		return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
+
+	// START_VEROLD_MOD - keyframes
 	}
 
-	return this.data.hierarchy[ h ].keys[ keys.length - 1 ];
+	return null;
+	// END_VEROLD_MOD - keyframes
 
 };
