@@ -16110,8 +16110,13 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	_canvasWidth = _canvas.width,
 	_canvasHeight = _canvas.height,
-	_canvasWidthHalf = Math.floor( _canvasWidth / 2 ),
-	_canvasHeightHalf = Math.floor( _canvasHeight / 2 ),
+
+	_viewportX = 0,
+	_viewportY = 0,
+	_viewportWidth = _canvasWidth,
+	_viewportHeight = _canvasHeight,
+	_viewportWidthHalf = Math.floor( _viewportWidth / 2 ),
+	_viewportHeightHalf = Math.floor( _viewportHeight / 2 ),
 	
 	_context = _canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
@@ -16244,9 +16249,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_canvasWidth = width * this.devicePixelRatio;
 		_canvasHeight = height * this.devicePixelRatio;
 
-		_canvasWidthHalf = Math.floor( _canvasWidth / 2 );
-		_canvasHeightHalf = Math.floor( _canvasHeight / 2 );
-
 		_canvas.width = _canvasWidth;
 		_canvas.height = _canvasHeight;
 
@@ -16257,12 +16259,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		}
 
-		_clipBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf ),
-		_clipBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
-
-		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
-
 		_contextGlobalAlpha = 1;
 		_contextGlobalCompositeOperation = 0;
 		_contextStrokeStyle = null;
@@ -16271,15 +16267,40 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_contextLineCap = null;
 		_contextLineJoin = null;
 
+		this.setViewport( 0, 0, width, height );
+
 	};
+
+	this.setViewport = function ( x, y, width, height ) {
+
+		_viewportX = x;
+		_viewportY = y;
+		_viewportWidth = width;
+		_viewportHeight = height;
+
+		_viewportWidthHalf = Math.floor( _viewportWidth / 2 ),
+		_viewportHeightHalf = Math.floor( _viewportHeight / 2 ),
+
+		_clipBox.min.set( - _viewportWidthHalf, - _viewportHeightHalf ),
+		_clipBox.max.set(   _viewportWidthHalf,   _viewportHeightHalf );
+
+		_clearBox.min.set( - _viewportWidthHalf, - _viewportHeightHalf );
+		_clearBox.max.set(   _viewportWidthHalf,   _viewportHeightHalf );
+
+		_context.setTransform( 1, 0, 0, - 1, _viewportX + _viewportWidthHalf, _canvasHeight - ( _viewportY + _viewportHeight ) + _viewportHeightHalf );
+
+	};
+
+	this.setScissor = function () {};
+	this.enableScissorTest = function () {};
 
 	this.setClearColor = function ( color, alpha ) {
 
 		_clearColor.set( color );
 		_clearAlpha = alpha !== undefined ? alpha : 1;
 
-		_clearBox.min.set( - _canvasWidthHalf, - _canvasHeightHalf );
-		_clearBox.max.set(   _canvasWidthHalf,   _canvasHeightHalf );
+		_clearBox.min.set( - _viewportWidthHalf, - _viewportHeightHalf );
+		_clearBox.max.set(   _viewportWidthHalf,   _viewportHeightHalf );
 
 	};
 
@@ -16297,8 +16318,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 	};
 
 	this.clear = function () {
-
-		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
 
 		if ( _clearBox.empty() === false ) {
 
@@ -16355,8 +16374,6 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 		if ( this.autoClear === true ) this.clear();
 
-		_context.setTransform( 1, 0, 0, - 1, _canvasWidthHalf, _canvasHeightHalf );
-
 		_this.info.render.vertices = 0;
 		_this.info.render.faces = 0;
 
@@ -16387,7 +16404,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 			if ( element instanceof THREE.RenderableSprite ) {
 
 				_v1 = element;
-				_v1.x *= _canvasWidthHalf; _v1.y *= _canvasHeightHalf;
+				_v1.x *= _viewportWidthHalf; _v1.y *= _viewportHeightHalf;
 
 				renderSprite( _v1, element, material );
 
@@ -16395,8 +16412,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 				_v1 = element.v1; _v2 = element.v2;
 
-				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
-				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
+				_v1.positionScreen.x *= _viewportWidthHalf; _v1.positionScreen.y *= _viewportHeightHalf;
+				_v2.positionScreen.x *= _viewportWidthHalf; _v2.positionScreen.y *= _viewportHeightHalf;
 
 				_elemBox.setFromPoints( [
 					_v1.positionScreen,
@@ -16417,9 +16434,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 				if ( _v2.positionScreen.z < -1 || _v2.positionScreen.z > 1 ) continue;
 				if ( _v3.positionScreen.z < -1 || _v3.positionScreen.z > 1 ) continue;
 
-				_v1.positionScreen.x *= _canvasWidthHalf; _v1.positionScreen.y *= _canvasHeightHalf;
-				_v2.positionScreen.x *= _canvasWidthHalf; _v2.positionScreen.y *= _canvasHeightHalf;
-				_v3.positionScreen.x *= _canvasWidthHalf; _v3.positionScreen.y *= _canvasHeightHalf;
+				_v1.positionScreen.x *= _viewportWidthHalf; _v1.positionScreen.y *= _viewportHeightHalf;
+				_v2.positionScreen.x *= _viewportWidthHalf; _v2.positionScreen.y *= _viewportHeightHalf;
+				_v3.positionScreen.x *= _viewportWidthHalf; _v3.positionScreen.y *= _viewportHeightHalf;
 
 				if ( material.overdraw > 0 ) {
 
@@ -16459,7 +16476,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 		_context.strokeRect( _clearBox.min.x, _clearBox.min.y, _clearBox.max.x - _clearBox.min.x, _clearBox.max.y - _clearBox.min.y );
 		*/
 
-		_context.setTransform( 1, 0, 0, 1, 0, 0 );
+		// _context.setTransform( 1, 0, 0, 1, 0, 0 );
 
 	};
 
@@ -16545,8 +16562,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 		setOpacity( material.opacity );
 		setBlending( material.blending );
 
-		var scaleX = element.scale.x * _canvasWidthHalf;
-		var scaleY = element.scale.y * _canvasHeightHalf;
+		var scaleX = element.scale.x * _viewportWidthHalf;
+		var scaleY = element.scale.y * _viewportHeightHalf;
 
 		var dist = 0.5 * Math.sqrt( scaleX * scaleX + scaleY * scaleY ); // allow for rotated sprite
 		_elemBox.min.set( v1.x - dist, v1.y - dist );
