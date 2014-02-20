@@ -20,13 +20,8 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	_canvasWidth = _canvas.width,
 	_canvasHeight = _canvas.height,
-	_canvasWidthHalf = Math.floor( _viewportWidth / 2 ),
-	_canvasHeightHalf = Math.floor( _viewportHeight / 2 ),
-
-	_viewportX = 0,
-	_viewportY = 0,
-	_viewportWidth = _canvasWidth,
-	_viewportHeight = _canvasHeight,
+	_canvasWidthHalf = Math.floor( _canvasWidth / 2 ),
+	_canvasHeightHalf = Math.floor( _canvasHeight / 2 ),
 	
 	_context = _canvas.getContext( '2d', {
 		alpha: parameters.alpha === true
@@ -192,14 +187,7 @@ THREE.CanvasRenderer = function ( parameters ) {
 
 	this.setViewport = function ( x, y, width, height ) {
 
-		_viewportX = x;
-		_viewportY = y;
-		_viewportWidth = width;
-		_viewportHeight = height;
-
-		_context.setTransform( 1, 0, 0, 1, 0, 0 );
-		_context.translate( _viewportX, _canvasHeight - _viewportY );
-		_context.scale( _viewportWidth / _canvasWidth, - _viewportHeight / _canvasHeight );
+		_context.setTransform( width / _canvasWidth, 0, 0, - height / _canvasHeight, x, _canvasHeight - y );
 		_context.translate( _canvasWidthHalf, _canvasHeightHalf );
 
 	};
