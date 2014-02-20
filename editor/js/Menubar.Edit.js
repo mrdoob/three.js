@@ -47,6 +47,8 @@ Menubar.Edit = function ( editor ) {
 	} );
 	options.add( option );
 
+	/*
+
 	options.add( new UI.HorizontalRule() );
 
 	// convert to BufferGeometry
@@ -104,7 +106,7 @@ Menubar.Edit = function ( editor ) {
 	} );
 	options.add( option );
 
-
+*/
 	//
 
 	return container;

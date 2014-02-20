@@ -36,6 +36,38 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	// open
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Open' );
+	option.onClick( function () {
+
+	} );
+	options.add( option );
+
+	// Save
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Save' );
+	option.onClick( function () {
+
+	} );
+	options.add( option );
+
+	// Save As...
+
+	var option = new UI.Panel();
+	option.setClass( 'option' );
+	option.setTextContent( 'Save as...' );
+	option.onClick( function () {
+
+	} );
+	options.add( option );
+
+/*
+
 	options.add( new UI.HorizontalRule() );
 
 
@@ -59,7 +91,7 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
-	options.add( new UI.HorizontalRule() );
+	//options.add( new UI.HorizontalRule() );
 
 
 	// export geometry
@@ -205,6 +237,7 @@ Menubar.File = function ( editor ) {
 		window.focus();
 
 	};
+	*/
 
 	return container;
 
