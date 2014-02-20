@@ -1,10 +1,5 @@
 Menubar.Help = function ( editor ) {
 
-	var menuConfig,
-		createOption,
-		createDivider,
-		optionsPanel;
-
 	// event handlers
 
 	function onSourcecodeOptionClick () {
@@ -21,15 +16,15 @@ Menubar.Help = function ( editor ) {
 
 	// configure menu contents
 
-	createOption  = UI.MenubarHelper.createOption;
-	createDivider = UI.MenubarHelper.createDivider;
+	var createOption = UI.MenubarHelper.createOption;
+	var createDivider = UI.MenubarHelper.createDivider;
 
-	menuConfig    = [
+	var menuConfig = [
 		createOption( 'Source code', onSourcecodeOptionClick ),
 		createOption( 'About', onAboutOptionClick )
 	];
 
-	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
 	return UI.MenubarHelper.createMenuContainer( 'Help', optionsPanel );
 }

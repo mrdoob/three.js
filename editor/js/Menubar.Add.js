@@ -1,10 +1,5 @@
 Menubar.Add = function ( editor ) {
 
-	var menuConfig,
-		optionsPanel,
-		createOption,
-		createDivider;
-
 	var meshCount = 0;
 	var lightCount = 0;
 
@@ -243,10 +238,10 @@ Menubar.Add = function ( editor ) {
 
 	// configure menu contents
 
-	createOption  = UI.MenubarHelper.createOption;
-	createDivider = UI.MenubarHelper.createDivider;
+	var createOption = UI.MenubarHelper.createOption;
+	var createDivider = UI.MenubarHelper.createDivider;
 
-	menuConfig    = [
+	var menuConfig = [
 		createOption( 'Object3D', onObject3DOptionClick ),
 		createDivider(),
 
@@ -270,7 +265,8 @@ Menubar.Add = function ( editor ) {
 		createOption( 'Ambient light', onAmbientLightOptionClick )
 	];
 
-	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
 	return UI.MenubarHelper.createMenuContainer( 'Add', optionsPanel );
+
 }
