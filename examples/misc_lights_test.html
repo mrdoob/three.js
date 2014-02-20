@@ -91,7 +91,7 @@
 				// Spheres
 
 				var geometry = new THREE.SphereGeometry( 100, 16, 8 );
-				materialSpheres = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: true } );
+				materialSpheres = new THREE.MeshLambertMaterial( { color: 0xffffff, shading: THREE.FlatShading, overdraw: 0.5 } );
 
 				for ( var i = 0; i < 30; i ++ ) {
 
@@ -106,7 +106,7 @@
 
 				// Torus
 
-				materialTorus = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: true } );
+				materialTorus = new THREE.MeshLambertMaterial( { color: 0xffffff, overdraw: 0.5 } );
 				mesh = new THREE.Mesh( new THREE.TorusGeometry( 100, 25, 15, 30 ), materialTorus );
 				scene.add( mesh );
 
