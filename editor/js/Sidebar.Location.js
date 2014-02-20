@@ -10,11 +10,9 @@ Sidebar.Location = function ( editor ) {
 	// location input
 
 	var locationInputRow = new UI.Panel();
-	var locationInput = new UI.Input().setColor( '#444' ).setFontSize( '12px' ).onChange( function () {
+	var locationInput = new UI.Input().setWidth( '230px' ).setColor( '#444' ).setFontSize( '12px' );
+	var autocomplete = new google.maps.places.Autocomplete( locationInput.dom );
 
-			//editor.setObjectName( editor.selected, objectName.getValue() );
-
-	} );
 	var goButton = new UI.Button( 'Go' ).onClick( function() {
 
 	} );
