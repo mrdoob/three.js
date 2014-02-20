@@ -113,7 +113,7 @@
 			function loadTexture( path ) {
 
 				var texture = new THREE.Texture( texture_placeholder );
-				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: true } );
+				var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
 
 				var image = new Image();
 				image.onload = function () {
