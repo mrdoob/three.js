@@ -1,12 +1,5 @@
 Menubar.File = function ( editor ) {
 
-	var menuConfig,
-		optionsPanel,
-		createOption,
-		createDivider,
-		fileInput;
-
-
 	// helpers
 	
 	function exportGeometry ( exporterClass ) {
@@ -160,16 +153,16 @@ Menubar.File = function ( editor ) {
 
 	// create file input element for scene import
 
-	fileInput = document.createElement( 'input' );
+	var fileInput = document.createElement( 'input' );
 	fileInput.type = 'file';
 	fileInput.addEventListener( 'change', onFileInputChange);
 
 	// configure menu contents
 
-	createOption  = UI.MenubarHelper.createOption;
-	createDivider = UI.MenubarHelper.createDivider;
+	var createOption = UI.MenubarHelper.createOption;
+	var createDivider = UI.MenubarHelper.createDivider;
 	
-	menuConfig    = [
+	var menuConfig = [
 		createOption( 'New', onNewOptionClick ),
 		createDivider(),
 
@@ -182,7 +175,7 @@ Menubar.File = function ( editor ) {
 		createOption( 'Export OBJ', onExportOBJOptionClick )
 	];
 
-	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
 	return UI.MenubarHelper.createMenuContainer( 'File', optionsPanel );
 

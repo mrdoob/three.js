@@ -1,10 +1,5 @@
 Menubar.Edit = function ( editor ) {
 
-	var menuConfig,
-		optionsPanel,
-		createOption,
-		createDivider;
-
 	// event handlers
 
 	// function onUndoOptionClick () {
@@ -84,10 +79,10 @@ Menubar.Edit = function ( editor ) {
 
 	// configure menu contents
 
-	createOption  = UI.MenubarHelper.createOption;
-	createDivider = UI.MenubarHelper.createDivider;
+	var createOption = UI.MenubarHelper.createOption;
+	var createDivider = UI.MenubarHelper.createDivider;
 
-	menuConfig    = [
+	var menuConfig = [
 		// createOption( 'Undo', onUndoOptionClick ),
 		// createOption( 'Redo', onRedoOptionClick ),
 		// createDivider(),
@@ -100,7 +95,7 @@ Menubar.Edit = function ( editor ) {
 		createOption( 'Flatten', onFlattenOptionClick )
 	];
 
-	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+	var optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
 	return UI.MenubarHelper.createMenuContainer( 'Edit', optionsPanel );
 }
