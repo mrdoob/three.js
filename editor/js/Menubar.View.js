@@ -1,5 +1,5 @@
 Menubar.View = function ( editor ) {
-	
+
 	var menuConfig,
 		optionsPanel,
 		createOption,
@@ -32,6 +32,6 @@ Menubar.View = function ( editor ) {
 
 	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
 
-	return UI.MenubarHelper.createMenuContainer( 'Help', optionsPanel );
+	return UI.MenubarHelper.createMenuContainer( 'View', optionsPanel );
 
 }
