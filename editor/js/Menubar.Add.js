@@ -1,3 +1,8 @@
+/**
+ * @author mrdoob / http://mrdoob.com/
+ * @author Dennis Wilson / http://www.abakia.de/
+ */
+
 Menubar.Add = function ( editor ) {
 
 	var meshCount = 0;
@@ -10,8 +15,9 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Object3D();
 		mesh.name = 'Object3D ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
+		editor.addAndSelectObject( mesh );
+		// editor.addObject( mesh );
+		// editor.select( mesh );
 
 	}
 
@@ -28,10 +34,8 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, material );
 		mesh.name = 'Plane ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
-	};
+		editor.addAndSelectObject( mesh );
+	}
 
 	function onBoxOptionClick () {
 
@@ -47,9 +51,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Box ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
+		editor.addAndSelectObject( mesh );
 	}
 	
 	function onCircleOptionClick () {
@@ -61,9 +63,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Circle ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
+		editor.addAndSelectObject( mesh );
 	}
 
 	function onCylinderOptionClick () {
@@ -79,9 +79,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Cylinder ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
+		editor.addAndSelectObject( mesh );
 	}
 
 	function onSphereOptionClick () {
@@ -94,9 +92,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Sphere ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
+		editor.addAndSelectObject( mesh );
 	}
 
 	function onIcosahedronOptionClick () {
@@ -108,9 +104,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Icosahedron ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
+		editor.addAndSelectObject( mesh );
 	}
 
 	function onTorusOptionClick () {
@@ -125,9 +119,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'Torus ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
+		editor.addAndSelectObject( mesh );
 	}
 
  	function onTorusKnotOptionClick () {
@@ -144,9 +136,7 @@ Menubar.Add = function ( editor ) {
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		mesh.name = 'TorusKnot ' + ( ++ meshCount );
 
-		editor.addObject( mesh );
-		editor.select( mesh );
-
+		editor.addAndSelectObject( mesh );
 	}
 
 	function onSpriteOptionClick () {
@@ -154,9 +144,7 @@ Menubar.Add = function ( editor ) {
 		var sprite = new THREE.Sprite( new THREE.SpriteMaterial() );
 		sprite.name = 'Sprite ' + ( ++ meshCount );
 
-		editor.addObject( sprite );
-		editor.select( sprite );
-
+		editor.addAndSelectObject( mesh );
 	}
 
 	function onPointLightOptionClick () {
@@ -168,9 +156,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.PointLight( color, intensity, distance );
 		light.name = 'PointLight ' + ( ++ lightCount );
 
-		editor.addObject( light );
-		editor.select( light );
-
+		editor.addAndSelectObject( light );
 	}
 
 	function onSpotLightOptionClick () {
@@ -187,9 +173,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 0, 1, 0 ).multiplyScalar( 200 );
 
-		editor.addObject( light );
-		editor.select( light );
-
+		editor.addAndSelectObject( light );
 	}
 
 	function onDirectionalLightOptionClick () {
@@ -203,9 +187,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-		editor.addObject( light );
-		editor.select( light );
-
+		editor.addAndSelectObject( light );
 	}
 
 	function onHemisphereLightOptionClick () {
@@ -219,9 +201,7 @@ Menubar.Add = function ( editor ) {
 
 		light.position.set( 1, 1, 1 ).multiplyScalar( 200 );
 
-		editor.addObject( light );
-		editor.select( light );
-
+		editor.addAndSelectObject( light );
 	}
 
 	function onAmbientLightOptionClick() {
@@ -231,9 +211,7 @@ Menubar.Add = function ( editor ) {
 		var light = new THREE.AmbientLight( color );
 		light.name = 'AmbientLight ' + ( ++ lightCount );
 
-		editor.addObject( light );
-		editor.select( light );
-
+		editor.addAndSelectObject( light );
 	}
 
 	// configure menu contents

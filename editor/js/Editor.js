@@ -52,6 +52,8 @@ var Editor = function () {
 	this.selected = null;
 	this.helpers = {};
 
+	this.history = new Editor.ChangeHistory(this);
+	window.hist = this.history;
 };
 
 Editor.prototype = {
@@ -64,33 +66,36 @@ Editor.prototype = {
 
 	},
 
-	setScene: function ( scene ) {
+	setScene: function ( scene, silent ) {
 
-		this.scene.name = scene.name;
-		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
+		// this.scene.name = scene.name;
+		// this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
 
-		// avoid render per object
+		// // avoid render per object
 
-		this.signals.sceneGraphChanged.active = false;
+		// this.signals.sceneGraphChanged.active = false;
 
-		while ( scene.children.length > 0 ) {
+		// while ( scene.children.length > 0 ) {
 
-			this.addObject( scene.children[ 0 ] );
+		// 	this.addObject( scene.children[ 0 ] );
 
+		// }
+		
+		this.scene = scene;
+
+		if(silent === false) {
+			this.signals.sceneGraphChanged.active = true;
+			this.signals.sceneGraphChanged.dispatch();
 		}
-
-		this.signals.sceneGraphChanged.active = true;
-		this.signals.sceneGraphChanged.dispatch();
-
 	},
 
 	//
 
 	addObject: function ( object ) {
+		var scope       = this,
+			addedObject = object;
 
-		var scope = this;
-
-		object.traverse( function ( child ) {
+		addedObject.traverse( function ( child ) {
 
 			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
 			if ( child.material !== undefined ) scope.addMaterial( child.material );
@@ -99,11 +104,29 @@ Editor.prototype = {
 
 		} );
 
-		this.scene.add( object );
+		scope.scene.add( addedObject );
 
-		this.signals.objectAdded.dispatch( object );
-		this.signals.sceneGraphChanged.dispatch();
+		scope.signals.objectAdded.dispatch( addedObject );
+		scope.signals.sceneGraphChanged.dispatch();
+	},
 
+	addAndSelectObject: function( object ) {
+		var transaction;
+
+		// use scope isolation to make a 'frozen' transaction,
+		// that can be applied any time again, without
+		// the need to know detailed parameters
+
+		transaction = (function (scope, addedObject) {
+
+			return function addAndSelectObject() {
+				scope.addObject(addedObject);
+				scope.select(addedObject);
+			};
+
+		})(this, object);
+
+		this.history.addAndApplyChange(transaction);
 	},
 
 	setObjectName: function ( object, name ) {
@@ -256,15 +279,15 @@ Editor.prototype = {
 
 		this.selected = object;
 
-		if ( object !== null ) {
+		// if ( object !== null ) {
 
-			this.config.setKey( 'selected', object.uuid );
+		// 	this.config.setKey( 'selected', object.uuid );
 
-		} else {
+		// } else {
 
-			this.config.setKey( 'selected', null );
+		// 	this.config.setKey( 'selected', null );
 
-		}
+		// }
 
 		this.signals.objectSelected.dispatch( object );
 

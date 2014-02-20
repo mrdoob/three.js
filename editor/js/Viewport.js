@@ -237,6 +237,9 @@ var Viewport = function ( editor ) {
 
 	signals.sceneGraphChanged.add( function () {
 
+		scene        = editor.scene;
+		sceneHelpers = editor.sceneHelpers;
+
 		render();
 		updateInfo();
 
