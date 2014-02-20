@@ -101,10 +101,10 @@ THREE.Animation.prototype.reset = function () {
 
 THREE.Animation.prototype.update = (function(){
 
-    var points = [];
-    var target = new THREE.Vector3();
-    
-    // Catmull-Rom spline
+	var points = [];
+	var target = new THREE.Vector3();
+	
+	// Catmull-Rom spline
 
 	var interpolateCatmullRom = function ( points, scale ) {
 
@@ -145,9 +145,9 @@ THREE.Animation.prototype.update = (function(){
 		return ( 2 * ( p1 - p2 ) + v0 + v1 ) * t3 + ( - 3 * ( p1 - p2 ) - 2 * v0 - v1 ) * t2 + v0 * t + p1;
 	
 	};
-    
-    return function ( delta ) {
-	    if ( this.isPlaying === false ) return;
+	
+	return function ( delta ) {
+		if ( this.isPlaying === false ) return;
 	
 		this.currentTime += delta * this.timeScale;
 	

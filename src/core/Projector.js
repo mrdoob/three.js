@@ -375,20 +375,6 @@ THREE.Projector = function () {
 
 					}
 
-				} else if ( geometry instanceof THREE.Geometry2 ) {
-
-					vertices = geometry.vertices;
-
-					for ( var i = 0, j = 0, l = vertices.length; i < l; i += 9, j += 3 ) {
-
-						renderList.pushVertex( vertices[ i + 0 ], vertices[ i + 1 ], vertices[ i + 2 ] );
-						renderList.pushVertex( vertices[ i + 3 ], vertices[ i + 4 ], vertices[ i + 5 ] );
-						renderList.pushVertex( vertices[ i + 6 ], vertices[ i + 7 ], vertices[ i + 8 ] );
-
-						renderList.pushTriangle( j + 0, j + 1, j + 2 );
-
-					}
-
 				} else if ( geometry instanceof THREE.Geometry ) {
 
 					vertices = geometry.vertices;

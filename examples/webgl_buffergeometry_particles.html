@@ -69,11 +69,11 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'position', Float32Array, particles, 3 );
-				geometry.addAttribute( 'color', Float32Array, particles, 3 );
+				geometry.addAttribute( 'position', new Float32Array( particles * 3 ), 3 );
+				geometry.addAttribute( 'color', new Float32Array( particles * 3 ), 3 );
 
-				var positions = geometry.attributes.position.array;
-				var colors = geometry.attributes.color.array;
+				var positions = geometry.getAttribute( 'position' ).array;
+				var colors = geometry.getAttribute( 'color' ).array;
 
 				var color = new THREE.Color();
 

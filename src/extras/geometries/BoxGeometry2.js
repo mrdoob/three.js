@@ -5,8 +5,6 @@
 
 THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
-	THREE.Geometry2.call( this );
-
 	var scope = this;
 
 	this.width = width;
@@ -24,7 +22,7 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 	var vector = new THREE.Vector3();
 
 	var vectors = [];
-	var vertices = this.vertices;
+	var vertices = [];
 
 	var addVertex = function ( a, b, c ) {
 
@@ -106,7 +104,9 @@ THREE.BoxGeometry2 = function ( width, height, depth, widthSegments, heightSegme
 
 	}
 
-	this.vertices = new Float32Array( vertices );
+	THREE.Geometry2.call( this, vertices.length / 3 );
+
+	this.vertices.set( vertices );
 
 };
 

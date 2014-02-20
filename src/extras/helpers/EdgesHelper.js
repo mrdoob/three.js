@@ -48,7 +48,7 @@ THREE.EdgesHelper = function ( object, hex ) {
 
 	}
 
-	geometry.addAttribute( 'position', Float32Array, 2 * numEdges, 3 );
+	geometry.addAttribute( 'position', new Float32Array( numEdges * 2 * 3 ), 3 );
 
 	var coords = geometry.attributes.position.array;
 

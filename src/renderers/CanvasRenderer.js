@@ -23,7 +23,9 @@ THREE.CanvasRenderer = function ( parameters ) {
 	_canvasWidthHalf = Math.floor( _canvasWidth / 2 ),
 	_canvasHeightHalf = Math.floor( _canvasHeight / 2 ),
 	
-	_context = _canvas.getContext( '2d' ),
+	_context = _canvas.getContext( '2d', {
+		alpha: parameters.alpha === true
+	} ),
 
 	_clearColor = new THREE.Color( 0x000000 ),
 	_clearAlpha = 0,

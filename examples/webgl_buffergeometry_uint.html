@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - interactive - buffergeometry</title>
+		<title>three.js webgl - buffergeometry - uint</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - interactive - buffergeometry</div>
+		<div id="info"><a href="http://threejs.org" target="_blank">three.js</a> webgl - buffergeometry - uint</div>
 
 		<script src="../build/three.min.js"></script>
 
@@ -47,9 +47,7 @@
 
 			var camera, scene, renderer;
 
-			var projector, raycaster, mouse, points = [];
-
-			var mesh, line;
+			var mesh;
 
 			init();
 			animate();
@@ -80,13 +78,22 @@
 
 				//
 
-				var triangles = 5000;
+				var triangles = 160000;
 
 				var geometry = new THREE.BufferGeometry();
 
+				geometry.addAttribute( 'index', new Uint32Array( triangles * 3 ), 1 );
 				geometry.addAttribute( 'position', new Float32Array( triangles * 3 * 3 ), 3 );
 				geometry.addAttribute( 'normal', new Float32Array( triangles * 3 * 3 ), 3 );
 				geometry.addAttribute( 'color', new Float32Array( triangles * 3 * 3 ), 3 );
+
+				var indices = geometry.getAttribute( 'index' ).array;
+
+				for ( var i = 0; i < indices.length; i ++ ) {
+
+					indices[ i ] = i;
+
+				}
 
 				var positions = geometry.getAttribute( 'position' ).array;
 				var normals = geometry.getAttribute( 'normal' ).array;
@@ -95,7 +102,7 @@
 				var color = new THREE.Color();
 
 				var n = 800, n2 = n/2;	// triangles spread in the cube
-				var d = 120, d2 = d/2;	// individual triangle size
+				var d = 12, d2 = d/2;	// individual triangle size
 
 				var pA = new THREE.Vector3();
 				var pB = new THREE.Vector3();
@@ -198,24 +205,12 @@
 
 				//
 
-				projector = new THREE.Projector();
-				raycaster = new THREE.Raycaster();
-
-				mouse = new THREE.Vector2();
-
-				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', Float32Array, 4, 3 );
-
-				var material = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 2, transparent: true } );
-
-				line = new THREE.Line( geometry, material );
-				scene.add( line );
-
-				//
-
 				renderer = new THREE.WebGLRenderer( { antialias: false } );
 				renderer.setClearColor( scene.fog.color, 1 );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
 
 				container.appendChild( renderer.domElement );
 
@@ -229,7 +224,6 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			}
 
@@ -239,15 +233,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				event.preventDefault();
-
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 			}
 
@@ -266,44 +251,8 @@
 
 				var time = Date.now() * 0.001;
 
-				mesh.rotation.x = time * 0.15;
-				mesh.rotation.y = time * 0.25;
-
-				var vector = new THREE.Vector3( mouse.x, mouse.y, 1 );
-				projector.unprojectVector( vector, camera );
-
-				raycaster.set( camera.position, vector.sub( camera.position ).normalize() );
-
-				var intersects = raycaster.intersectObject( mesh );
-
-				if ( intersects.length > 0 ) {
-
-					var intersect = intersects[ 0 ];
-
-					var object = intersect.object;
-					var positions = object.geometry.attributes.position.array;
-
-					for ( var i = 0, j = 0; i < 4; i ++, j += 3 ) {
-
-						var index = intersect.indices[ i % 3 ] * 3;
-
-						line.geometry.attributes.position.array[ j     ] = positions[ index     ];
-						line.geometry.attributes.position.array[ j + 1 ] = positions[ index + 1 ];
-						line.geometry.attributes.position.array[ j + 2 ] = positions[ index + 2 ];
-
-					}
-
-					mesh.updateMatrix();
-					
-					line.geometry.applyMatrix( mesh.matrix );
-
-					line.visible = true;
-
-				} else {
-
-					line.visible = false;
-
-				}
+				mesh.rotation.x = time * 0.25;
+				mesh.rotation.y = time * 0.5;
 
 				renderer.render( scene, camera );
 

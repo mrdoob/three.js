@@ -374,7 +374,7 @@ def rgb2int(rgb):
 # #####################################################
 
 def write_file(fname, content):
-    out = open(fname, "w")
+    out = open(fname, "w", encoding="utf-8")
     out.write(content)
     out.close()
 
@@ -2161,7 +2161,7 @@ def generate_cameras(data):
         else:
 
             for cameraobj in cams:
-                camera = bpy.data.cameras[cameraobj.name]
+                camera = bpy.data.cameras[cameraobj.data.name]
 
                 # TODO:
                 #   Support more than perspective camera
@@ -2170,7 +2170,7 @@ def generate_cameras(data):
                 if camera.id_data.type == "PERSP":
 
                     camera_string = TEMPLATE_CAMERA_PERSPECTIVE % {
-                    "camera_id" : generate_string(camera.name),
+                    "camera_id" : generate_string(cameraobj.name),
                     "fov"       : (camera.angle / 3.14) * 180.0,
                     "aspect"    : 1.333,
                     "near"      : camera.clip_start,
@@ -2457,7 +2457,7 @@ def save(operator, context, filepath = "",
                 # otherwise can share geometry
 
                 #else:
-                name = object.data.name
+                name = object.name
 
                 if name not in geo_set:
 

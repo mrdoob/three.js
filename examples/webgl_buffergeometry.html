@@ -82,10 +82,10 @@
 
 				var geometry = new THREE.BufferGeometry();
 
-				geometry.addAttribute( 'index', Uint16Array, triangles * 3, 1 );
-				geometry.addAttribute( 'position', Float32Array, triangles * 3, 3 );
-				geometry.addAttribute( 'normal', Float32Array, triangles * 3, 3 );
-				geometry.addAttribute( 'color', Float32Array, triangles * 3, 3 );
+				geometry.addAttribute( 'index', new Uint16Array( triangles * 3 ), 1 );
+				geometry.addAttribute( 'position', new Float32Array( triangles * 3 * 3 ), 3 );
+				geometry.addAttribute( 'normal', new Float32Array( triangles * 3 * 3 ), 3 );
+				geometry.addAttribute( 'color', new Float32Array( triangles * 3 * 3 ), 3 );
 
 				// break geometry into
 				// chunks of 21,845 triangles (3 unique vertices per triangle)
@@ -94,7 +94,7 @@
 
 				var chunkSize = 21845;
 
-				var indices = geometry.attributes.index.array;
+				var indices = geometry.getAttribute( 'index' ).array;
 
 				for ( var i = 0; i < indices.length; i ++ ) {
 
@@ -102,9 +102,9 @@
 
 				}
 
-				var positions = geometry.attributes.position.array;
-				var normals = geometry.attributes.normal.array;
-				var colors = geometry.attributes.color.array;
+				var positions = geometry.getAttribute( 'position' ).array;
+				var normals = geometry.getAttribute( 'normal' ).array;
+				var colors = geometry.getAttribute( 'color' ).array;
 
 				var color = new THREE.Color();
 
@@ -199,8 +199,6 @@
 					colors[ i + 8 ] = color.b;
 
 				}
-
-				geometry.offsets = [];
 
 				var offsets = triangles / chunkSize;
 

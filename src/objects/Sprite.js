@@ -5,8 +5,8 @@
 
 THREE.Sprite = ( function () {
 
-	var geometry = new THREE.Geometry2( 3 );
-	geometry.vertices.set( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] );
+	var geometry = new THREE.BufferGeometry();
+	geometry.addAttribute( 'position', new Float32Array( [ - 0.5, - 0.5, 0, 0.5, - 0.5, 0, 0.5, 0.5, 0 ] ), 3 );
 
 	return function ( material ) {
 

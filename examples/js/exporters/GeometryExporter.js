@@ -41,7 +41,7 @@ THREE.GeometryExporter.prototype = {
 
 			var hasMaterial = false; // face.materialIndex !== undefined;
 			var hasFaceUv = false; // deprecated
-			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ].length > 0;
+			var hasFaceVertexUv = geometry.faceVertexUvs[ 0 ][ i ] !== undefined;
 			var hasFaceNormal = face.normal.length() > 0;
 			var hasFaceVertexNormal = face.vertexNormals.length > 0;
 			var hasFaceColor = face.color.r !== 1 || face.color.g !== 1 || face.color.b !== 1;

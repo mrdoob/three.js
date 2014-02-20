@@ -1,26 +1,25 @@
 Menubar.Edit = function ( editor ) {
 
-	var container = new UI.Panel();
-	container.setClass( 'menu' );
+	var menuConfig,
+		optionsPanel,
+		createOption,
+		createDivider;
 
-	var title = new UI.Panel();
-	title.setTextContent( 'Edit' );
-	title.setMargin( '0px' );
-	title.setPadding( '8px' );
-	container.add( title );
+	// event handlers
 
-	//
+	// function onUndoOptionClick () {
 
-	var options = new UI.Panel();
-	options.setClass( 'options' );
-	container.add( options );
+	// 	console.log( 'UNDO not implemented yet' );
 
-	// clone
+	// }
 
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Clone' );
-	option.onClick( function () {
+	// function onRedoOptionClick () {
+
+	// 	console.log( 'REDO not implemented yet' );
+
+	// }
+
+	function onCloneOptionClick () {
 
 		var object = editor.selected;
 
@@ -31,33 +30,20 @@ Menubar.Edit = function ( editor ) {
 		editor.addObject( object );
 		editor.select( object );
 
-	} );
-	options.add( option );
+	}
 
-	// delete
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Delete' );
-	option.onClick( function () {
+	function onDeleteOptionClick () {
 
 		editor.removeObject( editor.selected );
 		editor.deselect();
 
-	} );
-	options.add( option );
+	}
 
-	options.add( new UI.HorizontalRule() );
+	function onConvertOptionClick () {
 
-	// convert to BufferGeometry
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Convert' );
-	option.onClick( function () {
-
+		// convert to BufferGeometry
+		
 		var object = editor.selected;
-
 		if ( object.geometry instanceof THREE.Geometry ) {
 
 			if ( object.parent === undefined ) return; // avoid flattening the camera or scene
@@ -69,18 +55,11 @@ Menubar.Edit = function ( editor ) {
 			object.geometry = THREE.BufferGeometryUtils.fromGeometry( object.geometry );
 
 			editor.signals.objectChanged.dispatch( object );
-
 		}
 
-	} );
-	options.add( option );
+	}
 
-	// flatten
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Flatten' );
-	option.onClick( function () {
+	function onFlattenOptionClick () {
 
 		var object = editor.selected;
 
@@ -101,12 +80,27 @@ Menubar.Edit = function ( editor ) {
 
 		editor.signals.objectChanged.dispatch( object );
 
-	} );
-	options.add( option );
+	}
 
+	// configure menu contents
 
-	//
+	createOption  = UI.MenubarHelper.createOption;
+	createDivider = UI.MenubarHelper.createDivider;
 
-	return container;
+	menuConfig    = [
+		// createOption( 'Undo', onUndoOptionClick ),
+		// createOption( 'Redo', onRedoOptionClick ),
+		// createDivider(),
 
+		createOption( 'Clone', onCloneOptionClick ),
+		createOption( 'Delete', onDeleteOptionClick ),
+		createDivider(),
+
+		createOption( 'Convert', onConvertOptionClick ),
+		createOption( 'Flatten', onFlattenOptionClick )
+	];
+
+	optionsPanel = UI.MenubarHelper.createOptionsPanel( menuConfig );
+
+	return UI.MenubarHelper.createMenuContainer( 'Edit', optionsPanel );
 }
