@@ -3,15 +3,26 @@ Sidebar.Location = function ( editor ) {
 	var signals = editor.signals;
 
 	var container = new UI.Panel();
-
-
-    var veglist = new UI.FancySelect().setId( 'veglist' ).onChange( function () {
-
-    } );
-
 	var locationInputRow = new UI.Panel();
 	var locationInput = new UI.Input().setWidth( '200px' ).setColor( '#444' ).setFontSize( '12px' );
 	var autocomplete = new google.maps.places.Autocomplete( locationInput.dom );
+
+    var veginfoPanel = new UI.Panel();
+    var veglist = new UI.FancySelect().setId( 'veglist' ).onChange( function () {
+        var input = document.createElement( 'input' );
+        input.type = 'file';
+        input.addEventListener( 'change', function ( event ) {
+            editor.loader.loadFile( input.files[ 0 ] );
+        } );
+        //signals.vegChanged.dispatch( veglist.getValue() );
+        var vegAddButton = new UI.Button( 'Add' ).onClick( function() {
+            input.click();
+        } );
+        veginfoPanel.clear();
+        veginfoPanel.add( new UI.Text( veglist.options[veglist.getValue()].innerHTML ) );
+        veginfoPanel.add( new UI.Break() );
+        veginfoPanel.add( vegAddButton );
+    } );
 
 	var goButton = new UI.Button( 'Go' ).onClick( function() {
 		var geocoder = new google.maps.Geocoder();
@@ -67,6 +78,8 @@ Sidebar.Location = function ( editor ) {
     container.add( new UI.Text( 'VEGETATION' ) );
     container.add( new UI.Break(), new UI.Break() );
     container.add( veglist );
+    container.add( new UI.Break(), new UI.Break() );
+    container.add( veginfoPanel );
 
 	return container;
 }
