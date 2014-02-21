@@ -12,6 +12,7 @@ Sidebar.Location = function ( editor ) {
         var input = document.createElement( 'input' );
         input.type = 'file';
         input.addEventListener( 'change', function ( event ) {
+            console.log( input.files[0] );
             editor.loader.loadFile( input.files[ 0 ] );
         } );
         //signals.vegChanged.dispatch( veglist.getValue() );

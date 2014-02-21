@@ -78,6 +78,10 @@
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 
+		<!-- Panorama stuff -->
+		<script src="js/GSVPano.min.js"></script>
+		<script src="js/Rhessys.js"></script>
+
 		<script>
 
 			window.URL = window.URL || window.webkitURL;
@@ -110,7 +114,20 @@
 						var loader = new THREE.ObjectLoader();
 						var scene = loader.parse( state );
 
+						var pano = scene.getObjectByName( "panorama", false );
+						scene.remove( pano );
+
+						loadPanorama();
+
 						editor.setScene( scene );
+
+					} else {
+
+						setFloorHeight( 100 );
+						createLightAtPos( 50, 150, 300 );
+						createTreeAtPos( 50, 0, 300 );
+						createGround();
+						loadPanorama();
 
 					}
 
